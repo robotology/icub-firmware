@@ -51,6 +51,14 @@ void SetBoardCanFilter()
 	CAN1SetFilter(2, CAN_FILTER_SID( (CAN_MSG_CLASS_LOADER|0x0F) )  // 0x70F
     & CAN_RX_EID_DIS, CAN_FILTER_EID(0));
 	
+	CAN1SetFilter(3, CAN_FILTER_SID( (CAN_MSG_CLASS_LOADER|0x0F) )  // 0x70F
+    & CAN_RX_EID_DIS, CAN_FILTER_EID(0));
+    
+    CAN1SetFilter(4, CAN_FILTER_SID( (CAN_MSG_CLASS_LOADER|0x0F) )  // 0x70F
+    & CAN_RX_EID_DIS, CAN_FILTER_EID(0));
+	
+	CAN1SetFilter(5, CAN_FILTER_SID( (CAN_MSG_CLASS_LOADER|0x0F) )  // 0x70F
+    & CAN_RX_EID_DIS, CAN_FILTER_EID(0));
 	// set acceptance mask
 	// answer commands from any source //0x70F
 	CAN1SetMask(0, CAN_MASK_SID(0x70F) & CAN_MATCH_FILTER_TYPE, CAN_MASK_EID(0));
@@ -803,7 +811,7 @@ void ParseCommand() //, unsigned int SID)
 		default:
 		{
 			// UNKNOWN COMMAND FOR THIS CLASS
-			SendCanProblem();
+		//	SendCanProblem();
 		}
 		break;
 		}
