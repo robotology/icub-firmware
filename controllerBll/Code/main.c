@@ -110,12 +110,11 @@ void main(void)
 	byte tailPos=0; //tail is (head+1)%winSize
 	byte headVel=0; //current pos/vel
 	byte tailVel=0; //tail is (head+1)%winSize
-	byte winSizePos=35;
-	byte winSizeVel=55;
-	//Int32 windSizePos=35;
-	//Int32 windSizeVel=50;
-	Int32 positionWindow[35][JN]; //max window size: 254
-	Int32 velocityWindow[55][JN]; //max window size: 254
+	const byte winShift=5; 
+	byte winSizePos=1<<winShift; //size of the position window 
+	byte winSizeVel=1<<winShift; //size of the position window 
+	Int32 positionWindow[1<<winShift][JN]; //max window size: 254
+	Int32 velocityWindow[1<<winShift][JN]; //max window size: 254
   	Int16 _safeband[JN];	//it is a value for reducing the JOINT limit of 2*_safeband [tick encoder]
 #ifdef TEMPERATURE_SENSOR
 	byte   TempSensCount1 = 0;
@@ -279,7 +278,7 @@ void main(void)
 	{
 		for(j=0;j<winSizePos;j++)
 		{
-			positionWindow[j][i]=0;	
+			positionWindow[j][i]=_position[i];	
 		}
 		for(j=0;j<winSizeVel;j++)
 		{
@@ -415,16 +414,15 @@ void main(void)
 		//tail= (tail+1)%winSize;
 		tailPos=headPos+1; if(tailPos==winSizePos) tailPos=0;
 		tailVel=headVel+1; if(tailVel==winSizeVel) tailVel=0;
-		
 		/* store the new position in the circular buffer */
 		for (i=0; i<JN; i++) positionWindow[headPos][i]=_position[i];
 				
 		/* compute speed and acceleration, and store the speed in the circular buffer */		
 		for (i=0; i<JN; i++)
 		{
-			velocityWindow[headVel][i]= (positionWindow[headPos][i] - positionWindow[tailPos][i] );/* /(windSize)*/
+			velocityWindow[headVel][i]= ((positionWindow[headPos][i] - positionWindow[tailPos][i] ))>>winShift;
 			_speed[i]= (Int16)(velocityWindow[headVel][i]);
-			_accel[i]= (Int16)((velocityWindow[headVel][i] - velocityWindow[tailVel][i]));
+			_accel[i]= (Int16)((velocityWindow[headVel][i] - velocityWindow[tailVel][i]))>>winShift;
 		}
 
 		

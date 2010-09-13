@@ -9,6 +9,8 @@
 #include "asc.h"
 #include "trajectory.h"
 
+extern Int16 _speed[JN];
+
 /******************************************************/
 // global variables
 /******************************************************/
@@ -73,7 +75,7 @@ float p5f_vel (float t, byte jj)
 
 Int32 compute_current_vel(byte jj)
 {
-	float a;
+//	float a;
 	
 	/* (10 * (t/T)^3 - 15 * (t/T)^4 + 6 * (t/T)^5) * (x0-xf) + x0 */
 	if (_ended[jj])
@@ -87,9 +89,9 @@ Int32 compute_current_vel(byte jj)
 	if (_curtf[jj] < 1.0 - _stepf[jj])
 	{
 		/* calculate the velocity */
-		a = p5f_vel (_curtf[jj], jj);
+	//	a = p5f_vel (_curtf[jj], jj);
 		
-		return (Int32)a;
+		return (Int32) _speed[jj]; //a;
 	}			
 	
 	return 0;
@@ -108,15 +110,18 @@ Int16 init_trajectory (byte jj, Int32 current, Int32 final, Int16 speed)
 	if (speed <= 0)
 		return -1;
 	
-	_dx0[jj] = compute_current_vel(jj);
+	_dx0[jj] = compute_current_vel(jj);//._speed[jj];//
 	_x0[jj] = current;
 	_prev_a[jj] = current;
 	_xf[jj] = final;
 	
 	_distance[jj] = _xf[jj] - _x0[jj];
-	_tf[jj] = 100 *__labs (_distance[jj]) / speedf;
-	_tf[jj] /= (float)_period;
-	_dx0[jj] = _dx0[jj] * _tf[jj];
+	_tf[jj] = 100 *__labs (_distance[jj]) / speedf; // *100 is to make fine trajectory
+	//    it should be _tf[jj] /= (float)_period; but _period is equal to 1
+	
+	_dx0[jj] = _dx0[jj] * _tf[jj]; //the velocity is scaled  
+								   // 	
+	
 	_stepf[jj] = 1 / _tf[jj];
 	
 	if (_tf[jj] < 1)
