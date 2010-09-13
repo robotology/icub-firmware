@@ -198,14 +198,14 @@ Int32 compute_pwm(byte j)
 #if   VERSION == 0x0119
 	//arm
 	read_force_data (0, WDT_JNT_STRAIN_12,4); //wrist pronosupination
-	read_force_data (1, -1               ,0); //wrist pitch disabled
-	read_force_data (2, -1               ,0); //wrist yaw   disabled
+	read_force_data (1, WDT_JNT_STRAIN_11,0); //wrist pitch disabled
+	read_force_data (2, WDT_JNT_STRAIN_11,1); //wrist yaw   disabled
 	read_force_data (3, -1               ,0); //fingers disabled
-#elif   VERSION == 0x0201
+#elif   VERSION == 0x0129
     //armV2
     read_force_data (0, WDT_JNT_STRAIN_12,4); //wrist pronosupination
-	read_force_data (1, -1				 ,0); //@@@TODO differential 1 for icubV2
-	read_force_data (2, -1				 ,0); //@@@TODO differential wrist 2 for icubV2
+	read_force_data (1, WDT_JNT_STRAIN_11,0); //@@@TODO differential 1 for icubV2
+	read_force_data (2, WDT_JNT_STRAIN_11,1); //@@@TODO differential wrist 2 for icubV2
 	read_force_data (3, -1				 ,0); //fingers disabled
 #endif
 
