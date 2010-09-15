@@ -52,7 +52,7 @@ void AD_interruptCCA(void)
 	{
 		/* Not running in trigger mode? */
 		ad_ModeFlgA = IDLE;                	/* Set the bean to the idle mode */
-	}
+	}	
 }
 
 /**************************************************************************************/
@@ -226,7 +226,7 @@ byte AD_enableIntTriggerA(void)
  **************************************************************************************/
 byte AD_enableIntTriggerB(void)
 {
-led1_on;
+
 	if (ad_ModeFlgB != IDLE)             /* Is the device in running mode? */
 		return ERR_BUSY;
 		
@@ -238,7 +238,7 @@ led1_on;
 	ad_ModeFlgB = MEASURE;               /* Set state of device to the measure mode */
 
 	HWEnDiB();
-		led1_off;
+
 	return ERR_OK;
 }
 
