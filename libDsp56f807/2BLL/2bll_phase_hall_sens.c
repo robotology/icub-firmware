@@ -125,21 +125,25 @@ void Interrupt_Phase_X0(void)
     	val=tmp | PWMState[0].MaskOut | (PWMState[0].Mask<<8);
 		setReg(PWMA_PMOUT,val); 
 		old_status0 = status0;	
+#ifdef COMM_ENC		
 		if (status0 == DIRECTION_TABLE[old_status0]) comm_enc[0]++;
 		else if (status0 == DIRECTION_TABLE_INV[old_status0]) comm_enc[0]--;
+#endif
 		}
+#ifdef HALL_GLITH_CHECK			
 		else
 		{
 			hall_error[0] |=HALL_ERROR_GLITCH;
 		}
-
+#endif
 	}
 	else hall_error[0]  |=HALL_ERROR_TABLE;
-
+#ifdef HALL_GLITH_CHECK		
 	if (((getReg(QD0_IMR) >> 5) &0x07)!=status0) 
 	{
 		hall_error[0] |=HALL_ERROR_GLITCH;
 	}
+#endif	
 	clrRegBits(TMRA0_SCR, TMRA0_SCR_IEF_MASK);
 
 }
@@ -160,22 +164,30 @@ void Interrupt_Phase_Y0(void)
     	val=tmp | PWMState[0].MaskOut | (PWMState[0].Mask<<8);
 		setReg(PWMA_PMOUT,val); 
 		old_status0 = status0;	
+#ifdef COMM_ENC				
 		if (status0 == DIRECTION_TABLE[old_status0]) comm_enc[0]++;
 		else if (status0 == DIRECTION_TABLE_INV[old_status0]) comm_enc[0]--;
+#endif		
+		}
+#ifdef HALL_GLITH_CHECK			
 		}
 		else
 		{
 			hall_error[0] |=HALL_ERROR_GLITCH;
 		}
-
+#endif
 	}
 	else hall_error[0]  |=HALL_ERROR_TABLE;
+
+#ifdef HALL_GLITH_CHECK	
 
 	if (((getReg(QD0_IMR) >> 5) &0x07)!=status0) 
 	{
 		hall_error[0] |=HALL_ERROR_GLITCH;
 	}
+#endif 	
 	clrRegBits(TMRA1_SCR, TMRA1_SCR_IEF_MASK);
+
 }
 #pragma interrupt saveall
 void Interrupt_Phase_Z0(void)
@@ -194,22 +206,27 @@ void Interrupt_Phase_Z0(void)
     	val=tmp | PWMState[0].MaskOut | (PWMState[0].Mask<<8);
 		setReg(PWMA_PMOUT,val); 
 		old_status0 = status0;	
+#ifdef COMM_ENC	
 		if (status0 == DIRECTION_TABLE[old_status0]) comm_enc[0]++;
 		else if (status0 == DIRECTION_TABLE_INV[old_status0]) comm_enc[0]--;
+#endif		
 		}
+#ifdef HALL_GLITH_CHECK			
 		else
 		{
 			hall_error[0] |=HALL_ERROR_GLITCH;
 		}
-
+#endif
 	}
 	else hall_error[0]  |=HALL_ERROR_TABLE;
+
+#ifdef HALL_GLITH_CHECK			
 
 	if (((getReg(QD0_IMR) >> 5) &0x07)!=status0) 
 	{
 		hall_error[0] |=HALL_ERROR_GLITCH;
 	}
-
+#endif
 	
 	clrRegBits(TMRA2_SCR, TMRA2_SCR_IEF_MASK);
 }
@@ -232,23 +249,26 @@ void Interrupt_Phase_X1(void)
 			tmp = getReg(PWMB_PMOUT) & 0x8000;
 			val=tmp | PWMState[1].MaskOut | (PWMState[1].Mask<<8);
 			setReg(PWMB_PMOUT,val);
+#ifdef COMM_ENC		
 			if (status1 == DIRECTION_TABLE[old_status1]) comm_enc[1]++;
 			else if (status1 == DIRECTION_TABLE_INV[old_status1]) comm_enc[1]--;
+#endif		
 			old_status1 = status1;	
 		}
+#ifdef HALL_GLITH_CHECK	
 		else
 			{
 				hall_error[1] |=HALL_ERROR_GLITCH;
 			}
-
+#endif
 	}
 	else hall_error[1] |=HALL_ERROR_TABLE;
-	
+#ifdef HALL_GLITH_CHECK	
 	if (((getReg(QD1_IMR) >> 5) &0x07)!=status1) 
 	{
 		hall_error[1] |=HALL_ERROR_GLITCH;
 	}
-	
+#endif	
 	clrRegBits(TMRB0_SCR, TMRB0_SCR_IEF_MASK);
 }
 #pragma interrupt saveall
@@ -268,31 +288,37 @@ void Interrupt_Phase_Y1(void)
 			tmp = getReg(PWMB_PMOUT) & 0x8000;
 			val=tmp | PWMState[1].MaskOut | (PWMState[1].Mask<<8);
 			setReg(PWMB_PMOUT,val);
+#ifdef COMM_ENC	
 			if (status1 == DIRECTION_TABLE[old_status1]) comm_enc[1]++;
 			else if (status1 == DIRECTION_TABLE_INV[old_status1]) comm_enc[1]--;
+#endif			
 			old_status1 = status1;	
 		}
+#ifdef HALL_GLITH_CHECK			
 		else
 			{
 				hall_error[1] |=HALL_ERROR_GLITCH;
 			}
-
+#endif
 	}
 	else hall_error[1] |=HALL_ERROR_TABLE;
-	
+#ifdef HALL_GLITH_CHECK		
 	if (((getReg(QD1_IMR) >> 5) &0x07)!=status1) 
 	{
 		hall_error[1] |=HALL_ERROR_GLITCH;
 	}
+#endif	
 	clrRegBits(TMRB1_SCR, TMRB1_SCR_IEF_MASK);
+
 }
 #pragma interrupt saveall
 void Interrupt_Phase_Z1(void)
 {
 	UInt8 tmp,val,deb;
+	
 	deb=(getReg(QD1_IMR) >> 5) &0x07;
 	
-	// conteggio fonti rispetto direzione	
+	// conteggio fronti rispetto direzione	
 	if ((deb == DIRECTION_TABLE[old_status1]) || (deb == DIRECTION_TABLE_INV[old_status1]))
 	{
 		status1=(getReg(QD1_IMR) >> 5) &0x07;
@@ -303,23 +329,28 @@ void Interrupt_Phase_Z1(void)
 			tmp = getReg(PWMB_PMOUT) & 0x8000;
 			val=tmp | PWMState[1].MaskOut | (PWMState[1].Mask<<8);
 			setReg(PWMB_PMOUT,val);
-			if (status1 == DIRECTION_TABLE[old_status1]) comm_enc[1]++;
+#ifdef COMM_ENC		
+			if (status1 == DIRECTION_TABLE[old_status1]) comm_enc[1]++; 
 			else if (status1 == DIRECTION_TABLE_INV[old_status1]) comm_enc[1]--;
+#endif			
 			old_status1 = status1;	
 		}
+#ifdef HALL_GLITH_CHECK	
 		else
 			{
 				hall_error[1] |=HALL_ERROR_GLITCH;
 			}
-
+#endif
 	}
 	else hall_error[1] |=HALL_ERROR_TABLE;
-	
+#ifdef HALL_GLITH_CHECK		
 	if (((getReg(QD1_IMR) >> 5) &0x07)!=status1) 
 	{
 		hall_error[1] |=HALL_ERROR_GLITCH;
 	}
+#endif	
 	clrRegBits(TMRB2_SCR, TMRB2_SCR_IEF_MASK);
+	
 }
 
 UInt8 Get_Sens0_Status(void)

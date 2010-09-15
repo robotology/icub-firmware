@@ -17,6 +17,10 @@ typedef struct sPwmControlBL_tag
 #define  HALL_ERROR_GLITCH	0x4 //when there is a mismatch between the two hall reading in the hall_interrupt 
 
 
+//if it is defined COMM_ENC, there is a calculation of the commutations in the hall_phase interrupts 
+
+//#define  COMM_ENC
+//#define  HALL_GLITH_CHECK
 
 /**************************************************************************************/
 /**

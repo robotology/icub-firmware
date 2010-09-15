@@ -51,8 +51,8 @@ void PWM_A_init(void)
  	// PWMA_PWMCM: ??=0,PWMCM=PWMFREQ
   	setReg(PWMA_PWMCM, PWMFREQ);     
   
-	// PWMA_PMCTL: LDOK=1,PWMEN=1 
-	setRegBits (PWMA_PMCTL, 3);     
+	// PWMA_PMCTL: LDQF=2, LDOK=1,PWMEN=1 
+	setRegBits (PWMA_PMCTL, 0x2003);      //the load of the PWM duty is setted every 3 cycle (10KHz)
 	
 	// write protect on 
 	setRegBits (PWMA_PMCFG, PWMA_PMCFG_WP_MASK);  
