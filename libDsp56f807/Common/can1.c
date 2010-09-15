@@ -592,7 +592,7 @@ void CAN1_interruptRx (void)
 	canmsg_t *p;
 	byte i;
 
-	setReg (CAN_RFLG, CAN_RFLG_RXF_MASK);   // Reset the reception complete flag 
+//	setReg (CAN_RFLG, CAN_RFLG_RXF_MASK);   // Reset the reception complete flag 
 	
 	CAN_DI;
 	
@@ -622,7 +622,7 @@ void CAN1_interruptRx (void)
 	
 	if (read_p == -1) read_p = write_p;
 
-//	setReg (CAN_RFLG, CAN_RFLG_RXF_MASK);   // Reset the reception complete flag 
+	setReg (CAN_RFLG, CAN_RFLG_RXF_MASK);   // Reset the reception complete flag 
 	CAN_EI;
 
 }
