@@ -73,12 +73,6 @@ TMsgBuff;
 const word TXMsgBuffer[CAN_TX_MBUFFERS] = { (word)CAN_TB0_IDR0, (word)CAN_TB1_IDR0, (word)CAN_TB2_IDR0 }; /* TX message buffer addresses */
 
 static byte ErrFlag;                   /* Error flags mirror of the status register */
-static byte SerFlag;                   /* Flags for CAN communication */
-                                       /* Bits: 0 - OverRun error */
-                                       /*       1 - Framing error */
-                                       /*       2 - Parity error */
-                                       /*       3 - Full RX buffer */
-                                       /*       4 - Full TX buffer */
 
 /**
  * gets the ID out of the received IDR registers.
@@ -185,16 +179,6 @@ byte CAN1_getErrorValues (byte *rcv, byte *tx)
 	return ERR_OK;                       /* OK */
 } 
  
-/**
- * gets the state of the receive buffer.
- * @return 1 if the RX buffer is full.
- */
-byte CAN1_getStateRX (void)
-{
-  return ((SerFlag & FULL_RX_BUF) != 0)? 1:0;
-}
-
-
 /**
  * sets the CAN filter RX acceptance code (Mask is masked by the
  * mask - see CAN1_setAcceptanceMask() - and messages are accepted only if they match
@@ -494,68 +478,6 @@ byte CAN1_sendFrame (byte BufferNo, dword MessageID,
 	return ERR_OK;
 }
 
-
-/**
- * reads a message.
- * @param MessageID is a pointer to the ID of the message (also arbitration ID).
- * @param FrameType is a pointer to the type of the message (either DATA_FRAME or REMOTE_FRAME).
- * @param FrameFormat is a pointer to the format (either STANDARD_FORMAT or EXTENDED_FORMAT).
- * @param Lemgth is a pointer to the length of the message.
- * @param Data is a pointer to the data buffer.
- */
-
-byte CAN1_readFrame (dword *MessageID,
-					 byte *FrameType,
-					 byte *FrameFormat,
-					 byte *Length,
-					 byte *Data)
-{
-	byte i,j;
-//	dword ID;
-
-	if (!SerFlag & FULL_RX_BUF)
-		return ERR_RXEMPTY;
-	
-//	ID = Idr2Id(GetRxBufferIdr());       /* Read the identification of the received message */
-#warning "this optimization does not work for extended frame ID"
-/*
-         __             _,-"~^"-.
-       _// )      _,-"~`         `.
-     ." ( /`"-,-"`                 ;
-    / 6                             ;
-   /           ,             ,-"     ;
-  (,__.--.      \           /        ;
-   //'   /`-.\   |          |        `._________
-     _.-'_/`  )  )--...,,,___\     \-----------,)
-   ((("~` _.-'.-'           __`-.   )         //
-         ((("`             (((---~"`         //
-                                            ((________________
-                                            `----""""~~~~^^^```	
-*/
-//	if (ID > EXTENDED_FRAME_ID)
-//		*FrameType = (getReg(CAN_RB_IDR3) & 1)? REMOTE_FRAME : DATA_FRAME;
-//	else
-//		*FrameType = (getReg(CAN_RB_IDR1) & 16)? REMOTE_FRAME : DATA_FRAME;
-//	*FrameFormat = (getReg(CAN_RB_IDR1) & 8)? EXTENDED_FORMAT : STANDARD_FORMAT;
-//	*MessageID = ID;
-
-	*FrameType =DATA_FRAME;
-	*FrameFormat=STANDARD_FORMAT;
-	*MessageID =GetRxBufferIdr()>>21;       /* Read the standard identification of the received message */
-	*Length = ((getReg(CAN_RB_DLR) & 0xF)<=8 ? (getReg(CAN_RB_DLR) & 0xF) : 8);
-
-		for (i = 0; i < *Length; i++) /* should be checking max len of the message */
-		{		
-			Data[i] = *((byte *)CAN_RB_DSR0 + i);
-		}
-
-	
-	SerFlag &= ~FULL_RX_BUF;             /* Clear flag "full RX buffer" */
-	
-	return ERR_OK;
-}
-
-
 /**
  * initializes the CAN bus. It must be called before anything else.
  * 
@@ -668,37 +590,39 @@ void CAN1_interruptTx (void)
 void CAN1_interruptRx (void)
 {
 	canmsg_t *p;
+	byte i;
 
-	setReg (CAN_RFLG, CAN_RFLG_RXF_MASK);   /* Reset the reception complete flag */
-	SerFlag |= FULL_RX_BUF;              /* Set flag "full RX buffer" */
+	setReg (CAN_RFLG, CAN_RFLG_RXF_MASK);   // Reset the reception complete flag 
 	
 	CAN_DI;
 	
-		write_p++;
-	if (write_p >= CAN_FIFO_LEN)  
-		write_p = 0;
+	write_p++;
+	if (write_p >= CAN_FIFO_LEN) write_p = 0;
 		
-
-	// check here for buffer full.
 	p = can_fifo +write_p;
 	
-	CAN1_readFrame (&(p->CAN_messID), &(p->CAN_frameType), &(p->CAN_frameFormat), &(p->CAN_length),  p->CAN_data);
-		
-#if 0
-	if (read_p != -1)
-	{
-
-	}
+/*
+ 	//WARNING: use this code for extended frame ID
+	dword ID;
+	ID = Idr2Id(GetRxBufferIdr());       // Read the identification of the received message
+	if (ID > EXTENDED_FRAME_ID)
+		*FrameType = (getReg(CAN_RB_IDR3) & 1)? REMOTE_FRAME : DATA_FRAME;
 	else
-#endif
-	
-	if (read_p == -1)
-	{
-		read_p = write_p;
-	
-	}
+		*FrameType = (getReg(CAN_RB_IDR1) & 16)? REMOTE_FRAME : DATA_FRAME;
+	*FrameFormat = (getReg(CAN_RB_IDR1) & 8)? EXTENDED_FORMAT : STANDARD_FORMAT;
+	*MessageID = ID;
+*/	
 
-//	setReg (CAN_RFLG, CAN_RFLG_RXF_MASK);
+	//WARNING: extended frame ID has been removed for speed optimization
+	p->CAN_frameType   = DATA_FRAME;
+	p->CAN_frameFormat = STANDARD_FORMAT;
+	p->CAN_messID      = GetRxBufferIdr()>>21; 
+	p->CAN_length      = ((getReg(CAN_RB_DLR) & 0xF)<=8 ? (getReg(CAN_RB_DLR) & 0xF) : 8);
+	for (i = 0; i < p->CAN_length; i++) p->CAN_data[i] = *((byte *)CAN_RB_DSR0 + i);
+	
+	if (read_p == -1) read_p = write_p;
+
+//	setReg (CAN_RFLG, CAN_RFLG_RXF_MASK);   // Reset the reception complete flag 
 	CAN_EI;
 
 }
