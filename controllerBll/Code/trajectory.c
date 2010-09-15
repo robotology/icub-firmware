@@ -25,7 +25,7 @@ Int32 _prev_a[JN] = INIT_ARRAY (0);
 
 float _tf[JN] = INIT_ARRAY (0.);
 float _curtf[JN] = INIT_ARRAY (0.);
-Int32 _curstepf[JN] = INIT_ARRAY (0);
+//Int32 _curstepf[JN] = INIT_ARRAY (0);
 
 
 float _stepf[JN] = INIT_ARRAY (0.);
@@ -75,7 +75,7 @@ float p5f_vel (float t, byte jj)
 
 Int32 compute_current_vel(byte jj)
 {
-//	float a;
+	float a;
 	
 	/* (10 * (t/T)^3 - 15 * (t/T)^4 + 6 * (t/T)^5) * (x0-xf) + x0 */
 	if (_ended[jj])
@@ -89,9 +89,9 @@ Int32 compute_current_vel(byte jj)
 	if (_curtf[jj] < 1.0 - _stepf[jj])
 	{
 		/* calculate the velocity */
-	//	a = p5f_vel (_curtf[jj], jj);
+		a = p5f_vel (_curtf[jj], jj);
 		
-		return (Int32) _speed[jj]; //a;
+		return (Int32) a;//_speed[jj]; //a;
 	}			
 	
 	return 0;
@@ -131,7 +131,6 @@ Int16 init_trajectory (byte jj, Int32 current, Int32 final, Int16 speed)
 	}
 		
 	_curtf[jj] = 0;
-	_curstepf[jj] = 0;
 	_ended[jj] = false;
 	
 	return 0;
@@ -148,13 +147,11 @@ Int16 abort_trajectory (byte jj, Int32 limit)
 	{
 		_ended[jj] = true;
 		_curtf[jj] = 0;
-		_curstepf[jj] = 0;
 		_xf[jj] = limit;
 	}
 	else
 	{
 		_curtf[jj] = 0;
-		_curstepf[jj] = 0;
 		_xf[jj] = limit;
 	}
 	
@@ -168,25 +165,19 @@ Int16 abort_trajectory (byte jj, Int32 limit)
 Int32 step_trajectory (byte jj)
 {
 	Int32 a;
-	Int32 delta_a;
 	
 	/* (10 * (t/T)^3 - 15 * (t/T)^4 + 6 * (t/T)^5) * (x0-xf) + x0 */
 	if (_ended[jj])
 	{
 		a = _xf[jj];
-		delta_a = a - _prev_a[jj];
-		_prev_a[jj] = a;
 		return a;
 	}
 		
 	if (_curtf[jj] == 0)
 	{
 		_curtf[jj] += _stepf[jj];
-		_curstepf[jj] ++;
 		
 		a = _x0[jj];
-		delta_a = a - _prev_a[jj];
-		_prev_a[jj] = a;
 		return a;
 
 	}
@@ -199,10 +190,6 @@ Int32 step_trajectory (byte jj)
 		
 		/* time */
 		_curtf[jj] += _stepf[jj];
-		_curstepf[jj] ++;
-
-		delta_a = a - _prev_a[jj];
-		_prev_a[jj] = a;
 		return a;
 	}			
 
@@ -231,7 +218,7 @@ Int32 step_trajectory_delta (byte jj)
 	if (_curtf[jj] == 0)
 	{
 		_curtf[jj] += _stepf[jj];
-		_curstepf[jj] ++;
+	
 		
 		a = _x0[jj];
 		delta_a = a - _prev_a[jj];
@@ -248,7 +235,6 @@ Int32 step_trajectory_delta (byte jj)
 		
 		/* time */
 		_curtf[jj] += _stepf[jj];
-		_curstepf[jj] ++;
 
 		delta_a = a - _prev_a[jj];
 		_prev_a[jj] = a;

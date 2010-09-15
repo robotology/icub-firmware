@@ -152,4 +152,9 @@
 * changed the AD setup. Now it is sync with the PWM.
 * added the function get_current(jnt)
 * Current build 47.
+2010-15-Sept  Maggiali Marco <marco.maggiali@iit.t>
+* Removed useless code in the step_trajectory function
+* Changed the AD setup. Now it is sync with the PWM and it has a frequency of 10KHz.
+* The reload of the PWM is 10KHz as well, but the frequency of the PWM is still 30KHz.
+* Current build 48.
 	

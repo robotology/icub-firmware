@@ -38,11 +38,11 @@
 byte	_board_ID = 16;	
 char    _additional_info [32];
 UInt8    mainLoopOVF=0;
-word    _build_number = 47;
+word    _build_number = 48;
 int     _countBoardStatus =0;
 Int16   _flash_version=0; 
 UInt8   BUS_OFF=false;
-
+const byte winShift=5; 
 
 #ifdef TEMPERATURE_SENSOR
 	//temperature sensor variables
@@ -110,7 +110,6 @@ void main(void)
 	byte tailPos=0; //tail is (head+1)%winSize
 	byte headVel=0; //current pos/vel
 	byte tailVel=0; //tail is (head+1)%winSize
-	const byte winShift=5; 
 	byte winSizePos=1<<winShift; //size of the position window 
 	byte winSizeVel=1<<winShift; //size of the position window 
 	Int32 positionWindow[1<<winShift][JN]; //max window size: 254
@@ -310,7 +309,7 @@ void main(void)
 
 // READING CAN MESSAGES
 		can_interface();
-		
+
 		
 		// Strain Gauges sampling by internal ADC
 #if	VERSION == 0x0171
@@ -360,6 +359,7 @@ void main(void)
 			_position[i]=Filter_Bit (get_position_abs_ssi(i));
 		}
 #endif 
+
 
 ///////////////////////////////////////////DEBUG////////////
 // ADDED VERSION !=0x0171
@@ -420,9 +420,9 @@ void main(void)
 		/* compute speed and acceleration, and store the speed in the circular buffer */		
 		for (i=0; i<JN; i++)
 		{
-			velocityWindow[headVel][i]= ((positionWindow[headPos][i] - positionWindow[tailPos][i] ))>>winShift;
+			velocityWindow[headVel][i]= ((positionWindow[headPos][i] - positionWindow[tailPos][i] ));//>>winShift;
 			_speed[i]= (Int16)(velocityWindow[headVel][i]);
-			_accel[i]= (Int16)((velocityWindow[headVel][i] - velocityWindow[tailVel][i]))>>winShift;
+			_accel[i]= (Int16)((velocityWindow[headVel][i] - velocityWindow[tailVel][i]));//>>winShift;
 		}
 
 		
@@ -444,20 +444,21 @@ void main(void)
 				
 		/* in reference configuration for calibration? */
 		//for (i=0; i<JN; i++) check_in_position_calib(i); 
+
 	
 //******************************************* POSITION LIMIT CHECK ***************************/
 
 		for (i=0; i<JN; i++)  check_range(i, _safeband[i], PWMoutput);
 
 //******************************************* COMPUTES CONTROLS *****************************/
-		
+led0_on	
 		for (i=0; i<JN; i++) 
 		{
 			_bfc_PWMoutput[i] = PWMoutput[i] = compute_pwm(i);	
 			if      (_bfc_PWMoutput[i] < -MAX_DUTY) _bfc_PWMoutput[i]=-MAX_DUTY;
 			else if (_bfc_PWMoutput[i] > MAX_DUTY)  _bfc_PWMoutput[i]= MAX_DUTY;
 		}
-
+	
 //		decouple PWM	
 #ifdef USE_NEW_DECOUPLING
 		decouple_dutycycle_new_joint(PWMoutput); //new version (july 2010) with torque decupling
@@ -473,7 +474,7 @@ void main(void)
 			 	_control_mode[i] == MODE_IMPEDANCE_VEL)
 				PWMoutput[i] = lpf_ord1_3hz (PWMoutput[i], i);	
 		}
-
+led0_off	
 //******************************************* LIMIT CHECK FOR FORCE CONTORL******************/
 		// Protection for joints out of the admissible range during force control
 		for (i=0; i<JN; i++)  check_range_torque(i, _safeband[i], PWMoutput);
@@ -486,7 +487,28 @@ void main(void)
 			if      (_pid[i] < -MAX_DUTY) _pid[i]=-MAX_DUTY;
 			else if (_pid[i] > MAX_DUTY)  _pid[i]= MAX_DUTY;
 		}
+				
+		/* generate PWM */		
+		for (i=0; i<JN; i++)
+		{
+			if (_pad_enabled[i] == false) 
+			{
+				_control_mode[i] = MODE_IDLE;
+			}
+			else	
+			{
+				PWM_generate(i,_pid[i]);
+		//		setReg (TMRD0_CNTR, 39998);              				
+			}
+			
+		}
+	
+		/* Check Current done in T1 */
 
+		/* do extra functions, communicate, etc. */
+		
+		can_send_broadcast();
+	
 		/* check temperature sensor */
 #ifdef TEMPERATURE_SENSOR
 		TempSensCount1++;
@@ -569,29 +591,7 @@ void main(void)
 				PWM_outputPadDisable(i);				
 			}
 		}	
-#endif
-				
-		/* generate PWM */		
-		for (i=0; i<JN; i++)
-		{
-			if (_pad_enabled[i] == false) 
-			{
-				_control_mode[i] = MODE_IDLE;
-			}
-			else	
-			{
-				PWM_generate(i,_pid[i]);
-		//		setReg (TMRD0_CNTR, 39998);              				
-			}
-			
-		}
-	
-		/* Check Current done in T1 */
-
-		/* do extra functions, communicate, etc. */
-		can_send_broadcast();
-	
-		
+#endif		
 //	Check for the MAIN LOOP duration
  
 			
