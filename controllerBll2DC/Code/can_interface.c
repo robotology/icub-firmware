@@ -295,6 +295,8 @@ byte can_interface (void)
 			HANDLE_MSG (CAN_ENABLE_PWM_PAD, CAN_ENABLE_PWM_PAD_HANDLER)
 			HANDLE_MSG (CAN_DISABLE_PWM_PAD, CAN_DISABLE_PWM_PAD_HANDLER)
 			HANDLE_MSG (CAN_GET_CONTROL_MODE, CAN_GET_CONTROL_MODE_HANDLER)
+			HANDLE_MSG (CAN_SET_CONTROL_MODE, CAN_SET_CONTROL_MODE_HANDLER)
+			
 			HANDLE_MSG (CAN_MOTION_DONE, CAN_MOTION_DONE_HANDLER)
 			
 			HANDLE_MSG (CAN_WRITE_FLASH_MEM, CAN_WRITE_FLASH_MEM_HANDLER)
@@ -584,10 +586,10 @@ void can_send_broadcast(void)
     	_canmsg.CAN_data[6] = BYTE_H(_error[1]);
 		_canmsg.CAN_data[7] = BYTE_L(_error[1]);
 						
-		_canmsg.CAN_data[0] = BYTE_4(_current[0]);
-		_canmsg.CAN_data[1] = BYTE_3(_current[0]);
-		_canmsg.CAN_data[2] = BYTE_2(_current[1]);
-		_canmsg.CAN_data[3] = BYTE_1(_current[1]);
+		_canmsg.CAN_data[0] = BYTE_4(get_current(0));
+		_canmsg.CAN_data[1] = BYTE_3(get_current(0));
+		_canmsg.CAN_data[2] = BYTE_2(get_current(1));
+		_canmsg.CAN_data[3] = BYTE_1(get_current(1));
 				
 						
 		_canmsg.CAN_length = 8;

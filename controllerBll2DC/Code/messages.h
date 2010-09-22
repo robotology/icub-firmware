@@ -131,6 +131,8 @@ extern char    _additional_info [32];
 	{ \
 		PWM_outputPadDisable(0); \
 		PWM_outputPadDisable(1); \
+		_pad_enabled[0]= false; \
+		_pad_enabled[1]= false; \
 		_general_board_error = ERROR_NONE; \
 		can_printf("PWM DIS COUPLED:0 & 1");\
 	}
@@ -138,6 +140,7 @@ extern char    _additional_info [32];
 	#define CAN_DISABLE_PWM_PAD_HANDLER(x) \
 	{ \
 		PWM_outputPadDisable(axis); \
+		_pad_enabled[axis]= false; \
 		_general_board_error = ERROR_NONE; \
 		can_printf("PWM DIS:%d",axis);\
 	}
@@ -158,14 +161,51 @@ extern char    _additional_info [32];
 }
 
 //-------------------------------------------------------------------
+#define CAN_SET_VEL_TIMEOUT_HANDLER(x) \
+{ \
+	byte value = 0; \
+	if (CAN_LEN == 3) \
+	{ \
+		value = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
+		if (value>=0) _vel_timeout[axis] = value; \
+		_general_board_error = ERROR_NONE; \
+	} \
+	else \
+		_general_board_error = ERROR_FMT; \
+}
+
+
+//-------------------------------------------------------------------
 #define CAN_GET_CONTROL_MODE_HANDLER(x) \
 { \
 	PREPARE_HEADER; \
-		CAN_LEN = 2; \
+		CAN_LEN = 3; \
 		CAN_DATA[1] = _control_mode[axis]; \
+		CAN_DATA[2] = 0; \
 		CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
 		_general_board_error = ERROR_NONE; \
 }
+
+//-------------------------------------------------------------------
+#define CAN_SET_CONTROL_MODE_HANDLER(x) \
+{ \
+	byte value = 0; \
+	if (CAN_LEN == 2) \
+	{ \
+		value = (CAN_DATA[1]); \
+		can_printf("CTRLMODE SET:%d",value); \
+		if (value>=0 && value <=0x50) _control_mode[axis] = value; \
+		_general_board_error = ERROR_NONE; \
+		_desired[axis] = _position[axis]; \
+		_desired_vel[axis] = 0; \
+		_integral[axis] = 0; \
+		_set_point[axis] = _position[axis]; \
+		init_trajectory (axis, _position[axis], _position[axis], 1); \
+	} \
+	else \
+		_general_board_error = ERROR_FMT; \
+}
+
 
 //-------------------------------------------------------------------
 #define CAN_MOTION_DONE_HANDLER(x) \

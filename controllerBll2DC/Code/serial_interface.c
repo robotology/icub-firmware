@@ -43,22 +43,7 @@ void serial_interface_init (byte channels_num)
 /***************************************************************************/
 void print_version(void)
 {
-	AS1_printStringEx ("\r\n\n");
-	AS1_printStringEx ("Firmware - ver ");
-#if VERSION == 0x0161
-	AS1_printStringEx ("1.61");
-#elif VERSION == 0x0162
-	AS1_printStringEx ("1.62");
-#elif VERSION == 0x0163
-	AS1_printStringEx ("1.63");
-#elif VERSION == 0x0164
-	AS1_printStringEx ("1.64");
-#elif VERSION == 0x0165
-	AS1_printStringEx ("1.65");
-#elif VERSION == 0x0166
-	AS1_printStringEx ("1.66");
-#endif
-	AS1_printStringEx ("\r\n");
+
 }
 
 /***************************************************************************/

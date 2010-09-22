@@ -49,7 +49,7 @@ void TI1_interrupt (void)
 		/* Check Current */
 		for (i=0; i<JN; i++) 
 		{
-			if ((_current[i]>=25000) || (-_current[i]>=25000))
+			if ((get_current(i)>=25000) || (-get_current(i)>=25000))
 			{
 				_control_mode[i] = MODE_IDLE;	
 				_pad_enabled[i] = false;

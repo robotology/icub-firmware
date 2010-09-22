@@ -174,7 +174,6 @@ void main(void)
 //
     init_faults           (true,true,true);	 
    init_position_encoder ();
-//  init_temp_sens        ();
     TI1_init 			  ();
 	__EI();
 	
@@ -205,7 +204,7 @@ void main(void)
 		test=test+1;
 		_count=0;
 		led3_off;
-	//	serial_interface();
+
 	// BUS_OFF check
 		if (getCanBusOffstatus() )
 		{
