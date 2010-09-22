@@ -29,6 +29,13 @@ void init_currents( void )
 	first_time[1]=true;	
 }
 
+Int32 get_current(byte jnt)
+{
+	return _current[jnt];
+}
+
+
+
 byte set_current_offset(byte jnt)
 {
     word temp;
@@ -55,7 +62,7 @@ byte set_current_offset(byte jnt)
 }
 
 
-word check_current(byte jnt, bool sign)
+Int32 check_current(byte jnt, bool sign)
 {
 //	#warning "_current now is Iss the Imot=Iss/deltaPWM;"
 //	#warning "_current now is Iss the Imot=Iss/deltaPWM;"
