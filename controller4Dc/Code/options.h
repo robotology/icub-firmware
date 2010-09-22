@@ -16,7 +16,7 @@
 //#define VERSION 0x0128                /* Analog encoder in M0 MAISEncoder in M1 (HES0), M2 (HES1+HES2), M3 (HES3) 
 //#define VERSION 0x0129                /* AEA encoders in the wrist  
 //#define VERSION 0x0130                /* MAISEncoder in M0 (HES4+HES5), M1 (HES6), M2 (HES7+HES8), M3 (HES11+HES12+HES13) 
-
+//#define VERSION 0x0215                /* coordinated control of the eyes + neck yaw and eye tilt with AEA*/
 //#define SERIAL_MENU_OPTION    1       /* if on, enables serial menu interface */
 
 //#define DEBUG_CAN_MSG 	    1		/* conditional compile for printing can info */
@@ -28,5 +28,10 @@
 //#define EMERGENCY_DISABLED	1		/* emergency fault signal disabled */
 //#define SMOOTH_PID_CTRL		1		/* for debugging current spikes */
 //#define DEBUG_ANA_INC         1       /* for debugging diff between analog and incremental*/
+
+
+#define AEA3   2   //SPIEN3
+#define AEA4   0   //SPIEN1
+
 
 #endif

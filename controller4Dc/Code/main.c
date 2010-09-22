@@ -39,6 +39,7 @@ Int16   _flash_version=0;
 UInt8   mais_counter=0;
 UInt16  mais_init_request=0;
 #define  MAX_MAIS_COUNTER 15
+
 //#define  MAIS_INIT_REQUEST 500
 
  
@@ -101,8 +102,9 @@ Int16 _version = 0x0130;
 Int16 _version = 0x0125;
 #elif VERSION == 0x0131
 Int16 _version = 0x0131;
+#elif VERSION == 0x0215
+Int16 _version = 0x0215;
 #endif
-
 #ifndef VERSION
 #	error "No valid version specified"
 #endif
@@ -205,16 +207,18 @@ void main(void)
     init_pwm			  ();	 
     init_faults           (true,true,true);	 
     init_position_encoder ();
-   	#if (VERSION==0x0129)		
+   	#if (VERSION==0x0129) || (VERSION==0x0215)		
 
 	init_position_abs_ssi();
 
 	// reset of the ABS_SSI
 	// this is needed because the AS5045 gives the first value wrong !!!
-    for (i=0; i<JN; i++)	_position[i]=(Int32) get_position_abs_ssi(i);
-    for (i=0; i<JN; i++)    _max_real_position[i]=4095;
-    for (i=0; i<JN; i++) 	_safeband[i] =-5; //5 ticks => 1 grado di AEA.
-	
+    	_position[0]=(Int32) get_position_abs_ssi(AEA3);
+    	_position[1]=(Int32) get_position_abs_ssi(AEA4);
+    	_max_real_position[0]=4095;
+    	_max_real_position[1]=4095;
+    	_safeband[0] =-5; //5 ticks => 1 grado di AEA.
+		_safeband[1] =-5; //5 ticks => 1 grado di AEA.
 
 	#endif
 	TI1_init 			  ();
@@ -413,6 +417,12 @@ void main(void)
 #if VERSION == 0x0130
 		for (i=0; i<JN; i++) _position[i]=_adjustment[i];					
 #endif
+#if VERSION == 0x0215
+	    _position[0]= get_position_abs_ssi(AEA4);	
+		_position[1]= get_position_abs_ssi(AEA3);
+		_position[2]= get_position_encoder(2);
+		_position[3]= get_position_encoder(3);					
+#endif
 //-------------------------------------------------------------------------------------------
 
 //******************************************************************************************/		
@@ -495,7 +505,33 @@ void main(void)
 		if (_control_mode[0] == MODE_CALIB_HARD_STOPS) PWMoutput[1] = 0;
 		if (_control_mode[1] == MODE_CALIB_HARD_STOPS) PWMoutput[0] = 0;	
 #endif
+//******************************************************************************************/		
+// 							  		COMPUTE CONTROLS FOR COUPLED JOINTS                                    
+// 							     /* computes controls */
+//******************************************************************************************/ 		
+#if VERSION == 0x0215 
 
+		if ( ! ((_control_mode[2] == MODE_CALIB_HARD_STOPS ) ||
+			    (_control_mode[3] == MODE_CALIB_HARD_STOPS ) ) )
+		{
+		
+			temp_swap 	 = PWMoutput[2];
+			PWMoutput[2] = (PWMoutput[2] + PWMoutput[3]) >> 1;
+			PWMoutput[3] = (temp_swap    - PWMoutput[3]) >> 1;			
+				if (_control_mode[2] == MODE_IDLE || 
+				_control_mode[3] == MODE_IDLE)
+			{
+				PWMoutput[2] = 0;
+				PWMoutput[3] = 0;
+			}	
+			temp_swap = _pd[2];
+			_pd[2] = (_pd[2] 	+ _pd[3]) >> 1;
+			_pd[3] = (temp_swap - _pd[3]) >> 1;		
+		}		
+
+		if (_control_mode[2] == MODE_CALIB_HARD_STOPS) PWMoutput[3] = 0;
+		if (_control_mode[3] == MODE_CALIB_HARD_STOPS) PWMoutput[2] = 0;	
+#endif
 		/*differential controls*/
 #if VERSION == 0x0119 
 			//PWMoutput[1] = PWMoutput[1];	//omitted
@@ -752,7 +788,11 @@ void decouple_positions(void)
 		//vergence / version inverted
 		_position[0] = _position[0] + _position[1];
 		_position[1] = _position[0] - 2*_position[1];
-		
+#elif VERSION == 0x0215
+
+		_position[2] = _position[2] + _position[3];
+		_position[3] = _position[2] - 2*_position[3];	
+			
 #elif VERSION == 0x0119
 		//_position[1] = _position[1];		//omitted
 		_position[2] = _position[1] + _position[2];		
