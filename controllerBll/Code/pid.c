@@ -104,11 +104,9 @@ Int16  _kr[JN] = INIT_ARRAY (3);				// scale factor (negative power of two)
 // TORQUE PID
 Int16  _strain_val[JN] = INIT_ARRAY (0);
 Int16  _error_torque[JN] ;						// actual feedback error 
-Int16  _error_old_torque[JN] ;					// error at t-1 
-Int16  _pid_torque[JN] ;						// pid result 
+Int16  _error_old_torque[JN] ;					// error at t-1  
 Int16  _pid_limit_torque[JN] ;					// pid limit 
-Int32  _pd_torque[JN] ;           			  	// pd portion of the pid
-Int32  _integral_torque[JN] ;					// store the sum of the integral component 
+Int32  _integral_torque[JN] ; //@@@REMOVE_ME@@	// store the sum of the integral component 
 Int16  _integral_limit_torque[JN] ;
 Int16  _kp_torque[JN] = INIT_ARRAY (0);			// PID gains: proportional... 
 Int16  _kd_torque[JN] = INIT_ARRAY (0);			// ... derivative  ...
@@ -304,7 +302,7 @@ Int32 compute_pwm(byte j)
 	#ifndef IDENTIF 
 		PWMoutput = compute_pid_torque(j, _strain[0][5]);
 		PWMoutput = PWMoutput + _ko_torque[j];
-		_pd_torque[j] = _pd_torque[j] + _ko_torque[j];
+		_pd[j] = _pd[j] + _ko_torque[j];
 	#endif
 
 	#ifdef IDENTIF 
@@ -325,7 +323,7 @@ Int32 compute_pwm(byte j)
 			PWMoutput = compute_pid_torque(j, 5); 
 		//	PWMoutput -= (-_kr[0] * _speed[1])>>4;
 			PWMoutput = PWMoutput + _ko_torque[j];
-			_pd_torque[j] = _pd_torque[j] + _ko_torque[j];	
+			_pd[j] = _pd[j] + _ko_torque[j];	
 		}	
 	#endif
 
@@ -357,7 +355,7 @@ Int32 compute_pwm(byte j)
 	case MODE_TORQUE: 
 		PWMoutput = compute_pid_torque(j, _strain_val[j]);
 		PWMoutput = PWMoutput + _ko_torque[j];
-		_pd_torque[j] = _pd_torque[j] + _ko_torque[j];
+		_pd[j] = _pd[j] + _ko_torque[j];
 	break;
 	case MODE_IMPEDANCE_POS:
 	case MODE_IMPEDANCE_VEL: 
@@ -377,7 +375,7 @@ Int32 compute_pwm(byte j)
 		_desired_torque[j] += -(Int32)_kd_imp[j] * (Int32)_speed[j];
 		PWMoutput = compute_pid_torque(j, _strain_val[j]);
 		PWMoutput = PWMoutput + _ko_torque[j];
-		_pd_torque[j] = _pd_torque[j] + _ko_torque[j];
+		_pd[j] = _pd[j] + _ko_torque[j];
 	break;
 #endif
 	
@@ -516,8 +514,8 @@ Int32 compute_pid_torque(byte j, Int16 strain_val)
 			_integral_torque[j] = (-_integral_limit_torque[j]);
 		}
 		
-	_pd_torque[j] = L_add(ProportionalPortion, DerivativePortion);
-	PIDoutput = L_add(_pd_torque[j], IntegralPortion);
+	_pd[j] = L_add(ProportionalPortion, DerivativePortion);
+	PIDoutput = L_add(_pd[j], IntegralPortion);
 	
 	return PIDoutput;
 }

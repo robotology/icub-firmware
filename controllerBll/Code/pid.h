@@ -145,9 +145,7 @@ extern Int16  _kr[JN] ;					// scale factor (negative power of two)
 extern Int16  _strain_val[JN];
 extern Int16  _error_torque[JN] ;			// actual feedback error 
 extern Int16  _error_old_torque[JN] ;		// error at t-1 
-extern Int16  _pid_torque[JN] ;				// pid result 
 extern Int16  _pid_limit_torque[JN] ;		// pid limit 
-extern Int32  _pd_torque[JN] ;             	// pd portion of the pid
 extern Int32  _integral_torque[JN] ;		// store the sum of the integral component 
 extern Int16  _integral_limit_torque[JN] ;
 
