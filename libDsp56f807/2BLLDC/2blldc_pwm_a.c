@@ -86,13 +86,7 @@ void PWM_A_outputPadEnable (word mask)
 void PWM_A_outputPadDisable (word mask)
 {  
     clrRegBit(PWMA_PMOUT,PAD_EN);
- //   PWM_A_setDuty (0, MIN_DUTY);
- //	PWM_A_setDuty (2, MIN_DUTY);
-///PWM_A_setDuty (4, MIN_DUTY);
-//	PWM_A_load();
- //  	 mask &= 0x000;;
-//	 setRegBits(PWMA_PMOUT, mask);
- //    clrRegBits(PWMA_PMOUT, 0x8000); //PAD_EN=0	 
+
 }
 void PWM_A_Write_Protect()
 {
