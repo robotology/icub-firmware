@@ -9,8 +9,6 @@
 #include "asc.h"
 #include "trajectory.h"
 
-extern Int16 _speed[JN];
-
 /******************************************************/
 // global variables
 /******************************************************/
@@ -25,7 +23,7 @@ Int32 _prev_a[JN] = INIT_ARRAY (0);
 
 float _tf[JN] = INIT_ARRAY (0.);
 float _curtf[JN] = INIT_ARRAY (0.);
-//Int32 _curstepf[JN] = INIT_ARRAY (0);
+Int32 _curstepf[JN] = INIT_ARRAY (0);
 
 
 float _stepf[JN] = INIT_ARRAY (0.);
@@ -91,7 +89,7 @@ Int32 compute_current_vel(byte jj)
 		/* calculate the velocity */
 		a = p5f_vel (_curtf[jj], jj);
 		
-		return (Int32) a;//_speed[jj]; //a;
+		return (Int32)a;
 	}			
 	
 	return 0;
@@ -110,18 +108,15 @@ Int16 init_trajectory (byte jj, Int32 current, Int32 final, Int16 speed)
 	if (speed <= 0)
 		return -1;
 	
-	_dx0[jj] = compute_current_vel(jj);//._speed[jj];//
+	_dx0[jj] = compute_current_vel(jj);
 	_x0[jj] = current;
 	_prev_a[jj] = current;
 	_xf[jj] = final;
 	
 	_distance[jj] = _xf[jj] - _x0[jj];
-	_tf[jj] = 100 *__labs (_distance[jj]) / speedf; // *100 is to make fine trajectory
-	//    it should be _tf[jj] /= (float)_period; but _period is equal to 1
-	
-	_dx0[jj] = _dx0[jj] * _tf[jj]; //the velocity is scaled  
-								   // 	
-	
+	_tf[jj] = 100 *__labs (_distance[jj]) / speedf;
+	_tf[jj] /= (float)_period;
+	_dx0[jj] = _dx0[jj] * _tf[jj];
 	_stepf[jj] = 1 / _tf[jj];
 	
 	if (_tf[jj] < 1)
@@ -131,6 +126,7 @@ Int16 init_trajectory (byte jj, Int32 current, Int32 final, Int16 speed)
 	}
 		
 	_curtf[jj] = 0;
+	_curstepf[jj] = 0;
 	_ended[jj] = false;
 	
 	return 0;
@@ -147,11 +143,13 @@ Int16 abort_trajectory (byte jj, Int32 limit)
 	{
 		_ended[jj] = true;
 		_curtf[jj] = 0;
+		_curstepf[jj] = 0;
 		_xf[jj] = limit;
 	}
 	else
 	{
 		_curtf[jj] = 0;
+		_curstepf[jj] = 0;
 		_xf[jj] = limit;
 	}
 	
@@ -165,19 +163,25 @@ Int16 abort_trajectory (byte jj, Int32 limit)
 Int32 step_trajectory (byte jj)
 {
 	Int32 a;
+	Int32 delta_a;
 	
 	/* (10 * (t/T)^3 - 15 * (t/T)^4 + 6 * (t/T)^5) * (x0-xf) + x0 */
 	if (_ended[jj])
 	{
 		a = _xf[jj];
+		delta_a = a - _prev_a[jj];
+		_prev_a[jj] = a;
 		return a;
 	}
 		
 	if (_curtf[jj] == 0)
 	{
 		_curtf[jj] += _stepf[jj];
+		_curstepf[jj] ++;
 		
 		a = _x0[jj];
+		delta_a = a - _prev_a[jj];
+		_prev_a[jj] = a;
 		return a;
 
 	}
@@ -190,6 +194,10 @@ Int32 step_trajectory (byte jj)
 		
 		/* time */
 		_curtf[jj] += _stepf[jj];
+		_curstepf[jj] ++;
+
+		delta_a = a - _prev_a[jj];
+		_prev_a[jj] = a;
 		return a;
 	}			
 
@@ -218,7 +226,7 @@ Int32 step_trajectory_delta (byte jj)
 	if (_curtf[jj] == 0)
 	{
 		_curtf[jj] += _stepf[jj];
-	
+		_curstepf[jj] ++;
 		
 		a = _x0[jj];
 		delta_a = a - _prev_a[jj];
@@ -235,6 +243,7 @@ Int32 step_trajectory_delta (byte jj)
 		
 		/* time */
 		_curtf[jj] += _stepf[jj];
+		_curstepf[jj] ++;
 
 		delta_a = a - _prev_a[jj];
 		_prev_a[jj] = a;
