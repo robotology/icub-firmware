@@ -163,3 +163,7 @@
 2010-23-Sept  Marco Randazzo <marco.randazzo@iit.it>
 	* fixed step_trajectory() problem. The code was precedently removed has been restored.
 	* Current build 49.	
+
+2010-24-Sept  Marco Randazzo <marco.randazzo@iit.it>
+	* fixed integral calculation in compute_pid_torque().
+	* Current build 50.	

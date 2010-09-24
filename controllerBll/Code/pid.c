@@ -103,10 +103,10 @@ Int16  _kr[JN] = INIT_ARRAY (3);				// scale factor (negative power of two)
 
 // TORQUE PID
 Int16  _strain_val[JN] = INIT_ARRAY (0);
-Int16  _error_torque[JN] ;						// actual feedback error 
-Int16  _error_old_torque[JN] ;					// error at t-1  
-Int16  _pid_limit_torque[JN] ;					// pid limit 
-Int16  _integral_limit_torque[JN] ;
+Int16  _error_torque[JN] = INIT_ARRAY (0);		// actual feedback error 
+Int16  _error_old_torque[JN] = INIT_ARRAY (0);	// error at t-1  
+Int16  _pid_limit_torque[JN] = INIT_ARRAY (0);	// pid limit 
+Int16  _integral_limit_torque[JN] = INIT_ARRAY (0x7fff);
 Int16  _kp_torque[JN] = INIT_ARRAY (0);			// PID gains: proportional... 
 Int16  _kd_torque[JN] = INIT_ARRAY (0);			// ... derivative  ...
 Int16  _ki_torque[JN] = INIT_ARRAY (0);			// ... integral
@@ -482,24 +482,22 @@ Int32 compute_pid_torque(byte j, Int16 strain_val)
 	/* Integral */
 	IntegralError =  ( (Int32) _error_torque[j]) * ((Int32) _ki_torque[j]);
 	
-	/* Integral */
-	IntegralError = ( (Int32) _error_torque[j]) * ((Int32) _ki_torque[j]);
-
-	if (IntegralError>=0)
+	_integral[j] = _integral[j] + IntegralError;
+	IntegralPortion = _integral[j];
+	
+	if (IntegralPortion>=0)
 	{
-		IntegralError = (IntegralError >> _kr_torque[j]); // integral reduction 
+		IntegralPortion = (IntegralPortion >> _kr[j]); // integral reduction 
 	}
 	else
 	{
-		IntegralError = -(-IntegralError >> _kr_torque[j]); // integral reduction 
-	}
-	if (IntegralError > MAX_16)
-		IntegralError = (Int32) MAX_16;
-	if (IntegralError < MIN_16) 
-		IntegralError = (Int32) MIN_16;
-	
-	_integral[j] = L_add(_integral[j], IntegralError);
-	IntegralPortion = (Int32) _integral[j];
+		IntegralPortion = -((-IntegralPortion) >> _kr[j]); // integral reduction 
+	} 
+	if (IntegralPortion > MAX_16)
+		IntegralPortion = (Int32) MAX_16;
+	if (IntegralPortion < MIN_16) 
+		IntegralPortion = (Int32) MIN_16;
+
 	/* Accumulator saturation */
 	if (IntegralPortion >= _integral_limit_torque[j])
 	{
