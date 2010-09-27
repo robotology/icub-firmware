@@ -37,7 +37,7 @@ void TI1_init (void)
 /**
  * isr timer. 
  */
-#pragma interrupt
+#pragma interrupt saveall
 void TI1_interrupt (void)
 {
 	byte i=0;
@@ -49,6 +49,8 @@ void TI1_interrupt (void)
 		/* Check Current */
 		for (i=0; i<JN; i++) 
 		{
+			check_current(i, (_pid[i] > 0));		
+			compute_i2t(i);
 			if ((get_current(i)>=25000) || (-get_current(i)>=25000))
 			{
 				_control_mode[i] = MODE_IDLE;	
@@ -59,8 +61,7 @@ void TI1_interrupt (void)
 				can_printf("ERR: ax%d _high curr DIS PWM",i);
                 #endif
 			}
-			check_current(i, (_pid[i] > 0));		
-			compute_i2t(i);
+	
 			if (_filt_current[i] > MAX_I2T_CURRENT)
 			{
 				_control_mode[i] = MODE_IDLE;	

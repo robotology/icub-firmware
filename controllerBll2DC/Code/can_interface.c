@@ -586,10 +586,10 @@ void can_send_broadcast(void)
     	_canmsg.CAN_data[6] = BYTE_H(_error[1]);
 		_canmsg.CAN_data[7] = BYTE_L(_error[1]);
 						
-		_canmsg.CAN_data[0] = BYTE_4(get_current(0));
-		_canmsg.CAN_data[1] = BYTE_3(get_current(0));
-		_canmsg.CAN_data[2] = BYTE_2(get_current(1));
-		_canmsg.CAN_data[3] = BYTE_1(get_current(1));
+		_canmsg.CAN_data[0] = BYTE_H(get_current(0));
+		_canmsg.CAN_data[1] = BYTE_L(get_current(0));
+		_canmsg.CAN_data[2] = BYTE_H(get_current(1));
+		_canmsg.CAN_data[3] = BYTE_L(get_current(1));
 				
 						
 		_canmsg.CAN_length = 8;

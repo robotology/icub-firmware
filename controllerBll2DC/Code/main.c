@@ -20,17 +20,17 @@
 #include "pwm_interface.h"
 #include "faults_interface.h"
 #include "temp_sens_interface.h"
-#include "brushess_comm.h"
-
+#include "brushed_comm.h"
+#include "abs_ssi_interface.h"
 #include "encoders_interface.h"
-
+#include "decoupling.h"
 #include "pwm_a.h"
 #include "pwm_b.h"
 
 
 byte	_board_ID = 15;	
 char    _additional_info [32];
-word    _build_number = 7;
+word    _build_number = 8;
 bool    mainLoopOVF=false;
 int     _countBoardStatus =0;
 Int16   _flash_version=0; 
@@ -48,7 +48,6 @@ UInt8   BUS_OFF=false;
 // Local prototypes 
 //********************
 
-void decouple_positions(void);
 
 #ifndef VERSION
 #	error "No valid version specified"
@@ -146,7 +145,7 @@ void main(void)
 	__ENIGROUP (35, 1); //AD triggered with the PWM 
 	__ENIGROUP (34, 1);
 	// TIMER_D
-	__ENIGROUP (33, 7); // 1ms timer for Brushess PWM ramp 
+	__ENIGROUP (33, 7); // 1ms timer for brushed PWM ramp 
 	__ENIGROUP (32, 1);
 	__ENIGROUP (31, 1);
 	__ENIGROUP (30, 1);
@@ -168,15 +167,15 @@ void main(void)
 	serial_interface_init (JN);
 	can_interface_init    (JN);
 
-	Init_Brushess_Comm    ();	
+	Init_Brushed_Comm    ();	
 
 
 //
     init_faults           (true,true,true);	 
-   init_position_encoder ();
+ //  init_position_encoder ();
     TI1_init 			  ();
 	__EI();
-	
+	init_position_abs_ssi  ();
 
 //	print_version ();
 	
@@ -186,7 +185,9 @@ void main(void)
 	/* reset trajectory generation */
 	for (i=0; i<JN; i++) abort_trajectory (i, 0);
 	
-	
+   for (i=0; i<JN; i++)	_position[i]=(Int32) Filter_Bit(get_position_abs_ssi(i));
+    for (i=0; i<JN; i++)    _max_real_position[i]=Filter_Bit(4095);
+    	
 	/* initialize speed and acceleration to zero (useful later on) */
 	for (i=0; i<JN; i++) _position_old[i] = 0;
 	for (i=0; i<JN; i++) _speed_old[i] = 0;
@@ -231,7 +232,11 @@ void main(void)
 	    for (i=0; i<JN; i++) 
 		{		
 			_position_old[i]=_position[i];
-			_position[i]=get_position_encoder(i);
+//			
+//			_position[i]=get_position_encoder(i);
+
+			_position[i]=Filter_Bit (get_position_abs_ssi(i));
+
 		}
 		
 		// decoupling the position
@@ -263,91 +268,39 @@ void main(void)
 		/* computes controls */
 		for (i=0; i<JN; i++) PWMoutput[i] = compute_pwm(i);
 		
+	
+
+//		decouple PWM	
+#ifdef USE_NEW_DECOUPLING
+		decouple_dutycycle_new_joint(PWMoutput); //new version (july 2010) with torque decupling
+#else
+		decouple_dutycycle(PWMoutput);				
+#endif				
+		
+//******************************************* SATURATES CONTROLS ***************************/                
 		/* saturates controls if necessary */
 		for (i=0; i<JN; i++)
 		{
 			ENFORCE_LIMITS			(i,PWMoutput[i]);
+			if      (_pid[i] < -MAX_DUTY) _pid[i]=-MAX_DUTY;
+			else if (_pid[i] > MAX_DUTY)  _pid[i]= MAX_DUTY;
 		}
-
 				
 		/* generate PWM */		
 		for (i=0; i<JN; i++)
 		{
 			if (_pad_enabled[i] == false) 
-			{			
+			{
 				_control_mode[i] = MODE_IDLE;
 			}
-			else
+			else	
 			{
-	
-					PWM_generate(i,_pid[i]);
-				
-			}		
+				PWM_generate(i,_pid[i]);
+		//		setReg (TMRD0_CNTR, 39998);              				
+			}
 			
 		}
 
-				/* check temperature sensor */
-		#ifdef TEMPERATURE_SENSOR
-		TempSensCount1++;
-		TempSensCount2++;
-		
-		// communicate with temperature sensor every 5millisecs
-		if (TempSensCount1==5)
-		{
-			if (MeasureTempSens()==TEMPERATURE_STATUS_OK)
-				{
-					TempSens[0]=GetTempSens(0);			
-					TempSens[1]=GetTempSens(1);		
-#ifdef DEBUG_TEMP_SENS			
-					can_printf("temp %d %d",TempSens[0],TempSens[1]);
-#endif				
-				}
-			else
-				{
-#ifdef DEBUG_TEMP_SENS
-					can_printf("ERR: Temp sens not ready! \r\n");
-#endif		
-					TempSens[0]=0;			
-					TempSens[1]=0;		
-				}	
-			TempSensCount1=0;
-		}
-
-		//print this warning message every 30secs		
-		if (TempSensCount2==30000)
-		{
-			for (i=0; i<JN; i++) 
-			{
-				if (TempSens[i] > 35) 
-				{	
-#ifdef DEBUG_CAN_MSG	
-					can_printf("WARN: high temp ax%d: %d",i,TempSens[i]);
-#endif
-				}
-				if (TempSens[i] > 70)	
-				{
-#ifdef DEBUG_CAN_MSG
-					can_printf("WARN: VERY HIGH temp ax%d: %d",i,TempSens[i]);	
-#endif			
-				}
-			}
-			TempSensCount2 = 0;		
-		}
-   
-		//check for overtemperature
-		for (i=0; i<JN; i++) 
-		{
-			if ((TempSens[i] > 75) && _pad_enabled[i] == true)
-			{
-				_control_mode[i] = MODE_IDLE;	
-				_pad_enabled[i] = false;
-#ifdef DEBUG_CAN_MSG
-				can_printf("WARN: VERY HIGH temp ax%d: %d! disabling pwm...",i,TempSens[i]);	
-#endif				
-				PWM_outputPadDisable(i);				
-			}
-		}
-		#endif
 		
 		
 /*****************************************************************
@@ -394,40 +347,7 @@ void main(void)
 	} /* end for(;;) */
 }
 	
-/***************************************************************************/
-/**
- * this function decouple encoder readings.
- ***************************************************************************/
-void decouple_positions(void)
-{
-		
-#if VERSION == 0x0163		
-		/* beware of the first cycle when _old has no meaning */		
-		_position[0] = _position[0]+ ((float)_adjustment[0]*6.5/3.8);  
-		_position[0] = _position[0]- ((float) _adjustment[1]*6.5/3.8);
-		/*
-		|M1| |  1     0    0   |  |T1|
-		|T2|=|  0     1    0   |* |T2|     with a=3.8/6
-		|M3| | 1/a  -1/a   1   |  |T3|
-		*/
-		_adjustment[0] = L_add(_adjustment[0], _delta_adj[0]);
-		_adjustment[1] = L_add(_adjustment[1], _delta_adj[1]);
-				
-#elif VERSION == 0x0165
-		_position[0] = _position[0] - _position[1];
-		_position[1] = _position[0] + 2*_position[1];	
-		
-/*#elif VERSION == 0x0162
-		
-	/*  Waist Differential coupling 
-		|Me1| |  1     1 |  |Je1|
-		|Me2|=|  1    -1 |* |Je2|    */
 
-/*	_position[0] =_position[0] -  _position[1];
-	_position[1] =_position[0] +2*_position[1];
-*/
-#endif
-}
 
 
 
