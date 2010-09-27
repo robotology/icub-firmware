@@ -5,7 +5,7 @@
 #include "faults_interface.h"
 #include "leds_interface.h"
 #include "can1.h"
-#include "brushess_comm.h"
+#include "brushed_comm.h"
 bool _pad_enabled[2] = {0,0};
 extern sDutyControlBL DutyCycle[2];
 extern sDutyControlBL DutyCycleReq[2];
@@ -37,16 +37,18 @@ void PWM_outputPadDisable(byte axis)
 	
 	if (axis == 0)	
 	{
-		PWM_generate_DC(0, 0, 0);
+//		PWM_generate_DC(0, 0, 0);
 		PWM_A_outputPadDisable(ALL_CHANNELS);
 		_pad_enabled[0]= false;
+		DutyCycle[0].Duty = MIN_DUTY; 
 		led0_off
 	}
 	else    		
 	{
-    	PWM_generate_DC(1, 0, 0);
+//   	PWM_generate_DC(1, 0, 0);
 		_pad_enabled[1]= false;
 		PWM_B_outputPadDisable(ALL_CHANNELS);	
+		DutyCycle[1].Duty = MIN_DUTY; 
 		led2_off
 	}
 	FaultInterruptDisable(axis);
@@ -60,25 +62,37 @@ void PWM_outputPadDisable(byte axis)
  ***************************************************************************/
 void PWM_outputPadEnable(byte axis)
 {
+Int16 status=0;
 //	#ifdef DEBUG_CAN_MSG
 	can_printf("PWM ENA CH%d", axis);
-//	#endif
-	if (axis == 0)
-	{
-		PWM_generate_DC(0, 0, 0);
-		PWM_A_outputPadEnable(ALL_CHANNELS);
-		_pad_enabled[0]= true;
+	
+	status = getReg (PWMA_PMFSA);
+	if ((axis == 0) && !(status & PWMA_PMFSA_FPIN3_MASK)) 	 
+	{	
+		if (getRegBit(PWMA_PMOUT,PAD_EN)) 
+		{
+			led0_on
+			_pad_enabled[0]= true;
+			return;
+		}
 		led0_on
+		_pad_enabled[0]= true;
+		PWM_A_outputPadEnable(ALL_CHANNELS); 	
 	}
-	else    		
+	status = getReg (PWMB_PMFSA);
+	if ((axis == 1)  && !(status & PWMB_PMFSA_FPIN3_MASK))
 	{
-		
-		PWM_generate_DC(1, 0, 0);
-		PWM_B_outputPadEnable(ALL_CHANNELS);
-		_pad_enabled[1]= true;
+		if (getRegBit(PWMB_PMOUT,PAD_EN))
+		{
+			led2_on
+			_pad_enabled[1]= true;
+			return;
+		}
 		led2_on
-	}
-	FaultInterruptEnable(axis);		
+		_pad_enabled[1]= true;
+		PWM_B_outputPadEnable(ALL_CHANNELS);
+	}    
+		FaultInterruptEnable(axis);			
 }
 
 

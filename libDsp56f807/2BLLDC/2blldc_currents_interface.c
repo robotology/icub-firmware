@@ -2,7 +2,7 @@
 #include "currents_interface.h"
 #include "ad.h"
 #include "pwm_interface.h"
-#include "brushess_comm.h"
+#include "brushed_comm.h"
 Int32 MAX_CURRENT=7000;   //MAX current in milliAmpere
 Int32 MAX_I2T_CURRENT=2000000000;
 Int32 _current_limit_I2T=7000; //NOT USED, we are using max_allowed_current  value in mA 

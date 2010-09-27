@@ -5,7 +5,7 @@
  
 #include "pwm_a.h"
 #include "faults_interface.h"
-#include "brushess_comm.h"
+#include "brushed_comm.h"
 
 extern sDutyControlBL DutyCycle[2];
 extern sDutyControlBL DutyCycleReq[2];

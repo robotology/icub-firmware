@@ -1,5 +1,5 @@
 
-#include "brushess_comm.h"
+#include "brushed_comm.h"
 #include "phase_hall_sens.h"
 #include "pwm_interface.h"
 #include "pwm_a.h"
@@ -142,7 +142,7 @@ void TD0_interrupt(void)
 }
 
 //*********************************************************
-void Init_Brushess_Comm()
+void Init_Brushed_Comm()
 {
 	UInt8 tmp=0;
 	UInt8 nop=0;
@@ -170,7 +170,7 @@ void Init_Brushess_Comm()
 
 /***************************************************************************/
 /**
- * This method generates the PWM signal for a 2 BRUSHESS board
+ * This method generates the PWM signal for a 2 brushed board
  * This must be used to give the dutycycle to the motor.
  * The function does not put immediately the value to the PWM channel, but 
  * it change the value of the DutyCycleReq. The DutyCycle will be increased or 

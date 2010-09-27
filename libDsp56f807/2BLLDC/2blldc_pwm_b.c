@@ -1,7 +1,7 @@
  
 #include "pwm_b.h"
 #include "faults_interface.h"
-#include "brushess_comm.h"
+#include "brushed_comm.h"
 // the PWM limit are MIN_DUTY= 2%   and MAX_DUTY=98%
 //#define PWMCM    1333   //it correspond to 30KHz PWM
 //#define MIN_DUTY 58 // 2% of  1333 + deadtime*2
@@ -84,7 +84,7 @@ void PWM_B_outputPadEnable (word mask)
 
 void PWM_B_outputPadDisable (word mask)
 {
-	setRegBits (PWMB_PMCFG, PWMB_PMCFG_WP_MASK); 
+      clrRegBit(PWMB_PMOUT,PAD_EN);
 }
 	
 void PWM_B_Write_Protect()
