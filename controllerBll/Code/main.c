@@ -351,6 +351,14 @@ void main(void)
 		_position[0]=get_position_encoder(1);
 		_position_old[1]=_position[1]; 
 		_position[1]=Filter_Bit (get_position_abs_ssi(0));
+#elif VERSION == 0x0351
+		_position_old[0]=_position[0];
+		if(get_error_abs_ssi(0)==ERR_OK) 
+			_position[0]=Filter_Bit (get_relative_position_abs_ssi(0));
+		
+		_position_old[1]=_position[1];
+		if(get_error_abs_ssi(1)==ERR_OK) 
+			_position[1]=Filter_Bit (get_relative_position_abs_ssi(1));
 #else
 	 	for (i=0; i<JN; i++) 
 		{
@@ -447,9 +455,9 @@ void main(void)
 
 	
 //******************************************* POSITION LIMIT CHECK ***************************/
-
+#if (VERSION != 0x0351)
 		for (i=0; i<JN; i++)  check_range(i, _safeband[i], PWMoutput);
-
+#endif
 //******************************************* COMPUTES CONTROLS *****************************/
 led0_on	
 		for (i=0; i<JN; i++) 
