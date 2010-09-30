@@ -113,8 +113,9 @@ void can_receive_additional_info();
 #define CAN_BCAST_OVERFLOW			5
 #define CAN_BCAST_PRINT				6
 #define CAN_BCAST_VELOCITY			7
+#define CAN_BCAST_PID_ERROR			8
 
-#define CAN_BCAST_MAX_MSGS			8
+#define CAN_BCAST_MAX_MSGS			9
 
 
 
