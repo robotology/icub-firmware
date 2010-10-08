@@ -489,11 +489,11 @@ Int32 compute_pid_torque(byte j, Int16 strain_val)
 	
 	if (IntegralPortion>=0)
 	{
-		IntegralPortion = (IntegralPortion >> _kr[j]); // integral reduction 
+		IntegralPortion = (IntegralPortion >> _kr_torque[j]); // integral reduction 
 	}
 	else
 	{
-		IntegralPortion = -((-IntegralPortion) >> _kr[j]); // integral reduction 
+		IntegralPortion = -((-IntegralPortion) >> _kr_torque[j]); // integral reduction 
 	} 
 	if (IntegralPortion > MAX_16)
 		IntegralPortion = (Int32) MAX_16;
