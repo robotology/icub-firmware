@@ -656,7 +656,7 @@ Int32 compute_current_pid(byte j)
 	/* the error @ previous cycle */
 	_error_current_old[j] = _error_current[j];
 
-	InputError = L_sub(_desired_current[j], get_current(j);
+	InputError = L_sub(_desired_current[j], get_current(j));
 		
 	if (InputError > MAX_16)
 		_error_current[j] = MAX_16;
