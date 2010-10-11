@@ -146,14 +146,12 @@ extern Int16  _ko[JN] ;					// offset
 extern Int16  _kr[JN] ;					// scale factor (negative power of two) 
 
 
+
 // TORQUE PID
 extern Int16  _strain_val[JN];
 extern Int16  _error_torque[JN] ;			// actual feedback error 
 extern Int16  _error_old_torque[JN] ;		// error at t-1 
-extern Int16  _pid_torque[JN] ;				// pid result 
 extern Int16  _pid_limit_torque[JN] ;		// pid limit 
-extern Int32  _pd_torque[JN] ;             	// pd portion of the pid
-extern Int32  _integral_torque[JN] ;		// store the sum of the integral component 
 extern Int16  _integral_limit_torque[JN] ;
 
 extern Int16  _kp_torque[JN] ;				// PID gains: proportional... 
@@ -170,16 +168,16 @@ extern Int16  _ko_imp[JN] ;				// offset
 											
 #if VERSION == 0x0116
 // CURRENT PID
-extern Int32  _desired_current[JN] ;		// PID ref value, computed by the trajectory generator 
+extern Int32  _desired_current[JN] ;	// PID ref value, computed by the trajectory generator 
 extern Int16  _error_current[JN] ;		// current error
 extern Int16  _error_current_old[JN] ;	// current error at t-1 
-extern Int16  _kp_current[JN] ;		// PID gains: proportional ... 
-extern Int16  _kd_current[JN] ;		// ... derivative  ...
+extern Int16  _kp_current[JN] ;			// PID gains: proportional ... 
+extern Int16  _kd_current[JN] ;			// ... derivative  ...
 extern Int16  _ki_current[JN] ;			// integral
 extern Int16  _kr_current[JN] ;			// scale factor (negative power of two) 
 extern Int32  _integral_current[JN] ;	// store the sum of the integral component 
-extern Int16  _current_limit[JN] ;	// pid current limit 
-extern Int32  _pd_current[JN] ;          // pd portion of the current pid
+extern Int16  _current_limit[JN] ;		// pid current limit 
+extern Int32  _pd_current[JN] ;         // pd portion of the current pid
 #endif
 
 
@@ -201,7 +199,7 @@ controlling with absolute position sensors*/
 #endif
 
 #ifdef SMOOTH_PID_CTRL
-extern float _pid_old[JN] ;			// pid control at previous time step 
+extern float _pid_old[JN] ;				// pid control at previous time step 
 extern float _filt_pid[JN] ;			// filtered pid control
 #endif
 

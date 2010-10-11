@@ -74,16 +74,16 @@ Int16 _set_vel[JN] = INIT_ARRAY (DEFAULT_VELOCITY);		// set point for velocity [
 Int16 _max_vel[JN] = INIT_ARRAY (DEFAULT_MAX_VELOCITY);	// assume this limit is symmetric 
 Int32 _vel_shift[JN] = INIT_ARRAY (4);
 Int16 _vel_counter[JN] = INIT_ARRAY (0);
-Int16 _vel_timeout[JN] = INIT_ARRAY (2000);                     // timeout on velocity messages
-
+Int16 _vel_timeout[JN] = INIT_ARRAY (2000);                  // timeout on velocity messages
 
 // ACCELERATION VARIABLES
 Int16  _accel[JN] = INIT_ARRAY (0);			 			 // encoder acceleration 
 Int16  _set_acc[JN] = INIT_ARRAY (DEFAULT_ACCELERATION); // set point for acceleration [too low!] 
 
-	
+
 // TORQUE VARIABLES
 Int32 _desired_torque[JN] = INIT_ARRAY (0); 	// PID ref value, computed by the trajectory generator 
+
 
 // POSITION PID VARIABLES
 Int16  _error_position[JN] = INIT_ARRAY (0);	// actual feedback error 
@@ -93,7 +93,7 @@ Int16  _absolute_error_old[JN] = INIT_ARRAY (0);// error at t-1
 Int16  _pid[JN] = INIT_ARRAY (0);				// pid result 
 Int16  _pid_limit[JN] = INIT_ARRAY (0);			// pid limit 
 Int32  _pd[JN] = INIT_ARRAY (0);              	// pd portion of the pid
-Int32  _integral[JN] = INIT_ARRAY (0.0);		// store the sum of the integral component 
+Int32  _integral[JN] = INIT_ARRAY (0);	 		// store the sum of the integral component 
 Int16  _integral_limit[JN] = INIT_ARRAY (0x7fff);
 
 Int16  _kp[JN] = INIT_ARRAY (10);				// PID gains: proportional... 
@@ -105,14 +105,10 @@ Int16  _kr[JN] = INIT_ARRAY (3);				// scale factor (negative power of two)
 
 // TORQUE PID
 Int16  _strain_val[JN] = INIT_ARRAY (0);
-Int16  _error_torque[JN] ;						// actual feedback error 
-Int16  _error_old_torque[JN] ;					// error at t-1 
-Int16  _pid_torque[JN] ;						// pid result 
-Int16  _pid_limit_torque[JN] ;					// pid limit 
-Int32  _pd_torque[JN] ;           			  	// pd portion of the pid
-Int32  _integral_torque[JN] ;					// store the sum of the integral component 
-Int16  _integral_limit_torque[JN] ;
-
+Int16  _error_torque[JN] = INIT_ARRAY (0);		// actual feedback error 
+Int16  _error_old_torque[JN] = INIT_ARRAY (0);	// error at t-1  
+Int16  _pid_limit_torque[JN] = INIT_ARRAY (0);	// pid limit 
+Int16  _integral_limit_torque[JN] = INIT_ARRAY (0x7fff);
 Int16  _kp_torque[JN] = INIT_ARRAY (10);		// PID gains: proportional... 
 Int16  _kd_torque[JN] = INIT_ARRAY (40);		// ... derivative  ...
 Int16  _ki_torque[JN] = INIT_ARRAY (0);			// ... integral
@@ -127,16 +123,16 @@ Int16  _ko_imp[JN] = INIT_ARRAY (0);			// offset
 											
 #if VERSION == 0x0116
 // CURRENT PID
-Int32 _desired_current[JN] = INIT_ARRAY (0);	/* PID ref value, computed by the trajectory generator */
-Int16  _error_current[JN] = INIT_ARRAY (0);		/* current error*/
-Int16  _error_current_old[JN] = INIT_ARRAY (0);	/* current error at t-1 */
-Int16  _kp_current[JN] = INIT_ARRAY (40);		/* PID gains: proportional ... */
-Int16  _kd_current[JN] = INIT_ARRAY (30);		/* ... derivative  ...*/
-Int16  _ki_current[JN] = INIT_ARRAY (1);		/* integral*/
-Int16  _kr_current[JN] = INIT_ARRAY (6);		/* scale factor (negative power of two) */
-Int32  _integral_current[JN] = INIT_ARRAY (0);	/* store the sum of the integral component */
-Int16  _current_limit[JN] = INIT_ARRAY (250);	/* pid current limit */
-Int32  _pd_current[JN] = INIT_ARRAY (0);         /* pd portion of the current pid*/
+Int32 _desired_current[JN] = INIT_ARRAY (0);	// PID ref value, computed by the trajectory generator 
+Int16  _error_current[JN] = INIT_ARRAY (0);		// current error
+Int16  _error_current_old[JN] = INIT_ARRAY (0);	// current error at t-1 
+Int16  _kp_current[JN] = INIT_ARRAY (40);		// PID gains: proportional ... 
+Int16  _kd_current[JN] = INIT_ARRAY (30);		// ... derivative  ...
+Int16  _ki_current[JN] = INIT_ARRAY (1);		// integral
+Int16  _kr_current[JN] = INIT_ARRAY (6);		// scale factor (negative power of two) 
+Int32  _integral_current[JN] = INIT_ARRAY (0);	// store the sum of the integral component 
+Int16  _current_limit[JN] = INIT_ARRAY (250);	// pid current limit 
+Int32  _pd_current[JN] = INIT_ARRAY (0);        // pd portion of the current pid
 #endif
 
 //variables for the smooth_pid
@@ -173,9 +169,10 @@ Int32  _delta_adj[JN] = INIT_ARRAY (0);			/* velocity over the adjustment */
 Int32  _adjustment[JN]=INIT_ARRAY (0);         /* the sum of the three value coming from the MAIS board*/
 #endif
 
+
 #ifdef SMOOTH_PID_CTRL
-float _pid_old[JN] = INIT_ARRAY (0);			/* pid control at previous time step */
-float _filt_pid[JN] = INIT_ARRAY (0);			/* filtered pid control*/
+float _pid_old[JN] = INIT_ARRAY (0);			// pid control at previous time step 
+float _filt_pid[JN] = INIT_ARRAY (0);			// filtered pid control
 #endif
 
 #if ((VERSION == 0x0120) || (VERSION == 0x0121) || (VERSION == 0x0128) || (VERSION == 0x0130))
@@ -244,7 +241,7 @@ Int32 compute_pwm(byte j)
 	case MODE_TORQUE: 
 		PWMoutput = compute_pid_torque(j, _strain_val[j]);
 		PWMoutput = PWMoutput + _ko_torque[j];
-		_pd_torque[j] = _pd_torque[j] + _ko_torque[j];
+		_pd[j] = _pd[j] + _ko_torque[j];
 	break;
 	case MODE_IMPEDANCE_POS:
 	case MODE_IMPEDANCE_VEL: 
@@ -264,11 +261,10 @@ Int32 compute_pwm(byte j)
 		_desired_torque[j] += -(Int32)_kd_imp[j] * (Int32)_speed[j];
 		PWMoutput = compute_pid_torque(j, _strain_val[j]);
 		PWMoutput = PWMoutput + _ko_torque[j];
-		_pd_torque[j] = _pd_torque[j] + _ko_torque[j];
+		_pd[j] = _pd[j] + _ko_torque[j];
 	break;
-	
 #endif
-			
+	
 	case MODE_CALIB_HARD_STOPS:
 		_desired[j]+=_velocity_calibration[j];
 		PWMoutput = compute_pid2(j);
@@ -280,12 +276,14 @@ Int32 compute_pwm(byte j)
 
 	case MODE_IDLE:
 		PWMoutput=0;
-		break; 		
+	break; 
 	}
+	
 	
 #ifdef SMOOTH_PID_CTRL
 	PWMoutput = compute_filtpid(j, PWMoutput);
 #endif
+	
 	return PWMoutput;
 }
 
@@ -363,39 +361,37 @@ Int32 compute_pid_torque(byte j, Int16 strain_val)
 	/* Integral */
 	IntegralError =  ( (Int32) _error_torque[j]) * ((Int32) _ki_torque[j]);
 	
-	/* Integral */
-	IntegralError = ( (Int32) _error_torque[j]) * ((Int32) _ki_torque[j]);
-
-	if (IntegralError>=0)
+	_integral[j] = _integral[j] + IntegralError;
+	IntegralPortion = _integral[j];
+	
+	if (IntegralPortion>=0)
 	{
-		IntegralError = (IntegralError >> _kr_torque[j]); // integral reduction 
+		IntegralPortion = (IntegralPortion >> _kr_torque[j]); // integral reduction 
 	}
 	else
 	{
-		IntegralError = -(-IntegralError >> _kr_torque[j]); // integral reduction 
-	}
-	if (IntegralError > MAX_16)
-		IntegralError = (Int32) MAX_16;
-	if (IntegralError < MIN_16) 
-		IntegralError = (Int32) MIN_16;
-	
-	_integral_torque[j] = L_add(_integral_torque[j], IntegralError);
-	IntegralPortion = (Int32) _integral_torque[j];
+		IntegralPortion = -((-IntegralPortion) >> _kr_torque[j]); // integral reduction 
+	} 
+	if (IntegralPortion > MAX_16)
+		IntegralPortion = (Int32) MAX_16;
+	if (IntegralPortion < MIN_16) 
+		IntegralPortion = (Int32) MIN_16;
+
 	/* Accumulator saturation */
 	if (IntegralPortion >= _integral_limit_torque[j])
 	{
 		IntegralPortion = _integral_limit_torque[j];
-		_integral_torque[j] =  _integral_limit_torque[j];
+		_integral[j] =  _integral_limit_torque[j];
 	}		
 	else
 		if (IntegralPortion < - (_integral_limit_torque[j]))
 		{
 			IntegralPortion = - (_integral_limit_torque[j]);
-			_integral_torque[j] = (-_integral_limit_torque[j]);
+			_integral[j] = (-_integral_limit_torque[j]);
 		}
 		
-	_pd_torque[j] = L_add(ProportionalPortion, DerivativePortion);
-	PIDoutput = L_add(_pd_torque[j], IntegralPortion);
+	_pd[j] = L_add(ProportionalPortion, DerivativePortion);
+	PIDoutput = L_add(_pd[j], IntegralPortion);
 	
 	return PIDoutput;
 }
@@ -407,10 +403,12 @@ Int32 compute_pid2(byte j)
 {
 	Int32 ProportionalPortion, DerivativePortion, IntegralPortion;
 	Int32 IntegralError;
+	
 	Int32 PIDoutput;
 	Int32 InputError;
 		
 	/* the error @ previous cycle */
+	
 	_error_position_old[j] = _error_position[j];
 
 	InputError = L_sub(_desired[j], _position[j]);
@@ -423,8 +421,8 @@ Int32 compute_pid2(byte j)
 	else
 	{
 		_error_position[j] = extract_l(InputError);
-	}		
-	
+	}
+			
 	/* Proportional */
 	ProportionalPortion = ((Int32) _error_position[j]) * ((Int32)_kp[j]);
 	
@@ -460,11 +458,11 @@ Int32 compute_pid2(byte j)
 	_pd_current[j] = L_add(ProportionalPortion, DerivativePortion);
 	PIDoutput = L_add(_pd_current[j], IntegralPortion);
 
-#else
-	
+#else 
+
 	_integral[j] = _integral[j] + IntegralError;
 	IntegralPortion = _integral[j];
-		
+	
 	if (IntegralPortion>=0)
 	{
 		IntegralPortion = IntegralPortion >> (_kr[j]); // integral reduction 
@@ -472,8 +470,7 @@ Int32 compute_pid2(byte j)
 	else
 	{
 		IntegralPortion = -(-IntegralPortion >> (_kr[j])); // integral reduction 
-	}
-	
+	} 
 	if (IntegralPortion > MAX_16)
 		IntegralPortion = (Int32) MAX_16;
 	if (IntegralPortion < MIN_16) 
@@ -491,8 +488,7 @@ Int32 compute_pid2(byte j)
 			IntegralPortion = - (_integral_limit[j]);
 			_integral[j] = -(_integral_limit[j] << (_kr[j]));
 		}
-
-
+		
 	_pd[j] = L_add(ProportionalPortion, DerivativePortion);
 	PIDoutput = L_add(_pd[j], IntegralPortion);
 
@@ -561,7 +557,6 @@ Int32 compute_pid_abs(byte j)
 {
 	Int32 ProportionalPortion, DerivativePortion;
 	Int32 PIDoutput;
-//	Int16 InputError;
 	Int16 Kp = 1;
 	Int16 Kd = 10;
 		
