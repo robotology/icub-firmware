@@ -51,6 +51,9 @@ extern Int32 _abs_pos_calibration[JN] ;		// absolute position to be reached duri
 extern Int32 _filt_abs_pos[JN] ;			// filtered absolute position sensor position
 extern Int32 _position[JN] ;				// encoder position 
 extern Int32 _position_old[JN] ;			// do I need to add bits for taking into account multiple rotations 
+extern Int32 _position_enc[JN] ;				// incremental encoder position 
+extern Int32 _position_enc_old[JN] ;			// do I need to add bits for taking into account multiple rotations 
+
 extern Int16 _speed[JN] ;					// encoder speed 
 
 extern Int16 _speed_old[JN]; 	//previous speed

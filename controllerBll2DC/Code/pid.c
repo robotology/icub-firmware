@@ -48,7 +48,10 @@ byte  _t1c =0;
 Int32 _abs_pos_calibration[JN] = INIT_ARRAY (0); // absolute position to be reached during calibration
 Int32 _filt_abs_pos[JN] = INIT_ARRAY (0);		 // filtered absolute position sensor position
 Int32 _position[JN] = INIT_ARRAY (0);			 // encoder position 
+Int32 _position_enc[JN] = INIT_ARRAY (0);			 // incremental encoder position 
+
 Int32 _position_old[JN] = INIT_ARRAY (0);		 // do I need to add bits for taking into account multiple rotations 
+Int32 _position_enc_old[JN] = INIT_ARRAY (0);			 // incremental encoder position 
 
 Int32 _real_position[JN]= INIT_ARRAY (0);
 Int32 _real_position_old[JN]= INIT_ARRAY (0);
@@ -243,6 +246,29 @@ Int32 compute_pid2(byte j)
 		ProportionalPortion = -(-ProportionalPortion >> _kr[j]);
 	}
 	
+#if VERSION==0x162
+	
+	/* Derivative */	
+		/* Derivative */
+	if (j==0)
+	{
+		DerivativePortion = ((Int32) (_speed[0]-_speed[1])) * ((Int32) _kd[j]);	
+	}
+	else 
+	{
+		DerivativePortion = ((Int32) (_speed[0]+_speed[1])) * ((Int32) _kd[j]);	
+	}
+
+	if (DerivativePortion>=0)
+	{
+		DerivativePortion = DerivativePortion >> _kr[j]; 
+	}
+	else
+	{
+		DerivativePortion = -(-DerivativePortion >> _kr[j]);
+	}
+#else
+
 	/* Derivative */	
 		/* Derivative */	
 	DerivativePortion = ((Int32) (_error[j]-_error_old[j])) * ((Int32) _kd[j]);
@@ -255,7 +281,8 @@ Int32 compute_pid2(byte j)
 	{
 		DerivativePortion = -(-DerivativePortion >> _kr[j]);
 	}
-		
+	
+#endif		
 	/* Integral */
 	IntegralError = ( (Int32) _error[j]) * ((Int32) _ki[j]);
 

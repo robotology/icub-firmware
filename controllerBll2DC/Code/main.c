@@ -30,7 +30,7 @@
 
 byte	_board_ID = 15;	
 char    _additional_info [32];
-word    _build_number = 8;
+word    _build_number = 9;
 bool    mainLoopOVF=false;
 int     _countBoardStatus =0;
 Int16   _flash_version=0; 
@@ -172,7 +172,7 @@ void main(void)
 
 //
     init_faults           (true,true,true);	 
- //  init_position_encoder ();
+    init_position_encoder ();
     TI1_init 			  ();
 	__EI();
 	init_position_abs_ssi  ();
@@ -185,11 +185,16 @@ void main(void)
 	/* reset trajectory generation */
 	for (i=0; i<JN; i++) abort_trajectory (i, 0);
 	
-   for (i=0; i<JN; i++)	_position[i]=(Int32) Filter_Bit(get_position_abs_ssi(i));
-    for (i=0; i<JN; i++)    _max_real_position[i]=Filter_Bit(4095);
-    	
+#if VERSION==0x0162	
+   	for (i=0; i<JN; i++)	_position[i]=(Int32) Filter_Bit(get_position_abs_ssi(i));
+   	for (i=0; i<JN; i++)    _max_real_position[i]=Filter_Bit(4095);
+   	for (i=0; i<JN; i++)	_position_enc[i]=0;
+#endif
+
+#    	
 	/* initialize speed and acceleration to zero (useful later on) */
 	for (i=0; i<JN; i++) _position_old[i] = 0;
+	for (i=0; i<JN; i++) _position_enc_old[i] = 0;
 	for (i=0; i<JN; i++) _speed_old[i] = 0;
 	for (i=0; i<JN; i++) _accel[i] = 0;
 	
@@ -233,12 +238,23 @@ void main(void)
 		{		
 			_position_old[i]=_position[i];
 //			
-//			_position[i]=get_position_encoder(i);
 
-			_position[i]=Filter_Bit (get_position_abs_ssi(i));
+#if VERSION==0x0162	
+		
+	    _position_enc_old[i]=_position_enc[i];	
+		_position[i]=Filter_Bit (get_position_abs_ssi(i));
+		_position_enc[i]=get_position_encoder(i);
+
+#elif VERSION==0x0161
+
+		_position[i]=get_position_encoder(i);
+
+#endif			
+
+		
 
 		}
-		
+	
 		// decoupling the position
 		 	
 		decouple_positions();
@@ -248,8 +264,14 @@ void main(void)
 		if (_counter == 0)
 		{		
 			/* this can be useful to estimate speed later on */
+	#if VERSION==0x0161		
+		
 			for (i=0; i<JN; i++) _speed[i] = (Int16)(_position[i] - _position_old[i]);
-			
+
+	#elif VERSION==0x0162	
+	
+			for (i=0; i<JN; i++) _speed[i] = (Int16)(_position_enc[i] - _position_enc_old[i]);	
+	#endif 
 			/* this can be useful to estimate acceleration later on */
 			for (i=0; i<JN; i++) _accel[i] = (_speed[i] - _speed_old[i]);
 			
