@@ -1,7 +1,7 @@
 
 
-#ifndef __brushess_commh__
-#define __brushess_commh__
+#ifndef __brushed_commh__
+#define __brushed_commh__
 
 #include "dsp56f807.h"
 
@@ -28,7 +28,7 @@ void TD0_Enable(void);
 
 void TD0_Disable(void);
 
-void Init_Brushess_Comm(void);
+void Init_Brushed_Comm(void);
 void TD0_init (void);
 void PWM_generate_DC(byte i, Int16 pwm_value, byte dir);
 
