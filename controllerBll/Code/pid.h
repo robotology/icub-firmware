@@ -19,6 +19,7 @@
 
 Int32 compute_pwm(byte j);
 Int32 compute_pid2(byte j);
+Int32 compute_pid_speed(byte j);
 Int32 compute_pid_torque(byte j, Int16 strain_val);
 Int32 compute_current_pid(byte j);
 Int32 compute_pid_abs(byte j);
@@ -153,6 +154,10 @@ extern Int16  _kd_torque[JN] ;				// ... derivative  ...
 extern Int16  _ki_torque[JN] ;				// ... integral
 extern Int16  _ko_torque[JN] ;				// offset 
 extern Int16  _kr_torque[JN] ;				// scale factor (negative power of two) 
+
+// SPEED PID (iKart)
+extern Int16  _error_speed[JN];	            // actual feedback error 
+extern Int16  _error_speed_old[JN];         // error at t-1
 
 // JOINT IMPEDANCE
 extern Int16  _ks_imp[JN] ;				// stiffness coeffficient

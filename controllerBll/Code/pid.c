@@ -113,6 +113,10 @@ Int16  _ki_torque[JN] = INIT_ARRAY (0);			// ... integral
 Int16  _ko_torque[JN] = INIT_ARRAY (0);			// offset 
 Int16  _kr_torque[JN] = INIT_ARRAY (10);		// scale factor (negative power of two) 
 
+// SPEED PID (iKart)
+Int16  _error_speed[JN] = INIT_ARRAY (0);	    // actual feedback error 
+Int16  _error_speed_old[JN] = INIT_ARRAY (0);   // error at t-1
+
 // JOINT IMPEDANCE
 Int16  _ks_imp[JN] = INIT_ARRAY (0);			// stiffness coefficient
 Int16  _kd_imp[JN] = INIT_ARRAY (0);			// damping coefficient
@@ -640,6 +644,115 @@ Int32 compute_pid2(byte j)
 	return PIDoutput;
 }
 
+/*
+ * compute explicit speed PID control (iKart).
+ */
+Int32 compute_pid_speed(byte j)
+{
+	Int32 ProportionalPortion, DerivativePortion, IntegralPortion;
+	Int32 IntegralError;
+	
+	Int32 PIDoutput;
+	Int32 InputError;
+	byte i=0;
+	byte k=0;
+
+	static Int32 DerPort[2][10]={{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};	
+	Int16 Coeff[10]={1,1,1,1,1,1,1,1,1,1};
+	Int16 Sum_Coeff=10; //should be equal to the sum of Coeffs
+	
+	/* the error @ previous cycle */
+	
+	_error_speed_old[j] = _error_speed[j];
+
+	InputError = L_sub(_set_vel[j], _speed[j]);
+		
+	if (InputError > MAX_16)
+		_error_speed[j] = MAX_16;
+	else
+	if (InputError < MIN_16) 
+		_error_speed[j] = MIN_16;
+	else
+	{
+		_error_speed[j] = extract_l(InputError);
+	}
+			
+	/* Proportional */
+	ProportionalPortion = ((Int32) _error_speed[j]) * ((Int32)_kp[j]);
+	
+	if (ProportionalPortion>=0)
+	{
+		ProportionalPortion = ProportionalPortion >> _kr[j]; 
+	}
+	else
+	{
+		ProportionalPortion = -(-ProportionalPortion >> _kr[j]);
+	}
+	
+	/* Derivative */	
+	DerivativePortion = ((Int32) (_error_speed[j]-_error_speed_old[j])) * ((Int32) _kd[j]);
+
+	if (DerivativePortion>=0)
+	{
+		DerivativePortion = DerivativePortion >> _kr[j]; 
+	}
+	else
+	{
+		DerivativePortion = -(-DerivativePortion >> _kr[j]);
+	}
+  
+//	AS1_printDWordAsCharsDec(DerivativePortion);
+	for(k=9;k>0;k--)
+	{
+		DerPort[j][k]=DerPort[j][k-1];
+	}
+	DerPort[j][0]=DerivativePortion;
+	
+	DerivativePortion=0;
+	for(k=0;k<10;k++)
+	{ 
+		DerivativePortion+=DerPort[j][k]*Coeff[k];
+	}	
+	DerivativePortion=DerivativePortion/Sum_Coeff;
+		
+	/* Integral */
+	IntegralError =  ( (Int32) _error_speed[j]) * ((Int32) _ki[j]);
+
+	_integral[j] = _integral[j] + IntegralError;
+	IntegralPortion = _integral[j];
+	
+	if (IntegralPortion>=0)
+	{
+		IntegralPortion = (IntegralPortion >> _kr[j]); // integral reduction 
+	}
+	else
+	{
+		IntegralPortion = -((-IntegralPortion) >> _kr[j]); // integral reduction 
+	} 
+	if (IntegralPortion > MAX_16)
+		IntegralPortion = (Int32) MAX_16;
+	if (IntegralPortion < MIN_16) 
+		IntegralPortion = (Int32) MIN_16;
+	
+	/* Accumulator saturation */
+	if (IntegralPortion >= _integral_limit[j])
+	{
+		IntegralPortion = _integral_limit[j];
+		_integral[j] =  _integral_limit[j];
+	}		
+	else
+	if (IntegralPortion < - (_integral_limit[j]))
+	{
+		IntegralPortion = - (_integral_limit[j]);
+		_integral[j] = (-_integral_limit[j]);
+	}
+		
+	_pd[j] = L_add(ProportionalPortion, DerivativePortion);
+	PIDoutput = L_add(_pd[j], IntegralPortion);
+
+					
+	return PIDoutput;
+}
 
 /*
  * compute PID control (integral implemented).
