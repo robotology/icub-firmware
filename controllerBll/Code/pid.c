@@ -345,6 +345,17 @@ Int32 compute_pwm(byte j)
 		PWMoutput = compute_current_pid(j); 		
 		break;
 	
+#elif VERSION == 0x0351 
+	//iKart control
+ 	case MODE_POSITION: 
+	case MODE_VELOCITY: 
+		PWMoutput = compute_pid_speed(j);
+		PWMoutput = PWMoutput + _ko[j];
+		_pd[j] = _pd[j] + _ko[j];
+	case MODE_OPENLOOP:
+		PWMoutput = _ko[j];
+	break;
+	
 #else //all other firmware versions
 	case MODE_POSITION:
 	case MODE_VELOCITY:
