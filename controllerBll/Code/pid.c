@@ -138,7 +138,7 @@ Int32  _pd_current[JN] = INIT_ARRAY (0);        // pd portion of the current pid
 #endif
 
 
-#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150
+#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x0351
 Int32  _cpl_pos_received[JN] = INIT_ARRAY (0);	// the position of the synchronized card 
 Int32  _cpl_pos_prediction[JN] = INIT_ARRAY (0);// the actual adjustment (compensation) 
 Int32  _cpl_pos_delta[JN] = INIT_ARRAY (0);		// velocity over the adjustment 
