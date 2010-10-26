@@ -349,6 +349,7 @@ Int32 compute_pwm(byte j)
 	//iKart control
  	case MODE_POSITION: 
  		PWMoutput = 0;
+ 		_pd[j] = 0;
  	break;
 	case MODE_VELOCITY: 
 		PWMoutput = compute_pid_speed(j);
@@ -357,6 +358,7 @@ Int32 compute_pwm(byte j)
 	break;
 	case MODE_OPENLOOP:
 		PWMoutput = _ko[j];
+		_pd[j] = 0;
 	break;
 	
 #else //all other firmware versions
