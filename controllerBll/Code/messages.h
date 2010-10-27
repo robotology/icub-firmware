@@ -67,6 +67,51 @@ extern char    _additional_info [32];
 		else \
 			_general_board_error = ERROR_MODE; \
 	}
+#elif VERSION == 0x0351
+#define CAN_CONTROLLER_RUN_HANDLER(x) \
+	{ \
+		if (_board_ID==1) \
+		{ \
+			if ((_pad_enabled[0]==false) || (_pad_enabled[1]==false)) can_printf("WARNING: RUN called before AMP");\
+			else if (((_control_mode[0] == MODE_IDLE) || (_control_mode[1] == MODE_IDLE)))  \
+			{ \
+				_control_mode[0] = MODE_POSITION; \
+				_control_mode[1] = MODE_POSITION; \
+				_desired[0] = _position[0]; \
+				_desired[1] = _position[1]; \
+				_integral[0] = 0; \
+				_integral[1] = 0; \
+				_set_point[0] = _position[0]; \
+				_set_point[1] = _position[1]; \
+				_general_board_error = ERROR_NONE; \
+				if (CAN_SRC==0) \
+				{ \
+				  CAN_ID = (_board_ID << 4) ; \
+				  CAN_ID |=  2; \
+				  CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
+				} \
+			} \
+		} \
+		else \
+		if (_board_ID==2) \
+		{ \
+			if (_pad_enabled[0]==false) can_printf("WARNING: RUN called before AMP");\
+			else if (((_control_mode[0] == MODE_IDLE) || (_control_mode[1] == MODE_IDLE)))  \
+			{ \
+				_control_mode[0] = MODE_POSITION; \
+				_desired[0] = _position[0]; \
+				_integral[0] = 0; \
+				_set_point[0] = _position[0]; \
+				_general_board_error = ERROR_NONE; \
+				if (CAN_SRC==0) \
+				{ \
+				  CAN_ID = (_board_ID << 4) ; \
+				  CAN_ID |=  1; \
+				  CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
+				} \
+			} \
+		} \
+	}
 #else
 	#define CAN_CONTROLLER_RUN_HANDLER(x) \
 	{ \
@@ -140,6 +185,42 @@ extern char    _additional_info [32];
 			can_printf("calib failed 0&1"); \
 		} \
 	}
+#elif VERSION == 0x0351 
+	#define CAN_ENABLE_PWM_PAD_HANDLER(x) \
+	{ \
+		if (_board_ID==1) \
+		{ \
+			if (_pad_enabled[0] == false &&	_pad_enabled[1] == false) \
+			{ \
+				PWM_outputPadEnable(0); \
+				PWM_outputPadEnable(1); \
+				_general_board_error = ERROR_NONE; \
+				can_printf("PWM ENA COUPLED:012");\
+				if (CAN_SRC==0) \
+				{ \
+				  CAN_ID = (_board_ID << 4) ; \
+				  CAN_ID |=  2; \
+				  CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
+				} \
+			} \
+		} \
+		else \
+		if (_board_ID==2) \
+		{ \
+			if (_pad_enabled[0] == false) \
+			{ \
+				PWM_outputPadEnable(0); \
+				_general_board_error = ERROR_NONE; \
+				can_printf("PWM ENA COUPLED:012");\
+				if (CAN_SRC==0) \
+				{ \
+				  CAN_ID = (_board_ID << 4) ; \
+				  CAN_ID |=  1; \
+				  CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
+				} \
+			} \
+		} \
+	}
 #else
 	#define CAN_ENABLE_PWM_PAD_HANDLER(x) \
 	{ \
@@ -168,7 +249,46 @@ extern char    _additional_info [32];
 		_general_board_error = ERROR_NONE; \
 		can_printf("PWM DIS COUPLED:0 & 1");\
 	}
-#else
+#elif VERSION == 0x0351 
+	#define CAN_DISABLE_PWM_PAD_HANDLER(x) \
+	{ \
+		if (_board_ID==1) \
+		{ \
+			PWM_outputPadDisable(0); \
+			PWM_outputPadDisable(1); \
+			_pad_enabled[0] = false; \
+			_pad_enabled[1] = false; \
+			_general_board_error = ERROR_NONE; \
+			can_printf("PWM DIS COUPLED:012");\
+			if (CAN_SRC==0) \
+				{ \
+				  CAN_ID = (_board_ID << 4) ; \
+				  CAN_ID |=  2; \
+				  CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
+				} \
+		} \
+		else \
+		if (_board_ID==2) \
+		{ \
+			PWM_outputPadDisable(0); \
+			PWM_outputPadDisable(1); \
+			_pad_enabled[0] = false; \
+			_pad_enabled[1] = false; \
+			_general_board_error = ERROR_NONE; \
+			can_printf("PWM ENA COUPLED:012");\
+			if (CAN_SRC==0) \
+				{ \
+				  CAN_ID = (_board_ID << 4) ; \
+				  CAN_ID |=  1; \
+				  CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
+				} \
+			CAN_LEN = 3; \
+			CAN_DATA[1] = _control_mode[axis]; \
+			CAN_DATA[2] = 0; \
+			CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
+		} \
+	}
+#else 
 	#define CAN_DISABLE_PWM_PAD_HANDLER(x) \
 	{ \
 		PWM_outputPadDisable(axis); \
@@ -290,7 +410,7 @@ extern char    _additional_info [32];
 
 //-------------------------------------------------------------------
 // shift by 2 is because data is available every 4 control cycles 
-#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150
+#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x351
 #define CAN_SET_ACTIVE_ENCODER_POSITION_HANDLER(x) \
 { \
 	long value; \
@@ -319,7 +439,7 @@ extern char    _additional_info [32];
 #endif
 
 //-------------------------------------------------------------------
-#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150
+#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x0351
 #define CAN_SET_ACTIVE_PID_HANDLER(x) \
 { \
 	Int16 value; \
@@ -344,7 +464,7 @@ extern char    _additional_info [32];
 #endif
 
 //-------------------------------------------------------------------
-#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150
+#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x351
 #define CAN_SET_ACTIVE_ERROR_HANDLER(x) \
 { \
 	Int16 value; \
