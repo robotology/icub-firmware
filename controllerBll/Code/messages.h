@@ -339,27 +339,88 @@ extern char    _additional_info [32];
 }
 
 //-------------------------------------------------------------------
-#define CAN_SET_CONTROL_MODE_HANDLER(x) \
-{ \
-	byte value = 0; \
-	if (CAN_LEN == 2) \
+#if VERSION != 0x0351 
+	#define CAN_SET_CONTROL_MODE_HANDLER(x) \
 	{ \
-		value = (CAN_DATA[1]); \
-		can_printf("CTRLMODE SET:%d",value); \
-		if (value>=0 && value <=0x50) _control_mode[axis] = value; \
-		_general_board_error = ERROR_NONE; \
-		_desired_torque[axis]=0; \
-		_desired[axis] = _position[axis]; \
-		_desired_vel[axis] = 0; \
-		_integral[axis] = 0; \
-		_ko_imp[axis] = 0; \
-		_set_point[axis] = _position[axis]; \
-		init_trajectory (axis, _position[axis], _position[axis], 1); \
-		clear_lpf_ord1_3hz  (axis); \
-	} \
-	else \
-		_general_board_error = ERROR_FMT; \
-}
+		byte value = 0; \
+		if (CAN_LEN == 2) \
+		{ \
+			value = (CAN_DATA[1]); \
+			can_printf("CTRLMODE SET:%d",value); \
+			if (value>=0 && value <=0x50) _control_mode[axis] = value; \
+			_general_board_error = ERROR_NONE; \
+			_desired_torque[axis]=0; \
+			_desired[axis] = _position[axis]; \
+			_desired_vel[axis] = 0; \
+			_integral[axis] = 0; \
+			_ko_imp[axis] = 0; \
+			_set_point[axis] = _position[axis]; \
+			init_trajectory (axis, _position[axis], _position[axis], 1); \
+			clear_lpf_ord1_3hz  (axis); \
+		} \
+		else \
+			_general_board_error = ERROR_FMT; \
+	}
+#elif VERSION == 0x0351
+	#define CAN_SET_CONTROL_MODE_HANDLER(x) \
+	{ \
+		byte value = 0; \
+		if (CAN_LEN == 2) \
+		{ \
+			if (_board_ID == 1) \
+			{ \
+				value = (CAN_DATA[1]); \
+				can_printf("CTRLMODE SET COUPLED 012:%d",value); \
+				if (value>=0 && value <=0x50) \
+					{ \
+						_control_mode[0] = value; \
+						_control_mode[1] = value; \
+					} \
+				_general_board_error = ERROR_NONE; \
+				_desired[0] = _position[0]; \
+				_desired[1] = _position[1]; \
+				_desired_vel[0] = 0; \
+				_desired_vel[1] = 0; \
+				_integral[0] = 0; \
+				_integral[1] = 0; \
+				_ko_imp[0] = 0; \
+				_ko_imp[1] = 0; \
+				_set_point[0] = _position[0]; \
+				_set_point[1] = _position[1]; \
+				if (CAN_SRC==0) \
+				{ \
+					 CAN_ID = (_board_ID << 4) ; \
+					 CAN_ID |=  2; \
+					 CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
+				} \
+			} \
+			else \
+			if (_board_ID == 2) \
+			{ \
+				value = (CAN_DATA[1]); \
+				can_printf("CTRLMODE SET COUPLED 012:%d",value); \
+				if (value>=0 && value <=0x50) \
+					{ \
+						_control_mode[0] = value; \
+					} \
+				_general_board_error = ERROR_NONE; \
+				_desired[0] = _position[0]; \
+				_desired_vel[0] = 0; \
+				_integral[0] = 0; \
+				_ko_imp[0] = 0; \
+				_set_point[0] = _position[0]; \
+				if (CAN_SRC==0) \
+				{ \
+					 CAN_ID = (_board_ID << 4) ; \
+					 CAN_ID |=  1; \
+					 CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
+				} \
+			} \
+		} \
+		else \
+			_general_board_error = ERROR_FMT; \
+	}
+#endif
 
 //-------------------------------------------------------------------
 #define CAN_MOTION_DONE_HANDLER(x) \
