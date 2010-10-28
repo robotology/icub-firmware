@@ -43,4 +43,23 @@ byte QD0_getSignals (bool Filtered, word *Signals);
  */
 void QD0_init (void);
 
+void QD0_Interrupt(void);
+
+#define QD0_SetCompare2(Value) setReg(TMRA0_CMP2,Value);
+
+#define QD0_SetCompare1(Value) setReg(TMRA0_CMP1,Value);
+
+#define QD0_GetCompare1Value() (getReg(TMRA0_CMP1))
+
+#define QD0_GetCompare2Value() (getReg(TMRA0_CMP2))
+
+void QD0_GetCounterValue(word *Value);
+
+void QD0_SetCounter(UInt16 Value);
+
+void QD0_DisableEvent();
+void QD0_EnableEvent();
+
+
+
 #endif 
