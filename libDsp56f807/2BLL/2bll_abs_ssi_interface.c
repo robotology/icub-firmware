@@ -8,7 +8,7 @@
 UInt16 max_real_position[2] = {4095, 4095};
 Int32 encoder_zeros[2] = {0,0};
 Int32 old_value[2] = {0,0};
-static Int16 turns[2] = {0,0};
+static Int32 turns[2] = {0,0};
 typedef struct ABS_SENSOR_STATUS
 {
 union 
@@ -204,7 +204,7 @@ Int32 get_relative_position_abs_ssi(byte jnt)
 
 	old_value[jnt]= value;
 				
-	return (value+turns[jnt]*4095);
+	return (value+(Int32)(turns[jnt]*4095));
 }
 
 Int32 init_relative_position_abs_ssi()
