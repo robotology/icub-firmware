@@ -167,3 +167,8 @@
 2010-24-Sept  Marco Randazzo <marco.randazzo@iit.it>
 	* fixed integral calculation in compute_pid_torque().
 	* Current build 50.	
+
+2010-3-Nov  Marco Randazzo <marco.randazzo@iit.it>
+	* fixed joint limits in torque/impedance mode.
+	* added iKart stuff.
+	* Current build 51.	

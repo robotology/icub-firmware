@@ -38,7 +38,7 @@
 byte	_board_ID = 16;	
 char    _additional_info [32];
 UInt8    mainLoopOVF=0;
-word    _build_number = 50;
+word    _build_number = 51;
 int     _countBoardStatus =0;
 Int16   _flash_version=0; 
 UInt8   BUS_OFF=false;
@@ -91,6 +91,7 @@ void main(void)
 {
 
 	Int32 PWMoutput [JN];
+	Int32 PWMoutput_old [JN];
 	word temporary;
 	byte i=0;
 	byte k=0;
@@ -213,7 +214,7 @@ void main(void)
 #endif 	
 
     init_position_abs_ssi ();
-#if VERSION == 0x0153 || VERSION ==0x0157 || VERSION == 0x0172 
+#if VERSION == 0x0153 || VERSION ==0x0157 || VERSION == 0x0172 || VERSION ==0x0351
     init_relative_position_abs_ssi();
 #endif 
  
@@ -270,6 +271,7 @@ void main(void)
 	for (i=0; i<JN; i++) _speed[i] = 0;
 	for (i=0; i<JN; i++) _accel[i] = 0;
 	for (i=0; i<JN; i++) _safeband[i] =-5; //5 ticks => 1 grado di AEA.
+	for (i=0; i<JN; i++) PWMoutput [i] = PWMoutput_old[i] = 0;
 	
 	/* reset the recursive windows for storage of position and velocity data */
 	/* (for velocity and position estimates) */
@@ -462,11 +464,24 @@ void main(void)
 led0_on	
 		for (i=0; i<JN; i++) 
 		{
-			_bfc_PWMoutput[i] = PWMoutput[i] = compute_pwm(i);	
+			//computing the PWM value (PID)
+			PWMoutput[i] = compute_pwm(i);
+
+			// PWM filtering in torque control 
+			if (_control_mode[i] == MODE_TORQUE ||
+			 	_control_mode[i] == MODE_IMPEDANCE_POS ||
+			 	_control_mode[i] == MODE_IMPEDANCE_VEL)
+				{
+					PWMoutput[i] = lpf_ord1_3hz (PWMoutput[i], i);
+				}	
+			// saving the PWM value before the decoupling					
+			_bfc_PWMoutput[i] = PWMoutput_old[i] = PWMoutput[i];
+
+			// applying the saturation to the PWM
 			if      (_bfc_PWMoutput[i] < -MAX_DUTY) _bfc_PWMoutput[i]=-MAX_DUTY;
 			else if (_bfc_PWMoutput[i] > MAX_DUTY)  _bfc_PWMoutput[i]= MAX_DUTY;
 		}
-	
+
 //		decouple PWM	
 #ifdef USE_NEW_DECOUPLING
 		decouple_dutycycle_new_joint(PWMoutput); //new version (july 2010) with torque decupling
@@ -474,14 +489,7 @@ led0_on
 		decouple_dutycycle(PWMoutput);				
 #endif
 
-		/* PWM filtering */
-		for (i=0; i<JN; i++) 
-		{
-			if (_control_mode[i] == MODE_TORQUE ||
-			 	_control_mode[i] == MODE_IMPEDANCE_POS ||
-			 	_control_mode[i] == MODE_IMPEDANCE_VEL)
-				PWMoutput[i] = lpf_ord1_3hz (PWMoutput[i], i);	
-		}
+
 led0_off	
 //******************************************* LIMIT CHECK FOR FORCE CONTORL******************/
 		// Protection for joints out of the admissible range during force control
@@ -742,36 +750,46 @@ void check_range(byte i, Int16 band, Int32 *PWM)
 void check_range_torque(byte i, Int16 band, Int32 *PWM)
 {
 	static UInt32 TrqLimitCount =0;
+ 	char   signKp = (_kp[i]>0?1:-1);
+ 	char   signPWM = (PWM[i]>0?1:-1);
+ 	int    PWMb   = PWM[i];
+ 	Int32  PWMc   = 0;
  	if (_control_mode[i] == MODE_TORQUE ||
 	  	_control_mode[i] == MODE_IMPEDANCE_POS ||
 	  	_control_mode[i] == MODE_IMPEDANCE_VEL)
  		{
 	 		if  (_position[i] > _max_position[i])
 	 		{
-	 			if (_speed[i]>=0)
+	 			if (signKp*signPWM >0 )
 				{
-					PWM[i] = 0;	
+					PWMc = ((Int32) (_max_position[i]-_position[i]) * ((Int32)_kp[i]));
+					if (PWMc>=0) {PWMc = PWMc >> _kr[i];} 
+					else 	 	 {PWMc = -(-PWMc >> _kr[i]);}
+					PWM[i] = PWMc;	
 				}
 				TrqLimitCount++;	 
-				if (TrqLimitCount>=500)
+				if (TrqLimitCount>=200)
 				{
 					#ifdef DEBUG_CONTROL_MODE
-						can_printf("MODE TORQUE OUT LIMITS ax:%d", i);	
+						can_printf("TORQUE LIMITS kp:%d B:%d A:%f", signKp, PWMb, PWM[i]);	
 						TrqLimitCount=0;
 				    #endif 
 				}			
 	 		}
 	 		if  (_position[i] < _min_position[i])   
 	 		{
-	 			if (_speed[i]<=0)
+	 			if (signKp*signPWM <0 )
 				{
-					PWM[i] = 0;			
+					PWMc = ((Int32) (_min_position[i]-_position[i]) * ((Int32)_kp[i]));
+					if (PWMc>=0) {PWMc = PWMc >> _kr[i];} 
+					else 	 	 {PWMc = -(-PWMc >> _kr[i]);}
+					PWM[i] = PWMc;			
 				}				
 				TrqLimitCount++;
-				if (TrqLimitCount>=500)
+				if (TrqLimitCount>=200)
 				{
 					#ifdef DEBUG_CONTROL_MODE
-						can_printf("MODE TORQUE OUT LIMITS ax:%d", i);	
+						can_printf("TORQUE LIMITS kp:%d B:%d A:%f", signKp, PWMb, PWM[i]);	
 						TrqLimitCount=0;
 				    #endif 
 				}

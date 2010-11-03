@@ -102,9 +102,14 @@ void decouple_positions(void)
 #endif
 }
 
+// CORRECT
 #define a_coeff 1.6455F
 #define b_coeff 1.6455F
-#define t_coeff 0,6077F
+#define t_coeff 0.6077F
+
+// UNDER TESTING
+//#define a_coeff 1.6455F
+//#define b_coeff 0.6077F
 
 #ifndef USE_NEW_DECOUPLING
 /***************************************************************************/
