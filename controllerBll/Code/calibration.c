@@ -40,8 +40,12 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
   // of the abs position sensor, in order to avoid the passage on 0.
 	if (type==CALIB_ABS_DIGITAL)
 	{
-
-#if (VERSION==0x0150 || VERSION==0x0151 || VERSION==0x0152 || VERSION==0x0154 || VERSION==0x0155 ) 
+#if (VERSION==0x0351)
+		set_relative_position_abs_ssi_turns(channel, 0);
+		set_current_as_middle_position(channel);
+		_position[channel] = get_relative_position_abs_ssi(channel);		
+		
+#elif (VERSION==0x0150 || VERSION==0x0151 || VERSION==0x0152 || VERSION==0x0154 || VERSION==0x0155 ) 
 
 		AS1_printStringEx ("Calibration ABS_DIGITAL started \r\n");
 		if (param3 >=0 && param3 <=4095) set_max_position(channel, param3);	
