@@ -41,8 +41,9 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 	if (type==CALIB_ABS_DIGITAL)
 	{
 #if (VERSION==0x0351)
-		set_relative_position_abs_ssi_turns(channel, 0);
+		//iKart
 		set_current_as_middle_position(channel);
+		set_relative_position_abs_ssi_turns(channel, 0);
 		_position[channel] = get_relative_position_abs_ssi(channel);		
 		
 #elif (VERSION==0x0150 || VERSION==0x0151 || VERSION==0x0152 || VERSION==0x0154 || VERSION==0x0155 ) 
