@@ -16,13 +16,20 @@
 #include "brushless_comm.h"
 #include "strain_board.h"
 #include "filters.h"
+#include "decoupling.h"
 
 #ifndef VERSION
 #	error "No valid version specified"
 #endif
 
 #ifdef IDENTIF
-	#include "identification.h"
+#	include "identification.h"
+#endif
+
+#ifdef USE_NEW_DECOUPLING
+#	warning "Using new decoupling"
+#else
+#   warning "NOT using new decoupling"
 #endif
 
 extern sDutyControlBL DutyCycle[2];
@@ -186,12 +193,13 @@ byte can_interface (void)
 #define CAN_FRAME_FMT _canmsg.CAN_frameFormat
 #define CAN_LEN _canmsg.CAN_length
 #define CAN_ID _canmsg.CAN_messID
+#define CAN_SRC _canmsg.CAN_ID_src
 #define CAN_TEMP16 ikk
 
 			// special message, not too neat
 			// ID 0x0100 (001 0000 0000b) message class = periodic message  
 			
-#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150
+#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 || VERSION == 0x0351
 
 			if (_canmsg.CAN_ID_class == CLASS_PERIODIC_DSP)
 			{
@@ -555,10 +563,10 @@ void can_send_broadcast(void)
 		
 		_canmsg.CAN_length = 8;
 		_canmsg.CAN_frameType = DATA_FRAME;
-#if (VERSION !=0x0154 && VERSION !=0x0155 && VERSION !=0x0158) 
+#if (VERSION !=0x0154 && VERSION !=0x0155 && VERSION !=0x0158 && VERSION != 0x0351) 
 		if((get_error_abs_ssi(0)==ERR_OK) && (get_error_abs_ssi(1)==ERR_OK))
 			CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
-#elif (VERSION ==0x0154 || VERSION ==0x0155 || VERSION ==0x0158)
+#elif (VERSION ==0x0154 || VERSION ==0x0155 || VERSION ==0x0158 || VERSION == 0x0351)
 		if((get_error_abs_ssi(0)==ERR_OK))
 			CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
 #endif
@@ -776,7 +784,7 @@ void can_send_broadcast(void)
 		_canmsg.CAN_data[2] = BYTE_H(get_current(1));
 		_canmsg.CAN_data[3] = BYTE_L(get_current(1));
 	
-  //      _canmsg.CAN_data[4] = BYTE_4(_filt_current[0]);
+//      _canmsg.CAN_data[4] = BYTE_4(_filt_current[0]);
 //		_canmsg.CAN_data[5] = BYTE_3(_filt_current[0]);
 //		_canmsg.CAN_data[6] = BYTE_2(_filt_current[0]);
 //		_canmsg.CAN_data[7] = BYTE_1(_filt_current[0]);
@@ -801,11 +809,28 @@ void can_send_broadcast(void)
 		_canmsg.CAN_data[1] = BYTE_L(_error_position[0]);
 		_canmsg.CAN_data[2] = BYTE_H(_error_position[1]);
 		_canmsg.CAN_data[3] = BYTE_L(_error_position[1]);
+		
+#if (VERSION ==0x0351)
+		//iKart only
+		_canmsg.CAN_data[0] = BYTE_H(_error_speed[0]);
+		_canmsg.CAN_data[1] = BYTE_L(_error_speed[0]);
+		_canmsg.CAN_data[2] = BYTE_H(_error_speed[1]);
+		_canmsg.CAN_data[3] = BYTE_L(_error_speed[1]);
+#endif
 
 		_canmsg.CAN_data[4] = BYTE_H(_error_torque[0]);
 		_canmsg.CAN_data[5] = BYTE_L(_error_torque[0]);
 		_canmsg.CAN_data[6] = BYTE_H(_error_torque[1]);
 		_canmsg.CAN_data[7] = BYTE_L(_error_torque[1]);
+
+		//_canmsg.CAN_data[0] = BYTE_H(_cpl_pid_prediction[0]);  //$$$ DEBUG ONLY!!!
+		//_canmsg.CAN_data[1] = BYTE_L(_cpl_pid_prediction[0]);  //$$$ DEBUG ONLY!!!
+		//_canmsg.CAN_data[2] = BYTE_H(_cpl_pid_prediction[1]);  //$$$ DEBUG ONLY!!!
+		//_canmsg.CAN_data[3] = BYTE_L(_cpl_pid_prediction[1]);  //$$$ DEBUG ONLY!!!
+		//_canmsg.CAN_data[4] = BYTE_H((Int16)(_bfc_PWMoutput[0]));  //$$$ DEBUG ONLY!!!
+		//_canmsg.CAN_data[5] = BYTE_L((Int16)(_bfc_PWMoutput[0]));  //$$$ DEBUG ONLY!!!
+		//_canmsg.CAN_data[6] = BYTE_H((Int16)(_bfc_PWMoutput[1]));  //$$$ DEBUG ONLY!!!
+		//_canmsg.CAN_data[7] = BYTE_L((Int16)(_bfc_PWMoutput[1]));  //$$$ DEBUG ONLY!!!	
 						
 		_canmsg.CAN_length = 8;
 		_canmsg.CAN_frameType = DATA_FRAME;
@@ -857,15 +882,26 @@ void set_can_masks()
 	UInt32 mask2=0;
 	
 	#if (VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150)
-	{	
-		create_F_M(&filter1, &mask1,CLASS_POLLING_DSP,0xFF, _board_ID, CLASS_PERIODIC_SENS, 0xFF, 0xFF);   
-		create_F_M(&filter2, &mask2,CLASS_CANLOADER,  0x00, 0xFF, 	   CLASS_PERIODIC_DSP, 	CAN_ID_COUPLED_BOARD, 0xFF);  		
-	}
+		{	
+			create_F_M(&filter1, &mask1,CLASS_POLLING_DSP,0xFF, _board_ID, CLASS_PERIODIC_SENS, 0xFF, 0xFF);   
+			create_F_M(&filter2, &mask2,CLASS_CANLOADER,  0x00, 0xFF, 	   CLASS_PERIODIC_DSP, 	CAN_ID_COUPLED_BOARD, 0xFF);  		
+		}
+	#elif (VERSION==0x0351)
+		if (_board_ID == 1)
+		{	
+			create_F_M(&filter1, &mask1,CLASS_POLLING_DSP,0xFF, _board_ID, CLASS_PERIODIC_SENS, 0xFF, 0xFF);   
+			create_F_M(&filter2, &mask2,CLASS_CANLOADER,  0x00, 0xFF, 	   CLASS_PERIODIC_DSP, 	2, 0xFF);  		
+		}
+		else if (_board_ID == 2)
+		{	
+			create_F_M(&filter1, &mask1,CLASS_POLLING_DSP,0xFF, _board_ID, CLASS_PERIODIC_SENS, 0xFF, 0xFF);   
+			create_F_M(&filter2, &mask2,CLASS_CANLOADER,  0x00, 0xFF, 	   CLASS_PERIODIC_DSP, 	1, 0xFF);  		
+		}			
 	#else
-	{
-		create_F_M(&filter1, &mask1,CLASS_POLLING_DSP,0xFF, _board_ID, CLASS_PERIODIC_SENS, 0xFF, 0xFF);   
-		create_F_M(&filter2, &mask2,CLASS_CANLOADER,  0x00, 0xFF, 	   CLASS_CANLOADER,  	0x00, 0xFF);  
-	}
+		{
+			create_F_M(&filter1, &mask1,CLASS_POLLING_DSP,0xFF, _board_ID, CLASS_PERIODIC_SENS, 0xFF, 0xFF);   
+			create_F_M(&filter2, &mask2,CLASS_CANLOADER,  0x00, 0xFF, 	   CLASS_CANLOADER,  	0x00, 0xFF);  
+		}
 	#endif	
 		
 	setmask(filter1,filter2, mask1, mask2);
