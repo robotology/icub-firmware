@@ -808,42 +808,53 @@ void decouple_positions(void)
 void check_range_torque(byte i, Int16 band, Int32 *PWM)
 {
 	static UInt32 TrqLimitCount =0;
+ 	char   signKp = (_kp[i]>0?1:-1);
+ 	char   signPWM = (PWM[i]>0?1:-1);
+ 	int    PWMb   = PWM[i];
+ 	Int32  PWMc   = 0;
  	if (_control_mode[i] == MODE_TORQUE ||
 	  	_control_mode[i] == MODE_IMPEDANCE_POS ||
 	  	_control_mode[i] == MODE_IMPEDANCE_VEL)
  		{
 	 		if  (_position[i] > _max_position[i])
 	 		{
-	 			if (_speed[i]>=0)
+	 			if (signKp*signPWM >0 )
 				{
-					PWM[i] = 0;	
+					PWMc = ((Int32) (_max_position[i]-_position[i]) * ((Int32)_kp[i]));
+					if (PWMc>=0) {PWMc = PWMc >> _kr[i];} 
+					else 	 	 {PWMc = -(-PWMc >> _kr[i]);}
+					PWM[i] = PWMc;	
 				}
 				TrqLimitCount++;	 
-				if (TrqLimitCount>=500)
+				if (TrqLimitCount>=200)
 				{
 					#ifdef DEBUG_CONTROL_MODE
-						can_printf("MODE TORQUE OUT LIMITS ax:%d", i);	
+						can_printf("TORQUE LIMITS kp:%d B:%d A:%f", signKp, PWMb, PWM[i]);	
 						TrqLimitCount=0;
 				    #endif 
 				}			
 	 		}
 	 		if  (_position[i] < _min_position[i])   
 	 		{
-	 			if (_speed[i]<=0)
+	 			if (signKp*signPWM <0 )
 				{
-					PWM[i] = 0;			
+					PWMc = ((Int32) (_min_position[i]-_position[i]) * ((Int32)_kp[i]));
+					if (PWMc>=0) {PWMc = PWMc >> _kr[i];} 
+					else 	 	 {PWMc = -(-PWMc >> _kr[i]);}
+					PWM[i] = PWMc;			
 				}				
 				TrqLimitCount++;
-				if (TrqLimitCount>=500)
+				if (TrqLimitCount>=200)
 				{
 					#ifdef DEBUG_CONTROL_MODE
-						can_printf("MODE TORQUE OUT LIMITS ax:%d", i);	
+						can_printf("TORQUE LIMITS kp:%d B:%d A:%f", signKp, PWMb, PWM[i]);	
 						TrqLimitCount=0;
 				    #endif 
 				}
 	 		} 				
  		}
 }
+
 
 /***************************************************************************/
 /**
