@@ -766,6 +766,7 @@ void check_range_torque(byte i, Int16 band, Int32 *PWM)
 					if (PWMc>=0) {PWMc = PWMc >> _kr[i];} 
 					else 	 	 {PWMc = -(-PWMc >> _kr[i]);}
 					PWM[i] = PWMc;	
+					_integral[i] = 0;
 				}
 				TrqLimitCount++;	 
 				if (TrqLimitCount>=200)
@@ -783,7 +784,8 @@ void check_range_torque(byte i, Int16 band, Int32 *PWM)
 					PWMc = ((Int32) (_min_position[i]-_position[i]) * ((Int32)_kp[i]));
 					if (PWMc>=0) {PWMc = PWMc >> _kr[i];} 
 					else 	 	 {PWMc = -(-PWMc >> _kr[i]);}
-					PWM[i] = PWMc;			
+					PWM[i] = PWMc;		
+					_integral[i] = 0;	
 				}				
 				TrqLimitCount++;
 				if (TrqLimitCount>=200)
