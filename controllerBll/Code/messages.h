@@ -723,11 +723,8 @@ extern char    _additional_info [32];
 { \
 	if (CAN_LEN == 7) \
 	{ \
-		/*if (_control_mode[axis] == MODE_MARGIN_REACHED)	\
-		{	\
-			_general_board_error = ERROR_NONE;	\
-		}	\
-		else */ if (_control_mode[axis] != MODE_IDLE) \
+		if (_control_mode[axis] != MODE_IDLE && \
+		    _control_mode[axis] != MODE_TORQUE) \
 		{ \
 			if (_control_mode[axis] != MODE_IMPEDANCE_POS && \
 				_control_mode[axis] != MODE_IMPEDANCE_VEL ) \
