@@ -666,7 +666,8 @@
 { \
 	if (CAN_LEN == 7) \
 	{ \
-		if (_control_mode[axis] != MODE_IDLE) \
+		if (_control_mode[axis] != MODE_IDLE && \
+		    _control_mode[axis] != MODE_TORQUE) \
 		{ \
 			if (_control_mode[axis] != MODE_IMPEDANCE_POS && \
 				_control_mode[axis] != MODE_IMPEDANCE_VEL ) \
