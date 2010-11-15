@@ -1,0 +1,446 @@
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  C:\Software\iCub\firmware\controllerBll\Support\ARTCMPF32.asm  Page 1
+
+
+
+1                          ;=============================================================
+2                          ;=== FILE: ARTCMPF32.asm
+3                          ;===
+4                          ;=== Copyright (c)1998 Metrowerks, Inc.  All rights reserved.
+5                          ;=============================================================
+6                          ; Recommended tab stop = 8.
+7      
+8                          ;===============================================================================
+9                          ; SECTION: the floating point code
+10                                   SECTION fp_engine
+11                                                   OPT     CC
+12                                                   GLOBAL  ARTCMPF32
+13                                                   GLOBAL  ARTCMPEF32
+14     
+15                                                   include "Fp568d.h"
+16                                         ;=============================================================
+17                                         ;=== FILE: Fp568d.h
+18                                         ;===
+19                                         ;=== Copyright (c)1998 Metrowerks, Inc.  All rights reserved.
+20                                         ;=============================================================
+21                                         ; Recommended tab stop = 8.
+22     
+23                                                   XREF    FPE_state
+24     
+25        0001                             UseRep    EQU     1
+26     
+27     
+28                                         ; xhi/xlo save the x operand (passed in a) in two-op functions, which
+29                                         ;       is handy for NaN handling, etc.
+30                                         ; yhi/ylo save the y operand (passed in b) in two-op functions, which
+31                                         ;       is handy for NaN handling, etc.
+32                                         ; rexp is the result exponent
+33                                         ; rsign is the result sign (compute as xor during unpack)
+34                                         ; yflip is 0 for add, 0x8000 for sub, to indicate a flip of y's sign
+35                                         ; omr contains value of original OMR register on entry to routine
+36        0000                             xhi       EQU     0
+37        0001                             xlo       EQU     1
+38        0002                             yhi       EQU     2
+39        0003                             ylo       EQU     3
+40        0004                             yflip     EQU     4
+41        0005                             rsign     EQU     5
+42        0006                             rexp      EQU     6
+43        0007                             saved_omr EQU     7
+44     
+45        0008                             SIZE_TEMPS EQU    8
+46     
+47                                         ;offsets for the unpack routines.
+48        0002                             xhi_unp   EQU     2
+49        0003                             xlo_unp   EQU     3
+50        0004                             yhi_unp   EQU     4
+51        0005                             ylo_unp   EQU     5
+52        0006                             yflip_unp EQU     6
+53        0007                             rsign_unp EQU     7
+54        0008                             rexp_unp  EQU     8
+55     
+56     
+57        0040                             INVALID   EQU     $0040
+58        0010                             OVERFLOW  EQU     $0010
+59        0008                             UNDERFLOW EQU     $0008
+60        0020                             DIVBYZERO EQU     $0020
+61        0004                             INEXACT   EQU     $0004
+62     
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  Fp568d.h  Page 2
+
+
+
+63        0000                             TONEAREST EQU     0
+64        0001                             TOWARDZERO EQU    1
+65        0002                             UPWARD    EQU     2
+66        0003                             DOWNWARD  EQU     3
+67        0002                             BITDIRRND EQU     2
+68                                         BITDOWNORCHOP
+69        0001                                       EQU     1
+70     
+71                                         LFPState  MACRO
+72   m                                               move    x:FPE_state,x0
+73   m                                               ENDM
+74     
+75                                         SetInvalid MACRO
+76   m                                               bfset   #INVALID,x:FPE_state
+77   m                                               ENDM
+78     
+79                                         SetInexact MACRO
+80   m                                               bfset   #INEXACT,x:FPE_state
+81   m                                               ENDM
+82     
+83                                         SetOverflow
+84                                                   MACRO
+85   m                                               bfset   #(OVERFLOW+INEXACT),x:FPE_state
+86   m                                               ENDM
+87     
+88                                         SetUnderflow
+89                                                   MACRO
+90   m                                               bfset   #(UNDERFLOW+INEXACT),x:FPE_state
+91   m                                               ENDM
+92     
+93                                         SetDivByZero
+94                                                   MACRO
+95   m                                               bfset   #DIVBYZERO,x:FPE_state
+96   m                                               ENDM
+97     
+98                                         StFPState MACRO
+99   m                                               move    x0,x:FPE_state
+100  m                                               ENDM
+101    
+102                                        NORMALIZE_OMR
+103                                                  MACRO
+104  m                                               move    OMR,x:(SP-saved_omr)              ; save original OMR state
+105  m                                               bfset   #$0100,OMR                        ; set CC bit
+106  m                                               bfclr   #$0030,OMR                        ; clear R and SA bits
+107  m                                               ENDM
+108    
+109                                        RESTORE_OMR
+110                                                  MACRO
+111  m                                               move    x:(SP-saved_omr),OMR              ; restore original OMR state
+112  m                                               ENDM
+113    
+114    
+115    
+116                                        ;===============================================================================
+117                                        ; FUNCTION: FARTCMPF32, FARTCMPEF32
+118                                        ; DESCRIPTION: Comparison functions, all described here because of commonality.
+119                                        ;
+120                                        ; INPUT: x in a, y at sp-[2, 3]
+121                                        ; OUTPUT: y0 = result
+122                                        ;       FARTCMPF32  --> 0-eq, 1-lt, 2-gt, 3-un (invalid if an SNaN)
+123                                        ;       FARTCMPEF32 --> 0-eq, 1-lt, 2-gt, 3-un (invalid if unordered)
+124                                        ;       In both cases, the condition codes are set as follows
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  C:\Software\iCub\firmware\controllerBll\Support\ARTCMPF32.asm  Page 3
+
+
+
+125                                        ;
+126                                        ;    | <  =  >  ?  <-- IEEE relation discovered, '?' means 'unordered'
+127                                        ;  --+------------
+128                                        ;  C | 1  0  0  0  <-- setting of condition codes on exit from function
+129                                        ;  Z | 0  1  0  0
+130                                        ;  N | 1  0  0  0
+131                                        ;  V | 0  0  0  1
+132                                        ;
+133                                        ; Here's how to use the CCs to implement C-style branches:
+134                                        ;
+135                                        ;         |  neg.  |  "fp"  |                          |
+136                                        ;  rel_op | rel_op | branch | DSP568 branch (with CC)  | op
+137                                        ; --------+--------+-----------------------------------+------------
+138                                        ;    !=   |   ==   |  fbeq  |  beq  (Z = 1)            | FARTCMPF32
+139                                        ;    ==   |   !=   |  fbne  |  bne  (Z = 0)            | FARTCMPF32
+140                                        ;    <    |  ">=?" |  fbgeu |  bcc  (C = 0)            | FARTCMPEF32
+141                                        ;    <=   |  ">?"  |  fbgu  |  bgt  (Z + (V + N) = 0)  | FARTCMPEF32
+142                                        ;    >    |  "<=?" |  fbleu |  ble  (Z + (V + N) = 1)  | FARTCMPEF32
+143                                        ;    >=   |  "<?"  |  fblu  |  blt  ((V + N) = 1)      | ARTCMPEF32
+144                                        ;
+145                                        ;Note that equal/not-equal comparisons never raise invalid on unordered,
+146                                        ;but the other four C relationals do raise invalid on unordered.  Here
+147                                        ;is how to simply branch on the six C relational operators:
+148                                        ;
+149                                        ;         |  "fp"  |
+150                                        ;  rel_op | branch | DSP568 branch (with CC)
+151                                        ; --------+-----------------------------------
+152                                        ;    ==   |  fbeq  |  beq  (Z = 1)
+153                                        ;    !=   |  fbne  |  bne  (Z = 0)
+154                                        ;    <    |  fblt  |  blo  (C = 1)
+155                                        ;    <=   |  fble  |  bls  (C + Z = 1)
+156                                        ;    >    |  fbgt  |  bgt  (Z + (N xor V) = 0)
+157                                        ;    >=   |  fbge  |  bge  ((N xor V) = 0)
+158                                        ;
+159                                        ;Finally, here is the table of the other 8 relationals, excluding the
+160                                        ;trivial cases branch-on-true and branch-on-false.  Four of these
+161                                        ;cases arose in the flipped conditionals above.  The statement
+162                                        ;"bxx skip" means that the condition is not true, and that the
+163                                        ;second conditional branch should be skipped.  A pair of
+164                                        ;branches like "bcs ; beq" has the target of the "fp" branch
+165                                        ;as the target of both branches.
+166                                        ;
+167                                        ;         |  "fp"  |
+168                                        ;  rel_op | branch | DSP568 branch (with CC)
+169                                        ; --------+-----------------------------------
+170                                        ;  ">=?"  |  fbgeu |  bcc  (C = 0)
+171                                        ;  ">?"   |  fbgu  |  bgt  (Z + (V + N) = 0)
+172                                        ;  "<=?"  |  fbleu |  ble  (Z + (V + N) = 1)
+173                                        ;  "<?"   |  fblu  |  blt  ((V + N) = 1)
+174                                        ;  "?"    |  fbu   |  bgt skip; bcc
+175                                        ;  "<=>"  |  fbleg |  bcs ; beq
+176                                        ;  "=?"   |  fbeu  |  bcs skip; ble
+177                                        ;  "<>"   |  fbgl  |  bcs ; bgt
+178                                        ;
+179                                        ;What this shows is that with careful use of the integer condition
+180                                        ;codes on a machine supporting signed and unsigned arithmetic, it's
+181                                        ;possible to satisfy the 4-way IEEE floating point branches with zero
+182                                        ;extra overhead.
+183                                        ;
+184                                        ; INCIDENTALLY: un --> unordered; NaNs are unordered with EVERYTHING,
+185                                        ; or --> ordered; all pairs of numbers, finite or infinite, are ordered
+186                                        ; as lt, eq, or gt.
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  C:\Software\iCub\firmware\controllerBll\Support\ARTCMPF32.asm  Page 4
+
+
+
+187                                        ;
+188                                        ; IMPLEMENTATION: This routine descends from a line of float/double
+189                                        ; routines that include boolean functions for testing ==, !=, etc.
+190                                        ; individually.
+191                                        ; The code uses a dispatch table, based on the sum
+192                                        ;       <operation code> + <relation>
+193                                        ; In this case there are just two codes, for the vanilla and the
+194                                        ; exceptional comparison.  Because DSP568 is a word-oriented machine,
+195                                        ; the <relation> is encoded in bis 0x0003, and the <operation code>
+196                                        ; in bit 0x004 -- all in y1.
+197                                        ; Historically, one grand dispatch has
+198                                        ; taken care of myriad cases, including setting of Invalid on unordered.
+199                                        ; The comparison codes are 0-eq, 1-lt, 2-gt, 3-un, as with the result.
+200                                        ; The idea is to compare the values as integers, converting the sign-magnitude
+201                                        ; representation to 2's-complement.  To catch unordered cases, watch compare
+202                                        ; against -INF and +INF as 2's-complement integers.  Also, look for
+203                                        ; signaling NaNs to force a signal, regardless of the type of comparison.
+204                                        ;
+205                                        ; BUG WORKAROUND: 32-bit cmp or accumulators doesn't work, so use a pair
+206                                        ; of comparisons: signed for high parts and, if those are equal, UNSIGNED
+207                                        ; for low parts.  This works because of the nature of 2's-complement
+208                                        ; representation.
+209                                        ;
+210       0000                             OP_CMP    EQU     $000                              ; was $040
+211       0004                             OP_CMPE   EQU     $004                              ; was $048
+212    
+213                                        ARTCMPEF32:
+214       P:000000 C304    [2 -        2]            move              #OP_CMPE,y1
+215       P:000001 A901    [4 -        6]            bra     f_compare
+216                                        ARTCMPF32:
+217       P:000002 C300    [2 -        8]            move              #OP_CMP,y1
+218                                                                                            ;bra    f_compare
+219                                                                                            ; Fall through to f_compare
+220    
+221                                        f_compare:
+222                                                                                            ; y1 = operation code
+223                                                                                            ; a = x operand
+224                                                                                            ; (sp-2) = y operand
+225                                                                                            ; Change signed-magnitude representation to 2's-complement to get
+226                                                                                            ; basic comparison.  Then watch for NaNs.
+227       P:000003 B5FE    [2 -       10]            move              x:(sp-2),b              ; high 16 bits and sign extension
+228       P:000004 F1CB    [6 -       16]            move              x:(sp-3),b0             ; low 16 bits
+                   FFFD
+229       P:000006 DE4B    [2 -       18]            lea     (SP+SIZE_TEMPS)                   ; reserve stack space for all temps
+                   0008
+230                                                  NORMALIZE_OMR
+234       P:00000E 8E06    [2 -       34]            tstw    a1                                ; is sign bit set?
+235       P:00000F A405    [4 -       38]            bge     y_12                              ; ge ==> already nonnegative
+236       P:000010 7430    [2 -       40]            asl     a
+237       P:000011 87CA    [4 -       44]            move              #0,a2                   ; clear sign bits
+                   0000
+238       P:000013 7C30    [2 -       46]            asr     a                                 ; realign
+239       P:000014 6C10    [2 -       48]            neg     a
+240                                        y_12:
+241       P:000015 8E07    [2 -       50]            tstw    b1
+242       P:000016 A405    [4 -       54]            bge     y_13
+243       P:000017 74B0    [2 -       56]            asl     b
+244       P:000018 87CB    [4 -       60]            move              #0,b2
+                   0000
+245       P:00001A 7CB0    [2 -       62]            asr     b
+246       P:00001B 6C90    [2 -       64]            neg     b
+247                                        y_13:
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  C:\Software\iCub\firmware\controllerBll\Support\ARTCMPF32.asm  Page 5
+
+
+
+248                                                                                            ; Here's the big comparison x vs y.  After the comparison, check
+249                                                                                            ; the lower against -NaN and the biggest against NaN.  Be sure
+250                                                                                            ; to watch for BOTH being less than -NaN...
+251                                                                                            ; Compare in two halves, signed high and unsigned low.
+252       P:00001C 8006    [2 -       66]            move              a1,x0
+253       P:00001D 7C01    [2 -       68]            cmp     b1,x0                             ; check high parts
+254       P:00001E A507    [4 -       72]            blt     f_bounds_less
+255       P:00001F A605    [4 -       76]            bgt     f_bounds_greater
+256       P:000020 8008    [2 -       78]            move              a0,x0
+257       P:000021 8109    [2 -       80]            move              b0,y0
+258       P:000022 7C51    [2 -       82]            cmp     y0,x0                             ; b vs. a, low parts
+259       P:000023 A102    [4 -       86]            bcs     f_bounds_less                     ; carry set means "lower"
+260       P:000024 A302    [4 -       90]            beq     f_bounds_check                    ; they're equal
+261                                                                                            ; Fall through to f_bounds_greater.
+262                                        f_bounds_greater:
+263       P:000025 4781    [2 -       92]            add     #1,y1
+264                                        f_bounds_less:
+265       P:000026 4781    [2 -       94]            add     #1,y1                             ; code = 4 if greater than
+266                                        f_bounds_check:
+267                                                                                            ; y1 = code.
+268                                                                                            ; Now check whether one or the other is a NaN by first restoring
+269                                                                                            ; to positive form and then checking against QNaN and SNaN.
+270                                                                                            ; Quiet NaNs look bigger than 7fc00000, and signaling NaNs
+271                                                                                            ; lie between 7f800000 (inf) and 7fc00000, exclusive.
+272                                                                                            ; TRICK: logically OR the unordered code into result, which is
+273                                                                                            ; now based on initial compare.
+274                                                                                            ; TRICK: Lead frac bit marks quiet NaN.  If a value has
+275                                                                                            ; magnitude >= 0x7fc00000 then it's quiet.
+276       P:000027 87C0    [4 -       98]            move              #$7f80,x0               ; true +INF
+                   7F80
+277    
+278       P:000029 7C10    [2 -      100]            tst     a                                 ; is the a operand negative
+279       P:00002A A401    [4 -      104]            bge     y_133
+280       P:00002B 6C10    [2 -      106]            neg     a
+281                                        y_133:
+282       P:00002C 7C21    [2 -      108]            cmp     a1,x0
+283       P:00002D A609    [4 -      112]            bgt     check_fy                          ; a-b < 0 means a is at most huge
+284       P:00002E A502    [4 -      116]            blt     f_cmp_x_NaN
+285       P:00002F 8E08    [2 -      118]            tstw    a0                                ; a0 0 if INF
+286       P:000030 A306    [4 -      122]            beq     check_fy
+287                                        f_cmp_x_NaN:
+288       P:000031 87C0    [4 -      126]            move              #$7fc0,x0               ; make smallest QNaN
+                   7FC0
+289       P:000033 7C21    [2 -      128]            cmp     a1,x0                             ; a - QNaN
+290       P:000034 A610    [4 -      132]            bgt     f_compare_un_inv                  ; a-b < 0 means a is an SNaN, so done
+291       P:000035 83C3    [4 -      136]            bfset   #3,y1                             ; mark the result unordered
+                   0003
+292                                                                                            ; Fall through to check_fy in case it's signaling.
+293                                        check_fy:
+294       P:000037 87C0    [4 -      140]            move              #$7f80,x0
+                   7F80
+295       P:000039 7C90    [2 -      142]            tst     b
+296       P:00003A A401    [4 -      146]            bge     y_135
+297       P:00003B 6C90    [2 -      148]            neg     b
+298                                        y_135:
+299       P:00003C 7C01    [2 -      150]            cmp     b1,x0
+300       P:00003D A60C    [4 -      154]            bgt     compare_dispatch                  ; a-b < 0 means a at most huge
+301       P:00003E A502    [4 -      158]            blt     f_cmp_y_NaN
+302       P:00003F 8E09    [2 -      160]            tstw    b0                                ; 0 if INF
+303       P:000040 A309    [4 -      164]            beq     compare_dispatch
+304                                        f_cmp_y_NaN:
+305       P:000041 87C0    [4 -      168]            move              #$7fc0,x0
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  C:\Software\iCub\firmware\controllerBll\Support\ARTCMPF32.asm  Page 6
+
+
+
+                   7FC0
+306       P:000043 7C01    [2 -      170]            cmp     b1,x0                             ; a - QNaN
+307       P:000044 A703    [4 -      174]            ble     f_compare_un                      ; a-b >= 0 means a is QNaN
+308                                                                                            ; Fall through to f_compare_un_inv.
+309    
+310                                        f_compare_un_inv:
+311                                                  SetInvalid
+313                                        f_compare_un:
+314       P:000048 83C3    [4 -      186]            bfset   #3,y1                             ; mark the result unordered
+                   0003
+315                                                                                            ; Fall through to compare_dispatch
+316    
+317    
+318                                        ;===============================================================================
+319                                        ; TERMINAL: compare_dispatch
+320                                        ; DESCRIPTION: Return result from one of many comparison routines.
+321                                        ; INPUT: y1 = dispatch code = (opcode * 8) + (relation * 2), where the codes
+322                                        ;       are defined at the start of FPE_cmp.
+323                                        ; OUTPUT: result in y0
+324                                        ;
+325                                        compare_dispatch:
+326       P:00004A E9C8    [6 -      192]            jsr     cmp_do_dispatch
+                   0054
+327    
+328                                        cmp_dispatch_top:
+329       P:00004C A90D    [4 -      196]            bra     cmp_equal                         ; fcmp (ARTCMPF32)
+330       P:00004D A912    [4 -      200]            bra     cmp_less
+331       P:00004E A917    [4 -      204]            bra     cmp_greater
+332       P:00004F A91F    [4 -      208]            bra     cmp_unordered
+333    
+334       P:000050 A909    [4 -      212]            bra     cmp_equal                         ; fcmpe (ARTFCMPEF32)
+335       P:000051 A90E    [4 -      216]            bra     cmp_less
+336       P:000052 A913    [4 -      220]            bra     cmp_greater
+337       P:000053 A918    [4 -      224]            bra     cmp_unordered_invalid
+338    
+339                                        cmp_do_dispatch:
+340       P:000054 43FF    [2 -      226]            add     x:(sp-1),y1                       ; bump table address
+341       P:000055 93FF    [2 -      228]            move              y1,x:(sp-1)
+342       P:000056 EDD8    [10 -      238]           rts                                       ; ...into branch
+343    
+344    
+345                                        ;===============================================================================
+346                                        ; TERMINAL: cmp_false_invalid, cmp_false, cmp_true, cmp_equal, cmp_less
+347                                        ;       cmp_false_invalid
+348                                        ; DESCRIPTION: Deliver the result of a comparison in y0.
+349                                        ;       cmp_false -- set y0 to 0
+350                                        ;       cmp_true -- leave y0 as 1
+351                                        ;       cmp_equal -- set y0 to 0.
+352                                        ; INPUT: y0 = 0
+353                                        ; OUTPUT: y0 = result, with CC set
+354                                        ;
+355                                        cmp_false_invalid:
+356                                                  SetInvalid
+358                                        cmp_equal:
+359                                        cmp_false:
+360       P:00005A C100    [2 -      248]            clr     y0
+361       P:00005B 8E01    [2 -      250]            tstw    y0                                ; set Z in CC
+362                                                  RESTORE_OMR
+364       P:00005E 9EF8    [2 -      258]            lea     (SP-SIZE_TEMPS)                   ; pop temp stack space
+365       P:00005F EDD8    [10 -      268]           rts
+366                                        cmp_less:
+367                                        cmp_true:
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  C:\Software\iCub\firmware\controllerBll\Support\ARTCMPF32.asm  Page 7
+
+
+
+368                                        cmp_done:
+369       P:000060 C101    [2 -      270]            move              #1,y0
+370       P:000061 5F02    [2 -      272]            cmp     #<2,y0                            ; set C and N
+371                                                  RESTORE_OMR
+373       P:000064 9EF8    [2 -      280]            lea     (SP-SIZE_TEMPS)                   ; pop temp stack space
+374       P:000065 EDD8    [10 -      290]           rts
+375    
+376    
+377                                        ;===============================================================================
+378                                        ; TERMINAL: cmp_greater
+379                                        ; DESCRIPTION: Deliver the result greater than.
+380                                        ; OUTPUT: y0 = 2
+381                                        ;
+382                                        cmp_greater:
+383       P:000066 C102    [2 -      292]            move              #2,y0
+384       P:000067 5F01    [2 -      294]            cmp     #<1,y0                            ; clear all CC bits
+385                                                  RESTORE_OMR
+387       P:00006A 9EF8    [2 -      302]            lea     (SP-SIZE_TEMPS)                   ; pop temp stack space
+388       P:00006B EDD8    [10 -      312]           rts
+389    
+390    
+391                                        ;===============================================================================
+392                                        ; TERMINAL: cmp_unordered, cmp_unordered_invalid
+393                                        ; DESCRIPTION: Deliver the result unordered.
+394                                        ; OUTPUT: y0 = 3 with V set and all other bits clear
+395                                        ;
+396                                        cmp_unordered_invalid:
+397                                                  SetInvalid
+399                                        cmp_unordered:
+400       P:00006F C103    [2 -      322]            move              #3,y0
+401       P:000070 5F01    [2 -      324]            cmp     #<1,y0                            ; clear all CC bits
+402       P:000071 83DD    [4 -      328]            bfset   #2,sr                             ; set V bit
+                   0002
+403                                                  RESTORE_OMR
+405       P:000075 9EF8    [2 -      336]            lea     (SP-SIZE_TEMPS)                   ; pop temp stack space
+406       P:000076 EDD8    [10 -      346]           rts
+407    
+408    
+409    
+410    
+411                                                  ENDSEC
+
+0    Errors
+0    Warnings
+
+

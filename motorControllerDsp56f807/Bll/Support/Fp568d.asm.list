@@ -1,0 +1,30 @@
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  C:\Software\iCub\firmware\controllerBll\Support\Fp568d.asm  Page 1
+
+
+
+1                          ;=============================================================
+2                          ;=== FILE: Fp568d.asm
+3                          ;===
+4                          ;=== Copyright (c)1998 Metrowerks, Inc.  All rights reserved.
+5                          ;=============================================================
+6                          ; Recommended tab stop = 8.
+7      
+8      
+9                          ;===============================================================================
+10                         ; GLOBAL DATA: fpe_state -- one word of state per process, indicating the
+11                         ;       prevailing rouding mode and holding the sticky exception flags.
+12                         ;
+13                                   SECTION fp_state  GLOBAL
+14     
+15                                   GLOBAL  FPE_state
+16     
+17     
+18        X:0000                   ORG     X:
+19                       FPE_state:
+20        X:0000                   DC      $0000
+21                                   ENDSEC
+
+0    Errors
+0    Warnings
+
+

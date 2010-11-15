@@ -1,0 +1,373 @@
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  C:\Software\iCub\firmware\controllerBll\Support\ARTDIVF32UZ.asm  Page 1
+
+
+
+1                          ;=============================================================
+2                          ;=== FILE: ARTDIVF32UZ.asm
+3                          ;===
+4                          ;=== Copyright (c)1998 Metrowerks, Inc.  All rights reserved.
+5                          ;=============================================================
+6                          ; Recommended tab stop = 8.
+7      
+8      
+9                          ;===============================================================================
+10                         ; SECTION: the floating point code
+11                                   SECTION fp_engine
+12                                                   OPT     CC
+13                                                   GLOBAL  ARTDIVF32UZ
+14     
+15                                                   include "Fp568d.h"
+16                                         ;=============================================================
+17                                         ;=== FILE: Fp568d.h
+18                                         ;===
+19                                         ;=== Copyright (c)1998 Metrowerks, Inc.  All rights reserved.
+20                                         ;=============================================================
+21                                         ; Recommended tab stop = 8.
+22     
+23                                                   XREF    FPE_state
+24     
+25        0001                             UseRep    EQU     1
+26     
+27     
+28                                         ; xhi/xlo save the x operand (passed in a) in two-op functions, which
+29                                         ;       is handy for NaN handling, etc.
+30                                         ; yhi/ylo save the y operand (passed in b) in two-op functions, which
+31                                         ;       is handy for NaN handling, etc.
+32                                         ; rexp is the result exponent
+33                                         ; rsign is the result sign (compute as xor during unpack)
+34                                         ; yflip is 0 for add, 0x8000 for sub, to indicate a flip of y's sign
+35                                         ; omr contains value of original OMR register on entry to routine
+36        0000                             xhi       EQU     0
+37        0001                             xlo       EQU     1
+38        0002                             yhi       EQU     2
+39        0003                             ylo       EQU     3
+40        0004                             yflip     EQU     4
+41        0005                             rsign     EQU     5
+42        0006                             rexp      EQU     6
+43        0007                             saved_omr EQU     7
+44     
+45        0008                             SIZE_TEMPS EQU    8
+46     
+47                                         ;offsets for the unpack routines.
+48        0002                             xhi_unp   EQU     2
+49        0003                             xlo_unp   EQU     3
+50        0004                             yhi_unp   EQU     4
+51        0005                             ylo_unp   EQU     5
+52        0006                             yflip_unp EQU     6
+53        0007                             rsign_unp EQU     7
+54        0008                             rexp_unp  EQU     8
+55     
+56     
+57        0040                             INVALID   EQU     $0040
+58        0010                             OVERFLOW  EQU     $0010
+59        0008                             UNDERFLOW EQU     $0008
+60        0020                             DIVBYZERO EQU     $0020
+61        0004                             INEXACT   EQU     $0004
+62     
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  Fp568d.h  Page 2
+
+
+
+63        0000                             TONEAREST EQU     0
+64        0001                             TOWARDZERO EQU    1
+65        0002                             UPWARD    EQU     2
+66        0003                             DOWNWARD  EQU     3
+67        0002                             BITDIRRND EQU     2
+68                                         BITDOWNORCHOP
+69        0001                                       EQU     1
+70     
+71                                         LFPState  MACRO
+72   m                                               move    x:FPE_state,x0
+73   m                                               ENDM
+74     
+75                                         SetInvalid MACRO
+76   m                                               bfset   #INVALID,x:FPE_state
+77   m                                               ENDM
+78     
+79                                         SetInexact MACRO
+80   m                                               bfset   #INEXACT,x:FPE_state
+81   m                                               ENDM
+82     
+83                                         SetOverflow
+84                                                   MACRO
+85   m                                               bfset   #(OVERFLOW+INEXACT),x:FPE_state
+86   m                                               ENDM
+87     
+88                                         SetUnderflow
+89                                                   MACRO
+90   m                                               bfset   #(UNDERFLOW+INEXACT),x:FPE_state
+91   m                                               ENDM
+92     
+93                                         SetDivByZero
+94                                                   MACRO
+95   m                                               bfset   #DIVBYZERO,x:FPE_state
+96   m                                               ENDM
+97     
+98                                         StFPState MACRO
+99   m                                               move    x0,x:FPE_state
+100  m                                               ENDM
+101    
+102                                        NORMALIZE_OMR
+103                                                  MACRO
+104  m                                               move    OMR,x:(SP-saved_omr)              ; save original OMR state
+105  m                                               bfset   #$0100,OMR                        ; set CC bit
+106  m                                               bfclr   #$0030,OMR                        ; clear R and SA bits
+107  m                                               ENDM
+108    
+109                                        RESTORE_OMR
+110                                                  MACRO
+111  m                                               move    x:(SP-saved_omr),OMR              ; restore original OMR state
+112  m                                               ENDM
+113    
+114    
+115    
+116                                        ;===============================================================================
+117                                        ; FUNCTION: ARTDIVF32UZ
+118                                        ; DESCRIPTION: Float divide.
+119                                        ; INPUT: a=x, (sp-2/3)=y, floats
+120                                        ; OUTPUT: a = result
+121                                        ;
+122                                        ARTDIVF32UZ:
+123                                                                                            ; Compute (-1)^x.sign * 2^x.exp-bias * 1.xxxx divided by
+124                                                                                            ; (-1)^y.sign * 2^y.exp-bias * 1.yyyy --->
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  C:\Software\iCub\firmware\controllerBll\Support\ARTDIVF32UZ.asm  Page 3
+
+
+
+125                                                                                            ; result.sign           = xor of x and y signs
+126                                                                                            ; result.exp (biased)   = x.exp - y.exp + bias
+127                                                                                            ; result.bits           = w.zzzzz before normalization, rounding, etc.
+128                                                                                            ; If the leading w bit is 0, then must decrement the exponent by 1
+129                                                                                            ; and realign.
+130       P:000000 B5FE    [2 -        2]            move              x:(sp-2),b              ; high 16 bits and sign extension
+131       P:000001 F1CB    [6 -        8]            move              x:(sp-3),b0             ; low 16 bits
+                   FFFD
+132       P:000003 DE4B    [2 -       10]            lea     (SP+SIZE_TEMPS)                   ; reserve stack space for all temps
+                   0008
+133                                                  NORMALIZE_OMR
+137       P:00000B E9C8    [6 -       30]            jsr     ARTf_unpack2z                     ; return with <x,y> flags in x0
+                   0000
+138       P:00000D 98FB    [2 -       32]            move              r0,x:(sp-rsign)         ; stuff xor
+139       P:00000E E9C8    [6 -       38]            jsr     ARTdispatch_x0
+                   0000
+140                                                                                            ; TRICK: dispatch table must be next.
+141    
+142       P:000010 A920    [4 -       42]            bra     f_div_numbers                     ; x is a number, y is number
+143       P:000011 A91A    [4 -       46]            bra     f_divide_by_zero                  ;       y is zero
+144       P:000012 A90D    [4 -       50]            bra     go_f_result_is_zero               ;       y is INF
+145       P:000013 A914    [4 -       54]            bra     go_f_y_is_NaN                     ;       y is NaN
+146    
+147       P:000014 A90B    [4 -       58]            bra     go_f_result_is_zero               ; x is zero, y is number
+148       P:000015 A90C    [4 -       62]            bra     go_f_result_is_Invalid            ;       y is zero
+149       P:000016 A909    [4 -       66]            bra     go_f_result_is_zero               ;       y is INF
+150       P:000017 A910    [4 -       70]            bra     go_f_y_is_NaN                     ;       y is NaN
+151    
+152       P:000018 A90B    [4 -       74]            bra     go_f_result_is_INF                ; x is INF, y is number
+153       P:000019 A90A    [4 -       78]            bra     go_f_result_is_INF                ;       y is zero
+154       P:00001A A907    [4 -       82]            bra     go_f_result_is_Invalid            ;       y is INF
+155       P:00001B A90C    [4 -       86]            bra     go_f_y_is_NaN                     ;       y is NaN
+156    
+157       P:00001C A909    [4 -       90]            bra     go_div_f_x_is_NaN                 ; x is NaN, y is number
+158       P:00001D A908    [4 -       94]            bra     go_div_f_x_is_NaN                 ;       y is zero
+159       P:00001E A907    [4 -       98]            bra     go_div_f_x_is_NaN                 ;       y is INF
+160       P:00001F A90A    [4 -      102]            bra     go_f_x_and_y_are_NaN              ;       y is NaN
+161    
+162                                        ; Get to utilities the long way.
+163                                        go_f_result_is_zero:
+164       P:000020 E984    [6 -      108]            jmp     ARTf_result_is_zero
+                   0000
+165                                        go_f_result_is_Invalid:
+166       P:000022 E984    [6 -      114]            jmp     ARTf_result_is_Invalid
+                   0000
+167                                        go_f_result_is_INF:
+168       P:000024 E984    [6 -      120]            jmp     ARTf_result_is_INF
+                   0000
+169                                        go_div_f_x_is_NaN:
+170       P:000026 E984    [6 -      126]            jmp     ARTf_x_is_NaN
+                   0000
+171                                        go_f_y_is_NaN:
+172       P:000028 E984    [6 -      132]            jmp     ARTf_y_is_NaN
+                   0000
+173                                        go_f_x_and_y_are_NaN:
+174       P:00002A E984    [6 -      138]            jmp     ARTf_x_and_y_are_NaN
+                   0000
+175    
+176                                        ;===============================================================================
+177                                        ; TERMINAL: f_divide_by_zero
+178                                        ; DESCRIPTION: Signal divbyzero and return INF
+179                                        ; INPUT: rsign = sign of result.
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  C:\Software\iCub\firmware\controllerBll\Support\ARTDIVF32UZ.asm  Page 4
+
+
+
+180                                        ;
+181                                        f_divide_by_zero:
+182                                                                                            ; Get here dividing finite / 0.
+183                                                  SetDivByZero
+185       P:00002F E984    [6 -      152]            jmp     ARTf_result_is_INF
+                   0000
+186    
+187                                        f_div_numbers:
+188                                                                                            ; In this typical case, compute exp = x.exp - y.exp + bias.
+189                                                                                            ; This presumes alignment as though the leading significant
+190                                                                                            ; bit will be 1.  If it's zero, we'll left shift and decrement
+191                                                                                            ; the exponenet.
+192    
+193                                                                                            ; Have to divide dyb into dxb.  It's "just" two steps of
+194                                                                                            ; 64/32 --> 32 quo + 32 rem.
+195                                                                                            ; In terms of 32-bit digits, the division is just
+196                                                                                            ;
+197                                                                                            ;            X Y
+198                                                                                            ;       --------
+199                                                                                            ;  A B | C D 0 0.
+200                                                                                            ;
+201                                                                                            ; Knuth, Vol. 2, explains how it goes.  First, A is normalized
+202                                                                                            ; because its leading bit is one.  To ensure that no bit is
+203                                                                                            ; needed left of the X-digit above, right-shift CD by 1 bit at
+204                                                                                            ; the outset.  Then use the div utility to divide CD by A
+205                                                                                            ; to guess X.  As Knuth shows, even for hideously large integers
+206                                                                                            ; like these, the guess X is at worst 2 units too high, so we watch
+207                                                                                            ; and correct the remainder suitably.
+208                                                                                            ;
+209                                                                                            ; Guessing Y is more interesting, because the partial remainder
+210                                                                                            ; is not constrained downward, as X was via preconditioning.
+211                                                                                            ; After X has been guessed and corrected, the situation is this:
+212                                                                                            ;
+213                                                                                            ;            X ?
+214                                                                                            ;       --------
+215                                                                                            ;  A B | C D 0 0.
+216                                                                                            ;        X*A B
+217                                                                                            ;          E F 0
+218                                                                                            ;
+219                                                                                            ; All that's known is that, after X is corrected, AB < EF.
+220                                                                                            ; It's possible for E to be = A, in which case the guess for Y
+221                                                                                            ; is the maximum "digit", in this case 0xffffffff.  Correcting Y
+222                                                                                            ; as before yields an unnormalized quotient (by 0 or 1 bit) and
+223                                                                                            ; a remainder (that contributes to the sticky bits).
+224                                                                                            ;
+225                                                                                            ; Subtract exp's and rebias as though dvd.sig >= dvr.sig.
+226                                                                                            ; rexp = dvd exp.
+227       P:000031 B1FA    [2 -      154]            move              x:(sp-rexp),y0
+228       P:000032 7473    [2 -      156]            sub     y1,y0
+229       P:000033 4740    [2 -      158]            add     #127,y0
+                   007F
+230       P:000035 91FA    [2 -      160]            move              y0,x:(sp-rexp)
+231    
+232                                                                                            ; We'll divide in the form 001xxxxx / 01yyyy to avoid sign,
+233                                                                                            ; producing a result of the form 0rstttttt, where r|s=1.
+234                                                                                            ; rsign contains the xor, so xhi and xlo are free for temporaries,
+235                                                                                            ; as are the r regs. b = dvd bits, a = drv bits.
+236       P:000036 7CB0    [2 -      162]            asr     b                                 ; align 001xxx
+237       P:000037 7CB0    [2 -      164]            asr     b
+238       P:000038 7C30    [2 -      166]            asr     a                                 ; align as 01yyy
+239       P:000039 8006    [2 -      168]            move              a1,x0
+240       P:00003A D0CB    [6 -      174]            move              a0,x:(sp-xlo)           ; xlo = dvrlo
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  C:\Software\iCub\firmware\controllerBll\Support\ARTDIVF32UZ.asm  Page 5
+
+
+
+                   FFFF
+241    
+242                                                                                            ; Produce first quotient 0rsttttt.
+243       P:00003C 81DD    [4 -      178]            bfclr   #1,sr                             ; clear C to start
+                   0001
+244                                                  IF      @def(UseRep)
+245       P:00003E CE90    [6 -      184]            rep     #16
+246                                                  ELSE
+249                                                  ENDIF
+250       P:00003F 64C4    [2 -      186]            div     x0,b
+251                                        div_1:
+252       P:000040 64C0    [2 -      188]            add     x0,b                              ; b1 = remainder, b0 = qhi
+253       P:000041 8109    [2 -      190]            move              b0,y0                   ; y0 = qhi
+254       P:000042 87C9    [4 -      194]            move              #0,b0
+                   0000
+255       P:000044 7CB0    [2 -      196]            asr     b                                 ; align partial rem as 00rrrrrrrr
+256    
+257                                                                                            ; Now set up qhi * dvrlo to compute true remainder, for
+258                                                                                            ; possible correction by 1 or 2.
+259       P:000045 B3FF    [2 -      198]            move              x:(sp-xlo),y1           ; y1 = dvrlo
+260       P:000046 747C    [2 -      200]            mpysu   y0,y1,a
+261       P:000047 7C30    [2 -      202]            asr     a                                 ; align as 00sssssss
+262    
+263                                                                                            ; True remainder with quotient digit qhi is b-a, adjusted to be
+264                                                                                            ; nonnegative.
+265       P:000048 7480    [2 -      204]            sub     a,b
+266       P:000049 A007    [4 -      208]            bcc     f_div_post_1st_fixup
+267    
+268                                                                                            ; Must correct qhi downward by 1 or 2.
+269       P:00004A 8400    [2 -      210]            move              x0,a
+270       P:00004B 8083    [2 -      212]            move              y1,a0                   ; a = dvr (right-adjusted)
+271       P:00004C 5701    [2 -      214]            sub     #1,y0                             ; --qhi
+272       P:00004D 6480    [2 -      216]            add     a,b                               ; does this fix the deficit?
+273       P:00004E A102    [4 -      220]            bcs     f_div_post_1st_fixup
+274       P:00004F 5701    [2 -      222]            sub     #1,y0
+275       P:000050 6480    [2 -      224]            add     a,b                               ; this MUST set carry
+276    
+277                                        f_div_post_1st_fixup:
+278       P:000051 D11F    [2 -      226]            move              y0,x:(sp-xhi)           ; xhi = qhi
+279                                                                                            ; Now compute the 2nd 15-bit quotient "digit".
+280       P:000052 81DD    [4 -      230]            bfclr   #1,sr                             ; clear C to start
+                   0001
+281                                                  IF      @def(UseRep)
+282       P:000054 CE90    [6 -      236]            rep     #16
+283                                                  ELSE
+286                                                  ENDIF
+287       P:000055 64C4    [2 -      238]            div     x0,b
+288                                        div_2:
+289       P:000056 64C0    [2 -      240]            add     x0,b
+290       P:000057 8109    [2 -      242]            move              b0,y0                   ; y0 = qlo
+291       P:000058 87C9    [4 -      246]            move              #0,b0
+                   0000
+292       P:00005A 7CB0    [2 -      248]            asr     b                                 ; align partial rem as 00rrrrrrr
+293    
+294                                                                                            ; Compute qlo * dvrlo, as before.
+295       P:00005B B3FF    [2 -      250]            move              x:(sp-xlo),y1
+296       P:00005C 747C    [2 -      252]            mpysu   y0,y1,a
+297       P:00005D 7C30    [2 -      254]            asr     a                                 ; align as 00ssssss
+298    
+299                                                                                            ; Subtract as before, and adjust by 1 or 2.
+300       P:00005E 7480    [2 -      256]            sub     a,b
+301       P:00005F A007    [4 -      260]            bcc     f_div_post_2nd_fixup
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  C:\Software\iCub\firmware\controllerBll\Support\ARTDIVF32UZ.asm  Page 6
+
+
+
+302    
+303                                                                                            ; Set a = dvr to correct qlo.
+304       P:000060 8400    [2 -      262]            move              x0,a
+305       P:000061 8083    [2 -      264]            move              y1,a0                   ; a dvr
+306       P:000062 5701    [2 -      266]            sub     #1,y0                             ; --qlo
+307       P:000063 6480    [2 -      268]            add     a,b
+308       P:000064 A102    [4 -      272]            bcs     f_div_post_2nd_fixup
+309       P:000065 5701    [2 -      274]            sub     #1,y0
+310       P:000066 6480    [2 -      276]            add     a,b                               ; MUST set carry
+311    
+312                                        f_div_post_2nd_fixup:
+313                                                                                            ; xhi/y0 = pair of 0xxxxx pieces of quotient
+314                                                                                            ; b = remainder, nonzero --> sticky
+315       P:000067 7637    [2 -      278]            lsl     y0
+316                                                                                            ; Any sticky bits in b?
+317       P:000068 8309    [2 -      280]            move              b0,y1
+318       P:000069 6683    [2 -      282]            or      b1,y1
+319       P:00006A A301    [4 -      286]            beq     f_div_nonstick
+320       P:00006B 4701    [2 -      288]            add     #1,y0
+321                                        f_div_nonstick:
+322       P:00006C B3FA    [2 -      290]            move              x:(sp-rexp),y1
+323       P:00006D F41F    [2 -      292]            move              x:(sp-xhi),a
+324       P:00006E 8081    [2 -      294]            move              y0,a0                   ; have quo = 0rstttt, r|s = 1
+325       P:00006F 7430    [2 -      296]            asl     a
+326       P:000070 8E06    [2 -      298]            tstw    a1
+327       P:000071 E584    [4 -      302]            jlt     ARTf_coerce
+                   0000
+328       P:000073 7430    [2 -      304]            asl     a                                 ; must set lead bit
+329       P:000074 5781    [2 -      306]            sub     #1,y1
+330       P:000075 E984    [6 -      312]            jmp     ARTf_coerce
+                   0000
+331    
+332    
+333                                                  ENDSEC
+
+0    Errors
+0    Warnings
+
+

@@ -1,0 +1,121 @@
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:55  C:\Software\iCub\firmware\controllerBll\Support\DSP56800_xromxram.asm  Page 1
+
+
+
+1      
+2      
+3      
+4      
+5      
+6      
+7                          ;  metrowerks sample code
+8      
+9      
+10                         ; this __romCopy copies xROM to xRAM
+11     
+12     
+13     
+14                         ; define which __romCopy routine to assemble
+15                         ; see alternative routine below
+16     
+17     
+18                         ; use the software loop routine
+19                         ; if you have more than 8191 elements to zero
+20     
+21                         ; use the hardware loop routine
+22                         ; if you have less than 8191 elements to zero
+23                         ; 56800 loop LC register is 13-bits
+24     
+25     
+26     
+27                         ; to handle the general case
+28                         ; DSP56800 stationery default clearBSS is software loop
+29     
+30                                   DEFINE  useSoftwareLoop ''
+31     
+32     
+33     
+34     
+35                                   section startup
+36     
+37     
+38                         ; these variables are defined in the linker command file (LCF)
+39     
+40                                   XREF    F_rom_to_ram
+41                                   XREF    F_data_size
+42                                   XREF    F_data_RAM_addr
+43                                   XREF    F_data_ROM_addr
+44     
+45     
+46     
+47        P:000000                   org     p:
+48     
+49     
+50                                   GLOBAL  F__romCopy
+51     
+52                         ;       SUBROUTINE "F__romCopy",F__romCopy,F__romCopyEND-F__romCopy
+53     
+54     
+55                         F__romCopy:
+56     
+57     
+58     
+59                         ; optional check for xROM-xRAM copy request
+60                         ; DSP56800 Stationery LCF sets variable F_rom_to_ram
+61                         ; comment this test out if target's LCF is always set for xROM-xRAM
+62     
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:55  C:\Software\iCub\firmware\controllerBll\Support\DSP56800_xromxram.asm  Page 2
+
+
+
+63        P:000000 87C0              move              #F_rom_to_ram,x0        ; optional check
+                   0000
+64        P:000002 8E00              tstw    x0
+65        P:000003 A30D              beq     end_romCopy                       ; if no xROM-to-xRAM, then exit
+66     
+67     
+68     
+69     
+70     
+71                                   IF      @DEF('useSoftwareLoop')
+72     
+73     
+74                         ; xROM-to-xRAM software loop
+75     
+76        P:000004 87C1              move              #F_data_size,y0         ; set count
+                   0000
+77        P:000006 8E01              tstw    y0                                ; optional zero count test
+78        P:000007 A309              beq     end_romCopy                       ; if zero count, then exit
+79     
+80        P:000008 87D3              move              #F_data_ROM_addr,r3     ; src address  -- ROM data start
+                   0000
+81        P:00000A 87D1              move              #F_data_RAM_addr,r1     ; dest address -- RAM data start
+                   0000
+82        P:00000C E040              nop
+83     
+84                         loop_romCopy:
+85        P:00000D F003              move              x:(r3)+,x0              ; fetch value at x address r3
+86        P:00000E D001              move              x0,x:(r1)+              ; stash value at x address r1
+87        P:00000F 6413              dec     y0                                ; decrement count and test
+88        P:000010 A27C              bne     loop_romCopy                      ; if not zero, continue loop
+89     
+90     
+91     
+92     
+93                                   ELSE
+113                                  ENDIF
+114    
+115    
+116    
+117                        end_romCopy:
+118       P:000011 EDD8              rts
+119    
+120                        F__romCopyEND:
+121    
+122                                  endsec
+123                                  end
+
+0    Errors
+0    Warnings
+
+

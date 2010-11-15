@@ -1,0 +1,283 @@
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:55  C:\Software\iCub\firmware\controllerBll\Support\ARTMPYF32U.asm  Page 1
+
+
+
+1                          ;=============================================================
+2                          ;=== FILE: ARTMPYF32U.asm
+3                          ;===
+4                          ;=== Copyright (c)1998 Metrowerks, Inc.  All rights reserved.
+5                          ;=============================================================
+6                          ; Recommended tab stop = 8.
+7      
+8                          ;===============================================================================
+9                          ; SECTION: the floating point code
+10                                   SECTION fp_engine
+11                                                   OPT     CC
+12                                                   GLOBAL  ARTMPYF32U
+13     
+14                                                   include "Fp568d.h"
+15                                         ;=============================================================
+16                                         ;=== FILE: Fp568d.h
+17                                         ;===
+18                                         ;=== Copyright (c)1998 Metrowerks, Inc.  All rights reserved.
+19                                         ;=============================================================
+20                                         ; Recommended tab stop = 8.
+21     
+22                                                   XREF    FPE_state
+23     
+24        0001                             UseRep    EQU     1
+25     
+26     
+27                                         ; xhi/xlo save the x operand (passed in a) in two-op functions, which
+28                                         ;       is handy for NaN handling, etc.
+29                                         ; yhi/ylo save the y operand (passed in b) in two-op functions, which
+30                                         ;       is handy for NaN handling, etc.
+31                                         ; rexp is the result exponent
+32                                         ; rsign is the result sign (compute as xor during unpack)
+33                                         ; yflip is 0 for add, 0x8000 for sub, to indicate a flip of y's sign
+34                                         ; omr contains value of original OMR register on entry to routine
+35        0000                             xhi       EQU     0
+36        0001                             xlo       EQU     1
+37        0002                             yhi       EQU     2
+38        0003                             ylo       EQU     3
+39        0004                             yflip     EQU     4
+40        0005                             rsign     EQU     5
+41        0006                             rexp      EQU     6
+42        0007                             saved_omr EQU     7
+43     
+44        0008                             SIZE_TEMPS EQU    8
+45     
+46                                         ;offsets for the unpack routines.
+47        0002                             xhi_unp   EQU     2
+48        0003                             xlo_unp   EQU     3
+49        0004                             yhi_unp   EQU     4
+50        0005                             ylo_unp   EQU     5
+51        0006                             yflip_unp EQU     6
+52        0007                             rsign_unp EQU     7
+53        0008                             rexp_unp  EQU     8
+54     
+55     
+56        0040                             INVALID   EQU     $0040
+57        0010                             OVERFLOW  EQU     $0010
+58        0008                             UNDERFLOW EQU     $0008
+59        0020                             DIVBYZERO EQU     $0020
+60        0004                             INEXACT   EQU     $0004
+61     
+62        0000                             TONEAREST EQU     0
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:55  Fp568d.h  Page 2
+
+
+
+63        0001                             TOWARDZERO EQU    1
+64        0002                             UPWARD    EQU     2
+65        0003                             DOWNWARD  EQU     3
+66        0002                             BITDIRRND EQU     2
+67                                         BITDOWNORCHOP
+68        0001                                       EQU     1
+69     
+70                                         LFPState  MACRO
+71   m                                               move    x:FPE_state,x0
+72   m                                               ENDM
+73     
+74                                         SetInvalid MACRO
+75   m                                               bfset   #INVALID,x:FPE_state
+76   m                                               ENDM
+77     
+78                                         SetInexact MACRO
+79   m                                               bfset   #INEXACT,x:FPE_state
+80   m                                               ENDM
+81     
+82                                         SetOverflow
+83                                                   MACRO
+84   m                                               bfset   #(OVERFLOW+INEXACT),x:FPE_state
+85   m                                               ENDM
+86     
+87                                         SetUnderflow
+88                                                   MACRO
+89   m                                               bfset   #(UNDERFLOW+INEXACT),x:FPE_state
+90   m                                               ENDM
+91     
+92                                         SetDivByZero
+93                                                   MACRO
+94   m                                               bfset   #DIVBYZERO,x:FPE_state
+95   m                                               ENDM
+96     
+97                                         StFPState MACRO
+98   m                                               move    x0,x:FPE_state
+99   m                                               ENDM
+100    
+101                                        NORMALIZE_OMR
+102                                                  MACRO
+103  m                                               move    OMR,x:(SP-saved_omr)              ; save original OMR state
+104  m                                               bfset   #$0100,OMR                        ; set CC bit
+105  m                                               bfclr   #$0030,OMR                        ; clear R and SA bits
+106  m                                               ENDM
+107    
+108                                        RESTORE_OMR
+109                                                  MACRO
+110  m                                               move    x:(SP-saved_omr),OMR              ; restore original OMR state
+111  m                                               ENDM
+112    
+113    
+114    
+115                                        ;===============================================================================
+116                                        ; FUNCTION: ARTMPYF32U
+117                                        ; DESCRIPTION: float multiply
+118                                        ; INPUT: x in a; y at sp-[2, 3
+119                                        ; OUTPUT: product in a
+120                                        ;
+121                                        ARTMPYF32U:
+122       P:000000 B5FE    [2 -        2]            move              x:(sp-2),b              ; high 16 bits and sign extension
+123       P:000001 F1CB    [6 -        8]            move              x:(sp-3),b0             ; low 16 bits
+                   FFFD
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:55  C:\Software\iCub\firmware\controllerBll\Support\ARTMPYF32U.asm  Page 3
+
+
+
+124       P:000003 DE4B    [2 -       10]            lea     (SP+SIZE_TEMPS)                   ; reserve stack space for all temps
+                   0008
+125                                                  NORMALIZE_OMR
+129       P:00000B E9C8    [6 -       30]            jsr     ARTf_unpack2z                     ; return with <x,y> flags in x0
+                   0000
+130       P:00000D 98FB    [2 -       32]            move              r0,x:(sp-rsign)         ; stuff xor
+131       P:00000E E9C8    [6 -       38]            jsr     ARTdispatch_x0
+                   0000
+132                                                                                            ; TRICK: dispatch table must be next.
+133    
+134                                                                                            ; Dispatch table for special cases.
+135       P:000010 A91B    [4 -       42]            bra     f_mul_numbers                     ; x is a number, y is number
+136       P:000011 A90E    [4 -       46]            bra     go_f_result_is_zero               ;       y is zero
+137       P:000012 A911    [4 -       50]            bra     go_f_result_is_INF                ;       y is INF
+138       P:000013 A914    [4 -       54]            bra     go_f_y_is_NaN                     ;       y is NaN
+139    
+140       P:000014 A90B    [4 -       58]            bra     go_f_result_is_zero               ; x is zero, y is number
+141       P:000015 A90A    [4 -       62]            bra     go_f_result_is_zero               ;       y is zero
+142       P:000016 A90B    [4 -       66]            bra     go_f_result_is_Invalid            ;       y is INF
+143       P:000017 A910    [4 -       70]            bra     go_f_y_is_NaN                     ;       y is NaN
+144    
+145       P:000018 A90B    [4 -       74]            bra     go_f_result_is_INF                ; x is INF, y is number
+146       P:000019 A908    [4 -       78]            bra     go_f_result_is_Invalid            ;       y is zero
+147       P:00001A A909    [4 -       82]            bra     go_f_result_is_INF                ;       y is INF
+148       P:00001B A90C    [4 -       86]            bra     go_f_y_is_NaN                     ;       y is NaN
+149    
+150       P:00001C A909    [4 -       90]            bra     go_f_x_is_NaN                     ; x is NaN, y is number
+151       P:00001D A908    [4 -       94]            bra     go_f_x_is_NaN                     ;       y is zero
+152       P:00001E A907    [4 -       98]            bra     go_f_x_is_NaN                     ;       y is INF
+153       P:00001F A90A    [4 -      102]            bra     go_f_x_and_y_are_NaN              ;       y is NaN
+154    
+155    
+156                                        ; Get to utilities the long way.
+157                                        go_f_result_is_zero:
+158       P:000020 E984    [6 -      108]            jmp     ARTf_result_is_zero
+                   0000
+159                                        go_f_result_is_Invalid:
+160       P:000022 E984    [6 -      114]            jmp     ARTf_result_is_Invalid
+                   0000
+161                                        go_f_result_is_INF:
+162       P:000024 E984    [6 -      120]            jmp     ARTf_result_is_INF
+                   0000
+163                                        go_f_x_is_NaN:
+164       P:000026 E984    [6 -      126]            jmp     ARTf_x_is_NaN
+                   0000
+165                                        go_f_y_is_NaN:
+166       P:000028 E984    [6 -      132]            jmp     ARTf_y_is_NaN
+                   0000
+167                                        go_f_x_and_y_are_NaN:
+168       P:00002A E984    [6 -      138]            jmp     ARTf_x_and_y_are_NaN
+                   0000
+169    
+170    
+171                                        ;===============================================================================
+172                                        ; TERMINAL: f_mul_numbers
+173                                        ; DESCRIPTION: Usual case of 2 finite, nonzero numbers
+174                                        ;
+175                                        f_mul_numbers:
+176       P:00002C 43FA    [2 -      140]            add     x:(sp-rexp),y1                    ; sum biased exponents
+177       P:00002D 57C0    [2 -      142]            sub     #126,y1
+                   007E
+178       P:00002F 93FA    [2 -      144]            move              y1,x:(sp-rexp)          ; save computed exp
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:55  C:\Software\iCub\firmware\controllerBll\Support\ARTMPYF32U.asm  Page 4
+
+
+
+179    
+180                                                                                            ; b = x, a = y, normalized and so pairs of "signed" values.
+181                                                                                            ; Because the fixed-point multiply shifts left a bit and
+182                                                                                            ; because the dsp doesn't support unsigned integer-style
+183                                                                                            ; multiplies, right-shift a bit to have 1+24+7 -bit
+184                                                                                            ; significands.  The fractional style of dsp arithmetic
+185                                                                                            ; causes the result of 01xxxx * 01xxxx style arithmetic
+186                                                                                            ; to be 0zyyyy, where z may be 1 or 0.  If 1, then there's
+187                                                                                            ; no need for further normalization -- hence the 126 bias
+188                                                                                            ; adjust.
+189                                                                                            ; The minimum number of moves is obtained by putting y
+190                                                                                            ; in x0-y1.
+191       P:000030 7C30    [2 -      146]            asr     a
+192       P:000031 7CB0    [2 -      148]            asr     b
+193                                                                                            ; Set up <x0, y1> * <b1, b0>.
+194       P:000032 8006    [2 -      150]            move              a1,x0                   ; x0 = yhi
+195       P:000033 8308    [2 -      152]            move              a0,y1                   ; y1 = ylo
+196                                                                                            ; Set up <x0, y1> * <b1, y0>.
+197       P:000034 8109    [2 -      154]            move              b0,y0                   ; y0 = xlo
+198       P:000035 747C    [2 -      156]            mpysu   y0,y1,a                           ; a get lowest unsigned product, xlo*ylo
+199       P:000036 8E01    [2 -      158]            tstw    y0                                ; if "negative" add y1 into high half
+200       P:000037 A406    [4 -      162]            bge     flolo_nofix
+201                                                                                            ; Correct for signed y0.  To get unsigned add * 2,
+202                                                                                            ; shift right and add 4 times.  y1 has trailing 0's.
+203       P:000038 7EB7    [2 -      164]            lsr     y1
+204       P:000039 6470    [2 -      166]            add     y1,a
+205       P:00003A 6470    [2 -      168]            add     y1,a
+206       P:00003B 6470    [2 -      170]            add     y1,a
+207       P:00003C 6470    [2 -      172]            add     y1,a
+208       P:00003D 76B7    [2 -      174]            lsl     y1
+209                                        flolo_nofix:
+210                                                                                            ; a0 has just 2 high bits of the product. a2 may have carry
+211       P:00003E 8808    [2 -      176]            move              a0,r0                   ; save lowest couple of stickies
+212       P:00003F 8186    [2 -      178]            move              a1,b0                   ; save high part for right shift
+213       P:000040 840A    [2 -      180]            move              a2,a                    ; move carry down
+214       P:000041 8089    [2 -      182]            move              b0,a0                   ; set up low bits
+215                                                                                            ; <x0, y1> * <b1, y0> with y1 * y0 aligned in a.
+216       P:000042 7C4C    [2 -      184]            macsu   x0,y0,a
+217                                                                                            ; <x0, y1> * <b1, 0>, with <x0, y1> * y0 aligned in a.
+218       P:000043 8107    [2 -      186]            move              b1,y0
+219       P:000044 7C7C    [2 -      188]            macsu   y0,y1,a                           ; add y1 * <y0, 0> into a
+220                                                                                            ; <x0, y1> * <y0, 0>
+221                                                                                            ; a now has a 33-bit result, so shift right with care
+222       P:000045 8308    [2 -      190]            move              a0,y1                   ; stickies
+223       P:000046 8086    [2 -      192]            move              a1,a0                   ; right shift 16 bits
+224       P:000047 860A    [2 -      194]            move              a2,a1
+225                                                                                            ;move   #0,a2           don't care about junk bits to left
+226       P:000048 6C48    [2 -      196]            mac     x0,y0,a
+227       P:000049 8110    [2 -      198]            move              r0,y0
+228       P:00004A 66D3    [2 -      200]            or      y0,y1                             ; any stickies?
+229       P:00004B A302    [4 -      204]            beq     fmn_nostick
+230       P:00004C 83C8    [4 -      208]            bfset   #1,a0                             ; force low bit
+                   0001
+231                                        fmn_nostick:
+232                                                                                            ; a has leading 0, then 31 bits, including stickies.  If it's
+233                                                                                            ; normalized then exp is correct. Otherwise, it's unnormalized
+234                                                                                            ; by 1 bit so shift and decrement exp.
+235       P:00004E B3FA    [2 -      210]            move              x:(sp-rexp),y1          ; set up for coerce
+236       P:00004F 7430    [2 -      212]            asl     a                                 ; V bit messes up test
+237       P:000050 8E06    [2 -      214]            tstw    a1                                ; extension bits mess up the CCR in asl
+238       P:000051 A502    [4 -      218]            blt     fmn_noshift
+239       P:000052 7430    [2 -      220]            asl     a
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:55  C:\Software\iCub\firmware\controllerBll\Support\ARTMPYF32U.asm  Page 5
+
+
+
+240       P:000053 5781    [2 -      222]            sub     #1,y1
+241                                        fmn_noshift:
+242       P:000054 E984    [6 -      228]            jmp     ARTf_coerce
+                   0000
+243    
+244    
+245    
+246    
+247    
+248                                                  ENDSEC
+
+0    Errors
+0    Warnings
+
+

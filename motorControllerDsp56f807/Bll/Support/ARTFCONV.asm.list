@@ -1,0 +1,606 @@
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  C:\Software\iCub\firmware\controllerBll\Support\ARTFCONV.asm  Page 1
+
+
+
+1                          ;=============================================================
+2                          ;=== FILE: fp568d.s
+3                          ;===
+4                          ;=== Copyright (c)1998 Metrowerks, Inc.  All rights reserved.
+5                          ;=============================================================
+6                          ; Recommended tab stop = 8.
+7      
+8                          ;===============================================================================
+9                          ; SECTION: the floating point code
+10                                   SECTION fp_engine
+11                                                   OPT     CC
+12                                                   GLOBAL  ARTF32_TO_U16U
+13                                                   GLOBAL  ARTF32_TO_S16U
+14                                                   GLOBAL  ARTF32_TO_U32U
+15                                                   GLOBAL  ARTF32_TO_S32U
+16     
+17                                                   include "Fp568d.h"
+18                                         ;=============================================================
+19                                         ;=== FILE: Fp568d.h
+20                                         ;===
+21                                         ;=== Copyright (c)1998 Metrowerks, Inc.  All rights reserved.
+22                                         ;=============================================================
+23                                         ; Recommended tab stop = 8.
+24     
+25                                                   XREF    FPE_state
+26     
+27        0001                             UseRep    EQU     1
+28     
+29     
+30                                         ; xhi/xlo save the x operand (passed in a) in two-op functions, which
+31                                         ;       is handy for NaN handling, etc.
+32                                         ; yhi/ylo save the y operand (passed in b) in two-op functions, which
+33                                         ;       is handy for NaN handling, etc.
+34                                         ; rexp is the result exponent
+35                                         ; rsign is the result sign (compute as xor during unpack)
+36                                         ; yflip is 0 for add, 0x8000 for sub, to indicate a flip of y's sign
+37                                         ; omr contains value of original OMR register on entry to routine
+38        0000                             xhi       EQU     0
+39        0001                             xlo       EQU     1
+40        0002                             yhi       EQU     2
+41        0003                             ylo       EQU     3
+42        0004                             yflip     EQU     4
+43        0005                             rsign     EQU     5
+44        0006                             rexp      EQU     6
+45        0007                             saved_omr EQU     7
+46     
+47        0008                             SIZE_TEMPS EQU    8
+48     
+49                                         ;offsets for the unpack routines.
+50        0002                             xhi_unp   EQU     2
+51        0003                             xlo_unp   EQU     3
+52        0004                             yhi_unp   EQU     4
+53        0005                             ylo_unp   EQU     5
+54        0006                             yflip_unp EQU     6
+55        0007                             rsign_unp EQU     7
+56        0008                             rexp_unp  EQU     8
+57     
+58     
+59        0040                             INVALID   EQU     $0040
+60        0010                             OVERFLOW  EQU     $0010
+61        0008                             UNDERFLOW EQU     $0008
+62        0020                             DIVBYZERO EQU     $0020
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  Fp568d.h  Page 2
+
+
+
+63        0004                             INEXACT   EQU     $0004
+64     
+65        0000                             TONEAREST EQU     0
+66        0001                             TOWARDZERO EQU    1
+67        0002                             UPWARD    EQU     2
+68        0003                             DOWNWARD  EQU     3
+69        0002                             BITDIRRND EQU     2
+70                                         BITDOWNORCHOP
+71        0001                                       EQU     1
+72     
+73                                         LFPState  MACRO
+74   m                                               move    x:FPE_state,x0
+75   m                                               ENDM
+76     
+77                                         SetInvalid MACRO
+78   m                                               bfset   #INVALID,x:FPE_state
+79   m                                               ENDM
+80     
+81                                         SetInexact MACRO
+82   m                                               bfset   #INEXACT,x:FPE_state
+83   m                                               ENDM
+84     
+85                                         SetOverflow
+86                                                   MACRO
+87   m                                               bfset   #(OVERFLOW+INEXACT),x:FPE_state
+88   m                                               ENDM
+89     
+90                                         SetUnderflow
+91                                                   MACRO
+92   m                                               bfset   #(UNDERFLOW+INEXACT),x:FPE_state
+93   m                                               ENDM
+94     
+95                                         SetDivByZero
+96                                                   MACRO
+97   m                                               bfset   #DIVBYZERO,x:FPE_state
+98   m                                               ENDM
+99     
+100                                        StFPState MACRO
+101  m                                               move    x0,x:FPE_state
+102  m                                               ENDM
+103    
+104                                        NORMALIZE_OMR
+105                                                  MACRO
+106  m                                               move    OMR,x:(SP-saved_omr)              ; save original OMR state
+107  m                                               bfset   #$0100,OMR                        ; set CC bit
+108  m                                               bfclr   #$0030,OMR                        ; clear R and SA bits
+109  m                                               ENDM
+110    
+111                                        RESTORE_OMR
+112                                                  MACRO
+113  m                                               move    x:(SP-saved_omr),OMR              ; restore original OMR state
+114  m                                               ENDM
+115    
+116    
+117    
+118                                        ;===============================================================================
+119                                        ; A NOTE ABOUT CONVERSIONS TO INTEGRAL FORMATS
+120                                        ;=============================================
+121                                        ;
+122                                        ; Conversions from float to the 16- and 32-bit signed and unsigned
+123                                        ; integral formats follow a number of conventions.
+124                                        ; 1) A negative number converts to unsigned 0, without signaling an exception.
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  C:\Software\iCub\firmware\controllerBll\Support\ARTFCONV.asm  Page 3
+
+
+
+125                                        ; 2) Otherwise, any fractional part is truncated, regardless of rounding mode.
+126                                        ; 3) If a nonzero fraction is truncated, and the value doesn't overflow,
+127                                        ;       inexact is set.
+128                                        ; 4) If a value overflows the integer destination, invalid (not overflow) is set
+129                                        ;       and the result is set to the most negative value for signed destinations
+130                                        ;       and to the biggest value for unsigned destinations.
+131                                        ; Conversions from float and double can share common terminal code.
+132                                        ; Bits 0x018 of y1 are set to indicate:
+133                                        ;       0x008 -- signed destination (versus unsigned)
+134                                        ;       0x004 -- long destination (32-bit), versus short (16-bit)
+135                                        ;       0x003 -- bits from unpack routine
+136                                        ; To use the f_unpack mechanism, they are placed in the word as is, not needing
+137                                        ; to be shifted left 2 bits.  (We let the routine normalize subnorms.)
+138       0008                             DST_SIGNED EQU    8
+139       0004                             DST_LONG  EQU     4
+140                                        DST_UNSIGNED
+141       0000                                       EQU     0
+142       0000                             DST_SHORT EQU     0
+143    
+144                                        ;===============================================================================
+145                                        ; FUNCTION: ARTF32_TO_S32U
+146                                        ; DESCRIPTION: Convert float to long integer.
+147                                        ; INPUT: a = float
+148                                        ; OUTPUT: a = long
+149                                        ;
+150                                        ARTF32_TO_S32U:
+151       P:000000 C00C    [2 -        2]            move              #(DST_SIGNED+DST_LONG),x0
+152       P:000001 A905    [4 -        6]            bra     f_toX_common
+153    
+154                                        ;===============================================================================
+155                                        ; FUNCTION: ARTF32_TO_U32U
+156                                        ; DESCRIPTION: Convert float to unsigned long integer.
+157                                        ; INPUT: a = float
+158                                        ; OUTPUT: a = unsigned long long
+159                                        ;
+160                                        ARTF32_TO_U32U:
+161       P:000002 C004    [2 -        8]            move              #(DST_UNSIGNED+DST_LONG),x0
+162       P:000003 A903    [4 -       12]            bra     f_toX_common
+163    
+164                                        ;===============================================================================
+165                                        ; FUNCTION: ARTF32_TO_U16U
+166                                        ; DESCRIPTION: Convert float to unsigned short.
+167                                        ; INPUT: a = float
+168                                        ; OUTPUT: y0 = unsigned int
+169                                        ;
+170                                        ARTF32_TO_U16U:
+171       P:000004 C000    [2 -       14]            move              #(DST_UNSIGNED+DST_SHORT),x0
+172       P:000005 A901    [4 -       18]            bra     f_toX_common
+173    
+174                                        ;===============================================================================
+175                                        ; FUNCTION: ARTF32_TO_S16U
+176                                        ; DESCRIPTION: Convert float to integer.
+177                                        ; INPUT: a = float
+178                                        ; OUTPUT: y0 = int
+179                                        ;
+180                                        ARTF32_TO_S16U:
+181       P:000006 C008    [2 -       20]            move              #(DST_SIGNED+DST_SHORT),x0
+182                                                                                            ; Fall through to f_toX_common
+183    
+184                                        f_toX_common:
+185       P:000007 DE4B    [2 -       22]            lea     (SP+SIZE_TEMPS)                   ; reserve stack space for all temps
+                   0008
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  C:\Software\iCub\firmware\controllerBll\Support\ARTFCONV.asm  Page 4
+
+
+
+186                                                  NORMALIZE_OMR
+190       P:00000F 96FB    [2 -       38]            move              a1,x:(sp-rsign)         ; result sign, if DST_SIGNED
+191       P:000010 E9C8    [6 -       44]            jsr     ARTf_unpackA                      ; return with x0 set to code
+                   0000
+192       P:000012 8100    [2 -       46]            move              x0,y0                   ; BUG trashes dispatch register
+193       P:000013 E9C8    [6 -       52]            jsr     dispatch_y0
+                   0025
+194                                                                                            ; OPTIMIZATION: save x0 for later tests.
+195    
+196                                        f_toX_top:
+197       P:000015 A914    [4 -       56]            bra     go_f_tou                          ; unsigned int cases, #
+198       P:000016 A917    [4 -       60]            bra     i_result_is_zero                  ;       zero
+199       P:000017 A914    [4 -       64]            bra     u_result_from_inf                 ;       INF
+200       P:000018 A924    [4 -       68]            bra     u_result_is_max                   ;       NaN
+201    
+202       P:000019 A90E    [4 -       72]            bra     go_f_toul                         ; unsigned long long cases, #
+203       P:00001A A92A    [4 -       76]            bra     l_result_is_zero                  ;       zero
+204       P:00001B A92E    [4 -       80]            bra     ul_result_from_inf                ;       INF
+205       P:00001C A93C    [4 -       84]            bra     ul_result_is_max                  ;       NaN
+206    
+207       P:00001D A93E    [4 -       88]            bra     f_toi                             ; signed int cases, #
+208       P:00001E A90F    [4 -       92]            bra     i_result_is_zero                  ;       zero
+209       P:00001F A915    [4 -       96]            bra     i_result_is_max                   ;       INF
+210       P:000020 A912    [4 -      100]            bra     i_result_is_neg_max               ;       NaN
+211    
+212       P:000021 A906    [4 -      104]            bra     go_f_tol                          ; signed long long cases, #
+213       P:000022 A922    [4 -      108]            bra     l_result_is_zero                  ;       zero
+214       P:000023 A92B    [4 -      112]            bra     l_result_is_max                   ;       INF
+215       P:000024 A928    [4 -      116]            bra     l_result_is_neg_max               ;       NaN
+216    
+217                                        dispatch_y0:
+218       P:000025 437F    [2 -      118]            add     x:(sp-1),y0
+219       P:000026 91FF    [2 -      120]            move              y0,x:(sp-1)
+220       P:000027 EDD8    [10 -      130]           rts
+221    
+222                                                                                            ; Compensate for branch range.
+223                                        go_f_toul
+224                                                                                            ;jmp    f_toul -- same address
+225                                        go_f_tol
+226       P:000028 E984    [6 -      136]            jmp     f_tol
+                   008D
+227                                        go_f_tou:
+228       P:00002A E984    [6 -      142]            jmp     f_tou
+                   005C
+229    
+230                                        ;===============================================================================
+231                                        ; TERMINAL: u_result_from_inf
+232                                        ; DESCRIPTION: Unsigned result from INF, -INF-->0, +INF-->max
+233                                        ; INPUT: rsign
+234                                        ; OUTPUT: Return with y0 = 0 or max positive.
+235                                        ;
+236                                        u_result_from_inf:
+237                                                                                            ; If it's -INF, return 0, else return max with Invalid.
+238       P:00002C BEFB    [2 -      144]            tstw    x:(sp-rsign)
+239       P:00002D A40F    [4 -      148]            bge     u_result_is_max
+240                                                                                            ; Fall through to i_result_is_zero...
+241    
+242                                        ;===============================================================================
+243                                        ; TERMINAL: i_result_is_zero
+244                                        ; DESCRIPTION: Force an int zero return value.
+245                                        ; INPUT:
+246                                        ; OUTPUT: Return with y0 = 0.
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  C:\Software\iCub\firmware\controllerBll\Support\ARTFCONV.asm  Page 5
+
+
+
+247                                        ;
+248                                        i_result_is_zero:
+249       P:00002E C100    [2 -      150]            move              #0,y0
+250                                                  RESTORE_OMR
+252       P:000031 9EF8    [2 -      158]            lea     (SP-SIZE_TEMPS)                   ; pop temp stack space
+253       P:000032 EDD8    [10 -      168]           rts
+254    
+255                                        ;===============================================================================
+256                                        ; TERMINAL: short_result_is_max, u_result_is_max, i_result_is_neg_max,
+257                                        ;               i_result_is_max
+258                                        ; DESCRIPTION: Signed or unsigned max result, with Invalid signal.
+259                                        ; INPUT: x0 = original unpack code = bits 0...0qrst
+260                                        ;       where q = DST_SIGNED, r = DST_LONG, st = x info
+261                                        ;       rsign = sign
+262                                        ; OUTPUT: Return with y0 = max positive (signed or unsigned) or max negative
+263                                        ;       and signal Invalid.
+264                                        ;
+265                                        i_result_is_neg_max:
+266       P:000033 A6FB    [4 -      172]            move              #$ffff,x:(sp-rsign)     ; fake neg sign
+                   FFFF
+267                                        i_result_is_max:
+268       P:000035 87C1    [4 -      176]            move              #$8000,y0               ; tentative huge neg.
+                   8000
+269       P:000037 BEFB    [2 -      178]            tstw    x:(sp-rsign)
+270       P:000038 A505    [4 -      182]            blt     toX_exit_Invalid
+271       P:000039 6413    [2 -      184]            dec     y0                                ; back to $7fff
+272       P:00003A A903    [4 -      188]            bra     toX_exit_Invalid
+273    
+274                                        ; Get here by computing huge value. Distinguish signed and not.
+275                                        short_result_is_max:
+276       P:00003B 8FC0    [8 -      196]            brset   #DST_SIGNED,x0,i_result_is_max
+                   0878
+277                                                                                            ; Fall through to u_result_is_max.
+278                                        u_result_is_max:
+279       P:00003D C17F    [2 -      198]            move              #$ffff,y0
+280                                        toX_exit_Invalid:
+281                                                  SetInvalid
+283                                                  RESTORE_OMR
+285       P:000043 9EF8    [2 -      214]            lea     (SP-SIZE_TEMPS)                   ; pop temp stack space
+286       P:000044 EDD8    [10 -      224]           rts
+287    
+288                                        ;===============================================================================
+289                                        ; TERMINAL: l_result_is_zero
+290                                        ; DESCRIPTION: Force an int zero return value.
+291                                        ; INPUT:
+292                                        ; OUTPUT: Return with a = 0.
+293                                        ;
+294                                        l_result_is_zero:
+295       P:000045 6C30    [2 -      226]            clr     a
+296                                                  RESTORE_OMR
+298       P:000048 9EF8    [2 -      234]            lea     (SP-SIZE_TEMPS)                   ; pop temp stack space
+299       P:000049 EDD8    [10 -      244]           rts
+300    
+301                                        ;===============================================================================
+302                                        ; TERMINAL: ul_result_from_inf
+303                                        ; DESCRIPTION: Unsigned result from INF, -INF-->0, +INF-->max
+304                                        ; INPUT: rsign
+305                                        ; OUTPUT: Return with a = 0 or max positive.
+306                                        ;
+307                                        ul_result_from_inf:
+308       P:00004A BEFB    [2 -      246]            tstw    x:(sp-rsign)
+309       P:00004B A579    [4 -      250]            blt     l_result_is_zero
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  C:\Software\iCub\firmware\controllerBll\Support\ARTFCONV.asm  Page 6
+
+
+
+310       P:00004C A90C    [4 -      254]            bra     ul_result_is_max
+311    
+312                                        ;===============================================================================
+313                                        ; TERMINAL: l_result_is_neg_max, l_result_is_max,
+314                                        ;               long_result_is_max, ul_result_is_max
+315                                        ; DESCRIPTION: Signed or unsigned long long max result, with Invalid signal.
+316                                        ; INPUT: x0 = original unpack code = bits 0...0qrst
+317                                        ;       where q = DST_SIGNED, r = DST_LONG, st = x info
+318                                        ;       rsign.15 = sign
+319                                        ; OUTPUT: Return with a = max positive (signed or unsigned) or max
+320                                        ;       value.
+321                                        ;
+322                                        l_result_is_neg_max:
+323       P:00004D A6FB    [4 -      258]            move              #$ffff,x:(sp-rsign)     ; fake neg sign in msb word
+                   FFFF
+324                                        l_result_is_max:
+325       P:00004F 87C4    [4 -      262]            move              #$8000,a                ; a = 8000 0000
+                   8000
+326       P:000051 BEFB    [2 -      264]            tstw    x:(sp-rsign)
+327       P:000052 A56B    [4 -      268]            blt     toX_exit_Invalid                  ; yes, it's negative
+328       P:000053 6410    [2 -      270]            dec     a                                 ; a = 7fff 0000
+329       P:000054 87C8    [4 -      274]            move              #-1,a0                  ; a = 7fff ffff
+                   FFFF
+330       P:000056 A967    [4 -      278]            bra     toX_exit_Invalid
+331    
+332                                        ; Get here by computing a large value from a number.
+333                                        long_result_is_max:
+334       P:000057 8FC0    [8 -      286]            brset   #DST_SIGNED,x0,l_result_is_max
+                   0876
+335                                                                                            ; Fall through to...
+336                                        ul_result_is_max:
+337       P:000059 C47F    [2 -      288]            move              #-1,a
+338       P:00005A 8086    [2 -      290]            move              a1,a0
+339       P:00005B A962    [4 -      294]            bra     toX_exit_Invalid
+340    
+341    
+342                                        ;===============================================================================
+343                                        ; TERMINAL: f_toi, f_tou
+344                                        ; DESCRIPTION: Convert unpacked float to a 16-bit integer.
+345                                        ; INPUT: x0 = original unpack code = bits 0...0qrst
+346                                        ;       where q = DST_SIGNED, r = DST_LONG, st = x info
+347                                        ;       rsign.15 = sign
+348                                        ; OUTPUT: Return with y0 set to value.
+349                                        ;
+350                                        f_toi:
+351                                        f_tou:
+352                                                                                            ; Convert an unpacked float to one of the short types.
+353                                                                                            ; Unbias the exponent and place the binary point to the right
+354                                                                                            ; of a1. That is, subtract 127+15 = 142, from the biased exp.
+355       P:00005C 57C0    [2 -      296]            sub     #142,y1
+                   008E
+356       P:00005E 8FC0    [8 -      304]            brset   #DST_SIGNED,x0,y_6
+                   0802
+357       P:000060 BEFB    [2 -      306]            tstw    x:(sp-rsign)
+358       P:000061 A54C    [4 -      310]            blt     i_result_is_zero                  ; neg to unsigned is 0
+359                                        y_6:
+360       P:000062 8E03    [2 -      312]            tstw    y1                                ; exp > 0 means oflow
+361       P:000063 A657    [4 -      316]            bgt     short_result_is_max
+362       P:000064 A30D    [4 -      320]            beq     to_short_check_oflow              ; tricky cases
+363                                                                                            ; Negative exponent gives number of right shifts.
+364       P:000065 8503    [2 -      322]            move              y1,b
+365       P:000066 6C90    [2 -      324]            neg     b
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  C:\Software\iCub\firmware\controllerBll\Support\ARTFCONV.asm  Page 7
+
+
+
+366       P:000067 5C90    [2 -      326]            cmp     #16,b                             ; will we shift all the way
+367       P:000068 A503    [4 -      330]            blt     to_short_right
+368    
+369                                                                                            ; Shift all the way to 0, truncating fraction bits.
+370       P:000069 8306    [2 -      332]            move              a1,y1
+371       P:00006A C600    [2 -      334]            move              #0,a1
+372       P:00006B A903    [4 -      338]            bra     to_short_right_common
+373    
+374                                        to_short_right:
+375                                                                                            ; Shift a1 rightward into a, collecting all round bits for
+376                                                                                            ; inexact test.
+377       P:00006C 8105    [2 -      340]            move              b,y0                    ; shift count
+378       P:00006D 8308    [2 -      342]            move              a0,y1                   ; low round bits
+379       P:00006E 753C    [2 -      344]            lsrr    a1,y0,a
+380                                        to_short_right_common:
+381       P:00006F 8108    [2 -      346]            move              a0,y0                   ; higher round bits
+382       P:000070 66D3    [2 -      348]            or      y0,y1
+383       P:000071 A90A    [4 -      352]            bra     to_short_finale
+384    
+385                                        to_short_check_oflow:
+386                                                                                            ; a1 = tentative value, with leading bit of 1.
+387                                                                                            ; a0 = rounding bits, if any
+388                                                                                            ; rsign = sign
+389                                                                                            ; x0 = result code
+390                                                                                            ; Any result with leading 0 is within range regardless.
+391                                                                                            ; Any 32-bit result is fine for unsigned destinations.
+392                                                                                            ; Otherwise, the only huge magnitude allowed to be negative
+393                                                                                            ; is 0x80000000, so test for that one tricky case.
+394       P:000072 8308    [2 -      354]            move              a0,y1                   ; round bits
+395       P:000073 8BC0    [8 -      362]            brclr   #DST_SIGNED,x0,to_short_finale    ; unsigned big numbers pass
+                   0807
+396       P:000075 BEFB    [2 -      364]            tstw    x:(sp-rsign)                      ; if positive, must overflow
+397       P:000076 E484    [4 -      368]            jge     i_result_is_max
+                   0035
+398                                                                                            ; Signed & negative, so must be 0x8000...
+399       P:000078 6C80    [2 -      370]            tfr     a,b
+400       P:000079 6480    [2 -      372]            add     a,b                               ; 32-bit result is 0 only if
+401                                                                                            ; operands were 0x80000000
+402                                                                                            ; The book doesn't say so, but add sets CC based on 32 bits.
+403                        
+404       P:00007A E284    [4 -      376]            jne     i_result_is_max                   ; too big if any lower bits are set
+                   0035
+405                                                                                            ; Fall through to to_short_finale with a = 0x80000000 = result
+406    
+407                                        to_short_finale:
+408                                                                                            ; a1 = value in range
+409                                                                                            ; y1 = rounding bits
+410                                                                                            ; rsign = sign
+411                                                                                            ; x0 = conversion codes
+412       P:00007C 8BC0    [8 -      384]            brclr   #DST_SIGNED,x0,to_short_check     ; unsigned
+                   0805
+413       P:00007E BEFB    [2 -      386]            tstw    x:(sp-rsign)
+414       P:00007F A403    [4 -      390]            bge     to_short_check
+415       P:000080 87C8    [4 -      394]            move              #0,a0
+                   0000
+416       P:000082 6C10    [2 -      396]            neg     a                                 ; negate result
+417                                        to_short_check:
+418       P:000083 8E03    [2 -      398]            tstw    y1
+419       P:000084 A303    [4 -      402]            beq     y_8                               ; any round bits?
+420                                        to_short_finale_inexact:
+421                                                  SetInexact
+423                                        y_8:
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  C:\Software\iCub\firmware\controllerBll\Support\ARTFCONV.asm  Page 8
+
+
+
+424       P:000088 8106    [2 -      412]            move              a1,y0
+425                                                  RESTORE_OMR
+427       P:00008B 9EF8    [2 -      420]            lea     (SP-SIZE_TEMPS)                   ; pop temp stack space
+428       P:00008C EDD8    [10 -      430]           rts
+429    
+430    
+431    
+432                                        ;===============================================================================
+433                                        ; TERMINAL: f_tol, f_toul
+434                                        ; DESCRIPTION: Convert unpacked float to a 32-bit integer.
+435                                        ; INPUT: x0 = original unpack code = bits 0...0qrst
+436                                        ;       where q = DST_SIGNED, r = DST_LONG, st = x info
+437                                        ;       rsign.15 = sign
+438                                        ; OUTPUT: Return with a (long) set to value.
+439                                        ;
+440                                        f_tol:
+441                                        f_toul:
+442                                                                                            ; Convert an unpacked float to one of the long types.
+443                                                                                            ; Unbias the exponent and place the binary point to the right
+444                                                                                            ; of a1. That is, subtract 127+31 = 158, from the biased exp.
+445       P:00008D 57C0    [2 -      432]            sub     #158,y1
+                   009E
+446       P:00008F 8FC0    [8 -      440]            brset   #DST_SIGNED,x0,y_16
+                   0803
+447       P:000091 BEFB    [2 -      442]            tstw    x:(sp-rsign)
+448       P:000092 E584    [4 -      446]            jlt     l_result_is_zero                  ; neg to unsigned is 0
+                   0045
+449                                        y_16:
+450       P:000094 8E03    [2 -      448]            tstw    y1                                ; exp > 0 means oflow
+451       P:000095 A641    [4 -      452]            bgt     long_result_is_max
+452       P:000096 A322    [4 -      456]            beq     to_long_check_oflow               ; tricky cases
+453                                                                                            ; Negative exponent gives number of right shifts.
+454       P:000097 8503    [2 -      458]            move              y1,b
+455       P:000098 6C90    [2 -      460]            neg     b
+456       P:000099 5CC0    [2 -      462]            cmp     #32,b                             ; will we shift all the way
+                   0020
+457       P:00009B A505    [4 -      466]            blt     to_long_right
+458    
+459                                                                                            ; Shift all the way to 0, truncating fraction bits.
+460       P:00009C 8306    [2 -      468]            move              a1,y1
+461       P:00009D 8108    [2 -      470]            move              a0,y0                   ; higher round bits
+462       P:00009E 66D3    [2 -      472]            or      y0,y1
+463       P:00009F 6C30    [2 -      474]            clr     a
+464       P:0000A0 A922    [4 -      478]            bra     to_long_finale
+465    
+466                                        to_long_right:
+467                                                                                            ; Shift a1 rightward into a, collecting all round bits for
+468                                                                                            ; inexact test.  Three cases arise:
+469                                                                                            ; CASE  under16: b < 16, so shift is less than a word
+470                                                                                            ;       exactly16: b == 16, so easy shift
+471                                                                                            ;       over16: b > 16 so shift into low word
+472       P:0000A1 8105    [2 -      480]            move              b,y0                    ; shift count
+473       P:0000A2 5F10    [2 -      482]            cmp     #16,y0
+474       P:0000A3 A605    [4 -      486]            bgt     over16
+475       P:0000A4 A50C    [4 -      490]            blt     under16
+476                                        ;exactly16:
+477       P:0000A5 8308    [2 -      492]            move              a0,y1                   ; round bits
+478       P:0000A6 8086    [2 -      494]            move              a1,a0
+479       P:0000A7 C600    [2 -      496]            move              #0,a1
+480       P:0000A8 A91A    [4 -      500]            bra     to_long_finale
+481                                        over16:
+482                                                                                            ; Save the lowest bits for rounding. Then shift the high sixteen
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  C:\Software\iCub\firmware\controllerBll\Support\ARTFCONV.asm  Page 9
+
+
+
+483                                                                                            ; bits by (shift-16).  Finally, do the last 16-bit shift.
+484       P:0000A9 5710    [2 -      502]            sub     #16,y0                            ; diminish by a word
+485       P:0000AA 8308    [2 -      504]            move              a0,y1                   ; low round bits
+486       P:0000AB 753C    [2 -      506]            lsrr    a1,y0,a                           ; a has aligned bits, left one word
+487       P:0000AC 8108    [2 -      508]            move              a0,y0                   ; higher round bits
+488       P:0000AD 66D3    [2 -      510]            or      y0,y1
+489       P:0000AE 8086    [2 -      512]            move              a1,a0                   ; now shift the other 16 bits
+490       P:0000AF C600    [2 -      514]            move              #0,a1
+491       P:0000B0 A912    [4 -      518]            bra     to_long_finale
+492                                        under16:
+493                                                                                            ; Trickiest case, shifting the 32-bit value by under 16 bits.
+494                                                                                            ; Use b to shift low half, then shift and accumulate.
+495       P:0000B1 8308    [2 -      520]            move              a0,y1                   ; low bits, for shifting
+496       P:0000B2 75FC    [2 -      522]            lsrr    y1,y0,b                           ; b1 = low bits, b0 = rounding
+497       P:0000B3 8309    [2 -      524]            move              b0,y1                   ; all the round bits
+498       P:0000B4 8187    [2 -      526]            move              b1,b0                   ; lowest sig bits
+499       P:0000B5 C700    [2 -      528]            move              #0,b1
+500       P:0000B6 7DBC    [2 -      530]            lsrac   a1,y0,b
+501       P:0000B7 6C00    [2 -      532]            tfr     b,a
+502       P:0000B8 A90A    [4 -      536]            bra     to_long_finale
+503    
+504                                        to_long_check_oflow:
+505                                                                                            ; a1 = tentative value, with leading bit of 1.
+506                                                                                            ; no rounding bits
+507                                                                                            ; rsign = sign
+508                                                                                            ; x0 = result code
+509                                                                                            ; Any result with leading 0 is within range regardless.
+510                                                                                            ; Any 32-bit result is fine for unsigned destinations.
+511                                                                                            ; Otherwise, the only huge magnitude allowed to be negative
+512                                                                                            ; is 0x80000000, so test for that one tricky case.
+513       P:0000B9 C300    [2 -      538]            move              #0,y1                   ; round bits
+514       P:0000BA 8BC0    [8 -      546]            brclr   #DST_SIGNED,x0,y_18               ; unsigned big numbers pass
+                   0811
+515       P:0000BC BEFB    [2 -      548]            tstw    x:(sp-rsign)                      ; if positive, must overflow
+516       P:0000BD E484    [4 -      552]            jge     l_result_is_max
+                   004F
+517                                                                                            ; Signed & negative, so must be 0x8000...
+518       P:0000BF 6C80    [2 -      554]            tfr     a,b
+519       P:0000C0 6480    [2 -      556]            add     a,b                               ; 32-bit result is 0 only if
+520                                                                                            ; operands were 0x80000000
+521                        
+522       P:0000C1 E284    [4 -      560]            jne     l_result_is_max                   ; too big if any lower bits are set
+                   004F
+523                                                                                            ; Fall through to to_long_finale with a = 0x80000000 = result
+524    
+525                                        to_long_finale:
+526                                                                                            ; a = value in range
+527                                                                                            ; y1 = rounding bits
+528                                                                                            ; rsign = sign
+529                                                                                            ; x0 = conversion codes
+530       P:0000C3 8BC0    [8 -      568]            brclr   #DST_SIGNED,x0,to_long_check      ; unsigned
+                   0803
+531       P:0000C5 BEFB    [2 -      570]            tstw    x:(sp-rsign)
+532       P:0000C6 A401    [4 -      574]            bge     to_long_check
+533       P:0000C7 6C10    [2 -      576]            neg     a                                 ; negate result
+534                                        to_long_check:
+535       P:0000C8 8E03    [2 -      578]            tstw    y1
+536       P:0000C9 A303    [4 -      582]            beq     y_18                              ; any round bits?
+537                                                  SetInexact
+539                                        y_18:
+540                                                  RESTORE_OMR
+542       P:0000CF 9EF8    [2 -      598]            lea     (SP-SIZE_TEMPS)                   ; pop temp stack space
+Motorola DSP56800 Assembler  Version 6.3.16  110-11-03  12:48:56  C:\Software\iCub\firmware\controllerBll\Support\ARTFCONV.asm  Page 10
+
+
+
+543       P:0000D0 EDD8    [10 -      608]           rts
+544    
+545                                                  ENDSEC
+
+0    Errors
+0    Warnings
+
+
