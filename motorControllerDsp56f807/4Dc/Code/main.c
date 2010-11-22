@@ -27,6 +27,7 @@
 #include "abs_analog_interface.h"
 #include "abs_ssi_interface.h"
 #include "strain_board.h"
+#include "check_range.h"
 	
 byte	_board_ID = 15;	
 
@@ -64,7 +65,6 @@ Int16 hall_temp=0;
 //********************
 
 void decouple_positions(void);
-void check_range_torque (byte, Int16, Int32 *);
 void check_encoder_hall_drift(byte jnt);
 /*
  * version specific global variables.
@@ -126,7 +126,6 @@ void main(void)
 	Int32 temp_swap = 0;
 
 	byte i=0;
-	byte j=0;
 	word test=0;
 	Int32 t1val=0; 
 	Int16 _safeband[JN]=INIT_ARRAY (-5); //it is a value for reducing the JOINT limit of 2*_safeband [tick encoder]
@@ -229,9 +228,9 @@ void main(void)
 	_count=0;
 	__EI();
 	
-	for(j=0;j<JN;j++)
+	for(i=0;i<JN;i++)
 	{
-	_received_pid[j].rec_pid=0;
+		_received_pid[i].rec_pid=0;
 	}
 	
 	
@@ -588,21 +587,6 @@ void main(void)
 #endif 
 //-------------------------------------------------------------------------------------------
 
-
-		/* PWM filtering */
-		for (i=0; i<JN; i++) 
-		{
-			if (_control_mode[i] == MODE_TORQUE ||
-			 	_control_mode[i] == MODE_IMPEDANCE_POS ||
-			 	_control_mode[i] == MODE_IMPEDANCE_VEL)
-				PWMoutput[i] = lpf_ord1_3hz (PWMoutput[i], i);	
-		}
-
-//******************************************* LIMIT CHECK FOR FORCE CONTORL******************/
-		// Protection for joints out of the admissible range during force control
-		for (i=0; i<JN; i++)  check_range_torque(i, _safeband[i], PWMoutput);
-
-
 //******************************************************************************************/		
 // 							  		CONTROL SATURATIONS                                  
 // 							/* saturates controls if necessary */
@@ -618,7 +602,25 @@ void main(void)
 		for (i=0; i<JN; i++) ENFORCE_LIMITS(i,1*_Feq);
 */
 #else
-		for (i=0; i<JN; i++) ENFORCE_LIMITS(i,PWMoutput[i]);
+		for (i=0; i<JN; i++) 
+		{
+			if (_control_mode[i] == MODE_TORQUE ||
+				_control_mode[i] == MODE_IMPEDANCE_POS ||
+				_control_mode[i] == MODE_IMPEDANCE_VEL)
+			{
+				// PWM filtering
+				PWMoutput[i] = lpf_ord1_3hz (PWMoutput[i], i);	
+				// Protection for joints out of the admissible range during force control
+				check_range_torque(i, _safeband[i], PWMoutput);
+				// PWM saturation
+				ENFORCE_LIMITS	(i,PWMoutput[i], _pid_limit_torque[i] );
+			}
+			else
+			{
+				ENFORCE_LIMITS	(i,PWMoutput[i], _pid_limit[i] );
+			};
+		}
+
 #endif
 
 #if VERSION==0x0120
@@ -796,65 +798,6 @@ void decouple_positions(void)
 		_position[2] = _position[1] + _position[2];		
 #endif
 }
-
-
-
-/***************************************************************************/
-/**
- * This function checks if the joint is in range during torque control mode
- ***************************************************************************/
-void check_range_torque(byte i, Int16 band, Int32 *PWM)
-{
-	static UInt32 TrqLimitCount =0;
- 	char   signKp = (_kp[i]>0?1:-1);
- 	char   signPWM = (PWM[i]>0?1:-1);
- 	int    PWMb   = PWM[i];
- 	Int32  PWMc   = 0;
- 	if (_control_mode[i] == MODE_TORQUE ||
-	  	_control_mode[i] == MODE_IMPEDANCE_POS ||
-	  	_control_mode[i] == MODE_IMPEDANCE_VEL)
- 		{
-	 		if  (_position[i] > _max_position[i])
-	 		{
-	 			if (signKp*signPWM >0 )
-				{
-					PWMc = ((Int32) (_max_position[i]-_position[i]) * ((Int32)_kp[i]));
-					if (PWMc>=0) {PWMc = PWMc >> _kr[i];} 
-					else 	 	 {PWMc = -(-PWMc >> _kr[i]);}
-					PWM[i] = PWMc;	
-					_integral[i] = 0;	
-				}
-				TrqLimitCount++;	 
-				if (TrqLimitCount>=200)
-				{
-					#ifdef DEBUG_CONTROL_MODE
-						can_printf("TORQUE LIMITS kp:%d B:%d A:%f", signKp, PWMb, PWM[i]);	
-						TrqLimitCount=0;
-				    #endif 
-				}			
-	 		}
-	 		if  (_position[i] < _min_position[i])   
-	 		{
-	 			if (signKp*signPWM <0 )
-				{
-					PWMc = ((Int32) (_min_position[i]-_position[i]) * ((Int32)_kp[i]));
-					if (PWMc>=0) {PWMc = PWMc >> _kr[i];} 
-					else 	 	 {PWMc = -(-PWMc >> _kr[i]);}
-					PWM[i] = PWMc;			
-					_integral[i] = 0;	
-				}				
-				TrqLimitCount++;
-				if (TrqLimitCount>=200)
-				{
-					#ifdef DEBUG_CONTROL_MODE
-						can_printf("TORQUE LIMITS kp:%d B:%d A:%f", signKp, PWMb, PWM[i]);	
-						TrqLimitCount=0;
-				    #endif 
-				}
-	 		} 				
- 		}
-}
-
 
 /***************************************************************************/
 /**

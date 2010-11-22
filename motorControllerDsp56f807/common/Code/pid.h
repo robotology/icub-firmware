@@ -258,33 +258,33 @@ extern float _filt_pid[JN] ;			// filtered pid control
 
 
 //void enforce_PIDlimits(byte j, Int32 PIDoutput)
-#define ENFORCE_LIMITS(j, PID) \
+#define ENFORCE_LIMITS(j, PID, PID_LIMIT) \
 { \
 	/* Anti reset wind up scheme */ \
-	if (PID > _pid_limit[j]) \
+	if (PID > PID_LIMIT) \
     { \
     	if ( _ki[j] != 0) \
 		{ \
-    		_integral[j] =  ((Int32) _pid_limit[j]) - _pd[j]; \
+    		_integral[j] =  ((Int32)(PID_LIMIT)) - _pd[j]; \
 		} \
 	} \
 	else \
 	{\
-		if (PID < -_pid_limit[j]) \
+		if (PID < -PID_LIMIT) \
 		{ \
 			if ( _ki[j] != 0) \
 			{ \
-	    		_integral[j] =  ((Int32) (-_pid_limit[j])) - _pd[j]; \
+	    		_integral[j] =  ((Int32)(-PID_LIMIT)) - _pd[j]; \
 			} \
 		} \
 	}\
 	/* Control saturation */ \
-	if (PID > (Int32) _pid_limit[j]) \
-    	_pid[j] = _pid_limit[j]; \
+	if (PID > (Int32) PID_LIMIT) \
+    	_pid[j] = PID_LIMIT; \
 	else \
 	{\
-	if ( PID < - ((Int32) _pid_limit[j])) \
-		_pid[j] =  -_pid_limit[j]; \
+	if ( PID < - ((Int32) PID_LIMIT)) \
+		_pid[j] =  -PID_LIMIT; \
 	else \
 		_pid[j] = (Int16)(PID); \
 	}\

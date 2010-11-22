@@ -24,6 +24,7 @@
 #include "abs_ssi_interface.h"
 #include "encoders_interface.h"
 #include "decoupling.h"
+#include "check_range.h"
 #include "pwm_a.h"
 #include "pwm_b.h"
 
@@ -87,6 +88,7 @@ void main(void)
 	Int16 test =0;
 	byte first_step=0;
 	Int32 t1val=0;	
+ 	Int16 _safeband[JN];	//it is a value for reducing the JOINT limit of 2*_safeband [tick encoder]
 	//temperature sensor variables
 	Int16  TempSens[]=	 {0,0};
 	byte   TempSensCount1 = 0;
@@ -200,6 +202,7 @@ void main(void)
 	for (i=0; i<JN; i++) _position_enc_old[i] = 0;
 	for (i=0; i<JN; i++) _speed_old[i] = 0;
 	for (i=0; i<JN; i++) _accel[i] = 0;
+	for (i=0; i<JN; i++) _safeband[i] =-5; //5 ticks => 1 grado di AEA.
 	
 
 
@@ -306,7 +309,19 @@ void main(void)
 		/* saturates controls if necessary */
 		for (i=0; i<JN; i++)
 		{
-			ENFORCE_LIMITS			(i,PWMoutput[i]);
+			if (_control_mode[i] == MODE_TORQUE ||
+				_control_mode[i] == MODE_IMPEDANCE_POS ||
+				_control_mode[i] == MODE_IMPEDANCE_VEL)
+			{
+				// Protection for joints out of the admissible range during force control
+				check_range_torque(i, _safeband[i], PWMoutput);
+				// PWM saturation
+				ENFORCE_LIMITS	(i,PWMoutput[i], _pid_limit_torque[i] );
+			}
+			else
+			{
+				ENFORCE_LIMITS	(i,PWMoutput[i], _pid_limit[i] );
+			}			
 			if      (_pid[i] < -MAX_DUTY) _pid[i]=-MAX_DUTY;
 			else if (_pid[i] > MAX_DUTY)  _pid[i]= MAX_DUTY;
 		}

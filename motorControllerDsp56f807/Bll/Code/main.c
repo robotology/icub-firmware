@@ -21,6 +21,7 @@
 #include "faults_interface.h"
 #include "temp_sens_interface.h"
 #include "encoders_interface.h"
+#include "check_range.h"
 #include "filters.h"
 #include "decoupling.h"
 
@@ -61,9 +62,6 @@ extern sDutyControlBL DutyCycleReq[2];
 //********************
 // Local prototypes 
 //********************
-
-void check_range        (byte, Int16, Int32 *);
-void check_range_torque (byte, Int16, Int32 *);
 
 #if   VERSION == 0x0150
 Int16 _version = 0x0150;
@@ -120,6 +118,7 @@ void main(void)
 	Int32 PWMoutput_old [JN];
 	word temporary;
 	byte i=0;
+	byte wi=0;
 	byte k=0;
 	UInt16 *value=0;
 	Int32 t1val=0;
@@ -129,9 +128,6 @@ void main(void)
 	Int16 print_number=0;
 	Int16 real_pos=0;
 	byte first_step=0;
-	
-	//velocity and acceleration estimation
-	byte j=0;
 
 	byte headPos=0; //current pos/vel
 	byte tailPos=0; //tail is (head+1)%winSize
@@ -257,9 +253,9 @@ void main(void)
 	mainLoopOVF=0;
 	_count=0;
 	
-	for(j=0;j<JN;j++)
+	for(i=0;i<JN;i++)
 	{
-	_received_pid[j].rec_pid=0;
+		_received_pid[i].rec_pid=0;
 	}
 	
 	BUS_OFF=false;
@@ -302,13 +298,13 @@ void main(void)
 	/* (for velocity and position estimates) */
 	for(i=0;i<JN;i++)
 	{
-		for(j=0;j<winSizePos;j++)
+		for(wi=0;wi<winSizePos;wi++)
 		{
-			positionWindow[j][i]=_position[i];	
+			positionWindow[wi][i]=_position[i];	
 		}
-		for(j=0;j<winSizeVel;j++)
+		for(wi=0;wi<winSizeVel;wi++)
 		{
-			velocityWindow[j][i]=0;	
+			velocityWindow[wi][i]=0;	
 		}	
 	}
 	
@@ -516,15 +512,24 @@ led0_on
 
 
 led0_off	
-//******************************************* LIMIT CHECK FOR FORCE CONTORL******************/
-		// Protection for joints out of the admissible range during force control
-		for (i=0; i<JN; i++)  check_range_torque(i, _safeband[i], PWMoutput);
 		
 //******************************************* SATURATES CONTROLS ***************************/                
 		/* saturates controls if necessary */
 		for (i=0; i<JN; i++)
 		{
-			ENFORCE_LIMITS			(i,PWMoutput[i]);
+			if (_control_mode[i] == MODE_TORQUE ||
+				_control_mode[i] == MODE_IMPEDANCE_POS ||
+				_control_mode[i] == MODE_IMPEDANCE_VEL)
+			{
+				// Protection for joints out of the admissible range during force control
+				check_range_torque(i, _safeband[i], PWMoutput);
+				// PWM saturation
+				ENFORCE_LIMITS	(i,PWMoutput[i], _pid_limit_torque[i] );
+			}
+			else
+			{
+				ENFORCE_LIMITS	(i,PWMoutput[i], _pid_limit[i] );
+			}			
 			if      (_pid[i] < -MAX_DUTY) _pid[i]=-MAX_DUTY;
 			else if (_pid[i] > MAX_DUTY)  _pid[i]= MAX_DUTY;
 		}
@@ -650,176 +655,4 @@ led0_off
 		_wait = true;		
 		
 	} /* end for(;;) */
-}
-
-/***************************************************************************/
-/**
- * This function checks if the joint is in range during position/openloop control mode
- ***************************************************************************/
-void check_range(byte i, Int16 band, Int32 *PWM)
-{
-	if (_control_mode[i] == MODE_POSITION)
-	{
- 		if  (_position[i] > (_max_position[i]-band) ||  (_position[i] < (_min_position[i]+band)))   
-		{			
-			_ko[i]=0;   //remove the PWM offset if it is out of limits 
-			#ifdef DEBUG_CONTROL_MODE
-			can_printf("OUT of LIMITS ax:%d", i);	
-			#endif
-			
-			if (band>0)
-			{
-				if  ((_position[i] > (_max_position[i]-band)) && (_desired[i]>(_max_position[i]-band)))
-				{
-					_desired[i]=(_max_position[i]-band); 
-					_integral[i] = 0; 
-					_set_point[i] = _desired[i];
-					init_trajectory (i, _desired[i], _desired[i], 1); 
-				}
-				
-				if  ((_position[i] < (_min_position[i]+band)) && (_desired[i]<(_min_position[i]+band)))
-				{
-					_desired[i]=(_min_position[i]+band); 
-					_integral[i] = 0; 
-					_set_point[i] = _desired[i];
-					init_trajectory (i, _desired[i], _desired[i], 1); 
-				}
-			}
-			else	
-			{
-				if  ((_position[i] > (_max_position[i]+band)) && (_desired[i]>(_max_position[i]-band)))
-				{
-					#ifdef DEBUG_CONTROL_MODE
-					can_printf("OUT of LIMITS MAX ax:%d", i);	
-					#endif
-					_desired[i]=_max_position[i]; 
-					_integral[i] = 0; 
-					_set_point[i] = _desired[i];
-					init_trajectory (i, _desired[i], _desired[i], 1); 
-				}
-				
-				if  ((_position[i] < (_min_position[i]-band)) && (_desired[i]<(_min_position[i]+band)))
-				{
-					#ifdef DEBUG_CONTROL_MODE
-					can_printf("OUT of LIMITS MIN ax:%d", i);	
-					#endif
-					_desired[i]=_min_position[i]; 
-					_integral[i] = 0; 
-					_set_point[i] = _desired[i];
-					init_trajectory (i, _desired[i], _desired[i], 1); 
-				}
-				
-			}
-		} 
-	}
-	else if (_control_mode[i] == MODE_OPENLOOP)
-	{
-		if  (_position[i] > (_max_position[i]-band) ||  (_position[i] < (_min_position[i]+band)))   
-		{			
-			_control_mode[i] = MODE_POSITION; //	
-			_ko[i]=0;  //remove the PWM offset if it is out of limits
-			if (band>0)
-			{
-				if  ((_position[i] > (_max_position[i]-band)) && (_desired[i]>(_max_position[i]-band)))
-				{
-					_desired[i]=(_max_position[i]-band); 
-					_integral[i] = 0; 
-					_set_point[i] = _desired[i];
-					init_trajectory (i, _desired[i], _desired[i], 1); 
-				}
-				
-				if  ((_position[i] < (_min_position[i]+band)) && (_desired[i]<(_min_position[i]+band)))
-				{
-					_desired[i]=(_min_position[i]+band); 
-					_integral[i] = 0; 
-					_set_point[i] = _desired[i];
-					init_trajectory (i, _desired[i], _desired[i], 1); 
-				}
-			}
-			else	
-			{
-				if  ((_position[i] > (_max_position[i]+band)) && (_desired[i]>(_max_position[i]-band)))
-				{
-					#ifdef DEBUG_CONTROL_MODE
-					can_printf("OUT of LIMITS MAX ax:%d", i);	
-					#endif
-					_desired[i]=_max_position[i]; 
-					_integral[i] = 0; 
-					_set_point[i] = _desired[i];
-					init_trajectory (i, _desired[i], _desired[i], 1); 
-				}
-				
-				if  ((_position[i] < (_min_position[i]-band)) && (_desired[i]<(_min_position[i]+band)))
-				{
-					#ifdef DEBUG_CONTROL_MODE
-					can_printf("OUT of LIMITS MIN ax:%d", i);	
-					#endif
-					_desired[i]=_min_position[i]; 
-					_integral[i] = 0; 
-					_set_point[i] = _desired[i];
-					init_trajectory (i, _desired[i], _desired[i], 1); 
-				}
-			}
-			#ifdef DEBUG_CONTROL_MODE
-			can_printf("MODE CHANGED TO POSITION, OUT of LIMITS ax:%d", i);	
-		    #endif 
-		} 				
-	}
-}
-
-
-/***************************************************************************/
-/**
- * This function checks if the joint is in range during torque control mode
- ***************************************************************************/
-void check_range_torque(byte i, Int16 band, Int32 *PWM)
-{
-	static UInt32 TrqLimitCount =0;
- 	char   signKp = (_kp[i]>0?1:-1);
- 	char   signPWM = (PWM[i]>0?1:-1);
- 	int    PWMb   = PWM[i];
- 	Int32  PWMc   = 0;
- 	if (_control_mode[i] == MODE_TORQUE ||
-	  	_control_mode[i] == MODE_IMPEDANCE_POS ||
-	  	_control_mode[i] == MODE_IMPEDANCE_VEL)
- 		{
-	 		if  (_position[i] > _max_position[i])
-	 		{
-	 			if (signKp*signPWM >0 )
-				{
-					PWMc = ((Int32) (_max_position[i]-_position[i]) * ((Int32)_kp[i]));
-					if (PWMc>=0) {PWMc = PWMc >> _kr[i];} 
-					else 	 	 {PWMc = -(-PWMc >> _kr[i]);}
-					PWM[i] = PWMc;	
-					_integral[i] = 0;
-				}
-				TrqLimitCount++;	 
-				if (TrqLimitCount>=200)
-				{
-					#ifdef DEBUG_CONTROL_MODE
-						can_printf("TORQUE LIMITS kp:%d B:%d A:%f", signKp, PWMb, PWM[i]);	
-						TrqLimitCount=0;
-				    #endif 
-				}			
-	 		}
-	 		if  (_position[i] < _min_position[i])   
-	 		{
-	 			if (signKp*signPWM <0 )
-				{
-					PWMc = ((Int32) (_min_position[i]-_position[i]) * ((Int32)_kp[i]));
-					if (PWMc>=0) {PWMc = PWMc >> _kr[i];} 
-					else 	 	 {PWMc = -(-PWMc >> _kr[i]);}
-					PWM[i] = PWMc;		
-					_integral[i] = 0;	
-				}				
-				TrqLimitCount++;
-				if (TrqLimitCount>=200)
-				{
-					#ifdef DEBUG_CONTROL_MODE
-						can_printf("TORQUE LIMITS kp:%d B:%d A:%f", signKp, PWMb, PWM[i]);	
-						TrqLimitCount=0;
-				    #endif 
-				}
-	 		} 				
- 		}
 }
