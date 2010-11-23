@@ -82,9 +82,10 @@ extern Int32   _bfc_PWMoutput [JN];
 
 // DEBUG VARIABLES
 extern byte  _t1c;                      // general purpouse counter
-extern Int16 _debug1[JN] ;				// general purpouse debug
-extern Int16 _debug2[JN] ;				// general purpouse debug
-
+extern Int16 _debug_in1[JN] ;			// general purpouse debug
+extern Int16 _debug_in2[JN] ;			// general purpouse debug
+extern Int16 _debug_out1[JN] ;			// general purpouse debug
+extern Int16 _debug_out2[JN] ;			// general purpouse debug
 
 // POSITION VARIABLES											
 extern Int32 _abs_pos_calibration[JN] ;	// absolute position to be reached during calibration

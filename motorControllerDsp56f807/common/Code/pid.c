@@ -41,8 +41,10 @@ Rec_Pid _received_pid[JN];
 Int32   _bfc_PWMoutput [JN] = INIT_ARRAY (0);
 
 // DEBUG VARIABLES
-Int16 _debug1[JN] = INIT_ARRAY (0); 		 	// general purpouse debug
-Int16 _debug2[JN] = INIT_ARRAY (0);				// general purpouse debug
+Int16 _debug_in1[JN] = INIT_ARRAY (0); 		 		// general purpouse debug
+Int16 _debug_in2[JN] = INIT_ARRAY (0);				// general purpouse debug
+Int16 _debug_out1[JN] = INIT_ARRAY (0); 		 	// general purpouse debug
+Int16 _debug_out2[JN] = INIT_ARRAY (0);				// general purpouse debug
 byte  _t1c =0;
 
 

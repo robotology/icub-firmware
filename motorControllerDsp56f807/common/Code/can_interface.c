@@ -503,8 +503,8 @@ void broadcast_strain_debug_info(void)
 		_canmsg.CAN_data[0] = BYTE_H(_strain[5]);
 		_canmsg.CAN_data[1] = BYTE_L(_strain[5]);
 		*/
-		_canmsg.CAN_data[0] = BYTE_H(_debug1[1]);
-		_canmsg.CAN_data[1] = BYTE_L(_debug1[1]);
+		_canmsg.CAN_data[0] = BYTE_H(_debug_out1[1]);
+		_canmsg.CAN_data[1] = BYTE_L(_debug_out1[1]);
 		
 		if (DutyCycle[1].Dir==0)
 		{
