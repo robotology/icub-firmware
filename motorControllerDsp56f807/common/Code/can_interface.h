@@ -9,6 +9,7 @@
 void can_interface_init (byte channels_num);
 byte can_interface (void);
 void can_send_broadcast(void);
+void can_send_broadcast_identification(byte j);
 void set_can_masks();
 void create_F_M(UInt32 *filter,UInt32 *mask,byte _class1, byte _source1, byte _dest1, byte _class2, byte _source2, byte _dest2);
 void setmask(UInt32 filter1, UInt32 filter2, UInt32 mask1,UInt32 mask2);

@@ -467,6 +467,30 @@ byte can_interface (void)
 	return ERR_OK;
 }
 
+/*********************************************************** 
+ * send broadcast messages FAST VERSION FOR IDENTIFICATION
+ ***********************************************************/
+void can_send_broadcast_identification(byte j)
+{
+		_canmsg.CAN_messID = 0x100;
+		_canmsg.CAN_messID |= (_board_ID) << 4;
+		_canmsg.CAN_messID |= 10; //special broadcast value: 10
+		_canmsg.CAN_data[0] = BYTE_H((Int16)_position[j]); //WARNING: _position casted from 32 to 16 bit
+		_canmsg.CAN_data[1] = BYTE_L((Int16)_position[j]);
+		_canmsg.CAN_data[2] = BYTE_H(_speed[j]);
+		_canmsg.CAN_data[3] = BYTE_L(_speed[j]);
+		_canmsg.CAN_data[4] = BYTE_H(_pid[j]);
+		_canmsg.CAN_data[5] = BYTE_L(_pid[j]);
+		_canmsg.CAN_data[6] = BYTE_H(_strain_val[j]);
+		_canmsg.CAN_data[7] = BYTE_L(_strain_val[j]);			
+		_canmsg.CAN_length = 8;
+		_canmsg.CAN_frameType = DATA_FRAME;
+		CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
+}
+
+/*********************************************************** 
+ * send broadcast messages according to mask. DEBUG VERSION
+ ***********************************************************/
 void broadcast_strain_debug_info(void)
 {
 	UInt32 hall_pos0=0;
@@ -533,12 +557,6 @@ void broadcast_strain_debug_info(void)
 
 /*********************************************************** 
  * send broadcast messages according to mask 
- * bit 1: position
- * bit 2: pid
- * bit 3: board status bits
- * bit 4: current feedback and position error
- * bit 5: velocity and acceleration
- *
  ***********************************************************/
 void can_send_broadcast(void)
 {
@@ -1147,14 +1165,6 @@ void can_send_broadcast(void)
 		CAN1_sendFrame (1, _canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
 		
 	}
-
-
-#ifdef STRAIN_DEBUG
-	#ifdef TORQUE_CNTRL
-	//	broadcast_strain_debug_info();
-	#endif
-#endif
-
 }
 
 /**************************************************************

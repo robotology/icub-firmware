@@ -554,6 +554,11 @@ led0_off
 		/* do extra functions, communicate, etc. */
 		
 		can_send_broadcast();
+#ifdef IDENTIF
+#warning "***** IDENTIFICATION MODE ON *****"
+		can_send_broadcast_identification(0); //axis 0
+		can_send_broadcast_identification(1); //axis 1
+#endif
 	
 		/* check temperature sensor */
 #ifdef TEMPERATURE_SENSOR

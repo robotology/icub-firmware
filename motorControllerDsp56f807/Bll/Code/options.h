@@ -38,5 +38,6 @@
 #define BOARDSTATUSTIME 5000 //the time in ms between a BCAST_STATUS message and another
 #define USE_HALL_SENS   1
 #define USE_ABS_SSI     1
+//#define IDENTIF         1
 #endif
  
