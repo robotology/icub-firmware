@@ -1082,10 +1082,7 @@
 // GENERIC DEBUG PARAMETER
 #define CAN_SET_DEBUG_PARAM_1_HANDLER(x) \
 { \
-	if (CAN_LEN == 2) \
-	{ \
-		_debug_in1[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
-	} \
+	_debug_in1[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
 }
 
 /*
@@ -1117,10 +1114,7 @@ else \
 // GENERIC DEBUG PARAMETER
 #define CAN_SET_DEBUG_PARAM_2_HANDLER(x) \
 { \
-	if (CAN_LEN == 2) \
-	{ \
-		_debug_in2[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
-	} \
+	_debug_in2[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
 }
 
 //-------------------------------------------------------------------
