@@ -91,14 +91,14 @@
 
 #ifndef __ONLY_DEF
 /* deals with the endianism - byte 4 is the MSB on the Pentium */
-#define BYTE_1(x) (__shr(__extract_h(x), 8))
-#define BYTE_2(x) (__extract_h(x) & 0xff)
-#define BYTE_3(x) (__shr(__extract_l(x), 8))
-#define BYTE_4(x) (__extract_l(x) & 0xff)
+#define BYTE_1(x) (byte)(__shr(__extract_h(x), 8))
+#define BYTE_2(x) (byte)(__extract_h(x) & 0xff)
+#define BYTE_3(x) (byte)(__shr(__extract_l(x), 8))
+#define BYTE_4(x) (byte)(__extract_l(x) & 0xff)
 
 /* extracting from a short */
-#define BYTE_L(x) (__shr(x, 8))
-#define BYTE_H(x) (x & 0xff)
+#define BYTE_L(x) (byte)(__shr(x, 8))
+#define BYTE_H(x) (byte)(x & 0xff)
 
 /* same as above, deals also with endianism */
 dword BYTE_C(byte x4, byte x3, byte x2, byte x1);
