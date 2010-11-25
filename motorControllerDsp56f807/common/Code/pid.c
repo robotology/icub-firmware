@@ -43,8 +43,12 @@ Int32   _bfc_PWMoutput [JN] = INIT_ARRAY (0);
 // DEBUG VARIABLES
 Int16 _debug_in1[JN] = INIT_ARRAY (0); 		 		// general purpouse debug
 Int16 _debug_in2[JN] = INIT_ARRAY (0);				// general purpouse debug
+Int16 _debug_in3[JN] = INIT_ARRAY (0); 		 		// general purpouse debug
+Int16 _debug_in4[JN] = INIT_ARRAY (0);				// general purpouse debug
 Int16 _debug_out1[JN] = INIT_ARRAY (0); 		 	// general purpouse debug
 Int16 _debug_out2[JN] = INIT_ARRAY (0);				// general purpouse debug
+Int16 _debug_out3[JN] = INIT_ARRAY (0); 		 	// general purpouse debug
+Int16 _debug_out4[JN] = INIT_ARRAY (0);				// general purpouse debug
 byte  _t1c =0;
 
 
@@ -333,7 +337,7 @@ Int32 compute_pwm(byte j)
 		if (openloop_identif==true)
 		{
 		 	//for open   loop transfer function
-			_desired_torque[j] = PWMoutput = (Int16)100*(sin(wt[j]));      
+			_desired_torque[j] = PWMoutput = (Int16)sine_ampl[j]*(sin(wt[j]));      
 		}
 		else
 		{
@@ -387,6 +391,13 @@ Int32 compute_pwm(byte j)
 	break;
 	case MODE_OPENLOOP:
 		PWMoutput = _ko[j];
+		#ifdef IDENTIF 
+		if (sine_ampl!=0)
+		{
+			compute_identif_wt(j);
+			PWMoutput = (Int16)sine_ampl[j]*(sin(wt[j]));  	 
+		}
+		#endif
 	break;
 	case MODE_TORQUE: 
 		PWMoutput = compute_pid_torque(j, _strain_val[j]);
@@ -442,7 +453,8 @@ Int32 compute_pwm(byte j)
 		
 	case MODE_IDLE:
 	#ifdef IDENTIF 
-		reset_identif(j);
+		//parameters: j,  amp,  start_freq,  step_freq
+		reset_identif(j,_debug_in1[j],1,_debug_in2[j]);
 	#endif	
 		PWMoutput=0;
 	break; 

@@ -393,7 +393,10 @@ byte can_interface (void)
 				HANDLE_MSG (CAN_GET_DEBUG_PARAM_1, CAN_GET_DEBUG_PARAM_1_HANDLER)
 				HANDLE_MSG (CAN_SET_DEBUG_PARAM_2, CAN_SET_DEBUG_PARAM_2_HANDLER)
 				HANDLE_MSG (CAN_GET_DEBUG_PARAM_2, CAN_GET_DEBUG_PARAM_2_HANDLER)
-
+				HANDLE_MSG (CAN_SET_DEBUG_PARAM_3, CAN_SET_DEBUG_PARAM_3_HANDLER)
+				HANDLE_MSG (CAN_GET_DEBUG_PARAM_3, CAN_GET_DEBUG_PARAM_3_HANDLER)
+				HANDLE_MSG (CAN_SET_DEBUG_PARAM_4, CAN_SET_DEBUG_PARAM_4_HANDLER)
+				HANDLE_MSG (CAN_GET_DEBUG_PARAM_4, CAN_GET_DEBUG_PARAM_4_HANDLER)
 
 				HANDLE_MSG (CAN_SET_ENCODER_POSITION, CAN_SET_ENCODER_POSITION_HANDLER)
 				HANDLE_MSG (CAN_GET_ENCODER_VELOCITY, CAN_GET_ENCODER_VELOCITY_HANDLER)
@@ -472,9 +475,13 @@ byte can_interface (void)
  ***********************************************************/
 void can_send_broadcast_identification(byte j)
 {
+	if (broadcast_mask[0] == 0) return;
+	if (j==0 && sine_ampl[0] == 0) return;
+	if (j==1 && sine_ampl[1] == 0) return;
+	
 		_canmsg.CAN_messID = 0x100;
 		_canmsg.CAN_messID |= (_board_ID) << 4;
-		_canmsg.CAN_messID |= 10; //special broadcast value: 10
+		_canmsg.CAN_messID |= 10; //special broadcast value
 		_canmsg.CAN_data[0] = BYTE_H((Int16)_position[j]); //WARNING: _position casted from 32 to 16 bit
 		_canmsg.CAN_data[1] = BYTE_L((Int16)_position[j]);
 		_canmsg.CAN_data[2] = BYTE_H(_speed[j]);
@@ -486,6 +493,22 @@ void can_send_broadcast_identification(byte j)
 		_canmsg.CAN_length = 8;
 		_canmsg.CAN_frameType = DATA_FRAME;
 		CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
+
+		_canmsg.CAN_messID = 0x100;
+		_canmsg.CAN_messID |= (_board_ID) << 4;
+		_canmsg.CAN_messID |= 11; //special broadcast value
+		_canmsg.CAN_data[0] = BYTE_H((Int16)sine_freq[j]*10); 
+		_canmsg.CAN_data[1] = BYTE_L((Int16)sine_freq[j]*10); 
+		_canmsg.CAN_data[2] = BYTE_H((Int16)sine_ampl[j]); 
+		_canmsg.CAN_data[3] = BYTE_L((Int16)sine_ampl[j]); 
+		_canmsg.CAN_data[4] = 0;
+		_canmsg.CAN_data[5] = 0;
+		_canmsg.CAN_data[6] = 0;
+		_canmsg.CAN_data[7] = 0;			
+		_canmsg.CAN_length = 8;
+		_canmsg.CAN_frameType = DATA_FRAME;
+		CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
+
 }
 
 /*********************************************************** 

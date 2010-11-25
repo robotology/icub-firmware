@@ -25,7 +25,7 @@ void check_range(byte i, Int16 band, Int32 *PWM)
 					_desired[i]=(_max_position[i]-band); 
 					_integral[i] = 0; 
 					_set_point[i] = _desired[i];
-					init_trajectory (i, _desired[i], _desired[i], 1); 
+					init_trajectory (i, _position[i], _desired[i], 1); 
 				}
 				
 				if  ((_position[i] < (_min_position[i]+band)) && (_desired[i]<(_min_position[i]+band)))
@@ -33,7 +33,7 @@ void check_range(byte i, Int16 band, Int32 *PWM)
 					_desired[i]=(_min_position[i]+band); 
 					_integral[i] = 0; 
 					_set_point[i] = _desired[i];
-					init_trajectory (i, _desired[i], _desired[i], 1); 
+					init_trajectory (i, _position[i], _desired[i], 1); 
 				}
 			}
 			else	
@@ -46,7 +46,7 @@ void check_range(byte i, Int16 band, Int32 *PWM)
 					_desired[i]=_max_position[i]; 
 					_integral[i] = 0; 
 					_set_point[i] = _desired[i];
-					init_trajectory (i, _desired[i], _desired[i], 1); 
+					init_trajectory (i, _position[i], _desired[i], 1); 
 				}
 				
 				if  ((_position[i] < (_min_position[i]-band)) && (_desired[i]<(_min_position[i]+band)))
@@ -57,7 +57,7 @@ void check_range(byte i, Int16 band, Int32 *PWM)
 					_desired[i]=_min_position[i]; 
 					_integral[i] = 0; 
 					_set_point[i] = _desired[i];
-					init_trajectory (i, _desired[i], _desired[i], 1); 
+					init_trajectory (i, _position[i], _desired[i], 1); 
 				}
 				
 			}
@@ -76,7 +76,7 @@ void check_range(byte i, Int16 band, Int32 *PWM)
 					_desired[i]=(_max_position[i]-band); 
 					_integral[i] = 0; 
 					_set_point[i] = _desired[i];
-					init_trajectory (i, _desired[i], _desired[i], 1); 
+					init_trajectory (i, _position[i], _desired[i], 1); 
 				}
 				
 				if  ((_position[i] < (_min_position[i]+band)) && (_desired[i]<(_min_position[i]+band)))
@@ -84,7 +84,7 @@ void check_range(byte i, Int16 band, Int32 *PWM)
 					_desired[i]=(_min_position[i]+band); 
 					_integral[i] = 0; 
 					_set_point[i] = _desired[i];
-					init_trajectory (i, _desired[i], _desired[i], 1); 
+					init_trajectory (i, _position[i], _desired[i], 1); 
 				}
 			}
 			else	
@@ -97,7 +97,7 @@ void check_range(byte i, Int16 band, Int32 *PWM)
 					_desired[i]=_max_position[i]; 
 					_integral[i] = 0; 
 					_set_point[i] = _desired[i];
-					init_trajectory (i, _desired[i], _desired[i], 1); 
+					init_trajectory (i, _position[i], _desired[i], 1); 
 				}
 				
 				if  ((_position[i] < (_min_position[i]-band)) && (_desired[i]<(_min_position[i]+band)))
@@ -108,7 +108,7 @@ void check_range(byte i, Int16 band, Int32 *PWM)
 					_desired[i]=_min_position[i]; 
 					_integral[i] = 0; 
 					_set_point[i] = _desired[i];
-					init_trajectory (i, _desired[i], _desired[i], 1); 
+					init_trajectory (i, _position[i], _desired[i], 1); 
 				}
 			}
 			#ifdef DEBUG_CONTROL_MODE
