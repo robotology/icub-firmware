@@ -503,6 +503,16 @@ void can_send_broadcast_identification(byte j)
 		_canmsg.CAN_data[3] = BYTE_L((Int16)sine_ampl[j]); 
 		_canmsg.CAN_data[4] = 0;
 		_canmsg.CAN_data[5] = 0;
+		if (DutyCycle[1].Dir==0)
+		{
+		    _canmsg.CAN_data[4] = BYTE_H((Int16)DutyCycle[j].Duty);
+			_canmsg.CAN_data[5] = BYTE_L((Int16)DutyCycle[j].Duty);		
+	    }
+		else
+		{
+			_canmsg.CAN_data[4] = BYTE_H(-1*(Int16)DutyCycle[j].Duty);
+			_canmsg.CAN_data[5] = BYTE_L(-1*(Int16)DutyCycle[j].Duty);
+		}
 		_canmsg.CAN_data[6] = 0;
 		_canmsg.CAN_data[7] = 0;			
 		_canmsg.CAN_length = 8;
