@@ -556,8 +556,7 @@ led0_off
 		can_send_broadcast();
 #ifdef IDENTIF
 #warning "***** IDENTIFICATION MODE ON *****"
-		can_send_broadcast_identification(0); //axis 0
-		can_send_broadcast_identification(1); //axis 1
+		can_send_broadcast_identification(IDENTIF); //IDENTIF is the axis number 
 #endif
 	
 		/* check temperature sensor */
