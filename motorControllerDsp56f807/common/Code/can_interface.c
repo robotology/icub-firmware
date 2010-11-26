@@ -352,8 +352,7 @@ byte can_interface (void)
 			
 			// polling message 
 			// ID 0x0000 (000 xxxx xxxxb) message class = polling message 
-			else
-			//if (_canmsg.CAN_ID_class == CLASS_POLLING_DSP)
+			else if (_canmsg.CAN_ID_class == CLASS_POLLING_DSP)
 			{
 				int axis = get_axis();
 				BEGIN_MSG_TABLE (_canmsg.CAN_data[0])
@@ -457,6 +456,10 @@ byte can_interface (void)
 	//			HANDLE_MSG (CAN_GET_ACTIVE_ENCODER_POSITION, CAN_GET_ACTIVE_ENCODER_POSITION_HANDLER)
 			
 				END_MSG_TABLE		
+			}
+			else 
+			{
+				// UNKNOWN _canmsg.CAN_ID_class
 			}
 
 		} /* end of while() */
