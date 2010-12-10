@@ -401,7 +401,7 @@ void main(void)
 		_position[0]= extract_h( compute_filt_pos(get_position_abs_analog(0)>>3,0));	
 		_position[1]= _adjustment[1];
 		_position[2]= _adjustment[2];
-		_position[3]= _adjustment[3];					
+		_position[3]= _adjustment[3]; 					
 #endif
 
 #if VERSION == 0x0129

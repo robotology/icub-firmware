@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-<?codewarrior exportversion="1.0" ideversion="5.5" success="y" ?>
+<?codewarrior exportversion="1.0" ideversion="5.9.0" success="y" ?>
 
 <!DOCTYPE MWIDEWORKSPACE [
 <!ELEMENT MWIDEWORKSPACE (WINDOW*, COMWINDOW*)>
@@ -54,7 +54,7 @@
             <COLUMN>0</COLUMN>
             <DOCKBARID>59420</DOCKBARID>
             <PCTWIDTH>1.000000</PCTWIDTH>
-            <HGT>355</HGT>
+            <HGT>515</HGT>
             <GROUPID>
                 <GIDHIGHPART>29802212</GIDHIGHPART>
                 <GIDLOWPART>1992947498</GIDLOWPART>
@@ -64,7 +64,7 @@
     <WINDOW>
         <SESSION>-1</SESSION>
         <EDOCTYPE>0</EDOCTYPE>
-        <PATH USERELATIVEPATHS = "true">..\libDsp56f807\library_2bll.mcp</PATH>
+        <PATH USERELATIVEPATHS = "true">..\..\libDsp56f807\2BLL\library_2bll.mcp</PATH>
         <FRAMELOC>
             <X>30</X>
             <Y>30</Y>
@@ -79,236 +79,10 @@
             <COLUMN>0</COLUMN>
             <DOCKBARID>59420</DOCKBARID>
             <PCTWIDTH>1.000000</PCTWIDTH>
-            <HGT>355</HGT>
+            <HGT>515</HGT>
             <GROUPID>
                 <GIDHIGHPART>29802212</GIDHIGHPART>
                 <GIDLOWPART>1992947498</GIDLOWPART>
-            </GROUPID>
-        </DOCKINFO>
-    </WINDOW>
-    <WINDOW>
-        <SESSION>-1</SESSION>
-        <EDOCTYPE>1</EDOCTYPE>
-        <PATH USERELATIVEPATHS = "true">Code\main.c</PATH>
-        <MAXIMIZED>true</MAXIMIZED>
-        <FRAMELOC>
-            <X>15</X>
-            <Y>0</Y>
-        </FRAMELOC>
-        <FRAMESIZE>
-            <W>556</W>
-            <H>640</H>
-        </FRAMESIZE>
-        <DOCKINFO>
-            <STATUS>0</STATUS>
-            <ROW></ROW>
-            <COLUMN></COLUMN>
-            <DOCKBARID></DOCKBARID>
-            <PCTWIDTH></PCTWIDTH>
-            <HGT></HGT>
-            <GROUPID>
-                <GIDHIGHPART></GIDHIGHPART>
-                <GIDLOWPART></GIDLOWPART>
-            </GROUPID>
-        </DOCKINFO>
-    </WINDOW>
-    <WINDOW>
-        <SESSION>-1</SESSION>
-        <EDOCTYPE>1</EDOCTYPE>
-        <PATH USERELATIVEPATHS = "true">Code\can_interface.c</PATH>
-        <FRAMELOC>
-            <X>10</X>
-            <Y>40</Y>
-        </FRAMELOC>
-        <FRAMESIZE>
-            <W>630</W>
-            <H>410</H>
-        </FRAMESIZE>
-        <DOCKINFO>
-            <STATUS>0</STATUS>
-            <ROW></ROW>
-            <COLUMN></COLUMN>
-            <DOCKBARID></DOCKBARID>
-            <PCTWIDTH></PCTWIDTH>
-            <HGT></HGT>
-            <GROUPID>
-                <GIDHIGHPART></GIDHIGHPART>
-                <GIDLOWPART></GIDLOWPART>
-            </GROUPID>
-        </DOCKINFO>
-    </WINDOW>
-    <WINDOW>
-        <SESSION>-1</SESSION>
-        <EDOCTYPE>1</EDOCTYPE>
-        <PATH USERELATIVEPATHS = "true">Code\messages.h</PATH>
-        <FRAMELOC>
-            <X>10</X>
-            <Y>40</Y>
-        </FRAMELOC>
-        <FRAMESIZE>
-            <W>630</W>
-            <H>410</H>
-        </FRAMESIZE>
-        <DOCKINFO>
-            <STATUS>0</STATUS>
-            <ROW></ROW>
-            <COLUMN></COLUMN>
-            <DOCKBARID></DOCKBARID>
-            <PCTWIDTH></PCTWIDTH>
-            <HGT></HGT>
-            <GROUPID>
-                <GIDHIGHPART></GIDHIGHPART>
-                <GIDLOWPART></GIDLOWPART>
-            </GROUPID>
-        </DOCKINFO>
-    </WINDOW>
-    <WINDOW>
-        <SESSION>-1</SESSION>
-        <EDOCTYPE>1</EDOCTYPE>
-        <PATH USERELATIVEPATHS = "true">Code\pid.h</PATH>
-        <FRAMELOC>
-            <X>10</X>
-            <Y>40</Y>
-        </FRAMELOC>
-        <FRAMESIZE>
-            <W>630</W>
-            <H>410</H>
-        </FRAMESIZE>
-        <DOCKINFO>
-            <STATUS>0</STATUS>
-            <ROW></ROW>
-            <COLUMN></COLUMN>
-            <DOCKBARID></DOCKBARID>
-            <PCTWIDTH></PCTWIDTH>
-            <HGT></HGT>
-            <GROUPID>
-                <GIDHIGHPART></GIDHIGHPART>
-                <GIDLOWPART></GIDLOWPART>
-            </GROUPID>
-        </DOCKINFO>
-    </WINDOW>
-    <WINDOW>
-        <SESSION>-1</SESSION>
-        <EDOCTYPE>1</EDOCTYPE>
-        <PATH USERELATIVEPATHS = "true">Code\calibration.c</PATH>
-        <FRAMELOC>
-            <X>10</X>
-            <Y>40</Y>
-        </FRAMELOC>
-        <FRAMESIZE>
-            <W>630</W>
-            <H>410</H>
-        </FRAMESIZE>
-        <DOCKINFO>
-            <STATUS>0</STATUS>
-            <ROW></ROW>
-            <COLUMN></COLUMN>
-            <DOCKBARID></DOCKBARID>
-            <PCTWIDTH></PCTWIDTH>
-            <HGT></HGT>
-            <GROUPID>
-                <GIDHIGHPART></GIDHIGHPART>
-                <GIDLOWPART></GIDLOWPART>
-            </GROUPID>
-        </DOCKINFO>
-    </WINDOW>
-    <WINDOW>
-        <SESSION>-1</SESSION>
-        <EDOCTYPE>1</EDOCTYPE>
-        <PATH USERELATIVEPATHS = "true">Code\options.h</PATH>
-        <FRAMELOC>
-            <X>23</X>
-            <Y>52</Y>
-        </FRAMELOC>
-        <FRAMESIZE>
-            <W>549</W>
-            <H>466</H>
-        </FRAMESIZE>
-        <DOCKINFO>
-            <STATUS>0</STATUS>
-            <ROW></ROW>
-            <COLUMN></COLUMN>
-            <DOCKBARID></DOCKBARID>
-            <PCTWIDTH></PCTWIDTH>
-            <HGT></HGT>
-            <GROUPID>
-                <GIDHIGHPART></GIDHIGHPART>
-                <GIDLOWPART></GIDLOWPART>
-            </GROUPID>
-        </DOCKINFO>
-    </WINDOW>
-    <WINDOW>
-        <SESSION>-1</SESSION>
-        <EDOCTYPE>1</EDOCTYPE>
-        <PATH USERELATIVEPATHS = "true">Code\can_interface.h</PATH>
-        <FRAMELOC>
-            <X>8</X>
-            <Y>34</Y>
-        </FRAMELOC>
-        <FRAMESIZE>
-            <W>638</W>
-            <H>444</H>
-        </FRAMESIZE>
-        <DOCKINFO>
-            <STATUS>0</STATUS>
-            <ROW></ROW>
-            <COLUMN></COLUMN>
-            <DOCKBARID></DOCKBARID>
-            <PCTWIDTH></PCTWIDTH>
-            <HGT></HGT>
-            <GROUPID>
-                <GIDHIGHPART></GIDHIGHPART>
-                <GIDLOWPART></GIDLOWPART>
-            </GROUPID>
-        </DOCKINFO>
-    </WINDOW>
-    <WINDOW>
-        <SESSION>-1</SESSION>
-        <EDOCTYPE>1</EDOCTYPE>
-        <PATH USERELATIVEPATHS = "true">Code\pid.c</PATH>
-        <FRAMELOC>
-            <X>38</X>
-            <Y>70</Y>
-        </FRAMELOC>
-        <FRAMESIZE>
-            <W>549</W>
-            <H>451</H>
-        </FRAMESIZE>
-        <DOCKINFO>
-            <STATUS>0</STATUS>
-            <ROW></ROW>
-            <COLUMN></COLUMN>
-            <DOCKBARID></DOCKBARID>
-            <PCTWIDTH></PCTWIDTH>
-            <HGT></HGT>
-            <GROUPID>
-                <GIDHIGHPART></GIDHIGHPART>
-                <GIDLOWPART></GIDLOWPART>
-            </GROUPID>
-        </DOCKINFO>
-    </WINDOW>
-    <WINDOW>
-        <SESSION>-1</SESSION>
-        <EDOCTYPE>1</EDOCTYPE>
-        <PATH USERELATIVEPATHS = "true">..\libDsp56f807\include\can1.h</PATH>
-        <FRAMELOC>
-            <X>68</X>
-            <Y>106</Y>
-        </FRAMELOC>
-        <FRAMESIZE>
-            <W>549</W>
-            <H>325</H>
-        </FRAMESIZE>
-        <DOCKINFO>
-            <STATUS>0</STATUS>
-            <ROW></ROW>
-            <COLUMN></COLUMN>
-            <DOCKBARID></DOCKBARID>
-            <PCTWIDTH></PCTWIDTH>
-            <HGT></HGT>
-            <GROUPID>
-                <GIDHIGHPART></GIDHIGHPART>
-                <GIDLOWPART></GIDLOWPART>
             </GROUPID>
         </DOCKINFO>
     </WINDOW>
