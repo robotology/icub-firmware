@@ -62,6 +62,7 @@ goto end
 
 
 :cpy_build_test
+if '%MY_BOARD%' == 'ALL' goto copy_all_build_test else
 ECHO copio da %MY_BOARD% in test
 copy /Y  ..\%MY_BOARD%\output\*.out.S ..\..\build_testing\
 goto end
@@ -76,6 +77,19 @@ copy /Y ..\2BLLDC\output\*.out.S ..\..\build\
 ECHO.
 ECHO copio da \4DC a build
 copy /Y ..\4DC\output\*.out.S ..\..\build\
+goto end
+
+
+
+:copy_all_build_test
+ECHO copio da 2BLL a build_testing
+copy /Y ..\2BLL\output\*.out.S ..\..\build_testing\
+ECHO.
+ECHO copio da \2BLLDC a build_testing
+copy /Y ..\2BLLDC\output\*.out.S ..\..\build_testing\
+ECHO.
+ECHO copio da \4DC a build_testing
+copy /Y ..\4DC\output\*.out.S ..\..\build_testing\
 goto end
 
 
