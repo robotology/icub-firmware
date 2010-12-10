@@ -4,7 +4,7 @@
  */
 
 #include "ad.h"
-#include "leds_interface.h"
+
 #define IDLE            0              /* IDLE state           */
 #define MEASURE         1              /* MESURE state         */
 #define CONTINUOUS      2              /* CONTINUOUS state     */

@@ -1,6 +1,5 @@
 
 #include "SPI1.h"
-#include "asc.h"
 
 static byte CLKshift;
 static byte CLKsampl;

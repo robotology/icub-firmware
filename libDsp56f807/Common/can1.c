@@ -12,7 +12,6 @@
 #include "can1.h"
 #include "asc.h"
 #include <stdarg.h>  
-#include "leds_interface.h"
 
 canmsg_t can_fifo[CAN_FIFO_LEN];
 Int16 write_p = 0;

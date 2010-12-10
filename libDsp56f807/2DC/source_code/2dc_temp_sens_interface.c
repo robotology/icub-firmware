@@ -106,7 +106,7 @@ bool ResetTempSens(void)
 }
 
 //*********************************************************
-void MeasureTempSens(void)
+byte MeasureTempSens(void)
 {
 
  UInt16 i=0;
@@ -115,7 +115,7 @@ void MeasureTempSens(void)
  {
  	case STATUS_OK:
  	case STATUS_ERR:
- 		return;
+ 		return temp_sens_status;
  		
   	case STATUS_IDLE:
   		 // begin a new conversion
@@ -129,26 +129,26 @@ void MeasureTempSens(void)
  			return;
 		}
 		temp_sens_status++;
-	 	return;
+	 	return temp_sens_status;
 	 	
  	case STATUS_RUNNING+1:
  		// skip address identification command
 	 	SendByte(0xCC);
 	 	temp_sens_status++;
-	 	return;
+	 	return temp_sens_status;
 	
  	case STATUS_RUNNING+2:
  	 	// begin temperature conversion command	
  		SendByte(0x44);
 	  	temp_sens_status++;
-	 	return;
+	 	return temp_sens_status;
 	 	
  	case STATUS_RUNNING+3:
  	    // check if temperature conversion is finished
  	    if (ReadBit())
  	    {
  	    	temp_sens_status++;
- 	    	return;
+ 	    	return temp_sens_status;
  	    }
  	    
   	case STATUS_RUNNING+4:
@@ -156,22 +156,22 @@ void MeasureTempSens(void)
 		 if(!ResetTempSens())
  		{
  			temp_sens_status = STATUS_ERR;
- 			return;
+ 			return temp_sens_status;
 		}
 		temp_sens_status++;
-	 	return;
+	 	return temp_sens_status;
 	 	
 	case STATUS_RUNNING+5:
  		// skip address identification command
  		SendByte(0xCC);
 	  	temp_sens_status++;
-	 	return;
+	 	return temp_sens_status;
 	 	
 	case STATUS_RUNNING+6:
  		// read data command	
  		SendByte(0xBE);
 	  	temp_sens_status++;
-	 	return;
+	 	return temp_sens_status;
 	 	
 	case STATUS_RUNNING+7:
 		//receives temperature data from the sensor
@@ -179,7 +179,7 @@ void MeasureTempSens(void)
 
 		//data ready for reading
 		temp_sens_status=STATUS_OK; 
-		return;	
+		return temp_sens_status;	
  }
 }
 
@@ -337,7 +337,7 @@ UInt8  ReceiveByte   (void)
 }
 
 //*********************************************************
-Int16 GetTempSens(void)
+Int16 GetTempSens(byte sens_num)
 {
  switch (temp_sens_status)
  {

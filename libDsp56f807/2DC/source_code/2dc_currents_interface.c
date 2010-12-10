@@ -25,7 +25,7 @@ void init_currents( void )
  * this function checks if the current consumption has exceeded a threshold
  * for more than 200 ms using a filtered verion of the current reading.
  ***************************************************************************/
-word check_current(byte jnt, bool sign)
+Int32 check_current(byte jnt, bool sign)
 {
 	word temp;
 	Int32 temporary;
