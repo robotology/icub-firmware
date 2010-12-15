@@ -124,11 +124,11 @@ void Interrupt_Phase_X0(void)
 		tmp = getReg(PWMA_PMOUT) & 0x8000;
     	val=tmp | PWMState[0].MaskOut | (PWMState[0].Mask<<8);
 		setReg(PWMA_PMOUT,val); 
-		old_status0 = status0;	
 #ifdef COMM_ENC		
 		if (status0 == DIRECTION_TABLE[old_status0]) comm_enc[0]++;
 		else if (status0 == DIRECTION_TABLE_INV[old_status0]) comm_enc[0]--;
 #endif
+		old_status0 = status0;	
 		}
 #ifdef HALL_GLITH_CHECK			
 		else
@@ -163,11 +163,11 @@ void Interrupt_Phase_Y0(void)
 		tmp = getReg(PWMA_PMOUT) & 0x8000;
     	val=tmp | PWMState[0].MaskOut | (PWMState[0].Mask<<8);
 		setReg(PWMA_PMOUT,val); 
-		old_status0 = status0;	
 #ifdef COMM_ENC				
 		if (status0 == DIRECTION_TABLE[old_status0]) comm_enc[0]++;
 		else if (status0 == DIRECTION_TABLE_INV[old_status0]) comm_enc[0]--;
 #endif		
+		old_status0 = status0;	
 		}
 #ifdef HALL_GLITH_CHECK			
 		}
@@ -205,11 +205,11 @@ void Interrupt_Phase_Z0(void)
 		tmp = getReg(PWMA_PMOUT) & 0x8000;
     	val=tmp | PWMState[0].MaskOut | (PWMState[0].Mask<<8);
 		setReg(PWMA_PMOUT,val); 
-		old_status0 = status0;	
 #ifdef COMM_ENC	
 		if (status0 == DIRECTION_TABLE[old_status0]) comm_enc[0]++;
 		else if (status0 == DIRECTION_TABLE_INV[old_status0]) comm_enc[0]--;
 #endif		
+		old_status0 = status0;	
 		}
 #ifdef HALL_GLITH_CHECK			
 		else
