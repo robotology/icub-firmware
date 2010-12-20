@@ -54,7 +54,7 @@
             <COLUMN>0</COLUMN>
             <DOCKBARID>59420</DOCKBARID>
             <PCTWIDTH>1.000000</PCTWIDTH>
-            <HGT>515</HGT>
+            <HGT>527</HGT>
             <GROUPID>
                 <GIDHIGHPART>29802212</GIDHIGHPART>
                 <GIDLOWPART>1992947498</GIDLOWPART>
@@ -79,10 +79,60 @@
             <COLUMN>0</COLUMN>
             <DOCKBARID>59420</DOCKBARID>
             <PCTWIDTH>1.000000</PCTWIDTH>
-            <HGT>515</HGT>
+            <HGT>527</HGT>
             <GROUPID>
                 <GIDHIGHPART>29802212</GIDHIGHPART>
                 <GIDLOWPART>1992947498</GIDLOWPART>
+            </GROUPID>
+        </DOCKINFO>
+    </WINDOW>
+    <WINDOW>
+        <SESSION>-1</SESSION>
+        <EDOCTYPE>0</EDOCTYPE>
+        <PATH USERELATIVEPATHS = "true">..\..\loader56f807\RM-DownloaderCAN.mcp</PATH>
+        <FRAMELOC>
+            <X>30</X>
+            <Y>30</Y>
+        </FRAMELOC>
+        <FRAMESIZE>
+            <W>347</W>
+            <H>200</H>
+        </FRAMESIZE>
+        <DOCKINFO>
+            <STATUS>1</STATUS>
+            <ROW>0</ROW>
+            <COLUMN>0</COLUMN>
+            <DOCKBARID>59420</DOCKBARID>
+            <PCTWIDTH>1.000000</PCTWIDTH>
+            <HGT>527</HGT>
+            <GROUPID>
+                <GIDHIGHPART>29802212</GIDHIGHPART>
+                <GIDLOWPART>1992947498</GIDLOWPART>
+            </GROUPID>
+        </DOCKINFO>
+    </WINDOW>
+    <WINDOW>
+        <SESSION>-1</SESSION>
+        <EDOCTYPE>1</EDOCTYPE>
+        <PATH USERELATIVEPATHS = "true">source_code\main.c</PATH>
+        <FRAMELOC>
+            <X>12</X>
+            <Y>34</Y>
+        </FRAMELOC>
+        <FRAMESIZE>
+            <W>678</W>
+            <H>524</H>
+        </FRAMESIZE>
+        <DOCKINFO>
+            <STATUS>0</STATUS>
+            <ROW></ROW>
+            <COLUMN></COLUMN>
+            <DOCKBARID></DOCKBARID>
+            <PCTWIDTH></PCTWIDTH>
+            <HGT></HGT>
+            <GROUPID>
+                <GIDHIGHPART></GIDHIGHPART>
+                <GIDLOWPART></GIDLOWPART>
             </GROUPID>
         </DOCKINFO>
     </WINDOW>
@@ -114,12 +164,12 @@
         <SESSION>-2147483648</SESSION>
         <EDOCTYPE>24</EDOCTYPE>
         <FRAMELOC>
-            <X>4</X>
-            <Y>30</Y>
+            <X>10</X>
+            <Y>104</Y>
         </FRAMELOC>
         <FRAMESIZE>
-            <W>654</W>
-            <H>858</H>
+            <W>558</W>
+            <H>450</H>
         </FRAMESIZE>
         <DOCKINFO>
             <STATUS>0</STATUS>
