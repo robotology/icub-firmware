@@ -31,7 +31,7 @@
 
 byte	_board_ID = 15;	
 char    _additional_info [32];
-word    _build_number = 9;
+word    _build_number = 10;
 UInt8    mainLoopOVF=0;
 int     _countBoardStatus[2] ={0,0};
 Int16   _flash_version=0; 
