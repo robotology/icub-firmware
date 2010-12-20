@@ -54,7 +54,7 @@
             <COLUMN>0</COLUMN>
             <DOCKBARID>59420</DOCKBARID>
             <PCTWIDTH>1.000000</PCTWIDTH>
-            <HGT>550</HGT>
+            <HGT>462</HGT>
             <GROUPID>
                 <GIDHIGHPART>29802212</GIDHIGHPART>
                 <GIDLOWPART>1992947498</GIDLOWPART>
@@ -79,36 +79,10 @@
             <COLUMN>0</COLUMN>
             <DOCKBARID>59420</DOCKBARID>
             <PCTWIDTH>1.000000</PCTWIDTH>
-            <HGT>550</HGT>
+            <HGT>462</HGT>
             <GROUPID>
                 <GIDHIGHPART>29802212</GIDHIGHPART>
                 <GIDLOWPART>1992947498</GIDLOWPART>
-            </GROUPID>
-        </DOCKINFO>
-    </WINDOW>
-    <WINDOW>
-        <SESSION>-1</SESSION>
-        <EDOCTYPE>1</EDOCTYPE>
-        <PATH USERELATIVEPATHS = "true">..\common_source_code\can_interface.c</PATH>
-        <MAXIMIZED>true</MAXIMIZED>
-        <FRAMELOC>
-            <X>13</X>
-            <Y>270</Y>
-        </FRAMELOC>
-        <FRAMESIZE>
-            <W>573</W>
-            <H>498</H>
-        </FRAMESIZE>
-        <DOCKINFO>
-            <STATUS>0</STATUS>
-            <ROW></ROW>
-            <COLUMN></COLUMN>
-            <DOCKBARID></DOCKBARID>
-            <PCTWIDTH></PCTWIDTH>
-            <HGT></HGT>
-            <GROUPID>
-                <GIDHIGHPART></GIDHIGHPART>
-                <GIDLOWPART></GIDLOWPART>
             </GROUPID>
         </DOCKINFO>
     </WINDOW>
@@ -139,7 +113,7 @@
         <DEBUGTARGETNAME>C:\Software\iCub\src\controller_rm2\a.out</DEBUGTARGETNAME>
             <REGISTERWINDOW><WINDOWINDEX>0</WINDOWINDEX>
             <DIVIDERPOS>512</DIVIDERPOS>
-            <REGDISCLOSE NAME = "" TYPE = "109150468" DISCLOSED = "0">
+            <REGDISCLOSE NAME = "" TYPE = "115474180" DISCLOSED = "0">
                 <REGDISCLOSE NAME = "xxx remote connection" TYPE = "3" DISCLOSED = "1">
                     <REGDISCLOSE NAME = "a.out" TYPE = "4" DISCLOSED = "1">
                         <REGDISCLOSE NAME = "" TYPE = "5" DISCLOSED = "1">
