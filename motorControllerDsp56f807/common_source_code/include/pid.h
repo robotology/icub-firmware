@@ -86,6 +86,10 @@ extern Int16 _debug_in1[JN] ;			// general purpouse debug
 extern Int16 _debug_in2[JN] ;			// general purpouse debug
 extern Int16 _debug_in3[JN] ;			// general purpouse debug
 extern Int16 _debug_in4[JN] ;			// general purpouse debug
+extern Int16 _debug_in5[JN] ;			// general purpouse debug
+extern Int16 _debug_in6[JN] ;			// general purpouse debug
+extern Int16 _debug_in7[JN] ;			// general purpouse debug
+extern Int16 _debug_in8[JN] ;			// general purpouse debug
 extern Int16 _debug_out1[JN] ;			// general purpouse debug
 extern Int16 _debug_out2[JN] ;			// general purpouse debug
 extern Int16 _debug_out3[JN] ;			// general purpouse debug

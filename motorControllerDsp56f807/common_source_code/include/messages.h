@@ -1080,9 +1080,16 @@
 
 //-------------------------------------------------------------------
 // GENERIC DEBUG PARAMETER
-#define CAN_SET_DEBUG_PARAM_1_HANDLER(x) \
+#define CAN_SET_DEBUG_PARAM_HANDLER(x) \
 { \
-	_debug_in1[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
+	if      (CAN_DATA[1]==0) _debug_in1[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
+	else if (CAN_DATA[1]==1) _debug_in2[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
+	else if (CAN_DATA[1]==2) _debug_in3[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
+	else if (CAN_DATA[1]==3) _debug_in4[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
+	else if (CAN_DATA[1]==4) _debug_in5[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
+	else if (CAN_DATA[1]==5) _debug_in6[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
+	else if (CAN_DATA[1]==6) _debug_in7[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
+	else if (CAN_DATA[1]==7) _debug_in8[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
 }
 
 /*
@@ -1109,6 +1116,13 @@ else \
 	setReg (TMRA3_CMP1, 39999); \
 } \
 */
+
+//-------------------------------------------------------------------
+// GENERIC DEBUG PARAMETER
+#define CAN_SET_DEBUG_PARAM_1_HANDLER(x) \
+{ \
+	_debug_in1[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
+}
 	
 //-------------------------------------------------------------------
 // GENERIC DEBUG PARAMETER
@@ -1129,6 +1143,26 @@ else \
 #define CAN_SET_DEBUG_PARAM_4_HANDLER(x) \
 { \
 	_debug_in4[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
+}
+
+//-------------------------------------------------------------------
+// GENERIC DEBUG PARAMETER
+#define CAN_GET_DEBUG_PARAM_HANDLER(x) \
+{ \
+	byte  index_dbg = CAN_DATA[1]; \
+	PREPARE_HEADER; \
+		CAN_LEN = 3; \
+		if      (index_dbg==0) {CAN_DATA[1] = BYTE_H(_debug_in1[axis]);CAN_DATA[2] = BYTE_L(_debug_in1[axis]);} \
+		else if (index_dbg==1) {CAN_DATA[1] = BYTE_H(_debug_in2[axis]);CAN_DATA[2] = BYTE_L(_debug_in2[axis]);} \
+		else if (index_dbg==2) {CAN_DATA[1] = BYTE_H(_debug_in3[axis]);CAN_DATA[2] = BYTE_L(_debug_in3[axis]);} \
+		else if (index_dbg==3) {CAN_DATA[1] = BYTE_H(_debug_in4[axis]);CAN_DATA[2] = BYTE_L(_debug_in4[axis]);} \
+		else if (index_dbg==4) {CAN_DATA[1] = BYTE_H(_debug_in5[axis]);CAN_DATA[2] = BYTE_L(_debug_in5[axis]);} \
+		else if (index_dbg==5) {CAN_DATA[1] = BYTE_H(_debug_in6[axis]);CAN_DATA[2] = BYTE_L(_debug_in6[axis]);} \
+		else if (index_dbg==6) {CAN_DATA[1] = BYTE_H(_debug_in7[axis]);CAN_DATA[2] = BYTE_L(_debug_in7[axis]);} \
+		else if (index_dbg==7) {CAN_DATA[1] = BYTE_H(_debug_in8[axis]);CAN_DATA[2] = BYTE_L(_debug_in8[axis]);} \
+		 \
+		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
+		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
