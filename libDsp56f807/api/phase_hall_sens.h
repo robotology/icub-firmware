@@ -17,9 +17,11 @@ typedef struct sPwmControlBL_tag
 #define  HALL_ERROR_GLITCH	0x4 //when there is a mismatch between the two hall reading in the hall_interrupt 
 
 
-//if it is defined COMM_ENC, there is a calculation of the commutations in the hall_phase interrupts 
+//If COMM_ENC is defined, the number of motor commutations is counted.
+//It can be used as a motor encoder. Function get_commutations() retrieves the computed value.
+//It is also mandatory for back-EMF compensation.
+#define  COMM_ENC
 
-//#define  COMM_ENC
 //#define  HALL_GLITH_CHECK
 
 /**************************************************************************************/
