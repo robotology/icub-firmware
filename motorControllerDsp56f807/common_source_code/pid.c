@@ -60,6 +60,7 @@ byte  _t1c =0;
 Int32 _abs_pos_calibration[JN] = INIT_ARRAY (0); // absolute position to be reached during calibration
 Int32 _filt_abs_pos[JN] = INIT_ARRAY (0);		 // filtered absolute position sensor position
 Int32 _position[JN] = INIT_ARRAY (0);			 // encoder position 
+Int32 _motor_position[JN] = INIT_ARRAY (0);		 // hall effect encoder position 
 Int32 _position_enc[JN] = INIT_ARRAY (0);		 // incremental encoder position 
 
 Int32 _position_old[JN] = INIT_ARRAY (0);		 // do I need to add bits for taking into account multiple rotations 
@@ -79,7 +80,8 @@ Int32 _max_real_position[JN]=INIT_ARRAY (0);
 // SPEED VARIABLES
 Int16 _speed[JN] = INIT_ARRAY (0);			 	 		// encoder speed 
 Int16 _speed_old[JN] = INIT_ARRAY (0);					// encoder old speed 
-Int32 _comm_speed[JN] = INIT_ARRAY (0);		     		// brushless commutation speed 
+Int16 _comm_speed[JN] = INIT_ARRAY (0);		     		// brushless commutation speed 
+Int16 _comm_speed_old[JN] = INIT_ARRAY (0);				// previous brushless commutation speed 
 Int16 _accu_desired_vel[JN] = INIT_ARRAY (0);			// accumultor for the fractional part of the desired vel 
 Int16 _desired_vel[JN] = INIT_ARRAY (0);				// speed reference value, computed by the trajectory gen. 
 Int16 _set_vel[JN] = INIT_ARRAY (DEFAULT_VELOCITY);		// set point for velocity [user specified] 
@@ -87,14 +89,15 @@ Int16 _max_vel[JN] = INIT_ARRAY (DEFAULT_MAX_VELOCITY);	// assume this limit is 
 Int32 _vel_shift[JN] = INIT_ARRAY (4);
 Int16 _vel_counter[JN] = INIT_ARRAY (0);
 Int16 _vel_timeout[JN] = INIT_ARRAY (2000);             // timeout on velocity messages
-byte  _vel_est_shift[JN] = INIT_ARRAY (5);				// shift of the speed estimator
+byte  _jntVel_est_shift[JN] = INIT_ARRAY (5);			// shift of the speed estimator (joint)
+byte  _motVel_est_shift[JN] = INIT_ARRAY (5);			// shift of the speed estimator (motor)
 
 // ACCELERATION VARIABLES
 Int16  _accel[JN] = INIT_ARRAY (0);			 			 // encoder acceleration 
 Int16  _accel_old[JN] = INIT_ARRAY (0); 		       	 // previous acceleration
 Int16  _set_acc[JN] = INIT_ARRAY (DEFAULT_ACCELERATION); // set point for acceleration [too low!] 
-byte   _acc_est_shift[JN] = INIT_ARRAY (5);				 // shift of the acceleration estimator
-
+byte   _jntAcc_est_shift[JN] = INIT_ARRAY (5);			 // shift of the acceleration estimator (joint)
+byte   _motAcc_est_shift[JN] = INIT_ARRAY (5);			 // shift of the acceleration estimator (motor)
 
 // TORQUE VARIABLES
 Int32 _desired_torque[JN] = INIT_ARRAY (0); 	// PID ref value, computed by the trajectory generator 

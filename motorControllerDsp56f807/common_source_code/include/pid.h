@@ -99,6 +99,7 @@ extern Int16 _debug_out4[JN] ;			// general purpouse debug
 extern Int32 _abs_pos_calibration[JN] ;	// absolute position to be reached during calibration
 extern Int32 _filt_abs_pos[JN] ;		// filtered absolute position sensor position
 extern Int32 _position[JN] ;			// encoder position 
+extern Int32 _motor_position[JN] ;		// hall effect encoder position 
 extern Int32 _position_old[JN] ;		// do I need to add bits for taking into account multiple rotations 
 
 extern Int32 _position_enc[JN] ;		// incremental encoder position 
@@ -119,11 +120,13 @@ extern Int32 _max_real_position[JN];
 // SPEED VARIABLES
 extern Int16 _speed[JN] ;				// encoder speed 
 extern Int16 _speed_old[JN]; 			// previous speed
-extern Int32 _comm_speed[JN] ;			// brushless commutation speed 
+extern Int16 _comm_speed[JN] ;			// brushless commutation speed 
+extern Int16 _comm_speed_old[JN] ;		// previous brushless commutation speed 
 extern Int16 _desired_vel[JN] ;			// speed reference value, computed by the trajectory gen. 
 extern Int16 _accu_desired_vel[JN];		// accumultor for the fractional part of the desired vel 
 extern Int16 _set_vel[JN] ;				// set point for velocity [user specified] 
-extern byte  _vel_est_shift[JN];        // shift for the speed estimator
+extern byte  _jntVel_est_shift[JN];     // shift for the speed estimator (joint)
+extern byte  _motVel_est_shift[JN];     // shift for the speed estimator (motor)
 extern Int16 _max_vel[JN] ;
 extern Int32 _vel_shift[JN]	;
 extern Int16 _vel_counter[JN]	;
@@ -134,7 +137,8 @@ extern Int16 _vel_timeout[JN]   ;
 extern Int16 _accel[JN]; 				// encoder estimated acceleration
 extern Int16 _accel_old[JN]; 			// previous acceleration		
 extern Int16 _set_acc[JN] ;				// set point for acceleration [too low!] 
-extern byte  _acc_est_shift[JN];        // shift for the acceleration estimator
+extern byte  _jntAcc_est_shift[JN];     // shift for the acceleration estimator (joint)
+extern byte  _motAcc_est_shift[JN];     // shift for the acceleration estimator (motor)
 
 
 // TORQUE VARIABLES
