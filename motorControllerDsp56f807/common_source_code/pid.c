@@ -87,11 +87,13 @@ Int16 _max_vel[JN] = INIT_ARRAY (DEFAULT_MAX_VELOCITY);	// assume this limit is 
 Int32 _vel_shift[JN] = INIT_ARRAY (4);
 Int16 _vel_counter[JN] = INIT_ARRAY (0);
 Int16 _vel_timeout[JN] = INIT_ARRAY (2000);             // timeout on velocity messages
+byte  _vel_est_shift[JN] = INIT_ARRAY (5);				// shift of the speed estimator
 
 // ACCELERATION VARIABLES
 Int16  _accel[JN] = INIT_ARRAY (0);			 			 // encoder acceleration 
 Int16  _accel_old[JN] = INIT_ARRAY (0); 		       	 // previous acceleration
 Int16  _set_acc[JN] = INIT_ARRAY (DEFAULT_ACCELERATION); // set point for acceleration [too low!] 
+byte   _acc_est_shift[JN] = INIT_ARRAY (5);				 // shift of the acceleration estimator
 
 
 // TORQUE VARIABLES

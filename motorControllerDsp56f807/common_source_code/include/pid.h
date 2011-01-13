@@ -123,6 +123,7 @@ extern Int32 _comm_speed[JN] ;			// brushless commutation speed
 extern Int16 _desired_vel[JN] ;			// speed reference value, computed by the trajectory gen. 
 extern Int16 _accu_desired_vel[JN];		// accumultor for the fractional part of the desired vel 
 extern Int16 _set_vel[JN] ;				// set point for velocity [user specified] 
+extern byte  _vel_est_shift[JN];        // shift for the speed estimator
 extern Int16 _max_vel[JN] ;
 extern Int32 _vel_shift[JN]	;
 extern Int16 _vel_counter[JN]	;
@@ -133,6 +134,7 @@ extern Int16 _vel_timeout[JN]   ;
 extern Int16 _accel[JN]; 				// encoder estimated acceleration
 extern Int16 _accel_old[JN]; 			// previous acceleration		
 extern Int16 _set_acc[JN] ;				// set point for acceleration [too low!] 
+extern byte  _acc_est_shift[JN];        // shift for the acceleration estimator
 
 
 // TORQUE VARIABLES
