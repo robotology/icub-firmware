@@ -130,7 +130,8 @@ extern Int16 _vel_timeout[JN]   ;
 
 
 // ACCELERATION VARIABLES
-extern Int16 _accel[JN]; 				// encoder estimated acceleration		
+extern Int16 _accel[JN]; 				// encoder estimated acceleration
+extern Int16 _accel_old[JN]; 			// previous acceleration		
 extern Int16 _set_acc[JN] ;				// set point for acceleration [too low!] 
 
 

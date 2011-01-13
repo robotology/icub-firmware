@@ -90,6 +90,7 @@ Int16 _vel_timeout[JN] = INIT_ARRAY (2000);             // timeout on velocity m
 
 // ACCELERATION VARIABLES
 Int16  _accel[JN] = INIT_ARRAY (0);			 			 // encoder acceleration 
+Int16  _accel_old[JN] = INIT_ARRAY (0); 		       	 // previous acceleration
 Int16  _set_acc[JN] = INIT_ARRAY (DEFAULT_ACCELERATION); // set point for acceleration [too low!] 
 
 
