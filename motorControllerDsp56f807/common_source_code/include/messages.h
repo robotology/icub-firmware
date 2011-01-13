@@ -1079,6 +1079,15 @@
 }
 
 //-------------------------------------------------------------------
+#define CAN_SET_SPEED_ESTIM_SHIFT_HANDLER(x) \
+{ \
+	_jntVel_est_shift[axis] = CAN_DATA[1]; \
+	_jntAcc_est_shift[axis] = CAN_DATA[2]; \
+	_motVel_est_shift[axis] = CAN_DATA[3]; \
+	_motAcc_est_shift[axis] = CAN_DATA[4]; \
+}
+
+//-------------------------------------------------------------------
 // GENERIC DEBUG PARAMETER
 #define CAN_SET_DEBUG_PARAM_HANDLER(x) \
 { \
@@ -1119,34 +1128,6 @@ else \
 
 //-------------------------------------------------------------------
 // GENERIC DEBUG PARAMETER
-#define CAN_SET_DEBUG_PARAM_1_HANDLER(x) \
-{ \
-	_debug_in1[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
-}
-	
-//-------------------------------------------------------------------
-// GENERIC DEBUG PARAMETER
-#define CAN_SET_DEBUG_PARAM_2_HANDLER(x) \
-{ \
-	_debug_in2[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
-}
-
-//-------------------------------------------------------------------
-// GENERIC DEBUG PARAMETER
-#define CAN_SET_DEBUG_PARAM_3_HANDLER(x) \
-{ \
-	_debug_in3[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
-}
-
-//-------------------------------------------------------------------
-// GENERIC DEBUG PARAMETER
-#define CAN_SET_DEBUG_PARAM_4_HANDLER(x) \
-{ \
-	_debug_in4[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
-}
-
-//-------------------------------------------------------------------
-// GENERIC DEBUG PARAMETER
 #define CAN_GET_DEBUG_PARAM_HANDLER(x) \
 { \
 	byte  index_dbg = CAN_DATA[1]; \
@@ -1161,54 +1142,6 @@ else \
 		else if (index_dbg==6) {CAN_DATA[1] = BYTE_H(_debug_in7[axis]);CAN_DATA[2] = BYTE_L(_debug_in7[axis]);} \
 		else if (index_dbg==7) {CAN_DATA[1] = BYTE_H(_debug_in8[axis]);CAN_DATA[2] = BYTE_L(_debug_in8[axis]);} \
 		 \
-		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
-}
-
-//-------------------------------------------------------------------
-// GENERIC DEBUG PARAMETER
-#define CAN_GET_DEBUG_PARAM_1_HANDLER(x) \
-{ \
-	PREPARE_HEADER; \
-		CAN_LEN = 3; \
-		CAN_DATA[1] = BYTE_H(_debug_in1[axis]); \
-		CAN_DATA[2] = BYTE_L(_debug_in1[axis]); \
-		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
-}
-
-//-------------------------------------------------------------------
-// GENERIC DEBUG PARAMETER
-#define CAN_GET_DEBUG_PARAM_2_HANDLER(x) \
-{ \
-	PREPARE_HEADER; \
-		CAN_LEN = 3; \
-		CAN_DATA[1] = BYTE_H(_debug_in2[axis]); \
-		CAN_DATA[2] = BYTE_L(_debug_in2[axis]); \
-		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
-}
-
-//-------------------------------------------------------------------
-// GENERIC DEBUG PARAMETER
-#define CAN_GET_DEBUG_PARAM_3_HANDLER(x) \
-{ \
-	PREPARE_HEADER; \
-		CAN_LEN = 3; \
-		CAN_DATA[1] = BYTE_H(_debug_in3[axis]); \
-		CAN_DATA[2] = BYTE_L(_debug_in3[axis]); \
-		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
-}
-
-//-------------------------------------------------------------------
-// GENERIC DEBUG PARAMETER
-#define CAN_GET_DEBUG_PARAM_4_HANDLER(x) \
-{ \
-	PREPARE_HEADER; \
-		CAN_LEN = 3; \
-		CAN_DATA[1] = BYTE_H(_debug_in4[axis]); \
-		CAN_DATA[2] = BYTE_L(_debug_in4[axis]); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
 		_general_board_error = ERROR_NONE; \
 }
