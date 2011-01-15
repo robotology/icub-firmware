@@ -366,7 +366,7 @@ inline Int32 compensate_bemf(byte j, Int16 motor_speed)
 	}
 	else
 	{
-		PWM_bemf = -(-PWM_bemf >> _debug_in4[j]+_jntVel_est_shift[j]);
+		PWM_bemf = -(-PWM_bemf >> (_debug_in4[j]+_jntVel_est_shift[j]));
 	}
 	return PWM_bemf;
 }
