@@ -31,6 +31,7 @@ void  check_desired_within_limits(byte i, Int32 previous_desired);
 void  init_smooth_pid(byte jnt,Int16 finalp,Int16 finald,byte finals, Int16 Time);
 void  smooth_pid(byte jnt);
 bool  read_force_data (byte,byte,byte);
+inline Int32 compensate_bemf(byte j, Int16 motor_speed);
 
 /******************************************************/
 // stable global data 
@@ -350,4 +351,26 @@ extern float _filt_pid[JN] ;			// filtered pid control
 	}\
 }
 
-#endif
+/***************************************************************************/
+/**
+ * This function calculates additional PWM required for back emf compensation
+ ***************************************************************************/
+inline Int32 compensate_bemf(byte j, Int16 motor_speed)
+{
+	Int32 PWM_bemf;
+	PWM_bemf = ((Int32) motor_speed) * ((Int32)_debug_in5[j]);
+	
+	if (PWM_bemf>=0)
+	{
+		PWM_bemf = PWM_bemf >> (_debug_in4[j]+_jntVel_est_shift[j]); 
+	}
+	else
+	{
+		PWM_bemf = -(-PWM_bemf >> _debug_in4[j]+_jntVel_est_shift[j]);
+	}
+	return PWM_bemf;
+}
+
+#endif //__pidh__
+
+
