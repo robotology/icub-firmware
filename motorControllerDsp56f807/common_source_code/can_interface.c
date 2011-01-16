@@ -62,8 +62,6 @@ extern UInt8 mainLoopOVF;
 extern int   _countBoardStatus[2];
 extern UInt8 highcurrent[2];
 
-void broadcast_strain_debug_info(void);
-
 #ifdef TEMPERATURE_SENSOR
 	extern UInt8   overtemp[2];
 	extern UInt8   errortemp[2];
@@ -523,72 +521,37 @@ void can_send_broadcast_identification(byte j)
 #endif 
 }
 
-/*********************************************************** 
- * send broadcast messages according to mask. DEBUG VERSION
- ***********************************************************/
-void broadcast_strain_debug_info(void)
+/********************************************************************* 
+ * Send broadcast debug messages
+ * you can (optionally) call this function from the main() in order
+ * to output the _debug[j] variables every <rate> milliseconds.
+ *********************************************************************/
+void can_send_broadcast_debug(byte j, int rate)
 {
-	UInt32 hall_pos0=0;
-	UInt32 hall_pos1=0;
-	Int32 commut0=0;
-	
-#if VERSION == 0x0170 
-        commut0= get_commutations(0);
-		_canmsg.CAN_data[0] = BYTE_H(_strain[0][5]);
-		_canmsg.CAN_data[1] = BYTE_L(_strain[0][5]);
-
-		if (DutyCycle[0].Dir==0)
-		{
-		    _canmsg.CAN_data[2] = BYTE_H((Int16)DutyCycle[0].Duty);
-			_canmsg.CAN_data[3] = BYTE_L((Int16)DutyCycle[0].Duty);		
-	    }
-		else
-		{
-			_canmsg.CAN_data[2] = BYTE_H(-1*(Int16)DutyCycle[0].Duty);
-			_canmsg.CAN_data[3] = BYTE_L(-1*(Int16)DutyCycle[0].Duty);
-		}
-				
-		/*_canmsg.CAN_data[4] = BYTE_4(commut0);
-		_canmsg.CAN_data[5] = BYTE_3(commut0);
-		_canmsg.CAN_data[6] = BYTE_2(commut0);
-		_canmsg.CAN_data[7] = BYTE_1(commut0);*/
-		_canmsg.CAN_data[4] = BYTE_H(_pid[0]);
-		_canmsg.CAN_data[5] = BYTE_L(_pid[0]);
-		_canmsg.CAN_data[6] = BYTE_H(_kp[0]);
-		_canmsg.CAN_data[7] = BYTE_L(_kp[0]);
-		
-#elif VERSION == 0x0171	
-		/*
-		_canmsg.CAN_data[0] = BYTE_H(_strain[5]);
-		_canmsg.CAN_data[1] = BYTE_L(_strain[5]);
-		*/
-		_canmsg.CAN_data[0] = BYTE_H(_debug_out1[1]);
-		_canmsg.CAN_data[1] = BYTE_L(_debug_out1[1]);
-		
-		if (DutyCycle[1].Dir==0)
-		{
-		    _canmsg.CAN_data[2] = BYTE_H((Int16)DutyCycle[1].Duty);
-			_canmsg.CAN_data[3] = BYTE_L((Int16)DutyCycle[1].Duty);		
-	    }
-		else
-		{
-			_canmsg.CAN_data[2] = BYTE_H(-1*(Int16)DutyCycle[1].Duty);
-			_canmsg.CAN_data[3] = BYTE_L(-1*(Int16)DutyCycle[1].Duty);
-		}
-				
-		_canmsg.CAN_data[4] = BYTE_H(_pid[1]);
-		_canmsg.CAN_data[5] = BYTE_L(_pid[1]);
-		_canmsg.CAN_data[6] = BYTE_H(_error_torque[1]);
-		_canmsg.CAN_data[7] = BYTE_L(_error_torque[1]);
-#endif		
+	static byte count = 0;
+	if (count==rate)
+	{
 		_canmsg.CAN_messID = 0x100;
 		_canmsg.CAN_messID |= (_board_ID) << 4;
-		_canmsg.CAN_messID |= CAN_BCAST_VELOCITY;		
+		_canmsg.CAN_messID |= CAN_BCAST_DEBUG;
+
+		_canmsg.CAN_data[0] = BYTE_H(_debug_out1[j]);
+		_canmsg.CAN_data[1] = BYTE_L(_debug_out1[j]);
+		_canmsg.CAN_data[2] = BYTE_H(_debug_out2[j]);
+		_canmsg.CAN_data[3] = BYTE_L(_debug_out2[j]);
+		
+		_canmsg.CAN_data[4] = BYTE_H(_debug_out3[j]);
+		_canmsg.CAN_data[5] = BYTE_L(_debug_out3[j]);
+		_canmsg.CAN_data[6] = BYTE_H(_debug_out4[j]);
+		_canmsg.CAN_data[7] = BYTE_L(_debug_out4[j]);
+			
 		_canmsg.CAN_length = 8;
 		_canmsg.CAN_frameType = DATA_FRAME;
-		CAN1_sendFrame (1, _canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);	
+		CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);		
+		count =0;
+	}
+	count++;
 }
-
 
 /*********************************************************** 
  * send broadcast messages according to mask 

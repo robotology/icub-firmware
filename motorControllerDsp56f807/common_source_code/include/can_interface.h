@@ -10,6 +10,7 @@ void can_interface_init (byte channels_num);
 byte can_interface (void);
 void can_send_broadcast(void);
 void can_send_broadcast_identification(byte j);
+void can_send_broadcast_debug(byte j, int rate);
 void set_can_masks();
 void create_F_M(UInt32 *filter,UInt32 *mask,byte _class1, byte _source1, byte _dest1, byte _class2, byte _source2, byte _dest2);
 void setmask(UInt32 filter1, UInt32 filter2, UInt32 mask1,UInt32 mask2);
@@ -136,8 +137,9 @@ void can_receive_additional_info();
 #define CAN_BCAST_PRINT				6
 #define CAN_BCAST_VELOCITY			7
 #define CAN_BCAST_PID_ERROR			8
+#define CAN_BCAST_DEBUG				9
 
-#define CAN_BCAST_MAX_MSGS			9
+#define CAN_BCAST_MAX_MSGS		   10
 
 #define MAIS_CAN_ID                 0xE 
 #define MAIS_8bit_D_MSG             0x3ED //8 bits value
