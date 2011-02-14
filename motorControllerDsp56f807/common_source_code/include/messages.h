@@ -1091,14 +1091,20 @@
 // GENERIC DEBUG PARAMETER
 #define CAN_SET_DEBUG_PARAM_HANDLER(x) \
 { \
-	if      (CAN_DATA[1]==0) _debug_in1[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
-	else if (CAN_DATA[1]==1) _debug_in2[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
-	else if (CAN_DATA[1]==2) _debug_in3[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
-	else if (CAN_DATA[1]==3) _debug_in4[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
-	else if (CAN_DATA[1]==4) _debug_in5[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
-	else if (CAN_DATA[1]==5) _debug_in6[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
-	else if (CAN_DATA[1]==6) _debug_in7[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
-	else if (CAN_DATA[1]==7) _debug_in8[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
+	if      (CAN_DATA[1]==0) _debug_in0[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
+	else if (CAN_DATA[1]==1) _debug_in1[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
+	else if (CAN_DATA[1]==2) _debug_in2[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
+	else if (CAN_DATA[1]==3) _backemf_shift[axis] = _debug_in3[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
+	else if (CAN_DATA[1]==4) _backemf_gain[axis]  = _debug_in4[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
+	else if (CAN_DATA[1]==5) _debug_in5[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
+	else if (CAN_DATA[1]==6) _debug_in6[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
+	else if (CAN_DATA[1]==7) _debug_in7[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
+	\
+	else if (CAN_DATA[1]==10) _param_a10_coeff = (float) (BYTE_W(CAN_DATA[2], CAN_DATA[3])) / 1000.0F; \
+	else if (CAN_DATA[1]==11) _param_a11_coeff = (float) (BYTE_W(CAN_DATA[2], CAN_DATA[3])) / 1000.0F; \
+	else if (CAN_DATA[1]==12) _param_a20_coeff = (float) (BYTE_W(CAN_DATA[2], CAN_DATA[3])) / 1000.0F; \
+	else if (CAN_DATA[1]==13) _param_a21_coeff = (float) (BYTE_W(CAN_DATA[2], CAN_DATA[3])) / 1000.0F; \
+	else if (CAN_DATA[1]==14) _param_a22_coeff = (float) (BYTE_W(CAN_DATA[2], CAN_DATA[3])) / 1000.0F; \
 }
 
 /*
@@ -1131,16 +1137,26 @@ else \
 #define CAN_GET_DEBUG_PARAM_HANDLER(x) \
 { \
 	byte  index_dbg = CAN_DATA[1]; \
+	Int16 val = 0; \
 	PREPARE_HEADER; \
 		CAN_LEN = 3; \
-		if      (index_dbg==0) {CAN_DATA[1] = BYTE_H(_debug_in1[axis]);CAN_DATA[2] = BYTE_L(_debug_in1[axis]);} \
-		else if (index_dbg==1) {CAN_DATA[1] = BYTE_H(_debug_in2[axis]);CAN_DATA[2] = BYTE_L(_debug_in2[axis]);} \
-		else if (index_dbg==2) {CAN_DATA[1] = BYTE_H(_debug_in3[axis]);CAN_DATA[2] = BYTE_L(_debug_in3[axis]);} \
-		else if (index_dbg==3) {CAN_DATA[1] = BYTE_H(_debug_in4[axis]);CAN_DATA[2] = BYTE_L(_debug_in4[axis]);} \
-		else if (index_dbg==4) {CAN_DATA[1] = BYTE_H(_debug_in5[axis]);CAN_DATA[2] = BYTE_L(_debug_in5[axis]);} \
-		else if (index_dbg==5) {CAN_DATA[1] = BYTE_H(_debug_in6[axis]);CAN_DATA[2] = BYTE_L(_debug_in6[axis]);} \
-		else if (index_dbg==6) {CAN_DATA[1] = BYTE_H(_debug_in7[axis]);CAN_DATA[2] = BYTE_L(_debug_in7[axis]);} \
-		else if (index_dbg==7) {CAN_DATA[1] = BYTE_H(_debug_in8[axis]);CAN_DATA[2] = BYTE_L(_debug_in8[axis]);} \
+		if      (index_dbg==0) {CAN_DATA[1] = BYTE_H(_debug_in0[axis]);CAN_DATA[2] = BYTE_L(_debug_in0[axis]);} \
+		else if (index_dbg==1) {CAN_DATA[1] = BYTE_H(_debug_in1[axis]);CAN_DATA[2] = BYTE_L(_debug_in1[axis]);} \
+		else if (index_dbg==2) {CAN_DATA[1] = BYTE_H(_debug_in2[axis]);CAN_DATA[2] = BYTE_L(_debug_in2[axis]);} \
+		else if (index_dbg==3) {CAN_DATA[1] = BYTE_H(_debug_in3[axis]);CAN_DATA[2] = BYTE_L(_debug_in3[axis]);} \
+		else if (index_dbg==4) {CAN_DATA[1] = BYTE_H(_debug_in4[axis]);CAN_DATA[2] = BYTE_L(_debug_in4[axis]);} \
+		else if (index_dbg==5) {CAN_DATA[1] = BYTE_H(_debug_in5[axis]);CAN_DATA[2] = BYTE_L(_debug_in5[axis]);} \
+		else if (index_dbg==6) {CAN_DATA[1] = BYTE_H(_debug_in6[axis]);CAN_DATA[2] = BYTE_L(_debug_in6[axis]);} \
+		else if (index_dbg==7) {CAN_DATA[1] = BYTE_H(_debug_in7[axis]);CAN_DATA[2] = BYTE_L(_debug_in7[axis]);} \
+		\
+		else if (index_dbg==10) {val=(Int16)(_param_a10_coeff*1000.0F); CAN_DATA[1] =BYTE_H(val);CAN_DATA[2] = BYTE_L(val);}\
+		else if (index_dbg==11) {val=(Int16)(_param_a11_coeff*1000.0F); CAN_DATA[1] =BYTE_H(val);CAN_DATA[2] = BYTE_L(val);}\
+		else if (index_dbg==12) {val=(Int16)(_param_a20_coeff*1000.0F); CAN_DATA[1] =BYTE_H(val);CAN_DATA[2] = BYTE_L(val);}\
+		else if (index_dbg==13) {val=(Int16)(_param_a21_coeff*1000.0F); CAN_DATA[1] =BYTE_H(val);CAN_DATA[2] = BYTE_L(val);}\
+		else if (index_dbg==14) {val=(Int16)(_param_a22_coeff*1000.0F);CAN_DATA[1] = BYTE_H(val);CAN_DATA[2] = BYTE_L(val);}\
+		else if (index_dbg==15) {val=0; CAN_DATA[1] =BYTE_H(val);CAN_DATA[2] = BYTE_L(val);}\
+		else if (index_dbg==16) {val=0; CAN_DATA[1] =BYTE_H(val);CAN_DATA[2] = BYTE_L(val);}\
+		else if (index_dbg==17) {val=0; CAN_DATA[1] =BYTE_H(val);CAN_DATA[2] = BYTE_L(val);}\
 		 \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
 		_general_board_error = ERROR_NONE; \
@@ -1605,6 +1621,22 @@ else \
 	else \
 		_general_board_error = ERROR_FMT; \
 }
+//-------------------------------------------------------------------
+#define CAN_GET_FIRMWARE_VERSION_HANDLER(x) \
+{ \
+	PREPARE_HEADER; \
+		CAN_LEN = 8; \
+		_canmsg.CAN_data[1] = CURRENT_BOARD_TYPE;   \
+		_canmsg.CAN_data[2] = (_version & 0xff00) >> 8; \
+		_canmsg.CAN_data[3] = _version & 0x00ff; 	    \
+		_canmsg.CAN_data[4] = _build_number & 0x00ff;   \
+		_canmsg.CAN_data[5] = 0; \
+		_canmsg.CAN_data[6] = 0; \
+		_canmsg.CAN_data[7] = 0; \
+		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
+		_general_board_error = ERROR_NONE; \
+}
+
 // end of messages 
 #endif
 

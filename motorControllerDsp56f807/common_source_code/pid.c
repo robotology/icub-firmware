@@ -41,20 +41,30 @@ Rec_Pid _received_pid[JN];
 Int32   _bfc_PWMoutput [JN] = INIT_ARRAY (0);
 
 // DEBUG VARIABLES
-Int16 _debug_in1[JN] = INIT_ARRAY (0); 		 		// general purpouse debug
-Int16 _debug_in2[JN] = INIT_ARRAY (0);				// general purpouse debug
-Int16 _debug_in3[JN] = INIT_ARRAY (0); 		 		// general purpouse debug
-Int16 _debug_in4[JN] = INIT_ARRAY (0);				// general purpouse debug
-Int16 _debug_in5[JN] = INIT_ARRAY (0); 		 		// general purpouse debug
-Int16 _debug_in6[JN] = INIT_ARRAY (0);				// general purpouse debug
-Int16 _debug_in7[JN] = INIT_ARRAY (0); 		 		// general purpouse debug
-Int16 _debug_in8[JN] = INIT_ARRAY (0);				// general purpouse debug
+Int16 _debug_in0[JN] = INIT_ARRAY (0); 		 		// general purpouse debug
+Int16 _debug_in1[JN] = INIT_ARRAY (0);				// general purpouse debug
+Int16 _debug_in2[JN] = INIT_ARRAY (0); 		 		// general purpouse debug
+Int16 _debug_in3[JN] = INIT_ARRAY (0);				// general purpouse debug
+Int16 _debug_in4[JN] = INIT_ARRAY (0); 		 		// general purpouse debug
+Int16 _debug_in5[JN] = INIT_ARRAY (0);				// general purpouse debug
+Int16 _debug_in6[JN] = INIT_ARRAY (0); 		 		// general purpouse debug
+Int16 _debug_in7[JN] = INIT_ARRAY (0);				// general purpouse debug
 Int16 _debug_out1[JN] = INIT_ARRAY (0); 		 	// general purpouse debug
 Int16 _debug_out2[JN] = INIT_ARRAY (0);				// general purpouse debug
 Int16 _debug_out3[JN] = INIT_ARRAY (0); 		 	// general purpouse debug
 Int16 _debug_out4[JN] = INIT_ARRAY (0);				// general purpouse debug
 byte  _t1c =0;
 
+// BACK-EMF COMPENSATION
+Int16 _backemf_gain[JN]  = INIT_ARRAY (0);
+Int16 _backemf_shift[JN] = INIT_ARRAY (0);
+
+// DECOUPLING PARAMETERS
+float _param_a10_coeff = -1.6455F;
+float _param_a11_coeff =  1.6455F;
+float _param_a20_coeff = -1.6455F;
+float _param_a21_coeff =  1.6455F;
+float _param_a22_coeff =  1.6455F;
 
 // POSITION VARIABLES
 Int32 _abs_pos_calibration[JN] = INIT_ARRAY (0); // absolute position to be reached during calibration
@@ -223,7 +233,7 @@ Int32 compute_pwm(byte j)
 	Int32 PWMoutput = 0;
 	Int32 Ioutput = 0;
 	byte  i=0;
-	Int32 ImpInputError=0;
+	Int32 speed_damping =0;
 
 		/*watchdog check for strain messages in torque control mode + input selection*/
 		//the function turns off pwm of joint <jnt> if <strain_num> watchdog is triggered
@@ -302,6 +312,9 @@ Int32 compute_pwm(byte j)
 		read_force_data (1, WDT_JNT_STRAIN_11,0); //@@@TODO differential 1 for icubV2
 		read_force_data (2, WDT_JNT_STRAIN_11,1); //@@@TODO differential wrist 2 for icubV2
 		read_force_data (3, -1				 ,0); //fingers disabled
+#elif	VERSION == 0x0351
+		//iKart has a fake torque mode that just compensates for back-emf
+		_strain_val[j]=0;
 #else
 	  	//other firmwares
 		//you should never execute this code
@@ -384,6 +397,10 @@ Int32 compute_pwm(byte j)
 		PWMoutput = PWMoutput + _ko[j];
 		_pd[j] = _pd[j] + _ko[j];
 	break;
+	case MODE_TORQUE: 
+		PWMoutput = compensate_bemf(j, _speed[j]);
+		_pd[j] = 0;
+	break;
 	case MODE_OPENLOOP:
 		PWMoutput = _ko[j];
 		_pd[j] = 0;
@@ -411,28 +428,27 @@ Int32 compute_pwm(byte j)
 	break;
 	case MODE_TORQUE: 
 		PWMoutput = compute_pid_torque(j, _strain_val[j]);
-		PWMoutput = PWMoutput + _ko_torque[j];
-		_pd[j] = _pd[j] + _ko_torque[j];
+		
+		// additional speed damping. It uses the same shift factor for bemf compensation
+		speed_damping = ((Int32) (-_speed[j]) * ((Int32) _debug_in7[j]));
+		speed_damping >>= (_backemf_shift[j]+_jntVel_est_shift[j]);
+		
+		PWMoutput = PWMoutput + _ko_torque[j] + speed_damping;
+		_pd[j] = _pd[j] + _ko_torque[j] + speed_damping;
+
+	
 	break;
 	case MODE_IMPEDANCE_POS:
 	case MODE_IMPEDANCE_VEL: 
 		compute_desired(j);
-		ImpInputError = L_sub(_position[j], _desired[j]);				
-		if (ImpInputError > MAX_16)
-			_error_position[j] = MAX_16;
-		else
-		if (ImpInputError < MIN_16) 
-			_error_position[j] = MIN_16;
-		else
-		{
-			_error_position[j] = extract_l(ImpInputError);
-		}		
-		_desired_torque[j] = -(Int32) _ks_imp[j] * (Int32)(_error_position[j]);
-		_desired_torque[j] += (Int32)_ko_imp[j];
-		_desired_torque[j] += -(Int32)_kd_imp[j] * (Int32)_speed[j];
+ #if 0
+		PWMoutput = compute_impedance_and_force(j);
+ #else
+		compute_pid_impedance(j);
 		PWMoutput = compute_pid_torque(j, _strain_val[j]);
 		PWMoutput = PWMoutput + _ko_torque[j];
 		_pd[j] = _pd[j] + _ko_torque[j];
+ #endif		
 	break;
 #endif
 
@@ -464,7 +480,7 @@ Int32 compute_pwm(byte j)
 	case MODE_IDLE:
 	#ifdef IDENTIF 
 		//parameters: j,  amp,  start_freq,  step_freq
-		reset_identif(j,_debug_in1[j],1,_debug_in2[j]);
+		reset_identif(j,_debug_in0[j],1,_debug_in1[j]);
 	#endif	
 		PWMoutput=0;
 	break; 
@@ -479,7 +495,68 @@ Int32 compute_pwm(byte j)
 }
 
 /*
- * compute PID torque (integral is implemented).
+ * compute PID impedence (integral is implemented).
+ */
+Int32 compute_pid_impedance(byte j)
+{
+	Int32 ImpInputError=0;
+	Int32 DampingPortion=0;
+	byte k=0;
+	static Int32 DmpAccu[JN]=INIT_ARRAY(0);  
+	static byte headDmpPor[JN]=INIT_ARRAY(0);  
+	static byte tailDmpPor[JN]=INIT_ARRAY(0); 
+	static Int32 DmpPort[2][10]={{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};	
+	
+	_error_position_old[j] = _error_position[j];
+	ImpInputError = L_sub(_position[j], _desired[j]);				
+	if (ImpInputError > MAX_16)
+	{
+		_error_position[j] = MAX_16;
+	}
+	else if (ImpInputError < MIN_16) 
+	{
+		_error_position[j] = MIN_16;	
+	}
+	else
+	{
+		_error_position[j] = extract_l(ImpInputError);
+	}		
+	
+	/* Proportional part (stiffness) */
+	_desired_torque[j] = -(Int32) _ks_imp[j] * (Int32)(_error_position[j]);
+
+	/* Additional offset (for gravity compensation) */
+	_desired_torque[j] += (Int32)_ko_imp[j];
+	
+	/* Derivative part (damping) */	
+	DampingPortion = -((Int32) (_error_position[j]-_error_position_old[j])) * ((Int32) _kd_imp[j]);
+	//DampingPortion = -((Int32) (_speed[j])) * ((Int32) _kd_imp[j]) >> _jntVel_est_shift[j];
+  
+    _debug_out1[j]=_kd_imp[j];
+    _debug_out2[j]=DampingPortion;
+    
+	#if (CURRENT_BOARD_TYPE  == BOARD_TYPE_BLL)
+		//derivative filtering in BLL boards
+		//this filter performs a mean on last 10 samples
+		DmpAccu[j] -= DmpPort[j][tailDmpPor[j]];
+		tailDmpPor[j]=headDmpPor[j]+1; if(tailDmpPor[j]>=10) tailDmpPor[j]=0;			
+		DmpPort[j][headDmpPor[j]] = DampingPortion;
+		DmpAccu[j] += DmpPort[j][headDmpPor[j]];
+
+		headDmpPor[j]=headDmpPor[j]+1; if(headDmpPor[j]>=10) headDmpPor[j]=0;
+		DampingPortion=DmpAccu[j]/10;
+	#endif
+	
+	_desired_torque[j] += DampingPortion;	
+	
+	_debug_out3[j]=DampingPortion;
+	_debug_out4[j]=_desired_torque[j];	
+	
+	return _desired_torque[j];
+}
+
+/*
+ * compute PID torque
  */
 Int32 compute_pid_torque(byte j, Int16 strain_val)
 {
@@ -491,9 +568,11 @@ Int32 compute_pid_torque(byte j, Int16 strain_val)
 
 	byte i=0;
 	byte k=0;
+	static Int32 DerAccu[JN]=INIT_ARRAY(0);  
+	static byte headDerPor[JN]=INIT_ARRAY(0);  
+	static byte tailDerPor[JN]=INIT_ARRAY(0); 
 	static Int32 DerPort[2][10]={{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};	
-	Int16 Coeff[10]={1,1,1,1,1,1,1,1,1,1};
-	Int16 Sum_Coeff=10; //should be equal to the sum of Coeffs
+	
 	
 	/* the error @ previous cycle */
 	
@@ -523,7 +602,7 @@ Int32 compute_pid_torque(byte j, Int16 strain_val)
 		ProportionalPortion = -(-ProportionalPortion >> _kr_torque[j]);
 	}
 	
-	/* Derivative */	
+	/* Force Derivative */	
 	DerivativePortion = ((Int32) (_error_torque[j]-_error_old_torque[j])) * ((Int32) _kd_torque[j]);
 
 	if (DerivativePortion>=0)
@@ -534,20 +613,15 @@ Int32 compute_pid_torque(byte j, Int16 strain_val)
 	{
 		DerivativePortion = -(-DerivativePortion >> _kr_torque[j]);
 	}
-  
-//	AS1_printDWordAsCharsDec(DerivativePortion);
-	for(k=9;k>0;k--)
-	{
-		DerPort[j][k]=DerPort[j][k-1];
-	}
-	DerPort[j][0]=DerivativePortion;
-	
-	DerivativePortion=0;
-	for(k=0;k<10;k++)
-	{ 
-		DerivativePortion+=DerPort[j][k]*Coeff[k];
-	}	
-	DerivativePortion=DerivativePortion/Sum_Coeff;
+	 
+    /* Derivative part filtering */
+	//this filter performs a mean on last 10 samples
+	DerAccu[j] -= DerPort[j][tailDerPor[j]];
+	tailDerPor[j]=headDerPor[j]+1; if(tailDerPor[j]>=10) tailDerPor[j]=0;			
+	DerPort[j][headDerPor[j]] = DerivativePortion;
+	DerAccu[j] += DerPort[j][headDerPor[j]];
+	headDerPor[j]=headDerPor[j]+1; if(headDerPor[j]>=10) headDerPor[j]=0;
+	DerivativePortion=DerAccu[j]/10;
 		
 	/* Integral */
 	IntegralError =  ( (Int32) _error_torque[j]) * ((Int32) _ki_torque[j]);
@@ -563,10 +637,6 @@ Int32 compute_pid_torque(byte j, Int16 strain_val)
 	{
 		IntegralPortion = -((-IntegralPortion) >> _kr_torque[j]); // integral reduction 
 	} 
-	if (IntegralPortion > MAX_16)
-		IntegralPortion = (Int32) MAX_16;
-	if (IntegralPortion < MIN_16) 
-		IntegralPortion = (Int32) MIN_16;
 
 	/* Accumulator saturation */
 	if (IntegralPortion >= _integral_limit_torque[j])
@@ -574,12 +644,11 @@ Int32 compute_pid_torque(byte j, Int16 strain_val)
 		IntegralPortion = _integral_limit_torque[j];
 		_integral[j] =  _integral_limit_torque[j];
 	}		
-	else
-		if (IntegralPortion < - (_integral_limit_torque[j]))
-		{
-			IntegralPortion = - (_integral_limit_torque[j]);
-			_integral[j] = (-_integral_limit_torque[j]);
-		}
+	else if (IntegralPortion < - (_integral_limit_torque[j]))
+	{
+		IntegralPortion = - (_integral_limit_torque[j]);
+		_integral[j] = (-_integral_limit_torque[j]);
+	}
 		
 	_pd[j] = L_add(ProportionalPortion, DerivativePortion);
 	_pi[j] = IntegralPortion;
@@ -601,9 +670,10 @@ Int32 compute_pid2(byte j)
 	byte i=0;
 	byte k=0;
 
+	static Int32 DerAccu[JN]=INIT_ARRAY(0);  
+	static byte headDerPor[JN]=INIT_ARRAY(0);  
+	static byte tailDerPor[JN]=INIT_ARRAY(0); 
 	static Int32 DerPort[2][10]={{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};	
-	Int16 Coeff[10]={1,1,1,1,1,1,1,1,1,1};
-	Int16 Sum_Coeff=10; //should be equal to the sum of Coeffs
 	
 	/* the error @ previous cycle */
 	
@@ -647,11 +717,11 @@ Int32 compute_pid2(byte j)
 
 	if (DerivativePortion>=0)
 	{
-		DerivativePortion = DerivativePortion >> _kr[j]; 
+		DerivativePortion = DerivativePortion >> (_kr[j]+_jntVel_est_shift[j]); 
 	}
 	else
 	{
-		DerivativePortion = -(-DerivativePortion >> _kr[j]);
+		DerivativePortion = -(-DerivativePortion >> (_kr[j]+_jntVel_est_shift[j]);
 	}
 
 #else
@@ -672,17 +742,13 @@ Int32 compute_pid2(byte j)
 
 #if (CURRENT_BOARD_TYPE  == BOARD_TYPE_BLL)
 	//derivative filtering in BLL boards
-	for(k=9;k>0;k--)
-	{
-		DerPort[j][k]=DerPort[j][k-1];
-	}
-	DerPort[j][0]=DerivativePortion;
-	DerivativePortion=0;
-	for(k=0;k<10;k++)
-	{ 
-		DerivativePortion+=DerPort[j][k]*Coeff[k];
-	}	
-	DerivativePortion=DerivativePortion/Sum_Coeff;
+	//this filter performs a mean on last 10 samples
+	DerAccu[j] -= DerPort[j][tailDerPor[j]];
+	tailDerPor[j]=headDerPor[j]+1; if(tailDerPor[j]>=10) tailDerPor[j]=0;			
+	DerPort[j][headDerPor[j]] = DerivativePortion;
+	DerAccu[j] += DerPort[j][headDerPor[j]];
+	headDerPor[j]=headDerPor[j]+1; if(headDerPor[j]>=10) headDerPor[j]=0;
+	DerivativePortion=DerAccu[j]/10;
 #endif
 
 	/* Integral */
@@ -709,10 +775,6 @@ Int32 compute_pid2(byte j)
 	{
 		IntegralPortion = -((-IntegralPortion) >> _kr[j]); // integral reduction 
 	} 
-	if (IntegralPortion > MAX_16)
-		IntegralPortion = (Int32) MAX_16;
-	if (IntegralPortion < MIN_16) 
-		IntegralPortion = (Int32) MIN_16;
 	
 	/* Accumulator saturation */
 	if (IntegralPortion >= _integral_limit[j])
@@ -720,12 +782,11 @@ Int32 compute_pid2(byte j)
 		IntegralPortion = _integral_limit[j];
 		_integral[j] =  _integral_limit[j];
 	}		
-	else
-		if (IntegralPortion < - (_integral_limit[j]))
-		{
-			IntegralPortion = - (_integral_limit[j]);
-			_integral[j] = (-_integral_limit[j]);
-		}
+	else if (IntegralPortion < - (_integral_limit[j]))
+	{
+		IntegralPortion = - (_integral_limit[j]);
+		_integral[j] = (-_integral_limit[j]);
+	}
 		
 	_pd[j] = L_add(ProportionalPortion, DerivativePortion);
 	_pi[j] = IntegralPortion;
@@ -749,9 +810,10 @@ Int32 compute_pid_speed(byte j)
 	byte i=0;
 	byte k=0;
 
+	static Int32 DerAccu[JN]=INIT_ARRAY(0);  
+	static byte headDerPor[JN]=INIT_ARRAY(0);  
+	static byte tailDerPor[JN]=INIT_ARRAY(0); 
 	static Int32 DerPort[2][10]={{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};	
-	Int16 Coeff[10]={1,1,1,1,1,1,1,1,1,1};
-	Int16 Sum_Coeff=10; //should be equal to the sum of Coeffs
 	
 	/* the error @ previous cycle */
 	
@@ -774,11 +836,11 @@ Int32 compute_pid_speed(byte j)
 	
 	if (ProportionalPortion>=0)
 	{
-		ProportionalPortion = ProportionalPortion >> _kr[j]; 
+		ProportionalPortion = ProportionalPortion >> (_kr[j]+_jntVel_est_shift[j]); 
 	}
 	else
 	{
-		ProportionalPortion = -(-ProportionalPortion >> _kr[j]);
+		ProportionalPortion = -(-ProportionalPortion >> (_kr[j]+_jntVel_est_shift[j]));
 	}
 	
 	/* Derivative */	
@@ -786,25 +848,20 @@ Int32 compute_pid_speed(byte j)
 
 	if (DerivativePortion>=0)
 	{
-		DerivativePortion = DerivativePortion >> _kr[j]; 
+		DerivativePortion = DerivativePortion >> (_kr[j]+_jntVel_est_shift[j]); 
 	}
 	else
 	{
-		DerivativePortion = -(-DerivativePortion >> _kr[j]);
+		DerivativePortion = -(-DerivativePortion >> (_kr[j]+_jntVel_est_shift[j]));
 	}
   
-	for(k=9;k>0;k--)
-	{
-		DerPort[j][k]=DerPort[j][k-1];
-	}
-	DerPort[j][0]=DerivativePortion;
-	
-	DerivativePortion=0;
-	for(k=0;k<10;k++)
-	{ 
-		DerivativePortion+=DerPort[j][k]*Coeff[k];
-	}	
-	DerivativePortion=DerivativePortion/Sum_Coeff;
+	//this filter performs a mean on last 10 samples
+	DerAccu[j] -= DerPort[j][tailDerPor[j]];
+	tailDerPor[j]=headDerPor[j]+1; if(tailDerPor[j]>=10) tailDerPor[j]=0;			
+	DerPort[j][headDerPor[j]] = DerivativePortion;
+	DerAccu[j] += DerPort[j][headDerPor[j]];
+	headDerPor[j]=headDerPor[j]+1; if(headDerPor[j]>=10) headDerPor[j]=0;
+	DerivativePortion=DerAccu[j]/10;
 		
 	/* Integral */
 	IntegralError =  ( (Int32) _error_speed[j]) * ((Int32) _ki[j]);
@@ -814,16 +871,12 @@ Int32 compute_pid_speed(byte j)
 	
 	if (IntegralPortion>=0)
 	{
-		IntegralPortion = (IntegralPortion >> _kr[j]); // integral reduction 
+		IntegralPortion = (IntegralPortion >> (_kr[j]+_jntVel_est_shift[j])); // integral reduction 
 	}
 	else
 	{
-		IntegralPortion = -((-IntegralPortion) >> _kr[j]); // integral reduction 
+		IntegralPortion = -((-IntegralPortion) >> (_kr[j]+_jntVel_est_shift[j])); // integral reduction 
 	} 
-	if (IntegralPortion > MAX_16)
-		IntegralPortion = (Int32) MAX_16;
-	if (IntegralPortion < MIN_16) 
-		IntegralPortion = (Int32) MIN_16;
 	
 	/* Accumulator saturation */
 	if (IntegralPortion >= _integral_limit[j])
@@ -831,8 +884,7 @@ Int32 compute_pid_speed(byte j)
 		IntegralPortion = _integral_limit[j];
 		_integral[j] =  _integral_limit[j];
 	}		
-	else
-	if (IntegralPortion < - (_integral_limit[j]))
+	else if (IntegralPortion < - (_integral_limit[j]))
 	{
 		IntegralPortion = - (_integral_limit[j]);
 		_integral[j] = (-_integral_limit[j]);
@@ -1360,4 +1412,161 @@ bool read_force_data (byte jnt, byte strain_num, byte strain_chan)
 		}
 	_strain_val[jnt]=_strain[strain_num][strain_chan];
 	return true;		
+}
+
+/***************************************************************** 
+ * compute_impedance_and_force (matteo version)
+ *****************************************************************/
+Int32 compute_impedance_and_force(byte j)
+{
+		
+		Int32 ProportionalPortion, DerivativePortion,InputErrorTrq,TorqueProportionalPortion,TorqueIntegralPortion;
+		Int32 TorqueIntegralError;
+		Int32 PIDoutput;
+		Int32 InputError;
+		byte i=0;
+		byte k=0;
+
+		static Int32 DerPort[2][10]={{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};	
+		Int16 Coeff[10]={1,1,1,1,1,1,1,1,1,1};
+		Int16 Sum_Coeff=10; //should be equal to the sum of Coeffs
+	
+	/* the error @ previous cycle */
+	
+		compute_desired(j);
+		_error_position_old[j] = _error_position[j];
+
+		InputError = L_sub(_desired[j], _position[j]);
+		
+		if (InputError > MAX_16)
+			_error_position[j] = MAX_16;
+		else
+		if (InputError < MIN_16) 
+			_error_position[j] = MIN_16;
+		else
+		{
+			_error_position[j] = extract_l(InputError);
+		}
+		
+		/* Proportional */
+		ProportionalPortion = ((Int32) _error_position[j]) * ((Int32)_debug_in0[j]);
+		
+		if (ProportionalPortion>=0)
+		{
+			ProportionalPortion = ProportionalPortion >> _debug_in2[j]; 
+		}
+		else
+		{
+			ProportionalPortion = -(-ProportionalPortion >> _debug_in2[j]);
+		}
+
+
+		/* Derivative */	
+		DerivativePortion = (((Int32) (_error_position[j]-_error_position_old[j])) * ((Int32) _debug_in1[j]));
+
+		if (DerivativePortion>=0)
+		{
+			DerivativePortion = DerivativePortion >> _debug_in2[j]; 
+		}
+		else
+		{
+			DerivativePortion = -(-DerivativePortion >> _debug_in2[j]);
+		}
+	  	
+
+		#if (CURRENT_BOARD_TYPE  == BOARD_TYPE_BLL)
+			//derivative filtering in BLL boards
+			for(k=9;k>0;k--)
+			{
+				DerPort[j][k]=DerPort[j][k-1];
+			}
+			DerPort[j][0]=DerivativePortion;
+			DerivativePortion=0;
+			for(k=0;k<10;k++)
+			{ 
+				DerivativePortion+=DerPort[j][k];//*Coeff[k];
+			}	
+			DerivativePortion=DerivativePortion/Sum_Coeff;
+		#endif
+
+	
+		_pd[j] = L_add(ProportionalPortion, DerivativePortion);
+
+
+	// computing torque feedback
+		_error_old_torque[j] = _error_torque[j];
+		_desired_torque[j] = _ko_imp[j];
+
+		InputErrorTrq = L_sub(	_desired_torque[j], (Int32)_strain_val[j]);
+				
+		if (InputErrorTrq > MAX_16)
+			_error_torque[j] = MAX_16;
+		else
+		if (InputError < MIN_16) 
+			_error_torque[j] = MIN_16;
+		else
+		{
+			_error_torque[j] = extract_l(InputErrorTrq);
+		}
+		/* Proportional */
+		TorqueProportionalPortion = ((Int32) _error_torque[j]) * ((Int32)_kp_torque[j]);
+		
+		if (TorqueProportionalPortion>=0)
+		{
+			TorqueProportionalPortion = TorqueProportionalPortion>> _kr_torque[j]; 
+		}
+		else
+		{
+			TorqueProportionalPortion = -(-TorqueProportionalPortion)>> _kr_torque[j];
+		}
+		_pd[j]=(_pd[j]) * ((Int32)_kp_torque[j]);
+		if (_pd[j]>=0)
+		{
+			_pd[j] = _pd[j]>> _kr_torque[j]; 
+		}
+		else
+		{
+			_pd[j] = -(-_pd[j])>> _kr_torque[j];
+		}
+		
+		PIDoutput = L_add(_pd[j],TorqueProportionalPortion); 
+		
+		/* Integral */
+//		TorqueIntegralError =  ( (Int32) _error_torque[j]) * ((Int32) _ki_torque[j]);
+//	
+//		_integral[j] = _integral[j] + TorqueIntegralError;
+//		TorqueIntegralPortion = _integral[j];
+//		
+//		if (TorqueIntegralPortion>=0)
+//		{
+//			TorqueIntegralPortion = (TorqueIntegralPortion >> _kr_torque[j]); // integral reduction 
+//		}
+//		else
+//		{
+//			TorqueIntegralPortion = -((-TorqueIntegralPortion) >> _kr_torque[j]); // integral reduction 
+//		} 
+//		if (TorqueIntegralPortion > MAX_16) 
+//			TorqueIntegralPortion = (Int32) MAX_16;
+//		if (TorqueIntegralPortion < MIN_16) 
+//			TorqueIntegralPortion = (Int32) MIN_16;
+//
+		/* Accumulator saturation */
+//		if (TorqueIntegralPortion >= _integral_limit_torque[j])
+//		{
+//			TorqueIntegralPortion = _integral_limit_torque[j];
+//			_integral[j] =  _integral_limit_torque[j];
+//		}		
+//		else
+//			if (TorqueIntegralPortion < - (_integral_limit_torque[j]))
+//			{
+//				TorqueIntegralPortion = - (_integral_limit_torque[j]);
+//				_integral[j] = (-_integral_limit_torque[j]);
+//			}
+//			
+//		_pi[j] = TorqueIntegralPortion;
+//		PIDoutput = L_add(PIDoutput, TorqueIntegralPortion);
+		
+		
+					
+	return PIDoutput;
 }

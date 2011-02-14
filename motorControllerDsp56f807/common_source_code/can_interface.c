@@ -16,7 +16,6 @@
 #include "brushless_comm.h"
 #include "strain_board.h"
 #include "filters.h"
-//#include "decoupling.h"
 #include "identification.h"
 
 #ifndef VERSION
@@ -447,6 +446,8 @@ byte can_interface (void)
 				HANDLE_MSG (CAN_GET_IMPEDANCE_PARAMS, CAN_GET_IMPEDANCE_PARAMS_HANDLER)
 				HANDLE_MSG (CAN_SET_IMPEDANCE_OFFSET, CAN_SET_IMPEDANCE_OFFSET_HANDLER)
 				HANDLE_MSG (CAN_GET_IMPEDANCE_OFFSET, CAN_GET_IMPEDANCE_OFFSET_HANDLER)
+				
+				HANDLE_MSG (CAN_GET_FIRMWARE_VERSION, CAN_GET_FIRMWARE_VERSION_HANDLER)
 										
 	//			HANDLE_MSG (CAN_GET_ACTIVE_ENCODER_POSITION, CAN_GET_ACTIVE_ENCODER_POSITION_HANDLER)
 			
@@ -647,7 +648,7 @@ void can_send_broadcast(void)
 		_canmsg.CAN_length = 8;
 		_canmsg.CAN_frameType = DATA_FRAME;
 
-#if (VERSION ==0x0154 || VERSION ==0x0155 || VERSION ==0x0158 || VERSION == 0x0351)
+#if (VERSION ==0x0154 || VERSION ==0x0155 || VERSION ==0x0158 || VERSION == 0x0351 || VERSION ==0x0151)
 		if(FAULT_ABS0 == 0)
 			CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
 #elif (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL)

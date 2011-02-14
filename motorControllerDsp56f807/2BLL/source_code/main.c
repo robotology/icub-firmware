@@ -39,7 +39,7 @@
 byte	_board_ID = 16;	
 char    _additional_info [32];
 UInt8    mainLoopOVF=0;
-word    _build_number = 53;
+word    _build_number = 55;
 int     _countBoardStatus[2] ={0,0};
 Int16   _flash_version=0; 
 UInt8   BUS_OFF=false;
@@ -128,15 +128,31 @@ void main(void)
 	Int16 print_number=0;
 	Int16 real_pos=0;
 	byte first_step=0;
-
-	byte headPos=0; //current pos/vel
-	byte tailPos=0; //tail is (head+1)%winSize
-	byte headVel=0; //current pos/vel
-	byte tailVel=0; //tail is (head+1)%winSize
-	byte winSizePos=1<<winShift; //size of the position window 
-	byte winSizeVel=1<<winShift; //size of the position window 
-	Int32 positionWindow[1<<winShift][JN]; //max window size: 254
-	Int32 velocityWindow[1<<winShift][JN]; //max window size: 254
+	
+#if (VERSION == 0x0351)
+	#define winSizeMax 32
+	#define initialWindowSize 4
+#else
+	#define winSizeMax 32
+	#define initialWindowSize 30
+#endif
+	byte divJntPos[JN]=INIT_ARRAY(initialWindowSize-1);
+	byte divJntVel[JN]=INIT_ARRAY(initialWindowSize-1);
+	byte divMotPos[JN]=INIT_ARRAY(initialWindowSize-1);
+	byte divMotVel[JN]=INIT_ARRAY(initialWindowSize-1);
+	byte headJntPos[JN]=INIT_ARRAY(0);  //current joint pos
+	byte tailJntPos[JN]=INIT_ARRAY(0); 
+	byte headJntVel[JN]=INIT_ARRAY(0);  //current joint vel
+	byte tailJntVel[JN]=INIT_ARRAY(0); 
+	byte headMotPos[JN]=INIT_ARRAY(0);  //current motor pos
+	byte tailMotPos[JN]=INIT_ARRAY(0); 
+	byte headMotVel[JN]=INIT_ARRAY(0);  //current motor vel
+	byte tailMotVel[JN]=INIT_ARRAY(0); 
+	Int32 jntPosWindow[winSizeMax][JN]; //max window size = winSizeMax
+	Int32 jntVelWindow[winSizeMax][JN]; //max window size = winSizeMax
+	Int32 motPosWindow[winSizeMax][JN]; //max window size = winSizeMax
+	Int32 motVelWindow[winSizeMax][JN]; //max window size = winSizeMax
+		
   	Int16 _safeband[JN];	//it is a value for reducing the JOINT limit of 2*_safeband [tick encoder]
 #ifdef TEMPERATURE_SENSOR
 	byte   TempSensCount1 = 0;
@@ -298,14 +314,13 @@ void main(void)
 	/* (for velocity and position estimates) */
 	for(i=0;i<JN;i++)
 	{
-		for(wi=0;wi<winSizePos;wi++)
+		for(wi=0;wi<winSizeMax;wi++)
 		{
-			positionWindow[wi][i]=_position[i];	
+			jntPosWindow[wi][i]=_position[i];	
+			jntVelWindow[wi][i]=0;
+			motPosWindow[wi][i]=0;	
+			motVelWindow[wi][i]=0;
 		}
-		for(wi=0;wi<winSizeVel;wi++)
-		{
-			velocityWindow[wi][i]=0;	
-		}	
 	}
 	
 	//set_relative_position_abs_ssi(1,get_absolute_real_position_abs_ssi(1));
@@ -391,7 +406,11 @@ void main(void)
 		}
 #endif 
 
-
+		// get_commutations() is used to read the hall effect sensor of the motors.
+		// the variable _motor_position is then used to estimate the rotor speed and
+		// compensate the back-EMF of the motor.
+		for (i=0; i<JN; i++) _motor_position[i]=get_commutations(i);
+		
 ///////////////////////////////////////////DEBUG////////////
 // ADDED VERSION !=0x0171
 #if (VERSION !=0x0154) && (VERSION !=0x0155) && (VERSION !=0x0171) && (VERSION !=0x0158)
@@ -427,44 +446,40 @@ void main(void)
 		// decoupling the position	 	
 		decouple_positions();
 		
-#ifdef DEBUG_TRAJECTORY
-		if (_verbose && _counter == 0)
-		{
+
+		/* velocity and acceleration estimators */
+		{	
 			for (i=0; i<JN; i++)
-			{
-				AS1_printDWordAsCharsDec (_position[i]);
-				AS1_printStringEx (" ");	
+			{	
+				//joint velocity estimator
+				tailJntPos[i]=headJntPos[i]+(winSizeMax-divJntPos[i]); if(tailJntPos[i]>=winSizeMax) tailJntPos[i]=tailJntPos[i]%winSizeMax;			
+				_speed_old[i] = _speed[i];
+				jntPosWindow[headJntPos[i]][i]=_position[i];
+				_speed[i] = ((jntPosWindow[headJntPos[i]][i] - jntPosWindow[tailJntPos[i]][i] ));
+				_speed[i] <<= _jntVel_est_shift[i];
+				_speed[i] = (Int32)(_speed[i]) / divJntPos[i];
+				headJntPos[i]=headJntPos[i]+1; if(headJntPos[i]>=winSizeMax) headJntPos[i]=0;
+/*
+				//joint acceleration estimator
+				tailJntVel[i]=headJntVel[i]+(winSizeMax-divJntVel[i]); if(tailJntVel[i]>=winSizeMax) tailJntVel[i]=tailJntVel[i]%winSizeMax;			
+				_accel_old[i] = _accel[i];
+				jntVelWindow[headJntVel[i]][i]=_speed[i];
+				_accel[i] = ((jntVelWindow[headJntVel[i]][i] - jntVelWindow[tailJntVel[i]][i] ));
+				_accel[i] << _jntAcc_est_shift[i];
+				_accel[i] = (Int32)(_accel[i]) / divJntVel[i];
+				headJntVel[i]=headJntVel[i]+1; if(headJntVel[i]>=winSizeMax) headJntVel[i]=0;
+*/				
+				//motor velocity estimator
+				tailMotPos[i]=headMotPos[i]+(winSizeMax-divMotPos[i]); if(tailMotPos[i]>=winSizeMax) tailMotPos[i]=tailMotPos[i]%winSizeMax;			
+				_comm_speed_old[i] = _comm_speed[i];
+				motPosWindow[headMotPos[i]][i]=_motor_position[i];
+				_comm_speed[i] = ((motPosWindow[headMotPos[i]][i] - motPosWindow[tailMotPos[i]][i] ));
+				_comm_speed[i] <<= _motVel_est_shift[i];
+				_comm_speed[i] = (Int32)(_comm_speed[i]) / divMotPos[i];
+				headMotPos[i]=headMotPos[i]+1; if(headMotPos[i]>=winSizeMax) headMotPos[i]=0;				
+
 			}
-			AS1_printStringEx ("\r\n");
 		}
-#endif
-
-		//if (_counter == 0)
-		//{	
-		
-		//tail= (tail+1)%winSize;
-		tailPos=headPos+1; if(tailPos==winSizePos) tailPos=0;
-		tailVel=headVel+1; if(tailVel==winSizeVel) tailVel=0;
-		/* store the new position in the circular buffer */
-		for (i=0; i<JN; i++) positionWindow[headPos][i]=_position[i];
-				
-		/* compute speed and acceleration, and store the speed in the circular buffer */		
-		for (i=0; i<JN; i++)
-		{
-			velocityWindow[headVel][i]= ((positionWindow[headPos][i] - positionWindow[tailPos][i] ));//>>winShift;
-			_speed[i]= (Int16)(velocityWindow[headVel][i]);
-			_accel[i]= (Int16)((velocityWindow[headVel][i] - velocityWindow[tailVel][i]));//>>winShift;
-		}
-
-		
-		/* advance in the circular buffer */
-		//head= (head+1)%winSize;
-		headPos=headPos+1; if(headPos==winSizePos) headPos=0;
-		headVel=headVel+1; if(headVel==winSizeVel) headVel=0;
-				
-	
-		//}
-		
 					
 		/* in position? */
 #if (VERSION != 0x0154) && (VERSION != 0x0155) && (VERSION != 0x0158)
@@ -489,6 +504,7 @@ led0_on
 			PWMoutput[i] = compute_pwm(i);
 
 			// PWM filtering in torque control 
+			#if (VERSION != 0x0351)
 			if (_control_mode[i] == MODE_TORQUE ||
 			 	_control_mode[i] == MODE_IMPEDANCE_POS ||
 			 	_control_mode[i] == MODE_IMPEDANCE_VEL)
@@ -501,11 +517,16 @@ led0_on
 			// applying the saturation to the PWM
 			if      (_bfc_PWMoutput[i] < -MAX_DUTY) _bfc_PWMoutput[i]=-MAX_DUTY;
 			else if (_bfc_PWMoutput[i] > MAX_DUTY)  _bfc_PWMoutput[i]= MAX_DUTY;
+			#endif //(VERSION != 0x0351)			
 		}
 
 //		decouple PWM	
 #ifdef USE_NEW_DECOUPLING
+		#ifdef USE_PARAMETRIC_DECOUPLING
+		decouple_dutycycle_new_joint_parametric(PWMoutput);  //parametric version
+		#else
 		decouple_dutycycle_new_joint(PWMoutput); //new version (july 2010) with torque decupling
+		#endif
 #else
 		decouple_dutycycle(PWMoutput);				
 #endif
@@ -514,17 +535,28 @@ led0_on
 led0_off	
 		
 //******************************************* SATURATES CONTROLS ***************************/                
-		/* saturates controls if necessary */
+		/* back emf compensation + controls saturation (if necessary) */
 		for (i=0; i<JN; i++)
 		{
 			if (_control_mode[i] == MODE_TORQUE ||
 				_control_mode[i] == MODE_IMPEDANCE_POS ||
 				_control_mode[i] == MODE_IMPEDANCE_VEL)
 			{
+				#if (VERSION != 0x0351)
+				// Back emf compensation
+				/*_debug_out1[i]=PWMoutput[i];
+				_debug_out2[i]=compensate_bemf(i, _comm_speed[i]);
+				PWMoutput[i]+=_debug_out2[i];
+				_debug_out3[i]=PWMoutput[i];			
+				*/
+				PWMoutput[i]+=compensate_bemf(i, _comm_speed[i]);
 				// Protection for joints out of the admissible range during force control
 				check_range_torque(i, _safeband[i], PWMoutput);
 				// PWM saturation
 				ENFORCE_LIMITS	(i,PWMoutput[i], _pid_limit_torque[i] );
+				#else  //(VERSION != 0x0351)
+				ENFORCE_LIMITS	(i,PWMoutput[i], _pid_limit[i] );
+				#endif //(VERSION != 0x0351)
 			}
 			else
 			{
@@ -552,8 +584,12 @@ led0_off
 		/* Check Current done in T1 */
 
 		/* do extra functions, communicate, etc. */
-		
+		//send broadcast data	
 		can_send_broadcast();
+
+		//send additional debug information
+		//can_send_broadcast_debug(1,1);
+
 #ifdef IDENTIF
 #warning "***** IDENTIFICATION MODE ON *****"
 		can_send_broadcast_identification(IDENTIF); //IDENTIF is the axis number 

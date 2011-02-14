@@ -32,7 +32,7 @@
 byte	_board_ID = 15;	
 
 char    _additional_info [32];
-word    _build_number = 40;
+word    _build_number = 41;
 UInt8    mainLoopOVF = 0;
 int     _countBoardStatus[2] ={0,0};
 UInt8   highcurrent[4]={false,false,false,false};

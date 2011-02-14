@@ -20,6 +20,8 @@
 Int32 compute_pwm(byte j);
 Int32 compute_pid2(byte j);
 Int32 compute_pid_speed(byte j);
+Int32 compute_pid_impedance(byte j);
+Int32 compute_impedance_and_force(byte j);
 Int32 compute_pid_torque(byte j, Int16 strain_val);
 Int32 compute_current_pid(byte j);
 Int32 compute_pid_abs(byte j);
@@ -83,6 +85,7 @@ extern Int32   _bfc_PWMoutput [JN];
 
 // DEBUG VARIABLES
 extern byte  _t1c;                      // general purpouse counter
+extern Int16 _debug_in0[JN] ;			// general purpouse debug
 extern Int16 _debug_in1[JN] ;			// general purpouse debug
 extern Int16 _debug_in2[JN] ;			// general purpouse debug
 extern Int16 _debug_in3[JN] ;			// general purpouse debug
@@ -90,11 +93,14 @@ extern Int16 _debug_in4[JN] ;			// general purpouse debug
 extern Int16 _debug_in5[JN] ;			// general purpouse debug
 extern Int16 _debug_in6[JN] ;			// general purpouse debug
 extern Int16 _debug_in7[JN] ;			// general purpouse debug
-extern Int16 _debug_in8[JN] ;			// general purpouse debug
 extern Int16 _debug_out1[JN] ;			// general purpouse debug
 extern Int16 _debug_out2[JN] ;			// general purpouse debug
 extern Int16 _debug_out3[JN] ;			// general purpouse debug
 extern Int16 _debug_out4[JN] ;			// general purpouse debug
+
+// BACK-EMF COMPENSATION
+extern Int16 _backemf_gain[JN];
+extern Int16 _backemf_shift[JN];
 
 // POSITION VARIABLES											
 extern Int32 _abs_pos_calibration[JN] ;	// absolute position to be reached during calibration
@@ -189,6 +195,12 @@ extern Int16  _ks_imp[JN] ;				// stiffness coeffficient
 extern Int16  _kd_imp[JN] ;				// damping coeffficient
 extern Int16  _ko_imp[JN] ;				// offset
 
+// DECOUPLING PARAMETERS
+extern float  _param_a10_coeff;
+extern float  _param_a11_coeff;
+extern float  _param_a20_coeff;
+extern float  _param_a21_coeff;
+extern float  _param_a22_coeff;
 								
 #if VERSION == 0x0156 || VERSION == 0x0166 || VERSION == 0x0116
 // CURRENT PID
@@ -358,15 +370,15 @@ extern float _filt_pid[JN] ;			// filtered pid control
 inline Int32 compensate_bemf(byte j, Int16 motor_speed)
 {
 	Int32 PWM_bemf;
-	PWM_bemf = ((Int32) motor_speed) * ((Int32)_debug_in5[j]);
+	PWM_bemf = ((Int32) motor_speed) * ((Int32)_backemf_gain[j]);
 	
 	if (PWM_bemf>=0)
 	{
-		PWM_bemf = PWM_bemf >> (_debug_in4[j]+_jntVel_est_shift[j]); 
+		PWM_bemf = PWM_bemf >> (_backemf_shift[j]+_jntVel_est_shift[j]); 
 	}
 	else
 	{
-		PWM_bemf = -(-PWM_bemf >> (_debug_in4[j]+_jntVel_est_shift[j]));
+		PWM_bemf = -(-PWM_bemf >> (_backemf_shift[j]+_jntVel_est_shift[j]));
 	}
 	return PWM_bemf;
 }

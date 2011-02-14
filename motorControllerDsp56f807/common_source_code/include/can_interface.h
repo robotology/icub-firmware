@@ -123,7 +123,9 @@ void can_receive_additional_info();
 #define CAN_SET_IMPEDANCE_OFFSET    89
 #define CAN_GET_IMPEDANCE_OFFSET    90
 
-#define NUM_OF_MESSAGES				91
+#define CAN_GET_FIRMWARE_VERSION    91
+
+#define NUM_OF_MESSAGES				92
 
 // class 1 messages, broadcast 
 // when in bcast mode, messages are sent periodically by the controller
