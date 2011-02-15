@@ -56,7 +56,11 @@ extern byte	_board_ID;
 extern void  bootStart(void);            // Defined in linker.cmd file  
 extern char  _additional_info [32];
 
-extern word _build_number;
+extern byte _build_number;
+extern byte _my_can_protocol_major;
+extern byte _my_can_protocol_minor;
+extern bool _can_protocol_ack;
+
 extern UInt8 mainLoopOVF;
 extern int   _countBoardStatus[2];
 extern UInt8 highcurrent[2];
@@ -292,7 +296,7 @@ byte can_interface (void)
 								_canmsg.CAN_data[1] = CURRENT_BOARD_TYPE;  
 								_canmsg.CAN_data[2] = (_version & 0xff00) >> 8;  // firmware version.	
 								_canmsg.CAN_data[3] = _version & 0x00ff; 		 // firmware revision.
-								_canmsg.CAN_data[4] = _build_number & 0x00ff;    // build number
+								_canmsg.CAN_data[4] = _build_number;             // build number
 								CAN1_send(IdTx, DATA_FRAME, 5, _canmsg.CAN_data);
 
 								

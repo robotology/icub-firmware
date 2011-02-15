@@ -229,6 +229,11 @@
 #if VERSION == 0x0152 || VERSION == 0x0162 
 	#define CAN_ENABLE_PWM_PAD_HANDLER(x) \
 	{ \
+		if (_can_protocol_ack == false) \
+		{ \
+			can_printf("can protocol NOT ack"); \
+			break; \
+		} \
 		if (_calibrated[0] == true && _calibrated[1] == true) \
 		{ \
 			if (_pad_enabled[0] == false &&	_pad_enabled[1] == false) \
@@ -247,6 +252,11 @@
 #elif VERSION == 0x0129 
 	#define CAN_ENABLE_PWM_PAD_HANDLER(x) \
 	{ \
+		if (_can_protocol_ack == false) \
+		{ \
+			can_printf("can protocol NOT ack"); \
+			break; \
+		} \
 		if ((axis>0) && (axis<3))\
 		{\
 			if (_pad_enabled[1] == false &&	_pad_enabled[2] == false) \
@@ -268,6 +278,11 @@
 #elif VERSION == 0x0351 
 	#define CAN_ENABLE_PWM_PAD_HANDLER(x) \
 	{ \
+		if (_can_protocol_ack == false) \
+		{ \
+			can_printf("can protocol NOT ack"); \
+			break; \
+		} \
 		if (_board_ID==1) \
 		{ \
 			if (_pad_enabled[0] == false &&	_pad_enabled[1] == false) \
@@ -305,6 +320,11 @@
 	#if (CURRENT_BOARD_TYPE  == BOARD_TYPE_4DC)
 		#define CAN_ENABLE_PWM_PAD_HANDLER(x) \
 		{ \
+			if (_can_protocol_ack == false) \
+			{ \
+				can_printf("can protocol NOT ack"); \
+				break; \
+			} \
 			PWM_outputPadEnable(axis); \
 			_control_mode[axis] = MODE_IDLE; \
 			_general_board_error = ERROR_NONE; \
@@ -313,6 +333,11 @@
 	#else //(CURRENT_BOARD_TYPE  == BOARD_TYPE_4DC)
 		#define CAN_ENABLE_PWM_PAD_HANDLER(x) \
 		{ \
+			if (_can_protocol_ack == false) \
+			{ \
+				can_printf("can protocol NOT ack"); \
+				break; \
+			} \
 			if (_calibrated[axis] == true) \
 			{ \
 				PWM_outputPadEnable(axis); \
@@ -1624,15 +1649,19 @@ else \
 //-------------------------------------------------------------------
 #define CAN_GET_FIRMWARE_VERSION_HANDLER(x) \
 { \
+	byte server_can_protocol_major = CAN_DATA[1]; \
+	byte server_can_protocol_minor = CAN_DATA[2]; \
 	PREPARE_HEADER; \
 		CAN_LEN = 8; \
+		_can_protocol_ack = (_my_can_protocol_major == server_can_protocol_major && \
+						     _my_can_protocol_minor == server_can_protocol_minor); \
 		_canmsg.CAN_data[1] = CURRENT_BOARD_TYPE;   \
 		_canmsg.CAN_data[2] = (_version & 0xff00) >> 8; \
 		_canmsg.CAN_data[3] = _version & 0x00ff; 	    \
-		_canmsg.CAN_data[4] = _build_number & 0x00ff;   \
-		_canmsg.CAN_data[5] = 0; \
-		_canmsg.CAN_data[6] = 0; \
-		_canmsg.CAN_data[7] = 0; \
+		_canmsg.CAN_data[4] = _build_number ;   \
+		_canmsg.CAN_data[5] = _my_can_protocol_major; \
+		_canmsg.CAN_data[6] = _my_can_protocol_minor; \
+		_canmsg.CAN_data[7] = (byte)(_can_protocol_ack); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
 		_general_board_error = ERROR_NONE; \
 }

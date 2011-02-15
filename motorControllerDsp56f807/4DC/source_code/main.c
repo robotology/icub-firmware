@@ -30,9 +30,12 @@
 #include "check_range.h"
 	
 byte	_board_ID = 15;	
-
 char    _additional_info [32];
-word    _build_number = 41;
+byte    _build_number = 41;
+byte    _my_can_protocol_major = 1;
+byte    _my_can_protocol_minor = 1;
+bool    _can_protocol_ack = false;
+
 UInt8    mainLoopOVF = 0;
 int     _countBoardStatus[2] ={0,0};
 UInt8   highcurrent[4]={false,false,false,false};

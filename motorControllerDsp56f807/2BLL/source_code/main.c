@@ -39,7 +39,11 @@
 byte	_board_ID = 16;	
 char    _additional_info [32];
 UInt8    mainLoopOVF=0;
-word    _build_number = 55;
+byte    _build_number = 55;
+byte    _my_can_protocol_major = 1;
+byte    _my_can_protocol_minor = 1;
+bool    _can_protocol_ack = false;
+
 int     _countBoardStatus[2] ={0,0};
 Int16   _flash_version=0; 
 UInt8   BUS_OFF=false;
