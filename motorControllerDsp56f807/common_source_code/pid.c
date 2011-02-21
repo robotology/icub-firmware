@@ -721,7 +721,7 @@ Int32 compute_pid2(byte j)
 	}
 	else
 	{
-		DerivativePortion = -(-DerivativePortion >> (_kr[j]+_jntVel_est_shift[j]);
+		DerivativePortion = -(-DerivativePortion >> (_kr[j]+_jntVel_est_shift[j]));
 	}
 
 #else
