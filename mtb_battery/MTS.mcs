@@ -1,0 +1,357 @@
+[Header]
+MagicCookie={0b13fe8c-dfe0-40eb-8900-6712719559a7}
+Version=1.0
+[File000]
+Location=C:\Documents and Settings\maggia\Desktop\Firmware\Randaz\can_protocol.o
+Folder=Intermediary
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall
+TraceCmdString=
+DebugOptions=
+[File001]
+Location=C:\Documents and Settings\maggia\Desktop\Firmware\Randaz\eeprom.o
+Folder=Intermediary
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall
+TraceCmdString=
+DebugOptions=
+[File002]
+Location=C:\Documents and Settings\maggia\Desktop\Firmware\Randaz\I2C.o
+Folder=Intermediary
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall
+TraceCmdString=
+DebugOptions=
+[File003]
+Location=C:\Documents and Settings\maggia\Desktop\Firmware\Randaz\T1.o
+Folder=Intermediary
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall
+TraceCmdString=
+DebugOptions=
+[File004]
+Location=C:\Documents and Settings\maggia\Desktop\Firmware\Randaz\traps.o
+Folder=Intermediary
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall
+TraceCmdString=
+DebugOptions=
+[File005]
+Location=C:\Documents and Settings\maggia\Desktop\Firmware\Randaz\serial_interface.o
+Folder=Intermediary
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall
+TraceCmdString=
+DebugOptions=
+[File006]
+Location=C:\Documents and Settings\maggia\Desktop\Firmware\Randaz\main_S2.o
+Folder=Intermediary
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall
+TraceCmdString=
+DebugOptions=
+[File007]
+Location=C:\Software\mtb\can_protocol.o
+Folder=Intermediary
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall
+TraceCmdString=
+DebugOptions=
+[File008]
+Location=C:\Software\mtb\eeprom.o
+Folder=Intermediary
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall
+TraceCmdString=
+DebugOptions=
+[File009]
+Location=C:\Software\mtb\I2C.o
+Folder=Intermediary
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall
+TraceCmdString=
+DebugOptions=
+[File010]
+Location=C:\Software\mtb\T1.o
+Folder=Intermediary
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall
+TraceCmdString=
+DebugOptions=
+[File011]
+Location=C:\Software\mtb\traps.o
+Folder=Intermediary
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall
+TraceCmdString=
+DebugOptions=
+[File012]
+Location=C:\Software\mtb\serial_interface.o
+Folder=Intermediary
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall
+TraceCmdString=
+DebugOptions=
+[File013]
+Location=C:\Software\mtb\main_S2.o
+Folder=Intermediary
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall
+TraceCmdString=
+DebugOptions=
+[File014]
+Location=C:\Software\iCub\firmware\mtb_battery\can_protocol.o
+Folder=Intermediary
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall
+TraceCmdString=
+DebugOptions=
+[File015]
+Location=C:\Software\iCub\firmware\mtb_battery\eeprom.o
+Folder=Intermediary
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall
+TraceCmdString=
+DebugOptions=
+[File016]
+Location=C:\Software\iCub\firmware\mtb_battery\I2C.o
+Folder=Intermediary
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall
+TraceCmdString=
+DebugOptions=
+[File017]
+Location=C:\Software\iCub\firmware\mtb_battery\T1.o
+Folder=Intermediary
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall
+TraceCmdString=
+DebugOptions=
+[File018]
+Location=C:\Software\iCub\firmware\mtb_battery\traps.o
+Folder=Intermediary
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall
+TraceCmdString=
+DebugOptions=
+[File019]
+Location=C:\Software\iCub\firmware\mtb_battery\serial_interface.o
+Folder=Intermediary
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall
+TraceCmdString=
+DebugOptions=
+[File020]
+Location=C:\Software\iCub\firmware\mtb_battery\main_S2.o
+Folder=Intermediary
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={069BD372-6CA0-40D4-BF2F-5DC806D05083}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-g -Wall
+TraceCmdString=
+DebugOptions=
+[File021]
+Location=C:\Documents and Settings\maggia\Desktop\Firmware\Randaz\MTS.cof
+Folder=Output
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={433C3D55-811D-409D-A6BF-159CF9355B42}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-ld.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)" -Map="$(BINDIR_)$(TARGETBASE).map" --report-mem
+TraceCmdString=
+DebugOptions=
+[File022]
+Location=C:\Documents and Settings\maggia\Desktop\Firmware\Randaz\MTS.hex
+Folder=Output
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={433C3D55-811D-409D-A6BF-159CF9355B42}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-ld.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)" -Map="$(BINDIR_)$(TARGETBASE).map" --report-mem
+TraceCmdString=
+DebugOptions=
+[File023]
+Location=C:\Software\mtb\MTS.cof
+Folder=Output
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={433C3D55-811D-409D-A6BF-159CF9355B42}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-ld.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)" -Map="$(BINDIR_)$(TARGETBASE).map" --report-mem
+TraceCmdString=
+DebugOptions=
+[File024]
+Location=C:\Software\mtb\MTS.hex
+Folder=Output
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={433C3D55-811D-409D-A6BF-159CF9355B42}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-ld.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)" -Map="$(BINDIR_)$(TARGETBASE).map" --report-mem
+TraceCmdString=
+DebugOptions=
+[File025]
+Location=C:\Software\iCub\firmware\mtb_battery\MTS.cof
+Folder=Output
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={433C3D55-811D-409D-A6BF-159CF9355B42}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-ld.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)" -Map="$(BINDIR_)$(TARGETBASE).map" --report-mem
+TraceCmdString=
+DebugOptions=
+[File026]
+Location=C:\Software\iCub\firmware\mtb_battery\MTS.hex
+Folder=Output
+DeviceName=dsPIC30F4011
+LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
+LanguageToolID={433C3D55-811D-409D-A6BF-159CF9355B42}
+LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-ld.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(INCDIR)|C:\Program Files\Microchip\MPLAB C30\src\peripheral_30F_24H_33F\src\pmc||$(LIBDIR)|C:\Program Files\Program Files\Microchip\MPLAB C30\lib||$(LKRDIR)||
+SOLK=<src>|can_protocol.c|eeprom.c|I2C.c|T1.c|traps.c|serial_interface.c|main_S2.c||<obj>||<lib>||<lkr>||
+SuiteArgsString=
+ToolArgsString=-o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)" -Map="$(BINDIR_)$(TARGETBASE).map" --report-mem
+TraceCmdString=
+DebugOptions=
+[TOOL_LOC_STAMPS]
+tool_loc{069BD372-6CA0-40D4-BF2F-5DC806D05083}=C:\Program Files\Microchip\MPLAB C30\bin\pic30-gcc.exe
+tool_loc{433C3D55-811D-409D-A6BF-159CF9355B42}=C:\Program Files\Microchip\MPLAB C30\bin\pic30-ld.exe
