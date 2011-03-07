@@ -708,11 +708,11 @@ Int32 compute_pid2(byte j)
 	/* Derivative */	
 	if (j==0)
 	{
-		DerivativePortion = ((Int32) (_speed[0]-_speed[1])) * ((Int32) _kd[j]);	
+		DerivativePortion = ((Int32) -(_speed[0]-_speed[1])) * ((Int32) _kd[j]);	
 	}
 	else 
 	{
-		DerivativePortion = ((Int32) (_speed[0]+_speed[1])) * ((Int32) _kd[j]);	
+		DerivativePortion = ((Int32) -(_speed[0]+_speed[1])) * ((Int32) _kd[j]);	
 	}
 
 	if (DerivativePortion>=0)
