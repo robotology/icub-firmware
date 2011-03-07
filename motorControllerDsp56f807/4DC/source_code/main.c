@@ -419,8 +419,8 @@ void main(void)
 		for (i=0; i<JN; i++) _position[i]=_adjustment[i];					
 #endif
 #if VERSION == 0x0215
-	    _position[0]= get_position_abs_ssi(AEA4);	
-		_position[1]= get_position_abs_ssi(AEA3);
+	    _position[0]= get_position_abs_ssi(AEA3);	
+		_position[1]= get_position_abs_ssi(AEA4);
 		_position[2]= get_position_encoder(2);
 		_position[3]= get_position_encoder(3);					
 #endif
