@@ -1130,22 +1130,23 @@ void compute_desired(byte i)
 			// checks if the velocity messages streaming
 			// has been interrupted (i.e. last message
 			// received  more than _vel_timeout ms ago)
-			if (_set_vel[i] != 0)
-			{
-				_vel_counter[i]++;
-			    if(_vel_counter[i] > _vel_timeout[i])
-			    {
-					//disabling velocity control						
-					if (_control_mode[i] == MODE_IMPEDANCE_VEL) _control_mode[i] = MODE_IMPEDANCE_POS;
-					else _control_mode[i] = MODE_POSITION;
-					init_trajectory (i, _desired[i], _desired[i], 1);
-#ifdef DEBUG_CAN_MSG
+
+			_vel_counter[i]++;
+		    if(_vel_counter[i] > _vel_timeout[i])
+		    {	
+		    	//disabling velocity control						
+				if (_control_mode[i] == MODE_IMPEDANCE_VEL) _control_mode[i] = MODE_IMPEDANCE_POS;
+				else _control_mode[i] = MODE_POSITION;
+						  	
+				init_trajectory (i, _desired[i], _desired[i], 1);
+				#ifdef DEBUG_CAN_MSG
 					can_printf("No vel msgs in %d[ms]", _vel_counter[i]);
-#endif			
-					//resetting the counter
-					_vel_counter[i] = 0;
-			      }
-			  }
+				#endif	
+				
+				//resetting the counter
+				_vel_counter[i] = 0;	
+		    }			  	
+
 			break;
 		}
 		
