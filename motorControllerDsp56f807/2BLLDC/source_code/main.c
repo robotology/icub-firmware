@@ -60,7 +60,7 @@ Int16 _version = 0x0162;
 #endif
 #ifndef VERSION
 #	error "No valid version specified"
-#endif
+#endif 
 
 
 #ifdef ENCODER_SHIFT_11BITS
