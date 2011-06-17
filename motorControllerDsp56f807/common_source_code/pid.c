@@ -152,6 +152,7 @@ Int16  _error_speed_old[JN] = INIT_ARRAY (0);   // error at t-1
 Int16  _ks_imp[JN] = INIT_ARRAY (0);			// stiffness coefficient
 Int16  _kd_imp[JN] = INIT_ARRAY (0);			// damping coefficient
 Int16  _ko_imp[JN] = INIT_ARRAY (0);			// offset
+Int16  _kr_imp[JN] = INIT_ARRAY (0);		    // scale factor (negative power of two) 
 
 	
 #if VERSION == 0x0156 || VERSION == 0x0166 || VERSION == 0x0116
@@ -290,10 +291,13 @@ Int32 compute_pwm(byte j)
 				_strain_val[j]=0;
 			}
 	  	}
-#elif VERSION == 0x152 || VERSION == 0x154
-	  	//head torso
-	  	read_force_data (0, WDT_JNT_STRAIN_12,0); //@@@fixme
-	  	read_force_data (1, WDT_JNT_STRAIN_12,1); //@@@fixme
+#elif VERSION == 0x152 
+	  	//torso
+	  	read_force_data (0, WDT_JNT_STRAIN_12,0); 
+	  	read_force_data (1, WDT_JNT_STRAIN_12,1); 
+#elif VERSION == 0x154
+	  	//torso
+	  	read_force_data (0, WDT_JNT_STRAIN_12,2); 
 	  	  
 #elif VERSION == 0x157 
       	//coupled joint of the arm
@@ -329,10 +333,6 @@ Int32 compute_pwm(byte j)
 				_strain_val[j]=0;
 			}
 #endif	  
-		//watchdog update
-		for (i=0; i<STRAIN_MAX; i++)
-			if (_strain_wtd[i]>0) _strain_wtd[i]--;
-			
 	
 	switch (_control_mode[j]) 
 	{ 
