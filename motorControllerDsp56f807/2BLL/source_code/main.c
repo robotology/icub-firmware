@@ -39,7 +39,7 @@
 byte	_board_ID = 16;	
 char    _additional_info [32];
 UInt8    mainLoopOVF=0;
-byte    _build_number = 55;
+byte    _build_number = 56;
 byte    _my_can_protocol_major = 1;
 byte    _my_can_protocol_minor = 1;
 bool    _can_protocol_ack = false;
@@ -502,6 +502,11 @@ void main(void)
 #endif
 //******************************************* COMPUTES CONTROLS *****************************/
 led0_on	
+
+		//FT sensor watchdog update 
+		for (i=0; i<STRAIN_MAX; i++) 
+			if (_strain_wtd[i]>0) _strain_wtd[i]--;
+			
 		for (i=0; i<JN; i++) 
 		{
 			//computing the PWM value (PID)
