@@ -31,7 +31,7 @@
 	
 byte	_board_ID = 15;	
 char    _additional_info [32];
-byte    _build_number = 41;
+byte    _build_number = 42;
 byte    _my_can_protocol_major = 1;
 byte    _my_can_protocol_minor = 1;
 bool    _can_protocol_ack = false;
@@ -465,6 +465,9 @@ void main(void)
 // 							  		COMPUTE CONTROLS                                    
 // 							     /* computes controls */
 //******************************************************************************************/ 		
+		//FT sensor watchdog update 
+		for (i=0; i<STRAIN_MAX; i++) 
+			if (_strain_wtd[i]>0) _strain_wtd[i]--;
 
 		for (i=0; i<JN; i++) PWMoutput[i] = compute_pwm(i);		
 //-------------------------------------------------------------------------------------------
