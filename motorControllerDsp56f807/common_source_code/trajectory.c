@@ -176,13 +176,13 @@ Int16 abort_trajectory (byte jj, Int32 limit)
 Int32 step_trajectory (byte jj)
 {
 	Int32 a;
-	Int32 delta_a;
+	//Int32 delta_a;
 	
 	/* (10 * (t/T)^3 - 15 * (t/T)^4 + 6 * (t/T)^5) * (x0-xf) + x0 */
 	if (_ended[jj])
 	{
 		a = _xf[jj];
-		delta_a = a - _prev_a[jj];
+		//delta_a = a - _prev_a[jj];
 		_prev_a[jj] = a;
 		return a;
 	}
@@ -193,7 +193,7 @@ Int32 step_trajectory (byte jj)
 		_curstepf[jj] ++;
 		
 		a = _x0[jj];
-		delta_a = a - _prev_a[jj];
+		//delta_a = a - _prev_a[jj];
 		_prev_a[jj] = a;
 		return a;
 
@@ -209,7 +209,7 @@ Int32 step_trajectory (byte jj)
 		_curtf[jj] += _stepf[jj];
 		_curstepf[jj] ++;
 
-		delta_a = a - _prev_a[jj];
+		//delta_a = a - _prev_a[jj];
 		_prev_a[jj] = a;
 		return a;
 	}			
