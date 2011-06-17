@@ -194,6 +194,7 @@ extern Int16  _error_speed_old[JN];         // error at t-1
 extern Int16  _ks_imp[JN] ;				// stiffness coeffficient
 extern Int16  _kd_imp[JN] ;				// damping coeffficient
 extern Int16  _ko_imp[JN] ;				// offset
+extern Int16  _kr_imp[JN] ;				// scale factor (negative power of two) 
 
 // DECOUPLING PARAMETERS
 extern float  _param_a10_coeff;
