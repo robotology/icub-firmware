@@ -225,7 +225,7 @@ byte can_interface (void)
 			else
 #endif
 
-#if VERSION == 0x0119 || VERSION == 0x0150 | VERSION == 0x0151 || VERSION == 0x0157
+#if VERSION == 0x0119 || VERSION == 0x0150 || VERSION == 0x0151 || VERSION == 0x0152 || VERSION == 0x0154 || VERSION == 0x0157
 			if (_canmsg.CAN_ID_class == CLASS_PERIODIC_SENS)
 			{
 				if 		(_canmsg.CAN_ID_src==CAN_ID_JNT_STRAIN_11)  strain_num=WDT_JNT_STRAIN_11;
