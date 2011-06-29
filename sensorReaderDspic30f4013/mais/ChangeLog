@@ -1,0 +1,13 @@
+2011-29-June  Valentina Gaggero <valentina.gaggero@iit.it>
+	* Started ChangeLog, please report here a brief summary 
+	of changes made to the firmware. Keep track of the build
+	number, CAN protocol version, SVN revision of used HAL library
+	and if possible add a list of your changes.
+	* Reorganized source code
+	* Removed a possible bug for exceeding the allocated memory.
+	* Removed bug in trasmitting data with HSE = 16 bit:
+	  the CAN_CMD_HES12TO14 message was not sent.
+	* Added CAN_CMD_GET_FW_VERSION message management.
+	* Current build: 3.0.0.
+	* Current CAN protocol version: 1.0
+	* Current HAL library: SVN revision: 12347.
