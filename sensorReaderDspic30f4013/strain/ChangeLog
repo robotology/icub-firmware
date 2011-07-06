@@ -4,7 +4,7 @@
 	number,CAN protocol version, SVN revision of used HAL library
 	and if possible add a list of your changes.
 	* Reorganized source code
-	* Now, after flashing application, it is not necessary restart the board.
+	* Now, after flashing application, it is not necessary to restart the board.
 	* Removed timer's drifting.
 	* Avoided "race condition" on CAN_CMD_SET_CURR_TARE message.
 	* Added CAN_CMD_GET_FW_VERSION message management.
