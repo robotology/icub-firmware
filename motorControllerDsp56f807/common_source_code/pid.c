@@ -293,11 +293,11 @@ Int32 compute_pwm(byte j)
 	  	}
 #elif VERSION == 0x152 
 	  	//torso
-	  	read_force_data (0, WDT_JNT_STRAIN_12,0); 
-	  	read_force_data (1, WDT_JNT_STRAIN_12,1); 
+	  	read_force_data (0, WDT_JNT_STRAIN_12,1); 
+	  	read_force_data (1, WDT_JNT_STRAIN_12,2); 
 #elif VERSION == 0x154
 	  	//torso
-	  	read_force_data (0, WDT_JNT_STRAIN_12,2); 
+	  	read_force_data (0, WDT_JNT_STRAIN_12,0); 
 	  	  
 #elif VERSION == 0x157 
       	//coupled joint of the arm
