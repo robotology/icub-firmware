@@ -240,6 +240,8 @@
 			{ \
 				PWM_outputPadEnable(0); \
 				PWM_outputPadEnable(1); \
+				_control_mode[0] = MODE_IDLE; \
+				_control_mode[1] = MODE_IDLE; \
 				_general_board_error = ERROR_NONE; \
 				can_printf("PWM ENA COUPLED:0 & 1");\
 			} \
