@@ -930,6 +930,29 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		break;
 		}
 		
+		case CAN_CMD_GET_FW_VERSION:
+		{
+			if( (strain_srcCode_info_ptr->canProtocol.version == msg->CAN_Per_Msg_PayLoad[1]) &&
+			    (strain_srcCode_info_ptr->canProtocol.release == msg->CAN_Per_Msg_PayLoad[2]) )
+				{
+					canProtocol_compatibility_ack = 1;
+				}
+            else
+                {
+                    canProtocol_compatibility_ack = 0;
+                }
+	
+			Txdata[0] = CAN_CMD_GET_FW_VERSION;
+			Txdata[1] = BOARD_TYPE_STRAIN; 
+			Txdata[2] = strain_srcCode_info_ptr->fw_ExeFile.version;
+			Txdata[3] = strain_srcCode_info_ptr->fw_ExeFile.release;
+			Txdata[4] = strain_srcCode_info_ptr->fw_ExeFile.build;
+			Txdata[5] = strain_srcCode_info_ptr->canProtocol.version;
+			Txdata[6] = strain_srcCode_info_ptr->canProtocol.release;			
+			Txdata[7] = canProtocol_compatibility_ack;
+			*datalen=8;           
+		break;
+		}
 
 		// ==> the following commands are unused actually: <==
 	    case CAN_CMD_SELECT_ACTIVE_CH:    	// select witch channel is sampled and CANsmitted
@@ -1001,30 +1024,6 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 //			*datalen=0;
 		break;  
 		}
-
-		case CAN_CMD_GET_FW_VERSION:
-		{
-			if( (strain_srcCode_info_ptr->canProtocol.version == msg->CAN_Per_Msg_PayLoad[1]) &&
-			    (strain_srcCode_info_ptr->canProtocol.release == msg->CAN_Per_Msg_PayLoad[2]) )
-				{
-					canProtocol_compatibility_ack = 1;
-				}
-            else
-                {
-                    canProtocol_compatibility_ack = 0;
-                }
-	
-			Txdata[0] = CAN_CMD_GET_FW_VERSION;
-			Txdata[1] = BOARD_TYPE_STRAIN; 
-			Txdata[2] = strain_srcCode_info_ptr->fw_ExeFile.version;
-			Txdata[3] = strain_srcCode_info_ptr->fw_ExeFile.release;
-			Txdata[4] = strain_srcCode_info_ptr->fw_ExeFile.build;
-			Txdata[5] = strain_srcCode_info_ptr->canProtocol.version;
-			Txdata[6] = strain_srcCode_info_ptr->canProtocol.release;			
-			Txdata[7] = canProtocol_compatibility_ack;
-			*datalen=8;           
-		break;
-		}
 	
 		default:
 		{
@@ -1050,7 +1049,7 @@ static void s_parse_can_loaderMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *da
 		case CMD_BROADCAST: 
 		{
 			//Create ID for CAN message
-			SID = CAN_MSG_CLASS_LOADER | ( strain_cfg.ee_data.EE_CAN_BoardAddress << 4 ) | (0); //VALE i non è usato
+			SID = CAN_MSG_CLASS_LOADER | ( strain_cfg.ee_data.EE_CAN_BoardAddress << 4 ) | (0);
 			Txdata[0] = CMD_BROADCAST;
 			Txdata[1] = BOARD_TYPE_STRAIN; 
 			Txdata[2] = strain_srcCode_info_ptr->fw_ExeFile.version;	//Firmware version number for BOOTLOADER
@@ -1080,7 +1079,7 @@ static void s_parse_can_loaderMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *da
 				{	
 					Txdata[2+j] = strain_cfg.ee_data.EE_AdditionalInfo[j+tmp*4]; 
 				}
-				hal_can_put(hal_can_portCAN1, strain_cfg.ee_data.EE_CAN_BoardAddress,SID,hal_can_frameType_data,*datalen,Txdata); //VALE x' invio direttamente????
+				hal_can_put(hal_can_portCAN1, strain_cfg.ee_data.EE_CAN_BoardAddress,SID,hal_can_frameType_data,*datalen,Txdata);
 			}
 			*datalen = -1;
 		break;
