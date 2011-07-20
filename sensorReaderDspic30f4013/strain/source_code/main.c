@@ -135,7 +135,7 @@ uint8_t canProtocol_compatibility_ack = 0;
 static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *datalen);
 static void s_parse_can_loaderMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *datalen);
 static void s_parse_can_msg(void);
-static void s_calculate_and_send_datas(void);
+static void s_calculate_and_send_data(void);
 static void s_timer1_callback(void);
 
 
@@ -314,7 +314,7 @@ static void s_parse_can_msg(void)
 
 
 
-static void s_calculate_and_send_datas(void)
+static void s_calculate_and_send_data(void)
 {    
   uint16_t SID; //adc;
   // LATBbits.LATB12 = 1; // led on
@@ -360,8 +360,11 @@ Ovviamente i due array devono essere salvati su memoria contigua.
 	strain_cfg.ee_data.EE_TF_TorqueValue[3]+=HEX_VALC; // is equal to EE_TF_ForceValue[0], because it is saved on contiguos memory with EE_TF_TorqueValue
 	strain_cfg.ee_data.EE_TF_TorqueValue[4]+=HEX_VALC; // is equal to EE_TF_ForceValue[1]
 	strain_cfg.ee_data.EE_TF_TorqueValue[5]+=HEX_VALC; // is equal to EE_TF_ForceValue[2]
+
+    //Note: in despite of field name in strain_cfg.ee_data, Force value are the first three elements
 	memcpy(ForceDataCalib,strain_cfg.ee_data.EE_TF_TorqueValue,6); // TorqueValue is an array of 3 int ==> 6 byte
 	memcpy(TorqueDataCalib,strain_cfg.ee_data.EE_TF_ForceValue,6); // ForceeValue is an array of 3 int ==> 6 byte
+
 	//...and for not calibrated ones
 	strain_cfg.ee_data.EE_AN_ChannelValue[0]+=HEX_VALC;
 	strain_cfg.ee_data.EE_AN_ChannelValue[1]+=HEX_VALC;
@@ -418,10 +421,10 @@ Ovviamente i due array devono essere salvati su memoria contigua.
 
   if (DebugCalibration==1)
   {
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (0XA) ;
+	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (CAN_CMD_FORCE_VECTOR) ;
 	  hal_can_put_immediately(hal_can_portCAN1, SID, ForceDataCalib, length, 0 );
 
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (0XB) ;
+	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (CAN_CMD_TORQUE_VECTOR) ;
 	  hal_can_put_immediately(hal_can_portCAN1, SID, TorqueDataCalib,length,1);
 
 	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (0x8) ;
@@ -1197,7 +1200,7 @@ static void s_timer1_callback(void)
 
 	if( (strain_cfg.ee_data.EE_AN_SelectedChannel== muxed_chans+1) && (can_enable) )
 	{
-		s_calculate_and_send_datas();
+		s_calculate_and_send_data();
 	} 
 }
 // --------------------------------------------------------------------------------------------------------------------
