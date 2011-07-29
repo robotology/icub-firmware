@@ -31,7 +31,7 @@
 
 byte	_board_ID = 15;	
 char    _additional_info [32];
-byte    _build_number = 56;
+byte    _build_number = 57;
 byte    _my_can_protocol_major = 1;
 byte    _my_can_protocol_minor = 1;
 bool    _can_protocol_ack = false;
@@ -335,7 +335,7 @@ void main(void)
 				
 		/* generate PWM */		
 		for (i=0; i<JN; i++)
-		{
+		{ 
 			if (_pad_enabled[i] == false) 
 			{
 				_control_mode[i] = MODE_IDLE;

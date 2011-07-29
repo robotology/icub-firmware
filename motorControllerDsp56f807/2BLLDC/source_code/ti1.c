@@ -69,7 +69,7 @@ void TI1_interrupt (void)
 				highcurrent[i]=true;
 				PWM_outputPadDisable(i);
 #ifdef DEBUG_CAN_MSG
-				can_printf("ERR: ax%d _high curr DIS PWM",i);
+				can_printf("I2T ERR: ax%d _high curr DIS PWM",i);
 #endif	
 			}					
 		}

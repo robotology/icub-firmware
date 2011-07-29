@@ -225,7 +225,7 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
 
 
 #if VERSION == 0x0162
-	/*  Waist Differential coupling 
+	/*  Neck Differential coupling 
 		|Me1| |  1    -1 |  |Je1|
 		|Me2|=|  1     1 |* |Je2|    */
 	
