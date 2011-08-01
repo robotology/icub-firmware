@@ -997,7 +997,9 @@
 { \
 	if (CAN_LEN == 5) \
 	{ \
-		if (_control_mode[axis] != MODE_IDLE && IS_DONE(axis)) \
+		if (_control_mode[axis] != MODE_IDLE && \
+		    _control_mode[axis] != MODE_TORQUE && \
+		    IS_DONE(axis)) \
 		{ \
 			_vel_counter[axis] = 0; \
 			if (_control_mode[axis] == MODE_POSITION || \
