@@ -103,7 +103,7 @@ Int32 check_current(byte jnt, bool sign)
 	}
 	else
 	{
- 		 _current[jnt]=  (temporary * (float) _conversion_factor[jnt])*((Int32)((1333<<4)/((Int32)(DutyCycle[jnt].Duty-MIN_DUTY-DEAD_TIME))))/16;//see BLP and BLL manual		
+ 		 _current[jnt]=  (temporary * (float) _conversion_factor[jnt])*((Int32)((PWMFREQ<<4)/((Int32)(DutyCycle[jnt].Duty-MIN_DUTY-DEAD_TIME))))/16;//see BLP and BLL manual		
 	}
    																							   //deadtime =0x010*2	
 	return _current[jnt];

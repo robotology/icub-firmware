@@ -54,7 +54,7 @@ void PWM_A_init(void)
 //	setReg (PWMA_PWMVAL5, 0);         
 
 	/* PWMA_PWMCM: ??=0,PWMCM=1333 i.e. 30KHz*/
-	setReg (PWMA_PWMCM, PWMCM);           
+	setReg (PWMA_PWMCM, PWMFREQ);           
 
 	// PWMA_PMCTL: LDQF=2, LDOK=1,PWMEN=1 
 	setRegBits (PWMA_PMCTL, 0x2003);      //the load of the PWM duty is setted every 3 cycle (10KHz)

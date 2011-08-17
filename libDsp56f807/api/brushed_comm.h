@@ -13,10 +13,9 @@ typedef struct sDutyControl_tag
 
 
 // the PWM limit are MIN_DUTY= 2%   and MAX_DUTY=98%
-#define PWMCM    800
 #define MIN_DUTY 58  // 2% of  800 +2*deadtime
 #define DEAD_TIME 0x16
-#define MAX_DUTY 784// 98% of 1333
+#define MAX_DUTY 756// 98% of 1333
 #define  STEP 6// step every cycle  
 #define  PWMFREQ 800 // 200 = 200KHz  800= 50KHz 1333= 30KHz
 

@@ -67,11 +67,24 @@ void TD0_interrupt(void)
 
 	if (DutyCycleReq[0].Dir != DutyCycle[0].Dir) 
 	{
-		if (DutyCycle[0].Duty <= (MIN_DUTY)) 
+		if ((DutyCycle[0].Duty-STEP) < (MIN_DUTY)) //then direction change 
 		{
+			DutyCycle[0].Duty=DutyCycle[0].Duty-STEP;
+			
+			if (DutyCycle[0].Duty<(-MIN_DUTY))
+			{
+		 		DutyCycle[0].Duty=-DutyCycle[0].Duty;
+				if (DutyCycle[0].Duty>DutyCycleReq[0].Duty) DutyCycle[0].Duty=DutyCycleReq[0].Duty; 	
+			}
+			else
+			{
+				DutyCycle[0].Duty=MIN_DUTY;
+			}
+			
 			DutyCycle[0].Dir = DutyCycleReq[0].Dir;
+			
 		}		
-		else 
+		else //no direction change
 		{	
 			DutyCycle[0].Duty=DutyCycle[0].Duty-STEP;
 		}
@@ -79,7 +92,7 @@ void TD0_interrupt(void)
 	else {
 			if (DutyCycleReq[0].Duty > DutyCycle[0].Duty) 
 			{
-				if (DutyCycleReq[0].Duty-DutyCycle[0].Duty>=STEP)
+				if ((DutyCycleReq[0].Duty-DutyCycle[0].Duty)>=STEP)
 					DutyCycle[0].Duty=DutyCycle[0].Duty+STEP;
 				else
 					DutyCycle[0].Duty=DutyCycleReq[0].Duty;
@@ -90,18 +103,29 @@ void TD0_interrupt(void)
 					DutyCycle[0].Duty=DutyCycle[0].Duty-STEP;
 				else
 					DutyCycle[0].Duty=DutyCycleReq[0].Duty;
-			}		
+			}
 	}
-	
 	//++++++
 	
 	if (DutyCycleReq[1].Dir != DutyCycle[1].Dir) 
 	{
-		if (DutyCycle[1].Duty <= (MIN_DUTY)) 
+		if ((DutyCycle[1].Duty-STEP) < (MIN_DUTY)) //then direction change 
 		{
+			DutyCycle[1].Duty=DutyCycle[1].Duty-STEP;
+			
+			if (DutyCycle[1].Duty<(-MIN_DUTY))
+			{
+		 		DutyCycle[1].Duty=-DutyCycle[1].Duty;
+				if (DutyCycle[1].Duty>DutyCycleReq[1].Duty) DutyCycle[1].Duty=DutyCycleReq[1].Duty; 	
+			}
+			else
+			{
+				DutyCycle[1].Duty=MIN_DUTY;
+			}
+			
 			DutyCycle[1].Dir = DutyCycleReq[1].Dir;
 		}		
-		else 
+		else //no direction change 
 		{
 			DutyCycle[1].Duty=DutyCycle[1].Duty-STEP;
 		}
@@ -122,16 +146,7 @@ void TD0_interrupt(void)
 				else
 					DutyCycle[1].Duty=DutyCycleReq[1].Duty;
 			}
-		
 	}
-
-
-	
-//	DutyCycle[0].Duty=DutyCycleReq[0].Duty;
-//	DutyCycle[0].Dir=DutyCycleReq[0].Dir;
-	
-//	DutyCycle[1].Duty=DutyCycleReq[1].Duty;
-//	DutyCycle[1].Dir=DutyCycleReq[1].Dir;
 	
 	PWM_generate_DC(0, DutyCycle[0].Duty,DutyCycle[0].Dir); 
 	PWM_generate_DC(1, DutyCycle[1].Duty,DutyCycle[1].Dir); 
@@ -187,13 +202,13 @@ void PWM_generate_DC(byte i, Int16 pwm_value, byte dir)
 		{
 			if (i==0)
 			{
-				PWM_A_setDuty (0, (unsigned char)(pwm_value & 0x7fff));
+				PWM_A_setDuty (0, pwm_value);
 				PWM_A_setDuty (2, 0);
 				PWM_A_setDuty (4, 0);
 			}
 			else
 			{
-				PWM_B_setDuty (0, (unsigned char)(pwm_value & 0x7fff));
+				PWM_B_setDuty (0, pwm_value);
 				PWM_B_setDuty (2, 0);
 				PWM_B_setDuty (4, 0);		
 			}
@@ -203,13 +218,13 @@ void PWM_generate_DC(byte i, Int16 pwm_value, byte dir)
 			if (i==0)
 			{
 				PWM_A_setDuty (0, 0);
-				PWM_A_setDuty (2, (unsigned char)((pwm_value) & 0x7fff));
+				PWM_A_setDuty (2, pwm_value);
 				PWM_A_setDuty (4, 0);
 			}
 			else
 			{
 				PWM_B_setDuty (0, 0);
-				PWM_B_setDuty (2, (unsigned char)((pwm_value) & 0x7fff));
+				PWM_B_setDuty (2, pwm_value);
 				PWM_B_setDuty (4, 0);				
 			}
 		}

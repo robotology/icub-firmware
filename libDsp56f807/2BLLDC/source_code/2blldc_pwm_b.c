@@ -53,7 +53,7 @@ void PWM_B_init(void)
 //	setReg (PWMB_PWMVAL5, 0);         
 
 	/* PWMB_PWMCM: ??=0,PWMCM=1333 i.e. 30KHz*/
-	setReg (PWMB_PWMCM, PWMCM);           
+	setReg (PWMB_PWMCM, PWMFREQ);           
 
 	/* PWMB_PMCTL: LDOK=1,PWMEN=0 */
 	setRegBits (PWMB_PMCTL, 2);         

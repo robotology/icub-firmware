@@ -8,11 +8,22 @@
 UInt16 max_real_position[2] = {4095, 4095};
 Int32 encoder_zeros[2] = {0,0};
 Int32 old_value[2] = {0,0};
-bool  status_ocf = 0;
-bool  status_cof = 0;
-bool  status_lin = 0;
-bool  status_inc = 0;
-bool  status_dec = 0;
+typedef struct ABS_SENSOR_STATUS
+{
+union 
+	{ 
+		struct bb
+		{	byte  status_ocf;
+			byte  status_cof;
+			byte  status_lin;
+			byte  status_inc;
+			byte  status_dec;
+		};
+		byte wordbb[5];
+	};
+}abs_sensor_status;
+
+abs_sensor_status status[2];
 
 /***************************************************************************/
 /**
@@ -92,60 +103,51 @@ UInt16 get_absolute_real_position_abs_ssi(byte jnt)
 	for(i=0;i<18;i++)
 	{
 		clrRegBits(GPIO_E_DR,GPIO_E4); //CLK
-		for (j=0;j<5;j++)
-		{
-		 asm
+		for(j=0;j<=4;j++)
+		asm
 		 {
 		 	NOP
-		 }
-		}// delay
+		 }// delay
 		setRegBits(GPIO_E_DR,GPIO_E4); //CLK
-		for (j=0;j<5;j++)
-		{
-		 asm
+		for(j=0;j<=5;j++)
+		asm
 		 {
 		 	NOP
-		 }
-		}// delay
+		 }// delay
 		if (i<12)
 		{
 			bit=getRegBits(GPIO_E_DR,GPIO_E6); //DATAIN
 			value=value | (bit <<(11-i)); 	
 		}
-		if (i==12)
+		else
 		{
-		 	status_ocf=getRegBits(GPIO_E_DR,GPIO_E6);	 	
-		}
-		if (i==13)
-		{
-		 	status_cof=getRegBits(GPIO_E_DR,GPIO_E6);	 	
-		}
-		if (i==14)
-		{
-			status_lin=getRegBits(GPIO_E_DR,GPIO_E6); //DATAIN	
-		}
-		if (i==15)
-		{
-			status_inc=getRegBits(GPIO_E_DR,GPIO_E6); //DATAIN	
-		}
-		if (i==16)
-		{
-			status_dec=getRegBits(GPIO_E_DR,GPIO_E6); //DATAIN	
+		 	status[jnt].wordbb[i-12]=getRegBits(GPIO_E_DR,GPIO_E6);	 	
 		}
 	}
-	setRegBits(GPIO_A_DR,mask); //ENABLE	
+	setRegBits(GPIO_A_DR,mask); //DISNABLE	
 	return (UInt16) value;
 }
 
-void get_status_abs_ssi(bool* s_ocf,bool* s_cof,bool* s_lin, bool* s_inc, bool* s_dec,byte jnt)
+void get_status_abs_ssi(bool* s_ocf,bool* s_cof,bool* s_lin, bool* s_inc, bool* s_dec, byte jnt)
 {
-	(*s_ocf)= status_ocf;
-	(*s_cof)= status_cof;
-	(*s_lin)= status_lin;
-	(*s_inc)= status_inc;
-	(*s_dec)= status_dec;
+	(*s_ocf)= status[jnt].status_ocf;
+	(*s_cof)= status[jnt].status_cof;
+	(*s_lin)= status[jnt].status_lin;
+	(*s_inc)= status[jnt].status_inc;
+	(*s_dec)= status[jnt].status_dec;
 }
 
+byte get_error_abs_ssi(byte jnt)
+{
+//	get_absolute_real_position_abs_ssi(jnt);
+	
+	if ((status[jnt].status_inc==1) && (status[jnt].status_dec==1) && (status[jnt].status_ocf==1) && (status[jnt].status_cof==1) && (status[jnt].status_lin==1) )
+	{
+		return ERR_ABS_SSI;	
+	}
+	
+	return ERR_OK;
+}
 /***************************************************************************/
 /**
  * this function reads the current _position which will be used in the PID.
