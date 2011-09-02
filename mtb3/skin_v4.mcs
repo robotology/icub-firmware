@@ -2,7 +2,7 @@
 MagicCookie={0b13fe8c-dfe0-40eb-8900-6712719559a7}
 Version=1.0
 [File000]
-Location=D:\icub\src\firmware\mtb3\can_interface.o
+Location=D:\icub\firmware\mtb3\can_interface.o
 Folder=Intermediary
 DeviceName=dsPIC30F4011
 LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
@@ -15,7 +15,7 @@ ToolArgsString=-g -Wall
 TraceCmdString=
 DebugOptions=
 [File001]
-Location=D:\icub\src\firmware\mtb3\can_protocol.o
+Location=D:\icub\firmware\mtb3\can_protocol.o
 Folder=Intermediary
 DeviceName=dsPIC30F4011
 LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
@@ -28,7 +28,7 @@ ToolArgsString=-g -Wall
 TraceCmdString=
 DebugOptions=
 [File002]
-Location=D:\icub\src\firmware\mtb3\I2C.o
+Location=D:\icub\firmware\mtb3\I2C.o
 Folder=Intermediary
 DeviceName=dsPIC30F4011
 LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
@@ -41,7 +41,7 @@ ToolArgsString=-g -Wall
 TraceCmdString=
 DebugOptions=
 [File003]
-Location=D:\icub\src\firmware\mtb3\LED.o
+Location=D:\icub\firmware\mtb3\LED.o
 Folder=Intermediary
 DeviceName=dsPIC30F4011
 LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
@@ -54,7 +54,7 @@ ToolArgsString=-g -Wall
 TraceCmdString=
 DebugOptions=
 [File004]
-Location=D:\icub\src\firmware\mtb3\main_V3.o
+Location=D:\icub\firmware\mtb3\main_V3.o
 Folder=Intermediary
 DeviceName=dsPIC30F4011
 LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
@@ -67,7 +67,7 @@ ToolArgsString=-g -Wall
 TraceCmdString=
 DebugOptions=
 [File005]
-Location=D:\icub\src\firmware\mtb3\T1.o
+Location=D:\icub\firmware\mtb3\T1.o
 Folder=Intermediary
 DeviceName=dsPIC30F4011
 LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
@@ -80,7 +80,7 @@ ToolArgsString=-g -Wall
 TraceCmdString=
 DebugOptions=
 [File006]
-Location=D:\icub\src\firmware\mtb3\traps.o
+Location=D:\icub\firmware\mtb3\traps.o
 Folder=Intermediary
 DeviceName=dsPIC30F4011
 LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
@@ -93,7 +93,7 @@ ToolArgsString=-g -Wall
 TraceCmdString=
 DebugOptions=
 [File007]
-Location=D:\icub\src\firmware\mtb3\AD7147 - Configuration.o
+Location=D:\icub\firmware\mtb3\AD7147 - Configuration.o
 Folder=Intermediary
 DeviceName=dsPIC30F4011
 LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
@@ -106,7 +106,7 @@ ToolArgsString=-g -Wall
 TraceCmdString=
 DebugOptions=
 [File008]
-Location=D:\icub\src\firmware\mtb3\eeprom.o
+Location=D:\icub\firmware\mtb3\eeprom.o
 Folder=Intermediary
 DeviceName=dsPIC30F4011
 LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
@@ -119,7 +119,7 @@ ToolArgsString=-g -Wall
 TraceCmdString=
 DebugOptions=
 [File009]
-Location=D:\icub\src\firmware\build\skin_v4.cof
+Location=D:\icub\firmware\build\skin_v4.cof
 Folder=Output
 DeviceName=dsPIC30F4011
 LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
@@ -128,11 +128,11 @@ LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-ld.exe
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|T1.c|traps.c|AD7147 - Configuration.c|eeprom.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)" -Map="$(BINDIR_)$(TARGETBASE).map" --report-mem
+ToolArgsString=-Map="$(BINDIR_)$(TARGETBASE).map" --report-mem -o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)"
 TraceCmdString=
 DebugOptions=
 [File010]
-Location=D:\icub\src\firmware\build\skin_v4.hex
+Location=D:\icub\firmware\build\skin_v4.hex
 Folder=Output
 DeviceName=dsPIC30F4011
 LanguageToolSuiteID={479DDE59-4D56-455E-855E-FFF59A3DB57E}
@@ -141,7 +141,7 @@ LanguageToolLocation=C:\Program Files\Microchip\MPLAB C30\bin\pic30-ld.exe
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|T1.c|traps.c|AD7147 - Configuration.c|eeprom.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)" -Map="$(BINDIR_)$(TARGETBASE).map" --report-mem
+ToolArgsString=-Map="$(BINDIR_)$(TARGETBASE).map" --report-mem -o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)"
 TraceCmdString=
 DebugOptions=
 [TOOL_LOC_STAMPS]
