@@ -124,9 +124,9 @@ void can_send_additional_info();
 
 #define CAN_TACT_SETUP              76
 #define CAN_TACT_CALIB              77
+#define CAN_TACT_SETUP2             78
 
-
-#define NUM_OF_MESSAGES				78
+#define NUM_OF_MESSAGES				79
 
 // class 1 messages, broadcast 
 // when in bcast mode, messages are sent periodically by the controller

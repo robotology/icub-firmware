@@ -43,6 +43,26 @@
 //  MPLAB 8.56
 //
 
+//  Rev 2.0.154 del 31/06/2011
+//  NOLOAD=235;
+//  MPLAB 8.63
+//
+
+//  Rev 2.0.15 del 31/08/2011
+//  Removed the bug in the overflow of the CDC value sent trought CAN 
+//  the NOLOAD pressure is set to 235 (default). There is a new message for sending parameters like:
+//		data[0] message type CAN_TACT_SETUP2 (0x4E)
+//		data[1] right SHIFT factor for the sensor readings (12 indipendent measurements)
+//		data[2] right SHIFT_THREE  factor for the sensor readings (3 macro areas)     
+//		data[3] right SHIFT_ALL  factor for the sensor readings (1 macro area) 
+//		data[4] NO_LOAD value (it is set to 235 for default)
+//		data[5] NU
+//		data[6] NU
+//		data[7] NU
+ //  MPLAB 8.63
+//
+
+
 #include<p30f4011.h>
 #include"can_interface.h"
 #include "AD7147RegMap.h"
@@ -58,7 +78,7 @@
 
 #warning "if you want to run the debug version uncomment the line below"
 
-// #define DEBUG
+ #define DEBUG
 
 // inizializzazione bit di configurazione (p30f4013.h)
 _FOSC(CSW_FSCM_OFF & EC_PLL8); 
@@ -164,10 +184,14 @@ unsigned char board_MODE=EIGHT_BITS;
 unsigned char new_board_MODE=EIGHT_BITS;
 char _additional_info [32]={'T','a','c','t','i','l','e',' ','S','e','n','s','o','r'};
 unsigned int PW_CONTROL= 0x0B0; // 0x1B0 for 128 decim  
-unsigned int TIMER_VALUE=0x3800;//0x3839;///0x3A00; // Timer duration 0x3000=> 40ms
+unsigned int TIMER_VALUE=TIMER_SINGLE_256dec; // Timer duration 0x3000=> 40ms
+unsigned int SHIFT=2; //shift of the CDC value for removing the noise
+unsigned int SHIFT_THREE=3;// shift of the CDC value for removing the noise
+unsigned int SHIFT_ALL=4; //shift of the CDC value for removing the noise
+unsigned int NOLOAD=235;
 unsigned int CONFIG_TYPE=CONFIG_SINGLE;
 unsigned int ERROR_COUNTER=0; //it counts the errors in reading the triangles.
-unsigned int ConValue[2]={0x2200, 0x2200};
+unsigned int ConValue[2]={0x2200, 0x2200}; //offset of the CDC reading 
 unsigned int PMsgID; //pressure measurement ID 
 unsigned char status[]={0,0,0,0,0,0,0,0};
    
@@ -566,8 +590,8 @@ void ServiceAD7147Isr(unsigned char Channel)
 	  
 	    for (i=0;i<nets;i++)
 	    {
-		 //   ReadFromAD7147ViaI2C(CH0,AD7147_ADD[i],STAGE_COMPLETE_LIMIT_INT, 1, stagecomplete0[0],stagecomplete1[0],stagecomplete2[0],stagecomplete3[0], 0);		
-		      WriteToAD7147ViaI2C(CH0,AD7147_ADD[i],AMB_COMP_CTRL0,1, ConfigBuffer, 0);
+		    ReadFromAD7147ViaI2C(CH0,AD7147_ADD[i],STAGE_COMPLETE_LIMIT_INT, 1, stagecomplete0[0],stagecomplete1[0],stagecomplete2[0],stagecomplete3[0], 0);		
+		 //     WriteToAD7147ViaI2C(CH0,AD7147_ADD[i],AMB_COMP_CTRL0,1, ConfigBuffer, 0);
 	///DEBUG	      
 	  //        ConfigAD7147(CH0,i,PW_CONTROL,ConValue); //0 is the number of the device		 
 	    } 
@@ -695,12 +719,16 @@ void TrianglesInit_all(unsigned char Channel)
 void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
 {
     unsigned char data[8];
-    unsigned int i,j,val,error;
+    unsigned int i,j,error;
+    int value; //difference of the current measurement and the initial value (_pCapOffset)
     unsigned int txdata[12];
-	unsigned int offset;
+//	unsigned int offset;
+	int UP_LIMIT, BOT_LIMIT;
 	
 		error=0;
-		offset=256<<SHIFT;
+//		offset=(255<<SHIFT)+((SHIFT*2)-1); // 255 511 1023 ....
+		UP_LIMIT=((MAXVAL-NOLOAD)<<SHIFT);
+		BOT_LIMIT=(NOLOAD)<<SHIFT;
 	    for (i=0;i<12;i++)
 	    {
 		    if (((_pCapOffset[triangleN][i]!=0) && ((AD7147Registers[triangleN][ADCRESULT_S0+i]==0))))
@@ -708,28 +736,21 @@ void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
 			    error=1;
 			    ERROR_COUNTER++;
 			}
-			    
-		    if ((_pCapOffset[triangleN][i]>=(AD7147Registers[triangleN][ADCRESULT_S0+i]+offset)) || //1024 is 256<<2
-		    	(_pCapOffset[triangleN][i]<=(AD7147Registers[triangleN][ADCRESULT_S0+i]-offset)))
+			value=(AD7147Registers[triangleN][ADCRESULT_S0+i]-_pCapOffset[triangleN][i]);    
+			
+		    if (value<-UP_LIMIT) 
 		    {
-			  txdata[i]=244; //When the value is different from 244 is no contact  	  
+		    	txdata[i]=MAXVAL; // out of range, pressure too low
 		    }
-		    else
-		    {	
-		        if (_pCapOffset[triangleN][i]>=AD7147Registers[triangleN][ADCRESULT_S0+i])
-		        {
-		            val=((_pCapOffset[triangleN][i]-AD7147Registers[triangleN][ADCRESULT_S0+i])>>SHIFT);
-		            if (val>=10) txdata[i]=255;
-		            else
-		                txdata[i]=val+244;
-		        } else
-		        {
-		            val=((AD7147Registers[triangleN][ADCRESULT_S0+i]-_pCapOffset[triangleN][i])>>SHIFT);
-		            if (val>=243)   txdata[i]=1;
-		            else
-		                txdata[i]=244-val;
-		        }
-			}
+		    if (value>BOT_LIMIT) 
+		    {
+		    	txdata[i]=MINVAL; // out of range, pressure too high    	
+		    }
+		    if ((value>-UP_LIMIT) && (value<BOT_LIMIT))
+		    {   
+		            txdata[i]=NOLOAD-(value>>SHIFT);
+		    } 
+
 	    }
 	    
 	    if (error==1)

@@ -13,9 +13,11 @@
 #define CONFIG_THREE 1
 #define CONFIG_ALL 2
 
-#define SHIFT        2 
-#define SHIFT_THREE  2
-#define SHIFT_ALL    3
+//#define SHIFT        0   //
+
+//#define NOLOAD   235 //the value that corresponds with 0 pressure
+#define MAXVAL   255 //max value of the taxel  
+#define MINVAL     0  //min value of the taxel
 #define TIMER_SINGLE_256dec   0x3700          //timer value default 3A00
 #define TIMER_SINGLE_128dec   0x2D00          //timer value default
 #define TIMER_SINGLE_64dec   0x1A00          //timer value default
@@ -24,7 +26,7 @@
 
 
 #define _version  0x0200
-#define _build_number  13      //changed the I2C speed
+#define _build_number  15      //changed the I2C speed
 
 
 #endif

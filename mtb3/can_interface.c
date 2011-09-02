@@ -22,6 +22,10 @@ unsigned int board_TIMER;
 extern unsigned int PW_CONTROL; // 0x1B0 for 120 decim
 extern unsigned int TIMER_VALUE;
 extern unsigned int CONFIG_TYPE;
+extern unsigned int SHIFT;
+extern unsigned int SHIFT_THREE;
+extern unsigned int SHIFT_ALL;
+extern unsigned int NOLOAD;
 extern char _additional_info[32];
 extern unsigned int ConValue[2];
 // can RX messages buffer
@@ -365,12 +369,13 @@ int CAN1_handleRx (unsigned int board_id)
     		switch (CANRxBuffer[canRxBufferIndex-1].CAN_data[0])
 			{
 			 	case CAN_SET_BOARD_ID:  //SETTING THE BOARD ID
-					
+				{
 					BoardConfig.EE_CAN_BoardAddress= CANRxBuffer[canRxBufferIndex-1].CAN_data[1];
 					_board_ID=BoardConfig.EE_CAN_BoardAddress;
 					SaveEepromBoardConfig();
 					SetBoardCanFilter();
-			break;	
+		  		}  	
+		    	break;	
 				case CAN_TACT_SETUP:
 				{
 					
@@ -462,6 +467,26 @@ int CAN1_handleRx (unsigned int board_id)
 					//main();
 					board_MODE=CALIB;
 					EnableIntT1;
+				}
+				break;
+				
+				case CAN_TACT_SETUP2:
+				{
+					//data[0] message CAN_TACT_SETUP2
+					//data[1] right SHIFT factor for the sensor readings (12 indipendent measurements)
+					//data[2] right SHIFT_THREE  factor for the sensor readings (3 macro areas)     
+				    //data[3] right SHIFT_ALL  factor for the sensor readings (1 macro area) 
+					//data[4] NO_LOAD value (it is set to 235 for default)
+					//data[5] NU
+					//data[6] NU
+					//data[7] NU
+					
+					SHIFT       =	CANRxBuffer[canRxBufferIndex-1].CAN_data[1]&0xF;
+					SHIFT_THREE =	CANRxBuffer[canRxBufferIndex-1].CAN_data[2]&0xF;             
+					SHIFT_ALL   =	CANRxBuffer[canRxBufferIndex-1].CAN_data[3]&0xF;     
+					NOLOAD		=	CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0xFF;  
+					board_MODE=CALIB;
+					EnableIntT1;   	
 				}
 				break;
 
