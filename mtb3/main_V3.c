@@ -738,7 +738,7 @@ void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
 			}
 			value=(AD7147Registers[triangleN][ADCRESULT_S0+i]-_pCapOffset[triangleN][i]);    
 			
-		    if (value<-UP_LIMIT) 
+		    if (value<=-UP_LIMIT) 
 		    {
 		    	txdata[i]=MAXVAL; // out of range, pressure too low
 		    }
@@ -778,6 +778,10 @@ void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
 			{
 			    data[i]    = (unsigned char)   (txdata[i+6] & 0xFF); //the last 6 bits	
 		 	}
+//		 	#warning "debug"
+		 	
+//		 	data[6]=0;
+//		 	data[7]= (unsigned char) (ERROR_COUNTER &0xFF);
 		
 		    CAN1_send(PMsgID,1,6,data);
 		}
