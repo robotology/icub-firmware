@@ -590,8 +590,8 @@ void ServiceAD7147Isr(unsigned char Channel)
 	  
 	    for (i=0;i<nets;i++)
 	    {
-		    ReadFromAD7147ViaI2C(CH0,AD7147_ADD[i],STAGE_COMPLETE_LIMIT_INT, 1, stagecomplete0[0],stagecomplete1[0],stagecomplete2[0],stagecomplete3[0], 0);		
-		 //     WriteToAD7147ViaI2C(CH0,AD7147_ADD[i],AMB_COMP_CTRL0,1, ConfigBuffer, 0);
+		 //  ReadFromAD7147ViaI2C(CH0,AD7147_ADD[i],STAGE_COMPLETE_LIMIT_INT, 1, stagecomplete0[0],stagecomplete1[0],stagecomplete2[0],stagecomplete3[0], 0);		
+		     WriteToAD7147ViaI2C(CH0,AD7147_ADD[i],AMB_COMP_CTRL0,1, ConfigBuffer, 0);
 	///DEBUG	      
 	  //        ConfigAD7147(CH0,i,PW_CONTROL,ConValue); //0 is the number of the device		 
 	    } 
@@ -722,11 +722,8 @@ void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
     unsigned int i,j,error;
     int value; //difference of the current measurement and the initial value (_pCapOffset)
     unsigned int txdata[12];
-//	unsigned int offset;
-	int UP_LIMIT, BOT_LIMIT;
-	
+	int UP_LIMIT, BOT_LIMIT;	
 		error=0;
-//		offset=(255<<SHIFT)+((SHIFT*2)-1); // 255 511 1023 ....
 		UP_LIMIT=((MAXVAL-NOLOAD)<<SHIFT);
 		BOT_LIMIT=(NOLOAD)<<SHIFT;
 	    for (i=0;i<12;i++)
@@ -742,7 +739,7 @@ void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
 		    {
 		    	txdata[i]=MAXVAL; // out of range, pressure too low
 		    }
-		    if (value>BOT_LIMIT) 
+		    if (value>=BOT_LIMIT) 
 		    {
 		    	txdata[i]=MINVAL; // out of range, pressure too high    	
 		    }
@@ -750,7 +747,6 @@ void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
 		    {   
 		            txdata[i]=NOLOAD-(value>>SHIFT);
 		    } 
-
 	    }
 	    
 	    if (error==1)
