@@ -1,8 +1,7 @@
 /* 
- * Copyright (C) 2011 RobotCub Consortium, European Commission FP6 Project IST-004370
- * Author: <name of author>
- * email:   <firstname.secondname>@
- * website: www.robotcub.org
+ * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Author: Valentina Gaggero
+ * email:   valentina.gaggero@iit.it
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
  * later version published by the Free Software Foundation.
