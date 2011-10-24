@@ -131,7 +131,7 @@ void main(void)
 	byte i=0;
 	word test=0;
 	Int32 t1val=0; 
-	Int16 _safeband[JN]=INIT_ARRAY (-5); //it is a value for reducing the JOINT limit of 2*_safeband [tick encoder]
+	Int16 _safeband[JN]=INIT_ARRAY (0); //it is a value for reducing the JOINT limit of _safeband for each side [tick encoder]
 	
 
 	/* gets the address of flash memory from the linker */
@@ -219,8 +219,8 @@ void main(void)
     	_position[1]=(Int32) get_position_abs_ssi(AEA4);
     	_max_real_position[0]=4095;
     	_max_real_position[1]=4095;
-    	_safeband[0] =-5; //5 ticks => 1 grado di AEA.
-		_safeband[1] =-5; //5 ticks => 1 grado di AEA.
+    	_safeband[0] =5; //5 ticks => 1 grado di AEA.
+		_safeband[1] =5; //5 ticks => 1 grado di AEA.
 
 	#endif
 	TI1_init 			  ();
