@@ -147,9 +147,9 @@ void can_receive_additional_info();
 #define MAIS_8bit_D_MSG             0x3ED //8 bits value
 #define MAIS_8bit_C_MSG             0x3EC //8 bits value
 
-#if (VERSION == 0x0153 || VERSION==0x0157)
+#if (VERSION == 0x0153 || VERSION==0x0157 || VERSION == 0x0147)
 	#define CAN_ID_COUPLED_BOARD        1
-#elif VERSION == 0x0150 
+#elif VERSION == 0x0150 || VERSION == 0x0140
 	#define CAN_ID_COUPLED_BOARD        2
 #endif
 

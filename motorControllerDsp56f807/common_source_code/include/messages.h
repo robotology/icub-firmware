@@ -605,7 +605,7 @@
 #endif
 
 //-------------------------------------------------------------------
-#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x351
+#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 | VERSION==0x0147 || VERSION==0x0140 || VERSION==0x351
 #define CAN_SET_ACTIVE_ENCODER_POSITION_HANDLER(x) \
 { \
 	long value; \
@@ -728,7 +728,7 @@
 
 
 //-------------------------------------------------------------------
-#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x0351
+#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0351
 #define CAN_SET_ACTIVE_PID_HANDLER(x) \
 { \
 	Int16 value; \
@@ -753,7 +753,7 @@
 #endif
 
 //-------------------------------------------------------------------
-#if VERSION == 0x0153 || VERSION == 0x0113 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x351
+#if VERSION == 0x0153 || VERSION == 0x0113 || VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x351
 #define CAN_SET_ACTIVE_ERROR_HANDLER(x) \
 { \
 	Int16 value; \
