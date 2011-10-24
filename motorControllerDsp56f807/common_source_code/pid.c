@@ -170,7 +170,7 @@ Int32  _pd_current[JN] = INIT_ARRAY (0);        // pd portion of the current pid
 #endif
 
 
-#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x0351
+#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0351
 Int32  _cpl_pos_received[JN] = INIT_ARRAY (0);	// the position of the synchronized card 
 Int32  _cpl_pos_prediction[JN] = INIT_ARRAY (0);// the actual adjustment (compensation) 
 Int32  _cpl_pos_delta[JN] = INIT_ARRAY (0);		// velocity over the adjustment 
@@ -239,7 +239,7 @@ Int32 compute_pwm(byte j)
 		/*watchdog check for strain messages in torque control mode + input selection*/
 		//the function turns off pwm of joint <jnt> if <strain_num> watchdog is triggered
 		//the first number is joint, the second number is the watchdog identifier
-#if   VERSION == 0x150
+#if   VERSION == 0x150 || VERSION == 0x140
 	  	//arm
 	  	read_force_data (0, WDT_JNT_STRAIN_12,0);
 	  	read_force_data (1, WDT_JNT_STRAIN_12,1);
@@ -299,7 +299,7 @@ Int32 compute_pwm(byte j)
 	  	//torso
 	  	read_force_data (0, WDT_JNT_STRAIN_12,0); 
 	  	  
-#elif VERSION == 0x157 
+#elif VERSION == 0x157 || VERSION == 0x147
       	//coupled joint of the arm
      // read_force_data (0, WDT_6AX_STRAIN_13,5);
 	 	read_force_data (0, WDT_JNT_STRAIN_12,2);
