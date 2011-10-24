@@ -93,6 +93,10 @@ Int16 _version = 0x0171;
 Int16 _version = 0x0172;
 #elif VERSION == 0x0351
 Int16 _version = 0x0351;
+#elif VERSION == 0x0140
+Int16 _version = 0x0140;
+#elif VERSION == 0x0147
+Int16 _version = 0x0147;
 #endif
 #ifndef VERSION
 #	error "No valid version specified"
@@ -311,7 +315,7 @@ void main(void)
 	for (i=0; i<JN; i++) _position_old[i] = 0;
 	for (i=0; i<JN; i++) _speed[i] = 0;
 	for (i=0; i<JN; i++) _accel[i] = 0;
-	for (i=0; i<JN; i++) _safeband[i] =-5; //5 ticks => 1 grado di AEA.
+	for (i=0; i<JN; i++) _safeband[i] =5; //5 ticks => 1 grado di AEA.
 	for (i=0; i<JN; i++) PWMoutput [i] = PWMoutput_old[i] = 0;
 	
 	/* reset the recursive windows for storage of position and velocity data */
@@ -367,7 +371,7 @@ void main(void)
 	    // max_real_position is the limit of the joint starting from 
 	    // 4095 and going to decrease this number without zero-cross
 	    // untill the joint limit is reached
-#if   VERSION == 0x0153 || VERSION == 0x0157 
+#if   VERSION == 0x0153 || VERSION == 0x0157 || VERSION == 0x0147
 		_position_old[0]=_position[0]; 
 		if(get_error_abs_ssi(0)==ERR_OK)
 			_position[0]=Filter_Bit (get_relative_position_abs_ssi(0));

@@ -46,7 +46,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		set_relative_position_abs_ssi_turns(channel, 0);
 		_position[channel] = get_relative_position_abs_ssi(channel);		
 		
-#elif (VERSION==0x0150 || VERSION==0x0151 || VERSION==0x0152 || VERSION==0x0154 || VERSION==0x0155 ) 
+#elif (VERSION==0x0140 || VERSION==0x0150 || VERSION==0x0151 || VERSION==0x0152 || VERSION==0x0154 || VERSION==0x0155 ) 
 
 		AS1_printStringEx ("Calibration ABS_DIGITAL started \r\n");
 		if (param3 >=0 && param3 <=4095) set_max_position(channel, param3);	
@@ -99,7 +99,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		}
 	
 	
-#elif VERSION==0x0153 || VERSION==0x0157 
+#elif VERSION==0x0153 || VERSION==0x0157 || VERSION==0x0147 
 	//  	AS1_printStringEx ("Calibration ABS_DIGITAL started \r\n");
 		if (param3 >=0 && param3 <=4095) set_max_position(channel, param3);	
 		if (param2>0 && channel==0)
