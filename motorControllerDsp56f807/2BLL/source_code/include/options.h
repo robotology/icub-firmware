@@ -13,6 +13,8 @@
 //#define VERSION 0x0170		    	/* Listens for CAN messages from strain boards and computes force control */
 //#define VERSION 0x0171		    	/* Use the internal ADC to measure the strain gauges computes force control */
 //#define VERSION 0x0172		    	/* like version 0x0170, with optical encoder*/
+//#define VERSION 0x0140   				/* similar to 0x150, but no joint decoupling  */
+//#define VERSION 0x0147   				/* similar to 0x157, but no joint decoupling  */
 //#define VERSION 0x0351		    	/* ikart wheels control*/
 
 
