@@ -29,7 +29,6 @@ Int32 compute_filtpid(byte jnt, Int32 PID);
 Int32 step_velocity (byte jj);
 void  compute_desired(byte i);
 bool  check_in_position(byte jnt);
-void  check_desired_within_limits(byte i, Int32 previous_desired);
 void  init_smooth_pid(byte jnt,Int16 finalp,Int16 finald,byte finals, Int16 Time);
 void  smooth_pid(byte jnt);
 bool  read_force_data (byte,byte,byte);

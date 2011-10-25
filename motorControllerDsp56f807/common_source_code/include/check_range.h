@@ -5,5 +5,6 @@
 
 void check_range        (byte, Int16, Int32 *);
 void check_range_torque (byte, Int16, Int32 *);
+void check_desired_within_limits(byte i, Int32 previous_desired);
 
 #endif 

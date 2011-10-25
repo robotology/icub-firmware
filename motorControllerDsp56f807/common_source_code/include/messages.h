@@ -957,12 +957,25 @@
 }
 
 //-------------------------------------------------------------------
+#define CAN_STOP_TRAJECTORY_HANDLER(x) \
+{ \
+	if (_control_mode[axis] == MODE_IMPEDANCE_POS || \
+		_control_mode[axis] == MODE_IMPEDANCE_VEL || \
+		_control_mode[axis] == MODE_POSITION || \
+		_control_mode[axis] == MODE_VELOCITY ) \
+		{ \
+			abort_trajectory (axis, _position[axis]); \
+		} \
+}
+
+//-------------------------------------------------------------------
 #define CAN_POSITION_MOVE_HANDLER(x) \
 { \
 	if (CAN_LEN == 7) \
 	{ \
 		if (_control_mode[axis] != MODE_IDLE && \
-		    _control_mode[axis] != MODE_TORQUE) \
+		    _control_mode[axis] != MODE_TORQUE  && \
+		    _control_mode[axis] != MODE_OPENLOOP) \
 		{ \
 			if (_control_mode[axis] != MODE_IMPEDANCE_POS && \
 				_control_mode[axis] != MODE_IMPEDANCE_VEL ) \
@@ -999,6 +1012,7 @@
 	{ \
 		if (_control_mode[axis] != MODE_IDLE && \
 		    _control_mode[axis] != MODE_TORQUE && \
+		    _control_mode[axis] != MODE_OPENLOOP && \
 		    IS_DONE(axis)) \
 		{ \
 			_vel_counter[axis] = 0; \
@@ -1010,7 +1024,7 @@
 			    _control_mode[axis] = MODE_VELOCITY; \
 			else \
 			    _control_mode[axis] = MODE_IMPEDANCE_VEL; \
-			_set_point[axis] = 0; \
+			_set_point[axis] = _desired[axis]; \
 			_set_vel[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
 			_set_acc[axis] = BYTE_W(CAN_DATA[3], CAN_DATA[4]); \
 			_general_board_error = ERROR_NONE; \
