@@ -960,12 +960,20 @@
 #define CAN_STOP_TRAJECTORY_HANDLER(x) \
 { \
 	if (_control_mode[axis] == MODE_IMPEDANCE_POS || \
-		_control_mode[axis] == MODE_IMPEDANCE_VEL || \
-		_control_mode[axis] == MODE_POSITION || \
-		_control_mode[axis] == MODE_VELOCITY ) \
+		_control_mode[axis] == MODE_POSITION ) \
 		{ \
-			abort_trajectory (axis, _position[axis]); \
+			init_trajectory (axis, _position[axis], _position[axis], 1); \
 		} \
+   	else if (_control_mode[axis] == MODE_IMPEDANCE_VEL) \
+    	{ \
+    	    _control_mode[axis] == MODE_IMPEDANCE_POS; \
+    		init_trajectory (axis, _position[axis], _position[axis], 1); \
+    	} \
+   	else if (_control_mode[axis] == MODE_VELOCITY) \
+    	{ \
+    	    _control_mode[axis] == MODE_POSITION; \
+    		init_trajectory (axis, _position[axis], _position[axis], 1); \
+    	} \
 }
 
 //-------------------------------------------------------------------
