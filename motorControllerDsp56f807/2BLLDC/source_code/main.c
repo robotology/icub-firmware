@@ -188,9 +188,16 @@ void main(void)
 
 //	print_version ();
 	
+#warning "no calibration check" 	
+#if VERSION==0x0161		
+	/* initialization */
+	for (i=0; i<JN; i++) _calibrated[i] = true;
+#endif
+
+#if VERSION==0x0162		
 	/* initialization */
 	for (i=0; i<JN; i++) _calibrated[i] = false;
-	
+#endif	
 	/* reset trajectory generation */
 	for (i=0; i<JN; i++) abort_trajectory (i, 0);
 	
