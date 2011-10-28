@@ -26,7 +26,7 @@
 #include "decoupling.h"
 #include "abs_ssi_interface.h"
 #include "2bllie_brushless_comm.h"
-#if VERSION != 0x0158  
+#if VERSION != 0x0258  
 #include "phase_hall_sens.h"
 
 #else
@@ -73,32 +73,11 @@ extern sDutyControlBL DutyCycleReq[2];
 // Local prototypes 
 //********************
 
-#if   VERSION == 0x0150
-Int16 _version = 0x0150;
-#elif VERSION == 0x0151
-Int16 _version = 0x0151;
-#elif VERSION == 0x0152
-Int16 _version = 0x0152;
-#elif VERSION == 0x0153
-Int16 _version = 0x0153;
-#elif VERSION == 0x0154
-Int16 _version = 0x0154;
-#elif VERSION == 0x0155
-Int16 _version = 0x0155;
-#elif VERSION == 0x0156
-Int16 _version = 0x0156;
-#elif VERSION == 0x0157
-Int16 _version = 0x0157;
-#elif VERSION == 0x0158
-Int16 _version = 0x0158;
-#elif VERSION == 0x0170
-Int16 _version = 0x0170;
-#elif VERSION == 0x0171
-Int16 _version = 0x0171;
-#elif VERSION == 0x0172
-Int16 _version = 0x0172;
-#elif VERSION == 0x0351
-Int16 _version = 0x0351;
+
+#if VERSION == 0x0255
+Int16 _version = 0x0255;
+#elif VERSION == 0x0258
+Int16 _version = 0x0258;
 #endif
 
 #ifndef VERSION
@@ -202,21 +181,21 @@ void main(void)
 	// enable timers
 	// TIMER_A
 	__ENIGROUP (45, 7); //Timer for the encoder commutation if used
-	__ENIGROUP (44, 7); //HallY0
-	__ENIGROUP (43, 7); //HallZ0
+//	__ENIGROUP (44, 7); //
+//	__ENIGROUP (43, 7); //
 	__ENIGROUP (42, 4); //TI1 1ms delay main loop
 	// TIMER_B
 
-	__ENIGROUP (41, 7); //HallX1
-	__ENIGROUP (40, 7); //HallY1
-	__ENIGROUP (39, 7); //HallZ1
-	__ENIGROUP (38, 7);
+//	__ENIGROUP (41, 7); //
+//	__ENIGROUP (40, 7); //
+//	__ENIGROUP (39, 7); //
+//	__ENIGROUP (38, 7);
 
 	// TIMER_C
-	__ENIGROUP (37, 1); 
-	__ENIGROUP (36, 1);
-	__ENIGROUP (35, 1);
-	__ENIGROUP (34, 1);
+//	__ENIGROUP (37, 1); 
+//	__ENIGROUP (36, 1);
+//	__ENIGROUP (35, 1);
+//	__ENIGROUP (34, 1);
 	// TIMER_D
 	__ENIGROUP (33, 7); //1ms delay duty cycle
 	__ENIGROUP (32, 1);
@@ -239,8 +218,8 @@ void main(void)
 		__EI();
 #warning "debug"//   ;
 	init_leds  			  ();
-#if VERSION == 0x0155 	
-	Init_Brushless_Comm	  (1,HALL); //only one axes
+#if VERSION == 0x0255 	
+	Init_Brushless_Comm	  (2,HALL); //two axes
 #else 
   
     enable_can_print();
@@ -263,7 +242,7 @@ void main(void)
  
     init_faults           (true,true,true);	 
     
-#if VERSION ==0x0155  || VERSION ==0x0158 
+#if VERSION ==0x0255  || VERSION ==0x0258 
     init_position_encoder ();
 #endif
 
@@ -280,7 +259,7 @@ void main(void)
 	}
 	
 	BUS_OFF=false;
-
+ 
 	  
 //	print_version ();
 	
@@ -291,7 +270,7 @@ void main(void)
 	for (i=0; i<JN; i++) abort_trajectory (i, 0);
 	
 	
-#if VERSION !=0x0155	&& VERSION !=0x0158
+#if VERSION !=0x0258
 	///////////////////////////////////////
 	// reset of the ABS_SSI
 	// this is needed because the AS5045 gives the first value wrong !!!
@@ -385,12 +364,12 @@ void main(void)
 		_position_old[1]=_position[1];
 		if(get_error_abs_ssi(1)==ERR_OK) 
 			_position[1]=Filter_Bit (get_relative_position_abs_ssi(1));
-#elif VERSION ==0x0155
+#elif VERSION ==0x0255
 		_position_old[0]=_position[0];
 		_position[0]=Filter_Bit (get_position_abs_ssi(0));
 		_position_old[1]=_position[1]; 
-		_position[1]=get_position_encoder(1);
-#elif VERSION ==0x0158
+		_position[1]=Filter_Bit (get_position_abs_ssi(1));
+#elif VERSION ==0x0258
 		_position_old[0]=_position[0];
 		_position[0]=get_position_encoder(0);//get_position_encoder(0);//Get_Sens1_Status();
 		_position[1]=Get_Sens1_Status();//Filter_Bit (get_position_abs_ssi(1));
@@ -408,7 +387,7 @@ void main(void)
 
 ///////////////////////////////////////////DEBUG////////////
 // ADDED VERSION !=0x0171
-#if (VERSION !=0x0154) && (VERSION !=0x0155) && (VERSION !=0x0171) && (VERSION !=0x0158)
+#if (VERSION !=0x0154) && (VERSION !=0x0171) && (VERSION !=0x0258)
 	    for (i=0; i<JN; i++) 
 		{		
 		   if (get_error_abs_ssi(i)==ERR_ABS_SSI)
@@ -423,8 +402,8 @@ void main(void)
 		}  
 #endif
 	
-#warning "here we should put a control for 0x0158"	
-#if (VERSION ==0x0154) || (VERSION ==0x0155) 
+#warning "here we should put a control for 0x0258"	
+#if (VERSION ==0x0154) 
 
 		   if (get_error_abs_ssi(0)==ERR_ABS_SSI)
 		   {
@@ -480,7 +459,7 @@ void main(void)
 		
 					
 		/* in position? */
-#if (VERSION != 0x0154) && (VERSION != 0x0155) && (VERSION != 0x0158)
+#if (VERSION != 0x0154)  && (VERSION != 0x0258)
 		for (i=0; i<JN; i++) _in_position[i] = check_in_position(i); 
 #else
 		_in_position[0] = check_in_position(0);
