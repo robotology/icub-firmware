@@ -249,7 +249,7 @@ void main(void)
 #endif				
 
 
-	serial_interface_init (JN);
+//	serial_interface_init (JN);
 	can_interface_init    (JN);
 	
 #ifdef TORQUE_CNTRL
@@ -298,9 +298,9 @@ void main(void)
     for (i=0; i<JN; i++)	_position[i]=(Int32) Filter_Bit(get_position_abs_ssi(i));
     for (i=0; i<JN; i++)    _max_real_position[i]=Filter_Bit(4095);
 #else 
-	_position[0]=(Int32)get_position_encoder(0);	
-   	_position[1]=(Int32) Filter_Bit(get_position_abs_ssi(1));
-    _max_real_position[1]=Filter_Bit(4095);
+	_position[1]=(Int32)get_position_encoder(1);	
+   	_position[0]=(Int32) Filter_Bit(get_position_abs_ssi(0));
+    _max_real_position[0]=Filter_Bit(4095);
 	
 #endif//	AS1_printStringEx ("\r\n");
 	
