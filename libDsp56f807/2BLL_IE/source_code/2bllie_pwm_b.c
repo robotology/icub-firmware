@@ -47,9 +47,9 @@ void PWM_B_init(void)
   	setReg(PWMB_PWMCM, PWMFREQ);     
   
   
- 	setRegBits(PWMB_PMCTL, 2);         /* Load counter and modulo registers into buffers */ 
+ 	setRegBits(PWMB_PMCTL, 0x2);         /* Load counter and modulo registers into buffers */ 
  	/* PWMB_PMCTL: PWMEN=1 */
-  	setRegBits(PWMB_PMCTL, 1);         /* Run counter */ 
+  	setRegBits(PWMB_PMCTL, 0x1);         /* Run counter */ 
   	/* PWMB_PMCTL: PWMF=1 */
     setRegBits(PWMB_PMCTL, 0x20);        /* Enable reload interrupt */ 
 	// write protect on 
@@ -91,7 +91,6 @@ void PWM_B_Write_Protect()
  * will cause the pwm to be on the whole period.
  * @return ERR_OK if successful.
  */
-#pragma interrupt called
 byte PWM_B_setDuty (byte channel, int duty)
 {
 	switch (channel) 

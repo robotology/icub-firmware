@@ -120,6 +120,44 @@ void PWMAReload_Interrupt(void)
 		
 }
 
+
+
+#pragma interrupt saveall
+void PWMBReload_Interrupt(void)
+{	
+	//clear the interrupt flag of the pwm reload interrupt
+	clrRegBits(PWMB_PMCTL, PWMB_PMCTL_PWMF_MASK);
+	//read the hall sensors
+	status1=HALLSENSOR1;
+	if (old_status1!= status1) 
+	{
+	  	if (status1 == DIRECTION_TABLE[old_status1]) 
+	  	{
+	  		comm_enc[1]++;
+	  	}
+		else if (status1 == DIRECTION_TABLE_INV[old_status1]) 
+			{
+				comm_enc[1]--;	
+			}
+			else
+			{
+		//		PWM_outputPadDisable(0);
+			}    
+		phase_changed[1]=1;		
+
+		// write mask to PWM Channel Control Register 
+		PWMState[1]= pTable1[status1];
+		tmp = getReg(PWMB_PMOUT) & 0x8000;
+		val=tmp | PWMState[1].MaskOut | (PWMState[1].Mask<<8);
+		setReg(PWMB_PMOUT,val);
+		old_status1 = status1;
+	}
+	else 
+	{
+ 		phase_changed[1]=0;	
+	}	
+}
+
 #pragma interrupt called
 void QD0_OnCompare(void)
 {
@@ -195,44 +233,6 @@ void QD0_OnCompare(void)
   setReg(PWMA_PMOUT,val); 
   old_status0 = status0;
 }
-
-
-#pragma interrupt saveall
-void PWMBReload_Interrupt(void)
-{	
-	//clear the interrupt flag of the pwm reload interrupt
-	clrRegBits(PWMB_PMCTL, PWMB_PMCTL_PWMF_MASK);
-	//read the hall sensors
-	status1=HALLSENSOR1;
-	if (old_status1!= status1) 
-	{
-	  	if (status1 == DIRECTION_TABLE[old_status1]) 
-	  	{
-	  		comm_enc[1]++;
-	  	}
-		else if (status1 == DIRECTION_TABLE_INV[old_status1]) 
-			{
-				comm_enc[1]--;	
-			}
-			else
-			{
-		//		PWM_outputPadDisable(0);
-			}    
-		phase_changed[1]=1;		
-
-		// write mask to PWM Channel Control Register 
-		PWMState[1]= pTable1[status1];
-		tmp = getReg(PWMB_PMOUT) & 0x8000;
-		val=tmp | PWMState[1].MaskOut | (PWMState[1].Mask<<8);
-		setReg(PWMB_PMOUT,val);
-		old_status1 = status1;
-	}
-	else 
-	{
- 		phase_changed[1]=0;	
-	}	
-}
-
 
 UInt8 Get_Sens0_Status(void)
 {
