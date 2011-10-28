@@ -110,7 +110,6 @@ void PWM_outputPadEnable(byte axis)
  * @param i is the axis number, can be 0/1
  * @param pwm_value is the duty cicle of the pwm (in clock ticks)
  ***************************************************************************/
-#pragma interrupt called
 void PWM_generate_BLL(byte i, Int16 pwm_value)
 {
 	if (pwm_value < MIN_DUTY) pwm_value = MIN_DUTY;

@@ -10,7 +10,7 @@ typedef struct sDutyControl_tag
 	byte    Dir;	
 	Int16   Duty;
 } sDutyControlBL;
-
+ 
 
 
 #define  MIN_DUTY 6  // MIN_DUTY has to be bigger then DEAD_TIME  8 a 200KHz 8 a 50KHz 8 a 30KHz at 48V it moves even at min duty
@@ -21,8 +21,8 @@ typedef struct sDutyControl_tag
 #define HALL			   0	
 #define ENCODER            1
 #define ALIGNEMENT_PWM   100
-#define HALLSENSOR0 ((getRegBits(GPIO_B_DR,GPIO_B2)<<2) | (getRegBits(GPIO_B_DR,GPIO_B3)<<1) | (getRegBits(GPIO_B_DR,GPIO_B4)<<1));
-#define HALLSENSOR1 ((getRegBits(GPIO_D_DR,GPIO_D2)<<2) | (getRegBits(GPIO_D_DR,GPIO_D3)<<1) | (getRegBits(GPIO_D_DR,GPIO_D4)<<1));
+#define HALLSENSOR0 ((getRegBits(GPIO_B_DR,GPIO_B2)<<2) | (getRegBits(GPIO_B_DR,GPIO_B3)<<1) | (getRegBits(GPIO_B_DR,GPIO_B4)));
+#define HALLSENSOR1 ((getRegBits(GPIO_D_DR,GPIO_D2)<<2) | (getRegBits(GPIO_D_DR,GPIO_D3)<<1) | (getRegBits(GPIO_D_DR,GPIO_D4)));
  
 
 void TD0_interrupt(void);

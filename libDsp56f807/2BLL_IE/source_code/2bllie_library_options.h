@@ -19,4 +19,4 @@
 	#error unable to init array for JN != 2,4
 #endif
     
-#endif
+#endif 

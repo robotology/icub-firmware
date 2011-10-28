@@ -115,6 +115,7 @@ void PWM_A_Write_Protect()
  * @return ERR_OK if successful.
  */
 /**************************************************************************************/
+
 byte PWM_A_setDuty (byte channel, int val)
 {
 	switch (channel) 

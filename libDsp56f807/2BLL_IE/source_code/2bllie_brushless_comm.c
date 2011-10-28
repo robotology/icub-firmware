@@ -172,7 +172,6 @@ led1_on;
 		if (COMMUTATION_MODE==HALL)
 		{
 				status0=HALLSENSOR0; 
-	//			can_printf("C_M %d ",COMMUTATION_MODE);
 		}
 		else 
   		{

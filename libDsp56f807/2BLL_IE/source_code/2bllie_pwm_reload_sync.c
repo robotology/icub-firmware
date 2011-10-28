@@ -88,7 +88,6 @@ void PWMAReload_Interrupt(void)
 	if (COMMUTATION_MODE==HALL)
 	{
 		status0=HALLSENSOR0;
-	//		can_printf("C_M_I %d ",COMMUTATION_MODE);
 		if (old_status0!= status0) 
 		{
 		  	if (status0 == DIRECTION_TABLE[old_status0]) 
@@ -110,8 +109,6 @@ void PWMAReload_Interrupt(void)
 			val=tmp | PWMState[0].MaskOut | (PWMState[0].Mask<<8);
 			setReg(PWMA_PMOUT,val); 
 			old_status0 = status0;
-
-
 		}
 		else 
 		{

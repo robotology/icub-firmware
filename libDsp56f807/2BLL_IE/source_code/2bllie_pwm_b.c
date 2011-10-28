@@ -91,13 +91,14 @@ void PWM_B_Write_Protect()
  * will cause the pwm to be on the whole period.
  * @return ERR_OK if successful.
  */
+#pragma interrupt called
 byte PWM_B_setDuty (byte channel, int duty)
 {
 	switch (channel) 
 	{
 	case 0 :
 		setReg (PWMB_PWMVAL0, duty);
-		break;
+		break; 
 	case 1 :
 		setReg (PWMB_PWMVAL1, duty);
 		break;
