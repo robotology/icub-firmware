@@ -11,18 +11,14 @@
 #include "qd1.h"
 #include "can1.h"
 
-#define  HALL_ERROR_0K   	0x0  //no errors
-#define  HALL_ERROR_TD0   	0x1  //when there is a mismatch between Hall reading in the hall_interrupt and the 1ms timer
-#define  HALL_ERROR_TABLE 	0x2  //when the reading of the hall in the hall_interrupt is not congruent with the table  
-#define  HALL_ERROR_GLITCH	0x4 //when there is a mismatch between the two hall reading in the hall_interrupt 
 
-volatile UInt8 _current_sign[4]={0,0,0,0};
+//volatile UInt8 _current_sign[4]={0,0,0,0};
 
 volatile   UInt16 status0 = 0;
 volatile   UInt16 status1 = 0;
 volatile   UInt16 old_status0 = 0;
 volatile   UInt16 old_status1 = 0;
-volatile   bool phase_changed[2]={0,0};    
+//volatile   bool phase_changed[2]={0,0};    
 volatile   UInt8 hall_error[2]={0,0};
 volatile   UInt8 tmp,val; //used in the interrupt routine
 
@@ -85,8 +81,8 @@ void PWMAReload_Interrupt(void)
 	clrRegBits(PWMA_PMCTL, PWMA_PMCTL_PWMF_MASK);
 	
 	//read the hall sensors
-	if (COMMUTATION_MODE==HALL)
-	{
+//	if (COMMUTATION_MODE==HALL)
+//	{
 		status0=HALLSENSOR0;
 		if (old_status0!= status0) 
 		{
@@ -100,9 +96,10 @@ void PWMAReload_Interrupt(void)
 				}
 				else
 				{
-			//		PWM_outputPadDisable(0);
+					hall_error[0]=HALL_ERROR_TABLE;
+					PWM_outputPadDisable(0);
 				} 
-			phase_changed[0]=1;
+//			phase_changed[0]=1;
 				// write mask to PWM Channel Control Register 
 			PWMState[0]= pTable0[status0];
 			tmp = getReg(PWMA_PMOUT) & 0x8000;
@@ -112,9 +109,9 @@ void PWMAReload_Interrupt(void)
 		}
 		else 
 		{
-	 		phase_changed[0]=0;	
+//	 		phase_changed[0]=0;	
 		}
-	}
+//	}
 
 
 		
@@ -141,9 +138,10 @@ void PWMBReload_Interrupt(void)
 			}
 			else
 			{
-		//		PWM_outputPadDisable(0);
+				PWM_outputPadDisable(1);
+				hall_error[1]=HALL_ERROR_TABLE;
 			}    
-		phase_changed[1]=1;		
+//		phase_changed[1]=1;		
 
 		// write mask to PWM Channel Control Register 
 		PWMState[1]= pTable1[status1];
@@ -154,7 +152,7 @@ void PWMBReload_Interrupt(void)
 	}
 	else 
 	{
- 		phase_changed[1]=0;	
+//		phase_changed[1]=0;	
 	}	
 }
 

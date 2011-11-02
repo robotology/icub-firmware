@@ -12,7 +12,7 @@ Int32 _current_limit_I2T=7000; //NOT USED, we are using max_allowed_current  val
 Int32 _current[4] =		 {0,0,0,0};					/* current through the transistors in mA*/
 Int32 _current_old[4] =  {0,0,0,0};					/* current at t-1*/
 Int16 _current_debug[4]={0,0,0,0};
-extern UInt8 _current_sign[4];
+//extern UInt8 _current_sign[4];
 Int32 _filt_current[4] = {0,0,0,0};     			/* filtered current through the transistors*/
 Int32 _max_allowed_current[4] = {7000,7000,7000,7000};	/* limit on the current in milli-ampere*/							
 float _conversion_factor[4] ={0.46,0.46,0.46,0.46};		/* limit on the current as set by the interface (later converted into the filter parameter) */

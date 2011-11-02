@@ -24,7 +24,7 @@ extern sPwmControlBL PWMState[2];
 extern Int32 comm_enc[2]; 
 extern UInt8 hall_error[2];
 Int32 comm_count[2] = {0, 0};
-extern volatile UInt8 	_current_sign[];
+//extern volatile UInt8 	_current_sign[];
 volatile byte COMMUTATION_MODE=0;   //the commutation method 
 extern COMMUTATION_CONVERSION_TABLE[8];
 const Int16  HALL_TO_COMMCOUNTER[8] = {0, 1, 3, 2, 5, 6, 4, 0};	/* order of commutation states */
@@ -158,14 +158,14 @@ led1_on;
 			if (DutyCycleReq[0].Dir) 
 			{
 				pTable0 = bldcCommutationTableCompInv;
-				_current_sign[0]=0;
+		//		_current_sign[0]=0;
 			
 			}
 			
 			else
 			{
 				pTable0 = bldcCommutationTableComp;
-				_current_sign[0]=1;
+		//		_current_sign[0]=1;
 				
 			} 
 		    // after a direction change the pwm must be changed immediately, before a hall sensor changed  
