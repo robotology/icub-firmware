@@ -22,17 +22,11 @@
 #include "check_range.h"
 
 #include "encoders_interface.h"
-#include "filters.h"
+#include "filters.h" 
 #include "decoupling.h"
 #include "abs_ssi_interface.h"
-#include "2bllie_brushless_comm.h"
-#if VERSION != 0x0258  
+#include "2bllie_brushless_comm.h" 
 #include "phase_hall_sens.h"
-
-#else
-
-#include "2bllie_pwm_reload_sync.h"
-#endif
 #include "pwm_a.h"
 #include "pwm_b.h"
 
