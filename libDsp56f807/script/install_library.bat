@@ -6,13 +6,17 @@ ECHO This script let you install library.
 ECHO 1. 2BLL
 ECHO 2. 2BLLDC
 ECHO 3. 4DC
-ECHO 4. ALL_BOARD
+ECHO 4. 2BLL_IE
+ECHO 5. ALL_BOARD
+
 set choice=
 set /p choice=Type of board.
 if '%choice%'=='1' goto 2bll_board
 if '%choice%'=='2' goto 2blldc_board
 if '%choice%'=='3' goto 4dc_board
-if '%choice%'=='4' goto all_board
+if '%choice%'=='4' goto 2bll_ie_board
+if '%choice%'=='5' goto all_board
+
 ECHO "%choice%" is not valid please try again
 ECHO.
 goto start
@@ -26,11 +30,13 @@ copy /-Y ..\2BLLDC\output\library_2blldc.lib ..\..\motorControllerDsp56f807\2BLL
 goto end
 
 
-
 :4dc_board
 copy /-Y ..\4DC\output\library_4dc.lib ..\..\motorControllerDsp56f807\4DC\lib\
 goto end
 
+:2bll_ie_board
+copy /-Y ..\2BLL_IE\output\library_2bll_ie.lib ..\..\motorControllerDsp56f807\2BLL_IE\lib\
+goto end
 
 :all_board
 copy /-Y ..\2BLL\output\library_2bll.lib ..\..\motorControllerDsp56f807\2BLL\lib\
