@@ -1,6 +1,6 @@
 
 #include "2bllie_brushless_comm.h"
-#include "2bllie_pwm_reload_sync.h"
+#include "phase_hall_sens.h"
 #include "pwm_interface.h"
 #include "pwm_a.h"
 #include "pwm_b.h"
@@ -129,6 +129,15 @@ void TD0_interrupt(void)
 	UInt8 tmp,val;
 	static Int16 counter = 0;
 led1_on;
+
+	if ((status0==0x00) || (status0==0x07))
+	{
+		hall_error[0] |=HALL_ERROR_TD0;
+	}
+	if ((status1==0x00) || (status1==0x07))
+	{
+    	hall_error[1] |=HALL_ERROR_TD0;
+	}
 
 	if (DutyCycleReq[0].Duty < MIN_DUTY)
 		DutyCycleReq[0].Duty=MIN_DUTY;

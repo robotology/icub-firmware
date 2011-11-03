@@ -6,7 +6,7 @@
 
 #include "qd0.h"
 #include "2bllie_brushless_comm.h"
-#include "2bllie_pwm_reload_sync.h"
+#include "phase_hall_sens.h"
 #include "qd0.h"
 
 #define NUMBER_OF_TICK_MS   1600 // it about 2x the number of tick/ms if the encoder is 8192 tick/ms and the motor speed is 6000rpm 
@@ -148,7 +148,7 @@ void QD0_init (void)
 #pragma interrupt saveall                     //it runs only if COMMUTATION_METHOD is ENCODER 
 void QD0_Interrupt(void)
 {
-   QD0_OnCompare();              
+ //  QD0_OnCompare();              
  clrRegBit (TMRA0_SCR, TCF);            /* Reset interrupt request flag */      
 
 }

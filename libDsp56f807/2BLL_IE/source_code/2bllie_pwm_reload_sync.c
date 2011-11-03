@@ -1,6 +1,6 @@
 
 
-#include "2bllie_pwm_reload_sync.h"
+#include "phase_hall_sens.h"
 #include "pwm_interface.h"
 #include "qd0.h"
 #include "qd1.h" 
@@ -19,7 +19,7 @@ volatile   UInt16 status1 = 0;
 volatile   UInt16 old_status0 = 0;
 volatile   UInt16 old_status1 = 0;
 //volatile   bool phase_changed[2]={0,0};    
-volatile   UInt8 hall_error[2]={0,0};
+volatile   UInt8 hall_error[2]={HALL_ERROR_0K,HALL_ERROR_0K};
 volatile   UInt8 tmp,val; //used in the interrupt routine
 
 Int16  	   DirectionSpinning0 = 1;	/* direction of spinning (1,-1) */
@@ -109,7 +109,12 @@ void PWMAReload_Interrupt(void)
 		}
 		else 
 		{
+			if ((status0==0x0) || (status0==0x07))
+			{
+				hall_error[0]=HALL_ERROR_TABLE;
+	//			PWM_outputPadDisable(0);
 //	 		phase_changed[0]=0;	
+			}
 		}
 //	}
 
@@ -138,8 +143,10 @@ void PWMBReload_Interrupt(void)
 			}
 			else
 			{
-				PWM_outputPadDisable(1);
 				hall_error[1]=HALL_ERROR_TABLE;
+	
+				PWM_outputPadDisable(1);
+		
 			}    
 //		phase_changed[1]=1;		
 
@@ -150,10 +157,14 @@ void PWMBReload_Interrupt(void)
 		setReg(PWMB_PMOUT,val);
 		old_status1 = status1;
 	}
-	else 
-	{
-//		phase_changed[1]=0;	
-	}	
+	else
+	{		
+		if ((status1==0x0) || (status1==0x07))
+		{
+			hall_error[1]=HALL_ERROR_TABLE;
+	//		PWM_outputPadDisable(1);
+		}
+	}
 }
 
 #pragma interrupt called

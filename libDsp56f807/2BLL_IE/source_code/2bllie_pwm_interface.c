@@ -38,9 +38,9 @@ void init_pwm(void)
  ***************************************************************************/
 void PWM_outputPadDisable(byte axis)
 {
-#ifdef DEBUG_CAN_MSG
+
 	can_printf("PWM DIS CH%d", axis);
-#endif
+
 	if (axis == 0)
 	{
 		led0_off

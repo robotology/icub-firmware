@@ -1,10 +1,10 @@
 /*
- * 2bll_timer_pwm_sync.h
+ * 
  * 	Interrupt syncronized with the center of the pwm 
  */
 
-#ifndef  __2bll_pwm_reload_synch__
-#define  __2bll_pwm_reload_synch__
+#ifndef  __2bllie_pwm_reload_synch__
+#define  __2bllie_pwm_reload_synch__
  
 #include "dsp56f807.h"
 
