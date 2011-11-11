@@ -1,0 +1,3 @@
+
+void AD_Init();
+
