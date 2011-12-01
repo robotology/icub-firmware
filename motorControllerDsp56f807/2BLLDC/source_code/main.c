@@ -31,7 +31,7 @@
 
 byte	_board_ID = 15;	
 char    _additional_info [32];
-byte    _build_number = 58;
+byte    _build_number = 59;
 byte    _my_can_protocol_major = 1;
 byte    _my_can_protocol_minor = 1;
 bool    _can_protocol_ack = false;
@@ -82,8 +82,6 @@ Int16 _version = 0x0162;
 void main(void)
 {
 	Int32 PWMoutput [JN];
-	word temp;
-	word temporary;
 	byte i=0;
 	UInt16 *value=0;
 	Int32 temp_swap = 0;
@@ -134,7 +132,7 @@ void main(void)
 	__ENIGROUP (16, 6);
 	__ENIGROUP (17, 6);
 	
-	// enable ADCA/ADCB
+	// enable ADCA/ADCB 
 	__ENIGROUP (55, 4);
 	__ENIGROUP (54, 4);
 	
@@ -165,7 +163,7 @@ void main(void)
 	BUS_OFF=false;
 	_count=0;
 
-	__EI();
+	__EI(); 
 	
 	flash_interface_init  (JN);			
 	readFromFlash (_flash_addr);  
@@ -173,7 +171,7 @@ void main(void)
 	__DI();
    
 	init_leds  			  ();			
-	serial_interface_init (JN);
+//	serial_interface_init (JN);
 	can_interface_init    (JN);
 
 	Init_Brushed_Comm    ();	
@@ -316,7 +314,7 @@ void main(void)
 #ifdef USE_NEW_DECOUPLING
 		decouple_dutycycle_new_joint(PWMoutput); //new version (july 2010) with torque decupling
 #else
-		decouple_dutycycle(PWMoutput);				
+		decouple_dutycycle_new_joint(PWMoutput);				
 #endif				
 		
 //******************************************* SATURATES CONTROLS ***************************/                

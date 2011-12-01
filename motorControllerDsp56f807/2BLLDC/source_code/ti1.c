@@ -45,7 +45,7 @@ void TI1_interrupt (void)
     _count++;
 	_wait = false;
 	highcurrent[0]=false;
-	highcurrent[1]=false;
+	highcurrent[1]=false; 
 		/* Check Current */
 		for (i=0; i<JN; i++) 
 		{
