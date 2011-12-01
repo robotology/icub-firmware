@@ -39,7 +39,7 @@ void init_pwm(void)
 void PWM_outputPadDisable(byte axis)
 {
 
-	can_printf("PWM DIS CH%d", axis);
+	can_printf("PWMDIS CH%d", axis);
 
 	if (axis == 0)
 	{
@@ -71,7 +71,7 @@ void PWM_outputPadEnable(byte axis)
 {
 
 	Int16 status=0;
-	can_printf("PWM EN");
+	can_printf("PWMEN CH%d", axis);
 	status = getReg (PWMA_PMFSA);
 	if ((axis == 0) && !(status & PWMA_PMFSA_FPIN3_MASK)) 	 
 	{	
@@ -83,7 +83,6 @@ void PWM_outputPadEnable(byte axis)
 		}
 		led0_on
 		_pad_enabled[0]= true;
-		old_status0=0;   //reset the old_status to 0
 		PWM_A_outputPadEnable(ALL_CHANNELS); 	
 	}
 	status = getReg (PWMB_PMFSA);

@@ -24,7 +24,7 @@ void turn_led_on(byte number)
 	if (number>=0 && number<4)	setRegBits(GPIO_A_DR,(0x10 << number));
 }
 
-
+  
 
 /***************************************************************************/
 /**

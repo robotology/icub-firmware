@@ -25,7 +25,7 @@ extern Int32 comm_enc[2];
 extern UInt8 hall_error[2];
 Int32 comm_count[2] = {0, 0};
 //extern volatile UInt8 	_current_sign[];
-volatile byte COMMUTATION_MODE=0;   //the commutation method 
+volatile byte COMMUTATION_MODE=HALL;   //the commutation method  
 extern COMMUTATION_CONVERSION_TABLE[8];
 const Int16  HALL_TO_COMMCOUNTER[8] = {0, 1, 3, 2, 5, 6, 4, 0};	/* order of commutation states */
 #define INITIAL_COMMUTATION_COUNTER_VALUE  5;
