@@ -67,7 +67,7 @@
 #include"can_interface.h"
 #include "AD7147RegMap.h"
 #include "I2C.h"
-#include "T1.h"
+#include "timers.h"
 #include "LED.h"
 #include "eeprom.h"
 #include "options.h"
@@ -76,17 +76,21 @@
 #include<adc10.h>
 
 
-#warning "if you want to run the debug version uncomment the line below"
+#warning "if you want to execute the A3A (accelerometer)reading uncomment this line"
 
- #define DEBUG
+#define ACCELEROMETER
 
+
+unsigned int AN2 = 0; //Accelerometer X axes
+unsigned int AN3 = 0; //Accelerometer Y axes
+unsigned int AN4 = 0; //Accelerometer Z axes
 // inizializzazione bit di configurazione (p30f4013.h)
 _FOSC(CSW_FSCM_OFF & EC_PLL8); 
   // Clock switching disabled Fail safe Clock Monitor disabled
   // External clock with PLL x8 (10MHz*8->Fcycle=80/4=20MIPS)
 _FWDT(WDT_OFF);      // WD disabled
 //
-_FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON & BORV_27);  // BOR 2.7V POR 64msec
+_FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON );  // BOR 2.7V POR 64msec
 _FGS(CODE_PROT_OFF); // Code protection disabled
 
 
@@ -107,7 +111,7 @@ void FillCanMessages16bit_all(unsigned char Channel,unsigned char triangleN);
 void FillCanMessagesTest(unsigned char Channel,unsigned int i); 	
 void TrianglesInit(unsigned char Channel);
 void TrianglesInit_all(unsigned char Channel);
-void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void);        
+       
 void __attribute__((interrupt, no_auto_psv)) _C1Interrupt(void);  
 
 
@@ -131,7 +135,8 @@ struct s_eeprom _EEDATA(1) ee_data =
 struct s_eeprom BoardConfig = {0}; 
 
 
-char flag;
+volatile char flag;
+volatile char flag2;
 unsigned int AD7147Registers[16][12];  //Element[23] = 0x17 = ID register @ 0x17
 const	unsigned char AD7147_ADD[4]={0x2C,0x2D,0x2E,0x2F};
 typedef unsigned const int __prog__ * FlashAddress; //flsh address 
@@ -185,6 +190,7 @@ unsigned char new_board_MODE=EIGHT_BITS;
 char _additional_info [32]={'T','a','c','t','i','l','e',' ','S','e','n','s','o','r'};
 unsigned int PW_CONTROL= 0x0B0; // 0x1B0 for 128 decim  
 unsigned int TIMER_VALUE=TIMER_SINGLE_256dec; // Timer duration 0x3000=> 40ms
+unsigned int TIMER_VALUE2=0xC00; // Timer duration 0xC00=> 10ms
 unsigned int SHIFT=2; //shift of the CDC value for removing the noise
 unsigned int SHIFT_THREE=3;// shift of the CDC value for removing the noise
 unsigned int SHIFT_ALL=4; //shift of the CDC value for removing the noise
@@ -209,15 +215,14 @@ extern void ConfigAD7147_ALL(unsigned char Channel, unsigned int i,unsigned int 
 //------------------------------------------------------------------------------
 // 								Interrrupt routines
 //------------------------------------------------------------------------------
-void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void)
+void __attribute__((interrupt, no_auto_psv)) _T2Interrupt(void)
 {
-    flag=flag+1;
-    WriteTimer1(0x0);
-//    if (CONFIG_TYPE==CONFIG_SINGLE)    ServiceAD7147Isr(CH0);
-//    if (CONFIG_TYPE==CONFIG_ALL)  ServiceAD7147Isr_all(CH0);
-  							   //      TMR1  = 0;          /* Reset Timer1 to 0x0000 */
-    PR1   = TIMER_VALUE;     /* assigning Period to Timer period register */
-    IFS0=IFS0 & 0xFFF7;
+   
+
+    flag2=1;
+    WriteTimer2(0x0);
+    _T2IF = 0;
+
 }
 void __attribute__((interrupt, no_auto_psv)) _C1Interrupt(void)
 {
@@ -247,35 +252,11 @@ int main(void)
     unsigned int counter;
     unsigned int led_counter;
     unsigned int result;
-	unsigned int mean;
-    unsigned int Channel, PinConfig, Scanselect;
-    unsigned int Adcon3_reg, Adcon2_reg, Adcon1_reg;
-    ADCON1bits.ADON = 0;
-    Channel = ADC_CH0_POS_SAMPLEA_AN4 &
-                     ADC_CH0_NEG_SAMPLEA_NVREF;
-    SetChanADC10(Channel);
-    ConfigIntADC10(ADC_INT_DISABLE);
-    PinConfig  = ENABLE_AN4_ANA;
-    Scanselect =SKIP_SCAN_AN1 & SKIP_SCAN_AN2 & SKIP_SCAN_AN5 &
-                 SKIP_SCAN_AN9 & SKIP_SCAN_AN10 &
-                 SKIP_SCAN_AN14 & SKIP_SCAN_AN15;
-    Adcon3_reg = ADC_SAMPLE_TIME_10 &
-                 ADC_CONV_CLK_SYSTEM &
-                 ADC_CONV_CLK_13Tcy;
-    Adcon2_reg = ADC_VREF_AVDD_AVSS  &//ADC_VREF_AVDD_AVSS & 
-                 ADC_SCAN_OFF &
-                 ADC_ALT_BUF_OFF &
-                 ADC_ALT_INPUT_OFF &
-                 ADC_CONVERT_CH0&
-                 ADC_SAMPLES_PER_INT_1;
-    Adcon1_reg = ADC_MODULE_ON &
-                 ADC_IDLE_CONTINUE &
-                 ADC_FORMAT_INTG &
-                 ADC_CLK_MANUAL &
-                 ADC_SAMPLE_SIMULTANEOUS &
-                 ADC_AUTO_SAMPLING_OFF; 
-    OpenADC10(Adcon1_reg, Adcon2_reg, Adcon3_reg,PinConfig, Scanselect);             
-    ADCON1bits.SAMP = 1;
+    unsigned int mean;
+
+
+    ADC_Init();             //Initialize the A/D converter
+
 
    	//
     // EEPROM Data Recovery
@@ -287,6 +268,7 @@ int main(void)
     //								Peripheral init
     //------------------------------------------------------------------------
     T1_Init(TIMER_VALUE);
+    T2_Init(TIMER_VALUE2);
     CAN_Init();
     I2C_Init(CH0); 
   //  I2C_Init(CH1); 
@@ -371,6 +353,23 @@ int main(void)
     for (;;)
     {
 
+        #ifdef ACCELEROMETER
+        if (flag2==1)
+        {
+            status[1]=((AN2 &0xFF00) >>0x8); // cycle number
+            status[0]=(AN2 & 0xFF);
+            status[3]=((AN3 &0xFF00) >>0x8); // cycle number
+            status[2]=(AN3 & 0xFF);
+            status[5]=((AN4 &0xFF00) >>0x8); // ERRORS in reading the I2C
+            status[4]=(AN4 & 0xFF);
+            flag2=0;
+            PMsgID=0x500;
+            PMsgID |= (BoardConfig.EE_CAN_BoardAddress<<4);
+            CAN1_send(PMsgID,1,6,status);
+        }
+#endif
+
+
         if (flag==1)
         {
         	flag=0;
@@ -404,9 +403,9 @@ int main(void)
 	        status[4]=(ERROR_COUNTER & 0xFF);
 	        counter++;
  	        
- 		    CAN1_send(0x100,1,8,status);		
+ 		    		
 #endif  
- 
+
  ////////////////////////////////////////////////////////				
             //debug
 				// Filling the can messages with the CapSensorData

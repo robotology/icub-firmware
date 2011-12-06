@@ -15,6 +15,7 @@ extern void main();
 extern struct s_eeprom BoardConfig; 
 
 
+
 extern unsigned int _board_ID;
 extern unsigned char board_MODE;
 extern unsigned char new_board_MODE;
@@ -74,7 +75,7 @@ void CAN_Init()
     // RX0IE    RX1IE    TX0IE 
     // 
     DisableIntCAN1;
-    ConfigIntCAN1(0x0007, CAN_INT_PRI_2 & CAN_INT_ENABLE);   
+    ConfigIntCAN1(0x0007, CAN_INT_PRI_1 & CAN_INT_ENABLE);
     canTxBufferIndex=-1;
     canRxBufferIndex=0;
     testcounter=0;
@@ -124,7 +125,6 @@ void CAN_Init()
     CAN1SetTXMode(          tx_rx_no,                       // Setta il buffer di trasmissione
                             CAN_TX_STOP_REQ &               // Leva la richiesta di trasmissione         
                             CAN_TX_PRIORITY_HIGH );     // Imposta la priorita del nodo?
-
     CAN1SetRXMode(          tx_rx_no,                       // Setta il buffer di ricezione
                             CAN_RXFUL_CLEAR &           // Azzera il flag RXFUL          
                             CAN_BUF0_DBLBUFFER_EN);  // Attiva la dipendenza dei due buffer?  
@@ -154,11 +154,11 @@ unsigned char CAN1_send(unsigned int MessageID,unsigned char FrameType,unsigned 
 {
     unsigned char i=0;
 
-    //CAN1_TX_DIS; 
-    DisableIntCAN1;  
+      DisableIntCAN1;
     if (canTxBufferIndex<(CAN_TX_SOFTWARE_BUFFER_SIZE-1))
     {
-        canTxBufferIndex++;
+      
+        canTxBufferIndex++;     
         canTxBuffer[canTxBufferIndex].CAN_messID=MessageID;
         canTxBuffer[canTxBufferIndex].CAN_frameType=FrameType;
         canTxBuffer[canTxBufferIndex].CAN_length=Length;
@@ -166,15 +166,15 @@ unsigned char CAN1_send(unsigned int MessageID,unsigned char FrameType,unsigned 
         {
             canTxBuffer[canTxBufferIndex].CAN_data[i]=Data[i];  
         }
+       
         if (canTxBufferIndex==0)
         {
             while (!CAN1IsTXReady(0));
             C1INTFbits.TX0IF=1;
           //	C1TX0CONbits.TXREQ=1;
         }
-
-    EnableIntCAN1;  
-        return 0;
+    EnableIntCAN1;
+    return 0;
     } else
     {
         canTxBufferIndex=-1;
@@ -187,6 +187,7 @@ unsigned char CAN1_send(unsigned int MessageID,unsigned char FrameType,unsigned 
                         Data, 0,0);
         return -1;
     }
+   
 }
 
 void CAN1_interruptTx (void)
@@ -198,7 +199,6 @@ void CAN1_interruptTx (void)
         buffer=0;       
         C1INTFbits.TX0IF=0;
     }
-
     if (canTxBufferIndex!=-1)
     {
         CAN1SendMessage((CAN_TX_SID(canTxBuffer[canTxBufferIndex].CAN_messID)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
@@ -206,7 +206,6 @@ void CAN1_interruptTx (void)
                         canTxBuffer[canTxBufferIndex].CAN_data,
                         canTxBuffer[canTxBufferIndex].CAN_length,
                         buffer);
-
         canTxBufferIndex--;
     }
     else 
@@ -281,7 +280,8 @@ int CAN1_handleRx (unsigned int board_id)
         // ID 0x700 (100 0000 0000b) message class = bootloader message
        if ((((CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x700) == 0x700) && (((CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x00F) == _board_ID)) || ((CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x00F) == 0x00F)) )
         {
-	        DisableIntT1;  
+	        DisableIntT1;
+                DisableIntT2;
             IdTx = (CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x0700);         
             IdTx |=  ((_board_ID) << 4);
             IdTx |= ((CANRxBuffer[canRxBufferIndex-1].CAN_messID >> 4) & 0x000F);     
@@ -467,6 +467,8 @@ int CAN1_handleRx (unsigned int board_id)
 					//main();
 					board_MODE=CALIB;
 					EnableIntT1;
+
+                                        EnableIntT2;
 				}
 				break;
 				
@@ -486,7 +488,8 @@ int CAN1_handleRx (unsigned int board_id)
 					SHIFT_ALL   =	CANRxBuffer[canRxBufferIndex-1].CAN_data[3]&0xF;     
 					NOLOAD		=	CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0xFF;  
 					board_MODE=CALIB;
-					EnableIntT1;   	
+					EnableIntT1;
+                                        EnableIntT2;
 				}
 				break;
 
@@ -499,8 +502,7 @@ int CAN1_handleRx (unsigned int board_id)
 			}	
  	   	
 	
-	    }
-	    
+	    }    
         DisableIntCAN1;
         canRxBufferIndex--;
         EnableIntCAN1;
