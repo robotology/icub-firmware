@@ -66,6 +66,7 @@
 #include<p30f4011.h>
 #include"can_interface.h"
 #include "AD7147RegMap.h"
+#include "ADC.h"
 #include "I2C.h"
 #include "timers.h"
 #include "LED.h"
