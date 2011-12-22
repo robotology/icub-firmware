@@ -4,21 +4,34 @@
 
 
 float x_filt[6][JN],  y_filt[6][JN];	
-		
+float gain[JN];
+float c1[JN];
+
 Int32 lpf_ord1_3hz(Int32 input, int j)
 {
-       	//order1 3Hz
 		x_filt[0][j] = x_filt[1][j]; 
-        x_filt[1][j] = input / 1.071001538e+02;
+        x_filt[1][j] = input / gain[j];
         y_filt[0][j] = y_filt[1][j]; 
         y_filt[1][j] = (x_filt[0][j] + x_filt[1][j])
-        	 	  + (  0.9813258905  * y_filt[0][j]);
+        	 	  + (  c1[j]  * y_filt[0][j]);
         return (Int32)(y_filt[1][j]);
 }
 
 void clear_lpf_ord1_3hz(int j)
 {
 	int i=0;
+	if (_debug_in5[j]==0 )
+	{
+	    //order1 3Hz
+		gain[j] = 1.071001538e+02;
+		c1[j] = 0.9813258905;
+	}
+	else
+	{
+		c1[j] = _debug_in5[j];
+		gain[j] = 2.0 / (1.0 - c1[j]);
+	}
+	
 	for (i=0; i<6; i++)
 	{
 		x_filt[i][j]=0;
