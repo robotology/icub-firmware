@@ -21,7 +21,6 @@ Int32 compute_pwm(byte j);
 Int32 compute_pid2(byte j);
 Int32 compute_pid_speed(byte j);
 Int32 compute_pid_impedance(byte j);
-Int32 compute_impedance_and_force(byte j);
 Int32 compute_pid_torque(byte j, Int16 strain_val);
 Int32 compute_current_pid(byte j);
 Int32 compute_pid_abs(byte j);
