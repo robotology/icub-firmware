@@ -6,190 +6,183 @@
 !_TAG_PROGRAM_VERSION	5.5.4	//
 !_TAG_REVISION_NAME	MCHPTags	//
 !_TAG_REVISION_VERSION	6.0.1	//
-AD_Init	F:\iCub\firmware\bcs\AD.c	5;"	f	line:5
-AD_Init	F:\iCub\firmware\bcs\AD.h	2;"	p	line:2	signature:()
-Adcon1_reg	F:\iCub\firmware\bcs\AD.c	8;"	l	line:8
-Adcon2_reg	F:\iCub\firmware\bcs\AD.c	8;"	l	line:8
-Adcon3_reg	F:\iCub\firmware\bcs\AD.c	8;"	l	line:8
-Am	F:\iCub\firmware\bcs\main.c	191;"	l	line:191
-BitToSend	F:\iCub\firmware\bcs\main.c	104;"	v	line:104
-BoardConfig	F:\iCub\firmware\bcs\main.c	91;"	v	line:91
-Buf	F:\iCub\firmware\bcs\main.c	125;"	v	line:125
-CANSTB::LATEbits.LATE1	F:\iCub\firmware\bcs\PIN.h	6;"	d	line:6
-CAN_DATA_FRAME::0	F:\iCub\firmware\bcs\can_protocol.c	16;"	d	line:16	file:
-CAN_EXTENDED_FORMAT::1	F:\iCub\firmware\bcs\can_protocol.c	13;"	d	line:13	file:
-CAN_MSG_CLASS_BOARDTEST::0x200	F:\iCub\firmware\bcs\can_protocol.c	37;"	d	line:37	file:
-CAN_MSG_CLASS_BOARDTEST::0x200	F:\iCub\firmware\bcs\can_protocol.c	3;"	d	line:3	file:
-CAN_MSG_CLASS_LOADER::7	F:\iCub\firmware\bcs\can_protocol.c	66;"	d	line:66	file:
-CAN_MSG_CLASS_PERIODIC::0x100	F:\iCub\firmware\bcs\can_protocol.c	28;"	d	line:28	file:
-CAN_MSG_CLASS_POLLING::0x000	F:\iCub\firmware\bcs\can_protocol.c	19;"	d	line:19	file:
-CAN_MSG_CLASS_TACTSENSOR::0x200	F:\iCub\firmware\bcs\can_protocol.c	46;"	d	line:46	file:
-CAN_REMOTE_FRAME::1	F:\iCub\firmware\bcs\can_protocol.c	17;"	d	line:17	file:
-CAN_STANDARD_FORMAT::0	F:\iCub\firmware\bcs\can_protocol.c	12;"	d	line:12	file:
-CAN_TX_SOFTWARE_BUFFER_SIZE::10	F:\iCub\firmware\bcs\can_protocol.c	78;"	d	line:78	file:
-CHARGE	F:\iCub\firmware\bcs\main.c	120;"	v	line:120
-CHARGE_CHAR	F:\iCub\firmware\bcs\main.c	133;"	v	line:133
-CHAR_RECEIVED	F:\iCub\firmware\bcs\main.c	135;"	v	line:135
-CHRG	F:\iCub\firmware\bcs\main.c	129;"	v	line:129
-CONFIG_ALL::1	F:\iCub\firmware\bcs\options.h	12;"	d	line:12
-CONFIG_SINGLE::0	F:\iCub\firmware\bcs\options.h	11;"	d	line:11
-CUR	F:\iCub\firmware\bcs\main.c	126;"	v	line:126
-CURRENT	F:\iCub\firmware\bcs\main.c	111;"	v	line:111
-CUR_CHAR	F:\iCub\firmware\bcs\main.c	131;"	v	line:131
-CUR_OFFSET	F:\iCub\firmware\bcs\main.c	113;"	v	line:113
-CharToUInt	F:\iCub\firmware\bcs\main.c	150;"	p	line:150	file:	signature:(char * c,unsigned int N)
-CharToUInt	F:\iCub\firmware\bcs\main.c	559;"	f	line:559	signature:(char * c,unsigned int N)
-Charge	F:\iCub\firmware\bcs\main.c	536;"	l	line:536
-DCDC	F:\iCub\firmware\bcs\main.c	128;"	v	line:128
-DCDC_VOLTAGE	F:\iCub\firmware\bcs\main.c	119;"	v	line:119
-DC_EN::LATEbits.LATE2	F:\iCub\firmware\bcs\PIN.h	5;"	d	line:5
-DMAdx	F:\iCub\firmware\bcs\eeprom.c	22;"	l	line:22
-EEPROM_H	F:\iCub\firmware\bcs\eeprom.h	3;"	d	line:3
-EE_AdditionalInfo	F:\iCub\firmware\bcs\eeprom.h	23;"	m	line:23	struct:s_eeprom
-EE_B_EEErased	F:\iCub\firmware\bcs\eeprom.h	13;"	m	line:13	struct:s_eeprom
-EE_B_EnableBOR	F:\iCub\firmware\bcs\eeprom.h	15;"	m	line:15	struct:s_eeprom
-EE_B_EnableWD	F:\iCub\firmware\bcs\eeprom.h	14;"	m	line:14	struct:s_eeprom
-EE_CAN_BoardAddress	F:\iCub\firmware\bcs\eeprom.h	18;"	m	line:18	struct:s_eeprom
-EE_CAN_MessageDataRate	F:\iCub\firmware\bcs\eeprom.h	19;"	m	line:19	struct:s_eeprom
-EE_CAN_Speed	F:\iCub\firmware\bcs\eeprom.h	20;"	m	line:20	struct:s_eeprom
-EE_ChkSum	F:\iCub\firmware\bcs\eeprom.h	27;"	m	line:27	struct:s_eeprom
-EE_CurrentOffset	F:\iCub\firmware\bcs\eeprom.h	25;"	m	line:25	struct:s_eeprom
-EE_Time	F:\iCub\firmware\bcs\eeprom.h	26;"	m	line:26	struct:s_eeprom
-EE_VoltageOffset	F:\iCub\firmware\bcs\eeprom.h	24;"	m	line:24	struct:s_eeprom
-EE_addr	F:\iCub\firmware\bcs\eeprom.c	21;"	l	line:21
-EE_addr	F:\iCub\firmware\bcs\eeprom.c	53;"	l	line:53
-EIGHT_BITS::1	F:\iCub\firmware\bcs\options.h	8;"	d	line:8
-END_LINE	F:\iCub\firmware\bcs\main.c	130;"	v	line:130
-INTERVAL	F:\iCub\firmware\bcs\main.c	109;"	v	line:109
-IntToString	F:\iCub\firmware\bcs\main.c	149;"	p	line:149	file:	signature:(char * C, long val, unsigned int N)
-IntToString	F:\iCub\firmware\bcs\main.c	500;"	f	line:500	signature:(char * c, long val, unsigned int N)
-LED1::LATEbits.LATE5	F:\iCub\firmware\bcs\PIN.h	2;"	d	line:2
-LED1_test	F:\iCub\firmware\bcs\PIN.c	31;"	f	line:31
-LED1_test	F:\iCub\firmware\bcs\PIN.h	10;"	p	line:10	signature:()
-LED1_toggle	F:\iCub\firmware\bcs\PIN.c	39;"	f	line:39
-LED1_toggle	F:\iCub\firmware\bcs\PIN.h	11;"	p	line:11	signature:()
-MAXVOLTAGE	F:\iCub\firmware\bcs\main.c	118;"	v	line:118
-MENU	F:\iCub\firmware\bcs\main.c	190;"	l	line:190
-OE::LATEbits.LATE3	F:\iCub\firmware\bcs\PIN.h	4;"	d	line:4
-OFFSET	F:\iCub\firmware\bcs\main.c	537;"	l	line:537
-OLD_CURRENT	F:\iCub\firmware\bcs\main.c	112;"	v	line:112
-OLD_VOLTAGE	F:\iCub\firmware\bcs\main.c	116;"	v	line:116
-PINs_Init	F:\iCub\firmware\bcs\PIN.c	6;"	f	line:6
-PINs_Init	F:\iCub\firmware\bcs\PIN.h	8;"	p	line:8	signature:()
-PINs_test	F:\iCub\firmware\bcs\PIN.c	22;"	f	line:22
-PINs_test	F:\iCub\firmware\bcs\PIN.h	9;"	p	line:9	signature:()
-PLOT	F:\iCub\firmware\bcs\main.c	96;"	v	line:96
-PLOT1	F:\iCub\firmware\bcs\main.c	97;"	v	line:97
-PLOT2	F:\iCub\firmware\bcs\main.c	98;"	v	line:98
-PinConfig	F:\iCub\firmware\bcs\AD.c	7;"	l	line:7
-REALMAXVOLTAGE	F:\iCub\firmware\bcs\main.c	117;"	v	line:117
-Receiveddata	F:\iCub\firmware\bcs\main.c	134;"	v	line:134
-RecoverConfigurationFromEEprom	F:\iCub\firmware\bcs\eeprom.c	51;"	f	line:51
-RecoverConfigurationFromEEprom	F:\iCub\firmware\bcs\eeprom.h	37;"	p	line:37	signature:()
-SAVE_EEPROM_ATONCE::1	F:\iCub\firmware\bcs\eeprom.h	5;"	d	line:5
-SD::LATEbits.LATE4	F:\iCub\firmware\bcs\PIN.h	3;"	d	line:3
-SLEEP::1	F:\iCub\firmware\bcs\T1.c	6;"	d	line:6	file:
-SaveEepromBoardConfig	F:\iCub\firmware\bcs\eeprom.c	15;"	f	line:15
-SaveEepromBoardConfig	F:\iCub\firmware\bcs\eeprom.h	36;"	p	line:36	signature:()
-T1_Init	F:\iCub\firmware\bcs\T1.c	13;"	f	line:13	signature:(unsigned int match_value)
-T1_Init	F:\iCub\firmware\bcs\T1.h	2;"	p	line:2	signature:(unsigned int match_value)
-T2_Init	F:\iCub\firmware\bcs\T1.c	69;"	f	line:69	signature:(unsigned int match_value)
-T2_Init	F:\iCub\firmware\bcs\T1.h	4;"	p	line:4	signature:(unsigned int match_value)
-T3_Init	F:\iCub\firmware\bcs\T1.c	78;"	f	line:78	signature:(unsigned int match_value)
-T3_Init	F:\iCub\firmware\bcs\T1.h	5;"	p	line:5	signature:(unsigned int match_value)
-TEN_BITS::2	F:\iCub\firmware\bcs\options.h	9;"	d	line:9
-TEST::0	F:\iCub\firmware\bcs\options.h	7;"	d	line:7
-TIMEOUT	F:\iCub\firmware\bcs\main.c	322;"	l	line:322
-TIMER_VALUE	F:\iCub\firmware\bcs\main.c	107;"	v	line:107
-TIME_INTERVAL	F:\iCub\firmware\bcs\main.c	108;"	v	line:108
-TRIANGLE_OFFSET::0	F:\iCub\firmware\bcs\options.h	5;"	d	line:5
-Tm	F:\iCub\firmware\bcs\main.c	193;"	l	line:193
-Tmax	F:\iCub\firmware\bcs\main.c	200;"	l	line:200
-U2MODEvalue	F:\iCub\firmware\bcs\main.c	326;"	l	line:326
-U2STAvalue	F:\iCub\firmware\bcs\main.c	327;"	l	line:327
-UIntToString	F:\iCub\firmware\bcs\main.c	148;"	p	line:148	file:	signature:(char * C, unsigned int val, unsigned int N)
-UIntToString	F:\iCub\firmware\bcs\main.c	486;"	f	line:486	signature:(char * c, unsigned int val, unsigned int N)
-VCC	F:\iCub\firmware\bcs\main.c	127;"	v	line:127
-VCC_CHAR	F:\iCub\firmware\bcs\main.c	132;"	v	line:132
-VOLTAGE	F:\iCub\firmware\bcs\main.c	115;"	v	line:115
-Vm	F:\iCub\firmware\bcs\main.c	192;"	l	line:192
-Wait	F:\iCub\firmware\bcs\PIN.c	4;"	p	line:4	file:	signature:(unsigned int value)
-Wait	F:\iCub\firmware\bcs\main.c	147;"	p	line:147	file:	signature:(int value)
-Wait	F:\iCub\firmware\bcs\main.c	475;"	f	line:475	signature:(int value)
-_AddressError	F:\iCub\firmware\bcs\traps.c	13;"	p	line:13	file:	signature:(void)
-_AddressError	F:\iCub\firmware\bcs\traps.c	35;"	f	line:35	signature:(void)
-_AltAddressError	F:\iCub\firmware\bcs\traps.c	17;"	p	line:17	file:	signature:(void)
-_AltAddressError	F:\iCub\firmware\bcs\traps.c	67;"	f	line:67	signature:(void)
-_AltMathError	F:\iCub\firmware\bcs\traps.c	19;"	p	line:19	file:	signature:(void)
-_AltMathError	F:\iCub\firmware\bcs\traps.c	79;"	f	line:79	signature:(void)
-_AltOscillatorFail	F:\iCub\firmware\bcs\traps.c	16;"	p	line:16	file:	signature:(void)
-_AltOscillatorFail	F:\iCub\firmware\bcs\traps.c	61;"	f	line:61	signature:(void)
-_AltStackError	F:\iCub\firmware\bcs\traps.c	18;"	p	line:18	file:	signature:(void)
-_AltStackError	F:\iCub\firmware\bcs\traps.c	73;"	f	line:73	signature:(void)
-_C1Interrupt	F:\iCub\firmware\bcs\main.c	145;"	p	line:145	file:	signature:(void)
-_MathError	F:\iCub\firmware\bcs\traps.c	15;"	p	line:15	file:	signature:(void)
-_MathError	F:\iCub\firmware\bcs\traps.c	46;"	f	line:46	signature:(void)
-_OscillatorFail	F:\iCub\firmware\bcs\traps.c	12;"	p	line:12	file:	signature:(void)
-_OscillatorFail	F:\iCub\firmware\bcs\traps.c	29;"	f	line:29	signature:(void)
-_StackError	F:\iCub\firmware\bcs\traps.c	14;"	p	line:14	file:	signature:(void)
-_StackError	F:\iCub\firmware\bcs\traps.c	40;"	f	line:40	signature:(void)
-_T1Interrupt	F:\iCub\firmware\bcs\main.c	143;"	p	line:143	file:	signature:(void)
-_T1Interrupt	F:\iCub\firmware\bcs\main.c	160;"	f	line:160	signature:(void)
-_T2Interrupt	F:\iCub\firmware\bcs\main.c	144;"	p	line:144	file:	signature:(void)
-_T2Interrupt	F:\iCub\firmware\bcs\main.c	170;"	f	line:170	signature:(void)
-_U2RXInterrupt	F:\iCub\firmware\bcs\main.c	146;"	p	line:146	file:	signature:(void)
-_U2RXInterrupt	F:\iCub\firmware\bcs\main.c	186;"	f	line:186	signature:(void)
-_U2TXInterrupt	F:\iCub\firmware\bcs\main.c	179;"	f	line:179	signature:(void)
-__options_h__	F:\iCub\firmware\bcs\options.h	2;"	d	line:2
-_board_ID	F:\iCub\firmware\bcs\main.c	106;"	v	line:106
-_build_number::1	F:\iCub\firmware\bcs\options.h	16;"	d	line:16
-_version::0x0200	F:\iCub\firmware\bcs\options.h	15;"	d	line:15
-a	F:\iCub\firmware\bcs\T1.c	41;"	l	line:41
-b	F:\iCub\firmware\bcs\T1.c	41;"	l	line:41
-battery_cap	F:\iCub\firmware\bcs\main.c	121;"	v	line:121
-battery_cap_div100	F:\iCub\firmware\bcs\main.c	122;"	v	line:122
-baudvalue	F:\iCub\firmware\bcs\main.c	325;"	l	line:325
-c	F:\iCub\firmware\bcs\T1.c	41;"	l	line:41
-charge	F:\iCub\firmware\bcs\main.c	123;"	v	line:123
-chargeCalculator	F:\iCub\firmware\bcs\main.c	151;"	p	line:151	file:	signature:(int A,int V)
-chargeCalculator	F:\iCub\firmware\bcs\main.c	528;"	f	line:528	signature:(int A,int V)
-counter	F:\iCub\firmware\bcs\main.c	99;"	v	line:99
-cur	F:\iCub\firmware\bcs\main.c	114;"	v	line:114
-current_cpu_ipl	F:\iCub\firmware\bcs\T1.c	16;"	l	line:16
-data	F:\iCub\firmware\bcs\main.c	489;"	l	line:489
-data	F:\iCub\firmware\bcs\main.c	503;"	l	line:503
-data	F:\iCub\firmware\bcs\main.c	562;"	l	line:562
-error	F:\iCub\firmware\bcs\main.c	202;"	l	line:202
-finish	F:\iCub\firmware\bcs\main.c	195;"	l	line:195
-flag	F:\iCub\firmware\bcs\main.c	103;"	v	line:103
-i	F:\iCub\firmware\bcs\eeprom.c	22;"	l	line:22
-i	F:\iCub\firmware\bcs\main.c	189;"	l	line:189
-i	F:\iCub\firmware\bcs\main.c	320;"	l	line:320
-i	F:\iCub\firmware\bcs\main.c	488;"	l	line:488
-i	F:\iCub\firmware\bcs\main.c	502;"	l	line:502
-i	F:\iCub\firmware\bcs\main.c	561;"	l	line:561
-m	F:\iCub\firmware\bcs\main.c	321;"	l	line:321
-m	F:\iCub\firmware\bcs\main.c	563;"	l	line:563
-main	F:\iCub\firmware\bcs\main.c	315;"	f	line:315	signature:(void)
-mean	F:\iCub\firmware\bcs\main.c	346;"	l	line:346
-not_sleeping	F:\iCub\firmware\bcs\main.c	137;"	v	line:137
-p	F:\iCub\firmware\bcs\T1.c	41;"	l	line:41
-p1	F:\iCub\firmware\bcs\main.c	530;"	l	line:530
-p2	F:\iCub\firmware\bcs\main.c	531;"	l	line:531
-p3	F:\iCub\firmware\bcs\main.c	532;"	l	line:532
-p4	F:\iCub\firmware\bcs\main.c	533;"	l	line:533
-p5	F:\iCub\firmware\bcs\main.c	534;"	l	line:534
-p6	F:\iCub\firmware\bcs\main.c	535;"	l	line:535
-pressA	F:\iCub\firmware\bcs\main.c	196;"	l	line:196
-pressM	F:\iCub\firmware\bcs\main.c	197;"	l	line:197
-pressS	F:\iCub\firmware\bcs\main.c	201;"	l	line:201
-pressT	F:\iCub\firmware\bcs\main.c	199;"	l	line:199
-pressV	F:\iCub\firmware\bcs\main.c	198;"	l	line:198
-read	F:\iCub\firmware\bcs\main.c	136;"	v	line:136
-result	F:\iCub\firmware\bcs\main.c	345;"	l	line:345
-s_eeprom	F:\iCub\firmware\bcs\eeprom.h	10;"	s	line:10
-s_eeprom	F:\iCub\firmware\bcs\eeprom.h	29;"	t	line:29
-setted	F:\iCub\firmware\bcs\main.c	194;"	l	line:194
-sleep	F:\iCub\firmware\bcs\main.c	124;"	v	line:124
-test	F:\iCub\firmware\bcs\eeprom.c	23;"	l	line:23
-test1	F:\iCub\firmware\bcs\eeprom.c	24;"	l	line:24
+AD_Init	F:\iCub\firmware\bcs\source_code\AD.c	5;"	f	line:5
+AD_Init	F:\iCub\firmware\bcs\source_code\include\AD.h	2;"	p	line:2	signature:()
+Adcon1_reg	F:\iCub\firmware\bcs\source_code\AD.c	8;"	l	line:8
+Adcon2_reg	F:\iCub\firmware\bcs\source_code\AD.c	8;"	l	line:8
+Adcon3_reg	F:\iCub\firmware\bcs\source_code\AD.c	8;"	l	line:8
+Am	F:\iCub\firmware\bcs\source_code\main.c	193;"	l	line:193
+BitToSend	F:\iCub\firmware\bcs\source_code\main.c	103;"	v	line:103
+BoardConfig	F:\iCub\firmware\bcs\source_code\main.c	90;"	v	line:90
+Buf	F:\iCub\firmware\bcs\source_code\main.c	125;"	v	line:125
+CANSTB::LATEbits.LATE1	F:\iCub\firmware\bcs\source_code\include\PIN.h	6;"	d	line:6
+CANSTB::PORTEbits.RE	F:\iCub\firmware\bcs\source_code\include\LED.h	6;"	d	line:6
+CHARGE	F:\iCub\firmware\bcs\source_code\main.c	119;"	v	line:119
+CHARGE_CHAR	F:\iCub\firmware\bcs\source_code\main.c	134;"	v	line:134
+CHAR_RECEIVED	F:\iCub\firmware\bcs\source_code\main.c	137;"	v	line:137
+CHECKSUM	F:\iCub\firmware\bcs\source_code\main.c	120;"	v	line:120
+CHECKSUM_CHAR	F:\iCub\firmware\bcs\source_code\main.c	135;"	v	line:135
+CHRG	F:\iCub\firmware\bcs\source_code\main.c	129;"	v	line:129
+CKS	F:\iCub\firmware\bcs\source_code\main.c	130;"	v	line:130
+CUR	F:\iCub\firmware\bcs\source_code\main.c	126;"	v	line:126
+CURRENT	F:\iCub\firmware\bcs\source_code\main.c	110;"	v	line:110
+CUR_CHAR	F:\iCub\firmware\bcs\source_code\main.c	132;"	v	line:132
+CUR_OFFSET	F:\iCub\firmware\bcs\source_code\main.c	112;"	v	line:112
+CharToUInt	F:\iCub\firmware\bcs\source_code\main.c	152;"	p	line:152	file:	signature:(char * c,unsigned int N)
+CharToUInt	F:\iCub\firmware\bcs\source_code\main.c	566;"	f	line:566	signature:(char * c,unsigned int N)
+Charge	F:\iCub\firmware\bcs\source_code\main.c	543;"	l	line:543
+DCDC	F:\iCub\firmware\bcs\source_code\main.c	128;"	v	line:128
+DCDC_VOLTAGE	F:\iCub\firmware\bcs\source_code\main.c	118;"	v	line:118
+DC_EN::LATEbits.LATE2	F:\iCub\firmware\bcs\source_code\include\PIN.h	5;"	d	line:5
+DC_EN::PORTEbits.RE2	F:\iCub\firmware\bcs\source_code\include\LED.h	5;"	d	line:5
+DMAdx	F:\iCub\firmware\bcs\source_code\eeprom.c	21;"	l	line:21
+EEPROM_H	F:\iCub\firmware\bcs\source_code\include\eeprom.h	3;"	d	line:3
+EE_AdditionalInfo	F:\iCub\firmware\bcs\source_code\include\eeprom.h	23;"	m	line:23	struct:s_eeprom
+EE_B_EEErased	F:\iCub\firmware\bcs\source_code\include\eeprom.h	13;"	m	line:13	struct:s_eeprom
+EE_B_EnableBOR	F:\iCub\firmware\bcs\source_code\include\eeprom.h	15;"	m	line:15	struct:s_eeprom
+EE_B_EnableWD	F:\iCub\firmware\bcs\source_code\include\eeprom.h	14;"	m	line:14	struct:s_eeprom
+EE_CAN_BoardAddress	F:\iCub\firmware\bcs\source_code\include\eeprom.h	18;"	m	line:18	struct:s_eeprom
+EE_CAN_MessageDataRate	F:\iCub\firmware\bcs\source_code\include\eeprom.h	19;"	m	line:19	struct:s_eeprom
+EE_CAN_Speed	F:\iCub\firmware\bcs\source_code\include\eeprom.h	20;"	m	line:20	struct:s_eeprom
+EE_ChkSum	F:\iCub\firmware\bcs\source_code\include\eeprom.h	27;"	m	line:27	struct:s_eeprom
+EE_CurrentOffset	F:\iCub\firmware\bcs\source_code\include\eeprom.h	25;"	m	line:25	struct:s_eeprom
+EE_Time	F:\iCub\firmware\bcs\source_code\include\eeprom.h	26;"	m	line:26	struct:s_eeprom
+EE_VoltageOffset	F:\iCub\firmware\bcs\source_code\include\eeprom.h	24;"	m	line:24	struct:s_eeprom
+EE_addr	F:\iCub\firmware\bcs\source_code\eeprom.c	20;"	l	line:20
+EE_addr	F:\iCub\firmware\bcs\source_code\eeprom.c	52;"	l	line:52
+END_LINE	F:\iCub\firmware\bcs\source_code\main.c	131;"	v	line:131
+INTERVAL	F:\iCub\firmware\bcs\source_code\main.c	108;"	v	line:108
+IntToString	F:\iCub\firmware\bcs\source_code\main.c	151;"	p	line:151	file:	signature:(char * C, long val, unsigned int N)
+IntToString	F:\iCub\firmware\bcs\source_code\main.c	507;"	f	line:507	signature:(char * c, long val, unsigned int N)
+LED1::LATEbits.LATE5	F:\iCub\firmware\bcs\source_code\include\PIN.h	2;"	d	line:2
+LED1_test	F:\iCub\firmware\bcs\source_code\PIN.c	31;"	f	line:31
+LED1_test	F:\iCub\firmware\bcs\source_code\include\PIN.h	10;"	p	line:10	signature:()
+LED1_toggle	F:\iCub\firmware\bcs\source_code\PIN.c	39;"	f	line:39
+LED1_toggle	F:\iCub\firmware\bcs\source_code\include\PIN.h	11;"	p	line:11	signature:()
+LED_Init	F:\iCub\firmware\bcs\source_code\LED.c	6;"	f	line:6
+LED_Init	F:\iCub\firmware\bcs\source_code\include\LED.h	8;"	p	line:8	signature:()
+LED_test	F:\iCub\firmware\bcs\source_code\LED.c	12;"	f	line:12
+LED_test	F:\iCub\firmware\bcs\source_code\include\LED.h	9;"	p	line:9	signature:()
+MAXVOLTAGE	F:\iCub\firmware\bcs\source_code\main.c	117;"	v	line:117
+MENU	F:\iCub\firmware\bcs\source_code\main.c	192;"	l	line:192
+OE::LATEbits.LATE3	F:\iCub\firmware\bcs\source_code\include\PIN.h	4;"	d	line:4
+OE::PORTEbits.RE3	F:\iCub\firmware\bcs\source_code\include\LED.h	4;"	d	line:4
+OFFSET	F:\iCub\firmware\bcs\source_code\main.c	544;"	l	line:544
+OLD_CURRENT	F:\iCub\firmware\bcs\source_code\main.c	111;"	v	line:111
+OLD_VOLTAGE	F:\iCub\firmware\bcs\source_code\main.c	115;"	v	line:115
+PINs_Init	F:\iCub\firmware\bcs\source_code\PIN.c	6;"	f	line:6
+PINs_Init	F:\iCub\firmware\bcs\source_code\include\PIN.h	8;"	p	line:8	signature:()
+PINs_test	F:\iCub\firmware\bcs\source_code\PIN.c	22;"	f	line:22
+PINs_test	F:\iCub\firmware\bcs\source_code\include\PIN.h	9;"	p	line:9	signature:()
+PLOT	F:\iCub\firmware\bcs\source_code\main.c	95;"	v	line:95
+PLOT1	F:\iCub\firmware\bcs\source_code\main.c	96;"	v	line:96
+PLOT2	F:\iCub\firmware\bcs\source_code\main.c	97;"	v	line:97
+PinConfig	F:\iCub\firmware\bcs\source_code\AD.c	7;"	l	line:7
+REALMAXVOLTAGE	F:\iCub\firmware\bcs\source_code\main.c	116;"	v	line:116
+Receiveddata	F:\iCub\firmware\bcs\source_code\main.c	136;"	v	line:136
+RecoverConfigurationFromEEprom	F:\iCub\firmware\bcs\source_code\eeprom.c	50;"	f	line:50
+RecoverConfigurationFromEEprom	F:\iCub\firmware\bcs\source_code\include\eeprom.h	37;"	p	line:37	signature:()
+SAVE_EEPROM_ATONCE::1	F:\iCub\firmware\bcs\source_code\include\eeprom.h	5;"	d	line:5
+SD::LATEbits.LATE4	F:\iCub\firmware\bcs\source_code\include\PIN.h	3;"	d	line:3
+SD::PORTEbits.RE4	F:\iCub\firmware\bcs\source_code\include\LED.h	3;"	d	line:3
+SLEEP::1	F:\iCub\firmware\bcs\source_code\T1.c	6;"	d	line:6	file:
+SaveEepromBoardConfig	F:\iCub\firmware\bcs\source_code\eeprom.c	14;"	f	line:14
+SaveEepromBoardConfig	F:\iCub\firmware\bcs\source_code\include\eeprom.h	36;"	p	line:36	signature:()
+T1_Init	F:\iCub\firmware\bcs\source_code\T1.c	13;"	f	line:13	signature:(unsigned int match_value)
+T1_Init	F:\iCub\firmware\bcs\source_code\include\T1.h	2;"	p	line:2	signature:(unsigned int match_value)
+T2_Init	F:\iCub\firmware\bcs\source_code\T1.c	69;"	f	line:69	signature:(unsigned int match_value)
+T2_Init	F:\iCub\firmware\bcs\source_code\include\T1.h	4;"	p	line:4	signature:(unsigned int match_value)
+T3_Init	F:\iCub\firmware\bcs\source_code\T1.c	78;"	f	line:78	signature:(unsigned int match_value)
+T3_Init	F:\iCub\firmware\bcs\source_code\include\T1.h	5;"	p	line:5	signature:(unsigned int match_value)
+TIMEOUT	F:\iCub\firmware\bcs\source_code\main.c	324;"	l	line:324
+TIMER_VALUE	F:\iCub\firmware\bcs\source_code\main.c	106;"	v	line:106
+TIME_INTERVAL	F:\iCub\firmware\bcs\source_code\main.c	107;"	v	line:107
+Tm	F:\iCub\firmware\bcs\source_code\main.c	195;"	l	line:195
+Tmax	F:\iCub\firmware\bcs\source_code\main.c	202;"	l	line:202
+U2MODEvalue	F:\iCub\firmware\bcs\source_code\main.c	328;"	l	line:328
+U2STAvalue	F:\iCub\firmware\bcs\source_code\main.c	329;"	l	line:329
+UIntToString	F:\iCub\firmware\bcs\source_code\main.c	150;"	p	line:150	file:	signature:(char * C, unsigned int val, unsigned int N)
+UIntToString	F:\iCub\firmware\bcs\source_code\main.c	493;"	f	line:493	signature:(char * c, unsigned int val, unsigned int N)
+VCC	F:\iCub\firmware\bcs\source_code\main.c	127;"	v	line:127
+VCC_CHAR	F:\iCub\firmware\bcs\source_code\main.c	133;"	v	line:133
+VOLTAGE	F:\iCub\firmware\bcs\source_code\main.c	114;"	v	line:114
+Vm	F:\iCub\firmware\bcs\source_code\main.c	194;"	l	line:194
+Wait	F:\iCub\firmware\bcs\source_code\LED.c	4;"	p	line:4	file:	signature:(unsigned int value)
+Wait	F:\iCub\firmware\bcs\source_code\PIN.c	4;"	p	line:4	file:	signature:(unsigned int value)
+Wait	F:\iCub\firmware\bcs\source_code\main.c	149;"	p	line:149	file:	signature:(int value)
+Wait	F:\iCub\firmware\bcs\source_code\main.c	482;"	f	line:482	signature:(int value)
+_AddressError	F:\iCub\firmware\bcs\source_code\traps.c	13;"	p	line:13	file:	signature:(void)
+_AddressError	F:\iCub\firmware\bcs\source_code\traps.c	35;"	f	line:35	signature:(void)
+_AltAddressError	F:\iCub\firmware\bcs\source_code\traps.c	17;"	p	line:17	file:	signature:(void)
+_AltAddressError	F:\iCub\firmware\bcs\source_code\traps.c	67;"	f	line:67	signature:(void)
+_AltMathError	F:\iCub\firmware\bcs\source_code\traps.c	19;"	p	line:19	file:	signature:(void)
+_AltMathError	F:\iCub\firmware\bcs\source_code\traps.c	79;"	f	line:79	signature:(void)
+_AltOscillatorFail	F:\iCub\firmware\bcs\source_code\traps.c	16;"	p	line:16	file:	signature:(void)
+_AltOscillatorFail	F:\iCub\firmware\bcs\source_code\traps.c	61;"	f	line:61	signature:(void)
+_AltStackError	F:\iCub\firmware\bcs\source_code\traps.c	18;"	p	line:18	file:	signature:(void)
+_AltStackError	F:\iCub\firmware\bcs\source_code\traps.c	73;"	f	line:73	signature:(void)
+_C1Interrupt	F:\iCub\firmware\bcs\source_code\main.c	147;"	p	line:147	file:	signature:(void)
+_MathError	F:\iCub\firmware\bcs\source_code\traps.c	15;"	p	line:15	file:	signature:(void)
+_MathError	F:\iCub\firmware\bcs\source_code\traps.c	46;"	f	line:46	signature:(void)
+_OscillatorFail	F:\iCub\firmware\bcs\source_code\traps.c	12;"	p	line:12	file:	signature:(void)
+_OscillatorFail	F:\iCub\firmware\bcs\source_code\traps.c	29;"	f	line:29	signature:(void)
+_StackError	F:\iCub\firmware\bcs\source_code\traps.c	14;"	p	line:14	file:	signature:(void)
+_StackError	F:\iCub\firmware\bcs\source_code\traps.c	40;"	f	line:40	signature:(void)
+_T1Interrupt	F:\iCub\firmware\bcs\source_code\main.c	145;"	p	line:145	file:	signature:(void)
+_T1Interrupt	F:\iCub\firmware\bcs\source_code\main.c	162;"	f	line:162	signature:(void)
+_T2Interrupt	F:\iCub\firmware\bcs\source_code\main.c	146;"	p	line:146	file:	signature:(void)
+_T2Interrupt	F:\iCub\firmware\bcs\source_code\main.c	172;"	f	line:172	signature:(void)
+_U2RXInterrupt	F:\iCub\firmware\bcs\source_code\main.c	148;"	p	line:148	file:	signature:(void)
+_U2RXInterrupt	F:\iCub\firmware\bcs\source_code\main.c	188;"	f	line:188	signature:(void)
+_U2TXInterrupt	F:\iCub\firmware\bcs\source_code\main.c	181;"	f	line:181	signature:(void)
+_board_ID	F:\iCub\firmware\bcs\source_code\main.c	105;"	v	line:105
+a	F:\iCub\firmware\bcs\source_code\T1.c	41;"	l	line:41
+b	F:\iCub\firmware\bcs\source_code\T1.c	41;"	l	line:41
+battery_cap	F:\iCub\firmware\bcs\source_code\main.c	121;"	v	line:121
+battery_cap_div100	F:\iCub\firmware\bcs\source_code\main.c	122;"	v	line:122
+baudvalue	F:\iCub\firmware\bcs\source_code\main.c	327;"	l	line:327
+c	F:\iCub\firmware\bcs\source_code\T1.c	41;"	l	line:41
+charge	F:\iCub\firmware\bcs\source_code\main.c	123;"	v	line:123
+chargeCalculator	F:\iCub\firmware\bcs\source_code\main.c	153;"	p	line:153	file:	signature:(int A,int V)
+chargeCalculator	F:\iCub\firmware\bcs\source_code\main.c	535;"	f	line:535	signature:(int A,int V)
+counter	F:\iCub\firmware\bcs\source_code\main.c	98;"	v	line:98
+cur	F:\iCub\firmware\bcs\source_code\main.c	113;"	v	line:113
+current_cpu_ipl	F:\iCub\firmware\bcs\source_code\T1.c	16;"	l	line:16
+data	F:\iCub\firmware\bcs\source_code\main.c	496;"	l	line:496
+data	F:\iCub\firmware\bcs\source_code\main.c	510;"	l	line:510
+data	F:\iCub\firmware\bcs\source_code\main.c	569;"	l	line:569
+error	F:\iCub\firmware\bcs\source_code\main.c	204;"	l	line:204
+finish	F:\iCub\firmware\bcs\source_code\main.c	197;"	l	line:197
+flag	F:\iCub\firmware\bcs\source_code\main.c	102;"	v	line:102
+i	F:\iCub\firmware\bcs\source_code\eeprom.c	21;"	l	line:21
+i	F:\iCub\firmware\bcs\source_code\main.c	191;"	l	line:191
+i	F:\iCub\firmware\bcs\source_code\main.c	322;"	l	line:322
+i	F:\iCub\firmware\bcs\source_code\main.c	495;"	l	line:495
+i	F:\iCub\firmware\bcs\source_code\main.c	509;"	l	line:509
+i	F:\iCub\firmware\bcs\source_code\main.c	568;"	l	line:568
+led0::PORTEbits.RE5	F:\iCub\firmware\bcs\source_code\include\LED.h	2;"	d	line:2
+m	F:\iCub\firmware\bcs\source_code\main.c	323;"	l	line:323
+m	F:\iCub\firmware\bcs\source_code\main.c	570;"	l	line:570
+main	F:\iCub\firmware\bcs\source_code\main.c	317;"	f	line:317	signature:(void)
+mean	F:\iCub\firmware\bcs\source_code\main.c	348;"	l	line:348
+not_sleeping	F:\iCub\firmware\bcs\source_code\main.c	139;"	v	line:139
+p	F:\iCub\firmware\bcs\source_code\T1.c	41;"	l	line:41
+p1	F:\iCub\firmware\bcs\source_code\main.c	537;"	l	line:537
+p2	F:\iCub\firmware\bcs\source_code\main.c	538;"	l	line:538
+p3	F:\iCub\firmware\bcs\source_code\main.c	539;"	l	line:539
+p4	F:\iCub\firmware\bcs\source_code\main.c	540;"	l	line:540
+p5	F:\iCub\firmware\bcs\source_code\main.c	541;"	l	line:541
+p6	F:\iCub\firmware\bcs\source_code\main.c	542;"	l	line:542
+pressA	F:\iCub\firmware\bcs\source_code\main.c	198;"	l	line:198
+pressM	F:\iCub\firmware\bcs\source_code\main.c	199;"	l	line:199
+pressS	F:\iCub\firmware\bcs\source_code\main.c	203;"	l	line:203
+pressT	F:\iCub\firmware\bcs\source_code\main.c	201;"	l	line:201
+pressV	F:\iCub\firmware\bcs\source_code\main.c	200;"	l	line:200
+read	F:\iCub\firmware\bcs\source_code\main.c	138;"	v	line:138
+result	F:\iCub\firmware\bcs\source_code\main.c	347;"	l	line:347
+s_eeprom	F:\iCub\firmware\bcs\source_code\include\eeprom.h	10;"	s	line:10
+s_eeprom	F:\iCub\firmware\bcs\source_code\include\eeprom.h	29;"	t	line:29
+setted	F:\iCub\firmware\bcs\source_code\main.c	196;"	l	line:196
+sleep	F:\iCub\firmware\bcs\source_code\main.c	124;"	v	line:124
+test	F:\iCub\firmware\bcs\source_code\eeprom.c	22;"	l	line:22
+test1	F:\iCub\firmware\bcs\source_code\eeprom.c	23;"	l	line:23

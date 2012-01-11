@@ -117,6 +117,7 @@ unsigned int REALMAXVOLTAGE=64; //V
 unsigned int MAXVOLTAGE=66; //the real max voltage (it depends by the board)
 unsigned int DCDC_VOLTAGE;//AN2
 long CHARGE; //charge value in %
+long CHECKSUM;
 const long battery_cap=9216000;
 const long battery_cap_div100=92160;
 volatile long charge; //20Ah  =>  128 (128 ADticks is 20A) x 3600 (s->h) x 20 (20Ah is the charge capacity of the battery)   
@@ -126,10 +127,12 @@ char CUR[4]={' ','C',' ','\0'};
 char VCC[4]={' ', 'V',' ','\0'};
 char DCDC[7]={' ','D','C','D','C',' ','\0'};
 char CHRG[5]={' ','C','H',' ','\0'}; 
+char CKS[5]={' ','C','K',' ','\0'}; 
 char END_LINE[2]={'\n','\0'};
 char CUR_CHAR[6];
 char VCC_CHAR[6];
 char CHARGE_CHAR[8];
+char CHECKSUM_CHAR[8];
 char * Receiveddata = Buf;
 unsigned int  CHAR_RECEIVED=8;
 char read[8];
@@ -329,7 +332,7 @@ CloseUART2();
     ConfigIntUART2(UART_RX_INT_EN & UART_RX_INT_PR6 & 
                    UART_TX_INT_EN & UART_TX_INT_PR2);
 /* Configure UART2 module to transmit 8 bit data with one stopbit. Also Enable loopback mode  */
-     baudvalue =23;//=38.4 15= 57.8 //
+     baudvalue =15; //45;//019.2 23;//=38.4 15= 57.6 //
      U2MODEvalue = UART_EN & UART_IDLE_CON & 
                   UART_EN_WAKE & UART_DIS_LOOPBACK  &
                   UART_DIS_ABAUD & UART_NO_PAR_8BIT  &
@@ -421,10 +424,13 @@ CloseUART2();
 	 			CHARGE= ((battery_cap-charge)*100/battery_cap_div100); 
 	 		else 
 	 			CHARGE=0;
+	 		
+	 		CHECKSUM=CURRENT+VOLTAGE+CHARGE;
 	 			 				
 			IntToString(CHARGE_CHAR,CHARGE,5);	
 	    	UIntToString(CUR_CHAR,CURRENT,4);
 			UIntToString(VCC_CHAR,VOLTAGE,4);
+			IntToString(CHECKSUM_CHAR,CHECKSUM,5);
 if (sleep)
 {
 			putsUART2((unsigned int *) CUR);
@@ -432,7 +438,9 @@ if (sleep)
 	    	putsUART2((unsigned int *) VCC); 
 	    	putsUART2((unsigned int *) VCC_CHAR); 
 	    	putsUART2((unsigned int *) CHRG); 
-	    	putsUART2((unsigned int *) CHARGE_CHAR);
+	    	putsUART2((unsigned int *) CHARGE_CHAR);	    	
+	    	putsUART2((unsigned int *) CKS); 
+	    	putsUART2((unsigned int *) CHECKSUM_CHAR);
 	    	putsUART2((unsigned int *) END_LINE); //must be left	
 	    	while (BusyUART2() && TIMEOUT<2000)
 	    	{

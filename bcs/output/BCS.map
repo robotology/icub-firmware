@@ -1,4 +1,4 @@
-Microchip Technology Inc, vv3_30 (B) }
+Microchip Technology Inc, vv3_30 (B) ;
 
 Tool Name:
   c:\program files (x86)\microchip\mplab c30\bin\bin\..\bin/pic30-coff-ld.exe
@@ -104,18 +104,18 @@ section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x100               0x32a           0x4bf  (1215)
 .const                       0x42a               0x110           0x198  (408)
-.text                        0x53a               0x94a           0xdef  (3567)
-.dinit                       0xe84                0x4a            0x6f  (111)
-.text                        0xece                0x7c            0xba  (186)
+.text                        0x53a               0x974           0xe2e  (3630)
+.dinit                       0xeae                0x4e            0x75  (117)
+.text                        0xefc                0x7c            0xba  (186)
 
-                     Total program memory used (bytes):         0x156f  (5487) 11%
+                     Total program memory used (bytes):         0x15b4  (5556) 11%
 
 
 Data EEPROM Memory  [Origin = 0x7ffc00, Length = 0x400]
 
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
-_03570ee04ebd0e89         0x7ffc00                0x2c            0x2c  (44)
+_0368fee04f0d8b0c         0x7ffc00                0x2c            0x2c  (44)
 
                         Total data EEPROM used (bytes):           0x2c  (44) 4%
 
@@ -124,10 +124,10 @@ Data Memory  [Origin = 0x800, Length = 0x800]
 
 section                    address      alignment gaps    total length  (dec)
 -------                    -------      --------------    -------------------
-.ndata                       0x800                   0            0x58  (88)
-.nbss                        0x858                   0            0x4a  (74)
+.ndata                       0x800                   0            0x5e  (94)
+.nbss                        0x85e                   0            0x56  (86)
 
-                        Total data memory used (bytes):           0xa2  (162) 7%
+                        Total data memory used (bytes):           0xb4  (180) 8%
 
 
 Dynamic Memory Usage
@@ -135,9 +135,9 @@ Dynamic Memory Usage
 region                     address                      maximum length  (dec)
 ------                     -------                      ---------------------
 heap                             0                                   0  (0)
-stack                        0x8a2                               0x75e  (1886)
+stack                        0x8b4                               0x74c  (1868)
 
-                        Maximum dynamic memory (bytes):          0x75e  (1886)
+                        Maximum dynamic memory (bytes):          0x74c  (1868)
 
 
 External Symbols in Data Memory (by address):
@@ -155,57 +155,63 @@ External Symbols in Data Memory (by address):
                     0x0840                  _VCC
                     0x0844                  _DCDC
                     0x084b                  _CHRG
-                    0x0850                  _END_LINE
-                    0x0852                  _Receiveddata
-                    0x0854                  _CHAR_RECEIVED
-                    0x0856                  _not_sleeping
-                    0x0858                  _BitToSend
-                    0x085a                  _INTERVAL
-                    0x085c                  _CURRENT
-                    0x085e                  _OLD_CURRENT
-                    0x0860                  _VOLTAGE
-                    0x0864                  _OLD_VOLTAGE
-                    0x0868                  _DCDC_VOLTAGE
-                    0x086a                  _CHARGE
-                    0x086e                  _charge
-                    0x0872                  _Buf
-                    0x0886                  _CUR_CHAR
-                    0x088c                  _VCC_CHAR
-                    0x0892                  _CHARGE_CHAR
-                    0x089a                  _read
+                    0x0850                  _CKS
+                    0x0855                  _END_LINE
+                    0x0858                  _Receiveddata
+                    0x085a                  _CHAR_RECEIVED
+                    0x085c                  _not_sleeping
+                    0x085e                  _BitToSend
+                    0x0860                  _INTERVAL
+                    0x0862                  _CURRENT
+                    0x0864                  _OLD_CURRENT
+                    0x0866                  _VOLTAGE
+                    0x086a                  _OLD_VOLTAGE
+                    0x086e                  _DCDC_VOLTAGE
+                    0x0870                  _CHARGE
+                    0x0874                  _CHECKSUM
+                    0x0878                  _charge
+                    0x087c                  _Buf
+                    0x0890                  _CUR_CHAR
+                    0x0896                  _VCC_CHAR
+                    0x089c                  _CHARGE_CHAR
+                    0x08a4                  _CHECKSUM_CHAR
+                    0x08ac                  _read
 
 External Symbols in Data Memory (by name):
 
-                    0x0858                  _BitToSend
+                    0x085e                  _BitToSend
                     0x0800                  _BoardConfig
-                    0x0872                  _Buf
-                    0x086a                  _CHARGE
-                    0x0892                  _CHARGE_CHAR
-                    0x0854                  _CHAR_RECEIVED
+                    0x087c                  _Buf
+                    0x0870                  _CHARGE
+                    0x089c                  _CHARGE_CHAR
+                    0x085a                  _CHAR_RECEIVED
+                    0x0874                  _CHECKSUM
+                    0x08a4                  _CHECKSUM_CHAR
                     0x084b                  _CHRG
+                    0x0850                  _CKS
                     0x083c                  _CUR
-                    0x085c                  _CURRENT
-                    0x0886                  _CUR_CHAR
+                    0x0862                  _CURRENT
+                    0x0890                  _CUR_CHAR
                     0x0832                  _CUR_OFFSET
                     0x0844                  _DCDC
-                    0x0868                  _DCDC_VOLTAGE
-                    0x0850                  _END_LINE
-                    0x085a                  _INTERVAL
+                    0x086e                  _DCDC_VOLTAGE
+                    0x0855                  _END_LINE
+                    0x0860                  _INTERVAL
                     0x0838                  _MAXVOLTAGE
-                    0x085e                  _OLD_CURRENT
-                    0x0864                  _OLD_VOLTAGE
+                    0x0864                  _OLD_CURRENT
+                    0x086a                  _OLD_VOLTAGE
                     0x0836                  _REALMAXVOLTAGE
-                    0x0852                  _Receiveddata
+                    0x0858                  _Receiveddata
                     0x0830                  _TIMER_VALUE
                     0x0840                  _VCC
-                    0x088c                  _VCC_CHAR
-                    0x0860                  _VOLTAGE
+                    0x0896                  _VCC_CHAR
+                    0x0866                  _VOLTAGE
                     0x082e                  __board_ID
-                    0x086e                  _charge
+                    0x0878                  _charge
                     0x0834                  _cur
                     0x082c                  _flag
-                    0x0856                  _not_sleeping
-                    0x089a                  _read
+                    0x085c                  _not_sleeping
+                    0x08ac                  _read
                     0x083a                  _sleep
 
 External Symbols in Data EEPROM (by address):
@@ -260,38 +266,38 @@ External Symbols in Program Memory (by address):
                   0x00057e                  __U2TXInterrupt
                   0x000586                  __U2RXInterrupt
                   0x00089a                  _main
-                  0x000a5a                  _Wait
-                  0x000a6e                  _UIntToString
-                  0x000ac8                  _IntToString
-                  0x000b3e                  _chargeCalculator
-                  0x000c40                  _CharToUInt
-                  0x000ca6                  _SaveEepromBoardConfig
-                  0x000d48                  _RecoverConfigurationFromEEprom
-                  0x000d5e                  _T1_Init
-                  0x000dea                  _T2_Init
-                  0x000e00                  _T3_Init
-                  0x000e16                  _PINs_Init
-                  0x000e3a                  _PINs_test
-                  0x000e50                  _LED1_test
-                  0x000e62                  _LED1_toggle
-                  0x000ece                  _AD_Init
-                  0x000efe                  __OscillatorFail
-                  0x000f04                  __AddressError
-                  0x000f0a                  __StackError
-                  0x000f10                  __MathError
-                  0x000f16                  __AltOscillatorFail
-                  0x000f1c                  __AltAddressError
-                  0x000f22                  __AltStackError
-                  0x000f28                  __AltMathError
-                  0x000f2e                  _LED_Init
-                  0x000f38                  _LED_test
+                  0x000a84                  _Wait
+                  0x000a98                  _UIntToString
+                  0x000af2                  _IntToString
+                  0x000b68                  _chargeCalculator
+                  0x000c6a                  _CharToUInt
+                  0x000cd0                  _SaveEepromBoardConfig
+                  0x000d72                  _RecoverConfigurationFromEEprom
+                  0x000d88                  _T1_Init
+                  0x000e14                  _T2_Init
+                  0x000e2a                  _T3_Init
+                  0x000e40                  _PINs_Init
+                  0x000e64                  _PINs_test
+                  0x000e7a                  _LED1_test
+                  0x000e8c                  _LED1_toggle
+                  0x000efc                  _AD_Init
+                  0x000f2c                  __OscillatorFail
+                  0x000f32                  __AddressError
+                  0x000f38                  __StackError
+                  0x000f3e                  __MathError
+                  0x000f44                  __AltOscillatorFail
+                  0x000f4a                  __AltAddressError
+                  0x000f50                  __AltStackError
+                  0x000f56                  __AltMathError
+                  0x000f5c                  _LED_Init
+                  0x000f66                  _LED_test
 
 External Symbols in Program Memory (by name):
 
-                  0x000ece                  _AD_Init
+                  0x000efc                  _AD_Init
                   0x0003aa                  _BusyADC10
                   0x00032e                  _BusyUART2
-                  0x000c40                  _CharToUInt
+                  0x000c6a                  _CharToUInt
                   0x000336                  _CloseTimer1
                   0x00033e                  _CloseUART2
                   0x00027c                  _ConfigIntADC10
@@ -300,38 +306,38 @@ External Symbols in Program Memory (by name):
                   0x00034a                  _ConfigIntUART2
                   0x0003a6                  _ConvertADC10
                   0x000424                  _DataRdyUART2
-                  0x000ac8                  _IntToString
-                  0x000e50                  _LED1_test
-                  0x000e62                  _LED1_toggle
-                  0x000f2e                  _LED_Init
-                  0x000f38                  _LED_test
+                  0x000af2                  _IntToString
+                  0x000e7a                  _LED1_test
+                  0x000e8c                  _LED1_toggle
+                  0x000f5c                  _LED_Init
+                  0x000f66                  _LED_test
                   0x0003e4                  _OpenTimer2
                   0x00041c                  _OpenTimer3
                   0x00039a                  _OpenUART2
-                  0x000e16                  _PINs_Init
-                  0x000e3a                  _PINs_test
+                  0x000e40                  _PINs_Init
+                  0x000e64                  _PINs_test
                   0x0003b2                  _ReadADC10
-                  0x000d48                  _RecoverConfigurationFromEEprom
-                  0x000ca6                  _SaveEepromBoardConfig
+                  0x000d72                  _RecoverConfigurationFromEEprom
+                  0x000cd0                  _SaveEepromBoardConfig
                   0x0003a2                  _SetChanADC10
-                  0x000d5e                  _T1_Init
-                  0x000dea                  _T2_Init
-                  0x000e00                  _T3_Init
+                  0x000d88                  _T1_Init
+                  0x000e14                  _T2_Init
+                  0x000e2a                  _T3_Init
                   0x00042a                  _TIME_INTERVAL
-                  0x000a6e                  _UIntToString
-                  0x000a5a                  _Wait
+                  0x000a98                  _UIntToString
+                  0x000a84                  _Wait
                   0x0002a6                  _WriteTimer1
                   0x0002aa                  _WriteTimer2
                   0x000418                  _WriteTimer3
-                  0x000f04                  __AddressError
-                  0x000f1c                  __AltAddressError
-                  0x000f28                  __AltMathError
-                  0x000f16                  __AltOscillatorFail
-                  0x000f22                  __AltStackError
+                  0x000f32                  __AddressError
+                  0x000f4a                  __AltAddressError
+                  0x000f56                  __AltMathError
+                  0x000f44                  __AltOscillatorFail
+                  0x000f50                  __AltStackError
                   0x000190                  __DefaultInterrupt
-                  0x000f10                  __MathError
-                  0x000efe                  __OscillatorFail
-                  0x000f0a                  __StackError
+                  0x000f3e                  __MathError
+                  0x000f2c                  __OscillatorFail
+                  0x000f38                  __StackError
                   0x00053a                  __T1Interrupt
                   0x00055e                  __T2Interrupt
                   0x000586                  __U2RXInterrupt
@@ -351,7 +357,7 @@ External Symbols in Program Memory (by name):
                   0x000100                  __resetPRI
                   0x00042c                  _battery_cap
                   0x000430                  _battery_cap_div100
-                  0x000b3e                  _chargeCalculator
+                  0x000b68                  _chargeCalculator
                   0x0002ae                  _getsUART2
                   0x00089a                  _main
                   0x0002fa                  _putsUART2
@@ -566,10 +572,10 @@ userdata
 
 .ivt              0x000004         0x7c
                   0x000004          0x4 LONG 0x190 DEFINED (__ReservedTrap0)?ABSOLUTE (__ReservedTrap0):ABSOLUTE (__DefaultInterrupt)
-                  0x000006          0x4 LONG 0xefe DEFINED (__OscillatorFail)?ABSOLUTE (__OscillatorFail):ABSOLUTE (__DefaultInterrupt)
-                  0x000008          0x4 LONG 0xf04 DEFINED (__AddressError)?ABSOLUTE (__AddressError):ABSOLUTE (__DefaultInterrupt)
-                  0x00000a          0x4 LONG 0xf0a DEFINED (__StackError)?ABSOLUTE (__StackError):ABSOLUTE (__DefaultInterrupt)
-                  0x00000c          0x4 LONG 0xf10 DEFINED (__MathError)?ABSOLUTE (__MathError):ABSOLUTE (__DefaultInterrupt)
+                  0x000006          0x4 LONG 0xf2c DEFINED (__OscillatorFail)?ABSOLUTE (__OscillatorFail):ABSOLUTE (__DefaultInterrupt)
+                  0x000008          0x4 LONG 0xf32 DEFINED (__AddressError)?ABSOLUTE (__AddressError):ABSOLUTE (__DefaultInterrupt)
+                  0x00000a          0x4 LONG 0xf38 DEFINED (__StackError)?ABSOLUTE (__StackError):ABSOLUTE (__DefaultInterrupt)
+                  0x00000c          0x4 LONG 0xf3e DEFINED (__MathError)?ABSOLUTE (__MathError):ABSOLUTE (__DefaultInterrupt)
                   0x00000e          0x4 LONG 0x190 DEFINED (__ReservedTrap5)?ABSOLUTE (__ReservedTrap5):ABSOLUTE (__DefaultInterrupt)
                   0x000010          0x4 LONG 0x190 DEFINED (__ReservedTrap6)?ABSOLUTE (__ReservedTrap6):ABSOLUTE (__DefaultInterrupt)
                   0x000012          0x4 LONG 0x190 DEFINED (__ReservedTrap7)?ABSOLUTE (__ReservedTrap7):ABSOLUTE (__DefaultInterrupt)
@@ -630,10 +636,10 @@ userdata
 
 .aivt             0x000084         0x7c
                   0x000084          0x4 LONG 0x190 DEFINED (__AltReservedTrap0)?ABSOLUTE (__AltReservedTrap0):DEFINED (__ReservedTrap0)?ABSOLUTE (__ReservedTrap0):ABSOLUTE (__DefaultInterrupt)
-                  0x000086          0x4 LONG 0xf16 DEFINED (__AltOscillatorFail)?ABSOLUTE (__AltOscillatorFail):DEFINED (__OscillatorFail)?ABSOLUTE (__OscillatorFail):ABSOLUTE (__DefaultInterrupt)
-                  0x000088          0x4 LONG 0xf1c DEFINED (__AltAddressError)?ABSOLUTE (__AltAddressError):DEFINED (__AddressError)?ABSOLUTE (__AddressError):ABSOLUTE (__DefaultInterrupt)
-                  0x00008a          0x4 LONG 0xf22 DEFINED (__AltStackError)?ABSOLUTE (__AltStackError):DEFINED (__StackError)?ABSOLUTE (__StackError):ABSOLUTE (__DefaultInterrupt)
-                  0x00008c          0x4 LONG 0xf28 DEFINED (__AltMathError)?ABSOLUTE (__AltMathError):DEFINED (__MathError)?ABSOLUTE (__MathError):ABSOLUTE (__DefaultInterrupt)
+                  0x000086          0x4 LONG 0xf44 DEFINED (__AltOscillatorFail)?ABSOLUTE (__AltOscillatorFail):DEFINED (__OscillatorFail)?ABSOLUTE (__OscillatorFail):ABSOLUTE (__DefaultInterrupt)
+                  0x000088          0x4 LONG 0xf4a DEFINED (__AltAddressError)?ABSOLUTE (__AltAddressError):DEFINED (__AddressError)?ABSOLUTE (__AddressError):ABSOLUTE (__DefaultInterrupt)
+                  0x00008a          0x4 LONG 0xf50 DEFINED (__AltStackError)?ABSOLUTE (__AltStackError):DEFINED (__StackError)?ABSOLUTE (__StackError):ABSOLUTE (__DefaultInterrupt)
+                  0x00008c          0x4 LONG 0xf56 DEFINED (__AltMathError)?ABSOLUTE (__AltMathError):DEFINED (__MathError)?ABSOLUTE (__MathError):ABSOLUTE (__DefaultInterrupt)
                   0x00008e          0x4 LONG 0x190 DEFINED (__AltReservedTrap5)?ABSOLUTE (__AltReservedTrap5):DEFINED (__ReservedTrap5)?ABSOLUTE (__ReservedTrap5):ABSOLUTE (__DefaultInterrupt)
                   0x000090          0x4 LONG 0x190 DEFINED (__AltReservedTrap6)?ABSOLUTE (__AltReservedTrap6):DEFINED (__ReservedTrap6)?ABSOLUTE (__ReservedTrap6):ABSOLUTE (__DefaultInterrupt)
                   0x000092          0x4 LONG 0x190 DEFINED (__AltReservedTrap7)?ABSOLUTE (__AltReservedTrap7):DEFINED (__ReservedTrap7)?ABSOLUTE (__ReservedTrap7):ABSOLUTE (__DefaultInterrupt)
@@ -1476,8 +1482,8 @@ __c30_signature
  __c30_signature
                   0x0000cc          0x6 c:/program files (x86)/microchip/mplab c30/bin/bin/../../lib\libm-coff.a(umodsi3.o)
 
-.ndata              0x0800         0x58
- .ndata             0x0800         0x58 main.o
+.ndata              0x0800         0x5e
+ .ndata             0x0800         0x5e main.o
                     0x0800                  BoardConfig
                     0x082c                  flag
                     0x082e                  _board_ID
@@ -1491,27 +1497,30 @@ __c30_signature
                     0x0840                  VCC
                     0x0844                  DCDC
                     0x084b                  CHRG
-                    0x0850                  END_LINE
-                    0x0852                  Receiveddata
-                    0x0854                  CHAR_RECEIVED
-                    0x0856                  not_sleeping
+                    0x0850                  CKS
+                    0x0855                  END_LINE
+                    0x0858                  Receiveddata
+                    0x085a                  CHAR_RECEIVED
+                    0x085c                  not_sleeping
 
-.nbss               0x0858         0x4a
- .nbss              0x0858         0x4a main.o
-                    0x0858                  BitToSend
-                    0x085a                  INTERVAL
-                    0x085c                  CURRENT
-                    0x085e                  OLD_CURRENT
-                    0x0860                  VOLTAGE
-                    0x0864                  OLD_VOLTAGE
-                    0x0868                  DCDC_VOLTAGE
-                    0x086a                  CHARGE
-                    0x086e                  charge
-                    0x0872                  Buf
-                    0x0886                  CUR_CHAR
-                    0x088c                  VCC_CHAR
-                    0x0892                  CHARGE_CHAR
-                    0x089a                  read
+.nbss               0x085e         0x56
+ .nbss              0x085e         0x56 main.o
+                    0x085e                  BitToSend
+                    0x0860                  INTERVAL
+                    0x0862                  CURRENT
+                    0x0864                  OLD_CURRENT
+                    0x0866                  VOLTAGE
+                    0x086a                  OLD_VOLTAGE
+                    0x086e                  DCDC_VOLTAGE
+                    0x0870                  CHARGE
+                    0x0874                  CHECKSUM
+                    0x0878                  charge
+                    0x087c                  Buf
+                    0x0890                  CUR_CHAR
+                    0x0896                  VCC_CHAR
+                    0x089c                  CHARGE_CHAR
+                    0x08a4                  CHECKSUM_CHAR
+                    0x08ac                  read
 
 .const              0x842a        0x110 load address 0x00042a  
  .const             0x842a        0x110 main.o
@@ -1519,52 +1528,52 @@ __c30_signature
                     0x842c                  battery_cap
                     0x8430                  battery_cap_div100
 
-.text             0x00053a        0x94a
- .text            0x00053a        0x76c main.o
+.text             0x00053a        0x974
+ .text            0x00053a        0x796 main.o
                   0x00053a                  _T1Interrupt
                   0x00055e                  _T2Interrupt
                   0x00057e                  _U2TXInterrupt
                   0x000586                  _U2RXInterrupt
                   0x00089a                  main
-                  0x000a5a                  Wait
-                  0x000a6e                  UIntToString
-                  0x000ac8                  IntToString
-                  0x000b3e                  chargeCalculator
-                  0x000c40                  CharToUInt
- .text            0x000ca6         0xb8 eeprom.o
-                  0x000ca6                  SaveEepromBoardConfig
-                  0x000d48                  RecoverConfigurationFromEEprom
- .text            0x000d5e         0xb8 T1.o
-                  0x000d5e                  T1_Init
-                  0x000dea                  T2_Init
-                  0x000e00                  T3_Init
- .text            0x000e16         0x6e PIN.o
-                  0x000e16                  PINs_Init
-                  0x000e3a                  PINs_test
-                  0x000e50                  LED1_test
-                  0x000e62                  LED1_toggle
+                  0x000a84                  Wait
+                  0x000a98                  UIntToString
+                  0x000af2                  IntToString
+                  0x000b68                  chargeCalculator
+                  0x000c6a                  CharToUInt
+ .text            0x000cd0         0xb8 eeprom.o
+                  0x000cd0                  SaveEepromBoardConfig
+                  0x000d72                  RecoverConfigurationFromEEprom
+ .text            0x000d88         0xb8 T1.o
+                  0x000d88                  T1_Init
+                  0x000e14                  T2_Init
+                  0x000e2a                  T3_Init
+ .text            0x000e40         0x6e PIN.o
+                  0x000e40                  PINs_Init
+                  0x000e64                  PINs_test
+                  0x000e7a                  LED1_test
+                  0x000e8c                  LED1_toggle
 
-.dinit            0x000e84         0x4a
- .dinit           0x000e84         0x4a data_init
+.dinit            0x000eae         0x4e
+ .dinit           0x000eae         0x4e data_init
 
-.text             0x000ece         0x7c
- .text            0x000ece         0x30 AD.o
-                  0x000ece                  AD_Init
- .text            0x000efe         0x30 traps.o
-                  0x000efe                  _OscillatorFail
-                  0x000f04                  _AddressError
-                  0x000f0a                  _StackError
-                  0x000f10                  _MathError
-                  0x000f16                  _AltOscillatorFail
-                  0x000f1c                  _AltAddressError
-                  0x000f22                  _AltStackError
-                  0x000f28                  _AltMathError
- .text            0x000f2e         0x1c LED.o
-                  0x000f2e                  LED_Init
-                  0x000f38                  LED_test
+.text             0x000efc         0x7c
+ .text            0x000efc         0x30 AD.o
+                  0x000efc                  AD_Init
+ .text            0x000f2c         0x30 traps.o
+                  0x000f2c                  _OscillatorFail
+                  0x000f32                  _AddressError
+                  0x000f38                  _StackError
+                  0x000f3e                  _MathError
+                  0x000f44                  _AltOscillatorFail
+                  0x000f4a                  _AltAddressError
+                  0x000f50                  _AltStackError
+                  0x000f56                  _AltMathError
+ .text            0x000f5c         0x1c LED.o
+                  0x000f5c                  LED_Init
+                  0x000f66                  LED_test
 
-_03570ee04ebd0e89
+_0368fee04f0d8b0c
                     0xfc00         0x2c load address 0x7ffc00  
- _03570ee04ebd0e89
+ _0368fee04f0d8b0c
                     0xfc00         0x2c main.o
                     0xfc00                  ee_data
