@@ -75,7 +75,7 @@ void CAN_Init()
     // RX0IE    RX1IE    TX0IE 
     // 
     DisableIntCAN1;
-    ConfigIntCAN1(0x0007, CAN_INT_PRI_1 & CAN_INT_ENABLE);
+    ConfigIntCAN1(0x0007, CAN_INT_PRI_2 & CAN_INT_ENABLE);
     canTxBufferIndex=-1;
     canRxBufferIndex=0;
     testcounter=0;
@@ -198,7 +198,7 @@ void CAN1_interruptTx (void)
     {
         buffer=0;       
         C1INTFbits.TX0IF=0;
-    }
+    
     if (canTxBufferIndex!=-1)
     {
         CAN1SendMessage((CAN_TX_SID(canTxBuffer[canTxBufferIndex].CAN_messID)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
@@ -207,6 +207,8 @@ void CAN1_interruptTx (void)
                         canTxBuffer[canTxBufferIndex].CAN_length,
                         buffer);
         canTxBufferIndex--;
+    }
+    
     }
     else 
     {
@@ -278,7 +280,7 @@ int CAN1_handleRx (unsigned int board_id)
 
         //  bootloader messages, 
         // ID 0x700 (100 0000 0000b) message class = bootloader message
-       if ((((CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x700) == 0x700) && (((CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x00F) == _board_ID)) || ((CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x00F) == 0x00F)) )
+       if (((((CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x700) == 0x700) && (((CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x00F) == _board_ID))) || ((CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x00F) == 0x00F)) )
         {
 	        DisableIntT1;
                 DisableIntT2;
@@ -456,9 +458,11 @@ int CAN1_handleRx (unsigned int board_id)
 						}	
 						break;
 					}
+					PR1=TIMER_VALUE;
 					if ((CANRxBuffer[canRxBufferIndex-1].CAN_data[3]&0xF)==0x3)
 					{
 						TIMER_VALUE=(CANRxBuffer[canRxBufferIndex-1].CAN_data[6]) | (CANRxBuffer[canRxBufferIndex-1].CAN_data[7]<<8);	
+						PR1=TIMER_VALUE;
 					}
 		
 						ConValue[0]=(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]) | (CANRxBuffer[canRxBufferIndex-1].CAN_data[5]<<8);

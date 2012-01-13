@@ -62,7 +62,10 @@
  //  MPLAB 8.63
 //
 
-
+//  Rev 2.0.16 del 31/08/2011
+//  Added the accelerometer reading  
+//  MPLAB 8.76
+//
 #include<p30f4011.h>
 #include"can_interface.h"
 #include "AD7147RegMap.h"
@@ -79,8 +82,8 @@
 
 #warning "if you want to execute the A3A (accelerometer)reading uncomment this line"
 
-#define ACCELEROMETER
-
+//#define ACCELEROMETER
+//#define DEBUG
 
 unsigned int AN2 = 0; //Accelerometer X axes
 unsigned int AN3 = 0; //Accelerometer Y axes
@@ -100,7 +103,7 @@ _FGS(CODE_PROT_OFF); // Code protection disabled
 //------------------------------------------------------------------------
 //								Function prototypes
 //------------------------------------------------------------------------
-void ServiceAD7147Isr(unsigned char Channel);
+static void ServiceAD7147Isr(unsigned char Channel);
 void ServiceAD7147Isr_three(unsigned char Channel);
 void ServiceAD7147Isr_all(unsigned char Channel);
 void Wait(unsigned int value);
@@ -191,7 +194,7 @@ unsigned char new_board_MODE=EIGHT_BITS;
 char _additional_info [32]={'T','a','c','t','i','l','e',' ','S','e','n','s','o','r'};
 unsigned int PW_CONTROL= 0x0B0; // 0x1B0 for 128 decim  
 unsigned int TIMER_VALUE=TIMER_SINGLE_256dec; // Timer duration 0x3000=> 40ms
-unsigned int TIMER_VALUE2=0xC00; // Timer duration 0xC00=> 10ms
+unsigned int TIMER_VALUE2=0x133;//0xC00; // Timer duration 0xC00=> 10ms
 unsigned int SHIFT=2; //shift of the CDC value for removing the noise
 unsigned int SHIFT_THREE=3;// shift of the CDC value for removing the noise
 unsigned int SHIFT_ALL=4; //shift of the CDC value for removing the noise
@@ -199,7 +202,7 @@ unsigned int NOLOAD=235;
 unsigned int CONFIG_TYPE=CONFIG_SINGLE;
 unsigned int ERROR_COUNTER=0; //it counts the errors in reading the triangles.
 unsigned int ConValue[2]={0x2200, 0x2200}; //offset of the CDC reading 
-unsigned int PMsgID; //pressure measurement ID 
+volatile unsigned int PMsgID; //pressure measurement ID 
 unsigned char status[]={0,0,0,0,0,0,0,0};
    
 
@@ -216,12 +219,37 @@ extern void ConfigAD7147_ALL(unsigned char Channel, unsigned int i,unsigned int 
 //------------------------------------------------------------------------------
 // 								Interrrupt routines
 //------------------------------------------------------------------------------
+void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void)
+{
+	unsigned int m=0;
+    flag=1;
+ 	//		led0=~led0;
+     ServiceAD7147Isr(CH0);
+   	 for (m=0;m<16;m++)
+	 {
+		FillCanMessages8bit(CH0,m); 	
+     }
+     _T1IF = 0;
+
+}
 void __attribute__((interrupt, no_auto_psv)) _T2Interrupt(void)
 {
-   
-
     flag2=1;
-    WriteTimer2(0x0);
+    	    status[1]=((AN2 &0xFF00) >>0x8); // axis X
+            status[0]=(AN2 & 0xFF);
+            status[3]=((AN3 &0xFF00) >>0x8); // axis Y
+            status[2]=(AN3 & 0xFF);
+            status[5]=((AN4 &0xFF00) >>0x8); // axis Z
+            status[4]=(AN4 & 0xFF);
+            flag2=0;
+       //     PMsgID=0x500;
+       //     PMsgID |= (BoardConfig.EE_CAN_BoardAddress<<4);
+            ;
+        while (!CAN1IsTXReady(1));    
+        CAN1SendMessage( (CAN_TX_SID(0x550)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
+                        (CAN_TX_EID(0)) & CAN_NOR_TX_REQ, 
+                        status, 6,1);
+    ADCON1bits.SAMP = 1;        
     _T2IF = 0;
 
 }
@@ -256,9 +284,7 @@ int main(void)
     unsigned int mean;
 
 
-    ADC_Init();             //Initialize the A/D converter
-
-
+    
    	//
     // EEPROM Data Recovery
     // 
@@ -269,7 +295,12 @@ int main(void)
     //								Peripheral init
     //------------------------------------------------------------------------
     T1_Init(TIMER_VALUE);
+   
+#ifdef ACCELEROMETER
     T2_Init(TIMER_VALUE2);
+    ADC_Init();             //Initialize the A/D converter
+  
+#endif
     CAN_Init();
     I2C_Init(CH0); 
   //  I2C_Init(CH1); 
@@ -354,22 +385,12 @@ int main(void)
     for (;;)
     {
 
-        #ifdef ACCELEROMETER
+#ifdef ACCELEROMETER
         if (flag2==1)
         {
-            status[1]=((AN2 &0xFF00) >>0x8); // cycle number
-            status[0]=(AN2 & 0xFF);
-            status[3]=((AN3 &0xFF00) >>0x8); // cycle number
-            status[2]=(AN3 & 0xFF);
-            status[5]=((AN4 &0xFF00) >>0x8); // ERRORS in reading the I2C
-            status[4]=(AN4 & 0xFF);
-            flag2=0;
-            PMsgID=0x500;
-            PMsgID |= (BoardConfig.EE_CAN_BoardAddress<<4);
-            CAN1_send(PMsgID,1,6,status);
+
         }
 #endif
-
 
         if (flag==1)
         {
@@ -377,9 +398,9 @@ int main(void)
            	i = 0;
 			result=0;
 			mean=0;
-			if (led_counter==20)
+		//	if (led_counter==20)
 			{
-				led0=~led0;
+	//			led0=~led0;
 				led_counter=0;
 			}	
 			led_counter++;
@@ -419,11 +440,12 @@ int main(void)
 						 	case CONFIG_SINGLE :
 						 	{
 							 	// Service routine for the triangles 
-	            				 ServiceAD7147Isr(CH0);
+	            	/*			 ServiceAD7147Isr(CH0);
 							 	 for (i=0;i<16;i++)
 	            				 {
 		 							FillCanMessages8bit(CH0,i); 	
 		      					 }
+		      		*/
 		      				}
 		      				break;
 		      			    case CONFIG_THREE:
@@ -558,7 +580,7 @@ int main(void)
 
 
 
-void ServiceAD7147Isr(unsigned char Channel)
+static void ServiceAD7147Isr(unsigned char Channel)
 {
     unsigned int i=0;
     unsigned int stagecomplete0[1][1];
@@ -755,6 +777,7 @@ void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
 			  {
 			  	ConfigAD7147(CH0,j,PW_CONTROL,ConValue); //0 is the number of the device
 			  }	
+			  return;
 		}
 		else 
 		{

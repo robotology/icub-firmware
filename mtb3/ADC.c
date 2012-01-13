@@ -49,10 +49,11 @@
 
 #include "p30f4011.h"
 #include "ADC.h"
-
+#include "LED.h"
 extern  unsigned int AN2; //Accelerometer X axes
 extern  unsigned int AN3; //Accelerometer Y axes
 extern  unsigned int AN4; //Accelerometrt Z axes
+
 //Functions and Variables with Global Scope:
 
 
@@ -70,7 +71,8 @@ void ADC_Init(void)
         //All other bits to their default state
         ADCON1bits.FORM = 0;
         ADCON1bits.SSRC = 7;
-        ADCON1bits.ASAM = 1;
+        #warning "auto no"
+      //  ADCON1bits.ASAM = 1;
         ADCON1bits.SIMSAM = 0;
 
         //ADCON2 Register
@@ -90,7 +92,7 @@ void ADC_Init(void)
         //Using equation in the Family Reference Manual we have
         //ADCS = 2*Tad/Tcy - 1
         ADCON3bits.SAMC = 0;
-        ADCON3bits.ADCS = 13;
+        ADCON3bits.ADCS =13;//53;//63;//60 corrisponde a circa 160us;//13
 
         //ADCHS Register
         //Set up A/D Channel Select Register to convert AN2 AN3 AN4 on Mux A input
@@ -126,13 +128,13 @@ void ADC_Init(void)
 //The ISR name is chosen from the device linker script.
 void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt(void)
 {
+
 	AN2 = ADCBUF0;
 	AN3 = ADCBUF1;
 	AN4 = ADCBUF2;
-        //Clear the A/D Interrupt flag bit or else the CPU will
-        //keep vectoring back to the ISR
-        IFS0bits.ADIF = 0;
-	
-        
+    //Clear the A/D Interrupt flag bit or else the CPU will
+    //keep vectoring back to the ISR
+    IFS0bits.ADIF = 0;
+
 }
 

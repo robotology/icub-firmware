@@ -16,19 +16,9 @@ void T1_Init(unsigned int match_value)
 void T2_Init(unsigned int match_value)
 {
 	//==================================== INIT TIMER ================================
-	ConfigIntTimer2(T2_INT_PRIOR_1 & T2_INT_ON);
+	ConfigIntTimer2(T2_INT_PRIOR_5 & T2_INT_ON);
 	WriteTimer2(0);
 	OpenTimer2(T2_ON & T2_GATE_OFF & T2_IDLE_STOP & T2_PS_1_64  & T2_SOURCE_INT, match_value);
 
 }
-void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void)
-{
-    flag=1;
-    WriteTimer1(0x0);
-//    if (CONFIG_TYPE==CONFIG_SINGLE)    ServiceAD7147Isr(CH0);
-//    if (CONFIG_TYPE==CONFIG_ALL)  ServiceAD7147Isr_all(CH0);
-  							   //      TMR1  = 0;          /* Reset Timer1 to 0x0000 */
-    PR1   = TIMER_VALUE;     /* assigning Period to Timer period register */
-    _T1IF = 0;
 
-}
