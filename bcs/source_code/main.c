@@ -245,48 +245,47 @@ void __attribute__((interrupt, , no_auto_psv)) _U2RXInterrupt(void)
    		putsUART2((unsigned int *) pressS);
    		while (BusyUART2());
  	  }
-
-  	if (read[0]=='A')
-  	{		
-		Am[18]=0x20;
-		CUR_OFFSET=(OLD_CURRENT+CUR_OFFSET)-512;//CharToUInt(read,4);  	
-		putsUART2((unsigned int *) Am);
-		putsUART2((unsigned int *) setted);
-		putsUART2((unsigned int *) pressM);	
-		putsUART2((unsigned int *) pressS);
-		while (BusyUART2());
-  	}	
-  	if (read[0]==0x00)
-  	{
-  	 putsUART2((unsigned int *) error);
-  	 while (BusyUART2());
-  	}	
-  	if (read[0]=='V')
-  	{
-		Vm[18]=0x20;
-		REALMAXVOLTAGE=(49104/OLD_VOLTAGE);// (744*48)*66/48  	
-		putsUART2((unsigned int *) Vm);
-		putsUART2((unsigned int *) setted);
-		putsUART2((unsigned int *) pressM);		
-		putsUART2((unsigned int *) pressS);
-		while (BusyUART2());
-  	}
-    if (read[0]=='T')
-  	{		
-		Tm[18]=0x20;		  
-		
-		INTERVAL=CharToUInt(read,2);
-		TIMER_VALUE=0x1100*INTERVAL; 
-		CloseTimer1();
-		T1_Init(TIMER_VALUE); 	
-		putsUART2((unsigned int *) Tm);
-		putsUART2((unsigned int *) setted);
-		putsUART2((unsigned int *) pressM);	
-		putsUART2((unsigned int *) pressS);
-		while (BusyUART2());
-  	}	
-  	if (read[0]=='M') //
-  	{
+	
+	switch (read[0])
+	{
+	  	case 'A':
+	  	{		
+			Am[18]=0x20;
+			CUR_OFFSET=(OLD_CURRENT+CUR_OFFSET)-512;//CharToUInt(read,4);  	
+			putsUART2((unsigned int *) Am);
+			putsUART2((unsigned int *) setted);
+			putsUART2((unsigned int *) pressM);	
+			putsUART2((unsigned int *) pressS);
+			while (BusyUART2());
+	  	}	
+	  	break;
+  		case 'V':
+  		{
+			Vm[18]=0x20;
+			REALMAXVOLTAGE=(49104/OLD_VOLTAGE);// (744*48)*66/48  	
+			putsUART2((unsigned int *) Vm);
+			putsUART2((unsigned int *) setted);
+			putsUART2((unsigned int *) pressM);		
+			putsUART2((unsigned int *) pressS);
+			while (BusyUART2());
+	  	}
+	  	break;
+    	case 'T':
+  		{		
+			Tm[18]=0x20;		  	
+			INTERVAL=CharToUInt(read,2);
+			TIMER_VALUE=0x1100*INTERVAL; 
+			CloseTimer1();
+			T1_Init(TIMER_VALUE); 	
+			putsUART2((unsigned int *) Tm);
+			putsUART2((unsigned int *) setted);
+			putsUART2((unsigned int *) pressM);	
+			putsUART2((unsigned int *) pressS);
+			while (BusyUART2());
+  		}	
+  		break;
+  		case 'M':
+  		{
   	   	putsUART2((unsigned int *) MENU);
   	   	putsUART2((unsigned int *) pressM);
    		putsUART2((unsigned int *) pressA);	
@@ -297,19 +296,27 @@ void __attribute__((interrupt, , no_auto_psv)) _U2RXInterrupt(void)
    	    putsUART2((unsigned int *) Tm);
    	    putsUART2((unsigned int *) Tmax);
    		putsUART2((unsigned int *) pressS);
+		}
+		break;
+		case 'S': //go in sleep mode until another setting is sent
+	  	{
+		  	sleep=1;
+		  	finish[30]='\0';
+		  	putsUART2((unsigned int *) finish);
+		  	BoardConfig.EE_CurrentOffset=CUR_OFFSET;
+		  	BoardConfig.EE_Time=INTERVAL;
+		  	BoardConfig.EE_VoltageOffset=REALMAXVOLTAGE;
+		  	SaveEepromBoardConfig();
+		  	while (BusyUART2());
+		}
+		break;
+		default:  
+  		{
+	  	 putsUART2((unsigned int *) error);
+	  	 while (BusyUART2());
+	  	}	
+	  	break;
 	}
-	if (read[0]=='S') //go in sleep mode until another setting is sent
-  	{
-	  	sleep=1;
-	  	finish[30]='\0';
-	  	putsUART2((unsigned int *) finish);
-	  	BoardConfig.EE_CurrentOffset=CUR_OFFSET;
-	  	BoardConfig.EE_Time=INTERVAL;
-	  	BoardConfig.EE_VoltageOffset=REALMAXVOLTAGE;
-	  	SaveEepromBoardConfig();
-	  	while (BusyUART2());
-	}
-
 }
 //------------------------------------------------------------------------
 //									MAIN
