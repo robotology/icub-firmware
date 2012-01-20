@@ -1,4 +1,4 @@
-Microchip Technology Inc, vv3_30 (B) n
+Microchip Technology Inc, vv3_30 (B) 
 
 Tool Name:
   c:\program files (x86)\microchip\mplab c30\bin\bin\..\bin/pic30-coff-ld.exe
@@ -103,19 +103,19 @@ Program Memory  [Origin = 0x100, Length = 0x7efe]
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x100               0x32a           0x4bf  (1215)
-.const                       0x42a               0x110           0x198  (408)
-.text                        0x53a               0x980           0xe40  (3648)
-.dinit                       0xeba                0x4e            0x75  (117)
-.text                        0xf08                0x7c            0xba  (186)
+.const                       0x42a               0x112           0x19b  (411)
+.text                        0x53c               0x996           0xe61  (3681)
+.dinit                       0xed2                0x4e            0x75  (117)
+.text                        0xf20                0x7c            0xba  (186)
 
-                     Total program memory used (bytes):         0x15c6  (5574) 11%
+                     Total program memory used (bytes):         0x15ea  (5610) 11%
 
 
 Data EEPROM Memory  [Origin = 0x7ffc00, Length = 0x400]
 
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
-_039bfee04f18386b         0x7ffc00                0x2c            0x2c  (44)
+_039dfee04f194024         0x7ffc00                0x2c            0x2c  (44)
 
                         Total data EEPROM used (bytes):           0x2c  (44) 4%
 
@@ -261,43 +261,43 @@ External Symbols in Program Memory (by address):
                   0x00042a                  _TIME_INTERVAL
                   0x00042c                  _battery_cap
                   0x000430                  _battery_cap_div100
-                  0x00053a                  __T1Interrupt
-                  0x00055e                  __T2Interrupt
-                  0x00057e                  __U2TXInterrupt
-                  0x000586                  __U2RXInterrupt
-                  0x0008a6                  _main
-                  0x000a90                  _Wait
-                  0x000aa4                  _UIntToString
-                  0x000afe                  _IntToString
-                  0x000b74                  _chargeCalculator
-                  0x000c76                  _CharToUInt
-                  0x000cdc                  _SaveEepromBoardConfig
-                  0x000d7e                  _RecoverConfigurationFromEEprom
-                  0x000d94                  _T1_Init
-                  0x000e20                  _T2_Init
-                  0x000e36                  _T3_Init
-                  0x000e4c                  _PINs_Init
-                  0x000e70                  _PINs_test
-                  0x000e86                  _LED1_test
-                  0x000e98                  _LED1_toggle
-                  0x000f08                  _AD_Init
-                  0x000f38                  __OscillatorFail
-                  0x000f3e                  __AddressError
-                  0x000f44                  __StackError
-                  0x000f4a                  __MathError
-                  0x000f50                  __AltOscillatorFail
-                  0x000f56                  __AltAddressError
-                  0x000f5c                  __AltStackError
-                  0x000f62                  __AltMathError
-                  0x000f68                  _LED_Init
-                  0x000f72                  _LED_test
+                  0x00053c                  __T1Interrupt
+                  0x000560                  __T2Interrupt
+                  0x000580                  __U2TXInterrupt
+                  0x000588                  __U2RXInterrupt
+                  0x0008be                  _main
+                  0x000aa8                  _Wait
+                  0x000abc                  _UIntToString
+                  0x000b16                  _IntToString
+                  0x000b8c                  _chargeCalculator
+                  0x000c8e                  _CharToUInt
+                  0x000cf4                  _SaveEepromBoardConfig
+                  0x000d96                  _RecoverConfigurationFromEEprom
+                  0x000dac                  _T1_Init
+                  0x000e38                  _T2_Init
+                  0x000e4e                  _T3_Init
+                  0x000e64                  _PINs_Init
+                  0x000e88                  _PINs_test
+                  0x000e9e                  _LED1_test
+                  0x000eb0                  _LED1_toggle
+                  0x000f20                  _AD_Init
+                  0x000f50                  __OscillatorFail
+                  0x000f56                  __AddressError
+                  0x000f5c                  __StackError
+                  0x000f62                  __MathError
+                  0x000f68                  __AltOscillatorFail
+                  0x000f6e                  __AltAddressError
+                  0x000f74                  __AltStackError
+                  0x000f7a                  __AltMathError
+                  0x000f80                  _LED_Init
+                  0x000f8a                  _LED_test
 
 External Symbols in Program Memory (by name):
 
-                  0x000f08                  _AD_Init
+                  0x000f20                  _AD_Init
                   0x0003aa                  _BusyADC10
                   0x00032e                  _BusyUART2
-                  0x000c76                  _CharToUInt
+                  0x000c8e                  _CharToUInt
                   0x000336                  _CloseTimer1
                   0x00033e                  _CloseUART2
                   0x00027c                  _ConfigIntADC10
@@ -306,42 +306,42 @@ External Symbols in Program Memory (by name):
                   0x00034a                  _ConfigIntUART2
                   0x0003a6                  _ConvertADC10
                   0x000424                  _DataRdyUART2
-                  0x000afe                  _IntToString
-                  0x000e86                  _LED1_test
-                  0x000e98                  _LED1_toggle
-                  0x000f68                  _LED_Init
-                  0x000f72                  _LED_test
+                  0x000b16                  _IntToString
+                  0x000e9e                  _LED1_test
+                  0x000eb0                  _LED1_toggle
+                  0x000f80                  _LED_Init
+                  0x000f8a                  _LED_test
                   0x0003e4                  _OpenTimer2
                   0x00041c                  _OpenTimer3
                   0x00039a                  _OpenUART2
-                  0x000e4c                  _PINs_Init
-                  0x000e70                  _PINs_test
+                  0x000e64                  _PINs_Init
+                  0x000e88                  _PINs_test
                   0x0003b2                  _ReadADC10
-                  0x000d7e                  _RecoverConfigurationFromEEprom
-                  0x000cdc                  _SaveEepromBoardConfig
+                  0x000d96                  _RecoverConfigurationFromEEprom
+                  0x000cf4                  _SaveEepromBoardConfig
                   0x0003a2                  _SetChanADC10
-                  0x000d94                  _T1_Init
-                  0x000e20                  _T2_Init
-                  0x000e36                  _T3_Init
+                  0x000dac                  _T1_Init
+                  0x000e38                  _T2_Init
+                  0x000e4e                  _T3_Init
                   0x00042a                  _TIME_INTERVAL
-                  0x000aa4                  _UIntToString
-                  0x000a90                  _Wait
+                  0x000abc                  _UIntToString
+                  0x000aa8                  _Wait
                   0x0002a6                  _WriteTimer1
                   0x0002aa                  _WriteTimer2
                   0x000418                  _WriteTimer3
-                  0x000f3e                  __AddressError
-                  0x000f56                  __AltAddressError
-                  0x000f62                  __AltMathError
-                  0x000f50                  __AltOscillatorFail
-                  0x000f5c                  __AltStackError
+                  0x000f56                  __AddressError
+                  0x000f6e                  __AltAddressError
+                  0x000f7a                  __AltMathError
+                  0x000f68                  __AltOscillatorFail
+                  0x000f74                  __AltStackError
                   0x000190                  __DefaultInterrupt
-                  0x000f4a                  __MathError
-                  0x000f38                  __OscillatorFail
-                  0x000f44                  __StackError
-                  0x00053a                  __T1Interrupt
-                  0x00055e                  __T2Interrupt
-                  0x000586                  __U2RXInterrupt
-                  0x00057e                  __U2TXInterrupt
+                  0x000f62                  __MathError
+                  0x000f50                  __OscillatorFail
+                  0x000f5c                  __StackError
+                  0x00053c                  __T1Interrupt
+                  0x000560                  __T2Interrupt
+                  0x000588                  __U2RXInterrupt
+                  0x000580                  __U2TXInterrupt
                   0x00023a                  ___divsi3
                   0x000258                  ___modsi3
                   0x00021a                  ___udivsi3
@@ -357,9 +357,9 @@ External Symbols in Program Memory (by name):
                   0x000100                  __resetPRI
                   0x00042c                  _battery_cap
                   0x000430                  _battery_cap_div100
-                  0x000b74                  _chargeCalculator
+                  0x000b8c                  _chargeCalculator
                   0x0002ae                  _getsUART2
-                  0x0008a6                  _main
+                  0x0008be                  _main
                   0x0002fa                  _putsUART2
 
 Memory Configuration
@@ -572,20 +572,20 @@ userdata
 
 .ivt              0x000004         0x7c
                   0x000004          0x4 LONG 0x190 DEFINED (__ReservedTrap0)?ABSOLUTE (__ReservedTrap0):ABSOLUTE (__DefaultInterrupt)
-                  0x000006          0x4 LONG 0xf38 DEFINED (__OscillatorFail)?ABSOLUTE (__OscillatorFail):ABSOLUTE (__DefaultInterrupt)
-                  0x000008          0x4 LONG 0xf3e DEFINED (__AddressError)?ABSOLUTE (__AddressError):ABSOLUTE (__DefaultInterrupt)
-                  0x00000a          0x4 LONG 0xf44 DEFINED (__StackError)?ABSOLUTE (__StackError):ABSOLUTE (__DefaultInterrupt)
-                  0x00000c          0x4 LONG 0xf4a DEFINED (__MathError)?ABSOLUTE (__MathError):ABSOLUTE (__DefaultInterrupt)
+                  0x000006          0x4 LONG 0xf50 DEFINED (__OscillatorFail)?ABSOLUTE (__OscillatorFail):ABSOLUTE (__DefaultInterrupt)
+                  0x000008          0x4 LONG 0xf56 DEFINED (__AddressError)?ABSOLUTE (__AddressError):ABSOLUTE (__DefaultInterrupt)
+                  0x00000a          0x4 LONG 0xf5c DEFINED (__StackError)?ABSOLUTE (__StackError):ABSOLUTE (__DefaultInterrupt)
+                  0x00000c          0x4 LONG 0xf62 DEFINED (__MathError)?ABSOLUTE (__MathError):ABSOLUTE (__DefaultInterrupt)
                   0x00000e          0x4 LONG 0x190 DEFINED (__ReservedTrap5)?ABSOLUTE (__ReservedTrap5):ABSOLUTE (__DefaultInterrupt)
                   0x000010          0x4 LONG 0x190 DEFINED (__ReservedTrap6)?ABSOLUTE (__ReservedTrap6):ABSOLUTE (__DefaultInterrupt)
                   0x000012          0x4 LONG 0x190 DEFINED (__ReservedTrap7)?ABSOLUTE (__ReservedTrap7):ABSOLUTE (__DefaultInterrupt)
                   0x000014          0x4 LONG 0x190 DEFINED (__INT0Interrupt)?ABSOLUTE (__INT0Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x000016          0x4 LONG 0x190 DEFINED (__IC1Interrupt)?ABSOLUTE (__IC1Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x000018          0x4 LONG 0x190 DEFINED (__OC1Interrupt)?ABSOLUTE (__OC1Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x00001a          0x4 LONG 0x53a DEFINED (__T1Interrupt)?ABSOLUTE (__T1Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x00001a          0x4 LONG 0x53c DEFINED (__T1Interrupt)?ABSOLUTE (__T1Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x00001c          0x4 LONG 0x190 DEFINED (__IC2Interrupt)?ABSOLUTE (__IC2Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x00001e          0x4 LONG 0x190 DEFINED (__OC2Interrupt)?ABSOLUTE (__OC2Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000020          0x4 LONG 0x55e DEFINED (__T2Interrupt)?ABSOLUTE (__T2Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000020          0x4 LONG 0x560 DEFINED (__T2Interrupt)?ABSOLUTE (__T2Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x000022          0x4 LONG 0x190 DEFINED (__T3Interrupt)?ABSOLUTE (__T3Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x000024          0x4 LONG 0x190 DEFINED (__SPI1Interrupt)?ABSOLUTE (__SPI1Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x000026          0x4 LONG 0x190 DEFINED (__U1RXInterrupt)?ABSOLUTE (__U1RXInterrupt):ABSOLUTE (__DefaultInterrupt)
@@ -603,8 +603,8 @@ userdata
                   0x00003e          0x4 LONG 0x190 DEFINED (__T4Interrupt)?ABSOLUTE (__T4Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x000040          0x4 LONG 0x190 DEFINED (__T5Interrupt)?ABSOLUTE (__T5Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x000042          0x4 LONG 0x190 DEFINED (__INT2Interrupt)?ABSOLUTE (__INT2Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000044          0x4 LONG 0x586 DEFINED (__U2RXInterrupt)?ABSOLUTE (__U2RXInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000046          0x4 LONG 0x57e DEFINED (__U2TXInterrupt)?ABSOLUTE (__U2TXInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000044          0x4 LONG 0x588 DEFINED (__U2RXInterrupt)?ABSOLUTE (__U2RXInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000046          0x4 LONG 0x580 DEFINED (__U2TXInterrupt)?ABSOLUTE (__U2TXInterrupt):ABSOLUTE (__DefaultInterrupt)
                   0x000048          0x4 LONG 0x190 DEFINED (__SPI2Interrupt)?ABSOLUTE (__SPI2Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x00004a          0x4 LONG 0x190 DEFINED (__C1Interrupt)?ABSOLUTE (__C1Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x00004c          0x4 LONG 0x190 DEFINED (__IC3Interrupt)?ABSOLUTE (__IC3Interrupt):ABSOLUTE (__DefaultInterrupt)
@@ -636,20 +636,20 @@ userdata
 
 .aivt             0x000084         0x7c
                   0x000084          0x4 LONG 0x190 DEFINED (__AltReservedTrap0)?ABSOLUTE (__AltReservedTrap0):DEFINED (__ReservedTrap0)?ABSOLUTE (__ReservedTrap0):ABSOLUTE (__DefaultInterrupt)
-                  0x000086          0x4 LONG 0xf50 DEFINED (__AltOscillatorFail)?ABSOLUTE (__AltOscillatorFail):DEFINED (__OscillatorFail)?ABSOLUTE (__OscillatorFail):ABSOLUTE (__DefaultInterrupt)
-                  0x000088          0x4 LONG 0xf56 DEFINED (__AltAddressError)?ABSOLUTE (__AltAddressError):DEFINED (__AddressError)?ABSOLUTE (__AddressError):ABSOLUTE (__DefaultInterrupt)
-                  0x00008a          0x4 LONG 0xf5c DEFINED (__AltStackError)?ABSOLUTE (__AltStackError):DEFINED (__StackError)?ABSOLUTE (__StackError):ABSOLUTE (__DefaultInterrupt)
-                  0x00008c          0x4 LONG 0xf62 DEFINED (__AltMathError)?ABSOLUTE (__AltMathError):DEFINED (__MathError)?ABSOLUTE (__MathError):ABSOLUTE (__DefaultInterrupt)
+                  0x000086          0x4 LONG 0xf68 DEFINED (__AltOscillatorFail)?ABSOLUTE (__AltOscillatorFail):DEFINED (__OscillatorFail)?ABSOLUTE (__OscillatorFail):ABSOLUTE (__DefaultInterrupt)
+                  0x000088          0x4 LONG 0xf6e DEFINED (__AltAddressError)?ABSOLUTE (__AltAddressError):DEFINED (__AddressError)?ABSOLUTE (__AddressError):ABSOLUTE (__DefaultInterrupt)
+                  0x00008a          0x4 LONG 0xf74 DEFINED (__AltStackError)?ABSOLUTE (__AltStackError):DEFINED (__StackError)?ABSOLUTE (__StackError):ABSOLUTE (__DefaultInterrupt)
+                  0x00008c          0x4 LONG 0xf7a DEFINED (__AltMathError)?ABSOLUTE (__AltMathError):DEFINED (__MathError)?ABSOLUTE (__MathError):ABSOLUTE (__DefaultInterrupt)
                   0x00008e          0x4 LONG 0x190 DEFINED (__AltReservedTrap5)?ABSOLUTE (__AltReservedTrap5):DEFINED (__ReservedTrap5)?ABSOLUTE (__ReservedTrap5):ABSOLUTE (__DefaultInterrupt)
                   0x000090          0x4 LONG 0x190 DEFINED (__AltReservedTrap6)?ABSOLUTE (__AltReservedTrap6):DEFINED (__ReservedTrap6)?ABSOLUTE (__ReservedTrap6):ABSOLUTE (__DefaultInterrupt)
                   0x000092          0x4 LONG 0x190 DEFINED (__AltReservedTrap7)?ABSOLUTE (__AltReservedTrap7):DEFINED (__ReservedTrap7)?ABSOLUTE (__ReservedTrap7):ABSOLUTE (__DefaultInterrupt)
                   0x000094          0x4 LONG 0x190 DEFINED (__AltINT0Interrupt)?ABSOLUTE (__AltINT0Interrupt):DEFINED (__INT0Interrupt)?ABSOLUTE (__INT0Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x000096          0x4 LONG 0x190 DEFINED (__AltIC1Interrupt)?ABSOLUTE (__AltIC1Interrupt):DEFINED (__IC1Interrupt)?ABSOLUTE (__IC1Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x000098          0x4 LONG 0x190 DEFINED (__AltOC1Interrupt)?ABSOLUTE (__AltOC1Interrupt):DEFINED (__OC1Interrupt)?ABSOLUTE (__OC1Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x00009a          0x4 LONG 0x53a DEFINED (__AltT1Interrupt)?ABSOLUTE (__AltT1Interrupt):DEFINED (__T1Interrupt)?ABSOLUTE (__T1Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x00009a          0x4 LONG 0x53c DEFINED (__AltT1Interrupt)?ABSOLUTE (__AltT1Interrupt):DEFINED (__T1Interrupt)?ABSOLUTE (__T1Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x00009c          0x4 LONG 0x190 DEFINED (__AltIC2Interrupt)?ABSOLUTE (__AltIC2Interrupt):DEFINED (__IC2Interrupt)?ABSOLUTE (__IC2Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x00009e          0x4 LONG 0x190 DEFINED (__AltOC2Interrupt)?ABSOLUTE (__AltOC2Interrupt):DEFINED (__OC2Interrupt)?ABSOLUTE (__OC2Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000a0          0x4 LONG 0x55e DEFINED (__AltT2Interrupt)?ABSOLUTE (__AltT2Interrupt):DEFINED (__T2Interrupt)?ABSOLUTE (__T2Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000a0          0x4 LONG 0x560 DEFINED (__AltT2Interrupt)?ABSOLUTE (__AltT2Interrupt):DEFINED (__T2Interrupt)?ABSOLUTE (__T2Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x0000a2          0x4 LONG 0x190 DEFINED (__AltT3Interrupt)?ABSOLUTE (__AltT3Interrupt):DEFINED (__T3Interrupt)?ABSOLUTE (__T3Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x0000a4          0x4 LONG 0x190 DEFINED (__AltSPI1Interrupt)?ABSOLUTE (__AltSPI1Interrupt):DEFINED (__SPI1Interrupt)?ABSOLUTE (__SPI1Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x0000a6          0x4 LONG 0x190 DEFINED (__AltU1RXInterrupt)?ABSOLUTE (__AltU1RXInterrupt):DEFINED (__U1RXInterrupt)?ABSOLUTE (__U1RXInterrupt):ABSOLUTE (__DefaultInterrupt)
@@ -667,8 +667,8 @@ userdata
                   0x0000be          0x4 LONG 0x190 DEFINED (__AltT4Interrupt)?ABSOLUTE (__AltT4Interrupt):DEFINED (__T4Interrupt)?ABSOLUTE (__T4Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x0000c0          0x4 LONG 0x190 DEFINED (__AltT5Interrupt)?ABSOLUTE (__AltT5Interrupt):DEFINED (__T5Interrupt)?ABSOLUTE (__T5Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x0000c2          0x4 LONG 0x190 DEFINED (__AltINT2Interrupt)?ABSOLUTE (__AltINT2Interrupt):DEFINED (__INT2Interrupt)?ABSOLUTE (__INT2Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000c4          0x4 LONG 0x586 DEFINED (__AltU2RXInterrupt)?ABSOLUTE (__AltU2RXInterrupt):DEFINED (__U2RXInterrupt)?ABSOLUTE (__U2RXInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000c6          0x4 LONG 0x57e DEFINED (__AltU2TXInterrupt)?ABSOLUTE (__AltU2TXInterrupt):DEFINED (__U2TXInterrupt)?ABSOLUTE (__U2TXInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000c4          0x4 LONG 0x588 DEFINED (__AltU2RXInterrupt)?ABSOLUTE (__AltU2RXInterrupt):DEFINED (__U2RXInterrupt)?ABSOLUTE (__U2RXInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000c6          0x4 LONG 0x580 DEFINED (__AltU2TXInterrupt)?ABSOLUTE (__AltU2TXInterrupt):DEFINED (__U2TXInterrupt)?ABSOLUTE (__U2TXInterrupt):ABSOLUTE (__DefaultInterrupt)
                   0x0000c8          0x4 LONG 0x190 DEFINED (__AltSPI2Interrupt)?ABSOLUTE (__AltSPI2Interrupt):DEFINED (__SPI2Interrupt)?ABSOLUTE (__SPI2Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x0000ca          0x4 LONG 0x190 DEFINED (__AltC1Interrupt)?ABSOLUTE (__AltC1Interrupt):DEFINED (__C1Interrupt)?ABSOLUTE (__C1Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x0000cc          0x4 LONG 0x190 DEFINED (__AltIC3Interrupt)?ABSOLUTE (__AltIC3Interrupt):DEFINED (__IC3Interrupt)?ABSOLUTE (__IC3Interrupt):ABSOLUTE (__DefaultInterrupt)
@@ -1522,58 +1522,58 @@ __c30_signature
                     0x08a4                  CHECKSUM_CHAR
                     0x08ac                  read
 
-.const              0x842a        0x110 load address 0x00042a  
- .const             0x842a        0x110 main.o
+.const              0x842a        0x112 load address 0x00042a  
+ .const             0x842a        0x112 main.o
                     0x842a                  TIME_INTERVAL
                     0x842c                  battery_cap
                     0x8430                  battery_cap_div100
 
-.text             0x00053a        0x980
- .text            0x00053a        0x7a2 main.o
-                  0x00053a                  _T1Interrupt
-                  0x00055e                  _T2Interrupt
-                  0x00057e                  _U2TXInterrupt
-                  0x000586                  _U2RXInterrupt
-                  0x0008a6                  main
-                  0x000a90                  Wait
-                  0x000aa4                  UIntToString
-                  0x000afe                  IntToString
-                  0x000b74                  chargeCalculator
-                  0x000c76                  CharToUInt
- .text            0x000cdc         0xb8 eeprom.o
-                  0x000cdc                  SaveEepromBoardConfig
-                  0x000d7e                  RecoverConfigurationFromEEprom
- .text            0x000d94         0xb8 T1.o
-                  0x000d94                  T1_Init
-                  0x000e20                  T2_Init
-                  0x000e36                  T3_Init
- .text            0x000e4c         0x6e PIN.o
-                  0x000e4c                  PINs_Init
-                  0x000e70                  PINs_test
-                  0x000e86                  LED1_test
-                  0x000e98                  LED1_toggle
+.text             0x00053c        0x996
+ .text            0x00053c        0x7b8 main.o
+                  0x00053c                  _T1Interrupt
+                  0x000560                  _T2Interrupt
+                  0x000580                  _U2TXInterrupt
+                  0x000588                  _U2RXInterrupt
+                  0x0008be                  main
+                  0x000aa8                  Wait
+                  0x000abc                  UIntToString
+                  0x000b16                  IntToString
+                  0x000b8c                  chargeCalculator
+                  0x000c8e                  CharToUInt
+ .text            0x000cf4         0xb8 eeprom.o
+                  0x000cf4                  SaveEepromBoardConfig
+                  0x000d96                  RecoverConfigurationFromEEprom
+ .text            0x000dac         0xb8 T1.o
+                  0x000dac                  T1_Init
+                  0x000e38                  T2_Init
+                  0x000e4e                  T3_Init
+ .text            0x000e64         0x6e PIN.o
+                  0x000e64                  PINs_Init
+                  0x000e88                  PINs_test
+                  0x000e9e                  LED1_test
+                  0x000eb0                  LED1_toggle
 
-.dinit            0x000eba         0x4e
- .dinit           0x000eba         0x4e data_init
+.dinit            0x000ed2         0x4e
+ .dinit           0x000ed2         0x4e data_init
 
-.text             0x000f08         0x7c
- .text            0x000f08         0x30 AD.o
-                  0x000f08                  AD_Init
- .text            0x000f38         0x30 traps.o
-                  0x000f38                  _OscillatorFail
-                  0x000f3e                  _AddressError
-                  0x000f44                  _StackError
-                  0x000f4a                  _MathError
-                  0x000f50                  _AltOscillatorFail
-                  0x000f56                  _AltAddressError
-                  0x000f5c                  _AltStackError
-                  0x000f62                  _AltMathError
- .text            0x000f68         0x1c LED.o
-                  0x000f68                  LED_Init
-                  0x000f72                  LED_test
+.text             0x000f20         0x7c
+ .text            0x000f20         0x30 AD.o
+                  0x000f20                  AD_Init
+ .text            0x000f50         0x30 traps.o
+                  0x000f50                  _OscillatorFail
+                  0x000f56                  _AddressError
+                  0x000f5c                  _StackError
+                  0x000f62                  _MathError
+                  0x000f68                  _AltOscillatorFail
+                  0x000f6e                  _AltAddressError
+                  0x000f74                  _AltStackError
+                  0x000f7a                  _AltMathError
+ .text            0x000f80         0x1c LED.o
+                  0x000f80                  LED_Init
+                  0x000f8a                  LED_test
 
-_039bfee04f18386b
+_039dfee04f194024
                     0xfc00         0x2c load address 0x7ffc00  
- _039bfee04f18386b
+ _039dfee04f194024
                     0xfc00         0x2c main.o
                     0xfc00                  ee_data

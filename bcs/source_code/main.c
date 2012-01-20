@@ -189,7 +189,7 @@ void __attribute__((interrupt, , no_auto_psv)) _U2RXInterrupt(void)
 
 {
   int i=0;
-  char MENU[14]={'S','e','t','t','i','n','g',' ','B','C','S','\n','\0'};
+  char MENU[14]={'S','e','t',' ','B','C','S',' ','V','0','1','\n','\0'};
   char Am[20]=" current offset   ";
   char Vm[20]=" value read at 48V";
   char Tm[20]=" time interval    ";
@@ -201,7 +201,7 @@ void __attribute__((interrupt, , no_auto_psv)) _U2RXInterrupt(void)
   char pressT[21]="press Txx to set the";
   char Tmax  [18]=":xx from 0 to 15";
   char pressS[28]="press S to finish and SAVE";
-  char error[23]="error reading character";
+  char error[25] ="error reading character";
   
   IFS1bits.U2RXIF = 0;
 	
@@ -217,12 +217,13 @@ void __attribute__((interrupt, , no_auto_psv)) _U2RXInterrupt(void)
 	    pressM[18]='\n';
 	    pressM[19]='\0';
 	    pressT[20]='\0';
-
+ 		error[23]='\n';
+	    error[24]='\0';
 
    /* Read the receive buffer till atleast one or more character can be
       read */ 
       read[0]='0';
-      i=getsUART2(CHAR_RECEIVED,read,800);
+      i=getsUART2(CHAR_RECEIVED,read,80);
       if (sleep==1)
       {
    		sleep=0;
@@ -339,10 +340,10 @@ CloseUART2();
     ConfigIntUART2(UART_RX_INT_EN & UART_RX_INT_PR6 & 
                    UART_TX_INT_EN & UART_TX_INT_PR2);
 /* Configure UART2 module to transmit 8 bit data with one stopbit. Also Enable loopback mode  */
-     baudvalue =15; //45;//019.2 23;//=38.4 15= 57.6 //
+     baudvalue =15;//15; //45;//019.2 23;//=38.4 15= 57.6 //
      U2MODEvalue = UART_EN & UART_IDLE_CON & 
                   UART_EN_WAKE & UART_DIS_LOOPBACK  &
-                  UART_DIS_ABAUD & UART_NO_PAR_8BIT  &
+                  UART_DIS_ABAUD & UART_EVEN_PAR_8BIT  &
                   UART_1STOPBIT;
     U2STAvalue  = UART_INT_TX_BUF_EMPTY &  
                   UART_TX_PIN_NORMAL &
