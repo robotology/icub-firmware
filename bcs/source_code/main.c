@@ -41,6 +41,11 @@
 // TODO: CAN but it seems to be useles
 // Inizializzazione lettura di corrente e tensione a 48V: DONE 
 //
+//  Revision 1.1 08/02/2012: 
+// TODO: CAN but it seems to be useles
+// Change the baudrate to 57600 with 1 parity bit  
+// Added checksum to the string
+ 
 
 #include<p30f4011.h>
 #include <uart.h>
@@ -189,7 +194,7 @@ void __attribute__((interrupt, , no_auto_psv)) _U2RXInterrupt(void)
 
 {
   int i=0;
-  char MENU[14]={'S','e','t',' ','B','C','S',' ','V','0','1','\n','\0'};
+  char MENU[20]={' ',' ',' ',' ','B','C','S',' ','V','1','.','1','\n','\0'};
   char Am[20]=" current offset   ";
   char Vm[20]=" value read at 48V";
   char Tm[20]=" time interval    ";
@@ -202,8 +207,8 @@ void __attribute__((interrupt, , no_auto_psv)) _U2RXInterrupt(void)
   char Tmax  [18]=":xx from 0 to 15";
   char pressS[28]="press S to finish and SAVE";
   char error[25] ="error reading character";
-  
-  IFS1bits.U2RXIF = 0;
+  char error_ch[2]={'\0','\0'};	  
+ 
 	
 		Am[18]='\n';
 		Vm[18]='\n';
@@ -217,13 +222,13 @@ void __attribute__((interrupt, , no_auto_psv)) _U2RXInterrupt(void)
 	    pressM[18]='\n';
 	    pressM[19]='\0';
 	    pressT[20]='\0';
- 		error[23]='\n';
+ 		error[23]='\0';
 	    error[24]='\0';
 
    /* Read the receive buffer till atleast one or more character can be
       read */ 
       read[0]='0';
-      i=getsUART2(CHAR_RECEIVED,read,80);
+      i=getsUART2(CHAR_RECEIVED,read,300);
       if (sleep==1)
       {
    		sleep=0;
@@ -314,10 +319,14 @@ void __attribute__((interrupt, , no_auto_psv)) _U2RXInterrupt(void)
 		default:  
   		{
 	  	 putsUART2((unsigned int *) error);
+	  	 error_ch[0]=read[0];
+	  	 putsUART2((unsigned int *) error_ch);
+	  	  putsUART2((unsigned int *) '\n');
 	  	 while (BusyUART2());
 	  	}	
 	  	break;
 	}
+	 IFS1bits.U2RXIF = 0;
 }
 //------------------------------------------------------------------------
 //									MAIN
