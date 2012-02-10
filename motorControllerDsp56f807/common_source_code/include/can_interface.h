@@ -131,7 +131,7 @@ void can_receive_additional_info();
 // class 1 messages, broadcast 
 // when in bcast mode, messages are sent periodically by the controller
 
-#define CAN_BCAST_NONE				0
+#define CAN_BCAST_2FOC				0
 #define CAN_BCAST_POSITION			1
 #define CAN_BCAST_PID_VAL			2
 #define CAN_BCAST_STATUS			3
