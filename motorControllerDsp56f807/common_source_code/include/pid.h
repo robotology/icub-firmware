@@ -96,6 +96,10 @@ extern Int16 _debug_out2[JN] ;			// general purpouse debug
 extern Int16 _debug_out3[JN] ;			// general purpouse debug
 extern Int16 _debug_out4[JN] ;			// general purpouse debug
 
+extern Int16 _sacc0[JN] ;
+extern Int16 _sacc1[JN] ;
+extern Int16 _sacc2[JN] ;
+
 // BACK-EMF COMPENSATION
 extern Int16 _backemf_gain[JN];
 extern Int16 _backemf_shift[JN];

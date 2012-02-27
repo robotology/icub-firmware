@@ -54,6 +54,9 @@ Int16 _debug_out1[JN] = INIT_ARRAY (0); 		 	// general purpouse debug
 Int16 _debug_out2[JN] = INIT_ARRAY (0);				// general purpouse debug
 Int16 _debug_out3[JN] = INIT_ARRAY (0); 		 	// general purpouse debug
 Int16 _debug_out4[JN] = INIT_ARRAY (0);				// general purpouse debug
+Int16 _sacc0[JN] = INIT_ARRAY (0);
+Int16 _sacc1[JN] = INIT_ARRAY (0);
+Int16 _sacc2[JN] = INIT_ARRAY (0);
 byte  _t1c =0;
 
 // BACK-EMF COMPENSATION
