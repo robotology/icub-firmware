@@ -1148,7 +1148,12 @@
 	else if (CAN_DATA[1]==6) _debug_in6[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
 	else if (CAN_DATA[1]==7) _debug_in7[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
 	\
-	else if (CAN_DATA[1]==20) {_sacc0[axis] = (CAN_DATA[2]); _sacc1[axis] = (CAN_DATA[3]); _sacc2[axis] = (CAN_DATA[4]);} \
+	else if (CAN_DATA[1]==20) \
+	{ \
+		_sacc0[axis] = BYTE_W(CAN_DATA[2],CAN_DATA[3]); \
+	 	_sacc1[axis] = BYTE_W(CAN_DATA[4],CAN_DATA[5]); \
+	 	_sacc2[axis] = BYTE_W(CAN_DATA[6],CAN_DATA[7]); \
+	} \
 	\
 	else if (CAN_DATA[1]==10) _param_a10_coeff = (float) (BYTE_W(CAN_DATA[2], CAN_DATA[3])) / 1000.0F; \
 	else if (CAN_DATA[1]==11) _param_a11_coeff = (float) (BYTE_W(CAN_DATA[2], CAN_DATA[3])) / 1000.0F; \
@@ -1207,9 +1212,16 @@ else \
 		else if (index_dbg==15) {val=0; CAN_DATA[1] =BYTE_H(val);CAN_DATA[2] = BYTE_L(val);}\
 		else if (index_dbg==16) {val=0; CAN_DATA[1] =BYTE_H(val);CAN_DATA[2] = BYTE_L(val);}\
 		else if (index_dbg==17) {val=0; CAN_DATA[1] =BYTE_H(val);CAN_DATA[2] = BYTE_L(val);}\
-         \
-        else if (index_dbg==20) {CAN_DATA[1] = _sacc0[axis]; CAN_DATA[2] = _sacc1[axis]; CAN_DATA[3] = _sacc2[axis]; } \
 		 \
+        else if (index_dbg==20) \
+        { \
+        	CAN_DATA[1] = BYTE_H(_sacc0[axis]); \
+        	CAN_DATA[2] = BYTE_L(_sacc0[axis]); \
+        	CAN_DATA[3] = BYTE_H(_sacc1[axis]); \
+        	CAN_DATA[4] = BYTE_L(_sacc1[axis]); \
+        	CAN_DATA[5] = BYTE_H(_sacc2[axis]); \
+        	CAN_DATA[6] = BYTE_L(_sacc2[axis]); \
+        } \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
 		_general_board_error = ERROR_NONE; \
 }

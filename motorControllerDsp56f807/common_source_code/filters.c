@@ -28,7 +28,7 @@ void clear_lpf_ord1_3hz(int j)
 	}
 	else
 	{
-		c1[j] = _debug_in5[j];
+		c1[j] = (double)(_debug_in5[j]) / 10000.0;
 		gain[j] = 2.0 / (1.0 - c1[j]);
 	}
 	
