@@ -45,8 +45,10 @@
 #include "hal_arch_cfg_arm.h"
 #elif defined(HAL_USE_ARCH_DSPIC)
 #include "hal_arch_cfg_dspic.h"
+#elif defined(HAL_USE_ARCH_NONE)
+#include "hal_arch_cfg_none.h"
 #else
-#error please choose an architecture with: HAL_USE_ARCH_ARM or HAL_USE_ARCH_DSPIC ?
+#error please choose an architecture with: HAL_USE_ARCH_ARM, HAL_USE_ARCH_DSPIC, or HAL_USE_ARCH_NONE.
 #endif
 
 
@@ -62,6 +64,8 @@
 typedef hal_arch_arm_cfg_t      hal_arch_cfg_t;
 #elif defined(HAL_USE_ARCH_DSPIC)
 typedef hal_arch_dspic_cfg_t    hal_arch_cfg_t;
+#elif defined(HAL_USE_ARCH_NONE)
+typedef hal_arch_none_cfg_t     hal_arch_cfg_t;
 #endif
 
 
