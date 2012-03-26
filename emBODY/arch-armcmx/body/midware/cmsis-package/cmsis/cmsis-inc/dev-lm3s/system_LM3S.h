@@ -28,40 +28,25 @@
 //
 //*****************************************************************************
 
-#ifndef __SYSTEM_LM3S_H
-#define __SYSTEM_LM3S_H
-
-#ifdef __cplusplus
- extern "C" {
-#endif
-
-extern uint32_t SystemCoreClock;     /*!< System Clock Frequency (Core Clock)  */
-
-
-/**
- * Initialize the system
+/*
+ * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
+ * website: www.robotcub.org
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
  *
- * @param  none
- * @return none
+ * A copy of the license can be found at
+ * http://www.robotcub.org/icub/license/gpl.txt
  *
- * @brief  Setup the microcontroller system.
- *         Initialize the System and update the SystemCoreClock variable.
- */
-extern void SystemInit (void);
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
+*/
 
-/**
- * Update SystemCoreClock variable
- *
- * @param  none
- * @return none
- *
- * @brief  Updates the SystemCoreClock with current core Clock
- *         retrieved from cpu registers.
- */
-extern void SystemCoreClockUpdate (void);
+#error --> the content of this file has been removed because "You may not combine this software with "viral" open-source software in order to form a larger program."
 
-#ifdef __cplusplus
-}
-#endif
 
-#endif /* __SYSTEM_LM3S_H */
+
