@@ -1,11 +1,43 @@
 /**
   ******************************************************************************
-  * @file    USART/Smartcard/system_stm32f10x.c
+  * @file    system_stm32f10x.c
   * @author  MCD Application Team
-  * @version V3.4.0
-  * @date    10/15/2010
+  * @version V3.5.0
+  * @date    11-March-2011
   * @brief   CMSIS Cortex-M3 Device Peripheral Access Layer System Source File.
-  ******************************************************************************  
+  * 
+  * 1.  This file provides two functions and one global variable to be called from 
+  *     user application:
+  *      - SystemInit(): Setups the system clock (System clock source, PLL Multiplier
+  *                      factors, AHB/APBx prescalers and Flash settings). 
+  *                      This function is called at startup just after reset and 
+  *                      before branch to main program. This call is made inside
+  *                      the "startup_stm32f10x_xx.s" file.
+  *
+  *      - SystemCoreClock variable: Contains the core clock (HCLK), it can be used
+  *                                  by the user application to setup the SysTick 
+  *                                  timer or configure other parameters.
+  *                                     
+  *      - SystemCoreClockUpdate(): Updates the variable SystemCoreClock and must
+  *                                 be called whenever the core clock is changed
+  *                                 during program execution.
+  *
+  * 2. After each device reset the HSI (8 MHz) is used as system clock source.
+  *    Then SystemInit() function is called, in "startup_stm32f10x_xx.s" file, to
+  *    configure the system clock before to branch to main program.
+  *
+  * 3. If the system clock source selected by user fails to startup, the SystemInit()
+  *    function will do nothing and HSI still used as system clock source. User can 
+  *    add some code to deal with this issue inside the SetSysClock() function.
+  *
+  * 4. The default value of HSE crystal is set to 8 MHz (or 25 MHz, depedning on
+  *    the product used), refer to "HSE_VALUE" define in "stm32f10x.h" file. 
+  *    When HSE is used as system clock source, directly or through PLL, and you
+  *    are using different crystal you have to adapt the HSE value to your own
+  *    configuration.
+  *        
+  ******************************************************************************
+  * @attention
   *
   * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
   * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE
@@ -14,9 +46,29 @@
   * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE
   * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
   *
-  * <h2><center>&copy; COPYRIGHT 2010 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT 2011 STMicroelectronics</center></h2>
   ******************************************************************************
   */
+
+
+/*
+ * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
+ * website: www.robotcub.org
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * A copy of the license can be found at
+ * http://www.robotcub.org/icub/license/gpl.txt
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
+*/
+
 
 /** @addtogroup CMSIS
   * @{
@@ -94,7 +146,7 @@
      Internal SRAM. */ 
 /* #define VECT_TAB_SRAM */
 #define VECT_TAB_OFFSET  0x0 /*!< Vector Table base offset field. 
-                                  This value must be a multiple of 0x100. */
+                                  This value must be a multiple of 0x200. */
 
 
 /**
@@ -249,8 +301,37 @@ void SystemInit (void)
 }
 
 /**
-  * @brief  Update SystemCoreClock according to Clock Register Values
-  * @note   None
+  * @brief  Update SystemCoreClock variable according to Clock Register Values.
+  *         The SystemCoreClock variable contains the core clock (HCLK), it can
+  *         be used by the user application to setup the SysTick timer or configure
+  *         other parameters.
+  *           
+  * @note   Each time the core clock (HCLK) changes, this function must be called
+  *         to update SystemCoreClock variable value. Otherwise, any configuration
+  *         based on this variable will be incorrect.         
+  *     
+  * @note   - The system frequency computed by this function is not the real 
+  *           frequency in the chip. It is calculated based on the predefined 
+  *           constant and the selected clock source:
+  *             
+  *           - If SYSCLK source is HSI, SystemCoreClock will contain the HSI_VALUE(*)
+  *                                              
+  *           - If SYSCLK source is HSE, SystemCoreClock will contain the HSE_VALUE(**)
+  *                          
+  *           - If SYSCLK source is PLL, SystemCoreClock will contain the HSE_VALUE(**) 
+  *             or HSI_VALUE(*) multiplied by the PLL factors.
+  *         
+  *         (*) HSI_VALUE is a constant defined in stm32f1xx.h file (default value
+  *             8 MHz) but the real value may vary depending on the variations
+  *             in voltage and temperature.   
+  *    
+  *         (**) HSE_VALUE is a constant defined in stm32f1xx.h file (default value
+  *              8 MHz or 25 MHz, depedning on the product used), user has to ensure
+  *              that HSE_VALUE is same as the real frequency of the crystal used.
+  *              Otherwise, this function may have wrong result.
+  *                
+  *         - The result of this function could be not correct when using fractional
+  *           value for HSE crystal.
   * @param  None
   * @retval None
   */
@@ -466,7 +547,7 @@ void SystemInit_ExtMemCtl(void)
 #ifdef SYSCLK_FREQ_HSE
 /**
   * @brief  Selects HSE as System clock source and configure HCLK, PCLK2
-  *          and PCLK1 prescalers.
+  *         and PCLK1 prescalers.
   * @note   This function should be used only after reset.
   * @param  None
   * @retval None
@@ -545,7 +626,7 @@ static void SetSysClockToHSE(void)
 #elif defined SYSCLK_FREQ_24MHz
 /**
   * @brief  Sets System clock frequency to 24MHz and configure HCLK, PCLK2 
-  *          and PCLK1 prescalers.
+  *         and PCLK1 prescalers.
   * @note   This function should be used only after reset.
   * @param  None
   * @retval None
@@ -649,7 +730,7 @@ static void SetSysClockTo24(void)
 #elif defined SYSCLK_FREQ_36MHz
 /**
   * @brief  Sets System clock frequency to 36MHz and configure HCLK, PCLK2 
-  *          and PCLK1 prescalers. 
+  *         and PCLK1 prescalers. 
   * @note   This function should be used only after reset.
   * @param  None
   * @retval None
@@ -750,7 +831,7 @@ static void SetSysClockTo36(void)
 #elif defined SYSCLK_FREQ_48MHz
 /**
   * @brief  Sets System clock frequency to 48MHz and configure HCLK, PCLK2 
-  *          and PCLK1 prescalers. 
+  *         and PCLK1 prescalers. 
   * @note   This function should be used only after reset.
   * @param  None
   * @retval None
@@ -851,7 +932,7 @@ static void SetSysClockTo48(void)
 #elif defined SYSCLK_FREQ_56MHz
 /**
   * @brief  Sets System clock frequency to 56MHz and configure HCLK, PCLK2 
-  *          and PCLK1 prescalers. 
+  *         and PCLK1 prescalers. 
   * @note   This function should be used only after reset.
   * @param  None
   * @retval None
@@ -953,7 +1034,7 @@ static void SetSysClockTo56(void)
 #elif defined SYSCLK_FREQ_72MHz
 /**
   * @brief  Sets System clock frequency to 72MHz and configure HCLK, PCLK2 
-  *          and PCLK1 prescalers. 
+  *         and PCLK1 prescalers. 
   * @note   This function should be used only after reset.
   * @param  None
   * @retval None
@@ -1065,4 +1146,4 @@ static void SetSysClockTo72(void)
 /**
   * @}
   */    
-/******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/
+/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
