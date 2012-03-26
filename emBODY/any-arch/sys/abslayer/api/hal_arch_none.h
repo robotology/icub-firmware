@@ -47,7 +47,7 @@
 #define HAL_USE_ARCH_NONE
 #endif
 
-//#define HAL_HAS_BASE
+#define HAL_HAS_BASE
 //#define HAL_HAS_CAN
 //#define HAL_HAS_CRC
 //#define HAL_HAS_DISPLAY
@@ -57,7 +57,7 @@
 //#define HAL_HAS_FLASH
 //#define HAL_HAS_GPIO
 //#define HAL_HAS_LED
-//#define HAL_HAS_SYS
+#define HAL_HAS_SYS
 //#define HAL_HAS_TIMER
 //#define HAL_HAS_TRACE
 //#define HAL_HAS_WATCHDOG
