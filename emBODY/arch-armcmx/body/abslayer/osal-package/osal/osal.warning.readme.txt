@@ -1,0 +1,7 @@
+
+    until publication on sourceforge of osiit-package, the osal cannot be compiled or used.
+
+
+
+
+
