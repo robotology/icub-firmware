@@ -132,7 +132,7 @@ extern eObool_t eo_rop_hid_DataField_is_Present(const eOrophead_t *head);
 
 extern eObool_t eo_rop_hid_DataField_is_Required(const eOrophead_t *head);
 
-__inline extern uint16_t eo_rop_hid_DataField_EffectiveSize(uint16_t ropdatasize)
+EO_extern_inline uint16_t eo_rop_hid_DataField_EffectiveSize(uint16_t ropdatasize)
 {
     return(((ropdatasize + 3) >> 2) << 2);
 }
