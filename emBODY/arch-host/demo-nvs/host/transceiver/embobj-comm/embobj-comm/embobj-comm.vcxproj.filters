@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\src\main-transceiver.c" />
+    <ClCompile Include="..\..\src\hostTransceiver.c">
+      <Filter>host2board-wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EoCommon.c">
+      <Filter>eo-common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOaction.c">
+      <Filter>eo-core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOarray.c">
+      <Filter>eo-core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOconstarray.c">
+      <Filter>eo-core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOconstvector.c">
+      <Filter>eo-core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOdeque.c">
+      <Filter>eo-core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOfifo.c">
+      <Filter>eo-core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOfifoByte.c">
+      <Filter>eo-core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOfifoWord.c">
+      <Filter>eo-core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOlist.c">
+      <Filter>eo-core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOtheErrorManager.c">
+      <Filter>eo-core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOtheMemoryPool.c">
+      <Filter>eo-core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOtimer.c">
+      <Filter>eo-core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOvector.c">
+      <Filter>eo-core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVmutex.c">
+      <Filter>eo-core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtask.c">
+      <Filter>eo-core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtheCallbackManager.c">
+      <Filter>eo-core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtheSystem.c">
+      <Filter>eo-core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtheTimerManager.c">
+      <Filter>eo-core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core-nee\src\EONtheSystem.c">
+      <Filter>eo-nee</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOfakeStorage.c">
+      <Filter>eo-nvs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOhostTransceiver.c">
+      <Filter>eo-nvs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOmatrix3d.c">
+      <Filter>eo-nvs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOnv.c">
+      <Filter>eo-nvs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOnvsCfg.c">
+      <Filter>eo-nvs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOreceiver.c">
+      <Filter>eo-nvs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOrop.c">
+      <Filter>eo-nvs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOropframe.c">
+      <Filter>eo-nvs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtheAgent.c">
+      <Filter>eo-nvs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtheFormer.c">
+      <Filter>eo-nvs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtheParser.c">
+      <Filter>eo-nvs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtransceiver.c">
+      <Filter>eo-nvs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtransmitter.c">
+      <Filter>eo-nvs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtreenode.c">
+      <Filter>eo-nvs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOVstorage.c">
+      <Filter>eo-nvs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\config\nvs\common\eOcfg_nvsEP_base_con.c">
+      <Filter>eo-nvs-cfg-common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\config\nvs\common\eOcfg_nvsEP_mngmnt_con.c">
+      <Filter>eo-nvs-cfg-common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\config\nvs\remote\eOcfg_EPs_rem_board.c">
+      <Filter>eo-nvs-cfg-host</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\config\nvs\remote\eOcfg_nvsEP_base_usr_rem_anydev.c">
+      <Filter>eo-nvs-cfg-host</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\config\nvs\remote\eOcfg_nvsEP_mngmnt_usr_rem_board.c">
+      <Filter>eo-nvs-cfg-host</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\hal-fake\hal_fake.c">
+      <Filter>hal-fake</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\ipnet\src\EOpacket.c">
+      <Filter>eo-some-ipnet</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="eo-nvs">
+      <UniqueIdentifier>{5145c9f0-ac32-48d4-86c2-f13f96da1f07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="eo-core">
+      <UniqueIdentifier>{0cee0a91-eb32-4e02-9c48-d10c78b575bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="eo-nee">
+      <UniqueIdentifier>{3c491b8f-6338-4692-89d0-5502365aae56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="eo-common">
+      <UniqueIdentifier>{50a3c763-b8fb-41bf-8420-b37769331881}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="eo-nvs-cfg-common">
+      <UniqueIdentifier>{9c822469-14b4-40bf-b8a0-ecc6f7ffbb90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="eo-nvs-cfg-host">
+      <UniqueIdentifier>{3d4c17ec-681d-4c2c-8d80-94750e99ccbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hal-fake">
+      <UniqueIdentifier>{04cb2830-069d-4a8c-9263-f39b2bd32e7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="host2board-wrapper">
+      <UniqueIdentifier>{e4b12829-2847-416f-8c8b-64142d2a6697}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="eo-some-ipnet">
+      <UniqueIdentifier>{9586cf5a-52e1-45bc-ba5e-1b83f185c09a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\..\any-arch\sys\embobj\ipnet\src\EOpacket_hid.h">
+      <Filter>eo-some-ipnet</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

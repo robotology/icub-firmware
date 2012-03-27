@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{80D5CC28-3E47-4C69-8E34-8D47E6A3097A}</ProjectGuid>
+    <RootNamespace>embobjcomm</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\..\..\host\hal-fake;..\..\..\..\..\..\porting;..\..\..\..\..\..\any-arch\sys\abslayer\api;..\..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\..\any-arch\sys\embobj\core-nee\api;..\..\..\..\..\..\any-arch\sys\embobj\core-nee\src;..\..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\..\any-arch\sys\embobj\config\nvs\common;..\..\..\..\..\..\any-arch\sys\embobj\config\nvs\remote;..\..\..\..\..\..\any-arch\body\embenv\envcom;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>false</ExceptionHandling>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <ForceConformanceInForLoopScope>false</ForceConformanceInForLoopScope>
+      <AdditionalOptions>/c %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>_MBCS;HAL_USE_ARCH_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\config\nvs\common\eOcfg_nvsEP_base_con.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\config\nvs\common\eOcfg_nvsEP_mngmnt_con.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\config\nvs\remote\eOcfg_EPs_rem_board.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\config\nvs\remote\eOcfg_nvsEP_base_usr_rem_anydev.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\config\nvs\remote\eOcfg_nvsEP_mngmnt_usr_rem_board.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core-nee\src\EONtheSystem.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVmutex.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtask.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtheCallbackManager.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtheSystem.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtheTimerManager.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOaction.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOarray.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EoCommon.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOconstarray.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOconstvector.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOdeque.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOfifo.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOfifoByte.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOfifoWord.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOlist.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOtheErrorManager.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOtheMemoryPool.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOtimer.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\core\src\EOvector.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\ipnet\src\EOpacket.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOfakeStorage.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOhostTransceiver.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOmatrix3d.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOnv.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOnvsCfg.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOreceiver.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOrop.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOropframe.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtheAgent.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtheFormer.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtheParser.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtransceiver.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtransmitter.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtreenode.c" />
+    <ClCompile Include="..\..\..\..\..\..\any-arch\sys\embobj\prot\src\EOVstorage.c" />
+    <ClCompile Include="..\..\..\hal-fake\hal_fake.c" />
+    <ClCompile Include="..\..\src\hostTransceiver.c" />
+    <ClCompile Include="..\..\src\main-transceiver.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\..\any-arch\sys\embobj\ipnet\src\EOpacket_hid.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,20 @@
+
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "embobj-comm", "embobj-comm\embobj-comm.vcxproj", "{80D5CC28-3E47-4C69-8E34-8D47E6A3097A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{80D5CC28-3E47-4C69-8E34-8D47E6A3097A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{80D5CC28-3E47-4C69-8E34-8D47E6A3097A}.Debug|Win32.Build.0 = Debug|Win32
+		{80D5CC28-3E47-4C69-8E34-8D47E6A3097A}.Release|Win32.ActiveCfg = Release|Win32
+		{80D5CC28-3E47-4C69-8E34-8D47E6A3097A}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
