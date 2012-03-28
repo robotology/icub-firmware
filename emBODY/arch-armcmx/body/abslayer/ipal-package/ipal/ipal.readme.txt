@@ -1,0 +1,9 @@
+
+    ipal requires tcpnet v4.13, whcih is omitted from the distribution because for it it is required a direct
+    license from www.keil.com
+    
+
+
+
+
+
