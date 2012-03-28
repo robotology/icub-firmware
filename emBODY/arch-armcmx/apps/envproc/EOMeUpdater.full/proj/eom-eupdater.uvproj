@@ -499,82 +499,97 @@
             <File>
               <FileName>EoCommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EoCommon.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EoCommon.c</FilePath>
             </File>
             <File>
               <FileName>EOtheErrorManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOtheErrorManager.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOtheErrorManager.c</FilePath>
             </File>
             <File>
               <FileName>EOtheMemoryPool.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOtheMemoryPool.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOtheMemoryPool.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheSystem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOVtheSystem.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtheSystem.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheTimerManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOVtheTimerManager.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtheTimerManager.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheCallbackManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOVtheCallbackManager.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtheCallbackManager.c</FilePath>
             </File>
             <File>
               <FileName>EOVtask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOVtask.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtask.c</FilePath>
             </File>
             <File>
               <FileName>EOVmutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOVmutex.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVmutex.c</FilePath>
             </File>
             <File>
               <FileName>EOaction.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOaction.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOaction.c</FilePath>
             </File>
             <File>
               <FileName>EOdeque.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOdeque.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOdeque.c</FilePath>
             </File>
             <File>
               <FileName>EOfifo.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOfifo.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOfifo.c</FilePath>
             </File>
             <File>
               <FileName>EOfifoByte.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOfifoByte.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOfifoByte.c</FilePath>
             </File>
             <File>
               <FileName>EOfifoWord.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOfifoWord.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOfifoWord.c</FilePath>
             </File>
             <File>
               <FileName>EOlist.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOlist.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOlist.c</FilePath>
             </File>
             <File>
               <FileName>EOtimer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOtimer.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOtimer.c</FilePath>
             </File>
             <File>
               <FileName>EOvector.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOvector.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOvector.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOarray.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOarray.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOconstarray.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOconstarray.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOconstvector.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOconstvector.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1168,82 +1183,97 @@
             <File>
               <FileName>EoCommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EoCommon.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EoCommon.c</FilePath>
             </File>
             <File>
               <FileName>EOtheErrorManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOtheErrorManager.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOtheErrorManager.c</FilePath>
             </File>
             <File>
               <FileName>EOtheMemoryPool.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOtheMemoryPool.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOtheMemoryPool.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheSystem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOVtheSystem.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtheSystem.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheTimerManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOVtheTimerManager.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtheTimerManager.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheCallbackManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOVtheCallbackManager.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtheCallbackManager.c</FilePath>
             </File>
             <File>
               <FileName>EOVtask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOVtask.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtask.c</FilePath>
             </File>
             <File>
               <FileName>EOVmutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOVmutex.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVmutex.c</FilePath>
             </File>
             <File>
               <FileName>EOaction.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOaction.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOaction.c</FilePath>
             </File>
             <File>
               <FileName>EOdeque.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOdeque.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOdeque.c</FilePath>
             </File>
             <File>
               <FileName>EOfifo.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOfifo.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOfifo.c</FilePath>
             </File>
             <File>
               <FileName>EOfifoByte.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOfifoByte.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOfifoByte.c</FilePath>
             </File>
             <File>
               <FileName>EOfifoWord.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOfifoWord.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOfifoWord.c</FilePath>
             </File>
             <File>
               <FileName>EOlist.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOlist.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOlist.c</FilePath>
             </File>
             <File>
               <FileName>EOtimer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOtimer.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOtimer.c</FilePath>
             </File>
             <File>
               <FileName>EOvector.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOvector.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOvector.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOarray.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOarray.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOconstarray.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOconstarray.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOconstvector.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core\src\EOconstvector.c</FilePath>
             </File>
           </Files>
         </Group>

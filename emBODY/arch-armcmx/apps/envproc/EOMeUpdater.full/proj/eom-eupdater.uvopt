@@ -728,7 +728,7 @@
 
   <Group>
     <GroupName>eo-core</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -742,7 +742,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embobj\embobj\embobj-src\EoCommon.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EoCommon.c</PathWithFileName>
       <FilenameWithoutPath>EoCommon.c</FilenameWithoutPath>
     </File>
     <File>
@@ -756,7 +756,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embobj\embobj\embobj-src\EOtheErrorManager.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOtheErrorManager.c</PathWithFileName>
       <FilenameWithoutPath>EOtheErrorManager.c</FilenameWithoutPath>
     </File>
     <File>
@@ -770,7 +770,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embobj\embobj\embobj-src\EOtheMemoryPool.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOtheMemoryPool.c</PathWithFileName>
       <FilenameWithoutPath>EOtheMemoryPool.c</FilenameWithoutPath>
     </File>
     <File>
@@ -784,7 +784,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embobj\embobj\embobj-src\EOVtheSystem.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtheSystem.c</PathWithFileName>
       <FilenameWithoutPath>EOVtheSystem.c</FilenameWithoutPath>
     </File>
     <File>
@@ -798,7 +798,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embobj\embobj\embobj-src\EOVtheTimerManager.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtheTimerManager.c</PathWithFileName>
       <FilenameWithoutPath>EOVtheTimerManager.c</FilenameWithoutPath>
     </File>
     <File>
@@ -812,7 +812,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embobj\embobj\embobj-src\EOVtheCallbackManager.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtheCallbackManager.c</PathWithFileName>
       <FilenameWithoutPath>EOVtheCallbackManager.c</FilenameWithoutPath>
     </File>
     <File>
@@ -826,7 +826,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embobj\embobj\embobj-src\EOVtask.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtask.c</PathWithFileName>
       <FilenameWithoutPath>EOVtask.c</FilenameWithoutPath>
     </File>
     <File>
@@ -840,7 +840,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embobj\embobj\embobj-src\EOVmutex.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVmutex.c</PathWithFileName>
       <FilenameWithoutPath>EOVmutex.c</FilenameWithoutPath>
     </File>
     <File>
@@ -849,12 +849,12 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>111</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embobj\embobj\embobj-src\EOaction.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOaction.c</PathWithFileName>
       <FilenameWithoutPath>EOaction.c</FilenameWithoutPath>
     </File>
     <File>
@@ -868,7 +868,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embobj\embobj\embobj-src\EOdeque.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOdeque.c</PathWithFileName>
       <FilenameWithoutPath>EOdeque.c</FilenameWithoutPath>
     </File>
     <File>
@@ -882,7 +882,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embobj\embobj\embobj-src\EOfifo.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOfifo.c</PathWithFileName>
       <FilenameWithoutPath>EOfifo.c</FilenameWithoutPath>
     </File>
     <File>
@@ -896,7 +896,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embobj\embobj\embobj-src\EOfifoByte.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOfifoByte.c</PathWithFileName>
       <FilenameWithoutPath>EOfifoByte.c</FilenameWithoutPath>
     </File>
     <File>
@@ -910,7 +910,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embobj\embobj\embobj-src\EOfifoWord.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOfifoWord.c</PathWithFileName>
       <FilenameWithoutPath>EOfifoWord.c</FilenameWithoutPath>
     </File>
     <File>
@@ -924,7 +924,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embobj\embobj\embobj-src\EOlist.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOlist.c</PathWithFileName>
       <FilenameWithoutPath>EOlist.c</FilenameWithoutPath>
     </File>
     <File>
@@ -933,12 +933,12 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>18</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embobj\embobj\embobj-src\EOtimer.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOtimer.c</PathWithFileName>
       <FilenameWithoutPath>EOtimer.c</FilenameWithoutPath>
     </File>
     <File>
@@ -952,14 +952,56 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embobj\embobj\embobj-src\EOvector.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOvector.c</PathWithFileName>
       <FilenameWithoutPath>EOvector.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>48</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>1</TopLine>
+      <CurrentLine>1</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOarray.c</PathWithFileName>
+      <FilenameWithoutPath>EOarray.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>49</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOconstarray.c</PathWithFileName>
+      <FilenameWithoutPath>EOconstarray.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>50</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOconstvector.c</PathWithFileName>
+      <FilenameWithoutPath>EOconstvector.c</FilenameWithoutPath>
     </File>
   </Group>
 
   <Group>
     <GroupName>eo-mee</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -1036,7 +1078,7 @@
 
   <Group>
     <GroupName>eo-ipnet</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
