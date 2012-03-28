@@ -348,7 +348,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\sys\abs\api;..\..\..\..\..\sys\prt;..\..\..\..\..\sys\env\api</IncludePath>
+              <IncludePath>..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\porting;..\..\..\..\sys\env\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -396,27 +396,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>shals-src</GroupName>
+          <GroupName>arm-shalib-src</GroupName>
           <Files>
-            <File>
-              <FileName>eEcommon.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\env\src\eEcommon.c</FilePath>
-            </File>
             <File>
               <FileName>shalBASE.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\env\src\shalBASE.c</FilePath>
+              <FilePath>..\..\..\..\sys\env\src\shalBASE.c</FilePath>
             </File>
             <File>
               <FileName>shalINFO.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\env\src\shalINFO.c</FilePath>
+              <FilePath>..\..\..\..\sys\env\src\shalINFO.c</FilePath>
             </File>
             <File>
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\env\src\shalPART.c</FilePath>
+              <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -436,7 +431,7 @@
             <File>
               <FileName>hal.stm32f1.ems001.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\abs\lib\hal.stm32f1.ems001.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\hal.stm32f1.ems001.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -459,12 +454,22 @@
             <File>
               <FileName>hal.stm32f1.mcbstm32c.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\abs\lib\hal.stm32f1.mcbstm32c.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\hal.stm32f1.mcbstm32c.lib</FilePath>
             </File>
             <File>
               <FileName>hal_stm32f1_startup.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\sys\abs\src\hal_stm32f1_startup.s</FilePath>
+              <FilePath>..\..\..\..\sys\abs\src\hal_stm32f1_startup.s</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>any-common</GroupName>
+          <Files>
+            <File>
+              <FileName>eEcommon.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\body\embenv\envcom\eEcommon.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -812,7 +817,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM EMS001 SHALS_MODE_STATIC</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\sys\abs\api;..\..\..\..\..\sys\prt;..\..\..\..\..\sys\env\api</IncludePath>
+              <IncludePath>..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\porting</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -860,27 +865,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>shals-src</GroupName>
+          <GroupName>arm-shalib-src</GroupName>
           <Files>
-            <File>
-              <FileName>eEcommon.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\env\src\eEcommon.c</FilePath>
-            </File>
             <File>
               <FileName>shalBASE.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\env\src\shalBASE.c</FilePath>
+              <FilePath>..\..\..\..\sys\env\src\shalBASE.c</FilePath>
             </File>
             <File>
               <FileName>shalINFO.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\env\src\shalINFO.c</FilePath>
+              <FilePath>..\..\..\..\sys\env\src\shalINFO.c</FilePath>
             </File>
             <File>
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\env\src\shalPART.c</FilePath>
+              <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -900,12 +900,12 @@
             <File>
               <FileName>hal.stm32f1.ems001.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\abs\lib\hal.stm32f1.ems001.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\hal.stm32f1.ems001.lib</FilePath>
             </File>
             <File>
               <FileName>hal.stm32f1.mcbstm32c.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\abs\lib\hal.stm32f1.mcbstm32c.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\hal.stm32f1.mcbstm32c.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -928,7 +928,17 @@
             <File>
               <FileName>hal_stm32f1_startup.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\sys\abs\src\hal_stm32f1_startup.s</FilePath>
+              <FilePath>..\..\..\..\sys\abs\src\hal_stm32f1_startup.s</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>any-common</GroupName>
+          <Files>
+            <File>
+              <FileName>eEcommon.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\body\embenv\envcom\eEcommon.c</FilePath>
             </File>
           </Files>
         </Group>

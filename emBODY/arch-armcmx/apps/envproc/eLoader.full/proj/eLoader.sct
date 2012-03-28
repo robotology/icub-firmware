@@ -18,7 +18,7 @@
 ; Public License for more details
 ; due to a bug in linker (in some older versions), you may need to put the whole path ... thus change it by hand
 ;#include "D:\#inhere\sdl\embedded\arm\embody\body\embenv\envcom\eEmemorymap.h"
-#include "..\..\..\envcom\eEmemorymap.h"
+#include "..\..\..\..\sys\env\api\eEmemorymap.h"
 
 
 ; flash starts from xx and its size is xxx
