@@ -170,6 +170,7 @@
           <EnabledFlag>1</EnabledFlag>
           <Address>134218650</Address>
           <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>

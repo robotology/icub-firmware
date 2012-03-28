@@ -31,8 +31,6 @@
 #include "osal.h"
 #include "osal_arch_arm.h"
 
-#include "cmsis_stm32f1.h"
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -45,7 +43,7 @@ static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, c
 static void s_osal_cfg_on_idle(void);
 
 
-static const osal_cfg_t s_cfg = 
+extern const osal_cfg_t osal_cfg = 
 {   
     .rtostype               = (osal_rtostype_t)OSAL_RTOSTYPE,          // uint8_t         rtostype;
     .memorymodel            = (osal_memorymodel_t)OSAL_MEMMODEL,
@@ -70,14 +68,14 @@ static const osal_cfg_t s_cfg =
     },      
     .extfn                  = 
     {
-        .hal_sys_irqn_priority_set      = NULL, //(void (*)(int32_t, uint8_t))NVIC_SetPriority, //NULL,
+        .hal_sys_irqn_priority_set      = NULL,
         .usr_on_fatal_error             = s_osal_cfg_on_fatal_error, 
         .usr_on_idle                    = s_osal_cfg_on_idle
     }
 };
 
 
-extern const osal_cfg_t *osal_cfgMINE = &s_cfg;
+extern const osal_cfg_t *osal_cfgMINE = &osal_cfg;
 
 
 static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, const char * errormsg)
