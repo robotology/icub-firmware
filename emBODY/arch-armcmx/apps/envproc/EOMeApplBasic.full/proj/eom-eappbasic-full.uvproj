@@ -386,7 +386,7 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>app_basic</GroupName>
+          <GroupName>app-basic</GroupName>
           <Files>
             <File>
               <FileName>eom_applbasic_main.c</FileName>
@@ -1103,7 +1103,7 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>app_basic</GroupName>
+          <GroupName>app-basic</GroupName>
           <Files>
             <File>
               <FileName>eom_applbasic_main.c</FileName>
