@@ -48,7 +48,7 @@
 #include "EOMtheTimerManager.h"
 #include "EOMtheCallbackManager.h"
 #include "hal.h"
-#include "fsal.h"
+//#include "fsal.h"
 #include "osal.h"
 
 
@@ -69,7 +69,7 @@ typedef struct
     uint32_t                    codespaceoffset;
     const hal_cfg_t*            halcfg;
     const osal_cfg_t*           osalcfg;
-    const fsal_params_cfg_t*    fsalcfg;
+    const void*                 fsalcfg; // good thing to remove the fsal, as on sourceforge it does not appear yet
 } eOmsystem_cfg_t;
  
 
