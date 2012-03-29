@@ -348,7 +348,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC</Define>
               <Undefine></Undefine>
-              <IncludePath>..\abslayer-cfg;..\app;..\..\..\..\embobj\embobj\embobj-api;..\..\..\..\embobj\embobj\embobj-src;..\..\..\..\embobj\embobj\embobj-cfg;..\..\..\..\..\sys\abs\api;..\..\..\..\..\sys\env\api;..\..\..\..\..\sys\prt</IncludePath>
+              <IncludePath>..\abslayer-cfg;..\app_basic;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\app_extra;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;.;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -416,17 +416,17 @@
             <File>
               <FileName>osal.cm3.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\abs\lib\osal.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\osal.cm3.lib</FilePath>
             </File>
             <File>
               <FileName>hal.stm32f1.mcbstm32c.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\abs\lib\hal.stm32f1.mcbstm32c.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\hal.stm32f1.mcbstm32c.lib</FilePath>
             </File>
             <File>
               <FileName>hal.stm32f1.ems001.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\abs\lib\hal.stm32f1.ems001.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\hal.stm32f1.ems001.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -447,14 +447,14 @@
               </FileOption>
             </File>
             <File>
-              <FileName>hal_stm32f1_startup.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\sys\abs\src\hal_stm32f1_startup.s</FilePath>
-            </File>
-            <File>
               <FileName>ipal.base.medium.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\abs\lib\ipal.base.medium.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\ipal.base.medium.lib</FilePath>
+            </File>
+            <File>
+              <FileName>hal_stm32f1_startup.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\..\..\..\sys\abs\src\hal_stm32f1_startup.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -599,27 +599,27 @@
             <File>
               <FileName>EOMmutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOMmutex.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMmutex.c</FilePath>
             </File>
             <File>
               <FileName>EOMtask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOMtask.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMtask.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheCallbackManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOMtheCallbackManager.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMtheCallbackManager.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheSystem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOMtheSystem.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMtheSystem.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheTimerManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOMtheTimerManager.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMtheTimerManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -627,29 +627,29 @@
           <GroupName>eo-ipnet</GroupName>
           <Files>
             <File>
-              <FileName>EOVtheIPnet.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOVtheIPnet.c</FilePath>
-            </File>
-            <File>
               <FileName>EOpacket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOpacket.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\ipnet\src\EOpacket.c</FilePath>
             </File>
             <File>
               <FileName>EOsocket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOsocket.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\ipnet\src\EOsocket.c</FilePath>
             </File>
             <File>
               <FileName>EOsocketDatagram.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOsocketDatagram.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\ipnet\src\EOsocketDatagram.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOVtheIPnet.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\ipnet\src\EOVtheIPnet.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheIPnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOMtheIPnet.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src\EOMtheIPnet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -657,34 +657,34 @@
           <GroupName>eo-arm-env</GroupName>
           <Files>
             <File>
-              <FileName>EOVtheEnvironment.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOVtheEnvironment.c</FilePath>
-            </File>
-            <File>
               <FileName>EOtheARMenvironment.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOtheARMenvironment.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\env\src\EOtheARMenvironment.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOVtheEnvironment.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\env\src\EOVtheEnvironment.c</FilePath>
             </File>
             <File>
               <FileName>eEcommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\env\src\eEcommon.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\body\embenv\envcom\eEcommon.c</FilePath>
             </File>
             <File>
               <FileName>shalBASE.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\env\src\shalBASE.c</FilePath>
+              <FilePath>..\..\..\..\sys\env\src\shalBASE.c</FilePath>
             </File>
             <File>
               <FileName>shalINFO.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\env\src\shalINFO.c</FilePath>
+              <FilePath>..\..\..\..\sys\env\src\shalINFO.c</FilePath>
             </File>
             <File>
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\env\src\shalPART.c</FilePath>
+              <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1032,7 +1032,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC</Define>
               <Undefine></Undefine>
-              <IncludePath>..\abslayer-cfg;..\app;..\..\..\..\embobj\embobj\embobj-api;..\..\..\..\embobj\embobj\embobj-src;..\..\..\..\embobj\embobj\embobj-cfg;..\..\..\..\..\sys\abs\api;..\..\..\..\..\sys\env\api;..\..\..\..\..\sys\prt</IncludePath>
+              <IncludePath>..\abslayer-cfg;..\app_basic;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\app_extra;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;.;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1100,12 +1100,12 @@
             <File>
               <FileName>osal.cm3.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\abs\lib\osal.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\osal.cm3.lib</FilePath>
             </File>
             <File>
               <FileName>hal.stm32f1.mcbstm32c.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\abs\lib\hal.stm32f1.mcbstm32c.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\hal.stm32f1.mcbstm32c.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1128,17 +1128,17 @@
             <File>
               <FileName>hal.stm32f1.ems001.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\abs\lib\hal.stm32f1.ems001.lib</FilePath>
-            </File>
-            <File>
-              <FileName>hal_stm32f1_startup.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\sys\abs\src\hal_stm32f1_startup.s</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\hal.stm32f1.ems001.lib</FilePath>
             </File>
             <File>
               <FileName>ipal.base.medium.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\abs\lib\ipal.base.medium.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\ipal.base.medium.lib</FilePath>
+            </File>
+            <File>
+              <FileName>hal_stm32f1_startup.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\..\..\..\sys\abs\src\hal_stm32f1_startup.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -1283,27 +1283,27 @@
             <File>
               <FileName>EOMmutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOMmutex.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMmutex.c</FilePath>
             </File>
             <File>
               <FileName>EOMtask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOMtask.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMtask.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheCallbackManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOMtheCallbackManager.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMtheCallbackManager.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheSystem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOMtheSystem.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMtheSystem.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheTimerManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOMtheTimerManager.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMtheTimerManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1311,29 +1311,29 @@
           <GroupName>eo-ipnet</GroupName>
           <Files>
             <File>
-              <FileName>EOVtheIPnet.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOVtheIPnet.c</FilePath>
-            </File>
-            <File>
               <FileName>EOpacket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOpacket.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\ipnet\src\EOpacket.c</FilePath>
             </File>
             <File>
               <FileName>EOsocket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOsocket.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\ipnet\src\EOsocket.c</FilePath>
             </File>
             <File>
               <FileName>EOsocketDatagram.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOsocketDatagram.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\ipnet\src\EOsocketDatagram.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOVtheIPnet.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\ipnet\src\EOVtheIPnet.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheIPnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOMtheIPnet.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src\EOMtheIPnet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1341,34 +1341,34 @@
           <GroupName>eo-arm-env</GroupName>
           <Files>
             <File>
-              <FileName>EOVtheEnvironment.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOVtheEnvironment.c</FilePath>
-            </File>
-            <File>
               <FileName>EOtheARMenvironment.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embobj\embobj\embobj-src\EOtheARMenvironment.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\env\src\EOtheARMenvironment.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOVtheEnvironment.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\env\src\EOVtheEnvironment.c</FilePath>
             </File>
             <File>
               <FileName>eEcommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\env\src\eEcommon.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\body\embenv\envcom\eEcommon.c</FilePath>
             </File>
             <File>
               <FileName>shalBASE.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\env\src\shalBASE.c</FilePath>
+              <FilePath>..\..\..\..\sys\env\src\shalBASE.c</FilePath>
             </File>
             <File>
               <FileName>shalINFO.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\env\src\shalINFO.c</FilePath>
+              <FilePath>..\..\..\..\sys\env\src\shalINFO.c</FilePath>
             </File>
             <File>
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\env\src\shalPART.c</FilePath>
+              <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
             </File>
           </Files>
         </Group>
