@@ -15,7 +15,7 @@ set URL=https://svn.cognitivehumanoids.eu/sdl/embedded/arm/embody/body/abslayer/
 
 echo. -- deleting ...
 
-DEL /F "%SOURCE%"
+rmdir /S "%SOURCE%"
 DEL /F .\ipal-lib\ipal.*.lib
 DEL /F ..\..\..\..\sys\abs\lib\ipal.*.lib
 
