@@ -7,7 +7,7 @@ echo == Initiating system instance variables...
 echo. -- Setting the variables...
 
 :: Here you need to make some changes to suit your system.
-set SOURCE=./tmp
+set SOURCE=../ipal-extra
 set SVN=C:\Program Files\TortoiseSVN\bin
 set URL=https://svn.cognitivehumanoids.eu/sdl/embedded/arm/embody/body/abslayer/ipal-package/ipal/ipal-extra
 
