@@ -23,6 +23,11 @@ echo. -- Running update...
 "%SVN%\TortoiseProc.exe" /command:checkout /path:"%SOURCE%" /url:"%URL%" /closeonend:1
 echo. ++ Done.
 
+
+echo. -- setting it RO...
+
+attrib +R "%SOURCE%"/*.*
+
 echo. -- Cleaning up...
 set SOURCE=
 set SVN=
