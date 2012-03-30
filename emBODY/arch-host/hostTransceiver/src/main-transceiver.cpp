@@ -127,23 +127,13 @@ int main(int argc, char *argv[])
 		signal(SIGINT, SIG_IGN);
 
 	// Set default connection data
-#ifdef PC104
 	local.address_string=string(DEFAULT_LAPTOP_IP);
-	local.port=DEFAULT_EMS_PORT;
-
 	remote01.address_string = string(DEFAULT_EMS_IP);
-	remote01.port = DEFAULT_EMS_PORT;
-#else
-	local.address_string=string(DEFAULT_EMS_IP);
-	local.port=DEFAULT_EMS_PORT;
+	port = DEFAULT_PORT;
 
-	remote01.address_string = string(DEFAULT_LAPTOP_IP);
-	remote01.port = DEFAULT_EMS_PORT;
-#endif
 
 	uint8_t *udppkt_data = NULL;
 	uint16_t udppkt_size = 0;
-
 
     // parse command line input argument
     if(argc > 1)
@@ -215,7 +205,7 @@ int main(int argc, char *argv[])
     printf("port is : %d\n\n", port);
 
 	eOipv4addr_t hostaddr = eo_common_ipv4addr(ip1,ip2,ip3,ip4); // marco (10, 255, 39, 151)
-	eOipv4port_t port = remote01.port;
+	eOipv4port_t port = port;
 
     // init object: one per ems
     hostTransceiver_Init(eo_common_ipv4addr(10,255,37,155), eo_common_ipv4addr(10, 39,255,152), port, 512);
@@ -334,7 +324,7 @@ void usage(void)
 		 "\t\t--help		print this help\n");
   printf("\t\t--loc-ip  <xx>	set the ip address of the local machine - needed by yarp - by default %s\n", DEFAULT_LAPTOP_IP);
   printf("\t\t--rem-ip  <xx>	set the ip address of the remote device - by default %s\n", DEFAULT_EMS_IP);
-  printf("\t\t--port    <xx>	set the socket port - by default %d\n", DEFAULT_EMS_PORT);
+  printf("\t\t--port    <xx>	set the socket port - by default %d\n", DEFAULT_PORT);
   printf("\t\t--reply		if present, then an empty ropframe is sent as an ack for each packet received - by default it's disabled\n");
 }
 

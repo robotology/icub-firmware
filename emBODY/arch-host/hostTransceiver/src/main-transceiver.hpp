@@ -20,7 +20,7 @@
 //#define DEFAULT_LAPTOP_IP		"10.0.0.1"
 //#define DEFAULT_EMS_IP 		"10.0.0.2"
 
-#define DEFAULT_EMS_PORT	3333
+#define DEFAULT_PORT		3333
 #define SIZE 				512
 
 #define PC104
@@ -45,10 +45,7 @@ typedef struct
 
 typedef struct
 {
-	ACE_UINT16		port;
 	string	 		address_string;
-	ACE_UINT32 		address_ACE;
-	ACE_UINT32 		Broadcast;
 	ACE_INET_Addr	addr;
 	char 			data[SIZE];
 } Board_connect_info;
