@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
+ * website: www.robotcub.org
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * A copy of the license can be found at
+ * http://www.robotcub.org/icub/license/gpl.txt
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
+*/
 
 /* @file       ipal_cfg.c
 	@brief      This file keeps internal implementation of the ipal.
@@ -30,7 +47,12 @@ static void onethframerx(void);
 static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg);;
 
 
-extern const ipal_cfg_t s_ipal_cfg = 
+
+extern uint64_t macnn = IPAL_mac48addr(0x1e, 0x30, 0x6c, 0xa2, 0x45, 0x5e);  
+
+
+
+extern const ipal_cfg_t ipal_cfg = 
 { 
     .arch_ipstack           = (ipal_ipstack_t)IPAL_TCPIPTYPE,
     .memorymodel            = (ipal_memorymodel_t)IPAL_MEMMODEL,
@@ -102,6 +124,10 @@ extern const ipal_cfg_t s_ipal_cfg =
         .osal_mutex_take            = NULL, 
         .osal_mutex_release         = NULL, 
         .osal_param_tout_forever    = 0, 
+//        .osal_mutex_new             = (void *(*)(void))osal_mutex_new,
+//        .osal_mutex_take            = (ipal_result_t (*)(void*, uint32_t))osal_mutex_take,
+//        .osal_mutex_release         = (ipal_result_t (*)(void*))osal_mutex_release,
+//        .osal_param_tout_forever    = OSAL_timeINFINITE,
 
         .hal_eth_init               = (ipal_result_t (*)(void*)) hal_eth_init,
         .hal_eth_enable             = (ipal_result_t (*)(void))  hal_eth_enable,
@@ -130,7 +156,7 @@ extern const ipal_cfg_t s_ipal_cfg =
 };
 
  
-extern const ipal_cfg_t *ipal_cfgMINE = &s_ipal_cfg;
+extern const ipal_cfg_t *ipal_cfgMINE = &ipal_cfg;
 
 
 static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg)

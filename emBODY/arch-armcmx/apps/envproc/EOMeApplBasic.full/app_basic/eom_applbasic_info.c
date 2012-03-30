@@ -1,6 +1,23 @@
+/*
+ * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
+ * website: www.robotcub.org
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * A copy of the license can be found at
+ * http://www.robotcub.org/icub/license/gpl.txt
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
+*/
 
 /* @file       eupdater-info.c
-	@brief      This file keeps the module info of the updatre
+	@brief      This file keeps ...
 	@author     marco.accame@iit.it
     @date       01/11/2012
 **/
@@ -19,8 +36,8 @@
 #include "EOMtheSystem.h"
 
 
-extern const hal_cfg_t     s_hal_cfg;
-extern const osal_cfg_t    s_osal_cfg;
+extern const hal_cfg_t     hal_cfg;
+extern const osal_cfg_t    osal_cfg;
 
 
 
@@ -114,8 +131,8 @@ extern const eEmoduleInfo_t eom_applbasic_info_modinfo __attribute__((at(EENV_ME
 extern const eOmsystem_cfg_t eom_applbasic_info_syscfg =
 {
     .codespaceoffset    = (EENV_MEMMAP_EAPPLICATION_ROMADDR-EENV_ROMSTART),
-    .halcfg             = &s_hal_cfg,
-    .osalcfg            = &s_osal_cfg,
+    .halcfg             = &hal_cfg,
+    .osalcfg            = &osal_cfg,
     .fsalcfg            = NULL
 };
 

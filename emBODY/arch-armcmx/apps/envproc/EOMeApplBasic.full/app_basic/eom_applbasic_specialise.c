@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
+ * website: www.robotcub.org
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * A copy of the license can be found at
+ * http://www.robotcub.org/icub/license/gpl.txt
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
+*/
 
 /* @file       eom_applbasic_specialise.c
 	@brief      This file keeps the vcececew
@@ -31,7 +48,7 @@
 
 #include "eventviewer.h"
 
-extern const ipal_cfg_t    s_ipal_cfg;
+extern const ipal_cfg_t    ipal_cfg;
 
 
 
@@ -112,7 +129,7 @@ static eOipv4addr_t s_host_ipaddress                    = 0;
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern const ipal_cfg_t* eom_applbasic_specialise_ipal_cfg = &s_ipal_cfg;
+extern const ipal_cfg_t* eom_applbasic_specialise_ipal_cfg = &ipal_cfg;
 
 
 extern const eOerrman_cfg_t  eom_applbasic_specialise_errcfg = 
