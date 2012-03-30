@@ -106,7 +106,7 @@
 #define EOK_reltime100ms                    (100*1000)
 #define EOK_reltime1sec                     (1000*1000)
 #define EOK_reltimeMAX                      (0xFFFFFFFE)
-#define EOK_reltimeINFINITE                 (0xFFFFFFFE)
+#define EOK_reltimeINFINITE                 (0xFFFFFFFF)
 
 #define EOK_abstimeNOW                      (0xffffffffffffffffLL)
 
@@ -399,7 +399,7 @@ extern const eOreltime_t    eok_reltime10ms;        /**< = 10*1000;             
 extern const eOreltime_t    eok_reltime100ms;       /**< = 100*1000;                                // 100 milli-sec */
 extern const eOreltime_t    eok_reltime1sec;        /**< = 1000*1000;                               // 1 sec */
 extern const eOreltime_t    eok_reltimeMAX;         /**< = 0xFFFFFFFE;                              // equals 4294 seconds */
-extern const eOreltime_t    eok_reltimeINFINITE;    /**< = 0xFFFFFFFE;                              // means that the wait must be infinite */
+extern const eOreltime_t    eok_reltimeINFINITE;    /**< = 0xFFFFFFFF;                              // means that the wait must be infinite */
 
 extern const eOabstime_t    eok_abstimeNOW;         /**< = 0xffffffffffffffffLL; */
 
