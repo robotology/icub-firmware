@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
+ * website: www.robotcub.org
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * A copy of the license can be found at
+ * http://www.robotcub.org/icub/license/gpl.txt
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
+*/
 
 // - include guard ----------------------------------------------------------------------------------------------------
 #ifndef _IPAL_CFG_H_
@@ -78,7 +95,7 @@
 //   <i> Free-assigned part of the MAC (last three octets).
 //   <i> Default: 0x010103
 #ifndef IPAL_MAC3OCT
- #define IPAL_MAC3OCT        10634152
+ #define IPAL_MAC3OCT        10634590
 #endif
 
 //  </h>MAC address

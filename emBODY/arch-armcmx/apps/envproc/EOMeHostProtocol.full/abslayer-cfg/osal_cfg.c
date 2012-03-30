@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
+ * website: www.robotcub.org
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * A copy of the license can be found at
+ * http://www.robotcub.org/icub/license/gpl.txt
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
+*/
 
 /* @file       osal_cfg.c
 	@brief      This file keeps internal implementation of the osal.
@@ -28,7 +45,7 @@ static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, c
 static void s_osal_cfg_on_idle(void);
 
 
-extern const osal_cfg_t s_osal_cfg = 
+extern const osal_cfg_t osal_cfg = 
 {   
     .rtostype               = (osal_rtostype_t)OSAL_RTOSTYPE,          // uint8_t         rtostype;
     .memorymodel            = (osal_memorymodel_t)OSAL_MEMMODEL,
@@ -60,7 +77,7 @@ extern const osal_cfg_t s_osal_cfg =
 };
 
 
-extern const osal_cfg_t *osal_cfgMINE = &s_osal_cfg;
+extern const osal_cfg_t *osal_cfgMINE = &osal_cfg;
 
 
 static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, const char * errormsg)
@@ -76,7 +93,7 @@ static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, c
 
 static void s_osal_cfg_on_idle(void)
 {
-        for(;;);
+    for(;;);
 }
 
 
