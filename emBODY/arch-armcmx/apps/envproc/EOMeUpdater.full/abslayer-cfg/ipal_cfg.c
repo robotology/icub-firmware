@@ -52,7 +52,7 @@ extern uint64_t macnn = IPAL_mac48addr(0x1e, 0x30, 0x6c, 0xa2, 0x45, 0x5e);
 
 
 
-extern const ipal_cfg_t s_ipal_cfg = 
+extern const ipal_cfg_t ipal_cfg = 
 { 
     .arch_ipstack           = (ipal_ipstack_t)IPAL_TCPIPTYPE,
     .memorymodel            = (ipal_memorymodel_t)IPAL_MEMMODEL,
@@ -124,6 +124,10 @@ extern const ipal_cfg_t s_ipal_cfg =
         .osal_mutex_take            = NULL, 
         .osal_mutex_release         = NULL, 
         .osal_param_tout_forever    = 0, 
+//        .osal_mutex_new             = (void *(*)(void))osal_mutex_new,
+//        .osal_mutex_take            = (ipal_result_t (*)(void*, uint32_t))osal_mutex_take,
+//        .osal_mutex_release         = (ipal_result_t (*)(void*))osal_mutex_release,
+//        .osal_param_tout_forever    = OSAL_timeINFINITE,
 
         .hal_eth_init               = (ipal_result_t (*)(void*)) hal_eth_init,
         .hal_eth_enable             = (ipal_result_t (*)(void))  hal_eth_enable,
@@ -152,7 +156,7 @@ extern const ipal_cfg_t s_ipal_cfg =
 };
 
  
-extern const ipal_cfg_t *ipal_cfgMINE = &s_ipal_cfg;
+extern const ipal_cfg_t *ipal_cfgMINE = &ipal_cfg;
 
 
 static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg)

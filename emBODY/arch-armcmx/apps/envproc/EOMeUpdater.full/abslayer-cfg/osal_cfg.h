@@ -147,7 +147,7 @@
 //   <i> Define max number of timers.
 //   <i> Default: 0  (User timers disabled)
 #ifndef OSAL_TIMERNUM
- #define OSAL_TIMERNUM    4
+ #define OSAL_TIMERNUM    6
 #endif
 
 

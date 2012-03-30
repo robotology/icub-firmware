@@ -36,10 +36,10 @@
 #include "EOMtheSystem.h"
 
 
-extern const hal_cfg_t     s_hal_cfg;
+extern const hal_cfg_t     hal_cfg;
 //extern const hal_cfg_t*     hal_cfgMINE;
-extern const osal_cfg_t    s_osal_cfg;
-extern const ipal_cfg_t    s_ipal_cfg;
+extern const osal_cfg_t    osal_cfg;
+extern const ipal_cfg_t    ipal_cfg;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -125,12 +125,12 @@ extern const eEmoduleInfo_t eupdater_modinfo __attribute__((at(EENV_MEMMAP_EUPDA
 extern const eOmsystem_cfg_t eupdater_syscfg =
 {
     .codespaceoffset    = (EENV_MEMMAP_EUPDATER_ROMADDR-EENV_ROMSTART),
-    .halcfg             = &s_hal_cfg,
-    .osalcfg            = &s_osal_cfg,
+    .halcfg             = &hal_cfg,
+    .osalcfg            = &osal_cfg,
     .fsalcfg            = NULL
 };
 
-extern const ipal_cfg_t* eupdater_ipal_cfg = &s_ipal_cfg;
+extern const ipal_cfg_t* eupdater_ipal_cfg = &ipal_cfg;
 
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -44,7 +44,7 @@
 static void s_hal_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char * errormsg);
 
 
-extern const hal_cfg_t s_hal_cfg = 
+extern const hal_cfg_t hal_cfg = 
 {   
     .cpu_family             = (hal_cpufamily_t) HAL_CPUFAM,
     .cpu_type               = (hal_cputype_t) HAL_CPUTYPE,
@@ -81,7 +81,7 @@ extern const hal_cfg_t s_hal_cfg =
 };
 
 
-extern const hal_cfg_t *hal_cfgMINE = &s_hal_cfg;
+extern const hal_cfg_t *hal_cfgMINE = &hal_cfg;
 
 
 

@@ -27,11 +27,11 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "stdio.h"
 #include "string.h"
 #include "osal.h"
 #include "osal_arch_arm.h"
 #include "hal_trace.h"
-#include "stdio.h"
 
 
 
@@ -45,7 +45,7 @@ static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, c
 static void s_osal_cfg_on_idle(void);
 
 
-extern const osal_cfg_t s_osal_cfg = 
+extern const osal_cfg_t osal_cfg = 
 {   
     .rtostype               = (osal_rtostype_t)OSAL_RTOSTYPE,          // uint8_t         rtostype;
     .memorymodel            = (osal_memorymodel_t)OSAL_MEMMODEL,
@@ -77,7 +77,7 @@ extern const osal_cfg_t s_osal_cfg =
 };
 
 
-extern const osal_cfg_t *osal_cfgMINE = &s_osal_cfg;
+extern const osal_cfg_t *osal_cfgMINE = &osal_cfg;
 
 
 static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, const char * errormsg)
@@ -86,7 +86,7 @@ static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, c
     char str[128];
     
     osal_task_id_get(task, &tskid);
-    snprintf(str, sizeof(str), "error %d from taskid %d: %s\n\r", errorcode, tskid, errormsg);
+    sprintf(str, "error %d from taskid %d: %s\n\r", errorcode, tskid, errormsg);
     hal_trace_puts(str);
     for(;;);
 }
