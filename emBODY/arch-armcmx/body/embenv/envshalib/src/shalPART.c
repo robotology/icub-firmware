@@ -78,7 +78,7 @@ typedef struct              // numer of bytes depends on many things. it is 984 
     eEprocess_t             defProc2run;                // it is the default process the eLoader runs (if no other info)
     eEprocess_t             tableprocs[ee_procMaxNum];  // contains list of Nproc procs
     eEsharlib_t             tableshals[ee_shalMaxNum];  // contains list of Nshar shals
-    uint8_t                 filler4[4];                 // to align to multiple of 8
+    uint32_t                startuptimeinupdater;   
     eEmoduleInfo_t          procInfo[ee_procMaxNum];    // the process info
     eEmoduleInfo_t          shalInfo[ee_shalMaxNum];    // the shallib info
 } partData_t;               EECOMMON_VERIFYsizeof(partData_t, 984);
@@ -409,6 +409,40 @@ extern eEresult_t shalpart_proc_def2run_set(eEprocess_t proc)
     if(partinfo->data.defProc2run != proc)
     {
         partinfo->data.defProc2run = proc;
+        partinfo->head.defflag = DEFFLAG_FALSE;
+        s_shalpart_permanent_partinfo_set(partinfo); // aka: s_program_page();
+    }
+
+    return(ee_res_OK);
+}
+
+
+//acemorhasverified
+extern eEresult_t shalpart_proc_startuptimeinupdater_get(uint32_t *startuptimeinupdater)
+{
+    partInfo_t  * volatile partinfo = s_shalpart_permanent_partinfo_get();
+
+    *startuptimeinupdater = partinfo->data.startuptimeinupdater;
+
+    if(0 == partinfo->data.startuptimeinupdater)
+    {
+        return(ee_res_NOK_generic);   
+    }
+    else
+    {
+   
+        return(ee_res_OK);
+    }
+}
+
+//acemorhasverified
+extern eEresult_t shalpart_proc_startuptimeinupdater_set(uint32_t startuptimeinupdater)
+{
+    partInfo_t  * volatile partinfo = s_shalpart_permanent_partinfo_get();
+
+    if(partinfo->data.startuptimeinupdater != startuptimeinupdater)
+    {
+        partinfo->data.startuptimeinupdater = startuptimeinupdater;
         partinfo->head.defflag = DEFFLAG_FALSE;
         s_shalpart_permanent_partinfo_set(partinfo); // aka: s_program_page();
     }
@@ -864,6 +898,8 @@ static void s_shalpart_permanent_partinfo_reset(partInfo_t *partinfo)
 
     memset(partinfo->data.tableprocs, ee_procNone, sizeof(partinfo->data.tableprocs));
     memset(partinfo->data.tableshals, ee_procNone, sizeof(partinfo->data.tableshals));
+    
+    partinfo->data.startuptimeinupdater = SHALPART_STARTUPTIMEINUPDATER;
 
     for(i=0; i<ee_procMaxNum; i++)
     {
