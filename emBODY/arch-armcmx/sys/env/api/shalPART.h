@@ -57,6 +57,8 @@
 #define SHALPART_BUILDDATE_HOUR         18
 #define SHALPART_BUILDDATE_MIN          0
 
+#define SHALPART_STARTUPTIMEINUPDATER   (5*1000*1000)
+
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
@@ -119,6 +121,9 @@ extern eEresult_t shalpart_proc_synchronise(eEprocess_t proc, const eEmoduleInfo
 extern eEresult_t shalpart_proc_def2run_get(eEprocess_t *proc);
 extern eEresult_t shalpart_proc_def2run_set(eEprocess_t proc);
 extern eEresult_t shalpart_proc_runaddress_get(eEprocess_t proc, uint32_t *addr);
+
+extern eEresult_t shalpart_proc_startuptimeinupdater_get(uint32_t *startuptimeinupdater);
+extern eEresult_t shalpart_proc_startuptimeinupdater_set(uint32_t startuptimeinupdater);
 
 extern eEresult_t shalpart_proc_allavailable_get(const eEprocess_t **table, uint8_t *size);
 
