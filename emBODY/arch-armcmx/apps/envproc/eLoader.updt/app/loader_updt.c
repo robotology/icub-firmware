@@ -300,8 +300,8 @@ int main(void)
     // if any, it either jumps or manage errors. else, it returns.
     s_loader_eval_jump_request_from_an_eproc();
     
-    // now we attempt to jump to updater.
-    s_loader_attempt_jump(ee_procUpdater, LOADER_ADR_INVALID);
+    // now we attempt to jump to updater. 
+    s_loader_attempt_jump(ee_procUpdater, EENV_MEMMAP_EUPDATER_ROMADDR);
 
     // nothing to do ...
     s_loader_manage_error(200, 50);
@@ -334,6 +334,7 @@ static void s_loader_hardware_init(void)
 static void s_loader_shalibs_init(void)
 {
     static volatile hal_result_t reshal = hal_res_NOK_generic;
+    eEprocess_t defproc = ee_procNone;
 
     if(ee_res_OK != shalbase_isvalid())
     {
@@ -385,6 +386,13 @@ static void s_loader_shalibs_init(void)
             s_loader_manage_error(50, 50);
         }
     }
+    
+    
+    if(ee_res_OK != shalpart_proc_def2run_get(&defproc))
+    {
+        // we impose that the default process is teh application
+        shalpart_proc_def2run_set(ee_procApplication);
+    }    
 
 }
 
@@ -392,12 +400,25 @@ static void s_loader_shalibs_init(void)
 static void s_loader_eval_jump_request_from_an_eproc(void)
 {
     eEprocess_t pr = ee_procNone;
+    uint32_t addr = LOADER_ADR_INVALID;
 
     if(ee_res_OK == shalbase_ipc_gotoproc_get(&pr))
     {
         shalbase_ipc_gotoproc_clr();
-        // attempt only to the requested process and dont try at an alternative address.
-        s_loader_attempt_jump(pr, LOADER_ADR_INVALID);
+        switch(pr)
+        {
+            case ee_procLoader:         addr = EENV_MEMMAP_ELOADER_ROMADDR;         break;
+            case ee_procUpdater:        addr = EENV_MEMMAP_EUPDATER_ROMADDR;        break;
+            case ee_procApplication:    addr = EENV_MEMMAP_EAPPLICATION_ROMADDR;    break;
+        }
+        
+        if(ee_procUpdater == pr)
+        {   // we communicate to the updater to stay forever and not to jump to default after the 5 (or what) seconds
+            shalbase_ipc_gotoproc_set(ee_procUpdater);
+        }
+        
+        // attempt only to the requested process.
+        s_loader_attempt_jump(pr, addr);
         // if in here ... the jump failed, thus ... i dont go to error i just go on with other choices ... 
         //s_loader_manage_error(800, 200);
     }
@@ -651,19 +672,34 @@ static void s_eval_eeprom_erase(void)
 
 static void s_loader_HW_LED_Config(void) 
 {
+     hal_led_init(hal_led0, NULL);
      hal_led_init(hal_led1, NULL);
+     hal_led_init(hal_led2, NULL);
+     hal_led_init(hal_led3, NULL);
+     hal_led_init(hal_led4, NULL);
+     hal_led_init(hal_led5, NULL);    
 }
 
 
 static void s_loader_HW_LED_On(uint32_t led) 
 {
+    hal_led_on(hal_led0);
     hal_led_on(hal_led1);
+    hal_led_on(hal_led2);
+    hal_led_on(hal_led3);
+    hal_led_on(hal_led4);
+    hal_led_on(hal_led5);
 }
 
 
 static void s_loader_HW_LED_Off(uint32_t led) 
 {
-     hal_led_off(hal_led1);
+    hal_led_off(hal_led0);
+    hal_led_off(hal_led1);
+    hal_led_off(hal_led2);
+    hal_led_off(hal_led3);
+    hal_led_off(hal_led4);
+    hal_led_off(hal_led5);
 }
 
 
