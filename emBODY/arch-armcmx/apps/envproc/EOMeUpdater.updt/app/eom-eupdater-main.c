@@ -115,7 +115,6 @@ static void s_udpserver_run(EOMtask *p, uint32_t t);
 
 static eObool_t s_eom_eupdater_main_connected2host(EOpacket *rxpkt, EOsocketDatagram *skt);
 
-static void s_toggle_led(void *p);
 
 
 
@@ -276,14 +275,13 @@ static void s_eom_eupdater_main_init(void)
 static void s_udpserver_startup(EOMtask *p, uint32_t t)
 {
     char str[96];
-    EOtimer* timer = NULL;
-
+ 
     // init the rx packet 
     s_rxpkt = eo_packet_New(1024);  
     s_txpkt = eo_packet_New(1024);
 
     // init the action used for various tasks
-    s_action = eo_action_New();  
+    //s_action = eo_action_New();  
 
     // initialise the socket 
     s_skt_rops = eo_socketdtg_New(  2, 1024, eom_mutex_New(), // input queue
@@ -310,11 +308,6 @@ static void s_udpserver_startup(EOMtask *p, uint32_t t)
 
 
     eupdater_parser_init();
-
-    timer = eo_timer_New();
-    eo_action_SetCallback(s_action, s_toggle_led, NULL, eom_callbackman_GetTask(eom_callbackman_GetHandle()));
-    eo_timer_Start(timer, 0, 500*1000, eo_tmrmode_FOREVER, s_action);
-
         
 }
 
@@ -448,16 +441,6 @@ static eObool_t s_eom_eupdater_main_connected2host(EOpacket *rxpkt, EOsocketData
     return(host_connected);
 }
 
-
-static void s_toggle_led(void *p)
-{
-    hal_led_toggle(hal_led0);
-    hal_led_toggle(hal_led1);
-    hal_led_toggle(hal_led2);
-    hal_led_toggle(hal_led3);
-    hal_led_toggle(hal_led4);
-    hal_led_toggle(hal_led5);
-}
 
 
 

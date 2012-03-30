@@ -41,6 +41,8 @@
 #include "shalBASE.h"
 #include "EOMtheCallbackmanager.h"
 
+#include "hal.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of external variables 
@@ -95,14 +97,26 @@ static eObool_t s_eupdater_parser_process_rop_alessandro(EOpacket *rxpkt, EOpack
 static void s_eupdater_jump2app(void *par);
 
 
+static void s_led_countdown_start(void);
+
+static void s_led_countdown_stop(void);
+
+static void s_led_stayforever_start(void);
+
+static void s_toggle_led(void *p);
+
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-EOtimer* s_timer_jump2app = NULL;
-const eOreltime_t s_countdown = 5 * EOK_reltime1sec;
-EOaction *s_action_jump2app = NULL;
+static EOtimer* s_timer_jump2app = NULL;
+static EOaction *s_action_jump2app = NULL;
+
+static EOtimer* s_timer_led = NULL;
+static EOaction *s_action_led = NULL;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -121,6 +135,7 @@ extern void eupdater_parser_init(void)
         
         if(ee_procUpdater == pr)
         {   // stay in here forever
+            s_led_stayforever_start();
             return;
         }
     }    
@@ -135,11 +150,12 @@ extern void eupdater_parser_init(void)
     }
     else if(EOK_reltimeINFINITE == time2stay)
     {
+        s_led_stayforever_start();
         return;
     }
     else
     {
-        // otherwise start a timer
+        // otherwise start a jump2app timer
         s_timer_jump2app = eo_timer_New();
         
         s_action_jump2app = eo_action_New();
@@ -149,6 +165,9 @@ extern void eupdater_parser_init(void)
                              );
         
         eo_timer_Start(s_timer_jump2app, eok_abstimeNOW, time2stay, eo_tmrmode_ONESHOT, s_action_jump2app);
+        
+        // and also start the countdown led
+        s_led_countdown_start();
     }
 
 }
@@ -196,6 +215,10 @@ static eObool_t s_eupdater_parser_process_rop_alessandro(EOpacket *rxpkt, EOpack
     if(eo_tmrstat_Running == eo_timer_GetStatus(s_timer_jump2app))
     {
         eo_timer_Stop(s_timer_jump2app);
+        
+        // and also we change the led frequency
+        s_led_countdown_stop();
+        s_led_stayforever_start();
     }
 
     eo_packet_Payload_Get(rxpkt, &datarx, &sizerx);
@@ -251,6 +274,7 @@ static void s_eupdater_jump2app(void *par)
 {
     // retrieve the default process
     eEprocess_t defproc = ee_procNone;
+    uint8_t stayinupdater = 0;
     
     // nobody else can avoid this ...
     osal_system_scheduling_suspend();
@@ -263,12 +287,73 @@ static void s_eupdater_jump2app(void *par)
             shalbase_ipc_gotoproc_set(defproc);
             shalbase_system_restart();
         }
+        else
+        {
+            stayinupdater = 1;        
+        }
+    }
+    else
+    {
+        stayinupdater = 1;
     }
 
     // if there is not a default process ... then stay in updater
     osal_system_scheduling_restart();
+    s_led_countdown_stop();
+    s_led_stayforever_start();    
   
 }
+
+static void s_led_countdown_start(void)
+{
+    if(NULL == s_timer_led)
+    {
+        s_timer_led = eo_timer_New();
+    }
+    
+    if(NULL == s_action_led)
+    {
+        s_action_led = eo_action_New();
+    }
+    
+    eo_action_SetCallback(s_action_led, s_toggle_led, NULL, eom_callbackman_GetTask(eom_callbackman_GetHandle()));
+    eo_timer_Start(s_timer_led, eok_abstimeNOW, 500*1000, eo_tmrmode_FOREVER, s_action_led);
+}
+
+static void s_led_countdown_stop(void)
+{
+        eo_timer_Stop(s_timer_led);
+}
+
+static void s_led_stayforever_start(void)
+{
+    if(NULL == s_timer_led)
+    {
+        s_timer_led = eo_timer_New();
+    }
+
+    if(NULL == s_action_led)
+    {
+        s_action_led = eo_action_New();
+    }
+    
+    eo_action_SetCallback(s_action_led, s_toggle_led, NULL, eom_callbackman_GetTask(eom_callbackman_GetHandle()));
+    eo_timer_Start(s_timer_led, eok_abstimeNOW, 1000*1000, eo_tmrmode_FOREVER, s_action_led);
+    #warning --> does not change blink rate ..... boh
+}
+
+
+
+static void s_toggle_led(void *p)
+{
+    hal_led_toggle(hal_led0);
+    hal_led_toggle(hal_led1);
+    hal_led_toggle(hal_led2);
+    hal_led_toggle(hal_led3);
+    hal_led_toggle(hal_led4);
+    hal_led_toggle(hal_led5);
+}
+
 
 
 
