@@ -50,9 +50,9 @@
 #define SHALBASE_VER_MAJOR              0x01                // change of APIs
 #define SHALBASE_VER_MINOR              0x01                // change of internals
 
-#define SHALBASE_BUILDDATE_YEAR         2011
-#define SHALBASE_BUILDDATE_MONTH        11
-#define SHALBASE_BUILDDATE_DAY          4
+#define SHALBASE_BUILDDATE_YEAR         2012
+#define SHALBASE_BUILDDATE_MONTH        4
+#define SHALBASE_BUILDDATE_DAY          2
 #define SHALBASE_BUILDDATE_HOUR         12
 #define SHALBASE_BUILDDATE_MIN          0
 
