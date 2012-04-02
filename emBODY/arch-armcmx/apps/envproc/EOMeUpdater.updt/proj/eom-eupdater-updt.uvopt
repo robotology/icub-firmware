@@ -73,7 +73,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>1</IsCurrentTarget>
+        <IsCurrentTarget>0</IsCurrentTarget>
       </OPTFL>
       <CpuCode>255</CpuCode>
       <Books>
@@ -167,64 +167,12 @@
           <Name>-UV0153FBE -O14 -S0 -C0 -N00("ARM CoreSight JTAG-DP") -D00(3BA00477) -L00(4) -N01("Unknown JTAG device") -D01(06418041) -L01(5) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_CL -FS08000000 -FL040000</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>282</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134244588</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\Users\acemor\source-forge\emBODY\arch-armcmx\apps\envproc\EOMeUpdater.updt\proj\..\app\eupdater_parser.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-      </Breakpoint>
+      <Breakpoint/>
       <WatchWindow1>
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>s_the_armenv.devinfo</ItemText>
-        </Ww>
-        <Ww>
-          <count>1</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>s_the_armenv.devinfo</ItemText>
-        </Ww>
-        <Ww>
-          <count>2</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>remport,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>3</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>secs,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>4</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>nano,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>5</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>res</ItemText>
-        </Ww>
-        <Ww>
-          <count>6</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>defProc2run</ItemText>
-        </Ww>
-        <Ww>
-          <count>7</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>partinfo</ItemText>
+          <ItemText>t</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>
@@ -332,7 +280,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>0</IsCurrentTarget>
+        <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
       <CpuCode>255</CpuCode>
       <Books>
@@ -393,7 +341,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ULP2CM3</Key>
-          <Name>-UP0948193 -O206 -S12 -C0 -N00("ARM CoreSight SW-DP") -D00(1BA01477) -L00(0) -TO12291 -TC72000000 -TP8 -TDX0 -TDD0 -TDS8007 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_CL -FS08000000 -FL040000</Name>
+          <Name>-UP1123199 -O206 -S12 -C0 -N00("ARM CoreSight SW-DP") -D00(1BA01477) -L00(0) -TO12291 -TC72000000 -TP8 -TDX0 -TDD0 -TDS8007 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_CL -FS08000000 -FL040000</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -426,7 +374,24 @@
           <Name>-UV0153FBE -O14 -S0 -C0 -N00("ARM CoreSight JTAG-DP") -D00(3BA00477) -L00(4) -N01("Unknown JTAG device") -D01(06418041) -L01(5) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_CL -FS08000000 -FL040000</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>157</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134244824</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>C:\Users\acemor\source-forge\emBODY\arch-armcmx\apps\envproc\EOMeUpdater.updt\proj\..\app\eupdater_parser.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\udpnode\../app/eupdater_parser.c\157</Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -500,7 +465,7 @@
         <aLa>0</aLa>
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
-        <aSer4>1</aSer4>
+        <aSer4>0</aSer4>
         <StkLoc>0</StkLoc>
         <TrcWin>0</TrcWin>
         <newCpu>0</newCpu>
@@ -524,8 +489,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>142</TopLine>
-      <CurrentLine>152</CurrentLine>
+      <TopLine>1</TopLine>
+      <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app\eom-eupdater-main.c</PathWithFileName>
       <FilenameWithoutPath>eom-eupdater-main.c</FilenameWithoutPath>
@@ -538,7 +503,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>98</TopLine>
+      <TopLine>1</TopLine>
       <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app\eupdater-info.c</PathWithFileName>
@@ -550,10 +515,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>53</ColumnNumber>
+      <ColumnNumber>2</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>336</TopLine>
-      <CurrentLine>342</CurrentLine>
+      <TopLine>136</TopLine>
+      <CurrentLine>157</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app\eupdater_parser.c</PathWithFileName>
       <FilenameWithoutPath>eupdater_parser.c</FilenameWithoutPath>
@@ -564,10 +529,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>36</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>73</TopLine>
+      <CurrentLine>74</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app\updater-core.c</PathWithFileName>
       <FilenameWithoutPath>updater-core.c</FilenameWithoutPath>
@@ -653,7 +618,7 @@
 
   <Group>
     <GroupName>abslayer-cfg</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -692,8 +657,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>112</TopLine>
-      <CurrentLine>96</CurrentLine>
+      <TopLine>1</TopLine>
+      <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\abslayer-cfg\osal_cfg.c</PathWithFileName>
       <FilenameWithoutPath>osal_cfg.c</FilenameWithoutPath>
@@ -744,7 +709,7 @@
 
   <Group>
     <GroupName>eo-core</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -811,8 +776,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>1</TopLine>
+      <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtheTimerManager.c</PathWithFileName>
       <FilenameWithoutPath>EOVtheTimerManager.c</FilenameWithoutPath>
@@ -951,7 +916,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>255</TopLine>
+      <TopLine>1</TopLine>
       <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOtimer.c</PathWithFileName>
@@ -1082,10 +1047,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>47</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>178</TopLine>
+      <CurrentLine>192</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMtheTimerManager.c</PathWithFileName>
       <FilenameWithoutPath>EOMtheTimerManager.c</FilenameWithoutPath>
@@ -1248,7 +1213,7 @@
       <GroupNumber>7</GroupNumber>
       <FileNumber>50</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>43</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>

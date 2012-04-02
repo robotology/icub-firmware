@@ -73,7 +73,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>1</IsCurrentTarget>
+        <IsCurrentTarget>0</IsCurrentTarget>
       </OPTFL>
       <CpuCode>255</CpuCode>
       <Books>
@@ -271,7 +271,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>0</IsCurrentTarget>
+        <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
       <CpuCode>255</CpuCode>
       <Books>
@@ -453,10 +453,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>30</ColumnNumber>
+      <ColumnNumber>80</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>679</TopLine>
-      <CurrentLine>684</CurrentLine>
+      <TopLine>408</TopLine>
+      <CurrentLine>427</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app\loader_updt.c</PathWithFileName>
       <FilenameWithoutPath>loader_updt.c</FilenameWithoutPath>
@@ -500,7 +500,7 @@
       <GroupNumber>2</GroupNumber>
       <FileNumber>4</FileNumber>
       <FileType>1</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -598,7 +598,7 @@
       <GroupNumber>4</GroupNumber>
       <FileNumber>10</FileNumber>
       <FileType>1</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>

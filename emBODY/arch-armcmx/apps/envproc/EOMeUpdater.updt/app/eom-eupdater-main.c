@@ -222,12 +222,13 @@ static void s_eom_eupdater_main_init(void)
         .maxdatagramenqueuedintx    = 2
     };
 
-#warning --> e se la gestione della eeprom richiedesse il disable irq in certi momenti?
 
     hal_eeprom_init(hal_eeprom_i2c_01, NULL);
     eo_armenv_Initialise(&eupdater_modinfo, NULL);
     eov_env_SharedData_Synchronise(eo_armenv_GetHandle());
-
+    
+    
+#ifndef _FORCE_NETWORK_FROM_IPAL_CFG
     if(eores_OK == eov_env_IPnetwork_Get(eo_armenv_GetHandle(), &ipnet))
     {
         eomipnet_addr = (eOmipnet_cfg_addr_t*)ipnet;   //they have the same memory layout
@@ -235,6 +236,7 @@ static void s_eom_eupdater_main_init(void)
         ipaddr = (uint8_t*)&(eomipnet_addr->ipaddr);
     }
     else
+#endif        
     {
         eomipnet_addr = NULL;
         ipaddr = (uint8_t*)&(eupdater_ipal_cfg->eth_ip);

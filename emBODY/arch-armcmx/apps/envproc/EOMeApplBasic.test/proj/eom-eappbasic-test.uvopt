@@ -73,7 +73,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>1</IsCurrentTarget>
+        <IsCurrentTarget>0</IsCurrentTarget>
       </OPTFL>
       <CpuCode>255</CpuCode>
       <Books>
@@ -291,7 +291,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>0</IsCurrentTarget>
+        <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
       <CpuCode>255</CpuCode>
       <Books>
@@ -501,7 +501,7 @@
       <ColumnNumber>40</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>175</TopLine>
-      <CurrentLine>196</CurrentLine>
+      <CurrentLine>178</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_basic\eom_applbasic_main.c</PathWithFileName>
       <FilenameWithoutPath>eom_applbasic_main.c</FilenameWithoutPath>
@@ -512,10 +512,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>27</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>111</TopLine>
-      <CurrentLine>118</CurrentLine>
+      <TopLine>1</TopLine>
+      <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_basic\eom_applbasic_info.c</PathWithFileName>
       <FilenameWithoutPath>eom_applbasic_info.c</FilenameWithoutPath>

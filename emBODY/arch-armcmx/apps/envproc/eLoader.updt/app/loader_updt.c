@@ -420,7 +420,13 @@ static void s_loader_eval_jump_request_from_an_eproc(void)
         // attempt only to the requested process.
         s_loader_attempt_jump(pr, addr);
         // if in here ... the jump failed, thus ... i dont go to error i just go on with other choices ... 
-        //s_loader_manage_error(800, 200);
+        
+        if(ee_procApplication == pr)
+        {   // if in here .... we have failed to jump to application thus ... we shall stay in updater forever
+            shalbase_ipc_gotoproc_set(ee_procUpdater);
+            s_loader_attempt_jump(ee_procUpdater, EENV_MEMMAP_EUPDATER_ROMADDR);            
+        }
+        
     }
 }
 
