@@ -186,7 +186,7 @@ static void s_eom_timerman_OnExpiry(osal_timer_t *osaltmr, void *tmr)
     {
         osal_eventflag_set(t->onexpiry.data.evt.event, ((EOMtask*)t->onexpiry.data.evt.totask)->osaltask, osal_callerISR);
 
-        if(EOTIMER_ONESHOT == t->mode) 
+        if(EOTIMER_MODE_ONESHOT == t->mode) 
         {
             // sets dummy values for the timer, which is completed 
             eo_timer_hid_Reset_but_not_osaltime(t, eo_tmrstat_Completed); 
@@ -231,7 +231,7 @@ static eOresult_t s_eom_timerman_OnNewTimer(EOVtheTimerManager* tm, EOtimer *t)
     
     // create the osal timer
     t->envir.osaltimer = osal_timer_new();
-    t->status = EOTIMER_IDLE;
+    t->status = EOTIMER_STATUS_IDLE;
     
     // it may be that osal does not have any more timers available.
     if(NULL != t->envir.osaltimer)
@@ -264,7 +264,7 @@ static eOresult_t s_eom_timerman_AddTimer(EOVtheTimerManager* tm, EOtimer *t)
         return(eores_NOK_nullpointer);    
     }
     
-    if(EOTIMER_RUNNING == t->status)
+    if(EOTIMER_STATUS_RUNNING == t->status)
     {
         // this timer is already running ..... return error
         return(eores_NOK_generic);
@@ -287,11 +287,20 @@ static eOresult_t s_eom_timerman_AddTimer(EOVtheTimerManager* tm, EOtimer *t)
     // start the osal timer
     timing.startat  = t->startat; 
     timing.count    = t->expirytime; 
-    timing.mode     = ( (EOTIMER_FOREVER == t->mode) ? (osal_tmrmodeFOREVER) : (osal_tmrmodeONESHOT) );
+    timing.mode     = ( (EOTIMER_MODE_FOREVER == t->mode) ? (osal_tmrmodeFOREVER) : (osal_tmrmodeONESHOT) );
     onexpi.cbk      = s_eom_timerman_OnExpiry;
     onexpi.par      = t;
 
     res = (eOresult_t)osal_timer_start(t->envir.osaltimer, &timing, &onexpi, osal_callerTSK);
+    
+    if(eores_OK == res)
+    {
+        t->status   = EOTIMER_STATUS_RUNNING;
+    }
+    else
+    {
+        t->status   = EOTIMER_STATUS_IDLE;
+    }
     
     
     // unlock the manager
@@ -392,7 +401,7 @@ static void s_eom_timerman_ProcessExpiry(eOmessage_t msg)
 
                 
     // 2. clear if one shot
-    if(EOTIMER_ONESHOT == t->mode) 
+    if(EOTIMER_MODE_ONESHOT == t->mode) 
     {
         // sets dummy values for the timer, which is completed 
         eo_timer_hid_Reset_but_not_osaltime(t, eo_tmrstat_Completed); 

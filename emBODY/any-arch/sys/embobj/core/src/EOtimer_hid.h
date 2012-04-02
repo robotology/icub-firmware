@@ -40,12 +40,12 @@
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
-#define EOTIMER_IDLE            0
-#define EOTIMER_RUNNING         1
-#define EOTIMER_COMPLETED       2
+#define EOTIMER_STATUS_IDLE             0
+#define EOTIMER_STATUS_RUNNING          1
+#define EOTIMER_STATUS_COMPLETED        2
 
-#define EOTIMER_ONESHOT         0
-#define EOTIMER_FOREVER         1
+#define EOTIMER_MODE_ONESHOT            0
+#define EOTIMER_MODE_FOREVER            1
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
