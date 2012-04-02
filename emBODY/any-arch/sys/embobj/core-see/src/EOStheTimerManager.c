@@ -340,7 +340,7 @@ extern void eos_hid_timerman_Synch(EOStheTimerManager *p, uint64_t oldtick, uint
 
         // need to insert inside t all info required to make the timer start again correctly
         // i start from the top with invariant data
-        t->status       = EOTIMER_IDLE;
+        t->status       = EOTIMER_STATUS_IDLE;
         t->mode         = t->mode;
         t->startat      = (eok_abstimeNOW == t->startat) ? (eok_abstimeNOW) : (t->startat * tickperiod); 
         t->expirytime   = t->expirytime * tickperiod;
@@ -357,7 +357,7 @@ extern void eos_hid_timerman_Synch(EOStheTimerManager *p, uint64_t oldtick, uint
         // fill timing. 
         // if periodic it is easy: we leave the same values. if singleshot in the future ok. if in the past we set curtime+1.
 
-        if(EOTIMER_FOREVER == t->mode)
+        if(EOTIMER_MODE_FOREVER == t->mode)
         {   // periodic: easy as we leave the same values
 
         }
@@ -373,7 +373,7 @@ extern void eos_hid_timerman_Synch(EOStheTimerManager *p, uint64_t oldtick, uint
 
 
         // now clear the timer and start it
-        t->status = EOTIMER_IDLE;
+        t->status = EOTIMER_STATUS_IDLE;
         s_eos_timerman_AddTimer(s_eos_thetimermanager.tmrman, t);
     }
 
@@ -404,7 +404,7 @@ static eOresult_t s_eos_timerman_OnNewTimer(EOVtheTimerManager* tm, EOtimer *t)
     
     // dont have any osal timer, so put it NULL. but set status as idle
     t->envir.nextexpiry = 0;
-    t->status = EOTIMER_IDLE;
+    t->status = EOTIMER_STATUS_IDLE;
     
     
 //    // unlock the manager
@@ -427,7 +427,7 @@ static eOresult_t s_eos_timerman_AddTimer(EOVtheTimerManager* tm, EOtimer *t)
         return(eores_NOK_nullpointer);    
     }
     
-    if(EOTIMER_RUNNING == t->status)
+    if(EOTIMER_STATUS_RUNNING == t->status)
     {
         // this timer is already running ..... return error
         return(eores_NOK_generic);
@@ -438,7 +438,7 @@ static eOresult_t s_eos_timerman_AddTimer(EOVtheTimerManager* tm, EOtimer *t)
     t->expirytime   /= eos_sys_hid_tickperiodget();
     
     // get some values
-    delta_shot_others = (EOTIMER_ONESHOT == t->mode) ? (0) : (t->expirytime);
+    delta_shot_others = (EOTIMER_MODE_ONESHOT == t->mode) ? (0) : (t->expirytime);
     absol_tickoflife = eos_sys_hid_tickoflifeget();
     
     
@@ -506,7 +506,8 @@ static eOresult_t s_eos_timerman_AddTimer(EOVtheTimerManager* tm, EOtimer *t)
 //        t->envir.nextexpiry = absol_tickoflife + t->counting;
         // ok, the timer manager can handle one or more timers ... i place it in ascending order of expiry
         s_eos_timerman_insert_timer(t);
-        res = eores_OK;    
+        res = eores_OK; 
+        t->status = EOTIMER_STATUS_RUNNING;   
     }
 
     
@@ -572,7 +573,7 @@ static void s_eos_timerman_ProcessExpiry(EOtimer *t, uint64_t currtickoflife)
 
                 
     // 2. clear if one shot
-    if(EOTIMER_ONESHOT == t->mode) 
+    if(EOTIMER_MODE_ONESHOT == t->mode) 
     {
         // sets dummy values for the timer, which is completed 
         eo_timer_hid_Reset(t, eo_tmrstat_Completed);    
@@ -619,7 +620,7 @@ static void s_eos_timerman_insert_timer(EOtimer *t)
     li = eo_list_Find(activetimers, s_eos_timerman_expirytimelater_than, &t->counting);
 
     // set status to running
-    t->status = EOTIMER_RUNNING; 
+    t->status = EOTIMER_STATUS_RUNNING; 
    
     if(NULL == li)
     {
