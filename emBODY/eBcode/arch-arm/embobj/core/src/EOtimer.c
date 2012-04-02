@@ -163,8 +163,8 @@ extern eOresult_t eo_timer_Start(EOtimer *t, eOabstime_t startat, eOreltime_t co
     {
         // put inside the timer only the values that the timer manager needs to know. 
         // the timer manager will then complete the others according to its needs
-        t->status           = EOTIMER_IDLE; 
-        t->mode             = (eo_tmrmode_ONESHOT == mode) ? (EOTIMER_ONESHOT) : (EOTIMER_FOREVER);
+        t->status           = EOTIMER_STATUS_IDLE; 
+        t->mode             = (eo_tmrmode_ONESHOT == mode) ? (EOTIMER_MODE_ONESHOT) : (EOTIMER_MODE_FOREVER);
         t->startat          = startat;
         t->expirytime       = countdown;
         memcpy(&t->onexpiry, action, sizeof(EOaction));
@@ -221,7 +221,7 @@ extern eOresult_t eo_timer_Stop(EOtimer *t)
         // ....
         // reset the values of the timer to idle. there is no need to remove it from the timer manager 
         // since the timer manager does not own it anymore.
-        eo_timer_hid_Reset(t, eo_tmrstat_Idle);
+        eo_timer_hid_Reset_but_not_osaltime(t, eo_tmrstat_Idle);
         res = eores_OK;  
     }
 
@@ -261,8 +261,8 @@ extern eOtimerStatus_t eo_timer_GetStatus(EOtimer *t)
         //eov_timerman_Release(eov_timerman_GetHandle());
     }
     
-    st = (EOTIMER_IDLE == sss) ? (eo_tmrstat_Idle) : 
-         ((EOTIMER_RUNNING == sss) ? (eo_tmrstat_Running) : (eo_tmrstat_Completed) );
+    st = (EOTIMER_STATUS_IDLE == sss) ? (eo_tmrstat_Idle) : 
+         ((EOTIMER_STATUS_RUNNING == sss) ? (eo_tmrstat_Running) : (eo_tmrstat_Completed) );
 
     return(st);
 }
@@ -275,8 +275,8 @@ extern eOtimerStatus_t eo_timer_GetStatus(EOtimer *t)
 
 extern void eo_timer_hid_Reset(EOtimer *t, eOtimerStatus_t stat) 
 {
-    uint8_t v = (eo_tmrstat_Idle == stat) ? (EOTIMER_IDLE) : 
-                ((eo_tmrstat_Running == stat) ? (EOTIMER_RUNNING) : (EOTIMER_COMPLETED));
+    uint8_t v = (eo_tmrstat_Idle == stat) ? (EOTIMER_STATUS_IDLE) : 
+                ((eo_tmrstat_Running == stat) ? (EOTIMER_STATUS_RUNNING) : (EOTIMER_STATUS_COMPLETED));
     if(NULL != t) 
     {
         t->startat              = eok_abstimeNOW;
@@ -295,8 +295,8 @@ extern void eo_timer_hid_Reset(EOtimer *t, eOtimerStatus_t stat)
 
 extern void eo_timer_hid_Reset_but_not_osaltime(EOtimer *t, eOtimerStatus_t stat) 
 {
-    uint8_t v = (eo_tmrstat_Idle == stat) ? (EOTIMER_IDLE) : 
-                ((eo_tmrstat_Running == stat) ? (EOTIMER_RUNNING) : (EOTIMER_COMPLETED));
+    uint8_t v = (eo_tmrstat_Idle == stat) ? (EOTIMER_STATUS_IDLE) : 
+                ((eo_tmrstat_Running == stat) ? (EOTIMER_STATUS_RUNNING) : (EOTIMER_STATUS_COMPLETED));
     if(NULL != t) 
     {
         t->status               = v;
