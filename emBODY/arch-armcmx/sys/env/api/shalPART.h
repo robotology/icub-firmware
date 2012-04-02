@@ -51,10 +51,10 @@
 #define SHALPART_VER_MAJOR              0x01                // change of APIs
 #define SHALPART_VER_MINOR              0x01                // change of internals
 
-#define SHALPART_BUILDDATE_YEAR         2011
-#define SHALPART_BUILDDATE_MONTH        11
-#define SHALPART_BUILDDATE_DAY          4
-#define SHALPART_BUILDDATE_HOUR         18
+#define SHALPART_BUILDDATE_YEAR         2012
+#define SHALPART_BUILDDATE_MONTH        4
+#define SHALPART_BUILDDATE_DAY          2
+#define SHALPART_BUILDDATE_HOUR         12
 #define SHALPART_BUILDDATE_MIN          0
 
 #define SHALPART_STARTUPTIMEINUPDATER   (5*1000*1000)

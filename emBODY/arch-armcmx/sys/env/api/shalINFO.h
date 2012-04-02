@@ -48,12 +48,12 @@
 #define SHALINFO_NAME                   "shalINFO"           
 
 #define SHALINFO_VER_MAJOR              0x01                // change of APIs
-#define SHALINFO_VER_MINOR              0x00                // change of internals
+#define SHALINFO_VER_MINOR              0x01                // change of internals
 
-#define SHALINFO_BUILDDATE_YEAR         2011
-#define SHALINFO_BUILDDATE_MONTH        11
-#define SHALINFO_BUILDDATE_DAY          3
-#define SHALINFO_BUILDDATE_HOUR         18
+#define SHALINFO_BUILDDATE_YEAR         2012
+#define SHALINFO_BUILDDATE_MONTH        4
+#define SHALINFO_BUILDDATE_DAY          2
+#define SHALINFO_BUILDDATE_HOUR         12
 #define SHALINFO_BUILDDATE_MIN          0
 
 
