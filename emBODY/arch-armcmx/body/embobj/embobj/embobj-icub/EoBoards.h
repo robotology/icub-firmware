@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Author: Valentina Gaggero, Marco Accame
+ * email:   valentina.gaggero@iit.it, marco.accame@iit.it
+ * website: www.robotcub.org
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * A copy of the license can be found at
+ * http://www.robotcub.org/icub/license/gpl.txt
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
+*/
 
 // - include guard ----------------------------------------------------------------------------------------------------
 #ifndef _EOBOARDS_H_
@@ -46,13 +63,13 @@ typedef enum
 } eObrd_types_t;
 
 
-typedef struct                      // size is: 1+1+0 = 2
+typedef struct                  // size is: 1+1+0 = 2
 {
     uint8_t                     major;
     uint8_t                     minor;    
 } eObrd_version_t;              EO_VERIFYsizeof(eObrd_version_t, 2);
 
-typedef struct                      // size is: 1+1+2+2+0 = 6
+typedef struct                  // size is: 1+1+2+2+0 = 6
 {
     eOenum08_t                  boardtype;
     uint8_t                     firmwarebuildnumber;
