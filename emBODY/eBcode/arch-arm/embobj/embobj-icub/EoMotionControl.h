@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Author: Valentina Gaggero, Marco Accame
+ * email:   valentina.gaggero@iit.it, marco.accame@iit.it
+ * website: www.robotcub.org
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * A copy of the license can be found at
+ * http://www.robotcub.org/icub/license/gpl.txt
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
+*/
 
 // - include guard ----------------------------------------------------------------------------------------------------
 #ifndef _EOMOTIONCONTROL_H_
@@ -128,10 +145,10 @@ typedef struct
 
 
 /** @typedef    typedef struct eOmc_joint_config_t
-    @brief      eOmc_joint_config_t contains the values required to configure a joint with one controlling motor
+    @brief      eOmc_joint_config_t contains the values required to configure a joint
     @warning    This struct must be of fixed and size and multiple of 4.
  **/
-typedef struct                  // size is: 12+12+12+12+4+4+2+2+2+2+1+3 = 68
+typedef struct                  // size is: 12+12+12+12+4+4+2+2+1+3 = 64
 {
     eOmc_PID_t                  pidpos;
     eOmc_PID_t                  pidvel;
@@ -139,27 +156,32 @@ typedef struct                  // size is: 12+12+12+12+4+4+2+2+2+2+1+3 = 68
     eOmc_PID_t                  pidcur;
     eOmeas_position_t           minpositionofjoint;     // of joint
     eOmeas_position_t           maxpositionofjoint;     // of joint
-    eOmeas_current_t            maxcurrentofmotor;      // of motor
-    eOmeas_velocity_t           maxvelocityofmotor;     // of motor
     uint16_t                    velocityshiftfactor;    // of joint !!!!!!!!
     uint16_t                    velocitysetpointtimeout;        // max time between two velocity setpoints before control switches to position mode
     eOenum08_t                  controlmode;            // use a eOmc_controlmode_t value. 
     uint8_t                     filler03[3]; // oppure filler00 se tolgo controlmode
-} eOmc_joint_config_t;          EO_VERIFYsizeof(eOmc_joint_config_t, 68);
+} eOmc_joint_config_t;          EO_VERIFYsizeof(eOmc_joint_config_t, 64);
 
 
-/** @typedef    typedef struct eOmc_axis_status_t
-    @brief      eOmc_axis_status_t contains the status of the axis of a joint
+typedef struct                  // size is: 2+2+0 = 4
+{
+    eOmeas_current_t            maxcurrentofmotor;      // of motor
+    eOmeas_velocity_t           maxvelocityofmotor;     // of motor
+} eOmc_motor_config_t;          EO_VERIFYsizeof(eOmc_motor_config_t, 4);
+
+
+/** @typedef    typedef struct eOmc_joint_status_t
+    @brief      eOmc_joint_status_t contains the status of the joint
     @warning    This struct must be of fixed and size and multiple of 4.
  **/
-typedef struct                  // size is: 4+2+2+2+2+0 = 12
+typedef struct                  // size is: 4+4+4+2+2+0 = 16
 {
     eOmeas_position_t           position;           
     eOmeas_velocity_t           velocity;           
     eOmeas_acceleration_t       acceleration;       
     eOmeas_torque_t             torque;  
     uint8_t                     filler02[2];    
-} eOmc_axis_status_t;           EO_VERIFYsizeof(eOmc_axis_status_t, 12);
+} eOmc_joint_status_t;          EO_VERIFYsizeof(eOmc_joint_status_t, 16);
 
 
 /** @typedef    typedef struct eOmc_pid_status_t
@@ -178,35 +200,37 @@ typedef struct                  // size is: 4+2+2+0 = 8
     @brief      eOmc_motor_status_t contains the status of a motor
     @warning    This struct must be of fixed and size and multiple of 4.
  **/
-typedef struct                  // size is: 4+2+2+0 = 8
+typedef struct                  // size is: 4+4+2+2+0 = 12
 {
     eOmeas_position_t           position;          
     eOmeas_velocity_t           velocity; 
     eOmeas_current_t            current; 
-} eOmc_motor_status_t;          EO_VERIFYsizeof(eOmc_motor_status_t, 8);
+    uint8_t                     filler02[2];
+} eOmc_motor_status_t;          EO_VERIFYsizeof(eOmc_motor_status_t, 12);
 
 
 /** @typedef    typedef struct eOmc_joint_status_t
     @brief      eOmc_joint_status_t contains the status of a joint with a position control loop
     @warning    This struct must be of fixed and size and multiple of 4.
  **/
-typedef struct                  // size is: 12+8+8+0 = 28
+typedef struct                  // size is: 16+12+4+8+0 = 40
 {
-    eOmc_axis_status_t          axis;
+    eOmc_joint_status_t         joint;
     eOmc_motor_status_t         motor;
+    uint8_t                     filler04[4];
     eOmc_pid_status_t           pidpos;
-} eOmc_joint_status_t;          EO_VERIFYsizeof(eOmc_joint_status_t, 28);
+} eOmc_1motorjoint_status_t;    EO_VERIFYsizeof(eOmc_1motorjoint_status_t, 40);
 
 
 /** @typedef    typedef struct eOmc_joint_status_t
     @brief      eOmc_joint_status_t contains the status of a joint with a position control loop with the addition of a debug 
     @warning    This struct must be of fixed and size and multiple of 4.
  **/
-typedef struct                  // size is: 28+8+0 = 36
+typedef struct                  // size is: 40+8+0 = 48
 {
-    eOmc_joint_status_t         jointstatus;
+    eOmc_1motorjoint_status_t   onemotorjointstatus;
     eOutil_debug_values_t       debugvalues;
-} eOmc_joint_status_debug_t;    EO_VERIFYsizeof(eOmc_joint_status_debug_t, 36);
+} eOmc_1motorjoint_status_debug_t;    EO_VERIFYsizeof(eOmc_1motorjoint_status_debug_t, 48);
 
 //#warning --> calibration types and modes are still to be defined
 
@@ -272,10 +296,10 @@ typedef struct
 
 typedef struct  
 {
-    int16_t                     stiffness;      /**< the Ks parameter */
-    int16_t                     dumping;        /**< the Kd parameter */
-    int16_t                     offset;         /**< the Ko parameter */
-} eOmc_impedance_t;             EO_VERIFYsizeof(eOmc_impedance_t, 6);
+    eOmeas_stiffness_t                     stiffness;      /**< the Ks parameter */
+    eOmeas_damping_t                     dumping;        /**< the Kd parameter */
+    eOmeas_torque_t                     offset;         /**< the Ko parameter */
+} eOmc_impedance_t;             EO_VERIFYsizeof(eOmc_impedance_t, 18);
 
 
 
@@ -296,10 +320,64 @@ typedef struct                  // size is 68+8+36+12+1+1+1+1 = 128
     eObool_t                    motorenabled;               /**< if eobool_true the motor is enabled via PWM or else */
     
     uint8_t                     filler01[1];
-} eOmc_joint_t;                 EO_VERIFYsizeof(eOmc_joint_t, 128);
+} eOmc_old_joint_t;                 EO_VERIFYsizeof(eOmc_joint_t, 128);
  
 
+
+typedef struct                  // size is 68+8+36+12+1+1+1+1 = 128
+{
+    eOmc_joint_config_t         jconfig;                     /**< the configuration of the joint */
+    eOmc_motor_config_t         mconfig;                     /**< the configuration of the joint */
+    eOmc_calibration_t          calibration;                // ok, da definire meglio ....
+    eOmc_1motorjoint_status_debug_t   onemotorjointstatusdebug;           /**< the configuration of the joint. If a normal joint status is enough, use jointstatusdebug.jointstatus */
+    eOmc_setpoint_t             setpoint;                   /**< the setpoint of the joint */
+    eOenum08_t                  controlmode;                /**< use values from eOmc_controlmode_t */
+    eOenum08_t                  controlstatus;              /**< use values from eOmc_controlstatus_t */
+    eObool_t                    motorenabled;               /**< if eobool_true the motor is enabled via PWM or else */
+    
+    uint8_t                     filler01[1];
+} eOmc_united_joint_t;          EO_VERIFYsizeof(eOmc_joint_t, 128);
+
+
+
+typedef struct                  // size is 68+8+36+12+1+1+1+1 = 128
+{
+    eOmc_joint_config_t         jconfig;                     /**< the configuration of the joint */
+    eOmc_calibration_t          calibration;                // ok, da definire meglio ....
+    eOmc_joint_status_t         jointstatus;;           /**< the configuration of the joint. If a normal joint status is enough, use jointstatusdebug.jointstatus */
+    eOmc_setpoint_t             setpoint;                   /**< the setpoint of the joint */
+    eOenum08_t                  controlmode;                /**< use values from eOmc_controlmode_t */
+    eOenum08_t                  controlstatus;              /**< use values from eOmc_controlstatus_t */
+   
+    uint8_t                     filler01[1];
+} eOmc_joint_t;             EO_VERIFYsizeof(eOmc_joint_t, 128);
+
+
+typedef struct                  // size is 68+8+36+12+1+1+1+1 = 128
+{
+    eOmc_motor_config_t         mconfig;                     /**< the configuration of the joint */
+    eOmc_motor_status_t         motorstatus;   
+    eObool_t                    motorenabled;               /**< if eobool_true the motor is enabled via PWM or else */    
+    uint8_t                     filler01[1];
+} eOmc_motor_t;             EO_VERIFYsizeof(eOmc_joint_t, 128); 
+ 
+ 
+typedef struct
+{
+    eOmc_joint_t                joint;
+    eOmc_motor_t                motor;
+} eOmc_superjoint1motor_t;
 // #error separare il joint dal motor. il joint possiede la config
+
+typedef struct
+{
+    eOmc_superjoint1motor_t     jm01_hip_flexext;
+    eOmc_superjoint1motor_t     jm02_hip_abdadd;
+    eOmc_superjoint1motor_t     jm03_tight_rot;
+    eOmc_superjoint1motor_t     jm04_knee;
+    eOmc_superjoint1motor_t     jm05_ankle_flexext;
+    eOmc_superjoint1motor_t     jm06_ankle_abdadd;
+} eOmc_EP_leftleg_t;
 
 
 
