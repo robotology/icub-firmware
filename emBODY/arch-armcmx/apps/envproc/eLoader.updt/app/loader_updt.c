@@ -288,7 +288,7 @@ int main(void)
 
     s_loader_hardware_init();
     s_loader_shalibs_init();
-
+    
 
 
 #if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT)
@@ -304,7 +304,7 @@ int main(void)
     s_loader_attempt_jump(ee_procUpdater, EENV_MEMMAP_EUPDATER_ROMADDR);
 
     // nothing to do ...
-    s_loader_manage_error(200, 50);
+    s_loader_manage_error(80, 20);
 
     // just for ...
     for(;;);
@@ -338,52 +338,52 @@ static void s_loader_shalibs_init(void)
 
     if(ee_res_OK != shalbase_isvalid())
     {
-        s_loader_manage_error(50, 50);
+        s_loader_manage_error(20, 80);
     }
     else
     {
         // init shalbase
         if(ee_res_OK != shalbase_init(1))
         {
-            s_loader_manage_error(50, 50);
+            s_loader_manage_error(20, 80);
         }
     }
 
 
     if(ee_res_OK != shalpart_isvalid())
     {
-        s_loader_manage_error(50, 50);
+        s_loader_manage_error(20, 80);
     }
     else
     {
         // init shalpart
         if(ee_res_OK != shalpart_init())
         {
-            s_loader_manage_error(50, 50);
+            s_loader_manage_error(20, 80);
         }
         // put signature in partition table using shalpart
         if(ee_res_OK != shalpart_proc_synchronise(ee_procLoader, &s_loader_info))
         {
-            s_loader_manage_error(50, 50);
+            s_loader_manage_error(20, 80);
         }
     }
 
     if(ee_res_OK != shalinfo_isvalid())
     {
-        s_loader_manage_error(50, 50);
+        s_loader_manage_error(20, 80);
     }
     else
     {
         if(ee_res_OK != shalinfo_init())
         {
-            s_loader_manage_error(50, 50);
+            s_loader_manage_error(20, 80);
         }
         
         s_loader_boardinfo.uniqueid = hal_arch_arm_uniqueid64_get();
         
         if(ee_res_OK != shalinfo_boardinfo_synchronise(&s_loader_boardinfo))
         {
-            s_loader_manage_error(50, 50);
+            s_loader_manage_error(20, 80);
         }
     }
     
