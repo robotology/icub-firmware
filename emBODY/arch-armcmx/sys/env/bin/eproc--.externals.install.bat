@@ -18,6 +18,8 @@ echo. %SVN%
 echo. %URL%
 echo. ++ Done setting variables.
 echo.
+echo == Removing destination directory
+RMDIR /S "%SOURCE%"
 echo == Updating source from SVN
 echo. -- Running update...
 "%SVN%\TortoiseProc.exe" /command:checkout /path:"%SOURCE%" /url:"%URL%" /closeonend:1
