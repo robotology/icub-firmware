@@ -91,7 +91,7 @@ typedef struct
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static eObool_t s_eupdater_parser_process_rop_dummy(EOpacket *rxpkt, EOpacket *txpkt);
+//static eObool_t s_eupdater_parser_process_rop_dummy(EOpacket *rxpkt, EOpacket *txpkt);
 static eObool_t s_eupdater_parser_process_rop_alessandro(EOpacket *rxpkt, EOpacket *txpkt);
 
 static void s_eupdater_jump2app(void *par);
@@ -198,26 +198,31 @@ extern void eupdater_parser_download_blinkled_start(void)
 {
     eo_timer_Stop(s_timer_led);
     
-    if(NULL == s_timer_led)
-    {
-        s_timer_led = eo_timer_New();
-    }
+//     if(NULL == s_timer_led)
+//     {
+//         s_timer_led = eo_timer_New();
+//     }
 
-    if(NULL == s_action_led)
-    {
-        s_action_led = eo_action_New();
-    }
-    
-    eo_action_SetCallback(s_action_led, s_toggle_led, NULL, eom_callbackman_GetTask(eom_callbackman_GetHandle()));
-    eo_timer_Start(s_timer_led, eok_abstimeNOW, 100*1000, eo_tmrmode_FOREVER, s_action_led);
+//     if(NULL == s_action_led)
+//     {
+//         s_action_led = eo_action_New();
+//     }
+//     
+//     eo_action_SetCallback(s_action_led, s_toggle_led, NULL, eom_callbackman_GetTask(eom_callbackman_GetHandle()));
+//     eo_timer_Start(s_timer_led, eok_abstimeNOW, 100*1000, eo_tmrmode_FOREVER, s_action_led);
 }
 
 
 extern void eupdater_parser_download_blinkled_stop(void)
 {
-    eo_timer_Stop(s_timer_led);
+//    eo_timer_Stop(s_timer_led);
     
     s_led_stayforever_start();
+}
+
+extern void eupdater_parser_download_toggleled(void)
+{
+    s_toggle_led(NULL);
 }
 
 
@@ -271,36 +276,36 @@ static eObool_t s_eupdater_parser_process_rop_alessandro(EOpacket *rxpkt, EOpack
 
 }
 
-static eObool_t s_eupdater_parser_process_rop_dummy(EOpacket *rxpkt, EOpacket *txpkt)
-{
-    pkt_payload_t *pktdata = NULL;
-    uint8_t *data;
-    uint16_t size;
-    eOnanotime_t nano = 0;
+// static eObool_t s_eupdater_parser_process_rop_dummy(EOpacket *rxpkt, EOpacket *txpkt)
+// {
+//     pkt_payload_t *pktdata = NULL;
+//     uint8_t *data;
+//     uint16_t size;
+//     eOnanotime_t nano = 0;
 
-    eOipv4addr_t remaddr = 0;
-    eOipv4port_t remport = 0;
+//     eOipv4addr_t remaddr = 0;
+//     eOipv4port_t remport = 0;
 
-    eo_packet_Destination_Get(rxpkt, &remaddr, &remport);
-
-
-    eo_packet_Payload_Get(rxpkt, &data, &size);
-    //ipaddr = ((uint8_t*)&remaddr);
-    pktdata = (pkt_payload_t*)data;
+//     eo_packet_Destination_Get(rxpkt, &remaddr, &remport);
 
 
-    // prepare tx packet
-    pktdata->client_id = 0x10101010;
-    eov_sys_NanoTimeGet(eov_sys_GetHandle(), &nano); 
+//     eo_packet_Payload_Get(rxpkt, &data, &size);
+//     //ipaddr = ((uint8_t*)&remaddr);
+//     pktdata = (pkt_payload_t*)data;
 
-    pktdata->client_tx_time = nano;
 
-    eo_packet_Payload_Set(txpkt, (uint8_t*)pktdata, sizeof(pkt_payload_t));
+//     // prepare tx packet
+//     pktdata->client_id = 0x10101010;
+//     eov_sys_NanoTimeGet(eov_sys_GetHandle(), &nano); 
 
-    eo_packet_Destination_Set(txpkt, remaddr, 3333);
+//     pktdata->client_tx_time = nano;
 
-    return(eobool_true);
-}
+//     eo_packet_Payload_Set(txpkt, (uint8_t*)pktdata, sizeof(pkt_payload_t));
+
+//     eo_packet_Destination_Set(txpkt, remaddr, 3333);
+
+//     return(eobool_true);
+// }
 
 static void s_eupdater_jump2app(void *par)
 {

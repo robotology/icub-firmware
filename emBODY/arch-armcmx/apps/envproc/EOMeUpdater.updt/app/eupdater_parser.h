@@ -66,6 +66,7 @@ extern eObool_t eupdater_parser_process_data(EOpacket *rxpkt, EOpacket *txpkt);
 
 
 extern void eupdater_parser_download_blinkled_start(void);
+extern void eupdater_parser_download_toggleled(void);
 extern void eupdater_parser_download_blinkled_stop(void);
  
 

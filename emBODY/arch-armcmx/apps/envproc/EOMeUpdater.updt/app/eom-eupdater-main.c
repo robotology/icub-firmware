@@ -283,7 +283,7 @@ static void s_udpserver_startup(EOMtask *p, uint32_t t)
     s_txpkt = eo_packet_New(1024);
 
     // init the action used for various tasks
-    //s_action = eo_action_New();  
+    s_action = eo_action_New();  
 
     // initialise the socket 
     s_skt_rops = eo_socketdtg_New(  2, 1024, eom_mutex_New(), // input queue
@@ -371,46 +371,46 @@ static void s_udpserver_run(EOMtask *p, uint32_t t)
 }
 
 
-static void s_udpserver_run_safe(EOMtask *p, uint32_t t)
-{
-    // read the packet.
-    eOresult_t res;
-    //eOipv4addr_t remaddr;
-    //eOipv4port_t remport;
-    //uint8_t *ipaddr;
+// static void s_udpserver_run_safe(EOMtask *p, uint32_t t)
+// {
+//     // read the packet.
+//     eOresult_t res;
+//     //eOipv4addr_t remaddr;
+//     //eOipv4port_t remport;
+//     //uint8_t *ipaddr;
 
-    // the message that we have received
-    eOmessage_t msg = (eOmessage_t)t;
-
-
-    if(s_message_from_skt_rops == msg)
-    {   // ok, message from the socket
-
-        res = eo_socketdtg_Get(s_skt_rops, 
-                               s_rxpkt, 
-                               eok_reltimeZERO //eok_reltimeINFINITE
-                               );
-    
-        if((eores_OK == res) && (eobool_true == s_eom_eupdater_main_connected2host(s_rxpkt, s_skt_rops)))
-        {
-
-            if(eobool_true == eupdater_parser_process_rop(s_rxpkt, s_txpkt))
-            {
-                // transmit a pkt back to the host
-                eo_socketdtg_Put(s_skt_rops, s_txpkt);
-            }
- 
-        }
-
-    }
-    else if(s_message_from_skt_data == msg)
-    {   // ok, message from the socket transfer
+//     // the message that we have received
+//     eOmessage_t msg = (eOmessage_t)t;
 
 
+//     if(s_message_from_skt_rops == msg)
+//     {   // ok, message from the socket
 
-    }
+//         res = eo_socketdtg_Get(s_skt_rops, 
+//                                s_rxpkt, 
+//                                eok_reltimeZERO //eok_reltimeINFINITE
+//                                );
+//     
+//         if((eores_OK == res) && (eobool_true == s_eom_eupdater_main_connected2host(s_rxpkt, s_skt_rops)))
+//         {
 
-}
+//             if(eobool_true == eupdater_parser_process_rop(s_rxpkt, s_txpkt))
+//             {
+//                 // transmit a pkt back to the host
+//                 eo_socketdtg_Put(s_skt_rops, s_txpkt);
+//             }
+//  
+//         }
+
+//     }
+//     else if(s_message_from_skt_data == msg)
+//     {   // ok, message from the socket transfer
+
+
+
+//     }
+
+// }
 
 static eObool_t s_eom_eupdater_main_connected2host(EOpacket *rxpkt, EOsocketDatagram *skt)
 {

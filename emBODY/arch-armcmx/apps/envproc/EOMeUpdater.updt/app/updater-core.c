@@ -16,6 +16,9 @@
  * Public License for more details
 */
 
+#include "eupdater_parser.h"
+
+
 #include "updater-core.h"
 
 #include "stdlib.h"
@@ -156,7 +159,13 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout)
             }
             
             osal_system_scheduling_restart();
-          
+            
+            if(0 != s_download_state)
+            {
+                // download is to begin, thus start blinking led in a different way
+                eupdater_parser_download_blinkled_start();
+            }
+            
             return 1;
         }
             
@@ -196,6 +205,8 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout)
             {
                 pktout[1] = UPD_ERR_PROT;
             }
+            
+            eupdater_parser_download_toggleled();   
                
             return 1;
         }
@@ -244,6 +255,9 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout)
             }
    
             s_download_state = 0;
+
+            // download is over, thus resume the normal blinking of led
+            eupdater_parser_download_blinkled_stop();
 
             return 1;
         }
@@ -414,8 +428,7 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout)
             for (uint8_t n=0; n<16; ++n)
             { 
                 hal_led_toggle(hal_led2);
-
-                osal_task_wait(300000);
+                osal_task_wait(250*1000);
             }
 
             return 0;
