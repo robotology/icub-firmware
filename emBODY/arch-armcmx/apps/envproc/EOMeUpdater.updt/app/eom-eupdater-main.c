@@ -49,8 +49,11 @@
 #include "EOMmutex.h"
 #include "EOsocketDatagram.h"
 
-
+#if !defined(_MAINTAINER_APPL_)
 #include "eupdater-info.h"
+#else
+#include "emaintainer-info.h"
+#endif
 
 #include "EOtheARMenvironment.h"
 #include "EOVtheEnvironment.h"
@@ -142,6 +145,11 @@ static const eOerrman_cfg_t  errmancfg =
     .extfn.usr_on_error = s_udpnode_errman_OnError
 };
 
+#if !defined(_MAINTAINER_APPL_)
+static const eOmsystem_cfg_t* psyscfg = &eupdater_syscfg;
+#else
+static const eOmsystem_cfg_t* psyscfg = &emaintainer_syscfg;
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -150,7 +158,7 @@ static const eOerrman_cfg_t  errmancfg =
 
 int main(void)
 {
-    eom_sys_Initialise( &eupdater_syscfg,
+    eom_sys_Initialise( psyscfg,
                         NULL,                           // mempool
                         &errmancfg,                     // errman
                         &eom_timerman_DefaultCfg,
@@ -211,7 +219,8 @@ static void s_udpnode_errman_OnError(eOerrmanErrorType_t errtype, eOid08_t taski
 
 static void s_eom_eupdater_main_init(void)
 {
-    uint8_t *ipaddr = (uint8_t*)&(eupdater_ipal_cfg->eth_ip);
+    const ipal_cfg_t* ipalcfg = NULL;
+    uint8_t *ipaddr = NULL;
     eOmipnet_cfg_addr_t* eomipnet_addr;
     const eEipnetwork_t *ipnet = NULL;
     char str[96];
@@ -222,9 +231,30 @@ static void s_eom_eupdater_main_init(void)
         .maxdatagramenqueuedintx    = 2
     };
 
+#if !defined(_MAINTAINER_APPL_)
+    ipalcfg = eupdater_ipal_cfg;
+#else
+    ipalcfg = emaintainer_ipal_cfg;
+#endif    
+    
+    
+    ipaddr  = (uint8_t*)&(ipalcfg->eth_ip);
+    
+    
+#if !defined(_MAINTAINER_APPL_)     
+    sprintf(str, "starting EOMeUpdater:: \n\r");
+#else
+    sprintf(str, "starting EOMeMaintainer:: \n\r");
+#endif  
+    hal_trace_puts(str);
+
 
     hal_eeprom_init(hal_eeprom_i2c_01, NULL);
+#if !defined(_MAINTAINER_APPL_)    
     eo_armenv_Initialise(&eupdater_modinfo, NULL);
+#else
+    eo_armenv_Initialise(&emaintainer_modinfo, NULL);
+#endif    
     eov_env_SharedData_Synchronise(eo_armenv_GetHandle());
     
     
@@ -239,23 +269,22 @@ static void s_eom_eupdater_main_init(void)
 #endif        
     {
         eomipnet_addr = NULL;
-        ipaddr = (uint8_t*)&(eupdater_ipal_cfg->eth_ip);
+        ipaddr = (uint8_t*)&(ipalcfg->eth_ip);
     }
 
 
-    
-    sprintf(str, "starting EOMeUpdater::ipnet with IP addr: %d.%d.%d.%d\n\r", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]);
+    sprintf(str, "starting ::ipnet with IP addr: %d.%d.%d.%d\n\r", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]);
     hal_trace_puts(str);    
 
     // start the ipnet
     eom_ipnet_Initialise(&eom_ipnet_DefaultCfg,
-                         eupdater_ipal_cfg, 
+                         ipalcfg, 
                          eomipnet_addr,
                          &eom_ipnet_dtgskt_MyCfg
                          );
                          
 
-    sprintf(str, "starting EOMeUpdater::taskudpserver");
+    sprintf(str, "starting ::taskudpserver");
     hal_trace_puts(str);                         
 
     s_task_udpserver = eom_task_New(eom_mtask_MessageDriven, 100, 2*1024, s_udpserver_startup, s_udpserver_run,  6, 

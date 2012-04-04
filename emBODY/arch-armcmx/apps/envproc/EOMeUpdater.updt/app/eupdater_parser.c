@@ -133,6 +133,8 @@ extern void eupdater_parser_init(void)
 {
     eOreltime_t time2stay = 0;
     eEprocess_t pr = ee_procNone;
+    
+#if !defined(_MAINTAINER_APPL_ )    
 
 //    uncomment only if you want to debug    
 //    shalbase_ipc_gotoproc_set(ee_procUpdater);
@@ -175,6 +177,12 @@ extern void eupdater_parser_init(void)
         s_led_countdown_start();
     }
 
+#elif defined(_MAINTAINER_APPL_)
+ 
+    // the maintainer just stays in here forever. thus init the stayforver leds    
+    s_led_stayforever_start();
+    
+#endif    
 }
 
 
@@ -425,12 +433,28 @@ static void s_led_stayforever_start(void)
 
 static void s_toggle_led(void *p)
 {
+#if !defined(_MAINTAINER_APPL_) 
+    
     hal_led_toggle(hal_led0);
     hal_led_toggle(hal_led1);
     hal_led_toggle(hal_led2);
     hal_led_toggle(hal_led3);
     hal_led_toggle(hal_led4);
     hal_led_toggle(hal_led5);
+
+#else
+    static uint8_t num = 0;
+    
+    switch(num)
+    {
+        case 0:     hal_led_toggle(hal_led0); hal_led_toggle(hal_led1);     break; 
+        case 1:     hal_led_toggle(hal_led2); hal_led_toggle(hal_led3);     break;   
+        case 2:     hal_led_toggle(hal_led4); hal_led_toggle(hal_led5);     break;        
+    }
+    
+    num = (num+1)%3;
+
+#endif    
 }
 
 
