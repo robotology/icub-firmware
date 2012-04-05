@@ -62,10 +62,15 @@
  //  MPLAB 8.63
 //
 
-//  Rev 2.0.16 del 31/08/2011
-//  Added the accelerometer reading  
+//  Rev 2.0.19 del 31/08/2011
+//  Added the analog accelerometer reading  
 //  MPLAB 8.76
 //
+//  Rev 2.1.0 del 05/04/2012
+//  Added the I2C accelerometer and gyroscope reading for the palm.  
+//  MPLAB 8.76
+//
+
 #include<p30f4011.h>
 #include"can_interface.h"
 #include "AD7147RegMap.h"
@@ -77,7 +82,9 @@
 #include "options.h"
 #include <timer.h>
 #include <libpic30.h>
-#include<adc10.h>
+#include <adc10.h>
+#include "l3g4200d.h"
+
 
 
 //#define DEBUG
@@ -196,7 +203,8 @@ unsigned int SHIFT=2; //shift of the CDC value for removing the noise
 unsigned int SHIFT_THREE=3;// shift of the CDC value for removing the noise
 unsigned int SHIFT_ALL=4; //shift of the CDC value for removing the noise
 unsigned int NOLOAD=235;
-unsigned int ACCELEROMETER=0;
+unsigned int ANALOG_ACC=0; //analog accelerometer, if one 1 messsage is sent every 10ms
+unsigned int GYRO_ACC=0; //gyro e accelerometer of the MMSP 
 unsigned int CONFIG_TYPE=CONFIG_SINGLE;
 unsigned int ERROR_COUNTER=0; //it counts the errors in reading the triangles.
 unsigned int ConValue[2]={0x2200, 0x2200}; //offset of the CDC reading 
@@ -235,6 +243,8 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void)
 }
 void __attribute__((interrupt, no_auto_psv)) _T2Interrupt(void)
 {
+	if (ANALOG_ACC)
+{
 	    acc[1]=((AN2 &0xFF00) >>0x8); // axis X
         acc[0]=(AN2 & 0xFF);
         acc[3]=((AN3 &0xFF00) >>0x8); // axis Y
@@ -244,10 +254,13 @@ void __attribute__((interrupt, no_auto_psv)) _T2Interrupt(void)
         while (!CAN1IsTXReady(1));    
         CAN1SendMessage( (CAN_TX_SID(0x550)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
                         (CAN_TX_EID(0)) & CAN_NOR_TX_REQ, acc, 6,1);
-    //executing the sampling of the 
-        ADCON1bits.SAMP = 1;        
+    //executing the sampling of the
+     ADCON1bits.SAMP = 1;    
+} 
+	if (GYRO_ACC)
+{	    
+}      
     _T2IF = 0;
-
 }
 void __attribute__((interrupt, no_auto_psv)) _C1Interrupt(void)
 {
@@ -288,20 +301,31 @@ int main(void)
     //								Peripheral init
     //------------------------------------------------------------------------
     T1_Init(TIMER_VALUE);
-   
-if (ACCELEROMETER)
-{
-    T2_Init(TIMER_VALUE2);
-    ADC_Init();             //Initialize the A/D converter
-}  
     CAN_Init();
     I2C_Init(CH0); 
     LED_Init();
+    
+if (ANALOG_ACC)
+{
+    T2_Init(TIMER_VALUE2);
+    ADC_Init();             //Initialize the A/D converter
+}
+else if (GYRO_ACC)
+{
+	tL3GI2COps l3g;
+	l3g.i2c_write= WriteByteViaI2C;
+	l3g.i2c_read=ReadByteViaI2C;
+	L3GInit(l3g);
+  
+    T2_Init(TIMER_VALUE2);
+    ReadViaI2C(CH0,AD7147_ADD[i],DEVID, 1, AD7147Registers[0],AD7147Registers[4],AD7147Registers[8],AD7147Registers[12], DEVID);  
+}    
+    
     //Read Silicon versions to check communication, It should read 0xE622
 
     for (i=0;i<4;i++)
     {
-        ReadFromAD7147ViaI2C(CH0,AD7147_ADD[i],DEVID, 1, AD7147Registers[0],AD7147Registers[4],AD7147Registers[8],AD7147Registers[12], DEVID);  
+        ReadViaI2C(CH0,AD7147_ADD[i],DEVID, 1, AD7147Registers[0],AD7147Registers[4],AD7147Registers[8],AD7147Registers[12], DEVID);  
     } 
     
        //............................Configure AD7147
@@ -383,9 +407,9 @@ if (ACCELEROMETER)
            	i = 0;
 			result=0;
 			mean=0;
-		//	if (led_counter==20)
+			if (led_counter==20)
 			{
-	//			led0=~led0;
+				led0=~led0;
 				led_counter=0;
 			}	
 			led_counter++;
@@ -575,25 +599,25 @@ static void ServiceAD7147Isr(unsigned char Channel)
 	ConfigBuffer[0]=0x8000;//0x8000;//0x220;
 /*		for (i=0;i<nets;i++)
 	    {
-		   ReadFromAD7147ViaI2C(CH0,AD7147_ADD[i],STAGE_COMPLETE_LIMIT_INT, 1, stagecomplete0[0],stagecomplete1[0],stagecomplete2[0],stagecomplete3[0], 0);		
-		 //   WriteToAD7147ViaI2C(Channel,AD7147_ADD[i],AMB_COMP_CTRL0,1, ConfigBuffer, AMB_COMP_CTRL0);
+		   ReadViaI2C(CH0,AD7147_ADD[i],STAGE_COMPLETE_LIMIT_INT, 1, stagecomplete0[0],stagecomplete1[0],stagecomplete2[0],stagecomplete3[0], 0);		
+		 //   WriteViaI2C(Channel,AD7147_ADD[i],AMB_COMP_CTRL0,1, ConfigBuffer, AMB_COMP_CTRL0);
 	    }
 */	 	
 	    for (i=0;i<nets;i++)
 	    {		
 	    // Added 0x0B because of register remapping
-	       ReadFromAD7147ViaI2C(CH0,AD7147_ADD[i],(ADCRESULT_S0+0x0B), 2, AD7147Registers[i],AD7147Registers[i+4],AD7147Registers[i+8],AD7147Registers[i+12], ADCRESULT_S0);
+	       ReadViaI2C(CH0,AD7147_ADD[i],(ADCRESULT_S0+0x0B), 2, AD7147Registers[i],AD7147Registers[i+4],AD7147Registers[i+8],AD7147Registers[i+12], ADCRESULT_S0);
 	    }	    
 	    for (i=0;i<nets;i++)
 	    {		
 	    // Added 0x0B because of register remapping
-	       ReadFromAD7147ViaI2C(CH0,AD7147_ADD[i],(ADCRESULT_S2+0x0B), 10, AD7147Registers[i],AD7147Registers[i+4],AD7147Registers[i+8],AD7147Registers[i+12], ADCRESULT_S2);
+	       ReadViaI2C(CH0,AD7147_ADD[i],(ADCRESULT_S2+0x0B), 10, AD7147Registers[i],AD7147Registers[i+4],AD7147Registers[i+8],AD7147Registers[i+12], ADCRESULT_S2);
 	    }
    		
 	    for (i=0;i<nets;i++)
 	    {
-		 //  ReadFromAD7147ViaI2C(CH0,AD7147_ADD[i],STAGE_COMPLETE_LIMIT_INT, 1, stagecomplete0[0],stagecomplete1[0],stagecomplete2[0],stagecomplete3[0], 0);		
-		     WriteToAD7147ViaI2C(CH0,AD7147_ADD[i],AMB_COMP_CTRL0,1, ConfigBuffer, 0);
+		 //  ReadViaI2C(CH0,AD7147_ADD[i],STAGE_COMPLETE_LIMIT_INT, 1, stagecomplete0[0],stagecomplete1[0],stagecomplete2[0],stagecomplete3[0], 0);		
+		     WriteViaI2C(CH0,AD7147_ADD[i],AMB_COMP_CTRL0,1, ConfigBuffer, 0);
 	///DEBUG	      
 	  //        ConfigAD7147(CH0,i,PW_CONTROL,ConValue); //0 is the number of the device		 
 	    } 
@@ -618,13 +642,13 @@ void ServiceAD7147Isr_all(unsigned char Channel)
 		//Read ADC Values
 //	    for (i=0;i<4;i++)
 //	    {
-//		    ReadFromAD7147ViaI2C(CH0,AD7147_ADD[i],STAGE_COMPLETE_LIMIT_INT, 1, stagecomplete0[0],stagecomplete1[0],stagecomplete2[0],stagecomplete3[0], 0);		
-//	//	    WriteToAD7147ViaI2C(Channel,AD7147_ADD[i],AMB_COMP_CTRL0,1, ConfigBuffer, AMB_COMP_CTRL0);
+//		    ReadViaI2C(CH0,AD7147_ADD[i],STAGE_COMPLETE_LIMIT_INT, 1, stagecomplete0[0],stagecomplete1[0],stagecomplete2[0],stagecomplete3[0], 0);		
+//	//	    WriteViaI2C(Channel,AD7147_ADD[i],AMB_COMP_CTRL0,1, ConfigBuffer, AMB_COMP_CTRL0);
 //	    }
 	   	for (i=0;i<ntriangles;i++)
 	    {		
 	    // Added 0x0B because of register remapping
-	       ReadFromAD7147ViaI2C(CH0,AD7147_ADD[i],(ADCRESULT_S0+0x0B), 1, AD7147Registers[i],AD7147Registers[i+4],AD7147Registers[i+8],AD7147Registers[i+12], ADCRESULT_S0);
+	       ReadViaI2C(CH0,AD7147_ADD[i],(ADCRESULT_S0+0x0B), 1, AD7147Registers[i],AD7147Registers[i+4],AD7147Registers[i+8],AD7147Registers[i+12], ADCRESULT_S0);
 	    }
 
 }
@@ -639,7 +663,7 @@ void ServiceAD7147Isr_three(unsigned char Channel)
 	    for (i=0;i<ntriangles;i++)
 	    {		
 	    // Added 0x0B because of register remapping
-	       ReadFromAD7147ViaI2C(CH0,AD7147_ADD[i],(ADCRESULT_S0+0x0B), 3, AD7147Registers[i],AD7147Registers[i+4],AD7147Registers[i+8],AD7147Registers[i+12], ADCRESULT_S0);
+	       ReadViaI2C(CH0,AD7147_ADD[i],(ADCRESULT_S0+0x0B), 3, AD7147Registers[i],AD7147Registers[i+4],AD7147Registers[i+8],AD7147Registers[i+12], ADCRESULT_S0);
 	    }
 }
 //------------------------------------------------------------------------

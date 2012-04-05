@@ -65,8 +65,10 @@ void I2C_test(unsigned char Channel);
 //Local functions
 //===============
 //High level functions
-unsigned char WriteToAD7147ViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToWrite, unsigned int *DataBuffer, const unsigned int OffsetInBuffer);
-unsigned char ReadFromAD7147ViaI2C(unsigned char Channel,unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer1, unsigned int *DataBuffer2, unsigned int *DataBuffer3, unsigned int *DataBuffer4, const unsigned int OffsetInBuffer);
+unsigned char WriteViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToWrite, unsigned int *DataBuffer, const unsigned int OffsetInBuffer);
+extern unsigned char WriteByteViaI2C(unsigned char DeviceAddress, const unsigned char RegisterStartAddress, unsigned char DataBuffer);
+extern unsigned char ReadViaI2C(unsigned char Channel,unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer1, unsigned int *DataBuffer2, unsigned int *DataBuffer3, unsigned int *DataBuffer4, const unsigned int OffsetInBuffer);
+unsigned char ReadByteViaI2C( unsigned char DeviceAddress, const unsigned char RegisterAddress, unsigned char *DataBuffer );
 //Low level functions
 void InitialiseI2CMaster(unsigned char Channel);
 void StartI2CMaster(unsigned char Channel);

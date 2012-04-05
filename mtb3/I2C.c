@@ -84,15 +84,61 @@ void I2C_test(unsigned char Channel)
  	}   
 }   
 
+//---------------------------------
+//WriteAD7147ViaI2C()
+//---------------------------------
+//Function that writes one byte via the I2C port . It sends first the device
+//address including the write bit, then the register address and finally the
+//data. The function returns "1" if successfull otherwise "0".
+//--------------------------------------------------------------------------------
+unsigned char WriteByteViaI2C(unsigned char DeviceAddress, const unsigned char RegisterStartAddress, unsigned char DataBuffer)
+{
+
+    unsigned char ByteAddress;
+    unsigned char AcknError;
+    unsigned char DeviceAddressHeader;
+	unsigned char Channel=0;
+    AcknError=1; //No error on initialisation
+
+    //Add the write bit to the device address
+    DeviceAddressHeader = DeviceAddress<<1 | I2C_WR;
+    //Split the address in two bytes 
+    ByteAddress = RegisterStartAddress & 0xFF00;
+  
+    //Start the I2C transfer
+    InitialiseI2CMaster(Channel);
+    StartI2CMaster(Channel);
+    //Send device address
+    if (!SendByteI2CMaster(Channel,DeviceAddressHeader))
+    {
+        //Send register address if the acknowledgement is there
+        if (!SendByteI2CMaster(Channel,ByteAddress))
+        {
+             SendByteI2CMaster(Channel,DataBuffer);
+               
+             StopI2CMaster(Channel);
+             AcknError=0;
+        } else //No acknowledgement was found therefore send the stop condition
+        {
+            StopI2CMaster(Channel);
+            AcknError=0;
+        }
+    } else //No acknowledgement was found therefore send the stop condition
+    {
+        StopI2CMaster(Channel);
+        AcknError=0;
+    }
+    return(AcknError);
+}
 
 //---------------------------------
 //WriteAD7147ViaI2C()
 //---------------------------------
-//Function that writes to the AD7147 via the I2C port. It sends first the device
+//Function that writes  via the I2C port pair of 16 bits data. It sends first the device
 //address including the write bit, then the register address and finally the
 //data. The function returns "1" if successfull otherwise "0".
 //--------------------------------------------------------------------------------
-unsigned char WriteToAD7147ViaI2C(unsigned char Channel,unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToWrite, unsigned int *DataBuffer, const unsigned int OffsetInBuffer)
+unsigned char WriteViaI2C(unsigned char Channel,unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToWrite, unsigned int *DataBuffer, const unsigned int OffsetInBuffer)
 {
     unsigned int  DataToWrite;
     unsigned char LowByteAddress, HighByteAddress;
@@ -154,16 +200,75 @@ unsigned char WriteToAD7147ViaI2C(unsigned char Channel,unsigned char DeviceAddr
     return(AcknError);
 }
 
-
 //---------------------------------
-//ReadFromAD7147ViaI2C()
+//ReadByteViaI2C()
 //---------------------------------
-//Function that reads from the AD7147 via the I2C port. It sends first the device
+//Function that reads a Byte from  via the I2C port. It sends first the device
 //address including the write bit, then the register address and finally reads data
 //back. The function returns "1" if successfull otherwise "0". If an error occurs,
 //Then the stop condition is sent.
 //--------------------------------------------------------------------------------
-unsigned char ReadFromAD7147ViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer1,unsigned int *DataBuffer2,unsigned int *DataBuffer3,unsigned int *DataBuffer4, const unsigned int OffsetInBuffer)
+unsigned char ReadByteViaI2C( unsigned char DeviceAddress, const unsigned char RegisterAddress, unsigned char *DataBuffer )
+{
+	unsigned char Channel=0;
+    unsigned char AcknError;
+    unsigned char SDA_number=0;
+    unsigned char DeviceAddressHeader;
+
+    AcknError=1; //No error on initialisation
+
+    //Add the write bit to the device address
+    DeviceAddressHeader=DeviceAddress<<1 | I2C_WR; //qui ci vuole I2C_WR o RD secondo me RD
+   
+
+    //Start the I2C transfer
+    InitialiseI2CMaster(Channel);
+    StartI2CMaster(Channel);
+
+    //Send device address
+    if (!SendByteI2CMaster(Channel,DeviceAddressHeader))
+    {
+        //Send register address
+        if (!SendByteI2CMaster(Channel,RegisterAddress))
+        {
+                //Send the repeated start
+                StartI2CMaster(Channel);
+                //Send device address again changing the Rd/Wr bit
+                DeviceAddressHeader = DeviceAddress<<1 | I2C_RD;
+                if (!SendByteI2CMaster(Channel,DeviceAddressHeader))
+                {
+                    //Perform block read, but first,we need to know if we must send an ACKN or a NACK
+
+                        ReceiveByteI2CMaster(Channel,ACK);
+                        DataBuffer=ReceivedByte[SDA_number];
+                    //Stop transfer
+                    StopI2CMaster(Channel);
+                } else //No acknowledgement was found therefore send the stop condition
+                {
+                    StopI2CMaster(Channel);
+                    AcknError=0;
+                }
+        } else //No acknowledgement was found therefore send the stop condition
+        {
+            StopI2CMaster(Channel);
+            AcknError=0;
+        }
+    } else //No acknowledgement was found therefore send the stop condition
+    {
+        StopI2CMaster(Channel);
+        AcknError=0;
+    }
+    return(AcknError);
+}
+//---------------------------------
+//ReadViaI2C()
+//---------------------------------
+//Function that reads from  via the I2C port. It sends first the device
+//address including the write bit, then the register address and finally reads data
+//back. The function returns "1" if successfull otherwise "0". If an error occurs,
+//Then the stop condition is sent.
+//--------------------------------------------------------------------------------
+unsigned char ReadViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer1,unsigned int *DataBuffer2,unsigned int *DataBuffer3,unsigned int *DataBuffer4, const unsigned int OffsetInBuffer)
 {
     unsigned int ReadData;
     unsigned char LowByteAddress, HighByteAddress;
@@ -202,9 +307,6 @@ unsigned char ReadFromAD7147ViaI2C(unsigned char Channel, unsigned char DeviceAd
                     {
                         ReceiveByteI2CMaster(Channel,ACK);
                         HighByteData[0]=ReceivedByte[0];
-                        HighByteData[1]=ReceivedByte[1];
-                        HighByteData[2]=ReceivedByte[2];
-                        HighByteData[3]=ReceivedByte[3];
 
                         ReceiveByteI2CMaster(Channel,NACK);
                         LowByteData[0]=ReceivedByte[0];
@@ -355,22 +457,6 @@ void StartI2CMaster(unsigned char Channel)
 	    MCO_0 = 0;    //SCL low
 	    Wait(I2Cbit);	
 	}    
-    /*{
-		DE_0output    //SDA as output	
-	    MCO_0 = 0;    //SCL low
-		Nop();
-		Nop();
-		Nop();
-		Nop();
-	    DO_0on        //SDA high
-	    MCO_0 = 1;    //SCL high
-	    Wait(I2Cbit);
-	    DO_0off       //SDA goes low before the clock
-	    Wait(I2Cbit);
-	    MCO_0 = 0;    //SCL low
-	    Wait(I2Cbit);
-	}
-	*/
 	break;
 	case CH1:
 	{

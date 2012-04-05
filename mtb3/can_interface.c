@@ -29,7 +29,7 @@ extern unsigned int SHIFT;
 extern unsigned int SHIFT_THREE;
 extern unsigned int SHIFT_ALL;
 extern unsigned int NOLOAD;
-extern unsigned int ACCELEROMETER;
+extern unsigned int ANALOG_ACC;
 extern char _additional_info[32];
 extern unsigned int ConValue[2];
 // can RX messages buffer
@@ -475,7 +475,7 @@ int CAN1_handleRx (unsigned int board_id)
 					board_MODE=CALIB;
 					EnableIntT1;
 
-   					if (1==ACCELEROMETER) EnableIntT2;
+   					if (1==ANALOG_ACC) EnableIntT2;
 				}
 				break;
 				
@@ -486,7 +486,7 @@ int CAN1_handleRx (unsigned int board_id)
 					//data[2] right SHIFT_THREE  factor for the sensor readings (3 macro areas)     
 				    //data[3] right SHIFT_ALL  factor for the sensor readings (1 macro area) 
 					//data[4] NO_LOAD value (it is set to 235 for default)
-					//data[5] ACCELEROMETER
+					//data[5] ANALOG_ACC
 					//data[6] NU
 					//data[7] NU
 					
@@ -494,11 +494,11 @@ int CAN1_handleRx (unsigned int board_id)
 					SHIFT_THREE =	CANRxBuffer[canRxBufferIndex-1].CAN_data[2]&0xF;             
 					SHIFT_ALL   =	CANRxBuffer[canRxBufferIndex-1].CAN_data[3]&0xF;     
 					NOLOAD		=	CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0xFF;  
-					ACCELEROMETER =	CANRxBuffer[canRxBufferIndex-1].CAN_data[5]&0x01;  
+					ANALOG_ACC =	CANRxBuffer[canRxBufferIndex-1].CAN_data[5]&0x01;  
 					
 					DisableIntT2;
 					
-					if (ACCELEROMETER)
+					if (ANALOG_ACC)
 					{
 						 EnableIntT2;
 						 T2_Init(TIMER_VALUE2);
