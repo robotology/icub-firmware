@@ -57,20 +57,20 @@
 
 /** @typedef    typedef struct eOmc_PIDq15_t
     @brief      eOmc_PIDq15_t contains the values required to configure a PID control when using q15 arithmetic
-    @warning    This struct must be of fixed and size and multiple of 4.
+    @warning    This struct must be of fixed size and multiple of 4.
     @todo       describe how the 16bit values are defined and how to map to/from floating point
  **/
-typedef struct              // size is 12 bytes
+typedef struct              // size is 2+2+2+2+2+2+1+3+0 bytes
 {
-    int16_t                 kp;             /**< proportional gain */
-    int16_t                 ki;             /**< integral gain */
-    int16_t                 kd;             /**< derivative gain */
-    int16_t                 limitonintegral;  /**< limit of integral term */ 
-    int16_t                 limitonoutput;  /**< limit of the output of the pid */
-    int8_t                  scale;          /**< scale factor for the gains (and what about the rest?)*/
-    int8_t                  offset;         /**< the k0 in the pid formula */
-//    uint8_t                 filler02[2];    /**< filler to make struct a multiple of 4 */
-} eOmc_PIDq15_t;            EO_VERIFYsizeof(eOmc_PIDq15_t, 12);
+    int16_t                 kp;                 /**< proportional gain */
+    int16_t                 ki;                 /**< integral gain */
+    int16_t                 kd;                 /**< derivative gain */
+    int16_t                 limitonintegral;    /**< limit of integral term */ 
+    int16_t                 limitonoutput;      /**< limit of the output of the pid */
+    int8_t                  scale;              /**< scale factor for the gains (usato per shift a destra)*/
+    int16_t                 offset;             /**< the k0 in the pid formula */
+    uint8_t                 filler03[3];        /**< filler to make struct a multiple of 4 */
+} eOmc_PIDq15_t;            EO_VERIFYsizeof(eOmc_PIDq15_t, 16);
 
 // the PID to be used is a q15
 typedef eOmc_PIDq15_t eOmc_PID_t;
@@ -111,17 +111,30 @@ typedef enum
 } eOmc_controlstatus_t;
 
 
+/** @typedef    typedef enum eOmc_setpoint_type_t
+    @brief      eOmc_setpoint_type_t contains the possible types of setpoints.
+ **/
+typedef enum
+{
+    eomc_setpoint_position                      = 0,
+    eomc_setpoint_velocity                      = 1,
+    eomc_setpoint_torque                        = 2,
+    eomc_setpoint_current                       = 3
+} eOmc_setpoint_type_t;
+
+
+
 /** @typedef    typedef struct eOmc_setpoint_t
     @brief      eOmc_setpoint_t contains the setpoint to be sent to a pid
-    @warning    This struct must be of fixed and size and multiple of 4.
+    @warning    This struct must be of fixed size and multiple of 4.
  **/
-typedef struct
+typedef struct              // size is 1+3+8+0 = 12
 {
-    uint8_t                 controlmode;
+    eOenum08_t              type;                   /**< use eOmc_setpoint_type_t */
     uint8_t                 filler03[3];
     union
     {
-        uint8_t             sizeofunionis08[8];
+        uint8_t             sizeofunionis08[8];     
         struct 
         { 
             eOmeas_position_t       value; 
@@ -140,100 +153,110 @@ typedef struct
         { 
             eOmeas_current_t       value; 
         } current;
-    }to;
+    }to;                                        /**< the uinion containing the value field and optional param */
 } eOmc_setpoint_t;              EO_VERIFYsizeof(eOmc_setpoint_t, 12);
 
 
 /** @typedef    typedef struct eOmc_joint_config_t
     @brief      eOmc_joint_config_t contains the values required to configure a joint
-    @warning    This struct must be of fixed and size and multiple of 4.
+    @warning    This struct must be of fixed size and multiple of 4.
  **/
-typedef struct                  // size is: 12+12+12+12+4+4+2+2+1+3 = 64
+typedef struct                  // size is: 16+16+16+4+4+2+1+5+0 = 64
 {
-    eOmc_PID_t                  pidpos;
-    eOmc_PID_t                  pidvel;
-    eOmc_PID_t                  pidtor;
-    eOmc_PID_t                  pidcur;
-    eOmeas_position_t           minpositionofjoint;     // of joint
-    eOmeas_position_t           maxpositionofjoint;     // of joint
-    uint16_t                    velocityshiftfactor;    // of joint !!!!!!!!
-    uint16_t                    velocitysetpointtimeout;        // max time between two velocity setpoints before control switches to position mode
-    eOenum08_t                  controlmode;            // use a eOmc_controlmode_t value. 
-    uint8_t                     filler03[3]; // oppure filler00 se tolgo controlmode
+    eOmc_PID_t                  pidposition;                /**< the pid for position control */
+    eOmc_PID_t                  pidvelocity;                /**< the pid for velocity control */
+    eOmc_PID_t                  pidtorque;                  /**< the pid for torque control */
+    eOmeas_position_t           minpositionofjoint;         /**< the minimum position of the joint */
+    eOmeas_position_t           maxpositionofjoint;         /**< the maximum position of the joint */
+    eOmeas_time_t               velocitysetpointtimeout;    /**< max time between two setpoints in eomc_controlmode_velocity before going back to eomc_controlmode_position */
+    uint8_t                     velocityshiftfactor;        /**< rigth shift to be applied to the velocity values of mc4 boards.. it could be removed and ... generato dalla ems e solo per la mc4 */
+    uint8_t                     filler05[5];
 } eOmc_joint_config_t;          EO_VERIFYsizeof(eOmc_joint_config_t, 64);
+#warning --> in eOmc_joint_config_t::filler05 we could insert a configuration for teh content of eOmc_joint_status_t::filler02 
 
-
-typedef struct                  // size is: 2+2+0 = 4
+/** @typedef    typedef struct eOmc_motor_config_t
+    @brief      eOmc_motor_config_t contains the values required to configure a motor
+    @warning    This struct must be of fixed size and multiple of 4.
+ **/
+typedef struct                  // size is: 16+4+2+2+0 = 24
 {
-    eOmeas_current_t            maxcurrentofmotor;      // of motor
-    eOmeas_velocity_t           maxvelocityofmotor;     // of motor
-} eOmc_motor_config_t;          EO_VERIFYsizeof(eOmc_motor_config_t, 4);
+    eOmc_PID_t                  pidcurrent;                 /**< the pid for current control */
+    eOmeas_velocity_t           maxvelocityofmotor;         /**< the maximum velocity in the motor */
+    eOmeas_current_t            maxcurrentofmotor;          /**< the maximum current in the motor */
+    uint8_t                     filler02[2];
+} eOmc_motor_config_t;          EO_VERIFYsizeof(eOmc_motor_config_t, 24);
 
 
 /** @typedef    typedef struct eOmc_joint_status_t
     @brief      eOmc_joint_status_t contains the status of the joint
-    @warning    This struct must be of fixed and size and multiple of 4.
+    @warning    This struct must be of fixed size and multiple of 4.
  **/
 typedef struct                  // size is: 4+4+4+2+2+0 = 16
 {
-    eOmeas_position_t           position;           
-    eOmeas_velocity_t           velocity;           
-    eOmeas_acceleration_t       acceleration;       
-    eOmeas_torque_t             torque;  
-    uint8_t                     filler02[2];    
+    eOmeas_position_t           position;                   /**< the position of the joint */           
+    eOmeas_velocity_t           velocity;                   /**< the velocity of the joint */          
+    eOmeas_acceleration_t       acceleration;               /**< the acceleration of the joint */       
+    eOmeas_torque_t             torque;                     /**< the torque of the joint */
+    uint8_t                     filler02[2];                // can change into eOutilsChameleon16_t  
 } eOmc_joint_status_t;          EO_VERIFYsizeof(eOmc_joint_status_t, 16);
 
 
 /** @typedef    typedef struct eOmc_pid_status_t
     @brief      eOmc_pid_status_t contains the status of a generic pid
-    @warning    This struct must be of fixed and size and multiple of 4.
+    @warning    This struct must be of fixed size and multiple of 4.
  **/
 typedef struct                  // size is: 4+2+2+0 = 8
 {
-    int32_t                     reference;       // in che unita' di misura? eOmeas_position_t ???
-    int16_t                     output;          // perche' reference and output non sono nella stessa unita' di misura?
-    int16_t                     error;           // QUALE PID? quello di position piu' esterno?        
-} eOmc_pid_status_t;            EO_VERIFYsizeof(eOmc_pid_status_t, 8);
+    int32_t                     reference;       /**< the reference of the pid. as it can be position, velocity, torque, current ... we use the biggest size */
+    int16_t                     output;          /**< the output of the pid */ 
+    int16_t                     error;           /**< the error of the pid */        
+} eOmc_PID15_status_t;          EO_VERIFYsizeof(eOmc_PID15_status_t, 8);
+
+typedef eOmc_PID15_status_t eOmc_PID_status; 
 
 
 /** @typedef    typedef struct eOmc_motor_status_t
     @brief      eOmc_motor_status_t contains the status of a motor
-    @warning    This struct must be of fixed and size and multiple of 4.
+    @warning    This struct must be of fixed size and multiple of 4.
  **/
-typedef struct                  // size is: 4+4+2+2+0 = 12
+typedef struct                  // size is: 4+4+2+6+0 = 16
 {
-    eOmeas_position_t           position;          
-    eOmeas_velocity_t           velocity; 
-    eOmeas_current_t            current; 
-    uint8_t                     filler02[2];
-} eOmc_motor_status_t;          EO_VERIFYsizeof(eOmc_motor_status_t, 12);
+    eOmeas_position_t           position;       /**< the position of the motor */         
+    eOmeas_velocity_t           velocity;       /**< the velocity of the motor */ 
+    eOmeas_current_t            current;        /**< the current of the motor */  
+    uint8_t                     filler06[6];    // we could transform it in a chameleon48_t configurable with eOmc_motor_config_t::filler02 
+} eOmc_motor_status_t;          EO_VERIFYsizeof(eOmc_motor_status_t, 16);
+#warning --> we could transform eOmc_motor_status_t::filler06 in a chameleon48_t configurable with eOmc_motor_config_t::filler02
+
+///** @typedef    typedef struct eOmc_joint_status_t
+//    @brief      eOmc_joint_status_t contains the status of a joint with a position control loop
+//    @warning    This struct must be of fixed size and multiple of 4.
+// **/
+//typedef struct                  // size is: 16+12+4+8+0 = 40
+//{
+//    eOmc_joint_status_t         joint;
+//    eOmc_motor_status_t         motor;
+//    uint8_t                     filler04[4];
+//    eOmc_pid_status_t           pidpos;
+//} eOmc_1motorjoint_status_t;    EO_VERIFYsizeof(eOmc_1motorjoint_status_t, 40);
 
 
-/** @typedef    typedef struct eOmc_joint_status_t
-    @brief      eOmc_joint_status_t contains the status of a joint with a position control loop
-    @warning    This struct must be of fixed and size and multiple of 4.
- **/
-typedef struct                  // size is: 16+12+4+8+0 = 40
-{
-    eOmc_joint_status_t         joint;
-    eOmc_motor_status_t         motor;
-    uint8_t                     filler04[4];
-    eOmc_pid_status_t           pidpos;
-} eOmc_1motorjoint_status_t;    EO_VERIFYsizeof(eOmc_1motorjoint_status_t, 40);
-
-
-/** @typedef    typedef struct eOmc_joint_status_t
-    @brief      eOmc_joint_status_t contains the status of a joint with a position control loop with the addition of a debug 
-    @warning    This struct must be of fixed and size and multiple of 4.
- **/
-typedef struct                  // size is: 40+8+0 = 48
-{
-    eOmc_1motorjoint_status_t   onemotorjointstatus;
-    eOutil_debug_values_t       debugvalues;
-} eOmc_1motorjoint_status_debug_t;    EO_VERIFYsizeof(eOmc_1motorjoint_status_debug_t, 48);
+///** @typedef    typedef struct eOmc_joint_status_t
+//    @brief      eOmc_joint_status_t contains the status of a joint with a position control loop with the addition of a debug 
+//    @warning    This struct must be of fixed and size and multiple of 4.
+// **/
+//typedef struct                  // size is: 40+8+0 = 48
+//{
+//    eOmc_1motorjoint_status_t   onemotorjointstatus;
+//    eOutil_debug_values_t       debugvalues;
+//} eOmc_1motorjoint_status_debug_t;    EO_VERIFYsizeof(eOmc_1motorjoint_status_debug_t, 48);
 
 //#warning --> calibration types and modes are still to be defined
 
+
+/** @typedef    typedef enum eOmc_calibration_types_t
+    @brief      eOmc_calibration_types_t contains the possible types of calibration.
+ **/
 typedef enum
 {
     eomc_calibration_type0_hard_stops               = 0,
@@ -241,143 +264,195 @@ typedef enum
     eomc_calibration_type2_hard_stops_diff          = 2,
     eomc_calibration_type3_abs_sens_digital         = 3,
     eomc_calibration_type4_abs_and_incremental      = 4
-} eOmc_calibration_types_t;
+} eOmc_calibration_type_t;
 
 
+/** @typedef    typedef struct eOmc_calibrator_params_type0_hard_stops_t
+    @brief      eOmc_calibrator_params_type0_hard_stops_t contains the params in case of eomc_calibration_type0_hard_stops
+ **/
 typedef struct  
 {
     uint16_t                    pwmlimit;
     uint16_t                    velocity;
-} eOmc_calibration_params_type0_hard_stops_t;
+} eOmc_calibrator_params_type0_hard_stops_t;
 
+
+/** @typedef    typedef struct eOmc_calibrator_params_type1_abs_sens_analog_t
+    @brief      eOmc_calibrator_params_type1_abs_sens_analog_t contains the params in case of eomc_calibration_type1_abs_sens_analog_t
+ **/
 typedef struct  
 {
     uint16_t                    position;
     uint16_t                    velocity;
-} eOmc_calibration_params_type1_abs_sens_analog_t;
+} eOmc_calibrator_params_type1_abs_sens_analog_t;
 
+
+/** @typedef    typedef struct eOmc_calibrator_params_type2_hard_stops_diff_t
+    @brief      eOmc_calibrator_params_type2_hard_stops_diff_t contains the params in case of eomc_calibration_type2_hard_stops_diff_t
+ **/
 typedef struct  
 {
     uint16_t                    pwmlimit;
     uint16_t                    velocity;
-} eOmc_calibration_params_type2_hard_stops_diff_t;
+} eOmc_calibrator_params_type2_hard_stops_diff_t;
 
+
+/** @typedef    typedef struct eOmc_calibrator_params_type3_abs_sens_digital_t
+    @brief      eOmc_calibrator_params_type3_abs_sens_digital_t contains the params in case of eomc_calibration_type3_abs_sens_digital_t
+ **/
 typedef struct  
 {
     uint16_t                    position;
     uint16_t                    velocity;
     uint16_t                    offset;
-} eOmc_calibration_params_type3_abs_sens_digital_t;
+} eOmc_calibrator_params_type3_abs_sens_digital_t;
 
+
+/** @typedef    typedef struct eOmc_calibrator_params_type4_abs_and_incremental_t
+    @brief      eOmc_calibrator_params_type4_abs_and_incremental_t contains the params in case of eomc_calibration_type4_abs_and_incremental_t
+ **/
 typedef struct  
 {
     uint16_t                    position;
     uint16_t                    velocity;
     uint16_t                    maxencoder;
-} eOmc_calibration_params_type4_abs_and_incremental_t;
+} eOmc_calibrator_params_type4_abs_and_incremental_t;
 
 
-typedef struct
+
+/** @typedef    typedef struct eOmc_calibrator_t
+    @brief      eOmc_calibrator_t specifies a calibrator with type and parameters
+ **/
+typedef struct                  // size is 1+1+2+2+2+0 = 8
 {
-    uint8_t                     filler;
-    eOenum08_t                  type;
-    union
+    uint8_t                     filler1[1];                         /**< in front to match the memory mapping of the can message */
+    eOenum08_t                  type;                               /**< use eOmc_calibration_type_t */
+    union                           
     {
         uint16_t                                            any[3];
-        eOmc_calibration_params_type0_hard_stops_t          type0;
-        eOmc_calibration_params_type1_abs_sens_analog_t     type1;
-        eOmc_calibration_params_type2_hard_stops_diff_t     type2;
-        eOmc_calibration_params_type3_abs_sens_digital_t    type3;
-        eOmc_calibration_params_type4_abs_and_incremental_t type4;
-    } params;   
-} eOmc_calibration_t;           EO_VERIFYsizeof(eOmc_calibration_t, 8);
+        eOmc_calibrator_params_type0_hard_stops_t           type0;
+        eOmc_calibrator_params_type1_abs_sens_analog_t      type1;
+        eOmc_calibrator_params_type2_hard_stops_diff_t      type2;
+        eOmc_calibrator_params_type3_abs_sens_digital_t     type3;
+        eOmc_calibrator_params_type4_abs_and_incremental_t  type4;
+    } params;                                                       /**< the params of the calibrator */   
+} eOmc_calibrator_t;           EO_VERIFYsizeof(eOmc_calibrator_t, 8);
 
 
-
-typedef struct  
+#warning --> ricordarsi di chiedere dove metterlo e come usarlo
+/** @typedef    typedef struct eOmc_impedance_t
+    @brief      eOmc_impedance_t specifies a the parameters used for impedance ...
+ **/
+typedef struct                  // size is 4+4+2+6+0 = 16
 {
-    eOmeas_stiffness_t                     stiffness;      /**< the Ks parameter */
-    eOmeas_damping_t                     dumping;        /**< the Kd parameter */
-    eOmeas_torque_t                     offset;         /**< the Ko parameter */
-} eOmc_impedance_t;             EO_VERIFYsizeof(eOmc_impedance_t, 18);
+    eOmeas_stiffness_t          stiffness;                          /**< the Ks parameter */
+    eOmeas_damping_t            dumping;                            /**< the Kd parameter */
+    eOmeas_torque_t             offset;                             /**< the Ko parameter */
+    uint8_t                     filler06[6];                        
+} eOmc_impedance_t;             EO_VERIFYsizeof(eOmc_impedance_t, 16);
 
 
 
 // manca la calibrazione ed altro ...
 
-// usare due variabili booleane per CAN_MOTION_DONE
+#warning -> usare due variabili booleane per CAN_MOTION_DONE
 //eObool_t    signalwhendesiredpositionisreached;     // beh, oppure output. magari si mette anche il numero di milli di validita'. 
 //eObool_t    desiredpositionisreached;               // input. magari si segnala anche la position.
 
-typedef struct                  // size is 68+8+36+12+1+1+1+1 = 128
+
+//typedef struct                  // size is 68+8+36+12+1+1+1+1 = 128
+//{
+//    eOmc_joint_config_t         config;                     /**< the configuration of the joint */
+//    eOmc_calibration_t          calibration;                // ok, da definire meglio ....
+//    eOmc_joint_status_debug_t   jointstatusdebug;           /**< the configuration of the joint. If a normal joint status is enough, use jointstatusdebug.jointstatus */
+//    eOmc_setpoint_t             setpoint;                   /**< the setpoint of the joint */
+//    eOenum08_t                  controlmode;                /**< use values from eOmc_controlmode_t */
+//    eOenum08_t                  controlstatus;              /**< use values from eOmc_controlstatus_t */
+//    eObool_t                    motorenabled;               /**< if eobool_true the motor is enabled via PWM or else */
+//    
+//    uint8_t                     filler01[1];
+//} eOmc_old_joint_t;                 EO_VERIFYsizeof(eOmc_joint_t, 128);
+
+
+
+//typedef struct                  // size is 68+8+36+12+1+1+1+1 = 128
+//{
+//    eOmc_joint_config_t         jconfig;                     /**< the configuration of the joint */
+//    eOmc_motor_config_t         mconfig;                     /**< the configuration of the joint */
+//    eOmc_calibration_t          calibration;                // ok, da definire meglio ....
+//    eOenum08_t                  controlmode;            // use a eOmc_controlmode_t value.
+//    eOmc_1motorjoint_status_debug_t   onemotorjointstatusdebug;           /**< the configuration of the joint. If a normal joint status is enough, use jointstatusdebug.jointstatus */
+//    eOmc_setpoint_t             setpoint;                   /**< the setpoint of the joint */
+//    eOenum08_t                  controlmode;                /**< use values from eOmc_controlmode_t */
+//    eOenum08_t                  controlstatus;              /**< use values from eOmc_controlstatus_t */
+//    eObool_t                    motorenabled;               /**< if eobool_true the motor is enabled via PWM or else */   
+//    uint8_t                     filler01[1];
+//} eOmc_united_joint_t;          EO_VERIFYsizeof(eOmc_joint_t, 128);
+
+
+
+typedef struct                  // size is 64+16+8+12+1+3+0 = 104
 {
-    eOmc_joint_config_t         config;                     /**< the configuration of the joint */
-    eOmc_calibration_t          calibration;                // ok, da definire meglio ....
-    eOmc_joint_status_debug_t   jointstatusdebug;           /**< the configuration of the joint. If a normal joint status is enough, use jointstatusdebug.jointstatus */
+    eOmc_joint_config_t         jconfig;                    /**< the configuration of the joint */
+    eOmc_joint_status_t         jointstatus;                /**< the status of the joint */
+    eOmc_calibrator_t           calibrator;                 /**< the calibrator to use */
     eOmc_setpoint_t             setpoint;                   /**< the setpoint of the joint */
-    eOenum08_t                  controlmode;                /**< use values from eOmc_controlmode_t */
-    eOenum08_t                  controlstatus;              /**< use values from eOmc_controlstatus_t */
-    eObool_t                    motorenabled;               /**< if eobool_true the motor is enabled via PWM or else */
-    
-    uint8_t                     filler01[1];
-} eOmc_old_joint_t;                 EO_VERIFYsizeof(eOmc_joint_t, 128);
+    eOenum08_t                  controlmode;                /**< use values from eOmc_controlmode_t, but maybe its enum type will change*/
+    uint8_t                     filler03[3];                // space for some other variables ...
+} eOmc_joint_t;                 EO_VERIFYsizeof(eOmc_joint_t, 104);
+
+
+typedef struct                  // size is 24+16+0 = 40
+{
+    eOmc_motor_config_t         mconfig;                    /**< the configuration of the motor */
+    eOmc_motor_status_t         motorstatus;                /**< the status of the motor */   
+} eOmc_motor_t;                 EO_VERIFYsizeof(eOmc_joint_t, 40); 
  
 
-
-typedef struct                  // size is 68+8+36+12+1+1+1+1 = 128
-{
-    eOmc_joint_config_t         jconfig;                     /**< the configuration of the joint */
-    eOmc_motor_config_t         mconfig;                     /**< the configuration of the joint */
-    eOmc_calibration_t          calibration;                // ok, da definire meglio ....
-    eOmc_1motorjoint_status_debug_t   onemotorjointstatusdebug;           /**< the configuration of the joint. If a normal joint status is enough, use jointstatusdebug.jointstatus */
-    eOmc_setpoint_t             setpoint;                   /**< the setpoint of the joint */
-    eOenum08_t                  controlmode;                /**< use values from eOmc_controlmode_t */
-    eOenum08_t                  controlstatus;              /**< use values from eOmc_controlstatus_t */
-    eObool_t                    motorenabled;               /**< if eobool_true the motor is enabled via PWM or else */
-    
-    uint8_t                     filler01[1];
-} eOmc_united_joint_t;          EO_VERIFYsizeof(eOmc_joint_t, 128);
-
-
-
-typedef struct                  // size is 68+8+36+12+1+1+1+1 = 128
-{
-    eOmc_joint_config_t         jconfig;                     /**< the configuration of the joint */
-    eOmc_calibration_t          calibration;                // ok, da definire meglio ....
-    eOmc_joint_status_t         jointstatus;;           /**< the configuration of the joint. If a normal joint status is enough, use jointstatusdebug.jointstatus */
-    eOmc_setpoint_t             setpoint;                   /**< the setpoint of the joint */
-    eOenum08_t                  controlmode;                /**< use values from eOmc_controlmode_t */
-    eOenum08_t                  controlstatus;              /**< use values from eOmc_controlstatus_t */
-   
-    uint8_t                     filler01[1];
-} eOmc_joint_t;             EO_VERIFYsizeof(eOmc_joint_t, 128);
-
-
-typedef struct                  // size is 68+8+36+12+1+1+1+1 = 128
-{
-    eOmc_motor_config_t         mconfig;                     /**< the configuration of the joint */
-    eOmc_motor_status_t         motorstatus;   
-    eObool_t                    motorenabled;               /**< if eobool_true the motor is enabled via PWM or else */    
-    uint8_t                     filler01[1];
-} eOmc_motor_t;             EO_VERIFYsizeof(eOmc_joint_t, 128); 
  
- 
-typedef struct
-{
-    eOmc_joint_t                joint;
-    eOmc_motor_t                motor;
-} eOmc_superjoint1motor_t;
-// #error separare il joint dal motor. il joint possiede la config
+// some considerations by acemor.
+// each joint-motor needs 144 bytes.  
+// the left leg uses ... 144*6 joint-motor = 864 bytes
+// the left arm uses ... 7 joint-motor + 9 = 16 --> 2304 bytes. .... however: if we split we had: 4*144=576 on the first and 12*144=1728 on the second
+// we need to signal eOmc_joint_status_t and eOmc_motor_status_t for each jm. thery are 32 bytes. thus:
+// the ems1 on leg sends 32*4 = 128 bytes
+// the ems2 on leg sends 32*2 = 64 bytes.
+// the ems1 on arm sends 32*4 = 128 bytes
+// the ems2 on arm sends 32*12 = 384 bytes 
 
-typedef struct
+
+typedef struct                  // size is 104*6+40*6+0 = 864
 {
-    eOmc_superjoint1motor_t     jm01_hip_flexext;
-    eOmc_superjoint1motor_t     jm02_hip_abdadd;
-    eOmc_superjoint1motor_t     jm03_tight_rot;
-    eOmc_superjoint1motor_t     jm04_knee;
-    eOmc_superjoint1motor_t     jm05_ankle_flexext;
-    eOmc_superjoint1motor_t     jm06_ankle_abdadd;
-} eOmc_EP_leftleg_t;
+    eOmc_joint_t                j01_hip_flexext;
+    eOmc_joint_t                j02_hip_abdadd;
+    eOmc_joint_t                j03_tight_rot;
+    eOmc_joint_t                j04_knee;
+    eOmc_joint_t                j05_ankle_flexext;
+    eOmc_joint_t                j06_ankle_abdadd;  
+ 
+    eOmc_motor_t                m01_hip_flexext;
+    eOmc_motor_t                m02_hip_abdadd;
+    eOmc_motor_t                m03_tight_rot;
+    eOmc_motor_t                m04_knee;
+    eOmc_motor_t                m05_ankle_flexext;
+    eOmc_motor_t                m06_ankle_abdadd;  
+} eOmc_EP_leftleg_names_t;      EO_VERIFYsizeof(eOmc_EP_leftleg_names_t, 864); 
+
+#define EOMC_EP_index_leftleg_j01_hip_flexext           1
+#define EOMC_EP_index_leftleg_j02_hip_abdadd            2
+#define EOMC_EP_index_leftleg_j03_tight_rot             3
+//etc..
+
+#define EOMC_EP_index_leftleg_m01_hip_flexext           1
+#define EOMC_EP_index_leftleg_m02_hip_abdadd            2
+#define EOMC_EP_index_leftleg_m03_tight_rot             3
+// etc.
+
+typedef struct                  // size is 104*6+40*6+0 = 864
+{
+    eOmc_joint_t                joints[6]; 
+    eOmc_motor_t                motors[6];
+} eOmc_EP_leftleg_indices_t;    EO_VERIFYsizeof(eOmc_EP_leftleg_indices_t, 864);
 
 
 
