@@ -56,7 +56,7 @@
 //		data[2] right SHIFT_THREE  factor for the sensor readings (3 macro areas)     
 //		data[3] right SHIFT_ALL  factor for the sensor readings (1 macro area) 
 //		data[4] NO_LOAD value (it is set to 235 for default)
-//		data[5] NU
+//		data[5] ACC_ON ACC_OFF (1 or 0)
 //		data[6] NU
 //		data[7] NU
  //  MPLAB 8.63
@@ -80,9 +80,6 @@
 #include<adc10.h>
 
 
-#warning "if you want to execute the A3A (accelerometer)reading uncomment this line"
-
-//#define ACCELEROMETER
 //#define DEBUG
 
 unsigned int AN2 = 0; //Accelerometer X axes
@@ -94,7 +91,7 @@ _FOSC(CSW_FSCM_OFF & EC_PLL8);
   // External clock with PLL x8 (10MHz*8->Fcycle=80/4=20MIPS)
 _FWDT(WDT_OFF);      // WD disabled
 //
-_FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON );  // BOR 2.7V POR 64msec
+_FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON & BORV27);  // BOR 2.7V POR 64msec
 _FGS(CODE_PROT_OFF); // Code protection disabled
 
 
@@ -107,7 +104,7 @@ static void ServiceAD7147Isr(unsigned char Channel);
 void ServiceAD7147Isr_three(unsigned char Channel);
 void ServiceAD7147Isr_all(unsigned char Channel);
 void Wait(unsigned int value);
-void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN);
+static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN);
 void FillCanMessages8bit_three(unsigned char Channel,unsigned char triangleN);
 void FillCanMessages8bit_all(unsigned char Channel,unsigned char triangleN);
 void FillCanMessages16bit(unsigned char Channel,unsigned char triangleN);
@@ -199,12 +196,16 @@ unsigned int SHIFT=2; //shift of the CDC value for removing the noise
 unsigned int SHIFT_THREE=3;// shift of the CDC value for removing the noise
 unsigned int SHIFT_ALL=4; //shift of the CDC value for removing the noise
 unsigned int NOLOAD=235;
+unsigned int ACCELEROMETER=0;
 unsigned int CONFIG_TYPE=CONFIG_SINGLE;
 unsigned int ERROR_COUNTER=0; //it counts the errors in reading the triangles.
 unsigned int ConValue[2]={0x2200, 0x2200}; //offset of the CDC reading 
 volatile unsigned int PMsgID; //pressure measurement ID 
-unsigned char status[]={0,0,0,0,0,0,0,0};
-   
+unsigned char acc[]={0,0,0,0,0,0,0,0}; //value of the three accelerometers
+    unsigned int stagecomplete0[1][1];
+    unsigned int stagecomplete1[1][1];
+    unsigned int stagecomplete2[1][1];
+    unsigned int stagecomplete3[1][1];
 
 
 //
@@ -234,22 +235,17 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void)
 }
 void __attribute__((interrupt, no_auto_psv)) _T2Interrupt(void)
 {
-    flag2=1;
-    	    status[1]=((AN2 &0xFF00) >>0x8); // axis X
-            status[0]=(AN2 & 0xFF);
-            status[3]=((AN3 &0xFF00) >>0x8); // axis Y
-            status[2]=(AN3 & 0xFF);
-            status[5]=((AN4 &0xFF00) >>0x8); // axis Z
-            status[4]=(AN4 & 0xFF);
-            flag2=0;
-       //     PMsgID=0x500;
-       //     PMsgID |= (BoardConfig.EE_CAN_BoardAddress<<4);
-            ;
+	    acc[1]=((AN2 &0xFF00) >>0x8); // axis X
+        acc[0]=(AN2 & 0xFF);
+        acc[3]=((AN3 &0xFF00) >>0x8); // axis Y
+        acc[2]=(AN3 & 0xFF);
+        acc[5]=((AN4 &0xFF00) >>0x8); // axis Z
+        acc[4]=(AN4 & 0xFF);
         while (!CAN1IsTXReady(1));    
         CAN1SendMessage( (CAN_TX_SID(0x550)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
-                        (CAN_TX_EID(0)) & CAN_NOR_TX_REQ, 
-                        status, 6,1);
-    ADCON1bits.SAMP = 1;        
+                        (CAN_TX_EID(0)) & CAN_NOR_TX_REQ, acc, 6,1);
+    //executing the sampling of the 
+        ADCON1bits.SAMP = 1;        
     _T2IF = 0;
 
 }
@@ -281,10 +277,7 @@ int main(void)
     unsigned int counter;
     unsigned int led_counter;
     unsigned int result;
-    unsigned int mean;
-
-
-    
+    unsigned int mean; 
    	//
     // EEPROM Data Recovery
     // 
@@ -296,23 +289,22 @@ int main(void)
     //------------------------------------------------------------------------
     T1_Init(TIMER_VALUE);
    
-#ifdef ACCELEROMETER
+if (ACCELEROMETER)
+{
     T2_Init(TIMER_VALUE2);
     ADC_Init();             //Initialize the A/D converter
-  
-#endif
+}  
     CAN_Init();
     I2C_Init(CH0); 
-  //  I2C_Init(CH1); 
     LED_Init();
-		
-    
     //Read Silicon versions to check communication, It should read 0xE622
+
     for (i=0;i<4;i++)
     {
         ReadFromAD7147ViaI2C(CH0,AD7147_ADD[i],DEVID, 1, AD7147Registers[0],AD7147Registers[4],AD7147Registers[8],AD7147Registers[12], DEVID);  
-    }   
-    //............................Configure AD7147
+    } 
+    
+       //............................Configure AD7147
   
   switch (CONFIG_TYPE)
 	{
@@ -382,16 +374,9 @@ int main(void)
 //
 //
 		led_counter=0;
+	led0=0;
     for (;;)
     {
-
-#ifdef ACCELEROMETER
-        if (flag2==1)
-        {
-
-        }
-#endif
-
         if (flag==1)
         {
         	flag=0;
@@ -583,16 +568,17 @@ int main(void)
 static void ServiceAD7147Isr(unsigned char Channel)
 {
     unsigned int i=0;
-    unsigned int stagecomplete0[1][1];
-    unsigned int stagecomplete1[1][1];
-    unsigned int stagecomplete2[1][1];
-    unsigned int stagecomplete3[1][1];
    unsigned int ConfigBuffer[0];
    unsigned int nets=4;
     
     		//Calibration configuration
 	ConfigBuffer[0]=0x8000;//0x8000;//0x220;
-			
+/*		for (i=0;i<nets;i++)
+	    {
+		   ReadFromAD7147ViaI2C(CH0,AD7147_ADD[i],STAGE_COMPLETE_LIMIT_INT, 1, stagecomplete0[0],stagecomplete1[0],stagecomplete2[0],stagecomplete3[0], 0);		
+		 //   WriteToAD7147ViaI2C(Channel,AD7147_ADD[i],AMB_COMP_CTRL0,1, ConfigBuffer, AMB_COMP_CTRL0);
+	    }
+*/	 	
 	    for (i=0;i<nets;i++)
 	    {		
 	    // Added 0x0B because of register remapping
@@ -603,13 +589,7 @@ static void ServiceAD7147Isr(unsigned char Channel)
 	    // Added 0x0B because of register remapping
 	       ReadFromAD7147ViaI2C(CH0,AD7147_ADD[i],(ADCRESULT_S2+0x0B), 10, AD7147Registers[i],AD7147Registers[i+4],AD7147Registers[i+8],AD7147Registers[i+12], ADCRESULT_S2);
 	    }
-   
-	 	for (i=0;i<nets;i++)
-	    {
-		   ReadFromAD7147ViaI2C(CH0,AD7147_ADD[i],STAGE_COMPLETE_LIMIT_INT, 1, stagecomplete0[0],stagecomplete1[0],stagecomplete2[0],stagecomplete3[0], 0);		
-		 //   WriteToAD7147ViaI2C(Channel,AD7147_ADD[i],AMB_COMP_CTRL0,1, ConfigBuffer, AMB_COMP_CTRL0);
-	    }
-	  
+   		
 	    for (i=0;i<nets;i++)
 	    {
 		 //  ReadFromAD7147ViaI2C(CH0,AD7147_ADD[i],STAGE_COMPLETE_LIMIT_INT, 1, stagecomplete0[0],stagecomplete1[0],stagecomplete2[0],stagecomplete3[0], 0);		
@@ -738,7 +718,8 @@ void TrianglesInit_all(unsigned char Channel)
 	p += (_FLASH_ROW * 2);	
 	
 }
-void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
+
+static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
 {
     unsigned char data[8];
     unsigned int i,j,error;
@@ -797,15 +778,15 @@ void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
 			{
 			    data[i]    = (unsigned char)   (txdata[i+6] & 0xFF); //the last 6 bits	
 		 	}
-//		 	#warning "debug"
+	//	 	#warning "debug"
 		 	
-//		 	data[6]=0;
-//		 	data[7]= (unsigned char) (ERROR_COUNTER &0xFF);
+	//	 	data[6]=(unsigned char) (ERROR_COUNTER &0xFF);//stagecomplete0[0][0];
+		 //	data[7]=stagecomplete3[0][0];
+		 //	data[7]= (unsigned char) (ERROR_COUNTER &0xFF);
 		
 		    CAN1_send(PMsgID,1,6,data);
 		}
 }
-
 void FillCanMessages8bit_all(unsigned char Channel,unsigned char triangleN)
 {
     unsigned char data[8];

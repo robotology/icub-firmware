@@ -3,6 +3,8 @@
 #include "options.h"
 #include "eeprom.h"
 #include "timer.h"
+#include "ADC.h"
+#include "timers.h"
 
 /// CAN TX BUFFER 
 static int canTxBufferIndex;
@@ -13,7 +15,7 @@ static canmsg_t canTxBuffer[CAN_TX_SOFTWARE_BUFFER_SIZE];
 extern void main();
 
 extern struct s_eeprom BoardConfig; 
-
+extern unsigned int TIMER_VALUE2;
 
 
 extern unsigned int _board_ID;
@@ -27,6 +29,7 @@ extern unsigned int SHIFT;
 extern unsigned int SHIFT_THREE;
 extern unsigned int SHIFT_ALL;
 extern unsigned int NOLOAD;
+extern unsigned int ACCELEROMETER;
 extern char _additional_info[32];
 extern unsigned int ConValue[2];
 // can RX messages buffer
@@ -283,7 +286,7 @@ int CAN1_handleRx (unsigned int board_id)
        if (((((CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x700) == 0x700) && (((CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x00F) == _board_ID))) || ((CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x00F) == 0x00F)) )
         {
 	        DisableIntT1;
-                DisableIntT2;
+            DisableIntT2;
             IdTx = (CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x0700);         
             IdTx |=  ((_board_ID) << 4);
             IdTx |= ((CANRxBuffer[canRxBufferIndex-1].CAN_messID >> 4) & 0x000F);     
@@ -404,17 +407,17 @@ int CAN1_handleRx (unsigned int board_id)
 						{
 							if ((CANRxBuffer[canRxBufferIndex-1].CAN_data[2]&0xf)==0x1)
 							{	
-								PW_CONTROL= 0xC0B0; // for 256 decim
+								PW_CONTROL= 0x00B0; // for 256 decim
 								TIMER_VALUE=TIMER_SINGLE_256dec ; // for 256 decim
 							}
 							if ((CANRxBuffer[canRxBufferIndex-1].CAN_data[2]&0xf)==0x2)
 							{
-								PW_CONTROL= 0xC1B0; // for 128 decim
+								PW_CONTROL= 0x01B0; // for 128 decim
 								TIMER_VALUE=TIMER_SINGLE_128dec ; // for 128 decim
 							}
 							if ((CANRxBuffer[canRxBufferIndex-1].CAN_data[2]&0xf)==0x3)
 							{
-								PW_CONTROL= 0xC2B0; // for 64 decim
+								PW_CONTROL= 0x02B0; // for 64 decim
 								TIMER_VALUE=TIMER_SINGLE_64dec ; // for 64 decim
 							}
 						}	
@@ -472,7 +475,7 @@ int CAN1_handleRx (unsigned int board_id)
 					board_MODE=CALIB;
 					EnableIntT1;
 
-                                        EnableIntT2;
+   					if (1==ACCELEROMETER) EnableIntT2;
 				}
 				break;
 				
@@ -483,7 +486,7 @@ int CAN1_handleRx (unsigned int board_id)
 					//data[2] right SHIFT_THREE  factor for the sensor readings (3 macro areas)     
 				    //data[3] right SHIFT_ALL  factor for the sensor readings (1 macro area) 
 					//data[4] NO_LOAD value (it is set to 235 for default)
-					//data[5] NU
+					//data[5] ACCELEROMETER
 					//data[6] NU
 					//data[7] NU
 					
@@ -491,9 +494,19 @@ int CAN1_handleRx (unsigned int board_id)
 					SHIFT_THREE =	CANRxBuffer[canRxBufferIndex-1].CAN_data[2]&0xF;             
 					SHIFT_ALL   =	CANRxBuffer[canRxBufferIndex-1].CAN_data[3]&0xF;     
 					NOLOAD		=	CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0xFF;  
+					ACCELEROMETER =	CANRxBuffer[canRxBufferIndex-1].CAN_data[5]&0x01;  
+					
+					DisableIntT2;
+					
+					if (ACCELEROMETER)
+					{
+						 EnableIntT2;
+						 T2_Init(TIMER_VALUE2);
+    				     ADC_Init();             //Initialize the A/D converter
+					}
 					board_MODE=CALIB;
 					EnableIntT1;
-                                        EnableIntT2;
+                                        
 				}
 				break;
 
