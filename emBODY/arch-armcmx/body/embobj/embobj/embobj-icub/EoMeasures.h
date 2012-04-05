@@ -99,8 +99,7 @@ typedef int16_t             eOmeas_torque_t;
 
 /** @typedef    typedef int16_t             eOmeas_current_t
     @brief      eOmeas_current_t contains the current values.
-    @todo       how are they scaled? what is the measurement unit?
-    #warning --> eOmeas_current_t is int16_t but its measuremnt unit is yet to be defined
+    the measurement unit is the icub milli Ampere imA = 25000 mA / 32K = 0.762939453125 mA
  **/
 typedef int16_t             eOmeas_current_t;
 
