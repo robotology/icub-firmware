@@ -174,6 +174,8 @@ typedef struct                  // size is: 16+16+16+4+4+2+1+5+0 = 64
 } eOmc_joint_config_t;          EO_VERIFYsizeof(eOmc_joint_config_t, 64);
 #warning --> in eOmc_joint_config_t::filler05 we could insert a configuration for teh content of eOmc_joint_status_t::filler02 
 
+#warning --> si potrebbe trasformare il eOmeas_time_t in micro-sec a 32 bit. 
+
 /** @typedef    typedef struct eOmc_motor_config_t
     @brief      eOmc_motor_config_t contains the values required to configure a motor
     @warning    This struct must be of fixed size and multiple of 4.
@@ -394,7 +396,7 @@ typedef struct                  // size is 4+4+2+6+0 = 16
 typedef struct                  // size is 64+16+8+12+1+3+0 = 104
 {
     eOmc_joint_config_t         jconfig;                    /**< the configuration of the joint */
-    eOmc_joint_status_t         jointstatus;                /**< the status of the joint */
+    eOmc_joint_status_t         jstatus;                    /**< the status of the joint */
     eOmc_calibrator_t           calibrator;                 /**< the calibrator to use */
     eOmc_setpoint_t             setpoint;                   /**< the setpoint of the joint */
     eOenum08_t                  controlmode;                /**< use values from eOmc_controlmode_t, but maybe its enum type will change*/
@@ -405,7 +407,7 @@ typedef struct                  // size is 64+16+8+12+1+3+0 = 104
 typedef struct                  // size is 24+16+0 = 40
 {
     eOmc_motor_config_t         mconfig;                    /**< the configuration of the motor */
-    eOmc_motor_status_t         motorstatus;                /**< the status of the motor */   
+    eOmc_motor_status_t         mstatus;                    /**< the status of the motor */   
 } eOmc_motor_t;                 EO_VERIFYsizeof(eOmc_joint_t, 40); 
  
 
