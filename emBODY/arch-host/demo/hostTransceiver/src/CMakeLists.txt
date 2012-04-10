@@ -14,13 +14,13 @@ PROJECT(${PROJECTNAME})
 set(BASE $ENV{ICUB_ROOT}/firmware/emBODY/)
 set(EXTRA_FOLDER  	${CMAKE_CURRENT_SOURCE_DIR}/)
 
-include(embObjLib.conf)
+include(../../embObjLib.conf)
 find_package(YARP)
 include_directories(${YARP_INCLUDE_DIRS})
 
 # Debug messages
 # message(INFO " BASE=${BASE}")
-message(INFO " lib_cmake - embObj_includes: ${embObj_includes}")
+# message(INFO " lib_cmake - embObj_includes: ${embObj_includes}")
   	
 # get all files needed, collected in different lists for better organization and handling
 
@@ -46,11 +46,6 @@ set(NVS_REMOTE_HEADER		${NVS_REMOTE_FOLDER}/eOcfg_EPs_rem_board.h
 							${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_base_usr_rem_anydev.h
 							${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_mngmnt_usr_rem_board.h
 							${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_jopint_usr_rem_board.h)
-
-# Mio tentativo di improvvisare una scheda EMS fake da usare come test per l'applicazione... rimandato a quando avrò fatto un po' di codice in più. 
-set(CFG_BOARD01_SOURCE 				${CFG_FOLDER}/eOcfg_EPs_FakeBoard01.c
-						${CFG_FOLDER}/eOcfg_nvsEP_base_FakeBoard01.c
-						${CFG_FOLDER}/eOcfg_nvsEP_mngmnt_FakeBoard01.c)
 
 # EmbObj-src
 set(CORE_FOLDER_SOURCE  			${CORE_FOLDER}/EOarray.c
