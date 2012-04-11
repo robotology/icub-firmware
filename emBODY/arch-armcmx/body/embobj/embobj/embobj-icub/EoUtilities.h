@@ -45,11 +45,19 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-
+#define EOUTIL_CHAMELEON_DESCRIPTOR_NONE    0xFF
 
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
+
+
+//typedef uint8_t eOutil_chameleon_id_t;      // invalid chameleon is 0xff
+typedef struct
+{
+    uint8_t     size        : 2;            /**< 0 for 1 byte, 1 for 2 bytes, 2 for 4 bytes, 3 for none. */
+    uint8_t     identifier  : 6;            /**< from 0 to 63 */
+} eOutil_chameleon_descriptor_t;            EO_VERIFYsizeof(eOutil_chameleon_descriptor_t, 1);  
 
 
 
@@ -63,7 +71,7 @@ typedef struct                  // size is: 1+1+2+4+0 = 8
     uint8_t                     debug08var01;
     uint16_t                    debug16var00;
     uint32_t                    debug32var00;     
-} eOutil_debug_values_t;        EO_VERIFYsizeof(eOutil_debug_values_t, 8);
+} eOutil_debug_values_t;        
 
 
 /** @typedef    typedef struct eOutil_2chameleons32_t
