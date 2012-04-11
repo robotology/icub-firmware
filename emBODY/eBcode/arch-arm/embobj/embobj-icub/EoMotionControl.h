@@ -67,8 +67,8 @@ typedef struct              // size is 2+2+2+2+2+2+1+3+0 bytes
     int16_t                 kd;                 /**< derivative gain */
     int16_t                 limitonintegral;    /**< limit of integral term */ 
     int16_t                 limitonoutput;      /**< limit of the output of the pid */
-    int8_t                  scale;              /**< scale factor for the gains (usato per shift a destra)*/
     int16_t                 offset;             /**< the k0 in the pid formula */
+    int8_t                  scale;              /**< scale factor for the gains (usato per shift a destra)*/
     uint8_t                 filler03[3];        /**< filler to make struct a multiple of 4 */
 } eOmc_PIDq15_t;            EO_VERIFYsizeof(eOmc_PIDq15_t, 16);
 
@@ -161,7 +161,7 @@ typedef struct              // size is 1+3+8+0 = 12
     @brief      eOmc_joint_config_t contains the values required to configure a joint
     @warning    This struct must be of fixed size and multiple of 4.
  **/
-typedef struct                  // size is: 16+16+16+4+4+2+1+5+0 = 64
+typedef struct                  // size is: 16+16+16+4+4+2+2+4+0 = 64
 {
     eOmc_PID_t                  pidposition;                /**< the pid for position control */
     eOmc_PID_t                  pidvelocity;                /**< the pid for velocity control */
@@ -169,10 +169,12 @@ typedef struct                  // size is: 16+16+16+4+4+2+1+5+0 = 64
     eOmeas_position_t           minpositionofjoint;         /**< the minimum position of the joint */
     eOmeas_position_t           maxpositionofjoint;         /**< the maximum position of the joint */
     eOmeas_time_t               velocitysetpointtimeout;    /**< max time between two setpoints in eomc_controlmode_velocity before going back to eomc_controlmode_position */
-    uint8_t                     velocityshiftfactor;        /**< rigth shift to be applied to the velocity values of mc4 boards.. it could be removed and ... generato dalla ems e solo per la mc4 */
-    uint8_t                     filler05[5];
+    // removed ... uint8_t                     velocityshiftfactor;        /**< rigth shift to be applied to the velocity values of mc4 boards.. it could be removed and ... generato dalla ems e solo per la mc4 */
+    //uint8_t                     filler05[5];              // instead of filler05 :
+    eOutil_chameleon_descriptor_t upto02descrforchameleon02[2];     /**< accomodates up to 2 descriptors for a chameleon of 2 bytes. */
+    uint8_t                     filler04[4];
 } eOmc_joint_config_t;          EO_VERIFYsizeof(eOmc_joint_config_t, 64);
-#warning --> in eOmc_joint_config_t::filler05 we could insert a configuration for teh content of eOmc_joint_status_t::filler02 
+
 
 #warning --> si potrebbe trasformare il eOmeas_time_t in micro-sec a 32 bit. 
 
@@ -185,7 +187,8 @@ typedef struct                  // size is: 16+4+2+2+0 = 24
     eOmc_PID_t                  pidcurrent;                 /**< the pid for current control */
     eOmeas_velocity_t           maxvelocityofmotor;         /**< the maximum velocity in the motor */
     eOmeas_current_t            maxcurrentofmotor;          /**< the maximum current in the motor */
-    uint8_t                     filler02[2];
+    //uint8_t                     filler02[2];
+    eOutil_chameleon_descriptor_t upto02descrforchameleon06[2]; /**< accomodates up to 2 descriptors for a chameleon of 6 bytes. */
 } eOmc_motor_config_t;          EO_VERIFYsizeof(eOmc_motor_config_t, 24);
 
 
@@ -199,7 +202,7 @@ typedef struct                  // size is: 4+4+4+2+2+0 = 16
     eOmeas_velocity_t           velocity;                   /**< the velocity of the joint */          
     eOmeas_acceleration_t       acceleration;               /**< the acceleration of the joint */       
     eOmeas_torque_t             torque;                     /**< the torque of the joint */
-    uint8_t                     filler02[2];                // can change into eOutilsChameleon16_t  
+    uint8_t                     chameleon02[2];             /**< these two bytes can be configured with eOmc_joint_config_t::upto02descrforchameleon02 to contain 0, 1, or 2 variables */  
 } eOmc_joint_status_t;          EO_VERIFYsizeof(eOmc_joint_status_t, 16);
 
 
@@ -209,9 +212,9 @@ typedef struct                  // size is: 4+4+4+2+2+0 = 16
  **/
 typedef struct                  // size is: 4+2+2+0 = 8
 {
-    int32_t                     reference;       /**< the reference of the pid. as it can be position, velocity, torque, current ... we use the biggest size */
-    int16_t                     output;          /**< the output of the pid */ 
-    int16_t                     error;           /**< the error of the pid */        
+    int32_t                     reference;              /**< the reference of the pid. as it can be position, velocity, torque, current ... we use the biggest size */
+    int16_t                     output;                 /**< the output of the pid */ 
+    int16_t                     error;                  /**< the error of the pid */        
 } eOmc_PID15_status_t;          EO_VERIFYsizeof(eOmc_PID15_status_t, 8);
 
 typedef eOmc_PID15_status_t eOmc_PID_status; 
@@ -223,12 +226,13 @@ typedef eOmc_PID15_status_t eOmc_PID_status;
  **/
 typedef struct                  // size is: 4+4+2+6+0 = 16
 {
-    eOmeas_position_t           position;       /**< the position of the motor */         
-    eOmeas_velocity_t           velocity;       /**< the velocity of the motor */ 
-    eOmeas_current_t            current;        /**< the current of the motor */  
-    uint8_t                     filler06[6];    // we could transform it in a chameleon48_t configurable with eOmc_motor_config_t::filler02 
+    eOmeas_position_t           position;               /**< the position of the motor */         
+    eOmeas_velocity_t           velocity;               /**< the velocity of the motor */ 
+    eOmeas_current_t            current;                /**< the current of the motor */  
+    //uint8_t                     filler06[6];          // we could transform it in a chameleon48_t configurable with eOmc_motor_config_t::filler02 
+    uint8_t                     chameleon06[6];         /**< these size bytes can be configured with eOmc_motor_config_t::upto02descrforchameleon06 to contain 0, 1, or 2 variables */
 } eOmc_motor_status_t;          EO_VERIFYsizeof(eOmc_motor_status_t, 16);
-#warning --> we could transform eOmc_motor_status_t::filler06 in a chameleon48_t configurable with eOmc_motor_config_t::filler02
+
 
 ///** @typedef    typedef struct eOmc_joint_status_t
 //    @brief      eOmc_joint_status_t contains the status of a joint with a position control loop
@@ -408,7 +412,7 @@ typedef struct                  // size is 24+16+0 = 40
 {
     eOmc_motor_config_t         mconfig;                    /**< the configuration of the motor */
     eOmc_motor_status_t         mstatus;                    /**< the status of the motor */   
-} eOmc_motor_t;                 EO_VERIFYsizeof(eOmc_joint_t, 40); 
+} eOmc_motor_t;                 EO_VERIFYsizeof(eOmc_motor_t, 40); 
  
 
  
