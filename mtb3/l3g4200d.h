@@ -11,10 +11,12 @@
 
 typedef struct{
 	unsigned char (*i2c_write)(unsigned char DeviceAddress, const unsigned char RegisterStartAddress, unsigned char DataBuffer);
-	unsigned char (*i2c_read)( unsigned char DeviceAddress, const unsigned char RegisterAddress, unsigned char *DataBuffer );
+	unsigned char (*i2c_read) (unsigned char DeviceAddress, const unsigned char RegisterAddress, unsigned char *DataBuffer );
+	unsigned char (*i2c_burst)(unsigned char Channel, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer);
 } tL3GI2COps;
 
 extern int L3GInit(tL3GI2COps ops);
 extern void L3GAxisRead(int *x, int *y, int *z);
+extern void L3GAxisBurst(int *x, int *y, int *z);
 
 #endif

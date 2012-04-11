@@ -30,6 +30,11 @@ char L3GRegRead(char reg)
 	return rbuf;
 }
 
+void L3GRegBurst(char reg,char naxis, unsigned int *data )
+{
+	L3GI2COps.i2c_burst(0, L3G_I2C_ADDR,reg|0x80, naxis, data);
+}
+
 
 int L3GInit(tL3GI2COps ops)
 {
@@ -42,15 +47,15 @@ int L3GInit(tL3GI2COps ops)
 
 
 	
-	tmp = L3G_CTRL2_HPM_NORMAL2 | L3G_CTRL2_HPCFG(0b1001);
+	tmp = L3G_CTRL2_HPM_NORMAL2 | L3G_CTRL2_HPCFG(0b1001); //0x29
 	L3GRegWrite(L3G_CTRL2,tmp);
 	
 	/* enable fifo WTM int*/
-	tmp = L3G_CTRL3_PPOD;//  L3G_CTRL3_I2WTM | L3G_CTRL3_I1INT;
+	tmp =  0;// L3G_CTRL3_I2WTM | L3G_CTRL3_I1INT; 
 	L3GRegWrite(L3G_CTRL3,tmp);
 
 	/* medium sensitivity, medium full scale */
-	tmp = L3G_CTRL4_SCALE_250 | L3G_CTRL4_BLOCKUPD;
+	tmp = L3G_CTRL4_SCALE_250 | L3G_CTRL4_BLOCKUPD; //0x80
 	L3GRegWrite(L3G_CTRL4,tmp);
 
 	/* set stream mode & fifo int threshold */
@@ -58,11 +63,11 @@ int L3GInit(tL3GI2COps ops)
 	L3GRegWrite(L3G_FIFO_CTRL,tmp);
 
 	/* enable fifo, no filter en */
-	tmp = L3G_CTRL5_FIFOEN | L3G_CTRL5_HPFEN;
+	tmp = L3G_CTRL5_FIFOEN | L3G_CTRL5_HPFEN | 0b11; //0x53
 	L3GRegWrite(L3G_CTRL5,tmp);
 	/* enable 3 axis */
 	 tmp = L3G_CTRL1_XEN | L3G_CTRL1_YEN | L3G_CTRL1_ZEN | L3G_CTRL1_PON | 
-		L3G_CTRL1_ODR_800HZ | L3G_CTRL1_BW_XW | L3G_CTRL5_HPFEN ;
+		L3G_CTRL1_ODR_800HZ | L3G_CTRL1_BW_XW | L3G_CTRL5_HPFEN ; //0xff
 	L3GRegWrite(L3G_CTRL1,tmp);
 	return 0;
 }
@@ -70,30 +75,28 @@ int L3GInit(tL3GI2COps ops)
 void L3GAxisRead(int *x, int *y, int *z)
 {
 	char xl,xh,yl,yh,zl,zh;
-	int value=100;
- //while (value>0)
- //       value--;
-//	L3GRegRead(0x28);
-//	L3GRegRead(L3G_CTRL4);
 
-//	L3GRegRead(L3G_CTRL5);
-	//	L3GRegRead(0x28);
-//	L3GRegRead(0x27);
-//	L3GRegRead(0x28);
-	/* TODO: read in burst */
-
-	xl = (unsigned char) L3GRegRead(L3G_OUT_X_L);
-	xh = (unsigned char) L3GRegRead(L3G_OUT_X_H);
+	yh = (unsigned char) L3GRegRead(L3G_OUT_Y_H);//(L3G_CTRL4);
+	zh = (unsigned char) L3GRegRead(L3G_OUT_Z_H);//(L3G_CTRL2);	
+	xl = (unsigned char) L3GRegRead(L3G_OUT_X_L);//(L3G_STATUS);
+    xh = (unsigned char) L3GRegRead(L3G_OUT_X_H);//(L3G_STATUS);
+    yl = (unsigned char) L3GRegRead(L3G_OUT_Y_L);//(L3G_CTRL3);
+	zl = (unsigned char) L3GRegRead(L3G_OUT_Z_L);//(L3G_CTRL5);
 		*x = xl | (xh<<8);
-	yl = (unsigned char) L3GRegRead(L3G_OUT_Y_L);
-	yh = (unsigned char) L3GRegRead(L3G_OUT_Y_H);
+	
+
 		*y = yl | (yh<<8);
- 	zl = (unsigned char) L3GRegRead(L3G_OUT_Z_L);
-	zh = (unsigned char) L3GRegRead(L3G_OUT_Z_H);	
+ 
+
 	*z = zl	| (zh<<8);
-
-
-
-
-
 }
+
+void L3GAxisBurst(int *x, int *y, int *z)
+{
+	unsigned int data[3];
+	L3GRegBurst(L3G_OUT_X_L,3,data);
+	*x = (int) data[0];
+	*y = (int) data[1];
+	*z = (int) data[2];
+}
+	

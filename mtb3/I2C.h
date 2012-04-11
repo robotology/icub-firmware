@@ -2,7 +2,7 @@
 #define I2C_RD		0b1
 #define	ACK			0
 #define	NACK		1
-#define I2Cbit    2 //the duration of a bit 10 is about 100Khz, 1 is about 500KHz
+#define I2Cbit    1 //the duration of a bit 10 is about 100Khz, 1 is about 500KHz
 
 //-------------------------------------
 //Pin assignment for the I2C interface
@@ -67,6 +67,7 @@ void I2C_test(unsigned char Channel);
 //High level functions
 unsigned char WriteViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToWrite, unsigned int *DataBuffer, const unsigned int OffsetInBuffer);
 extern unsigned char WriteByteViaI2C(unsigned char DeviceAddress, const unsigned char RegisterStartAddress, unsigned char DataBuffer);
+unsigned char ReadBurstViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer);
 extern unsigned char ReadViaI2C(unsigned char Channel,unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer1, unsigned int *DataBuffer2, unsigned int *DataBuffer3, unsigned int *DataBuffer4, const unsigned int OffsetInBuffer);
 unsigned char ReadByteViaI2C( unsigned char DeviceAddress, const unsigned char RegisterAddress, unsigned char *DataBuffer );
 //Low level functions

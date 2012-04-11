@@ -404,6 +404,106 @@ unsigned char ReadViaI2C(unsigned char Channel, unsigned char DeviceAddress, con
 /********************************************************************************************************/
 /*** Low level functions, do not change anything below this line, however check the valid clock level ***/
 /********************************************************************************************************/
+//ReadViaI2C()
+//---------------------------------
+//Function that reads from  via the I2C port. It sends first the device
+//address including the write bit, then the register address and finally reads data
+//back. The function returns "1" if successfull otherwise "0". If an error occurs,
+//Then the stop condition is sent.
+//--------------------------------------------------------------------------------
+unsigned char ReadBurstViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer)
+{
+    unsigned int ReadData;
+    unsigned char ByteAddress;
+    unsigned char LowByteData, HighByteData;
+    unsigned char r, AcknError;
+    unsigned char SDA_number=0;
+    unsigned char DeviceAddressHeader;
+
+    AcknError=1; //No error on initialisation
+
+    //Add the write bit to the device address
+    DeviceAddressHeader=DeviceAddress<<1 | I2C_WR; //qui ci vuole I2C_WR o RD secondo me RD 
+   
+    ByteAddress = RegisterStartAddress & 0x00FF;
+
+    //Start the I2C transfer
+    InitialiseI2CMaster(Channel);
+    StartI2CMaster(Channel);
+
+    //Send device address
+    if (!SendByteI2CMaster(Channel,DeviceAddressHeader))
+    {
+        //Send register address
+
+            if (!SendByteI2CMaster(Channel,ByteAddress))
+            {
+                //Send the repeated start
+                StartI2CMaster(Channel);
+                //Send device address again changing the Rd/Wr bit
+                DeviceAddressHeader = DeviceAddress<<1 | I2C_RD;
+                if (!SendByteI2CMaster(Channel,DeviceAddressHeader))
+                {
+                    //Perform block read, but first,we need to know if we must send an ACKN or a NACK
+                    if (NumberOfRegistersToRead==1)
+                    {
+                        ReceiveByteI2CMaster(Channel,ACK);
+                        HighByteData=ReceivedByte[SDA_number];;
+
+						
+                        ReceiveByteI2CMaster(Channel,NACK);
+                        LowByteData=ReceivedByte[SDA_number];;
+                  
+                        DataBuffer[0]=((HighByteData & 0xFF)<<8) | LowByteData;
+
+
+                    } else
+                    {
+                        for (r=0;r<(NumberOfRegistersToRead-1);r++)
+                        {
+                            ReceiveByteI2CMaster(Channel,ACK);
+                            HighByteData=ReceivedByte[SDA_number];;
+                         
+                            ReceiveByteI2CMaster(Channel,ACK);
+                            LowByteData=ReceivedByte[SDA_number];;
+
+                            DataBuffer[r]=((HighByteData & 0xFF)<<8) | LowByteData;
+                            
+                        }
+                        //Do the last read sending the NACK
+                        ReceiveByteI2CMaster(Channel,ACK);
+                        HighByteData=ReceivedByte[SDA_number];;
+                  
+                        ReceiveByteI2CMaster(Channel,NACK);
+                        LowByteData=ReceivedByte[SDA_number];;
+                       
+
+                        DataBuffer[NumberOfRegistersToRead-1]=((HighByteData & 0xFF)<<8) | LowByteData;
+
+                    }
+                    //Stop transfer
+                    StopI2CMaster(Channel);
+                } else //No acknowledgement was found therefore send the stop condition
+                {
+                    StopI2CMaster(Channel);
+                    AcknError=0;
+                }
+            } else //No acknowledgement was found therefore send the stop condition
+            {
+                StopI2CMaster(Channel);
+                AcknError=0;
+            }
+
+    } else //No acknowledgement was found therefore send the stop condition
+    {
+        StopI2CMaster(Channel);
+        AcknError=0;
+    }
+    return(AcknError);
+}
+
+
+
 
 //---------------------------------
 //InitialiseI2CMaster();
@@ -449,15 +549,15 @@ void StartI2CMaster(unsigned char Channel)
 //	    MCO_0 = 0;    //SCL low
 //    	Wait(I2Cbit);
 //	    DO_0off        //SDA high
-	    Wait(I2Cbit);
+//	    Wait(I2Cbit);
 	    Wait(I2Cbit);
 	    MCO_0 = 1;    //SCL high
 	    Wait(I2Cbit);
 	  
 	  //  DO_0on       //SDA goes low before the clock
 	    Wait(I2Cbit);
-	    Wait(I2Cbit);
-	    Wait(I2Cbit);
+//	    Wait(I2Cbit);
+//	    Wait(I2Cbit);
 	    DE_0output    //SDA as output	
 	    DO_0off
 	    Wait(I2Cbit);
@@ -502,7 +602,7 @@ void StopI2CMaster(unsigned char Channel)
 	    Wait(I2Cbit);//Wait(I2Cbit);
 	    DE_0input  //SDA as output	
 	    //DO_0on   //SDA goes from low to high when SCL is already high,
-	    Wait(I2Cbit);//Wait(I2Cbit);
+	    //Wait(I2Cbit);//Wait(I2Cbit);
 	}
 	break;
 	case CH1:
@@ -658,7 +758,7 @@ void ReceiveByteI2CMaster(unsigned char Channel,unsigned char ackn)     // chang
 	    MCO_0 = 1;    //Set SCL
 	     Wait(I2Cbit);//Wait(I2Cbit);
 	    MCO_0 = 0;    //Reset SCL
-	     Wait(I2Cbit);//Wait(I2Cbit);
+	     //Wait(I2Cbit);//Wait(I2Cbit);
 	}
 	break;
 	case CH1:

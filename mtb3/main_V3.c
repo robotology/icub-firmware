@@ -198,7 +198,7 @@ unsigned char new_board_MODE=EIGHT_BITS;
 char _additional_info [32]={'T','a','c','t','i','l','e',' ','S','e','n','s','o','r'};
 unsigned int PW_CONTROL= 0x0B0; // 0x1B0 for 128 decim  
 unsigned int TIMER_VALUE=TIMER_SINGLE_256dec; // Timer duration 0x3000=> 40ms
-unsigned int TIMER_VALUE2=0x99;//1ms 0xc00;//0xC00; // Timer duration 0xC00=> 10ms
+unsigned int TIMER_VALUE2=0xc00;//0x99;//1ms 0xc00;//0xC00; // Timer duration 0xC00=> 10ms
 unsigned int SHIFT=2; //shift of the CDC value for removing the noise
 unsigned int SHIFT_THREE=3;// shift of the CDC value for removing the noise
 unsigned int SHIFT_ALL=4; //shift of the CDC value for removing the noise
@@ -262,7 +262,7 @@ void __attribute__((interrupt, no_auto_psv)) _T2Interrupt(void)
 	if (GYRO_ACC)
 {	    
 	//	L3GInit(l3g);
-	    L3GAxisRead(&x, &y, &z);  
+	    L3GAxisBurst(&x, &y, &z);  
 	    acc[1]=((x &0xFF00) >>0x8); // axis X
         acc[0]=(x & 0xFF);
         acc[3]=((y &0xFF00) >>0x8); // axis Y
@@ -313,7 +313,7 @@ int main(void)
     //------------------------------------------------------------------------
     //								Peripheral init
     //------------------------------------------------------------------------
-//    T1_Init(TIMER_VALUE);
+  //  T1_Init(TIMER_VALUE);
     CAN_Init();
     I2C_Init(CH0); 
     LED_Init();
@@ -330,6 +330,7 @@ if (GYRO_ACC)
 
 	l3g.i2c_write=WriteByteViaI2C;
 	l3g.i2c_read=ReadByteViaI2C;
+	l3g.i2c_burst=ReadBurstViaI2C;
 	L3GInit(l3g);
   
     T2_Init(TIMER_VALUE2);
