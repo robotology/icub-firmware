@@ -198,13 +198,13 @@ unsigned char new_board_MODE=EIGHT_BITS;
 char _additional_info [32]={'T','a','c','t','i','l','e',' ','S','e','n','s','o','r'};
 unsigned int PW_CONTROL= 0x0B0; // 0x1B0 for 128 decim  
 unsigned int TIMER_VALUE=TIMER_SINGLE_256dec; // Timer duration 0x3000=> 40ms
-unsigned int TIMER_VALUE2=0x133;//0xC00; // Timer duration 0xC00=> 10ms
+unsigned int TIMER_VALUE2=0x99;//1ms 0xc00;//0xC00; // Timer duration 0xC00=> 10ms
 unsigned int SHIFT=2; //shift of the CDC value for removing the noise
 unsigned int SHIFT_THREE=3;// shift of the CDC value for removing the noise
 unsigned int SHIFT_ALL=4; //shift of the CDC value for removing the noise
 unsigned int NOLOAD=235;
 unsigned int ANALOG_ACC=0; //analog accelerometer, if one 1 messsage is sent every 10ms
-unsigned int GYRO_ACC=0; //gyro e accelerometer of the MMSP 
+unsigned int GYRO_ACC=1; //gyro e accelerometer of the MMSP 
 unsigned int CONFIG_TYPE=CONFIG_SINGLE;
 unsigned int ERROR_COUNTER=0; //it counts the errors in reading the triangles.
 unsigned int ConValue[2]={0x2200, 0x2200}; //offset of the CDC reading 
@@ -214,8 +214,10 @@ unsigned char acc[]={0,0,0,0,0,0,0,0}; //value of the three accelerometers
     unsigned int stagecomplete1[1][1];
     unsigned int stagecomplete2[1][1];
     unsigned int stagecomplete3[1][1];
-
-
+	tL3GI2COps l3g;
+	 int x=0;
+	 int y=0;
+	 int z=0;
 //
 //------------------------------------------------------------------------------ 
 //								External functions
@@ -259,6 +261,17 @@ void __attribute__((interrupt, no_auto_psv)) _T2Interrupt(void)
 } 
 	if (GYRO_ACC)
 {	    
+	//	L3GInit(l3g);
+	    L3GAxisRead(&x, &y, &z);  
+	    acc[1]=((x &0xFF00) >>0x8); // axis X
+        acc[0]=(x & 0xFF);
+        acc[3]=((y &0xFF00) >>0x8); // axis Y
+        acc[2]=(y & 0xFF);
+        acc[5]=((z &0xFF00) >>0x8); // axis Z
+        acc[4]=(z & 0xFF);
+        while (!CAN1IsTXReady(1));    
+        CAN1SendMessage( (CAN_TX_SID(0x550)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
+                        (CAN_TX_EID(0)) & CAN_NOR_TX_REQ, acc, 6,1);
 }      
     _T2IF = 0;
 }
@@ -300,7 +313,7 @@ int main(void)
     //------------------------------------------------------------------------
     //								Peripheral init
     //------------------------------------------------------------------------
-    T1_Init(TIMER_VALUE);
+//    T1_Init(TIMER_VALUE);
     CAN_Init();
     I2C_Init(CH0); 
     LED_Init();
@@ -310,16 +323,24 @@ if (ANALOG_ACC)
     T2_Init(TIMER_VALUE2);
     ADC_Init();             //Initialize the A/D converter
 }
-else if (GYRO_ACC)
+GYRO_ACC=1;
+if (GYRO_ACC)
 {
-	tL3GI2COps l3g;
-	l3g.i2c_write= WriteByteViaI2C;
+
+
+	l3g.i2c_write=WriteByteViaI2C;
 	l3g.i2c_read=ReadByteViaI2C;
 	L3GInit(l3g);
   
     T2_Init(TIMER_VALUE2);
-    ReadViaI2C(CH0,AD7147_ADD[i],DEVID, 1, AD7147Registers[0],AD7147Registers[4],AD7147Registers[8],AD7147Registers[12], DEVID);  
+  
 }    
+   while(1)
+   {
+	   l=0;
+	    
+   	   l=1;	
+   } 
     
     //Read Silicon versions to check communication, It should read 0xE622
 

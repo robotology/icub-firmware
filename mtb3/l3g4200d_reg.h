@@ -13,18 +13,18 @@
 #define L3G_REG_WHOIAM_MAGIC 0xd3
 
 #define L3G_CTRL1			0x20
-#define L3G_CTRL1_ODR_100HZ (0<<7)
-#define L3G_CTRL1_ODR_200HZ (1<<7)
-#define L3G_CTRL1_ODR_400HZ (2<<7)
-#define L3G_CTRL1_ODR_800HZ (3<<7)
-#define L3G_CTRL1_BW_XN		(0<<5)
-#define L3G_CTRL1_BW_N 		(1<<5)
-#define L3G_CTRL1_BW_W 		(2<<5)
-#define L3G_CTRL1_BW_XW 	(3<<5)
+#define L3G_CTRL1_ODR_100HZ (0<<6)
+#define L3G_CTRL1_ODR_200HZ (1<<6)
+#define L3G_CTRL1_ODR_400HZ (2<<6)
+#define L3G_CTRL1_ODR_800HZ (3<<6)
+#define L3G_CTRL1_BW_XN		(0<<4)
+#define L3G_CTRL1_BW_N 		(1<<4)
+#define L3G_CTRL1_BW_W 		(2<<4)
+#define L3G_CTRL1_BW_XW 	(3<<4)
 #define L3G_CTRL1_PON		(1<<3)
 #define L3G_CTRL1_ZEN 		(1<<2)
-#define L3G_CTRL1_YEN 		(1<<1)
-#define L3G_CTRL1_XEN 		(1<<0)
+#define L3G_CTRL1_YEN 		(1<<0)
+#define L3G_CTRL1_XEN 		(1<<1)
 
 #define L3G_CTRL2			0x21
 #define L3G_CTRL2_HPM_NORMAL 		(0<<4)

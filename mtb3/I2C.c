@@ -103,7 +103,7 @@ unsigned char WriteByteViaI2C(unsigned char DeviceAddress, const unsigned char R
     //Add the write bit to the device address
     DeviceAddressHeader = DeviceAddress<<1 | I2C_WR;
     //Split the address in two bytes 
-    ByteAddress = RegisterStartAddress & 0xFF00;
+    ByteAddress = RegisterStartAddress & 0xFF;
   
     //Start the I2C transfer
     InitialiseI2CMaster(Channel);
@@ -239,8 +239,8 @@ unsigned char ReadByteViaI2C( unsigned char DeviceAddress, const unsigned char R
                 {
                     //Perform block read, but first,we need to know if we must send an ACKN or a NACK
 
-                        ReceiveByteI2CMaster(Channel,ACK);
-                        DataBuffer=ReceivedByte[SDA_number];
+                        ReceiveByteI2CMaster(Channel,NACK);
+                        *DataBuffer=ReceivedByte[SDA_number];
                     //Stop transfer
                     StopI2CMaster(Channel);
                 } else //No acknowledgement was found therefore send the stop condition
@@ -307,7 +307,10 @@ unsigned char ReadViaI2C(unsigned char Channel, unsigned char DeviceAddress, con
                     {
                         ReceiveByteI2CMaster(Channel,ACK);
                         HighByteData[0]=ReceivedByte[0];
-
+						HighByteData[1]=ReceivedByte[1];
+						HighByteData[2]=ReceivedByte[2];
+						HighByteData[3]=ReceivedByte[3];
+						
                         ReceiveByteI2CMaster(Channel,NACK);
                         LowByteData[0]=ReceivedByte[0];
                         LowByteData[1]=ReceivedByte[1];
@@ -441,17 +444,21 @@ void StartI2CMaster(unsigned char Channel)
 	{
 	case CH0:
 	{	
-		DE_0output    //SDA as output	
-		DO_0off        //SDA high
-	    MCO_0 = 0;    //SCL low
-    	Wait(I2Cbit);
-	    DO_0off        //SDA high
+	    DE_0input;
+//		DO_0off        //SDA high
+//	    MCO_0 = 0;    //SCL low
+//    	Wait(I2Cbit);
+//	    DO_0off        //SDA high
+	    Wait(I2Cbit);
 	    Wait(I2Cbit);
 	    MCO_0 = 1;    //SCL high
 	    Wait(I2Cbit);
-	    DO_0on       //SDA goes low before the clock
+	  
+	  //  DO_0on       //SDA goes low before the clock
 	    Wait(I2Cbit);
 	    Wait(I2Cbit);
+	    Wait(I2Cbit);
+	    DE_0output    //SDA as output	
 	    DO_0off
 	    Wait(I2Cbit);
 	    MCO_0 = 0;    //SCL low
@@ -490,10 +497,11 @@ void StopI2CMaster(unsigned char Channel)
     {
 	    DE_0output  //SDA as output	
 	    DO_0off  //SDA low
-	    Wait(I2Cbit);Wait(I2Cbit);
+	    Wait(I2Cbit);
 	    MCO_0 = 1;    //SCL high
 	    Wait(I2Cbit);//Wait(I2Cbit);
-	    DO_0on   //SDA goes from low to high when SCL is already high,
+	    DE_0input  //SDA as output	
+	    //DO_0on   //SDA goes from low to high when SCL is already high,
 	    Wait(I2Cbit);//Wait(I2Cbit);
 	}
 	break;
@@ -523,7 +531,7 @@ unsigned char SendByteI2CMaster(unsigned char Channel,unsigned char ByteToSend)
 {
 
     unsigned char i;
-    unsigned char noack;
+    unsigned char noack=0;
 	
 	switch (Channel)
 	{
@@ -544,14 +552,21 @@ unsigned char SendByteI2CMaster(unsigned char Channel,unsigned char ByteToSend)
 	        {
 	            DO_0off;
 	        }
-			Wait(0);
+	    	Wait(0);
 		
 	     //   Wait(I2Cbit);//Wait(I2Cbit);
 	        MCO_0 = 1;                //Set SCL
-	         Wait(I2Cbit);//Wait(I2Cbit);
-	        MCO_0 = 0;                //Reset SCL
-	   //      Wait(I2Cbit);//Wait(I2Cbit);
+	        Wait(I2Cbit);//Wait(I2Cbit);
+	        MCO_0 = 0;
+	        if (i==1)
+	        {
+		         DE_0input;
+		    } 
+		    else
+		    {                //Reset SCL
+	        Wait(I2Cbit);//Wait(I2Cbit);
 	        ByteToSend<<=1;         //Rotate data
+	        }   
 	    }
 	    DO_0off
 	    DE_0input                //SDA becomes an input
@@ -564,14 +579,15 @@ unsigned char SendByteI2CMaster(unsigned char Channel,unsigned char ByteToSend)
 	//	else noack=1;
 
 //#warning "DEBUG" 
-		//noack=0;  
+		noack=0;  
 	    //noack =(unsigned char) ((DO1 | DO2<<1 | DO3<<2 | DO4<<3) & 0xFF)?1:0);//(unsigned char) (PORTDbits.RD0 );//& PORTDbits.RD1 & PORTDbits.RD2 & PORTDbits.RD3);//PORTDbits.RD0; // 
-	    DO_0off;
+	    //DO_0off;
 	
 	     Wait(I2Cbit);//Wait(I2Cbit);
 	    MCO_0 = 0;
 	    //DE = 1;	//Enable SDA output
 	    DE_0output   //SDA becomes an output
+	   
 	}
 	break;
 	case CH1:
@@ -613,19 +629,19 @@ void ReceiveByteI2CMaster(unsigned char Channel,unsigned char ackn)     // chang
 	        ReceivedByte[3] <<= 1;      //Rotate data
 	        MCO_0 = 1;                //Set SCL
 	        
-			D1=PORTDbits.RD0;
-			D2=PORTDbits.RD2;
-			D3=PORTDbits.RD3;
-			D4=PORTDbits.RD1;
+	//		D1=PORTDbits.RD0;
+	//		D2=PORTDbits.RD2;
+	//		D3=PORTDbits.RD3;
+	//		D4=PORTDbits.RD1;
 		
 
 	
 	        //test	
 	        //	ReceivedByte[0]=i;			
-	        ReceivedByte[0] |= D1;   //Read SDA -> data 
- 	        ReceivedByte[1] |= D2;   //Read SDA -> data   
-	        ReceivedByte[2] |= D3;   //Read SDA -> data   
-	        ReceivedByte[3] |= D4;   //Read SDA -> data   
+	        ReceivedByte[0] |= PORTDbits.RD0;//D1;   //Read SDA -> data 
+ 	        ReceivedByte[1] |= PORTDbits.RD2;//D2;   //Read SDA -> data   
+	        ReceivedByte[2] |= PORTDbits.RD3;//D3;   //Read SDA -> data   
+	        ReceivedByte[3] |= PORTDbits.RD1;//D4;   //Read SDA -> data   
 	      //   Wait(I2Cbit);//Wait(I2Cbit);
 	        MCO_0 = 0;                //Reset SCL
 	    //     Wait(I2Cbit);//Wait(I2Cbit);
