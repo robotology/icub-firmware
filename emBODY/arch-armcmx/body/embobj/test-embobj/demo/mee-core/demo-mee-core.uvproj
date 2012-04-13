@@ -348,7 +348,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM</Define>
               <Undefine></Undefine>
-              <IncludePath>..\abslayer-cfg;..\app;..\..\..\embobj\embobj-api;..\..\..\embobj\embobj-src;..\..\..\embobj\embobj-cfg;..\..\..\..\..\sys\abs\api;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc;..\..\..\..\..\sys\prt</IncludePath>
+              <IncludePath>..\abslayer-cfg;..\app;..\..\..\embobj\embobj-api;..\..\..\embobj\embobj-src;..\..\..\embobj\embobj-cfg;..\..\..\..\..\sys\abs\api;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc;..\..\..\..\..\..\porting</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
