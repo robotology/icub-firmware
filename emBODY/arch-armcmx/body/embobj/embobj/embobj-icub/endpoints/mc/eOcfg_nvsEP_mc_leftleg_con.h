@@ -50,33 +50,27 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
+#define EOK_cfg_nvsEP_mc_leftleg_NUMofJOINTS                                        (6)
+#define EOK_cfg_nvsEP_mc_leftleg_NUMofMOTORS                                        (6)
+
 
 // the 16bit value to use to identify the endpoint
-#define EOK_cfg_nvsEP_mc_leftleg_endpoint                           (0x0010)
+#define EOK_cfg_nvsEP_mc_leftleg_EP                                                 (0x0010)
 
 
-
-
-// -- the fun and typ of all the nv in the endpoint are in eOcfg_nvsEP_mc_jxx_con.h and eOcfg_nvsEP_mc_mxx_con.h
-// -- the identifiers of all the nv in the endpoint are in eOcfg_nvsEP_mc_jxx_con.h and eOcfg_nvsEP_mc_mxx_con.h
-// -- there are 12 nvid for each of the 6 joints. the nvids are a function of the joint number j = [0, 5]
-// -- there are 6 nvid for each of the 6 motors. the nvids are a function of the motor number m = [0, 5]
-
-#include "eOcfg_nvsEP_mc_jxx_con.h"
-
-
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig(jth)                                  EOK_cfg_nvsEP_mc_jxx_NVID_jconfig(jth)
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__pidposition(jth)                     EOK_cfg_nvsEP_mc_NVID_jconfig__pidposition(jth)                       
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__pidvelocity(jth)                     EOK_cfg_nvsEP_mc_NVID_jconfig__pidvelocity(jth)                      
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__pidtorque(jth)                       EOK_cfg_nvsEP_mc_NVID_jconfig__pidtorque(jth)       
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__minpositionofjoint(jth)              EOK_cfg_nvsEP_mc_NVID_jconfig__minpositionofjoint(jth)       
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__maxpositionofjoint(jth)              EOK_cfg_nvsEP_mc_NVID_jconfig__maxpositionofjoint(jth)       
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__velocitysetpointtimeout(jth)         EOK_cfg_nvsEP_mc_NVID_jconfig__velocitysetpointtimeout(jth)    
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__upto02descrforchameleon02(jth)       EOK_cfg_nvsEP_mc_NVID_jconfig__upto02descrforchameleon02(jth)        
-#define EOK_cfg_nvsEP_mc_leftleg_NVID__jstatus(jth)                                 EOK_cfg_nvsEP_mc_NVID__jstatus(jth)                  
-#define EOK_cfg_nvsEP_mc_leftleg_NVID__calibrator(jth)                              EOK_cfg_nvsEP_mc_NVID__calibrator(jth)                              
-#define EOK_cfg_nvsEP_mc_leftleg_NVID__setpoint(jth)                                EOK_cfg_nvsEP_mc_NVID__setpoint(jth)                                
-#define EOK_cfg_nvsEP_mc_leftleg_NVID__controlmode(jth)                             EOK_cfg_nvsEP_mc_NVID__controlmode(jth)                           
+// the 16bit used to identify the network variable inside the endpoint. they are function of the joint or motor number (jth or mth)
+#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig(jth)                                  EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig(jth)
+#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__pidposition(jth)                     EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidposition(jth)                       
+#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__pidvelocity(jth)                     EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidvelocity(jth)                      
+#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__pidtorque(jth)                       EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidtorque(jth)       
+#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__minpositionofjoint(jth)              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__minpositionofjoint(jth)       
+#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__maxpositionofjoint(jth)              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__maxpositionofjoint(jth)       
+#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__velocitysetpointtimeout(jth)         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__velocitysetpointtimeout(jth)    
+#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__upto02descrforchameleon02(jth)       EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__upto02descrforchameleon02(jth)        
+#define EOK_cfg_nvsEP_mc_leftleg_NVID__jstatus(jth)                                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__jstatus(jth)                  
+#define EOK_cfg_nvsEP_mc_leftleg_NVID__calibrator(jth)                              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__calibrator(jth)                              
+#define EOK_cfg_nvsEP_mc_leftleg_NVID__setpoint(jth)                                EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__setpoint(jth)                                
+#define EOK_cfg_nvsEP_mc_leftleg_NVID__controlmode(jth)                             EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__controlmode(jth)                           
 
 
 
@@ -90,8 +84,8 @@
 
 typedef struct               
 {
-    eOmc_joint_t                joints[6]; 
-    eOmc_motor_t                motors[6];
+    eOmc_joint_t                joints[EOK_cfg_nvsEP_mc_leftleg_NUMofJOINTS]; 
+    eOmc_motor_t                motors[EOK_cfg_nvsEP_mc_leftleg_NUMofMOTORS];
 } eo_cfg_nvsEP_mc_leftleg_t;    EO_VERIFYsizeof(eo_cfg_nvsEP_mc_leftleg_t, 864);
 
     
