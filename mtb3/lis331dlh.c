@@ -2,7 +2,7 @@
  *  MTB board - RBCS,  - 2012                     *
  *  Accelerometer LIS331DLH driver   				     *
  * 						     *
- *  Written by Marco Maggiali			     *
+ *  adjusted by Marco Maggiali stolen from Merello			     *
  *  <marco.maggiali@iit.it>			     *
  ****************************************************/
 
@@ -13,42 +13,38 @@ tLISI2COps LISI2COps;
 
 
 
-void LISRegWrite( char reg, char val)
+void LISRegWrite( unsigned char reg, unsigned char val)
 {
-	char buf[2];
-		
-	buf[0] = reg;
-	buf[1] = val;
-	 
-	LISI2COps.i2c_write(LIS_I2C_ADDR, buf, 2);	
+ 
+	LISI2COps.i2c_write(LIS_I2C_ADDR, reg, val );	
 }
 
 
-char LISRegRead(char reg, char *rbuf)
+char LISRegRead(char reg, unsigned char *rbuf)
 {
-	int ret;
-	ret = LISI2COps.i2c_read(LIS_I2C_ADDR,&reg, 1, rbuf, 1);
+	unsigned char ret;
+	ret = LISI2COps.i2c_read(LIS_I2C_ADDR, reg, rbuf);
 
 	return ret;
 }
 
-int LISInit(tLISI2COps ops)
+void LISRegBurst(char reg,char naxis, unsigned int *data )
 {
-	char tmp;
+	LISI2COps.i2c_burst(0, LIS_I2C_ADDR,reg|0x80, naxis, data);
+}
+
+unsigned int LISInit(tLISI2COps ops)
+{
+	unsigned char tmp;
 	LISI2COps = ops;
-	char id;
+	unsigned char id;
 
-	if(LISRegRead(LIS_REG_WHOIAM, &id))
-		return -2; /* i2c dead */
-
+//	if(LISRegRead(LIS_REG_WHOIAM, &id))
+//		return -2; /* i2c dead */
+    LISRegRead(LIS_REG_WHOIAM, &id);
 	if(LIS_REG_WHOIAM_MAGIC != id)
 	 	return -1;/* lis not detected :-( */
 	
-	/* enable 3 axis */
-	tmp = LIS_CTRL1_XEN | LIS_CTRL1_YEN | LIS_CTRL1_ZEN 
-			| LIS_CTRL1_MODE_ODR | LIS_CTRL1_MODE_DR1000LP780; // enable, 400Khz
-
-	LISRegWrite(LIS_CTRL1,tmp);
 
 	tmp = LIS_CTRL2_HPM_NORMAL; // filter normal, disabled
 
@@ -61,6 +57,12 @@ int LISInit(tLISI2COps ops)
 	/* 2g full scale */
 	tmp = LIS_CTRL4_SCALE_2G | LTS_CTRL4_BLOCKDATAUPDATE;
 	LISRegWrite(LIS_CTRL4,tmp);
+	
+	/* enable 3 axis */
+	tmp = LIS_CTRL1_XEN | LIS_CTRL1_YEN | LIS_CTRL1_ZEN 
+			| LIS_CTRL1_MODE_ODR | LIS_CTRL1_MODE_DR1000LP780; // enable, 400Khz
+
+	LISRegWrite(LIS_CTRL1,tmp);
 
 	return 0;
 }
@@ -68,7 +70,7 @@ int LISInit(tLISI2COps ops)
 
 void LISAxisRead(int *x, int *y, int *z)
 {
-	char xl,xh,yl,yh,zl,zh;
+	unsigned char xl,xh,yl,yh,zl,zh;
 	/* TODO: read in burst */
 	 LISRegRead(LIS_OUT_X_L, &xl);
 	 LISRegRead(LIS_OUT_X_H, &xh);
@@ -83,3 +85,11 @@ void LISAxisRead(int *x, int *y, int *z)
 
 }
 
+void LISAxisBurst(int *x, int *y, int *z)
+{
+	unsigned int data[3];
+	LISRegBurst(LIS_OUT_X_L,3,data);
+	*x = (int) data[0];
+	*y = (int) data[1];
+	*z = (int) data[2];
+}

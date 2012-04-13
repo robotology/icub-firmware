@@ -270,7 +270,6 @@ unsigned char ReadByteViaI2C( unsigned char DeviceAddress, const unsigned char R
 //--------------------------------------------------------------------------------
 unsigned char ReadViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer1,unsigned int *DataBuffer2,unsigned int *DataBuffer3,unsigned int *DataBuffer4, const unsigned int OffsetInBuffer)
 {
-    unsigned int ReadData;
     unsigned char LowByteAddress, HighByteAddress;
     unsigned char LowByteData[4], HighByteData[4];
     unsigned char r, AcknError;
@@ -317,14 +316,14 @@ unsigned char ReadViaI2C(unsigned char Channel, unsigned char DeviceAddress, con
                         LowByteData[2]=ReceivedByte[2];
                         LowByteData[3]=ReceivedByte[3];
 
-                        ReadData=((HighByteData[0] & 0xFF)<<8) | LowByteData[0];
-                        DataBuffer1[OffsetInBuffer]=ReadData;
-                        ReadData=((HighByteData[1] & 0xFF)<<8) | LowByteData[1];
-                        DataBuffer2[OffsetInBuffer]=ReadData;
-                        ReadData=((HighByteData[2] & 0xFF)<<8) | LowByteData[2];
-                        DataBuffer3[OffsetInBuffer]=ReadData;
-                        ReadData=((HighByteData[3] & 0xFF)<<8) | LowByteData[3];
-                        DataBuffer4[OffsetInBuffer]=ReadData;
+                        DataBuffer1[OffsetInBuffer]=((HighByteData[0] & 0xFF)<<8) | LowByteData[0];
+                       
+                        DataBuffer2[OffsetInBuffer]=((HighByteData[1] & 0xFF)<<8) | LowByteData[1];
+                       
+                        DataBuffer3[OffsetInBuffer]=((HighByteData[2] & 0xFF)<<8) | LowByteData[2];
+                        
+                        DataBuffer4[OffsetInBuffer]=((HighByteData[3] & 0xFF)<<8) | LowByteData[3];
+                        
 
                     } else
                     {
@@ -342,14 +341,14 @@ unsigned char ReadViaI2C(unsigned char Channel, unsigned char DeviceAddress, con
                             LowByteData[2]=ReceivedByte[2];
                             LowByteData[3]=ReceivedByte[3];
 
-                            ReadData=((HighByteData[0] & 0xFF)<<8) | LowByteData[0];
-                            DataBuffer1[OffsetInBuffer+r]=ReadData;
-                            ReadData=((HighByteData[1] & 0xFF)<<8) | LowByteData[1];
-                            DataBuffer2[OffsetInBuffer+r]=ReadData;
-                            ReadData=((HighByteData[2] & 0xFF)<<8) | LowByteData[2];
-                            DataBuffer3[OffsetInBuffer+r]=ReadData;
-                            ReadData=((HighByteData[3] & 0xFF)<<8) | LowByteData[3];
-                            DataBuffer4[OffsetInBuffer+r]=ReadData;
+                           DataBuffer1[OffsetInBuffer+r]=((HighByteData[0] & 0xFF)<<8) | LowByteData[0];
+                           
+                           DataBuffer2[OffsetInBuffer+r]=((HighByteData[1] & 0xFF)<<8) | LowByteData[1];
+                        
+                           DataBuffer3[OffsetInBuffer+r]=((HighByteData[2] & 0xFF)<<8) | LowByteData[2];
+                           
+                           DataBuffer4[OffsetInBuffer+r]=((HighByteData[3] & 0xFF)<<8) | LowByteData[3];
+                           
                         }
                         //Do the last read sending the NACK
                         ReceiveByteI2CMaster(Channel,ACK);
@@ -364,14 +363,14 @@ unsigned char ReadViaI2C(unsigned char Channel, unsigned char DeviceAddress, con
                         LowByteData[2]=ReceivedByte[2];
                         LowByteData[3]=ReceivedByte[3];
 
-                        ReadData=((HighByteData[0] & 0xFF)<<8) | LowByteData[0];
-                        DataBuffer1[OffsetInBuffer+NumberOfRegistersToRead-1]=ReadData;
-                        ReadData=((HighByteData[1] & 0xFF)<<8) | LowByteData[1];
-                        DataBuffer2[OffsetInBuffer+NumberOfRegistersToRead-1]=ReadData;
-                        ReadData=((HighByteData[2] & 0xFF)<<8) | LowByteData[2];
-                        DataBuffer3[OffsetInBuffer+NumberOfRegistersToRead-1]=ReadData;
-                        ReadData=((HighByteData[3] & 0xFF)<<8) | LowByteData[3];
-                        DataBuffer4[OffsetInBuffer+NumberOfRegistersToRead-1]=ReadData;
+                        DataBuffer1[OffsetInBuffer+NumberOfRegistersToRead-1]=((HighByteData[0] & 0xFF)<<8) | LowByteData[0];
+                       
+                        DataBuffer2[OffsetInBuffer+NumberOfRegistersToRead-1]=((HighByteData[1] & 0xFF)<<8) | LowByteData[1];
+                        
+                        DataBuffer3[OffsetInBuffer+NumberOfRegistersToRead-1]=((HighByteData[2] & 0xFF)<<8) | LowByteData[2];
+                        
+                        DataBuffer4[OffsetInBuffer+NumberOfRegistersToRead-1]=((HighByteData[3] & 0xFF)<<8) | LowByteData[3];
+                        
 
                     }
                     //Stop transfer
@@ -413,7 +412,6 @@ unsigned char ReadViaI2C(unsigned char Channel, unsigned char DeviceAddress, con
 //--------------------------------------------------------------------------------
 unsigned char ReadBurstViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer)
 {
-    unsigned int ReadData;
     unsigned char ByteAddress;
     unsigned char LowByteData, HighByteData;
     unsigned char r, AcknError;
@@ -711,7 +709,6 @@ unsigned char SendByteI2CMaster(unsigned char Channel,unsigned char ByteToSend)
 void ReceiveByteI2CMaster(unsigned char Channel,unsigned char ackn)     // changed bit with unsigned char
 {	
     unsigned char i;
-	unsigned char D1,D2,D3,D4;
 	switch (Channel)
 	{
 	case CH0:

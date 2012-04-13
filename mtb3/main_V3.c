@@ -84,6 +84,7 @@
 #include <libpic30.h>
 #include <adc10.h>
 #include "l3g4200d.h"
+#include "lis331dlh.h"
 
 
 
@@ -198,26 +199,31 @@ unsigned char new_board_MODE=EIGHT_BITS;
 char _additional_info [32]={'T','a','c','t','i','l','e',' ','S','e','n','s','o','r'};
 unsigned int PW_CONTROL= 0x0B0; // 0x1B0 for 128 decim  
 unsigned int TIMER_VALUE=TIMER_SINGLE_256dec; // Timer duration 0x3000=> 40ms
-unsigned int TIMER_VALUE2=0xc00;//0x99;//1ms 0xc00;//0xC00; // Timer duration 0xC00=> 10ms
+unsigned int TIMER_VALUE2=0x99;//0xc00;//0x99;//1ms 0xc00;//0xC00; // Timer duration 0xC00=> 10ms
 unsigned int SHIFT=2; //shift of the CDC value for removing the noise
 unsigned int SHIFT_THREE=3;// shift of the CDC value for removing the noise
 unsigned int SHIFT_ALL=4; //shift of the CDC value for removing the noise
 unsigned int NOLOAD=235;
 unsigned int ANALOG_ACC=0; //analog accelerometer, if one 1 messsage is sent every 10ms
-unsigned int GYRO_ACC=1; //gyro e accelerometer of the MMSP 
+unsigned int GYRO_ACC=0; //gyro e accelerometer of the MMSP 
 unsigned int CONFIG_TYPE=CONFIG_SINGLE;
 unsigned int ERROR_COUNTER=0; //it counts the errors in reading the triangles.
 unsigned int ConValue[2]={0x2200, 0x2200}; //offset of the CDC reading 
 volatile unsigned int PMsgID; //pressure measurement ID 
 unsigned char acc[]={0,0,0,0,0,0,0,0}; //value of the three accelerometers
+unsigned char gyro[]={0,0,0,0,0,0,0,0}; //value of the three gyro
     unsigned int stagecomplete0[1][1];
     unsigned int stagecomplete1[1][1];
     unsigned int stagecomplete2[1][1];
     unsigned int stagecomplete3[1][1];
 	tL3GI2COps l3g;
-	 int x=0;
-	 int y=0;
-	 int z=0;
+	tLISI2COps l3a;
+	int gx=0;
+	int gy=0;
+	int gz=0;
+	int ax=0;
+	int ay=0;
+	int az=0;
 //
 //------------------------------------------------------------------------------ 
 //								External functions
@@ -232,19 +238,20 @@ extern void ConfigAD7147_ALL(unsigned char Channel, unsigned int i,unsigned int 
 //------------------------------------------------------------------------------
 void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void)
 {
-	unsigned int m=0;
+//	unsigned int m=0;
     flag=1;
  	//		led0=~led0;
-     ServiceAD7147Isr(CH0);
-   	 for (m=0;m<16;m++)
+    // ServiceAD7147Isr(CH0);
+ /*  	 for (m=0;m<16;m++)
 	 {
 		FillCanMessages8bit(CH0,m); 	
      }
+   */
      _T1IF = 0;
-
 }
 void __attribute__((interrupt, no_auto_psv)) _T2Interrupt(void)
 {
+	flag2=1;
 	if (ANALOG_ACC)
 {
 	    acc[1]=((AN2 &0xFF00) >>0x8); // axis X
@@ -259,20 +266,7 @@ void __attribute__((interrupt, no_auto_psv)) _T2Interrupt(void)
     //executing the sampling of the
      ADCON1bits.SAMP = 1;    
 } 
-	if (GYRO_ACC)
-{	    
-	//	L3GInit(l3g);
-	    L3GAxisBurst(&x, &y, &z);  
-	    acc[1]=((x &0xFF00) >>0x8); // axis X
-        acc[0]=(x & 0xFF);
-        acc[3]=((y &0xFF00) >>0x8); // axis Y
-        acc[2]=(y & 0xFF);
-        acc[5]=((z &0xFF00) >>0x8); // axis Z
-        acc[4]=(z & 0xFF);
-        while (!CAN1IsTXReady(1));    
-        CAN1SendMessage( (CAN_TX_SID(0x550)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
-                        (CAN_TX_EID(0)) & CAN_NOR_TX_REQ, acc, 6,1);
-}      
+	
     _T2IF = 0;
 }
 void __attribute__((interrupt, no_auto_psv)) _C1Interrupt(void)
@@ -313,35 +307,32 @@ int main(void)
     //------------------------------------------------------------------------
     //								Peripheral init
     //------------------------------------------------------------------------
-  //  T1_Init(TIMER_VALUE);
+    T1_Init(TIMER_VALUE);
     CAN_Init();
     I2C_Init(CH0); 
     LED_Init();
-    
+    l3g.i2c_write=WriteByteViaI2C;
+	l3g.i2c_read=ReadByteViaI2C;
+	l3g.i2c_burst=ReadBurstViaI2C;
+	L3GInit(l3g);
+    l3a.i2c_write=WriteByteViaI2C;
+	l3a.i2c_read=ReadByteViaI2C;
+	l3a.i2c_burst=ReadBurstViaI2C;
+	LISInit(l3a);
 if (ANALOG_ACC)
 {
     T2_Init(TIMER_VALUE2);
     ADC_Init();             //Initialize the A/D converter
 }
-GYRO_ACC=1;
+
+
 if (GYRO_ACC)
 {
-
-
-	l3g.i2c_write=WriteByteViaI2C;
-	l3g.i2c_read=ReadByteViaI2C;
-	l3g.i2c_burst=ReadBurstViaI2C;
-	L3GInit(l3g);
-  
     T2_Init(TIMER_VALUE2);
+
+	
   
 }    
-   while(1)
-   {
-	   l=0;
-	    
-   	   l=1;	
-   } 
     
     //Read Silicon versions to check communication, It should read 0xE622
 
@@ -419,10 +410,39 @@ if (GYRO_ACC)
 //
 //
 //
-		led_counter=0;
+	led_counter=0;
 	led0=0;
     for (;;)
     {
+	    if ((GYRO_ACC) && (flag2))
+		{	  
+		flag2=0;  
+	//	L3GInit(l3g);
+	    L3GAxisBurst(&gx, &gy, &gz);  
+	    LISAxisBurst(&ax, &ay, &az);  
+	    gyro[1]=((gx &0xFF00) >>0x8); // axis X
+        gyro[0]=(gx & 0xFF);
+        gyro[3]=((gy &0xFF00) >>0x8); // axis Y
+        gyro[2]=(gy & 0xFF);
+        gyro[5]=((gz &0xFF00) >>0x8); // axis Z
+        gyro[4]=(gz & 0xFF);
+      
+	    acc[1]=((ax &0xFF00) >>0x8); // axis X
+        acc[0]=(ax & 0xFF);
+        acc[3]=((ay &0xFF00) >>0x8); // axis Y
+        acc[2]=(ay & 0xFF);
+        acc[5]=((az &0xFF00) >>0x8); // axis Z
+        acc[4]=(az & 0xFF);
+        
+        while (!CAN1IsTXReady(1));    
+        CAN1SendMessage( (CAN_TX_SID(0x550)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
+                        (CAN_TX_EID(0)) & CAN_NOR_TX_REQ, gyro, 6,1);
+       
+        while (!CAN1IsTXReady(2));    
+        CAN1SendMessage( (CAN_TX_SID(0x650)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
+                        (CAN_TX_EID(0)) & CAN_NOR_TX_REQ, acc, 6,2);
+		}     
+		
         if (flag==1)
         {
         	flag=0;
@@ -471,12 +491,12 @@ if (GYRO_ACC)
 						 	case CONFIG_SINGLE :
 						 	{
 							 	// Service routine for the triangles 
-	            	/*			 ServiceAD7147Isr(CH0);
-							 	 for (i=0;i<16;i++)
+	            				 ServiceAD7147Isr(CH0);
+					    	 	 for (i=0;i<16;i++)
 	            				 {
 		 							FillCanMessages8bit(CH0,i); 	
 		      					 }
-		      		*/
+		      		
 		      				}
 		      				break;
 		      			    case CONFIG_THREE:
@@ -624,22 +644,23 @@ static void ServiceAD7147Isr(unsigned char Channel)
 		   ReadViaI2C(CH0,AD7147_ADD[i],STAGE_COMPLETE_LIMIT_INT, 1, stagecomplete0[0],stagecomplete1[0],stagecomplete2[0],stagecomplete3[0], 0);		
 		 //   WriteViaI2C(Channel,AD7147_ADD[i],AMB_COMP_CTRL0,1, ConfigBuffer, AMB_COMP_CTRL0);
 	    }
-*/	 	
+	 	
 	    for (i=0;i<nets;i++)
 	    {		
 	    // Added 0x0B because of register remapping
 	       ReadViaI2C(CH0,AD7147_ADD[i],(ADCRESULT_S0+0x0B), 2, AD7147Registers[i],AD7147Registers[i+4],AD7147Registers[i+8],AD7147Registers[i+12], ADCRESULT_S0);
 	    }	    
-	    for (i=0;i<nets;i++)
+*/	    for (i=0;i<nets;i++)
 	    {		
 	    // Added 0x0B because of register remapping
-	       ReadViaI2C(CH0,AD7147_ADD[i],(ADCRESULT_S2+0x0B), 10, AD7147Registers[i],AD7147Registers[i+4],AD7147Registers[i+8],AD7147Registers[i+12], ADCRESULT_S2);
+	       ReadViaI2C(CH0,AD7147_ADD[i],(ADCRESULT_S0+0x0B), 12, AD7147Registers[i],AD7147Registers[i+4],AD7147Registers[i+8],AD7147Registers[i+12], ADCRESULT_S0);
 	    }
    		
 	    for (i=0;i<nets;i++)
 	    {
 		 //  ReadViaI2C(CH0,AD7147_ADD[i],STAGE_COMPLETE_LIMIT_INT, 1, stagecomplete0[0],stagecomplete1[0],stagecomplete2[0],stagecomplete3[0], 0);		
 		     WriteViaI2C(CH0,AD7147_ADD[i],AMB_COMP_CTRL0,1, ConfigBuffer, 0);
+
 	///DEBUG	      
 	  //        ConfigAD7147(CH0,i,PW_CONTROL,ConValue); //0 is the number of the device		 
 	    } 
@@ -800,12 +821,14 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
 	    
 	    if (error==1)
 	    {
-		      for (j=0;j<4;j++)
-			  {
-			  	ConfigAD7147(CH0,j,PW_CONTROL,ConValue); //0 is the number of the device
-			  }	
+	//	      for (j=0;j<4;j++)
+			  
+				j=(triangleN/4);
+				ConfigAD7147(CH0,j,PW_CONTROL,ConValue); //0 is the number of the device
+	    
+			  	
 			  return;
-		}
+			   }
 		else 
 		{
 		    PMsgID=0x300;   

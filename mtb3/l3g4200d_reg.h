@@ -2,7 +2,7 @@
  *  MTB board - RBCS,  - 2012                        *
  *  Gyroscope L3G4200D                               *
  *                                                   *
- *  Written by Marco Maggiali                        *
+ *  Written by Merello                        *
  *  <marco.maggiali@iit.it>                          *
  ****************************************************/
 

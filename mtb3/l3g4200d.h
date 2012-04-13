@@ -2,7 +2,7 @@
  *  EMS board - RBCS, EDL - 2010                     *
  *  L3G4200D driver                                  *
  *                                                   *
- *  Written by Andrea Merello                        *  
+ *  adjusted by Marco Maggiali stolen from Merello                      *  
  *  <andrea.merello@iit.it>                          *
  ****************************************************/
 

@@ -18,7 +18,7 @@
 //#define NOLOAD   235 //the value that corresponds with 0 pressure
 #define MAXVAL   255 //max value of the taxel  
 #define MINVAL     0  //min value of the taxel
-#define TIMER_SINGLE_256dec   0x3700          //timer value default 3A00
+#define TIMER_SINGLE_256dec   0x3D1C          //timer value default 50ms
 #define TIMER_SINGLE_128dec   0x2D00          //timer value default
 #define TIMER_SINGLE_64dec   0x1A00          //timer value default
 #define TIMER_THREE    0x2A00

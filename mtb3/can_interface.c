@@ -30,6 +30,7 @@ extern unsigned int SHIFT_THREE;
 extern unsigned int SHIFT_ALL;
 extern unsigned int NOLOAD;
 extern unsigned int ANALOG_ACC;
+extern unsigned int GYRO_ACC;
 extern char _additional_info[32];
 extern unsigned int ConValue[2];
 // can RX messages buffer
@@ -157,32 +158,31 @@ unsigned char CAN1_send(unsigned int MessageID,unsigned char FrameType,unsigned 
 {
     unsigned char i=0;
 
-      DisableIntCAN1;
+    DisableIntCAN1;
     if (canTxBufferIndex<(CAN_TX_SOFTWARE_BUFFER_SIZE-1))
     {
-      
         canTxBufferIndex++;     
         canTxBuffer[canTxBufferIndex].CAN_messID=MessageID;
-        canTxBuffer[canTxBufferIndex].CAN_frameType=FrameType;
+        //canTxBuffer[canTxBufferIndex].CAN_frameType=FrameType;
         canTxBuffer[canTxBufferIndex].CAN_length=Length;
         for (i=0;i<Length;i++)
         {
             canTxBuffer[canTxBufferIndex].CAN_data[i]=Data[i];  
         }
-       
+    
         if (canTxBufferIndex==0)
         {
             while (!CAN1IsTXReady(0));
             C1INTFbits.TX0IF=1;
           //	C1TX0CONbits.TXREQ=1;
         }
-    EnableIntCAN1;
+    EnableIntCAN1; 
     return 0;
     } else
     {
         canTxBufferIndex=-1;
-        MessageID= 0x100;
-        MessageID |= (CAN_BOARD_ID) << 4;
+        MessageID= 0x700;
+        MessageID |= (_board_ID) << 4;
         MessageID |= CAN_BCAST_OVERFLOW;
         while (!CAN1IsTXReady(0));    
         CAN1SendMessage((CAN_TX_SID(MessageID)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
@@ -195,13 +195,8 @@ unsigned char CAN1_send(unsigned int MessageID,unsigned char FrameType,unsigned 
 
 void CAN1_interruptTx (void)
 {
-    unsigned char buffer;
-        
-    if ((C1CTRLbits.ICODE==0b100))
-    {
-        buffer=0;       
-        C1INTFbits.TX0IF=0;
-    
+    unsigned char buffer=0;
+
     if (canTxBufferIndex!=-1)
     {
         CAN1SendMessage((CAN_TX_SID(canTxBuffer[canTxBufferIndex].CAN_messID)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
@@ -211,17 +206,9 @@ void CAN1_interruptTx (void)
                         buffer);
         canTxBufferIndex--;
     }
-    
-    }
-    else 
-    {
-//    	 CAN1SendMessage((CAN_TX_SID(0x200 | _board_ID)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
-//                      (CAN_TX_EID(0)) & CAN_NOR_TX_REQ,
-//                      buffer,
-//                        1,
-//                        buffer);
-   }
-
+       
+    if ((C1CTRLbits.ICODE==0b100))
+    C1INTFbits.TX0IF=0;
 }
 
 void CAN1_interruptRx (void)
@@ -476,6 +463,7 @@ int CAN1_handleRx (unsigned int board_id)
 					EnableIntT1;
 
    					if (1==ANALOG_ACC) EnableIntT2;
+   					if (1==GYRO_ACC)   EnableIntT2;
 				}
 				break;
 				
@@ -494,15 +482,20 @@ int CAN1_handleRx (unsigned int board_id)
 					SHIFT_THREE =	CANRxBuffer[canRxBufferIndex-1].CAN_data[2]&0xF;             
 					SHIFT_ALL   =	CANRxBuffer[canRxBufferIndex-1].CAN_data[3]&0xF;     
 					NOLOAD		=	CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0xFF;  
-					ANALOG_ACC =	CANRxBuffer[canRxBufferIndex-1].CAN_data[5]&0x01;  
-					
-					DisableIntT2;
+					ANALOG_ACC  =	CANRxBuffer[canRxBufferIndex-1].CAN_data[5]&0x01;  
+					GYRO_ACC    =   CANRxBuffer[canRxBufferIndex-1].CAN_data[6]&0x01;
 					
 					if (ANALOG_ACC)
 					{
 						 EnableIntT2;
 						 T2_Init(TIMER_VALUE2);
     				     ADC_Init();             //Initialize the A/D converter
+					}
+					if (GYRO_ACC)
+					{
+						 EnableIntT2;
+						 T2_Init(TIMER_VALUE2);
+
 					}
 					board_MODE=CALIB;
 					EnableIntT1;

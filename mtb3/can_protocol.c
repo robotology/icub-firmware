@@ -75,7 +75,7 @@ B[1-7] Pressure Measurements
 
 
 
-#define CAN_TX_SOFTWARE_BUFFER_SIZE 10
+#define CAN_TX_SOFTWARE_BUFFER_SIZE 64
 
 //
 // Needed CAN test commands for AdC (class 010)
