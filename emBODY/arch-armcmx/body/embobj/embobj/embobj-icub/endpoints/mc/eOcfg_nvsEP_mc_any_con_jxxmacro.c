@@ -87,7 +87,6 @@
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-#define K2K EOK_cfg_nvsEP_mc_jxx_NVID_jconfig
 
 
 #define OFFSETof_jconfig                                        (JMACRO_JOFF)

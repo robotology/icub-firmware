@@ -70,9 +70,9 @@
 //    jth is the joint number, jnvindex is the index of variable in the joint 
 #define EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(jth, jnvindex)            (EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_joint(jth) + (jnvindex))
 
-
-#warning  --> ????????pensoc he il posto giusto per i vari EOK_cfg_nvsEP_mc_jxx_NVID_jconfig(jth) sia in questo file perche' i NVID dipendono da come i joint e poi gli endpoint sono piazzati dentro le bodypart.
-        
+// -- macro which computes the off part of the nvid of a nv in the motor mth when inserted inside a bodypart
+//    mth is the motor number, mnvindex is the index of variable in the motor 
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_motor(mth, mnvindex)            (EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_motor(mth) + (mnvindex))
 
 
 
@@ -91,6 +91,18 @@
 #define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__setpoint(j)                                  EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__setpoint, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__setpoint))
 #define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__controlmode(j)                               EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__controlmode, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__controlmode))
         
+
+        
+// -- the nvid of all the network variables of the motor as a function of the motor number m
+
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig(m)                                    EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_motor(m, EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig))
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__pidcurrent(m)                        EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__pidcurrent, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_motor(m, EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__pidcurrent))
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__maxvelocityofmotor(m)                EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__maxvelocityofmotor, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_motor(m, EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__maxvelocityofmotor))
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__maxcurrentofmotor(m)                 EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__maxcurrentofmotor, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_motor(m, EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__maxcurrentofmotor))
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__upto02descrforchameleon06(m)         EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__upto02descrforchameleon06, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_motor(m, EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__upto02descrforchameleon06))
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx__mstatus(m)                                   EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP__mstatus, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_motor(m, EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex__mstatus))
+      
+
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
