@@ -38,9 +38,12 @@
 
 
 #include "eOcfg_nvsEP_mc_any_con_bodypart.h"
+
 #include "eOcfg_nvsEP_mc_any_con_jxx.h"    
 #include "eOcfg_nvsEP_mc_any_con_jxxdefault.h" 
 
+#include "eOcfg_nvsEP_mc_any_con_mxx.h"    
+#include "eOcfg_nvsEP_mc_any_con_mxxdefault.h" 
 
 
 
@@ -79,6 +82,8 @@ static uint16_t s_hash(uint16_t id);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
+
+// -- the 6 joints
 
 #define JMACRO_EXTERNALPREFIX_GETID                EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx
 
@@ -144,6 +149,73 @@ static uint16_t s_hash(uint16_t id);
 #include "eOcfg_nvsEP_mc_any_con_jxxmacro.c"
 
 
+// -- the 6 motors
+
+#define MMACRO_EXTERNALPREFIX_GETID                EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx
+
+
+// motor 00
+#define MMACRO_PSTR    _leftleg
+#define MMACRO_MSTR    _m00
+#define MMACRO_PNUM    5
+#define MMACRO_MNUM    0    
+#define MMACRO_MOFF    (MMACRO_MNUM*sizeof(eOmc_motor_t))
+
+#include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
+
+
+// motor 01
+#define MMACRO_PSTR    _leftleg
+#define MMACRO_MSTR    _m01
+#define MMACRO_PNUM    5
+#define MMACRO_MNUM    1    
+#define MMACRO_MOFF    (MMACRO_MNUM*sizeof(eOmc_motor_t))
+
+#include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
+
+
+
+// motor 02
+#define MMACRO_PSTR    _leftleg
+#define MMACRO_MSTR    _m02
+#define MMACRO_PNUM    5
+#define MMACRO_MNUM    2    
+#define MMACRO_MOFF    (MMACRO_MNUM*sizeof(eOmc_motor_t))
+
+#include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
+
+
+// motor 03
+#define MMACRO_PSTR    _leftleg
+#define MMACRO_MSTR    _m03
+#define MMACRO_PNUM    5
+#define MMACRO_MNUM    3    
+#define MMACRO_MOFF    (MMACRO_MNUM*sizeof(eOmc_motor_t))
+
+#include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
+
+
+// motor 04
+#define MMACRO_PSTR    _leftleg
+#define MMACRO_MSTR    _m04
+#define MMACRO_PNUM    5
+#define MMACRO_MNUM    4    
+#define MMACRO_MOFF    (MMACRO_MNUM*sizeof(eOmc_motor_t))
+
+#include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
+
+
+// motor 05
+#define MMACRO_PSTR    _leftleg
+#define MMACRO_MSTR    _m05
+#define MMACRO_PNUM    5
+#define MMACRO_MNUM    5    
+#define MMACRO_MOFF    (MMACRO_MNUM*sizeof(eOmc_motor_t))
+
+#include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
+
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -157,6 +229,15 @@ static uint16_t s_hash(uint16_t id);
 #define J04p    (4*Jn)
 #define J05p    (5*Jn)
 
+
+#define Mn      (6)
+
+#define M00p    (0)
+#define M01p    (1*Mn)
+#define M02p    (2*Mn)
+#define M03p    (3*Mn)
+#define M04p    (4*Mn)
+#define M05p    (5*Mn)
 //extern EOtreenode eo_cfg_nvsEP_mc_leftleg_tree_con[];
 
 extern EOtreenode eo_cfg_nvsEP_mc_leftleg_tree_con[] =
@@ -691,11 +772,14 @@ extern EOtreenode eo_cfg_nvsEP_mc_leftleg_tree_con[] =
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
-    }
+    },
     
     
         #warning and in here come the 6 motors
- 
+
+
+
+    
 };
 
 
