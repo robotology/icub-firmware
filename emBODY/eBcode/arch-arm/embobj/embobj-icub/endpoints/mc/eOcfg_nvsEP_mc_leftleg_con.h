@@ -17,6 +17,7 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
+
 #ifndef _EOCFG_NVSEP_MC_LEFTLEG_CON_H_
 #define _EOCFG_NVSEP_MC_LEFTLEG_CON_H_
 
@@ -49,62 +50,33 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-// the starting number for the nvid
-#define EOK_cfg_nvsEP_mc_leftleg_firstid                            (0)
 
 // the 16bit value to use to identify the endpoint
 #define EOK_cfg_nvsEP_mc_leftleg_endpoint                           (0x0010)
 
 
-// -- the fun and typ of all the nv in the endpoint
-
-#define EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00_jconfig                           EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd)
-#define EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00_jconfig__pidposition              EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd)
-#define EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00_jconfig__pidvelocity              EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd)
-#define EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00_jconfig__pidtorque                EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd)
-#define EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00_jconfig__minpositionofjoint       EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u32)
-#define EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00_jconfig__maxpositionofjoint       EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u32)
-#define EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00_jconfig__velocitysetpointtimeout  EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u16)
-
-#define EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00__jstatus                          EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd)
-#define EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00__calibrator                       EO_nv_FUNTYP(eo_nv_FUN_out, eo_nv_TYP_pkd)
-#define EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00__setpoint                         EO_nv_FUNTYP(eo_nv_FUN_out, eo_nv_TYP_pkd)
-#define EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00__controlmode                      EO_nv_FUNTYP(eo_nv_FUN_out, eo_nv_TYP_u08)
 
 
+// -- the fun and typ of all the nv in the endpoint are in eOcfg_nvsEP_mc_jxx_con.h and eOcfg_nvsEP_mc_mxx_con.h
+// -- the identifiers of all the nv in the endpoint are in eOcfg_nvsEP_mc_jxx_con.h and eOcfg_nvsEP_mc_mxx_con.h
+// -- there are 12 nvid for each of the 6 joints. the nvids are a function of the joint number j = [0, 5]
+// -- there are 6 nvid for each of the 6 motors. the nvids are a function of the motor number m = [0, 5]
 
-#define EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_motor00_mconfig                           EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd)
-#define EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_motor00_mconfig__pidcurrent               EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd)
-#define EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_motor00_mconfig__maxvelocityofmotor       EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u32)
-#define EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_motor00_mconfig__maxcurrentofmotor        EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u16)
-
-#define EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_motor00__mstatus                          EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd)
-
+#include "eOcfg_nvsEP_mc_jxx_con.h"
 
 
-// -- the identifiers of all the nv in the endpoint
-
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_joint00_jconfig                               EO_nv_ID(EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00_jconfig,                         0+EOK_cfg_nvsEP_mc_leftleg_firstid)
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_joint00_jconfig__pidposition                  EO_nv_ID(EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00_jconfig__pidposition,            1+EOK_cfg_nvsEP_mc_leftleg_firstid)
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_joint00_jconfig__pidvelocity                  EO_nv_ID(EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00_jconfig__pidvelocity,            2+EOK_cfg_nvsEP_mc_leftleg_firstid)
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_joint00_jconfig__pidtorque                    EO_nv_ID(EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00_jconfig__pidtorque,              3+EOK_cfg_nvsEP_mc_leftleg_firstid)
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_joint00_jconfig__minpositionofjoint           EO_nv_ID(EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00_jconfig__minpositionofjoint,     4+EOK_cfg_nvsEP_mc_leftleg_firstid)
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_joint00_jconfig__maxpositionofjoint           EO_nv_ID(EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00_jconfig__maxpositionofjoint,     5+EOK_cfg_nvsEP_mc_leftleg_firstid)
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_joint00_jconfig__velocitysetpointtimeout      EO_nv_ID(EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00_jconfig__velocitysetpointtimeout,6+EOK_cfg_nvsEP_mc_leftleg_firstid)
-
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_joint00__jstatus                              EO_nv_ID(EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00__jstatus,                        7+EOK_cfg_nvsEP_mc_leftleg_firstid)
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_joint00__calibrator                           EO_nv_ID(EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00__calibrator,                     8+EOK_cfg_nvsEP_mc_leftleg_firstid)
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_joint00__setpoint                             EO_nv_ID(EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00__setpoint,                       9+EOK_cfg_nvsEP_mc_leftleg_firstid)
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_joint00__controlmode                          EO_nv_ID(EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_joint00__controlmode,                   10+EOK_cfg_nvsEP_mc_leftleg_firstid)
-
-
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_motor00_mconfig                               EO_nv_ID(EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_motor00_mconfig,                        11+EOK_cfg_nvsEP_mc_leftleg_firstid)
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_motor00_mconfig__pidcurrent                   EO_nv_ID(EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_motor00_mconfig__pidcurrent,            12+EOK_cfg_nvsEP_mc_leftleg_firstid)
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_motor00_mconfig__maxvelocityofmotor           EO_nv_ID(EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_motor00_mconfig__maxvelocityofmotor,    13+EOK_cfg_nvsEP_mc_leftleg_firstid)
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_motor00_mconfig__maxcurrentofmotor            EO_nv_ID(EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_motor00_mconfig__maxcurrentofmotor,     14+EOK_cfg_nvsEP_mc_leftleg_firstid)
-
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_motor00__mstatus                              EO_nv_ID(EOK_cfg_nvsEP_mc_leftleg_NVFUNTYP_motor00__mstatus,                       15+EOK_cfg_nvsEP_mc_leftleg_firstid)
-
+#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig(jth)                                  EOK_cfg_nvsEP_mc_jxx_NVID_jconfig(jth)
+#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__pidposition(jth)                     EOK_cfg_nvsEP_mc_NVID_jconfig__pidposition(jth)                       
+#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__pidvelocity(jth)                     EOK_cfg_nvsEP_mc_NVID_jconfig__pidvelocity(jth)                      
+#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__pidtorque(jth)                       EOK_cfg_nvsEP_mc_NVID_jconfig__pidtorque(jth)       
+#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__minpositionofjoint(jth)              EOK_cfg_nvsEP_mc_NVID_jconfig__minpositionofjoint(jth)       
+#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__maxpositionofjoint(jth)              EOK_cfg_nvsEP_mc_NVID_jconfig__maxpositionofjoint(jth)       
+#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__velocitysetpointtimeout(jth)         EOK_cfg_nvsEP_mc_NVID_jconfig__velocitysetpointtimeout(jth)    
+#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__upto02descrforchameleon02(jth)       EOK_cfg_nvsEP_mc_NVID_jconfig__upto02descrforchameleon02(jth)        
+#define EOK_cfg_nvsEP_mc_leftleg_NVID__jstatus(jth)                                 EOK_cfg_nvsEP_mc_NVID__jstatus(jth)                  
+#define EOK_cfg_nvsEP_mc_leftleg_NVID__calibrator(jth)                              EOK_cfg_nvsEP_mc_NVID__calibrator(jth)                              
+#define EOK_cfg_nvsEP_mc_leftleg_NVID__setpoint(jth)                                EOK_cfg_nvsEP_mc_NVID__setpoint(jth)                                
+#define EOK_cfg_nvsEP_mc_leftleg_NVID__controlmode(jth)                             EOK_cfg_nvsEP_mc_NVID__controlmode(jth)                           
 
 
 
@@ -125,7 +97,7 @@ typedef struct
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eo_cfg_nvsEP_mc_leftleg_t eo_cfg_nvsEP_mc_leftleg_default;
+//extern const eo_cfg_nvsEP_mc_leftleg_t eo_cfg_nvsEP_mc_leftleg_default;
 
 // EOconstvector where each element is a EOtreenode whose data field is a EOnv_con_t object (id, capacity, valuedef, offset)
 extern const EOconstvector* const eo_cfg_nvsEP_mc_leftleg_constvector_of_treenodes_EOnv_con;
