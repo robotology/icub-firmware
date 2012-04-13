@@ -361,9 +361,6 @@ typedef struct                  // size is 4+4+2+6+0 = 16
 
 // manca la calibrazione ed altro ...
 
-#warning -> usare due variabili booleane per CAN_MOTION_DONE
-//eObool_t    signalwhendesiredpositionisreached;     // beh, oppure output. magari si mette anche il numero di milli di validita'. 
-//eObool_t    desiredpositionisreached;               // input. magari si segnala anche la position.
 
 
 //typedef struct                  // size is 68+8+36+12+1+1+1+1 = 128
@@ -406,6 +403,9 @@ typedef struct                  // size is 64+16+8+12+1+3+0 = 104
     eOenum08_t                  controlmode;                /**< use values from eOmc_controlmode_t, but maybe its enum type will change*/
     uint8_t                     filler03[3];                // space for some other variables ...
 } eOmc_joint_t;                 EO_VERIFYsizeof(eOmc_joint_t, 104);
+#warning -> usare due variabili booleane per CAN_MOTION_DONE
+//eObool_t    signalwhendesiredpositionisreached;     // beh, oppure output. magari si mette anche il numero di milli di validita'. 
+//eObool_t    desiredpositionisreached;               // input. magari si segnala anche la position.
 
 
 typedef struct                  // size is 24+16+0 = 40
