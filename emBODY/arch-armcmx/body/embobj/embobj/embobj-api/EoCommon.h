@@ -302,6 +302,33 @@ typedef struct
 } eOipv4addressing_t; 
 
 
+/** @typedef    typedef struct eOutil_canframe_t
+    @brief      eOcanframe_t contains a can frame as defined in hal_can.h. 
+ **/
+typedef struct              // size is 16 bytes
+{
+    uint32_t                id;             /**< can frame id    */
+    uint8_t                 id_type;        /**< can frame id format */
+    uint8_t                 frame_type;     /**< frame type */
+    uint8_t                 size;           /**< data size */
+    uint8_t                 unused;         /**< filler */
+    uint8_t                 data[8];        /**< the data (payload) */    
+} eOcanframe_t;
+
+
+
+/** @typedef    typedef enum  eOutil_canport_t
+    @brief      eOcanport_t contains a can port as defined in hal_can.h. 
+ **/
+typedef enum              
+{
+     eOcanport1    = 0,          /**< CAN1        */
+     eOcanport2    = 1           /**< CAN2        */
+} eOcanport_t;    
+  
+
+
+
 /** @define     eOvirtual
     @brief      eOvirtual is a qualifier used to identify the virtual methods of an object.
  **/
@@ -355,7 +382,14 @@ typedef     void        (*eOvoid_fp_voidfpvoiduint32_t)             (void (*)(vo
 typedef     void        (*eOvoid_fp_voidfpvoiduint32uint8_t)       (void (*)(void), uint32_t, uint8_t);
 
 
-
+/** @typedef    typedef struct eOcallbackData_t
+    @brief      eOcallbackData_t contains data of a callback: function pointer and its argument.
+ **/  
+typedef struct
+{
+    eOcallback_t     fn;
+    void             *argoffn;
+} eOcallbackData_t;
 
 /** @typedef    typedef struct eObasicabstraction_hal_sys_fn_t
     @brief      eObasicabstr_hal_sys_fn_t contains the basic system functions typically given by a HAL which can be used for instance

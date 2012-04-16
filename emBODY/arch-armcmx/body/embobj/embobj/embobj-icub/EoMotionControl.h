@@ -190,6 +190,7 @@ typedef struct                  // size is: 16+4+2+2+0 = 24
     //uint8_t                     filler02[2];
     eOutil_chameleon_descriptor_t upto02descrforchameleon06[2]; /**< accomodates up to 2 descriptors for a chameleon of 6 bytes. */
 } eOmc_motor_config_t;          EO_VERIFYsizeof(eOmc_motor_config_t, 24);
+#warning --> I2T params misssed 
 
 
 /** @typedef    typedef struct eOmc_joint_status_t
@@ -463,15 +464,30 @@ typedef struct                  // size is 104*6+40*6+0 = 864
 
 
 /** @typedef    typedef uint8_t  eOmc_jointUniqueId_t
-    @brief      eOmc_jointUniqueId_t contains the values required to identify a joint of robot univocally
+    @brief      eOmc_jointUniqueId_t contains the values required to identify a joint 
+                of robot univocally on a body part
  **/
 typedef uint8_t  eOmc_jointUniqueId_t;
 
-//VALE
+
 /** @typedef    typedef uint8_t  eOmc_jointBoardId_t
     @brief      eOmc_jointBoardId_t contains the values required to identify a joint on a board.
  **/
 typedef uint8_t  eOmc_jointBoardId_t;
+
+
+/** @typedef    typedef uint8_t  eOmc_motorUniqueId_t
+    @brief      eOmc_motorUniqueId_t contains the values required to identify a motor 
+                of robot univocally on a body part
+ **/
+typedef uint8_t  eOmc_motorUniqueId_t;
+
+
+/** @typedef    typedef uint8_t  eOmc_motorBoardId_t
+    @brief      eOmc_motorBoardId_t contains the values required to identify a motor on a board.
+ **/
+typedef uint8_t  eOmc_motorBoardId_t;
+
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
