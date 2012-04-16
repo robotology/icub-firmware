@@ -41,7 +41,8 @@
 
 #include "EoCommon.h"
 #include "EoMotionControl.h"
-
+#include "eOcfg_nvsEP_mc_any_con_jxx.h"
+#include "eOcfg_nvsEP_mc_any_con_mxx.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
