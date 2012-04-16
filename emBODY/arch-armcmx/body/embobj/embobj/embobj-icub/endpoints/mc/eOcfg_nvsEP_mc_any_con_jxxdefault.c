@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       eo_cfg_nvsEP_mc_any_con_jxxdefault.c
+/* @file       eOcfg_nvsEP_mc_any_con_jxxdefault.c
     @brief      This file keeps constant configuration for ...
     @author     marco.accame@iit.it
     @date       04/06/2012
