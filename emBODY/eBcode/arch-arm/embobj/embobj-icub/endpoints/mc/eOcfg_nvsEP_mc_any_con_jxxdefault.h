@@ -23,7 +23,7 @@
 
 
 
-/** @file       eOcfg_cfg_nvsEP_mc_any_con_jxxdefault.h
+/** @file       eOcfg_nvsEP_mc_any_con_jxxdefault.h
 	@brief      This header file gives the ...
 	@author     marco.accame@iit.it
 	@date       09/06/2011
