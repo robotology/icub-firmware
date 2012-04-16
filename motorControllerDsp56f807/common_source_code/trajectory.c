@@ -8,6 +8,7 @@
 #include "controller.h"
 #include "asc.h"
 #include "trajectory.h"
+#include "can1.h"
 
 /******************************************************/
 // global variables
@@ -141,6 +142,7 @@ Int16 init_trajectory (byte jj, Int32 current, Int32 final, Int16 speed)
 	_curtf[jj] = 0;
 	_curstepf[jj] = 0;
 	_ended[jj] = false;
+	//can_printf ("INIT_TRJ");
 	
 	return 0;
 }
@@ -165,6 +167,7 @@ Int16 abort_trajectory (byte jj, Int32 limit)
 		_curstepf[jj] = 0;
 		_xf[jj] = limit;
 	}
+	//can_printf ("ABORT_TRJ");
 	
 	return 0;
 }
@@ -214,6 +217,7 @@ Int32 step_trajectory (byte jj)
 		return a;
 	}			
 
+	//can_printf ("POS_ENDED");
 	_ended[jj] = true;
 	return _xf[jj];
 }
@@ -263,6 +267,7 @@ Int32 step_trajectory_delta (byte jj)
 		return delta_a;
 	}			
 
+	//can_printf ("VEL_ENDED");
 	_ended[jj] = true;
 	return 0;
 }
