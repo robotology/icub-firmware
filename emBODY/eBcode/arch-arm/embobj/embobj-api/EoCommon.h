@@ -85,6 +85,10 @@
 // issues a compiler error if the sizeof the struct is not what in second argument
 #define EO_VERIFYsizeof(sname, ssize)       __emBODYportingVERIFYsizeof(sname, ssize)
 
+// issues a compiler error if the sizeof the struct is not what in second argument
+#define EO_VERIFYproposition(name, prop)    typedef uint8_t GUARD##name[ ( 0 == (prop) ) ? (0) : (1)];
+
+
 #define EO_U8toU32(a)                       ((uint32_t)(a)&0xff)
 #define EO_U16toU32(a)                      ((uint32_t)(a)&0xffff)
 #define EO_U8toU64(a)                       ((uint64_t)(a)&0xff)
