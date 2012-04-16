@@ -45,6 +45,9 @@
 #include "EOnv.h"
 
 #include "EoMotionControl.h"
+#include "eOcfg_nvsEP_mc_any_con_bodypart.h"
+#include "eOcfg_nvsEP_mc_any_con_jxx.h"
+#include "eOcfg_nvsEP_mc_any_con_mxx.h"
 
  
 
@@ -56,6 +59,9 @@
 
 // the 16bit value to use to identify the endpoint
 #define EOK_cfg_nvsEP_mc_leftleg_EP                                                 (0x0010)
+
+// the total number of nv in the endpoint
+#define EOK_cfg_nvsEP_leftleg_NUMofVARS                                             ((EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber*EOK_cfg_nvsEP_mc_leftleg_NUMofJOINTS)+(EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber*EOK_cfg_nvsEP_mc_leftleg_NUMofMOTORS))
 
 
 // the 16bit used to identify the network variable inside the endpoint. they are function of the joint or motor number (jth or mth)
