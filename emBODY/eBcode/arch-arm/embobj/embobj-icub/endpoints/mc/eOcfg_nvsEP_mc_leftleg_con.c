@@ -265,7 +265,7 @@ static uint16_t s_hash(uint16_t id);
 
 //extern EOtreenode eo_cfg_nvsEP_mc_leftleg_tree_con[];
 
-extern EOtreenode eo_cfg_nvsEP_mc_leftleg_tree_con[] =
+extern EOtreenode eo_cfg_nvsEP_mc_leftleg_tree_con[EOK_cfg_nvsEP_leftleg_NUMofVARS] =
 {
     // joint00
     {   // 0
