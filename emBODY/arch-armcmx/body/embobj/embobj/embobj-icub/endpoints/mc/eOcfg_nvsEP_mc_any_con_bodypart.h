@@ -56,8 +56,6 @@
 // -- max number of network variables in a motor
 #define  EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_nvs_in_motor                    16
 
-#warning --> add a control so that max number of id per motor and joint is not higher than 1024. if it is ... then ... dont use EO_nv_FUNTYP() 
-
 
 // -- the first nvid off of the joint jth
 #define EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_joint(jth)                ((jth)*EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_nvs_in_joint) 
