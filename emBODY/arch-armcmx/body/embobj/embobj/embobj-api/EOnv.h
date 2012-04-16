@@ -74,16 +74,15 @@
 typedef struct EOnv_hid EOnv;
 
 
+typedef uint16_t eOnvEP_t;
 
 typedef uint16_t eOnvID_t;
 
-typedef uint16_t eOnvEP_t;
-
-//typedef struct      // 04 bytes
-//{
-//    eOnvEP_t        ep;
-//    eOnvID_t        id;
-//} eOnvEPID_t;       EO_VERIFYsizeof(eOnvEPID_t, 4);
+typedef struct      // 04 bytes
+{
+    eOnvEP_t        ep;
+    eOnvID_t        id;
+} eOnvEPID_t;       EO_VERIFYsizeof(eOnvEPID_t, 4);
 
 
 typedef enum
