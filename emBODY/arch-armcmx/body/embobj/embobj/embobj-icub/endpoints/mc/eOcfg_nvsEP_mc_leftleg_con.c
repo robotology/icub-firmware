@@ -31,7 +31,7 @@
 #include "string.h"
 #include "stdio.h"
 
-#include "eOcommon.h"
+#include "EoCommon.h"
 #include "EOnv_hid.h"
 #include "EOtreenode_hid.h"
 #include "EOconstvector_hid.h"
