@@ -46,7 +46,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+#include "eOcfg_nvsEP_mc_any_con_bodypart_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -115,7 +116,7 @@ static const uint8_t s_eo_cfg_nvsEP_mc_any_con_bodypart_mxxfuntyp[EOK_cfg_nvsEP_
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_joint_var_Get(uint8_t j, eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t jnvindex)
+extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_joint_var_Get(eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t j, eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t jnvindex)
 {
     if((j >= EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_joints) || (jnvindex >= EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber))
     {
@@ -125,7 +126,7 @@ extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_joint_var_Get(uint8_t 
 }
 
 
-extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get(uint8_t m, eo_cfg_nvsEP_mc_any_con_bodypart_motorNVindex_t mnvindex)
+extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get(eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t m, eo_cfg_nvsEP_mc_any_con_bodypart_motorNVindex_t mnvindex)
 {
     if((m >= EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_motors) || (mnvindex >= EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber))
     {
@@ -159,7 +160,7 @@ extern eOnvIDfuntyp_t eo_cfg_nvsEP_mc_any_con_bodypart_NVIDfuntyp_mxx_Get(eo_cfg
     }
     return(s_eo_cfg_nvsEP_mc_any_con_bodypart_mxxfuntyp[mnvindex]);
 } 
-
+    
 #endif   
 
 

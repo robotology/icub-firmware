@@ -243,7 +243,7 @@ static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_UPDT_Mxx__mstatus(uint1
 //        EO_INIT(.stg_address)           EOK_uint32dummy       // we dont give any storage address.
 //    },
 
-static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_array_of_EOnv_usr[EOK_cfg_nvsEP_leftleg_NUMofVARS] =
+static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_array_of_EOnv_usr[varsLeftLeg_TOTALnumber] =
 {
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leftleg_j00_ebx_jconfig,
@@ -854,11 +854,11 @@ extern void eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_initialise(void* loc, void* rem)
     // 1. assign default values
     //memcpy(mngmnt_loc, &eo_cfg_nvsEP_mc_leftleg_default, sizeof(eo_cfg_nvsEP_mc_leftleg_t));
     // as there is not a global default value ...
-    for(j=0; j<EOK_cfg_nvsEP_mc_leftleg_NUMofJOINTS; j++)
+    for(j=0; j<jointLeftLeg_TOTALnumber; j++)
     {
         memcpy(&lloc->joints[j], &eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue, sizeof(eOmc_joint_t)); 
     }
-    for(m=0; m<EOK_cfg_nvsEP_mc_leftleg_NUMofMOTORS; m++)
+    for(m=0; m<motorLeftLeg_TOTALnumber; m++)
     {
         memcpy(&lloc->motors[m], &eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue, sizeof(eOmc_motor_t)); 
     }    

@@ -45,91 +45,71 @@
 #include "eOcfg_nvsEP_mc_any_con_jxx.h"
 #include "eOcfg_nvsEP_mc_any_con_mxx.h"
 
+
 // - public #define  --------------------------------------------------------------------------------------------------
 
-// -- max mumber of joints and motors in a bodypart
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_joints                           20
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_motors                           20
-
-// -- max number of network variables in a joint
-#define  EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_nvs_in_joint                    32
-
-// -- max number of network variables in a motor
-#define  EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_nvs_in_motor                    16
-
-
-// -- the first nvid off of the joint jth
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_joint(jth)                ((jth)*EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_nvs_in_joint) 
-
-// -- the first nvid off of the motor mth
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_motor(mth)                ((mth)*EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_nvs_in_motor + EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_joint(EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_joints))                                               
-
-
-
-// -- macro which computes the off part of the nvid of a nv in the joint jth when inserted inside a bodypart
-//    jth is the joint number, jnvindex is the index of variable in the joint 
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(jth, jnvindex)            (EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_joint(jth) + (jnvindex))
-
-// -- macro which computes the off part of the nvid of a nv in the motor mth when inserted inside a bodypart
-//    mth is the motor number, mnvindex is the index of variable in the motor 
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_motor(mth, mnvindex)            (EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_motor(mth) + (mnvindex))
-
-
-
-// -- the nvid of all the network variables of the joint as a function of the joint number j
-
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig(j)                                    EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig))
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidposition(j)                       EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__pidposition, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidposition))
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidvelocity(j)                       EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__pidvelocity, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidvelocity))
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidtorque(j)                         EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__pidtorque, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidtorque))
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__minpositionofjoint(j)                EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__minpositionofjoint, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__minpositionofjoint))
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__maxpositionofjoint(j)                EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__maxpositionofjoint, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__maxpositionofjoint))
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__velocitysetpointtimeout(j)           EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__velocitysetpointtimeout, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__velocitysetpointtimeout))
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__upto02descrforchameleon02(j)         EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__upto02descrforchameleon02, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__upto02descrforchameleon02))
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__jstatus(j)                                   EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__jstatus, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__jstatus))
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__calibrator(j)                                EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__calibrator, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__calibrator))
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__setpoint(j)                                  EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__setpoint, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__setpoint))
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__controlmode(j)                               EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__controlmode, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__controlmode))
-        
-
-        
-// -- the nvid of all the network variables of the motor as a function of the motor number m
-
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig(m)                                    EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_motor(m, EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig))
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__pidcurrent(m)                        EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__pidcurrent, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_motor(m, EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__pidcurrent))
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__maxvelocityofmotor(m)                EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__maxvelocityofmotor, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_motor(m, EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__maxvelocityofmotor))
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__maxcurrentofmotor(m)                 EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__maxcurrentofmotor, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_motor(m, EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__maxcurrentofmotor))
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__upto02descrforchameleon06(m)         EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__upto02descrforchameleon06, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_motor(m, EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__upto02descrforchameleon06))
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx__mstatus(m)                                   EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP__mstatus, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_motor(m, EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex__mstatus))
-      
-
-
-      
+     
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-EO_VERIFYproposition(EOK_cfg_nvsEP_mc_any_con_bodypart, (1024 > EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_motor(EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_nvs_in_motor)));
 
-
+/** @typedef    typedef enum eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t;
+    @brief      It contains an index for all the joints in a bodypart. In a given bodypart, there are joints for a number lower
+                than jointNumber_TOTALnumber. The numbers are consecutive and without holes.
+ **/
 typedef enum
 {
-    jointNVindex_jconfig                                =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig,
-    jointNVindex_jconfig__pidposition                   =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidposition,
-    jointNVindex_jconfig__pidvelocity                   =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidvelocity,
-    jointNVindex_jconfig__pidtorque                     =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidtorque,
-    jointNVindex_jconfig__minpositionofjoint            =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__minpositionofjoint,
-    jointNVindex_jconfig__maxpositionofjoint            =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__maxpositionofjoint,
-    jointNVindex_jconfig__velocitysetpointtimeout       =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__velocitysetpointtimeout,
-    jointNVindex_jconfig__upto02descrforchameleon02     =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__upto02descrforchameleon02,
-    jointNVindex__jstatus                               =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__jstatus,
-    jointNVindex__calibrator                            =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__calibrator,
-    jointNVindex__setpoint                              =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__setpoint,
-    jointNVindex__controlmode                           =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__controlmode
+    jointNumber_00 = 0,   
+    jointNumber_01, jointNumber_02, jointNumber_03, jointNumber_04, jointNumber_05, jointNumber_06, jointNumber_07, jointNumber_08, jointNumber_09, jointNumber_10,
+    jointNumber_11, jointNumber_12, jointNumber_13, jointNumber_14, jointNumber_15, jointNumber_16, jointNumber_17, jointNumber_18, jointNumber_19
+} eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t;
+
+enum { jointNumber_TOTALnumber = 20};
+
+
+/** @typedef    typedef enum eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t;
+    @brief      It contains an index for all the network variables in a joint. The indices are consecutive and without
+                holes.
+ **/
+typedef enum
+{
+    jointNVindex_jconfig                                =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig,                                  /**< 0 */
+    jointNVindex_jconfig__pidposition                   =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidposition,                     /**< 1 */
+    jointNVindex_jconfig__pidvelocity                   =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidvelocity,                     /**< 2 */
+    jointNVindex_jconfig__pidtorque                     =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidtorque,                       /**< 3 */
+    jointNVindex_jconfig__minpositionofjoint            =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__minpositionofjoint,              /**< 4 */
+    jointNVindex_jconfig__maxpositionofjoint            =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__maxpositionofjoint,              /**< 5 */
+    jointNVindex_jconfig__velocitysetpointtimeout       =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__velocitysetpointtimeout,         /**< 6 */
+    jointNVindex_jconfig__upto02descrforchameleon02     =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__upto02descrforchameleon02,       /**< 7 */
+    jointNVindex__jstatus                               =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__jstatus,                                 /**< 8 */
+    jointNVindex__calibrator                            =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__calibrator,                              /**< 9 */
+    jointNVindex__setpoint                              =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__setpoint,                                /**< 10 */
+    jointNVindex__controlmode                           =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__controlmode                              /**< 11 */
 } eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t;
 
 enum { jointNVindex_TOTALnumber = EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber};
 
+
+
+/** @typedef    typedef enum eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t;
+    @brief      It contains an index for all the motors in a bodypart. In a given bodypart, there are motors for a number lower
+                than motorNumber_TOTALnumber. The numbers are consecutive and without holes.
+ **/
+typedef enum
+{
+    motorNumber_00 = 0,   
+    motorNumber_01, motorNumber_02, motorNumber_03, motorNumber_04, motorNumber_05, motorNumber_06, motorNumber_07, motorNumber_08, motorNumber_09, motorNumber_10,
+    motorNumber_11, motorNumber_12, motorNumber_13, motorNumber_14, motorNumber_15, motorNumber_16, motorNumber_17, motorNumber_18, motorNumber_19
+} eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t;
+
+enum { motorNumber_TOTALnumber = 20};
+
+
+/** @typedef    typedef enum eo_cfg_nvsEP_mc_any_con_bodypart_motorNVindex_t;
+    @brief      It contains an index for all the network variables in a motor. The indices are consecutive and without
+                holes.
+ **/
 typedef enum
 {
     motorNVindex_mconfig                                =   EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig,
@@ -148,11 +128,22 @@ enum { motorNVindex_TOTALnumber = EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnum
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
+/** @fn         extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_joint_var_Get(eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t j, eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t jnvindex)
+    @brief      This function retrieves the eOnvID_t of a network variable with index @e jnvindex for the joint number @e j
+    @param      j               the joint number 
+    @param      jnvinxed        the index of the nv inside the joint
+    @return     the nvid or EOK_uint16dummy in case of failure.
+  */
+extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_joint_var_Get(eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t j, eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t jnvindex);
 
-extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_joint_var_Get(uint8_t j, eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t jnvindex);
 
-extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get(uint8_t m, eo_cfg_nvsEP_mc_any_con_bodypart_motorNVindex_t mnvindex);
-
+/** @fn         extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get(eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t m, eo_cfg_nvsEP_mc_any_con_bodypart_motorNVindex_t mnvindex)
+    @brief      This function retrieves the eOnvID_t of a network variable with index @e nnvindex for the motor number @e m
+    @param      m               the motor number 
+    @param      mnvinxed        the index of the nv inside the motor
+    @return     the nvid or EOK_uint16dummy in case of failure.
+  */
+extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get(eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t m, eo_cfg_nvsEP_mc_any_con_bodypart_motorNVindex_t mnvindex);
 
 
 /** @}            
