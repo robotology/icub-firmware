@@ -49,6 +49,11 @@
 
 
 
+#define ep_leftleg      0x1234
+#define id_j0_setpoint  0x6789
+
+ 
+
 // - public #define  --------------------------------------------------------------------------------------------------
 
 #define EOK_cfg_nvsEP_base                                          (64*0)
@@ -84,7 +89,7 @@
 #define EOK_cfg_nvsEP_base_NVID__forcerestart                       EO_nv_ID(EOK_cfg_nvsEP_base_NVFUNTYP__forcerestart,         8+EOK_cfg_nvsEP_base)
 #define EOK_cfg_nvsEP_base_NVID__localise                           EO_nv_ID(EOK_cfg_nvsEP_base_NVFUNTYP__localise,             9+EOK_cfg_nvsEP_base)
 #define EOK_cfg_nvsEP_base_NVID__remoteipaddress                    EO_nv_ID(EOK_cfg_nvsEP_base_NVFUNTYP__remoteipaddress,      10+EOK_cfg_nvsEP_base)
-#define EOK_cfg_nvsEP_base_NVID__remoteipport                       EO_nv_ID(EOK_cfg_nvsEP_base_NVFUNTYP__remoteipport,         11+EOK_cfg_nvsEP_base)
+#define EOK_cfg_nvsEP_base_NVID__remoteipport(bodypart, joint)                       EO_nv_ID(EOK_cfg_nvsEP_base_NVFUNTYP__remoteipport,         11+EOK_cfg_nvsEP_base)
 
 
 //#define EOK_cfg_nvsEP_base_NVID__boardinfo                          EO_nv_getID(eo_nv_FUN_con, eo_nv_TYP_pkd, 0+EOK_cfg_nvsEP_base)
