@@ -33,8 +33,9 @@
 
 #include "EoMotionControl.h"
 
-#include "EOappCanservicesProvider.h"
+#include "EOappCanServicesProvider.h"
 
+#include "eom_appSkeletonEms_body.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -165,6 +166,10 @@ static void s_eo_cfg_nvsEP_joint_usr_loc_board_action_update__cfg(const EOnv* nv
     eOmc_joint_config_t *cfg = nv->loc;
 
     eOmc_jointUniqueId_t jUniqueId = 0;
+    EOappCanSP *appCanSP_ptr = (EOappCanSP *)eom_appSkeletonEms_body_services_can_getHandle();
+
+    eo_appCanSP_ConfigJoint(appCanSP_ptr, jUniqueId, cfg);
+
  //   eo_appCanSP_ConfigJoint(jUniqueId, cfg);
  #warning: vale-->complete action_update__cfg
 }

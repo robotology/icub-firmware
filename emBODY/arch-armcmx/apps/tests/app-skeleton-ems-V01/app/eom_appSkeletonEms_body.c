@@ -40,6 +40,12 @@
 #include "EOtheErrorManager.h"
 #include "EOsocketDatagram.h"
 #include "EOtheBOARDtransceiver.h"
+#include "EOtheBOARDtransceiver_hid.h"
+#include "EOfifoByte.h"
+
+#include "EoMotionControl.h"
+#include "EOnvsCfg.h"
+
 
 //embobj of application
 #include "EOappCanServicesProvider.h"
@@ -48,6 +54,7 @@
 #include "EOMappDataTransmitter.h"
 #include "EOMappMotorController.h"
 #include "EOMappTheSysController.h"
+#include "EOappTheMCNVmap.h"
 
 //embobj-cfg
 #include "eOcfg_EPs_loc_board.h"
@@ -115,6 +122,7 @@ static void s_eom_appSkeletonEms_body_ledInit(void);
 static void s_eom_appSkeletonEms_body_theBoardTransceiver_init(void);
 static void s_eom_appSkeletonEms_body_CanServicesProvider_init(void);
 static void s_eom_appSkeletonEms_body_EncodersReader_init(void);
+static void s_eom_appSkeletonEms_body_MCNVmap_init(void);
 
 //actors
 static void s_eom_appSkeletonEms_body_TheSysController_init(void);
@@ -156,6 +164,8 @@ extern eOresult_t eom_appSkeletonEms_body_services_init(void)
 /* 4) init encoder reader */
     s_eom_appSkeletonEms_body_EncodersReader_init();
 
+/* 5) init motorController-networkVariables map*/
+    s_eom_appSkeletonEms_body_MCNVmap_init();
     return(eores_OK);
 }
 
@@ -200,6 +210,12 @@ extern eOresult_t eom_appSkeletonEms_body_actors_start(void)
     return(eores_OK);
 }
 
+
+
+extern void* eom_appSkeletonEms_body_services_can_getHandle(void)
+{
+    return((void*)s_appCanSP_ptr);   
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -272,22 +288,46 @@ static void s_eom_appSkeletonEms_body_EncodersReader_init(void)
 
 }
 
-static eOresult_t s_eom_appSkeletonEms_body_sig2appDataCollector_start(void *arg)
+static void s_eom_appSkeletonEms_body_MCNVmap_init(void)
+{
+
+    EOfifoByte *mList_ptr, *sList_ptr;
+
+    eOappTheMCNVmap_cfg_t cfg =
+    {
+        EO_INIT(.jointsList)    eo_fifobyte_New(20 /*jointNumber_TOTALnumber*/, NULL),
+        EO_INIT(.motorsList)    eo_fifobyte_New(20 /*motorNumber_TOTALnumber*/, NULL),
+        EO_INIT(.sensorsList)   sList_ptr,
+        EO_INIT(.nvsCfg)        eo_boardtransceiver_hid_GetNvsCfg(),
+        EO_INIT(.endpoint)      (0x0010) //EOK_cfg_nvsEP_mc_leftleg_EP
+    };
+
+    //from can configuration I get information about joint connected to ems
+    //this let me no waste memory
+//   jList_ptr =  eo_fifobyte_New(eOmc_maxnumof_joints_perBodypart, NULL); 
+
+    eo_appCanSP_GetConnectedJoints(s_appCanSP_ptr, cfg.jointsList/*jList_ptr*/);
+    eo_appCanSP_GetConnectedJoints(s_appCanSP_ptr, cfg.motorsList/*jList_ptr*/);
+#warning VALE--> fai GetConnectedmotors func!!!!
+    eo_appTheMCNVmap_Initialise(&cfg);
+
+}
+
+
+
+static void s_eom_appSkeletonEms_body_sig2appDataCollector_start(void *arg)
 {
     eom_appDataCollector_CollectDataStart(((EOMappDataCollector*)(arg)));
-    return(eores_OK);
 }
 
-static eOresult_t s_eom_appSkeletonEms_body_sig2appDataCollector_stop(void *arg)
+static void s_eom_appSkeletonEms_body_sig2appDataCollector_stop(void *arg)
 {
     eom_appDataCollector_CollectDataStop(((EOMappDataCollector*)arg));
-    return(eores_OK);
 }
 
-static eOresult_t s_eom_appSkeletonEms_body_sig2appMotorController(void *arg)
+static void s_eom_appSkeletonEms_body_sig2appMotorController(void *arg)
 {
     eom_appMotorController_Satrt2Calculate(((EOMappMotorController*)arg));
-    return(eores_OK);
 }
 
 static void s_eom_appSkeletonEms_body_TheSysController_init(void)
@@ -327,10 +367,9 @@ static void s_eom_appSkeletonEms_body_TheSysController_init(void)
     eom_appTheSysController_Initialise(&cfg);
 }
 
-static eOresult_t s_eom_appSkeletonEms_body_sig2appMotorController_byAppDataCollector(void *arg)
+static void s_eom_appSkeletonEms_body_sig2appMotorController_byAppDataCollector(void *arg)
 {
     eom_appMotorController_AllDataAreReady(((EOMappMotorController*)arg));
-    return(eores_OK);
 }
 
 static void s_eom_appSkeletonEms_body_appDataCollector_init(void)
@@ -351,10 +390,9 @@ static void s_eom_appSkeletonEms_body_appDataCollector_init(void)
 }
 
 
-static eOresult_t s_eom_appSkeletonEms_body_sig2appDataTransmitter(void *arg)
+static void s_eom_appSkeletonEms_body_sig2appDataTransmitter(void *arg)
 {
     eom_appDataTransmitter_SendData(((EOMappDataTransmitter*)arg));
-    return(eores_OK);
 }
 
 

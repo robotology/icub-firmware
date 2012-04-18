@@ -87,6 +87,13 @@ extern eOresult_t eom_appSkeletonEms_body_actors_init(void);
 extern eOresult_t eom_appSkeletonEms_body_actors_start(void);
 
 
+
+/** @fn         extern void* eom_appSkeletonEms_body_services_can_getHandle(void)
+    @brief      This function returns hadle to object that provides services about can.
+    @return     a poiter.
+ **/
+extern void* eom_appSkeletonEms_body_services_can_getHandle(void);
+
 /** @}            
     end of group eo_appSkeletonEms_body  
  **/

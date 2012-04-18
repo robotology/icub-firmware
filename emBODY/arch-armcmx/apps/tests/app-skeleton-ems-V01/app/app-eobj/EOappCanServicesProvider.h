@@ -39,6 +39,7 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 #include "EoCommon.h"
 #include "EoMotionControl.h"
+#include "EOfifoByte.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -57,6 +58,7 @@ typedef struct
 // - declaration of extern public functions ---------------------------------------------------------------------------
 extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg);
 
+extern eOresult_t eo_appCanSP_GetConnectedJoints(EOappCanSP *p, EOfifoByte *connectedJointsList); 
 
 extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorUniqueId_t mUniqueId, eOmc_motor_config_t *cfg);
 extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointUniqueId_t jUniqueId, eOmc_joint_config_t *cfg);

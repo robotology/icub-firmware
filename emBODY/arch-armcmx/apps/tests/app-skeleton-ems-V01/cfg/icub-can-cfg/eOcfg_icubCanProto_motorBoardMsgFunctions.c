@@ -27,6 +27,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
+#include "string.h"
+
 #include "EOcommon.h"
 #include "EOicubCanProto.h"
 #include "EOicubCanProto_specifications.h"
@@ -36,6 +38,9 @@
 #include "EOnv_hid.h"
 
 #include "EOemsCanNetworkTopology.h"
+#include "EOappTheMCNVmap.h"
+//#include "eOcfg_nvsEP_mc_any_con_jxx.h"
+#include "eOcfg_nvsEP_mc_any_con_bodypart.h"
 
 #include "hal_debugPin.h"
 // --------------------------------------------------------------------------------------------------------------------
@@ -95,21 +100,99 @@ extern eOresult_t eo_icubCanProto_parser_test(EOicubCanProto* p, eOcanframe_t *f
 {
 
     eOresult_t res;
-    EOnv* nvt_ptr;
-    eOmc_joint_status_t *j;
+    static eOmc_joint_status_t j;
+    eo_emsCanNetTopo_jointOrMotorCanLocation_t canLoc;
+    eOmc_jointUniqueId_t jUniqueId;
+    eOmc_motorUniqueId_t mUniqueId;
+    void *memRef1, *memRef2, *pidVel_NVptr;
+    eOmc_PID_t pidVel, pidPos1, pidPos2;
+    eOmc_joint_config_t jc1, jc2;
+    eOmc_motor_config_t  mc;
      
     eo_icubCanProto_canBoardAddress_t boardAddr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
 DEBUG_PIN4_OFF;
 
-      res = eo_emsCanNetTopo_GetMotorBoardNV_Status_ByCanLocation(p->emsCanNetTopo_ptr, canPort, boardAddr,
-                                                       eo_icubCanProto_mAxis_0, &nvt_ptr);
-
+//      res = eo_emsCanNetTopo_GetMotorBoardNV_Status_ByCanLocation(p->emsCanNetTopo_ptr, canPort, boardAddr,
+//                                                       eo_icubCanProto_mAxis_0, &nvt_ptr);
+    canLoc.emscanport = canPort;
+    canLoc.canaddr = boardAddr;
+    canLoc.axis = eo_icubCanProto_mAxis_0;
+    res = eo_emsCanNetTopo_GetJointUinqueId_ByJointCanLocation(p->emsCanNetTopo_ptr, &canLoc, &jUniqueId);
     if(eores_OK != res)
     {
         return(res);
     }
-    j = (eOmc_joint_status_t*)nvt_ptr->loc;
-    j->velocity= 0x9999;
+
+    res = eo_appTheMCNVmap_GetJointNVMemoryRef_test(eo_appTheMCNVmap_GetHandle(), jUniqueId, jointNVindex_jconfig, &memRef1);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+
+    res = eo_appTheMCNVmap_GetJointNVMemoryRef(eo_appTheMCNVmap_GetHandle(), jUniqueId, jointNVindex_jconfig, &memRef2);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    if(memRef1 == memRef2)
+    {
+        j.velocity = 1;
+    }
+    else
+    {
+        j.velocity = 2;
+    }
+
+    memcpy(&jc1, memRef1, sizeof(eOmc_joint_config_t));
+
+    memcpy(&jc2, memRef2, sizeof(eOmc_joint_config_t));
+
+
+//pidPos
+    res = eo_appTheMCNVmap_GetJointNVMemoryRef_test(eo_appTheMCNVmap_GetHandle(), jUniqueId, jointNVindex_jconfig__pidposition, &memRef1);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+
+    res = eo_appTheMCNVmap_GetJointNVMemoryRef(eo_appTheMCNVmap_GetHandle(), jUniqueId, jointNVindex_jconfig__pidposition, &memRef2);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    memcpy(&pidPos1, memRef1, sizeof(eOmc_PID_t)); 
+    memcpy(&pidPos2, memRef2, sizeof(eOmc_PID_t)); 
+
+
+
+    //pidvel
+    res = eo_appTheMCNVmap_GetJointNVMemoryRef(eo_appTheMCNVmap_GetHandle(), jUniqueId, jointNVindex_jconfig__pidvelocity, &pidVel_NVptr);
+    memcpy(&pidVel,pidVel_NVptr, sizeof(eOmc_PID_t)); 
+
+    pidVel.kd = 0x1010;
+
+
+
+
+/*************************************************************************************/
+/*              motor                      */
+
+    res = eo_emsCanNetTopo_GetMotorUinqueId_ByMotorCanLocation(p->emsCanNetTopo_ptr, &canLoc, &mUniqueId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    res = eo_appTheMCNVmap_GetMotorNVMemoryRef(eo_appTheMCNVmap_GetHandle(), mUniqueId, motorNVindex_mconfig, &memRef1);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    memcpy(&mc, memRef1, sizeof(eOmc_motor_config_t));
 
 DEBUG_PIN3_OFF;
 //    nvJoint_ptr->axis.position = frame->data[1];

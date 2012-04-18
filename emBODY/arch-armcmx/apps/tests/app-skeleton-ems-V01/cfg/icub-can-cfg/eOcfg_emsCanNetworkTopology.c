@@ -29,12 +29,11 @@
 #include "EoBoards.h"
 #include "EoMotionControl.h"
 #include "EoSensors.h"
-#include "EOicubCanProto.h" 
-#include "eOcfg_nvsEP_joint_con.h"
-#include "EOconstLookupTbl.h"
-#include "EOconstLookupTbl_hid.h"
+#include "EOconstvector.h"
+#include "EOconstvector_hid.h"
 #include "EOemsCanNetworkTopology.h"
 #include "EOemsCanNetworkTopology_hid.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -72,107 +71,160 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-static const eo_emsCanNetTopo_hid_LUTbl_item_boardNvsReferences_t s_boardCanLoc2NvsRef_port1_list[] = 
+
+/*definition of left leg can net topology (ems 1) */
+
+static const eo_emsCanNetTopo_jointOrMotorTopoInfo_t s_cfg_canNetTopo_leftleg_joints_ems1[] = 
 {
-    {   // 0
+    { // 0 
+        EO_INIT(.boardAddr)                 3,
+        EO_INIT(.axis)                      0,
+        EO_INIT(.canPort)                   eOcanport1,
+        EO_INIT(.boardType)                 eobrd_1foc,
+        EO_INIT(.id)                        0
+    },    
+
+    { // 1 
         EO_INIT(.boardAddr)                 4,
-        EO_INIT(.axis)                      eo_icubCanProto_mAxis_0,
-        EO_INIT(.boardType)                 eo_icubCanProto_boardType__2foc,
-        EO_INIT(.joint_nvid_list)
-        {
-            {  // 0 nvsType_joint_cfg
-                EO_INIT(.ep)                    EOK_cfg_nvsEP_joint_endpoint,
-                EO_INIT(.id)                    EOK_cfg_nvsEP_joint_NVID__cfg
-            },
-            {  // 1 nvsType_setPoint
-                EO_INIT(.ep)                    EOK_cfg_nvsEP_joint_endpoint,
-                EO_INIT(.id)                    EOK_cfg_nvsEP_joint_NVID__setPoint
-            },
-            {  // 2 nvsType_setPoint
-                EO_INIT(.ep)                    EOK_cfg_nvsEP_joint_endpoint,
-                EO_INIT(.id)                    EOK_cfg_nvsEP_joint_NVID__status
-            }
-        }
+        EO_INIT(.axis)                      0,
+        EO_INIT(.canPort)                   eOcanport1,
+        EO_INIT(.boardType)                 eobrd_1foc,
+        EO_INIT(.id)                        1
+    },
+    
+    { // 2 
+        EO_INIT(.boardAddr)                 1,
+        EO_INIT(.axis)                      0,
+        EO_INIT(.canPort)                   eOcanport1,
+        EO_INIT(.boardType)                 eobrd_1foc,
+        EO_INIT(.id)                        2
+    },
+        
+    { // 3 
+        EO_INIT(.boardAddr)                 2,
+        EO_INIT(.axis)                      0,
+        EO_INIT(.canPort)                   eOcanport1,
+        EO_INIT(.boardType)                 eobrd_1foc,
+        EO_INIT(.id)                        3
     }
 
 };
 
-//non vale, messo solo per compilare!!!
-static const eo_emsCanNetTopo_hid_LUTbl_item_boardNvsReferences_t s_boardCanLoc2NvsRef_port2_list[] = 
+
+const EOconstvector  s_eo_cfg_emsCanNetTopo_leftleg_constvec_joints_ems1 = 
 {
- //port 2
-    {   // 0
-        EO_INIT(.boardAddr)                 4,
-        EO_INIT(.axis)                      eo_icubCanProto_mAxis_0,
-        EO_INIT(.boardType)                 eo_icubCanProto_boardType__2foc,
-        EO_INIT(.joint_nvid_list)
-        {
-            {  // 0 nvsType_joint_cfg
-                EO_INIT(.ep)                    EOK_cfg_nvsEP_joint_endpoint,
-                EO_INIT(.id)                    EOK_cfg_nvsEP_joint_NVID__cfg
-            },
-            {  // 1 nvsType_setPoint
-                EO_INIT(.ep)                    EOK_cfg_nvsEP_joint_endpoint,
-                EO_INIT(.id)                    EOK_cfg_nvsEP_joint_NVID__setPoint
-            },
-            {  // 2 nvsType_setPoint
-                EO_INIT(.ep)                    EOK_cfg_nvsEP_joint_endpoint,
-                EO_INIT(.id)                    EOK_cfg_nvsEP_joint_NVID__status
-            }
-        }
+    EO_INIT(.size)              sizeof(s_cfg_canNetTopo_leftleg_joints_ems1)/sizeof(eo_emsCanNetTopo_jointOrMotorTopoInfo_t), //EOK_cfg_nvsEP_joint_numberof,
+    EO_INIT(.item_size)         sizeof(eo_emsCanNetTopo_jointOrMotorTopoInfo_t),
+    EO_INIT(.item_array_data)   s_cfg_canNetTopo_leftleg_joints_ems1
+};
+
+
+extern const EOconstvector* const eo_cfg_emsCanNetTopo_leftleg_constvec_joints_ems1__ptr = &s_eo_cfg_emsCanNetTopo_leftleg_constvec_joints_ems1;
+
+
+
+static const eo_emsCanNetTopo_jointOrMotorTopoInfo_t s_cfg_canNetTopo_leftleg_joints_ems2[] = 
+{
+    { // 0 
+        EO_INIT(.boardAddr)                 1,
+        EO_INIT(.axis)                      0,
+        EO_INIT(.canPort)                   eOcanport1,
+        EO_INIT(.boardType)                 eobrd_1foc,
+        EO_INIT(.id)                        4
+    },    
+
+    { // 1 
+        EO_INIT(.boardAddr)                 2,
+        EO_INIT(.axis)                      0,
+        EO_INIT(.canPort)                   eOcanport1,
+        EO_INIT(.boardType)                 eobrd_1foc,
+        EO_INIT(.id)                        5
     }
 
 };
 
-static const EOconstLookupTbl  s_eo_emsCanNetTopo_boardCanLoc2NvsRef_port1_LUTbl = 
+
+const EOconstvector  s_eo_cfg_emsCanNetTopo_leftleg_constvec_joints_ems2 = 
 {
-    EO_INIT(.capacity)           1,
-    EO_INIT(.offset)             0,
-    EO_INIT(.exceptionMngFn)     NULL,
-    EO_INIT(.itemsList)          s_boardCanLoc2NvsRef_port1_list
+    EO_INIT(.size)              sizeof(s_cfg_canNetTopo_leftleg_joints_ems2)/sizeof(eo_emsCanNetTopo_jointOrMotorTopoInfo_t), //EOK_cfg_nvsEP_joint_numberof,
+    EO_INIT(.item_size)         sizeof(eo_emsCanNetTopo_jointOrMotorTopoInfo_t),
+    EO_INIT(.item_array_data)   s_cfg_canNetTopo_leftleg_joints_ems2
 };
 
 
-static const EOconstLookupTbl  s_eo_emsCanNetTopo_boardCanLoc2NvsRef_port2_LUTbl = 
+extern const EOconstvector* const eo_cfg_emsCanNetTopo_leftleg_constvec_joints_ems2__ptr = &s_eo_cfg_emsCanNetTopo_leftleg_constvec_joints_ems2;
+
+
+extern const EOconstvector* const eo_cfg_emsCanNetTopo_leftleg_constvec_joints [eObrd_emsInBodypart_maxnum] = 
 {
-    EO_INIT(.capacity)           0,
-    EO_INIT(.offset)             0,
-    EO_INIT(.exceptionMngFn)     NULL,
-    EO_INIT(.itemsList)          s_boardCanLoc2NvsRef_port2_list
-};
+    { // eObrd_emsInBodypart__ems1
+        //eo_cfg_emsCanNetTopo_leftleg_constvec_joints_ems1__ptr,
+        &s_eo_cfg_emsCanNetTopo_leftleg_constvec_joints_ems1,
+    },
 
-extern const EOconstLookupTbl* const emsCanNetTopo_motorBoardCanLoc2NvsRef_LUTbl__ptr[eo_emsCanNetTopo_canports_num] =
-{
-    { &s_eo_emsCanNetTopo_boardCanLoc2NvsRef_port1_LUTbl},
-    { &s_eo_emsCanNetTopo_boardCanLoc2NvsRef_port2_LUTbl},
-};
-
-
-
-
-
-
-
-
-/***************************************************************************/
-/*          look up tbl :  joint id ==> board can location                 */
-/***************************************************************************/
-
-
-static const eo_emsCanNetTopo_hid_LUTbl_item_joint2BoardCanLocation_t  s_joint2BoardCanLocation_list[] = 
-{
-    { // 0
-        EO_INIT(.canPort)               eOcanport1,
-        EO_INIT(.boardAddr)             4,
-        EO_INIT(.axis4board)            eo_icubCanProto_mAxis_0
+    { // eObrd_emsInBodypart__ems2
+        //eo_cfg_emsCanNetTopo_leftleg_constvec_joints_ems2__ptr,
+        &s_eo_cfg_emsCanNetTopo_leftleg_constvec_joints_ems2
     }
-};     
-static const EOconstLookupTbl    s_joint2BoardCanLocation_LUTbl = 
-{
-    EO_INIT(.capacity)           1,
-    EO_INIT(.offset)             0,
-    EO_INIT(.exceptionMngFn)     NULL,
-    EO_INIT(.itemsList)          s_joint2BoardCanLocation_list
+
 };
 
-extern const EOconstLookupTbl *emsCanNetTopo_joint2BoardCanLocation_LUTbl__ptr = &s_joint2BoardCanLocation_LUTbl;
+
+/***********************************************************************************************/
+/***********************         M O T O R S             ***************************************/
+/***********************************************************************************************/
+
+/*   since motors and joints in this body part are equivalent, we use the same constvecor  */
+extern const EOconstvector* const eo_cfg_emsCanNetTopo_leftleg_constvec_motors [eObrd_emsInBodypart_maxnum] = 
+{
+    { // eObrd_emsInBodypart__ems1
+        //eo_cfg_emsCanNetTopo_leftleg_constvec_joints_ems1__ptr,
+        &s_eo_cfg_emsCanNetTopo_leftleg_constvec_joints_ems1,
+    },
+
+    { // eObrd_emsInBodypart__ems2
+        //eo_cfg_emsCanNetTopo_leftleg_constvec_joints_ems2__ptr,
+        &s_eo_cfg_emsCanNetTopo_leftleg_constvec_joints_ems2
+    }
+
+};
+
+/***********************************************************************************************/
+/***********************         S E N S O R S            ***************************************/
+/***********************************************************************************************/
+static const eo_emsCanNetTopo_sensorTopoInfo_t  s_cfg_canNetTopo_leftleg_sensors_ems1 [] = 
+{
+    {// 0
+        EO_INIT(.boardAddr)                 1,
+        EO_INIT(.canPort)                   eOcanport2,
+        EO_INIT(.boardType)                 eobrd_strain,
+        EO_INIT(.id)                        1
+    
+    }
+};
+
+
+const EOconstvector  s_eo_cfg_emsCanNetTopo_leftleg_constvec_sensors_ems1 = 
+{
+    EO_INIT(.size)              sizeof(s_cfg_canNetTopo_leftleg_sensors_ems1)/sizeof(eo_emsCanNetTopo_sensorTopoInfo_t), //EOK_cfg_nvsEP_joint_numberof,
+    EO_INIT(.item_size)         sizeof(eo_emsCanNetTopo_sensorTopoInfo_t),
+    EO_INIT(.item_array_data)   s_cfg_canNetTopo_leftleg_sensors_ems1
+};
+
+
+extern const EOconstvector* const eo_cfg_emsCanNetTopo_leftleg_constvec_sensors_ems1__ptr = &s_eo_cfg_emsCanNetTopo_leftleg_constvec_sensors_ems1;
+
+
+
+extern const EOconstvector* const eo_cfg_emsCanNetTopo_leftleg_constvec_sensors [eObrd_emsInBodypart_maxnum] = 
+{
+    { // eObrd_emsInBodypart__ems1
+        //eo_cfg_emsCanNetTopo_leftleg_constvec_sensors_ems1__ptr,
+        &s_eo_cfg_emsCanNetTopo_leftleg_constvec_sensors_ems1
+    },
+
+    { // eObrd_emsInBodypart__ems2
+        NULL
+    }
+
+};

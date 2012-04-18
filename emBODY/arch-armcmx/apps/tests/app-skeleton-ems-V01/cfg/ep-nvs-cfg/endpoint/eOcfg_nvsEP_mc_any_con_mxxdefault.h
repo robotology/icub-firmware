@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
- * Author:  Valentina Gaggero
- * email:   valentina.gaggero@iit.it
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
@@ -17,19 +17,19 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOCFG_EOEMSCANNETWORKTOPOLOGY_H_
-#define _EOCFG_EOEMSCANNETWORKTOPOLOGY_H_
+#ifndef _EOCFG_NVSEP_MC_ANY_CON_MXXDEFAULT_H_
+#define _EOCFG_NVSEP_MC_ANY_CON_MXXDEFAULT_H_
 
 
 
 
-/** @file       eOcfg_emsCanNetworkTopology.h
-    @brief      This file keeps ...
-    @author     valentina.gaggero@iit.it
-    @date       03/12/2012
+/** @file       eOcfg_cfg_nvsEP_mc_any_con_mxxdefault.h
+	@brief      This header file gives the ...
+	@author     marco.accame@iit.it
+	@date       09/06/2011
 **/
 
-/** @defgroup eo_icubCanProto Configuation of the messages lookup tables.
+/** @defgroup eo_456uilsdede2345er Configuation of the ......
     Tcecece 
     
     @{		
@@ -38,39 +38,31 @@
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
-#include "Eocommon.h"
-#include "EoBoards.h"
-#include "EOconstvector.h"
+
+#include "EoCommon.h"
+#include "EoMotionControl.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
-// empty-section
+// empty-section 
+        
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
-// empty-section
 
-
+    
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-//extern const EOconstLookupTbl* const emsCanNetTopo_motorBoardCanLoc2NvsRef_LUTbl__ptr[eo_emsCanNetTopo_canports_num];
-//extern const EOconstLookupTbl *emsCanNetTopo_joint2BoardCanLocation_LUTbl__ptr;
+extern const eOmc_motor_t eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue;
 
-
-//extern const EOconstvector* const eo_cfg_emsCanNetTopo_joint_constvector_ems1__ptr;
-
-extern const EOconstvector* const eo_cfg_emsCanNetTopo_leftleg_constvec_joints [eObrd_emsInBodypart_maxnum];
-extern const EOconstvector* const eo_cfg_emsCanNetTopo_leftleg_constvec_motors [eObrd_emsInBodypart_maxnum];
-extern const EOconstvector* const eo_cfg_emsCanNetTopo_leftleg_constvec_sensors [eObrd_emsInBodypart_maxnum];
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
-// empty-section
 
 
 
 
 /** @}            
-    end of group eo_icubCanProto 
+    end of group eo_456uilsdede2345er  
  **/
 
 #endif  // include-guard

@@ -346,7 +346,7 @@
               <MiscControls>--c99 --forceinline</MiscControls>
               <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO _FORCE_NETWORK_FROM_IPAL_CFG</Define>
               <Undefine></Undefine>
-              <IncludePath>..\app;..\app\app-eobj;..\cfg\hal-cfg;..\cfg\ipal-cfg;..\cfg\osal-cfg;..\cfg\icub-can-cfg;..\cfg\ep-nvs-cfg\com;..\cfg\ep-nvs-cfg\local;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\body\embobj\embobj\embobj-api;..\..\..\..\body\embobj\embobj\embobj-src;..\..\..\..\body\embobj\embobj\embobj-icub;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;.;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\config\nvs\common;..\..\..\..\..\any-arch\sys\embobj\config\nvs\local;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api</IncludePath>
+              <IncludePath>..\app;..\app\app-eobj;..\cfg\hal-cfg;..\cfg\ipal-cfg;..\cfg\osal-cfg;..\cfg\icub-can-cfg;..\cfg\ep-nvs-cfg\endpoint;..\cfg\ep-nvs-cfg\endpoint\mc;..\cfg\ep-nvs-cfg\local;..\cfg\ep-nvs-cfg\com;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\body\embobj\embobj\embobj-api;..\..\..\..\body\embobj\embobj\embobj-src;..\..\..\..\body\embobj\embobj\embobj-icub;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;.;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\config\nvs\common;..\..\..\..\..\any-arch\sys\embobj\config\nvs\local;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -702,82 +702,79 @@
           <GroupName>eo-nvs-common</GroupName>
           <Files>
             <File>
+              <FileName>EOVstorage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOVstorage.c</FilePath>
+            </File>
+            <File>
               <FileName>EOmatrix3d.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOmatrix3d.c</FilePath>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOmatrix3d.c</FilePath>
             </File>
             <File>
               <FileName>EOnv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOnv.c</FilePath>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOnv.c</FilePath>
             </File>
             <File>
               <FileName>EOnvsCfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOnvsCfg.c</FilePath>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOnvsCfg.c</FilePath>
             </File>
             <File>
               <FileName>EOreceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOreceiver.c</FilePath>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOreceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOrop.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOrop.c</FilePath>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOrop.c</FilePath>
             </File>
             <File>
               <FileName>EOropframe.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOropframe.c</FilePath>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOropframe.c</FilePath>
             </File>
             <File>
               <FileName>EOstorageEEPROM.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOstorageEEPROM.c</FilePath>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOstorageEEPROM.c</FilePath>
             </File>
             <File>
               <FileName>EOtheAgent.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtheAgent.c</FilePath>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOtheAgent.c</FilePath>
             </File>
             <File>
               <FileName>EOtheFormer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtheFormer.c</FilePath>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOtheFormer.c</FilePath>
             </File>
             <File>
               <FileName>EOtheParser.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtheParser.c</FilePath>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOtheParser.c</FilePath>
             </File>
             <File>
               <FileName>EOtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtransceiver.c</FilePath>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOtransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOtransmitter.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtransmitter.c</FilePath>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOtransmitter.c</FilePath>
             </File>
             <File>
               <FileName>EOtreenode.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtreenode.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOVstorage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOVstorage.c</FilePath>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOtreenode.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>eo-nvs-board</GroupName>
-        </Group>
-        <Group>
-          <GroupName>eo-nvs-cfg-common</GroupName>
+          <GroupName>eo-nvs-base-endpoint-cfg</GroupName>
           <Files>
             <File>
               <FileName>eOcfg_nvsEP_base_con.c</FileName>
@@ -785,39 +782,69 @@
               <FilePath>..\cfg\ep-nvs-cfg\com\eOcfg_nvsEP_base_con.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_nvsEP_joint_con.c</FileName>
+              <FileName>eOcfg_nvsEP_base_usr_loc_anydev.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\cfg\ep-nvs-cfg\com\eOcfg_nvsEP_joint_con.c</FilePath>
+              <FilePath>..\cfg\ep-nvs-cfg\local\eOcfg_nvsEP_base_usr_loc_anydev.c</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-nvs-mng-endpoit-cfg</GroupName>
+          <Files>
             <File>
               <FileName>eOcfg_nvsEP_mngmnt_con.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\cfg\ep-nvs-cfg\com\eOcfg_nvsEP_mngmnt_con.c</FilePath>
             </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mngmnt_usr_loc_board.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\ep-nvs-cfg\local\eOcfg_nvsEP_mngmnt_usr_loc_board.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>eo-nvs-cfg-board</GroupName>
+          <GroupName>eo-nvs-mc-endpoint-cfg</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_leftleg_usr_loc_ebx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\ep-nvs-cfg\endpoint\eOcfg_nvsEP_mc_leftleg_usr_loc_ebx.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_any_con_jxxdefault.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\ep-nvs-cfg\endpoint\eOcfg_nvsEP_mc_any_con_jxxdefault.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_any_con_mxxdefault.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\ep-nvs-cfg\endpoint\eOcfg_nvsEP_mc_any_con_mxxdefault.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_any_usr_nvmacro.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\ep-nvs-cfg\endpoint\eOcfg_nvsEP_mc_any_usr_nvmacro.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_leftleg_con.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\ep-nvs-cfg\endpoint\eOcfg_nvsEP_mc_leftleg_con.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_any_con_bodypart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\ep-nvs-cfg\endpoint\eOcfg_nvsEP_mc_any_con_bodypart.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-nvs-endpoints-loc-cfg</GroupName>
           <Files>
             <File>
               <FileName>eOcfg_EPs_loc_board.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\cfg\ep-nvs-cfg\local\eOcfg_EPs_loc_board.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_nvsEP_base_usr_loc_anydev.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\ep-nvs-cfg\local\eOcfg_nvsEP_base_usr_loc_anydev.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_nvsEP_joint_usr_loc_board.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\ep-nvs-cfg\local\eOcfg_nvsEP_joint_usr_loc_board.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_nvsEP_mngmnt_usr_loc_board.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\ep-nvs-cfg\local\eOcfg_nvsEP_mngmnt_usr_loc_board.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -858,6 +885,11 @@
               <FileName>EOVcanProto.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOVcanProto.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOappTheMCNVmap.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app\app-eobj\EOappTheMCNVmap.c</FilePath>
             </File>
           </Files>
         </Group>
