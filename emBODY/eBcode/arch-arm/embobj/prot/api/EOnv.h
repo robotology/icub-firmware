@@ -57,8 +57,10 @@
 
 #if defined(EO_NV_EMBED_FUNTYP_IN_ID)
     #define EO_nv_ID(funtyp, off)   ((uint16_t)( ((((uint16_t)(funtyp))<<8)&0xfc00) | (((uint16_t)(off)&0x03ff)<<0) ))
+    #define EO_nv_OFF(id)           ((uint16_t)( ((uint16_t)(id)&0x03FF) ))
 #else
     #define EO_nv_ID(funtyp, off)   ((uint16_t)( ((uint16_t)(off)&0xffff) ))
+    #define EO_nv_OFF(id)           ((uint16_t)( ((uint16_t)(id)&0xffff) ))
 #endif  
 
 // - declaration of public user-defined types -------------------------------------------------------------------------    
@@ -72,16 +74,18 @@
 typedef struct EOnv_hid EOnv;
 
 
+typedef uint16_t eOnvEP_t;
 
 typedef uint16_t eOnvID_t;
 
-typedef uint16_t eOnvEP_t;
+typedef uint8_t eOnvIDfuntyp_t;
+typedef uint16_t eOnvIDoffset_t;
 
-//typedef struct      // 04 bytes
-//{
-//    eOnvEP_t        ep;
-//    eOnvID_t        id;
-//} eOnvEPID_t;       EO_VERIFYsizeof(eOnvEPID_t, 4);
+typedef struct      // 04 bytes
+{
+    eOnvEP_t        ep;
+    eOnvID_t        id;
+} eOnvEPID_t;       EO_VERIFYsizeof(eOnvEPID_t, 4);
 
 
 typedef enum
