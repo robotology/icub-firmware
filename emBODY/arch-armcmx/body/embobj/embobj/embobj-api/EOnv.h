@@ -78,6 +78,9 @@ typedef uint16_t eOnvEP_t;
 
 typedef uint16_t eOnvID_t;
 
+typedef uint8_t eOnvIDfuntyp_t;
+typedef uint16_t eOnvIDoffset_t;
+
 typedef struct      // 04 bytes
 {
     eOnvEP_t        ep;
