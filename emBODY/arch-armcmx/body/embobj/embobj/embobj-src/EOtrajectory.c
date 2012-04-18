@@ -92,23 +92,39 @@ extern EOtrajectory* eo_trajectory_New(void)
         o->pi = 0.0f;
         o->pf = 0.0f;
         
+        o->delta = 0.0f;
+
         o->steps_to_end = 0;
     }
 
     return o;
 }
 
-extern void eo_trajectory_Set(EOtrajectory *o, float p0, float pf, float v0, float tf_s)
+extern void eo_trajectory_Set(EOtrajectory *o, float p0, float pf, float v0, float speed /*float tf*/)
 {
-    v0 *= tf_s;
+    if (speed == 0.0f)
+    {
+        eo_trajectory_Abort(o);
 
-    float steps = FREQUENCY*tf_s;
+        return;
+    }
+    
+    float pf_p0 = pf - p0;
+
+    float tf = pf_p0/speed;
+    
+    if (tf < 0.0f) tf = -tf; 
+
+    v0 *= tf;
+
+    float steps = FREQUENCY*tf;
 
     o->steps_to_end = (unsigned long)steps;
 
     if (o->steps_to_end == 0)
     { 
         o->steps_to_end = 1;
+
         steps = 1.0f;
     }
 
@@ -120,7 +136,7 @@ extern void eo_trajectory_Set(EOtrajectory *o, float p0, float pf, float v0, flo
     o->Ci = 6.0f*o->Bi;
     o->Kc = o->Ci;
 
-    float pf_p0 = pf - p0;
+    
     o->Zi = 10.0f*pf_p0 - 6.0f*v0;
     float K5D2 = (6.0f*pf_p0 - 3.0f*v0)*D2;
     o->Yi = K5D2 - (15.0f*pf_p0 - 8.0f*v0)*D;
@@ -131,6 +147,8 @@ extern void eo_trajectory_Set(EOtrajectory *o, float p0, float pf, float v0, flo
 
     o->pi = p0;
     o->pf = pf;
+
+    o->delta = 0.0f;
 }
 
 
@@ -143,6 +161,7 @@ extern void eo_trajectory_Set(EOtrajectory *o, float p0, float pf, float v0, flo
 extern void eo_trajectory_Abort(EOtrajectory *o)
 {
     o->steps_to_end = 0;
+    o->delta = 0.0f;
     o->pf = o->pi;
 }
 
