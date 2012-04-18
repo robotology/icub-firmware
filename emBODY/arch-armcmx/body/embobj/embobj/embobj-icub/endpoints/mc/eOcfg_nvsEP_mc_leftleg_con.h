@@ -93,10 +93,10 @@ enum { motorLeftLeg_TOTALnumber = 6};
 typedef eo_cfg_nvsEP_mc_any_con_bodypart_motorNVindex_t eo_cfg_nvsEP_mc_leftleg_con_motorNVindex_t;
 
 
-/** @typedef    enum varsLeftLeg_TOTALnumber;
-    @brief      It contains the total number of network variables managed by the endpoint leftleg
+/** @typedef    enum varsMCleftleg_TOTALnumber;
+    @brief      It contains the total number of network variables managed by the endpoint mc leftleg
  **/
-enum {varsLeftLeg_TOTALnumber = jointLeftLeg_TOTALnumber*jointNVindex_TOTALnumber + motorLeftLeg_TOTALnumber*motorNVindex_TOTALnumber };
+enum {varsMCleftleg_TOTALnumber = jointLeftLeg_TOTALnumber*jointNVindex_TOTALnumber + motorLeftLeg_TOTALnumber*motorNVindex_TOTALnumber };
 
 
 /** @typedef    typedef struct eo_cfg_nvsEP_mc_leftleg_t;

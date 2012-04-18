@@ -243,7 +243,7 @@ static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_UPDT_Mxx__mstatus(uint1
 //        EO_INIT(.stg_address)           EOK_uint32dummy       // we dont give any storage address.
 //    },
 
-static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_array_of_EOnv_usr[varsLeftLeg_TOTALnumber] =
+static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_array_of_EOnv_usr[varsMCleftleg_TOTALnumber] =
 {
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leftleg_j00_ebx_jconfig,
