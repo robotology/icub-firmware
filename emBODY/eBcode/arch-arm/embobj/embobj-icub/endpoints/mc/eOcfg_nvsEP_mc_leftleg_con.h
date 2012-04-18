@@ -58,14 +58,14 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-/** @typedef    typedef enum eo_cfg_nvsEP_mc_leftlef_con_jointNumber_t
+/** @typedef    typedef enum eo_cfg_nvsEP_mc_leftleg_con_jointNumber_t
     @brief      It contains an index for all the joints the left leg. It is a subset of those in eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t
  **/
 typedef enum
 {
     jointLeftLeg_00 = 0,   
     jointLeftLeg_01, jointLeftLeg_02, jointLeftLeg_03, jointLeftLeg_04, jointLeftLeg_05
-} eo_cfg_nvsEP_mc_leftlef_con_jointNumber_t;
+} eo_cfg_nvsEP_mc_leftleg_con_jointNumber_t;
 
 enum { jointLeftLeg_TOTALnumber = 6}; 
 
@@ -75,14 +75,14 @@ enum { jointLeftLeg_TOTALnumber = 6};
 typedef eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t eo_cfg_nvsEP_mc_leftleg_con_jointNVindex_t;
 
 
-/** @typedef    typedef enum eo_cfg_nvsEP_mc_leftlef_con_motorNumber_t;
+/** @typedef    typedef enum eo_cfg_nvsEP_mc_leftleg_con_motorNumber_t;
     @brief      It contains an index for all the motors the left leg. It is a subset of those in eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t
  **/
 typedef enum
 {
     motorLeftLeg_00 = 0,   
     motorLeftLeg_01, motorLeftLeg_02, motorLeftLeg_03, motorLeftLeg_04, motorLeftLeg_05
-} eo_cfg_nvsEP_mc_leftlef_con_motorNumber_t;
+} eo_cfg_nvsEP_mc_leftleg_con_motorNumber_t;
 
 enum { motorLeftLeg_TOTALnumber = 6}; 
 
@@ -120,29 +120,29 @@ typedef struct
 
 
 
-/** @fn         extern eOnvEP_t eo_cfg_nvsEP_mc_leftlef_EP_Get(void)
+/** @fn         extern eOnvEP_t eo_cfg_nvsEP_mc_leftleg_EP_Get(void)
     @brief      This function retrieves the eOnvEP_t of this endpoint
     @return     the endpoint.
   */
-extern eOnvEP_t eo_cfg_nvsEP_mc_leftlef_EP_Get(void);
+extern eOnvEP_t eo_cfg_nvsEP_mc_leftleg_EP_Get(void);
 
 
-/** @fn         extern eOnvID_t eo_cfg_nvsEP_mc_leftlef_NVID_for_joint_var_Get(eo_cfg_nvsEP_mc_leftlef_con_jointNumber_t j, eo_cfg_nvsEP_mc_leftleg_con_jointNVindex_t jnvindex)
+/** @fn         extern eOnvID_t eo_cfg_nvsEP_mc_leftleg_NVID_for_joint_var_Get(eo_cfg_nvsEP_mc_leftleg_con_jointNumber_t j, eo_cfg_nvsEP_mc_leftleg_con_jointNVindex_t jnvindex)
     @brief      This function retrieves the eOnvID_t of a network variable with index @e jnvindex for the joint number @e j
     @param      j               the joint number 
     @param      jnvinxed        the index of the nv inside the joint
     @return     the nvid or EOK_uint16dummy in case of failure.
   */
-extern eOnvID_t eo_cfg_nvsEP_mc_leftlef_NVID_for_joint_var_Get(eo_cfg_nvsEP_mc_leftlef_con_jointNumber_t j, eo_cfg_nvsEP_mc_leftleg_con_jointNVindex_t jnvindex);
+extern eOnvID_t eo_cfg_nvsEP_mc_leftleg_NVID_for_joint_var_Get(eo_cfg_nvsEP_mc_leftleg_con_jointNumber_t j, eo_cfg_nvsEP_mc_leftleg_con_jointNVindex_t jnvindex);
 
 
-/** @fn         extern eOnvID_t eo_cfg_nvsEP_mc_leftlef_NVID_for_motor_var_Get(eo_cfg_nvsEP_mc_leftlef_con_motorNumber_t m, eo_cfg_nvsEP_mc_leftleg_con_motorNVindex_t mnvindex)
+/** @fn         extern eOnvID_t eo_cfg_nvsEP_mc_leftleg_NVID_for_motor_var_Get(eo_cfg_nvsEP_mc_leftleg_con_motorNumber_t m, eo_cfg_nvsEP_mc_leftleg_con_motorNVindex_t mnvindex)
     @brief      This function retrieves the eOnvID_t of a network variable with index @e nnvindex for the motor number @e m
     @param      m               the motor number 
     @param      mnvinxed        the index of the nv inside the motor
     @return     the nvid or EOK_uint16dummy in case of failure.
   */
-extern eOnvID_t eo_cfg_nvsEP_mc_leftlef_NVID_for_motor_var_Get(eo_cfg_nvsEP_mc_leftlef_con_motorNumber_t m, eo_cfg_nvsEP_mc_leftleg_con_motorNVindex_t mnvindex);
+extern eOnvID_t eo_cfg_nvsEP_mc_leftleg_NVID_for_motor_var_Get(eo_cfg_nvsEP_mc_leftleg_con_motorNumber_t m, eo_cfg_nvsEP_mc_leftleg_con_motorNVindex_t mnvindex);
 
 
 

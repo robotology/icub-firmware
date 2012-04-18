@@ -1243,12 +1243,12 @@ extern eOnvEP_t eo_cfg_nvsEP_mc_leftlef_EP_Get(void)
     return(EOK_cfg_nvsEP_mc_leftleg_EP);
 }
 
-extern eOnvID_t eo_cfg_nvsEP_mc_leftlef_NVID_for_joint_var_Get(eo_cfg_nvsEP_mc_leftlef_con_jointNumber_t j, eo_cfg_nvsEP_mc_leftleg_con_jointNVindex_t jnvindex)
+extern eOnvID_t eo_cfg_nvsEP_mc_leftleg_NVID_for_joint_var_Get(eo_cfg_nvsEP_mc_leftleg_con_jointNumber_t j, eo_cfg_nvsEP_mc_leftleg_con_jointNVindex_t jnvindex)
 {
     return(eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_joint_var_Get(j, jnvindex));
 }
 
-extern eOnvID_t eo_cfg_nvsEP_mc_leftlef_NVID_for_motor_var_Get(eo_cfg_nvsEP_mc_leftlef_con_motorNumber_t m, eo_cfg_nvsEP_mc_leftleg_con_motorNVindex_t mnvindex)
+extern eOnvID_t eo_cfg_nvsEP_mc_leftleg_NVID_for_motor_var_Get(eo_cfg_nvsEP_mc_leftleg_con_motorNumber_t m, eo_cfg_nvsEP_mc_leftleg_con_motorNVindex_t mnvindex)
 {
     return(eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get(m, mnvindex));
 }
