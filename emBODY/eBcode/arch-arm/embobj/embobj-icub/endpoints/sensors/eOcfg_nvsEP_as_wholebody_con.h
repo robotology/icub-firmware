@@ -46,8 +46,8 @@
 
 #include "EoSensors.h"
 
-#include "eOcfg_nvsEP_as_any_con_maisxx.h"
-#include "eOcfg_nvsEP_as_any_con_strainxx.h"
+#include "eOcfg_nvsEP_as_any_con_mxx.h"
+#include "eOcfg_nvsEP_as_any_con_sxx.h"
 
  
 
@@ -92,7 +92,7 @@ typedef enum
     maisRigthHand_01
 } eo_cfg_nvsEP_as_wholebody_con_maisNumber_t;
 
-enum { mais_TOTALnumber = 4}; 
+enum { mais_TOTALnumber = 2}; 
 
 /** @typedef    typedef struct eo_cfg_nvsEP_as_wholebody_con_maisNVindex_t
     @brief      It contains an index for all the network variables in a mais.
@@ -117,7 +117,7 @@ enum {varsASwholebody_TOTALnumber = strain_TOTALnumber*strainNVindex_TOTALnumber
 /** @typedef    typedef struct eo_cfg_nvsEP_as_wholebody_t;
     @brief      contains all the variables in the wholebody of kind analog sensors
  **/
-typedef struct               
+typedef struct                      // size is 24*4+32*2 = 160                
 {
     eOsnsr_strain_t                 strains[strain_TOTALnumber];
     eOsnsr_mais_t                   maises[mais_TOTALnumber];
