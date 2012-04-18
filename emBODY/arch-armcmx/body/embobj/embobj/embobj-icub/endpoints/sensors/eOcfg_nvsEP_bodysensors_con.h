@@ -99,6 +99,23 @@
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
+/** @typedef    typedef enum eo_cfg_nvsEP_mc_leftlef_con_jointNumber_t
+    @brief      It contains an index for all the joints the left leg. It is a subset of those in eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t
+ **/
+typedef enum
+{
+    strainLeftArm_00 = 0,   
+    strainRigthArm_01, strainLeftLeg_02, strainRigthLeg_03
+} eo_cfg_nvsEP_bodysensor_con_jointNumber_t;
+
+enum { jointLeftLeg_TOTALnumber = 6}; 
+
+/** @typedef    typedef eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t eo_cfg_nvsEP_mc_leftleg_con_jointNVindex_t
+    @brief      It contains an index for all the network variables in a joint of the left leg. use the same type as in bodypart
+ **/
+typedef eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t eo_cfg_nvsEP_mc_leftleg_con_jointNVindex_t;
+
+
 
 // - very important information: on ARM alignment is done using "#pragma pack(8)", thus ... there are rules to follow
 
