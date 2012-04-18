@@ -1,11 +1,11 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOTRAJECTORY_HID_H_
-#define _EOTRAJECTORY_HID_H_
+#ifndef _EOPID_HID_H_
+#define _EOPID_HID_H_
 
 
-/* @file        EOtrajectory_hid.h
-    @brief      This header file implements hidden interface to motor minumum jerk trajectory generation.
+/*  @file       EOpid_hid.h
+    @brief      This header file implements hidden interface to PID controller.
     @author     alessandro.scalzo@iit.it
     @date       23/03/2012
  **/
@@ -17,7 +17,7 @@
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "EOtrajectory.h"
+#include "EOpid.h"
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------

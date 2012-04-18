@@ -1,8 +1,8 @@
 
-/* @file       EOtrajectory.c
-    @brief      This file implements internal implementation of a motor minimum jerk trajectory generator.
-    @author     alessandro.scalzo@iit.it
-    @date       27/03/2012
+/* @file       EOpid.c
+   @brief      This file implements internal implementation of a PID controller.
+   @author     alessandro.scalzo@iit.it
+   @date       27/03/2012
 **/
 
 
