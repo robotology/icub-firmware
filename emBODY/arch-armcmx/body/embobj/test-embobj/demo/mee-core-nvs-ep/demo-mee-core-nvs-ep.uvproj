@@ -348,7 +348,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO</Define>
               <Undefine></Undefine>
-              <IncludePath>..\abslayer-cfg;..\app;..\..\..\embobj\embobj-api;..\..\..\embobj\embobj-src;..\..\..\embobj\embobj-cfg;..\..\..\..\..\sys\abs\api;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc;..\..\..\..\..\sys\env\api;..\..\..\..\..\..\porting;..\..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\embobj\embobj-icub;..\..\..\embobj\embobj-icub\endpoints\mc</IncludePath>
+              <IncludePath>..\abslayer-cfg;..\app;..\..\..\embobj\embobj-api;..\..\..\embobj\embobj-src;..\..\..\embobj\embobj-cfg;..\..\..\..\..\sys\abs\api;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc;..\..\..\..\..\sys\env\api;..\..\..\..\..\..\porting;..\..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\embobj\embobj-icub;..\..\..\embobj\embobj-icub\endpoints\mc;..\..\..\embobj\embobj-icub\endpoints\sensors</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -811,6 +811,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_any_con_mxxdefault.c</FilePath>
             </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_any_con_bodypart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_any_con_bodypart.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -840,6 +845,31 @@
         </Group>
         <Group>
           <GroupName>ep-mc-leftleg-rem</GroupName>
+        </Group>
+        <Group>
+          <GroupName>ep-as-any</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_nvsEP_as_any_con_mxxdefault.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_any_con_mxxdefault.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_as_any_con_sxxdefault.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_any_con_sxxdefault.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ep-as-wholebody</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_nvsEP_as_wholebody_con.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_wholebody_con.c</FilePath>
+            </File>
+          </Files>
         </Group>
       </Groups>
     </Target>
