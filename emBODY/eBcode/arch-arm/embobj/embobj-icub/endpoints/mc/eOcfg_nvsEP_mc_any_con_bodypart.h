@@ -128,7 +128,7 @@ typedef enum
     jointNVindex__controlmode                           =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__controlmode
 } eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t;
 
-
+enum { jointNVindex_TOTALnumber = EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber};
 
 typedef enum
 {
@@ -140,6 +140,7 @@ typedef enum
     motorNVindex__mstatus                               =   EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex__mstatus
 } eo_cfg_nvsEP_mc_any_con_bodypart_motorNVindex_t;
 
+enum { motorNVindex_TOTALnumber = EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber};
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
@@ -152,9 +153,7 @@ extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_joint_var_Get(uint8_t 
 
 extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get(uint8_t m, eo_cfg_nvsEP_mc_any_con_bodypart_motorNVindex_t mnvindex);
 
-extern eOnvIDfuntyp_t eo_cfg_nvsEP_mc_any_con_bodypart_NVIDfuntyp_jxx_Get(eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t jnvindex);
 
-extern eOnvIDfuntyp_t eo_cfg_nvsEP_mc_any_con_bodypart_NVIDfuntyp_mxx_Get(eo_cfg_nvsEP_mc_any_con_bodypart_motorNVindex_t mnvindex);
 
 /** @}            
     end of group eo_2uilsdede2345er  
