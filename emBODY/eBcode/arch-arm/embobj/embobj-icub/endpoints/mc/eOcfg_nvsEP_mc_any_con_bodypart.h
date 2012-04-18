@@ -40,6 +40,7 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
+#include "EOnv.h"
 #include "EoMotionControl.h"
 #include "eOcfg_nvsEP_mc_any_con_jxx.h"
 #include "eOcfg_nvsEP_mc_any_con_mxx.h"
@@ -103,10 +104,41 @@
       
 
 
+      
+
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 EO_VERIFYproposition(EOK_cfg_nvsEP_mc_any_con_bodypart, (1024 > EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_motor(EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_nvs_in_motor)));
+
+
+typedef enum
+{
+    jointNVindex_jconfig                                =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig,
+    jointNVindex_jconfig__pidposition                   =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidposition,
+    jointNVindex_jconfig__pidvelocity                   =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidvelocity,
+    jointNVindex_jconfig__pidtorque                     =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidtorque,
+    jointNVindex_jconfig__minpositionofjoint            =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__minpositionofjoint,
+    jointNVindex_jconfig__maxpositionofjoint            =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__maxpositionofjoint,
+    jointNVindex_jconfig__velocitysetpointtimeout       =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__velocitysetpointtimeout,
+    jointNVindex_jconfig__upto02descrforchameleon02     =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__upto02descrforchameleon02,
+    jointNVindex__jstatus                               =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__jstatus,
+    jointNVindex__calibrator                            =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__calibrator,
+    jointNVindex__setpoint                              =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__setpoint,
+    jointNVindex__controlmode                           =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__controlmode
+} eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t;
+
+
+
+typedef enum
+{
+    motorNVindex_mconfig                                =   EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig,
+    motorNVindex_mconfig__pidcurrent                    =   EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__pidcurrent,
+    motorNVindex_mconfig__maxvelocityofmotor            =   EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__maxvelocityofmotor,
+    motorNVindex_mconfig__maxcurrentofmotor             =   EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__maxcurrentofmotor,
+    motorNVindex_mconfig__upto02descrforchameleon06     =   EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__upto02descrforchameleon06,
+    motorNVindex__mstatus                               =   EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex__mstatus
+} eo_cfg_nvsEP_mc_any_con_bodypart_motorNVindex_t;
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
@@ -116,7 +148,13 @@ EO_VERIFYproposition(EOK_cfg_nvsEP_mc_any_con_bodypart, (1024 > EOK_cfg_nvsEP_mc
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
+extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_joint_var_Get(uint8_t j, eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t jnvindex);
 
+extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get(uint8_t m, eo_cfg_nvsEP_mc_any_con_bodypart_motorNVindex_t mnvindex);
+
+extern eOnvIDfuntyp_t eo_cfg_nvsEP_mc_any_con_bodypart_NVIDfuntyp_jxx_Get(eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t jnvindex);
+
+extern eOnvIDfuntyp_t eo_cfg_nvsEP_mc_any_con_bodypart_NVIDfuntyp_mxx_Get(eo_cfg_nvsEP_mc_any_con_bodypart_motorNVindex_t mnvindex);
 
 /** @}            
     end of group eo_2uilsdede2345er  

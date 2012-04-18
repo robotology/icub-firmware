@@ -63,24 +63,6 @@
 // the total number of nv in the endpoint
 #define EOK_cfg_nvsEP_leftleg_NUMofVARS                                             ((EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber*EOK_cfg_nvsEP_mc_leftleg_NUMofJOINTS)+(EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber*EOK_cfg_nvsEP_mc_leftleg_NUMofMOTORS))
 
-#if 0
-#warning --> so far we prefer using the names coming from eOcfg_nvsEP_mc_any_con_bodypart.h, however we could add in here more specific names for the kneee, ankle, etc.
-// the 16bit used to identify the network variable inside the endpoint. they are function of the joint or motor number (jth or mth)
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig(jth)                                  EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig(jth)
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__pidposition(jth)                     EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidposition(jth)                       
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__pidvelocity(jth)                     EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidvelocity(jth)                      
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__pidtorque(jth)                       EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidtorque(jth)       
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__minpositionofjoint(jth)              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__minpositionofjoint(jth)       
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__maxpositionofjoint(jth)              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__maxpositionofjoint(jth)       
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__velocitysetpointtimeout(jth)         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__velocitysetpointtimeout(jth)    
-#define EOK_cfg_nvsEP_mc_leftleg_NVID_jconfig__upto02descrforchameleon02(jth)       EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__upto02descrforchameleon02(jth)        
-#define EOK_cfg_nvsEP_mc_leftleg_NVID__jstatus(jth)                                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__jstatus(jth)                  
-#define EOK_cfg_nvsEP_mc_leftleg_NVID__calibrator(jth)                              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__calibrator(jth)                              
-#define EOK_cfg_nvsEP_mc_leftleg_NVID__setpoint(jth)                                EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__setpoint(jth)                                
-#define EOK_cfg_nvsEP_mc_leftleg_NVID__controlmode(jth)                             EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__controlmode(jth)                           
-#endif
-
-
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
@@ -98,6 +80,7 @@ typedef struct
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
+//we prefer to omit this to save rom space: use the default joint and motor values instead ....
 //extern const eo_cfg_nvsEP_mc_leftleg_t eo_cfg_nvsEP_mc_leftleg_default;
 
 // EOconstvector where each element is a EOtreenode whose data field is a EOnv_con_t object (id, capacity, valuedef, offset)
