@@ -116,7 +116,7 @@ static const uint8_t s_eo_cfg_nvsEP_mc_any_con_bodypart_mxxfuntyp[EOK_cfg_nvsEP_
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_joint_var_Get(eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t j, eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t jnvindex)
+extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_joint_var_Get(eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t j, eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t jnvindex)
 {
     if((j >= EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_joints) || (jnvindex >= EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber))
     {
