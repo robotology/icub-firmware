@@ -33,7 +33,7 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 #include "Eocommon.h"
 #include "EoUtilities.h"
-#include "EOconstLookupTbl.h"
+#include "EoBoards.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 #include "EoemsCanNetworkTopology.h"
@@ -41,61 +41,104 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
+#define MAX_NUM_JOINT_FOR_BODY_PART         10   //o ems??
+#define MAX_NUM_MOTOR_FOR_BODY_PART         10   //o ems??
+#define MAX_CAN_ADDRESS                     0XF 
+
+
+//tipi non dipendenti dal protocollo can
+//typedef struct
+//{
+//    eo_icubCanProto_canBoardAddress_t      boardAddr;
+//    eo_icubCanProto_motorAxis_t            axis;
+//    eOcanport_t                            canPort;
+//    eo_icubCanProto_boardType_t            boardType;
+//    uint32_t                               id; //id del motore o del joint
+//} eo_emsCanNetTopo_jointOrMotorTopoInfo_t;
+
+//typedef struct
+//{
+//    eo_icubCanProto_canBoardAddress_t      boardAddr;
+//    eOcanport_t                            canPort;
+//    eo_icubCanProto_boardType_t            boardType;
+//    uint32_t                               id; //sensor id
+//} eo_emsCanNetTopo_sensorTopoInfo_t;
+
+
+
+
+typedef struct
+{
+    uint32_t id;
+    eo_emsCanNetTopo_jointOrMotorTopoInfo_t     *ptr;
+} eo_emsCanNetTopo_hashTbl_item_t;
+
+
 /** @struct     EOemsCanNetTopo_hid
     @brief      Hidden definition. Implements private data used only internally by the 
                 public or private (static) functions of the object and protected data
                 used also by its derived objects.
- **/  
- 
+ **/   
 struct EOemsCanNetTopo_hid 
 {
     eo_emsCanNetTopo_cfg_t cfg;
-    uint8_t motorBoardHashTbl[eo_emsCanNetTopo_canports_num][0xF];
-    uint8_t sensorBoardHashTbl[eo_emsCanNetTopo_canports_num][0xF];
+//    uint8_t motorBoardHashTbl[eo_emsCanNetTopo_canports_num][0xF];
+//    uint8_t sensorBoardHashTbl[eo_emsCanNetTopo_canports_num][0xF];
+
+    eo_emsCanNetTopo_hashTbl_item_t joint_Id2CanLoc_hTbl[MAX_NUM_JOINT_FOR_BODY_PART];
+    eo_emsCanNetTopo_hashTbl_item_t motor_Id2CanLoc_hTbl[MAX_NUM_MOTOR_FOR_BODY_PART];
+    
+    eo_emsCanNetTopo_hashTbl_item_t joint_CanLoc2Id_hTbl[eo_emsCanNetTopo_canports_num][MAX_CAN_ADDRESS][2];
+    eo_emsCanNetTopo_hashTbl_item_t motor_CanLoc2Id_hTbl[eo_emsCanNetTopo_canports_num][MAX_CAN_ADDRESS][2];
+
 };
 
 
 
 /********* type definitions for can location ==> netvar ptr *************************************/
 
-
-typedef enum
-{
-  nvsType_joint_cfg             = 0,
-  nvsType_joint_setPoint        = 1,
-  nvsType_joint_status          = 2  
-} eo_emsCanNetTopo_nvsType_joint_t;
-
-enum {eo_emsCanNetTopo_nvsType_joint_maxnum = 3};
-
-typedef struct
-{
-    eo_icubCanProto_canBoardAddress_t      boardAddr;
-    eo_icubCanProto_motorAxis_t            axis;
-    eo_icubCanProto_boardType_t            boardType;
-    eOnvEPID_t                             joint_nvid_list[eo_emsCanNetTopo_nvsType_joint_maxnum];
-} eo_emsCanNetTopo_hid_LUTbl_item_boardNvsReferences_t;
-
-
-/********* type definitions for joint/sensor ==> can location *************************************/
-
-typedef struct
-{
-    eOcanport_t                         canPort;
-    eo_icubCanProto_canBoardAddress_t   boardAddr;
-    eo_icubCanProto_motorAxis_t         axis4board; 
-} eo_emsCanNetTopo_hid_LUTbl_item_joint2BoardCanLocation_t;
+//
+//typedef enum
+//{
+//  nvsType_joint_cfg             = 0,
+//  nvsType_joint_setPoint        = 1,
+//  nvsType_joint_status          = 2  
+//} eo_emsCanNetTopo_nvsType_joint_t;
+//
+//enum {eo_emsCanNetTopo_nvsType_joint_maxnum = 3};
+//
+//typedef struct
+//{
+//    eo_icubCanProto_canBoardAddress_t      boardAddr;
+//    eo_icubCanProto_motorAxis_t            axis;
+//    eo_icubCanProto_boardType_t            boardType;
+//    eOnvEPID_t                             joint_nvid_list[eo_emsCanNetTopo_nvsType_joint_maxnum];
+//} eo_emsCanNetTopo_hid_LUTbl_item_boardNvsReferences_t;
 
 
+///********* type definitions for joint/sensor ==> can location *************************************/
+//
+//typedef struct
+//{
+//    eOcanport_t                         canPort;
+//    eo_icubCanProto_canBoardAddress_t   boardAddr;
+//    eo_icubCanProto_motorAxis_t         axis4board; 
+//} eo_emsCanNetTopo_hid_LUTbl_item_joint2BoardCanLocation_t;
+//
+//
+//
+//typedef struct
+//{
+//    eOcanport_t                        canPort;
+//    eo_icubCanProto_canBoardAddress_t  boardAddr; 
+//} eo_emsCanNetTopo_hid_LUTbl_item_sensor2BoardCanLocation_t;
+//
+//
+//#define EO_emsCanNetTopo_BOARD_CAN_ADDR_NULL             255 /**< this value is usend in joint2BoardLocation_lookupTbl */
 
-typedef struct
-{
-    eOcanport_t                        canPort;
-    eo_icubCanProto_canBoardAddress_t  boardAddr; 
-} eo_emsCanNetTopo_hid_LUTbl_item_sensor2BoardCanLocation_t;
 
 
-#define EO_emsCanNetTopo_BOARD_CAN_ADDR_NULL             255 /**< this value is usend in joint2BoardLocation_lookupTbl */
+
 
 
 
