@@ -125,6 +125,8 @@ static uint16_t s_hash(uint16_t id);
 
 #include "eOcfg_nvsEP_as_any_con_sxxmacro.c"
 
+#define OFFSET_OF_END_OF_STRAINS    (4*sizeof(eOsnsr_strain_t))
+
 
 // -- the 2 mais
 
@@ -136,7 +138,7 @@ static uint16_t s_hash(uint16_t id);
 #define MMACRO_STR    _m00
 #define MMACRO_PNUM    5
 #define MMACRO_NUM    0    
-#define MMACRO_OFF    (MMACRO_NUM*sizeof(eOsnsr_mais_t))
+#define MMACRO_OFF    (OFFSET_OF_END_OF_STRAINS+MMACRO_NUM*sizeof(eOsnsr_mais_t))
 
 #include "eOcfg_nvsEP_as_any_con_mxxmacro.c"
 
@@ -146,7 +148,7 @@ static uint16_t s_hash(uint16_t id);
 #define MMACRO_STR    _m01
 #define MMACRO_PNUM    5
 #define MMACRO_NUM    1    
-#define MMACRO_OFF    (MMACRO_NUM*sizeof(eOsnsr_mais_t))
+#define MMACRO_OFF    (OFFSET_OF_END_OF_STRAINS+MMACRO_NUM*sizeof(eOsnsr_mais_t))
 
 #include "eOcfg_nvsEP_as_any_con_mxxmacro.c"
 
