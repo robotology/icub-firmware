@@ -52,7 +52,7 @@ typedef struct EOpid_hid EOpid;
 extern EOpid* eo_pid_New(void);
 
 
-/** @fn         extern void eo_pid_Set(EOpid *o, float Kp, float Kd, float Ki, float Ymax)
+/** @fn         extern void eo_pid_Init(EOpid *o, float Kp, float Kd, float Ki, float Ymax)
     @brief      Sets PID gain parameters and output limit.   
     @param      o     The pointer to the pid object.
     @param      Kp    The proportional gain.         
@@ -60,7 +60,7 @@ extern EOpid* eo_pid_New(void);
     @param      Ki    The integrative gain.
     @param      Ymax  The output maximum value.
  **/
-extern void eo_pid_Set(EOpid *o, float Kp, float Kd, float Ki, float Ymax);
+extern void eo_pid_Init(EOpid *o, float Kp, float Kd, float Ki, float Ymax);
 
 
 /** @fn         extern float eo_pid_Step(EOpid *o)
@@ -71,6 +71,7 @@ extern void eo_pid_Set(EOpid *o, float Kp, float Kd, float Ki, float Ymax);
  **/
 extern float eo_pid_Step(EOpid *o, float En);
 
+extern uint8_t eo_pid_IsInitialized(EOpid *o);
 
 /** @}            
     end of group eo_pid  

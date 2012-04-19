@@ -1,5 +1,5 @@
 
-/* @file       EOtrajectory.c
+/*  @file       EOmotorcontroller.c
     @brief      This file implements internal implementation of a motor minimum jerk trajectory generator.
     @author     alessandro.scalzo@iit.it
     @date       27/03/2012
@@ -23,14 +23,14 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOtrajectory.h"
+#include "EOmotorcontroller.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOtrajectory_hid.h" 
+#include "EOmotorcontroller_hid.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -62,174 +62,100 @@
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const char s_eobj_ownname[] = "EOtrajectory";
-
-static const float PERIOD = 0.001f;          // 1 ms
-static const float FREQUENCY = 1.0f/PERIOD;  // 1 kHz
+static const char s_eobj_ownname[] = "EOmotorcontroller";
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOtrajectory* eo_trajectory_New(void) 
+extern EOmotorcontroller* eo_motorcontroller_New(void) 
 {
-    EOtrajectory *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOtrajectory), 1);
+    EOmotorcontroller *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOmotorcontroller), 1);
 
     if (o)
     {
-        o->Ai = 0.0f;
-        o->Bi = 0.0f;
-        o->Ci = 0.0f;
-        o->Kc = 0.0f;
+        o->control_mode = CM_UNINIT;
 
-        o->Zi = 0.0f;
-        o->Yi = 0.0f;
-        o->Ky = 0.0f;
-            
-        o->Fi = 0.0f;
-        o->Kf = 0.0f;
+        o->torque_meas  = 0.0f;
+        o->encoder_meas = 0.0f;
+        o->stiffness = 0.0f;
+        o->speed_ref = 0.0f;
 
-        o->pi = 0.0f;
-        o->pf = 0.0f;
+        o->pid[CM_POSITION]  = eo_pid_New();
+        o->pid[CM_TORQUE]    = eo_pid_New();
+        o->pid[CM_VELOCITY]  = eo_pid_New();
+        o->pid[CM_IMPEDANCE] = eo_pid_New();
         
-        o->delta = 0.0f;
-
-        o->steps_to_end = 0;
+        o->trajectory = eo_trajectory_New(); 
     }
 
     return o;
 }
 
-extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, float v0, float speed /*float tf*/)
+extern uint8_t eo_motorcontroller_SetControlMode(EOmotorcontroller *o, control_mode_t cm)
 {
-    float pf_p0;
-    float tf;
-    float steps;
-    float D;
-    float D2;
-    float K5D2;
-    
-    if (speed == 0.0f)
+    if (eo_pid_IsInitialized(o->pid[cm]))
     {
-        eo_trajectory_Abort(o);
-
-        return;
-    }
-    
-    pf_p0 = pf - p0;
-
-    tf = pf_p0/speed;
-    
-    if (tf < 0.0f) tf = -tf; 
-
-    v0 *= tf;
-
-    steps = FREQUENCY*tf;
-
-    o->steps_to_end = (unsigned long)steps;
-
-    if (o->steps_to_end == 0)
-    { 
-        o->steps_to_end = 1;
-
-        steps = 1.0f;
-    }
-
-    D  = 1.0f / steps;
-    D2 = D*D;
-   
-    o->Ai = 0.0f;
-    o->Bi = D2*D;
-    o->Ci = 6.0f*o->Bi;
-    o->Kc = o->Ci;
-
-    
-    o->Zi = 10.0f*pf_p0 - 6.0f*v0;
-    K5D2  = (6.0f*pf_p0 - 3.0f*v0)*D2;
-    o->Yi = K5D2 - (15.0f*pf_p0 - 8.0f*v0)*D;
-    o->Ky = 2.0f*K5D2;
-
-    o->Fi = p0;
-    o->Kf = v0*D;
-
-    o->pi = p0;
-    o->pf = pf;
-
-    o->delta = 0.0f;
-}
-
-
-/** @fn         extern float eo_trajectory_Step(EOtrajectory *o)
-    @brief      Executes a trajectory step.
-    @param      o               The pointer to the trajectory object.
-    @return     The actual trajectory point value.
- **/
-
-extern void eo_trajectory_Abort(EOtrajectory *o)
-{
-    o->steps_to_end = 0;
-    o->delta = 0.0f;
-    o->pf = o->pi;
-}
-
-extern float eo_trajectory_GetSpeed(EOtrajectory *o)
-{
-    return o->delta*FREQUENCY;
-}
-
-extern float eo_trajectory_GetPos(EOtrajectory *o)
-{
-    return o->pi;
-}
-
-extern float eo_trajectory_Step(EOtrajectory *o)
-{
-    float pi;
-
-    if (!o->steps_to_end) return o->pf;
+        o->control_mode = cm;
         
-    --(o->steps_to_end);
-    
-    o->Ai += o->Bi; 
-    o->Bi += o->Ci;
-    o->Ci += o->Kc;
-    
-    o->Zi += o->Yi; 
-    o->Yi += o->Ky;
-
-    o->Fi += o->Kf;
-    
-    pi = o->Fi + o->Ai*o->Zi;
-    o->delta = pi - o->pi;
-    o->pi = pi;
-
-    return pi;
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
-extern float eo_trajectory_StepDelta(EOtrajectory *o)
+extern void eo_motorcontroller_ReadEncoder(EOmotorcontroller *o, float position)
 {
-    float pi;
-
-    if (!o->steps_to_end) return o->pf;
-        
-    --(o->steps_to_end);
-    
-    o->Ai += o->Bi; 
-    o->Bi += o->Ci;
-    o->Ci += o->Kc;
-    
-    o->Zi += o->Yi; 
-    o->Yi += o->Ky;
-
-    o->Fi += o->Kf;
-    
-    pi = o->Fi + o->Ai*o->Zi;
-    o->delta = pi - o->pi;
-    o->pi = pi;
-
-    return o->delta;
+    o->encoder_meas = position;
 }
 
+extern void eo_motorcontroller_ReadTorque(EOmotorcontroller *o, float torque)
+{
+    o->torque_meas = torque;
+}
+
+extern void eo_motorcontroller_SetReference(EOmotorcontroller *o, float reference, float speed)
+{
+    if (o->control_mode == CM_IMPEDANCE)
+    {
+        // reference is the desired torque
+        eo_trajectory_SetReference(o->trajectory, 
+                                   o->encoder_meas, 
+                                   o->encoder_meas + reference / o->stiffness, 
+                                   eo_trajectory_GetSpeed(o->trajectory), 
+                                   speed);
+    }
+    else if (o->control_mode == CM_VELOCITY)
+    {
+    }
+    else
+    {
+        eo_trajectory_SetReference(o->trajectory, 
+                                   o->encoder_meas, 
+                                   reference,
+                                   eo_trajectory_GetSpeed(o->trajectory), 
+                                   speed);
+    }    
+}
+
+extern void eo_motorcontroller_SetStiffness(EOmotorcontroller *o, float stiffness)
+{
+    o->stiffness = stiffness;
+}
+
+extern float eo_motorcontroller_Step(EOmotorcontroller *o, float En)
+{
+    if (o->control_mode == CM_VELOCITY)
+    {
+        return 0.0f;
+    }
+    else
+    {
+        return eo_pid_Step(o->pid[o->control_mode], En);
+    }
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

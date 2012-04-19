@@ -82,17 +82,21 @@ extern EOpid* eo_pid_New(void)
         o->Ymax = 0.0f;
         o->En_1 = 0.0f;
         o->En_2 = 0.0f;
+
+        o->initialized = 0;
     }
 
     return o;
 }
 
-extern void eo_pid_Set(EOpid *o, float Kp, float Kd, float Ki, float Ymax)
+extern void eo_pid_Init(EOpid *o, float Kp, float Kd, float Ki, float Ymax)
 {
     o->A0 =  Kp + Kd + Ki;
     o->A1 = -Kp - 2.0f*Kd;
     o->A2 =  Kd;
     o->Ymax = Ymax;
+
+    o->initialized = 1;
 }
 
 extern float eo_pid_Step(EOpid *o, float En)
@@ -112,6 +116,11 @@ extern float eo_pid_Step(EOpid *o, float En)
     }
 
     return o->Yn;
+}
+
+extern uint8_t eo_pid_IsInitialized(EOpid *o)
+{
+    return o->initialized;
 }
 
 
