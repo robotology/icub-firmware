@@ -90,6 +90,8 @@ static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_INIT_Jxx__jstatus(uint1
 static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_INIT_Jxx__calibrator(uint16_t n, const EOnv* nv);
 static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_INIT_Jxx__setpoint(uint16_t n, const EOnv* nv);
 static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_INIT_Jxx__controlmode(uint16_t n, const EOnv* nv);
+static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_INIT_Jxx__signalwhenmotionisdone(uint16_t n, const EOnv* nv);
+static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_INIT_Jxx__motionisdone(uint16_t n, const EOnv* nv);
 // jxx-updt: all the nvs
 static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_UPDT_Jxx_jconfig(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_UPDT_Jxx_jconfig__pidposition(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
@@ -103,7 +105,8 @@ static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_UPDT_Jxx__jstatus(uint1
 static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_UPDT_Jxx__calibrator(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_UPDT_Jxx__setpoint(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_UPDT_Jxx__controlmode(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-
+static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_UPDT_Jxx__signalwhenmotionisdone(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_UPDT_Jxx__motionisdone(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
 // mxx-init:
 static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_INIT_Mxx_mconfig(uint16_t n, const EOnv* nv);
@@ -305,7 +308,16 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_array_of_EOnv_usr[
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
-    
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leftleg_j00_ebx__signalwhenmotionisdone,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leftleg_j00_ebx__motionisdone,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },     
 
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leftleg_j01_ebx_jconfig,
@@ -367,7 +379,16 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_array_of_EOnv_usr[
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
-
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leftleg_j01_ebx__signalwhenmotionisdone,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leftleg_j01_ebx__motionisdone,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },   
 
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leftleg_j02_ebx_jconfig,
@@ -429,7 +450,16 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_array_of_EOnv_usr[
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },    
-
+    {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leftleg_j02_ebx__signalwhenmotionisdone,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leftleg_j02_ebx__motionisdone,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },   
 
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leftleg_j03_ebx_jconfig,
@@ -491,8 +521,18 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_array_of_EOnv_usr[
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
+    {   // j03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leftleg_j03_ebx__signalwhenmotionisdone,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leftleg_j03_ebx__motionisdone,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },   
 
-
+    
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leftleg_j04_ebx_jconfig,
         EO_INIT(.on_rop_reception)      NULL,                 
@@ -553,6 +593,16 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_array_of_EOnv_usr[
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
+    {   // j04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leftleg_j04_ebx__signalwhenmotionisdone,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leftleg_j04_ebx__motionisdone,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },   
     
 
     {   // j05 
@@ -615,9 +665,19 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_array_of_EOnv_usr[
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
+    {   // j05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leftleg_j05_ebx__signalwhenmotionisdone,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leftleg_j05_ebx__motionisdone,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },       
+
     
-    
-    
+    // and in here come the 6 motors     
     
     
     {   // m00 
@@ -951,6 +1011,17 @@ static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_INIT_Jxx__controlmode(u
     
 }
 
+static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_INIT_Jxx__signalwhenmotionisdone(uint16_t n, const EOnv* nv)
+{
+    
+}
+
+
+static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_INIT_Jxx__motionisdone(uint16_t n, const EOnv* nv)
+{
+    
+}
+
 
 // jxx-updt: all the nvs
 static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_UPDT_Jxx_jconfig(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
@@ -1024,6 +1095,16 @@ static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_UPDT_Jxx__controlmode(u
     
 }
 
+
+static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_UPDT_Jxx__signalwhenmotionisdone(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    
+}
+
+static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_UPDT_Jxx__motionisdone(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    
+}
 
 
 static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_INIT_Mxx_mconfig(uint16_t n, const EOnv* nv)

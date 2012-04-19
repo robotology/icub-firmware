@@ -61,9 +61,37 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
+// in here we put a check vs inconsistent values between joint-motor and bodypart
 
+EO_VERIFYproposition(xxx, jointNVindex_jconfig                              == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig);
+EO_VERIFYproposition(xxx, jointNVindex_jconfig__pidposition                 == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidposition);
+EO_VERIFYproposition(xxx, jointNVindex_jconfig__pidvelocity                 == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidvelocity);
+EO_VERIFYproposition(xxx, jointNVindex_jconfig__pidtorque                   == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidtorque);
+EO_VERIFYproposition(xxx, jointNVindex_jconfig__minpositionofjoint          == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__minpositionofjoint);
+EO_VERIFYproposition(xxx, jointNVindex_jconfig__maxpositionofjoint          == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__maxpositionofjoint);
+EO_VERIFYproposition(xxx, jointNVindex_jconfig__velocitysetpointtimeout     == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__velocitysetpointtimeout);
+EO_VERIFYproposition(xxx, jointNVindex_jconfig__upto02descrforchameleon02   == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__upto02descrforchameleon02);
+EO_VERIFYproposition(xxx, jointNVindex__jstatus                             == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__jstatus);
+EO_VERIFYproposition(xxx, jointNVindex__calibrator                          == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__calibrator);
+EO_VERIFYproposition(xxx, jointNVindex__setpoint                            == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__setpoint);
+EO_VERIFYproposition(xxx, jointNVindex__controlmode                         == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__controlmode);
+EO_VERIFYproposition(xxx, jointNVindex__signalwhenmotionisdone              == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__signalwhenmotionisdone);
+EO_VERIFYproposition(xxx, jointNVindex__motionisdone                        == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__motionisdone);
+//EO_VERIFYproposition(xxx, jointNVindex__measuredtorque                      == );
+
+EO_VERIFYproposition(xxx, jointNVindex_TOTALnumber                          == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber);
+
+EO_VERIFYproposition(xxx, motorNVindex_mconfig                              == EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig);
+EO_VERIFYproposition(xxx, motorNVindex_mconfig__pidcurrent                  == EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__pidcurrent);
+EO_VERIFYproposition(xxx, motorNVindex_mconfig__maxvelocityofmotor          == EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__maxvelocityofmotor);
+EO_VERIFYproposition(xxx, motorNVindex_mconfig__maxcurrentofmotor           == EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__maxcurrentofmotor);
+EO_VERIFYproposition(xxx, motorNVindex_mconfig__upto02descrforchameleon06   == EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__upto02descrforchameleon06);
+EO_VERIFYproposition(xxx, motorNVindex__mstatus                             == EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex__mstatus);
+
+EO_VERIFYproposition(xxx, motorNVindex_TOTALnumber                          == EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber);
+
+ 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -74,7 +102,7 @@
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const uint8_t s_eo_cfg_nvsEP_mc_any_con_bodypart_jxxfuntyp[EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber] =
+static const uint8_t s_eo_cfg_nvsEP_mc_any_con_bodypart_jxxfuntyp[] =
 {
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig,
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__pidposition,
@@ -88,11 +116,13 @@ static const uint8_t s_eo_cfg_nvsEP_mc_any_con_bodypart_jxxfuntyp[EOK_cfg_nvsEP_
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__jstatus,
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__calibrator,
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__setpoint,
-    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__controlmode
-};
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__controlmode,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__signalwhenmotionisdone,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__motionisdone
+};  EO_VERIFYsizeof(s_eo_cfg_nvsEP_mc_any_con_bodypart_jxxfuntyp, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber);
 
 
-static const uint8_t s_eo_cfg_nvsEP_mc_any_con_bodypart_mxxfuntyp[EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber] =
+static const uint8_t s_eo_cfg_nvsEP_mc_any_con_bodypart_mxxfuntyp[] =
 {
     EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig,
     EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__pidcurrent,
@@ -101,7 +131,7 @@ static const uint8_t s_eo_cfg_nvsEP_mc_any_con_bodypart_mxxfuntyp[EOK_cfg_nvsEP_
     EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__upto02descrforchameleon06,
 
     EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP__mstatus
-};
+};  EO_VERIFYsizeof(s_eo_cfg_nvsEP_mc_any_con_bodypart_mxxfuntyp, EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables

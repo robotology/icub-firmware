@@ -230,6 +230,10 @@ static uint16_t s_hash(uint16_t id);
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
 
+
+extern const eOmc_joint_t* eo_cfg_nvsEP_mc_leftleg_joint_defaultvalue = &eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue;
+extern const eOmc_motor_t* eo_cfg_nvsEP_mc_leftleg_motor_defaultvalue = &eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue;
+
 // EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber is 12 and keeps the number of nvs per joint
 #define Jnvs    (EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber)
 
@@ -274,6 +278,8 @@ static uint16_t s_hash(uint16_t id);
 
 
 //extern EOtreenode eo_cfg_nvsEP_mc_leftleg_tree_con[];
+
+#warning --> cambiare sintassi 0+J00p in Jindex(0, 0)
 
 extern EOtreenode eo_cfg_nvsEP_mc_leftleg_tree_con[EOK_cfg_nvsEP_leftleg_NUMofVARS] =
 {
@@ -364,6 +370,21 @@ extern EOtreenode eo_cfg_nvsEP_mc_leftleg_tree_con[EOK_cfg_nvsEP_leftleg_NUMofVA
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
+    {   //12
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_leftleg_j00__signalwhenmotionisdone,
+        EO_INIT(.index)     12+J00p,
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },
+    {   //13
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_leftleg_j00__motionisdone,
+        EO_INIT(.index)     13+J00p,
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },
+
 
 
     // joint01
@@ -453,7 +474,20 @@ extern EOtreenode eo_cfg_nvsEP_mc_leftleg_tree_con[EOK_cfg_nvsEP_leftleg_NUMofVA
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
-    
+    {   //12
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_leftleg_j01__signalwhenmotionisdone,
+        EO_INIT(.index)     12+J01p,
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },
+    {   //13
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_leftleg_j01__motionisdone,
+        EO_INIT(.index)     13+J01p,
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },    
 
     // joint02
     {   // 0
@@ -542,7 +576,21 @@ extern EOtreenode eo_cfg_nvsEP_mc_leftleg_tree_con[EOK_cfg_nvsEP_leftleg_NUMofVA
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
-
+    {   //12
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_leftleg_j02__signalwhenmotionisdone,
+        EO_INIT(.index)     12+J02p,
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },
+    {   //13
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_leftleg_j02__motionisdone,
+        EO_INIT(.index)     13+J02p,
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },
+    
     
     // joint03
     {   // 0
@@ -631,7 +679,20 @@ extern EOtreenode eo_cfg_nvsEP_mc_leftleg_tree_con[EOK_cfg_nvsEP_leftleg_NUMofVA
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
-
+    {   //12
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_leftleg_j03__signalwhenmotionisdone,
+        EO_INIT(.index)     12+J03p,
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },
+    {   //13
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_leftleg_j03__motionisdone,
+        EO_INIT(.index)     13+J03p,
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },
 
     // joint04
     {   // 0
@@ -720,7 +781,22 @@ extern EOtreenode eo_cfg_nvsEP_mc_leftleg_tree_con[EOK_cfg_nvsEP_leftleg_NUMofVA
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
-
+    {   //12
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_leftleg_j04__signalwhenmotionisdone,
+        EO_INIT(.index)     12+J04p,
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },
+    {   //13
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_leftleg_j04__motionisdone,
+        EO_INIT(.index)     13+J04p,
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },
+    
+    
     // joint05
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_leftleg_j05_jconfig,
@@ -808,9 +884,22 @@ extern EOtreenode eo_cfg_nvsEP_mc_leftleg_tree_con[EOK_cfg_nvsEP_leftleg_NUMofVA
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
+    {   //12
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_leftleg_j05__signalwhenmotionisdone,
+        EO_INIT(.index)     12+J05p,
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },
+    {   //13
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_leftleg_j05__motionisdone,
+        EO_INIT(.index)     13+J05p,
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },    
     
-    
-    #warning and in here come the 6 motors
+    // and in here come the 6 motors
 
     // motor00
     {   // 0

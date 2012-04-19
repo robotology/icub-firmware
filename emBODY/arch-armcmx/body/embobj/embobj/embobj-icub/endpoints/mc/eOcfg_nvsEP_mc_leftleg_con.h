@@ -30,7 +30,7 @@
 	@date       04/05/2012
 **/
 
-/** @defgroup eo_asfdgr234 Configuation of the NVs for the updater
+/** @defgroup eo_asfdgr234 Configuation of the NVs ..
     Tcecece 
     
     @{		
@@ -46,8 +46,7 @@
 
 #include "EoMotionControl.h"
 #include "eOcfg_nvsEP_mc_any_con_bodypart.h"
-//#include "eOcfg_nvsEP_mc_any_con_jxx.h"
-//#include "eOcfg_nvsEP_mc_any_con_mxx.h"
+
 
  
 
@@ -58,8 +57,10 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
+
 /** @typedef    typedef enum eo_cfg_nvsEP_mc_leftleg_con_jointNumber_t
-    @brief      It contains an index for all the joints the left leg. It is a subset of those in eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t
+    @brief      It contains an index for all the joints the left leg. It is a subset of those 
+                in eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t
  **/
 typedef enum
 {
@@ -69,6 +70,7 @@ typedef enum
 
 enum { jointLeftLeg_TOTALnumber = 6}; 
 
+
 /** @typedef    typedef eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t eo_cfg_nvsEP_mc_leftleg_con_jointNVindex_t
     @brief      It contains an index for all the network variables in a joint of the left leg. use the same type as in bodypart
  **/
@@ -76,7 +78,8 @@ typedef eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t eo_cfg_nvsEP_mc_leftleg_
 
 
 /** @typedef    typedef enum eo_cfg_nvsEP_mc_leftleg_con_motorNumber_t;
-    @brief      It contains an index for all the motors the left leg. It is a subset of those in eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t
+    @brief      It contains an index for all the motors the left leg. It is a subset of those 
+                in eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t
  **/
 typedef enum
 {
@@ -102,7 +105,7 @@ enum {varsMCleftleg_TOTALnumber = jointLeftLeg_TOTALnumber*jointNVindex_TOTALnum
 /** @typedef    typedef struct eo_cfg_nvsEP_mc_leftleg_t;
     @brief      contains all the variables in the leftleg.
  **/
-typedef struct               
+typedef struct                  // 112*6+40*6 = 912               
 {
     eOmc_joint_t                joints[jointLeftLeg_TOTALnumber]; 
     eOmc_motor_t                motors[motorLeftLeg_TOTALnumber];
@@ -113,6 +116,9 @@ typedef struct
 
 //we prefer to omit this to save rom space: use the default joint and motor values instead ....
 //extern const eo_cfg_nvsEP_mc_leftleg_t eo_cfg_nvsEP_mc_leftleg_default;
+
+extern const eOmc_joint_t* eo_cfg_nvsEP_mc_leftleg_joint_defaultvalue;
+extern const eOmc_motor_t* eo_cfg_nvsEP_mc_leftleg_motor_defaultvalue;
 
 
 

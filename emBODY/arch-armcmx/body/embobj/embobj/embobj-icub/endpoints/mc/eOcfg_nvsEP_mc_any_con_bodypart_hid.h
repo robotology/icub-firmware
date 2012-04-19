@@ -92,6 +92,9 @@
 #define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__calibrator(j)                                EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__calibrator, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__calibrator))
 #define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__setpoint(j)                                  EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__setpoint, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__setpoint))
 #define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__controlmode(j)                               EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__controlmode, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__controlmode))
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__signalwhenmotionisdone(j)                    EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__signalwhenmotionisdone, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__signalwhenmotionisdone))
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__motionisdone(j)                              EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__motionisdone, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__motionisdone))
+ 
         
 
         

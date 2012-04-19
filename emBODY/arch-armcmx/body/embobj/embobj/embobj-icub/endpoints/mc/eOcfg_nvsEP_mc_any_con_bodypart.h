@@ -42,8 +42,6 @@
 #include "EoCommon.h"
 #include "EOnv.h"
 #include "EoMotionControl.h"
-#include "eOcfg_nvsEP_mc_any_con_jxx.h"
-#include "eOcfg_nvsEP_mc_any_con_mxx.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -56,7 +54,8 @@
 
 /** @typedef    typedef enum eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t;
     @brief      It contains an index for all the joints in a bodypart. In a given bodypart, there are joints for a number lower
-                than jointNumber_TOTALnumber. The numbers are consecutive and without holes.
+                than jointNumber_TOTALnumber. The numbers are consecutive and without holes, so that the enum value can be changed 
+                by a normal index.
  **/
 typedef enum
 {
@@ -68,27 +67,31 @@ typedef enum
 enum { jointNumber_TOTALnumber = 20};
 
 
+
 /** @typedef    typedef enum eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t;
     @brief      It contains an index for all the network variables in a joint. The indices are consecutive and without
-                holes.
+                holes, so that the enum value can be changed by a normal index.
  **/
 typedef enum
 {
-    jointNVindex_jconfig                                =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig,                                  /**< 0 */
-    jointNVindex_jconfig__pidposition                   =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidposition,                     /**< 1 */
-    jointNVindex_jconfig__pidvelocity                   =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidvelocity,                     /**< 2 */
-    jointNVindex_jconfig__pidtorque                     =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidtorque,                       /**< 3 */
-    jointNVindex_jconfig__minpositionofjoint            =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__minpositionofjoint,              /**< 4 */
-    jointNVindex_jconfig__maxpositionofjoint            =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__maxpositionofjoint,              /**< 5 */
-    jointNVindex_jconfig__velocitysetpointtimeout       =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__velocitysetpointtimeout,         /**< 6 */
-    jointNVindex_jconfig__upto02descrforchameleon02     =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__upto02descrforchameleon02,       /**< 7 */
-    jointNVindex__jstatus                               =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__jstatus,                                 /**< 8 */
-    jointNVindex__calibrator                            =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__calibrator,                              /**< 9 */
-    jointNVindex__setpoint                              =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__setpoint,                                /**< 10 */
-    jointNVindex__controlmode                           =   EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__controlmode                              /**< 11 */
+    jointNVindex_jconfig                                    =   0,
+    jointNVindex_jconfig__pidposition                       =   1,
+    jointNVindex_jconfig__pidvelocity                       =   2,
+    jointNVindex_jconfig__pidtorque                         =   3,
+    jointNVindex_jconfig__minpositionofjoint                =   4,
+    jointNVindex_jconfig__maxpositionofjoint                =   5,
+    jointNVindex_jconfig__velocitysetpointtimeout           =   6,
+    jointNVindex_jconfig__upto02descrforchameleon02         =   7,
+    jointNVindex__jstatus                                   =   8,
+    jointNVindex__calibrator                                =   9,
+    jointNVindex__setpoint                                  =   10,
+    jointNVindex__controlmode                               =   11,
+    jointNVindex__signalwhenmotionisdone                    =   12,
+    jointNVindex__motionisdone                              =   13//,
+//    jointNVindex__measuredtorque                            =   14
 } eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t;
 
-enum { jointNVindex_TOTALnumber = EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber};
+enum { jointNVindex_TOTALnumber = 14};
 
 
 
@@ -112,15 +115,15 @@ enum { motorNumber_TOTALnumber = 20};
  **/
 typedef enum
 {
-    motorNVindex_mconfig                                =   EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig,
-    motorNVindex_mconfig__pidcurrent                    =   EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__pidcurrent,
-    motorNVindex_mconfig__maxvelocityofmotor            =   EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__maxvelocityofmotor,
-    motorNVindex_mconfig__maxcurrentofmotor             =   EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__maxcurrentofmotor,
-    motorNVindex_mconfig__upto02descrforchameleon06     =   EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__upto02descrforchameleon06,
-    motorNVindex__mstatus                               =   EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex__mstatus
+    motorNVindex_mconfig                                    =   0,
+    motorNVindex_mconfig__pidcurrent                        =   1,
+    motorNVindex_mconfig__maxvelocityofmotor                =   2,
+    motorNVindex_mconfig__maxcurrentofmotor                 =   3,
+    motorNVindex_mconfig__upto02descrforchameleon06         =   4,
+    motorNVindex__mstatus                                   =   5
 } eo_cfg_nvsEP_mc_any_con_bodypart_motorNVindex_t;
 
-enum { motorNVindex_TOTALnumber = EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber};
+enum { motorNVindex_TOTALnumber = 6};
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
