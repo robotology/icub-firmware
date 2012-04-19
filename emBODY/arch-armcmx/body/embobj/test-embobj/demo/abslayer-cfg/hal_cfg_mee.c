@@ -14,6 +14,7 @@
 #include "stdlib.h"
 #include "osal.h"
 
+#include "stdio.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -80,10 +81,14 @@ static void s_hal_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char * err
 {
     volatile uint32_t xxx = (uint32_t)errorcode;
     errorcode = errorcode;
+    char str[128];
     if(NULL != errormsg)
     {
 //        hal_display_putstring(4, (uint8_t*)errormsg);
+        snprintf(str, sizeof(str)-1, "hal error #%d: %s", errorcode, errormsg);
     }
+    
+    hal_trace_puts(str);
 
     xxx = xxx;
 
