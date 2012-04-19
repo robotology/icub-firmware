@@ -521,10 +521,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>14</ColumnNumber>
+      <ColumnNumber>2</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>28</TopLine>
-      <CurrentLine>36</CurrentLine>
+      <TopLine>39</TopLine>
+      <CurrentLine>53</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app\demo-mee-core-nvs-main.c</PathWithFileName>
       <FilenameWithoutPath>demo-mee-core-nvs-main.c</FilenameWithoutPath>
@@ -535,10 +535,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>9</ColumnNumber>
+      <ColumnNumber>2</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>22</TopLine>
+      <CurrentLine>36</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app\demo-mee-core-nvs-appl.c</PathWithFileName>
       <FilenameWithoutPath>demo-mee-core-nvs-appl.c</FilenameWithoutPath>
@@ -995,7 +995,7 @@
 
   <Group>
     <GroupName>eo-nvs</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -1086,7 +1086,7 @@
       <GroupNumber>6</GroupNumber>
       <FileNumber>39</FileNumber>
       <FileType>1</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>92</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1296,7 +1296,7 @@
 
   <Group>
     <GroupName>eo-nvs-cfg-common</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -1380,7 +1380,7 @@
 
   <Group>
     <GroupName>eo_nvs-cfg-remote</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -1429,7 +1429,7 @@
 
   <Group>
     <GroupName>eo-arm-env</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -1466,12 +1466,12 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>21</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>6</TopLine>
-      <CurrentLine>12</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embenv\envcom\eEcommon.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\any-arch\body\embenv\envcom\eEcommon.c</PathWithFileName>
       <FilenameWithoutPath>eEcommon.c</FilenameWithoutPath>
     </File>
     <File>
@@ -1482,10 +1482,10 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>28</TopLine>
-      <CurrentLine>28</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embenv\envshalib\shalBASE-package\shalBASE\src\shalBASE.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\sys\env\src\shalBASE.c</PathWithFileName>
       <FilenameWithoutPath>shalBASE.c</FilenameWithoutPath>
     </File>
     <File>
@@ -1494,13 +1494,13 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>25</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embenv\envshalib\shalPART-package\shalPART\src\shalPART.c</PathWithFileName>
-      <FilenameWithoutPath>shalPART.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\sys\env\src\shalINFO.c</PathWithFileName>
+      <FilenameWithoutPath>shalINFO.c</FilenameWithoutPath>
     </File>
     <File>
       <GroupNumber>10</GroupNumber>
@@ -1508,13 +1508,13 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>24</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embenv\envshalib\shalINFO-package\shalINFO\src\shalINFO.c</PathWithFileName>
-      <FilenameWithoutPath>shalINFO.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\sys\env\src\shalPART.c</PathWithFileName>
+      <FilenameWithoutPath>shalPART.c</FilenameWithoutPath>
     </File>
   </Group>
 

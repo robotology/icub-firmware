@@ -348,7 +348,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO</Define>
               <Undefine></Undefine>
-              <IncludePath>..\abslayer-cfg;..\app;..\..\..\embobj\embobj-api;..\..\..\embobj\embobj-src;..\..\..\embobj\embobj-cfg;..\..\..\..\..\sys\abs\api;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc;..\..\..\..\..\sys\env\api;..\..\..\..\..\sys\prt</IncludePath>
+              <IncludePath>..\abslayer-cfg;..\app;..\..\..\embobj\embobj-api;..\..\..\embobj\embobj-src;..\..\..\embobj\embobj-cfg;..\..\..\..\..\sys\abs\api;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc;..\..\..\..\..\sys\env\api;..\..\..\..\..\..\porting;..\..\..\..\..\..\any-arch\body\embenv\envcom</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -769,22 +769,22 @@
             <File>
               <FileName>eEcommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embenv\envcom\eEcommon.c</FilePath>
+              <FilePath>..\..\..\..\..\..\any-arch\body\embenv\envcom\eEcommon.c</FilePath>
             </File>
             <File>
               <FileName>shalBASE.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embenv\envshalib\shalBASE-package\shalBASE\src\shalBASE.c</FilePath>
-            </File>
-            <File>
-              <FileName>shalPART.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\embenv\envshalib\shalPART-package\shalPART\src\shalPART.c</FilePath>
+              <FilePath>..\..\..\..\..\sys\env\src\shalBASE.c</FilePath>
             </File>
             <File>
               <FileName>shalINFO.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embenv\envshalib\shalINFO-package\shalINFO\src\shalINFO.c</FilePath>
+              <FilePath>..\..\..\..\..\sys\env\src\shalINFO.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalPART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\sys\env\src\shalPART.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1545,22 +1545,22 @@
             <File>
               <FileName>eEcommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embenv\envcom\eEcommon.c</FilePath>
+              <FilePath>..\..\..\..\..\..\any-arch\body\embenv\envcom\eEcommon.c</FilePath>
             </File>
             <File>
               <FileName>shalBASE.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embenv\envshalib\shalBASE-package\shalBASE\src\shalBASE.c</FilePath>
-            </File>
-            <File>
-              <FileName>shalPART.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\embenv\envshalib\shalPART-package\shalPART\src\shalPART.c</FilePath>
+              <FilePath>..\..\..\..\..\sys\env\src\shalBASE.c</FilePath>
             </File>
             <File>
               <FileName>shalINFO.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\embenv\envshalib\shalINFO-package\shalINFO\src\shalINFO.c</FilePath>
+              <FilePath>..\..\..\..\..\sys\env\src\shalINFO.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalPART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\sys\env\src\shalPART.c</FilePath>
             </File>
           </Files>
         </Group>
