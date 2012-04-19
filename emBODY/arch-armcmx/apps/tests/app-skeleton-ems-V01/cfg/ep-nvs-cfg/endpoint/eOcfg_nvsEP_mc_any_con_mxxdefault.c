@@ -77,17 +77,17 @@ extern const eOmc_motor_t eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue =
     {
         EO_INIT(.pidcurrent)
         {
-            EO_INIT(.kp)                    0x0ABB,
-            EO_INIT(.ki)                    0xC0DD,
-            EO_INIT(.kd)                    0xEE0F,
-            EO_INIT(.limitonintegral)       0X1122,
-            EO_INIT(.limitonoutput)         0x3344,
+            EO_INIT(.kp)                    0x1111,
+            EO_INIT(.ki)                    0x2222,
+            EO_INIT(.kd)                    0x3333,
+            EO_INIT(.limitonintegral)       0X4444,
+            EO_INIT(.limitonoutput)         0x5555,
             EO_INIT(.scale)                 0x0,
-            EO_INIT(.offset)                0x5566,
+            EO_INIT(.offset)                0x6666,
             EO_INIT(.filler03)              {0xf1, 0xf2, 0xf3}
         },
-        EO_INIT(.maxvelocityofmotor)        0x123,
-        EO_INIT(.maxcurrentofmotor)         0x456,
+        EO_INIT(.maxvelocityofmotor)        0xAA,
+        EO_INIT(.maxcurrentofmotor)         0xBB,
         EO_INIT(.upto02descrforchameleon06) {EOUTIL_CHAMELEON_DESCRIPTOR_NONE, EOUTIL_CHAMELEON_DESCRIPTOR_NONE}
     },
     EO_INIT(.mstatus)                       {0}

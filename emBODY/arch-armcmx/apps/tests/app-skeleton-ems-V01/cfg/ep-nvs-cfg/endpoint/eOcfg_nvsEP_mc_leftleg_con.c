@@ -37,7 +37,7 @@
 #include "EOconstvector_hid.h"
 
 
-#include "eOcfg_nvsEP_mc_any_con_bodypart.h"
+#include "eOcfg_nvsEP_mc_any_con_bodypart_hid.h"
 
 #include "eOcfg_nvsEP_mc_any_con_jxx.h"    
 #include "eOcfg_nvsEP_mc_any_con_jxxdefault.h" 
@@ -63,6 +63,14 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
+
+//the number of joints used in the endpoint
+#define EOK_cfg_nvsEP_mc_leftleg_NUMofJOINTS                                        (6)
+//the number of motors used in the endpoint
+#define EOK_cfg_nvsEP_mc_leftleg_NUMofMOTORS                                        (6)
+
+//the total number of nvs in the endpoint
+#define EOK_cfg_nvsEP_leftleg_NUMofVARS                                             ((EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber*EOK_cfg_nvsEP_mc_leftleg_NUMofJOINTS)+(EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber*EOK_cfg_nvsEP_mc_leftleg_NUMofMOTORS))
 
 
 
@@ -148,6 +156,8 @@ static uint16_t s_hash(uint16_t id);
 
 #include "eOcfg_nvsEP_mc_any_con_jxxmacro.c"
 
+#define OFFSET_OF_END_OF_JOINTS    (6*sizeof(eOmc_joint_t))
+
 
 // -- the 6 motors
 
@@ -159,7 +169,7 @@ static uint16_t s_hash(uint16_t id);
 #define MMACRO_MSTR    _m00
 #define MMACRO_PNUM    5
 #define MMACRO_MNUM    0    
-#define MMACRO_MOFF    (MMACRO_MNUM*sizeof(eOmc_motor_t))
+#define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
 #include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
@@ -169,7 +179,7 @@ static uint16_t s_hash(uint16_t id);
 #define MMACRO_MSTR    _m01
 #define MMACRO_PNUM    5
 #define MMACRO_MNUM    1    
-#define MMACRO_MOFF    (MMACRO_MNUM*sizeof(eOmc_motor_t))
+#define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
 #include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
@@ -180,7 +190,7 @@ static uint16_t s_hash(uint16_t id);
 #define MMACRO_MSTR    _m02
 #define MMACRO_PNUM    5
 #define MMACRO_MNUM    2    
-#define MMACRO_MOFF    (MMACRO_MNUM*sizeof(eOmc_motor_t))
+#define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
 #include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
@@ -190,7 +200,7 @@ static uint16_t s_hash(uint16_t id);
 #define MMACRO_MSTR    _m03
 #define MMACRO_PNUM    5
 #define MMACRO_MNUM    3    
-#define MMACRO_MOFF    (MMACRO_MNUM*sizeof(eOmc_motor_t))
+#define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
 #include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
@@ -200,7 +210,7 @@ static uint16_t s_hash(uint16_t id);
 #define MMACRO_MSTR    _m04
 #define MMACRO_PNUM    5
 #define MMACRO_MNUM    4    
-#define MMACRO_MOFF    (MMACRO_MNUM*sizeof(eOmc_motor_t))
+#define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
 #include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
@@ -210,7 +220,7 @@ static uint16_t s_hash(uint16_t id);
 #define MMACRO_MSTR    _m05
 #define MMACRO_PNUM    5
 #define MMACRO_MNUM    5    
-#define MMACRO_MOFF    (MMACRO_MNUM*sizeof(eOmc_motor_t))
+#define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
 #include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
@@ -1227,6 +1237,22 @@ static uint16_t s_hash(uint16_t id)
     }
     
     return(r);
+}
+
+
+extern eOnvEP_t eo_cfg_nvsEP_mc_leftlef_EP_Get(void)
+{
+    return(EOK_cfg_nvsEP_mc_leftleg_EP);
+}
+
+extern eOnvID_t eo_cfg_nvsEP_mc_leftleg_NVID_for_joint_var_Get(eo_cfg_nvsEP_mc_leftleg_con_jointNumber_t j, eo_cfg_nvsEP_mc_leftleg_con_jointNVindex_t jnvindex)
+{
+    return(eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_joint_var_Get(j, jnvindex));
+}
+
+extern eOnvID_t eo_cfg_nvsEP_mc_leftleg_NVID_for_motor_var_Get(eo_cfg_nvsEP_mc_leftleg_con_motorNumber_t m, eo_cfg_nvsEP_mc_leftleg_con_motorNVindex_t mnvindex)
+{
+    return(eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get(m, mnvindex));
 }
 
 

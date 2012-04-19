@@ -123,11 +123,11 @@ DEBUG_PIN4_OFF;
         return(res);
     }
 
-    res = eo_appTheMCNVmap_GetJointNVMemoryRef_test(eo_appTheMCNVmap_GetHandle(), jUniqueId, jointNVindex_jconfig, &memRef1);
-    if(eores_OK != res)
-    {
-        return(res);
-    }
+//    res = eo_appTheMCNVmap_GetJointNVMemoryRef_test(eo_appTheMCNVmap_GetHandle(), jUniqueId, jointNVindex_jconfig, &memRef1);
+//    if(eores_OK != res)
+//    {
+//        return(res);
+//    }
 
 
     res = eo_appTheMCNVmap_GetJointNVMemoryRef(eo_appTheMCNVmap_GetHandle(), jUniqueId, jointNVindex_jconfig, &memRef2);
@@ -145,10 +145,10 @@ DEBUG_PIN4_OFF;
         j.velocity = 2;
     }
 
-    memcpy(&jc1, memRef1, sizeof(eOmc_joint_config_t));
+//    memcpy(&jc1, memRef1, sizeof(eOmc_joint_config_t));  memref1 uset for test
 
     memcpy(&jc2, memRef2, sizeof(eOmc_joint_config_t));
-
+DEBUG_PIN3_OFF;
 
 //pidPos
     res = eo_appTheMCNVmap_GetJointNVMemoryRef_test(eo_appTheMCNVmap_GetHandle(), jUniqueId, jointNVindex_jconfig__pidposition, &memRef1);
