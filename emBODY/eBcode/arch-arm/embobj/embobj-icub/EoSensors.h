@@ -119,25 +119,24 @@ typedef struct                  // size is: 4+0 = 4
 typedef struct                      // size is: 1+1+1+1+4+16+0 = 24
 {
     eOenum08_t                      txmode;
-    uint8_t                         datarateinms;
-    eObool_t                        signalonce_fullscale;
+    uint8_t                         datarate;
+    eObool_t                        signaloncefullscale;
     uint8_t                         filler01[1];
     uint8_t                         filler04[4];    
     eOsnsr_arrayofupto12bytes_t     values;
-} eOsnsr_strain_t;
+} eOsnsr_strain_t;                  EO_VERIFYsizeof(eOsnsr_strain_t, 24);
 
 
 typedef struct                      // size is: 1+1+1+1+4+24+0 = 32
 {
     eOenum08_t                      txmode;
-    uint8_t                         datarateinms;
-    eOenum08_t                      notused_resolutionmode;
+    uint8_t                         datarate;
+    eOenum08_t                      resolutionmode;
     uint8_t                         filler01[1];
     uint8_t                         filler04[4];    
     eOsnsr_arrayofupto20bytes_t     values; 
-} eOsnsr_mais_t;
+} eOsnsr_mais_t;                    EO_VERIFYsizeof(eOsnsr_mais_t, 32);
 
-// the endpoint needs: 4 strain + 2 mais -> 4*24+2*32 = 160 bytes. accettabile.
 
 
 /** @typedef    typedef uint8_t  eOsnsr_sensorId_t
