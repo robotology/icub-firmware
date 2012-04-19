@@ -279,8 +279,8 @@ typedef enum
  **/
 typedef struct  
 {
-    uint16_t                    pwmlimit;
-    uint16_t                    velocity;
+    uint16_t                    pwmlimit;    //first param in icub can message
+    uint16_t                    velocity;     //secondparam in icub can message
 } eOmc_calibrator_params_type0_hard_stops_t;
 
 
@@ -422,6 +422,11 @@ typedef uint8_t  eOmc_motorUniqueId_t;
  **/
 typedef uint8_t  eOmc_motorBoardId_t;
 
+
+//#warning VALE --> max num joints x body part
+//enum{ eOmc_maxnumof_joints_perBodypart = 20}; //equal to EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_joints 
+//
+//enum{ eOmc_maxnumof_motors_perBodypart = 20}; // equal to EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_motors 
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section

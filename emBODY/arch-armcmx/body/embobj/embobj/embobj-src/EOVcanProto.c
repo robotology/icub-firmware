@@ -47,8 +47,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-eOresult_t s_eov_canFrame_parseCanFrame_dummy(EOVcanProtoDerived *d, eOcanframe_t *frame, eOcanport_t canPortRx);
-eOresult_t s_eov_canFrame_formCanFrame_dummy(EOVcanProtoDerived *d, eo_canProto_msgCommand_t command, 
+static eOresult_t s_eov_canFrame_parseCanFrame_dummy(EOVcanProtoDerived *d, eOcanframe_t *frame, eOcanport_t canPortRx);
+static eOresult_t s_eov_canFrame_formCanFrame_dummy(EOVcanProtoDerived *d, eo_canProto_msgCommand_t command, 
 											eo_canProto_msgDestination_t dest, void *value,
 											eOcanframe_t *frame);
 

@@ -193,6 +193,11 @@ extern __inline eo_icubCanProto_canBoardAddress_t eo_icubCanProto_hid_getSourceB
     return((eo_icubCanProto_canBoardAddress_t)((frame_id & 0x0F0) >> 4));
 }
 
+extern __inline eo_icubCanProto_motorAxis_t eo_icubCanProto_hid_getmotorAxisFromFrame(eOcanframe_t *frame)
+{
+    return((eo_icubCanProto_motorAxis_t)((frame->data[0] & 0x8) >> 4));
+}
+
 
 #endif  // include guard
 

@@ -40,11 +40,8 @@
 #include "EoBoards.h"
 #include "EoMotionControl.h"
 #include "EoSensors.h"
-#include "EOicubCanProto_specifications.h"
-#include "EOconstLookupTbl.h"
+#include "EOconstvector.h"
 
-#include "EOnv.h"
-#include "EOnvsCfg.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -59,15 +56,44 @@
 typedef struct EOemsCanNetTopo_hid EOemsCanNetTopo;
 
 
+/** @typedef    typedef     struct             eo_emsCanNetTopo_jointOrMotorLocation_t
+    @brief      contains information to identify a joint or a motor managed by an ems univocally on that ems.
+ **/
+typedef struct
+{
+    eOcanport_t         emscanport;	
+    uint8_t             canaddr;        /**< CAN address of board liked with joint/motor.
+                                             if this struct is used with icubCanProtocol canaddr's values must be complient with eo_icubCanProto_canBoardAddress_t*/
+    uint8_t             axis;	        /**< number of joint/ motor, said axis generally.
+                                             if this struct is used with icubCanProtocol axis's values must be complient with eo_icubCanProto_motorAxis_t*/
+} eo_emsCanNetTopo_jointOrMotorCanLocation_t;
+
+
+/** @typedef    typedef     struct             eo_emsCanNetTopo_jointOrMotorLocation_t
+    @brief      contains information to identify a joint or a motor managed by an ems univocally on that ems.
+ **/
+typedef struct
+{
+    eOcanport_t         emscanport;	
+    uint8_t             canaddr;        /**< CAN address of board liked with joint/motor.
+                                             if this struct is used with icubCanProtocol canaddr's values must be complient with eo_icubCanProto_canBoardAddress_t*/
+} eo_emsCanNetTopo_sensorCanLocation_t;
+
+
 /** @typedef    typedef     struct             eo_emsCanNetTopo_cfg_t
     @brief      contains data to configure an EOemsCanNetTopo object.
  **/
 typedef struct
 {
-    EOnvsCfg                           *nvsCfg;
-    const EOconstLookupTbl /*const*/  *joint2BoardCanLocation_LUTbl_ptr;
-    const EOconstLookupTbl* const   *motorBoardCanLoc2NvsRef_LUTbl_ptr/*[eOutil_canports_num]*/;
+//    EOnvsCfg                           *nvsCfg;
+//    const EOconstLookupTbl /*const*/  *joint2BoardCanLocation_LUTbl_ptr;
+//    const EOconstLookupTbl* const   *motorBoardCanLoc2NvsRef_LUTbl_ptr; //can points to the same datastruct
     //if you need, put here other stuff 
+
+
+    const EOconstvector* const emsCanNetTopo_joints__ptr;  /**< list of joints managed by an EMS board */
+    const EOconstvector* const emsCanNetTopo_motors__ptr;  /**< list of motors managed by an EMS board */
+    const EOconstvector* const emsCanNetTopo_sensors__ptr; /**< list of sensors managed by an EMS board */
 } eo_emsCanNetTopo_cfg_t;
 
 
@@ -76,26 +102,43 @@ typedef struct
     @warning    pay attention to eOcanport_t define d in eOcommon.h
  **/
 enum { eo_emsCanNetTopo_canports_num = 2 }; 
+ 
+ 
     
+typedef struct
+{
+    uint8_t                 boardAddr;
+    uint8_t                 axis;
+    eOcanport_t             canPort;
+    eObrd_types_t           boardType;
+    uint32_t                id; //id del motore o del joint
+} eo_emsCanNetTopo_jointOrMotorTopoInfo_t;
+
+typedef struct
+{
+    uint8_t                 boardAddr;
+    eOcanport_t             canPort;
+    uint8_t                 boardType;
+    uint32_t                id; //sensor id
+} eo_emsCanNetTopo_sensorTopoInfo_t;
+
+
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 //currently does not exist default config.
 //extern const eo_icubCanProto_cfg_t eo_icubCanProto_cfg_default; 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern EOemsCanNetTopo* eo_emsCanNetTopo_New(/*const*/ eo_emsCanNetTopo_cfg_t *cfg);
+extern EOemsCanNetTopo* eo_emsCanNetTopo_New(eo_emsCanNetTopo_cfg_t *cfg);
 
-extern eOresult_t eo_emsCanNetTopo_GetMotorBoardNV_Status_ByCanLocation(EOemsCanNetTopo *p, eOcanport_t canPort, eo_icubCanProto_canBoardAddress_t boardAddr,
-                                                                        eo_icubCanProto_motorAxis_t axis, EOnv** nvt_ptr);
+extern eOresult_t eo_emsCanNetTopo_GetJointCanLocation_ByJointUniqueId(EOemsCanNetTopo *p, eOmc_jointUniqueId_t jUniqueId, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr);
 
-extern eOresult_t eo_emsCanNetTopo_GetCanLocation_ByJointUniqueId(EOemsCanNetTopo *p, eOmc_jointUniqueId_t jUniqueId, eOcanport_t *canPort, eo_icubCanProto_canBoardAddress_t *boardAddr, eo_icubCanProto_motorAxis_t *axis);
+extern eOresult_t eo_emsCanNetTopo_GetMotorCanLocation_ByMotorUniqueId(EOemsCanNetTopo *p, eOmc_motorUniqueId_t mUniqueId, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr);
 
-extern eOresult_t eo_emsCanNetTopo_GetCanLocation_ByJointBoardId(EOemsCanNetTopo *p, eOmc_jointBoardId_t jBoardId, eOcanport_t *canPort, eo_icubCanProto_canBoardAddress_t *boardAddr, eo_icubCanProto_motorAxis_t *axis);
 
-extern eOresult_t eo_emsCanNetTopo_GetCanLocation_BySensorId(EOemsCanNetTopo *p, eOsnsr_sensorId_t sensorId, eOcanport_t *canPort, eo_icubCanProto_canBoardAddress_t *boardAddr);
+extern eOresult_t eo_emsCanNetTopo_GetJointUinqueId_ByJointCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eOmc_jointUniqueId_t *jUniqueId_ptr);
 
-extern eOresult_t eo_emsCanNetTopo_GetCanLocation_ByMotorUniqueId(EOemsCanNetTopo *p, eOmc_motorUniqueId_t mUniqueId, eOcanport_t *canPort, eo_icubCanProto_canBoardAddress_t *boardAddr, eo_icubCanProto_motorAxis_t *axis);
-
+extern eOresult_t eo_emsCanNetTopo_GetMotorUinqueId_ByMotorCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eOmc_motorUniqueId_t *mUniqueId_ptr);
 
 
 // - doxy end ---------------------------------------------------------------------------------------------------------

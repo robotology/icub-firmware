@@ -50,13 +50,13 @@
 /** @typedef     eo_icubCanProto_former_fn_t
     @brief       ptr to parser-function.
  **/
-typedef     eOresult_t  (*eOres_fp_canProto_parserFn_t)     (EOVcanProto*, eOcanframe_t *, eOcanport_t);
+typedef     eOresult_t  (*eOres_fp_canProto_parserFn_t)     (EOVcanProtoDerived*, eOcanframe_t *, eOcanport_t);
 
 
 /** @typedef     eo_icubCanProto_former_fn_t
     @brief       ptr to former-function.
  **/
-typedef    eOresult_t  (*eOres_fp_canProto_formerFn_t)  (EOVcanProto* p, eo_canProto_msgCommand_t, eo_canProto_msgDestination_t, void*, eOcanframe_t*);
+typedef    eOresult_t  (*eOres_fp_canProto_formerFn_t)  (EOVcanProtoDerived* p, eo_canProto_msgCommand_t, eo_canProto_msgDestination_t, void*, eOcanframe_t*);
 
 
 /** @struct     EOVmutex_hid

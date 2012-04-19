@@ -171,7 +171,9 @@ static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_
 
     msgClass = eo_icubCanProto_hid_getMsgClassFromFrameId(frame->id);
 
-    if(! (tbl = s_eo_icubCanProto_LUTbl_GetParserTbl(p, msgClass)))
+    tbl = s_eo_icubCanProto_LUTbl_GetParserTbl(p, msgClass);
+
+    if(NULL == tbl)
     {
         return(eores_NOK_nullpointer);
     }
@@ -201,7 +203,9 @@ static eOresult_t s_eo_icubCanProto_FormCanFrame(EOicubCanProto* p,
     eo_icubCanProto_msgCommand_t *icommand = (eo_icubCanProto_msgCommand_t*)&command; 
     eo_icubCanProto_msgDestination_t *idest = (eo_icubCanProto_msgDestination_t*)&dest;
 
-    if(! (tbl = s_eo_icubCanProto_LUTbl_GetFormerTbl(p, (eo_icubCanProto_msgCommand_class_t)icommand->class)))
+    tbl = s_eo_icubCanProto_LUTbl_GetFormerTbl(p, (eo_icubCanProto_msgCommand_class_t)icommand->class);
+
+    if(NULL == tbl)
     {
         return(eores_NOK_nullpointer);
     }

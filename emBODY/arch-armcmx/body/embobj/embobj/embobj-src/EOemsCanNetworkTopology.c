@@ -27,9 +27,9 @@
 #include "string.h"
 #include "EoCommon.h"
 #include "EOtheMemoryPool.h"
-#include "EOconstLookupTbl.h"
-#include "EOconstLookupTbl_hid.h"
-#include "EONV_hid.h"
+#include "EOconstvector.h"
+#include "EOconstvector_hid.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -46,9 +46,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-#ifdef EO_NVSCFG_USE_CACHED_NVS
-    #define EO_EMSCANNETTOPO_USE_CACHED_NVS
-#endif
+// empty-section
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -67,22 +67,21 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 static void s_eo_emsCanNetTopo_hashTbls_init(EOemsCanNetTopo *p);
-static void s_eo_emsCanNetTopo_nvsPtr_TEST_init(EOemsCanNetTopo *p);
-
-static eOresult_t s_eo_emsCanNetTopo_GetMotorBoardNV_Status_ByCanLocation(EOemsCanNetTopo *p, eOcanport_t canPort, eo_icubCanProto_canBoardAddress_t boardAddr,
-                                                                             eo_icubCanProto_motorAxis_t axis, EOnv** nvt_ptr);
+static void s_eo_emsCanNetTopo_hashTbl_joint_init(EOemsCanNetTopo *p);
+static void s_eo_emsCanNetTopo_hashTbl_motor_init(EOemsCanNetTopo *p);
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-static EOnv *nvPtr_status_TEST[1] = {0};
+// empty-section
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
-extern EOemsCanNetTopo* eo_emsCanNetTopo_New(/*const*/ eo_emsCanNetTopo_cfg_t *cfg)
+extern EOemsCanNetTopo* eo_emsCanNetTopo_New(eo_emsCanNetTopo_cfg_t *cfg)
 {
     EOemsCanNetTopo *retptr = NULL;  
 
@@ -98,120 +97,75 @@ extern EOemsCanNetTopo* eo_emsCanNetTopo_New(/*const*/ eo_emsCanNetTopo_cfg_t *c
     
     s_eo_emsCanNetTopo_hashTbls_init(retptr);  
 
-#ifdef EO_EMSCANNETTOPO_USE_CACHED_NVS
-    s_eo_emsCanNetTopo_nvsPtr_TEST_init(retptr);
-#endif
-
     return(retptr);
 } 
 
-extern eOresult_t eo_emsCanNetTopo_GetMotorBoardNV_Status_ByCanLocation(EOemsCanNetTopo *p, eOcanport_t canPort, eo_icubCanProto_canBoardAddress_t boardAddr,
-                                                                        eo_icubCanProto_motorAxis_t axis, EOnv** nvt_ptr)
+
+extern eOresult_t eo_emsCanNetTopo_GetJointCanLocation_ByJointUniqueId(EOemsCanNetTopo *p, eOmc_jointUniqueId_t jUniqueId, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr)
 {
-    return (s_eo_emsCanNetTopo_GetMotorBoardNV_Status_ByCanLocation(p, canPort, boardAddr,
-                                                                    axis,nvt_ptr));
-}
-
-
-
-
-extern eOresult_t eo_emsCanNetTopo_GetCanLocation_ByJointUniqueId(EOemsCanNetTopo *p, eOmc_jointUniqueId_t jUniqueId, eOcanport_t *canPort, eo_icubCanProto_canBoardAddress_t *boardAddr, eo_icubCanProto_motorAxis_t *axis)
-{
-    const EOconstLookupTbl* tbl_ptr;
-    eo_emsCanNetTopo_hid_LUTbl_item_joint2BoardCanLocation_t *itemsList;
+    if((NULL == p) || (NULL == location_ptr))
+    {
+        return(eores_NOK_nullpointer);
+    }
     
-    if(NULL == p)
+    if( NULL == p->joint_Id2CanLoc_hTbl[jUniqueId].ptr)
     {
-        return(eores_OK);
+        return(eores_NOK_nodata);
     }
 
+    location_ptr->canaddr = p->joint_Id2CanLoc_hTbl[jUniqueId].ptr->boardAddr;
+    location_ptr->axis = p->joint_Id2CanLoc_hTbl[jUniqueId].ptr->axis;
+    location_ptr->emscanport = p->joint_Id2CanLoc_hTbl[jUniqueId].ptr->canPort;
 
-    tbl_ptr = p->cfg.joint2BoardCanLocation_LUTbl_ptr;
-
-    if((jUniqueId - tbl_ptr->offset) >= tbl_ptr->capacity)
-    {
-        return(eores_NOK_generic);
-    }
-
-    itemsList = ( eo_emsCanNetTopo_hid_LUTbl_item_joint2BoardCanLocation_t *)tbl_ptr->itemsList;
-    *canPort = itemsList[jUniqueId - tbl_ptr->offset].canPort;
-    *boardAddr = itemsList[jUniqueId - tbl_ptr->offset].boardAddr; 
-    *axis = itemsList[jUniqueId - tbl_ptr->offset].axis4board;
-    return(eores_OK); 
-
-
+    return(eores_OK);
 }
 
-extern eOresult_t eo_emsCanNetTopo_GetCanLocation_ByMotorUniqueId(EOemsCanNetTopo *p, eOmc_motorUniqueId_t mUniqueId, eOcanport_t *canPort, eo_icubCanProto_canBoardAddress_t *boardAddr, eo_icubCanProto_motorAxis_t *axis)
+extern eOresult_t eo_emsCanNetTopo_GetMotorCanLocation_ByMotorUniqueId(EOemsCanNetTopo *p, eOmc_motorUniqueId_t mUniqueId, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr)
 {
-//    const EOconstLookupTbl* tbl_ptr;
-//    eo_emsCanNetTopo_hid_LUTbl_item_joint2BoardCanLocation_t *itemsList;
-//    
-//    if(NULL == p)
-//    {
-//        return(eores_OK);
-//    }
-//
-//
-//    tbl_ptr = p->cfg.joint2BoardCanLocation_LUTbl_ptr;
-//
-//    if((jUniqueId - tbl_ptr->offset) >= tbl_ptr->capacity)
-//    {
-//        return(eores_NOK_generic);
-//    }
-//
-//    itemsList = ( eo_emsCanNetTopo_hid_LUTbl_item_joint2BoardCanLocation_t *)tbl_ptr->itemsList;
-//    *canPort = itemsList[jUniqueId - tbl_ptr->offset].canPort;
-//    *boardAddr = itemsList[jUniqueId - tbl_ptr->offset].boardAddr; 
-//    *axis = itemsList[jUniqueId - tbl_ptr->offset].axis4board;
-    return(eores_OK); 
-
-
+    return(eores_OK);
 }
 
 
-
-extern eOresult_t eo_emsCanNetTopo_GetCanLocation_ByJointBoardId(EOemsCanNetTopo *p, eOmc_jointBoardId_t jBoardId, eOcanport_t *canPort, eo_icubCanProto_canBoardAddress_t *boardAddr, eo_icubCanProto_motorAxis_t *axis)
+extern eOresult_t eo_emsCanNetTopo_GetJointUinqueId_ByJointCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eOmc_jointUniqueId_t *jUniqueId_ptr)
 {
 
-    const EOconstLookupTbl  *tbl_ptr;
-    eo_emsCanNetTopo_hid_LUTbl_item_joint2BoardCanLocation_t *itemsList;
-
-
-    if(NULL == p)
+    eo_emsCanNetTopo_hashTbl_item_t *item_ptr;
+    if((NULL == p) || (NULL == location_ptr) || (NULL == jUniqueId_ptr))
     {
-        return(eores_OK);
+        return(eores_NOK_nullpointer);
     }
-    tbl_ptr = p->cfg.joint2BoardCanLocation_LUTbl_ptr;
     
-    if(jBoardId >= tbl_ptr->capacity)
+    item_ptr = &(p->joint_CanLoc2Id_hTbl[location_ptr->emscanport][location_ptr->canaddr][location_ptr->axis]); 
+    if( NULL == item_ptr->ptr)
     {
-        return(eores_NOK_generic);
+        return(eores_NOK_nodata);
     }
 
-    itemsList = ( eo_emsCanNetTopo_hid_LUTbl_item_joint2BoardCanLocation_t *)tbl_ptr->itemsList;
-
-    *canPort = itemsList[jBoardId].canPort;
-    *boardAddr = itemsList[jBoardId].boardAddr; 
-    *axis = itemsList[jBoardId].axis4board;
-    return(eores_OK); 
+    *jUniqueId_ptr = item_ptr->id;
+    return(eores_OK);
 }
 
-
-
-extern eOresult_t eo_emsCanNetTopo_GetCanLocation_BySensorId(EOemsCanNetTopo *p, eOsnsr_sensorId_t sensorId, eOcanport_t *canPort, eo_icubCanProto_canBoardAddress_t *boardAddr)
+extern eOresult_t eo_emsCanNetTopo_GetMotorUinqueId_ByMotorCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eOmc_motorUniqueId_t *mUniqueId_ptr)
 {
-//    const eo_emsCanNetTopo_sensor2BoardCanLocation_lookupTbl_t   *tbl_ptr = eo_emsCanNetTopo_sensor2BoardCanLocation_tbl_ptr;
-//
-//    if((sensorId - tbl_ptr->hdr.offset) > tbl_ptr->hdr.capacity)
-//    {
-//        return(eores_NOK_generic);
-//    }
-//
-//    *canPort = tbl_ptr->tbl[sensorId - tbl_ptr->hdr.offset].canPort;
-//    *boardAddr = tbl_ptr->tbl[sensorId - tbl_ptr->hdr.offset].boardAddr; 
-    return(eores_OK); 
+    eo_emsCanNetTopo_hashTbl_item_t *item_ptr;
+    if((NULL == p) || (NULL == location_ptr) || (NULL == mUniqueId_ptr))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    item_ptr = &(p->motor_CanLoc2Id_hTbl[location_ptr->emscanport][location_ptr->canaddr][location_ptr->axis]); 
+    if( NULL == item_ptr->ptr)
+    {
+        return(eores_NOK_nodata);
+    }
+
+    *mUniqueId_ptr = item_ptr->id;
+    return(eores_OK);
+
 }
+
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -224,163 +178,59 @@ extern eOresult_t eo_emsCanNetTopo_GetCanLocation_BySensorId(EOemsCanNetTopo *p,
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
+
+
 static void s_eo_emsCanNetTopo_hashTbls_init(EOemsCanNetTopo *p)
 {
-    uint8_t i; //i indexes the motorBoardCanLoc2NvsRef lookup tbl
-        eo_emsCanNetTopo_hid_LUTbl_item_boardNvsReferences_t *itemsList;
+    s_eo_emsCanNetTopo_hashTbl_joint_init(p);
+    s_eo_emsCanNetTopo_hashTbl_motor_init(p);
+}
 
+
+static void s_eo_emsCanNetTopo_hashTbl_joint_init(EOemsCanNetTopo *p)
+{
+    uint8_t i; //i indexes the motorBoardCanLoc2NvsRef lookup tbl
+    eo_emsCanNetTopo_jointOrMotorTopoInfo_t *j_topoinfo_ptr = (eo_emsCanNetTopo_jointOrMotorTopoInfo_t*)(p->cfg.emsCanNetTopo_joints__ptr->item_array_data);
 
     //reset hashtbl
-    memset(p->motorBoardHashTbl, 0xFF, sizeof(p->motorBoardHashTbl));    
-    memset(p->sensorBoardHashTbl, 0xFF, sizeof(p->sensorBoardHashTbl)); 
+    memset(p->joint_Id2CanLoc_hTbl, 0x0, sizeof(p->joint_Id2CanLoc_hTbl));  //probabilmente non e' suff==> da rivedere   
+    memset(p->joint_CanLoc2Id_hTbl, 0x0, sizeof(p->joint_CanLoc2Id_hTbl));  //probabilmente non e' suff==> da rivedere   
     
-   
 
-    const EOconstLookupTbl* MBLUTbl_p1 = p->cfg.motorBoardCanLoc2NvsRef_LUTbl_ptr[eOutil_canport1];
-    const EOconstLookupTbl* MBLUTbl_p2 = p->cfg.motorBoardCanLoc2NvsRef_LUTbl_ptr[eOutil_canport2];
-    
-    itemsList = (eo_emsCanNetTopo_hid_LUTbl_item_boardNvsReferences_t *)MBLUTbl_p1->itemsList;
-    for(i=0; i<MBLUTbl_p1->capacity; i++)
+    for(i = 0; i< p->cfg.emsCanNetTopo_joints__ptr->size; i++)
     {
-        p->motorBoardHashTbl[eOutil_canport1][itemsList[i].boardAddr] = i;            
-    }   
-
-    itemsList = (eo_emsCanNetTopo_hid_LUTbl_item_boardNvsReferences_t *)MBLUTbl_p2->itemsList;
-    for(i=0; i<MBLUTbl_p2->capacity; i++)
-    {
-        p->motorBoardHashTbl[eOutil_canport2][itemsList[i].boardAddr] = i;            
-    } 
-   //TODO: setssa cosa sulle sensor board
-}
-
-
-
-static void s_eo_emsCanNetTopo_motorBoardNvsPtr_init(EOemsCanNetTopo *p)
-{
-
-//    uint8_t index_board, index_nvType;
-//    eOnvEPID_t *nvEPID_ptr = NULL;
-//    uint8_t ipindex, epindex, idindex;
-//    EOnv nvtarget;
-//    eOresult_t res;
-//
-//    const eo_emsCanNetTopo_hid_LUTbl_boardCanLocation2NvsRef_t* LUTbl = eo_emsCanNetTopo_LUTbl_motorBoardCanLoc2NvsRef_ptr;
-//    for(index_board=0; index_board<LUTbl->hdr[eOutil_canport1].capacity; index_board++)
-//    {
-//        //set nv_ptr for joint
-//        for(index_nvType=0; index_nvType<nvType_joint_max; index_nvType++)
-//        {
-//             nvEPID_ptr =&(LUTbl->tbl[eOutil_canport1][index_board].jointNvs_list[index_nvType]);
-//             
-//             res = eo_nvscfg_GetIndices(eo_my_nvsCfg, eok_ipv4addr_localhost, nvEPID_ptr->ep, nvEPID_ptr->id, 
-//                                        &ipindex, &epindex, &idindex); 
-//    
-//            //suppongo di usare: EO_NVSCFG_USE_CACHED_NVS
-//            s_eo_emsCanNetTopo_motorBoardNvsPtr_port1_list[index_board].jointNvsPtr_list[index_nvType] = eo_nvscfg_GetNV(eo_my_nvsCfg, ipindex, epindex, idindex, NULL, &nvtarget);    
-//        }
-//
-//        //TODO: set nv_ptr for board
-//    }
-
-}
-
-
-
-
-static void s_eo_emsCanNetTopo_nvsPtr_TEST_init(EOemsCanNetTopo *p)
-{
-
-    const eOnvEPID_t *nvEPID_ptr;
-    uint8_t ipindex, epindex, idindex;
-    EOnv nvtarget;
-    eo_emsCanNetTopo_hid_LUTbl_item_boardNvsReferences_t *itemsList;
-    const EOconstLookupTbl* MBLUTbl_p1 = p->cfg.motorBoardCanLoc2NvsRef_LUTbl_ptr[eOutil_canport1];
-
-    itemsList = (eo_emsCanNetTopo_hid_LUTbl_item_boardNvsReferences_t *)MBLUTbl_p1->itemsList;
-
-    nvEPID_ptr =&(itemsList[0].joint_nvid_list[nvsType_joint_status]);
+        p->joint_Id2CanLoc_hTbl[j_topoinfo_ptr[i].id].ptr =&j_topoinfo_ptr[i];
+        p->joint_Id2CanLoc_hTbl[j_topoinfo_ptr[i].id].id  = i;   
     
-    eo_nvscfg_GetIndices(p->cfg.nvsCfg, eok_ipv4addr_localhost, nvEPID_ptr->ep, nvEPID_ptr->id, 
-                            &ipindex, &epindex, &idindex); 
-    
-    //suppongo di usare: EO_NVSCFG_USE_CACHED_NVS
-    nvPtr_status_TEST[0] = eo_nvscfg_GetNV(p->cfg.nvsCfg, ipindex, epindex, idindex, NULL, &nvtarget);    
-
-}
-
-#ifdef EO_EMSCANNETTOPO_USE_CACHED_NVS
-static eOresult_t s_eo_emsCanNetTopo_GetMotorBoardNV_Status_ByCanLocation(EOemsCanNetTopo *p, eOcanport_t canPort, eo_icubCanProto_canBoardAddress_t boardAddr,
-                                                                             eo_icubCanProto_motorAxis_t axis, EOnv** nvt_ptr)
-{
-    uint8_t i;
-
-    if(NULL == p)
-    {
-        return(eores_OK);
+        p->joint_CanLoc2Id_hTbl[j_topoinfo_ptr[i].canPort][j_topoinfo_ptr[i].boardAddr][j_topoinfo_ptr[i].axis].id = i; 
+        p->joint_CanLoc2Id_hTbl[j_topoinfo_ptr[i].canPort][j_topoinfo_ptr[i].boardAddr][j_topoinfo_ptr[i].axis].ptr = &j_topoinfo_ptr[i]; 
     }
 
-
-    i = p->motorBoardHashTbl[canPort][boardAddr];
-    *nvt_ptr = nvPtr_status_TEST[i];
-    return(eores_OK);
 }
 
-#else
-
-
-//if not define EO_EMSCANNETTOPO_USE_CACHED_NVS: 
-// I allacate a new nv, fill it with value and return its address.
-//this solution is not goot (memory fragmented), but i use this only for test porpouse
-static eOresult_t s_eo_emsCanNetTopo_GetMotorBoardNV_Status_ByCanLocation(EOemsCanNetTopo *p, eOcanport_t canPort, eo_icubCanProto_canBoardAddress_t boardAddr,
-                                                                             eo_icubCanProto_motorAxis_t axis, EOnv** nvt_ptr)
+static void s_eo_emsCanNetTopo_hashTbl_motor_init(EOemsCanNetTopo *p)
 {
-   uint8_t                 i;
-    const eOnvEPID_t        *nvEPID_ptr;
-    uint8_t ipindex,        epindex, idindex;
-    EOnv                    nvtarget;
-    const EOconstLookupTbl  *LUTbl;
-    eo_emsCanNetTopo_hid_LUTbl_item_boardNvsReferences_t *itemsList;
-    eOresult_t  res;
+    uint8_t i; //i indexes the motorBoardCanLoc2NvsRef lookup tbl
+    eo_emsCanNetTopo_jointOrMotorTopoInfo_t *m_topoinfo_ptr = (eo_emsCanNetTopo_jointOrMotorTopoInfo_t*)(p->cfg.emsCanNetTopo_motors__ptr->item_array_data);
 
-    if(NULL == p)
+    //reset hashtbl
+    memset(p->motor_Id2CanLoc_hTbl, 0x0, sizeof(p->motor_Id2CanLoc_hTbl));  //probabilmente non e' suff==> da rivedere   
+    memset(p->motor_CanLoc2Id_hTbl, 0x0, sizeof(p->motor_CanLoc2Id_hTbl));  //probabilmente non e' suff==> da rivedere   
+    
+
+    for(i = 0; i< p->cfg.emsCanNetTopo_motors__ptr->size; i++)
     {
-        return(eores_OK);
+        p->motor_Id2CanLoc_hTbl[m_topoinfo_ptr[i].id].ptr =&m_topoinfo_ptr[i];
+        p->motor_Id2CanLoc_hTbl[m_topoinfo_ptr[i].id].id  = i;   
+    
+        p->motor_CanLoc2Id_hTbl[m_topoinfo_ptr[i].canPort][m_topoinfo_ptr[i].boardAddr][m_topoinfo_ptr[i].axis].id = i; 
+        p->motor_CanLoc2Id_hTbl[m_topoinfo_ptr[i].canPort][m_topoinfo_ptr[i].boardAddr][m_topoinfo_ptr[i].axis].ptr = &m_topoinfo_ptr[i]; 
     }
-
-    LUTbl = p->cfg.motorBoardCanLoc2NvsRef_LUTbl_ptr[canPort];
-    itemsList = (eo_emsCanNetTopo_hid_LUTbl_item_boardNvsReferences_t *)LUTbl->itemsList;
-////versione senza hashtable
-//    for(i=0; i<LUTbl->hdr[canPort].capacity; i++)
-//    {
-//        if((boardAddr == LUTbl->tbl[canPort][i].boardAddr) && (axis == LUTbl->tbl[canPort][i].axis))
-//        {
-//            nvEPID_ptr = &(LUTbl->tbl[canPort][i].joint_nvid_list[nvsType_joint_status]);
-//            break;       
-//        }
-//    }
-
-//versione con hastbl
-    i = p->motorBoardHashTbl[canPort][boardAddr];
-    nvEPID_ptr = &(itemsList[i].joint_nvid_list[nvsType_joint_status]);
-
-//da qui in poi rimane uguale!
-    if(NULL == nvEPID_ptr)
-    {
-        return(eores_NOK_nodata); //non ho trovato niente!!! non dovrebbe capitare!!!tieni questo controllo solo per debug    
-    }
-
-    *nvt_ptr = eo_nv_New();
-    res = eo_nvscfg_GetIndices(p->cfg.nvsCfg, 
-                               eok_ipv4addr_localhost, nvEPID_ptr->ep, nvEPID_ptr->id, 
-                               &ipindex, &epindex, &idindex); 
-
-    eo_nvscfg_GetNV(p->cfg.nvsCfg, ipindex, epindex, idindex, NULL, *nvt_ptr);
-    return(res);
-
 
 }
 
-#endif
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
