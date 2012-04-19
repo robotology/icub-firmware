@@ -132,24 +132,11 @@ static const eOerrman_cfg_t errman_cfg =
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-#define uuu(pstr, jstr, var)           UUU ## pstr ## jstr ## var
-#define uu0(pstr, jstr, var)           UUU ## pstr ## jstr ## var
-#define uuu(pstr, jstr, var)           uu0(pstr, jstr, var)
-
-#define JPRAGMA_PSTR    _leftleg
-#define JPRAGMA_JSTR    _j00
-
-extern volatile uint8_t uuu(JPRAGMA_PSTR, JPRAGMA_JSTR, _val) = 1;
 
 
 int main(void)
 {
     
-    if(0 == uuu(JPRAGMA_PSTR, JPRAGMA_JSTR, _val))
-    {
-        uuu(JPRAGMA_PSTR, JPRAGMA_JSTR, _val) = 1;
-    }
-
     // init the system
     eom_sys_Initialise  (   &demoinfo_syscfg,                       // sys
                             NULL,                           // mempool

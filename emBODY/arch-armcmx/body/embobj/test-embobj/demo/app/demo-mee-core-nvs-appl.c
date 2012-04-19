@@ -155,6 +155,8 @@ extern EOtransceiver* theems00transceiver = NULL;
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static void s_xxx(void);
+
 extern void demo_nvs_init(void);
 extern void demo_nvs_tick(void);
 
@@ -376,10 +378,12 @@ extern void demo_nvs_init(void)
 
     }
 #endif
+    
+    
+    s_xxx();
 
 
     s_test_nvs_transceiver_init();
-
 
 
 }
@@ -1406,6 +1410,74 @@ static void s_test_nvs_transceiver_pc104_configure_ems(EOtransceiver *txrx)
 
     s_test_nvs_transceiver_pc104_occasional_load(txrx, eo_ropcode_set, EOK_cfg_nvsEP_mngmnt_endpoint, EOK_cfg_nvsEP_mngmnt_NVID__upto10rop2signal);  
 }
+
+
+#include "eOcfg_nvsEP_mc_leftleg_con.h"
+#include "eOcfg_nvsEP_mc_any_con_bodypart.h"
+#include "eOcfg_nvsEP_mc_any_con_bodypart_hid.h"
+#include "EOconstvector.h"
+#include "EOtreenode_hid.h"
+
+extern EOtreenode eo_cfg_nvsEP_mc_leftleg_tree_con[];
+
+static void s_xxx(void)
+{
+    
+    //extern const EOconstvector* const eo_cfg_nvsEP_mc_leftleg_constvector_of_treenodes_EOnv_con;
+    
+    EOconstvector *p;
+    EOtreenode *treenode;
+    uint16_t index;    
+    uint16_t sss;
+
+    sss = eo_constvector_Size(eo_cfg_nvsEP_mc_leftleg_constvector_of_treenodes_EOnv_con);
+
+    
+    treenode = &eo_cfg_nvsEP_mc_leftleg_tree_con[0];
+    treenode = &eo_cfg_nvsEP_mc_leftleg_tree_con[1];
+    treenode = &eo_cfg_nvsEP_mc_leftleg_tree_con[2];
+    treenode = &eo_cfg_nvsEP_mc_leftleg_tree_con[3];
+    
+    treenode =  treenode;
+    sss = sss;
+    
+    index = eo_cfg_nvsEP_mc_leftleg_hashfunction_id2index(EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidposition(0));
+    index = eo_cfg_nvsEP_mc_leftleg_hashfunction_id2index(EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidposition(1));
+    index = eo_cfg_nvsEP_mc_leftleg_hashfunction_id2index(EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig(0));
+    index = eo_cfg_nvsEP_mc_leftleg_hashfunction_id2index(EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig(1));
+    
+    index = index;
+    
+    
+    
+    
+}
+
+
+static void s_my_INIT_jconfig(uint16_t jth, const EOnv *nv)
+{
+    nv = nv;
+}
+
+
+static void s_my_UPDT_jconfig(uint16_t jth, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    nv = nv;
+}
+
+// #define NVMACRO_FUN_INIT    my_INIT
+// #define NVMACRO_FUN_UPDT    my_UPDT
+
+// #define NVMACRO_PSTR        _leftleg
+// #define NVMACRO_BSTR        _ebx
+// #define NVMACRO_NVSTR1      _j00
+// #define NVMACRO_NVNUM       0
+// #define NVMACRO_NVSTR2      _jconfig
+
+// #define NVMACRO_USE_INIT    1
+// #define NVMACRO_USE_UPDT    1
+
+// #include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
 
 
 
