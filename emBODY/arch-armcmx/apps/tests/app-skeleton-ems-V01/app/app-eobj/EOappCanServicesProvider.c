@@ -233,10 +233,24 @@ extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointUniqueId_t jU
     {
         return(res);
     }
+#warning VALE --> completa l'invio della congig del goint co i pidparams!!!!!!
+    // 1) send pid position 
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_POS_PIDLIMITS;
+
+    res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, (void*)&cfg->pidposition, &canFrame);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    res = (eOresult_t)hal_can_put((hal_can_port_t)canLoc.emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
 
 
     // 2) send velocity pid 
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_VELOCITY_PID_PARAM;
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_VELOCITY_PID;
 
     res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, (void*)&cfg->pidvelocity, &canFrame);
     if(eores_OK != res)
@@ -249,8 +263,35 @@ extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointUniqueId_t jU
         return(res);
     }
 
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_VELOCITY_PIDLIMITS;
+
+    res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, (void*)&cfg->pidvelocity, &canFrame);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    res = (eOresult_t)hal_can_put((hal_can_port_t)canLoc.emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
     // 3) send torque pid
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_TORQUE_PID;
+
+    res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, (void*)&cfg->pidtorque, &canFrame);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    res = (eOresult_t)hal_can_put((hal_can_port_t)canLoc.emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+
+    // 3) send torque pid
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_TORQUE_PIDLIMITS;
 
     res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, (void*)&cfg->pidtorque, &canFrame);
     if(eores_OK != res)
@@ -443,7 +484,7 @@ extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorUniqueId_t mU
 
 
     // 1) send current pid
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID_PARAM;
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID;
     res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, (void*)&cfg->pidcurrent, &canFrame);
     if(eores_OK != res)
     {
@@ -455,6 +496,18 @@ extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorUniqueId_t mU
         return(res);
     }
 
+    // 2) send current pid limits
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PIDLIMITS;
+    res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, (void*)&cfg->pidcurrent, &canFrame);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    res = (eOresult_t)hal_can_put((hal_can_port_t)canLoc.emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
 
     // 2) set max velocity   
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_MAX_VELOCITY;

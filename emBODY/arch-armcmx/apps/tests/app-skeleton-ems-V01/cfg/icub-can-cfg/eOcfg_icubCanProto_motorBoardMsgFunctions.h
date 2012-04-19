@@ -77,8 +77,10 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getPosPidLimits(EOicubCanPr
 extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getImpedanceParams(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort);
 extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getImpedanceOffset(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort);
 extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getFirmwareVersion(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort);
-extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getCurrentPidParam(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort);
-extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getVelocityPidParam(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort);
+extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getCurrentPid(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort);
+extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getCurrentPidLimits(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort);
+extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getVelocityPid(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort);
+extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getVelocityPidLimits(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort);
 extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getDesiredCurrent(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort);
 extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getI2TParams(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort);
 
@@ -133,10 +135,14 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getImpedanceParams(EOicubCa
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setImpedanceOffset(EOicubCanProto* p, void *nv_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getImpedanceOffset(EOicubCanProto* p, void *nv_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getFirmwareVersion(EOicubCanProto* p, void *nv_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
-extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setCurrentPidParam(EOicubCanProto* p, void *nv_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
-extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getCurrentPidParam(EOicubCanProto* p, void *nv_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
-extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setVelocityPidParam(EOicubCanProto* p, void *nv_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
-extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getVelocityPidParam(EOicubCanProto* p, void *nv_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
+extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setCurrentPid(EOicubCanProto* p, void *nv_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
+extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getCurrentPid(EOicubCanProto* p, void *nv_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
+extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setCurrentPidLimits(EOicubCanProto* p, void *nv_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
+extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getCurrentPidLimits(EOicubCanProto* p, void *nv_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
+extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setVelocityPid(EOicubCanProto* p, void *nv_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
+extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getVelocityPid(EOicubCanProto* p, void *nv_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
+extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setVelocityPidLimits(EOicubCanProto* p, void *nv_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
+extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getVelocityPidLimits(EOicubCanProto* p, void *nv_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setDesiredCurrent(EOicubCanProto* p, void *nv_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getDesiredCurrent(EOicubCanProto* p, void *nv_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setPeriodicContents(EOicubCanProto* p, void *nv_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
