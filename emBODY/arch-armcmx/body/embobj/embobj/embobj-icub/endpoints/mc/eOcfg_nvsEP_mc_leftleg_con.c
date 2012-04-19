@@ -156,6 +156,8 @@ static uint16_t s_hash(uint16_t id);
 
 #include "eOcfg_nvsEP_mc_any_con_jxxmacro.c"
 
+#define OFFSET_OF_END_OF_JOINTS    (6*sizeof(eOmc_joint_t))
+
 
 // -- the 6 motors
 
@@ -167,7 +169,7 @@ static uint16_t s_hash(uint16_t id);
 #define MMACRO_MSTR    _m00
 #define MMACRO_PNUM    5
 #define MMACRO_MNUM    0    
-#define MMACRO_MOFF    (MMACRO_MNUM*sizeof(eOmc_motor_t))
+#define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
 #include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
@@ -177,7 +179,7 @@ static uint16_t s_hash(uint16_t id);
 #define MMACRO_MSTR    _m01
 #define MMACRO_PNUM    5
 #define MMACRO_MNUM    1    
-#define MMACRO_MOFF    (MMACRO_MNUM*sizeof(eOmc_motor_t))
+#define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
 #include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
@@ -188,7 +190,7 @@ static uint16_t s_hash(uint16_t id);
 #define MMACRO_MSTR    _m02
 #define MMACRO_PNUM    5
 #define MMACRO_MNUM    2    
-#define MMACRO_MOFF    (MMACRO_MNUM*sizeof(eOmc_motor_t))
+#define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
 #include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
@@ -198,7 +200,7 @@ static uint16_t s_hash(uint16_t id);
 #define MMACRO_MSTR    _m03
 #define MMACRO_PNUM    5
 #define MMACRO_MNUM    3    
-#define MMACRO_MOFF    (MMACRO_MNUM*sizeof(eOmc_motor_t))
+#define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
 #include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
@@ -208,7 +210,7 @@ static uint16_t s_hash(uint16_t id);
 #define MMACRO_MSTR    _m04
 #define MMACRO_PNUM    5
 #define MMACRO_MNUM    4    
-#define MMACRO_MOFF    (MMACRO_MNUM*sizeof(eOmc_motor_t))
+#define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
 #include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
@@ -218,7 +220,7 @@ static uint16_t s_hash(uint16_t id);
 #define MMACRO_MSTR    _m05
 #define MMACRO_PNUM    5
 #define MMACRO_MNUM    5    
-#define MMACRO_MOFF    (MMACRO_MNUM*sizeof(eOmc_motor_t))
+#define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
 #include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
