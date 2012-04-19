@@ -46,6 +46,7 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
+
 // -- the index of the network variables inside a joint
 
 #define EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig                                       (0)
