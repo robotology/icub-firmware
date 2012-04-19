@@ -53,53 +53,6 @@ struct EOtrajectory_hid
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-inline float eo_trajectory_Step(EOtrajectory *o)
-{
-    if (!o->steps_to_end) return o->pf;
-        
-    --(o->steps_to_end);
-    
-    o->Ai += o->Bi; 
-    o->Bi += o->Ci;
-    o->Ci += o->Kc;
-    
-    o->Zi += o->Yi; 
-    o->Yi += o->Ky;
-
-    o->Fi += o->Kf;
-    
-    float pi = o->Fi + o->Ai*o->Zi;
-
-    o->delta = pi - o->pi;
-
-    o->pi = pi;
-
-    return o->pi;
-}
-
-inline float eo_trajectory_StepDelta(EOtrajectory *o)
-{
-    if (!o->steps_to_end) return o->pf;
-        
-    --(o->steps_to_end);
-    
-    o->Ai += o->Bi; 
-    o->Bi += o->Ci;
-    o->Ci += o->Kc;
-    
-    o->Zi += o->Yi; 
-    o->Yi += o->Ky;
-
-    o->Fi += o->Kf;
-    
-    float pi = o->Fi + o->Ai*o->Zi;
-
-    o->delta = pi - o->pi;
-
-    o->pi = pi;
-
-    return o->delta;
-}
 
 #endif  // include guard
 

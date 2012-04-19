@@ -52,7 +52,7 @@ typedef struct EOtrajectory_hid EOtrajectory;
 extern EOtrajectory* eo_trajectory_New(void);
 
 
-/** @fn         extern void eo_trajectory_Set(EOtrajectory *o, float p0, float pf, float v0, float speed)
+/** @fn         extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, float v0, float speed)
     @brief      Sets minimum jerk trajectory new start and end points, initial and average speed. When the time is 
                 expired, the function always returns the trajectory end point. 
     @param      o      The pointer to the trajectory object.
@@ -61,7 +61,7 @@ extern EOtrajectory* eo_trajectory_New(void);
     @param      v0     The inital velocity.
     @param      speed  The average speed.
  **/
-extern void eo_trajectory_Set(EOtrajectory *o, float p0, float pf, float v0, float speed);
+extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, float v0, float speed);
 
 
 /** @fn         extern float eo_trajectory_Step(EOtrajectory *o)
@@ -82,11 +82,25 @@ extern float eo_trajectory_StepDelta(EOtrajectory *o);
 
 
 
-/** @fn         extern float eo_trajectory_Abort(EOtrajectory *o)
+/** @fn         extern void eo_trajectory_Abort(EOtrajectory *o)
     @brief      Aborts the trajectory.
     @param      o  The pointer to the trajectory object.
  **/
 extern void eo_trajectory_Abort(EOtrajectory *o);
+
+/** @fn         extern float eo_trajectory_GetSpeed(EOtrajectory *o)
+    @brief      Get the actual trajectory speed.
+    @param      o  The pointer to the trajectory object.
+    @return     The actual trajectory speed.
+ **/
+extern float eo_trajectory_GetSpeed(EOtrajectory *o);
+
+/** @fn         extern float eo_trajectory_GetPos(EOtrajectory *o)
+    @brief      Get the actual trajectory position.
+    @param      o  The pointer to the trajectory object.
+    @return     The actual trajectory position.
+ **/
+extern float eo_trajectory_GetPos(EOtrajectory *o);
 
 /** @}            
     end of group eo_trajectory  
