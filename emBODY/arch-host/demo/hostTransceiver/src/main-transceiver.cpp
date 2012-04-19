@@ -33,8 +33,10 @@ using namespace std;
 #include <yarp/dev/ControlBoardInterfacesImpl.h>
 #include "yarp/dev/ControlBoardInterfacesImpl.inl" //ControlBoardHelper
 
+extern "C" {
 #include "EoMotionControl.h"
 #include "eOcfg_EPs_rem_board.h"
+}
 
 //#include "eOcfg_nvsEP_base_con.h"
 //#include "eOcfg_nvsEP_mngmnt_con.h"
@@ -85,6 +87,7 @@ static void s_callback_button_1(void);
 static void s_callback_button_2(void);
 static void s_callback_button_3(void);
 static void s_callback_button_4(void);
+static void s_callback_button_5(void);
 
 static void s_eom_hostprotoc_extra_protocoltransceiver_ask_the_board(void);
 
@@ -187,6 +190,7 @@ int main(int argc, char *argv[])
     // Set my own address_string
     sscanf(local.address_string.c_str(),"%d.%d.%d.%d",&ip1,&ip2,&ip3,&ip4);
     local.addr.set(port, (ip1<<24)|(ip2<<16)|(ip3<<8)|ip4 );
+    eOipv4addr_t localAddr = eo_common_ipv4addr(ip1,ip2,ip3,ip4);
 
     printf("local.address: %s\n", local.address_string.c_str());
 
@@ -204,11 +208,11 @@ int main(int argc, char *argv[])
     printf("remote01.address: %s\n", remote01.address_string.c_str());
     printf("port is : %d\n\n", port);
 
-	eOipv4addr_t hostaddr = eo_common_ipv4addr(ip1,ip2,ip3,ip4); // marco (10, 255, 39, 151)
-	eOipv4port_t port = port;
+	eOipv4addr_t remoteAddr = eo_common_ipv4addr(ip1,ip2,ip3,ip4); // marco (10, 255, 39, 151)
+	eOipv4port_t eOport = port;
 
     // init object: one per ems
-    hostTransceiver_Init(eo_common_ipv4addr(10,255,37,155), eo_common_ipv4addr(10, 39,255,152), port, 512);
+    hostTransceiver_Init(localAddr,remoteAddr, eOport, EOK_HOSTTRANSCEIVER_capacityofpacket);
 
     ACE_UINT8		tmp = 1;
 
@@ -243,6 +247,10 @@ int main(int argc, char *argv[])
 
 					case '4':	//	send a set pid rop
 						s_callback_button_4();
+						break;
+
+					case '5':	//	send a status sig
+						s_callback_button_5();
 						break;
 
 					default:
@@ -299,7 +307,8 @@ void *recvThread(void * arg)
 		  hostTransceiver_GetTransmit((ACE_UINT8 **)&sender.data, &udppkt_size);  // repeated, just to be sure the packet got at the end is empty
 
 		  // write into skt: udppkt_data, udppkt_size
-			ACE_socket->send(sender.data, udppkt_size, remote01.addr, flags);		  printf("Sent EmbObj packet, size = %d\n", udppkt_size);
+		  ACE_socket->send(sender.data, udppkt_size, remote01.addr, flags);
+		  printf("Sent EmbObj packet, size = %d\n", udppkt_size);
 	  }
   }
   pthread_exit(NULL);
@@ -372,10 +381,29 @@ static void s_callback_button_4(void )
 {
 	char str[128];
 	Pid pid;
-	eOmc_joint_config_t *cfg =  &eo_cfg_nvsEP_joint_usr_rem_board_mem_local->cfg;
-	copyPid2eo(pid, &cfg->pidpos);
+	int j = 0;
+//	eOmc_joint_config_t *cfg =  &eo_cfg_nvsEP_joint_usr_rem_board_mem_local->cfg;
+//	copyPid2eo(pid, &cfg->pidpos);
+	eOnvID_t nvid = eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get((eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t)j, motorNVindex_mconfig);
 
-    s_eom_hostprotoc_extra_protocoltransceiver_load_occasional_rop(eo_ropcode_set, EOK_cfg_nvsEP_joint_endpoint, EOK_cfg_nvsEP_joint_NVID__cfg);
+    s_eom_hostprotoc_extra_protocoltransceiver_load_occasional_rop(eo_ropcode_set, EOK_cfg_nvsEP_mc_leftleg_EP, nvid);
+
+	snprintf(str, sizeof(str)-1, "called callback on BUTTON_WKUP: tx a ropframe\n");
+}
+
+static void s_callback_button_5(void )
+{
+	char str[128];
+	Pid pid;
+	int j = 0;
+
+	//eOmc_joint_config_t *cfg =  &eo_cfg_nvsEP_joint_usr_rem_board_mem_local->cfg;
+	//copyPid2eo(pid, &cfg->pidpos);
+
+	eOnvID_t nvid = eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get((eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t)j, motorNVindex_mconfig);
+//	remoteSet(nvid, pid, eo_nv_upd_dontdo);
+
+	s_eom_hostprotoc_extra_protocoltransceiver_load_occasional_rop(eo_ropcode_ask, EOK_cfg_nvsEP_mc_leftleg_EP, nvid);
 
 	snprintf(str, sizeof(str)-1, "called callback on BUTTON_WKUP: tx a ropframe\n");
 }
