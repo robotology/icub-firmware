@@ -1,4 +1,4 @@
-Microchip Technology Inc, vv3_30 (B) x
+Microchip Technology Inc, vv3_30 (B) l
 
 Tool Name:
   c:\program files (x86)\microchip\mplab c30\bin\bin\..\bin/pic30-coff-ld.exe
@@ -115,7 +115,7 @@ Data EEPROM Memory  [Origin = 0x7ffc00, Length = 0x400]
 
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
-_0399fee04f312266         0x7ffc00                0x2c            0x2c  (44)
+_039a0ee04f5782f9         0x7ffc00                0x2c            0x2c  (44)
 
                         Total data EEPROM used (bytes):           0x2c  (44) 4%
 
@@ -1572,8 +1572,8 @@ __c30_signature
                   0x000faa                  LED_Init
                   0x000fb4                  LED_test
 
-_0399fee04f312266
+_039a0ee04f5782f9
                     0xfc00         0x2c load address 0x7ffc00  
- _0399fee04f312266
+ _039a0ee04f5782f9
                     0xfc00         0x2c main.o
                     0xfc00                  ee_data
