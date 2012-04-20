@@ -17,8 +17,6 @@ set(EXTRA_FOLDER  	${CMAKE_CURRENT_SOURCE_DIR}/)
 include($ENV{ICUB_ROOT}/main/src/libraries/icubmod/embObjLib/embObjLib.conf)
 find_package(YARP)
 include_directories(${YARP_INCLUDE_DIRS})
-find_package(ACE)
-include_directories(${ACE_INCLUDE_DIRS})
 
 # Debug messages
 # message(INFO " BASE=${BASE}")
@@ -32,22 +30,18 @@ set(BODY_COMMON_HEADER 		${BODY_COMMON_FOLDER}/eEcommon.h)
 
 # Network Variable configuration
 set(NVS_COMMON_SOURCE 		${NVS_COMMON_FOLDER}/eOcfg_nvsEP_base_con.c
-							${NVS_COMMON_FOLDER}/eOcfg_nvsEP_mngmnt_con.c
-							${NVS_COMMON_FOLDER}/eOcfg_nvsEP_joint_con.c)
+							${NVS_COMMON_FOLDER}/eOcfg_nvsEP_mngmnt_con.c)
 
 set(NVS_COMMON_HEADER 		${NVS_COMMON_FOLDER}/eOcfg_nvsEP_base_con.h
-							${NVS_COMMON_FOLDER}/eOcfg_nvsEP_mngmnt_con.h
-							${NVS_COMMON_FOLDER}/eOcfg_nvsEP_joint_con.h)
+							${NVS_COMMON_FOLDER}/eOcfg_nvsEP_mngmnt_con.h)
 
 set(NVS_REMOTE_SOURCE		${NVS_REMOTE_FOLDER}/eOcfg_EPs_rem_board.c
 							${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_base_usr_rem_anydev.c
-							${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_mngmnt_usr_rem_board.c
-							${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_joint_usr_rem_board.c)
+							${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_mngmnt_usr_rem_board.c)
 
 set(NVS_REMOTE_HEADER		${NVS_REMOTE_FOLDER}/eOcfg_EPs_rem_board.h
 							${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_base_usr_rem_anydev.h
-							${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_mngmnt_usr_rem_board.h
-							${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_joint_usr_rem_board.h)
+							${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_mngmnt_usr_rem_board.h)
 
 
 set(NVS_MC_EP_SOURCE 		${NVS_MC_EP}eOcfg_nvsEP_mc_any_con_bodypart.c
