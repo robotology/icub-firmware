@@ -36,9 +36,10 @@ using namespace std;
 
 #include "boardTransceiver.hpp"
 #include "main_BOARD_transceiver.hpp"
+extern "C" {
 #include "EoMotionControl.h"
 #include "EOtheBOARDtransceiver.h"
-
+}
 
 
 //BoardTransceiver 	boardTransceiver;
@@ -318,6 +319,18 @@ void usage(void)
 }
 
 
+void load_occasional_rop(eOropcode_t opc, uint16_t ep, uint16_t nvid)
+{
+    eo_transceiver_ropinfo_t ropinfo;
+
+    ropinfo.ropcfg      = eok_ropconfig_basic;
+    ropinfo.ropcode     = opc;
+    ropinfo.nvep        = ep;
+
+    ropinfo.nvid 		= nvid;
+    eo_transceiver_rop_occasional_Load(boardTransceiver, &ropinfo);
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of callback functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -376,11 +389,15 @@ static void s_callback_button_4(void )
 static void s_callback_button_5(void )
 {
 	char str[128];
-//	Pid pid;
-//	eOmc_joint_config_t *cfg =  &eo_cfg_nvsEP_joint_usr_rem_board_mem_local->cfg;
-//	copyPid2eo(pid, &cfg->pidpos);
+	int j = 0;
+	Pid pid;
 
- //   s_eom_hostprotoc_extra_protocoltransceiver_load_occasional_rop(eo_ropcode_sig, EOK_cfg_nvsEP_joint_endpoint, EOK_cfg_nvsEP_joint_NVID__status);
+	eo_cfg_nvsEP_mc_leftleg_t* eo_cfg_nvsEP_mc_leftleg_usr_rem_ebx_mem_local;
+	eOmc_joint_t *joint = &eo_cfg_nvsEP_mc_leftleg_usr_rem_ebx_mem_local->joints[3];
+
+	copyPid2eo(pid, &joint->jconfig.pidposition);
+	eOnvID_t nvid = eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get((eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t)j, motorNVindex_mconfig);
+	load_occasional_rop(eo_ropcode_set, EOK_cfg_nvsEP_mc_leftleg_EP, nvid);
 
 	snprintf(str, sizeof(str)-1, "called callback on BUTTON_WKUP: tx a ropframe\n");
 }

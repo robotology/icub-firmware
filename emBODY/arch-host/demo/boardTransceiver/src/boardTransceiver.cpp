@@ -17,9 +17,8 @@ using namespace std;
 #include "stdio.h"
 #include "string.h"
 
+
 #include "boardTransceiver.hpp"
-
-
 extern "C" {
 #include "EoCommon.h"
 #include "EOnv_hid.h"

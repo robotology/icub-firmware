@@ -34,7 +34,7 @@
 // - in here there are the nvids plus ... 
 #include "eOcfg_nvsEP_base_con.h"
 #include "eOcfg_nvsEP_mngmnt_con.h"
-//#include "eOcfg_nvsEP_joint_con.h"
+#include "eOcfg_nvsEP_joint_con.h"
 
 // - in here there is access to ram of the endpoints
 #include "eOcfg_nvsEP_base_usr_loc_anydev.h"
@@ -43,8 +43,6 @@
 
 #include "eOcfg_nvsEP_mc_leftleg_con.h"
 #include "eOcfg_nvsEP_mc_leftleg_usr_loc_ebx.h"
-
-
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 

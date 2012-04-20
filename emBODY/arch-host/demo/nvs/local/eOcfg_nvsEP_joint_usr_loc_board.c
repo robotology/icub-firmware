@@ -15,19 +15,25 @@
 #include "stdio.h"
 
 #include "EoCommon.h"
+#include "eOcfg_nvsEP_joint_con.h"
+#include "EOMtheCallbackManager.h"
+
+
+
+
 #include "EOnv_hid.h"
+
+
 #include "EOconstvector_hid.h"
 
-#ifdef _INCLUDE_HW_DEPENDENCIES_
-	#include "EOMtheCallbackManager.h"
-	#include "EOtheARMenvironment.h"
-	#include "EOVtheEnvironment.h"
-	#include "eo_ap_canModule.h"
-	#include "eEcommon.h"
-#endif
+#include "EOtheARMenvironment.h"
+#include "EOVtheEnvironment.h"
 
+#include "eEcommon.h"
 
+#include "EoMotionControl.h"
 
+#include "eo_ap_canModule.h"
 
 
 
@@ -36,8 +42,6 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EoMotionControl.h"
-#include "eOcfg_nvsEP_joint_con.h"
 #include "eOcfg_nvsEP_joint_usr_loc_board.h"
 
 
@@ -64,12 +68,11 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_eo_cfg_nvsEP_joint_usr_loc_board_action_update__cfg(const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+static void s_eo_cfg_nvsEP_base_joint_usr_loc_board_action_update__cfg(const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
-static void s_eo_cfg_nvsEP_joint_usr_loc_board_action_update__setPoint(const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+static void s_eo_cfg_nvsEP_base_joint_usr_loc_board_action_update__setPoint(const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
-static void s_eo_cfg_nvsEP_joint_usr_loc_board_action_update__status(const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-
+static void s_eo_cfg_nvsEP_base_joint_usr_loc_board_action_update__status(const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -77,7 +80,7 @@ static void s_eo_cfg_nvsEP_joint_usr_loc_board_action_update__status(const EOnv*
 static const eOnv_fn_peripheral_t s_eo_cfg_nvsEP_joint_usr_loc_board_action_peripheralinterface__cfg =
 {
     EO_INIT(.init)      NULL,
-    EO_INIT(.update)    s_eo_cfg_nvsEP_joint_usr_loc_board_action_update__cfg
+    EO_INIT(.update)    s_eo_cfg_nvsEP_base_joint_usr_loc_board_action_update__cfg
 };
 
 
@@ -100,18 +103,18 @@ static const eOnv_fn_peripheral_t s_eo_cfg_nvsEP_joint_usr_loc_board_action_peri
 static const EOnv_usr_t s_eo_cfg_nvsEP_joint_usr_loc_board_array_of_EOnv_usr[] =
 {
     {   // 00 __cfg
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_joint_usr_loc_board_action_peripheralinterface__cfg,
-        EO_INIT(.on_rop_reception)      NULL,
+        EO_INIT(.peripheralinterface)   s_eo_cfg_nvsEP_joint_usr_loc_board_action_peripheralinterface_cfg,
+        EO_INIT(.on_rop_reception)      NULL, //metti qui nella azione di before lo sto di tutta la barachetta!!!
         EO_INIT(.stg_address)           EOK_uint32dummy
     },
     {   // 01 __setPoint
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_joint_usr_loc_board_action_peripheralinterface__setPoint,
+        EO_INIT(.peripheralinterface)   s_eo_cfg_nvsEP_joint_usr_loc_board_action_peripheralinterface_setPoint,
         EO_INIT(.on_rop_reception)      NULL,
         EO_INIT(.stg_address)           EOK_uint32dummy
     }
     ,
     {   // 01 __status
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_joint_usr_loc_board_action_peripheralinterface__status,
+        EO_INIT(.peripheralinterface)   s_eo_cfg_nvsEP_joint_usr_loc_board_action_peripheralinterface_status,
         EO_INIT(.on_rop_reception)      NULL,
         EO_INIT(.stg_address)           EOK_uint32dummy
     }
@@ -145,11 +148,7 @@ extern void eo_cfg_nvsEP_joint_usr_loc_board_initialise(void* loc, void* rem)
     eo_cfg_nvsEP_joint_usr_loc_board_mem_local = vol;
 
     // assign default values
-//    memcpy(vol, &eo_cfg_nvsEP_joint_default, sizeof(eo_cfg_nvsEP_joint_t)); //sizeof(eo_cfg_nvsEP_base_t));
-
-    vol->cfg.pidpos.kp=0xAA;
-    vol->cfg.pidpos.ki=0xBB;
-    vol->cfg.pidpos.kd=0xCC;
+    memcpy(vol, &eo_cfg_nvsEP_joint_default, sizeof(eo_cfg_nvsEP_joint_t)); //sizeof(eo_cfg_nvsEP_base_t));
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -161,8 +160,8 @@ extern void eo_cfg_nvsEP_joint_usr_loc_board_initialise(void* loc, void* rem)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-#ifdef _INCLUDE_HW_DEPENDENCIES_
-static void s_eo_cfg_nvsEP_joint_usr_loc_board_action_update__cfg(const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+
+static void s_eo_cfg_nvsEP_joint_usr_loc_board_action_peripheralinterface_cfg(const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eOmc_joint_config_t *cfg = nv->loc;
 
@@ -171,7 +170,7 @@ static void s_eo_cfg_nvsEP_joint_usr_loc_board_action_update__cfg(const EOnv* nv
 }
 
 
-static void s_eo_cfg_nvsEP_joint_usr_loc_board_action_update__setPoint(const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+static void s_eo_cfg_nvsEP_joint_usr_loc_board_action_peripheralinterface_setPoint(const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eOmc_setpoint_t *setPoint = nv->loc;
 
@@ -181,32 +180,14 @@ static void s_eo_cfg_nvsEP_joint_usr_loc_board_action_update__setPoint(const EOn
 }
 
 
-static void s_eo_cfg_nvsEP_joint_usr_loc_board_action_update__status(const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+static void s_eo_cfg_nvsEP_joint_usr_loc_board_action_peripheralinterface_status(const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eOmc_setpoint_t *setPoint = nv->loc;
 
-}
-#else
-
-static void s_eo_cfg_nvsEP_joint_usr_loc_board_action_update__cfg(const EOnv* nv, const eOabstime_t time, const uint32_t sign)
-{
-	eOmc_joint_config_t* vol = (eOmc_joint_config_t *) nv->loc;
-	vol->pidpos.offset++;
-	printf("cfg updated\n");
-}
-
-
-static void s_eo_cfg_nvsEP_joint_usr_loc_board_action_update__setPoint(const EOnv* nv, const eOabstime_t time, const uint32_t sign)
-{
+   .....
     
 }
 
-
-static void s_eo_cfg_nvsEP_joint_usr_loc_board_action_update__status(const EOnv* nv, const eOabstime_t time, const uint32_t sign)
-{
-
-}
-#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

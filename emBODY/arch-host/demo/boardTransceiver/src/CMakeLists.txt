@@ -15,13 +15,14 @@ set(BASE 				$ENV{ICUB_ROOT}/firmware/emBODY/)
 set(MAIN_FOLDER  		${CMAKE_CURRENT_SOURCE_DIR}/)
 set(NVS_BOARD_FOLDER  	${MAIN_FOLDER}nvscfg/local_pc104/)
 
-include(../../embObjLib.conf)
+include($ENV{ICUB_ROOT}/main/src/libraries/icubmod/embObjLib/embObjLib.conf)
+
 find_package(YARP)
 include_directories(${YARP_INCLUDE_DIRS})
 
 # Debug messages
 # message(INFO " BASE=${BASE}")
-# message(INFO " lib_cmake - embObj_includes: ${embObj_includes}")
+ message(INFO " lib_cmake - embObj_includes: ${embObj_includes}")
   	
 # get all files needed, collected in different lists for better organization and handling
 
@@ -46,7 +47,7 @@ set(NVS_REMOTE_SOURCE		${NVS_REMOTE_FOLDER}/eOcfg_EPs_rem_board.c
 set(NVS_REMOTE_HEADER		${NVS_REMOTE_FOLDER}/eOcfg_EPs_rem_board.h
 							${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_base_usr_rem_anydev.h
 							${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_mngmnt_usr_rem_board.h
-							${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_jopint_usr_rem_board.h)
+							${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_joint_usr_rem_board.h)
 
 set(NVS_LOCAL_SOURCE		${NVS_LOCAL_FOLDER}/eOcfg_EPs_loc_board.c
 							${NVS_LOCAL_FOLDER}/eOcfg_nvsEP_base_usr_loc_anydev.c
@@ -56,18 +57,31 @@ set(NVS_LOCAL_SOURCE		${NVS_LOCAL_FOLDER}/eOcfg_EPs_loc_board.c
 set(NVS_LOCAL_HEADER		${NVS_LOCAL_FOLDER}/eOcfg_EPs_loc_board.h
 							${NVS_LOCAL_FOLDER}/eOcfg_nvsEP_base_usr_loc_anydev.h
 							${NVS_LOCAL_FOLDER}/eOcfg_nvsEP_mngmnt_usr_loc_board.h
-							${NVS_LOCAL_FOLDER}/eOcfg_nvsEP_jopint_usr_loc_board.h)
+							${NVS_LOCAL_FOLDER}/eOcfg_nvsEP_joint_usr_loc_board.h)
 
 # Mio tentativo di improvvisare una scheda EMS fake da usare come test per l'applicazione... rimandato a quando avrò fatto un po' di codice in più. 
 set(NVS_BOARD_SOURCE  	${NVS_BOARD_FOLDER}/eOcfg_EPs_loc_board_pc104.c
 						${NVS_BOARD_FOLDER}/eOcfg_nvsEP_base_usr_loc_pc104.c
 						${NVS_BOARD_FOLDER}/eOcfg_nvsEP_mngmnt_usr_loc_pc104.c
-						${NVS_BOARD_FOLDER}/eOcfg_nvsEP_joint_usr_loc_pc104.c)
+#						${NVS_BOARD_FOLDER}/eOcfg_nvsEP_joint_usr_loc_pc104.c
+						${NVS_BOARD_FOLDER}/eOcfg_nvsEP_mc_leftleg_usr_loc_ebx.c
+						${NVS_MC_EP}eOcfg_nvsEP_mc_any_con_bodypart.c
+						${NVS_MC_EP}eOcfg_nvsEP_mc_any_con_jxxdefault.c
+						${NVS_MC_EP}eOcfg_nvsEP_mc_any_con_mxxdefault.c
+						${NVS_MC_EP}eOcfg_nvsEP_mc_leftleg_con.c
+						${NVS_MC_EP}eOcfg_nvsEP_mc_leftleg_usr_rem_ebx.c)
 
-set(NVS_BOARD_HEADER  	${NVS_BOARD_FOLDER}/eOcfg_EPs_loc_board_pc104.h
-						${NVS_BOARD_FOLDER}/eOcfg_nvsEP_base_usr_loc_pc104.h
-						${NVS_BOARD_FOLDER}/eOcfg_nvsEP_mngmnt_usr_loc_pc104.h
-						${NVS_BOARD_FOLDER}/eOcfg_nvsEP_joint_usr_loc_pc104.h)
+set(NVS_BOARD_HEADER  		${NVS_BOARD_FOLDER}/eOcfg_EPs_loc_board_pc104.h
+							${NVS_BOARD_FOLDER}/eOcfg_nvsEP_base_usr_loc_pc104.h
+							${NVS_BOARD_FOLDER}/eOcfg_nvsEP_mngmnt_usr_loc_pc104.h
+							#${NVS_BOARD_FOLDER}/eOcfg_nvsEP_joint_usr_loc_pc104.h
+							${NVS_MC_EP}/eOcfg_nvsEP_mc_any_con_bodypart.h
+							${NVS_MC_EP}/eOcfg_nvsEP_mc_any_con_jxx.h
+							${NVS_MC_EP}/eOcfg_nvsEP_mc_any_con_jxxdefault.h
+							${NVS_MC_EP}/eOcfg_nvsEP_mc_any_con_mxx.h
+							${NVS_MC_EP}/eOcfg_nvsEP_mc_any_con_mxxdefault.h
+							${NVS_MC_EP}/eOcfg_nvsEP_mc_leftleg_con.h
+							${NVS_MC_EP}/eOcfg_nvsEP_mc_leftleg_usr_rem_ebx.h)
 						
 # EmbObj-src
 set(CORE_FOLDER_SOURCE  ${CORE_FOLDER}/EOarray.c
