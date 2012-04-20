@@ -48,7 +48,7 @@
 
 // the 16bit value to use to identify the endpoints
 #define EOK_cfg_nvsEP_mc_leftleg_EP                             (0x0010)     
-#define EOK_cfg_nvsEP_mc_rigthleg_EP                            (0x0011) 
+#define EOK_cfg_nvsEP_mc_rightleg_EP                            (0x0011) 
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 

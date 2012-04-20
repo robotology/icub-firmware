@@ -140,7 +140,15 @@ static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_loc_ebx_data[] =
         EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mc_leg_constvector_of_treenodes_EOnv_con, 
         EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_mc_leg_usr_constvector_of_EOnv_usr, 
         EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mc_leg_usr_initialise
-    } 
+    },
+    {   // 16-mc-rightleg
+        EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mc_rightleg_EP,
+        EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_mc_leg_t),
+        EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mc_leg_hashfunction_id2index,
+        EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mc_leg_constvector_of_treenodes_EOnv_con, 
+        EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_mc_leg_usr_constvector_of_EOnv_usr, 
+        EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mc_leg_usr_initialise
+    }     
     
 };
 

@@ -861,14 +861,14 @@ extern eo_cfg_nvsEP_mc_leg_t* nvsEP_mc_leg_usr_mem_remote   = NULL;
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern void eo_cfg_nvsEP_mc_leg_usr_initialise(void* loc, void* rem)
+extern void eo_cfg_nvsEP_mc_leg_usr_initialise(eOnvEP_t ep, void* loc, void* rem)
 { 
     // init the extern variable which can be directly used by the application 
     nvsEP_mc_leg_usr_mem_local      = (eo_cfg_nvsEP_mc_leg_t*)loc;
     nvsEP_mc_leg_usr_mem_remote     = (eo_cfg_nvsEP_mc_leg_t*)rem;
     
     // launch a specialised initialisation
-    eo_cfg_nvsEP_mc_leg_usr_hid_INITIALISE(nvsEP_mc_leg_usr_mem_local, nvsEP_mc_leg_usr_mem_remote);
+    eo_cfg_nvsEP_mc_leg_usr_hid_INITIALISE(ep, nvsEP_mc_leg_usr_mem_local, nvsEP_mc_leg_usr_mem_remote);
 
 }
 
@@ -882,7 +882,7 @@ extern void eo_cfg_nvsEP_mc_leg_usr_initialise(void* loc, void* rem)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INITIALISE(void *loc, void *rem)
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
 {
 
 }

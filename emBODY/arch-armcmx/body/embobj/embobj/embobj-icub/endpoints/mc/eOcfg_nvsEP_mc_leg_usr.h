@@ -65,7 +65,7 @@ extern eo_cfg_nvsEP_mc_leg_t* eo_cfg_nvsEP_mc_leg_usr_mem_remote;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern void eo_cfg_nvsEP_mc_leg_usr_initialise(void* loc, void* rem);
+extern void eo_cfg_nvsEP_mc_leg_usr_initialise(eOnvEP_t ep, void* loc, void* rem);
 
 
 /** @}            

@@ -48,7 +48,7 @@
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_INITIALISE(void *loc, void *rem);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem);
 
 // jxx-init:
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig(uint16_t n, const EOnv* nv);
