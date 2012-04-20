@@ -352,6 +352,7 @@ typedef     void        (*eOvoid_fp_voidp_uint32_t)                 (void *, uin
 typedef     void        (*eOvoid_fp_vuint32p_uint32_t)              (volatile uint32_t *, uint32_t);
 typedef     void        (*eOvoid_fp_voidp_t)                        (void *);
 typedef     void        (*eOvoid_fp_voidp_voidp_t)                  (void *, void *);
+typedef     void        (*eOvoid_fp_uint16_voidp_voidp_t)           (uint16_t, void *, void *);
 typedef     void        (*eOvoid_fp_cvoidp_t)                       (const void *);
 typedef     eObool_t    (*eObool_fp_cvoidp_t)                       (const void *);
 typedef     eOresult_t  (*eOres_fp_voidp_uint32_uint32_t)           (void *, uint32_t, uint32_t);
