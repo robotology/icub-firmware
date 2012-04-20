@@ -39,7 +39,7 @@
 #include "EOconstvector_hid.h"
 
 
-#include "hal_trace.h"
+//#include "hal_trace.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface

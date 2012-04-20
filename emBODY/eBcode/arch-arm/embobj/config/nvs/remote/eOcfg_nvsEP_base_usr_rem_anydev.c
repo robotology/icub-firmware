@@ -44,7 +44,7 @@
 //#include "shalINFO.h"
 
 
-#include "hal_trace.h"
+//#include "hal_trace.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -323,7 +323,7 @@ static void s_eo_cfg_nvsEP_base_usr_rem_anydev_action_update__applicationinfo(co
     applicationinfo = applicationinfo;
     t = t;
     s = s;
-    snprintf(s_str, sizeof(s_str)-1, "REM has updated applinfo w/ appl.info.entity.version = (maj = %d, min = %d)", 
+    snprintf(s_str, sizeof(s_str)-1, "REM has updated applinfo\n",
                                       applicationinfo->info.entity.version.major, applicationinfo->info.entity.version.minor);
     hal_trace_puts(s_str);
 
@@ -362,7 +362,6 @@ static void s_eo_cfg_nvsEP_base_usr_rem_anydev_action_update__forcerestart(const
 }
 
 
-
 static void s_eo_cfg_nvsEP_base_usr_rem_anydev_action_update__localise(const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t *localise = nv->rem;
@@ -370,6 +369,7 @@ static void s_eo_cfg_nvsEP_base_usr_rem_anydev_action_update__localise(const EOn
     snprintf(s_str, sizeof(s_str)-1, "REM has updated localise w/ = %d", *localise);
     hal_trace_puts(s_str);
 }
+
 
 static void s_eo_cfg_nvsEP_base_usr_rem_anydev_action_update_ipnetwork(const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
@@ -394,6 +394,7 @@ static void s_eo_cfg_nvsEP_base_usr_rem_anydev_action_update_ipnetwork__macaddre
     hal_trace_puts(s_str);
 }
 
+
 static void s_eo_cfg_nvsEP_base_usr_rem_anydev_action_update_ipnetwork__ipaddress(const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     uint32_t *ipaddress = nv->rem;
@@ -402,6 +403,7 @@ static void s_eo_cfg_nvsEP_base_usr_rem_anydev_action_update_ipnetwork__ipaddres
     snprintf(s_str, sizeof(s_str)-1, "REM has updated ipaddress w/ 0x%x = %d.%d.%d.%d", *ipaddress, adr[0], adr[1], adr[2], adr[3]);
     hal_trace_puts(s_str);
 }
+
 
 static void s_eo_cfg_nvsEP_base_usr_rem_anydev_action_update_ipnetwork__ipnetmask(const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {

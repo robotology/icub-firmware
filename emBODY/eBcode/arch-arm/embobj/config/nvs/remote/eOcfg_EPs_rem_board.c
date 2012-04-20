@@ -31,24 +31,18 @@
 #include "string.h"
 #include "stdio.h"
 
-
-
-
-
 #include "EOconstvector_hid.h"
 
-#include "eOcfg_nvsEP_base_con.h"
-#include "eOcfg_nvsEP_base_usr_rem_anydev.h"
+#include "eOcfg_EPs_rem_board.h"
 
-#include "eOcfg_nvsEP_mngmnt_con.h"
-#include "eOcfg_nvsEP_mngmnt_usr_rem_board.h"
-
+#include "eOcfg_nvsEP_mc_leftleg_con.h"
+#include "eOcfg_nvsEP_mc_leftleg_usr_loc_ebx.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "eOcfg_EPs_rem_board.h"
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -88,6 +82,12 @@ extern const EOconstvector  s_eo_cfg_nvsEP_base_usr_rem_anydev_constvector_of_EO
 extern uint16_t eo_cfg_nvsEP_mngmnt_hashfunction_id2index(uint16_t nvid);
 extern const EOconstvector  s_eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con;
 extern const EOconstvector  s_eo_cfg_nvsEP_mngmnt_usr_rem_board_constvector_of_EOnv_usr;
+//extern const EOconstvector  s_eo_cfg_nvsEP_joint_usr_rem_board_constvector_of_EOnv_usr;
+
+extern uint16_t eo_cfg_nvsEP_mc_leftleg_hashfunction_id2index(uint16_t nvid);
+extern const EOconstvector  s_eo_cfg_nvsEP_mc_leftleg_constvector_of_treenodes_EOnv_con;
+extern const EOconstvector  s_eo_cfg_nvsEP_mc_leftleg_usr_rem_ebx_constvector_of_EOnv_usr;
+
 
 static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_rem_board_data[] =
 {              
@@ -95,18 +95,26 @@ static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_rem_board_data[] =
         EO_INIT(.endpoint)                          EOK_cfg_nvsEP_base_endpoint,
         EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_base_t),
         EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_base_hashfunction_id2index,
-        EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_base_constvector_of_treenodes_EOnv_con, //eo_cfg_nvsEP_base_constvector_of_treenodes_EOnv_con,
-        EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_base_usr_rem_anydev_constvector_of_EOnv_usr, //eo_cfg_nvsEP_base_usr_rem_anydev_constvector_of_EOnv_usr,
+        EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_base_constvector_of_treenodes_EOnv_con, 		//eo_cfg_nvsEP_base_constvector_of_treenodes_EOnv_con,
+        EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_base_usr_rem_anydev_constvector_of_EOnv_usr, 	//eo_cfg_nvsEP_base_usr_rem_anydev_constvector_of_EOnv_usr,
         EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_base_usr_rem_anydev_initialise
     },
     {   // 01-mngmnt
         EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mngmnt_endpoint,
         EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_mngmnt_t),
         EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mngmnt_hashfunction_id2index,
-        EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con, //eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con,
-        EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_mngmnt_usr_rem_board_constvector_of_EOnv_usr, //eo_cfg_nvsEP_mngmnt_usr_rem_board_constvector_of_EOnv_usr,
+        EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con, 		//eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con,
+        EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_mngmnt_usr_rem_board_constvector_of_EOnv_usr, 	//eo_cfg_nvsEP_mngmnt_usr_rem_board_constvector_of_EOnv_usr,
         EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mngmnt_usr_rem_board_initialise
-    }    
+    },    
+    {   // 16-mc-leftleg
+        EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mc_leftleg_EP,
+        EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_mc_leftleg_t),
+        EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mc_leftleg_hashfunction_id2index,
+        EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mc_leftleg_constvector_of_treenodes_EOnv_con,
+        EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_mc_leftleg_usr_rem_ebx_constvector_of_EOnv_usr, //eo_cfg_nvsEP_mngmnt_usr_loc_ebx_constvector_of_EOnv_usr,
+        EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mc_leftleg_usr_rem_ebx_initialise
+    }
 };
 
 static const EOconstvector s_eo_cfg_EPs_vectorof_rem_board = 
@@ -162,7 +170,7 @@ static uint16_t s_eo_cfg_nvsEP_rem_board_hashfunction_ep2index(uint16_t ep)
     static const uint16_t s_eptable[EPTABLESIZE] = 
     {   
         EOK_cfg_nvsEP_base_endpoint,                            EOK_cfg_nvsEP_mngmnt_endpoint,   
-        EOK_uint16dummy,                                        EOK_uint16dummy,
+        EOK_cfg_nvsEP_mc_leftleg_EP,                           	EOK_uint16dummy,
         EOK_uint16dummy,                                        EOK_uint16dummy,
         EOK_uint16dummy,                                        EOK_uint16dummy,
         EOK_uint16dummy,                                        EOK_uint16dummy,
