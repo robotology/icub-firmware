@@ -384,7 +384,13 @@ extern EOtreenode eo_cfg_nvsEP_mc_leftleg_tree_con[EOK_cfg_nvsEP_leftleg_NUMofVA
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
-
+    {   //14
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_leftleg_j00__externalvalueoftorque,
+        EO_INIT(.index)     14+J00p,
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },
 
 
     // joint01
@@ -488,7 +494,14 @@ extern EOtreenode eo_cfg_nvsEP_mc_leftleg_tree_con[EOK_cfg_nvsEP_leftleg_NUMofVA
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },    
-
+    {   //14
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_leftleg_j01__externalvalueoftorque,
+        EO_INIT(.index)     14+J01p,
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    }, 
+    
     // joint02
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_leftleg_j02_jconfig,
@@ -590,7 +603,13 @@ extern EOtreenode eo_cfg_nvsEP_mc_leftleg_tree_con[EOK_cfg_nvsEP_leftleg_NUMofVA
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
-    
+    {   //14
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_leftleg_j02__externalvalueoftorque,
+        EO_INIT(.index)     14+J02p,
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },    
     
     // joint03
     {   // 0
@@ -693,7 +712,14 @@ extern EOtreenode eo_cfg_nvsEP_mc_leftleg_tree_con[EOK_cfg_nvsEP_leftleg_NUMofVA
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
-
+    {   //14
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_leftleg_j03__externalvalueoftorque,
+        EO_INIT(.index)     14+J03p,
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },
+    
     // joint04
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_leftleg_j04_jconfig,
@@ -795,7 +821,13 @@ extern EOtreenode eo_cfg_nvsEP_mc_leftleg_tree_con[EOK_cfg_nvsEP_leftleg_NUMofVA
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
-    
+    {   //14
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_leftleg_j04__externalvalueoftorque,
+        EO_INIT(.index)     14+J04p,
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },    
     
     // joint05
     {   // 0
@@ -898,7 +930,13 @@ extern EOtreenode eo_cfg_nvsEP_mc_leftleg_tree_con[EOK_cfg_nvsEP_leftleg_NUMofVA
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },    
-    
+    {   //14
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_leftleg_j05__externalvalueoftorque,
+        EO_INIT(.index)     14+J05p,
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },     
     // and in here come the 6 motors
 
     // motor00
@@ -1203,11 +1241,13 @@ extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_mc_leftleg_fptr_hashfunction_id2i
 extern uint16_t eo_cfg_nvsEP_mc_leftleg_hashfunction_id2index(uint16_t id)
 {
 
-    // 12*6
-    #define IDTABLEJSIZE     (EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber*EOK_cfg_nvsEP_mc_leftleg_NUMofJOINTS)
+    // 15*6
+    #define IDTABLEJSIZE        (EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber*EOK_cfg_nvsEP_mc_leftleg_NUMofJOINTS)
     
     // 6*6
-    #define IDTABLEMSIZE     (EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber*EOK_cfg_nvsEP_mc_leftleg_NUMofMOTORS)    
+    #define IDTABLEMSIZE        (EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber*EOK_cfg_nvsEP_mc_leftleg_NUMofMOTORS)  
+
+    #define IDTABLESIZE         (IDTABLEJSIZE+IDTABLEMSIZE)
     
 
     // in order to always have a hit the table s_idtable[] it must be of size equal to max{ s_hash(id) }, thus if we
@@ -1216,39 +1256,45 @@ extern uint16_t eo_cfg_nvsEP_mc_leftleg_hashfunction_id2index(uint16_t id)
     // then the table shall be of size 17, shall contain 0xffff everywhere but in positions 0, 7, 16 where the values
     // are ... 0, 7, 16
 
-    static const uint16_t s_idtable[IDTABLEJSIZE+IDTABLEMSIZE] = 
+    static const uint16_t s_idtable[] = 
     { 
         // j00
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig(0), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidposition(0), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidvelocity(0),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidtorque(0), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__minpositionofjoint(0), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__maxpositionofjoint(0), 
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__velocitysetpointtimeout(0), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__upto02descrforchameleon02(0), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__jstatus(0),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__calibrator(0), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__setpoint(0), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__controlmode(0),
+        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__signalwhenmotionisdone(0), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__motionisdone(0), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__externalvalueoftorque(0),
         // j01
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig(1), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidposition(1), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidvelocity(1),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidtorque(1), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__minpositionofjoint(1), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__maxpositionofjoint(1), 
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__velocitysetpointtimeout(1), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__upto02descrforchameleon02(1), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__jstatus(1),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__calibrator(1), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__setpoint(1), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__controlmode(1),
+        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__signalwhenmotionisdone(1), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__motionisdone(1), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__externalvalueoftorque(1),
         // j02
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig(2), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidposition(2), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidvelocity(2),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidtorque(2), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__minpositionofjoint(2), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__maxpositionofjoint(2), 
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__velocitysetpointtimeout(2), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__upto02descrforchameleon02(2), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__jstatus(2),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__calibrator(2), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__setpoint(2), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__controlmode(2),       
+        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__signalwhenmotionisdone(2), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__motionisdone(2), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__externalvalueoftorque(2),
         // j03
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig(3), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidposition(3), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidvelocity(3),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidtorque(3), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__minpositionofjoint(3), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__maxpositionofjoint(3), 
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__velocitysetpointtimeout(3), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__upto02descrforchameleon02(3), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__jstatus(3),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__calibrator(3), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__setpoint(3), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__controlmode(3),       
+        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__signalwhenmotionisdone(3), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__motionisdone(3), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__externalvalueoftorque(3),
         // j04
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig(4), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidposition(4), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidvelocity(4),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidtorque(4), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__minpositionofjoint(4), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__maxpositionofjoint(4), 
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__velocitysetpointtimeout(4), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__upto02descrforchameleon02(4), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__jstatus(4),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__calibrator(4), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__setpoint(4), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__controlmode(4),       
+        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__signalwhenmotionisdone(4), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__motionisdone(4), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__externalvalueoftorque(4),
         // j05
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig(5), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidposition(5), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidvelocity(5),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidtorque(5), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__minpositionofjoint(5), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__maxpositionofjoint(5), 
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__velocitysetpointtimeout(5), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__upto02descrforchameleon02(5), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__jstatus(5),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__calibrator(5), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__setpoint(5), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__controlmode(5),
-
+        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__signalwhenmotionisdone(5), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__motionisdone(5), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx__externalvalueoftorque(5),
+        
         // m00
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig(0), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__pidcurrent(0), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__maxvelocityofmotor(0),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__maxcurrentofmotor(0), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__upto02descrforchameleon06(0), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx__mstatus(0), 
@@ -1268,13 +1314,13 @@ extern uint16_t eo_cfg_nvsEP_mc_leftleg_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig(5), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__pidcurrent(5), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__maxvelocityofmotor(5),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__maxcurrentofmotor(5), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__upto02descrforchameleon06(5), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx__mstatus(5) 
                                         
-    };
+    };  EO_VERIFYsizeof(s_idtable, sizeof(uint16_t)*(IDTABLESIZE));
     
     uint16_t index = s_hash(id);
     
     #warning --> so far the hashing is ok only for teh joints. for the motor it is a different story 
     
-    if((index < (IDTABLEJSIZE+IDTABLEMSIZE)) && (id == s_idtable[index]) )
+    if((index < (IDTABLESIZE)) && (id == s_idtable[index]) )
     {
         return(index);
     }

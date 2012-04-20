@@ -43,7 +43,7 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-//#include "eOcfg_nvsEP_jpragma_con.h"
+//#include "eOcfg_nvsEP_mc_any_con_jxxmacro.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -284,8 +284,8 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, __signalwhenmot
 #define OFFSETafter__signalwhenmotionisdone                                     (OFFSETof__signalwhenmotionisdone+CAPACITY__signalwhenmotionisdone)
 
 
-#define OFFSETof__motionisdone                                   (OFFSETafter__signalwhenmotionisdone)
-#define CAPACITY__motionisdone                         sizeof(eObool_t)
+#define OFFSETof__motionisdone                                          (OFFSETafter__signalwhenmotionisdone)
+#define CAPACITY__motionisdone                                          sizeof(eObool_t)
 extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, __motionisdone) =
 {    
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, __motionisdone, JMACRO_JNUM),
@@ -295,17 +295,38 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, __motionisdone)
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__motionisdone),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__motionisdone)
 };
-#define OFFSETafter__motionisdone                                     (OFFSETof__motionisdone+CAPACITY__motionisdone)
+#define OFFSETafter__motionisdone                                       (OFFSETof__motionisdone+CAPACITY__motionisdone)
 
 
 
-#define OFFSETof_filler01                                           (OFFSETafter__motionisdone)
-#define CAPACITY_filler01                                           (1)
+#define OFFSETof_filler01                                               (OFFSETafter__motionisdone)
+#define CAPACITY_filler01                                               (1)
 //
-#define OFFSETafter_filler01                                        (OFFSETof_filler01+CAPACITY_filler01)
+#define OFFSETafter_filler01                                            (OFFSETof_filler01+CAPACITY_filler01)
+
+
+#define OFFSETof__externalvalueoftorque                                 (OFFSETafter_filler01)
+#define CAPACITY__externalvalueoftorque                                 sizeof(eOmeas_torque_t)
+extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, __externalvalueoftorque) =
+{    
+    EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, __externalvalueoftorque, JMACRO_JNUM),
+    EO_INIT(.capacity)  CAPACITY__externalvalueoftorque,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.externalvalueoftorque,
+    EO_INIT(.offset)    OFFSETof__externalvalueoftorque,
+    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__externalvalueoftorque),
+    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__externalvalueoftorque)
+};
+#define OFFSETafter__externalvalueoftorque                              (OFFSETof__externalvalueoftorque+CAPACITY__externalvalueoftorque)
+
+
+
+#define OFFSETof_filler06                                           (OFFSETafter__externalvalueoftorque)
+#define CAPACITY_filler06                                           (6)
+//
+#define OFFSETafter_filler06                                        (OFFSETof_filler06+CAPACITY_filler06)
 
 // guard on alignement of variables. if it doesnt compile then ... the compiler has surely inserted some holes
-MACRO_VERIFYSIZEOF(JMACRO_JNUM, eOmc_joint_t, OFFSETafter_filler01-JMACRO_JOFF);
+MACRO_VERIFYSIZEOF(JMACRO_JNUM, eOmc_joint_t, OFFSETafter_filler06-JMACRO_JOFF);
 
 
 

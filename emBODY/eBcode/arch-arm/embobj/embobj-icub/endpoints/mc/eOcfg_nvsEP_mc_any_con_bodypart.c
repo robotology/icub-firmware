@@ -78,7 +78,7 @@ EO_VERIFYproposition(xxx, jointNVindex__setpoint                            == E
 EO_VERIFYproposition(xxx, jointNVindex__controlmode                         == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__controlmode);
 EO_VERIFYproposition(xxx, jointNVindex__signalwhenmotionisdone              == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__signalwhenmotionisdone);
 EO_VERIFYproposition(xxx, jointNVindex__motionisdone                        == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__motionisdone);
-//EO_VERIFYproposition(xxx, jointNVindex__measuredtorque                      == );
+EO_VERIFYproposition(xxx, jointNVindex__externalvalueoftorque               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__externalvalueoftorque);
 
 EO_VERIFYproposition(xxx, jointNVindex_TOTALnumber                          == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber);
 
@@ -118,7 +118,8 @@ static const uint8_t s_eo_cfg_nvsEP_mc_any_con_bodypart_jxxfuntyp[] =
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__setpoint,
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__controlmode,
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__signalwhenmotionisdone,
-    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__motionisdone
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__motionisdone,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__externalvalueoftorque
 };  EO_VERIFYsizeof(s_eo_cfg_nvsEP_mc_any_con_bodypart_jxxfuntyp, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber);
 
 

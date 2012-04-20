@@ -199,11 +199,10 @@ typedef struct                  // size is: 4+4+4+2+2+0 = 16
     eOmeas_position_t           position;                   /**< the position of the joint */           
     eOmeas_velocity_t           velocity;                   /**< the velocity of the joint */          
     eOmeas_acceleration_t       acceleration;               /**< the acceleration of the joint */       
-    eOmeas_torque_t             torque;                     /**< the torque of the joint */
+    eOmeas_torque_t             torque;                     /**< the torque of the joint when locally measured */
     uint8_t                     chameleon02[2];             /**< these two bytes can be configured with eOmc_joint_config_t::upto02descrforchameleon02 to contain 0, 1, or 2 variables */  
 } eOmc_joint_status_t;          EO_VERIFYsizeof(eOmc_joint_status_t, 16);
 
-#warning ---> ask maggialirandazzo if the torque of the joint_status_t can be removed ... we already have one coming from teh pc104 in joint_t
 
 /** @typedef    typedef struct eOmc_pid_status_t
     @brief      eOmc_pid_status_t contains the status of a generic pid
@@ -340,10 +339,10 @@ typedef struct                  // size is 64+16+8+12+1+1+1+1+2+6+0 = 112
     eOenum08_t                  controlmode;                /**< use values from eOmc_controlmode_t, but maybe its enum type will change*/
     eObool_t                    signalwhenmotionisdone;     /**< when true, the motion done must be signalled when the setpoint is reached (beh oppure out)*/
     eObool_t                    motionisdone;               /**< the signal coming from the joint telling that the setpoint is reached */ 
-    uint8_t                     filler01[1];                // space for some other variable ...
-//    eOmeas_torque_t             measuredtorque;             /**< the measured torque at the joint which is either virtual or real */
-//    uint8_t                     filler07[6];                // space for some other variable ...
-} eOmc_joint_t;                 EO_VERIFYsizeof(eOmc_joint_t, 104);
+    uint8_t                     filler01[1];                // space for a variable of 1 byte ... however needs  a shift of the inidices of successive variables
+    eOmeas_torque_t             externalvalueoftorque;      /**< the torque at the joint when externally measured or estimated */
+    uint8_t                     filler06[6];                // space for some other variable ...
+} eOmc_joint_t;                 EO_VERIFYsizeof(eOmc_joint_t, 112);
 
 #warning -->si potrebbe mettere motionisdone (anche) dentro il jstatus come un enum che valga: 0 non ancora, 1 done, ff non rilevante. ma si deve rinunciare ad un byte di chameleon
 
