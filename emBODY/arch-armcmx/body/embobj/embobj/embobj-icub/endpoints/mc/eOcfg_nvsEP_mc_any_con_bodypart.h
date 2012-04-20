@@ -87,11 +87,11 @@ typedef enum
     jointNVindex__setpoint                                  =   10,
     jointNVindex__controlmode                               =   11,
     jointNVindex__signalwhenmotionisdone                    =   12,
-    jointNVindex__motionisdone                              =   13//,
-//    jointNVindex__measuredtorque                            =   14
+    jointNVindex__motionisdone                              =   13,
+    jointNVindex__externalvalueoftorque                     =   14
 } eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t;
 
-enum { jointNVindex_TOTALnumber = 14};
+enum { jointNVindex_TOTALnumber = 15};
 
 
 

@@ -64,11 +64,11 @@
 #define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__controlmode                                  (11)
 #define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__signalwhenmotionisdone                       (12)
 #define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__motionisdone                                 (13)
-
+#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__externalvalueoftorque                        (14)
 
 // -- the total number of network variables inside a joint
 
-#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber                                   (14)
+#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber                                   (15)
 
 
 
@@ -93,7 +93,7 @@
 #define EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__controlmode                                  EO_nv_FUNTYP(eo_nv_FUN_out, eo_nv_TYP_u08)
 #define EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__signalwhenmotionisdone                       EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_u08)
 #define EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__motionisdone                                 EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_u08)
-
+#define EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__externalvalueoftorque                        EO_nv_FUNTYP(eo_nv_FUN_out, eo_nv_TYP_u16)
 
 
 

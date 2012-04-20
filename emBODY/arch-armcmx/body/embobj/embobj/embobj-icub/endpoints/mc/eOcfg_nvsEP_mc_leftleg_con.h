@@ -109,7 +109,7 @@ typedef struct                  // 112*6+40*6 = 912
 {
     eOmc_joint_t                joints[jointLeftLeg_TOTALnumber]; 
     eOmc_motor_t                motors[motorLeftLeg_TOTALnumber];
-} eo_cfg_nvsEP_mc_leftleg_t;    EO_VERIFYsizeof(eo_cfg_nvsEP_mc_leftleg_t, 864);
+} eo_cfg_nvsEP_mc_leftleg_t;    EO_VERIFYsizeof(eo_cfg_nvsEP_mc_leftleg_t, 912);
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------

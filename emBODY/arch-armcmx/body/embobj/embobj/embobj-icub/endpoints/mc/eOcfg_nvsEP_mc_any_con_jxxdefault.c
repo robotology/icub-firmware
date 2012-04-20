@@ -121,9 +121,9 @@ extern const eOmc_joint_t eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue =
     EO_INIT(.controlmode)                   eomc_controlmode_idle,
     EO_INIT(.signalwhenmotionisdone)        0,
     EO_INIT(.motionisdone)                  0,
-    EO_INIT(.filler01)                      {0xf1}//,
-//    EO_INIT(.measuredtorque)                0,
-//    EO_INIT(.filler07)                      {0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7}
+    EO_INIT(.filler01)                      {0xf1},
+    EO_INIT(.externalvalueoftorque)         0,
+    EO_INIT(.filler06)                      {0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6}
 }; 
 
 
