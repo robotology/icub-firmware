@@ -183,7 +183,7 @@ extern eOresult_t eo_nvscfg_PushBackDevice(EOnvsCfg* p, eOnvscfgOwnership_t owne
 
 
 
-extern eOresult_t eo_nvscfg_ondevice_PushBackEndpoint(EOnvsCfg* p, uint8_t ondevindex, eOnvEP_t endpoint, eOuint16_fp_uint16_t hashfn_id2index, const EOconstvector* treeofnvs_con, const EOconstvector* datanvs_usr, uint32_t datanvs_size, eOvoid_fp_voidp_voidp_t datanvs_init, EOVmutexDerived* mtx)
+extern eOresult_t eo_nvscfg_ondevice_PushBackEndpoint(EOnvsCfg* p, uint8_t ondevindex, eOnvEP_t endpoint, eOuint16_fp_uint16_t hashfn_id2index, const EOconstvector* treeofnvs_con, const EOconstvector* datanvs_usr, uint32_t datanvs_size, eOvoid_fp_uint16_voidp_voidp_t datanvs_init, EOVmutexDerived* mtx)
 {
     EOnvsCfg_device_t** thedev = NULL;
     EOnvsCfg_ep_t *theendpoint = NULL;
@@ -265,7 +265,7 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
     uint16_t ndev;
     uint16_t nendpoints;
     uint8_t nvars;
-    eOvoid_fp_voidp_voidp_t initialise = NULL;
+    eOvoid_fp_uint16_voidp_voidp_t initialise = NULL;
     EOnv tmpnv;
     EOnv_con_t* tmpnvcon = NULL;
 
@@ -303,7 +303,7 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
                 
                 if((NULL != initialise))
                 {
-                    initialise((*theendpoint)->thenvs_vol, (*theendpoint)->thenvs_rem);
+                    initialise((*theendpoint)->endpoint, (*theendpoint)->thenvs_vol, (*theendpoint)->thenvs_rem);
                 }
             }
 
