@@ -92,7 +92,7 @@
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 #warning --> OK BUT NEED TO KNOW WHICH EP WE ARE INITIALISING.
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_INITIALISE(void *loc, void *rem)
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
 {
     uint8_t j, m;
     eo_cfg_nvsEP_mc_leg_t *lloc = (eo_cfg_nvsEP_mc_leg_t*)loc;
