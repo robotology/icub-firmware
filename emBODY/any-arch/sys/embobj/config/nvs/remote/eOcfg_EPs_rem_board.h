@@ -47,13 +47,17 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-// - in here there are the nvids plus ... 
+// include EP definition
 #include "eOcfg_nvsEP_base_con.h"
-#include "eOcfg_nvsEP_mngmnt_con.h"
-
-// - in here there is access to ram of the endpoints
 #include "eOcfg_nvsEP_base_usr_rem_anydev.h"
+
+#include "eOcfg_nvsEP_mngmnt_con.h"
 #include "eOcfg_nvsEP_mngmnt_usr_rem_board.h"
+
+#include "eOcfg_nvsEP_mc_any_con_bodypart.h"
+
+#include "eOcfg_nvsEP_mc_leftleg_con.h"
+#include "eOcfg_nvsEP_mc_leftleg_usr_rem_ebx.h"
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
