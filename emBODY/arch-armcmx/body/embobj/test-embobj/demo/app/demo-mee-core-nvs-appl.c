@@ -1430,23 +1430,23 @@ static void s_xxx(void)
     uint16_t index;    
     uint16_t sss;
 
-    sss = eo_constvector_Size(eo_cfg_nvsEP_mc_leftleg_constvector_of_treenodes_EOnv_con);
+//     sss = eo_constvector_Size(eo_cfg_nvsEP_mc_leftleg_constvector_of_treenodes_EOnv_con);
 
-    
-    treenode = &eo_cfg_nvsEP_mc_leftleg_tree_con[0];
-    treenode = &eo_cfg_nvsEP_mc_leftleg_tree_con[1];
-    treenode = &eo_cfg_nvsEP_mc_leftleg_tree_con[2];
-    treenode = &eo_cfg_nvsEP_mc_leftleg_tree_con[3];
-    
-    treenode =  treenode;
-    sss = sss;
-    
-    index = eo_cfg_nvsEP_mc_leftleg_hashfunction_id2index(EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidposition(0));
-    index = eo_cfg_nvsEP_mc_leftleg_hashfunction_id2index(EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidposition(1));
-    index = eo_cfg_nvsEP_mc_leftleg_hashfunction_id2index(EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig(0));
-    index = eo_cfg_nvsEP_mc_leftleg_hashfunction_id2index(EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig(1));
-    
-    index = index;
+//     
+//     treenode = &eo_cfg_nvsEP_mc_leftleg_tree_con[0];
+//     treenode = &eo_cfg_nvsEP_mc_leftleg_tree_con[1];
+//     treenode = &eo_cfg_nvsEP_mc_leftleg_tree_con[2];
+//     treenode = &eo_cfg_nvsEP_mc_leftleg_tree_con[3];
+//     
+//     treenode =  treenode;
+//     sss = sss;
+//     
+//     index = eo_cfg_nvsEP_mc_leftleg_hashfunction_id2index(EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidposition(0));
+//     index = eo_cfg_nvsEP_mc_leftleg_hashfunction_id2index(EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidposition(1));
+//     index = eo_cfg_nvsEP_mc_leftleg_hashfunction_id2index(EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig(0));
+//     index = eo_cfg_nvsEP_mc_leftleg_hashfunction_id2index(EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig(1));
+//     
+//     index = index;
     
     
     
