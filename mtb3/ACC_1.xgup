@@ -7,7 +7,7 @@
     <interface name="CAN" config="Esd USB-CAN driver:Device 0, Baudrate 1000, ID len 0, 0x0 -&gt; 0x7ff"/>
   </ifaces>
   <trigger edge="rising" raw="0" val="0" xpos="0" enabled="0"/>
-  <scale x="1134238" ymin="-3931" xmax="3931"/>
+  <scale x="1134238" ymin="-1697" xmax="18865"/>
   <numeric enabled="1"/>
   <grid width0="39" width1="42" width2="50" width3="50" width4="61" width5="85" width6="52" width7="63" width8="58" width9="40" width10="44" width11="51" width12="72" width13="60" width14="46"/>
   <vars>
@@ -16,6 +16,7 @@
     <var color="Cyan" filpos="0" fillen="2" filmask="0xffff" filval="0x550" varpos="8" varmask="0xffff" vartype="S16BE" varoffs="0" varscale="1" vartrig="" varname="gyro z" varxy="" source="CAN" visible="1"/>
     <var color="Cyan" filpos="0" fillen="2" filmask="0xffff" filval="0x650" varpos="4" varmask="0xffff" vartype="S16BE" varoffs="0" varscale="1" vartrig="" varname="acc x" varxy="" source="CAN" visible="1"/>
     <var color="Green" filpos="0" fillen="2" filmask="0xffff" filval="0x650" varpos="6" varmask="0xffff" vartype="S16BE" varoffs="0" varscale="1" vartrig="" varname="acc y" varxy="" source="CAN" visible="1"/>
+    <var color="Purple" filpos="0" fillen="2" filmask="0xffff" filval="0x650" varpos="8" varmask="0xffff" vartype="S16BE" varoffs="0" varscale="1" vartrig="" varname="acc z" varxy="" source="CAN" visible="1"/>
   </vars>
   <sendpanel slideval="1&#xA;"/>
   <ledpanel/>

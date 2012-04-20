@@ -659,8 +659,8 @@ static void ServiceAD7147Isr(unsigned char Channel)
 	    for (i=0;i<nets;i++)
 	    {
 		 //  ReadViaI2C(CH0,AD7147_ADD[i],STAGE_COMPLETE_LIMIT_INT, 1, stagecomplete0[0],stagecomplete1[0],stagecomplete2[0],stagecomplete3[0], 0);		
-		     WriteViaI2C(CH0,AD7147_ADD[i],AMB_COMP_CTRL0,1, ConfigBuffer, 0);
-
+//		     WriteViaI2C(CH0,AD7147_ADD[i],AMB_COMP_CTRL0,1, ConfigBuffer, 0);
+//
 	///DEBUG	      
 	  //        ConfigAD7147(CH0,i,PW_CONTROL,ConValue); //0 is the number of the device		 
 	    } 

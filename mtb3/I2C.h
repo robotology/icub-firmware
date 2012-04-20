@@ -2,7 +2,7 @@
 #define I2C_RD		0b1
 #define	ACK			0
 #define	NACK		1
-#define I2Cbit    2 //the duration of a bit 10 is about 100Khz, 1 is about 500KHz
+#define I2Cbit    1 //the duration of a bit 10 is about 100Khz, 1 is about 500KHz
 
 //-------------------------------------
 //Pin assignment for the I2C interface

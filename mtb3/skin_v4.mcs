@@ -11,9 +11,9 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall
+ToolArgsString=-g -Wall -O3
 TraceCmdString=
-DebugOptions=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File001]
 Location=F:\iCub\firmware\mtb3\can_protocol.o
 Folder=Intermediary
@@ -24,9 +24,9 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall
+ToolArgsString=-g -Wall -O3
 TraceCmdString=
-DebugOptions=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File002]
 Location=F:\iCub\firmware\mtb3\I2C.o
 Folder=Intermediary
@@ -37,9 +37,9 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall
+ToolArgsString=-g -Wall -O3
 TraceCmdString=
-DebugOptions=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File003]
 Location=F:\iCub\firmware\mtb3\LED.o
 Folder=Intermediary
@@ -50,9 +50,9 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall
+ToolArgsString=-g -Wall -O3
 TraceCmdString=
-DebugOptions=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File004]
 Location=F:\iCub\firmware\mtb3\main_V3.o
 Folder=Intermediary
@@ -63,9 +63,9 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall
+ToolArgsString=-g -Wall -O3
 TraceCmdString=
-DebugOptions=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File005]
 Location=F:\iCub\firmware\mtb3\traps.o
 Folder=Intermediary
@@ -76,9 +76,9 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall
+ToolArgsString=-g -Wall -O3
 TraceCmdString=
-DebugOptions=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File006]
 Location=F:\iCub\firmware\mtb3\AD7147 - Configuration.o
 Folder=Intermediary
@@ -89,9 +89,9 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall
+ToolArgsString=-g -Wall -O3
 TraceCmdString=
-DebugOptions=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File007]
 Location=F:\iCub\firmware\mtb3\eeprom.o
 Folder=Intermediary
@@ -102,9 +102,9 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall
+ToolArgsString=-g -Wall -O3
 TraceCmdString=
-DebugOptions=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File008]
 Location=F:\iCub\firmware\mtb3\timers.o
 Folder=Intermediary
@@ -115,9 +115,9 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall
+ToolArgsString=-g -Wall -O3
 TraceCmdString=
-DebugOptions=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File009]
 Location=F:\iCub\firmware\mtb3\ADC.o
 Folder=Intermediary
@@ -128,9 +128,9 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall
+ToolArgsString=-g -Wall -O3
 TraceCmdString=
-DebugOptions=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File010]
 Location=F:\iCub\firmware\mtb3\lis331dlh.o
 Folder=Intermediary
@@ -141,9 +141,9 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall
+ToolArgsString=-g -Wall -O3
 TraceCmdString=
-DebugOptions=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File011]
 Location=F:\iCub\firmware\mtb3\l3g4200d.o
 Folder=Intermediary
@@ -154,9 +154,9 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall
+ToolArgsString=-g -Wall -O3
 TraceCmdString=
-DebugOptions=
+DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File012]
 Location=F:\iCub\firmware\build\skin_v4.cof
 Folder=Output
@@ -169,7 +169,7 @@ SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 -
 SuiteArgsString=
 ToolArgsString=-Map="$(BINDIR_)$(TARGETBASE).map" --report-mem -o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)"
 TraceCmdString=
-DebugOptions=
+DebugOptions=--defsym=__MPLAB_DEBUG=1 --defsym=__MPLAB_DEBUGGER_ICD3=1 --defsym=__ICD2RAM=1
 [File013]
 Location=F:\iCub\firmware\build\skin_v4.hex
 Folder=Output
@@ -182,7 +182,7 @@ SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 -
 SuiteArgsString=
 ToolArgsString=-Map="$(BINDIR_)$(TARGETBASE).map" --report-mem -o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)"
 TraceCmdString=
-DebugOptions=
+DebugOptions=--defsym=__MPLAB_DEBUG=1 --defsym=__MPLAB_DEBUGGER_ICD3=1 --defsym=__ICD2RAM=1
 [TOOL_LOC_STAMPS]
 tool_loc{069BD372-6CA0-40D4-BF2F-5DC806D05083}=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.exe
 tool_loc{433C3D55-811D-409D-A6BF-159CF9355B42}=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-ld.exe
