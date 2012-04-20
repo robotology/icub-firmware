@@ -22,6 +22,8 @@ using namespace std;
 #include <ace/ACE.h>
 #include "ace/SOCK_Dgram.h"
 #include "ace/Addr.h"
+#include "ace/Thread.h"
+
 
 #include "main-transceiver.hpp"
 #include "hostTransceiver.hpp"
@@ -217,7 +219,11 @@ int main(int argc, char *argv[])
     ACE_UINT8		tmp = 1;
 
     // Start receiver thread
-    pthread_create(&thread, NULL, recvThread, (void*) &remote01);
+    //pthread_create(&thread, NULL, recvThread, (void*) &remote01);
+	ACE_thread_t t_id;
+    if(ACE_Thread::spawn((ACE_THR_FUNC)recvThread, NULL, THR_CANCEL_ENABLE, &t_id)==-1)
+    	ACE_DEBUG((LM_DEBUG,"Error in spawning thread\n"));
+
 
 	 // Send a packet to test dummy
 	 while(keepGoingOn)
@@ -266,7 +272,8 @@ int main(int argc, char *argv[])
 			}
 		}
 
-    pthread_cancel(thread);
+    //pthread_cancel(thread);
+	 ACE_Thread::cancel(t_id);
     return(0);
 }
 
@@ -311,7 +318,7 @@ void *recvThread(void * arg)
 		  printf("Sent EmbObj packet, size = %d\n", udppkt_size);
 	  }
   }
-  pthread_exit(NULL);
+  //pthread_exit(NULL);
   return NULL;
 }
 

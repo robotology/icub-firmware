@@ -17,6 +17,8 @@ set(EXTRA_FOLDER  	${CMAKE_CURRENT_SOURCE_DIR}/)
 include($ENV{ICUB_ROOT}/main/src/libraries/icubmod/embObjLib/embObjLib.conf)
 find_package(YARP)
 include_directories(${YARP_INCLUDE_DIRS})
+find_package(ACE)
+include_directories(${ACE_INCLUDE_DIRS})
 
 # Debug messages
 # message(INFO " BASE=${BASE}")
