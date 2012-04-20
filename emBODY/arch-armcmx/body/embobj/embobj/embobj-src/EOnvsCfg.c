@@ -267,6 +267,7 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
     uint8_t nvars;
     eOvoid_fp_voidp_voidp_t initialise = NULL;
     EOnv tmpnv;
+    EOnv_con_t* tmpnvcon = NULL;
 
  	if(NULL == p) 
 	{
@@ -316,20 +317,32 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
             for(k=0; k<nvars; k++)
             {
                 treenode = (EOtreenode*) eo_constvector_At((*theendpoint)->thetreeofnvs_con, k);
-
-                tmpnv.con = (EOnv_con_t*) eo_treenode_GetData(treenode);
-                tmpnv.usr = (EOnv_usr_t*) eo_constvector_At((*theendpoint)->thenvs_usr, k);
-                tmpnv.loc = (void*) ((uint32_t)((*theendpoint)->thenvs_vol) + tmpnv.con->offset);
-                if(eo_nvscfg_ownership_remote == (*thedev)->ownership)
-                {
-                    tmpnv.rem = (void*) ((uint32_t)((*theendpoint)->thenvs_rem) + tmpnv.con->offset);   
-                }
-                else
-                {
-                    tmpnv.rem = NULL;
-                }
-                tmpnv.mtx = (*theendpoint)->mtx_endpoint;
-                tmpnv.stg = p->storage;
+                tmpnvcon = (EOnv_con_t*) eo_treenode_GetData(treenode);
+                
+                eo_nv_hid_Load(     &tmpnv,
+                                    (*theendpoint)->endpoint,
+                                    tmpnvcon,
+                                    (EOnv_usr_t*) eo_constvector_At((*theendpoint)->thenvs_usr, k),
+                                    (void*) ((uint32_t)((*theendpoint)->thenvs_vol) + tmpnvcon->offset),
+                                    (eo_nvscfg_ownership_remote == (*thedev)->ownership) ? ((void*) ((uint32_t)((*theendpoint)->thenvs_rem) + tmpnvcon->offset)) : (NULL),
+                                    (*theendpoint)->mtx_endpoint,
+                                    p->storage
+                              );
+                
+//                 tmpnv.ep  = (*theendpoint)->endpoint;
+//                 tmpnv.con = (EOnv_con_t*) eo_treenode_GetData(treenode);
+//                 tmpnv.usr = (EOnv_usr_t*) eo_constvector_At((*theendpoint)->thenvs_usr, k);
+//                 tmpnv.loc = (void*) ((uint32_t)((*theendpoint)->thenvs_vol) + tmpnv.con->offset);
+//                 if(eo_nvscfg_ownership_remote == (*thedev)->ownership)
+//                 {
+//                     tmpnv.rem = (void*) ((uint32_t)((*theendpoint)->thenvs_rem) + tmpnv.con->offset);   
+//                 }
+//                 else
+//                 {
+//                     tmpnv.rem = NULL;
+//                 }
+//                 tmpnv.mtx = (*theendpoint)->mtx_endpoint;
+//                 tmpnv.stg = p->storage;
 
 #if defined(EO_NVSCFG_INIT_EVERY_NV)
                 eo_nv_Init(&tmpnv); 
@@ -481,6 +494,7 @@ extern EOnv* eo_nvscfg_GetNV(EOnvsCfg* p, uint8_t ondevindex, uint8_t onendpoint
     EOnvsCfg_device_t** thedev = NULL;
     EOnvsCfg_ep_t **theendpoint = NULL;
     uint16_t k = 0;
+    EOnv_con_t* tmpnvcon = NULL;
  
     if((NULL == p) || (NULL == nvtarget)) 
 	{
@@ -509,22 +523,35 @@ extern EOnv* eo_nvscfg_GetNV(EOnvsCfg* p, uint8_t ondevindex, uint8_t onendpoint
 
     k = onidindex; // or eo_treenode_GetIndex(treenode);
     nv = nvtarget;
+    
+    tmpnvcon = (EOnv_con_t*) eo_treenode_GetData(treenode);
+    
+    eo_nv_hid_Load(     nv,
+                        (*theendpoint)->endpoint,
+                        tmpnvcon,
+                        (EOnv_usr_t*) eo_constvector_At((*theendpoint)->thenvs_usr, k),
+                        (void*) ((uint32_t)((*theendpoint)->thenvs_vol) + tmpnvcon->offset),
+                        (eo_nvscfg_ownership_remote == (*thedev)->ownership) ? ((void*) ((uint32_t)((*theendpoint)->thenvs_rem) + tmpnvcon->offset)) : (NULL),
+                        (*theendpoint)->mtx_endpoint,
+                        p->storage
+                  );    
 
-    nv->con = (EOnv_con_t*) eo_treenode_GetData(treenode);
-    nv->usr = (EOnv_usr_t*) eo_constvector_At((*theendpoint)->thenvs_usr, k);
-    nv->loc = (void*) ((uint32_t)((*theendpoint)->thenvs_vol) + nv->con->offset);
+//    nv->ep  = (*theendpoint)->endpoint;
+//    nv->con = (EOnv_con_t*) eo_treenode_GetData(treenode);
+//    nv->usr = (EOnv_usr_t*) eo_constvector_At((*theendpoint)->thenvs_usr, k);
+//    nv->loc = (void*) ((uint32_t)((*theendpoint)->thenvs_vol) + nv->con->offset);
+//
+//     if(eo_nvscfg_ownership_remote == (*thedev)->ownership)
+//     {
+//         nv->rem = (void*) ((uint32_t)((*theendpoint)->thenvs_rem) + nv->con->offset);   
+//     }
+//     else
+//     {
+//         nv->rem = NULL;
+//     }
 
-    if(eo_nvscfg_ownership_remote == (*thedev)->ownership)
-    {
-        nv->rem = (void*) ((uint32_t)((*theendpoint)->thenvs_rem) + nv->con->offset);   
-    }
-    else
-    {
-        nv->rem = NULL;
-    }
-
-    nv->mtx = (*theendpoint)->mtx_endpoint;
-    nv->stg = p->storage;
+//     nv->mtx = (*theendpoint)->mtx_endpoint;
+//     nv->stg = p->storage;
 
 
     return(nv);

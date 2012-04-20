@@ -433,6 +433,18 @@ extern eOnvType_t eo_nv_GetTYP(const EOnv *netvar)
 // --------------------------------------------------------------------------------------------------------------------
 
 
+extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOnvEP_t ep, EOnv_con_t* con, EOnv_usr_t* usr, void* loc, void* rem, EOVmutexDerived* mtx, EOVstorageDerived* stg)
+{ 
+    nv->ep  = ep;
+    nv->con = con;
+    nv->usr = usr;
+    nv->loc = loc;
+    nv->rem = rem;   
+    nv->mtx = mtx;
+    nv->stg = stg;
+           
+    return(eores_OK);
+}
 
 
 extern eObool_t eo_nv_hid_OnBefore_ROP(const EOnv *nv, eOropcode_t ropcode, eOabstime_t roptime, uint32_t ropsign)
