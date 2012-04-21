@@ -281,7 +281,7 @@ extern const eOmc_motor_t* eo_cfg_nvsEP_mc_leg_motor_defaultvalue = &eo_cfg_nvsE
 
 #warning --> cambiare sintassi 0+J00p in Jindex(0, 0)
 
-extern EOtreenode eo_cfg_nvsEP_mc_leg_tree_con[EOK_cfg_nvsEP_leg_NUMofVARS] =
+extern EOtreenode eo_cfg_nvsEP_mc_leg_tree_con[] =
 {
     // joint00
     {   // 0
@@ -1214,7 +1214,7 @@ extern EOtreenode eo_cfg_nvsEP_mc_leg_tree_con[EOK_cfg_nvsEP_leg_NUMofVARS] =
         EO_INIT(.pchildren) {NULL}
     }         
     
-};
+};  EO_VERIFYsizeof(eo_cfg_nvsEP_mc_leg_tree_con, sizeof(EOtreenode)*(EOK_cfg_nvsEP_leg_NUMofVARS));
 
 
 
@@ -1310,7 +1310,7 @@ extern uint16_t eo_cfg_nvsEP_mc_leg_hashfunction_id2index(uint16_t id)
         // m04
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig(4), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__pidcurrent(4), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__maxvelocityofmotor(4),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__maxcurrentofmotor(4), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__upto02descrforchameleon06(4), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx__mstatus(4), 
-       // m05
+        // m05
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig(5), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__pidcurrent(5), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__maxvelocityofmotor(5),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__maxcurrentofmotor(5), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__upto02descrforchameleon06(5), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx__mstatus(5) 
                                         
@@ -1377,12 +1377,12 @@ static uint16_t s_hash(uint16_t id)
 
 extern eOnvID_t eo_cfg_nvsEP_mc_leg_NVID_for_joint_var_Get(eo_cfg_nvsEP_mc_leg_con_jointNumber_t j, eo_cfg_nvsEP_mc_leg_con_jointNVindex_t jnvindex)
 {
-    return(eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_joint_var_Get(j, jnvindex));
+    return(eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_joint_var_Get((eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t)j, (eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t)jnvindex));
 }
 
 extern eOnvID_t eo_cfg_nvsEP_mc_leg_NVID_for_motor_var_Get(eo_cfg_nvsEP_mc_leg_con_motorNumber_t m, eo_cfg_nvsEP_mc_leg_con_motorNVindex_t mnvindex)
 {
-    return(eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get(m, mnvindex));
+    return(eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get((eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t)m, (eo_cfg_nvsEP_mc_any_con_bodypart_motorNVindex_t)mnvindex));
 }
 
 

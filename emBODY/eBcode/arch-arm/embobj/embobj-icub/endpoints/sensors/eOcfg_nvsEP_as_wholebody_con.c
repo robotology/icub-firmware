@@ -66,7 +66,23 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+
+
+EO_VERIFYproposition(xxx, strainNVindex__txmode                       == EOK_cfg_nvsEP_as_any_con_sxx_snvindex__txmode);
+EO_VERIFYproposition(xxx, strainNVindex__datarate                     == EOK_cfg_nvsEP_as_any_con_sxx_snvindex__datarate);
+EO_VERIFYproposition(xxx, strainNVindex__signaloncefullscale          == EOK_cfg_nvsEP_as_any_con_sxx_snvindex__signaloncefullscale);
+EO_VERIFYproposition(xxx, strainNVindex__values                       == EOK_cfg_nvsEP_as_any_con_sxx_snvindex__values);
+
+EO_VERIFYproposition(xxx, strainNVindex_TOTALnumber                   == EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber);
+
+
+EO_VERIFYproposition(xxx, maisNVindex__txmode                       == EOK_cfg_nvsEP_as_any_con_mxx_mnvindex__txmode);
+EO_VERIFYproposition(xxx, maisNVindex__datarate                     == EOK_cfg_nvsEP_as_any_con_mxx_mnvindex__datarate);
+EO_VERIFYproposition(xxx, maisNVindex__resolutionmode               == EOK_cfg_nvsEP_as_any_con_mxx_mnvindex__resolutionmode);
+EO_VERIFYproposition(xxx, maisNVindex__values                       == EOK_cfg_nvsEP_as_any_con_mxx_mnvindex__values);
+
+EO_VERIFYproposition(xxx, maisNVindex_TOTALnumber                   == EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -188,7 +204,7 @@ static uint16_t s_hash(uint16_t id);
 
 //extern EOtreenode eo_cfg_nvsEP_as_wholebody_tree_con[];
 
-extern EOtreenode eo_cfg_nvsEP_as_wholebody_tree_con[varsASwholebody_TOTALnumber] =
+extern EOtreenode eo_cfg_nvsEP_as_wholebody_tree_con[] =
 {
     // strainLeftArm_00
     {   // 0
@@ -372,7 +388,7 @@ extern EOtreenode eo_cfg_nvsEP_as_wholebody_tree_con[varsASwholebody_TOTALnumber
         EO_INIT(.pchildren) {NULL}
     }         
     
-};
+};  EO_VERIFYsizeof(eo_cfg_nvsEP_as_wholebody_tree_con, sizeof(EOtreenode)*(varsASwholebody_TOTALnumber));
 
 
 
@@ -400,10 +416,12 @@ extern uint16_t eo_cfg_nvsEP_as_wholebody_hashfunction_id2index(uint16_t id)
 {
 
     // 4*4
-    #define IDTABLESSIZE     (EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber*strain_TOTALnumber)
+    #define IDTABLESSIZE        (EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber*strain_TOTALnumber)
     
     // 4*2
-    #define IDTABLEMSIZE     (EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber*mais_TOTALnumber)    
+    #define IDTABLEMSIZE        (EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber*mais_TOTALnumber)    
+    
+    #define IDTABLESIZE         (IDTABLESSIZE+IDTABLEMSIZE)
     
 
     // in order to always have a hit the table s_idtable[] it must be of size equal to max{ s_hash(id) }, thus if we
@@ -412,7 +430,7 @@ extern uint16_t eo_cfg_nvsEP_as_wholebody_hashfunction_id2index(uint16_t id)
     // then the table shall be of size 17, shall contain 0xffff everywhere but in positions 0, 7, 16 where the values
     // are ... 0, 7, 16
 
-    static const uint16_t s_idtable[IDTABLESSIZE+IDTABLEMSIZE] = 
+    static const uint16_t s_idtable[] = 
     { 
         // s00
         EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx__txmode(0),              EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx__datarate(0),
@@ -433,12 +451,12 @@ extern uint16_t eo_cfg_nvsEP_as_wholebody_hashfunction_id2index(uint16_t id)
         // m01
         EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx__txmode(1),              EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx__datarate(1),
         EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx__resolutionmode(1),      EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx__values(1)      
-    };
+    };  EO_VERIFYsizeof(s_idtable, sizeof(uint16_t)*(IDTABLESIZE));
     
     uint16_t index = s_hash(id);
     
    
-    if((index < (IDTABLESSIZE+IDTABLEMSIZE)) && (id == s_idtable[index]) )
+    if((index < (IDTABLESIZE)) && (id == s_idtable[index]) )
     {
         return(index);
     }
@@ -498,13 +516,13 @@ extern eOnvEP_t eo_cfg_nvsEP_as_wholebody_EP_Get(void)
 }
 
 
-static const uint8_t s_eo_cfg_nvsEP_as_wholebody_sxxfuntyp[EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber] =
+static const uint8_t s_eo_cfg_nvsEP_as_wholebody_sxxfuntyp[] =
 {
     EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP__txmode,
     EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP__datarate,
     EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP__signaloncefullscale,
     EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP__values
-};
+};  EO_VERIFYsizeof(s_eo_cfg_nvsEP_as_wholebody_sxxfuntyp, EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber);
 
 
 static const uint8_t s_eo_cfg_nvsEP_as_wholebody_mxxfuntyp[EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber] =
@@ -513,7 +531,7 @@ static const uint8_t s_eo_cfg_nvsEP_as_wholebody_mxxfuntyp[EOK_cfg_nvsEP_as_any_
     EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP__datarate,
     EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP__resolutionmode,
     EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP__values
-};
+};  EO_VERIFYsizeof(s_eo_cfg_nvsEP_as_wholebody_mxxfuntyp, EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber);
 
 
 extern eOnvID_t eo_cfg_nvsEP_as_wholebody_NVID_for_strain_var_Get(eo_cfg_nvsEP_as_wholebody_con_strainNumber_t s, eo_cfg_nvsEP_as_wholebody_con_strainNVindex_t snvindex)
