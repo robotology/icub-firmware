@@ -131,15 +131,19 @@ typedef struct
 
 extern EOemsCanNetTopo* eo_emsCanNetTopo_New(eo_emsCanNetTopo_cfg_t *cfg);
 
-extern eOresult_t eo_emsCanNetTopo_GetJointCanLocation_ByJointUniqueId(EOemsCanNetTopo *p, eOmc_jointUniqueId_t jUniqueId, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr);
+extern eOresult_t eo_emsCanNetTopo_GetJointCanLocation_ByJointUniqueId(EOemsCanNetTopo *p, eOmc_jointUniqueId_t jUniqueId, 
+                                                                        eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eObrd_types_t *boardType);
 
-extern eOresult_t eo_emsCanNetTopo_GetMotorCanLocation_ByMotorUniqueId(EOemsCanNetTopo *p, eOmc_motorUniqueId_t mUniqueId, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr);
+extern eOresult_t eo_emsCanNetTopo_GetMotorCanLocation_ByMotorUniqueId(EOemsCanNetTopo *p, eOmc_motorUniqueId_t mUniqueId, 
+                                                                        eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eObrd_types_t *boardType);
 
 
 extern eOresult_t eo_emsCanNetTopo_GetJointUinqueId_ByJointCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eOmc_jointUniqueId_t *jUniqueId_ptr);
 
 extern eOresult_t eo_emsCanNetTopo_GetMotorUinqueId_ByMotorCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eOmc_motorUniqueId_t *mUniqueId_ptr);
 
+
+/*VALE: aggiungi funzione che dato joint id ritorna il tipo di board che lo gestisce! idem per il kotor. puo' venire utile??*/
 
 // - doxy end ---------------------------------------------------------------------------------------------------------
 
