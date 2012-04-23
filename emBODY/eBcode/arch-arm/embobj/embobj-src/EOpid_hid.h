@@ -34,6 +34,7 @@
  
 struct EOpid_hid 
 {
+    float Ko;
     float A0;
     float A1;
     float A2;

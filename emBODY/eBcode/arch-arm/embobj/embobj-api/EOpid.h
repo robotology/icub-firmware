@@ -58,20 +58,20 @@ extern EOpid* eo_pid_New(void);
     @param      Kp    The proportional gain.         
     @param      Kd    The derivative gain.
     @param      Ki    The integrative gain.
+    @param      Ko    The constant offset.
     @param      Ymax  The output maximum value.
  **/
-extern void eo_pid_Init(EOpid *o, float Kp, float Kd, float Ki, float Ymax);
+extern void eo_pid_Init(EOpid *o, float Kp, float Kd, float Ki, float Ko, float Ymax);
+extern uint8_t eo_pid_IsInitialized(EOpid *o);
+extern void eo_pid_Reset(EOpid *o);
 
-
-/** @fn         extern float eo_pid_Step(EOpid *o)
+/** @fn         extern float eo_pid_PWM(EOpid *o, float En)
     @brief      Executes a PID control step.
     @param      o  The pointer to the pid object.
     @param      En The error between measure and setpoint.
     @return     The actual PWM output value.
  **/
-extern float eo_pid_Step(EOpid *o, float En);
-
-extern uint8_t eo_pid_IsInitialized(EOpid *o);
+extern float eo_pid_PWM(EOpid *o, float En);
 
 /** @}            
     end of group eo_pid  
