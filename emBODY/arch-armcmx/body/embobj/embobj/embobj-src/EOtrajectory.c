@@ -64,7 +64,7 @@
 
 static const char s_eobj_ownname[] = "EOtrajectory";
 
-static const float PERIOD = 0.001f;          // 1 ms
+static const float PERIOD    = 0.001f;       // 1 ms
 static const float FREQUENCY = 1.0f/PERIOD;  // 1 kHz
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -100,7 +100,7 @@ extern EOtrajectory* eo_trajectory_New(void)
     return o;
 }
 
-extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, float v0, float speed /*float tf*/)
+extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, float v0, float avg_speed /*float tf*/)
 {
     float pf_p0;
     float tf;
@@ -109,7 +109,7 @@ extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, floa
     float D2;
     float K5D2;
     
-    if (speed == 0.0f)
+    if (avg_speed == 0.0f)
     {
         eo_trajectory_Abort(o);
 
@@ -118,7 +118,7 @@ extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, floa
     
     pf_p0 = pf - p0;
 
-    tf = pf_p0/speed;
+    tf = pf_p0/avg_speed;
     
     if (tf < 0.0f) tf = -tf; 
 
@@ -172,14 +172,14 @@ extern void eo_trajectory_Abort(EOtrajectory *o)
     o->pf = o->pi;
 }
 
-extern float eo_trajectory_GetSpeed(EOtrajectory *o)
-{
-    return o->delta*FREQUENCY;
-}
-
 extern float eo_trajectory_GetPos(EOtrajectory *o)
 {
     return o->pi;
+}
+
+extern float eo_trajectory_GetVel(EOtrajectory *o)
+{
+    return o->delta*FREQUENCY;
 }
 
 extern float eo_trajectory_Step(EOtrajectory *o)
