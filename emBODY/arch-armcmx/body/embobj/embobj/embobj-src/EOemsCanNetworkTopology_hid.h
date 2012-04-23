@@ -65,8 +65,9 @@
 //} eo_emsCanNetTopo_sensorTopoInfo_t;
 
 
-
-
+/*NOTE: the information is rendundant: 
+    - id identifies the position inside vector that describes CAN network topology of this board
+    ptr: is the pointer to the element of vector that describes CAN network topology of this board*/
 typedef struct
 {
     uint32_t id;
@@ -82,8 +83,6 @@ typedef struct
 struct EOemsCanNetTopo_hid 
 {
     eo_emsCanNetTopo_cfg_t cfg;
-//    uint8_t motorBoardHashTbl[eo_emsCanNetTopo_canports_num][0xF];
-//    uint8_t sensorBoardHashTbl[eo_emsCanNetTopo_canports_num][0xF];
 
     eo_emsCanNetTopo_hashTbl_item_t joint_Id2CanLoc_hTbl[MAX_NUM_JOINT_FOR_BODY_PART];
     eo_emsCanNetTopo_hashTbl_item_t motor_Id2CanLoc_hTbl[MAX_NUM_MOTOR_FOR_BODY_PART];
