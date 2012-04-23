@@ -110,7 +110,7 @@ extern eOresult_t eo_icubCanProto_parser_test(EOicubCanProto* p, eOcanframe_t *f
     eOmc_motor_config_t  mc;
      
     eo_icubCanProto_canBoardAddress_t boardAddr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
-DEBUG_PIN4_OFF;
+//DEBUG_PIN4_OFF;
 
 //      res = eo_emsCanNetTopo_GetMotorBoardNV_Status_ByCanLocation(p->emsCanNetTopo_ptr, canPort, boardAddr,
 //                                                       eo_icubCanProto_mAxis_0, &nvt_ptr);
@@ -148,7 +148,7 @@ DEBUG_PIN4_OFF;
 //    memcpy(&jc1, memRef1, sizeof(eOmc_joint_config_t));  memref1 uset for test
 
     memcpy(&jc2, memRef2, sizeof(eOmc_joint_config_t));
-DEBUG_PIN3_OFF;
+//DEBUG_PIN3_OFF;
 
 //pidPos
     res = eo_appTheMCNVmap_GetJointNVMemoryRef_test(eo_appTheMCNVmap_GetHandle(), jUniqueId, jointNVindex_jconfig__pidposition, &memRef1);
@@ -194,7 +194,7 @@ DEBUG_PIN3_OFF;
     }
     memcpy(&mc, memRef1, sizeof(eOmc_motor_config_t));
 
-DEBUG_PIN3_OFF;
+//DEBUG_PIN3_OFF;
 //    nvJoint_ptr->axis.position = frame->data[1];
 //    nvJoint_ptr->axis.velocity = frame->data[2]; 
     return(eores_OK);

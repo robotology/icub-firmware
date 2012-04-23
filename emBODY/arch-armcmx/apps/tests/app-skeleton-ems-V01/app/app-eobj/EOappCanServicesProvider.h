@@ -56,18 +56,64 @@ typedef struct
 // empty-section
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
+
+
+/** @fn         EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg)
+    @brief      Create a new application CAN Services Provider.
+                Creating this obj entails in creations of other obj used by EOappCanSP to provides CAN services 
+    @param      cfg        configuration for the obj. (currently is not used)
+    @return     NULL in case of errors (for example CAN peripheral's error) or pointer to EOappCanSP on successfully 
+ **/
 extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg);
 
+
+
+/** @fn         eOresult_t eo_appCanSP_GetConnectedJoints(EOappCanSP *p, EOfifoByte *connectedJointsList)
+    @brief      fill @e connectedJointsList with joint unique id connected to ems
+    @param      p                       target obj
+    @param      connectedJointsList     in output contains a list of joint unique id connected to ems 
+    @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
+ **/
 extern eOresult_t eo_appCanSP_GetConnectedJoints(EOappCanSP *p, EOfifoByte *connectedJointsList); 
 
-extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorUniqueId_t mUniqueId, eOmc_motor_config_t *cfg);
+
+/** @fn         extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointUniqueId_t jUniqueId, eOmc_joint_config_t *cfg)
+    @brief      sends can messages to can board to configure one of its joint 
+    @param      p                       target obj
+    @param      jUniqueId               identifies the joint to config.
+    @param      cfg                     joint's configuration 
+    @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
+ **/
 extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointUniqueId_t jUniqueId, eOmc_joint_config_t *cfg);
+
+
+
+/** @fn         extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointUniqueId_t jUniqueId, eOmc_joint_config_t *cfg)
+    @brief      sends can messages to can board to configure one of its motor 
+    @param      p                       target obj
+    @param      jUniqueId               identifies the motor to config.
+    @param      cfg                     motor's configuration 
+    @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
+ **/
+extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorUniqueId_t mUniqueId, eOmc_motor_config_t *cfg);
+
+
+/** @fn         extern eOresult_t eo_appCanSP_SendSetPoint(EOappCanSP *p, eOmc_jointUniqueId_t jUniqueId, eOmc_setpoint_t *setPoint)
+    @brief      sends set point to joint. (this joint is managed by a CAN board)
+    @param      p                       target obj
+    @param      jUniqueId               identifies the joint.
+    @param      cfg                     motor's configuration 
+    @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
+ **/
+extern eOresult_t eo_appCanSP_SendSetPoint(EOappCanSP *p, eOmc_jointUniqueId_t jUniqueId, eOmc_setpoint_t *setPoint);
+
+
+
+extern eOresult_t eo_appCanSP_read(EOappCanSP *p); //test porpouse
 
 //extern eOresult_t eo_appCanSP_ConfigJoint_4IndipendentBoard(EOappCanSP *p, eOmc_jointUniqueId_t jUniqueId, eOmc_joint_config_t *cfg);
 //extern eOresult_t eo_appCanSP_ConfigJoint_4SlaveBoard(EOappCanSP *p, eOmc_jointUniqueId_t jUniqueId, eOmc_joint_config_t *cfg);
-extern eOresult_t eo_appCanSP_SendSetPoint(EOappCanSP *p, eOmc_jointUniqueId_t jUniqueId, eOmc_setpoint_t *setPoint);
 
-extern eOresult_t eo_appCanSP_read(EOappCanSP *p); //test porpouse
 
 /** @}            
     end of group eo_app_canServicesProvider

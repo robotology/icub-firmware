@@ -127,6 +127,11 @@ extern EOMappDataCollector* eom_appDataCollector_New(EOMappDataCollector_cfg_t *
     //copy configuration data
     memcpy(&(retptr->cfg), cfg, sizeof(EOMappDataCollector_cfg_t));
 
+    //create ethBase module in order to manage eth services.
+    retptr->eth_mod = eo_ethBaseModule_New(&eth_mod_cfg);
+
+
+
     retptr->mytask = eom_task_New(eom_mtask_EventDriven,
                               TASK_DATACOLLECTOR_PRIO ,
                               2*1024,           //stacksize: da rivedere
@@ -149,6 +154,7 @@ extern eOresult_t eom_appDataCollector_Activate(EOMappDataCollector *p)
         return(eores_NOK_nullpointer);
     }
 
+    eo_ethBaseModule_Activate(p->eth_mod);
     p->st = eOm_appDataCollector_st__active;
 
      return(eores_OK);
@@ -161,7 +167,7 @@ extern eOresult_t eom_appDataCollector_Deactivate(EOMappDataCollector *p)
     {
         return(eores_NOK_nullpointer);
     }
-
+    eo_ethBaseModule_Deactivate(p->eth_mod);
     p->st = eOm_appDataCollector_st__idle;
 
      return(eores_OK);
@@ -228,7 +234,10 @@ static void s_eom_appDataCollector_taskStartup(EOMtask *tsk, uint32_t t)
 
 static void s_eom_appDataCollector_taskRun(EOMtask *tsk, uint32_t evtmsgper)
 {
-
+    EOpacket *pkt_ptr;
+    uint16_t numberofrops;
+    eOabstime_t txtime;
+    eOresult_t res;
     EOMappDataCollector *p = (EOMappDataCollector*)eom_task_GetExternalData(tsk);
 
     eOevent_t evt = (eOevent_t)evtmsgper;   
@@ -240,11 +249,13 @@ static void s_eom_appDataCollector_taskRun(EOMtask *tsk, uint32_t evtmsgper)
 
         /* 1) start encoder reading */
          eo_appEncReader_startRead(p->cfg.encReader_ptr);
-
-#ifdef _USE_TRANSCEIVER_ 
+ 
         /* 2) process received eth packet*/
-        eo_transceiver_Receive(eo_boardtransceiver_GetHandle(), rxpkt, &numofrops_ems00_rx, &txtime);
-#endif
+        res = eo_ethBaseModule_GetPacket(p->eth_mod, &pkt_ptr);
+        if(eores_OK == res)
+        {
+            eo_transceiver_Receive(eo_boardtransceiver_GetHandle(), pkt_ptr, &numberofrops, &txtime);
+        }
 
         /* 3) process received can frame */
         eo_appCanSP_read(p->cfg.canSP_ptr);

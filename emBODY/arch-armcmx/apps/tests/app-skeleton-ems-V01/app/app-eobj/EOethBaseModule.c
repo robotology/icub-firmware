@@ -255,6 +255,35 @@ extern eOresult_t eo_ethBaseModule_Transmit(EOethBaseModule *p, uint8_t *payload
 }
 
 
+extern eOresult_t eo_ethBaseModule_GetPacket(EOethBaseModule *p, EOpacket **pkt)
+{
+    eOresult_t res = eores_OK;
+    
+    if((NULL == p) || (NULL == pkt))
+    {
+        return(eores_NOK_nullpointer);    
+    }
+        
+    eo_packet_Full_Clear(p->rxpkt, 0); //clear the packet
+
+    /*the third param is ignored, because the socket is not blocking*/
+    res = eo_socketdtg_Get(p->socket, p->rxpkt, eok_reltimeZERO );
+    //NOTE: the only reason I get error is caused by socket's fifo is emmpty
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    *pkt = p->rxpkt;
+        
+    if((0 == p->remaddr) || (0 == p->remport))
+    {
+        eo_packet_Destination_Get(p->rxpkt, &(p->remaddr), &(p->remport));
+        eo_socketdtg_Connect(p->socket, p->remaddr, EOK_reltimeZERO); //arp force
+    }
+
+    return(res); 
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

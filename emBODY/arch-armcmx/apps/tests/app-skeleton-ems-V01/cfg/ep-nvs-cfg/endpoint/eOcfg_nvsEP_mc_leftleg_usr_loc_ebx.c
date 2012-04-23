@@ -40,7 +40,9 @@
 #include "eOcfg_nvsEP_mc_any_con_jxxdefault.h"
 #include "eOcfg_nvsEP_mc_any_con_mxxdefault.h"
 
-
+//application
+#include "eom_appSkeletonEms_body.h"
+#include "EOappCanServicesProvider.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -955,7 +957,9 @@ static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_INIT_Jxx__controlmode(u
 // jxx-updt: all the nvs
 static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_UPDT_Jxx_jconfig(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-    
+    eOmc_joint_config_t *cfg = (eOmc_joint_config_t*)nv->loc;
+    EOappCanSP *appCanSP_ptr = (EOappCanSP*)eom_appSkeletonEms_body_services_can_getHandle();
+    eo_appCanSP_ConfigJoint(appCanSP_ptr, (eOmc_jointUniqueId_t)n, cfg);
 }
 
 
@@ -1015,7 +1019,9 @@ static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_UPDT_Jxx__calibrator(ui
 
 static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_UPDT_Jxx__setpoint(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-    
+    eOmc_setpoint_t *setPoint = (eOmc_setpoint_t*)nv->loc;
+    EOappCanSP *appCanSP_ptr = (EOappCanSP*)eom_appSkeletonEms_body_services_can_getHandle();
+    eo_appCanSP_SendSetPoint(appCanSP_ptr, (eOmc_jointUniqueId_t)n, setPoint);
 }
 
 
@@ -1064,7 +1070,9 @@ static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_INIT_Mxx__mstatus(uint1
 // mxx-updt: all the nvs
 static void s_eo_cfg_nvsEP_mc_leftleg_usr_loc_ebx_action_UPDT_Mxx_mconfig(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-    
+    eOmc_motor_config_t *cfg = (eOmc_motor_config_t*)nv->loc;
+    EOappCanSP *appCanSP_ptr = (EOappCanSP*)eom_appSkeletonEms_body_services_can_getHandle();
+    eo_appCanSP_ConfigMotor(appCanSP_ptr, (eOmc_motorUniqueId_t)n, cfg);
 }
 
 

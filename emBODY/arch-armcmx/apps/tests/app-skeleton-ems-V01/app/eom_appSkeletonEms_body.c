@@ -256,8 +256,8 @@ static void s_eom_appSkeletonEms_body_theBoardTransceiver_init(void)
     {
         .vectorof_endpoint_cfg          = eo_cfg_EPs_vectorof_loc_board,
         .hashfunction_ep2index          = eo_cfg_nvsEP_loc_board_fptr_hashfunction_ep2index,
-        .remotehostipv4addr             = 0x01010106,
-        .remotehostipv4port             = 3333
+        .remotehostipv4addr             = 0x01010102,
+        .remotehostipv4port             = 3334
     };
     
     eo_boardtransceiver_Initialise(&boardtxrxcfg);
@@ -291,7 +291,7 @@ static void s_eom_appSkeletonEms_body_EncodersReader_init(void)
 static void s_eom_appSkeletonEms_body_MCNVmap_init(void)
 {
 
-    EOfifoByte *mList_ptr, *sList_ptr;
+    EOfifoByte *sList_ptr;
 
     eOappTheMCNVmap_cfg_t cfg =
     {

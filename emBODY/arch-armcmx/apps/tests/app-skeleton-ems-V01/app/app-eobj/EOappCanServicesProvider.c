@@ -43,8 +43,6 @@
 //embobj
 #include "EoCommon.h"
 #include "EOtheMemoryPool.h"
-#include "EOtheBOARDTransceiver_hid.h" //to get nvscfg
-#warning VALE --> mi serve EOtheBOARDTransceiver_hid.h  ???
 #include "EOfifoByte_hid.h"
 #include "EOconstvector_hid.h"
 
@@ -197,6 +195,7 @@ extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointUniqueId_t jU
 {
     eOresult_t res;
     eOcanframe_t canFrame;
+    eObrd_types_t boardType;
     eo_icubCanProto_msgDestination_t dest;
     eo_emsCanNetTopo_jointOrMotorCanLocation_t canLoc;
     eo_icubCanProto_msgCommand_t msgCmd = 
@@ -209,12 +208,18 @@ extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointUniqueId_t jU
     {
         return(eores_NOK_nullpointer);
     }
-    res = eo_emsCanNetTopo_GetJointCanLocation_ByJointUniqueId(p->emsCanNetTopo_ptr, jUniqueId, &canLoc);
-//    res = eo_emsCanNetTopo_GetCanLocation_ByJointUniqueId(p->emsCanNetTopo_ptr, jUniqueId, &canPort, &boardAddr, &axis);
+    res = eo_emsCanNetTopo_GetJointCanLocation_ByJointUniqueId(p->emsCanNetTopo_ptr, jUniqueId, &canLoc, &boardType);
     if(eores_OK != res)
     {
         return(res);
     }
+
+    //no joint to configure to 2foc (1foc for us :) )
+    if(eobrd_1foc == boardType)
+    {
+        return(eores_OK);
+    }
+
 
     //set destination of message (one for all msg)
     dest.axis = canLoc.axis;
@@ -233,8 +238,8 @@ extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointUniqueId_t jU
     {
         return(res);
     }
-#warning VALE --> completa l'invio della congig del goint co i pidparams!!!!!!
-    // 1) send pid position 
+
+
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_POS_PIDLIMITS;
 
     res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, (void*)&cfg->pidposition, &canFrame);
@@ -262,6 +267,7 @@ extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointUniqueId_t jU
     {
         return(res);
     }
+
 
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_VELOCITY_PIDLIMITS;
 
@@ -359,57 +365,7 @@ extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointUniqueId_t jU
 
 
 
-
-
-
-
-
-
-
-
-
-//    // 4) set max velocity   
-//    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_MAX_VELOCITY;
-//    res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, (void*)&cfg->maxvelocityofmotor, &canFrame);
-//    if(eores_OK != res)
-//    {
-//        return(res);
-//    }
-//    res = (eOresult_t)hal_can_put((hal_can_port_t)canLoc.emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now);
-//    if(eores_OK != res)
-//    {
-//        return(res);
-//    }
-//
-//    // 5) set current limit  
-//    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_LIMIT;
-//    res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, (void*)&cfg->maxcurrentofmotor, &canFrame);
-//    if(eores_OK != res)
-//    {
-//        return(res);
-//    }
-//    res = (eOresult_t)hal_can_put((hal_can_port_t)canLoc.emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now);
-//    if(eores_OK != res)
-//    {
-//        return(res);
-//    }
-
-    // 6) set bcast policy  ??? DOVE PRENDO L'INFO
-//    res = eo_icubCanProto_formCanFrame4MotorBoard(ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_LIMIT, (void*)&cfg->maxcurrentofmotor,
-//                                                  boardAddr, axis, &canFrame);
-//    if(eores_OK != res)
-//    {
-//        return(res);
-//    }
-//    res = (eOresult_t)hal_can_put((hal_can_port_t)canLoc.emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now);
-//    if(eores_OK != res)
-//    {
-//        return(res);
-//    }
-
-
-
-//    // 8) set speed etim shift    COSA METTO COME CAMPO DELL NVS???
+//    // 7) set speed etim shift    COSA METTO COME CAMPO DELL NVS???
 //    res = eo_icubCanProto_formCanFrame4MotorBoard(ICUBCANPROTO_POL_MB_CMD__SET_SPEED_ESTIM_SHIFT, (void*)&cfg->velocitysetpointtimeout,
 //                                                  boardAddr, axis, &canFrame);
 //    if(eores_OK != res)
@@ -423,7 +379,7 @@ extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointUniqueId_t jU
 //    }
 
 
-    // 9) set controller idle
+    // 8) set controller idle
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_IDLE;
     res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, NULL, &canFrame);
     if(eores_OK != res)
@@ -436,7 +392,7 @@ extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointUniqueId_t jU
         return(res);
     }
 
-    // 10) set pwm pad
+    // 9) set pwm pad
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__DISABLE_PWM_PAD;
     res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, NULL, &canFrame);
     if(eores_OK != res)
@@ -470,9 +426,7 @@ extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorUniqueId_t mU
         return(eores_NOK_nullpointer);
     }
 
-    res = eo_emsCanNetTopo_GetMotorCanLocation_ByMotorUniqueId(p->emsCanNetTopo_ptr, mUniqueId, &canLoc);
-
-    //res = eo_emsCanNetTopo_GetCanLocation_ByMotorUniqueId(p->emsCanNetTopo_ptr, mUniqueId, &canPort, &boardAddr, &axis);
+    res = eo_emsCanNetTopo_GetMotorCanLocation_ByMotorUniqueId(p->emsCanNetTopo_ptr, mUniqueId, &canLoc, NULL);
     if(eores_OK != res)
     {
         return(res);
@@ -561,7 +515,6 @@ extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorUniqueId_t mU
 //    {
 //        return(res);
 //    }
-
 
     return(eores_OK);
 }
@@ -658,8 +611,7 @@ extern eOresult_t eo_appCanSP_SendSetPoint(EOappCanSP *p, eOmc_jointUniqueId_t j
     {
         return(eores_NOK_nullpointer);
     }
-    res = eo_emsCanNetTopo_GetJointCanLocation_ByJointUniqueId(p->emsCanNetTopo_ptr, jUniqueId, &canLoc);
-    //res = eo_emsCanNetTopo_GetCanLocation_ByJointUniqueId(p->emsCanNetTopo_ptr, jUniqueId, &canPort, &boardAddr, &axis);
+    res = eo_emsCanNetTopo_GetJointCanLocation_ByJointUniqueId(p->emsCanNetTopo_ptr, jUniqueId, &canLoc, NULL);
     if(eores_OK != res)
     {
         return(res);
@@ -667,7 +619,6 @@ extern eOresult_t eo_appCanSP_SendSetPoint(EOappCanSP *p, eOmc_jointUniqueId_t j
 
     dest.axis = canLoc.axis;
     dest.canAddr = canLoc.canaddr;
-    #warning VALE--> usa direttamente canLocation
 
 
     switch( setPoint->type)

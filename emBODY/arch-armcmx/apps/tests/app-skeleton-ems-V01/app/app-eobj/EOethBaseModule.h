@@ -39,6 +39,7 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 #include "EoCommon.h"
 #include "EOaction.h"
+#include "EOpacket.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -106,11 +107,11 @@ extern eOresult_t eo_ethBaseModule_Deactivate(EOethBaseModule *p);
 
 
 /** @fn        extern eOresult_t eo_ethBaseModule_Receive(EOethBaseModule *p, uint8_t **payload_ptr, uint16_t *payloadsize)
-    @brief      gets the received packet. if the obj  had been configured with remote address equal to 0, 
-                       then it perform a connect on first received packet
-    @param      p                            reference to EOethBaseModule obj
+    @brief      gets the received packet and returns its payloads. if the obj  had been configured with remote address equal to 0, 
+                then it perform a connect on first received packet
+    @param      p                    reference to EOethBaseModule obj
     @param      payload_ptr          in output contains the pointer to recieved packet's payload.
-   @param      payloadsize            in output contains the size of to recieved packet
+   @param      payloadsize           in output contains the size of to recieved packet
     @return     The value eores_NOK_nullpointer if @e p or  @e payload_ptr or  @e payloadsize are NULL, eores_OK otherwise.
  **/
 extern eOresult_t eo_ethBaseModule_Receive(EOethBaseModule *p, uint8_t **payload_ptr, uint16_t *payloadsize);
@@ -124,6 +125,19 @@ extern eOresult_t eo_ethBaseModule_Receive(EOethBaseModule *p, uint8_t **payload
     @return     The value eores_NOK_nullpointer if @e p is NULL,  eores_NOK_generic if destination is not valid, eores_OK otherwise.
  **/
 extern eOresult_t eo_ethBaseModule_Transmit(EOethBaseModule *p, uint8_t *payload_ptr, uint16_t payloadsize);
+
+
+
+/** @fn        extern eOresult_t eo_ethBaseModule_GetPacket(EOethBaseModule *p, EOpacket **pkt)
+    @brief      gets the received packet. if the obj  had been configured with remote address equal to 0, 
+                       then it perform a connect on first received packet
+    @param      p                            reference to EOethBaseModule obj
+    @param      pkt          in output contains the pointer to recieved packet.
+    @return     The value eores_NOK_nullpointer if @e p or  @e payload_ptr or  @e payloadsize are NULL, eores_OK otherwise.
+ **/
+extern eOresult_t eo_ethBaseModule_GetPacket(EOethBaseModule *p, EOpacket **pkt);
+
+
 
 /** @}            
     end of group eo_ethBaseModule 

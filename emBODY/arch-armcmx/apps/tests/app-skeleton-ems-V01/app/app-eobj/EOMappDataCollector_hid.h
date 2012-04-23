@@ -13,10 +13,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 #include "EOMtask.h"
-#include "EOMfifoProdCons.h"
-#include "EOMdataContainer.h"
-#include "EOtimer.h"
-#include "EOaction.h"
+#include "EOethBaseModule.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -42,6 +39,7 @@ struct EOMappDataCollector_hid
     EOMappDataCollector_cfg_t           cfg;
     EOMtask                             *mytask;                /**< pointer to my task */
     eOm_appDataCollector_states_hid_t   st;
+    EOethBaseModule                     *eth_mod;               /**< pointer to eth module. thi obj manages eth services*/
 };
 
 
