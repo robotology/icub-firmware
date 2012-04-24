@@ -55,8 +55,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
+static float limit(float x, float min, float max);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -143,28 +143,36 @@ extern uint8_t eo_motorcontroller_SetRefPos(EOmotorcontroller *o, float pos_ref,
         o->control_mode = CM_POSITION;
     }
 
-    // TODO: check limits
-    o->pos_ref = pos_ref;
+    o->pos_ref = limit(pos_ref, o->pos_min, o->pos_max);
     o->vel_ref = avg_speed;
     o->acc_ref = 0.0f;
 
-    eo_trajectory_SetReference(o->trajectory, o->encpos_meas, pos_ref, o->vel, avg_speed);
+    eo_trajectory_SetReference(o->trajectory, o->encpos_meas, o->pos_ref, o->vel, o->vel_ref);
 
     return 1;
 }
 
 extern void eo_motorcontroller_SetRefVel(EOmotorcontroller *o, float vel_ref, float acc_ref)
 {
-    if (vel_ref < -o->vel_max) 
-        o->vel_ref = -o->vel_max;
-    else if (vel_ref > o->vel_max) 
-        o->vel_ref =  o->vel_max;
-    else 
-        o->vel_ref = vel_ref;
-        
-    if (o->acc_ref < 0.0f) o->acc_ref = -o->acc_ref;
+    if (o->control_mode == CM_IDLE || o->control_mode == CM_TORQUE || o->control_mode == CM_OPENLOOP /*|| !IS_DONE*/) return;
+
+    o->vel_timer = 0.0f;
+
+    o->vel_ref = limit(vel_ref, -o->vel_max, o->vel_max); 
+    o->acc_ref = acc_ref * ( acc_ref > 0.0f ? PERIOD:-PERIOD);
+    o->fake_pos_ref = 0.0f;
+    o->pos_ref = o->encpos_meas;
     
-    acc_ref *= PERIOD;  
+    if (o->control_mode == CM_POSITION || o->control_mode == CM_IMPEDANCE_POS) o->vel = 0.0f;
+    
+    if (o->control_mode == CM_IMPEDANCE_POS || o->control_mode == CM_IMPEDANCE_VEL)
+    { 
+        o->control_mode = CM_IMPEDANCE_VEL;
+    }
+    else
+    {
+        o->control_mode = CM_VELOCITY;
+    }
 }
 
 extern float eo_motorcontroller_PWM(EOmotorcontroller *o)
@@ -194,7 +202,15 @@ extern float eo_motorcontroller_PWM(EOmotorcontroller *o)
 
             o->fake_pos_ref += o->vel*PERIOD;
 
-            o->pos_ref = eo_trajectory_Step(o->trajectory) + o->fake_pos_ref;   
+            o->pos_ref = eo_trajectory_Step(o->trajectory) + o->fake_pos_ref;
+            
+            o->vel_timer += PERIOD;
+            
+            if (o->vel_timer >= o->vel_timeout)
+            {
+                o->vel_timer = 0.0f;
+                o->control_mode = CM_POSITION;
+            }   
 
             return eo_pid_PWM(o->pidP, o->pos_ref - o->encpos_meas);
         }         
@@ -224,8 +240,13 @@ extern float eo_motorcontroller_PWM(EOmotorcontroller *o)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
+static float limit(float x, float min, float max)
+{
+    if (x < min) return min;
+    if (x > max) return max;
+    return x;    
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

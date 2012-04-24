@@ -48,10 +48,15 @@ struct EOmotorcontroller_hid
     float vel;
     float vel_max;
     float fake_pos_ref;
+    float vel_timer;
+    float vel_timeout;
 
     float pos_ref;
     float vel_ref;
     float acc_ref;
+
+    float pos_min;
+    float pos_max;
 
     float torque_ref;
     
