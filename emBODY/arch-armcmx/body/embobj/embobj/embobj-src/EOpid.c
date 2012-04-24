@@ -82,7 +82,7 @@ extern EOpid* eo_pid_New(void)
         o->Yn = 0.0f;
         o->Ymax = 0.0f;
         o->En_1 = 0.0f;
-        o->En_2 = 0.0f;
+        o->Dn   = 0.0f;
 
         o->initialized = 0;
     }
@@ -92,18 +92,20 @@ extern EOpid* eo_pid_New(void)
 
 extern void eo_pid_Init(EOpid *o, float Kp, float Kd, float Ki, float Ko, float Ymax)
 {
-    o->Yn = o->Ko = Ko;
     //o->A0 =  Kp + Kd + Ki;
     //o->A1 = -Kp - 2.0f*Kd;
     //o->A2 =  Kd;
-    
+        
     o->A2 = -0.1f*Kd;
     o->A1 = -Kp + o->A2;
     o->A0 =  Kp + Ki - o->A2;
-    
+
     o->Ymax = Ymax;
 
-    o->En_1 = o->En_2 = 0.0f;
+    o->Yn = o->Ko = Ko;
+
+    o->En_1 = 0.0f;
+    o->Dn   = 0.0f;
 
     o->initialized = 1;
 }
@@ -115,8 +117,9 @@ extern uint8_t eo_pid_IsInitialized(EOpid *o)
 
 extern void eo_pid_Reset(EOpid *o)
 {
-    o->Yn = o->Ko;
-    o->En_1 = o->En_2 = 0.0f; 
+    o->Yn   = o->Ko;
+    o->En_1 = 0.0f; 
+    o->Dn   = 0.0f; 
 }
 
 /*
@@ -135,9 +138,9 @@ extern float eo_pid_PWM(EOpid *o, float En)
 */
 
 extern float eo_pid_PWM(EOpid *o, float En)
-{
-    o->Yn += o->A0 * En + o->A1 * o->En_1 + o->A2 * o->En_2;
-    o->En_2 = 0.9f*o->En_2 + 0.1f*(En - o->En_1);
+{   
+    o->Yn += o->A0 * En + o->A1 * o->En_1 + o->A2 * o->Dn;
+    o->Dn = 0.9f*o->Dn + 0.1f*(En - o->En_1);
     o->En_1 = En;
     
     if (o->Yn >  o->Ymax) return o->Yn =  o->Ymax;
