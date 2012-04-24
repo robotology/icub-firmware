@@ -41,7 +41,7 @@ struct EOpid_hid
     float Yn;
     float Ymax;
     float En_1;
-    float En_2;
+    float Dn;
 
     uint8_t initialized;
 }; 

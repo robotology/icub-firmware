@@ -130,9 +130,29 @@ extern void eo_motorcontroller_ReadTorque(EOmotorcontroller *o, float torque_mea
     o->torque_meas = torque_meas;
 }
 
-extern void eo_motorcontroller_SetRefPos(EOmotorcontroller *o, float pos_ref, float avg_speed)
+extern uint8_t eo_motorcontroller_SetRefPos(EOmotorcontroller *o, float pos_ref, float avg_speed)
 {
+    if (o->control_mode == CM_IDLE || o->control_mode == CM_TORQUE  || o->control_mode == CM_OPENLOOP) return 0;
+
+    if (o->control_mode == CM_IMPEDANCE_POS || o->control_mode == CM_IMPEDANCE_VEL)
+    {
+        o->control_mode = CM_IMPEDANCE_POS;
+    }
+    else
+    {
+        o->control_mode = CM_POSITION;
+    }
+
+    // TODO: check limits
+    o->pos_ref = pos_ref;
+    o->vel_ref = avg_speed;
+    o->acc_ref = 0.0f;
+
+    eo_trajectory_SetReference(o->trajectory, o->encpos_meas, pos_ref, o->vel, avg_speed);
+
+    return 1;
 }
+
 extern void eo_motorcontroller_SetRefVel(EOmotorcontroller *o, float vel_ref, float acc_ref)
 {
     if (vel_ref < -o->vel_max) 
