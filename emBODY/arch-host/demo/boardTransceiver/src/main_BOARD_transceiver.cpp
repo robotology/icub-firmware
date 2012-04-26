@@ -58,9 +58,7 @@ extern "C" {
 static void s_callback_button_1(void);
 static void s_callback_button_2(void);
 static void s_callback_button_3(void);
-#ifdef _REMOTE_
-	static void s_callback_button_4(void);
-#endif
+static void s_callback_button_4(void);
 static void s_callback_button_5(void);
 
 static void s_eom_hostprotoc_extra_protocoltransceiver_ask_the_board(void);
@@ -219,11 +217,11 @@ int main(int argc, char *argv[])
 					case '3':	//	send empty rop
 						s_callback_button_3();
 						break;
-#ifdef _REMOTE_
+
 					case '4':	//	send a set pid rop
 						s_callback_button_4();
 						break;
-#endif
+
 					case '5':	//	send a status sig
 						s_callback_button_5();
 						break;
@@ -272,7 +270,7 @@ void *recvThread(void * arg)
 	  printf("Received new packet, size = %d\n", udppkt_size);
 
 	  uint16_t remPort 	= remote01.addr.get_port_number();
-	  String remIp(remote01.addr.get_host_addr());
+	  string remIp(remote01.addr.get_host_addr());
 	  sscanf(remIp.c_str(),"%d.%d.%d.%d",&ip1,&ip2,&ip3,&ip4);
 	  eOipv4addr_t remAddr = eo_common_ipv4addr(ip1,ip2,ip3,ip4);
 
@@ -372,33 +370,28 @@ static void s_callback_button_3(void )
 	snprintf(str, sizeof(str)-1, "called callback on BUTTON_WKUP: tx a ropframe\n");
 }
 
-#ifdef _REMOTE_
+
 static void s_callback_button_4(void )
 {
 	char str[128];
-	Pid pid;
-	eOmc_joint_config_t *cfg =  &eo_cfg_nvsEP_joint_usr_rem_board_mem_local->cfg;
-	copyPid2eo(pid, &cfg->pidpos);
-
-    s_eom_hostprotoc_extra_protocoltransceiver_load_occasional_rop(eo_ropcode_set, EOK_cfg_nvsEP_joint_endpoint, EOK_cfg_nvsEP_joint_NVID__cfg);
 
 	snprintf(str, sizeof(str)-1, "called callback on BUTTON_WKUP: tx a ropframe\n");
 }
-#endif
+
 
 static void s_callback_button_5(void )
 {
 	char str[128];
 	int j = 0;
 	Pid pid;
-
+/*
 	eo_cfg_nvsEP_mc_leftleg_t* eo_cfg_nvsEP_mc_leftleg_usr_rem_ebx_mem_local;
-	eOmc_joint_t *joint = &eo_cfg_nvsEP_mc_leftleg_usr_rem_ebx_mem_local->joints[3];
+	eOmc_joint_t *joint = &eo_cfg_nvsEP_mc_leftleg_usr_rem_ebx_mem_local->joints[j];
 
 	copyPid2eo(pid, &joint->jconfig.pidposition);
 	eOnvID_t nvid = eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get((eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t)j, motorNVindex_mconfig);
-	load_occasional_rop(eo_ropcode_set, EOK_cfg_nvsEP_mc_leftleg_EP, nvid);
-
+	load_occasional_rop(eo_ropcode_sig, EOK_cfg_nvsEP_mc_leftleg_EP, nvid);
+*/
 	snprintf(str, sizeof(str)-1, "called callback on BUTTON_WKUP: tx a ropframe\n");
 }
 
