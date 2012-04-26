@@ -64,10 +64,11 @@ typedef struct              // size is 4+10*16+0 = 164
     @brief      eOskin_array_data_t contains up to 10 can frames as received by hal placed in an EOarray  object
     @warning    This struct must be of fixed and size and multiple of 4.
  **/
-typedef struct                  // size is: 164+0 = 164 
+typedef struct                  // size is: 164+4+0 = 168 
 {
     EOarray_of_10canframes  array;
-} eOskin_array_data_t;      EO_VERIFYsizeof(eOskin_array_data_t, 164);
+    uint8_t                 filler04[4];
+} eOskin_array_data_t;      EO_VERIFYsizeof(eOskin_array_data_t, 168);
 
 
 

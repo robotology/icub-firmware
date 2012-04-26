@@ -117,7 +117,6 @@
 
 
 
-
 #define NVMACRO_FUN_INIT    JXXMACRO_INIT
 #define NVMACRO_FUN_UPDT    JXXMACRO_UPDT
 
@@ -162,6 +161,22 @@
 #define NVMACRO_USE_UPDT    1
 
 #include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
+#define NVMACRO_FUN_INIT    JXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    JXXMACRO_UPDT
+
+#define NVMACRO_PSTR        JXXMACRO_PART
+#define NVMACRO_BSTR        JXXMACRO_BOARD
+#define NVMACRO_NVSTR1      JXXMACRO_JSTR
+#define NVMACRO_NVNUM1      JXXMACRO_JNUM
+#define NVMACRO_NVSTR2      _jconfig__impedance
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
 
 
 
@@ -218,7 +233,22 @@
 #define NVMACRO_BSTR        JXXMACRO_BOARD
 #define NVMACRO_NVSTR1      JXXMACRO_JSTR
 #define NVMACRO_NVNUM1      JXXMACRO_JNUM
-#define NVMACRO_NVSTR2      _jconfig__upto02descrforchameleon02
+#define NVMACRO_NVSTR2      _jconfig__controlmode
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
+#define NVMACRO_FUN_INIT    JXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    JXXMACRO_UPDT
+
+#define NVMACRO_PSTR        JXXMACRO_PART
+#define NVMACRO_BSTR        JXXMACRO_BOARD
+#define NVMACRO_NVSTR1      JXXMACRO_JSTR
+#define NVMACRO_NVNUM1      JXXMACRO_JNUM
+#define NVMACRO_NVSTR2      _jconfig__motionmonitormode
 
 #define NVMACRO_USE_INIT    1
 #define NVMACRO_USE_UPDT    1
@@ -234,7 +264,22 @@
 #define NVMACRO_BSTR        JXXMACRO_BOARD
 #define NVMACRO_NVSTR1      JXXMACRO_JSTR
 #define NVMACRO_NVNUM1      JXXMACRO_JNUM
-#define NVMACRO_NVSTR2      __jstatus
+#define NVMACRO_NVSTR2      _jconfig__des02FORjstatuschamaleon04
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
+#define NVMACRO_FUN_INIT    JXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    JXXMACRO_UPDT
+
+#define NVMACRO_PSTR        JXXMACRO_PART
+#define NVMACRO_BSTR        JXXMACRO_BOARD
+#define NVMACRO_NVSTR1      JXXMACRO_JSTR
+#define NVMACRO_NVNUM1      JXXMACRO_JNUM
+#define NVMACRO_NVSTR2      _jconfig__holder01FFU01
 
 #define NVMACRO_USE_INIT    1
 #define NVMACRO_USE_UPDT    1
@@ -250,7 +295,7 @@
 #define NVMACRO_BSTR        JXXMACRO_BOARD
 #define NVMACRO_NVSTR1      JXXMACRO_JSTR
 #define NVMACRO_NVNUM1      JXXMACRO_JNUM
-#define NVMACRO_NVSTR2      __calibrator
+#define NVMACRO_NVSTR2      _jconfig__holder01FFU02
 
 #define NVMACRO_USE_INIT    1
 #define NVMACRO_USE_UPDT    1
@@ -266,7 +311,40 @@
 #define NVMACRO_BSTR        JXXMACRO_BOARD
 #define NVMACRO_NVSTR1      JXXMACRO_JSTR
 #define NVMACRO_NVNUM1      JXXMACRO_JNUM
-#define NVMACRO_NVSTR2      __setpoint
+#define NVMACRO_NVSTR2      _jconfig__holder02FFU03
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
+
+#define NVMACRO_FUN_INIT    JXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    JXXMACRO_UPDT
+
+#define NVMACRO_PSTR        JXXMACRO_PART
+#define NVMACRO_BSTR        JXXMACRO_BOARD
+#define NVMACRO_NVSTR1      JXXMACRO_JSTR
+#define NVMACRO_NVNUM1      JXXMACRO_JNUM
+#define NVMACRO_NVSTR2      _jconfig__holder02FFU04
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
+
+
+#define NVMACRO_FUN_INIT    JXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    JXXMACRO_UPDT
+
+#define NVMACRO_PSTR        JXXMACRO_PART
+#define NVMACRO_BSTR        JXXMACRO_BOARD
+#define NVMACRO_NVSTR1      JXXMACRO_JSTR
+#define NVMACRO_NVNUM1      JXXMACRO_JNUM
+#define NVMACRO_NVSTR2      _jstatus
 
 #define NVMACRO_USE_INIT    1
 #define NVMACRO_USE_UPDT    1
@@ -281,7 +359,72 @@
 #define NVMACRO_BSTR        JXXMACRO_BOARD
 #define NVMACRO_NVSTR1      JXXMACRO_JSTR
 #define NVMACRO_NVNUM1      JXXMACRO_JNUM
-#define NVMACRO_NVSTR2      __controlmode
+#define NVMACRO_NVSTR2      _jstatus__basic
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
+
+#define NVMACRO_FUN_INIT    JXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    JXXMACRO_UPDT
+
+#define NVMACRO_PSTR        JXXMACRO_PART
+#define NVMACRO_BSTR        JXXMACRO_BOARD
+#define NVMACRO_NVSTR1      JXXMACRO_JSTR
+#define NVMACRO_NVNUM1      JXXMACRO_JNUM
+#define NVMACRO_NVSTR2      _jstatus__ofpid
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
+
+#define NVMACRO_FUN_INIT    JXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    JXXMACRO_UPDT
+
+#define NVMACRO_PSTR        JXXMACRO_PART
+#define NVMACRO_BSTR        JXXMACRO_BOARD
+#define NVMACRO_NVSTR1      JXXMACRO_JSTR
+#define NVMACRO_NVNUM1      JXXMACRO_JNUM
+#define NVMACRO_NVSTR2      _jstatus__chamaleon04
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
+
+
+#define NVMACRO_FUN_INIT    JXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    JXXMACRO_UPDT
+
+#define NVMACRO_PSTR        JXXMACRO_PART
+#define NVMACRO_BSTR        JXXMACRO_BOARD
+#define NVMACRO_NVSTR1      JXXMACRO_JSTR
+#define NVMACRO_NVNUM1      JXXMACRO_JNUM
+#define NVMACRO_NVSTR2      _jinputs__externallymeasuredtorque
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
+
+#define NVMACRO_FUN_INIT    JXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    JXXMACRO_UPDT
+
+#define NVMACRO_PSTR        JXXMACRO_PART
+#define NVMACRO_BSTR        JXXMACRO_BOARD
+#define NVMACRO_NVSTR1      JXXMACRO_JSTR
+#define NVMACRO_NVNUM1      JXXMACRO_JNUM
+#define NVMACRO_NVSTR2      _jinputs__holder02FFU01
 
 #define NVMACRO_USE_INIT    1
 #define NVMACRO_USE_UPDT    1
@@ -296,7 +439,75 @@
 #define NVMACRO_BSTR        JXXMACRO_BOARD
 #define NVMACRO_NVSTR1      JXXMACRO_JSTR
 #define NVMACRO_NVNUM1      JXXMACRO_JNUM
-#define NVMACRO_NVSTR2      __signalwhenmotionisdone
+#define NVMACRO_NVSTR2      _jinputs__holder04FFU02
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
+
+
+
+
+
+#define NVMACRO_FUN_INIT    JXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    JXXMACRO_UPDT
+
+#define NVMACRO_PSTR        JXXMACRO_PART
+#define NVMACRO_BSTR        JXXMACRO_BOARD
+#define NVMACRO_NVSTR1      JXXMACRO_JSTR
+#define NVMACRO_NVNUM1      JXXMACRO_JNUM
+#define NVMACRO_NVSTR2      _jcmmnds__calibration
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
+
+#define NVMACRO_FUN_INIT    JXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    JXXMACRO_UPDT
+
+#define NVMACRO_PSTR        JXXMACRO_PART
+#define NVMACRO_BSTR        JXXMACRO_BOARD
+#define NVMACRO_NVSTR1      JXXMACRO_JSTR
+#define NVMACRO_NVNUM1      JXXMACRO_JNUM
+#define NVMACRO_NVSTR2      _jcmmnds__setpoint
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
+
+#define NVMACRO_FUN_INIT    JXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    JXXMACRO_UPDT
+
+#define NVMACRO_PSTR        JXXMACRO_PART
+#define NVMACRO_BSTR        JXXMACRO_BOARD
+#define NVMACRO_NVSTR1      JXXMACRO_JSTR
+#define NVMACRO_NVNUM1      JXXMACRO_JNUM
+#define NVMACRO_NVSTR2      _jcmmnds__stoptrajectory
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
+
+#define NVMACRO_FUN_INIT    JXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    JXXMACRO_UPDT
+
+#define NVMACRO_PSTR        JXXMACRO_PART
+#define NVMACRO_BSTR        JXXMACRO_BOARD
+#define NVMACRO_NVSTR1      JXXMACRO_JSTR
+#define NVMACRO_NVNUM1      JXXMACRO_JNUM
+#define NVMACRO_NVSTR2      _jcmmnds__holder01FFU01
 
 #define NVMACRO_USE_INIT    1
 #define NVMACRO_USE_UPDT    1
@@ -311,7 +522,7 @@
 #define NVMACRO_BSTR        JXXMACRO_BOARD
 #define NVMACRO_NVSTR1      JXXMACRO_JSTR
 #define NVMACRO_NVNUM1      JXXMACRO_JNUM
-#define NVMACRO_NVSTR2      __motionisdone
+#define NVMACRO_NVSTR2      _jcmmnds__holder01FFU02
 
 #define NVMACRO_USE_INIT    1
 #define NVMACRO_USE_UPDT    1
@@ -326,13 +537,12 @@
 #define NVMACRO_BSTR        JXXMACRO_BOARD
 #define NVMACRO_NVSTR1      JXXMACRO_JSTR
 #define NVMACRO_NVNUM1      JXXMACRO_JNUM
-#define NVMACRO_NVSTR2      __externalvalueoftorque
+#define NVMACRO_NVSTR2      _jcmmnds__holder01FFU03
 
 #define NVMACRO_USE_INIT    1
 #define NVMACRO_USE_UPDT    1
 
 #include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
-
 
 
 

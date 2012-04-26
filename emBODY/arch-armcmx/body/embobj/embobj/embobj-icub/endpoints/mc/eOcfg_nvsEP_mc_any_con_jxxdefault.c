@@ -108,22 +108,28 @@ extern const eOmc_joint_t eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue =
             EO_INIT(.scale)                 0,
             EO_INIT(.offset)                0,
             EO_INIT(.filler03)              {0xf1, 0xf2, 0xf3}
+        }, 
+        EO_INIT(.impedance)
+        {
+            EO_INIT(.stiffness)             0,
+            EO_INIT(.dumping)               0,
+            EO_INIT(.offset)                0,
+            EO_INIT(.filler02)              {0xf1, 0xf2}           
         },        
         EO_INIT(.minpositionofjoint)        0,
         EO_INIT(.maxpositionofjoint)        0,
         EO_INIT(.velocitysetpointtimeout)   0,
-        EO_INIT(.upto02descrforchameleon02) {EOUTIL_CHAMELEON_DESCRIPTOR_NONE, EOUTIL_CHAMELEON_DESCRIPTOR_NONE},
-        EO_INIT(.filler04)                  {0xf1, 0xf2, 0xf3, 0xf4}    
+        EO_INIT(.controlmode)               eomc_controlmode_idle,
+        EO_INIT(.motionmonitormode)         eomc_motionmonitormode_dontmonitor,
+        EO_INIT(.des02FORjstatuschamaleon04)   {EOUTIL_CHAMELEON_DESCRIPTOR_NONE, EOUTIL_CHAMELEON_DESCRIPTOR_NONE},
+        EO_INIT(.holder01FFU01)             0xe1,
+        EO_INIT(.holder01FFU02)             0xe2,
+        EO_INIT(.holder02FFU03)             0xe3e3,
+        EO_INIT(.holder02FFU04)             0xe4e3
     },
     EO_INIT(.jstatus)                       {0},
-    EO_INIT(.calibrator)                    {0},
-    EO_INIT(.setpoint)                      {0},
-    EO_INIT(.controlmode)                   eomc_controlmode_idle,
-    EO_INIT(.signalwhenmotionisdone)        0,
-    EO_INIT(.motionisdone)                  0,
-    EO_INIT(.filler01)                      {0xf1},
-    EO_INIT(.externalvalueoftorque)         0,
-    EO_INIT(.filler06)                      {0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6}
+    EO_INIT(.jinputs)                       {0},
+    EO_INIT(.jcmmnds)                       {0}
 }; 
 
 

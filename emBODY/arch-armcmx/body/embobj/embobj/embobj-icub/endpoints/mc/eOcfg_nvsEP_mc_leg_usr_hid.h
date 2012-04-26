@@ -55,47 +55,87 @@ extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig(uint16_t n, const EOnv*
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__pidposition(uint16_t n, const EOnv* nv);
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__pidvelocity(uint16_t n, const EOnv* nv);
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__pidtorque(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__impedance(uint16_t n, const EOnv* nv);
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__minpositionofjoint(uint16_t n, const EOnv* nv);
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__maxpositionofjoint(uint16_t n, const EOnv* nv);
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__velocitysetpointtimeout(uint16_t n, const EOnv* nv);
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__upto02descrforchameleon02(uint16_t n, const EOnv* nv);
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx__jstatus(uint16_t n, const EOnv* nv);
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx__calibrator(uint16_t n, const EOnv* nv);
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx__setpoint(uint16_t n, const EOnv* nv);
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx__controlmode(uint16_t n, const EOnv* nv);
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx__signalwhenmotionisdone(uint16_t n, const EOnv* nv);
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx__motionisdone(uint16_t n, const EOnv* nv);
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx__externalvalueoftorque(uint16_t n, const EOnv* nv);
-// jxx-updt: all the nvs
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__controlmode(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__motionmonitormode(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__des02FORjstatuschamaleon04(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__holder01FFU01(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__holder01FFU02(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__holder02FFU03(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__holder02FFU04(uint16_t n, const EOnv* nv);
+
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jstatus(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jstatus__basic(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jstatus__ofpid(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jstatus__chamaleon04(uint16_t n, const EOnv* nv);
+
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jinputs__externallymeasuredtorque(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jinputs__holder02FFU01(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jinputs__holder04FFU02(uint16_t n, const EOnv* nv);
+
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jcmmnds__calibration(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jcmmnds__setpoint(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jcmmnds__stoptrajectory(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jcmmnds__holder01FFU01(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jcmmnds__holder01FFU02(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jcmmnds__holder01FFU03(uint16_t n, const EOnv* nv);
+
+
+// jxx-updt:
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__pidposition(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__pidvelocity(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__pidtorque(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__impedance(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__minpositionofjoint(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__maxpositionofjoint(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__velocitysetpointtimeout(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__upto02descrforchameleon02(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx__jstatus(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx__calibrator(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx__setpoint(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx__controlmode(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx__signalwhenmotionisdone(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx__motionisdone(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx__externalvalueoftorque(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__controlmode(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__motionmonitormode(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__des02FORjstatuschamaleon04(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__holder01FFU01(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__holder01FFU02(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__holder02FFU03(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__holder02FFU04(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jstatus(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jstatus__basic(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jstatus__ofpid(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jstatus__chamaleon04(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jinputs__externallymeasuredtorque(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jinputs__holder02FFU01(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jinputs__holder04FFU02(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jcmmnds__calibration(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jcmmnds__setpoint(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jcmmnds__stoptrajectory(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jcmmnds__holder01FFU01(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jcmmnds__holder01FFU02(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jcmmnds__holder01FFU03(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+
 // mxx-init:
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Mxx_mconfig(uint16_t n, const EOnv* nv);
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Mxx_mconfig__pidcurrent(uint16_t n, const EOnv* nv);
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Mxx_mconfig__maxvelocityofmotor(uint16_t n, const EOnv* nv);
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Mxx_mconfig__maxcurrentofmotor(uint16_t n, const EOnv* nv);
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Mxx_mconfig__upto02descrforchameleon06(uint16_t n, const EOnv* nv);
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Mxx__mstatus(uint16_t n, const EOnv* nv);
-// mxx-updt: all the nvs
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Mxx_mconfig__des02FORmstatuschamaleon04(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Mxx_mstatus(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Mxx_mstatus__basic(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Mxx_mstatus__chamaleon04(uint16_t n, const EOnv* nv);
+
+// mxx-updt:
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Mxx_mconfig(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Mxx_mconfig__pidcurrent(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Mxx_mconfig__maxvelocityofmotor(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Mxx_mconfig__maxcurrentofmotor(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Mxx_mconfig__upto02descrforchameleon06(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Mxx__mstatus(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Mxx_mconfig__des02FORmstatuschamaleon04(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Mxx_mstatus(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Mxx_mstatus__basic(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Mxx_mstatus__chamaleon04(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
 
 #endif  // include guard
