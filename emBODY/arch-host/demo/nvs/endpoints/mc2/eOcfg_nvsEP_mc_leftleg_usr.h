@@ -17,19 +17,19 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOCFG_EPS_LOC_BOARD_H_
-#define _EOCFG_EPS_LOC_BOARD_H_
+#ifndef _EOCFG_NVSEP_MC_LEFTLEG_USR_H_
+#define _EOCFG_NVSEP_MC_LEFTLEG_USR_H_
 
 
 
 
-/** @file       eOcfg_EPs_loc_ebx.h
-	@brief      This header file contains a const configuration for the local endpoints managed by a given board
+/** @file       eOcfg_nvsEP_mc_leftleg_usr.h
+	@brief      This header file gives the local configuration for the ...
 	@author     marco.accame@iit.it
 	@date       09/06/2011
 **/
 
-/** @defgroup eo_1234fr Configuation of the NVs for management of the ems board
+/** @defgroup eo_23sdfwervcer Local configuation of the management NVs 
     Tcecece 
     
     @{		
@@ -41,45 +41,35 @@
 
 #include "EoCommon.h"
 #include "EOconstvector.h"
-#include "EOnvsCfg.h"
+#include "eOcfg_nvsEP_mc_leftleg_con.h"
+
 
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
-
-// - in here there are the nvids plus ... 
-//#include "eOcfg_nvsEP_base_con.h"
-//#include "eOcfg_nvsEP_mngmnt_con.h"
-//#include "eOcfg_nvsEP_mc_leftleg_con.h"
-
-// - in here there is access to ram of the endpoints
-//#include "eOcfg_nvsEP_base_usr_loc_anydev.h"
-//#include "eOcfg_nvsEP_mngmnt_usr_loc_ebx.h"
-//#include "eOcfg_nvsEP_mc_leftleg_usr_loc_ebx.h"
-
+// empty-section
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
-
+// empty-section
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-// EOconstvector where each element is a eOnvscfg_EP_t
-extern const EOconstvector* const eo_cfg_EPs_vectorof_loc_ebx;
+extern const EOconstvector* const eo_cfg_nvsEP_mc_leftleg_usr_constvector_of_EOnv_usr;
 
-// if not NULL it contains a mapping from EPs to index inside eo_cfg_EPs_vectorof_loc_ebx
-extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_loc_ebx_fptr_hashfunction_ep2index;
+extern eo_cfg_nvsEP_mc_leftleg_t* eo_cfg_nvsEP_mc_leftleg_usr_mem_local;
+extern eo_cfg_nvsEP_mc_leftleg_t* eo_cfg_nvsEP_mc_leftleg_usr_mem_remote;
+
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
-// empty-section
 
-
+extern void eo_cfg_nvsEP_mc_leftleg_usr_initialise(void* loc, void* rem);
 
 
 /** @}            
-    end of group eo_1234fr  
+    end of group eo_23sdfwervcer  
  **/
 
 #endif  // include-guard
