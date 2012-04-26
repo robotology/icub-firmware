@@ -397,7 +397,7 @@ static void s_callback_button_4(void )
 	EOnv 		*nvRoot;
 
 	// get nvid from parameters
-    eOnvID_t nvid = eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get((eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t) j, jointNVindex_jconfig__pidposition);
+    eOnvID_t nvid = eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_joint_var_Get((eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t) j, jointNVindex_jconfig__pidposition);
     nvRoot = transceiver->getNVhandler(EOK_cfg_nvsEP_mc_leftleg_EP, nvid);
 
 	eOmc_PID_t pid;
@@ -423,7 +423,7 @@ static void s_callback_button_4(void )
 	// tell agent to prepare a rop to send
     transceiver->load_occasional_rop(eo_ropcode_set, EOK_cfg_nvsEP_mc_leftleg_EP, nvid);
 
-	snprintf(str, sizeof(str)-1, "called s_callback_button_4: set a motorNVindex_mconfig, motor %d\n", j);
+	snprintf(str, sizeof(str)-1, "called s_callback_button_4: set a jointNVindex_mconfig, joint %d\n", j);
 }
 
 static void s_callback_button_5(void )
@@ -432,12 +432,12 @@ static void s_callback_button_5(void )
 	int j = 0;
 
 	// get nvid from parameters
-	eOnvID_t nvid = eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get((eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t)j, jointNVindex_jconfig__pidposition);
+	eOnvID_t nvid = eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_joint_var_Get((eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t)j, jointNVindex_jconfig__pidposition);
 
 	// tell agent to prepare a rop to send
     transceiver->load_occasional_rop(eo_ropcode_ask, EOK_cfg_nvsEP_mc_leftleg_EP, nvid);
 
-	snprintf(str, sizeof(str)-1, "called s_callback_button_5: ask a motorNVindex_mconfig, motor %d\n", j);
+	snprintf(str, sizeof(str)-1, "called s_callback_button_5: ask a jointNVindex_mconfig, joint %d\n", j);
 }
 
 // Utilities
