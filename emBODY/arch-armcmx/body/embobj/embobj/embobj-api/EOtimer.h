@@ -105,7 +105,7 @@ extern EOtimer* eo_timer_New(void);
                 absolute time specified by @e startat. After the first expiry, the timer can simply stop itself or restart the countdown
                 depending upon the value of @e mode.
     @param      t               The pointer to the timer object.
-    @parm       startat         If the value is equal to eok_abstimeNOW, then the coundown is started using the current
+    @param      startat         If the value is equal to eok_abstimeNOW, then the coundown is started using the current
                                 lifetime as absolute reference and the timer is NOT synchronised. If the timer is not synchronised,
                                 in case of  a change of lifetime, then the countdown will not be changed.
                                 If instead the value is different from eok_abstimeNOW (it can be even zero), then the timer starts
