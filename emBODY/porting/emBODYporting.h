@@ -64,7 +64,8 @@
     #define EO_static_inline       static inline
     #define EO_INIT(f)
     #pragma pack(8)
-    #define snprintf        snprintf    
+    #define snprintf        snprintf  
+    #define float32_t       float    
 #elif defined(__arm__)
     // __arm__ or __ARMCC_VERSION are always defined in armcc compiler
     #define EO_extern_inline        extern inline
@@ -74,6 +75,7 @@
     #pragma pack(8)
     // or pack(4) ???
     #define snprintf        snprintf  
+    #define float32_t       float
 #elif defined(_DSPIC_) & defined(__GNUC__)
     // for dspic ...
     #define EO_extern_inline        extern inline
