@@ -61,7 +61,7 @@ struct EOtheBOARDtransceiver_hid
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
-// empty-section
+extern EOnvsCfg * eo_boardtransceiver_hid_GetNvsCfg(void);
 
 #endif  // include guard
 

@@ -56,7 +56,7 @@ typedef struct
     const EOconstvector*    thenvs_usr;
     void*                   thenvs_vol;
     void*                   thenvs_rem;
-    eOvoid_fp_voidp_voidp_t thenvs_initialise; // vol_local, vol_remote
+    eOvoid_fp_uint16_voidp_voidp_t thenvs_initialise; // ep, vol_local, vol_remote
     uint32_t                thenvs_sizeof;   
     eOuint16_fp_uint16_t    hashfn_id2index; 
     EOVmutexDerived*        mtx_endpoint;                 
