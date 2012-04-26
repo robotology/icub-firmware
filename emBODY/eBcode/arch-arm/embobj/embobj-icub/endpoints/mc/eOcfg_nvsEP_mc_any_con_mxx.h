@@ -53,14 +53,16 @@
 #define EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__pidcurrent                           (1)
 #define EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__maxvelocityofmotor                   (2)
 #define EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__maxcurrentofmotor                    (3)
-#define EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__upto02descrforchameleon06            (4)
+#define EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__des02FORmstatuschamaleon04           (4)
 
-#define EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex__mstatus                                      (5)
+#define EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mstatus                                       (5)
+#define EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mstatus__basic                                (6)
+#define EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mstatus__chamaleon04                          (7)
 
 
 // -- the total number of network variables inside a joint
 
-#define EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber                                   (6)
+#define EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber                                   (8)
 
 
 
@@ -74,9 +76,11 @@
 #define EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__pidcurrent                           EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd)
 #define EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__maxvelocityofmotor                   EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u32)
 #define EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__maxcurrentofmotor                    EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u16)
-#define EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__upto02descrforchameleon06            EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u16)
+#define EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__des02FORmstatuschamaleon04           EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u16)
 
-#define EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP__mstatus                                      EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd)
+#define EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mstatus                                       EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd)
+#define EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mstatus__basic                                EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd)
+#define EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mstatus__chamaleon04                          EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_u32)
 
 
 

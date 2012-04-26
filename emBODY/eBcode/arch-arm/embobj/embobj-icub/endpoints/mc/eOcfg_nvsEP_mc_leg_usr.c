@@ -188,7 +188,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leg_usr_array_of_EOnv_usr[varsMCleg_TOTALnumber] =
+static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leg_usr_array_of_EOnv_usr[] =
 {
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jconfig,
@@ -211,6 +211,11 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leg_usr_array_of_EOnv_usr[varsMCleg_TO
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jconfig__impedance,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },     
+    {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jconfig__minpositionofjoint,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
@@ -224,44 +229,104 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leg_usr_array_of_EOnv_usr[varsMCleg_TO
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jconfig__velocitysetpointtimeout,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
-    },      
-    {   // j00 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jconfig__upto02descrforchameleon02,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },      
-    {   // j00 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx__jstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },   
-    {   // j00 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx__calibrator,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j00 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx__setpoint,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },  
-    {   // j00 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx__controlmode,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },  
-    {   // j00 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx__signalwhenmotionisdone,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jconfig__controlmode,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j00 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx__motionisdone,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jconfig__motionmonitormode,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },    
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jconfig__des02FORjstatuschamaleon04,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jconfig__holder01FFU01,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jconfig__holder01FFU02,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jconfig__holder02FFU03,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j00 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx__externalvalueoftorque,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jconfig__holder02FFU04,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jstatus,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jstatus__basic,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jstatus__ofpid,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jstatus__chamaleon04,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jinputs__externallymeasuredtorque,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jinputs__holder02FFU01,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jinputs__holder04FFU02,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jcmmnds__calibration,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jcmmnds__setpoint,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jcmmnds__stoptrajectory,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jcmmnds__holder01FFU01,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jcmmnds__holder01FFU02,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },     
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j00_ebx_jcmmnds__holder01FFU03,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
@@ -287,6 +352,11 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leg_usr_array_of_EOnv_usr[varsMCleg_TO
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jconfig__impedance,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },     
+    {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jconfig__minpositionofjoint,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
@@ -300,47 +370,107 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leg_usr_array_of_EOnv_usr[varsMCleg_TO
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jconfig__velocitysetpointtimeout,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
-    },      
-    {   // j01 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jconfig__upto02descrforchameleon02,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },      
-    {   // j01 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx__jstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },   
-    {   // j01 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx__calibrator,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j01 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx__setpoint,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },  
-    {   // j01 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx__controlmode,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jconfig__controlmode,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j01 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx__signalwhenmotionisdone,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jconfig__motionmonitormode,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },    
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jconfig__des02FORjstatuschamaleon04,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jconfig__holder01FFU01,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j01 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx__motionisdone,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jconfig__holder01FFU02,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
-    },   
+    }, 
     {   // j01 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx__externalvalueoftorque,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jconfig__holder02FFU03,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },     
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jconfig__holder02FFU04,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jstatus,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jstatus__basic,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jstatus__ofpid,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jstatus__chamaleon04,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jinputs__externallymeasuredtorque,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jinputs__holder02FFU01,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jinputs__holder04FFU02,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jcmmnds__calibration,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jcmmnds__setpoint,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jcmmnds__stoptrajectory,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jcmmnds__holder01FFU01,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jcmmnds__holder01FFU02,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },     
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j01_ebx_jcmmnds__holder01FFU03,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
     
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jconfig,
@@ -363,6 +493,11 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leg_usr_array_of_EOnv_usr[varsMCleg_TO
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jconfig__impedance,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },     
+    {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jconfig__minpositionofjoint,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
@@ -376,48 +511,108 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leg_usr_array_of_EOnv_usr[varsMCleg_TO
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jconfig__velocitysetpointtimeout,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
-    },      
-    {   // j02 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jconfig__upto02descrforchameleon02,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },      
-    {   // j02 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx__jstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },   
-    {   // j02 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx__calibrator,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j02 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx__setpoint,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jconfig__controlmode,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
-    },  
+    }, 
     {   // j02 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx__controlmode,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jconfig__motionmonitormode,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },    
     {   // j02 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx__signalwhenmotionisdone,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jconfig__des02FORjstatuschamaleon04,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jconfig__holder01FFU01,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j02 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx__motionisdone,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },   
-    {   // j02 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx__externalvalueoftorque,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jconfig__holder01FFU02,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
-    
+    {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jconfig__holder02FFU03,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },     
+    {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jconfig__holder02FFU04,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jstatus,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },
+    {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jstatus__basic,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jstatus__ofpid,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jstatus__chamaleon04,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jinputs__externallymeasuredtorque,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jinputs__holder02FFU01,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jinputs__holder04FFU02,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jcmmnds__calibration,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jcmmnds__setpoint,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jcmmnds__stoptrajectory,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jcmmnds__holder01FFU01,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jcmmnds__holder01FFU02,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },     
+    {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j02_ebx_jcmmnds__holder01FFU03,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jconfig,
         EO_INIT(.on_rop_reception)      NULL,                 
@@ -439,6 +634,11 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leg_usr_array_of_EOnv_usr[varsMCleg_TO
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jconfig__impedance,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },     
+    {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jconfig__minpositionofjoint,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
@@ -452,48 +652,108 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leg_usr_array_of_EOnv_usr[varsMCleg_TO
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jconfig__velocitysetpointtimeout,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
-    },      
-    {   // j03 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jconfig__upto02descrforchameleon02,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },      
-    {   // j03 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx__jstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },   
-    {   // j03 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx__calibrator,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j03 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx__setpoint,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },  
-    {   // j03 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx__controlmode,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },  
-    {   // j03 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx__signalwhenmotionisdone,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jconfig__controlmode,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j03 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx__motionisdone,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jconfig__motionmonitormode,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
-    },   
+    },    
     {   // j03 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx__externalvalueoftorque,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jconfig__des02FORjstatuschamaleon04,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
-    },   
-    
+    },  
+    {   // j03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jconfig__holder01FFU01,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jconfig__holder01FFU02,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jconfig__holder02FFU03,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },     
+    {   // j03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jconfig__holder02FFU04,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jstatus,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },
+    {   // j03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jstatus__basic,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jstatus__ofpid,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jstatus__chamaleon04,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jinputs__externallymeasuredtorque,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jinputs__holder02FFU01,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jinputs__holder04FFU02,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jcmmnds__calibration,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jcmmnds__setpoint,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jcmmnds__stoptrajectory,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jcmmnds__holder01FFU01,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jcmmnds__holder01FFU02,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },     
+    {   // j03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j03_ebx_jcmmnds__holder01FFU03,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jconfig,
         EO_INIT(.on_rop_reception)      NULL,                 
@@ -515,6 +775,11 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leg_usr_array_of_EOnv_usr[varsMCleg_TO
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jconfig__impedance,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },     
+    {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jconfig__minpositionofjoint,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
@@ -528,47 +793,107 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leg_usr_array_of_EOnv_usr[varsMCleg_TO
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jconfig__velocitysetpointtimeout,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
-    },      
-    {   // j04 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jconfig__upto02descrforchameleon02,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },      
-    {   // j04 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx__jstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },   
-    {   // j04 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx__calibrator,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j04 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx__setpoint,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },  
-    {   // j04 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx__controlmode,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },
-    {   // j04 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx__signalwhenmotionisdone,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jconfig__controlmode,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j04 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx__motionisdone,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jconfig__motionmonitormode,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
-    },   
+    },    
     {   // j04 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx__externalvalueoftorque,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jconfig__des02FORjstatuschamaleon04,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
-    },      
+    },  
+    {   // j04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jconfig__holder01FFU01,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jconfig__holder01FFU02,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jconfig__holder02FFU03,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },     
+    {   // j04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jconfig__holder02FFU04,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jstatus,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },
+    {   // j04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jstatus__basic,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jstatus__ofpid,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jstatus__chamaleon04,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jinputs__externallymeasuredtorque,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jinputs__holder02FFU01,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jinputs__holder04FFU02,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jcmmnds__calibration,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jcmmnds__setpoint,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jcmmnds__stoptrajectory,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jcmmnds__holder01FFU01,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jcmmnds__holder01FFU02,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },     
+    {   // j04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j04_ebx_jcmmnds__holder01FFU03,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
 
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jconfig,
@@ -591,6 +916,11 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leg_usr_array_of_EOnv_usr[varsMCleg_TO
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jconfig__impedance,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },     
+    {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jconfig__minpositionofjoint,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
@@ -604,47 +934,107 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leg_usr_array_of_EOnv_usr[varsMCleg_TO
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jconfig__velocitysetpointtimeout,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
-    },      
-    {   // j05 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jconfig__upto02descrforchameleon02,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },      
-    {   // j05 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx__jstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },   
-    {   // j05 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx__calibrator,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j05 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx__setpoint,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },  
-    {   // j05 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx__controlmode,
-        EO_INIT(.on_rop_reception)      NULL,                
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    },
-    {   // j05 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx__signalwhenmotionisdone,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jconfig__controlmode,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j05 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx__motionisdone,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jconfig__motionmonitormode,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
-    },       
+    },    
     {   // j05 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx__externalvalueoftorque,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jconfig__des02FORjstatuschamaleon04,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
+    {   // j05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jconfig__holder01FFU01,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jconfig__holder01FFU02,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jconfig__holder02FFU03,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },     
+    {   // j05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jconfig__holder02FFU04,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jstatus,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },
+    {   // j05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jstatus__basic,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jstatus__ofpid,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jstatus__chamaleon04,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jinputs__externallymeasuredtorque,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jinputs__holder02FFU01,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jinputs__holder04FFU02,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jcmmnds__calibration,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jcmmnds__setpoint,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jcmmnds__stoptrajectory,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jcmmnds__holder01FFU01,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jcmmnds__holder01FFU02,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },     
+    {   // j05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_j05_ebx_jcmmnds__holder01FFU03,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },     
     
     // and in here come the 6 motors     
     
@@ -670,17 +1060,27 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leg_usr_array_of_EOnv_usr[varsMCleg_TO
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // m00 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m00_ebx_mconfig__upto02descrforchameleon06,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m00_ebx_mconfig__des02FORmstatuschamaleon04,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m00 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m00_ebx__mstatus,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m00_ebx_mstatus,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
-
-
+    {   // m00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m00_ebx_mstatus__basic,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // m00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m00_ebx_mstatus__chamaleon04,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    
+    
     {   // m01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m01_ebx_mconfig,
         EO_INIT(.on_rop_reception)      NULL,                 
@@ -702,16 +1102,26 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leg_usr_array_of_EOnv_usr[varsMCleg_TO
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // m01 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m01_ebx_mconfig__upto02descrforchameleon06,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m01_ebx_mconfig__des02FORmstatuschamaleon04,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m01 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m01_ebx__mstatus,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m01_ebx_mstatus,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
-
+    {   // m01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m01_ebx_mstatus__basic,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // m01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m01_ebx_mstatus__chamaleon04,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    
     
     {   // m02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m02_ebx_mconfig,
@@ -734,17 +1144,27 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leg_usr_array_of_EOnv_usr[varsMCleg_TO
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // m02 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m02_ebx_mconfig__upto02descrforchameleon06,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m02_ebx_mconfig__des02FORmstatuschamaleon04,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m02 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m02_ebx__mstatus,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m02_ebx_mstatus,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // m02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m02_ebx_mstatus__basic,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // m02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m02_ebx_mstatus__chamaleon04,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
 
-
+    
     {   // m03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m03_ebx_mconfig,
         EO_INIT(.on_rop_reception)      NULL,                 
@@ -766,17 +1186,27 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leg_usr_array_of_EOnv_usr[varsMCleg_TO
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // m03 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m03_ebx_mconfig__upto02descrforchameleon06,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m03_ebx_mconfig__des02FORmstatuschamaleon04,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m03 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m03_ebx__mstatus,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m03_ebx_mstatus,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // m03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m03_ebx_mstatus__basic,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // m03 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m03_ebx_mstatus__chamaleon04,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
 
-
+    
     {   // m04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m04_ebx_mconfig,
         EO_INIT(.on_rop_reception)      NULL,                 
@@ -798,16 +1228,25 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leg_usr_array_of_EOnv_usr[varsMCleg_TO
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // m04 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m04_ebx_mconfig__upto02descrforchameleon06,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m04_ebx_mconfig__des02FORmstatuschamaleon04,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m04 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m04_ebx__mstatus,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m04_ebx_mstatus,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
-
+    {   // m04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m04_ebx_mstatus__basic,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // m04 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m04_ebx_mstatus__chamaleon04,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
 
     {   // m05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m05_ebx_mconfig,
@@ -830,17 +1269,27 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_leg_usr_array_of_EOnv_usr[varsMCleg_TO
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // m05 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m05_ebx_mconfig__upto02descrforchameleon06,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m05_ebx_mconfig__des02FORmstatuschamaleon04,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m05 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m05_ebx__mstatus,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m05_ebx_mstatus,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
-    }  
+    },  
+    {   // m05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m05_ebx_mstatus__basic,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // m05 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_leg_m05_ebx_mstatus__chamaleon04,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }    
     
-};
+};  EO_VERIFYsizeof(s_eo_cfg_nvsEP_mc_leg_usr_array_of_EOnv_usr, sizeof(EOnv_usr_t)*(varsMCleg_TOTALnumber)); 
 
 
 const EOconstvector  s_eo_cfg_nvsEP_mc_leg_usr_constvector_of_EOnv_usr = 
@@ -910,6 +1359,11 @@ __weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__pidtorque(uint1
     
 }
 
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__impedance(uint16_t n, const EOnv* nv)
+{
+    
+}
+
 
 __weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__minpositionofjoint(uint16_t n, const EOnv* nv)
 {
@@ -929,63 +1383,125 @@ __weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__velocitysetpoin
 }
 
 
-__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__upto02descrforchameleon02(uint16_t n, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__controlmode(uint16_t n, const EOnv* nv)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__motionmonitormode(uint16_t n, const EOnv* nv)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__des02FORjstatuschamaleon04(uint16_t n, const EOnv* nv)
 {
     
 }
 
 
-__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx__jstatus(uint16_t n, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__holder01FFU01(uint16_t n, const EOnv* nv)
 {
     
 }
 
 
-__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx__calibrator(uint16_t n, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__holder01FFU02(uint16_t n, const EOnv* nv)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__holder02FFU03(uint16_t n, const EOnv* nv)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig__holder02FFU04(uint16_t n, const EOnv* nv)
 {
     
 }
 
 
-__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx__setpoint(uint16_t n, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jstatus(uint16_t n, const EOnv* nv)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jstatus__basic(uint16_t n, const EOnv* nv)
 {
     
 }
 
 
-__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx__controlmode(uint16_t n, const EOnv* nv)
-{
-    
-}
-
-__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx__signalwhenmotionisdone(uint16_t n, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jstatus__ofpid(uint16_t n, const EOnv* nv)
 {
     
 }
 
 
-__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx__motionisdone(uint16_t n, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jstatus__chamaleon04(uint16_t n, const EOnv* nv)
 {
     
 }
 
-__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx__externalvalueoftorque(uint16_t n, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jinputs__externallymeasuredtorque(uint16_t n, const EOnv* nv)
 {
     
 }
 
-// jxx-updt: all the nvs
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jinputs__holder02FFU01(uint16_t n, const EOnv* nv)
+{
+    
+}
+
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jinputs__holder04FFU02(uint16_t n, const EOnv* nv)
+{
+    
+}
+
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jcmmnds__calibration(uint16_t n, const EOnv* nv)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jcmmnds__setpoint(uint16_t n, const EOnv* nv)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jcmmnds__stoptrajectory(uint16_t n, const EOnv* nv)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jcmmnds__holder01FFU01(uint16_t n, const EOnv* nv)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jcmmnds__holder01FFU02(uint16_t n, const EOnv* nv)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jcmmnds__holder01FFU03(uint16_t n, const EOnv* nv)
+{
+    
+}
+
+
+// jxx-updt:
+
 __weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     
 }
 
-
 __weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__pidposition(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     
 }
-
 
 __weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__pidvelocity(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
@@ -994,6 +1510,11 @@ __weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__pidvelocity(uin
 
 
 __weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__pidtorque(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__impedance(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     
 }
@@ -1017,51 +1538,115 @@ __weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__velocitysetpoin
 }
 
 
-__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__upto02descrforchameleon02(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__controlmode(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__motionmonitormode(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__des02FORjstatuschamaleon04(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     
 }
 
 
-__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx__jstatus(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__holder01FFU01(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     
 }
 
 
-__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx__calibrator(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__holder01FFU02(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__holder02FFU03(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jconfig__holder02FFU04(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     
 }
 
 
-__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx__setpoint(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jstatus(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jstatus__basic(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     
 }
 
 
-__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx__controlmode(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jstatus__ofpid(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     
 }
 
 
-__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx__signalwhenmotionisdone(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jstatus__chamaleon04(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     
 }
 
-__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx__motionisdone(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jinputs__externallymeasuredtorque(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     
 }
 
-__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx__externalvalueoftorque(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jinputs__holder02FFU01(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     
 }
 
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jinputs__holder04FFU02(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    
+}
+
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jcmmnds__calibration(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jcmmnds__setpoint(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jcmmnds__stoptrajectory(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jcmmnds__holder01FFU01(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jcmmnds__holder01FFU02(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jcmmnds__holder01FFU03(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    
+}
+
+
+// mxx-init:
 
 __weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Mxx_mconfig(uint16_t n, const EOnv* nv)
 {
@@ -1086,24 +1671,34 @@ __weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Mxx_mconfig__maxcurrentofmot
 }
 
 
-__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Mxx_mconfig__upto02descrforchameleon06(uint16_t n, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Mxx_mconfig__des02FORmstatuschamaleon04(uint16_t n, const EOnv* nv)
 {
     
 }
 
 
-__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Mxx__mstatus(uint16_t n, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Mxx_mstatus(uint16_t n, const EOnv* nv)
 {
     
 }
 
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Mxx_mstatus__basic(uint16_t n, const EOnv* nv)
+{
+    
+}
 
-// mxx-updt: all the nvs
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Mxx_mstatus__chamaleon04(uint16_t n, const EOnv* nv)
+{
+    
+}
+
+// mxx-updt:
+
+
 __weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Mxx_mconfig(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     
 }
-
 
 __weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Mxx_mconfig__pidcurrent(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
@@ -1123,16 +1718,29 @@ __weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Mxx_mconfig__maxcurrentofmot
 }
 
 
-__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Mxx_mconfig__upto02descrforchameleon06(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Mxx_mconfig__des02FORmstatuschamaleon04(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     
 }
 
 
-__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Mxx__mstatus(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Mxx_mstatus(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     
 }
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Mxx_mstatus__basic(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    
+}
+
+__weak extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Mxx_mstatus__chamaleon04(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    
+}
+
+
+
 
 
 

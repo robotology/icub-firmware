@@ -68,26 +68,47 @@ EO_VERIFYproposition(xxx, jointNVindex_jconfig                              == E
 EO_VERIFYproposition(xxx, jointNVindex_jconfig__pidposition                 == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidposition);
 EO_VERIFYproposition(xxx, jointNVindex_jconfig__pidvelocity                 == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidvelocity);
 EO_VERIFYproposition(xxx, jointNVindex_jconfig__pidtorque                   == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidtorque);
+EO_VERIFYproposition(xxx, jointNVindex_jconfig__impedance                   == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__impedance);
 EO_VERIFYproposition(xxx, jointNVindex_jconfig__minpositionofjoint          == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__minpositionofjoint);
 EO_VERIFYproposition(xxx, jointNVindex_jconfig__maxpositionofjoint          == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__maxpositionofjoint);
 EO_VERIFYproposition(xxx, jointNVindex_jconfig__velocitysetpointtimeout     == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__velocitysetpointtimeout);
-EO_VERIFYproposition(xxx, jointNVindex_jconfig__upto02descrforchameleon02   == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__upto02descrforchameleon02);
-EO_VERIFYproposition(xxx, jointNVindex__jstatus                             == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__jstatus);
-EO_VERIFYproposition(xxx, jointNVindex__calibrator                          == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__calibrator);
-EO_VERIFYproposition(xxx, jointNVindex__setpoint                            == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__setpoint);
-EO_VERIFYproposition(xxx, jointNVindex__controlmode                         == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__controlmode);
-EO_VERIFYproposition(xxx, jointNVindex__signalwhenmotionisdone              == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__signalwhenmotionisdone);
-EO_VERIFYproposition(xxx, jointNVindex__motionisdone                        == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__motionisdone);
-EO_VERIFYproposition(xxx, jointNVindex__externalvalueoftorque               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex__externalvalueoftorque);
+EO_VERIFYproposition(xxx, jointNVindex_jconfig__controlmode                 == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__controlmode);
+EO_VERIFYproposition(xxx, jointNVindex_jconfig__motionmonitormode           == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__motionmonitormode);
+EO_VERIFYproposition(xxx, jointNVindex_jconfig__des02FORjstatuschamaleon04  == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__des02FORjstatuschamaleon04);
+EO_VERIFYproposition(xxx, jointNVindex_jconfig__holder01FFU01               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__holder01FFU01);
+EO_VERIFYproposition(xxx, jointNVindex_jconfig__holder01FFU02               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__holder01FFU02);
+EO_VERIFYproposition(xxx, jointNVindex_jconfig__holder02FFU03               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__holder02FFU03);
+EO_VERIFYproposition(xxx, jointNVindex_jconfig__holder02FFU04               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__holder02FFU04);
+
+EO_VERIFYproposition(xxx, jointNVindex_jstatus                              == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jstatus);
+EO_VERIFYproposition(xxx, jointNVindex_jstatus__basic                       == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jstatus__basic);
+EO_VERIFYproposition(xxx, jointNVindex_jstatus__ofpid                       == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jstatus__ofpid);
+EO_VERIFYproposition(xxx, jointNVindex_jstatus__chamaleon04                 == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jstatus__chamaleon04);
+
+EO_VERIFYproposition(xxx, jointNVindex_jinputs__externallymeasuredtorque    == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jinputs__externallymeasuredtorque);
+EO_VERIFYproposition(xxx, jointNVindex_jinputs__holder02FFU01               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jinputs__holder02FFU01);
+EO_VERIFYproposition(xxx, jointNVindex_jinputs__holder04FFU02               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jinputs__holder04FFU02);
+
+EO_VERIFYproposition(xxx, jointNVindex_jcmmnds__calibration                 == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__calibration);
+EO_VERIFYproposition(xxx, jointNVindex_jcmmnds__setpoint                    == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__setpoint);
+EO_VERIFYproposition(xxx, jointNVindex_jcmmnds__stoptrajectory              == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__stoptrajectory);
+EO_VERIFYproposition(xxx, jointNVindex_jcmmnds__holder01FFU01               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__holder01FFU01);
+EO_VERIFYproposition(xxx, jointNVindex_jcmmnds__holder01FFU02               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__holder01FFU02);
+EO_VERIFYproposition(xxx, jointNVindex_jcmmnds__holder01FFU03               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__holder01FFU03);
 
 EO_VERIFYproposition(xxx, jointNVindex_TOTALnumber                          == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber);
+
 
 EO_VERIFYproposition(xxx, motorNVindex_mconfig                              == EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig);
 EO_VERIFYproposition(xxx, motorNVindex_mconfig__pidcurrent                  == EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__pidcurrent);
 EO_VERIFYproposition(xxx, motorNVindex_mconfig__maxvelocityofmotor          == EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__maxvelocityofmotor);
 EO_VERIFYproposition(xxx, motorNVindex_mconfig__maxcurrentofmotor           == EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__maxcurrentofmotor);
-EO_VERIFYproposition(xxx, motorNVindex_mconfig__upto02descrforchameleon06   == EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__upto02descrforchameleon06);
-EO_VERIFYproposition(xxx, motorNVindex__mstatus                             == EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex__mstatus);
+EO_VERIFYproposition(xxx, motorNVindex_mconfig__des02FORmstatuschamaleon04  == EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__des02FORmstatuschamaleon04);
+
+EO_VERIFYproposition(xxx, motorNVindex_mstatus                              == EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mstatus);
+EO_VERIFYproposition(xxx, motorNVindex_mstatus__basic                       == EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mstatus__basic);
+EO_VERIFYproposition(xxx, motorNVindex_mstatus__chamaleon04                 == EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mstatus__chamaleon04);
+
 
 EO_VERIFYproposition(xxx, motorNVindex_TOTALnumber                          == EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber);
 
@@ -107,19 +128,36 @@ static const uint8_t s_eo_cfg_nvsEP_mc_any_con_bodypart_jxxfuntyp[] =
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig,
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__pidposition,
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__pidvelocity,
-    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__pidtorque,                           
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__pidtorque,  
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__impedance,    
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__minpositionofjoint,
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__maxpositionofjoint,
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__velocitysetpointtimeout,
-    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__upto02descrforchameleon02,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__controlmode,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__motionmonitormode,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__des02FORjstatuschamaleon04,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__holder01FFU01,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__holder01FFU02,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__holder02FFU03,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__holder02FFU04,
+    
 
-    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__jstatus,
-    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__calibrator,
-    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__setpoint,
-    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__controlmode,
-    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__signalwhenmotionisdone,
-    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__motionisdone,
-    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP__externalvalueoftorque
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jstatus,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jstatus__basic,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jstatus__ofpid,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jstatus__chamaleon04,
+    
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jinputs__externallymeasuredtorque,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jinputs__holder02FFU01,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jinputs__holder04FFU02,
+    
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__calibration,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__setpoint,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__stoptrajectory,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__holder01FFU01,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__holder01FFU02,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__holder01FFU03
+    
 };  EO_VERIFYsizeof(s_eo_cfg_nvsEP_mc_any_con_bodypart_jxxfuntyp, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber);
 
 
@@ -129,9 +167,12 @@ static const uint8_t s_eo_cfg_nvsEP_mc_any_con_bodypart_mxxfuntyp[] =
     EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__pidcurrent,
     EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__maxvelocityofmotor,
     EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__maxcurrentofmotor,
-    EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__upto02descrforchameleon06,
+    EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__des02FORmstatuschamaleon04,
 
-    EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP__mstatus
+    EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mstatus,
+    EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mstatus__basic,
+    EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mstatus__chamaleon04
+    
 };  EO_VERIFYsizeof(s_eo_cfg_nvsEP_mc_any_con_bodypart_mxxfuntyp, EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber);
 
 // --------------------------------------------------------------------------------------------------------------------

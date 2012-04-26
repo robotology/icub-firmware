@@ -172,7 +172,7 @@
 #define NVMACRO_BSTR        MXXMACRO_BOARD
 #define NVMACRO_NVSTR1      MXXMACRO_MSTR
 #define NVMACRO_NVNUM1      MXXMACRO_MNUM
-#define NVMACRO_NVSTR2      _mconfig__upto02descrforchameleon06
+#define NVMACRO_NVSTR2      _mconfig__des02FORmstatuschamaleon04
 
 #define NVMACRO_USE_INIT    1
 #define NVMACRO_USE_UPDT    1
@@ -188,12 +188,44 @@
 #define NVMACRO_BSTR        MXXMACRO_BOARD
 #define NVMACRO_NVSTR1      MXXMACRO_MSTR
 #define NVMACRO_NVNUM1      MXXMACRO_MNUM
-#define NVMACRO_NVSTR2      __mstatus
+#define NVMACRO_NVSTR2      _mstatus
 
 #define NVMACRO_USE_INIT    1
 #define NVMACRO_USE_UPDT    1
 
 #include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
+#define NVMACRO_FUN_INIT    MXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    MXXMACRO_UPDT
+
+#define NVMACRO_PSTR        MXXMACRO_PART
+#define NVMACRO_BSTR        MXXMACRO_BOARD
+#define NVMACRO_NVSTR1      MXXMACRO_MSTR
+#define NVMACRO_NVNUM1      MXXMACRO_MNUM
+#define NVMACRO_NVSTR2      _mstatus__basic
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
+#define NVMACRO_FUN_INIT    MXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    MXXMACRO_UPDT
+
+#define NVMACRO_PSTR        MXXMACRO_PART
+#define NVMACRO_BSTR        MXXMACRO_BOARD
+#define NVMACRO_NVSTR1      MXXMACRO_MSTR
+#define NVMACRO_NVNUM1      MXXMACRO_MNUM
+#define NVMACRO_NVSTR2      _mstatus__chamaleon04
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
 
 #undef MXXMACRO_INIT        
 #undef MXXMACRO_UPDT        

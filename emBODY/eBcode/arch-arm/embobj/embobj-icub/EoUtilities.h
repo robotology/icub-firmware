@@ -57,8 +57,7 @@ typedef struct
 {
     uint8_t     size        : 2;            /**< 0 for 1 byte, 1 for 2 bytes, 2 for 4 bytes, 3 for none. */
     uint8_t     identifier  : 6;            /**< from 0 to 63 */
-} eOutil_chameleon_descriptor_t;            EO_VERIFYsizeof(eOutil_chameleon_descriptor_t, 1);  
-
+} eOutil_chameleon_descr_t;                 EO_VERIFYsizeof(eOutil_chameleon_descr_t, 1);  
 
 
 /** @typedef    typedef struct eOutil_debug_values_t
