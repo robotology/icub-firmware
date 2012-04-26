@@ -111,6 +111,7 @@ void hostTransceiver::load_occasional_rop(eOropcode_t opc, uint16_t ep, uint16_t
 
 void hostTransceiver::s_eom_hostprotoc_extra_protocoltransceiver_configure_regular_rops_on_board(void)
 {
+/*
     EOarray *upto10 = (EOarray*) & eo_cfg_nvsEP_mngmnt_usr_rem_board_mem_local->upto10rop2signal;
     eOropSIGcfg_t sigcfg;
     char str[128];
@@ -177,6 +178,7 @@ void hostTransceiver::s_eom_hostprotoc_extra_protocoltransceiver_configure_regul
 
 
     reset = (0==reset) ? (1) : (0);
+*/
 }
 
 // vecchio //
@@ -190,7 +192,7 @@ void hostTransceiver::hostTransceiver_ConfigureRegularsOnRemote(void)
     //       pair (endpoint, id) which we wnat to manipulate, and then to use the methods of EOnv to set the value of that variable.
     //       we shall use this mode in function hostTransceiver_AddSetROP()
     
-    EOarray *upto15 = (EOarray*) & eo_cfg_nvsEP_mngmnt_usr_rem_board_mem_local->upto10rop2signal;
+ //   EOarray *upto15 = (EOarray*) & eo_cfg_nvsEP_mngmnt_usr_rem_board_mem_local->upto10rop2signal;
 #warning "cambiato?? per compilare scommentato definizione eOnvEPID_t in EOnv.h"
 //    eOnvEPID_t epid;
 

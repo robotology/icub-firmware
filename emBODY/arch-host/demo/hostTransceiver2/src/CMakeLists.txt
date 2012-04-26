@@ -35,13 +35,15 @@ set(NVS_COMMON_SOURCE 		${NVS_COMMON_FOLDER}/eOcfg_nvsEP_base_con.c
 set(NVS_COMMON_HEADER 		${NVS_COMMON_FOLDER}/eOcfg_nvsEP_base_con.h
 							${NVS_COMMON_FOLDER}/eOcfg_nvsEP_mngmnt_con.h)
 
-set(NVS_REMOTE_SOURCE		${NVS_REMOTE_FOLDER}/eOcfg_EPs_rem_board.c
-							${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_base_usr_rem_anydev.c
-							${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_mngmnt_usr_rem_board.c)
+set(NVS_REMOTE_SOURCE		${NVS_REMOTE_FOLDER}/eOcfg_EPs_rem_board2.c
+						#	${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_base_usr_rem_anydev.c
+						#	${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_mngmnt_usr_rem_board.c
+							)
 
-set(NVS_REMOTE_HEADER		${NVS_REMOTE_FOLDER}/eOcfg_EPs_rem_board.h
-							${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_base_usr_rem_anydev.h
-							${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_mngmnt_usr_rem_board.h)
+set(NVS_REMOTE_HEADER		${NVS_REMOTE_FOLDER}/eOcfg_EPs_rem_board2.h
+						#	${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_base_usr_rem_anydev.h
+						#	${NVS_REMOTE_FOLDER}/eOcfg_nvsEP_mngmnt_usr_rem_board.h
+							)
 
 
 set(NVS_MC_EP_SOURCE 		${NVS_MC_EP}eOcfg_nvsEP_mc_any_con_bodypart.c
@@ -49,7 +51,13 @@ set(NVS_MC_EP_SOURCE 		${NVS_MC_EP}eOcfg_nvsEP_mc_any_con_bodypart.c
 							${NVS_MC_EP}eOcfg_nvsEP_mc_any_con_mxxdefault.c
 							${NVS_MC_EP}eOcfg_nvsEP_mc_leftleg_con.c
 							${NVS_MC_EP}eOcfg_nvsEP_mc_leftleg_usr_rem_ebx.c)
-							
+	
+set(NVS_MC_EP_SOURCE2 		${NVS_MC_EP}eOcfg_nvsEP_mc_any_con_bodypart.c
+							${NVS_MC_EP}eOcfg_nvsEP_mc_any_con_jxxdefault.c
+							${NVS_MC_EP}eOcfg_nvsEP_mc_any_con_mxxdefault.c
+							${NVS_MC_EP}eOcfg_nvsEP_mc_leg_con.c
+							${NVS_MC_EP}eOcfg_nvsEP_mc_leg_usr.c
+							${NVS_MC_EP}eOcfg_nvsEP_mc_leg_usr_pippo.c)						
 
 set(NVS_MC_EP_HEADER 		${NVS_MC_EP}/eOcfg_nvsEP_mc_any_con_bodypart.h
 							${NVS_MC_EP}/eOcfg_nvsEP_mc_any_con_bodypart_hid.h
@@ -57,8 +65,9 @@ set(NVS_MC_EP_HEADER 		${NVS_MC_EP}/eOcfg_nvsEP_mc_any_con_bodypart.h
 							${NVS_MC_EP}/eOcfg_nvsEP_mc_any_con_jxxdefault.h
 							${NVS_MC_EP}/eOcfg_nvsEP_mc_any_con_mxx.h
 							${NVS_MC_EP}/eOcfg_nvsEP_mc_any_con_mxxdefault.h
-							${NVS_MC_EP}/eOcfg_nvsEP_mc_leftleg_con.h
-							${NVS_MC_EP}/eOcfg_nvsEP_mc_leftleg_usr_rem_ebx.h)
+							${NVS_MC_EP}/eOcfg_nvsEP_mc_leg_con.h
+#							${NVS_MC_EP}/eOcfg_nvsEP_mc_leg_usr.h
+							)
 
 
 # EmbObj-src
@@ -169,7 +178,7 @@ set(embobj_source 		${BODY_COMMON_SOURCE}
 				${PROT_FOLDER}
 				${NVS_COMMON_SOURCE} 
 				${NVS_REMOTE_SOURCE}
-				${NVS_MC_EP_SOURCE})
+				${NVS_MC_EP_SOURCE2})
 
 
 set(embobj_header 		${BODY_COMMON_SOURCE} 
