@@ -8,71 +8,78 @@
     @brief      This header file implements public interface to ...
     @author     marco.accame@iit.it
     @date       04/20/2011
-**/
+ **/
 
-/** @defgroup eo_cedcew Library hostTransceiver
+/** @defgroup  Library hostTransceiver
     It is an example of how the embOBJ can operate as host trasceiver.
-     
+
     @{        
  **/
 
 
-
 // - external dependencies --------------------------------------------------------------------------------------------
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 #include "EoCommon.h"
 #include "EOhostTransceiver.h"
+#include "transceiverInterface.h"
 
 #ifdef __cplusplus
 }
 #endif
 
+#include <yarp/dev/DeviceDriver.h>
 
+using namespace yarp::dev;
 
-// - public #define  --------------------------------------------------------------------------------------------------
-// empty-section
- 
+class hostTransceiver : public DeviceDriver,
+						public ITransceiver
+{
+private:
+	EOhostTransceiver*  hosttxrx;
+	EOtransceiver*      pc104txrx;
+	EOnvsCfg*           pc104nvscfg;
+	uint32_t            localipaddr;
+	uint32_t            remoteipaddr;
+	uint16_t            ipport;
+	EOpacket*           pkt;
+	int					culo;
 
-// - declaration of public user-defined types -------------------------------------------------------------------------    
-// empty-section
+public:
+public:
+	hostTransceiver();
+    ~hostTransceiver();
 
-    
-// - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-// empty-section
+	void init( uint32_t localipaddr, uint32_t remoteipaddr, uint16_t ipport, uint16_t pktsize);
 
+	// as an alternative ... create one methd which clears the remote vars, one which pushes one ack, and another the confirms them all.
+	void hostTransceiver_ConfigureRegularsOnRemote(void);
 
-// - declaration of extern public functions ---------------------------------------------------------------------------
- 
+	void load_occasional_rop(eOropcode_t opc, uint16_t ep, uint16_t nvid);
+	void s_eom_hostprotoc_extra_protocoltransceiver_configure_regular_rops_on_board(void);
 
-extern void hostTransceiver_Init(uint32_t localipaddr, uint32_t remoteipaddr, uint16_t ipport, uint16_t pktsize);
+	// somebody adds a set-rop  plus data.
+	void hostTransceiver_AddSetROP(uint16_t endpoint, uint16_t id, uint8_t* data, uint16_t size);
 
-// as an alternative ... create one methd which clears the remote vars, one which pushes one ack, and another the confirms them all.
-extern void hostTransceiver_ConfigureRegularsOnRemote(void);
+	// create a get nv rop
+	void s_hostTransceiver_AddGetROP(uint16_t ep, uint16_t id);
 
-void s_eom_hostprotoc_extra_protocoltransceiver_load_occasional_rop(eOropcode_t opc, uint16_t ep, uint16_t nvid);
-void s_eom_hostprotoc_extra_protocoltransceiver_configure_regular_rops_on_board(void);
+	void s_hostTransceiver_AddSetROP_with_data_already_set(uint16_t ep, uint16_t id);
 
-// somebody adds a set-rop  plus data.
-extern void hostTransceiver_AddSetROP(uint16_t endpoint, uint16_t id, uint8_t* data, uint16_t size);
+	// somebody passes the received packet
+	void SetReceived(uint8_t *data, uint16_t size);
+	// and Processes it
+	virtual void onMsgReception(uint8_t *data, uint16_t size);
 
-// create a get nv rop
-static void s_hostTransceiver_AddGetROP(uint16_t ep, uint16_t id);
+	// somebody retrieves what must be transmitted
+	void getTransmit(uint8_t **data, uint16_t *size);
 
-// somebody passes the received packet
-extern void hostTransceiver_SetReceived(uint8_t *data, uint16_t size);
-
-
-// somebody retrieves what must be transmitted
-extern void hostTransceiver_GetTransmit(uint8_t **data, uint16_t *size);
-
-
-
-/** @}            
-    end of group eo_cedcew 
- **/
+	void getNVvalue(EOnv *nvRoot, uint8_t* data, uint16_t* size);
+	EOnv* getNVhandler(uint16_t endpoint, uint16_t id);
+	void askNV(uint16_t endpoint, uint16_t id, uint8_t* data, uint16_t* size);
+} ;
 
 #endif  // include-guard
 

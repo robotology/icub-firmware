@@ -23,7 +23,7 @@ using namespace std;
 #include "ace/SOCK_Dgram.h"
 #include "ace/Addr.h"
 #include "ace/Thread.h"
-
+#include "ace/Logging_Strategy.h"	// for logging stuff
 
 #include "main-transceiver.hpp"
 #include "hostTransceiver.hpp"
@@ -36,9 +36,12 @@ using namespace std;
 #include "yarp/dev/ControlBoardInterfacesImpl.inl" //ControlBoardHelper
 
 extern "C" {
+#include "EOnv_hid.h"
 #include "EoMotionControl.h"
 #include "eOcfg_EPs_rem_board.h"
 }
+
+
 
 //#include "eOcfg_nvsEP_base_con.h"
 //#include "eOcfg_nvsEP_mngmnt_con.h"
@@ -111,9 +114,10 @@ ACE_SOCK_Dgram				*ACE_socket;
 ACE_UINT16					port;
 ACE_INT8					flags = 0;
 
+eOipv4addr_t remoteAddr;
 Board_connect_info local, remote01;
 uint8_t need2sendarop = 0;
-
+hostTransceiver *transceiver;
 pthread_t thread;
 
 
@@ -210,11 +214,14 @@ int main(int argc, char *argv[])
     printf("remote01.address: %s\n", remote01.address_string.c_str());
     printf("port is : %d\n\n", port);
 
-	eOipv4addr_t remoteAddr = eo_common_ipv4addr(ip1,ip2,ip3,ip4); // marco (10, 255, 39, 151)
+	remoteAddr = eo_common_ipv4addr(ip1,ip2,ip3,ip4); // marco (10, 255, 39, 151)
 	eOipv4port_t eOport = port;
 
     // init object: one per ems
-    hostTransceiver_Init(localAddr,remoteAddr, eOport, EOK_HOSTTRANSCEIVER_capacityofpacket);
+	//hostTransceiver_Init(localAddr,remoteAddr, eOport, EOK_HOSTTRANSCEIVER_capacityofpacket);
+	transceiver= new hostTransceiver;
+	transceiver->init(localAddr,remoteAddr, eOport, EOK_HOSTTRANSCEIVER_capacityofpacket);
+
 
     ACE_UINT8		tmp = 1;
 
@@ -266,7 +273,7 @@ int main(int argc, char *argv[])
 
 				// Get the actual packet and write it into socket using udppkt_data, udppkt_size
 				// if the command isn't known, an empty ropframe wil be sent -- I guess
-				hostTransceiver_GetTransmit(&udppkt_data, &udppkt_size);
+				transceiver->getTransmit(&udppkt_data, &udppkt_size);
 				ACE_socket->send(udppkt_data, udppkt_size, remote01.addr, flags);
 				printf("Sent EmbObj packet, size = %d\n", udppkt_size);
 			}
@@ -304,14 +311,14 @@ void *recvThread(void * arg)
 	  udppkt_size = ACE_socket->recv((void *) &sender.data, maxBytes2Read, remote01.addr, flags);
 	  printf("Received new packet, size = %d\n", udppkt_size);
 
-	  hostTransceiver_SetReceived((ACE_UINT8 *)sender.data, udppkt_size);
+	  transceiver->SetReceived((ACE_UINT8 *)sender.data, udppkt_size);
 
 	  if(1 == need2sendarop)
 	  {
 		// eo_ropframe_Clear(p->ropframereply);
 		//  hostTransceiver_AddSetROP((ACE_UINT16 ) EOK_cfg_nvsEP_base_endpoint, (ACE_UINT16 ) EOK_cfg_nvsEP_base_NVID__forcerestart, &tmp, 1);
-		  hostTransceiver_GetTransmit((ACE_UINT8 **)&sender.data, &udppkt_size);
-		  hostTransceiver_GetTransmit((ACE_UINT8 **)&sender.data, &udppkt_size);  // repeated, just to be sure the packet got at the end is empty
+		  transceiver->getTransmit((ACE_UINT8 **)&sender.data, &udppkt_size);
+		  transceiver->getTransmit((ACE_UINT8 **)&sender.data, &udppkt_size);  // repeated, just to be sure the packet got at the end is empty
 
 		  // write into skt: udppkt_data, udppkt_size
 		  ACE_socket->send(sender.data, udppkt_size, remote01.addr, flags);
@@ -364,7 +371,7 @@ static void s_eom_hostprotoc_extra_protocoltransceiver_ask_the_board(void)
 {
 	char str[128];
 
-	s_eom_hostprotoc_extra_protocoltransceiver_load_occasional_rop(eo_ropcode_ask, EOK_cfg_nvsEP_base_endpoint, EOK_cfg_nvsEP_base_NVID__applicationinfo);
+	transceiver->load_occasional_rop(eo_ropcode_ask, EOK_cfg_nvsEP_base_endpoint, EOK_cfg_nvsEP_base_NVID__applicationinfo);
 	snprintf(str, sizeof(str)-1, "added a ask<__applicationinfo>\n");
 }
 
@@ -373,9 +380,8 @@ static void s_callback_button_2(void)
 	char str[128];
 
 	snprintf(str, sizeof(str)-1, "called callback on BUTTON_TAMP: tx a set<regulars>\n");
-	s_eom_hostprotoc_extra_protocoltransceiver_configure_regular_rops_on_board();
+	transceiver->s_eom_hostprotoc_extra_protocoltransceiver_configure_regular_rops_on_board();
 }
-
 
 static void s_callback_button_3(void )
 {
@@ -387,32 +393,51 @@ static void s_callback_button_3(void )
 static void s_callback_button_4(void )
 {
 	char str[128];
-	Pid pid;
-	int j = 0;
-//	eOmc_joint_config_t *cfg =  &eo_cfg_nvsEP_joint_usr_rem_board_mem_local->cfg;
-//	copyPid2eo(pid, &cfg->pidpos);
-	eOnvID_t nvid = eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get((eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t)j, motorNVindex_mconfig);
+	uint8_t  j = 0;
+	EOnv 		*nvRoot;
 
-    s_eom_hostprotoc_extra_protocoltransceiver_load_occasional_rop(eo_ropcode_set, EOK_cfg_nvsEP_mc_leftleg_EP, nvid);
+	// get nvid from parameters
+    eOnvID_t nvid = eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get((eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t) j, motorNVindex_mconfig);
+    nvRoot = transceiver->getNVhandler(EOK_cfg_nvsEP_mc_leftleg_EP, nvid);
 
-	snprintf(str, sizeof(str)-1, "called callback on BUTTON_WKUP: tx a ropframe\n");
+	eOmc_PID_t pid;
+	pid.kp = 0;
+	pid.ki = 1;
+	pid.kd = 2;
+	pid.limitonintegral = 3;
+	pid.limitonoutput = 4;
+	pid.offset = 5;
+	pid.scale = 6;
+
+	eo_nv_remoteSet(nvRoot, &pid, eo_nv_upd_ifneeded);
+
+
+	/*  Faster way to fill a nv with data, but less portable
+
+	// get the pointer to the memory
+	eOmc_PID_t *nv_pid =  &eo_cfg_nvsEP_mc_leftleg_usr_rem_ebx_mem_lodddcal->joints[j].jconfig.pidposition;
+	// write it
+	copyPid2eo(pid, &nv_pid);
+	*/
+
+	// tell agent to prepare a rop to send
+    transceiver->load_occasional_rop(eo_ropcode_set, EOK_cfg_nvsEP_mc_leftleg_EP, nvid);
+
+	snprintf(str, sizeof(str)-1, "called s_callback_button_4: set a motorNVindex_mconfig, motor %d\n", j);
 }
 
 static void s_callback_button_5(void )
 {
 	char str[128];
-	Pid pid;
 	int j = 0;
 
-	//eOmc_joint_config_t *cfg =  &eo_cfg_nvsEP_joint_usr_rem_board_mem_local->cfg;
-	//copyPid2eo(pid, &cfg->pidpos);
-
+	// get nvid from parameters
 	eOnvID_t nvid = eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get((eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t)j, motorNVindex_mconfig);
-//	remoteSet(nvid, pid, eo_nv_upd_dontdo);
 
-	s_eom_hostprotoc_extra_protocoltransceiver_load_occasional_rop(eo_ropcode_ask, EOK_cfg_nvsEP_mc_leftleg_EP, nvid);
+	// tell agent to prepare a rop to send
+    transceiver->load_occasional_rop(eo_ropcode_ask, EOK_cfg_nvsEP_mc_leftleg_EP, nvid);
 
-	snprintf(str, sizeof(str)-1, "called callback on BUTTON_WKUP: tx a ropframe\n");
+	snprintf(str, sizeof(str)-1, "called s_callback_button_5: ask a motorNVindex_mconfig, motor %d\n", j);
 }
 
 // Utilities
