@@ -128,6 +128,11 @@ extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig(uint16_t n, const EOnv*
     
 }
 
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jstatus(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    
+}
+
 
 
 
