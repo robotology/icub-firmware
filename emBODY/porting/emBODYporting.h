@@ -66,6 +66,7 @@
     #pragma pack(8)
     #define snprintf        snprintf  
     #define float32_t       float    
+	#define __weak __attribute__((weak))
 #elif defined(__arm__)
     // __arm__ or __ARMCC_VERSION are always defined in armcc compiler
     #define EO_extern_inline        extern inline
