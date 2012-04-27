@@ -95,14 +95,19 @@
 
 #include "EOtransceiver.h"
 
+#include "EOarray.h"
+
 
 // all that is enough for the local board
-#include "eOcfg_EPs_loc_board.h"
+#include "eOcfg_EPs_ebx.h"
 #include "EOtheBOARDtransceiver.h"
 
 // all that is enough for the remote host to see the board
-#include "eOcfg_EPs_rem_board.h"
+#include "eOcfg_EPs_ebx.h"
 #include "EOhostTransceiver.h"
+
+// but need this one to see ram of teh endpoints
+//#include "eOcfg_nvsEP_mngmnt_usr.h"
 
 
 //#include "eOcfg_nvsEP_base_usr_rem_anydev.h"
@@ -1066,15 +1071,15 @@ static void s_test_nvs_transceiver_init(void)
 //    eo_transceiver_cfg_t ems00cfg = eo_transceiver_cfg_default;
     eOboardtransceiver_cfg_t boardtxrxcfg = 
     {
-        .vectorof_endpoint_cfg          = eo_cfg_EPs_vectorof_loc_board,
-        .hashfunction_ep2index          = eo_cfg_nvsEP_loc_board_fptr_hashfunction_ep2index,
+        .vectorof_endpoint_cfg          = eo_cfg_EPs_vectorof_ebx,
+        .hashfunction_ep2index          = eo_cfg_nvsEP_ebx_fptr_hashfunction_ep2index,
         .remotehostipv4addr             = nvs_pc104_ipaddress,
         .remotehostipv4port             = nvs_base_endpoint_iport
     };
     eOhosttransceiver_cfg_t hosttxrxcfg = 
     {
-        .vectorof_endpoint_cfg          = eo_cfg_EPs_vectorof_rem_board,
-        .hashfunction_ep2index          = eo_cfg_nvsEP_rem_board_fptr_hashfunction_ep2index,
+        .vectorof_endpoint_cfg          = eo_cfg_EPs_vectorof_ebx,
+        .hashfunction_ep2index          = eo_cfg_nvsEP_ebx_fptr_hashfunction_ep2index,
         .remoteboardipv4addr            = nvs_ems00_ipaddress,
         .remoteboardipv4port            = nvs_base_endpoint_iport
     };
@@ -1103,15 +1108,15 @@ static void s_test_nvs_transceiver_init(void)
  
     // 1. the pc104 adds a command set-EOK_cfg_nvsEP_base_NVID__localise, a ask-EOK_cfg_nvsEP_base_NVID__gotoprocess
     //    and sends the packet
-    s_test_nvs_transceiver_pc104_occasional_load(pc104txrx, eo_ropcode_set, EOK_cfg_nvsEP_base_endpoint, EOK_cfg_nvsEP_base_NVID__localise);
-    s_test_nvs_transceiver_pc104_occasional_load(pc104txrx, eo_ropcode_ask, EOK_cfg_nvsEP_base_endpoint, EOK_cfg_nvsEP_base_NVID__gotoprocess);
-    eo_transceiver_Transmit(pc104txrx, &transpacket, &numofrops);
+//    s_test_nvs_transceiver_pc104_occasional_load(pc104txrx, eo_ropcode_set, EOK_cfg_nvsEP_base_endpoint, EOK_cfg_nvsEP_base_NVID__localise);
+//    s_test_nvs_transceiver_pc104_occasional_load(pc104txrx, eo_ropcode_ask, EOK_cfg_nvsEP_base_endpoint, EOK_cfg_nvsEP_base_NVID__gotoprocess);
+//    eo_transceiver_Transmit(pc104txrx, &transpacket, &numofrops);
 
 
      // 2. the ems receives teh packet, then add a sig-EOK_cfg_nvsEP_base_NVID__boardinfo and transmits
-     eo_transceiver_Receive(ems00txrx, transpacket, &numofrops, &txtime);
-     s_test_nvs_transceiver_ems00_occasional_load(ems00txrx, EOK_cfg_nvsEP_base_NVID__boardinfo);
-     eo_transceiver_Transmit(ems00txrx, &transpacket, &numofrops);
+//     eo_transceiver_Receive(ems00txrx, transpacket, &numofrops, &txtime);
+//     s_test_nvs_transceiver_ems00_occasional_load(ems00txrx, EOK_cfg_nvsEP_base_NVID__boardinfo);
+//     eo_transceiver_Transmit(ems00txrx, &transpacket, &numofrops);
 
 //     // 3. the pc104 receives and transmits, the ems00 receives and transmits
 //     for(;;)
@@ -1165,7 +1170,7 @@ static void s_test_nvs_transceiver_tick(void)
         // may add an extra rop: ask or set or rst
         if(4==(step%10))
         {
-            s_test_nvs_transceiver_pc104_occasional_load(pc104txrx, eo_ropcode_ask, EOK_cfg_nvsEP_base_endpoint, EOK_cfg_nvsEP_base_NVID__gotoprocess);
+//            s_test_nvs_transceiver_pc104_occasional_load(pc104txrx, eo_ropcode_ask, EOK_cfg_nvsEP_base_endpoint, EOK_cfg_nvsEP_base_NVID__gotoprocess);
             snprintf(str, sizeof(str)-1, "               - added a ask<__gotoprocess>");
             hal_trace_puts(str); 
 
@@ -1174,8 +1179,8 @@ static void s_test_nvs_transceiver_tick(void)
         {
             //boolval = (eobool_false==boolval) ? (eobool_true) : (eobool_false);
             boolval = 0;
-            eo_cfg_nvsEP_base_usr_rem_anydev_mem_local->localise = boolval;
-            s_test_nvs_transceiver_pc104_occasional_load(pc104txrx, eo_ropcode_set, EOK_cfg_nvsEP_base_endpoint, EOK_cfg_nvsEP_base_NVID__localise);
+//            eo_cfg_nvsEP_base_usr_rem_anydev_mem_local->localise = boolval;
+//            s_test_nvs_transceiver_pc104_occasional_load(pc104txrx, eo_ropcode_set, EOK_cfg_nvsEP_base_endpoint, EOK_cfg_nvsEP_base_NVID__localise);
             snprintf(str, sizeof(str)-1, "               - added a set<__localise, %d>", boolval);
             hal_trace_puts(str); 
         //    s_test_nvs_transceiver_pc104_occasional_load(pc104txrx, eo_ropcode_ask, EOK_cfg_nvsEP_base_endpoint, EOK_cfg_nvsEP_base_NVID__localise);
@@ -1206,7 +1211,7 @@ static void s_test_nvs_transceiver_tick(void)
         // may add an extra rop: sig
         if(3==(step%10))
         {
-            s_test_nvs_transceiver_ems00_occasional_load(ems00txrx, EOK_cfg_nvsEP_base_NVID__bootprocess);
+//            s_test_nvs_transceiver_ems00_occasional_load(ems00txrx, EOK_cfg_nvsEP_base_NVID__bootprocess);
 //            snprintf(str, sizeof(str)-1, "               - added a sig<__boardinfo>");
 //            hal_trace_puts(str); 
         }
@@ -1338,7 +1343,7 @@ static void s_test_nvs_transceiver_ems00_occasional_load(EOtransceiver *txrx, ui
 
     ropinfo.ropcfg      = eok_ropconfig_basic;
     ropinfo.ropcode     = eo_ropcode_sig;
-    ropinfo.nvep        = EOK_cfg_nvsEP_base_endpoint;
+//    ropinfo.nvep        = EOK_cfg_nvsEP_base_endpoint;
 
     ropinfo.nvid = nvid;
     eo_transceiver_rop_occasional_Load(txrx, &ropinfo);
@@ -1360,55 +1365,55 @@ static void s_test_nvs_transceiver_pc104_occasional_load(EOtransceiver *txrx, eO
 
 static void s_test_nvs_transceiver_pc104_configure_ems(EOtransceiver *txrx)
 {
-    EOarray *upto10 = (EOarray*) & eo_cfg_nvsEP_mngmnt_usr_rem_board_mem_local->upto10rop2signal;
+    EOarray *upto10 = (EOarray*) & eo_cfg_nvsEP_mngmnt_usr_remotelyownedmemory_loc->ropsigcfgassign;
     eOropSIGcfg_t sigcfg;
 
     eo_array_Reset(upto10);
 
-    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
-    sigcfg.id = EOK_cfg_nvsEP_base_NVID_ipnetwork;
+//    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
+//    sigcfg.id = EOK_cfg_nvsEP_base_NVID_ipnetwork;
     sigcfg.plustime = 1;
     eo_array_PushBack(upto10, &sigcfg);
 
 
-    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
-    sigcfg.id = EOK_cfg_nvsEP_base_NVID__bootprocess;
+//    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
+//    sigcfg.id = EOK_cfg_nvsEP_base_NVID__bootprocess;
     sigcfg.plustime = 1;
     eo_array_PushBack(upto10, &sigcfg);
 
-    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
-    sigcfg.id = EOK_cfg_nvsEP_base_NVID__applicationinfo;
+//    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
+//    sigcfg.id = EOK_cfg_nvsEP_base_NVID__applicationinfo;
     sigcfg.plustime = 0;
     eo_array_PushBack(upto10, &sigcfg);
 
-    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
-    sigcfg.id = EOK_cfg_nvsEP_base_NVID__boardinfo;
+//    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
+//    sigcfg.id = EOK_cfg_nvsEP_base_NVID__boardinfo;
     sigcfg.plustime = 0;
     eo_array_PushBack(upto10, &sigcfg);
 
-    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
-    sigcfg.id = EOK_cfg_nvsEP_base_NVID_ipnetwork__ipnetmask;
+//    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
+//    sigcfg.id = EOK_cfg_nvsEP_base_NVID_ipnetwork__ipnetmask;
     sigcfg.plustime = 0;
     eo_array_PushBack(upto10, &sigcfg);
 
-    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
-    sigcfg.id = EOK_cfg_nvsEP_base_NVID_ipnetwork__ipaddress;
+//    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
+//    sigcfg.id = EOK_cfg_nvsEP_base_NVID_ipnetwork__ipaddress;
     sigcfg.plustime = 0;
     eo_array_PushBack(upto10, &sigcfg);
 
-    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
-    sigcfg.id = EOK_cfg_nvsEP_base_NVID__remoteipaddress;
+//    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
+//    sigcfg.id = EOK_cfg_nvsEP_base_NVID__remoteipaddress;
     sigcfg.plustime = 0;
     eo_array_PushBack(upto10, &sigcfg);
 
-    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
-    sigcfg.id = EOK_cfg_nvsEP_base_NVID__remoteipport;
+//    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
+//    sigcfg.id = EOK_cfg_nvsEP_base_NVID__remoteipport;
     sigcfg.plustime = 0;
     eo_array_PushBack(upto10, &sigcfg);    
 #if 0
 #endif
 
-    s_test_nvs_transceiver_pc104_occasional_load(txrx, eo_ropcode_set, EOK_cfg_nvsEP_mngmnt_endpoint, EOK_cfg_nvsEP_mngmnt_NVID__upto10rop2signal);  
+    s_test_nvs_transceiver_pc104_occasional_load(txrx, eo_ropcode_set, EOK_cfg_nvsEP_mngmnt_EP, eo_cfg_nvsEP_mngmnt_NVID_Get(mngmntNVindex__ropsigcfgassign));  
 }
 
 
