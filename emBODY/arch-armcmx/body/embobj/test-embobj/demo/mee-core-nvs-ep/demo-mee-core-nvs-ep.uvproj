@@ -848,6 +848,26 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>ep-mc-upperleg</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_upperleg_con.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_upperleg_con.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_upperleg_usr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_upperleg_usr.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_upperleg_usr_pippo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_upperleg_usr_pippo.c</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
   </Targets>
