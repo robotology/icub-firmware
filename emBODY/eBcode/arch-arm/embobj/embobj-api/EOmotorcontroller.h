@@ -72,7 +72,7 @@ extern float eo_motorcontroller_PWM(EOmotorcontroller *o);
 
 extern void eo_motorcontroller_SetStiffness(EOmotorcontroller *o, float stiffness);
 
-extern void eo_motorcontroller_SetPosRef(EOmotorcontroller *o, float pos_ref, float avg_speed);
+extern void eo_motorcontroller_SetPosRef(EOmotorcontroller *o, float pos_ref, float speed);
 extern void eo_motorcontroller_SetVelRef(EOmotorcontroller *o, float vel_ref, float acc_ref);
 extern void eo_motorcontroller_SetVelMax(EOmotorcontroller *o, float vel_max);
 

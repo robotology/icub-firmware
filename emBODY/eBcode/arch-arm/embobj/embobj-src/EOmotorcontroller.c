@@ -65,7 +65,7 @@ static float limit(float x, float min, float max);
 static const char s_eobj_ownname[] = "EOmotorcontroller";
 
 static const float PERIOD    = 0.001f;       // 1 ms
-static const float FREQUENCY = 1.0f/PERIOD;  // 1 kHz
+//static const float FREQUENCY = 1.0f/PERIOD;  // 1 kHz
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -84,13 +84,22 @@ extern EOmotorcontroller* eo_motorcontroller_New(void)
         
         o->stiffness = 0.0f;
 
-        o->vel = 0.0f;
-        o->vel_max = 0.0f;
-        o->fake_pos_ref = 0.0f;
+        o->pos_now = 0.0f;
+        o->vel_now = 0.0f;
+
+        o->vel_pos_ref = 0.0f;
+        o->vel_timer   = 0.0f;
+        o->vel_timeout = 0.1f;
 
         o->pos_ref = 0.0f;
+        o->speed   = 0.0f;
+
         o->vel_ref = 0.0f;
         o->acc_ref = 0.0f;
+
+        o->pos_min = 0.0f;
+        o->pos_max = 0.0f;
+        o->vel_max = 0.0f;
 
         o->pidP = eo_pid_New();
         o->pidT = eo_pid_New();
@@ -101,18 +110,15 @@ extern EOmotorcontroller* eo_motorcontroller_New(void)
     return o;
 }
 
-extern void eo_motorcontroller_SetVelMax(EOmotorcontroller *o, float vel_max)
+extern void eo_motorcontroller_SetPosLimits(EOmotorcontroller *o, float pos_min, float pos_max)
 {
-    if (vel_max < 0.0f) vel_max = -vel_max;
-
-    o->vel_max = vel_max;
+    o->pos_min = pos_min;
+    o->pos_max = pos_max;
 }
 
-extern uint8_t eo_motorcontroller_SetControlMode(EOmotorcontroller *o, control_mode_t control_mode)
+extern void eo_motorcontroller_SetVelMax(EOmotorcontroller *o, float vel_max)
 {
-    o->control_mode = control_mode;
-
-    return 1;
+    o->vel_max = vel_max;
 }
 
 extern void eo_motorcontroller_SetStiffness(EOmotorcontroller *o, float stiffness)
@@ -120,17 +126,17 @@ extern void eo_motorcontroller_SetStiffness(EOmotorcontroller *o, float stiffnes
     o->stiffness = stiffness;
 }
 
-extern void eo_motorcontroller_ReadEncPos(EOmotorcontroller *o, float encpos_meas)
+extern void eo_motorcontroller_ReadEncoder(EOmotorcontroller *o, float encpos_meas)
 {
     o->encpos_meas = encpos_meas;
 }
 
-extern void eo_motorcontroller_ReadTorque(EOmotorcontroller *o, float torque_meas)
+extern void eo_motorcontroller_ReadTorqueSensor(EOmotorcontroller *o, float torque_meas)
 {
     o->torque_meas = torque_meas;
 }
 
-extern uint8_t eo_motorcontroller_SetRefPos(EOmotorcontroller *o, float pos_ref, float avg_speed)
+extern uint8_t eo_motorcontroller_SetRefPos(EOmotorcontroller *o, float pos_ref, float speed)
 {
     if (o->control_mode == CM_IDLE || o->control_mode == CM_TORQUE  || o->control_mode == CM_OPENLOOP) return 0;
 
@@ -144,27 +150,17 @@ extern uint8_t eo_motorcontroller_SetRefPos(EOmotorcontroller *o, float pos_ref,
     }
 
     o->pos_ref = limit(pos_ref, o->pos_min, o->pos_max);
-    o->vel_ref = avg_speed;
-    o->acc_ref = 0.0f;
+    o->speed = speed;
 
-    eo_trajectory_SetReference(o->trajectory, o->encpos_meas, o->pos_ref, o->vel, o->vel_ref);
+    eo_trajectory_SetReference(o->trajectory, o->encpos_meas, o->pos_ref, o->vel_now, o->speed);
 
     return 1;
 }
 
-extern void eo_motorcontroller_SetRefVel(EOmotorcontroller *o, float vel_ref, float acc_ref)
+extern uint8_t eo_motorcontroller_SetRefVel(EOmotorcontroller *o, float vel_ref, float acc_ref)
 {
-    if (o->control_mode == CM_IDLE || o->control_mode == CM_TORQUE || o->control_mode == CM_OPENLOOP /*|| !IS_DONE*/) return;
+    if (o->control_mode == CM_IDLE || o->control_mode == CM_TORQUE || o->control_mode == CM_OPENLOOP /*|| !IS_DONE*/) return 0;
 
-    o->vel_timer = 0.0f;
-
-    o->vel_ref = limit(vel_ref, -o->vel_max, o->vel_max); 
-    o->acc_ref = acc_ref * ( acc_ref > 0.0f ? PERIOD:-PERIOD);
-    o->fake_pos_ref = 0.0f;
-    o->pos_ref = o->encpos_meas;
-    
-    if (o->control_mode == CM_POSITION || o->control_mode == CM_IMPEDANCE_POS) o->vel = 0.0f;
-    
     if (o->control_mode == CM_IMPEDANCE_POS || o->control_mode == CM_IMPEDANCE_VEL)
     { 
         o->control_mode = CM_IMPEDANCE_VEL;
@@ -173,6 +169,50 @@ extern void eo_motorcontroller_SetRefVel(EOmotorcontroller *o, float vel_ref, fl
     {
         o->control_mode = CM_VELOCITY;
     }
+
+    o->vel_ref = limit(vel_ref, -o->vel_max, o->vel_max); 
+    o->acc_ref = acc_ref * ( acc_ref > 0.0f ? PERIOD:-PERIOD);
+    o->vel_pos_ref = o->encpos_meas;
+    o->vel_timer = 0.0f;
+
+    //if (o->control_mode == CM_POSITION || o->control_mode == CM_IMPEDANCE_POS) o->vel = 0.0f;
+
+    return 1;
+}
+
+extern uint8_t eo_motorcontroller_SetControlMode(EOmotorcontroller *o, control_mode_t control_mode)
+{
+    if (o->control_mode == control_mode) return 1;
+
+    switch (control_mode)
+    {
+        case CM_POSITION:
+        {
+            o->control_mode = CM_POSITION;
+
+            if (eo_trajectory_IsDone(o->trajectory))
+            {
+                eo_trajectory_Stop(o->trajectory,o->encpos_meas);
+            }
+            else
+            {
+                eo_trajectory_SetReference(o->trajectory, o->encpos_meas, o->pos_ref, o->vel_now, o->speed);    
+            }
+
+            break;
+        }
+
+        case CM_VELOCITY:
+        {
+            o->control_mode = CM_VELOCITY;
+
+            o->vel_ref = 0.0f;
+
+            break;
+        }
+    };
+
+    return 1;
 }
 
 extern float eo_motorcontroller_PWM(EOmotorcontroller *o)
@@ -185,34 +225,59 @@ extern float eo_motorcontroller_PWM(EOmotorcontroller *o)
         case CM_POSITION:
         {
             o->pos_ref = eo_trajectory_Step(o->trajectory);
-            
+            o->vel_now = eo_trajectory_GetVel(o->trajectory);
+
             return eo_pid_PWM(o->pidP, o->pos_ref - o->encpos_meas);
+        }
+
+        case CM_IMPEDANCE_POS:
+        {
+            o->pos_ref = eo_trajectory_Step(o->trajectory);
+            o->vel_now = eo_trajectory_GetVel(o->trajectory);
         }
 
         case CM_VELOCITY:
         {
-            float vel_err = o->vel_ref - o->vel;
+            float vel_err = o->vel_ref - o->vel_now;
 
-            if (vel_err < -o->acc_ref)
-                o->vel -= o->acc_ref;
-            else if (vel_err > o->acc_ref)
-                o->vel += o->acc_ref;
-            else
-                o->vel  = o->vel_ref;
+            if (vel_err != 0.0f)
+            {
+                if (vel_err < -o->acc_ref)
+                {
+                    o->vel_now = limit(o->vel_now - o->acc_ref, -o->vel_max, o->vel_max);
+                }
+                else if (vel_err > o->acc_ref)
+                {
+                    o->vel_now = limit(o->vel_now + o->acc_ref, -o->vel_max, o->vel_max);
+                }
+                else
+                {
+                    o->vel_now = limit(o->vel_ref, -o->vel_max, o->vel_max);
+                }
 
-            o->fake_pos_ref += o->vel*PERIOD;
+                o->vel_now_PERIOD = o->vel_now * PERIOD;
+            }
 
-            o->pos_ref = eo_trajectory_Step(o->trajectory) + o->fake_pos_ref;
-            
+            o->vel_pos_ref = limit(o->vel_pos_ref + o->vel_now_PERIOD, o->pos_min, o->pos_max); 
+
             o->vel_timer += PERIOD;
-            
+
             if (o->vel_timer >= o->vel_timeout)
             {
                 o->vel_timer = 0.0f;
                 o->control_mode = CM_POSITION;
+
+                if (eo_trajectory_IsDone(o->trajectory))
+                {
+                    eo_trajectory_Stop(o->trajectory,o->encpos_meas);
+                }
+                else
+                {
+                    eo_trajectory_SetReference(o->trajectory, o->encpos_meas, o->pos_ref, o->vel_now, o->speed);    
+                }
             }   
 
-            return eo_pid_PWM(o->pidP, o->pos_ref - o->encpos_meas);
+            return eo_pid_PWM(o->pidP, o->vel_pos_ref - o->encpos_meas);
         }         
 
         case CM_TORQUE:
@@ -223,7 +288,7 @@ extern float eo_motorcontroller_PWM(EOmotorcontroller *o)
 
             return pwm;
         }       
-        case CM_IMPEDANCE_POS: 
+      
         case CM_IMPEDANCE_VEL:
         ;
     }

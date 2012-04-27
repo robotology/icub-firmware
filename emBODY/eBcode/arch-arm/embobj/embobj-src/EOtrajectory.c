@@ -100,7 +100,7 @@ extern EOtrajectory* eo_trajectory_New(void)
     return o;
 }
 
-extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, float v0, float avg_speed /*float tf*/)
+extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, float v0, float speed)
 {
     float pf_p0;
     float tf;
@@ -109,7 +109,7 @@ extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, floa
     float D2;
     float K5D2;
     
-    if (avg_speed == 0.0f)
+    if (speed == 0.0f)
     {
         eo_trajectory_Abort(o);
 
@@ -118,7 +118,7 @@ extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, floa
     
     pf_p0 = pf - p0;
 
-    tf = pf_p0/avg_speed;
+    tf = pf_p0/speed;
     
     if (tf < 0.0f) tf = -tf; 
 
@@ -172,17 +172,29 @@ extern void eo_trajectory_Abort(EOtrajectory *o)
     o->pf = o->pi;
 }
 
-extern float eo_trajectory_GetPos(EOtrajectory *o)
+extern void eo_trajectory_Stop(EOtrajectory *o, float pos)
+{
+    o->steps_to_end = 0;
+    o->delta = 0.0f;
+    o->pf = pos;
+}
+
+extern uint8_t eo_trajectory_IsDone(EOtrajectory* o)
+{
+    return o->steps_to_end == 0;
+}
+
+extern float eo_trajectory_GetPos(EOtrajectory* o)
 {
     return o->pi;
 }
 
-extern float eo_trajectory_GetVel(EOtrajectory *o)
+extern float eo_trajectory_GetVel(EOtrajectory* o)
 {
     return o->delta*FREQUENCY;
 }
 
-extern float eo_trajectory_Step(EOtrajectory *o)
+extern float eo_trajectory_Step(EOtrajectory* o)
 {
     float pi;
 
@@ -206,7 +218,7 @@ extern float eo_trajectory_Step(EOtrajectory *o)
     return pi;
 }
 
-extern float eo_trajectory_StepDelta(EOtrajectory *o)
+extern float eo_trajectory_StepDelta(EOtrajectory* o)
 {
     float pi;
 
