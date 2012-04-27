@@ -1417,7 +1417,7 @@ static void s_test_nvs_transceiver_pc104_configure_ems(EOtransceiver *txrx)
 }
 
 
-#include "eOcfg_nvsEP_mc_leftleg_con.h"
+#include "eOcfg_nvsEP_mc_leg_con.h"
 #include "eOcfg_nvsEP_mc_any_con_bodypart.h"
 #include "eOcfg_nvsEP_mc_any_con_bodypart_hid.h"
 #include "EOconstvector.h"
