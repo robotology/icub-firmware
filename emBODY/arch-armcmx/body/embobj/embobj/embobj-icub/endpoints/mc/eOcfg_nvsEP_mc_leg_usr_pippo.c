@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       eOcfg_nvsEP_mc_leg_usr.c
+/* @file       eOcfg_nvsEP_mc_leg_usr_pippo.c
     @brief      This file keeps the user-defined local ...
     @author     marco.accame@iit.it
     @date       09/06/2011
