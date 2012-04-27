@@ -94,9 +94,11 @@
 #warning --> OK BUT NEED TO KNOW WHICH EP WE ARE INITIALISING.
 extern void eo_cfg_nvsEP_mc_leg_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
 {
+    eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
+    
     uint8_t j, m;
     eo_cfg_nvsEP_mc_leg_t *lloc = (eo_cfg_nvsEP_mc_leg_t*)loc;
-    eo_cfg_nvsEP_mc_leg_t *rrem = (eo_cfg_nvsEP_mc_leg_t*)rem;    // it is NULL if we are in a local ownership
+    eo_cfg_nvsEP_mc_leg_t *rrem = (eo_cfg_nvsEP_mc_leg_t*)rem;    
  
     // in here we initailise the ram allocated by the EOnvscfg object: 
     // 1. at least put it at its default value. 
@@ -123,14 +125,15 @@ extern void eo_cfg_nvsEP_mc_leg_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void 
 
 
 // jxx-init:
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig(uint16_t n, const EOnv* nv)
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_INIT_Jxx_jconfig(uint16_t xx, const EOnv* nv)
 {
+    // xx is the joint number
     
 }
 
-extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jstatus(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jstatus(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-    
+    // xx is the joint number
 }
 
 
