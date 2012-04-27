@@ -99,7 +99,7 @@ typedef eo_cfg_nvsEP_mc_any_con_bodypart_motorNVindex_t eo_cfg_nvsEP_mc_upperleg
 /** @typedef    enum varsMCleg_TOTALnumber;
     @brief      It contains the total number of network variables managed by the endpoint mc leg
  **/
-enum {varsMCleg_TOTALnumber = jointUpperLeg_TOTALnumber*jointNVindex_TOTALnumber + motorUpperLeg_TOTALnumber*motorNVindex_TOTALnumber };
+enum {varsMCupperleg_TOTALnumber = jointUpperLeg_TOTALnumber*jointNVindex_TOTALnumber + motorUpperLeg_TOTALnumber*motorNVindex_TOTALnumber };
 
 
 /** @typedef    typedef struct eo_cfg_nvsEP_mc_upperleg_t;
