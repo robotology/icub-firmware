@@ -17,8 +17,8 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOCFG_EPS_LOC_BOARD_H_
-#define _EOCFG_EPS_LOC_BOARD_H_
+#ifndef _EOCFG_EPS_LOC_EBX_H_
+#define _EOCFG_EPS_LOC_EBX_H_
 
 
 
@@ -50,12 +50,12 @@
 // - in here there are the nvids plus ... 
 //#include "eOcfg_nvsEP_base_con.h"
 //#include "eOcfg_nvsEP_mngmnt_con.h"
-#include "eOcfg_nvsEP_mc_leftleg_con.h"
+//#include "eOcfg_nvsEP_mc_leftleg_con.h"
 
 // - in here there is access to ram of the endpoints
 //#include "eOcfg_nvsEP_base_usr_loc_anydev.h"
 //#include "eOcfg_nvsEP_mngmnt_usr_loc_ebx.h"
-#include "eOcfg_nvsEP_mc_leftleg_usr_loc_ebx.h"
+//#include "eOcfg_nvsEP_mc_leftleg_usr_loc_ebx.h"
 
 
 
