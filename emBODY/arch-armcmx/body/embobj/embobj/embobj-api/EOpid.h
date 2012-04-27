@@ -62,6 +62,7 @@ extern EOpid* eo_pid_New(void);
     @param      Ymax  The output maximum value.
  **/
 extern void eo_pid_Init(EOpid *o, float Kp, float Kd, float Ki, float Ko, float Ymax);
+
 extern uint8_t eo_pid_IsInitialized(EOpid *o);
 extern void eo_pid_Reset(EOpid *o);
 
