@@ -37,21 +37,15 @@
 
 #include "EOconstvector_hid.h"
 
-//#include "eOcfg_nvsEP_base_con.h"
-//#include "eOcfg_nvsEP_base_usr_loc_anydev.h"
 
-//#include "eOcfg_nvsEP_mngmnt_con.h"
-//#include "eOcfg_nvsEP_mngmnt_usr_loc_ebx.h"
-
-//#include "eOcfg_nvsEP_mc_leftleg_con.h"
-//#include "eOcfg_nvsEP_mc_leftleg_usr.h"
 
 
 #include "eOcfg_nvsEP_mc_any_con_bodypart.h"
 #include "eOcfg_nvsEP_mc_leg_con.h"
 #include "eOcfg_nvsEP_mc_leg_usr.h"
 
-
+#include "eOcfg_nvsEP_mngmnt_con.h"
+#include "eOcfg_nvsEP_mngmnt_usr.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -96,8 +90,8 @@ static uint16_t s_eo_cfg_nvsEP_loc_ebx_hashfunction_ep2index(uint16_t ep);
 // extern const EOconstvector  s_eo_cfg_nvsEP_base_usr_loc_anydev_constvector_of_EOnv_usr;
 
 // extern uint16_t eo_cfg_nvsEP_mngmnt_hashfunction_id2index(uint16_t nvid);
-// extern const EOconstvector  s_eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con;
-// extern const EOconstvector  s_eo_cfg_nvsEP_mngmnt_usr_loc_ebx_constvector_of_EOnv_usr;
+extern const EOconstvector  s_eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con;
+extern const EOconstvector  s_eo_cfg_nvsEP_mngmnt_constvector_of_EOnv_usr;
 
 //extern const EOconstvector  s_eo_cfg_nvsEP_mc_leftleg_constvector_of_treenodes_EOnv_con;
 //extern const EOconstvector  s_eo_cfg_nvsEP_mc_leftleg_usr_constvector_of_EOnv_usr;
@@ -107,33 +101,15 @@ extern const EOconstvector  s_eo_cfg_nvsEP_mc_leg_usr_constvector_of_EOnv_usr;
 
 static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_loc_ebx_data[] =
 {  
-#if 0            
-    {   // 00-base
-        EO_INIT(.endpoint)                          EOK_cfg_nvsEP_base_endpoint,
-        EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_base_t),
-        EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_base_hashfunction_id2index,
-        EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_base_constvector_of_treenodes_EOnv_con, //eo_cfg_nvsEP_base_constvector_of_treenodes_EOnv_con,
-        EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_base_usr_loc_anydev_constvector_of_EOnv_usr, //eo_cfg_nvsEP_base_usr_loc_anydev_constvector_of_EOnv_usr,
-        EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_base_usr_loc_anydev_initialise
-    },
-    {   // 01-mngmnt
-        EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mngmnt_endpoint,
-        EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_mngmnt_t),
+    {   // mngmnt
+        EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mngmnt_EP,
+        EO_INIT(.sizeof_endpoint_data)              EOK_cfg_nvsEP_mngmnt_RAMSIZE,
         EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mngmnt_hashfunction_id2index,
-        EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con, //eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con,
-        EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_mngmnt_usr_loc_ebx_constvector_of_EOnv_usr, //eo_cfg_nvsEP_mngmnt_usr_loc_ebx_constvector_of_EOnv_usr,
-        EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mngmnt_usr_loc_ebx_initialise
-    },
-#endif
-//     {   // 16-mc-leftleg
-//         EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mc_leftleg_EP,
-//         EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_mc_leftleg_t),
-//         EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mc_leftleg_hashfunction_id2index,
-//         EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mc_leftleg_constvector_of_treenodes_EOnv_con, 
-//         EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_mc_leftleg_usr_constvector_of_EOnv_usr, //eo_cfg_nvsEP_mngmnt_usr_loc_ebx_constvector_of_EOnv_usr,
-//         EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mc_leftleg_usr_initialise
-//     }   
-    {   // 16-mc-leftleg
+        EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con, 
+        EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_mngmnt_constvector_of_EOnv_usr, 
+        EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mngmnt_initialise
+    },    
+    {   // mc-leftleg
         EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mc_leftleg_EP,
         EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_mc_leg_t),
         EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mc_leg_hashfunction_id2index,
@@ -141,7 +117,7 @@ static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_loc_ebx_data[] =
         EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_mc_leg_usr_constvector_of_EOnv_usr, 
         EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mc_leg_usr_initialise
     },
-    {   // 16-mc-rightleg
+    {   // mc-rightleg
         EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mc_rightleg_EP,
         EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_mc_leg_t),
         EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mc_leg_hashfunction_id2index,
@@ -190,19 +166,26 @@ extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_loc_ebx_fptr_hashfunction_ep2inde
 static uint16_t s_hash(uint16_t ep)
 {
     uint16_t r = ep & 0xff;
-    if(EOK_cfg_nvsEP_mc_leftleg_EP == r)
+    if(EOK_cfg_nvsEP_mngmnt_EP == r)
     {
         return(0);
     }
-    else
+    else if(EOK_cfg_nvsEP_mc_leftleg_EP == r)
     {
-        return(r);
+        return(1);
     }
+    else if(EOK_cfg_nvsEP_mc_rightleg_EP == r)
+    {
+        return(2);
+    }
+    
+    return(EOK_uint16dummy);
+    #warning --> ma meglio usare una tabella con i numeri 0, 1 e 2 in posizione correispondente al valore di r.
 }
 
 static uint16_t s_eo_cfg_nvsEP_loc_ebx_hashfunction_ep2index(uint16_t ep)
 {
-    #define EPTABLESIZE     32
+    #define EPTABLESIZE     4
 
     // in order to always have a hit the table s_eptable[] it must be of size equal to max{ s_hash(ep) }, thus if we
     // use an ep of value 16 and s_hash() just keeps the lsb, then the size must be 17 
@@ -211,24 +194,9 @@ static uint16_t s_eo_cfg_nvsEP_loc_ebx_hashfunction_ep2index(uint16_t ep)
     // are ... 0, 7, 16
 
     static const uint16_t s_eptable[EPTABLESIZE] = 
-    {   
-        //EOK_cfg_nvsEP_base_endpoint,                            EOK_cfg_nvsEP_mngmnt_endpoint,  
-        EOK_cfg_nvsEP_mc_leftleg_EP,                            EOK_uint16dummy,        
-        EOK_uint16dummy,                                        EOK_uint16dummy,
-        EOK_uint16dummy,                                        EOK_uint16dummy,
-        EOK_uint16dummy,                                        EOK_uint16dummy,
-        EOK_uint16dummy,                                        EOK_uint16dummy,
-        EOK_uint16dummy,                                        EOK_uint16dummy,
-        EOK_uint16dummy,                                        EOK_uint16dummy,
-        EOK_uint16dummy,                                        EOK_uint16dummy,       
-        EOK_uint16dummy,                                        EOK_uint16dummy, 
-        EOK_uint16dummy,                                        EOK_uint16dummy, 
-        EOK_uint16dummy,                                        EOK_uint16dummy,        
-        EOK_uint16dummy,                                        EOK_uint16dummy,
-        EOK_uint16dummy,                                        EOK_uint16dummy,
-        EOK_uint16dummy,                                        EOK_uint16dummy,
-        EOK_uint16dummy,                                        EOK_uint16dummy,
-        EOK_uint16dummy,                                        EOK_uint16dummy        
+    { 
+        EOK_cfg_nvsEP_mngmnt_EP,                                EOK_cfg_nvsEP_mc_leftleg_EP,                            
+        EOK_cfg_nvsEP_mc_rightleg_EP,                           EOK_uint16dummy    
     };
 
     uint16_t index = s_hash(ep);
