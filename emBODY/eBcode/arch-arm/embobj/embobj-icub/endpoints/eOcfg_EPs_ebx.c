@@ -44,6 +44,12 @@
 #include "eOcfg_nvsEP_mc_leg_con.h"
 #include "eOcfg_nvsEP_mc_leg_usr.h"
 
+#include "eOcfg_nvsEP_mc_upperleg_con.h"
+#include "eOcfg_nvsEP_mc_upperleg_usr.h"
+#include "eOcfg_nvsEP_mc_lowerleg_con.h"
+#include "eOcfg_nvsEP_mc_lowerleg_usr.h"
+
+
 #include "eOcfg_nvsEP_mngmnt_con.h"
 #include "eOcfg_nvsEP_mngmnt_usr.h"
 
@@ -96,6 +102,16 @@ extern const EOconstvector  s_eo_cfg_nvsEP_mngmnt_usr_constvector_of_EOnv_usr;
 extern const EOconstvector  s_eo_cfg_nvsEP_mc_leg_constvector_of_treenodes_EOnv_con;
 extern const EOconstvector  s_eo_cfg_nvsEP_mc_leg_usr_constvector_of_EOnv_usr;
 
+
+extern const EOconstvector  s_eo_cfg_nvsEP_mc_upperleg_constvector_of_treenodes_EOnv_con;
+extern const EOconstvector  s_eo_cfg_nvsEP_mc_upperleg_usr_constvector_of_EOnv_usr;
+extern const EOconstvector  s_eo_cfg_nvsEP_mc_lowerleg_constvector_of_treenodes_EOnv_con;
+extern const EOconstvector  s_eo_cfg_nvsEP_mc_lowerleg_usr_constvector_of_EOnv_usr;
+
+
+
+#define USE_SUBPART
+
 static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_ebx_data[] =
 {  
     {   // mngmnt
@@ -105,7 +121,8 @@ static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_ebx_data[] =
         EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con, 
         EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_mngmnt_usr_constvector_of_EOnv_usr, 
         EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mngmnt_usr_initialise
-    },    
+    }, 
+#if !defined(USE_SUBPART)    
     {   // mc-leftleg
         EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mc_leftleg_EP,
         EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_mc_leg_t),
@@ -121,7 +138,42 @@ static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_ebx_data[] =
         EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mc_leg_constvector_of_treenodes_EOnv_con, 
         EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_mc_leg_usr_constvector_of_EOnv_usr, 
         EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mc_leg_usr_initialise
-    }     
+    }
+#else
+    {   // mc-leftleg-upper
+        EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mc_leftupperleg_EP,
+        EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_mc_upperleg_t),
+        EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mc_upperleg_hashfunction_id2index,
+        EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mc_upperleg_constvector_of_treenodes_EOnv_con, 
+        EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_mc_upperleg_usr_constvector_of_EOnv_usr, 
+        EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mc_upperleg_usr_initialise
+    },
+    {   // mc-leftleg-lower
+        EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mc_leftlowerleg_EP,
+        EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_mc_lowerleg_t),
+        EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mc_lowerleg_hashfunction_id2index,
+        EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mc_lowerleg_constvector_of_treenodes_EOnv_con, 
+        EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_mc_lowerleg_usr_constvector_of_EOnv_usr, 
+        EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mc_lowerleg_usr_initialise
+    },    
+    {   // mc-rightleg-upper
+        EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mc_rightupperleg_EP,
+        EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_mc_upperleg_t),
+        EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mc_upperleg_hashfunction_id2index,
+        EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mc_upperleg_constvector_of_treenodes_EOnv_con, 
+        EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_mc_upperleg_usr_constvector_of_EOnv_usr, 
+        EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mc_upperleg_usr_initialise
+    },
+    {   // mc-rightleg-lower
+        EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mc_rightlowerleg_EP,
+        EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_mc_lowerleg_t),
+        EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mc_lowerleg_hashfunction_id2index,
+        EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mc_lowerleg_constvector_of_treenodes_EOnv_con, 
+        EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_mc_lowerleg_usr_constvector_of_EOnv_usr, 
+        EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mc_lowerleg_usr_initialise
+    },    
+
+#endif    
     
 };
 
@@ -167,6 +219,7 @@ static uint16_t s_hash(uint16_t ep)
     {
         return(0);
     }
+#if !defined(USE_SUBPART)      
     else if(EOK_cfg_nvsEP_mc_leftleg_EP == r)
     {
         return(1);
@@ -175,6 +228,26 @@ static uint16_t s_hash(uint16_t ep)
     {
         return(2);
     }
+#else
+
+    else if(EOK_cfg_nvsEP_mc_leftupperleg_EP == r)
+    {
+        return(1);
+    }
+    else if(EOK_cfg_nvsEP_mc_leftlowerleg_EP == r)
+    {
+        return(2);
+    }    
+    else if(EOK_cfg_nvsEP_mc_rightupperleg_EP == r)
+    {
+        return(3);
+    }
+    else if(EOK_cfg_nvsEP_mc_rightlowerleg_EP == r)
+    {
+        return(4);
+    }  
+
+#endif    
     
     return(EOK_uint16dummy);
     #warning --> ma meglio usare una tabella con i numeri 0, 1 e 2 in posizione correispondente al valore di r.
@@ -182,19 +255,35 @@ static uint16_t s_hash(uint16_t ep)
 
 static uint16_t s_eo_cfg_nvsEP_ebx_hashfunction_ep2index(uint16_t ep)
 {
-    #define EPTABLESIZE     4
-
     // in order to always have a hit the table s_eptable[] it must be of size equal to max{ s_hash(ep) }, thus if we
     // use an ep of value 16 and s_hash() just keeps the lsb, then the size must be 17 
     // if there are holes, they shall have EOK_uint16dummy in other entries. for example, if we have eps = {0, 7, 16}
     // then the table shall be of size 17, shall contain 0xffff everywhere but in positions 0, 7, 16 where the values
-    // are ... 0, 7, 16
+    // are ... 0, 7, 16    
+
+#if !defined(USE_SUBPART)      
+    
+    #define EPTABLESIZE     4
 
     static const uint16_t s_eptable[EPTABLESIZE] = 
     { 
         EOK_cfg_nvsEP_mngmnt_EP,                                EOK_cfg_nvsEP_mc_leftleg_EP,                            
         EOK_cfg_nvsEP_mc_rightleg_EP,                           EOK_uint16dummy    
     };
+       
+#else
+
+    #define EPTABLESIZE     6
+
+    static const uint16_t s_eptable[EPTABLESIZE] = 
+    { 
+        EOK_cfg_nvsEP_mngmnt_EP,                                
+        EOK_cfg_nvsEP_mc_leftupperleg_EP,                       EOK_cfg_nvsEP_mc_leftlowerleg_EP,
+        EOK_cfg_nvsEP_mc_rightupperleg_EP,                      EOK_cfg_nvsEP_mc_rightlowerleg_EP,        
+        EOK_uint16dummy    
+    };
+   
+#endif    
 
     uint16_t index = s_hash(ep);
     

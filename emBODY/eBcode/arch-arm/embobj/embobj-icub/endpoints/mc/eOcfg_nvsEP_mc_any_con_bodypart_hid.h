@@ -45,26 +45,21 @@
 #include "eOcfg_nvsEP_mc_any_con_jxx.h"
 #include "eOcfg_nvsEP_mc_any_con_mxx.h"
 
-#include "eOcfg_nvsEP_mc_any_con_bodypart_hid.h"
+
+#include "eOcfg_nvsEP_mc_any_con_bodypart.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
 // -- max mumber of joints and motors in a bodypart
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_joints                           20
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_motors                           20
-
-// -- max number of network variables in a joint
-#define  EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_nvs_in_joint                    32
-
-// -- max number of network variables in a motor
-#define  EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_nvs_in_motor                    16
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_joints                           jointNumberBodypart_TOTALnumber
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_motors                           motorNumberBodypart_TOTALnumber
 
 
 // -- the first nvid off of the joint jth
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_joint(jth)                ((jth)*EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_nvs_in_joint) 
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_joint(jth)                ((jth)*EOK_cfg_nvsEP_mc_any_con_jxx_maxnumof_nvs_in_joint) 
 
 // -- the first nvid off of the motor mth
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_motor(mth)                ((mth)*EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_nvs_in_motor + EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_joint(EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_joints))                                               
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_motor(mth)                ((mth)*EOK_cfg_nvsEP_mc_any_con_mxx_maxnumof_nvs_in_motor + EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_joint(EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_joints))                                               
 
 
 
@@ -78,7 +73,8 @@
 
 
 
-// -- the nvid of all the network variables of the joint as a function of the joint number j
+// -- the nvid of all the network variables of the joint as a function of the joint number j 
+// -- use them only when required in constant initialisations and prefer using functions otherwise
 
 #define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig(j)                               EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig))
 #define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidposition(j)                  EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__pidposition, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidposition))
@@ -113,7 +109,8 @@
 #define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__holder01FFU03(j)                EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__holder01FFU03, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__holder01FFU03))
 
         
-// -- the nvid of all the network variables of the motor as a function of the motor number m
+// -- the nvid of all the network variables of the motor as a function of the motor number m 
+// -- use them only when required in constant initialisations and prefer using functions otherwise
 
 #define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig(m)                               EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_motor(m, EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig))
 #define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__pidcurrent(m)                   EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__pidcurrent, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_motor(m, EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_mconfig__pidcurrent))
@@ -135,7 +132,7 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-EO_VERIFYproposition(EOK_cfg_nvsEP_mc_any_con_bodypart, (1024 > EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_motor(EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_nvs_in_motor)));
+EO_VERIFYproposition(EOK_cfg_nvsEP_mc_any_con_bodypart, (1024 > EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_motor(EOK_cfg_nvsEP_mc_any_con_mxx_maxnumof_nvs_in_motor)));
 
 
     

@@ -41,10 +41,15 @@
 
 #include "EoCommon.h"
 #include "EoMotionControl.h"
+#include "EOnv.h"
 
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
+
+// -- max number of network variables in a joint
+
+#define  EOK_cfg_nvsEP_mc_any_con_jxx_maxnumof_nvs_in_joint                                 32
 
 
 // -- the index of the network variables inside a joint
@@ -130,9 +135,12 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
+EO_VERIFYproposition(eo_cfg_nvsEP_mc_any_con_jxx_check, (EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber <= EOK_cfg_nvsEP_mc_any_con_jxx_maxnumof_nvs_in_joint));
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-// empty-section
+
+// contains the funtyp ordered by nvindex
+extern const uint8_t eo_cfg_nvsEP_mc_any_con_jxx_funtyp[];
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------

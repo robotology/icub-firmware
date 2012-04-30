@@ -32,13 +32,18 @@
 #include "stdio.h"
 
 #include "EoCommon.h"
+#include "eOcfg_nvsEP_mc_hid.h"
 #include "eOcfg_nvsEP_mc_any_con_bodypart.h"
+#include "eOcfg_nvsEP_mc_any_con_bodypart_hid.h"
 #include "eOcfg_nvsEP_mc_upperleg_con.h"
 
 #include "EOnv.h"
 #include "EOconstvector_hid.h"
 #include "eOcfg_nvsEP_mc_any_con_jxxdefault.h"
 #include "eOcfg_nvsEP_mc_any_con_mxxdefault.h"
+
+
+
 
 
 
@@ -950,196 +955,221 @@ extern void eo_cfg_nvsEP_mc_upperleg_usr_initialise(eOnvEP_t ep, void* loc, void
 // --------------------------------------------------------------------------------------------------------------------
 
 
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of static functions 
-// --------------------------------------------------------------------------------------------------------------------
-
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
 {
     eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INITIALISE(ep, loc, rem);
 }
 
 
 // jxx-init:
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jconfig(uint16_t xx, const EOnv* nv)
 {
-      eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-      theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jconfig__pidposition(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__pidposition((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jconfig__pidvelocity(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__pidvelocity((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jconfig__pidtorque(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__pidtorque((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jconfig__impedance(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__impedance((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jconfig__minpositionofjoint(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__minpositionofjoint((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jconfig__maxpositionofjoint(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__maxpositionofjoint((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jconfig__velocitysetpointtimeout(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__velocitysetpointtimeout((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jconfig__controlmode(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__controlmode((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jconfig__motionmonitormode(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__motionmonitormode((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jconfig__des02FORjstatuschamaleon04(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__des02FORjstatuschamaleon04((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jconfig__holder01FFU01(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__holder01FFU01((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jconfig__holder01FFU02(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__holder01FFU02((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jconfig__holder02FFU03(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__holder02FFU03((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jconfig__holder02FFU04(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__holder02FFU04((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jstatus(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jstatus((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jstatus__basic(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jstatus__basic((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jstatus__ofpid(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jstatus__ofpid((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jstatus__chamaleon04(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jstatus__chamaleon04((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jinputs__externallymeasuredtorque(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jinputs__externallymeasuredtorque((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jinputs__holder02FFU01(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jinputs__holder02FFU01((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jinputs__holder04FFU02(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jinputs__holder04FFU02((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jcmmnds__calibration(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__calibration((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jcmmnds__setpoint(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__setpoint((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jcmmnds__stoptrajectory(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__stoptrajectory((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jcmmnds__holder01FFU01(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__holder01FFU01((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jcmmnds__holder01FFU02(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__holder01FFU02((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jcmmnds__holder01FFU03(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__holder01FFU03((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 
@@ -1147,182 +1177,210 @@ __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jcmmnds__holder01FF
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jconfig(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jconfig__pidposition(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidposition((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jconfig__pidvelocity(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidvelocity((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jconfig__pidtorque(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidtorque((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jconfig__impedance(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__impedance((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jconfig__minpositionofjoint(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__minpositionofjoint((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jconfig__maxpositionofjoint(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__maxpositionofjoint((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jconfig__velocitysetpointtimeout(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__velocitysetpointtimeout((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jconfig__controlmode(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__controlmode((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jconfig__motionmonitormode(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__motionmonitormode((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jconfig__des02FORjstatuschamaleon04(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__des02FORjstatuschamaleon04((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jconfig__holder01FFU01(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__holder01FFU01((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jconfig__holder01FFU02(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;    
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__holder01FFU02((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);    
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jconfig__holder02FFU03(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__holder02FFU03((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jconfig__holder02FFU04(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__holder02FFU04((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jstatus(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jstatus((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jstatus__basic(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jstatus__basic((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jstatus__ofpid(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jstatus__ofpid((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jstatus__chamaleon04(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jstatus__chamaleon04((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jinputs__externallymeasuredtorque(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs__externallymeasuredtorque((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jinputs__holder02FFU01(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs__holder02FFU01((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jinputs__holder04FFU02(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs__holder04FFU02((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jcmmnds__calibration(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jcmmnds__setpoint(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jcmmnds__stoptrajectory(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__stoptrajectory((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jcmmnds__holder01FFU01(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__holder01FFU01((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jcmmnds__holder01FFU02(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__holder01FFU02((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jcmmnds__holder01FFU03(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__holder01FFU03((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 
@@ -1330,54 +1388,62 @@ __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jcmmnds__holder01FF
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Mxx_mconfig(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Mxx_mconfig((eo_cfg_nvsEP_mc_motorNumber_t)xx, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Mxx_mconfig__pidcurrent(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Mxx_mconfig__pidcurrent((eo_cfg_nvsEP_mc_motorNumber_t)xx, nv);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Mxx_mconfig__maxvelocityofmotor(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Mxx_mconfig__maxvelocityofmotor((eo_cfg_nvsEP_mc_motorNumber_t)xx, nv);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Mxx_mconfig__maxcurrentofmotor(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Mxx_mconfig__maxcurrentofmotor((eo_cfg_nvsEP_mc_motorNumber_t)xx, nv);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Mxx_mconfig__des02FORmstatuschamaleon04(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Mxx_mconfig__des02FORmstatuschamaleon04((eo_cfg_nvsEP_mc_motorNumber_t)xx, nv);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Mxx_mstatus(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Mxx_mstatus((eo_cfg_nvsEP_mc_motorNumber_t)xx, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Mxx_mstatus__basic(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Mxx_mstatus__basic((eo_cfg_nvsEP_mc_motorNumber_t)xx, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Mxx_mstatus__chamaleon04(uint16_t xx, const EOnv* nv)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Mxx_mstatus__chamaleon04((eo_cfg_nvsEP_mc_motorNumber_t)xx, nv);
 }
 
 // mxx-updt:
@@ -1385,56 +1451,70 @@ __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Mxx_mstatus__chamaleon0
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Mxx_mconfig(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig((eo_cfg_nvsEP_mc_motorNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Mxx_mconfig__pidcurrent(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig__pidcurrent((eo_cfg_nvsEP_mc_motorNumber_t)xx, nv, time, sign);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Mxx_mconfig__maxvelocityofmotor(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig__maxvelocityofmotor((eo_cfg_nvsEP_mc_motorNumber_t)xx, nv, time, sign);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Mxx_mconfig__maxcurrentofmotor(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig__maxcurrentofmotor((eo_cfg_nvsEP_mc_motorNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Mxx_mconfig__des02FORmstatuschamaleon04(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig__des02FORmstatuschamaleon04((eo_cfg_nvsEP_mc_motorNumber_t)xx, nv, time, sign);
 }
 
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Mxx_mstatus(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mstatus((eo_cfg_nvsEP_mc_motorNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Mxx_mstatus__basic(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mstatus__basic((eo_cfg_nvsEP_mc_motorNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Mxx_mstatus__chamaleon04(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal; 
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mstatus__chamaleon04((eo_cfg_nvsEP_mc_motorNumber_t)xx, nv, time, sign); 
 }
 
 
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of static functions 
+// --------------------------------------------------------------------------------------------------------------------
 
 
 

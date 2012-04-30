@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       eOcfg_nvsEP_mc_upperleg_usr_pippo.c
+/* @file       eOcfg_nvsEP_mc_lowerleg_usr_pippo.c
     @brief      This file keeps the user-defined local ...
     @author     marco.accame@iit.it
     @date       09/06/2011
@@ -32,11 +32,9 @@
 #include "stdio.h"
 
 #include "EoCommon.h"
-#include "eOcfg_nvsEP_mc_upperleg_usr_hid.h"
+#include "eOcfg_nvsEP_mc_lowerleg_usr_hid.h"
 
-#include "eOcfg_nvsEP_mc_upperleg_con.h"
-
-#include "EOnv_hid.h"
+#include "eOcfg_nvsEP_mc_lowerleg_con.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -94,13 +92,13 @@
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 #warning --> OK BUT NEED TO KNOW WHICH EP WE ARE INITIALISING.
-extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
+extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
 {
     eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
     
     uint8_t j, m;
-    eo_cfg_nvsEP_mc_upperleg_t *lloc = (eo_cfg_nvsEP_mc_upperleg_t*)loc;
-    eo_cfg_nvsEP_mc_upperleg_t *rrem = (eo_cfg_nvsEP_mc_upperleg_t*)rem;    
+    eo_cfg_nvsEP_mc_lowerleg_t *lloc = (eo_cfg_nvsEP_mc_lowerleg_t*)loc;
+    eo_cfg_nvsEP_mc_lowerleg_t *rrem = (eo_cfg_nvsEP_mc_lowerleg_t*)rem;    
  
     // in here we initailise the ram allocated by the EOnvscfg object: 
     // 1. at least put it at its default value. 
@@ -109,23 +107,21 @@ extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, 
     
     
     // 1. assign default values to loc ..
-    
     if(eobool_true == theOwnershipIsLocal)
     {
         if(NULL == loc) 
         {
             return;
         }
-        for(j=0; j<jointUpperLeg_TOTALnumber; j++)
+        for(j=0; j<jointLowerLeg_TOTALnumber; j++)
         {
-            memcpy(&lloc->joints[j], eo_cfg_nvsEP_mc_upperleg_joint_defaultvalue, sizeof(eOmc_joint_t)); 
+            memcpy(&lloc->joints[j], eo_cfg_nvsEP_mc_lowerleg_joint_defaultvalue, sizeof(eOmc_joint_t)); 
         }
-        for(m=0; m<motorUpperLeg_TOTALnumber; m++)
+        for(m=0; m<motorLowerLeg_TOTALnumber; m++)
         {
-            memcpy(&lloc->motors[m], &eo_cfg_nvsEP_mc_upperleg_motor_defaultvalue, sizeof(eOmc_motor_t)); 
-        } 
-    }   
-        
+            memcpy(&lloc->motors[m], &eo_cfg_nvsEP_mc_lowerleg_motor_defaultvalue, sizeof(eOmc_motor_t)); 
+        }  
+    }    
     
     
     // 2. init other peripherals ...
@@ -135,27 +131,24 @@ extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, 
 
 
 // jxx-init:
-extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jconfig(uint16_t xx, const EOnv* nv)
+extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_INIT_Jxx_jconfig(uint16_t xx, const EOnv* nv)
 {
     // xx is the joint number
     
 }
 
-extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jstatus(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Jxx_jstatus(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     // xx is the joint number
 }
 
-
-
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eo_cfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Jxx_jcmmnds__setpoint(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    eOnvEP_t ep = nv->ep;
-    
-    theOwnershipIsLocal = theOwnershipIsLocal;
-    ep = ep;
+    // xx is the joint number
+    xx = xx;
 }
+
+
 
 
 

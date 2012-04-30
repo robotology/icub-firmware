@@ -16,10 +16,10 @@
  * Public License for more details
 */
 
-/* @file       eOcfg_nvsEP_mc_upperleg_usr_pippo.c
-    @brief      This file keeps the user-defined local ...
+/* @file       eOcfg_nvsEP_mc_any_con_jxx.c
+    @brief      This file keeps constant configuration for ...
     @author     marco.accame@iit.it
-    @date       09/06/2011
+    @date       04/06/2012
 **/
 
 
@@ -31,28 +31,28 @@
 #include "string.h"
 #include "stdio.h"
 
-#include "EoCommon.h"
-#include "eOcfg_nvsEP_mc_upperleg_usr_hid.h"
+#include "EoMotionControl.h"
+#include "EOnv.h"
 
-#include "eOcfg_nvsEP_mc_upperleg_con.h"
-
-#include "EOnv_hid.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "eOcfg_nvsEP_mc_any_con_jxx.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+
 
 
 
@@ -67,6 +67,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -77,6 +78,44 @@
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
 
+extern const uint8_t eo_cfg_nvsEP_mc_any_con_jxx_funtyp[] =
+{
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__pidposition,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__pidvelocity,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__pidtorque,  
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__impedance,    
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__minpositionofjoint,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__maxpositionofjoint,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__velocitysetpointtimeout,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__controlmode,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__motionmonitormode,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__des02FORjstatuschamaleon04,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__holder01FFU01,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__holder01FFU02,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__holder02FFU03,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__holder02FFU04,
+    
+
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jstatus,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jstatus__basic,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jstatus__ofpid,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jstatus__chamaleon04,
+    
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jinputs__externallymeasuredtorque,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jinputs__holder02FFU01,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jinputs__holder04FFU02,
+    
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__calibration,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__setpoint,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__stoptrajectory,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__holder01FFU01,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__holder01FFU02,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__holder01FFU03
+    
+};  EO_VERIFYsizeof(eo_cfg_nvsEP_mc_any_con_jxx_funtyp, EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber);
+
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -85,79 +124,15 @@
 
 
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-#warning --> OK BUT NEED TO KNOW WHICH EP WE ARE INITIALISING.
-extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
-{
-    eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
-    
-    uint8_t j, m;
-    eo_cfg_nvsEP_mc_upperleg_t *lloc = (eo_cfg_nvsEP_mc_upperleg_t*)loc;
-    eo_cfg_nvsEP_mc_upperleg_t *rrem = (eo_cfg_nvsEP_mc_upperleg_t*)rem;    
- 
-    // in here we initailise the ram allocated by the EOnvscfg object: 
-    // 1. at least put it at its default value. 
-    // 2. if you need to initialise other peripherals or objects linked to the values do it.
-    //    HOWEVER: initialisation of NVs is done on specific functions 
-    
-    
-    // 1. assign default values to loc ..
-    
-    if(eobool_true == theOwnershipIsLocal)
-    {
-        if(NULL == loc) 
-        {
-            return;
-        }
-        for(j=0; j<jointUpperLeg_TOTALnumber; j++)
-        {
-            memcpy(&lloc->joints[j], eo_cfg_nvsEP_mc_upperleg_joint_defaultvalue, sizeof(eOmc_joint_t)); 
-        }
-        for(m=0; m<motorUpperLeg_TOTALnumber; m++)
-        {
-            memcpy(&lloc->motors[m], &eo_cfg_nvsEP_mc_upperleg_motor_defaultvalue, sizeof(eOmc_motor_t)); 
-        } 
-    }   
-        
-    
-    
-    // 2. init other peripherals ...
-    // i dont do it
-    
-}
-
-
-// jxx-init:
-extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jconfig(uint16_t xx, const EOnv* nv)
-{
-    // xx is the joint number
-    
-}
-
-extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jstatus(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
-{
-    // xx is the joint number
-}
-
-
-
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eo_cfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
-{
-    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    eOnvEP_t ep = nv->ep;
-    
-    theOwnershipIsLocal = theOwnershipIsLocal;
-    ep = ep;
-}
-
-
 
 
 
@@ -166,6 +141,3 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eo_cfg_nvsEP_mc_jo
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
-
-
-
