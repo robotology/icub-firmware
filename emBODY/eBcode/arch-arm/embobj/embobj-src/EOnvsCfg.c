@@ -80,8 +80,8 @@
 static void s_eo_nvscfg_devicesowneship_change(EOnvsCfg *p,  eOnvscfgOwnership_t ownership);
 
 
-static uint8_t s_eo_nvscfg_ondevice_endpoint2index(EOnvsCfg* p, uint8_t ondevindex, eOnvEP_t endpoint);
-static uint8_t s_eo_nvscfg_ondevice_onendpoint_id2index(EOnvsCfg* p, uint8_t ondevindex, uint8_t onendpointindex, eOnvID_t id);
+static uint16_t s_eo_nvscfg_ondevice_endpoint2index(EOnvsCfg* p, uint16_t ondevindex, eOnvEP_t endpoint);
+static uint16_t s_eo_nvscfg_ondevice_onendpoint_id2index(EOnvsCfg* p, uint16_t ondevindex, uint16_t onendpointindex, eOnvID_t id);
 
 #if defined(EO_NVSCFG_USE_HASHTABLE)
 static uint16_t s_nvscfg_hashing(uint16_t ep, uint16_t sizeofhashtable);
@@ -111,7 +111,7 @@ extern EOnvsCfg* eo_nvscfg_New(uint16_t ndevices, EOVstorageDerived* stg)
     
     p->thedevices           = eo_vector_New(sizeof(EOnvsCfg_device_t*), ndevices, NULL, 0, NULL, NULL);
     p->ip2index             = eo_vector_New(sizeof(eOipv4addr_t), ndevices, NULL, 0, NULL, NULL);
-    p->indexoflocaldevice   = EOK_uint08dummy;
+    p->indexoflocaldevice   = EOK_uint16dummy;
     p->devicesowneship      = eo_nvscfg_devicesownership_none;
     p->storage              = stg;
     p->allnvs               = NULL;
@@ -130,11 +130,11 @@ extern eOnvscfgDevicesOwnership_t eo_nvscfg_GetDevicesOwnership(EOnvsCfg* p)
 }
 
 
-extern uint8_t eo_nvscfg_GetIndexOfLocalDevice(EOnvsCfg* p)
+extern uint16_t eo_nvscfg_GetIndexOfLocalDevice(EOnvsCfg* p)
 {
  	if(NULL == p) 
 	{
-		return(EOK_uint08dummy); 
+		return(EOK_uint16dummy); 
 	}
 
     return(p->indexoflocaldevice);
@@ -158,7 +158,7 @@ extern eOresult_t eo_nvscfg_PushBackDevice(EOnvsCfg* p, eOnvscfgOwnership_t owne
 
     if(eo_nvscfg_ownership_local == ownership)
     {
-        p->indexoflocaldevice   = (uint8_t)eo_vector_Size(p->thedevices);
+        p->indexoflocaldevice   = eo_vector_Size(p->thedevices);
     }
     
     dev = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOnvsCfg_device_t), 1);
@@ -183,11 +183,11 @@ extern eOresult_t eo_nvscfg_PushBackDevice(EOnvsCfg* p, eOnvscfgOwnership_t owne
 
 
 
-extern eOresult_t eo_nvscfg_ondevice_PushBackEndpoint(EOnvsCfg* p, uint8_t ondevindex, eOnvEP_t endpoint, eOuint16_fp_uint16_t hashfn_id2index, const EOconstvector* treeofnvs_con, const EOconstvector* datanvs_usr, uint32_t datanvs_size, eOvoid_fp_uint16_voidp_voidp_t datanvs_init, EOVmutexDerived* mtx)
+extern eOresult_t eo_nvscfg_ondevice_PushBackEndpoint(EOnvsCfg* p, uint16_t ondevindex, eOnvEP_t endpoint, eOuint16_fp_uint16_t hashfn_id2index, const EOconstvector* treeofnvs_con, const EOconstvector* datanvs_usr, uint32_t datanvs_size, eOvoid_fp_uint16_voidp_voidp_t datanvs_init, EOVmutexDerived* mtx)
 {
     EOnvsCfg_device_t** thedev = NULL;
     EOnvsCfg_ep_t *theendpoint = NULL;
-    uint8_t nnvs = 0;
+    uint16_t nnvs = 0;
  
     
  	if(NULL == p) 
@@ -195,7 +195,7 @@ extern eOresult_t eo_nvscfg_ondevice_PushBackEndpoint(EOnvsCfg* p, uint8_t ondev
 		return(eores_NOK_nullpointer); 
 	}
 
-    nnvs = (uint8_t)eo_constvector_Size(datanvs_usr);
+    nnvs = eo_constvector_Size(datanvs_usr);
 
     
     eo_errman_Assert(eo_errman_GetHandle(), (0 != nnvs), s_eobj_ownname, "nnvs is zero");
@@ -264,7 +264,7 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
     uint16_t i, j, k;
     uint16_t ndev;
     uint16_t nendpoints;
-    uint8_t nvars;
+    uint16_t nvars;
     eOvoid_fp_uint16_voidp_voidp_t initialise = NULL;
     EOnv tmpnv;
     EOnv_con_t* tmpnvcon = NULL;
@@ -279,7 +279,7 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
 
 
 #if defined(EO_NVSCFG_USE_CACHED_NVS)
-    p->allnvs  = eo_matrix3d_New(sizeof(EOnv), (uint8_t)ndev);
+    p->allnvs  = eo_matrix3d_New(sizeof(EOnv), ndev);
 #endif
 
 
@@ -289,7 +289,7 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
         nendpoints = eo_vector_Size((*thedev)->theendpoints);
 
 #if defined(EO_NVSCFG_USE_CACHED_NVS)
-        eo_matrix3d_Level1_PushBack(p->allnvs, (uint8_t)nendpoints);
+        eo_matrix3d_Level1_PushBack(p->allnvs, nendpoints);
 #endif
 
         for(j=0; j<nendpoints; j++)
@@ -312,7 +312,7 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
             nvars = (*theendpoint)->thenvs_numberof;
 
 #if defined(EO_NVSCFG_USE_CACHED_NVS)
-            eo_matrix3d_Level2_PushBack(p->allnvs, (uint8_t)i, (uint8_t)nvars);
+            eo_matrix3d_Level2_PushBack(p->allnvs, i, nvars);
 #endif
             for(k=0; k<nvars; k++)
             {
@@ -349,7 +349,7 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
 #endif  
                 
 #if defined(EO_NVSCFG_USE_CACHED_NVS)
-                eo_matrix3d_Level3_PushBack(p->allnvs, (uint8_t)i, (uint8_t)j, &tmpnv);
+                eo_matrix3d_Level3_PushBack(p->allnvs, i, j, &tmpnv);
 #endif
                              
             }
@@ -366,12 +366,12 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
 #if 0
 extern void * eo_nvscfg_localdev_endpoint_GetRAM(EOnvsCfg* p, eOnvEP_t endpoint)
 {
-    uint8_t ondevindex, onendpointindex;
+    uint16_t ondevindex, onendpointindex;
     EOnvsCfg_device_t** thedev = NULL;
     EOnvsCfg_ep_t **theendpoint = NULL;
  
 
-    if((NULL == p) || (EOK_uint08dummy == p->indexoflocaldevice)) 
+    if((NULL == p) || (EOK_uint16dummy == p->indexoflocaldevice)) 
 	{
 		return(NULL); 
 	}
@@ -380,7 +380,7 @@ extern void * eo_nvscfg_localdev_endpoint_GetRAM(EOnvsCfg* p, eOnvEP_t endpoint)
 
     onendpointindex = eo_nvscfg_hid_ondevice_endpoint2index(p, ondevindex, endpoint);
 
-    if(EOK_uint08dummy == onendpointindex)
+    if(EOK_uint16dummy == onendpointindex)
     {
         return(NULL);
     }
@@ -396,7 +396,7 @@ extern void * eo_nvscfg_localdev_endpoint_GetRAM(EOnvsCfg* p, eOnvEP_t endpoint)
 
 extern eOresult_t eo_nvscfg_GetIndices(EOnvsCfg* p, 
                                        eOipv4addr_t ip, eOnvEP_t ep, eOnvID_t id, 
-                                       uint8_t *ipindex, uint8_t *epindex, uint8_t *idindex)
+                                       uint16_t *ipindex, uint16_t *epindex, uint16_t *idindex)
 {
     if((NULL == p) || (NULL == ipindex) || (NULL == epindex) || (NULL == idindex))
     {
@@ -414,7 +414,7 @@ extern eOresult_t eo_nvscfg_GetIndices(EOnvsCfg* p,
         *ipindex = eo_nvscfg_hid_ip2index(p, ip);
     }
 
-    if(EOK_uint08dummy == *ipindex)
+    if(EOK_uint16dummy == *ipindex)
     {
         return(eores_NOK_generic);
     }
@@ -422,7 +422,7 @@ extern eOresult_t eo_nvscfg_GetIndices(EOnvsCfg* p,
     // --- search for the index of the ep
 
     *epindex = s_eo_nvscfg_ondevice_endpoint2index(p, *ipindex, ep);
-    if(EOK_uint08dummy == *epindex)
+    if(EOK_uint16dummy == *epindex)
     {
         return(eores_NOK_generic);
     }
@@ -430,7 +430,7 @@ extern eOresult_t eo_nvscfg_GetIndices(EOnvsCfg* p,
     // --- search for the index of the id
 
     *idindex = s_eo_nvscfg_ondevice_onendpoint_id2index(p, *ipindex, *epindex, id);
-    if(EOK_uint08dummy == *idindex)
+    if(EOK_uint16dummy == *idindex)
     {
         return(eores_NOK_generic);
     }
@@ -440,7 +440,7 @@ extern eOresult_t eo_nvscfg_GetIndices(EOnvsCfg* p,
 
 
 
-extern EOtreenode* eo_nvscfg_GetTreeNode(EOnvsCfg* p, uint8_t ondevindex, uint8_t onendpointindex, uint8_t onidindex)
+extern EOtreenode* eo_nvscfg_GetTreeNode(EOnvsCfg* p, uint16_t ondevindex, uint16_t onendpointindex, uint16_t onidindex)
 {
     EOnvsCfg_device_t** thedev = NULL;
     EOnvsCfg_ep_t **theendpoint = NULL;
@@ -463,7 +463,7 @@ extern EOtreenode* eo_nvscfg_GetTreeNode(EOnvsCfg* p, uint8_t ondevindex, uint8_
 
 
 
-extern EOnv* eo_nvscfg_GetNV(EOnvsCfg* p, uint8_t ondevindex, uint8_t onendpointindex, uint8_t onidindex, EOtreenode* treenode, EOnv* nvtarget)
+extern EOnv* eo_nvscfg_GetNV(EOnvsCfg* p, uint16_t ondevindex, uint16_t onendpointindex, uint16_t onidindex, EOtreenode* treenode, EOnv* nvtarget)
 {
 
 #if defined(EO_NVSCFG_USE_CACHED_NVS)
@@ -566,46 +566,46 @@ extern EOnv* eo_nvscfg_GetNV(EOnvsCfg* p, uint8_t ondevindex, uint8_t onendpoint
 
 
 
-extern uint8_t eo_nvscfg_hid_ip2index(EOnvsCfg* p, eOipv4addr_t ipaddress)
+extern uint16_t eo_nvscfg_hid_ip2index(EOnvsCfg* p, eOipv4addr_t ipaddress)
 {
     uint16_t index = 0;
 
     if(NULL == p)
     {
-        return(EOK_uint08dummy);
+        return(EOK_uint16dummy);
     }
 
     if(eobool_true == eo_vector_Find(p->ip2index, &ipaddress, &index))
     {
-        return((uint8_t)index);  
+        return(index);  
     }
 
-    return(EOK_uint08dummy);
+    return(EOK_uint16dummy);
 }
 
-extern uint8_t eo_nvscfg_hid_ondevice_endpoint2index(EOnvsCfg* p, uint8_t ondevindex, eOnvEP_t endpoint)
+extern uint16_t eo_nvscfg_hid_ondevice_endpoint2index(EOnvsCfg* p, uint16_t ondevindex, eOnvEP_t endpoint)
 {
     if(NULL == p)
     {
-        return(EOK_uint08dummy);
+        return(EOK_uint16dummy);
     }
 
     return(s_eo_nvscfg_ondevice_endpoint2index(p, ondevindex, endpoint));
 }
 
 
-extern uint8_t eo_nvscfg_hid_ondevice_onendpoint_id2index(EOnvsCfg* p, uint8_t ondevindex, uint8_t onendpointindex, eOnvID_t id)
+extern uint16_t eo_nvscfg_hid_ondevice_onendpoint_id2index(EOnvsCfg* p, uint16_t ondevindex, uint16_t onendpointindex, eOnvID_t id)
 {
     if(NULL == p)
     {
-        return(EOK_uint08dummy);
+        return(EOK_uint16dummy);
     }
 
     return(s_eo_nvscfg_ondevice_onendpoint_id2index(p, ondevindex, onendpointindex, id));
 }
 
 
-extern EOtreenode* eo_nvscfg_hid_ondevice_onendpoint_withID_GetTreeNode(EOnvsCfg* p, uint8_t ondevindex, uint8_t onendpointindex, eOnvID_t id)
+extern EOtreenode* eo_nvscfg_hid_ondevice_onendpoint_withID_GetTreeNode(EOnvsCfg* p, uint16_t ondevindex, uint16_t onendpointindex, eOnvID_t id)
 {
     EOnvsCfg_device_t** thedev = NULL;
     EOnvsCfg_ep_t **theendpoint = NULL;
@@ -732,14 +732,14 @@ static uint16_t s_nvscfg_hashing(uint16_t ep, uint16_t sizeofhashtable)
 }
 #endif
 
-static uint8_t s_eo_nvscfg_ondevice_endpoint2index(EOnvsCfg* p, uint8_t ondevindex, eOnvEP_t endpoint)
+static uint16_t s_eo_nvscfg_ondevice_endpoint2index(EOnvsCfg* p, uint16_t ondevindex, eOnvEP_t endpoint)
 {
     EOnvsCfg_device_t** thedev = NULL;
 
     thedev = (EOnvsCfg_device_t**) eo_vector_At(p->thedevices, ondevindex);
     if(NULL == thedev)
     {
-        return(EOK_uint08dummy);
+        return(EOK_uint16dummy);
     }
 
 #if defined(EO_NVSCFG_USE_HASHTABLE)
@@ -765,7 +765,7 @@ static uint8_t s_eo_nvscfg_ondevice_endpoint2index(EOnvsCfg* p, uint8_t ondevind
         uint16_t index = (*thedev)->hashfn_ep2index(endpoint);
         if(EOK_uint16dummy != index)
         {
-            return((uint8_t)index);
+            return(index);
         }        
     }
 
@@ -774,8 +774,8 @@ static uint8_t s_eo_nvscfg_ondevice_endpoint2index(EOnvsCfg* p, uint8_t ondevind
 
     if(1)
     {   // cannot fill w/ hash --> need to do an exhaustive search.
-        uint8_t j = 0;
-        uint8_t nendpoints = (uint8_t)eo_vector_Size((*thedev)->theendpoints);
+        uint16_t j = 0;
+        uint16_t nendpoints = eo_vector_Size((*thedev)->theendpoints);
         for(j=0; j<nendpoints; j++)
         {
             EOnvsCfg_ep_t **theendpoint = (EOnvsCfg_ep_t**) eo_vector_At((*thedev)->theendpoints, j);
@@ -788,11 +788,11 @@ static uint8_t s_eo_nvscfg_ondevice_endpoint2index(EOnvsCfg* p, uint8_t ondevind
 
     }
 
-    return(EOK_uint08dummy);
+    return(EOK_uint16dummy);
 }
 
 
-static uint8_t s_eo_nvscfg_ondevice_onendpoint_id2index(EOnvsCfg* p, uint8_t ondevindex, uint8_t onendpointindex, eOnvID_t id)
+static uint16_t s_eo_nvscfg_ondevice_onendpoint_id2index(EOnvsCfg* p, uint16_t ondevindex, uint16_t onendpointindex, eOnvID_t id)
 {
     EOnvsCfg_device_t** thedev = NULL;
     EOnvsCfg_ep_t **theendpoint = NULL;
@@ -805,7 +805,7 @@ static uint8_t s_eo_nvscfg_ondevice_onendpoint_id2index(EOnvsCfg* p, uint8_t ond
     theendpoint = (EOnvsCfg_ep_t**) eo_vector_At((*thedev)->theendpoints, onendpointindex);
     if(NULL == theendpoint)
     {
-        return(EOK_uint08dummy);
+        return(EOK_uint16dummy);
     }
 
  
@@ -814,14 +814,14 @@ static uint8_t s_eo_nvscfg_ondevice_onendpoint_id2index(EOnvsCfg* p, uint8_t ond
         uint16_t index = (*theendpoint)->hashfn_id2index(id);
         if(EOK_uint16dummy != index)
         {
-            return((uint8_t)index);
+            return(index);
         }        
     }
 
     if(1)
     {   // cannot find with hash function, thus use exhaustive search
-        uint8_t k = 0;
-        uint8_t nvars = (*theendpoint)->thenvs_numberof;
+        uint16_t k = 0;
+        uint16_t nvars = (*theendpoint)->thenvs_numberof;
     
         for(k=0; k<nvars; k++)
         {
@@ -835,7 +835,7 @@ static uint8_t s_eo_nvscfg_ondevice_onendpoint_id2index(EOnvsCfg* p, uint8_t ond
 
     }
 
-    return(EOK_uint08dummy);
+    return(EOK_uint16dummy);
 }
 
 // --------------------------------------------------------------------------------------------------------------------

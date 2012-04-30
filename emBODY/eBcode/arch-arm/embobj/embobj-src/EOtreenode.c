@@ -76,11 +76,11 @@
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern uint8_t eo_treenode_GetIndex(EOtreenode *node)
+extern uint16_t eo_treenode_GetIndex(EOtreenode *node)
 {
     if(NULL == node)
     {
-        return(EOK_uint08dummy);
+        return(EOK_uint16dummy);
     }
     
     return(node->index);
@@ -106,25 +106,25 @@ extern uint8_t eo_treenode_GetNumberOfChilden(EOtreenode *node)
     return(node->nchildren);
 }
 
-extern uint8_t eo_treenode_GetIndexOfChild(EOtreenode *node, uint8_t index)
-{
-    if((NULL == node) || (index >= node->nchildren))
-    {
-        return(EOK_uint08dummy);
-    }
-    
-    return(node->ichildren[index]);
-}
+// extern uint16_t eo_treenode_GetIndexOfChild(EOtreenode *node, uint8_t childpos)
+// {
+//     if((NULL == node) || (childpos >= node->nchildren))
+//     {
+//         return(EOK_uint16dummy);
+//     }
+//     
+//     return(node->ichildren[childpos]);
+// }
 
 
-extern EOtreenode* eo_treenode_GetChild(EOtreenode *node, uint8_t index)
+extern EOtreenode* eo_treenode_GetChild(EOtreenode *node, uint8_t childpos)
 {
-    if((NULL == node) || (index >= node->nchildren))
+    if((NULL == node) || (childpos >= node->nchildren))
     {
         return(NULL);
     }
     
-    return(node->pchildren[index]);
+    return(node->pchildren[childpos]);
 
 }
 

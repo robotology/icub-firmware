@@ -51,7 +51,7 @@ typedef struct
 {
     eOnvEP_t                endpoint;
     eObool_t                initted;
-    uint8_t                 thenvs_numberof; 
+    uint16_t                thenvs_numberof; 
     const EOconstvector*    thetreeofnvs_con;      
     const EOconstvector*    thenvs_usr;
     void*                   thenvs_vol;
@@ -89,7 +89,7 @@ struct EOnvsCfg_hid
 {
     EOvector*                   thedevices;
     EOvector*                   ip2index;
-    uint8_t                     indexoflocaldevice;
+    uint16_t                    indexoflocaldevice;
     eOnvscfgDevicesOwnership_t  devicesowneship;
     EOVstorageDerived*          storage;
     EOmatrix3d*                 allnvs;
@@ -100,13 +100,13 @@ struct EOnvsCfg_hid
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern uint8_t eo_nvscfg_hid_ip2index(EOnvsCfg* p, eOipv4addr_t ipaddress);
+extern uint16_t eo_nvscfg_hid_ip2index(EOnvsCfg* p, eOipv4addr_t ipaddress);
 
-extern uint8_t eo_nvscfg_hid_ondevice_endpoint2index(EOnvsCfg* p, uint8_t ondevindex, eOnvEP_t endpoint);
+extern uint16_t eo_nvscfg_hid_ondevice_endpoint2index(EOnvsCfg* p, uint16_t ondevindex, eOnvEP_t endpoint);
 
-extern uint8_t eo_nvscfg_hid_ondevice_onendpoint_id2index(EOnvsCfg* p, uint8_t ondevindex, uint8_t onendpointindex, eOnvID_t id);
+extern uint16_t eo_nvscfg_hid_ondevice_onendpoint_id2index(EOnvsCfg* p, uint16_t ondevindex, uint16_t onendpointindex, eOnvID_t id);
 
-extern EOtreenode* eo_nvscfg_hid_ondevice_onendpoint_withID_GetTreeNode(EOnvsCfg* p, uint8_t ondevindex, uint8_t onendpointindex, eOnvID_t id);
+extern EOtreenode* eo_nvscfg_hid_ondevice_onendpoint_withID_GetTreeNode(EOnvsCfg* p, uint16_t ondevindex, uint16_t onendpointindex, eOnvID_t id);
 
 
 
