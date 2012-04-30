@@ -120,7 +120,9 @@ extern void eo_cfg_nvsEP_mngmnt_usr_hid_INIT__ropsigcfgassign(uint16_t n, const 
         s_eo_cfg_nvsEP_mngmnt_usr_ebx_generic_ropsigcfgassign(arrayloc);  
     }
     else
-    {   // function is called from within the remote host
+    {   // function is called from within the remote host because it has initialised its data
+        // it is possible to know which board owns the arrayrem from the ip address
+        eOipv4addr_t ipaddress_of_remote_board = nv->ip;
 
     }    
 }
@@ -137,7 +139,9 @@ extern void eo_cfg_nvsEP_mngmnt_usr_hid_UPDT__ropsigcfgcommand(uint16_t n, const
         s_eo_cfg_nvsEP_mngmnt_usr_ebx_generic_ropsigcfgassign(arrayloc);  
     }
     else
-    {   // function is called from within the remote host
+    {   // function is called from within the remote host because it has received a say or a sig
+        // it is possible to know which board has sent the say/sig by the ipaddress
+        eOipv4addr_t ipaddress_of_remote_board = nv->ip;
 
     }    
 }
