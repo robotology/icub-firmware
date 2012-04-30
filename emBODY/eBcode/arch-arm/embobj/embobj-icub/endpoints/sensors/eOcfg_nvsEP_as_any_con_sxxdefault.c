@@ -74,15 +74,22 @@
 
 extern const eOsnsr_strain_t eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue =
 {
-    EO_INIT(.txmode)                        0,
-    EO_INIT(.datarate)                      0,    
-    EO_INIT(.signaloncefullscale)           0,  
-    EO_INIT(.filler01)                      {0},  
-    EO_INIT(.filler04)                      {0xf1, 0xf2, 0xf3, 0xf4},  
-    EO_INIT(.values)                       
+    EO_INIT(.sconfig)
     {
-        EO_INIT(.head)                      {0},
-        EO_INIT(.data)                      {0}
+        EO_INIT(.mode)                          snsr_strainmode_acquirebutdonttx,
+        EO_INIT(.datarate)                      1,    
+        EO_INIT(.signaloncefullscale)           eobool_true,  
+        EO_INIT(.filler01)                      {0xf1}
+    },
+    EO_INIT(.sinputs)
+    {
+        EO_INIT(.filler04)                      {0xf1, 0xf2, 0xf3, 0xf4}
+    },
+    EO_INIT(.sstatus)                       
+    {
+        EO_INIT(.fullscale)                     {0},
+        EO_INIT(.calibratedvalues)              {0},
+        EO_INIT(.uncalibratedvalues)            {0}
     }
 }; 
 

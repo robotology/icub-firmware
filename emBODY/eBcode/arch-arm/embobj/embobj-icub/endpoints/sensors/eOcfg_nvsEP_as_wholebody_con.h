@@ -52,11 +52,18 @@
  
 
 // - public #define  --------------------------------------------------------------------------------------------------
-// empty-section
+
+#define EOK_cfg_nvsEP_as_wholebody_EP               (0x0030) 
 
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
+
+
+typedef enum
+{
+    endpoint_mngmnt_EP                          = EOK_cfg_nvsEP_as_wholebody_EP 
+} eo_cfg_nvsEP_as_wholebody_endpoint_t;
 
 
 /** @typedef    typedef enum eo_cfg_nvsEP_as_wholebody_con_strainNumber_t
@@ -75,13 +82,16 @@ enum { strain_TOTALnumber = 4};
  **/
 typedef enum
 {
-    strainNVindex__txmode                                   =   0,
-    strainNVindex__datarate                                 =   1,
-    strainNVindex__signaloncefullscale                      =   2,
-    strainNVindex__values                                   =   3
+    strainNVindex_sconfig__mode                                     =  0,
+    strainNVindex_sconfig__datarate                                 =  1,
+    strainNVindex_sconfig__signaloncefullscale                      =  2,
+    strainNVindex_sstatus__fullscale                                =  3,
+    strainNVindex_sstatus__calibratedvalues                         =  4,
+    strainNVindex_sstatus__uncalibratedvalues                       =  5
 } eo_cfg_nvsEP_as_wholebody_con_strainNVindex_t;
 
-enum { strainNVindex_TOTALnumber = 4 };
+enum { strainNVindex_TOTALnumber = 6 };
+
 
 /** @typedef    typedef enum eo_cfg_nvsEP_as_wholebody_con_maisNumber_t
     @brief      It contains an index for all the mais in the body.
@@ -99,10 +109,10 @@ enum { mais_TOTALnumber = 2};
  **/
 typedef enum
 {
-    maisNVindex__txmode                                     =   0,
-    maisNVindex__datarate                                   =   1,
-    maisNVindex__resolutionmode                             =   2,
-    maisNVindex__values                                     =   3
+    maisNVindex_mconfig__mode                                       =  0,
+    maisNVindex_mconfig__datarate                                   =  1,
+    maisNVindex_mconfig__resolution                                 =  2,
+    maisNVindex_mstatus__the15values                                =  3
 } eo_cfg_nvsEP_as_wholebody_con_maisNVindex_t;
 
 enum { maisNVindex_TOTALnumber = 4 };
@@ -117,11 +127,11 @@ enum {varsASwholebody_TOTALnumber = strain_TOTALnumber*strainNVindex_TOTALnumber
 /** @typedef    typedef struct eo_cfg_nvsEP_as_wholebody_t;
     @brief      contains all the variables in the wholebody of kind analog sensors
  **/
-typedef struct                      // size is 24*4+32*2 = 160                
+typedef struct                      // size is 56*4+48*2 = 320                
 {
     eOsnsr_strain_t                 strains[strain_TOTALnumber];
     eOsnsr_mais_t                   maises[mais_TOTALnumber];
-} eo_cfg_nvsEP_as_wholebody_t;      EO_VERIFYsizeof(eo_cfg_nvsEP_as_wholebody_t, 160);
+} eo_cfg_nvsEP_as_wholebody_t;      EO_VERIFYsizeof(eo_cfg_nvsEP_as_wholebody_t, 320);
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
@@ -131,37 +141,28 @@ typedef struct                      // size is 24*4+32*2 = 160
 
 
 
-/** @fn         extern eOnvEP_t eo_cfg_nvsEP_as_wholebody_EP_Get(void)
-    @brief      This function retrieves the eOnvEP_t of this endpoint
-    @return     the endpoint.
-  */
-extern eOnvEP_t eo_cfg_nvsEP_as_wholebody_EP_Get(void);
-
-
-/** @fn         extern eOnvID_t eo_cfg_nvsEP_as_wholebody_NVID_for_strain_var_Get(eo_cfg_nvsEP_as_wholebody_con_strainNumber_t s, eo_cfg_nvsEP_as_wholebody_con_strainNVindex_t snvindex)
+/** @fn         extern eOnvID_t eo_cfg_nvsEP_as_wholebody_strain_NVID_Get(eo_cfg_nvsEP_as_wholebody_con_strainNumber_t s, eo_cfg_nvsEP_as_wholebody_con_strainNVindex_t snvindex)
     @brief      This function retrieves the eOnvID_t of a network variable with index @e snvindex for the strain number @e s
     @param      s               the strain number 
     @param      snvinxed        the index of the nv inside the strain
     @return     the nvid or EOK_uint16dummy in case of failure.
   */
-extern eOnvID_t eo_cfg_nvsEP_as_wholebody_NVID_for_strain_var_Get(eo_cfg_nvsEP_as_wholebody_con_strainNumber_t s, eo_cfg_nvsEP_as_wholebody_con_strainNVindex_t snvindex);
+extern eOnvID_t eo_cfg_nvsEP_as_wholebody_strain_NVID_Get(eo_cfg_nvsEP_as_wholebody_con_strainNumber_t s, eo_cfg_nvsEP_as_wholebody_con_strainNVindex_t snvindex);
 
 
-/** @fn         extern eOnvID_t eo_cfg_nvsEP_as_wholebody_NVID_for_mais_var_Get(eo_cfg_nvsEP_as_wholebody_con_maisNumber_t s, eo_cfg_nvsEP_as_wholebody_con_maisNVindex_t mnvindex)
+/** @fn         extern eOnvID_t eo_cfg_nvsEP_as_wholebody_mais_NVID_Get(eo_cfg_nvsEP_as_wholebody_con_maisNumber_t s, eo_cfg_nvsEP_as_wholebody_con_maisNVindex_t mnvindex)
     @brief      This function retrieves the eOnvID_t of a network variable with index @e snvindex for the strain number @e s
     @param      m               the mais number 
     @param      mnvinxed        the index of the nv inside the mais
     @return     the nvid or EOK_uint16dummy in case of failure.
   */
-extern eOnvID_t eo_cfg_nvsEP_as_wholebody_NVID_for_mais_var_Get(eo_cfg_nvsEP_as_wholebody_con_maisNumber_t s, eo_cfg_nvsEP_as_wholebody_con_maisNVindex_t mnvindex);
+extern eOnvID_t eo_cfg_nvsEP_as_wholebody_mais_NVID_Get(eo_cfg_nvsEP_as_wholebody_con_maisNumber_t s, eo_cfg_nvsEP_as_wholebody_con_maisNVindex_t mnvindex);
 
 
 
 
 // - declarations used to load the endpoint into a EOnvsCfg object ----------------------------------------------------
 
-// the 16bit value to use to identify the endpoint
-#define EOK_cfg_nvsEP_as_wholebody_EP                                                 (0x0020)
 
 // it is a EOconstvector where each element is a EOtreenode whose data field is a EOnv_con_t object (id, capacity, valuedef, offset)
 extern const EOconstvector* const eo_cfg_nvsEP_as_wholebody_constvector_of_treenodes_EOnv_con;

@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       eOcfg_nvsEP_as_any_con_mxxdefault.c
+/* @file       eOcfg_nvsEP_as_any_con_sxx.c
     @brief      This file keeps constant configuration for ...
     @author     marco.accame@iit.it
     @date       04/06/2012
@@ -32,13 +32,14 @@
 #include "stdio.h"
 
 #include "EoSensors.h"
+#include "EOnv.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "eOcfg_nvsEP_as_any_con_mxxdefault.h"
+#include "eOcfg_nvsEP_as_any_con_sxx.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -72,29 +73,22 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern const eOsnsr_mais_t eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue =
-{
-    EO_INIT(.mconfig)
-    {
-        EO_INIT(.mode)                          snsr_strainmode_acquirebutdonttx,
-        EO_INIT(.datarate)                      1,    
-        EO_INIT(.resolution)                    snsr_maisresolution_08,  
-        EO_INIT(.filler01)                      {0xf1}
-    },
-    EO_INIT(.minputs)
-    {
-        EO_INIT(.filler04)                      {0xf1, 0xf2, 0xf3, 0xf4}
-    },
-    EO_INIT(.mstatus)                       
-    {
-        EO_INIT(.the15values)                   {0}
-    }
-}; 
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
+
+extern const uint8_t eo_cfg_nvsEP_as_any_con_sxx_funtyp[] =
+{
+    EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__mode,
+    EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__datarate,
+    EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__signaloncefullscale,
+    EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__fullscale,
+    EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__calibratedvalues,
+    EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__uncalibratedvalues    
+};  EO_VERIFYsizeof(eo_cfg_nvsEP_as_any_con_sxx_funtyp, EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber);
+
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
