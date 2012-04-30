@@ -55,6 +55,11 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
+typedef enum
+{
+    endpoint_mngmnt_EP                          = EOK_cfg_nvsEP_mngmnt_EP 
+} eo_cfg_nvsEP_mngmnt_endpoint_t;
+
 
 /** @typedef    typedef enum eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t;
     @brief      It contains an index for all the network variables in a joint. The indices are consecutive and without
