@@ -56,6 +56,11 @@
 #define EOK_cfg_nvsEP_mc_rightupperleg_EP                       (0x0022) 
 #define EOK_cfg_nvsEP_mc_rightlowerleg_EP                       (0x0023) 
 
+#define EOK_cfg_nvsEP_mc_leftupperarm_EP                        (0x0024)     
+#define EOK_cfg_nvsEP_mc_leftlowerarm_EP                        (0x0025) 
+#define EOK_cfg_nvsEP_mc_rightupperarm_EP                       (0x0026) 
+#define EOK_cfg_nvsEP_mc_rightlowerarm_EP                       (0x0027) 
+
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
@@ -69,7 +74,12 @@ typedef enum
     endpoint_leftupperleg_EP                    = EOK_cfg_nvsEP_mc_leftupperleg_EP,
     endpoint_leftlowerleg_EP                    = EOK_cfg_nvsEP_mc_leftlowerleg_EP,
     endpoint_rightupperleg_EP                   = EOK_cfg_nvsEP_mc_rightupperleg_EP,
-    endpoint_rightlowerleg_EP                   = EOK_cfg_nvsEP_mc_rightlowerleg_EP
+    endpoint_rightlowerleg_EP                   = EOK_cfg_nvsEP_mc_rightlowerleg_EP,
+    
+    endpoint_leftupperarm_EP                    = EOK_cfg_nvsEP_mc_leftupperarm_EP,
+    endpoint_leftlowerarm_EP                    = EOK_cfg_nvsEP_mc_leftlowerarm_EP,
+    endpoint_rightupperarm_EP                   = EOK_cfg_nvsEP_mc_rightupperarm_EP,
+    endpoint_rightlowerarm_EP                   = EOK_cfg_nvsEP_mc_rightlowerarm_EP    
 
 } eo_cfg_nvsEP_mc_endpoint_t;
 
