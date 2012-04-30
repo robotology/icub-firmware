@@ -51,8 +51,8 @@
 // - public #define  --------------------------------------------------------------------------------------------------
 
 // -- max mumber of joints and motors in a bodypart
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_joints                           jointNumberBodypart_TOTALnumber
-#define EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_motors                           motorNumberBodypart_TOTALnumber
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_joints                           jointBodypart_TOTALnumber
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_motors                           motorBodypart_TOTALnumber
 
 
 // -- the first nvid off of the joint jth

@@ -107,9 +107,9 @@ enum {varsMCupperleg_TOTALnumber = jointUpperLeg_TOTALnumber*jointNVindex_TOTALn
  **/
 typedef struct                  // 152*4+40*4 = 1152               
 {
-    eOmc_joint_t            joints[jointUpperLeg_TOTALnumber]; 
-    eOmc_motor_t            motors[motorUpperLeg_TOTALnumber];
-} eo_cfg_nvsEP_mc_upperleg_t;    EO_VERIFYsizeof(eo_cfg_nvsEP_mc_upperleg_t, 768);
+    eOmc_joint_t                joints[jointUpperLeg_TOTALnumber]; 
+    eOmc_motor_t                motors[motorUpperLeg_TOTALnumber];
+} eo_cfg_nvsEP_mc_upperleg_t;   EO_VERIFYsizeof(eo_cfg_nvsEP_mc_upperleg_t, 768);
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
@@ -125,22 +125,22 @@ extern const eOmc_motor_t* eo_cfg_nvsEP_mc_upperleg_motor_defaultvalue;
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-/** @fn         extern eOnvID_t eo_cfg_nvsEP_mc_upperleg_NVID_for_joint_var_Get(eo_cfg_nvsEP_mc_upperleg_con_jointNumber_t j, eo_cfg_nvsEP_mc_upperleg_con_jointNVindex_t jnvindex)
+/** @fn         extern eOnvID_t eo_cfg_nvsEP_mc_upperleg_joint_NVID_Get(eo_cfg_nvsEP_mc_upperleg_con_jointNumber_t j, eo_cfg_nvsEP_mc_upperleg_con_jointNVindex_t jnvindex)
     @brief      This function retrieves the eOnvID_t of a network variable with index @e jnvindex for the joint number @e j
     @param      j               the joint number 
     @param      jnvinxed        the index of the nv inside the joint
     @return     the nvid or EOK_uint16dummy in case of failure.
   */
-extern eOnvID_t eo_cfg_nvsEP_mc_upperleg_NVID_for_joint_var_Get(eo_cfg_nvsEP_mc_upperleg_con_jointNumber_t j, eo_cfg_nvsEP_mc_upperleg_con_jointNVindex_t jnvindex);
+extern eOnvID_t eo_cfg_nvsEP_mc_upperleg_joint_NVID_Get(eo_cfg_nvsEP_mc_upperleg_con_jointNumber_t j, eo_cfg_nvsEP_mc_upperleg_con_jointNVindex_t jnvindex);
 
 
-/** @fn         extern eOnvID_t eo_cfg_nvsEP_mc_upperleg_NVID_for_motor_var_Get(eo_cfg_nvsEP_mc_upperleg_con_motorNumber_t m, eo_cfg_nvsEP_mc_upperleg_con_motorNVindex_t mnvindex)
+/** @fn         extern eOnvID_t eo_cfg_nvsEP_mc_upperleg_motor_NVID_Get(eo_cfg_nvsEP_mc_upperleg_con_motorNumber_t m, eo_cfg_nvsEP_mc_upperleg_con_motorNVindex_t mnvindex)
     @brief      This function retrieves the eOnvID_t of a network variable with index @e nnvindex for the motor number @e m
     @param      m               the motor number 
     @param      mnvinxed        the index of the nv inside the motor
     @return     the nvid or EOK_uint16dummy in case of failure.
   */
-extern eOnvID_t eo_cfg_nvsEP_mc_upperleg_NVID_for_motor_var_Get(eo_cfg_nvsEP_mc_upperleg_con_motorNumber_t m, eo_cfg_nvsEP_mc_upperleg_con_motorNVindex_t mnvindex);
+extern eOnvID_t eo_cfg_nvsEP_mc_upperleg_motor_NVID_Get(eo_cfg_nvsEP_mc_upperleg_con_motorNumber_t m, eo_cfg_nvsEP_mc_upperleg_con_motorNVindex_t mnvindex);
 
 
 

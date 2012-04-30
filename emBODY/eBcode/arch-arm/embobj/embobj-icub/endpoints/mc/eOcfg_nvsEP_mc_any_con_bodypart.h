@@ -53,32 +53,32 @@
 
 /** @typedef    typedef enum eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t;
     @brief      It contains an index for all the joints in a bodypart. In a given bodypart, there are joints for a number lower
-                than jointNumberBodypart_TOTALnumber. The numbers are consecutive and without holes, so that the enum value can be changed 
+                than jointBodypart_TOTALnumber. The numbers are consecutive and without holes, so that the enum value can be changed 
                 by a normal index.
  **/
 typedef enum
 {
-    jointNumberBodypart_00 = 0,   
-    jointNumberBodypart_01, jointNumberBodypart_02, jointNumberBodypart_03, jointNumberBodypart_04, jointNumberBodypart_05, jointNumberBodypart_06, jointNumberBodypart_07, 
-    jointNumberBodypart_08, jointNumberBodypart_09, jointNumberBodypart_10, jointNumberBodypart_11, jointNumberBodypart_12, jointNumberBodypart_13, jointNumberBodypart_14, jointNumberBodypart_15
+    jointBodypart_00 = 0,   
+    jointBodypart_01, jointBodypart_02, jointBodypart_03, jointBodypart_04, jointBodypart_05, jointBodypart_06, jointBodypart_07, 
+    jointBodypart_08, jointBodypart_09, jointBodypart_10, jointBodypart_11, jointBodypart_12, jointBodypart_13, jointBodypart_14, jointBodypart_15
 } eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t;
 
-enum { jointNumberBodypart_TOTALnumber = 16};
+enum { jointBodypart_TOTALnumber = 16};
 
 
 
-/** @typedef    typedef enum eo_cfg_nvsEP_mc_any_con_bodypart_motorNumberBodypart_t;
+/** @typedef    typedef enum eo_cfg_nvsEP_mc_any_con_bodypart_motorBodypart_t;
     @brief      It contains an index for all the motors in a bodypart. In a given bodypart, there are motors for a number lower
-                than motorNumberBodypart_TOTALnumber. The numbers are consecutive and without holes.
+                than motorBodypart_TOTALnumber. The numbers are consecutive and without holes.
  **/
 typedef enum
 {
-    motorNumberBodypart_00 = 0,   
-    motorNumberBodypart_01, motorNumberBodypart_02, motorNumberBodypart_03, motorNumberBodypart_04, motorNumberBodypart_05, motorNumberBodypart_06, motorNumberBodypart_07, 
-    motorNumberBodypart_08, motorNumberBodypart_09, motorNumberBodypart_10, motorNumberBodypart_11, motorNumberBodypart_12, motorNumberBodypart_13, motorNumberBodypart_14, motorNumberBodypart_15
+    motorBodypart_00 = 0,   
+    motorBodypart_01, motorBodypart_02, motorBodypart_03, motorBodypart_04, motorBodypart_05, motorBodypart_06, motorBodypart_07, 
+    motorBodypart_08, motorBodypart_09, motorBodypart_10, motorBodypart_11, motorBodypart_12, motorBodypart_13, motorBodypart_14, motorBodypart_15
 } eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t;
 
-enum { motorNumberBodypart_TOTALnumber = 16};
+enum { motorBodypart_TOTALnumber = 16};
 
 
     
@@ -88,22 +88,22 @@ enum { motorNumberBodypart_TOTALnumber = 16};
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn         extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_joint_var_Get(eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t j, eo_cfg_nvsEP_mc_jointNVindex_t jnvindex)
+/** @fn         extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_joint_NVID_Get(eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t j, eo_cfg_nvsEP_mc_jointNVindex_t jnvindex)
     @brief      This function retrieves the eOnvID_t of a network variable with index @e jnvindex for the joint number @e j
     @param      j               the joint number 
     @param      jnvinxed        the index of the nv inside the joint
     @return     the nvid or EOK_uint16dummy in case of failure.
   */
-extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_joint_var_Get(eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t j, eo_cfg_nvsEP_mc_jointNVindex_t jnvindex);
+extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_joint_NVID_Get(eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t j, eo_cfg_nvsEP_mc_jointNVindex_t jnvindex);
 
 
-/** @fn         extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get(eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t m, eo_cfg_nvsEP_mc_motorNVindex_t mnvindex)
+/** @fn         extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_motor_NVID_Get(eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t m, eo_cfg_nvsEP_mc_motorNVindex_t mnvindex)
     @brief      This function retrieves the eOnvID_t of a network variable with index @e nnvindex for the motor number @e m
     @param      m               the motor number 
     @param      mnvinxed        the index of the nv inside the motor
     @return     the nvid or EOK_uint16dummy in case of failure.
   */
-extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get(eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t m, eo_cfg_nvsEP_mc_motorNVindex_t mnvindex);
+extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_motor_NVID_Get(eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t m, eo_cfg_nvsEP_mc_motorNVindex_t mnvindex);
 
 
 /** @}            
