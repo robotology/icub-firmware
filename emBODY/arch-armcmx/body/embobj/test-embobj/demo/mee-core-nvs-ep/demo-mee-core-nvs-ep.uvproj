@@ -787,9 +787,19 @@
           <GroupName>ep-mc-any</GroupName>
           <Files>
             <File>
+              <FileName>eOcfg_nvsEP_mc_any_con_jxx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_any_con_jxx.c</FilePath>
+            </File>
+            <File>
               <FileName>eOcfg_nvsEP_mc_any_con_jxxdefault.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_any_con_jxxdefault.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_any_con_mxx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_any_con_mxx.c</FilePath>
             </File>
             <File>
               <FileName>eOcfg_nvsEP_mc_any_con_mxxdefault.c</FileName>
@@ -800,6 +810,11 @@
               <FileName>eOcfg_nvsEP_mc_any_con_bodypart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_any_con_bodypart.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -865,6 +880,81 @@
               <FileName>eOcfg_nvsEP_mc_upperleg_usr_pippo.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_upperleg_usr_pippo.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ep-mc-lowerleg</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_lowerleg_con.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_lowerleg_con.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_lowerleg_usr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_lowerleg_usr.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_lowerleg_usr_pippo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_lowerleg_usr_pippo.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ep-mc-usr</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_pippo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_pippo.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ep-mc-upperarm</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_upperarm_con.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_upperarm_con.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_upperarm_usr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_upperarm_usr.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ep-mc-torso</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_torso_con.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_torso_con.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_torso_usr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_torso_usr.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ep-mc-lowerarm</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_lowerarm_con.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_lowerarm_con.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_lowerarm_usr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_lowerarm_usr.c</FilePath>
             </File>
           </Files>
         </Group>
