@@ -129,6 +129,7 @@ typedef const struct
  **/
 struct EOnv_hid 
 {
+    eOipv4addr_t                    ip;
     eOnvEP_t                        ep;
     uint8_t                         filler[2];
     EOnv_con_t*                     con;        // pointer to the constant part common to every device which uses this nv
@@ -151,7 +152,7 @@ struct EOnv_hid
 //extern EOnv * eo_nv_hid_New(uint8_t fun, uint8_t typ, uint32_t otherthingsmaybe);
 
 
-extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOnvEP_t ep, EOnv_con_t* con, EOnv_usr_t* usr, void* loc, void* rem, EOVmutexDerived* mtx, EOVstorageDerived* stg);
+extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvEP_t ep, EOnv_con_t* con, EOnv_usr_t* usr, void* loc, void* rem, EOVmutexDerived* mtx, EOVstorageDerived* stg);
 
 
 

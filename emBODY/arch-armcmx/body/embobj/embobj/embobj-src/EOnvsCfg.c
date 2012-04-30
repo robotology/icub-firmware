@@ -320,6 +320,7 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
                 tmpnvcon = (EOnv_con_t*) eo_treenode_GetData(treenode);
                 
                 eo_nv_hid_Load(     &tmpnv,
+                                    (*thedev)->ipaddress,
                                     (*theendpoint)->endpoint,
                                     tmpnvcon,
                                     (EOnv_usr_t*) eo_constvector_At((*theendpoint)->thenvs_usr, k),
@@ -527,6 +528,7 @@ extern EOnv* eo_nvscfg_GetNV(EOnvsCfg* p, uint16_t ondevindex, uint16_t onendpoi
     tmpnvcon = (EOnv_con_t*) eo_treenode_GetData(treenode);
     
     eo_nv_hid_Load(     nv,
+                        (*thedev)->ipaddress,
                         (*theendpoint)->endpoint,
                         tmpnvcon,
                         (EOnv_usr_t*) eo_constvector_At((*theendpoint)->thenvs_usr, k),
