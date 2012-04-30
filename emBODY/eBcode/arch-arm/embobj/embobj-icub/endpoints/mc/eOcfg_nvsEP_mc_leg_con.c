@@ -65,9 +65,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 //the number of joints used in the endpoint
-#define EOK_cfg_nvsEP_mc_leg_NUMofJOINTS                                        (6)
+#define EOK_cfg_nvsEP_mc_leg_NUMofJOINTS                                        (jointLeg_TOTALnumber)
 //the number of motors used in the endpoint
-#define EOK_cfg_nvsEP_mc_leg_NUMofMOTORS                                        (6)
+#define EOK_cfg_nvsEP_mc_leg_NUMofMOTORS                                        (motorLeg_TOTALnumber)
 
 //the total number of nvs in the endpoint
 #define EOK_cfg_nvsEP_leg_NUMofVARS                                             ((EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber*EOK_cfg_nvsEP_mc_leg_NUMofJOINTS)+(EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber*EOK_cfg_nvsEP_mc_leg_NUMofMOTORS))
