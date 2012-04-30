@@ -66,6 +66,7 @@
 
 
 
+
 //#include "EOtheNVs.h"
 //#include "eOcfg_NVs_updater.h"
 //#include "eOcfg_nvsEP_base_con.h"
@@ -161,6 +162,8 @@ extern EOtransceiver* theems00transceiver = NULL;
 // --------------------------------------------------------------------------------------------------------------------
 
 static void s_xxx(void);
+static void s_zzz(void);
+
 
 extern void demo_nvs_init(void);
 extern void demo_nvs_tick(void);
@@ -287,6 +290,8 @@ static EOpacket *transpacket = NULL;
 
 extern void demo_mee_core_nvs_appl_init00(void)
 {
+    
+    s_zzz();
 
     s_action = eo_action_New(); 
 
@@ -1483,6 +1488,32 @@ static void s_my_UPDT_jconfig(uint16_t jth, const EOnv* nv, const eOabstime_t ti
 // #define NVMACRO_USE_UPDT    1
 
 // #include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
+
+#include "eOcfg_nvsEP_mc_upperleg_usr_hid.h"
+#include "eOcfg_nvsEP_mc_lowerleg_usr_hid.h"
+#include "eOcfg_nvsEP_mc_hid.h"
+static void s_zzz(void)
+{
+    eo_cfg_nvsEP_mc_upperleg_usr_hid_INITIALISE(5, NULL, NULL);
+    eo_cfg_nvsEP_mc_lowerleg_usr_hid_INITIALISE(6, NULL, NULL);
+    
+   
+    eo_cfg_nvsEP_mc_hid_INITIALISE(9, NULL, NULL);
+    
+    eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jcmmnds__calibration(3, NULL, 2, 9);
+    
+    eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Jxx_jcmmnds__calibration(1, NULL, 1, 1);
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration((eo_cfg_nvsEP_mc_jointNumber_t)2, NULL, 0, 0);
+    
+    eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Jxx_jcmmnds__calibration(1, NULL, 1, 1);
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration((eo_cfg_nvsEP_mc_jointNumber_t)2, NULL, 0, 0);   
+
+    eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Jxx_jcmmnds__setpoint(5, NULL, 10, 10);   
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint((eo_cfg_nvsEP_mc_jointNumber_t)7, NULL, 0, 0);   
+    
+}
 
 
 
