@@ -73,15 +73,15 @@ typedef const struct EOtreenode_hid EOtreenode;
 //    @return     The pointer to the required object.
 // **/
 
-extern uint8_t eo_treenode_GetIndex(EOtreenode *node);
+extern uint16_t eo_treenode_GetIndex(EOtreenode *node);
 
 extern void* eo_treenode_GetData(EOtreenode *node);
 
 extern uint8_t eo_treenode_GetNumberOfChilden(EOtreenode *node);
 
-extern uint8_t eo_treenode_GetIndexOfChild(EOtreenode *node, uint8_t index);
+//extern uint16_t eo_treenode_GetIndexOfChild(EOtreenode *node, uint8_t childpos);
 
-extern EOtreenode* eo_treenode_GetChild(EOtreenode *node, uint8_t index);
+extern EOtreenode* eo_treenode_GetChild(EOtreenode *node, uint8_t childpos);
 
 extern eObool_t eo_treenode_isLeaf(EOtreenode *node);
 
