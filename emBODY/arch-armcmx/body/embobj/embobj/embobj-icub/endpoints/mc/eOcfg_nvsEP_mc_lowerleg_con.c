@@ -117,7 +117,7 @@ static uint16_t s_hash(uint16_t id);
 
 
 
-#define OFFSET_OF_END_OF_JOINTS    (2*sizeof(eOmc_joint_t))
+#define OFFSET_OF_END_OF_JOINTS    (EOK_cfg_nvsEP_mc_lowerleg_NUMofJOINTS*sizeof(eOmc_joint_t))
 
 
 // -- the 2 motors
