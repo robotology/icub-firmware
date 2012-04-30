@@ -113,6 +113,8 @@ extern eOresult_t eo_nv_Clear(EOnv *nv)
         return(eores_NOK_nullpointer);
     }
     
+    nv->ip      = 0;
+    nv->ep      = 0;
     nv->con     = NULL;       
     nv->usr     = NULL;
     nv->loc     = NULL;  
@@ -433,8 +435,9 @@ extern eOnvType_t eo_nv_GetTYP(const EOnv *netvar)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOnvEP_t ep, EOnv_con_t* con, EOnv_usr_t* usr, void* loc, void* rem, EOVmutexDerived* mtx, EOVstorageDerived* stg)
-{ 
+extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvEP_t ep, EOnv_con_t* con, EOnv_usr_t* usr, void* loc, void* rem, EOVmutexDerived* mtx, EOVstorageDerived* stg)
+{
+    nv->ip  = ip;
     nv->ep  = ep;
     nv->con = con;
     nv->usr = usr;
