@@ -885,14 +885,14 @@ static uint16_t s_hash(uint16_t id)
 }
 
 
-extern eOnvID_t eo_cfg_nvsEP_mc_lowerleg_NVID_for_joint_var_Get(eo_cfg_nvsEP_mc_lowerleg_con_jointNumber_t j, eo_cfg_nvsEP_mc_lowerleg_con_jointNVindex_t jnvindex)
+extern eOnvID_t eo_cfg_nvsEP_mc_lowerleg_joint_NVID_Get(eo_cfg_nvsEP_mc_lowerleg_con_jointNumber_t j, eo_cfg_nvsEP_mc_lowerleg_con_jointNVindex_t jnvindex)
 {
-    return(eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_joint_var_Get((eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t)j, (eo_cfg_nvsEP_mc_jointNVindex_t)jnvindex));
+    return(eo_cfg_nvsEP_mc_any_con_bodypart_joint_NVID_Get((eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t)j, (eo_cfg_nvsEP_mc_jointNVindex_t)jnvindex));
 }
 
-extern eOnvID_t eo_cfg_nvsEP_mc_lowerleg_NVID_for_motor_var_Get(eo_cfg_nvsEP_mc_lowerleg_con_motorNumber_t m, eo_cfg_nvsEP_mc_lowerleg_con_motorNVindex_t mnvindex)
+extern eOnvID_t eo_cfg_nvsEP_mc_lowerleg_motor_NVID_Get(eo_cfg_nvsEP_mc_lowerleg_con_motorNumber_t m, eo_cfg_nvsEP_mc_lowerleg_con_motorNVindex_t mnvindex)
 {
-    return(eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_motor_var_Get((eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t)m, (eo_cfg_nvsEP_mc_motorNVindex_t)mnvindex));
+    return(eo_cfg_nvsEP_mc_any_con_bodypart_motor_NVID_Get((eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t)m, (eo_cfg_nvsEP_mc_motorNVindex_t)mnvindex));
 }
 
 
