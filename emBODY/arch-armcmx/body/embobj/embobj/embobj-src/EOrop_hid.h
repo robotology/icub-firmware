@@ -89,9 +89,9 @@ typedef struct
 {
     EOnvsCfg*           nvscfg;                 // the used nvscfg
     eOnvOwnership_t     nvownership;
-    uint8_t             ondevindex;
-    uint8_t             onendpointindex;
-    uint8_t             onidindex;
+    uint16_t            ondevindex;
+    uint16_t            onendpointindex;
+    uint16_t            onidindex;
     EOtreenode*         nvtreenoderoot;         // points to the relevant nv in the used nvscfg using ondevindx and onendpointindex
     EOnv                nvroot;
 //    EOnv                nvleaf;               // dont need it

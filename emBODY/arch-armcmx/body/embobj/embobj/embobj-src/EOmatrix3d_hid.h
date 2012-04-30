@@ -45,11 +45,11 @@
 
 typedef struct
 {
-    uint8_t         capacity;
-    uint8_t         itemsize;
-    uint8_t         size;
-    uint8_t         dummy;
-} eOmatrix3d_head_t;   EO_VERIFYsizeof(eOmatrix3d_head_t, 4);
+    uint16_t        capacity;
+    uint16_t        itemsize;
+    uint16_t        size;
+    uint16_t        dummy;
+} eOmatrix3d_head_t;   EO_VERIFYsizeof(eOmatrix3d_head_t, 8);
 
 typedef struct eOmatrix3d_node_T
 {

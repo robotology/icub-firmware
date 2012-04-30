@@ -78,7 +78,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern EOmatrix3d* eo_matrix3d_New(uint8_t sizeofitem, uint8_t capacity1)
+extern EOmatrix3d* eo_matrix3d_New(uint16_t sizeofitem, uint16_t capacity1)
 {
     EOmatrix3d *retptr = NULL;    
 
@@ -92,7 +92,7 @@ extern EOmatrix3d* eo_matrix3d_New(uint8_t sizeofitem, uint8_t capacity1)
     return(retptr);
 }
 
-extern eOresult_t eo_matrix3d_Level1_PushBack(EOmatrix3d *p, uint8_t capacity2)
+extern eOresult_t eo_matrix3d_Level1_PushBack(EOmatrix3d *p, uint16_t capacity2)
 {
     eOmatrix3d_node_t *ptr = NULL;
     
@@ -118,7 +118,7 @@ extern eOresult_t eo_matrix3d_Level1_PushBack(EOmatrix3d *p, uint8_t capacity2)
     return(eores_OK);
 }
 
-extern eOresult_t eo_matrix3d_Level2_PushBack(EOmatrix3d *p, uint8_t onindex1, uint8_t capacity3)
+extern eOresult_t eo_matrix3d_Level2_PushBack(EOmatrix3d *p, uint16_t onindex1, uint16_t capacity3)
 {
     eOmatrix3d_node_t *ptri1 = NULL;
     eOmatrix3d_end_t *ptre = NULL;
@@ -151,7 +151,7 @@ extern eOresult_t eo_matrix3d_Level2_PushBack(EOmatrix3d *p, uint8_t onindex1, u
     return(eores_OK);
 }
 
-extern eOresult_t eo_matrix3d_Level3_PushBack(EOmatrix3d *p, uint8_t onindex1, uint8_t onindex2, void *pitem)
+extern eOresult_t eo_matrix3d_Level3_PushBack(EOmatrix3d *p, uint16_t onindex1, uint16_t onindex2, void *pitem)
 {
     eOmatrix3d_node_t *ptri1 = NULL;
     eOmatrix3d_node_t *ptri2 = NULL;
@@ -187,7 +187,7 @@ extern eOresult_t eo_matrix3d_Level3_PushBack(EOmatrix3d *p, uint8_t onindex1, u
     return(eores_OK);
 }
 
-extern void* eo_matrix3d_At(EOmatrix3d *p, uint8_t i1, uint8_t i2, uint8_t i3)
+extern void* eo_matrix3d_At(EOmatrix3d *p, uint16_t i1, uint16_t i2, uint16_t i3)
 {
     eOmatrix3d_node_t *ptri1 = NULL;
     eOmatrix3d_node_t *ptri2 = NULL;
@@ -221,7 +221,7 @@ extern void* eo_matrix3d_At(EOmatrix3d *p, uint8_t i1, uint8_t i2, uint8_t i3)
     return(&(ptre->data[i3*p->head.itemsize]));
 }
 
-extern uint8_t eo_matrix3d_ItemSize(EOmatrix3d *p)
+extern uint16_t eo_matrix3d_ItemSize(EOmatrix3d *p)
 {
     if(NULL == p)
     {
@@ -231,7 +231,7 @@ extern uint8_t eo_matrix3d_ItemSize(EOmatrix3d *p)
     return(p->head.itemsize);
 }
 
-extern uint8_t eo_matrix3d_Level1_Capacity(EOmatrix3d *p)
+extern uint16_t eo_matrix3d_Level1_Capacity(EOmatrix3d *p)
 {  
     if(NULL == p)
     {
@@ -241,7 +241,7 @@ extern uint8_t eo_matrix3d_Level1_Capacity(EOmatrix3d *p)
 
 }
 
-extern uint8_t eo_matrix3d_Level1_Size(EOmatrix3d *p)
+extern uint16_t eo_matrix3d_Level1_Size(EOmatrix3d *p)
 {
     if(NULL == p)
     {
@@ -251,7 +251,7 @@ extern uint8_t eo_matrix3d_Level1_Size(EOmatrix3d *p)
 
 }
 
-extern uint8_t eo_matrix3d_Level2_Capacity(EOmatrix3d *p, uint8_t onindex1)
+extern uint16_t eo_matrix3d_Level2_Capacity(EOmatrix3d *p, uint16_t onindex1)
 {
     eOmatrix3d_node_t *ptri1 = NULL;
     
@@ -268,7 +268,7 @@ extern uint8_t eo_matrix3d_Level2_Capacity(EOmatrix3d *p, uint8_t onindex1)
     return(ptri1->head.capacity);
 }
 
-extern uint8_t eo_matrix3d_Level2_Size(EOmatrix3d *p, uint8_t onindex1)
+extern uint16_t eo_matrix3d_Level2_Size(EOmatrix3d *p, uint16_t onindex1)
 {
     eOmatrix3d_node_t *ptri1 = NULL;
     
@@ -285,7 +285,7 @@ extern uint8_t eo_matrix3d_Level2_Size(EOmatrix3d *p, uint8_t onindex1)
     return(ptri1->head.size);   
 }
 
-extern uint8_t eo_matrix3d_Level3_Capacity(EOmatrix3d *p, uint8_t onindex1, uint8_t onindex2)
+extern uint16_t eo_matrix3d_Level3_Capacity(EOmatrix3d *p, uint16_t onindex1, uint16_t onindex2)
 {
     eOmatrix3d_node_t *ptri1 = NULL;
     eOmatrix3d_node_t *ptri2 = NULL;
@@ -308,7 +308,7 @@ extern uint8_t eo_matrix3d_Level3_Capacity(EOmatrix3d *p, uint8_t onindex1, uint
     return(ptri2->head.capacity);   
 }
 
-extern uint8_t eo_matrix3d_Level3_Size(EOmatrix3d *p, uint8_t onindex1, uint8_t onindex2)
+extern uint16_t eo_matrix3d_Level3_Size(EOmatrix3d *p, uint16_t onindex1, uint16_t onindex2)
 {
     eOmatrix3d_node_t *ptri1 = NULL;
     eOmatrix3d_node_t *ptri2 = NULL;

@@ -39,7 +39,7 @@
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
-#define EOTREENODE_NCHILDREN      14
+#define EOTREENODE_NCHILDREN      16
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
@@ -53,10 +53,10 @@
 struct EOtreenode_hid 
 {
     void*                   data;                               // pointer to the data 
-    uint8_t                 index;                              // index in the array
+    uint16_t                index;                              // index in the array
     uint8_t                 nchildren;                          // number of dependant netvars
-    uint8_t                 ichildren[EOTREENODE_NCHILDREN];     // using indices in a common array rather than pointers which would require more space  
-    EOtreenode*             pchildren[EOTREENODE_NCHILDREN];     // using indices in a common array rather than pointers which would require more space  
+    uint16_t                ichildren[EOTREENODE_NCHILDREN];    // using indices in a common array rather than pointers which would require more space  
+    EOtreenode*             pchildren[EOTREENODE_NCHILDREN];    // using indices in a common array rather than pointers which would require more space  
 };   
  
 
