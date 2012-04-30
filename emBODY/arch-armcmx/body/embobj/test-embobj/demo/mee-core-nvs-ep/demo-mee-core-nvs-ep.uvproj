@@ -747,6 +747,16 @@
           <GroupName>ep-as-any</GroupName>
           <Files>
             <File>
+              <FileName>eOcfg_nvsEP_as_any_con_sxx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_any_con_sxx.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_as_any_con_mxx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_any_con_mxx.c</FilePath>
+            </File>
+            <File>
               <FileName>eOcfg_nvsEP_as_any_con_mxxdefault.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_any_con_mxxdefault.c</FilePath>
@@ -771,6 +781,11 @@
         <Group>
           <GroupName>ep-mngmnt</GroupName>
           <Files>
+            <File>
+              <FileName>eOcfg_nvsEP_mngmnt_usr_ebx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mngmnt\eOcfg_nvsEP_mngmnt_usr_ebx.c</FilePath>
+            </File>
             <File>
               <FileName>eOcfg_nvsEP_mngmnt_usr.c</FileName>
               <FileType>1</FileType>
@@ -840,16 +855,6 @@
               <FileName>eOcfg_EPs_ebx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\embobj\embobj-icub\endpoints\eOcfg_EPs_ebx.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>ep-mngmnt-userdef-functions</GroupName>
-          <Files>
-            <File>
-              <FileName>eOcfg_nvsEP_mngmnt_usr_ebx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mngmnt\eOcfg_nvsEP_mngmnt_usr_ebx.c</FilePath>
             </File>
           </Files>
         </Group>
