@@ -115,29 +115,85 @@ typedef struct                  // size is: 4+0 = 4
 } eOsnsr_aea_t;                 EO_VERIFYsizeof(eOsnsr_aea_t, 4);
 
 
-
-typedef struct                      // size is: 1+1+1+1+4+16+0 = 24
+typedef enum
 {
-    eOenum08_t                      txmode;
-    uint8_t                         datarate;
-    eObool_t                        signaloncefullscale;
-    uint8_t                         filler01[1];
-    uint8_t                         filler04[4];    
-    eOsnsr_arrayofupto12bytes_t     values;
-} eOsnsr_strain_t;                  EO_VERIFYsizeof(eOsnsr_strain_t, 24);
+    snsr_strainmode_txcalibrateddatacontinuously          = 0,
+    snsr_strainmode_acquirebutdonttx                      = 1,
+    snsr_strainmode_txuncalibrateddatacontinuously        = 3,
+    snsr_strainmode_txalldatacontinuously                 = 4   
+} eOsnsr_strainmode_t;
 
-
-typedef struct                      // size is: 1+1+1+1+4+24+0 = 32
+typedef struct                      
 {
-    eOenum08_t                      txmode;
-    uint8_t                         datarate;
-    eOenum08_t                      resolutionmode;
-    uint8_t                         filler01[1];
-    uint8_t                         filler04[4];    
-    eOsnsr_arrayofupto20bytes_t     values; 
-} eOsnsr_mais_t;                    EO_VERIFYsizeof(eOsnsr_mais_t, 32);
+    eOenum08_t                      mode;                                   /**< use values from eOsnsr_strainmode_t */
+    uint8_t                         datarate;                               /**< in ms from 1 upto 210 */
+    eObool_t                        signaloncefullscale;                    /**< if eobool_true, then the strains signals its fullscale*/
+    uint8_t                         filler01[1];                           
+} eOsnsr_strain_config_t;           EO_VERIFYsizeof(eOsnsr_strain_config_t, 4);
 
 
+typedef struct                      
+{
+    uint8_t                         filler04[4];                               
+} eOsnsr_strain_inputs_t;           EO_VERIFYsizeof(eOsnsr_strain_inputs_t, 4);
+
+typedef struct                      // size is: 16+16+16+0 = 48                     
+{
+    eOsnsr_arrayofupto12bytes_t     fullscale;                              /**< the full scale as an array of three forces and three torques each of 2 bytes */
+    eOsnsr_arrayofupto12bytes_t     calibratedvalues;                       /**< the calibrated values as an array of three forces and three torques each of 2 bytes */
+    eOsnsr_arrayofupto12bytes_t     uncalibratedvalues;                     /**< the uncalibrated values as an array of three forces and three torques each of 2 bytes */                  
+} eOsnsr_strain_status_t;           EO_VERIFYsizeof(eOsnsr_strain_status_t, 48);
+
+typedef struct                      // size is: 4+4+48+0 = 56
+{
+    eOsnsr_strain_config_t          sconfig;
+    eOsnsr_strain_inputs_t          sinputs;    
+    eOsnsr_strain_status_t          sstatus;
+} eOsnsr_strain_t;                  EO_VERIFYsizeof(eOsnsr_strain_t, 56);
+
+
+
+typedef enum
+{
+    snsr_maismode_txdatacontinuously                    = 0,
+    snsr_maismode_acquirebutdonttx                      = 1,
+    snsr_maismode_dontacquiredonttx                     = 5  
+} eOsnsr_maismode_t;
+
+typedef enum
+{
+    snsr_maisresolution_08                              = 0,
+    snsr_maisresolution_16                              = 1
+} eOsnsr_maisresolution_t;
+
+
+typedef struct                      
+{
+    eOenum08_t                      mode;                               /**< use values from eOsnsr_maismode_t */
+    uint8_t                         datarate;                           /**< in ms from 1 upto 210 */
+    eOenum08_t                      resolution;                         /**< use values from eOsnsr_maisresolution_t */               
+    uint8_t                         filler01[1];                           
+} eOsnsr_mais_config_t;             EO_VERIFYsizeof(eOsnsr_mais_config_t, 4);
+
+
+typedef struct                      
+{
+    uint8_t                         filler04[4];                               
+} eOsnsr_mais_inputs_t;             EO_VERIFYsizeof(eOsnsr_mais_inputs_t, 4);
+
+typedef struct                      // size is: 40+0 = 40                     
+{
+    eOsnsr_arrayofupto36bytes_t     the15values;                        /**< the 15 values of the mais, either at 1 byte or 2 bytes resolution. */                  
+} eOsnsr_mais_status_t;             EO_VERIFYsizeof(eOsnsr_mais_status_t, 40);
+
+typedef struct                      // size is: 4+4+40+0 = 48
+{
+    eOsnsr_mais_config_t            mconfig;
+    eOsnsr_mais_inputs_t            minputs;    
+    eOsnsr_mais_status_t            mstatus;
+} eOsnsr_mais_t;                    EO_VERIFYsizeof(eOsnsr_mais_t, 48);
+
+    
 
 /** @typedef    typedef uint8_t  eOsnsr_sensorId_t
     @brief      eOsnsr_sensorId_t contains the values required to identify a sensor board in robot.
