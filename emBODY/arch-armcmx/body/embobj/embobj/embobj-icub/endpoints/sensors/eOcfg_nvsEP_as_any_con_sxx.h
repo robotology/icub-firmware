@@ -46,17 +46,23 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
+// -- max number of network variables in a strain
+
+#define EOK_cfg_nvsEP_as_any_con_sxx_maxnumof_nvs_in_strain                                 (16)     
+
+
 // -- the index of the network variables inside a strain
 
-#define EOK_cfg_nvsEP_as_any_con_sxx_snvindex__txmode                                       (0)
-#define EOK_cfg_nvsEP_as_any_con_sxx_snvindex__datarate                                     (1)
-#define EOK_cfg_nvsEP_as_any_con_sxx_snvindex__signaloncefullscale                          (2)
-#define EOK_cfg_nvsEP_as_any_con_sxx_snvindex__values                                       (3)
-
+#define EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sconfig__mode                                 (0)
+#define EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sconfig__datarate                             (1)
+#define EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sconfig__signaloncefullscale                  (2)
+#define EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sstatus__fullscale                            (3)
+#define EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sstatus__calibratedvalues                     (4)
+#define EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sstatus__uncalibratedvalues                   (5)
 
 // -- the total number of network variables inside a strain
 
-#define EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber                                   (4)
+#define EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber                                   (6)
   
 
 
@@ -65,12 +71,12 @@
 
 // -- the fun and typ of all the network variables in the strain
 
-#define EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP__txmode                                       EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08)
-#define EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP__datarate                                     EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08)
-#define EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP__signaloncefullscale                          EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08)
-#define EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP__values                                       EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd)
-
-
+#define EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__mode                                 EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08)
+#define EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__datarate                             EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08)
+#define EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__signaloncefullscale                  EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08)
+#define EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__fullscale                            EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_arr)
+#define EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__calibratedvalues                     EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_arr)
+#define EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__uncalibratedvalues                   EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_arr)
 
 
 
@@ -80,10 +86,12 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
+EO_VERIFYproposition(eo_cfg_nvsEP_as_any_con_sxx_check, (EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber <= EOK_cfg_nvsEP_as_any_con_sxx_maxnumof_nvs_in_strain));
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-// empty-section
 
+// contains the funtyp ordered by nvindex
+extern const uint8_t eo_cfg_nvsEP_as_any_con_sxx_funtyp[];
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 

@@ -69,20 +69,24 @@
 
 
 
-EO_VERIFYproposition(xxx, strainNVindex__txmode                       == EOK_cfg_nvsEP_as_any_con_sxx_snvindex__txmode);
-EO_VERIFYproposition(xxx, strainNVindex__datarate                     == EOK_cfg_nvsEP_as_any_con_sxx_snvindex__datarate);
-EO_VERIFYproposition(xxx, strainNVindex__signaloncefullscale          == EOK_cfg_nvsEP_as_any_con_sxx_snvindex__signaloncefullscale);
-EO_VERIFYproposition(xxx, strainNVindex__values                       == EOK_cfg_nvsEP_as_any_con_sxx_snvindex__values);
+EO_VERIFYproposition(xxx, strainNVindex_sconfig__mode                   == EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sconfig__mode);
+EO_VERIFYproposition(xxx, strainNVindex_sconfig__datarate               == EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sconfig__datarate);
+EO_VERIFYproposition(xxx, strainNVindex_sconfig__signaloncefullscale    == EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sconfig__signaloncefullscale);
+EO_VERIFYproposition(xxx, strainNVindex_sstatus__fullscale              == EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sstatus__fullscale);
+EO_VERIFYproposition(xxx, strainNVindex_sstatus__calibratedvalues       == EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sstatus__calibratedvalues);
+EO_VERIFYproposition(xxx, strainNVindex_sstatus__uncalibratedvalues     == EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sstatus__uncalibratedvalues);
 
-EO_VERIFYproposition(xxx, strainNVindex_TOTALnumber                   == EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber);
 
 
-EO_VERIFYproposition(xxx, maisNVindex__txmode                       == EOK_cfg_nvsEP_as_any_con_mxx_mnvindex__txmode);
-EO_VERIFYproposition(xxx, maisNVindex__datarate                     == EOK_cfg_nvsEP_as_any_con_mxx_mnvindex__datarate);
-EO_VERIFYproposition(xxx, maisNVindex__resolutionmode               == EOK_cfg_nvsEP_as_any_con_mxx_mnvindex__resolutionmode);
-EO_VERIFYproposition(xxx, maisNVindex__values                       == EOK_cfg_nvsEP_as_any_con_mxx_mnvindex__values);
+EO_VERIFYproposition(xxx, strainNVindex_TOTALnumber                     == EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber);
 
-EO_VERIFYproposition(xxx, maisNVindex_TOTALnumber                   == EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber);
+
+EO_VERIFYproposition(xxx, maisNVindex_mconfig__mode                     == EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__mode);
+EO_VERIFYproposition(xxx, maisNVindex_mconfig__datarate                 == EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__datarate);
+EO_VERIFYproposition(xxx, maisNVindex_mconfig__resolution               == EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__resolution);
+EO_VERIFYproposition(xxx, maisNVindex_mstatus__the15values              == EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mstatus__the15values);
+
+EO_VERIFYproposition(xxx, maisNVindex_TOTALnumber                       == EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -141,7 +145,7 @@ static uint16_t s_hash(uint16_t id);
 
 #include "eOcfg_nvsEP_as_any_con_sxxmacro.c"
 
-#define OFFSET_OF_END_OF_STRAINS    (4*sizeof(eOsnsr_strain_t))
+#define OFFSET_OF_END_OF_STRAINS    (strain_TOTALnumber*sizeof(eOsnsr_strain_t))
 
 
 // -- the 2 mais
@@ -208,89 +212,131 @@ extern EOtreenode eo_cfg_nvsEP_as_wholebody_tree_con[] =
 {
     // strainLeftArm_00
     {   // 0
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s00__txmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s00_sconfig__mode,
         EO_INIT(.index)     Sindex(0, 0),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
     {   // 1
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s00__datarate,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s00_sconfig__datarate,
         EO_INIT(.index)     Sindex(0, 1),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },  
     {   // 2
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s00__signaloncefullscale,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s00_sconfig__signaloncefullscale,
         EO_INIT(.index)     Sindex(0, 2),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
     {   // 3
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s00__values,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s00_sstatus__fullscale,
         EO_INIT(.index)     Sindex(0, 3),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },  
-
+    {   // 4
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s00_sstatus__calibratedvalues,
+        EO_INIT(.index)     Sindex(0, 4),
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },  
+    {   // 5
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s00_sstatus__uncalibratedvalues,
+        EO_INIT(.index)     Sindex(0, 5),
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },   
+    
     // strainRigthArm_01
     {   // 0
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s01__txmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s01_sconfig__mode,
         EO_INIT(.index)     Sindex(1, 0),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
     {   // 1
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s01__datarate,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s01_sconfig__datarate,
         EO_INIT(.index)     Sindex(1, 1),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },  
     {   // 2
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s01__signaloncefullscale,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s01_sconfig__signaloncefullscale,
         EO_INIT(.index)     Sindex(1, 2),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
     {   // 3
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s01__values,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s01_sstatus__fullscale,
         EO_INIT(.index)     Sindex(1, 3),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },  
- 
+    {   // 4
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s01_sstatus__calibratedvalues,
+        EO_INIT(.index)     Sindex(1, 4),
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },  
+    {   // 5
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s01_sstatus__uncalibratedvalues,
+        EO_INIT(.index)     Sindex(1, 5),
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },   
+    
     // strainLeftLeg_02
     {   // 0
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s02__txmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s02_sconfig__mode,
         EO_INIT(.index)     Sindex(2, 0),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
     {   // 1
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s02__datarate,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s02_sconfig__datarate,
         EO_INIT(.index)     Sindex(2, 1),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },  
     {   // 2
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s02__signaloncefullscale,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s02_sconfig__signaloncefullscale,
         EO_INIT(.index)     Sindex(2, 2),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
     {   // 3
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s02__values,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s02_sstatus__fullscale,
         EO_INIT(.index)     Sindex(2, 3),
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },   
+    {   // 4
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s02_sstatus__calibratedvalues,
+        EO_INIT(.index)     Sindex(2, 4),
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },  
+    {   // 5
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s02_sstatus__uncalibratedvalues,
+        EO_INIT(.index)     Sindex(2, 5),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
@@ -298,60 +344,75 @@ extern EOtreenode eo_cfg_nvsEP_as_wholebody_tree_con[] =
     
     // strainRigthLeg_03
     {   // 0
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s03__txmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s03_sconfig__mode,
         EO_INIT(.index)     Sindex(3, 0),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
     {   // 1
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s03__datarate,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s03_sconfig__datarate,
         EO_INIT(.index)     Sindex(3, 1),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },  
     {   // 2
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s03__signaloncefullscale,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s03_sconfig__signaloncefullscale,
         EO_INIT(.index)     Sindex(3, 2),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
     {   // 3
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s03__values,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s03_sstatus__fullscale,
         EO_INIT(.index)     Sindex(3, 3),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },  
-
+    {   // 4
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s03_sstatus__calibratedvalues,
+        EO_INIT(.index)     Sindex(3, 4),
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },  
+    {   // 5
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_s03_sstatus__uncalibratedvalues,
+        EO_INIT(.index)     Sindex(3, 5),
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    },   
+    
+    
     // the 2 mais
     
     // maisLeftHand_00
     {   // 0
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_m00__txmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_m00_mconfig__mode,
         EO_INIT(.index)     Mindex(0, 0),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
     {   // 1
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_m00__datarate,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_m00_mconfig__datarate,
         EO_INIT(.index)     Mindex(0, 1),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },  
     {   // 2
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_m00__resolutionmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_m00_mconfig__resolution,
         EO_INIT(.index)     Mindex(0, 2),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
     {   // 3
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_m00__values,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_m00_mstatus__the15values,
         EO_INIT(.index)     Mindex(0, 3),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
@@ -360,28 +421,28 @@ extern EOtreenode eo_cfg_nvsEP_as_wholebody_tree_con[] =
 
     // maisRigthHand_01
     {   // 0
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_m01__txmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_m01_mconfig__mode,
         EO_INIT(.index)     Mindex(1, 0),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
     {   // 1
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_m01__datarate,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_m01_mconfig__datarate,
         EO_INIT(.index)     Mindex(1, 1),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },  
     {   // 2
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_m01__resolutionmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_m01_mconfig__resolution,
         EO_INIT(.index)     Mindex(1, 2),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
     },
     {   // 3
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_m01__values,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_wholebody_m01_mstatus__the15values,
         EO_INIT(.index)     Mindex(1, 3),
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
@@ -433,24 +494,28 @@ extern uint16_t eo_cfg_nvsEP_as_wholebody_hashfunction_id2index(uint16_t id)
     static const uint16_t s_idtable[] = 
     { 
         // s00
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx__txmode(0),              EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx__datarate(0),
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx__signaloncefullscale(0), EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx__values(0), 
+        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__mode(0),                   EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__datarate(0),
+        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__signaloncefullscale(0),    EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__fullscale(0), 
+        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__calibratedvalues(0),       EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__uncalibratedvalues(0),  
         // s01
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx__txmode(1),              EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx__datarate(1),
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx__signaloncefullscale(1), EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx__values(1), 
+        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__mode(1),                   EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__datarate(1),
+        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__signaloncefullscale(1),    EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__fullscale(1), 
+        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__calibratedvalues(1),       EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__uncalibratedvalues(1),  
         // s02
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx__txmode(2),              EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx__datarate(2),
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx__signaloncefullscale(2), EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx__values(2), 
+        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__mode(2),                   EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__datarate(2),
+        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__signaloncefullscale(2),    EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__fullscale(2), 
+        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__calibratedvalues(2),       EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__uncalibratedvalues(2),  
         // s03
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx__txmode(3),              EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx__datarate(3),
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx__signaloncefullscale(3), EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx__values(3),         
-
+        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__mode(3),                   EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__datarate(3),
+        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__signaloncefullscale(3),    EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__fullscale(3),         
+        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__calibratedvalues(3),       EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__uncalibratedvalues(3),  
+        
         // m00
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx__txmode(0),              EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx__datarate(0),
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx__resolutionmode(0),      EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx__values(0), 
+        EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx_mconfig__mode(0),                   EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx_mconfig__datarate(0),
+        EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx_mconfig__resolution(0),             EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx_mstatus__the15values(0), 
         // m01
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx__txmode(1),              EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx__datarate(1),
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx__resolutionmode(1),      EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx__values(1)      
+        EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx_mconfig__mode(1),                   EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx_mconfig__datarate(1),
+        EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx_mconfig__resolution(1),             EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx_mstatus__the15values(1)      
     };  EO_VERIFYsizeof(s_idtable, sizeof(uint16_t)*(IDTABLESIZE));
     
     uint16_t index = s_hash(id);
@@ -510,46 +575,23 @@ static uint16_t s_hash(uint16_t id)
 }
 
 
-extern eOnvEP_t eo_cfg_nvsEP_as_wholebody_EP_Get(void)
-{
-    return(EOK_cfg_nvsEP_as_wholebody_EP);
-}
 
-
-static const uint8_t s_eo_cfg_nvsEP_as_wholebody_sxxfuntyp[] =
-{
-    EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP__txmode,
-    EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP__datarate,
-    EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP__signaloncefullscale,
-    EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP__values
-};  EO_VERIFYsizeof(s_eo_cfg_nvsEP_as_wholebody_sxxfuntyp, EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber);
-
-
-static const uint8_t s_eo_cfg_nvsEP_as_wholebody_mxxfuntyp[EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber] =
-{
-    EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP__txmode,
-    EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP__datarate,
-    EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP__resolutionmode,
-    EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP__values
-};  EO_VERIFYsizeof(s_eo_cfg_nvsEP_as_wholebody_mxxfuntyp, EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber);
-
-
-extern eOnvID_t eo_cfg_nvsEP_as_wholebody_NVID_for_strain_var_Get(eo_cfg_nvsEP_as_wholebody_con_strainNumber_t s, eo_cfg_nvsEP_as_wholebody_con_strainNVindex_t snvindex)
+extern eOnvID_t eo_cfg_nvsEP_as_wholebody_strain_NVID_Get(eo_cfg_nvsEP_as_wholebody_con_strainNumber_t s, eo_cfg_nvsEP_as_wholebody_con_strainNVindex_t snvindex)
 {
     if((s >= strain_TOTALnumber) || (snvindex >= EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber))
     {
         return(EOK_uint16dummy);
     }
-    return(EO_nv_ID(s_eo_cfg_nvsEP_as_wholebody_sxxfuntyp[snvindex], EOK_cfg_nvsEP_as_wholebody_con_NVIDoff_of_strain(s, snvindex)));    
+    return(EO_nv_ID(eo_cfg_nvsEP_as_any_con_sxx_funtyp[snvindex], EOK_cfg_nvsEP_as_wholebody_con_NVIDoff_of_strain(s, snvindex)));    
 }
 
-extern eOnvID_t eo_cfg_nvsEP_as_wholebody_NVID_for_mais_var_Get(eo_cfg_nvsEP_as_wholebody_con_maisNumber_t m, eo_cfg_nvsEP_as_wholebody_con_maisNVindex_t mnvindex)
+extern eOnvID_t eo_cfg_nvsEP_as_wholebody_mais_NVID_Get(eo_cfg_nvsEP_as_wholebody_con_maisNumber_t m, eo_cfg_nvsEP_as_wholebody_con_maisNVindex_t mnvindex)
 {
     if((m >= mais_TOTALnumber) || (mnvindex >= EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber))
     {
         return(EOK_uint16dummy);
     }
-    return(EO_nv_ID(s_eo_cfg_nvsEP_as_wholebody_mxxfuntyp[mnvindex], EOK_cfg_nvsEP_as_wholebody_con_NVIDoff_of_mais(m, mnvindex)));    
+    return(EO_nv_ID(eo_cfg_nvsEP_as_any_con_mxx_funtyp[mnvindex], EOK_cfg_nvsEP_as_wholebody_con_NVIDoff_of_mais(m, mnvindex)));    
 }
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -46,15 +46,20 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-// -- the index of the network variables inside a strain
+// -- max number of network variables in a mais
 
-#define EOK_cfg_nvsEP_as_any_con_mxx_mnvindex__txmode                                       (0)
-#define EOK_cfg_nvsEP_as_any_con_mxx_mnvindex__datarate                                     (1)
-#define EOK_cfg_nvsEP_as_any_con_mxx_mnvindex__resolutionmode                               (2)
-#define EOK_cfg_nvsEP_as_any_con_mxx_mnvindex__values                                       (3)
+#define EOK_cfg_nvsEP_as_any_con_mxx_maxnumof_nvs_in_mais                                   (16)     
 
 
-// -- the total number of network variables inside a strain
+// -- the index of the network variables inside a mais
+
+#define EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__mode                                 (0)
+#define EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__datarate                             (1)
+#define EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__resolution                           (2)
+#define EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mstatus__the15values                          (3)
+
+
+// -- the total number of network variables inside a mais
 
 #define EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber                                   (4)
 
@@ -63,12 +68,12 @@
 
 
 
-// -- the fun and typ of all the network variables in the strain
+// -- the fun and typ of all the network variables in the mais
 
-#define EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP__txmode                                       EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08)
-#define EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP__datarate                                     EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08)
-#define EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP__resolutionmode                               EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08)
-#define EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP__values                                       EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd)
+#define EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig__mode                                 EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08)
+#define EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig__datarate                             EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08)
+#define EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig__resolution                           EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08)
+#define EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mstatus__the15values                          EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_arr)
 
 
 
@@ -80,10 +85,12 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
+EO_VERIFYproposition(eo_cfg_nvsEP_as_any_con_mxx_check, (EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber <= EOK_cfg_nvsEP_as_any_con_mxx_maxnumof_nvs_in_mais));
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-// empty-section
 
+// contains the funtyp ordered by nvindex
+extern const uint8_t eo_cfg_nvsEP_as_any_con_mxx_funtyp[];
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 

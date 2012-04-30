@@ -61,13 +61,13 @@
 //#define SMACRO_NAMEOFVARIABLE(pstr, jstr, var)            eo_cfg_nvsEP_as ## pstr ## jstr ## var 
 
 #define xx0nameofvariable(pstr, jstr, var)                  eo_cfg_nvsEP_as ## pstr ## jstr ## var
-#define SMACRO_NAMEOFVARIABLE(pstr, jstr, var)               xx0nameofvariable(pstr, jstr, var)
+#define SMACRO_NAMEOFVARIABLE(pstr, jstr, var)              xx0nameofvariable(pstr, jstr, var)
 
 #define xx0verifysizeof(id, sname, ssize)                   typedef uint8_t GUARD##id##sname[ ( ssize == sizeof(sname) ) ? (1) : (0)];
 #define SMACRO_VERIFYSIZEOF(id, sname, ssize)                xx0verifysizeof(id, sname, ssize)
 
 #define xx0getnvid(extprefix, postfix, j)                   extprefix##postfix(j)
-#define SMACRO_GETNVID(extprefix, postfix, j)                xx0getnvid(extprefix, postfix, j)
+#define SMACRO_GETNVID(extprefix, postfix, j)               xx0getnvid(extprefix, postfix, j)
 
 
 
@@ -89,78 +89,107 @@
 
 
 
-#define SOFFSETof__txmode                                        (SMACRO_OFF)
-#define SCAPACITY__txmode                                        sizeof(eOenum08_t)
-extern EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, __txmode) =
+#define SOFFSETof_sconfig__mode                                        (SMACRO_OFF)
+#define SCAPACITY_sconfig__mode                                        sizeof(eOenum08_t)
+extern EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sconfig__mode) =
 {   
  
-    EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, __txmode, SMACRO_NUM),
-    EO_INIT(.capacity)  SCAPACITY__txmode,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.txmode,
-    EO_INIT(.offset)    SOFFSETof__txmode,
-    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP__txmode),
-    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP__txmode)
+    EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sconfig__mode, SMACRO_NUM),
+    EO_INIT(.capacity)  SCAPACITY_sconfig__mode,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.sconfig.mode,
+    EO_INIT(.offset)    SOFFSETof_sconfig__mode,
+    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__mode),
+    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__mode)
 };
-#define SOFFSETafter__txmode                                     (SOFFSETof__txmode+SCAPACITY__txmode)
+#define SOFFSETafter_sconfig__mode                                     (SOFFSETof_sconfig__mode+SCAPACITY_sconfig__mode)
 
-#define SOFFSETof__datarate                                        (SOFFSETafter__txmode)
-#define SCAPACITY__datarate                                        sizeof(uint8_t)
-extern EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, __datarate) =
+#define SOFFSETof_sconfig__datarate                                        (SOFFSETafter_sconfig__mode)
+#define SCAPACITY_sconfig__datarate                                        sizeof(uint8_t)
+extern EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sconfig__datarate) =
 {   
  
-    EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, __datarate, SMACRO_NUM),
-    EO_INIT(.capacity)  SCAPACITY__datarate,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.datarate,
-    EO_INIT(.offset)    SOFFSETof__datarate,
-    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP__datarate),
-    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP__datarate)
+    EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sconfig__datarate, SMACRO_NUM),
+    EO_INIT(.capacity)  SCAPACITY_sconfig__datarate,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.sconfig.datarate,
+    EO_INIT(.offset)    SOFFSETof_sconfig__datarate,
+    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__datarate),
+    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__datarate)
 };
-#define SOFFSETafter__datarate                                     (SOFFSETof__datarate+SCAPACITY__datarate)
+#define SOFFSETafter_sconfig__datarate                                     (SOFFSETof_sconfig__datarate+SCAPACITY_sconfig__datarate)
 
-#define SOFFSETof__signaloncefullscale                                        (SOFFSETafter__datarate)
-#define SCAPACITY__signaloncefullscale                                        sizeof(eObool_t)
-extern EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, __signaloncefullscale) =
+#define SOFFSETof_sconfig__signaloncefullscale                                        (SOFFSETafter_sconfig__datarate)
+#define SCAPACITY_sconfig__signaloncefullscale                                        sizeof(eObool_t)
+extern EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sconfig__signaloncefullscale) =
 {   
  
-    EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, __signaloncefullscale, SMACRO_NUM),
-    EO_INIT(.capacity)  SCAPACITY__signaloncefullscale,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.signaloncefullscale,
-    EO_INIT(.offset)    SOFFSETof__signaloncefullscale,
-    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP__signaloncefullscale),
-    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP__signaloncefullscale)
+    EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sconfig__signaloncefullscale, SMACRO_NUM),
+    EO_INIT(.capacity)  SCAPACITY_sconfig__signaloncefullscale,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.sconfig.signaloncefullscale,
+    EO_INIT(.offset)    SOFFSETof_sconfig__signaloncefullscale,
+    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__signaloncefullscale),
+    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__signaloncefullscale)
 };
-#define SOFFSETafter__signaloncefullscale                                     (SOFFSETof__signaloncefullscale+SCAPACITY__signaloncefullscale)
+#define SOFFSETafter_sconfig__signaloncefullscale                                     (SOFFSETof_sconfig__signaloncefullscale+SCAPACITY_sconfig__signaloncefullscale)
 
 
-#define SOFFSETof_filler01                                       (SOFFSETafter__signaloncefullscale)
-#define SCAPACITY_filler01                                       (1)
+#define SOFFSETof_sconfig_filler01                                       (SOFFSETafter_sconfig__signaloncefullscale)
+#define SCAPACITY_sconfig_filler01                                       (1)
 //
-#define SOFFSETafter_filler01                                     (SOFFSETof_filler01+SCAPACITY_filler01)
+#define SOFFSETafter_sconfig_filler01                                    (SOFFSETof_sconfig_filler01+SCAPACITY_sconfig_filler01)
 
-#define SOFFSETof_filler04                                       (SOFFSETafter_filler01)
-#define SCAPACITY_filler04                                       (4)
+#define SOFFSETof_sinputs_filler04                                       (SOFFSETafter_sconfig_filler01)
+#define SCAPACITY_sinputs_filler04                                       (4)
 //
-#define SOFFSETafter_filler04                                     (SOFFSETof_filler04+SCAPACITY_filler04)
+#define SOFFSETafter_sinputs_filler04                                    (SOFFSETof_sinputs_filler04+SCAPACITY_sinputs_filler04)
 
 
-#define SOFFSETof__values                                        (SOFFSETafter_filler04)
-#define SCAPACITY__values                                        sizeof(eOsnsr_arrayofupto12bytes_t)
-extern EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, __values) =
+#define SOFFSETof_sstatus__fullscale                                        (SOFFSETafter_sinputs_filler04)
+#define SCAPACITY_sstatus__fullscale                                        sizeof(eOsnsr_arrayofupto12bytes_t)
+extern EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sstatus__fullscale) =
 {   
  
-    EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, __values, SMACRO_NUM),
-    EO_INIT(.capacity)  SCAPACITY__values,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.values,
-    EO_INIT(.offset)    SOFFSETof__values,
-    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP__values),
-    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP__values)
+    EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sstatus__fullscale, SMACRO_NUM),
+    EO_INIT(.capacity)  SCAPACITY_sstatus__fullscale,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.sstatus.fullscale,
+    EO_INIT(.offset)    SOFFSETof_sstatus__fullscale,
+    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__fullscale),
+    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__fullscale)
 };
-#define SOFFSETafter__values                                     (SOFFSETof__values+SCAPACITY__values)
+#define SOFFSETafter_sstatus__fullscale                                     (SOFFSETof_sstatus__fullscale+SCAPACITY_sstatus__fullscale)
+
+
+#define SOFFSETof_sstatus__calibratedvalues                                        (SOFFSETafter_sstatus__fullscale)
+#define SCAPACITY_sstatus__calibratedvalues                                        sizeof(eOsnsr_arrayofupto12bytes_t)
+extern EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sstatus__calibratedvalues) =
+{   
+ 
+    EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sstatus__calibratedvalues, SMACRO_NUM),
+    EO_INIT(.capacity)  SCAPACITY_sstatus__calibratedvalues,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.sstatus.calibratedvalues,
+    EO_INIT(.offset)    SOFFSETof_sstatus__calibratedvalues,
+    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__calibratedvalues),
+    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__calibratedvalues)
+};
+#define SOFFSETafter_sstatus__calibratedvalues                                     (SOFFSETof_sstatus__calibratedvalues+SCAPACITY_sstatus__calibratedvalues)
+
+#define SOFFSETof_sstatus__uncalibratedvalues                                        (SOFFSETafter_sstatus__calibratedvalues)
+#define SCAPACITY_sstatus__uncalibratedvalues                                        sizeof(eOsnsr_arrayofupto12bytes_t)
+extern EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sstatus__uncalibratedvalues) =
+{   
+ 
+    EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sstatus__uncalibratedvalues, SMACRO_NUM),
+    EO_INIT(.capacity)  SCAPACITY_sstatus__uncalibratedvalues,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.sstatus.uncalibratedvalues,
+    EO_INIT(.offset)    SOFFSETof_sstatus__uncalibratedvalues,
+    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__uncalibratedvalues),
+    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__uncalibratedvalues)
+};
+#define SOFFSETafter_sstatus__uncalibratedvalues                                     (SOFFSETof_sstatus__uncalibratedvalues+SCAPACITY_sstatus__uncalibratedvalues)
 
 
 
 // guard on alignement of variables. if it doesnt compile then ... the compiler has surely inserted some holes
-SMACRO_VERIFYSIZEOF(SMACRO_NUM, eOsnsr_strain_t, SOFFSETafter__values-SMACRO_OFF);
+SMACRO_VERIFYSIZEOF(SMACRO_NUM, eOsnsr_strain_t, SOFFSETafter_sstatus__uncalibratedvalues-SMACRO_OFF);
 
 
 
