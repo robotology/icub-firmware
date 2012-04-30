@@ -156,7 +156,7 @@ static uint16_t s_hash(uint16_t id);
 
 #include "eOcfg_nvsEP_mc_any_con_jxxmacro.c"
 
-#define OFFSET_OF_END_OF_JOINTS    (6*sizeof(eOmc_joint_t))
+#define OFFSET_OF_END_OF_JOINTS    (EOK_cfg_nvsEP_mc_leg_NUMofJOINTS*sizeof(eOmc_joint_t))
 
 
 // -- the 6 motors
