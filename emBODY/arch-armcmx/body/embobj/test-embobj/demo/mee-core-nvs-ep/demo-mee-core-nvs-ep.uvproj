@@ -776,6 +776,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_wholebody_con.c</FilePath>
             </File>
+            <File>
+              <FileName>eOcfg_nvsEP_as_wholebody_usr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_wholebody_usr.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
