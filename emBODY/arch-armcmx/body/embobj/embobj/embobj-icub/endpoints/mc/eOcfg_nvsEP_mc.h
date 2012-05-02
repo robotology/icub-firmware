@@ -61,6 +61,8 @@
 #define EOK_cfg_nvsEP_mc_rightupperarm_EP                       (0x0026) 
 #define EOK_cfg_nvsEP_mc_rightlowerarm_EP                       (0x0027) 
 
+#define EOK_cfg_nvsEP_mc_torso_EP                               (0x0028)  
+
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
@@ -79,7 +81,9 @@ typedef enum
     endpoint_leftupperarm_EP                    = EOK_cfg_nvsEP_mc_leftupperarm_EP,
     endpoint_leftlowerarm_EP                    = EOK_cfg_nvsEP_mc_leftlowerarm_EP,
     endpoint_rightupperarm_EP                   = EOK_cfg_nvsEP_mc_rightupperarm_EP,
-    endpoint_rightlowerarm_EP                   = EOK_cfg_nvsEP_mc_rightlowerarm_EP    
+    endpoint_rightlowerarm_EP                   = EOK_cfg_nvsEP_mc_rightlowerarm_EP,
+
+    endpoint_torso_EP                           = EOK_cfg_nvsEP_mc_torso_EP      
 
 } eo_cfg_nvsEP_mc_endpoint_t;
 
