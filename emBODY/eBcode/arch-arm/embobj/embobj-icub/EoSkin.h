@@ -71,7 +71,38 @@ typedef struct                  // size is: 164+4+0 = 168
 } eOskin_array_data_t;      EO_VERIFYsizeof(eOskin_array_data_t, 168);
 
 
+typedef enum
+{
+    skin_sigmode_dontsignal                         = 0,
+    snsr_sigmode_signal                             = 1  
+} eOskin_sigmode_t;
 
+typedef struct                      
+{
+    eOenum08_t                  sigmode;                                   /**< use values from eOskin_sigmode_t */
+    uint8_t                     filler03[3];                           
+} eOskin_config_t;              EO_VERIFYsizeof(eOskin_config_t, 4);
+
+
+typedef struct                      
+{
+    uint8_t                     filler04[4];                           
+} eOskin_inputs_t;              EO_VERIFYsizeof(eOskin_inputs_t, 4);
+
+
+typedef struct                  // size is: 164+4+0 = 168                     
+{
+    EOarray_of_10canframes      arrayof10canframes;
+    uint8_t                     filler04[4];                           
+} eOskin_status_t;              EO_VERIFYsizeof(eOskin_status_t, 168);
+
+
+typedef struct                      // size is: 4+4+168+0 = 176
+{
+    eOskin_config_t                 sconfig;
+    eOskin_inputs_t                 sinputs;    
+    eOskin_status_t                 sstatus;
+} eOskin_someskin_t;                EO_VERIFYsizeof(eOskin_someskin_t, 176);
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
