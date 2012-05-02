@@ -1418,7 +1418,7 @@ static void s_test_nvs_transceiver_pc104_configure_ems(EOtransceiver *txrx)
 #if 0
 #endif
 
-    s_test_nvs_transceiver_pc104_occasional_load(txrx, eo_ropcode_set, EOK_cfg_nvsEP_mngmnt_EP, eo_cfg_nvsEP_mngmnt_NVID_Get(mngmntNVindex__ropsigcfgassign));  
+    s_test_nvs_transceiver_pc104_occasional_load(txrx, eo_ropcode_set, endpoint_mngmnt, eo_cfg_nvsEP_mngmnt_NVID_Get(mngmntNVindex__ropsigcfgassign));  
 }
 
 
