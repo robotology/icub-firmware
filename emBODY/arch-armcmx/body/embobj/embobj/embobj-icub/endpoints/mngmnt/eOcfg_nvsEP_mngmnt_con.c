@@ -70,8 +70,6 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-// must be extern so that another file can use it as initialiser of a a const struct
-extern uint16_t eo_cfg_nvsEP_mngmnt_hashfunction_id2index(uint16_t nvid);
 
 static uint16_t s_hash(uint16_t id);
 

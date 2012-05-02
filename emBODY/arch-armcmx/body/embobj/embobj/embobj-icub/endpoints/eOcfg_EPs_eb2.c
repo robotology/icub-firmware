@@ -98,6 +98,9 @@ extern const EOconstvector  s_eo_cfg_nvsEP_mc_lowerarm_constvector_of_treenodes_
 extern const EOconstvector  s_eo_cfg_nvsEP_mc_lowerarm_usr_constvector_of_EOnv_usr;
 
 
+extern const EOconstvector  s_eo_cfg_nvsEP_sk_emsboard_constvector_of_treenodes_EOnv_con;
+extern const EOconstvector  s_eo_cfg_nvsEP_sk_emsboard_usr_constvector_of_EOnv_usr;
+
 
 static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_eb2_data[] =
 {  
@@ -117,7 +120,16 @@ static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_eb2_data[] =
         EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mc_lowerarm_constvector_of_treenodes_EOnv_con, 
         EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_mc_lowerarm_usr_constvector_of_EOnv_usr, 
         EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mc_lowerarm_usr_initialise
-    }
+    },
+    
+    {   // sk-leftarm-lower
+        EO_INIT(.endpoint)                          endpoint_sk_emsboard_leftlowerarm,
+        EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_sk_emsboard_t),
+        EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_sk_emsboard_hashfunction_id2index,
+        EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_sk_emsboard_constvector_of_treenodes_EOnv_con, 
+        EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_sk_emsboard_usr_constvector_of_EOnv_usr, 
+        EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_sk_emsboard_usr_initialise
+    }    
     
 };
 
@@ -168,7 +180,10 @@ static uint16_t s_hash(uint16_t ep)
     {
         return(1);
     }
-
+    else if(endpoint_sk_emsboard_leftlowerarm == r)
+    {
+        return(2);
+    }
     
     return(EOK_uint16dummy);
     #warning --> ma meglio usare una tabella con i numeri 0, 1  in posizione corrispondente al valore di r. magari una tabella comune definita in endpoints.c
@@ -183,11 +198,11 @@ static uint16_t s_eo_cfg_nvsEP_eb2_hashfunction_ep2index(uint16_t ep)
     // are ... 0, 7, 16    
 
 
-    #define EPTABLESIZE     2
+    #define EPTABLESIZE     3
 
     static const uint16_t s_eptable[EPTABLESIZE] = 
     { 
-        endpoint_mngmnt,        endpoint_mc_leftlowerarm
+        endpoint_mngmnt,        endpoint_mc_leftlowerarm,       endpoint_sk_emsboard_leftlowerarm
     };
    
     uint16_t index = s_hash(ep);

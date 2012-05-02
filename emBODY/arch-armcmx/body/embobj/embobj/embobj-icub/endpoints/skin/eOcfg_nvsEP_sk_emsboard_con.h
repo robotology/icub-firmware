@@ -61,7 +61,8 @@
 
 typedef enum
 {
-    endpoint_sk_emsboard       = 0x0030 
+    endpoint_sk_emsboard_leftlowerarm           = 0x0032,
+    endpoint_sk_emsboard_rightlowerarm          = 0x0034    
 } eo_cfg_nvsEP_sk_emsboard_endpoint_t;
 
 
