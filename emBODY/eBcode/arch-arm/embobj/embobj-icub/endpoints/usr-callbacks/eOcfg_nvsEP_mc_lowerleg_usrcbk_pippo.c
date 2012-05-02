@@ -132,7 +132,7 @@ extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, 
         }
         for(m=0; m<motorLowerLeg_TOTALnumber; m++)
         {
-            memcpy(&lloc->motors[m], &eo_cfg_nvsEP_mc_lowerleg_motor_defaultvalue, sizeof(eOmc_motor_t)); 
+            memcpy(&lloc->motors[m], eo_cfg_nvsEP_mc_lowerleg_motor_defaultvalue, sizeof(eOmc_motor_t)); 
         } 
         
         

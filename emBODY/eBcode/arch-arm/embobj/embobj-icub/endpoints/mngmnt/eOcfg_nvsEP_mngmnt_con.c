@@ -144,6 +144,8 @@ EO_VERIFYproposition(eocfg_nvsep_mngmnt, ( (OFFSETafter__ropsigcfgcommand) == si
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
 
+extern const eo_cfg_nvsEP_mngmnt_t *eo_cfg_nvsEP_mngmnt_defaultvalue = &eo_cfg_nvsEP_mngmnt_default;
+
 //extern EOtreenode eo_cfg_nvsEP_mngmnt_tree_con[];
 
 extern EOtreenode eo_cfg_nvsEP_mngmnt_tree_con[] =

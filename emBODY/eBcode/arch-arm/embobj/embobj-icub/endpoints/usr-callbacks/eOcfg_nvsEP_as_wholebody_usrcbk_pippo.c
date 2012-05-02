@@ -43,6 +43,7 @@
 
 #include "EOnv_hid.h"
 
+#include "EOarray.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -102,20 +103,31 @@
 extern void eo_cfg_nvsEP_as_wholebody_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
 {
     eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
+    uint16_t s, m;
+    
+    eo_cfg_nvsEP_as_wholebody_t *lloc = (eo_cfg_nvsEP_as_wholebody_t*)loc;
+    eo_cfg_nvsEP_as_wholebody_t *rrem = (eo_cfg_nvsEP_as_wholebody_t*)rem; 
     
     if(eobool_true == theOwnershipIsLocal)
     {   // function is called from within the local board
-        memcpy(loc, &eo_cfg_nvsEP_as_wholebody_default, sizeof(eo_cfg_nvsEP_as_wholebody_t));
+  
+        for(s=0; s<strain_TOTALnumber; s++)
+        {
+            memcpy(&lloc->strains[s], eo_cfg_nvsEP_as_strain_defaultvalue, sizeof(eOsnsr_strain_t)); 
+        }
+        for(m=0; m<mais_TOTALnumber; m++)
+        {
+            memcpy(&lloc->maises[m], eo_cfg_nvsEP_as_mais_defaultvalue, sizeof(eOsnsr_mais_t)); 
+        } 
+                       
     }
     else
     {   // function is called from within the remote host to initialise the data of the endopoint.
         // there is one of such a call for each class of the pc104 which has the as_wholebody as a remotely owned endpoint
         // it is NOT possible to undestand who is the caller 
-        memcpy(loc, &eo_cfg_nvsEP_as_wholebody_default, sizeof(eo_cfg_nvsEP_as_wholebody_t));
-        if(NULL != rem)
-        {   
-            memcpy(rem, &eo_cfg_nvsEP_as_wholebody_default, sizeof(eo_cfg_nvsEP_as_wholebody_t));
-        }        
+        // we can initialise both local and remote memory
+        rrem = rrem;
+        lloc = lloc;     
     }
     
     // nothing else ...
@@ -182,12 +194,17 @@ extern void eo_cfg_nvsEP_as_wholebody_usr_hid_UPDT_Sxx_sstatus__calibratedvalues
         eOipv4addr_t ipaddress_of_remote_board = nv->ip;
         ipaddress_of_remote_board = ipaddress_of_remote_board;
         
+        uint8_t size = 0;
+        uint8_t itemsize = 0;
+        
+        uint16_t *valueref = NULL;
+        
         // the received values are in ...
         calibratedvalues = (eOsnsr_arrayofupto12bytes_t*) nv->rem;
-        uint8_t size = eo_array_Size((EOarray*)calibratedvalues);
-        uint8_t itemsize = eo_array_ItemSize((EOarray*)calibratedvalues)); // must be 2 bytes.
+        size = eo_array_Size((EOarray*)calibratedvalues);
+        itemsize = eo_array_ItemSize((EOarray*)calibratedvalues); // must be 2 bytes.
         
-        uint16_t *valueref = (uint16_t*) eo_array_At((EOarray*)calibratedvalues, 0); // the first of six values
+        valueref = (uint16_t*) eo_array_At((EOarray*)calibratedvalues, 0); // the first of six values
     }    
 }
 

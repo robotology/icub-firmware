@@ -178,6 +178,10 @@ static uint16_t s_hash(uint16_t id);
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
 
+
+extern const eOsnsr_strain_t* eo_cfg_nvsEP_as_strain_defaultvalue = &eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue;
+extern const eOsnsr_mais_t* eo_cfg_nvsEP_as_mais_defaultvalue = &eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue;
+
 // EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber is  4 and keeps the number of nvs per strain
 #define Snvs    (EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber)
 
