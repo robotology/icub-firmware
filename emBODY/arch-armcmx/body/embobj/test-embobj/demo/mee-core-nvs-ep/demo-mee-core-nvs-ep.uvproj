@@ -348,7 +348,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO</Define>
               <Undefine></Undefine>
-              <IncludePath>..\abslayer-cfg;..\app;..\..\..\embobj\embobj-api;..\..\..\embobj\embobj-src;..\..\..\embobj\embobj-cfg;..\..\..\..\..\sys\abs\api;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc;..\..\..\..\..\sys\env\api;..\..\..\..\..\..\porting;..\..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\embobj\embobj-icub;..\..\..\embobj\embobj-icub\endpoints\mc;..\..\..\embobj\embobj-icub\endpoints\sensors;..\..\..\embobj\embobj-icub\endpoints\mngmnt;..\..\..\embobj\embobj-icub\endpoints</IncludePath>
+              <IncludePath>..\abslayer-cfg;..\app;..\..\..\embobj\embobj-api;..\..\..\embobj\embobj-src;..\..\..\embobj\embobj-cfg;..\..\..\..\..\sys\abs\api;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc;..\..\..\..\..\sys\env\api;..\..\..\..\..\..\porting;..\..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\embobj\embobj-icub;..\..\..\embobj\embobj-icub\endpoints\mc;..\..\..\embobj\embobj-icub\endpoints\sensors;..\..\..\embobj\embobj-icub\endpoints\mngmnt;..\..\..\embobj\embobj-icub\endpoints;..\..\..\embobj\embobj-icub\endpoints\skin</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -787,11 +787,6 @@
           <GroupName>ep-mngmnt</GroupName>
           <Files>
             <File>
-              <FileName>eOcfg_nvsEP_mngmnt_usr_ebx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mngmnt\eOcfg_nvsEP_mngmnt_usr_ebx.c</FilePath>
-            </File>
-            <File>
               <FileName>eOcfg_nvsEP_mngmnt_usr.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\embobj\embobj-icub\endpoints\mngmnt\eOcfg_nvsEP_mngmnt_usr.c</FilePath>
@@ -831,6 +826,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_any_con_bodypart.c</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ep-mc</GroupName>
+          <Files>
             <File>
               <FileName>eOcfg_nvsEP_mc.c</FileName>
               <FileType>1</FileType>
@@ -864,16 +864,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>ep-mc-leg-userdef-functions</GroupName>
-          <Files>
-            <File>
-              <FileName>eOcfg_nvsEP_mc_leg_usr_pippo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_leg_usr_pippo.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>ep-mc-upperleg</GroupName>
           <Files>
             <File>
@@ -885,11 +875,6 @@
               <FileName>eOcfg_nvsEP_mc_upperleg_usr.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_upperleg_usr.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_nvsEP_mc_upperleg_usr_pippo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_upperleg_usr_pippo.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -905,21 +890,6 @@
               <FileName>eOcfg_nvsEP_mc_lowerleg_usr.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_lowerleg_usr.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_nvsEP_mc_lowerleg_usr_pippo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_lowerleg_usr_pippo.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>ep-mc-usr</GroupName>
-          <Files>
-            <File>
-              <FileName>eOcfg_nvsEP_mc_pippo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_pippo.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -965,6 +935,101 @@
               <FileName>eOcfg_nvsEP_mc_lowerarm_usr.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\embobj\embobj-icub\endpoints\mc\eOcfg_nvsEP_mc_lowerarm_usr.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eps-of-ems-boards</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_EPs_eb1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\eOcfg_EPs_eb1.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_EPs_eb2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\eOcfg_EPs_eb2.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_EPs_eb3.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\eOcfg_EPs_eb3.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_EPs_eb4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\eOcfg_EPs_eb4.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_EPs_eb5.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\eOcfg_EPs_eb5.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_EPs_eb6.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\eOcfg_EPs_eb6.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_EPs_eb7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\eOcfg_EPs_eb7.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_EPs_eb8.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\eOcfg_EPs_eb8.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_EPs_eb9.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\eOcfg_EPs_eb9.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ep-sk-emsboard</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_nvsEP_sk_emsboard_con.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\skin\eOcfg_nvsEP_sk_emsboard_con.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_sk_emsboard_usr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\skin\eOcfg_nvsEP_sk_emsboard_usr.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-callbacks</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_nvsEP_mngmnt_usrcbk_ebx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\usr-callbacks\eOcfg_nvsEP_mngmnt_usrcbk_ebx.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_upperleg_usrcbk_pippo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\usr-callbacks\eOcfg_nvsEP_mc_upperleg_usrcbk_pippo.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_lowerleg_usrcbk_pippo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\usr-callbacks\eOcfg_nvsEP_mc_lowerleg_usrcbk_pippo.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_usrcbk_pippo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\usr-callbacks\eOcfg_nvsEP_mc_usrcbk_pippo.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_as_wholebody_usrcbk_pippo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\endpoints\usr-callbacks\eOcfg_nvsEP_as_wholebody_usrcbk_pippo.c</FilePath>
             </File>
           </Files>
         </Group>
