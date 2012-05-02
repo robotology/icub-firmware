@@ -105,16 +105,16 @@ extern void eo_cfg_nvsEP_mngmnt_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void 
     
     if(eobool_true == theOwnershipIsLocal)
     {   // function is called from within the local board
-        memcpy(loc, &eo_cfg_nvsEP_mngmnt_default, sizeof(eo_cfg_nvsEP_mngmnt_t));
+        memcpy(loc, eo_cfg_nvsEP_mngmnt_defaultvalue, sizeof(eo_cfg_nvsEP_mngmnt_t));
     }
     else
     {   // function is called from within the remote host to initialise the data of the endopoint.
         // there is one of such a call for each class of the pc104 which has the mngmnt as a remotely owned endpoint
         // it is NOT possible to undestand who is the caller 
-        memcpy(loc, &eo_cfg_nvsEP_mngmnt_default, sizeof(eo_cfg_nvsEP_mngmnt_t));
+        memcpy(loc, eo_cfg_nvsEP_mngmnt_defaultvalue, sizeof(eo_cfg_nvsEP_mngmnt_t));
         if(NULL != rem)
         {   
-            memcpy(rem, &eo_cfg_nvsEP_mngmnt_default, sizeof(eo_cfg_nvsEP_mngmnt_t));
+            memcpy(rem,&eo_cfg_nvsEP_mngmnt_defaultvalue, sizeof(eo_cfg_nvsEP_mngmnt_t));
         }        
     }
     

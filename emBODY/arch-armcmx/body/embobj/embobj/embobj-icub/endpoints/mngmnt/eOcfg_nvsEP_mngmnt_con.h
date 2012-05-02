@@ -117,7 +117,7 @@ typedef struct              // size is 112+8+0 = 120 bytes
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eo_cfg_nvsEP_mngmnt_t eo_cfg_nvsEP_mngmnt_default;
+extern const eo_cfg_nvsEP_mngmnt_t *eo_cfg_nvsEP_mngmnt_defaultvalue;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------

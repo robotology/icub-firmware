@@ -135,7 +135,10 @@ typedef struct                      // size is 56*4+48*2 = 320
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-// empty-section
+
+
+extern const eOsnsr_strain_t* eo_cfg_nvsEP_as_strain_defaultvalue;
+extern const eOsnsr_mais_t* eo_cfg_nvsEP_as_mais_defaultvalue;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
