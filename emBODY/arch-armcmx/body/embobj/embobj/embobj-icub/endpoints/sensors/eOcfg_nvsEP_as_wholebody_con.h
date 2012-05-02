@@ -53,7 +53,7 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-#define EOK_cfg_nvsEP_as_wholebody_EP               (0x0030) 
+//#define EOK_cfg_nvsEP_as_wholebody_EP               (0x0030) 
 
 
 
@@ -62,7 +62,7 @@
 
 typedef enum
 {
-    endpoint_as_wholebody_EP    = EOK_cfg_nvsEP_as_wholebody_EP 
+    endpoint_as_wholebody       = 0x0020 
 } eo_cfg_nvsEP_as_wholebody_endpoint_t;
 
 

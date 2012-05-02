@@ -115,7 +115,7 @@ extern const EOconstvector  s_eo_cfg_nvsEP_mc_lowerleg_usr_constvector_of_EOnv_u
 static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_ebx_data[] =
 {  
     {   // mngmnt
-        EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mngmnt_EP,
+        EO_INIT(.endpoint)                          endpoint_mngmnt,
         EO_INIT(.sizeof_endpoint_data)              EOK_cfg_nvsEP_mngmnt_RAMSIZE,
         EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mngmnt_hashfunction_id2index,
         EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con, 
@@ -124,7 +124,7 @@ static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_ebx_data[] =
     }, 
 #if !defined(USE_SUBPART)    
     {   // mc-leftleg
-        EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mc_leftleg_EP,
+        EO_INIT(.endpoint)                          endpoint_leftleg_EP,
         EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_mc_leg_t),
         EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mc_leg_hashfunction_id2index,
         EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mc_leg_constvector_of_treenodes_EOnv_con, 
@@ -132,7 +132,7 @@ static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_ebx_data[] =
         EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mc_leg_usr_initialise
     },
     {   // mc-rightleg
-        EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mc_rightleg_EP,
+        EO_INIT(.endpoint)                          endpoint_rightleg_EP,
         EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_mc_leg_t),
         EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mc_leg_hashfunction_id2index,
         EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mc_leg_constvector_of_treenodes_EOnv_con, 
@@ -141,7 +141,7 @@ static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_ebx_data[] =
     }
 #else
     {   // mc-leftleg-upper
-        EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mc_leftupperleg_EP,
+        EO_INIT(.endpoint)                          endpoint_mc_leftupperleg,
         EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_mc_upperleg_t),
         EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mc_upperleg_hashfunction_id2index,
         EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mc_upperleg_constvector_of_treenodes_EOnv_con, 
@@ -149,7 +149,7 @@ static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_ebx_data[] =
         EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mc_upperleg_usr_initialise
     },
     {   // mc-leftleg-lower
-        EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mc_leftlowerleg_EP,
+        EO_INIT(.endpoint)                          endpoint_mc_leftlowerleg,
         EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_mc_lowerleg_t),
         EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mc_lowerleg_hashfunction_id2index,
         EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mc_lowerleg_constvector_of_treenodes_EOnv_con, 
@@ -157,7 +157,7 @@ static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_ebx_data[] =
         EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mc_lowerleg_usr_initialise
     },    
     {   // mc-rightleg-upper
-        EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mc_rightupperleg_EP,
+        EO_INIT(.endpoint)                          endpoint_mc_rightupperleg,
         EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_mc_upperleg_t),
         EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mc_upperleg_hashfunction_id2index,
         EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mc_upperleg_constvector_of_treenodes_EOnv_con, 
@@ -165,7 +165,7 @@ static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_ebx_data[] =
         EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mc_upperleg_usr_initialise
     },
     {   // mc-rightleg-lower
-        EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mc_rightlowerleg_EP,
+        EO_INIT(.endpoint)                          endpoint_mc_rightlowerleg,
         EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_mc_lowerleg_t),
         EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mc_lowerleg_hashfunction_id2index,
         EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mc_lowerleg_constvector_of_treenodes_EOnv_con, 
@@ -215,34 +215,34 @@ extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_ebx_fptr_hashfunction_ep2index = 
 static uint16_t s_hash(uint16_t ep)
 {
     uint16_t r = ep & 0xff;
-    if(EOK_cfg_nvsEP_mngmnt_EP == r)
+    if(endpoint_mngmnt == r)
     {
         return(0);
     }
 #if !defined(USE_SUBPART)      
-    else if(EOK_cfg_nvsEP_mc_leftleg_EP == r)
+    else if(endpoint_leftleg_EP == r)
     {
         return(1);
     }
-    else if(EOK_cfg_nvsEP_mc_rightleg_EP == r)
+    else if(endpoint_rightleg_EP == r)
     {
         return(2);
     }
 #else
 
-    else if(EOK_cfg_nvsEP_mc_leftupperleg_EP == r)
+    else if(endpoint_mc_leftupperleg == r)
     {
         return(1);
     }
-    else if(EOK_cfg_nvsEP_mc_leftlowerleg_EP == r)
+    else if(endpoint_mc_leftlowerleg == r)
     {
         return(2);
     }    
-    else if(EOK_cfg_nvsEP_mc_rightupperleg_EP == r)
+    else if(endpoint_mc_rightupperleg == r)
     {
         return(3);
     }
-    else if(EOK_cfg_nvsEP_mc_rightlowerleg_EP == r)
+    else if(endpoint_mc_rightlowerleg == r)
     {
         return(4);
     }  
@@ -267,8 +267,8 @@ static uint16_t s_eo_cfg_nvsEP_ebx_hashfunction_ep2index(uint16_t ep)
 
     static const uint16_t s_eptable[EPTABLESIZE] = 
     { 
-        EOK_cfg_nvsEP_mngmnt_EP,                                EOK_cfg_nvsEP_mc_leftleg_EP,                            
-        EOK_cfg_nvsEP_mc_rightleg_EP,                           EOK_uint16dummy    
+        endpoint_mngmnt,                                endpoint_leftleg_EP,                            
+        endpoint_rightleg_EP,                           EOK_uint16dummy    
     };
        
 #else
@@ -277,9 +277,9 @@ static uint16_t s_eo_cfg_nvsEP_ebx_hashfunction_ep2index(uint16_t ep)
 
     static const uint16_t s_eptable[EPTABLESIZE] = 
     { 
-        EOK_cfg_nvsEP_mngmnt_EP,                                
-        EOK_cfg_nvsEP_mc_leftupperleg_EP,                       EOK_cfg_nvsEP_mc_leftlowerleg_EP,
-        EOK_cfg_nvsEP_mc_rightupperleg_EP,                      EOK_cfg_nvsEP_mc_rightlowerleg_EP,        
+        endpoint_mngmnt,                                
+        endpoint_mc_leftupperleg,                       endpoint_mc_leftlowerleg,
+        endpoint_mc_rightupperleg,                      endpoint_mc_rightlowerleg,        
         EOK_uint16dummy    
     };
    
