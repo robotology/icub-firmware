@@ -38,7 +38,8 @@
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 
-
+// use enum instead
+//#define EOK_cfg_nvsEP_mngmnt_EP                                         (0x0001) 
 
 // - the indices of the nv in the endpoint
 #define EOK_cfg_nvsEP_mngmnt_con_nvindex__ropsigcfgassign                       (mngmntNVindex__ropsigcfgassign)

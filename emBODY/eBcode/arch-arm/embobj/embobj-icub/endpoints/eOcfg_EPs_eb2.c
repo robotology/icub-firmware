@@ -102,7 +102,7 @@ extern const EOconstvector  s_eo_cfg_nvsEP_mc_lowerarm_usr_constvector_of_EOnv_u
 static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_eb2_data[] =
 {  
     {   // mngmnt
-        EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mngmnt_EP,
+        EO_INIT(.endpoint)                          endpoint_mngmnt,
         EO_INIT(.sizeof_endpoint_data)              EOK_cfg_nvsEP_mngmnt_RAMSIZE,
         EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mngmnt_hashfunction_id2index,
         EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con, 
@@ -111,7 +111,7 @@ static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_eb2_data[] =
     }, 
 
     {   // mc-leftarm-lower
-        EO_INIT(.endpoint)                          EOK_cfg_nvsEP_mc_leftlowerarm_EP,
+        EO_INIT(.endpoint)                          endpoint_mc_leftlowerarm,
         EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_mc_lowerarm_t),
         EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mc_lowerarm_hashfunction_id2index,
         EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mc_lowerarm_constvector_of_treenodes_EOnv_con, 
@@ -160,11 +160,11 @@ static uint16_t s_hash(uint16_t ep)
 {
     uint16_t r = ep & 0xff;
     
-    if(EOK_cfg_nvsEP_mngmnt_EP == r)
+    if(endpoint_mngmnt == r)
     {
         return(0);
     }
-    else if(EOK_cfg_nvsEP_mc_leftlowerarm_EP == r)
+    else if(endpoint_mc_leftlowerarm == r)
     {
         return(1);
     }
@@ -187,7 +187,7 @@ static uint16_t s_eo_cfg_nvsEP_eb2_hashfunction_ep2index(uint16_t ep)
 
     static const uint16_t s_eptable[EPTABLESIZE] = 
     { 
-        EOK_cfg_nvsEP_mngmnt_EP,        EOK_cfg_nvsEP_mc_leftlowerarm_EP
+        endpoint_mngmnt,        endpoint_mc_leftlowerarm
     };
    
     uint16_t index = s_hash(ep);

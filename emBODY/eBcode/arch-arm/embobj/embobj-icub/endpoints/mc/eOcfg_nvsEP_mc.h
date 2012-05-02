@@ -45,51 +45,38 @@
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
-
-// the 16bit value to use to identify the endpoints
-#define EOK_cfg_nvsEP_mc_leftleg_EP                             (0x0010)     
-#define EOK_cfg_nvsEP_mc_rightleg_EP                            (0x0011) 
-
-
-#define EOK_cfg_nvsEP_mc_leftupperleg_EP                        (0x0020)     
-#define EOK_cfg_nvsEP_mc_leftlowerleg_EP                        (0x0021) 
-#define EOK_cfg_nvsEP_mc_rightupperleg_EP                       (0x0022) 
-#define EOK_cfg_nvsEP_mc_rightlowerleg_EP                       (0x0023) 
-
-#define EOK_cfg_nvsEP_mc_leftupperarm_EP                        (0x0024)     
-#define EOK_cfg_nvsEP_mc_leftlowerarm_EP                        (0x0025) 
-#define EOK_cfg_nvsEP_mc_rightupperarm_EP                       (0x0026) 
-#define EOK_cfg_nvsEP_mc_rightlowerarm_EP                       (0x0027) 
-
-#define EOK_cfg_nvsEP_mc_torso_EP                               (0x0028)  
-
+// empty-section
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
+/** @typedef    typedef enum eo_cfg_nvsEP_mc_endpoint_t;
+    @brief      It contains all the endpoints used for motion control. The grouping is done by sub-bodypart
+                in such a way that each ep is contained by a exactly one EMS board in iCub ver 2.5
+ **/
 typedef enum
 {
-    endpoint_leftleg_EP                         = EOK_cfg_nvsEP_mc_leftleg_EP,
-    endpoint_rightleg_EP                        = EOK_cfg_nvsEP_mc_rightleg_EP,
+    endpoint_mc_leftupperarm                        = 0x0011,   /**< used by EB1 board */
+    endpoint_mc_leftlowerarm                        = 0x0012,   /**< used by EB2 board */
     
-    endpoint_leftupperleg_EP                    = EOK_cfg_nvsEP_mc_leftupperleg_EP,
-    endpoint_leftlowerleg_EP                    = EOK_cfg_nvsEP_mc_leftlowerleg_EP,
-    endpoint_rightupperleg_EP                   = EOK_cfg_nvsEP_mc_rightupperleg_EP,
-    endpoint_rightlowerleg_EP                   = EOK_cfg_nvsEP_mc_rightlowerleg_EP,
-    
-    endpoint_leftupperarm_EP                    = EOK_cfg_nvsEP_mc_leftupperarm_EP,
-    endpoint_leftlowerarm_EP                    = EOK_cfg_nvsEP_mc_leftlowerarm_EP,
-    endpoint_rightupperarm_EP                   = EOK_cfg_nvsEP_mc_rightupperarm_EP,
-    endpoint_rightlowerarm_EP                   = EOK_cfg_nvsEP_mc_rightlowerarm_EP,
+    endpoint_mc_rightupperarm                       = 0x0013,   /**< used by EB3 board */
+    endpoint_mc_rightlowerarm                       = 0x0014,   /**< used by EB4 board */
 
-    endpoint_torso_EP                           = EOK_cfg_nvsEP_mc_torso_EP      
+    endpoint_mc_torso                               = 0x0015,   /**< used by EB5 board */
+
+    endpoint_mc_leftupperleg                        = 0x0016,   /**< used by EB6 board */
+    endpoint_mc_leftlowerleg                        = 0x0017,   /**< used by EB7 board */
+    
+    endpoint_mc_rightupperleg                       = 0x0018,   /**< used by EB8 board */
+    endpoint_mc_rightlowerleg                       = 0x0019    /**< used by EB9 board */  
 
 } eo_cfg_nvsEP_mc_endpoint_t;
 
 
 /** @typedef    typedef uint16_t eo_cfg_nvsEP_mc_jointNumber_t;
     @brief      It contains an index for a joint in a manner that is independent from the endpoint.
+                This number is used to retrieve the network variable of that joint.
  **/
 typedef uint16_t eo_cfg_nvsEP_mc_jointNumber_t;
 

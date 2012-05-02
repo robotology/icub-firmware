@@ -65,6 +65,26 @@
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+// in here we put a check vs coherency of eo_cfg_nvsEP_mc_endpoint_t and macros used around 
+
+
+// EO_VERIFYproposition(xxx, jointNVindex_jconfig                              == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig);
+// EO_VERIFYproposition(xxx, jointNVindex_jconfig__pidposition                 == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidposition);
+// EO_VERIFYproposition(xxx, jointNVindex_jconfig__pidvelocity                 == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidvelocity);
+// EO_VERIFYproposition(xxx, jointNVindex_jconfig__pidtorque                   == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__pidtorque);
+// EO_VERIFYproposition(xxx, jointNVindex_jconfig__impedance                   == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__impedance);
+// EO_VERIFYproposition(xxx, jointNVindex_jconfig__minpositionofjoint          == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__minpositionofjoint);
+// EO_VERIFYproposition(xxx, jointNVindex_jconfig__maxpositionofjoint          == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__maxpositionofjoint);
+// EO_VERIFYproposition(xxx, jointNVindex_jconfig__velocitysetpointtimeout     == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__velocitysetpointtimeout);
+// EO_VERIFYproposition(xxx, jointNVindex_jconfig__controlmode                 == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__controlmode);
+// EO_VERIFYproposition(xxx, jointNVindex_jconfig__motionmonitormode           == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__motionmonitormode);
+// EO_VERIFYproposition(xxx, jointNVindex_jconfig__des02FORjstatuschamaleon04  == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__des02FORjstatuschamaleon04);
+// EO_VERIFYproposition(xxx, jointNVindex_jconfig__holder01FFU01               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__holder01FFU01);
+// EO_VERIFYproposition(xxx, jointNVindex_jconfig__holder01FFU02               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__holder01FFU02);
+// EO_VERIFYproposition(xxx, jointNVindex_jconfig__holder02FFU03               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__holder02FFU03);
+// EO_VERIFYproposition(xxx, jointNVindex_jconfig__holder02FFU04               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__holder02FFU04);
+
+
 // in here we put a check vs coherency of eo_cfg_nvsEP_mc_jointNVindex_t and eo_cfg_nvsEP_mc_motorNVindex_t and macros 
 // used in joint-motor 
 

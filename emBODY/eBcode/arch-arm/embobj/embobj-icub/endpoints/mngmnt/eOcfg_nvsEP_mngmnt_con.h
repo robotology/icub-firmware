@@ -49,15 +49,13 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-// the 16bit value to use to identify the endpoints
-#define EOK_cfg_nvsEP_mngmnt_EP                                         (0x0001)    
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 typedef enum
 {
-    endpoint_mngmnt_EP                          = EOK_cfg_nvsEP_mngmnt_EP 
+    endpoint_mngmnt                             = 0x0001 
 } eo_cfg_nvsEP_mngmnt_endpoint_t;
 
 
