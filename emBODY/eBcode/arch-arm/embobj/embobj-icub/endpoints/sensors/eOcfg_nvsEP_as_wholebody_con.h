@@ -62,7 +62,7 @@
 
 typedef enum
 {
-    endpoint_mngmnt_EP                          = EOK_cfg_nvsEP_as_wholebody_EP 
+    endpoint_as_wholebody_EP    = EOK_cfg_nvsEP_as_wholebody_EP 
 } eo_cfg_nvsEP_as_wholebody_endpoint_t;
 
 
