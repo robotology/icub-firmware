@@ -1,3 +1,9 @@
+/*
+Copyright: Microchop Technology Inc. 2005
+License: Microchip
+Author:  Hrushikesh Vasuki
+*/
+
 /**********************************************************************
 * © 2005 Microchip Technology Inc.
 *
