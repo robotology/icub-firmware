@@ -75,7 +75,7 @@ typedef enum
     strainRigthArm_01, strainLeftLeg_02, strainRigthLeg_03
 } eo_cfg_nvsEP_as_wholebody_con_strainNumber_t;
 
-enum { strain_TOTALnumber = 4}; 
+enum { strainWholeBody_TOTALnumber = 4}; 
 
 /** @typedef    typedef struct eo_cfg_nvsEP_as_wholebody_con_strainNVindex_t
     @brief      It contains an index for all the network variables in a strain.
@@ -102,7 +102,7 @@ typedef enum
     maisRigthHand_01
 } eo_cfg_nvsEP_as_wholebody_con_maisNumber_t;
 
-enum { mais_TOTALnumber = 2}; 
+enum { maisWholeBody_TOTALnumber = 2}; 
 
 /** @typedef    typedef struct eo_cfg_nvsEP_as_wholebody_con_maisNVindex_t
     @brief      It contains an index for all the network variables in a mais.
@@ -121,7 +121,7 @@ enum { maisNVindex_TOTALnumber = 4 };
 /** @typedef    enum varsASwholebody_TOTALnumber;
     @brief      It contains the total number of network variables managed by the endpoint leftleg
  **/
-enum {varsASwholebody_TOTALnumber = strain_TOTALnumber*strainNVindex_TOTALnumber + mais_TOTALnumber*maisNVindex_TOTALnumber };
+enum {varsASwholebody_TOTALnumber = strainWholeBody_TOTALnumber*strainNVindex_TOTALnumber + maisWholeBody_TOTALnumber*maisNVindex_TOTALnumber };
 
 
 /** @typedef    typedef struct eo_cfg_nvsEP_as_wholebody_t;
@@ -129,16 +129,16 @@ enum {varsASwholebody_TOTALnumber = strain_TOTALnumber*strainNVindex_TOTALnumber
  **/
 typedef struct                      // size is 56*4+48*2 = 320                
 {
-    eOsnsr_strain_t                 strains[strain_TOTALnumber];
-    eOsnsr_mais_t                   maises[mais_TOTALnumber];
+    eOsnsr_strain_t                 strains[strainWholeBody_TOTALnumber];
+    eOsnsr_mais_t                   maises[maisWholeBody_TOTALnumber];
 } eo_cfg_nvsEP_as_wholebody_t;      EO_VERIFYsizeof(eo_cfg_nvsEP_as_wholebody_t, 320);
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
 
-extern const eOsnsr_strain_t* eo_cfg_nvsEP_as_strain_defaultvalue;
-extern const eOsnsr_mais_t* eo_cfg_nvsEP_as_mais_defaultvalue;
+extern const eOsnsr_strain_t* eo_cfg_nvsEP_as_wholebody_strain_defaultvalue;
+extern const eOsnsr_mais_t* eo_cfg_nvsEP_as_wholebody_mais_defaultvalue;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
