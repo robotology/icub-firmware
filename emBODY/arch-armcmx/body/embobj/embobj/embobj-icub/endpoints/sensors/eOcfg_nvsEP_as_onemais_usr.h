@@ -17,13 +17,13 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOCFG_NVSEP_AS_UPPERARM_USR_H_
-#define _EOCFG_NVSEP_AS_UPPERARM_USR_H_
+#ifndef _EOCFG_NVSEP_AS_ONEMAIS_USR_H_
+#define _EOCFG_NVSEP_AS_ONEMAIS_USR_H_
 
 
-#error --> obsolete. dont use.
 
-/** @file       eOcfg_nvsEP_as_upperarm_usr.h
+
+/** @file       eOcfg_nvsEP_as_onemais_usr.h
 	@brief      This header file gives the local configuration for the ...
 	@author     marco.accame@iit.it
 	@date       09/06/2011
@@ -41,7 +41,7 @@
 
 #include "EoCommon.h"
 #include "EOconstvector.h"
-#include "eOcfg_nvsEP_as_upperarm_con.h"
+#include "eOcfg_nvsEP_as_onemais_con.h"
 
 
 
@@ -56,23 +56,23 @@
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const EOconstvector* const eo_cfg_nvsEP_as_upperarm_usr_constvector_of_EOnv_usr;
+extern const EOconstvector* const eo_cfg_nvsEP_as_onemais_usr_constvector_of_EOnv_usr;
 
-//extern eo_cfg_nvsEP_as_upperarm_t* eo_cfg_nvsEP_as_upperarm_usr_mem_local;
-//extern eo_cfg_nvsEP_as_upperarm_t* eo_cfg_nvsEP_as_upperarm_usr_mem_remote;
+//extern eo_cfg_nvsEP_as_onemais_t* eo_cfg_nvsEP_as_onemais_usr_mem_local;
+//extern eo_cfg_nvsEP_as_onemais_t* eo_cfg_nvsEP_as_onemais_usr_mem_remote;
 
 // - pointer to memory used if variables are locally owned. the ems use this pointer. 
-extern eo_cfg_nvsEP_as_upperarm_t* eo_cfg_nvsEP_as_upperarm_usr_locallyownedmemory;
+extern eo_cfg_nvsEP_as_onemais_t* eo_cfg_nvsEP_as_onemais_usr_locallyownedmemory;
 
 // - pointers to memory used if variables are remotely owned. the pc104 used these two pointers
-extern eo_cfg_nvsEP_as_upperarm_t* eo_cfg_nvsEP_as_upperarm_usr_remotelyownedmemory_loc;
-extern eo_cfg_nvsEP_as_upperarm_t* eo_cfg_nvsEP_as_upperarm_usr_remotelyownedmemory_rem;
+extern eo_cfg_nvsEP_as_onemais_t* eo_cfg_nvsEP_as_onemais_usr_remotelyownedmemory_loc;
+extern eo_cfg_nvsEP_as_onemais_t* eo_cfg_nvsEP_as_onemais_usr_remotelyownedmemory_rem;
 
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern void eo_cfg_nvsEP_as_upperarm_usr_initialise(eOnvEP_t ep, void* loc, void* rem);
+extern void eo_cfg_nvsEP_as_onemais_usr_initialise(eOnvEP_t ep, void* loc, void* rem);
 
 
 /** @}            

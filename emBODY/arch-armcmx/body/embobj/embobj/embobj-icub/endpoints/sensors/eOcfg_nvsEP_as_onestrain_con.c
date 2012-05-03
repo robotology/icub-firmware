@@ -43,6 +43,10 @@
 #include "eOcfg_nvsEP_as_any_con_mxx.h"    
 #include "eOcfg_nvsEP_as_any_con_mxxdefault.h" 
 
+#include "eOcfg_nvsEP_as_any_con_body.h"
+
+#include "eOcfg_nvsEP_as_any_con_body_hid.h"    
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -81,7 +85,7 @@ static uint16_t s_hash(uint16_t id);
 
 // -- the 1 strain
 
-#define SMACRO_EXTERNALPREFIX_GETID                EOK_cfg_nvsEP_as_onestrain_con_NVID_sxx
+#define SMACRO_EXTERNALPREFIX_GETID                EOK_cfg_nvsEP_as_any_con_body_NVID_sxx
 
 
 // strain 00
@@ -94,12 +98,12 @@ static uint16_t s_hash(uint16_t id);
 #include "eOcfg_nvsEP_as_any_con_sxxmacro.c"
 
 
-#define OFFSET_OF_END_OF_STRAINS    (strainUpperArm_TOTALnumber*sizeof(eOsnsr_strain_t))
+#define OFFSET_OF_END_OF_STRAINS    (strainOneStrain_TOTALnumber*sizeof(eOsnsr_strain_t))
 
 
 // -- the 0 mais
 
-#define MMACRO_EXTERNALPREFIX_GETID                EOK_cfg_nvsEP_as_onestrain_con_NVID_mxx
+#define MMACRO_EXTERNALPREFIX_GETID                EOK_cfg_nvsEP_as_any_con_body_NVID_mxx
         
 
 //// mais 00
@@ -122,8 +126,8 @@ static uint16_t s_hash(uint16_t id);
 
 #define Snvs    (EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber)
 
-// strainUpperArm_TOTALnumber is 1 and is the number of strain in the onestrain
-#define SNUM    (strainUpperArm_TOTALnumber)
+// strainOneStrain_TOTALnumber is 1 and is the number of strain in the onestrain
+#define SNUM    (strainOneStrain_TOTALnumber)
 
 
 // it is the start of index for the strain
@@ -137,7 +141,7 @@ static uint16_t s_hash(uint16_t id);
 #define Mnvs    (EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber)
 
 // mais_TOTALnumber is 0 and is the number of mais in the onestrain
-#define MNUM     (maisUpperArm_TOTALnumber)
+#define MNUM     (maisOneStrain_TOTALnumber)
 
 
 // it is the start of index for the motors
@@ -258,9 +262,9 @@ extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_as_onestrain_fptr_hashfunction_id
 extern uint16_t eo_cfg_nvsEP_as_onestrain_hashfunction_id2index(uint16_t id)
 {
 
-    #define IDTABLESSIZE        (EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber*strainUpperArm_TOTALnumber)
+    #define IDTABLESSIZE        (EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber*strainOneStrain_TOTALnumber)
     
-    #define IDTABLEMSIZE        (EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber*maisUpperArm_TOTALnumber)    
+    #define IDTABLEMSIZE        (EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber*maisOneStrain_TOTALnumber)    
     
     #define IDTABLESIZE         (IDTABLESSIZE+IDTABLEMSIZE)
     
@@ -268,13 +272,13 @@ extern uint16_t eo_cfg_nvsEP_as_onestrain_hashfunction_id2index(uint16_t id)
     static const uint16_t s_idtable[] = 
     { 
         // s00
-        EOK_cfg_nvsEP_as_onestrain_con_NVID_sxx_sconfig__mode(0),                   EOK_cfg_nvsEP_as_onestrain_con_NVID_sxx_sconfig__datarate(0),
-        EOK_cfg_nvsEP_as_onestrain_con_NVID_sxx_sconfig__signaloncefullscale(0),    EOK_cfg_nvsEP_as_onestrain_con_NVID_sxx_sstatus__fullscale(0), 
-        EOK_cfg_nvsEP_as_onestrain_con_NVID_sxx_sstatus__calibratedvalues(0),       EOK_cfg_nvsEP_as_onestrain_con_NVID_sxx_sstatus__uncalibratedvalues(0)  
+        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__mode(0),                   EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__datarate(0),
+        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__signaloncefullscale(0),    EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__fullscale(0), 
+        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__calibratedvalues(0),       EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__uncalibratedvalues(0)  
         
         // m00
-//        EOK_cfg_nvsEP_as_onestrain_con_NVID_mxx_mconfig__mode(0),                   EOK_cfg_nvsEP_as_onestrain_con_NVID_mxx_mconfig__datarate(0),
-//        EOK_cfg_nvsEP_as_onestrain_con_NVID_mxx_mconfig__resolution(0),             EOK_cfg_nvsEP_as_onestrain_con_NVID_mxx_mstatus__the15values(0), 
+//        EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__mode(0),                   EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__datarate(0),
+//        EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__resolution(0),             EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mstatus__the15values(0), 
     
     };  EO_VERIFYsizeof(s_idtable, sizeof(uint16_t)*(IDTABLESIZE));
     
@@ -306,8 +310,8 @@ extern uint16_t eo_cfg_nvsEP_as_onestrain_hashfunction_id2index(uint16_t id)
 
 
 
-typedef uint8_t sdfg[ ( EOK_cfg_nvsEP_as_onestrain_con_maxnumof_nvs_in_strain == 16 ) ? (1) : (0)];
-typedef uint8_t redf[ ( EOK_cfg_nvsEP_as_onestrain_con_maxnumof_nsv_in_mais == 16 ) ? (1) : (0)];
+typedef uint8_t sdfg[ ( EOK_cfg_nvsEP_as_any_con_sxx_maxnumof_nvs_in_strain == 16 ) ? (1) : (0)];
+typedef uint8_t redf[ ( EOK_cfg_nvsEP_as_any_con_mxx_maxnumof_nvs_in_mais == 16 ) ? (1) : (0)];
 
 static uint16_t s_hash(uint16_t id)
 {
@@ -316,7 +320,7 @@ static uint16_t s_hash(uint16_t id)
     uint16_t b;
     uint16_t r;
     
-    if(off < EOK_cfg_nvsEP_as_onestrain_con_firstNVIDoff_of_mais(0))
+    if(off < EOK_cfg_nvsEP_as_any_con_body_firstNVIDoff_of_mais(0))
     {
         a = off >> 4;
         b = off - (a << 4);
@@ -324,11 +328,11 @@ static uint16_t s_hash(uint16_t id)
     }
     else
     {
-        off -= EOK_cfg_nvsEP_as_onestrain_con_firstNVIDoff_of_mais(0);
+        off -= EOK_cfg_nvsEP_as_any_con_body_firstNVIDoff_of_mais(0);
         a = off >> 4;
         b = off - (a << 4);
         r = a*EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber+b;
-        r += (EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber*strainUpperArm_TOTALnumber);
+        r += (EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber*strainOneStrain_TOTALnumber);
     }
     
     return(r);
@@ -338,20 +342,13 @@ static uint16_t s_hash(uint16_t id)
 
 extern eOnvID_t eo_cfg_nvsEP_as_onestrain_strain_NVID_Get(eo_cfg_nvsEP_as_onestrain_con_strainNumber_t s, eo_cfg_nvsEP_as_onestrain_con_strainNVindex_t snvindex)
 {
-    if((s >= strainUpperArm_TOTALnumber) || (snvindex >= EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber))
-    {
-        return(EOK_uint16dummy);
-    }
-    return(EO_nv_ID(eo_cfg_nvsEP_as_any_con_sxx_funtyp[snvindex], EOK_cfg_nvsEP_as_onestrain_con_NVIDoff_of_strain(s, snvindex)));    
+    return(eo_cfg_nvsEP_as_any_con_body_strain_NVID_Get((eo_cfg_nvsEP_as_any_con_body_strainNumber_t)s, snvindex));
 }
 
 extern eOnvID_t eo_cfg_nvsEP_as_onestrain_mais_NVID_Get(eo_cfg_nvsEP_as_onestrain_con_maisNumber_t m, eo_cfg_nvsEP_as_onestrain_con_maisNVindex_t mnvindex)
 {
-//    if((m >= maisUpperArm_TOTALnumber) || (mnvindex >= EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber))
-//    {
-        return(EOK_uint16dummy);
-//    }
-//    return(EO_nv_ID(eo_cfg_nvsEP_as_any_con_mxx_funtyp[mnvindex], EOK_cfg_nvsEP_as_onestrain_con_NVIDoff_of_mais(m, mnvindex)));    
+//    return(eo_cfg_nvsEP_as_any_con_body_mais_NVID_Get((eo_cfg_nvsEP_as_any_con_body_maisNumber_t)m, mnvindex));
+    return(EOK_uint16dummy);
 }
 
 // --------------------------------------------------------------------------------------------------------------------

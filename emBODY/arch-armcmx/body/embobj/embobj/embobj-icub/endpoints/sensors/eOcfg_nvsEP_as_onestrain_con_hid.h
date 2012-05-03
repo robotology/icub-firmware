@@ -49,9 +49,10 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
+#if 0
 // -- max mumber of strain and mais in the upper arm
-#define EOK_cfg_nvsEP_as_onestrain_con_maxnumof_strains                             strainUpperArm_TOTALnumber
-#define EOK_cfg_nvsEP_as_onestrain_con_maxnumof_maises                              maisUpperArm_TOTALnumber
+#define EOK_cfg_nvsEP_as_onestrain_con_maxnumof_strains                             strainOneStrain_TOTALnumber
+#define EOK_cfg_nvsEP_as_onestrain_con_maxnumof_maises                              maisOneStrain_TOTALnumber
 
 // -- max number of network variables in a strain
 #define   EOK_cfg_nvsEP_as_onestrain_con_maxnumof_nvs_in_strain                     16
@@ -101,7 +102,7 @@
 
 EO_VERIFYproposition(EOK_cfg_nvsEP_as_onestrain, (1024 > EOK_cfg_nvsEP_as_onestrain_con_firstNVIDoff_of_mais(EOK_cfg_nvsEP_as_onestrain_con_maxnumof_nsv_in_mais)));
 
-
+#endif
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
