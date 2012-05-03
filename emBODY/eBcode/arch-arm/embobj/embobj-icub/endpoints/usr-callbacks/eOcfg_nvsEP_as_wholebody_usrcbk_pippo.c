@@ -111,13 +111,13 @@ extern void eo_cfg_nvsEP_as_wholebody_usr_hid_INITIALISE(eOnvEP_t ep, void *loc,
     if(eobool_true == theOwnershipIsLocal)
     {   // function is called from within the local board
   
-        for(s=0; s<strain_TOTALnumber; s++)
+        for(s=0; s<strainWholeBody_TOTALnumber; s++)
         {
-            memcpy(&lloc->strains[s], eo_cfg_nvsEP_as_strain_defaultvalue, sizeof(eOsnsr_strain_t)); 
+            memcpy(&lloc->strains[s], eo_cfg_nvsEP_as_wholebody_strain_defaultvalue, sizeof(eOsnsr_strain_t)); 
         }
-        for(m=0; m<mais_TOTALnumber; m++)
+        for(m=0; m<maisWholeBody_TOTALnumber; m++)
         {
-            memcpy(&lloc->maises[m], eo_cfg_nvsEP_as_mais_defaultvalue, sizeof(eOsnsr_mais_t)); 
+            memcpy(&lloc->maises[m], eo_cfg_nvsEP_as_wholebody_mais_defaultvalue, sizeof(eOsnsr_mais_t)); 
         } 
                        
     }
