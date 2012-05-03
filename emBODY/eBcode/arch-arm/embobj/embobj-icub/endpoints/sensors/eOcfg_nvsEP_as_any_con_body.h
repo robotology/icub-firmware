@@ -58,7 +58,7 @@
  **/
 typedef enum
 {
-    strainBody_00 = 0, strainBody_01, strainBody_02, strainBody_03, strainBody_04
+    strainBody_00 = 0, strainBody_01, strainBody_02, strainBody_03
 } eo_cfg_nvsEP_as_any_con_body_strainNumber_t;
 
 enum { strainBody_TOTALnumber = 4};
@@ -87,10 +87,10 @@ enum { maisBody_TOTALnumber = 2};
 /** @fn         extern eOnvID_t eo_cfg_nvsEP_as_any_con_body_strain_NVID_Get(eo_cfg_nvsEP_as_any_con_body_strainNumber_t s, eo_cfg_nvsEP_as_strainNVindex_t snvindex)
     @brief      This function retrieves the eOnvID_t of a network variable with index @e snvindex for the strain number @e s
     @param      s               the strain number 
-    @param      jnvinxed        the index of the nv inside the strain
+    @param      snvinxed        the index of the nv inside the strain
     @return     the nvid or EOK_uint16dummy in case of failure.
   */
-extern eOnvID_t eo_cfg_nvsEP_as_any_con_body_strain_NVID_Get(eo_cfg_nvsEP_as_any_con_body_strainNumber_t j, eo_cfg_nvsEP_as_strainNVindex_t snvindex);
+extern eOnvID_t eo_cfg_nvsEP_as_any_con_body_strain_NVID_Get(eo_cfg_nvsEP_as_any_con_body_strainNumber_t s, eo_cfg_nvsEP_as_strainNVindex_t snvindex);
 
 
 /** @fn         extern eOnvID_t eo_cfg_nvsEP_as_any_con_body_mais_NVID_Get(eo_cfg_nvsEP_as_any_con_body_maisNumber_t m, eo_cfg_nvsEP_as_maisNVindex_t mnvindex)
