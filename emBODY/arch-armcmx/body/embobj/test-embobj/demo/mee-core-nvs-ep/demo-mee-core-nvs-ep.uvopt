@@ -1150,8 +1150,8 @@
   </Group>
 
   <Group>
-    <GroupName>ep-as-any</GroupName>
-    <tvExp>0</tvExp>
+    <GroupName>ep-mngmnt</GroupName>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -1160,13 +1160,13 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>69</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_any_con_sxx.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_as_any_con_sxx.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\mngmnt\eOcfg_nvsEP_mngmnt_usr.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mngmnt_usr.c</FilenameWithoutPath>
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
@@ -1174,108 +1174,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>62</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_any_con_mxx.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_as_any_con_mxx.c</FilenameWithoutPath>
-    </File>
-    <File>
-      <GroupNumber>9</GroupNumber>
-      <FileNumber>63</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_any_con_mxxdefault.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_as_any_con_mxxdefault.c</FilenameWithoutPath>
-    </File>
-    <File>
-      <GroupNumber>9</GroupNumber>
-      <FileNumber>64</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_any_con_sxxdefault.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_as_any_con_sxxdefault.c</FilenameWithoutPath>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>ep-as-wholebody</GroupName>
-    <tvExp>1</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>65</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>65</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>168</TopLine>
-      <CurrentLine>182</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_wholebody_con.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_as_wholebody_con.c</FilenameWithoutPath>
-    </File>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>66</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>94</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>422</TopLine>
-      <CurrentLine>439</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_wholebody_usr.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_as_wholebody_usr.c</FilenameWithoutPath>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>ep-mngmnt</GroupName>
-    <tvExp>1</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <File>
-      <GroupNumber>11</GroupNumber>
-      <FileNumber>68</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>98</TopLine>
-      <CurrentLine>1</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\mngmnt\eOcfg_nvsEP_mngmnt_usr.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mngmnt_usr.c</FilenameWithoutPath>
-    </File>
-    <File>
-      <GroupNumber>11</GroupNumber>
-      <FileNumber>69</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>100</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>130</TopLine>
-      <CurrentLine>147</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\mngmnt\eOcfg_nvsEP_mngmnt_con.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_nvsEP_mngmnt_con.c</FilenameWithoutPath>
@@ -1284,12 +1186,12 @@
 
   <Group>
     <GroupName>ep-mc-any</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>12</GroupNumber>
-      <FileNumber>70</FileNumber>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>63</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1302,8 +1204,8 @@
       <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_jxx.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>12</GroupNumber>
-      <FileNumber>71</FileNumber>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>64</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1316,8 +1218,8 @@
       <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_jxxdefault.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>12</GroupNumber>
-      <FileNumber>72</FileNumber>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>65</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1330,8 +1232,8 @@
       <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_mxx.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>12</GroupNumber>
-      <FileNumber>73</FileNumber>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>66</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1344,12 +1246,12 @@
       <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_mxxdefault.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>12</GroupNumber>
-      <FileNumber>74</FileNumber>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>67</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>17</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -1365,8 +1267,8 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>75</FileNumber>
+      <GroupNumber>11</GroupNumber>
+      <FileNumber>68</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1386,8 +1288,8 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>13</GroupNumber>
-      <FileNumber>76</FileNumber>
+      <GroupNumber>12</GroupNumber>
+      <FileNumber>69</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1400,8 +1302,8 @@
       <FilenameWithoutPath>eOcfg_nvsEP_mc_leg_usr.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>13</GroupNumber>
-      <FileNumber>77</FileNumber>
+      <GroupNumber>12</GroupNumber>
+      <FileNumber>70</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1417,12 +1319,12 @@
 
   <Group>
     <GroupName>eps-for-board-ebx (loc and rem)</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>14</GroupNumber>
-      <FileNumber>78</FileNumber>
+      <GroupNumber>13</GroupNumber>
+      <FileNumber>71</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1442,12 +1344,12 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>16</GroupNumber>
-      <FileNumber>80</FileNumber>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>72</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>56</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -1456,8 +1358,8 @@
       <FilenameWithoutPath>eOcfg_nvsEP_mc_upperleg_con.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>16</GroupNumber>
-      <FileNumber>81</FileNumber>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>73</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1473,12 +1375,12 @@
 
   <Group>
     <GroupName>ep-mc-lowerleg</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>17</GroupNumber>
-      <FileNumber>83</FileNumber>
+      <GroupNumber>15</GroupNumber>
+      <FileNumber>74</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1491,8 +1393,8 @@
       <FilenameWithoutPath>eOcfg_nvsEP_mc_lowerleg_con.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>17</GroupNumber>
-      <FileNumber>84</FileNumber>
+      <GroupNumber>15</GroupNumber>
+      <FileNumber>75</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1508,12 +1410,12 @@
 
   <Group>
     <GroupName>ep-mc-upperarm</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>19</GroupNumber>
-      <FileNumber>87</FileNumber>
+      <GroupNumber>16</GroupNumber>
+      <FileNumber>76</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1526,8 +1428,8 @@
       <FilenameWithoutPath>eOcfg_nvsEP_mc_upperarm_con.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>19</GroupNumber>
-      <FileNumber>88</FileNumber>
+      <GroupNumber>16</GroupNumber>
+      <FileNumber>77</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1543,12 +1445,12 @@
 
   <Group>
     <GroupName>ep-mc-torso</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>20</GroupNumber>
-      <FileNumber>89</FileNumber>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>78</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1561,12 +1463,12 @@
       <FilenameWithoutPath>eOcfg_nvsEP_mc_torso_con.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>20</GroupNumber>
-      <FileNumber>90</FileNumber>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>79</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>78</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -1582,8 +1484,8 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>21</GroupNumber>
-      <FileNumber>91</FileNumber>
+      <GroupNumber>18</GroupNumber>
+      <FileNumber>80</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1596,8 +1498,8 @@
       <FilenameWithoutPath>eOcfg_nvsEP_mc_lowerarm_con.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>21</GroupNumber>
-      <FileNumber>92</FileNumber>
+      <GroupNumber>18</GroupNumber>
+      <FileNumber>81</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1613,16 +1515,16 @@
 
   <Group>
     <GroupName>eps-of-ems-boards</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>22</GroupNumber>
-      <FileNumber>93</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>82</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>93</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -1631,26 +1533,26 @@
       <FilenameWithoutPath>eOcfg_EPs_eb1.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>22</GroupNumber>
-      <FileNumber>94</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>83</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>40</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>1</TopLine>
+      <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\eOcfg_EPs_eb2.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_EPs_eb2.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>22</GroupNumber>
-      <FileNumber>95</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>84</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>94</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -1659,12 +1561,12 @@
       <FilenameWithoutPath>eOcfg_EPs_eb3.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>22</GroupNumber>
-      <FileNumber>96</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>85</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>65</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -1673,12 +1575,12 @@
       <FilenameWithoutPath>eOcfg_EPs_eb4.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>22</GroupNumber>
-      <FileNumber>97</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>86</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>40</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -1687,12 +1589,12 @@
       <FilenameWithoutPath>eOcfg_EPs_eb5.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>22</GroupNumber>
-      <FileNumber>98</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>87</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>33</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -1701,8 +1603,8 @@
       <FilenameWithoutPath>eOcfg_EPs_eb6.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>22</GroupNumber>
-      <FileNumber>99</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>88</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1715,12 +1617,12 @@
       <FilenameWithoutPath>eOcfg_EPs_eb7.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>22</GroupNumber>
-      <FileNumber>100</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>89</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>94</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -1729,8 +1631,8 @@
       <FilenameWithoutPath>eOcfg_EPs_eb8.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>22</GroupNumber>
-      <FileNumber>101</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>90</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1745,17 +1647,129 @@
   </Group>
 
   <Group>
+    <GroupName>ep-as-any</GroupName>
+    <tvExp>1</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>91</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_any_con_sxx.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_any_con_sxx.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>92</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_any_con_mxx.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_any_con_mxx.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>93</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_any_con_mxxdefault.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_any_con_mxxdefault.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>94</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>48</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_any_con_sxxdefault.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_any_con_sxxdefault.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>0</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_any_con_body.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_any_con_body.c</FilenameWithoutPath>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>ep-as-wholebody</GroupName>
+    <tvExp>1</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <File>
+      <GroupNumber>21</GroupNumber>
+      <FileNumber>95</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>1</TopLine>
+      <CurrentLine>1</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_wholebody_con.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_wholebody_con.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>21</GroupNumber>
+      <FileNumber>96</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>35</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_wholebody_usr.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_wholebody_usr.c</FilenameWithoutPath>
+    </File>
+  </Group>
+
+  <Group>
     <GroupName>ep-sk-emsboard</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>23</GroupNumber>
-      <FileNumber>102</FileNumber>
+      <GroupNumber>22</GroupNumber>
+      <FileNumber>97</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>88</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -1764,8 +1778,8 @@
       <FilenameWithoutPath>eOcfg_nvsEP_sk_emsboard_con.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>23</GroupNumber>
-      <FileNumber>103</FileNumber>
+      <GroupNumber>22</GroupNumber>
+      <FileNumber>98</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1785,26 +1799,26 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>23</GroupNumber>
+      <FileNumber>99</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>56</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>95</TopLine>
-      <CurrentLine>117</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\usr-callbacks\eOcfg_nvsEP_mngmnt_usrcbk_ebx.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_nvsEP_mngmnt_usrcbk_ebx.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>23</GroupNumber>
+      <FileNumber>100</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>96</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -1813,8 +1827,8 @@
       <FilenameWithoutPath>eOcfg_nvsEP_mc_upperleg_usrcbk_pippo.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>23</GroupNumber>
+      <FileNumber>101</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1827,12 +1841,12 @@
       <FilenameWithoutPath>eOcfg_nvsEP_mc_lowerleg_usrcbk_pippo.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>23</GroupNumber>
+      <FileNumber>102</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>70</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -1841,18 +1855,123 @@
       <FilenameWithoutPath>eOcfg_nvsEP_mc_usrcbk_pippo.c</FilenameWithoutPath>
     </File>
     <File>
+      <GroupNumber>23</GroupNumber>
+      <FileNumber>103</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>62</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\usr-callbacks\eOcfg_nvsEP_as_wholebody_usrcbk_pippo.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_wholebody_usrcbk_pippo.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>23</GroupNumber>
+      <FileNumber>0</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\usr-callbacks\eOcfg_nvsEP_as_usrcbk_pippo.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_usrcbk_pippo.c</FilenameWithoutPath>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>eo-as</GroupName>
+    <tvExp>1</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <File>
+      <GroupNumber>25</GroupNumber>
+      <FileNumber>105</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>96</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>141</TopLine>
+      <CurrentLine>161</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as.c</FilenameWithoutPath>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>eo-as-onestrain</GroupName>
+    <tvExp>1</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <File>
       <GroupNumber>0</GroupNumber>
       <FileNumber>0</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>63</ColumnNumber>
+      <ColumnNumber>34</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>194</TopLine>
-      <CurrentLine>205</CurrentLine>
+      <TopLine>97</TopLine>
+      <CurrentLine>19</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\usr-callbacks\eOcfg_nvsEP_as_wholebody_usrcbk_pippo.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_as_wholebody_usrcbk_pippo.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_onestrain_con.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_onestrain_con.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>0</GroupNumber>
+      <FileNumber>0</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>4</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_onestrain_usr.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_onestrain_usr.c</FilenameWithoutPath>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>eo-as-onemais</GroupName>
+    <tvExp>1</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <File>
+      <GroupNumber>0</GroupNumber>
+      <FileNumber>0</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>48</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_onemais_con.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_onemais_con.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>0</GroupNumber>
+      <FileNumber>0</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\embobj\embobj-icub\endpoints\sensors\eOcfg_nvsEP_as_onemais_usr.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_onemais_usr.c</FilenameWithoutPath>
     </File>
   </Group>
 
