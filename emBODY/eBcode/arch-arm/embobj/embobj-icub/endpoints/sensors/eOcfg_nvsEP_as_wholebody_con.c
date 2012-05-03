@@ -584,21 +584,34 @@ static uint16_t s_hash(uint16_t id)
 
 extern eOnvID_t eo_cfg_nvsEP_as_wholebody_strain_NVID_Get(eo_cfg_nvsEP_as_wholebody_con_strainNumber_t s, eo_cfg_nvsEP_as_wholebody_con_strainNVindex_t snvindex)
 {
-    if((s >= strainWholeBody_TOTALnumber) || (snvindex >= EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber))
-    {
-        return(EOK_uint16dummy);
-    }
-    return(EO_nv_ID(eo_cfg_nvsEP_as_any_con_sxx_funtyp[snvindex], EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_strain(s, snvindex)));    
+    return(eo_cfg_nvsEP_as_any_con_body_strain_NVID_Get((eo_cfg_nvsEP_as_any_con_body_strainNumber_t)s, snvindex));    
 }
+
 
 extern eOnvID_t eo_cfg_nvsEP_as_wholebody_mais_NVID_Get(eo_cfg_nvsEP_as_wholebody_con_maisNumber_t m, eo_cfg_nvsEP_as_wholebody_con_maisNVindex_t mnvindex)
 {
-    if((m >= maisWholeBody_TOTALnumber) || (mnvindex >= EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber))
-    {
-        return(EOK_uint16dummy);
-    }
-    return(EO_nv_ID(eo_cfg_nvsEP_as_any_con_mxx_funtyp[mnvindex], EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_mais(m, mnvindex)));    
-}
+    return(eo_cfg_nvsEP_as_any_con_body_mais_NVID_Get((eo_cfg_nvsEP_as_any_con_body_maisNumber_t)m, mnvindex));
+} 
+
+
+
+// extern eOnvID_t eo_cfg_nvsEP_as_wholebody_strain_NVID_Get(eo_cfg_nvsEP_as_wholebody_con_strainNumber_t s, eo_cfg_nvsEP_as_wholebody_con_strainNVindex_t snvindex)
+// {
+//     if((s >= strainWholeBody_TOTALnumber) || (snvindex >= EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber))
+//     {
+//         return(EOK_uint16dummy);
+//     }
+//     return(EO_nv_ID(eo_cfg_nvsEP_as_any_con_sxx_funtyp[snvindex], EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_strain(s, snvindex)));    
+// }
+
+// extern eOnvID_t eo_cfg_nvsEP_as_wholebody_mais_NVID_Get(eo_cfg_nvsEP_as_wholebody_con_maisNumber_t m, eo_cfg_nvsEP_as_wholebody_con_maisNVindex_t mnvindex)
+// {
+//     if((m >= maisWholeBody_TOTALnumber) || (mnvindex >= EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber))
+//     {
+//         return(EOK_uint16dummy);
+//     }
+//     return(EO_nv_ID(eo_cfg_nvsEP_as_any_con_mxx_funtyp[mnvindex], EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_mais(m, mnvindex)));    
+// }
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

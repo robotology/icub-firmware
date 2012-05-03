@@ -64,10 +64,10 @@
  **/
 typedef enum
 {
-    strainUpperArm_00 = 0
+    strainOneStrain_00 = 0
 } eo_cfg_nvsEP_as_onestrain_con_strainNumber_t;
 
-enum { strainUpperArm_TOTALnumber = 1}; 
+enum { strainOneStrain_TOTALnumber = 1}; 
 
 
 /** @typedef    typedef eo_cfg_nvsEP_as_strainNVindex_t eo_cfg_nvsEP_as_onestrain_con_strainNVindex_t
@@ -85,14 +85,14 @@ typedef eo_cfg_nvsEP_as_maisNVindex_t eo_cfg_nvsEP_as_onestrain_con_maisNVindex_
 
 typedef uint16_t eo_cfg_nvsEP_as_onestrain_con_maisNumber_t; // just to have it
 
-enum { maisUpperArm_TOTALnumber = 0}; 
+enum { maisOneStrain_TOTALnumber = 0}; 
 
 
 
 /** @typedef    enum varsASonestrain_TOTALnumber;
     @brief      It contains the total number of network variables managed by the endpoint leftleg
  **/
-enum {varsASonestrain_TOTALnumber = strainUpperArm_TOTALnumber*strainNVindex_TOTALnumber + maisUpperArm_TOTALnumber*maisNVindex_TOTALnumber };
+enum {varsASonestrain_TOTALnumber = strainOneStrain_TOTALnumber*strainNVindex_TOTALnumber + maisOneStrain_TOTALnumber*maisNVindex_TOTALnumber };
 
 
 /** @typedef    typedef struct eo_cfg_nvsEP_as_onestrain_t;
