@@ -50,8 +50,8 @@
 // - public #define  --------------------------------------------------------------------------------------------------
 
 // -- max mumber of strain and mais in the whole body
-#define EOK_cfg_nvsEP_as_wholebody_con_maxnumof_strains                             strainNVindex_TOTALnumber
-#define EOK_cfg_nvsEP_as_wholebody_con_maxnumof_maises                              maisNVindex_TOTALnumber
+#define EOK_cfg_nvsEP_as_wholebody_con_maxnumof_strains                             strainWholeBody_TOTALnumber
+#define EOK_cfg_nvsEP_as_wholebody_con_maxnumof_maises                              maisWholeBody_TOTALnumber
 
 // -- max number of network variables in a strain
 #define   EOK_cfg_nvsEP_as_wholebody_con_maxnumof_nvs_in_strain                     16

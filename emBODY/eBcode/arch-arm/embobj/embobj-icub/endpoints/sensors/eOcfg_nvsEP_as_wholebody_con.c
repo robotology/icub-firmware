@@ -145,7 +145,7 @@ static uint16_t s_hash(uint16_t id);
 
 #include "eOcfg_nvsEP_as_any_con_sxxmacro.c"
 
-#define OFFSET_OF_END_OF_STRAINS    (strain_TOTALnumber*sizeof(eOsnsr_strain_t))
+#define OFFSET_OF_END_OF_STRAINS    (strainWholeBody_TOTALnumber*sizeof(eOsnsr_strain_t))
 
 
 // -- the 2 mais
@@ -179,14 +179,14 @@ static uint16_t s_hash(uint16_t id);
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern const eOsnsr_strain_t* eo_cfg_nvsEP_as_strain_defaultvalue = &eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue;
-extern const eOsnsr_mais_t* eo_cfg_nvsEP_as_mais_defaultvalue = &eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue;
+extern const eOsnsr_strain_t* eo_cfg_nvsEP_as_wholebody_strain_defaultvalue = &eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue;
+extern const eOsnsr_mais_t* eo_cfg_nvsEP_as_wholebody_mais_defaultvalue = &eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue;
 
 // EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber is  4 and keeps the number of nvs per strain
 #define Snvs    (EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber)
 
 // strain_TOTALnumber is 4 and is the number of strain in the wholebody
-#define SNUM    (strain_TOTALnumber)
+#define SNUM    (strainWholeBody_TOTALnumber)
 
 
 // it is the start of index for the strain
@@ -201,7 +201,7 @@ extern const eOsnsr_mais_t* eo_cfg_nvsEP_as_mais_defaultvalue = &eo_cfg_nvsEP_as
 #define Mnvs    (EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber)
 
 // mais_TOTALnumber is 2 and is the number of mais in the wholebody
-#define MNUM     (mais_TOTALnumber)
+#define MNUM     (maisWholeBody_TOTALnumber)
 
 
 // it is the start of index for the motors
@@ -481,10 +481,10 @@ extern uint16_t eo_cfg_nvsEP_as_wholebody_hashfunction_id2index(uint16_t id)
 {
 
     // 4*4
-    #define IDTABLESSIZE        (EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber*strain_TOTALnumber)
+    #define IDTABLESSIZE        (EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber*strainWholeBody_TOTALnumber)
     
     // 4*2
-    #define IDTABLEMSIZE        (EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber*mais_TOTALnumber)    
+    #define IDTABLEMSIZE        (EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber*maisWholeBody_TOTALnumber)    
     
     #define IDTABLESIZE         (IDTABLESSIZE+IDTABLEMSIZE)
     
@@ -572,7 +572,7 @@ static uint16_t s_hash(uint16_t id)
         a = off >> 4;
         b = off - (a << 4);
         r = a*EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber+b;
-        r += (EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber*strain_TOTALnumber);
+        r += (EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber*strainWholeBody_TOTALnumber);
     }
     
     return(r);
@@ -582,7 +582,7 @@ static uint16_t s_hash(uint16_t id)
 
 extern eOnvID_t eo_cfg_nvsEP_as_wholebody_strain_NVID_Get(eo_cfg_nvsEP_as_wholebody_con_strainNumber_t s, eo_cfg_nvsEP_as_wholebody_con_strainNVindex_t snvindex)
 {
-    if((s >= strain_TOTALnumber) || (snvindex >= EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber))
+    if((s >= strainWholeBody_TOTALnumber) || (snvindex >= EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber))
     {
         return(EOK_uint16dummy);
     }
@@ -591,7 +591,7 @@ extern eOnvID_t eo_cfg_nvsEP_as_wholebody_strain_NVID_Get(eo_cfg_nvsEP_as_wholeb
 
 extern eOnvID_t eo_cfg_nvsEP_as_wholebody_mais_NVID_Get(eo_cfg_nvsEP_as_wholebody_con_maisNumber_t m, eo_cfg_nvsEP_as_wholebody_con_maisNVindex_t mnvindex)
 {
-    if((m >= mais_TOTALnumber) || (mnvindex >= EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber))
+    if((m >= maisWholeBody_TOTALnumber) || (mnvindex >= EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber))
     {
         return(EOK_uint16dummy);
     }
