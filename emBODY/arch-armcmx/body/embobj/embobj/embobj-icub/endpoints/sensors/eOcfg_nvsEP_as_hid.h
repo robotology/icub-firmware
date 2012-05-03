@@ -86,7 +86,7 @@ extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__signaloncefullscale(eo_cfg_nvs
 
 extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__fullscale(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
-extern void eo_cfg_nvsEP_as_hid_UPDT__Sxx_sstatus__calibratedvalues(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__calibratedvalues(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
 extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__uncalibratedvalues(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 

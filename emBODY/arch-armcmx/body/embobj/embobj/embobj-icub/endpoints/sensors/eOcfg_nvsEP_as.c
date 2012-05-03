@@ -241,7 +241,7 @@ __weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__fullscale(eo_cfg_nvsEP_
     ep = ep;
 }
 
-__weak extern void eo_cfg_nvsEP_as_hid_UPDT__Sxx_sstatus__calibratedvalues(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__calibratedvalues(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
