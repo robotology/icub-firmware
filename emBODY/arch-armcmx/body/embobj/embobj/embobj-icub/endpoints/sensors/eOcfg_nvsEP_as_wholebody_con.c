@@ -43,6 +43,8 @@
 #include "eOcfg_nvsEP_as_any_con_mxx.h"    
 #include "eOcfg_nvsEP_as_any_con_mxxdefault.h" 
 
+#include "eOcfg_nvsEP_as_any_con_body_hid.h"    
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -102,7 +104,7 @@ static uint16_t s_hash(uint16_t id);
 
 // -- the 4 strain
 
-#define SMACRO_EXTERNALPREFIX_GETID                EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx
+#define SMACRO_EXTERNALPREFIX_GETID                EOK_cfg_nvsEP_as_any_con_body_NVID_sxx
 
 
 // strain 00
@@ -150,7 +152,7 @@ static uint16_t s_hash(uint16_t id);
 
 // -- the 2 mais
 
-#define MMACRO_EXTERNALPREFIX_GETID                EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx
+#define MMACRO_EXTERNALPREFIX_GETID                EOK_cfg_nvsEP_as_any_con_body_NVID_mxx
         
 
 // mais 00
@@ -498,28 +500,28 @@ extern uint16_t eo_cfg_nvsEP_as_wholebody_hashfunction_id2index(uint16_t id)
     static const uint16_t s_idtable[] = 
     { 
         // s00
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__mode(0),                   EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__datarate(0),
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__signaloncefullscale(0),    EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__fullscale(0), 
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__calibratedvalues(0),       EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__uncalibratedvalues(0),  
+        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__mode(0),                   EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__datarate(0),
+        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__signaloncefullscale(0),    EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__fullscale(0), 
+        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__calibratedvalues(0),       EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__uncalibratedvalues(0),  
         // s01
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__mode(1),                   EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__datarate(1),
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__signaloncefullscale(1),    EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__fullscale(1), 
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__calibratedvalues(1),       EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__uncalibratedvalues(1),  
+        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__mode(1),                   EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__datarate(1),
+        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__signaloncefullscale(1),    EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__fullscale(1), 
+        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__calibratedvalues(1),       EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__uncalibratedvalues(1),  
         // s02
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__mode(2),                   EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__datarate(2),
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__signaloncefullscale(2),    EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__fullscale(2), 
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__calibratedvalues(2),       EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__uncalibratedvalues(2),  
+        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__mode(2),                   EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__datarate(2),
+        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__signaloncefullscale(2),    EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__fullscale(2), 
+        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__calibratedvalues(2),       EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__uncalibratedvalues(2),  
         // s03
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__mode(3),                   EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__datarate(3),
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sconfig__signaloncefullscale(3),    EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__fullscale(3),         
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__calibratedvalues(3),       EOK_cfg_nvsEP_as_wholebody_con_NVID_sxx_sstatus__uncalibratedvalues(3),  
+        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__mode(3),                   EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__datarate(3),
+        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__signaloncefullscale(3),    EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__fullscale(3),         
+        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__calibratedvalues(3),       EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__uncalibratedvalues(3),  
         
         // m00
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx_mconfig__mode(0),                   EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx_mconfig__datarate(0),
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx_mconfig__resolution(0),             EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx_mstatus__the15values(0), 
+        EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__mode(0),                   EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__datarate(0),
+        EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__resolution(0),             EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mstatus__the15values(0), 
         // m01
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx_mconfig__mode(1),                   EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx_mconfig__datarate(1),
-        EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx_mconfig__resolution(1),             EOK_cfg_nvsEP_as_wholebody_con_NVID_mxx_mstatus__the15values(1)      
+        EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__mode(1),                   EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__datarate(1),
+        EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__resolution(1),             EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mstatus__the15values(1)      
     };  EO_VERIFYsizeof(s_idtable, sizeof(uint16_t)*(IDTABLESIZE));
     
     uint16_t index = s_hash(id);
@@ -550,8 +552,8 @@ extern uint16_t eo_cfg_nvsEP_as_wholebody_hashfunction_id2index(uint16_t id)
 
 
 
-typedef uint8_t sdfg[ ( EOK_cfg_nvsEP_as_wholebody_con_maxnumof_nvs_in_strain == 16 ) ? (1) : (0)];
-typedef uint8_t redf[ ( EOK_cfg_nvsEP_as_wholebody_con_maxnumof_nsv_in_mais == 16 ) ? (1) : (0)];
+typedef uint8_t sdfg[ ( EOK_cfg_nvsEP_as_any_con_sxx_maxnumof_nvs_in_strain == 16 ) ? (1) : (0)];
+typedef uint8_t redf[ ( EOK_cfg_nvsEP_as_any_con_mxx_maxnumof_nvs_in_mais == 16 ) ? (1) : (0)];
 
 static uint16_t s_hash(uint16_t id)
 {
@@ -560,7 +562,7 @@ static uint16_t s_hash(uint16_t id)
     uint16_t b;
     uint16_t r;
     
-    if(off < EOK_cfg_nvsEP_as_wholebody_con_firstNVIDoff_of_mais(0))
+    if(off < EOK_cfg_nvsEP_as_any_con_body_firstNVIDoff_of_mais(0))
     {
         a = off >> 4;
         b = off - (a << 4);
@@ -568,7 +570,7 @@ static uint16_t s_hash(uint16_t id)
     }
     else
     {
-        off -= EOK_cfg_nvsEP_as_wholebody_con_firstNVIDoff_of_mais(0);
+        off -= EOK_cfg_nvsEP_as_any_con_body_firstNVIDoff_of_mais(0);
         a = off >> 4;
         b = off - (a << 4);
         r = a*EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber+b;
@@ -586,7 +588,7 @@ extern eOnvID_t eo_cfg_nvsEP_as_wholebody_strain_NVID_Get(eo_cfg_nvsEP_as_wholeb
     {
         return(EOK_uint16dummy);
     }
-    return(EO_nv_ID(eo_cfg_nvsEP_as_any_con_sxx_funtyp[snvindex], EOK_cfg_nvsEP_as_wholebody_con_NVIDoff_of_strain(s, snvindex)));    
+    return(EO_nv_ID(eo_cfg_nvsEP_as_any_con_sxx_funtyp[snvindex], EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_strain(s, snvindex)));    
 }
 
 extern eOnvID_t eo_cfg_nvsEP_as_wholebody_mais_NVID_Get(eo_cfg_nvsEP_as_wholebody_con_maisNumber_t m, eo_cfg_nvsEP_as_wholebody_con_maisNVindex_t mnvindex)
@@ -595,7 +597,7 @@ extern eOnvID_t eo_cfg_nvsEP_as_wholebody_mais_NVID_Get(eo_cfg_nvsEP_as_wholebod
     {
         return(EOK_uint16dummy);
     }
-    return(EO_nv_ID(eo_cfg_nvsEP_as_any_con_mxx_funtyp[mnvindex], EOK_cfg_nvsEP_as_wholebody_con_NVIDoff_of_mais(m, mnvindex)));    
+    return(EO_nv_ID(eo_cfg_nvsEP_as_any_con_mxx_funtyp[mnvindex], EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_mais(m, mnvindex)));    
 }
 
 // --------------------------------------------------------------------------------------------------------------------
