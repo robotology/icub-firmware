@@ -46,8 +46,8 @@
 
 #include "EoSensors.h"
 
-#include "eOcfg_nvsEP_as_any_con_mxx.h"
-#include "eOcfg_nvsEP_as_any_con_sxx.h"
+#include "eOcfg_nvsEP_as_any_con_body.h"
+
 
  
 
@@ -77,20 +77,13 @@ typedef enum
 
 enum { strainWholeBody_TOTALnumber = 4}; 
 
-/** @typedef    typedef struct eo_cfg_nvsEP_as_wholebody_con_strainNVindex_t
+
+
+/** @typedef    typedef eo_cfg_nvsEP_as_strainNVindex_t eo_cfg_nvsEP_as_wholebody_con_strainNVindex_t
     @brief      It contains an index for all the network variables in a strain.
  **/
-typedef enum
-{
-    strainNVindex_sconfig__mode                                     =  0,
-    strainNVindex_sconfig__datarate                                 =  1,
-    strainNVindex_sconfig__signaloncefullscale                      =  2,
-    strainNVindex_sstatus__fullscale                                =  3,
-    strainNVindex_sstatus__calibratedvalues                         =  4,
-    strainNVindex_sstatus__uncalibratedvalues                       =  5
-} eo_cfg_nvsEP_as_wholebody_con_strainNVindex_t;
+typedef eo_cfg_nvsEP_as_strainNVindex_t eo_cfg_nvsEP_as_wholebody_con_strainNVindex_t;
 
-enum { strainNVindex_TOTALnumber = 6 };
 
 
 /** @typedef    typedef enum eo_cfg_nvsEP_as_wholebody_con_maisNumber_t
@@ -104,18 +97,12 @@ typedef enum
 
 enum { maisWholeBody_TOTALnumber = 2}; 
 
-/** @typedef    typedef struct eo_cfg_nvsEP_as_wholebody_con_maisNVindex_t
+/** @typedef    typedef eo_cfg_nvsEP_as_maisNVindex_t eo_cfg_nvsEP_as_wholebody_con_maisNVindex_t
     @brief      It contains an index for all the network variables in a mais.
  **/
-typedef enum
-{
-    maisNVindex_mconfig__mode                                       =  0,
-    maisNVindex_mconfig__datarate                                   =  1,
-    maisNVindex_mconfig__resolution                                 =  2,
-    maisNVindex_mstatus__the15values                                =  3
-} eo_cfg_nvsEP_as_wholebody_con_maisNVindex_t;
+typedef eo_cfg_nvsEP_as_maisNVindex_t eo_cfg_nvsEP_as_wholebody_con_maisNVindex_t;
 
-enum { maisNVindex_TOTALnumber = 4 };
+
 
 
 /** @typedef    enum varsASwholebody_TOTALnumber;
