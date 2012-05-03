@@ -32,7 +32,7 @@
 #include "stdio.h"
 
 #include "EoCommon.h"
-#include "eOcfg_nvsEP_mc_hid.h"
+#include "eOcfg_nvsEP_as_hid.h"
 #include "eOcfg_nvsEP_as_wholebody_con.h"
 #include "eOcfg_nvsEP_as_wholebody_con_hid.h"
 
