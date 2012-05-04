@@ -183,18 +183,38 @@ extern eOresult_t eo_nvscfg_PushBackDevice(EOnvsCfg* p, eOnvscfgOwnership_t owne
 
 
 
-extern eOresult_t eo_nvscfg_ondevice_PushBackEndpoint(EOnvsCfg* p, uint16_t ondevindex, eOnvEP_t endpoint, eOuint16_fp_uint16_t hashfn_id2index, const EOconstvector* treeofnvs_con, const EOconstvector* datanvs_usr, uint32_t datanvs_size, eOvoid_fp_uint16_voidp_voidp_t datanvs_init, EOVmutexDerived* mtx)
+//extern eOresult_t eo_nvscfg_ondevice_PushBackEndpoint(EOnvsCfg* p, uint16_t ondevindex, eOnvEP_t endpoint, eOuint16_fp_uint16_t hashfn_id2index, const EOconstvector* treeofnvs_con, const EOconstvector* datanvs_usr, uint32_t datanvs_size, eOvoid_fp_uint16_voidp_voidp_t datanvs_init, EOVmutexDerived* mtx)
+
+extern eOresult_t eo_nvscfg_ondevice_PushBackEP(EOnvsCfg* p, uint16_t ondevindex, eOnvscfg_EP_t *cfgofep, EOVmutexDerived* mtx)
 {
     EOnvsCfg_device_t** thedev = NULL;
     EOnvsCfg_ep_t *theendpoint = NULL;
     uint16_t nnvs = 0;
+    
+    eOnvEP_t endpoint;
+    eOuint16_fp_uint16_t hashfn_id2index;
+    const EOconstvector* treeofnvs_con;
+    const EOconstvector* datanvs_usr;
+    uint32_t datanvs_size;
+    eOvoid_fp_uint16_voidp_voidp_t datanvs_init;
+    eOvoid_fp_uint16_voidp_voidp_t datanvs_retrieve;
  
     
- 	if(NULL == p) 
+ 	if((NULL == p) || (NULL == cfgofep)) 
 	{
 		return(eores_NOK_nullpointer); 
 	}
+    
+    
+    endpoint                        = cfgofep->endpoint;
+    datanvs_size                    = cfgofep->sizeof_endpoint_data;
+    hashfn_id2index                 = cfgofep->hashfunction_id2index;
+    treeofnvs_con                   = cfgofep->constvector_of_treenodes_EOnv_con;
+    datanvs_usr                     = cfgofep->constvector_of_EOnv_usr;
+    datanvs_init                    = cfgofep->endpoint_data_init;
+    datanvs_retrieve                = cfgofep->endpoint_data_retrieve;
 
+ 
     nnvs = eo_constvector_Size(datanvs_usr);
 
     
@@ -227,6 +247,7 @@ extern eOresult_t eo_nvscfg_ondevice_PushBackEndpoint(EOnvsCfg* p, uint16_t onde
         theendpoint->thenvs_rem     = NULL;
     }
     theendpoint->thenvs_initialise  = datanvs_init;
+    theendpoint->thenvs_ramretrieve = datanvs_retrieve;
     theendpoint->thenvs_sizeof      = datanvs_size;
     theendpoint->hashfn_id2index    = hashfn_id2index;
     theendpoint->mtx_endpoint       = mtx;
@@ -266,6 +287,7 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
     uint16_t nendpoints;
     uint16_t nvars;
     eOvoid_fp_uint16_voidp_voidp_t initialise = NULL;
+    eOvoid_fp_uint16_voidp_voidp_t ramretrieve = NULL;
     EOnv tmpnv;
     EOnv_con_t* tmpnvcon = NULL;
 
@@ -298,12 +320,17 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
 
             if(eobool_false == ((*theendpoint)->initted))
             {
-                initialise = (*theendpoint)->thenvs_initialise;
+                initialise  = (*theendpoint)->thenvs_initialise;
+                ramretrieve = (*theendpoint)->thenvs_ramretrieve;
                 (*theendpoint)->initted = eobool_true;
                 
-                if((NULL != initialise))
+                if(NULL != initialise)
                 {
                     initialise((*theendpoint)->endpoint, (*theendpoint)->thenvs_vol, (*theendpoint)->thenvs_rem);
+                }
+                if(NULL != ramretrieve)
+                {
+                    ramretrieve((*theendpoint)->endpoint, (*theendpoint)->thenvs_vol, (*theendpoint)->thenvs_rem);
                 }
             }
 

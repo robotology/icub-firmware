@@ -190,13 +190,15 @@ static EOnvsCfg* s_eo_hosttransceiver_nvscfg_get(const eOhosttransceiver_cfg_t *
     {
         epcfg = (eOnvscfg_EP_t*) eo_constvector_At(theepcfgs, i);
 
-        eo_nvscfg_ondevice_PushBackEndpoint(nvscfg, 0, epcfg->endpoint,
-                                        epcfg->hashfunction_id2index,
-                                        epcfg->constvector_of_treenodes_EOnv_con,
-                                        epcfg->constvector_of_EOnv_usr,
-                                        epcfg->sizeof_endpoint_data, 
-                                        epcfg->endpoint_data_init,
-                                        NULL);
+//         eo_nvscfg_ondevice_PushBackEndpoint(nvscfg, 0, epcfg->endpoint,
+//                                         epcfg->hashfunction_id2index,
+//                                         epcfg->constvector_of_treenodes_EOnv_con,
+//                                         epcfg->constvector_of_EOnv_usr,
+//                                         epcfg->sizeof_endpoint_data, 
+//                                         epcfg->endpoint_data_init,
+//                                         NULL);
+        
+        eo_nvscfg_ondevice_PushBackEP(nvscfg, 0, epcfg, NULL);        
     }
     
     eo_nvscfg_data_Initialise(nvscfg);

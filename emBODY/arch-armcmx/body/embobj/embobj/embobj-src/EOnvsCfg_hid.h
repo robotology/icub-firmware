@@ -49,33 +49,34 @@
 
 typedef struct
 {
-    eOnvEP_t                endpoint;
-    eObool_t                initted;
-    uint16_t                thenvs_numberof; 
-    const EOconstvector*    thetreeofnvs_con;      
-    const EOconstvector*    thenvs_usr;
-    void*                   thenvs_vol;
-    void*                   thenvs_rem;
-    eOvoid_fp_uint16_voidp_voidp_t thenvs_initialise; // ep, vol_local, vol_remote
-    uint32_t                thenvs_sizeof;   
-    eOuint16_fp_uint16_t    hashfn_id2index; 
-    EOVmutexDerived*        mtx_endpoint;                 
+    eOnvEP_t                        endpoint;
+    eObool_t                        initted;
+    uint16_t                        thenvs_numberof; 
+    const EOconstvector*            thetreeofnvs_con;      
+    const EOconstvector*            thenvs_usr;
+    void*                           thenvs_vol;
+    void*                           thenvs_rem;
+    eOvoid_fp_uint16_voidp_voidp_t  thenvs_initialise;  // ep, vol_local, vol_remote
+    eOvoid_fp_uint16_voidp_voidp_t  thenvs_ramretrieve; // ep, vol_local, vol_remote
+    uint32_t                        thenvs_sizeof;   
+    eOuint16_fp_uint16_t            hashfn_id2index; 
+    EOVmutexDerived*                mtx_endpoint;                 
 } EOnvsCfg_ep_t;
 
 typedef struct
 {
-    uint16_t                index;
-    eOnvEP_t                ephashed;
+    uint16_t                        index;
+    eOnvEP_t                        ephashed;
 } eOnvsCfgEPhash_t;
 
 typedef struct
 {
-    eOipv4addr_t            ipaddress;
-    EOvector*               theendpoints;
-    eOnvscfgOwnership_t     ownership;
-    uint16_t                theendpoints_numberof; 
-    eOnvsCfgEPhash_t*       ephashtable;  
-    eOuint16_fp_uint16_t    hashfn_ep2index;    
+    eOipv4addr_t                    ipaddress;
+    EOvector*                       theendpoints;
+    eOnvscfgOwnership_t             ownership;
+    uint16_t                        theendpoints_numberof; 
+    eOnvsCfgEPhash_t*               ephashtable;  
+    eOuint16_fp_uint16_t            hashfn_ep2index;    
 } EOnvsCfg_device_t;
 
 
@@ -87,12 +88,12 @@ typedef struct
  **/
 struct EOnvsCfg_hid 
 {
-    EOvector*                   thedevices;
-    EOvector*                   ip2index;
-    uint16_t                    indexoflocaldevice;
-    eOnvscfgDevicesOwnership_t  devicesowneship;
-    EOVstorageDerived*          storage;
-    EOmatrix3d*                 allnvs;
+    EOvector*                       thedevices;
+    EOvector*                       ip2index;
+    uint16_t                        indexoflocaldevice;
+    eOnvscfgDevicesOwnership_t      devicesowneship;
+    EOVstorageDerived*              storage;
+    EOmatrix3d*                     allnvs;
 };   
  
 
