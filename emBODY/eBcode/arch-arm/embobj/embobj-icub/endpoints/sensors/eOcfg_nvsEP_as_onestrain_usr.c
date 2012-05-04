@@ -195,6 +195,7 @@ extern const EOconstvector* const eo_cfg_nvsEP_as_onestrain_usr_constvector_of_E
 extern void eo_cfg_nvsEP_as_onestrain_usr_initialise(eOnvEP_t ep, void* loc, void* rem)
 { 
     eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
        
     // launch a specialised initialisation
     eo_cfg_nvsEP_as_onestrain_usr_hid_INITIALISE(ep, loc, rem);

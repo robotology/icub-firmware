@@ -139,11 +139,11 @@ static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_eb1_data[] =
     
 };
 
-static void* s_eocfg_eps_ebx_ram[][2] =
+static void* s_eocfg_eps_ebx_ram[][3] =
 {
-    {NULL, NULL},   // mngmnt
-    {NULL, NULL},      
-    {NULL, NULL}    
+    {NULL, NULL, NULL},   // mngmnt
+    {NULL, NULL, NULL},      
+    {NULL, NULL, NULL}    
 };
 
 static const EOconstvector s_eo_cfg_EPs_vectorof_eb1 = 
@@ -172,7 +172,7 @@ extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb1_fptr_hashfunction_ep2index = 
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern void* eo_cfg_nvsEP_eb1_Get_RAM(eOnvEP_t ep, eOnvscfgOwnership_t ownership)
+extern void* eo_cfg_nvsEP_eb1_Get_remotelyownedRAM(eOnvEP_t ep, eOnvscfgOwnership_t ownership)
 {
     uint16_t i = s_hash(ep);
     
@@ -181,7 +181,19 @@ extern void* eo_cfg_nvsEP_eb1_Get_RAM(eOnvEP_t ep, eOnvscfgOwnership_t ownership
         return(NULL);
     }
     
-    return(s_eocfg_eps_ebx_ram[i][(eo_nvscfg_ownership_local == ownership) ? (0) : (1)]);       
+    return(s_eocfg_eps_ebx_ram[i][(eo_nvscfg_ownership_local == ownership) ? (1) : (2)]);       
+}
+
+extern void* eo_cfg_nvsEP_eb1_Get_locallyownedRAM(eOnvEP_t ep)
+{
+    uint16_t i = s_hash(ep);
+    
+    if(EOK_uint16dummy == i)
+    {
+        return(NULL);
+    }
+    
+    return(s_eocfg_eps_ebx_ram[i][0]);       
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -266,8 +278,16 @@ static void s_eocfg_eps_ebx_ram_retrieve(eOnvEP_t ep, void* loc, void* rem)
     uint16_t i = s_hash(ep);
     if(EOK_uint16dummy != i)
     {
-        s_eocfg_eps_ebx_ram[i][0] = loc;
-        s_eocfg_eps_ebx_ram[i][1] = rem;
+    
+        if((NULL != loc) && (NULL != rem))
+        {   // remotely owned
+            s_eocfg_eps_ebx_ram[i][1] = loc;
+            s_eocfg_eps_ebx_ram[i][2] = rem;
+        }
+        else
+        {
+            s_eocfg_eps_ebx_ram[i][0] = loc;
+        }
     }
 }
 
