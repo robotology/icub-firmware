@@ -178,7 +178,7 @@ static EOnvsCfg* s_eo_boardtransceiver_nvscfg_get(const eOboardtransceiver_cfg_t
 
     theepcfgs = cfg->vectorof_endpoint_cfg;
 
-    #warning --> so far the BOARDtransceiver does not use any storage. if needed ... change the NULL into a ...
+//    #warning --> so far the BOARDtransceiver does not use any storage. if needed ... change the NULL into a ...
     nvscfg = eo_nvscfg_New(1, NULL);
 
     nendpoints = eo_constvector_Size(theepcfgs);

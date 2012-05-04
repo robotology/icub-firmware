@@ -213,7 +213,7 @@ extern eOresult_t eo_former_GetStream(EOtheFormer *p, const EOrop *rop, const ui
     *ipaddr = rop->aboutip.ipaddr;
 
     // to be called only once just before transmission
-    #warning --> i have removed the eo_agent_hid_OutROPonTransmission() from inside the former .... verify it
+//    #warning --> i have removed the eo_agent_hid_OutROPonTransmission() from inside the former .... verify it
     //eo_agent_hid_OutROPonTransmission(eo_agent_GetHandle(), rop);
     
     return(eores_OK);
