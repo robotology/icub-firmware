@@ -125,10 +125,10 @@ static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_eb5_data[] =
     
 };
 
-static void* s_eocfg_eps_ebx_ram[][2] =
+static void* s_eocfg_eps_ebx_ram[][3] =
 {
-    {NULL, NULL},   // mngmnt
-    {NULL, NULL}   
+    {NULL, NULL, NULL},   // mngmnt
+    {NULL, NULL, NULL}   
 };
 
 static const EOconstvector s_eo_cfg_EPs_vectorof_eb5 = 
@@ -155,7 +155,7 @@ extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb5_fptr_hashfunction_ep2index = 
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern void* eo_cfg_nvsEP_eb5_Get_RAM(eOnvEP_t ep, eOnvscfgOwnership_t ownership)
+extern void* eo_cfg_nvsEP_eb5_Get_remotelyownedRAM(eOnvEP_t ep, eOnvscfgOwnership_t ownership)
 {
     uint16_t i = s_hash(ep);
     
@@ -164,7 +164,19 @@ extern void* eo_cfg_nvsEP_eb5_Get_RAM(eOnvEP_t ep, eOnvscfgOwnership_t ownership
         return(NULL);
     }
     
-    return(s_eocfg_eps_ebx_ram[i][(eo_nvscfg_ownership_local == ownership) ? (0) : (1)]);       
+    return(s_eocfg_eps_ebx_ram[i][(eo_nvscfg_ownership_local == ownership) ? (1) : (2)]);       
+}
+
+extern void* eo_cfg_nvsEP_eb5_Get_locallyownedRAM(eOnvEP_t ep)
+{
+    uint16_t i = s_hash(ep);
+    
+    if(EOK_uint16dummy == i)
+    {
+        return(NULL);
+    }
+    
+    return(s_eocfg_eps_ebx_ram[i][0]);       
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -176,8 +188,21 @@ extern void* eo_cfg_nvsEP_eb5_Get_RAM(eOnvEP_t ep, eOnvscfgOwnership_t ownership
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+static uint8_t s_hashtable[64] = 
+{
+    // 00-15: BS endpoint_mngmnt is 1 and is in pos 0
+    0xff, 0,    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+    // 16-31: MC endpoint_mc_torso is 0x15 and is in pos 1
+    0xff, 0xff, 0xff, 0xff, 0xff, 1,    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+    // 32-47: 
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+    // 48-63: 
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff     
+};
+
 static uint16_t s_hash(uint16_t ep)
 {
+#if 0
     uint16_t r = ep & 0xff;
     
     if(endpoint_mngmnt == r)
@@ -188,10 +213,16 @@ static uint16_t s_hash(uint16_t ep)
     {
         return(1);
     }
-
     
     return(EOK_uint16dummy);
-    #warning --> ma meglio usare una tabella con i numeri 0, 1  in posizione corrispondente al valore di r. magari una tabella comune definita in endpoints.c
+#else
+    uint16_t r = s_hashtable[ep & 0x3f];
+    if(0xff != r)
+    {
+        return(r);
+    }
+    return(EOK_uint16dummy);
+#endif
 }
 
 static uint16_t s_eo_cfg_nvsEP_eb5_hashfunction_ep2index(uint16_t ep)
@@ -228,10 +259,19 @@ static void s_eocfg_eps_ebx_ram_retrieve(eOnvEP_t ep, void* loc, void* rem)
     uint16_t i = s_hash(ep);
     if(EOK_uint16dummy != i)
     {
-        s_eocfg_eps_ebx_ram[i][0] = loc;
-        s_eocfg_eps_ebx_ram[i][1] = rem;
+    
+        if((NULL != loc) && (NULL != rem))
+        {   // remotely owned
+            s_eocfg_eps_ebx_ram[i][1] = loc;
+            s_eocfg_eps_ebx_ram[i][2] = rem;
+        }
+        else
+        {
+            s_eocfg_eps_ebx_ram[i][0] = loc;
+        }
     }
 }
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

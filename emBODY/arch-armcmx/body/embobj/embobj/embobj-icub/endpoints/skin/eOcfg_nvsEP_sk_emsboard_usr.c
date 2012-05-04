@@ -138,6 +138,7 @@ extern const EOconstvector* const eo_cfg_nvsEP_sk_emsboard_usr_constvector_of_EO
 extern void eo_cfg_nvsEP_sk_emsboard_usr_initialise(eOnvEP_t ep, void* loc, void* rem)
 {
     eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
     
     
     // launch a specialised initialisation
