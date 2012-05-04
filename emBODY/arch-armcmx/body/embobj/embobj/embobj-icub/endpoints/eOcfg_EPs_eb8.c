@@ -50,8 +50,8 @@
 #include "eOcfg_nvsEP_mc_upperleg_usr.h"
 
 
-#include "eOcfg_nvsEP_as_wholebody_con.h"
-#include "eOcfg_nvsEP_as_wholebody_usr.h"
+#include "eOcfg_nvsEP_as_onestrain_con.h"
+#include "eOcfg_nvsEP_as_onestrain_usr.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -99,8 +99,8 @@ extern const EOconstvector  s_eo_cfg_nvsEP_mngmnt_usr_constvector_of_EOnv_usr;
 extern const EOconstvector  s_eo_cfg_nvsEP_mc_upperleg_constvector_of_treenodes_EOnv_con;
 extern const EOconstvector  s_eo_cfg_nvsEP_mc_upperleg_usr_constvector_of_EOnv_usr;
 
-extern const EOconstvector  s_eo_cfg_nvsEP_as_wholebody_constvector_of_treenodes_EOnv_con;
-extern const EOconstvector  s_eo_cfg_nvsEP_as_wholebody_usr_constvector_of_EOnv_usr;
+extern const EOconstvector  s_eo_cfg_nvsEP_as_onestrain_constvector_of_treenodes_EOnv_con;
+extern const EOconstvector  s_eo_cfg_nvsEP_as_onestrain_usr_constvector_of_EOnv_usr;
 
 
 static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_eb8_data[] =
@@ -123,13 +123,13 @@ static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_eb8_data[] =
         EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mc_upperleg_usr_initialise
     },
     
-    {   // as-wholebody
-        EO_INIT(.endpoint)                          endpoint_as_wholebody,
-        EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_as_wholebody_t),
-        EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_as_wholebody_hashfunction_id2index,
-        EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_as_wholebody_constvector_of_treenodes_EOnv_con, 
-        EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_as_wholebody_usr_constvector_of_EOnv_usr, 
-        EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_as_wholebody_usr_initialise
+    {   // as-one strain
+        EO_INIT(.endpoint)                          endpoint_as_rightupperleg,
+        EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_as_onestrain_t),
+        EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_as_onestrain_hashfunction_id2index,
+        EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_as_onestrain_constvector_of_treenodes_EOnv_con, 
+        EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_as_onestrain_usr_constvector_of_EOnv_usr, 
+        EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_as_onestrain_usr_initialise
     }
     
 };
@@ -181,7 +181,7 @@ static uint16_t s_hash(uint16_t ep)
     {
         return(1);
     }
-    else if(endpoint_as_wholebody == r)
+    else if(endpoint_as_rightupperleg == r)
     {
         return(2);
     }
@@ -203,7 +203,7 @@ static uint16_t s_eo_cfg_nvsEP_eb8_hashfunction_ep2index(uint16_t ep)
 
     static const uint16_t s_eptable[EPTABLESIZE] = 
     { 
-        endpoint_mngmnt,        endpoint_mc_rightupperleg,       endpoint_as_wholebody
+        endpoint_mngmnt,        endpoint_mc_rightupperleg,       endpoint_as_rightupperleg
     };
    
     uint16_t index = s_hash(ep);
