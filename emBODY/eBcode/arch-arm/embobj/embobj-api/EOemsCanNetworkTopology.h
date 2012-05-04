@@ -131,17 +131,23 @@ typedef struct
 
 extern EOemsCanNetTopo* eo_emsCanNetTopo_New(eo_emsCanNetTopo_cfg_t *cfg);
 
-extern eOresult_t eo_emsCanNetTopo_GetJointCanLocation_ByJointUniqueId(EOemsCanNetTopo *p, eOmc_jointUniqueId_t jUniqueId, 
+extern eOresult_t eo_emsCanNetTopo_GetJointCanLocation_ByJointId(EOemsCanNetTopo *p, eOmc_jointId_t jId, 
                                                                         eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eObrd_types_t *boardType);
 
-extern eOresult_t eo_emsCanNetTopo_GetMotorCanLocation_ByMotorUniqueId(EOemsCanNetTopo *p, eOmc_motorUniqueId_t mUniqueId, 
+extern eOresult_t eo_emsCanNetTopo_GetMotorCanLocation_ByMotorId(EOemsCanNetTopo *p, eOmc_motorId_t mId, 
                                                                         eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eObrd_types_t *boardType);
 
 
-extern eOresult_t eo_emsCanNetTopo_GetJointUinqueId_ByJointCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eOmc_jointUniqueId_t *jUniqueId_ptr);
+extern eOresult_t eo_emsCanNetTopo_GetSensorCanLocation_BySensorId(EOemsCanNetTopo *p, eOsnsr_sensorId_t sId, 
+                                                                        eo_emsCanNetTopo_sensorCanLocation_t *location_ptr, eObrd_types_t *boardType);
 
-extern eOresult_t eo_emsCanNetTopo_GetMotorUinqueId_ByMotorCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eOmc_motorUniqueId_t *mUniqueId_ptr);
 
+
+extern eOresult_t eo_emsCanNetTopo_GetJointId_ByJointCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eOmc_jointId_t *jId_ptr);
+
+extern eOresult_t eo_emsCanNetTopo_GetMotorId_ByMotorCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eOmc_motorId_t *mId_ptr);
+
+extern eOresult_t eo_emsCanNetTopo_GetSensorId_ByMotorCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_sensorCanLocation_t *location_ptr, eOsnsr_sensorId_t *sId_ptr);
 
 /*VALE: aggiungi funzione che dato joint id ritorna il tipo di board che lo gestisce! idem per il kotor. puo' venire utile??*/
 

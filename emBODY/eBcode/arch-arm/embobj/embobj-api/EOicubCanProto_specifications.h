@@ -216,10 +216,15 @@ ICUBCANPROTO_PER_SB_CMD_
 /***************************************************************************/
 #define ICUBCANPROTO_PER_SB_CMD__FORCE_VECTOR      0xA // Transmit Torque values t1 t1 t2 t2 t3 t3
 #define ICUBCANPROTO_PER_SB_CMD__TORQUE_VECTOR     0xB // Transmit Force  values f1 f1 f2 f2 f3 f3
-#define ICUBCANPROTO_PER_SB_CMD__HES0TO3           0xC // hall effect sensors from 0  to 3  *16bits
-#define ICUBCANPROTO_PER_SB_CMD__HES4TO7           0xD // hall effect sensors from 4  to 7  *16bits
-#define ICUBCANPROTO_PER_SB_CMD__HES8TO11          0xE // hall effect sensors from 8  to 11 *16bits
-#define ICUBCANPROTO_PER_SB_CMD__HES12TO14         0xF // hall effect sensors from 12 to 14 *16bits
+#define ICUBCANPROTO_PER_SB_CMD__HES0TO6           0xC //hall effect sensors from 0  to 6  *8bits
+#define ICUBCANPROTO_PER_SB_CMD__HES7TO14          0xD //hall effect sensors from 7  to 14  *8bits
+
+
+//the following msg are unused!!!
+//#define ICUBCANPROTO_PER_SB_CMD__HES0TO3           0xC // hall effect sensors from 0  to 3  *16bits
+//#define ICUBCANPROTO_PER_SB_CMD__HES4TO7           0xD // hall effect sensors from 4  to 7  *16bits
+//#define ICUBCANPROTO_PER_SB_CMD__HES8TO11          0xE // hall effect sensors from 8  to 11 *16bits
+//#define ICUBCANPROTO_PER_SB_CMD__HES12TO14         0xF // hall effect sensors from 12 to 14 *16bits
 //there there aren't skin's messages!!!
 
 #define ICUBCANPROTO_PER_SB_CMD__CMD_MAXNUM         6
