@@ -122,6 +122,11 @@ extern void eo_pid_Reset(EOpid *o)
     o->Dn   = 0.0f; 
 }
 
+extern float eo_pid_GetOffset(EOpid *o)
+{
+    return o->Ko;
+}
+
 /*
 extern float eo_pid_PWM(EOpid *o, float En)
 {
