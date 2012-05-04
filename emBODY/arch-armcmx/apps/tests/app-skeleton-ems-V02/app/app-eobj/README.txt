@@ -1,0 +1,1 @@
+vale: ethBasemodule lo metto negli embobj oppure lo lascio nella appl??
