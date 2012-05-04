@@ -68,18 +68,18 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_eo_agent_on_rop_confirmation_received(eOipv4addr_t ipaddr, eOropcode_t ropc, eOnvID_t nvid, 
-                                                    uint32_t sign, eOabstime_t time, eOropconfinfo_t confinfo);
+// static void s_eo_agent_on_rop_confirmation_received(eOipv4addr_t ipaddr, eOropcode_t ropc, eOnvID_t nvid, 
+//                                                     uint32_t sign, eOabstime_t time, eOropconfinfo_t confinfo);
 
 
-static void s_eo_agent_on_rop_confirmation_requested(eOipv4addr_t ipaddr, eOropcode_t ropc, eOnvID_t nvid,
-                                                     uint32_t sign, eOabstime_t time);
+// static void s_eo_agent_on_rop_confirmation_requested(eOipv4addr_t ipaddr, eOropcode_t ropc, eOnvID_t nvid,
+//                                                      uint32_t sign, eOabstime_t time);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const char s_eobj_ownname[] = "EOtheAgent";
+//static const char s_eobj_ownname[] = "EOtheAgent";
  
 static EOtheAgent eo_theagent = 
 {
@@ -396,22 +396,22 @@ extern eOresult_t eo_agent_hid_OutROPonTransmission(EOtheAgent *p, EOrop *rop)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static void s_eo_agent_on_rop_confirmation_received(eOipv4addr_t ipaddr, eOropcode_t ropc, eOnvID_t nvid, 
-                                                    uint32_t sign, eOabstime_t time, eOropconfinfo_t confinfo)
-{
-    char str[64];
-    snprintf(str, sizeof(str)-1, "rx %s for opc %d and nvid 0x%xd from ip %d", (eo_ropconf_ack == confinfo) ? ("ack") : ("nak"), ropc, nvid, ipaddr);
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, s_eobj_ownname, str);    
-}
+// static void s_eo_agent_on_rop_confirmation_received(eOipv4addr_t ipaddr, eOropcode_t ropc, eOnvID_t nvid, 
+//                                                     uint32_t sign, eOabstime_t time, eOropconfinfo_t confinfo)
+// {
+//     char str[64];
+//     snprintf(str, sizeof(str)-1, "rx %s for opc %d and nvid 0x%xd from ip %d", (eo_ropconf_ack == confinfo) ? ("ack") : ("nak"), ropc, nvid, ipaddr);
+//     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, s_eobj_ownname, str);    
+// }
 
 
-static void s_eo_agent_on_rop_confirmation_requested(eOipv4addr_t ipaddr, eOropcode_t ropc, eOnvID_t nvid,
-                                                     uint32_t sign, eOabstime_t time)
-{
-    char str[64];
-    snprintf(str, sizeof(str)-1, "rqst conf for opc %d and nvid 0x%x from ip %d", ropc, nvid, ipaddr);
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, s_eobj_ownname, str);        
-}
+// static void s_eo_agent_on_rop_confirmation_requested(eOipv4addr_t ipaddr, eOropcode_t ropc, eOnvID_t nvid,
+//                                                      uint32_t sign, eOabstime_t time)
+// {
+//     char str[64];
+//     snprintf(str, sizeof(str)-1, "rqst conf for opc %d and nvid 0x%x from ip %d", ropc, nvid, ipaddr);
+//     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, s_eobj_ownname, str);        
+// }
 
 
 // --------------------------------------------------------------------------------------------------------------------
