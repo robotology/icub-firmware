@@ -1370,7 +1370,10 @@ static void s_test_nvs_transceiver_pc104_occasional_load(EOtransceiver *txrx, eO
 
 static void s_test_nvs_transceiver_pc104_configure_ems(EOtransceiver *txrx)
 {
-    EOarray *upto10 = (EOarray*) & eo_cfg_nvsEP_mngmnt_usr_remotelyownedmemory_loc->ropsigcfgassign;
+    eo_cfg_nvsEP_mngmnt_t* nvsEP_mngmnt_usr_remotelyownedmemory_loc = eo_cfg_nvsEP_ebx_Get_remotelyownedRAM(endpoint_mngmnt, eo_nvscfg_ownership_local);
+    
+
+    EOarray *upto10 = (EOarray*) & nvsEP_mngmnt_usr_remotelyownedmemory_loc->ropsigcfgassign;
     eOropSIGcfg_t sigcfg;
 
     eo_array_Reset(upto10);
