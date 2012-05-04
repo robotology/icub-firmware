@@ -42,10 +42,10 @@ struct EOtrajectory_hid
     float Ky; /**< fast incremental algorithm register */
     float Fi; /**< fast incremental algorithm register */
     float Kf; /**< fast incremental algorithm register */
-    float pi; /**< trajectory actual point */
-    float pf; /**< trajectory end point */
 
-    float delta; /**< last step value */
+    float pi; /**< trajectory actual point    */
+    float pf; /**< trajectory end point       */
+    float vi; /**< trajectory actual velocity */
 
     uint32_t steps_to_end; /**< steps required to complete the trajectory */
 }; 

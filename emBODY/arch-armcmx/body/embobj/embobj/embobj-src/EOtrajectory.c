@@ -91,8 +91,7 @@ extern EOtrajectory* eo_trajectory_New(void)
 
         o->pi = 0.0f;
         o->pf = 0.0f;
-        
-        o->delta = 0.0f;
+        o->vi = 0.0f;
 
         o->steps_to_end = 0;
     }
@@ -154,8 +153,7 @@ extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, floa
 
     o->pi = p0;
     o->pf = pf;
-
-    o->delta = 0.0f;
+    o->vi = v0;
 }
 
 
@@ -168,15 +166,15 @@ extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, floa
 extern void eo_trajectory_Abort(EOtrajectory *o)
 {
     o->steps_to_end = 0;
-    o->delta = 0.0f;
+    o->vi = 0.0f;
     o->pf = o->pi;
 }
 
 extern void eo_trajectory_Stop(EOtrajectory *o, float pos)
 {
     o->steps_to_end = 0;
-    o->delta = 0.0f;
-    o->pf = pos;
+    o->vi = 0.0f;
+    o->pf = o->pi = pos;
 }
 
 extern uint8_t eo_trajectory_IsDone(EOtrajectory* o)
@@ -191,15 +189,19 @@ extern float eo_trajectory_GetPos(EOtrajectory* o)
 
 extern float eo_trajectory_GetVel(EOtrajectory* o)
 {
-    return o->delta*FREQUENCY;
+    return o->vi;
 }
 
-extern float eo_trajectory_Step(EOtrajectory* o)
+extern void eo_trajectory_Step(EOtrajectory* o, float *pi, float *vi)
 {
-    float pi;
+    if (!o->steps_to_end)
+    {
+        o->pi = *pi = o->pf;
+        o->vi = *vi = 0.0f;
 
-    if (!o->steps_to_end) return o->pf;
-        
+        return;
+    }
+       
     --(o->steps_to_end);
     
     o->Ai += o->Bi; 
@@ -211,37 +213,15 @@ extern float eo_trajectory_Step(EOtrajectory* o)
 
     o->Fi += o->Kf;
     
-    pi = o->Fi + o->Ai*o->Zi;
-    o->delta = pi - o->pi;
-    o->pi = pi;
+    *pi = o->Fi + o->Ai*o->Zi;
+    
+    if (vi)
+    {
+        o->vi = *vi = (*pi - o->pi) * FREQUENCY;
+    }
 
-    return pi;
+    o->pi = *pi;    
 }
-
-extern float eo_trajectory_StepDelta(EOtrajectory* o)
-{
-    float pi;
-
-    if (!o->steps_to_end) return o->pf;
-        
-    --(o->steps_to_end);
-    
-    o->Ai += o->Bi; 
-    o->Bi += o->Ci;
-    o->Ci += o->Kc;
-    
-    o->Zi += o->Yi; 
-    o->Yi += o->Ky;
-
-    o->Fi += o->Kf;
-    
-    pi = o->Fi + o->Ai*o->Zi;
-    o->delta = pi - o->pi;
-    o->pi = pi;
-
-    return o->delta;
-}
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

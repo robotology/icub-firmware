@@ -37,34 +37,37 @@ struct EOmotorcontroller_hid
 {
     EOpid *pidP;
     EOpid *pidT;
+    EOpid *pidI;
 
     EOtrajectory *trajectory;
 
-    float stiffness;
-    
-    float encpos_meas;
-    float torque_meas;
-    
-    float pos_now;
-    float vel_now;
-    float vel_now_PERIOD;
-
-    float vel_pos_ref;
-    float vel_timer;
-    float vel_timeout;
-
-    float pos_ref;
-    float speed;
-
-    float vel_ref;
-    float acc_ref;
-
+    // axis limits
     float pos_min;
     float pos_max;
     float vel_max;
 
-    float torque_ref;
+    // parameters
+    float stiffness;
     
+    // measures (read only)
+    float encpos_meas;
+    float torque_meas;
+
+    // velocity control
+    float pos_vel_bias;
+    float vel_ref;
+    float acc_ref_step;
+    float vel_timer;
+    float vel_timeout;
+
+    float pos_out;
+    float vel_out;
+    float vel_out_step;
+
+
+    // torque control
+    float torque_ref;
+
     uint8_t control_mode;
 }; 
 

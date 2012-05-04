@@ -103,6 +103,7 @@ extern EOmotorcontroller* eo_motorcontroller_New(void)
 
         o->pidP = eo_pid_New();
         o->pidT = eo_pid_New();
+        o->pidI = eo_pid_New();
         
         o->trajectory = eo_trajectory_New(); 
     }
@@ -159,7 +160,7 @@ extern uint8_t eo_motorcontroller_SetRefPos(EOmotorcontroller *o, float pos_ref,
 
 extern uint8_t eo_motorcontroller_SetRefVel(EOmotorcontroller *o, float vel_ref, float acc_ref)
 {
-    if (o->control_mode == CM_IDLE || o->control_mode == CM_TORQUE || o->control_mode == CM_OPENLOOP /*|| !IS_DONE*/) return 0;
+    if (o->control_mode == CM_IDLE || o->control_mode == CM_TORQUE || o->control_mode == CM_OPENLOOP) return 0;
 
     if (o->control_mode == CM_IMPEDANCE_POS || o->control_mode == CM_IMPEDANCE_VEL)
     { 
@@ -171,11 +172,9 @@ extern uint8_t eo_motorcontroller_SetRefVel(EOmotorcontroller *o, float vel_ref,
     }
 
     o->vel_ref = limit(vel_ref, -o->vel_max, o->vel_max); 
-    o->acc_ref = acc_ref * ( acc_ref > 0.0f ? PERIOD:-PERIOD);
+    o->acc_ref_step = acc_ref * ( acc_ref > 0.0f ? PERIOD:-PERIOD);
     o->vel_pos_ref = o->encpos_meas;
     o->vel_timer = 0.0f;
-
-    //if (o->control_mode == CM_POSITION || o->control_mode == CM_IMPEDANCE_POS) o->vel = 0.0f;
 
     return 1;
 }
@@ -192,11 +191,11 @@ extern uint8_t eo_motorcontroller_SetControlMode(EOmotorcontroller *o, control_m
 
             if (eo_trajectory_IsDone(o->trajectory))
             {
-                eo_trajectory_Stop(o->trajectory,o->encpos_meas);
+                eo_trajectory_Stop(o->trajectory, o->encpos_meas);
             }
             else
             {
-                eo_trajectory_SetReference(o->trajectory, o->encpos_meas, o->pos_ref, o->vel_now, o->speed);    
+                eo_trajectory_SetReference(o->trajectory, o->encpos_meas, o->pos_ref, o->vel_out, o->speed);    
             }
 
             break;
@@ -220,45 +219,64 @@ extern float eo_motorcontroller_PWM(EOmotorcontroller *o)
     switch (o->control_mode)
     {
         case CM_IDLE:
-            return 0.0f;
-            
-        case CM_POSITION:
-        {
-            o->pos_ref = eo_trajectory_Step(o->trajectory);
-            o->vel_now = eo_trajectory_GetVel(o->trajectory);
+            break;
 
-            return eo_pid_PWM(o->pidP, o->pos_ref - o->encpos_meas);
+        case CM_IMPEDANCE_VEL:
+        {
         }
 
         case CM_IMPEDANCE_POS:
         {
-            o->pos_ref = eo_trajectory_Step(o->trajectory);
-            o->vel_now = eo_trajectory_GetVel(o->trajectory);
+            eo_trajectory_Step(o->trajectory, &(o->pos_out), &(o->vel_out));
+
+
+        }
+
+        case CM_POSITION:
+        {
+            eo_trajectory_Step(o->trajectory, &(o->pos_out), &(o->vel_out));
+
+            return eo_pid_PWM(o->pidP, o->pos_out - o->encpos_meas);
         }
 
         case CM_VELOCITY:
         {
-            float vel_err = o->vel_ref - o->vel_now;
+            float last_pos_out = o->pos_out;
+
+            float vel_err = o->vel_ref - o->vel_out;
 
             if (vel_err != 0.0f)
             {
-                if (vel_err < -o->acc_ref)
+                if (vel_err < -o->acc_ref_step)
                 {
-                    o->vel_now = limit(o->vel_now - o->acc_ref, -o->vel_max, o->vel_max);
+                    o->vel_out = limit(o->vel_out - o->acc_ref_step, -o->vel_max, o->vel_max);
                 }
-                else if (vel_err > o->acc_ref)
+                else if (vel_err > o->acc_ref_step)
                 {
-                    o->vel_now = limit(o->vel_now + o->acc_ref, -o->vel_max, o->vel_max);
+                    o->vel_out = limit(o->vel_out + o->acc_ref_step, -o->vel_max, o->vel_max);
                 }
                 else
                 {
-                    o->vel_now = limit(o->vel_ref, -o->vel_max, o->vel_max);
+                    o->vel_out = limit(o->vel_ref, -o->vel_max, o->vel_max);
                 }
 
-                o->vel_now_PERIOD = o->vel_now * PERIOD;
+                o->vel_out_step = o->vel_out * PERIOD;
             }
 
-            o->vel_pos_ref = limit(o->vel_pos_ref + o->vel_now_PERIOD, o->pos_min, o->pos_max); 
+            eo_trajectory_Step(o->trajectory, &(o->pos_out), &(o->vel_out));            
+            o->pos_vel_bias += o->vel_out_step;
+            o->pos_out += o->pos_vel_bias;
+
+            if (o->pos_out < o->pos_min && o->pos_out < last_pos_out)
+            {
+                o->pos_out = o->pos_min;
+                o->vel_ref = 0.0f;
+            }
+            else if (o->pos_out > o->pos_max && o->pos_out > last_pos_out)
+            {
+                o->pos_out = o->pos_max;
+                o->vel_ref = 0.0f;
+            }
 
             o->vel_timer += PERIOD;
 
@@ -266,19 +284,18 @@ extern float eo_motorcontroller_PWM(EOmotorcontroller *o)
             {
                 o->vel_timer = 0.0f;
                 o->control_mode = CM_POSITION;
-
-                if (eo_trajectory_IsDone(o->trajectory))
-                {
-                    eo_trajectory_Stop(o->trajectory,o->encpos_meas);
-                }
-                else
-                {
-                    eo_trajectory_SetReference(o->trajectory, o->encpos_meas, o->pos_ref, o->vel_now, o->speed);    
-                }
+                
+                eo_trajectory_Stop(o->trajectory, o->pos_out);
             }   
 
-            return eo_pid_PWM(o->pidP, o->vel_pos_ref - o->encpos_meas);
-        }         
+            return eo_pid_PWM(o->pidP, o->pos_out - o->encpos_meas);
+        }
+
+
+
+
+
+
 
         case CM_TORQUE:
         {
@@ -288,9 +305,6 @@ extern float eo_motorcontroller_PWM(EOmotorcontroller *o)
 
             return pwm;
         }       
-      
-        case CM_IMPEDANCE_VEL:
-        ;
     }
     
     return 0.0f;   
@@ -312,6 +326,8 @@ static float limit(float x, float min, float max)
     if (x > max) return max;
     return x;    
 }
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
