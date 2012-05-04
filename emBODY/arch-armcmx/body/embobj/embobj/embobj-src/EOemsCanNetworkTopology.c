@@ -101,7 +101,7 @@ extern EOemsCanNetTopo* eo_emsCanNetTopo_New(eo_emsCanNetTopo_cfg_t *cfg)
 } 
 
 
-extern eOresult_t eo_emsCanNetTopo_GetJointCanLocation_ByJointUniqueId(EOemsCanNetTopo *p, eOmc_jointUniqueId_t jUniqueId, 
+extern eOresult_t eo_emsCanNetTopo_GetJointCanLocation_ByJointId(EOemsCanNetTopo *p, eOmc_jointId_t jId, 
                                                                         eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eObrd_types_t *boardType)
 {
     if((NULL == p) || (NULL == location_ptr))
@@ -109,52 +109,78 @@ extern eOresult_t eo_emsCanNetTopo_GetJointCanLocation_ByJointUniqueId(EOemsCanN
         return(eores_NOK_nullpointer);
     }
     
-    if( NULL == p->joint_Id2CanLoc_hTbl[jUniqueId].ptr)
+    if( NULL == p->joint_Id2CanLoc_hTbl[jId].ptr)
     {
         return(eores_NOK_nodata);
     }
 
-    location_ptr->canaddr = p->joint_Id2CanLoc_hTbl[jUniqueId].ptr->boardAddr;
-    location_ptr->axis = p->joint_Id2CanLoc_hTbl[jUniqueId].ptr->axis;
-    location_ptr->emscanport = p->joint_Id2CanLoc_hTbl[jUniqueId].ptr->canPort;
+    location_ptr->canaddr = p->joint_Id2CanLoc_hTbl[jId].ptr->boardAddr;
+    location_ptr->axis = p->joint_Id2CanLoc_hTbl[jId].ptr->axis;
+    location_ptr->emscanport = p->joint_Id2CanLoc_hTbl[jId].ptr->canPort;
 
     if(NULL !=boardType)
     {
-        *boardType = p->joint_Id2CanLoc_hTbl[jUniqueId].ptr->boardType;
+        *boardType = p->joint_Id2CanLoc_hTbl[jId].ptr->boardType;
     }
     return(eores_OK);
 }
 
-extern eOresult_t eo_emsCanNetTopo_GetMotorCanLocation_ByMotorUniqueId(EOemsCanNetTopo *p, eOmc_motorUniqueId_t mUniqueId, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eObrd_types_t *boardType)
+extern eOresult_t eo_emsCanNetTopo_GetMotorCanLocation_ByMotorId(EOemsCanNetTopo *p, eOmc_motorId_t mId, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eObrd_types_t *boardType)
 {
     if((NULL == p) || (NULL == location_ptr))
     {
         return(eores_NOK_nullpointer);
     }
     
-    if( NULL == p->motor_Id2CanLoc_hTbl[mUniqueId].ptr)
+    if( NULL == p->motor_Id2CanLoc_hTbl[mId].ptr)
     {
         return(eores_NOK_nodata);
     }
 
-    location_ptr->canaddr = p->motor_Id2CanLoc_hTbl[mUniqueId].ptr->boardAddr;
-    location_ptr->axis = p->motor_Id2CanLoc_hTbl[mUniqueId].ptr->axis;
-    location_ptr->emscanport = p->motor_Id2CanLoc_hTbl[mUniqueId].ptr->canPort;
+    location_ptr->canaddr = p->motor_Id2CanLoc_hTbl[mId].ptr->boardAddr;
+    location_ptr->axis = p->motor_Id2CanLoc_hTbl[mId].ptr->axis;
+    location_ptr->emscanport = p->motor_Id2CanLoc_hTbl[mId].ptr->canPort;
 
     if(NULL !=boardType)
     {
-        *boardType = p->motor_Id2CanLoc_hTbl[mUniqueId].ptr->boardType;
+        *boardType = p->motor_Id2CanLoc_hTbl[mId].ptr->boardType;
     }
 
     return(eores_OK);
 }
 
 
-extern eOresult_t eo_emsCanNetTopo_GetJointUinqueId_ByJointCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eOmc_jointUniqueId_t *jUniqueId_ptr)
+extern eOresult_t eo_emsCanNetTopo_GetSensorCanLocation_BySensorId(EOemsCanNetTopo *p, eOsnsr_sensorId_t sId, 
+                                                                        eo_emsCanNetTopo_sensorCanLocation_t *location_ptr, eObrd_types_t *boardType)
+{
+    if((NULL == p) || (NULL == location_ptr))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if( NULL == p->sensor_Id2CanLoc_hTbl[sId].ptr)
+    {
+        return(eores_NOK_nodata);
+    }
+
+    location_ptr->canaddr = p->sensor_Id2CanLoc_hTbl[sId].ptr->boardAddr;
+    location_ptr->emscanport = p->sensor_Id2CanLoc_hTbl[sId].ptr->canPort;
+
+    if(NULL !=boardType)
+    {
+        *boardType = p->sensor_Id2CanLoc_hTbl[sId].ptr->boardType;
+    }
+    return(eores_OK);
+}
+
+
+
+
+extern eOresult_t eo_emsCanNetTopo_GetJointId_ByJointCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eOmc_jointId_t *jId_ptr)
 {
 
-    eo_emsCanNetTopo_hashTbl_item_t *item_ptr;
-    if((NULL == p) || (NULL == location_ptr) || (NULL == jUniqueId_ptr))
+    eo_emsCanNetTopo_hashTbl_jm_item_t *item_ptr;
+    if((NULL == p) || (NULL == location_ptr) || (NULL == jId_ptr))
     {
         return(eores_NOK_nullpointer);
     }
@@ -165,14 +191,16 @@ extern eOresult_t eo_emsCanNetTopo_GetJointUinqueId_ByJointCanLocation(EOemsCanN
         return(eores_NOK_nodata);
     }
 
-    *jUniqueId_ptr = item_ptr->id;
+    *jId_ptr = item_ptr->id;
     return(eores_OK);
 }
 
-extern eOresult_t eo_emsCanNetTopo_GetMotorUinqueId_ByMotorCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eOmc_motorUniqueId_t *mUniqueId_ptr)
+
+
+extern eOresult_t eo_emsCanNetTopo_GetMotorId_ByMotorCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eOmc_motorId_t *mId_ptr)
 {
-    eo_emsCanNetTopo_hashTbl_item_t *item_ptr;
-    if((NULL == p) || (NULL == location_ptr) || (NULL == mUniqueId_ptr))
+    eo_emsCanNetTopo_hashTbl_jm_item_t *item_ptr;
+    if((NULL == p) || (NULL == location_ptr) || (NULL == mId_ptr))
     {
         return(eores_NOK_nullpointer);
     }
@@ -183,12 +211,30 @@ extern eOresult_t eo_emsCanNetTopo_GetMotorUinqueId_ByMotorCanLocation(EOemsCanN
         return(eores_NOK_nodata);
     }
 
-    *mUniqueId_ptr = item_ptr->id;
+    *mId_ptr = item_ptr->id;
     return(eores_OK);
 
 }
 
 
+extern eOresult_t eo_emsCanNetTopo_GetSensorId_ByMotorCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_sensorCanLocation_t *location_ptr, eOsnsr_sensorId_t *sId_ptr)
+{
+
+    eo_emsCanNetTopo_hashTbl_s_item_t *item_ptr;
+    if((NULL == p) || (NULL == location_ptr) || (NULL == sId_ptr))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    item_ptr = &(p->sensor_CanLoc2Id_hTbl[location_ptr->emscanport][location_ptr->canaddr]); 
+    if( NULL == item_ptr->ptr)
+    {
+        return(eores_NOK_nodata);
+    }
+
+    *sId_ptr = item_ptr->id;
+    return(eores_OK);
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -253,7 +299,26 @@ static void s_eo_emsCanNetTopo_hashTbl_motor_init(EOemsCanNetTopo *p)
 
 }
 
+static void s_eo_emsCanNetTopo_hashTbl_sensor_init(EOemsCanNetTopo *p)
+{
+    uint8_t i; //i indexes the motorBoardCanLoc2NvsRef lookup tbl
+    eo_emsCanNetTopo_sensorTopoInfo_t *s_topoinfo_ptr = (eo_emsCanNetTopo_sensorTopoInfo_t*)(p->cfg.emsCanNetTopo_sensors__ptr->item_array_data);
 
+    //reset hashtbl
+    memset(p->sensor_Id2CanLoc_hTbl, 0x0, sizeof(p->sensor_Id2CanLoc_hTbl));  //probabilmente non e' suff==> da rivedere   
+    memset(p->sensor_CanLoc2Id_hTbl, 0x0, sizeof(p->sensor_CanLoc2Id_hTbl));  //probabilmente non e' suff==> da rivedere   
+    
+
+    for(i = 0; i< p->cfg.emsCanNetTopo_sensors__ptr->size; i++)
+    {
+        p->sensor_Id2CanLoc_hTbl[s_topoinfo_ptr[i].id].ptr =&s_topoinfo_ptr[i];
+        p->sensor_Id2CanLoc_hTbl[s_topoinfo_ptr[i].id].id  = i;   
+    
+        p->sensor_CanLoc2Id_hTbl[s_topoinfo_ptr[i].canPort][s_topoinfo_ptr[i].boardAddr].id = i; 
+        p->sensor_CanLoc2Id_hTbl[s_topoinfo_ptr[i].canPort][s_topoinfo_ptr[i].boardAddr].ptr = &s_topoinfo_ptr[i]; 
+    }
+
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
