@@ -27,19 +27,19 @@
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 typedef enum { 
-    CM_IDLE                 =0x00, 
-    CM_POSITION             =0x01,
-    CM_VELOCITY             =0x02, 
-    CM_TORQUE               =0x03, 
-    CM_IMPEDANCE_POS        =0x04, 
-    CM_IMPEDANCE_VEL        =0x05,
+    CM_IDLE                 =0x00,   //
+    CM_POSITION             =0x01,   //
+    CM_VELOCITY             =0x02,   //
+    CM_TORQUE               =0x03,   //
+    CM_IMPEDANCE_POS        =0x04,   //
+    CM_IMPEDANCE_VEL        =0x05,   //
 
-    CM_CALIB_ABS_POS_SENS   =0x10,
+    CM_CALIB_ABS_POS_SENS   =0x10,   //
     CM_CALIB_HARD_STOPS     =0x20,
     CM_HANDLE_HARD_STOPS    =0x30,
-    CM_MARGIN_REACHED       =0x40,
-    CM_CALIB_ABS_AND_INC    =0x41,
-    CM_OPENLOOP             =0x50
+    CM_MARGIN_REACHED       =0x40,   // ?
+    CM_CALIB_ABS_AND_INC    =0x41,   //
+    CM_OPENLOOP             =0x50    //
 } control_mode_t;
 
 /** @typedef    typedef struct EOmotorcontroller_hid EOmotorcontroller

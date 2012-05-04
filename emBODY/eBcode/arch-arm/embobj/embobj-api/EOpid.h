@@ -74,6 +74,8 @@ extern void eo_pid_Reset(EOpid *o);
  **/
 extern float eo_pid_PWM(EOpid *o, float En);
 
+extern float eo_pid_GetOffset(EOpid *o);
+
 /** @}            
     end of group eo_pid  
  **/

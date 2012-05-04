@@ -45,9 +45,6 @@ struct EOmotorcontroller_hid
     float pos_min;
     float pos_max;
     float vel_max;
-
-    // parameters
-    float stiffness;
     
     // measures (read only)
     float encpos_meas;
@@ -64,9 +61,16 @@ struct EOmotorcontroller_hid
     float vel_out;
     float vel_out_step;
 
-
     // torque control
     float torque_ref;
+    float torque_out;
+    float torque_off;
+    float torque_last_pos_err;
+    float torque_damp_lp_filt;
+
+    // parameters
+    float stiffness;
+    float damping;
 
     uint8_t control_mode;
 }; 
