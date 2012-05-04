@@ -63,6 +63,16 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
+/** @fn         extern void* eo_cfg_nvsEP_eb8_Get_RAM(eOnvEP_t ep, eOnvscfgOwnership_t ownership)
+    @brief      retrieves the RAM of the endpoint specified by @e ep if loaded by the EOnvsCfg object with eo_cfg_EPs_vectorof_ebx .
+    @param      ep              The endpoint.
+    @param      ownnership      local or remote.
+    @return     The pointer to teh memory or NULL if the memory is not initialised yet or if the ep is not recognised
+ **/
+extern void* eo_cfg_nvsEP_eb8_Get_RAM(eOnvEP_t ep, eOnvscfgOwnership_t ownership);
+
+ 
+
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------

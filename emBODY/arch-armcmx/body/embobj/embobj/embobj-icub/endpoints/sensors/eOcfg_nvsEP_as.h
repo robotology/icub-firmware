@@ -57,15 +57,15 @@
  **/
 typedef enum
 {
-    endpoint_as_leftupperarm                        = 0x0041,   /**< used by EB1 board. it has a strain */
-    endpoint_as_leftlowerarm                        = 0x0042,   /**< used by EB2 board. it has a mais   */
+    endpoint_as_leftupperarm                        = 0x0021,   /**< used by EB1 board. it has a strain */
+    endpoint_as_leftlowerarm                        = 0x0022,   /**< used by EB2 board. it has a mais   */
     
-    endpoint_as_rightupperarm                       = 0x0043,   /**< used by EB3 board. it has a strain */
-    endpoint_as_rightlowerarm                       = 0x0044,   /**< used by EB4 board. it has a mais   */
+    endpoint_as_rightupperarm                       = 0x0023,   /**< used by EB3 board. it has a strain */
+    endpoint_as_rightlowerarm                       = 0x0024,   /**< used by EB4 board. it has a mais   */
 
-    endpoint_as_leftupperleg                        = 0x0046,   /**< used by EB6 board. it has a strain */
+    endpoint_as_leftupperleg                        = 0x0026,   /**< used by EB6 board. it has a strain */
     
-    endpoint_as_rightupperleg                       = 0x0048    /**< used by EB8 board. it has a strain */
+    endpoint_as_rightupperleg                       = 0x0028    /**< used by EB8 board. it has a strain */
 
 } eo_cfg_nvsEP_as_endpoint_t;
 

@@ -185,15 +185,7 @@ const EOconstvector  s_eo_cfg_nvsEP_as_onestrain_usr_constvector_of_EOnv_usr =
 
 extern const EOconstvector* const eo_cfg_nvsEP_as_onestrain_usr_constvector_of_EOnv_usr = &s_eo_cfg_nvsEP_as_onestrain_usr_constvector_of_EOnv_usr;
 
-extern eo_cfg_nvsEP_as_onestrain_t* nvsEP_as_onestrain_usr_mem_local    = NULL;
-extern eo_cfg_nvsEP_as_onestrain_t* nvsEP_as_onestrain_usr_mem_remote   = NULL;
 
-
-
-extern eo_cfg_nvsEP_as_onestrain_t* eo_cfg_nvsEP_as_onestrain_usr_locallyownedmemory            = NULL;
-
-extern eo_cfg_nvsEP_as_onestrain_t* eo_cfg_nvsEP_as_onestrain_usr_remotelyownedmemory_loc       = NULL;
-extern eo_cfg_nvsEP_as_onestrain_t* eo_cfg_nvsEP_as_onestrain_usr_remotelyownedmemory_rem       = NULL;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -203,18 +195,7 @@ extern eo_cfg_nvsEP_as_onestrain_t* eo_cfg_nvsEP_as_onestrain_usr_remotelyownedm
 extern void eo_cfg_nvsEP_as_onestrain_usr_initialise(eOnvEP_t ep, void* loc, void* rem)
 { 
     eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
-    
-    // init the pointer to the ram of the endpoint
-    if(eobool_true == theOwnershipIsLocal)
-    {   // when used locally
-        eo_cfg_nvsEP_as_onestrain_usr_locallyownedmemory      = (eo_cfg_nvsEP_as_onestrain_t*)loc;
-    }
-    else
-    {   // when used remotely
-        eo_cfg_nvsEP_as_onestrain_usr_remotelyownedmemory_loc = (eo_cfg_nvsEP_as_onestrain_t*)loc;
-        eo_cfg_nvsEP_as_onestrain_usr_remotelyownedmemory_rem = (eo_cfg_nvsEP_as_onestrain_t*)rem;
-    }
-    
+       
     // launch a specialised initialisation
     eo_cfg_nvsEP_as_onestrain_usr_hid_INITIALISE(ep, loc, rem);
 

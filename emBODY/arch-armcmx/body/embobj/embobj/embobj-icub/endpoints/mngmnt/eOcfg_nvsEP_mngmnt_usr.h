@@ -58,15 +58,6 @@
 
 extern const EOconstvector* const eo_cfg_nvsEP_mngmnt_usr_constvector_of_EOnv_usr;
 
-#warning --> DONT use remotely owned memory with a pointer.
-#warning --> USE locally owned memory with a pointer only if the mngmnt_usr.c is ised by only one endpoint in the micro.
-
-// - pointer to memory used if variables are locally owned. the ems use this pointer. 
-extern eo_cfg_nvsEP_mngmnt_t* eo_cfg_nvsEP_mngmnt_usr_locallyownedmemory;
-
-// - pointers to memory used if variables are remotely owned. the pc104 used these two pointers
-extern eo_cfg_nvsEP_mngmnt_t* eo_cfg_nvsEP_mngmnt_usr_remotelyownedmemory_loc;
-extern eo_cfg_nvsEP_mngmnt_t* eo_cfg_nvsEP_mngmnt_usr_remotelyownedmemory_rem;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
