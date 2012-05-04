@@ -42,7 +42,7 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-#warning --> instead of 20 ... can i put 0? answer: seems yes  .. but be carefule w/ eo_ropframe_ROP_NumberOf_quickversion()
+//#warning --> instead of 20 ... can i put 0? answer: seems yes  .. but be carefule w/ eo_ropframe_ROP_NumberOf_quickversion()
 
 #define EOK_HOSTTRANSCEIVER_capacityofpacket                   512
 #define EOK_HOSTTRANSCEIVER_capacityofrop                      128
