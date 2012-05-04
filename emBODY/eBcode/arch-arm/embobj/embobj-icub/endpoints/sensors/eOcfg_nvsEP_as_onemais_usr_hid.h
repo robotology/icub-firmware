@@ -50,26 +50,26 @@
 
 extern void eo_cfg_nvsEP_as_onemais_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem);
 
-// sxx-init:    xx is the strain number
-extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sconfig__mode(uint16_t xx, const EOnv* nv);
-extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sconfig__datarate(uint16_t xx, const EOnv* nv);
-extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sconfig__signaloncefullscale(uint16_t xx, const EOnv* nv);
+// // sxx-init:    xx is the strain number
+// extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sconfig__mode(uint16_t xx, const EOnv* nv);
+// extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sconfig__datarate(uint16_t xx, const EOnv* nv);
+// extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sconfig__signaloncefullscale(uint16_t xx, const EOnv* nv);
 
 
-extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sstatus__fullscale(uint16_t xx, const EOnv* nv);
-extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sstatus__calibratedvalues(uint16_t xx, const EOnv* nv);
-extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sstatus__uncalibratedvalues(uint16_t xx, const EOnv* nv);
+// extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sstatus__fullscale(uint16_t xx, const EOnv* nv);
+// extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sstatus__calibratedvalues(uint16_t xx, const EOnv* nv);
+// extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sstatus__uncalibratedvalues(uint16_t xx, const EOnv* nv);
 
 
-// sxx-updt:    xx is the strain number
-extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sconfig__mode(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sconfig__datarate(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sconfig__signaloncefullscale(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+// // sxx-updt:    xx is the strain number
+// extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sconfig__mode(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+// extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sconfig__datarate(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+// extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sconfig__signaloncefullscale(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
 
-extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sstatus__fullscale(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sstatus__calibratedvalues(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sstatus__uncalibratedvalues(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+// extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sstatus__fullscale(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+// extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sstatus__calibratedvalues(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+// extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sstatus__uncalibratedvalues(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
 
 // mxx-init:    xx is the mais number

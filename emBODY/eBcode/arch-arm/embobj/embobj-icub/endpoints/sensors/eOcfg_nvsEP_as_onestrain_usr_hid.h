@@ -72,18 +72,18 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sstatus__calibratedvalues
 extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sstatus__uncalibratedvalues(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
 
-// mxx-init:    xx is the mais number
-extern void eo_cfg_nvsEP_as_onestrain_usr_hid_INIT_Mxx_mconfig__mode(uint16_t xx, const EOnv* nv);
-extern void eo_cfg_nvsEP_as_onestrain_usr_hid_INIT_Mxx_mconfig__datarate(uint16_t xx, const EOnv* nv);
-extern void eo_cfg_nvsEP_as_onestrain_usr_hid_INIT_Mxx_mconfig__resolution(uint16_t xx, const EOnv* nv);
-extern void eo_cfg_nvsEP_as_onestrain_usr_hid_INIT_Mxx_mstatus__the15values(uint16_t xx, const EOnv* nv);
+// // mxx-init:    xx is the mais number
+// extern void eo_cfg_nvsEP_as_onestrain_usr_hid_INIT_Mxx_mconfig__mode(uint16_t xx, const EOnv* nv);
+// extern void eo_cfg_nvsEP_as_onestrain_usr_hid_INIT_Mxx_mconfig__datarate(uint16_t xx, const EOnv* nv);
+// extern void eo_cfg_nvsEP_as_onestrain_usr_hid_INIT_Mxx_mconfig__resolution(uint16_t xx, const EOnv* nv);
+// extern void eo_cfg_nvsEP_as_onestrain_usr_hid_INIT_Mxx_mstatus__the15values(uint16_t xx, const EOnv* nv);
 
 
-// mxx-updt:    xx is the mais number
-extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Mxx_mconfig__mode(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Mxx_mconfig__datarate(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Mxx_mconfig__resolution(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Mxx_mstatus__the15values(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+// // mxx-updt:    xx is the mais number
+// extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Mxx_mconfig__mode(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+// extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Mxx_mconfig__datarate(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+// extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Mxx_mconfig__resolution(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+// extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Mxx_mstatus__the15values(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
 
 
