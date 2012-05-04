@@ -81,6 +81,8 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static void s_eocfg_eps_ebx_ram_retrieve(eOnvEP_t ep, void* loc, void* rem);
+
 static uint16_t s_hash(uint16_t ep);
 
 static uint16_t s_eo_cfg_nvsEP_eb7_hashfunction_ep2index(uint16_t ep);
@@ -107,7 +109,8 @@ static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_eb7_data[] =
         EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mngmnt_hashfunction_id2index,
         EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con, 
         EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_mngmnt_usr_constvector_of_EOnv_usr, 
-        EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mngmnt_usr_initialise
+        EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mngmnt_usr_initialise,
+        EO_INIT(.endpoint_data_retrieve)            s_eocfg_eps_ebx_ram_retrieve
     }, 
 
     {   // mc-leftleg-lower
@@ -116,9 +119,16 @@ static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_eb7_data[] =
         EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mc_lowerleg_hashfunction_id2index,
         EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mc_lowerleg_constvector_of_treenodes_EOnv_con, 
         EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_mc_lowerleg_usr_constvector_of_EOnv_usr, 
-        EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mc_lowerleg_usr_initialise
+        EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mc_lowerleg_usr_initialise,
+        EO_INIT(.endpoint_data_retrieve)            s_eocfg_eps_ebx_ram_retrieve
     }
     
+};
+
+static void* s_eocfg_eps_ebx_ram[][2] =
+{
+    {NULL, NULL},   // mngmnt
+    {NULL, NULL}   
 };
 
 static const EOconstvector s_eo_cfg_EPs_vectorof_eb7 = 
@@ -145,7 +155,17 @@ extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb7_fptr_hashfunction_ep2index = 
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-
+extern void* eo_cfg_nvsEP_eb7_Get_RAM(eOnvEP_t ep, eOnvscfgOwnership_t ownership)
+{
+    uint16_t i = s_hash(ep);
+    
+    if(EOK_uint16dummy == i)
+    {
+        return(NULL);
+    }
+    
+    return(s_eocfg_eps_ebx_ram[i][(eo_nvscfg_ownership_local == ownership) ? (0) : (1)]);       
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -203,6 +223,15 @@ static uint16_t s_eo_cfg_nvsEP_eb7_hashfunction_ep2index(uint16_t ep)
 }
 
 
+static void s_eocfg_eps_ebx_ram_retrieve(eOnvEP_t ep, void* loc, void* rem)
+{
+    uint16_t i = s_hash(ep);
+    if(EOK_uint16dummy != i)
+    {
+        s_eocfg_eps_ebx_ram[i][0] = loc;
+        s_eocfg_eps_ebx_ram[i][1] = rem;
+    }
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

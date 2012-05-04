@@ -58,12 +58,6 @@
 
 extern const EOconstvector* const eo_cfg_nvsEP_sk_emsboard_usr_constvector_of_EOnv_usr;
 
-// - pointer to memory used if variables are locally owned. the ems use this pointer. 
-extern eo_cfg_nvsEP_sk_emsboard_t* eo_cfg_nvsEP_sk_emsboard_usr_locallyownedmemory;
-
-// - pointers to memory used if variables are remotely owned. the pc104 used these two pointers
-extern eo_cfg_nvsEP_sk_emsboard_t* eo_cfg_nvsEP_sk_emsboard_usr_remotelyownedmemory_loc;
-extern eo_cfg_nvsEP_sk_emsboard_t* eo_cfg_nvsEP_sk_emsboard_usr_remotelyownedmemory_rem;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
