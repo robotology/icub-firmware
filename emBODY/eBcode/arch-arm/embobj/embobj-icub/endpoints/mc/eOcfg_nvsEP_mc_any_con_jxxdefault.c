@@ -112,7 +112,7 @@ extern const eOmc_joint_t eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue =
         EO_INIT(.impedance)
         {
             EO_INIT(.stiffness)             0,
-            EO_INIT(.dumping)               0,
+            EO_INIT(.damping)               0,
             EO_INIT(.offset)                0,
             EO_INIT(.filler02)              {0xf1, 0xf2}           
         },        

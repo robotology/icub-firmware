@@ -296,7 +296,7 @@ typedef eOmc_PID16_t eOmc_PID_t;
 typedef struct                  // size is 4+4+2+2+0 = 12
 {
     eOmeas_stiffness_t          stiffness;                          /**< the Ks parameter */
-    eOmeas_damping_t            dumping;                            /**< the Kd parameter */
+    eOmeas_damping_t            damping;                            /**< the Kd parameter */
     eOmeas_torque_t             offset;                             /**< the Ko parameter */
     uint8_t                     filler02[2];                        
 } eOmc_impedance_t;             EO_VERIFYsizeof(eOmc_impedance_t, 12);
