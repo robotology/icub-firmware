@@ -69,18 +69,7 @@ extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, floa
     @param      o  The pointer to the trajectory object.
     @return     The actual trajectory point value.
  **/
-extern float eo_trajectory_Step(EOtrajectory *o);
-
-
-
-/** @fn         extern float eo_trajectory_StepDelta(EOtrajectory *o)
-    @brief      Executes a trajectory step.
-    @param      o  The pointer to the trajectory object.
-    @return     The difference between actual trajectory point value and the previous one.
- **/
-extern float eo_trajectory_StepDelta(EOtrajectory *o);
-
-
+extern void eo_trajectory_Step(EOtrajectory *o, float *pi, float *vi);
 
 /** @fn         extern void eo_trajectory_Abort(EOtrajectory *o)
     @brief      Aborts the trajectory.
