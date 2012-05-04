@@ -234,98 +234,98 @@ __weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_INITIALISE(eOnvEP_t ep, void 
 }
 
 
-// sxx-init:
-__weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sconfig__mode(uint16_t xx, const EOnv* nv)
-{
-    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__mode((eo_cfg_nvsEP_as_strainNumber_t)xx, nv);
-}
+// // sxx-init:
+// __weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sconfig__mode(uint16_t xx, const EOnv* nv)
+// {
+//     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+//     theOwnershipIsLocal = theOwnershipIsLocal;
+//     eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__mode((eo_cfg_nvsEP_as_strainNumber_t)xx, nv);
+// }
 
-__weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sconfig__datarate(uint16_t xx, const EOnv* nv)
-{
-    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__datarate((eo_cfg_nvsEP_as_strainNumber_t)xx, nv);
-}
+// __weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sconfig__datarate(uint16_t xx, const EOnv* nv)
+// {
+//     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+//     theOwnershipIsLocal = theOwnershipIsLocal;
+//     eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__datarate((eo_cfg_nvsEP_as_strainNumber_t)xx, nv);
+// }
 
-__weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sconfig__signaloncefullscale(uint16_t xx, const EOnv* nv)
-{
-    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__signaloncefullscale((eo_cfg_nvsEP_as_strainNumber_t)xx, nv);
-}
-
-
-__weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sstatus__fullscale(uint16_t xx, const EOnv* nv)
-{
-    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__fullscale((eo_cfg_nvsEP_as_strainNumber_t)xx, nv);
-}
-
-__weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sstatus__calibratedvalues(uint16_t xx, const EOnv* nv)
-{
-    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__calibratedvalues((eo_cfg_nvsEP_as_strainNumber_t)xx, nv);
-}
+// __weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sconfig__signaloncefullscale(uint16_t xx, const EOnv* nv)
+// {
+//     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+//     theOwnershipIsLocal = theOwnershipIsLocal;
+//     eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__signaloncefullscale((eo_cfg_nvsEP_as_strainNumber_t)xx, nv);
+// }
 
 
-__weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sstatus__uncalibratedvalues(uint16_t xx, const EOnv* nv)
-{
-    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__uncalibratedvalues((eo_cfg_nvsEP_as_strainNumber_t)xx, nv);
-}
+// __weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sstatus__fullscale(uint16_t xx, const EOnv* nv)
+// {
+//     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+//     theOwnershipIsLocal = theOwnershipIsLocal;
+//     eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__fullscale((eo_cfg_nvsEP_as_strainNumber_t)xx, nv);
+// }
+
+// __weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sstatus__calibratedvalues(uint16_t xx, const EOnv* nv)
+// {
+//     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+//     theOwnershipIsLocal = theOwnershipIsLocal;
+//     eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__calibratedvalues((eo_cfg_nvsEP_as_strainNumber_t)xx, nv);
+// }
+
+
+// __weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Sxx_sstatus__uncalibratedvalues(uint16_t xx, const EOnv* nv)
+// {
+//     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+//     theOwnershipIsLocal = theOwnershipIsLocal;
+//     eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__uncalibratedvalues((eo_cfg_nvsEP_as_strainNumber_t)xx, nv);
+// }
 
 
 
-// sxx-updt:
+// // sxx-updt:
 
-__weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sconfig__mode(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
-{
-    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__mode((eo_cfg_nvsEP_as_strainNumber_t)xx, nv, time, sign);
-}
+// __weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sconfig__mode(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+// {
+//     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+//     theOwnershipIsLocal = theOwnershipIsLocal;
+//     eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__mode((eo_cfg_nvsEP_as_strainNumber_t)xx, nv, time, sign);
+// }
 
-__weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sconfig__datarate(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
-{
-    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__datarate((eo_cfg_nvsEP_as_strainNumber_t)xx, nv, time, sign);
-}
+// __weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sconfig__datarate(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+// {
+//     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+//     theOwnershipIsLocal = theOwnershipIsLocal;
+//     eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__datarate((eo_cfg_nvsEP_as_strainNumber_t)xx, nv, time, sign);
+// }
 
-__weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sconfig__signaloncefullscale(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
-{
-    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__signaloncefullscale((eo_cfg_nvsEP_as_strainNumber_t)xx, nv, time, sign);
-}
-
-
-__weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sstatus__fullscale(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
-{
-    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__fullscale((eo_cfg_nvsEP_as_strainNumber_t)xx, nv, time, sign);
-}
-
-__weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sstatus__calibratedvalues(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
-{
-    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__calibratedvalues((eo_cfg_nvsEP_as_strainNumber_t)xx, nv, time, sign);
-}
+// __weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sconfig__signaloncefullscale(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+// {
+//     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+//     theOwnershipIsLocal = theOwnershipIsLocal;
+//     eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__signaloncefullscale((eo_cfg_nvsEP_as_strainNumber_t)xx, nv, time, sign);
+// }
 
 
-__weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sstatus__uncalibratedvalues(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
-{
-    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__uncalibratedvalues((eo_cfg_nvsEP_as_strainNumber_t)xx, nv, time, sign);
-}
+// __weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sstatus__fullscale(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+// {
+//     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+//     theOwnershipIsLocal = theOwnershipIsLocal;
+//     eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__fullscale((eo_cfg_nvsEP_as_strainNumber_t)xx, nv, time, sign);
+// }
+
+// __weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sstatus__calibratedvalues(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+// {
+//     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+//     theOwnershipIsLocal = theOwnershipIsLocal;
+//     eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__calibratedvalues((eo_cfg_nvsEP_as_strainNumber_t)xx, nv, time, sign);
+// }
+
+
+// __weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Sxx_sstatus__uncalibratedvalues(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+// {
+//     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+//     theOwnershipIsLocal = theOwnershipIsLocal;
+//     eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__uncalibratedvalues((eo_cfg_nvsEP_as_strainNumber_t)xx, nv, time, sign);
+// }
 
 
 
