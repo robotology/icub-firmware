@@ -52,12 +52,13 @@
 #include "eOcfg_nvsEP_mngmnt_con.h"
 #include "eOcfg_nvsEP_mc_any_con_bodypart.h"
 #include "eOcfg_nvsEP_mc_upperarm_con.h"
-#include "eOcfg_nvsEP_as_wholebody_con.h"
+#include "eOcfg_nvsEP_as_onestrain_con.h"
+
 
 // - in here there is access to ram of the endpoints
 #include "eOcfg_nvsEP_mngmnt_usr.h"
 #include "eOcfg_nvsEP_mc_upperarm_usr.h"
-#include "eOcfg_nvsEP_as_wholebody_usr.h"
+#include "eOcfg_nvsEP_as_onestrain_usr.h"
 
 
 

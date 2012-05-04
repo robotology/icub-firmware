@@ -22,7 +22,7 @@
 #define _EOCFG_NVSEP_AS_WHOLEBODY_CON_H_
 
 
-
+#error --> dont use: obsolete
 
 /** @file       eOcfg_nvsEP_as_wholebody_con.h
 	@brief      This header file gives the constant configuration for the NVs in the endpoint bodysensors

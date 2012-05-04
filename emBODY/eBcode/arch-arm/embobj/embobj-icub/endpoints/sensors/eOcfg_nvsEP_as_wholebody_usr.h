@@ -21,7 +21,7 @@
 #define _EOCFG_NVSEP_AS_WHOLEBODY_USR_H_
 
 
-
+#error --> dont use: obsolete
 
 /** @file       eOcfg_nvsEP_as_wholebody_usr.h
 	@brief      This header file gives the local configuration for the ...
