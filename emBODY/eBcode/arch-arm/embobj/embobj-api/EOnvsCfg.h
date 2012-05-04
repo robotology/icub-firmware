@@ -83,16 +83,17 @@ typedef enum
 
 
 
-typedef struct                  // size is 16 bytes
+typedef struct                      // size is 24 bytes
 {
-    eOnvEP_t                    endpoint;
-    uint16_t                    sizeof_endpoint_data;
-    eOuint16_fp_uint16_t        hashfunction_id2index;
-    const EOconstvector* const  constvector_of_treenodes_EOnv_con;
-    const EOconstvector* const  constvector_of_EOnv_usr;
-    eOvoid_fp_uint16_voidp_voidp_t     endpoint_data_init;
+    eOnvEP_t                        endpoint;
+    uint16_t                        sizeof_endpoint_data;
+    eOuint16_fp_uint16_t            hashfunction_id2index;
+    const EOconstvector* const      constvector_of_treenodes_EOnv_con;
+    const EOconstvector* const      constvector_of_EOnv_usr;
+    eOvoid_fp_uint16_voidp_voidp_t  endpoint_data_init;
+    eOvoid_fp_uint16_voidp_voidp_t  endpoint_data_retrieve;
 } eOnvscfg_EP_t;
-#warning --> change the function to be endpoint_data_init(eOnvEP_t, void* and void*)
+
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
@@ -109,7 +110,9 @@ extern eOresult_t eo_nvscfg_PushBackDevice(EOnvsCfg* p, eOnvscfgOwnership_t owne
 
 extern uint16_t eo_nvscfg_GetIndexOfLocalDevice(EOnvsCfg* p);
 
-extern eOresult_t eo_nvscfg_ondevice_PushBackEndpoint(EOnvsCfg* p, uint16_t ondevindex, eOnvEP_t endpoint, eOuint16_fp_uint16_t hashfn_id2index, const EOconstvector* treeofnvs_con, const EOconstvector* datanvs_usr, uint32_t datanvs_size, eOvoid_fp_uint16_voidp_voidp_t datanvs_init, EOVmutexDerived* mtx);
+//extern eOresult_t eo_nvscfg_ondevice_PushBackEndpoint(EOnvsCfg* p, uint16_t ondevindex, eOnvEP_t endpoint, eOuint16_fp_uint16_t hashfn_id2index, const EOconstvector* treeofnvs_con, const EOconstvector* datanvs_usr, uint32_t datanvs_size, eOvoid_fp_uint16_voidp_voidp_t datanvs_init, EOVmutexDerived* mtx);
+
+extern eOresult_t eo_nvscfg_ondevice_PushBackEP(EOnvsCfg* p, uint16_t ondevindex, eOnvscfg_EP_t *cfgofep, EOVmutexDerived* mtx);
 
 
 extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p);
