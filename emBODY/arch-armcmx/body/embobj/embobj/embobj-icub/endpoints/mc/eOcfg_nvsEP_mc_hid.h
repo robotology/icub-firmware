@@ -39,56 +39,25 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "EoCommon.h"
-#include "EOnv.h"
-#include "EoMotionControl.h"
-#include "eOcfg_nvsEP_mc_any_con_jxx.h"
-#include "eOcfg_nvsEP_mc_any_con_mxx.h"
+//#include "EoCommon.h"
+//#include "EOnv.h"
+//#include "EoMotionControl.h"
+
 
 
 #include "eOcfg_nvsEP_mc.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
-
-//#define EOK_cfg_nvsEP_mc_leftleg_EP                             (0x0020)     
-//#define EOK_cfg_nvsEP_mc_rightleg_EP                            (0x0021) 
-
-
-// use the enum instead
-// #define EOK_cfg_nvsEP_mc_leftupperarm_EP                        (0x0011)     
-// #define EOK_cfg_nvsEP_mc_leftlowerarm_EP                        (0x0012) 
-
-// #define EOK_cfg_nvsEP_mc_rightupperarm_EP                       (0x0013) 
-// #define EOK_cfg_nvsEP_mc_rightlowerarm_EP                       (0x0014) 
-
-// #define EOK_cfg_nvsEP_mc_torso_EP                               (0x0015) 
-
-// #define EOK_cfg_nvsEP_mc_leftupperleg_EP                        (0x0016)     
-// #define EOK_cfg_nvsEP_mc_leftlowerleg_EP                        (0x0017) 
-
-// #define EOK_cfg_nvsEP_mc_rightupperleg_EP                       (0x0018) 
-// #define EOK_cfg_nvsEP_mc_rightlowerleg_EP                       (0x0019) 
-
-
-
-
-  
-
-
+// empty-section
       
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
-
-
-//EO_VERIFYproposition(EOK_cfg_nvsEP_mc_any_usr, (1024 > EOK_cfg_nvsEP_mc_firstNVIDoff_of_motor(EOK_cfg_nvsEP_mc_maxnumof_nvs_in_motor)));
-
+// empty-section
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-
-//extern const uint8_t eo_cfg_nvsEP_mc_hid_jxxfuntyp[] ;
-//extern const uint8_t eo_cfg_nvsEP_mc_hid_mxxfuntyp[];
+// empty-section
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
