@@ -18,13 +18,13 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EOCFG_NVSEP_SK_CON_H_
-#define _EOCFG_NVSEP_SK_CON_H_
+#ifndef _EOCFG_NVSEP_SK_H_
+#define _EOCFG_NVSEP_SK_H_
 
 
 
 
-/** @file       eOcfg_nvsEP_sk_con.h
+/** @file       eOcfg_nvsEP_sk.h
 	@brief      This header file gives the constant configuration for the NVs in the endpoint bodysensors
 	@author     marco.accame@iit.it
 	@date       04/05/2012
@@ -58,8 +58,8 @@
 
 typedef enum
 {
-    endpoint_sk_leftlowerarm           = 0x0032,        
-    endpoint_sk_rightlowerarm          = 0x0034    
+    endpoint_sk_emsboard_leftlowerarm           = 0x0032,        
+    endpoint_sk_emsboard_rightlowerarm          = 0x0034    
 } eo_cfg_nvsEP_sk_endpoint_t;
 
 

@@ -57,12 +57,6 @@
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
-typedef enum
-{
-    endpoint_sk_emsboard_leftlowerarm           = 0x0032,
-    endpoint_sk_emsboard_rightlowerarm          = 0x0034    
-} eo_cfg_nvsEP_sk_emsboard_endpoint_t;
-
 
 
 /** @typedef    typedef struct eo_cfg_nvsEP_sk_emsboard_con_strainNVindex_t
