@@ -37,6 +37,8 @@
 #include "EOnv_hid.h"
 #include "EOconstvector_hid.h"
 
+#include "eOcfg_nvsEP_sk_hid.h"
+
 
 
 
@@ -158,6 +160,7 @@ __weak extern void eo_cfg_nvsEP_sk_emsboard_usr_hid_INITIALISE(eOnvEP_t ep, void
 {
     eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_sk_hid_INITIALISE(ep, loc, rem);
 }
 
 // init:
@@ -165,12 +168,14 @@ __weak extern void eo_cfg_nvsEP_sk_emsboard_usr_hid_INIT_sconfig__sigmode(uint16
 {   // n is always 0
      eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
      theOwnershipIsLocal = theOwnershipIsLocal;
+     eo_cfg_nvsEP_sk_hid_INIT_sconfig__sigmode(n, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_sk_emsboard_usr_hid_INIT_sstatus__arrayof10canframe(uint16_t n, const EOnv* nv)
 {   // n is always 0
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_sk_hid_INIT_sstatus__arrayof10canframe(n, nv);    
 }
 
 
@@ -179,12 +184,14 @@ __weak extern void eo_cfg_nvsEP_sk_emsboard_usr_hid_UPDT_sconfig__sigmode(uint16
 {   // n is always 0
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_sk_hid_UPDT_sconfig__sigmode(n, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_sk_emsboard_usr_hid_UPDT_sstatus__arrayof10canframe(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {   // n is always 0
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe(n, nv, time, sign);
 }
 
 
