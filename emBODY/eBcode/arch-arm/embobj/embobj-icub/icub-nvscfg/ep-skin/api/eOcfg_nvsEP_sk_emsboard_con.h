@@ -72,18 +72,18 @@ typedef enum
  **/
 typedef enum
 {
-    skinNVindex_sconfig__sigmode                        =  0,
-    skinNVindex_sstatus__arrayof10canframe              =  1
+    skinEMSboardNVindex_sconfig__sigmode                        =  0,
+    skinEMSboardNVindex_sstatus__arrayof10canframe              =  1
 } eo_cfg_nvsEP_sk_emsboard_con_skinNVindex_t;
 
-enum { skinNVindex_TOTALnumber = 2 };
+enum { skinEMSboardNVindex_TOTALnumber = 2 };
 
 
 
 /** @typedef    enum varsSKemsboard_TOTALnumber;
     @brief      It contains the total number of network variables managed by the endpoint
  **/
-enum {varsSKemsboard_TOTALnumber = skinNVindex_TOTALnumber };
+enum {varsSKemsboard_TOTALnumber = skinEMSboardNVindex_TOTALnumber };
 
 
 /** @typedef    typedef struct eo_cfg_nvsEP_sk_emsboard_t;
