@@ -54,6 +54,8 @@
 #include "eOcfg_nvsEP_as_onemais_con.h"
 #include "eOcfg_nvsEP_as_onemais_usr.h"
 
+#include "eOcfg_nvsEP_sk.h"
+
 
 
 
