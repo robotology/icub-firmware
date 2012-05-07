@@ -50,11 +50,11 @@
 // - in here there are the nvids plus ... 
 #include "eOcfg_nvsEP_mc_any_con_bodypart.h"
 #include "eOcfg_nvsEP_mngmnt_con.h"
-#include "eOcfg_nvsEP_mc_leg_con.h"
+//#include "eOcfg_nvsEP_mc_leg_con.h"
 
 // - in here there is access to ram of the endpoints
 #include "eOcfg_nvsEP_mngmnt_usr.h"
-#include "eOcfg_nvsEP_mc_leg_usr.h"
+//#include "eOcfg_nvsEP_mc_leg_usr.h"
 
 
 
