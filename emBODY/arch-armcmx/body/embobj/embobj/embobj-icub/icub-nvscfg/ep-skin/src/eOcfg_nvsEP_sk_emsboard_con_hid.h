@@ -49,8 +49,8 @@
 
 
 // - the indices of the nv in the endpoint
-#define EOK_cfg_nvsEP_sk_emsboard_con_nvindex_sconfig__sigmode              (skinNVindex_sconfig__sigmode)
-#define EOK_cfg_nvsEP_sk_emsboard_con_nvindex_sstatus__arrayof10canframes   (skinNVindex_sstatus__arrayof10canframe)
+#define EOK_cfg_nvsEP_sk_emsboard_con_nvindex_sconfig__sigmode              (skinEMSboardNVindex_sconfig__sigmode)
+#define EOK_cfg_nvsEP_sk_emsboard_con_nvindex_sstatus__arrayof10canframes   (skinEMSboardNVindex_sstatus__arrayof10canframe)
 
 
 
