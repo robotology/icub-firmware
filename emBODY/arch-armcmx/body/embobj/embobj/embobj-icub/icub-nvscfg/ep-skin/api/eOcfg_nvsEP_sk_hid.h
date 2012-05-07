@@ -17,13 +17,13 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOCFG_NVSEP_AS_HID_H_
-#define _EOCFG_NVSEP_AS_HID_H_
+#ifndef _EOCFG_NVSEP_SK_HID_H_
+#define _EOCFG_NVSEP_SK_HID_H_
 
 
 
 
-/** @file       eOcfg_nvsEP_as_hid.h
+/** @file       eOcfg_nvsEP_sk_hid.h
 	@brief      This header file gives the ...
 	@author     marco.accame@iit.it
 	@date       09/06/2011
