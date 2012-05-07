@@ -41,8 +41,8 @@
 
 
 #include "eOcfg_nvsEP_mc_any_con_bodypart.h"
-#include "eOcfg_nvsEP_mc_leg_con.h"
-#include "eOcfg_nvsEP_mc_leg_usr.h"
+//#include "eOcfg_nvsEP_mc_leg_con.h"
+//#include "eOcfg_nvsEP_mc_leg_usr.h"
 
 #include "eOcfg_nvsEP_mc_upperleg_con.h"
 #include "eOcfg_nvsEP_mc_upperleg_usr.h"
