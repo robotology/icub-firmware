@@ -59,9 +59,9 @@
 
 //extern const EOconstvector* const eo_cfg_emsCanNetTopo_joint_constvector_ems1__ptr;
 
-extern const EOconstvector* const eo_cfg_emsCanNetTopo_leftleg_constvec_joints [eObrd_emsInBodypart_maxnum];
-extern const EOconstvector* const eo_cfg_emsCanNetTopo_leftleg_constvec_motors [eObrd_emsInBodypart_maxnum];
-extern const EOconstvector* const eo_cfg_emsCanNetTopo_leftleg_constvec_sensors [eObrd_emsInBodypart_maxnum];
+extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_joints__ptr;
+extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_motors__ptr;
+extern const EOconstvector*  const eo_cfg_emsCanNetTopo_constvec_sensors__ptr;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 // empty-section

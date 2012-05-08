@@ -322,7 +322,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>25</ColumnNumber>
+      <ColumnNumber>26</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -343,10 +343,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>102</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>12</CurrentLine>
+      <TopLine>107</TopLine>
+      <CurrentLine>122</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app\app-eobj\EOappCanServicesProvider.c</PathWithFileName>
       <FilenameWithoutPath>EOappCanServicesProvider.c</FilenameWithoutPath>
@@ -357,7 +357,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>25</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -1328,7 +1328,7 @@
 
   <Group>
     <GroupName>eo-develop</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -1351,10 +1351,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>18</ColumnNumber>
+      <ColumnNumber>41</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>107</TopLine>
-      <CurrentLine>107</CurrentLine>
+      <TopLine>296</TopLine>
+      <CurrentLine>296</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-src\EOemsCanNetworkTopology.c</PathWithFileName>
       <FilenameWithoutPath>EOemsCanNetworkTopology.c</FilenameWithoutPath>
@@ -1367,8 +1367,8 @@
       <Focus>0</Focus>
       <ColumnNumber>18</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>133</TopLine>
-      <CurrentLine>133</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-src\EOicubCanProto.c</PathWithFileName>
       <FilenameWithoutPath>EOicubCanProto.c</FilenameWithoutPath>
@@ -1407,13 +1407,13 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>16</ColumnNumber>
+      <ColumnNumber>48</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>163</TopLine>
-      <CurrentLine>171</CurrentLine>
+      <TopLine>285</TopLine>
+      <CurrentLine>287</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\app\app-eobj\EOappTheMCNVmap.c</PathWithFileName>
-      <FilenameWithoutPath>EOappTheMCNVmap.c</FilenameWithoutPath>
+      <PathWithFileName>..\app\app-eobj\EOappTheNVmapRef.c</PathWithFileName>
+      <FilenameWithoutPath>EOappTheNVmapRef.c</FilenameWithoutPath>
     </File>
   </Group>
 
@@ -1440,7 +1440,7 @@
 
   <Group>
     <GroupName>eo-icubCan-cfg</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -1454,8 +1454,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\cfg\icub-can-cfg\eOcfg_emsCanNetworkTopology.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_emsCanNetworkTopology.c</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\icub-can-cfg\eOcfg_icubCanProto_messagesLookupTbl.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_icubCanProto_messagesLookupTbl.c</FilenameWithoutPath>
     </File>
     <File>
       <GroupNumber>12</GroupNumber>
@@ -1463,31 +1463,17 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>11</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\cfg\icub-can-cfg\eOcfg_icubCanProto_messagesLookupTbl.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_icubCanProto_messagesLookupTbl.c</FilenameWithoutPath>
-    </File>
-    <File>
-      <GroupNumber>12</GroupNumber>
-      <FileNumber>80</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>845</TopLine>
-      <CurrentLine>852</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\cfg\icub-can-cfg\eOcfg_icubCanProto_motorBoardMsgFunctions.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_icubCanProto_motorBoardMsgFunctions.c</FilenameWithoutPath>
     </File>
     <File>
       <GroupNumber>12</GroupNumber>
-      <FileNumber>81</FileNumber>
+      <FileNumber>80</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1501,7 +1487,7 @@
     </File>
     <File>
       <GroupNumber>12</GroupNumber>
-      <FileNumber>82</FileNumber>
+      <FileNumber>81</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1515,7 +1501,7 @@
     </File>
     <File>
       <GroupNumber>12</GroupNumber>
-      <FileNumber>83</FileNumber>
+      <FileNumber>82</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1527,11 +1513,25 @@
       <PathWithFileName>..\cfg\icub-can-cfg\eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</FilenameWithoutPath>
     </File>
+    <File>
+      <GroupNumber>12</GroupNumber>
+      <FileNumber>83</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\cfg\icub-can-cfg\eOcfg_emsCanNetworkTopology_eb7.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_emsCanNetworkTopology_eb7.c</FilenameWithoutPath>
+    </File>
   </Group>
 
   <Group>
     <GroupName>ep-cfg-mc-any</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -1554,10 +1554,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>23</ColumnNumber>
+      <ColumnNumber>12</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>820</TopLine>
-      <CurrentLine>826</CurrentLine>
+      <TopLine>10</TopLine>
+      <CurrentLine>10</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\cfg\ep-nvs-cfg\mc\eOcfg_nvsEP_mc.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_nvsEP_mc.c</FilenameWithoutPath>
@@ -1596,10 +1596,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>23</ColumnNumber>
+      <ColumnNumber>43</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>103</TopLine>
-      <CurrentLine>115</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\cfg\ep-nvs-cfg\mc\eOcfg_nvsEP_mc_any_con_jxxdefault.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_jxxdefault.c</FilenameWithoutPath>
@@ -1634,14 +1634,14 @@
     </File>
     <File>
       <GroupNumber>13</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <FileNumber>91</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>43</ColumnNumber>
+      <ColumnNumber>83</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>181</TopLine>
-      <CurrentLine>203</CurrentLine>
+      <TopLine>440</TopLine>
+      <CurrentLine>443</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\cfg\ep-nvs-cfg\mc\usr-callbk\eOcfg_nvsEP_mc_usrcbk_ebx.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_nvsEP_mc_usrcbk_ebx.c</FilenameWithoutPath>
@@ -1655,11 +1655,11 @@
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>14</GroupNumber>
-      <FileNumber>91</FileNumber>
+      <FileNumber>92</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>16</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -1671,16 +1671,16 @@
 
   <Group>
     <GroupName>ep-cfg-mc-lowerleg</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>15</GroupNumber>
-      <FileNumber>92</FileNumber>
+      <FileNumber>93</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>27</ColumnNumber>
+      <ColumnNumber>75</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -1690,7 +1690,7 @@
     </File>
     <File>
       <GroupNumber>15</GroupNumber>
-      <FileNumber>93</FileNumber>
+      <FileNumber>94</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1713,12 +1713,12 @@
 
   <Group>
     <GroupName>ep-cfg-mng</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>17</GroupNumber>
-      <FileNumber>100</FileNumber>
+      <FileNumber>95</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1732,7 +1732,7 @@
     </File>
     <File>
       <GroupNumber>17</GroupNumber>
-      <FileNumber>101</FileNumber>
+      <FileNumber>96</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1746,11 +1746,11 @@
     </File>
     <File>
       <GroupNumber>17</GroupNumber>
-      <FileNumber>102</FileNumber>
+      <FileNumber>97</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>24</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -1761,9 +1761,87 @@
   </Group>
 
   <AlienFiles>
+    <PathWithFilename>C:\firmware_repo\emBODY\arch-armcmx\body\embobj\embobj\embobj-api\EOemsCanNetworkTopology.h</PathWithFilename>
+    <TopLine>117</TopLine>
+    <CurrentLine>123</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
     <PathWithFilename>C:\firmware_repo\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V02\app\app-eobj\EOappCanServicesProvider.h</PathWithFilename>
-    <TopLine>150</TopLine>
-    <CurrentLine>150</CurrentLine>
+    <TopLine>98</TopLine>
+    <CurrentLine>98</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>C:\firmware_repo\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V02\app\app-eobj\EOappCanServicesProvider_hid.h</PathWithFilename>
+    <TopLine>54</TopLine>
+    <CurrentLine>57</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>C:\firmware_repo\emBODY\arch-armcmx\body\embobj\embobj\embobj-src\EOemsCanNetworkTopology_hid.h</PathWithFilename>
+    <TopLine>1</TopLine>
+    <CurrentLine>1</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -1794,40 +1872,40 @@
       <ActiveTab>0</ActiveTab>
       <Documents>
         <Doc>
-          <Name>..\cfg\ep-nvs-cfg\mc\eOcfg_nvsEP_mc_any_con_jxxdefault.c</Name>
-          <ColumnNumber>23</ColumnNumber>
-          <TopLine>103</TopLine>
-          <CurrentLine>115</CurrentLine>
+          <Name>..\app\app-eobj\EOappCanServicesProvider.h</Name>
+          <ColumnNumber>36</ColumnNumber>
+          <TopLine>98</TopLine>
+          <CurrentLine>98</CurrentLine>
         </Doc>
         <Doc>
-          <Name>..\cfg\icub-can-cfg\eOcfg_icubCanProto_motorBoardMsgFunctions.c</Name>
+          <Name>..\..\..\..\body\embobj\embobj\embobj-src\EOemsCanNetworkTopology_hid.h</Name>
           <ColumnNumber>0</ColumnNumber>
-          <TopLine>845</TopLine>
-          <CurrentLine>852</CurrentLine>
+          <TopLine>1</TopLine>
+          <CurrentLine>1</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\app\app-eobj\EOappCanServicesProvider.c</Name>
-          <ColumnNumber>102</ColumnNumber>
-          <TopLine>1</TopLine>
-          <CurrentLine>12</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\app\app-eobj\EOappCanServicesProvider.h</Name>
-          <ColumnNumber>26</ColumnNumber>
-          <TopLine>150</TopLine>
-          <CurrentLine>150</CurrentLine>
+          <ColumnNumber>0</ColumnNumber>
+          <TopLine>107</TopLine>
+          <CurrentLine>122</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\..\..\..\body\embobj\embobj\embobj-src\EOemsCanNetworkTopology.c</Name>
-          <ColumnNumber>18</ColumnNumber>
-          <TopLine>107</TopLine>
-          <CurrentLine>107</CurrentLine>
+          <ColumnNumber>41</ColumnNumber>
+          <TopLine>296</TopLine>
+          <CurrentLine>296</CurrentLine>
         </Doc>
         <Doc>
-          <Name>..\..\..\..\body\embobj\embobj\embobj-src\EOicubCanProto.c</Name>
-          <ColumnNumber>18</ColumnNumber>
-          <TopLine>133</TopLine>
-          <CurrentLine>133</CurrentLine>
+          <Name>..\..\..\..\body\embobj\embobj\embobj-api\EOemsCanNetworkTopology.h</Name>
+          <ColumnNumber>0</ColumnNumber>
+          <TopLine>117</TopLine>
+          <CurrentLine>123</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app\app-eobj\EOappCanServicesProvider_hid.h</Name>
+          <ColumnNumber>38</ColumnNumber>
+          <TopLine>54</TopLine>
+          <CurrentLine>57</CurrentLine>
         </Doc>
       </Documents>
     </MDIGroup>

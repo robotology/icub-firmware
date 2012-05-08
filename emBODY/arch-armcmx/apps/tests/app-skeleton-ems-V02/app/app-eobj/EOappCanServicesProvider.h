@@ -90,6 +90,25 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg);
 extern eOresult_t eo_appCanSP_GetConnectedJoints(EOappCanSP *p, EOfifoByte *connectedJointsList); 
 
 
+/** @fn         eOresult_t eo_appCanSP_GetConnectedMotors(EOappCanSP *p, EOfifoByte *connectedMotorsList)
+    @brief      fill @e connectedMotorsList with motor id connected to ems
+    @param      p                       target obj
+    @param      connectedMotorsList     in output contains a list of motor id connected to ems 
+    @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
+ **/
+extern eOresult_t eo_appCanSP_GetConnectedMotors(EOappCanSP *p, EOfifoByte *connectedMotorsList);
+
+
+
+/** @fn         eOresult_t eo_appCanSP_GetConnectedSensors(EOappCanSP *p, EOfifoByte *connectedSensorsList)
+    @brief      fill @e connectedSensorsList with Sensor id connected to ems
+    @param      p                       target obj
+    @param      connectedJSensorsList     in output contains a list of Sensor id connected to ems 
+    @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
+ **/
+extern eOresult_t eo_appCanSP_GetConnectedSensors(EOappCanSP *p, EOfifoByte *connectedSensorsList);
+
+
 
 /** @fn         extern eOresult_t eo_appCanSP_SendCmd2Joint(EOappCanSP *p, eOmc_jointId_t jId, eo_icubCanProto_msgCommand_t msgCmd, void *val_ptr)
     @brief      send a command to a joint

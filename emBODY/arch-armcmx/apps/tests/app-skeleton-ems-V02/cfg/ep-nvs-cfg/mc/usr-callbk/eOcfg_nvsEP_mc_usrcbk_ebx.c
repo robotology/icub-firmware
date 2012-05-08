@@ -46,6 +46,8 @@
 #include "EOappCanServicesProvider.h"
 #include "EOicubCanProto_specifications.h"
 
+#include "EOappTheNVmapRef.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -381,6 +383,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__controlmode(eo_cfg_nvsEP_mc_jo
     eOresult_t                      res;
     eo_appCanSP_canLocation         canLoc;
     eObrd_types_t                   boardType;
+    void                            *nv_mem_ptr;
     eOenum08_t                      *controlmode_ptr = (eOenum08_t*)nv->loc;
     eo_icubCanProto_msgCommand_t    msgCmd = 
     {
@@ -390,6 +393,19 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__controlmode(eo_cfg_nvsEP_mc_jo
 
     EOappCanSP *appCanSP_ptr = (EOappCanSP*)eom_appSkeletonEms_body_services_can_getHandle();
 
+
+    // 1) set control mode in status nv
+    res = eo_appTheNVmapRef_GetJointNVMemoryRef(eo_appTheNVmapRef_GetHandle(), (eOmc_jointId_t)jxx, jointNVindex_jstatus__basic, &nv_mem_ptr);
+    if(eores_OK != res)
+    {
+        return;
+    }
+
+    ((eOmc_joint_status_basic_t*)nv_mem_ptr)->controlmodestatus = *controlmode_ptr;
+
+
+
+    // 2) if jxx doesn't belong to 2foc board, send control mode value to CAN-board
     res = eo_appCanSP_GetJointCanLocation(appCanSP_ptr, jxx, &canLoc, &boardType);
     if(eores_OK != res)
     {
@@ -402,13 +418,39 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__controlmode(eo_cfg_nvsEP_mc_jo
     {
         return;
     }
-    // control mode
+    // send control mode
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
     eo_appCanSP_SendCmd(appCanSP_ptr, &canLoc, msgCmd, (void*)controlmode_ptr);
 
 
 }
 
+
+extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__motionmonitormode(eo_cfg_nvsEP_mc_jointNumber_t jxx,  const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    void              *nv_mem_ptr;
+    eOresult_t        res;
+    
+
+    res = eo_appTheNVmapRef_GetJointNVMemoryRef(eo_appTheNVmapRef_GetHandle(), (eOmc_jointId_t)jxx, jointNVindex_jstatus__basic, &nv_mem_ptr);
+    if(eores_OK != res)
+    {
+        return;
+    }
+
+    if(eomc_motionmonitormode_dontmonitor == *((eOenum08_t*)nv->loc))
+    {
+        ((eOmc_joint_status_basic_t*)nv_mem_ptr)->motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;  
+    }
+    else
+    {
+        ((eOmc_joint_status_basic_t*)nv_mem_ptr)->motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
+    }
+
+    // TODO: add something to notify the application to check motion done
+
+
+}
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eo_cfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eOresult_t                          res;

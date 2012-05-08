@@ -54,7 +54,7 @@
 #include "EOMappDataTransmitter.h"
 #include "EOMappMotorController.h"
 #include "EOMappTheSysController.h"
-#include "EOappTheMCNVmap.h"
+#include "EOappTheNVmapRef.h"
 
 //endpoints-cfg
 #include "eOcfg_EPs_eb7.h"
@@ -122,7 +122,7 @@ static void s_eom_appSkeletonEms_body_ledInit(void);
 static void s_eom_appSkeletonEms_body_theBoardTransceiver_init(void);
 static void s_eom_appSkeletonEms_body_CanServicesProvider_init(void);
 static void s_eom_appSkeletonEms_body_EncodersReader_init(void);
-static void s_eom_appSkeletonEms_body_MCNVmap_init(void);
+static void s_eom_appSkeletonEms_body_NVmapRef_init(void);
 
 //actors
 static void s_eom_appSkeletonEms_body_TheSysController_init(void);
@@ -165,7 +165,7 @@ extern eOresult_t eom_appSkeletonEms_body_services_init(void)
     s_eom_appSkeletonEms_body_EncodersReader_init();
 
 /* 5) init motorController-networkVariables map*/
-    s_eom_appSkeletonEms_body_MCNVmap_init();
+    s_eom_appSkeletonEms_body_NVmapRef_init();
     return(eores_OK);
 }
 
@@ -216,6 +216,12 @@ extern void* eom_appSkeletonEms_body_services_can_getHandle(void)
 {
     return((void*)s_appCanSP_ptr);   
 }
+
+extern void* eom_appSkeletonEms_body_services_TheNVmapRef_getHandle(void)
+{
+    return((void*)s_appCanSP_ptr);   
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -288,12 +294,12 @@ static void s_eom_appSkeletonEms_body_EncodersReader_init(void)
 
 }
 
-static void s_eom_appSkeletonEms_body_MCNVmap_init(void)
+static void s_eom_appSkeletonEms_body_NVmapRef_init(void)
 {
 
     EOfifoByte *sList_ptr;
 
-    eOappTheMCNVmap_cfg_t cfg =
+    eOappTheNVmapRef_cfg_t cfg =
     {
         EO_INIT(.jointsList)    eo_fifobyte_New(20 /*jointNumber_TOTALnumber*/, NULL),
         EO_INIT(.motorsList)    eo_fifobyte_New(20 /*motorNumber_TOTALnumber*/, NULL),
@@ -309,7 +315,7 @@ static void s_eom_appSkeletonEms_body_MCNVmap_init(void)
     eo_appCanSP_GetConnectedJoints(s_appCanSP_ptr, cfg.jointsList/*jList_ptr*/);
     eo_appCanSP_GetConnectedJoints(s_appCanSP_ptr, cfg.motorsList/*jList_ptr*/);
 #warning VALE--> fai GetConnectedmotors func!!!!
-    eo_appTheMCNVmap_Initialise(&cfg);
+    eo_appTheNVmapRef_Initialise(&cfg);
 
 }
 

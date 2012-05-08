@@ -51,6 +51,19 @@
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
+/** @typedef    enum jointEndpoint_TOTALnumber;
+    @brief      It contains the max number of joints in a given motionControl endpoint. The numbers are consecutive and without holes
+ **/
+enum { jointEndpoint_TOTALnumber = 12};
+
+
+/** @typedef    enum motorEndpoint_TOTALnumber;
+    @brief      It contains the max number of motors in a given motionControl endpoint. The numbers are consecutive and without holes
+ **/
+enum { motorEndpoint_TOTALnumber = 12};
+
+
+
 /** @typedef    typedef enum eo_cfg_nvsEP_mc_endpoint_t;
     @brief      It contains all the endpoints used for motion control. The grouping is done by sub-bodypart
                 in such a way that each ep is contained by a exactly one EMS board in iCub ver 2.5

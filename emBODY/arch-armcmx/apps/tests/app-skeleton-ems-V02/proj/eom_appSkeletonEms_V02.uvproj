@@ -825,9 +825,9 @@
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOVcanProto.c</FilePath>
             </File>
             <File>
-              <FileName>EOappTheMCNVmap.c</FileName>
+              <FileName>EOappTheNVmapRef.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app\app-eobj\EOappTheMCNVmap.c</FilePath>
+              <FilePath>..\app\app-eobj\EOappTheNVmapRef.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -844,11 +844,6 @@
         <Group>
           <GroupName>eo-icubCan-cfg</GroupName>
           <Files>
-            <File>
-              <FileName>eOcfg_emsCanNetworkTopology.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\icub-can-cfg\eOcfg_emsCanNetworkTopology.c</FilePath>
-            </File>
             <File>
               <FileName>eOcfg_icubCanProto_messagesLookupTbl.c</FileName>
               <FileType>1</FileType>
@@ -873,6 +868,11 @@
               <FileName>eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\cfg\icub-can-cfg\eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_emsCanNetworkTopology_eb7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\icub-can-cfg\eOcfg_emsCanNetworkTopology_eb7.c</FilePath>
             </File>
           </Files>
         </Group>

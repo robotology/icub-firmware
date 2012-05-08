@@ -17,11 +17,11 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOAPPTHEMCNVMAP_HID_H_
-#define _EOAPPTHEMCNVMAP_HID_H_
+#ifndef _EOAPPTHENVMAPREF_HID_H_
+#define _EOAPPTHENVMAPREF_HID_H_
 
 
-/* @file       EOappTheMCNVmap_hid.h
+/* @file       EOappTheNVmapRef_hid.h
     @brief      This file keeps ...
     @author     valentina.gaggero@iit.it
     @date       04/17/2012
@@ -38,7 +38,7 @@
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "EOappTheMCNVmap.h"
+#include "EOappTheNVmapRef.h"
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------

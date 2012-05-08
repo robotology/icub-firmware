@@ -18,17 +18,17 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOAPPTHEMCNVMAP_H_
-#define _EOAPPTHEMCNVMAP_H_
+#ifndef _EOAPPTHENVMAPREF_H_
+#define _EOAPPTHENVMAPREF_H_
 
 
-/** @file       EOappTheMCNVmap.h
+/** @file       EOappTheNVmapRef.h
     @brief      This file keeps ...
     @author     valentina.gaggero@iit.it
     @date       04/17/2012
 **/
 
-/** @defgroup eo_app_theMCNVmap Singleton EOappTheMCNVmap
+/** @defgroup eo_app_TheNVmapRef Singleton EOappTheNVmapRef
     ................ 
     @{        
  **/
@@ -50,8 +50,8 @@
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
-/** @typedef    eOappTheMCNVmap_cfg_t
-    @brief      eOappTheMCNVmap_cfg_t contains .....
+/** @typedef    eOappTheNVmapRef_cfg_t
+    @brief      eOappTheNVmapRef_cfg_t contains .....
  **/  
 typedef struct
 {
@@ -61,14 +61,13 @@ typedef struct
     EOnvsCfg    *nvsCfg;      /**<  Network Variable configuration          */
     eOnvEP_t    mc_endpoint;  /**<  motion control endopoint managed by the application    */
     eOnvEP_t    as_endpoint;  /**<  analog sensor endopoint managed by the application    */
-} eOappTheMCNVmap_cfg_t;
+} eOappTheNVmapRef_cfg_t;
 
 
-/** @typedef    typedef struct EOappTheMCNVmap_hid EOappTheMCNVmap
+/** @typedef    typedef struct EOappTheNVmapRef_hid EOappTheNVmapRef
     @brief      ...... 
  **/  
-typedef struct EOappTheMCNVmap_hid EOappTheMCNVmap;
-
+typedef struct EOappTheNVmapRef_hid EOappTheNVmapRef;
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
@@ -78,36 +77,36 @@ typedef struct EOappTheMCNVmap_hid EOappTheMCNVmap;
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-/** @fn         extern EOappTheMCNVmap* eo_appTheMCNVmap_Initialise(eOappTheMCNVmap_cfg_t *cfg)
+/** @fn         extern EOappTheNVmapRef* eo_appTheNVmapRef_Initialise(eOappTheNVmapRef_cfg_t *cfg)
 
-    @brief      Initialise the singleton EOappTheMCNVmap.
+    @brief      Initialise the singleton EOappTheNVmapRef.
     @param      cfg         The configuration.
     @return     NULL is case of error, otherwise a handle to the singleton.
  
  **/
-extern EOappTheMCNVmap* eo_appTheMCNVmap_Initialise(eOappTheMCNVmap_cfg_t *cfg);
+extern EOappTheNVmapRef* eo_appTheNVmapRef_Initialise(eOappTheNVmapRef_cfg_t *cfg);
 
 
 
-extern EOappTheMCNVmap* eo_appTheMCNVmap_GetHandle(void);
+extern EOappTheNVmapRef* eo_appTheNVmapRef_GetHandle(void);
 
 
-/** @fn         extern eOresult_t eo_appTheMCNVmap_GetJointNVMemoryRef(EOappTheMCNVmap* p, eOmc_jointId_t jUiniqueId, uint8_t nvindex, void**memRef);
+/** @fn         extern eOresult_t eo_appTheNVmapRef_GetJointNVMemoryRef(EOappTheNVmapRef* p, eOmc_jointId_t jUiniqueId, uint8_t nvindex, void**memRef);
     @brief      given joint id and network variable index about joint return a poiter to ram where there is nv's value.
     @param      
     @return     
     @waring:   use eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t for nvindex
  **/
-extern eOresult_t eo_appTheMCNVmap_GetJointNVMemoryRef(EOappTheMCNVmap* p, eOmc_jointId_t jUiniqueId, uint8_t nvindex, void**memRef);
+extern eOresult_t eo_appTheNVmapRef_GetJointNVMemoryRef(EOappTheNVmapRef* p, eOmc_jointId_t jUiniqueId, uint8_t nvindex, void**memRef);
 
 
-extern eOresult_t eo_appTheMCNVmap_GetJointNVMemoryRef_test(EOappTheMCNVmap* p, eOmc_jointId_t jUiniqueId, uint8_t nvindex, void**memRef);
+extern eOresult_t eo_appTheNVmapRef_GetJointNVMemoryRef_test(EOappTheNVmapRef* p, eOmc_jointId_t jUiniqueId, uint8_t nvindex, void**memRef);
 
 
-extern eOresult_t eo_appTheMCNVmap_GetMotorNVMemoryRef(EOappTheMCNVmap* p, eOmc_motorId_t mUiniqueId, uint8_t nvindex, void**memRef);
+extern eOresult_t eo_appTheNVmapRef_GetMotorNVMemoryRef(EOappTheNVmapRef* p, eOmc_motorId_t mUiniqueId, uint8_t nvindex, void**memRef);
 
 /** @}            
-    end of group eo_app_theMCNVmap  
+    end of group eo_app_TheNVmapRef  
  **/
 
 #endif  // include-guard

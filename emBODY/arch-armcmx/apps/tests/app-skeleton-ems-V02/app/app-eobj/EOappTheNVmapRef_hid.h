@@ -32,19 +32,16 @@
 
 #include "EoCommon.h"
 #include "EOMotionControl.h"
-//#include "eOcfg_nvsEP_mc.h"
+#include "eOcfg_nvsEP_mc.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "EOappTheMCNVmap.h"
+#include "EOappTheNVmapRef.h"
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
-#define jointNumber_TOTALnumber     12
-#define motorNumber_TOTALnumber     12
-#define sensorNumber_TOTALnumber     12
-//vale: usa qc costante globale
+
 
 
 
@@ -57,15 +54,15 @@
  **/  
 
 
-struct EOappTheMCNVmap_hid 
+struct EOappTheNVmapRef_hid 
 {
     eOboolvalues_t     isInited; 
     EOnvsCfg           *nvsCfg;
     eOnvEP_t           mc_endpoint;
     eOnvEP_t           as_endpoint;
-    void**             jointsList[jointNumber_TOTALnumber];
-    void**             motorsList[motorNumber_TOTALnumber];
-    void**             sensorsList[sensorNumber_TOTALnumber];   //  TODO: metti il num dei sensori
+    void**             jointsList[jointEndpoint_TOTALnumber];
+    void**             motorsList[motorEndpoint_TOTALnumber];
+    void**             sensorsList[jointEndpoint_TOTALnumber];   //  TODO: metti il num dei sensori
 }; 
 
 

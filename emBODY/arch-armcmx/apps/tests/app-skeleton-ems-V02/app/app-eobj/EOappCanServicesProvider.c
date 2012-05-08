@@ -116,9 +116,9 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg)
 
     eo_emsCanNetTopo_cfg_t   emsCanNetTopo_cfg = 
     {
-        EO_INIT(.emsCanNetTopo_joints__ptr)     eo_cfg_emsCanNetTopo_leftleg_constvec_joints[eObrd_emsInBodypart__ems1],
-        EO_INIT(.emsCanNetTopo_motors__ptr)     eo_cfg_emsCanNetTopo_leftleg_constvec_motors[eObrd_emsInBodypart__ems1],
-        EO_INIT(.emsCanNetTopo_sensors__ptr)    eo_cfg_emsCanNetTopo_leftleg_constvec_sensors[eObrd_emsInBodypart__ems1],
+        EO_INIT(.emsCanNetTopo_joints__ptr)     eo_cfg_emsCanNetTopo_constvec_joints__ptr,
+        EO_INIT(.emsCanNetTopo_motors__ptr)     eo_cfg_emsCanNetTopo_constvec_motors__ptr,
+        EO_INIT(.emsCanNetTopo_sensors__ptr)    eo_cfg_emsCanNetTopo_constvec_sensors__ptr,
     };
 
 
@@ -163,31 +163,19 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg)
 
 extern eOresult_t eo_appCanSP_GetConnectedJoints(EOappCanSP *p, EOfifoByte *connectedJointsList)
 {
-    eOsizecntnr_t size;
-    uint8_t i;
-
-    eo_emsCanNetTopo_jointOrMotorTopoInfo_t *jTInfo;
-    if((NULL == p) || (NULL == connectedJointsList))
-    {
-        return(eores_NOK_nullpointer);
-    }
-
-    if(NULL == p->emsCanNetTopo_ptr->cfg.emsCanNetTopo_joints__ptr)
-    {
-        return(eores_NOK_nodata);
-    }
-
-    jTInfo = (eo_emsCanNetTopo_jointOrMotorTopoInfo_t *)p->emsCanNetTopo_ptr->cfg.emsCanNetTopo_joints__ptr->item_array_data;
-    size = p->emsCanNetTopo_ptr->cfg.emsCanNetTopo_joints__ptr->size;
-
-    for(i=0; i< size; i++)
-    {
-        eo_fifobyte_Put(connectedJointsList, jTInfo[i].id, 0);    
-    }
-
-    return(eores_OK);
+    return(eo_emsCanNetTopo_GetConnectedJoints(p->emsCanNetTopo_ptr, connectedJointsList));
 }
 
+
+extern eOresult_t eo_appCanSP_GetConnectedMotors(EOappCanSP *p, EOfifoByte *connectedMotorsList)
+{
+    return(eo_emsCanNetTopo_GetConnectedMotors(p->emsCanNetTopo_ptr, connectedMotorsList));
+}
+
+extern eOresult_t eo_appCanSP_GetConnectedSensors(EOappCanSP *p, EOfifoByte *connectedSensorsList)
+{
+    return(eo_emsCanNetTopo_GetConnectedSensors(p->emsCanNetTopo_ptr, connectedSensorsList));
+}
 
 extern eOresult_t eo_appCanSP_SendCmd2Joint(EOappCanSP *p, eOmc_jointId_t jId, eo_icubCanProto_msgCommand_t msgCmd, void *val_ptr)
 {

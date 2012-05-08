@@ -43,14 +43,14 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
-#include "EOappTheMCNVmap.h"
+#include "EOappTheNVmapRef.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOappTheMCNVmap_hid.h" 
+#include "EOappTheNVmapRef_hid.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -74,19 +74,19 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-static void s_eo_appTheMCNVmap_tables_create(eOappTheMCNVmap_cfg_t *cfg);
-static void s_eo_appTheMCNVmap_tables_initialise(void);
-static void s_eo_appTheMCNVmap_table_motors_initialise(void);
-static void s_eo_appTheMCNVmap_table_joints_initialise(void);
+static void s_eo_appTheNVmapRef_tables_create(eOappTheNVmapRef_cfg_t *cfg);
+static void s_eo_appTheNVmapRef_tables_initialise(void);
+static void s_eo_appTheNVmapRef_table_motors_initialise(void);
+static void s_eo_appTheNVmapRef_table_joints_initialise(void);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
 
-//static const char s_eobj_ownname[] = "EOappTheMCNVmap";
+//static const char s_eobj_ownname[] = "EOappTheNVmapRef";
 
-static EOappTheMCNVmap s_eo_appTheMCNVmap;
+static EOappTheNVmapRef s_eo_appTheNVmapRef;
 
 
 
@@ -94,20 +94,20 @@ static EOappTheMCNVmap s_eo_appTheMCNVmap;
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOappTheMCNVmap* eo_appTheMCNVmap_Initialise(eOappTheMCNVmap_cfg_t *cfg)
+extern EOappTheNVmapRef* eo_appTheNVmapRef_Initialise(eOappTheNVmapRef_cfg_t *cfg)
 {
-    EOappTheMCNVmap* retptr = NULL;
+    EOappTheNVmapRef* retptr = NULL;
     if(NULL == cfg)
     {
         return(retptr);
     }
     
-    retptr = &s_eo_appTheMCNVmap;
+    retptr = &s_eo_appTheNVmapRef;
     retptr->nvsCfg = cfg->nvsCfg;
     retptr->mc_endpoint = cfg->mc_endpoint;
     retptr->as_endpoint = cfg->as_endpoint;
-    s_eo_appTheMCNVmap_tables_create(cfg);
-    s_eo_appTheMCNVmap_tables_initialise();
+    s_eo_appTheNVmapRef_tables_create(cfg);
+    s_eo_appTheNVmapRef_tables_initialise();
 
     retptr->isInited = eobool_true;
 
@@ -116,12 +116,12 @@ extern EOappTheMCNVmap* eo_appTheMCNVmap_Initialise(eOappTheMCNVmap_cfg_t *cfg)
 
 
 
-extern EOappTheMCNVmap* eo_appTheMCNVmap_GetHandle(void)
+extern EOappTheNVmapRef* eo_appTheNVmapRef_GetHandle(void)
 {
-    return(&s_eo_appTheMCNVmap);
+    return(&s_eo_appTheNVmapRef);
 }
 
-extern eOresult_t eo_appTheMCNVmap_GetJointNVMemoryRef(EOappTheMCNVmap* p, eOmc_jointId_t jUiniqueId, uint8_t nvindex, void**memRef)
+extern eOresult_t eo_appTheNVmapRef_GetJointNVMemoryRef(EOappTheNVmapRef* p, eOmc_jointId_t jUiniqueId, uint8_t nvindex, void**memRef)
 {
 
     if(NULL == p)
@@ -135,7 +135,7 @@ extern eOresult_t eo_appTheMCNVmap_GetJointNVMemoryRef(EOappTheMCNVmap* p, eOmc_
 
 }
 
-extern eOresult_t eo_appTheMCNVmap_GetJointNVMemoryRef_test(EOappTheMCNVmap* p, eOmc_jointId_t jId, uint8_t nvindex, void**memRef)
+extern eOresult_t eo_appTheNVmapRef_GetJointNVMemoryRef_test(EOappTheNVmapRef* p, eOmc_jointId_t jId, uint8_t nvindex, void**memRef)
 {
     eOnvID_t nv_id;
     EOnv nv;
@@ -155,7 +155,7 @@ extern eOresult_t eo_appTheMCNVmap_GetJointNVMemoryRef_test(EOappTheMCNVmap* p, 
 }
 
 
-extern eOresult_t eo_appTheMCNVmap_GetMotorNVMemoryRef(EOappTheMCNVmap* p, eOmc_motorId_t mId, uint8_t nvindex, void**memRef)
+extern eOresult_t eo_appTheNVmapRef_GetMotorNVMemoryRef(EOappTheNVmapRef* p, eOmc_motorId_t mId, uint8_t nvindex, void**memRef)
 {
     void **aux;
     void *addr = 0;
@@ -181,14 +181,14 @@ extern eOresult_t eo_appTheMCNVmap_GetMotorNVMemoryRef(EOappTheMCNVmap* p, eOmc_
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-static void s_eo_appTheMCNVmap_tables_create(eOappTheMCNVmap_cfg_t *cfg)
+static void s_eo_appTheNVmapRef_tables_create(eOappTheNVmapRef_cfg_t *cfg)
 {
 
     uint8_t         i;
     eOsizecntnr_t  size;
     eOmc_jointId_t jUId;
     eOmc_motorId_t mUId;
-    EOappTheMCNVmap* p = &s_eo_appTheMCNVmap;
+    EOappTheNVmapRef* p = &s_eo_appTheNVmapRef;
     
 
     //reset joint list
@@ -224,14 +224,14 @@ static void s_eo_appTheMCNVmap_tables_create(eOappTheMCNVmap_cfg_t *cfg)
 
 }
 
-static void s_eo_appTheMCNVmap_tables_initialise(void)
+static void s_eo_appTheNVmapRef_tables_initialise(void)
 {
-    s_eo_appTheMCNVmap_table_motors_initialise();
-    s_eo_appTheMCNVmap_table_joints_initialise();
+    s_eo_appTheNVmapRef_table_motors_initialise();
+    s_eo_appTheNVmapRef_table_joints_initialise();
 }
 
 
-static void s_eo_appTheMCNVmap_table_joints_initialise(void)
+static void s_eo_appTheNVmapRef_table_joints_initialise(void)
 {
 
     uint8_t             j;
@@ -240,13 +240,13 @@ static void s_eo_appTheMCNVmap_table_joints_initialise(void)
     EOnv                *nv_res_ptr;
     eOnvID_t            nv_id;
     eOresult_t          res;
-    EOappTheMCNVmap     *p = &s_eo_appTheMCNVmap;
+    EOappTheNVmapRef     *p = &s_eo_appTheNVmapRef;
 
     eo_cfg_nvsEP_mc_jointNVindex_t jnvindex;
  
  
     //init joints-NV table   
-    for(j=0; j<jointNumber_TOTALnumber; j++)
+    for(j=0; j<jointEndpoint_TOTALnumber; j++)
     {
         if(NULL == p->jointsList[j])
         {
@@ -275,7 +275,7 @@ static void s_eo_appTheMCNVmap_table_joints_initialise(void)
 
 }
 
-static void s_eo_appTheMCNVmap_table_motors_initialise(void)
+static void s_eo_appTheNVmapRef_table_motors_initialise(void)
 {
     uint8_t             m;
     uint16_t            ipindex, epindex, idindex;;
@@ -283,13 +283,13 @@ static void s_eo_appTheMCNVmap_table_motors_initialise(void)
     EOnv                *nv_res_ptr;
     eOnvID_t            nv_id;
     eOresult_t          res;
-    EOappTheMCNVmap     *p = &s_eo_appTheMCNVmap;
+    EOappTheNVmapRef     *p = &s_eo_appTheNVmapRef;
 
     eo_cfg_nvsEP_mc_motorNVindex_t mnvindex;
  
  
     //init motors-NV table   
-    for(m=0; m<motorNumber_TOTALnumber; m++)
+    for(m=0; m<motorEndpoint_TOTALnumber; m++)
     {
         if(NULL == p->motorsList[m])
         {
