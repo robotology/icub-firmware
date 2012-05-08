@@ -744,7 +744,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>ep-mngmnt</GroupName>
+          <GroupName>eo-mn</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_nvsEP_mn.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ep-mn-mngmnt</GroupName>
           <Files>
             <File>
               <FileName>eOcfg_nvsEP_mngmnt_con.c</FileName>
