@@ -91,6 +91,7 @@ typedef struct                  // size is 16 bytes
     const EOconstvector* const  constvector_of_treenodes_EOnv_con;
     const EOconstvector* const  constvector_of_EOnv_usr;
     eOvoid_fp_uint16_voidp_voidp_t     endpoint_data_init;
+    eOvoid_fp_uint16_voidp_voidp_t  endpoint_data_retrieve;
 } eOnvscfg_EP_t;
 #warning --> change the function to be endpoint_data_init(eOnvEP_t, void* and void*)
     
