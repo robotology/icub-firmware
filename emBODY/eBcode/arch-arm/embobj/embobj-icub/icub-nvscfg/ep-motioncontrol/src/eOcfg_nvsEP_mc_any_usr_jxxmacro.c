@@ -27,7 +27,7 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "eOcommon.h"    
+#include "EoCommon.h"    
 #include "EOnv_hid.h"
 
       

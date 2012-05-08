@@ -56,6 +56,8 @@
 
 #include "eOcfg_nvsEP_sk.h"
 
+#include "eOcfg_nvsEP_mn.h"
+
 
 
 
@@ -117,7 +119,7 @@ extern const EOconstvector  s_eo_cfg_nvsEP_sk_emsboard_usr_constvector_of_EOnv_u
 static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_eb2_data[] =
 {  
     {   // mngmnt
-        EO_INIT(.endpoint)                          endpoint_mngmnt,
+        EO_INIT(.endpoint)                          endpoint_mn_mngmnt,
         EO_INIT(.sizeof_endpoint_data)              EOK_cfg_nvsEP_mngmnt_RAMSIZE,
         EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mngmnt_hashfunction_id2index,
         EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con, 
@@ -228,7 +230,7 @@ extern void* eo_cfg_nvsEP_eb2_Get_locallyownedRAM(eOnvEP_t ep)
 
 static uint8_t s_hashtable[64] = 
 {
-    // 00-15: BS endpoint_mngmnt is 1 and is in pos 0
+    // 00-15: BS endpoint_mn_mngmnt is 1 and is in pos 0
     0xff, 0,    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
     // 16-31: MC endpoint_mc_leftlowerarm is 0x12 andis in pos 1
     0xff, 0xff, 1,    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
@@ -243,7 +245,7 @@ static uint16_t s_hash(uint16_t ep)
 #if 0 
     uint16_t r = ep & 0xff;
     
-    if(endpoint_mngmnt == r)
+    if(endpoint_mn_mngmnt == r)
     {
         return(0);
     }
@@ -284,7 +286,7 @@ static uint16_t s_eo_cfg_nvsEP_eb2_hashfunction_ep2index(uint16_t ep)
 
     static const uint16_t s_eptable[EPTABLESIZE] = 
     { 
-        endpoint_mngmnt,        endpoint_mc_leftlowerarm,       endpoint_as_leftlowerarm,   endpoint_sk_emsboard_leftlowerarm
+        endpoint_mn_mngmnt,        endpoint_mc_leftlowerarm,       endpoint_as_leftlowerarm,   endpoint_sk_emsboard_leftlowerarm
     };
    
     uint16_t index = s_hash(ep);

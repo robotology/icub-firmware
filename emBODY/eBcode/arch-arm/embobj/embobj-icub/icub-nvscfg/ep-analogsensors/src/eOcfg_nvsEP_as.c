@@ -39,6 +39,9 @@
 
 #include "eOcfg_nvsEP_as_any_con_body.h"
 
+#include "eOcfg_nvsEP_as_onestrain_con.h"
+#include "eOcfg_nvsEP_as_onemais_con.h"
+
 #include "EOnv_hid.h"
 
 
@@ -117,7 +120,53 @@ extern const eOsnsr_mais_t* eo_cfg_nvsEP_as_mais_defaultvalue = &eo_cfg_nvsEP_as
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-// as the maximum aggregation of joint-motor in an endpoint is the bodypart, we use the bodypart functions to get the nvid
+
+extern uint16_t eo_cfg_nvsEP_as_strain_numbermax_Get(eo_cfg_nvsEP_as_endpoint_t ep)
+{
+    static const uint8_t smax[9] =
+    {
+        strainOneStrain_TOTALnumber, 0,                                 // left arm
+        strainOneStrain_TOTALnumber, 0,                                 // right arm
+        0,                                                              // torso
+        strainOneStrain_TOTALnumber, 0,                                 // left leg
+        strainOneStrain_TOTALnumber, 0                                  // right leg       
+    };  EO_VERIFYsizeof(smax, 9*sizeof(uint8_t));   
+    
+    uint16_t max = 0; 
+    uint16_t i = (uint16_t)ep - (uint16_t)endpoint_as_leftupperarm;
+    if(i < 9)
+    {
+        max = smax[i];
+    }
+    
+    return(max);       
+}
+
+
+extern uint16_t eo_cfg_nvsEP_as_mais_numbermax_Get(eo_cfg_nvsEP_as_endpoint_t ep)
+{
+    static const uint8_t mmax[9] =
+    {
+        0, maisOneMais_TOTALnumber,                                 // left arm
+        0, maisOneMais_TOTALnumber,                                 // right arm
+        0,                                                          // torso
+        0, 0,                                                       // left leg
+        0, 0                                                        // right leg       
+    };  EO_VERIFYsizeof(mmax, 9*sizeof(uint8_t));   
+    
+    uint16_t max = 0; 
+    uint16_t i = (uint16_t)ep - (uint16_t)endpoint_as_leftupperarm;
+    if(i < 9)
+    {
+        max = mmax[i];
+    }
+    
+    return(max);        
+    
+}
+
+
+// as the maximum aggregation in an endpoint is the bodypart, we use the bodypart functions to get the nvid
 // irrespectively of the endpoint
 
 extern eOnvID_t eo_cfg_nvsEP_as_strain_NVID_Get(eo_cfg_nvsEP_as_endpoint_t ep, eo_cfg_nvsEP_as_strainNumber_t s, eo_cfg_nvsEP_as_strainNVindex_t snvindex)

@@ -53,10 +53,10 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-typedef enum
-{
-    endpoint_mngmnt                             = 0x0001 
-} eo_cfg_nvsEP_mngmnt_endpoint_t;
+// typedef enum
+// {
+//     endpoint_mngmnt                             = 0x0001 
+// } eo_cfg_nvsEP_mngmnt_endpoint_t;
 
 
 /** @typedef    typedef enum eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t;

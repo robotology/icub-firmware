@@ -73,12 +73,16 @@ typedef enum
 
 } eo_cfg_nvsEP_mc_endpoint_t;
 
+enum { endpoint_mc_TOTALnumber = 9};
+
 
 /** @typedef    typedef uint16_t eo_cfg_nvsEP_mc_jointNumber_t;
     @brief      It contains an index for a joint in a manner that is independent from the endpoint.
-                This number is used to retrieve the network variable of that joint.
+                The maximum value is jointNumberMAX.
  **/
 typedef uint16_t eo_cfg_nvsEP_mc_jointNumber_t;
+
+enum { jointNumberMAX = 12};
 
 
 
@@ -127,9 +131,11 @@ enum { jointNVindex_TOTALnumber = 28};
 
 /** @typedef    typedef uint16_t eo_cfg_nvsEP_mc_motorNumber_t;
     @brief      It contains an index for a motor in a manner that is independnt from the endpoint of bodypart.
+                It maximum number in every endpoint is motorNumberMAX
  **/
 typedef uint16_t eo_cfg_nvsEP_mc_motorNumber_t;
 
+enum { motorNumberMAX = 12};
 
 
 /** @typedef    typedef enum eo_cfg_nvsEP_mc_motorNVindex_t;
@@ -158,6 +164,13 @@ enum { motorNVindex_TOTALnumber = 8};
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
+
+
+extern uint16_t eo_cfg_nvsEP_mc_joint_numbermax_Get(eo_cfg_nvsEP_mc_endpoint_t ep);
+
+
+extern uint16_t eo_cfg_nvsEP_mc_motor_numbermax_Get(eo_cfg_nvsEP_mc_endpoint_t ep);
+
 
 /** @fn         extern eOnvID_t eo_cfg_nvsEP_mc_motor_NVID_Get(eo_cfg_nvsEP_mc_endpoint_t ep, eo_cfg_nvsEP_mc_motorNumber_t m, eo_cfg_nvsEP_mc_motorNVindex_t mnvindex)
     @brief      This function retrieves the eOnvID_t of a network variable with index @e jnvindex for the joint number @e j, given the endpoint @e ep

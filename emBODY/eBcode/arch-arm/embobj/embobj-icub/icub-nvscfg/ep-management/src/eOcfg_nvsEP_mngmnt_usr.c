@@ -33,6 +33,7 @@
 
 #include "EoCommon.h"
 #include "eOcfg_nvsEP_mngmnt_con.h"
+#include "eOcfg_nvsEP_mn_hid.h"
 
 #include "EOnv_hid.h"
 #include "EOconstvector_hid.h"
@@ -158,6 +159,7 @@ __weak extern void eo_cfg_nvsEP_mngmnt_usr_hid_INITIALISE(eOnvEP_t ep, void *loc
 {
     eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mn_hid_INITIALISE(ep, loc, rem);
 }
 
 // init:
@@ -165,12 +167,14 @@ __weak extern void eo_cfg_nvsEP_mngmnt_usr_hid_INIT__ropsigcfgassign(uint16_t n,
 {   // n is always 0
      eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
      theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgassign(n , nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mngmnt_usr_hid_INIT__ropsigcfgcommand(uint16_t n, const EOnv* nv)
 {   // n is always 0
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgcommand(n, nv);
 }
 
 
@@ -179,12 +183,14 @@ __weak extern void eo_cfg_nvsEP_mngmnt_usr_hid_UPDT__ropsigcfgassign(uint16_t n,
 {   // n is always 0
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgassign(n, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mngmnt_usr_hid_UPDT__ropsigcfgcommand(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {   // n is always 0
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgcommand(n, nv, time, sign);    
 }
 
 

@@ -63,11 +63,13 @@ typedef enum
     endpoint_as_rightupperarm                       = 0x0023,   /**< used by EB3 board. it has a strain */
     endpoint_as_rightlowerarm                       = 0x0024,   /**< used by EB4 board. it has a mais   */
 
-    endpoint_as_leftupperleg                        = 0x0026,   /**< used by EB6 board. it has a strain */
-    
+    endpoint_as_leftupperleg                        = 0x0026,   /**< used by EB6 board. it has a strain */    
     endpoint_as_rightupperleg                       = 0x0028    /**< used by EB8 board. it has a strain */
 
 } eo_cfg_nvsEP_as_endpoint_t;
+
+enum { endpoint_as_TOTALnumber = 6 };
+
 
 
 /** @typedef    typedef uint16_t eo_cfg_nvsEP_as_strainNumber_t;
@@ -75,6 +77,8 @@ typedef enum
                 This number is used to retrieve the network variable of that strain.
  **/
 typedef uint16_t eo_cfg_nvsEP_as_strainNumber_t;
+
+enum { strainNumberMAX = 4};
 
 
 
@@ -101,6 +105,8 @@ enum { strainNVindex_TOTALnumber = 6};
  **/
 typedef uint16_t eo_cfg_nvsEP_as_maisNumber_t;
 
+enum { maisNumberMAX = 2};
+
 
 
 /** @typedef    typedef enum eo_cfg_nvsEP_as_maisNVindex_t;
@@ -125,6 +131,14 @@ extern const eOsnsr_strain_t* eo_cfg_nvsEP_as_strain_defaultvalue;
 extern const eOsnsr_mais_t* eo_cfg_nvsEP_as_mais_defaultvalue;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
+
+
+extern uint16_t eo_cfg_nvsEP_as_strain_numbermax_Get(eo_cfg_nvsEP_as_endpoint_t ep);
+
+
+extern uint16_t eo_cfg_nvsEP_as_mais_numbermax_Get(eo_cfg_nvsEP_as_endpoint_t ep);
+
+
 
 /** @fn         extern eOnvID_t eo_cfg_nvsEP_as_strain_NVID_Get(eo_cfg_nvsEP_as_endpoint_t ep, eo_cfg_nvsEP_as_strainNumber_t s, eo_cfg_nvsEP_as_strainNVindex_t snvindex)
     @brief      This function retrieves the eOnvID_t of a network variable with index @e snvindex for the strain number @e s, given the endpoint @e ep
