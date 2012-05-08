@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       eOcfg_nvsEP_as_any_usr_nvmacro.c
+/* @file       eOcfg_nvsEP_as.c
     @brief      This file keeps constant configuration for ...
     @author     marco.accame@iit.it
     @date       04/06/2012
@@ -27,11 +27,14 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "stdlib.h" 
+#include "string.h"
+#include "stdio.h"
 
-#include "EoCommon.h"    
+#include "EoSkin.h"
 #include "EOnv_hid.h"
 
-      
+#include "eOcfg_nvsEP_mngmnt_con.h"
 
 
 
@@ -40,11 +43,14 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "eOcfg_nvsEP_mn.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+#include "eOcfg_nvsEP_mn_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -54,10 +60,19 @@
 
 
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+// in here we put a check vs coherency of ....
+
+
+EO_VERIFYproposition(xxx, mnNVindex__ropsigcfgassign                    == mngmntNVindex__ropsigcfgassign);
+EO_VERIFYproposition(xxx, mnNVindex__ropsigcfgcommand                   == mngmntNVindex__ropsigcfgcommand);
+
+EO_VERIFYproposition(xxx, mnNVindex_TOTALnumber                         == mngmntNVindex_TOTALnumber);
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -75,6 +90,9 @@
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
 
+//extern const eo_cfg_nvsEP_sk_emsboard_t eo_cfg_nvsEP_sk_emsboard_default;
+
+//extern const eOskin_someskin_t* eo_cfg_nvsEP_sk_someskin_defaultvalue = &eo_cfg_nvsEP_sk_emsboard_default.someskin;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -83,10 +101,64 @@
 
 
 
+extern eOnvID_t eo_cfg_nvsEP_mn_NVID_Get(eo_cfg_nvsEP_mn_endpoint_t ep, eo_cfg_nvsEP_mn_Number_t n, eo_cfg_nvsEP_mn_NVindex_t nvindex)
+{
+    return(eo_cfg_nvsEP_mngmnt_NVID_Get((eo_cfg_nvsEP_mngmnt_NVindex_t) nvindex));
+}
+
+
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+__weak extern void eo_cfg_nvsEP_mn_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
+{
+    eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+}
+
+// init:    n is not used
+__weak extern void eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgassign(uint16_t n, const EOnv* nv)
+{   // n is always 0
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+
+__weak extern void eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgcommand(uint16_t n, const EOnv* nv)
+{   // n is always 0
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+
+
+// updt:    n is not used
+__weak extern void eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgassign(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{   // n is always 0
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+
+__weak extern void eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgcommand(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{   // n is always 0
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+
+
 
 
 
@@ -95,69 +167,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#define xx0fun_init(pstr, bstr, nvstr, var)                  s_eo_cfg_nvsEP_as_INIT ## pstr ## bstr ## nvstr ## var
-#define MACRO_fun_INIT(pstr, bstr, nvstr, var)               xx0fun_init(pstr, bstr, nvstr, var)
-
-
-#define xx0fun_exinit(funinit, var, nvnum, a1)                  eo_cfg_nvsEP_as_ ## funinit ## var (nvnum, a1)
-#define MACRO_fun_external_INIT(funinit, var, nvnum, a1)        xx0fun_exinit(funinit, var, nvnum, a1)
-
-//#define xx0fun_updt(pstr, bstr, nvstr, var)                  s_eo_cfg_nvsEP_as ## pstr _usr_loc ## bstr _action_UPDT ## nvstr ## var
-#define xx0fun_updt(pstr, bstr, nvstr, var)                  s_eo_cfg_nvsEP_as_UPDT ## pstr ## bstr ## nvstr ## var
-#define MACRO_fun_UPDT(pstr, bstr, nvstr, var)               xx0fun_updt(pstr, bstr, nvstr, var)
-
-
-#define xx0fun_exupdt(funupdt, var, nvnum, a1, a2, a3)                  eo_cfg_nvsEP_as_ ## funupdt ## var (nvnum, a1, a2, a3)
-#define MACRO_fun_external_UDPT(funupdt, var, nvnum, a1, a2, a3)        xx0fun_exupdt(funupdt, var, nvnum, a1, a2, a3)
-
-
-#define xx0var(pstr, bstr, nvstr, var)                  s_eo_cfg_nvsEP_as ## pstr ## bstr ## nvstr ## var
-#define MACRO_PERIPH_INTERFACE(pstr, bstr, nvstr, var)               xx0var(pstr, bstr, nvstr, var)
-
-
-#if(1 == NVMACRO_USE_INIT)
-//static void s_eo_cfg_nvsEP_as_leftleg_usr_loc_ebx_action_INIT_j00NVMACRO_NVSTR2(const EOnv* nv)
-static void MACRO_fun_INIT(NVMACRO_PSTR, NVMACRO_NVSTR1, NVMACRO_BSTR, NVMACRO_NVSTR2)(const EOnv* nv)
-{   
-    MACRO_fun_external_INIT(NVMACRO_FUN_INIT, NVMACRO_NVSTR2, NVMACRO_NVNUM1, nv);
-}
-#endif
-
-#if(1 == NVMACRO_USE_UPDT)
-//static void s_eo_cfg_nvsEP_as_leftleg_usr_loc_ebx_action_UPDT_j00NVMACRO_NVSTR2(const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-static void MACRO_fun_UPDT(NVMACRO_PSTR, NVMACRO_NVSTR1, NVMACRO_BSTR, NVMACRO_NVSTR2)(const EOnv* nv, const eOabstime_t time, const uint32_t sign)
-{
-    MACRO_fun_external_UDPT(NVMACRO_FUN_UPDT, NVMACRO_NVSTR2, NVMACRO_NVNUM1, nv, time, sign);
-}
-#endif
-
-// s_eo_cfg_nvsEP_as_leftleg_j00_ebx_xxxxx
-static const eOnv_fn_peripheral_t MACRO_PERIPH_INTERFACE(NVMACRO_PSTR, NVMACRO_NVSTR1, NVMACRO_BSTR, NVMACRO_NVSTR2) =
-{
-#if(1 == NVMACRO_USE_INIT)
-    EO_INIT(.init)      MACRO_fun_INIT(NVMACRO_PSTR, NVMACRO_NVSTR1, NVMACRO_BSTR, NVMACRO_NVSTR2),
-#else
-    EO_INIT(.init)      NULL,
-#endif
-#if(1 == NVMACRO_USE_UPDT)
-    EO_INIT(.update)    MACRO_fun_UPDT(NVMACRO_PSTR, NVMACRO_NVSTR1, NVMACRO_BSTR, NVMACRO_NVSTR2)
-#else
-    EO_INIT(.update)    NULL
-#endif
-};
-
-
-#undef NVMACRO_FUN_INIT    
-#undef NVMACRO_FUN_UPDT    
-
-#undef NVMACRO_PSTR        
-#undef NVMACRO_BSTR        
-#undef NVMACRO_NVSTR1      
-#undef NVMACRO_NVNUM1      
-#undef NVMACRO_NVSTR2      
-
-#undef NVMACRO_USE_INIT    
-#undef NVMACRO_USE_UPDT    
 
 
 

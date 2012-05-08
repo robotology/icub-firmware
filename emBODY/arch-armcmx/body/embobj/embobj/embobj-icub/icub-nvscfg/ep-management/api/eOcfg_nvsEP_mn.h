@@ -18,19 +18,19 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EOCFG_NVSEP_SK_H_
-#define _EOCFG_NVSEP_SK_H_
+#ifndef _EOCFG_NVSEP_MN_H_
+#define _EOCFG_NVSEP_MN_H_
 
 
 
 
-/** @file       eOcfg_nvsEP_sk.h
+/** @file       eOcfg_nvsEP_mn.h
 	@brief      This header file gives the constant configuration for the NVs in the endpoint bodysensors
 	@author     marco.accame@iit.it
 	@date       04/05/2012
 **/
 
-/** @defgroup eo_werasfdgr234 Configuation of the NVs ...
+/** @defgroup eo_awerasfdgr234 Configuation of the NVs ...
     Tcecece 
     
     @{		
@@ -44,7 +44,6 @@
 #include "EOarray.h"
 #include "EOnv.h"
 
-#include "EoSkin.h"
 
  
 
@@ -55,62 +54,64 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-/** @typedef    typedef enum eo_cfg_nvsEP_sk_endpoint_t;
-    @brief      It contains all the endpoints used for skin. The grouping is done by sub-bodypart
-                in such a way that each ep is contained by a exactly one EMS board in iCub ver 2.5
+
+typedef enum
+{
+    endpoint_mn_mngmnt                          = 0x0001    /**< used by every board */
+} eo_cfg_nvsEP_mn_endpoint_t;
+
+enum { endpoint_mn_TOTALnumber = 1};
+
+
+
+/** @typedef    typedef uint16_t eo_cfg_nvsEP_mn_Number_t;
+    @brief      It contains an index for a mn in a manner that is independnt from the endpoint.
+ **/
+typedef uint16_t eo_cfg_nvsEP_mn_Number_t;
+
+enum { mnNumberMAX = 1};
+
+
+
+/** @typedef    typedef enum eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t;
+    @brief      It contains an index for all the network variables in a joint. The indices are consecutive and without
+                holes, so that the enum value can be changed by a normal index.
  **/
 typedef enum
 {
-    endpoint_sk_emsboard_leftlowerarm           = 0x0032,   /**< used by EB2 board */      
-    endpoint_sk_emsboard_rightlowerarm          = 0x0034    /**< used by EB4 board */    
-} eo_cfg_nvsEP_sk_endpoint_t;
+    mnNVindex__ropsigcfgassign                          =  0,
+    mnNVindex__ropsigcfgcommand                         =  1
+} eo_cfg_nvsEP_mn_NVindex_t;
 
-enum { endpoint_sk_TOTALnumber = 2};
-
-
-/** @typedef    typedef uint16_t eo_cfg_nvsEP_sk_skinNumber_t;
-    @brief      It contains an index for a skin in a manner that is independnt from the endpoint.
- **/
-typedef uint16_t eo_cfg_nvsEP_sk_skinNumber_t;
-
-enum { skinNumberMAX = 1};
+enum { mnNVindex_TOTALnumber = 2};
 
 
-/** @typedef    typedef struct eo_cfg_nvsEP_sk_skinNVindex_t
-    @brief      It contains an index for all the network variables in the skin.
- **/
-typedef enum
-{
-    skinNVindex_sconfig__sigmode                        =  0,
-    skinNVindex_sstatus__arrayof10canframe              =  1
-} eo_cfg_nvsEP_sk_skinNVindex_t;
-
-enum { skinNVindex_TOTALnumber = 2 };
 
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eOskin_someskin_t* eo_cfg_nvsEP_sk_someskin_defaultvalue;
+//const eo_cfg_nvsEP_mngmnt_t *eo_cfg_nvsEP_mngmnt_defaultvalue;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
 
-/** @fn         extern eOnvID_t eo_cfg_nvsEP_sk_NVID_Get(eo_cfg_nvsEP_sk_endpoint_t ep, eo_cfg_nvsEP_sk_skinNumber_t s, eo_cfg_nvsEP_sk_skinNVindex_t snvindex)
-    @brief      This function retrieves the eOnvID_t of a network variable with index @e snvindex for the skin
+/** @fn         extern eOnvID_t eo_cfg_nvsEP_mn_NVID_Get(eo_cfg_nvsEP_mn_NVindex_t nvindex)
+    @brief      This function retrieves the eOnvID_t of a network variable with index @e nvindex.
     @param      ep              the endpoint
-    @param      s               the skin number (always 0)
-    @param      snvindex        the index of the nv inside the skin
+    @param      n               the mn number (always 0)
+    @param      nvindex         the index of the nv inside the endpoint
     @return     the nvid or EOK_uint16dummy in case of failure.
   */
-extern eOnvID_t eo_cfg_nvsEP_sk_NVID_Get(eo_cfg_nvsEP_sk_endpoint_t ep, eo_cfg_nvsEP_sk_skinNumber_t s, eo_cfg_nvsEP_sk_skinNVindex_t snvindex);
+extern eOnvID_t eo_cfg_nvsEP_mn_NVID_Get(eo_cfg_nvsEP_mn_endpoint_t ep, eo_cfg_nvsEP_mn_Number_t n, eo_cfg_nvsEP_mn_NVindex_t nvindex);
+
 
 
 
 /** @}            
-    end of group eo_werasfdgr234  
+    end of group eo_awerasfdgr234  
  **/
 
 #endif  // include-guard

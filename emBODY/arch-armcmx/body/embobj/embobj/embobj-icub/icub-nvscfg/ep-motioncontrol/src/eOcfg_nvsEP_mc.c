@@ -38,6 +38,12 @@
 
 #include "EOnv_hid.h"
 
+#include "eOcfg_nvsEP_mc_upperarm_con.h"
+#include "eOcfg_nvsEP_mc_lowerarm_con.h"
+#include "eOcfg_nvsEP_mc_torso_con.h"
+#include "eOcfg_nvsEP_mc_upperleg_con.h"
+#include "eOcfg_nvsEP_mc_lowerleg_con.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -161,6 +167,33 @@ EO_VERIFYproposition(xxx, motorNVindex_TOTALnumber                          == E
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
+
+
+extern uint16_t eo_cfg_nvsEP_mc_joint_numbermax_Get(eo_cfg_nvsEP_mc_endpoint_t ep)
+{
+    static const uint8_t jmax[9] =
+    {
+        jointUpperArm_TOTALnumber, jointLowerArm_TOTALnumber,           // left arm
+        jointUpperArm_TOTALnumber, jointLowerArm_TOTALnumber,           // right arm
+        jointTorso_TOTALnumber,                                         // torso
+        jointUpperLeg_TOTALnumber, jointLowerLeg_TOTALnumber,           // left leg
+        jointUpperLeg_TOTALnumber, jointLowerLeg_TOTALnumber            // right leg       
+    };  EO_VERIFYsizeof(jmax, 9*sizeof(uint8_t));
+    
+    uint16_t max = 0; 
+    uint16_t i = (uint16_t)ep - (uint16_t)endpoint_mc_leftupperarm;
+    if(i < 9)
+    {
+        max = jmax[i];
+    }
+    
+    return(max);   
+}
+
+extern uint16_t eo_cfg_nvsEP_mc_motor_numbermax_Get(eo_cfg_nvsEP_mc_endpoint_t ep)
+{
+    return(eo_cfg_nvsEP_mc_joint_numbermax_Get(ep));
+}
 
 // as the maximum aggregation of joint-motor in an endpoint is the bodypart, we use the bodypart functions to get the nvid
 // irrespectively of the endpoint

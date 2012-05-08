@@ -49,6 +49,7 @@
 
 // - in here there are the nvids plus ... 
 
+#include "eOcfg_nvsEP_mn.h"
 #include "eOcfg_nvsEP_mngmnt_con.h"
 #include "eOcfg_nvsEP_mc_any_con_bodypart.h"
 #include "eOcfg_nvsEP_mc_upperleg_con.h"
