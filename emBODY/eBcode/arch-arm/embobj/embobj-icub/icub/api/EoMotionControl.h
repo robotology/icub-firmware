@@ -64,7 +64,7 @@
  **/
 typedef enum
 {
-    eomc_controlmode_idle                       = 0x00,
+    eomc_controlmode_idle                       = 0x00,     /**< it imposes a zero current on the motor (to the current pid actually), but does not turn the pwm off*/
     eomc_controlmode_position                   = 0x01,
     eomc_controlmode_velocity                   = 0x02,
     eomc_controlmode_torque                     = 0x03,
@@ -76,7 +76,8 @@ typedef enum
     eomc_controlmode_handle_hard_stops          = 0x30,
     eomc_controlmode_margin_reached             = 0x40,
     eomc_controlmode_calib_abs_and_inc          = 0x41,
-    eomc_controlmode_openloop                   = 0x50    
+    eomc_controlmode_openloop                   = 0x50,
+    eomc_controlmode_switch_everything_off      = 0xf0      /**< it imposes a zero current on the motor and also turns the pwm off */    
 } eOmc_controlmode_t;
 
 
@@ -420,7 +421,7 @@ typedef struct                  // size is: 16+16+16+12+4+4+2+1+1+2+1+1+2+2+0 = 
     uint16_t                    holder02FFU04;              /**< holder of a variable for future use */
 } eOmc_joint_config_t;          EO_VERIFYsizeof(eOmc_joint_config_t, 80);
 
-
+#warning --> remember to move controlmode (and motionmonitormode?) into eOmc_joint_commands_t ...
 
 
 /** @typedef    typedef struct eOmc_joint_status_basic_t
