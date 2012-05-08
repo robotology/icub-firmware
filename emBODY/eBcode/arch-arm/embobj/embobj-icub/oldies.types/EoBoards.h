@@ -186,13 +186,8 @@ typedef struct                      // size is: 4+0 = 4
 } eObrd_ems_status_t;               EO_VERIFYsizeof(eObrd_strain_status_t, 4);
 
 
-typedef enum
-{
-    eObrd_emsInBodypart__ems1 = 0,
-    eObrd_emsInBodypart__ems2 = 1	
-} eObrd_emsInBodypart_t;
 
-enum {eObrd_emsInBodypart_maxnum = 2};
+
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
