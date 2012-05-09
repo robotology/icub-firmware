@@ -20,6 +20,9 @@
 #ifndef _EOMTASK_H_
 #define _EOMTASK_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOMtask.h
     @brief      This header file implements public interface to a task for MEE
@@ -245,6 +248,10 @@ extern eOresult_t eom_task_PrioritySet(EOMtask *p, uint8_t prio);
 /** @}            
     end of group eom_task  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 
