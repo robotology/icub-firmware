@@ -20,6 +20,9 @@
 #ifndef _EOCONSTVECTOR_H_
 #define _EOCONSTVECTOR_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOconstvector.h
 	@brief      This header file implements public interface to a constvector object.
@@ -118,6 +121,10 @@ extern const void * eo_constvector_At(const EOconstvector * cvect, eOsizecntnr_t
 /** @}            
     end of group eo_constvector  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 
