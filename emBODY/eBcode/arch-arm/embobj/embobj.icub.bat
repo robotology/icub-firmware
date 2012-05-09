@@ -1,9 +1,9 @@
 @echo off
 
 :: here are core files
-set SOURCE_API=.\embobj-api
-set SOURCE_SRC=.\embobj-src
-set SOURCE_HID=.\embobj-src
+set SOURCE_API=.\embobj-icub\icub\api
+set SOURCE_SRC=.\embobj-icub\icub\api
+set SOURCE_HID=.\embobj-icub\icub\api
 
 :: here are the final dirs
 set D_API=api
@@ -11,8 +11,8 @@ set D_HID=src
 set D_SRC=src
 
 
-set TYP=core-nee
-set LST=(EONtheSystem)
+set TYP=icub
+set LST=(EoBoards EoMeasures EoMotionControl EoSensors EoSkin EoUtilities)
 
 echo. -- copying "%TYP%" files
 
