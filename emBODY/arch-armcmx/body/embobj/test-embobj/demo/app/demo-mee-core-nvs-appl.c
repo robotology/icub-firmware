@@ -1508,13 +1508,13 @@ static void s_zzz(void)
 //    eo_cfg_nvsEP_mc_leg_usr_hid_UPDT_Jxx_jcmmnds__calibration(3, NULL, 2, 9);
     
 //    eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Jxx_jcmmnds__calibration(1, NULL, 1, 1);
-    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration((eo_cfg_nvsEP_mc_jointNumber_t)2, NULL, 0, 0);
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration((eOcfg_nvsEP_mc_jointNumber_t)2, NULL, 0, 0);
     
     eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Jxx_jcmmnds__calibration(1, NULL, 1, 1);
-    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration((eo_cfg_nvsEP_mc_jointNumber_t)2, NULL, 0, 0);   
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration((eOcfg_nvsEP_mc_jointNumber_t)2, NULL, 0, 0);   
 
 //    eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Jxx_jcmmnds__setpoint(5, NULL, 10, 10);   
-    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint((eo_cfg_nvsEP_mc_jointNumber_t)7, NULL, 0, 0);   
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint((eOcfg_nvsEP_mc_jointNumber_t)7, NULL, 0, 0);   
     
 }
 
