@@ -139,7 +139,7 @@ extern void eo_cfg_nvsEP_as_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem
 
 
 
-extern void eo_cfg_nvsEP_as_usr_hid_UPDT_Sxx_sconfig__datarate(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eo_cfg_nvsEP_as_usr_hid_UPDT_Sxx_sconfig__datarate(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOipv4addr_t ip = nv->ip;
@@ -173,7 +173,7 @@ extern void eo_cfg_nvsEP_as_usr_hid_UPDT_Sxx_sconfig__datarate(eo_cfg_nvsEP_as_s
 
 
 
-extern void eo_cfg_nvsEP_as_usr_hid_UPDT_Sxx_sstatus__calibratedvalues(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eo_cfg_nvsEP_as_usr_hid_UPDT_Sxx_sstatus__calibratedvalues(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOipv4addr_t ip = nv->ip;

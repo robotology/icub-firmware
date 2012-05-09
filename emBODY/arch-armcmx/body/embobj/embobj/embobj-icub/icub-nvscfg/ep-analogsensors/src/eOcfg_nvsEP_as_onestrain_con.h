@@ -70,16 +70,16 @@ typedef enum
 enum { strainOneStrain_TOTALnumber = 1}; 
 
 
-/** @typedef    typedef eo_cfg_nvsEP_as_strainNVindex_t eo_cfg_nvsEP_as_onestrain_con_strainNVindex_t
+/** @typedef    typedef eOcfg_nvsEP_as_strainNVindex_t eo_cfg_nvsEP_as_onestrain_con_strainNVindex_t
     @brief      It contains an index for all the network variables in a strain of the upper arm.
  **/
-typedef eo_cfg_nvsEP_as_strainNVindex_t eo_cfg_nvsEP_as_onestrain_con_strainNVindex_t;
+typedef eOcfg_nvsEP_as_strainNVindex_t eo_cfg_nvsEP_as_onestrain_con_strainNVindex_t;
 
 
-/** @typedef    typedef eo_cfg_nvsEP_as_maisNVindex_t eo_cfg_nvsEP_as_onestrain_con_maisNVindex_t
+/** @typedef    typedef eOcfg_nvsEP_as_maisNVindex_t eo_cfg_nvsEP_as_onestrain_con_maisNVindex_t
     @brief      It contains an index for all the network variables in a mais of the upper arm: none
  **/
-typedef eo_cfg_nvsEP_as_maisNVindex_t eo_cfg_nvsEP_as_onestrain_con_maisNVindex_t;
+typedef eOcfg_nvsEP_as_maisNVindex_t eo_cfg_nvsEP_as_onestrain_con_maisNVindex_t;
 
 
 

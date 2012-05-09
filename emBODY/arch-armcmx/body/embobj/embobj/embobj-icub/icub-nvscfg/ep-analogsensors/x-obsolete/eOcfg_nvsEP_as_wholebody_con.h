@@ -79,10 +79,10 @@ enum { strainWholeBody_TOTALnumber = 4};
 
 
 
-/** @typedef    typedef eo_cfg_nvsEP_as_strainNVindex_t eo_cfg_nvsEP_as_wholebody_con_strainNVindex_t
+/** @typedef    typedef eOcfg_nvsEP_as_strainNVindex_t eo_cfg_nvsEP_as_wholebody_con_strainNVindex_t
     @brief      It contains an index for all the network variables in a strain.
  **/
-typedef eo_cfg_nvsEP_as_strainNVindex_t eo_cfg_nvsEP_as_wholebody_con_strainNVindex_t;
+typedef eOcfg_nvsEP_as_strainNVindex_t eo_cfg_nvsEP_as_wholebody_con_strainNVindex_t;
 
 
 
@@ -97,10 +97,10 @@ typedef enum
 
 enum { maisWholeBody_TOTALnumber = 2}; 
 
-/** @typedef    typedef eo_cfg_nvsEP_as_maisNVindex_t eo_cfg_nvsEP_as_wholebody_con_maisNVindex_t
+/** @typedef    typedef eOcfg_nvsEP_as_maisNVindex_t eo_cfg_nvsEP_as_wholebody_con_maisNVindex_t
     @brief      It contains an index for all the network variables in a mais.
  **/
-typedef eo_cfg_nvsEP_as_maisNVindex_t eo_cfg_nvsEP_as_wholebody_con_maisNVindex_t;
+typedef eOcfg_nvsEP_as_maisNVindex_t eo_cfg_nvsEP_as_wholebody_con_maisNVindex_t;
 
 
 

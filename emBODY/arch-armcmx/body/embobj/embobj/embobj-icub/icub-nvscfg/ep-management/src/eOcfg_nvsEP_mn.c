@@ -106,7 +106,7 @@ EO_VERIFYproposition(xxx, mnNVindex_TOTALnumber                         == mngmn
 
 
 
-extern eOnvID_t eo_cfg_nvsEP_mn_NVID_Get(eo_cfg_nvsEP_mn_endpoint_t ep, eo_cfg_nvsEP_mn_Number_t n, eo_cfg_nvsEP_mn_NVindex_t nvindex)
+extern eOnvID_t eo_cfg_nvsEP_mn_NVID_Get(eOcfg_nvsEP_mn_endpoint_t ep, eOcfg_nvsEP_mn_Number_t n, eOcfg_nvsEP_mn_NVindex_t nvindex)
 {
     return(eo_cfg_nvsEP_mngmnt_NVID_Get((eo_cfg_nvsEP_mngmnt_NVindex_t) nvindex));
 }

@@ -75,7 +75,7 @@
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-// in here we put a check vs coherency of eo_cfg_nvsEP_as_strainNVindex_t and eo_cfg_nvsEP_as_maisNVindex_t and macros 
+// in here we put a check vs coherency of eOcfg_nvsEP_as_strainNVindex_t and eOcfg_nvsEP_as_maisNVindex_t and macros 
 // used in strain-mais 
 
 
@@ -125,7 +125,7 @@ extern const eOsnsr_mais_t* eo_cfg_nvsEP_as_mais_defaultvalue = &eo_cfg_nvsEP_as
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern uint16_t eo_cfg_nvsEP_as_strain_numbermax_Get(eo_cfg_nvsEP_as_endpoint_t ep)
+extern uint16_t eo_cfg_nvsEP_as_strain_numbermax_Get(eOcfg_nvsEP_as_endpoint_t ep)
 {
     static const uint8_t smax[9] =
     {
@@ -147,7 +147,7 @@ extern uint16_t eo_cfg_nvsEP_as_strain_numbermax_Get(eo_cfg_nvsEP_as_endpoint_t 
 }
 
 
-extern uint16_t eo_cfg_nvsEP_as_mais_numbermax_Get(eo_cfg_nvsEP_as_endpoint_t ep)
+extern uint16_t eo_cfg_nvsEP_as_mais_numbermax_Get(eOcfg_nvsEP_as_endpoint_t ep)
 {
     static const uint8_t mmax[9] =
     {
@@ -173,13 +173,13 @@ extern uint16_t eo_cfg_nvsEP_as_mais_numbermax_Get(eo_cfg_nvsEP_as_endpoint_t ep
 // as the maximum aggregation in an endpoint is the bodypart, we use the bodypart functions to get the nvid
 // irrespectively of the endpoint
 
-extern eOnvID_t eo_cfg_nvsEP_as_strain_NVID_Get(eo_cfg_nvsEP_as_endpoint_t ep, eo_cfg_nvsEP_as_strainNumber_t s, eo_cfg_nvsEP_as_strainNVindex_t snvindex)
+extern eOnvID_t eo_cfg_nvsEP_as_strain_NVID_Get(eOcfg_nvsEP_as_endpoint_t ep, eOcfg_nvsEP_as_strainNumber_t s, eOcfg_nvsEP_as_strainNVindex_t snvindex)
 {
     return(eo_cfg_nvsEP_as_any_con_body_strain_NVID_Get((eo_cfg_nvsEP_as_any_con_body_strainNumber_t)s, snvindex));    
 }
 
 
-extern eOnvID_t eo_cfg_nvsEP_as_mais_NVID_Get(eo_cfg_nvsEP_as_endpoint_t ep, eo_cfg_nvsEP_as_maisNumber_t m, eo_cfg_nvsEP_as_maisNVindex_t mnvindex)
+extern eOnvID_t eo_cfg_nvsEP_as_mais_NVID_Get(eOcfg_nvsEP_as_endpoint_t ep, eOcfg_nvsEP_as_maisNumber_t m, eOcfg_nvsEP_as_maisNVindex_t mnvindex)
 {
     return(eo_cfg_nvsEP_as_any_con_body_mais_NVID_Get((eo_cfg_nvsEP_as_any_con_body_maisNumber_t)m, mnvindex));
 } 
@@ -205,7 +205,7 @@ __weak extern void eo_cfg_nvsEP_as_hid_INITIALISE(eOnvEP_t ep, void *loc, void *
 // sxx-init:
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__mode)
-__weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__mode(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__mode(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -216,7 +216,7 @@ __weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__mode(eo_cfg_nvsEP_as_st
 #endif
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__datarate)
-__weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__datarate(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__datarate(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -227,7 +227,7 @@ __weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__datarate(eo_cfg_nvsEP_a
 #endif
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__signaloncefullscale)
-__weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__signaloncefullscale(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__signaloncefullscale(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -238,7 +238,7 @@ __weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__signaloncefullscale(eo_
 #endif
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__fullscale)
-__weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__fullscale(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__fullscale(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -249,7 +249,7 @@ __weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__fullscale(eo_cfg_nvsEP_
 #endif
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__calibratedvalues)
-__weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__calibratedvalues(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__calibratedvalues(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -260,7 +260,7 @@ __weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__calibratedvalues(eo_cfg
 #endif
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__uncalibratedvalues)
-__weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__uncalibratedvalues(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__uncalibratedvalues(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -273,7 +273,7 @@ __weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__uncalibratedvalues(eo_c
 // sxx-updt:
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__mode)
-__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__mode(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__mode(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -284,7 +284,7 @@ __weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__mode(eo_cfg_nvsEP_as_st
 #endif
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__datarate)
-__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__datarate(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__datarate(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -295,7 +295,7 @@ __weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__datarate(eo_cfg_nvsEP_a
 #endif
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__signaloncefullscale)
-__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__signaloncefullscale(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__signaloncefullscale(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -306,7 +306,7 @@ __weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__signaloncefullscale(eo_
 #endif
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__fullscale)
-__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__fullscale(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__fullscale(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -317,7 +317,7 @@ __weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__fullscale(eo_cfg_nvsEP_
 #endif
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__calibratedvalues)
-__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__calibratedvalues(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__calibratedvalues(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -328,7 +328,7 @@ __weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__calibratedvalues(eo_cfg
 #endif
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__uncalibratedvalues)
-__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__uncalibratedvalues(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__uncalibratedvalues(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -341,7 +341,7 @@ __weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__uncalibratedvalues(eo_c
 // mxx-init:
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__mode)
-__weak extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__mode(eo_cfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__mode(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -352,7 +352,7 @@ __weak extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__mode(eo_cfg_nvsEP_as_ma
 #endif
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__datarate)
-__weak extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__datarate(eo_cfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__datarate(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -363,7 +363,7 @@ __weak extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__datarate(eo_cfg_nvsEP_a
 #endif
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__resolution)
-__weak extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__resolution(eo_cfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__resolution(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -374,7 +374,7 @@ __weak extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__resolution(eo_cfg_nvsEP
 #endif
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_INIT_Mxx_mstatus__the15values)
-__weak extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mstatus__the15values(eo_cfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mstatus__the15values(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -387,7 +387,7 @@ __weak extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mstatus__the15values(eo_cfg_nvsE
 // mxx-updt:
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__mode)
-__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__mode(eo_cfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__mode(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -398,7 +398,7 @@ __weak extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__mode(eo_cfg_nvsEP_as_ma
 #endif
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__datarate)
-__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__datarate(eo_cfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__datarate(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -409,7 +409,7 @@ __weak extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__datarate(eo_cfg_nvsEP_a
 #endif
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__resolution)
-__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__resolution(eo_cfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__resolution(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -420,7 +420,7 @@ __weak extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__resolution(eo_cfg_nvsEP
 #endif
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_UPDT_Mxx_mstatus__the15values)
-__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mstatus__the15values(eo_cfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mstatus__the15values(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;

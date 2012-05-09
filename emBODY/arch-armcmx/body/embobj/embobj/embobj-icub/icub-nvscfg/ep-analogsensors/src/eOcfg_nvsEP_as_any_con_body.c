@@ -92,7 +92,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern eOnvID_t eo_cfg_nvsEP_as_any_con_body_strain_NVID_Get(eo_cfg_nvsEP_as_any_con_body_strainNumber_t s, eo_cfg_nvsEP_as_strainNVindex_t snvindex)
+extern eOnvID_t eo_cfg_nvsEP_as_any_con_body_strain_NVID_Get(eo_cfg_nvsEP_as_any_con_body_strainNumber_t s, eOcfg_nvsEP_as_strainNVindex_t snvindex)
 {
     if((s >= EOK_cfg_nvsEP_as_any_con_body_maxnumof_strains) || (snvindex >= EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber))
     {
@@ -102,7 +102,7 @@ extern eOnvID_t eo_cfg_nvsEP_as_any_con_body_strain_NVID_Get(eo_cfg_nvsEP_as_any
 }
 
 
-extern eOnvID_t eo_cfg_nvsEP_as_any_con_body_mais_NVID_Get(eo_cfg_nvsEP_as_any_con_body_maisNumber_t m, eo_cfg_nvsEP_as_maisNVindex_t mnvindex)
+extern eOnvID_t eo_cfg_nvsEP_as_any_con_body_mais_NVID_Get(eo_cfg_nvsEP_as_any_con_body_maisNumber_t m, eOcfg_nvsEP_as_maisNVindex_t mnvindex)
 {
     if((m >= EOK_cfg_nvsEP_as_any_con_body_maxnumof_maiss) || (mnvindex >= EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber))
     {
