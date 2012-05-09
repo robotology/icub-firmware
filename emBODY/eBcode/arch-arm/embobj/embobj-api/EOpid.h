@@ -3,6 +3,9 @@
 #ifndef _EOPID_H_
 #define _EOPID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOpid.h
     @brief      This header file implements public interface to PID controller.
@@ -79,6 +82,10 @@ extern float eo_pid_GetOffset(EOpid *o);
 /** @}            
     end of group eo_pid  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

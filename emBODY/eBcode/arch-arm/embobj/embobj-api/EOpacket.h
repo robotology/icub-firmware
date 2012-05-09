@@ -20,6 +20,9 @@
 #ifndef _EOPACKET_H_
 #define _EOPACKET_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOpacket.h
     @brief      This header file implements public interface to a packet.
@@ -222,6 +225,10 @@ extern eOresult_t eo_packet_Copy(EOpacket *p, const EOpacket *source);
 /** @}            
     end of group eo_packet  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

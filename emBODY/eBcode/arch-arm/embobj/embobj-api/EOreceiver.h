@@ -20,6 +20,9 @@
 #ifndef _EORECEIVER_H_
 #define _EORECEIVER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOreceiver.h
     @brief      This header file implements public interface to a frame.
@@ -118,6 +121,10 @@ extern eOresult_t eo_receiver_GetReply(EOreceiver *p, EOropframe **ropframereply
 /** @}            
     end of group eo_receiver  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

@@ -20,7 +20,9 @@
 #ifndef _EOSYNCHROSOCKET_H_
 #define _EOSYNCHROSOCKET_H_
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOsynchroSocket.h
     @brief      This header file implements public interface to a datagram socket object.
@@ -162,6 +164,10 @@ extern eOresult_t eo_synsocket_Get(EOsynchroSocket *p, EOpacket *pkt, eOreltime_
 /** @}            
     end of group eo_synsocket  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

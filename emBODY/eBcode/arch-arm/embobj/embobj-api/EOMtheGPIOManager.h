@@ -20,6 +20,9 @@
 #ifndef _EOMTHEGPIOMANAGER_H_
 #define _EOMTHEGPIOMANAGER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOMtheGPIOManager.h
     @brief      This header file implements public interface to the GPIO manager singleton for the MEE
@@ -95,6 +98,10 @@ extern EOMtheGPIOManager * eom_gpioman_GetHandle(void);
 /** @}            
     end of group eom_thegpiomanager  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 
