@@ -20,6 +20,10 @@
 #ifndef _EOSOCKET_H_
 #define _EOSOCKET_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** @file       EOsocket.h
     @brief      This header file implements public interface to a base socket object.
     @author     marco.accame@iit.it
@@ -98,6 +102,10 @@ extern EOsocket* eo_socket_New(void);
 /** @}            
     end of group eo_socket  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

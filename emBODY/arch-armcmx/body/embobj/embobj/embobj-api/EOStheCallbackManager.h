@@ -20,6 +20,9 @@
 #ifndef _EOSTHECALLBACKMANAGER_H_
 #define _EOSTHECALLBACKMANAGER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOStheCallbackManager.h
     @brief      This header file implements public interface to the ...
@@ -117,6 +120,10 @@ extern EOStheFOOP * eos_callbackman_GetTask(EOStheCallbackManager *p);
 /** @}            
     end of group eos_thecallbackmanager  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

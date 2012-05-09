@@ -20,6 +20,9 @@
 #ifndef _EOROP_H_
 #define _EOROP_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOrop.h
     @brief      This header file implements public interface to a remote oepration rop.
@@ -162,6 +165,10 @@ extern uint8_t* eo_rop_GetROPdata(EOrop *p);
 /** @}            
     end of group eo_rop  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

@@ -20,6 +20,9 @@
 #ifndef _EOSMUTEX_H_
 #define _EOSMUTEX_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOSmutex.h
     @brief      This header file implements public interface to a multitasking mutex.
@@ -105,6 +108,10 @@ extern eOresult_t eos_mutex_Release(EOSmutex *const m);
 /** @}            
     end of group eos_mutex  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

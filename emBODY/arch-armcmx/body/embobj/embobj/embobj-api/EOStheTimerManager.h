@@ -20,6 +20,9 @@
 #ifndef _EOSTHETIMERMANAGER_H_
 #define _EOSTHETIMERMANAGER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOStheTimerManager.h
     @brief      This header file implements public interface to timer manager singleton for see
@@ -111,6 +114,10 @@ extern void eos_timerman_Tick(EOStheTimerManager *p);
 /** @}            
     end of group eos_thetimermanager  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

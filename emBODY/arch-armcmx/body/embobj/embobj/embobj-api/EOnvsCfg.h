@@ -20,7 +20,9 @@
 #ifndef _EONVSCFG_H_
 #define _EONVSCFG_H_
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOnvsCfg.h
     @brief      This header file implements public interface to the configuration of netvars.
@@ -136,6 +138,10 @@ extern EOnv* eo_nvscfg_GetNV(EOnvsCfg* p, uint16_t ondevindex, uint16_t onendpoi
 /** @}            
     end of group eo_nv 
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

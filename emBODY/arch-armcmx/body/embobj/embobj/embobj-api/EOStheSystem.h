@@ -20,6 +20,9 @@
 #ifndef _EOSTHESYSTEM_H_
 #define _EOSTHESYSTEM_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOStheSystem.h
     @brief      This header file implements public interface to the system singleton.
@@ -141,6 +144,10 @@ extern void eos_sys_Start(EOStheSystem *p, eOvoid_fp_void_t userinit_fn);
 /** @}            
     end of group eos_thesystem  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 
