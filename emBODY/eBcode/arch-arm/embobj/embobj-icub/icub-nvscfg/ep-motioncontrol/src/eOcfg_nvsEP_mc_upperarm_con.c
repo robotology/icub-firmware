@@ -1524,12 +1524,12 @@ static uint16_t s_hash(uint16_t id)
 
 extern eOnvID_t eo_cfg_nvsEP_mc_upperarm_joint_NVID_Get(eo_cfg_nvsEP_mc_upperarm_con_jointNumber_t j, eo_cfg_nvsEP_mc_upperarm_con_jointNVindex_t jnvindex)
 {
-    return(eo_cfg_nvsEP_mc_any_con_bodypart_joint_NVID_Get((eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t)j, (eo_cfg_nvsEP_mc_jointNVindex_t)jnvindex));
+    return(eo_cfg_nvsEP_mc_any_con_bodypart_joint_NVID_Get((eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t)j, (eOcfg_nvsEP_mc_jointNVindex_t)jnvindex));
 }
 
 extern eOnvID_t eo_cfg_nvsEP_mc_upperarm_motor_NVID_Get(eo_cfg_nvsEP_mc_upperarm_con_motorNumber_t m, eo_cfg_nvsEP_mc_upperarm_con_motorNVindex_t mnvindex)
 {
-    return(eo_cfg_nvsEP_mc_any_con_bodypart_motor_NVID_Get((eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t)m, (eo_cfg_nvsEP_mc_motorNVindex_t)mnvindex));
+    return(eo_cfg_nvsEP_mc_any_con_bodypart_motor_NVID_Get((eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t)m, (eOcfg_nvsEP_mc_motorNVindex_t)mnvindex));
 }
 
 

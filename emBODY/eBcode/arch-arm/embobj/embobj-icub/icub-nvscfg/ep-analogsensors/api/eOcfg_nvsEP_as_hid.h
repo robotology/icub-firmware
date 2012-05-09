@@ -66,51 +66,51 @@ extern "C" {
 extern void eo_cfg_nvsEP_as_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem);
 
 // sxx-init:
-extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__mode(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv);
+extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__mode(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv);
 
-extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__datarate(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv);
+extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__datarate(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv);
 
-extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__signaloncefullscale(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv);
+extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__signaloncefullscale(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv);
 
-extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__fullscale(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv);
+extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__fullscale(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv);
 
-extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__calibratedvalues(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv);
+extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__calibratedvalues(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv);
 
-extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__uncalibratedvalues(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv);
+extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__uncalibratedvalues(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv);
 
 // sxx-updt:
 
-extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__mode(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__mode(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
-extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__datarate(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__datarate(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
-extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__signaloncefullscale(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__signaloncefullscale(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
-extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__fullscale(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__fullscale(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
-extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__calibratedvalues(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__calibratedvalues(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
-extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__uncalibratedvalues(eo_cfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__uncalibratedvalues(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
 // mxx-init:
 
-extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__mode(eo_cfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv);
+extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__mode(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv);
 
-extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__datarate(eo_cfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv);
+extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__datarate(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv);
 
-extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__resolution(eo_cfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv);
+extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__resolution(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv);
 
-extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mstatus__the15values(eo_cfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv);
+extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mstatus__the15values(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv);
 
 // mxx-updt:
 
-extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__mode(eo_cfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__mode(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
-extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__datarate(eo_cfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__datarate(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
-extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__resolution(eo_cfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__resolution(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
-extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mstatus__the15values(eo_cfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mstatus__the15values(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
 
 /** @}            

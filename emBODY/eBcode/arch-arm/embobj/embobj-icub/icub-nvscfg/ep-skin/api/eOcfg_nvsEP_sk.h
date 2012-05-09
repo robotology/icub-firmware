@@ -57,7 +57,7 @@ extern "C" {
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-/** @typedef    typedef enum eo_cfg_nvsEP_sk_endpoint_t;
+/** @typedef    typedef enum eOcfg_nvsEP_sk_endpoint_t;
     @brief      It contains all the endpoints used for skin. The grouping is done by sub-bodypart
                 in such a way that each ep is contained by a exactly one EMS board in iCub ver 2.5
  **/
@@ -65,27 +65,27 @@ typedef enum
 {
     endpoint_sk_emsboard_leftlowerarm           = 0x0032,   /**< used by EB2 board */      
     endpoint_sk_emsboard_rightlowerarm          = 0x0034    /**< used by EB4 board */    
-} eo_cfg_nvsEP_sk_endpoint_t;
+} eOcfg_nvsEP_sk_endpoint_t;
 
 enum { endpoint_sk_TOTALnumber = 2};
 
 
-/** @typedef    typedef uint16_t eo_cfg_nvsEP_sk_skinNumber_t;
+/** @typedef    typedef uint16_t eOcfg_nvsEP_sk_skinNumber_t;
     @brief      It contains an index for a skin in a manner that is independnt from the endpoint.
  **/
-typedef uint16_t eo_cfg_nvsEP_sk_skinNumber_t;
+typedef uint16_t eOcfg_nvsEP_sk_skinNumber_t;
 
 enum { skinNumberMAX = 1};
 
 
-/** @typedef    typedef struct eo_cfg_nvsEP_sk_skinNVindex_t
+/** @typedef    typedef struct eOcfg_nvsEP_sk_skinNVindex_t
     @brief      It contains an index for all the network variables in the skin.
  **/
 typedef enum
 {
     skinNVindex_sconfig__sigmode                        =  0,
     skinNVindex_sstatus__arrayof10canframe              =  1
-} eo_cfg_nvsEP_sk_skinNVindex_t;
+} eOcfg_nvsEP_sk_skinNVindex_t;
 
 enum { skinNVindex_TOTALnumber = 2 };
 
@@ -100,14 +100,14 @@ extern const eOskin_someskin_t* eo_cfg_nvsEP_sk_someskin_defaultvalue;
 
 
 
-/** @fn         extern eOnvID_t eo_cfg_nvsEP_sk_NVID_Get(eo_cfg_nvsEP_sk_endpoint_t ep, eo_cfg_nvsEP_sk_skinNumber_t s, eo_cfg_nvsEP_sk_skinNVindex_t snvindex)
+/** @fn         extern eOnvID_t eo_cfg_nvsEP_sk_NVID_Get(eOcfg_nvsEP_sk_endpoint_t ep, eOcfg_nvsEP_sk_skinNumber_t s, eOcfg_nvsEP_sk_skinNVindex_t snvindex)
     @brief      This function retrieves the eOnvID_t of a network variable with index @e snvindex for the skin
     @param      ep              the endpoint
     @param      s               the skin number (always 0)
     @param      snvindex        the index of the nv inside the skin
     @return     the nvid or EOK_uint16dummy in case of failure.
   */
-extern eOnvID_t eo_cfg_nvsEP_sk_NVID_Get(eo_cfg_nvsEP_sk_endpoint_t ep, eo_cfg_nvsEP_sk_skinNumber_t s, eo_cfg_nvsEP_sk_skinNVindex_t snvindex);
+extern eOnvID_t eo_cfg_nvsEP_sk_NVID_Get(eOcfg_nvsEP_sk_endpoint_t ep, eOcfg_nvsEP_sk_skinNumber_t s, eOcfg_nvsEP_sk_skinNVindex_t snvindex);
 
 
 

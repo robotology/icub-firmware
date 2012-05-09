@@ -74,7 +74,7 @@ enum { jointTorso_TOTALnumber = 3};
 /** @typedef    typedef eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t eo_cfg_nvsEP_mc_torso_con_jointNVindex_t
     @brief      It contains an index for all the network variables in a joint of the left leg. use the same type as in bodypart
  **/
-typedef eo_cfg_nvsEP_mc_jointNVindex_t eo_cfg_nvsEP_mc_torso_con_jointNVindex_t;
+typedef eOcfg_nvsEP_mc_jointNVindex_t eo_cfg_nvsEP_mc_torso_con_jointNVindex_t;
 
 
 /** @typedef    typedef enum eo_cfg_nvsEP_mc_torso_con_motorNumber_t;
@@ -93,7 +93,7 @@ enum { motorTorso_TOTALnumber = 3};
 /** @typedef    typedef eo_cfg_nvsEP_mc_any_con_bodypart_motorNVindex_t eo_cfg_nvsEP_mc_torso_con_motorNVindex_t
     @brief      It contains an index for all the network variables in a motor of the left leg. use the same type as in bodypart
  **/
-typedef eo_cfg_nvsEP_mc_motorNVindex_t eo_cfg_nvsEP_mc_torso_con_motorNVindex_t;
+typedef eOcfg_nvsEP_mc_motorNVindex_t eo_cfg_nvsEP_mc_torso_con_motorNVindex_t;
 
 
 /** @typedef    enum varsMCleg_TOTALnumber;
