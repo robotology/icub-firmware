@@ -20,6 +20,9 @@
 #ifndef _EOIOPINOUTPUTMANAGED_H_
 #define _EOIOPINOUTPUTMANAGED_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOioPinOutputManaged.h
     @brief      This header file implements public interface to a managed output pin object.
@@ -147,6 +150,10 @@ extern eOresult_t eo_iopinoutman_Waveform_Stop(EOioPinOutputManaged *const p);
 /** @}            
     end of group eo_pinwave  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 
