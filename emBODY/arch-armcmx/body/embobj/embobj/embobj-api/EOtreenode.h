@@ -20,6 +20,9 @@
 #ifndef _EOTREENODE_H_
 #define _EOTREENODE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOtreenode.h
     @brief      This header file implements public interface to a node which contains a nv
@@ -89,6 +92,10 @@ extern eObool_t eo_treenode_isLeaf(EOtreenode *node);
 /** @}            
     end of group eo_nvnode 
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

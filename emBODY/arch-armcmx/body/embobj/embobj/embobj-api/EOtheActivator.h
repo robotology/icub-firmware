@@ -20,6 +20,10 @@
 #ifndef _EOTHEACTIVATOR_H_
 #define _EOTHEACTIVATOR_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** @file       EOtheActivator.h
 	@brief      This header file contains public interfaces for the activator singleton object.
 	@author     marco.accame@iit.it
@@ -142,6 +146,10 @@ extern eOresult_t eo_activator_DeactivateAll(EOtheActivator *p);
 /** @}            
     end of group eo_theactivator  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

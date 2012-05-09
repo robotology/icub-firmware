@@ -20,6 +20,10 @@
 #ifndef _EOTHEMEMORYPOOL_H_
 #define _EOTHEMEMORYPOOL_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** @file       EOtheMemoryPool.h
 	@brief      This header file contains public interfaces for the memory pool singleton object.
 	@author     marco.accame@iit.it
@@ -172,6 +176,10 @@ extern uint32_t eo_mempool_SizeOfAllocated(EOtheMemoryPool *p);
 /** @}            
     end of group eo_thememorypool  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

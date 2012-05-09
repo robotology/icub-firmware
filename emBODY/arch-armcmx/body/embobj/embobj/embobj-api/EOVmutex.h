@@ -20,6 +20,9 @@
 #ifndef _EOVMUTEX_H_
 #define _EOVMUTEX_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOVmutex.h
     @brief      This header file implements public interface to a mutex object.
@@ -104,6 +107,10 @@ extern eOpurevirtual eOresult_t eov_mutex_Release(EOVmutexDerived *d);
 /** @}            
     end of group eov_mutex  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

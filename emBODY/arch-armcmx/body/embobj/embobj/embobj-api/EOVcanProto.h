@@ -20,6 +20,9 @@
 #ifndef _EOVCANPROTO_H_
 #define _EOVCANPROTO_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOVCanProto.h
 	@brief      This header file gives 
@@ -101,6 +104,10 @@ extern eOpurevirtual eOresult_t eov_canProto_FormCanFrame(EOVcanProtoDerived *d,
 /** @}            
     end of group eov_canProto  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

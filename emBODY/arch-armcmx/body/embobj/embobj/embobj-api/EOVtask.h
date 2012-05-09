@@ -20,6 +20,9 @@
 #ifndef _EOVTASK_H_
 #define _EOVTASK_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOVtask.h
     @brief      This header file implements public interface to a virtual task object.
@@ -159,6 +162,10 @@ extern eOpurevirtual eOid08_t eov_task_GetID(EOVtaskDerived *t);
 /** @}            
     end of group eov_task  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

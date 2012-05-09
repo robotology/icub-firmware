@@ -20,6 +20,9 @@
 #ifndef _EOVTHESYSTEM_H_
 #define _EOVTHESYSTEM_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOVtheSystem.h
     @brief      This header file implements public interface to the virtual system singleton.
@@ -130,6 +133,10 @@ extern eOpurevirtual eOresult_t eov_sys_Stop(EOVtheSystem *p);
 /** @}            
     end of group eov_thesystem  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

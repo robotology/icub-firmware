@@ -3,6 +3,9 @@
 #ifndef _EOTRAJECTORY_H_
 #define _EOTRAJECTORY_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOtrajectory.h
     @brief      This header file implements public interface to a motor minimum jerk trajectory generator.
@@ -98,6 +101,10 @@ extern uint8_t eo_trajectory_IsDone(EOtrajectory* o);
 /** @}            
     end of group eo_trajectory  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

@@ -20,6 +20,9 @@
 #ifndef _EOTRANSCEIVER_H_
 #define _EOTRANSCEIVER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOtransceiver.h
     @brief      This header file implements public interface to a frame.
@@ -118,6 +121,10 @@ extern eOresult_t eo_transceiver_rop_occasional_Load(EOtransceiver *p, eo_transc
 /** @}            
     end of group eo_transceiver  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

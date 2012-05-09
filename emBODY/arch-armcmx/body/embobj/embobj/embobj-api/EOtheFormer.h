@@ -20,6 +20,9 @@
 #ifndef _EOTHEFORMER_H_
 #define _EOTHEFORMER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOtheFormer.h
     @brief      This header file implements public interface to the former singleton used for communication protocol
@@ -98,6 +101,10 @@ extern eOresult_t eo_former_GetStream(EOtheFormer *p, const EOrop *rop, const ui
 /** @}            
     end of group eo_theformer  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

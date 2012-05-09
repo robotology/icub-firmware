@@ -20,6 +20,9 @@
 #ifndef _EOUMLSM_H_
 #define _EOUMLSM_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOumlsm.h
 	@brief      This header file implements public interface to a uml state machine object.
@@ -244,6 +247,10 @@ extern void* eo_umlsm_GetDynamicData(EOumlsm *p);
 /** @}            
     end of group eo_umlsm  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

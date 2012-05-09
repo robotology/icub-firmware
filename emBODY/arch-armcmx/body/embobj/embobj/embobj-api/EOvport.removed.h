@@ -20,6 +20,9 @@
 #ifndef _EOVPORT_H_
 #define _EOVPORT_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOvport.h
     @brief      This header file implements public interface to a remote oepration rop.
@@ -114,6 +117,10 @@ extern void * eo_vportcfg_GetMemory(EOvportCfg *p, uint16_t *size);
 /** @}            
     end of group eo_vport 
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

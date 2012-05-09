@@ -20,6 +20,9 @@
 #ifndef _EOTIMER_H_
 #define _EOTIMER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOtimer.h
     @brief      This header file implements public interface to a timer object.
@@ -159,6 +162,10 @@ extern eOtimerStatus_t eo_timer_GetStatus(EOtimer *t);
 /** @}            
     end of group eo_timer  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 
