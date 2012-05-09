@@ -20,6 +20,10 @@
 #ifndef _EOFIFOBYTE_H_
 #define _EOFIFOBYTE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** @file       EOfifoByte.h
 	@brief      This header file implements public interface to a mutex-protected fifo object which 
                 manupulates bytes.
@@ -146,6 +150,10 @@ extern eOresult_t eo_fifobyte_Clear(EOfifoByte *fifobyte, eOreltime_t tout);
 /** @}            
     end of group eo_fifobyte  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

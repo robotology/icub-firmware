@@ -20,6 +20,10 @@
 #ifndef _EOFIFOWORD_H_
 #define _EOFIFOWORD_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** @file       EOfifoWord.h
 	@brief      This header file implements public interface to a mutex-protected fifo object which 
                 manupulates words.
@@ -145,6 +149,10 @@ extern eOresult_t eo_fifoword_Clear(EOfifoWord *fifo, eOreltime_t tout);
 /** @}            
     end of group eo_fifoword  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

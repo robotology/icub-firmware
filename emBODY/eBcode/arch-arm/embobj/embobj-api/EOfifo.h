@@ -20,6 +20,10 @@
 #ifndef _EOFIFO_H_
 #define _EOFIFO_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** @file       EOfifo.h
     @brief      This header file implements public interface to a fifo queue protected by a mutex.
     @author     marco.accame@iit.it
@@ -173,6 +177,10 @@ extern eOresult_t eo_fifo_Clear(EOfifo *fifo, eOreltime_t tout);
 /** @}            
     end of group eo_fifo  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 
