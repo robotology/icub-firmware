@@ -34,7 +34,7 @@
 byte	_board_ID = 16;	
 char    _additional_info [32];
 UInt8    mainLoopOVF=0;
-word    _build_number = 48;
+word    _build_number = 49;
 int     _countBoardStatus =0;
 Int16   _flash_version=0; 
 UInt8   BUS_OFF=false;
@@ -271,9 +271,9 @@ void main(void)
     for (i=0; i<JN; i++)	_position[i]=(Int32) Filter_Bit(get_position_abs_ssi(i));
     for (i=0; i<JN; i++)    _max_real_position[i]=Filter_Bit(4095);
 #else 
-	_position[1]=(Int32)get_position_encoder(1);	
-   	_position[0]=(Int32) Filter_Bit(get_position_abs_ssi(0));
-    _max_real_position[0]=Filter_Bit(4095);
+	_position[0]=(Int32)get_position_encoder(0);	
+   	_position[1]=(Int32) Filter_Bit(get_position_abs_ssi(1));
+    _max_real_position[1]=Filter_Bit(4095);
 	
 #endif//	AS1_printStringEx ("\r\n");
 	
@@ -366,7 +366,7 @@ void main(void)
 #elif VERSION ==0x0258
 		_position_old[0]=_position[0];
 		_position[0]=get_position_encoder(0);//get_position_encoder(0);//Get_Sens1_Status();
-		_position[1]=Get_Sens1_Status();//Filter_Bit (get_position_abs_ssi(1));
+		_position[1]=Filter_Bit (get_position_abs_ssi(1));
 		_position_old[1]=_position[1]; 
 
 #else
@@ -398,7 +398,6 @@ void main(void)
 	
 #warning "here we should put a control for 0x0258"	
 #if (VERSION ==0x0154) 
-
 		   if (get_error_abs_ssi(0)==ERR_ABS_SSI)
 		   {
 					_control_mode[0] = MODE_IDLE;	
