@@ -17,22 +17,19 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOCFG_NVSEP_SK_HID_H_
-#define _EOCFG_NVSEP_SK_HID_H_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifndef _EOCFG_NVSEP_SK_OVERRIDDEN_H_
+#define _EOCFG_NVSEP_SK_OVERRIDDEN_H_
 
 
-/** @file       eOcfg_nvsEP_sk_hid.h
+
+
+/** @file       eOcfg_nvsEP_sk_overridden.h
 	@brief      This header file gives the ...
 	@author     marco.accame@iit.it
 	@date       09/06/2011
 **/
 
-/** @defgroup eo_h2uilsdede2345er Configuration of the bodypart
-    In here there are constants for the max number of strains and maiss in an endpoint 
+/** @defgroup eo_desh2uilsdede2345er dcefcew
     
     @{		
  **/
@@ -40,15 +37,11 @@ extern "C" {
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
-
-#include "EoCommon.h"
-#include "EOnv.h"
-
-#include "eOcfg_nvsEP_sk.h"
-
+// empty-section
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
+      
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
@@ -56,31 +49,30 @@ extern "C" {
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
+// empty-section
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-extern void eo_cfg_nvsEP_sk_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem);
+//#define OVERRIDE_eo_cfg_nvsEP_sk_hid_INITIALISE
 
-// init:    n is not used
-extern void eo_cfg_nvsEP_sk_hid_INIT_sconfig__sigmode(uint16_t n, const EOnv* nv);
-extern void eo_cfg_nvsEP_sk_hid_INIT_sstatus__arrayof10canframe(uint16_t n, const EOnv* nv);
+// init:   
+//#define OVERRIDE_eo_cfg_nvsEP_sk_hid_INIT_sconfig__sigmode
+//#define OVERRIDE_eo_cfg_nvsEP_sk_hid_INIT_sstatus__arrayof10canframe
 
 
-// updt:    n is not used
-extern void eo_cfg_nvsEP_sk_hid_UPDT_sconfig__sigmode(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-extern void eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+// updt:    
+//#define OVERRIDE_eo_cfg_nvsEP_sk_hid_UPDT_sconfig__sigmode
+//#define OVERRIDE_eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe
+
+
 
 
 /** @}            
-    end of group eo_h2uilsdede2345er  
+    end of group eo_desh2uilsdede2345er  
  **/
 
-#ifdef __cplusplus
-}       // closing brace for extern "C"
-#endif 
- 
 #endif  // include-guard
 
 

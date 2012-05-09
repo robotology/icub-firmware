@@ -20,8 +20,9 @@
 #ifndef _EOMOTIONCONTROL_H_
 #define _EOMOTIONCONTROL_H_
 
-
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EoMotionControl.h
 	@brief      This header file gives 
@@ -589,6 +590,10 @@ typedef struct                  // size is 24+16+0 = 40
     end of group eo_devervrffdvf  
  **/
 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
 #endif  // include-guard
 
 

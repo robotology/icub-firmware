@@ -21,7 +21,9 @@
 #ifndef _EOCFG_NVSEP_MN_H_
 #define _EOCFG_NVSEP_MN_H_
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /** @file       eOcfg_nvsEP_mn.h
@@ -114,6 +116,10 @@ extern eOnvID_t eo_cfg_nvsEP_mn_NVID_Get(eo_cfg_nvsEP_mn_endpoint_t ep, eo_cfg_n
     end of group eo_awerasfdgr234  
  **/
 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
 #endif  // include-guard
 
 

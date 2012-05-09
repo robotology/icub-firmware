@@ -21,7 +21,9 @@
 #define _EOBOARDS_H_
 
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EoBoards.h
 	@brief      This header file gives 
@@ -252,6 +254,10 @@ typedef enum
     end of group eo_cevcwervcrev5555  
  **/
 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
 #endif  // include-guard
 
 
