@@ -20,6 +20,9 @@
 #ifndef _EOMATRIX3D_H_
 #define _EOMATRIX3D_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOmatrix3d.h
     @brief      This header file implements public interface to a matrix3d object.
@@ -107,6 +110,10 @@ extern void* eo_matrix3d_At(EOmatrix3d *p, uint16_t i1, uint16_t i2, uint16_t i3
 /** @}            
     end of group eo_matrix3d  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 
