@@ -107,18 +107,16 @@ typedef int8_t emBODYporting_enum08_t;
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
  
-#ifdef __cplusplus
-}       // closing brace for extern "C"
-#endif 
- 
-#endif  // include-guard 
 
 /** @}            
     end of group cecedcedc 
  **/
 
-#endif  // include-guard
-
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
