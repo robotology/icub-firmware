@@ -20,6 +20,10 @@
 #ifndef _EOTHEARMENVIRONMENT_H_
 #define _EOTHEARMENVIRONMENT_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** @file       EOtheARMenvironment.h
 	@brief      This header file contains public interfaces for the ARM environment singleton.
 	@author     marco.accame@iit.it
@@ -102,6 +106,10 @@ extern eOresult_t eo_armenv_SharedStorage_ScanProcesses(EOtheARMenvironment *p);
 /** @}            
     end of group eo_thearmenv  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

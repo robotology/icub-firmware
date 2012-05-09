@@ -20,6 +20,9 @@
 #ifndef _EOTHEGPIOMANAGER_H_
 #define _EOTHEGPIOMANAGER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOtheGPIOManager.h
     @brief      This header file implements public interface to the GPIO manager singleton.
@@ -99,6 +102,10 @@ extern eOresult_t eo_gpioman_Tick(EOtheGPIOManager* p, eOreltime_t delta);
 /** @}            
     end of group eo_thegpiomanager  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

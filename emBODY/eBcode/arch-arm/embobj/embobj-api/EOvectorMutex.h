@@ -20,6 +20,9 @@
 #ifndef _EOVECTORMUTEX_H_
 #define _EOVECTORMUTEX_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOvectorMutex.h
 	@brief      This header file implements public interface to a vectorMutex object.
@@ -227,6 +230,10 @@ extern eOresult_t eo_vectorMutex_Full(EOvectorMutex * vector, eObool_t *isFull, 
 /** @}            
     end of group eo_vector  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 
