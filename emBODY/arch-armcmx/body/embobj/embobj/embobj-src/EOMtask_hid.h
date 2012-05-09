@@ -20,6 +20,9 @@
 #ifndef _EOMTASK_HID_H_
 #define _EOMTASK_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOMtask_hid.h
     @brief      This header file implements hidden interface to the rtos task object.
@@ -79,7 +82,11 @@ extern eOresult_t eom_task_hid_WaitMessage(EOMtask *const p, eOmessage_t *msg, e
 // used to wait from inside the task
 extern eOresult_t eom_task_hid_WaitEvent(EOMtask *const p, eOevent_t msk, eOevent_t *rxmsk, eOreltime_t tout);
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

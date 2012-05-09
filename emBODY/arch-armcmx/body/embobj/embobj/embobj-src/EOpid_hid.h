@@ -3,6 +3,9 @@
 #ifndef _EOPID_HID_H_
 #define _EOPID_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*  @file       EOpid_hid.h
     @brief      This header file implements hidden interface to PID controller.
@@ -50,7 +53,11 @@ struct EOpid_hid
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

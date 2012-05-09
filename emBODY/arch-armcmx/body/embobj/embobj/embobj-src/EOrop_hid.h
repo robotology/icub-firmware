@@ -20,6 +20,9 @@
 #ifndef _EOROP_HID_H_
 #define _EOROP_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOrop_hid.h
     @brief      This header file implements hidden interface to a rop object.
@@ -137,7 +140,11 @@ EO_extern_inline uint16_t eo_rop_hid_DataField_EffectiveSize(uint16_t ropdatasiz
     return(((ropdatasize + 3) >> 2) << 2);
 }
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

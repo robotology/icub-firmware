@@ -20,6 +20,9 @@
 #ifndef _EOSTHETIMERMANAGER_HID_H_
 #define _EOSTHETIMERMANAGER_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOStheTimerManager_hid.h
     @brief      This header file implements hidden interface to the rtos timer manager singleton.
@@ -75,7 +78,11 @@ struct EOStheTimerManager_hid
 extern void eos_hid_timerman_Synch(EOStheTimerManager *p, uint64_t oldtick, uint64_t newtick);
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

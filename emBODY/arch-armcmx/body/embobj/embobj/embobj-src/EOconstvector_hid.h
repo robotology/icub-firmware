@@ -20,6 +20,9 @@
 #ifndef _EOCONSTVECTOR_HID_H_
 #define _EOCONSTVECTOR_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOconstvector_hid.h
     @brief      This header file implements hidden interface to a EOconstvector object.
@@ -61,7 +64,11 @@ struct EOconstvector_hid
 // empty-section
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

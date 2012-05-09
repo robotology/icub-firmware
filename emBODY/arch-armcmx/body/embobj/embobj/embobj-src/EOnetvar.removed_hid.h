@@ -3,6 +3,9 @@
 #ifndef _EONETVAR_HID_H_
 #define _EONETVAR_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOnetvar_hid.h
     @brief      This header file implements hidden interface to a netvar object.
@@ -224,7 +227,11 @@ extern uint16_t eo_netvar_hid_GetCAPACITY(const EOnetvar *netvar);
 
  
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

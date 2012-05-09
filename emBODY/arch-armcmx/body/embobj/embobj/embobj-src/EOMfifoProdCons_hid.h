@@ -20,6 +20,9 @@
 #ifndef _EOMFIFOPRODCONS_HID_H_
 #define _EOMFIFOPRODCONS_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 // - doxy -------------------------------------------------------------------------------------------------------------
 
 /* @file       EOMprodConsSharedData_hid.h
@@ -62,7 +65,11 @@ struct EOMfifoProdCons_hid
 // empty-section
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

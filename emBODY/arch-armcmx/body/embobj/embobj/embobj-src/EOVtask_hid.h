@@ -20,6 +20,9 @@
 #ifndef _EOVTASK_HID_H_
 #define _EOVTASK_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOVtask_hid.h
     @brief      This header file implements hidden interface to a task object.
@@ -99,7 +102,11 @@ extern void eov_task_hid_StartUp(EOVtaskDerived *t, uint32_t u);
 
 extern void eov_task_hid_Run(EOVtaskDerived *t, uint32_t u);
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

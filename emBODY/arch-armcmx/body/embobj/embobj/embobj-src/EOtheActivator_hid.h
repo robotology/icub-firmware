@@ -20,6 +20,9 @@
 #ifndef _EOTHEACTIVATOR_HID_H_
 #define _EOTHEACTIVATOR_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
@@ -47,7 +50,11 @@ struct EOtheActivator_hid
 }; 
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

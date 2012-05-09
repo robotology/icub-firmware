@@ -20,6 +20,9 @@
 #ifndef _EOCONSTLOOKUPTBL_HID_H_
 #define _EOCONSTLOOKUPTBL_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOconstLookupTbl_hid.h
     @brief      This header file implements hidden interface to a constLookupTbl object
@@ -64,7 +67,11 @@ struct EOconstLookupTbl_hid
 // empty-section
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
