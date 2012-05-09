@@ -20,6 +20,9 @@
 #ifndef _EOEMSCANNETWORKTOPOLOGY_H_
 #define _EOEMSCANNETWORKTOPOLOGY_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EoemsCanNetworkTopology.h
 	@brief      This header file gives 
@@ -158,6 +161,10 @@ extern eOresult_t eo_emsCanNetTopo_GetSensorId_ByMotorCanLocation(EOemsCanNetTop
  **/
 
  
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+
 #endif  // include-guard
 
 
