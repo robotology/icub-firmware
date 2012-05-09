@@ -20,7 +20,9 @@
 #ifndef _EOCFG_NVSEP_MN_HID_H_
 #define _EOCFG_NVSEP_MN_HID_H_
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /** @file       eOcfg_nvsEP_mn_hid.h
@@ -76,6 +78,10 @@ extern void eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgcommand(uint16_t n, const EOnv* n
     end of group eo_h2uilsdede2345er  
  **/
 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
 #endif  // include-guard
 
 

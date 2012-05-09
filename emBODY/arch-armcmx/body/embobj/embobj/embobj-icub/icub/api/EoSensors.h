@@ -20,7 +20,9 @@
 #ifndef _EOSENSORS_H_
 #define _EOSENSORS_H_
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /** @file       EoSensors.h
@@ -212,6 +214,10 @@ typedef uint8_t  eOsnsr_sensorId_t;
     end of group eo_cevcwervcrev5555  
  **/
 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
 #endif  // include-guard
 
 

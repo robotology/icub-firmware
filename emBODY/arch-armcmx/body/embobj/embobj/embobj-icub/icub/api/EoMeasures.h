@@ -20,7 +20,9 @@
 #ifndef _EOMEASURES_H_
 #define _EOMEASURES_H_
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /** @file       EoMeasures.h
@@ -132,6 +134,10 @@ typedef uint32_t            eOmeas_damping_t;
     end of group eo_c2e2rd3f3egfvr3  
  **/
 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
 #endif  // include-guard
 
 

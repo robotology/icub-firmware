@@ -20,7 +20,9 @@
 #ifndef _EOSKIN_H_
 #define _EOSKIN_H_
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /** @file       EoSkin.h
@@ -117,6 +119,10 @@ typedef struct                      // size is: 4+4+168+0 = 176
     end of group eo_cevcwervcrev2345  
  **/
 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
 #endif  // include-guard
 
 

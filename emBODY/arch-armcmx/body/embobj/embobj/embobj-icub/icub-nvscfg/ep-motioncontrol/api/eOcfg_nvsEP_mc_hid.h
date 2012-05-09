@@ -20,7 +20,9 @@
 #ifndef _EOCFG_NVSEP_MC_HID_H_
 #define _EOCFG_NVSEP_MC_HID_H_
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /** @file       eOcfg_nvsEP_mc_hid.h
@@ -220,6 +222,10 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mstatus__chamaleon04(eo_cfg_nvsEP_mc_mo
     end of group eo_h2uilsdede2345er  
  **/
 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
 #endif  // include-guard
 
 

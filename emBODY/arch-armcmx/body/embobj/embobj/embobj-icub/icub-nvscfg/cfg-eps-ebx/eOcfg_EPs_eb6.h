@@ -20,7 +20,9 @@
 #ifndef _EOCFG_EPS_EB6_H_
 #define _EOCFG_EPS_EB6_H_
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /** @file       eOcfg_EPs_eb6.h
@@ -101,6 +103,10 @@ extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb6_fptr_hashfunction_ep2index;
     end of group eo_we1234fr  
  **/
 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
 #endif  // include-guard
 
 

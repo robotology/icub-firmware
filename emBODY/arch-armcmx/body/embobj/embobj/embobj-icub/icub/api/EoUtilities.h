@@ -20,7 +20,9 @@
 #ifndef _EOUTILITIES_H_
 #define _EOUTILITIES_H_
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /** @file       EoUtilities.h
@@ -136,6 +138,10 @@ typedef enum
     end of group eo_c2e2rd3f3egfvr45  
  **/
 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
 #endif  // include-guard
 
 
