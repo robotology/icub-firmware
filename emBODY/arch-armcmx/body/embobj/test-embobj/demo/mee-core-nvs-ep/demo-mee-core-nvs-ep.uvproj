@@ -348,7 +348,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO</Define>
               <Undefine></Undefine>
-              <IncludePath>..\abslayer-cfg;..\app;..\..\..\embobj\embobj-api;..\..\..\embobj\embobj-src;..\..\..\embobj\embobj-cfg;..\..\..\..\..\sys\abs\api;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc;..\..\..\..\..\sys\env\api;..\..\..\..\..\..\porting;..\..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\embobj\embobj-icub\icub\api;..\..\..\embobj\embobj-icub\icub-nvscfg\cfg-eps-ebx;..\..\..\embobj\embobj-icub\icub-nvscfg\ep-analogsensors\api;..\..\..\embobj\embobj-icub\icub-nvscfg\ep-analogsensors\src;..\..\..\embobj\embobj-icub\icub-nvscfg\ep-management\api;..\..\..\embobj\embobj-icub\icub-nvscfg\ep-management\src;..\..\..\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\api;..\..\..\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\src;..\..\..\embobj\embobj-icub\icub-nvscfg\ep-skin\api;..\..\..\embobj\embobj-icub\icub-nvscfg\ep-skin\src</IncludePath>
+              <IncludePath>..\abslayer-cfg;..\app;..\..\..\embobj\embobj-api;..\..\..\embobj\embobj-src;..\..\..\embobj\embobj-cfg;..\..\..\..\..\sys\abs\api;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc;..\..\..\..\..\sys\env\api;..\..\..\..\..\..\porting;..\..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\embobj\embobj-icub\icub\api;..\..\..\embobj\embobj-icub\icub-nvscfg\cfg-eps-ebx;..\..\..\embobj\embobj-icub\icub-nvscfg\ep-analogsensors\api;..\..\..\embobj\embobj-icub\icub-nvscfg\ep-analogsensors\src;..\..\..\embobj\embobj-icub\icub-nvscfg\ep-management\api;..\..\..\embobj\embobj-icub\icub-nvscfg\ep-management\src;..\..\..\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\api;..\..\..\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\src;..\..\..\embobj\embobj-icub\icub-nvscfg\ep-skin\api;..\..\..\embobj\embobj-icub\icub-nvscfg\ep-skin\src;..\..\..\embobj\embobj-icub\icub-nvscfg\ep-management\usrcbk</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1031,11 +1031,6 @@
               </FileOption>
             </File>
             <File>
-              <FileName>eOcfg_nvsEP_mngmnt_usr_ebx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\embobj\embobj-icub\icub-nvscfg\ep-management\usrcbk\eOcfg_nvsEP_mngmnt_usr_ebx.c</FilePath>
-            </File>
-            <File>
               <FileName>eOcfg_nvsEP_mc_lowerleg_usrcbk_pippo.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\usrcbk\eOcfg_nvsEP_mc_lowerleg_usrcbk_pippo.c</FilePath>
@@ -1049,6 +1044,11 @@
               <FileName>eOcfg_nvsEP_mc_usrcbk_pippo.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\usrcbk\eOcfg_nvsEP_mc_usrcbk_pippo.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mn_usrcbk_ebx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\icub-nvscfg\ep-management\usrcbk\eOcfg_nvsEP_mn_usrcbk_ebx.c</FilePath>
             </File>
           </Files>
         </Group>
