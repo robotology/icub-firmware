@@ -10,14 +10,14 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-using namespace std;
-
 #include "stdint.h"
 #include "stdlib.h"
 #include "stdio.h"
 #include <string>
 #include <signal.h>
+#include <iostream>
 
+using namespace std;
 // Ace stuff
 #include <ace/ACE.h>
 #include "ace/SOCK_Dgram.h"
@@ -114,7 +114,6 @@ eOipv4addr_t remoteAddr;
 Board_connect_info local, remote01;
 uint8_t need2sendarop = 0;
 hostTransceiver *transceiver;
-pthread_t thread;
 
 
 int main(int argc, char *argv[])
@@ -368,16 +367,17 @@ static void s_callback_button_1(void)
 //    eo_cfg_nvsEP_mc_jointNVindex_t jNVindex = mngmntNVindex__ropsigcfgassign;
 
     // get nvid from parameters
-#warning "aggiornare chiamate a funzione"
-    eOnvID_t nvid = eo_cfg_nvsEP_mngmnt_NVID_Get(mngmntNVindex__ropsigcfgassign);
-    cnv = transceiver->getNVhandler(endpoint_mngmnt, nvid);
+//#warning "aggiornare chiamate a funzione"
+    eOnvID_t nvid_ropsigcfgassign = eo_cfg_nvsEP_mngmnt_NVID_Get(mngmntNVindex__ropsigcfgassign);
+    cnv = transceiver->getNVhandler(endpoint_mngmnt, nvid_ropsigcfgassign);
     ropsigcfgassign = (EOarray*) cnv->loc;
 
 //    EOarray_of_18eOropSIGcfg *ropsigcfgassign;
 
     eo_array_Reset(ropsigcfgassign);
+	eOnvID_t nvid;
 
-    if(0 == reset)
+ //   if(0 == reset)
     {
         nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_leftlowerleg, 0, jointNVindex_jstatus__basic);
     	sigcfg.ep = endpoint_mc_leftlowerleg;
@@ -404,18 +404,18 @@ static void s_callback_button_1(void)
     	eo_array_PushBack(ropsigcfgassign, &sigcfg);
     }
 
-    transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mngmnt, nvid);
+    transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mngmnt, nvid_ropsigcfgassign);
 
-    if(1 == reset)
+//    if(1 == reset)
     {
-        printf( "added a set<__upto10rop2signal, empty-list>");
+ //       printf( "added a set<__upto10rop2signal, empty-list>");
     }
-    else
+//    else
     {
         printf("added a set<__upto10rop2signal, list>");
     }
 
-    reset = (0==reset) ? (1) : (0);
+//    reset = (0==reset) ? (1) : (0);
 }
 
 
