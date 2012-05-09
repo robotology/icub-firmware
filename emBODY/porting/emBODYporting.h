@@ -20,6 +20,10 @@
 #ifndef _EMBODYPORTING_H_
 #define _EMBODYPORTING_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       emBODYporting.h
@@ -103,6 +107,11 @@ typedef int8_t emBODYporting_enum08_t;
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
  
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 /** @}            
     end of group cecedcedc 
