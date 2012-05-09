@@ -20,6 +20,9 @@
 #ifndef _EOVTHETIMERMANAGER_H_
 #define _EOVTHETIMERMANAGER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOVtheTimerManager.h
     @brief      This header file implements public interface to the timer manager singleton.
@@ -137,6 +140,10 @@ extern eOresult_t eov_timerman_Release(EOVtheTimerManager *p);
 /** @}            
     end of group eov_thetimermanager  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 
