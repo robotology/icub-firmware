@@ -28,7 +28,7 @@ Int32 get_position_encoder(byte jnt)
 {
 	dword temp=0;
 	
-	switch (jnt)
+	switch (jnt)  
 	{
 		case 0:
 			QD0_getPosition (&temp); //old: (dword *)(temp)
