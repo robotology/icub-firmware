@@ -155,7 +155,7 @@ extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Jxx_jconfig(uint16_t xx, const
 {
     eo_cfg_nvsEP_mc_lowerleg_con_jointNumber_t  jxx = (eo_cfg_nvsEP_mc_lowerleg_con_jointNumber_t) xx;
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    eOipv4addr_t ip = nv->ip;
+    eOipv4addr_t ip;// = nv->ip;
     eOnvEP_t ep = nv->ep;
     
     
@@ -177,7 +177,7 @@ extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Mxx_mconfig(uint16_t xx, const
 {
     eo_cfg_nvsEP_mc_lowerleg_con_motorNumber_t  mxx = (eo_cfg_nvsEP_mc_lowerleg_con_motorNumber_t) xx;
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    eOipv4addr_t ip = nv->ip;
+    eOipv4addr_t ip;// = nv->ip;
     eOnvEP_t ep = nv->ep;
     
     
@@ -198,7 +198,7 @@ extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Jxx_jstatus(uint16_t xx, const
 {
     eo_cfg_nvsEP_mc_lowerleg_con_jointNumber_t  jxx = (eo_cfg_nvsEP_mc_lowerleg_con_jointNumber_t) xx;
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    eOipv4addr_t ip = nv->ip;
+    eOipv4addr_t ip;// = nv->ip;
     eOnvEP_t ep = nv->ep;
     
     
@@ -230,7 +230,7 @@ extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Jxx_jcmmnds__calibration(uint1
 {
     eo_cfg_nvsEP_mc_lowerleg_con_jointNumber_t  jxx = (eo_cfg_nvsEP_mc_lowerleg_con_jointNumber_t) xx;
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    eOipv4addr_t ip = nv->ip;
+    eOipv4addr_t ip;// = nv->ip;
     eOnvEP_t ep = nv->ep;
     
     
@@ -261,6 +261,9 @@ extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Jxx_jcmmnds__calibration(uint1
     }
     
 }
+
+
+
 
 
 #if 0

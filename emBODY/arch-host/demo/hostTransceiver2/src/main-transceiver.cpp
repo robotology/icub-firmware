@@ -43,6 +43,7 @@ extern "C" {
 
 
 
+
 #define hal_trace_puts(arg)		printf("%s", arg)
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -107,11 +108,13 @@ void copyPid2eo(Pid in, eOmc_PID_t *out);
 //DSocket	UDP_socket, UDP_socket2;
 
 ACE_SOCK_Dgram				*ACE_socket;
+ACE_SOCK_Dgram				*ACE_socket2;
+
 ACE_UINT16					port;
 ACE_INT8					flags = 0;
 
 eOipv4addr_t remoteAddr;
-Board_connect_info local, remote01;
+Board_connect_info local, remote01, remote02;
 uint8_t need2sendarop = 0;
 hostTransceiver *transceiver;
 
@@ -138,6 +141,9 @@ int main(int argc, char *argv[])
 
 	uint8_t *udppkt_data = NULL;
 	uint16_t udppkt_size = 0;
+
+
+//	printf("%s", _AC_);
 
     // parse command line input argument
     if(argc > 1)
@@ -205,12 +211,16 @@ int main(int argc, char *argv[])
     // Set destination address_string
     sscanf(remote01.address_string.c_str(),"%d.%d.%d.%d",&ip1,&ip2,&ip3,&ip4);
     remote01.addr.set(port, (ip1<<24)|(ip2<<16)|(ip3<<8)|ip4 );
+    remote02.addr.set(3333, (ip1<<24)|(ip2<<16)|(ip3<<8)|ip4 );
+
 
     printf("remote01.address: %s\n", remote01.address_string.c_str());
     printf("port is : %d\n\n", port);
 
 	remoteAddr = eo_common_ipv4addr(ip1,ip2,ip3,ip4); // marco (10, 255, 39, 151)
 	eOipv4port_t eOport = port;
+
+
 
     // init object: one per ems
 	//hostTransceiver_Init(localAddr,remoteAddr, eOport, EOK_HOSTTRANSCEIVER_capacityofpacket);
@@ -333,6 +343,7 @@ void commands(void)
   printf("2: send type 2 packet -> set joint configuration\n");
   printf("3: send type 3 packet -> send position setPoint\n");
   printf("4: send type 4 packet -> empty packet\n");
+  printf("4: send type 4 packet -> weak up EMS\n");
   printf("\n");
 }
 
@@ -510,13 +521,16 @@ static void s_callback_button_5(void )
 	char str[128];
 	int j = 0;
 
-	// get nvid from parameters
-//	eOnvID_t nvid = eo_cfg_nvsEP_mc_any_con_bodypart_NVID_for_joint_var_Get((eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t)j, jointNVindex_jconfig__pidposition);
+	// weak up EMS
+	str[0] = 0x01;
 
-	// tell agent to prepare a rop to send
-//    transceiver->load_occasional_rop(eo_ropcode_ask, EOK_cfg_nvsEP_mc_leftleg_EP, nvid);
+	ACE_socket->send(str, 1, remote02.addr, flags);
+	sleep(5);
 
-	snprintf(str, sizeof(str)-1, "called s_callback_button_5: ask a motorNVindex_mconfig, motor %d\n", j);
+	str[0] = 0x02;
+	ACE_socket->send(str, 1, remote02.addr, flags);
+
+	snprintf(str, sizeof(str)-1, "called weak up EMS\n", j);
 }
 
 // Utilities

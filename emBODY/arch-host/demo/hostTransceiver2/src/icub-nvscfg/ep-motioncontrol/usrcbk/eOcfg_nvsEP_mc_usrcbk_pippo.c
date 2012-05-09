@@ -204,11 +204,31 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eo_cfg_nvsEP_mc_joint
 // --------------------------------------------------------------------------------------------------------------------
 
 
+extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jstatus__basic(uint16_t xx, const EOnv* nv)
+{
+	eOmc_joint_status_basic_t *jstatus_b = nv->rem;
+	printf("jnum = %d\n", xx);
+	printf("ep = %d\n", nv->ep);
+	printf("jstatus_b->acceleration = %d\n", jstatus_b->acceleration);
+	printf("jstatus_b->controlmodestatus = %d\n", jstatus_b->controlmodestatus);
+	printf("jstatus_b->motionmonitorstatus = %d\n", jstatus_b->motionmonitorstatus);
+	printf("jstatus_b->position = %d\n", jstatus_b->position);
+	printf("jstatus_b->torque = %d\n", jstatus_b->torque);
+	printf("jstatus_b->velocity = %d\n", jstatus_b->velocity);
+}
 
 
 
-
-
+extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mstatus__basic(uint16_t xx, const EOnv* nv)
+{
+	eOmc_motor_status_basic_t *mstatus_b = nv->rem;
+	printf("jnum = %d\n", xx);
+	printf("ep = %d\n", nv->ep);
+	printf("mstatus_b->currentn = %d\n", mstatus_b->current);
+	printf("mstatus_b->filler02 = %d\n", mstatus_b->filler02);
+	printf("mstatus_b->position = %d\n", mstatus_b->position);
+	printf("mstatus_b->velocity = %d\n", mstatus_b->velocity);
+}
 
 
 

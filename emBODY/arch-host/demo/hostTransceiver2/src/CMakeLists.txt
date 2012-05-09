@@ -15,6 +15,7 @@ set(BASE 				$ENV{ICUB_ROOT}/firmware/emBODY/)
 set(EXTRA_FOLDER  		${CMAKE_CURRENT_SOURCE_DIR}/)
 set(TRANSCEIVER_FOLDER	$ENV{ICUB_ROOT}/main/src/libraries/icubmod/embObjLib/ )
 
+#add_definitions( -D_AC_="STRINGA" )
 
 include(embObjLib.conf)
 find_package(YARP)
@@ -66,7 +67,6 @@ set(NVS_MC_SOURCE 			${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc.c
 
 							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_lowerleg_con.c
 							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_lowerleg_usr.c
-#							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_lowerleg_usr_pippo.c
 
 #							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_pippo.c
 							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_torso_con.c
@@ -75,8 +75,7 @@ set(NVS_MC_SOURCE 			${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc.c
 							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_upperarm_usr.c
 
 							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_upperleg_con.c
-							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_upperleg_usr.c
-#							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_upperleg_usr_pippo.c  
+							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_upperleg_usr.c 
 							)						
 
 set(NVS_MNGMNT_SOURCE		${NVS_MNGMNT_SRC_FOLDER}eOcfg_nvsEP_mngmnt_con.c
@@ -114,11 +113,11 @@ set(NVS_SKIN_SOURCE			${NVS_SKIN_SRC_FOLDER}eOcfg_nvsEP_sk.c
 #							${NVS_USR_SRC_FOLDER}eOcfg_nvsEP_mngmnt_usrcbk_ebx.c  )
 
 set(NVS_CBK_SOURCE			${NVS_MC_CBK_FOLDER}eOcfg_nvsEP_mc_lowerleg_usrcbk_pippo.c
-							${NVS_MC_CBK_FOLDER}eOcfg_nvsEP_mc_upperleg_usrcbk_pippo.c
-							${NVS_MC_CBK_FOLDER}eOcfg_nvsEP_mc_usrcbk_pippo.c
-							${NVS_MNGMNT_CBK_FOLDER}eOcfg_nvsEP_mngmnt_usr_ebx.c
-							${NVS_SENSORS_CBK_FOLDER}eOcfg_nvsEP_as_wholebody_usrcbk_pippo.c 
-							${NVS_SENSORS_CBK_FOLDER}eOcfg_nvsEP_as_usrcbk_pippo.c 
+#							${NVS_MC_CBK_FOLDER}eOcfg_nvsEP_mc_upperleg_usrcbk_pippo.c
+#							${NVS_MC_CBK_FOLDER}eOcfg_nvsEP_mc_usrcbk_pippo.c
+#							${NVS_MNGMNT_CBK_FOLDER}eOcfg_nvsEP_mngmnt_usr_ebx.c
+#							${NVS_SENSORS_CBK_FOLDER}eOcfg_nvsEP_as_wholebody_usrcbk_pippo.c 
+#							${NVS_SENSORS_CBK_FOLDER}eOcfg_nvsEP_as_usrcbk_pippo.c 
 							)
 
 
@@ -232,7 +231,8 @@ set(embobj_source 		${BODY_COMMON_SOURCE}
 						${NVS_MNGMNT_SOURCE} 
 						${NVS_SENSORS_SOURCE} 
 						${NVS_SKIN_SOURCE} 
-						${NVS_USR_SOURCE} )
+						${NVS_USR_SOURCE} 
+						${NVS_CBK_SOURCE})
 
 
 #set(embobj_header 		${BODY_COMMON_SOURCE} 
