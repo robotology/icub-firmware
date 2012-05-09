@@ -20,6 +20,9 @@
 #ifndef _EOVCANPROTO_HID_H_
 #define _EOVCANPROTO_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOVcanProto_hid.h
     @brief      This header file gives 
@@ -96,7 +99,11 @@ extern EOVcanProto* eov_canProto_hid_New(void);
 extern eOresult_t eov_canProto_hid_SetVTABLE(EOVcanProto *p, eOres_fp_canProto_parserFn_t v_parse, eOres_fp_canProto_formerFn_t v_form);
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

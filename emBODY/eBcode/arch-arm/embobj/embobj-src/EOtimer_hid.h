@@ -20,6 +20,10 @@
 #ifndef _EOTIMER_HID_H_
 #define _EOTIMER_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 /* @file        EOtimer_hid.h
     @brief      This header file implements hidden interface to a timer object.
@@ -86,7 +90,11 @@ extern void eo_timer_hid_Reset(EOtimer *t, eOtimerStatus_t stat);
 extern void eo_timer_hid_Reset_but_not_osaltime(EOtimer *t, eOtimerStatus_t stat);
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

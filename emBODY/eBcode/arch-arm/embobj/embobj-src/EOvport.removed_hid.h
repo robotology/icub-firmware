@@ -20,6 +20,9 @@
 #ifndef _EOVPORT_HID_H_
 #define _EOVPORT_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOvport_hid.h
     @brief      This header file implements hidden interface to a rop object.
@@ -117,7 +120,11 @@ extern void eo_vport_hid_MoveDat2NVs(EOvport *vp, eOnetvarOwnership_t ownership,
 // on the vport and call the related callbacks.
 //extern void eo_vport_hid_SynchroniseDat2NVs(EOvport *vp, eOnetvarOwnership_t ownership, eOipv4addr_t ipaddr, eOropcode_t ropc); 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

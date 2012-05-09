@@ -20,6 +20,9 @@
 #ifndef _THEMEMORYPOOL_HID_H_
 #define _THEMEMORYPOOL_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
@@ -52,7 +55,11 @@ struct EOtheMemoryPool_hid
 }; 
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

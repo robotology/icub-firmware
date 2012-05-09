@@ -20,6 +20,9 @@
 #ifndef _EOMTHEGPIOMANAGER_HID_H_
 #define _EOMTHEGPIOMANAGER_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOMtheGPIOManager_hid.h
     @brief      This header file implements hidden interface to the gpio manager singleton used in MEE
@@ -68,7 +71,11 @@ struct EOMtheGPIOManager_hid
 void eom_gpioman(void *p);
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

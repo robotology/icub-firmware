@@ -20,6 +20,9 @@
 #ifndef _EOICUBCANPROTO_HID_H_
 #define _EOICUBCANPROTO_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 // - doxy -------------------------------------------------------------------------------------------------------------
 
 /* @file       EOicubCanProto_hid.h
@@ -199,7 +202,11 @@ extern __inline eo_icubCanProto_motorAxis_t eo_icubCanProto_hid_getmotorAxisFrom
 }
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

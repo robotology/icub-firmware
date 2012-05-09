@@ -20,6 +20,9 @@
 #ifndef _EOSYNCHROSOCKET_HID_H_
 #define _EOSYNCHROSOCKET_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOsynchroSocket_hid.h
     @brief      This header file implements hidden interface to a datagram socket object.
@@ -67,7 +70,11 @@ struct EOsynchroSocket_hid
 // empty-section
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

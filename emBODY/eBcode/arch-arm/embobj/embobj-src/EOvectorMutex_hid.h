@@ -20,6 +20,9 @@
 #ifndef _EOVECTORMUTEX_HID_H_
 #define _EOVECTORMUTEX_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOvectorMutex_hid.h
     @brief      This header file implements hidden interface to a EOvectorMutex object.
@@ -65,7 +68,11 @@ struct EOvectorMutex_hid
 // empty-section
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

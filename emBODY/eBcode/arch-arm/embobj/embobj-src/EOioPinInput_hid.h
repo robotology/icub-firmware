@@ -20,6 +20,9 @@
 #ifndef _EOIOPININPUT_HID_H_
 #define _EOIOPININPUT_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOioPinInput_hid.h
     @brief      This header file implements hidden interface to an input pin object.
@@ -68,7 +71,11 @@ struct EOioPinInput_hid
 extern EOioPinInput * eo_iopininp_hid_NewArray(uint8_t n);
  
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

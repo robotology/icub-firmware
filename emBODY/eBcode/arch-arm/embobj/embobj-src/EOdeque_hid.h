@@ -20,6 +20,9 @@
 #ifndef _EODEQUE_HID_H_
 #define _EODEQUE_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOdeque_hid.h
     @brief      This header file implements hidden interface to a EOdeque object.
@@ -75,7 +78,11 @@ struct EOdeque_hid
 extern void eo_deque_hid_QuickPopFront(EOdeque * deque);
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

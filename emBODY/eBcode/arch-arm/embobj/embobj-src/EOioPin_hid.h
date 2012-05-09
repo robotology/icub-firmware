@@ -20,6 +20,9 @@
 #ifndef _EOIOPIN_HID_H_
 #define _EOIOPIN_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOioPin_hid.h
     @brief      This header file implements hidden interface to a IO pin object.
@@ -156,7 +159,11 @@ struct EOioPin_hid
 //extern eOresult_t eo_iopin_hid_Reset(EOioPin *const p);
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

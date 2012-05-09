@@ -20,6 +20,9 @@
 #ifndef _EONVSCFG_HID_H_
 #define _EONVSCFG_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOnvsCfg_hid.h
     @brief      This header file implements hidden interface to a netvar object.
@@ -113,7 +116,11 @@ extern EOtreenode* eo_nvscfg_hid_ondevice_onendpoint_withID_GetTreeNode(EOnvsCfg
 
  
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

@@ -20,6 +20,9 @@
 #ifndef _EOMATRIX3D_HID_H_
 #define _EOMATRIX3D_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file        EOmatrix3d_hid.h
     @brief      This header file implements hidden interface to a matrix3d object.
@@ -82,7 +85,11 @@ struct EOmatrix3d_hid
 //extern eOresult_t eo_matrix3d_hid_PushBackData(EOmatrix3d *p, const void *data, uint8_t sizedata);
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
