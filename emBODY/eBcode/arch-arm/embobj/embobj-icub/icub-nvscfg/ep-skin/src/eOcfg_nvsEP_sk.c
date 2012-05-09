@@ -59,6 +59,11 @@
 
 
 
+//#define EOCFG_NVSEP_SK_OVERRIDE
+
+#if defined(EOCFG_NVSEP_SK_OVERRIDE)
+#include "eOcfg_nvsEP_sk_overridden.h"
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------

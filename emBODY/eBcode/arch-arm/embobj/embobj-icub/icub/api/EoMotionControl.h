@@ -421,7 +421,7 @@ typedef struct                  // size is: 16+16+16+12+4+4+2+1+1+2+1+1+2+2+0 = 
     uint16_t                    holder02FFU04;              /**< holder of a variable for future use */
 } eOmc_joint_config_t;          EO_VERIFYsizeof(eOmc_joint_config_t, 80);
 
-#warning --> remember to move controlmode (and motionmonitormode?) into eOmc_joint_commands_t ...
+
 
 
 /** @typedef    typedef struct eOmc_joint_status_basic_t
