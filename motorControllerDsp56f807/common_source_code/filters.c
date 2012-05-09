@@ -17,7 +17,7 @@ Int32 lpf_ord1_3hz(Int32 input, int j)
         return (Int32)(y_filt[1][j]);
 }
 
-void clear_lpf_ord1_3hz(int j)
+void clear_lpf_ord1_3hz(int j) 
 {
 	int i=0;
 	if (_debug_in5[j]==0 )

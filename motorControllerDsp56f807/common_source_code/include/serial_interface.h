@@ -1,6 +1,6 @@
-# Copyright: (C) 2007-2010 RobotCub Consortium
-# Authors: Marco Maggiali, Marco Randazzo
-# CopyPolicy: Released under the terms of the GNU GPL v2.0.
+//# Copyright: (C) 2007-2010 RobotCub Consortium
+//# Authors: Marco Maggiali, Marco Randazzo
+//# CopyPolicy: Released under the terms of the GNU GPL v2.0.
 
 #ifndef __serial_interfaceh__
 #define __serial_interfaceh__

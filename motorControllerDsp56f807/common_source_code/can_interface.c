@@ -581,8 +581,9 @@ void can_send_broadcast(void)
 	char FAULT_HLL1 = 0;
 	
 	// Absolute encoder errors			
-	#if (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL)
+	#if (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOARD_TYPE == BOARD_TYPE_2BLLDC)
 	#ifdef USE_ABS_SSI	
+
 		if (get_error_abs_ssi(0)==ERR_ABS_SSI) FAULT_ABS0 = 1;
 		if (get_error_abs_ssi(1)==ERR_ABS_SSI) FAULT_ABS1 = 1;
 	#endif		
@@ -657,9 +658,11 @@ void can_send_broadcast(void)
 #if (VERSION ==0x0154 || VERSION ==0x0155 || VERSION ==0x0158 || VERSION == 0x0351 || VERSION ==0x0151)
 		if(FAULT_ABS0 == 0)
 			CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
-#elif (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL)
+#elif (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOARD_TYPE == BOARD_TYPE_2BLLDC)
+		#ifdef USE_ABS_SSI
 		if(FAULT_ABS0 == 0 && FAULT_ABS1 == 0)
 			CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
+		#endif
 #else
 			CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
 #endif

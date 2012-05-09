@@ -1,6 +1,6 @@
-# Copyright: (C) 2007-2010 RobotCub Consortium
-# Authors: Marco Maggiali, Marco Randazzo
-# CopyPolicy: Released under the terms of the GNU GPL v2.0.
+//# Copyright: (C) 2007-2010 RobotCub Consortium
+//# Authors: Marco Maggiali, Marco Randazzo
+//# CopyPolicy: Released under the terms of the GNU GPL v2.0.
 
 #ifndef __CHECK_RANGE_H__
 #define __CHECK_RANGE_H__
