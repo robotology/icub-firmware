@@ -20,6 +20,11 @@
 #ifndef _EO_ICUBCANPROTOCOL_SPECIFICATION_H_
 #define _EO_ICUBCANPROTOCOL_SPECIFICATION_H_
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /* @file       eo_ICUBCANPROTOcol_messages.h
@@ -338,6 +343,10 @@ typedef struct
 
 // - doxy end ---------------------------------------------------------------------------------------------------------
 // empty-section
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 
