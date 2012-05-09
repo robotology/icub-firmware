@@ -20,6 +20,11 @@
 #ifndef _EOCOMMON_H_
 #define _EOCOMMON_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 /** @file       EoCommon.h
     @brief      This header file implements public interface to the common types used by the EmbObj
@@ -483,6 +488,10 @@ EO_extern_inline eOmacaddr_t eo_common_macaddr(uint8_t m1, uint8_t m2, uint8_t m
     end of group eo_common  
  **/
  
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
  
 #endif  // include-guard
 

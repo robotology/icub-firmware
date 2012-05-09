@@ -20,6 +20,10 @@
 #ifndef _EOCONSTLOOKUPTBL_H_
 #define _EOCONSTLOOKUPTBL_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 /** @file       EOconstLookupTbl.h
     @brief      This header file implements public interface to a constLookupTbl object
@@ -120,6 +124,10 @@ extern eOres_fp_voidp_t eo_constLookupTbl_GetExceptionMngFn(EOconstLookupTbl *p)
 /** @}            
     end of group eo_constvector  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 
