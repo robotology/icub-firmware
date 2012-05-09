@@ -31,7 +31,7 @@
 
 byte	_board_ID = 15;	
 char    _additional_info [32];
-byte    _build_number = 59;
+byte    _build_number = 60;
 byte    _my_can_protocol_major = 1;
 byte    _my_can_protocol_minor = 1;
 bool    _can_protocol_ack = false;
@@ -304,11 +304,27 @@ void main(void)
 		//FT sensor watchdog update 
 		for (i=0; i<STRAIN_MAX; i++) 
 			if (_strain_wtd[i]>0) _strain_wtd[i]--;
+		
+		
+	    for (i=0; i<JN; i++) 
+		{		
+		   if (get_error_abs_ssi(i)==ERR_ABS_SSI)
+		   {
+					_control_mode[i] = MODE_IDLE;	
+					_pad_enabled[0] = false;
+					_pad_enabled[1] = false;
+					PWM_outputPadDisable(0);
+					PWM_outputPadDisable(1);
+			#ifdef DEBUG_CAN_MSG
+		    	can_printf("ABS error %d",i);	
+			#endif
+		   }				
+		}  
 						
 		/* computes controls */
 		for (i=0; i<JN; i++) PWMoutput[i] = compute_pwm(i);
 		
-	
+	     
 
 //		decouple PWM	
 #ifdef USE_NEW_DECOUPLING
