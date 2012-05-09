@@ -20,6 +20,9 @@
 #ifndef _EOICUBCANPROTO_H_
 #define _EOICUBCANPROTO_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EoicubCanProto.h
 	@brief      This header implements public interface to iCub CAN protocol
@@ -124,6 +127,10 @@ extern eOresult_t eo_icubCanProto_FormCanFrame(EOicubCanProto* p,
  **/
 
  
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+
 #endif  // include-guard
 
 
