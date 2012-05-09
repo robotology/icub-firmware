@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       eOcfg_nvsEP_mngmnt_usr_ebx.c
+/* @file       eOcfg_nvsEP_mn_usrcbk_ebx.c
     @brief      This file keeps the user-defined local ...
     @author     marco.accame@iit.it
     @date       09/06/2011
@@ -49,7 +49,7 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "eOcfg_nvsEP_mngmnt_usr_hid.h"
+#include "eOcfg_nvsEP_mn_hid.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
@@ -93,7 +93,7 @@ static void s_eo_cfg_nvsEP_mngmnt_usr_ebx_generic_ropsigcfgassign(EOarray* array
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern void eo_cfg_nvsEP_mngmnt_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
+extern void eo_cfg_nvsEP_mn_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
 {
     eObool_t theOwnershipIsRemote = (NULL == rem) ? eobool_true : eobool_false;
     
@@ -108,7 +108,7 @@ extern void eo_cfg_nvsEP_mngmnt_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void 
 }
 
 
-extern void eo_cfg_nvsEP_mngmnt_usr_hid_INIT__ropsigcfgassign(uint16_t n, const EOnv* nv)
+extern void eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgassign(uint16_t n, const EOnv* nv)
 {
     eObool_t theOwnershipIsRemote = (NULL == nv->rem) ? eobool_true : eobool_false;
     
@@ -127,7 +127,7 @@ extern void eo_cfg_nvsEP_mngmnt_usr_hid_INIT__ropsigcfgassign(uint16_t n, const 
     }    
 }
 
-extern void eo_cfg_nvsEP_mngmnt_usr_hid_UPDT__ropsigcfgcommand(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgassign(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsRemote = (NULL == nv->rem) ? eobool_true : eobool_false;
     

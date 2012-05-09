@@ -58,6 +58,11 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
+//#define EOCFG_NVSEP_MN_OVERRIDE
+
+#if defined(EOCFG_NVSEP_MN_OVERRIDE)
+#include "eOcfg_nvsEP_mn_overridden.h"
+#endif
 
 
 
@@ -113,13 +118,17 @@ extern eOnvID_t eo_cfg_nvsEP_mn_NVID_Get(eo_cfg_nvsEP_mn_endpoint_t ep, eo_cfg_n
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mn_hid_INITIALISE)
 __weak extern void eo_cfg_nvsEP_mn_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
 {
     eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
 }
+#endif
 
 // init:    n is not used
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgassign)
 __weak extern void eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgassign(uint16_t n, const EOnv* nv)
 {   // n is always 0
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
@@ -128,7 +137,9 @@ __weak extern void eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgassign(uint16_t n, const E
     theOwnershipIsLocal = theOwnershipIsLocal;
     ep = ep;
 }
+#endif
 
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgcommand)
 __weak extern void eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgcommand(uint16_t n, const EOnv* nv)
 {   // n is always 0
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
@@ -137,9 +148,11 @@ __weak extern void eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgcommand(uint16_t n, const 
     theOwnershipIsLocal = theOwnershipIsLocal;
     ep = ep;
 }
-
+#endif
 
 // updt:    n is not used
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgassign)
 __weak extern void eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgassign(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {   // n is always 0
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
@@ -148,7 +161,9 @@ __weak extern void eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgassign(uint16_t n, const E
     theOwnershipIsLocal = theOwnershipIsLocal;
     ep = ep;
 }
+#endif
 
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgcommand)
 __weak extern void eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgcommand(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {   // n is always 0
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
@@ -157,7 +172,7 @@ __weak extern void eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgcommand(uint16_t n, const 
     theOwnershipIsLocal = theOwnershipIsLocal;
     ep = ep;
 }
-
+#endif
 
 
 
