@@ -16,9 +16,9 @@ set LST=(EOfakeStorage EOhostTransceiver EOmatrix3d EOnv EOnvsCfg EOreceiver EOr
 
 echo. -- copying "%TYP%" files
 
-set DEST_API=..\..\..\..\any-arch\sys\embobj\"%TYP%"\"%D_API%"
-set DEST_HID=..\..\..\..\any-arch\sys\embobj\"%TYP%"\"%D_HID%"
-set DEST_SRC=..\..\..\..\any-arch\sys\embobj\"%TYP%"\"%D_SRC%"
+set DEST_API="%DEST_ROOT%"\"%TYP%"\"%D_API%"
+set DEST_HID="%DEST_ROOT%"\"%TYP%"\"%D_HID%"
+set DEST_SRC="%DEST_ROOT%"\"%TYP%"\"%D_SRC%"
 
 
 del /F /Q "%DEST_API%"\* 
