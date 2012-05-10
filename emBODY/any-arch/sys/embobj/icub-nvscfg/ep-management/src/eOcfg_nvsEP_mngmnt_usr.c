@@ -1,4 +1,4 @@
-/*
+    /*
  * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
@@ -141,7 +141,16 @@ extern void eo_cfg_nvsEP_mngmnt_usr_initialise(eOnvEP_t ep, void* loc, void* rem
     eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
     
-    
+    // copy default values
+    if(NULL != loc)
+    {
+        memcpy(loc, eo_cfg_nvsEP_mngmnt_defaultvalue, sizeof(eo_cfg_nvsEP_mngmnt_t));
+    }    
+    if(NULL != rem)
+    {   
+        memcpy(rem, eo_cfg_nvsEP_mngmnt_defaultvalue, sizeof(eo_cfg_nvsEP_mngmnt_t));
+    }
+        
     // launch a specialised initialisation
     eo_cfg_nvsEP_mngmnt_usr_hid_INITIALISE(ep, loc, rem);
 }
