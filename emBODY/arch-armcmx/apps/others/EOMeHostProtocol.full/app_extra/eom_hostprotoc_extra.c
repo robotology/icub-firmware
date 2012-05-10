@@ -62,7 +62,7 @@
 // -- nvs part
 
 // all that is enough for the host board
-#include "eOcfg_EPs_rem_board.h"
+#include "eOcfg_EPs_eb7.h"
 #include "EOhostTransceiver.h"
 
 
@@ -149,7 +149,7 @@ EOpacket* s_mytxpkt = NULL;
 
 static EOtransceiver *pc104txrx = NULL;
 
-static const eOipv4addr_t nvs_ems00_ipaddress       = EO_COMMON_IPV4ADDR(10, 255, 39, 152);
+static const eOipv4addr_t nvs_ems00_ipaddress       = EO_COMMON_IPV4ADDR(10, 0, 0, 3);
 //static const eOipv4addr_t nvs_ems00_ipaddress       = EO_COMMON_IPV4ADDR(10, 255, 36, 127);
 
 
@@ -293,10 +293,11 @@ static void s_eom_hostprotoc_extra_protocoltransceiver_init(void)
 {
     eOhosttransceiver_cfg_t hosttxrxcfg = 
     {
-        .vectorof_endpoint_cfg          = eo_cfg_EPs_vectorof_rem_board,
-        .hashfunction_ep2index          = eo_cfg_nvsEP_rem_board_fptr_hashfunction_ep2index,
+        .vectorof_endpoint_cfg          = eo_cfg_EPs_vectorof_eb7,
+        .hashfunction_ep2index          = eo_cfg_nvsEP_eb7_fptr_hashfunction_ep2index,
         .remoteboardipv4addr            = nvs_ems00_ipaddress,
-        .remoteboardipv4port            = nvs_base_endpoint_iport
+        .remoteboardipv4port            = nvs_base_endpoint_iport,
+        .tobedefined                    = 0
     };  
 
     EOhostTransceiver *hosttxrx = NULL;
@@ -369,29 +370,30 @@ static void s_eom_hostprotoc_extra_protocoltransceiver_addoccasionalrop(void)
 
         ropinfo.ropcfg      = eok_ropconfig_basic;
         ropinfo.ropcode     = eo_ropcode_ask;
-        ropinfo.nvep        = EOK_cfg_nvsEP_base_endpoint;
-        ropinfo.nvid        = EOK_cfg_nvsEP_base_NVID__gotoprocess;
+        ropinfo.nvep        = endpoint_mc_leftlowerleg;
+        ropinfo.nvid        = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_leftlowerleg, (eOcfg_nvsEP_mc_jointNumber_t)0, jointNVindex_jconfig__motionmonitormode);
         
         eo_transceiver_rop_occasional_Load(pc104txrx, &ropinfo);
 
-        snprintf(str, sizeof(str)-1, "               - added a ask<__gotoprocess>");
+        snprintf(str, sizeof(str)-1, "               - added a ask<__jcfg_motionmonitormode j0>");
         hal_trace_puts(str); 
 
     }
     else if(8==(step%10))
     {
         eo_transceiver_ropinfo_t ropinfo;
+        eo_cfg_nvsEP_mc_lowerleg_t* locllleg = eo_cfg_nvsEP_eb7_Get_remotelyownedRAM(endpoint_mc_leftlowerleg, eo_nvscfg_ownership_local);
 
         ropinfo.ropcfg      = eok_ropconfig_basic;
-        ropinfo.ropcode     = eo_ropcode_ask;
-        ropinfo.nvep        = EOK_cfg_nvsEP_base_endpoint;
-        ropinfo.nvid        = EOK_cfg_nvsEP_base_NVID__localise;
+        ropinfo.ropcode     = eo_ropcode_set;
+        ropinfo.nvep        = endpoint_mc_leftlowerleg;
+        ropinfo.nvid        = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_leftlowerleg, (eOcfg_nvsEP_mc_jointNumber_t)1, jointNVindex_jconfig__maxpositionofjoint);
 
-        eo_cfg_nvsEP_base_usr_rem_anydev_mem_local->localise = 0;
+        locllleg->joints[1].jconfig.maxpositionofjoint = 5;
         
         eo_transceiver_rop_occasional_Load(pc104txrx, &ropinfo);
 
-        snprintf(str, sizeof(str)-1, "               - added a set<__localise, %d>", 0);
+        snprintf(str, sizeof(str)-1, "               - added a set<__jcfg_maxpositionofjoint j1, %d>", locllleg->joints[1].jconfig.maxpositionofjoint);
         hal_trace_puts(str); 
 
     }
@@ -404,11 +406,11 @@ static void s_eom_hostprotoc_extra_protocoltransceiver_addoccasionalrop(void)
 
         ropinfo.ropcfg      = eok_ropconfig_basic;
         ropinfo.ropcode     = eo_ropcode_ask;
-        ropinfo.nvep        = EOK_cfg_nvsEP_base_endpoint;
-        ropinfo.nvid        = EOK_cfg_nvsEP_base_NVID__bootprocess;
+        ropinfo.nvep        = endpoint_mc_leftlowerleg;
+        ropinfo.nvid        = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_leftlowerleg, (eOcfg_nvsEP_mc_jointNumber_t)1, jointNVindex_jconfig__minpositionofjoint);
 //        eo_transceiver_rop_occasional_Load(pc104txrx, &ropinfo);
 
-//            snprintf(str, sizeof(str)-1, "               - added a ask<__boardinfo>");
+//            snprintf(str, sizeof(str)-1, "               - added a ask<__minpositionofjoint j1>");
 //            hal_trace_puts(str); 
     }
 
@@ -424,7 +426,8 @@ static void s_eom_hostprotoc_extra_protocoltransceiver_addoccasionalrop(void)
 
 static void s_eom_hostprotoc_extra_protocoltransceiver_configure_regular_rops_on_board(void)
 {
-    EOarray *upto10 = (EOarray*) & eo_cfg_nvsEP_mngmnt_usr_rem_board_mem_local->upto10rop2signal;
+    eo_cfg_nvsEP_mngmnt_t* locmn = eo_cfg_nvsEP_eb7_Get_remotelyownedRAM(endpoint_mn_mngmnt, eo_nvscfg_ownership_local);
+    EOarray *upto10 = (EOarray*) & locmn->ropsigcfgassign;
     eOropSIGcfg_t sigcfg;
     char str[128];
     static uint8_t reset = 0;
@@ -434,61 +437,42 @@ static void s_eom_hostprotoc_extra_protocoltransceiver_configure_regular_rops_on
     if(0 == reset)
     {
 
-        sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
-        sigcfg.id = EOK_cfg_nvsEP_base_NVID_ipnetwork;
-        sigcfg.plustime = 1;
-        eo_array_PushBack(upto10, &sigcfg);
-    
-    
-        sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
-        sigcfg.id = EOK_cfg_nvsEP_base_NVID__bootprocess;
-        sigcfg.plustime = 1;
-        eo_array_PushBack(upto10, &sigcfg);
-    
-        sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
-        sigcfg.id = EOK_cfg_nvsEP_base_NVID__applicationinfo;
+        sigcfg.ep = endpoint_mc_leftlowerleg;
+        sigcfg.id = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_leftlowerleg, (eOcfg_nvsEP_mc_jointNumber_t)0, jointNVindex_jstatus__basic);
         sigcfg.plustime = 0;
         eo_array_PushBack(upto10, &sigcfg);
     
-        sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
-        sigcfg.id = EOK_cfg_nvsEP_base_NVID__boardinfo;
+    
+        sigcfg.ep = endpoint_mc_leftlowerleg;
+        sigcfg.id = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_leftlowerleg, (eOcfg_nvsEP_mc_jointNumber_t)1, jointNVindex_jstatus__basic);
         sigcfg.plustime = 0;
         eo_array_PushBack(upto10, &sigcfg);
     
-        sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
-        sigcfg.id = EOK_cfg_nvsEP_base_NVID_ipnetwork__ipnetmask;
+        sigcfg.ep = endpoint_mc_leftlowerleg;
+        sigcfg.id = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_leftlowerleg, (eOcfg_nvsEP_mc_motorNumber_t)0, motorNVindex_mstatus__basic);
         sigcfg.plustime = 0;
         eo_array_PushBack(upto10, &sigcfg);
     
-        sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
-        sigcfg.id = EOK_cfg_nvsEP_base_NVID_ipnetwork__ipaddress;
+        sigcfg.ep = endpoint_mc_leftlowerleg;
+        sigcfg.id = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_leftlowerleg, (eOcfg_nvsEP_mc_motorNumber_t)1, motorNVindex_mstatus__basic);
         sigcfg.plustime = 0;
         eo_array_PushBack(upto10, &sigcfg);
     
-        sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
-        sigcfg.id = EOK_cfg_nvsEP_base_NVID__remoteipaddress;
-        sigcfg.plustime = 0;
-        eo_array_PushBack(upto10, &sigcfg);
-    
-        sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
-        sigcfg.id = EOK_cfg_nvsEP_base_NVID__remoteipport;
-        sigcfg.plustime = 0;
-        eo_array_PushBack(upto10, &sigcfg);    
 #if 0
 #endif
 
     }
 
-    s_eom_hostprotoc_extra_protocoltransceiver_load_occasional_rop(eo_ropcode_set, EOK_cfg_nvsEP_mngmnt_endpoint, EOK_cfg_nvsEP_mngmnt_NVID__upto10rop2signal);  
+    s_eom_hostprotoc_extra_protocoltransceiver_load_occasional_rop(eo_ropcode_set, endpoint_mn_mngmnt, eo_cfg_nvsEP_mn_NVID_Get(endpoint_mn_mngmnt, 0, mnNVindex__ropsigcfgassign));  
 
     if(1 == reset)
     {
-        snprintf(str, sizeof(str)-1, "added a set<__upto10rop2signal, empty-list>");
+        snprintf(str, sizeof(str)-1, "added a set<__ropsigcfgassign, empty-list>");
         hal_trace_puts(str);     
     }
     else
     {
-        snprintf(str, sizeof(str)-1, "added a set<__upto10rop2signal, list>");
+        snprintf(str, sizeof(str)-1, "added a set<__ropsigcfgassign, list>");
         hal_trace_puts(str);        
     }    
 
@@ -500,9 +484,9 @@ static void s_eom_hostprotoc_extra_protocoltransceiver_ask_the_board(void)
 {
     char str[128];
 
-    s_eom_hostprotoc_extra_protocoltransceiver_load_occasional_rop(eo_ropcode_ask, EOK_cfg_nvsEP_base_endpoint, EOK_cfg_nvsEP_base_NVID__applicationinfo);  
+    s_eom_hostprotoc_extra_protocoltransceiver_load_occasional_rop(eo_ropcode_ask, endpoint_mc_leftlowerleg, eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_leftlowerleg, (eOcfg_nvsEP_mc_motorNumber_t)0, motorNVindex_mconfig__maxcurrentofmotor));  
     
-    snprintf(str, sizeof(str)-1, "added a ask<__applicationinfo>");
+    snprintf(str, sizeof(str)-1, "added a ask<_mconfig__maxcurrentofmotor m0>");
     hal_trace_puts(str); 
 }
 

@@ -48,7 +48,7 @@
 // -- nvs part
 
 // all that is enough for the local board
-#include "eOcfg_EPs_loc_board.h"
+#include "eOcfg_EPs_eb7.h"
 #include "EOtheBOARDtransceiver.h"
 
 
@@ -121,7 +121,7 @@ EOpacket* s_mytxpkt = NULL;
 
 static EOtransceiver *ems00txrx = NULL;
 
-static const eOipv4addr_t nvs_pc104_ipaddress       = EO_COMMON_IPV4ADDR(10, 255, 39, 151);
+static const eOipv4addr_t nvs_pc104_ipaddress       = EO_COMMON_IPV4ADDR(10, 0, 0, 2);
 
 static const eOipv4port_t nvs_base_endpoint_iport   = 33333;
 
@@ -241,10 +241,11 @@ static void s_eom_applprotoc_extra_protocoltransceiver_init(void)
 {
     eOboardtransceiver_cfg_t boardtxrxcfg = 
     {
-        .vectorof_endpoint_cfg          = eo_cfg_EPs_vectorof_loc_board,
-        .hashfunction_ep2index          = eo_cfg_nvsEP_loc_board_fptr_hashfunction_ep2index,
+        .vectorof_endpoint_cfg          = eo_cfg_EPs_vectorof_eb7,
+        .hashfunction_ep2index          = eo_cfg_nvsEP_eb7_fptr_hashfunction_ep2index,
         .remotehostipv4addr             = nvs_pc104_ipaddress,
-        .remotehostipv4port             = nvs_base_endpoint_iport
+        .remotehostipv4port             = nvs_base_endpoint_iport,
+        .tobedefined                    = 0
     };    
 
     ems00txrx = eo_boardtransceiver_Initialise(&boardtxrxcfg);
@@ -303,8 +304,8 @@ static void s_eom_applprotoc_extra_protocoltransceiver_addoccasionalrop(void)
 
         ropinfo.ropcfg      = eok_ropconfig_basic;
         ropinfo.ropcode     = eo_ropcode_sig;
-        ropinfo.nvep        = EOK_cfg_nvsEP_base_endpoint;
-        ropinfo.nvid        = EOK_cfg_nvsEP_base_NVID__bootprocess;
+        ropinfo.nvep        = endpoint_mc_leftlowerleg;
+        ropinfo.nvid        = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_leftlowerleg, (eOcfg_nvsEP_mc_jointNumber_t)0, jointNVindex_jstatus__ofpid);
         eo_transceiver_rop_occasional_Load(ems00txrx, &ropinfo);
 
 //            snprintf(str, sizeof(str)-1, "               - added a sig<__boardinfo>");

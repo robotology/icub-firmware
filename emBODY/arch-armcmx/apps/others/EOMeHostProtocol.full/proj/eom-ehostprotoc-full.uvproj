@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>mcbstm32c-zerooffset</TargetName>
+      <TargetName>mcbstm32c-zerooffset-leftlowerleg-eb7</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -348,7 +348,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO _FORCE_NETWORK_FROM_IPAL_CFG</Define>
               <Undefine></Undefine>
-              <IncludePath>..\abslayer-cfg;..\app_basic;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\app_extra;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;.;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\config\nvs\common;..\..\..\..\..\any-arch\sys\embobj\config\nvs\remote;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\gpio\api;..\..\..\..\..\any-arch\sys\embobj\gpio\src;..\..\..\..\..\any-arch\sys\embobj\gpio-mee\api;..\..\..\..\..\any-arch\sys\embobj\gpio-mee\src;..\..\..\..\..\any-arch\sys\embobj\config\gpio</IncludePath>
+              <IncludePath>..\abslayer-cfg;..\app_basic;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\app_extra;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;.;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\gpio\api;..\..\..\..\..\any-arch\sys\embobj\gpio\src;..\..\..\..\..\any-arch\sys\embobj\gpio-mee\api;..\..\..\..\..\any-arch\sys\embobj\gpio-mee\src;..\..\..\..\..\any-arch\sys\embobj\config\gpio;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\icub\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -424,7 +424,7 @@
                   <RVCTZI>0</RVCTZI>
                   <RVCTOtherData>0</RVCTOtherData>
                   <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
+                  <IncludeInBuild>2</IncludeInBuild>
                   <AlwaysBuild>2</AlwaysBuild>
                   <GenerateAssemblyFile>2</GenerateAssemblyFile>
                   <AssembleAssemblyFile>2</AssembleAssemblyFile>
@@ -478,6 +478,24 @@
               <FileName>osal.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\sys\abs\lib\osal.cm3.dbg.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
             </File>
           </Files>
         </Group>
@@ -797,37 +815,82 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>eo-nvs-cfg-common</GroupName>
+          <GroupName>eo-nvs-cfg-board</GroupName>
           <Files>
             <File>
-              <FileName>eOcfg_nvsEP_base_con.c</FileName>
+              <FileName>eOcfg_EPs_eb7.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\config\nvs\common\eOcfg_nvsEP_base_con.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_nvsEP_mngmnt_con.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\config\nvs\common\eOcfg_nvsEP_mngmnt_con.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps\eOcfg_EPs_eb7.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>eo-nvs-cfg-host</GroupName>
+          <GroupName>eo-nvs-cfg-ep-mn</GroupName>
           <Files>
             <File>
-              <FileName>eOcfg_nvsEP_mngmnt_usr_rem_board.c</FileName>
+              <FileName>eOcfg_nvsEP_mn.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\config\nvs\remote\eOcfg_nvsEP_mngmnt_usr_rem_board.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_nvsEP_base_usr_rem_anydev.c</FileName>
+              <FileName>eOcfg_nvsEP_mngmnt_con.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\config\nvs\remote\eOcfg_nvsEP_base_usr_rem_anydev.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mngmnt_con.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_EPs_rem_board.c</FileName>
+              <FileName>eOcfg_nvsEP_mngmnt_usr.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\config\nvs\remote\eOcfg_EPs_rem_board.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mngmnt_usr.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-nvs-cfg-mc-any</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_nvsEP_mc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_any_con_bodypart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_bodypart.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_any_con_jxx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_jxx.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_any_con_jxxdefault.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_jxxdefault.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_any_con_mxx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_mxx.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_any_con_mxxdefault.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_mxxdefault.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-nvs-cfg-mc-lowerleg</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_lowerleg_con.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_lowerleg_con.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_lowerleg_usr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_lowerleg_usr.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -893,6 +956,24 @@
               <FileName>eventviewer.cm3.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\sys\mid\lib\eventviewer.cm3.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
             </File>
           </Files>
         </Group>
@@ -1689,37 +1770,82 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>eo-nvs-cfg-common</GroupName>
+          <GroupName>eo-nvs-cfg-board</GroupName>
           <Files>
             <File>
-              <FileName>eOcfg_nvsEP_base_con.c</FileName>
+              <FileName>eOcfg_EPs_eb7.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\config\nvs\common\eOcfg_nvsEP_base_con.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_nvsEP_mngmnt_con.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\config\nvs\common\eOcfg_nvsEP_mngmnt_con.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps\eOcfg_EPs_eb7.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>eo-nvs-cfg-host</GroupName>
+          <GroupName>eo-nvs-cfg-ep-mn</GroupName>
           <Files>
             <File>
-              <FileName>eOcfg_nvsEP_mngmnt_usr_rem_board.c</FileName>
+              <FileName>eOcfg_nvsEP_mn.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\config\nvs\remote\eOcfg_nvsEP_mngmnt_usr_rem_board.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_nvsEP_base_usr_rem_anydev.c</FileName>
+              <FileName>eOcfg_nvsEP_mngmnt_con.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\config\nvs\remote\eOcfg_nvsEP_base_usr_rem_anydev.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mngmnt_con.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_EPs_rem_board.c</FileName>
+              <FileName>eOcfg_nvsEP_mngmnt_usr.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\config\nvs\remote\eOcfg_EPs_rem_board.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mngmnt_usr.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-nvs-cfg-mc-any</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_nvsEP_mc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_any_con_bodypart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_bodypart.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_any_con_jxx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_jxx.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_any_con_jxxdefault.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_jxxdefault.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_any_con_mxx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_mxx.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_any_con_mxxdefault.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_mxxdefault.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-nvs-cfg-mc-lowerleg</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_lowerleg_con.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_lowerleg_con.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_lowerleg_usr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_lowerleg_usr.c</FilePath>
             </File>
           </Files>
         </Group>

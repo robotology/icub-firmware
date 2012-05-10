@@ -95,7 +95,7 @@
 //   <i> Free-assigned part of the MAC (last three octets).
 //   <i> Default: 0x010103
 #ifndef IPAL_MAC3OCT
- #define IPAL_MAC3OCT        10634590
+ #define IPAL_MAC3OCT        2245970
 #endif
 
 //  </h>MAC address
@@ -154,15 +154,15 @@
 #endif
 //   <o> IP1 <0-255> 
 #ifndef IPAL_IP1
- #define IPAL_IP1        255
+ #define IPAL_IP1        0
 #endif
 //   <o> IP2 <0-255> 
 #ifndef IPAL_IP2
- #define IPAL_IP2        39
+ #define IPAL_IP2        0
 #endif
 //   <o> IP3 <0-255> 
 #ifndef IPAL_IP3
- #define IPAL_IP3        151
+ #define IPAL_IP3        2
 #endif
 
 //  </h>Fixed IP address
@@ -181,7 +181,7 @@
 #endif
 //   <o> MSK2 <0-255> 
 #ifndef IPAL_MSK2
- #define IPAL_MSK2        252
+ #define IPAL_MSK2        255
 #endif
 //   <o> MSK3 <0-255> 
 #ifndef IPAL_MSK3
