@@ -922,12 +922,37 @@ extern const EOconstvector* const eo_cfg_nvsEP_mc_upperarm_usr_constvector_of_EO
 
 extern void eo_cfg_nvsEP_mc_upperarm_usr_initialise(eOnvEP_t ep, void* loc, void* rem)
 { 
-    eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
-    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_upperarm_t* ul = NULL;
+    uint8_t i;
+   
+    // copy default values
+    if(NULL != loc)
+    {
+        ul = (eo_cfg_nvsEP_mc_upperarm_t*) loc;
+        for(i=0; i<jointUpperArm_TOTALnumber; i++)
+        {
+            memcpy(&ul->joints[i], eo_cfg_nvsEP_mc_upperarm_joint_defaultvalue, sizeof(eOmc_joint_t));
+        }
+        for(i=0; i<motorUpperArm_TOTALnumber; i++)
+        {
+            memcpy(&ul->motors[i], eo_cfg_nvsEP_mc_upperarm_motor_defaultvalue, sizeof(eOmc_motor_t));
+        }
+    }    
+    if(NULL != rem)
+    {   
+        ul = (eo_cfg_nvsEP_mc_upperarm_t*) rem;
+        for(i=0; i<jointUpperArm_TOTALnumber; i++)
+        {
+            memcpy(&ul->joints[i], eo_cfg_nvsEP_mc_upperarm_joint_defaultvalue, sizeof(eOmc_joint_t));
+        }
+        for(i=0; i<motorUpperArm_TOTALnumber; i++)
+        {
+            memcpy(&ul->motors[i], eo_cfg_nvsEP_mc_upperarm_motor_defaultvalue, sizeof(eOmc_motor_t));
+        }
+    }    
     
     // launch a specialised initialisation
     eo_cfg_nvsEP_mc_upperarm_usr_hid_INITIALISE(ep, loc, rem);
-
 }
 
 
