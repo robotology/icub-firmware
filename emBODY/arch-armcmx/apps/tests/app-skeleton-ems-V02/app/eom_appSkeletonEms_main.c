@@ -122,6 +122,7 @@ static void s_eom_appSkeletonEms_main_init(void);
 
 int main(void)
 {
+#error This application works with embobj with svn revision 17620
     eom_sys_Initialise( &eom_appSkeletonEms_info_syscfg,
                         NULL,                                           // mempool uses calloc
                         &eom_appSkeletonEms_body_errcfg,               // errman
