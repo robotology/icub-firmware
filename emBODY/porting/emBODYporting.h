@@ -60,6 +60,8 @@ extern "C" {
     //#pragma pack(4) 
     #pragma pack(8) 
     #define snprintf        sprintf_s
+	#define float32_t       float
+	#define __weak			     
 //#pragma message(a)
 #elif defined(__linux__) & defined(__GNUC__)
     // gcc-linux
