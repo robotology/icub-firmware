@@ -237,6 +237,94 @@ extern eOresult_t eo_emsCanNetTopo_GetSensorId_ByMotorCanLocation(EOemsCanNetTop
 }
 
 
+extern eOresult_t eo_emsCanNetTopo_GetConnectedJoints(EOemsCanNetTopo *p, EOfifoByte *connectedJointsList)
+{
+    eOsizecntnr_t size;
+    uint8_t i;
+
+    eo_emsCanNetTopo_jointOrMotorTopoInfo_t *jTInfo;
+    if((NULL == p) || (NULL == connectedJointsList))
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    //if no joints are connected to this board return nok 
+    if((NULL == p->cfg.emsCanNetTopo_joints__ptr) || (0 == p->cfg.emsCanNetTopo_joints__ptr->size))
+    {
+        return(eores_NOK_nodata);
+    }
+
+    jTInfo = (eo_emsCanNetTopo_jointOrMotorTopoInfo_t *)p->cfg.emsCanNetTopo_joints__ptr->item_array_data;
+    size = p->cfg.emsCanNetTopo_joints__ptr->size;
+
+    for(i=0; i< size; i++)
+    {
+        eo_fifobyte_Put(connectedJointsList, jTInfo[i].id, 0);    
+    }
+
+    return(eores_OK);
+
+}
+extern eOresult_t eo_emsCanNetTopo_GetConnectedMotors(EOemsCanNetTopo *p, EOfifoByte *connectedMotorsList)
+{
+    eOsizecntnr_t size;
+    uint8_t i;
+
+    eo_emsCanNetTopo_jointOrMotorTopoInfo_t *mTInfo;
+    if((NULL == p) || (NULL == connectedMotorsList))
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    //if no Motors are connected to this board return nok 
+    if((NULL == p->cfg.emsCanNetTopo_motors__ptr) || (0 == p->cfg.emsCanNetTopo_motors__ptr->size))
+    {
+        return(eores_NOK_nodata);
+    }
+
+    mTInfo = (eo_emsCanNetTopo_jointOrMotorTopoInfo_t *)p->cfg.emsCanNetTopo_motors__ptr->item_array_data;
+    size = p->cfg.emsCanNetTopo_motors__ptr->size;
+
+    for(i=0; i< size; i++)
+    {
+        eo_fifobyte_Put(connectedMotorsList, mTInfo[i].id, 0);    
+    }
+
+    return(eores_OK);
+}
+
+
+extern eOresult_t eo_emsCanNetTopo_GetConnectedSensors(EOemsCanNetTopo *p, EOfifoByte *connectedSensorsList)
+{
+    eOsizecntnr_t size;
+    uint8_t i;
+
+    eo_emsCanNetTopo_sensorTopoInfo_t *sTInfo;
+    if((NULL == p) || (NULL == connectedSensorsList))
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    //if no Motors are connected to this board return nok 
+    if((NULL == p->cfg.emsCanNetTopo_sensors__ptr) || (0 == p->cfg.emsCanNetTopo_sensors__ptr->size))
+    {
+        return(eores_NOK_nodata);
+    }
+
+    sTInfo = (eo_emsCanNetTopo_sensorTopoInfo_t *)p->cfg.emsCanNetTopo_sensors__ptr->item_array_data;
+    size = p->cfg.emsCanNetTopo_sensors__ptr->size;
+
+    for(i=0; i< size; i++)
+    {
+        eo_fifobyte_Put(connectedSensorsList, sTInfo[i].id, 0);    
+    }
+
+    return(eores_OK);
+
+
+}
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------

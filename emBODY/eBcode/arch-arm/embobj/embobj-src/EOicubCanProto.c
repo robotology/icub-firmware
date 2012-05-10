@@ -123,6 +123,10 @@ extern eOresult_t eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_t 
         return(eores_NOK_nullpointer);
     }
 
+    /* Since skin messages will not place in a new icub-can-proto-class-message, 
+       i use canport_rx to distinguish them from sensor board nessages
+    */
+    //PUT HERE FUNC TO MANAGE SKIN'S MESSAGES!!!
     //return(eov_canProto_ParseCanFrame(p, frame, canPortRX));
     //use this in oreder to remove overhead
     return(s_eo_icubCanProto_ParseCanFrame(p, frame, canPortRX));

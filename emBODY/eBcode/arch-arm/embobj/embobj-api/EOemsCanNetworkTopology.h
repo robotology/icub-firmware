@@ -44,6 +44,7 @@ extern "C" {
 #include "EoMotionControl.h"
 #include "EoSensors.h"
 #include "EOconstvector.h"
+#include "EOfifoByte.h"
 
 
 
@@ -114,14 +115,14 @@ typedef struct
     uint8_t                 axis;
     eOcanport_t             canPort;
     eObrd_types_t           boardType;
-    uint32_t                id; //id del motore o del joint
+    uint32_t                id; //motor or joint id
 } eo_emsCanNetTopo_jointOrMotorTopoInfo_t;
 
 typedef struct
 {
     uint8_t                 boardAddr;
     eOcanport_t             canPort;
-    uint8_t                 boardType;
+    eObrd_types_t           boardType;
     uint32_t                id; //sensor id
 } eo_emsCanNetTopo_sensorTopoInfo_t;
 
@@ -151,6 +152,12 @@ extern eOresult_t eo_emsCanNetTopo_GetJointId_ByJointCanLocation(EOemsCanNetTopo
 extern eOresult_t eo_emsCanNetTopo_GetMotorId_ByMotorCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eOmc_motorId_t *mId_ptr);
 
 extern eOresult_t eo_emsCanNetTopo_GetSensorId_ByMotorCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_sensorCanLocation_t *location_ptr, eOsnsr_sensorId_t *sId_ptr);
+
+
+extern eOresult_t eo_emsCanNetTopo_GetConnectedJoints(EOemsCanNetTopo *p, EOfifoByte *connectedJointsList);
+extern eOresult_t eo_emsCanNetTopo_GetConnectedMotors(EOemsCanNetTopo *p, EOfifoByte *connectedMotorsList);
+extern eOresult_t eo_emsCanNetTopo_GetConnectedSensors(EOemsCanNetTopo *p, EOfifoByte *connectedSensorsList);
+
 
 /*VALE: aggiungi funzione che dato joint id ritorna il tipo di board che lo gestisce! idem per il kotor. puo' venire utile??*/
 
