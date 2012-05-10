@@ -65,6 +65,11 @@ extern EOpid* eo_pid_New(void);
     @param      Ymax  The output maximum value.
  **/
 extern void eo_pid_Init(EOpid *o, float Kp, float Kd, float Ki, float Ko, float Ymax);
+extern void eo_pid_SetPid(EOpid *o, float Kp, float Kd, float Ki);
+extern void eo_pid_SetMaxOutput(EOpid *o, float Ymax);
+extern void eo_pid_SetOffset(EOpid *o, float Ko);
+extern float eo_pid_GetOffset(EOpid *o);
+extern void eo_pid_GetStatus(EOpid *o, float *pwm, float *err);
 
 extern uint8_t eo_pid_IsInitialized(EOpid *o);
 extern void eo_pid_Reset(EOpid *o);
@@ -76,8 +81,6 @@ extern void eo_pid_Reset(EOpid *o);
     @return     The actual PWM output value.
  **/
 extern float eo_pid_PWM(EOpid *o, float En);
-
-extern float eo_pid_GetOffset(EOpid *o);
 
 /** @}            
     end of group eo_pid  

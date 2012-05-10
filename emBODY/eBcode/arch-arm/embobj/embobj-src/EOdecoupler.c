@@ -1,8 +1,8 @@
 
-/* @file       EOpid.c
-   @brief      This file implements internal implementation of a PID controller.
-   @author     alessandro.scalzo@iit.it
-   @date       27/03/2012
+/*  @file       EOdecoupler.c
+    @brief      This file implements internal implementation of motor-joint decoupling matrix.
+    @author     alessandro.scalzo@iit.it
+    @date       07/05/2012
 **/
 
 
@@ -23,14 +23,14 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOpid.h"
+#include "EOdecoupler.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOpid_hid.h" 
+#include "EOdecoupler_hid.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -62,115 +62,70 @@
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const char s_eobj_ownname[] = "EOpid";
+static const char s_eobj_ownname[] = "EOdecoupler";
 
+extern float decoupler_shoulder_pos[4][4] = 
+{
+    {1.0f, 0.0f, 0.0f, 0.0f},
+    {0.0f, 1.0f, 0.0f, 0.0f},
+    {0.0f, 0.0f, 1.0f, 0.0f},
+    {0.0f, 0.0f, 0.0f, 1.0f}
+};
+
+float decoupler_shoulder_trq[4][4];
+float decoupler_shoulder_pwm[4][4];
+float decoupler_waist_pwm[4][4];
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOpid* eo_pid_New(void) 
+extern EOdecoupler* eo_decoupler_New(uint8_t dim, float matrix[4][4]) 
 {
-    EOpid *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOpid), 1);
+    if (dim > DEC_MAX_SIZE) return NULL;
+
+    EOdecoupler *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOdecoupler), 1);
 
     if (o)
     {
-        o->Ko = 0.0f;
-        o->A0 = 0.0f;
-        o->A1 = 0.0f;
-        o->A2 = 0.0f;
-        o->Yn = 0.0f;
-        o->En = 0.0f;
-        o->Dn = 0.0f;
-        o->pwm = 0.0f;
-        o->Ymax = 0.0f;
+        o->n = dim;
 
-        o->initialized = 0;
+        for (int i=0; i<DEC_MAX_SIZE; ++i)
+        {
+            for (int j=0; j<DEC_MAX_SIZE; ++j)
+            {
+                o->M[i][j] = matrix[i][j];
+            }
+        }
     }
 
     return o;
 }
 
-extern void eo_pid_Init(EOpid *o, float Kp, float Kd, float Ki, float Ko, float Ymax)
+/*  @fn         extern float eo_trajectory_Step(EOtrajectory *o)
+    @brief      Executes a trajectory step.
+    @param o    The pointer to the trajectory object.
+    @return     The actual trajectory point value.
+ **/
+
+extern void eo_decoupler_Mult(EOdecoupler *o, float *src, float *dst)
 {
-    o->A2 = -0.1f*Kd;
-    o->A1 = -Kp + o->A2;
-    o->A0 =  Kp + Ki - o->A2;
+    uint8_t i,j;
 
-    o->Yn = 0.0f;
-    o->Ko = Ko;
-
-    o->En = 0.0f;
-    o->Dn = 0.0f;
-    o->pwm = 0.0f;
-    o->Ymax = Ymax;
-
-    o->initialized = 1;
-}
-
-extern void eo_pid_SetPid(EOpid *o, float Kp, float Kd, float Ki)
-{
-    o->A2 = -0.1f*Kd;
-    o->A1 = -Kp + o->A2;
-    o->A0 =  Kp + Ki - o->A2; 
-}
-
-extern void eo_pid_SetMaxOutput(EOpid *o, float Ymax)
-{
-    o->Ymax = Ymax;
-}
-
-extern void eo_pid_SetOffset(EOpid *o, float Ko)
-{
-    o->Ko = Ko;
-}
-
-extern float eo_pid_GetOffset(EOpid *o)
-{
-    return o->Ko;
-}
-
-extern void eo_pid_GetStatus(EOpid *o, float *pwm, float *err)
-{
-    *pwm = o->pwm;
-    *err = o->En;
-}
-
-extern uint8_t eo_pid_IsInitialized(EOpid *o)
-{
-    return o->initialized;
-}
-
-extern void eo_pid_Reset(EOpid *o)
-{
-    o->Yn = 0.0f;
-    o->En = 0.0f; 
-    o->Dn = 0.0f; 
-}
-
-extern float eo_pid_PWM(EOpid *o, float En)
-{
-    o->Yn += o->A0 * En + o->A1 * o->En + o->A2 * o->Dn;
-    o->Dn = 0.9f*o->Dn + 0.1f*(En - o->En);
-    o->En = En;
-    
-    o->pwm = o->Ko + o->Yn;
-
-    if (o->pwm > o->Ymax)
+    for (i=0; i<o->n; ++i)
     {
-        o->Yn = o->Ymax - o->Ko;
+        dst[i] = 0.0f;
 
-        return o->Ymax;
+        for (j=0; j<o->n; ++j)
+        {
+            dst[i] += o->M[i][j] * src[j];
+        }    
     }
-    
-    if (o->pwm < -o->Ymax)
-    {
-        o->Yn = -o->Ymax - o->Ko;
+}
 
-        return -o->Ymax;
-    }
-
-    return o->pwm;
+extern uint8_t eo_decoupler_IsCoupled(EOdecoupler *o, uint8_t joint, uint8_t motor)
+{
+    return o->M[joint][motor] != 0.0f;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
