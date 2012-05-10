@@ -20,6 +20,10 @@
 #ifndef _EOIOPIN_H_
 #define _EOIOPIN_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 /** @file       EOioPin.h
     @brief      This header file implements public interface to a IO pin object.
@@ -250,6 +254,10 @@ extern eOresult_t eo_iopin_Reset(EOioPin *p);
 /** @}            
     end of group eo_iopin  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

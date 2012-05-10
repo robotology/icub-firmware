@@ -20,6 +20,9 @@
 #ifndef _EOVSTORAGE_H_
 #define _EOVSTORAGE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOVstorage.h
     @brief      This header file implements public interface to a virtual object used to store data
@@ -113,6 +116,10 @@ extern eOpurevirtual eOresult_t eov_strg_Get(EOVstorageDerived *d, uint32_t offs
 /** @}            
     end of group eov_strg  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

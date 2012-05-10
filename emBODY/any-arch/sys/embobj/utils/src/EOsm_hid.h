@@ -20,6 +20,9 @@
 #ifndef _EOSM_HID_H_
 #define _EOSM_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOeo_sm_hid.h
     @brief      This header file implements hidden interface to a state machine.
@@ -74,7 +77,11 @@ struct EOsm_hid
 // empty-section
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

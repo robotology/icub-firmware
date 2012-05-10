@@ -20,6 +20,9 @@
 #ifndef _EOIOPININPUT_H_
 #define _EOIOPININPUT_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOioPinInput.h
     @brief      This header file implements public interface to an input pin object.
@@ -101,8 +104,11 @@ extern eOiopinVal_t eo_iopininp_GetVal(EOioPinInput *const p);
     end of group eo_iopininp  
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

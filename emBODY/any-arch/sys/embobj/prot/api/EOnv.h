@@ -20,7 +20,9 @@
 #ifndef _EONV_H_
 #define _EONV_H_
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOnv.h
     @brief      This header file implements public interface to a netvar.
@@ -191,6 +193,10 @@ extern eOnvType_t eo_nv_GetTYP(const EOnv *netvar);
 /** @}            
     end of group eo_nv 
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

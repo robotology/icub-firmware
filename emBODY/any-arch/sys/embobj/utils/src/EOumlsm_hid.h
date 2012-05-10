@@ -20,6 +20,9 @@
 #ifndef _EOUMLSM_HID_H_
 #define _EOUMLSM_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOeo_umlsm_hid.h
     @brief      This header file implements hidden interface to a uml state machine.
@@ -65,7 +68,11 @@ struct EOumlsm_hid
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 // empty-section
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

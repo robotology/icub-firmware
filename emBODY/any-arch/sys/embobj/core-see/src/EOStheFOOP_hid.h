@@ -20,6 +20,9 @@
 #ifndef _EOSTHEFOOP_HID_H_
 #define _EOSTHEFOOP_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOStheFOOP_hid.h
     @brief      This header file implements hidden interface to the foop singleton.
@@ -78,7 +81,11 @@ extern eOresult_t eos_foop_hid_SetOnTick(EOStheFOOP *p, eOvoid_fp_void_t ontick)
 extern eOresult_t eos_foop_hid_Tick(EOStheFOOP *p);
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

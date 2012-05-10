@@ -20,6 +20,9 @@
 #ifndef _EOMTHETIMERMANAGER_H_
 #define _EOMTHETIMERMANAGER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOMtheTimerManager.h
     @brief      This header file implements public interface to the MEE timer manager singleton.
@@ -106,6 +109,10 @@ extern EOMtheTimerManager* eom_timerman_GetHandle(void);
 /** @}            
     end of group eom_thetimermanager  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

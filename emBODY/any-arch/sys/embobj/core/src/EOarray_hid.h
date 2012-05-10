@@ -20,6 +20,9 @@
 #ifndef _EOARRAY_HID_H_
 #define _EOARRAY_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file        EOarray_hid.h
     @brief      This header file implements hidden interface to a array object.
@@ -59,7 +62,11 @@
 //extern eOresult_t eo_array_hid_PushBackData(EOarray *p, const void *data, uint16_t sizedata);
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

@@ -20,6 +20,9 @@
 #ifndef _EOVTHEIPNET_H_
 #define _EOVTHEIPNET_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOVtheIPnet.h
     @brief      This header file implements public interface to the virtual IP net singleton.
@@ -162,6 +165,10 @@ extern void eov_ipnet_EnableSynTx(EOVtheIPnet* p, uint8_t skttag);
 /** @}            
     end of group eov_theipnet 
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

@@ -20,6 +20,9 @@
 #ifndef _EOROPFRAME_H_
 #define _EOROPFRAME_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOropframe.h
     @brief      This header file implements public interface to a frame.
@@ -107,6 +110,10 @@ extern eOabstime_t eo_ropframe_age_Get(EOropframe *p);
 /** @}            
     end of group eo_ropframe  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

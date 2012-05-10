@@ -268,7 +268,8 @@ extern uint16_t eo_cfg_nvsEP_as_onestrain_hashfunction_id2index(uint16_t id)
     
     #define IDTABLESIZE         (IDTABLESSIZE+IDTABLEMSIZE)
     
-
+    uint16_t index;
+    
     static const uint16_t s_idtable[] = 
     { 
         // s00
@@ -282,7 +283,7 @@ extern uint16_t eo_cfg_nvsEP_as_onestrain_hashfunction_id2index(uint16_t id)
     
     };  EO_VERIFYsizeof(s_idtable, sizeof(uint16_t)*(IDTABLESIZE));
     
-    uint16_t index = s_hash(id);
+    index = s_hash(id);
     
    
     if((index < (IDTABLESIZE)) && (id == s_idtable[index]) )

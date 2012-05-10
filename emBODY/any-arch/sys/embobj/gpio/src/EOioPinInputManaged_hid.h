@@ -20,6 +20,9 @@
 #ifndef _EOIOPININPUTMANAGED_HID_H_
 #define _EOIOPININPUTMANAGED_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOioPinInputManaged_hid.h
     @brief      This header file implements hidden interface to a managed input pin object.
@@ -86,7 +89,11 @@ extern EOioPinInputManaged * eo_iopininpman_hid_NewArray(uint8_t n);
 extern void eo_iopininpman_hid_Reset(EOioPinInputManaged *const p);
  
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

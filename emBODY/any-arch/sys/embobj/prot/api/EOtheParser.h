@@ -20,6 +20,9 @@
 #ifndef _EOTHEPARSER_H_
 #define _EOTHEPARSER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOtheParser.h
     @brief      This header file implements public interface to the parser singleton used for communication protocol
@@ -100,6 +103,10 @@ extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, co
 /** @}            
     end of group eo_theparser  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

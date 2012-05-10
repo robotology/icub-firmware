@@ -20,6 +20,9 @@
 #ifndef _EOONEHOSTTRANSCEIVER_H_
 #define _EOONEHOSTTRANSCEIVER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOhostTransceiver.h
     @brief      This header file implements public interface to the host transceiver (pc104)
@@ -42,7 +45,7 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-#warning --> instead of 20 ... can i put 0? answer: seems yes  .. but be carefule w/ eo_ropframe_ROP_NumberOf_quickversion()
+//#warning --> instead of 20 ... can i put 0? answer: seems yes  .. but be carefule w/ eo_ropframe_ROP_NumberOf_quickversion()
 
 #define EOK_HOSTTRANSCEIVER_capacityofpacket                   512
 #define EOK_HOSTTRANSCEIVER_capacityofrop                      128
@@ -102,6 +105,10 @@ extern EOnvsCfg* eo_hosttransceiver_NVsCfg(EOhostTransceiver *p);
 /** @}            
     end of group eo_ecvrevrebvtr2342r7  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

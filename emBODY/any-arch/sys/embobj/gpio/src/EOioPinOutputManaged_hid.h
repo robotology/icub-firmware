@@ -20,6 +20,9 @@
 #ifndef _EOIOPINOUTPUTMANAGED_HID_H_
 #define _EOIOPINOUTPUTMANAGED_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOioPinOutputManaged_hid.h
     @brief      This header file implements hidden interface to a managed output pin object.
@@ -78,7 +81,11 @@ extern EOioPinOutputManaged * eo_iopinoutman_hid_NewArray(uint8_t n);
 extern void eo_iopinoutman_hid_Reset(EOioPinOutputManaged *const p);
  
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

@@ -20,6 +20,9 @@
 #ifndef _EOVTHEENVIRONMENT_H_
 #define _EOVTHEENVIRONMENT_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOVtheEnvironment.h
     @brief      This header file implements public interface to the virtual environment singleton.
@@ -110,6 +113,10 @@ extern eOresult_t eov_env_CANnetworks_Get(EOVtheEnvironmentDerived *p, const eEc
 /** @}            
     end of group eov_EOVtheEnvironment  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

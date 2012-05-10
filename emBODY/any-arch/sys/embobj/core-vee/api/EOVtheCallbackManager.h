@@ -20,6 +20,9 @@
 #ifndef _EOVTHECALLBACKMANAGER_H_
 #define _EOVTHECALLBACKMANAGER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOVtheCallbackManager.h
     @brief      This header file implements public interface to the virtual callback manager singleton.
@@ -111,6 +114,10 @@ extern eOpurevirtual EOVtaskDerived * eov_callbackman_GetTask(EOVtheCallbackMana
 /** @}            
     end of group eov_thecallbackmanager  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

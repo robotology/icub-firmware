@@ -20,6 +20,9 @@
 #ifndef _EOTHEGPIOMANAGER_HID_H_
 #define _EOTHEGPIOMANAGER_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOtheGPIOManager_hid.h
     @brief      This header file implements hidden interface to the base gpio manager singleton.
@@ -83,7 +86,11 @@ extern eOresult_t eo_gpioman_hid_Release(EOtheGPIOManager *p);
 
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

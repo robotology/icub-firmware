@@ -20,6 +20,9 @@
 #ifndef _EOMTHESYSTEM_H_
 #define _EOMTHESYSTEM_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOMtheSystem.h
     @brief      This header file implements public interface to the system singleton.
@@ -154,6 +157,10 @@ extern void eom_sys_Start(EOMtheSystem *p, eOvoid_fp_void_t userinit_fn);
 /** @}            
     end of group eom_thesystem  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

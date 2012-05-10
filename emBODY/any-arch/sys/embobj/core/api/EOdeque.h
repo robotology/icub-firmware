@@ -20,6 +20,9 @@
 #ifndef _EODEQUE_H_
 #define _EODEQUE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EoDeque.h
 	@brief      This header file implements public interface to a deque object.
@@ -212,8 +215,11 @@ extern void* eo_deque_At(EOdeque * deque, eOsizecntnr_t pos);
     end of group eo_deque  
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

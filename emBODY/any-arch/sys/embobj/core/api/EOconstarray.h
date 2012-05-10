@@ -20,6 +20,9 @@
 #ifndef _EOCONSTARRAY_H_
 #define _EOCONSTARRAY_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOconstarray.h
     @brief      This header file implements public interface to a array object.
@@ -109,6 +112,11 @@ extern const void * eo_constarray_At(EOconstarray *p, eOsizecntnr_t pos);
     end of group eo_constarray  
  **/
 
+ 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
 #endif  // include-guard
 
 

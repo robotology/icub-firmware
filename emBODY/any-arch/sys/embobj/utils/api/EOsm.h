@@ -20,6 +20,9 @@
 #ifndef _EOSM_H_
 #define _EOSM_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOsm.h
 	@brief      This header file implements public interface to a state machine object.
@@ -202,6 +205,10 @@ extern eOsmEvent_t eo_sm_GetLatestEvent(EOsm *p);
 /** @}            
     end of group eo_sm  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

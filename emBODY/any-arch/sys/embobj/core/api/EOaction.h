@@ -20,6 +20,10 @@
 #ifndef _EOACTION_H_
 #define _EOACTION_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 /** @file       EOaction.h
     @brief      This header file implements public interface to a generic action.
@@ -183,6 +187,10 @@ extern eOresult_t eo_action_Execute(EOaction *act, eOreltime_t tout);
 /** @}            
     end of group eo_action  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

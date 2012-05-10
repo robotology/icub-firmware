@@ -20,6 +20,9 @@
 #ifndef _EOMTHEENTITIESENV_H_
 #define _EOMTHEENTITIESENV_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
@@ -205,6 +208,10 @@ extern eOresult_t EOMtheEntitiesEnv_stop_all(EOMtheEntitiesEnv *handler);
  **/
 
  
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+
 #endif  // include-guard
 
 

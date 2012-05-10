@@ -20,6 +20,11 @@
 #ifndef _EOCOMMON_H_
 #define _EOCOMMON_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 /** @file       EoCommon.h
     @brief      This header file implements public interface to the common types used by the EmbObj
@@ -85,7 +90,7 @@
 // issues a compiler error if the sizeof the struct is not what in second argument
 #define EO_VERIFYsizeof(sname, ssize)       __emBODYportingVERIFYsizeof(sname, ssize)
 
-// issues a compiler error if the sizeof the struct is not what in second argument
+// issues a compiler error if the prop is false
 #define EO_VERIFYproposition(name, prop)    typedef uint8_t GUARD##name[ ( 0 == (prop) ) ? (0) : (1)];
 
 
@@ -302,6 +307,33 @@ typedef struct
 } eOipv4addressing_t; 
 
 
+/** @typedef    typedef struct eOutil_canframe_t
+    @brief      eOcanframe_t contains a can frame as defined in hal_can.h. 
+ **/
+typedef struct              // size is 16 bytes
+{
+    uint32_t                id;             /**< can frame id    */
+    uint8_t                 id_type;        /**< can frame id format */
+    uint8_t                 frame_type;     /**< frame type */
+    uint8_t                 size;           /**< data size */
+    uint8_t                 unused;         /**< filler */
+    uint8_t                 data[8];        /**< the data (payload) */    
+} eOcanframe_t;
+
+
+
+/** @typedef    typedef enum  eOutil_canport_t
+    @brief      eOcanport_t contains a can port as defined in hal_can.h. 
+ **/
+typedef enum              
+{
+     eOcanport1    = 0,          /**< CAN1        */
+     eOcanport2    = 1           /**< CAN2        */
+} eOcanport_t;    
+  
+
+
+
 /** @define     eOvirtual
     @brief      eOvirtual is a qualifier used to identify the virtual methods of an object.
  **/
@@ -325,6 +357,7 @@ typedef     void        (*eOvoid_fp_voidp_uint32_t)                 (void *, uin
 typedef     void        (*eOvoid_fp_vuint32p_uint32_t)              (volatile uint32_t *, uint32_t);
 typedef     void        (*eOvoid_fp_voidp_t)                        (void *);
 typedef     void        (*eOvoid_fp_voidp_voidp_t)                  (void *, void *);
+typedef     void        (*eOvoid_fp_uint16_voidp_voidp_t)           (uint16_t, void *, void *);
 typedef     void        (*eOvoid_fp_cvoidp_t)                       (const void *);
 typedef     eObool_t    (*eObool_fp_cvoidp_t)                       (const void *);
 typedef     eOresult_t  (*eOres_fp_voidp_uint32_uint32_t)           (void *, uint32_t, uint32_t);
@@ -355,7 +388,14 @@ typedef     void        (*eOvoid_fp_voidfpvoiduint32_t)             (void (*)(vo
 typedef     void        (*eOvoid_fp_voidfpvoiduint32uint8_t)       (void (*)(void), uint32_t, uint8_t);
 
 
-
+/** @typedef    typedef struct eOcallbackData_t
+    @brief      eOcallbackData_t contains data of a callback: function pointer and its argument.
+ **/  
+typedef struct
+{
+    eOcallback_t     fn;
+    void             *argoffn;
+} eOcallbackData_t;
 
 /** @typedef    typedef struct eObasicabstraction_hal_sys_fn_t
     @brief      eObasicabstr_hal_sys_fn_t contains the basic system functions typically given by a HAL which can be used for instance
@@ -448,6 +488,10 @@ EO_extern_inline eOmacaddr_t eo_common_macaddr(uint8_t m1, uint8_t m2, uint8_t m
     end of group eo_common  
  **/
  
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
  
 #endif  // include-guard
 

@@ -20,6 +20,9 @@
 #ifndef _EOTHEERRORMANAGER_H_
 #define _EOTHEERRORMANAGER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOtheErrorManager.h
 	@brief      This header file implements public interface to the error manager singleton.
@@ -157,6 +160,10 @@ extern void eo_errman_Info(EOtheErrorManager *p, const char *eobjstr, const char
 /** @}            
     end of group eo_theerrormanager  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

@@ -20,6 +20,9 @@
 #ifndef _EOMATRIX3D_HID_H_
 #define _EOMATRIX3D_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file        EOmatrix3d_hid.h
     @brief      This header file implements hidden interface to a matrix3d object.
@@ -45,11 +48,11 @@
 
 typedef struct
 {
-    uint8_t         capacity;
-    uint8_t         itemsize;
-    uint8_t         size;
-    uint8_t         dummy;
-} eOmatrix3d_head_t;   EO_VERIFYsizeof(eOmatrix3d_head_t, 4);
+    uint16_t        capacity;
+    uint16_t        itemsize;
+    uint16_t        size;
+    uint16_t        dummy;
+} eOmatrix3d_head_t;   EO_VERIFYsizeof(eOmatrix3d_head_t, 8);
 
 typedef struct eOmatrix3d_node_T
 {
@@ -82,7 +85,11 @@ struct EOmatrix3d_hid
 //extern eOresult_t eo_matrix3d_hid_PushBackData(EOmatrix3d *p, const void *data, uint8_t sizedata);
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

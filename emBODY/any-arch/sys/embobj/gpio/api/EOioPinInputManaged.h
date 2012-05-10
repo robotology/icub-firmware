@@ -20,6 +20,9 @@
 #ifndef _EOIOPININPUTMANAGED_H_
 #define _EOIOPININPUTMANAGED_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOioPinInputManaged.h
     @brief      This header file implements public interface to a managed input pin object.
@@ -157,6 +160,10 @@ extern eOresult_t eo_iopininpman_ActionOn_Unregister(EOioPinInputManaged *p, eOi
 /** @}            
     end of group eo_mnginppin  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

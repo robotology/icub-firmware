@@ -20,6 +20,9 @@
 #ifndef _EOTRANSMITTER_HID_H_
 #define _EOTRANSMITTER_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOtransmitter_hid.h
     @brief      This header file implements hidden interface to a packet object.
@@ -92,7 +95,11 @@ struct EOtransmitter_hid
 
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

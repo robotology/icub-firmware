@@ -20,6 +20,9 @@
 #ifndef _EOIOPINOUTPUT_H_
 #define _EOIOPINOUTPUT_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOioPinOutput.h
     @brief      This header file implements public interface to an outut pin object.
@@ -116,6 +119,10 @@ extern eOresult_t eo_iopinout_ToggleVal(EOioPinOutput *const p);
 /** @}            
     end of group eo_iopinout  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

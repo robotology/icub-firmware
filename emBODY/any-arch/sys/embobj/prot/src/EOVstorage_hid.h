@@ -20,6 +20,9 @@
 #ifndef _EOVSTORAGE_HID_H_
 #define _EOVSTORAGE_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOVstorage_hid.h
     @brief      This header file implements hidden interface to a mutex object.
@@ -94,7 +97,11 @@ extern EOVstorage* eov_strg_hid_New(uint32_t id, uint32_t capacity, const void *
 extern eOresult_t eov_strg_hid_SetVTABLE(EOVstorage *p, eOres_fp_voidp_uint32_uint32_cvoidp_t v_set, eOres_fp_voidp_uint32_uint32_voidp_t v_get);
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
