@@ -3,9 +3,6 @@
 #ifndef _EOMOTORCONTROLLER_HID_H_
 #define _EOMOTORCONTROLLER_HID_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* @file        EOtrajectory_hid.h
     @brief      This header file implements hidden interface to motor minumum jerk trajectory generation.
@@ -22,11 +19,16 @@ extern "C" {
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "EOmotorcontroller.h"
+#include "EOaxisController.h"
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
+#define eo_axisController_GetPosPidPtr_hid(axis_controller) (axis_controller->pidP)
+#define eo_axisController_GetTrqPidPtr_hid(axis_controller) (axis_controller->pidT)
+
+#define eo_axisController_ReadEncPos_hid(axis_controller, encpos) axis_controller->encpos_meas = encpos
+#define eo_axisController_ReadTorque_hid(axis_controller, torque) axis_controller->torque_meas = torque
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
@@ -36,11 +38,10 @@ extern "C" {
                 used also by its derived objects.
  **/  
  
-struct EOmotorcontroller_hid 
+struct EOaxisController_hid 
 {
     EOpid *pidP;
     EOpid *pidT;
-    EOpid *pidI;
 
     EOtrajectory *trajectory;
 
@@ -82,11 +83,7 @@ struct EOmotorcontroller_hid
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
 
-#ifdef __cplusplus
-}       // closing brace for extern "C"
-#endif 
- 
-#endif  // include-guard
+#endif  // include guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

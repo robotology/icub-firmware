@@ -1,5 +1,5 @@
 
-/*  @file       EOmotorcontroller.c
+/*  @file       EOaxisController.c
     @brief      This file implements internal implementation of a motor minimum jerk trajectory generator.
     @author     alessandro.scalzo@iit.it
     @date       27/03/2012
@@ -23,14 +23,14 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOmotorcontroller.h"
+#include "EOaxisController.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOmotorcontroller_hid.h" 
+#include "EOaxisController_hid.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -57,14 +57,14 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 static float limit(float x, float min, float max);
-static void compute_velocity_ref(EOmotorcontroller *o);
-static void compute_torque_ref(EOmotorcontroller *o);
+static void compute_velocity_ref(EOaxisController *o);
+static void compute_torque_ref(EOaxisController *o);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const char s_eobj_ownname[] = "EOmotorcontroller";
+static const char s_eobj_ownname[] = "EOaxisController";
 
 static const float PERIOD    = 0.001f;       // 1 ms
 //static const float FREQUENCY = 1.0f/PERIOD;  // 1 kHz
@@ -73,15 +73,14 @@ static const float PERIOD    = 0.001f;       // 1 ms
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOmotorcontroller* eo_motorcontroller_New(void) 
+extern EOaxisController* eo_axisController_New(void) 
 {
-    EOmotorcontroller *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOmotorcontroller), 1);
+    EOaxisController *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOaxisController), 1);
 
     if (o)
     {
         o->pidP = eo_pid_New();
         o->pidT = eo_pid_New();
-        o->pidI = eo_pid_New();
         
         o->trajectory = eo_trajectory_New(); 
 
@@ -117,35 +116,43 @@ extern EOmotorcontroller* eo_motorcontroller_New(void)
     return o;
 }
 
-extern void eo_motorcontroller_SetPosLimits(EOmotorcontroller *o, float pos_min, float pos_max)
+extern void eo_axisController_SetPosLimits(EOaxisController *o, float pos_min, float pos_max)
 {
     o->pos_min = pos_min;
     o->pos_max = pos_max;
 }
 
-extern void eo_motorcontroller_SetVelMax(EOmotorcontroller *o, float vel_max)
+extern void eo_axisController_SetVelMax(EOaxisController *o, float vel_max)
 {
     o->vel_max = vel_max;
 }
 
-extern void eo_motorcontroller_SetStiffness(EOmotorcontroller *o, float stiffness)
+extern void eo_axisController_SetStiffness(EOaxisController *o, float stiffness)
 {
     o->stiffness = stiffness;
 }
 
-extern void eo_motorcontroller_ReadEncoder(EOmotorcontroller *o, float encpos_meas)
+/*
+extern void eo_axisController_ReadEncPos(EOaxisController *o, float encpos)
 {
-    o->encpos_meas = encpos_meas;
+    o->encpos_meas = encpos;
 }
 
-extern void eo_motorcontroller_ReadTorqueSensor(EOmotorcontroller *o, float torque_meas)
+extern void eo_axisController_ReadTorque(EOaxisController *o, float torque)
 {
-    o->torque_meas = torque_meas;
+    o->torque_meas = torque;
 }
+*/
 
-extern uint8_t eo_motorcontroller_SetRefPos(EOmotorcontroller *o, float pos, float speed)
+extern void eo_axisController_ReadStatus(EOaxisController *o, float encpos, float torque)
 {
-    if (o->control_mode == CM_IDLE || o->control_mode == CM_TORQUE  || o->control_mode == CM_OPENLOOP) return 0;
+    o->encpos_meas = encpos;
+    o->torque_meas = torque;
+}                  
+
+extern void eo_axisController_SetPosRef(EOaxisController *o, float pos, float vel)
+{
+    if (o->control_mode == CM_IDLE || o->control_mode == CM_TORQUE  || o->control_mode == CM_OPENLOOP) return;
 
     if (o->control_mode == CM_IMPEDANCE_POS || o->control_mode == CM_IMPEDANCE_VEL)
     {
@@ -160,14 +167,12 @@ extern uint8_t eo_motorcontroller_SetRefPos(EOmotorcontroller *o, float pos, flo
                                o->encpos_meas, 
                                limit(pos,  o->pos_min, o->pos_max), 
                                o->vel_out, 
-                               limit(speed, -o->vel_max, o->vel_max));
-
-    return 1;
+                               limit(vel, -o->vel_max, o->vel_max));
 }
 
-extern uint8_t eo_motorcontroller_SetRefVel(EOmotorcontroller *o, float vel_ref, float acc_ref)
+extern void eo_axisController_SetVelRef(EOaxisController *o, float vel, float acc)
 {
-    if (o->control_mode == CM_IDLE || o->control_mode == CM_TORQUE || o->control_mode == CM_OPENLOOP) return 0;
+    if (o->control_mode == CM_IDLE || o->control_mode == CM_TORQUE || o->control_mode == CM_OPENLOOP) return;
 
     if (o->control_mode == CM_IMPEDANCE_POS || o->control_mode == CM_IMPEDANCE_VEL)
     { 
@@ -178,15 +183,18 @@ extern uint8_t eo_motorcontroller_SetRefVel(EOmotorcontroller *o, float vel_ref,
         o->control_mode = CM_VELOCITY;
     }
 
-    o->vel_ref = limit(vel_ref, -o->vel_max, o->vel_max); 
-    o->acc_ref_step = acc_ref * ( acc_ref > 0.0f ? PERIOD:-PERIOD);
+    o->vel_ref = limit(vel, -o->vel_max, o->vel_max); 
+    o->acc_ref_step = acc * ( acc > 0.0f ? PERIOD:-PERIOD);
     //o->pos_vel_bias = 0.0f;
     o->vel_timer = 0.0f;
-
-    return 1;
 }
 
-extern uint8_t eo_motorcontroller_SetControlMode(EOmotorcontroller *o, control_mode_t control_mode)
+extern void eo_axisController_SetTrqRef(EOaxisController *o, float trq)
+{
+    o->torque_ref = trq;
+}
+
+extern uint8_t eo_axisController_SetControlMode(EOaxisController *o, control_mode_t control_mode)
 {
     if (o->control_mode == control_mode) return 1;
 
@@ -214,7 +222,32 @@ extern uint8_t eo_motorcontroller_SetControlMode(EOmotorcontroller *o, control_m
     return 1;
 }
 
-extern float eo_motorcontroller_PWM(EOmotorcontroller *o)
+extern void eo_axisController_GetActivePidStatus(EOaxisController *o, float *pwm, float *err)
+{
+    switch (o->control_mode)
+    {
+        case CM_IDLE:
+            *pwm = 0.0f;
+            *err = 0.0f;
+            break;
+
+        case CM_OPENLOOP:
+            *pwm = eo_pid_GetOffset(o->pidP);
+            *err = 0.0f;
+            break;
+
+        case CM_VELOCITY:
+        case CM_POSITION:
+            eo_pid_GetStatus(o->pidP, pwm, err);
+            break;
+
+        case CM_TORQUE:
+            eo_pid_GetStatus(o->pidT, pwm, err);
+            break;
+    }
+}
+
+extern float eo_axisController_PWM(EOaxisController *o)
 {
     switch (o->control_mode)
     {
@@ -276,6 +309,18 @@ extern float eo_motorcontroller_PWM(EOmotorcontroller *o)
     return 0.0f;   
 }
 
+/*
+extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o)
+{
+    return o->pidP;
+}
+
+extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o)
+{
+    return o->pidT;
+}
+*/
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -293,7 +338,7 @@ static float limit(float x, float min, float max)
     return x;    
 }
 
-static void compute_velocity_ref(EOmotorcontroller *o)
+static void compute_velocity_ref(EOaxisController *o)
 {
     float last_pos_out = o->pos_out;
 
@@ -343,7 +388,7 @@ static void compute_velocity_ref(EOmotorcontroller *o)
     }  
 }
 
-static void compute_torque_ref(EOmotorcontroller *o)
+static void compute_torque_ref(EOaxisController *o)
 {
     float pos_err = o->pos_out - o->encpos_meas;
     o->torque_damp_lp_filt = 0.9f * o->torque_damp_lp_filt + 0.1f * o->damping * (pos_err - o->torque_last_pos_err);

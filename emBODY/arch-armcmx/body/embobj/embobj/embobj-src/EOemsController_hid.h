@@ -1,16 +1,13 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOPID_HID_H_
-#define _EOPID_HID_H_
+#ifndef _EOEMSCONTROLLER_HID_H_
+#define _EOEMSCONTROLLER_HID_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-/*  @file       EOpid_hid.h
-    @brief      This header file implements hidden interface to PID controller.
+/*  @file       EOemsController_hid.h
+    @brief      This header file implements hidden interface to motor-joint decoupling matrix.
     @author     alessandro.scalzo@iit.it
-    @date       23/03/2012
+    @date       07/05/2012
  **/
 
 
@@ -20,45 +17,47 @@ extern "C" {
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "EOpid.h"
+#include "EOdecoupler.h"
+#include "EOaxisController.h"
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
-
+#define MAX_MOTORS 4
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-/** @struct     EOpid_hid
+/*  @struct     EOemsController_hid
     @brief      Hidden definition. Implements private data used only internally by the 
                 public or private (static) functions of the object and protected data
                 used also by its derived objects.
  **/  
  
-struct EOpid_hid 
+struct EOemsController_hid 
 {
-    float Ko;
-    float A0;
-    float A1;
-    float A2;
-    float Yn;
-    float En;
-    float Dn;
-    float pwm;
-    float Ymax;
+    EOdecoupler *decoupler[3];
 
-    uint8_t initialized;
+    EOaxisController *axis_controller[MAX_MOTORS];
+
+    float encoder_pos[MAX_MOTORS];
+    float torque_meas[MAX_MOTORS];
+
+    uint8_t flag_encoder_pos_dirty;
+    uint8_t flag_torque_meas_dirty;
+
+    float pos_ref[MAX_MOTORS];
+    float vel_ref[MAX_MOTORS];
+    float acc_ref[MAX_MOTORS];
+    float trq_ref[MAX_MOTORS];
+
+    uint8_t nmotors;
 }; 
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
 
-#ifdef __cplusplus
-}       // closing brace for extern "C"
-#endif 
- 
-#endif  // include-guard
+#endif  // include guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
