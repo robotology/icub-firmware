@@ -413,6 +413,30 @@ static void s_callback_button_1(void)
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
     	eo_array_PushBack(ropsigcfgassign, &sigcfg);
+
+        nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_leftlowerleg, 0, jointNVindex_jconfig);
+    	sigcfg.ep = endpoint_mc_leftlowerleg;
+    	sigcfg.id = nvid;
+    	sigcfg.plustime = 0;
+    	eo_array_PushBack(ropsigcfgassign, &sigcfg);
+
+        nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_leftlowerleg, 0, jointNVindex_jconfig__maxpositionofjoint);
+    	sigcfg.ep = endpoint_mc_leftlowerleg;
+    	sigcfg.id = nvid;
+    	sigcfg.plustime = 0;
+    	eo_array_PushBack(ropsigcfgassign, &sigcfg);
+
+		nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_leftlowerleg, 0, motorNVindex_mconfig);
+    	sigcfg.ep = endpoint_mc_leftlowerleg;
+    	sigcfg.id = nvid;
+    	sigcfg.plustime = 0;
+    	eo_array_PushBack(ropsigcfgassign, &sigcfg);
+
+		nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_leftlowerleg, 0, motorNVindex_mconfig__maxcurrentofmotor);
+    	sigcfg.ep = endpoint_mc_leftlowerleg;
+    	sigcfg.id = nvid;
+    	sigcfg.plustime = 0;
+    	eo_array_PushBack(ropsigcfgassign, &sigcfg);
     }
 
     transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mngmnt, nvid_ropsigcfgassign);
@@ -435,6 +459,7 @@ static void s_callback_button_2(void )
 	char str[128];
 	EOnv 		*nvRoot;
 
+	//--
 	eo_cfg_nvsEP_mc_endpoint_t ep = endpoint_mc_leftlowerleg;
 	eo_cfg_nvsEP_mc_jointNumber_t j = 0;
 	eo_cfg_nvsEP_mc_jointNVindex_t jNVindex = jointNVindex_jconfig;
@@ -453,12 +478,14 @@ static void s_callback_button_2(void )
     jData.pidposition.offset 			= 0X1FFF;
     jData.pidposition.scale 			= 0X11;
     jData.minpositionofjoint			= 0x22333322;
-    jData.controlmode					= 0x44;
+	jData.maxpositionofjoint			= 0x44555544,
+    jData.controlmode					= 0x66;
 	eo_nv_remoteSet(nvRoot, &jData, eo_nv_upd_ifneeded);
-
 	// tell agent to prepare a rop to send
     transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
 
+	//--
+	// get nvid from parameters
     eo_cfg_nvsEP_mc_motorNVindex_t mNVindex = motorNVindex_mconfig;
     nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(ep, j, mNVindex);
 	nvRoot = transceiver->getNVhandler(ep, nvid);
@@ -474,17 +501,51 @@ static void s_callback_button_2(void )
 	mData.pidcurrent.scale				= 0x66;
 	mData.maxvelocityofmotor			= 0x77888877;
 	mData.maxcurrentofmotor				= 0x9999;
-
 	eo_nv_remoteSet(nvRoot, &mData, eo_nv_upd_ifneeded);
-
 	// tell agent to prepare a rop to send
 	transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
 
-	snprintf(str, sizeof(str)-1, "called s_callback_button_2: set motort and joint config, index %d\n", j);
+	snprintf(str, sizeof(str)-1, "called set motort and joint config, index %d\n", j);
 }
 
+static void s_callback_button_3(void )
+{
+	char str[128];
+	EOnv 		*nvRoot;
+	eOmeas_position_t jDataPos;
+    memset(&jDataPos, 0x00, sizeof(eOmeas_position_t));
 
-static void s_callback_button_3(void)
+	// joint Max Position
+	eo_cfg_nvsEP_mc_endpoint_t ep = endpoint_mc_leftlowerleg;
+	eo_cfg_nvsEP_mc_jointNumber_t j = 0;
+	eo_cfg_nvsEP_mc_jointNVindex_t jNVindex = jointNVindex_jconfig__maxpositionofjoint;
+	// get nvid from parameters
+    eOnvID_t nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, j, jNVindex);
+    nvRoot = transceiver->getNVhandler(ep, nvid);
+	// Set-up new value
+	jDataPos					= 0x44555544,
+	eo_nv_remoteSet(nvRoot, &jDataPos, eo_nv_upd_ifneeded);
+	// tell agent to prepare a rop to send
+    transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
+
+	// Motor qualcosa
+	//eo_cfg_nvsEP_mc_endpoint_t ep = endpoint_mc_leftlowerleg;
+	eo_cfg_nvsEP_mc_motorNumber_t j2 = 0;
+	eo_cfg_nvsEP_mc_motorNVindex_t jNVindex2 = motorNVindex_mconfig__maxcurrentofmotor;
+    memset(&jDataPos, 0x00, sizeof(eOmeas_position_t));
+	// get nvid from parameters
+    nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(ep, j2, jNVindex2);
+    nvRoot = transceiver->getNVhandler(ep, nvid);
+	// Set-up new value
+	jDataPos					= 0xC1A0DAAC,
+	eo_nv_remoteSet(nvRoot, &jDataPos, eo_nv_upd_ifneeded);
+	// tell agent to prepare a rop to send
+    transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
+
+	snprintf(str, sizeof(str)-1, "called set jointNVindex_jconfig__maxpositionofjoint\n");
+}
+
+static void s_callback_button_4(void)
 {
 	char str[128];
 	EOnv 		*nvRoot;
@@ -509,12 +570,6 @@ static void s_callback_button_3(void)
 	snprintf(str, sizeof(str)-1, "called setPoint position\n");
 }
 
-static void s_callback_button_4(void )
-{
-	char str[128];
-
-	snprintf(str, sizeof(str)-1, "called callback on BUTTON_WKUP: tx a ropframe\n");
-}
 
 static void s_callback_button_5(void )
 {
@@ -525,7 +580,7 @@ static void s_callback_button_5(void )
 	str[0] = 0x01;
 
 	ACE_socket->send(str, 1, remote02.addr, flags);
-	sleep(5);
+	//sleep(5);
 
 	str[0] = 0x02;
 	ACE_socket->send(str, 1, remote02.addr, flags);
