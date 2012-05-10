@@ -40,6 +40,9 @@
 #include "EOMotionControl.h"
 #include "eOcfg_nvsEP_mc.h"
 
+#include "eOcfg_nvsEP_mc_any_con_jxxdefault.h"
+#include "eOcfg_nvsEP_mc_any_con_mxxdefault.h"
+
 
 //application
 #include "eom_appSkeletonEms_body.h"
@@ -47,6 +50,8 @@
 #include "EOicubCanProto_specifications.h"
 
 #include "EOappTheNVmapRef.h"
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -98,6 +103,20 @@
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+//joint-init
+extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig(eo_cfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
+{
+    eOmc_joint_config_t             *cfg = (eOmc_joint_config_t*)nv->loc;
+    memcpy(cfg, &eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.jconfig, sizeof(eOmc_joint_config_t));
+}
+
+extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jstatus(eo_cfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
+{
+    eOmc_joint_status_t             *cfg = (eOmc_joint_status_t*)nv->loc;
+    memcpy(cfg, &eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.jstatus, sizeof(eOmc_joint_status_t));
+}
+
+
 //joint-update
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eo_cfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
@@ -141,7 +160,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eo_cfg_nvsEP_mc_jointNumber_t j
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_TORQUE_PIDLIMITS;
     eo_appCanSP_SendCmd(appCanSP_ptr, &canLoc, msgCmd, (void*)&cfg->pidtorque);
 
-    // 3) send velocity pid DA CHIEDERE!!!!!.
+    // 3) send velocity pid: currently is not send: neither MC4 nor 2foc use pid velocity.
 
     // 4) set min position
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_MIN_POSITION;
@@ -546,6 +565,24 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__stoptrajectory(eo_cfg_nvsEP_mc
         //ems stuff
     }
 
+}
+
+
+/********************************************************************************************************************************/
+/*************************************   M O T O R S  ****************************************************************************/
+/********************************************************************************************************************************/
+//motor init
+//joint-init
+extern void eo_cfg_nvsEP_mc_hid_INIT_Mxx_mconfig(eo_cfg_nvsEP_mc_motorNumber_t mxx, const EOnv* nv)
+{
+    eOmc_motor_config_t             *cfg = (eOmc_motor_config_t*)nv->loc;
+    memcpy(cfg, &eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.mconfig, sizeof(eOmc_motor_config_t));
+}
+
+extern void eo_cfg_nvsEP_mc_hid_INIT_Mxx_mstatus(eo_cfg_nvsEP_mc_motorNumber_t mxx, const EOnv* nv)
+{
+    eOmc_motor_status_t             *cfg = (eOmc_motor_status_t*)nv->loc;
+    memcpy(cfg, &eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.mstatus, sizeof(eOmc_motor_status_t));
 }
 
 

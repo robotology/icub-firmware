@@ -39,7 +39,7 @@ struct EOMappDataCollector_hid
     EOMappDataCollector_cfg_t           cfg;
     EOMtask                             *mytask;                /**< pointer to my task */
     eOm_appDataCollector_states_hid_t   st;
-    EOethBaseModule                     *eth_mod;               /**< pointer to eth module. thi obj manages eth services*/
+//    EOethBaseModule                     *eth_mod;               /**< pointer to eth module. thi obj manages eth services*/
 };
 
 

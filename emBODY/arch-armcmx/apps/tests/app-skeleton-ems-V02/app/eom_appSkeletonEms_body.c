@@ -100,8 +100,8 @@ extern const eOerrman_cfg_t  eom_appSkeletonEms_body_errcfg =
 
 extern const eOmipnet_cfg_dtgskt_t eom_appSkeletonEms_body_dtgskt_cfg = 
 {   
-    .numberofsockets            = 2, 
-    .maxdatagramenqueuedintx    = 2
+    EO_INIT(.numberofsockets)			4, 
+    EO_INIT(.maxdatagramenqueuedintx)   8
 };
 
 
@@ -123,6 +123,7 @@ static void s_eom_appSkeletonEms_body_theBoardTransceiver_init(void);
 static void s_eom_appSkeletonEms_body_CanServicesProvider_init(void);
 static void s_eom_appSkeletonEms_body_EncodersReader_init(void);
 static void s_eom_appSkeletonEms_body_NVmapRef_init(void);
+static void s_eom_appSkeletonEms_body_ethService_init(void);
 
 //actors
 static void s_eom_appSkeletonEms_body_TheSysController_init(void);
@@ -139,6 +140,7 @@ to access shared obj in safe modo, becouse aech actor works during a specific qu
 and race condition should not verify. if it is not so, then  there is a project error.*/
 static EOappCanSP           *s_appCanSP_ptr;
 static EOappEncReader       *s_appEncReader_ptr;
+static EOethBaseModule      *s_ethMod_ptr;
 
 /*** actors obj ***/ 
 static EOMappDataCollector      *s_appDataCollector_ptr;
@@ -166,6 +168,9 @@ extern eOresult_t eom_appSkeletonEms_body_services_init(void)
 
 /* 5) init motorController-networkVariables map*/
     s_eom_appSkeletonEms_body_NVmapRef_init();
+
+/* 6) init eth services */
+   s_eom_appSkeletonEms_body_ethService_init(); 
     return(eores_OK);
 }
 
@@ -262,7 +267,7 @@ static void s_eom_appSkeletonEms_body_theBoardTransceiver_init(void)
     {
         .vectorof_endpoint_cfg          = eo_cfg_EPs_vectorof_eb7,
         .hashfunction_ep2index          = eo_cfg_nvsEP_eb7_fptr_hashfunction_ep2index,
-        .remotehostipv4addr             = 0x01010102,
+        .remotehostipv4addr             = 0x01010101,
         .remotehostipv4port             = 3334
     };
     
@@ -320,6 +325,23 @@ static void s_eom_appSkeletonEms_body_NVmapRef_init(void)
 }
 
 
+static void s_eom_appSkeletonEms_body_ethService_init(void)
+{
+    EOethBaseModule_cfg_t eth_mod_cfg = 
+    {
+        EO_INIT(.dtagramQueue_itemNum)  2,
+        EO_INIT(.dtagramQueue_itemSize) 512,
+        EO_INIT(.remaddr)               0x01010101,
+        EO_INIT(.remport)               3334,
+        EO_INIT(.localport)             3334,
+        EO_INIT(.action_onRec)          NULL,
+        EO_INIT(.periodTx)              0
+    }; 
+
+    s_ethMod_ptr = eo_ethBaseModule_New(&eth_mod_cfg);
+    eo_ethBaseModule_Activate(s_ethMod_ptr);
+}
+
 
 static void s_eom_appSkeletonEms_body_sig2appDataCollector_start(void *arg)
 {
@@ -344,7 +366,7 @@ static void s_eom_appSkeletonEms_body_TheSysController_init(void)
         {
             EO_INIT(.dtagramQueue_itemNum)      2,
             EO_INIT(.dtagramQueue_itemSize)     64,
-            EO_INIT(.remaddr)                   0x01010106,
+            EO_INIT(.remaddr)                   0x01010101,
             EO_INIT(.remport)                   3333,
             EO_INIT(.localport)                 3333,
             EO_INIT(.action_onRec)              NULL,
@@ -390,6 +412,7 @@ static void s_eom_appSkeletonEms_body_appDataCollector_init(void)
         },  
         EO_INIT(.encReader_ptr)             s_appEncReader_ptr,
         EO_INIT(.canSP_ptr)                 s_appCanSP_ptr,
+        EO_INIT(.eth_mod)                   s_ethMod_ptr
 
     };
     s_appDataCollector_ptr = eom_appDataCollector_New(&cfg);
@@ -422,7 +445,8 @@ static void s_eom_appSkeletonEms_body_appDataTransmitter_init(void)
 
     EOMappDataTransmitter_cfg_t cfg = 
     {
-        EO_INIT(.appCanSP_ptr)     s_appCanSP_ptr     
+        EO_INIT(.appCanSP_ptr)     s_appCanSP_ptr,
+        EO_INIT(.eth_mod)          s_ethMod_ptr     
     };
 
     s_appDataTransmitter_ptr = eom_appDataTransmitter_New(&cfg);

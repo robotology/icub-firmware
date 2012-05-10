@@ -160,9 +160,9 @@ static void s_eom_appSkeletonEms_main_init(void)
     // ----------------------------------------------------------------------------------------------------------------
     // 1. initialise eeprom and the arm-environmemnt
 
-    hal_eeprom_init(hal_eeprom_i2c_01, NULL);
-    eo_armenv_Initialise(&eom_appSkeletonEms_info_modinfo, NULL);
-    eov_env_SharedData_Synchronise(eo_armenv_GetHandle());
+//    hal_eeprom_init(hal_eeprom_i2c_01, NULL);
+//    eo_armenv_Initialise(&eom_appSkeletonEms_info_modinfo, NULL);
+//    eov_env_SharedData_Synchronise(eo_armenv_GetHandle());
 
 
 

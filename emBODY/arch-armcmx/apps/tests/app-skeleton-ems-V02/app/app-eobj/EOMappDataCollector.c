@@ -84,7 +84,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
-
+extern  uint32_t ena_tx_onrx = 0;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -120,15 +120,15 @@ extern EOMappDataCollector* eom_appDataCollector_New(EOMappDataCollector_cfg_t *
         return(retptr);
     }
 
-    EOethBaseModule_cfg_t eth_mod_cfg = 
-    {
-        EO_INIT(.dtagramQueue_itemNum)  2,
-        EO_INIT(.dtagramQueue_itemSize) 128,
-        EO_INIT(.remaddr)               0x01010102,
-        EO_INIT(.localport)             3334,
-        EO_INIT(.action_onRec)          NULL,
-        EO_INIT(.periodTx)              0
-    };    
+//    EOethBaseModule_cfg_t eth_mod_cfg = 
+//    {
+//        EO_INIT(.dtagramQueue_itemNum)  2,
+//        EO_INIT(.dtagramQueue_itemSize) 128,
+//        EO_INIT(.remaddr)               0x01010102,
+//        EO_INIT(.localport)             3334,
+//        EO_INIT(.action_onRec)          NULL,
+//        EO_INIT(.periodTx)              0
+//    };    
     
        
     retptr = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOMappDataCollector), 1);
@@ -139,7 +139,7 @@ extern EOMappDataCollector* eom_appDataCollector_New(EOMappDataCollector_cfg_t *
     memcpy(&(retptr->cfg), cfg, sizeof(EOMappDataCollector_cfg_t));
 
     //create ethBase module in order to manage eth services.
-    retptr->eth_mod = eo_ethBaseModule_New(&eth_mod_cfg);
+    //retptr->cfg.eth_mod = eo_ethBaseModule_New(&eth_mod_cfg);
 
 
 
@@ -165,7 +165,7 @@ extern eOresult_t eom_appDataCollector_Activate(EOMappDataCollector *p)
         return(eores_NOK_nullpointer);
     }
 
-    eo_ethBaseModule_Activate(p->eth_mod);
+//    eo_ethBaseModule_Activate(p->eth_mod);
     p->st = eOm_appDataCollector_st__active;
 
      return(eores_OK);
@@ -178,7 +178,7 @@ extern eOresult_t eom_appDataCollector_Deactivate(EOMappDataCollector *p)
     {
         return(eores_NOK_nullpointer);
     }
-    eo_ethBaseModule_Deactivate(p->eth_mod);
+//    eo_ethBaseModule_Deactivate(p->eth_mod);
     p->st = eOm_appDataCollector_st__idle;
 
      return(eores_OK);
@@ -262,9 +262,10 @@ static void s_eom_appDataCollector_taskRun(EOMtask *tsk, uint32_t evtmsgper)
          eo_appEncReader_startRead(p->cfg.encReader_ptr);
  
         /* 2) process received eth packet*/
-        res = eo_ethBaseModule_GetPacket(p->eth_mod, &pkt_ptr);
+        res = eo_ethBaseModule_GetPacket(p->cfg.eth_mod, &pkt_ptr);
         if(eores_OK == res)
         {
+            ena_tx_onrx = 1;
             eo_transceiver_Receive(eo_boardtransceiver_GetHandle(), pkt_ptr, &numberofrops, &txtime);
         }
 

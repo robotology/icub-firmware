@@ -77,20 +77,30 @@ extern const eOmc_motor_t eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue =
     {
         EO_INIT(.pidcurrent)
         {
-            EO_INIT(.kp)                    0,
-            EO_INIT(.ki)                    0,
-            EO_INIT(.kd)                    0,
-            EO_INIT(.limitonintegral)       0,
-            EO_INIT(.limitonoutput)         0,
-            EO_INIT(.scale)                 0,
-            EO_INIT(.offset)                0,
+            EO_INIT(.kp)                    0x1111,
+            EO_INIT(.ki)                    0x2222,
+            EO_INIT(.kd)                    0x3333,
+            EO_INIT(.limitonintegral)       0X4444,
+            EO_INIT(.limitonoutput)         0x5555,
+            EO_INIT(.scale)                 0x0,
+            EO_INIT(.offset)                0x6666,
             EO_INIT(.filler03)              {0xf1, 0xf2, 0xf3}
         },
-        EO_INIT(.maxvelocityofmotor)        0,
-        EO_INIT(.maxcurrentofmotor)         0,
-        EO_INIT(.des02FORmstatuschamaleon04)   {EOUTIL_CHAMELEON_DESCRIPTOR_NONE, EOUTIL_CHAMELEON_DESCRIPTOR_NONE}
+        EO_INIT(.maxvelocityofmotor)        0xAA,
+        EO_INIT(.maxcurrentofmotor)         0xBB,
+         EO_INIT(.des02FORmstatuschamaleon04)   {EOUTIL_CHAMELEON_DESCRIPTOR_NONE, EOUTIL_CHAMELEON_DESCRIPTOR_NONE}
     },
-    EO_INIT(.mstatus)                       {0}
+    EO_INIT(.mstatus)
+    {
+        EO_INIT(.basic)
+        {
+            EO_INIT(.position)              0xF1F2F3F4, 
+            EO_INIT(.velocity)              0xC5C6C7C8, 
+            EO_INIT(.current)               0x4444,
+            EO_INIT(.filler02)              {0}
+        },
+        EO_INIT(.chamaleon04)               {0}
+    }
 }; 
 
 

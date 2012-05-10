@@ -107,7 +107,7 @@ extern EOethBaseModule* eo_ethBaseModule_New(EOethBaseModule_cfg_t *cfg)
     retptr->remaddr = cfg->remaddr;
     retptr->remport = cfg->remport;
     retptr->periodTx = cfg->periodTx;
-
+    retptr->conected_st = 0;
     retptr->action_onrx = eo_action_New();
 
     if(NULL != cfg->action_onRec)
@@ -198,12 +198,10 @@ extern eOresult_t eo_ethBaseModule_Receive(EOethBaseModule *p, uint8_t **payload
     {
         return(eores_NOK_nullpointer);    
     }
-        
-    eo_packet_Full_Clear(p->rxpkt, 0); //clear the packet
-
+    eo_packet_Size_Set(p->rxpkt, 0);    
 
     /*the third param is ignored, because the socket is not blocking*/
-    res = eo_socketdtg_Get(p->socket, p->rxpkt, eok_reltimeZERO );
+    res = eo_socketdtg_Get(p->socket, p->rxpkt, eok_reltimeZERO);
     //NOTE: the only reason I get error is caused by socket's fifo is emmpty
     if(eores_OK != res)
     {
@@ -212,11 +210,14 @@ extern eOresult_t eo_ethBaseModule_Receive(EOethBaseModule *p, uint8_t **payload
 
     eo_packet_Payload_Get(p->rxpkt, payload_ptr, payloadsize);
     
-    if((0 == p->remaddr) || (0 == p->remport))
-    {
-        eo_packet_Destination_Get(p->rxpkt, &(p->remaddr), &(p->remport));
-        eo_socketdtg_Connect(p->socket, p->remaddr, EOK_reltimeZERO); //arp force
-    }
+//    if(0 == p->conected_st)
+//    {
+//        res = eo_socketdtg_Connect(p->socket, p->remaddr, EOK_reltimeZERO); //arp force
+//        if(eores_OK == res)
+//        {
+//            p->conected_st = 1;
+//        }
+//    }
 
     return(res); 
 }
@@ -244,6 +245,14 @@ extern eOresult_t eo_ethBaseModule_Transmit(EOethBaseModule *p, uint8_t *payload
             i remaddr e remport si possono settare su conect.!!!
     */
 
+//    if(0 == p->conected_st)
+//    {
+//        res = eo_socketdtg_Connect(p->socket, p->remaddr, EOK_reltimeZERO); //arp force
+//        if(eores_OK == res)
+//        {
+//            p->conected_st = 1;
+//        }
+//    }
     //send the pkt
     res = eo_socketdtg_Put(p->socket, p->txpkt);
 
@@ -276,15 +285,84 @@ extern eOresult_t eo_ethBaseModule_GetPacket(EOethBaseModule *p, EOpacket **pkt)
 
     *pkt = p->rxpkt;
         
-    if((0 == p->remaddr) || (0 == p->remport))
+    if(0 == p->conected_st)
     {
-        eo_packet_Destination_Get(p->rxpkt, &(p->remaddr), &(p->remport));
-        eo_socketdtg_Connect(p->socket, p->remaddr, EOK_reltimeZERO); //arp force
+        res = eo_socketdtg_Connect(p->socket, p->remaddr, EOK_reltimeZERO); //arp force
+        if(eores_OK == res)
+        {
+            p->conected_st = 1;
+        }
     }
+
 
     return(res); 
 }
 
+
+extern eOresult_t eo_ethBaseModule_TransmitPacket(EOethBaseModule *p, EOpacket *pkt)
+{
+
+    eOresult_t res = eores_OK;
+    
+    if((NULL == p) || (NULL == pkt))
+    {
+        return(eores_NOK_nullpointer);    
+    }
+
+//    if(0 == p->conected_st)
+//    {
+//        res = eo_socketdtg_Connect(p->socket, p->remaddr, EOK_reltimeZERO); //arp force
+//        if(eores_OK == res)
+//        {
+//            p->conected_st = 1;
+//        }
+//    }
+
+    //send the pkt
+    res = eo_socketdtg_Put(p->socket, pkt);
+
+
+    return(res);
+
+}
+
+
+extern eOresult_t eo_ethBaseModule_TransmitMyPacket(EOethBaseModule *p)
+{
+
+    eOresult_t res = eores_OK;
+    
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);    
+    }
+
+
+    if(0 == p->conected_st)
+    {
+        res = eo_socketdtg_Connect(p->socket, p->remaddr, EOK_reltimeZERO); //arp force
+        if(eores_OK == res)
+        {
+            p->conected_st = 1;
+        }
+    }
+
+    //send the pkt
+    res = eo_socketdtg_Put(p->socket, p->txpkt);
+
+
+    //prepare pkt for the next time (reinit with 0)
+    eo_packet_Full_Clear(p->txpkt, 0);
+
+    return(res);
+
+}
+
+extern EOpacket* eo_ethBaseModule_GetTxPacket(EOethBaseModule *p)
+{
+    return(p->txpkt);
+
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------

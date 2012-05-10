@@ -39,7 +39,12 @@
 //embobj
 #include "EOtheMemoryPool.h"
 #include "EOtheErrorManager.h"
-//#include "EOMtask_hid.h"
+//nvs
+#include "EOtransceiver.h"
+#include "EOtheBOARDtransceiver.h"
+
+//only for debug purpose
+#include "EOpacket_hid.h"
 
 // application
 #include "EoMotionControl.h"
@@ -74,7 +79,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
-
+extern  uint32_t ena_tx_onrx;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -113,7 +118,6 @@ extern EOMappDataTransmitter* eom_appDataTransmitter_New(EOMappDataTransmitter_c
 
     //save obj's configuration
     memcpy(&retptr->cfg, cfg, sizeof(EOMappDataTransmitter_cfg_t));
-
     retptr->mytask = eom_task_New(eom_mtask_EventDriven,
                               TASK_DATATRANSMITTER_PRIO ,
                               2*1024,           //stacksize: da rivedere
@@ -139,7 +143,7 @@ extern eOresult_t eom_appDataTransmitter_Activate(EOMappDataTransmitter *p)
     }
 
     p->st = eOm_appDataTransmitter_st__active;
-
+    ena_tx_onrx = 0;
     return(eores_OK);
 }
 
@@ -205,6 +209,9 @@ static void s_eom_appDataTransmitter_taskStartup(EOMtask *tsk, uint32_t t)
 static void s_eom_appDataTransmitter_taskRun(EOMtask *tsk, uint32_t evtmsgper)
 {
     eOevent_t evt;
+    EOpacket *pkt_ptr;
+    uint16_t numberofrops;
+    eOresult_t res;
     
     eOmc_setpoint_t     mySetPoint_current = 
     {
@@ -228,6 +235,23 @@ static void s_eom_appDataTransmitter_taskRun(EOMtask *tsk, uint32_t evtmsgper)
     if(EVT_CHECK(evt, EVT_START))
     {
         //this set point should be fill by motor controller: used mySetPoint_current only for test porpouse
+        res = eo_transceiver_Transmit(eo_boardtransceiver_GetHandle(), &pkt_ptr, &numberofrops);
+        if(eores_OK != res)
+        {
+            return;
+        }
+        if(0 == ena_tx_onrx)
+        {
+            return;
+        }
+
+        ena_tx_onrx = 0;
+
+        res = eo_ethBaseModule_TransmitPacket(p->cfg.eth_mod, pkt_ptr);
+        if(eores_OK != res)
+        {
+            return;
+        }
         eo_appCanSP_SendSetPoint(p->cfg.appCanSP_ptr, 0, &mySetPoint_current);
         p->st = eOm_appDataTransmitter_st__active;
     }

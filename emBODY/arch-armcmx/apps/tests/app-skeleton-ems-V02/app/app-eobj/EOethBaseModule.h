@@ -137,8 +137,19 @@ extern eOresult_t eo_ethBaseModule_Transmit(EOethBaseModule *p, uint8_t *payload
  **/
 extern eOresult_t eo_ethBaseModule_GetPacket(EOethBaseModule *p, EOpacket **pkt);
 
+/** @fn        eOresult_t eo_ethBaseModule_TransmitPacket(EOethBaseModule *p, EOpacket *pkt)
+    @brief      transmits  the packet
+    @param      p                   reference to EOethBaseModule obj
+    @param      pkt                 the packet to transmit
+    @return     The value eores_NOK_nullpointer if @e p is NULL,  eores_NOK_generic if destination is not valid, eores_OK otherwise.
+    @warning    this function is not good!!!work in progress
+ **/
+extern eOresult_t eo_ethBaseModule_TransmitPacket(EOethBaseModule *p, EOpacket *pkt);
 
 
+extern eOresult_t eo_ethBaseModule_TransmitMyPacket(EOethBaseModule *p);
+
+extern EOpacket* eo_ethBaseModule_GetTxPacket(EOethBaseModule *p);
 /** @}            
     end of group eo_ethBaseModule 
  **/

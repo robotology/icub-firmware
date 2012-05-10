@@ -345,6 +345,7 @@ static void s_eom_appTheSysController_recDgram_mng(EOMappTheSysController *p)
 
     //p and &s_theSysController are equal. 
     eo_ethBaseModule_Receive(p->eth_mod, &payload_ptr, &payloadsize);
+    eo_ethBaseModule_Transmit(p->eth_mod, payload_ptr, payloadsize);
 
     switch(payload_ptr[0]) 
     {

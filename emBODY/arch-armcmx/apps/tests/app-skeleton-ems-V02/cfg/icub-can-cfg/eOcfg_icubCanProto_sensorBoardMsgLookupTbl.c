@@ -156,10 +156,10 @@ static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_periodicSensor
         EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__forceVector
     },
     {   // 12 ICUBCANPROTO_PER_SB_CMD__HES0TO6 			
-        EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__forceVector
+        EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__hes0to6
     },
     {   // 13 ICUBCANPROTO_PER_SB_CMD__HES7TO14
-        EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__forceVector
+        EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__hes7to14
     }
 };        
 

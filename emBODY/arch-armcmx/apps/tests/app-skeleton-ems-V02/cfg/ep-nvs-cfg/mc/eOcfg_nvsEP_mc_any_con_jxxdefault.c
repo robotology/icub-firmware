@@ -78,35 +78,35 @@ extern const eOmc_joint_t eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue =
     {
         EO_INIT(.pidposition)
         {
-            EO_INIT(.kp)                    0,
-            EO_INIT(.ki)                    0,
-            EO_INIT(.kd)                    0,
-            EO_INIT(.limitonintegral)       0,
-            EO_INIT(.limitonoutput)         0,
-            EO_INIT(.scale)                 0,
-            EO_INIT(.offset)                0,
+            EO_INIT(.kp)                    0xAABB,
+            EO_INIT(.ki)                    0xCCDD,
+            EO_INIT(.kd)                    0xEEFF,
+            EO_INIT(.limitonintegral)       0X1122,
+            EO_INIT(.limitonoutput)         0x3344,
+            EO_INIT(.scale)                 0x0,
+            EO_INIT(.offset)                0x5566,
             EO_INIT(.filler03)              {0xf1, 0xf2, 0xf3}
         },
         EO_INIT(.pidvelocity)
         {
-            EO_INIT(.kp)                    0,
-            EO_INIT(.ki)                    0,
-            EO_INIT(.kd)                    0,
-            EO_INIT(.limitonintegral)       0,
-            EO_INIT(.limitonoutput)         0,
+            EO_INIT(.kp)                    0xAABB,
+            EO_INIT(.ki)                    0xCCDD,
+            EO_INIT(.kd)                    0xEEFF,
+            EO_INIT(.limitonintegral)       0X1122,
+            EO_INIT(.limitonoutput)         0x8899,
             EO_INIT(.scale)                 0,
-            EO_INIT(.offset)                0,
+            EO_INIT(.offset)                0x5566,
             EO_INIT(.filler03)              {0xf1, 0xf2, 0xf3}
         },
         EO_INIT(.pidtorque)
         {
-            EO_INIT(.kp)                    0,
-            EO_INIT(.ki)                    0,
-            EO_INIT(.kd)                    0,
-            EO_INIT(.limitonintegral)       0,
-            EO_INIT(.limitonoutput)         0,
+            EO_INIT(.kp)                    0xAABB,
+            EO_INIT(.ki)                    0xCCDD,
+            EO_INIT(.kd)                    0xEEFF,
+            EO_INIT(.limitonintegral)       0X1122,
+            EO_INIT(.limitonoutput)         0x3344,
             EO_INIT(.scale)                 0,
-            EO_INIT(.offset)                0,
+            EO_INIT(.offset)                0x5566,
             EO_INIT(.filler03)              {0xf1, 0xf2, 0xf3}
         }, 
         EO_INIT(.impedance)
@@ -116,9 +116,9 @@ extern const eOmc_joint_t eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue =
             EO_INIT(.offset)                0,
             EO_INIT(.filler02)              {0xf1, 0xf2}           
         },        
-        EO_INIT(.minpositionofjoint)        0,
-        EO_INIT(.maxpositionofjoint)        0,
-        EO_INIT(.velocitysetpointtimeout)   0,
+        EO_INIT(.minpositionofjoint)        0xCACACACA,
+        EO_INIT(.maxpositionofjoint)        0xBDBDBDBD,
+        EO_INIT(.velocitysetpointtimeout)   0xEFEF,
         EO_INIT(.controlmode)               eomc_controlmode_idle,
         EO_INIT(.motionmonitormode)         eomc_motionmonitormode_dontmonitor,
         EO_INIT(.des02FORjstatuschamaleon04)   {EOUTIL_CHAMELEON_DESCRIPTOR_NONE, EOUTIL_CHAMELEON_DESCRIPTOR_NONE},
@@ -127,7 +127,20 @@ extern const eOmc_joint_t eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue =
         EO_INIT(.holder02FFU03)             0xe3e3,
         EO_INIT(.holder02FFU04)             0xe4e3
     },
-    EO_INIT(.jstatus)                       {0},
+    EO_INIT(.jstatus)
+    {
+        EO_INIT(.basic)
+        {
+            EO_INIT(.position)                    0xAA11BB11,
+            EO_INIT(.velocity)                    0xAA22BB22,         
+            EO_INIT(.acceleration)                0xAA33BB33,   
+            EO_INIT(.torque)                      0xAA44,
+            EO_INIT(.motionmonitorstatus)         0x55,
+            EO_INIT(.controlmodestatus)           0x66,
+        
+        }, 
+        EO_INIT(.ofpid) {0}
+    },
     EO_INIT(.jinputs)                       {0},
     EO_INIT(.jcmmnds)                       {0}
 }; 

@@ -48,6 +48,7 @@
 #include "eOcommon.h"
 
 #include "EOappCanServicesProvider.h"
+#include "EOethBaseModule.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -61,6 +62,7 @@ typedef struct EOMappDataTransmitter_hid EOMappDataTransmitter;
 typedef struct
 {    
     EOappCanSP                  *appCanSP_ptr;
+    EOethBaseModule             *eth_mod;
 } EOMappDataTransmitter_cfg_t;
     
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------

@@ -45,6 +45,7 @@
 
 #include "EOappEncodersReader.h"
 #include "EOappCanServicesProvider.h"
+#include "EOethBaseModule.h"
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
   
@@ -61,6 +62,7 @@ typedef struct
     eOcallbackData_t            sig2appMotorController;
     EOappEncReader              *encReader_ptr;
     EOappCanSP                  *canSP_ptr;
+    EOethBaseModule             *eth_mod;
 } EOMappDataCollector_cfg_t;
     
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
