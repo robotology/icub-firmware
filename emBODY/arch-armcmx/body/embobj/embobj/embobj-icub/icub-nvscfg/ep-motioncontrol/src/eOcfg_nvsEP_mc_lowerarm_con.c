@@ -3742,6 +3742,7 @@ extern uint16_t eo_cfg_nvsEP_mc_lowerarm_hashfunction_id2index(uint16_t id)
 
     #define IDTABLESIZE         (IDTABLEJSIZE+IDTABLEMSIZE)
     
+    uint16_t index;
 
     // in order to always have a hit the table s_idtable[] it must be of size equal to max{ s_hash(id) }, thus if we
     // use an id of value 16 and s_hash() just keeps the lsb, then the size must be 17 
@@ -4007,7 +4008,7 @@ extern uint16_t eo_cfg_nvsEP_mc_lowerarm_hashfunction_id2index(uint16_t id)
         
     };  EO_VERIFYsizeof(s_idtable, sizeof(uint16_t)*(IDTABLESIZE));
     
-    uint16_t index = s_hash(id);
+    index = s_hash(id);
  
     
     if((index < (IDTABLESIZE)) && (id == s_idtable[index]) )
