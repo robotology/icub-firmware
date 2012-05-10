@@ -193,9 +193,29 @@ extern const EOconstvector* const eo_cfg_nvsEP_as_onemais_usr_constvector_of_EOn
 
 extern void eo_cfg_nvsEP_as_onemais_usr_initialise(eOnvEP_t ep, void* loc, void* rem)
 { 
-    eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
-    theOwnershipIsLocal = theOwnershipIsLocal;
-    
+//    eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
+//    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_as_onemais_t* p = NULL;
+    uint8_t i;
+   
+    // copy default values
+    if(NULL != loc)
+    {
+        p = (eo_cfg_nvsEP_as_onemais_t*) loc;
+        for(i=0; i<maisOneMais_TOTALnumber; i++)
+        {
+            memcpy(&p->maises[i], eo_cfg_nvsEP_as_mais_defaultvalue, sizeof(eo_cfg_nvsEP_as_onemais_t));
+        }
+    }    
+    if(NULL != rem)
+    {   
+        p = (eo_cfg_nvsEP_as_onemais_t*) rem;
+        for(i=0; i<maisOneMais_TOTALnumber; i++)
+        {
+            memcpy(&p->maises[i], eo_cfg_nvsEP_as_mais_defaultvalue, sizeof(eo_cfg_nvsEP_as_onemais_t));
+        }
+
+    }        
     
     // launch a specialised initialisation
     eo_cfg_nvsEP_as_onemais_usr_hid_INITIALISE(ep, loc, rem);

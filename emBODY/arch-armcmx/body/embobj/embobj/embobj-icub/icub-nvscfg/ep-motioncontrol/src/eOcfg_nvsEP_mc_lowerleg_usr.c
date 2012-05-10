@@ -520,12 +520,39 @@ extern const EOconstvector* const eo_cfg_nvsEP_mc_lowerleg_usr_constvector_of_EO
 
 extern void eo_cfg_nvsEP_mc_lowerleg_usr_initialise(eOnvEP_t ep, void* loc, void* rem)
 { 
-    eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
-    theOwnershipIsLocal = theOwnershipIsLocal;
-    
+//    eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
+//    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_lowerleg_t* ul = NULL;
+    uint8_t i;
+   
+    // copy default values
+    if(NULL != loc)
+    {
+        ul = (eo_cfg_nvsEP_mc_lowerleg_t*) loc;
+        for(i=0; i<jointLowerLeg_TOTALnumber; i++)
+        {
+            memcpy(&ul->joints[i], eo_cfg_nvsEP_mc_lowerleg_joint_defaultvalue, sizeof(eOmc_joint_t));
+        }
+        for(i=0; i<motorLowerLeg_TOTALnumber; i++)
+        {
+            memcpy(&ul->motors[i], eo_cfg_nvsEP_mc_lowerleg_motor_defaultvalue, sizeof(eOmc_motor_t));
+        }
+    }    
+    if(NULL != rem)
+    {   
+        ul = (eo_cfg_nvsEP_mc_lowerleg_t*) rem;
+        for(i=0; i<jointLowerLeg_TOTALnumber; i++)
+        {
+            memcpy(&ul->joints[i], eo_cfg_nvsEP_mc_lowerleg_joint_defaultvalue, sizeof(eOmc_joint_t));
+        }
+        for(i=0; i<motorLowerLeg_TOTALnumber; i++)
+        {
+            memcpy(&ul->motors[i], eo_cfg_nvsEP_mc_lowerleg_motor_defaultvalue, sizeof(eOmc_motor_t));
+        }
+    }
+        
     // launch a specialised initialisation
     eo_cfg_nvsEP_mc_lowerleg_usr_hid_INITIALISE(ep, loc, rem);
-
 }
 
 
