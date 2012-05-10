@@ -95,13 +95,9 @@ static void s_eo_cfg_nvsEP_mngmnt_usr_ebx_generic_ropsigcfgassign(EOarray* array
 
 extern void eo_cfg_nvsEP_mn_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
 {
-    eObool_t theOwnershipIsRemote = (NULL == rem) ? eobool_true : eobool_false;
+    eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
     
-    memcpy(loc, eo_cfg_nvsEP_mngmnt_defaultvalue, sizeof(eo_cfg_nvsEP_mngmnt_t));
-    if(NULL != rem)
-    {   
-        memcpy(rem, eo_cfg_nvsEP_mngmnt_defaultvalue, sizeof(eo_cfg_nvsEP_mngmnt_t));
-    }
+    // initialisation of loc and rem is always done in the usr part of the endpoint and can never be overridden
     
     // nothing else ...
 
@@ -110,12 +106,12 @@ extern void eo_cfg_nvsEP_mn_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
 
 extern void eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgassign(uint16_t n, const EOnv* nv)
 {
-    eObool_t theOwnershipIsRemote = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     
     EOarray* arrayloc = (EOarray*)nv->loc;
     EOarray* arrayrem = (EOarray*)nv->rem;
     
-    if(eobool_false == theOwnershipIsRemote)
+    if(eobool_true == theOwnershipIsLocal)
     {   // function is called from within the local board
         s_eo_cfg_nvsEP_mngmnt_usr_ebx_generic_ropsigcfgassign(arrayloc);  
     }
@@ -129,12 +125,12 @@ extern void eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgassign(uint16_t n, const EOnv* nv
 
 extern void eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgassign(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-    eObool_t theOwnershipIsRemote = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     
     EOarray* arrayloc = (EOarray*)nv->loc;
     EOarray* arrayrem = (EOarray*)nv->rem;
     
-    if(eobool_false == theOwnershipIsRemote)
+    if(eobool_true == theOwnershipIsLocal)
     {   // function is called from within the local board
         s_eo_cfg_nvsEP_mngmnt_usr_ebx_generic_ropsigcfgassign(arrayloc);  
     }
