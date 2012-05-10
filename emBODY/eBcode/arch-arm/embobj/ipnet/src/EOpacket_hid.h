@@ -21,6 +21,10 @@
 #define _EOPACKET_HID_H_
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* @file       EOpacket_hid.h
     @brief      This header file implements hidden interface to a packet object.
     @author     marco.accame@iit.it
@@ -72,7 +76,11 @@ extern eOresult_t eo_packet_hid_DefCopy(void *d, void *s);
 extern eOresult_t eo_packet_hid_DefClear(void *p);
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

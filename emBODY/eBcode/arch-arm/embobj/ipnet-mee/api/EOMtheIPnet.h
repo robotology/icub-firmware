@@ -20,6 +20,9 @@
 #ifndef _EOMTHEIPNET_H_
 #define _EOMTHEIPNET_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOMtheIPnet.h
     @brief      This header file implements public interface to the IP net singleton used in MEE.
@@ -183,6 +186,10 @@ extern eOresult_t eom_ipnet_IGMPgroupLeave(EOMtheIPnet *ip, eOipv4addr_t igmp);
 /** @}            
     end of group eom_theipnet  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

@@ -20,6 +20,9 @@
 #ifndef _EOSTHESYSTEM_HID_H_
 #define _EOSTHESYSTEM_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOStheSystem_hid.h
     @brief      This header file implements hidden interface to the system singleton.
@@ -74,7 +77,11 @@ extern uint64_t eos_sys_hid_tickoflifeget(void);
 
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

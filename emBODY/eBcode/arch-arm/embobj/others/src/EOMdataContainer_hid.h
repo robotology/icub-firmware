@@ -20,6 +20,9 @@
 #ifndef _EOMDATACONTAINER_HID_H_
 #define _EOMDATACONTAINER_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 // - doxy -------------------------------------------------------------------------------------------------------------
 
 /* @file       EOMdataContainer_hid.h
@@ -66,7 +69,11 @@ struct EOMdataContainer_hid
 // empty-section
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

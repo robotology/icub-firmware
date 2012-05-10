@@ -20,7 +20,9 @@
 #ifndef _EOFAKESTORAGE_H_
 #define _EOFAKESTORAGE_H_
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOfakeStorage.h
     @brief      This header file implements public interface to a fake storage object.
@@ -80,6 +82,10 @@ extern EOfakeStorage* eo_fakestrg_New(uint32_t id, uint32_t capacity, const void
 /** @}            
     end of group eo_fakestrg  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

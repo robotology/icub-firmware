@@ -20,6 +20,9 @@
 #ifndef _EOFIFOWORD_HID_H_
 #define _EOFIFOWORD_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
@@ -47,6 +50,10 @@ struct EOfifoWord_hid
     EOfifo     *fifo;
 };
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

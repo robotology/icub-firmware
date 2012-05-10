@@ -20,6 +20,9 @@
 #ifndef _EOSTHEFOOP_H_
 #define _EOSTHEFOOP_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOStheFOOP.h
     @brief      This header file implements public interface to the FOOP singleton 
@@ -153,6 +156,10 @@ extern eOresult_t eos_foop_ExecCallback(EOStheFOOP *p, eOcallback_t cbk, void *a
 /** @}            
     end of group eos_theFOOP  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

@@ -20,6 +20,9 @@
 #ifndef _EONV_HID_H_
 #define _EONV_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOnv_hid.h
     @brief      This header file implements hidden interface to a netvar object.
@@ -112,7 +115,7 @@ typedef const struct                // 12 bytes on arm
     uint16_t                        offset;   
     uint8_t                         typ;
     uint8_t                         fun;
- } EOnv_con_t;                       EO_VERIFYsizeof(EOnv_con_t, 12); 
+ } EOnv_con_t;                      EO_VERIFYsizeof(EOnv_con_t, 12); 
 
 typedef const struct
 {
@@ -129,6 +132,9 @@ typedef const struct
  **/
 struct EOnv_hid 
 {
+    eOipv4addr_t                    ip;
+    eOnvEP_t                        ep;
+    uint8_t                         filler[2];
     EOnv_con_t*                     con;        // pointer to the constant part common to every device which uses this nv
     EOnv_usr_t*                     usr;        // pointer to the configurable part specific to each device which uses this nv
     void*                           loc;        // the volatile part which keeps LOCAL value of nv 
@@ -147,6 +153,9 @@ struct EOnv_hid
 //    @return     The pointer to the required object.
 // **/
 //extern EOnv * eo_nv_hid_New(uint8_t fun, uint8_t typ, uint32_t otherthingsmaybe);
+
+
+extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvEP_t ep, EOnv_con_t* con, EOnv_usr_t* usr, void* loc, void* rem, EOVmutexDerived* mtx, EOVstorageDerived* stg);
 
 
 
@@ -186,7 +195,11 @@ extern uint16_t eo_nv_hid_GetCAPACITY(const EOnv *netvar);
 
  
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

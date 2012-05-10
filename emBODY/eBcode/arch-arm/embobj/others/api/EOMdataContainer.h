@@ -20,6 +20,9 @@
 #ifndef _EOMDATACONTAINER_H_
 #define _EOMDATACONTAINER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
@@ -130,6 +133,10 @@ extern eOresult_t eom_dataContainer_WriteItem(EOMdataContainer *p, eOdataContain
  **/
 
  
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+
 #endif  // include-guard
 
 

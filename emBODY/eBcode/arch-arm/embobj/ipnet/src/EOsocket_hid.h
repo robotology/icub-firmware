@@ -20,6 +20,9 @@
 #ifndef _EOSOCKET_HID_H_
 #define _EOSOCKET_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOsocket_hid.h
     @brief      This header file implements hidden interface to the base socket object.
@@ -78,7 +81,11 @@ extern void * eo_socket_hid_derived_Get_Handle(EOsocketDerived *s);
 extern eOsocketType_t eo_socket_hid_derived_Get_Type(EOsocketDerived *s);
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

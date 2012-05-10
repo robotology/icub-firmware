@@ -1076,6 +1076,8 @@ extern uint16_t eo_cfg_nvsEP_mc_torso_hashfunction_id2index(uint16_t id)
     // then the table shall be of size 17, shall contain 0xffff everywhere but in positions 0, 7, 16 where the values
     // are ... 0, 7, 16
 
+    uint16_t index;
+    
     static const uint16_t s_idtable[] = 
     { 
         // j00
@@ -1147,7 +1149,7 @@ extern uint16_t eo_cfg_nvsEP_mc_torso_hashfunction_id2index(uint16_t id)
         
     };  EO_VERIFYsizeof(s_idtable, sizeof(uint16_t)*(IDTABLESIZE));
     
-    uint16_t index = s_hash(id);
+    index = s_hash(id);
  
     
     if((index < (IDTABLESIZE)) && (id == s_idtable[index]) )

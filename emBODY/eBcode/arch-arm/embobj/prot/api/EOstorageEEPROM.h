@@ -20,7 +20,9 @@
 #ifndef _EOSTORAGEEEPROM_H_
 #define _EOSTORAGEEEPROM_H_
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOstorageEEPROM.h
     @brief      This header file implements public interface to a fake storage object.
@@ -81,6 +83,10 @@ extern EOstorageEEPROM* eo_strgeeprom_New(hal_eeprom_t id, uint32_t baseaddress,
 /** @}            
     end of group eo_strgeeprom  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

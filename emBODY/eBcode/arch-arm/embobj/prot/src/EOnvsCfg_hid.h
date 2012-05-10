@@ -20,6 +20,9 @@
 #ifndef _EONVSCFG_HID_H_
 #define _EONVSCFG_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOnvsCfg_hid.h
     @brief      This header file implements hidden interface to a netvar object.
@@ -49,33 +52,34 @@
 
 typedef struct
 {
-    eOnvEP_t                endpoint;
-    eObool_t                initted;
-    uint8_t                 thenvs_numberof; 
-    const EOconstvector*    thetreeofnvs_con;      
-    const EOconstvector*    thenvs_usr;
-    void*                   thenvs_vol;
-    void*                   thenvs_rem;
-    eOvoid_fp_voidp_voidp_t thenvs_initialise; // vol_local, vol_remote
-    uint32_t                thenvs_sizeof;   
-    eOuint16_fp_uint16_t    hashfn_id2index; 
-    EOVmutexDerived*        mtx_endpoint;                 
+    eOnvEP_t                        endpoint;
+    eObool_t                        initted;
+    uint16_t                        thenvs_numberof; 
+    const EOconstvector*            thetreeofnvs_con;      
+    const EOconstvector*            thenvs_usr;
+    void*                           thenvs_vol;
+    void*                           thenvs_rem;
+    eOvoid_fp_uint16_voidp_voidp_t  thenvs_initialise;  // ep, vol_local, vol_remote
+    eOvoid_fp_uint16_voidp_voidp_t  thenvs_ramretrieve; // ep, vol_local, vol_remote
+    uint32_t                        thenvs_sizeof;   
+    eOuint16_fp_uint16_t            hashfn_id2index; 
+    EOVmutexDerived*                mtx_endpoint;                 
 } EOnvsCfg_ep_t;
 
 typedef struct
 {
-    uint16_t                index;
-    eOnvEP_t                ephashed;
+    uint16_t                        index;
+    eOnvEP_t                        ephashed;
 } eOnvsCfgEPhash_t;
 
 typedef struct
 {
-    eOipv4addr_t            ipaddress;
-    EOvector*               theendpoints;
-    eOnvscfgOwnership_t     ownership;
-    uint16_t                theendpoints_numberof; 
-    eOnvsCfgEPhash_t*       ephashtable;  
-    eOuint16_fp_uint16_t    hashfn_ep2index;    
+    eOipv4addr_t                    ipaddress;
+    EOvector*                       theendpoints;
+    eOnvscfgOwnership_t             ownership;
+    uint16_t                        theendpoints_numberof; 
+    eOnvsCfgEPhash_t*               ephashtable;  
+    eOuint16_fp_uint16_t            hashfn_ep2index;    
 } EOnvsCfg_device_t;
 
 
@@ -87,12 +91,12 @@ typedef struct
  **/
 struct EOnvsCfg_hid 
 {
-    EOvector*                   thedevices;
-    EOvector*                   ip2index;
-    uint8_t                     indexoflocaldevice;
-    eOnvscfgDevicesOwnership_t  devicesowneship;
-    EOVstorageDerived*          storage;
-    EOmatrix3d*                 allnvs;
+    EOvector*                       thedevices;
+    EOvector*                       ip2index;
+    uint16_t                        indexoflocaldevice;
+    eOnvscfgDevicesOwnership_t      devicesowneship;
+    EOVstorageDerived*              storage;
+    EOmatrix3d*                     allnvs;
 };   
  
 
@@ -100,19 +104,23 @@ struct EOnvsCfg_hid
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern uint8_t eo_nvscfg_hid_ip2index(EOnvsCfg* p, eOipv4addr_t ipaddress);
+extern uint16_t eo_nvscfg_hid_ip2index(EOnvsCfg* p, eOipv4addr_t ipaddress);
 
-extern uint8_t eo_nvscfg_hid_ondevice_endpoint2index(EOnvsCfg* p, uint8_t ondevindex, eOnvEP_t endpoint);
+extern uint16_t eo_nvscfg_hid_ondevice_endpoint2index(EOnvsCfg* p, uint16_t ondevindex, eOnvEP_t endpoint);
 
-extern uint8_t eo_nvscfg_hid_ondevice_onendpoint_id2index(EOnvsCfg* p, uint8_t ondevindex, uint8_t onendpointindex, eOnvID_t id);
+extern uint16_t eo_nvscfg_hid_ondevice_onendpoint_id2index(EOnvsCfg* p, uint16_t ondevindex, uint16_t onendpointindex, eOnvID_t id);
 
-extern EOtreenode* eo_nvscfg_hid_ondevice_onendpoint_withID_GetTreeNode(EOnvsCfg* p, uint8_t ondevindex, uint8_t onendpointindex, eOnvID_t id);
+extern EOtreenode* eo_nvscfg_hid_ondevice_onendpoint_withID_GetTreeNode(EOnvsCfg* p, uint16_t ondevindex, uint16_t onendpointindex, eOnvID_t id);
 
 
 
  
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

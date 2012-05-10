@@ -20,6 +20,9 @@
 #ifndef _EOLIST_H_
 #define _EOLIST_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOlist.h
 	@brief      This header file implements public interface to a list object.
@@ -305,6 +308,10 @@ extern void eo_list_FromIterForEach(EOlist *list, EOlistIter *li, void (execute)
 /** @}            
     end of group eo_list  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

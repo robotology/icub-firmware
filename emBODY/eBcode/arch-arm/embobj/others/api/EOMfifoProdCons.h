@@ -20,6 +20,9 @@
 #ifndef _EOMFIFOPRODCONS_H_
 #define _EOMFIFOPRODCONS_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
@@ -129,6 +132,10 @@ extern eOresult_t eom_fifoProdCons_GetItemInfo(EOMfifoProdCons *p, eOsizeitem_t 
  **/
 
  
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+
 #endif  // include-guard
 
 

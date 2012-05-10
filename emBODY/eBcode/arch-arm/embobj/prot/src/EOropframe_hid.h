@@ -20,6 +20,9 @@
 #ifndef _EOROPFRAME_HID_H_
 #define _EOROPFRAME_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOropframe_hid.h
     @brief      This header file implements hidden interface to a packet object.
@@ -90,7 +93,11 @@ uint8_t* eo_ropframe_hid_get_pointer_offset(EOropframe *p, uint16_t offset);
 extern eOresult_t eo_ropframe_hid_rop_rem(EOropframe *p, uint16_t startat, uint16_t size);
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

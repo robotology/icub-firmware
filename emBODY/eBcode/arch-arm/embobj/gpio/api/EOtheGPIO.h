@@ -20,6 +20,9 @@
 #ifndef _EOTHEGPIO_H_
 #define _EOTHEGPIO_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOtheGPIO.h
     @brief      This header file implements public interface to the GPIO singleton.
@@ -120,6 +123,10 @@ extern EOtheGPIO * eo_gpio_GetHandle(void);
 /** @}            
     end of group eo_thegpio  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

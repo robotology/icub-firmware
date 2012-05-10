@@ -20,6 +20,9 @@
 #ifndef _EOSMUTEX_HID_H_
 #define _EOSMUTEX_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOSmutex_hid.h
     @brief      This header file keeps hidden interface to a mutex object for see
@@ -64,7 +67,11 @@ struct EOSmutex_hid
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 // empty-section
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

@@ -20,6 +20,9 @@
 #ifndef _EOVECTOR_H_
 #define _EOVECTOR_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOvector.h
 	@brief      This header file implements public interface to a vector object.
@@ -211,6 +214,10 @@ extern eObool_t eo_vector_Find(EOvector * vector, void *p, eOsizecntnr_t *index)
 /** @}            
     end of group eo_vector  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

@@ -231,6 +231,8 @@ extern uint16_t eo_cfg_nvsEP_sk_emsboard_hashfunction_id2index(uint16_t id)
 {
     #define IDTABLESIZE         (2)
     
+    uint16_t index;
+    
     static const uint16_t s_idtable[] = 
     {
         EOK_cfg_nvsEP_sk_emsboard_NVID_sconfig__sigmode,        EOK_cfg_nvsEP_sk_emsboard_NVID_sstatus__arrayof10canframes
@@ -238,7 +240,7 @@ extern uint16_t eo_cfg_nvsEP_sk_emsboard_hashfunction_id2index(uint16_t id)
     };  EO_VERIFYsizeof(s_idtable, sizeof(uint16_t)*(IDTABLESIZE));
     
     
-    uint16_t index = s_hash(id);
+    index = s_hash(id);
     
    
     if((index < (IDTABLESIZE)) && (id == s_idtable[index]) )

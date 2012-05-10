@@ -153,7 +153,10 @@ extern EOtransceiver * eo_boardtransceiver_GetHandle(void)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
-
+extern EOnvsCfg * eo_boardtransceiver_hid_GetNvsCfg(void)
+{
+    return(s_eo_theboardtrans.nvscfg);
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -175,7 +178,7 @@ static EOnvsCfg* s_eo_boardtransceiver_nvscfg_get(const eOboardtransceiver_cfg_t
 
     theepcfgs = cfg->vectorof_endpoint_cfg;
 
-    #warning --> so far the BOARDtransceiver does not use any storage. if needed ... change the NULL into a ...
+//    #warning --> so far the BOARDtransceiver does not use any storage. if needed ... change the NULL into a ...
     nvscfg = eo_nvscfg_New(1, NULL);
 
     nendpoints = eo_constvector_Size(theepcfgs);
@@ -187,13 +190,16 @@ static EOnvsCfg* s_eo_boardtransceiver_nvscfg_get(const eOboardtransceiver_cfg_t
     {
         epcfg = (eOnvscfg_EP_t*) eo_constvector_At(theepcfgs, i);
 
-        eo_nvscfg_ondevice_PushBackEndpoint(nvscfg, 0, epcfg->endpoint,
-                                        epcfg->hashfunction_id2index,
-                                        epcfg->constvector_of_treenodes_EOnv_con,
-                                        epcfg->constvector_of_EOnv_usr,
-                                        epcfg->sizeof_endpoint_data, 
-                                        epcfg->endpoint_data_init,
-                                        NULL);
+//         eo_nvscfg_ondevice_PushBackEndpoint(nvscfg, 0, epcfg->endpoint,
+//                                         epcfg->hashfunction_id2index,
+//                                         epcfg->constvector_of_treenodes_EOnv_con,
+//                                         epcfg->constvector_of_EOnv_usr,
+//                                         epcfg->sizeof_endpoint_data, 
+//                                         epcfg->endpoint_data_init,
+//                                         NULL);
+
+        eo_nvscfg_ondevice_PushBackEP(nvscfg, 0, epcfg, NULL);        
+        
     }
     
     eo_nvscfg_data_Initialise(nvscfg);

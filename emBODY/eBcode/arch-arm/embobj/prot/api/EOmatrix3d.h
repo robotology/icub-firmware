@@ -20,6 +20,9 @@
 #ifndef _EOMATRIX3D_H_
 #define _EOMATRIX3D_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOmatrix3d.h
     @brief      This header file implements public interface to a matrix3d object.
@@ -66,10 +69,10 @@ typedef struct EOmatrix3d_hid EOmatrix3d;
 // - declaration of extern public functions ---------------------------------------------------------------------------
  
  
-/** @fn         extern EOmatrix3d* eo_matrix3d_New(uint8_t sizeofitem, uint8_t capacity1)
+/** @fn         extern EOmatrix3d* eo_matrix3d_New(uint16_t sizeofitem, uint16_t capacity1)
     @brief      creates a 3d matrix able to accept items of @e sizeitems
  **/
-extern EOmatrix3d* eo_matrix3d_New(uint8_t sizeofitem, uint8_t capacity1);
+extern EOmatrix3d* eo_matrix3d_New(uint16_t sizeofitem, uint16_t capacity1);
 
 
 /** @fn         extern eOresult_t eo_matrix3d_Reset(EOmatrix3d *t)
@@ -77,28 +80,28 @@ extern EOmatrix3d* eo_matrix3d_New(uint8_t sizeofitem, uint8_t capacity1);
     @param      p               The pointer to the matrix3d object.
     @return     eores_OK upon success, eores_NOK_nullpointer if p is NULL
  **/
-extern eOresult_t eo_matrix3d_Level1_PushBack(EOmatrix3d *p, uint8_t capacity2);
+extern eOresult_t eo_matrix3d_Level1_PushBack(EOmatrix3d *p, uint16_t capacity2);
 
 
-extern eOresult_t eo_matrix3d_Level2_PushBack(EOmatrix3d *p, uint8_t onindex1, uint8_t capacity3);
+extern eOresult_t eo_matrix3d_Level2_PushBack(EOmatrix3d *p, uint16_t onindex1, uint16_t capacity3);
 
-extern eOresult_t eo_matrix3d_Level3_PushBack(EOmatrix3d *p, uint8_t onindex1, uint8_t onindex2, void *pitem);
+extern eOresult_t eo_matrix3d_Level3_PushBack(EOmatrix3d *p, uint16_t onindex1, uint16_t onindex2, void *pitem);
 
-extern void* eo_matrix3d_At(EOmatrix3d *p, uint8_t i1, uint8_t i2, uint8_t i3);
+extern void* eo_matrix3d_At(EOmatrix3d *p, uint16_t i1, uint16_t i2, uint16_t i3);
 
-extern uint8_t eo_matrix3d_ItemSize(EOmatrix3d *p);
+extern uint16_t eo_matrix3d_ItemSize(EOmatrix3d *p);
 
-extern uint8_t eo_matrix3d_Level1_Capacity(EOmatrix3d *p);
-extern uint8_t eo_matrix3d_Level2_Capacity(EOmatrix3d *p, uint8_t onindex1);
-extern uint8_t eo_matrix3d_Level3_Capacity(EOmatrix3d *p, uint8_t onindex1, uint8_t onindex2);
+extern uint16_t eo_matrix3d_Level1_Capacity(EOmatrix3d *p);
+extern uint16_t eo_matrix3d_Level2_Capacity(EOmatrix3d *p, uint16_t onindex1);
+extern uint16_t eo_matrix3d_Level3_Capacity(EOmatrix3d *p, uint16_t onindex1, uint16_t onindex2);
 
-extern uint8_t eo_matrix3d_Level1_Size(EOmatrix3d *p);
-extern uint8_t eo_matrix3d_Level2_Size(EOmatrix3d *p, uint8_t onindex1);
-extern uint8_t eo_matrix3d_Level3_Size(EOmatrix3d *p, uint8_t onindex1, uint8_t onindex2);
+extern uint16_t eo_matrix3d_Level1_Size(EOmatrix3d *p);
+extern uint16_t eo_matrix3d_Level2_Size(EOmatrix3d *p, uint16_t onindex1);
+extern uint16_t eo_matrix3d_Level3_Size(EOmatrix3d *p, uint16_t onindex1, uint16_t onindex2);
 
 
 
-extern void* eo_matrix3d_At(EOmatrix3d *p, uint8_t i1, uint8_t i2, uint8_t i3);
+extern void* eo_matrix3d_At(EOmatrix3d *p, uint16_t i1, uint16_t i2, uint16_t i3);
  
 
  
@@ -107,6 +110,10 @@ extern void* eo_matrix3d_At(EOmatrix3d *p, uint8_t i1, uint8_t i2, uint8_t i3);
 /** @}            
     end of group eo_matrix3d  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

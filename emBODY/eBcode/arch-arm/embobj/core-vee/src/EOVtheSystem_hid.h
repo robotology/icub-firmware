@@ -20,6 +20,9 @@
 #ifndef _EOVTHESYSTEM_HID_H_
 #define _EOVTHESYSTEM_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOVtheSystem_hid.h
     @brief      This header file implements hidden interface to the base timer manager singleton.
@@ -108,7 +111,11 @@ extern EOVtheSystem * eov_sys_hid_Initialise(const eOmempool_cfg_t *mpcfg,
  **/
 extern eOpurevirtual eOresult_t eov_sys_hid_Start(EOVtheSystem *p, void (*init_fn)(void));
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

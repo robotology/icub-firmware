@@ -20,6 +20,9 @@
 #ifndef _EOMMUTEX_H_
 #define _EOMMUTEX_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOMmutex.h
     @brief      This header file implements public interface to a multitasking mutex.
@@ -104,6 +107,10 @@ extern eOresult_t eom_mutex_Release(EOMmutex *const m);
 /** @}            
     end of group eom_mutex  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

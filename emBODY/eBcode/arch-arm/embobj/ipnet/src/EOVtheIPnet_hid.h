@@ -20,6 +20,9 @@
 #ifndef _EOVTHEIPNET_HID_H_
 #define _EOVTHEIPNET_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOVtheIPNet_hid.h
     @brief      This header file implements hidden interface to the base IP net singleton.
@@ -109,7 +112,11 @@ extern EOVtheIPnet * eov_ipnet_hid_Initialise(uint8_t maxdgramsocks, EOVmutexDer
 
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

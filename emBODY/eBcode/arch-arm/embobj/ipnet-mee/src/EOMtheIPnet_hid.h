@@ -20,6 +20,9 @@
 #ifndef _EOMTHEIPNET_HID_H_
 #define _EOMTHEIPNET_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOMtheIPnet_hid.h
     @brief      This header file implements hidden interface to the rtos IP net singleton.
@@ -102,7 +105,11 @@ void eom_ipnettick(void *p);
 
 void eom_ipnetproc(void *p);
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

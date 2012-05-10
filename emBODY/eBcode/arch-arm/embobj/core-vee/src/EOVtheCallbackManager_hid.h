@@ -20,6 +20,9 @@
 #ifndef _EOVTHECALLBACKMANAGER_HID_H_
 #define _EOVTHECALLBACKMANAGER_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file       EOVtheCallbackManager_hid.h
     @brief      This header file implements hidden interface to the base timer manager singleton.
@@ -82,7 +85,11 @@ extern EOVtheCallbackManager * eov_callbackman_hid_Initialise(eOres_fp_vcbkmanp_
 
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

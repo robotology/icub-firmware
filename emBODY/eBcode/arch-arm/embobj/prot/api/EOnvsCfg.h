@@ -20,7 +20,9 @@
 #ifndef _EONVSCFG_H_
 #define _EONVSCFG_H_
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       EOnvsCfg.h
     @brief      This header file implements public interface to the configuration of netvars.
@@ -83,14 +85,15 @@ typedef enum
 
 
 
-typedef struct                  // size is 16 bytes
+typedef struct                      // size is 24 bytes
 {
-    eOnvEP_t                    endpoint;
-    uint16_t                    sizeof_endpoint_data;
-    eOuint16_fp_uint16_t        hashfunction_id2index;
-    const EOconstvector* const  constvector_of_treenodes_EOnv_con;
-    const EOconstvector* const  constvector_of_EOnv_usr;
-    eOvoid_fp_voidp_voidp_t     endpoint_data_init;
+    eOnvEP_t                        endpoint;
+    uint16_t                        sizeof_endpoint_data;
+    eOuint16_fp_uint16_t            hashfunction_id2index;
+    const EOconstvector* const      constvector_of_treenodes_EOnv_con;
+    const EOconstvector* const      constvector_of_EOnv_usr;
+    eOvoid_fp_uint16_voidp_voidp_t  endpoint_data_init;
+    eOvoid_fp_uint16_voidp_voidp_t  endpoint_data_retrieve;
 } eOnvscfg_EP_t;
 
     
@@ -107,9 +110,11 @@ extern EOnvsCfg* eo_nvscfg_New(uint16_t ndevices, EOVstorageDerived* stg);
 extern eOresult_t eo_nvscfg_PushBackDevice(EOnvsCfg* p, eOnvscfgOwnership_t ownership, eOipv4addr_t ipaddress, eOuint16_fp_uint16_t hashfn_ep2index, uint16_t nendpoints);
 
 
-extern uint8_t eo_nvscfg_GetIndexOfLocalDevice(EOnvsCfg* p);
+extern uint16_t eo_nvscfg_GetIndexOfLocalDevice(EOnvsCfg* p);
 
-extern eOresult_t eo_nvscfg_ondevice_PushBackEndpoint(EOnvsCfg* p, uint8_t ondevindex, eOnvEP_t endpoint, eOuint16_fp_uint16_t hashfn_id2index, const EOconstvector* treeofnvs_con, const EOconstvector* datanvs_usr, uint32_t datanvs_size, eOvoid_fp_voidp_voidp_t datanvs_init, EOVmutexDerived* mtx);
+//extern eOresult_t eo_nvscfg_ondevice_PushBackEndpoint(EOnvsCfg* p, uint16_t ondevindex, eOnvEP_t endpoint, eOuint16_fp_uint16_t hashfn_id2index, const EOconstvector* treeofnvs_con, const EOconstvector* datanvs_usr, uint32_t datanvs_size, eOvoid_fp_uint16_voidp_voidp_t datanvs_init, EOVmutexDerived* mtx);
+
+extern eOresult_t eo_nvscfg_ondevice_PushBackEP(EOnvsCfg* p, uint16_t ondevindex, eOnvscfg_EP_t *cfgofep, EOVmutexDerived* mtx);
 
 
 extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p);
@@ -119,20 +124,24 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p);
 
 
 extern eOresult_t eo_nvscfg_GetIndices(EOnvsCfg* p, 
-                                    eOipv4addr_t ip, eOnvEP_t ep, eOnvID_t id, 
-                                    uint8_t *ipindex, uint8_t *epindex, uint8_t *idindex); 
+                                        eOipv4addr_t ip, eOnvEP_t ep, eOnvID_t id, 
+                                        uint16_t *ipindex, uint16_t *epindex, uint16_t *idindex); 
 
 
-extern EOtreenode* eo_nvscfg_GetTreeNode(EOnvsCfg* p, uint8_t ondevindex, uint8_t onendpointindex, uint8_t onidindex);
+extern EOtreenode* eo_nvscfg_GetTreeNode(EOnvsCfg* p, uint16_t ondevindex, uint16_t onendpointindex, uint16_t onidindex);
 
 
-extern EOnv* eo_nvscfg_GetNV(EOnvsCfg* p, uint8_t ondevindex, uint8_t onendpointindex, uint8_t onidindex, EOtreenode* treenode, EOnv* nvtarget);
+extern EOnv* eo_nvscfg_GetNV(EOnvsCfg* p, uint16_t ondevindex, uint16_t onendpointindex, uint16_t onidindex, EOtreenode* treenode, EOnv* nvtarget);
 
 
 
 /** @}            
     end of group eo_nv 
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 
