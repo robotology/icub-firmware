@@ -369,8 +369,6 @@ static void s_callback_button_1(void)
 	EOarray *ropsigcfgassign;
     eOropSIGcfg_t sigcfg;
 
-
-
     snprintf(str, sizeof(str)-1, "called set<regulars>");
     hal_trace_puts(str);
 
@@ -441,16 +439,8 @@ static void s_callback_button_1(void)
 
     transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mngmnt, nvid_ropsigcfgassign);
 
-//    if(1 == reset)
-    {
- //       printf( "added a set<__upto10rop2signal, empty-list>");
-    }
-//    else
-    {
-        printf("added a set<__upto10rop2signal, list>");
-    }
+    printf("added a set<__upto10rop2signal, list>");
 
-//    reset = (0==reset) ? (1) : (0);
 }
 
 
@@ -458,6 +448,7 @@ static void s_callback_button_2(void )
 {
 	char str[128];
 	EOnv 		*nvRoot;
+	eOresult_t res;
 
 	//--
 	eo_cfg_nvsEP_mc_endpoint_t ep = endpoint_mc_leftlowerleg;
@@ -480,7 +471,8 @@ static void s_callback_button_2(void )
     jData.minpositionofjoint			= 0x22333322;
 	jData.maxpositionofjoint			= 0x44555544,
     jData.controlmode					= 0x66;
-	eo_nv_remoteSet(nvRoot, &jData, eo_nv_upd_ifneeded);
+	if( eores_OK != eo_nv_Set(nvRoot, &jData, eobool_true, eo_nv_upd_dontdo))
+		printf("error!!");
 	// tell agent to prepare a rop to send
     transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
 
@@ -501,11 +493,12 @@ static void s_callback_button_2(void )
 	mData.pidcurrent.scale				= 0x66;
 	mData.maxvelocityofmotor			= 0x77888877;
 	mData.maxcurrentofmotor				= 0x9999;
-	eo_nv_remoteSet(nvRoot, &mData, eo_nv_upd_ifneeded);
+	if( eores_OK != eo_nv_Set(nvRoot, &mData, eobool_true, eo_nv_upd_dontdo))
+		printf("error!!");
 	// tell agent to prepare a rop to send
 	transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
 
-	snprintf(str, sizeof(str)-1, "called set motort and joint config, index %d\n", j);
+	snprintf(str, sizeof(str)-1, "called set motor and joint config, index %d\n", j);
 }
 
 static void s_callback_button_3(void )
@@ -523,8 +516,9 @@ static void s_callback_button_3(void )
     eOnvID_t nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, j, jNVindex);
     nvRoot = transceiver->getNVhandler(ep, nvid);
 	// Set-up new value
-	jDataPos					= 0x44555544,
-	eo_nv_remoteSet(nvRoot, &jDataPos, eo_nv_upd_ifneeded);
+    jDataPos					= 0x44556677;
+    if( eores_OK != eo_nv_Set(nvRoot, &jDataPos, eobool_true, eo_nv_upd_dontdo))
+    	printf("error!!");
 	// tell agent to prepare a rop to send
     transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
 
@@ -536,10 +530,11 @@ static void s_callback_button_3(void )
 	// get nvid from parameters
     nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(ep, j2, jNVindex2);
     nvRoot = transceiver->getNVhandler(ep, nvid);
-	// Set-up new value
-	jDataPos					= 0xC1A0DAAC,
-	eo_nv_remoteSet(nvRoot, &jDataPos, eo_nv_upd_ifneeded);
-	// tell agent to prepare a rop to send
+    // Set-up new value
+    jDataPos					= 0xC1A0DAAC;
+    if( eores_OK != eo_nv_Set(nvRoot, &jDataPos, eobool_true, eo_nv_upd_dontdo))
+    	printf("error!!");
+    // tell agent to prepare a rop to send
     transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
 
 	snprintf(str, sizeof(str)-1, "called set jointNVindex_jconfig__maxpositionofjoint\n");
