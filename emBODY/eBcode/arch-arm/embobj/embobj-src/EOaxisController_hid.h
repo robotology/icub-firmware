@@ -3,6 +3,9 @@
 #ifndef _EOMOTORCONTROLLER_HID_H_
 #define _EOMOTORCONTROLLER_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* @file        EOtrajectory_hid.h
     @brief      This header file implements hidden interface to motor minumum jerk trajectory generation.
@@ -82,6 +85,9 @@ struct EOaxisController_hid
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include guard
 

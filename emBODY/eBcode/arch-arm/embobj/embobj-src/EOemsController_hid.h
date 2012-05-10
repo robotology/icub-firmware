@@ -3,6 +3,9 @@
 #ifndef _EOEMSCONTROLLER_HID_H_
 #define _EOEMSCONTROLLER_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*  @file       EOemsController_hid.h
     @brief      This header file implements hidden interface to motor-joint decoupling matrix.
@@ -56,6 +59,9 @@ struct EOemsController_hid
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include guard
 
