@@ -533,14 +533,14 @@ extern void eo_cfg_nvsEP_mc_lowerleg_usr_initialise(eOnvEP_t ep, void* loc, void
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-
+#ifdef _USE_VIRTUAL_FN_
 __weak extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
 {
     eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
     eo_cfg_nvsEP_mc_hid_INITIALISE(ep, loc, rem);
 }
-
+#endif
 
 // jxx-init:
 __weak extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_INIT_Jxx_jconfig(uint16_t xx, const EOnv* nv)
@@ -753,14 +753,14 @@ __weak extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_INIT_Jxx_jcmmnds__holder01FF
 
 
 // jxx-updt:
-
+#ifdef _USE_VIRTUAL_FN_
 __weak extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Jxx_jconfig(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
     eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
-
+#endif
 __weak extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Jxx_jconfig__pidposition(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
@@ -919,7 +919,6 @@ __weak extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Jxx_jinputs__holder04FF
     eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs__holder04FFU02((eo_cfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
-
 __weak extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Jxx_jcmmnds__calibration(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
@@ -1027,14 +1026,14 @@ __weak extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_INIT_Mxx_mstatus__chamaleon0
 
 // mxx-updt:
 
-
+#ifdef _USE_VIRTUAL_FN_
 __weak extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Mxx_mconfig(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
     eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig((eo_cfg_nvsEP_mc_motorNumber_t)xx, nv, time, sign);
 }
-
+#endif
 __weak extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Mxx_mconfig__pidcurrent(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
