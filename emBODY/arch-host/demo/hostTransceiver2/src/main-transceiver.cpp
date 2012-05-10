@@ -382,8 +382,8 @@ static void s_callback_button_1(void)
     eOnvID_t nvid_ropsigcfgassign = eo_cfg_nvsEP_mngmnt_NVID_Get(mngmntNVindex__ropsigcfgassign);
     cnv = transceiver->getNVhandler(endpoint_mngmnt, nvid_ropsigcfgassign);
     ropsigcfgassign = (EOarray*) cnv->loc;
-
-//    EOarray_of_18eOropSIGcfg *ropsigcfgassign;
+    ropsigcfgassign->head.capacity = NUMOFROPSIGCFG;
+    ropsigcfgassign->head.itemsize = sizeof(eOropSIGcfg_t);
 
     eo_array_Reset(ropsigcfgassign);
 	eOnvID_t nvid;
