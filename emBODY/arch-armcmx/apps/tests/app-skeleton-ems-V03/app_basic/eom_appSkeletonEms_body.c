@@ -353,8 +353,9 @@ static void s_eom_appSkeletonEms_body_TheSysController_init(void)
 {
     EOMappTheSysController_cfg_t cfg =
     {
-        EO_INIT(.ethmod_cfg)
-        {0}, //configured with memcpy
+        EO_INIT(.ethmod_cfg)                    {0}, //configured with memcpy
+
+        EO_INIT(.canSP_ptr)                     s_appCanSP_ptr, 
 
         EO_INIT(.sig2appDataCollector_start)
         {                                      

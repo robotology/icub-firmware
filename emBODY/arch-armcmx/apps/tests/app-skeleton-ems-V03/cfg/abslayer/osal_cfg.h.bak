@@ -82,7 +82,7 @@
 //   <i> Set the timer tick, the base of time for OSAL.
 //   <i> Default: 1000  (1ms)
 #ifndef OSAL_TICK
- #define OSAL_TICK        1000
+ #define OSAL_TICK        3000
 #endif
 
 
@@ -91,7 +91,7 @@
 //   <i> Set the stack size for launcher task.
 //   <i> Default: 128
 #ifndef OSAL_LAUNSTKSIZE
- #define OSAL_LAUNSTKSIZE     2048
+ #define OSAL_LAUNSTKSIZE     1024
 #endif
 
 //   <o> Stack size for idle task [bytes] <200-4096:8>
@@ -105,7 +105,7 @@
 //   <i> Define max. size in bytes of the global stack.
 //   <i> Default: 256  (only one task for instance)
 #ifndef OSAL_GLOBSTKSIZE
- #define OSAL_GLOBSTKSIZE    8196
+ #define OSAL_GLOBSTKSIZE    16384
 #endif
 
 
@@ -147,7 +147,7 @@
 //   <i> Define max number of timers.
 //   <i> Default: 0  (User timers disabled)
 #ifndef OSAL_TIMERNUM
- #define OSAL_TIMERNUM    4
+ #define OSAL_TIMERNUM    12
 #endif
 
 

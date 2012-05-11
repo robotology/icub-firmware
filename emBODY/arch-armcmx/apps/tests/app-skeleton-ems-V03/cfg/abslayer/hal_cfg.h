@@ -143,7 +143,7 @@
 
 //   <o> Max can frames in output buffer <1-16>
 //   <i> Default: 4
-#define HAL_CAN1_OUTBUFFCAPACITY     10
+#define HAL_CAN1_OUTBUFFCAPACITY     14
 
 
 // </e> CAN 0  
@@ -164,7 +164,7 @@
 
 //   <o> Max can frames in output buffer <1-16>
 //   <i> Default: 4
-#define HAL_CAN2_OUTBUFFCAPACITY     10
+#define HAL_CAN2_OUTBUFFCAPACITY     14
 
 
 // </e> CAN 2  
@@ -174,7 +174,7 @@
 // <i> SPI1 peripheral
 
 #ifndef HAL_SPI1_ENABLE
- #define HAL_SPI1_ENABLE  1     
+ #define HAL_SPI1_ENABLE  0     
 #endif
 
 //   <h> Nothing to configure in SPI1 part

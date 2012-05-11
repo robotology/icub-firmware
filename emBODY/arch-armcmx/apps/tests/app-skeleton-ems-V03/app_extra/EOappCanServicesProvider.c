@@ -630,7 +630,7 @@ extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOm
         return(res);
     }
 
-    // 2) set max velocity   
+    // 3) set max velocity   
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_MAX_VELOCITY;
     res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, (void*)&cfg->maxvelocityofmotor, &canFrame);
     if(eores_OK != res)
@@ -643,7 +643,7 @@ extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOm
         return(res);
     }
 
-    // 3) set current limit  
+    // 4) set current limit  
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_LIMIT;
     res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, (void*)&cfg->maxcurrentofmotor, &canFrame);
     if(eores_OK != res)
@@ -656,7 +656,8 @@ extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOm
         return(res);
     }
 
-    // 4) set perriodic msg contents  ??? DOVE PRENDO L'INFO
+
+    // 5) set perriodic msg contents  ??? DOVE PRENDO L'INFO
 //    res = eo_icubCanProto_formCanFrame4MotorBoard(ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_LIMIT, (void*)&cfg->maxcurrentofmotor,
 //                                                  boardAddr, axis, &canFrame);
 //    if(eores_OK != res)
@@ -670,7 +671,7 @@ extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOm
 //    }
 
 #warning: VALE-> manca il campo i2t in motor config!!!!
-    // 5) set i2t param      MANCANO!!!
+    // 6) set i2t param      MANCANO!!!
 //    res = eo_icubCanProto_formCanFrame4MotorBoard(ICUBCANPROTO_POL_MB_CMD__SET_I2T_PARAMS, (void*)&cfg->velocityshiftfactor,
 //                                                  boardAddr, axis, &canFrame);
 //    if(eores_OK != res)
@@ -685,6 +686,21 @@ extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOm
 
 
 //enable pwm and control loop
+
+    // 5) set pwm pad
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__ENABLE_PWM_PAD;
+    res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, NULL, &canFrame);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    res = (eOresult_t)hal_can_put((hal_can_port_t)canLoc.emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+
     // 6) set controller run
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;
     res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, NULL, &canFrame);
@@ -698,20 +714,20 @@ extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOm
         return(res);
     }
 
-    // 7) set pwm pad
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__ENABLE_PWM_PAD;
-    res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, NULL, &canFrame);
-    if(eores_OK != res)
-    {
-        return(res);
-    }
-    res = (eOresult_t)hal_can_put((hal_can_port_t)canLoc.emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now);
-    if(eores_OK != res)
-    {
-        return(res);
-    }
+//#warning aggiunto un messaggio x test!!!    
+//    // 7) set controller run
+//    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__DISABLE_PWM_PAD;
+//    res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, NULL, &canFrame);
+//    if(eores_OK != res)
+//    {
+//        return(res);
+//    }
+//    res = (eOresult_t)hal_can_put((hal_can_port_t)canLoc.emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now);
+//    if(eores_OK != res)
+//    {
+//        return(res);
+//    }
 
-    return(eores_OK);
 }
 
 

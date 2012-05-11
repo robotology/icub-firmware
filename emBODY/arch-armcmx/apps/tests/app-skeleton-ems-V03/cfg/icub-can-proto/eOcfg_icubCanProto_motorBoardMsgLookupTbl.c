@@ -631,6 +631,17 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_former(EOicubC
             res = eo_icubCanProto_former_pol_mb_cmd__calibrateEncoder(p, nv_ptr, dest, canFrame);
         }break;
 
+        case ICUBCANPROTO_POL_MB_CMD__ENABLE_PWM_PAD:  /* 5 */
+        {
+            res = eo_icubCanProto_former_pol_mb_cmd__enablePwmPad(p, nv_ptr, dest, canFrame);
+        }break;
+
+        case ICUBCANPROTO_POL_MB_CMD__DISABLE_PWM_PAD:  /* 6 */
+        {
+            res = eo_icubCanProto_former_pol_mb_cmd__disablePwmPad(p, nv_ptr, dest, canFrame);
+        }break;
+
+
         case ICUBCANPROTO_POL_MB_CMD__GET_CONTROL_MODE:  /* 7 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__getControlMode(p, nv_ptr, dest, canFrame);

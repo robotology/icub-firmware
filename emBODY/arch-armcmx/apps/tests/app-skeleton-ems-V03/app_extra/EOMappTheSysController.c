@@ -353,9 +353,12 @@ static void s_eom_appTheSysController_recDgram_mng(EOMappTheSysController *p)
         {
             if(eOm_appTheSysController_st__inited == p->st)
             {
-                p->st = eOm_appTheSysController_st__configured;
                 res = s_eom_appTheSysController_confugureSystem(p);
-            }
+                if(eores_OK == res)
+                {
+                    p->st = eOm_appTheSysController_st__configured;
+                }
+           }
             p->st = eOm_appTheSysController_st__configured;
         }break;
 
@@ -391,7 +394,23 @@ static void s_eom_appTheSysController_recDgram_mng(EOMappTheSysController *p)
 static eOresult_t s_eom_appTheSysController_confugureSystem(EOMappTheSysController *p)
 {
     eOmc_motorId_t mId = 0;
-    eOmc_motor_config_t cfg;
+    eOmc_motor_config_t cfg =
+    { 
+        EO_INIT(.pidcurrent)
+        {
+            EO_INIT(.kp)                    0x1111,
+            EO_INIT(.ki)                    0x2222,
+            EO_INIT(.kd)                    0x3333,
+            EO_INIT(.limitonintegral)       0X4444,
+            EO_INIT(.limitonoutput)         0x5555,
+            EO_INIT(.scale)                 0x0,
+            EO_INIT(.offset)                0x6666,
+            EO_INIT(.filler03)              {0xf1, 0xf2, 0xf3}
+        },
+        EO_INIT(.maxvelocityofmotor)        0xAA,
+        EO_INIT(.maxcurrentofmotor)         0xBB,
+        EO_INIT(.des02FORmstatuschamaleon04)   {0}
+    };
 
 #warning X ALE --> set static motor config  in cfg var
 

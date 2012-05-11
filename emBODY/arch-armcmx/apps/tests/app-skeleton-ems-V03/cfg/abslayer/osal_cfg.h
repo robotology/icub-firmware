@@ -140,7 +140,7 @@
 //   <i> Maximum number of tasks that will run at the same time.
 //   <i> Default: 6
 #ifndef OSAL_TASKNUM
- #define OSAL_TASKNUM     8
+ #define OSAL_TASKNUM     14
 #endif
 
 //   <o> Number of timers <0-250>
@@ -155,7 +155,7 @@
 //   <i> Define max. number of mutexes that will run at the same time.
 //   <i> Default: 0  (Mutexes not enabled)
 #ifndef OSAL_MUTEXNUM
- #define OSAL_MUTEXNUM    8
+ #define OSAL_MUTEXNUM    25
 #endif
 
 
@@ -171,7 +171,7 @@
 //   <i> Define max. number of message queues that that will run at the same time.
 //   <i> Default: 0  (Message queues not enabled)
 #ifndef OSAL_MQUEUENUM
- #define OSAL_MQUEUENUM    8
+ #define OSAL_MQUEUENUM    9
 #endif
 
 //   <o> Total number of messages in message queues <0-1000>
