@@ -7,7 +7,7 @@ echo == installing embobj ...
 set DEST_ROOT=..\..\..\..\any-arch\sys\embobj
 
 
-set TYPES=(core core-mee core-see core-nee core-vee env gpio gpio-mee ipnet ipnet-mee others prot utils)
+set TYPES=(core core-mee core-see core-nee core-vee env gpio gpio-mee icub-ems ipnet ipnet-mee mc others prot utils)
 
 set OTHERS=(icub icub-nvscfg-as icub-nvscfg-mn icub-nvscfg-mc icub-nvscfg-sk icub-nvscfg-eps)
 
