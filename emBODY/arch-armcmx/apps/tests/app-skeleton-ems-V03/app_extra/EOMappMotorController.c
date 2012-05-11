@@ -40,6 +40,7 @@
 //embobj
 #include "EOtheMemoryPool.h"
 #include "EOtheErrorManager.h"
+#include "EOemsController.h"
 //#include "EOMtask_hid.h"
 
 // application
@@ -77,7 +78,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
-
+int16_t pwm_out = 0.0f;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -221,13 +222,17 @@ static void s_eom_appMotorController_taskStartup(EOMtask *tsk, uint32_t t)
 
     eo_errman_Assert(eo_errman_GetHandle(), NULL != p, s_eobj_ownname, "extdata() is NULL");
 
-    s_eom_appMotorController_PIDresetVal();
-
+    // ALE
+    eo_emsController_Init(1, EMS_GENERIC);
 }
+
+
 
 static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
 {
+    float *pwm;
     eOevent_t evt;
+    uint32_t encoders_values[6];
 
     EOMappMotorController *p = (EOMappMotorController*)eom_task_GetExternalData(tsk);
 
@@ -235,8 +240,14 @@ static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
 
     if(EVT_CHECK(evt, EVT_CALC_START))
     {
+    // ALE
+        eo_appEncReader_getValues(p->cfg.encReader, encoders_values);
+        
+        eo_emsController_ReadEncoder(0, (encoders_values[0]>>6)&0x0FFF);
         /* 1) calcolo pid */
-        s_eom_appMotorController_PIDcalc();
+        pwm = eo_emsController_PWM();
+
+        pwm_out = (int16_t)pwm[0];
 
         /* 2) resetto il mio stato */
         p->st = eOm_appMotorController_st__active;

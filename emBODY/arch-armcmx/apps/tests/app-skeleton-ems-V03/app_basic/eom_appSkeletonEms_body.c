@@ -415,6 +415,7 @@ static void s_eom_appSkeletonEms_body_appMotorController_init(void)
 {
     EOMappMotorController_cfg_t cfg =
     {
+        EO_INIT(.encReader)                 s_appEncReader_ptr,
         EO_INIT(.sig2appDataTransmitter)
         {                                      
             EO_INIT(.fn)                    s_eom_appSkeletonEms_body_sig2appDataTransmitter,

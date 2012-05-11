@@ -1050,6 +1050,36 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>eo-motioncontrol</GroupName>
+          <Files>
+            <File>
+              <FileName>EOaxisController.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOaxisController.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOdecoupler.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOdecoupler.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOemsController.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOemsController.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOpid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOpid.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtrajectory.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOtrajectory.c</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -2057,6 +2087,36 @@
               <FileName>EOVcanProto.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOVcanProto.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-motioncontrol</GroupName>
+          <Files>
+            <File>
+              <FileName>EOaxisController.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOaxisController.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOdecoupler.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOdecoupler.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOemsController.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOemsController.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOpid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOpid.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtrajectory.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOtrajectory.c</FilePath>
             </File>
           </Files>
         </Group>

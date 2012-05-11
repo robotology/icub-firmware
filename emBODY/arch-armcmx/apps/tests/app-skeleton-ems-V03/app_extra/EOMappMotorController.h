@@ -42,6 +42,7 @@
 
 //embobj
 #include "Eocommon.h"
+#include "EOappEncodersReader.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -53,7 +54,8 @@ typedef struct EOMappMotorController_hid EOMappMotorController;
 
 
 typedef struct
-{    
+{
+    EOappEncReader              *encReader;    
     eOcallbackData_t            sig2appDataTransmitter;
 } EOMappMotorController_cfg_t;
     

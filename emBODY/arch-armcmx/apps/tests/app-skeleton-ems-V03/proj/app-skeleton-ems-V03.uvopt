@@ -533,25 +533,25 @@
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>1</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <FileNumber>1</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>26</ColumnNumber>
+      <ColumnNumber>63</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>365</TopLine>
-      <CurrentLine>379</CurrentLine>
+      <TopLine>414</TopLine>
+      <CurrentLine>418</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_basic\eom_appSkeletonEms_body.c</PathWithFileName>
       <FilenameWithoutPath>eom_appSkeletonEms_body.c</FilenameWithoutPath>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <FileNumber>2</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>27</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -561,11 +561,11 @@
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <FileNumber>3</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>1</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -577,40 +577,40 @@
 
   <Group>
     <GroupName>app-extra</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>4</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>81</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>596</TopLine>
+      <CurrentLine>609</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOappCanServicesProvider.c</PathWithFileName>
       <FilenameWithoutPath>EOappCanServicesProvider.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>5</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>51</ColumnNumber>
+      <ColumnNumber>19</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>76</TopLine>
-      <CurrentLine>94</CurrentLine>
+      <TopLine>136</TopLine>
+      <CurrentLine>142</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOappEncodersReader.c</PathWithFileName>
       <FilenameWithoutPath>EOappEncodersReader.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>6</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -623,8 +623,8 @@
       <FilenameWithoutPath>EOappTheNVmapRef.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>7</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -637,57 +637,57 @@
       <FilenameWithoutPath>EOethBaseModule.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>8</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>18</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>97</TopLine>
+      <CurrentLine>108</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOMappDataCollector.c</PathWithFileName>
       <FilenameWithoutPath>EOMappDataCollector.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>9</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>22</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>209</TopLine>
+      <CurrentLine>229</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOMappDataTransmitter.c</PathWithFileName>
       <FilenameWithoutPath>EOMappDataTransmitter.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>10</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>69</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>243</TopLine>
+      <CurrentLine>243</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOMappMotorController.c</PathWithFileName>
       <FilenameWithoutPath>EOMappMotorController.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>11</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>33</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>109</TopLine>
-      <CurrentLine>120</CurrentLine>
+      <TopLine>381</TopLine>
+      <CurrentLine>391</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOMappTheSysController.c</PathWithFileName>
       <FilenameWithoutPath>EOMappTheSysController.c</FilenameWithoutPath>
@@ -700,8 +700,8 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>3</GroupNumber>
+      <FileNumber>12</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -714,15 +714,15 @@
       <FilenameWithoutPath>app_cfg.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>3</GroupNumber>
+      <FileNumber>13</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>23</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>109</TopLine>
-      <CurrentLine>109</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\cfg\app\app_cfg.h</PathWithFileName>
       <FilenameWithoutPath>app_cfg.h</FilenameWithoutPath>
@@ -735,8 +735,8 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>5</FileNumber>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>14</FileNumber>
       <FileType>4</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -749,8 +749,8 @@
       <FilenameWithoutPath>osal.cm3.lib</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>6</FileNumber>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>15</FileNumber>
       <FileType>4</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -763,8 +763,8 @@
       <FilenameWithoutPath>hal.stm32f1.mcbstm32c.lib</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>7</FileNumber>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>16</FileNumber>
       <FileType>4</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -777,8 +777,8 @@
       <FilenameWithoutPath>hal.stm32f1.ems001.lib</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>8</FileNumber>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>17</FileNumber>
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -791,8 +791,8 @@
       <FilenameWithoutPath>hal_stm32f1_startup.s</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>9</FileNumber>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>18</FileNumber>
       <FileType>4</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -805,8 +805,8 @@
       <FilenameWithoutPath>ipal.base.medium.lib</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>10</FileNumber>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>19</FileNumber>
       <FileType>4</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -826,12 +826,12 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>5</GroupNumber>
+      <FileNumber>20</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>22</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -840,8 +840,8 @@
       <FilenameWithoutPath>hal_cfg.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>5</GroupNumber>
+      <FileNumber>21</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -854,8 +854,8 @@
       <FilenameWithoutPath>ipal_cfg.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>5</GroupNumber>
+      <FileNumber>22</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -868,8 +868,8 @@
       <FilenameWithoutPath>osal_cfg.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>5</GroupNumber>
+      <FileNumber>23</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -882,8 +882,8 @@
       <FilenameWithoutPath>hal_cfg.h</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>5</GroupNumber>
+      <FileNumber>24</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -896,8 +896,8 @@
       <FilenameWithoutPath>ipal_cfg.h</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>5</GroupNumber>
+      <FileNumber>25</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -917,8 +917,8 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>17</FileNumber>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>26</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -931,8 +931,8 @@
       <FilenameWithoutPath>EOaction.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>18</FileNumber>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>27</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -945,8 +945,8 @@
       <FilenameWithoutPath>EOarray.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>19</FileNumber>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>28</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -959,8 +959,8 @@
       <FilenameWithoutPath>EoCommon.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>20</FileNumber>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>29</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -973,8 +973,8 @@
       <FilenameWithoutPath>EOconstarray.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>21</FileNumber>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>30</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -987,8 +987,8 @@
       <FilenameWithoutPath>EOconstvector.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>22</FileNumber>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>31</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1001,8 +1001,8 @@
       <FilenameWithoutPath>EOdeque.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>23</FileNumber>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>32</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1015,8 +1015,8 @@
       <FilenameWithoutPath>EOfifo.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>24</FileNumber>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>33</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1029,8 +1029,8 @@
       <FilenameWithoutPath>EOfifoByte.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>25</FileNumber>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>34</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1043,8 +1043,8 @@
       <FilenameWithoutPath>EOfifoWord.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>26</FileNumber>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>35</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1057,8 +1057,8 @@
       <FilenameWithoutPath>EOlist.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>27</FileNumber>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>36</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1071,8 +1071,8 @@
       <FilenameWithoutPath>EOtheErrorManager.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>28</FileNumber>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>37</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1085,8 +1085,8 @@
       <FilenameWithoutPath>EOtheMemoryPool.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>29</FileNumber>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>38</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1099,8 +1099,8 @@
       <FilenameWithoutPath>EOtimer.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>30</FileNumber>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>39</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1113,8 +1113,8 @@
       <FilenameWithoutPath>EOvector.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>31</FileNumber>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>40</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1127,8 +1127,8 @@
       <FilenameWithoutPath>EOVmutex.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>32</FileNumber>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>41</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1141,8 +1141,8 @@
       <FilenameWithoutPath>EOVtask.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>33</FileNumber>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>42</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1155,8 +1155,8 @@
       <FilenameWithoutPath>EOVtheCallbackManager.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>34</FileNumber>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>43</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1169,8 +1169,8 @@
       <FilenameWithoutPath>EOVtheSystem.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>35</FileNumber>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>44</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1190,8 +1190,8 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>5</GroupNumber>
-      <FileNumber>36</FileNumber>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>45</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1204,8 +1204,8 @@
       <FilenameWithoutPath>EOMmutex.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>5</GroupNumber>
-      <FileNumber>37</FileNumber>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>46</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1218,8 +1218,8 @@
       <FilenameWithoutPath>EOMtask.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>5</GroupNumber>
-      <FileNumber>38</FileNumber>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>47</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1232,8 +1232,8 @@
       <FilenameWithoutPath>EOMtheCallbackManager.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>5</GroupNumber>
-      <FileNumber>39</FileNumber>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>48</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1246,8 +1246,8 @@
       <FilenameWithoutPath>EOMtheSystem.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>5</GroupNumber>
-      <FileNumber>40</FileNumber>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>49</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1267,8 +1267,8 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>6</GroupNumber>
-      <FileNumber>41</FileNumber>
+      <GroupNumber>8</GroupNumber>
+      <FileNumber>50</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1281,8 +1281,8 @@
       <FilenameWithoutPath>EOMtheIPnet.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>6</GroupNumber>
-      <FileNumber>42</FileNumber>
+      <GroupNumber>8</GroupNumber>
+      <FileNumber>51</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1295,8 +1295,8 @@
       <FilenameWithoutPath>EOpacket.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>6</GroupNumber>
-      <FileNumber>43</FileNumber>
+      <GroupNumber>8</GroupNumber>
+      <FileNumber>52</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1309,8 +1309,8 @@
       <FilenameWithoutPath>EOsocket.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>6</GroupNumber>
-      <FileNumber>44</FileNumber>
+      <GroupNumber>8</GroupNumber>
+      <FileNumber>53</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1323,8 +1323,8 @@
       <FilenameWithoutPath>EOsocketDatagram.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>6</GroupNumber>
-      <FileNumber>45</FileNumber>
+      <GroupNumber>8</GroupNumber>
+      <FileNumber>54</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1344,8 +1344,8 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>7</GroupNumber>
-      <FileNumber>46</FileNumber>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>55</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1358,8 +1358,8 @@
       <FilenameWithoutPath>EOtheARMenvironment.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>7</GroupNumber>
-      <FileNumber>47</FileNumber>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>56</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1372,8 +1372,8 @@
       <FilenameWithoutPath>EOVtheEnvironment.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>7</GroupNumber>
-      <FileNumber>48</FileNumber>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>57</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1386,8 +1386,8 @@
       <FilenameWithoutPath>eEcommon.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>7</GroupNumber>
-      <FileNumber>49</FileNumber>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>58</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1400,8 +1400,8 @@
       <FilenameWithoutPath>shalBASE.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>7</GroupNumber>
-      <FileNumber>50</FileNumber>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>59</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1414,8 +1414,8 @@
       <FilenameWithoutPath>shalINFO.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>7</GroupNumber>
-      <FileNumber>51</FileNumber>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>60</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1435,8 +1435,8 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>52</FileNumber>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>61</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1449,8 +1449,8 @@
       <FilenameWithoutPath>EOmatrix3d.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>53</FileNumber>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>62</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1463,8 +1463,8 @@
       <FilenameWithoutPath>EOnv.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>54</FileNumber>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>63</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1477,8 +1477,8 @@
       <FilenameWithoutPath>EOnvsCfg.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>55</FileNumber>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>64</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1491,8 +1491,8 @@
       <FilenameWithoutPath>EOreceiver.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>56</FileNumber>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>65</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1505,8 +1505,8 @@
       <FilenameWithoutPath>EOrop.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>57</FileNumber>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>66</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1519,8 +1519,8 @@
       <FilenameWithoutPath>EOropframe.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>58</FileNumber>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>67</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1533,8 +1533,8 @@
       <FilenameWithoutPath>EOstorageEEPROM.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>59</FileNumber>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>68</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1547,8 +1547,8 @@
       <FilenameWithoutPath>EOtheAgent.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>60</FileNumber>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>69</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1561,8 +1561,8 @@
       <FilenameWithoutPath>EOtheFormer.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>61</FileNumber>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>70</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1575,8 +1575,8 @@
       <FilenameWithoutPath>EOtheParser.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>62</FileNumber>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>71</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1589,8 +1589,8 @@
       <FilenameWithoutPath>EOtransceiver.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>63</FileNumber>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>72</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1603,8 +1603,8 @@
       <FilenameWithoutPath>EOtransmitter.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>64</FileNumber>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>73</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1617,8 +1617,8 @@
       <FilenameWithoutPath>EOtreenode.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>65</FileNumber>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>74</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1634,12 +1634,12 @@
 
   <Group>
     <GroupName>eo-nvs-board</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>9</GroupNumber>
-      <FileNumber>66</FileNumber>
+      <GroupNumber>11</GroupNumber>
+      <FileNumber>75</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1659,8 +1659,8 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>67</FileNumber>
+      <GroupNumber>12</GroupNumber>
+      <FileNumber>76</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1676,12 +1676,12 @@
 
   <Group>
     <GroupName>eo-nvs-cfg-ep-mn</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>11</GroupNumber>
-      <FileNumber>68</FileNumber>
+      <GroupNumber>13</GroupNumber>
+      <FileNumber>77</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1694,8 +1694,8 @@
       <FilenameWithoutPath>eOcfg_nvsEP_mn.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>11</GroupNumber>
-      <FileNumber>69</FileNumber>
+      <GroupNumber>13</GroupNumber>
+      <FileNumber>78</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1708,8 +1708,8 @@
       <FilenameWithoutPath>eOcfg_nvsEP_mngmnt_con.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>11</GroupNumber>
-      <FileNumber>70</FileNumber>
+      <GroupNumber>13</GroupNumber>
+      <FileNumber>79</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1729,8 +1729,8 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>12</GroupNumber>
-      <FileNumber>71</FileNumber>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>80</FileNumber>
       <FileType>4</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1750,22 +1750,22 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>13</GroupNumber>
-      <FileNumber>72</FileNumber>
+      <GroupNumber>15</GroupNumber>
+      <FileNumber>81</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>7</ColumnNumber>
+      <ColumnNumber>32</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>188</TopLine>
-      <CurrentLine>188</CurrentLine>
+      <CurrentLine>196</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_nvsEP_mc.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>13</GroupNumber>
-      <FileNumber>73</FileNumber>
+      <GroupNumber>15</GroupNumber>
+      <FileNumber>82</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1778,8 +1778,8 @@
       <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_bodypart.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>13</GroupNumber>
-      <FileNumber>74</FileNumber>
+      <GroupNumber>15</GroupNumber>
+      <FileNumber>83</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1792,8 +1792,8 @@
       <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_jxx.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>13</GroupNumber>
-      <FileNumber>75</FileNumber>
+      <GroupNumber>15</GroupNumber>
+      <FileNumber>84</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1806,8 +1806,8 @@
       <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_jxxdefault.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>13</GroupNumber>
-      <FileNumber>76</FileNumber>
+      <GroupNumber>15</GroupNumber>
+      <FileNumber>85</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1820,8 +1820,8 @@
       <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_mxx.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>13</GroupNumber>
-      <FileNumber>77</FileNumber>
+      <GroupNumber>15</GroupNumber>
+      <FileNumber>86</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1841,8 +1841,8 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>14</GroupNumber>
-      <FileNumber>78</FileNumber>
+      <GroupNumber>16</GroupNumber>
+      <FileNumber>87</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1855,8 +1855,8 @@
       <FilenameWithoutPath>eOcfg_nvsEP_mc_lowerleg_con.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>14</GroupNumber>
-      <FileNumber>79</FileNumber>
+      <GroupNumber>16</GroupNumber>
+      <FileNumber>88</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1876,12 +1876,12 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>15</GroupNumber>
-      <FileNumber>80</FileNumber>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>89</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>11</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -1890,12 +1890,12 @@
       <FilenameWithoutPath>eOcfg_nvsEP_mn_usrcbk_ebx.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>15</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>90</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>78</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -1911,8 +1911,8 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>18</GroupNumber>
+      <FileNumber>91</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1925,8 +1925,8 @@
       <FilenameWithoutPath>EOicubCanProto.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>18</GroupNumber>
+      <FileNumber>92</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1946,8 +1946,8 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>93</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1967,8 +1967,8 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>94</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -1981,22 +1981,22 @@
       <FilenameWithoutPath>eOcfg_icubCanProto_messagesLookupTbl.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>95</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>1046</TopLine>
+      <CurrentLine>1057</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\cfg\icub-can-proto\eOcfg_icubCanProto_motorBoardMsgFunctions.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_icubCanProto_motorBoardMsgFunctions.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>96</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2009,8 +2009,8 @@
       <FilenameWithoutPath>eOcfg_icubCanProto_motorBoardMsgLookupTbl.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>97</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2023,8 +2023,8 @@
       <FilenameWithoutPath>eOcfg_icubCanProto_sensorBoardMsgFunctions.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>98</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2037,8 +2037,8 @@
       <FilenameWithoutPath>eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>99</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2052,8 +2052,111 @@
     </File>
   </Group>
 
+  <Group>
+    <GroupName>eo-motioncontrol</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <File>
+      <GroupNumber>0</GroupNumber>
+      <FileNumber>0</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>1</TopLine>
+      <CurrentLine>1</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-src\EOaxisController.c</PathWithFileName>
+      <FilenameWithoutPath>EOaxisController.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>0</GroupNumber>
+      <FileNumber>0</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-src\EOdecoupler.c</PathWithFileName>
+      <FilenameWithoutPath>EOdecoupler.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>0</GroupNumber>
+      <FileNumber>0</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>1</TopLine>
+      <CurrentLine>1</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-src\EOemsController.c</PathWithFileName>
+      <FilenameWithoutPath>EOemsController.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>0</GroupNumber>
+      <FileNumber>0</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-src\EOpid.c</PathWithFileName>
+      <FilenameWithoutPath>EOpid.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>0</GroupNumber>
+      <FileNumber>0</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-src\EOtrajectory.c</PathWithFileName>
+      <FilenameWithoutPath>EOtrajectory.c</FilenameWithoutPath>
+    </File>
+  </Group>
+
   <AlienFiles>
-    <PathWithFilename>C:\firmware_repo\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V03\app_extra\EOMappTheSysController.h</PathWithFilename>
+    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V03\app_extra\EOappEncodersReader.h</PathWithFilename>
+    <TopLine>51</TopLine>
+    <CurrentLine>61</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V03\app_extra\EOMappTheSysController.h</PathWithFilename>
     <TopLine>53</TopLine>
     <CurrentLine>61</CurrentLine>
     <Constant>0</Constant>
@@ -2079,9 +2182,113 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>C:\firmware_repo\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V03\app_extra\EOappEncodersReader.h</PathWithFilename>
-    <TopLine>47</TopLine>
-    <CurrentLine>50</CurrentLine>
+    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-api\EOemsController.h</PathWithFilename>
+    <TopLine>73</TopLine>
+    <CurrentLine>96</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V03\app_extra\EOMappMotorController.h</PathWithFilename>
+    <TopLine>37</TopLine>
+    <CurrentLine>45</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V03\app_extra\EOMappMotorController_hid.h</PathWithFilename>
+    <TopLine>58</TopLine>
+    <CurrentLine>58</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\any-arch\sys\embobj\icub\api\EoMeasures.h</PathWithFilename>
+    <TopLine>106</TopLine>
+    <CurrentLine>106</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\any-arch\sys\embobj\icub\api\EoMotionControl.h</PathWithFilename>
+    <TopLine>361</TopLine>
+    <CurrentLine>379</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -2109,13 +2316,103 @@
     <ActiveMDIGroup>0</ActiveMDIGroup>
     <MDIGroup>
       <Size>100</Size>
-      <ActiveTab>1</ActiveTab>
+      <ActiveTab>3</ActiveTab>
       <Documents>
         <Doc>
+          <Name>..\app_extra\EOMappMotorController.h</Name>
+          <ColumnNumber>32</ColumnNumber>
+          <TopLine>37</TopLine>
+          <CurrentLine>45</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOMappMotorController.c</Name>
+          <ColumnNumber>69</ColumnNumber>
+          <TopLine>243</TopLine>
+          <CurrentLine>243</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\..\..\..\..\any-arch\sys\embobj\icub\api\EoMotionControl.h</Name>
+          <ColumnNumber>2</ColumnNumber>
+          <TopLine>361</TopLine>
+          <CurrentLine>379</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOappCanServicesProvider.c</Name>
+          <ColumnNumber>81</ColumnNumber>
+          <TopLine>596</TopLine>
+          <CurrentLine>609</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\..\..\..\..\any-arch\sys\embobj\icub\api\EoMeasures.h</Name>
+          <ColumnNumber>28</ColumnNumber>
+          <TopLine>106</TopLine>
+          <CurrentLine>106</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\cfg\icub-can-proto\eOcfg_icubCanProto_motorBoardMsgFunctions.c</Name>
+          <ColumnNumber>0</ColumnNumber>
+          <TopLine>1046</TopLine>
+          <CurrentLine>1057</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOMappDataTransmitter.c</Name>
+          <ColumnNumber>22</ColumnNumber>
+          <TopLine>209</TopLine>
+          <CurrentLine>229</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_basic\eom_appSkeletonEms_body.c</Name>
+          <ColumnNumber>63</ColumnNumber>
+          <TopLine>414</TopLine>
+          <CurrentLine>418</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOMappDataCollector.c</Name>
+          <ColumnNumber>0</ColumnNumber>
+          <TopLine>97</TopLine>
+          <CurrentLine>108</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOappEncodersReader.h</Name>
+          <ColumnNumber>44</ColumnNumber>
+          <TopLine>51</TopLine>
+          <CurrentLine>61</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOappEncodersReader.c</Name>
+          <ColumnNumber>19</ColumnNumber>
+          <TopLine>136</TopLine>
+          <CurrentLine>142</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOMappMotorController_hid.h</Name>
+          <ColumnNumber>0</ColumnNumber>
+          <TopLine>58</TopLine>
+          <CurrentLine>58</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\..\..\..\body\embobj\embobj\embobj-api\EOemsController.h</Name>
+          <ColumnNumber>67</ColumnNumber>
+          <TopLine>73</TopLine>
+          <CurrentLine>96</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\..\..\..\body\embobj\embobj\embobj-src\EOemsController.c</Name>
+          <ColumnNumber>0</ColumnNumber>
+          <TopLine>1</TopLine>
+          <CurrentLine>1</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\..\..\..\body\embobj\embobj\embobj-src\EOaxisController.c</Name>
+          <ColumnNumber>0</ColumnNumber>
+          <TopLine>1</TopLine>
+          <CurrentLine>1</CurrentLine>
+        </Doc>
+        <Doc>
           <Name>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc.c</Name>
-          <ColumnNumber>7</ColumnNumber>
+          <ColumnNumber>32</ColumnNumber>
           <TopLine>188</TopLine>
-          <CurrentLine>188</CurrentLine>
+          <CurrentLine>196</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\app_extra\EOappTheNVmapRef.c</Name>
@@ -2136,28 +2433,10 @@
           <CurrentLine>61</CurrentLine>
         </Doc>
         <Doc>
-          <Name>..\app_extra\EOappEncodersReader.h</Name>
-          <ColumnNumber>53</ColumnNumber>
-          <TopLine>47</TopLine>
-          <CurrentLine>50</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\app_extra\EOappEncodersReader.c</Name>
-          <ColumnNumber>51</ColumnNumber>
-          <TopLine>76</TopLine>
-          <CurrentLine>94</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\cfg\app\app_cfg.h</Name>
-          <ColumnNumber>23</ColumnNumber>
-          <TopLine>109</TopLine>
-          <CurrentLine>109</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\app_basic\eom_appSkeletonEms_body.c</Name>
-          <ColumnNumber>26</ColumnNumber>
-          <TopLine>365</TopLine>
-          <CurrentLine>379</CurrentLine>
+          <Name>..\app_extra\EOMappTheSysController.c</Name>
+          <ColumnNumber>33</ColumnNumber>
+          <TopLine>381</TopLine>
+          <CurrentLine>391</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\cfg\app\app_cfg.c</Name>
@@ -2166,10 +2445,10 @@
           <CurrentLine>24</CurrentLine>
         </Doc>
         <Doc>
-          <Name>..\app_extra\EOMappTheSysController.c</Name>
-          <ColumnNumber>0</ColumnNumber>
+          <Name>..\cfg\app\app_cfg.h</Name>
+          <ColumnNumber>23</ColumnNumber>
           <TopLine>109</TopLine>
-          <CurrentLine>120</CurrentLine>
+          <CurrentLine>109</CurrentLine>
         </Doc>
       </Documents>
     </MDIGroup>

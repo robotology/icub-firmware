@@ -80,6 +80,7 @@
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
 extern  uint32_t ena_tx_onrx;
+extern  int16_t pwm_out;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -220,10 +221,12 @@ static void s_eom_appDataTransmitter_taskRun(EOMtask *tsk, uint32_t evtmsgper)
         {
             EO_INIT(.current)
             {
-                EO_INIT(.value)     0xA1B1
+                EO_INIT(.value)     0
             }   
         }
     };
+
+    mySetPoint_current.to.current.value = pwm_out;
 
 
 
