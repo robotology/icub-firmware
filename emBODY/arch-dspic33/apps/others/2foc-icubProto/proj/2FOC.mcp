@@ -312,8 +312,8 @@ file_065=..\app\PID.inc
 file_066=..\app\pid2.inc
 file_067=..\app\SVGen.inc
 file_068=..\app\park.inc
-file_069=C:\Program Files (x86)\Microchip\mplabc30\v3.30c\lib\libq-coff.a
-file_070=C:\Program Files (x86)\Microchip\mplabc30\v3.30c\lib\libdsp-coff.a
+file_069=C:\Program Files\Microchip\mplabc30\v3.30c\lib\libq-coff.a
+file_070=C:\Program Files\Microchip\mplabc30\v3.30c\lib\libdsp-coff.a
 file_071=eElinkerscript_appl_2FOC.gld
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}

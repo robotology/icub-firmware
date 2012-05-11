@@ -60,9 +60,9 @@
 //   ENCODER_DHES, digital Hall effect sensors as encoder
 //   ENCODER_TLE, Infineon TLE5012 absolute magnetic GMR encoder
 // #define ENCODER_QE
-// #define ENCODER_ABS
+ #define ENCODER_ABS
 // #define ENCODER_AIE
- #define ENCODER_DHES
+// #define ENCODER_DHES
 // #define ENCODER_TLE
 
 
@@ -661,9 +661,9 @@
 // Enable ack. for CAN set commands
 // #define CAN_ACK_EACH_COMMAND
 //the board send a periodic msg on received set point current, in oreder to synchronize the communication
-//#define SYNC_2FOC_TO_EMS
+#define SYNC_2FOC_TO_EMS
 //this macro let you to work with 2foc without fault
-//#define NO_FAULT
+#define NO_FAULT
 //the ems send desired current in periodic message (the ems can send only one message for all 4 2FOC)
 //NOTE: if you use this mode, you must be sure that 2FOC can addres belong to [1, 4].
 //#define DESIRED_CURR_IN_PER_MSG_BY_EMS          

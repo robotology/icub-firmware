@@ -103,7 +103,7 @@ void CanIcubProtoParserParse(unsigned long rxid, unsigned char rxlen, tCanData *
         
         case ICUBPROTO_CLASS_PERIODIC_MOTORBOARD:
         {
-            command_ok = s_canIcubProtoParser_parse_periodicMsg(rxpayload, rxlen, &txpayload, &txlen);
+            command_ok = s_canIcubProtoParser_parse_periodicMsg(permsg_type, rxpayload, rxlen, &txpayload, &txlen);
         }break;
         
         case ICUBPROTO_CLASS_CANLOADER:
@@ -417,7 +417,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         
         case ICUBPROTO_POLLINGCMD_SET_CURRENT_PID: 
         {
-            tCanData auxpayload;
+            SFRAC16 pp, pi, pd;
             if(7 != rxlen)
             {   // incorrect number of parameters
                 *txlen = 0x1;
@@ -425,9 +425,11 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 return(0);
             }
 
-            memcpy(&auxpayload.b[0], &rxpayload->b[1], 6); //brutto da vedersi, ma dovrebbe funzionare
-            ControllerSetCurrentDPIDParm(auxpayload.w[0],auxpayload.w[1],auxpayload.w[2]);
-			ControllerSetCurrentQPIDParm(auxpayload.w[0],auxpayload.w[1],auxpayload.w[2]);
+            pp = (rxpayload->b[2] << 8 | rxpayload->b[1]);
+            pi = (rxpayload->b[4] << 8 | rxpayload->b[3]);
+            pd = (rxpayload->b[6] << 8 | rxpayload->b[5]); 
+            ControllerSetCurrentDPIDParm(pp,pi,pd);
+			ControllerSetCurrentQPIDParm(pp,pi,pd);
         }break;
         
         case ICUBPROTO_POLLINGCMD_GET_CURRENT_PID: 
@@ -450,7 +452,8 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         
         case ICUBPROTO_POLLINGCMD_SET_VELOCITY_PID: 
         {
-            tCanData auxpayload;
+            SFRAC16 pp, pi, pd;
+            
             if(7 != rxlen)
             {   // incorrect number of parameters
                 *txlen = 0x1;
@@ -458,8 +461,10 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 return(0);
             }
 
-            memcpy(&auxpayload.b[0], &rxpayload->b[1], 6); //brutto da vedersi, madovrebbe funzionare
-            ControllerSetWPIDParm(auxpayload.w[0], auxpayload.w[1], auxpayload.w[2]);
+            pp = (rxpayload->b[2] << 8 | rxpayload->b[1]);
+            pi = (rxpayload->b[4] << 8 | rxpayload->b[3]);
+            pd = (rxpayload->b[6] << 8 | rxpayload->b[5]); 
+            ControllerSetWPIDParm(pp,pi,pd);
         }break;
         
         case ICUBPROTO_POLLINGCMD_GET_VELOCITY_PID: 
@@ -478,7 +483,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             memcpy(&txpayload->b[5], &d, 2);
             *txlen = 0x7;
         }break;
-
+                
         case ICUBPROTO_POLLINGCMD_SET_DESIRED_CURRENT: 
         {
             if(5 != rxlen)
