@@ -72,7 +72,7 @@ __inline__ static void s_controlMode_setVelocity(void)
 static unsigned char canprotoparser_bid;
 
 static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned char rxlen, tCanData *txpayload, unsigned char *txlen);
-static int s_canIcubProtoParser_parse_periodicMsg(tCanData *rxpayload, unsigned char rxlen, tCanData *txpayload, unsigned char *txlen);
+static int s_canIcubProtoParser_parse_periodicMsg(unsigned char permsg_type, tCanData *rxpayload, unsigned char rxlen, tCanData *txpayload, unsigned char *txlen);
 static int s_canIcubProtoParser_parse_canLoaderMsg(tCanData *rxpayload, unsigned char rxlen, tCanData *txpayload, unsigned char *txlen);
 
 void CanIcubProtoParserInit(unsigned char bid)
@@ -86,12 +86,13 @@ void CanIcubProtoParserParse(unsigned long rxid, unsigned char rxlen, tCanData *
   int command_ok=1;
   unsigned char txlen = 0;
   unsigned char msg_class = 255;
-  unsigned char source;
+  unsigned char source, permsg_type;
   tCanData txpayload;
   unsigned long resp_id=0;
   
    msg_class = CAN_ICUBPROTO_STDID_GETCLASS(rxid);
    source = CAN_ICUBPROTO_STDID_RX_GETSOURCE(rxid);
+   permsg_type = CAN_ICUBPROTO_STDID_RX_GETPERMSGTYPE(rxid);
   
     switch(msg_class)
     {
@@ -414,7 +415,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             ; //todo da leggere dalla partizione giusta della eeprom
         }break;
         
-        case ICUBPROTO_POLLINGCMD_SET_CURRENT_PID_PARAM: 
+        case ICUBPROTO_POLLINGCMD_SET_CURRENT_PID: 
         {
             tCanData auxpayload;
             if(7 != rxlen)
@@ -429,7 +430,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 			ControllerSetCurrentQPIDParm(auxpayload.w[0],auxpayload.w[1],auxpayload.w[2]);
         }break;
         
-        case ICUBPROTO_POLLINGCMD_GET_CURRENT_PID_PARAM: 
+        case ICUBPROTO_POLLINGCMD_GET_CURRENT_PID: 
         {
             signed int p, i, d;
             if(1 != rxlen)
@@ -447,7 +448,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             *txlen = 0x7;   
         }break;
         
-        case ICUBPROTO_POLLINGCMD_SET_VELOCITY_PID_PARAM: 
+        case ICUBPROTO_POLLINGCMD_SET_VELOCITY_PID: 
         {
             tCanData auxpayload;
             if(7 != rxlen)
@@ -461,7 +462,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             ControllerSetWPIDParm(auxpayload.w[0], auxpayload.w[1], auxpayload.w[2]);
         }break;
         
-        case ICUBPROTO_POLLINGCMD_GET_VELOCITY_PID_PARAM: 
+        case ICUBPROTO_POLLINGCMD_GET_VELOCITY_PID: 
         {
             signed int p, i, d;
             if(1 != rxlen)
@@ -587,10 +588,38 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
     return(1);
 }
 
-static int s_canIcubProtoParser_parse_periodicMsg(tCanData *rxpayload, unsigned char rxlen, tCanData *txpayload, unsigned char *txlen)
+static int s_canIcubProtoParser_parse_periodicMsg(unsigned char permsg_type, tCanData *rxpayload, unsigned char rxlen, tCanData *txpayload, unsigned char *txlen)
 {
+#ifndef DESIRED_CURR_IN_PER_MSG_BY_EMS
     ICUBPROTO_PAYLOAD_ERROR_SET(txpayload, txlen, CAN_PROTO_ERROR_UNKNOWN_COMMAND);
-    return(0);    
+    return(0);
+#else
+    
+    switch(permsg_type)
+    {
+        case ICUBPROTO_PERIODICCMD_EMSTO2FOC_DESIRED_CURRENT:
+        {
+            if(canprotoparser_bid*2 > rxlen)
+            {
+                ICUBPROTO_PAYLOAD_ERROR_SET(txpayload, txlen, CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS);
+                return(0);
+            }
+             // Torque control references
+            CtrlReferences.qIqRef = rxpayload->w[canprotoparser_bid]; 
+#ifdef SYNC_2FOC_TO_EMS
+            CanIcubProtoTrasmitterSendPeriodicData();          
+#endif   
+        }break;
+       
+        default:
+        {
+            ICUBPROTO_PAYLOAD_ERROR_SET(txpayload, txlen, CAN_PROTO_ERROR_UNKNOWN_COMMAND);
+            return(0);
+        }
+
+    }
+
+#endif    
 }
 
 static int s_canIcubProtoParser_parse_canLoaderMsg(tCanData *rxpayload, unsigned char rxlen, tCanData *txpayload, unsigned char *txlen)

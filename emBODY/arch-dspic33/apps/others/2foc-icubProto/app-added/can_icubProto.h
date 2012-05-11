@@ -61,7 +61,8 @@
 #define CAN_ICUBPROTO_ID_ISEXTENDED(rxid) (!!(rxid & ECAN_ID_29))
 #define CAN_ICUBPROTO_STDID_RX_GETDEST(rxid) (rxid & 0x000f)
 #define CAN_ICUBPROTO_STDID_RX_GETSOURCE(rxid) ((rxid & 0x00f0)>>4)
-
+//get periodic message type. it is equal to get dest for polling msg
+#define CAN_ICUBPROTO_STDID_RX_GETPERMSGTYPE(rxid)  CAN_ICUBPROTO_STDID_RX_GETDEST(rxid)
 
 /* PAY ATTENTION: this values are synchronized with ICUBPROTO_CONTROLMODE_* value!!!!!*/
 typedef enum

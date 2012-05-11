@@ -664,7 +664,9 @@
 //#define SYNC_2FOC_TO_EMS
 //this macro let you to work with 2foc without fault
 //#define NO_FAULT
-          
+//the ems send desired current in periodic message (the ems can send only one message for all 4 2FOC)
+//NOTE: if you use this mode, you must be sure that 2FOC can addres belong to [1, 4].
+//#define DESIRED_CURR_IN_PER_MSG_BY_EMS          
    
 
 // Enable accept all commands (including setpoints) when in switch off state
