@@ -80,17 +80,17 @@ static const char s_eobj_ownname[] = "EOtheBOARDtransceiver";
  
 static EOtheBOARDtransceiver s_eo_theboardtrans = 
 {
-    .transceiver        = NULL,
-    .nvscfg             = NULL
+    EO_INIT(.transceiver)               NULL,
+    EO_INIT(.nvscfg)                    NULL
 };
 
 
 extern const eOboardtransceiver_cfg_t eo_boardtransceiver_cfg_default = 
 {
-    .vectorof_endpoint_cfg      = NULL,
-    .remotehostipv4addr         = 0,
-    .remotehostipv4port         = 0,
-    .tobedefined = 0
+    EO_INIT(.vectorof_endpoint_cfg)     NULL,
+    EO_INIT(.remotehostipv4addr)        0,
+    EO_INIT(.remotehostipv4port)        0,
+    EO_INIT(.tobedefined)               0
 };
 
 
