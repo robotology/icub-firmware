@@ -44,8 +44,9 @@
 // embobj
 #include "EoCommon.h"
 
-//appl
+//appl  - service providers
 #include "EOethBaseModule.h"
+#include "EOappCanServicesProvider.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -58,6 +59,7 @@ typedef struct EOMappTheSysController_hid   EOMappTheSysController;
 typedef struct
 {
     EOethBaseModule_cfg_t    ethmod_cfg;
+    EOappCanSP               *canSP_ptr;
     eOcallbackData_t         sig2appDataCollector_start;
     eOcallbackData_t         sig2appDataCollector_stop;
     eOcallbackData_t         sig2appMotorController;

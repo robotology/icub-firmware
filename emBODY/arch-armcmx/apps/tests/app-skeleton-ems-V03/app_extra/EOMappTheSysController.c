@@ -105,7 +105,7 @@ static void s_timer4_motorCntrlStart_cbk(void *p);
 static void s_eom_appTheSysController_timers_start(void);
 static void s_eom_appTheSysController_timers_stop(void);
 
-static void s_eom_appTheSysController_confugureSystem(void);
+static eOresult_t s_eom_appTheSysController_confugureSystem(EOMappTheSysController *p);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -342,10 +342,10 @@ static void s_eom_appTheSysController_recDgram_mng(EOMappTheSysController *p)
 {
     uint8_t *payload_ptr;
     uint16_t payloadsize;
+    eOresult_t res = eores_OK;
 
     //p and &s_theSysController are equal. 
     eo_ethBaseModule_Receive(p->eth_mod, &payload_ptr, &payloadsize);
-    eo_ethBaseModule_Transmit(p->eth_mod, payload_ptr, payloadsize);
 
     switch(payload_ptr[0]) 
     {
@@ -354,7 +354,7 @@ static void s_eom_appTheSysController_recDgram_mng(EOMappTheSysController *p)
             if(eOm_appTheSysController_st__inited == p->st)
             {
                 p->st = eOm_appTheSysController_st__configured;
-                s_eom_appTheSysController_confugureSystem();
+                res = s_eom_appTheSysController_confugureSystem(p);
             }
             p->st = eOm_appTheSysController_st__configured;
         }break;
@@ -382,11 +382,20 @@ static void s_eom_appTheSysController_recDgram_mng(EOMappTheSysController *p)
     
     }
 
+    if(eores_OK == res)
+    {
+        eo_ethBaseModule_Transmit(p->eth_mod, payload_ptr, payloadsize);    
+    }
 
 }
-static void s_eom_appTheSysController_confugureSystem(void)
+static eOresult_t s_eom_appTheSysController_confugureSystem(EOMappTheSysController *p)
 {
-    return;
+    eOmc_motorId_t mId = 0;
+    eOmc_motor_config_t cfg;
+
+#warning X ALE --> set static motor config  in cfg var
+
+    return(eo_appCanSP_ConfigMotor(p->cfg.canSP_ptr, mId, &cfg));
 }
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

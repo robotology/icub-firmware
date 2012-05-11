@@ -683,6 +683,34 @@ extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOm
 //        return(res);
 //    }
 
+
+//enable pwm and control loop
+    // 6) set controller run
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;
+    res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, NULL, &canFrame);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    res = (eOresult_t)hal_can_put((hal_can_port_t)canLoc.emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    // 7) set pwm pad
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__ENABLE_PWM_PAD;
+    res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, NULL, &canFrame);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    res = (eOresult_t)hal_can_put((hal_can_port_t)canLoc.emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
     return(eores_OK);
 }
 

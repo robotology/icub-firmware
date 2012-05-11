@@ -271,21 +271,25 @@ static void s_eom_appDataCollector_taskRun(EOMtask *tsk, uint32_t evtmsgper)
         /* 3) process received can frame */
         eo_appCanSP_read(p->cfg.canSP_ptr);
 
-        /* 4) get encoders values*/
-        if(eobool_true == eo_appEncReader_isReady(p->cfg.encReader_ptr))
-        {
-            eo_appEncReader_getValues(p->cfg.encReader_ptr, encoders_values);
-        }
-        else
-        {
+//        /* 4) get encoders values*/
+//        if(eobool_true == eo_appEncReader_isReady(p->cfg.encReader_ptr))
+//        {
+//            eo_appEncReader_getValues(p->cfg.encReader_ptr, encoders_values);
+//        }
+//        else
+//        {
            //Soluzione 1: mi invio un evento dedicato alla lettura dell'encoder 
            //nella gestione di questo evento verifico se i valorio sono pronti:
            //  se si ==>  ok
            //  altrimenti mi rinvio l'evento
 
            //Soluzione 2: faccio una lettura degli encoder su ricezione dell'evt_stop.
-           //ho deciso di adottare questa soluzione.
-        }
+           
+
+           //soluzione 3: faccio una get degli encoder letti nel motion control, tanto e' inutile farla qui,
+           //copiare i valori e passarli al motion control
+           //ho deciso di adottare questa soluzione e quindi ho commentato le letture degli encoder
+//        }
 
     }
 
@@ -293,10 +297,10 @@ static void s_eom_appDataCollector_taskRun(EOMtask *tsk, uint32_t evtmsgper)
     {
 
         hal_led_on(hal_led3);
-        if(eobool_true == eo_appEncReader_isReady(p->cfg.encReader_ptr))
-        {
-            eo_appEncReader_getValues(p->cfg.encReader_ptr, encoders_values);
-        }
+//        if(eobool_true == eo_appEncReader_isReady(p->cfg.encReader_ptr))
+//        {
+//            eo_appEncReader_getValues(p->cfg.encReader_ptr, encoders_values);
+//        }
 
         if(NULL != p->cfg.sig2appMotorController.fn)
         {

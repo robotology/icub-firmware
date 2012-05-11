@@ -53,7 +53,7 @@
 #endif
 //   <o> IP3 <0-255> 
 #ifndef SYSCNTRL_REM_IP3
- #define SYSCNTRL_REM_IP3       3
+ #define SYSCNTRL_REM_IP3       1
 #endif
 //  </h> Fixed remote IP address
 
@@ -109,7 +109,7 @@
 #endif
 //   <o> IP3 <0-255> 
 #ifndef MC_REM_IP3
- #define MC_REM_IP3       3
+ #define MC_REM_IP3       1
 #endif
 //  </h> Fixed IP address
 

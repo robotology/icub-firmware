@@ -537,10 +537,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>63</ColumnNumber>
+      <ColumnNumber>39</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>414</TopLine>
-      <CurrentLine>418</CurrentLine>
+      <TopLine>143</TopLine>
+      <CurrentLine>146</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_basic\eom_appSkeletonEms_body.c</PathWithFileName>
       <FilenameWithoutPath>eom_appSkeletonEms_body.c</FilenameWithoutPath>
@@ -577,7 +577,7 @@
 
   <Group>
     <GroupName>app-extra</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -586,10 +586,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>81</ColumnNumber>
+      <ColumnNumber>31</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>596</TopLine>
-      <CurrentLine>609</CurrentLine>
+      <TopLine>681</TopLine>
+      <CurrentLine>691</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOappCanServicesProvider.c</PathWithFileName>
       <FilenameWithoutPath>EOappCanServicesProvider.c</FilenameWithoutPath>
@@ -642,10 +642,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>27</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>97</TopLine>
-      <CurrentLine>108</CurrentLine>
+      <TopLine>238</TopLine>
+      <CurrentLine>257</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOMappDataCollector.c</PathWithFileName>
       <FilenameWithoutPath>EOMappDataCollector.c</FilenameWithoutPath>
@@ -658,7 +658,7 @@
       <Focus>0</Focus>
       <ColumnNumber>22</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>209</TopLine>
+      <TopLine>210</TopLine>
       <CurrentLine>229</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOMappDataTransmitter.c</PathWithFileName>
@@ -670,10 +670,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>69</ColumnNumber>
+      <ColumnNumber>54</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>243</TopLine>
-      <CurrentLine>243</CurrentLine>
+      <TopLine>237</TopLine>
+      <CurrentLine>257</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOMappMotorController.c</PathWithFileName>
       <FilenameWithoutPath>EOMappMotorController.c</FilenameWithoutPath>
@@ -684,10 +684,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>33</ColumnNumber>
+      <ColumnNumber>41</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>381</TopLine>
-      <CurrentLine>391</CurrentLine>
+      <TopLine>331</TopLine>
+      <CurrentLine>348</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOMappTheSysController.c</PathWithFileName>
       <FilenameWithoutPath>EOMappTheSysController.c</FilenameWithoutPath>
@@ -696,7 +696,7 @@
 
   <Group>
     <GroupName>app-cfg</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -719,10 +719,10 @@
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>23</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>109</TopLine>
+      <CurrentLine>109</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\cfg\app\app_cfg.h</PathWithFileName>
       <FilenameWithoutPath>app_cfg.h</FilenameWithoutPath>
@@ -822,7 +822,7 @@
 
   <Group>
     <GroupName>abslayer-cfg</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -2058,8 +2058,8 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>21</GroupNumber>
+      <FileNumber>100</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2072,8 +2072,8 @@
       <FilenameWithoutPath>EOaxisController.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>21</GroupNumber>
+      <FileNumber>101</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2086,8 +2086,8 @@
       <FilenameWithoutPath>EOdecoupler.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>21</GroupNumber>
+      <FileNumber>102</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2100,8 +2100,8 @@
       <FilenameWithoutPath>EOemsController.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>21</GroupNumber>
+      <FileNumber>103</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2114,8 +2114,8 @@
       <FilenameWithoutPath>EOpid.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>0</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>21</GroupNumber>
+      <FileNumber>104</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2130,9 +2130,9 @@
   </Group>
 
   <AlienFiles>
-    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V03\app_extra\EOappEncodersReader.h</PathWithFilename>
-    <TopLine>51</TopLine>
-    <CurrentLine>61</CurrentLine>
+    <PathWithFilename>C:\firmware_repo\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V03\app_extra\EOMappTheSysController.h</PathWithFilename>
+    <TopLine>41</TopLine>
+    <CurrentLine>49</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -2156,34 +2156,8 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V03\app_extra\EOMappTheSysController.h</PathWithFilename>
-    <TopLine>53</TopLine>
-    <CurrentLine>61</CurrentLine>
-    <Constant>0</Constant>
-    <WindowPosition>
-      <length>0</length>
-      <flags>0</flags>
-      <showCmd>0</showCmd>
-      <MinPosition>
-        <xPos>0</xPos>
-        <yPos>0</yPos>
-      </MinPosition>
-      <MaxPosition>
-        <xPos>0</xPos>
-        <yPos>0</yPos>
-      </MaxPosition>
-      <NormalPosition>
-        <Top>0</Top>
-        <Left>0</Left>
-        <Right>0</Right>
-        <Bottom>0</Bottom>
-      </NormalPosition>
-    </WindowPosition>
-  </AlienFiles>
-
-  <AlienFiles>
-    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-api\EOemsController.h</PathWithFilename>
-    <TopLine>73</TopLine>
+    <PathWithFilename>C:\firmware_repo\emBODY\arch-armcmx\body\embobj\embobj\embobj-api\EOemsController.h</PathWithFilename>
+    <TopLine>77</TopLine>
     <CurrentLine>96</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
@@ -2208,33 +2182,7 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V03\app_extra\EOMappMotorController.h</PathWithFilename>
-    <TopLine>37</TopLine>
-    <CurrentLine>45</CurrentLine>
-    <Constant>0</Constant>
-    <WindowPosition>
-      <length>0</length>
-      <flags>0</flags>
-      <showCmd>0</showCmd>
-      <MinPosition>
-        <xPos>0</xPos>
-        <yPos>0</yPos>
-      </MinPosition>
-      <MaxPosition>
-        <xPos>0</xPos>
-        <yPos>0</yPos>
-      </MaxPosition>
-      <NormalPosition>
-        <Top>0</Top>
-        <Left>0</Left>
-        <Right>0</Right>
-        <Bottom>0</Bottom>
-      </NormalPosition>
-    </WindowPosition>
-  </AlienFiles>
-
-  <AlienFiles>
-    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V03\app_extra\EOMappMotorController_hid.h</PathWithFilename>
+    <PathWithFilename>C:\firmware_repo\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V03\app_extra\EOMappMotorController_hid.h</PathWithFilename>
     <TopLine>58</TopLine>
     <CurrentLine>58</CurrentLine>
     <Constant>0</Constant>
@@ -2260,7 +2208,33 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\any-arch\sys\embobj\icub\api\EoMeasures.h</PathWithFilename>
+    <PathWithFilename>C:\firmware_repo\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V03\app_extra\EOappEncodersReader.h</PathWithFilename>
+    <TopLine>51</TopLine>
+    <CurrentLine>61</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>C:\firmware_repo\emBODY\any-arch\sys\embobj\icub\api\EoMeasures.h</PathWithFilename>
     <TopLine>106</TopLine>
     <CurrentLine>106</CurrentLine>
     <Constant>0</Constant>
@@ -2286,9 +2260,139 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\any-arch\sys\embobj\icub\api\EoMotionControl.h</PathWithFilename>
+    <PathWithFilename>C:\firmware_repo\emBODY\any-arch\sys\embobj\icub\api\EoMotionControl.h</PathWithFilename>
     <TopLine>361</TopLine>
     <CurrentLine>379</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>C:\firmware_repo\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V03\app_extra\EOMappMotorController.h</PathWithFilename>
+    <TopLine>37</TopLine>
+    <CurrentLine>45</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>C:\firmware_repo\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V03\app_extra\EOMappDataCollector.h</PathWithFilename>
+    <TopLine>49</TopLine>
+    <CurrentLine>64</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>C:\firmware_repo\emBODY\any-arch\sys\embobj\core\api\EoCommon.h</PathWithFilename>
+    <TopLine>130</TopLine>
+    <CurrentLine>142</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>C:\firmware_repo\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V03\app_extra\EOappCanServicesProvider.h</PathWithFilename>
+    <TopLine>1</TopLine>
+    <CurrentLine>7</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>C:\firmware_repo\emBODY\arch-armcmx\body\embobj\embobj\embobj-api\EOicubCanProto_specifications.h</PathWithFilename>
+    <TopLine>78</TopLine>
+    <CurrentLine>83</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -2316,8 +2420,80 @@
     <ActiveMDIGroup>0</ActiveMDIGroup>
     <MDIGroup>
       <Size>100</Size>
-      <ActiveTab>3</ActiveTab>
+      <ActiveTab>0</ActiveTab>
       <Documents>
+        <Doc>
+          <Name>..\cfg\abslayer\ipal_cfg.h</Name>
+          <ColumnNumber>26</ColumnNumber>
+          <TopLine>25</TopLine>
+          <CurrentLine>25</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\cfg\app\app_cfg.h</Name>
+          <ColumnNumber>23</ColumnNumber>
+          <TopLine>109</TopLine>
+          <CurrentLine>109</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOMappDataCollector.c</Name>
+          <ColumnNumber>27</ColumnNumber>
+          <TopLine>238</TopLine>
+          <CurrentLine>257</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOMappMotorController.c</Name>
+          <ColumnNumber>54</ColumnNumber>
+          <TopLine>237</TopLine>
+          <CurrentLine>257</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\..\..\..\body\embobj\embobj\embobj-api\EOicubCanProto_specifications.h</Name>
+          <ColumnNumber>33</ColumnNumber>
+          <TopLine>78</TopLine>
+          <CurrentLine>83</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOappCanServicesProvider.h</Name>
+          <ColumnNumber>3</ColumnNumber>
+          <TopLine>1</TopLine>
+          <CurrentLine>7</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOMappTheSysController.c</Name>
+          <ColumnNumber>41</ColumnNumber>
+          <TopLine>331</TopLine>
+          <CurrentLine>348</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\..\..\..\..\any-arch\sys\embobj\core\api\EoCommon.h</Name>
+          <ColumnNumber>2</ColumnNumber>
+          <TopLine>130</TopLine>
+          <CurrentLine>142</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOappCanServicesProvider.c</Name>
+          <ColumnNumber>31</ColumnNumber>
+          <TopLine>681</TopLine>
+          <CurrentLine>691</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOMappDataCollector.h</Name>
+          <ColumnNumber>4</ColumnNumber>
+          <TopLine>49</TopLine>
+          <CurrentLine>64</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOMappTheSysController.h</Name>
+          <ColumnNumber>24</ColumnNumber>
+          <TopLine>41</TopLine>
+          <CurrentLine>49</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_basic\eom_appSkeletonEms_body.c</Name>
+          <ColumnNumber>39</ColumnNumber>
+          <TopLine>143</TopLine>
+          <CurrentLine>146</CurrentLine>
+        </Doc>
         <Doc>
           <Name>..\app_extra\EOMappMotorController.h</Name>
           <ColumnNumber>32</ColumnNumber>
@@ -2325,22 +2501,10 @@
           <CurrentLine>45</CurrentLine>
         </Doc>
         <Doc>
-          <Name>..\app_extra\EOMappMotorController.c</Name>
-          <ColumnNumber>69</ColumnNumber>
-          <TopLine>243</TopLine>
-          <CurrentLine>243</CurrentLine>
-        </Doc>
-        <Doc>
           <Name>..\..\..\..\..\any-arch\sys\embobj\icub\api\EoMotionControl.h</Name>
           <ColumnNumber>2</ColumnNumber>
           <TopLine>361</TopLine>
           <CurrentLine>379</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\app_extra\EOappCanServicesProvider.c</Name>
-          <ColumnNumber>81</ColumnNumber>
-          <TopLine>596</TopLine>
-          <CurrentLine>609</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\..\..\..\..\any-arch\sys\embobj\icub\api\EoMeasures.h</Name>
@@ -2357,20 +2521,8 @@
         <Doc>
           <Name>..\app_extra\EOMappDataTransmitter.c</Name>
           <ColumnNumber>22</ColumnNumber>
-          <TopLine>209</TopLine>
+          <TopLine>210</TopLine>
           <CurrentLine>229</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\app_basic\eom_appSkeletonEms_body.c</Name>
-          <ColumnNumber>63</ColumnNumber>
-          <TopLine>414</TopLine>
-          <CurrentLine>418</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\app_extra\EOMappDataCollector.c</Name>
-          <ColumnNumber>0</ColumnNumber>
-          <TopLine>97</TopLine>
-          <CurrentLine>108</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\app_extra\EOappEncodersReader.h</Name>
@@ -2393,7 +2545,7 @@
         <Doc>
           <Name>..\..\..\..\body\embobj\embobj\embobj-api\EOemsController.h</Name>
           <ColumnNumber>67</ColumnNumber>
-          <TopLine>73</TopLine>
+          <TopLine>77</TopLine>
           <CurrentLine>96</CurrentLine>
         </Doc>
         <Doc>
@@ -2427,28 +2579,10 @@
           <CurrentLine>73</CurrentLine>
         </Doc>
         <Doc>
-          <Name>..\app_extra\EOMappTheSysController.h</Name>
-          <ColumnNumber>30</ColumnNumber>
-          <TopLine>53</TopLine>
-          <CurrentLine>61</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\app_extra\EOMappTheSysController.c</Name>
-          <ColumnNumber>33</ColumnNumber>
-          <TopLine>381</TopLine>
-          <CurrentLine>391</CurrentLine>
-        </Doc>
-        <Doc>
           <Name>..\cfg\app\app_cfg.c</Name>
           <ColumnNumber>25</ColumnNumber>
           <TopLine>17</TopLine>
           <CurrentLine>24</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\cfg\app\app_cfg.h</Name>
-          <ColumnNumber>23</ColumnNumber>
-          <TopLine>109</TopLine>
-          <CurrentLine>109</CurrentLine>
         </Doc>
       </Documents>
     </MDIGroup>

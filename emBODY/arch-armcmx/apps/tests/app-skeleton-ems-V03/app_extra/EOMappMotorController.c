@@ -241,18 +241,19 @@ static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
     if(EVT_CHECK(evt, EVT_CALC_START))
     {
     // ALE
+        /* 1) get encoders' value */
         eo_appEncReader_getValues(p->cfg.encReader, encoders_values);
-        
         eo_emsController_ReadEncoder(0, (encoders_values[0]>>6)&0x0FFF);
-        /* 1) calcolo pid */
+        
+        /* 2) pid calc */
         pwm = eo_emsController_PWM();
 
         pwm_out = (int16_t)pwm[0];
 
-        /* 2) resetto il mio stato */
+        /* 3) reset my state */
         p->st = eOm_appMotorController_st__active;
 
-        /* 3) say to start transmiting data to appDataTransmitter */
+        /* 4) say to start transmiting data to appDataTransmitter */
         p->cfg.sig2appDataTransmitter.fn(p->cfg.sig2appDataTransmitter.argoffn);
     }
 }
