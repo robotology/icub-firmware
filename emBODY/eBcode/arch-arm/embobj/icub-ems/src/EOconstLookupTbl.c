@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
- * Author:  Marco Accame
- * email:   marco.accame@iit.it
+ * Author:  Valentina Gaggero
+ * email:   valentina.gaggero@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
@@ -16,6 +16,13 @@
  * Public License for more details
 */
 
+
+/* @file       eOcfg_icubCanProto_motorBoardMsgfunction.c
+    @brief      This file keeps ...
+    @author     valentina.gaggero@iit.it
+    @date       04/04/2012
+**/
+
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
@@ -23,12 +30,8 @@
 #include "stdlib.h"
 #include "EoCommon.h"
 #include "string.h"
-#include "stdio.h"
 #include "EOtheMemoryPool.h"
 #include "EOtheErrorManager.h"
-#include "EOnv_hid.h"
-#include "EOrop_hid.h"
-
 
 
 
@@ -36,14 +39,14 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOtheBOARDtransceiver.h"
+#include "EOconstLookupTbl.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOtheBOARDtransceiver_hid.h" 
+#include "EOconstLookupTbl_hid.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -68,30 +71,14 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-
-static EOnvsCfg* s_eo_boardtransceiver_nvscfg_get(const eOboardtransceiver_cfg_t *cfg);
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const char s_eobj_ownname[] = "EOtheBOARDtransceiver";
- 
-static EOtheBOARDtransceiver s_eo_theboardtrans = 
-{
-    EO_INIT(.transceiver)               NULL,
-    EO_INIT(.nvscfg)                    NULL
-};
-
-
-extern const eOboardtransceiver_cfg_t eo_boardtransceiver_cfg_default = 
-{
-    EO_INIT(.vectorof_endpoint_cfg)     NULL,
-    EO_INIT(.remotehostipv4addr)        0,
-    EO_INIT(.remotehostipv4port)        0,
-    EO_INIT(.tobedefined)               0
-};
+static const char s_eobj_ownname[] = "EOconstLookupTbl";
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -99,119 +86,96 @@ extern const eOboardtransceiver_cfg_t eo_boardtransceiver_cfg_default =
 // --------------------------------------------------------------------------------------------------------------------
 
 
+extern EOconstLookupTbl * eo_constLookupTbl_New(eOsizecntnr_t capacity, uint16_t offset , eOres_fp_voidp_t exceptionMngFn, const void* itemsList)
+{
+    EOconstLookupTbl *retptr = NULL;
  
-extern EOtransceiver * eo_boardtransceiver_Initialise(const eOboardtransceiver_cfg_t *cfg) 
-{
-    eo_transceiver_cfg_t txrxcfg = eo_transceiver_cfg_default;
-    
-    if(NULL != s_eo_theboardtrans.transceiver)
+    if(NULL == itemsList)
     {
-        return(s_eo_theboardtrans.transceiver);
+        return(retptr);
     }
 
+    // i get the memory for the object. no need to check versus NULL because the memory pool already does it
+    retptr = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOconstLookupTbl), 1);
 
-    if(NULL == cfg)
-    {
-        cfg = &eo_boardtransceiver_cfg_default;
-    }
 
-    if(NULL == cfg->vectorof_endpoint_cfg)
-    {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "need a vector of endpoints");
-    }
+    // now the obj has valid memory. i need to initialise it with user-defined data,
 
-    // 1. init the proper transceiver cfg
+    eo_errman_Assert(eo_errman_GetHandle(), (0 != capacity), s_eobj_ownname, "capacity is zero");
 
-    s_eo_theboardtrans.nvscfg = s_eo_boardtransceiver_nvscfg_get(cfg);
+    retptr->capacity           = capacity;
+    retptr->offset             = offset;
+    retptr->exceptionMngFn     = exceptionMngFn;
+    retptr->itemsList          = itemsList;     
     
-
-    txrxcfg.capacityofpacket               = EOK_BOARDTRANSCEIVER_capacityofpacket;
-    txrxcfg.capacityofrop                  = EOK_BOARDTRANSCEIVER_capacityofrop;
-    txrxcfg.capacityofropframeregulars     = EOK_BOARDTRANSCEIVER_capacityofropframeregulars;
-    txrxcfg.capacityofropframeoccasionals  = EOK_BOARDTRANSCEIVER_capacityofropframeoccasionals;
-    txrxcfg.capacityofropframereplies      = EOK_BOARDTRANSCEIVER_capacityofropframereplies;
-    txrxcfg.maxnumberofregularrops         = EOK_BOARDTRANSCEIVER_maxnumberofregularrops;
-    txrxcfg.remipv4addr                    = cfg->remotehostipv4addr;
-    txrxcfg.remipv4port                    = cfg->remotehostipv4port;
-    txrxcfg.nvscfg                         = s_eo_theboardtrans.nvscfg;
-    
-    s_eo_theboardtrans.transceiver = eo_transceiver_New(&txrxcfg);
-    
-    
-    return(s_eo_theboardtrans.transceiver);        
-}    
-
-
-extern EOtransceiver * eo_boardtransceiver_GetHandle(void) 
-{
-    return(s_eo_theboardtrans.transceiver);
+    return(retptr);   
 }
 
 
+extern eOsizecntnr_t eo_constLookupTbl_GetCapacity(EOconstLookupTbl *p) 
+{
+    if(NULL == p) 
+    {
+        // invalid p
+        return(0);    
+    }
+    
+    return(p->capacity);        
+}
+
+extern eOsizecntnr_t eo_constLookupTbl_GetOffset(EOconstLookupTbl *p) 
+{
+    if(NULL == p) 
+    {
+        // invalid p
+        return(0);    
+    }
+    
+    return(p->offset);        
+}
+
+
+extern const void * eo_constLookupTbl_GetItemsList(EOconstLookupTbl *p) 
+{
+   
+    if(NULL == p) 
+    {
+        return(NULL);    
+    }
+        
+    return(p->itemsList);         
+}
+
+
+extern eOres_fp_voidp_t  eo_constLookupTbl_GetExceptionMngFn(EOconstLookupTbl *p)
+{
+    if(NULL == p) 
+    {
+        return(NULL);    
+    }
+        
+    return(p->exceptionMngFn);         
+
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
-extern EOnvsCfg * eo_boardtransceiver_hid_GetNvsCfg(void)
-{
-    return(s_eo_theboardtrans.nvscfg);
-}
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
+// empty-section
 
-static EOnvsCfg* s_eo_boardtransceiver_nvscfg_get(const eOboardtransceiver_cfg_t *cfg)
-{
-    EOnvsCfg* nvscfg = s_eo_theboardtrans.nvscfg;
-    eOnvscfg_EP_t *epcfg;
-    const EOconstvector* theepcfgs = NULL;
-    uint16_t nendpoints = 0;
-    uint16_t i;
 
-    if(NULL != nvscfg)
-    {
-        return(NULL);
-    }
-
-    theepcfgs = cfg->vectorof_endpoint_cfg;
-
-//    #warning --> so far the BOARDtransceiver does not use any storage. if needed ... change the NULL into a ...
-    nvscfg = eo_nvscfg_New(1, NULL);
-
-    nendpoints = eo_constvector_Size(theepcfgs);
-    
-    // use local-host address as we dont need to put the actual address of board in nvscfg.
-    eo_nvscfg_PushBackDevice(nvscfg, eo_nvscfg_ownership_local, EO_COMMON_IPV4ADDR_LOCALHOST, cfg->hashfunction_ep2index, nendpoints);
-    
-    for(i=0; i<nendpoints; i++)
-    {
-        epcfg = (eOnvscfg_EP_t*) eo_constvector_At(theepcfgs, i);
-
-//         eo_nvscfg_ondevice_PushBackEndpoint(nvscfg, 0, epcfg->endpoint,
-//                                         epcfg->hashfunction_id2index,
-//                                         epcfg->constvector_of_treenodes_EOnv_con,
-//                                         epcfg->constvector_of_EOnv_usr,
-//                                         epcfg->sizeof_endpoint_data, 
-//                                         epcfg->endpoint_data_init,
-//                                         NULL);
-
-        eo_nvscfg_ondevice_PushBackEP(nvscfg, 0, epcfg, NULL);        
-        
-    }
-    
-    eo_nvscfg_data_Initialise(nvscfg);
-
-    return(nvscfg);
-}
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
-
 
 
 

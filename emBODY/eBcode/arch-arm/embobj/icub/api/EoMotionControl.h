@@ -387,17 +387,26 @@ typedef struct              // size is 1+3+8+0 = 12
 // -- the definition of a joint
 
 
-/** @typedef    typedef uint8_t  eOmc_jointUniqueId_t
-    @brief      eOmc_jointUniqueId_t contains the values required to identify a joint 
-                of robot univocally on a body part
- **/
-typedef uint8_t  eOmc_jointUniqueId_t;
+///** @typedef    typedef uint8_t  eOmc_jointUniqueId_t
+//    @brief      eOmc_jointUniqueId_t contains the values required to identify a joint 
+//                of robot univocally on a body part
+// **/
+//typedef uint8_t  eOmc_jointUniqueId_t;
+//
+//
+///** @typedef    typedef uint8_t  eOmc_jointBoardId_t
+//    @brief      eOmc_jointBoardId_t contains the values required to identify a joint on a board univocally.
+// **/
+//typedef uint8_t  eOmc_jointBoardId_t;
 
 
-/** @typedef    typedef uint8_t  eOmc_jointBoardId_t
-    @brief      eOmc_jointBoardId_t contains the values required to identify a joint on a board.
+/** @typedef    typedef uint8_t  eOmc_jointId_t
+    @brief      eOmc_jointId_t contains the values required to identify a joint;
+                this type doesn't specify if it identifies a joint on a board or body part univocally,
+                unlike eOmc_jointBoardId_t and eOmc_jointUniqueId_t. 
  **/
-typedef uint8_t  eOmc_jointBoardId_t;
+typedef uint16_t  eOmc_jointId_t;
+
 
 
 
@@ -499,17 +508,25 @@ typedef struct                  // size is 80+32+8+32+0 = 152
 // -- the definition of a motor
 
 
-/** @typedef    typedef uint8_t  eOmc_motorUniqueId_t
-    @brief      eOmc_motorUniqueId_t contains the values required to identify a motor 
-                of robot univocally on a body part
- **/
-typedef uint8_t  eOmc_motorUniqueId_t;
+///** @typedef    typedef uint8_t  eOmc_motorUniqueId_t
+//    @brief      eOmc_motorUniqueId_t contains the values required to identify a motor 
+//                of robot univocally on a body part
+// **/
+//typedef uint8_t  eOmc_motorUniqueId_t;
+//
+//
+///** @typedef    typedef uint8_t  eOmc_motorBoardId_t
+//    @brief      eOmc_motorBoardId_t contains the values required to identify a motor on a board.
+// **/
+//typedef uint8_t  eOmc_motorBoardId_t;
 
 
-/** @typedef    typedef uint8_t  eOmc_motorBoardId_t
-    @brief      eOmc_motorBoardId_t contains the values required to identify a motor on a board.
+/** @typedef    typedef uint8_t  eOmc_jointId_t
+    @brief      eOmc_jointId_t contains the values required to identify a joint;
+                this type doesn't specify if it identifies a joint on a board or body part univocally,
+                unlike eOmc_motorBoardId_t and eOmc_motorUniqueId_t. 
  **/
-typedef uint8_t  eOmc_motorBoardId_t;
+typedef uint16_t  eOmc_motorId_t;
 
 
 /** @typedef    typedef struct eOmc_motor_config_t
