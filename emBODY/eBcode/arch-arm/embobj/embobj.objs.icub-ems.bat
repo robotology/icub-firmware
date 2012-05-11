@@ -30,3 +30,6 @@ FOR %%x in %LST% do call embobj.copy.object.bat %%x
 attrib +R   "%DEST_API%"\*    
 attrib +R   "%DEST_HID%"\*
 attrib +R   "%DEST_SRC%"\*  
+
+::here is an exception
+copy /Y     %SOURCE_API%\EOicubCanProto_specifications.h      %DEST_API% 
