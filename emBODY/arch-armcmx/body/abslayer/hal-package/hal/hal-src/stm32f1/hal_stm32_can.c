@@ -340,11 +340,9 @@ extern hal_result_t hal_can_get(hal_can_port_t port, hal_can_frame_t *frame, uin
         s_hal_can_isr_rx_enable(port);
         return(hal_res_NOK_nodata); //the fifo is empty
     }
-
-    frame->id = fifoframe_ptr->StdId;
-    frame->size = fifoframe_ptr->DLC;
-    *((uint64_t*)frame->data) = *((uint64_t*)fifoframe_ptr->Data);
     
+    memcpy(frame, fifoframe_ptr, sizeof(hal_canfifo_item_t));
+
     hal_canfifo_hid_pop(&cport->canframes_rx_norm);
     // enable interrupt rx
     s_hal_can_isr_rx_enable(port);
@@ -555,6 +553,14 @@ static hal_boolval_t s_hal_can_initted_is(hal_can_port_t port)
 static void s_hal_can_isr_sendframes_canx(hal_can_port_t port)
 {
     hal_canfifo_item_t *canframe_ptr;
+    CanTxMsg TxMessage =
+    {
+        .IDE   = CAN_ID_STD,     //only stdid are managed
+        .ExtId = 0,              // since frame-id is std it is not used by stm32lib
+        .RTR   = CAN_RTR_DATA   //only data frame are managed    
+    };
+
+
     hal_can_portdatastructure_t *cport = s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
 	uint8_t res = 0;
 
@@ -564,8 +570,11 @@ static void s_hal_can_isr_sendframes_canx(hal_can_port_t port)
     {
 
         canframe_ptr = hal_canfifo_hid_front(&cport->canframes_tx_norm);
+        TxMessage.StdId = canframe_ptr->id & 0x7FF;
+        TxMessage.DLC = canframe_ptr->size;
+        *(uint64_t*)TxMessage.Data = *((uint64_t*)canframe_ptr->data);
 
-       	res = CAN_Transmit( ((hal_can_port1 == port) ? (CAN1) : (CAN2)), (CanTxMsg*)canframe_ptr);
+       	res = CAN_Transmit( ((hal_can_port1 == port) ? (CAN1) : (CAN2)), &TxMessage);
 
         if(res != CAN_NO_MB)
         {
@@ -597,15 +606,20 @@ static void s_hal_can_isr_sendframes_canx(hal_can_port_t port)
 static void s_hal_can_isr_recvframe_canx(hal_can_port_t port)
 {
     hal_canfifo_item_t *canframe_ptr;
+    CanRxMsg RxMessage;
     hal_can_portdatastructure_t *cport = s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
+
 
     canframe_ptr = hal_canfifo_hid_getFirstFree(&cport->canframes_rx_norm);
     if(NULL == canframe_ptr)
     {
         return; //the fifo is full
     }
-    CAN_Receive( ((hal_can_port1 == port) ? (CAN1) : (CAN2)), /*FIFO0*/0, canframe_ptr);
-
+    CAN_Receive( ((hal_can_port1 == port) ? (CAN1) : (CAN2)), /*FIFO0*/0, &RxMessage);
+    
+    canframe_ptr->id = RxMessage.StdId;
+    canframe_ptr->size = RxMessage.DLC;
+    *((uint64_t*)canframe_ptr->data) = *((uint64_t*)RxMessage.Data);
 
     //if call back is set, invoke it
     if(NULL != cport->cfg.callback_on_rx )

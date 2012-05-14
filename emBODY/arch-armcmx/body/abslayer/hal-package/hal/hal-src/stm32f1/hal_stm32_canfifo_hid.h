@@ -33,6 +33,7 @@
 #include "stm32f1.h"
 
 #include "hal_base.h"
+#include "hal_can.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -40,10 +41,10 @@
 
 
 // - #define used with hidden structs ---------------------------------------------------------------------------------
-#define hal_canfifo__itemsize sizeof(CanRxMsg)
+#define hal_canfifo__itemsize sizeof(hal_can_frame_t)
 
 // - definition of hidden structs -------------------------------------------------------------------------------------
-typedef   CanRxMsg     hal_canfifo_item_t;
+typedef   hal_can_frame_t     hal_canfifo_item_t;
 
 typedef struct
 {
@@ -67,6 +68,7 @@ extern hal_result_t hal_canfifo_hid_put(hal_canfifo_t *fifo, uint32_t id, uint8_
 extern hal_canfifo_item_t * hal_canfifo_hid_front(hal_canfifo_t*fifo);
 extern void hal_canfifo_hid_pop(hal_canfifo_t*fifo);
 extern uint8_t hal_canfifo_hid_size(hal_canfifo_t*gf);
+
 /* return the pointer to the first free item and increm the size of fifo,
 because it supposes that, at one the user has the poiter, the user fills item's field.*/
 extern hal_canfifo_item_t* hal_canfifo_hid_getFirstFree(hal_canfifo_t *fifo);

@@ -103,9 +103,8 @@ extern void hal_canfifo_hid_init(hal_canfifo_t *fifo, uint8_t capacity, uint8_t 
 
     for(i=0; i<capacity; i++)
     {
-        fifo->canFrame_list[i].IDE   = CAN_ID_STD;     //only stdid are managed
-        fifo->canFrame_list[i].ExtId = 0;              // since frame-id is std it is not used by stm32lib
-        fifo->canFrame_list[i].RTR   = CAN_RTR_DATA;   //only data frame are managed
+        fifo->canFrame_list[i].id_type      = hal_can_frameID_std;     //only stdid are managed
+        fifo->canFrame_list[i].frame_type   = hal_can_frame_data;      //only data frame are managed
     }
 
     hal_canfifo_hid_reset(fifo);
@@ -123,20 +122,24 @@ __inline void hal_canfifo_hid_reset(hal_canfifo_t *fifo)
 extern hal_result_t hal_canfifo_hid_put(hal_canfifo_t *fifo, uint32_t id, uint8_t datasize, uint8_t *data)
 {
     hal_canfifo_item_t *first_free_item = NULL;
+
     // avoid checks .... be careful in calling
     
     if(fifo->size == fifo->capacity)
     {
         return(hal_res_NOK_busy);
     }
-    /*ATTERNZIONE: dato che gli item di questa coda sono di tipo CanRxMsg la cui size e' 16 byte, invece di fare la moltiplicazione faccio <<4 */
-    first_free_item = fifo->canFrame_list +(fifo->index << 4);
-    first_free_item->StdId = id & 0x7FF;
-    first_free_item->DLC = datasize;
+    /* Since hal_canfifo_item_t has size 16Bytes, we shift of 4 pos, instead of multiply.
+    Before shifting, it's important to cast list pointer to uint8_t */ 
+    first_free_item = (hal_canfifo_item_t *)(((uint8_t*)fifo->canFrame_list) +(fifo->index << 4));
+    
+    first_free_item->id = id & 0x7FF;
+    first_free_item->size = datasize;
  
     /* Qui suppongo che al di la della size, data e' cmq un puntatore ad un arry di 8, in quanto 
     hal_can_frame_t ha la parte data pre-allocata ci 8 byte.*/
-    *(uint64_t*)first_free_item->Data = *((uint64_t*)data);
+    *(uint64_t*)first_free_item->data = *((uint64_t*)data);
+
 
     fifo->size ++;
     fifo->index ++;
@@ -152,14 +155,16 @@ extern hal_result_t hal_canfifo_hid_put(hal_canfifo_t *fifo, uint32_t id, uint8_
 extern  hal_canfifo_item_t* hal_canfifo_hid_getFirstFree(hal_canfifo_t *fifo)
 {
     hal_canfifo_item_t *first_free_item = NULL;
+
     // avoid checks .... be careful in calling
     
     if(fifo->size == fifo->capacity)
     {
         return(NULL);
     }
-
-    first_free_item = fifo->canFrame_list +(fifo->index << 4);
+    /* Since hal_canfifo_item_t has size 16Bytes, we shift of 4 pos, instead of multiply.
+    Before shifting, it's important to cast list pointer to uint8_t */
+    first_free_item = (hal_canfifo_item_t*)(((uint8_t*)fifo->canFrame_list) +(fifo->index << 4));
 
     fifo->size ++;
     fifo->index ++;
@@ -188,8 +193,9 @@ extern hal_canfifo_item_t* hal_canfifo_hid_front(hal_canfifo_t *fifo)
     {
         start -= fifo->capacity;
     }
-    
-    return((hal_canfifo_item_t*)(fifo->canFrame_list + (start << 4)));
+    /* Since hal_canfifo_item_t has size 16Bytes, we shift of 4 pos, instead of multiply.
+    Before shifting, it's important to cast list pointer to uint8_t */   
+    return((hal_canfifo_item_t*)(((uint8_t*)fifo->canFrame_list) + (start << 4)));
 }
 
 
@@ -211,6 +217,7 @@ __inline uint8_t hal_canfifo_hid_size(hal_canfifo_t *fifo)
 {
     return(fifo->size);
 }
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
