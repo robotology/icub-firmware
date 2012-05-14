@@ -141,8 +141,10 @@ void can_receive_additional_info();
 #define CAN_BCAST_VELOCITY			7
 #define CAN_BCAST_PID_ERROR			8
 #define CAN_BCAST_DEBUG				9
+#define CAN_BCAST_MOTOR_POSITION   10
+#define CAN_BCAST_MOTOR_SPEED      11
 
-#define CAN_BCAST_MAX_MSGS		   10
+#define CAN_BCAST_MAX_MSGS		   12
 
 #define MAIS_CAN_ID                 0xE 
 #define MAIS_8bit_D_MSG             0x3ED //8 bits value

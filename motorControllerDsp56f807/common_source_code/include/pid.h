@@ -131,6 +131,8 @@ extern Int16 _speed[JN] ;				// encoder speed
 extern Int16 _speed_old[JN]; 			// previous speed
 extern Int16 _comm_speed[JN] ;			// brushless commutation speed 
 extern Int16 _comm_speed_old[JN] ;		// previous brushless commutation speed 
+extern Int16 _motor_speed[JN] ;			// brushless motor speed 
+extern Int16 _motor_speed_old[JN] ;		// previous brushless motor speed 
 extern Int16 _desired_vel[JN] ;			// speed reference value, computed by the trajectory gen. 
 extern Int16 _accu_desired_vel[JN];		// accumultor for the fractional part of the desired vel 
 extern Int16 _set_vel[JN] ;				// set point for velocity [user specified] 

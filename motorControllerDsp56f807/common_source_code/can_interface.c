@@ -24,7 +24,7 @@
 
 #ifdef IDENTIF
 #	include "identification.h"
-#endif
+#endif 
 
 #ifdef USE_NEW_DECOUPLING
 #	warning "Using new decoupling"
@@ -154,9 +154,9 @@ byte can_interface (void)
 			_canmsg.CAN_data[6] = p->CAN_data[6];
 			_canmsg.CAN_data[7] = p->CAN_data[7];
 			_canmsg.CAN_messID = p->CAN_messID;
-			_canmsg.CAN_ID_class=(_canmsg.CAN_messID>>8 & 0x7);
-			_canmsg.CAN_ID_src=(_canmsg.CAN_messID>>4 & 0xf);
-			_canmsg.CAN_ID_dst=(_canmsg.CAN_messID  & 0xf);
+			_canmsg.CAN_ID_class= (unsigned char) (_canmsg.CAN_messID>>8 & 0x7);
+			_canmsg.CAN_ID_src=(unsigned char) (_canmsg.CAN_messID>>4 & 0xf);
+			_canmsg.CAN_ID_dst=(unsigned char) (_canmsg.CAN_messID  & 0xf);
 			_canmsg.CAN_frameType = p->CAN_frameType;
 			_canmsg.CAN_frameFormat = p->CAN_frameFormat;
 			_canmsg.CAN_length = p->CAN_length;
@@ -225,7 +225,7 @@ byte can_interface (void)
 			else
 #endif
 
-#if VERSION == 0x0119 || VERSION == 0x0150 || VERSION == 0x0151 || VERSION == 0x0152 || VERSION == 0x0154 || VERSION == 0x0157 || VERSION == 0x0140 || VERSION == 0x0147 
+#if VERSION == 0x0119 || VERSION == 0x0150 || VERSION == 0x0151 || VERSION == 0x0152 || VERSION == 0x0154 || VERSION == 0x0157 || VERSION == 0x0140 || VERSION == 0x0147 || VERSION == 0x0251 
 			if (_canmsg.CAN_ID_class == CLASS_PERIODIC_SENS)
 			{
 				if 		(_canmsg.CAN_ID_src==CAN_ID_JNT_STRAIN_11)  strain_num=WDT_JNT_STRAIN_11;
@@ -295,7 +295,7 @@ byte can_interface (void)
 								_canmsg.CAN_data[0] = 0xFF;
 								_canmsg.CAN_data[1] = CURRENT_BOARD_TYPE;  
 								_canmsg.CAN_data[2] = (_version & 0xff00) >> 8;  // firmware version.	
-								_canmsg.CAN_data[3] = _version & 0x00ff; 		 // firmware revision.
+								_canmsg.CAN_data[3] = (unsigned char) (_version & 0x00ff); 		 // firmware revision.
 								_canmsg.CAN_data[4] = _build_number;             // build number
 								CAN1_send(IdTx, DATA_FRAME, 5, _canmsg.CAN_data);
 
@@ -333,7 +333,7 @@ byte can_interface (void)
 				    			if (_board_ID == _canmsg.CAN_ID_dst) 
 			    				{
 					    			can_receive_additional_info(); 
-									writeToFlash (_flash_addr); 
+									writeToFlash ( (unsigned int)_flash_addr); 
 			    				}
 			    			break;
 			    			
@@ -357,7 +357,7 @@ byte can_interface (void)
 			else if (_canmsg.CAN_ID_class == CLASS_POLLING_DSP)
 			{
 				int axis = get_axis();
-				BEGIN_MSG_TABLE (_canmsg.CAN_data[0])
+				BEGIN_MSG_TABLE (_canmsg.CAN_data[0]) 
 				
 				//High priority (most frequent) messages. 
 				//The 'switch/break' statements ensures that the other conditions are not evaluated.
@@ -571,14 +571,14 @@ void can_send_broadcast(void)
 	
 	bool sendA      = false;
 	bool sendB      = false;
-	char FAULT0     = 0;
-	char FAULT1     = 0;
-	char FAULT2     = 0;
-	char FAULT3     = 0;
-	char FAULT_ABS0 = 0;
-	char FAULT_ABS1 = 0;
-	char FAULT_HLL0 = 0;
-	char FAULT_HLL1 = 0;
+	unsigned char FAULT0     = 0;
+	unsigned char  FAULT1     = 0;
+	unsigned char  FAULT2     = 0;
+	unsigned char  FAULT3     = 0;
+	unsigned char  FAULT_ABS0 = 0;
+	unsigned char  FAULT_ABS1 = 0;
+	unsigned char  FAULT_HLL0 = 0;
+	unsigned char  FAULT_HLL1 = 0;
 	
 	// Absolute encoder errors			
 	#if (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOARD_TYPE == BOARD_TYPE_2BLLDC)
@@ -615,14 +615,14 @@ void can_send_broadcast(void)
 	_fault[1] = getReg (PWMB_PMFSA);
 	setReg(PWMB_PMFSA,	0x55);
 	#if (CURRENT_BOARD_TYPE != BOARD_TYPE_4DC) 
-		FAULT0 = ((_fault[0]>>8) & 0x01)  | ((_fault[0]>>9) & 0x02) | ((_fault[0]>>10) & 0x04) | ((_fault[0]>>12) & 0x04);				
-		FAULT1 = ((_fault[1]>>8) & 0x01)  | ((_fault[1]>>9) & 0x02) | ((_fault[1]>>10) & 0x04) | ((_fault[1]>>12) & 0x04);
+		FAULT0 = (unsigned char )((_fault[0]>>8) & 0x01)  | ((_fault[0]>>9) & 0x02) | ((_fault[0]>>10) & 0x04) | ((_fault[0]>>12) & 0x04);				
+		FAULT1 = (unsigned char )((_fault[1]>>8) & 0x01)  | ((_fault[1]>>9) & 0x02) | ((_fault[1]>>10) & 0x04) | ((_fault[1]>>12) & 0x04);
 
 	#else
-		FAULT0 = ((_fault[0]>>8) & 0x01)  | ((_fault[0]>>9)  & 0x02) | ((_fault[0]>>12) & 0x04);	
-		FAULT1 = ((_fault[0]>>8) & 0x01)  | ((_fault[0]>>11) & 0x02) | ((_fault[0]>>12) & 0x04);
-		FAULT2 = ((_fault[1]>>8) & 0x01)  | ((_fault[1]>>9)  & 0x02) | ((_fault[1]>>12) & 0x04);						
-		FAULT3 = ((_fault[1]>>8) & 0x01)  | ((_fault[1]>>11) & 0x02) | ((_fault[1]>>12) & 0x04);
+		FAULT0 = (unsigned char )((_fault[0]>>8) & 0x01)  | ((_fault[0]>>9)  & 0x02) | ((_fault[0]>>12) & 0x04);	
+		FAULT1 = (unsigned char )((_fault[0]>>8) & 0x01)  | ((_fault[0]>>11) & 0x02) | ((_fault[0]>>12) & 0x04);
+		FAULT2 = (unsigned char )((_fault[1]>>8) & 0x01)  | ((_fault[1]>>9)  & 0x02) | ((_fault[1]>>12) & 0x04);						
+		FAULT3 = (unsigned char )((_fault[1]>>8) & 0x01)  | ((_fault[1]>>11) & 0x02) | ((_fault[1]>>12) & 0x04);
 	#endif
 
 	// Updates						
@@ -655,7 +655,7 @@ void can_send_broadcast(void)
 		_canmsg.CAN_length = 8;
 		_canmsg.CAN_frameType = DATA_FRAME;
 
-#if (VERSION ==0x0154 || VERSION ==0x0155 || VERSION ==0x0158 || VERSION == 0x0351 || VERSION ==0x0151)
+#if (VERSION ==0x0154 || VERSION ==0x0155 || VERSION ==0x0158 || VERSION == 0x0351 || VERSION ==0x0151 || VERSION ==0x0251)
 		if(FAULT_ABS0 == 0)
 			CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
 #elif (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOARD_TYPE == BOARD_TYPE_2BLLDC)
@@ -1173,7 +1173,100 @@ void can_send_broadcast(void)
 		CAN1_sendFrame (1, _canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
 		
 	}
+	
+	// **************************************************************************/
+	// * 						    BROADCAST MOTOR POSITION                    */
+	// **************************************************************************/
+	
+//  @@@RANDAZ: important: CAN_SYNCHRO_STEP has been reduced from 5 to 4 because of CAN_SET_ACTIVE_PID_HANDLER()	
+ 
+	if ((broadcast_mask[0] & (1<<(CAN_BCAST_MOTOR_POSITION-1))) && _counter == 3)
+	{
+		_canmsg.CAN_messID = 0x100;
+		_canmsg.CAN_messID |= (_board_ID) << 4;
+		_canmsg.CAN_messID |= CAN_BCAST_MOTOR_POSITION;
+
+		_canmsg.CAN_data[0] = BYTE_4(_motor_position[0]);
+		_canmsg.CAN_data[1] = BYTE_3(_motor_position[0]);
+		_canmsg.CAN_data[2] = BYTE_2(_motor_position[0]);
+		_canmsg.CAN_data[3] = BYTE_1(_motor_position[0]);
+		
+		_canmsg.CAN_data[4] = BYTE_4(_motor_position[1]);
+		_canmsg.CAN_data[5] = BYTE_3(_motor_position[1]);
+		_canmsg.CAN_data[6] = BYTE_2(_motor_position[1]);
+		_canmsg.CAN_data[7] = BYTE_1(_motor_position[1]);
+		
+			
+		_canmsg.CAN_length = 8;
+		_canmsg.CAN_frameType = DATA_FRAME;
+		CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);	
+
+	}
+	if (JN == 4 && (broadcast_mask[1] & (1<<(CAN_BCAST_MOTOR_POSITION-1))) && _counter == 4)
+	{
+		_canmsg.CAN_messID = 0x100;
+		_canmsg.CAN_messID |= (_board_ID+1) << 4;
+		_canmsg.CAN_messID |= CAN_BCAST_MOTOR_POSITION;
+
+		_canmsg.CAN_data[0] = BYTE_4(_motor_position[0]);
+		_canmsg.CAN_data[1] = BYTE_3(_motor_position[0]);
+		_canmsg.CAN_data[2] = BYTE_2(_motor_position[0]);
+		_canmsg.CAN_data[3] = BYTE_1(_motor_position[0]);
+		
+		_canmsg.CAN_data[4] = BYTE_4(_motor_position[1]);
+		_canmsg.CAN_data[5] = BYTE_3(_motor_position[1]);
+		_canmsg.CAN_data[6] = BYTE_2(_motor_position[1]);
+		_canmsg.CAN_data[7] = BYTE_1(_motor_position[1]);
+		
+			
+		_canmsg.CAN_length = 8;
+		_canmsg.CAN_frameType = DATA_FRAME;
+		CAN1_sendFrame (1, _canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
+		
+	}
+		
+	// **************************************************************************/
+	// * 						    BROADCAST MOTOR SPEED                       */
+	// **************************************************************************/
+	
+//  @@@RANDAZ: important: CAN_SYNCHRO_STEP has been reduced from 5 to 4 because of CAN_SET_ACTIVE_PID_HANDLER()	
+ 
+	if ((broadcast_mask[0] & (1<<(CAN_BCAST_MOTOR_SPEED-1))) && _counter == 3)
+	{
+		_canmsg.CAN_messID = 0x100;
+		_canmsg.CAN_messID |= (_board_ID) << 4;
+		_canmsg.CAN_messID |= CAN_BCAST_MOTOR_SPEED;
+
+		_canmsg.CAN_data[0] = BYTE_H(_motor_speed[0]);
+		_canmsg.CAN_data[1] = BYTE_L(_motor_speed[0]);
+		_canmsg.CAN_data[2] = BYTE_H(_motor_speed[1]);
+		_canmsg.CAN_data[3] = BYTE_L(_motor_speed[1]);
+				
+			
+		_canmsg.CAN_length = 4;
+		_canmsg.CAN_frameType = DATA_FRAME;
+		CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);	
+
+	}
+	if (JN == 4 && (broadcast_mask[1] & (1<<(CAN_BCAST_MOTOR_SPEED-1))) && _counter == 4)
+	{
+		_canmsg.CAN_messID = 0x100;
+		_canmsg.CAN_messID |= (_board_ID+1) << 4;
+		_canmsg.CAN_messID |= CAN_BCAST_MOTOR_SPEED;
+
+		_canmsg.CAN_data[0] = BYTE_H(_motor_speed[0]);
+		_canmsg.CAN_data[1] = BYTE_L(_motor_speed[0]);
+		_canmsg.CAN_data[2] = BYTE_H(_motor_speed[1]);
+		_canmsg.CAN_data[3] = BYTE_L(_motor_speed[1]);
+		
+			
+		_canmsg.CAN_length = 4;
+		_canmsg.CAN_frameType = DATA_FRAME;
+		CAN1_sendFrame (1, _canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
+		
+	}
 }
+
 
 /**************************************************************
 Set Can Mask

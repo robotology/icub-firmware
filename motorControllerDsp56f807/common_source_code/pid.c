@@ -96,6 +96,8 @@ Int16 _speed[JN] = INIT_ARRAY (0);			 	 		// encoder speed
 Int16 _speed_old[JN] = INIT_ARRAY (0);					// encoder old speed 
 Int16 _comm_speed[JN] = INIT_ARRAY (0);		     		// brushless commutation speed 
 Int16 _comm_speed_old[JN] = INIT_ARRAY (0);				// previous brushless commutation speed 
+Int16 _motor_speed[JN] = INIT_ARRAY (0);		     		// brushless motor speed 
+Int16 _motor_speed_old[JN] = INIT_ARRAY (0);				// previous brushless motor speed 
 Int16 _accu_desired_vel[JN] = INIT_ARRAY (0);			// accumultor for the fractional part of the desired vel 
 Int16 _desired_vel[JN] = INIT_ARRAY (0);				// speed reference value, computed by the trajectory gen. 
 Int16 _set_vel[JN] = INIT_ARRAY (DEFAULT_VELOCITY);		// set point for velocity [user specified] 
@@ -243,11 +245,11 @@ Int32 compute_pwm(byte j)
 		/*watchdog check for strain messages in torque control mode + input selection*/
 		//the function turns off pwm of joint <jnt> if <strain_num> watchdog is triggered
 		//the first number is joint, the second number is the watchdog identifier
-#if   VERSION == 0x150 || VERSION == 0x140
+#if   (VERSION == 0x150 || VERSION == 0x140 || VERSION == 0x250 )
 	  	//arm
 	  	read_force_data (0, WDT_JNT_STRAIN_12,0);
 	  	read_force_data (1, WDT_JNT_STRAIN_12,1);
-#elif VERSION == 0x151 
+#elif (VERSION == 0x151 || VERSION == 0x251 ) 
 	  	//legs
 	  	if (_board_ID==5)     //left leg
 	  	{
@@ -295,15 +297,15 @@ Int32 compute_pwm(byte j)
 				_strain_val[j]=0;
 			}
 	  	}
-#elif VERSION == 0x152 
+#elif (VERSION == 0x152 || VERSION == 0x252) 
 	  	//torso
 	  	read_force_data (0, WDT_JNT_STRAIN_12,1); 
 	  	read_force_data (1, WDT_JNT_STRAIN_12,2); 
-#elif VERSION == 0x154
+#elif (VERSION == 0x154 || VERSION == 0x254)
 	  	//torso
 	  	read_force_data (0, WDT_JNT_STRAIN_12,0); 
 	  	  
-#elif VERSION == 0x157 || VERSION == 0x147
+#elif VERSION == 0x157 || VERSION == 0x147 || VERSION == 0x257
       	//coupled joint of the arm
      // read_force_data (0, WDT_6AX_STRAIN_13,5);
 	 	read_force_data (0, WDT_JNT_STRAIN_12,2);

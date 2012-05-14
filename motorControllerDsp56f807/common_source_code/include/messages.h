@@ -372,7 +372,7 @@
 			PWM_outputPadDisable(2); \
 			_pad_enabled[1] = false; \
 			_pad_enabled[2] = false; \
-			_general_board_error = ERROR_NONE; \
+			_general_board_error = (unsigned char) ERROR_NONE; \
 			can_printf("PWM DIS COUPLED:1 & 2");\
 		}\
 		else\
@@ -1002,7 +1002,7 @@
 			/* _set_vel needs to be checked */ \
 			_set_acc[axis] = 0; \
 			init_trajectory (axis, _desired[axis], _set_point[axis], _set_vel[axis]); \
-			_general_board_error = ERROR_NONE; \
+			_general_board_error =  ERROR_NONE; \
 		} \
 		else \
 		{ \
