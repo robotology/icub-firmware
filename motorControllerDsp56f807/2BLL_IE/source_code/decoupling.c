@@ -19,14 +19,14 @@ void decouple_positions(void)
 	_cpl_pos_counter++;
 	if (_cpl_pos_counter < timeout_cpl_pos && (get_error_abs_ssi(0)==ERR_OK))
 	{
-		/* beware of the first cycle when _old has no meaning */		
+		// beware of the first cycle when _old has no meaning 
 		_position[0] = _position[0]+ (float) (((float) _cpl_pos_prediction[0])*1.625F);  
 		_position[0] = _position[0]- (float) (((float) _cpl_pos_prediction[1])*1.625F);
-		/*
-		|M1| |  1     0    0   |  |T1|
-		|T2|=|  0     1    0   |* |T2|     with a=40/65 i.e. a=1/1.625
-		|M3| | 1/a  -1/a   1   |  |T3|
-		*/
+		
+		// |J1| |  1     0    0   |  |E1|
+		// |J2|=|  0     1    0   |* |E2|     with a=40/65 i.e. a=1/1.625
+		// |J3| | 1/a  -1/a   1   |  |E3|
+		
 		_cpl_pos_prediction[0] = L_add(_cpl_pos_prediction[0], _cpl_pos_delta[0]);
 		_cpl_pos_prediction[1] = L_add(_cpl_pos_prediction[1], _cpl_pos_delta[1]);
 		
@@ -55,19 +55,27 @@ void decouple_positions(void)
 		count++;				
 		#endif			
 	}
+#elif   VERSION == 0x0140 	
+	//_position [0] = _position[0];
+	_position[1] = (float) (-_position[0] + _position[1]) * 1.625F;
+	
+#elif   VERSION == 0x0147
+ 	//_position [0] = _position[0];
+ 	//_position [1] = _position[1];
+
 #elif   VERSION == 0x0157 
 	_cpl_pos_counter++;
 	if (_cpl_pos_counter < timeout_cpl_pos  && (get_error_abs_ssi(0)==ERR_OK))
 	{
-		/* beware of the first cycle when _old has no meaning */		
+		// beware of the first cycle when _old has no meaning		
 		_position[0] = (((float) _position[0])*0.6153F);  
 		_position[0] = _position[0]+ _cpl_pos_prediction[0];
 		_position[0] = _position[0]- _cpl_pos_prediction[1];
-		/*
-		|M1| |  1     0    0   |  |T1|     pulley diameter
-		|T2|=|  0     1    0   |* |T2|     with a=40/65 i.e. a=0.6153
-		|M3| |  1    -1    a   |  |T3|
-		*/
+		
+		// |J1| |  1     0    0   |  |E1|     pulley diameter
+		// |J2|=|  0     1    0   |* |E2|     with a=40/65 i.e. a=0.6153
+		// |J3| |  1    -1    a   |  |E3|
+		
 		_cpl_pos_prediction[0] = L_add(_cpl_pos_prediction[0], _cpl_pos_delta[0]);
 		_cpl_pos_prediction[1] = L_add(_cpl_pos_prediction[1], _cpl_pos_delta[1]);
 	}
@@ -86,19 +94,21 @@ void decouple_positions(void)
 		count++;				
 		#endif			
 	}
-#elif VERSION == 0x0255
+#elif VERSION == 0x0155
 //		_position[0] = _position[0] - _position[1];
 //		_position[1] = _position[0] + 2*_position[1];	
 		
-/*#elif VERSION == 0x0152
+/*
+#elif VERSION == 0x0152
 		
-	/*  Waist Differential coupling 
-		|Me1| |  1     1 |  |Je1|
-		|Me2|=|  1    -1 |* |Je2|    */
+	//  Waist Differential coupling 
+	//	|Me1| |  1     1 |  |Je1|
+	//	|Me2|=|  1    -1 |* |Je2|    
 
-/*	_position[0] =_position[0] -  _position[1];
-	_position[1] =_position[0] +2*_position[1];
+//_position[0] =_position[0] -  _position[1];
+//_position[1] =_position[0] +2*_position[1];
 */
+
 #endif
 }
 
@@ -123,7 +133,7 @@ void decouple_dutycycle(Int32 *pwm)
 	static UInt8 count=0;
 	byte timeout_cpl_pid = 100;
 
-#if VERSION == 0x0150
+#if VERSION == 0x0250
 
 	/* Version 0x0150 relizes the shoulder coupling (here '_c' denotes 
 	 * the coupled board variables).The applied coupling is the following:
@@ -201,7 +211,7 @@ void decouple_dutycycle(Int32 *pwm)
 		
 	
 
-#elif VERSION == 0x0152
+#elif VERSION == 0x0252
 	/*  Waist Differential coupling 
 		|Me1| |  1    -1 |  |Je1|
 		|Me2|=|  1     1 |* |Je2|    */
@@ -220,7 +230,7 @@ void decouple_dutycycle(Int32 *pwm)
 	_pd[0] = (_pd[0] - _pd[1])>>1;
 	_pd[1] = (temp32   + _pd[1])>>1;
 		
-#elif VERSION == 0x0153 || VERSION == 0x0157
+#elif VERSION == 0x0253 || VERSION == 0x0257
 	/* Version 0x0153 relizes the shoulder coupling (here '_c' denotes 
 	 * the coupled board variables).The applied coupling is the following:
 	 *
@@ -330,7 +340,7 @@ void decouple_dutycycle(Int32 *pwm)
 	count++;
 #endif
 
-#if VERSION == 0x0150
+#if VERSION == 0x0250
 	// ----- JOINT 0 -----	
 	if (_control_mode[0] == MODE_POSITION)
 	{
@@ -394,7 +404,7 @@ void decouple_dutycycle(Int32 *pwm)
 		#endif			
 	}
 	
-#elif VERSION == 0x0152
+#elif VERSION == 0x0252
 	//  Waist Differential coupling 
 	//	|Me1| |  1    -1 |  |Je1|
 	//	|Me2|=|  1     1 |* |Je2|    
@@ -496,7 +506,7 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
 	pwm_out[0]=pwm[0];
 	pwm_out[1]=pwm[1];
 
-#if VERSION == 0x0150
+#if VERSION == 0x0250
 
 	/*
 		  TORQUE COUPLING MATRIX
@@ -508,7 +518,7 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
 		  b = 1.6455		  
 	*/	
 	  
-	/* Version 0x0150 relizes the shoulder coupling (here '_c' denotes 
+	/* Version 0x0250 relizes the shoulder coupling (here '_c' denotes 
 	 * the coupled board variables).The applied coupling is the following:
 	 *
 	 * 			[    Jm1,      0,      0]
@@ -632,7 +642,7 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
 		#endif			
 	}
 	
-#elif VERSION == 0x0152
+#elif VERSION == 0x0252
 	/*  Waist Differential coupling 
 		|Me1| |  1    -1 |  |Je1|
 		|Me2|=|  1     1 |* |Je2|    */
@@ -651,7 +661,7 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
 	}
 
 		
-#elif VERSION == 0x0153 || VERSION == 0x0157
+#elif VERSION == 0x0253 || VERSION == 0x0257
 	/*
 		  TORQUE COUPLING MATRIX
 		  
@@ -803,7 +813,7 @@ void decouple_dutycycle_new_joint_parametric(Int32 *pwm)
 	pwm_out[0]=pwm[0];
 	pwm_out[1]=pwm[1];
 
-#if VERSION == 0x0150
+#if VERSION == 0x0250
 
 	/*
 		  TORQUE COUPLING MATRIX
@@ -912,7 +922,7 @@ void decouple_dutycycle_new_joint_parametric(Int32 *pwm)
 		#endif			
 	}
 	
-#elif VERSION == 0x0152
+#elif VERSION == 0x0252
 	/*  Waist Differential coupling 
 		|Me1| |  1    -1 |  |Je1|
 		|Me2|=|  1     1 |* |Je2|    */
@@ -931,7 +941,7 @@ void decouple_dutycycle_new_joint_parametric(Int32 *pwm)
 	}
 
 		
-#elif VERSION == 0x0153 || VERSION == 0x0157
+#elif VERSION == 0x0253 || VERSION == 0x0257
 	/*
 		  TORQUE COUPLING MATRIX
 		  

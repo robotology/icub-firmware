@@ -34,8 +34,8 @@
 byte	_board_ID = 16;	
 char    _additional_info [32];
 UInt8    mainLoopOVF=0;
-word    _build_number = 49;
-int     _countBoardStatus =0;
+word    _build_number = 50;
+int     _countBoardStatus[2] ={0,0};
 Int16   _flash_version=0; 
 UInt8   BUS_OFF=false;
 const byte winShift=5;
@@ -68,7 +68,9 @@ extern sDutyControlBL DutyCycleReq[2];
 //********************
 
 
-#if VERSION == 0x0255
+#if VERSION == 0x0251
+Int16 _version = 0x0251;
+#elif VERSION == 0x0255
 Int16 _version = 0x0255;
 #elif VERSION == 0x0258
 Int16 _version = 0x0258;
@@ -99,9 +101,11 @@ void main(void)
 {
 
 	Int32 PWMoutput [JN];
+	Int32 PWMoutput_old [JN];
 	Int32 test;
 	word temporary;
 	byte i=0;
+	byte wi=0;
 	byte k=0;
 	UInt16 *value=0;
 	Int32 t1val=0;
@@ -111,19 +115,32 @@ void main(void)
 	Int16 print_number=0;
 	Int16 real_pos=0;
 	byte first_step=0;
-	
-	//velocity and acceleration estimation
-	byte j=0;
 
-	byte headPos=0; //current pos/vel
-	byte tailPos=0; //tail is (head+1)%winSize
-	byte headVel=0; //current pos/vel
-	byte tailVel=0; //tail is (head+1)%winSize
-	byte winSizePos=1<<winShift; //size of the position window 
-	byte winSizeVel=1<<winShift; //size of the position window 
-	Int32 positionWindow[1<<winShift][JN]; //max window size: 254
-	Int32 velocityWindow[1<<winShift][JN]; //max window size: 254
-  	Int16 _safeband[JN];	//it is a value for reducing the JOINT limit of 2*_safeband [tick encoder]
+#if (VERSION == 0x0351)
+
+	#define winSizeMax 32
+	#define initialWindowSize 4
+#else
+	#define winSizeMax 32
+	#define initialWindowSize 30
+#endif
+	byte divJntPos[JN]=INIT_ARRAY(initialWindowSize-1);
+	byte divJntVel[JN]=INIT_ARRAY(initialWindowSize-1);
+	byte divMotPos[JN]=INIT_ARRAY(initialWindowSize-1);
+	byte divMotVel[JN]=INIT_ARRAY(initialWindowSize-1);
+	byte headJntPos[JN]=INIT_ARRAY(0);  //current joint pos
+	byte tailJntPos[JN]=INIT_ARRAY(0); 
+	byte headJntVel[JN]=INIT_ARRAY(0);  //current joint vel
+	byte tailJntVel[JN]=INIT_ARRAY(0); 
+	byte headMotPos[JN]=INIT_ARRAY(0);  //current motor pos
+	byte tailMotPos[JN]=INIT_ARRAY(0); 
+	byte headMotVel[JN]=INIT_ARRAY(0);  //current motor vel
+	byte tailMotVel[JN]=INIT_ARRAY(0); 
+	Int32 jntPosWindow[winSizeMax][JN]; //max window size = winSizeMax
+	Int32 jntVelWindow[winSizeMax][JN]; //max window size = winSizeMax
+	Int32 motPosWindow[winSizeMax][JN]; //max window size = winSizeMax
+	Int32 motVelWindow[winSizeMax][JN]; //max window size = winSizeMax
+	Int16 _safeband[JN];	//it is a value for reducing the JOINT limit of 2*_safeband [tick encoder]
 #ifdef TEMPERATURE_SENSOR
 	byte   TempSensCount1 = 0;
 	UInt32 TempSensCount2 = 0;
@@ -209,20 +226,16 @@ void main(void)
 		writeToFlash(_flash_addr);
 	}
 	__DI();
-		__EI();
-#warning "debug"//   ;
+	
+	#warning "debug"//   ;
+	
+	__EI();
+
 	init_leds  			  ();
-#if VERSION == 0x0255 	
-	Init_Brushless_Comm	  (2,HALL); //two axes
-#else 
-  
-    enable_can_print();
+
    Init_Brushless_Comm	  (JN,HALL); 
-  
-#endif				
+  			
 
-
-//	serial_interface_init (JN);
 	can_interface_init    (JN);
 	
 #ifdef TORQUE_CNTRL
@@ -230,7 +243,7 @@ void main(void)
 #endif 	
 
     init_position_abs_ssi ();
-#if VERSION == 0x0153 || VERSION ==0x0157 || VERSION == 0x0172 
+#if VERSION ==0x0257 
     init_relative_position_abs_ssi();
 #endif 
  
@@ -244,16 +257,18 @@ void main(void)
 
 //variable init	
 	mainLoopOVF=0;
-	_countBoardStatus=0;
 	_count=0;
 	
-	for(j=0;j<JN;j++)
+	for(i=0;i<JN;i++)
 	{
-	_received_pid[j].rec_pid=0;
+	_received_pid[i].rec_pid=0;
 	}
 	
 	BUS_OFF=false;
- 
+ 	#warning "debug"//   ;
+	
+	//__EI();
+
 	  
 //	print_version ();
 	
@@ -274,11 +289,8 @@ void main(void)
 	_position[0]=(Int32)get_position_encoder(0);	
    	_position[1]=(Int32) Filter_Bit(get_position_abs_ssi(1));
     _max_real_position[1]=Filter_Bit(4095);
-	
-#endif//	AS1_printStringEx ("\r\n");
-	
-	
-	
+
+#endif
  	
 	//////////////////////////////////////
 	
@@ -286,20 +298,20 @@ void main(void)
 	for (i=0; i<JN; i++) _position_old[i] = 0;
 	for (i=0; i<JN; i++) _speed[i] = 0;
 	for (i=0; i<JN; i++) _accel[i] = 0;
-	for (i=0; i<JN; i++) _safeband[i] =-5; //5 ticks => 1 grado di AEA.
+	for (i=0; i<JN; i++) _safeband[i] =5; //5 ticks => 1 grado di AEA.
+	for (i=0; i<JN; i++) PWMoutput [i] = PWMoutput_old[i] = 0;
 	
 	/* reset the recursive windows for storage of position and velocity data */
 	/* (for velocity and position estimates) */
 	for(i=0;i<JN;i++)
 	{
-		for(j=0;j<winSizePos;j++)
+		for(wi=0;wi<winSizeMax;wi++)
 		{
-			positionWindow[j][i]=_position[i];	
+			jntPosWindow[wi][i]=_position[i];	
+			jntVelWindow[wi][i]=0;
+			motPosWindow[wi][i]=0;	
+			motVelWindow[wi][i]=0;
 		}
-		for(j=0;j<winSizeVel;j++)
-		{
-			velocityWindow[j][i]=0;	
-		}	
 	}
 	
 	//set_relative_position_abs_ssi(1,get_absolute_real_position_abs_ssi(1));
@@ -328,12 +340,7 @@ void main(void)
 		can_interface();
 
 		
-		// Strain Gauges sampling by internal ADC
-#if	VERSION == 0x0171
-//		_strain[0][5] = (read_strain(1,1)*3.03/*2*1.515*/); // 1.515=5/3.3
-		_strain[0][5] = (read_strain(1,1)*3); // 1.515=5/3.3
-		_strain[0][5]-=0x7FFF;
-#endif
+	
 	
 	    //Position calculation
 	    // This is used to have a shift of the zero-cross out of the 
@@ -342,22 +349,14 @@ void main(void)
 	    // max_real_position is the limit of the joint starting from 
 	    // 4095 and going to decrease this number without zero-cross
 	    // untill the joint limit is reached
-#if   VERSION == 0x0153 || VERSION == 0x0157 
+#if   VERSION == 0x0253 || VERSION == 0x0257 
 		_position_old[0]=_position[0]; 
 		if(get_error_abs_ssi(0)==ERR_OK)
 			_position[0]=Filter_Bit (get_relative_position_abs_ssi(0));
-		
 		_position_old[1]=_position[1];
 		if(get_error_abs_ssi(1)==ERR_OK) 
 			_position[1]=Filter_Bit (get_position_abs_ssi(1));
-#elif VERSION == 0x0172
-		_position_old[0]=_position[0];
-		if(get_error_abs_ssi(0)==ERR_OK) 
-			_position[0]=Filter_Bit (get_relative_position_abs_ssi(0));
 		
-		_position_old[1]=_position[1];
-		if(get_error_abs_ssi(1)==ERR_OK) 
-			_position[1]=Filter_Bit (get_relative_position_abs_ssi(1));
 #elif VERSION ==0x0255
 		_position_old[0]=_position[0];
 		_position[0]=Filter_Bit (get_position_abs_ssi(0));
@@ -378,10 +377,15 @@ void main(void)
 		}
 #endif 
 
+		// get_commutations() is used to read the incremental encoder of the motors.
+		// the variable _motor_position is then used to estimate the rotor speed and
+		// compensate the back-EMF of the motor.
+		for (i=0; i<JN; i++) _motor_position[i]=get_position_encoder(i);//get_commutations(i);
+
 
 ///////////////////////////////////////////DEBUG////////////
 // ADDED VERSION !=0x0171
-#if (VERSION !=0x0154) && (VERSION !=0x0171) && (VERSION !=0x0258)
+#if (VERSION !=0x0254) || (VERSION !=0x0258)
 	    for (i=0; i<JN; i++) 
 		{		
 		   if (get_error_abs_ssi(i)==ERR_ABS_SSI)
@@ -397,7 +401,7 @@ void main(void)
 #endif
 	
 #warning "here we should put a control for 0x0258"	
-#if (VERSION ==0x0154) 
+#if (VERSION ==0x0254) || (VERSION ==0x0258)
 		   if (get_error_abs_ssi(0)==ERR_ABS_SSI)
 		   {
 					_control_mode[0] = MODE_IDLE;	
@@ -412,47 +416,43 @@ void main(void)
 		// decoupling the position	 	
 		decouple_positions();
 		
-#ifdef DEBUG_TRAJECTORY
-		if (_verbose && _counter == 0)
-		{
+
+				/* velocity and acceleration estimators */
+		{	
 			for (i=0; i<JN; i++)
-			{
-				AS1_printDWordAsCharsDec (_position[i]);
-				AS1_printStringEx (" ");	
+			{	
+				//joint velocity estimator
+				tailJntPos[i]=headJntPos[i]+(winSizeMax-divJntPos[i]); if(tailJntPos[i]>=winSizeMax) tailJntPos[i]=tailJntPos[i]%winSizeMax;			
+				_speed_old[i] = _speed[i];
+				jntPosWindow[headJntPos[i]][i]=_position[i];
+				_speed[i] = ((jntPosWindow[headJntPos[i]][i] - jntPosWindow[tailJntPos[i]][i] ));
+				_speed[i] <<= _jntVel_est_shift[i];
+				_speed[i] = (Int32)(_speed[i]) / divJntPos[i];
+				headJntPos[i]=headJntPos[i]+1; if(headJntPos[i]>=winSizeMax) headJntPos[i]=0;
+/*
+				//joint acceleration estimator
+				tailJntVel[i]=headJntVel[i]+(winSizeMax-divJntVel[i]); if(tailJntVel[i]>=winSizeMax) tailJntVel[i]=tailJntVel[i]%winSizeMax;			
+				_accel_old[i] = _accel[i];
+				jntVelWindow[headJntVel[i]][i]=_speed[i];
+				_accel[i] = ((jntVelWindow[headJntVel[i]][i] - jntVelWindow[tailJntVel[i]][i] ));
+				_accel[i] << _jntAcc_est_shift[i];
+				_accel[i] = (Int32)(_accel[i]) / divJntVel[i];
+				headJntVel[i]=headJntVel[i]+1; if(headJntVel[i]>=winSizeMax) headJntVel[i]=0;
+*/				
+				//motor velocity estimator
+				tailMotPos[i]=headMotPos[i]+(winSizeMax-divMotPos[i]); if(tailMotPos[i]>=winSizeMax) tailMotPos[i]=tailMotPos[i]%winSizeMax;			
+				_motor_speed_old[i] = _motor_speed[i];
+				motPosWindow[headMotPos[i]][i]=_motor_position[i];
+				_motor_speed[i] = ((motPosWindow[headMotPos[i]][i] - motPosWindow[tailMotPos[i]][i] ));
+				_motor_speed[i] <<= _motVel_est_shift[i];
+				_motor_speed[i] = (Int32)(_motor_speed[i]) / divMotPos[i];
+				headMotPos[i]=headMotPos[i]+1; if(headMotPos[i]>=winSizeMax) headMotPos[i]=0;				
 			}
-			AS1_printStringEx ("\r\n");
-		}
-#endif
-
-		//if (_counter == 0)
-		//{	
-		
-		//tail= (tail+1)%winSize;
-		tailPos=headPos+1; if(tailPos==winSizePos) tailPos=0;
-		tailVel=headVel+1; if(tailVel==winSizeVel) tailVel=0;
-		/* store the new position in the circular buffer */
-		for (i=0; i<JN; i++) positionWindow[headPos][i]=_position[i];
-				
-		/* compute speed and acceleration, and store the speed in the circular buffer */		
-		for (i=0; i<JN; i++)
-		{
-			velocityWindow[headVel][i]= ((positionWindow[headPos][i] - positionWindow[tailPos][i] ));//>>winShift;
-			_speed[i]= (Int16)(velocityWindow[headVel][i]);
-			_accel[i]= (Int16)((velocityWindow[headVel][i] - velocityWindow[tailVel][i]));//>>winShift;
 		}
 
-		
-		/* advance in the circular buffer */
-		//head= (head+1)%winSize;
-		headPos=headPos+1; if(headPos==winSizePos) headPos=0;
-		headVel=headVel+1; if(headVel==winSizeVel) headVel=0;
-				
-	
-		//}
-		
 					
 		/* in position? */
-#if (VERSION != 0x0154)  && (VERSION != 0x0258)
+#if (VERSION != 0x0254)  && (VERSION != 0x0258)
 		for (i=0; i<JN; i++) _in_position[i] = check_in_position(i); 
 #else
 		_in_position[0] = check_in_position(0);
@@ -467,40 +467,72 @@ void main(void)
 		for (i=0; i<JN; i++)  check_range(i, _safeband[i], PWMoutput);
 
 //******************************************* COMPUTES CONTROLS *****************************/
+led0_on	
 
+		//FT sensor watchdog update 
+		for (i=0; i<STRAIN_MAX; i++) 
+			if (_strain_wtd[i]>0) _strain_wtd[i]--;
+			
 		for (i=0; i<JN; i++) 
 		{
-			_bfc_PWMoutput[i] = PWMoutput[i] = compute_pwm(i);	
+			//computing the PWM value (PID)
+			PWMoutput[i] = compute_pwm(i);
+
+			// PWM filtering in torque control 
+			#if (VERSION != 0x0351)
+			if (_control_mode[i] == MODE_TORQUE ||
+			 	_control_mode[i] == MODE_IMPEDANCE_POS ||
+			 	_control_mode[i] == MODE_IMPEDANCE_VEL)
+				{
+					PWMoutput[i] = lpf_ord1_3hz (PWMoutput[i], i);
+				}	
+			// saving the PWM value before the decoupling					
+			_bfc_PWMoutput[i] = PWMoutput_old[i] = PWMoutput[i];
+
+			// applying the saturation to the PWM
 			if      (_bfc_PWMoutput[i] < -MAX_DUTY) _bfc_PWMoutput[i]=-MAX_DUTY;
 			else if (_bfc_PWMoutput[i] > MAX_DUTY)  _bfc_PWMoutput[i]= MAX_DUTY;
+			#endif //(VERSION != 0x0351)			
 		}
-	
+
 //		decouple PWM	
 #ifdef USE_NEW_DECOUPLING
+		#ifdef USE_PARAMETRIC_DECOUPLING
+		decouple_dutycycle_new_joint_parametric(PWMoutput);  //parametric version
+		#else
 		decouple_dutycycle_new_joint(PWMoutput); //new version (july 2010) with torque decupling
+		#endif
 #else
 		decouple_dutycycle(PWMoutput);				
 #endif
 
-		/* PWM filtering */
-		for (i=0; i<JN; i++) 
-		{
-			if (_control_mode[i] == MODE_TORQUE ||
-			 	_control_mode[i] == MODE_IMPEDANCE_POS ||
-			 	_control_mode[i] == MODE_IMPEDANCE_VEL)
-				PWMoutput[i] = lpf_ord1_3hz (PWMoutput[i], i);	
-		}
-	
-//******************************************* LIMIT CHECK FOR FORCE CONTORL******************/
-		// Protection for joints out of the admissible range during force control
-		for (i=0; i<JN; i++)  check_range_torque(i, _safeband[i], PWMoutput);
+
+led0_off	
 		
 //******************************************* SATURATES CONTROLS ***************************/                
-		/* saturates controls if necessary */
+		/* back emf compensation + controls saturation (if necessary) */
 		for (i=0; i<JN; i++)
 		{
+			if (_control_mode[i] == MODE_TORQUE ||
+				_control_mode[i] == MODE_IMPEDANCE_POS ||
+				_control_mode[i] == MODE_IMPEDANCE_VEL)
+			{
+				#if (VERSION != 0x0351)
+				// Back emf compensation			
+			
+				PWMoutput[i]+=compensate_bemf(i, _comm_speed[i]);
+				// Protection for joints out of the admissible range during force control
+				check_range_torque(i, _safeband[i], PWMoutput);
+				// PWM saturation
+				ENFORCE_LIMITS	(i,PWMoutput[i], _pid_limit_torque[i] );
+				#else  //(VERSION != 0x0351)
 				ENFORCE_LIMITS	(i,PWMoutput[i], _pid_limit[i] );
-					
+				#endif //(VERSION != 0x0351)
+			}
+			else
+			{
+				ENFORCE_LIMITS	(i,PWMoutput[i], _pid_limit[i] );
+			}			
 			if      (_pid[i] < -MAX_DUTY) _pid[i]=-MAX_DUTY;
 			else if (_pid[i] > MAX_DUTY)  _pid[i]= MAX_DUTY;
 		}
@@ -514,8 +546,7 @@ void main(void)
 			}
 			else	
 			{
-				PWM_generate(i,_pid[i]);
-		//		setReg (TMRD0_CNTR, 39998);              				
+				PWM_generate(i,_pid[i]);        				
 			}
 			
 		}
@@ -523,8 +554,16 @@ void main(void)
 		/* Check Current done in T1 */
 
 		/* do extra functions, communicate, etc. */
-		
+		//send broadcast data	
 		can_send_broadcast();
+
+		//send additional debug information
+		//can_send_broadcast_debug(1,1);
+
+#ifdef IDENTIF
+#warning "***** IDENTIFICATION MODE ON *****"
+		can_send_broadcast_identification(IDENTIF); //IDENTIF is the axis number 
+#endif
 	
 
 //	Check for the MAIN LOOP duration
@@ -545,6 +584,3 @@ void main(void)
 		
 	} /* end for(;;) */
 }
-
-
-

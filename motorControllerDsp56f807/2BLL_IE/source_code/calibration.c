@@ -27,8 +27,7 @@ void check_in_position_calib(byte jnt)
   //this function is not used for a board with brushess motors
 }   
 
-
-      
+     
 /**************************************************************** 
  * calibration procedure, depends on the firmware version.
  ****************************************************************/
@@ -46,7 +45,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		set_relative_position_abs_ssi_turns(channel, 0);
 		_position[channel] = get_relative_position_abs_ssi(channel);		
 		
-#elif (VERSION==0x0150 || VERSION==0x0151 || VERSION==0x0152 || VERSION==0x0154 || VERSION==0x0255 ) 
+#elif (VERSION==0x0250 || VERSION==0x0251 || VERSION==0x0252 || VERSION==0x0254 || VERSION==0x0255 ) 
 
 	//	AS1_printStringEx ("Calibration ABS_DIGITAL started \r\n");
 		if (param3 >=0 && param3 <=4095) set_max_position(channel, param3);	
@@ -97,7 +96,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		}
 	
 	
-#elif VERSION==0x0153 || VERSION==0x0157 
+#elif VERSION==0x0253 || VERSION==0x0257 
 	//  	AS1_printStringEx ("Calibration ABS_DIGITAL started \r\n");
 		if (param3 >=0 && param3 <=4095) set_max_position(channel, param3);	
 		if (param2>0 && channel==0)
