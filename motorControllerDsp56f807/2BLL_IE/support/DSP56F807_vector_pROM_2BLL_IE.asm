@@ -73,7 +73,7 @@ M56807_intDef:
 	jmp M56807_intRoutine    ; Timer B Channel 1        ($4e)
 	jmp M56807_intRoutine    ; Timer B Channel 2        ($50)
 	jmp M56807_intRoutine    ; Timer B Channel 3        ($52)
-    jsr FQD0_Interrupt       ; Timer A Channel 0        ($54)
+    jmp M56807_intRoutine    ; Timer A Channel 0        ($54)
     jmp M56807_intRoutine    ; Timer A Channel 1        ($56)
     jmp M56807_intRoutine    ; Timer A Channel 2        ($58)
 	jsr FTI1_interrupt       ; Timer A Channel 3        ($5a)

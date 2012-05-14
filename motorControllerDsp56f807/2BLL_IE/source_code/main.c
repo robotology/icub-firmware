@@ -192,21 +192,21 @@ void main(void)
 	// enable timers
 	// TIMER_A
 	__ENIGROUP (45, 7); //Timer for the encoder commutation if used
-//	__ENIGROUP (44, 7); //
-//	__ENIGROUP (43, 7); //
+    __ENIGROUP (44, 7); //
+	__ENIGROUP (43, 7); //
 	__ENIGROUP (42, 4); //TI1 1ms delay main loop
 	// TIMER_B
 
-//	__ENIGROUP (41, 7); //
-//	__ENIGROUP (40, 7); //
-//	__ENIGROUP (39, 7); //
-//	__ENIGROUP (38, 7);
+	__ENIGROUP (41, 7); //
+	__ENIGROUP (40, 7); //
+	__ENIGROUP (39, 7); //
+	__ENIGROUP (38, 7);
 
 	// TIMER_C
-//	__ENIGROUP (37, 1); 
-//	__ENIGROUP (36, 1);
-//	__ENIGROUP (35, 1);
-//	__ENIGROUP (34, 1);
+	__ENIGROUP (37, 1); 
+	__ENIGROUP (36, 1);
+	__ENIGROUP (35, 1);
+	__ENIGROUP (34, 1);
 	// TIMER_D
 	__ENIGROUP (33, 7); //1ms delay duty cycle
 	__ENIGROUP (32, 1);
@@ -234,7 +234,7 @@ void main(void)
 	init_leds  			  ();
 
    Init_Brushless_Comm	  (JN,HALL); 
-  			
+  			 
 
 	can_interface_init    (JN);
 	
@@ -249,9 +249,8 @@ void main(void)
  
     init_faults           (true,true,true);	 
     
-#if VERSION ==0x0255  || VERSION ==0x0258 
     init_position_encoder ();
-#endif
+
 
 	TI1_init 			  ();
 
@@ -286,7 +285,7 @@ void main(void)
     for (i=0; i<JN; i++)	_position[i]=(Int32) Filter_Bit(get_position_abs_ssi(i));
     for (i=0; i<JN; i++)    _max_real_position[i]=Filter_Bit(4095);
 #else 
-	_position[0]=(Int32)get_position_encoder(0);	
+	_position[0]=(Int32)Filter_Bit(get_position_abs_ssi(0));	
    	_position[1]=(Int32) Filter_Bit(get_position_abs_ssi(1));
     _max_real_position[1]=Filter_Bit(4095);
 
