@@ -81,7 +81,7 @@ void QD0_GetCounterValue(word *Value)
  */
 byte QD0_getPosition (dword *Position)
 {
-	word TimerValue=getReg(TMRA0_CNTR);
+//	word TimerValue=getReg(TMRA0_CNTR);
 	
   //	if (COMMUTATION_MODE==HALL )  
 	{
@@ -117,31 +117,31 @@ byte QD0_getPosition (dword *Position)
  */
 void QD0_init (void)
 {
-  	if (COMMUTATION_MODE==ENCODER)  
-	{
-		 /* TMRA0_CTRL: CM=0,PCS=1,SCS=0,ONCE=0,LENGTH=0,DIR=0,Co_INIT=0,OM=0 */
-	  	setReg(TMRA0_CTRL,0x200);               /* Set up mode */
-		/*TMRA0_SCR: TCF=0,TCFIE=1,TOF=0,TOFIE=0,IEF=0,IEFIE=0,IPS=0,INPUT=0,Capture_Mode=0,MSTR=0,EEOF=0,VAL=0,FORCE=0,OPS=0,OEN=0 */
-		setReg(TMRA0_SCR,0x4000);
-		setReg(TMRA0_CNTR,0);                /* Reset counter register */
-	  	setReg(TMRA0_LOAD,0);                /* Reset load register */
-	  	setReg(TMRA0_CMP1,HALF_COMMUTATION_INTERVAL);           /* Set up compare 1 register */
-	  	setReg(TMRA0_CMP2,-HALF_COMMUTATION_INTERVAL-1);     /* Set up compare 2 register */
-
+// 	if (COMMUTATION_MODE==ENCODER)  
+//	{
+//		 /* TMRA0_CTRL: CM=0,PCS=1,SCS=0,ONCE=0,LENGTH=0,DIR=0,Co_INIT=0,OM=0 */
+//	  	setReg(TMRA0_CTRL,0x200);               /* Set up mode */
+//		/*TMRA0_SCR: TCF=0,TCFIE=1,TOF=0,TOFIE=0,IEF=0,IEFIE=0,IPS=0,INPUT=0,Capture_Mode=0,MSTR=0,EEOF=0,VAL=0,FORCE=0,OPS=0,OEN=0 */
+//		setReg(TMRA0_SCR,0x4000);
+//		setReg(TMRA0_CNTR,0);                /* Reset counter register */
+//	  	setReg(TMRA0_LOAD,0);                /* Reset load register */
+//	  	setReg(TMRA0_CMP1,HALF_COMMUTATION_INTERVAL);           /* Set up compare 1 register */
+//	  	setReg(TMRA0_CMP2,-HALF_COMMUTATION_INTERVAL-1);     /* Set up compare 2 register */
+//
 	//	clrRegBits (TMRA0_CTRL, 0xe000);
-		setRegBits (TMRA0_CTRL, 0x8000);	   /* counter on in quadrature mode! */
+//		setRegBits (TMRA0_CTRL, 0x8000);	   /* counter on in quadrature mode! */
     
-    	setReg (QD0_FIR, 10);
-		setRegBits (QD0_DECCR, 0);
+//    	setReg (QD0_FIR, 10);
+//		setRegBits (QD0_DECCR, 0);
 
-	}
-	else
+//	}
+//	else
 	{	
 		setReg (QD0_FIR, 10);
 		setRegBits (QD0_DECCR, 0);
 	
 	}  
-  
+   
 }
 
 

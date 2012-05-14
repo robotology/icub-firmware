@@ -10,7 +10,7 @@
  ***************************************************************************/ 
 void init_position_encoder()
 {
-//	QD0_init ();
+	QD0_init ();
 	QD1_init ();
 	QD0_ResetPosition ();
 	QD1_ResetPosition ();
