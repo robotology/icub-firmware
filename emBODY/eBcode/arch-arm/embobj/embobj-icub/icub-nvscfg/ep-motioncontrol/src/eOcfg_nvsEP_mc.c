@@ -197,6 +197,12 @@ extern eOnvID_t eo_cfg_nvsEP_mc_motor_NVID_Get(eOcfg_nvsEP_mc_endpoint_t ep, eOc
 } 
 
 
+extern eOnvID_t eo_cfg_nvsEP_mc_controller_NVID_Get(eOcfg_nvsEP_mc_endpoint_t ep, eOcfg_nvsEP_mc_controllerNVindex_t cnvindex)
+{
+    return(eo_cfg_nvsEP_mc_any_con_bodypart_controller_NVID_Get(cnvindex));
+}
+
+
 
 
 
@@ -1016,6 +1022,118 @@ __weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mstatus__chamaleon04(eOcfg_nvsEP
 }
 #endif
 
+
+// c00-init:    xx is 0
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_INIT_Cxx_cconfig)
+__weak extern void eo_cfg_nvsEP_mc_hid_INIT_Cxx_cconfig(uint16_t xx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_INIT_Cxx_cconfig__durationofctrlloop)
+__weak extern void eo_cfg_nvsEP_mc_hid_INIT_Cxx_cconfig__durationofctrlloop(uint16_t xx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_INIT_Cxx_cstatus)
+__weak extern void eo_cfg_nvsEP_mc_hid_INIT_Cxx_cstatus(uint16_t xx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_Cxx_cstatus__alljomoinitted)
+__weak extern void eo_cfg_nvsEP_mc_hid_INIT_Cxx_cstatus__alljomoinitted(uint16_t xx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_INIT_Cxx_ccmmnds__go2stateofcontroller)
+__weak extern void eo_cfg_nvsEP_mc_hid_INIT_Cxx_ccmmnds__go2stateofcontroller(uint16_t xx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
+// c00-updt:    xx is 0
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Cxx_cconfig)
+__weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Cxx_cconfig(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Cxx_cconfig__durationofctrlloop)
+__weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Cxx_cconfig__durationofctrlloop(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Cxx_cstatus)
+__weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Cxx_cstatus(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Cxx_cstatus__alljomoinitted)
+__weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Cxx_cstatus__alljomoinitted(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_Cxx_ccmmnds__go2stateofcontroller)
+__weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Cxx_ccmmnds__go2stateofcontroller(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
 
 
 

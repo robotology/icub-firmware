@@ -61,7 +61,8 @@
 // -- the first nvid off of the motor mth
 #define EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_motor(mth)                ((mth)*EOK_cfg_nvsEP_mc_any_con_mxx_maxnumof_nvs_in_motor + EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_joint(EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_joints))                                               
 
-
+// -- the first nvid of the controller
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_controller(z)             (EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_motor(EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_motors))
 
 // -- macro which computes the off part of the nvid of a nv in the joint jth when inserted inside a bodypart
 //    jth is the joint number, jnvindex is the index of variable in the joint 
@@ -70,6 +71,11 @@
 // -- macro which computes the off part of the nvid of a nv in the motor mth when inserted inside a bodypart
 //    mth is the motor number, mnvindex is the index of variable in the motor 
 #define EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_motor(mth, mnvindex)            (EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_motor(mth) + (mnvindex))
+
+
+// -- macro which computes the off part of the nvid of a nv in the controller of the bodypart
+//    cnvindex is the index of variable in the controller 
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_controller(cnvindex)            (EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_controller(0) + (cnvindex))
 
 
 
@@ -123,7 +129,16 @@
   
 
   
+// -- the nvid of all the network variables of the controller
+// -- use them only when required in constant initialisations and prefer using functions otherwise
 
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_c00_cconfig(c)                               EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_cxx_NVFUNTYP_cconfig, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_controller(EOK_cfg_nvsEP_mc_any_con_cxx_cnvindex_cconfig))
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_c00_cconfig__durationofctrlloop(c)           EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_cxx_NVFUNTYP_cconfig__durationofctrlloop, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_controller(EOK_cfg_nvsEP_mc_any_con_cxx_cnvindex_cconfig__durationofctrlloop))
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_c00_cstatus(c)                               EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_cxx_NVFUNTYP_cstatus, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_controller(EOK_cfg_nvsEP_mc_any_con_cxx_cnvindex_cstatus))
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_c00_cstatus__alljomoinitted(c)               EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_cxx_NVFUNTYP_cstatus__alljomoinitted, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_controller(EOK_cfg_nvsEP_mc_any_con_cxx_cnvindex_cstatus__alljomoinitted))
+#define EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_c00_ccmmnds__go2stateofcontroller(c)         EO_nv_ID(EOK_cfg_nvsEP_mc_any_con_cxx_NVFUNTYP_ccmmnds__go2stateofcontroller, EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_controller(EOK_cfg_nvsEP_mc_any_con_cxx_cnvindex_ccmmnds__go2stateofcontroller))
+
+  
   
 
 
@@ -132,7 +147,9 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-EO_VERIFYproposition(EOK_cfg_nvsEP_mc_any_con_bodypart, (1024 > EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_motor(EOK_cfg_nvsEP_mc_any_con_mxx_maxnumof_nvs_in_motor)));
+//EO_VERIFYproposition(EOK_cfg_nvsEP_mc_any_con_bodypart, (1024 > EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_motor(EOK_cfg_nvsEP_mc_any_con_mxx_maxnumof_nvs_in_motor)));
+
+EO_VERIFYproposition(EOK_cfg_nvsEP_mc_any_con_bodypart, (1024 > EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_controller(EOK_cfg_nvsEP_mc_any_con_cxx_maxnumof_nvs_in_controller)));
 
 
     
