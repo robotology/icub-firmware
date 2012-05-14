@@ -283,6 +283,15 @@
 #include "eOcfg_nvsEP_mc_any_usr_mxxmacro.c"
 
 
+#define CXXMACRO_INIT        lowerarm_usr_hid_INIT_Cxx
+#define CXXMACRO_UPDT        lowerarm_usr_hid_UPDT_Cxx
+#define CXXMACRO_PART        _lowerarm
+#define CXXMACRO_BOARD       _ebx
+#define CXXMACRO_CSTR        _c00
+#define CXXMACRO_CNUM        0
+#include "eOcfg_nvsEP_mc_any_usr_cxxmacro.c"
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -2486,6 +2495,34 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_lowerarm_usr_array_of_EOnv_usr[] =
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m11_ebx_mstatus__chamaleon04,
         EO_INIT(.on_rop_reception)      NULL,                
         EO_INIT(.stg_address)           EOK_uint32dummy       
+    },
+
+    // and in here the controller
+    
+    {   // c00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_c00_ebx_cconfig,
+        EO_INIT(.on_rop_reception)      NULL,                 
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },
+    {   // c00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_c00_ebx_cconfig__durationofctrlloop,
+        EO_INIT(.on_rop_reception)      NULL,                 
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },
+    {   // c00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_c00_ebx_cstatus,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },     
+    {   // c00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_c00_ebx_cstatus__alljomoinitted,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // c00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_c00_ebx_ccmmnds__go2stateofcontroller,
+        EO_INIT(.on_rop_reception)      NULL,                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
     }        
     
 };  EO_VERIFYsizeof(s_eo_cfg_nvsEP_mc_lowerarm_usr_array_of_EOnv_usr, sizeof(EOnv_usr_t)*(varsMClowerarm_TOTALnumber)); 
@@ -2526,7 +2563,8 @@ extern void eo_cfg_nvsEP_mc_lowerarm_usr_initialise(eOnvEP_t ep, void* loc, void
         {
             memcpy(&ul->motors[i], eo_cfg_nvsEP_mc_lowerarm_motor_defaultvalue, sizeof(eOmc_motor_t));
         }
-    }    
+        memcpy(&ul->thecontroller, eo_cfg_nvsEP_mc_lowerarm_controller_defaultvalue, sizeof(eOmc_controller_t));       
+    } 
     if(NULL != rem)
     {   
         ul = (eo_cfg_nvsEP_mc_lowerarm_t*) rem;
@@ -2538,6 +2576,7 @@ extern void eo_cfg_nvsEP_mc_lowerarm_usr_initialise(eOnvEP_t ep, void* loc, void
         {
             memcpy(&ul->motors[i], eo_cfg_nvsEP_mc_lowerarm_motor_defaultvalue, sizeof(eOmc_motor_t));
         }
+        memcpy(&ul->thecontroller, eo_cfg_nvsEP_mc_lowerarm_controller_defaultvalue, sizeof(eOmc_controller_t));
     }
     
     
@@ -3103,6 +3142,79 @@ __weak extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_UPDT_Mxx_mstatus__chamaleon0
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
     eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mstatus__chamaleon04((eOcfg_nvsEP_mc_motorNumber_t)xx, nv, time, sign); 
+}
+
+// c00-init:    xx is 0
+__weak extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_INIT_Cxx_cconfig(uint16_t xx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Cxx_cconfig((eOcfg_nvsEP_mc_controllerNumber_t)xx, nv);
+}
+
+__weak extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_INIT_Cxx_cconfig__durationofctrlloop(uint16_t xx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Cxx_cconfig__durationofctrlloop((eOcfg_nvsEP_mc_controllerNumber_t)xx, nv);
+}
+
+__weak extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_INIT_Cxx_cstatus(uint16_t xx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Cxx_cstatus((eOcfg_nvsEP_mc_controllerNumber_t)xx, nv);
+}
+
+__weak extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_INIT_Cxx_cstatus__alljomoinitted(uint16_t xx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Cxx_cstatus__alljomoinitted((eOcfg_nvsEP_mc_controllerNumber_t)xx, nv);
+}
+
+__weak extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_INIT_Cxx_ccmmnds__go2stateofcontroller(uint16_t xx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Cxx_ccmmnds__go2stateofcontroller((eOcfg_nvsEP_mc_controllerNumber_t)xx, nv);
+}
+
+
+// c00-updt:    xx is 0
+extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_UPDT_Cxx_cconfig(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Cxx_cconfig((eOcfg_nvsEP_mc_controllerNumber_t)xx, nv, time, sign);
+}
+
+__weak extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_UPDT_Cxx_cconfig__durationofctrlloop(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Cxx_cconfig__durationofctrlloop((eOcfg_nvsEP_mc_controllerNumber_t)xx, nv, time, sign);
+}
+
+__weak extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_UPDT_Cxx_cstatus(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Cxx_cstatus((eOcfg_nvsEP_mc_controllerNumber_t)xx, nv, time, sign);
+}
+
+__weak extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_UPDT_Cxx_cstatus__alljomoinitted(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Cxx_cstatus__alljomoinitted((eOcfg_nvsEP_mc_controllerNumber_t)xx, nv, time, sign);
+}
+
+__weak extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_UPDT_Cxx_ccmmnds__go2stateofcontroller(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Cxx_ccmmnds__go2stateofcontroller((eOcfg_nvsEP_mc_controllerNumber_t)xx, nv, time, sign);
 }
 
 

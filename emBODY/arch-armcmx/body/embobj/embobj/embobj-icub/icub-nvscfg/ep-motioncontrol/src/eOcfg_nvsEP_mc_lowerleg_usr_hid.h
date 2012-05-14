@@ -137,6 +137,19 @@ extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Mxx_mstatus(uint16_t xx, const
 extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Mxx_mstatus__basic(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Mxx_mstatus__chamaleon04(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
+// cxx-init:    xx is 0
+extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_INIT_Cxx_cconfig(uint16_t xx, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_INIT_Cxx_cconfig__durationofctrlloop(uint16_t xx, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_INIT_Cxx_cstatus(uint16_t xx, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_INIT_Cxx_cstatus__alljomoinitted(uint16_t xx, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_INIT_Cxx_ccmmnds__go2stateofcontroller(uint16_t xx, const EOnv* nv);
+
+// c00-updt:    xx is 0
+extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Cxx_cconfig(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Cxx_cconfig__durationofctrlloop(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Cxx_cstatus(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Cxx_cstatus__alljomoinitted(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Cxx_ccmmnds__go2stateofcontroller(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
 #endif  // include guard
 

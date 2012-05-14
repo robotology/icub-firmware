@@ -106,6 +106,13 @@ extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_joint_NVID_Get(eo_cfg_nvsEP_mc_
 extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_motor_NVID_Get(eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t m, eOcfg_nvsEP_mc_motorNVindex_t mnvindex);
 
 
+/** @fn         extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_controller_NVID_Get(eOcfg_nvsEP_mc_controllerNVindex_t cnvindex)
+    @brief      This function retrieves the eOnvID_t of a network variable with index @e cnvindex for the motion controller
+    @param      cnvinxed        the index of the nv inside the controller
+    @return     the nvid or EOK_uint16dummy in case of failure.
+  */
+extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_controller_NVID_Get(eOcfg_nvsEP_mc_controllerNVindex_t cnvindex);
+
 /** @}            
     end of group eo_2uilsdede2345er  
  **/
