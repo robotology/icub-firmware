@@ -5,13 +5,16 @@ ECHO.
 ECHO 1. 2BLL
 ECHO 2. 2BLLDC
 ECHO 3. 4DC
-ECHO 4. ALL_BOARD
+ECHO 4. 2BLL_IE
+ECHO 5. ALL_BOARD
 set choice=
 set /p choice=Type of board.
 if '%choice%'=='1' goto 2bll_board
 if '%choice%'=='2' goto 2blldc_board
 if '%choice%'=='3' goto 4dc_board
-if '%choice%'=='4' goto all_board
+if '%choice%'=='4' goto 2bll_ie_board
+if '%choice%'=='5' goto all_board
+
 ECHO "%choice%" is not valid please try again
 ECHO.
 goto start
@@ -29,6 +32,11 @@ goto choose_dest
 :4dc_board
 set MY_BOARD=4DC
 ECHO %MY_BOARD%
+goto choose_dest
+
+:2bll_ie_board
+set MY_BOARD=2BLL_IE
+ECHO selected board is %MY_BOARD%
 goto choose_dest
 
 :all_board
@@ -78,6 +86,9 @@ ECHO.
 ECHO copio da \4DC a build
 copy /Y ..\4DC\output\*.out.S ..\..\build\
 goto end
+ECHO copio da \2BLL_IE a build
+copy /Y ..\2BLL_IE\output\*.out.S ..\..\build\
+goto end
 
 
 
@@ -91,7 +102,9 @@ ECHO.
 ECHO copio da \4DC a build_testing
 copy /Y ..\4DC\output\*.out.S ..\..\build_testing\
 goto end
-
+ECHO copio da \2BLL_IE a build_testing
+copy /Y ..\2BLL_IE\output\*.out.S ..\..\build_testing\
+goto end
 
 :end
 pause
