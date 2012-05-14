@@ -47,7 +47,7 @@ struct EOpid_hid
     float pwm;
     float Ymax;
 
-    uint8_t initialized;
+    eObool_t configured;
 }; 
 
 

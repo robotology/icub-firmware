@@ -39,6 +39,7 @@
 // empty-section
 
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
@@ -85,44 +86,39 @@ extern EOpid* eo_pid_New(void)
         o->pwm = 0.0f;
         o->Ymax = 0.0f;
 
-        o->initialized = 0;
+        o->configured = eobool_false;
     }
 
     return o;
 }
 
-extern void eo_pid_Init(EOpid *o, float Kp, float Kd, float Ki, float Ko, float Ymax)
+extern void eo_pid_Configure(EOpid *o, eOmc_PID_t *c)
 {
-    o->A2 = -0.1f*Kd;
-    o->A1 = -Kp + o->A2;
-    o->A0 =  Kp + Ki - o->A2;
+    int8_t scale = c->scale;
 
-    o->Yn = 0.0f;
-    o->Ko = Ko;
+    float kp = c->kp>>scale;
+    float kd = c->kd>>scale;
+    float ki = c->ki>>scale;
+     
+    o->Ko =  c->offset;
 
-    o->En = 0.0f;
-    o->Dn = 0.0f;
+    o->A2 = -0.1f*kd;
+    o->A1 = -kp + o->A2;
+    o->A0 =  kp + ki - o->A2;
+
+    o->Yn  = 0.0f;
+    o->En  = 0.0f;
+    o->Dn  = 0.0f;
     o->pwm = 0.0f;
-    o->Ymax = Ymax;
+    
+    o->Ymax = c->limitonoutput;
 
-    o->initialized = 1;
+    o->configured = eobool_true;
 }
 
-extern void eo_pid_SetPid(EOpid *o, float Kp, float Kd, float Ki)
+extern eObool_t eo_pid_IsConfigured(EOpid *o)
 {
-    o->A2 = -0.1f*Kd;
-    o->A1 = -Kp + o->A2;
-    o->A0 =  Kp + Ki - o->A2; 
-}
-
-extern void eo_pid_SetMaxOutput(EOpid *o, float Ymax)
-{
-    o->Ymax = Ymax;
-}
-
-extern void eo_pid_SetOffset(EOpid *o, float Ko)
-{
-    o->Ko = Ko;
+    return o->configured;
 }
 
 extern float eo_pid_GetOffset(EOpid *o)
@@ -134,11 +130,6 @@ extern void eo_pid_GetStatus(EOpid *o, float *pwm, float *err)
 {
     *pwm = o->pwm;
     *err = o->En;
-}
-
-extern uint8_t eo_pid_IsInitialized(EOpid *o)
-{
-    return o->initialized;
 }
 
 extern void eo_pid_Reset(EOpid *o)

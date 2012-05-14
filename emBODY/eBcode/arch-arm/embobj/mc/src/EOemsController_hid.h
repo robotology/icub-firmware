@@ -45,8 +45,8 @@ struct EOemsController_hid
     float encoder_pos[MAX_MOTORS];
     float torque_meas[MAX_MOTORS];
 
-    uint8_t flag_encoder_pos_dirty;
-    uint8_t flag_torque_meas_dirty;
+    eObool_t flag_encoder_pos_dirty;
+    eObool_t flag_torque_meas_dirty;
 
     float pos_ref[MAX_MOTORS];
     float vel_ref[MAX_MOTORS];

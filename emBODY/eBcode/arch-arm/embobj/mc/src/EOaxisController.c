@@ -79,14 +79,14 @@ extern EOaxisController* eo_axisController_New(void)
 
     if (o)
     {
-        o->pidP = eo_pid_New();
-        o->pidT = eo_pid_New();
+        o->pidP = eo_pid_New(); //
+        o->pidT = eo_pid_New(); //
         
         o->trajectory = eo_trajectory_New(); 
 
-        o->pos_min = 0.0f;
-        o->pos_max = 0.0f;
-        o->vel_max = 0.0f;
+        o->pos_min = 0.0f; //
+        o->pos_max = 0.0f; //
+        //o->vel_max = 0.0f;
 
         o->encpos_meas = 0.0f;
         o->torque_meas = 0.0f;
@@ -95,7 +95,7 @@ extern EOaxisController* eo_axisController_New(void)
         o->vel_ref      = 0.0f;
         o->acc_ref_step = 0.0f;
         o->vel_timer    = 0.0f;
-        o->vel_timeout  = 0.1f;
+        o->vel_timeout  = 0.1f; //
 
         o->pos_out      = 0.0f;
         o->vel_out      = 0.0f;
@@ -103,12 +103,19 @@ extern EOaxisController* eo_axisController_New(void)
 
         o->torque_ref = 0.0f;
         o->torque_out = 0.0f;
-        o->torque_off = 0.0f;
         o->torque_last_pos_err = 0.0f;
         o->torque_damp_lp_filt = 0.0f;
 
-        o->stiffness = 0.0f;
-        o->damping   = 0.0f;
+        o->stiffness  = 0.0f; //
+        o->damping    = 0.0f; //
+        o->torque_off = 0.0f; //
+
+        o->enc_offset = 0.0f;
+
+        o->is_configured = eobool_false;
+        o->is_calibrated = eobool_false;
+
+        o->calibrating = eobool_false;
 
         o->control_mode = CM_IDLE;
     }
@@ -116,39 +123,47 @@ extern EOaxisController* eo_axisController_New(void)
     return o;
 }
 
-extern void eo_axisController_SetPosLimits(EOaxisController *o, float pos_min, float pos_max)
+extern void eo_axisController_Configure(EOaxisController *o, eOmc_joint_config_t *c)
 {
-    o->pos_min = pos_min;
-    o->pos_max = pos_max;
+    eo_pid_Configure(eo_axisController_GetPosPidPtr(o), &(c->pidposition));
+    eo_pid_Configure(eo_axisController_GetTrqPidPtr(o), &(c->pidtorque));
+
+    o->stiffness  = c->impedance.stiffness;
+    o->damping    = c->impedance.damping;
+    o->torque_off = c->impedance.offset;
+
+    o->pos_min = c->minpositionofjoint;
+    o->pos_max = c->maxpositionofjoint;
+    o->vel_timeout = 0.001f*c->velocitysetpointtimeout;
+
+    o->is_configured = eobool_true;    
 }
 
-extern void eo_axisController_SetVelMax(EOaxisController *o, float vel_max)
+extern eObool_t eo_axisController_Calibrate(EOaxisController *o, eOmc_calibrator_t *c)
 {
-    o->vel_max = vel_max;
+    EOpid *pidP = eo_axisController_GetPosPidPtr(o);
+
+    if (!eo_pid_IsConfigured(pidP))
+    {
+        return eobool_false;
+    }
+    
+    if (c->type != 3)
+    {
+        return eobool_false;
+    }
+
+    o->control_mode = CM_POSITION;
+    o->calibrating = eobool_true;
+
+    o->enc_offset   = c->params.type3.offset;
+
+    eo_axisController_SetPosRef(o, c->params.type3.position, c->params.type3.velocity);
+
+    return 1;
 }
 
-extern void eo_axisController_SetStiffness(EOaxisController *o, float stiffness)
-{
-    o->stiffness = stiffness;
-}
-
-/*
-extern void eo_axisController_ReadEncPos(EOaxisController *o, float encpos)
-{
-    o->encpos_meas = encpos;
-}
-
-extern void eo_axisController_ReadTorque(EOaxisController *o, float torque)
-{
-    o->torque_meas = torque;
-}
-*/
-
-extern void eo_axisController_ReadStatus(EOaxisController *o, float encpos, float torque)
-{
-    o->encpos_meas = encpos;
-    o->torque_meas = torque;
-}                  
+//////////////////////////////////////////////////////////////////////////////////////
 
 extern void eo_axisController_SetPosRef(EOaxisController *o, float pos, float vel)
 {
@@ -167,7 +182,7 @@ extern void eo_axisController_SetPosRef(EOaxisController *o, float pos, float ve
                                o->encpos_meas, 
                                limit(pos,  o->pos_min, o->pos_max), 
                                o->vel_out, 
-                               limit(vel, -o->vel_max, o->vel_max));
+                               vel);
 }
 
 extern void eo_axisController_SetVelRef(EOaxisController *o, float vel, float acc)
@@ -183,7 +198,7 @@ extern void eo_axisController_SetVelRef(EOaxisController *o, float vel, float ac
         o->control_mode = CM_VELOCITY;
     }
 
-    o->vel_ref = limit(vel, -o->vel_max, o->vel_max); 
+    o->vel_ref = vel; 
     o->acc_ref_step = acc * ( acc > 0.0f ? PERIOD:-PERIOD);
     //o->pos_vel_bias = 0.0f;
     o->vel_timer = 0.0f;
@@ -309,6 +324,8 @@ extern float eo_axisController_PWM(EOaxisController *o)
     return 0.0f;   
 }
 
+
+
 /*
 extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o)
 {
@@ -318,6 +335,18 @@ extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o)
 extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o)
 {
     return o->pidT;
+}
+*/
+
+/*
+extern void eo_axisController_ReadEncPos(EOaxisController *o, float encpos)
+{
+    o->encpos_meas = encpos - o->enc_offset;
+}
+
+extern void eo_axisController_ReadTorque(EOaxisController *o, float torque)
+{
+    o->torque_meas = torque;
 }
 */
 
@@ -348,15 +377,15 @@ static void compute_velocity_ref(EOaxisController *o)
     {
         if (vel_err < -o->acc_ref_step)
         {
-            o->vel_out = limit(o->vel_out - o->acc_ref_step, -o->vel_max, o->vel_max);
+            o->vel_out -= o->acc_ref_step;
         }
         else if (vel_err > o->acc_ref_step)
         {
-            o->vel_out = limit(o->vel_out + o->acc_ref_step, -o->vel_max, o->vel_max);
+            o->vel_out += o->acc_ref_step;
         }
         else
         {
-            o->vel_out = limit(o->vel_ref, -o->vel_max, o->vel_max);
+            o->vel_out = o->vel_ref;
         }
 
         o->vel_out_step = o->vel_out * PERIOD;
