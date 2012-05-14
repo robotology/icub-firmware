@@ -24,6 +24,8 @@ extern "C" {
 
 #include "EoCommon.h"
 
+#include "icub/api/EoMotionControl.h"
+
 #include "EOpid.h"
 #include "EOaxisController_hid.h"
 
@@ -31,6 +33,8 @@ extern "C" {
 
 #define eo_axisController_GetPosPidPtr(o) eo_axisController_GetPosPidPtr_hid(o)
 #define eo_axisController_GetTrqPidPtr(o) eo_axisController_GetTrqPidPtr_hid(o)
+
+#define eo_axisController_IsCalibrated(o) eo_axisController_IsCalibrated_hid(o)
 
 #define eo_axisController_ReadEncPos(axis_controller, encpos) eo_axisController_ReadEncPos_hid(axis_controller, encpos)
 #define eo_axisController_ReadTorque(axis_controller, torque) eo_axisController_ReadTorque_hid(axis_controller, torque)
@@ -79,28 +83,23 @@ extern float decoupler_waist_pwm[4][4];
     @return     The pointer to the required object.
  **/
 extern EOaxisController* eo_axisController_New(void);
-
-//extern void eo_axisController_ReadEncPos(EOaxisController *o, float encpos);
-//extern void eo_axisController_ReadTorque(EOaxisController *o, float torque);
-extern void eo_axisController_ReadStatus(EOaxisController *o, float encpos, float torque);
+extern void eo_axisController_Configure(EOaxisController *o, eOmc_joint_config_t *c);
+extern eObool_t eo_axisController_Calibrate(EOaxisController *o, eOmc_calibrator_t *c);
 
 extern void eo_axisController_SetPosRef(EOaxisController *o, float pos, float vel);
 extern void eo_axisController_SetVelRef(EOaxisController *o, float vel, float acc);
 extern void eo_axisController_SetTrqRef(EOaxisController *o, float trq);
 
-extern float eo_axisController_PWM(EOaxisController *o);
-
-extern uint8_t eo_axisController_SetControlMode(EOaxisController *o, control_mode_t cm);
-
-extern void eo_axisController_SetStiffness(EOaxisController *o, float stiffness);
-
-extern void eo_axisController_SetVelMax(EOaxisController *o, float vel_max);
-extern void eo_axisController_SetPosLimits(EOaxisController *o, float pos_min, float pos_max);
+extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, control_mode_t cm);
 
 extern void eo_axisController_GetActivePidStatus(EOaxisController *o, float *pwm, float *err);
 
+extern float eo_axisController_PWM(EOaxisController *o);
+
 //extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o);
 //extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o);
+//extern void eo_axisController_ReadEncPos(EOaxisController *o, float encpos);
+//extern void eo_axisController_ReadTorque(EOaxisController *o, float torque);
 
 /** @}            
     end of group eo_axisController  
