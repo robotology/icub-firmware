@@ -63,8 +63,8 @@ typedef struct EOtheAgent_hid EOtheAgent;
 
 typedef struct
 {
-    void (*on_rop_conf_received)(eOipv4addr_t ipaddr, eOropcode_t ropc, eOnvID_t nvid, uint32_t sign, eOabstime_t time, eOropconfinfo_t confinfo);
-    void (*on_rop_conf_requested)(eOipv4addr_t ipaddr, eOropcode_t ropc, eOnvID_t nvid, uint32_t sign, eOabstime_t time);
+    void (*on_rop_conf_received)(eOipv4addr_t ipaddr, eOropcode_t ropc, eOnvEP_t nvep, eOnvID_t nvid, uint32_t sign, eOabstime_t time, eOropconfinfo_t confinfo);
+    void (*on_rop_conf_requested)(eOipv4addr_t ipaddr, eOropcode_t ropc, eOnvEP_t nvep, eOnvID_t nvid, uint32_t sign, eOabstime_t time);
 } eOagent_cfg_t;
  
 

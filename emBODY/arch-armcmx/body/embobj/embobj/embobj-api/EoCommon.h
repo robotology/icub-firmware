@@ -321,6 +321,75 @@ typedef struct              // size is 16 bytes
 } eOcanframe_t;
 
 
+typedef struct 
+{
+    uint8_t                 f00 : 1;
+    uint8_t                 f01 : 1;
+    uint8_t                 f02 : 1;
+    uint8_t                 f03 : 1;
+    uint8_t                 f04 : 1;
+    uint8_t                 f05 : 1;
+    uint8_t                 f06 : 1;
+    uint8_t                 f07 : 1;    
+} eO08flags_t; 
+
+typedef struct 
+{
+    uint16_t                f00 : 1;
+    uint16_t                f01 : 1;
+    uint16_t                f02 : 1;
+    uint16_t                f03 : 1;
+    uint16_t                f04 : 1;
+    uint16_t                f05 : 1;
+    uint16_t                f06 : 1;
+    uint16_t                f07 : 1;  
+    uint16_t                f08 : 1;
+    uint16_t                f09 : 1;
+    uint16_t                f10 : 1;
+    uint16_t                f11 : 1;
+    uint16_t                f12 : 1;
+    uint16_t                f13 : 1;
+    uint16_t                f14 : 1;
+    uint16_t                f15 : 1;       
+} eO16flags_t; 
+
+
+typedef struct 
+{
+    uint32_t                f00 : 1;
+    uint32_t                f01 : 1;
+    uint32_t                f02 : 1;
+    uint32_t                f03 : 1;
+    uint32_t                f04 : 1;
+    uint32_t                f05 : 1;
+    uint32_t                f06 : 1;
+    uint32_t                f07 : 1;  
+    uint32_t                f08 : 1;
+    uint32_t                f09 : 1;
+    uint32_t                f10 : 1;
+    uint32_t                f11 : 1;
+    uint32_t                f12 : 1;
+    uint32_t                f13 : 1;
+    uint32_t                f14 : 1;
+    uint32_t                f15 : 1;   
+    uint32_t                f16 : 1;
+    uint32_t                f17 : 1;
+    uint32_t                f18 : 1;
+    uint32_t                f19 : 1;
+    uint32_t                f20 : 1;
+    uint32_t                f21 : 1;
+    uint32_t                f22 : 1;
+    uint32_t                f23 : 1;
+    uint32_t                f24 : 1;
+    uint32_t                f25 : 1;
+    uint32_t                f26 : 1;
+    uint32_t                f27 : 1;  
+    uint32_t                f28 : 1;
+    uint32_t                f29 : 1;
+    uint32_t                f30 : 1;
+    uint32_t                f31 : 1;       
+} eO32flags_t; 
+
 
 /** @typedef    typedef enum  eOutil_canport_t
     @brief      eOcanport_t contains a can port as defined in hal_can.h. 
