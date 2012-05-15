@@ -103,6 +103,7 @@ typedef struct                      // size is 56*1 = 56
     eOsnsr_strain_t                 strains[1];
 } eo_cfg_nvsEP_as_onestrain_t;      EO_VERIFYsizeof(eo_cfg_nvsEP_as_onestrain_t, 56);
 
+#warning --> add an enable in eo_cfg_nvsEP_as_onestrain_t whcih tells the ems to forward any msg to the pc104 (?)
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
