@@ -103,13 +103,13 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_upperarm_con_defaultvalue =
         EO_INIT(.alljomoinitted)            eobool_false,
         EO_INIT(.numofjoints)               EOK_cfg_nvsEP_mc_upperarm_NUMofJOINTS,
         EO_INIT(.numofmotors)               EOK_cfg_nvsEP_mc_upperarm_NUMofMOTORS,
-        EO_INIT(.stateofcontroller)         eomc_stateofcontroller_configuration,
+        EO_INIT(.stateofcontroller)         eomc_stateofcontroller_config,
         EO_INIT(.flagsinittedjoints)        0x0000,
         EO_INIT(.flagsinittedmotors)        0x0000   
     },
     EO_INIT(.ccmmnds)                      
     {
-        EO_INIT(.go2stateofcontroller)      eomc_stateofcontroller_configuration,
+        EO_INIT(.go2stateofcontroller)      eomc_stateofcontroller_config,
         EO_INIT(.filler07)                  {0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7}   
     }    
 }; 
