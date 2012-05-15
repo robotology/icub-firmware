@@ -160,6 +160,32 @@ typedef enum
 enum { motorNVindex_TOTALnumber = 8};
 
 
+
+/** @typedef    typedef uint16_t eOcfg_nvsEP_mc_controllerNumber_t;
+    @brief      It contains an index for a controller in a manner that is independnt from the endpoint of bodypart.
+                It maximum number in every endpoint is controlerNumberMAX
+ **/
+typedef uint16_t eOcfg_nvsEP_mc_controllerNumber_t;
+
+enum { controllerNumberMAX = 1};
+
+
+/** @typedef    typedef enum eOcfg_nvsEP_mc_controllerNVindex_t;
+    @brief      It contains an index for all the network variables of a controller containing a number of joints and motors. 
+                The indices are consecutive and without holes.
+ **/
+typedef enum
+{
+    controllerNVindex_cconfig                               = 0,
+    controllerNVindex_cconfig__durationofctrlloop           = 1,
+    controllerNVindex_cstatus                               = 2,
+    controllerNVindex_cstatus__alljomoinitted               = 3,
+    controllerNVindex_ccmmnds__go2stateofcontroller         = 4
+} eOcfg_nvsEP_mc_controllerNVindex_t;
+
+enum { controllerNVindex_TOTALnumber = 5};
+
+
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
@@ -168,9 +194,19 @@ enum { motorNVindex_TOTALnumber = 8};
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
+/** @fn         extern uint16_t eo_cfg_nvsEP_mc_joint_numbermax_Get(eOcfg_nvsEP_mc_endpoint_t ep)
+    @brief      This function retrieves the number of joints given the endpoint @e ep
+    @param      ep              the endpoint
+    @return     the number of joints.
+  */
 extern uint16_t eo_cfg_nvsEP_mc_joint_numbermax_Get(eOcfg_nvsEP_mc_endpoint_t ep);
 
 
+/** @fn         extern uint16_t eo_cfg_nvsEP_mc_motor_numbermax_Get(eOcfg_nvsEP_mc_endpoint_t ep)
+    @brief      This function retrieves the number of motors given the endpoint @e ep
+    @param      ep              the endpoint
+    @return     the number of motors.
+  */
 extern uint16_t eo_cfg_nvsEP_mc_motor_numbermax_Get(eOcfg_nvsEP_mc_endpoint_t ep);
 
 
@@ -193,6 +229,14 @@ extern eOnvID_t eo_cfg_nvsEP_mc_joint_NVID_Get(eOcfg_nvsEP_mc_endpoint_t ep, eOc
   */
 extern eOnvID_t eo_cfg_nvsEP_mc_motor_NVID_Get(eOcfg_nvsEP_mc_endpoint_t ep, eOcfg_nvsEP_mc_motorNumber_t m, eOcfg_nvsEP_mc_motorNVindex_t mnvindex);
 
+
+/** @fn         extern eOnvID_t eo_cfg_nvsEP_mc_controller_NVID_Get(eOcfg_nvsEP_mc_endpoint_t ep, eOcfg_nvsEP_mc_controllerNVindex_t cnvindex)
+    @brief      This function retrieves the eOnvID_t of a network variable with index @e cnvindex for the motion controller, given the endpoint @e ep
+    @param      ep              the endpoint
+    @param      cnvinxed        the index of the nv inside the controller
+    @return     the nvid or EOK_uint16dummy in case of failure.
+  */
+extern eOnvID_t eo_cfg_nvsEP_mc_controller_NVID_Get(eOcfg_nvsEP_mc_endpoint_t ep, eOcfg_nvsEP_mc_controllerNVindex_t cnvindex);
 
 /** @}            
     end of group eo_2uilsdede2345er  

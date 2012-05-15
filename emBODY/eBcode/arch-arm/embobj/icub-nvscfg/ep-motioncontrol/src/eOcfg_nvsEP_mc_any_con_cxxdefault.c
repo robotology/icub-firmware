@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       eOcfg_nvsEP_mc_any_con_bodypart.c
+/* @file       eo_cfg_nvsEP_mc_any_con_cxxdefault.c
     @brief      This file keeps constant configuration for ...
     @author     marco.accame@iit.it
     @date       04/06/2012
@@ -32,26 +32,19 @@
 #include "stdio.h"
 
 #include "EoMotionControl.h"
-#include "eOcfg_nvsEP_mc_any_con_jxx.h"
-#include "eOcfg_nvsEP_mc_any_con_mxx.h"
-#include "eOcfg_nvsEP_mc_any_con_cxx.h"
-#include "eOcfg_nvsEP_mc_hid.h"
-
-#include "EOnv_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "eOcfg_nvsEP_mc_any_con_bodypart.h"
+#include "eOcfg_nvsEP_mc_any_con_cxxdefault.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
-
-#include "eOcfg_nvsEP_mc_any_con_bodypart_hid.h"
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -67,7 +60,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
- 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -77,49 +70,40 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
- 
+
+extern const eOmc_controller_t eo_cfg_nvsEP_mc_any_con_cxxdefault_defaultvalue =
+{
+    EO_INIT(.cconfig)             
+    {
+        EO_INIT(.durationofctrlloop)        EOK_reltime1ms,
+        EO_INIT(.filler04)                  {0xf1, 0xf2, 0xf3, 0xf4}
+    },
+    EO_INIT(.cstatus)                      
+    {
+        EO_INIT(.alljomoinitted)            eobool_false,
+        EO_INIT(.numofjoints)               0,
+        EO_INIT(.numofmotors)               0,
+        EO_INIT(.stateofcontroller)         eomc_stateofcontroller_configuration,
+        EO_INIT(.flagsinittedjoints)        0x0000,
+        EO_INIT(.flagsinittedmotors)        0x0000   
+    },
+    EO_INIT(.ccmmnds)                      
+    {
+        EO_INIT(.go2stateofcontroller)      eomc_stateofcontroller_configuration,
+        EO_INIT(.filler07)                  {0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7}   
+    }    
+}; 
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
 
 
-
-
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
-
-
-extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_joint_NVID_Get(eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t j, eOcfg_nvsEP_mc_jointNVindex_t jnvindex)
-{
-    if((j >= EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_joints) || (jnvindex >= EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber))
-    {
-        return(EOK_uint16dummy);
-    }
-    return(EO_nv_ID(eo_cfg_nvsEP_mc_any_con_jxx_funtyp[jnvindex], EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, jnvindex)));    
-}
-
-
-extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_motor_NVID_Get(eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t m, eOcfg_nvsEP_mc_motorNVindex_t mnvindex)
-{
-    if((m >= EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_motors) || (mnvindex >= EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber))
-    {
-        return(EOK_uint16dummy);
-    }
-    return(EO_nv_ID(eo_cfg_nvsEP_mc_any_con_mxx_funtyp[mnvindex], EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_motor(m, mnvindex)));
-} 
-
-extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_controller_NVID_Get(eOcfg_nvsEP_mc_controllerNVindex_t cnvindex)
-{
-    if((cnvindex >= EOK_cfg_nvsEP_mc_any_con_cxx_cnvindex_TOTALnumber))
-    {
-        return(EOK_uint16dummy);
-    }
-    return(EO_nv_ID(eo_cfg_nvsEP_mc_any_con_cxx_funtyp[cnvindex], EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_controller(cnvindex)));
-}
 
 
 
@@ -128,7 +112,6 @@ extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_controller_NVID_Get(eOcfg_nvsEP
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 

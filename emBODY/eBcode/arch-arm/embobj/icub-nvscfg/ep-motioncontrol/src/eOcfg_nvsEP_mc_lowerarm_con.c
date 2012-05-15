@@ -45,7 +45,8 @@
 #include "eOcfg_nvsEP_mc_any_con_mxx.h"    
 #include "eOcfg_nvsEP_mc_any_con_mxxdefault.h" 
 
-
+#include "eOcfg_nvsEP_mc_any_con_cxx.h"    
+#include "eOcfg_nvsEP_mc_any_con_cxxdefault.h" 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -70,7 +71,7 @@
 #define EOK_cfg_nvsEP_mc_lowerarm_NUMofMOTORS                                        (motorLowerArm_TOTALnumber)
 
 //the total number of nvs in the endpoint
-#define EOK_cfg_nvsEP_lowerarm_NUMofVARS                                             ((EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber*EOK_cfg_nvsEP_mc_lowerarm_NUMofJOINTS)+(EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber*EOK_cfg_nvsEP_mc_lowerarm_NUMofMOTORS))
+#define EOK_cfg_nvsEP_lowerarm_NUMofVARS                                             (controllerNVindex_TOTALnumber+(EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber*EOK_cfg_nvsEP_mc_lowerarm_NUMofJOINTS)+(EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber*EOK_cfg_nvsEP_mc_lowerarm_NUMofMOTORS))
 
 
 
@@ -90,8 +91,30 @@ static uint16_t s_hash(uint16_t id);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
+static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
+{
+    EO_INIT(.cconfig)             
+    {
+        EO_INIT(.durationofctrlloop)        EOK_reltime1ms,
+        EO_INIT(.filler04)                  {0xf1, 0xf2, 0xf3, 0xf4}
+    },
+    EO_INIT(.cstatus)                      
+    {
+        EO_INIT(.alljomoinitted)            eobool_false,
+        EO_INIT(.numofjoints)               EOK_cfg_nvsEP_mc_lowerarm_NUMofJOINTS,
+        EO_INIT(.numofmotors)               EOK_cfg_nvsEP_mc_lowerarm_NUMofMOTORS,
+        EO_INIT(.stateofcontroller)         eomc_stateofcontroller_configuration,
+        EO_INIT(.flagsinittedjoints)        0x0000,
+        EO_INIT(.flagsinittedmotors)        0x0000   
+    },
+    EO_INIT(.ccmmnds)                      
+    {
+        EO_INIT(.go2stateofcontroller)      eomc_stateofcontroller_configuration,
+        EO_INIT(.filler07)                  {0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7}   
+    }    
+}; 
 
-// -- the 6 joints
+// -- the 12 joints
 
 #define JMACRO_EXTERNALPREFIX_GETID                EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx
 
@@ -346,6 +369,25 @@ static uint16_t s_hash(uint16_t id);
 #include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
 
+#define OFFSET_OF_END_OF_MOTORS    (OFFSET_OF_END_OF_JOINTS+EOK_cfg_nvsEP_mc_lowerarm_NUMofMOTORS*sizeof(eOmc_motor_t))
+
+
+// the controller
+
+#define CMACRO_EXTERNALPREFIX_GETID                EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_c00
+
+#define CMACRO_EXTERNALPREFIX_CONST                s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue
+
+#define CMACRO_PSTR    _lowerarm
+#define CMACRO_CSTR    _c00
+#define CMACRO_PNUM    5
+#define CMACRO_CNUM    0    
+#define CMACRO_COFF    (OFFSET_OF_END_OF_MOTORS+CMACRO_CNUM*sizeof(eOmc_controller_t))
+
+#include "eOcfg_nvsEP_mc_any_con_cxxmacro.c"
+
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -353,6 +395,8 @@ static uint16_t s_hash(uint16_t id);
 
 extern const eOmc_joint_t* eo_cfg_nvsEP_mc_lowerarm_joint_defaultvalue = &eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue;
 extern const eOmc_motor_t* eo_cfg_nvsEP_mc_lowerarm_motor_defaultvalue = &eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue;
+extern const eOmc_controller_t* eo_cfg_nvsEP_mc_lowerarm_controller_defaultvalue = &s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue;
+
 
 // EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber is 12 and keeps the number of nvs per joint
 #define Jnvs    (EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber)
@@ -399,6 +443,10 @@ extern const eOmc_motor_t* eo_cfg_nvsEP_mc_lowerarm_motor_defaultvalue = &eo_cfg
 #define Mindex(m, i)   (Mstart + (m)*Mnvs + (i))
 
 #define Mndx06(m, i)   (Mstart + (6+m)*Mnvs + (i))
+
+// it is the start of index for the configuration
+#define Cstart          (Mstart+Mnvs*MNUM+0)
+#define Cindex(i)       (Cstart + (i))
 
 
 extern EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
@@ -3704,7 +3752,49 @@ extern EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
             EO_INIT(.nchildren) 0,
             EO_INIT(.ichildren) {0},
             EO_INIT(.pchildren) {NULL}
-        } 
+        },
+        
+
+
+    // the controller
+    // cconfig
+    {   // 0
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_c00_cconfig,
+        EO_INIT(.index)     Cindex( 0),
+        EO_INIT(.nchildren) 1,
+        EO_INIT(.ichildren) {Cindex( 1)},
+        EO_INIT(.pchildren) {&eo_cfg_nvsEP_mc_lowerarm_tree_con[Cindex( 1)]}
+    },
+        {   // 1
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_c00_cconfig__durationofctrlloop,
+            EO_INIT(.index)     Cindex( 1),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.ichildren) {0},
+            EO_INIT(.pchildren) {NULL}
+        },  
+    // cstatus
+    {   // 2
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_c00_cstatus,
+        EO_INIT(.index)     Cindex( 2),
+        EO_INIT(.nchildren) 1,
+        EO_INIT(.ichildren) {Cindex( 3)},
+        EO_INIT(.pchildren) {&eo_cfg_nvsEP_mc_lowerarm_tree_con[Cindex( 3)]}
+    },
+        {   // 3
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_c00_cstatus__alljomoinitted,
+            EO_INIT(.index)     Cindex( 3),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.ichildren) {0},
+            EO_INIT(.pchildren) {NULL}
+        },  
+    // ccmmnds    
+    {   // 4
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_c00_ccmmnds__go2stateofcontroller,
+        EO_INIT(.index)     Cindex( 4),
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.ichildren) {0},
+        EO_INIT(.pchildren) {NULL}
+    }    
         
          
 };  EO_VERIFYsizeof(eo_cfg_nvsEP_mc_lowerarm_tree_con, sizeof(EOtreenode)*(EOK_cfg_nvsEP_lowerarm_NUMofVARS));
@@ -3740,7 +3830,11 @@ extern uint16_t eo_cfg_nvsEP_mc_lowerarm_hashfunction_id2index(uint16_t id)
     // 8*12
     #define IDTABLEMSIZE        (EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber*EOK_cfg_nvsEP_mc_lowerarm_NUMofMOTORS)  
 
-    #define IDTABLESIZE         (IDTABLEJSIZE+IDTABLEMSIZE)
+    // 5*1
+    #define IDTABLECSIZE        (EOK_cfg_nvsEP_mc_any_con_cxx_cnvindex_TOTALnumber)  
+    
+    #define IDTABLESIZE         (IDTABLEJSIZE+IDTABLEMSIZE+IDTABLECSIZE)
+    
     
     uint16_t index;
 
@@ -4004,7 +4098,12 @@ extern uint16_t eo_cfg_nvsEP_mc_lowerarm_hashfunction_id2index(uint16_t id)
         // m11
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig(11), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__pidcurrent(11), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__maxvelocityofmotor(11),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__maxcurrentofmotor(11), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mconfig__des02FORmstatuschamaleon04(11), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mstatus(11), 
-        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mstatus__basic(11), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mstatus__chamaleon04(11)
+        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mstatus__basic(11), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_mxx_mstatus__chamaleon04(11),
+        
+        // controller c00
+        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_c00_cconfig(0), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_c00_cconfig__durationofctrlloop(0), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_c00_cstatus(0),
+        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_c00_cstatus__alljomoinitted(0), EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_c00_ccmmnds__go2stateofcontroller(0)
+         
         
     };  EO_VERIFYsizeof(s_idtable, sizeof(uint16_t)*(IDTABLESIZE));
     
@@ -4040,6 +4139,8 @@ extern uint16_t eo_cfg_nvsEP_mc_lowerarm_hashfunction_id2index(uint16_t id)
 
 typedef uint8_t sdfg[ ( EOK_cfg_nvsEP_mc_any_con_jxx_maxnumof_nvs_in_joint == 32 ) ? (1) : (0)];
 typedef uint8_t redf[ ( EOK_cfg_nvsEP_mc_any_con_mxx_maxnumof_nvs_in_motor == 16 ) ? (1) : (0)];
+typedef uint8_t sdfg[ ( EOK_cfg_nvsEP_mc_any_con_cxx_maxnumof_nvs_in_controller == 32 ) ? (1) : (0)];
+
 
 static uint16_t s_hash(uint16_t id)
 {
@@ -4054,12 +4155,21 @@ static uint16_t s_hash(uint16_t id)
         b = off - (a << 5);
         r = a*EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber+b;
     }
-    else
+    else if(off < EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_controller(0))
     {
         off -= EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_motor(0);
         a = off >> 4;
         b = off - (a << 4);
         r = a*EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber+b;
+        r += (EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber*EOK_cfg_nvsEP_mc_lowerarm_NUMofJOINTS);
+    }
+    else
+    {
+        off -= EOK_cfg_nvsEP_mc_any_con_bodypart_firstNVIDoff_of_controller(0);
+        a = off >> 5;
+        b = off - (a << 5);
+        r = a*EOK_cfg_nvsEP_mc_any_con_cxx_cnvindex_TOTALnumber+b;
+        r += (EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber*EOK_cfg_nvsEP_mc_lowerarm_NUMofMOTORS);
         r += (EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber*EOK_cfg_nvsEP_mc_lowerarm_NUMofJOINTS);
     }
     
@@ -4077,6 +4187,12 @@ extern eOnvID_t eo_cfg_nvsEP_mc_lowerarm_motor_NVID_Get(eo_cfg_nvsEP_mc_lowerarm
     return(eo_cfg_nvsEP_mc_any_con_bodypart_motor_NVID_Get((eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t)m, (eOcfg_nvsEP_mc_motorNVindex_t)mnvindex));
 }
 
+
+
+extern eOnvID_t eo_cfg_nvsEP_mc_lowerarm_controller_NVID_Get(eo_cfg_nvsEP_mc_lowerarm_con_controllerNVindex_t cnvindex)
+{
+    return(eo_cfg_nvsEP_mc_any_con_bodypart_controller_NVID_Get((eOcfg_nvsEP_mc_controllerNVindex_t)cnvindex));
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
