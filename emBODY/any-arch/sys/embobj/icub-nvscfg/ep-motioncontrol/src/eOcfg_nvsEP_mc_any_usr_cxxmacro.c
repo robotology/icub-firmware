@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       eOcfg_nvsEP_mc_any_con_bodypart.c
+/* @file       eOcfg_nvsEP_mc_any_usr_cxxmacro.c
     @brief      This file keeps constant configuration for ...
     @author     marco.accame@iit.it
     @date       04/06/2012
@@ -27,31 +27,23 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "stdlib.h" 
-#include "string.h"
-#include "stdio.h"
-
-#include "EoMotionControl.h"
-#include "eOcfg_nvsEP_mc_any_con_jxx.h"
-#include "eOcfg_nvsEP_mc_any_con_mxx.h"
-#include "eOcfg_nvsEP_mc_any_con_cxx.h"
-#include "eOcfg_nvsEP_mc_hid.h"
-
+#include "EoCommon.h"    
 #include "EOnv_hid.h"
+
+      
+
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "eOcfg_nvsEP_mc_any_con_bodypart.h"
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
-
-#include "eOcfg_nvsEP_mc_any_con_bodypart_hid.h"
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -61,13 +53,12 @@
 
 
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
- 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -77,8 +68,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
- 
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables
@@ -86,41 +76,9 @@
 
 
 
-
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
-
-
-extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_joint_NVID_Get(eo_cfg_nvsEP_mc_any_con_bodypart_jointNumber_t j, eOcfg_nvsEP_mc_jointNVindex_t jnvindex)
-{
-    if((j >= EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_joints) || (jnvindex >= EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber))
-    {
-        return(EOK_uint16dummy);
-    }
-    return(EO_nv_ID(eo_cfg_nvsEP_mc_any_con_jxx_funtyp[jnvindex], EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_joint(j, jnvindex)));    
-}
-
-
-extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_motor_NVID_Get(eo_cfg_nvsEP_mc_any_con_bodypart_motorNumber_t m, eOcfg_nvsEP_mc_motorNVindex_t mnvindex)
-{
-    if((m >= EOK_cfg_nvsEP_mc_any_con_bodypart_maxnumof_motors) || (mnvindex >= EOK_cfg_nvsEP_mc_any_con_mxx_mnvindex_TOTALnumber))
-    {
-        return(EOK_uint16dummy);
-    }
-    return(EO_nv_ID(eo_cfg_nvsEP_mc_any_con_mxx_funtyp[mnvindex], EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_motor(m, mnvindex)));
-} 
-
-extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_controller_NVID_Get(eOcfg_nvsEP_mc_controllerNVindex_t cnvindex)
-{
-    if((cnvindex >= EOK_cfg_nvsEP_mc_any_con_cxx_cnvindex_TOTALnumber))
-    {
-        return(EOK_uint16dummy);
-    }
-    return(EO_nv_ID(eo_cfg_nvsEP_mc_any_con_cxx_funtyp[cnvindex], EOK_cfg_nvsEP_mc_any_con_bodypart_NVIDoff_of_controller(cnvindex)));
-}
-
 
 
 
@@ -130,10 +88,105 @@ extern eOnvID_t eo_cfg_nvsEP_mc_any_con_bodypart_controller_NVID_Get(eOcfg_nvsEP
 // empty-section
 
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+// use 
+// CXXMACRO_INIT        my_INIT
+// CXXMACRO_UPDT        my_UPDT
+// CXXMACRO_PART        _leftleg etc
+// CXXMACRO_BOARD       _ebx etc
+// CXXMACRO_MSTR        _c00 etc
+// CXXMACRO_MNUM        0 etc
+
+#define NVMACRO_FUN_INIT    CXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    CXXMACRO_UPDT
+
+#define NVMACRO_PSTR        CXXMACRO_PART
+#define NVMACRO_BSTR        CXXMACRO_BOARD
+#define NVMACRO_NVSTR1      CXXMACRO_CSTR
+#define NVMACRO_NVNUM1      CXXMACRO_CNUM
+#define NVMACRO_NVSTR2      _cconfig
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
+
+
+#define NVMACRO_FUN_INIT    CXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    CXXMACRO_UPDT
+
+#define NVMACRO_PSTR        CXXMACRO_PART
+#define NVMACRO_BSTR        CXXMACRO_BOARD
+#define NVMACRO_NVSTR1      CXXMACRO_CSTR
+#define NVMACRO_NVNUM1      CXXMACRO_CNUM
+#define NVMACRO_NVSTR2      _cconfig__durationofctrlloop
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
+#define NVMACRO_FUN_INIT    CXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    CXXMACRO_UPDT
+
+#define NVMACRO_PSTR        CXXMACRO_PART
+#define NVMACRO_BSTR        CXXMACRO_BOARD
+#define NVMACRO_NVSTR1      CXXMACRO_CSTR
+#define NVMACRO_NVNUM1      CXXMACRO_CNUM
+#define NVMACRO_NVSTR2      _cstatus
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
+
+#define NVMACRO_FUN_INIT    CXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    CXXMACRO_UPDT
+
+#define NVMACRO_PSTR        CXXMACRO_PART
+#define NVMACRO_BSTR        CXXMACRO_BOARD
+#define NVMACRO_NVSTR1      CXXMACRO_CSTR
+#define NVMACRO_NVNUM1      CXXMACRO_CNUM
+#define NVMACRO_NVSTR2      _cstatus__alljomoinitted
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
+
+#define NVMACRO_FUN_INIT    CXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    CXXMACRO_UPDT
+
+#define NVMACRO_PSTR        CXXMACRO_PART
+#define NVMACRO_BSTR        CXXMACRO_BOARD
+#define NVMACRO_NVSTR1      CXXMACRO_CSTR
+#define NVMACRO_NVNUM1      CXXMACRO_CNUM
+#define NVMACRO_NVSTR2      _ccmmnds__go2stateofcontroller
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
+
+
+
+#undef CXXMACRO_INIT        
+#undef CXXMACRO_UPDT        
+#undef CXXMACRO_PART        
+#undef CXXMACRO_BOARD       
+#undef CXXMACRO_CSTR        
+#undef CXXMACRO_CNUM        
 
 
 

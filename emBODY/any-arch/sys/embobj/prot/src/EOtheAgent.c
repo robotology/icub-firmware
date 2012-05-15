@@ -68,11 +68,11 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-// static void s_eo_agent_on_rop_confirmation_received(eOipv4addr_t ipaddr, eOropcode_t ropc, eOnvID_t nvid, 
+// static void s_eo_agent_on_rop_confirmation_received(eOipv4addr_t ipaddr, eOropcode_t ropc, eOnvEP_t endp, eOnvID_t nvid, 
 //                                                     uint32_t sign, eOabstime_t time, eOropconfinfo_t confinfo);
 
 
-// static void s_eo_agent_on_rop_confirmation_requested(eOipv4addr_t ipaddr, eOropcode_t ropc, eOnvID_t nvid,
+// static void s_eo_agent_on_rop_confirmation_requested(eOipv4addr_t ipaddr, eOropcode_t ropc, eOnvEP_t endp, eOnvID_t nvid,
 //                                                      uint32_t sign, eOabstime_t time);
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -170,7 +170,7 @@ extern eOresult_t eo_agent_InpROPprocess(EOtheAgent *p, EOnvsCfg* nvscfg, EOrop 
         // received a confirmation ack/nak: execute the callback
         if(NULL != eo_theagent.cfg->on_rop_conf_received)
         {
-            eo_theagent.cfg->on_rop_conf_received(r->aboutip.ipaddr, ropc, r->head.nvid, r->sign, r->time, (eOropconfinfo_t)r->head.ctrl.confinfo);
+            eo_theagent.cfg->on_rop_conf_received(r->aboutip.ipaddr, ropc, r->head.endp, r->head.nvid, r->sign, r->time, (eOropconfinfo_t)r->head.ctrl.confinfo);
         }
 
         return(eores_OK); 
@@ -374,19 +374,19 @@ extern eOresult_t eo_agent_OutROPfill(EOtheAgent *p, EOrop *rop, uint32_t *sign,
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+
 extern eOresult_t eo_agent_hid_OutROPonTransmission(EOtheAgent *p, EOrop *rop)
 {
     if(1 == rop->head.ctrl.rqstconf)
     {
         if(NULL !=  eo_theagent.cfg->on_rop_conf_requested)
         {
-            eo_theagent.cfg->on_rop_conf_requested(rop->aboutip.ipaddr, rop->head.ropc, rop->head.nvid, rop->sign, rop->time);
+            eo_theagent.cfg->on_rop_conf_requested(rop->aboutip.ipaddr, rop->head.ropc, rop->head.endp, rop->head.nvid, rop->sign, rop->time);
         }
         return(eores_OK);
     }
 
-    return(eores_NOK_generic);
-   
+    return(eores_NOK_generic);   
 }
 
 
@@ -396,7 +396,7 @@ extern eOresult_t eo_agent_hid_OutROPonTransmission(EOtheAgent *p, EOrop *rop)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-// static void s_eo_agent_on_rop_confirmation_received(eOipv4addr_t ipaddr, eOropcode_t ropc, eOnvID_t nvid, 
+// static void s_eo_agent_on_rop_confirmation_received(eOipv4addr_t ipaddr, eOropcode_t ropc, eOnvID_t nvid, eOnvEP_t endp
 //                                                     uint32_t sign, eOabstime_t time, eOropconfinfo_t confinfo)
 // {
 //     char str[64];
@@ -405,7 +405,7 @@ extern eOresult_t eo_agent_hid_OutROPonTransmission(EOtheAgent *p, EOrop *rop)
 // }
 
 
-// static void s_eo_agent_on_rop_confirmation_requested(eOipv4addr_t ipaddr, eOropcode_t ropc, eOnvID_t nvid,
+// static void s_eo_agent_on_rop_confirmation_requested(eOipv4addr_t ipaddr, eOropcode_t ropc, eOnvID_t nvid, eOnvEP_t endp
 //                                                      uint32_t sign, eOabstime_t time)
 // {
 //     char str[64];

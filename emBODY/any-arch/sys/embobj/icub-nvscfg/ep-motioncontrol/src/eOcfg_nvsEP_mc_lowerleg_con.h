@@ -45,7 +45,7 @@
 #include "EOnv.h"
 
 #include "EoMotionControl.h"
-#include "eOcfg_nvsEP_mc_any_con_bodypart.h"
+#include "eOcfg_nvsEP_mc.h"
 
 
  
@@ -96,20 +96,26 @@ enum { motorLowerLeg_TOTALnumber = 2};
 typedef eOcfg_nvsEP_mc_motorNVindex_t eo_cfg_nvsEP_mc_lowerleg_con_motorNVindex_t;
 
 
-/** @typedef    enum varsMCleg_TOTALnumber;
-    @brief      It contains the total number of network variables managed by the endpoint mc leg
+/** @typedef    typedef eOcfg_nvsEP_mc_controllerNVindex_t eo_cfg_nvsEP_mc_lowerleg_con_controllerNVindex_t
+    @brief      It contains an index for all the network variables in the controller of the left leg. use the same type as in bodypart
  **/
-enum {varsMClowerleg_TOTALnumber = jointLowerLeg_TOTALnumber*jointNVindex_TOTALnumber + motorLowerLeg_TOTALnumber*motorNVindex_TOTALnumber };
+typedef eOcfg_nvsEP_mc_controllerNVindex_t eo_cfg_nvsEP_mc_lowerleg_con_controllerNVindex_t;
+
+/** @typedef    enum varsMClowerleg_TOTALnumber;
+    @brief      It contains the total number of network variables managed by the endpoint lowerleg
+ **/
+enum {varsMClowerleg_TOTALnumber = controllerNVindex_TOTALnumber + jointLowerLeg_TOTALnumber*jointNVindex_TOTALnumber + motorLowerLeg_TOTALnumber*motorNVindex_TOTALnumber };
 
 
 /** @typedef    typedef struct eo_cfg_nvsEP_mc_lowerleg_t;
     @brief      contains all the variables in the leg.
  **/
-typedef struct                  // 152*2+40*2 = 384               
+typedef struct                  // 152*2+40*2+24 = 408               
 {
     eOmc_joint_t                joints[jointLowerLeg_TOTALnumber]; 
     eOmc_motor_t                motors[motorLowerLeg_TOTALnumber];
-} eo_cfg_nvsEP_mc_lowerleg_t;   EO_VERIFYsizeof(eo_cfg_nvsEP_mc_lowerleg_t, 384);
+    eOmc_controller_t           thecontroller;
+} eo_cfg_nvsEP_mc_lowerleg_t;   EO_VERIFYsizeof(eo_cfg_nvsEP_mc_lowerleg_t, 408);
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
@@ -119,7 +125,7 @@ typedef struct                  // 152*2+40*2 = 384
 
 extern const eOmc_joint_t* eo_cfg_nvsEP_mc_lowerleg_joint_defaultvalue;
 extern const eOmc_motor_t* eo_cfg_nvsEP_mc_lowerleg_motor_defaultvalue;
-
+extern const eOmc_controller_t* eo_cfg_nvsEP_mc_lowerleg_controller_defaultvalue;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -143,6 +149,12 @@ extern eOnvID_t eo_cfg_nvsEP_mc_lowerleg_joint_NVID_Get(eo_cfg_nvsEP_mc_lowerleg
 extern eOnvID_t eo_cfg_nvsEP_mc_lowerleg_motor_NVID_Get(eo_cfg_nvsEP_mc_lowerleg_con_motorNumber_t m, eo_cfg_nvsEP_mc_lowerleg_con_motorNVindex_t mnvindex);
 
 
+/** @fn         extern eOnvID_t eo_cfg_nvsEP_mc_lowerleg_controller_NVID_Get(eo_cfg_nvsEP_mc_lowerleg_con_controllerNVindex_t cnvindex)
+    @brief      This function retrieves the eOnvID_t of a network variable with index @e nnvindex for motion controller
+    @param      cnvinxed        the index of the nv inside the controller
+    @return     the nvid or EOK_uint16dummy in case of failure.
+  */
+extern eOnvID_t eo_cfg_nvsEP_mc_lowerleg_controller_NVID_Get(eo_cfg_nvsEP_mc_lowerleg_con_controllerNVindex_t cnvindex);
 
 // - declarations used to load the endpoint into a EOnvsCfg object ----------------------------------------------------
 

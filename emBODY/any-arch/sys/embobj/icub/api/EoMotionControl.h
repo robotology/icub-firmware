@@ -487,7 +487,7 @@ typedef struct                  // size is 16+12+1+1+1+1+0 = 32
 {
     eOmc_calibrator_t           calibration;                /**< the calibrator to use */
     eOmc_setpoint_t             setpoint;                   /**< the setpoint of the joint */
-    eObool_t                    stoptrajectory;             /**< it is an order to stop the current trajectory */
+    eObool_t                    stoptrajectory;             /**< it is an order to stop the current trajectory on the joint*/
     uint8_t                     holder01FFU01;              /**< holder of a variable for future use */
     uint8_t                     holder01FFU02;              /**< holder of a variable for future use */
     uint8_t                     holder01FFU03;              /**< holder of a variable for future use */
@@ -573,6 +573,51 @@ typedef struct                  // size is 24+16+0 = 40
     eOmc_motor_status_t         mstatus;                    /**< the status of the motor */   
 } eOmc_motor_t;                 EO_VERIFYsizeof(eOmc_motor_t, 40); 
  
+
+// -- the definition of a controller containing a given number of joints and motors  
+
+/** @typedef    typedef enum eOmc_stateofcontroller_t
+    @brief      contains the possible states of the controller.
+ **/
+typedef enum
+{
+    eomc_stateofcontroller_configuration              = 0,
+    eomc_stateofcontroller_running                    = 1
+} eOmc_stateofcontroller_t;
+ 
+
+typedef struct                  // size is 4+4+0 = 8
+{
+    eOreltime_t                 durationofctrlloop;         /**< the duration of the control-loop in micro-sec. its default is 1000. so far it cannot be changed. */
+    uint8_t                     filler04[4];                /**< for future use */
+} eOmc_controller_config_t;     EO_VERIFYsizeof(eOmc_controller_config_t, 8); 
+
+
+typedef struct                  // size is 1+1+1+1+2+2+0 = 8
+{
+    eObool_t                    alljomoinitted;             /**< it is eobool_true only when every joint and motor is initted */
+    uint8_t                     numofjoints;                /**< the number of joints */   
+    uint8_t                     numofmotors;                /**< the number of motors */ 
+    eOenum08_t                  stateofcontroller;          /**< it holds a value from enum eOmc_stateofcontroller_t */               
+    eO16flags_t                 flagsinittedjoints;         /**< bit position 0 (1, 2, ..) keeps 1 if the joint 0 (1, 2, ..) is fully initted. */
+    eO16flags_t                 flagsinittedmotors;         /**< bit position 0 (1, 2, ..) keeps 1 if the motor 0 (1, 2, ..) is fully initted. */ 
+} eOmc_controller_status_t;     EO_VERIFYsizeof(eOmc_controller_status_t, 8); 
+
+
+typedef struct                  // size is 1+7+0 = 8
+{
+    eOenum08_t                  go2stateofcontroller;       /**< it forces a transition towards the specified state. use a value from enum eOmc_stateofcontroller_t */
+    uint8_t                     filler07[7];                /**< for future use */
+} eOmc_controller_commands_t;   EO_VERIFYsizeof(eOmc_controller_commands_t, 8); 
+
+
+typedef struct                  // size is 8+8+8+0 = 24
+{
+    eOmc_controller_config_t    cconfig;                    /**< controller configuration */
+    eOmc_controller_status_t    cstatus;                    /**< controller status  */
+    eOmc_controller_commands_t  ccmmnds;                    /**< controller commands  */
+} eOmc_controller_t;            EO_VERIFYsizeof(eOmc_controller_t, 24); 
+
 
  
 // some considerations by acemor.
