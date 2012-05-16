@@ -54,16 +54,16 @@
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-#define OVERRIDE_eo_cfg_nvsEP_mn_hid_INITIALISE 
+#define OVERRIDE_eo_cfg_nvsEP_mn_comm_hid_INITIALISE 
 
 // init:   
 #define OVERRIDE_eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgassign
-//#define OVERRIDE_eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgcommand
+//#define OVERRIDE_eo_cfg_nvsEP_mn_comm_hid_INIT__ropsigcfgcommand
 
 
 // updt:    
 #define OVERRIDE_eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgassign
-//#define OVERRIDE_eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgcommand
+//#define OVERRIDE_eo_cfg_nvsEP_mn_comm_hid_UPDT__ropsigcfgcommand
 
 
 

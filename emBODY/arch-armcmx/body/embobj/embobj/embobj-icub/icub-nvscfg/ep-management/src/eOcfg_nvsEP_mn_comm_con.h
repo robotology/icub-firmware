@@ -17,13 +17,13 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOCFG_NVSEP_MNGMNT_CON_H_
-#define _EOCFG_NVSEP_MNGMNT_CON_H_
+#ifndef _EOCFG_NVSEP_MN_COMM_CON_H_
+#define _EOCFG_NVSEP_MN_COMM_CON_H_
 
 
 
 
-/** @file       eOcfg_nvsEP_mngmnt_con.h
+/** @file       eOcfg_nvsEP_mn_comm_con.h
 	@brief      This header file gives the constant configuration for the NVs in the management endpoint port
 	@author     marco.accame@iit.it
 	@date       09/06/2011
@@ -44,7 +44,8 @@
 
 #include "EOarray.h"
 #include "EOnv.h"
-#include "EOrop.h"
+#include "EoManagement.h"
+#include "eOcfg_nvsEP_mn.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -53,12 +54,8 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-// typedef enum
-// {
-//     endpoint_mngmnt                             = 0x0001 
-// } eo_cfg_nvsEP_mngmnt_endpoint_t;
 
-
+#if 0
 /** @typedef    typedef enum eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t;
     @brief      It contains an index for all the network variables in a joint. The indices are consecutive and without
                 holes, so that the enum value can be changed by a normal index.
@@ -67,68 +64,38 @@ typedef enum
 {
     mngmntNVindex__ropsigcfgassign                          =  0,
     mngmntNVindex__ropsigcfgcommand                         =  1
-} eo_cfg_nvsEP_mngmnt_NVindex_t;
+} eo_cfg_nvsEP_mn_commNVindex_t;
 
 enum { mngmntNVindex_TOTALnumber = 2};
 
-#undef _EP_MNGMNT_USE_10ROPSIGCFG_
-#if defined(_EP_MNGMNT_USE_10ROPSIGCFG_)
-#define NUMOFROPSIGCFG 10
-typedef struct              // size is 4+10*6=64 bytes
-{
-    eOarray_head_t          head;
-    uint8_t                 data[NUMOFROPSIGCFG*sizeof(eOropSIGcfg_t)];
-} EOarray_of_10eOropSIGcfg; EO_VERIFYsizeof(EOarray_of_10eOropSIGcfg, 64);
-typedef EOarray_of_10eOropSIGcfg eo_cfg_nvsEP_mngmnt_ropsigcfg_array_t; 
-#else
-#define NUMOFROPSIGCFG 18
-typedef struct              // size is 4+18*6=112 bytes
-{
-    eOarray_head_t          head;
-    uint8_t                 data[NUMOFROPSIGCFG*sizeof(eOropSIGcfg_t)];
-} EOarray_of_18eOropSIGcfg; EO_VERIFYsizeof(EOarray_of_18eOropSIGcfg, 112);
-typedef EOarray_of_18eOropSIGcfg eo_cfg_nvsEP_mngmnt_ropsigcfg_array_t;  
 #endif
 
-typedef enum 
-{
-    ropsigcfg_cmd_none      = 0,
-    ropsigcfg_cmd_pushback  = 1,
-    ropsigcfg_cmd_popback   = 2
-} eo_cfg_nvsEP_mngmnt_ropsigcfg_commandtype_t;
-
-typedef struct              // size is 6+1+1 = 8 bytes
-{
-    eOropSIGcfg_t           ropsigcfg;                  /**< the ropsigcfg to use if the commandtype requires it. */
-    eOenum08_t              commandtype;                /**< use eo_cfg_nvsEP_mngmnt_ropsigcfg_commandtype_t */
-    uint8_t                 filler01[01];
-} eo_cfg_nvsEP_mngmnt_ropsigcfg_command_t;  EO_VERIFYsizeof(eo_cfg_nvsEP_mngmnt_ropsigcfg_command_t, 8);
 
 
-/** @typedef    typedef struct eo_cfg_nvsEP_mngmnt_t;
-    @brief      contains all the variables in the management endpoint.
+
+/** @typedef    typedef struct eo_cfg_nvsEP_mn_comm_t;
+    @brief      contains all the variables in the mn comm endpoint which is used to configure communication 
  **/
-typedef struct              // size is 112+8+0 = 120 bytes
+typedef struct                  // size is 1128+0 = 128 bytes
 {
-    eo_cfg_nvsEP_mngmnt_ropsigcfg_array_t   ropsigcfgassign;           // assign the whole array
-    eo_cfg_nvsEP_mngmnt_ropsigcfg_command_t ropsigcfgcommand;          // push-back or pop-back a single item
-} eo_cfg_nvsEP_mngmnt_t;                    EO_VERIFYsizeof(eo_cfg_nvsEP_mngmnt_t, 120)
+    eOmn_ropsigcfg_command_t    ropsigcfgcommand;        
+} eo_cfg_nvsEP_mn_comm_t;       EO_VERIFYsizeof(eo_cfg_nvsEP_mn_comm_t, 128)
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eo_cfg_nvsEP_mngmnt_t *eo_cfg_nvsEP_mngmnt_defaultvalue;
+extern const eo_cfg_nvsEP_mn_comm_t *eo_cfg_nvsEP_mn_comm_defaultvalue;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn         extern eOnvID_t eo_cfg_nvsEP_mngmnt_NVID_Get(eo_cfg_nvsEP_mngmnt_NVindex_t nvindex)
+/** @fn         extern eOnvID_t eo_cfg_nvsEP_mn_comm_comm_NVID_Get(eOcfg_nvsEP_mn_commNVindex_t nvindex)
     @brief      This function retrieves the eOnvID_t of a network variable with index @e nvindex.
                 As an alternative use the #define values in the _hid.h file.
     @param      nvinxed         the index of the nv
     @return     the nvid or EOK_uint16dummy in case of failure.
   */
-extern eOnvID_t eo_cfg_nvsEP_mngmnt_NVID_Get(eo_cfg_nvsEP_mngmnt_NVindex_t nvindex);
+extern eOnvID_t eo_cfg_nvsEP_mn_comm_comm_NVID_Get(eOcfg_nvsEP_mn_commNVindex_t nvindex);
 
 
 
@@ -137,16 +104,16 @@ extern eOnvID_t eo_cfg_nvsEP_mngmnt_NVID_Get(eo_cfg_nvsEP_mngmnt_NVindex_t nvind
 
 
 // it is a EOconstvector where each element is a EOtreenode whose data field is a EOnv_con_t object (id, capacity, valuedef, offset)
-extern const EOconstvector* const eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con;
+extern const EOconstvector* const eo_cfg_nvsEP_mn_comm_constvector_of_treenodes_EOnv_con;
 
-// if not NULL it contains a mapping from IDs to index inside eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con
-extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_mngmnt_fnptr_hashfunction_id2index;
+// if not NULL it contains a mapping from IDs to index inside eo_cfg_nvsEP_mn_comm_constvector_of_treenodes_EOnv_con
+extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_mn_comm_fnptr_hashfunction_id2index;
 
 // the size of the ram to be used
-#define EOK_cfg_nvsEP_mngmnt_RAMSIZE                                            (sizeof(eo_cfg_nvsEP_mngmnt_t))
+#define EOK_cfg_nvsEP_mn_comm_RAMSIZE                                            (sizeof(eo_cfg_nvsEP_mn_comm_t))
 
-// same as the eo_cfg_nvsEP_mngmnt_fnptr_hashfunction_id2index pointer  
-extern uint16_t eo_cfg_nvsEP_mngmnt_hashfunction_id2index(uint16_t nvid);
+// same as the eo_cfg_nvsEP_mn_comm_fnptr_hashfunction_id2index pointer  
+extern uint16_t eo_cfg_nvsEP_mn_comm_hashfunction_id2index(uint16_t nvid);
 
 
 
