@@ -103,7 +103,7 @@ typedef struct              // size is 4+20*6=124 bytes
 typedef struct              // size is 124+1+3 = 128 bytes
 {
     eOmn_ropsigcfg_array_t          array;
-    eOmn_ropsigcfg_commandtype_t    cmmnd;
+    eOenum08_t                      cmmnd;              /**< but use eOmn_ropsigcfg_commandtype_t */
     uint8_t                         filler03[3];
 } eOmn_ropsigcfg_command_t;         EO_VERIFYsizeof(eOmn_ropsigcfg_command_t, 128);
 
