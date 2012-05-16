@@ -348,7 +348,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM _USE_GPIO_ _USE_STATE_MACHINES_</Define>
               <Undefine></Undefine>
-              <IncludePath>..\abslayer-cfg;..\app;..\..\..\embobj\embobj-api;..\..\..\embobj\embobj-src;..\..\..\embobj\embobj-cfg;..\..\..\..\..\sys\abs\api;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc;..\..\..\..\..\sys\prt</IncludePath>
+              <IncludePath>..\abslayer-cfg;..\app;..\..\..\embobj\embobj-api;..\..\..\embobj\embobj-src;..\..\..\embobj\embobj-cfg;..\..\..\..\..\sys\abs\api;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc;..\..\..\..\..\..\porting</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -409,16 +409,6 @@
               <FilePath>..\..\..\..\..\sys\abs\lib\osal.cm3.lib</FilePath>
             </File>
             <File>
-              <FileName>fsal.cm3.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\abs\lib\fsal.cm3.lib</FilePath>
-            </File>
-            <File>
-              <FileName>fsal_retarget.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\abs\src\fsal_retarget.c</FilePath>
-            </File>
-            <File>
               <FileName>hal.stm32f1.mcbstm32c.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\sys\abs\lib\hal.stm32f1.mcbstm32c.lib</FilePath>
@@ -447,11 +437,6 @@
               <FileName>osal_cfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\abslayer-cfg\osal_cfg.c</FilePath>
-            </File>
-            <File>
-              <FileName>fsal_cfg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\abslayer-cfg\fsal_cfg.h</FilePath>
             </File>
             <File>
               <FileName>hal_cfg_mee.c</FileName>
@@ -1065,16 +1050,6 @@
               <FilePath>..\..\..\..\..\sys\abs\lib\osal.cm3.lib</FilePath>
             </File>
             <File>
-              <FileName>fsal.cm3.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\abs\lib\fsal.cm3.lib</FilePath>
-            </File>
-            <File>
-              <FileName>fsal_retarget.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\abs\src\fsal_retarget.c</FilePath>
-            </File>
-            <File>
               <FileName>hal.stm32f1.mcbstm32c.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\sys\abs\lib\hal.stm32f1.mcbstm32c.lib</FilePath>
@@ -1103,11 +1078,6 @@
               <FileName>osal_cfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\abslayer-cfg\osal_cfg.c</FilePath>
-            </File>
-            <File>
-              <FileName>fsal_cfg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\abslayer-cfg\fsal_cfg.h</FilePath>
             </File>
             <File>
               <FileName>hal_cfg_mee.c</FileName>
