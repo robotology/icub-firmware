@@ -12,7 +12,7 @@ set D_SRC=src
 
 
 set TYP=icub
-set LST=(EoBoards EoMeasures EoMotionControl EoSensors EoSkin EoUtilities)
+set LST=(EoBoards EoManagement EoMeasures EoMotionControl EoSensors EoSkin EoUtilities)
 
 echo. -- copying "%TYP%" files
 
