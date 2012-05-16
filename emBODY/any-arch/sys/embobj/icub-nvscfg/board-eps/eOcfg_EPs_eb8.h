@@ -52,13 +52,13 @@ extern "C" {
 // - in here there are the nvids plus ... 
 
 #include "eOcfg_nvsEP_mn.h"
-#include "eOcfg_nvsEP_mngmnt_con.h"
+#include "eOcfg_nvsEP_mn_comm_con.h"
 #include "eOcfg_nvsEP_mc_any_con_bodypart.h"
 #include "eOcfg_nvsEP_mc_upperleg_con.h"
 #include "eOcfg_nvsEP_as_onestrain_con.h"
 
 // - in here there is access to ram of the endpoints
-#include "eOcfg_nvsEP_mngmnt_usr.h"
+#include "eOcfg_nvsEP_mn_comm_usr.h"
 #include "eOcfg_nvsEP_mc_upperleg_usr.h"
 #include "eOcfg_nvsEP_as_onestrain_usr.h"
 

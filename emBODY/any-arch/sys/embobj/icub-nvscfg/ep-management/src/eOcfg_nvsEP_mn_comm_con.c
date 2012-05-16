@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       eOcfg_nvsEP_mngmnt_con.c
+/* @file       eOcfg_nvsEP_mn_comm_con.c
     @brief      This file keeps the constant configuration for the NVs in the base endpoint port
     @author     marco.accame@iit.it
     @date       09/06/2011
@@ -43,14 +43,14 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "eOcfg_nvsEP_mngmnt_con.h"
+#include "eOcfg_nvsEP_mn_comm_con.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "eOcfg_nvsEP_mngmnt_con_hid.h"
+#include "eOcfg_nvsEP_mn_comm_con_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -81,22 +81,22 @@ static uint16_t s_hash(uint16_t id);
 
 // this struct contains the default values of the entities of the whole device
 
-extern const eo_cfg_nvsEP_mngmnt_t eo_cfg_nvsEP_mngmnt_default =
+extern const eo_cfg_nvsEP_mn_comm_t eo_cfg_nvsEP_mn_comm_default =
 {
-    EO_INIT(.ropsigcfgassign)
+    EO_INIT(.ropsigcfgcommand)
     {
-        EO_INIT(.head)
+        EO_INIT(.array)
         {
-            EO_INIT(.capacity)      NUMOFROPSIGCFG,
-            EO_INIT(.itemsize)      sizeof(eOropSIGcfg_t),
-            EO_INIT(.size)          0     // it is the only one in the header that can change
+            EO_INIT(.head)
+            {
+                EO_INIT(.capacity)      NUMOFROPSIGCFG,
+                EO_INIT(.itemsize)      sizeof(eOropSIGcfg_t),
+                EO_INIT(.size)          0       // it is the only field in the header that can change
+            },
+            EO_INIT(.data)              {0}     // data can also change
         },
-        EO_INIT(.data)              {0}           // data can also change
-    },
-    EO_INIT(.ropsigcfgcommand)           
-    {
-        EO_INIT(.ropsigcfg)         {0},
-        EO_INIT(.commandtype)       ropsigcfg_cmd_none    
+        EO_INIT(.cmmnd)                 ropsigcfg_cmd_none,
+        EO_INIT(.filler03)              {0xf1, 0xf2, 0xf3}
     }
 }; 
 
@@ -106,79 +106,58 @@ extern const eo_cfg_nvsEP_mngmnt_t eo_cfg_nvsEP_mngmnt_default =
 // now we have the const netvars
 
 
-#define OFFSETof__ropsigcfgassign                 (0) 
-#define CAPACITY__ropsigcfgassign                 sizeof(eo_cfg_nvsEP_mngmnt_ropsigcfg_array_t)
-extern EOnv_con_t eo_cfg_nvsEP_mngmnt__ropsigcfgassign =
+#define OFFSETof__ropsigcfgcommand                 (0) 
+#define CAPACITY__ropsigcfgcommand                 sizeof(eOmn_ropsigcfg_command_t)
+extern EOnv_con_t eo_cfg_nvsEP_mn_comm__ropsigcfgcommand =
 {   // pos =  00
-    EO_INIT(.id)        EOK_cfg_nvsEP_mngmnt_NVID__ropsigcfgassign,
-    EO_INIT(.capacity)  CAPACITY__ropsigcfgassign,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mngmnt_default.ropsigcfgassign,
-    EO_INIT(.offset)    OFFSETof__ropsigcfgassign,
-    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mngmnt_NVFUNTYP__ropsigcfgassign),
-    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mngmnt_NVFUNTYP__ropsigcfgassign)
-};
-#define OFFSETafter__ropsigcfgassign              (OFFSETof__ropsigcfgassign + CAPACITY__ropsigcfgassign)
-
-
-
-#define OFFSETof__ropsigcfgcommand                       OFFSETafter__ropsigcfgassign
-#define CAPACITY__ropsigcfgcommand                       sizeof(eo_cfg_nvsEP_mngmnt_ropsigcfg_command_t)
-extern EOnv_con_t eo_cfg_nvsEP_mngmnt__ropsigcfgcommand =
-{   // pos =  01
-    EO_INIT(.id)        EOK_cfg_nvsEP_mngmnt_NVID__ropsigcfgcommand,
+    EO_INIT(.id)        EOK_cfg_nvsEP_mn_comm_NVID__ropsigcfgcommand,
     EO_INIT(.capacity)  CAPACITY__ropsigcfgcommand,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mngmnt_default.ropsigcfgcommand,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mn_comm_default.ropsigcfgcommand,
     EO_INIT(.offset)    OFFSETof__ropsigcfgcommand,
-    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mngmnt_NVFUNTYP__ropsigcfgcommand),
-    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mngmnt_NVFUNTYP__ropsigcfgcommand)
+    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mn_comm_NVFUNTYP__ropsigcfgcommand),
+    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mn_comm_NVFUNTYP__ropsigcfgcommand)
 };
-#define OFFSETafter__ropsigcfgcommand                    (OFFSETof__ropsigcfgcommand + CAPACITY__ropsigcfgcommand)
+#define OFFSETafter__ropsigcfgcommand              (OFFSETof__ropsigcfgcommand + CAPACITY__ropsigcfgcommand)
+
 
 
 // guard on alignment of variables. if it doesnt compile then ... the compiler has surely inserted some holes
 
-EO_VERIFYproposition(eocfg_nvsep_mngmnt, ( (OFFSETafter__ropsigcfgcommand) == sizeof(eo_cfg_nvsEP_mngmnt_t) ) );
+EO_VERIFYproposition(eocfg_nvsep_mn_comm, ( (OFFSETafter__ropsigcfgcommand) == sizeof(eo_cfg_nvsEP_mn_comm_t) ) );
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
 
-extern const eo_cfg_nvsEP_mngmnt_t *eo_cfg_nvsEP_mngmnt_defaultvalue = &eo_cfg_nvsEP_mngmnt_default;
+extern const eo_cfg_nvsEP_mn_comm_t *eo_cfg_nvsEP_mn_comm_defaultvalue = &eo_cfg_nvsEP_mn_comm_default;
 
-//extern EOtreenode eo_cfg_nvsEP_mngmnt_tree_con[];
+//extern EOtreenode eo_cfg_nvsEP_mn_comm_tree_con[];
 
-extern EOtreenode eo_cfg_nvsEP_mngmnt_tree_con[] =
+extern EOtreenode eo_cfg_nvsEP_mn_comm_tree_con[] =
 {              
     {   // 00
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mngmnt__ropsigcfgassign,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mn_comm__ropsigcfgcommand,
         EO_INIT(.index)     0,
         EO_INIT(.nchildren) 0,
         EO_INIT(.ichildren) {0},
         EO_INIT(.pchildren) {NULL}
-    },
-    {   // 1
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mngmnt__ropsigcfgcommand,
-        EO_INIT(.index)     1,
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.ichildren) {0},
-        EO_INIT(.pchildren) {NULL}
-    }    
-};  EO_VERIFYsizeof(eo_cfg_nvsEP_mngmnt_tree_con, sizeof(EOtreenode)*(EOK_cfg_nvsEP_mngmnt_con_NUMofVARS));
+    }
+};  EO_VERIFYsizeof(eo_cfg_nvsEP_mn_comm_tree_con, sizeof(EOtreenode)*(EOK_cfg_nvsEP_mn_comm_con_NUMofVARS));
 
 
-const EOconstvector  s_eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con = 
+const EOconstvector  s_eo_cfg_nvsEP_mn_comm_constvector_of_treenodes_EOnv_con = 
 {
-    EO_INIT(.size)              sizeof(eo_cfg_nvsEP_mngmnt_tree_con)/sizeof(EOtreenode),
+    EO_INIT(.size)              sizeof(eo_cfg_nvsEP_mn_comm_tree_con)/sizeof(EOtreenode),
     EO_INIT(.item_size)         sizeof(EOtreenode),
-    EO_INIT(.item_array_data)   eo_cfg_nvsEP_mngmnt_tree_con
+    EO_INIT(.item_array_data)   eo_cfg_nvsEP_mn_comm_tree_con
 };
 
 
-extern const EOconstvector* const eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con = &s_eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con;
+extern const EOconstvector* const eo_cfg_nvsEP_mn_comm_constvector_of_treenodes_EOnv_con = &s_eo_cfg_nvsEP_mn_comm_constvector_of_treenodes_EOnv_con;
 
 
-extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_mngmnt_fnptr_hashfunction_id2index = eo_cfg_nvsEP_mngmnt_hashfunction_id2index;
+extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_mn_comm_fnptr_hashfunction_id2index = eo_cfg_nvsEP_mn_comm_hashfunction_id2index;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -186,25 +165,25 @@ extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_mngmnt_fnptr_hashfunction_id2inde
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern eOnvID_t eo_cfg_nvsEP_mngmnt_NVID_Get(eo_cfg_nvsEP_mngmnt_NVindex_t nvindex)
+extern eOnvID_t eo_cfg_nvsEP_mn_comm_comm_NVID_Get(eOcfg_nvsEP_mn_commNVindex_t nvindex)
 {
-    static const uint8_t s_eo_cfg_nvsEP_mngmnt_con_nvs_funtyp[] =
+    static const uint8_t s_eo_cfg_nvsEP_mn_comm_con_nvs_funtyp[] =
     {
-        EOK_cfg_nvsEP_mngmnt_NVFUNTYP__ropsigcfgassign,                 EOK_cfg_nvsEP_mngmnt_NVFUNTYP__ropsigcfgcommand
+        EOK_cfg_nvsEP_mn_comm_NVFUNTYP__ropsigcfgcommand
         
-    };  EO_VERIFYsizeof(s_eo_cfg_nvsEP_mngmnt_con_nvs_funtyp, EOK_cfg_nvsEP_mngmnt_con_NUMofVARS);
+    };  EO_VERIFYsizeof(s_eo_cfg_nvsEP_mn_comm_con_nvs_funtyp, EOK_cfg_nvsEP_mn_comm_con_NUMofVARS);
 
 
-    if(nvindex >= EOK_cfg_nvsEP_mngmnt_con_NUMofVARS)
+    if(nvindex >= EOK_cfg_nvsEP_mn_comm_con_NUMofVARS)
     {
         return(EOK_uint16dummy);
     }
-    return(EO_nv_ID(s_eo_cfg_nvsEP_mngmnt_con_nvs_funtyp[nvindex], EOK_cfg_nvsEP_mngmnt_con_NVIDoff(nvindex)));    
+    return(EO_nv_ID(s_eo_cfg_nvsEP_mn_comm_con_nvs_funtyp[nvindex], EOK_cfg_nvsEP_mn_comm_con_NVIDoff(nvindex)));    
 }
 
-extern uint16_t eo_cfg_nvsEP_mngmnt_hashfunction_id2index(uint16_t id)
+extern uint16_t eo_cfg_nvsEP_mn_comm_hashfunction_id2index(uint16_t id)
 {
-    #define IDTABLESIZE     2
+    #define IDTABLESIZE     1
 
     // in order to always have a hit the table s_idtable[] it must be of size equal to max{ s_hash(id) }, thus if we
     // use an id of value 16 and s_hash() just keeps the lsb, then the size must be 17 
@@ -214,9 +193,9 @@ extern uint16_t eo_cfg_nvsEP_mngmnt_hashfunction_id2index(uint16_t id)
     
     uint16_t index;
 
-    static const uint16_t s_idtable[IDTABLESIZE] = 
+    static const uint16_t s_idtable[] = 
     { 
-        EOK_cfg_nvsEP_mngmnt_NVID__ropsigcfgassign,             EOK_cfg_nvsEP_mngmnt_NVID__ropsigcfgcommand
+        EOK_cfg_nvsEP_mn_comm_NVID__ropsigcfgcommand
         
     };  EO_VERIFYsizeof(s_idtable, sizeof(uint16_t)*(IDTABLESIZE));
 
@@ -248,7 +227,7 @@ extern uint16_t eo_cfg_nvsEP_mngmnt_hashfunction_id2index(uint16_t id)
 static uint16_t s_hash(uint16_t id)
 {
     uint16_t off = EO_nv_OFF(id);
-    return(EOK_cfg_nvsEP_mngmnt_con_NVindex(off));
+    return(EOK_cfg_nvsEP_mn_comm_con_NVindex(off));
 }
 
 

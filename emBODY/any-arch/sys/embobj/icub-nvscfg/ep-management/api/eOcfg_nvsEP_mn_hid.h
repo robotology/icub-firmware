@@ -62,16 +62,16 @@ extern "C" {
 
 
 
-extern void eo_cfg_nvsEP_mn_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem);
+extern void eo_cfg_nvsEP_mn_comm_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem);
 
 // init:    n is not used
 extern void eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgassign(uint16_t n, const EOnv* nv);
-extern void eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgcommand(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mn_comm_hid_INIT__ropsigcfgcommand(uint16_t n, const EOnv* nv);
 
 
 // updt:    n is not used
 extern void eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgassign(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-extern void eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgcommand(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mn_comm_hid_UPDT__ropsigcfgcommand(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
 
 /** @}            

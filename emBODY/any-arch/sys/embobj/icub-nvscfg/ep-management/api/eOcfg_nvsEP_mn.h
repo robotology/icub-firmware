@@ -43,8 +43,7 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EOconstvector.h"
-#include "EOarray.h"
-#include "EOnv.h"
+#include "EoManagement.h"
 
 
  
@@ -59,33 +58,32 @@ extern "C" {
 
 typedef enum
 {
-    endpoint_mn_mngmnt                          = 0x0001    /**< used by every board */
+    endpoint_mn_comm                          = 0x0001    /**< used by every board to configure communication */
 } eOcfg_nvsEP_mn_endpoint_t;
 
 enum { endpoint_mn_TOTALnumber = 1};
 
 
 
-/** @typedef    typedef uint16_t eOcfg_nvsEP_mn_Number_t;
+/** @typedef    typedef uint16_t eOcfg_nvsEP_mn_commNumber_t;
     @brief      It contains an index for a mn in a manner that is independnt from the endpoint.
  **/
-typedef uint16_t eOcfg_nvsEP_mn_Number_t;
+typedef uint16_t eOcfg_nvsEP_mn_commNumber_t;
 
-enum { mnNumberMAX = 1};
+enum { mnCommNumberMAX = 1};
 
 
 
-/** @typedef    typedef enum eOcfg_nvsEP_mn_NVindex_t;
+/** @typedef    typedef enum eOcfg_nvsEP_mn_commNVindex_t;
     @brief      It contains an index for all the network variables in a joint. The indices are consecutive and without
                 holes, so that the enum value can be changed by a normal index.
  **/
 typedef enum
 {
-    mnNVindex__ropsigcfgassign                          =  0,
-    mnNVindex__ropsigcfgcommand                         =  1
-} eOcfg_nvsEP_mn_NVindex_t;
+    commNVindex__ropsigcfgcommand                         =  0
+} eOcfg_nvsEP_mn_commNVindex_t;
 
-enum { mnNVindex_TOTALnumber = 2};
+enum { commNVindex_TOTALnumber = 1};
 
 
 
@@ -93,21 +91,21 @@ enum { mnNVindex_TOTALnumber = 2};
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-//const eo_cfg_nvsEP_mngmnt_t *eo_cfg_nvsEP_mngmnt_defaultvalue;
+//const eo_cfg_nvsEP_mn_comm_t *eo_cfg_nvsEP_mn_comm_defaultvalue;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
 
-/** @fn         extern eOnvID_t eo_cfg_nvsEP_mn_NVID_Get(eOcfg_nvsEP_mn_NVindex_t nvindex)
+/** @fn         extern eOnvID_t eo_cfg_nvsEP_mn_comm_NVID_Get(eOcfg_nvsEP_mn_endpoint_t ep, eOcfg_nvsEP_mn_commNumber_t n, eOcfg_nvsEP_mn_commNVindex_t nvindex)
     @brief      This function retrieves the eOnvID_t of a network variable with index @e nvindex.
     @param      ep              the endpoint
     @param      n               the mn number (always 0)
     @param      nvindex         the index of the nv inside the endpoint
     @return     the nvid or EOK_uint16dummy in case of failure.
   */
-extern eOnvID_t eo_cfg_nvsEP_mn_NVID_Get(eOcfg_nvsEP_mn_endpoint_t ep, eOcfg_nvsEP_mn_Number_t n, eOcfg_nvsEP_mn_NVindex_t nvindex);
+extern eOnvID_t eo_cfg_nvsEP_mn_comm_NVID_Get(eOcfg_nvsEP_mn_endpoint_t ep, eOcfg_nvsEP_mn_commNumber_t n, eOcfg_nvsEP_mn_commNVindex_t nvindex);
 
 
 

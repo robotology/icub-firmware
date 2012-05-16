@@ -581,8 +581,9 @@ typedef struct                  // size is 24+16+0 = 40
  **/
 typedef enum
 {
-    eomc_stateofcontroller_configuration              = 0,
-    eomc_stateofcontroller_running                    = 1
+    eomc_stateofcontroller_config                       = 0,
+    eomc_stateofcontroller_ready                        = 1,
+    eomc_stateofcontroller_active                       = 2
 } eOmc_stateofcontroller_t;
  
 
