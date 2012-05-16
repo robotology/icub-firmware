@@ -58,7 +58,8 @@ extern "C" {
 
 typedef enum
 {
-    endpoint_mn_comm                          = 0x0001    /**< used by every board to configure communication */
+    endpoint_mn_comm                          = 0x0001,   /**< used by every board to configure communication */
+    endpoint_mn_appl                          = 0x0002    /**< used by every board to configure and manage application */
 } eOcfg_nvsEP_mn_endpoint_t;
 
 enum { endpoint_mn_TOTALnumber = 1};
@@ -87,6 +88,27 @@ enum { commNVindex_TOTALnumber = 1};
 
 
 
+/** @typedef    typedef uint16_t eOcfg_nvsEP_mn_applNumber_t;
+    @brief      It contains an index for a mn in a manner that is independnt from the endpoint.
+ **/
+typedef uint16_t eOcfg_nvsEP_mn_applNumber_t;
+
+enum { mnApplNumberMAX = 1};
+
+
+
+/** @typedef    typedef enum eOcfg_nvsEP_mn_applNVindex_t;
+    @brief      It contains an index for all the network variables in a ...
+ **/
+typedef enum
+{
+    applNVindex_config                          =  0,
+    applNVindex_status                          =  1,
+    applNVindex_cmmnds__go2state                =  2
+} eOcfg_nvsEP_mn_applNVindex_t;
+
+enum { applNVindex_TOTALnumber = 3};
+
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
@@ -106,6 +128,16 @@ enum { commNVindex_TOTALnumber = 1};
     @return     the nvid or EOK_uint16dummy in case of failure.
   */
 extern eOnvID_t eo_cfg_nvsEP_mn_comm_NVID_Get(eOcfg_nvsEP_mn_endpoint_t ep, eOcfg_nvsEP_mn_commNumber_t n, eOcfg_nvsEP_mn_commNVindex_t nvindex);
+
+
+/** @fn         extern eOnvID_t eo_cfg_nvsEP_mn_appl_NVID_Get(eOcfg_nvsEP_mn_endpoint_t ep, eOcfg_nvsEP_mn_applNumber_t n, eOcfg_nvsEP_mn_applNVindex_t nvindex)
+    @brief      This function retrieves the eOnvID_t of a network variable with index @e nvindex.
+    @param      ep              the endpoint
+    @param      n               the mn number (always 0)
+    @param      nvindex         the index of the nv inside the endpoint
+    @return     the nvid or EOK_uint16dummy in case of failure.
+  */
+extern eOnvID_t eo_cfg_nvsEP_mn_appl_NVID_Get(eOcfg_nvsEP_mn_endpoint_t ep, eOcfg_nvsEP_mn_applNumber_t n, eOcfg_nvsEP_mn_applNVindex_t nvindex);
 
 
 
