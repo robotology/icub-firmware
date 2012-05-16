@@ -754,17 +754,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>ep-mn-mngmnt</GroupName>
+          <GroupName>ep-mn-comm</GroupName>
           <Files>
             <File>
-              <FileName>eOcfg_nvsEP_mngmnt_con.c</FileName>
+              <FileName>eOcfg_nvsEP_mn_comm_con.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\embobj\embobj-icub\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mngmnt_con.c</FilePath>
+              <FilePath>..\..\..\embobj\embobj-icub\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn_comm_con.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_nvsEP_mngmnt_usr.c</FileName>
+              <FileName>eOcfg_nvsEP_mn_comm_usr.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\embobj\embobj-icub\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mngmnt_usr.c</FilePath>
+              <FilePath>..\..\..\embobj\embobj-icub\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn_comm_usr.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1056,9 +1056,9 @@
               <FilePath>..\..\..\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\usrcbk\eOcfg_nvsEP_mc_usrcbk_pippo.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_nvsEP_mn_usrcbk_ebx.c</FileName>
+              <FileName>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\embobj\embobj-icub\icub-nvscfg\ep-management\usrcbk\eOcfg_nvsEP_mn_usrcbk_ebx.c</FilePath>
+              <FilePath>..\..\..\embobj\embobj-icub\icub-nvscfg\ep-management\usrcbk\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
             </File>
           </Files>
         </Group>
