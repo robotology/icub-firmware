@@ -412,6 +412,78 @@ Int32 compute_pwm(byte j)
 		_pd[j] = 0;
 	break;
 	
+#elif VERSION == 0x0215 
+   	case MODE_POSITION:
+	case MODE_VELOCITY:
+	{
+        if (_sacc0[j] == 0)
+        {
+     		compute_desired(j);
+     		PWMoutput = compute_pid2(j);
+     		PWMoutput = PWMoutput + _ko[j];
+     		_pd[j] = _pd[j] + _ko[j];
+        }
+        else
+        {
+       	    static bool up[4] =INIT_ARRAY (1);
+       	    static byte time_div[4] = INIT_ARRAY (0);
+       	    static Int16 accum[4] = INIT_ARRAY (0);
+       		Int32 _des_saved = 0;
+       
+       	    time_div[j]++;
+       	    if (time_div[j] > 4) time_div[j] =0;
+       		
+       		if (j==2)
+       		{
+       			if (up[j]) accum[j] += 2;
+       			else       accum[j] -= 2;
+       			if      (accum[j] >  200) up[j] = false; //280 = 1 deg
+       			else if (accum[j] < -200) up[j] = true;				
+       		}
+       		if (j==1)
+       		{
+       			if (time_div[j]==0)
+       			{
+       				if (up[j]) accum[j] += 1;
+       				else       accum[j] -= 1;	
+       			}
+       			if      (accum[j] >  5) up[j] = false; //11 = 1 deg
+       			else if (accum[j] < -5) up[j] = true;				
+       		}
+       		
+       		compute_desired(j);
+       		//microsaccades
+       		_des_saved=_desired[j];	
+       		//randomNext();
+       		
+       		if (j==1 || j == 2) {_desired[j] = _desired[j]+accum[j];}
+            //can_printf("%d %f %f %f %f", j, _desired[0], _desired[1], _desired[2], _desired[3]); //jnt == 2 corrisponde al giunto 4
+       		
+       		PWMoutput = compute_pid2(j);
+       		PWMoutput = PWMoutput + _ko[j];
+       		_pd[j] = _pd[j] + _ko[j];
+       		_desired[j]=_des_saved;
+        }
+	}
+	break;
+	case MODE_CALIB_ABS_POS_SENS:
+	case MODE_CALIB_ABS_AND_INCREMENTAL:
+		compute_desired(j);
+		PWMoutput = compute_pid2(j);
+		PWMoutput = PWMoutput + _ko[j];
+		_pd[j] = _pd[j] + _ko[j];
+	break;
+	case MODE_OPENLOOP:
+		PWMoutput = _ko[j];
+		#ifdef IDENTIF 
+		if (sine_ampl!=0)
+		{
+			compute_identif_wt(j);
+			PWMoutput = (Int16)sine_ampl[j]*(sin(wt[j]));  	 
+		}
+		#endif
+	break;	   
+
 #else //all other firmware versions
 	case MODE_POSITION:
 	case MODE_VELOCITY:
@@ -1162,7 +1234,10 @@ void compute_desired(byte i)
  *****************************************************************/
 bool check_in_position(byte jnt)
 {
-	if (_control_mode[jnt] == MODE_POSITION)
+	if (_control_mode[jnt] == MODE_POSITION ||
+	    _control_mode[jnt] == MODE_VELOCITY ||
+	    _control_mode[jnt] == MODE_IMPEDANCE_POS ||
+	    _control_mode[jnt] == MODE_IMPEDANCE_VEL)
 	{
 		//if (__abs(_position[jnt] - _set_point[jnt]) < INPOSITION_THRESHOLD && _ended[jnt])
 		if (_ended[jnt])

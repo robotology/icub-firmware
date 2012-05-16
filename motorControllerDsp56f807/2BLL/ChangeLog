@@ -178,3 +178,7 @@
 	* fixed velocity timeout in impedance velocity control mode.
     * fixed position commands in torque control mode (now commands are ignored).	
 	* Current build 52.		
+    
+2012-16-May Marco Randazzo <marco.randazzo@iit.it>
+    * fixed issue related to the execution of velocity commands during a position trajectory.
+    * Current build 60.

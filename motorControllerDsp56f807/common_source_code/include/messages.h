@@ -1020,8 +1020,7 @@
 	{ \
 		if (_control_mode[axis] != MODE_IDLE && \
 		    _control_mode[axis] != MODE_TORQUE && \
-		    _control_mode[axis] != MODE_OPENLOOP && \
-		    IS_DONE(axis)) \
+		    _control_mode[axis] != MODE_OPENLOOP) \
 		{ \
 			_vel_counter[axis] = 0; \
 			if (_control_mode[axis] == MODE_POSITION || \
