@@ -125,7 +125,7 @@ typedef struct                      // size is 4+4 = 8 bytes
  **/
 typedef struct                      // size is 1+7 = 8 bytes
 {
-    eOmn_appl_state_t               currstate;
+    eOenum08_t                      currstate;      /**< use eOmn_appl_state_t */
     uint8_t                         filler07[7];
 } eOmn_appl_status_t;               EO_VERIFYsizeof(eOmn_appl_status_t, 8);
 
@@ -135,7 +135,7 @@ typedef struct                      // size is 1+7 = 8 bytes
  **/
 typedef struct                      // size is 1+7 = 8 bytes
 {
-    eOmn_appl_state_t               go2state;
+    eOenum08_t                      go2state;       /**< use eOmn_appl_state_t */
     uint8_t                         filler07[7];
 } eOmn_appl_cmmnds_t;               EO_VERIFYsizeof(eOmn_appl_cmmnds_t, 8);
 

@@ -53,6 +53,7 @@ extern "C" {
 
 #include "eOcfg_nvsEP_mn.h"
 #include "eOcfg_nvsEP_mn_comm_con.h"
+#include "eOcfg_nvsEP_mn_appl_con.h"
 #include "eOcfg_nvsEP_mc_any_con_bodypart.h"
 #include "eOcfg_nvsEP_mc_lowerarm_con.h"
 #include "eOcfg_nvsEP_as_onemais_con.h"
@@ -62,6 +63,7 @@ extern "C" {
 
 // - in here there is access to ram of the endpoints
 #include "eOcfg_nvsEP_mn_comm_usr.h"
+#include "eOcfg_nvsEP_mn_appl_usr.h"
 #include "eOcfg_nvsEP_mc_lowerarm_usr.h"
 #include "eOcfg_nvsEP_as_onemais_usr.h"
 #include "eOcfg_nvsEP_sk_emsboard_usr.h"

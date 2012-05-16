@@ -104,13 +104,14 @@ static uint16_t s_eo_cfg_nvsEP_eb2_hashfunction_ep2index(uint16_t ep);
 extern const EOconstvector  s_eo_cfg_nvsEP_mn_comm_constvector_of_treenodes_EOnv_con;
 extern const EOconstvector  s_eo_cfg_nvsEP_mn_comm_usr_constvector_of_EOnv_usr;
 
+extern const EOconstvector  s_eo_cfg_nvsEP_mn_appl_constvector_of_treenodes_EOnv_con;
+extern const EOconstvector  s_eo_cfg_nvsEP_mn_appl_usr_constvector_of_EOnv_usr;
 
 extern const EOconstvector  s_eo_cfg_nvsEP_mc_lowerarm_constvector_of_treenodes_EOnv_con;
 extern const EOconstvector  s_eo_cfg_nvsEP_mc_lowerarm_usr_constvector_of_EOnv_usr;
 
 extern const EOconstvector  s_eo_cfg_nvsEP_as_onemais_constvector_of_treenodes_EOnv_con;
 extern const EOconstvector  s_eo_cfg_nvsEP_as_onemais_usr_constvector_of_EOnv_usr;
-
 
 extern const EOconstvector  s_eo_cfg_nvsEP_sk_emsboard_constvector_of_treenodes_EOnv_con;
 extern const EOconstvector  s_eo_cfg_nvsEP_sk_emsboard_usr_constvector_of_EOnv_usr;
@@ -127,6 +128,16 @@ static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_eb2_data[] =
         EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mn_comm_usr_initialise,
         EO_INIT(.endpoint_data_retrieve)            s_eocfg_eps_ebx_ram_retrieve
     }, 
+
+    {   // mn-appl
+        EO_INIT(.endpoint)                          endpoint_mn_appl,
+        EO_INIT(.sizeof_endpoint_data)              EOK_cfg_nvsEP_mn_appl_RAMSIZE,
+        EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mn_appl_hashfunction_id2index,
+        EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mn_appl_constvector_of_treenodes_EOnv_con, 
+        EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_mn_appl_usr_constvector_of_EOnv_usr, 
+        EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mn_appl_usr_initialise,
+        EO_INIT(.endpoint_data_retrieve)            s_eocfg_eps_ebx_ram_retrieve
+    },      
 
     {   // mc-leftarm-lower
         EO_INIT(.endpoint)                          endpoint_mc_leftlowerarm,
@@ -166,7 +177,8 @@ static void* s_eocfg_eps_ebx_ram[][3] =
     {NULL, NULL, NULL},   // mn-comm
     {NULL, NULL, NULL},       
     {NULL, NULL, NULL},
-    {NULL, NULL, NULL}       
+    {NULL, NULL, NULL},
+    {NULL, NULL, NULL}    
 };
 
 
@@ -230,47 +242,26 @@ extern void* eo_cfg_nvsEP_eb2_Get_locallyownedRAM(eOnvEP_t ep)
 
 static uint8_t s_hashtable[64] = 
 {
-    // 00-15: BS endpoint_mn_comm is 1 and is in pos 0
-    0xff, 0,    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
-    // 16-31: MC endpoint_mc_leftlowerarm is 0x12 andis in pos 1
-    0xff, 0xff, 1,    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+    // 00-15: MN endpoint_mn_comm is 0x01 and is in pos 0, endpoint_mn_appl is 0x02 and is in pos 1
+    0xff,    0,    1, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,  
+    // 16-31: MC endpoint_mc_leftlowerarm is 0x12 andis in pos 2
+    0xff, 0xff,    2, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
     // 32-47: AS endpoint_as_leftlowerarm is 0x22 and is in pos 2.
-    0xff, 0xff, 2,    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    // 48-63: SK endpoint_sk_emsboard_leftlowerarm is 0x32 and is in pos 3
-    0xff, 0xff, 3,    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff     
+    0xff, 0xff,    3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+    // 48-63: SK endpoint_sk_emsboard_leftlowerarm is 0x32 and is in pos 2
+    0xff, 0xff,    4, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff     
 };
 
 static uint16_t s_hash(uint16_t ep)
 {
-#if 0 
-    uint16_t r = ep & 0xff;
-    
-    if(endpoint_mn_comm == r)
-    {
-        return(0);
-    }
-    else if(endpoint_mc_leftlowerarm == r)
-    {
-        return(1);
-    }
-    else if (endpoint_as_leftlowerarm == r)
-    {
-        return(2);
-    }
-    else if(endpoint_sk_emsboard_leftlowerarm == r)
-    {
-        return(3);
-    }
-    
-    return(EOK_uint16dummy);
-#else
+
     uint16_t r = s_hashtable[ep & 0x3f];
     if(0xff != r)
     {
         return(r);
     }
     return(EOK_uint16dummy);   
-#endif   
+
 }
 
 static uint16_t s_eo_cfg_nvsEP_eb2_hashfunction_ep2index(uint16_t ep)
@@ -282,11 +273,11 @@ static uint16_t s_eo_cfg_nvsEP_eb2_hashfunction_ep2index(uint16_t ep)
     // are ... 0, 7, 16    
 
 
-    #define EPTABLESIZE     4
+    #define EPTABLESIZE     5
 
     static const uint16_t s_eptable[EPTABLESIZE] = 
     { 
-        endpoint_mn_comm,        endpoint_mc_leftlowerarm,       endpoint_as_leftlowerarm,   endpoint_sk_emsboard_leftlowerarm
+        endpoint_mn_comm,        endpoint_mn_appl,      endpoint_mc_leftlowerarm,       endpoint_as_leftlowerarm,   endpoint_sk_emsboard_leftlowerarm
     };
    
     uint16_t index = s_hash(ep);
