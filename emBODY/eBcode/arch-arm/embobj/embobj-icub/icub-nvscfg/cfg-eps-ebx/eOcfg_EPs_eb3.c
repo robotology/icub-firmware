@@ -253,7 +253,7 @@ static uint16_t s_eo_cfg_nvsEP_eb3_hashfunction_ep2index(uint16_t ep)
 
     static const uint16_t s_eptable[EPTABLESIZE] = 
     { 
-        endpoint_mn_comm,        endpoint_mn_appl,      endpoint_mc_rightupperarm,       endpoint_as_rightupperarm
+        endpoint_mn_comm,        endpoint_mn_appl,       endpoint_mc_rightupperarm,       endpoint_as_rightupperarm
     };
    
     uint16_t index = s_hash(ep);
