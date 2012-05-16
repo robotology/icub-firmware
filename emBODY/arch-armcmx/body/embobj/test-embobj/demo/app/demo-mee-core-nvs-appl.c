@@ -1370,58 +1370,60 @@ static void s_test_nvs_transceiver_pc104_occasional_load(EOtransceiver *txrx, eO
 
 static void s_test_nvs_transceiver_pc104_configure_ems(EOtransceiver *txrx)
 {
-    eo_cfg_nvsEP_mngmnt_t* nvsEP_mngmnt_usr_remotelyownedmemory_loc = eo_cfg_nvsEP_ebx_Get_remotelyownedRAM(endpoint_mn_mngmnt, eo_nvscfg_ownership_local);
+    eo_cfg_nvsEP_mn_comm_t* nvsEP_mn_comm_usr_remotelyownedmemory_loc = eo_cfg_nvsEP_ebx_Get_remotelyownedRAM(endpoint_mn_comm, eo_nvscfg_ownership_local);
     
 
-    EOarray *ropsigcfgassign = (EOarray*) & nvsEP_mngmnt_usr_remotelyownedmemory_loc->ropsigcfgassign;
+    eOmn_ropsigcfg_command_t *ropsigcfgcommand = (eOmn_ropsigcfg_command_t*) & nvsEP_mn_comm_usr_remotelyownedmemory_loc->ropsigcfgcommand;
     eOropSIGcfg_t sigcfg;
+    EOarray* array = (EOarray*) &ropsigcfgcommand->array;
 
-    eo_array_Reset(ropsigcfgassign);
+    ropsigcfgcommand->cmmnd = ropsigcfg_cmd_assign;
+    eo_array_Reset(array);
 
 //    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
 //    sigcfg.id = EOK_cfg_nvsEP_base_NVID_ipnetwork;
     sigcfg.plustime = 1;
-    eo_array_PushBack(ropsigcfgassign, &sigcfg);
+    eo_array_PushBack(array, &sigcfg);
 
 
 //    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
 //    sigcfg.id = EOK_cfg_nvsEP_base_NVID__bootprocess;
     sigcfg.plustime = 1;
-    eo_array_PushBack(ropsigcfgassign, &sigcfg);
+    eo_array_PushBack(array, &sigcfg);
 
 //    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
 //    sigcfg.id = EOK_cfg_nvsEP_base_NVID__applicationinfo;
     sigcfg.plustime = 0;
-    eo_array_PushBack(ropsigcfgassign, &sigcfg);
+    eo_array_PushBack(array, &sigcfg);
 
 //    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
 //    sigcfg.id = EOK_cfg_nvsEP_base_NVID__boardinfo;
     sigcfg.plustime = 0;
-    eo_array_PushBack(ropsigcfgassign, &sigcfg);
+    eo_array_PushBack(array, &sigcfg);
 
 //    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
 //    sigcfg.id = EOK_cfg_nvsEP_base_NVID_ipnetwork__ipnetmask;
     sigcfg.plustime = 0;
-    eo_array_PushBack(ropsigcfgassign, &sigcfg);
+    eo_array_PushBack(array, &sigcfg);
 
 //    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
 //    sigcfg.id = EOK_cfg_nvsEP_base_NVID_ipnetwork__ipaddress;
     sigcfg.plustime = 0;
-    eo_array_PushBack(ropsigcfgassign, &sigcfg);
+    eo_array_PushBack(array, &sigcfg);
 
 //    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
 //    sigcfg.id = EOK_cfg_nvsEP_base_NVID__remoteipaddress;
     sigcfg.plustime = 0;
-    eo_array_PushBack(ropsigcfgassign, &sigcfg);
+    eo_array_PushBack(array, &sigcfg);
 
 //    sigcfg.ep = EOK_cfg_nvsEP_base_endpoint;
 //    sigcfg.id = EOK_cfg_nvsEP_base_NVID__remoteipport;
     sigcfg.plustime = 0;
-    eo_array_PushBack(ropsigcfgassign, &sigcfg);    
+    eo_array_PushBack(array, &sigcfg);    
 #if 0
 #endif
 
-    s_test_nvs_transceiver_pc104_occasional_load(txrx, eo_ropcode_set, endpoint_mn_mngmnt, eo_cfg_nvsEP_mn_NVID_Get(endpoint_mn_mngmnt, 0, mnNVindex__ropsigcfgassign));  
+    s_test_nvs_transceiver_pc104_occasional_load(txrx, eo_ropcode_set, endpoint_mn_comm, eo_cfg_nvsEP_mn_comm_NVID_Get(endpoint_mn_comm, 0, commNVindex__ropsigcfgcommand));  
 }
 
 
