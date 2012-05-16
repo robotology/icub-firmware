@@ -17,11 +17,11 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOCFG_NVSEP_MNGMNT_CON_HID_H_
-#define _EOCFG_NVSEP_MNGMNT_CON_HID_H_
+#ifndef _EOCFG_NVSEP_MN_COMM_CON_HID_H_
+#define _EOCFG_NVSEP_MN_COMM_CON_HID_H_
 
 
-/* @file       eOcfg_nvsEP_mngmnt_con_hid.h
+/* @file       eOcfg_nvsEP_mn_comm_con_hid.h
     @brief      This header file implements hidden interface to ...
     @author     marco.accame@iit.it
     @date       09/06/2011
@@ -33,35 +33,29 @@
 #include "EoCommon.h"
 #include "EOnv.h"
 
-#include "eOcfg_nvsEP_mngmnt_con.h"
+#include "eOcfg_nvsEP_mn_comm_con.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 
-// use enum instead
-//#define EOK_cfg_nvsEP_mngmnt_EP                                         (0x0001) 
 
 // - the indices of the nv in the endpoint
-#define EOK_cfg_nvsEP_mngmnt_con_nvindex__ropsigcfgassign                       (mngmntNVindex__ropsigcfgassign)
-#define EOK_cfg_nvsEP_mngmnt_con_nvindex__ropsigcfgcommand                      (mngmntNVindex__ropsigcfgcommand)
+#define EOK_cfg_nvsEP_mn_comm_con_nvindex__ropsigcfgcommand                      (0)
 
 
-// - the total number of nv
-#define EOK_cfg_nvsEP_mngmnt_con_NUMofVARS                                      mngmntNVindex_TOTALnumber
+// - the total number of nvs
+#define EOK_cfg_nvsEP_mn_comm_con_NUMofVARS                                      1
 
 // -  macros whcih transforms the index in nvid-offset and the nvid-offset in index
-#define EOK_cfg_nvsEP_mngmnt_con_NVIDoff(nvindex)                               (nvindex)
-#define EOK_cfg_nvsEP_mngmnt_con_NVindex(nvidoffset)                            (nvidoffset)
+#define EOK_cfg_nvsEP_mn_comm_con_NVIDoff(nvindex)                               (nvindex)
+#define EOK_cfg_nvsEP_mn_comm_con_NVindex(nvidoffset)                            (nvidoffset)
 
 // -- the fun and typ of all the nv in the endpoint
-#define EOK_cfg_nvsEP_mngmnt_NVFUNTYP__ropsigcfgassign                          EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_arr)
-#define EOK_cfg_nvsEP_mngmnt_NVFUNTYP__ropsigcfgcommand                         EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_pkd)
+#define EOK_cfg_nvsEP_mn_comm_NVFUNTYP__ropsigcfgcommand                         EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_pkd)
 
 
 // -- the nvid of all the nv in the endpoint
-
-#define EOK_cfg_nvsEP_mngmnt_NVID__ropsigcfgassign                              EO_nv_ID(EOK_cfg_nvsEP_mngmnt_NVFUNTYP__ropsigcfgassign, EOK_cfg_nvsEP_mngmnt_con_NVIDoff(EOK_cfg_nvsEP_mngmnt_con_nvindex__ropsigcfgassign))
-#define EOK_cfg_nvsEP_mngmnt_NVID__ropsigcfgcommand                             EO_nv_ID(EOK_cfg_nvsEP_mngmnt_NVFUNTYP__ropsigcfgcommand, EOK_cfg_nvsEP_mngmnt_con_NVIDoff(EOK_cfg_nvsEP_mngmnt_con_nvindex__ropsigcfgcommand))
+#define EOK_cfg_nvsEP_mn_comm_NVID__ropsigcfgcommand                             EO_nv_ID(EOK_cfg_nvsEP_mn_comm_NVFUNTYP__ropsigcfgcommand, EOK_cfg_nvsEP_mn_comm_con_NVIDoff(EOK_cfg_nvsEP_mn_comm_con_nvindex__ropsigcfgcommand))
 
 
    

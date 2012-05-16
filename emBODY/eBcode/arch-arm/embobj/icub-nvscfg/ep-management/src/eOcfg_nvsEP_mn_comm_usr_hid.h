@@ -17,11 +17,11 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOCFG_NVSEP_MNGMNT_USR_HID_H_
-#define _EOCFG_NVSEP_MNGMNT_USR_HID_H_
+#ifndef _EOCFG_NVSEP_MN_COMM_USR_HID_H_
+#define _EOCFG_NVSEP_MN_COMM_USR_HID_H_
 
 
-/* @file       eOcfg_nvsEP_mngmnt_usr_hid.h
+/* @file       eOcfg_nvsEP_mn_comm_usr_hid.h
     @brief      This header file implements hidden interface to ...
     @author     marco.accame@iit.it
     @date       09/06/2011
@@ -48,16 +48,14 @@
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern void eo_cfg_nvsEP_mngmnt_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem);
+extern void eo_cfg_nvsEP_mn_comm_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem);
 
 // init:    n is not used
-extern void eo_cfg_nvsEP_mngmnt_usr_hid_INIT__ropsigcfgassign(uint16_t n, const EOnv* nv);
-extern void eo_cfg_nvsEP_mngmnt_usr_hid_INIT__ropsigcfgcommand(uint16_t n, const EOnv* nv);
+extern void eo_cfg_nvsEP_mn_comm_usr_hid_INIT__ropsigcfgcommand(uint16_t n, const EOnv* nv);
 
 
 // updt:    n is not used
-extern void eo_cfg_nvsEP_mngmnt_usr_hid_UPDT__ropsigcfgassign(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-extern void eo_cfg_nvsEP_mngmnt_usr_hid_UPDT__ropsigcfgcommand(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mn_comm_usr_hid_UPDT__ropsigcfgcommand(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
 
 

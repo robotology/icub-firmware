@@ -17,13 +17,13 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOCFG_NVSEP_MNGMNT_USR_H_
-#define _EOCFG_NVSEP_MNGMNT_USR_H_
+#ifndef _EOCFG_NVSEP_MN_COMM_USR_H_
+#define _EOCFG_NVSEP_MN_COMM_USR_H_
 
 
 
 
-/** @file       eOcfg_nvsEP_mngmnt_usr.h
+/** @file       eOcfg_nvsEP_mn_comm_usr.h
 	@brief      This header file gives the local configuration for the ...
 	@author     marco.accame@iit.it
 	@date       09/06/2011
@@ -41,7 +41,7 @@
 
 #include "EoCommon.h"
 #include "EOconstvector.h"
-#include "eOcfg_nvsEP_mngmnt_con.h"
+#include "eOcfg_nvsEP_mn_comm_con.h"
 
 
 
@@ -56,13 +56,13 @@
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const EOconstvector* const eo_cfg_nvsEP_mngmnt_usr_constvector_of_EOnv_usr;
+extern const EOconstvector* const eo_cfg_nvsEP_mn_comm_usr_constvector_of_EOnv_usr;
 
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern void eo_cfg_nvsEP_mngmnt_usr_initialise(eOnvEP_t ep, void* loc, void* rem);
+extern void eo_cfg_nvsEP_mn_comm_usr_initialise(eOnvEP_t ep, void* loc, void* rem);
 
 
 /** @}            

@@ -41,8 +41,8 @@
 
 
 
-#include "eOcfg_nvsEP_mngmnt_con.h"
-#include "eOcfg_nvsEP_mngmnt_usr.h"
+#include "eOcfg_nvsEP_mn_comm_con.h"
+#include "eOcfg_nvsEP_mn_comm_usr.h"
 
 #include "eOcfg_nvsEP_mc_any_con_bodypart.h"
 
@@ -94,8 +94,8 @@ static uint16_t s_eo_cfg_nvsEP_eb5_hashfunction_ep2index(uint16_t ep);
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern const EOconstvector  s_eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con;
-extern const EOconstvector  s_eo_cfg_nvsEP_mngmnt_usr_constvector_of_EOnv_usr;
+extern const EOconstvector  s_eo_cfg_nvsEP_mn_comm_constvector_of_treenodes_EOnv_con;
+extern const EOconstvector  s_eo_cfg_nvsEP_mn_comm_usr_constvector_of_EOnv_usr;
 
 
 extern const EOconstvector  s_eo_cfg_nvsEP_mc_torso_constvector_of_treenodes_EOnv_con;
@@ -105,13 +105,13 @@ extern const EOconstvector  s_eo_cfg_nvsEP_mc_torso_usr_constvector_of_EOnv_usr;
 
 static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_eb5_data[] =
 {  
-    {   // mngmnt
-        EO_INIT(.endpoint)                          endpoint_mn_mngmnt,
-        EO_INIT(.sizeof_endpoint_data)              EOK_cfg_nvsEP_mngmnt_RAMSIZE,
-        EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mngmnt_hashfunction_id2index,
-        EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mngmnt_constvector_of_treenodes_EOnv_con, 
-        EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_mngmnt_usr_constvector_of_EOnv_usr, 
-        EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mngmnt_usr_initialise,
+    {   // mn-comm
+        EO_INIT(.endpoint)                          endpoint_mn_comm,
+        EO_INIT(.sizeof_endpoint_data)              EOK_cfg_nvsEP_mn_comm_RAMSIZE,
+        EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mn_comm_hashfunction_id2index,
+        EO_INIT(.constvector_of_treenodes_EOnv_con) &s_eo_cfg_nvsEP_mn_comm_constvector_of_treenodes_EOnv_con, 
+        EO_INIT(.constvector_of_EOnv_usr)           &s_eo_cfg_nvsEP_mn_comm_usr_constvector_of_EOnv_usr, 
+        EO_INIT(.endpoint_data_init)                eo_cfg_nvsEP_mn_comm_usr_initialise,
         EO_INIT(.endpoint_data_retrieve)            s_eocfg_eps_ebx_ram_retrieve
     }, 
 
@@ -129,7 +129,7 @@ static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_eb5_data[] =
 
 static void* s_eocfg_eps_ebx_ram[][3] =
 {
-    {NULL, NULL, NULL},   // mngmnt
+    {NULL, NULL, NULL},   // mn-comm
     {NULL, NULL, NULL}   
 };
 
@@ -192,7 +192,7 @@ extern void* eo_cfg_nvsEP_eb5_Get_locallyownedRAM(eOnvEP_t ep)
 
 static uint8_t s_hashtable[64] = 
 {
-    // 00-15: BS endpoint_mn_mngmnt is 1 and is in pos 0
+    // 00-15: BS endpoint_mn_comm is 1 and is in pos 0
     0xff, 0,    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
     // 16-31: MC endpoint_mc_torso is 0x15 and is in pos 1
     0xff, 0xff, 0xff, 0xff, 0xff, 1,    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
@@ -207,7 +207,7 @@ static uint16_t s_hash(uint16_t ep)
 #if 0
     uint16_t r = ep & 0xff;
     
-    if(endpoint_mn_mngmnt == r)
+    if(endpoint_mn_comm == r)
     {
         return(0);
     }
@@ -240,7 +240,7 @@ static uint16_t s_eo_cfg_nvsEP_eb5_hashfunction_ep2index(uint16_t ep)
 
     static const uint16_t s_eptable[EPTABLESIZE] = 
     { 
-        endpoint_mn_mngmnt,        endpoint_mc_torso
+        endpoint_mn_comm,        endpoint_mc_torso
     };
    
     uint16_t index = s_hash(ep);
