@@ -97,6 +97,8 @@ extern void eo_cfg_nvsEP_mn_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
 {
     eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
     
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    
     // initialisation of loc and rem is always done in the usr part of the endpoint and can never be overridden
     
     // nothing else ...
@@ -119,6 +121,9 @@ extern void eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgcommand(uint16_t n, const EOnv* n
     {   // function is called from within the remote host because it has initialised its data
         // it is possible to know which board owns the cmdrem from the ip address
         eOipv4addr_t ipaddress_of_remote_board = nv->ip;
+        
+        ipaddress_of_remote_board = ipaddress_of_remote_board;
+        cmdrem = cmdrem;
 
     }    
 }
@@ -138,6 +143,9 @@ extern void eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgassign(uint16_t n, const EOnv* nv
     {   // function is called from within the remote host because it has received a say or a sig
         // it is possible to know which board has sent the say/sig by the ipaddress
         eOipv4addr_t ipaddress_of_remote_board = nv->ip;
+        
+        ipaddress_of_remote_board = ipaddress_of_remote_board;
+        cmdrem = cmdrem;
 
     }    
 }
