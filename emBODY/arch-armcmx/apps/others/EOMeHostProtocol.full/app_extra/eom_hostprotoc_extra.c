@@ -426,13 +426,17 @@ static void s_eom_hostprotoc_extra_protocoltransceiver_addoccasionalrop(void)
 
 static void s_eom_hostprotoc_extra_protocoltransceiver_configure_regular_rops_on_board(void)
 {
-    eo_cfg_nvsEP_mngmnt_t* locmn = eo_cfg_nvsEP_eb7_Get_remotelyownedRAM(endpoint_mn_mngmnt, eo_nvscfg_ownership_local);
-    EOarray *upto10 = (EOarray*) & locmn->ropsigcfgassign;
+    eo_cfg_nvsEP_mn_comm_t* locmn = eo_cfg_nvsEP_eb7_Get_remotelyownedRAM(endpoint_mn_comm, eo_nvscfg_ownership_local);
+    eOmn_ropsigcfg_command_t* ropsigcmd = (eOmn_ropsigcfg_command_t*) & locmn->ropsigcfgcommand; 
+    EOarray *array = (EOarray*) & ropsigcmd->array;
+
     eOropSIGcfg_t sigcfg;
     char str[128];
     static uint8_t reset = 0;
+    
+    ropsigcmd->cmmnd = ropsigcfg_cmd_assign; 
 
-    eo_array_Reset(upto10);
+    eo_array_Reset(array);
 
     if(0 == reset)
     {
@@ -440,30 +444,30 @@ static void s_eom_hostprotoc_extra_protocoltransceiver_configure_regular_rops_on
         sigcfg.ep = endpoint_mc_leftlowerleg;
         sigcfg.id = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_leftlowerleg, (eOcfg_nvsEP_mc_jointNumber_t)0, jointNVindex_jstatus__basic);
         sigcfg.plustime = 0;
-        eo_array_PushBack(upto10, &sigcfg);
+        eo_array_PushBack(array, &sigcfg);
     
     
         sigcfg.ep = endpoint_mc_leftlowerleg;
         sigcfg.id = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_leftlowerleg, (eOcfg_nvsEP_mc_jointNumber_t)1, jointNVindex_jstatus__basic);
         sigcfg.plustime = 0;
-        eo_array_PushBack(upto10, &sigcfg);
+        eo_array_PushBack(array, &sigcfg);
     
         sigcfg.ep = endpoint_mc_leftlowerleg;
         sigcfg.id = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_leftlowerleg, (eOcfg_nvsEP_mc_motorNumber_t)0, motorNVindex_mstatus__basic);
         sigcfg.plustime = 0;
-        eo_array_PushBack(upto10, &sigcfg);
+        eo_array_PushBack(array, &sigcfg);
     
         sigcfg.ep = endpoint_mc_leftlowerleg;
         sigcfg.id = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_leftlowerleg, (eOcfg_nvsEP_mc_motorNumber_t)1, motorNVindex_mstatus__basic);
         sigcfg.plustime = 0;
-        eo_array_PushBack(upto10, &sigcfg);
+        eo_array_PushBack(array, &sigcfg);
     
 #if 0
 #endif
 
     }
 
-    s_eom_hostprotoc_extra_protocoltransceiver_load_occasional_rop(eo_ropcode_set, endpoint_mn_mngmnt, eo_cfg_nvsEP_mn_NVID_Get(endpoint_mn_mngmnt, 0, mnNVindex__ropsigcfgassign));  
+    s_eom_hostprotoc_extra_protocoltransceiver_load_occasional_rop(eo_ropcode_set, endpoint_mn_comm, eo_cfg_nvsEP_mn_comm_NVID_Get(endpoint_mn_comm, 0, commNVindex__ropsigcfgcommand));  
 
     if(1 == reset)
     {

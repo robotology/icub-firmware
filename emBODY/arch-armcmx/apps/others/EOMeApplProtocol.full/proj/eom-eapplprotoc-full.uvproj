@@ -833,14 +833,24 @@
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_nvsEP_mngmnt_con.c</FileName>
+              <FileName>eOcfg_nvsEP_mn_comm_con.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mngmnt_con.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn_comm_con.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_nvsEP_mngmnt_usr.c</FileName>
+              <FileName>eOcfg_nvsEP_mn_comm_usr.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mngmnt_usr.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn_comm_usr.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mn_appl_con.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn_appl_con.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mn_appl_usr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn_appl_usr.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -905,6 +915,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_mxxdefault.c</FilePath>
             </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_any_con_cxx .c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_cxx .c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_any_con_cxxdefault.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_cxxdefault.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -926,9 +946,9 @@
           <GroupName>eo-nvs-cf-usrcbk</GroupName>
           <Files>
             <File>
-              <FileName>eOcfg_nvsEP_mn_usrcbk_ebx.c</FileName>
+              <FileName>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-management\usrcbk\eOcfg_nvsEP_mn_usrcbk_ebx.c</FilePath>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-management\usrcbk\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1707,14 +1727,24 @@
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_nvsEP_mngmnt_con.c</FileName>
+              <FileName>eOcfg_nvsEP_mn_comm_con.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mngmnt_con.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn_comm_con.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_nvsEP_mngmnt_usr.c</FileName>
+              <FileName>eOcfg_nvsEP_mn_comm_usr.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mngmnt_usr.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn_comm_usr.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mn_appl_con.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn_appl_con.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mn_appl_usr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn_appl_usr.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1761,6 +1791,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_mxxdefault.c</FilePath>
             </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_any_con_cxx .c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_cxx .c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_any_con_cxxdefault.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_cxxdefault.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1782,9 +1822,9 @@
           <GroupName>eo-nvs-cf-usrcbk</GroupName>
           <Files>
             <File>
-              <FileName>eOcfg_nvsEP_mn_usrcbk_ebx.c</FileName>
+              <FileName>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-management\usrcbk\eOcfg_nvsEP_mn_usrcbk_ebx.c</FilePath>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-management\usrcbk\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
             </File>
           </Files>
         </Group>
