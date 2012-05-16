@@ -31,11 +31,10 @@
 #include "string.h"
 #include "stdio.h"
 
-#include "EoSkin.h"
 #include "EOnv_hid.h"
 
-#include "eOcfg_nvsEP_mngmnt_con.h"
-
+#include "eOcfg_nvsEP_mn_comm_con.h"
+#include "eOcfg_nvsEP_mn_comm_con_hid.h"
 
 
 
@@ -73,10 +72,9 @@
 // in here we put a check vs coherency of ....
 
 
-EO_VERIFYproposition(xxx, mnNVindex__ropsigcfgassign                    == mngmntNVindex__ropsigcfgassign);
-EO_VERIFYproposition(xxx, mnNVindex__ropsigcfgcommand                   == mngmntNVindex__ropsigcfgcommand);
+EO_VERIFYproposition(xxx, commNVindex__ropsigcfgcommand                   == EOK_cfg_nvsEP_mn_comm_con_nvindex__ropsigcfgcommand);
 
-EO_VERIFYproposition(xxx, mnNVindex_TOTALnumber                         == mngmntNVindex_TOTALnumber);
+EO_VERIFYproposition(xxx, commNVindex_TOTALnumber                         == EOK_cfg_nvsEP_mn_comm_con_NUMofVARS);
 
 
 
@@ -106,9 +104,9 @@ EO_VERIFYproposition(xxx, mnNVindex_TOTALnumber                         == mngmn
 
 
 
-extern eOnvID_t eo_cfg_nvsEP_mn_NVID_Get(eOcfg_nvsEP_mn_endpoint_t ep, eOcfg_nvsEP_mn_Number_t n, eOcfg_nvsEP_mn_NVindex_t nvindex)
+extern eOnvID_t eo_cfg_nvsEP_mn_comm_NVID_Get(eOcfg_nvsEP_mn_endpoint_t ep, eOcfg_nvsEP_mn_commNumber_t n, eOcfg_nvsEP_mn_commNVindex_t nvindex)
 {
-    return(eo_cfg_nvsEP_mngmnt_NVID_Get((eo_cfg_nvsEP_mngmnt_NVindex_t) nvindex));
+    return(eo_cfg_nvsEP_mn_comm_comm_NVID_Get((eOcfg_nvsEP_mn_commNVindex_t) nvindex));
 }
 
 
@@ -118,8 +116,8 @@ extern eOnvID_t eo_cfg_nvsEP_mn_NVID_Get(eOcfg_nvsEP_mn_endpoint_t ep, eOcfg_nvs
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-#if !defined(OVERRIDE_eo_cfg_nvsEP_mn_hid_INITIALISE)
-__weak extern void eo_cfg_nvsEP_mn_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mn_comm_hid_INITIALISE)
+__weak extern void eo_cfg_nvsEP_mn_comm_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
 {
     eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
@@ -139,8 +137,8 @@ __weak extern void eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgassign(uint16_t n, const E
 }
 #endif
 
-#if !defined(OVERRIDE_eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgcommand)
-__weak extern void eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgcommand(uint16_t n, const EOnv* nv)
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mn_comm_hid_INIT__ropsigcfgcommand)
+__weak extern void eo_cfg_nvsEP_mn_comm_hid_INIT__ropsigcfgcommand(uint16_t n, const EOnv* nv)
 {   // n is always 0
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -163,8 +161,8 @@ __weak extern void eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgassign(uint16_t n, const E
 }
 #endif
 
-#if !defined(OVERRIDE_eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgcommand)
-__weak extern void eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgcommand(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mn_comm_hid_UPDT__ropsigcfgcommand)
+__weak extern void eo_cfg_nvsEP_mn_comm_hid_UPDT__ropsigcfgcommand(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {   // n is always 0
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;

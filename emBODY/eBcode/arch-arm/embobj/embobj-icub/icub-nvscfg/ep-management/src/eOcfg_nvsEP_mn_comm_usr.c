@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       eOcfg_nvsEP_mngmnt_usr.c
+/* @file       eOcfg_nvsEP_mn_comm_usr.c
     @brief      This file keeps the user-defined local ...
     @author     marco.accame@iit.it
     @date       09/06/2011
@@ -32,7 +32,8 @@
 #include "stdio.h"
 
 #include "EoCommon.h"
-#include "eOcfg_nvsEP_mngmnt_con.h"
+#include "eOcfg_nvsEP_mn_comm_con.h"
+#include "eOcfg_nvsEP_mn_comm_con_hid.h"
 #include "eOcfg_nvsEP_mn_hid.h"
 
 #include "EOnv_hid.h"
@@ -45,13 +46,13 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "eOcfg_nvsEP_mngmnt_usr.h"
+#include "eOcfg_nvsEP_mn_comm_usr.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
-#include "eOcfg_nvsEP_mngmnt_usr_hid.h"
+#include "eOcfg_nvsEP_mn_comm_usr_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -71,11 +72,9 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_eo_cfg_nvsEP_mngmnt_INIT__ropsigcfgassign(const EOnv* nv);
-static void s_eo_cfg_nvsEP_mngmnt_INIT__ropsigcfgcommand(const EOnv* nv);
+static void s_eo_cfg_nvsEP_mn_comm_INIT__ropsigcfgcommand(const EOnv* nv);
 
-static void s_eo_cfg_nvsEP_mngmnt_UPDT__ropsigcfgassign(const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-static void s_eo_cfg_nvsEP_mngmnt_UPDT__ropsigcfgcommand(const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+static void s_eo_cfg_nvsEP_mn_comm_UPDT__ropsigcfgcommand(const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -83,33 +82,21 @@ static void s_eo_cfg_nvsEP_mngmnt_UPDT__ropsigcfgcommand(const EOnv* nv, const e
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static const eOnv_fn_peripheral_t s_eo_cfg_nvsEP_mngmnt_ebx__ropsigcfgassign =
+static const eOnv_fn_peripheral_t s_eo_cfg_nvsEP_mn_comm_ebx__ropsigcfgcommand =
 {
-    EO_INIT(.init)      s_eo_cfg_nvsEP_mngmnt_INIT__ropsigcfgassign,
-    EO_INIT(.update)    s_eo_cfg_nvsEP_mngmnt_UPDT__ropsigcfgassign
-};
-
-static const eOnv_fn_peripheral_t s_eo_cfg_nvsEP_mngmnt_ebx__ropsigcfgcommand =
-{
-    EO_INIT(.init)      s_eo_cfg_nvsEP_mngmnt_INIT__ropsigcfgcommand,
-    EO_INIT(.update)    s_eo_cfg_nvsEP_mngmnt_UPDT__ropsigcfgcommand
+    EO_INIT(.init)      s_eo_cfg_nvsEP_mn_comm_INIT__ropsigcfgcommand,
+    EO_INIT(.update)    s_eo_cfg_nvsEP_mn_comm_UPDT__ropsigcfgcommand
 };
 
 
-static const EOnv_usr_t s_eo_cfg_nvsEP_mngmnt_array_of_EOnv_usr[] =
+static const EOnv_usr_t s_eo_cfg_nvsEP_mn_comm_array_of_EOnv_usr[] =
 {
     {   // 00 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mngmnt_ebx__ropsigcfgassign,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mn_comm_ebx__ropsigcfgcommand,
         EO_INIT(.on_rop_reception)      NULL,                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
-    },
-    {   // 01 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mngmnt_ebx__ropsigcfgcommand,
-        EO_INIT(.on_rop_reception)      NULL,                 
-        EO_INIT(.stg_address)           EOK_uint32dummy       
-    }
-    
-};  EO_VERIFYsizeof(s_eo_cfg_nvsEP_mngmnt_array_of_EOnv_usr, sizeof(EOnv_usr_t)*(mngmntNVindex_TOTALnumber)); 
+    }   
+};  EO_VERIFYsizeof(s_eo_cfg_nvsEP_mn_comm_array_of_EOnv_usr, sizeof(EOnv_usr_t)*(EOK_cfg_nvsEP_mn_comm_con_NUMofVARS)); 
 
 
 
@@ -119,15 +106,15 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mngmnt_array_of_EOnv_usr[] =
 // --------------------------------------------------------------------------------------------------------------------
 
 
-const EOconstvector  s_eo_cfg_nvsEP_mngmnt_usr_constvector_of_EOnv_usr = 
+const EOconstvector  s_eo_cfg_nvsEP_mn_comm_usr_constvector_of_EOnv_usr = 
 {
-    EO_INIT(.size)              sizeof(s_eo_cfg_nvsEP_mngmnt_array_of_EOnv_usr)/sizeof(EOnv_usr_t), 
+    EO_INIT(.size)              sizeof(s_eo_cfg_nvsEP_mn_comm_array_of_EOnv_usr)/sizeof(EOnv_usr_t), 
     EO_INIT(.item_size)         sizeof(EOnv_usr_t),
-    EO_INIT(.item_array_data)   s_eo_cfg_nvsEP_mngmnt_array_of_EOnv_usr
+    EO_INIT(.item_array_data)   s_eo_cfg_nvsEP_mn_comm_array_of_EOnv_usr
 };
 
 
-extern const EOconstvector* const eo_cfg_nvsEP_mngmnt_usr_constvector_of_EOnv_usr = &s_eo_cfg_nvsEP_mngmnt_usr_constvector_of_EOnv_usr;
+extern const EOconstvector* const eo_cfg_nvsEP_mn_comm_usr_constvector_of_EOnv_usr = &s_eo_cfg_nvsEP_mn_comm_usr_constvector_of_EOnv_usr;
 
 
 
@@ -136,7 +123,7 @@ extern const EOconstvector* const eo_cfg_nvsEP_mngmnt_usr_constvector_of_EOnv_us
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern void eo_cfg_nvsEP_mngmnt_usr_initialise(eOnvEP_t ep, void* loc, void* rem)
+extern void eo_cfg_nvsEP_mn_comm_usr_initialise(eOnvEP_t ep, void* loc, void* rem)
 {
     eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
@@ -144,15 +131,15 @@ extern void eo_cfg_nvsEP_mngmnt_usr_initialise(eOnvEP_t ep, void* loc, void* rem
     // copy default values
     if(NULL != loc)
     {
-        memcpy(loc, eo_cfg_nvsEP_mngmnt_defaultvalue, sizeof(eo_cfg_nvsEP_mngmnt_t));
+        memcpy(loc, eo_cfg_nvsEP_mn_comm_defaultvalue, sizeof(eo_cfg_nvsEP_mn_comm_t));
     }    
     if(NULL != rem)
     {   
-        memcpy(rem, eo_cfg_nvsEP_mngmnt_defaultvalue, sizeof(eo_cfg_nvsEP_mngmnt_t));
+        memcpy(rem, eo_cfg_nvsEP_mn_comm_defaultvalue, sizeof(eo_cfg_nvsEP_mn_comm_t));
     }
         
     // launch a specialised initialisation
-    eo_cfg_nvsEP_mngmnt_usr_hid_INITIALISE(ep, loc, rem);
+    eo_cfg_nvsEP_mn_comm_usr_hid_INITIALISE(ep, loc, rem);
 }
 
 
@@ -164,42 +151,28 @@ extern void eo_cfg_nvsEP_mngmnt_usr_initialise(eOnvEP_t ep, void* loc, void* rem
 // -- if we want to simulate on the same process (or teh same board) both local and remote behaviour, the same function is 
 //    called by both local and remote transceiver, with different ram. if rem is not NULL, then it called by the remote host 
 
-__weak extern void eo_cfg_nvsEP_mngmnt_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
+__weak extern void eo_cfg_nvsEP_mn_comm_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
 {
     eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_mn_hid_INITIALISE(ep, loc, rem);
+    eo_cfg_nvsEP_mn_comm_hid_INITIALISE(ep, loc, rem);
 }
 
 // init:
-__weak extern void eo_cfg_nvsEP_mngmnt_usr_hid_INIT__ropsigcfgassign(uint16_t n, const EOnv* nv)
-{   // n is always 0
-     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-     theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgassign(n , nv);
-}
-
-__weak extern void eo_cfg_nvsEP_mngmnt_usr_hid_INIT__ropsigcfgcommand(uint16_t n, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_mn_comm_usr_hid_INIT__ropsigcfgcommand(uint16_t n, const EOnv* nv)
 {   // n is always 0
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgcommand(n, nv);
+    eo_cfg_nvsEP_mn_comm_hid_INIT__ropsigcfgcommand(n, nv);
 }
 
 
 // updt:
-__weak extern void eo_cfg_nvsEP_mngmnt_usr_hid_UPDT__ropsigcfgassign(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_mn_comm_usr_hid_UPDT__ropsigcfgcommand(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {   // n is always 0
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgassign(n, nv, time, sign);
-}
-
-__weak extern void eo_cfg_nvsEP_mngmnt_usr_hid_UPDT__ropsigcfgcommand(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
-{   // n is always 0
-    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgcommand(n, nv, time, sign);    
+    eo_cfg_nvsEP_mn_comm_hid_UPDT__ropsigcfgcommand(n, nv, time, sign);    
 }
 
 
@@ -209,25 +182,15 @@ __weak extern void eo_cfg_nvsEP_mngmnt_usr_hid_UPDT__ropsigcfgcommand(uint16_t n
 
 
 
-static void s_eo_cfg_nvsEP_mngmnt_INIT__ropsigcfgassign(const EOnv* nv)
+static void s_eo_cfg_nvsEP_mn_comm_INIT__ropsigcfgcommand(const EOnv* nv)
 {   
-    eo_cfg_nvsEP_mngmnt_usr_hid_INIT__ropsigcfgassign(0, nv);
-}
-
-static void s_eo_cfg_nvsEP_mngmnt_INIT__ropsigcfgcommand(const EOnv* nv)
-{   
-    eo_cfg_nvsEP_mngmnt_usr_hid_INIT__ropsigcfgcommand(0, nv);
+    eo_cfg_nvsEP_mn_comm_usr_hid_INIT__ropsigcfgcommand(0, nv);
 }
 
 
-static void s_eo_cfg_nvsEP_mngmnt_UPDT__ropsigcfgassign(const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+static void s_eo_cfg_nvsEP_mn_comm_UPDT__ropsigcfgcommand(const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {   
-    eo_cfg_nvsEP_mngmnt_usr_hid_UPDT__ropsigcfgassign(0, nv, time, sign);
-}
-
-static void s_eo_cfg_nvsEP_mngmnt_UPDT__ropsigcfgcommand(const EOnv* nv, const eOabstime_t time, const uint32_t sign)
-{   
-    eo_cfg_nvsEP_mngmnt_usr_hid_UPDT__ropsigcfgcommand(0, nv, time, sign);
+    eo_cfg_nvsEP_mn_comm_usr_hid_UPDT__ropsigcfgcommand(0, nv, time, sign);
 }
 
 
