@@ -76,14 +76,18 @@ extern EOpid* eo_pid_New(void)
     if (o)
     {
         o->Ko = 0.0f;
-        o->A0 = 0.0f;
-        o->A1 = 0.0f;
-        o->A2 = 0.0f;
-        o->Yn = 0.0f;
-        o->En = 0.0f;
+        o->Kp = 0.0f;
+        o->Ki = 0.0f;
+        o->Kd = 0.0f;
+
+        o->En = 0.0f;        
+        o->In = 0.0f;
         o->Dn = 0.0f;
-        o->pwm = 0.0f;
+        
         o->Ymax = 0.0f;
+        o->Imax = 0.0f;
+
+        o->pwm = 0.0f;
 
         o->initialized = 0;
     }
@@ -91,28 +95,33 @@ extern EOpid* eo_pid_New(void)
     return o;
 }
 
-extern void eo_pid_Init(EOpid *o, float Kp, float Kd, float Ki, float Ko, float Ymax)
+extern void eo_pid_Init(EOpid *o, float Kp, float Ki, float Kd, float Ko, float Ymax, float Imax)
 {
-    o->A2 = -0.1f*Kd;
-    o->A1 = -Kp + o->A2;
-    o->A0 =  Kp + Ki - o->A2;
-
-    o->Yn = 0.0f;
     o->Ko = Ko;
+    o->Kp = Kp;
+    o->Ki = Ki;
+    o->Kd = Kd;
 
     o->En = 0.0f;
+    o->In = 0.0f;
     o->Dn = 0.0f;
-    o->pwm = 0.0f;
+
     o->Ymax = Ymax;
+    o->Imax = Imax;
+
+    o->pwm = 0.0f;
 
     o->initialized = 1;
 }
 
-extern void eo_pid_SetPid(EOpid *o, float Kp, float Kd, float Ki)
+extern void eo_pid_SetPid(EOpid *o, float Kp, float Ki, float Kd, float Ymax, float Imax)
 {
-    o->A2 = -0.1f*Kd;
-    o->A1 = -Kp + o->A2;
-    o->A0 =  Kp + Ki - o->A2; 
+    o->Kp = Kp;
+    o->Ki = Ki;
+    o->Kd = Kd;
+
+    o->Ymax = Ymax;
+    o->Imax = Imax; 
 }
 
 extern void eo_pid_SetMaxOutput(EOpid *o, float Ymax)
@@ -143,31 +152,31 @@ extern uint8_t eo_pid_IsInitialized(EOpid *o)
 
 extern void eo_pid_Reset(EOpid *o)
 {
-    o->Yn = 0.0f;
+    o->In = 0.0f;
     o->En = 0.0f; 
     o->Dn = 0.0f; 
 }
 
 extern float eo_pid_PWM(EOpid *o, float En)
 {
-    o->Yn += o->A0 * En + o->A1 * o->En + o->A2 * o->Dn;
+    //if (En*o->En<0.0f) o->In = 0.0f;
+
+    o->pwm = o->Ko + o->Kp*En + o->In + o->Kd*o->Dn;
+    o->In += o->Ki*En;
+    if (o->In > o->Imax) 
+        o->In = o->Imax; 
+    else if (o->In< -o->Imax) 
+        o->In = -o->Imax;
     o->Dn = 0.9f*o->Dn + 0.1f*(En - o->En);
     o->En = En;
     
-    o->pwm = o->Ko + o->Yn;
-
     if (o->pwm > o->Ymax)
     {
-        o->Yn = o->Ymax - o->Ko;
-
-        return o->Ymax;
+        o->pwm = o->Ymax;
     }
-    
-    if (o->pwm < -o->Ymax)
+    else if (o->pwm < -o->Ymax)
     {
-        o->Yn = -o->Ymax - o->Ko;
-
-        return -o->Ymax;
+        o->pwm = -o->Ymax;
     }
 
     return o->pwm;
