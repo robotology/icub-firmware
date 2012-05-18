@@ -110,73 +110,66 @@ extern EOemsController* eo_emsController_Init(uint8_t nmotors, emsBoardType_t bo
     return s_emsc;
 }
 
-extern void eo_emsController_ReadEncoder(uint8_t joint, int32_t pos)
+extern void eo_emsController_ReadEncoders(int32_t *enc)
 {
-    s_emsc->encoder_pos[joint] = (float)pos;
-    
-    s_emsc->flag_encoder_pos_dirty = 1;
-}
+    static float axis_pos[MAX_MOTORS];
 
-extern void eo_emsController_ReadEncoderSet(int32_t *pos)
-{
+    float *pos = s_emsc->encoder_pos;
+
     for (int i=0; i<s_emsc->nmotors; ++i)
     {
-        s_emsc->encoder_pos[i] = (float)pos[i];
+        s_emsc->encoder_pos[i] = (float)enc[i];
     }
 
-    s_emsc->flag_encoder_pos_dirty = 1;
+    if (s_emsc->decoupler[DECOUPLER_POS])
+    {
+        eo_decoupler_Mult(s_emsc->decoupler[DECOUPLER_POS], s_emsc->encoder_pos, axis_pos);
+     
+        pos = axis_pos;       
+    }
+
+    for (uint8_t i=0; i<s_emsc->nmotors; ++i)
+    {
+        eo_axisController_ReadEncPos(s_emsc->axis_controller[i], pos[i]);
+    }
 }
 
-extern void eo_emsController_ReadTorque(uint8_t joint, int32_t torque)
-{
-    s_emsc->torque_meas[joint] = (float)torque;
-
-    s_emsc->flag_torque_meas_dirty = 1;
-}
-
-extern void eo_emsController_ReadTorqueSet(int32_t *torque)
+extern void eo_emsController_ReadTorques(int32_t *torque)
 {
     for (int i=0; i<s_emsc->nmotors; ++i)
     {
         s_emsc->torque_meas[i] = (float)torque[i];
     }
 
-    s_emsc->flag_torque_meas_dirty = 1;
-}
+    float *trq = s_emsc->torque_meas;
+    static float axis_trq[MAX_MOTORS];
 
-extern void eo_emsController_ReadStatus(uint8_t joint, int32_t pos, int32_t torque)
-{
-    s_emsc->encoder_pos[joint] = (float)pos;
-    s_emsc->torque_meas[joint] = (float)torque;
-
-    s_emsc->flag_encoder_pos_dirty = 1;
-    s_emsc->flag_torque_meas_dirty = 1;
-}
-
-extern void eo_emsController_ReadStatusSet(uint8_t joint, int32_t *pos, int32_t *torque)
-{
-    for (int i=0; i<s_emsc->nmotors; ++i)
+    if (s_emsc->decoupler[DECOUPLER_TRQ])
     {
-        s_emsc->encoder_pos[i] = (float)pos[i];
-        s_emsc->torque_meas[i] = (float)torque[i];
+        eo_decoupler_Mult(s_emsc->decoupler[DECOUPLER_TRQ], s_emsc->torque_meas, axis_trq);
+        trq = axis_trq;
     }
 
-    s_emsc->flag_encoder_pos_dirty = 1;
-    s_emsc->flag_torque_meas_dirty = 1;
+    for (uint8_t i=0; i<s_emsc->nmotors; ++i)
+    {
+        eo_axisController_ReadTorque(s_emsc->axis_controller[i], trq[i]);
+    }
 }
 
-extern void eo_emsController_SetPosRef(uint8_t joint, float pos, float vel)
+extern void eo_emsController_SetPosRef(uint8_t joint, float pos, float vel, uint8_t reset)
 {
-    eo_axisController_SetPosRef(s_emsc->axis_controller[joint], pos, vel);
+    eo_axisController_SetPosRef(s_emsc->axis_controller[joint], pos, vel, reset);
 }
 
-extern void eo_emsController_SetPosRefSet(float *pos, float *vel)
+/*
+extern void eo_emsController_SetPosRefSet(float *pos, float *vel, uint8_t reset)
 {
     for (uint8_t i=0; i<s_emsc->nmotors; ++i)
     {
-        eo_axisController_SetPosRef(s_emsc->axis_controller[i], pos[i], vel[i]);
+        eo_axisController_SetPosRef(s_emsc->axis_controller[i], pos[i], vel[i], reset);
     }
 }
+*/
 
 extern void eo_emsController_SetVelRef(uint8_t joint, float vel, float acc)
 {
@@ -206,47 +199,8 @@ extern void eo_emsController_SetTrqRefSet(float *trq)
 
 extern float* eo_emsController_PWM()
 {
-    static float axis_pos[MAX_MOTORS];
-    static float axis_trq[MAX_MOTORS];
-
     static float pwm_axis[MAX_MOTORS];
     static float pwm_motor[MAX_MOTORS];
-
-    if (s_emsc->flag_encoder_pos_dirty)
-    {
-        float *pos = s_emsc->encoder_pos;
-
-        s_emsc->flag_encoder_pos_dirty = 0;
-
-        if (s_emsc->decoupler[DECOUPLER_POS])
-        {
-            eo_decoupler_Mult(s_emsc->decoupler[DECOUPLER_POS], s_emsc->encoder_pos, axis_pos);
-            pos = axis_pos;       
-        }
-
-        for (uint8_t i=0; i<s_emsc->nmotors; ++i)
-        {
-            eo_axisController_ReadEncPos(s_emsc->axis_controller[i], pos[i]);
-        }
-    }
-
-    if (s_emsc->flag_torque_meas_dirty)
-    { 
-        float *trq = s_emsc->torque_meas;
-
-        s_emsc->flag_torque_meas_dirty = 0;
-
-        if (s_emsc->decoupler[DECOUPLER_TRQ])
-        {
-            eo_decoupler_Mult(s_emsc->decoupler[DECOUPLER_TRQ], s_emsc->torque_meas, axis_trq);
-            trq = axis_trq;
-        }
-
-        for (uint8_t i=0; i<s_emsc->nmotors; ++i)
-        {
-            eo_axisController_ReadTorque(s_emsc->axis_controller[i], trq[i]);
-        }
-    }
 
     for (uint8_t i=0; i<s_emsc->nmotors; ++i)
     {
@@ -289,14 +243,14 @@ extern void eo_emsController_SetDecoupler(emsMotorDecoupler_t dec_type, float ma
     s_emsc->decoupler[dec_type] = eo_decoupler_New(s_emsc->nmotors, matrix);
 }
 
-extern void eo_emsController_SetPosPid(uint8_t joint, float kp, float kd, float ki)
+extern void eo_emsController_SetPosPid(uint8_t joint, float kp, float ki, float kd, float Ymax, float Imax)
 {
-    eo_pid_SetPid(eo_axisController_GetPosPidPtr(s_emsc->axis_controller[joint]), kp, kd, ki);    
+    eo_pid_SetPid(eo_axisController_GetPosPidPtr(s_emsc->axis_controller[joint]), kp, ki, kd, Ymax, Imax);    
 }
 
-extern void eo_emsController_SetTrqPid(uint8_t joint, float kp, float kd, float ki)
+extern void eo_emsController_SetTrqPid(uint8_t joint, float kp, float ki, float kd, float Ymax, float Imax)
 {
-    eo_pid_SetPid(eo_axisController_GetTrqPidPtr(s_emsc->axis_controller[joint]), kp, kd, ki); 
+    eo_pid_SetPid(eo_axisController_GetTrqPidPtr(s_emsc->axis_controller[joint]), kp, ki, kd, Ymax, Imax); 
 }
 
 extern void eo_emsController_SetStiffness(uint8_t joint, float stiffness)

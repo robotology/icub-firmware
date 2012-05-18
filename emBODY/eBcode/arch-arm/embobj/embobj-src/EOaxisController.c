@@ -86,7 +86,7 @@ extern EOaxisController* eo_axisController_New(void)
 
         o->pos_min = 0.0f;
         o->pos_max = 0.0f;
-        o->vel_max = 0.0f;
+        o->vel_max = 2000.0f;
 
         o->encpos_meas = 0.0f;
         o->torque_meas = 0.0f;
@@ -150,7 +150,7 @@ extern void eo_axisController_ReadStatus(EOaxisController *o, float encpos, floa
     o->torque_meas = torque;
 }                  
 
-extern void eo_axisController_SetPosRef(EOaxisController *o, float pos, float vel)
+extern void eo_axisController_SetPosRef(EOaxisController *o, float pos, float vel, uint8_t reset)
 {
     if (o->control_mode == CM_IDLE || o->control_mode == CM_TORQUE  || o->control_mode == CM_OPENLOOP) return;
 
@@ -164,9 +164,9 @@ extern void eo_axisController_SetPosRef(EOaxisController *o, float pos, float ve
     }
 
     eo_trajectory_SetReference(o->trajectory, 
-                               o->encpos_meas, 
+                               reset?o->encpos_meas:eo_trajectory_GetPos(o->trajectory),
                                limit(pos,  o->pos_min, o->pos_max), 
-                               o->vel_out, 
+                               reset?0.0f:eo_trajectory_GetVel(o->trajectory), 
                                limit(vel, -o->vel_max, o->vel_max));
 }
 
@@ -204,7 +204,7 @@ extern uint8_t eo_axisController_SetControlMode(EOaxisController *o, control_mod
         {
             o->control_mode = CM_POSITION;
 
-            eo_trajectory_Stop(o->trajectory, o->encpos_meas);
+            //eo_trajectory_Stop(o->trajectory, o->encpos_meas);
 
             break;
         }
