@@ -549,6 +549,12 @@ EO_extern_inline eOmacaddr_t eo_common_macaddr(uint8_t m1, uint8_t m2, uint8_t m
     return(EO_COMMON_MACADDR(m1, m2, m3, m4, m5, m6));
 }
 
+EO_extern_inline eObool_t eo_common_event_check(eOevent_t event, eOevent_t mask)
+{
+    return( (mask == (event & mask)) ? (eobool_true) : (eobool_false) );
+}
+
+
 
 
 
