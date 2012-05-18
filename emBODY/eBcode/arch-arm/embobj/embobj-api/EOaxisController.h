@@ -84,7 +84,8 @@ extern EOaxisController* eo_axisController_New(void);
 //extern void eo_axisController_ReadTorque(EOaxisController *o, float torque);
 extern void eo_axisController_ReadStatus(EOaxisController *o, float encpos, float torque);
 
-extern void eo_axisController_SetPosRef(EOaxisController *o, float pos, float vel);
+extern void eo_axisController_SetPosRef(EOaxisController *o, float pos, float vel, uint8_t reset);
+
 extern void eo_axisController_SetVelRef(EOaxisController *o, float vel, float acc);
 extern void eo_axisController_SetTrqRef(EOaxisController *o, float trq);
 
