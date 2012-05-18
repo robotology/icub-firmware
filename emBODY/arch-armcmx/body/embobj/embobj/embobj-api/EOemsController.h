@@ -77,14 +77,10 @@ extern EOemsController* eo_emsController_Init(uint8_t nmotors, emsBoardType_t bo
  **/
 
 // synchronous
-extern void eo_emsController_ReadEncoder(uint8_t joint, int32_t pos);
-extern void eo_emsController_ReadEncoderSet(int32_t *pos);
-extern void eo_emsController_ReadTorque(uint8_t joint, int32_t torque);
-extern void eo_emsController_ReadTorqueSet(int32_t *torque);
-extern void eo_emsController_ReadStatus(uint8_t joint, int32_t pos, int32_t torque);
-extern void eo_emsController_ReadStatusSet(uint8_t joint, int32_t *pos, int32_t *torque); 
+extern void eo_emsController_ReadEncoders(int32_t *pos);
+extern void eo_emsController_ReadTorques(int32_t *torque);
 
-extern void eo_emsController_SetPosRef(uint8_t joint, float pos, float vel);
+extern void eo_emsController_SetPosRef(uint8_t joint, float pos, float vel, uint8_t reset);
 extern void eo_emsController_SetPosRefSet(float *pos, float *vel);
 extern void eo_emsController_SetVelRef(uint8_t joint, float vel, float acc);
 extern void eo_emsController_SetVelRefSet(float *vel, float *acc);
@@ -102,8 +98,8 @@ extern void eo_emsGetActivePidStatus(uint8_t joint, float *pwm, float *err);
 
 // configuration
 extern void eo_emsController_SetDecoupler(emsMotorDecoupler_t dec_type, float matrix[4][4]);
-extern void eo_emsController_SetPosPid(uint8_t joint,float kp, float kd, float ki);
-extern void eo_emsController_SetTrqPid(uint8_t joint,float kp, float kd, float ki);
+extern void eo_emsController_SetPosPid(uint8_t joint, float kp, float ki, float kd, float Ymax, float Imax);
+extern void eo_emsController_SetTrqPid(uint8_t joint, float kp, float ki, float kd, float Ymax, float Imax);
 extern void eo_emsController_SetStiffness(uint8_t joint, float stiffeness);
 extern void eo_emsController_SetVelMax(uint8_t joint, float vel_max);
 extern void eo_emsController_SetPosLimits(uint8_t joint, float pos_min, float pos_max);
