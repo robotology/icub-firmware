@@ -33,7 +33,8 @@
 
 #include "EoCommon.h"
 
-#include "eOcfg_nvsEP_mngmnt_con.h"
+#include "eOcfg_nvsEP_mn.h"
+#include "eOcfg_nvsEP_mn_hid.h"
 
 #include "EOarray.h"
 #include "EOnv_hid.h"
@@ -49,7 +50,7 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "eOcfg_nvsEP_mngmnt_usr_hid.h"
+//#include "eOcfg_nvsEP_mngmnt_usr_hid.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
@@ -97,11 +98,11 @@ extern void eo_cfg_nvsEP_mngmnt_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void 
 {
     eObool_t theOwnershipIsRemote = (NULL == rem) ? eobool_true : eobool_false;
     
-    memcpy(loc, eo_cfg_nvsEP_mngmnt_defaultvalue, sizeof(eo_cfg_nvsEP_mngmnt_t));
-    if(NULL != rem)
-    {   
-        memcpy(rem, eo_cfg_nvsEP_mngmnt_defaultvalue, sizeof(eo_cfg_nvsEP_mngmnt_t));
-    }
+//    memcpy(loc, eOcfg_nvsEP_mngmnt_defaultvalue, sizeof(eo_cfg_nvsEP_mngmnt_t));
+//    if(NULL != rem)
+//    {
+//        memcpy(rem, eOcfg_nvsEP_mn_defaultvalue, sizeof(eo_cfg_nvsEP_mngmnt_t));
+//    }
     
     // nothing else ...
 

@@ -204,7 +204,7 @@ static MYmotionController themotioncontrollers[3];
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jstatus__basic(eo_cfg_nvsEP_mc_jointNumber_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jstatus__basic(eOcfg_nvsEP_mc_jointNumber_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
 	eOmc_joint_status_basic_t *jstatus_b = nv->rem;
 	printf("\njstatus__basic for Joint num = %d\n", xx);
@@ -219,7 +219,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jstatus__basic(eo_cfg_nvsEP_mc_jointNum
 
 
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mstatus__basic(eo_cfg_nvsEP_mc_motorNumber_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mstatus__basic(eOcfg_nvsEP_mc_motorNumber_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
 	eOmc_motor_status_basic_t *mstatus_b = nv->rem;
 	printf("\nmstatus__basic for motor num = %d\n", xx);
@@ -230,7 +230,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mstatus__basic(eo_cfg_nvsEP_mc_motorNum
 	printf("mstatus_b->velocity = 0x%X\n", mstatus_b->velocity);
 }
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eo_cfg_nvsEP_mc_jointNumber_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
 	eOmc_joint_config_t *jConfig = nv->rem;
 	printf("\nmaxpositionofjoint for Joint num = %d\n", xx);
@@ -248,7 +248,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eo_cfg_nvsEP_mc_jointNumber_t x
 
 }
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig(eo_cfg_nvsEP_mc_motorNumber_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig(eOcfg_nvsEP_mc_motorNumber_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
 	eOmc_motor_config_t *jConfig = nv->rem;
 	printf("\nmaxpositionofjoint for Joint num = %d\n", xx);
@@ -265,7 +265,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig(eo_cfg_nvsEP_mc_motorNumber_t x
 
 }
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__maxpositionofjoint(eo_cfg_nvsEP_mc_jointNumber_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__maxpositionofjoint(eOcfg_nvsEP_mc_jointNumber_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
 	eOmeas_position_t *jMaxPosition_b = nv->rem;
 	printf("\nmaxpositionofjoint for Joint num = %d\n", xx);
@@ -273,7 +273,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__maxpositionofjoint(eo_cfg_nvsE
 	printf("maxpositionofjoint = 0x%X\n", jMaxPosition_b);
 }
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig__maxcurrentofmotor(eo_cfg_nvsEP_mc_motorNumber_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig__maxcurrentofmotor(eOcfg_nvsEP_mc_motorNumber_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
 	eOmeas_position_t *jMaxCurrent_b = nv->rem;
 	printf("\nmaxcurrentofmotor for Joint num = %d\n", xx);

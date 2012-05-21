@@ -35,11 +35,8 @@ using namespace std;
 #include <yarp/dev/ControlBoardInterfacesImpl.h>
 #include "yarp/dev/ControlBoardInterfacesImpl.inl" //ControlBoardHelper
 
-extern "C" {
 #include "EOnv_hid.h"
 #include "EoMotionControl.h"
-#include "eOcfg_EPs_eb7.h"
-}
 
 
 
@@ -84,14 +81,14 @@ extern "C" {
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-static uint8_t reset = 0;
+
 static void s_callback_button_1(void);
 static void s_callback_button_2(void);
 static void s_callback_button_3(void);
 static void s_callback_button_4(void);
 static void s_callback_button_5(void);
 
-static void s_eom_hostprotoc_extra_protocoltransceiver_ask_the_board(void);
+//static void s_eom_hostprotoc_extra_protocoltransceiver_ask_the_board(void);
 
 void copyPid2eo(Pid in, eOmc_PID_t *out);
 // --------------------------------------------------------------------------------------------------------------------
@@ -142,8 +139,6 @@ int main(int argc, char *argv[])
 	uint8_t *udppkt_data = NULL;
 	uint16_t udppkt_size = 0;
 
-
-//	printf("%s", _AC_);
 
     // parse command line input argument
     if(argc > 1)
@@ -225,7 +220,7 @@ int main(int argc, char *argv[])
     // init object: one per ems
 	//hostTransceiver_Init(localAddr,remoteAddr, eOport, EOK_HOSTTRANSCEIVER_capacityofpacket);
 	transceiver= new hostTransceiver;
-	transceiver->init(localAddr,remoteAddr, eOport, EOK_HOSTTRANSCEIVER_capacityofpacket);
+	transceiver->init(localAddr,remoteAddr, eOport, EOK_HOSTTRANSCEIVER_capacityofpacket, 4);
 
 	transceiver->getTransmit(&udppkt_data, &udppkt_size);
     ACE_UINT8		tmp = 1;
@@ -368,6 +363,7 @@ static void s_callback_button_1(void)
 	EOnv 		*cnv;
 	EOarray *ropsigcfgassign;
     eOropSIGcfg_t sigcfg;
+    eOcfg_nvsEP_mn_commNumber_t  dummy = 0;
 
     snprintf(str, sizeof(str)-1, "called set<regulars>");
     hal_trace_puts(str);
@@ -377,8 +373,8 @@ static void s_callback_button_1(void)
 
     // get nvid from parameters
 //#warning "aggiornare chiamate a funzione"
-    eOnvID_t nvid_ropsigcfgassign = eo_cfg_nvsEP_mngmnt_NVID_Get(mngmntNVindex__ropsigcfgassign);
-    cnv = transceiver->getNVhandler(endpoint_mngmnt, nvid_ropsigcfgassign);
+    eOnvID_t nvid_ropsigcfgassign = eo_cfg_nvsEP_mn_comm_NVID_Get(endpoint_mn_comm, dummy, commNVindex__ropsigcfgcommand);
+    cnv = transceiver->getNVhandler(endpoint_mn_comm, nvid_ropsigcfgassign);
     ropsigcfgassign = (EOarray*) cnv->loc;
     ropsigcfgassign->head.capacity = NUMOFROPSIGCFG;
     ropsigcfgassign->head.itemsize = sizeof(eOropSIGcfg_t);
@@ -388,61 +384,60 @@ static void s_callback_button_1(void)
 
  //   if(0 == reset)
     {
-        nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_leftlowerleg, 0, jointNVindex_jstatus__basic);
-    	sigcfg.ep = endpoint_mc_leftlowerleg;
+        nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_rightlowerarm, 0, jointNVindex_jstatus__basic);
+    	sigcfg.ep = endpoint_mc_rightlowerarm;
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
     	eo_array_PushBack(ropsigcfgassign, &sigcfg);
 
-        nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_leftlowerleg, 0, motorNVindex_mstatus__basic);
-    	sigcfg.ep = endpoint_mc_leftlowerleg;
+        nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_rightlowerarm, 0, motorNVindex_mstatus__basic);
+    	sigcfg.ep = endpoint_mc_rightlowerarm;
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
     	eo_array_PushBack(ropsigcfgassign, &sigcfg);
 
-        nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_leftlowerleg, 1, jointNVindex_jstatus__basic);
-    	sigcfg.ep = endpoint_mc_leftlowerleg;
+        nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_rightlowerarm, 1, jointNVindex_jstatus__basic);
+    	sigcfg.ep = endpoint_mc_rightlowerarm;
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
     	eo_array_PushBack(ropsigcfgassign, &sigcfg);
 
-        nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_leftlowerleg, 1, motorNVindex_mstatus__basic);
-    	sigcfg.ep = endpoint_mc_leftlowerleg;
+        nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_rightlowerarm, 1, motorNVindex_mstatus__basic);
+    	sigcfg.ep = endpoint_mc_rightlowerarm;
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
     	eo_array_PushBack(ropsigcfgassign, &sigcfg);
 
-        nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_leftlowerleg, 0, jointNVindex_jconfig);
-    	sigcfg.ep = endpoint_mc_leftlowerleg;
+        nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_rightlowerarm, 0, jointNVindex_jconfig);
+    	sigcfg.ep = endpoint_mc_rightlowerarm;
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
     	eo_array_PushBack(ropsigcfgassign, &sigcfg);
 
-        nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_leftlowerleg, 0, jointNVindex_jconfig__maxpositionofjoint);
-    	sigcfg.ep = endpoint_mc_leftlowerleg;
+        nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_rightlowerarm, 0, jointNVindex_jconfig__maxpositionofjoint);
+    	sigcfg.ep = endpoint_mc_rightlowerarm;
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
     	eo_array_PushBack(ropsigcfgassign, &sigcfg);
 
-		nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_leftlowerleg, 0, motorNVindex_mconfig);
-    	sigcfg.ep = endpoint_mc_leftlowerleg;
+		nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_rightlowerarm, 0, motorNVindex_mconfig);
+    	sigcfg.ep = endpoint_mc_rightlowerarm;
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
     	eo_array_PushBack(ropsigcfgassign, &sigcfg);
 
-		nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_leftlowerleg, 0, motorNVindex_mconfig__maxcurrentofmotor);
-    	sigcfg.ep = endpoint_mc_leftlowerleg;
+		nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_rightlowerarm, 0, motorNVindex_mconfig__maxcurrentofmotor);
+    	sigcfg.ep = endpoint_mc_rightlowerarm;
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
     	eo_array_PushBack(ropsigcfgassign, &sigcfg);
     }
 
-    transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mngmnt, nvid_ropsigcfgassign);
+    transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mn_comm, commNVindex__ropsigcfgcommand);
 
     printf("added a set<__upto10rop2signal, list>");
 
 }
-
 
 static void s_callback_button_2(void )
 {
@@ -451,9 +446,9 @@ static void s_callback_button_2(void )
 	eOresult_t res;
 
 	//--
-	eo_cfg_nvsEP_mc_endpoint_t ep = endpoint_mc_leftlowerleg;
-	eo_cfg_nvsEP_mc_jointNumber_t j = 0;
-	eo_cfg_nvsEP_mc_jointNVindex_t jNVindex = jointNVindex_jconfig;
+	eOcfg_nvsEP_mc_endpoint_t ep = endpoint_mc_rightlowerarm;
+	eOcfg_nvsEP_mc_jointNumber_t j = 0;
+	eOcfg_nvsEP_mc_jointNVindex_t jNVindex = jointNVindex_jconfig__maxpositionofjoint;
 
 	// get nvid from parameters
     eOnvID_t nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, j, jNVindex);
@@ -478,7 +473,7 @@ static void s_callback_button_2(void )
 
 	//--
 	// get nvid from parameters
-    eo_cfg_nvsEP_mc_motorNVindex_t mNVindex = motorNVindex_mconfig;
+    eOcfg_nvsEP_mc_motorNVindex_t mNVindex = motorNVindex_mconfig;
     nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(ep, j, mNVindex);
 	nvRoot = transceiver->getNVhandler(ep, nvid);
 
@@ -509,9 +504,9 @@ static void s_callback_button_3(void )
     memset(&jDataPos, 0x00, sizeof(eOmeas_position_t));
 
 	// joint Max Position
-	eo_cfg_nvsEP_mc_endpoint_t ep = endpoint_mc_leftlowerleg;
-	eo_cfg_nvsEP_mc_jointNumber_t j = 0;
-	eo_cfg_nvsEP_mc_jointNVindex_t jNVindex = jointNVindex_jconfig__maxpositionofjoint;
+    eOcfg_nvsEP_mc_endpoint_t ep = endpoint_mc_rightlowerarm;
+	eOcfg_nvsEP_mc_jointNumber_t j = 0;
+	eOcfg_nvsEP_mc_jointNVindex_t jNVindex = jointNVindex_jconfig__maxpositionofjoint;
 	// get nvid from parameters
     eOnvID_t nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, j, jNVindex);
     nvRoot = transceiver->getNVhandler(ep, nvid);
@@ -523,9 +518,9 @@ static void s_callback_button_3(void )
     transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
 
 	// Motor qualcosa
-	//eo_cfg_nvsEP_mc_endpoint_t ep = endpoint_mc_leftlowerleg;
-	eo_cfg_nvsEP_mc_motorNumber_t j2 = 0;
-	eo_cfg_nvsEP_mc_motorNVindex_t jNVindex2 = motorNVindex_mconfig__maxcurrentofmotor;
+	//eo_cfg_nvsEP_mc_endpoint_t ep = endpoint_mc_rightlowerarm;
+    eOcfg_nvsEP_mc_motorNumber_t j2 = 0;
+    eOcfg_nvsEP_mc_motorNVindex_t jNVindex2 = motorNVindex_mconfig__maxcurrentofmotor;
     memset(&jDataPos, 0x00, sizeof(eOmeas_position_t));
 	// get nvid from parameters
     nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(ep, j2, jNVindex2);
@@ -545,9 +540,9 @@ static void s_callback_button_4(void)
 	char str[128];
 	EOnv 		*nvRoot;
 
-	eo_cfg_nvsEP_mc_endpoint_t ep = endpoint_mc_leftlowerleg;
-	eo_cfg_nvsEP_mc_jointNumber_t j = 0;
-	eo_cfg_nvsEP_mc_jointNVindex_t jNVindex = jointNVindex_jcmmnds__setpoint;
+	eOcfg_nvsEP_mc_endpoint_t ep = endpoint_mc_rightlowerarm;
+	eOcfg_nvsEP_mc_jointNumber_t j = 0;
+	eOcfg_nvsEP_mc_jointNVindex_t jNVindex = jointNVindex_jcmmnds__setpoint;
 
 	// get nvid from parameters
 	eOnvID_t nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, j, jNVindex);
@@ -558,13 +553,12 @@ static void s_callback_button_4(void)
 	setPoint.to.position.value 			= 0x0610;
 	setPoint.to.position.withvelocity 	= 0x6996;
 
-	eo_nv_remoteSet(nvRoot, &setPoint, eo_nv_upd_ifneeded);
+	eo_nv_Set(nvRoot, &setPoint, eo_nv_upd_ifneeded, eo_nv_upd_dontdo);
 	// tell agent to prepare a rop to send
 	transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
 
 	snprintf(str, sizeof(str)-1, "called setPoint position\n");
 }
-
 
 static void s_callback_button_5(void )
 {
