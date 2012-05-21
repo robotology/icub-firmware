@@ -47,10 +47,10 @@ extern "C" {
 
 //#warning --> instead of 20 ... can i put 0? answer: seems yes  .. but be carefule w/ eo_ropframe_ROP_NumberOf_quickversion()
 
-#define EOK_HOSTTRANSCEIVER_capacityofpacket                   512
-#define EOK_HOSTTRANSCEIVER_capacityofrop                      128
+#define EOK_HOSTTRANSCEIVER_capacityofpacket                   640
+#define EOK_HOSTTRANSCEIVER_capacityofrop                      192
 #define EOK_HOSTTRANSCEIVER_capacityofropframeregulars         20
-#define EOK_HOSTTRANSCEIVER_capacityofropframeoccasionals      (512-4-4)
+#define EOK_HOSTTRANSCEIVER_capacityofropframeoccasionals      (EOK_HOSTTRANSCEIVER_capacityofpacket-4-4)
 #define EOK_HOSTTRANSCEIVER_capacityofropframereplies          20 
 #define EOK_HOSTTRANSCEIVER_maxnumberofregularrops             4     
 
@@ -58,7 +58,7 @@ extern "C" {
 
 typedef struct
 {
-    const EOconstvector* const  vectorof_endpoint_cfg;
+    const EOconstvector*        vectorof_endpoint_cfg;
     eOuint16_fp_uint16_t        hashfunction_ep2index;
     eOipv4addr_t                remoteboardipv4addr;
     eOipv4port_t                remoteboardipv4port;
