@@ -45,9 +45,9 @@ extern "C" {
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-#define EOK_BOARDTRANSCEIVER_capacityofpacket                   512
-#define EOK_BOARDTRANSCEIVER_capacityofrop                      128
-#define EOK_BOARDTRANSCEIVER_capacityofropframeregulars         256
+#define EOK_BOARDTRANSCEIVER_capacityofpacket                   640
+#define EOK_BOARDTRANSCEIVER_capacityofrop                      192
+#define EOK_BOARDTRANSCEIVER_capacityofropframeregulars         384
 #define EOK_BOARDTRANSCEIVER_capacityofropframeoccasionals      128
 #define EOK_BOARDTRANSCEIVER_capacityofropframereplies          128 
 #define EOK_BOARDTRANSCEIVER_maxnumberofregularrops             16 
@@ -56,7 +56,7 @@ extern "C" {
 
 typedef struct
 {
-    const EOconstvector* const  vectorof_endpoint_cfg;
+    const EOconstvector*        vectorof_endpoint_cfg;
     eOuint16_fp_uint16_t        hashfunction_ep2index;
     eOipv4addr_t                remotehostipv4addr;
     eOipv4port_t                remotehostipv4port;
