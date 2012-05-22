@@ -51,7 +51,7 @@ extern "C" {
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef struct      // 24 bytes ... 
+typedef struct      // 24 bytes on arm .... 32 on 64 bit arch
 {
     eOropcode_t     ropcode;
     eOnvEP_t        nvep;
@@ -62,7 +62,7 @@ typedef struct      // 24 bytes ...
     uint16_t        timeoffsetinsiderop;     // if time is not present its value is 0xffff 
     void*           nvloc;          // the pointer to the where the real value of the nv is stored. if null, then the rop does not contain data (an ask for example)
     EOnv*           nv;
-} eo_transm_permrops_info_t; EO_VERIFYsizeof(eo_transm_permrops_info_t, 24);
+} eo_transm_permrops_info_t; //EO_VERIFYsizeof(eo_transm_permrops_info_t, 24);
 
 
 /** @struct     EOtransmitter_hid
