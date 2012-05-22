@@ -168,6 +168,7 @@ EO_VERIFYproposition(eocfg_nvsep_sk_emsboard, ( (OFFSETafter_sstatus_filler04) =
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
 
+extern const eo_cfg_nvsEP_sk_emsboard_t *eo_cfg_nvsEP_sk_emsboard_defaultvalues = &eo_cfg_nvsEP_sk_emsboard_default;
 
 extern EOtreenode eo_cfg_nvsEP_sk_emsboard_tree_con[] =
 { 
