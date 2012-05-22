@@ -12,7 +12,7 @@ set D_SRC=src
 
 
 set TYP=mc
-set LST=(EOdecoupler EOemsController EOpid EOaxisController EOtrajectory)
+set LST=(EOdecoupler EOemsController EOpid EOaxisController EOtrajectory EOspeedmeter)
 
 echo. -- copying "%TYP%" files
 
