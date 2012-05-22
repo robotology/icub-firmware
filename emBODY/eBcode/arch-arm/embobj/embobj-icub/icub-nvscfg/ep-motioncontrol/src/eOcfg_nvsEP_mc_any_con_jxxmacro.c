@@ -91,7 +91,7 @@
 
 #define OFFSETof_jconfig                                        (JMACRO_JOFF)
 #define CAPACITY_jconfig                                        sizeof(eOmc_joint_config_t)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jconfig, JMACRO_JNUM),
     EO_INIT(.capacity)  CAPACITY_jconfig,
@@ -105,7 +105,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig) =
 
 #define OFFSETof_jconfig__pidposition                           (OFFSETof_jconfig)
 #define CAPACITY_jconfig__pidposition                           sizeof(eOmc_PID_t)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__pidposition) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__pidposition) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jconfig__pidposition, JMACRO_JNUM), 
     EO_INIT(.capacity)  CAPACITY_jconfig__pidposition,
@@ -119,7 +119,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__pidpo
 
 #define OFFSETof_jconfig__pidvelocity                           (OFFSETafter_jconfig__pidposition)
 #define CAPACITY_jconfig__pidvelocity                           sizeof(eOmc_PID_t)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__pidvelocity) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__pidvelocity) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jconfig__pidvelocity, JMACRO_JNUM),       
     EO_INIT(.capacity)  CAPACITY_jconfig__pidvelocity,
@@ -133,7 +133,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__pidve
 
 #define OFFSETof_jconfig__pidtorque                             (OFFSETafter_jconfig__pidvelocity)
 #define CAPACITY_jconfig__pidtorque                             sizeof(eOmc_PID_t)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__pidtorque) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__pidtorque) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jconfig__pidtorque, JMACRO_JNUM),    
     EO_INIT(.capacity)  CAPACITY_jconfig__pidtorque,
@@ -148,7 +148,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__pidto
 
 #define OFFSETof_jconfig__impedance                             (OFFSETafter_jconfig__pidtorque)
 #define CAPACITY_jconfig__impedance                             sizeof(eOmc_impedance_t)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__impedance) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__impedance) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jconfig__impedance, JMACRO_JNUM),    
     EO_INIT(.capacity)  CAPACITY_jconfig__impedance,
@@ -163,7 +163,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__imped
 
 #define OFFSETof_jconfig__minpositionofjoint                    (OFFSETafter_jconfig__impedance)
 #define CAPACITY_jconfig__minpositionofjoint                    sizeof(eOmeas_position_t)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__minpositionofjoint) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__minpositionofjoint) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jconfig__minpositionofjoint, JMACRO_JNUM),    
     EO_INIT(.capacity)  CAPACITY_jconfig__minpositionofjoint,
@@ -177,7 +177,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__minpo
 
 #define OFFSETof_jconfig__maxpositionofjoint                    (OFFSETafter_jconfig__minpositionofjoint)
 #define CAPACITY_jconfig__maxpositionofjoint                    sizeof(eOmeas_position_t)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__maxpositionofjoint) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__maxpositionofjoint) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jconfig__maxpositionofjoint, JMACRO_JNUM),
     EO_INIT(.capacity)  CAPACITY_jconfig__maxpositionofjoint,
@@ -193,7 +193,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__maxpo
 
 #define OFFSETof_jconfig__velocitysetpointtimeout              (OFFSETafter_jconfig__maxpositionofjoint)
 #define CAPACITY_jconfig__velocitysetpointtimeout              sizeof(eOmeas_time_t)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__velocitysetpointtimeout) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__velocitysetpointtimeout) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jconfig__velocitysetpointtimeout, JMACRO_JNUM),
     EO_INIT(.capacity)  CAPACITY_jconfig__velocitysetpointtimeout,
@@ -207,7 +207,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__veloc
 
 #define OFFSETof_jconfig__controlmode            (OFFSETafter_jconfig__velocitysetpointtimeout)
 #define CAPACITY_jconfig__controlmode            (sizeof(eOenum08_t))
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__controlmode) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__controlmode) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jconfig__controlmode, JMACRO_JNUM),    
     EO_INIT(.capacity)  CAPACITY_jconfig__controlmode,
@@ -221,7 +221,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__contr
 
 #define OFFSETof_jconfig__motionmonitormode            (OFFSETafter_jconfig__controlmode)
 #define CAPACITY_jconfig__motionmonitormode            (sizeof(eOenum08_t))
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__motionmonitormode) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__motionmonitormode) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jconfig__motionmonitormode, JMACRO_JNUM),    
     EO_INIT(.capacity)  CAPACITY_jconfig__motionmonitormode,
@@ -235,7 +235,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__motio
 
 #define OFFSETof_jconfig__des02FORjstatuschamaleon04            (OFFSETafter_jconfig__motionmonitormode)
 #define CAPACITY_jconfig__des02FORjstatuschamaleon04            (2*sizeof(eOutil_chameleon_descr_t))
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__des02FORjstatuschamaleon04) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__des02FORjstatuschamaleon04) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jconfig__des02FORjstatuschamaleon04, JMACRO_JNUM),    
     EO_INIT(.capacity)  CAPACITY_jconfig__des02FORjstatuschamaleon04,
@@ -249,7 +249,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__des02
 
 #define OFFSETof_jconfig__holder01FFU01            (OFFSETafter_jconfig__des02FORjstatuschamaleon04)
 #define CAPACITY_jconfig__holder01FFU01            (1)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__holder01FFU01) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__holder01FFU01) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jconfig__holder01FFU01, JMACRO_JNUM),    
     EO_INIT(.capacity)  CAPACITY_jconfig__holder01FFU01,
@@ -263,7 +263,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__holde
 
 #define OFFSETof_jconfig__holder01FFU02            (OFFSETafter_jconfig__holder01FFU01)
 #define CAPACITY_jconfig__holder01FFU02            (1)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__holder01FFU02) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__holder01FFU02) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jconfig__holder01FFU02, JMACRO_JNUM),    
     EO_INIT(.capacity)  CAPACITY_jconfig__holder01FFU02,
@@ -276,7 +276,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__holde
 
 #define OFFSETof_jconfig__holder02FFU03            (OFFSETafter_jconfig__holder01FFU02)
 #define CAPACITY_jconfig__holder02FFU03            (2)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__holder02FFU03) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__holder02FFU03) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jconfig__holder02FFU03, JMACRO_JNUM),    
     EO_INIT(.capacity)  CAPACITY_jconfig__holder02FFU03,
@@ -289,7 +289,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__holde
 
 #define OFFSETof_jconfig__holder02FFU04            (OFFSETafter_jconfig__holder02FFU03)
 #define CAPACITY_jconfig__holder02FFU04            (2)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__holder02FFU04) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__holder02FFU04) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jconfig__holder02FFU04, JMACRO_JNUM),    
     EO_INIT(.capacity)  CAPACITY_jconfig__holder02FFU04,
@@ -310,7 +310,7 @@ MACRO_VERIFYSIZEOF(JMACRO_JNUM, eOmc_joint_config_t, OFFSETafter_jconfig__holder
 
 #define OFFSETof_jstatus                                        (OFFSETafter_jconfig)
 #define CAPACITY_jstatus                                        sizeof(eOmc_joint_status_t)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jstatus) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jstatus) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jstatus, JMACRO_JNUM),
     EO_INIT(.capacity)  CAPACITY_jstatus,
@@ -324,7 +324,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jstatus) =
 
 #define OFFSETof_jstatus__basic                                 (OFFSETafter_jconfig)
 #define CAPACITY_jstatus__basic                                 sizeof(eOmc_joint_status_basic_t)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jstatus__basic) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jstatus__basic) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jstatus__basic, JMACRO_JNUM),
     EO_INIT(.capacity)  CAPACITY_jstatus__basic,
@@ -337,7 +337,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jstatus__basic
 
 #define OFFSETof_jstatus__ofpid                                 (OFFSETafter_jstatus__basic)
 #define CAPACITY_jstatus__ofpid                                 sizeof(eOmc_joint_status_ofpid_t)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jstatus__ofpid) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jstatus__ofpid) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jstatus__ofpid, JMACRO_JNUM),
     EO_INIT(.capacity)  CAPACITY_jstatus__ofpid,
@@ -351,7 +351,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jstatus__ofpid
 
 #define OFFSETof_jstatus__chamaleon04                                 (OFFSETafter_jstatus__ofpid)
 #define CAPACITY_jstatus__chamaleon04                                 (4)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jstatus__chamaleon04) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jstatus__chamaleon04) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jstatus__chamaleon04, JMACRO_JNUM),
     EO_INIT(.capacity)  CAPACITY_jstatus__chamaleon04,
@@ -369,7 +369,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jstatus__chama
 
 #define OFFSETof_jinputs__externallymeasuredtorque                  (OFFSETafter_jstatus)
 #define CAPACITY_jinputs__externallymeasuredtorque              sizeof(eOmeas_torque_t)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jinputs__externallymeasuredtorque) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jinputs__externallymeasuredtorque) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jinputs__externallymeasuredtorque, JMACRO_JNUM),
     EO_INIT(.capacity)  CAPACITY_jinputs__externallymeasuredtorque,
@@ -383,7 +383,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jinputs__exter
 
 #define OFFSETof_jinputs__holder02FFU01                  (OFFSETafter_jinputs__externallymeasuredtorque)
 #define CAPACITY_jinputs__holder02FFU01              (2)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jinputs__holder02FFU01) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jinputs__holder02FFU01) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jinputs__holder02FFU01, JMACRO_JNUM),
     EO_INIT(.capacity)  CAPACITY_jinputs__holder02FFU01,
@@ -397,7 +397,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jinputs__holde
 
 #define OFFSETof_jinputs__holder04FFU02                  (OFFSETafter_jinputs__holder02FFU01)
 #define CAPACITY_jinputs__holder04FFU02              (4)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jinputs__holder04FFU02) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jinputs__holder04FFU02) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jinputs__holder04FFU02, JMACRO_JNUM),
     EO_INIT(.capacity)  CAPACITY_jinputs__holder04FFU02,
@@ -412,7 +412,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jinputs__holde
 
 #define OFFSETof_jcmmnds__calibration                  (OFFSETafter_jinputs)
 #define CAPACITY_jcmmnds__calibration                   (sizeof(eOmc_calibrator_t))
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__calibration) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__calibration) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jcmmnds__calibration, JMACRO_JNUM),
     EO_INIT(.capacity)  CAPACITY_jcmmnds__calibration,
@@ -427,7 +427,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__calib
 
 #define OFFSETof_jcmmnds__setpoint                  (OFFSETafter_jcmmnds__calibration)
 #define CAPACITY_jcmmnds__setpoint                   (sizeof(eOmc_setpoint_t))
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__setpoint) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__setpoint) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jcmmnds__setpoint, JMACRO_JNUM),
     EO_INIT(.capacity)  CAPACITY_jcmmnds__setpoint,
@@ -441,7 +441,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__setpo
 
 #define OFFSETof_jcmmnds__stoptrajectory                  (OFFSETafter_jcmmnds__setpoint)
 #define CAPACITY_jcmmnds__stoptrajectory                   (sizeof(eObool_t))
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__stoptrajectory) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__stoptrajectory) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jcmmnds__stoptrajectory, JMACRO_JNUM),
     EO_INIT(.capacity)  CAPACITY_jcmmnds__stoptrajectory,
@@ -455,7 +455,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__stopt
 
 #define OFFSETof_jcmmnds__holder01FFU01                  (OFFSETafter_jcmmnds__stoptrajectory)
 #define CAPACITY_jcmmnds__holder01FFU01                   (1)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__holder01FFU01) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__holder01FFU01) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jcmmnds__holder01FFU01, JMACRO_JNUM),
     EO_INIT(.capacity)  CAPACITY_jcmmnds__holder01FFU01,
@@ -469,7 +469,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__holde
 
 #define OFFSETof_jcmmnds__holder01FFU02                  (OFFSETafter_jcmmnds__holder01FFU01)
 #define CAPACITY_jcmmnds__holder01FFU02                   (1)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__holder01FFU02) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__holder01FFU02) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jcmmnds__holder01FFU02, JMACRO_JNUM),
     EO_INIT(.capacity)  CAPACITY_jcmmnds__holder01FFU02,
@@ -482,7 +482,7 @@ extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__holde
 
 #define OFFSETof_jcmmnds__holder01FFU03                  (OFFSETafter_jcmmnds__holder01FFU02)
 #define CAPACITY_jcmmnds__holder01FFU03                   (1)
-extern EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__holder01FFU03) =
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__holder01FFU03) =
 {   
     EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jcmmnds__holder01FFU03, JMACRO_JNUM),
     EO_INIT(.capacity)  CAPACITY_jcmmnds__holder01FFU03,

@@ -71,7 +71,7 @@
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-extern const eOmc_controller_t eo_cfg_nvsEP_mc_any_con_cxxdefault_defaultvalue =
+const eOmc_controller_t eo_cfg_nvsEP_mc_any_con_cxxdefault_defaultvalue =
 {
     EO_INIT(.cconfig)             
     {

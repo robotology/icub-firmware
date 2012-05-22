@@ -78,7 +78,7 @@
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
 
-extern const uint8_t eo_cfg_nvsEP_mc_any_con_jxx_funtyp[] =
+const uint8_t eo_cfg_nvsEP_mc_any_con_jxx_funtyp[] =
 {
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig,
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__pidposition,

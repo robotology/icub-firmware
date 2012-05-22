@@ -393,9 +393,9 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern const eOmc_joint_t* eo_cfg_nvsEP_mc_lowerarm_joint_defaultvalue = &eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue;
-extern const eOmc_motor_t* eo_cfg_nvsEP_mc_lowerarm_motor_defaultvalue = &eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue;
-extern const eOmc_controller_t* eo_cfg_nvsEP_mc_lowerarm_controller_defaultvalue = &s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue;
+const eOmc_joint_t* eo_cfg_nvsEP_mc_lowerarm_joint_defaultvalue = &eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue;
+const eOmc_motor_t* eo_cfg_nvsEP_mc_lowerarm_motor_defaultvalue = &eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue;
+const eOmc_controller_t* eo_cfg_nvsEP_mc_lowerarm_controller_defaultvalue = &s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue;
 
 
 // EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber is 12 and keeps the number of nvs per joint
@@ -449,7 +449,7 @@ extern const eOmc_controller_t* eo_cfg_nvsEP_mc_lowerarm_controller_defaultvalue
 #define Cindex(i)       (Cstart + (i))
 
 
-extern EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
+EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
 {
     // joint-j00
     // jconfig
@@ -3811,10 +3811,10 @@ const EOconstvector  s_eo_cfg_nvsEP_mc_lowerarm_constvector_of_treenodes_EOnv_co
 };
 
 
-extern const EOconstvector* const eo_cfg_nvsEP_mc_lowerarm_constvector_of_treenodes_EOnv_con = &s_eo_cfg_nvsEP_mc_lowerarm_constvector_of_treenodes_EOnv_con;
+const EOconstvector* const eo_cfg_nvsEP_mc_lowerarm_constvector_of_treenodes_EOnv_con = &s_eo_cfg_nvsEP_mc_lowerarm_constvector_of_treenodes_EOnv_con;
 
 
-extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_mc_lowerarm_fptr_hashfunction_id2index = eo_cfg_nvsEP_mc_lowerarm_hashfunction_id2index;
+const eOuint16_fp_uint16_t eo_cfg_nvsEP_mc_lowerarm_fptr_hashfunction_id2index = eo_cfg_nvsEP_mc_lowerarm_hashfunction_id2index;
 
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -81,7 +81,7 @@ static uint16_t s_hash(uint16_t id);
 
 // this struct contains the default values of the entities of the whole device
 
-extern const eo_cfg_nvsEP_mn_appl_t eo_cfg_nvsEP_mn_appl_default =
+const eo_cfg_nvsEP_mn_appl_t eo_cfg_nvsEP_mn_appl_default =
 {
     EO_INIT(.application)
     {
@@ -111,7 +111,7 @@ extern const eo_cfg_nvsEP_mn_appl_t eo_cfg_nvsEP_mn_appl_default =
 
 #define OFFSETof_config                 (0) 
 #define CAPACITY_config                 sizeof(eOmn_appl_config_t)
-extern EOnv_con_t eo_cfg_nvsEP_mn_appl_config =
+EOnv_con_t eo_cfg_nvsEP_mn_appl_config =
 {   // pos =  00
     EO_INIT(.id)        EOK_cfg_nvsEP_mn_appl_NVID_config,
     EO_INIT(.capacity)  CAPACITY_config,
@@ -125,7 +125,7 @@ extern EOnv_con_t eo_cfg_nvsEP_mn_appl_config =
 
 #define OFFSETof_status                 (OFFSETafter_config) 
 #define CAPACITY_status                 sizeof(eOmn_appl_status_t)
-extern EOnv_con_t eo_cfg_nvsEP_mn_appl_status =
+EOnv_con_t eo_cfg_nvsEP_mn_appl_status =
 {   // pos =  00
     EO_INIT(.id)        EOK_cfg_nvsEP_mn_appl_NVID_status,
     EO_INIT(.capacity)  CAPACITY_status,
@@ -139,7 +139,7 @@ extern EOnv_con_t eo_cfg_nvsEP_mn_appl_status =
 
 #define OFFSETof_cmmnds__go2state                 (OFFSETafter_status) 
 #define CAPACITY_cmmnds__go2state                 sizeof(eOenum08_t)
-extern EOnv_con_t eo_cfg_nvsEP_mn_appl_cmmnds__go2state =
+EOnv_con_t eo_cfg_nvsEP_mn_appl_cmmnds__go2state =
 {   // pos =  00
     EO_INIT(.id)        EOK_cfg_nvsEP_mn_appl_NVID_cmmnds__go2state,
     EO_INIT(.capacity)  CAPACITY_cmmnds__go2state,
@@ -166,11 +166,11 @@ EO_VERIFYproposition(eocfg_nvsep_mn_appl, ( (OFFSETafter_cmmnds_filler07) == siz
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
 
-extern const eo_cfg_nvsEP_mn_appl_t *eo_cfg_nvsEP_mn_appl_defaultvalue = &eo_cfg_nvsEP_mn_appl_default;
+const eo_cfg_nvsEP_mn_appl_t *eo_cfg_nvsEP_mn_appl_defaultvalue = &eo_cfg_nvsEP_mn_appl_default;
 
-//extern EOtreenode eo_cfg_nvsEP_mn_appl_tree_con[];
+//EOtreenode eo_cfg_nvsEP_mn_appl_tree_con[];
 
-extern EOtreenode eo_cfg_nvsEP_mn_appl_tree_con[] =
+EOtreenode eo_cfg_nvsEP_mn_appl_tree_con[] =
 {              
     {   // 00
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mn_appl_config,
@@ -204,10 +204,10 @@ const EOconstvector  s_eo_cfg_nvsEP_mn_appl_constvector_of_treenodes_EOnv_con =
 };
 
 
-extern const EOconstvector* const eo_cfg_nvsEP_mn_appl_constvector_of_treenodes_EOnv_con = &s_eo_cfg_nvsEP_mn_appl_constvector_of_treenodes_EOnv_con;
+const EOconstvector* const eo_cfg_nvsEP_mn_appl_constvector_of_treenodes_EOnv_con = &s_eo_cfg_nvsEP_mn_appl_constvector_of_treenodes_EOnv_con;
 
 
-extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_mn_appl_fnptr_hashfunction_id2index = eo_cfg_nvsEP_mn_appl_hashfunction_id2index;
+const eOuint16_fp_uint16_t eo_cfg_nvsEP_mn_appl_fnptr_hashfunction_id2index = eo_cfg_nvsEP_mn_appl_hashfunction_id2index;
 
 
 // --------------------------------------------------------------------------------------------------------------------

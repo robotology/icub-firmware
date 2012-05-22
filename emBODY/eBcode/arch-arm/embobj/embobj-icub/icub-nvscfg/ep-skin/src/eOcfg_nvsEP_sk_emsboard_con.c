@@ -77,7 +77,7 @@ static uint16_t s_hash(uint16_t id);
 
 // this struct contains the default values of the entities of the whole device
 
-extern const eo_cfg_nvsEP_sk_emsboard_t eo_cfg_nvsEP_sk_emsboard_default =
+const eo_cfg_nvsEP_sk_emsboard_t eo_cfg_nvsEP_sk_emsboard_default =
 {
     EO_INIT(.someskin)
     {
@@ -113,7 +113,7 @@ extern const eo_cfg_nvsEP_sk_emsboard_t eo_cfg_nvsEP_sk_emsboard_default =
 
 #define OFFSETof_sconfig__sigmode                 (0) 
 #define CAPACITY_sconfig__sigmode                 sizeof(eOenum08_t)
-extern EOnv_con_t eo_cfg_nvsEP_sk_emsboard_sconfig__sigmode =
+EOnv_con_t eo_cfg_nvsEP_sk_emsboard_sconfig__sigmode =
 {   // pos =  00
     EO_INIT(.id)        EOK_cfg_nvsEP_sk_emsboard_NVID_sconfig__sigmode,
     EO_INIT(.capacity)  CAPACITY_sconfig__sigmode,
@@ -139,7 +139,7 @@ extern EOnv_con_t eo_cfg_nvsEP_sk_emsboard_sconfig__sigmode =
 
 #define OFFSETof_sstatus__arrayof10canframes                 (OFFSETafter_sinputs_filler04) 
 #define CAPACITY_sstatus__arrayof10canframes                 sizeof(EOarray_of_10canframes)
-extern EOnv_con_t eo_cfg_nvsEP_sk_emsboard_sstatus__arrayof10canframes =
+EOnv_con_t eo_cfg_nvsEP_sk_emsboard_sstatus__arrayof10canframes =
 {   // pos =  01
     EO_INIT(.id)        EOK_cfg_nvsEP_sk_emsboard_NVID_sstatus__arrayof10canframes,
     EO_INIT(.capacity)  CAPACITY_sstatus__arrayof10canframes,
@@ -168,9 +168,9 @@ EO_VERIFYproposition(eocfg_nvsep_sk_emsboard, ( (OFFSETafter_sstatus_filler04) =
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
 
-extern const eo_cfg_nvsEP_sk_emsboard_t *eo_cfg_nvsEP_sk_emsboard_defaultvalues = &eo_cfg_nvsEP_sk_emsboard_default;
+const eo_cfg_nvsEP_sk_emsboard_t *eo_cfg_nvsEP_sk_emsboard_defaultvalues = &eo_cfg_nvsEP_sk_emsboard_default;
 
-extern EOtreenode eo_cfg_nvsEP_sk_emsboard_tree_con[] =
+EOtreenode eo_cfg_nvsEP_sk_emsboard_tree_con[] =
 { 
     {   // 00
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_sk_emsboard_sconfig__sigmode,
@@ -200,10 +200,10 @@ const EOconstvector  s_eo_cfg_nvsEP_sk_emsboard_constvector_of_treenodes_EOnv_co
 };
 
 
-extern const EOconstvector* const eo_cfg_nvsEP_sk_emsboard_constvector_of_treenodes_EOnv_con = &s_eo_cfg_nvsEP_sk_emsboard_constvector_of_treenodes_EOnv_con;
+const EOconstvector* const eo_cfg_nvsEP_sk_emsboard_constvector_of_treenodes_EOnv_con = &s_eo_cfg_nvsEP_sk_emsboard_constvector_of_treenodes_EOnv_con;
 
 
-extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_sk_emsboard_fptr_hashfunction_id2index = eo_cfg_nvsEP_sk_emsboard_hashfunction_id2index;
+const eOuint16_fp_uint16_t eo_cfg_nvsEP_sk_emsboard_fptr_hashfunction_id2index = eo_cfg_nvsEP_sk_emsboard_hashfunction_id2index;
 
 
 // --------------------------------------------------------------------------------------------------------------------

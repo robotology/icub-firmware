@@ -78,7 +78,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern const uint8_t eo_cfg_nvsEP_mc_any_con_cxx_funtyp[] =
+const uint8_t eo_cfg_nvsEP_mc_any_con_cxx_funtyp[] =
 {
     EOK_cfg_nvsEP_mc_any_con_cxx_NVFUNTYP_cconfig,
     EOK_cfg_nvsEP_mc_any_con_cxx_NVFUNTYP_cconfig__durationofctrlloop,
