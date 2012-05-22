@@ -106,7 +106,13 @@ typedef struct                      // size is: 4+4+168+0 = 176
     eOskin_status_t                 sstatus;
 } eOskin_someskin_t;                EO_VERIFYsizeof(eOskin_someskin_t, 176);
 
-    
+
+/** @typedef    uint16_t  eOsk_skinId_t
+    @brief      eOsk_skinId_t contains the values required to identify a skin;
+		currently a skin id identifies a set of 7 skin board attached on a single body part.
+ **/
+typedef uint16_t  eOsk_skinId_t;
+
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
 

@@ -177,7 +177,7 @@ extern eOresult_t eo_array_PushBack(EOarray *p, const void *item)
     memcpy(&(p->data[p->head.size*p->head.itemsize]), item, p->head.itemsize);
     p->head.size++;
 
-    return(eores_NOK_generic);
+    return(eores_OK);
 }
 
 
