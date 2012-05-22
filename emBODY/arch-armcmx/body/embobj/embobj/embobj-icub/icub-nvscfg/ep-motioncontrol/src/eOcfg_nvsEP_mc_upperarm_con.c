@@ -233,9 +233,9 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_upperarm_con_defaultvalue =
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern const eOmc_joint_t* eo_cfg_nvsEP_mc_upperarm_joint_defaultvalue = &eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue;
-extern const eOmc_motor_t* eo_cfg_nvsEP_mc_upperarm_motor_defaultvalue = &eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue;
-extern const eOmc_controller_t* eo_cfg_nvsEP_mc_upperarm_controller_defaultvalue = &s_eo_cfg_nvsEP_mc_upperarm_con_defaultvalue;
+const eOmc_joint_t* eo_cfg_nvsEP_mc_upperarm_joint_defaultvalue = &eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue;
+const eOmc_motor_t* eo_cfg_nvsEP_mc_upperarm_motor_defaultvalue = &eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue;
+const eOmc_controller_t* eo_cfg_nvsEP_mc_upperarm_controller_defaultvalue = &s_eo_cfg_nvsEP_mc_upperarm_con_defaultvalue;
 
 
 #define Jnvs    (EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber)
@@ -266,7 +266,7 @@ extern const eOmc_controller_t* eo_cfg_nvsEP_mc_upperarm_controller_defaultvalue
 #define Cstart          (Mstart+Mnvs*MNUM+0)
 #define Cindex(i)       (Cstart + (i))
 
-extern EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
+EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
 {
     // joint-j00
     // jconfig
@@ -1425,10 +1425,10 @@ const EOconstvector  s_eo_cfg_nvsEP_mc_upperarm_constvector_of_treenodes_EOnv_co
 };
 
 
-extern const EOconstvector* const eo_cfg_nvsEP_mc_upperarm_constvector_of_treenodes_EOnv_con = &s_eo_cfg_nvsEP_mc_upperarm_constvector_of_treenodes_EOnv_con;
+const EOconstvector* const eo_cfg_nvsEP_mc_upperarm_constvector_of_treenodes_EOnv_con = &s_eo_cfg_nvsEP_mc_upperarm_constvector_of_treenodes_EOnv_con;
 
 
-extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_mc_upperarm_fptr_hashfunction_id2index = eo_cfg_nvsEP_mc_upperarm_hashfunction_id2index;
+const eOuint16_fp_uint16_t eo_cfg_nvsEP_mc_upperarm_fptr_hashfunction_id2index = eo_cfg_nvsEP_mc_upperarm_hashfunction_id2index;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1583,9 +1583,11 @@ extern uint16_t eo_cfg_nvsEP_mc_upperarm_hashfunction_id2index(uint16_t id)
 // but EOK_cfg_nvsEP_mc_any_con_jxx_maxnumof_nvs_in_joint must be 32
 // and EOK_cfg_nvsEP_mc_any_con_mxx_maxnumof_nvs_in_motor 16
 
-typedef uint8_t sdfg[ ( EOK_cfg_nvsEP_mc_any_con_jxx_maxnumof_nvs_in_joint == 32 ) ? (1) : (0)];
-typedef uint8_t redf[ ( EOK_cfg_nvsEP_mc_any_con_mxx_maxnumof_nvs_in_motor == 16 ) ? (1) : (0)];
-typedef uint8_t sdfg[ ( EOK_cfg_nvsEP_mc_any_con_cxx_maxnumof_nvs_in_controller == 32 ) ? (1) : (0)];
+
+
+EO_VERIFYproposition(xxx, ( EOK_cfg_nvsEP_mc_any_con_jxx_maxnumof_nvs_in_joint == 32 ) );
+EO_VERIFYproposition(xxx, ( EOK_cfg_nvsEP_mc_any_con_mxx_maxnumof_nvs_in_motor == 16 ) );
+EO_VERIFYproposition(xxx, ( EOK_cfg_nvsEP_mc_any_con_cxx_maxnumof_nvs_in_controller == 32 ) );
 
 
 static uint16_t s_hash(uint16_t id)

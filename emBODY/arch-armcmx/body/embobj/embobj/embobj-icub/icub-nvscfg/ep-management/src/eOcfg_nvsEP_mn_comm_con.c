@@ -81,7 +81,7 @@ static uint16_t s_hash(uint16_t id);
 
 // this struct contains the default values of the entities of the whole device
 
-extern const eo_cfg_nvsEP_mn_comm_t eo_cfg_nvsEP_mn_comm_default =
+const eo_cfg_nvsEP_mn_comm_t eo_cfg_nvsEP_mn_comm_default =
 {
     EO_INIT(.ropsigcfgcommand)
     {
@@ -108,7 +108,7 @@ extern const eo_cfg_nvsEP_mn_comm_t eo_cfg_nvsEP_mn_comm_default =
 
 #define OFFSETof__ropsigcfgcommand                 (0) 
 #define CAPACITY__ropsigcfgcommand                 sizeof(eOmn_ropsigcfg_command_t)
-extern EOnv_con_t eo_cfg_nvsEP_mn_comm__ropsigcfgcommand =
+EOnv_con_t eo_cfg_nvsEP_mn_comm__ropsigcfgcommand =
 {   // pos =  00
     EO_INIT(.id)        EOK_cfg_nvsEP_mn_comm_NVID__ropsigcfgcommand,
     EO_INIT(.capacity)  CAPACITY__ropsigcfgcommand,
@@ -130,11 +130,11 @@ EO_VERIFYproposition(eocfg_nvsep_mn_comm, ( (OFFSETafter__ropsigcfgcommand) == s
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
 
-extern const eo_cfg_nvsEP_mn_comm_t *eo_cfg_nvsEP_mn_comm_defaultvalue = &eo_cfg_nvsEP_mn_comm_default;
+const eo_cfg_nvsEP_mn_comm_t *eo_cfg_nvsEP_mn_comm_defaultvalue = &eo_cfg_nvsEP_mn_comm_default;
 
-//extern EOtreenode eo_cfg_nvsEP_mn_comm_tree_con[];
+//EOtreenode eo_cfg_nvsEP_mn_comm_tree_con[];
 
-extern EOtreenode eo_cfg_nvsEP_mn_comm_tree_con[] =
+EOtreenode eo_cfg_nvsEP_mn_comm_tree_con[] =
 {              
     {   // 00
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mn_comm__ropsigcfgcommand,
@@ -154,10 +154,10 @@ const EOconstvector  s_eo_cfg_nvsEP_mn_comm_constvector_of_treenodes_EOnv_con =
 };
 
 
-extern const EOconstvector* const eo_cfg_nvsEP_mn_comm_constvector_of_treenodes_EOnv_con = &s_eo_cfg_nvsEP_mn_comm_constvector_of_treenodes_EOnv_con;
+const EOconstvector* const eo_cfg_nvsEP_mn_comm_constvector_of_treenodes_EOnv_con = &s_eo_cfg_nvsEP_mn_comm_constvector_of_treenodes_EOnv_con;
 
 
-extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_mn_comm_fnptr_hashfunction_id2index = eo_cfg_nvsEP_mn_comm_hashfunction_id2index;
+const eOuint16_fp_uint16_t eo_cfg_nvsEP_mn_comm_fnptr_hashfunction_id2index = eo_cfg_nvsEP_mn_comm_hashfunction_id2index;
 
 
 // --------------------------------------------------------------------------------------------------------------------

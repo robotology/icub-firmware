@@ -103,7 +103,8 @@
 extern void eo_cfg_nvsEP_as_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
 {
     eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
-    uint16_t s, m;
+    //uint16_t s, m;
+    theOwnershipIsLocal = theOwnershipIsLocal;
 
 #if 0    
     eo_cfg_nvsEP_as_wholebody_t *lloc = (eo_cfg_nvsEP_as_wholebody_t*)loc;
@@ -132,7 +133,7 @@ extern void eo_cfg_nvsEP_as_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem
     }
 #endif
 
-#warning --> to rewrite teh example ....    
+#warning --> to rewrite the example ....    
     // nothing else ...
 
 }
@@ -142,8 +143,8 @@ extern void eo_cfg_nvsEP_as_usr_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem
 extern void eo_cfg_nvsEP_as_usr_hid_UPDT_Sxx_sconfig__datarate(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    eOipv4addr_t ip = nv->ip;
-    eOnvEP_t ep = nv->ep;
+    //eOipv4addr_t ip = nv->ip;
+    //eOnvEP_t ep = nv->ep;
 
     
     uint8_t milliseconds = 0;
@@ -176,8 +177,8 @@ extern void eo_cfg_nvsEP_as_usr_hid_UPDT_Sxx_sconfig__datarate(eOcfg_nvsEP_as_st
 extern void eo_cfg_nvsEP_as_usr_hid_UPDT_Sxx_sstatus__calibratedvalues(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    eOipv4addr_t ip = nv->ip;
-    eOnvEP_t ep = nv->ep;
+//    eOipv4addr_t ip = nv->ip;
+//    eOnvEP_t ep = nv->ep;
 
     
     eOsnsr_arrayofupto12bytes_t *calibratedvalues;
@@ -204,8 +205,11 @@ extern void eo_cfg_nvsEP_as_usr_hid_UPDT_Sxx_sstatus__calibratedvalues(eOcfg_nvs
         calibratedvalues = (eOsnsr_arrayofupto12bytes_t*) nv->rem;
         size = eo_array_Size((EOarray*)calibratedvalues);
         itemsize = eo_array_ItemSize((EOarray*)calibratedvalues); // must be 2 bytes.
+        size = size;
+        itemsize = itemsize;
         
         valueref = (uint16_t*) eo_array_At((EOarray*)calibratedvalues, 0); // the first of six values
+        valueref = valueref;
     }    
 }
 

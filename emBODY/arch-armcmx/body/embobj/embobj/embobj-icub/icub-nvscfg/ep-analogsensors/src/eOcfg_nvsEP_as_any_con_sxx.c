@@ -78,7 +78,7 @@
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
 
-extern const uint8_t eo_cfg_nvsEP_as_any_con_sxx_funtyp[] =
+const uint8_t eo_cfg_nvsEP_as_any_con_sxx_funtyp[] =
 {
     EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__mode,
     EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__datarate,

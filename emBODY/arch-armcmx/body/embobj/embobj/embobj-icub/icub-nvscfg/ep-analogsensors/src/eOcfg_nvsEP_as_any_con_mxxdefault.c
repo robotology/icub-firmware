@@ -72,7 +72,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern const eOsnsr_mais_t eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue =
+const eOsnsr_mais_t eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue =
 {
     EO_INIT(.mconfig)
     {

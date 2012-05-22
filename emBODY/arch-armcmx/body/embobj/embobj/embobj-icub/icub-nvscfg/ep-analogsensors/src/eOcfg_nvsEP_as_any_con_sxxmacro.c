@@ -91,7 +91,7 @@
 
 #define SOFFSETof_sconfig__mode                                        (SMACRO_OFF)
 #define SCAPACITY_sconfig__mode                                        sizeof(eOenum08_t)
-extern EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sconfig__mode) =
+EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sconfig__mode) =
 {   
  
     EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sconfig__mode, SMACRO_NUM),
@@ -105,7 +105,7 @@ extern EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sconfig__mode)
 
 #define SOFFSETof_sconfig__datarate                                        (SOFFSETafter_sconfig__mode)
 #define SCAPACITY_sconfig__datarate                                        sizeof(uint8_t)
-extern EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sconfig__datarate) =
+EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sconfig__datarate) =
 {   
  
     EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sconfig__datarate, SMACRO_NUM),
@@ -119,7 +119,7 @@ extern EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sconfig__datar
 
 #define SOFFSETof_sconfig__signaloncefullscale                                        (SOFFSETafter_sconfig__datarate)
 #define SCAPACITY_sconfig__signaloncefullscale                                        sizeof(eObool_t)
-extern EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sconfig__signaloncefullscale) =
+EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sconfig__signaloncefullscale) =
 {   
  
     EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sconfig__signaloncefullscale, SMACRO_NUM),
@@ -145,7 +145,7 @@ extern EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sconfig__signa
 
 #define SOFFSETof_sstatus__fullscale                                        (SOFFSETafter_sinputs_filler04)
 #define SCAPACITY_sstatus__fullscale                                        sizeof(eOsnsr_arrayofupto12bytes_t)
-extern EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sstatus__fullscale) =
+EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sstatus__fullscale) =
 {   
  
     EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sstatus__fullscale, SMACRO_NUM),
@@ -160,7 +160,7 @@ extern EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sstatus__fulls
 
 #define SOFFSETof_sstatus__calibratedvalues                                        (SOFFSETafter_sstatus__fullscale)
 #define SCAPACITY_sstatus__calibratedvalues                                        sizeof(eOsnsr_arrayofupto12bytes_t)
-extern EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sstatus__calibratedvalues) =
+EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sstatus__calibratedvalues) =
 {   
  
     EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sstatus__calibratedvalues, SMACRO_NUM),
@@ -174,7 +174,7 @@ extern EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sstatus__calib
 
 #define SOFFSETof_sstatus__uncalibratedvalues                                        (SOFFSETafter_sstatus__calibratedvalues)
 #define SCAPACITY_sstatus__uncalibratedvalues                                        sizeof(eOsnsr_arrayofupto12bytes_t)
-extern EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sstatus__uncalibratedvalues) =
+EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sstatus__uncalibratedvalues) =
 {   
  
     EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sstatus__uncalibratedvalues, SMACRO_NUM),

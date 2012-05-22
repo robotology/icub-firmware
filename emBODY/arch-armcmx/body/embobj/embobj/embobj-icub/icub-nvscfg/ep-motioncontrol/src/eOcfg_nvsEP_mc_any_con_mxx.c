@@ -78,7 +78,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern const uint8_t eo_cfg_nvsEP_mc_any_con_mxx_funtyp[] =
+const uint8_t eo_cfg_nvsEP_mc_any_con_mxx_funtyp[] =
 {
     EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig,
     EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__pidcurrent,
