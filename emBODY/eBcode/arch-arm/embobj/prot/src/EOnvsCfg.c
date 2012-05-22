@@ -354,8 +354,8 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
                                     (*theendpoint)->endpoint,
                                     tmpnvcon,
                                     (EOnv_usr_t*) eo_constvector_At((*theendpoint)->thenvs_usr, k),
-                                    (void*) u8ptrvol[tmpnvcon->offset],
-                                    (eo_nvscfg_ownership_remote == (*thedev)->ownership) ? ( (void*) u8ptrrem[tmpnvcon->offset] ) : (NULL),
+                                    (void*) (&u8ptrvol[tmpnvcon->offset]),
+                                    (eo_nvscfg_ownership_remote == (*thedev)->ownership) ? ( (void*) (&u8ptrrem[tmpnvcon->offset]) ) : (NULL),
                                     //(eo_nvscfg_ownership_remote == (*thedev)->ownership) ? ((void*) ((uint32_t)((*theendpoint)->thenvs_rem) + tmpnvcon->offset)) : (NULL),
                                     (*theendpoint)->mtx_endpoint,
                                     p->storage
