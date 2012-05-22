@@ -23,7 +23,6 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-#include "icub/api/EoMotionControl.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -54,13 +53,33 @@ typedef struct EOpid_hid EOpid;
     @return     The pointer to the required object.
  **/
 extern EOpid* eo_pid_New(void);
-extern void eo_pid_Configure(EOpid *o, eOmc_PID_t *c);
-extern eObool_t eo_pid_IsConfigured(EOpid *o);
-extern float eo_pid_GetOffset(EOpid *o);
 
+
+/** @fn         extern void eo_pid_Init(EOpid *o, float Kp, float Kd, float Ki, float Ymax)
+    @brief      Sets PID gain parameters and output limit.   
+    @param      o     The pointer to the pid object.
+    @param      Kp    The proportional gain.         
+    @param      Kd    The derivative gain.
+    @param      Ki    The integrative gain.
+    @param      Ko    The constant offset.
+    @param      Ymax  The output maximum value.
+ **/
+extern void eo_pid_Init(EOpid *o, float Kp, float Ki, float Kd, float Ko, float Ymax, float Imax);
+extern void eo_pid_SetPid(EOpid *o, float Kp, float Ki, float Kd, float Ymax, float Imax);
+extern void eo_pid_SetMaxOutput(EOpid *o, float Ymax);
+extern void eo_pid_SetOffset(EOpid *o, float Ko);
+extern float eo_pid_GetOffset(EOpid *o);
 extern void eo_pid_GetStatus(EOpid *o, float *pwm, float *err);
+
+extern uint8_t eo_pid_IsInitialized(EOpid *o);
 extern void eo_pid_Reset(EOpid *o);
 
+/** @fn         extern float eo_pid_PWM(EOpid *o, float En)
+    @brief      Executes a PID control step.
+    @param      o  The pointer to the pid object.
+    @param      En The error between measure and setpoint.
+    @return     The actual PWM output value.
+ **/
 extern float eo_pid_PWM(EOpid *o, float En);
 
 /** @}            

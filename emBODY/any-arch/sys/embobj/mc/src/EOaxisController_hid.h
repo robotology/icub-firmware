@@ -29,9 +29,8 @@ extern "C" {
 
 #define eo_axisController_GetPosPidPtr_hid(axis_controller) (axis_controller->pidP)
 #define eo_axisController_GetTrqPidPtr_hid(axis_controller) (axis_controller->pidT)
-#define eo_axisController_IsCalibrated_hid(axis_controller) (axis_controller->is_calibrated)
 
-#define eo_axisController_ReadEncPos_hid(axis_controller, encpos) axis_controller->encpos_meas = (encpos - axis_controller->enc_offset)
+#define eo_axisController_ReadEncPos_hid(axis_controller, encpos) axis_controller->encpos_meas = encpos
 #define eo_axisController_ReadTorque_hid(axis_controller, torque) axis_controller->torque_meas = torque
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
@@ -52,7 +51,7 @@ struct EOaxisController_hid
     // axis limits
     float pos_min;
     float pos_max;
-    //float vel_max;
+    float vel_max;
     
     // measures (read only)
     float encpos_meas;
@@ -79,14 +78,6 @@ struct EOaxisController_hid
     // parameters
     float stiffness;
     float damping;
-
-    float enc_offset;
-    //float home;
-
-    eObool_t is_configured;
-    eObool_t is_calibrated;
-
-    eObool_t calibrating;
 
     uint8_t control_mode;
 }; 
