@@ -291,6 +291,7 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
     EOnv tmpnv;
     EOnv_con_t* tmpnvcon = NULL;
 
+
  	if(NULL == p) 
 	{
 		return(eores_NOK_nullpointer); 
@@ -345,15 +346,17 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
             {
                 treenode = (EOtreenode*) eo_constvector_At((*theendpoint)->thetreeofnvs_con, k);
                 tmpnvcon = (EOnv_con_t*) eo_treenode_GetData(treenode);
+                uint8_t *u8ptrvol = (uint8_t*) (*theendpoint)->thenvs_vol;
+                uint8_t *u8ptrrem = (uint8_t*) (*theendpoint)->thenvs_rem;
 
-#warning --> on 64bit architecture the void* is 8 bytes .... verify if the code in here can be modified to be warning free.                
                 eo_nv_hid_Load(     &tmpnv,
                                     (*thedev)->ipaddress,
                                     (*theendpoint)->endpoint,
                                     tmpnvcon,
                                     (EOnv_usr_t*) eo_constvector_At((*theendpoint)->thenvs_usr, k),
-                                    (void*) (((uint32_t)((*theendpoint)->thenvs_vol)) + tmpnvcon->offset),
-                                    (eo_nvscfg_ownership_remote == (*thedev)->ownership) ? ((void*) ((uint32_t)((*theendpoint)->thenvs_rem) + tmpnvcon->offset)) : (NULL),
+                                    (void*) u8ptrvol[tmpnvcon->offset],
+                                    (eo_nvscfg_ownership_remote == (*thedev)->ownership) ? ( (void*) u8ptrrem[tmpnvcon->offset] ) : (NULL),
+                                    //(eo_nvscfg_ownership_remote == (*thedev)->ownership) ? ((void*) ((uint32_t)((*theendpoint)->thenvs_rem) + tmpnvcon->offset)) : (NULL),
                                     (*theendpoint)->mtx_endpoint,
                                     p->storage
                               );

@@ -482,8 +482,7 @@ static void s_eo_transmitter_list_updaterop_in_ropframe(void *item, void *param)
     // if it has a time field ... copy from the current time to the ropstream
     if(EOK_uint16dummy != inside->timeoffsetinsiderop)
     {
-#warning --> on 64bit architecture the pointer is 8 bytes .... verify if the code in here can be modified to be warning free.         
-        eOabstime_t *time = (eOabstime_t*) ((uint32_t)((uint32_t)origofrop+inside->timeoffsetinsiderop));
+        eOabstime_t *time = (eOabstime_t*) (&origofrop[inside->timeoffsetinsiderop]);
         //*time = p->currenttime;
         memcpy(time, &p->currenttime, sizeof(eOabstime_t));
     }
