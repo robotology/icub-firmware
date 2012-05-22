@@ -217,7 +217,7 @@ extern eOresult_t eo_emsCanNetTopo_GetMotorId_ByMotorCanLocation(EOemsCanNetTopo
 }
 
 
-extern eOresult_t eo_emsCanNetTopo_GetSensorId_ByMotorCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_sensorCanLocation_t *location_ptr, eOsnsr_sensorId_t *sId_ptr)
+extern eOresult_t eo_emsCanNetTopo_GetSensorId_BySensorCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_sensorCanLocation_t *location_ptr, eOsnsr_sensorId_t *sId_ptr)
 {
 
     eo_emsCanNetTopo_hashTbl_s_item_t *item_ptr;
@@ -237,7 +237,7 @@ extern eOresult_t eo_emsCanNetTopo_GetSensorId_ByMotorCanLocation(EOemsCanNetTop
 }
 
 
-extern eOresult_t eo_emsCanNetTopo_GetConnectedJoints(EOemsCanNetTopo *p, EOfifoByte *connectedJointsList)
+extern eOresult_t eo_emsCanNetTopo_GetConnectedJoints(EOemsCanNetTopo *p, EOfifoWord *connectedJointsList)
 {
     eOsizecntnr_t size;
     uint8_t i;
@@ -259,13 +259,13 @@ extern eOresult_t eo_emsCanNetTopo_GetConnectedJoints(EOemsCanNetTopo *p, EOfifo
 
     for(i=0; i< size; i++)
     {
-        eo_fifobyte_Put(connectedJointsList, jTInfo[i].id, 0);    
+        eo_fifoword_Put(connectedJointsList, jTInfo[i].id, 0);    
     }
 
     return(eores_OK);
 
 }
-extern eOresult_t eo_emsCanNetTopo_GetConnectedMotors(EOemsCanNetTopo *p, EOfifoByte *connectedMotorsList)
+extern eOresult_t eo_emsCanNetTopo_GetConnectedMotors(EOemsCanNetTopo *p, EOfifoWord *connectedMotorsList)
 {
     eOsizecntnr_t size;
     uint8_t i;
@@ -287,14 +287,14 @@ extern eOresult_t eo_emsCanNetTopo_GetConnectedMotors(EOemsCanNetTopo *p, EOfifo
 
     for(i=0; i< size; i++)
     {
-        eo_fifobyte_Put(connectedMotorsList, mTInfo[i].id, 0);    
+        eo_fifoword_Put(connectedMotorsList, mTInfo[i].id, 0);    
     }
 
     return(eores_OK);
 }
 
 
-extern eOresult_t eo_emsCanNetTopo_GetConnectedSensors(EOemsCanNetTopo *p, EOfifoByte *connectedSensorsList)
+extern eOresult_t eo_emsCanNetTopo_GetConnectedSensors(EOemsCanNetTopo *p, EOfifoWord *connectedSensorsList)
 {
     eOsizecntnr_t size;
     uint8_t i;
@@ -316,7 +316,7 @@ extern eOresult_t eo_emsCanNetTopo_GetConnectedSensors(EOemsCanNetTopo *p, EOfif
 
     for(i=0; i< size; i++)
     {
-        eo_fifobyte_Put(connectedSensorsList, sTInfo[i].id, 0);    
+        eo_fifoword_Put(connectedSensorsList, sTInfo[i].id, 0);    
     }
 
     return(eores_OK);
@@ -325,6 +325,76 @@ extern eOresult_t eo_emsCanNetTopo_GetConnectedSensors(EOemsCanNetTopo *p, EOfif
 }
 
 
+
+
+extern eOresult_t eo_emsCanNetTopo_GetConnectedSkin(EOemsCanNetTopo *p, EOfifoWord *connectedSkinList)
+{
+    eOsizecntnr_t size;
+    uint8_t i;
+
+    eo_emsCanNetTopo_sensorTopoInfo_t *skTInfo;
+    if((NULL == p) || (NULL == connectedSkinList))
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    //if no Motors are connected to this board return nok 
+    if((NULL == p->cfg.emsCanNetTopo_skin__ptr) || (0 == p->cfg.emsCanNetTopo_skin__ptr->size))
+    {
+        return(eores_NOK_nodata);
+    }
+
+    skTInfo = (eo_emsCanNetTopo_sensorTopoInfo_t *)p->cfg.emsCanNetTopo_skin__ptr->item_array_data;
+    size = p->cfg.emsCanNetTopo_skin__ptr->size;
+
+    for(i=0; i< size; i++)
+    {
+        eo_fifoword_Put(connectedSkinList, skTInfo[i].id, 0);    
+    }
+
+    return(eores_OK);
+
+}
+
+
+
+
+
+
+
+
+
+
+
+//extern eOresult_t eo_emsCanNetTopo_GetSkinCanPort(EOemsCanNetTopo *p, eOsk_skinId_t skId)
+//{
+//
+//
+//}
+
+extern eOresult_t eo_emsCanNetTopo_GetskinCanLocation_BySkinId(EOemsCanNetTopo *p, eOsk_skinId_t skId, 
+                                                               eo_emsCanNetTopo_sensorCanLocation_t *location_ptr)
+{
+    eo_emsCanNetTopo_sensorTopoInfo_t *sk_topoinfo_ptr = (eo_emsCanNetTopo_sensorTopoInfo_t*)(p->cfg.emsCanNetTopo_sensors__ptr->item_array_data);
+    if((NULL == p) || (NULL == location_ptr))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if( NULL == p->cfg.emsCanNetTopo_skin__ptr)
+    {
+        return(eores_NOK_nodata);
+    }
+
+    sk_topoinfo_ptr = (eo_emsCanNetTopo_sensorTopoInfo_t*)(p->cfg.emsCanNetTopo_skin__ptr->item_array_data);
+    location_ptr->emscanport = sk_topoinfo_ptr->canPort;
+
+    /*Note: board addres is meanless*/
+    location_ptr->canaddr = 0;
+
+    return(eores_OK);
+
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
