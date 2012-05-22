@@ -76,10 +76,16 @@
 static eOresult_t s_eo_nv_Set(const EOnv *netvar, const void *dat, void *dst, eOnvUpdate_t upd);
 static eOresult_t s_eo_nv_SetTS(const EOnv *nv, const void *dat, void *dst, eOnvUpdate_t upd, eOabstime_t time, uint32_t sign);
 
-EO_static_inline uint16_t s_eo_nv_array_get_size(void* data)
+EO_static_inline uint16_t s_eo_nv_array_get_size(void* data, uint16_t capacity)
 {
-    // 4 bytes are for teh capacity and the size fields, whcih are always present. head->size are the othres
-    return(eo_array_UsedBytes((EOarray*)data));    
+#define USECAPACITYFORARRAY
+
+#if     defined(USECAPACITYFORARRAY)
+    return(capacity);
+#else
+    // 4 bytes are for the capacity and the size fields, whcih are always present. head->size are the othres
+    return(eo_array_UsedBytes((EOarray*)data)); 
+#endif    
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -234,7 +240,7 @@ extern uint16_t eo_nv_Size(const EOnv *nv, const void *data)
     typisarray = (eo_nv_TYP_arr == nv->con->typ) ? (eobool_true) : (eobool_false);
     dat = (NULL != data) ? ((void*)data) : (nv->loc);
 
-    size = (eobool_false == typisarray) ? (nv->con->capacity) : (s_eo_nv_array_get_size(dat));
+    size = (eobool_false == typisarray) ? (nv->con->capacity) : (s_eo_nv_array_get_size(dat, nv->con->capacity));
        
     return(size);  
 }
@@ -262,7 +268,7 @@ extern eOresult_t eo_nv_Get(const EOnv *nv, eOnvStorage_t strg, void *data, uint
             eov_mutex_Take(nv->mtx, eok_reltimeINFINITE);
             source = nv->loc;
             //*size = (eobool_false == typisarray) ? (nv->con->capacity) : (2 + *((uint16_t*)source));
-            *size = (eobool_false == typisarray) ? (nv->con->capacity) : (s_eo_nv_array_get_size(source));
+            *size = (eobool_false == typisarray) ? (nv->con->capacity) : (s_eo_nv_array_get_size(source, nv->con->capacity));
             memcpy(data, source, *size); 
             eov_mutex_Release(nv->mtx);
             res = eores_OK;
@@ -272,7 +278,7 @@ extern eOresult_t eo_nv_Get(const EOnv *nv, eOnvStorage_t strg, void *data, uint
         {   // no need to protect as the data is read only
             source = (void*)nv->con->resetval;
             //*size = (eobool_false == typisarray) ? (nv->con->capacity) : (2 + *((uint16_t*)source));
-            *size = (eobool_false == typisarray) ? (nv->con->capacity) : (s_eo_nv_array_get_size(source));            
+            *size = (eobool_false == typisarray) ? (nv->con->capacity) : (s_eo_nv_array_get_size(source, nv->con->capacity));            
             memcpy(data, source, *size);
             res = eores_OK;
         } break;
@@ -400,7 +406,7 @@ extern eOresult_t eo_nv_remoteGet(const EOnv *nv, void *data, uint16_t *size)
 
     eov_mutex_Take(nv->mtx, eok_reltimeINFINITE);
     source = nv->rem;
-    *size = (eobool_false == typisarray) ? (nv->con->capacity) : (s_eo_nv_array_get_size(source));
+    *size = (eobool_false == typisarray) ? (nv->con->capacity) : (s_eo_nv_array_get_size(source, nv->con->capacity));
     memcpy(data, source, *size);
     eov_mutex_Release(nv->mtx);
 
@@ -704,7 +710,7 @@ static eOresult_t s_eo_nv_Set(const EOnv *nv, const void *dat, void *dst, eOnvUp
 
     typisarray = (eo_nv_TYP_arr == nv->con->typ) ? (eobool_true) : (eobool_false);
 
-    size = (eobool_false == typisarray) ? (eo_nv_hid_GetCAPACITY(nv)) : (s_eo_nv_array_get_size((void*)dat));
+    size = (eobool_false == typisarray) ? (eo_nv_hid_GetCAPACITY(nv)) : (s_eo_nv_array_get_size((void*)dat, eo_nv_hid_GetCAPACITY(nv)));
 
 
     memcpy(dst, dat, size);
@@ -746,7 +752,7 @@ static eOresult_t s_eo_nv_SetTS(const EOnv *nv, const void *dat, void *dst, eOnv
 
     typisarray = (eo_nv_TYP_arr == nv->con->typ) ? (eobool_true) : (eobool_false);
 
-    size = (eobool_false == typisarray) ? (eo_nv_hid_GetCAPACITY(nv)) : (s_eo_nv_array_get_size((void*)dat));
+    size = (eobool_false == typisarray) ? (eo_nv_hid_GetCAPACITY(nv)) : (s_eo_nv_array_get_size((void*)dat, eo_nv_hid_GetCAPACITY(nv)));
 
 
     memcpy(dst, dat, size);
