@@ -88,7 +88,7 @@ static EOtheAgent eo_theagent =
 };
 
 
-extern const eOagent_cfg_t eo_agent_cfg_default =
+const eOagent_cfg_t eo_agent_cfg_default =
 {
     EO_INIT(.on_rop_conf_received)      NULL, 
     EO_INIT(.on_rop_conf_requested)     NULL

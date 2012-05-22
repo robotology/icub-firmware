@@ -115,7 +115,7 @@ typedef const struct                // 12 bytes on arm
     uint16_t                        offset;   
     uint8_t                         typ;
     uint8_t                         fun;
- } EOnv_con_t;                      EO_VERIFYsizeof(EOnv_con_t, 12); 
+} EOnv_con_t;                       EO_VERIFYsizeof(EOnv_con_t, 12); 
 
 typedef const struct
 {

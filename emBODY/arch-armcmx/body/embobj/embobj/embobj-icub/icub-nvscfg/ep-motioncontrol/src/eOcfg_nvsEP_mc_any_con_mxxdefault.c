@@ -88,7 +88,7 @@ const eOmc_motor_t eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue =
         },
         EO_INIT(.maxvelocityofmotor)        0,
         EO_INIT(.maxcurrentofmotor)         0,
-        EO_INIT(.des02FORmstatuschamaleon04)   {EOUTIL_CHAMELEON_DESCRIPTOR_NONE, EOUTIL_CHAMELEON_DESCRIPTOR_NONE}
+        EO_INIT(.des02FORmstatuschamaleon04)   {{EOUTIL_CHAMELEON_DESCRIPTOR_SIZE_NONE,EOUTIL_CHAMELEON_DESCRIPTOR_IDEN_NONE}, {EOUTIL_CHAMELEON_DESCRIPTOR_SIZE_NONE, EOUTIL_CHAMELEON_DESCRIPTOR_IDEN_NONE}}
     },
     EO_INIT(.mstatus)                       {0}
 }; 
