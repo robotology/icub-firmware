@@ -99,7 +99,7 @@ extern "C" {
 #endif
 
 
-#define __emBODYportingVERIFYsizeof(sname, ssize)    typedef uint8_t GUARD##sname[ ( ssize == sizeof(sname) ) ? (1) : (0)];
+#define __emBODYportingVERIFYsizeof(sname, ssize)    typedef uint8_t GUARD##sname[ ( ssize == sizeof(sname) ) ? (1) : (-1)];
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
