@@ -119,6 +119,9 @@ extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_sk_emsboard_fptr_hashfunction_id2
 // the hash function
 extern uint16_t eo_cfg_nvsEP_sk_emsboard_hashfunction_id2index(uint16_t id);
 
+
+extern const eo_cfg_nvsEP_sk_emsboard_t *eo_cfg_nvsEP_sk_emsboard_defaultvalues;
+
 /** @}            
     end of group eo_werasfdgr234  
  **/
