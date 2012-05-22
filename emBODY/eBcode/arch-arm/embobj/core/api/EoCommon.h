@@ -91,11 +91,9 @@ extern "C" {
 #define EO_VERIFYsizeof(sname, ssize)       __emBODYportingVERIFYsizeof(sname, ssize)
 
 // issues a compiler error if the prop is false
-#define xstr(x) (x)
-//#define str(x) #x
 #define TOKENPASTE(x, y) x ## y
 #define TOKENPASTE2(x, y) TOKENPASTE(x, y)
-#define EO_VERIFYproposition(name, prop)    typedef uint8_t TOKENPASTE2(name, __LINE__)[ ( 0 == (prop) ) ? (0) : (1)];
+#define EO_VERIFYproposition(name, prop)    typedef uint8_t TOKENPASTE2(name, __LINE__)[ ( 0 == (prop) ) ? (-1) : (1)];
 
 
 #define EO_U8toU32(a)                       ((uint32_t)(a)&0xff)

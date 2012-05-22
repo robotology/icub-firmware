@@ -79,7 +79,7 @@ static EOnvsCfg* s_eo_hosttransceiver_nvscfg_get(const eOhosttransceiver_cfg_t *
 static const char s_eobj_ownname[] = "EOhostTransceiver";
  
 
-extern const eOhosttransceiver_cfg_t eo_hosttransceiver_cfg_default = 
+const eOhosttransceiver_cfg_t eo_hosttransceiver_cfg_default = 
 {
     EO_INIT(.vectorof_endpoint_cfg)     NULL,
     EO_INIT(.remoteboardipv4addr)       0,

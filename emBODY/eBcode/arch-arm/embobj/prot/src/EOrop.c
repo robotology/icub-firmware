@@ -56,7 +56,7 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern const eOropconfig_t eok_ropconfig_basic = 
+const eOropconfig_t eok_ropconfig_basic = 
 {
     EO_INIT(.confrqst)      eobool_false,
     EO_INIT(.timerqst)      eobool_false,
