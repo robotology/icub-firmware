@@ -163,7 +163,7 @@ static void s_eo_cfg_nvsEP_mngmnt_usr_ebx_generic_ropsigcfgcommand(eOmn_ropsigcf
     eo_transceiver_ropinfo_t ropinfo;
     EOtransceiver* theems00transceiver; 
     EOarray *array = (EOarray*)&ropsigcfgcmd->array;
-    eOmn_ropsigcfg_commandtype_t cmmnd = ropsigcfgcmd->cmmnd;
+    eOmn_ropsigcfg_commandtype_t cmmnd = (eOmn_ropsigcfg_commandtype_t)ropsigcfgcmd->cmmnd;
 
     eOresult_t res;
     
