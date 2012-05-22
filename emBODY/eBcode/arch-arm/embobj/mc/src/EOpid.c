@@ -39,7 +39,6 @@
 // empty-section
 
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
@@ -77,48 +76,62 @@ extern EOpid* eo_pid_New(void)
     if (o)
     {
         o->Ko = 0.0f;
-        o->A0 = 0.0f;
-        o->A1 = 0.0f;
-        o->A2 = 0.0f;
-        o->Yn = 0.0f;
-        o->En = 0.0f;
-        o->Dn = 0.0f;
-        o->pwm = 0.0f;
-        o->Ymax = 0.0f;
+        o->Kp = 0.0f;
+        o->Ki = 0.0f;
+        o->Kd = 0.0f;
 
-        o->configured = eobool_false;
+        o->En = 0.0f;        
+        o->In = 0.0f;
+        o->Dn = 0.0f;
+        
+        o->Ymax = 0.0f;
+        o->Imax = 0.0f;
+
+        o->pwm = 0.0f;
+
+        o->initialized = 0;
     }
 
     return o;
 }
 
-extern void eo_pid_Configure(EOpid *o, eOmc_PID_t *c)
+extern void eo_pid_Init(EOpid *o, float Kp, float Ki, float Kd, float Ko, float Ymax, float Imax)
 {
-    int8_t scale = c->scale;
+    o->Ko = Ko;
+    o->Kp = Kp;
+    o->Ki = Ki;
+    o->Kd = Kd;
 
-    float kp = c->kp>>scale;
-    float kd = c->kd>>scale;
-    float ki = c->ki>>scale;
-     
-    o->Ko =  c->offset;
+    o->En = 0.0f;
+    o->In = 0.0f;
+    o->Dn = 0.0f;
 
-    o->A2 = -0.1f*kd;
-    o->A1 = -kp + o->A2;
-    o->A0 =  kp + ki - o->A2;
+    o->Ymax = Ymax;
+    o->Imax = Imax;
 
-    o->Yn  = 0.0f;
-    o->En  = 0.0f;
-    o->Dn  = 0.0f;
     o->pwm = 0.0f;
-    
-    o->Ymax = c->limitonoutput;
 
-    o->configured = eobool_true;
+    o->initialized = 1;
 }
 
-extern eObool_t eo_pid_IsConfigured(EOpid *o)
+extern void eo_pid_SetPid(EOpid *o, float Kp, float Ki, float Kd, float Ymax, float Imax)
 {
-    return o->configured;
+    o->Kp = Kp;
+    o->Ki = Ki;
+    o->Kd = Kd;
+
+    o->Ymax = Ymax;
+    o->Imax = Imax; 
+}
+
+extern void eo_pid_SetMaxOutput(EOpid *o, float Ymax)
+{
+    o->Ymax = Ymax;
+}
+
+extern void eo_pid_SetOffset(EOpid *o, float Ko)
+{
+    o->Ko = Ko;
 }
 
 extern float eo_pid_GetOffset(EOpid *o)
@@ -132,33 +145,38 @@ extern void eo_pid_GetStatus(EOpid *o, float *pwm, float *err)
     *err = o->En;
 }
 
+extern uint8_t eo_pid_IsInitialized(EOpid *o)
+{
+    return o->initialized;
+}
+
 extern void eo_pid_Reset(EOpid *o)
 {
-    o->Yn = 0.0f;
+    o->In = 0.0f;
     o->En = 0.0f; 
     o->Dn = 0.0f; 
 }
 
 extern float eo_pid_PWM(EOpid *o, float En)
 {
-    o->Yn += o->A0 * En + o->A1 * o->En + o->A2 * o->Dn;
+    //if (En*o->En<0.0f) o->In = 0.0f;
+
+    o->pwm = o->Ko + o->Kp*En + o->In + o->Kd*o->Dn;
+    o->In += o->Ki*En;
+    if (o->In > o->Imax) 
+        o->In = o->Imax; 
+    else if (o->In< -o->Imax) 
+        o->In = -o->Imax;
     o->Dn = 0.9f*o->Dn + 0.1f*(En - o->En);
     o->En = En;
     
-    o->pwm = o->Ko + o->Yn;
-
     if (o->pwm > o->Ymax)
     {
-        o->Yn = o->Ymax - o->Ko;
-
-        return o->Ymax;
+        o->pwm = o->Ymax;
     }
-    
-    if (o->pwm < -o->Ymax)
+    else if (o->pwm < -o->Ymax)
     {
-        o->Yn = -o->Ymax - o->Ko;
-
-        return -o->Ymax;
+        o->pwm = -o->Ymax;
     }
 
     return o->pwm;

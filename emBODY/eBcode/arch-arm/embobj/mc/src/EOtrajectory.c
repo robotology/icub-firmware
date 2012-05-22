@@ -44,7 +44,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-
+extern int32_t strong_pos;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -156,7 +156,6 @@ extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, floa
     o->vi = v0;
 }
 
-
 /** @fn         extern float eo_trajectory_Step(EOtrajectory *o)
     @brief      Executes a trajectory step.
     @param      o               The pointer to the trajectory object.
@@ -199,6 +198,8 @@ extern void eo_trajectory_Step(EOtrajectory* o, float *pi, float *vi)
         o->pi = *pi = o->pf;
         o->vi = *vi = 0.0f;
 
+        strong_pos = (int32_t)*pi;
+
         return;
     }
        
@@ -213,14 +214,16 @@ extern void eo_trajectory_Step(EOtrajectory* o, float *pi, float *vi)
 
     o->Fi += o->Kf;
     
-    *pi = o->Fi + o->Ai*o->Zi;
+    strong_pos = (int32_t)o->pi;
+
+    *pi = o->pi;
+
+    o->pi = o->Fi + o->Ai*o->Zi;
     
     if (vi)
     {
-        o->vi = *vi = (*pi - o->pi) * FREQUENCY;
+        o->vi = *vi = (o->pi - *pi) * FREQUENCY;
     }
-
-    o->pi = *pi;    
 }
 
 // --------------------------------------------------------------------------------------------------------------------

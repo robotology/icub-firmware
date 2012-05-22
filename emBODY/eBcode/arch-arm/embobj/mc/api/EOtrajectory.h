@@ -65,6 +65,8 @@ extern EOtrajectory* eo_trajectory_New(void);
     @param      avg_speed  The average speed.
  **/
 extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, float v0, float speed);
+//extern void eo_trajectory_MoveReference(EOtrajectory *o, float p0, float pf, float v0, float speed);
+//extern void eo_trajectory_MoveReference(EOtrajectory *o, float pf, float speed);
 
 
 /** @fn         extern float eo_trajectory_Step(EOtrajectory *o)

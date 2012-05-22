@@ -51,9 +51,10 @@ extern "C" {
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef struct      // 16 bytes ... 
+typedef struct      // 24 bytes ... 
 {
     eOropcode_t     ropcode;
+    eOnvEP_t        nvep;
     eOnvID_t        nvid;
     uint16_t        capacity;       
     uint16_t        ropstarthere;   // the index where the rop starts inside teh ropframe. if data is available, then it is placed at ropstarthere+8
@@ -61,7 +62,7 @@ typedef struct      // 16 bytes ...
     uint16_t        timeoffsetinsiderop;     // if time is not present its value is 0xffff 
     void*           nvloc;          // the pointer to the where the real value of the nv is stored. if null, then the rop does not contain data (an ask for example)
     EOnv*           nv;
-} eo_transm_permrops_info_t;
+} eo_transm_permrops_info_t; EO_VERIFYsizeof(eo_transm_permrops_info_t, 24);
 
 
 /** @struct     EOtransmitter_hid

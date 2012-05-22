@@ -183,7 +183,9 @@ extern eOresult_t eo_transmitter_permanentrops_Load(EOtransmitter *p, eOropcode_
     
     permropinfo.ropcode = ropcode;
     permropinfo.nvid    = nvid;
+    permropinfo.nvep    = nvep;
     
+
     // search for ropcode+nvid if found, then ... return OK and dont do anything.
     if(NULL != eo_list_Find(p->listofpermropsinfo, s_eo_transmitter_listmatching_rule, &permropinfo))
     {   // it is already inside ...
@@ -447,7 +449,7 @@ static eOresult_t s_eo_transmitter_listmatching_rule(void *item, void *param)
     eo_transm_permrops_info_t *inside = (eo_transm_permrops_info_t*)item;
     eo_transm_permrops_info_t *target = (eo_transm_permrops_info_t*)param;
     
-    if((inside->nvid == target->nvid) && (inside->ropcode == target->ropcode))
+    if((inside->nvid == target->nvid) && (inside->nvep == target->nvep) && (inside->ropcode == target->ropcode))
     {
         return(eores_OK);
     }
