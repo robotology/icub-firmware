@@ -123,10 +123,6 @@ extern eOresult_t eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_t 
         return(eores_NOK_nullpointer);
     }
 
-    /* Since skin messages will not place in a new icub-can-proto-class-message, 
-       i use canport_rx to distinguish them from sensor board nessages
-    */
-    //PUT HERE FUNC TO MANAGE SKIN'S MESSAGES!!!
     //return(eov_canProto_ParseCanFrame(p, frame, canPortRX));
     //use this in oreder to remove overhead
     return(s_eo_icubCanProto_ParseCanFrame(p, frame, canPortRX));
@@ -154,6 +150,30 @@ extern eOresult_t eo_icubCanProto_FormCanFrame(EOicubCanProto* p,
                                           *((eo_canProto_msgDestination_t*)&dest),
                                           value, frame));
 }
+
+
+
+extern eOresult_t eo_icubCanProto_ParseSkinCanFrame(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPortRX)
+{
+    const EOconstLookupTbl                             *tbl;
+    eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  *itemList;
+ 
+    if((NULL == p) || (NULL == frame))
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    tbl = s_eo_icubCanProto_LUTbl_GetParserTbl(p, eo_icubCanProto_msgCmdClass_skinBoard);
+
+    if(NULL == tbl)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    itemList = (eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t*)tbl->itemsList;
+    return(itemList[0].parser(p, frame, canPortRX));
+
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -171,9 +191,26 @@ static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_
     eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  *itemList;
     eo_icubCanProto_msgCommand_cmdId_t                  cmdId;
     eo_icubCanProto_msgCommand_class_t                  msgClass;
+    eo_emsCanNetTopo_sensorCanLocation_t                canLoc;
+    eOresult_t                                          res;
 
 
+#ifdef SKIN_IS_CONNECTED 
+
+    res = eo_emsCanNetTopo_GetskinCanLocation_BySkinId(p->emsCanNetTopo_ptr, 0, &canLoc);
+        
+    if((eores_OK == res) && (canPortRX == canLoc.emscanport))
+    {
+        msgClass = eo_icubCanProto_msgCmdClass_skinBoard;
+    }
+    else
+    {
+        msgClass = eo_icubCanProto_hid_getMsgClassFromFrameId(frame->id);    
+    }
+#else
     msgClass = eo_icubCanProto_hid_getMsgClassFromFrameId(frame->id);
+#endif
+
 
     tbl = s_eo_icubCanProto_LUTbl_GetParserTbl(p, msgClass);
 
