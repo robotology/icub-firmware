@@ -76,7 +76,7 @@
 
 //static const char s_eobj_ownname[] = "EOreceiver";
 
-extern const eo_receiver_cfg_t eo_receiver_cfg_default = 
+const eo_receiver_cfg_t eo_receiver_cfg_default = 
 {
     EO_INIT(.capacityofropframereply)   256, 
     EO_INIT(.capacityofropinput)        128, 

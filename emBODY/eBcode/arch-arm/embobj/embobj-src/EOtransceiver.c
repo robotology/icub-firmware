@@ -78,7 +78,7 @@
 
 //static const char s_eobj_ownname[] = "EOtransceiver";
 
-extern const eo_transceiver_cfg_t eo_transceiver_cfg_default = 
+const eo_transceiver_cfg_t eo_transceiver_cfg_default = 
 {
     EO_INIT(.capacityofpacket)              512, 
     EO_INIT(.capacityofrop)                 128, 
