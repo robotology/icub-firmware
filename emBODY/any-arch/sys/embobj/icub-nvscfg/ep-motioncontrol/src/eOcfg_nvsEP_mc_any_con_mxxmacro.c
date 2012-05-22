@@ -91,7 +91,7 @@
 
 #define OFFSETof_mconfig                                        (MMACRO_MOFF)
 #define CAPACITY_mconfig                                         sizeof(eOmc_motor_config_t)
-extern EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mconfig) =
+EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mconfig) =
 {   
  
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mconfig, MMACRO_MNUM),
@@ -107,7 +107,7 @@ extern EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mconfig) =
 
 #define OFFSETof_mconfig__pidcurrent                            (OFFSETof_mconfig)
 #define CAPACITY_mconfig__pidcurrent                            sizeof(eOmc_PID_t)
-extern EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mconfig__pidcurrent) =
+EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mconfig__pidcurrent) =
 {   
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mconfig__pidcurrent, MMACRO_MNUM), 
     EO_INIT(.capacity)  CAPACITY_mconfig__pidcurrent,
@@ -122,7 +122,7 @@ extern EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mconfig__pidc
 
 #define OFFSETof_mconfig__maxvelocityofmotor                    (OFFSETafter_mconfig__pidcurrent)
 #define CAPACITY_mconfig__maxvelocityofmotor                    sizeof(eOmeas_velocity_t)
-extern EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mconfig__maxvelocityofmotor) =
+EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mconfig__maxvelocityofmotor) =
 {   
     //EO_INIT(.id)        EOK_cfg_nvsEP_mc_NVID_mconfig__maxvelocityofmotor(MMACRO_MNUM),  
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mconfig__maxvelocityofmotor, MMACRO_MNUM),    
@@ -137,7 +137,7 @@ extern EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mconfig__maxv
 
 #define OFFSETof_mconfig__maxcurrentofmotor                    (OFFSETafter_mconfig__maxvelocityofmotor)
 #define CAPACITY_mconfig__maxcurrentofmotor                    sizeof(eOmeas_current_t)
-extern EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mconfig__maxcurrentofmotor) =
+EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mconfig__maxcurrentofmotor) =
 {   
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mconfig__maxcurrentofmotor, MMACRO_MNUM),    
     EO_INIT(.capacity)  CAPACITY_mconfig__maxcurrentofmotor,
@@ -151,7 +151,7 @@ extern EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mconfig__maxc
 
 #define OFFSETof_mconfig__des02FORmstatuschamaleon04            (OFFSETafter_mconfig__maxcurrentofmotor)
 #define CAPACITY_mconfig__des02FORmstatuschamaleon04            (2*sizeof(eOutil_chameleon_descr_t))
-extern EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mconfig__des02FORmstatuschamaleon04) =
+EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mconfig__des02FORmstatuschamaleon04) =
 {   
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mconfig__des02FORmstatuschamaleon04, MMACRO_MNUM),    
     EO_INIT(.capacity)  CAPACITY_mconfig__des02FORmstatuschamaleon04,
@@ -169,7 +169,7 @@ MMACRO_VERIFYSIZEOF(MMACRO_MNUM, eOmc_motor_config_t, OFFSETafter_mconfig__des02
 
 #define OFFSETof_mstatus                                        (OFFSETafter_mconfig)
 #define CAPACITY_mstatus                                        sizeof(eOmc_motor_status_t)
-extern EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mstatus) =
+EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mstatus) =
 {   
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mstatus, MMACRO_MNUM),
     EO_INIT(.capacity)  CAPACITY_mstatus,
@@ -183,7 +183,7 @@ extern EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mstatus) =
 
 #define OFFSETof_mstatus__basic                                        (OFFSETafter_mconfig)
 #define CAPACITY_mstatus__basic                                        sizeof(eOmc_motor_status_basic_t)
-extern EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mstatus__basic) =
+EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mstatus__basic) =
 {   
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mstatus__basic, MMACRO_MNUM),
     EO_INIT(.capacity)  CAPACITY_mstatus__basic,
@@ -197,7 +197,7 @@ extern EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mstatus__basi
 
 #define OFFSETof_mstatus__chamaleon04                                        (OFFSETafter_mstatus__basic)
 #define CAPACITY_mstatus__chamaleon04                                        (4)
-extern EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mstatus__chamaleon04) =
+EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mstatus__chamaleon04) =
 {   
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mstatus__chamaleon04, MMACRO_MNUM),
     EO_INIT(.capacity)  CAPACITY_mstatus__chamaleon04,

@@ -160,9 +160,9 @@ static const EOconstvector s_eo_cfg_EPs_vectorof_eb7 =
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern const EOconstvector* const eo_cfg_EPs_vectorof_eb7 = &s_eo_cfg_EPs_vectorof_eb7;
+const EOconstvector* const eo_cfg_EPs_vectorof_eb7 = &s_eo_cfg_EPs_vectorof_eb7;
 
-extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb7_fptr_hashfunction_ep2index = s_eo_cfg_nvsEP_eb7_hashfunction_ep2index;
+const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb7_fptr_hashfunction_ep2index = s_eo_cfg_nvsEP_eb7_hashfunction_ep2index;
 
 
 

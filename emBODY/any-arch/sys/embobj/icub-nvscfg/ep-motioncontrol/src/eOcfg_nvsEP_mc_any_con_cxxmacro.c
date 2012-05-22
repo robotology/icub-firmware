@@ -91,7 +91,7 @@
 
 #define OFFSETof_cconfig                                        (CMACRO_COFF)
 #define CAPACITY_cconfig                                         sizeof(eOmc_controller_config_t)
-extern EOnv_con_t CMACRO_NAMEOFVARIABLE(CMACRO_PSTR, CMACRO_CSTR, _cconfig) =
+EOnv_con_t CMACRO_NAMEOFVARIABLE(CMACRO_PSTR, CMACRO_CSTR, _cconfig) =
 {   
  
     EO_INIT(.id)        CMACRO_GETNVID(CMACRO_EXTERNALPREFIX_GETID, _cconfig, CMACRO_CNUM),
@@ -108,7 +108,7 @@ extern EOnv_con_t CMACRO_NAMEOFVARIABLE(CMACRO_PSTR, CMACRO_CSTR, _cconfig) =
 
 #define OFFSETof_cconfig__durationofctrlloop                            (OFFSETof_cconfig)
 #define CAPACITY_cconfig__durationofctrlloop                            sizeof(eOreltime_t)
-extern EOnv_con_t CMACRO_NAMEOFVARIABLE(CMACRO_PSTR, CMACRO_CSTR, _cconfig__durationofctrlloop) =
+EOnv_con_t CMACRO_NAMEOFVARIABLE(CMACRO_PSTR, CMACRO_CSTR, _cconfig__durationofctrlloop) =
 {   
     EO_INIT(.id)        CMACRO_GETNVID(CMACRO_EXTERNALPREFIX_GETID, _cconfig__durationofctrlloop, CMACRO_CNUM), 
     EO_INIT(.capacity)  CAPACITY_cconfig__durationofctrlloop,
@@ -130,7 +130,7 @@ extern EOnv_con_t CMACRO_NAMEOFVARIABLE(CMACRO_PSTR, CMACRO_CSTR, _cconfig__dura
 
 #define OFFSETof_cstatus                            (OFFSETafter_cconfig)
 #define CAPACITY_cstatus                            sizeof(eOmc_controller_status_t)
-extern EOnv_con_t CMACRO_NAMEOFVARIABLE(CMACRO_PSTR, CMACRO_CSTR, _cstatus) =
+EOnv_con_t CMACRO_NAMEOFVARIABLE(CMACRO_PSTR, CMACRO_CSTR, _cstatus) =
 {   
     EO_INIT(.id)        CMACRO_GETNVID(CMACRO_EXTERNALPREFIX_GETID, _cstatus, CMACRO_CNUM),    
     EO_INIT(.capacity)  CAPACITY_cstatus,
@@ -145,7 +145,7 @@ extern EOnv_con_t CMACRO_NAMEOFVARIABLE(CMACRO_PSTR, CMACRO_CSTR, _cstatus) =
 
 #define OFFSETof_cstatus__alljomoinitted            (OFFSETof_cstatus)
 #define CAPACITY_cstatus__alljomoinitted            (sizeof(eObool_t))
-extern EOnv_con_t CMACRO_NAMEOFVARIABLE(CMACRO_PSTR, CMACRO_CSTR, _cstatus__alljomoinitted) =
+EOnv_con_t CMACRO_NAMEOFVARIABLE(CMACRO_PSTR, CMACRO_CSTR, _cstatus__alljomoinitted) =
 {   
     EO_INIT(.id)        CMACRO_GETNVID(CMACRO_EXTERNALPREFIX_GETID, _cstatus__alljomoinitted, CMACRO_CNUM),    
     EO_INIT(.capacity)  CAPACITY_cstatus__alljomoinitted,
@@ -166,7 +166,7 @@ extern EOnv_con_t CMACRO_NAMEOFVARIABLE(CMACRO_PSTR, CMACRO_CSTR, _cstatus__allj
 
 #define OFFSETof_ccmmnds__go2stateofcontroller                                        (OFFSETafter_cstatus)
 #define CAPACITY_ccmmnds__go2stateofcontroller                                        sizeof(eOenum08_t)
-extern EOnv_con_t CMACRO_NAMEOFVARIABLE(CMACRO_PSTR, CMACRO_CSTR, _ccmmnds__go2stateofcontroller) =
+EOnv_con_t CMACRO_NAMEOFVARIABLE(CMACRO_PSTR, CMACRO_CSTR, _ccmmnds__go2stateofcontroller) =
 {   
     EO_INIT(.id)        CMACRO_GETNVID(CMACRO_EXTERNALPREFIX_GETID, _ccmmnds__go2stateofcontroller, CMACRO_CNUM),
     EO_INIT(.capacity)  CAPACITY_ccmmnds__go2stateofcontroller,
