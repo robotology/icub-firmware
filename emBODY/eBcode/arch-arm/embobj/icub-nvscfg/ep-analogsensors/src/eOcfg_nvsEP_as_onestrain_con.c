@@ -151,7 +151,7 @@ static uint16_t s_hash(uint16_t id);
 
 
 
-extern EOtreenode eo_cfg_nvsEP_as_onestrain_tree_con[] =
+EOtreenode eo_cfg_nvsEP_as_onestrain_tree_con[] =
 {
     // strain s00
     {   // 0
@@ -249,10 +249,10 @@ const EOconstvector  s_eo_cfg_nvsEP_as_onestrain_constvector_of_treenodes_EOnv_c
 };
 
 
-extern const EOconstvector* const eo_cfg_nvsEP_as_onestrain_constvector_of_treenodes_EOnv_con = &s_eo_cfg_nvsEP_as_onestrain_constvector_of_treenodes_EOnv_con;
+const EOconstvector* const eo_cfg_nvsEP_as_onestrain_constvector_of_treenodes_EOnv_con = &s_eo_cfg_nvsEP_as_onestrain_constvector_of_treenodes_EOnv_con;
 
 
-extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_as_onestrain_fptr_hashfunction_id2index = eo_cfg_nvsEP_as_onestrain_hashfunction_id2index;
+const eOuint16_fp_uint16_t eo_cfg_nvsEP_as_onestrain_fptr_hashfunction_id2index = eo_cfg_nvsEP_as_onestrain_hashfunction_id2index;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -311,8 +311,8 @@ extern uint16_t eo_cfg_nvsEP_as_onestrain_hashfunction_id2index(uint16_t id)
 
 
 
-typedef uint8_t sdfg[ ( EOK_cfg_nvsEP_as_any_con_sxx_maxnumof_nvs_in_strain == 16 ) ? (1) : (0)];
-typedef uint8_t redf[ ( EOK_cfg_nvsEP_as_any_con_mxx_maxnumof_nvs_in_mais == 16 ) ? (1) : (0)];
+EO_VERIFYproposition(xxx, ( EOK_cfg_nvsEP_as_any_con_sxx_maxnumof_nvs_in_strain == 16 ) );
+EO_VERIFYproposition(xxx, ( EOK_cfg_nvsEP_as_any_con_mxx_maxnumof_nvs_in_mais == 16 ) );
 
 static uint16_t s_hash(uint16_t id)
 {

@@ -72,7 +72,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern const eOsnsr_strain_t eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue =
+const eOsnsr_strain_t eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue =
 {
     EO_INIT(.sconfig)
     {

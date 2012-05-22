@@ -91,7 +91,7 @@
 
 #define MOFFSETof_mconfig__mode                                        (MMACRO_OFF)
 #define MCAPACITY_mconfig__mode                                        sizeof(eOenum08_t)
-extern EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mconfig__mode) =
+EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mconfig__mode) =
 {   
  
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mconfig__mode, MMACRO_NUM),
@@ -105,7 +105,7 @@ extern EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mconfig__mode)
 
 #define MOFFSETof_mconfig__datarate                                        (MOFFSETafter_mconfig__mode)
 #define MCAPACITY_mconfig__datarate                                        sizeof(uint8_t)
-extern EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mconfig__datarate) =
+EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mconfig__datarate) =
 {   
  
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mconfig__datarate, MMACRO_NUM),
@@ -119,7 +119,7 @@ extern EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mconfig__datar
 
 #define MOFFSETof_mconfig__resolution                                        (MOFFSETafter_mconfig__datarate)
 #define MCAPACITY_mconfig__resolution                                        sizeof(eOenum08_t)
-extern EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mconfig__resolution) =
+EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mconfig__resolution) =
 {   
  
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mconfig__resolution, MMACRO_NUM),
@@ -145,7 +145,7 @@ extern EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mconfig__resol
 
 #define MOFFSETof_mstatus__the15values                                        (MOFFSETafter_minputs_filler04)
 #define MCAPACITY_mstatus__the15values                                        sizeof(eOsnsr_arrayofupto36bytes_t)
-extern EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mstatus__the15values) =
+EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mstatus__the15values) =
 {   
  
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mstatus__the15values, MMACRO_NUM),

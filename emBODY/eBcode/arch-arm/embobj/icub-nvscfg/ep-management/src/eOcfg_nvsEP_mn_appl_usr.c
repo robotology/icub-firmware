@@ -139,7 +139,7 @@ const EOconstvector  s_eo_cfg_nvsEP_mn_appl_usr_constvector_of_EOnv_usr =
 };
 
 
-extern const EOconstvector* const eo_cfg_nvsEP_mn_appl_usr_constvector_of_EOnv_usr = &s_eo_cfg_nvsEP_mn_appl_usr_constvector_of_EOnv_usr;
+const EOconstvector* const eo_cfg_nvsEP_mn_appl_usr_constvector_of_EOnv_usr = &s_eo_cfg_nvsEP_mn_appl_usr_constvector_of_EOnv_usr;
 
 
 

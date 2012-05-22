@@ -72,7 +72,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern const eOmc_joint_t eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue =
+const eOmc_joint_t eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue =
 {
     EO_INIT(.jconfig)             
     {
