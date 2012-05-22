@@ -44,8 +44,8 @@ extern "C" {
 /****************************************************************************/
 #define ICUBCANPROTO_CLASS_POLLING_MOTORBOARD    			0x00
 #define ICUBCANPROTO_CLASS_PERIODIC_MOTORBOARD   			0x01
-#define ICUBCANPROTO_CLASS_POLLING_SENSBOARD     			0x02
-#define ICUBCANPROTO_CLASS_PERIODIC_SENSBOARD    			0x03
+#define ICUBCANPROTO_CLASS_POLLING_SENSORBOARD     			0x02
+#define ICUBCANPROTO_CLASS_PERIODIC_SENSORBOARD    			0x03
 #define ICUBCANPROTO_CLASS_LOADER             			    0x07
 
 #define ICUBCANPROTO_CLASS_MAXNUM             			    0x05
@@ -234,6 +234,15 @@ ICUBCANPROTO_PER_SB_CMD_
 
 #define ICUBCANPROTO_PER_SB_CMD__CMD_MAXNUM         6
 
+
+
+
+/***************************************************************************/
+// command messages of class 4 ==> SKIN  
+/***************************************************************************/
+#define ICUBCANPROTO_POL_SK_CMD__TACT_SETUP         76
+
+
  
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
@@ -318,6 +327,7 @@ typedef enum
     eo_icubCanProto_msgCmdClass_periodicMotorBoard     = 1,
     eo_icubCanProto_msgCmdClass_pollingSensorBoard     = 2,
     eo_icubCanProto_msgCmdClass_periodicSensorBoard    = 3,
+    eo_icubCanProto_msgCmdClass_skinBoard              = 4, //ATTENTION: currently it is not used by other fw. Insert here to manage skin message like other calss messages.
     eo_icubCanProto_msgCmdClass_loader                 = 7    
 }eo_icubCanProto_msgCommand_class_t;
 
