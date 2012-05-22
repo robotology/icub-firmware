@@ -82,6 +82,7 @@ using namespace std;
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static void s_callback_button_0(void);
 static void s_callback_button_1(void);
 static void s_callback_button_2(void);
 static void s_callback_button_3(void);
@@ -245,7 +246,13 @@ int main(int argc, char *argv[])
 					case 'q':  	// quit
 						keepGoingOn = FALSE;
 						break;
-
+					case '0':
+						str[0]=0x01;
+						ACE_socket->send(str, 1, remote01.addr, flags);
+						sleep(1);
+						str[0]=0x02;
+						ACE_socket->send(str, 1, remote01.addr, flags);
+						break;
 					case '1':	//	send one ask rop
 						s_callback_button_1();
 						break;
@@ -356,6 +363,13 @@ void usage(void)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of callback functions
 // --------------------------------------------------------------------------------------------------------------------
+
+static void s_callback_button_0(void)
+{
+    char str[128];
+
+}
+
 
 static void s_callback_button_1(void)
 {
