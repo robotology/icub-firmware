@@ -91,7 +91,11 @@ extern "C" {
 #define EO_VERIFYsizeof(sname, ssize)       __emBODYportingVERIFYsizeof(sname, ssize)
 
 // issues a compiler error if the prop is false
-#define EO_VERIFYproposition(name, prop)    typedef uint8_t GUARD##name[ ( 0 == (prop) ) ? (0) : (1)];
+#define xstr(x) (x)
+//#define str(x) #x
+#define TOKENPASTE(x, y) x ## y
+#define TOKENPASTE2(x, y) TOKENPASTE(x, y)
+#define EO_VERIFYproposition(name, prop)    typedef uint8_t TOKENPASTE2(name, __LINE__)[ ( 0 == (prop) ) ? (0) : (1)];
 
 
 #define EO_U8toU32(a)                       ((uint32_t)(a)&0xff)
@@ -165,7 +169,6 @@ typedef uint8_t eObool_t;
     @brief      eOenum08_t contains a generic enum which must be contained in exactly 8 bit. It is a int8_t
  **/
 typedef emBODYporting_enum08_t eOenum08_t;
-
 
 /** @typedef    typedef uint8_t eOflags08_t
     @brief      eOflags08_t contains up to 8 flags 
