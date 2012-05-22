@@ -43,8 +43,9 @@ extern "C" {
 #include "EoBoards.h"
 #include "EoMotionControl.h"
 #include "EoSensors.h"
+#include "EoSkin.h"
 #include "EOconstvector.h"
-#include "EOfifoByte.h"
+#include "EOfifoWord.h"
 
 
 
@@ -98,6 +99,7 @@ typedef struct
     const EOconstvector* const emsCanNetTopo_joints__ptr;  /**< list of joints managed by an EMS board */
     const EOconstvector* const emsCanNetTopo_motors__ptr;  /**< list of motors managed by an EMS board */
     const EOconstvector* const emsCanNetTopo_sensors__ptr; /**< list of sensors managed by an EMS board */
+    const EOconstvector* const emsCanNetTopo_skin__ptr;    /**< list of skin managed by an EMS board */
 } eo_emsCanNetTopo_cfg_t;
 
 
@@ -115,7 +117,7 @@ typedef struct
     uint8_t                 axis;
     eOcanport_t             canPort;
     eObrd_types_t           boardType;
-    uint32_t                id; //motor or joint id
+    uint16_t                id;         //it must be complient with eOmc_jointId_t and eOmc_motorId_t
 } eo_emsCanNetTopo_jointOrMotorTopoInfo_t;
 
 typedef struct
@@ -123,7 +125,7 @@ typedef struct
     uint8_t                 boardAddr;
     eOcanport_t             canPort;
     eObrd_types_t           boardType;
-    uint32_t                id; //sensor id
+    uint16_t                id;         //it must be complient with eOmc_sensorId_t and eOmc_skinId_t
 } eo_emsCanNetTopo_sensorTopoInfo_t;
 
 
@@ -145,18 +147,22 @@ extern eOresult_t eo_emsCanNetTopo_GetMotorCanLocation_ByMotorId(EOemsCanNetTopo
 extern eOresult_t eo_emsCanNetTopo_GetSensorCanLocation_BySensorId(EOemsCanNetTopo *p, eOsnsr_sensorId_t sId, 
                                                                         eo_emsCanNetTopo_sensorCanLocation_t *location_ptr, eObrd_types_t *boardType);
 
+extern eOresult_t eo_emsCanNetTopo_GetskinCanLocation_BySkinId(EOemsCanNetTopo *p, eOsk_skinId_t skId, eo_emsCanNetTopo_sensorCanLocation_t *location_ptr);
+
 
 
 extern eOresult_t eo_emsCanNetTopo_GetJointId_ByJointCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eOmc_jointId_t *jId_ptr);
 
 extern eOresult_t eo_emsCanNetTopo_GetMotorId_ByMotorCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_jointOrMotorCanLocation_t *location_ptr, eOmc_motorId_t *mId_ptr);
 
-extern eOresult_t eo_emsCanNetTopo_GetSensorId_ByMotorCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_sensorCanLocation_t *location_ptr, eOsnsr_sensorId_t *sId_ptr);
+extern eOresult_t eo_emsCanNetTopo_GetSensorId_BySensorCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_sensorCanLocation_t *location_ptr, eOsnsr_sensorId_t *sId_ptr);
 
 
-extern eOresult_t eo_emsCanNetTopo_GetConnectedJoints(EOemsCanNetTopo *p, EOfifoByte *connectedJointsList);
-extern eOresult_t eo_emsCanNetTopo_GetConnectedMotors(EOemsCanNetTopo *p, EOfifoByte *connectedMotorsList);
-extern eOresult_t eo_emsCanNetTopo_GetConnectedSensors(EOemsCanNetTopo *p, EOfifoByte *connectedSensorsList);
+extern eOresult_t eo_emsCanNetTopo_GetConnectedJoints(EOemsCanNetTopo *p, EOfifoWord *connectedJointsList);
+extern eOresult_t eo_emsCanNetTopo_GetConnectedMotors(EOemsCanNetTopo *p, EOfifoWord *connectedMotorsList);
+extern eOresult_t eo_emsCanNetTopo_GetConnectedSensors(EOemsCanNetTopo *p, EOfifoWord *connectedSensorsList);
+extern eOresult_t eo_emsCanNetTopo_GetConnectedSkin(EOemsCanNetTopo *p, EOfifoWord *connectedSkinList);
+
 
 
 /*VALE: aggiungi funzione che dato joint id ritorna il tipo di board che lo gestisce! idem per il kotor. puo' venire utile??*/

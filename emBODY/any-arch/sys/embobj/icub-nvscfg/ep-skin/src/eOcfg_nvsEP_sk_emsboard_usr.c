@@ -139,8 +139,17 @@ extern const EOconstvector* const eo_cfg_nvsEP_sk_emsboard_usr_constvector_of_EO
 
 extern void eo_cfg_nvsEP_sk_emsboard_usr_initialise(eOnvEP_t ep, void* loc, void* rem)
 {
+    eo_cfg_nvsEP_sk_emsboard_t *sk_ptr;
     eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
+	
+    // copy default values
+    if(NULL != loc)
+    {
+	sk_ptr = (eo_cfg_nvsEP_sk_emsboard_t*)loc;     
+        memcpy(sk_ptr, eo_cfg_nvsEP_sk_emsboard_defaultvalues, sizeof(eo_cfg_nvsEP_sk_emsboard_t));
+    }    
+   
     
     
     // launch a specialised initialisation
