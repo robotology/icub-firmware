@@ -769,6 +769,21 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>eo-mn-appl</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_nvsEP_mn_appl_con.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn_appl_con.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mn_appl_usr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-icub\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn_appl_usr.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>ep-mc-any</GroupName>
           <Files>
             <File>
@@ -797,9 +812,9 @@
               <FilePath>..\..\..\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_mxxdefault.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_nvsEP_mc_any_con_cxx .c</FileName>
+              <FileName>eOcfg_nvsEP_mc_any_con_cxx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_cxx .c</FilePath>
+              <FilePath>..\..\..\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_cxx.c</FilePath>
             </File>
             <File>
               <FileName>eOcfg_nvsEP_mc_any_con_cxxdefault.c</FileName>

@@ -645,6 +645,16 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>eo-sm-cfg-emsappl</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_sm_EMSappl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-cfg\eOcfg_sm_EMSappl.c</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -1283,6 +1293,16 @@
               <FileName>eOcfg_umlsm_Ex1.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\embobj\embobj-cfg\eOcfg_umlsm_Ex1.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-sm-cfg-emsappl</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_sm_EMSappl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\embobj\embobj-cfg\eOcfg_sm_EMSappl.c</FilePath>
             </File>
           </Files>
         </Group>
