@@ -119,6 +119,18 @@ extern eOresult_t eo_icubCanProto_FormCanFrame(EOicubCanProto* p,
                                                void *value,
                                                eOcanframe_t *frame);
 
+/** @fn         eeo_icubCanProto_ParseSkinCanFrame
+    @brief      Parse a reaceived can frame from skin board.
+                if the received frame is formatting in according with icub can protocol,
+                the object calls function call back memorized in lookup table.
+    @param      p               reference to the object
+    @param      frame           The received frame.  
+    @return     returns the result of function call back or eores_NOK_nullpointer
+                if frame or p are NULL.
+ **/
+extern eOresult_t eo_icubCanProto_ParseSkinCanFrame(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPortRX);
+
+
 
 // - doxy end ---------------------------------------------------------------------------------------------------------
 
