@@ -99,7 +99,9 @@ extern EOMtheEMSappl * eom_emsappl_GetHandle(void);
 
 
 extern EOsm* eom_emsappl_GetStateMachine(EOMtheEMSappl *p) ;
- 
+
+
+extern eOresult_t eom_emsappl_ProcessEvent(EOMtheEMSappl *p, eOsmEventsEMSappl_t ev);
  
 
 

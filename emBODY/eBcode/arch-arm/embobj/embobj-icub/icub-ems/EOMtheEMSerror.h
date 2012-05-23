@@ -99,7 +99,7 @@ extern EOMtheEMSerror * eom_emserror_Initialise(const eOemserror_cfg_t *emserror
 extern EOMtheEMSerror * eom_emserror_GetHandle(void);
 
 
-
+extern EOMtask * eom_emserror_GetTask(EOMtheEMSerror *p);
 
 
 

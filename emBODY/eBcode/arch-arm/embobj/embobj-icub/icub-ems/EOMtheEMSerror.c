@@ -37,7 +37,7 @@
 
 #include "EOVtheSystem.h"
 
-#include "EOsm.h"
+//#include "EOsm.h"
 
 #include "EOMtheEMSappl.h"
 
@@ -145,6 +145,16 @@ extern EOMtheEMSerror* eom_emserror_GetHandle(void)
     }
 }
 
+extern EOMtask * eom_emserror_GetTask(EOMtheEMSerror *p)
+{
+    if(NULL == p)
+    {
+        return(NULL);
+    }
+    
+    return(s_emserror_singleton.task);
+}
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -207,7 +217,8 @@ static void s_eom_emserror_task_run(EOMtask *p, uint32_t t)
     if(eobool_true == eo_common_event_check(evt, emserror_evt_error))
     {
         #warning ---> manage start of error....
-        eo_sm_ProcessEvent(eom_emsappl_GetStateMachine(eom_emsappl_GetHandle()), eo_sm_emsappl_EVgo2err); 
+        eom_emsappl_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2err);
+        //eo_sm_ProcessEvent(eom_emsappl_GetStateMachine(eom_emsappl_GetHandle()), eo_sm_emsappl_EVgo2err); 
     }
 }
 

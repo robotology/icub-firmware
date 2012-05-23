@@ -46,6 +46,8 @@
 
 #include "EOMtheEMSerror.h"
 
+#include "EOaction_hid.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -173,8 +175,7 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
        
     // finally ... start the state machine which enters in cfg mode    
     eo_sm_Start(s_emsappl_singleton.sm);
-    
-    
+        
     return(&s_emsappl_singleton);
 }
 
@@ -199,6 +200,17 @@ extern EOsm* eom_emsappl_GetStateMachine(EOMtheEMSappl *p)
     }
 
     return(s_emsappl_singleton.sm);
+}
+
+
+extern eOresult_t eom_emsappl_ProcessEvent(EOMtheEMSappl *p, eOsmEventsEMSappl_t ev)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }    
+    
+    return(eo_sm_ProcessEvent(s_emsappl_singleton.sm, ev));   
 }
 
 
@@ -303,6 +315,35 @@ static void s_eom_emsappl_theemserror_init(void)
     eom_emserror_Initialise(NULL);
 }
 
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// redefinition of functions of state machine
+
+extern void eo_cfg_sm_EMSappl_hid_on_entry_CFG(EOsm *s)
+{
+    EOaction onrx;
+    eo_action_SetEvent(&onrx, emssocket_evt_packet_received, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
+    // teh socket alert the cfg task
+    eom_emssocket_Open(eom_emssocket_GetHandle(), &onrx);
+}
+
+extern void eo_cfg_sm_EMSappl_hid_on_entry_ERR(EOsm *s)
+{
+    EOaction onrx;
+    eo_action_SetEvent(&onrx, emssocket_evt_packet_received, eom_emserror_GetTask(eom_emserror_GetHandle()));
+    // the socket alert the error task
+    eom_emssocket_Open(eom_emssocket_GetHandle(), &onrx);
+}
+
+
+extern void eo_cfg_sm_EMSappl_hid_on_entry_RUN(EOsm *s)
+{
+    // the socket does not alert anybody 
+    eom_emssocket_Open(eom_emssocket_GetHandle(), NULL);
+}
+#warning --> quando la sm entra in RUN il skt non avvisa nessun task. il task runRX piglia quello che gli serve. quando si entra in runDO si disabilita il IPnet, lo si riabilita in runTX, si mette il pacchetto nel socket
+#warning --> pero' ... 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
