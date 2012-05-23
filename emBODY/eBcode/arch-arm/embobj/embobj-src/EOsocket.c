@@ -158,6 +158,41 @@ extern eOresult_t eo_socket_hid_derived_Prepare(EOsocketDerived *s, eOsocketType
 }
 
 
+extern eOresult_t eo_socket_hid_derived_SetActions(EOsocketDerived *s, EOaction *onrec, EOaction *ontra)
+{
+    EOsocket *bs = (EOsocket*)eo_common_getbaseobject(s);
+    
+    if(NULL == bs)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+ 
+    // copy rx action into socket.
+    if(NULL != onrec)
+    {
+        eo_action_Copy(bs->onreception, onrec);
+    }
+    else
+    {
+        eo_action_Clear(bs->onreception); 
+    }
+
+
+    // copy tx actions into socket.
+    if(NULL != ontra)
+    {
+        eo_action_Copy(bs->ontransmission, ontra);
+    }
+    else
+    {
+        eo_action_Clear(bs->ontransmission); 
+    }    
+    
+    
+    return(eores_OK);
+}
+
 
 
 extern void * eo_socket_hid_derived_Get_Handle(EOsocketDerived *s)

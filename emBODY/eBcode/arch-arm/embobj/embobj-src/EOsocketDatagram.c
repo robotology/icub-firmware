@@ -192,6 +192,41 @@ extern eOresult_t eo_socketdtg_Open(EOsocketDatagram *p, eOipv4port_t localport,
 }
 
 
+
+extern eOresult_t eo_socketdtg_SetActions(EOsocketDatagram *p, EOaction *onrx, EOaction *ontx)
+{
+
+    eOresult_t res = eores_NOK_generic;
+
+    if(NULL == p) 
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    
+    // operate only if the socket is not in none state
+    if(STATUS_SOCK_NONE != p->socket->status)
+    {
+        
+        // the proper way to do it would be to use a command modify-socket sent to the ipnet so that inside teh main loop
+        // of ipent the properties of the socket are changed without concurrent use.
+        // see the following eov_ipnet_ModifySocket() method.
+        //res = eov_ipnet_ModifySocket(eov_ipnet_GetHandle(), p, newp);
+        // HOWEVER: we can safely do the same thing by deactivating the ipnet, doing the changes, reactivating teh ipnet.
+        //          during deativation, the received packets are stored inside the buffer of the ETH isr
+        //          things work fine if the priority of the ipnet is higher than that of the caller.
+        
+        eov_ipnet_Deactivate(eov_ipnet_GetHandle());
+        
+        eo_socket_hid_derived_SetActions(p, onrx, ontx);
+        
+        eov_ipnet_Activate(eov_ipnet_GetHandle());       
+    }
+    
+    return(res);
+}
+
+
 extern eOresult_t eo_socketdtg_Close(EOsocketDatagram *p)
 {
     eOresult_t res = eores_NOK_generic;
