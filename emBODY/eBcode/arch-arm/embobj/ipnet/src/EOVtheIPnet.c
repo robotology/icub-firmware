@@ -88,7 +88,8 @@ static EOVtheIPnet s_ipnet =
     .vtable                     = {NULL},         // vtable: attach, detach, alert, arp, waitpacket
     .tsk                        = NULL,           // tsk
     .activedgramsocksptrlist    = NULL,           // activedgramsocksptrlist
-    .mutexactivedgram           = NULL            // mutexactivedgram
+    .mutexactivedgram           = NULL,            // mutexactivedgram
+    .active                     = eobool_true
 }; 
 
 
@@ -107,7 +108,29 @@ extern EOVtheIPnet* eov_ipnet_GetHandle(void)
     return(&s_ipnet);
 }
 
+extern eOresult_t eov_ipnet_Activate(EOVtheIPnet *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    p->active = eobool_true;
+    
+    return(eores_OK);
+}
 
+extern eOresult_t eov_ipnet_Deactivate(EOVtheIPnet *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    p->active = eobool_false;
+    
+    return(eores_OK);
+}
 
 
 extern eOresult_t  eov_ipnet_AttachSocket(EOVtheIPnet* p, EOsocketDerived *s)
@@ -325,6 +348,8 @@ extern EOVtheIPnet * eov_ipnet_hid_Initialise(uint8_t maxdgramsocks, EOVmutexDer
 
     // i copy the mutex
     s_ipnet.mutexactivedgram = mutex;
+    
+    s_ipnet.active = eobool_true;
 
 
     return(&s_ipnet);
