@@ -121,6 +121,15 @@ extern EOtheErrorManager* eo_errman_GetHandle(void)
 #endif
 }
 
+extern void eo_errman_SetOnErrorHandler(EOtheErrorManager *p, eOerrman_fp_onerror_t onerrorhandler)
+{
+#ifndef EODEF_DONT_USE_THE_ERRORMAN    
+    s_errman_singleton.cfg.extfn.usr_on_error = onerrorhandler;
+#else
+    ;
+#endif
+}
+
  
 extern void eo_errman_Assert(EOtheErrorManager *p, uint32_t cond, const char *eobjstr, const char *info) 
 {

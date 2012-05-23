@@ -71,13 +71,18 @@ typedef enum
 } eOerrmanErrorType_t;
 
 
+typedef     void (*eOerrman_fp_onerror_t)(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info);
+
+
 /** @typedef    typedef struct eOerrman_fn_cfg_t
     @brief      eOerrman_fn_cfg_t keeps pointers to functions of EOtheErrorManager whcih can be redefined by the user.
  **/
 typedef struct
 {
-    /** When an error is detected, the error manager calls this function and if errtype is eo_errortype_weak or lower
-        it returns control to the environment. Otherwise if error is eo_errortype_fatal it enters in a forever loop.
+    /** When an error is detected, the error manager attempt to call this function.
+        If not defined: if errtype is eo_errortype_weak or lower it returns control to the environment. Otherwise if 
+        error is eo_errortype_fatal it stops the environment and it enters in a forever loop.
+        If defined: it just calls the function and if the function returns it returns control to teh caller. 
         Parameters are: the error type, the id of the calling task, the name of the calling embOBJ, and a string with a
         more detailed info */ 
     void            (*usr_on_error)(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info);
@@ -116,6 +121,9 @@ extern EOtheErrorManager * eo_errman_Initialise(const eOerrman_cfg_t *errmancfg)
     @return     The handle to the EOtheErrorManager
  **/
 extern EOtheErrorManager * eo_errman_GetHandle(void);
+
+
+extern void eo_errman_SetOnErrorHandler(EOtheErrorManager *p, eOerrman_fp_onerror_t onerrorhandler);
  
  
 /** @fn         extern void eo_errman_Assert(EOtheErrorManager *p, uint32_t cond, const char *eobjstr,
