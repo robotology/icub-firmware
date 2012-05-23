@@ -166,16 +166,8 @@ extern void eo_axisController_SetPosRef(EOaxisController *o, float pos, float ve
     eo_trajectory_SetReference(o->trajectory, 
                                o->encpos_meas,
                                limit(pos,  o->pos_min, o->pos_max), 
-                               0.0f,//o->vel_out, 
+                               eo_trajectory_GetVel(o->trajectory),//0.0f,//o->vel_out, 
                                limit(vel, -o->vel_max, o->vel_max));
-
-    /*
-    eo_trajectory_SetReference(o->trajectory, 
-                               reset?o->encpos_meas:eo_trajectory_GetPos(o->trajectory),
-                               limit(pos,  o->pos_min, o->pos_max), 
-                               reset?0.0f:eo_trajectory_GetVel(o->trajectory), 
-                               limit(vel, -o->vel_max, o->vel_max));
-    */
 }
 
 extern void eo_axisController_SetVelRef(EOaxisController *o, float vel, float acc)
