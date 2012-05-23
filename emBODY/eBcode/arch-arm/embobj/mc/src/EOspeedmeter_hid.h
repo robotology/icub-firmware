@@ -1,16 +1,16 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOTRAJECTORY_HID_H_
-#define _EOTRAJECTORY_HID_H_
+#ifndef _EOSPEEDMETER_HID_H_
+#define _EOSPEEDMETER_HID_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* @file        EOtrajectory_hid.h
-    @brief      This header file implements hidden interface to motor minumum jerk trajectory generation.
+/*  @file       EOspeedmeter_hid.h
+    @brief      This header file implements hidden interface to speed meter from slow encoder.
     @author     alessandro.scalzo@iit.it
-    @date       23/03/2012
+    @date       19/05/2012
  **/
 
 
@@ -20,47 +20,32 @@ extern "C" {
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "EOtrajectory.h"
+#include "EOspeedmeter.h"
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
 
+
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-/** @struct     EOtrajectory_hid
+/** @struct     EOspeedmeter_hid
     @brief      Hidden definition. Implements private data used only internally by the 
                 public or private (static) functions of the object and protected data
                 used also by its derived objects.
  **/  
  
-struct EOtrajectory_hid 
+struct EOspeedmeter_hid 
 {
-//    float Ai; /**< fast incremental algorithm register */
-//    float Bi; /**< fast incremental algorithm register */
-//    float Ci; /**< fast incremental algorithm register */
-//    float Kc; /**< fast incremental algorithm register */
-//    float Zi; /**< fast incremental algorithm register */
-//    float Yi; /**< fast incremental algorithm register */
-//    float Ky; /**< fast incremental algorithm register */
-//    float Fi; /**< fast incremental algorithm register */
-//    float Kf; /**< fast incremental algorithm register */
-//
-//    float pi; /**< trajectory actual point    */
-//    float pf; /**< trajectory end point       */
-//    float vi; /**< trajectory actual velocity */
-//
-//    uint32_t steps_to_end; /**< steps required to complete the trajectory */
-
-    float time;
-    float pfp0;
-    float step;
-    float p0;
-    float v0;
-    float pf;
-    float p;
-    float v;
-    float pfp030;
+    float period;
+    float frequency;
+    int32_t impulse_per_revolution;
+    int32_t impulse_per_revolution_by_2;
+    float time_from_last_reading;
+    int32_t last_reading;
+    float speed;
+    float speed_new;
+    eObool_t first_reading;
 }; 
 
 

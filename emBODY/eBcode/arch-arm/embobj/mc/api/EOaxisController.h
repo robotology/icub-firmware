@@ -32,7 +32,6 @@ extern "C" {
 #define eo_axisController_GetPosPidPtr(o) eo_axisController_GetPosPidPtr_hid(o)
 #define eo_axisController_GetTrqPidPtr(o) eo_axisController_GetTrqPidPtr_hid(o)
 
-#define eo_axisController_ReadEncPos(axis_controller, encpos) eo_axisController_ReadEncPos_hid(axis_controller, encpos)
 #define eo_axisController_ReadTorque(axis_controller, torque) eo_axisController_ReadTorque_hid(axis_controller, torque)
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
@@ -80,12 +79,11 @@ extern float decoupler_waist_pwm[4][4];
  **/
 extern EOaxisController* eo_axisController_New(void);
 
-//extern void eo_axisController_ReadEncPos(EOaxisController *o, float encpos);
-//extern void eo_axisController_ReadTorque(EOaxisController *o, float torque);
-extern void eo_axisController_ReadStatus(EOaxisController *o, float encpos, float torque);
+extern void eo_axisController_ReadEncPos(EOaxisController *o, int32_t pos); 
+extern void eo_axisController_SkipEncPos(EOaxisController *o);
+extern float eo_axisController_GetSpeed(EOaxisController *o);
 
-extern void eo_axisController_SetPosRef(EOaxisController *o, float pos, float vel, uint8_t reset);
-
+extern void eo_axisController_SetPosRef(EOaxisController *o, float pos, float vel);
 extern void eo_axisController_SetVelRef(EOaxisController *o, float vel, float acc);
 extern void eo_axisController_SetTrqRef(EOaxisController *o, float trq);
 

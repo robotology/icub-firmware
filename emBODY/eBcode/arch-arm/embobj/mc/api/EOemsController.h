@@ -78,14 +78,14 @@ extern EOemsController* eo_emsController_Init(uint8_t nmotors, emsBoardType_t bo
 
 // synchronous
 extern void eo_emsController_ReadEncoders(int32_t *pos);
+extern void eo_emsController_SkipEncoders(void);
+extern float eo_emsController_GetSpeed(uint8_t joint);
+
 extern void eo_emsController_ReadTorques(int32_t *torque);
 
-extern void eo_emsController_SetPosRef(uint8_t joint, float pos, float vel, uint8_t reset);
-extern void eo_emsController_SetPosRefSet(float *pos, float *vel);
+extern void eo_emsController_SetPosRef(uint8_t joint, float pos, float vel);
 extern void eo_emsController_SetVelRef(uint8_t joint, float vel, float acc);
-extern void eo_emsController_SetVelRefSet(float *vel, float *acc);
 extern void eo_emsController_SetTrqRef(uint8_t joint, float trq);
-extern void eo_emsController_SetTrqRefSet(float *trq);
 
 extern float* eo_emsController_PWM(void);
 

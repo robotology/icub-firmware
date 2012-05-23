@@ -1,6 +1,6 @@
 
-/* @file       EOpid.c
-   @brief      This file implements internal implementation of a PID controller.
+/* @file       EOspeedmeter.c
+   @brief      This file implements internal implementation of a speed meter from slow axis encoder.
    @author     alessandro.scalzo@iit.it
    @date       27/03/2012
 **/
@@ -23,14 +23,14 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOpid.h"
+#include "EOspeedmeter.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOpid_hid.h" 
+#include "EOspeedmeter_hid.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -62,147 +62,89 @@
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const char s_eobj_ownname[] = "EOpid";
+static const char s_eobj_ownname[] = "EOspeedmeter";
 
+extern int32_t posref_can;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOpid* eo_pid_New(void) 
+extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution, float period)
 {
-    EOpid *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOpid), 1);
+    EOspeedmeter *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOspeedmeter), 1);
 
     if (o)
     {
-        o->Ko = 0.0f;
-        o->Kp = 0.0f;
-        o->Ki = 0.0f;
-        o->Kd = 0.0f;
-
-        o->En = 0.0f;        
-        o->In = 0.0f;
-        o->Dn = 0.0f;
-        
-        o->Ymax = 0.0f;
-        o->Imax = 0.0f;
-
-        o->pwm = 0.0f;
-
-        o->initialized = 0;
+        o->period = period;
+        o->frequency = 1.0f/period;
+        o->impulse_per_revolution = impulse_per_revolution;
+        o->impulse_per_revolution_by_2 = impulse_per_revolution / 2;
+        o->time_from_last_reading = 0.0f;
+        o->last_reading = 0;
+        o->speed = 0.0f;
+        o->first_reading = eobool_true;
     }
 
     return o;
 }
 
-extern void eo_pid_Init(EOpid *o, float Kp, float Kd, float Ki, float Ko, float Ymax, float Imax)
+extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
 {
-    o->Ko = Ko;
-    o->Kp = Kp;
-    o->Kd = Kd;
-    o->Ki = Ki;
+    int32_t delta;
 
-    o->En = 0.0f;
-    o->In = 0.0f;
-    o->Dn = 0.0f;
-
-    o->Ymax = Ymax;
-    o->Imax = Imax;
-
-    o->pwm = 0.0f;
-
-    o->initialized = 1;
-}
-
-extern void eo_pid_SetPid(EOpid *o, float Kp, float Kd, float Ki, float Ymax, float Imax)
-{
-    o->Kp = Kp;
-    o->Kd = Kd;
-    o->Ki = Ki;
-
-    o->Ymax = Ymax;
-    o->Imax = Imax; 
-}
-
-extern void eo_pid_SetMaxOutput(EOpid *o, float Ymax)
-{
-    o->Ymax = Ymax;
-}
-
-extern void eo_pid_SetOffset(EOpid *o, float Ko)
-{
-    o->Ko = Ko;
-}
-
-extern float eo_pid_GetOffset(EOpid *o)
-{
-    return o->Ko;
-}
-
-extern void eo_pid_GetStatus(EOpid *o, float *pwm, float *err)
-{
-    *pwm = o->pwm;
-    *err = o->En;
-}
-
-extern uint8_t eo_pid_IsInitialized(EOpid *o)
-{
-    return o->initialized;
-}
-
-extern void eo_pid_Reset(EOpid *o)
-{
-    o->In = 0.0f;
-    o->En = 0.0f; 
-    o->Dn = 0.0f; 
-}
-
-extern float eo_pid_PWM(EOpid *o, float En)
-{
-    //if (En*o->En<0.0f) o->In = 0.0f;
-
-    o->pwm = o->Ko + o->Kp*En + o->In + o->Kd*o->Dn;
-    o->In += o->Ki*En;
-    if (o->In > o->Imax) 
-        o->In = o->Imax; 
-    else if (o->In< -o->Imax) 
-        o->In = -o->Imax;
-    o->Dn = 0.9f*o->Dn + 0.1f*(En - o->En);
-    o->En = En;
-    
-    if (o->pwm > o->Ymax)
+    if (o->first_reading)
     {
-        o->pwm = o->Ymax;
-    }
-    else if (o->pwm < -o->Ymax)
-    {
-        o->pwm = -o->Ymax;
+        o->first_reading = eobool_false;
+        o->last_reading = encoder;
+        
+        return;
     }
 
-    return o->pwm;
+    o->time_from_last_reading += o->period;
+
+    delta = encoder - o->last_reading;
+
+    if (delta > o->impulse_per_revolution_by_2)
+    {
+        delta -= o->impulse_per_revolution;
+    }
+    else if (delta < -o->impulse_per_revolution_by_2)
+    {
+        delta += o->impulse_per_revolution;
+    }
+
+    float divider = 1.0f / o->time_from_last_reading;
+
+    if (delta<=-4 || delta>=4)
+    {
+        o->speed = 0.95f*o->speed + 0.05f*(float)delta*divider;
+        o->time_from_last_reading = 0.0f;
+        o->last_reading = encoder;
+    }
+    else
+    {
+        float max_speed = divider * 5.0f;
+
+        if (o->speed > max_speed)
+        {    
+            o->speed = max_speed;
+        }
+        else if (o->speed < -max_speed)
+        {
+            o->speed = -max_speed;
+        }
+    }
 }
 
-extern float eo_pid_PWM2(EOpid *o, float En, float Vn)
+extern void eo_speedometer_EncoderError(EOspeedmeter* o)
 {
-    o->pwm = o->Kp*En + o->Kd*Vn + o->In;
- 
-    o->In += o->Ki*En;
-    
-    if (o->In > o->Imax) 
-        o->In = o->Imax; 
-    else if (o->In< -o->Imax) 
-        o->In = -o->Imax;
-    
-    if (o->pwm > o->Ymax)
-    {
-        o->pwm = o->Ymax;
-    }
-    else if (o->pwm < -o->Ymax)
-    {
-        o->pwm = -o->Ymax;
-    }
+    o->time_from_last_reading += o->period;
+}
 
-    return o->pwm;
+extern float eo_speedometer_GetSpeed(EOspeedmeter* o)
+{
+    return o->speed;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
