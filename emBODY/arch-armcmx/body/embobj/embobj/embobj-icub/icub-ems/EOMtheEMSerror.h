@@ -68,6 +68,11 @@ typedef struct
      uint16_t       taskstacksize;   
 } eOemserror_cfg_t;
 
+enum
+{
+    emserror_evt_error  = 0x40000000
+};
+
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------

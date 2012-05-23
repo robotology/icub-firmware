@@ -43,6 +43,8 @@ extern "C" {
 
 #include "EoCommon.h"
 #include "eEcommon.h"
+#include "EOsm.h"
+#include "eOcfg_sm_EMSappl.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -94,6 +96,9 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
     @return     The handle to the EOMtheEMSappl
  **/
 extern EOMtheEMSappl * eom_emsappl_GetHandle(void);
+
+
+extern EOsm* eom_emsappl_GetStateMachine(EOMtheEMSappl *p) ;
  
  
 

@@ -17,13 +17,13 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOCFG_SM_EX2_H_
-#define _EOCFG_SM_EX2_H_
+#ifndef _EOCFG_SM_EMSAPPL_H_
+#define _EOCFG_SM_EMSAPPL_H_
 
 
 
 
-/** @file       eOcfg_sm_Ex2.h
+/** @file       eOcfg_sm_EMSappl.h
 	@brief      This header file implements public interface to the configuration of the example state machine Ex2.
 	@author     marco.accame@iit.it
 	@date       09/01/2011
