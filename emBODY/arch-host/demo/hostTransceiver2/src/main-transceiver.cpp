@@ -383,10 +383,11 @@ static void s_callback_button_0(void)
 static void s_callback_button_1(void)
 {
     char str[128];
-	EOnv 		*cnv;
-	EOarray *ropsigcfgassign;
-    eOropSIGcfg_t sigcfg;
-    eOcfg_nvsEP_mn_commNumber_t  dummy = 0;
+	EOnv 						*cnv;
+	eOmn_ropsigcfg_command_t 	*ropsigcfgassign;
+	EOarray						*array;
+    eOropSIGcfg_t 				sigcfg;
+    eOcfg_nvsEP_mn_commNumber_t dummy = 0;
 
     snprintf(str, sizeof(str)-1, "called set<regulars>");
     hal_trace_puts(str);
@@ -398,11 +399,13 @@ static void s_callback_button_1(void)
 //#warning "aggiornare chiamate a funzione"
     eOnvID_t nvid_ropsigcfgassign = eo_cfg_nvsEP_mn_comm_NVID_Get(endpoint_mn_comm, dummy, commNVindex__ropsigcfgcommand);
     cnv = transceiver->getNVhandler(endpoint_mn_comm, nvid_ropsigcfgassign);
-    ropsigcfgassign = (EOarray*) cnv->loc;
-    ropsigcfgassign->head.capacity = NUMOFROPSIGCFG;
-    ropsigcfgassign->head.itemsize = sizeof(eOropSIGcfg_t);
+    ropsigcfgassign = (eOmn_ropsigcfg_command_t*) cnv->loc;
+    array = (EOarray*) &ropsigcfgassign->array;
+    eo_array_Reset(array);
+    array->head.capacity = NUMOFROPSIGCFG;
+    array->head.itemsize = sizeof(eOropSIGcfg_t);
+    ropsigcfgassign->cmmnd = ropsigcfg_cmd_assign;
 
-    eo_array_Reset(ropsigcfgassign);
 	eOnvID_t nvid;
 
  //   if(0 == reset)
@@ -411,55 +414,55 @@ static void s_callback_button_1(void)
     	sigcfg.ep = endpoint_mc_rightlowerarm;
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
-    	eo_array_PushBack(ropsigcfgassign, &sigcfg);
+    	eo_array_PushBack(array, &sigcfg);
 
         nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_rightlowerarm, 0, motorNVindex_mstatus__basic);
     	sigcfg.ep = endpoint_mc_rightlowerarm;
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
-    	eo_array_PushBack(ropsigcfgassign, &sigcfg);
+    	eo_array_PushBack(array, &sigcfg);
 
         nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_rightlowerarm, 1, jointNVindex_jstatus__basic);
     	sigcfg.ep = endpoint_mc_rightlowerarm;
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
-    	eo_array_PushBack(ropsigcfgassign, &sigcfg);
+    	eo_array_PushBack(array, &sigcfg);
 
         nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_rightlowerarm, 1, motorNVindex_mstatus__basic);
     	sigcfg.ep = endpoint_mc_rightlowerarm;
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
-    	eo_array_PushBack(ropsigcfgassign, &sigcfg);
+    	eo_array_PushBack(array, &sigcfg);
 
         nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_rightlowerarm, 0, jointNVindex_jconfig);
     	sigcfg.ep = endpoint_mc_rightlowerarm;
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
-    	eo_array_PushBack(ropsigcfgassign, &sigcfg);
+    	eo_array_PushBack(array, &sigcfg);
 
         nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_rightlowerarm, 0, jointNVindex_jconfig__maxpositionofjoint);
     	sigcfg.ep = endpoint_mc_rightlowerarm;
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
-    	eo_array_PushBack(ropsigcfgassign, &sigcfg);
+    	eo_array_PushBack(array, &sigcfg);
 
 		nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_rightlowerarm, 0, motorNVindex_mconfig);
     	sigcfg.ep = endpoint_mc_rightlowerarm;
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
-    	eo_array_PushBack(ropsigcfgassign, &sigcfg);
+    	eo_array_PushBack(array, &sigcfg);
 
 		nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_rightlowerarm, 0, motorNVindex_mconfig__maxcurrentofmotor);
     	sigcfg.ep = endpoint_mc_rightlowerarm;
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
-    	eo_array_PushBack(ropsigcfgassign, &sigcfg);
+    	eo_array_PushBack(array, &sigcfg);
 
 		nvid = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_rightlowerarm, 0, skinNVindex_sstatus__arrayof10canframe);
     	sigcfg.ep = endpoint_sk_emsboard_rightlowerarm;
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
-    	eo_array_PushBack(ropsigcfgassign, &sigcfg);
+    	eo_array_PushBack(array, &sigcfg);
     }
 
     transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mn_comm, nvid_ropsigcfgassign);
