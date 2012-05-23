@@ -698,6 +698,12 @@ static void e_eom_ipnet_signal_new_frame_is_available(void)
  **/
 static void s_eom_ipnet_tsktick_forever(EOMtask *rt, uint32_t n)
 {
+// we call the ipal_sys_timetick_increment() at regular intervals even if teh ipnet is not active. the reason is that the timeout of teh stack must be computed anyway 
+//    if(eobool_false == s_eom_theipnet.active)
+//    {
+//        return;
+//    }
+    
     ipal_sys_timetick_increment();
 }
 
