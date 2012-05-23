@@ -747,10 +747,17 @@ static void s_eom_ipnet_tskproc_startup(EOMtask *rt, uint32_t n)
  **/
 static void s_eom_ipnet_tskproc_forever(EOMtask *rt, uint32_t evtmsk)
 {
+    static uint8_t force_transmission_when_reactivated = 0;
+    
     // evtmask contains the events which the task has just received.
     
     if(eobool_false == s_eom_theipnet.ipnet->active)
     {
+        if(EOK_ipnet_evt_TXdatagram == (evtmsk & EOK_ipnet_evt_TXdatagram))
+        {    
+            force_transmission_when_reactivated = 1;
+        }
+        
         return;
     }
 
@@ -782,8 +789,9 @@ static void s_eom_ipnet_tskproc_forever(EOMtask *rt, uint32_t evtmsk)
     // allow the following mechanism: transmit one or mor packets (by a very high priority task)
     // and then ... the same task closes teh socket .... well: the IPnet before transmit every packet
     // in the fifooutput and then closes the socket.
-    if(EOK_ipnet_evt_TXdatagram == (evtmsk & EOK_ipnet_evt_TXdatagram))
+    if((EOK_ipnet_evt_TXdatagram == (evtmsk & EOK_ipnet_evt_TXdatagram)) || (1 == force_transmission_when_reactivated))
     {
+        force_transmission_when_reactivated = 0;
         s_eom_ipnet_process_transmission_datagram();
     }
 
