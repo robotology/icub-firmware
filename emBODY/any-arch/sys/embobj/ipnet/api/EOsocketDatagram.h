@@ -135,11 +135,27 @@ extern EOsocketDatagram* eo_socketdtg_New(uint8_t dtg_in_num, uint16_t dtg_in_si
     @param      txmode          Tells when is done the transmission of the packet. If NULL, then the function uses eo_sktdtg_TXnow.
     @param      onrx            Action executed upon arrival of a datagram inside the internal fifo. It can be used to send an event
                                 to a processing task to retrieve a datagram when the socket is in non-blocking mode.
+    @param      ontx            Action executed upon transmission of a datagram.
     @return     eores_OK upon success, otherwise: eores_NOK_nullpointer if p is NULL or there is no IP service 
                 active (the service is given by any EOVtheIPnet-derived singleton), eores_NOK_generic upon 
                 failure to open the socket.
  **/
 extern eOresult_t eo_socketdtg_Open(EOsocketDatagram *p, eOipv4port_t localport, eOsocketDirection_t dir, eObool_t block2wait4packet, eOsktdtgTXmode_t *txmode, EOaction *onrx, EOaction *ontx);
+
+
+/** @fn         extern eOresult_t eo_socketdtg_SetActions(EOsocketDatagram *p, EOaction *onrx, EOaction *ontx)
+    @brief      Changes the actions on rx and tx of an opened socket by keeping the socket open.
+                The altenative is to close and re-open the socket with teh new actions, but in such a case there is risk to lose
+                incoming packets.
+    @param      p               The object pointer. 
+    @param      onrx            Action executed upon arrival of a datagram inside the internal fifo. It can be used to send an event
+                                to a processing task to retrieve a datagram when the socket is in non-blocking mode.
+    @param      ontx            Action executed upon transmission of a datagram.                                
+    @return     eores_OK upon success, otherwise: eores_NOK_nullpointer or eores_NOK_generic upon failure.
+    @warning    teh implementaion of may 2012 uses eom_ipnet_Deactivate() and eom_ipnet_Activate() to protect vs use of teh actions by teh ipnet
+                during the call of this function. That works, with a CAVEAT: priority of task in IPnet must be higher than priority of the caller.
+ **/
+extern eOresult_t eo_socketdtg_SetActions(EOsocketDatagram *p, EOaction *onrx, EOaction *ontx);
 
 
 /** @fn         extern eOresult_t eo_socketdtg_Close(EOsocketDatagram *p)

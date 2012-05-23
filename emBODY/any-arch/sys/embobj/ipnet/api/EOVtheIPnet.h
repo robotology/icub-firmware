@@ -110,6 +110,10 @@ extern const eOevent_t  eok_ipnet_evt_evalRXipframe;    /**< = 0x00000010;  */
  **/
 extern EOVtheIPnet* eov_ipnet_GetHandle(void);
 
+extern eOresult_t eov_ipnet_Activate(EOVtheIPnet *p);
+
+extern eOresult_t eov_ipnet_Deactivate(EOVtheIPnet *p);
+
 
 /** @fn         extern eOpurevirtual eOresult_t eov_ eov_ipnet_AttachSocket(EOVtheIPnet* p, EOdatagramSocket *s)
     @brief      Attach a datagram socket to the ip manager. The function is to be called only by a method of
