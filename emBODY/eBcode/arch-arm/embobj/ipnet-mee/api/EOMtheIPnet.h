@@ -118,7 +118,7 @@ extern const eOmipnet_cfg_addr_t eom_ipnet_addr_DefaultCfg; // = {0, 0, 0};
                                           ipal_params_cfg_t *ipcfg, 
                                           eOmacaddr_t macaddr, eOipv4addr_t ipaddr, eOipv4addr_t ipmask,
                                           uint8_t maxdgramsocks)
-    @brief      Initialises the singleton EOMtheIPnet.
+    @brief      Initialises the singleton EOMtheIPnet and puts it in activated state.
                 When called the first time, the function creates all data structure required to guarantee the
                 correct communication need of upto maxdgramsocks datagram sockets.
     @param      prio            The priority of the worker task
@@ -149,6 +149,20 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
     @return     The handle to the IP net (or NULL upon in-initialised singleton)
  **/
 extern EOMtheIPnet* eom_ipnet_GetHandle(void);
+
+
+/** @fn         extern eOresult_t eom_ipnet_Deactivate(EOMtheIPnet *ip)
+    @brief      Deactivates the processing of the TCP/IP stack.
+    @return     Upon success: eores_OK. Else: eores_NOK_generic if operation fails, eores_NOK_nullpointer if pointer is NULL.
+ **/
+extern eOresult_t eom_ipnet_Deactivate(EOMtheIPnet *ip);
+
+
+/** @fn         extern eOresult_t eom_ipnet_Activate(EOMtheIPnet *ip)
+    @brief      Activates the processing of the TCP/IP stack.
+    @return     Upon success: eores_OK. Else: eores_NOK_generic if operation fails, eores_NOK_nullpointer if pointer is NULL.
+ **/
+extern eOresult_t eom_ipnet_Activate(EOMtheIPnet *ip);
 
 
 /** @fn         extern eOresult_t eom_ipnet_ResolveIP(EOMtheIPnet *ip, eOipv4addr_t ipaddr, eOreltime_t tout)
