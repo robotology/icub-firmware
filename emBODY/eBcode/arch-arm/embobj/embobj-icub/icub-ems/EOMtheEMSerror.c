@@ -32,6 +32,16 @@
 #include "EOMtheEMSsocket.h"
 #include "EOMtask.h"
 
+#include "stdio.h"
+#include "hal_trace.h"
+
+#include "EOVtheSystem.h"
+
+#include "EOsm.h"
+
+#include "EOMtheEMSappl.h"
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -78,6 +88,8 @@ extern void tskEMSerr(void *p);
 static void s_eom_emserror_task_startup(EOMtask *p, uint32_t t);
 static void s_eom_emserror_task_run(EOMtask *p, uint32_t t);
 
+static void s_eom_emserror_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info);
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -115,7 +127,7 @@ extern EOMtheEMSerror * eom_emserror_Initialise(const eOemserror_cfg_t *cfg)
                                                     (eOevent_t)0, eok_reltimeINFINITE, NULL, 
                                                     tskEMSerr, "tskEMSerr");
  
-                                                   
+    eo_errman_SetOnErrorHandler(eo_errman_GetHandle(), s_eom_emserror_OnError);                                               
     
     return(&s_emserror_singleton);
 }
@@ -189,14 +201,42 @@ static void s_eom_emserror_task_run(EOMtask *p, uint32_t t)
         if(remainingrxpkts > 0)
         {
             eom_task_SetEvent(p, emssocket_evt_packet_received); 
-        }
-     
+        }     
     }
-
+    
+    if(eobool_true == eo_common_event_check(evt, emserror_evt_error))
+    {
+        #warning ---> manage start of error....
+        eo_sm_ProcessEvent(eom_emsappl_GetStateMachine(eom_emsappl_GetHandle()), eo_sm_emsappl_EVgo2err); 
+    }
 }
 
 
+static void s_eom_emserror_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info)
+{
+  
+   
+    const char err[4][16] = {"info", "warning", "weak error", "fatal error"};
+    char str[128];
 
+    snprintf(str, sizeof(str)-1, "EOMtheEMSerror: [eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, err[(uint8_t)errtype], info);
+    hal_trace_puts(str);
+
+    if(errtype <= eo_errortype_warning)
+    {
+        return;
+    }
+    
+    //eov_sys_Stop(eov_sys_GetHandle());
+    
+    #warning ----> if fatal: force initialisation of sm (if not initted), go into error state, etc. 
+     
+    eom_task_PrioritySet(s_emserror_singleton.task, eom_mtask_prio_max);
+    
+    eom_task_SetEvent(s_emserror_singleton.task, emserror_evt_error); 
+    
+    for(;;);    
+}
 
 
 

@@ -44,6 +44,8 @@
 
 #include "EOMtheEMSconfigurator.h"
 
+#include "EOMtheEMSerror.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -95,6 +97,8 @@ static void s_eom_emsappl_theemssocket_init(void);
 
 static void s_eom_emsappl_theemstransceiver_init(void);
 
+static void s_eom_emsappl_theemserror_init(void);
+
 static void s_eom_emsappl_theemsconfigurator_init(void);
 
 
@@ -135,11 +139,11 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
 
     memcpy(&s_emsappl_singleton.cfg, emsapplcfg, sizeof(eOemsappl_cfg_t));
 
-
     // do whatever is needed
     
     // 1. create the sm.
     s_emsappl_singleton.sm = eo_sm_New(eo_cfg_sm_EMSappl_Get());
+    
     
     // 2. initialise the environment and the ip network.
     s_eom_emsappl_environment_init();
@@ -149,18 +153,27 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
     s_eom_emsappl_theemssocket_init();    
     s_eom_emsappl_theemstransceiver_init();
     
-    // 4. initialise the EOMtheEMSconfigurator
+    // 4. initialise the EOMtheEMSerror
+    s_eom_emsappl_theemserror_init();    
+    
+    // 5. initialise the EOMtheEMSconfigurator
     s_eom_emsappl_theemsconfigurator_init();
     
-    // instanstiate the EOMtheEMSconfigurer, EOMtheEMSrunner, EOMtheEMSerror, 
+    // instanstiate the EOMtheEMSrunner, 
     // they have on their inside the tasks which they need.
     // - the EOMtheEMSconfigurer has an event based task which uses the EOMtheEMSsocket configured to send it an event.
     //   the task retrieves teh packet and passed it to the EOMtheEMStransceiver.
-    // - the EOMtheEMSrunner has three tasks: rx, do, tx.    
-    
-    
+    // - the EOMtheEMSrunner has three tasks: rx, do, tx.   
+
+
+
     // call usrdef initialise
     eom_emsappl_hid_userdef_initialise(&s_emsappl_singleton);
+    
+       
+    // finally ... start the state machine which enters in cfg mode    
+    eo_sm_Start(s_emsappl_singleton.sm);
+    
     
     return(&s_emsappl_singleton);
 }
@@ -176,6 +189,16 @@ extern EOMtheEMSappl* eom_emsappl_GetHandle(void)
     {
         return(NULL);
     }
+}
+
+extern EOsm* eom_emsappl_GetStateMachine(EOMtheEMSappl *p) 
+{
+    if(NULL == p)
+    {
+        return(NULL);
+    }
+
+    return(s_emsappl_singleton.sm);
 }
 
 
@@ -274,6 +297,11 @@ static void s_eom_emsappl_theemsconfigurator_init(void)
     eom_emsconfigurator_Initialise(NULL);
 }
 
+
+static void s_eom_emsappl_theemserror_init(void)
+{
+    eom_emserror_Initialise(NULL);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
