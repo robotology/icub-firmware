@@ -44,7 +44,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-extern int32_t strong_pos;
+extern int32_t posref_can;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -65,7 +65,7 @@ extern int32_t strong_pos;
 static const char s_eobj_ownname[] = "EOtrajectory";
 
 static const float PERIOD    = 0.001f;       // 1 ms
-static const float FREQUENCY = 1.0f/PERIOD;  // 1 kHz
+//static const float FREQUENCY = 1.0f/PERIOD;  // 1 kHz
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -77,23 +77,31 @@ extern EOtrajectory* eo_trajectory_New(void)
 
     if (o)
     {
-        o->Ai = 0.0f;
-        o->Bi = 0.0f;
-        o->Ci = 0.0f;
-        o->Kc = 0.0f;
+//        o->Ai = 0.0f;
+//        o->Bi = 0.0f;
+//        o->Ci = 0.0f;
+//        o->Kc = 0.0f;
+//
+//        o->Zi = 0.0f;
+//        o->Yi = 0.0f;
+//        o->Ky = 0.0f;
+//            
+//        o->Fi = 0.0f;
+//        o->Kf = 0.0f;
+//
+//        o->pi = 0.0f;
+//        o->pf = 0.0f;
+//        o->vi = 0.0f;
 
-        o->Zi = 0.0f;
-        o->Yi = 0.0f;
-        o->Ky = 0.0f;
-            
-        o->Fi = 0.0f;
-        o->Kf = 0.0f;
+//        o->steps_to_end = 0;
 
-        o->pi = 0.0f;
-        o->pf = 0.0f;
-        o->vi = 0.0f;
-
-        o->steps_to_end = 0;
+          o->time = 1.0f;
+          o->pfp0 = 0.0f;
+          o->step = 0.0f;
+          o->p0 = 0.0f;
+          o->v0 = 0.0f;
+          o->p = 0.0f;
+          o->v = 0.0f;
     }
 
     return o;
@@ -101,6 +109,31 @@ extern EOtrajectory* eo_trajectory_New(void)
 
 extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, float v0, float speed)
 {
+    if (speed == 0.0f)
+    {
+        eo_trajectory_Abort(o);
+
+        return;
+    }    
+
+    o->pfp0 = pf - p0;
+
+    float T = o->pfp0/speed;
+    
+    if (T < 0.0f) T = -T;
+
+    o->step = PERIOD / T;
+    
+    o->p = o->p0 = p0;
+    o->v = o->v0 = v0;
+
+    o->pf = pf;
+
+    o->pfp030 = o->pfp0 * 30.0f;
+
+    o->time = 0.0f; 
+
+    /*
     float pf_p0;
     float tf;
     float steps;
@@ -154,6 +187,7 @@ extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, floa
     o->pi = p0;
     o->pf = pf;
     o->vi = v0;
+    */
 }
 
 /** @fn         extern float eo_trajectory_Step(EOtrajectory *o)
@@ -164,41 +198,71 @@ extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, floa
 
 extern void eo_trajectory_Abort(EOtrajectory *o)
 {
-    o->steps_to_end = 0;
-    o->vi = 0.0f;
-    o->pf = o->pi;
+//    o->steps_to_end = 0;
+//    o->vi = 0.0f;
+//    o->pf = o->pi;
+
+    o->pf = o->p;
+    o->time = 1.0f;
 }
 
+/*
 extern void eo_trajectory_Stop(EOtrajectory *o, float pos)
 {
     o->steps_to_end = 0;
     o->vi = 0.0f;
     o->pf = o->pi = pos;
 }
+*/
 
 extern uint8_t eo_trajectory_IsDone(EOtrajectory* o)
 {
-    return o->steps_to_end == 0;
+//    return o->steps_to_end == 0;
+    return o->time >= 1.0f;
 }
 
 extern float eo_trajectory_GetPos(EOtrajectory* o)
 {
-    return o->pi;
+    //return o->pi;
+    return o->p;
 }
 
 extern float eo_trajectory_GetVel(EOtrajectory* o)
 {
-    return o->vi;
+    //return o->vi;
+    return o->v;
 }
 
-extern void eo_trajectory_Step(EOtrajectory* o, float *pi, float *vi)
+extern void eo_trajectory_Step(EOtrajectory* o, float *p, float *v)
 {
+    float t = o->time;
+
+    if (t >= 1.0f)
+    {
+        *p = o->p = o->pf;
+        *v = 0.0f;
+        
+        posref_can = (int32_t)*p;
+
+        return;
+    }
+    
+    float t2 = t*t;
+
+    *p = o->p0 + o->v0*t + t*t2*(o->pfp0*((6.0f*t-15.0f)*t+10.0f)+o->v0*((-3.0f*t+8.0f)*t-6.0f));
+    *v = o->v0 + t2*(o->pfp030*((t-2.0f)*t+1.0f)+o->v0*((-15.0f*t+32.0f)*t-18.0f));
+
+    posref_can = (int32_t)*p;
+
+    o->time += o->step;
+
+    /*
     if (!o->steps_to_end)
     {
         o->pi = *pi = o->pf;
         o->vi = *vi = 0.0f;
 
-        strong_pos = (int32_t)*pi;
+        posref_can = (int32_t)*pi;
 
         return;
     }
@@ -213,17 +277,18 @@ extern void eo_trajectory_Step(EOtrajectory* o, float *pi, float *vi)
     o->Yi += o->Ky;
 
     o->Fi += o->Kf;
-    
-    strong_pos = (int32_t)o->pi;
 
-    *pi = o->pi;
-
-    o->pi = o->Fi + o->Ai*o->Zi;
+    *pi = o->Fi + o->Ai*o->Zi;
     
     if (vi)
     {
-        o->vi = *vi = (o->pi - *pi) * FREQUENCY;
+        o->vi = *vi = (*pi - o->pi) * FREQUENCY;
     }
+
+    o->pi = *pi;
+
+    posref_can = (int32_t)*pi;
+    */
 }
 
 // --------------------------------------------------------------------------------------------------------------------
