@@ -37,6 +37,7 @@ using namespace std;
 
 #include "EOnv_hid.h"
 #include "EoMotionControl.h"
+#include "EoSkin.h"
 
 
 
@@ -119,6 +120,14 @@ hostTransceiver *transceiver;
 
 int main(int argc, char *argv[])
 {
+
+//#define www(sname, ssize)    typedef uint8_t GUARD##sname[ ( ssize == sizeof(sname) ) ? (1) : ( 0x12345678 )];
+//	www(char, 2);
+
+
+
+//	EO_VERIFYproposition(name,  (sizeof(int*) == 4));
+
 	char str[SIZE];
 	// Program data
 	memset(&remote01.data, 0x00, SIZE);
@@ -442,6 +451,12 @@ static void s_callback_button_1(void)
 
 		nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_rightlowerarm, 0, motorNVindex_mconfig__maxcurrentofmotor);
     	sigcfg.ep = endpoint_mc_rightlowerarm;
+    	sigcfg.id = nvid;
+    	sigcfg.plustime = 0;
+    	eo_array_PushBack(ropsigcfgassign, &sigcfg);
+
+		nvid = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_rightlowerarm, 0, skinNVindex_sstatus__arrayof10canframe);
+    	sigcfg.ep = endpoint_sk_emsboard_rightlowerarm;
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
     	eo_array_PushBack(ropsigcfgassign, &sigcfg);

@@ -5,6 +5,8 @@ cmake_minimum_required(VERSION 2.8)
 SET(PROJECTNAME hostTransceiver2)
 PROJECT(${PROJECTNAME})
 
+
+
 #############################################################################################################
 ## the BASE variable must point to the root of the emBODY software, i.e. ${Whatever}/iCub/firmware/embody. ##
 ## If you followed the installation instruction and therefore the environment variable ICUB_ROOT           ##
@@ -242,6 +244,7 @@ SOURCE_GROUP("EmbObj Source Files" FILES ${folder_source})
   
 #add_executable(${PROJECTNAME} ${embobj_source} ${embobj_header})
 add_executable(${PROJECTNAME} ${embobj_source})
+#set_target_properties(${PROJECTNAME} PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
 
 target_link_libraries(${PROJECTNAME} ${YARP_LIBRARIES})
 
