@@ -81,6 +81,7 @@ extern void eo_pid_Reset(EOpid *o);
     @return     The actual PWM output value.
  **/
 extern float eo_pid_PWM(EOpid *o, float En);
+extern float eo_pid_PWM2(EOpid *o, float En, float Vn);
 
 /** @}            
     end of group eo_pid  
