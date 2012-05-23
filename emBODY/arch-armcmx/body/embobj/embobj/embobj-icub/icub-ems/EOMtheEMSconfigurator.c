@@ -133,6 +133,16 @@ extern EOMtheEMSconfigurator* eom_emsconfigurator_GetHandle(void)
     }
 }
 
+extern EOMtask * eom_emsconfigurator_GetTask(EOMtheEMSconfigurator *p)
+{
+    if(NULL == p)
+    {
+        return(NULL);
+    }
+    
+    return(s_emsconfigurator_singleton.task);
+}
+
 
 
 // --------------------------------------------------------------------------------------------------------------------

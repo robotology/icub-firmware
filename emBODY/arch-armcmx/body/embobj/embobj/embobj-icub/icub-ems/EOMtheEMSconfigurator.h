@@ -97,6 +97,10 @@ extern EOMtheEMSconfigurator * eom_emsconfigurator_GetHandle(void);
 
 
 
+extern EOMtask * eom_emsconfigurator_GetTask(EOMtheEMSconfigurator *p);
+
+
+
 
 
 /** @}            
