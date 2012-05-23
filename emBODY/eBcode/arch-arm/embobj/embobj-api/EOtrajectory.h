@@ -74,7 +74,7 @@ extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, floa
     @param      o  The pointer to the trajectory object.
     @return     The actual trajectory point value.
  **/
-extern void eo_trajectory_Step(EOtrajectory *o, float *pi, float *vi);
+extern void eo_trajectory_Step(EOtrajectory *o, float *p, float *v);
 
 /** @fn         extern void eo_trajectory_Abort(EOtrajectory *o)
     @brief      Aborts the trajectory.
@@ -82,7 +82,7 @@ extern void eo_trajectory_Step(EOtrajectory *o, float *pi, float *vi);
  **/
 extern void eo_trajectory_Abort(EOtrajectory *o);
 
-extern void eo_trajectory_Stop(EOtrajectory *o, float pos);
+//extern void eo_trajectory_Stop(EOtrajectory *o, float pos);
 
 /** @fn         extern float eo_trajectory_GetPos(EOtrajectory *o)
     @brief      Get the actual trajectory position.

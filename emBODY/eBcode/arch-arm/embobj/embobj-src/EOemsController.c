@@ -134,6 +134,19 @@ extern void eo_emsController_ReadEncoders(int32_t *enc)
     }
 }
 
+extern void eo_emsController_SkipEncoders(void)
+{
+    for (uint8_t i=0; i<s_emsc->nmotors; ++i)
+    {
+        eo_axisController_SkipEncPos(s_emsc->axis_controller[i]);
+    }
+}
+
+extern float eo_emsController_GetSpeed(uint8_t joint)
+{
+    return eo_axisController_GetSpeed(s_emsc->axis_controller[joint]);                
+}
+
 extern void eo_emsController_ReadTorques(int32_t *torque)
 {
     for (int i=0; i<s_emsc->nmotors; ++i)
@@ -156,45 +169,19 @@ extern void eo_emsController_ReadTorques(int32_t *torque)
     }
 }
 
-extern void eo_emsController_SetPosRef(uint8_t joint, float pos, float vel, uint8_t reset)
+extern void eo_emsController_SetPosRef(uint8_t joint, float pos, float vel)
 {
-    eo_axisController_SetPosRef(s_emsc->axis_controller[joint], pos, vel, reset);
+    eo_axisController_SetPosRef(s_emsc->axis_controller[joint], pos, vel);
 }
-
-/*
-extern void eo_emsController_SetPosRefSet(float *pos, float *vel, uint8_t reset)
-{
-    for (uint8_t i=0; i<s_emsc->nmotors; ++i)
-    {
-        eo_axisController_SetPosRef(s_emsc->axis_controller[i], pos[i], vel[i], reset);
-    }
-}
-*/
 
 extern void eo_emsController_SetVelRef(uint8_t joint, float vel, float acc)
 {
     eo_axisController_SetVelRef(s_emsc->axis_controller[joint], vel, acc);
 }
 
-extern void eo_emsController_SetVelRefSet(float *vel, float *acc)
-{
-    for (uint8_t i=0; i<s_emsc->nmotors; ++i)
-    {
-        eo_axisController_SetVelRef(s_emsc->axis_controller[i], vel[i], acc[i]);
-    }
-}
-
 extern void eo_emsController_SetTrqRef(uint8_t joint, float trq)
 {
     eo_axisController_SetTrqRef(s_emsc->axis_controller[joint], trq);
-}
-
-extern void eo_emsController_SetTrqRefSet(float *trq)
-{
-    for (uint8_t i=0; i<s_emsc->nmotors; ++i)
-    {
-        eo_axisController_SetTrqRef(s_emsc->axis_controller[i], trq[i]);
-    }
 }
 
 extern float* eo_emsController_PWM()

@@ -64,6 +64,7 @@
 
 static const char s_eobj_ownname[] = "EOspeedmeter";
 
+extern int32_t posref_can;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -82,9 +83,10 @@ extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution, float per
         o->time_from_last_reading = 0.0f;
         o->last_reading = 0;
         o->speed = 0.0f;
-        o->speed_new = 0.0f;
         o->first_reading = eobool_true;
     }
+
+    return o;
 }
 
 extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
@@ -93,7 +95,7 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
 
     if (o->first_reading)
     {
-        o->first_reading = ebool_false;
+        o->first_reading = eobool_false;
         o->last_reading = encoder;
         
         return;
@@ -101,7 +103,7 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
 
     o->time_from_last_reading += o->period;
 
-    delta = o->last_reading - encoder;
+    delta = encoder - o->last_reading;
 
     if (delta > o->impulse_per_revolution_by_2)
     {
@@ -111,47 +113,27 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
     {
         delta += o->impulse_per_revolution;
     }
-    
-    if (delta)
-    {
-        if (delta == 1 || delta == -1)
-        {
-            if (o->time_from_last_reading == o->period)
-            {
-                float speed_old = o->speed_new;
-                o->speed_new = ((float)delta) * o->frequency;
-                o->speed = 0.5f * (speed_old + o->speed_new);
-            }
-            else
-            {
-                o->speed_new = ((float)delta) / o->time_from_last_reading;
-                o->speed = o->speed_new;
-            }
-        }
-        else
-        {
-            float speed_old = o->speed_new;
-            o->speed_new = ((float)delta) * o->frequency;
-            o->speed = 0.5f * (speed_old + o->speed_new);
-        }
 
-        o->last_reading = encoder;
-        o->time_from_last_reading = 0.0f;
-    }
-    else // delta == 0
+    float divider = 1.0f / o->time_from_last_reading;
+
+    if (delta<=-4 || delta>=4)
     {
-        float max_speed = 1.0f / o->time_from_last_reading;
+        o->speed = 0.95f*o->speed + 0.05f*(float)delta*divider;
+        o->time_from_last_reading = 0.0f;
+        o->last_reading = encoder;
+    }
+    else
+    {
+        float max_speed = divider * 5.0f;
 
         if (o->speed > max_speed)
         {    
-            o->speed_new =  max_speed;
+            o->speed = max_speed;
         }
         else if (o->speed < -max_speed)
         {
-            o->speed_new = -max_speed;
+            o->speed = -max_speed;
         }
-
-        o->speed = o->speed_new;
     }
 }
 
