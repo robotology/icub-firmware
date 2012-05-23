@@ -176,7 +176,8 @@ static EOMtheIPnet s_eom_theipnet =
     .maxwaittime            = 0,                                  // maxwaittime 
     .dgramsocketready2tx    = NULL,                               // dgramsocketready2tx  
 //    .ipcfg                  = {0},                                // ipcfg
-    .taskwakeuponrxframe    = eobool_false                            // taskwakeuponrxframe
+    .taskwakeuponrxframe    = eobool_false,
+    .active                 = eobool_false
 };
 
 
@@ -292,6 +293,9 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
 
     
     s_eom_theipnet.taskwakeuponrxframe = ipnetcfg->procwakeuponrxframe;
+    
+    
+    eom_ipnet_Activate(&s_eom_theipnet);
 
 
     // and finally, i prepare the task able to process the ip net
@@ -322,6 +326,30 @@ extern EOMtheIPnet* eom_ipnet_GetHandle(void)
     }
     
     return(&s_eom_theipnet);
+}
+
+extern eOresult_t eom_ipnet_Activate(EOMtheIPnet *ip)
+{
+    if(NULL == ip)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    s_eom_theipnet.active = eobool_true;
+    
+    return(eores_OK);
+}
+
+extern eOresult_t eom_ipnet_Deactivate(EOMtheIPnet *ip)
+{
+    if(NULL == ip)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    s_eom_theipnet.active = eobool_false;
+    
+    return(eores_OK);
 }
 
 
@@ -656,6 +684,11 @@ static void e_eom_ipnet_signal_new_frame_is_available(void)
     // to the task whcih process the tcp/ip stack improved response time of
     // ping from values around 200-300 ms or more down to values always <1ms.
     // the test is done on the iit intranet.
+    
+    if(eobool_false == s_eom_theipnet.active)
+    {
+        return;
+    }
 
     eom_task_isrSetEvent(s_eom_theipnet.tskproc, EOK_ipnet_evt_RXipframe);   
 }
@@ -710,6 +743,11 @@ static void s_eom_ipnet_tskproc_startup(EOMtask *rt, uint32_t n)
 static void s_eom_ipnet_tskproc_forever(EOMtask *rt, uint32_t evtmsk)
 {
     // evtmask contains the events which the task has just received.
+    
+    if(eobool_false == s_eom_theipnet.active)
+    {
+        return;
+    }
 
         
     // - (a) process the tcp/ip stack.
