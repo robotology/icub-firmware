@@ -177,15 +177,17 @@ static void s_eo_errman_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, co
     {
         s_errman_singleton.cfg.extfn.usr_on_error(errtype, taskid, eobjstr, info);
     }
-
-    if(errtype <= eo_errortype_weak)
+    else
     {
-        return;
+        if(errtype <= eo_errortype_weak)
+        {
+            return;
+        }
+
+        eov_sys_Stop(eov_sys_GetHandle());
+
+        for(;;);
     }
-
-    eov_sys_Stop(eov_sys_GetHandle());
-
-    for(;;);
 #else
 #endif
 }
