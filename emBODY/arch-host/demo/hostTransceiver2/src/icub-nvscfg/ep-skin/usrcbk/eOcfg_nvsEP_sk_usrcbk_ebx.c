@@ -103,12 +103,12 @@ extern void eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe(uint16_t n, cons
 	printf("--- ARRAY SIZE = %d  ---- \n", sk_array->head.size);
 	for(i=0; i<sk_array->head.size; i++)
 	{
-		canframe = (eOutil_canframe_t*) &sk_array->data[i];
-		printf("SID = %0x  ", canframe->id);
-		printf("DATA: ");
+		canframe = (eOutil_canframe_t*) &sk_array->data[i*sizeof(eOutil_canframe_t)];
+		printf("SID = 0x%0x  ", canframe->id);
+		printf("DATA: 0x");
 		for(j=0; j<canframe->size;j++)
 		{
-			printf(" %0x", canframe->data[j]);
+			printf("%0x", canframe->data[j]);
 		}
 		printf("\n\n");
 
