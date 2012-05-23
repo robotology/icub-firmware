@@ -38,7 +38,6 @@ extern "C" {
 struct EOspeedmeter_hid 
 {
     float period;
-    float frequency;
     int32_t impulse_per_revolution;
     int32_t impulse_per_revolution_by_2;
     float time_from_last_reading;

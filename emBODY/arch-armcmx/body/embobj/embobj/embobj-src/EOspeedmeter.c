@@ -77,7 +77,6 @@ extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution, float per
     if (o)
     {
         o->period = period;
-        o->frequency = 1.0f/period;
         o->impulse_per_revolution = impulse_per_revolution;
         o->impulse_per_revolution_by_2 = impulse_per_revolution / 2;
         o->time_from_last_reading = 0.0f;
@@ -92,16 +91,16 @@ extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution, float per
 extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
 {
     int32_t delta;
+    float divider;
 
     if (o->first_reading)
     {
         o->first_reading = eobool_false;
+        o->time_from_last_reading = 0.0f;
         o->last_reading = encoder;
         
         return;
     }
-
-    o->time_from_last_reading += o->period;
 
     delta = encoder - o->last_reading;
 
@@ -114,7 +113,9 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
         delta += o->impulse_per_revolution;
     }
 
-    float divider = 1.0f / o->time_from_last_reading;
+    o->time_from_last_reading += o->period;
+
+    divider = 1.0f / o->time_from_last_reading;
 
     if (delta<=-4 || delta>=4)
     {

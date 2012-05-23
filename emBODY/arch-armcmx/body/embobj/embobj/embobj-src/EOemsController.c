@@ -230,14 +230,20 @@ extern void eo_emsController_SetDecoupler(emsMotorDecoupler_t dec_type, float ma
     s_emsc->decoupler[dec_type] = eo_decoupler_New(s_emsc->nmotors, matrix);
 }
 
-extern void eo_emsController_SetPosPid(uint8_t joint, float kp, float ki, float kd, float Ymax, float Imax)
+extern void eo_emsController_SetPosPid(uint8_t joint, float kp, float kd, float ki)
 {
-    eo_pid_SetPid(eo_axisController_GetPosPidPtr(s_emsc->axis_controller[joint]), kp, ki, kd, Ymax, Imax);    
+    eo_pid_SetPid(eo_axisController_GetPosPidPtr(s_emsc->axis_controller[joint]), kp, kd, ki);    
+}
+    
+extern void eo_emsController_SetPosPidLimits(uint8_t joint, float Ymax, float Imax)
+{
+    eo_pid_SetPidLimits(eo_axisController_GetPosPidPtr(s_emsc->axis_controller[joint]), Ymax, Imax);    
 }
 
 extern void eo_emsController_SetTrqPid(uint8_t joint, float kp, float ki, float kd, float Ymax, float Imax)
 {
-    eo_pid_SetPid(eo_axisController_GetTrqPidPtr(s_emsc->axis_controller[joint]), kp, ki, kd, Ymax, Imax); 
+    eo_pid_SetPid(eo_axisController_GetTrqPidPtr(s_emsc->axis_controller[joint]), kp, ki, kd);
+    eo_pid_SetPidLimits(eo_axisController_GetTrqPidPtr(s_emsc->axis_controller[joint]), Ymax, Imax); 
 }
 
 extern void eo_emsController_SetStiffness(uint8_t joint, float stiffness)

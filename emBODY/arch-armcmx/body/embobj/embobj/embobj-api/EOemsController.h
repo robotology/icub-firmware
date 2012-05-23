@@ -98,7 +98,8 @@ extern void eo_emsGetActivePidStatus(uint8_t joint, float *pwm, float *err);
 
 // configuration
 extern void eo_emsController_SetDecoupler(emsMotorDecoupler_t dec_type, float matrix[4][4]);
-extern void eo_emsController_SetPosPid(uint8_t joint, float kp, float ki, float kd, float Ymax, float Imax);
+extern void eo_emsController_SetPosPid(uint8_t joint, float kp, float kd, float ki);
+extern void eo_emsController_SetPosPidLimits(uint8_t joint, float Ymax, float Imax);
 extern void eo_emsController_SetTrqPid(uint8_t joint, float kp, float ki, float kd, float Ymax, float Imax);
 extern void eo_emsController_SetStiffness(uint8_t joint, float stiffeness);
 extern void eo_emsController_SetVelMax(uint8_t joint, float vel_max);
