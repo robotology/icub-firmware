@@ -93,7 +93,7 @@ static void s_eo_cfg_nvsEP_mngmnt_usr_ebx_generic_ropsigcfgcommand(eOmn_ropsigcf
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern void eo_cfg_nvsEP_mn_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
+extern void eo_cfg_nvsEP_mn_comm_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
 {
     eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
     
@@ -106,7 +106,7 @@ extern void eo_cfg_nvsEP_mn_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
 }
 
 
-extern void eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgcommand(uint16_t n, const EOnv* nv)
+extern void eo_cfg_nvsEP_mn_comm_hid_INIT__ropsigcfgcommand(uint16_t n, const EOnv* nv)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     
@@ -128,7 +128,7 @@ extern void eo_cfg_nvsEP_mn_hid_INIT__ropsigcfgcommand(uint16_t n, const EOnv* n
     }    
 }
 
-extern void eo_cfg_nvsEP_mn_hid_UPDT__ropsigcfgassign(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eo_cfg_nvsEP_mn_comm_hid_UPDT__ropsigcfgcommand(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     
