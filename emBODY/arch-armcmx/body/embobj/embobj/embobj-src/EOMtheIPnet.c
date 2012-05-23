@@ -176,8 +176,7 @@ static EOMtheIPnet s_eom_theipnet =
     .maxwaittime            = 0,                                  // maxwaittime 
     .dgramsocketready2tx    = NULL,                               // dgramsocketready2tx  
 //    .ipcfg                  = {0},                                // ipcfg
-    .taskwakeuponrxframe    = eobool_false,
-    .active                 = eobool_false
+    .taskwakeuponrxframe    = eobool_false
 };
 
 
@@ -335,7 +334,7 @@ extern eOresult_t eom_ipnet_Activate(EOMtheIPnet *ip)
         return(eores_NOK_nullpointer);
     }
     
-    s_eom_theipnet.active = eobool_true;
+    s_eom_theipnet.ipnet->active = eobool_true;
     
     return(eores_OK);
 }
@@ -347,7 +346,7 @@ extern eOresult_t eom_ipnet_Deactivate(EOMtheIPnet *ip)
         return(eores_NOK_nullpointer);
     }
     
-    s_eom_theipnet.active = eobool_false;
+    s_eom_theipnet.ipnet->active = eobool_false;
     
     return(eores_OK);
 }
@@ -685,7 +684,7 @@ static void e_eom_ipnet_signal_new_frame_is_available(void)
     // ping from values around 200-300 ms or more down to values always <1ms.
     // the test is done on the iit intranet.
     
-    if(eobool_false == s_eom_theipnet.active)
+    if(eobool_false == s_eom_theipnet.ipnet->active)
     {
         return;
     }
@@ -699,7 +698,7 @@ static void e_eom_ipnet_signal_new_frame_is_available(void)
 static void s_eom_ipnet_tsktick_forever(EOMtask *rt, uint32_t n)
 {
 // we call the ipal_sys_timetick_increment() at regular intervals even if teh ipnet is not active. the reason is that the timeout of teh stack must be computed anyway 
-//    if(eobool_false == s_eom_theipnet.active)
+//    if(eobool_false == s_eom_theipnet.ipnet->active)
 //    {
 //        return;
 //    }
@@ -750,7 +749,7 @@ static void s_eom_ipnet_tskproc_forever(EOMtask *rt, uint32_t evtmsk)
 {
     // evtmask contains the events which the task has just received.
     
-    if(eobool_false == s_eom_theipnet.active)
+    if(eobool_false == s_eom_theipnet.ipnet->active)
     {
         return;
     }

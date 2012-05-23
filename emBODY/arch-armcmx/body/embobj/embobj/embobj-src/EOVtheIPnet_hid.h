@@ -80,7 +80,7 @@ struct EOVtheIPnet_hid
     EOVtaskDerived                  *tsk;
     EOlist                          *activedgramsocksptrlist;   /*< list of pointers to active datagram sockets */     
     EOVmutexDerived                 *mutexactivedgram;          /*< mutex which guarantees exclusive access to the list */
-
+    eObool_t                        active;
 }; 
 
 

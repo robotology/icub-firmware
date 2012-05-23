@@ -76,6 +76,8 @@ struct EOsocket_hid
 
 extern eOresult_t eo_socket_hid_derived_Prepare(EOsocketDerived *s, eOsocketType_t type, eOipv4port_t port, EOaction *onrec, EOaction *ontra, eOsocketDirection_t dir, eObool_t block2wait4packet);
 
+extern eOresult_t eo_socket_hid_derived_SetActions(EOsocketDerived *s, EOaction *onrec, EOaction *ontra);
+
 extern void * eo_socket_hid_derived_Get_Handle(EOsocketDerived *s);
 
 extern eOsocketType_t eo_socket_hid_derived_Get_Type(EOsocketDerived *s);
