@@ -462,7 +462,7 @@ static void s_callback_button_1(void)
     	eo_array_PushBack(ropsigcfgassign, &sigcfg);
     }
 
-    transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mn_comm, commNVindex__ropsigcfgcommand);
+    transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mn_comm, nvid_ropsigcfgassign);
 
     printf("added a set<__upto10rop2signal, list>");
 
