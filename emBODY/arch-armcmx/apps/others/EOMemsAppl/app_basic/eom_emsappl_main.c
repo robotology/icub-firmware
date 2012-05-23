@@ -26,8 +26,8 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "stdint.h"
-#include "stdlib.h"
+
+#if 0
 
 // abslayer 
 #include "hal.h"
@@ -60,8 +60,22 @@
 #include "EOtheARMenvironment.h"
 #include "EOVtheEnvironment.h"
 
+#endif
 
 
+
+#include "stdint.h"
+#include "stdlib.h"
+#include "stdio.h"
+#include "hal_trace.h"
+
+#include "EoCommon.h"
+#include "EOMtheSystem.h"
+#include "EOVtheSystem.h"
+#include "EOtheErrorManager.h"
+#include "EOMtheEMSappl.h"
+
+#include "eom_emsappl_info.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -105,6 +119,8 @@
 
 static void s_eom_emsappl_main_init(void);
 
+static void s_eom_emsappl_main_startup_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info);
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -112,7 +128,10 @@ static void s_eom_emsappl_main_init(void);
 // --------------------------------------------------------------------------------------------------------------------
 
 
-
+static const eOerrman_cfg_t  s_eom_emsappl_main_errcfg_startup = 
+{
+    .extfn.usr_on_error = s_eom_emsappl_main_startup_OnError
+};
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -124,8 +143,8 @@ int main(void)
 {
 
     eom_sys_Initialise( &eom_emsappl_info_syscfg,
-                        NULL,                                           // mempool uses calloc
-                        &eom_emsappl_specialise_errcfg,                 // errormanager
+                        NULL,                         // mempool uses calloc
+                        &s_eom_emsappl_main_errcfg_startup,                
                         &eom_timerman_DefaultCfg,
                         &eom_callbackman_DefaultCfg
                       );  
@@ -148,13 +167,39 @@ int main(void)
 
 
 /** @fn         static void s_eom_emsappl_main_init(void)
-    @brief      It initialises services such arm-environment and tcp/ip. then it calls a specific specialisation 
-                function.
-    @details    bla bla bla.
+    @brief      It initialises the emsappl 
+     @details    bla bla bla.
  **/
 
 static void s_eom_emsappl_main_init(void)
 {
+    eom_emsappl_Initialise(NULL);
+}
+
+
+
+static void s_eom_emsappl_main_startup_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info)
+{
+    const char err[4][16] = {"info", "warning", "weak error", "fatal error"};
+    char str[128];
+
+    snprintf(str, sizeof(str)-1, "startup: [eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, err[(uint8_t)errtype], info);
+    hal_trace_puts(str);
+
+    if(errtype <= eo_errortype_warning)
+    {
+        return;
+    }
+    
+    eov_sys_Stop(eov_sys_GetHandle());
+
+    for(;;);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// old s_eom_emsappl_main_init():
+#if 0    
     //uint8_t *ipaddr = (uint8_t*)&(eom_emsappl_info_ipal_cfg->eth_ip);
     eOmipnet_cfg_addr_t* eomipnet_addr = NULL;
     const eEipnetwork_t *ipnet = NULL;
@@ -211,13 +256,7 @@ static void s_eom_emsappl_main_init(void)
     // 5. call specialisation function
 
     eom_emsappl_specialise_otherthings();
-
-}
-
-
-
-
-
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------

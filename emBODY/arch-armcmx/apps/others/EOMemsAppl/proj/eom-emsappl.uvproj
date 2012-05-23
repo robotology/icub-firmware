@@ -943,12 +943,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>eo-nvs-cf-usrcbk</GroupName>
+          <GroupName>eo-nvs-cfg-usrcbk</GroupName>
           <Files>
             <File>
               <FileName>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-management\usrcbk\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-sm</GroupName>
+          <Files>
+            <File>
+              <FileName>EOsm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\utils\src\EOsm.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -960,15 +970,30 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\eOcfg_sm_EMSappl.c</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>eo-sm</GroupName>
-          <Files>
             <File>
-              <FileName>EOsm.c</FileName>
+              <FileName>EOMtheEMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\utils\src\EOsm.c</FilePath>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSappl.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSsocket.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSsocket.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMStransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMStransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSconfigurator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSconfigurator.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSerror.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSerror.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1839,12 +1864,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>eo-nvs-cf-usrcbk</GroupName>
+          <GroupName>eo-nvs-cfg-usrcbk</GroupName>
           <Files>
             <File>
               <FileName>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-management\usrcbk\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-sm</GroupName>
+          <Files>
+            <File>
+              <FileName>EOsm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\utils\src\EOsm.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1856,15 +1891,30 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\eOcfg_sm_EMSappl.c</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>eo-sm</GroupName>
-          <Files>
             <File>
-              <FileName>EOsm.c</FileName>
+              <FileName>EOMtheEMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\utils\src\EOsm.c</FilePath>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSappl.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSsocket.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSsocket.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMStransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMStransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSconfigurator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSconfigurator.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSerror.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSerror.c</FilePath>
             </File>
           </Files>
         </Group>
