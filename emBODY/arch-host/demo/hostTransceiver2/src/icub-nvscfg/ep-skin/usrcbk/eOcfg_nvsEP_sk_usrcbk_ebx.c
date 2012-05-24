@@ -55,8 +55,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
-
+#define SKIN_BOARD_MAXNUM				7  //each skin endpoint is composed by 7 skin boards (mtb3)
+#define SKIN_TRIANGLE4BOARD_MAXNUM		16 //each mtb3 manages 16 skin-triangle
+#define SKIN_POINTS4TRIANGLE_MAXNUM  	12 //each triangle sends 12 point (value)
+#define SKIN_RECCANFRAME4TRIANGLE_MAXNUM 2 //each triangle sends 12 points in two can frame
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -68,16 +70,19 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
-
+void s_eo_cfg_nvsEP_sk_hid_print_arrayof10canframe(EOarray_of_10canframes *sk_array);
+void s_eo_cfg__nvsEP_sk_hid_Histogram_Print(void);
+void s_eo_cfg_nvsEP_sk_hid_Histogram_Reset(void);
+void s_eo_cfg__nvsEP_sk_hid_ParseCanFrame(EOarray_of_10canframes *sk_array);
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+//static uint32_t s_skin_matrix_histogram[SKIN_BOARD_MAXNUM][SKIN_TRIANGLE4BOARD_MAXNUM][SKIN_POINTS4TRIANGLE_MAXNUM];
+uint32_t s_skin_matrix_histogramRecCanFrame[SKIN_BOARD_MAXNUM][SKIN_TRIANGLE4BOARD_MAXNUM][SKIN_RECCANFRAME4TRIANGLE_MAXNUM];
 
-
+uint32_t count;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables
@@ -97,6 +102,40 @@
 extern void eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
 	EOarray_of_10canframes *sk_array = (EOarray_of_10canframes *)nv->rem;
+
+//	s_eo_cfg__nvsEP_sk_hid_ParseCanFrame(sk_array);
+//	s_eo_cfg__nvsEP_sk_hid_Histogram_Print();
+//	s_eo_cfg_nvsEP_sk_hid_print_arrayof10canframe(sk_array);
+//	count++;
+
+
+	if(count < 10000)
+	{
+		//count=0;
+		s_eo_cfg__nvsEP_sk_hid_ParseCanFrame(sk_array);
+
+	}
+	else if(count == 10000 )
+	{
+		count++; //stop to print
+		s_eo_cfg__nvsEP_sk_hid_Histogram_Print();
+	}
+
+
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of extern hidden functions
+// --------------------------------------------------------------------------------------------------------------------
+
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of static functions
+// --------------------------------------------------------------------------------------------------------------------
+void s_eo_cfg_nvsEP_sk_hid_print_arrayof10canframe(EOarray_of_10canframes *sk_array)
+{
 	eOutil_canframe_t *canframe;
 	int i, j;
 
@@ -110,24 +149,96 @@ extern void eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe(uint16_t n, cons
 		{
 			printf("%0x", canframe->data[j]);
 		}
+		printf("   tri = %0x,  %0x", (canframe->id & 0x000f), (((canframe->data[0])& 0x80) ? 0xC0 :0x40) );
 		printf("\n\n");
 
 	}
+
 }
 
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of extern hidden functions 
-// --------------------------------------------------------------------------------------------------------------------
+
+void s_eo_cfg_nvsEP_sk_hid_Histogram_Reset(void)
+{
+//	memset(s_skin_matrix_histogram, 0, sizeof(s_skin_matrix_histogram));
+	memset(s_skin_matrix_histogramRecCanFrame, 0, sizeof(s_skin_matrix_histogramRecCanFrame));
+}
+
+ void s_eo_cfg__nvsEP_sk_hid_ParseCanFrame(EOarray_of_10canframes *sk_array)
+{
+	eOutil_canframe_t *canframe;
+	int i, j;
+
+	uint8_t boardId = 0;
+	uint8_t boardAddr = 0;
+	uint8_t triangle = 0;
+	uint8_t point = 0 ;
+	uint8_t point_offset;
+	uint8_t msgtype = 0;
+	uint8_t row = 0;
+	uint8_t offset;
+
+	if(sk_array->head.size > 0)
+	{
+		count++;
+//		printf("COUNT = %d", count);
+	}
+
+	for(i=0; i<sk_array->head.size; i++)
+	{
+		canframe = (eOutil_canframe_t*) &sk_array->data[i*sizeof(eOutil_canframe_t)];
+
+		boardAddr = (canframe->id & 0x00f0)>>4;
+		boardId = boardAddr - 8;
+		if(boardId>6) //gli indirizzi sono 8....14
+		{
+			continue;
+		}
+		triangle = (canframe->id & 0x000f);
+		msgtype= ((canframe->data[0])& 0x80);
+
+		if(msgtype)
+		{ //0xC0
+			row = 1;
+			offset = 7;
+		}
+		else
+		{ //0x40
+			row = 0;
+			offset = 0;
+		}
+
+		s_skin_matrix_histogramRecCanFrame[boardId][triangle][row]++;
+/*
+ * 		questo può essere usato per creare la matrice di valori
+		for(i = 0; i<canframe->size; i++)
+		{
+			point = offset+i;
+			s_skin_matrix_histogram[boardId][triangle][point] = canframe->data[i+1];
+		}
+*/
+
+	}
 
 
+}
 
 
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of static functions 
-// --------------------------------------------------------------------------------------------------------------------
+void s_eo_cfg__nvsEP_sk_hid_Histogram_Print(void)
+{
 
+	uint8_t i,j,k;
 
+	for(i=0; i<SKIN_BOARD_MAXNUM; i++)
+	{
 
+		printf("board addr: %0x\n", i+8);
+		for(j=0; j<SKIN_TRIANGLE4BOARD_MAXNUM; j++)
+		{
+			printf("    t:%0x - %0x, %0x | ", j, s_skin_matrix_histogramRecCanFrame[i][j][0], s_skin_matrix_histogramRecCanFrame[i][j][1]);
+		}
+		printf("\n");
+	}
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

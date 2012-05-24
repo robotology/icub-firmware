@@ -325,7 +325,7 @@ void *recvThread(void * arg)
 	  // get from sockt
 	  sender.addr.get_addr();
 	  udppkt_size = ACE_socket->recv((void *) &sender.data, maxBytes2Read, remote01.addr, flags);
-	  printf("Received new packet, size = %d\n", udppkt_size);
+//	  printf("Received new packet, size = %d\n", udppkt_size);
 
 	  transceiver->SetReceived((ACE_UINT8 *)sender.data, udppkt_size);
 
@@ -410,7 +410,7 @@ static void s_callback_button_1(void)
 
  //   if(0 == reset)
     {
-        nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_rightlowerarm, 0, jointNVindex_jstatus__basic);
+/*        nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_rightlowerarm, 0, jointNVindex_jstatus__basic);
     	sigcfg.ep = endpoint_mc_rightlowerarm;
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
@@ -457,7 +457,7 @@ static void s_callback_button_1(void)
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
     	eo_array_PushBack(array, &sigcfg);
-
+*/
 		nvid = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_rightlowerarm, 0, skinNVindex_sstatus__arrayof10canframe);
     	sigcfg.ep = endpoint_sk_emsboard_rightlowerarm;
     	sigcfg.id = nvid;
