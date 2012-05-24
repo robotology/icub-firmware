@@ -27,41 +27,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#if 0
-
-// abslayer 
-#include "hal.h"
-#include "hal_trace.h"
-#include "osal.h"
-#include "ipal.h"
-
-
-// embobj  
-#include "EoCommon.h"
-#include "EOMtheSystem.h"
-#include "EOVtheSystem.h"
-#include "EOtheMemoryPool.h"
-#include "EOtheErrormanager.h"
-#include "EOMtheIPnet.h"
-
-#include "EOaction.h"
-#include "EOpacket.h"
-#include "EOMmutex.h"
-#include "EOsocketDatagram.h"
-
-
-// keeps info on appl
-#include "eom_emsappl_info.h"
-
-// keeps specialisation proper to the board function
-#include "eom_emsappl_specialise.h"
-
-
-#include "EOtheARMenvironment.h"
-#include "EOVtheEnvironment.h"
-
-#endif
-
 
 
 #include "stdint.h"
@@ -197,66 +162,66 @@ static void s_eom_emsappl_main_startup_OnError(eOerrmanErrorType_t errtype, eOid
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
-// old s_eom_emsappl_main_init():
-#if 0    
-    //uint8_t *ipaddr = (uint8_t*)&(eom_emsappl_info_ipal_cfg->eth_ip);
-    eOmipnet_cfg_addr_t* eomipnet_addr = NULL;
-    const eEipnetwork_t *ipnet = NULL;
+// //////////////////////////////////////////////////////////////////////////////
+// // old s_eom_emsappl_main_init():
+// #if 0    
+//     //uint8_t *ipaddr = (uint8_t*)&(eom_emsappl_info_ipal_cfg->eth_ip);
+//     eOmipnet_cfg_addr_t* eomipnet_addr = NULL;
+//     const eEipnetwork_t *ipnet = NULL;
 
-    
-    // ----------------------------------------------------------------------------------------------------------------
-    // 1. initialise eeprom and the arm-environmemnt
+//     
+//     // ----------------------------------------------------------------------------------------------------------------
+//     // 1. initialise eeprom and the arm-environmemnt
 
-    hal_eeprom_init(hal_eeprom_i2c_01, NULL);
-    eo_armenv_Initialise(&eom_emsappl_info_modinfo, NULL);
-    eov_env_SharedData_Synchronise(eo_armenv_GetHandle());
-
-
-
-    // ----------------------------------------------------------------------------------------------------------------
-    // 2. initialise the parameters for ipnet with params taken from the arm-environment (or from ipal-cfg)
-
-
-    // retrieve the configuration for ipnetwork
-#ifndef _FORCE_NETWORK_FROM_IPAL_CFG
-    if(eores_OK == eov_env_IPnetwork_Get(eo_armenv_GetHandle(), &ipnet))
-    {
-        eomipnet_addr = (eOmipnet_cfg_addr_t*)ipnet;   //they have the same memory layout
-
-        //ipaddr = (uint8_t*)&(eomipnet_addr->ipaddr);
-    }
-
-    else
-#endif
-    {
-        eomipnet_addr = NULL;
-        //ipaddr = (uint8_t*)&(eom_emsappl_info_ipal_cfg->eth_ip);
-    }
-
-
-    // ----------------------------------------------------------------------------------------------------------------
-    // 3. start the ipnet
-
-    eom_ipnet_Initialise(&eom_ipnet_DefaultCfg,
-                         eom_emsappl_specialise_ipal_cfg, 
-                         eomipnet_addr,
-                         &eom_emsappl_specialise_dtgskt_cfg
-                         );
+//     hal_eeprom_init(hal_eeprom_i2c_01, NULL);
+//     eo_armenv_Initialise(&eom_emsappl_info_modinfo, NULL);
+//     eov_env_SharedData_Synchronise(eo_armenv_GetHandle());
 
 
 
-    // ----------------------------------------------------------------------------------------------------------------
-    // 5. start task-upd-server
-
-    eom_emsappl_specialise_updserver_start();  
+//     // ----------------------------------------------------------------------------------------------------------------
+//     // 2. initialise the parameters for ipnet with params taken from the arm-environment (or from ipal-cfg)
 
 
-    // ----------------------------------------------------------------------------------------------------------------
-    // 5. call specialisation function
+//     // retrieve the configuration for ipnetwork
+// #ifndef _FORCE_NETWORK_FROM_IPAL_CFG
+//     if(eores_OK == eov_env_IPnetwork_Get(eo_armenv_GetHandle(), &ipnet))
+//     {
+//         eomipnet_addr = (eOmipnet_cfg_addr_t*)ipnet;   //they have the same memory layout
 
-    eom_emsappl_specialise_otherthings();
-#endif
+//         //ipaddr = (uint8_t*)&(eomipnet_addr->ipaddr);
+//     }
+
+//     else
+// #endif
+//     {
+//         eomipnet_addr = NULL;
+//         //ipaddr = (uint8_t*)&(eom_emsappl_info_ipal_cfg->eth_ip);
+//     }
+
+
+//     // ----------------------------------------------------------------------------------------------------------------
+//     // 3. start the ipnet
+
+//     eom_ipnet_Initialise(&eom_ipnet_DefaultCfg,
+//                          eom_emsappl_specialise_ipal_cfg, 
+//                          eomipnet_addr,
+//                          &eom_emsappl_specialise_dtgskt_cfg
+//                          );
+
+
+
+//     // ----------------------------------------------------------------------------------------------------------------
+//     // 5. start task-upd-server
+
+//     eom_emsappl_specialise_updserver_start();  
+
+
+//     // ----------------------------------------------------------------------------------------------------------------
+//     // 5. call specialisation function
+
+//     eom_emsappl_specialise_otherthings();
+// #endif
 
 
 // --------------------------------------------------------------------------------------------------------------------

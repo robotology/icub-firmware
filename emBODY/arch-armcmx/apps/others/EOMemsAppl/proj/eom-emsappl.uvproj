@@ -995,6 +995,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSerror.c</FilePath>
             </File>
+            <File>
+              <FileName>EOMtheEMSrunner.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSrunner.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -1915,6 +1920,11 @@
               <FileName>EOMtheEMSerror.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSerror.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSrunner.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSrunner.c</FilePath>
             </File>
           </Files>
         </Group>

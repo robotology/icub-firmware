@@ -539,10 +539,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>26</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_basic\eom_emsappl_main.c</PathWithFileName>
       <FilenameWithoutPath>eom_emsappl_main.c</FilenameWithoutPath>
@@ -567,7 +567,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>17</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -581,7 +581,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>32</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -775,7 +775,7 @@
 
   <Group>
     <GroupName>eo-core</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -1048,7 +1048,7 @@
 
   <Group>
     <GroupName>eo-mee</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -1125,7 +1125,7 @@
 
   <Group>
     <GroupName>eo-ipnet</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -1134,10 +1134,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>24</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>332</TopLine>
+      <CurrentLine>347</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src\EOMtheIPnet.c</PathWithFileName>
       <FilenameWithoutPath>EOMtheIPnet.c</FilenameWithoutPath>
@@ -1178,8 +1178,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>286</TopLine>
+      <CurrentLine>306</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\ipnet\src\EOsocketDatagram.c</PathWithFileName>
       <FilenameWithoutPath>EOsocketDatagram.c</FilenameWithoutPath>
@@ -1192,8 +1192,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>105</TopLine>
+      <CurrentLine>112</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\ipnet\src\EOVtheIPnet.c</PathWithFileName>
       <FilenameWithoutPath>EOVtheIPnet.c</FilenameWithoutPath>
@@ -1496,7 +1496,7 @@
 
   <Group>
     <GroupName>eo-nvs-board</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -1790,7 +1790,7 @@
 
   <Group>
     <GroupName>eo-nvs-cfg-usrcbk</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -1811,19 +1811,19 @@
 
   <Group>
     <GroupName>eo-sm</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>17</GroupNumber>
-      <FileNumber>89</FileNumber>
+      <GroupNumber>16</GroupNumber>
+      <FileNumber>85</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>36</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>63</TopLine>
-      <CurrentLine>133</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\utils\src\EOsm.c</PathWithFileName>
       <FilenameWithoutPath>EOsm.c</FilenameWithoutPath>
@@ -1836,88 +1836,102 @@
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
-      <GroupNumber>16</GroupNumber>
-      <FileNumber>85</FileNumber>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>86</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>7</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\eOcfg_sm_EMSappl.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_sm_EMSappl.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>16</GroupNumber>
-      <FileNumber>86</FileNumber>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>87</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>43</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>174</TopLine>
-      <CurrentLine>182</CurrentLine>
+      <TopLine>197</TopLine>
+      <CurrentLine>206</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSappl.c</PathWithFileName>
       <FilenameWithoutPath>EOMtheEMSappl.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>16</GroupNumber>
-      <FileNumber>87</FileNumber>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>88</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>36</ColumnNumber>
+      <ColumnNumber>31</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>180</TopLine>
+      <CurrentLine>168</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSsocket.c</PathWithFileName>
       <FilenameWithoutPath>EOMtheEMSsocket.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>16</GroupNumber>
-      <FileNumber>88</FileNumber>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>89</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>5</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>115</TopLine>
-      <CurrentLine>134</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMStransceiver.c</PathWithFileName>
       <FilenameWithoutPath>EOMtheEMStransceiver.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>16</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>90</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>73</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>103</TopLine>
+      <CurrentLine>113</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSconfigurator.c</PathWithFileName>
       <FilenameWithoutPath>EOMtheEMSconfigurator.c</FilenameWithoutPath>
     </File>
     <File>
-      <GroupNumber>16</GroupNumber>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>91</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>32</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>207</TopLine>
+      <CurrentLine>220</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSerror.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSerror.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>17</GroupNumber>
       <FileNumber>0</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>38</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>26</TopLine>
-      <CurrentLine>43</CurrentLine>
+      <TopLine>134</TopLine>
+      <CurrentLine>161</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSerror.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMSerror.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSrunner.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSrunner.c</FilenameWithoutPath>
     </File>
   </Group>
 
