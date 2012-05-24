@@ -278,15 +278,15 @@ static void s_eom_appSkeletonEms_body_theBoardTransceiver_init(void)
     eo_boardtransceiver_Initialise(&boardtxrxcfg);
 
 
-#warning VALE ==> aggiunto cfg rop regular
-    eo_transceiver_rop_regular_Clear(eo_boardtransceiver_GetHandle());
-    ropinfo.ropcfg              = eok_ropconfig_basic;
-    ropinfo.ropcfg.plustime     = 0;
-    ropinfo.ropcode             = eo_ropcode_sig;
-    ropinfo.nvep                = 0x0034;  //SKIN RIGHT  
-    ropinfo.nvid                = 1;      //ARRAY
-    res = eo_transceiver_rop_regular_Load(eo_boardtransceiver_GetHandle(), &ropinfo);
-    res = res;
+//#warning VALE ==> aggiunto cfg rop regular
+//    eo_transceiver_rop_regular_Clear(eo_boardtransceiver_GetHandle());
+//    ropinfo.ropcfg              = eok_ropconfig_basic;
+//    ropinfo.ropcfg.plustime     = 0;
+//    ropinfo.ropcode             = eo_ropcode_sig;
+//    ropinfo.nvep                = 0x0034;  //SKIN RIGHT  
+//    ropinfo.nvid                = 1;      //ARRAY
+//    res = eo_transceiver_rop_regular_Load(eo_boardtransceiver_GetHandle(), &ropinfo);
+//    res = res;
 
 }
 

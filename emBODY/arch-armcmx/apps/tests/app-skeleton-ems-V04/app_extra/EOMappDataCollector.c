@@ -269,7 +269,8 @@ static void s_eom_appDataCollector_taskRun(EOMtask *tsk, uint32_t evtmsgper)
         }
 
         /* 3) process received can frame */
-        eo_appCanSP_read(p->cfg.canSP_ptr);
+        eo_appCanSP_readOnlySkin_TEST(p->cfg.canSP_ptr);
+//        eo_appCanSP_read(p->cfg.canSP_ptr);
 
 //        /* 4) get encoders values*/
 //        if(eobool_true == eo_appEncReader_isReady(p->cfg.encReader_ptr))

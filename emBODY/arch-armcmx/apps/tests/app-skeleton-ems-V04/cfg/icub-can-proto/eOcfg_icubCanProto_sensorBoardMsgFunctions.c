@@ -170,6 +170,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sk_cmd__allSkinMsg(EOicubCanProto* 
 
     array = (EOarray*)nv_mem_ptr;
     res =  eo_array_PushBack(array, frame);
+
     return(res);
 }
 

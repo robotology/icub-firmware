@@ -186,7 +186,7 @@ extern eOresult_t eo_appCanSP_SendCmd(EOappCanSP *p, eo_appCanSP_canLocation *ca
 
 
 extern eOresult_t eo_appCanSP_read(EOappCanSP *p); //test porpouse
-
+extern eOresult_t eo_appCanSP_readOnlySkin_TEST(EOappCanSP *p); //test porpouse
 
 //following functions are obsolete!!!
 

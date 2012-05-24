@@ -255,7 +255,7 @@ static void s_eom_appDataTransmitter_taskRun(EOMtask *tsk, uint32_t evtmsgper)
         {
             return;
         }
-        eo_appCanSP_SendSetPoint(p->cfg.appCanSP_ptr, 0, &mySetPoint_current);
+//        eo_appCanSP_SendSetPoint(p->cfg.appCanSP_ptr, 0, &mySetPoint_current);
         p->st = eOm_appDataTransmitter_st__active;
     }
 

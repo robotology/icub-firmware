@@ -106,8 +106,9 @@ static eOresult_t s_eo_appCanSP_canPeriphInit(void);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
-
-
+static uint32_t error_count = 0;
+static uint32_t error_tr5 = 0;
+static uint32_t error_general = 0;
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -298,11 +299,11 @@ extern eOresult_t eo_appCanSP_GetMotorCanLocation(EOappCanSP *p, eOmc_motorId_t 
 
 extern eOresult_t eo_appCanSP_read(EOappCanSP *p)
 {
-#define MOTOR_MSG_MAX_RX 2
+#define MOTOR_MSG_MAX_RX 10
 
     eOresult_t res;
     hal_can_frame_t rec_frame;
-//    uint8_t  i;
+    uint8_t  i;
     uint8_t remainingMsg = 100;
     hal_can_port_t canPort = hal_can_port2;
     void *memRef = NULL;
@@ -326,7 +327,7 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p)
 
 
     //2) read messages
-    while(0!= remainingMsg)//for(i=0; i<MOTOR_MSG_MAX_RX; i++)
+    for(i=0; ((i<MOTOR_MSG_MAX_RX) && (0!= remainingMsg)) ; i++) //while(0!= remainingMsg)
     {
         res = (eOresult_t)hal_can_get(canPort, &rec_frame, &remainingMsg);
         if(eores_OK != res) 
@@ -346,11 +347,105 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p)
         DEBUG_PIN3_ON;
         DEBUG_PIN4_ON;
         res = eo_icubCanProto_ParseCanFrame(p->icubCanProto_ptr, (eOcanframe_t*)&rec_frame, (eOcanport_t)canPort);
+        if(eores_OK != res)
+        {
+            if(eores_NOK_generic == res) //array is full!!!
+            {
+                //verifico se e' un errore sul triangolo 5.
+                if((rec_frame.id & 0x00f) == 5)
+                {
+                    error_tr5 ++;
+                }
+                else
+                {
+                    error_count++;
+                }    
+            }
+            else
+            {
+                error_general++;
+            }
+
+        }
     }
     return(res);
 
 }
 
+extern eOresult_t eo_appCanSP_readOnlySkin_TEST(EOappCanSP *p)
+{
+#define MOTOR_MSG_MAX_RX 10
+
+    eOresult_t res;
+    hal_can_frame_t rec_frame;
+    uint8_t  i;
+    uint8_t remainingMsg = 100;
+    hal_can_port_t canPort = hal_can_port2;
+    void *memRef = NULL;
+    EOarray *sk_array = NULL;
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    //1) init operation
+    res = eo_appTheNVmapRef_GetSkinNVMemoryRef(eo_appTheNVmapRef_GetHandle(), 0, skinNVindex_sstatus__arrayof10canframe, &memRef);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    sk_array = (EOarray*)memRef;
+    eo_array_Reset(sk_array);
+
+    /* put here other init stuf before start reading from CAN */
+
+
+    //2) read messages
+    for(i=0; ((i<MOTOR_MSG_MAX_RX) && (0!= remainingMsg)) ; i++) //while(0!= remainingMsg)
+    {
+        res = (eOresult_t)hal_can_get(canPort, &rec_frame, &remainingMsg);
+        if(eores_OK != res) 
+        {
+            if(eores_NOK_nodata == res)
+            {
+                return(eores_OK);
+            }
+            else
+            {
+                return(res); //error management
+            }
+                                     
+        }
+//        rec_frame.id = 0x040;
+//        rec_frame.data[0] = 0;
+        DEBUG_PIN3_ON;
+        DEBUG_PIN4_ON;
+        res = eo_icubCanProto_ParseCanFrame(p->icubCanProto_ptr, (eOcanframe_t*)&rec_frame, (eOcanport_t)canPort);
+        if(eores_OK != res)
+        {
+            if(eores_NOK_generic == res) //array is full!!!
+            {
+                //verifico se e' un errore sul triangolo 5.
+                if((rec_frame.id & 0x00f) == 5)
+                {
+                    error_tr5 ++;
+                }
+                else
+                {
+                    error_count++;
+                }    
+            }
+            else
+            {
+                error_general++;
+            }
+
+        }
+    }
+    return(res);
+
+}
 
 
 extern eOresult_t eo_appCanSP_ReadSkin(EOappCanSP *p, eOsk_skinId_t skId)
@@ -416,6 +511,20 @@ extern eOresult_t eo_appCanSP_ConfigSkin(EOappCanSP *p, eOsk_skinId_t skId)
         return(eores_NOK_nullpointer);
     }
 
+#warning VALE--> MESSO ENA CAN IN CONFIG SKIN X TEST
+   res = (eOresult_t)hal_can_enable(hal_can_port1);
+
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    res = (eOresult_t)hal_can_enable(hal_can_port2);
+
+    if(eores_OK != res)
+    {
+        return(res);
+    }
 
     res = eo_emsCanNetTopo_GetskinCanLocation_BySkinId(p->emsCanNetTopo_ptr, 0, &canLoc);
     if(eores_OK != res)
@@ -1021,15 +1130,15 @@ static eOresult_t s_eo_appCanSP_canPeriphInit(void)
 
     can_cfg_port1.runmode            = hal_can_runmode_isr_1txq1rxq;
     can_cfg_port1.baudrate           = hal_can_baudrate_1mbps; 
-    can_cfg_port1.priorx             = hal_int_priority05;
-    can_cfg_port1.priotx             = hal_int_priority05;
+    can_cfg_port1.priorx             = hal_int_priority11;
+    can_cfg_port1.priotx             = hal_int_priority11;
     can_cfg_port1.callback_on_rx     = NULL;
     can_cfg_port1.arg                = NULL;
     
     can_cfg_port2.runmode            = hal_can_runmode_isr_1txq1rxq;
     can_cfg_port2.baudrate           = hal_can_baudrate_1mbps; 
-    can_cfg_port2.priorx             = hal_int_priority06;
-    can_cfg_port2.priotx             = hal_int_priority06;
+    can_cfg_port2.priorx             = hal_int_priority11;
+    can_cfg_port2.priotx             = hal_int_priority11;
     can_cfg_port2.callback_on_rx     = NULL;
     can_cfg_port2.arg                = NULL;
 
@@ -1047,19 +1156,19 @@ static eOresult_t s_eo_appCanSP_canPeriphInit(void)
         return(res);
     }
 
-    res = (eOresult_t)hal_can_enable(hal_can_port1);
-
-    if(eores_OK != res)
-    {
-        return(res);
-    }
-
-    res = (eOresult_t)hal_can_enable(hal_can_port2);
-
-    if(eores_OK != res)
-    {
-        return(res);
-    }
+//    res = (eOresult_t)hal_can_enable(hal_can_port1);
+//
+//    if(eores_OK != res)
+//    {
+//        return(res);
+//    }
+//
+//    res = (eOresult_t)hal_can_enable(hal_can_port2);
+//
+//    if(eores_OK != res)
+//    {
+//        return(res);
+//    }
 
     return(eores_OK);
 }
