@@ -303,7 +303,7 @@ static void s_eom_appSkeletonEms_body_EncodersReader_init(void)
 
     eOappEncReader_cfg_t  cfg = 
     {
-        EO_INIT(.connectedEncodersMask)     0xFFF,
+        EO_INIT(.connectedEncodersMask)     connectedEncodersMask_cfg,
         EO_INIT(.callbackOnLastRead)        NULL
     };
 
