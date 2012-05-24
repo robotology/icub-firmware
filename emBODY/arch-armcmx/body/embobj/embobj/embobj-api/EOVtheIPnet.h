@@ -68,32 +68,30 @@ typedef struct EOVtheIPnet_hid EOVtheIPnet;
 typedef void EOVtheIPnetDerived;
 
 
-extern const eOevent_t  eok_ipnet_evt_RXipframe;        /**< = 0x00000001;  */
-extern const eOevent_t  eok_ipnet_evt_CMD2process;      /**< = 0x00000002;  */
-extern const eOevent_t  eok_ipnet_evt_CMD2stop;         /**< = 0x00000004;  */
-extern const eOevent_t  eok_ipnet_evt_TXdatagram;       /**< = 0x00000008;  */
-extern const eOevent_t  eok_ipnet_evt_evalRXipframe;    /**< = 0x00000010;  */
-//extern const eOevent_t  eok_ipnet_evt_TXstream;         /**< = 0x00000010;  */
-//extern const eOevent_t  eok_ipnet_evt_TXsynchroBASE;    /**< = 0x10000000;  */
-//extern const eOevent_t  eok_ipnet_evt_TXsynchroMASK;    /**< = 0xF0000000;  */
-//extern const eOevent_t  eok_ipnet_evt_TXsynchro0;       /**< = 0x10000000;  */
-//extern const eOevent_t  eok_ipnet_evt_TXsynchro1;       /**< = 0x20000000;  */
-//extern const eOevent_t  eok_ipnet_evt_TXsynchro2;       /**< = 0x40000000;  */
-//extern const eOevent_t  eok_ipnet_evt_TXsynchro3;       /**< = 0x80000000;  */
+//extern const eOevent_t  eok_ipnet_evt_RXipframe;        /**< = 0x00000001;  */
+//extern const eOevent_t  eok_ipnet_evt_CMD2process;      /**< = 0x00000002;  */
+//extern const eOevent_t  eok_ipnet_evt_CMD2stop;         /**< = 0x00000004;  */
+//extern const eOevent_t  eok_ipnet_evt_TXdatagram;       /**< = 0x00000008;  */
+//extern const eOevent_t  eok_ipnet_evt_evalRXipframe;    /**< = 0x00000010;  */
+//extern const eOevent_t  eok_ipnet_evt_tick;             /**< = 0x00000020;  */
+
+typedef enum
+{
+    eov_ipnet_evt_tick                  = 0x00000001,   /**< used to produce a run of the ipnet loop. the effect of a run depends on implementions */   
+    eov_ipnet_evt_RXethframe            = 0x00000002,   /**< used to alert the ipnet about the reception of an IP frame. it is the ISR of ETH to alert */
+    eov_ipnet_evt_CMD2process           = 0x00000004,   /**< used to alert the ipnet about the start of processing of a command */
+    eov_ipnet_evt_CMD2stop              = 0x00000008,   /**< used to alert the ipnet about the end of processing of a command */
+    eov_ipnet_evt_TXdatagram            = 0x00000010    /**< used to alert the ipnet about the presence of a datagram to transmit. it is a socket or the ipnet to alert */
+} eOv_ipnet_event_t;
 
 
-#define     EOK_ipnet_evt_RXipframe         0x00000001
-#define     EOK_ipnet_evt_CMD2process       0x00000002
-#define     EOK_ipnet_evt_CMD2stop          0x00000004
-#define     EOK_ipnet_evt_TXdatagram        0x00000008
-#define     EOK_ipnet_evt_evalRXipframes    0x00000010
-//#define     EOK_ipnet_evt_TXstream          0x00000010
-//#define     EOK_ipnet_evt_TXsynchroBASE     0x10000000
-//#define     EOK_ipnet_evt_TXsynchroMASK     0xF0000000
-//#define     EOK_ipnet_evt_TXsynchro0        0x10000000
-//#define     EOK_ipnet_evt_TXsynchro1        0x20000000
-//#define     EOK_ipnet_evt_TXsynchro2        0x40000000
-//#define     EOK_ipnet_evt_TXsynchro3        0x80000000
+//#define     EOK_ipnet_evt_RXipframe         0x00000001
+//#define     EOK_ipnet_evt_CMD2process       0x00000002
+//#define     EOK_ipnet_evt_CMD2stop          0x00000004
+//#define     EOK_ipnet_evt_TXdatagram        0x00000008
+//#define     EOK_ipnet_evt_evalRXipframes    0x00000010
+//#define     EOK_ipnet_evt_tick              0x00000020
+
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------

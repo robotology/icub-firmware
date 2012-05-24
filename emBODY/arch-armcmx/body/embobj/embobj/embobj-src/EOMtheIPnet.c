@@ -430,7 +430,7 @@ static eOresult_t s_eom_ipnet_ARP(EOVtheIPnet *ip, eOipv4addr_t ipaddr, eOreltim
 
  
     // - tell the task that there is a command to process, so that a switch context is forced.
-    s_eom_ipnet_Alert(s_eom_theipnet.ipnet, &s_eom_theipnet, EOK_ipnet_evt_CMD2process);
+    s_eom_ipnet_Alert(s_eom_theipnet.ipnet, &s_eom_theipnet, eov_ipnet_evt_CMD2process);
 
     // - now the calling task is placed in hold until this semaphore is incremented  
     // - by the ipnet task when it has finished executing the command or its time has expired
@@ -484,7 +484,7 @@ static eOresult_t s_eom_ipnet_AttachSocket(EOVtheIPnet* ip, EOsocketDerived *s)
     if(eobool_true == canattach)
     {   
         // - tell the task that there is a command to process, so that a switch context is forced.
-        s_eom_ipnet_Alert(s_eom_theipnet.ipnet, &s_eom_theipnet, EOK_ipnet_evt_CMD2process);
+        s_eom_ipnet_Alert(s_eom_theipnet.ipnet, &s_eom_theipnet, eov_ipnet_evt_CMD2process);
 
         // - now the calling task is placed in hold until this semaphore is incremented 
         // - by the ipnet task when it has finished executing the command or its time has expired
@@ -541,7 +541,7 @@ static eOresult_t s_eom_ipnet_DetachSocket(EOVtheIPnet* ip, EOsocketDerived *s)
     if(eobool_true == candetach)
     {   
         // - tell the task that there is a command to process, so that a switch context is forced.
-        s_eom_ipnet_Alert(s_eom_theipnet.ipnet, &s_eom_theipnet, EOK_ipnet_evt_CMD2process);
+        s_eom_ipnet_Alert(s_eom_theipnet.ipnet, &s_eom_theipnet, eov_ipnet_evt_CMD2process);
 
         // - now the calling task is placed in hold until this semaphore is incremented 
         // - by the ipnet task when it has finished executing the command or its time has expired
@@ -580,20 +580,20 @@ static eOresult_t s_eom_ipnet_Alert(EOVtheIPnet* ip, void *eobjcaller, eOevent_t
 
     switch(evt)
     {
-        case EOK_ipnet_evt_RXipframe:
+        case eov_ipnet_evt_RXethframe:
         {
             // caller is the eth isr
-            eom_task_isrSetEvent(s_eom_theipnet.tskproc, EOK_ipnet_evt_RXipframe);
+            eom_task_isrSetEvent(s_eom_theipnet.tskproc, eov_ipnet_evt_RXethframe);
         } break;
 
-        case EOK_ipnet_evt_TXdatagram:
+        case eov_ipnet_evt_TXdatagram:
         {
             // caller is a socket object which ... wants to tx a datagram packet. we need to put inside a fifo the reference to the socket
             // contained in eobjcaller
             if(osal_res_OK == osal_messagequeue_put(s_eom_theipnet.dgramsocketready2tx, (osal_message_t)eobjcaller, osal_reltimeINFINITE, osal_callerTSK))
             {
                 // send event
-                eom_task_SetEvent(s_eom_theipnet.tskproc, EOK_ipnet_evt_TXdatagram);
+                eom_task_SetEvent(s_eom_theipnet.tskproc, eov_ipnet_evt_TXdatagram);
             }
 
         } break;
@@ -689,7 +689,7 @@ static void e_eom_ipnet_signal_new_frame_is_available(void)
         return;
     }
 
-    eom_task_isrSetEvent(s_eom_theipnet.tskproc, EOK_ipnet_evt_RXipframe);   
+    eom_task_isrSetEvent(s_eom_theipnet.tskproc, eov_ipnet_evt_RXethframe);   
 }
 
 
@@ -753,7 +753,7 @@ static void s_eom_ipnet_tskproc_forever(EOMtask *rt, uint32_t evtmsk)
     
     if(eobool_false == s_eom_theipnet.ipnet->active)
     {
-        if(EOK_ipnet_evt_TXdatagram == (evtmsk & EOK_ipnet_evt_TXdatagram))
+        if(eov_ipnet_evt_TXdatagram == (evtmsk & eov_ipnet_evt_TXdatagram))
         {    
             force_transmission_when_reactivated = 1;
         }
@@ -768,7 +768,7 @@ static void s_eom_ipnet_tskproc_forever(EOMtask *rt, uint32_t evtmsk)
 
 
 
-//    if(EOK_ipnet_evt_RXipframe == (evtmsk & EOK_ipnet_evt_RXipframe))
+//    if(eov_ipnet_evt_RXethframe == (evtmsk & eov_ipnet_evt_RXethframe))
 //    {   // the ethernet isr has just received and processed an ethernet frame
 //
 //        // i could maybe return if i have this event and only this ????  no: i go on  
@@ -789,7 +789,7 @@ static void s_eom_ipnet_tskproc_forever(EOMtask *rt, uint32_t evtmsk)
     // allow the following mechanism: transmit one or mor packets (by a very high priority task)
     // and then ... the same task closes teh socket .... well: the IPnet before transmit every packet
     // in the fifooutput and then closes the socket.
-    if((EOK_ipnet_evt_TXdatagram == (evtmsk & EOK_ipnet_evt_TXdatagram)) || (1 == force_transmission_when_reactivated))
+    if((eov_ipnet_evt_TXdatagram == (evtmsk & eov_ipnet_evt_TXdatagram)) || (1 == force_transmission_when_reactivated))
     {
         force_transmission_when_reactivated = 0;
         s_eom_ipnet_process_transmission_datagram();
@@ -798,7 +798,7 @@ static void s_eom_ipnet_tskproc_forever(EOMtask *rt, uint32_t evtmsk)
     
     // - (d) process request of a command
     
-    if(EOK_ipnet_evt_CMD2process == (evtmsk & EOK_ipnet_evt_CMD2process))
+    if(eov_ipnet_evt_CMD2process == (evtmsk & eov_ipnet_evt_CMD2process))
     {
         s_eom_ipnet_process_command();
     }
@@ -806,7 +806,7 @@ static void s_eom_ipnet_tskproc_forever(EOMtask *rt, uint32_t evtmsk)
     
     // - (e) process termination of processing of a command (the termination is internally issued)
     
-    if(EOK_ipnet_evt_CMD2stop == (evtmsk & EOK_ipnet_evt_CMD2stop))
+    if(eov_ipnet_evt_CMD2stop == (evtmsk & eov_ipnet_evt_CMD2stop))
     {
         s_eom_ipnet_stop_command();
     }
@@ -947,7 +947,7 @@ static void s_eom_ipnet_process_command(void)
                 {
                     // unlucky. retry with a timeout
                     // start a one-shot timer with tout and which sends an event of stop to this task
-                    eo_action_SetEvent(s_eom_theipnet.cmd.stopact, EOK_ipnet_evt_CMD2stop, s_eom_theipnet.tskproc);
+                    eo_action_SetEvent(s_eom_theipnet.cmd.stopact, eov_ipnet_evt_CMD2stop, s_eom_theipnet.tskproc);
                     eo_timer_Start(s_eom_theipnet.cmd.stoptmr, eok_abstimeNOW, s_eom_theipnet.cmd.tout, eo_tmrmode_ONESHOT, s_eom_theipnet.cmd.stopact);
                 }
 
@@ -978,15 +978,15 @@ static void s_eom_ipnet_process_command(void)
             // initialise the base socket, commit the derived socket in proper data stratcure of ipnet
 
             // if we are asked to close a datagram socket which has some more packets to transmit, then
-            // we decide to empty the fifo first. we do that by sending a EOK_ipnet_evt_TXdatagram
-            // event but also a EOK_ipnet_evt_CMD2process to get here inside again. 
+            // we decide to empty the fifo first. we do that by sending a eov_ipnet_evt_TXdatagram
+            // event but also a eov_ipnet_evt_CMD2process to get here inside again. 
 
             if(eores_OK == eo_fifo_Size(((EOsocketDatagram*)sdrv)->dgramfifooutput, &size, s_eom_theipnet.maxwaittime))
             {
                 if(0 != size)
                 {
                     // sends an event of kind tx-pkt and cmd
-                    eom_task_SetEvent(s_eom_theipnet.tskproc, EOK_ipnet_evt_TXdatagram | EOK_ipnet_evt_CMD2process);
+                    eom_task_SetEvent(s_eom_theipnet.tskproc, eov_ipnet_evt_TXdatagram | eov_ipnet_evt_CMD2process);
                     // and then return ....
                     return;
                 }
@@ -1147,7 +1147,7 @@ static void s_eom_ipnet_process_transmission_datagram(void)
             // if message queue is not empty, then sends another tx event because there is another socket which needs transmission
             if(0 != osal_messagequeue_size(s_eom_theipnet.dgramsocketready2tx, osal_callerTSK))
             {
-                eom_task_SetEvent(s_eom_theipnet.tskproc, EOK_ipnet_evt_TXdatagram);
+                eom_task_SetEvent(s_eom_theipnet.tskproc, eov_ipnet_evt_TXdatagram);
             } 
             
         } break;

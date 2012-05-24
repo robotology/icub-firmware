@@ -303,7 +303,7 @@ extern eOresult_t eo_socketdtg_Put(EOsocketDatagram *p, EOpacket *pkt)
     // alert that a new pkt is available from this socket. immediately or deferred by a one-shot timer or even at periodic slots
     if((eok_abstimeNOW == p->txmode.startat) && (0 == p->txmode.after))
     {
-        res = eov_ipnet_Alert(eov_ipnet_GetHandle(), p, EOK_ipnet_evt_TXdatagram);
+        res = eov_ipnet_Alert(eov_ipnet_GetHandle(), p, eov_ipnet_evt_TXdatagram);
     }
     else if(eobool_false == p->txmode.periodic)
     {
@@ -418,7 +418,7 @@ extern eOresult_t eo_socketdtg_Received_NumberOf(EOsocketDatagram *p, eOsizecntn
 
 static void s_eo_socketdtg_txcallback(void *arg)
 {
-    eov_ipnet_Alert(eov_ipnet_GetHandle(), arg, EOK_ipnet_evt_TXdatagram);
+    eov_ipnet_Alert(eov_ipnet_GetHandle(), arg, eov_ipnet_evt_TXdatagram);
 }
 
 
