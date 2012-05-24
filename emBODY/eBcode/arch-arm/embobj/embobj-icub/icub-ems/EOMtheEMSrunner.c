@@ -32,28 +32,18 @@
 #include "EOMtheEMSsocket.h"
 #include "EOMtask.h"
 
-#include "stdio.h"
-#include "hal_trace.h"
-
-#include "EOVtheSystem.h"
-
-//#include "EOsm.h"
-
-#include "EOMtheEMSappl.h"
-
-
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOMtheEMSerror.h"
+#include "EOMtheEMSrunner.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOMtheEMSerror_hid.h" 
+#include "EOMtheEMSrunner_hid.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -66,10 +56,10 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-const eOemserror_cfg_t eom_emserror_DefaultCfg = 
+const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg = 
 {
-    EO_INIT(.taskpriority)             50, 
-    EO_INIT(.taskstacksize)            512
+    EO_INIT(.taskpriority)             {62,     61,     60},  
+    EO_INIT(.taskstacksize)            {1024,   1024,   1024}
 };
 
 
@@ -83,24 +73,29 @@ const eOemserror_cfg_t eom_emserror_DefaultCfg =
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern void tskEMSerr(void *p);
+extern void tskEMSrunRX(void *p);
+extern void tskEMSrunDO(void *p);
+extern void tskEMSrunTX(void *p);
 
-static void s_eom_emserror_task_startup(EOMtask *p, uint32_t t);
-static void s_eom_emserror_task_run(EOMtask *p, uint32_t t);
+static void s_eom_emsrunner_taskRX_startup(EOMtask *p, uint32_t t);
+static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t);
 
-static void s_eom_emserror_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info);
+static void s_eom_emsrunner_taskDO_startup(EOMtask *p, uint32_t t);
+static void s_eom_emsrunner_taskDO_run(EOMtask *p, uint32_t t);
 
+static void s_eom_emsrunner_taskTX_startup(EOMtask *p, uint32_t t);
+static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-//static const char s_eobj_ownname[] = "EOMtheEMSerror";
+//static const char s_eobj_ownname[] = "EOMtheEMSrunner";
 
  
-static EOMtheEMSerror s_emserror_singleton = 
+static EOMtheEMSrunner s_theemsrunner = 
 {
-    EO_INIT(.task)              NULL
+    EO_INIT(.task)          {NULL, NULL, NULL}
 };
 
 
@@ -110,34 +105,52 @@ static EOMtheEMSerror s_emserror_singleton =
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern EOMtheEMSerror * eom_emserror_Initialise(const eOemserror_cfg_t *cfg)
+extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
 {
-    if(NULL != s_emserror_singleton.task)
+    if(NULL != s_theemsrunner.task[0])
     {
-        return(&s_emserror_singleton);
+        return(&s_theemsrunner);
     }
     
     if(NULL == cfg)
     {
-        cfg = &eom_emserror_DefaultCfg;
+        cfg = &eom_emsrunner_DefaultCfg;
     }
     
-    s_emserror_singleton.task = eom_task_New(eom_mtask_EventDriven, cfg->taskpriority, cfg->taskstacksize, 
-                                                    s_eom_emserror_task_startup, s_eom_emserror_task_run,  
-                                                    (eOevent_t)0, eok_reltimeINFINITE, NULL, 
-                                                    tskEMSerr, "tskEMSerr");
+    s_theemsrunner.task[eo_emsrunner_taskid_runRX] = eom_task_New(eom_mtask_OnAllEventsDriven, 
+                                                                  cfg->taskpriority[eo_emsrunner_taskid_runRX], 
+                                                                  cfg->taskstacksize[eo_emsrunner_taskid_runRX], 
+                                                                  s_eom_emsrunner_taskRX_startup, s_eom_emsrunner_taskRX_run,  
+                                                                  (eOevent_t)(eo_emsrunner_evt_enable) & (eOevent_t)(eo_emsrunner_evt_execute), 
+                                                                  eok_reltimeINFINITE, NULL, 
+                                                                  tskEMSrunRX, "tskEMSrunRX");
  
-    eo_errman_SetOnErrorHandler(eo_errman_GetHandle(), s_eom_emserror_OnError);                                               
+    s_theemsrunner.task[eo_emsrunner_taskid_runDO] = eom_task_New(eom_mtask_OnAllEventsDriven, 
+                                                                  cfg->taskpriority[eo_emsrunner_taskid_runDO], 
+                                                                  cfg->taskstacksize[eo_emsrunner_taskid_runDO], 
+                                                                  s_eom_emsrunner_taskDO_startup, s_eom_emsrunner_taskDO_run,  
+                                                                  (eOevent_t)(eo_emsrunner_evt_enable) & (eOevent_t)(eo_emsrunner_evt_execute), 
+                                                                  eok_reltimeINFINITE, NULL, 
+                                                                  tskEMSrunDO, "tskEMSrunDO"); 
+                                                                  
+    s_theemsrunner.task[eo_emsrunner_taskid_runTX] = eom_task_New(eom_mtask_OnAllEventsDriven, 
+                                                                  cfg->taskpriority[eo_emsrunner_taskid_runTX], 
+                                                                  cfg->taskstacksize[eo_emsrunner_taskid_runTX], 
+                                                                  s_eom_emsrunner_taskTX_startup, s_eom_emsrunner_taskTX_run,  
+                                                                  (eOevent_t)(eo_emsrunner_evt_enable) & (eOevent_t)(eo_emsrunner_evt_execute), 
+                                                                  eok_reltimeINFINITE, NULL, 
+                                                                  tskEMSrunTX, "tskEMSrunTX");                                                              
+                                                   
     
-    return(&s_emserror_singleton);
+    return(&s_theemsrunner);
 }
 
 
-extern EOMtheEMSerror* eom_emserror_GetHandle(void) 
+extern EOMtheEMSrunner* eom_emsrunner_GetHandle(void) 
 {
-    if(NULL != s_emserror_singleton.task)
+    if(NULL != s_theemsrunner.task)
     {
-        return(&s_emserror_singleton);
+        return(&s_theemsrunner);
     }
     else
     {
@@ -145,14 +158,14 @@ extern EOMtheEMSerror* eom_emserror_GetHandle(void)
     }
 }
 
-extern EOMtask * eom_emserror_GetTask(EOMtheEMSerror *p)
+extern EOMtask * eom_emsrunner_GetTask(EOMtheEMSrunner *p, eOemsrunner_taskid_t id)
 {
     if(NULL == p)
     {
         return(NULL);
     }
     
-    return(s_emserror_singleton.task);
+    return(s_theemsrunner.task[id]);
 }
 
 
@@ -161,17 +174,25 @@ extern EOMtask * eom_emserror_GetTask(EOMtheEMSerror *p)
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern void tskEMSerr(void *p)
+extern void tskEMSrunRX(void *p)
+{
+    // do here whatever you like before startup() is executed and then forever()
+    eom_task_Start(p);
+} 
+
+extern void tskEMSrunDO(void *p)
+{
+    // do here whatever you like before startup() is executed and then forever()
+    eom_task_Start(p);
+} 
+
+extern void tskEMSrunTX(void *p)
 {
     // do here whatever you like before startup() is executed and then forever()
     eom_task_Start(p);
 } 
 
 
-__weak extern void eom_emserror_hid_userdef_DoJustAfterPacketReceived(EOpacket *rxpkt)
-{
-
-} 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -179,74 +200,47 @@ __weak extern void eom_emserror_hid_userdef_DoJustAfterPacketReceived(EOpacket *
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static void s_eom_emserror_task_startup(EOMtask *p, uint32_t t)
+static void s_eom_emsrunner_taskRX_startup(EOMtask *p, uint32_t t)
 {
-    // dont do anything. the ems-socket, ems-transceiver etc have been already initted by the EOMtheEMSappl
+    
 }
 
 
 
-static void s_eom_emserror_task_run(EOMtask *p, uint32_t t)
+static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
 {
-    // the event that we have received
-    eOevent_t evt = (eOevent_t)t;
-    EOpacket* rxpkt = NULL;
-    eOsizecntnr_t remainingrxpkts = 0;
-    eOresult_t res;
-    
-    if(eobool_true == eo_common_event_check(evt, emssocket_evt_packet_received))
-    {   // process the reception of a packet. it must contain a ropframe and nothing else
-    
-        // 1. get the packet. we need passing just a pointer because the storage is inside the EOMtheEMSsocket       
-        res = eom_emssocket_Receive(eom_emssocket_GetHandle(), &rxpkt, &remainingrxpkts);
 
-        
-        if(eores_OK == res)
-        {
-            // perform an user-defined function
-            eom_emserror_hid_userdef_DoJustAfterPacketReceived(rxpkt);
-        }
-        
-        // 5. if another packet is in the rx fifo, send a new event to process its retrieval again        
-        if(remainingrxpkts > 0)
-        {
-            eom_task_SetEvent(p, emssocket_evt_packet_received); 
-        }     
-    }
-    
-    if(eobool_true == eo_common_event_check(evt, emserror_evt_error))
-    {
-        #warning ---> manage start of error....
-        eom_emsappl_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2err);
-        //eo_sm_ProcessEvent(eom_emsappl_GetStateMachine(eom_emsappl_GetHandle()), eo_sm_emsappl_EVgo2err); 
-    }
+
 }
 
 
-static void s_eom_emserror_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info)
+static void s_eom_emsrunner_taskDO_startup(EOMtask *p, uint32_t t)
 {
-  
-   
-    const char err[4][16] = {"info", "warning", "weak error", "fatal error"};
-    char str[128];
-
-    snprintf(str, sizeof(str)-1, "EOMtheEMSerror: [eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, err[(uint8_t)errtype], info);
-    hal_trace_puts(str);
-
-    if(errtype <= eo_errortype_warning)
-    {
-        return;
-    }
     
-    //eov_sys_Stop(eov_sys_GetHandle());
-    
-     
-    eom_task_PrioritySet(s_emserror_singleton.task, eom_mtask_prio_max);
-    
-    eom_task_SetEvent(s_emserror_singleton.task, emserror_evt_error); 
-    
-    for(;;);    
 }
+
+
+
+static void s_eom_emsrunner_taskDO_run(EOMtask *p, uint32_t t)
+{
+
+
+}
+
+
+static void s_eom_emsrunner_taskTX_startup(EOMtask *p, uint32_t t)
+{
+    
+}
+
+
+
+static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
+{
+
+
+}
+
 
 
 
