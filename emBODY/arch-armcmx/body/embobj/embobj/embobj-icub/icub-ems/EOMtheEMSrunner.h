@@ -82,13 +82,18 @@ typedef struct
 {
      uint8_t        taskpriority[eo_emsrunner_task_numberof];
      uint16_t       taskstacksize[eo_emsrunner_task_numberof];   
+     eOreltime_t    period;                 /**< The period of the cycle rx-do-tx. It is 1000 us. The rx task starts at beginning of the cycle.*/
+     eOreltime_t    execDOafter;            /**< The start of the do task as an offset from the beginning of the cycle. It is 500 us. */  
+     eOreltime_t    execTXafter;            /**< The start of the tx task as an offset from the beginning of the cycle. It is 750 us. */  
+     eOreltime_t    safetyGAP;              /**< The time beween two consecutive tasks before which the previous task must have finished its ececution. 50 us> */ 
 } eOemsrunner_cfg_t;
 
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg; // = {.taskpriority = {62, 61, 60}, .taskstacksize = {1024, 1024, 1024}};
+extern const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg; // = {.taskpriority = {62, 61, 60}, .taskstacksize = {1024, 1024, 1024}, 
+                                                         //    .execDOafter = 500, .execTXafter = 750, .safetyGAP = 50};
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -110,7 +115,9 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *emsru
 extern EOMtheEMSrunner * eom_emsrunner_GetHandle(void);
 
 
+extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p);
 
+extern eOresult_t eom_emsrunner_Stop(EOMtheEMSrunner *p);
 
 extern EOMtask * eom_emsrunner_GetTask(EOMtheEMSrunner *p, eOemsrunner_taskid_t id);
 

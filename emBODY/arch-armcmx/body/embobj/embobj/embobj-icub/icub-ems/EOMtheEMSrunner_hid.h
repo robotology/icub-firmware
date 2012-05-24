@@ -56,7 +56,9 @@ extern "C" {
  **/  
 struct EOMtheEMSrunner_hid 
 {
-    EOMtask*    task[eo_emsrunner_task_numberof];
+    EOMtask*            task[eo_emsrunner_task_numberof];
+    eOemsrunner_cfg_t   cfg;
+    eObool_t            cycleisrunning;
 };
 
 
