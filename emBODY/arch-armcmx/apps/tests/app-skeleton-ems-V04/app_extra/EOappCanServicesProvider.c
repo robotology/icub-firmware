@@ -511,21 +511,6 @@ extern eOresult_t eo_appCanSP_ConfigSkin(EOappCanSP *p, eOsk_skinId_t skId)
         return(eores_NOK_nullpointer);
     }
 
-#warning VALE--> MESSO ENA CAN IN CONFIG SKIN X TEST
-   res = (eOresult_t)hal_can_enable(hal_can_port1);
-
-    if(eores_OK != res)
-    {
-        return(res);
-    }
-
-    res = (eOresult_t)hal_can_enable(hal_can_port2);
-
-    if(eores_OK != res)
-    {
-        return(res);
-    }
-
     res = eo_emsCanNetTopo_GetskinCanLocation_BySkinId(p->emsCanNetTopo_ptr, 0, &canLoc);
     if(eores_OK != res)
     {
@@ -1156,19 +1141,19 @@ static eOresult_t s_eo_appCanSP_canPeriphInit(void)
         return(res);
     }
 
-//    res = (eOresult_t)hal_can_enable(hal_can_port1);
-//
-//    if(eores_OK != res)
-//    {
-//        return(res);
-//    }
-//
-//    res = (eOresult_t)hal_can_enable(hal_can_port2);
-//
-//    if(eores_OK != res)
-//    {
-//        return(res);
-//    }
+    res = (eOresult_t)hal_can_enable(hal_can_port1);
+
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    res = (eOresult_t)hal_can_enable(hal_can_port2);
+
+    if(eores_OK != res)
+    {
+        return(res);
+    }
 
     return(eores_OK);
 }

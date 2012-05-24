@@ -96,9 +96,8 @@ extern EOethBaseModule* eo_ethBaseModule_New(EOethBaseModule_cfg_t *cfg)
 
     //Here I don't check (dtg_num > 0) and (dtg_size > 0), because it is already do in eo_socketdtg_New.
     //if the the check is not passed then the function calls EOerrorManager.
-    #warning VALE==> eliminati mutex in ethbasemodule no memory!!!
-    retptr->socket = eo_socketdtg_New(cfg->dtagramQueue_itemNum, cfg->dtagramQueue_itemSize,/* eom_mutex_New()*/NULL, // input queue: 4 datagram with mwax size = ETH_CONTROL_DGRAM_PAYLOAD_SIZE
-                                        cfg->dtagramQueue_itemNum, cfg->dtagramQueue_itemSize, /* eom_mutex_New()*/NULL  // input queue: 4 datagram with mwax size = ETH_CONTROL_DGRAM_PAYLOAD_SIZE
+    retptr->socket = eo_socketdtg_New(cfg->dtagramQueue_itemNum, cfg->dtagramQueue_itemSize, eom_mutex_New(), // input queue: 4 datagram with mwax size = ETH_CONTROL_DGRAM_PAYLOAD_SIZE
+                                        cfg->dtagramQueue_itemNum, cfg->dtagramQueue_itemSize,  eom_mutex_New() // input queue: 4 datagram with mwax size = ETH_CONTROL_DGRAM_PAYLOAD_SIZE
                                         );
 
     retptr->rxpkt = eo_packet_New(cfg->dtagramQueue_itemSize);

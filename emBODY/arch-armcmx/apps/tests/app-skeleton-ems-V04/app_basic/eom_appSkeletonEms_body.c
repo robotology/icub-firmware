@@ -265,8 +265,8 @@ static void s_eom_appSkeletonEms_body_ledInit(void)
 
 static void s_eom_appSkeletonEms_body_theBoardTransceiver_init(void)
 {
-    eo_transceiver_ropinfo_t ropinfo;
-    eOresult_t res;
+//    eo_transceiver_ropinfo_t ropinfo;
+//    eOresult_t res;
     eOboardtransceiver_cfg_t boardtxrxcfg = 
     {
         .vectorof_endpoint_cfg          = eo_cfg_EPs_vectorof_eb4,
