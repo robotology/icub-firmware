@@ -17,20 +17,20 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOMTHEEMSAPPL_H_
-#define _EOMTHEEMSAPPL_H_
+#ifndef _EOMTHEEMSRUNNER_H_
+#define _EOMTHEEMSRUNNER_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/** @file       EOMtheEMSappl.h
-	@brief      This header file implements public interface to the EMS application singleton.
+/** @file       EOMtheEMSrunner.h
+	@brief      This header file implements public interface to the EMS runner singleton.
  	@author     marco.accame@iit.it
 	@date       05/21/2012
  **/
 
-/** @defgroup eom_theemsappl Singleton EOMtheEMSappl 
+/** @defgroup eom_EOMtheEMSrunner Singleton EOMtheEMSrunner 
     
     The .....  
   
@@ -42,9 +42,8 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-#include "eEcommon.h"
-#include "EOsm.h"
-#include "eOcfg_sm_EMSappl.h"
+#include "EOtransceiver.h"
+
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -52,64 +51,75 @@ extern "C" {
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-/** @typedef    typedef struct EOMtheEMSappl_hid EOMtheEMSappl
-    @brief      EOMtheEMSappl is an opaque struct. It is used to implement data abstraction for the 
+/** @typedef    typedef struct EOMtheEMSrunner_hid EOMtheEMSrunner
+    @brief      EOMtheEMSrunner is an opaque struct. It is used to implement data abstraction for the 
                 object so that the user cannot see its private fields so that he/she is forced to manipulate the
                 object only with the proper public functions
  **/  
-typedef struct EOMtheEMSappl_hid EOMtheEMSappl;
+typedef struct EOMtheEMSrunner_hid EOMtheEMSrunner;
+
+typedef enum
+{
+    eo_emsrunner_taskid_runRX       = 0,
+    eo_emsrunner_taskid_runDO       = 1,
+    eo_emsrunner_taskid_runTX       = 2   
+} eOemsrunner_taskid_t;
+
+enum { eo_emsrunner_task_numberof   = 3 };
 
 
+typedef enum
+{
+    eo_emsrunner_evt_enable       = 0x00000001,
+    eo_emsrunner_evt_execute      = 0x00000002
+} eOemsrunner_event_t;
 
-/**	@typedef    typedef struct eOemsappl_cfg_t 
- 	@brief      Contains the configuration for the EOMtheEMSappl. 
+
+/**	@typedef    typedef struct eOemsrunner_cfg_t 
+ 	@brief      Contains the configuration for the EOMtheEMSrunner. 
  **/
 typedef struct
 {
-    eEmoduleInfo_t* emsappinfo;
-    eOipv4addr_t    hostipv4addr;
-    eOipv4port_t    hostipv4port;    
-} eOemsappl_cfg_t;
+     uint8_t        taskpriority[eo_emsrunner_task_numberof];
+     uint16_t       taskstacksize[eo_emsrunner_task_numberof];   
+} eOemsrunner_cfg_t;
 
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eOemsappl_cfg_t eom_emsappl_DefaultCfg; // = {.emsappinfo = NULL, .hostipv4addr = EO_COMMON_IPV4ADDR(10, 0, 1, 200), .hostipv4port = 12345};
+extern const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg; // = {.taskpriority = {62, 61, 60}, .taskstacksize = {1024, 1024, 1024}};
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
 
-/** @fn         extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
-    @brief      Initialise the EOMtheEMSappl singleton 
-    @arg        emsapplcfg       The configuration. NULL is OK.
-    @return     The handle to the EOMtheEMSappl
+/** @fn         extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *emsrunnercfg)
+    @brief      Initialise the EOMtheEMSrunner singleton 
+    @arg        emsrunnercfg       The configuration. NULL is OK.
+    @return     The handle to the EOMtheEMSrunner
  **/
+extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *emsrunnercfg);
 
-extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg);
 
-
-/** @fn         extern EOMtheEMSappl * eom_emsappl_GetHandle(void)
-    @brief      Retrieve the EOMtheEMSappl singleton 
-    @return     The handle to the EOMtheEMSappl
+/** @fn         extern EOMtheEMSrunner * eom_emsrunner_GetHandle(void)
+    @brief      Retrieve the EOMtheEMSrunner singleton 
+    @return     The handle to the EOMtheEMSrunner
  **/
-extern EOMtheEMSappl * eom_emsappl_GetHandle(void);
+extern EOMtheEMSrunner * eom_emsrunner_GetHandle(void);
 
 
-//extern EOsm* eom_emsappl_GetStateMachine(EOMtheEMSappl *p) ;
 
 
-extern eOresult_t eom_emsappl_ProcessEvent(EOMtheEMSappl *p, eOsmEventsEMSappl_t ev);
- 
+extern EOMtask * eom_emsrunner_GetTask(EOMtheEMSrunner *p, eOemsrunner_taskid_t id);
 
 
 
 
 
 /** @}            
-    end of group eom_theemsappl  
+    end of group eom_EOMtheEMSrunner  
  **/
 
 #ifdef __cplusplus
