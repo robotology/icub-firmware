@@ -55,12 +55,13 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern const eOevent_t  eok_ipnet_evt_RXipframe         = 0x00000001;  
-extern const eOevent_t  eok_ipnet_evt_CMD2process       = 0x00000002;  
-extern const eOevent_t  eok_ipnet_evt_CMD2stop          = 0x00000004;  
-extern const eOevent_t  eok_ipnet_evt_TXdatagram        = 0x00000008; 
-extern const eOevent_t  eok_ipnet_evt_evalRXipframe     = 0x00000010;  
-//extern const eOevent_t  eok_ipnet_evt_TXstream          = 0x00000010;  
+//extern const eOevent_t  eok_ipnet_evt_RXipframe         = EOK_ipnet_evt_RXipframe;  
+//extern const eOevent_t  eok_ipnet_evt_CMD2process       = EOK_ipnet_evt_CMD2process;  
+//extern const eOevent_t  eok_ipnet_evt_CMD2stop          = EOK_ipnet_evt_CMD2stop;  
+//extern const eOevent_t  eok_ipnet_evt_TXdatagram        = EOK_ipnet_evt_TXdatagram; 
+//extern const eOevent_t  eok_ipnet_evt_evalRXipframe     = EOK_ipnet_evt_evalRXipframes;  
+//extern const eOevent_t  eok_ipnet_evt_tick              = EOK_ipnet_evt_tick;   
+
 
 
 
@@ -116,6 +117,8 @@ extern eOresult_t eov_ipnet_Activate(EOVtheIPnet *p)
     }
     
     p->active = eobool_true;
+    // used to force a tick of the loop of ipnet
+    eov_ipnet_Alert(p, p, eov_ipnet_evt_tick);
     
     return(eores_OK);
 }
