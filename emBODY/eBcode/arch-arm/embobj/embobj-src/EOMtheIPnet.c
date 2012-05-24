@@ -334,9 +334,7 @@ extern eOresult_t eom_ipnet_Activate(EOMtheIPnet *ip)
         return(eores_NOK_nullpointer);
     }
     
-    s_eom_theipnet.ipnet->active = eobool_true;
-    
-    return(eores_OK);
+    return(eov_ipnet_Activate(s_eom_theipnet.ipnet));
 }
 
 extern eOresult_t eom_ipnet_Deactivate(EOMtheIPnet *ip)
@@ -346,9 +344,7 @@ extern eOresult_t eom_ipnet_Deactivate(EOMtheIPnet *ip)
         return(eores_NOK_nullpointer);
     }
     
-    s_eom_theipnet.ipnet->active = eobool_false;
-    
-    return(eores_OK);
+    return(eov_ipnet_Deactivate(s_eom_theipnet.ipnet));
 }
 
 
