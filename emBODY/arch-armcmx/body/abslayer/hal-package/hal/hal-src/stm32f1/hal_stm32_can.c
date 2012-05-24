@@ -613,7 +613,9 @@ static void s_hal_can_isr_recvframe_canx(hal_can_port_t port)
     canframe_ptr = hal_canfifo_hid_getFirstFree(&cport->canframes_rx_norm);
     if(NULL == canframe_ptr)
     {
-        return; //the fifo is full
+        //fifo is full
+        hal_canfifo_hid_pop(&cport->canframes_rx_norm); //remove the oldest frame
+        canframe_ptr = hal_canfifo_hid_getFirstFree(&cport->canframes_rx_norm);
     }
     CAN_Receive( ((hal_can_port1 == port) ? (CAN1) : (CAN2)), /*FIFO0*/0, &RxMessage);
     

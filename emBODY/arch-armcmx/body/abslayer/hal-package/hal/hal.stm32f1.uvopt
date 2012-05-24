@@ -524,7 +524,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>0</IsCurrentTarget>
+        <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
       <CpuCode>255</CpuCode>
       <Books>
@@ -773,7 +773,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>1</IsCurrentTarget>
+        <IsCurrentTarget>0</IsCurrentTarget>
       </OPTFL>
       <CpuCode>255</CpuCode>
       <Books>
@@ -1232,10 +1232,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>20</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>121</TopLine>
-      <CurrentLine>136</CurrentLine>
+      <CurrentLine>135</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\hal-src\stm32f1\hal_stm32_canfifo_hid.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_canfifo_hid.c</FilenameWithoutPath>
@@ -1246,10 +1246,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>53</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>417</TopLine>
-      <CurrentLine>417</CurrentLine>
+      <TopLine>606</TopLine>
+      <CurrentLine>616</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\hal-src\stm32f1\hal_stm32_can.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_can.c</FilenameWithoutPath>
@@ -1408,18 +1408,70 @@
     </WindowPosition>
   </AlienFiles>
 
+  <AlienFiles>
+    <PathWithFilename>C:\firmware_repo\emBODY\arch-armcmx\body\abslayer\hal-package\hal\hal-src\stm32f1\brdcfg\hal_brdcfg_ems001.c</PathWithFilename>
+    <TopLine>351</TopLine>
+    <CurrentLine>355</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>C:\firmware_repo\emBODY\arch-armcmx\body\abslayer\hal-package\hal\hal-src\stm32f1\hal_stm32_canfifo_hid.h</PathWithFilename>
+    <TopLine>62</TopLine>
+    <CurrentLine>69</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
   <MDIGroups>
     <Orientation>1</Orientation>
     <ActiveMDIGroup>0</ActiveMDIGroup>
     <MDIGroup>
       <Size>100</Size>
-      <ActiveTab>2</ActiveTab>
+      <ActiveTab>0</ActiveTab>
       <Documents>
         <Doc>
           <Name>.\hal-src\stm32f1\hal_stm32_can.c</Name>
-          <ColumnNumber>0</ColumnNumber>
-          <TopLine>417</TopLine>
-          <CurrentLine>417</CurrentLine>
+          <ColumnNumber>53</ColumnNumber>
+          <TopLine>606</TopLine>
+          <CurrentLine>616</CurrentLine>
         </Doc>
         <Doc>
           <Name>C:\firmware_repo\emBODY\arch-armcmx\body\abslayer\hal-package\hal\hal-api\hal_debugPin.h</Name>
@@ -1429,9 +1481,21 @@
         </Doc>
         <Doc>
           <Name>.\hal-src\stm32f1\hal_stm32_canfifo_hid.c</Name>
-          <ColumnNumber>0</ColumnNumber>
+          <ColumnNumber>20</ColumnNumber>
           <TopLine>121</TopLine>
-          <CurrentLine>136</CurrentLine>
+          <CurrentLine>135</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>hal-src\stm32f1\brdcfg/hal_brdcfg_ems001.c</Name>
+          <ColumnNumber>22</ColumnNumber>
+          <TopLine>351</TopLine>
+          <CurrentLine>355</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>hal-src\stm32f1\hal_stm32_canfifo_hid.h</Name>
+          <ColumnNumber>12</ColumnNumber>
+          <TopLine>62</TopLine>
+          <CurrentLine>69</CurrentLine>
         </Doc>
       </Documents>
     </MDIGroup>
