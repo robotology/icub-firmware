@@ -82,7 +82,7 @@ typedef enum
 {
     applstate_config        = 0,                /**< config */
     applstate_running       = 1,                /**< running */
-    applstate_error         = 0                 /**< error */
+    applstate_error         = 2                 /**< error */
 } eOmn_appl_state_t;
 
 
