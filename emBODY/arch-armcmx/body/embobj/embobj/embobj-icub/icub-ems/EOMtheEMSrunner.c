@@ -38,6 +38,11 @@
 
 #include "EOMtask_hid.h" // to retrieve its osaltask pointer
 
+#include "EOVtheIPnet.h"
+
+#include "EOMtheEMSappl.h"
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -64,12 +69,16 @@
 
 const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg = 
 {
-    EO_INIT(.taskpriority)              {62,     61,     60},  
+    EO_INIT(.taskpriority)              {250,     251,     252},  
     EO_INIT(.taskstacksize)             {512,   512,   512},
     EO_INIT(.period)                    1000, 
     EO_INIT(.execDOafter)               500, 
-    EO_INIT(.execTXafter)               750, 
-    EO_INIT(.safetyGAP)                 50
+    EO_INIT(.execTXafter)               700, 
+    EO_INIT(.safetyGAP)                 10
+//     EO_INIT(.period)                    500000, 
+//     EO_INIT(.execDOafter)               50000, 
+//     EO_INIT(.execTXafter)               75000, 
+//     EO_INIT(.safetyGAP)                 500
 };
 
 
@@ -337,6 +346,9 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
     static uint32_t lost_datagrams = 0;
     // do things .... only when both eo_emsrunner_evt_enable and a eo_emsrunner_evt_execute are received.
     
+    //eov_ipnet_Activate(eov_ipnet_GetHandle());
+    
+    
     if(1 == received)
     {
         received = 0;
@@ -362,11 +374,23 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
         
         if(remainingrxpkts > 0)
         {
-            for(;;remainingrxpkts>0)
+            uint8_t i;
+            for(i=0;i<4;i++)
             {
+                uint16_t tmp = 0;
                 lost_datagrams++;
                 remainingrxpkts = 0;
                 res = eom_emssocket_Receive(eom_emssocket_GetHandle(), &rxpkt, &remainingrxpkts);
+                if(eores_OK == res)
+                {
+                    res = eom_emstransceiver_Parse(eom_emstransceiver_GetHandle(), rxpkt, &tmp, &txtimeofrxropframe);
+                    received = 1;
+                    numberofrxrops += tmp;
+                }
+                if(0 == remainingrxpkts)
+                {
+                    break;
+                }
             }           
         }
         
@@ -377,6 +401,8 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
     
    
 
+    //eov_ipnet_Deactivate(eov_ipnet_GetHandle());
+    
     // Z. at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
     s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runDO]);
 }
@@ -418,6 +444,9 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
     eOresult_t res;
     
     // do things .... only when both eo_emsrunner_evt_enable and a eo_emsrunner_evt_execute are received.
+    
+    //eov_ipnet_Activate(eov_ipnet_GetHandle());
+    
 
     // A. perform a first activity
     eom_emsrunner_hid_userdef_taskTX_beforedatagramtransmission();    
@@ -440,6 +469,11 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
     
     // C. perform an user-defined function after datagram transmission
     eom_emsrunner_hid_userdef_taskTX_afterdatagramtransmission(numberoftxrops);    
+    
+    
+    
+    
+    //eov_ipnet_Deactivate(eov_ipnet_GetHandle());
 
 
     // Z. at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable

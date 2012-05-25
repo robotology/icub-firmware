@@ -27,6 +27,8 @@
 #include "EOsm.h"
 #include "eOcfg_sm_EMSappl.h"
 
+#include "EOVtheIPnet.h"
+
 
 #include "EOMtheSystem.h"
 #include "EOVtheSystem.h"
@@ -56,6 +58,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "EOMtheEMSappl.h"
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -349,6 +352,14 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_RUN(EOsm *s)
     
     // we activate the runner
     eom_emsrunner_Start(eom_emsrunner_GetHandle());
+    
+    //eov_ipnet_Deactivate(eov_ipnet_GetHandle());
+}
+
+
+extern void eo_cfg_sm_EMSappl_hid_on_exit_RUN(EOsm *s)
+{
+    //eov_ipnet_Activate(eov_ipnet_GetHandle());
 }
 
 #warning --> quando la sm entra in RUN il skt non avvisa + nessun task. il task runRX piglia quello che gli serve. 
