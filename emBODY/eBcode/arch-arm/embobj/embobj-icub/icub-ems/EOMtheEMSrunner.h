@@ -43,6 +43,7 @@ extern "C" {
 
 #include "EoCommon.h"
 #include "EOtransceiver.h"
+#include "EOMtask.h"
 
 #include "eOcfg_sm_EMSappl.h"
 
