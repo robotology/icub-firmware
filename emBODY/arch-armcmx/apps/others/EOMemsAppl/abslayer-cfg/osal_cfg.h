@@ -140,7 +140,7 @@
 //   <i> Maximum number of tasks that will run at the same time.
 //   <i> Default: 6
 #ifndef OSAL_TASKNUM
- #define OSAL_TASKNUM     8
+ #define OSAL_TASKNUM     10
 #endif
 
 //   <o> Number of timers <0-250>

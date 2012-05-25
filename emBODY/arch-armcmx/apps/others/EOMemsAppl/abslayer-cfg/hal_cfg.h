@@ -214,7 +214,7 @@
 
 //   <o> Max number of timers <0-7>
 //   <i> Default: 2
-#define HAL_TIMERS_NUMBER     2
+#define HAL_TIMERS_NUMBER     4
 
 // </h> Timers    
 
