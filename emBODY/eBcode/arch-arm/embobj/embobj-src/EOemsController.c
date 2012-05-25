@@ -215,6 +215,11 @@ extern void eo_emsController_ResetPosPid(uint8_t joint)
     eo_pid_Reset(eo_axisController_GetPosPidPtr(s_emsc->axis_controller[joint]));
 }
 
+extern void eo_emsController_Stop(uint8_t joint)
+{
+    eo_axisController_Stop(s_emsc->axis_controller[joint]);
+}
+
 extern void eo_emsController_ResetTrqPid(uint8_t joint)
 {
     eo_pid_Reset(eo_axisController_GetTrqPidPtr(s_emsc->axis_controller[joint]));
@@ -232,6 +237,8 @@ extern void eo_emsController_SetDecoupler(emsMotorDecoupler_t dec_type, float ma
 
 extern void eo_emsController_SetPosPid(uint8_t joint, float kp, float kd, float ki)
 {
+    eo_axisController_SetVelMin(s_emsc->axis_controller[joint], (kd==0.0f ? 0.0f : 1024.0f/kd));
+    
     eo_pid_SetPid(eo_axisController_GetPosPidPtr(s_emsc->axis_controller[joint]), kp, kd, ki);    
 }
     
