@@ -81,6 +81,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 extern  uint32_t ena_tx_onrx;
 extern  int16_t pwm_out;
+extern int32_t encoder_can;
+extern int32_t posref_can;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -232,7 +234,8 @@ static void s_eom_appDataTransmitter_taskRun(EOMtask *tsk, uint32_t evtmsgper)
 
     EOMappDataTransmitter *p = (EOMappDataTransmitter*)eom_task_GetExternalData(tsk);
 
-    evt = (eOevent_t)evtmsgper;   
+    evt = (eOevent_t)evtmsgper;
+    uint8_t payload[8];   
    
 
     if(EVT_CHECK(evt, EVT_START))
@@ -243,10 +246,10 @@ static void s_eom_appDataTransmitter_taskRun(EOMtask *tsk, uint32_t evtmsgper)
         {
             return;
         }
-        if(0 == ena_tx_onrx)
-        {
-            return;
-        }
+//        if(0 == ena_tx_onrx)
+//        {
+//            return;
+//        }
 
         ena_tx_onrx = 0;
 
@@ -256,6 +259,11 @@ static void s_eom_appDataTransmitter_taskRun(EOMtask *tsk, uint32_t evtmsgper)
             return;
         }
         eo_appCanSP_SendSetPoint(p->cfg.appCanSP_ptr, 0, &mySetPoint_current);
+    
+        ((int32_t*)payload)[0]=encoder_can;
+        ((int32_t*)payload)[1]=posref_can;
+
+        eo_appCanSP_SendMessage_TEST(p->cfg.appCanSP_ptr, NULL, payload);
         p->st = eOm_appDataTransmitter_st__active;
     }
 

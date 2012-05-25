@@ -74,10 +74,11 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-static void s_eo_appTheNVmapRef_tables_create(eOappTheNVmapRef_cfg_t *cfg);
-static void s_eo_appTheNVmapRef_tables_initialise(void);
-static void s_eo_appTheNVmapRef_table_motors_initialise(void);
-static void s_eo_appTheNVmapRef_table_joints_initialise(void);
+static eOresult_t s_eo_appTheNVmapRef_tables_create(eOappTheNVmapRef_cfg_t *cfg);
+static eOresult_t s_eo_appTheNVmapRef_tables_initialise(void);
+static eOresult_t s_eo_appTheNVmapRef_table_motors_initialise(void);
+static eOresult_t s_eo_appTheNVmapRef_table_joints_initialise(void);
+static eOresult_t s_eo_appTheNVmapRef_table_skin_initialise(void);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -96,6 +97,7 @@ static EOappTheNVmapRef s_eo_appTheNVmapRef;
 
 extern EOappTheNVmapRef* eo_appTheNVmapRef_Initialise(eOappTheNVmapRef_cfg_t *cfg)
 {
+    eOresult_t res;
     EOappTheNVmapRef* retptr = NULL;
     if(NULL == cfg)
     {
@@ -106,8 +108,18 @@ extern EOappTheNVmapRef* eo_appTheNVmapRef_Initialise(eOappTheNVmapRef_cfg_t *cf
     retptr->nvsCfg = cfg->nvsCfg;
     retptr->mc_endpoint = cfg->mc_endpoint;
     retptr->as_endpoint = cfg->as_endpoint;
-    s_eo_appTheNVmapRef_tables_create(cfg);
-    s_eo_appTheNVmapRef_tables_initialise();
+    retptr->sk_endpoint = cfg->sk_endpoint;
+
+    res = s_eo_appTheNVmapRef_tables_create(cfg);
+    if(eores_OK != res)
+    {
+        return(NULL);    
+    }
+    res = s_eo_appTheNVmapRef_tables_initialise();
+    if(eores_OK != res)
+    {
+        return(NULL);    
+    }
 
     retptr->isInited = eobool_true;
 
@@ -173,6 +185,13 @@ extern eOresult_t eo_appTheNVmapRef_GetMotorNVMemoryRef(EOappTheNVmapRef* p, eOm
 
 }
 
+
+extern eOresult_t eo_appTheNVmapRef_GetSkinNVMemoryRef(EOappTheNVmapRef* p, eOsk_skinId_t skId, uint8_t nvindex, void**memRef)
+{
+    *memRef = p->skinList[skId][nvindex];
+    return(eores_OK);
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -181,14 +200,14 @@ extern eOresult_t eo_appTheNVmapRef_GetMotorNVMemoryRef(EOappTheNVmapRef* p, eOm
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-static void s_eo_appTheNVmapRef_tables_create(eOappTheNVmapRef_cfg_t *cfg)
+static eOresult_t s_eo_appTheNVmapRef_tables_create(eOappTheNVmapRef_cfg_t *cfg)
 {
 
     uint8_t         i;
     eOsizecntnr_t  size;
-    eOmc_jointId_t jUId;
-    eOmc_motorId_t mUId;
     EOappTheNVmapRef* p = &s_eo_appTheNVmapRef;
+    uint32_t id = 0;
+    eOresult_t res;
     
 
     //reset joint list
@@ -197,41 +216,104 @@ static void s_eo_appTheNVmapRef_tables_create(eOappTheNVmapRef_cfg_t *cfg)
     memset(p->motorsList, 0, sizeof(p->motorsList));
     //reset sensors list
     memset(p->sensorsList, 0, sizeof(p->sensorsList));
+    //reset skin list
+    memset(p->skinList, 0, sizeof(p->skinList));
 
 
+    id = 0;
+    size = 0;
     //create joint-NV table
-    eo_fifobyte_Size(cfg->jointsList, &size, 0);
-  
-    for(i = 0; i<size; i++)
+    if(NULL != cfg->jointsList)
     {
-        eo_fifobyte_Get(cfg->jointsList, (uint8_t*)&jUId, 0);
-        eo_fifobyte_Rem(cfg->jointsList, 0);
-        p->jointsList[jUId] = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
-                                           sizeof(void*), jointNVindex_TOTALnumber);    
+        eo_fifoword_Size(cfg->jointsList, &size, 0);
+      
+        for(i = 0; i<size; i++)
+        {
+            res = eo_fifoword_Get(cfg->jointsList, &id, 0);
+            if(eores_OK != res)
+            {
+                return(res);
+            }
+            eo_fifoword_Rem(cfg->jointsList, 0);
+           
+            p->jointsList[id] = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
+                                               sizeof(void*), jointNVindex_TOTALnumber);    
+        }
     }
 
+    id = 0;
+    size = 0;
     //create motor-NV table
-    eo_fifobyte_Size(cfg->motorsList, &size, 0);
-  
-    for(i = 0; i<size; i++)
+    if(NULL != cfg->motorsList)
     {
-        eo_fifobyte_Get(cfg->motorsList, (uint8_t*)&mUId, 0);
-        eo_fifobyte_Rem(cfg->motorsList, 0);
-        p->motorsList[mUId] = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
-                                           sizeof(void*), motorNVindex_TOTALnumber);    
+        eo_fifoword_Size(cfg->motorsList, &size, 0);
+      
+        for(i = 0; i<size; i++)
+        {
+            res = eo_fifoword_Get(cfg->motorsList, &id, 0);
+            if(eores_OK != res)
+            {
+                return(res);
+            }
+            eo_fifoword_Rem(cfg->motorsList, 0);
+            p->motorsList[id] = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
+                                               sizeof(void*), motorNVindex_TOTALnumber);
+                
+        }
     }
 
 
+    id = 0;
+    size = 0;
+    //create skin-NV table
+    if(NULL != cfg->skinList)
+    {
+        eo_fifoword_Size(cfg->skinList, &size, 0);
+      
+        for(i = 0; i<size; i++)
+        {
+            res = eo_fifoword_Get(cfg->skinList, &id, 0);
+            if(eores_OK != res)
+            {
+                return(res);
+            }
+            eo_fifoword_Rem(cfg->skinList, 0);
+            p->skinList[id] = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
+                                               sizeof(void*),10);    
+        }
+    }
+
+    return(eores_OK);
+
 }
 
-static void s_eo_appTheNVmapRef_tables_initialise(void)
+static eOresult_t s_eo_appTheNVmapRef_tables_initialise(void)
 {
-    s_eo_appTheNVmapRef_table_motors_initialise();
-    s_eo_appTheNVmapRef_table_joints_initialise();
+    eOresult_t res;
+
+    res = s_eo_appTheNVmapRef_table_motors_initialise();
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    res = s_eo_appTheNVmapRef_table_joints_initialise();
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    res = s_eo_appTheNVmapRef_table_skin_initialise();
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    return(eores_OK);
 }
 
 
-static void s_eo_appTheNVmapRef_table_joints_initialise(void)
+static eOresult_t s_eo_appTheNVmapRef_table_joints_initialise(void)
 {
 
     uint8_t             j;
@@ -260,22 +342,22 @@ static void s_eo_appTheNVmapRef_table_joints_initialise(void)
                                        &ipindex, &epindex, &idindex); 
             if(eores_OK != res)
             {
-                continue;
+                return(res);
             }
             nv_res_ptr = eo_nvscfg_GetNV(p->nvsCfg, ipindex, epindex, idindex, NULL, &nv);
             if(NULL == nv_res_ptr)
             {
-                continue;    
+                return(eores_NOK_nullpointer);    
             }
             
             p->jointsList[j][jnvindex] = nv.loc;               
         }   
     }
-
+   return(eores_OK);
 
 }
 
-static void s_eo_appTheNVmapRef_table_motors_initialise(void)
+static eOresult_t s_eo_appTheNVmapRef_table_motors_initialise(void)
 {
     uint8_t             m;
     uint16_t            ipindex, epindex, idindex;;
@@ -303,19 +385,61 @@ static void s_eo_appTheNVmapRef_table_motors_initialise(void)
                                        &ipindex, &epindex, &idindex); 
             if(eores_OK != res)
             {
-                continue;
+                return(res);
             }
             nv_res_ptr = eo_nvscfg_GetNV(p->nvsCfg, ipindex, epindex, idindex, NULL, &nv);
             if(NULL == nv_res_ptr)
             {
-                continue;    
+                return(eores_NOK_nullpointer);    
             }
             
             p->motorsList[m][mnvindex] = nv.loc;               
         }   
     }
+    return(eores_OK);
+}
 
+static eOresult_t s_eo_appTheNVmapRef_table_skin_initialise(void)
+{
+//    uint8_t             sk;
+//    uint16_t            ipindex, epindex, idindex;;
+//    EOnv                nv;
+//    EOnv                *nv_res_ptr;
+//    eOnvID_t            nv_id;
+//    eOresult_t          res;
+//    EOappTheNVmapRef     *p = &s_eo_appTheNVmapRef;
 
+//    eOcfg_nvsEP_sk_skinNVindex_t sknvindex;
+// 
+// 
+//    //init motors-NV table   
+//    for(sk=0; sk<skinNumberMAX; sk++)
+//    {
+//        if(NULL == p->skinList[sk])
+//        {
+//            continue;
+//        }
+//
+//        for(sknvindex=skinNVindex_sconfig__sigmode /*=0*/; sknvindex<skinNVindex_TOTALnumber; sknvindex++)
+//        {
+//            nv_id = eo_cfg_nvsEP_sk_NVID_Get((eOcfg_nvsEP_sk_endpoint_t)p->sk_endpoint, sk, sknvindex);
+//            res = eo_nvscfg_GetIndices(p->nvsCfg, eok_ipv4addr_localhost, p->sk_endpoint, nv_id, 
+//                                       &ipindex, &epindex, &idindex); 
+//            if(eores_OK != res)
+//            {
+//                return(res);
+//            }
+//            nv_res_ptr = eo_nvscfg_GetNV(p->nvsCfg, ipindex, epindex, idindex, NULL, &nv);
+//            if(NULL == nv_res_ptr)
+//            {
+//                return(eores_NOK_nullpointer);   
+//            }
+//            
+//            p->skinList[sk][sknvindex] = nv.loc;               
+//        }   
+//    }
+
+    return(eores_OK);
 }
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -78,7 +78,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
-int16_t pwm_out = 0.0f;
+int16_t pwm_out = 0;
+int32_t encoder_can = 0;
+int32_t posref_can = 0;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -94,15 +96,10 @@ void s_eom_appMotorController_taskInit(void *p);
 static void s_eom_appMotorController_taskStartup(EOMtask *p, uint32_t t);
 static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper); 
 
-static void s_eom_appMotorController_PIDcalc(void);
-static void s_eom_appMotorController_PIDresetVal(void);
-static void s_eom_appMotorController_PIDmoltiply(void);
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 static const char s_eobj_ownname[] = "EOMappMotorController";
-static uint32_t pidVal[100];
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -215,7 +212,6 @@ void s_eom_appMotorController_taskInit(void *p)
     eom_task_Start(p);
 }
 
-
 static void s_eom_appMotorController_taskStartup(EOMtask *tsk, uint32_t t)
 {
     EOMappMotorController *p = (EOMappMotorController*)eom_task_GetExternalData(tsk);
@@ -224,31 +220,83 @@ static void s_eom_appMotorController_taskStartup(EOMtask *tsk, uint32_t t)
 
     // ALE
     eo_emsController_Init(1, EMS_GENERIC);
+
+    eo_emsController_SetPosLimits(0, 0, 4095);
+    eo_emsController_SetVelMax(0, 40960.0f);
+    eo_emsController_SetPosPid(0, 5.0f, 0.2f, 0.0f);
+    eo_emsController_SetPosPidLimits(0, 0x7FFF, 1024);
+    eo_emsController_SetControlMode(0, CM_POSITION);
 }
-
-
 
 static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
 {
     float *pwm;
     eOevent_t evt;
-    uint32_t encoders_values[6];
+
+    uint32_t encoder_raw[6];
+    
+    uint8_t parity_error = 0;
 
     EOMappMotorController *p = (EOMappMotorController*)eom_task_GetExternalData(tsk);
 
-    evt = (eOevent_t)evtmsgper;     
+    evt = (eOevent_t)evtmsgper;
 
     if(EVT_CHECK(evt, EVT_CALC_START))
     {
-    // ALE
-        /* 1) get encoders' value */
-        eo_appEncReader_getValues(p->cfg.encReader, encoders_values);
-        eo_emsController_ReadEncoder(0, (encoders_values[0]>>6)&0x0FFF);
-        
+        // ALE
+  
+        //if (eobool_true == eo_appEncReader_isReady(p->cfg.encReader))     
+            eo_appEncReader_getValues(p->cfg.encReader, encoder_raw);
+
+        for (uint8_t b=0; b<18; ++b)
+        {
+            parity_error ^= (encoder_raw[0]>>b) & 1;
+        }
+
+        uint8_t bit_check = encoder_raw[0] & 0x3E;
+
+        if (parity_error || bit_check!=0x20)
+        {
+            eo_emsController_SkipEncoders();
+        }
+        else
+        {
+            encoder_raw[0]>>=6;
+            encoder_raw[0]&=0x0FFF;
+
+            eo_emsController_ReadEncoders((int32_t*)encoder_raw);
+
+            encoder_can = encoder_raw[0];
+        }
+    
+        /*
+        static uint32_t cycle = 0;
+
+        if (++cycle%2000==2)
+        {
+            if (encoder_can<2048)
+            {
+                eo_emsController_SetPosRef(0, 3072, 1024);
+            }
+            else
+            {
+                eo_emsController_SetPosRef(0, 1024, 512);
+            }       
+        }
+        */
+
+        static eObool_t must_reset = eobool_true;
+
+        if (must_reset)
+        {
+            eo_emsController_Stop(0);
+            must_reset = eobool_false;
+        }
+
         /* 2) pid calc */
         pwm = eo_emsController_PWM();
-
-        pwm_out = (int16_t)pwm[0];
+        
+        pwm_out = -(int16_t)pwm[0];
 
         /* 3) reset my state */
         p->st = eOm_appMotorController_st__active;
@@ -258,39 +306,6 @@ static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
     }
 }
 
-static void s_eom_appMotorController_PIDcalc(void)
-{
-    uint8_t i;
-    for(i=0; i<1; i++)
-    {
-        s_eom_appMotorController_PIDmoltiply();
-        s_eom_appMotorController_PIDresetVal();
-    }
-    return;
-}
-
-static void s_eom_appMotorController_PIDresetVal(void)
-{
-    uint8_t i;
-        
-    for(i=0; i<100; i++)
-    {
-        pidVal[i] = i+1;
-    }
-
-}
-
-static void s_eom_appMotorController_PIDmoltiply(void)
-{
-    uint8_t i;
-    
-    for(i=2; i<100; i++)
-    {
-        pidVal[i] =pidVal[i-1]* pidVal[i-2];
-    }
-
-
-}
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------

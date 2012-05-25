@@ -43,7 +43,7 @@
 //embobj
 #include "EoCommon.h"
 #include "EOtheMemoryPool.h"
-#include "EOfifoByte_hid.h"
+#include "EOfifoWord_hid.h"
 #include "EOconstvector_hid.h"
 
 //embobj-icub
@@ -119,6 +119,7 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg)
         EO_INIT(.emsCanNetTopo_joints__ptr)     eo_cfg_emsCanNetTopo_constvec_joints__ptr,
         EO_INIT(.emsCanNetTopo_motors__ptr)     eo_cfg_emsCanNetTopo_constvec_motors__ptr,
         EO_INIT(.emsCanNetTopo_sensors__ptr)    eo_cfg_emsCanNetTopo_constvec_sensors__ptr,
+//        EO_INIT(.emsCanNetTopo_skin__ptr)       eo_cfg_emsCanNetTopo_constvec_skin__ptr,
     };
 
 
@@ -161,18 +162,18 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg)
     return(retptr);
 }
 
-extern eOresult_t eo_appCanSP_GetConnectedJoints(EOappCanSP *p, EOfifoByte *connectedJointsList)
+extern eOresult_t eo_appCanSP_GetConnectedJoints(EOappCanSP *p, EOfifoWord *connectedJointsList)
 {
     return(eo_emsCanNetTopo_GetConnectedJoints(p->emsCanNetTopo_ptr, connectedJointsList));
 }
 
 
-extern eOresult_t eo_appCanSP_GetConnectedMotors(EOappCanSP *p, EOfifoByte *connectedMotorsList)
+extern eOresult_t eo_appCanSP_GetConnectedMotors(EOappCanSP *p, EOfifoWord *connectedMotorsList)
 {
     return(eo_emsCanNetTopo_GetConnectedMotors(p->emsCanNetTopo_ptr, connectedMotorsList));
 }
 
-extern eOresult_t eo_appCanSP_GetConnectedSensors(EOappCanSP *p, EOfifoByte *connectedSensorsList)
+extern eOresult_t eo_appCanSP_GetConnectedSensors(EOappCanSP *p, EOfifoWord *connectedSensorsList)
 {
     return(eo_emsCanNetTopo_GetConnectedSensors(p->emsCanNetTopo_ptr, connectedSensorsList));
 }
@@ -322,6 +323,38 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p)
     return(eores_OK);
 
 }
+
+
+extern eOresult_t eo_appCanSP_SendMessage_TEST(EOappCanSP *p, eo_appCanSP_canLocation *canLocation, uint8_t *payload_ptr)
+{
+    eOresult_t                                  res;
+    eOcanframe_t                                canFrame;
+    eo_icubCanProto_msgDestination_t            dest;
+    eo_emsCanNetTopo_jointOrMotorCanLocation_t  *canLoc = (eo_emsCanNetTopo_jointOrMotorCanLocation_t *)canLocation;
+
+    //set destination of message 
+    dest.axis = canLoc->axis;
+    dest.canAddr = canLoc->canaddr;
+
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    //form can frame
+    canFrame.id = 2;
+    canFrame.id_type = 0; //standard id
+    canFrame.frame_type = 0; //data frame
+    canFrame.size = 8;
+
+    memcpy(canFrame.data, payload_ptr, 8);
+
+     res = (eOresult_t)hal_can_put(hal_can_port1, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now);
+    
+     return(res);
+}
+
+
 
 
 /*****************************************************************************************************************/
@@ -727,7 +760,7 @@ extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOm
 //    {
 //        return(res);
 //    }
-
+    return(eores_OK);
 }
 
 

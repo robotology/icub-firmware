@@ -43,6 +43,7 @@
 #include "EOtheErrorManager.h"
 #include "EOtheActivator.h"
 #include "EOMmutex.h"
+#include "EOemsController.h"
 
 
 //appl
@@ -82,6 +83,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
+extern int16_t pwm_out;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -336,60 +338,91 @@ static void s_eom_appTheSysController_run(EOMtask *tsk, uint32_t evtmsgper)
 
 }
 
-
+#define MC_START   1
+#define MC_STOP    2
+#define MC_SET_POS 3
+#define MC_SET_PID 4
+#define MC_SET_LIM 5
 
 static void s_eom_appTheSysController_recDgram_mng(EOMappTheSysController *p)
 {
     uint8_t *payload_ptr;
     uint16_t payloadsize;
-    eOresult_t res = eores_OK;
+    //eOresult_t res = eores_OK;
 
     //p and &s_theSysController are equal. 
     eo_ethBaseModule_Receive(p->eth_mod, &payload_ptr, &payloadsize);
 
+    // ALE
+
     switch(payload_ptr[0]) 
     {
-        case 1:  //Corrisponde a PKT QUERY in WINNODE utils appl
+        case MC_START:  //Corrisponde a PKT QUERY in WINNODE utils appl
         {
             if(eOm_appTheSysController_st__inited == p->st)
             {
-                res = s_eom_appTheSysController_confugureSystem(p);
-                if(eores_OK == res)
-                {
-                    p->st = eOm_appTheSysController_st__configured;
-                }
-           }
-            p->st = eOm_appTheSysController_st__configured;
-        }break;
-
-        case 2: //Corrisponde a PKT REPLY in WINNODE utils appl
-        {
-            if((eOm_appTheSysController_st__configured == p->st) ||
-               (eOm_appTheSysController_st__stopped    == p->st))
-            {
-                p->st = eOm_appTheSysController_st__started;
-                s_eom_appTheSysController_timers_start();
+                p->st = eOm_appTheSysController_st__configured;
+                s_eom_appTheSysController_confugureSystem(p);
             }
-         }break;
+                 
+            p->st = eOm_appTheSysController_st__started;
+            s_eom_appTheSysController_timers_start();
+        }
+        break;
 
-
-        case 3: //Corrisponde a ADDCLNT in WINNODE utils appl
+        case MC_STOP: //Corrisponde a ADDCLNT in WINNODE utils appl
         {
             if(eOm_appTheSysController_st__started == p->st)
             {
                 p->st = eOm_appTheSysController_st__stopped;
                 s_eom_appTheSysController_timers_stop();
+                
+                eo_emsController_Stop(0);
+                eo_emsController_ResetPosPid(0);
+                pwm_out = 0;
             }
             
-        }break;
-    
+        }
+        break;
+
+        case MC_SET_POS:
+        {
+            uint8_t joint = payload_ptr[1];
+            int32_t pos = *(int32_t*)(payload_ptr+4);
+            int32_t vel = *(int32_t*)(payload_ptr+8);
+
+            eo_emsController_SetPosRef(joint,pos,vel);
+        }
+        break;
+
+        case MC_SET_PID:
+        {
+            uint8_t joint = payload_ptr[1];
+            float kp = *(float*)(payload_ptr+4);
+            float kd = *(float*)(payload_ptr+8);
+            float ki = *(float*)(payload_ptr+12);
+
+            eo_emsController_SetPosPid(joint,kp,kd,ki);
+        }
+        break;
+
+        case MC_SET_LIM:
+        {
+            uint8_t joint = payload_ptr[1];
+            int16_t Ymax = *(int16_t*)(payload_ptr+4);
+            int16_t Imax = *(int16_t*)(payload_ptr+8);
+
+            eo_emsController_SetPosPidLimits(joint, Ymax, Imax);
+        }
+        break;
     }
 
+    /*
     if(eores_OK == res)
     {
         eo_ethBaseModule_Transmit(p->eth_mod, payload_ptr, payloadsize);    
     }
-
+    */
 }
 static eOresult_t s_eom_appTheSysController_confugureSystem(EOMappTheSysController *p)
 {

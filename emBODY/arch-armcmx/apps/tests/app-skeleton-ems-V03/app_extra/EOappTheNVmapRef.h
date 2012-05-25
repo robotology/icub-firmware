@@ -38,7 +38,8 @@
 
 #include "EoCommon.h"
 #include "EoMotionControl.h"
-#include "EOfifoByte.h"
+#include "EoSkin.h"
+#include "EOfifoWord.h"
 #include "EOnvsCfg.h"
 #include "EOnv.h"
 
@@ -55,12 +56,14 @@
  **/  
 typedef struct
 {
-    EOfifoByte  *jointsList;  /**<  List of joints used by the application  */
-    EOfifoByte  *motorsList;  /**<  List of motors used by the application  */
-    EOfifoByte  *sensorsList; /**<  List of sensors used by the application */
+    EOfifoWord  *jointsList;  /**<  List of joints used by the application  */
+    EOfifoWord  *motorsList;  /**<  List of motors used by the application  */
+    EOfifoWord  *sensorsList; /**<  List of sensors used by the application */
+    EOfifoWord  *skinList;    /**<  List of sensors used by the application */
     EOnvsCfg    *nvsCfg;      /**<  Network Variable configuration          */
     eOnvEP_t    mc_endpoint;  /**<  motion control endopoint managed by the application    */
     eOnvEP_t    as_endpoint;  /**<  analog sensor endopoint managed by the application    */
+    eOnvEP_t    sk_endpoint;  /**<  analog sensor endopoint managed by the application    */
 } eOappTheNVmapRef_cfg_t;
 
 
@@ -104,6 +107,10 @@ extern eOresult_t eo_appTheNVmapRef_GetJointNVMemoryRef_test(EOappTheNVmapRef* p
 
 
 extern eOresult_t eo_appTheNVmapRef_GetMotorNVMemoryRef(EOappTheNVmapRef* p, eOmc_motorId_t mUiniqueId, uint8_t nvindex, void**memRef);
+
+
+extern eOresult_t eo_appTheNVmapRef_GetSkinNVMemoryRef(EOappTheNVmapRef* p, eOsk_skinId_t skId, uint8_t nvindex, void**memRef);
+
 
 /** @}            
     end of group eo_app_TheNVmapRef  

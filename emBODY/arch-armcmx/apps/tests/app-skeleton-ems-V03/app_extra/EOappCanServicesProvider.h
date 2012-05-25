@@ -40,7 +40,7 @@
 #include "EoCommon.h"
 #include "EoMotionControl.h"
 #include "EoBoards.h"
-#include "EOfifoByte.h"
+#include "EOfifoWord.h"
 #include "EOicubCanProto_specifications.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -81,32 +81,32 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg);
 
 
 
-/** @fn         eOresult_t eo_appCanSP_GetConnectedJoints(EOappCanSP *p, EOfifoByte *connectedJointsList)
+/** @fn         eOresult_t eo_appCanSP_GetConnectedJoints(EOappCanSP *p, EOfifoWord *connectedJointsList)
     @brief      fill @e connectedJointsList with joint id connected to ems
     @param      p                       target obj
     @param      connectedJointsList     in output contains a list of joint id connected to ems 
     @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
  **/
-extern eOresult_t eo_appCanSP_GetConnectedJoints(EOappCanSP *p, EOfifoByte *connectedJointsList); 
+extern eOresult_t eo_appCanSP_GetConnectedJoints(EOappCanSP *p, EOfifoWord *connectedJointsList); 
 
 
-/** @fn         eOresult_t eo_appCanSP_GetConnectedMotors(EOappCanSP *p, EOfifoByte *connectedMotorsList)
+/** @fn         eOresult_t eo_appCanSP_GetConnectedMotors(EOappCanSP *p, EOfifoWord *connectedMotorsList)
     @brief      fill @e connectedMotorsList with motor id connected to ems
     @param      p                       target obj
     @param      connectedMotorsList     in output contains a list of motor id connected to ems 
     @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
  **/
-extern eOresult_t eo_appCanSP_GetConnectedMotors(EOappCanSP *p, EOfifoByte *connectedMotorsList);
+extern eOresult_t eo_appCanSP_GetConnectedMotors(EOappCanSP *p, EOfifoWord *connectedMotorsList);
 
 
 
-/** @fn         eOresult_t eo_appCanSP_GetConnectedSensors(EOappCanSP *p, EOfifoByte *connectedSensorsList)
+/** @fn         eOresult_t eo_appCanSP_GetConnectedSensors(EOappCanSP *p, EOfifoWord *connectedSensorsList)
     @brief      fill @e connectedSensorsList with Sensor id connected to ems
     @param      p                       target obj
     @param      connectedJSensorsList     in output contains a list of Sensor id connected to ems 
     @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
  **/
-extern eOresult_t eo_appCanSP_GetConnectedSensors(EOappCanSP *p, EOfifoByte *connectedSensorsList);
+extern eOresult_t eo_appCanSP_GetConnectedSensors(EOappCanSP *p, EOfifoWord *connectedSensorsList);
 
 
 
@@ -177,7 +177,7 @@ extern eOresult_t eo_appCanSP_SendCmd(EOappCanSP *p, eo_appCanSP_canLocation *ca
 
 
 extern eOresult_t eo_appCanSP_read(EOappCanSP *p); //test porpouse
-
+extern eOresult_t eo_appCanSP_SendMessage_TEST(EOappCanSP *p, eo_appCanSP_canLocation *canLocation, uint8_t *payload_ptr);
 
 //following functions are obsolete!!!
 
@@ -210,7 +210,6 @@ extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOm
     @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
  **/
 extern eOresult_t eo_appCanSP_SendSetPoint(EOappCanSP *p, eOmc_jointId_t jId, eOmc_setpoint_t *setPoint);
-
 
 
 

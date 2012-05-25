@@ -32,6 +32,7 @@
 
 #include "EoCommon.h"
 #include "EOMotionControl.h"
+//#include "eOcfg_nvsEP_sk.h"
 #include "eOcfg_nvsEP_mc.h"
 
 
@@ -60,9 +61,11 @@ struct EOappTheNVmapRef_hid
     EOnvsCfg           *nvsCfg;
     eOnvEP_t           mc_endpoint;
     eOnvEP_t           as_endpoint;
+    eOnvEP_t           sk_endpoint;
     void**             jointsList[jointNumberMAX];
     void**             motorsList[motorNumberMAX];
     void**             sensorsList[motorNumberMAX];   //  TODO: metti il num dei sensori
+    void**             skinList[10];
 }; 
 
 
