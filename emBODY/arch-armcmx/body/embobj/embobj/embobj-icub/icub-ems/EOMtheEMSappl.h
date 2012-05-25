@@ -66,9 +66,9 @@ typedef struct EOMtheEMSappl_hid EOMtheEMSappl;
  **/
 typedef struct
 {
-    eEmoduleInfo_t* emsappinfo;
-    eOipv4addr_t    hostipv4addr;
-    eOipv4port_t    hostipv4port;    
+    const eEmoduleInfo_t*   emsappinfo;
+    eOipv4addr_t            hostipv4addr;
+    eOipv4port_t            hostipv4port;    
 } eOemsappl_cfg_t;
 
 

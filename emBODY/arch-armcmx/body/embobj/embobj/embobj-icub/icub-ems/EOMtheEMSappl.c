@@ -46,6 +46,8 @@
 
 #include "EOMtheEMSerror.h"
 
+#include "EOMtheEMSrunner.h"
+
 #include "EOaction_hid.h"
 
 
@@ -102,6 +104,8 @@ static void s_eom_emsappl_theemstransceiver_init(void);
 static void s_eom_emsappl_theemserror_init(void);
 
 static void s_eom_emsappl_theemsconfigurator_init(void);
+
+static void s_eom_emsppl_theemsrunner_init(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -161,13 +165,9 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
     // 5. initialise the EOMtheEMSconfigurator
     s_eom_emsappl_theemsconfigurator_init();
     
-    // instanstiate the EOMtheEMSrunner, 
-    // they have on their inside the tasks which they need.
-    // - the EOMtheEMSconfigurer has an event based task which uses the EOMtheEMSsocket configured to send it an event.
-    //   the task retrieves teh packet and passed it to the EOMtheEMStransceiver.
-    // - the EOMtheEMSrunner has three tasks: rx, do, tx.   
-
-
+    // 6. initialise the EOMtheEMSrunner, 
+    
+    s_eom_emsppl_theemsrunner_init();
 
     // call usrdef initialise
     eom_emsappl_hid_userdef_initialise(&s_emsappl_singleton);
@@ -315,6 +315,11 @@ static void s_eom_emsappl_theemserror_init(void)
     eom_emserror_Initialise(NULL);
 }
 
+static void s_eom_emsppl_theemsrunner_init(void)
+{
+    eom_emsrunner_Initialise(NULL);
+}
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -341,6 +346,9 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_RUN(EOsm *s)
 {
     // the socket does not alert anybody 
     eom_emssocket_Open(eom_emssocket_GetHandle(), NULL);
+    
+    // we activate the runner
+    eom_emsrunner_Start(eom_emsrunner_GetHandle());
 }
 
 #warning --> quando la sm entra in RUN il skt non avvisa + nessun task. il task runRX piglia quello che gli serve. 

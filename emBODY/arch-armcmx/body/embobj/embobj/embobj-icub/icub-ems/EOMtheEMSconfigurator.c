@@ -27,6 +27,8 @@
 #include "EOtheMemoryPool.h"
 #include "EOtheErrormanager.h"
 
+#include "EOMtheEMSappl.h"
+
 
 #include "EOMtheEMStransceiver.h"
 #include "EOMtheEMSsocket.h"
@@ -158,6 +160,17 @@ extern void tskEMScfg(void *p)
 
 __weak extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(uint16_t numberofrxrops, eOabstime_t txtimeofrxropframe)
 {
+    static uint8_t num = 0;
+            // juts for debug
+        if(0 == numberofrxrops)
+        {
+            num++;
+            if(3 == num)
+            {
+                num = 0;
+                eom_emsappl_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2run);
+            }
+        }
 
 } 
 
@@ -185,6 +198,7 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
     uint16_t numberoftxrops = 0;
     eOabstime_t txtimeofrxropframe = 0;
     eOresult_t res;
+
     
     if(eobool_true == eo_common_event_check(evt, emssocket_evt_packet_received))
     {   // process the reception of a packet. it must contain a ropframe and nothing else
@@ -209,6 +223,7 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
         {
             res = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
         }
+        
                
         // 5. if another packet is in the rx fifo, send a new event to process its retrieval again        
         if(remainingrxpkts > 0)

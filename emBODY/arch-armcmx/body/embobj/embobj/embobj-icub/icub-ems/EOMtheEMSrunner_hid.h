@@ -37,11 +37,13 @@ extern "C" {
 #include "EOMtheEMStransceiver.h"
 #include "EOMtheEMSsocket.h"
 #include "EOMtask.h"
+#include "eOcfg_sm_EMSappl.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
 #include "EOMtheEMSrunner.h"
+
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
@@ -59,11 +61,20 @@ struct EOMtheEMSrunner_hid
     EOMtask*            task[eo_emsrunner_task_numberof];
     eOemsrunner_cfg_t   cfg;
     eObool_t            cycleisrunning;
+    eOsmEventsEMSappl_t event;
 };
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
+
+extern void eom_emsrunner_hid_userdef_taskRX_beforedatagramreception(void);
+extern void eom_emsrunner_hid_userdef_taskRX_afterdatagramreception(uint16_t numberofrxrops, eOabstime_t txtimeofrxropframe);
+
+extern void eom_emsrunner_hid_userdef_taskDO_activity(void);
+
+extern void eom_emsrunner_hid_userdef_taskTX_beforedatagramtransmission(void);
+extern void eom_emsrunner_hid_userdef_taskTX_afterdatagramtransmission(uint16_t numberoftxrops);
 
 
 #ifdef __cplusplus

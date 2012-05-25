@@ -228,7 +228,7 @@ static void s_eom_emserror_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid,
   
    
     const char err[4][16] = {"info", "warning", "weak error", "fatal error"};
-    char str[128];
+    char str[192];
 
     snprintf(str, sizeof(str)-1, "EOMtheEMSerror: [eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, err[(uint8_t)errtype], info);
     hal_trace_puts(str);
