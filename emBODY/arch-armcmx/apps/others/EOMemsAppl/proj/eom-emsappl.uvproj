@@ -964,6 +964,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSrunner.c</FilePath>
             </File>
+            <File>
+              <FileName>runner_overridden.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\runner_overridden.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -1889,6 +1894,11 @@
               <FileName>EOMtheEMSrunner.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSrunner.c</FilePath>
+            </File>
+            <File>
+              <FileName>runner_overridden.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\runner_overridden.c</FilePath>
             </File>
           </Files>
         </Group>
