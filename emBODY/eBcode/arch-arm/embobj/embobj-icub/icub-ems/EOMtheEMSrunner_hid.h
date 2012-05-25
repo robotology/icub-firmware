@@ -38,7 +38,7 @@ extern "C" {
 #include "EOMtheEMSsocket.h"
 #include "EOMtask.h"
 #include "eOcfg_sm_EMSappl.h"
-
+#include "EOtimer.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
@@ -62,6 +62,7 @@ struct EOMtheEMSrunner_hid
     eOemsrunner_cfg_t   cfg;
     eObool_t            cycleisrunning;
     eOsmEventsEMSappl_t event;
+    EOtimer*            timer;
 };
 
 

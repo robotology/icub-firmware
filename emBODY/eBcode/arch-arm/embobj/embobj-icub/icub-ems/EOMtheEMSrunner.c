@@ -42,6 +42,9 @@
 
 #include "EOMtheEMSappl.h"
 
+#include "EOaction_hid.h"
+#include "EOMtheCallbackManager.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -116,6 +119,8 @@ static void s_eom_emsrunner_start_taskDO(void *arg);
 
 static void s_eom_emsrunner_start_taskTX(void *arg);
 
+static void s_eom_emsrunner_cbk_activate(void* arg);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -128,7 +133,8 @@ static EOMtheEMSrunner s_theemsrunner =
     EO_INIT(.task)              {NULL, NULL, NULL},
     EO_INIT(.cfg)               {0},
     EO_INIT(.cycleisrunning)    eobool_false,
-    EO_INIT(.event)             eo_sm_emsappl_EVdummy
+    EO_INIT(.event)             eo_sm_emsappl_EVdummy,
+    EO_INIT(.timer)             NULL
 };
 
 
@@ -157,6 +163,8 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
     
     s_theemsrunner.cycleisrunning = eobool_false; 
     s_theemsrunner.event = eo_sm_emsappl_EVdummy;
+    
+    s_theemsrunner.timer = eo_timer_New();
     
     s_theemsrunner.task[eo_emsrunner_taskid_runRX] = eom_task_New(eom_mtask_OnAllEventsDriven, 
                                                                   cfg->taskpriority[eo_emsrunner_taskid_runRX], 
@@ -219,7 +227,9 @@ extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
-    }  
+    } 
+
+#if 0    
 
     hal_timer_cfg_t t2per_cfg  = 
     {
@@ -242,7 +252,20 @@ extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
     s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runRX]);
     
     s_theemsrunner.cycleisrunning = eobool_true;
-    
+
+#else
+
+    {
+        EOaction action;
+        
+        eo_action_SetCallback(&action, s_eom_emsrunner_cbk_activate, p, eom_callbackman_GetTask(eom_callbackman_GetHandle()));
+        eo_timer_Start(s_theemsrunner.timer, eok_abstimeNOW, 1000, eo_tmrmode_ONESHOT, &action);
+   
+    }
+
+
+
+#endif    
     return(eores_OK);
 }
 
@@ -629,6 +652,34 @@ static void s_eom_emsrunner_start_taskTX(void *arg)
     // send event to activate the task in argument (taskTX)
     //eom_task_isrSetEvent(task, eo_emsrunner_evt_execute);
     eom_task_isrSetEvent(s_theemsrunner.task[eo_emsrunner_taskid_runTX], eo_emsrunner_evt_execute);
+}
+
+
+static void s_eom_emsrunner_cbk_activate(void* arg)
+{
+    EOMtheEMSrunner *p = (EOMtheEMSrunner*)arg;
+    hal_result_t res;
+    hal_timer_cfg_t t2per_cfg  = 
+    {
+        .prescaler          = hal_timer_prescalerAUTO,         
+        .countdown          = 0,
+        .priority           = hal_int_priority02,
+        .mode               = hal_timer_mode_periodic,
+        .callback_on_exp    = NULL,
+        .arg                = NULL
+    };  
+
+    t2per_cfg.countdown         = p->cfg.period;
+    t2per_cfg.callback_on_exp   = s_eom_emsrunner_start_cycle;
+
+    // after a period time, the first task shall be executed
+    res = hal_timer_init(hal_timer2, &t2per_cfg, NULL);  
+    hal_timer_start(hal_timer2);
+
+    // but now we need to enable the first task: taskRX. the other enables shall be send at teh end of the relevant tasks
+    s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runRX]);
+    
+    s_theemsrunner.cycleisrunning = eobool_true;    
 }
 
 
