@@ -44,6 +44,8 @@ extern "C" {
 #include "EoCommon.h"
 #include "EOtransceiver.h"
 
+#include "eOcfg_sm_EMSappl.h"
+
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -92,7 +94,7 @@ typedef struct
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg; // = {.taskpriority = {62, 61, 60}, .taskstacksize = {1024, 1024, 1024}, 
+extern const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg; // = {.taskpriority = {62, 61, 60}, .taskstacksize = {512, 512, 512}, 
                                                          //    .execDOafter = 500, .execTXafter = 750, .safetyGAP = 50};
 
 
@@ -117,7 +119,7 @@ extern EOMtheEMSrunner * eom_emsrunner_GetHandle(void);
 
 extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p);
 
-extern eOresult_t eom_emsrunner_Stop(EOMtheEMSrunner *p);
+extern eOresult_t eom_emsrunner_StopAndGoTo(EOMtheEMSrunner *p, eOsmEventsEMSappl_t ev);
 
 extern EOMtask * eom_emsrunner_GetTask(EOMtheEMSrunner *p, eOemsrunner_taskid_t id);
 

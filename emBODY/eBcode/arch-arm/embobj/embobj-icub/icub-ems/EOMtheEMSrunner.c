@@ -65,7 +65,8 @@
 const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg = 
 {
     EO_INIT(.taskpriority)              {62,     61,     60},  
-    EO_INIT(.taskstacksize)             {1024,   1024,   1024},
+    EO_INIT(.taskstacksize)             {512,   512,   512},
+    EO_INIT(.period)                    1000, 
     EO_INIT(.execDOafter)               500, 
     EO_INIT(.execTXafter)               750, 
     EO_INIT(.safetyGAP)                 50
@@ -117,7 +118,8 @@ static EOMtheEMSrunner s_theemsrunner =
 {
     EO_INIT(.task)              {NULL, NULL, NULL},
     EO_INIT(.cfg)               {0},
-    EO_INIT(.cycleisrunning)    eobool_false
+    EO_INIT(.cycleisrunning)    eobool_false,
+    EO_INIT(.event)             eo_sm_emsappl_EVdummy
 };
 
 
@@ -145,12 +147,13 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
     memcpy(&s_theemsrunner.cfg, cfg, sizeof(eOemsrunner_cfg_t));
     
     s_theemsrunner.cycleisrunning = eobool_false; 
+    s_theemsrunner.event = eo_sm_emsappl_EVdummy;
     
     s_theemsrunner.task[eo_emsrunner_taskid_runRX] = eom_task_New(eom_mtask_OnAllEventsDriven, 
                                                                   cfg->taskpriority[eo_emsrunner_taskid_runRX], 
                                                                   cfg->taskstacksize[eo_emsrunner_taskid_runRX], 
                                                                   s_eom_emsrunner_taskRX_startup, s_eom_emsrunner_taskRX_run,  
-                                                                  (eOevent_t)(eo_emsrunner_evt_enable) & (eOevent_t)(eo_emsrunner_evt_execute), 
+                                                                  (eOevent_t)(eo_emsrunner_evt_enable) | (eOevent_t)(eo_emsrunner_evt_execute), 
                                                                   eok_reltimeINFINITE, NULL, 
                                                                   tskEMSrunRX, "tskEMSrunRX");
  
@@ -158,7 +161,7 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
                                                                   cfg->taskpriority[eo_emsrunner_taskid_runDO], 
                                                                   cfg->taskstacksize[eo_emsrunner_taskid_runDO], 
                                                                   s_eom_emsrunner_taskDO_startup, s_eom_emsrunner_taskDO_run,  
-                                                                  (eOevent_t)(eo_emsrunner_evt_enable) & (eOevent_t)(eo_emsrunner_evt_execute), 
+                                                                  (eOevent_t)(eo_emsrunner_evt_enable) | (eOevent_t)(eo_emsrunner_evt_execute), 
                                                                   eok_reltimeINFINITE, NULL, 
                                                                   tskEMSrunDO, "tskEMSrunDO"); 
                                                                   
@@ -166,7 +169,7 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
                                                                   cfg->taskpriority[eo_emsrunner_taskid_runTX], 
                                                                   cfg->taskstacksize[eo_emsrunner_taskid_runTX], 
                                                                   s_eom_emsrunner_taskTX_startup, s_eom_emsrunner_taskTX_run,  
-                                                                  (eOevent_t)(eo_emsrunner_evt_enable) & (eOevent_t)(eo_emsrunner_evt_execute), 
+                                                                  (eOevent_t)(eo_emsrunner_evt_enable) | (eOevent_t)(eo_emsrunner_evt_execute), 
                                                                   eok_reltimeINFINITE, NULL, 
                                                                   tskEMSrunTX, "tskEMSrunTX");                                                              
                                                    
@@ -234,7 +237,7 @@ extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
     return(eores_OK);
 }
 
-extern eOresult_t eom_emsrunner_Stop(EOMtheEMSrunner *p)
+extern eOresult_t eom_emsrunner_StopAndGoTo(EOMtheEMSrunner *p, eOsmEventsEMSappl_t ev)
 {
     // stop the hal timers.
 
@@ -242,12 +245,18 @@ extern eOresult_t eom_emsrunner_Stop(EOMtheEMSrunner *p)
     {
         return(eores_NOK_nullpointer);
     } 
+    
+    if((eo_sm_emsappl_EVdummy == ev) || (eo_sm_emsappl_EVgo2run == ev))
+    {   // cannot stop on dummy event or 
+        return(eores_NOK_generic);
+    }
 
     // simply stop timer2 ... that allows to finish the cycle without restarting it.
    
     hal_timer_stop(hal_timer2);
     
     s_theemsrunner.cycleisrunning = eobool_false;
+    s_theemsrunner.event = ev;
     
     return(eores_OK);
 }
@@ -277,12 +286,39 @@ extern void tskEMSrunTX(void *p)
 } 
 
 
+__weak extern void eom_emsrunner_hid_userdef_taskRX_beforedatagramreception(void)
+{
+    
+}
+
+__weak extern void eom_emsrunner_hid_userdef_taskRX_afterdatagramreception(uint16_t numberofrxrops, eOabstime_t txtimeofrxropframe)
+{
+    
+}
+
+__weak extern void eom_emsrunner_hid_userdef_taskDO_activity(void)
+{
+    
+}
+
+__weak extern void eom_emsrunner_hid_userdef_taskTX_beforedatagramtransmission(void)
+{
+    
+}
+
+__weak extern void eom_emsrunner_hid_userdef_taskTX_afterdatagramtransmission(uint16_t numberoftxrops)
+{
+    
+}
+
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+static uint8_t received = 0;
 
 static void s_eom_emsrunner_taskRX_startup(EOMtask *p, uint32_t t)
 {
@@ -293,19 +329,62 @@ static void s_eom_emsrunner_taskRX_startup(EOMtask *p, uint32_t t)
 
 static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
 {
+    EOpacket *rxpkt = NULL;
+    eOsizecntnr_t remainingrxpkts = 0;
+    uint16_t numberofrxrops = 0;
+    eOabstime_t txtimeofrxropframe = 0;
+    eOresult_t res;
+    static uint32_t lost_datagrams = 0;
     // do things .... only when both eo_emsrunner_evt_enable and a eo_emsrunner_evt_execute are received.
+    
+    if(1 == received)
+    {
+        received = 0;
+    }
+    
+    // A. perform a first activity
+    eom_emsrunner_hid_userdef_taskRX_beforedatagramreception(); 
 
+    // B. receive and parse a single datagram
+    {
+        
+        // 1. get the packet. we need passing just a pointer because the storage is inside the EOMtheEMSsocket       
+        res = eom_emssocket_Receive(eom_emssocket_GetHandle(), &rxpkt, &remainingrxpkts);
+                
+        // 2. process the packet with the transceiver
+        if(eores_OK == res)
+        {
+            res = eom_emstransceiver_Parse(eom_emstransceiver_GetHandle(), rxpkt, &numberofrxrops, &txtimeofrxropframe);
+            received = 1;
+        }
+        
+        #warning ---> what to do if there are n > 1 datagram in teh queue ??? so far i remove them without parsing
+        
+        if(remainingrxpkts > 0)
+        {
+            for(;;remainingrxpkts>0)
+            {
+                lost_datagrams++;
+                remainingrxpkts = 0;
+                res = eom_emssocket_Receive(eom_emssocket_GetHandle(), &rxpkt, &remainingrxpkts);
+            }           
+        }
+        
+    }
+    
+    // C. perform an user-defined function after datagram parsing
+    eom_emsrunner_hid_userdef_taskRX_afterdatagramreception(numberofrxrops, txtimeofrxropframe);    
+    
+   
 
-
-    // at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
+    // Z. at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
     s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runDO]);
 }
 
 
 static void s_eom_emsrunner_taskDO_startup(EOMtask *p, uint32_t t)
 {
-    
-    
+ 
 }
 
 
@@ -315,8 +394,11 @@ static void s_eom_emsrunner_taskDO_run(EOMtask *p, uint32_t t)
     // do things .... only when both eo_emsrunner_evt_enable and a eo_emsrunner_evt_execute are received.
 
 
+    // A. perform a do activity
+    eom_emsrunner_hid_userdef_taskDO_activity();   
+    
 
-    // at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
+    // Z. at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
     s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runTX]);
 }
 
@@ -328,20 +410,49 @@ static void s_eom_emsrunner_taskTX_startup(EOMtask *p, uint32_t t)
 
 
 
+
 static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
 {
+    EOpacket* txpkt = NULL;
+    uint16_t numberoftxrops = 0;
+    eOresult_t res;
+    
     // do things .... only when both eo_emsrunner_evt_enable and a eo_emsrunner_evt_execute are received.
 
+    // A. perform a first activity
+    eom_emsrunner_hid_userdef_taskTX_beforedatagramtransmission();    
+    
+    
+    
+    // B. transmit a single datagram
+    {
+        // 1. call the former to retrieve a tx packet (even if it is an empty ropframe)        
+        res = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, &numberoftxrops);
+        
+        // 2.  send a packet back. but only if the former gave us a good one.
+        if(eores_OK == res)
+        {
+            res = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
+        }        
+        
+    }
+    
+    
+    // C. perform an user-defined function after datagram transmission
+    eom_emsrunner_hid_userdef_taskTX_afterdatagramtransmission(numberoftxrops);    
 
 
-    // at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
+    // Z. at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
     if(eobool_true == s_theemsrunner.cycleisrunning)
     {
         s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runRX]);
     }
     else
-    {
-        #warning ---> put in here the evolution of the state machine .... 
+    {   // we need to reset the event to the dummy value.
+        eOsmEventsEMSappl_t ev = s_theemsrunner.event;
+        s_theemsrunner.event = eo_sm_emsappl_EVdummy;
+        // we process the event. it can be either eo_sm_emsappl_EVgo2err or eo_sm_emsappl_EVgo2cfg
+        eom_emsappl_ProcessEvent(eom_emsappl_GetHandle(), ev); 
     }
 }
 
