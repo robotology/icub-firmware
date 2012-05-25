@@ -933,11 +933,6 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn_comm_con.c</FilePath>
             </File>
-            <File>
-              <FileName>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-management\usrcbk\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1047,6 +1042,11 @@
               <FileName>eOcfg_nvsEP_mc_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\cfg\icub-nvscfg-usrcbk\eOcfg_nvsEP_mc_usrcbk_ebx.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\icub-nvscfg-usrcbk\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1527,8 +1527,8 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
-            <oTime>1</oTime>
+            <Optim>1</Optim>
+            <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>0</OneElfS>
             <Strict>0</Strict>
@@ -2132,11 +2132,6 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn_comm_con.c</FilePath>
             </File>
-            <File>
-              <FileName>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-management\usrcbk\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -2324,6 +2319,11 @@
               <FileName>eOcfg_nvsEP_mc_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\cfg\icub-nvscfg-usrcbk\eOcfg_nvsEP_mc_usrcbk_ebx.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\icub-nvscfg-usrcbk\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
             </File>
           </Files>
         </Group>
