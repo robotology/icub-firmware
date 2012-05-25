@@ -64,7 +64,7 @@ extern EOtrajectory* eo_trajectory_New(void);
     @param      v0     The inital velocity.
     @param      avg_speed  The average speed.
  **/
-extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, float v0, float speed);
+extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, float v0, float vf, float speed);
 //extern void eo_trajectory_MoveReference(EOtrajectory *o, float p0, float pf, float v0, float speed);
 //extern void eo_trajectory_MoveReference(EOtrajectory *o, float pf, float speed);
 
@@ -80,7 +80,7 @@ extern void eo_trajectory_Step(EOtrajectory *o, float *p, float *v);
     @brief      Aborts the trajectory.
     @param      o  The pointer to the trajectory object.
  **/
-extern void eo_trajectory_Abort(EOtrajectory *o);
+extern void eo_trajectory_Abort(EOtrajectory *o, float pos);
 
 //extern void eo_trajectory_Stop(EOtrajectory *o, float pos);
 

@@ -118,18 +118,13 @@ extern void eo_pid_SetPid(EOpid *o, float Kp, float Kd, float Ki)
 {
     o->Kp = Kp;
     o->Kd = Kd;
-    o->Ki = Ki/Kp; 
+    o->Ki = Ki; 
 }
 
 extern void eo_pid_SetPidLimits(EOpid *o, float Ymax, float Imax)
 {
     o->Ymax = Ymax;
     o->Imax = Imax; 
-}
-
-extern void eo_pid_SetMaxOutput(EOpid *o, float Ymax)
-{
-    o->Ymax = Ymax;
 }
 
 extern void eo_pid_SetOffset(EOpid *o, float Ko)
@@ -188,11 +183,9 @@ extern float eo_pid_PWM(EOpid *o, float En)
 
 extern float eo_pid_PWM2(EOpid *o, float En, float Vn)
 {
-    float Xn = o->Kp*En + o->Kd*Vn;
-
-    o->pwm = Xn + o->In;
- 
-    o->In += o->Ki*Xn;
+    o->In += o->Ki*En;
+    
+    o->pwm = o->Kp*En + o->Kd*Vn + o->In;
     
     if (o->In > o->Imax) 
         o->In = o->Imax; 

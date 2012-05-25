@@ -93,6 +93,7 @@ extern float* eo_emsController_PWM(void);
 extern void eo_emsController_SetControlMode(uint8_t joint, control_mode_t mode);
 extern void eo_emsController_ResetPosPid(uint8_t joint);
 extern void eo_emsController_ResetTrqPid(uint8_t joint);
+extern void eo_emsController_Stop(uint8_t joint);
 
 extern void eo_emsGetActivePidStatus(uint8_t joint, float *pwm, float *err);
 
