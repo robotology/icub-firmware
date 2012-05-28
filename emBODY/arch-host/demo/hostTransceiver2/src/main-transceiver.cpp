@@ -28,6 +28,8 @@ using namespace std;
 #include "main-transceiver.hpp"
 #include "hostTransceiver.hpp"
 
+#include <yarp/os/Network.h>
+#include <yarp/os/BufferedPort.h>
 #include <yarp/dev/DeviceDriver.h>
 #include <yarp/dev/CanBusInterface.h>
 #include <yarp/dev/PolyDriver.h>
@@ -39,10 +41,12 @@ using namespace std;
 #include "EoMotionControl.h"
 #include "EoSkin.h"
 
-
-
+#define _AC_
+#include "SkinWrapper.h"
+#undef _AC_
 
 #define hal_trace_puts(arg)		printf("%s", arg)
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of external variables 
@@ -124,7 +128,7 @@ int main(int argc, char *argv[])
 //#define www(sname, ssize)    typedef uint8_t GUARD##sname[ ( ssize == sizeof(sname) ) ? (1) : ( 0x12345678 )];
 //	www(char, 2);
 
-
+	yarp::os::Network yarp;
 
 //	EO_VERIFYproposition(name,  (sizeof(int*) == 4));
 
@@ -237,9 +241,13 @@ int main(int argc, char *argv[])
 
     // Start receiver thread
     //pthread_create(&thread, NULL, recvThread, (void*) &remote01);
-	ACE_thread_t t_id;
-    if(ACE_Thread::spawn((ACE_THR_FUNC)recvThread, NULL, THR_CANCEL_ENABLE, &t_id)==-1)
-    	ACE_DEBUG((LM_DEBUG,"Error in spawning thread\n"));
+	ACE_thread_t id_recvThread;
+    if(ACE_Thread::spawn((ACE_THR_FUNC)recvThread, NULL, THR_CANCEL_ENABLE, &id_recvThread)==-1)
+    	ACE_DEBUG((LM_DEBUG,"Error in spawning recvThread\n"));
+
+    ACE_thread_t id_skinThread;
+        if(ACE_Thread::spawn((ACE_THR_FUNC)skinThread, NULL, THR_CANCEL_ENABLE, &id_skinThread)==-1)
+        	ACE_DEBUG((LM_DEBUG,"Error in spawning id_skinThread\n"));
 
 
 	 // Send a packet to test dummy
@@ -256,11 +264,7 @@ int main(int argc, char *argv[])
 						keepGoingOn = FALSE;
 						break;
 					case '0':
-						str[0]=0x01;
-						ACE_socket->send(str, 1, remote01.addr, flags);
-						sleep(1);
-						str[0]=0x02;
-						ACE_socket->send(str, 1, remote01.addr, flags);
+						s_callback_button_0();
 						break;
 					case '1':	//	send one ask rop
 						s_callback_button_1();
@@ -296,7 +300,8 @@ int main(int argc, char *argv[])
 		}
 
     //pthread_cancel(thread);
-	 ACE_Thread::cancel(t_id);
+	 ACE_Thread::cancel(id_recvThread);
+	 ACE_Thread::cancel(id_skinThread);
     return(0);
 }
 
@@ -345,16 +350,113 @@ void *recvThread(void * arg)
   return NULL;
 }
 
+void *skinThread(void * arg)
+{
+    AnalogServer 		*analogServer;
+    int 				period = 20;
+    uint16_t			sizze;
 
+    yarp::sig::Vector 	data;
+	uint8_t 			msgtype = 0;
+	uint8_t 			i, triangle = 0;
+
+	uint8_t sensorsNum=16*12*1;
+    data.resize(sensorsNum);
+
+    // Read the list of ports
+//	std::string root_name;
+//	root_name+="/icub/skin/";
+//
+//	std::vector<AnalogPortEntry> skinPorts;
+//
+//	// if there is no "ports" section take the name of the "skin" group as the only port name
+//	skinPorts.resize(1);
+//	skinPorts[0].offset = 0;
+//	skinPorts[0].length = -1;
+//	skinPorts[0].port_name = root_name + "testing";
+//  analogServer = new AnalogServer(skinPorts);
+//  analogServer->setRate(period);
+//  analogServer->attach(analog);
+//  analogServer->start();
+
+    yarp::os::BufferedPort<yarp::sig::Vector> outPort;
+    if(!outPort.open("/icub/skin/testing"))
+    {
+    	printf("Error, cannot open YARP port!!\n");
+    	return NULL;
+    }
+
+
+	EOarray_of_10canframes sk_array;
+    eOnvID_t nvid = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_rightlowerarm, 0, skinNVindex_sstatus__arrayof10canframe);
+	EOnv	*nvRoot = transceiver->getNVhandler( endpoint_sk_emsboard_rightlowerarm,  nvid);  //??
+
+    while(keepGoingOn)
+    {
+    	yarp::sig::Vector &pv = outPort.prepare();
+    	pv.clear();
+//    	transceiver->getNVvalue(nvRoot, (uint8_t *)&sk_array, &sizze);
+
+    	memcpy( &sk_array, nvRoot->rem, sizeof(EOarray_of_10canframes));
+		printf("\n--- ARRAY SIZE = %d  ---- \n", sk_array.head.size);
+
+		for (i = 0; i< data.size(); i++ )
+			data[i]=255;
+
+    	for(i=0; i<sk_array.head.size; i++)
+    	{
+    		eOutil_canframe_t *canframe;
+    		int  j, mtbId = 0;
+
+    		canframe = (eOutil_canframe_t*) &sk_array.data[i*sizeof(eOutil_canframe_t)];
+    		triangle = (canframe->id & 0x000f);
+    		msgtype= ((canframe->data[0])& 0x80);
+    		printf("\n data id 0x%04X, 0x", canframe->id);
+
+    		//   			for (int i=0; i<mtbId.size(); i++)
+    		{
+    			//if (id==mtbId[i])
+    			{
+    				int index=16*12*mtbId + triangle*12;
+
+    				printf("%0X ", canframe->data[0]);
+    				if (msgtype)
+    				{
+    					for(int k=0;k<5;k++)
+    					{
+    						data[index+k+7]=canframe->data[k+1];
+    						printf("%0X ", canframe->data[k+1]);
+    					}
+    				}
+    				else
+    				{
+    					for(int k=0;k<7;k++)
+    					{
+    						data[index+k]=canframe->data[k+1];
+    						printf("%0X ", canframe->data[k+1]);
+    					}
+    				}
+    			}
+    		}
+
+    	}
+
+    	pv = data;
+    	outPort.write();
+    	sleep(3);
+    }
+    outPort.close();
+    return NULL;
+}
 
 void commands(void)
 {
   printf("q: quit\n");
-  printf("1: send type 1 packet -> configure regulars (toggling)\n");
-  printf("2: send type 2 packet -> set joint configuration\n");
-  printf("3: send type 3 packet -> send position setPoint\n");
-  printf("4: send type 4 packet -> empty packet\n");
-  printf("4: send type 4 packet -> weak up EMS\n");
+  printf("0: send wake up packet -> set appl state to running\n");
+  printf("1: send config  packet -> configure regulars\n");
+  printf("2: set treeroot -> set joint configuration\n");
+  printf("3: set leaves packet -> max current and maxposition\n");
+  printf("4: send type 4 packet -> send position setPoint\n");
   printf("\n");
 }
 
@@ -376,9 +478,16 @@ void usage(void)
 static void s_callback_button_0(void)
 {
     char str[128];
+    eOcfg_nvsEP_mn_applNumber_t dummy = 0;
+    eOnvID_t nvid_go2state 		= eo_cfg_nvsEP_mn_appl_NVID_Get(endpoint_mn_appl, dummy, applNVindex_config);
+    EOnv 	*nv_p 				= transceiver->getNVhandler(endpoint_mn_appl, nvid_go2state);
+    eOmn_appl_state_t  desired 	= applstate_running;
 
+	if( eores_OK != eo_nv_Set(nv_p, &desired, eobool_true, eo_nv_upd_dontdo))
+		printf("error!!");
+	// tell agent to prepare a rop to send
+	transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mn_appl, nvid_go2state);
 }
-
 
 static void s_callback_button_1(void)
 {

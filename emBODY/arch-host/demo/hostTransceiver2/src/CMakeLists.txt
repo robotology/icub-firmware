@@ -21,7 +21,8 @@ set(TRANSCEIVER_FOLDER	$ENV{ICUB_ROOT}/main/src/libraries/icubmod/embObjLib/ )
 
 include(embObjLib.conf)
 find_package(YARP)
-include_directories(${YARP_INCLUDE_DIRS})
+find_package(ICUB)
+include_directories(${YARP_INCLUDE_DIRS} ${ICUB_INCLUDE_DIRS})
 
 # Debug messages
 # message(INFO " BASE=${BASE}")

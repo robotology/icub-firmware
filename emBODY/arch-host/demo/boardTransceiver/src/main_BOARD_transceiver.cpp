@@ -39,6 +39,7 @@ using namespace std;
 extern "C" {
 #include "EoMotionControl.h"
 #include "EOtheBOARDtransceiver.h"
+#include "eOcfg_EPs_eb7.h"
 }
 
 

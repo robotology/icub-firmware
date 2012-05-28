@@ -123,6 +123,13 @@ pthread_t thread;
 
 int main(int argc, char *argv[])
 {
+
+	int *p;
+
+	EO_VERIFYproposition(name,  sizeof(void*) == 4);
+
+	return 0;
+
 	char str[SIZE];
 	// Program data
 	memset(&remote01.data, 0x00, SIZE);

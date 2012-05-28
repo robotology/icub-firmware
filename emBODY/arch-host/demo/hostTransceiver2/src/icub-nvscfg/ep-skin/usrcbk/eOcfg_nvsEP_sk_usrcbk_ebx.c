@@ -115,7 +115,7 @@ extern void eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe(uint16_t n, cons
 		s_eo_cfg__nvsEP_sk_hid_ParseCanFrame(sk_array);
 
 	}
-	else if(count == 10000 )
+//	else if(count == 10000 )
 	{
 		count++; //stop to print
 		s_eo_cfg__nvsEP_sk_hid_Histogram_Print();
