@@ -304,15 +304,28 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
                                           NULL,
                                           eom_ipnetproc, 
                                           "ipnet.proc");
-                                              
-    // and task which ticks the timers
+
+#define IPNET_TICK_PERIODIC                                          
+#if defined(IPNET_TICK_PERIODIC) 
+    // and task which ticks the timers. it is a periodic task
     s_eom_theipnet.tsktick = eom_task_New(eom_mtask_Periodic, ipnetcfg->tickpriority, ipnetcfg->tickstacksize,
                                           NULL, s_eom_ipnet_tsktick_forever,
                                           0, s_eom_theipnet.ipcfg.sys_timetick,
                                           NULL, 
                                           eom_ipnettick,
                                           "ipnet.tick");
-   
+#else
+    // and task which ticks the timers. it is an event based task with timeout. 
+    // this solution is not really periodic, but it can be good enough because we just need to increment some delays for tcp/ip retransmission.
+    // we use this solution in the particular case of the object EOMtheEMSrunner with hw timer (but not with osaltimer) to avoid the ipnettick to delay start of rx task
+    s_eom_theipnet.tsktick = eom_task_New(eom_mtask_EventDriven, ipnetcfg->tickpriority, ipnetcfg->tickstacksize,
+                                          NULL, s_eom_ipnet_tsktick_forever,
+                                          0, s_eom_theipnet.ipcfg.sys_timetick,
+                                          NULL, 
+                                          eom_ipnettick,
+                                          "ipnet.tick");
+#endif
+                                          
     return(&s_eom_theipnet);
 }    
 
