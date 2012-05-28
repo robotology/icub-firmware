@@ -63,7 +63,6 @@ struct EOMtheEMSrunner_hid
     eOemsrunner_cfg_t   cfg;
     eObool_t            cycleisrunning;
     eOsmEventsEMSappl_t event;
-    EOtimer*            timer;
     osal_timer_t*       osaltimer;
 };
 
