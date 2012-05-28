@@ -119,13 +119,11 @@ static void s_eom_emsrunner_start_taskDO(void *arg);
 
 static void s_eom_emsrunner_start_taskTX(void *arg);
 
-static void s_eom_emsrunner_cbk_activate_from_isr(void* arg);
-
-static void s_eom_emsrunner_cbk_activate_from_tsk(void* arg);
-
+//static void s_eom_emsrunner_cbk_activate_from_isr(void* arg);
+//static void s_eom_emsrunner_cbk_activate_from_tsk(void* arg);
 static void s_eom_emsrunner_cbk_activate_from_osaltmrman(osal_timer_t* tmr, void* par);
 
-static void s_eom_emsrunner_cbk_activate(void* arg, osal_caller_t osalcaller);
+static void s_eom_emsrunner_cbk_activate_with_hal_timer(void* arg, osal_caller_t osalcaller);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -140,7 +138,6 @@ static EOMtheEMSrunner s_theemsrunner =
     EO_INIT(.cfg)               {0},
     EO_INIT(.cycleisrunning)    eobool_false,
     EO_INIT(.event)             eo_sm_emsappl_EVdummy,
-    EO_INIT(.timer)             NULL,
     EO_INIT(.osaltimer)         NULL
 };
 
@@ -171,7 +168,6 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
     s_theemsrunner.cycleisrunning = eobool_false; 
     s_theemsrunner.event = eo_sm_emsappl_EVdummy;
     
-    s_theemsrunner.timer = eo_timer_New();
     s_theemsrunner.osaltimer = osal_timer_new();
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_theemsrunner.osaltimer), s_eobj_ownname, "osaltimer is NULL");
     
@@ -238,7 +234,8 @@ extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
         return(eores_NOK_nullpointer);
     } 
 
-#if 0    
+#if 0 
+    // start the hal timer straigth away
 
     hal_timer_cfg_t t2per_cfg  = 
     {
@@ -263,16 +260,7 @@ extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
     s_theemsrunner.cycleisrunning = eobool_true;
 
 #else
-
-// EOMtheTimermanager    
-//     {
-//         EOaction action;
-//         
-//         eo_action_SetCallback(&action, s_eom_emsrunner_cbk_activate, p, eom_callbackman_GetTask(eom_callbackman_GetHandle()));
-//         eo_timer_Start(s_theemsrunner.timer, eok_abstimeNOW, 1000, eo_tmrmode_ONESHOT, &action);   
-//     }
-
-// OSAL timer
+    // start the hal timer in synch with the systick
     {
         osal_timer_timing_t timing;
         osal_timer_onexpiry_t onexpiry;
@@ -286,7 +274,9 @@ extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
         osal_timer_start(s_theemsrunner.osaltimer, &timing, &onexpiry, osal_callerTSK);
     }
 
-#endif    
+#endif 
+
+    
     return(eores_OK);
 }
 
@@ -685,22 +675,22 @@ static void s_eom_emsrunner_start_taskTX(void *arg)
 }
 
 
-static void s_eom_emsrunner_cbk_activate_from_isr(void* arg)
-{
-    s_eom_emsrunner_cbk_activate(arg, osal_callerISR);
-}
+// static void s_eom_emsrunner_cbk_activate_from_isr(void* arg)
+// {
+//     s_eom_emsrunner_cbk_activate_with_hal_timer(arg, osal_callerISR);
+// }
 
-static void s_eom_emsrunner_cbk_activate_from_tsk(void* arg)
-{
-    s_eom_emsrunner_cbk_activate(arg, osal_callerTSK);
-}
+// static void s_eom_emsrunner_cbk_activate_from_tsk(void* arg)
+// {
+//     s_eom_emsrunner_cbk_activate_with_hal_timer(arg, osal_callerTSK);
+// }
 
 static void s_eom_emsrunner_cbk_activate_from_osaltmrman(osal_timer_t* tmr, void* par)
 {
-    s_eom_emsrunner_cbk_activate(par, osal_callerTMRMAN);
+    s_eom_emsrunner_cbk_activate_with_hal_timer(par, osal_callerTMRMAN);
 }
 
-static void s_eom_emsrunner_cbk_activate(void* arg, osal_caller_t osalcaller)
+static void s_eom_emsrunner_cbk_activate_with_hal_timer(void* arg, osal_caller_t osalcaller)
 {
     EOMtheEMSrunner *p = (EOMtheEMSrunner*)arg;
     hal_result_t res;
