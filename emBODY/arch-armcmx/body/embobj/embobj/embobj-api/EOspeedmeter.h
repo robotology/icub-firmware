@@ -48,11 +48,11 @@ typedef struct EOspeedmeter_hid EOspeedmeter;
 // - declaration of extern public functions ---------------------------------------------------------------------------
  
  
-extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution, float period);
+extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution, int32_t frequency);
 
 extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder);
 extern void eo_speedometer_EncoderError(EOspeedmeter* o);
-extern float eo_speedometer_GetSpeed(EOspeedmeter* o);
+extern int32_t eo_speedometer_GetSpeed(EOspeedmeter* o);
 
 
 /** @}            

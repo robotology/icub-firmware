@@ -83,11 +83,11 @@ extern float eo_emsController_GetSpeed(uint8_t joint);
 
 extern void eo_emsController_ReadTorques(int32_t *torque);
 
-extern void eo_emsController_SetPosRef(uint8_t joint, float pos, float vel);
-extern void eo_emsController_SetVelRef(uint8_t joint, float vel, float acc);
-extern void eo_emsController_SetTrqRef(uint8_t joint, float trq);
+extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t vel);
+extern void eo_emsController_SetVelRef(uint8_t joint, int32_t vel, int32_t acc);
+extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq);
 
-extern float* eo_emsController_PWM(void);
+extern int16_t* eo_emsController_PWM(void);
 
 // asynchronous
 extern void eo_emsController_SetControlMode(uint8_t joint, control_mode_t mode);
@@ -95,16 +95,20 @@ extern void eo_emsController_ResetPosPid(uint8_t joint);
 extern void eo_emsController_ResetTrqPid(uint8_t joint);
 extern void eo_emsController_Stop(uint8_t joint);
 
-extern void eo_emsGetActivePidStatus(uint8_t joint, float *pwm, float *err);
+extern void eo_emsGetActivePidStatus(uint8_t joint, int16_t *pwm, int32_t *err);
 
 // configuration
 extern void eo_emsController_SetDecoupler(emsMotorDecoupler_t dec_type, float matrix[4][4]);
-extern void eo_emsController_SetPosPid(uint8_t joint, float kp, float kd, float ki);
-extern void eo_emsController_SetPosPidLimits(uint8_t joint, float Ymax, float Imax);
-extern void eo_emsController_SetTrqPid(uint8_t joint, float kp, float ki, float kd, float Ymax, float Imax);
-extern void eo_emsController_SetStiffness(uint8_t joint, float stiffeness);
-extern void eo_emsController_SetVelMax(uint8_t joint, float vel_max);
-extern void eo_emsController_SetPosLimits(uint8_t joint, float pos_min, float pos_max);
+
+extern void eo_emsController_SetPosPid(uint8_t joint, int32_t kp, int32_t kd, int32_t ki, uint8_t shift);
+extern void eo_emsController_SetPosPidLimits(uint8_t joint, int32_t Ymax, int32_t Imax);
+
+extern void eo_emsController_SetTrqPid(uint8_t joint, int32_t kp, int32_t kd, int32_t ki, uint8_t shift);
+extern void eo_emsController_SetTrqPidLimits(uint8_t joint, int32_t Ymax, int32_t Imax);
+
+extern void eo_emsController_SetStiffness(uint8_t joint, int32_t stiffeness);
+extern void eo_emsController_SetVelMax(uint8_t joint, int32_t vel_max);
+extern void eo_emsController_SetPosLimits(uint8_t joint, int32_t pos_min, int32_t pos_max);
 
 /** @}            
     end of group eo_emsController  

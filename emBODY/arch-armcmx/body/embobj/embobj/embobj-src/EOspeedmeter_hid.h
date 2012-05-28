@@ -25,7 +25,7 @@ extern "C" {
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
-
+#define DELTA_THR 4
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
@@ -34,16 +34,16 @@ extern "C" {
                 public or private (static) functions of the object and protected data
                 used also by its derived objects.
  **/  
- 
+
 struct EOspeedmeter_hid 
 {
-    float period;
+    int32_t FREQUENCY;
+    int32_t FREQUENCYxTHR;
     int32_t impulse_per_revolution;
     int32_t impulse_per_revolution_by_2;
-    float time_from_last_reading;
+    int32_t time_from_last_reading;
     int32_t last_reading;
-    float speed;
-    float speed_new;
+    int32_t speed;
     eObool_t first_reading;
 }; 
 

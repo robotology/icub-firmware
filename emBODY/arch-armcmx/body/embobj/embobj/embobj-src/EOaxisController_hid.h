@@ -44,42 +44,42 @@ extern "C" {
 struct EOaxisController_hid 
 {
     EOpid *pidP;
+    EOpod *pidV;
     EOpid *pidT;
 
     EOspeedmeter *speedmeter;
     EOtrajectory *trajectory;
 
     // axis limits
-    float pos_min;
-    float pos_max;
-    float vel_min;
-    float vel_max;
+    int32_t pos_min;
+    int32_t pos_max;
+    int32_t vel_max;
     
     // measures (read only)
-    float encpos_meas;
-    float torque_meas;
+    int32_t encpos_meas;
+    int32_t torque_meas;
 
     // velocity control
-    float pos_vel_bias;
-    float vel_ref;
-    float acc_ref_step;
-    float vel_timer;
-    float vel_timeout;
+    int32_t pos_vel_bias;
+    int32_t vel_ref;
+    int32_t acc_ref_step;
+    int32_t vel_timer;
+    int32_t vel_timeout;
 
-    float pos_out;
-    float vel_out;
-    float vel_out_step;
+    int32_t pos_out;
+    int32_t vel_out;
+    int32_t vel_out_step;
 
     // torque control
-    float torque_ref;
-    float torque_out;
-    float torque_off;
-    float torque_last_pos_err;
-    float torque_damp_lp_filt;
+    int32_t torque_ref;
+    int32_t torque_out;
+    int32_t torque_off;
+    int32_t torque_last_pos_err;
+    int32_t torque_damp_lp_filt;
 
     // parameters
-    float stiffness;
-    float damping;
+    int32_t stiffness;
+    int32_t damping;
 
     uint8_t control_mode;
 }; 
