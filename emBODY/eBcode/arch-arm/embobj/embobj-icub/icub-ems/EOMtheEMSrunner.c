@@ -109,7 +109,7 @@ static void s_eom_emsrunner_taskTX_startup(EOMtask *p, uint32_t t);
 static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t);
 
 
-static void s_eom_emsrunner_enable_task(EOMtask *tsk);
+static void s_eom_emsrunner_enable_task(EOMtask *tsk, osal_caller_t osalcaller);
 
 static void s_eom_emsrunner_start_cycle(void *arg);
 
@@ -119,13 +119,19 @@ static void s_eom_emsrunner_start_taskDO(void *arg);
 
 static void s_eom_emsrunner_start_taskTX(void *arg);
 
-static void s_eom_emsrunner_cbk_activate(void* arg);
+static void s_eom_emsrunner_cbk_activate_from_isr(void* arg);
+
+static void s_eom_emsrunner_cbk_activate_from_tsk(void* arg);
+
+static void s_eom_emsrunner_cbk_activate_from_osaltmrman(osal_timer_t* tmr, void* par);
+
+static void s_eom_emsrunner_cbk_activate(void* arg, osal_caller_t osalcaller);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-//static const char s_eobj_ownname[] = "EOMtheEMSrunner";
+static const char s_eobj_ownname[] = "EOMtheEMSrunner";
 
  
 static EOMtheEMSrunner s_theemsrunner = 
@@ -134,7 +140,8 @@ static EOMtheEMSrunner s_theemsrunner =
     EO_INIT(.cfg)               {0},
     EO_INIT(.cycleisrunning)    eobool_false,
     EO_INIT(.event)             eo_sm_emsappl_EVdummy,
-    EO_INIT(.timer)             NULL
+    EO_INIT(.timer)             NULL,
+    EO_INIT(.osaltimer)         NULL
 };
 
 
@@ -165,6 +172,8 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
     s_theemsrunner.event = eo_sm_emsappl_EVdummy;
     
     s_theemsrunner.timer = eo_timer_New();
+    s_theemsrunner.osaltimer = osal_timer_new();
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_theemsrunner.osaltimer), s_eobj_ownname, "osaltimer is NULL");
     
     s_theemsrunner.task[eo_emsrunner_taskid_runRX] = eom_task_New(eom_mtask_OnAllEventsDriven, 
                                                                   cfg->taskpriority[eo_emsrunner_taskid_runRX], 
@@ -249,21 +258,33 @@ extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
     hal_timer_start(hal_timer2);
 
     // but now we need to enable the first task: taskRX. the other enables shall be send at teh end of the relevant tasks
-    s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runRX]);
+    s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runRX], osal_callerTSK);
     
     s_theemsrunner.cycleisrunning = eobool_true;
 
 #else
 
+// EOMtheTimermanager    
+//     {
+//         EOaction action;
+//         
+//         eo_action_SetCallback(&action, s_eom_emsrunner_cbk_activate, p, eom_callbackman_GetTask(eom_callbackman_GetHandle()));
+//         eo_timer_Start(s_theemsrunner.timer, eok_abstimeNOW, 1000, eo_tmrmode_ONESHOT, &action);   
+//     }
+
+// OSAL timer
     {
-        EOaction action;
+        osal_timer_timing_t timing;
+        osal_timer_onexpiry_t onexpiry;
+        timing.startat  = OSAL_abstimeNONE;
+        timing.count    = 1000; // or 0.
+        timing.mode     = osal_tmrmodeONESHOT;   
+        onexpiry.cbk    = s_eom_emsrunner_cbk_activate_from_osaltmrman;
+        onexpiry.par    = p;        
         
-        eo_action_SetCallback(&action, s_eom_emsrunner_cbk_activate, p, eom_callbackman_GetTask(eom_callbackman_GetHandle()));
-        eo_timer_Start(s_theemsrunner.timer, eok_abstimeNOW, 1000, eo_tmrmode_ONESHOT, &action);
-   
+
+        osal_timer_start(s_theemsrunner.osaltimer, &timing, &onexpiry, osal_callerTSK);
     }
-
-
 
 #endif    
     return(eores_OK);
@@ -427,7 +448,7 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
     //eov_ipnet_Deactivate(eov_ipnet_GetHandle());
     
     // Z. at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
-    s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runDO]);
+    s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runDO], osal_callerTSK);
 }
 
 
@@ -448,7 +469,7 @@ static void s_eom_emsrunner_taskDO_run(EOMtask *p, uint32_t t)
     
 
     // Z. at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
-    s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runTX]);
+    s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runTX], osal_callerTSK);
 }
 
 
@@ -502,7 +523,7 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
     // Z. at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
     if(eobool_true == s_theemsrunner.cycleisrunning)
     {
-        s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runRX]);
+        s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runRX], osal_callerTSK);
     }
     else
     {   // we need to reset the event to the dummy value.
@@ -513,11 +534,20 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
     }
 }
 
-static void s_eom_emsrunner_enable_task(EOMtask *tsk)
+static void s_eom_emsrunner_enable_task(EOMtask *tsk, osal_caller_t osalcaller)
 {
     // send an event to enable tsk. 
-    eom_task_SetEvent(tsk, eo_emsrunner_evt_enable);
+    if(osal_callerTSK == osalcaller)
+    {
+        eom_task_SetEvent(tsk, eo_emsrunner_evt_enable);
+    }
+    else // isr or tmrman
+    {
+        eom_task_isrSetEvent(tsk, eo_emsrunner_evt_enable);
+    }
 }
+
+
 
 static void s_eom_emsrunner_start_cycle(void *arg)
 {
@@ -655,7 +685,22 @@ static void s_eom_emsrunner_start_taskTX(void *arg)
 }
 
 
-static void s_eom_emsrunner_cbk_activate(void* arg)
+static void s_eom_emsrunner_cbk_activate_from_isr(void* arg)
+{
+    s_eom_emsrunner_cbk_activate(arg, osal_callerISR);
+}
+
+static void s_eom_emsrunner_cbk_activate_from_tsk(void* arg)
+{
+    s_eom_emsrunner_cbk_activate(arg, osal_callerTSK);
+}
+
+static void s_eom_emsrunner_cbk_activate_from_osaltmrman(osal_timer_t* tmr, void* par)
+{
+    s_eom_emsrunner_cbk_activate(par, osal_callerTMRMAN);
+}
+
+static void s_eom_emsrunner_cbk_activate(void* arg, osal_caller_t osalcaller)
 {
     EOMtheEMSrunner *p = (EOMtheEMSrunner*)arg;
     hal_result_t res;
@@ -677,10 +722,13 @@ static void s_eom_emsrunner_cbk_activate(void* arg)
     hal_timer_start(hal_timer2);
 
     // but now we need to enable the first task: taskRX. the other enables shall be send at teh end of the relevant tasks
-    s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runRX]);
+    s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runRX], osalcaller);
     
     s_theemsrunner.cycleisrunning = eobool_true;    
 }
+
+
+
 
 
 // --------------------------------------------------------------------------------------------------------------------

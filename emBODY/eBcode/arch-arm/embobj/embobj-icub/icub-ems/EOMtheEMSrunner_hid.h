@@ -39,6 +39,7 @@ extern "C" {
 #include "EOMtask.h"
 #include "eOcfg_sm_EMSappl.h"
 #include "EOtimer.h"
+#include "osal_timer.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
@@ -63,6 +64,7 @@ struct EOMtheEMSrunner_hid
     eObool_t            cycleisrunning;
     eOsmEventsEMSappl_t event;
     EOtimer*            timer;
+    osal_timer_t*       osaltimer;
 };
 
 
