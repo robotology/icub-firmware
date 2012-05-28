@@ -64,24 +64,23 @@
 
 static const char s_eobj_ownname[] = "EOspeedmeter";
 
-extern int32_t posref_can;
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution, float period)
+extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution, int32_t frequency)
 {
     EOspeedmeter *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOspeedmeter), 1);
 
     if (o)
     {
-        o->period = period;
+        o->FREQUENCY = frequency;
+        o->FREQUENCYxTHR = frequency * (DELTA_THR + 1);
         o->impulse_per_revolution = impulse_per_revolution;
         o->impulse_per_revolution_by_2 = impulse_per_revolution / 2;
-        o->time_from_last_reading = 0.0f;
+        o->time_from_last_reading = 0;
         o->last_reading = 0;
-        o->speed = 0.0f;
+        o->speed = 0;
         o->first_reading = eobool_true;
     }
 
@@ -91,12 +90,11 @@ extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution, float per
 extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
 {
     int32_t delta;
-    float divider;
 
     if (o->first_reading)
     {
         o->first_reading = eobool_false;
-        o->time_from_last_reading = 0.0f;
+        o->time_from_last_reading = 0;
         o->last_reading = encoder;
         
         return;
@@ -113,19 +111,17 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
         delta += o->impulse_per_revolution;
     }
 
-    o->time_from_last_reading += o->period;
+    ++o->time_from_last_reading;
 
-    divider = 1.0f / o->time_from_last_reading;
-
-    if (delta<=-4 || delta>=4)
+    if (delta <= -DELTA_THR || delta >= DELTA_THR)
     {
-        o->speed = 0.95f*o->speed + 0.05f*(float)delta*divider;
+        o->speed = (15 * o->speed + (delta * o->FREQUENCY) / o->time_from_last_reading) >> 4;
         o->time_from_last_reading = 0.0f;
         o->last_reading = encoder;
     }
     else
     {
-        float max_speed = divider * 5.0f;
+        int32_t max_speed = o->FREQUENCYxTHR / o->time_from_last_reading;
 
         if (o->speed > max_speed)
         {    
@@ -140,10 +136,10 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
 
 extern void eo_speedometer_EncoderError(EOspeedmeter* o)
 {
-    o->time_from_last_reading += o->period;
+    ++o->time_from_last_reading;
 }
 
-extern float eo_speedometer_GetSpeed(EOspeedmeter* o)
+extern int32_t eo_speedometer_GetSpeed(EOspeedmeter* o)
 {
     return o->speed;
 }
