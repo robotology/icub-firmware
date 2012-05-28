@@ -63,7 +63,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+//#define EOMTHEEMSRUNNER_USE_HAL_TIMER_FOR_PERIOD
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -113,6 +114,8 @@ static void s_eom_emsrunner_enable_task(EOMtask *tsk, osal_caller_t osalcaller);
 
 static void s_eom_emsrunner_start_cycle(void *arg);
 
+static void s_eom_emsrunner_start_cycle_within_osaltimer(osal_timer_t *tmr, void *arg);
+
 static void s_eom_emsrunner_warn_task(void *arg);
 
 static void s_eom_emsrunner_start_taskDO(void *arg);
@@ -123,7 +126,9 @@ static void s_eom_emsrunner_start_taskTX(void *arg);
 //static void s_eom_emsrunner_cbk_activate_from_tsk(void* arg);
 static void s_eom_emsrunner_cbk_activate_from_osaltmrman(osal_timer_t* tmr, void* par);
 
-static void s_eom_emsrunner_cbk_activate_with_hal_timer(void* arg, osal_caller_t osalcaller);
+static void s_eom_emsrunner_cbk_activate_with_period_by_hal_timer(void* arg, osal_caller_t osalcaller);
+
+static void s_eom_emsrunner_cbk_activate_with_period_by_osal_timer(void* arg);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -162,6 +167,13 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
     
     
     // verify that the cfg has timing that are compatible ... d2>d1+gap, period > d1+d2+gap
+    
+    // to be done
+    
+    // verify that the period is compatible with the used timer
+#if !defined(EOMTHEEMSRUNNER_USE_HAL_TIMER_FOR_PERIOD)
+    eo_errman_Assert(eo_errman_GetHandle(), ((cfg->period % osal_info_get_tick()) == 0), s_eobj_ownname, "cfg->period must be multiple of osaltick");
+#endif    
     
     memcpy(&s_theemsrunner.cfg, cfg, sizeof(eOemsrunner_cfg_t));
     
@@ -260,6 +272,9 @@ extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
     s_theemsrunner.cycleisrunning = eobool_true;
 
 #else
+  
+#if defined(EOMTHEEMSRUNNER_USE_HAL_TIMER_FOR_PERIOD)    
+    
     // start the hal timer in synch with the systick
     {
         osal_timer_timing_t timing;
@@ -273,8 +288,14 @@ extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
 
         osal_timer_start(s_theemsrunner.osaltimer, &timing, &onexpiry, osal_callerTSK);
     }
-
-#endif 
+    
+#else
+    
+    s_eom_emsrunner_cbk_activate_with_period_by_osal_timer(&s_theemsrunner);    
+    
+#endif
+    
+#endif
 
     
     return(eores_OK);
@@ -294,9 +315,13 @@ extern eOresult_t eom_emsrunner_StopAndGoTo(EOMtheEMSrunner *p, eOsmEventsEMSapp
         return(eores_NOK_generic);
     }
 
-    // simply stop timer2 ... that allows to finish the cycle without restarting it.
-   
+#if defined(EOMTHEEMSRUNNER_USE_HAL_TIMER_FOR_PERIOD)     
+    // simply stop timer2 ... that allows to finish the cycle without restarting it.   
     hal_timer_stop(hal_timer2);
+#else
+    // stop the osaltimer
+    osal_timer_stop(s_theemsrunner.osaltimer, osal_callerTSK);
+#endif    
     
     s_theemsrunner.cycleisrunning = eobool_false;
     s_theemsrunner.event = ev;
@@ -361,7 +386,7 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_afterdatagramtransmission(ui
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static uint8_t received = 0;
+static uint32_t received = 0;
 
 static void s_eom_emsrunner_taskRX_startup(EOMtask *p, uint32_t t)
 {
@@ -383,10 +408,7 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
     //eov_ipnet_Activate(eov_ipnet_GetHandle());
     
     
-    if(1 == received)
-    {
-        received = 0;
-    }
+ 
     
     // A. perform a first activity
     eom_emsrunner_hid_userdef_taskRX_beforedatagramreception(); 
@@ -401,7 +423,7 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
         if(eores_OK == res)
         {
             res = eom_emstransceiver_Parse(eom_emstransceiver_GetHandle(), rxpkt, &numberofrxrops, &txtimeofrxropframe);
-            received = 1;
+            received ++;
         }
         
         #warning ---> what to do if there are n > 1 datagram in teh queue ??? so far i remove them without parsing
@@ -418,7 +440,7 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
                 if(eores_OK == res)
                 {
                     res = eom_emstransceiver_Parse(eom_emstransceiver_GetHandle(), rxpkt, &tmp, &txtimeofrxropframe);
-                    received = 1;
+                    received ++;
                     numberofrxrops += tmp;
                 }
                 if(0 == remainingrxpkts)
@@ -428,6 +450,12 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
             }           
         }
         
+    }
+    
+    if(3 == received)
+    {
+        received = 0;
+        eom_emsrunner_StopAndGoTo(eom_emsrunner_GetHandle(), eo_sm_emsappl_EVgo2cfg);
     }
     
     // C. perform an user-defined function after datagram parsing
@@ -570,6 +598,38 @@ static void s_eom_emsrunner_start_cycle(void *arg)
     eom_task_isrSetEvent(s_theemsrunner.task[eo_emsrunner_taskid_runRX], eo_emsrunner_evt_execute);
 }
 
+
+static void s_eom_emsrunner_start_cycle_within_osaltimer(osal_timer_t *tmr, void *arg)
+{
+    hal_timer_cfg_t toneshot_cfg  = 
+    {
+        .prescaler          = hal_timer_prescalerAUTO,         
+        .countdown          = 0,
+        .priority           = hal_int_priority02,
+        .mode               = hal_timer_mode_oneshot,
+        .callback_on_exp    = NULL,
+        .arg                = NULL
+    };  
+
+    // one-shot timer which verify if taskRX has finished. if not ... it issues a warning.
+    toneshot_cfg.countdown          = s_theemsrunner.cfg.execDOafter - s_theemsrunner.cfg.safetyGAP;
+    toneshot_cfg.callback_on_exp    = s_eom_emsrunner_warn_task;
+    toneshot_cfg.arg                = s_theemsrunner.task[eo_emsrunner_taskid_runRX];
+    hal_timer_init(hal_timer3, &toneshot_cfg, NULL); 
+    
+    // one-shot timer which starts taskDO.
+    toneshot_cfg.countdown          = s_theemsrunner.cfg.execDOafter;
+    toneshot_cfg.callback_on_exp    = s_eom_emsrunner_start_taskDO;
+    toneshot_cfg.arg                = s_theemsrunner.task[eo_emsrunner_taskid_runDO];
+    hal_timer_init(hal_timer4, &toneshot_cfg, NULL); 
+    
+    hal_timer_start(hal_timer3);
+    hal_timer_start(hal_timer4);
+ 
+    // send an event to execute taskRX
+    eom_task_isrSetEvent(s_theemsrunner.task[eo_emsrunner_taskid_runRX], eo_emsrunner_evt_execute);
+}
+
 static void s_eom_emsrunner_warn_task(void *arg)
 {
     static uint32_t count = 0;
@@ -677,20 +737,20 @@ static void s_eom_emsrunner_start_taskTX(void *arg)
 
 // static void s_eom_emsrunner_cbk_activate_from_isr(void* arg)
 // {
-//     s_eom_emsrunner_cbk_activate_with_hal_timer(arg, osal_callerISR);
+//     s_eom_emsrunner_cbk_activate_with_period_by_hal_timer(arg, osal_callerISR);
 // }
 
 // static void s_eom_emsrunner_cbk_activate_from_tsk(void* arg)
 // {
-//     s_eom_emsrunner_cbk_activate_with_hal_timer(arg, osal_callerTSK);
+//     s_eom_emsrunner_cbk_activate_with_period_by_hal_timer(arg, osal_callerTSK);
 // }
 
 static void s_eom_emsrunner_cbk_activate_from_osaltmrman(osal_timer_t* tmr, void* par)
 {
-    s_eom_emsrunner_cbk_activate_with_hal_timer(par, osal_callerTMRMAN);
+    s_eom_emsrunner_cbk_activate_with_period_by_hal_timer(par, osal_callerTMRMAN);
 }
 
-static void s_eom_emsrunner_cbk_activate_with_hal_timer(void* arg, osal_caller_t osalcaller)
+static void s_eom_emsrunner_cbk_activate_with_period_by_hal_timer(void* arg, osal_caller_t osalcaller)
 {
     EOMtheEMSrunner *p = (EOMtheEMSrunner*)arg;
     hal_result_t res;
@@ -717,6 +777,28 @@ static void s_eom_emsrunner_cbk_activate_with_hal_timer(void* arg, osal_caller_t
     s_theemsrunner.cycleisrunning = eobool_true;    
 }
 
+
+static void s_eom_emsrunner_cbk_activate_with_period_by_osal_timer(void* arg)
+{
+    
+    {
+        osal_timer_timing_t timing;
+        osal_timer_onexpiry_t onexpiry;
+        timing.startat  = OSAL_abstimeNONE;
+        timing.count    = s_theemsrunner.cfg.period; 
+        timing.mode     = osal_tmrmodeFOREVER;   
+        onexpiry.cbk    = s_eom_emsrunner_start_cycle_within_osaltimer;
+        onexpiry.par    = arg;        
+        
+
+        osal_timer_start(s_theemsrunner.osaltimer, &timing, &onexpiry, osal_callerTSK);
+    }
+
+    // now we also need to enable the first task: taskRX. the other enables shall be send at the end of the relevant tasks
+    s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runRX], osal_callerTSK);
+    
+    s_theemsrunner.cycleisrunning = eobool_true;    
+}
 
 
 
