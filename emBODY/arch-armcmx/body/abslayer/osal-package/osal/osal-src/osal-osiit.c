@@ -325,6 +325,25 @@ extern osal_info_status_t osal_info_get_status(void)
     return(s_osal_info_status);
 }
 
+
+extern osal_reltime_t osal_info_get_tick(void)
+{
+    return(s_osal_usec_in_tick);
+}
+
+extern const osal_cfg_t* osal_info_get_config(void)
+{
+    if(osal_info_status_zero == s_osal_info_status)
+    {
+        return(NULL);
+    }
+    else
+    {
+        return(&s_osal_osal_cfg);
+    }
+    
+}
+
 extern void osal_system_start(void (*launcher_fn)(void)) 
 {
 
