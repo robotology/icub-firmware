@@ -19,6 +19,7 @@ extern "C" {
 #include "EoCommon.h"
 #include "EOpid.h"
 #include "EOtrajectory.h"
+#include "EOspeedcurve.h"
 #include "EOspeedmeter.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -27,9 +28,6 @@ extern "C" {
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
-
-#define eo_axisController_GetPosPidPtr_hid(axis_controller) (axis_controller->pidP)
-#define eo_axisController_GetTrqPidPtr_hid(axis_controller) (axis_controller->pidT)
 
 #define eo_axisController_ReadTorque_hid(axis_controller, torque) axis_controller->torque_meas = torque
 
@@ -44,11 +42,13 @@ extern "C" {
 struct EOaxisController_hid 
 {
     EOpid *pidP;
-    EOpod *pidV;
+    EOpid *pidV;
     EOpid *pidT;
 
     EOspeedmeter *speedmeter;
     EOtrajectory *trajectory;
+
+    EOspeedcurve *speedcurve;
 
     // axis limits
     int32_t pos_min;
@@ -80,6 +80,8 @@ struct EOaxisController_hid
     // parameters
     int32_t stiffness;
     int32_t damping;
+
+    int16_t pwm_offset;
 
     uint8_t control_mode;
 }; 

@@ -29,9 +29,6 @@ extern "C" {
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-#define eo_axisController_GetPosPidPtr(o) eo_axisController_GetPosPidPtr_hid(o)
-#define eo_axisController_GetTrqPidPtr(o) eo_axisController_GetTrqPidPtr_hid(o)
-
 #define eo_axisController_ReadTorque(axis_controller, torque) eo_axisController_ReadTorque_hid(axis_controller, torque)
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
@@ -98,10 +95,13 @@ extern void eo_axisController_SetStiffness(EOaxisController *o, int32_t stiffnes
 extern void eo_axisController_SetVelMax(EOaxisController *o, int32_t vel_max);
 extern void eo_axisController_SetPosLimits(EOaxisController *o, int32_t pos_min, int32_t pos_max);
 
+extern void eo_axisController_SetOffset(EOaxisController *o, int16_t offset);
+
 extern void eo_axisController_GetActivePidStatus(EOaxisController *o, int16_t *pwm, int32_t *err);
 
-//extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o);
-//extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o);
+extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o);
+extern EOpid* eo_axisController_GetVelPidPtr(EOaxisController *o);
+extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o);
 
 /** @}            
     end of group eo_axisController  

@@ -44,8 +44,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-extern int32_t posref_can;
-
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
@@ -147,7 +145,7 @@ extern void eo_trajectory_Abort(EOtrajectory *o, int32_t p)
     o->steps_to_end = 0;
 }
 
-extern uint8_t eo_trajectory_IsDone(EOtrajectory* o)
+extern eObool_t eo_trajectory_IsDone(EOtrajectory* o)
 {
     return o->steps_to_end == 0;
 }
@@ -169,8 +167,6 @@ extern void eo_trajectory_Step(EOtrajectory* o, int32_t *p, int32_t *v, int32_t 
         if (a) *a = 0;
         if (v) *v = o->vf;
         if (p) *p = o->pf;
-        
-        //posref_can = (int32_t)*p;
 
         return;
     }
@@ -187,8 +183,6 @@ extern void eo_trajectory_Step(EOtrajectory* o, int32_t *p, int32_t *v, int32_t 
     if (a) *a = (int32_t) o->a;
     if (v) *v = (int32_t) o->v;
     if (p) *p = (int32_t) o->p;
-
-    //posref_can = *p;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
