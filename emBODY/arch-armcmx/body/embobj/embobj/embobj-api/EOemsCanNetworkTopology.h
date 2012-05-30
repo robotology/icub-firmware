@@ -45,7 +45,7 @@ extern "C" {
 #include "EoSensors.h"
 #include "EoSkin.h"
 #include "EOconstvector.h"
-#include "EOfifoWord.h"
+#include "EOarray.h"
 
 
 
@@ -157,11 +157,11 @@ extern eOresult_t eo_emsCanNetTopo_GetMotorId_ByMotorCanLocation(EOemsCanNetTopo
 
 extern eOresult_t eo_emsCanNetTopo_GetSensorId_BySensorCanLocation(EOemsCanNetTopo *p, eo_emsCanNetTopo_sensorCanLocation_t *location_ptr, eOsnsr_sensorId_t *sId_ptr);
 
-
-extern eOresult_t eo_emsCanNetTopo_GetConnectedJoints(EOemsCanNetTopo *p, EOfifoWord *connectedJointsList);
-extern eOresult_t eo_emsCanNetTopo_GetConnectedMotors(EOemsCanNetTopo *p, EOfifoWord *connectedMotorsList);
-extern eOresult_t eo_emsCanNetTopo_GetConnectedSensors(EOemsCanNetTopo *p, EOfifoWord *connectedSensorsList);
-extern eOresult_t eo_emsCanNetTopo_GetConnectedSkin(EOemsCanNetTopo *p, EOfifoWord *connectedSkinList);
+/* NOTE: these fn eo_emsCanNetTopo_GetConnectedSomething... return nok if one of arg is null, else ok. in case of no "somethig" is connected the fifo size is 0*/
+extern eOresult_t eo_emsCanNetTopo_GetConnectedJoints(EOemsCanNetTopo *p, EOarray *connectedJointsList);
+extern eOresult_t eo_emsCanNetTopo_GetConnectedMotors(EOemsCanNetTopo *p, EOarray *connectedMotorsList);
+extern eOresult_t eo_emsCanNetTopo_GetConnectedSensors(EOemsCanNetTopo *p, EOarray *connectedSensorsList);
+extern eOresult_t eo_emsCanNetTopo_GetConnectedSkin(EOemsCanNetTopo *p, EOarray *connectedSkinList);
 
 
 

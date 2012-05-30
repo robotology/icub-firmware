@@ -191,7 +191,7 @@ extern eOresult_t eo_emsCanNetTopo_GetJointId_ByJointCanLocation(EOemsCanNetTopo
         return(eores_NOK_nodata);
     }
 
-    *jId_ptr = item_ptr->id;
+    *jId_ptr = item_ptr->ptr->id;
     return(eores_OK);
 }
 
@@ -211,7 +211,7 @@ extern eOresult_t eo_emsCanNetTopo_GetMotorId_ByMotorCanLocation(EOemsCanNetTopo
         return(eores_NOK_nodata);
     }
 
-    *mId_ptr = item_ptr->id;
+    *mId_ptr = item_ptr->ptr->id;
     return(eores_OK);
 
 }
@@ -232,12 +232,12 @@ extern eOresult_t eo_emsCanNetTopo_GetSensorId_BySensorCanLocation(EOemsCanNetTo
         return(eores_NOK_nodata);
     }
 
-    *sId_ptr = item_ptr->id;
+    *sId_ptr = item_ptr->ptr->id;
     return(eores_OK);
 }
 
 
-extern eOresult_t eo_emsCanNetTopo_GetConnectedJoints(EOemsCanNetTopo *p, EOfifoWord *connectedJointsList)
+extern eOresult_t eo_emsCanNetTopo_GetConnectedJoints(EOemsCanNetTopo *p, EOarray *connectedJointsList)
 {
     eOsizecntnr_t size;
     uint8_t i;
@@ -248,10 +248,11 @@ extern eOresult_t eo_emsCanNetTopo_GetConnectedJoints(EOemsCanNetTopo *p, EOfifo
         return(eores_NOK_nullpointer);
     }
 
-    //if no joints are connected to this board return nok 
+    //if no joints are connected to this board return ok and empty list 
     if((NULL == p->cfg.emsCanNetTopo_joints__ptr) || (0 == p->cfg.emsCanNetTopo_joints__ptr->size))
     {
-        return(eores_NOK_nodata);
+        eo_array_Reset(connectedJointsList); //eo_fifoword_Clear(connectedJointsList, 0);
+        return(eores_OK);
     }
 
     jTInfo = (eo_emsCanNetTopo_jointOrMotorTopoInfo_t *)p->cfg.emsCanNetTopo_joints__ptr->item_array_data;
@@ -259,13 +260,13 @@ extern eOresult_t eo_emsCanNetTopo_GetConnectedJoints(EOemsCanNetTopo *p, EOfifo
 
     for(i=0; i< size; i++)
     {
-        eo_fifoword_Put(connectedJointsList, jTInfo[i].id, 0);    
+        eo_array_PushBack(connectedJointsList, &(jTInfo[i].id));    
     }
 
     return(eores_OK);
 
 }
-extern eOresult_t eo_emsCanNetTopo_GetConnectedMotors(EOemsCanNetTopo *p, EOfifoWord *connectedMotorsList)
+extern eOresult_t eo_emsCanNetTopo_GetConnectedMotors(EOemsCanNetTopo *p, EOarray *connectedMotorsList)
 {
     eOsizecntnr_t size;
     uint8_t i;
@@ -276,10 +277,11 @@ extern eOresult_t eo_emsCanNetTopo_GetConnectedMotors(EOemsCanNetTopo *p, EOfifo
         return(eores_NOK_nullpointer);
     }
 
-    //if no Motors are connected to this board return nok 
+    //if no Motors are connected to this board return ok and empty list
     if((NULL == p->cfg.emsCanNetTopo_motors__ptr) || (0 == p->cfg.emsCanNetTopo_motors__ptr->size))
     {
-        return(eores_NOK_nodata);
+        eo_array_Reset(connectedMotorsList); //eo_fifoword_Clear(connectedMotorsList, 0);
+        return(eores_OK);
     }
 
     mTInfo = (eo_emsCanNetTopo_jointOrMotorTopoInfo_t *)p->cfg.emsCanNetTopo_motors__ptr->item_array_data;
@@ -287,14 +289,15 @@ extern eOresult_t eo_emsCanNetTopo_GetConnectedMotors(EOemsCanNetTopo *p, EOfifo
 
     for(i=0; i< size; i++)
     {
-        eo_fifoword_Put(connectedMotorsList, mTInfo[i].id, 0);    
+        eo_array_PushBack(connectedMotorsList, &(mTInfo[i].id));   
+        //eo_fifoword_Put(connectedMotorsList, mTInfo[i].id, 0);    
     }
 
     return(eores_OK);
 }
 
 
-extern eOresult_t eo_emsCanNetTopo_GetConnectedSensors(EOemsCanNetTopo *p, EOfifoWord *connectedSensorsList)
+extern eOresult_t eo_emsCanNetTopo_GetConnectedSensors(EOemsCanNetTopo *p, EOarray *connectedSensorsList)
 {
     eOsizecntnr_t size;
     uint8_t i;
@@ -305,10 +308,11 @@ extern eOresult_t eo_emsCanNetTopo_GetConnectedSensors(EOemsCanNetTopo *p, EOfif
         return(eores_NOK_nullpointer);
     }
 
-    //if no Motors are connected to this board return nok 
+    //if no Motors are connected to this board return ok and empty list
     if((NULL == p->cfg.emsCanNetTopo_sensors__ptr) || (0 == p->cfg.emsCanNetTopo_sensors__ptr->size))
     {
-        return(eores_NOK_nodata);
+        eo_array_Reset(connectedSensorsList); //eo_fifoword_Clear(connectedSensorsList, 0);
+        return(eores_OK);
     }
 
     sTInfo = (eo_emsCanNetTopo_sensorTopoInfo_t *)p->cfg.emsCanNetTopo_sensors__ptr->item_array_data;
@@ -316,7 +320,8 @@ extern eOresult_t eo_emsCanNetTopo_GetConnectedSensors(EOemsCanNetTopo *p, EOfif
 
     for(i=0; i< size; i++)
     {
-        eo_fifoword_Put(connectedSensorsList, sTInfo[i].id, 0);    
+        eo_array_PushBack(connectedSensorsList, &(sTInfo[i].id)); 
+        //eo_fifoword_Put(connectedSensorsList, sTInfo[i].id, 0);    
     }
 
     return(eores_OK);
@@ -327,7 +332,7 @@ extern eOresult_t eo_emsCanNetTopo_GetConnectedSensors(EOemsCanNetTopo *p, EOfif
 
 
 
-extern eOresult_t eo_emsCanNetTopo_GetConnectedSkin(EOemsCanNetTopo *p, EOfifoWord *connectedSkinList)
+extern eOresult_t eo_emsCanNetTopo_GetConnectedSkin(EOemsCanNetTopo *p, EOarray *connectedSkinList)
 {
     eOsizecntnr_t size;
     uint8_t i;
@@ -338,10 +343,11 @@ extern eOresult_t eo_emsCanNetTopo_GetConnectedSkin(EOemsCanNetTopo *p, EOfifoWo
         return(eores_NOK_nullpointer);
     }
 
-    //if no Motors are connected to this board return nok 
+    //if no Motors are connected to this board return ok and empty list
     if((NULL == p->cfg.emsCanNetTopo_skin__ptr) || (0 == p->cfg.emsCanNetTopo_skin__ptr->size))
     {
-        return(eores_NOK_nodata);
+        eo_array_Reset(connectedSkinList); // eo_fifoword_Clear(connectedSkinList, 0);
+        return(eores_OK);
     }
 
     skTInfo = (eo_emsCanNetTopo_sensorTopoInfo_t *)p->cfg.emsCanNetTopo_skin__ptr->item_array_data;
@@ -349,7 +355,8 @@ extern eOresult_t eo_emsCanNetTopo_GetConnectedSkin(EOemsCanNetTopo *p, EOfifoWo
 
     for(i=0; i< size; i++)
     {
-        eo_fifoword_Put(connectedSkinList, skTInfo[i].id, 0);    
+        eo_array_PushBack(connectedSkinList, &(skTInfo[i].id));
+        //eo_fifoword_Put(connectedSkinList, skTInfo[i].id, 0);    
     }
 
     return(eores_OK);
@@ -428,9 +435,6 @@ static void s_eo_emsCanNetTopo_hashTbl_joint_init(EOemsCanNetTopo *p)
     for(i = 0; i< p->cfg.emsCanNetTopo_joints__ptr->size; i++)
     {
         p->joint_Id2CanLoc_hTbl[j_topoinfo_ptr[i].id].ptr =&j_topoinfo_ptr[i];
-        p->joint_Id2CanLoc_hTbl[j_topoinfo_ptr[i].id].id  = i;   
-    
-        p->joint_CanLoc2Id_hTbl[j_topoinfo_ptr[i].canPort][j_topoinfo_ptr[i].boardAddr][j_topoinfo_ptr[i].axis].id = i; 
         p->joint_CanLoc2Id_hTbl[j_topoinfo_ptr[i].canPort][j_topoinfo_ptr[i].boardAddr][j_topoinfo_ptr[i].axis].ptr = &j_topoinfo_ptr[i]; 
     }
 
@@ -449,9 +453,6 @@ static void s_eo_emsCanNetTopo_hashTbl_motor_init(EOemsCanNetTopo *p)
     for(i = 0; i< p->cfg.emsCanNetTopo_motors__ptr->size; i++)
     {
         p->motor_Id2CanLoc_hTbl[m_topoinfo_ptr[i].id].ptr =&m_topoinfo_ptr[i];
-        p->motor_Id2CanLoc_hTbl[m_topoinfo_ptr[i].id].id  = i;   
-    
-        p->motor_CanLoc2Id_hTbl[m_topoinfo_ptr[i].canPort][m_topoinfo_ptr[i].boardAddr][m_topoinfo_ptr[i].axis].id = i; 
         p->motor_CanLoc2Id_hTbl[m_topoinfo_ptr[i].canPort][m_topoinfo_ptr[i].boardAddr][m_topoinfo_ptr[i].axis].ptr = &m_topoinfo_ptr[i]; 
     }
 
@@ -470,9 +471,6 @@ static void s_eo_emsCanNetTopo_hashTbl_sensor_init(EOemsCanNetTopo *p)
     for(i = 0; i< p->cfg.emsCanNetTopo_sensors__ptr->size; i++)
     {
         p->sensor_Id2CanLoc_hTbl[s_topoinfo_ptr[i].id].ptr =&s_topoinfo_ptr[i];
-        p->sensor_Id2CanLoc_hTbl[s_topoinfo_ptr[i].id].id  = i;   
-    
-        p->sensor_CanLoc2Id_hTbl[s_topoinfo_ptr[i].canPort][s_topoinfo_ptr[i].boardAddr].id = i; 
         p->sensor_CanLoc2Id_hTbl[s_topoinfo_ptr[i].canPort][s_topoinfo_ptr[i].boardAddr].ptr = &s_topoinfo_ptr[i]; 
     }
 

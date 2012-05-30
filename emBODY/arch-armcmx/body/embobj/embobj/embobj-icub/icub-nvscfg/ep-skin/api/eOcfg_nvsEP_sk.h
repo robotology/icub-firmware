@@ -98,7 +98,12 @@ extern const eOskin_someskin_t* eo_cfg_nvsEP_sk_someskin_defaultvalue;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-
+/** @fn         extern uint16_t eo_cfg_nvsEP_sk_jnumbermax_Get(eOcfg_nvsEP_mc_endpoint_t ep)
+    @brief      This function retrieves the number of joints given the endpoint @e ep
+    @param      ep              the endpoint
+    @return     the number of skin
+  */
+extern uint16_t eo_cfg_nvsEP_sk_sknumbermax_Get(eOcfg_nvsEP_sk_endpoint_t ep);
 
 /** @fn         extern eOnvID_t eo_cfg_nvsEP_sk_NVID_Get(eOcfg_nvsEP_sk_endpoint_t ep, eOcfg_nvsEP_sk_skinNumber_t s, eOcfg_nvsEP_sk_skinNVindex_t snvindex)
     @brief      This function retrieves the eOnvID_t of a network variable with index @e snvindex for the skin
