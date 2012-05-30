@@ -169,6 +169,11 @@ extern void eo_emsController_ReadTorques(int32_t *torque)
     }
 }
 
+extern void eo_emsController_SetOffset(uint8_t joint, int16_t off)
+{
+    eo_axisController_SetOffset(s_emsc->axis_controller[joint], off);    
+}
+
 extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t vel)
 {
     eo_axisController_SetPosRef(s_emsc->axis_controller[joint], pos, vel);
@@ -235,25 +240,39 @@ extern void eo_emsController_SetDecoupler(emsMotorDecoupler_t dec_type, float ma
     s_emsc->decoupler[dec_type] = eo_decoupler_New(s_emsc->nmotors, matrix);
 }
 
+///////////////////////
+// PID configurations
+
 extern void eo_emsController_SetPosPid(uint8_t joint, int32_t kp, int32_t kd, int32_t ki, uint8_t shift)
 {
     eo_pid_SetPid(eo_axisController_GetPosPidPtr(s_emsc->axis_controller[joint]), kp, kd, ki, shift);    
-}
-    
+}   
 extern void eo_emsController_SetPosPidLimits(uint8_t joint, int32_t Ymax, int32_t Imax)
 {
     eo_pid_SetPidLimits(eo_axisController_GetPosPidPtr(s_emsc->axis_controller[joint]), Ymax, Imax);    
 }
 
+extern void eo_emsController_SetVelPid(uint8_t joint, int32_t kp, int32_t kd, int32_t ki, uint8_t shift)
+{
+    eo_pid_SetPid(eo_axisController_GetVelPidPtr(s_emsc->axis_controller[joint]), kp, kd, ki, shift);    
+}    
+extern void eo_emsController_SetVelPidLimits(uint8_t joint, int32_t Ymax, int32_t Imax)
+{
+    eo_pid_SetPidLimits(eo_axisController_GetVelPidPtr(s_emsc->axis_controller[joint]), Ymax, Imax);    
+}
+
 extern void eo_emsController_SetTrqPid(uint8_t joint, int32_t kp, int32_t kd, int32_t ki, uint8_t shift)
 {
     eo_pid_SetPid(eo_axisController_GetTrqPidPtr(s_emsc->axis_controller[joint]), kp, kd, ki, shift);    
-}
-    
+}   
 extern void eo_emsController_SetTrqPidLimits(uint8_t joint, int32_t Ymax, int32_t Imax)
 {
     eo_pid_SetPidLimits(eo_axisController_GetTrqPidPtr(s_emsc->axis_controller[joint]), Ymax, Imax);    
 }
+
+// PID configurations
+///////////////////////
+
 
 extern void eo_emsController_SetStiffness(uint8_t joint, int32_t stiffness)
 {

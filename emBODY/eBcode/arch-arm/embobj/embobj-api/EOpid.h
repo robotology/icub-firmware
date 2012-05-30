@@ -64,13 +64,12 @@ extern EOpid* eo_pid_New(void);
     @param      Ko    The constant offset.
     @param      Ymax  The output maximum value.
  **/
-extern void eo_pid_Init(EOpid *o, int32_t Kp, int32_t Ki, int32_t Kd, int16_t Ko, int32_t Ymax, int32_t Imax, uint8_t shift);
+extern void eo_pid_Init(EOpid *o, int32_t Kp, int32_t Ki, int32_t Kd, int32_t Ymax, int32_t Imax, uint8_t shift);
 
 extern void eo_pid_SetPid(EOpid *o, int32_t Kp, int32_t Kd, int32_t Ki, uint8_t shift);
 
 extern void eo_pid_SetPidLimits(EOpid *o, int32_t Ymax, int32_t Imax);
-extern void eo_pid_SetOffset(EOpid *o, int16_t Ko);
-extern int16_t eo_pid_GetOffset(EOpid *o);
+
 extern void eo_pid_GetStatus(EOpid *o, int16_t *pwm, int32_t *err);
 
 extern uint8_t eo_pid_IsInitialized(EOpid *o);

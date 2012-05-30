@@ -98,7 +98,7 @@ extern int32_t eo_trajectory_GetPos(EOtrajectory *o);
  **/
 extern int32_t eo_trajectory_GetVel(EOtrajectory *o);
 
-extern uint8_t eo_trajectory_IsDone(EOtrajectory* o);
+extern eObool_t eo_trajectory_IsDone(EOtrajectory* o);
 
 /** @}            
     end of group eo_trajectory  
