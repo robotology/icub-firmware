@@ -55,8 +55,8 @@
 //
 //#include "EOappTheNVmapRef.h"
 //
-////endpoints-cfg
-//#include "eOcfg_EPs_eb4.h"
+//endpoints-cfg
+#include "eOcfg_EPs_eb4.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -141,9 +141,9 @@ extern void eom_appSkeletonEms_body_application_init(void)
     EOMappTheSysController_cfg_t cfg =
     {
         EO_INIT(.ethmod_cfg_ptr)                ethmod_cfg_ptr,
-       EO_INIT(.connectedEncodersMask_cfg)     connectedEncodersMask_cfg,
-//        EO_INIT(.vectorof_endpoint_cfg)         vectorof_endpoint_cfg,
-//        EO_INIT(.hashfunction_ep2index)         hashfunction_ep2index,
+        EO_INIT(.connectedEncodersMask_cfg)     connectedEncodersMask_cfg,
+        EO_INIT(.vectorof_endpoint_cfg)         eo_cfg_EPs_vectorof_eb4,
+        EO_INIT(.hashfunction_ep2index)         eo_cfg_nvsEP_eb4_fptr_hashfunction_ep2index,
         EO_INIT(.mc_endpoint)                   mc_endpoint,       
         EO_INIT(.as_endpoint)                   as_endpoint, 
         EO_INIT(.sk_endpoint)                   sk_endpoint 

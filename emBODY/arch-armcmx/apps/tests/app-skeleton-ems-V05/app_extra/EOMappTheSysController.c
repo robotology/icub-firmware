@@ -69,7 +69,7 @@
 #include "EOMappMotorController.h"
 
 
-#include "eOcfg_EPs_eb4.h"
+//#include "eOcfg_EPs_eb4.h"
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -122,7 +122,6 @@ static void s_timer4_motorCntrlStart_cbk(void *p);
 static void s_eom_appTheSysController_Timers_Start(void);
 static void s_eom_appTheSysController_Timers_Stop(void);
 
-static eOresult_t s_eom_appTheSysController_confugureSystem(EOMappTheSysController *p);
 static void s_eom_appTheSysController_GetRunMode(void);
 static void s_eom_appTheSysController_GetCanConnectedStuff(void);
 static void s_eom_appTheSysController_PopulateNVmapRef(void);
@@ -145,8 +144,6 @@ static void s_eom_appTheSysController_act_appDataCollector_init(void);
 static void s_eom_appTheSysController_actors_start(void);
 
 /* fn on cfg */
-static void s_eom_appTheSysController_ConfigureConnectedCanBoards(void);
-
 static eOresult_t s_eom_appTheSysController_ConnectedCanBoards_Configure(void);
 static eOresult_t s_eom_appTheSysController_ConnectedCanBoards_Start(void);
 static eOresult_t s_eom_appTheSysController_ConnectedCanBoards_Stop(void);
@@ -515,35 +512,6 @@ static void s_eom_appTheSysController_recDgram_mng(EOMappTheSysController *p)
 
 
 
-static eOresult_t s_eom_appTheSysController_confugureSystem(EOMappTheSysController *p)
-{
-//    eOmc_motorId_t mId = 0;
-//    eOmc_motor_config_t cfg =
-//    { 
-//        EO_INIT(.pidcurrent)
-//        {
-//            EO_INIT(.kp)                    0x1111,
-//            EO_INIT(.ki)                    0x2222,
-//            EO_INIT(.kd)                    0x3333,
-//            EO_INIT(.limitonintegral)       0X4444,
-//            EO_INIT(.limitonoutput)         0x5555,
-//            EO_INIT(.scale)                 0x0,
-//            EO_INIT(.offset)                0x6666,
-//            EO_INIT(.filler03)              {0xf1, 0xf2, 0xf3}
-//        },
-//        EO_INIT(.maxvelocityofmotor)        0xAA,
-//        EO_INIT(.maxcurrentofmotor)         0xBB,
-//        EO_INIT(.des02FORmstatuschamaleon04)   {0}
-//    };
-//
-//#warning X ALE --> set static motor config  in cfg var
-//
-//    return(eo_appCanSP_ConfigMotor(p->cfg.canSP_ptr, mId, &cfg));
-    return(eo_appCanSP_ConfigSkin(p->srv.appCanSP_ptr, 0));
-}
-
-
-
 
 
 static void s_eom_appTheSysController_services_init(void)
@@ -588,8 +556,8 @@ static void s_eom_appTheSysController_srv_theBoardTransceiver_init(void)
 {
     eOboardtransceiver_cfg_t boardtxrxcfg = 
     {
-        .vectorof_endpoint_cfg          = eo_cfg_EPs_vectorof_eb4, //s_theSysController.cfg.vectorof_endpoint_cfg,
-        .hashfunction_ep2index          = eo_cfg_nvsEP_eb4_fptr_hashfunction_ep2index, //s_theSysController.cfg.hashfunction_ep2index,
+        .vectorof_endpoint_cfg          = s_theSysController.cfg.vectorof_endpoint_cfg, //eo_cfg_EPs_vectorof_eb4, 
+        .hashfunction_ep2index          = s_theSysController.cfg.hashfunction_ep2index, //eo_cfg_nvsEP_eb4_fptr_hashfunction_ep2index, 
         .remotehostipv4addr             = s_theSysController.cfg.ethmod_cfg_ptr->remaddr,
         .remotehostipv4port             = s_theSysController.cfg.ethmod_cfg_ptr->remport
     };
@@ -652,7 +620,6 @@ static void s_eom_appTheSysController_PopulateNVmapRef(void)
 
 static void s_eom_appTheSysController_srv_ethService_init(void)
 {
-    eOresult_t res; 
 
     s_theSysController.srv.ethMod_ptr = eo_ethBaseModule_New(s_theSysController.cfg.ethmod_cfg_ptr);
 
@@ -781,7 +748,7 @@ static void s_eom_appTheSysController_GetCanConnectedStuff(void)
     uint16_t jointMaxNumber = eo_cfg_nvsEP_mc_joint_numbermax_Get((eOcfg_nvsEP_mc_endpoint_t)s_theSysController.cfg.mc_endpoint);
     uint16_t motorMaxNumber = eo_cfg_nvsEP_mc_motor_numbermax_Get((eOcfg_nvsEP_mc_endpoint_t)s_theSysController.cfg.mc_endpoint);
 //    uint16_t sensorMaxNumber = eo_cfg_nvsEP_mc_joint_numbermax_Get(eOcfg_nvsEP_mc_endpoint_t ep);
-    uint16_t skinMaxNumber = eo_cfg_nvsEP_sk_sknumbermax_Get(s_theSysController.cfg.sk_endpoint);
+    uint16_t skinMaxNumber = eo_cfg_nvsEP_sk_sknumbermax_Get((eOcfg_nvsEP_sk_endpoint_t)s_theSysController.cfg.sk_endpoint);
 
    //get joints, motors, sensors and skin from can configuration
     s_theSysController.jointsList =  eo_array_New(jointMaxNumber, sizeof(eOmc_jointId_t), NULL);
@@ -798,12 +765,8 @@ static void s_eom_appTheSysController_GetCanConnectedStuff(void)
 static void s_eom_appTheSysController_GetRunMode(void)
 {
 
-    eOresult_t res;
-    uint32_t jId;
     eOsizecntnr_t size;
     eOmc_jointId_t *jid_ptr;
-    eOmc_motorId_t *mid_ptr;
-    eOsk_skinId_t  *skid_ptr;
     eo_appCanSP_canLocation canLoc;
     eObrd_types_t motor_boardType;
     eObool_t skin_isConnected = eobool_false;

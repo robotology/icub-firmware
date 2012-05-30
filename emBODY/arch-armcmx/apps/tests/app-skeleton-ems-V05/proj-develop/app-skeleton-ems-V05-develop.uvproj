@@ -61,6 +61,8 @@
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
+            <nStopU1X>0</nStopU1X>
+            <nStopU2X>0</nStopU2X>
           </BeforeCompile>
           <BeforeMake>
             <RunUserProg1>0</RunUserProg1>
@@ -549,6 +551,11 @@
                 </CommonProperty>
                 <FileArmAds/>
               </FileOption>
+            </File>
+            <File>
+              <FileName>ipal.base.small.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\sys\abs\lib\ipal.base.small.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1262,6 +1269,8 @@
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
+            <nStopU1X>0</nStopU1X>
+            <nStopU2X>0</nStopU2X>
           </BeforeCompile>
           <BeforeMake>
             <RunUserProg1>0</RunUserProg1>
@@ -1532,10 +1541,10 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>1</Optim>
-            <oTime>0</oTime>
+            <Optim>4</Optim>
+            <oTime>1</oTime>
             <SplitLS>0</SplitLS>
-            <OneElfS>0</OneElfS>
+            <OneElfS>1</OneElfS>
             <Strict>0</Strict>
             <EnumInt>0</EnumInt>
             <PlainCh>0</PlainCh>
@@ -1545,9 +1554,9 @@
             <uThumb>0</uThumb>
             <VariousControls>
               <MiscControls>--c99 --forceinline</MiscControls>
-              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO _FORCE_NETWORK_FROM_IPAL_CFG SKIN_IS_CONNECTED</Define>
+              <Define>STM32F10X_CL HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO _FORCE_NETWORK_FROM_IPAL_CFG SKIN_IS_CONNECTED</Define>
               <Undefine></Undefine>
-              <IncludePath>.;..\app_basic;..\app_extra;..\cfg\abslayer;..\cfg\icub-can-proto;..\cfg\icub-can-net;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\body\embobj\embobj\embobj-src;..\..\..\..\body\embobj\embobj\embobj-api;..\..\..\..\body\embobj\embobj\embobj-icub\icub\api;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\cfg-eps-ebx;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-analogsensors\api;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-analogsensors\src;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-management\api;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-management\src;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-skin\api;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\body\embenv\envcom</IncludePath>
+              <IncludePath>.;..\app_basic;..\app_extra;..\cfg\abslayer;..\cfg\icub-can-proto;..\cfg\icub-can-net;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\sys\mid\inc;..\..\..\..\..\porting;..\..\..\..\body\embobj\embobj\embobj-src;..\..\..\..\body\embobj\embobj\embobj-api;..\..\..\..\body\embobj\embobj\embobj-icub\icub\api;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\cfg-eps-ebx;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-analogsensors\api;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-analogsensors\src;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-management\api;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-management\src;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-skin\api;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\body\embenv\envcom</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1714,6 +1723,29 @@
               <FileName>osal.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\sys\abs\lib\osal.cm3.dbg.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>ipal.base.small.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\sys\abs\lib\ipal.base.small.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>

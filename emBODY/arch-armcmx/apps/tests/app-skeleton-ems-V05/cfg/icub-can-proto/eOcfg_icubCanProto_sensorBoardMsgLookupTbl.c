@@ -266,13 +266,13 @@ extern const EOconstLookupTbl* const icubCanProto_periodicSkinMsg_parser_LUTbl__
 static eOresult_t s_eo_icubCanProto_exceptionMsgpollingSensorBoard_parser(EOicubCanProto *p, eo_icubCanProto_msgCommand_cmdId_t cmdId, 
                                                                           eOcanframe_t *frame, eOcanport_t canPort)
 {                                                                      
-    eOresult_t res;
+    eOresult_t res = eores_OK;
 
     switch(cmdId)
     {
         case ICUBCANPROTO_POL_SB_CMD__GET_FULL_SCALES:
         {
-            eo_icubCanProto_parser_pol_sb_cmd__getFullScales(p, frame, canPort);
+            res = eo_icubCanProto_parser_pol_sb_cmd__getFullScales(p, frame, canPort);
         }break;
 
         default:
@@ -293,26 +293,26 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingSensorBoard_former(EOicub
                                                                             eo_icubCanProto_msgDestination_t dest,
                                                                             eOcanframe_t *canFrame)
 {
-    eOresult_t res;
+    eOresult_t res = eores_OK;
 
     switch(cmdId)
     {
 
         case ICUBCANPROTO_POL_SB_CMD__SET_TXMODE:
         {
-            eo_icubCanProto_former_pol_sb_cmd__setTxMode(p, val_ptr, dest, canFrame);
+            res = eo_icubCanProto_former_pol_sb_cmd__setTxMode(p, val_ptr, dest, canFrame);
         }break;
 
 
         case ICUBCANPROTO_POL_SB_CMD__SET_CANDATARATE:
         {
-            eo_icubCanProto_former_pol_sb_cmd__setCanDatarate(p, val_ptr, dest, canFrame);
+            res = eo_icubCanProto_former_pol_sb_cmd__setCanDatarate(p, val_ptr, dest, canFrame);
         }break;
 
 
         case ICUBCANPROTO_POL_SB_CMD__GET_FULL_SCALES:
         {
-            eo_icubCanProto_former_pol_sb_cmd__getFullScales(p, val_ptr, dest, canFrame);
+            res = eo_icubCanProto_former_pol_sb_cmd__getFullScales(p, val_ptr, dest, canFrame);
         }break;
 
         default:

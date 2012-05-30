@@ -36,6 +36,7 @@
 #include "EOnv_hid.h"
 #include "EOarray.h"
 
+#include "EOappTheNVmapRef.h"
 #include "EOemsCanNetworkTopology.h"
 
 //nv-cfg
