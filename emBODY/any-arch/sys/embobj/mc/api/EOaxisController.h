@@ -89,10 +89,13 @@ extern void eo_axisController_SetTrqRef(EOaxisController *o, float trq);
 
 extern float eo_axisController_PWM(EOaxisController *o);
 
+extern void eo_axisController_Stop(EOaxisController *o);
+
 extern uint8_t eo_axisController_SetControlMode(EOaxisController *o, control_mode_t cm);
 
 extern void eo_axisController_SetStiffness(EOaxisController *o, float stiffness);
 
+extern void eo_axisController_SetVelMin(EOaxisController *o, float vel_min);
 extern void eo_axisController_SetVelMax(EOaxisController *o, float vel_max);
 extern void eo_axisController_SetPosLimits(EOaxisController *o, float pos_min, float pos_max);
 

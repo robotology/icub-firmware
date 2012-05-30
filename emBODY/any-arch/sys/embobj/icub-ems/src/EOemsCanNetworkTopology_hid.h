@@ -38,14 +38,17 @@ extern "C" {
 #include "EoUtilities.h"
 #include "EoBoards.h"
 
+#include "eOcfg_nvsEP_mc.h"
+#include "eOcfg_nvsEP_as.h"
+
 // - declaration of extern public interface ---------------------------------------------------------------------------
 #include "EoemsCanNetworkTopology.h"
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-#define MAX_NUM_JOINT_FOR_BODY_PART         10   //o ems??
-#define MAX_NUM_MOTOR_FOR_BODY_PART         10   //o ems??
+#define MAX_NUM_JOINT_FOR_BODY_PART         12   //o ems??
+#define MAX_NUM_MOTOR_FOR_BODY_PART         12   //o ems??
 #define MAX_NUM_SENSOR_FOR_BODY_PART        4
 #define MAX_CAN_ADDRESS                     0XF 
 
@@ -68,21 +71,15 @@ extern "C" {
 //    uint32_t                               id; //sensor id
 //} eo_emsCanNetTopo_sensorTopoInfo_t;
 
-
-/*NOTE: the information is rendundant: 
-    - id identifies the position inside vector that describes CAN network topology of this board
-    ptr: is the pointer to the element of vector that describes CAN network topology of this board*/
 typedef struct
 {
-    uint32_t id;
-    eo_emsCanNetTopo_jointOrMotorTopoInfo_t     *ptr;
+    eo_emsCanNetTopo_jointOrMotorTopoInfo_t     *ptr; //is the pointer to the element of vector that describes CAN network topology of this board
 } eo_emsCanNetTopo_hashTbl_jm_item_t; //eo_emsCanNetTopo_hashTbl_jm_item_t;
 
 
 
 typedef struct
 {
-    uint32_t id;
     eo_emsCanNetTopo_sensorTopoInfo_t     *ptr;
 } eo_emsCanNetTopo_hashTbl_s_item_t; //eo_emsCanNetTopo_hashTbl_jm_item_t;
 
@@ -97,13 +94,14 @@ struct EOemsCanNetTopo_hid
 {
     eo_emsCanNetTopo_cfg_t cfg;
 
-    eo_emsCanNetTopo_hashTbl_jm_item_t joint_Id2CanLoc_hTbl[MAX_NUM_JOINT_FOR_BODY_PART];
-    eo_emsCanNetTopo_hashTbl_jm_item_t motor_Id2CanLoc_hTbl[MAX_NUM_MOTOR_FOR_BODY_PART];
-    eo_emsCanNetTopo_hashTbl_s_item_t  sensor_Id2CanLoc_hTbl[MAX_NUM_SENSOR_FOR_BODY_PART];  
+    eo_emsCanNetTopo_hashTbl_jm_item_t joint_Id2CanLoc_hTbl[jointNumberMAX];
+    eo_emsCanNetTopo_hashTbl_jm_item_t motor_Id2CanLoc_hTbl[motorNumberMAX];
+    eo_emsCanNetTopo_hashTbl_s_item_t  sensor_Id2CanLoc_hTbl[strainNumberMAX];  //todo: max between strain and mais
 
     eo_emsCanNetTopo_hashTbl_jm_item_t joint_CanLoc2Id_hTbl[eo_emsCanNetTopo_canports_num][MAX_CAN_ADDRESS][2];
     eo_emsCanNetTopo_hashTbl_jm_item_t motor_CanLoc2Id_hTbl[eo_emsCanNetTopo_canports_num][MAX_CAN_ADDRESS][2];
     eo_emsCanNetTopo_hashTbl_s_item_t  sensor_CanLoc2Id_hTbl[eo_emsCanNetTopo_canports_num][MAX_CAN_ADDRESS];
+
 };
 
 

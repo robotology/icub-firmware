@@ -58,6 +58,7 @@ struct EOtrajectory_hid
     float p0;
     float v0;
     float pf;
+    float vf;
     float p;
     float v;
     float pfp030;
