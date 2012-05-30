@@ -104,7 +104,10 @@ const eOskin_someskin_t* eo_cfg_nvsEP_sk_someskin_defaultvalue = &eo_cfg_nvsEP_s
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-
+extern uint16_t eo_cfg_nvsEP_sk_sknumbermax_Get(eOcfg_nvsEP_sk_endpoint_t ep)
+{
+    return(skinNumberMAX);
+}
 extern eOnvID_t eo_cfg_nvsEP_sk_NVID_Get(eOcfg_nvsEP_sk_endpoint_t ep, eOcfg_nvsEP_sk_skinNumber_t s, eOcfg_nvsEP_sk_skinNVindex_t snvindex)
 {
     return(eo_cfg_nvsEP_sk_emsboard_NVID_Get((eo_cfg_nvsEP_sk_emsboard_con_skinNVindex_t) snvindex));

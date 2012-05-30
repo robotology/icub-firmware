@@ -52,6 +52,7 @@ struct EOaxisController_hid
     // axis limits
     float pos_min;
     float pos_max;
+    float vel_min;
     float vel_max;
     
     // measures (read only)

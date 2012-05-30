@@ -114,19 +114,17 @@ extern void eo_pid_Init(EOpid *o, float Kp, float Kd, float Ki, float Ko, float 
     o->initialized = 1;
 }
 
-extern void eo_pid_SetPid(EOpid *o, float Kp, float Kd, float Ki, float Ymax, float Imax)
+extern void eo_pid_SetPid(EOpid *o, float Kp, float Kd, float Ki)
 {
     o->Kp = Kp;
     o->Kd = Kd;
-    o->Ki = Ki;
-
-    o->Ymax = Ymax;
-    o->Imax = Imax; 
+    o->Ki = Ki; 
 }
 
-extern void eo_pid_SetMaxOutput(EOpid *o, float Ymax)
+extern void eo_pid_SetPidLimits(EOpid *o, float Ymax, float Imax)
 {
     o->Ymax = Ymax;
+    o->Imax = Imax; 
 }
 
 extern void eo_pid_SetOffset(EOpid *o, float Ko)
@@ -159,14 +157,15 @@ extern void eo_pid_Reset(EOpid *o)
 
 extern float eo_pid_PWM(EOpid *o, float En)
 {
-    //if (En*o->En<0.0f) o->In = 0.0f;
-
     o->pwm = o->Ko + o->Kp*En + o->In + o->Kd*o->Dn;
+
     o->In += o->Ki*En;
+
     if (o->In > o->Imax) 
         o->In = o->Imax; 
     else if (o->In< -o->Imax) 
         o->In = -o->Imax;
+
     o->Dn = 0.9f*o->Dn + 0.1f*(En - o->En);
     o->En = En;
     
@@ -184,13 +183,13 @@ extern float eo_pid_PWM(EOpid *o, float En)
 
 extern float eo_pid_PWM2(EOpid *o, float En, float Vn)
 {
-    o->pwm = o->Kp*En + o->Kd*Vn + o->In;
- 
     o->In += o->Ki*En;
+    
+    o->pwm = o->Kp*En + o->Kd*Vn + o->In;
     
     if (o->In > o->Imax) 
         o->In = o->Imax; 
-    else if (o->In< -o->Imax) 
+    else if (o->In < -o->Imax) 
         o->In = -o->Imax;
     
     if (o->pwm > o->Ymax)
