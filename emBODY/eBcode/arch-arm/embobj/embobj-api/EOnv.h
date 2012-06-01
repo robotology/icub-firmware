@@ -48,6 +48,8 @@ extern "C" {
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
+#define EO_NV_DONT_USE_ONROPRECEPTION
+
 // if it is undefined, then the id does not contain anymore information about functionality and type of the netvar,
 // pros: there is complete freedom in giving the IDs as the space is a full 2^16
 // cons: there is less control upon validity of the rop and it may happen that a badly formed rop which has a wrong size
