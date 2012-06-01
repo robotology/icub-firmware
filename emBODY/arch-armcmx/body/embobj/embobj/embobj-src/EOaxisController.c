@@ -276,7 +276,9 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
 
         case CM_VELOCITY:
         {
-            eo_speedcurve_Step(o->speedcurve, &(o->vel_out));
+            int32_t delta = eo_speedometer_GetDelta(o->speedmeter);
+
+            int32_t rabbit = eo_speedcurve_Step(o->speedcurve, delta, &(o->vel_out));
 
             int32_t speed = eo_speedometer_GetSpeed(o->speedmeter);
 
@@ -285,6 +287,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
             posref_can = (int16_t)o->vel_out;
 
             return eo_pid_PWM(o->pidV, o->vel_out - speed);
+            //return eo_pid_PWM(o->pidV, rabbit);
         }
 
         case CM_IMPEDANCE_VEL:
