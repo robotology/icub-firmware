@@ -53,14 +53,14 @@ extern "C" {
                 public or private (static) functions of the object and protected data
                 used also by its derived objects.
  **/
-struct EOtreenode_hid 
+struct EOtreenode_hid       // with EOTREENODE_NCHILDREN = 16 is ... 104 
 {
     void*                   data;                               // pointer to the data 
     uint16_t                index;                              // index in the array
     uint8_t                 nchildren;                          // number of dependant netvars
     uint16_t                ichildren[EOTREENODE_NCHILDREN];    // using indices in a common array rather than pointers which would require more space  
-    EOtreenode*             pchildren[EOTREENODE_NCHILDREN];    // using indices in a common array rather than pointers which would require more space  
-};   
+//    EOtreenode*             pchildren[EOTREENODE_NCHILDREN];    // using indices in a common array rather than pointers which would require more space  
+};  //EO_VERIFYsizeof(EOtreenode, 104);   
  
 
 
