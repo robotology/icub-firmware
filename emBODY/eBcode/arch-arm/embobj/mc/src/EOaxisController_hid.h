@@ -19,6 +19,7 @@ extern "C" {
 #include "EoCommon.h"
 #include "EOpid.h"
 #include "EOtrajectory.h"
+#include "EOspeedcurve.h"
 #include "EOspeedmeter.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -27,9 +28,6 @@ extern "C" {
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
-
-#define eo_axisController_GetPosPidPtr_hid(axis_controller) (axis_controller->pidP)
-#define eo_axisController_GetTrqPidPtr_hid(axis_controller) (axis_controller->pidT)
 
 #define eo_axisController_ReadTorque_hid(axis_controller, torque) axis_controller->torque_meas = torque
 
@@ -44,42 +42,46 @@ extern "C" {
 struct EOaxisController_hid 
 {
     EOpid *pidP;
+    EOpid *pidV;
     EOpid *pidT;
 
     EOspeedmeter *speedmeter;
     EOtrajectory *trajectory;
 
+    EOspeedcurve *speedcurve;
+
     // axis limits
-    float pos_min;
-    float pos_max;
-    float vel_min;
-    float vel_max;
+    int32_t pos_min;
+    int32_t pos_max;
+    int32_t vel_max;
     
     // measures (read only)
-    float encpos_meas;
-    float torque_meas;
+    int32_t encpos_meas;
+    int32_t torque_meas;
 
     // velocity control
-    float pos_vel_bias;
-    float vel_ref;
-    float acc_ref_step;
-    float vel_timer;
-    float vel_timeout;
+    int32_t pos_vel_bias;
+    int32_t vel_ref;
+    int32_t acc_ref_step;
+    int32_t vel_timer;
+    int32_t vel_timeout;
 
-    float pos_out;
-    float vel_out;
-    float vel_out_step;
+    int32_t pos_out;
+    int32_t vel_out;
+    int32_t vel_out_step;
 
     // torque control
-    float torque_ref;
-    float torque_out;
-    float torque_off;
-    float torque_last_pos_err;
-    float torque_damp_lp_filt;
+    int32_t torque_ref;
+    int32_t torque_out;
+    int32_t torque_off;
+    int32_t torque_last_pos_err;
+    int32_t torque_damp_lp_filt;
 
     // parameters
-    float stiffness;
-    float damping;
+    int32_t stiffness;
+    int32_t damping;
+
+    int16_t pwm_offset;
 
     uint8_t control_mode;
 }; 

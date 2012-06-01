@@ -36,32 +36,20 @@ extern "C" {
  
 struct EOtrajectory_hid 
 {
-//    float Ai; /**< fast incremental algorithm register */
-//    float Bi; /**< fast incremental algorithm register */
-//    float Ci; /**< fast incremental algorithm register */
-//    float Kc; /**< fast incremental algorithm register */
-//    float Zi; /**< fast incremental algorithm register */
-//    float Yi; /**< fast incremental algorithm register */
-//    float Ky; /**< fast incremental algorithm register */
-//    float Fi; /**< fast incremental algorithm register */
-//    float Kf; /**< fast incremental algorithm register */
-//
-//    float pi; /**< trajectory actual point    */
-//    float pf; /**< trajectory end point       */
-//    float vi; /**< trajectory actual velocity */
-//
-//    uint32_t steps_to_end; /**< steps required to complete the trajectory */
-
-    float time;
-    float pfp0;
-    float step;
-    float p0;
-    float v0;
-    float pf;
-    float vf;
     float p;
     float v;
-    float pfp030;
+    float a;
+
+    float Kw;
+    float Wn;
+    float Yn;
+
+    float DT;
+
+    int32_t pf;
+    int32_t vf;
+
+    int32_t steps_to_end;
 }; 
 
 

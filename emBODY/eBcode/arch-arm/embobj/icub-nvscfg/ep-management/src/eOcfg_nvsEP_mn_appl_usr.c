@@ -108,17 +108,17 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mn_appl_array_of_EOnv_usr[] =
 {
     {   // 00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mn_appl_ebx_config,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL   
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // 00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mn_appl_ebx_status,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL        
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // 00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mn_appl_ebx_cmmnds__go2state,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL         
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }    
 };  EO_VERIFYsizeof(s_eo_cfg_nvsEP_mn_appl_array_of_EOnv_usr, sizeof(EOnv_usr_t)*(EOK_cfg_nvsEP_mn_appl_con_NUMofVARS)); 

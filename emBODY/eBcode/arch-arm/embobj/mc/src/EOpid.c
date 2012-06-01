@@ -57,6 +57,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
+static int32_t limit(int32_t val, int32_t lim);
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -75,133 +77,147 @@ extern EOpid* eo_pid_New(void)
 
     if (o)
     {
-        o->Ko = 0.0f;
-        o->Kp = 0.0f;
-        o->Ki = 0.0f;
-        o->Kd = 0.0f;
+        o->Kp = 0;
+        o->Ki = 0;
+        o->Kd = 0;
 
-        o->En = 0.0f;        
-        o->In = 0.0f;
-        o->Dn = 0.0f;
+        o->shift = 0;
+        o->shift_fact_by_2 = 0;
+
+        o->En = 0;        
+        o->KiIn = 0;
+        o->Dn = 0;
         
-        o->Ymax = 0.0f;
-        o->Imax = 0.0f;
+        o->pwm = 0;
 
-        o->pwm = 0.0f;
+        o->Ymax = 0;
+        o->Imax = 0;
+        o->Imax_shift = 0;
 
-        o->initialized = 0;
+        o->initialized = eobool_false;
     }
 
     return o;
 }
 
-extern void eo_pid_Init(EOpid *o, float Kp, float Kd, float Ki, float Ko, float Ymax, float Imax)
+extern void eo_pid_Init(EOpid *o, int32_t Kp, int32_t Kd, int32_t Ki, int32_t Ymax, int32_t Imax, uint8_t shift)
 {
-    o->Ko = Ko;
+    eo_pid_SetPid(o, Kp, Kd, Ki, shift);
+
+    eo_pid_SetPidLimits(o, Ymax, Imax);
+
+    eo_pid_Reset(o);
+
+    o->initialized = eobool_true;
+}
+
+extern void eo_pid_SetPid(EOpid *o, int32_t Kp, int32_t Kd, int32_t Ki, uint8_t shift)
+{
     o->Kp = Kp;
     o->Kd = Kd;
     o->Ki = Ki;
 
-    o->En = 0.0f;
-    o->In = 0.0f;
-    o->Dn = 0.0f;
+    o->shift = shift;
 
+    o->shift_fact_by_2 = shift ? (1<<(shift-1)) : 0;
+
+    o->Imax_shift = o->Imax<<shift;
+}
+
+extern void eo_pid_SetPidLimits(EOpid *o, int32_t Ymax, int32_t Imax)
+{
     o->Ymax = Ymax;
     o->Imax = Imax;
 
-    o->pwm = 0.0f;
-
-    o->initialized = 1;
+    o->Imax_shift = Imax<<o->shift;
 }
 
-extern void eo_pid_SetPid(EOpid *o, float Kp, float Kd, float Ki)
+extern void eo_pid_GetStatus(EOpid *o, int16_t *pwm, int32_t *err)
 {
-    o->Kp = Kp;
-    o->Kd = Kd;
-    o->Ki = Ki; 
-}
-
-extern void eo_pid_SetPidLimits(EOpid *o, float Ymax, float Imax)
-{
-    o->Ymax = Ymax;
-    o->Imax = Imax; 
-}
-
-extern void eo_pid_SetOffset(EOpid *o, float Ko)
-{
-    o->Ko = Ko;
-}
-
-extern float eo_pid_GetOffset(EOpid *o)
-{
-    return o->Ko;
-}
-
-extern void eo_pid_GetStatus(EOpid *o, float *pwm, float *err)
-{
-    *pwm = o->pwm;
+    *pwm = (int16_t)o->pwm;
     *err = o->En;
 }
 
-extern uint8_t eo_pid_IsInitialized(EOpid *o)
+extern eObool_t eo_pid_IsInitialized(EOpid *o)
 {
     return o->initialized;
 }
 
 extern void eo_pid_Reset(EOpid *o)
 {
-    o->In = 0.0f;
-    o->En = 0.0f; 
-    o->Dn = 0.0f; 
+    o->En = 0;
+    o->KiIn = 0; 
+    o->Dn = 0;
+
+    o->pwm = 0;
 }
 
-extern float eo_pid_PWM(EOpid *o, float En)
+extern int16_t eo_pid_PWM(EOpid *o, int32_t En)
 {
-    o->pwm = o->Ko + o->Kp*En + o->In + o->Kd*o->Dn;
+    o->pwm = o->Kp*En+o->Kd*o->Dn+o->KiIn;
 
-    o->In += o->Ki*En;
+    if (o->pwm >= o->shift_fact_by_2)
+    {
+        o->pwm =  ((o->shift_fact_by_2+o->pwm)>>o->shift);
+        
+        if (o->pwm >  o->Ymax) o->pwm =  o->Ymax;        
+    }
+    else if (o-> pwm <= -o->shift_fact_by_2)
+    {
+        o->pwm = -((o->shift_fact_by_2-o->pwm)>>o->shift);
 
-    if (o->In > o->Imax) 
-        o->In = o->Imax; 
-    else if (o->In< -o->Imax) 
-        o->In = -o->Imax;
+        if (o->pwm < -o->Ymax) o->pwm = -o->Ymax;
+    }
+    else
+    {
+        o->pwm = 0;
+    }
 
-    o->Dn = 0.9f*o->Dn + 0.1f*(En - o->En);
+    o->Dn = (15*o->Dn+(En-o->En))/16; ///
+
     o->En = En;
-    
-    if (o->pwm > o->Ymax)
-    {
-        o->pwm = o->Ymax;
-    }
-    else if (o->pwm < -o->Ymax)
-    {
-        o->pwm = -o->Ymax;
-    }
 
-    return o->pwm;
+    o->KiIn += o->Ki*En;
+
+    if (o->KiIn > o->Imax_shift) 
+        o->KiIn =  o->Imax_shift;
+    else if (o->KiIn < -o->Imax_shift) 
+        o->KiIn = -o->Imax_shift;
+
+    return (int16_t)o->pwm;
 }
 
-extern float eo_pid_PWM2(EOpid *o, float En, float Vn)
+extern int16_t eo_pid_PWM2(EOpid *o, int32_t En, int32_t Vn)
 {
-    o->In += o->Ki*En;
-    
-    o->pwm = o->Kp*En + o->Kd*Vn + o->In;
-    
-    if (o->In > o->Imax) 
-        o->In = o->Imax; 
-    else if (o->In < -o->Imax) 
-        o->In = -o->Imax;
-    
-    if (o->pwm > o->Ymax)
+    o->pwm = o->Kp*En+o->Kd*Vn+o->KiIn;
+
+    if (o->pwm >= o->shift_fact_by_2)
     {
-        o->pwm = o->Ymax;
+        o->pwm =  ((o->shift_fact_by_2+o->pwm)>>o->shift);
+
+        if (o->pwm >  o->Ymax) o->pwm =  o->Ymax;        
     }
-    else if (o->pwm < -o->Ymax)
+    else if (o-> pwm <= -o->shift_fact_by_2)
     {
-        o->pwm = -o->Ymax;
+        o->pwm = -((o->shift_fact_by_2-o->pwm)>>o->shift);
+
+        if (o->pwm < -o->Ymax) o->pwm = -o->Ymax;
+    }
+    else
+    {
+        o->pwm = 0;
     }
 
-    return o->pwm;
+    o->En = En;
+
+    o->KiIn += o->Ki*En;
+
+    if (o->KiIn > o->Imax_shift) 
+        o->KiIn =  o->Imax_shift;
+    else if (o->KiIn < -o->Imax_shift) 
+        o->KiIn = -o->Imax_shift;
+
+    return (int16_t)o->pwm;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -215,6 +231,14 @@ extern float eo_pid_PWM2(EOpid *o, float En, float Vn)
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
+static int32_t limit(int32_t val, int32_t lim)
+{
+    if (val >=  lim) return  lim;
+
+    if (val <= -lim) return -lim;
+
+    return val;
+} 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

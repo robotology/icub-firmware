@@ -206,8 +206,11 @@ extern eOresult_t eo_rop_Process(EOrop *p, EOrop *replyrop)
 
     // very well indeed .. we are in here, then we may perform a rop ... lets see.
 
+#if !defined(EO_NV_DONT_USE_ONROPRECEPTION)    
     eo_nv_hid_OnBefore_ROP(&p->aboutnvs.nvroot, (eOropcode_t)p->head.ropc, p->time, p->sign);
-
+#endif
+    
+    
     // per i leaf si chiama s_eo_rop_received_leaf_exec_on_it() direttamente.
     // per i non leaf che sono operabili (non MIX) si chiama una s_eo_rop_received_nonleaf_exec_on_it() che usa la piena capacita' del nodo (anche se c'e' un ARRAY sotto!!)
     // per i non leaf non MIX ma che non richiedono una scrittura chiamo s_eo_rop_received_nonleaf_exec_on_it()           
@@ -233,9 +236,9 @@ extern eOresult_t eo_rop_Process(EOrop *p, EOrop *replyrop)
         s_eo_rop_received_nonleaf_descend_to_leaves_and_exec(p, p->aboutnvs.nvtreenoderoot, rop_o);
     }
 
-
+#if !defined(EO_NV_DONT_USE_ONROPRECEPTION)
     eo_nv_hid_OnAfter_ROP(&p->aboutnvs.nvroot, (eOropcode_t)p->head.ropc, p->time, p->sign);
-
+#endif
 
     return(eores_OK);
 }

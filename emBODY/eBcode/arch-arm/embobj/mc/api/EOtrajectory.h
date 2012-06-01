@@ -64,7 +64,7 @@ extern EOtrajectory* eo_trajectory_New(void);
     @param      v0     The inital velocity.
     @param      avg_speed  The average speed.
  **/
-extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, float v0, float vf, float speed);
+extern void eo_trajectory_SetReference(EOtrajectory *o, int32_t p0, int32_t pf, int32_t v0, int32_t vf, int32_t speed);
 //extern void eo_trajectory_MoveReference(EOtrajectory *o, float p0, float pf, float v0, float speed);
 //extern void eo_trajectory_MoveReference(EOtrajectory *o, float pf, float speed);
 
@@ -74,13 +74,13 @@ extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, floa
     @param      o  The pointer to the trajectory object.
     @return     The actual trajectory point value.
  **/
-extern void eo_trajectory_Step(EOtrajectory *o, float *p, float *v);
+extern void eo_trajectory_Step(EOtrajectory *o, int32_t *p, int32_t *v, int32_t *a);
 
 /** @fn         extern void eo_trajectory_Abort(EOtrajectory *o)
     @brief      Aborts the trajectory.
     @param      o  The pointer to the trajectory object.
  **/
-extern void eo_trajectory_Abort(EOtrajectory *o, float pos);
+extern void eo_trajectory_Abort(EOtrajectory *o, int32_t p);
 
 //extern void eo_trajectory_Stop(EOtrajectory *o, float pos);
 
@@ -89,16 +89,16 @@ extern void eo_trajectory_Abort(EOtrajectory *o, float pos);
     @param      o  The pointer to the trajectory object.
     @return     The actual trajectory position.
  **/
-extern float eo_trajectory_GetPos(EOtrajectory *o);
+extern int32_t eo_trajectory_GetPos(EOtrajectory *o);
 
 /** @fn         extern float eo_trajectory_GetVelo(EOtrajectory *o)
     @brief      Get the actual trajectory velocity.
     @param      o  The pointer to the trajectory object.
     @return     The actual trajectory velocity.
  **/
-extern float eo_trajectory_GetVel(EOtrajectory *o);
+extern int32_t eo_trajectory_GetVel(EOtrajectory *o);
 
-extern uint8_t eo_trajectory_IsDone(EOtrajectory* o);
+extern eObool_t eo_trajectory_IsDone(EOtrajectory* o);
 
 /** @}            
     end of group eo_trajectory  
