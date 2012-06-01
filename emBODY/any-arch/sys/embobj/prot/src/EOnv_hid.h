@@ -62,6 +62,12 @@ extern "C" {
 #define EONV_NOPTRREC       NULL
 
 
+#if !defined(EO_NV_DONT_USE_ONROPRECEPTION)
+#define EONV_ONROPRECEPTION_IS_NULL      EO_INIT(.on_rop_reception)      NULL,
+#else
+#define EONV_ONROPRECEPTION_IS_NULL
+#endif
+
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
@@ -102,8 +108,7 @@ typedef union
 typedef struct                      
 {
     eOvoid_fp_cnvp_t                    init;       // called at startup to init the link between the input or output netvar and the peripheral
-    eOvoid_fp_cnvp_cabstime_cuint32_t   update;     // used to propagate the value of the netvar towards the peripheral (if out)
-                                                    // or to place the value of the peripheral into the netvar (if inp)
+    eOvoid_fp_cnvp_cabstime_cuint32_t   update;     // used to propagate the value of the netvar towards the peripheral (if out)                                                    // or to place the value of the peripheral into the netvar (if inp)
 } eOnv_fn_peripheral_t;
 
 
@@ -120,7 +125,9 @@ typedef const struct                // 12 bytes on arm ... 24 on 64 bit arch
 typedef const struct
 {
     const eOnv_fn_peripheral_t*     peripheralinterface;
+#if !defined(EO_NV_DONT_USE_ONROPRECEPTION)
     const eOnv_fn_onrop_rx_t*       on_rop_reception;
+#endif    
     const uint32_t                  stg_address;           
 } EOnv_usr_t; 
 
@@ -158,10 +165,13 @@ struct EOnv_hid
 extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvEP_t ep, EOnv_con_t* con, EOnv_usr_t* usr, void* loc, void* rem, EOVmutexDerived* mtx, EOVstorageDerived* stg);
 
 
-
+#if     !defined(EO_NV_DONT_USE_ONROPRECEPTION)
 extern eObool_t eo_nv_hid_OnBefore_ROP(const EOnv *nv, eOropcode_t ropcode, eOabstime_t roptime, uint32_t ropsign);
+#endif
 
+#if     !defined(EO_NV_DONT_USE_ONROPRECEPTION)
 extern eObool_t eo_nv_hid_OnAfter_ROP(const EOnv *nv, eOropcode_t ropcode, eOabstime_t roptime, uint32_t ropsign);
+#endif
 
 
 extern eObool_t eo_nv_hid_isWritable(const EOnv *netvar);

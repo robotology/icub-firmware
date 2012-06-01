@@ -455,7 +455,7 @@ extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvEP_t ep, EOnv_co
     return(eores_OK);
 }
 
-
+#if !defined(EO_NV_DONT_USE_ONROPRECEPTION)
 extern eObool_t eo_nv_hid_OnBefore_ROP(const EOnv *nv, eOropcode_t ropcode, eOabstime_t roptime, uint32_t ropsign)
 {
     eObool_t ret = eobool_false;
@@ -511,7 +511,10 @@ extern eObool_t eo_nv_hid_OnBefore_ROP(const EOnv *nv, eOropcode_t ropcode, eOab
     return(ret);
    
 }
+#endif
 
+
+#if !defined(EO_NV_DONT_USE_ONROPRECEPTION)
 extern eObool_t eo_nv_hid_OnAfter_ROP(const EOnv *nv, eOropcode_t ropcode, eOabstime_t roptime, uint32_t ropsign)
 {
     eObool_t ret = eobool_false;
@@ -565,7 +568,7 @@ extern eObool_t eo_nv_hid_OnAfter_ROP(const EOnv *nv, eOropcode_t ropcode, eOabs
         
     return(ret);
 }
-
+#endif
 
 
 extern eObool_t eo_nv_hid_isWritable(const EOnv *nv)

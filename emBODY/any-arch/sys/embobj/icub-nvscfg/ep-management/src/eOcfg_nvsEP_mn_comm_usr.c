@@ -92,8 +92,8 @@ static const eOnv_fn_peripheral_t s_eo_cfg_nvsEP_mn_comm_ebx__ropsigcfgcommand =
 static const EOnv_usr_t s_eo_cfg_nvsEP_mn_comm_array_of_EOnv_usr[] =
 {
     {   // 00 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mn_comm_ebx__ropsigcfgcommand,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mn_comm_ebx__ropsigcfgcommand,    
+        EONV_ONROPRECEPTION_IS_NULL   
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }   
 };  EO_VERIFYsizeof(s_eo_cfg_nvsEP_mn_comm_array_of_EOnv_usr, sizeof(EOnv_usr_t)*(EOK_cfg_nvsEP_mn_comm_con_NUMofVARS)); 

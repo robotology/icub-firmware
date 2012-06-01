@@ -37,21 +37,24 @@ extern "C" {
  
 struct EOpid_hid 
 {
-    float Ko;
-    float Kp;
-    float Ki;
-    float Kd;
+    int32_t Kp;
+    int32_t Ki;
+    int32_t Kd;
 
-    float En;
-    float In;
-    float Dn;
+    int32_t En;
+    int32_t KiIn;
+    int32_t Dn;
 
-    float Ymax;
-    float Imax;
+    int32_t Ymax;
+    int32_t Imax;
+    int32_t Imax_shift;
 
-    float pwm;
+    int32_t pwm;
+    int32_t shift_fact_by_2;
 
-    uint8_t initialized;
+    eObool_t initialized;
+
+    uint8_t shift;
 }; 
 
 
