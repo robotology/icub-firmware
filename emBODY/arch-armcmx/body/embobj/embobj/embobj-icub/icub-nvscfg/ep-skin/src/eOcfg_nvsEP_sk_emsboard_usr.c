@@ -101,12 +101,12 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_sk_emsboard_array_of_EOnv_usr[] =
 {
     {   // 00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_sk_emsboard_ebx_sconfig__sigmode,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // 01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_sk_emsboard_ebx_sstatus__arrayof10canframe,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }
     

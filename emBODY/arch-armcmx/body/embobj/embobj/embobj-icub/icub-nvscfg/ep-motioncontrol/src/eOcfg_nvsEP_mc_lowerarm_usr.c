@@ -301,1693 +301,1693 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_lowerarm_usr_array_of_EOnv_usr[] =
 {
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jconfig__pidposition,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jconfig__pidvelocity,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jconfig__pidtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jconfig__impedance,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jconfig__minpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jconfig__maxpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jconfig__velocitysetpointtimeout,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jconfig__controlmode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jconfig__motionmonitormode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },    
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jconfig__des02FORjstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jconfig__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jconfig__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jconfig__holder02FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jconfig__holder02FFU04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jstatus__ofpid,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jinputs__externallymeasuredtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jinputs__holder02FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jinputs__holder04FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jcmmnds__calibration,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jcmmnds__setpoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jcmmnds__stoptrajectory,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jcmmnds__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jcmmnds__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j00_ebx_jcmmnds__holder01FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jconfig__pidposition,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jconfig__pidvelocity,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jconfig__pidtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jconfig__impedance,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jconfig__minpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jconfig__maxpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jconfig__velocitysetpointtimeout,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jconfig__controlmode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jconfig__motionmonitormode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },    
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jconfig__des02FORjstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jconfig__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jconfig__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jconfig__holder02FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jconfig__holder02FFU04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jstatus__ofpid,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jinputs__externallymeasuredtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jinputs__holder02FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jinputs__holder04FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jcmmnds__calibration,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jcmmnds__setpoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jcmmnds__stoptrajectory,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jcmmnds__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jcmmnds__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j01_ebx_jcmmnds__holder01FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jconfig__pidposition,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jconfig__pidvelocity,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jconfig__pidtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jconfig__impedance,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jconfig__minpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jconfig__maxpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jconfig__velocitysetpointtimeout,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jconfig__controlmode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jconfig__motionmonitormode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },    
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jconfig__des02FORjstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jconfig__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jconfig__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jconfig__holder02FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jconfig__holder02FFU04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jstatus__ofpid,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jinputs__externallymeasuredtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jinputs__holder02FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jinputs__holder04FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jcmmnds__calibration,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jcmmnds__setpoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jcmmnds__stoptrajectory,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jcmmnds__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jcmmnds__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j02_ebx_jcmmnds__holder01FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
 
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jconfig__pidposition,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jconfig__pidvelocity,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jconfig__pidtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jconfig__impedance,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jconfig__minpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jconfig__maxpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jconfig__velocitysetpointtimeout,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jconfig__controlmode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jconfig__motionmonitormode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },    
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jconfig__des02FORjstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jconfig__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jconfig__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jconfig__holder02FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jconfig__holder02FFU04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jstatus__ofpid,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jinputs__externallymeasuredtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jinputs__holder02FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jinputs__holder04FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jcmmnds__calibration,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jcmmnds__setpoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jcmmnds__stoptrajectory,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jcmmnds__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jcmmnds__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j03_ebx_jcmmnds__holder01FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
 
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jconfig__pidposition,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jconfig__pidvelocity,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jconfig__pidtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jconfig__impedance,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jconfig__minpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jconfig__maxpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jconfig__velocitysetpointtimeout,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jconfig__controlmode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jconfig__motionmonitormode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },    
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jconfig__des02FORjstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jconfig__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jconfig__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jconfig__holder02FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jconfig__holder02FFU04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jstatus__ofpid,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jinputs__externallymeasuredtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jinputs__holder02FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jinputs__holder04FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jcmmnds__calibration,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jcmmnds__setpoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jcmmnds__stoptrajectory,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jcmmnds__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jcmmnds__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j04_ebx_jcmmnds__holder01FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
 
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jconfig__pidposition,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jconfig__pidvelocity,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jconfig__pidtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jconfig__impedance,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jconfig__minpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jconfig__maxpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jconfig__velocitysetpointtimeout,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jconfig__controlmode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jconfig__motionmonitormode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },    
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jconfig__des02FORjstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jconfig__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jconfig__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jconfig__holder02FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jconfig__holder02FFU04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jstatus__ofpid,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jinputs__externallymeasuredtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jinputs__holder02FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jinputs__holder04FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jcmmnds__calibration,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jcmmnds__setpoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jcmmnds__stoptrajectory,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jcmmnds__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jcmmnds__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j05_ebx_jcmmnds__holder01FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     
      {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jconfig__pidposition,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jconfig__pidvelocity,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jconfig__pidtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jconfig__impedance,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jconfig__minpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jconfig__maxpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jconfig__velocitysetpointtimeout,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jconfig__controlmode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jconfig__motionmonitormode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },    
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jconfig__des02FORjstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jconfig__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jconfig__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jconfig__holder02FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jconfig__holder02FFU04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jstatus__ofpid,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jinputs__externallymeasuredtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jinputs__holder02FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jinputs__holder04FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jcmmnds__calibration,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jcmmnds__setpoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jcmmnds__stoptrajectory,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jcmmnds__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jcmmnds__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j06_ebx_jcmmnds__holder01FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jconfig__pidposition,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jconfig__pidvelocity,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jconfig__pidtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jconfig__impedance,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jconfig__minpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jconfig__maxpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jconfig__velocitysetpointtimeout,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jconfig__controlmode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jconfig__motionmonitormode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },    
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jconfig__des02FORjstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jconfig__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jconfig__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jconfig__holder02FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jconfig__holder02FFU04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jstatus__ofpid,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jinputs__externallymeasuredtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jinputs__holder02FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jinputs__holder04FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jcmmnds__calibration,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jcmmnds__setpoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jcmmnds__stoptrajectory,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jcmmnds__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jcmmnds__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j07_ebx_jcmmnds__holder01FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jconfig__pidposition,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jconfig__pidvelocity,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jconfig__pidtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jconfig__impedance,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jconfig__minpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jconfig__maxpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jconfig__velocitysetpointtimeout,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jconfig__controlmode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jconfig__motionmonitormode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },    
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jconfig__des02FORjstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jconfig__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jconfig__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jconfig__holder02FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jconfig__holder02FFU04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jstatus__ofpid,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jinputs__externallymeasuredtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jinputs__holder02FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jinputs__holder04FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jcmmnds__calibration,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jcmmnds__setpoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jcmmnds__stoptrajectory,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jcmmnds__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jcmmnds__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j08_ebx_jcmmnds__holder01FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
 
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jconfig__pidposition,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jconfig__pidvelocity,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jconfig__pidtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jconfig__impedance,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jconfig__minpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jconfig__maxpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jconfig__velocitysetpointtimeout,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jconfig__controlmode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jconfig__motionmonitormode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },    
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jconfig__des02FORjstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jconfig__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jconfig__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jconfig__holder02FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jconfig__holder02FFU04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jstatus__ofpid,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jinputs__externallymeasuredtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jinputs__holder02FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jinputs__holder04FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jcmmnds__calibration,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jcmmnds__setpoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jcmmnds__stoptrajectory,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jcmmnds__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jcmmnds__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j09_ebx_jcmmnds__holder01FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
 
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jconfig__pidposition,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jconfig__pidvelocity,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jconfig__pidtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jconfig__impedance,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jconfig__minpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jconfig__maxpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jconfig__velocitysetpointtimeout,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jconfig__controlmode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jconfig__motionmonitormode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },    
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jconfig__des02FORjstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jconfig__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jconfig__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jconfig__holder02FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jconfig__holder02FFU04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jstatus__ofpid,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jinputs__externallymeasuredtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jinputs__holder02FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jinputs__holder04FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jcmmnds__calibration,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jcmmnds__setpoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jcmmnds__stoptrajectory,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jcmmnds__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jcmmnds__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j10_ebx_jcmmnds__holder01FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
 
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jconfig__pidposition,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jconfig__pidvelocity,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jconfig__pidtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jconfig__impedance,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jconfig__minpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jconfig__maxpositionofjoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jconfig__velocitysetpointtimeout,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jconfig__controlmode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jconfig__motionmonitormode,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },    
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jconfig__des02FORjstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jconfig__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jconfig__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jconfig__holder02FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jconfig__holder02FFU04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jstatus__ofpid,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jinputs__externallymeasuredtorque,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jinputs__holder02FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jinputs__holder04FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jcmmnds__calibration,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jcmmnds__setpoint,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jcmmnds__stoptrajectory,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jcmmnds__holder01FFU01,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jcmmnds__holder01FFU02,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // j11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_j11_ebx_jcmmnds__holder01FFU03,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
        
@@ -1999,501 +1999,501 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_lowerarm_usr_array_of_EOnv_usr[] =
     
     {   // m00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m00_ebx_mconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m00_ebx_mconfig__pidcurrent,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m00_ebx_mconfig__maxvelocityofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // m00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m00_ebx_mconfig__maxcurrentofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // m00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m00_ebx_mconfig__des02FORmstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m00_ebx_mstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m00_ebx_mstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m00_ebx_mstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     
     
     {   // m01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m01_ebx_mconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m01_ebx_mconfig__pidcurrent,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m01_ebx_mconfig__maxvelocityofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // m01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m01_ebx_mconfig__maxcurrentofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // m01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m01_ebx_mconfig__des02FORmstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m01_ebx_mstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m01_ebx_mstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m01_ebx_mstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     
     
     {   // m02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m02_ebx_mconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m02_ebx_mconfig__pidcurrent,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m02_ebx_mconfig__maxvelocityofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // m02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m02_ebx_mconfig__maxcurrentofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // m02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m02_ebx_mconfig__des02FORmstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m02_ebx_mstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m02_ebx_mstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m02_ebx_mstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
 
     
     {   // m03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m03_ebx_mconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m03_ebx_mconfig__pidcurrent,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m03_ebx_mconfig__maxvelocityofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // m03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m03_ebx_mconfig__maxcurrentofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // m03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m03_ebx_mconfig__des02FORmstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m03_ebx_mstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m03_ebx_mstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m03 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m03_ebx_mstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
 
     
     {   // m04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m04_ebx_mconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m04_ebx_mconfig__pidcurrent,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m04_ebx_mconfig__maxvelocityofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // m04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m04_ebx_mconfig__maxcurrentofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // m04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m04_ebx_mconfig__des02FORmstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m04_ebx_mstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m04_ebx_mstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m04 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m04_ebx_mstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
 
     {   // m05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m05_ebx_mconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m05_ebx_mconfig__pidcurrent,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m05_ebx_mconfig__maxvelocityofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // m05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m05_ebx_mconfig__maxcurrentofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // m05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m05_ebx_mconfig__des02FORmstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m05_ebx_mstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m05_ebx_mstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m05 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m05_ebx_mstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
 
     {   // m06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m06_ebx_mconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m06_ebx_mconfig__pidcurrent,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m06_ebx_mconfig__maxvelocityofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // m06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m06_ebx_mconfig__maxcurrentofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // m06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m06_ebx_mconfig__des02FORmstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m06_ebx_mstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m06_ebx_mstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m06 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m06_ebx_mstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     
     
     {   // m07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m07_ebx_mconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m07_ebx_mconfig__pidcurrent,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m07_ebx_mconfig__maxvelocityofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // m07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m07_ebx_mconfig__maxcurrentofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // m07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m07_ebx_mconfig__des02FORmstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m07_ebx_mstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m07_ebx_mstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m07 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m07_ebx_mstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     
     
     {   // m08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m08_ebx_mconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m08_ebx_mconfig__pidcurrent,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m08_ebx_mconfig__maxvelocityofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // m08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m08_ebx_mconfig__maxcurrentofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // m08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m08_ebx_mconfig__des02FORmstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m08_ebx_mstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m08_ebx_mstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m08 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m08_ebx_mstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
 
     
     {   // m09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m09_ebx_mconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m09_ebx_mconfig__pidcurrent,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m09_ebx_mconfig__maxvelocityofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // m09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m09_ebx_mconfig__maxcurrentofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // m09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m09_ebx_mconfig__des02FORmstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m09_ebx_mstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m09_ebx_mstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m09 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m09_ebx_mstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
 
     
     {   // m10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m10_ebx_mconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m10_ebx_mconfig__pidcurrent,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m10_ebx_mconfig__maxvelocityofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // m10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m10_ebx_mconfig__maxcurrentofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // m10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m10_ebx_mconfig__des02FORmstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m10_ebx_mstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m10_ebx_mstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m10 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m10_ebx_mstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
 
     {   // m11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m11_ebx_mconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m11_ebx_mconfig__pidcurrent,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m11_ebx_mconfig__maxvelocityofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // m11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m11_ebx_mconfig__maxcurrentofmotor,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // m11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m11_ebx_mconfig__des02FORmstatuschamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m11_ebx_mstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m11_ebx_mstatus__basic,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // m11 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_m11_ebx_mstatus__chamaleon04,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
 
@@ -2501,27 +2501,27 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_lowerarm_usr_array_of_EOnv_usr[] =
     
     {   // c00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_c00_ebx_cconfig,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // c00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_c00_ebx_cconfig__durationofctrlloop,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // c00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_c00_ebx_cstatus,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // c00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_c00_ebx_cstatus__alljomoinitted,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // c00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerarm_c00_ebx_ccmmnds__go2stateofcontroller,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }        
     
