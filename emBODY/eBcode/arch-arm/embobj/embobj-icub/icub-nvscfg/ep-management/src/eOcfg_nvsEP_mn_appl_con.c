@@ -176,19 +176,19 @@ EOtreenode eo_cfg_nvsEP_mn_appl_tree_con[] =
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mn_appl_config,
         EO_INIT(.index)     0,
         EO_INIT(.nchildren) 0,
-        EO_INIT(.ichildren) {0}
+        EO_INIT(.dchildren) {0}
     },
     {   // 01
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mn_appl_status,
         EO_INIT(.index)     0,
         EO_INIT(.nchildren) 0,
-        EO_INIT(.ichildren) {0}
+        EO_INIT(.dchildren) {0}
     },
     {   // 02
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mn_appl_cmmnds__go2state,
         EO_INIT(.index)     0,
         EO_INIT(.nchildren) 0,
-        EO_INIT(.ichildren) {0}
+        EO_INIT(.dchildren) {0}
     }    
 };  EO_VERIFYsizeof(eo_cfg_nvsEP_mn_appl_tree_con, sizeof(EOtreenode)*(EOK_cfg_nvsEP_mn_appl_con_NUMofVARS));
 
