@@ -115,32 +115,32 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_as_onemais_usr_array_of_EOnv_usr[] =
 #if 0
     {   // s00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_as_onemais_s00_ebx_sconfig__mode,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // s00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_as_onemais_s00_ebx_sconfig__datarate,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // s00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_as_onemais_s00_ebx_sconfig__signaloncefullscale,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // s00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_as_onemais_s00_ebx_sstatus__fullscale,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // s00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_as_onemais_s00_ebx_sstatus__calibratedvalues,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // s00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_as_onemais_s00_ebx_sstatus__uncalibratedvalues,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }
 #endif    
@@ -152,22 +152,22 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_as_onemais_usr_array_of_EOnv_usr[] =
     
     {   // m00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_as_onemais_m00_ebx_mconfig__mode,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_as_onemais_m00_ebx_mconfig__datarate,
-        EO_INIT(.on_rop_reception)      NULL,                 
+        EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },
     {   // m00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_as_onemais_m00_ebx_mconfig__resolution,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },     
     {   // m00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_as_onemais_m00_ebx_mstatus__the15values,
-        EO_INIT(.on_rop_reception)      NULL,                
+        EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }
 #endif    

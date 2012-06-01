@@ -140,8 +140,7 @@ EOtreenode eo_cfg_nvsEP_mn_comm_tree_con[] =
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mn_comm__ropsigcfgcommand,
         EO_INIT(.index)     0,
         EO_INIT(.nchildren) 0,
-        EO_INIT(.ichildren) {0},
-        EO_INIT(.pchildren) {NULL}
+        EO_INIT(.ichildren) {0}
     }
 };  EO_VERIFYsizeof(eo_cfg_nvsEP_mn_comm_tree_con, sizeof(EOtreenode)*(EOK_cfg_nvsEP_mn_comm_con_NUMofVARS));
 
