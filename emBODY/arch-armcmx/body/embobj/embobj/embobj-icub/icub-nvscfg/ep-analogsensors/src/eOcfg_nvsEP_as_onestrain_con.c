@@ -158,37 +158,37 @@ EOtreenode eo_cfg_nvsEP_as_onestrain_tree_con[] =
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_s00_sconfig__mode,
         EO_INIT(.index)     Sindex(0, 0),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.ichildren) {0}
+        EO_INIT(.dchildren) {0}
     },
     {   // 1
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_s00_sconfig__datarate,
         EO_INIT(.index)     Sindex(0, 1),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.ichildren) {0}
+        EO_INIT(.dchildren) {0}
     },  
     {   // 2
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_s00_sconfig__signaloncefullscale,
         EO_INIT(.index)     Sindex(0, 2),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.ichildren) {0}
+        EO_INIT(.dchildren) {0}
     },
     {   // 3
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_s00_sstatus__fullscale,
         EO_INIT(.index)     Sindex(0, 3),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.ichildren) {0}
+        EO_INIT(.dchildren) {0}
     },  
     {   // 4
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_s00_sstatus__calibratedvalues,
         EO_INIT(.index)     Sindex(0, 4),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.ichildren) {0}
+        EO_INIT(.dchildren) {0}
     },  
     {   // 5
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_s00_sstatus__uncalibratedvalues,
         EO_INIT(.index)     Sindex(0, 5),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.ichildren) {0}
+        EO_INIT(.dchildren) {0}
     }   
     
      
@@ -201,25 +201,25 @@ EOtreenode eo_cfg_nvsEP_as_onestrain_tree_con[] =
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_m00_mconfig__mode,
         EO_INIT(.index)     Mindex(0, 0),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.ichildren) {0}
+        EO_INIT(.dchildren) {0}
     },
     {   // 1
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_m00_mconfig__datarate,
         EO_INIT(.index)     Mindex(0, 1),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.ichildren) {0}
+        EO_INIT(.dchildren) {0}
     },  
     {   // 2
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_m00_mconfig__resolution,
         EO_INIT(.index)     Mindex(0, 2),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.ichildren) {0}
+        EO_INIT(.dchildren) {0}
     },
     {   // 3
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_m00_mstatus__the15values,
         EO_INIT(.index)     Mindex(0, 3),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.ichildren) {0}
+        EO_INIT(.dchildren) {0}
     }
     
 #endif
