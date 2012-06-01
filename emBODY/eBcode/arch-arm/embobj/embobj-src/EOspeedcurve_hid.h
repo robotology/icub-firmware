@@ -38,7 +38,8 @@ struct EOspeedcurve_hid
 {
     float v;
     float vf;
-    float delta;
+    float acc;
+    float rabbit;
     eObool_t done;
 }; 
 

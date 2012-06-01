@@ -76,7 +76,7 @@ extern EOspeedcurve* eo_speedcurve_New(void)
     if (o)
     {
         o->v = 0.0f;
-        o->delta = 0.0f;
+        o->acc = 0.0f;
 
         o->vf = 0.0f;
 
@@ -95,11 +95,13 @@ extern void eo_speedcurve_SetReference(EOspeedcurve *o, int32_t v0, int32_t vf, 
         return;
     }    
 
-    o->delta = PERIOD*(float)acc;
+    o->acc = PERIOD*(float)acc;
     o->v  = (float)v0;
     o->vf = (float)vf;
 
     o->done = eobool_false;
+
+    o->rabbit = 0.0f;
 }
 
 /** @fn         extern float eo_trajectory_Step(EOtrajectory *o)
@@ -125,33 +127,37 @@ extern int32_t eo_speedcurve_GetVel(EOspeedcurve* o)
     return (int32_t)o->v;
 }
 
-extern void eo_speedcurve_Step(EOspeedcurve* o, int32_t *v)
+extern int32_t eo_speedcurve_Step(EOspeedcurve* o, int32_t delta, int32_t* v)
 {
     if (o->done)
     {
-        if (v) *v = (int32_t)o->vf;
-      
-        return;
-    }
-    
-    float delta = o->vf - o->v;
-
-    if (-o->delta <= delta && delta <= o->delta)
-    {
         o->v = o->vf;
+    }
+    else
+    {
+        float acc = o->vf - o->v;
 
-        o->done = eobool_true;
+        if (-o->acc <= acc && acc <= o->acc)
+        {
+            o->v = o->vf;
+
+            o->done = eobool_true;
+        }
+        else if (acc < -o->acc)
+        {
+            o->v -= o->acc;
+        }
+        else if (acc >  o->acc)
+        {
+            o->v += o->acc;
+        }
     }
-    else if (delta < -o->delta)
-    {
-        o->v -= o->delta;
-    }
-    else if (delta > o->delta)
-    {
-        o->v += o->delta;
-    }
+
+    o->rabbit += o->v*PERIOD-(float)delta;
 
     if (v) *v = (int32_t)o->v;
+
+    return (int32_t)(o->rabbit);
 }
 
 // --------------------------------------------------------------------------------------------------------------------

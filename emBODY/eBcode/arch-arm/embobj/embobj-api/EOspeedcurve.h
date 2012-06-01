@@ -62,7 +62,7 @@ extern eObool_t eo_speedcurve_IsDone(EOspeedcurve* o);
 
 extern int32_t eo_speedcurve_GetVel(EOspeedcurve* o);
 
-extern void eo_speedcurve_Step(EOspeedcurve* o, int32_t *v);
+extern int32_t eo_speedcurve_Step(EOspeedcurve* o, int32_t delta, int32_t* v);
 
 /** @}            
     end of group eo_trajectory  

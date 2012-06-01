@@ -82,6 +82,7 @@ extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution, int32_t f
         o->last_reading = 0;
         o->speed = 0;
         o->first_reading = eobool_true;
+        o->delta = 0;
     }
 
     return o;
@@ -89,33 +90,32 @@ extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution, int32_t f
 
 extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
 {
-    int32_t delta;
-
     if (o->first_reading)
     {
         o->first_reading = eobool_false;
         o->time_from_last_reading = 0;
         o->last_reading = encoder;
+        o->delta = 0;
         
         return;
     }
 
-    delta = encoder - o->last_reading;
+    o->delta = encoder - o->last_reading;
 
-    if (delta > o->impulse_per_revolution_by_2)
+    if (o->delta > o->impulse_per_revolution_by_2)
     {
-        delta -= o->impulse_per_revolution;
+        o->delta -= o->impulse_per_revolution;
     }
-    else if (delta < -o->impulse_per_revolution_by_2)
+    else if (o->delta < -o->impulse_per_revolution_by_2)
     {
-        delta += o->impulse_per_revolution;
+        o->delta += o->impulse_per_revolution;
     }
 
     ++o->time_from_last_reading;
 
-    if (delta <= -DELTA_THR || delta >= DELTA_THR)
+    if (o->delta <= -DELTA_THR || o->delta >= DELTA_THR)
     {
-        o->speed = (15 * o->speed + (delta * o->FREQUENCY) / o->time_from_last_reading);
+        o->speed = (15 * o->speed + (o->delta * o->FREQUENCY) / o->time_from_last_reading);
         
         if (o->speed >= 8)        
         {
@@ -151,11 +151,18 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
 extern void eo_speedometer_EncoderError(EOspeedmeter* o)
 {
     ++o->time_from_last_reading;
+
+    o->delta = 0;
 }
 
 extern int32_t eo_speedometer_GetSpeed(EOspeedmeter* o)
 {
     return o->speed;
+}
+
+extern int32_t eo_speedometer_GetDelta(EOspeedmeter* o)
+{
+    return o->delta;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
