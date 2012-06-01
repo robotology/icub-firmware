@@ -124,9 +124,14 @@ extern EOtreenode* eo_treenode_GetChild(EOtreenode *node, uint8_t childpos)
         return(NULL);
     }
     
-    EOtreenode* root = node - node->index;
+//    EOtreenode* root = node - node->index;    
+//    return(&root[node->index+childpos+1]);
 
-    return(&root[node->index+node->dchildren[childpos]]);
+//    return(&node[childpos+1]); // se non uso ...
+    
+    //return(&root[node->index+node->dchildren[childpos]]);
+    
+    return(&node[node->dchildren[childpos]]);
 }
 
 
