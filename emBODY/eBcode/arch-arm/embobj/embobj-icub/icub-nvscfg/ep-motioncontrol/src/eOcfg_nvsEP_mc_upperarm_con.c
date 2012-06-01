@@ -281,98 +281,84 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
             EO_INIT(.index)     Jindex( 0, 1),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
         {   // 2
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jconfig__pidvelocity,
             EO_INIT(.index)     Jindex( 0, 2),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },
         {   // 3
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jconfig__pidtorque,
             EO_INIT(.index)     Jindex( 0, 3),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },   
         {   // 4
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jconfig__impedance,
             EO_INIT(.index)     Jindex( 0, 4),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },      
         {   // 5
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jconfig__minpositionofjoint,
             EO_INIT(.index)     Jindex( 0, 5),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },         
         {   // 6
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jconfig__maxpositionofjoint,
             EO_INIT(.index)     Jindex( 0, 6),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },   
         {   // 7
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jconfig__velocitysetpointtimeout,
             EO_INIT(.index)     Jindex( 0, 7),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
         {   // 8
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jconfig__controlmode,
             EO_INIT(.index)     Jindex( 0, 8),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
         {   // 9
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jconfig__motionmonitormode,
             EO_INIT(.index)     Jindex( 0, 9),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
        {   //10
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jconfig__des02FORjstatuschamaleon04,
             EO_INIT(.index)     Jindex( 0,10),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
        {   //11
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jconfig__holder01FFU01,
             EO_INIT(.index)     Jindex( 0,11),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         }, 
        {   //12
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jconfig__holder01FFU02,
             EO_INIT(.index)     Jindex( 0,12),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         }, 
        {   //13
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jconfig__holder02FFU03,
             EO_INIT(.index)     Jindex( 0,13),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         }, 
        {   //14
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jconfig__holder02FFU04,
             EO_INIT(.index)     Jindex( 0,14),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },
 
     // jstatus
@@ -387,21 +373,18 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
             EO_INIT(.index)     Jindex( 0,16),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },    
         {   //17
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jstatus__ofpid,
             EO_INIT(.index)     Jindex( 0,17),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },     
         {   //18
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jstatus__chamaleon04,
             EO_INIT(.index)     Jindex( 0,18),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
 
     // jinputs
@@ -409,22 +392,19 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jinputs__externallymeasuredtorque,
         EO_INIT(.index)     Jindex( 0,19),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },  
     {   //20
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jinputs__holder02FFU01,
         EO_INIT(.index)     Jindex( 0,20),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },  
     {   //21
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jinputs__holder04FFU02,
         EO_INIT(.index)     Jindex( 0,21),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) {0}
-        
     }, 
 
     
@@ -433,43 +413,37 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jcmmnds__calibration,
         EO_INIT(.index)     Jindex( 0,22),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     }, 
     {   //23
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jcmmnds__setpoint,
         EO_INIT(.index)     Jindex( 0,23),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },        
     {   //24
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jcmmnds__stoptrajectory,
         EO_INIT(.index)     Jindex( 0,24),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },
     {   //25
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jcmmnds__holder01FFU01,
         EO_INIT(.index)     Jindex( 0,25),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },    
     {   //26
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jcmmnds__holder01FFU02,
         EO_INIT(.index)     Jindex( 0,26),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },        
     {   //27
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jcmmnds__holder01FFU03,
         EO_INIT(.index)     Jindex( 0,27),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },    
        
     // joint-j01
@@ -485,98 +459,84 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
             EO_INIT(.index)     Jindex( 1, 1),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
         {   // 2
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jconfig__pidvelocity,
             EO_INIT(.index)     Jindex( 1, 2),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },
         {   // 3
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jconfig__pidtorque,
             EO_INIT(.index)     Jindex( 1, 3),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },   
         {   // 4
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jconfig__impedance,
             EO_INIT(.index)     Jindex( 1, 4),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },      
         {   // 5
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jconfig__minpositionofjoint,
             EO_INIT(.index)     Jindex( 1, 5),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },         
         {   // 6
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jconfig__maxpositionofjoint,
             EO_INIT(.index)     Jindex( 1, 6),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },   
         {   // 7
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jconfig__velocitysetpointtimeout,
             EO_INIT(.index)     Jindex( 1, 7),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
         {   // 8
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jconfig__controlmode,
             EO_INIT(.index)     Jindex( 1, 8),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
         {   // 9
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jconfig__motionmonitormode,
             EO_INIT(.index)     Jindex( 1, 9),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
        {   //10
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jconfig__des02FORjstatuschamaleon04,
             EO_INIT(.index)     Jindex( 1,10),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
        {   //11
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jconfig__holder01FFU01,
             EO_INIT(.index)     Jindex( 1,11),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         }, 
        {   //12
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jconfig__holder01FFU02,
             EO_INIT(.index)     Jindex( 1,12),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         }, 
        {   //13
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jconfig__holder02FFU03,
             EO_INIT(.index)     Jindex( 1,13),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         }, 
        {   //14
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jconfig__holder02FFU04,
             EO_INIT(.index)     Jindex( 1,14),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },
 
     // jstatus
@@ -591,21 +551,18 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
             EO_INIT(.index)     Jindex( 1,16),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },    
         {   //17
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jstatus__ofpid,
             EO_INIT(.index)     Jindex( 1,17),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },     
         {   //18
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jstatus__chamaleon04,
             EO_INIT(.index)     Jindex( 1,18),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
 
     // jinputs
@@ -613,22 +570,19 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jinputs__externallymeasuredtorque,
         EO_INIT(.index)     Jindex( 1,19),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },  
     {   //20
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jinputs__holder02FFU01,
         EO_INIT(.index)     Jindex( 1,20),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },  
     {   //21
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jinputs__holder04FFU02,
         EO_INIT(.index)     Jindex( 1,21),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     }, 
 
     
@@ -637,8 +591,7 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jcmmnds__calibration,
         EO_INIT(.index)     Jindex( 1,22),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     }, 
     {   //23
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jcmmnds__setpoint,
@@ -651,29 +604,25 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jcmmnds__stoptrajectory,
         EO_INIT(.index)     Jindex( 1,24),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },
     {   //25
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jcmmnds__holder01FFU01,
         EO_INIT(.index)     Jindex( 1,25),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },    
     {   //26
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jcmmnds__holder01FFU02,
         EO_INIT(.index)     Jindex( 1,26),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },        
     {   //27
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jcmmnds__holder01FFU03,
         EO_INIT(.index)     Jindex( 1,27),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },    
     
 
@@ -690,98 +639,84 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
             EO_INIT(.index)     Jindex( 2, 1),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
         {   // 2
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jconfig__pidvelocity,
             EO_INIT(.index)     Jindex( 2, 2),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },
         {   // 3
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jconfig__pidtorque,
             EO_INIT(.index)     Jindex( 2, 3),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },   
         {   // 4
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jconfig__impedance,
             EO_INIT(.index)     Jindex( 2, 4),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },      
         {   // 5
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jconfig__minpositionofjoint,
             EO_INIT(.index)     Jindex( 2, 5),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },         
         {   // 6
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jconfig__maxpositionofjoint,
             EO_INIT(.index)     Jindex( 2, 6),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },   
         {   // 7
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jconfig__velocitysetpointtimeout,
             EO_INIT(.index)     Jindex( 2, 7),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
         {   // 8
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jconfig__controlmode,
             EO_INIT(.index)     Jindex( 2, 8),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
         {   // 9
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jconfig__motionmonitormode,
             EO_INIT(.index)     Jindex( 2, 9),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
        {   //10
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jconfig__des02FORjstatuschamaleon04,
             EO_INIT(.index)     Jindex( 2,10),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
        {   //11
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jconfig__holder01FFU01,
             EO_INIT(.index)     Jindex( 2,11),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         }, 
        {   //12
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jconfig__holder01FFU02,
             EO_INIT(.index)     Jindex( 2,12),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         }, 
        {   //13
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jconfig__holder02FFU03,
             EO_INIT(.index)     Jindex( 2,13),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         }, 
        {   //14
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jconfig__holder02FFU04,
             EO_INIT(.index)     Jindex( 2,14),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },
 
     // jstatus
@@ -796,21 +731,18 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
             EO_INIT(.index)     Jindex( 2,16),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },    
         {   //17
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jstatus__ofpid,
             EO_INIT(.index)     Jindex( 2,17),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },     
         {   //18
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jstatus__chamaleon04,
             EO_INIT(.index)     Jindex( 2,18),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
 
     // jinputs
@@ -818,22 +750,19 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jinputs__externallymeasuredtorque,
         EO_INIT(.index)     Jindex( 2,19),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },  
     {   //20
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jinputs__holder02FFU01,
         EO_INIT(.index)     Jindex( 2,20),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },  
     {   //21
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jinputs__holder04FFU02,
         EO_INIT(.index)     Jindex( 2,21),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     }, 
 
     
@@ -842,43 +771,37 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jcmmnds__calibration,
         EO_INIT(.index)     Jindex( 2,22),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     }, 
     {   //23
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jcmmnds__setpoint,
         EO_INIT(.index)     Jindex( 2,23),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },        
     {   //24
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jcmmnds__stoptrajectory,
         EO_INIT(.index)     Jindex( 2,24),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },
     {   //25
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jcmmnds__holder01FFU01,
         EO_INIT(.index)     Jindex( 2,25),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },    
     {   //26
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jcmmnds__holder01FFU02,
         EO_INIT(.index)     Jindex( 2,26),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },        
     {   //27
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jcmmnds__holder01FFU03,
         EO_INIT(.index)     Jindex( 2,27),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },    
 
 
@@ -895,98 +818,84 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
             EO_INIT(.index)     Jindex( 3, 1),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
         {   // 2
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jconfig__pidvelocity,
             EO_INIT(.index)     Jindex( 3, 2),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },
         {   // 3
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jconfig__pidtorque,
             EO_INIT(.index)     Jindex( 3, 3),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },   
         {   // 4
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jconfig__impedance,
             EO_INIT(.index)     Jindex( 3, 4),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },      
         {   // 5
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jconfig__minpositionofjoint,
             EO_INIT(.index)     Jindex( 3, 5),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },         
         {   // 6
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jconfig__maxpositionofjoint,
             EO_INIT(.index)     Jindex( 3, 6),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },   
         {   // 7
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jconfig__velocitysetpointtimeout,
             EO_INIT(.index)     Jindex( 3, 7),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
         {   // 8
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jconfig__controlmode,
             EO_INIT(.index)     Jindex( 3, 8),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
         {   // 9
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jconfig__motionmonitormode,
             EO_INIT(.index)     Jindex( 3, 9),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
        {   //10
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jconfig__des02FORjstatuschamaleon04,
             EO_INIT(.index)     Jindex( 3,10),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
        {   //11
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jconfig__holder01FFU01,
             EO_INIT(.index)     Jindex( 3,11),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         }, 
        {   //12
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jconfig__holder01FFU02,
             EO_INIT(.index)     Jindex( 3,12),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         }, 
        {   //13
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jconfig__holder02FFU03,
             EO_INIT(.index)     Jindex( 3,13),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         }, 
        {   //14
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jconfig__holder02FFU04,
             EO_INIT(.index)     Jindex( 3,14),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },
 
     // jstatus
@@ -1001,21 +910,18 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
             EO_INIT(.index)     Jindex( 3,16),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },    
         {   //17
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jstatus__ofpid,
             EO_INIT(.index)     Jindex( 3,17),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },     
         {   //18
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jstatus__chamaleon04,
             EO_INIT(.index)     Jindex( 3,18),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
 
     // jinputs
@@ -1023,22 +929,19 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jinputs__externallymeasuredtorque,
         EO_INIT(.index)     Jindex( 3,19),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },  
     {   //20
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jinputs__holder02FFU01,
         EO_INIT(.index)     Jindex( 3,20),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },  
     {   //21
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jinputs__holder04FFU02,
         EO_INIT(.index)     Jindex( 3,21),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     }, 
 
     
@@ -1047,43 +950,37 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jcmmnds__calibration,
         EO_INIT(.index)     Jindex( 3,22),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     }, 
     {   //23
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jcmmnds__setpoint,
         EO_INIT(.index)     Jindex( 3,23),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },        
     {   //24
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jcmmnds__stoptrajectory,
         EO_INIT(.index)     Jindex( 3,24),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },
     {   //25
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jcmmnds__holder01FFU01,
         EO_INIT(.index)     Jindex( 3,25),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },    
     {   //26
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jcmmnds__holder01FFU02,
         EO_INIT(.index)     Jindex( 3,26),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },        
     {   //27
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jcmmnds__holder01FFU03,
         EO_INIT(.index)     Jindex( 3,27),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     },    
        
 
@@ -1104,28 +1001,24 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
             EO_INIT(.index)     Mindex( 0, 1),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
         {   // 2
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_m00_mconfig__maxvelocityofmotor,
             EO_INIT(.index)     Mindex( 0, 2),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },
         {   // 3
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_m00_mconfig__maxcurrentofmotor,
             EO_INIT(.index)     Mindex( 0, 3),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },        
         {   // 4
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_m00_mconfig__des02FORmstatuschamaleon04,
             EO_INIT(.index)     Mindex( 0, 4),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
     // mstatus
     {   // 5
@@ -1139,14 +1032,12 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
             EO_INIT(.index)     Mindex( 0, 6),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },      
         {   // 7
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_m00_mstatus__chamaleon04,
             EO_INIT(.index)     Mindex( 0, 7),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },       
  
  
@@ -1163,28 +1054,24 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
             EO_INIT(.index)     Mindex( 1, 1),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
         {   // 2
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_m01_mconfig__maxvelocityofmotor,
             EO_INIT(.index)     Mindex( 1, 2),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },
         {   // 3
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_m01_mconfig__maxcurrentofmotor,
             EO_INIT(.index)     Mindex( 1, 3),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },        
         {   // 4
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_m01_mconfig__des02FORmstatuschamaleon04,
             EO_INIT(.index)     Mindex( 1, 4),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
     // mstatus
     {   // 5
@@ -1198,14 +1085,12 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
             EO_INIT(.index)     Mindex( 1, 6),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },      
         {   // 7
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_m01_mstatus__chamaleon04,
             EO_INIT(.index)     Mindex( 1, 7),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },       
  
 
@@ -1222,28 +1107,24 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
             EO_INIT(.index)     Mindex( 2, 1),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
         {   // 2
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_m02_mconfig__maxvelocityofmotor,
             EO_INIT(.index)     Mindex( 2, 2),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },
         {   // 3
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_m02_mconfig__maxcurrentofmotor,
             EO_INIT(.index)     Mindex( 2, 3),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },        
         {   // 4
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_m02_mconfig__des02FORmstatuschamaleon04,
             EO_INIT(.index)     Mindex( 2, 4),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
     // mstatus
     {   // 5
@@ -1257,14 +1138,12 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
             EO_INIT(.index)     Mindex( 2, 6),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },      
         {   // 7
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_m02_mstatus__chamaleon04,
             EO_INIT(.index)     Mindex( 2, 7),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },    
 
 
@@ -1281,28 +1160,24 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
             EO_INIT(.index)     Mindex( 3, 1),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
         {   // 2
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_m03_mconfig__maxvelocityofmotor,
             EO_INIT(.index)     Mindex( 3, 2),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },
         {   // 3
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_m03_mconfig__maxcurrentofmotor,
             EO_INIT(.index)     Mindex( 3, 3),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },        
         {   // 4
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_m03_mconfig__des02FORmstatuschamaleon04,
             EO_INIT(.index)     Mindex( 3, 4),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
     // mstatus
     {   // 5
@@ -1316,14 +1191,12 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
             EO_INIT(.index)     Mindex( 3, 6),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },      
         {   // 7
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_m03_mstatus__chamaleon04,
             EO_INIT(.index)     Mindex( 3, 7),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         }, 
 
 
@@ -1340,7 +1213,6 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
             EO_INIT(.index)     Cindex( 1),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
     // cstatus
     {   // 2
@@ -1354,15 +1226,13 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
             EO_INIT(.index)     Cindex( 3),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) {0}
-            
         },  
     // ccmmnds    
     {   // 4
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_c00_ccmmnds__go2stateofcontroller,
         EO_INIT(.index)     Cindex( 4),
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
-        
+        EO_INIT(.dchildren) {0}        
     }          
          
 };  EO_VERIFYsizeof(eo_cfg_nvsEP_mc_upperarm_tree_con, sizeof(EOtreenode)*(EOK_cfg_nvsEP_upperarm_NUMofVARS));
