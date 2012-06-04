@@ -547,7 +547,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 	if (type==CALIB_ABS_POS_SENS)
 	{
 		#ifdef DEBUG_CALIBRATION	
- 		AS1_printStringEx ("Calibration ABS_POS aborted \r\n");
+ 		can_printf ("Calibration ABS analog aborted %d \r\n",channel);
 		#endif
 	}
 

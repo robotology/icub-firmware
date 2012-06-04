@@ -31,7 +31,7 @@
 	
 byte	_board_ID = 15;	
 char    _additional_info [32];
-byte    _build_number = 45;
+byte    _build_number = 46;
 byte    _my_can_protocol_major = 1;
 byte    _my_can_protocol_minor = 1;
 bool    _can_protocol_ack = false;
@@ -802,6 +802,9 @@ void decouple_positions(void)
 #elif VERSION == 0x0119
 		//_position[1] = _position[1];		//omitted
 		_position[2] = _position[1] + _position[2];		
+#elif VERSION == 0x0129
+		//_position[1] = _position[1];		//omitted
+		//_position[2] = _position[2];		//omitted
 #endif
 }
 
