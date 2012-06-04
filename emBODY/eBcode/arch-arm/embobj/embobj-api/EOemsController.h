@@ -94,6 +94,7 @@ extern int16_t* eo_emsController_PWM(void);
 // asynchronous
 extern void eo_emsController_SetControlMode(uint8_t joint, control_mode_t mode);
 extern void eo_emsController_ResetPosPid(uint8_t joint);
+extern void eo_emsController_ResetVelPid(uint8_t joint);
 extern void eo_emsController_ResetTrqPid(uint8_t joint);
 extern void eo_emsController_Stop(uint8_t joint);
 

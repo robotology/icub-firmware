@@ -42,6 +42,7 @@ struct EOspeedmeter_hid
     int32_t impulse_per_revolution;
     int32_t impulse_per_revolution_by_2;
     int32_t time_from_last_reading;
+    int32_t last_valid_reading;
     int32_t last_reading;
     int32_t speed;
     int32_t delta;

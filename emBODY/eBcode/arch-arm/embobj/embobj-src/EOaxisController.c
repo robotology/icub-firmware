@@ -67,7 +67,7 @@ static void compute_torque_ref(EOaxisController *o);
 
 static const char s_eobj_ownname[] = "EOaxisController";
 
-//static const float PERIOD    = 0.001f;  // 1 ms
+static const float PERIOD    = 0.001f;  // 1 ms
 static const int32_t FREQUENCY = 1000;  // 1 kHz
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -277,17 +277,29 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
         case CM_VELOCITY:
         {
             int32_t delta = eo_speedometer_GetDelta(o->speedmeter);
-
             int32_t rabbit = eo_speedcurve_Step(o->speedcurve, delta, &(o->vel_out));
 
-            int32_t speed = eo_speedometer_GetSpeed(o->speedmeter);
+            /*
+            static float rabbit=0.0f;
+            rabbit += PERIOD*(float)(o->vel_out)-(float)delta;
+            static float integral=0.0f;
+            integral += rabbit;
 
-            encoder_can = speed;
 
-            posref_can = (int16_t)o->vel_out;
 
-            return eo_pid_PWM(o->pidV, o->vel_out - speed);
-            //return eo_pid_PWM(o->pidV, rabbit);
+            int16_t pwm = (int16_t)(50.0f*rabbit+0.05f*integral);
+
+            if (pwm> 4096) pwm= 4096;
+            if (pwm<-4096) pwm=-4096;
+            
+            return pwm;
+            */
+
+            encoder_can = eo_speedometer_GetSpeed(o->speedmeter);
+            posref_can = (int32_t)o->vel_out;
+
+            //return eo_pid_PWM(o->pidV, o->vel_out - speed);
+            return eo_pid_PWM(o->pidV, rabbit);
         }
 
         case CM_IMPEDANCE_VEL:
@@ -348,6 +360,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
 extern void eo_axisController_Stop(EOaxisController *o)
 {
     eo_trajectory_Abort(o->trajectory, o->encpos_meas);
+    eo_speedcurve_Stop(o->speedcurve);
 }
 
 extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o)

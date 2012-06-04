@@ -78,10 +78,11 @@ extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution, int32_t f
         o->FREQUENCYxTHR = frequency * (DELTA_THR + 1);
         o->impulse_per_revolution = impulse_per_revolution;
         o->impulse_per_revolution_by_2 = impulse_per_revolution / 2;
+        o->first_reading = eobool_true;
         o->time_from_last_reading = 0;
+        o->last_valid_reading = 0;
         o->last_reading = 0;
         o->speed = 0;
-        o->first_reading = eobool_true;
         o->delta = 0;
     }
 
@@ -90,17 +91,22 @@ extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution, int32_t f
 
 extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
 {
+    int32_t delta;
+
     if (o->first_reading)
     {
         o->first_reading = eobool_false;
         o->time_from_last_reading = 0;
+        o->last_valid_reading = encoder;
         o->last_reading = encoder;
+        o->speed = 0;
         o->delta = 0;
         
         return;
     }
 
     o->delta = encoder - o->last_reading;
+    o->last_reading = encoder;
 
     if (o->delta > o->impulse_per_revolution_by_2)
     {
@@ -111,11 +117,22 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
         o->delta += o->impulse_per_revolution;
     }
 
+    delta = encoder - o->last_valid_reading;
+
+    if (delta > o->impulse_per_revolution_by_2)
+    {
+        delta -= o->impulse_per_revolution;
+    }
+    else if (delta < -o->impulse_per_revolution_by_2)
+    {
+        delta += o->impulse_per_revolution;
+    }
+
     ++o->time_from_last_reading;
 
-    if (o->delta <= -DELTA_THR || o->delta >= DELTA_THR)
+    if (delta <= -DELTA_THR || delta >= DELTA_THR)
     {
-        o->speed = (15 * o->speed + (o->delta * o->FREQUENCY) / o->time_from_last_reading);
+        o->speed = (15 * o->speed + (delta * o->FREQUENCY) / o->time_from_last_reading);
         
         if (o->speed >= 8)        
         {
@@ -131,6 +148,7 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
         }
          
         o->time_from_last_reading = 0.0f;
+        o->last_valid_reading = encoder;
         o->last_reading = encoder;
     }
     else

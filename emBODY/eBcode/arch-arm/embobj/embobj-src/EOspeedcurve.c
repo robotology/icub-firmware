@@ -110,9 +110,10 @@ extern void eo_speedcurve_SetReference(EOspeedcurve *o, int32_t v0, int32_t vf, 
     @return     The actual trajectory point value.
  **/
 
-extern void eo_speedcurve_Stop(EOspeedcurve *o, int32_t p)
+extern void eo_speedcurve_Stop(EOspeedcurve *o)
 {
     o->vf = 0.0f;
+    //o->rabbit = 0.0f;
 
     o->done = eobool_true;
 }
@@ -157,7 +158,7 @@ extern int32_t eo_speedcurve_Step(EOspeedcurve* o, int32_t delta, int32_t* v)
 
     if (v) *v = (int32_t)o->v;
 
-    return (int32_t)(o->rabbit);
+    return (int32_t)o->rabbit;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
