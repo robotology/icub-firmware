@@ -169,7 +169,7 @@ unsigned UseHES=0;
 // Variables for GULP!ing
 tGulp Gulp;
 // define the contents of the periodic message used as an index for PeriodicData
-unsigned char PeriodicMessageContents[4] = {0,0,0,0};
+unsigned char PeriodicMessageContents[4] = {6,15,16,17};
 
 // a new set of variables are requested for Gulp!ing
 // if this is 1 we are waiting for FOC to fill new values
