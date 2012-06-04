@@ -98,17 +98,6 @@ void decouple_positions(void)
 //		_position[0] = _position[0] - _position[1];
 //		_position[1] = _position[0] + 2*_position[1];	
 		
-/*
-#elif VERSION == 0x0152
-		
-	//  Waist Differential coupling 
-	//	|Me1| |  1     1 |  |Je1|
-	//	|Me2|=|  1    -1 |* |Je2|    
-
-//_position[0] =_position[0] -  _position[1];
-//_position[1] =_position[0] +2*_position[1];
-*/
-
 #endif
 }
 
@@ -135,7 +124,7 @@ void decouple_dutycycle(Int32 *pwm)
 
 #if VERSION == 0x0250
 
-	/* Version 0x0150 relizes the shoulder coupling (here '_c' denotes 
+	/* Version 0x0250 relizes the shoulder coupling (here '_c' denotes 
 	 * the coupled board variables).The applied coupling is the following:
 	 *
 	 * 			[    Jm1,      0,      0]

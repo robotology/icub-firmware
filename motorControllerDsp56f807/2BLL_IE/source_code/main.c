@@ -67,16 +67,23 @@ extern sDutyControlBL DutyCycleReq[2];
 // Local prototypes 
 //********************
 
-
-#if VERSION == 0x0251
+#if VERSION == 0x0250
+Int16 _version = 0x0250;
+#elif VERSION == 0x0251
 Int16 _version = 0x0251;
+#elif VERSION == 0x0252
+Int16 _version = 0x0252;
+#elif VERSION == 0x0254
+Int16 _version = 0x0254;
 #elif VERSION == 0x0255
 Int16 _version = 0x0255;
+#elif VERSION == 0x0257
+Int16 _version = 0x0257;
 #elif VERSION == 0x0258
 Int16 _version = 0x0258;
 #endif
 
-#ifndef VERSION
+#ifndef VERSION 
 #	error "No valid version specified"
 #endif
 
@@ -102,8 +109,6 @@ void main(void)
 
 	Int32 PWMoutput [JN];
 	Int32 PWMoutput_old [JN];
-	Int32 test;
-	word temporary;
 	byte i=0;
 	byte wi=0;
 	byte k=0;

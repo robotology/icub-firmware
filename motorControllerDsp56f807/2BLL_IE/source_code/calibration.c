@@ -106,7 +106,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			#if VERSION==0x0153
 				_position[channel] = _position[channel]+ ((float)_cpl_pos_prediction[0]*6.5/4.0);  
 				_position[channel] = _position[channel]- ((float) _cpl_pos_prediction[1]*6.5/4.0);    
-			#elif VERSION==0x0157 
+			#elif VERSION==0x0257 
 				_position[channel] = (((float) _position[channel])*0.6153F);  
 				_position[channel] = _position[channel]+ _cpl_pos_prediction[0];
 				_position[channel] = _position[channel]- _cpl_pos_prediction[1];			
