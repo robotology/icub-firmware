@@ -44,6 +44,7 @@ struct EOspeedmeter_hid
     int32_t time_from_last_reading;
     int32_t last_reading;
     int32_t speed;
+    int32_t delta;
     eObool_t first_reading;
 }; 
 
