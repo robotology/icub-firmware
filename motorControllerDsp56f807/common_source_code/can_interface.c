@@ -191,7 +191,7 @@ byte can_interface (void)
 			// special message, not too neat
 			// ID 0x0100 (001 0000 0000b) message class = periodic message  
 			
-#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 || VERSION == 0x0351 || VERSION==0x0147 || VERSION==0x0140 
+#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 || VERSION == 0x0351 || VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0250 || VERSION==0x0257
 
 			if (_canmsg.CAN_ID_class == CLASS_PERIODIC_DSP)
 			{
@@ -199,10 +199,10 @@ byte can_interface (void)
 				// AAA BBBB CCCC, with AAA=Message class, BBBB Source address, CCCC message command
 				
 				// Switch on the message command: 000 0000 1111b
-				switch (_canmsg.CAN_ID_dst)
+	 			switch (_canmsg.CAN_ID_dst)
 				{
 					case CAN_BCAST_POSITION:
-						CAN_SET_ACTIVE_ENCODER_POSITION_HANDLER(0)
+		 				CAN_SET_ACTIVE_ENCODER_POSITION_HANDLER(0)
 						break;
 
 					case CAN_BCAST_PID_VAL:
@@ -225,7 +225,8 @@ byte can_interface (void)
 			else
 #endif
 
-#if VERSION == 0x0119 || VERSION == 0x0150 || VERSION == 0x0151 || VERSION == 0x0152 || VERSION == 0x0154 || VERSION == 0x0157 || VERSION == 0x0140 || VERSION == 0x0147 || VERSION == 0x0251 
+#if VERSION == 0x0119 || VERSION == 0x0150 || VERSION == 0x0151 || VERSION == 0x0152 || VERSION == 0x0154 || VERSION == 0x0157 || VERSION == 0x0140 
+     || VERSION == 0x0147 || VERSION==0x0250 || VERSION == 0x0251 || VERSION==0x0257 || VERSION==0x0252 || VERSION==0x0254  
 			if (_canmsg.CAN_ID_class == CLASS_PERIODIC_SENS)
 			{
 				if 		(_canmsg.CAN_ID_src==CAN_ID_JNT_STRAIN_11)  strain_num=WDT_JNT_STRAIN_11;
@@ -655,7 +656,7 @@ void can_send_broadcast(void)
 		_canmsg.CAN_length = 8;
 		_canmsg.CAN_frameType = DATA_FRAME;
 
-#if (VERSION ==0x0154 || VERSION ==0x0155 || VERSION ==0x0158 || VERSION == 0x0351 || VERSION ==0x0151 || VERSION ==0x0251)
+#if (VERSION ==0x0154 || VERSION ==0x0155 || VERSION ==0x0158 || VERSION == 0x0351 || VERSION ==0x0151 || VERSION ==0x0251 || VERSION==0x0254 )
 		if(FAULT_ABS0 == 0)
 			CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
 #elif (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOARD_TYPE == BOARD_TYPE_2BLLDC)
@@ -819,7 +820,7 @@ void can_send_broadcast(void)
 		_canmsg.CAN_data[2]= FAULT1;
 
 		//  --- HIGH CURRENT CH 1---
-	#if (VERSION !=0x0154) && (VERSION !=0x0155) && (VERSION !=0x0158)
+	#if (VERSION !=0x0154) && (VERSION !=0x0155) && (VERSION !=0x0158) && (VERSION !=0x0254)
 		if (highcurrent[1])
 		{
 			_canmsg.CAN_data[2] |=highcurrent[1]<<3;
@@ -1278,7 +1279,7 @@ void set_can_masks()
 	UInt32 mask1=0;
 	UInt32 mask2=0;
 	
-	#if (VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x0147 || VERSION==0x0140)
+	#if (VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0250 || VERSION==0x0257)
 		{	
 			create_F_M(&filter1, &mask1,CLASS_POLLING_DSP,0xFF, _board_ID, CLASS_PERIODIC_SENS, 0xFF, 0xFF);   
 			create_F_M(&filter2, &mask2,CLASS_CANLOADER,  0x00, 0xFF, 	   CLASS_PERIODIC_DSP, 	CAN_ID_COUPLED_BOARD, 0xFF);  		
@@ -1402,7 +1403,7 @@ void can_send_additional_info()
 		{
 			CAN_LEN = 6; 
 			CAN_DATA[1]=counter;
-			for (j=0; j<4; j++)	CAN_DATA[2+j] = _additional_info[j+counter*4]; 		
+			for (j=0; j<4; j++)	CAN_DATA[2+j] = (byte)_additional_info[j+counter*4]; 		
 			CAN1_send (CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); 
 		} 	
     }		
@@ -1418,7 +1419,7 @@ void can_receive_additional_info()
 		value = CAN_DATA[1]; 
 		
 		for (j=0; j<4; j++)
-			_additional_info[value*4+j] = CAN_DATA[2+j]; 		
+			_additional_info[value*4+j] = (char) CAN_DATA[2+j]; 		
 	}
 }
 

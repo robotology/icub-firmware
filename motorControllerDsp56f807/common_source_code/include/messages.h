@@ -36,7 +36,7 @@
 }
 
 //-------------------------------------------------------------------
-#if VERSION == 0x0152 || VERSION == 0x0162
+#if VERSION == 0x0152 || VERSION == 0x0162 || VERSION==0x0252 
 #define CAN_CONTROLLER_RUN_HANDLER(x) \
 	{ \
 		if ((_pad_enabled[0]==false) || (_pad_enabled[1]==false))\
@@ -226,7 +226,7 @@
 	_general_board_error = ERROR_NONE; \
 }
 //-------------------------------------------------------------------
-#if VERSION == 0x0152 || VERSION == 0x0162 
+#if VERSION == 0x0152 || VERSION == 0x0162 || VERSION==0x0252 
 	#define CAN_ENABLE_PWM_PAD_HANDLER(x) \
 	{ \
 		if (_can_protocol_ack == false) \
@@ -353,7 +353,7 @@
 #endif
 
 //-------------------------------------------------------------------
-#if VERSION == 0x0152 || VERSION == 0x0162
+#if VERSION == 0x0152 || VERSION == 0x0162 || VERSION==0x0252 
 	#define CAN_DISABLE_PWM_PAD_HANDLER(x) \
 	{ \
 		PWM_outputPadDisable(0); \
@@ -605,7 +605,7 @@
 #endif
 
 //-------------------------------------------------------------------
-#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 | VERSION==0x0147 || VERSION==0x0140 || VERSION==0x351
+#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 | VERSION==0x0147 || VERSION==0x0140 || VERSION==0x351 || VERSION==0x0250 || VERSION==0x0257
 #define CAN_SET_ACTIVE_ENCODER_POSITION_HANDLER(x) \
 { \
 	long value; \
@@ -728,7 +728,7 @@
 
 
 //-------------------------------------------------------------------
-#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0351
+#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0351 || VERSION==0x0250 || VERSION==0x0257
 #define CAN_SET_ACTIVE_PID_HANDLER(x) \
 { \
 	Int16 value; \
@@ -753,7 +753,7 @@
 #endif
 
 //-------------------------------------------------------------------
-#if VERSION == 0x0153 || VERSION == 0x0113 || VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x351
+#if VERSION == 0x0153 || VERSION == 0x0113 || VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x351 || VERSION==0x0250 || VERSION==0x0257
 #define CAN_SET_ACTIVE_ERROR_HANDLER(x) \
 { \
 	Int16 value; \
@@ -966,12 +966,12 @@
 		} \
    	else if (_control_mode[axis] == MODE_IMPEDANCE_VEL) \
     	{ \
-    	    _control_mode[axis] == MODE_IMPEDANCE_POS; \
+    	    _control_mode[axis] = MODE_IMPEDANCE_POS; \
     		init_trajectory (axis, _position[axis], _position[axis], 1); \
     	} \
    	else if (_control_mode[axis] == MODE_VELOCITY) \
     	{ \
-    	    _control_mode[axis] == MODE_POSITION; \
+    	    _control_mode[axis] = MODE_POSITION; \
     		init_trajectory (axis, _position[axis], _position[axis], 1); \
     	} \
 }
