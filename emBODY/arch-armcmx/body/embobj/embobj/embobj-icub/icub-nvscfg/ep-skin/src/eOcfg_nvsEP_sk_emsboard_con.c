@@ -176,13 +176,13 @@ EOtreenode eo_cfg_nvsEP_sk_emsboard_tree_con[] =
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_sk_emsboard_sconfig__sigmode,
         EO_INIT(.index)     0,
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
+        EO_INIT(.dchildren) NULL
     },             
     {   // 01
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_sk_emsboard_sstatus__arrayof10canframes,
         EO_INIT(.index)     0,
         EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) {0}
+        EO_INIT(.dchildren) NULL
     }
 };  EO_VERIFYsizeof(eo_cfg_nvsEP_sk_emsboard_tree_con, sizeof(EOtreenode)*(varsSKemsboard_TOTALnumber));
 
