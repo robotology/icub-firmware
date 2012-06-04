@@ -42,7 +42,7 @@ extern "C" {
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
-#define EOTREENODE_NCHILDREN      16
+//#define EOTREENODE_NCHILDREN      16
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
@@ -53,13 +53,15 @@ extern "C" {
                 public or private (static) functions of the object and protected data
                 used also by its derived objects.
  **/
-struct EOtreenode_hid       // with EOTREENODE_NCHILDREN = 16 is 24. without ... it is 8 
+struct EOtreenode_hid       // size is 12 
 {
-    void*                   data;                               // pointer to the data 
-    uint16_t                index;                              // index in the array
-    uint8_t                 nchildren;                          // number of dependant netvars
-    uint8_t                 dchildren[EOTREENODE_NCHILDREN];    // using indices in a common array rather than pointers which would require more space      
-};  //EO_VERIFYsizeof(EOtreenode, 24);   
+    void*                   data;           // pointer to the data 
+    uint16_t                index;          // index in the array
+    uint8_t                 nchildren;      // number of children
+    uint8_t*                dchildren;      // if not NULL it contains nchildren relative indices, so that index+dchildren[i]
+                                            // is the index in array of treenodes of the i-th children.
+                                            // if NULL, and nchildren is not zero, then the index is index+(1+i).
+};  //EO_VERIFYsizeof(EOtreenode, 12);   
  
 
 
