@@ -56,7 +56,7 @@ extern EOspeedcurve* eo_speedcurve_New(void);
 
 extern void eo_speedcurve_SetReference(EOspeedcurve *o, int32_t v0, int32_t vf, int32_t acc);
 
-extern void eo_speedcurve_Stop(EOspeedcurve *o, int32_t p);
+extern void eo_speedcurve_Stop(EOspeedcurve *o);
 
 extern eObool_t eo_speedcurve_IsDone(EOspeedcurve* o);
 
