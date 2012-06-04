@@ -131,7 +131,12 @@ extern EOtreenode* eo_treenode_GetChild(EOtreenode *node, uint8_t childpos)
     
     //return(&root[node->index+node->dchildren[childpos]]);
     
-    return(&node[node->dchildren[childpos]]);
+    // use relativeindex as the index to be added to node->index to retrieve teh absolute position inside
+    // the array which contains all teh treenodes. however, node is already in position node->index, thus
+    // we use only relativeindex.
+    uint8_t relativeindex = (NULL == node->dchildren) ? (childpos+1) : (node->dchildren[childpos]);
+    
+    return(&node[relativeindex]);
 }
 
 
