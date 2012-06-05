@@ -68,7 +68,8 @@ typedef struct
 {
     eOsizecntnr_t               inpdatagramnumber;
     eOsizecntnr_t               outdatagramnumber;
-    eOsizeitem_t                datagramsizeof;
+    eOsizeitem_t                inpdatagramsizeof;
+    eOsizeitem_t                outdatagramsizeof;
     eOipv4port_t                localport;
     eObool_t                    usemutex;
 } eOemssocket_cfg_t;
