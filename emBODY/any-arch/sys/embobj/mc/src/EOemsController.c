@@ -220,6 +220,11 @@ extern void eo_emsController_ResetPosPid(uint8_t joint)
     eo_pid_Reset(eo_axisController_GetPosPidPtr(s_emsc->axis_controller[joint]));
 }
 
+extern void eo_emsController_ResetVelPid(uint8_t joint)
+{
+    eo_pid_Reset(eo_axisController_GetVelPidPtr(s_emsc->axis_controller[joint]));
+}
+
 extern void eo_emsController_Stop(uint8_t joint)
 {
     eo_axisController_Stop(s_emsc->axis_controller[joint]);
