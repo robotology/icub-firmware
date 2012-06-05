@@ -229,14 +229,14 @@ set(embobj_source 		${BODY_COMMON_SOURCE}
 						${PROT_SOURCE} 
 						${IPNET_SOURCE} 
 						${HAL_FAKE_SOURCE} 
-						${EXTRA_SOURCE}
 						${PROT_FOLDER}
 						${NVS_EB_SOURCE} 
 						${NVS_MC_SOURCE} 
 						${NVS_MNGMNT_SOURCE} 
 						${NVS_SENSORS_SOURCE} 
 						${NVS_SKIN_SOURCE} 
-						${NVS_USR_SOURCE} )
+						${NVS_USR_SOURCE} 
+						${EXTRA_SOURCE})
 
 
 #set(embobj_header 		${BODY_COMMON_SOURCE} 
