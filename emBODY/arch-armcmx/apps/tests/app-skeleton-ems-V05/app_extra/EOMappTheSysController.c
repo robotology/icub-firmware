@@ -305,6 +305,7 @@ extern eOresult_t eom_appTheSysController_Go2RunState(EOMappTheSysController *p)
 
     s_theSysController.appl_state = applstate_running;
 
+    hal_led_on(hal_led1);
     return(eores_OK);
 
 }
@@ -322,7 +323,8 @@ extern void* eom_appTheSysController_Services_Can_GetHandle(EOMappTheSysControll
 extern eOresult_t eom_appTheSysController_ExitFromRunState(EOMappTheSysController *p)
 {
     s_eom_appTheSysController_Timers_Stop();
-    s_eom_appTheSysController_ConnectedCanBoards_Stop(); 
+    s_eom_appTheSysController_ConnectedCanBoards_Stop();
+    hal_led_off(hal_led1);
     return(eores_OK);   
 }
 
@@ -471,9 +473,7 @@ static void s_eom_appTheSysController_startup(EOMtask *tsk, uint32_t t)
     #warning VALE --> gestisci errore in go2new state
     res = res;
 
-
-    hal_led_off(hal_led0);
-    hal_led_off(hal_led1);
+    hal_led_on(hal_led0);
 } 
 
 

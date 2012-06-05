@@ -88,14 +88,14 @@ extern const eEmoduleInfo_t eom_appSkeletonEms_info_modinfo __attribute__((at(EE
             .signature  = ee_procApplication,
             .version    = 
             { 
-                .major = 1, 
-                .minor = 0
+                .major = 3, 
+                .minor = 3
             },  
             .builddate  = 
             {
                 .year  = 2012,
-                .month = 1,
-                .day   = 11,
+                .month = 6,
+                .day   = 1,
                 .hour  = 18,
                 .min   = 0
             }
@@ -117,7 +117,7 @@ extern const eEmoduleInfo_t eom_appSkeletonEms_info_modinfo __attribute__((at(EE
             .addr   = 0
         },
         .communication  = ee_commtype_eth,  // later on we may also add can1 and can2
-        .name           = "EOMeApplBasic"
+        .name           = "apSkEms-v05"
     },
     .protocols  =
     {

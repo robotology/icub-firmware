@@ -154,17 +154,23 @@ int main(void)
 
 static void s_eom_appSkeletonEms_main_init(void)
 {
+    static uint8_t a = 4;
+    
+    a++;
+    a = a;
     eOmipnet_cfg_addr_t* eomipnet_addr = NULL;
-//    const eEipnetwork_t *ipnet = NULL;
-
+#ifndef _FORCE_NETWORK_FROM_IPAL_CFG
+    const eEipnetwork_t *ipnet = NULL;
+#endif
     
     // ----------------------------------------------------------------------------------------------------------------
     // 1. initialise eeprom and the arm-environmemnt
 
-//    hal_eeprom_init(hal_eeprom_i2c_01, NULL);
-//    eo_armenv_Initialise(&eom_appSkeletonEms_info_modinfo, NULL);
-//    eov_env_SharedData_Synchronise(eo_armenv_GetHandle());
-
+#ifndef _FORCE_NETWORK_FROM_IPAL_CFG
+   hal_eeprom_init(hal_eeprom_i2c_01, NULL);
+   eo_armenv_Initialise(&eom_appSkeletonEms_info_modinfo, NULL);
+   eov_env_SharedData_Synchronise(eo_armenv_GetHandle());
+#endif
 
 
     // ----------------------------------------------------------------------------------------------------------------

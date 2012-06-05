@@ -45,19 +45,19 @@
 
 //   <o> IP0 <0-255> 
 #ifndef REM_IP0
- #define REM_IP0        1
+ #define REM_IP0        10
 #endif
 //   <o> IP1 <0-255> 
 #ifndef REM_IP1
- #define REM_IP1        1
+ #define REM_IP1        0
 #endif
 //   <o> IP2 <0-255> 
 #ifndef REM_IP2
- #define REM_IP2        1
+ #define REM_IP2        0
 #endif
 //   <o> IP3 <0-255> 
 #ifndef REM_IP3
- #define REM_IP3       1
+ #define REM_IP3       254
 #endif
 //  </h> Fixed IP address
 

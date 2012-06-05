@@ -74,8 +74,12 @@
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
+uint32_t ip3 = REM_IP3; 
+uint32_t ip2 = REM_IP2; 
+uint32_t ip1 = REM_IP1; 
+uint32_t ip0 = REM_IP0; 
 
-
+uint32_t  uintip =  ((uint32_t)(((((uint32_t)(REM_IP3))&0xff))<<24)|((((uint32_t)(REM_IP2)&0xff))<<16)|((((uint32_t)(REM_IP1)&0xff))<<8)|(((uint32_t)(REM_IP0)&0xff)));
 extern EOethBaseModule_cfg_t    ethmod_cfg = 
 {
     EO_INIT(.dtagramQueue_itemNum)      DGRAMPAYLOAD_NUM,

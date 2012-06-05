@@ -150,15 +150,15 @@
 
 //   <o> IP0 <0-255> 
 #ifndef IPAL_IP0
- #define IPAL_IP0        1
+ #define IPAL_IP0        10
 #endif
 //   <o> IP1 <0-255> 
 #ifndef IPAL_IP1
- #define IPAL_IP1        1
+ #define IPAL_IP1        10
 #endif
 //   <o> IP2 <0-255> 
 #ifndef IPAL_IP2
- #define IPAL_IP2        1
+ #define IPAL_IP2        10
 #endif
 //   <o> IP3 <0-255> 
 #ifndef IPAL_IP3
