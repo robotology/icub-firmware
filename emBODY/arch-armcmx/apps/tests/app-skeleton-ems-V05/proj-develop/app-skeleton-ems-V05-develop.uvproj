@@ -1155,6 +1155,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOspeedmeter.c</FilePath>
             </File>
+            <File>
+              <FileName>EOspeedcurve.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOspeedcurve.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2500,6 +2505,11 @@
               <FileName>EOspeedmeter.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOspeedmeter.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOspeedcurve.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOspeedcurve.c</FilePath>
             </File>
           </Files>
         </Group>

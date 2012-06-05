@@ -231,7 +231,7 @@ static void s_eom_appMotorController_taskStartup(EOMtask *tsk, uint32_t t)
 
 static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
 {
-    float *pwm;
+    int16_t *pwm;
     eOevent_t evt;
     uint32_t encoders_values[6];
 
