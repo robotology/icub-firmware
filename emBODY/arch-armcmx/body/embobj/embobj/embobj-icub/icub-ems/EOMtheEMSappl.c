@@ -115,7 +115,7 @@ static void s_eom_emsppl_theemsrunner_init(void);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-//static const char s_eobj_ownname[] = "EOMtheEMSappl";
+static const char s_eobj_ownname[] = "EOMtheEMSappl";
 
  
 static EOMtheEMSappl s_emsappl_singleton = 
@@ -123,7 +123,7 @@ static EOMtheEMSappl s_emsappl_singleton =
     EO_INIT(.sm)                NULL,
 	EO_INIT(.cfg) 
     {   
-        EO_INIT(.hostipv4addr)      EO_COMMON_IPV4ADDR(10, 0, 1, 200), 
+        EO_INIT(.hostipv4addr)      EO_COMMON_IPV4ADDR(10, 0, 0, 254), 
         EO_INIT(.hostipv4port)      12345
     }
 };
@@ -136,6 +136,8 @@ static EOMtheEMSappl s_emsappl_singleton =
 
 extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
 {
+    char str[96];
+    
     if(NULL != s_emsappl_singleton.sm)
     {
         return(&s_emsappl_singleton);
@@ -147,6 +149,19 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
     }
 
     memcpy(&s_emsappl_singleton.cfg, emsapplcfg, sizeof(eOemsappl_cfg_t));
+    
+    // tell something
+    snprintf(str, sizeof(str)-1, 
+             "THE EMS APPLICATION IS %s VER %d.%d BUILT ON: %d/%d/%d at %d:%d", 
+             s_emsappl_singleton.cfg.emsappinfo->info.name,
+             s_emsappl_singleton.cfg.emsappinfo->info.entity.version.major,
+             s_emsappl_singleton.cfg.emsappinfo->info.entity.version.minor,
+             s_emsappl_singleton.cfg.emsappinfo->info.entity.builddate.year,
+             s_emsappl_singleton.cfg.emsappinfo->info.entity.builddate.month,
+             s_emsappl_singleton.cfg.emsappinfo->info.entity.builddate.day,
+             s_emsappl_singleton.cfg.emsappinfo->info.entity.builddate.hour,
+             s_emsappl_singleton.cfg.emsappinfo->info.entity.builddate.min);  
+    eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);  
 
     // do whatever is needed
     
@@ -175,7 +190,12 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
     // call usrdef initialise
     eom_emsappl_hid_userdef_initialise(&s_emsappl_singleton);
     
-       
+    
+    // tell things  
+    // tells how much ram we have used so far.
+    snprintf(str, sizeof(str)-1, "used %d bytes of HEAP out of %d so far", eo_mempool_SizeOfAllocated(eo_mempool_GetHandle()), eom_sys_GetHeapSize(eom_sys_GetHandle()));  
+    eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);    
+    
     // finally ... start the state machine which enters in cfg mode    
     eo_sm_Start(s_emsappl_singleton.sm);
         
@@ -249,14 +269,15 @@ static void s_eom_emsappl_environment_init(void)
 
 static void s_eom_emsappl_ipnetwork_init(void)
 {
-
+    char str[128];
     eOmipnet_cfg_addr_t* eomipnet_addr = NULL;
+    uint8_t *ipaddr = NULL;
     const eEipnetwork_t *ipnet = NULL;
     extern const ipal_cfg_t    ipal_cfg;
     const eOmipnet_cfg_dtgskt_t eom_emsappl_specialise_dtgskt_cfg = 
     {   
         .numberofsockets            = 1, 
-        .maxdatagramenqueuedintx    = 2
+        .maxdatagramenqueuedintx    = 2         // used to allocate an osal messagequeue to keep tracks of the datagram one wants to tx at a given time. 1 is enough, but 2 does not waste ram
     };
 
     // ----------------------------------------------------------------------------------------------------------------
@@ -268,12 +289,14 @@ static void s_eom_emsappl_ipnetwork_init(void)
     if(eores_OK == eov_env_IPnetwork_Get(eo_armenv_GetHandle(), &ipnet))
     {
         eomipnet_addr = (eOmipnet_cfg_addr_t*)ipnet;   //they have the same memory layout
+        ipaddr = (uint8_t*)&(eomipnet_addr->ipaddr);
     }
     else
 #endif
     {   
         ipnet = ipnet;
         eomipnet_addr = NULL;
+        ipaddr = (uint8_t*)&(ipal_cfg.eth_ip);
     }
 
 
@@ -285,6 +308,9 @@ static void s_eom_emsappl_ipnetwork_init(void)
                          eomipnet_addr,
                          &eom_emsappl_specialise_dtgskt_cfg
                          );
+
+    snprintf(str, sizeof(str)-1, "started EOMtheEMSappl::ipnet with IP addr: %d.%d.%d.%d\n\r", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]);
+    eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);
 
 
 }
@@ -322,6 +348,7 @@ static void s_eom_emsppl_theemsrunner_init(void)
 {
     eom_emsrunner_Initialise(NULL);
 }
+
 
 
 

@@ -33,6 +33,7 @@
 #include "EOMmutex.h"
 
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -59,11 +60,12 @@
 
 const eOemssocket_cfg_t eom_emssocket_DefaultCfg = 
 {
-    EO_INIT(.inpdatagramnumber)         2, 
+    EO_INIT(.inpdatagramnumber)         3, 
     EO_INIT(.outdatagramnumber)         1, 
-    EO_INIT(.datagramsizeof)            768, 
+    EO_INIT(.inpdatagramsizeof)         768, 
+    EO_INIT(.outdatagramsizeof)         1024,
     EO_INIT(.localport)                 12345, 
-    EO_INIT(.usemutex)                  eobool_false
+    EO_INIT(.usemutex)                  eobool_true
 };
 
 
@@ -91,11 +93,12 @@ static EOMtheEMSsocket s_emssocket_singleton =
     EO_INIT(.socket)                        NULL,
 	EO_INIT(.cfg) 
     {
-        EO_INIT(.inpdatagramnumber)         2, 
+        EO_INIT(.inpdatagramnumber)         3, 
         EO_INIT(.outdatagramnumber)         1, 
-        EO_INIT(.datagramsizeof)            768, 
+        EO_INIT(.inpdatagramsizeof)         768, 
+        EO_INIT(.outdatagramsizeof)         1024,
         EO_INIT(.localport)                 12345,
-        EO_INIT(.usemutex)                  eobool_false
+        EO_INIT(.usemutex)                  eobool_true
     },
     EO_INIT(.rxpkt)                         NULL,
     EO_INIT(.txpkt)                         NULL,
@@ -130,12 +133,12 @@ extern EOMtheEMSsocket * eom_emssocket_Initialise(const eOemssocket_cfg_t *cfg)
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "the EOMtheIPnet has not started yet");
     }
 
-    s_emssocket_singleton.socket = eo_socketdtg_New(    cfg->inpdatagramnumber, cfg->datagramsizeof, (eobool_true == cfg->usemutex) ? (eom_mutex_New()) : (NULL), 
-                                                        cfg->outdatagramnumber, cfg->datagramsizeof, (eobool_true == cfg->usemutex) ? (eom_mutex_New()) : (NULL)
+    s_emssocket_singleton.socket = eo_socketdtg_New(    cfg->inpdatagramnumber, cfg->inpdatagramsizeof, (eobool_true == cfg->usemutex) ? (eom_mutex_New()) : (NULL), 
+                                                        cfg->outdatagramnumber, cfg->outdatagramsizeof, (eobool_true == cfg->usemutex) ? (eom_mutex_New()) : (NULL)
                                                     );
                                                     
-    s_emssocket_singleton.rxpkt = eo_packet_New(cfg->datagramsizeof);                                                
-    //s_emssocket_singleton.txpkt = eo_packet_New(cfg->datagramsizeof); 
+    s_emssocket_singleton.rxpkt = eo_packet_New(cfg->inpdatagramsizeof);                                                
+    //s_emssocket_singleton.txpkt = eo_packet_New(cfg->outdatagramsizeof); 
     
     s_emssocket_singleton.active = eobool_false;
     
@@ -177,7 +180,10 @@ extern eOresult_t eom_emssocket_Open(EOMtheEMSsocket *p, EOaction* withactiononr
         
         if(eores_OK == res)
         {
+            char str[96];
             p->active = eobool_true;
+            snprintf(str, sizeof(str)-1, "started socket listeing on local port %d\n\r", p->cfg.localport);
+            eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);                        
         }
     }                        
                             

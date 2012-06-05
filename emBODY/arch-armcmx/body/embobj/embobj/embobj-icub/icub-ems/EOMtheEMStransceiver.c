@@ -22,6 +22,8 @@
 
 
 #include "stdlib.h"
+#include "stdio.h"
+#include "string.h"
 #include "EoCommon.h"
 
 #include "EOtheMemoryPool.h"
@@ -79,7 +81,7 @@ const eOemstransceiver_cfg_t eom_emstransceiver_DefaultCfg =
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-//static const char s_eobj_ownname[] = "EOMtheEMStransceiver";
+static const char s_eobj_ownname[] = "EOMtheEMStransceiver";
 
  
 static EOMtheEMStransceiver s_emstransceiver_singleton = 
@@ -108,7 +110,11 @@ extern EOMtheEMStransceiver * eom_emstransceiver_Initialise(const eOemstransceiv
     
  
     s_emstransceiver_singleton.transceiver = eo_boardtransceiver_Initialise(eom_emstransceiver_hid_userdef_get_cfg(cfg));
-                                                   
+    
+    char str[96];
+    uint8_t *ipaddr = (uint8_t*) &cfg->hostipv4addr;
+    snprintf(str, sizeof(str)-1, "initted with host: IP = %d.%d.%d.%d, port = %d\n\r", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3], cfg->hostipv4port);
+    eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);    
     
     return(&s_emstransceiver_singleton);
 }
@@ -184,64 +190,26 @@ extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** tx
 
 __weak extern eOboardtransceiver_cfg_t* eom_emstransceiver_hid_userdef_get_cfg(const eOemstransceiver_cfg_t *cfg)
 {
-#define USE_EB7
+    const eo_transceiver_sizes_t sizes =   
+    {
+        .capacityofpacket               = 1024,
+        .capacityofrop                  = 256,
+        .capacityofropframeregulars     = 768,
+        .capacityofropframeoccasionals  = 128,
+        .capacityofropframereplies      = 128,
+        .maxnumberofregularrops         = 32
+    };   
+    static eOboardtransceiver_cfg_t boardtxrxcfg =  {0};
 
-#if     defined(USE_EB1)
-    extern const EOconstvector* const eo_cfg_EPs_vectorof_eb1;
-    extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb1_fptr_hashfunction_ep2index;  
-    const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb1;
-    eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb1_fptr_hashfunction_ep2index;
-#elif   defined(USE_EB2)
-    extern const EOconstvector* const eo_cfg_EPs_vectorof_eb2;
-    extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb2_fptr_hashfunction_ep2index;
-    const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb2;
-    eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb2_fptr_hashfunction_ep2index;
-#elif   defined(USE_EB3)
-    extern const EOconstvector* const eo_cfg_EPs_vectorof_eb3;
-    extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb3_fptr_hashfunction_ep2index;
-    const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb3;
-    eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb3_fptr_hashfunction_ep2index;
-#elif   defined(USE_EB4)
-    extern const EOconstvector* const eo_cfg_EPs_vectorof_eb4;
-    extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb4_fptr_hashfunction_ep2index;
-    const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb4;
-    eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb4_fptr_hashfunction_ep2index;
-#elif   defined(USE_EB5)
-    extern const EOconstvector* const eo_cfg_EPs_vectorof_eb5;
-    extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb5_fptr_hashfunction_ep2index;
-    const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb5;
-    eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb5_fptr_hashfunction_ep2index;
-#elif   defined(USE_EB6)
-    extern const EOconstvector* const eo_cfg_EPs_vectorof_eb6;
-    extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb6_fptr_hashfunction_ep2index;
-    const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb6;
-    eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb6_fptr_hashfunction_ep2index;
-#elif   defined(USE_EB7)
-    extern const EOconstvector* const eo_cfg_EPs_vectorof_eb7;
-    extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb7_fptr_hashfunction_ep2index;
-    const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb7;
-    eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb7_fptr_hashfunction_ep2index;    
-#elif   defined(USE_EB8)
-    extern const EOconstvector* const eo_cfg_EPs_vectorof_eb8;
-    extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb8_fptr_hashfunction_ep2index;
-    const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb8;
-    eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb8_fptr_hashfunction_ep2index;
-#elif   defined(USE_EB9)
-    extern const EOconstvector* const eo_cfg_EPs_vectorof_eb9;
-    extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb9_fptr_hashfunction_ep2index;
-    const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb9;
-    eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb9_fptr_hashfunction_ep2index;
-#endif    
 
-    static eOboardtransceiver_cfg_t boardtxrxcfg;
-
- 
+#if 0 
     boardtxrxcfg.vectorof_endpoint_cfg          = vectorof_endpoint_cfg;
     boardtxrxcfg.hashfunction_ep2index          = hashfunction_ep2index;
     boardtxrxcfg.remotehostipv4addr             = cfg->hostipv4addr;
     boardtxrxcfg.remotehostipv4port             = cfg->hostipv4port;
-    boardtxrxcfg.tobedefined                    = 0;
-
+    memcpy(&boardtxrxcfg.sizes, &sizes, sizeof(eo_transceiver_sizes_t));
+#endif
+    
     return(&boardtxrxcfg);
 }
 
