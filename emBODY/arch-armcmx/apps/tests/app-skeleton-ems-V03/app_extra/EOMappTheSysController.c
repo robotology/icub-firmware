@@ -338,11 +338,15 @@ static void s_eom_appTheSysController_run(EOMtask *tsk, uint32_t evtmsgper)
 
 }
 
-#define MC_START   1
-#define MC_STOP    2
-#define MC_SET_POS 3
-#define MC_SET_PID 4
-#define MC_SET_LIM 5
+#define MC_START       1
+#define MC_STOP        2
+#define MC_SET_POS     3
+#define MC_SET_POS_PID 4
+#define MC_SET_POS_LIM 5
+#define MC_SET_VEL     6
+#define MC_SET_VEL_PID 7
+#define MC_SET_VEL_LIM 8
+#define MC_SET_OFFSET  9
 
 static void s_eom_appTheSysController_recDgram_mng(EOMappTheSysController *p)
 {
@@ -379,6 +383,7 @@ static void s_eom_appTheSysController_recDgram_mng(EOMappTheSysController *p)
                 
                 eo_emsController_Stop(0);
                 eo_emsController_ResetPosPid(0);
+                eo_emsController_ResetVelPid(0);
                 pwm_out = 0;
             }
             
@@ -391,22 +396,23 @@ static void s_eom_appTheSysController_recDgram_mng(EOMappTheSysController *p)
             int32_t pos = *(int32_t*)(payload_ptr+4);
             int32_t vel = *(int32_t*)(payload_ptr+8);
 
-            eo_emsController_SetPosRef(joint,pos,vel);
+            eo_emsController_SetPosRef(joint, pos, vel);
         }
         break;
 
-        case MC_SET_PID:
+        case MC_SET_POS_PID:
         {
             uint8_t joint = payload_ptr[1];
-            float kp = *(float*)(payload_ptr+4);
-            float kd = *(float*)(payload_ptr+8);
-            float ki = *(float*)(payload_ptr+12);
+            int32_t kp = *(int32_t*)(payload_ptr+4);
+            int32_t kd = *(int32_t*)(payload_ptr+8);
+            int32_t ki = *(int32_t*)(payload_ptr+12);
+            uint8_t shift = *(uint8_t*)(payload_ptr+16);
 
-            eo_emsController_SetPosPid(joint,kp,kd,ki);
+            eo_emsController_SetPosPid(joint, kp, kd, ki, shift);
         }
         break;
 
-        case MC_SET_LIM:
+        case MC_SET_POS_LIM:
         {
             uint8_t joint = payload_ptr[1];
             int16_t Ymax = *(int16_t*)(payload_ptr+4);
@@ -415,6 +421,48 @@ static void s_eom_appTheSysController_recDgram_mng(EOMappTheSysController *p)
             eo_emsController_SetPosPidLimits(joint, Ymax, Imax);
         }
         break;
+
+        case MC_SET_VEL:
+        {
+            uint8_t joint = payload_ptr[1];
+            int32_t vel = *(int32_t*)(payload_ptr+4);
+            int32_t acc = *(int32_t*)(payload_ptr+8);
+
+            eo_emsController_SetVelRef(joint, vel, acc);
+        }
+        break;
+
+        case MC_SET_VEL_PID:
+        {
+            uint8_t joint = payload_ptr[1];
+            int32_t kp = *(int32_t*)(payload_ptr+4);
+            int32_t kd = *(int32_t*)(payload_ptr+8);
+            int32_t ki = *(int32_t*)(payload_ptr+12);
+            uint8_t shift = *(uint8_t*)(payload_ptr+16);
+
+            eo_emsController_SetVelPid(joint, kp, kd, ki, shift);
+        }
+        break;
+
+        case MC_SET_VEL_LIM:
+        {
+            uint8_t joint = payload_ptr[1];
+            int16_t Ymax = *(int16_t*)(payload_ptr+4);
+            int16_t Imax = *(int16_t*)(payload_ptr+8);
+
+            eo_emsController_SetVelPidLimits(joint, Ymax, Imax);
+        }
+        break;
+
+        case MC_SET_OFFSET:
+        {
+            uint8_t joint = payload_ptr[1];
+            int16_t off = *(int16_t*)(payload_ptr+4);
+            
+            eo_emsController_SetOffset(joint, off);
+        }
+        break;
+
     }
 
     /*

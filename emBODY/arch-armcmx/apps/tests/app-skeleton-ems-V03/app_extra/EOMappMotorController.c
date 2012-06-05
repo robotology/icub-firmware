@@ -222,15 +222,17 @@ static void s_eom_appMotorController_taskStartup(EOMtask *tsk, uint32_t t)
     eo_emsController_Init(1, EMS_GENERIC);
 
     eo_emsController_SetPosLimits(0, 0, 4095);
-    eo_emsController_SetVelMax(0, 40960.0f);
-    eo_emsController_SetPosPid(0, 5.0f, 0.2f, 0.0f);
+    eo_emsController_SetVelMax(0, 4096);
+    eo_emsController_SetPosPid(0, 100*1024, 4*1024, 1024/2, 10);
     eo_emsController_SetPosPidLimits(0, 0x7FFF, 1024);
-    eo_emsController_SetControlMode(0, CM_POSITION);
+    eo_emsController_SetVelPid(0, 50*1024, 2*1024, 1024/20, 10);
+    eo_emsController_SetVelPidLimits(0, 4096, 1024);
+    eo_emsController_SetControlMode(0, CM_VELOCITY);
 }
 
 static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
 {
-    float *pwm;
+    int16_t *pwm;
     eOevent_t evt;
 
     uint32_t encoder_raw[6];
@@ -265,25 +267,7 @@ static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
             encoder_raw[0]&=0x0FFF;
 
             eo_emsController_ReadEncoders((int32_t*)encoder_raw);
-
-            encoder_can = encoder_raw[0];
         }
-    
-        /*
-        static uint32_t cycle = 0;
-
-        if (++cycle%2000==2)
-        {
-            if (encoder_can<2048)
-            {
-                eo_emsController_SetPosRef(0, 3072, 1024);
-            }
-            else
-            {
-                eo_emsController_SetPosRef(0, 1024, 512);
-            }       
-        }
-        */
 
         static eObool_t must_reset = eobool_true;
 
@@ -296,7 +280,7 @@ static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
         /* 2) pid calc */
         pwm = eo_emsController_PWM();
         
-        pwm_out = -(int16_t)pwm[0];
+        pwm_out = -pwm[0];
 
         /* 3) reset my state */
         p->st = eOm_appMotorController_st__active;
