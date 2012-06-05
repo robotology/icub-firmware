@@ -1,6 +1,6 @@
-# Copyright: (C) 2007-2010 RobotCub Consortium
-# Authors: Marco Maggiali, Marco Randazzo
-# CopyPolicy: Released under the terms of the GNU GPL v2.0.
+//# Copyright: (C) 2007-2010 RobotCub Consortium
+//# Authors: Marco Maggiali, Marco Randazzo
+//# CopyPolicy: Released under the terms of the GNU GPL v2.0.
 
 ///
 /// $Id: controller.h,v 1.1 2006/06/09 09:34:14 pasa Exp $
