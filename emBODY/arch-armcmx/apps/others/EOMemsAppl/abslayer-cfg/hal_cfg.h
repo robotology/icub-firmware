@@ -59,13 +59,13 @@
 //   <o> stack size         <0x0-0xFFFFFFFF:8>
 //   <i> define how much stack you want.
 #ifndef HAL_SYS_STACKSIZE
- #define HAL_SYS_STACKSIZE      0x00002000
+ #define HAL_SYS_STACKSIZE      0x00001000
 #endif
 
 //   <o> heap size         <0x0-0xFFFFFFFF:8>
 //   <i> define how much heap you want.
 #ifndef HAL_SYS_HEAPSIZE
- #define HAL_SYS_HEAPSIZE      0x0000B000
+ #define HAL_SYS_HEAPSIZE      0x0000C000
 #endif
 
 
@@ -133,17 +133,17 @@
 // <i> sssssssss
 
 #ifndef HAL_CAN1_ENABLE
- #define HAL_CAN1_ENABLE  0     
+ #define HAL_CAN1_ENABLE  1     
 #endif
 
 
 //   <o> Max can frames in input buffer <1-16>
 //   <i> Default: 4
-#define HAL_CAN1_INPBUFFCAPACITY     2
+#define HAL_CAN1_INPBUFFCAPACITY     16
 
 //   <o> Max can frames in output buffer <1-16>
 //   <i> Default: 4
-#define HAL_CAN1_OUTBUFFCAPACITY     30
+#define HAL_CAN1_OUTBUFFCAPACITY     16
 
 
 // </e> CAN 0  
@@ -154,17 +154,17 @@
 // <i> sssssssss
 
 #ifndef HAL_CAN2_ENABLE
- #define HAL_CAN2_ENABLE  0     
+ #define HAL_CAN2_ENABLE  1     
 #endif
 
 
 //   <o> Max can frames in input buffer <1-16>
 //   <i> Default: 4
-#define HAL_CAN2_INPBUFFCAPACITY     2
+#define HAL_CAN2_INPBUFFCAPACITY     16
 
 //   <o> Max can frames in output buffer <1-16>
 //   <i> Default: 4
-#define HAL_CAN2_OUTBUFFCAPACITY     1
+#define HAL_CAN2_OUTBUFFCAPACITY     16
 
 
 // </e> CAN 2  
@@ -174,7 +174,7 @@
 // <i> SPI1 peripheral
 
 #ifndef HAL_SPI1_ENABLE
- #define HAL_SPI1_ENABLE  0     
+ #define HAL_SPI1_ENABLE  1     
 #endif
 
 //   <h> Nothing to configure in SPI1 part
@@ -187,7 +187,7 @@
 // <i> SPI2 peripheral
 
 #ifndef HAL_SPI2_ENABLE
- #define HAL_SPI2_ENABLE  0     
+ #define HAL_SPI2_ENABLE  1     
 #endif
 
 //   <h> Nothing to configure in SPI2 part
@@ -200,7 +200,7 @@
 // <i> SPI3 peripheral
 
 #ifndef HAL_SPI3_ENABLE
- #define HAL_SPI3_ENABLE  0     
+ #define HAL_SPI3_ENABLE  1     
 #endif
 
 //   <h> Nothing to configure in SPI3 part
@@ -214,7 +214,7 @@
 
 //   <o> Max number of timers <0-7>
 //   <i> Default: 2
-#define HAL_TIMERS_NUMBER     4
+#define HAL_TIMERS_NUMBER     5
 
 // </h> Timers    
 

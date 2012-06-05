@@ -35,6 +35,8 @@
 
 #include "EOMtheSystem.h"
 
+#include "eom_emsappl_ebx.h"
+
 
 extern const hal_cfg_t     hal_cfg;
 extern const osal_cfg_t    osal_cfg;
@@ -63,7 +65,8 @@ extern const osal_cfg_t    osal_cfg;
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -116,7 +119,7 @@ extern const eEmoduleInfo_t eom_emsappl_info_modinfo __attribute__((at(EENV_MEMM
             .addr   = 0
         },
         .communication  = ee_commtype_eth,  // later on we may also add can1 and can2
-        .name           = "EOMemsAppl"
+        .name           = EMSAPPL_NAME
     },
     .protocols  =
     {

@@ -53,8 +53,6 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-
-
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
@@ -143,6 +141,7 @@ static void s_eom_emsappl_main_init(void)
     memcpy(&cfg, &eom_emsappl_DefaultCfg, sizeof(eOemsappl_cfg_t));
     cfg.emsappinfo = &eom_emsappl_info_modinfo;
     cfg.hostipv4addr = EO_COMMON_IPV4ADDR(10, 255, 72, 205);
+    //cfg.hostipv4addr = EO_COMMON_IPV4ADDR(10, 0, 0, 254);
     cfg.hostipv4port = 33333;
     
     eom_emsappl_Initialise(&cfg);
@@ -168,67 +167,6 @@ static void s_eom_emsappl_main_startup_OnError(eOerrmanErrorType_t errtype, eOid
     for(;;);
 }
 
-
-// //////////////////////////////////////////////////////////////////////////////
-// // old s_eom_emsappl_main_init():
-// #if 0    
-//     //uint8_t *ipaddr = (uint8_t*)&(eom_emsappl_info_ipal_cfg->eth_ip);
-//     eOmipnet_cfg_addr_t* eomipnet_addr = NULL;
-//     const eEipnetwork_t *ipnet = NULL;
-
-//     
-//     // ----------------------------------------------------------------------------------------------------------------
-//     // 1. initialise eeprom and the arm-environmemnt
-
-//     hal_eeprom_init(hal_eeprom_i2c_01, NULL);
-//     eo_armenv_Initialise(&eom_emsappl_info_modinfo, NULL);
-//     eov_env_SharedData_Synchronise(eo_armenv_GetHandle());
-
-
-
-//     // ----------------------------------------------------------------------------------------------------------------
-//     // 2. initialise the parameters for ipnet with params taken from the arm-environment (or from ipal-cfg)
-
-
-//     // retrieve the configuration for ipnetwork
-// #ifndef _FORCE_NETWORK_FROM_IPAL_CFG
-//     if(eores_OK == eov_env_IPnetwork_Get(eo_armenv_GetHandle(), &ipnet))
-//     {
-//         eomipnet_addr = (eOmipnet_cfg_addr_t*)ipnet;   //they have the same memory layout
-
-//         //ipaddr = (uint8_t*)&(eomipnet_addr->ipaddr);
-//     }
-
-//     else
-// #endif
-//     {
-//         eomipnet_addr = NULL;
-//         //ipaddr = (uint8_t*)&(eom_emsappl_info_ipal_cfg->eth_ip);
-//     }
-
-
-//     // ----------------------------------------------------------------------------------------------------------------
-//     // 3. start the ipnet
-
-//     eom_ipnet_Initialise(&eom_ipnet_DefaultCfg,
-//                          eom_emsappl_specialise_ipal_cfg, 
-//                          eomipnet_addr,
-//                          &eom_emsappl_specialise_dtgskt_cfg
-//                          );
-
-
-
-//     // ----------------------------------------------------------------------------------------------------------------
-//     // 5. start task-upd-server
-
-//     eom_emsappl_specialise_updserver_start();  
-
-
-//     // ----------------------------------------------------------------------------------------------------------------
-//     // 5. call specialisation function
-
-//     eom_emsappl_specialise_otherthings();
-// #endif
 
 
 // --------------------------------------------------------------------------------------------------------------------

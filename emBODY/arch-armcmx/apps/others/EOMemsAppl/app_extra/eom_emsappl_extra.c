@@ -46,9 +46,16 @@
 
 
 // -- nvs part
+#define USE_EB2
 
 // all that is enough for the local board
+
+#if     defined(USE_EB2)
+#include "eOcfg_EPs_eb2.h"
+#elif   defined(USE_EB7)
 #include "eOcfg_EPs_eb7.h"
+#endif
+
 #include "EOtheBOARDtransceiver.h"
 
 
@@ -239,6 +246,24 @@ static void s_eom_emsappl_extra_asimm_receive(EOpacket* rxpkt)
 
 static void s_eom_emsappl_extra_protocoltransceiver_init(void)
 {
+#if     defined(USE_EB2)
+    eOboardtransceiver_cfg_t boardtxrxcfg = 
+    {
+        .vectorof_endpoint_cfg          = eo_cfg_EPs_vectorof_eb2,
+        .hashfunction_ep2index          = eo_cfg_nvsEP_eb2_fptr_hashfunction_ep2index,
+        .remotehostipv4addr             = nvs_pc104_ipaddress,
+        .remotehostipv4port             = nvs_base_endpoint_iport,
+        .sizes                          = 
+        {
+            .capacityofpacket               = 1024,
+            .capacityofrop                  = 256,
+            .capacityofropframeregulars     = 768,
+            .capacityofropframeoccasionals  = 128,
+            .capacityofropframereplies      = 128,
+            .maxnumberofregularrops         = 32
+        }
+    };    
+#elif   defined(USE_EB7)
     eOboardtransceiver_cfg_t boardtxrxcfg = 
     {
         .vectorof_endpoint_cfg          = eo_cfg_EPs_vectorof_eb7,
@@ -247,7 +272,7 @@ static void s_eom_emsappl_extra_protocoltransceiver_init(void)
         .remotehostipv4port             = nvs_base_endpoint_iport,
         .tobedefined                    = 0
     };    
-
+#endif    
     ems00txrx = eo_boardtransceiver_Initialise(&boardtxrxcfg);
 
 }
