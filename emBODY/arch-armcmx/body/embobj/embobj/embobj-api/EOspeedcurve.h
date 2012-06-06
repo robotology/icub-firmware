@@ -54,15 +54,16 @@ typedef struct EOspeedcurve_hid EOspeedcurve;
  **/
 extern EOspeedcurve* eo_speedcurve_New(void);
 
-extern void eo_speedcurve_SetReference(EOspeedcurve *o, int32_t v0, int32_t vf, int32_t acc);
+extern void eo_speedcurve_SetReference(EOspeedcurve *o, int32_t p0, int32_t v0, int32_t vf, int32_t acc);
 
-extern void eo_speedcurve_Stop(EOspeedcurve *o);
+extern void eo_speedcurve_Stop(EOspeedcurve *o, int32_t p);
 
 extern eObool_t eo_speedcurve_IsDone(EOspeedcurve* o);
 
 extern int32_t eo_speedcurve_GetVel(EOspeedcurve* o);
 
-extern int32_t eo_speedcurve_Step(EOspeedcurve* o, int32_t delta, int32_t* v);
+extern void eo_speedcurve_Step(EOspeedcurve* o, int32_t* p, int32_t* v, int32_t *a);
+//extern int32_t eo_speedcurve_Step2(EOtrajectory* o, int32_t *p, int32_t *v, int32_t *a)
 
 /** @}            
     end of group eo_trajectory  

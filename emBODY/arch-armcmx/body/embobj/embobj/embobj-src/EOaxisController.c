@@ -58,8 +58,8 @@ extern int16_t encoder_can;
 // --------------------------------------------------------------------------------------------------------------------
 
 static int32_t limit(int32_t x, int32_t min, int32_t max);
-static void compute_velocity_ref(EOaxisController *o);
-static void compute_torque_ref(EOaxisController *o);
+
+//static void compute_torque_ref(EOaxisController *o);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -92,18 +92,10 @@ extern EOaxisController* eo_axisController_New(void)
         o->pos_max = 0;
         o->vel_max = 5000;
 
-        o->encpos_meas = 0;
         o->torque_meas = 0;
-
-        o->pos_vel_bias = 0;
-        o->vel_ref      = 0;
-        o->acc_ref_step = 0;
+        
         o->vel_timer    = 0;
         o->vel_timeout  = FREQUENCY/10;
-
-        o->pos_out      = 0;
-        o->vel_out      = 0;
-        o->vel_out_step = 0;
 
         o->torque_ref = 0;
         o->torque_out = 0;
@@ -117,6 +109,10 @@ extern EOaxisController* eo_axisController_New(void)
         o->pwm_offset = 0;
 
         o->control_mode = CM_IDLE;
+
+        o->pos_ref = 0;
+        o->vel_ref = 0;
+        o->first_run = eobool_true;
     }
 
     return o;
@@ -140,8 +136,6 @@ extern void eo_axisController_SetStiffness(EOaxisController *o, int32_t stiffnes
 
 extern void eo_axisController_ReadEncPos(EOaxisController *o, int32_t pos)
 {
-    o->encpos_meas = pos;
-
     eo_speedometer_EncoderValid(o->speedmeter, pos);
 } 
 
@@ -168,10 +162,18 @@ extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_
         o->control_mode = CM_POSITION;
     }
 
+    if (o->first_run)
+    {
+        o->first_run = eobool_false;
+
+        o->pos_ref = eo_speedometer_GetPosition(o->speedmeter);
+        o->pos_ref = eo_speedometer_GetSpeed(o->speedmeter);
+    }
+
     eo_trajectory_SetReference(o->trajectory, 
-                               o->encpos_meas,
+                               o->pos_ref,
                                limit(pos,  o->pos_min, o->pos_max), 
-                               eo_speedometer_GetSpeed(o->speedmeter),//eo_trajectory_GetVel(o->trajectory),
+                               o->vel_ref,//eo_trajectory_GetVel(o->trajectory),
                                0, 
                                limit(vel, -o->vel_max, o->vel_max));
 }
@@ -189,8 +191,17 @@ extern void eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_
         o->control_mode = CM_VELOCITY;
     }
 
-    eo_speedcurve_SetReference(o->speedcurve, 
-                               eo_speedometer_GetSpeed(o->speedmeter), 
+    if (o->first_run)
+    {
+        o->first_run = eobool_false;
+
+        o->pos_ref = eo_speedometer_GetDistance(o->speedmeter);
+        o->pos_ref = eo_speedometer_GetSpeed(o->speedmeter);
+    }
+
+    eo_speedcurve_SetReference(o->speedcurve,
+                               o->pos_ref,
+                               o->vel_ref, 
                                limit(vel, -o->vel_max, o->vel_max), 
                                acc); 
 }
@@ -218,8 +229,6 @@ extern uint8_t eo_axisController_SetControlMode(EOaxisController *o, control_mod
         case CM_VELOCITY:
         {
             o->control_mode = CM_VELOCITY;
-
-            o->vel_ref = 0;
 
             break;
         }
@@ -268,38 +277,20 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
             return 0;
 
         case CM_OPENLOOP:
-            encoder_can = eo_speedometer_GetSpeed(o->speedmeter);
-
-            posref_can = o->pwm_offset;
-
             return o->pwm_offset;
 
         case CM_VELOCITY:
         {
-            int32_t delta = eo_speedometer_GetDelta(o->speedmeter);
-            int32_t rabbit = eo_speedcurve_Step(o->speedcurve, delta, &(o->vel_out));
+            int32_t distance = eo_speedometer_GetDistance(o->speedmeter);
+            int32_t speed = eo_speedometer_GetSpeed(o->speedmeter);
 
-            /*
-            static float rabbit=0.0f;
-            rabbit += PERIOD*(float)(o->vel_out)-(float)delta;
-            static float integral=0.0f;
-            integral += rabbit;
+            eo_speedcurve_Step(o->speedcurve, &(o->pos_ref), &(o->vel_ref), NULL);
 
+            encoder_can = speed;
+            posref_can = o->vel_ref;
 
-
-            int16_t pwm = (int16_t)(50.0f*rabbit+0.05f*integral);
-
-            if (pwm> 4096) pwm= 4096;
-            if (pwm<-4096) pwm=-4096;
-            
-            return pwm;
-            */
-
-            encoder_can = eo_speedometer_GetSpeed(o->speedmeter);
-            posref_can = (int32_t)o->vel_out;
-
-            //return eo_pid_PWM(o->pidV, o->vel_out - speed);
-            return eo_pid_PWM(o->pidV, rabbit);
+            //return eo_pid_PWM(o->pidV, pos_ref - distance);
+            return eo_pid_PWM2(o->pidV, o->pos_ref - distance, o->vel_ref - speed);
         }
 
         case CM_IMPEDANCE_VEL:
@@ -320,24 +311,24 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
         case CM_POSITION:
         case CM_CALIB_ABS_AND_INC:
         {
-            eo_trajectory_Step(o->trajectory, &(o->pos_out), &(o->vel_out), 0);
-
+            int32_t position = eo_speedometer_GetPosition(o->speedmeter);
             int32_t speed = eo_speedometer_GetSpeed(o->speedmeter);
 
-            encoder_can = o->encpos_meas;
+            eo_trajectory_Step(o->trajectory, &(o->pos_ref), &(o->vel_ref), NULL);
 
-            posref_can = (int16_t)o->pos_out;
+            encoder_can = position;
+            posref_can = o->pos_ref;
             
-            int16_t pwm = eo_pid_PWM2(o->pidP, o->pos_out - o->encpos_meas, o->vel_out - speed);
-
-            //pwm = (pwm * (30000 + speed*speed)) / (10000 + speed*speed); 
-
-            return pwm;
+            //return eo_pid_PWM(o->pidP, pos_ref - position);
+            return eo_pid_PWM2(o->pidP, o->pos_ref - position, o->vel_ref - speed);
         }
 
         case CM_IMPEDANCE_POS:
         {
-            eo_trajectory_Step(o->trajectory, &(o->pos_out), &(o->vel_out), 0);
+            int32_t pos_ref;
+            int32_t vel_ref;
+
+            eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref, 0);
 
             //compute_torque_ref(o);//
 
@@ -359,8 +350,8 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
 
 extern void eo_axisController_Stop(EOaxisController *o)
 {
-    eo_trajectory_Abort(o->trajectory, o->encpos_meas);
-    eo_speedcurve_Stop(o->speedcurve);
+    eo_trajectory_Stop(o->trajectory, eo_speedometer_GetPosition(o->speedmeter));
+    eo_speedcurve_Stop(o->speedcurve, eo_speedometer_GetDistance(o->speedmeter));
 }
 
 extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o)
@@ -401,56 +392,6 @@ static int32_t limit(int32_t x, int32_t min, int32_t max)
 }
 
 /*
-static void compute_velocity_ref(EOaxisController *o)
-{
-    float last_pos_out = o->pos_out;
-
-    float vel_err = o->vel_ref - o->vel_out;
-
-    if (vel_err != 0.0f)
-    {
-        if (vel_err < -o->acc_ref_step)
-        {
-            o->vel_out = limit(o->vel_out - o->acc_ref_step, -o->vel_max, o->vel_max);
-        }
-        else if (vel_err > o->acc_ref_step)
-        {
-            o->vel_out = limit(o->vel_out + o->acc_ref_step, -o->vel_max, o->vel_max);
-        }
-        else
-        {
-            o->vel_out = limit(o->vel_ref, -o->vel_max, o->vel_max);
-        }
-
-        o->vel_out_step = o->vel_out * PERIOD;
-    }
-
-    eo_trajectory_Step(o->trajectory, &(o->pos_out), &(o->vel_out));            
-    o->pos_vel_bias += o->vel_out_step;
-    o->pos_out += o->pos_vel_bias;
-
-    if (o->pos_out < o->pos_min && o->pos_out < last_pos_out)
-    {
-        o->pos_out = o->pos_min;
-        o->vel_ref = 0.0f;
-    }
-    else if (o->pos_out > o->pos_max && o->pos_out > last_pos_out)
-    {
-        o->pos_out = o->pos_max;
-        o->vel_ref = 0.0f;
-    }
-
-    o->vel_timer += PERIOD;
-
-    if (o->vel_timer >= o->vel_timeout)
-    {
-        o->vel_timer = 0.0f;
-        o->control_mode = CM_POSITION;
-                
-        eo_trajectory_Abort(o->trajectory, o->encpos_meas);
-    }  
-}
-
 static void compute_torque_ref(EOaxisController *o)
 {
     float pos_err = o->pos_out - o->encpos_meas;
