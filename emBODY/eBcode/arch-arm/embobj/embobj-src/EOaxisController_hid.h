@@ -50,25 +50,20 @@ struct EOaxisController_hid
 
     EOspeedcurve *speedcurve;
 
+    int32_t pos_ref;
+    int32_t vel_ref;
+    eObool_t first_run;
+
     // axis limits
     int32_t pos_min;
     int32_t pos_max;
     int32_t vel_max;
     
     // measures (read only)
-    int32_t encpos_meas;
     int32_t torque_meas;
 
-    // velocity control
-    int32_t pos_vel_bias;
-    int32_t vel_ref;
-    int32_t acc_ref_step;
     int32_t vel_timer;
-    int32_t vel_timeout;
-
-    int32_t pos_out;
-    int32_t vel_out;
-    int32_t vel_out_step;
+    int32_t vel_timeout;    
 
     // torque control
     int32_t torque_ref;

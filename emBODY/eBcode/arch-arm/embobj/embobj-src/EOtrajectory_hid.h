@@ -44,7 +44,7 @@ struct EOtrajectory_hid
     float Wn;
     float Yn;
 
-    float DT;
+    float period_by_time2;
 
     int32_t pf;
     int32_t vf;

@@ -82,8 +82,9 @@ extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution, int32_t f
         o->time_from_last_reading = 0;
         o->last_valid_reading = 0;
         o->last_reading = 0;
+        o->position = 0;
+        o->distance = 0;
         o->speed = 0;
-        o->delta = 0;
     }
 
     return o;
@@ -99,23 +100,31 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
         o->time_from_last_reading = 0;
         o->last_valid_reading = encoder;
         o->last_reading = encoder;
+        o->position = encoder;
+        o->distance = 0;
         o->speed = 0;
-        o->delta = 0;
         
         return;
     }
 
-    o->delta = encoder - o->last_reading;
+    ////////////////////////////////////////
+    delta = encoder - o->last_reading;
     o->last_reading = encoder;
 
-    if (o->delta > o->impulse_per_revolution_by_2)
+    if (delta > o->impulse_per_revolution_by_2)
     {
-        o->delta -= o->impulse_per_revolution;
+        o->distance += delta - o->impulse_per_revolution;
     }
-    else if (o->delta < -o->impulse_per_revolution_by_2)
+    else if (delta < -o->impulse_per_revolution_by_2)
     {
-        o->delta += o->impulse_per_revolution;
+        o->distance += delta + o->impulse_per_revolution;
     }
+    else
+    {
+        o->distance += delta;
+    }
+
+    ////////////////////////////////////////
 
     delta = encoder - o->last_valid_reading;
 
@@ -127,20 +136,21 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
     {
         delta += o->impulse_per_revolution;
     }
+    ////////////////////////////////////////
 
     ++o->time_from_last_reading;
 
     if (delta <= -DELTA_THR || delta >= DELTA_THR)
     {
-        o->speed = (15 * o->speed + (delta * o->FREQUENCY) / o->time_from_last_reading);
+        o->speed = (31 * o->speed + (delta * o->FREQUENCY) / o->time_from_last_reading);
         
-        if (o->speed >= 8)        
+        if (o->speed >= 16)        
         {
-            o->speed =  ((8+o->speed)>>4);
+            o->speed =  ((16+o->speed)>>5);
         }
-        else if (o->speed <= -8)
+        else if (o->speed <= -16)
         {
-            o->speed = -((8-o->speed)>>4);
+            o->speed = -((16-o->speed)>>5);
         }
         else
         {
@@ -169,8 +179,6 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
 extern void eo_speedometer_EncoderError(EOspeedmeter* o)
 {
     ++o->time_from_last_reading;
-
-    o->delta = 0;
 }
 
 extern int32_t eo_speedometer_GetSpeed(EOspeedmeter* o)
@@ -178,9 +186,14 @@ extern int32_t eo_speedometer_GetSpeed(EOspeedmeter* o)
     return o->speed;
 }
 
-extern int32_t eo_speedometer_GetDelta(EOspeedmeter* o)
+extern int32_t eo_speedometer_GetPosition(EOspeedmeter* o)
 {
-    return o->delta;
+    return o->position;
+}
+
+extern int32_t eo_speedometer_GetDistance(EOspeedmeter* o)
+{
+    return o->distance;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
