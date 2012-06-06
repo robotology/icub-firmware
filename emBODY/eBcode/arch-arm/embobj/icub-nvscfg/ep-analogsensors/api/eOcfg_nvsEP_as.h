@@ -80,7 +80,7 @@ enum { endpoint_as_TOTALnumber = 6 };
  **/
 typedef uint16_t eOcfg_nvsEP_as_strainNumber_t;
 
-enum { strainNumberMAX = 4};
+enum { strainNumberMAX = 1};
 
 
 
@@ -107,7 +107,7 @@ enum { strainNVindex_TOTALnumber = 6};
  **/
 typedef uint16_t eOcfg_nvsEP_as_maisNumber_t;
 
-enum { maisNumberMAX = 2};
+enum { maisNumberMAX = 1};
 
 
 
