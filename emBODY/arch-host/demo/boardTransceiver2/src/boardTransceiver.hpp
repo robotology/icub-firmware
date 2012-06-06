@@ -53,7 +53,7 @@ static const eOipv4addr_t pc104_ipaddress       = EO_COMMON_IPV4ADDR(10, 255, 39
 static const eOipv4port_t pc104_port  			= 3333;
 
 
-extern EOtransceiver* boardTransceiver_new(uint32_t _localipaddr, uint32_t _remoteipaddr, uint16_t _ipport, uint16_t _pktsize);
+extern EOtransceiver* boardTransceiver_new(uint32_t _localipaddr, uint32_t _remoteipaddr, uint16_t _ipport);
 
 void boardTransceiver_load_occasional_rop(eOropcode_t opc, uint16_t ep, uint16_t nvid);
 

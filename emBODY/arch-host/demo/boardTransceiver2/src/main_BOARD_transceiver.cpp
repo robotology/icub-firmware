@@ -12,20 +12,6 @@
 
 using namespace std;
 
-#include "stdint.h"
-#include "stdlib.h"
-#include "stdio.h"
-#include <string>
-#include <signal.h>
-
-// Ace stuff
-#include <ace/ACE.h>
-#include "ace/SOCK_Dgram.h"
-#include "ace/Addr.h"
-
-
-
-
 #include <yarp/dev/DeviceDriver.h>
 #include <yarp/dev/CanBusInterface.h>
 #include <yarp/dev/PolyDriver.h>
@@ -93,9 +79,9 @@ uint8_t buffer[sizeof(EOarray_of_10canframes)] = {0};
 
 int main(int argc, char *argv[])
 {
-	char str[SIZE];
+	char str[STR_SIZE];
 	// Program data
-	memset(&remote01.data, 0x00, SIZE);
+	memset(&remote01.data, 0x00, MAX_CAPACITY_OF_PACKET);
 
 	// Utility stuff
 	int i;
@@ -106,8 +92,8 @@ int main(int argc, char *argv[])
 		signal(SIGINT, SIG_IGN);
 
 	// Set default connection data
-	local.address_string=string(DEFAULT_EMS_IP);
-	remote01.address_string = string(DEFAULT_LAPTOP_IP);
+	local.address_string=string(DEFAULT_LOC_IP);
+	remote01.address_string = string(DEFAULT_REM_IP);
 	port = DEFAULT_PORT;
 
 
@@ -189,7 +175,7 @@ int main(int argc, char *argv[])
 	eOipv4port_t eOport = port;
 
 	// init object: it's a singleton, so run the program once for each ems you want to simulate
-	boardTransceiver = boardTransceiver_new(localAddr,remoteAddr, eOport, EOK_BOARDTRANSCEIVER_capacityofpacket);
+	boardTransceiver = boardTransceiver_new(localAddr,remoteAddr, eOport);
 
 
 	// Start receiver thread
@@ -263,13 +249,13 @@ void *recvThread(void * arg)
 	ACE_UINT8					bytesRecv = -1;
 	int 						ip1, ip2, ip3, ip4;
 
-	char str[SIZE];
+	char str[STR_SIZE];
 
 	uint8_t *udppkt_data = NULL;
 
 	while (keepGoingOn)
 	{
-		udppkt_size = ACE_socket->recv((void *) &sender.data, EOK_BOARDTRANSCEIVER_capacityofpacket, remote01.addr, flags);
+		udppkt_size = ACE_socket->recv((void *) &sender.data, MAX_CAPACITY_OF_PACKET, remote01.addr, flags);
 		printf("Received new packet, size = %d\n", udppkt_size);
 
 		uint16_t remPort 	= remote01.addr.get_port_number();
@@ -279,7 +265,7 @@ void *recvThread(void * arg)
 
 		SetReceived((ACE_UINT8 *)sender.data, udppkt_size, remAddr, remPort);
 
-		memset(sender.data, 0x00, EOK_BOARDTRANSCEIVER_capacityofpacket);
+		memset(sender.data, 0x00, MAX_CAPACITY_OF_PACKET);
 		// Recupera il pacchetto con una eventuale risposta
 		//boardTransceiver_GetTransmit((ACE_UINT8 **)&sender.data, &udppkt_size);
 		boardTransceiver_GetTransmit(&udppkt_data, &udppkt_size);
@@ -302,10 +288,11 @@ void *recvThread(void * arg)
 void commands(void)
 {
 	printf("q: quit\n");
-	printf("1: send type 1 packet -> ask application info\n");
-	printf("2: send type 2 packet -> configure regulars (toggling)\n");
-	printf("3: send type 3 packet -> send an empty rop frame\n");
-	printf("4: send type 4 packet -> set joint configuration\n");
+	printf("1: signaling jointNVindex_jstatus__basic joint 0\n");
+	printf("2: signaling endpoint_sk_emsboard_rightlowerarm\n");
+	printf("3: send an empty rop frame\n");
+	printf("4: send an empty rop frame\n");
+	printf("5: send an empty rop frame\n");
 	printf("\n");
 }
 
@@ -313,8 +300,8 @@ void usage(void)
 {
 	printf("usage: "
 			"\t\t--help		print this help\n");
-	printf("\t\t--loc-ip  <xx>	set the ip address of the local machine - needed by yarp - by default %s\n", DEFAULT_LAPTOP_IP);
-	printf("\t\t--rem-ip  <xx>	set the ip address of the remote device - by default %s\n", DEFAULT_EMS_IP);
+	printf("\t\t--loc-ip  <xx>	set the ip address of the local machine - needed by yarp - by default %s\n", DEFAULT_LOC_IP);
+	printf("\t\t--rem-ip  <xx>	set the ip address of the remote device - by default %s\n", DEFAULT_REM_IP);
 	printf("\t\t--port    <xx>	set the socket port - by default %d\n", DEFAULT_PORT);
 	printf("\t\t--reply		if present, then an empty ropframe is sent as an ack for each packet received - by default it's disabled\n");
 }
@@ -484,7 +471,7 @@ static void s_callback_button_3(void )
 {
 	char str[128];
 
-	snprintf(str, sizeof(str)-1, "called callback on BUTTON_WKUP: tx a ropframe\n");
+	snprintf(str, sizeof(str)-1, "sent empty ropframe\n");
 }
 
 
@@ -492,16 +479,14 @@ static void s_callback_button_4(void )
 {
 	char str[128];
 
-	snprintf(str, sizeof(str)-1, "called callback on BUTTON_WKUP: tx a ropframe\n");
+	snprintf(str, sizeof(str)-1, "sent empty ropframe\n");
 }
 
 
 static void s_callback_button_5(void )
 {
 	char str[128];
-	int j = 0;
-	Pid pid;
-	snprintf(str, sizeof(str)-1, "called callback on BUTTON_WKUP: tx a ropframe\n");
+	snprintf(str, sizeof(str)-1, "sent empty ropframe\n");
 }
 
 // Utilities

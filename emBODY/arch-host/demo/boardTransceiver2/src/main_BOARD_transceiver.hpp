@@ -13,17 +13,34 @@
 #define TRUE	1
 #define FALSE	0
 
-#define DEFAULT_EMS_IP	"10.255.37.155" // <- dhcp;   "10.0.0.1" da usare col pc104
-//#define DEFAULT_EMS_IP 		"10.255.39.152" // ems
-#define DEFAULT_LAPTOP_IP 		"127.0.0.1" // ip della workstation qui dietro.
 
-//#define DEFAULT_LAPTOP_IP		"10.0.0.1"
-//#define DEFAULT_EMS_IP 		"10.0.0.2"
+#define DEFAULT_PORT				3333
+#define STR_SIZE 					512
+#define MAX_CAPACITY_OF_PACKET		640
 
-#define DEFAULT_PORT		3333
-#define SIZE 				512
+#define _ON_AC_LAP_
 
-#define PC104
+#ifdef _ON_PC104_
+	#define DEFAULT_LOC_IP 	"10.0.0.1"
+	#define DEFAULT_REM_IP 	"10.0.1.1"
+#endif
+
+#ifdef _ON_AC_LAP_
+	#define DEFAULT_LOC_IP 	"192.168.125.1"
+	#define DEFAULT_REM_IP 	"192.168.202.1"
+#endif
+
+#include "stdint.h"
+#include "stdlib.h"
+#include "stdio.h"
+#include <string>
+#include <signal.h>
+
+// Ace stuff
+#include <ace/ACE.h>
+#include "ace/SOCK_Dgram.h"
+#include "ace/Addr.h"
+
 
 // Catch CTRL + C
 static int keepGoingOn   = TRUE;
@@ -40,14 +57,14 @@ void *recvThread(void * arg);
 
 typedef struct
 {
-		char field[SIZE];
+		char field[MAX_CAPACITY_OF_PACKET];
 }Data;
 
 typedef struct
 {
 	string	 		address_string;
 	ACE_INET_Addr	addr;
-	char 			data[SIZE];
+	char 			data[MAX_CAPACITY_OF_PACKET];
 } Board_connect_info;
 
 

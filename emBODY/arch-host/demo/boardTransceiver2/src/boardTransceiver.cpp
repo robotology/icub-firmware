@@ -20,29 +20,39 @@ using namespace std;
 
 #include "boardTransceiver.hpp"
 #include "EOtheBOARDtransceiver_hid.h"
-extern "C" {
+#include "main_BOARD_transceiver.hpp"
 #include "EoCommon.h"
 #include "EOnv_hid.h"
 
-}
 
 // static EOtransceiver *ems00txrx = NULL;
 static EOtransceiver *boardTransceiver = NULL;
 static EOnvsCfg *nvsCfg = NULL;
 EOpacket*      pkt;
 
-extern EOtransceiver* boardTransceiver_new(uint32_t _localipaddr, uint32_t _remoteipaddr, uint16_t _ipport, uint16_t _pktsize = EOK_BOARDTRANSCEIVER_capacityofpacket)
+extern EOtransceiver* boardTransceiver_new(uint32_t _localipaddr, uint32_t _remoteipaddr, uint16_t _ipport)
 {
+	eo_transceiver_sizes_t	my_sizes =
+	{
+			EO_INIT(.capacityofpacket) 				MAX_CAPACITY_OF_PACKET,
+			EO_INIT(.capacityofrop) 				256,
+			EO_INIT(.capacityofropframeregulars) 	384,
+			EO_INIT(.capacityofropframeoccasionals)	256,
+			EO_INIT(.capacityofropframereplies)		128,
+			EO_INIT(.maxnumberofregularrops)		32
+	};
+
     eOboardtransceiver_cfg_t boardTransceiverCfg =
     {
     		EO_INIT(.vectorof_endpoint_cfg)         eo_cfg_EPs_vectorof_eb4,
     		EO_INIT(.hashfunction_ep2index)       	eo_cfg_nvsEP_eb4_fptr_hashfunction_ep2index,
     		EO_INIT(.remotehostipv4addr)            _remoteipaddr,
-    		EO_INIT(.remotehostipv4port)            _ipport
+    		EO_INIT(.remotehostipv4port)            _ipport,
+    		EO_INIT(.sizes)							my_sizes
     };
     boardTransceiver = eo_boardtransceiver_Initialise(&boardTransceiverCfg);
     nvsCfg = eo_boardtransceiver_hid_GetNvsCfg();
-    pkt = eo_packet_New(_pktsize);
+    pkt = eo_packet_New(MAX_CAPACITY_OF_PACKET);
     return (boardTransceiver);
 }
 
