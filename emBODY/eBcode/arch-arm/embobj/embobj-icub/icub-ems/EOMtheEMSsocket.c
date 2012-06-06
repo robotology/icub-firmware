@@ -182,7 +182,7 @@ extern eOresult_t eom_emssocket_Open(EOMtheEMSsocket *p, EOaction* withactiononr
         {
             char str[96];
             p->active = eobool_true;
-            snprintf(str, sizeof(str)-1, "started socket listeing on local port %d\n\r", p->cfg.localport);
+            snprintf(str, sizeof(str)-1, "started socket listening on local port %d\n\r", p->cfg.localport);
             eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);                        
         }
     }                        

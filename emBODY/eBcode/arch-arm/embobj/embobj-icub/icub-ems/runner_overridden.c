@@ -26,6 +26,8 @@
 #include "string.h"
 #include "EoCommon.h"
 
+#include "EOMtheEMSappl.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -79,23 +81,20 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern void eom_emsrunner_hid_userdef_taskRX_beforedatagramreception(void)
+extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(uint16_t numberofrxdatagrams, uint16_t numberofrxrops, eOabstime_t txtimeofrxropframe)
 {
+    static uint32_t totalreceived = 0;
     
-}
-
-extern void eom_emsrunner_hid_userdef_taskRX_afterdatagramreception(uint16_t numberofrxrops, eOabstime_t txtimeofrxropframe)
-{
-
-    volatile uint32_t i;
-    float aaa = 1.01f;
+    totalreceived += numberofrxdatagrams;
     
-    for(i=0; i<10; i++)
+    if(3 == totalreceived)
     {
-        aaa = aaa*1.02f;
-    }
-    
+        totalreceived = 0;
+        eom_emsrunner_StopAndGoTo(eom_emsrunner_GetHandle(), eo_sm_emsappl_EVgo2cfg);
+    }     
 }
+
+
 
 extern void eom_emsrunner_hid_userdef_taskDO_activity(void)
 {
@@ -109,15 +108,7 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(void)
     }    
 }
 
-extern void eom_emsrunner_hid_userdef_taskTX_beforedatagramtransmission(void)
-{
-    
-}
 
-extern void eom_emsrunner_hid_userdef_taskTX_afterdatagramtransmission(uint16_t numberoftxrops)
-{
-    
-}
 
 
 
