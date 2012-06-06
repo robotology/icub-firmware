@@ -637,6 +637,7 @@ extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOm
     dest.canAddr = canLoc.canaddr;
 
 
+    /*
     // 1) send current pid
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID;
     res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, (void*)&cfg->pidcurrent, &canFrame);
@@ -688,7 +689,7 @@ extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOm
     {
         return(res);
     }
-
+    */
 
     // 5) set perriodic msg contents  ??? DOVE PRENDO L'INFO
 //    res = eo_icubCanProto_formCanFrame4MotorBoard(ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_LIMIT, (void*)&cfg->maxcurrentofmotor,
@@ -703,7 +704,7 @@ extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOm
 //        return(res);
 //    }
 
-#warning: VALE-> manca il campo i2t in motor config!!!!
+//#warning: VALE-> manca il campo i2t in motor config!!!!
     // 6) set i2t param      MANCANO!!!
 //    res = eo_icubCanProto_formCanFrame4MotorBoard(ICUBCANPROTO_POL_MB_CMD__SET_I2T_PARAMS, (void*)&cfg->velocityshiftfactor,
 //                                                  boardAddr, axis, &canFrame);
@@ -732,7 +733,6 @@ extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOm
     {
         return(res);
     }
-
 
     // 6) set controller run
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;

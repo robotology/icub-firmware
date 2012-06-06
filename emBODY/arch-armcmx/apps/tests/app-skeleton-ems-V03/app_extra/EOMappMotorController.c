@@ -223,11 +223,11 @@ static void s_eom_appMotorController_taskStartup(EOMtask *tsk, uint32_t t)
 
     eo_emsController_SetPosLimits(0, 0, 4095);
     eo_emsController_SetVelMax(0, 4096);
-    eo_emsController_SetPosPid(0, 100*1024, 4*1024, 1024/2, 10);
+    eo_emsController_SetPosPid(0, 1024, 0, 0, 10);
     eo_emsController_SetPosPidLimits(0, 0x7FFF, 1024);
-    eo_emsController_SetVelPid(0, 50*1024, 2*1024, 1024/20, 10);
+    eo_emsController_SetVelPid(0, 1024, 0, 0, 10);
     eo_emsController_SetVelPidLimits(0, 4096, 1024);
-    eo_emsController_SetControlMode(0, CM_VELOCITY);
+    eo_emsController_SetControlMode(0, CM_POSITION);
 }
 
 static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)

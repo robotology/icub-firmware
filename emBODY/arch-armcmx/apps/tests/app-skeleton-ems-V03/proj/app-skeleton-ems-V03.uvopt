@@ -517,8 +517,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>193</TopLine>
-      <CurrentLine>193</CurrentLine>
+      <TopLine>197</TopLine>
+      <CurrentLine>197</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_basic\eom_appSkeletonEms_body.c</PathWithFileName>
       <FilenameWithoutPath>eom_appSkeletonEms_body.c</FilenameWithoutPath>
@@ -543,10 +543,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>32</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>92</TopLine>
-      <CurrentLine>130</CurrentLine>
+      <TopLine>124</TopLine>
+      <CurrentLine>124</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_basic\eom_appSkeletonEms_main.c</PathWithFileName>
       <FilenameWithoutPath>eom_appSkeletonEms_main.c</FilenameWithoutPath>
@@ -555,7 +555,7 @@
 
   <Group>
     <GroupName>app-extra</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -564,10 +564,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>37</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>913</TopLine>
+      <CurrentLine>913</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOappCanServicesProvider.c</PathWithFileName>
       <FilenameWithoutPath>EOappCanServicesProvider.c</FilenameWithoutPath>
@@ -622,8 +622,8 @@
       <Focus>0</Focus>
       <ColumnNumber>56</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>14</TopLine>
-      <CurrentLine>15</CurrentLine>
+      <TopLine>19</TopLine>
+      <CurrentLine>19</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOMappDataCollector.c</PathWithFileName>
       <FilenameWithoutPath>EOMappDataCollector.c</FilenameWithoutPath>
@@ -634,10 +634,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>21</ColumnNumber>
+      <ColumnNumber>49</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>70</TopLine>
-      <CurrentLine>84</CurrentLine>
+      <TopLine>209</TopLine>
+      <CurrentLine>209</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOMappDataTransmitter.c</PathWithFileName>
       <FilenameWithoutPath>EOMappDataTransmitter.c</FilenameWithoutPath>
@@ -648,9 +648,9 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>44</ColumnNumber>
+      <ColumnNumber>37</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>214</TopLine>
+      <TopLine>228</TopLine>
       <CurrentLine>228</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOMappMotorController.c</PathWithFileName>
@@ -662,10 +662,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>20</ColumnNumber>
+      <ColumnNumber>28</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>417</TopLine>
-      <CurrentLine>431</CurrentLine>
+      <TopLine>341</TopLine>
+      <CurrentLine>349</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOMappTheSysController.c</PathWithFileName>
       <FilenameWithoutPath>EOMappTheSysController.c</FilenameWithoutPath>
@@ -709,7 +709,7 @@
 
   <Group>
     <GroupName>abslayer-lib</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -972,8 +972,8 @@
       <Focus>0</Focus>
       <ColumnNumber>43</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>344</TopLine>
-      <CurrentLine>345</CurrentLine>
+      <TopLine>349</TopLine>
+      <CurrentLine>349</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOdeque.c</PathWithFileName>
       <FilenameWithoutPath>EOdeque.c</FilenameWithoutPath>
@@ -1280,8 +1280,8 @@
       <Focus>0</Focus>
       <ColumnNumber>45</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>67</TopLine>
-      <CurrentLine>67</CurrentLine>
+      <TopLine>71</TopLine>
+      <CurrentLine>71</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\ipnet\src\EOsocket.c</PathWithFileName>
       <FilenameWithoutPath>EOsocket.c</FilenameWithoutPath>
@@ -2088,7 +2088,7 @@
 
   <Group>
     <GroupName>eo-motioncontrol</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -2097,10 +2097,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>57</ColumnNumber>
+      <ColumnNumber>41</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>179</TopLine>
-      <CurrentLine>193</CurrentLine>
+      <TopLine>162</TopLine>
+      <CurrentLine>176</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-src\EOaxisController.c</PathWithFileName>
       <FilenameWithoutPath>EOaxisController.c</FilenameWithoutPath>
@@ -2127,8 +2127,8 @@
       <Focus>0</Focus>
       <ColumnNumber>12</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>287</TopLine>
-      <CurrentLine>287</CurrentLine>
+      <TopLine>291</TopLine>
+      <CurrentLine>291</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-src\EOemsController.c</PathWithFileName>
       <FilenameWithoutPath>EOemsController.c</FilenameWithoutPath>
@@ -2141,8 +2141,8 @@
       <Focus>0</Focus>
       <ColumnNumber>15</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>148</TopLine>
-      <CurrentLine>155</CurrentLine>
+      <TopLine>159</TopLine>
+      <CurrentLine>159</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-src\EOpid.c</PathWithFileName>
       <FilenameWithoutPath>EOpid.c</FilenameWithoutPath>
@@ -2151,12 +2151,12 @@
       <GroupNumber>21</GroupNumber>
       <FileNumber>108</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>45</ColumnNumber>
+      <ColumnNumber>21</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>94</TopLine>
-      <CurrentLine>110</CurrentLine>
+      <TopLine>91</TopLine>
+      <CurrentLine>105</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-src\EOtrajectory.c</PathWithFileName>
       <FilenameWithoutPath>EOtrajectory.c</FilenameWithoutPath>
@@ -2167,10 +2167,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>22</ColumnNumber>
+      <ColumnNumber>32</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>177</TopLine>
-      <CurrentLine>189</CurrentLine>
+      <TopLine>127</TopLine>
+      <CurrentLine>127</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-src\EOspeedmeter.c</PathWithFileName>
       <FilenameWithoutPath>EOspeedmeter.c</FilenameWithoutPath>
@@ -2179,12 +2179,12 @@
       <GroupNumber>21</GroupNumber>
       <FileNumber>110</FileNumber>
       <FileType>1</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>23</ColumnNumber>
+      <ColumnNumber>22</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>106</TopLine>
-      <CurrentLine>142</CurrentLine>
+      <TopLine>95</TopLine>
+      <CurrentLine>95</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-src\EOspeedcurve.c</PathWithFileName>
       <FilenameWithoutPath>EOspeedcurve.c</FilenameWithoutPath>
@@ -2193,8 +2193,8 @@
 
   <AlienFiles>
     <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\abslayer\hal-package\hal\hal-src\stm32f1\hal_stm32_encoder.c</PathWithFilename>
-    <TopLine>360</TopLine>
-    <CurrentLine>361</CurrentLine>
+    <TopLine>365</TopLine>
+    <CurrentLine>365</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -2219,8 +2219,8 @@
 
   <AlienFiles>
     <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\abslayer\hal-package\hal\hal-src\stm32f1\hal_stm32_can.c</PathWithFilename>
-    <TopLine>564</TopLine>
-    <CurrentLine>565</CurrentLine>
+    <TopLine>569</TopLine>
+    <CurrentLine>569</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -2245,8 +2245,8 @@
 
   <AlienFiles>
     <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-api\EOtrajectory.h</PathWithFilename>
-    <TopLine>37</TopLine>
-    <CurrentLine>37</CurrentLine>
+    <TopLine>1</TopLine>
+    <CurrentLine>3</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -2271,8 +2271,8 @@
 
   <AlienFiles>
     <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-api\EOaxisController.h</PathWithFilename>
-    <TopLine>97</TopLine>
-    <CurrentLine>98</CurrentLine>
+    <TopLine>102</TopLine>
+    <CurrentLine>102</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -2297,8 +2297,8 @@
 
   <AlienFiles>
     <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-api\EOpid.h</PathWithFilename>
-    <TopLine>71</TopLine>
-    <CurrentLine>72</CurrentLine>
+    <TopLine>76</TopLine>
+    <CurrentLine>76</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -2323,8 +2323,8 @@
 
   <AlienFiles>
     <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-src\EOaxisController_hid.h</PathWithFilename>
-    <TopLine>61</TopLine>
-    <CurrentLine>61</CurrentLine>
+    <TopLine>65</TopLine>
+    <CurrentLine>65</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -2349,8 +2349,8 @@
 
   <AlienFiles>
     <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-src\EOpid_hid.h</PathWithFilename>
-    <TopLine>44</TopLine>
-    <CurrentLine>45</CurrentLine>
+    <TopLine>49</TopLine>
+    <CurrentLine>49</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -2375,34 +2375,8 @@
 
   <AlienFiles>
     <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\abslayer\hal-package\hal\hal-src\stm32f1\hal_stm32_timer.c</PathWithFilename>
-    <TopLine>523</TopLine>
-    <CurrentLine>524</CurrentLine>
-    <Constant>0</Constant>
-    <WindowPosition>
-      <length>0</length>
-      <flags>0</flags>
-      <showCmd>0</showCmd>
-      <MinPosition>
-        <xPos>0</xPos>
-        <yPos>0</yPos>
-      </MinPosition>
-      <MaxPosition>
-        <xPos>0</xPos>
-        <yPos>0</yPos>
-      </MaxPosition>
-      <NormalPosition>
-        <Top>0</Top>
-        <Left>0</Left>
-        <Right>0</Right>
-        <Bottom>0</Bottom>
-      </NormalPosition>
-    </WindowPosition>
-  </AlienFiles>
-
-  <AlienFiles>
-    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\abslayer\hal-package\hal\hal-src\stm32f1\hal_stm32_spi4encoder.c</PathWithFilename>
-    <TopLine>311</TopLine>
-    <CurrentLine>311</CurrentLine>
+    <TopLine>528</TopLine>
+    <CurrentLine>528</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -2427,8 +2401,8 @@
 
   <AlienFiles>
     <PathWithFilename>C:\embedded\arm\embody\body\midware\eventviewer-package\eventviewer\eventviewer-src\eventviewer.c</PathWithFilename>
-    <TopLine>148</TopLine>
-    <CurrentLine>149</CurrentLine>
+    <TopLine>153</TopLine>
+    <CurrentLine>153</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -2453,8 +2427,86 @@
 
   <AlienFiles>
     <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-api\EOemsController.h</PathWithFilename>
-    <TopLine>83</TopLine>
-    <CurrentLine>97</CurrentLine>
+    <TopLine>101</TopLine>
+    <CurrentLine>101</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-src\EOspeedmeter_hid.h</PathWithFilename>
+    <TopLine>53</TopLine>
+    <CurrentLine>53</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-api\EOspeedmeter.h</PathWithFilename>
+    <TopLine>60</TopLine>
+    <CurrentLine>60</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-api\EOspeedcurve.h</PathWithFilename>
+    <TopLine>56</TopLine>
+    <CurrentLine>56</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -2504,9 +2556,9 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-src\EOspeedmeter_hid.h</PathWithFilename>
-    <TopLine>35</TopLine>
-    <CurrentLine>49</CurrentLine>
+    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\abslayer\hal-package\hal\hal-src\stm32f1\hal_stm32_spi4encoder.c</PathWithFilename>
+    <TopLine>363</TopLine>
+    <CurrentLine>363</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -2530,9 +2582,9 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-api\EOspeedmeter.h</PathWithFilename>
-    <TopLine>43</TopLine>
-    <CurrentLine>56</CurrentLine>
+    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\sys\mid\inc\core_cm3.h</PathWithFilename>
+    <TopLine>1250</TopLine>
+    <CurrentLine>1250</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -2557,34 +2609,8 @@
 
   <AlienFiles>
     <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-src\EOspeedcurve_hid.h</PathWithFilename>
-    <TopLine>29</TopLine>
-    <CurrentLine>43</CurrentLine>
-    <Constant>0</Constant>
-    <WindowPosition>
-      <length>0</length>
-      <flags>0</flags>
-      <showCmd>0</showCmd>
-      <MinPosition>
-        <xPos>0</xPos>
-        <yPos>0</yPos>
-      </MinPosition>
-      <MaxPosition>
-        <xPos>0</xPos>
-        <yPos>0</yPos>
-      </MaxPosition>
-      <NormalPosition>
-        <Top>0</Top>
-        <Left>0</Left>
-        <Right>0</Right>
-        <Bottom>0</Bottom>
-      </NormalPosition>
-    </WindowPosition>
-  </AlienFiles>
-
-  <AlienFiles>
-    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-api\EOspeedcurve.h</PathWithFilename>
-    <TopLine>38</TopLine>
-    <CurrentLine>52</CurrentLine>
+    <TopLine>33</TopLine>
+    <CurrentLine>33</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -2612,25 +2638,73 @@
     <ActiveMDIGroup>0</ActiveMDIGroup>
     <MDIGroup>
       <Size>100</Size>
-      <ActiveTab>0</ActiveTab>
+      <ActiveTab>1</ActiveTab>
       <Documents>
         <Doc>
           <Name>..\..\..\..\body\embobj\embobj\embobj-src\EOtrajectory.c</Name>
-          <ColumnNumber>45</ColumnNumber>
-          <TopLine>94</TopLine>
-          <CurrentLine>110</CurrentLine>
+          <ColumnNumber>21</ColumnNumber>
+          <TopLine>91</TopLine>
+          <CurrentLine>105</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\..\..\..\body\embobj\embobj\embobj-src\EOtrajectory_hid.h</Name>
+          <ColumnNumber>19</ColumnNumber>
+          <TopLine>19</TopLine>
+          <CurrentLine>19</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOMappTheSysController.c</Name>
+          <ColumnNumber>28</ColumnNumber>
+          <TopLine>341</TopLine>
+          <CurrentLine>349</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOMappDataTransmitter.c</Name>
+          <ColumnNumber>49</ColumnNumber>
+          <TopLine>209</TopLine>
+          <CurrentLine>209</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_basic\eom_appSkeletonEms_main.c</Name>
+          <ColumnNumber>0</ColumnNumber>
+          <TopLine>124</TopLine>
+          <CurrentLine>124</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\..\..\..\sys\abs\src\hal_stm32f1_startup.s</Name>
+          <ColumnNumber>0</ColumnNumber>
+          <TopLine>192</TopLine>
+          <CurrentLine>192</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOMappMotorController.c</Name>
+          <ColumnNumber>37</ColumnNumber>
+          <TopLine>228</TopLine>
+          <CurrentLine>228</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\..\..\..\body\embobj\embobj\embobj-api\EOtrajectory.h</Name>
+          <ColumnNumber>21</ColumnNumber>
+          <TopLine>1</TopLine>
+          <CurrentLine>3</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\..\..\..\body\embobj\embobj\embobj-src\EOspeedmeter.c</Name>
+          <ColumnNumber>32</ColumnNumber>
+          <TopLine>127</TopLine>
+          <CurrentLine>127</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\..\..\..\body\embobj\embobj\embobj-src\EOspeedcurve.c</Name>
-          <ColumnNumber>23</ColumnNumber>
-          <TopLine>106</TopLine>
-          <CurrentLine>142</CurrentLine>
+          <ColumnNumber>22</ColumnNumber>
+          <TopLine>95</TopLine>
+          <CurrentLine>95</CurrentLine>
         </Doc>
         <Doc>
-          <Name>..\..\..\..\body\embobj\embobj\embobj-api\EOspeedcurve.h</Name>
-          <ColumnNumber>25</ColumnNumber>
-          <TopLine>38</TopLine>
-          <CurrentLine>52</CurrentLine>
+          <Name>..\app_extra\EOappCanServicesProvider.c</Name>
+          <ColumnNumber>37</ColumnNumber>
+          <TopLine>913</TopLine>
+          <CurrentLine>913</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\cfg\abslayer\osal_cfg.c</Name>
@@ -2640,171 +2714,135 @@
         </Doc>
         <Doc>
           <Name>..\..\..\..\body\embobj\embobj\embobj-src\EOaxisController.c</Name>
-          <ColumnNumber>57</ColumnNumber>
-          <TopLine>179</TopLine>
-          <CurrentLine>193</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\app_basic\eom_appSkeletonEms_main.c</Name>
-          <ColumnNumber>32</ColumnNumber>
-          <TopLine>92</TopLine>
-          <CurrentLine>130</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\..\..\..\sys\abs\src\hal_stm32f1_startup.s</Name>
-          <ColumnNumber>0</ColumnNumber>
-          <TopLine>192</TopLine>
-          <CurrentLine>192</CurrentLine>
+          <ColumnNumber>41</ColumnNumber>
+          <TopLine>162</TopLine>
+          <CurrentLine>176</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\..\..\..\body\embobj\embobj\embobj-src\EOspeedcurve_hid.h</Name>
-          <ColumnNumber>12</ColumnNumber>
-          <TopLine>29</TopLine>
-          <CurrentLine>43</CurrentLine>
+          <ColumnNumber>24</ColumnNumber>
+          <TopLine>33</TopLine>
+          <CurrentLine>33</CurrentLine>
         </Doc>
         <Doc>
-          <Name>..\..\..\..\body\embobj\embobj\embobj-src\EOemsController.c</Name>
-          <ColumnNumber>12</ColumnNumber>
-          <TopLine>287</TopLine>
-          <CurrentLine>287</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\app_extra\EOMappMotorController.c</Name>
-          <ColumnNumber>44</ColumnNumber>
-          <TopLine>214</TopLine>
-          <CurrentLine>228</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\app_extra\EOMappTheSysController.c</Name>
-          <ColumnNumber>20</ColumnNumber>
-          <TopLine>417</TopLine>
-          <CurrentLine>431</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\app_extra\EOMappDataTransmitter.c</Name>
-          <ColumnNumber>21</ColumnNumber>
-          <TopLine>70</TopLine>
-          <CurrentLine>84</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\..\..\..\body\embobj\embobj\embobj-api\EOspeedmeter.h</Name>
-          <ColumnNumber>41</ColumnNumber>
-          <TopLine>43</TopLine>
-          <CurrentLine>56</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\..\..\..\body\embobj\embobj\embobj-src\EOspeedmeter_hid.h</Name>
-          <ColumnNumber>2</ColumnNumber>
-          <TopLine>35</TopLine>
-          <CurrentLine>49</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\..\..\..\body\embobj\embobj\embobj-src\EOspeedmeter.c</Name>
-          <ColumnNumber>22</ColumnNumber>
-          <TopLine>177</TopLine>
-          <CurrentLine>189</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\..\..\..\body\embobj\embobj\embobj-src\EOtrajectory_hid.h</Name>
-          <ColumnNumber>15</ColumnNumber>
-          <TopLine>19</TopLine>
-          <CurrentLine>19</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\..\..\..\body\embobj\embobj\embobj-api\EOemsController.h</Name>
-          <ColumnNumber>56</ColumnNumber>
-          <TopLine>83</TopLine>
-          <CurrentLine>97</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\..\..\..\body\embobj\embobj\embobj-src\EOpid.c</Name>
-          <ColumnNumber>15</ColumnNumber>
-          <TopLine>148</TopLine>
-          <CurrentLine>155</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>C:\embedded\arm\embody\body\midware\eventviewer-package\eventviewer\eventviewer-src\eventviewer.c</Name>
+          <Name>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\sys\mid\inc\core_cm3.h</Name>
           <ColumnNumber>0</ColumnNumber>
-          <TopLine>148</TopLine>
-          <CurrentLine>149</CurrentLine>
+          <TopLine>1250</TopLine>
+          <CurrentLine>1250</CurrentLine>
         </Doc>
         <Doc>
           <Name>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\abslayer\hal-package\hal\hal-src\stm32f1\hal_stm32_spi4encoder.c</Name>
           <ColumnNumber>0</ColumnNumber>
-          <TopLine>311</TopLine>
-          <CurrentLine>311</CurrentLine>
+          <TopLine>363</TopLine>
+          <CurrentLine>363</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\..\..\..\body\embobj\embobj\embobj-api\EOspeedcurve.h</Name>
+          <ColumnNumber>25</ColumnNumber>
+          <TopLine>56</TopLine>
+          <CurrentLine>56</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\..\..\..\body\embobj\embobj\embobj-src\EOemsController.c</Name>
+          <ColumnNumber>12</ColumnNumber>
+          <TopLine>291</TopLine>
+          <CurrentLine>291</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\..\..\..\body\embobj\embobj\embobj-api\EOspeedmeter.h</Name>
+          <ColumnNumber>41</ColumnNumber>
+          <TopLine>60</TopLine>
+          <CurrentLine>60</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\..\..\..\body\embobj\embobj\embobj-src\EOspeedmeter_hid.h</Name>
+          <ColumnNumber>2</ColumnNumber>
+          <TopLine>53</TopLine>
+          <CurrentLine>53</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\..\..\..\body\embobj\embobj\embobj-api\EOemsController.h</Name>
+          <ColumnNumber>56</ColumnNumber>
+          <TopLine>101</TopLine>
+          <CurrentLine>101</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\..\..\..\body\embobj\embobj\embobj-src\EOpid.c</Name>
+          <ColumnNumber>15</ColumnNumber>
+          <TopLine>159</TopLine>
+          <CurrentLine>159</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>C:\embedded\arm\embody\body\midware\eventviewer-package\eventviewer\eventviewer-src\eventviewer.c</Name>
+          <ColumnNumber>0</ColumnNumber>
+          <TopLine>153</TopLine>
+          <CurrentLine>153</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\..\..\..\..\any-arch\sys\embobj\ipnet\src\EOsocket.c</Name>
           <ColumnNumber>45</ColumnNumber>
-          <TopLine>67</TopLine>
-          <CurrentLine>67</CurrentLine>
+          <TopLine>71</TopLine>
+          <CurrentLine>71</CurrentLine>
         </Doc>
         <Doc>
           <Name>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\abslayer\hal-package\hal\hal-src\stm32f1\hal_stm32_timer.c</Name>
           <ColumnNumber>0</ColumnNumber>
-          <TopLine>523</TopLine>
-          <CurrentLine>524</CurrentLine>
+          <TopLine>528</TopLine>
+          <CurrentLine>528</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\..\..\..\body\embobj\embobj\embobj-src\EOpid_hid.h</Name>
           <ColumnNumber>14</ColumnNumber>
-          <TopLine>44</TopLine>
-          <CurrentLine>45</CurrentLine>
+          <TopLine>49</TopLine>
+          <CurrentLine>49</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\..\..\..\body\embobj\embobj\embobj-src\EOaxisController_hid.h</Name>
           <ColumnNumber>32</ColumnNumber>
-          <TopLine>61</TopLine>
-          <CurrentLine>61</CurrentLine>
+          <TopLine>65</TopLine>
+          <CurrentLine>65</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\..\..\..\body\embobj\embobj\embobj-api\EOpid.h</Name>
           <ColumnNumber>0</ColumnNumber>
-          <TopLine>71</TopLine>
-          <CurrentLine>72</CurrentLine>
+          <TopLine>76</TopLine>
+          <CurrentLine>76</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\..\..\..\body\embobj\embobj\embobj-api\EOaxisController.h</Name>
           <ColumnNumber>0</ColumnNumber>
-          <TopLine>97</TopLine>
-          <CurrentLine>98</CurrentLine>
+          <TopLine>102</TopLine>
+          <CurrentLine>102</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\app_extra\EOMappDataCollector.c</Name>
           <ColumnNumber>56</ColumnNumber>
-          <TopLine>14</TopLine>
-          <CurrentLine>15</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\..\..\..\body\embobj\embobj\embobj-api\EOtrajectory.h</Name>
-          <ColumnNumber>59</ColumnNumber>
-          <TopLine>37</TopLine>
-          <CurrentLine>37</CurrentLine>
+          <TopLine>19</TopLine>
+          <CurrentLine>19</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\..\..\..\..\any-arch\sys\embobj\core\src\EOdeque.c</Name>
           <ColumnNumber>43</ColumnNumber>
-          <TopLine>344</TopLine>
-          <CurrentLine>345</CurrentLine>
+          <TopLine>349</TopLine>
+          <CurrentLine>349</CurrentLine>
         </Doc>
         <Doc>
           <Name>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\abslayer\hal-package\hal\hal-src\stm32f1\hal_stm32_can.c</Name>
           <ColumnNumber>34</ColumnNumber>
-          <TopLine>564</TopLine>
-          <CurrentLine>565</CurrentLine>
+          <TopLine>569</TopLine>
+          <CurrentLine>569</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\app_basic\eom_appSkeletonEms_body.c</Name>
           <ColumnNumber>0</ColumnNumber>
-          <TopLine>193</TopLine>
-          <CurrentLine>193</CurrentLine>
+          <TopLine>197</TopLine>
+          <CurrentLine>197</CurrentLine>
         </Doc>
         <Doc>
           <Name>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\abslayer\hal-package\hal\hal-src\stm32f1\hal_stm32_encoder.c</Name>
           <ColumnNumber>0</ColumnNumber>
-          <TopLine>360</TopLine>
-          <CurrentLine>361</CurrentLine>
+          <TopLine>365</TopLine>
+          <CurrentLine>365</CurrentLine>
         </Doc>
       </Documents>
     </MDIGroup>

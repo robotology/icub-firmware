@@ -379,7 +379,7 @@ static void s_eom_appTheSysController_recDgram_mng(EOMappTheSysController *p)
             if(eOm_appTheSysController_st__started == p->st)
             {
                 p->st = eOm_appTheSysController_st__stopped;
-                s_eom_appTheSysController_timers_stop();
+                //s_eom_appTheSysController_timers_stop();
                 
                 eo_emsController_Stop(0);
                 eo_emsController_ResetPosPid(0);
