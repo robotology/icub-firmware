@@ -90,7 +90,7 @@ const eOboardtransceiver_cfg_t eo_boardtransceiver_cfg_default =
     EO_INIT(.vectorof_endpoint_cfg)     NULL,
     EO_INIT(.remotehostipv4addr)        0,
     EO_INIT(.remotehostipv4port)        0,
-    EO_INIT(.tobedefined)               0
+    EO_INIT(.sizes)                     {0}
 };
 
 
@@ -120,17 +120,23 @@ extern EOtransceiver * eo_boardtransceiver_Initialise(const eOboardtransceiver_c
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "need a vector of endpoints");
     }
 
+    if((0 == cfg->sizes.capacityofpacket) || (0 == cfg->sizes.capacityofrop) || (0 == cfg->sizes.capacityofropframeregulars) ||
+       (0 == cfg->sizes.capacityofropframeoccasionals) || (0 == cfg->sizes.capacityofropframereplies) || (0 == cfg->sizes.maxnumberofregularrops))
+    {
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "a cfg->sizes field is 0");
+    }    
+    
     // 1. init the proper transceiver cfg
 
     s_eo_theboardtrans.nvscfg = s_eo_boardtransceiver_nvscfg_get(cfg);
     
 
-    txrxcfg.capacityofpacket               = EOK_BOARDTRANSCEIVER_capacityofpacket;
-    txrxcfg.capacityofrop                  = EOK_BOARDTRANSCEIVER_capacityofrop;
-    txrxcfg.capacityofropframeregulars     = EOK_BOARDTRANSCEIVER_capacityofropframeregulars;
-    txrxcfg.capacityofropframeoccasionals  = EOK_BOARDTRANSCEIVER_capacityofropframeoccasionals;
-    txrxcfg.capacityofropframereplies      = EOK_BOARDTRANSCEIVER_capacityofropframereplies;
-    txrxcfg.maxnumberofregularrops         = EOK_BOARDTRANSCEIVER_maxnumberofregularrops;
+    txrxcfg.capacityofpacket               = cfg->sizes.capacityofpacket;
+    txrxcfg.capacityofrop                  = cfg->sizes.capacityofrop;
+    txrxcfg.capacityofropframeregulars     = cfg->sizes.capacityofropframeregulars;
+    txrxcfg.capacityofropframeoccasionals  = cfg->sizes.capacityofropframeoccasionals;
+    txrxcfg.capacityofropframereplies      = cfg->sizes.capacityofropframereplies;
+    txrxcfg.maxnumberofregularrops         = cfg->sizes.maxnumberofregularrops;
     txrxcfg.remipv4addr                    = cfg->remotehostipv4addr;
     txrxcfg.remipv4port                    = cfg->remotehostipv4port;
     txrxcfg.nvscfg                         = s_eo_theboardtrans.nvscfg;
