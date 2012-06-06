@@ -42,7 +42,10 @@ using namespace std;
 #include "EoSkin.h"
 
 #define _AC_
+//#include "IRobotInterface.h"
+//#include "FeatureInterface.h"
 #include "SkinWrapper.h"
+
 #undef _AC_
 
 #define hal_trace_puts(arg)		printf("%s", arg)
@@ -246,8 +249,8 @@ int main(int argc, char *argv[])
     	ACE_DEBUG((LM_DEBUG,"Error in spawning recvThread\n"));
 
     ACE_thread_t id_skinThread;
-        if(ACE_Thread::spawn((ACE_THR_FUNC)skinThread, NULL, THR_CANCEL_ENABLE, &id_skinThread)==-1)
-        	ACE_DEBUG((LM_DEBUG,"Error in spawning id_skinThread\n"));
+    if(ACE_Thread::spawn((ACE_THR_FUNC)skinThread, NULL, THR_CANCEL_ENABLE, &id_skinThread)==-1)
+    	ACE_DEBUG((LM_DEBUG,"Error in spawning id_skinThread\n"));
 
 
 	 // Send a packet to test dummy

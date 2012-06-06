@@ -16,8 +16,11 @@ PROJECT(${PROJECTNAME})
 set(BASE 				$ENV{ICUB_ROOT}/firmware/emBODY/)
 set(EXTRA_FOLDER  		${CMAKE_CURRENT_SOURCE_DIR}/)
 set(TRANSCEIVER_FOLDER	$ENV{ICUB_ROOT}/main/src/libraries/icubmod/embObjLib/ )
+set(ICUB_INTERFACE_CORE_FOLDER	$ENV{ICUB_ROOT}/main/src/core/iCubInterface-branch/robotInterface/)
 
 #add_definitions( -D_AC_="STRINGA" )
+
+
 
 include(embObjLib.conf)
 find_package(YARP)
@@ -33,6 +36,10 @@ include_directories(${YARP_INCLUDE_DIRS} ${ICUB_INCLUDE_DIRS})
 # Common, architecture independent
 set(BODY_COMMON_SOURCE 		${BODY_COMMON_FOLDER}/eEcommon.c)
 set(BODY_COMMON_HEADER 		${BODY_COMMON_FOLDER}/eEcommon.h)
+
+
+
+#set(ICUB_INTERFACE_SOURCE	${ICUB_INTERFACE_CORE_FOLDER}RobotInterfaceRemap.cpp)
 
 # Network Variable configuration
 set(NVS_EB_SOURCE 			${NVS_EB_SRC_FOLDER}eOcfg_EPs_eb1.c  
@@ -103,18 +110,20 @@ set(NVS_SENSORS_SOURCE		${NVS_SENSORS_SRC_FOLDER}eOcfg_nvsEP_as.c
 #							${NVS_SENSORS_SRC_FOLDER}eOcfg_nvsEP_as_wholebody_usr.c 
 							)
 
+#SET_SOURCE_FILES_PROPERTIES( ${NVS_SKIN_CBK_FOLDER}eOcfg_nvsEP_sk_usrcbk_ebx.c PROPERTIES LANGUAGE CXX )
+
 set(NVS_SKIN_SOURCE			${NVS_SKIN_SRC_FOLDER}eOcfg_nvsEP_sk.c
 							${NVS_SKIN_SRC_FOLDER}eOcfg_nvsEP_sk_emsboard_con.c							
 							${NVS_SKIN_SRC_FOLDER}eOcfg_nvsEP_sk_emsboard_usr.c )
 
 
-set(NVS_CBK_SOURCE			${NVS_MC_CBK_FOLDER}eOcfg_nvsEP_mc_lowerleg_usrcbk_pippo.c
-#							${NVS_MC_CBK_FOLDER}eOcfg_nvsEP_mc_upperleg_usrcbk_pippo.c
+set(NVS_CBK_SOURCE			${NVS_MNGMNT_CBK_FOLDER}eOcfg_nvsEP_mngmnt_usr_ebx.c
+							${NVS_SKIN_CBK_FOLDER}eOcfg_nvsEP_sk_usrcbk_ebx.c
+#							${NVS_MC_CBK_FOLDER}eOcfg_nvsEP_mc_lowerleg_usrcbk_pippo.c
 #							${NVS_MC_CBK_FOLDER}eOcfg_nvsEP_mc_usrcbk_pippo.c
-							${NVS_MNGMNT_CBK_FOLDER}eOcfg_nvsEP_mngmnt_usr_ebx.c
+#							${NVS_MC_CBK_FOLDER}eOcfg_nvsEP_mc_upperleg_usrcbk_pippo.c
 #							${NVS_SENSORS_CBK_FOLDER}eOcfg_nvsEP_as_wholebody_usrcbk_pippo.c 
 #							${NVS_SENSORS_CBK_FOLDER}eOcfg_nvsEP_as_usrcbk_pippo.c 
-							${NVS_SKIN_CBK_FOLDER}eOcfg_nvsEP_sk_usrcbk_ebx.c
 							)
 
 
@@ -227,9 +236,10 @@ set(embobj_source 		${BODY_COMMON_SOURCE}
 						${NVS_MC_SOURCE} 
 						${NVS_MNGMNT_SOURCE} 
 						${NVS_SENSORS_SOURCE} 
-						${NVS_SKIN_SOURCE} 
+						${NVS_CBK_SOURCE}
 						${NVS_USR_SOURCE} 
-						${NVS_CBK_SOURCE})
+						${NVS_SKIN_SOURCE} 
+						${ICUB_INTERFACE_SOURCE})
 
 
 #set(embobj_header 		${BODY_COMMON_SOURCE} 

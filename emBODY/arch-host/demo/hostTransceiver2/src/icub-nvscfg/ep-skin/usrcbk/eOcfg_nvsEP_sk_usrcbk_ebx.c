@@ -31,14 +31,21 @@
 #include "string.h"
 #include "stdio.h"
 
+#ifdef _ICUB_CALLBACK_
+//#include "IRobotInterface.h"
+#include "FeatureInterface.h"
+#endif
+
 #include "EoCommon.h"
 #include "EOarray.h"
 #include "EOnv_hid.h"
 
 #include "EoSkin.h"
 #include "eOcfg_nvsEP_sk.h"
+#include "eOcfg_nvsEP_sk_hid.h"
 
-
+#include "eOcfg_nvsEP_sk_overridden_pc104.h"
+#include "eOcfg_nvsEP_sk_emsboard_usr_hid.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -99,31 +106,44 @@ uint32_t count;
 
 
 //sk-update
+//#ifdef OVERRIDE_eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe
 extern void eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-	EOarray_of_10canframes *sk_array = (EOarray_of_10canframes *)nv->rem;
+//	EOarray_of_10canframes *sk_array = (EOarray_of_10canframes *)nv->rem;
 
 //	s_eo_cfg__nvsEP_sk_hid_ParseCanFrame(sk_array);
 //	s_eo_cfg__nvsEP_sk_hid_Histogram_Print();
 //	s_eo_cfg_nvsEP_sk_hid_print_arrayof10canframe(sk_array);
 //	count++;
 
+//	popopopopopo = 666;
 
-	if(count < 10000)
-	{
-		//count=0;
-		s_eo_cfg__nvsEP_sk_hid_ParseCanFrame(sk_array);
+//	if(count < 10000)
+//	{
+//		//count=0;
+//		s_eo_cfg__nvsEP_sk_hid_ParseCanFrame(sk_array);
+//
+//	}
+////	else if(count == 10000 )
+//	{
+//		count++; //stop to print
+//		s_eo_cfg__nvsEP_sk_hid_Histogram_Print();
+//	}
 
-	}
-//	else if(count == 10000 )
-	{
-		count++; //stop to print
-		s_eo_cfg__nvsEP_sk_hid_Histogram_Print();
-	}
+	//
+	//	connection with iCubInterface stuff
+	//
+#ifdef _ICUB_CALLBACK_
+	FEAT_ID id;
+	id.type = Skin;
 
+//	weweweqwe();
+	void *featList;
+	getRobotFeatureList_C(&id);
 
+#endif
 }
-
+//#endif
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions
 // --------------------------------------------------------------------------------------------------------------------

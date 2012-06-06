@@ -24,7 +24,7 @@ extern "C" {
 
 #include "EoCommon.h"
 #include "EOhostTransceiver.h"
-#include "transceiverInterface.h"
+//#include "transceiverInterface.h"
 
 #ifdef __cplusplus
 }

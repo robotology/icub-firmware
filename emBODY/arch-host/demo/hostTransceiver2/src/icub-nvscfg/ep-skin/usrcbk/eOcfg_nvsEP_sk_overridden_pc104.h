@@ -17,20 +17,19 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOCFG_NVSEP_MC_LEFTLEG_USR_REM_EBX_H_
-#define _EOCFG_NVSEP_MC_LEFTLEG_USR_REM_EBX_H_
+#ifndef _EOCFG_NVSEP_AS_OVERRIDDEN_H_
+#define _EOCFG_NVSEP_AS_OVERRIDDEN_H_
 
 
 
 
-/** @file       eOcfg_nvsEP_mc_leftleg_usr_rem_ebx.h
-	@brief      This header file gives the local configuration for the ...
+/** @file       eOcfg_nvsEP_as_overridden.h
+	@brief      This header file gives the ...
 	@author     marco.accame@iit.it
 	@date       09/06/2011
 **/
 
-/** @defgroup eo_23sdfwervcer Local configuation of the management NVs for the board (an ems or mcbstm2x)
-    Tcecece 
+/** @defgroup eo_2desh2uilsdede2345er dcefcew
     
     @{		
  **/
@@ -38,16 +37,11 @@
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
-
-#include "EoCommon.h"
-#include "EOconstvector.h"
-#include "eOcfg_nvsEP_mc_leftleg_con.h"
-
-
-
+// empty-section
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
+      
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
@@ -55,26 +49,23 @@
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-
-extern const EOconstvector* const eo_cfg_nvsEP_mc_leftleg_usr_rem_ebx_constvector_of_EOnv_usr;
-
-extern eo_cfg_nvsEP_mc_leftleg_t* eo_cfg_nvsEP_mc_leftleg_usr_rem_ebx_mem_local;
+// empty-section
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern void eo_cfg_nvsEP_mc_leftleg_usr_rem_ebx_initialise(void* loc, void* rem);
+#define OVERRIDE_eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe
+
+
 
 
 /** @}            
-    end of group eo_23sdfwervcer  
+    end of group eo_2desh2uilsdede2345er  
  **/
 
 #endif  // include-guard
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
-
-
 
 
