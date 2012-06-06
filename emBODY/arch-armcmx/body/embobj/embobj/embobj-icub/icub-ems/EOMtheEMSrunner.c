@@ -79,10 +79,6 @@ const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg =
     EO_INIT(.execDOafter)               500, 
     EO_INIT(.execTXafter)               700, 
     EO_INIT(.safetyGAP)                 10
-//     EO_INIT(.period)                    500000, 
-//     EO_INIT(.execDOafter)               50000, 
-//     EO_INIT(.execTXafter)               75000, 
-//     EO_INIT(.safetyGAP)                 500
 };
 
 
@@ -122,8 +118,7 @@ static void s_eom_emsrunner_start_taskDO(void *arg);
 
 static void s_eom_emsrunner_start_taskTX(void *arg);
 
-//static void s_eom_emsrunner_cbk_activate_from_isr(void* arg);
-//static void s_eom_emsrunner_cbk_activate_from_tsk(void* arg);
+
 static void s_eom_emsrunner_cbk_activate_from_osaltmrman(osal_timer_t* tmr, void* par);
 
 static void s_eom_emsrunner_cbk_activate_with_period_by_hal_timer(void* arg, osal_caller_t osalcaller);
@@ -354,12 +349,79 @@ extern void tskEMSrunTX(void *p)
 } 
 
 
-__weak extern void eom_emsrunner_hid_userdef_taskRX_beforedatagramreception(void)
+__weak extern void eom_emsrunner_hid_userdef_taskRX_activity(void)
+{   
+    uint16_t numberofrxdatagrams = 0;
+    uint16_t numberofrxrops = 0;
+    eOabstime_t txtimeofrxropframe = 0;
+    
+    // A. perform a first activity before datagram reception
+    eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(); 
+
+    // B. receive and parse datagram(s)
+    eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(&numberofrxdatagrams, &numberofrxrops, &txtimeofrxropframe);
+    
+    // C. perform a third activity after datagram parsing
+    eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(numberofrxdatagrams, numberofrxrops, txtimeofrxropframe);                
+}
+
+
+__weak extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(void)
 {
     
 }
 
-__weak extern void eom_emsrunner_hid_userdef_taskRX_afterdatagramreception(uint16_t numberofrxrops, eOabstime_t txtimeofrxropframe)
+__weak extern void eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(uint16_t *numberofrxdatagrams, uint16_t *numberofrxrops, eOabstime_t *txtimeofrxropframe)
+{
+    EOpacket *rxpkt = NULL;
+    eOsizecntnr_t remainingrxpkts = 0;
+    eOresult_t res;
+    static uint32_t lost_datagrams = 0;
+    uint16_t received = 0;
+
+ 
+
+       
+    // 1. get the packet. we need passing just a pointer because the storage is inside the EOMtheEMSsocket       
+    res = eom_emssocket_Receive(eom_emssocket_GetHandle(), &rxpkt, &remainingrxpkts);
+            
+    // 2. process the packet with the transceiver
+    if(eores_OK == res)
+    {
+        res = eom_emstransceiver_Parse(eom_emstransceiver_GetHandle(), rxpkt, numberofrxrops, txtimeofrxropframe);
+        received ++;
+    }
+    
+    #warning ---> what to do if there are n > 1 datagram in teh queue ??? so far i remove them without parsing
+    
+    if(remainingrxpkts > 0)
+    {
+        uint8_t i;
+        for(i=0;i<4;i++)
+        {
+            uint16_t tmp = 0;
+            lost_datagrams++;
+            remainingrxpkts = 0;
+            res = eom_emssocket_Receive(eom_emssocket_GetHandle(), &rxpkt, &remainingrxpkts);
+            if(eores_OK == res)
+            {
+                res = eom_emstransceiver_Parse(eom_emstransceiver_GetHandle(), rxpkt, &tmp, txtimeofrxropframe);
+                received ++;
+                *numberofrxrops += tmp;
+            }
+            if(0 == remainingrxpkts)
+            {
+                break;
+            }
+        }           
+    }
+    
+    
+    *numberofrxdatagrams = received;
+           
+}
+
+__weak extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(uint16_t numberofrxdatagrams, uint16_t numberofrxrops, eOabstime_t txtimeofrxropframe)
 {
     
 }
@@ -369,12 +431,45 @@ __weak extern void eom_emsrunner_hid_userdef_taskDO_activity(void)
     
 }
 
-__weak extern void eom_emsrunner_hid_userdef_taskTX_beforedatagramtransmission(void)
+__weak extern void eom_emsrunner_hid_userdef_taskTX_activity(void)
+{
+    uint16_t numberoftxrops = 0;
+
+    // A. perform a first activity
+    eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission();    
+         
+    // B. transmit a datagram
+    eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmission(&numberoftxrops);
+    
+    // C. perform an user-defined function after datagram transmission
+    eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(numberoftxrops);           
+}
+
+
+
+__weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(void)
 {
     
 }
 
-__weak extern void eom_emsrunner_hid_userdef_taskTX_afterdatagramtransmission(uint16_t numberoftxrops)
+__weak extern void eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmission(uint16_t *numberoftxrops)
+{
+    EOpacket* txpkt = NULL;
+    eOresult_t res;
+ 
+
+    // 1. call the former to retrieve a tx packet (even if it is an empty ropframe)        
+    res = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, numberoftxrops);
+    
+    // 2.  send a packet back. but only if the former gave us a good one.
+    if(eores_OK == res)
+    {
+        res = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
+    }        
+           
+}
+
+__weak extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(uint16_t numberoftxrops)
 {
     
 }
@@ -386,7 +481,6 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_afterdatagramtransmission(ui
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static uint32_t received = 0;
 
 static void s_eom_emsrunner_taskRX_startup(EOMtask *p, uint32_t t)
 {
@@ -397,72 +491,14 @@ static void s_eom_emsrunner_taskRX_startup(EOMtask *p, uint32_t t)
 
 static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
 {
-    EOpacket *rxpkt = NULL;
-    eOsizecntnr_t remainingrxpkts = 0;
-    uint16_t numberofrxrops = 0;
-    eOabstime_t txtimeofrxropframe = 0;
-    eOresult_t res;
-    static uint32_t lost_datagrams = 0;
     // do things .... only when both eo_emsrunner_evt_enable and a eo_emsrunner_evt_execute are received.
+    
     
     //eov_ipnet_Activate(eov_ipnet_GetHandle());
     
-    
- 
-    
-    // A. perform a first activity
-    eom_emsrunner_hid_userdef_taskRX_beforedatagramreception(); 
-
-    // B. receive and parse a single datagram
-    {
-        
-        // 1. get the packet. we need passing just a pointer because the storage is inside the EOMtheEMSsocket       
-        res = eom_emssocket_Receive(eom_emssocket_GetHandle(), &rxpkt, &remainingrxpkts);
-                
-        // 2. process the packet with the transceiver
-        if(eores_OK == res)
-        {
-            res = eom_emstransceiver_Parse(eom_emstransceiver_GetHandle(), rxpkt, &numberofrxrops, &txtimeofrxropframe);
-            received ++;
-        }
-        
-        #warning ---> what to do if there are n > 1 datagram in teh queue ??? so far i remove them without parsing
-        
-        if(remainingrxpkts > 0)
-        {
-            uint8_t i;
-            for(i=0;i<4;i++)
-            {
-                uint16_t tmp = 0;
-                lost_datagrams++;
-                remainingrxpkts = 0;
-                res = eom_emssocket_Receive(eom_emssocket_GetHandle(), &rxpkt, &remainingrxpkts);
-                if(eores_OK == res)
-                {
-                    res = eom_emstransceiver_Parse(eom_emstransceiver_GetHandle(), rxpkt, &tmp, &txtimeofrxropframe);
-                    received ++;
-                    numberofrxrops += tmp;
-                }
-                if(0 == remainingrxpkts)
-                {
-                    break;
-                }
-            }           
-        }
-        
-    }
-    
-    if(3 == received)
-    {
-        received = 0;
-        eom_emsrunner_StopAndGoTo(eom_emsrunner_GetHandle(), eo_sm_emsappl_EVgo2cfg);
-    }
-    
-    // C. perform an user-defined function after datagram parsing
-    eom_emsrunner_hid_userdef_taskRX_afterdatagramreception(numberofrxrops, txtimeofrxropframe);    
-    
-   
-
+    // perform the rx activity     
+    eom_emsrunner_hid_userdef_taskRX_activity();
+  
     //eov_ipnet_Deactivate(eov_ipnet_GetHandle());
     
     // Z. at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
@@ -482,7 +518,7 @@ static void s_eom_emsrunner_taskDO_run(EOMtask *p, uint32_t t)
     // do things .... only when both eo_emsrunner_evt_enable and a eo_emsrunner_evt_execute are received.
 
 
-    // A. perform a do activity
+    // perform the do activity
     eom_emsrunner_hid_userdef_taskDO_activity();   
     
 
@@ -498,47 +534,18 @@ static void s_eom_emsrunner_taskTX_startup(EOMtask *p, uint32_t t)
 
 
 
-
 static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
 {
-    EOpacket* txpkt = NULL;
-    uint16_t numberoftxrops = 0;
-    eOresult_t res;
-    
     // do things .... only when both eo_emsrunner_evt_enable and a eo_emsrunner_evt_execute are received.
     
     //eov_ipnet_Activate(eov_ipnet_GetHandle());
     
-
-    // A. perform a first activity
-    eom_emsrunner_hid_userdef_taskTX_beforedatagramtransmission();    
-    
-    
-    
-    // B. transmit a single datagram
-    {
-        // 1. call the former to retrieve a tx packet (even if it is an empty ropframe)        
-        res = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, &numberoftxrops);
-        
-        // 2.  send a packet back. but only if the former gave us a good one.
-        if(eores_OK == res)
-        {
-            res = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
-        }        
-        
-    }
-    
-    
-    // C. perform an user-defined function after datagram transmission
-    eom_emsrunner_hid_userdef_taskTX_afterdatagramtransmission(numberoftxrops);    
-    
-    
-    
+    eom_emsrunner_hid_userdef_taskTX_activity();
     
     //eov_ipnet_Deactivate(eov_ipnet_GetHandle());
 
 
-    // Z. at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
+    // at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
     if(eobool_true == s_theemsrunner.cycleisrunning)
     {
         s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runRX], osal_callerTSK);

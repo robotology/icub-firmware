@@ -161,17 +161,6 @@ extern void tskEMScfg(void *p)
 
 __weak extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(uint16_t numberofrxrops, eOabstime_t txtimeofrxropframe)
 {
-    static uint8_t num = 0;
-            // juts for debug
-        if(0 == numberofrxrops)
-        {
-            num++;
-            if(3 == num)
-            {
-                num = 0;
-                eom_emsappl_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2run);
-            }
-        }
 
 } 
 

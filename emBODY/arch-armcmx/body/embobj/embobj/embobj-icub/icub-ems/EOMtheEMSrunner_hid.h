@@ -69,14 +69,25 @@ struct EOMtheEMSrunner_hid
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
+// default function for RX: it calls _beforedatagramreception(), _datagramreception(), _afterdatagramreception()
+extern void eom_emsrunner_hid_userdef_taskRX_activity(void);
 
-extern void eom_emsrunner_hid_userdef_taskRX_beforedatagramreception(void);
-extern void eom_emsrunner_hid_userdef_taskRX_afterdatagramreception(uint16_t numberofrxrops, eOabstime_t txtimeofrxropframe);
+// default funtion for RX-before-datagram-reception: it is empty.
+extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(void);
+// default funztion for RX-datagram-reception: it repeates upto xx times: get a pkt, call the transceiver, verifies if a quit evt has arrived.
+extern void eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(uint16_t *numberofrxdatagrams, uint16_t *numberofrxrops, eOabstime_t *txtimeofrxropframe);
+// deafult function for RX-after-datagram-reception
+extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(uint16_t numberofrxdatagrams, uint16_t numberofrxrops, eOabstime_t txtimeofrxropframe);
+
 
 extern void eom_emsrunner_hid_userdef_taskDO_activity(void);
 
-extern void eom_emsrunner_hid_userdef_taskTX_beforedatagramtransmission(void);
-extern void eom_emsrunner_hid_userdef_taskTX_afterdatagramtransmission(uint16_t numberoftxrops);
+
+extern void eom_emsrunner_hid_userdef_taskTX_activity(void);
+
+extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(void);
+extern void eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmission(uint16_t *numberoftxrops);
+extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(uint16_t numberoftxrops);
 
 
 #ifdef __cplusplus
