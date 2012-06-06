@@ -376,7 +376,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 
 #define CMACRO_EXTERNALPREFIX_GETID                EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_c00
 
-#define CMACRO_EXTERNALPREFIX_CONST                s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue
+#define CMACRO_EXTERNALPREFIX_CONST                s_eo_cfg_nvsEP_mc_lowerarm_con_
 
 #define CMACRO_PSTR    _lowerarm
 #define CMACRO_CSTR    _c00
