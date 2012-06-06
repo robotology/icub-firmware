@@ -1,19 +1,19 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOSPEEDMETER_H_
-#define _EOSPEEDMETER_H_
+#ifndef _EOSPEEDCURVE_H_
+#define _EOSPEEDCURVE_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/** @file       EOspeedmeter.h
-    @brief      This header file implements public interface to axis speed measure from slow encoder.
+/** @file       EOtrajectory.h
+    @brief      This header file implements public interface to a motor minimum jerk trajectory generator.
     @author     alessandro.scalzo@iit.it
-    @date       19/05/2012
+    @date       27/03/2012
 **/
 
-/** @defgroup eo_speedmeter Object EOspeedmeter
+/** @defgroup eo_trajectory Object EOtrajectory
     Does something.
      
     @{        
@@ -33,12 +33,12 @@ extern "C" {
 
  
 
-/** @typedef    typedef struct EOspeedmeter_hid EOspeedmeter
-    @brief      EOpid is an opaque struct. It is used to implement data abstraction for the 
+/** @typedef    typedef struct EOtrajectory_hid EOtrajectory
+    @brief      EOtrajectory is an opaque struct. It is used to implement data abstraction for the 
                 object so that the user cannot see its private fields and he/she is forced to manipulate the
                 object only with the proper public functions. 
  **/  
-typedef struct EOspeedmeter_hid EOspeedmeter;
+typedef struct EOspeedcurve_hid EOspeedcurve;
 
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
@@ -48,17 +48,25 @@ typedef struct EOspeedmeter_hid EOspeedmeter;
 // - declaration of extern public functions ---------------------------------------------------------------------------
  
  
-extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution, int32_t frequency);
+/** @fn         extern EOtrajectory* eo_trajectory_New(void)
+    @brief      Creates a new trajectory object 
+    @return     The pointer to the required object.
+ **/
+extern EOspeedcurve* eo_speedcurve_New(void);
 
-extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder);
-extern void eo_speedometer_EncoderError(EOspeedmeter* o);
-extern int32_t eo_speedometer_GetSpeed(EOspeedmeter* o);
-extern int32_t eo_speedometer_GetPosition(EOspeedmeter* o);
-extern int32_t eo_speedometer_GetDistance(EOspeedmeter* o);
+extern void eo_speedcurve_SetReference(EOspeedcurve *o, int32_t p0, int32_t v0, int32_t vf, int32_t acc);
 
+extern void eo_speedcurve_Stop(EOspeedcurve *o, int32_t p);
+
+extern eObool_t eo_speedcurve_IsDone(EOspeedcurve* o);
+
+extern int32_t eo_speedcurve_GetVel(EOspeedcurve* o);
+
+extern void eo_speedcurve_Step(EOspeedcurve* o, int32_t* p, int32_t* v, int32_t *a);
+//extern int32_t eo_speedcurve_Step2(EOtrajectory* o, int32_t *p, int32_t *v, int32_t *a)
 
 /** @}            
-    end of group eo_pid  
+    end of group eo_trajectory  
  **/
 
 #ifdef __cplusplus

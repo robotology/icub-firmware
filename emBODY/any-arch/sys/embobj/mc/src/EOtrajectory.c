@@ -63,6 +63,8 @@
 static const char s_eobj_ownname[] = "EOtrajectory";
 
 static const int32_t FREQUENCY = 1000;         // 1 kHz
+static const float   frequency = (float)FREQUENCY;
+static const float   PERIOD = 1.0f/frequency;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -81,7 +83,7 @@ extern EOtrajectory* eo_trajectory_New(void)
         o->pf = 0;
         o->vf = 0;
 
-        o->DT = 0.0f;
+        o->period_by_time2 = 0.0f;
 
         o->steps_to_end = 0;
 
@@ -95,9 +97,9 @@ extern EOtrajectory* eo_trajectory_New(void)
 
 extern void eo_trajectory_SetReference(EOtrajectory *o, int32_t p0, int32_t pf, int32_t v0, int32_t vf, int32_t speed)
 {
-    if (!speed)
+    if (!speed || p0==pf)
     {
-        eo_trajectory_Abort(o, p0);
+        o->steps_to_end = 0;
 
         return;
     }    
@@ -124,7 +126,7 @@ extern void eo_trajectory_SetReference(EOtrajectory *o, int32_t p0, int32_t pf, 
     float BDT2 = ((float)B)*DT2;
     float ADT3 = ((float)A)*DT2*DT;
 
-    o->DT = DT;
+    o->period_by_time2 = DT2*frequency;
 
     o->Kw =       6.0f*ADT3;
     o->Wn = o->Kw+2.0f*BDT2;
@@ -137,10 +139,10 @@ extern void eo_trajectory_SetReference(EOtrajectory *o, int32_t p0, int32_t pf, 
     @return     The actual trajectory point value.
  **/
 
-extern void eo_trajectory_Abort(EOtrajectory *o, int32_t p)
+extern void eo_trajectory_Stop(EOtrajectory *o, int32_t p)
 {
-    o->pf = p;
-    o->vf = 0;
+    o->pf = o->p = p;
+    o->vf = o->v = 0;
 
     o->steps_to_end = 0;
 }
@@ -177,8 +179,8 @@ extern void eo_trajectory_Step(EOtrajectory* o, int32_t *p, int32_t *v, int32_t 
     o->Yn += o->Wn;
     o->Wn += o->Kw;
 
-    o->v += o->DT*o->a;
-    o->p += o->DT*o->v;
+    o->v += o->period_by_time2*o->a;
+    o->p += PERIOD*o->v;
 
     if (a) *a = (int32_t) o->a;
     if (v) *v = (int32_t) o->v;
