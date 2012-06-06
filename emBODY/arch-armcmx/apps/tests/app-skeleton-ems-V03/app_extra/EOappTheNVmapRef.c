@@ -38,6 +38,10 @@
 #include "EOnv_hid.h"
 
 #include "eOcfg_nvsEP_mc.h"
+#include "eOcfg_nvsEP_sk.h" 
+
+#include "EoMotionControl.h"
+#include "EoSkin.h"
           
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -206,8 +210,9 @@ static eOresult_t s_eo_appTheNVmapRef_tables_create(eOappTheNVmapRef_cfg_t *cfg)
     uint8_t         i;
     eOsizecntnr_t  size;
     EOappTheNVmapRef* p = &s_eo_appTheNVmapRef;
-    uint32_t id = 0;
-    eOresult_t res;
+    eOmc_jointId_t *jid_ptr;
+    eOmc_motorId_t *mid_ptr;
+    eOsk_skinId_t  *skid_ptr;
     
 
     //reset joint list
@@ -220,66 +225,62 @@ static eOresult_t s_eo_appTheNVmapRef_tables_create(eOappTheNVmapRef_cfg_t *cfg)
     memset(p->skinList, 0, sizeof(p->skinList));
 
 
-    id = 0;
+
     size = 0;
     //create joint-NV table
     if(NULL != cfg->jointsList)
     {
-        eo_fifoword_Size(cfg->jointsList, &size, 0);
+        size = eo_array_Size(cfg->jointsList); //eo_fifoword_Size(cfg->jointsList, &size, 0);
       
         for(i = 0; i<size; i++)
         {
-            res = eo_fifoword_Get(cfg->jointsList, &id, 0);
-            if(eores_OK != res)
+            jid_ptr = (eOmc_jointId_t*) eo_array_At(cfg->jointsList, i);
+            if(NULL == jid_ptr)
             {
-                return(res);
+                return(eores_NOK_generic);
             }
-            eo_fifoword_Rem(cfg->jointsList, 0);
            
-            p->jointsList[id] = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
+            p->jointsList[(*jid_ptr)] = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
                                                sizeof(void*), jointNVindex_TOTALnumber);    
         }
     }
 
-    id = 0;
     size = 0;
     //create motor-NV table
     if(NULL != cfg->motorsList)
     {
-        eo_fifoword_Size(cfg->motorsList, &size, 0);
+        size = eo_array_Size(cfg->motorsList); //eo_fifoword_Size(cfg->motorsList, &size, 0);
       
         for(i = 0; i<size; i++)
         {
-            res = eo_fifoword_Get(cfg->motorsList, &id, 0);
-            if(eores_OK != res)
+            mid_ptr = (eOmc_motorId_t*) eo_array_At(cfg->motorsList, i);
+            if(NULL == mid_ptr)
             {
-                return(res);
+                return(eores_NOK_generic);
             }
-            eo_fifoword_Rem(cfg->motorsList, 0);
-            p->motorsList[id] = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
+
+            p->motorsList[(*mid_ptr)] = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
                                                sizeof(void*), motorNVindex_TOTALnumber);
                 
         }
     }
 
 
-    id = 0;
     size = 0;
     //create skin-NV table
     if(NULL != cfg->skinList)
     {
-        eo_fifoword_Size(cfg->skinList, &size, 0);
+        size = eo_array_Size(cfg->skinList); //eo_fifoword_Size(cfg->skinList, &size, 0);
       
         for(i = 0; i<size; i++)
         {
-            res = eo_fifoword_Get(cfg->skinList, &id, 0);
-            if(eores_OK != res)
+            skid_ptr = (eOsk_skinId_t*) eo_array_At(cfg->skinList, i);
+            if(NULL == skid_ptr)
             {
-                return(res);
+                return(eores_NOK_generic);
             }
-            eo_fifoword_Rem(cfg->skinList, 0);
-            p->skinList[id] = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
-                                               sizeof(void*),10);    
+            p->skinList[*skid_ptr] = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
+                                               sizeof(void*), skinNVindex_TOTALnumber);    
         }
     }
 

@@ -57,6 +57,11 @@
 #include "eOcfg_emsCanNetworkTopology.h"
 #include "eOcfg_icubCanProto_messagesLookupTbl.h"
 
+
+#include "EOappTheNVmapRef.h" //==> included to clear skin array
+// #include "eOcfg_nvsEP_sk.h"   //==> included to clear skin array
+#include "EOarray.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -162,18 +167,18 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg)
     return(retptr);
 }
 
-extern eOresult_t eo_appCanSP_GetConnectedJoints(EOappCanSP *p, EOfifoWord *connectedJointsList)
+extern eOresult_t eo_appCanSP_GetConnectedJoints(EOappCanSP *p,EOarray *connectedJointsList)
 {
     return(eo_emsCanNetTopo_GetConnectedJoints(p->emsCanNetTopo_ptr, connectedJointsList));
 }
 
 
-extern eOresult_t eo_appCanSP_GetConnectedMotors(EOappCanSP *p, EOfifoWord *connectedMotorsList)
+extern eOresult_t eo_appCanSP_GetConnectedMotors(EOappCanSP *p, EOarray *connectedMotorsList)
 {
     return(eo_emsCanNetTopo_GetConnectedMotors(p->emsCanNetTopo_ptr, connectedMotorsList));
 }
 
-extern eOresult_t eo_appCanSP_GetConnectedSensors(EOappCanSP *p, EOfifoWord *connectedSensorsList)
+extern eOresult_t eo_appCanSP_GetConnectedSensors(EOappCanSP *p, EOarray *connectedSensorsList)
 {
     return(eo_emsCanNetTopo_GetConnectedSensors(p->emsCanNetTopo_ptr, connectedSensorsList));
 }

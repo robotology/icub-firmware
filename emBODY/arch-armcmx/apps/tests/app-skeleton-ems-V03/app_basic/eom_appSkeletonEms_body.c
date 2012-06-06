@@ -41,9 +41,10 @@
 #include "EOsocketDatagram.h"
 #include "EOtheBOARDtransceiver.h"
 #include "EOtheBOARDtransceiver_hid.h"
-#include "EOfifoWord.h"
+#include "EOarray.h"
 
 #include "EoMotionControl.h"
+#include "EoSensors.h"
 #include "EOnvsCfg.h"
 
 
@@ -304,13 +305,12 @@ static void s_eom_appSkeletonEms_body_EncodersReader_init(void)
 static void s_eom_appSkeletonEms_body_NVmapRef_init(void)
 {
 
-    EOfifoWord *sList_ptr;
-
+ 
     eOappTheNVmapRef_cfg_t cfg =
     {
-        EO_INIT(.jointsList)    eo_fifoword_New(20 /*jointNumber_TOTALnumber*/, NULL),
-        EO_INIT(.motorsList)    eo_fifoword_New(20 /*motorNumber_TOTALnumber*/, NULL),
-        EO_INIT(.sensorsList)   sList_ptr,
+        EO_INIT(.jointsList)    eo_array_New(12, sizeof(eOmc_jointId_t), NULL),
+        EO_INIT(.motorsList)    eo_array_New(12, sizeof(eOmc_motorId_t), NULL),
+        EO_INIT(.sensorsList)   NULL,
         EO_INIT(.nvsCfg)        eo_boardtransceiver_hid_GetNvsCfg(),
         EO_INIT(.mc_endpoint)      (0x0017) //endpoint_mc_leftlowerleg
     };

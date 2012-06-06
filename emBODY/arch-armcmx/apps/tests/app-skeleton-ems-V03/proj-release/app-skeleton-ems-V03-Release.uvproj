@@ -61,6 +61,8 @@
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
+            <nStopU1X>0</nStopU1X>
+            <nStopU2X>0</nStopU2X>
           </BeforeCompile>
           <BeforeMake>
             <RunUserProg1>0</RunUserProg1>
@@ -1103,6 +1105,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOtrajectory.c</FilePath>
             </File>
+            <File>
+              <FileName>EOspeedcurve.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOspeedcurve.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -1162,6 +1169,8 @@
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
+            <nStopU1X>0</nStopU1X>
+            <nStopU2X>0</nStopU2X>
           </BeforeCompile>
           <BeforeMake>
             <RunUserProg1>0</RunUserProg1>
@@ -1445,9 +1454,9 @@
             <uThumb>0</uThumb>
             <VariousControls>
               <MiscControls>--c99 --forceinline</MiscControls>
-              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO _FORCE_NETWORK_FROM_IPAL_CFG</Define>
+              <Define>STM32F10X_CL HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO _FORCE_NETWORK_FROM_IPAL_CFG</Define>
               <Undefine></Undefine>
-              <IncludePath>.;..\app_basic;..\app_extra;..\cfg\abslayer;..\cfg\icub-can-proto;..\cfg\icub-can-net;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\config\nvs\common;..\..\..\..\..\any-arch\sys\embobj\config\nvs\local;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\mc\api;..\..\..\..\..\any-arch\sys\embobj\mc\src;..\..\..\..\..\any-arch\sys\embobj\icub-ems\src;..\..\..\..\..\any-arch\sys\embobj\icub-ems\api</IncludePath>
+              <IncludePath>.;..\app_basic;..\app_extra;..\cfg\abslayer;..\cfg\icub-can-proto;..\cfg\icub-can-net;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\config\nvs\common;..\..\..\..\..\any-arch\sys\embobj\config\nvs\local;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\mc\api;..\..\..\..\..\any-arch\sys\embobj\mc\src;..\..\..\..\..\any-arch\sys\embobj\icub-ems\src;..\..\..\..\..\any-arch\sys\embobj\icub-ems\api;..\..\..\..\sys\mid\inc;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2206,6 +2215,11 @@
               <FileName>EOtrajectory.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOtrajectory.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOspeedcurve.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOspeedcurve.c</FilePath>
             </File>
           </Files>
         </Group>

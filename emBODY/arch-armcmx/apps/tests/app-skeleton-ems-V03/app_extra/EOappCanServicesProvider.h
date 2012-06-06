@@ -40,7 +40,7 @@
 #include "EoCommon.h"
 #include "EoMotionControl.h"
 #include "EoBoards.h"
-#include "EOfifoWord.h"
+#include "EOarray.h"
 #include "EOicubCanProto_specifications.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -81,32 +81,35 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg);
 
 
 
-/** @fn         eOresult_t eo_appCanSP_GetConnectedJoints(EOappCanSP *p, EOfifoWord *connectedJointsList)
+/** @fn         eOresult_t eo_appCanSP_GetConnectedJoints(EOappCanSP *p, EOarray *connectedJointsList)
     @brief      fill @e connectedJointsList with joint id connected to ems
     @param      p                       target obj
     @param      connectedJointsList     in output contains a list of joint id connected to ems 
-    @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
+    @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, else ok.
+                if no joints are connected to ems, connectedJointsList is empty.
  **/
-extern eOresult_t eo_appCanSP_GetConnectedJoints(EOappCanSP *p, EOfifoWord *connectedJointsList); 
+extern eOresult_t eo_appCanSP_GetConnectedJoints(EOappCanSP *p, EOarray *connectedJointsList); 
 
 
-/** @fn         eOresult_t eo_appCanSP_GetConnectedMotors(EOappCanSP *p, EOfifoWord *connectedMotorsList)
+/** @fn         eOresult_t eo_appCanSP_GetConnectedMotors(EOappCanSP *p, EOarray *connectedMotorsList)
     @brief      fill @e connectedMotorsList with motor id connected to ems
     @param      p                       target obj
     @param      connectedMotorsList     in output contains a list of motor id connected to ems 
-    @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
+    @return     eores_OK or eores_NOK_nullpointer if p or connectedMotorsList are null,else ok.
+                if no motors are connected to ems, connectedMotorsListd is empty.
  **/
-extern eOresult_t eo_appCanSP_GetConnectedMotors(EOappCanSP *p, EOfifoWord *connectedMotorsList);
+extern eOresult_t eo_appCanSP_GetConnectedMotors(EOappCanSP *p, EOarray *connectedMotorsList);
 
 
 
-/** @fn         eOresult_t eo_appCanSP_GetConnectedSensors(EOappCanSP *p, EOfifoWord *connectedSensorsList)
+/** @fn         eOresult_t eo_appCanSP_GetConnectedSensors(EOappCanSP *p, EOarray *connectedSensorsList)
     @brief      fill @e connectedSensorsList with Sensor id connected to ems
     @param      p                       target obj
     @param      connectedJSensorsList     in output contains a list of Sensor id connected to ems 
-    @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
+    @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, else ok.
+                if no sensors are connected to ems, connectedSensorsList is empty.
  **/
-extern eOresult_t eo_appCanSP_GetConnectedSensors(EOappCanSP *p, EOfifoWord *connectedSensorsList);
+extern eOresult_t eo_appCanSP_GetConnectedSensors(EOappCanSP *p, EOarray *connectedSensorsList);
 
 
 

@@ -39,7 +39,7 @@
 #include "EoCommon.h"
 #include "EoMotionControl.h"
 #include "EoSkin.h"
-#include "EOfifoWord.h"
+#include "EOarray.h"
 #include "EOnvsCfg.h"
 #include "EOnv.h"
 
@@ -56,10 +56,10 @@
  **/  
 typedef struct
 {
-    EOfifoWord  *jointsList;  /**<  List of joints used by the application  */
-    EOfifoWord  *motorsList;  /**<  List of motors used by the application  */
-    EOfifoWord  *sensorsList; /**<  List of sensors used by the application */
-    EOfifoWord  *skinList;    /**<  List of sensors used by the application */
+    EOarray     *jointsList;  /**<  List of joints used by the application  */
+    EOarray     *motorsList;  /**<  List of motors used by the application  */
+    EOarray     *sensorsList; /**<  List of sensors used by the application */
+    EOarray     *skinList;    /**<  List of sensors used by the application */
     EOnvsCfg    *nvsCfg;      /**<  Network Variable configuration          */
     eOnvEP_t    mc_endpoint;  /**<  motion control endopoint managed by the application    */
     eOnvEP_t    as_endpoint;  /**<  analog sensor endopoint managed by the application    */
