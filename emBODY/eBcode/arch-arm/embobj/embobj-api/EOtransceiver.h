@@ -63,6 +63,17 @@ extern "C" {
 typedef struct EOtransceiver_hid EOtransceiver;
 
 
+typedef struct   
+{
+    uint16_t        capacityofpacket; 
+    uint16_t        capacityofrop;    
+    uint16_t        capacityofropframeregulars; 
+    uint16_t        capacityofropframeoccasionals;
+    uint16_t        capacityofropframereplies;
+    uint16_t        maxnumberofregularrops;
+} eo_transceiver_sizes_t; 
+
+
 typedef struct
 {
     uint16_t        capacityofpacket; 
