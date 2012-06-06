@@ -96,8 +96,8 @@ EOnv_con_t CMACRO_NAMEOFVARIABLE(CMACRO_PSTR, CMACRO_CSTR, _cconfig) =
  
     EO_INIT(.id)        CMACRO_GETNVID(CMACRO_EXTERNALPREFIX_GETID, _cconfig, CMACRO_CNUM),
     EO_INIT(.capacity)  CAPACITY_cconfig,
-    //EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_cxxdefault_defaultvalue.cconfig,
-    EO_INIT(.resetval)  (const void*)&CMACRO_CONST(CMACRO_EXTERNALPREFIX_CONST, .cconfig),
+//    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_cxxdefault_defaultvalue.cconfig,
+    EO_INIT(.resetval)  (const void*)&CMACRO_CONST(CMACRO_EXTERNALPREFIX_CONST, defaultvalue.cconfig),
     EO_INIT(.offset)    OFFSETof_cconfig,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_cxx_NVFUNTYP_cconfig),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_cxx_NVFUNTYP_cconfig)
@@ -112,8 +112,8 @@ EOnv_con_t CMACRO_NAMEOFVARIABLE(CMACRO_PSTR, CMACRO_CSTR, _cconfig__durationofc
 {   
     EO_INIT(.id)        CMACRO_GETNVID(CMACRO_EXTERNALPREFIX_GETID, _cconfig__durationofctrlloop, CMACRO_CNUM), 
     EO_INIT(.capacity)  CAPACITY_cconfig__durationofctrlloop,
-    //EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_cxxdefault_defaultvalue.cconfig.durationofctrlloop,
-    EO_INIT(.resetval)  (const void*)&CMACRO_CONST(CMACRO_EXTERNALPREFIX_CONST, .cconfig.durationofctrlloop),
+//    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_cxxdefault_defaultvalue.cconfig.durationofctrlloop,
+    EO_INIT(.resetval)  (const void*)&CMACRO_CONST(CMACRO_EXTERNALPREFIX_CONST, defaultvalue.cconfig.durationofctrlloop),
     EO_INIT(.offset)    OFFSETof_cconfig__durationofctrlloop,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_cxx_NVFUNTYP_cconfig__durationofctrlloop),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_cxx_NVFUNTYP_cconfig__durationofctrlloop)
@@ -134,8 +134,8 @@ EOnv_con_t CMACRO_NAMEOFVARIABLE(CMACRO_PSTR, CMACRO_CSTR, _cstatus) =
 {   
     EO_INIT(.id)        CMACRO_GETNVID(CMACRO_EXTERNALPREFIX_GETID, _cstatus, CMACRO_CNUM),    
     EO_INIT(.capacity)  CAPACITY_cstatus,
-    //EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_cxxdefault_defaultvalue.cstatus,
-    EO_INIT(.resetval)  (const void*)&CMACRO_CONST(CMACRO_EXTERNALPREFIX_CONST, .cstatus),
+//    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_cxxdefault_defaultvalue.cstatus,
+    EO_INIT(.resetval)  (const void*)&CMACRO_CONST(CMACRO_EXTERNALPREFIX_CONST, defaultvalue.cstatus),
     EO_INIT(.offset)    OFFSETof_cstatus,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_cxx_NVFUNTYP_cstatus),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_cxx_NVFUNTYP_cstatus)
@@ -149,8 +149,8 @@ EOnv_con_t CMACRO_NAMEOFVARIABLE(CMACRO_PSTR, CMACRO_CSTR, _cstatus__alljomoinit
 {   
     EO_INIT(.id)        CMACRO_GETNVID(CMACRO_EXTERNALPREFIX_GETID, _cstatus__alljomoinitted, CMACRO_CNUM),    
     EO_INIT(.capacity)  CAPACITY_cstatus__alljomoinitted,
-    //EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_cxxdefault_defaultvalue.cstatus.alljomoinitted,
-    EO_INIT(.resetval)  (const void*)&CMACRO_CONST(CMACRO_EXTERNALPREFIX_CONST, .cstatus.alljomoinitted),
+//    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_cxxdefault_defaultvalue.cstatus.alljomoinitted,
+    EO_INIT(.resetval)  (const void*)&CMACRO_CONST(CMACRO_EXTERNALPREFIX_CONST, defaultvalue.cstatus.alljomoinitted),
     EO_INIT(.offset)    OFFSETof_cstatus__alljomoinitted,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_cxx_NVFUNTYP_cstatus__alljomoinitted),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_cxx_NVFUNTYP_cstatus__alljomoinitted)
@@ -170,8 +170,8 @@ EOnv_con_t CMACRO_NAMEOFVARIABLE(CMACRO_PSTR, CMACRO_CSTR, _ccmmnds__go2stateofc
 {   
     EO_INIT(.id)        CMACRO_GETNVID(CMACRO_EXTERNALPREFIX_GETID, _ccmmnds__go2stateofcontroller, CMACRO_CNUM),
     EO_INIT(.capacity)  CAPACITY_ccmmnds__go2stateofcontroller,
-    //EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_cxxdefault_defaultvalue.ccmmnds.go2stateofcontroller,
-    EO_INIT(.resetval)  (const void*)&CMACRO_CONST(CMACRO_EXTERNALPREFIX_CONST, .ccmmnds.go2stateofcontroller),
+//    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_cxxdefault_defaultvalue.ccmmnds.go2stateofcontroller,
+    EO_INIT(.resetval)  (const void*)&CMACRO_CONST(CMACRO_EXTERNALPREFIX_CONST, defaultvalue.ccmmnds.go2stateofcontroller),
     EO_INIT(.offset)    OFFSETof_ccmmnds__go2stateofcontroller,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_cxx_NVFUNTYP_ccmmnds__go2stateofcontroller),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_cxx_NVFUNTYP_ccmmnds__go2stateofcontroller)
