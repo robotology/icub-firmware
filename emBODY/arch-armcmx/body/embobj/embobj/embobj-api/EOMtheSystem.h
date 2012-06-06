@@ -152,6 +152,9 @@ extern EOMtheSystem* eom_sys_GetHandle(void);
 extern void eom_sys_Start(EOMtheSystem *p, eOvoid_fp_void_t userinit_fn);
 
 
+extern uint32_t eom_sys_GetHeapSize(EOMtheSystem *p);
+
+
 
 
 /** @}            

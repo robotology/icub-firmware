@@ -45,12 +45,12 @@ extern "C" {
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-#define EOK_BOARDTRANSCEIVER_capacityofpacket                   640
-#define EOK_BOARDTRANSCEIVER_capacityofrop                      192
-#define EOK_BOARDTRANSCEIVER_capacityofropframeregulars         384
-#define EOK_BOARDTRANSCEIVER_capacityofropframeoccasionals      128
-#define EOK_BOARDTRANSCEIVER_capacityofropframereplies          128 
-#define EOK_BOARDTRANSCEIVER_maxnumberofregularrops             16 
+//#define EOK_BOARDTRANSCEIVER_capacityofpacket                   640
+//#define EOK_BOARDTRANSCEIVER_capacityofrop                      192
+//#define EOK_BOARDTRANSCEIVER_capacityofropframeregulars         384
+//#define EOK_BOARDTRANSCEIVER_capacityofropframeoccasionals      128
+//#define EOK_BOARDTRANSCEIVER_capacityofropframereplies          128 
+//#define EOK_BOARDTRANSCEIVER_maxnumberofregularrops             16 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
@@ -60,9 +60,7 @@ typedef struct
     eOuint16_fp_uint16_t        hashfunction_ep2index;
     eOipv4addr_t                remotehostipv4addr;
     eOipv4port_t                remotehostipv4port;
-    uint8_t                     tobedefined; // ip, port, numendpoints ... or simply: local ip is retrieved by eeprom, remote ip from
-                             // first reception, port is fixed, numendpoints and an constvector of endpoint config
-                             // is store in a file containing a variable pointer to const data. 
+    eo_transceiver_sizes_t      sizes; 
 } eOboardtransceiver_cfg_t;
 
 
