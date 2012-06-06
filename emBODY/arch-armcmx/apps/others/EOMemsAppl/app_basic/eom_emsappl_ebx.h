@@ -56,7 +56,9 @@
     #undef  EMSAPPL_hasSKIN
     #undef  EMSAPPL_hasMC4
     #define EMSAPPL_has2FOC
-#endif 
+#else
+    #error --> you must define a EBx
+#endif
 
 
 // the name of the application
@@ -78,7 +80,9 @@
     #define EMSAPPL_NAME "EOMemsApplEB8"
 #elif   defined(USE_EB9)
     #define EMSAPPL_NAME "EOMemsApplEB9"
-#endif 
+#else
+    #error --> you must define a EBx
+#endif
 
 
 

@@ -1124,6 +1124,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\runner_overridden.c</FilePath>
             </File>
+            <File>
+              <FileName>configurator_overridden.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\configurator_overridden.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2255,6 +2260,11 @@
               <FileName>runner_overridden.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\runner_overridden.c</FilePath>
+            </File>
+            <File>
+              <FileName>configurator_overridden.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\configurator_overridden.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3388,6 +3398,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\runner_overridden.c</FilePath>
             </File>
+            <File>
+              <FileName>configurator_overridden.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\configurator_overridden.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4519,6 +4534,11 @@
               <FileName>runner_overridden.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\runner_overridden.c</FilePath>
+            </File>
+            <File>
+              <FileName>configurator_overridden.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\configurator_overridden.c</FilePath>
             </File>
           </Files>
         </Group>
