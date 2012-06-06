@@ -132,6 +132,7 @@ extern EOMtheSystem * eom_sys_Initialise(const eOmsystem_cfg_t *syscfg,
                                                   (eOuint64_fp_void_t)osal_system_nanotime_get,
                                                   hal_sys_irq_disable);
 
+    s_eom_system.halcfg     = syscfg->halcfg;
     s_eom_system.osalcfg    = syscfg->osalcfg;
     s_eom_system.tmrmancfg  = tmrmancfg;
     s_eom_system.cbkmancfg  = cbkmancfg;
@@ -201,7 +202,17 @@ extern void eom_sys_Start(EOMtheSystem *p, eOvoid_fp_void_t userinit_fn)
 
 
     s_eom_sys_start(userinit_fn);
-}    
+}
+
+extern uint32_t eom_sys_GetHeapSize(EOMtheSystem *p)
+{
+    if(NULL == s_eom_system.thevsys)
+    {
+        return(0);
+    }
+    
+    return(s_eom_system.halcfg->sys_heapsize);
+}
 
 
 

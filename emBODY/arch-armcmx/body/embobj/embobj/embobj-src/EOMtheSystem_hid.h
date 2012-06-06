@@ -61,6 +61,7 @@ struct EOMtheSystem_hid
     EOVtheSystem                *thevsys;
 
     // other stuff
+    const hal_cfg_t             *halcfg;
     const osal_cfg_t            *osalcfg;
     const eOmtimerman_cfg_t     *tmrmancfg;
     const eOmcallbackman_cfg_t  *cbkmancfg;
