@@ -36,11 +36,27 @@ extern "C" {
  
 struct EOspeedcurve_hid 
 {
+    float p;
+    float v;
+    float a;
+
+    float Ky;
+    float Yn;
+
+    float period_by_time;
+
+    int32_t vf;
+
+    int32_t steps_to_end;
+
+    /*
+    float p;
     float v;
     float vf;
     float acc;
-    float rabbit;
+    
     eObool_t done;
+    */
 }; 
 
 
