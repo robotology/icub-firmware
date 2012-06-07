@@ -353,14 +353,15 @@ void main(void)
 	    // max_real_position is the limit of the joint starting from 
 	    // 4095 and going to decrease this number without zero-cross
 	    // untill the joint limit is reached
-#if   VERSION == 0x0253 || VERSION == 0x0257 
+#if    VERSION == 0x0257 
 		_position_old[0]=_position[0]; 
 		if(get_error_abs_ssi(0)==ERR_OK)
-			_position[0]=Filter_Bit (get_relative_position_abs_ssi(0));
-		_position_old[1]=_position[1];
+			_position[0]=Filter_Bit (get_position_abs_ssi(0));
+    	_position_old[1]=_position[1];
 		if(get_error_abs_ssi(1)==ERR_OK) 
 			_position[1]=Filter_Bit (get_position_abs_ssi(1));
-		
+
+		 
 #elif VERSION ==0x0255
 		_position_old[0]=_position[0];
 		_position[0]=Filter_Bit (get_position_abs_ssi(0));
@@ -378,6 +379,7 @@ void main(void)
 		_position_old[i]=_position[i];
 		if(get_error_abs_ssi(i)==ERR_OK)
 		_position[i]=Filter_Bit (get_position_abs_ssi(i));
+		
 		}
 #endif 
 
