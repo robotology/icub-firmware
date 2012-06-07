@@ -244,13 +244,15 @@ int main(int argc, char *argv[])
 
     // Start receiver thread
     //pthread_create(&thread, NULL, recvThread, (void*) &remote01);
+	printf("Launching recvThread\n");
 	ACE_thread_t id_recvThread;
     if(ACE_Thread::spawn((ACE_THR_FUNC)recvThread, NULL, THR_CANCEL_ENABLE, &id_recvThread)==-1)
-    	ACE_DEBUG((LM_DEBUG,"Error in spawning recvThread\n"));
+    	printf((LM_DEBUG,"Error in spawning recvThread\n"));
 
+	printf("Launching skinThread\n");
     ACE_thread_t id_skinThread;
     if(ACE_Thread::spawn((ACE_THR_FUNC)skinThread, NULL, THR_CANCEL_ENABLE, &id_skinThread)==-1)
-    	ACE_DEBUG((LM_DEBUG,"Error in spawning id_skinThread\n"));
+    	printf((LM_DEBUG,"Error in spawning id_skinThread\n"));
 
 
 	 // Send a packet to test dummy
@@ -315,7 +317,7 @@ int main(int argc, char *argv[])
 
 void *recvThread(void * arg)
 {
-  printf("Thread started\n");
+  printf("recvThread started\n");
 
   int  timeout = 2000;
   Board_connect_info		sender;
@@ -355,16 +357,20 @@ void *recvThread(void * arg)
 
 void *skinThread(void * arg)
 {
+	printf("skinThread started\n");
     AnalogServer 		*analogServer;
     int 				period = 20;
     uint16_t			sizze;
 
     yarp::sig::Vector 	data;
 	uint8_t 			msgtype = 0;
-	uint8_t 			i, triangle = 0;
+	uint32_t 			i, triangle = 0;
 
-	uint8_t sensorsNum=16*12*1;
+	uint32_t sensorsNum=16*12*7;
     data.resize(sensorsNum);
+
+    for (i = 0; i< data.size(); i++ )
+    	data[i]=255;
 
     // Read the list of ports
 //	std::string root_name;
@@ -382,12 +388,15 @@ void *skinThread(void * arg)
 //  analogServer->attach(analog);
 //  analogServer->start();
 
+	printf("before open\n");
     yarp::os::BufferedPort<yarp::sig::Vector> outPort;
     if(!outPort.open("/icub/skin/testing"))
     {
     	printf("Error, cannot open YARP port!!\n");
     	return NULL;
     }
+    else
+    	printf("Port opened!!\n");
 
 
 	EOarray_of_10canframes sk_array;
@@ -398,6 +407,7 @@ void *skinThread(void * arg)
 
     while(keepGoingOn)
     {
+//    	printf(".");
     	yarp::sig::Vector &pv = outPort.prepare();
     	pv.clear();
 //    	transceiver->getNVvalue(nvRoot, (uint8_t *)&sk_array, &sizze);
@@ -456,7 +466,7 @@ void *skinThread(void * arg)
 
     	pv = data;
     	outPort.write();
-    	usleep(1000);
+    //	usleep(1000);
     }
     outPort.close();
     return NULL;
@@ -520,6 +530,15 @@ static void s_callback_button_1(void)
 
     // get nvid from parameters
 //#warning "aggiornare chiamate a funzione"
+    eOnvID_t signal = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_rightlowerarm, dummy, skinNVindex_sconfig__sigmode);
+	EOnv 		*nvRoot;
+	nvRoot = transceiver->getNVhandler(endpoint_sk_emsboard_rightlowerarm, signal);
+	uint8_t dat = 1;
+	if( eores_OK != eo_nv_Set(nvRoot, &dat, eobool_true, eo_nv_upd_dontdo))
+		printf("error!!");
+	// tell agent to prepare a rop to send
+    transceiver->load_occasional_rop(eo_ropcode_set, endpoint_sk_emsboard_rightlowerarm, signal);
+
     eOnvID_t nvid_ropsigcfgassign = eo_cfg_nvsEP_mn_comm_NVID_Get(endpoint_mn_comm, dummy, commNVindex__ropsigcfgcommand);
     cnv = transceiver->getNVhandler(endpoint_mn_comm, nvid_ropsigcfgassign);
     ropsigcfgassign = (eOmn_ropsigcfg_command_t*) cnv->loc;

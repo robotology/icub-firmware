@@ -109,11 +109,11 @@ uint32_t count;
 //#ifdef OVERRIDE_eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe
 extern void eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-//	EOarray_of_10canframes *sk_array = (EOarray_of_10canframes *)nv->rem;
+	EOarray_of_10canframes *sk_array = (EOarray_of_10canframes *)nv->rem;
 
 //	s_eo_cfg__nvsEP_sk_hid_ParseCanFrame(sk_array);
 //	s_eo_cfg__nvsEP_sk_hid_Histogram_Print();
-//	s_eo_cfg_nvsEP_sk_hid_print_arrayof10canframe(sk_array);
+	s_eo_cfg_nvsEP_sk_hid_print_arrayof10canframe(sk_array);
 //	count++;
 
 //	popopopopopo = 666;
