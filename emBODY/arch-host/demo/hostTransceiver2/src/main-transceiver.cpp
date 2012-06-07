@@ -394,6 +394,8 @@ void *skinThread(void * arg)
     eOnvID_t nvid = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_rightlowerarm, 0, skinNVindex_sstatus__arrayof10canframe);
 	EOnv	*nvRoot = transceiver->getNVhandler( endpoint_sk_emsboard_rightlowerarm,  nvid);  //??
 
+	bool valid = false;
+
     while(keepGoingOn)
     {
     	yarp::sig::Vector &pv = outPort.prepare();
@@ -401,10 +403,12 @@ void *skinThread(void * arg)
 //    	transceiver->getNVvalue(nvRoot, (uint8_t *)&sk_array, &sizze);
 
     	memcpy( &sk_array, nvRoot->rem, sizeof(EOarray_of_10canframes));
-		printf("\n--- ARRAY SIZE = %d  ---- \n", sk_array.head.size);
+    	if(0 != sk_array.head.size)
+    		printf("\n--- ARRAY SIZE = %d  ---- \n", sk_array.head.size);
 
-		for (i = 0; i< data.size(); i++ )
-			data[i]=255;
+// 		'zeroing' the array
+//		for (i = 0; i< data.size(); i++ )
+//			data[i]=255;
 
     	for(i=0; i<sk_array.head.size; i++)
     	{
@@ -412,41 +416,47 @@ void *skinThread(void * arg)
     		int  j, mtbId = 0;
 
     		canframe = (eOutil_canframe_t*) &sk_array.data[i*sizeof(eOutil_canframe_t)];
-    		triangle = (canframe->id & 0x000f);
-    		msgtype= ((canframe->data[0])& 0x80);
-    		printf("\n data id 0x%04X, 0x", canframe->id);
+    		valid = (((canframe->id & 0x0F00) >> 8) == 3) ? 1 : 0;
 
-    		//   			for (int i=0; i<mtbId.size(); i++)
+    		if(valid)
     		{
-    			//if (id==mtbId[i])
-    			{
-    				int index=16*12*mtbId + triangle*12;
+    			triangle = (canframe->id & 0x000f);
+    			msgtype= ((canframe->data[0])& 0x80);
+    			printf("\n data id 0x%04X, 0x", canframe->id);
 
-    				printf("%0X ", canframe->data[0]);
-    				if (msgtype)
+    			//   			for (int i=0; i<mtbId.size(); i++)
+    			{
+    				//if (id==mtbId[i])
     				{
-    					for(int k=0;k<5;k++)
+    					int index=16*12*mtbId + triangle*12;
+
+    					printf("%0X ", canframe->data[0]);
+    					if (msgtype)
     					{
-    						data[index+k+7]=canframe->data[k+1];
-    						printf("%0X ", canframe->data[k+1]);
+    						for(int k=0;k<5;k++)
+    						{
+    							data[index+k+7]=canframe->data[k+1];
+    							printf("%0X ", canframe->data[k+1]);
+    						}
     					}
-    				}
-    				else
-    				{
-    					for(int k=0;k<7;k++)
+    					else
     					{
-    						data[index+k]=canframe->data[k+1];
-    						printf("%0X ", canframe->data[k+1]);
+    						for(int k=0;k<7;k++)
+    						{
+    							data[index+k]=canframe->data[k+1];
+    							printf("%0X ", canframe->data[k+1]);
+    						}
     					}
     				}
     			}
     		}
-
+    		else
+    			printf("\n\nInvalid message\n\n\n");
     	}
 
     	pv = data;
     	outPort.write();
-    	sleep(3);
+    	usleep(1000);
     }
     outPort.close();
     return NULL;
@@ -482,10 +492,11 @@ static void s_callback_button_0(void)
 {
     char str[128];
     eOcfg_nvsEP_mn_applNumber_t dummy = 0;
-    eOnvID_t nvid_go2state 		= eo_cfg_nvsEP_mn_appl_NVID_Get(endpoint_mn_appl, dummy, applNVindex_config);
+    eOnvID_t nvid_go2state 		= eo_cfg_nvsEP_mn_appl_NVID_Get(endpoint_mn_appl, dummy, applNVindex_cmmnds__go2state);
     EOnv 	*nv_p 				= transceiver->getNVhandler(endpoint_mn_appl, nvid_go2state);
     eOmn_appl_state_t  desired 	= applstate_running;
 
+    printf("nvid = %d (0X%04X", nvid_go2state, nvid_go2state);
 	if( eores_OK != eo_nv_Set(nv_p, &desired, eobool_true, eo_nv_upd_dontdo))
 		printf("error!!");
 	// tell agent to prepare a rop to send
