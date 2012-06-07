@@ -103,31 +103,36 @@ UInt16 get_absolute_real_position_abs_ssi(byte jnt)
 		
 	setRegBits(GPIO_E_DR,GPIO_E4); //CLK
 	clrRegBits(GPIO_A_DR,mask);	//ENABLE
+	for(j=0;j<=5;j++)
+	asm
+	{
+	 	NOP
+	}// delay
 	for(i=0;i<18;i++)
 	{
 		clrRegBits(GPIO_E_DR,GPIO_E4); //CLK
-		for(j=0;j<=4;j++)
+		for(j=0;j<=3;j++)
 		asm
 		 {
 		 	NOP
 		 }// delay
 		setRegBits(GPIO_E_DR,GPIO_E4); //CLK
-		for(j=0;j<=5;j++)
+		for(j=0;j<=3;j++)
 		asm
 		 {
 		 	NOP
 		 }// delay
 		if (i<12)
 		{
-			bit=getRegBits(GPIO_E_DR,GPIO_E6); //DATAIN
+			bit=getRegBits(GPIO_E_DR,GPIO_E6); //DATAIN	
 			value=value | (bit <<(11-i)); 	
 		}
-		else
-		{
+		else 
+		{ 
 		 	status[jnt].wordbb[i-12]=getRegBits(GPIO_E_DR,GPIO_E6);	 	
 		}
 	}
-	setRegBits(GPIO_A_DR,mask); //DISNABLE	
+	setRegBits(GPIO_A_DR,mask); //DISABLE	
 	return (UInt16) value;
 }
 

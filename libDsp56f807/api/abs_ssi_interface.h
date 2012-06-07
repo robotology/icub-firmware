@@ -17,3 +17,4 @@ void    set_current_as_middle_position  	(byte jnt);
 void    get_status_abs_ssi	(bool* s_ocf,bool* s_cof,bool* s_lin, bool* s_inc, bool* s_dec, byte jnt);
 byte    get_error_abs_ssi               	(byte jnt);
 #endif 
+ 

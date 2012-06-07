@@ -22,7 +22,7 @@ void PWM_B_init (void);
  * @param val determines the duty cycle which is given by
  * the expression duty = val/PWMCM * 100. 0 means off, 
  * greater than 0x7fff will cause the pwm to be on the 
- * whole period.
+ * whole period. 
  * @return ERR_OK if successful.
  */
 /**************************************************************************************/

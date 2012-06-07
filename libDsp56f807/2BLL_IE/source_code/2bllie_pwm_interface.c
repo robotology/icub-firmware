@@ -39,10 +39,10 @@ void init_pwm(void)
 void PWM_outputPadDisable(byte axis)
 {
 
-	can_printf("PWMDIS CH%d", axis);
+	can_printf("PWM DIS CH%d", axis);
 
 	if (axis == 0)
-	{
+	{  
 		led0_off
 		_pad_enabled[0]= false;
 		PWM_A_outputPadDisable(ALL_CHANNELS);

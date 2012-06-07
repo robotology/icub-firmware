@@ -85,31 +85,44 @@ void PWMAReload_Interrupt(void)
 	{
 	  	if (status0 == DIRECTION_TABLE[old_status0]) 
 	  	{
-	  		comm_enc[0]++;
+	  		comm_enc[0]++; 		
+	  		
+	  		//			phase_changed[0]=1;
+			// write mask to PWM Channel Control Register 
+			PWMState[0]= pTable0[status0];
+			tmp = getReg(PWMA_PMOUT) & 0x8000;
+			val=tmp | PWMState[0].MaskOut | (PWMState[0].Mask<<8);
+			setReg(PWMA_PMOUT,val); 
+			old_status0 = status0;	
 	  	}
 		else if (status0 == DIRECTION_TABLE_INV[old_status0]) 
 			{
 				comm_enc[0]--;	
+				//			phase_changed[0]=1;
+				// write mask to PWM Channel Control Register 
+				PWMState[0]= pTable0[status0];
+				tmp = getReg(PWMA_PMOUT) & 0x8000;
+				val=tmp | PWMState[0].MaskOut | (PWMState[0].Mask<<8);
+				setReg(PWMA_PMOUT,val); 
+				old_status0 = status0;	
 			}
 			else
 			{
 				hall_error[0]=HALL_ERROR_TABLE;
 				PWM_outputPadDisable(0);
+				#warning "debug"
+				can_printf("HALL ERROR 0");
 			} 
-//			phase_changed[0]=1;
-			// write mask to PWM Channel Control Register 
-		PWMState[0]= pTable0[status0];
-		tmp = getReg(PWMA_PMOUT) & 0x8000;
-		val=tmp | PWMState[0].MaskOut | (PWMState[0].Mask<<8);
-		setReg(PWMA_PMOUT,val); 
-		old_status0 = status0;
+
 	}
 	else 
 	{
 		if ((status0==0x0) || (status0==0x07))
 		{
 			hall_error[0]=HALL_ERROR_TABLE;
-//			PWM_outputPadDisable(0);
+			PWM_outputPadDisable(0);
+			#warning "debug"
+			can_printf("HALL ERROR 0");
 //	 		phase_changed[0]=0;	
 		}
 	}
@@ -133,33 +146,44 @@ void PWMBReload_Interrupt(void)
 	  	if (status1 == DIRECTION_TABLE[old_status1]) 
 	  	{
 	  		comm_enc[1]++;
+  			//		phase_changed[1]=1;		
+			// write mask to PWM Channel Control Register 
+			PWMState[1]= pTable1[status1];
+			tmp = getReg(PWMB_PMOUT) & 0x8000;
+			val=tmp | PWMState[1].MaskOut | (PWMState[1].Mask<<8);
+			setReg(PWMB_PMOUT,val);
+			old_status1 = status1;
 	  	}
 		else if (status1 == DIRECTION_TABLE_INV[old_status1]) 
 			{
 				comm_enc[1]--;	
+				//		phase_changed[1]=1;		
+				// write mask to PWM Channel Control Register 
+				PWMState[1]= pTable1[status1];
+				tmp = getReg(PWMB_PMOUT) & 0x8000;
+				val=tmp | PWMState[1].MaskOut | (PWMState[1].Mask<<8);
+				setReg(PWMB_PMOUT,val);
+				old_status1 = status1;
 			}
 			else
 			{
 				hall_error[1]=HALL_ERROR_TABLE;
 	
 				PWM_outputPadDisable(1);
+				#warning "debug"
+				can_printf("HALL ERROR 1");
 		
 			}    
-//		phase_changed[1]=1;		
 
-		// write mask to PWM Channel Control Register 
-		PWMState[1]= pTable1[status1];
-		tmp = getReg(PWMB_PMOUT) & 0x8000;
-		val=tmp | PWMState[1].MaskOut | (PWMState[1].Mask<<8);
-		setReg(PWMB_PMOUT,val);
-		old_status1 = status1;
 	}
 	else
 	{		
 		if ((status1==0x0) || (status1==0x07))
 		{
 			hall_error[1]=HALL_ERROR_TABLE;
-	//		PWM_outputPadDisable(1);
+			#warning "debug"
+			can_printf("HALL ERROR 1");
+			PWM_outputPadDisable(1);
 		}
 	}
 }
