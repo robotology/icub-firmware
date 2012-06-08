@@ -70,6 +70,14 @@ typedef struct
 } eOemsconfigurator_cfg_t;
 
 
+
+
+typedef enum
+{
+    emsconfigurator_evt_go2runner   =   0x00000002
+} eOemsconfigurator_event_t;
+
+
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 

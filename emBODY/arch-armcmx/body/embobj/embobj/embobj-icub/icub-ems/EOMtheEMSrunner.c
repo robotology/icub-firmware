@@ -40,6 +40,8 @@
 
 #include "EOVtheIPnet.h"
 
+#include "EOMtheIPnet.h"
+
 #include "EOMtheEMSappl.h"
 
 #include "EOaction_hid.h"
@@ -73,12 +75,14 @@
 
 const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg = 
 {
-    EO_INIT(.taskpriority)              {250,     251,     252},  
-    EO_INIT(.taskstacksize)             {512,   512,   512},
+    EO_INIT(.taskpriority)              {250,   251,    252},  
+    EO_INIT(.taskstacksize)             {1024,  1024,   1024},
     EO_INIT(.period)                    1000, 
-    EO_INIT(.execDOafter)               500, 
-    EO_INIT(.execTXafter)               700, 
-    EO_INIT(.safetyGAP)                 10
+    EO_INIT(.execDOafter)               200, 
+    EO_INIT(.execTXafter)               500,
+    EO_INIT(.safetyGAP)                 50,
+    EO_INIT(.maxnumofRXpackets)         3,
+    EO_INIT(.maxnumofTXpackets)         1
 };
 
 
@@ -134,11 +138,17 @@ static const char s_eobj_ownname[] = "EOMtheEMSrunner";
  
 static EOMtheEMSrunner s_theemsrunner = 
 {
-    EO_INIT(.task)              {NULL, NULL, NULL},
     EO_INIT(.cfg)               {0},
-    EO_INIT(.cycleisrunning)    eobool_false,
+    EO_INIT(.task)              {NULL, NULL, NULL},
     EO_INIT(.event)             eo_sm_emsappl_EVdummy,
-    EO_INIT(.osaltimer)         NULL
+    EO_INIT(.osaltimer)         NULL,
+    EO_INIT(.cycleisrunning)    eobool_false,
+    EO_INIT(.safetyGAPtouched)  {eobool_false, eobool_false, eobool_false},
+    EO_INIT(.safetyGAPbroken)   {eobool_false, eobool_false, eobool_false},
+    EO_INIT(.numofrxpackets)    0,  
+    EO_INIT(.numofrxrops)       0,
+    EO_INIT(.numoftxpackets)    0,
+    EO_INIT(.numoftxrops)       0 
 };
 
 
@@ -324,6 +334,26 @@ extern eOresult_t eom_emsrunner_StopAndGoTo(EOMtheEMSrunner *p, eOsmEventsEMSapp
     return(eores_OK);
 }
 
+eObool_t eom_emsrunner_SafetyGapTouched(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid)
+{
+    if(NULL == p)
+    {
+        return(eobool_true);
+    } 
+
+    return(s_theemsrunner.safetyGAPtouched[taskid]);
+}
+
+
+eObool_t eom_emsrunner_SafetyGapBroken(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid)
+{
+    if(NULL == p)
+    {
+        return(eobool_true);
+    } 
+
+    return(s_theemsrunner.safetyGAPbroken[taskid]);
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -349,36 +379,35 @@ extern void tskEMSrunTX(void *p)
 } 
 
 
-__weak extern void eom_emsrunner_hid_userdef_taskRX_activity(void)
+__weak extern void eom_emsrunner_hid_userdef_taskRX_activity(EOMtheEMSrunner *p)
 {   
-    uint16_t numberofrxdatagrams = 0;
-    uint16_t numberofrxrops = 0;
-    eOabstime_t txtimeofrxropframe = 0;
+    p->numofrxrops = 0;
+    p->numofrxpackets = 0;
     
     // A. perform a first activity before datagram reception
-    eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(); 
+    eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(p); 
 
     // B. receive and parse datagram(s)
-    eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(&numberofrxdatagrams, &numberofrxrops, &txtimeofrxropframe);
+    eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(p);
     
     // C. perform a third activity after datagram parsing
-    eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(numberofrxdatagrams, numberofrxrops, txtimeofrxropframe);                
+    eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(p);                
 }
 
 
-__weak extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(void)
+__weak extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p)
 {
     
 }
 
-__weak extern void eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(uint16_t *numberofrxdatagrams, uint16_t *numberofrxrops, eOabstime_t *txtimeofrxropframe)
+__weak extern void eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(EOMtheEMSrunner *p)
 {
     EOpacket *rxpkt = NULL;
     eOsizecntnr_t remainingrxpkts = 0;
     eOresult_t res;
     static uint32_t lost_datagrams = 0;
     uint16_t received = 0;
-
+    uint16_t tmp = 0;
  
 
        
@@ -388,7 +417,8 @@ __weak extern void eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(u
     // 2. process the packet with the transceiver
     if(eores_OK == res)
     {
-        res = eom_emstransceiver_Parse(eom_emstransceiver_GetHandle(), rxpkt, numberofrxrops, txtimeofrxropframe);
+        res = eom_emstransceiver_Parse(eom_emstransceiver_GetHandle(), rxpkt, &tmp, NULL);
+        p->numofrxrops += tmp;
         received ++;
     }
     
@@ -399,15 +429,14 @@ __weak extern void eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(u
         uint8_t i;
         for(i=0;i<4;i++)
         {
-            uint16_t tmp = 0;
             lost_datagrams++;
             remainingrxpkts = 0;
             res = eom_emssocket_Receive(eom_emssocket_GetHandle(), &rxpkt, &remainingrxpkts);
             if(eores_OK == res)
             {
-                res = eom_emstransceiver_Parse(eom_emstransceiver_GetHandle(), rxpkt, &tmp, txtimeofrxropframe);
+                res = eom_emstransceiver_Parse(eom_emstransceiver_GetHandle(), rxpkt, &tmp, NULL);
                 received ++;
-                *numberofrxrops += tmp;
+                p->numofrxrops += tmp;
             }
             if(0 == remainingrxpkts)
             {
@@ -417,59 +446,61 @@ __weak extern void eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(u
     }
     
     
-    *numberofrxdatagrams = received;
-           
+    p->numofrxpackets = received;           
 }
 
-__weak extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(uint16_t numberofrxdatagrams, uint16_t numberofrxrops, eOabstime_t txtimeofrxropframe)
+__weak extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
 {
     
 }
 
-__weak extern void eom_emsrunner_hid_userdef_taskDO_activity(void)
+__weak extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 {
     
 }
 
-__weak extern void eom_emsrunner_hid_userdef_taskTX_activity(void)
+__weak extern void eom_emsrunner_hid_userdef_taskTX_activity(EOMtheEMSrunner *p)
 {
-    uint16_t numberoftxrops = 0;
-
+    p->numoftxrops = 0;
+    p->numoftxpackets = 0;
+    
     // A. perform a first activity
-    eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission();    
+    eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(p);    
          
     // B. transmit a datagram
-    eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmission(&numberoftxrops);
+    eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmission(p);
     
     // C. perform an user-defined function after datagram transmission
-    eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(numberoftxrops);           
+    eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(p);           
 }
 
 
 
-__weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(void)
+__weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p)
 {
     
 }
 
-__weak extern void eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmission(uint16_t *numberoftxrops)
+__weak extern void eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmission(EOMtheEMSrunner *p)
 {
     EOpacket* txpkt = NULL;
     eOresult_t res;
- 
+    uint16_t numberoftxrops = 0;
 
     // 1. call the former to retrieve a tx packet (even if it is an empty ropframe)        
-    res = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, numberoftxrops);
+    res = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, &numberoftxrops);
     
     // 2.  send a packet back. but only if the former gave us a good one.
     if(eores_OK == res)
     {
         res = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
+        p->numoftxrops = numberoftxrops;
+        p->numoftxpackets = 1;
     }        
            
 }
 
-__weak extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(uint16_t numberoftxrops)
+__weak extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p)
 {
     
 }
@@ -497,7 +528,7 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
     //eov_ipnet_Activate(eov_ipnet_GetHandle());
     
     // perform the rx activity     
-    eom_emsrunner_hid_userdef_taskRX_activity();
+    eom_emsrunner_hid_userdef_taskRX_activity(&s_theemsrunner);
   
     //eov_ipnet_Deactivate(eov_ipnet_GetHandle());
     
@@ -519,7 +550,7 @@ static void s_eom_emsrunner_taskDO_run(EOMtask *p, uint32_t t)
 
 
     // perform the do activity
-    eom_emsrunner_hid_userdef_taskDO_activity();   
+    eom_emsrunner_hid_userdef_taskDO_activity(&s_theemsrunner);   
     
 
     // Z. at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
@@ -540,7 +571,7 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
     
     //eov_ipnet_Activate(eov_ipnet_GetHandle());
     
-    eom_emsrunner_hid_userdef_taskTX_activity();
+    eom_emsrunner_hid_userdef_taskTX_activity(&s_theemsrunner);
     
     //eov_ipnet_Deactivate(eov_ipnet_GetHandle());
 
@@ -584,7 +615,13 @@ static void s_eom_emsrunner_start_cycle(void *arg)
         .mode               = hal_timer_mode_oneshot,
         .callback_on_exp    = NULL,
         .arg                = NULL
-    };  
+    }; 
+
+    s_theemsrunner.safetyGAPtouched[eo_emsrunner_taskid_runRX] = eobool_false;
+    s_theemsrunner.safetyGAPbroken[eo_emsrunner_taskid_runRX] = eobool_false;
+
+    
+    #warning --> do things
 
     // one-shot timer which verify if taskRX has finished. if not ... it issues a warning.
     toneshot_cfg.countdown          = s_theemsrunner.cfg.execDOafter - s_theemsrunner.cfg.safetyGAP;
@@ -617,7 +654,23 @@ static void s_eom_emsrunner_start_cycle_within_osaltimer(osal_timer_t *tmr, void
         .callback_on_exp    = NULL,
         .arg                = NULL
     };  
+    
+    EOMtask* prevtask = s_theemsrunner.task[eo_emsrunner_taskid_runTX];
+//    EOMtask* ipnettskproc = eom_ipnet_GetTask(eom_ipnet_GetHandle(), eomipnet_task_proc);
+    osal_task_t *scheduledosaltask = osal_task_get(osal_callerISR);    
 
+    // set to false the safety gap touched/broken for RX
+    s_theemsrunner.safetyGAPtouched[eo_emsrunner_taskid_runRX] = eobool_false;
+    s_theemsrunner.safetyGAPbroken[eo_emsrunner_taskid_runRX] = eobool_false;
+
+    
+    // verify that the running task is not the TX, otherwise ... problems (and set a safety GAP etc.
+//    if((prevtask->osaltask == scheduledosaltask) || (ipnettskproc->osaltask == scheduledosaltask))
+    if(prevtask->osaltask == scheduledosaltask)
+    {   // but also the ipnet is not ok .... it must be the idle task ....
+        s_theemsrunner.safetyGAPbroken[eo_emsrunner_taskid_runTX] = eobool_true;
+    }
+    
     // one-shot timer which verify if taskRX has finished. if not ... it issues a warning.
     toneshot_cfg.countdown          = s_theemsrunner.cfg.execDOafter - s_theemsrunner.cfg.safetyGAP;
     toneshot_cfg.callback_on_exp    = s_eom_emsrunner_warn_task;
@@ -639,18 +692,24 @@ static void s_eom_emsrunner_start_cycle_within_osaltimer(osal_timer_t *tmr, void
 
 static void s_eom_emsrunner_warn_task(void *arg)
 {
-    static uint32_t count = 0;
     EOMtask* task = (EOMtask*) arg;
     osal_task_t *scheduledosaltask = osal_task_get(osal_callerISR);
         
     if(task->osaltask == scheduledosaltask)
-    {
-        count++;
-        count = count;
-        #warning ---> if execution is in here it means that the task has not finished its computing in the time it was given to it minus the guard    
-        // we could ... send an event to the task to force a graceful finish ... issue a warning ... issue a fatal error ... whatever else.
-        // un attimo ... potrebbe essere che il task interrotto sia uno dei task di ipnet ... in tal caso andrebbe bene?
-        // oppure 
+    {   // if execution is in here it means that the task has not finished its computing in the time it was given to it minus the guard
+        
+        // search for the task which broke the time: RX, DO, or TX?
+        uint8_t i;
+        for(i=0; i<eo_emsrunner_task_numberof-1; i++)
+        {
+            if(task == s_theemsrunner.task[i])
+            {
+                break;
+            }
+        }
+        
+        // set the boolean variable of the given task to true.
+        s_theemsrunner.safetyGAPtouched[i] = eobool_true;        
     }
 
 }
@@ -671,11 +730,15 @@ static void s_eom_emsrunner_start_taskDO(void *arg)
     EOMtask* prevtask = s_theemsrunner.task[eo_emsrunner_taskid_runRX];
     osal_task_t *scheduledosaltask = osal_task_get(osal_callerISR);
     
+    // set to false the safety gap touched for DO
+    s_theemsrunner.safetyGAPtouched[eo_emsrunner_taskid_runDO] = eobool_false;
+    s_theemsrunner.safetyGAPbroken[eo_emsrunner_taskid_runDO] = eobool_false;
+    
     // che controlli si potrebbe fare qui per evitare che ci siano problemi? ad esempio che lo scheduled task non sia quello prima di task?
     
     if(prevtask->osaltask == scheduledosaltask)
     {
-        #warning --> ahi ahi ahi problemi.
+        s_theemsrunner.safetyGAPbroken[eo_emsrunner_taskid_runRX] = eobool_true;
     }
     
     // one-shot timer which verify if taskDO has finished. if not ... it issues a warning.
@@ -694,8 +757,7 @@ static void s_eom_emsrunner_start_taskDO(void *arg)
     hal_timer_start(hal_timer4);
     
     // send event to activate the task in argument (taskDO)
-    //eom_task_isrSetEvent(task, eo_emsrunner_evt_execute);
-    eom_task_isrSetEvent(s_theemsrunner.task[eo_emsrunner_taskid_runDO], eo_emsrunner_evt_execute);
+     eom_task_isrSetEvent(s_theemsrunner.task[eo_emsrunner_taskid_runDO], eo_emsrunner_evt_execute);
 }
 
 
@@ -714,17 +776,22 @@ static void s_eom_emsrunner_start_taskTX(void *arg)
     EOMtask* prevtask = s_theemsrunner.task[eo_emsrunner_taskid_runDO];
     osal_task_t *scheduledosaltask = osal_task_get(osal_callerISR);
     
+    
+    // set to false the safety gap touched for TX
+    s_theemsrunner.safetyGAPtouched[eo_emsrunner_taskid_runTX] = eobool_false;
+    s_theemsrunner.safetyGAPbroken[eo_emsrunner_taskid_runTX] = eobool_false;
+    
     // che controlli si potrebbe fare qui per evitare che ci siano problemi? ad esempio che lo scheduled task non sia quello prima di task?
     
     if(prevtask->osaltask == scheduledosaltask)
     {
-        #warning --> ahi ahi ahi altri problemi.
+        s_theemsrunner.safetyGAPbroken[eo_emsrunner_taskid_runDO] = eobool_true;
     }
     
     // one-shot timer which verify if taskTX has finished. if not ... it issues a warning.
     toneshot_cfg.countdown          = s_theemsrunner.cfg.period - s_theemsrunner.cfg.execTXafter - s_theemsrunner.cfg.safetyGAP;
     toneshot_cfg.callback_on_exp    = s_eom_emsrunner_warn_task;
-    toneshot_cfg.arg                = s_theemsrunner.task[eo_emsrunner_taskid_runDO];
+    toneshot_cfg.arg                = s_theemsrunner.task[eo_emsrunner_taskid_runTX];
     hal_timer_init(hal_timer3, &toneshot_cfg, NULL); 
     
 //    // one-shot timer which starts taskTX.
@@ -797,7 +864,14 @@ static void s_eom_emsrunner_cbk_activate_with_period_by_osal_timer(void* arg)
         onexpiry.cbk    = s_eom_emsrunner_start_cycle_within_osaltimer;
         onexpiry.par    = arg;        
         
+        s_theemsrunner.safetyGAPtouched[eo_emsrunner_taskid_runRX] = eobool_false;
+        s_theemsrunner.safetyGAPtouched[eo_emsrunner_taskid_runDO] = eobool_false;
+        s_theemsrunner.safetyGAPtouched[eo_emsrunner_taskid_runTX] = eobool_false; 
 
+        s_theemsrunner.safetyGAPbroken[eo_emsrunner_taskid_runRX] = eobool_false;
+        s_theemsrunner.safetyGAPbroken[eo_emsrunner_taskid_runDO] = eobool_false;
+        s_theemsrunner.safetyGAPbroken[eo_emsrunner_taskid_runTX] = eobool_false; 
+        
         osal_timer_start(s_theemsrunner.osaltimer, &timing, &onexpiry, osal_callerTSK);
     }
 

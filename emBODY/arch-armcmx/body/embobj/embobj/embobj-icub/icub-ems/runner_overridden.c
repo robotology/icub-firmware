@@ -28,6 +28,7 @@
 
 #include "EOMtheEMSappl.h"
 
+#include "osal_system.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -70,10 +71,12 @@
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
+static void s_delay(eOreltime_t delay);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -81,11 +84,11 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(uint16_t numberofrxdatagrams, uint16_t numberofrxrops, eOabstime_t txtimeofrxropframe)
+extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
 {
     static uint32_t totalreceived = 0;
     
-    totalreceived += numberofrxdatagrams;
+    totalreceived += p->numofrxpackets;
     
     if(3 == totalreceived)
     {
@@ -96,18 +99,43 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(uin
 
 
 
-extern void eom_emsrunner_hid_userdef_taskDO_activity(void)
+extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 {
-    volatile uint32_t i;
-    volatile float aaa = 1.01f;
+#if 1
+    volatile eObool_t quit = eobool_false;
+    volatile eObool_t* touched = &p->safetyGAPtouched[eo_emsrunner_taskid_runDO];
     
-    for(i=0; i<50; i++)
+    for(;;)
     {
-        aaa = aaa*1.02f;
-        aaa = aaa/1.0345f;
-    }    
+        s_delay(20);
+        //if(eobool_true == *touched)
+        if(eobool_true == eom_emsrunner_SafetyGapTouched(eom_emsrunner_GetHandle(), eo_emsrunner_taskid_runDO))
+        {
+            return;
+        }        
+    }
+#else
+    s_delay(100);
+#endif    
+    //     
+//     //for(i=0; i<1000*2; i++)
+//     for(i=0; i<2000; i++) // 200 microsec
+//     {
+//         aaa = aaa*1.02f;
+//         aaa = aaa/1.0345f;
+//         if(eobool_true == *touched)
+//         {
+//             return;
+//         }
+//     }    
 }
 
+
+
+extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p)
+{
+    s_delay(50);
+}
 
 
 
@@ -117,6 +145,38 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+static void s_delay(eOreltime_t delay)
+{
+
+    uint64_t startat = osal_system_nanotime_get();
+    uint64_t stopat = startat + delay*1000;
+    volatile uint64_t now = startat;
+//    volatile uint32_t i = 0;
+    
+
+    for(;;)
+    {
+        
+        if(now >= stopat)
+        {
+//             i = i;
+//             if(i<100000)
+//             {
+//                 i = 1+1;
+//             }
+//             else
+//             {
+//                 i = i-1;
+//             }
+//             i = i+1;
+//             i = i;
+//            i = i;
+            break;
+        }  
+        now = osal_system_nanotime_get();        
+//        i++;
+    }    
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

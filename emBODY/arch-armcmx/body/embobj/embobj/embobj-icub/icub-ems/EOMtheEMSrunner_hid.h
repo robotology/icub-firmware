@@ -59,35 +59,41 @@ extern "C" {
  **/  
 struct EOMtheEMSrunner_hid 
 {
-    EOMtask*            task[eo_emsrunner_task_numberof];
     eOemsrunner_cfg_t   cfg;
-    eObool_t            cycleisrunning;
+    EOMtask*            task[eo_emsrunner_task_numberof];
     eOsmEventsEMSappl_t event;
     osal_timer_t*       osaltimer;
+    eObool_t            cycleisrunning;
+    eObool_t            safetyGAPtouched[eo_emsrunner_task_numberof]; 
+    eObool_t            safetyGAPbroken[eo_emsrunner_task_numberof]; 
+    uint16_t            numofrxpackets;
+    uint16_t            numofrxrops;
+    uint16_t            numoftxpackets;
+    uint16_t            numoftxrops;
 };
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
 // default function for RX: it calls _beforedatagramreception(), _datagramreception(), _afterdatagramreception()
-extern void eom_emsrunner_hid_userdef_taskRX_activity(void);
+extern void eom_emsrunner_hid_userdef_taskRX_activity(EOMtheEMSrunner *p);
 
 // default funtion for RX-before-datagram-reception: it is empty.
-extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(void);
+extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p);
 // default funztion for RX-datagram-reception: it repeates upto xx times: get a pkt, call the transceiver, verifies if a quit evt has arrived.
-extern void eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(uint16_t *numberofrxdatagrams, uint16_t *numberofrxrops, eOabstime_t *txtimeofrxropframe);
+extern void eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(EOMtheEMSrunner *p);
 // deafult function for RX-after-datagram-reception
-extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(uint16_t numberofrxdatagrams, uint16_t numberofrxrops, eOabstime_t txtimeofrxropframe);
+extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p);
 
 
-extern void eom_emsrunner_hid_userdef_taskDO_activity(void);
+extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p);
 
 
-extern void eom_emsrunner_hid_userdef_taskTX_activity(void);
+extern void eom_emsrunner_hid_userdef_taskTX_activity(EOMtheEMSrunner *p);
 
-extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(void);
-extern void eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmission(uint16_t *numberoftxrops);
-extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(uint16_t numberoftxrops);
+extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p);
+extern void eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmission(EOMtheEMSrunner *p);
+extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p);
 
 
 #ifdef __cplusplus
