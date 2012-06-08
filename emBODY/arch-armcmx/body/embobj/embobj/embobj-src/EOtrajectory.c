@@ -95,9 +95,9 @@ extern EOtrajectory* eo_trajectory_New(void)
     return o;
 }
 
-extern void eo_trajectory_SetReference(EOtrajectory *o, int32_t p0, int32_t pf, int32_t v0, int32_t vf, int32_t speed)
+extern void eo_trajectory_SetReference(EOtrajectory *o, int32_t p0, int32_t p1, int32_t v0, int32_t v1, int32_t a0, int32_t speed)
 {
-    if (!speed || p0==pf)
+    if (!speed || p0==p1)
     {
         o->steps_to_end = 0;
 
@@ -106,23 +106,25 @@ extern void eo_trajectory_SetReference(EOtrajectory *o, int32_t p0, int32_t pf, 
 
     o->p = (float)p0;
     o->v = (float)v0;
-    o->a = 0.0f;
+    o->a = (float)a0;
 
-    o->pf = pf;
-    o->vf = vf;
+    o->pf = p1;
+    o->vf = v1;
 
-    int32_t pfp0 = pf-p0;
+    int32_t p1p0 = p1-p0;
 
-    int32_t A =  120*pfp0-60*(v0+vf);
-    int32_t B = -180*pfp0+96*v0+63*vf;
-  //int32_t C =   60*pfp0-36*v0-24*vf;
+    int32_t A =  120*p1p0-60*(v0+v1) -10*a0;//+10*a1;
+    int32_t B = -180*p1p0+96*v0+84*v1+18*a0;//-12*a1
+    int32_t C =   60*p1p0-36*v0-24*v1- 9*a0;//+ 3*a1;
 
-    o->steps_to_end = (pfp0*FREQUENCY)/speed;
+    o->steps_to_end = (p1p0*FREQUENCY)/speed;
 
     if (o->steps_to_end < 0) o->steps_to_end = -o->steps_to_end;
 
     float DT = 1.0f/((float)o->steps_to_end);
     float DT2 = DT*DT;
+
+    float CDT  = ((float)C)*DT;
     float BDT2 = ((float)B)*DT2;
     float ADT3 = ((float)A)*DT2*DT;
 
@@ -130,7 +132,7 @@ extern void eo_trajectory_SetReference(EOtrajectory *o, int32_t p0, int32_t pf, 
 
     o->Kw =       6.0f*ADT3;
     o->Wn = o->Kw+2.0f*BDT2;
-    o->Yn = ADT3+BDT2+((float)(60*pfp0-36*v0-24*vf))*DT;
+    o->Yn = ADT3+BDT2+CDT;
 }
 
 /** @fn         extern float eo_trajectory_Step(EOtrajectory *o)

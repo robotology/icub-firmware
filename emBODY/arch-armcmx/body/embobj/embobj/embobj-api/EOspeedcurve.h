@@ -54,7 +54,7 @@ typedef struct EOspeedcurve_hid EOspeedcurve;
  **/
 extern EOspeedcurve* eo_speedcurve_New(void);
 
-extern void eo_speedcurve_SetReference(EOspeedcurve *o, int32_t p0, int32_t v0, int32_t vf, int32_t acc);
+extern void eo_speedcurve_SetReference(EOspeedcurve *o, int32_t p0, int32_t v0, int32_t v1, int32_t a0, int32_t acc);
 
 extern void eo_speedcurve_Stop(EOspeedcurve *o, int32_t p);
 
