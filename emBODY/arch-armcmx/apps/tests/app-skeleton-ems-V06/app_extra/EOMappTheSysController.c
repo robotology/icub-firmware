@@ -54,6 +54,7 @@
 //nv-cfg
 #include "eOcfg_nvsEP_mc.h"
 #include "eOcfg_nvsEP_sk.h" 
+#include "eOcfg_nvsEP_as.h" 
 
 //can
 #include "EOemsCanNetworkTopology.h"
@@ -309,7 +310,6 @@ extern eOresult_t eom_appTheSysController_Go2RunState(EOMappTheSysController *p)
 
     s_theSysController.appl_state = applstate_running;
 
-    hal_led_on(hal_led1);
     return(eores_OK);
 
 }
@@ -328,7 +328,6 @@ extern eOresult_t eom_appTheSysController_ExitFromRunState(EOMappTheSysControlle
 {
     s_eom_appTheSysController_Timers_Stop();
     s_eom_appTheSysController_ConnectedCanBoards_Stop();
-    hal_led_off(hal_led1);
     return(eores_OK);   
 }
 
@@ -413,9 +412,6 @@ static eOresult_t s_eom_appTheSysController_Timers_Init(void)
 
 static void s_timer2_appFreq_cbk(void *p)
 {
-        hal_led_on(hal_led0);
-        hal_led_off(hal_led1);
-
         DEBUG_PIN_ON;
 
         eom_appDataCollector_CollectDataStart((EOMappDataCollector*)p);
@@ -428,7 +424,6 @@ static void s_timer2_appFreq_cbk(void *p)
 
 static void s_timer3_dataCollect_cbk(void *p)
 {
-    hal_led_on(hal_led2);
 //    if(NULL != s_theSysController.cfg.sig2appDataCollector_stop.fn)
 //    {
 //        s_theSysController.cfg.sig2appDataCollector_stop.fn(s_theSysController.cfg.sig2appDataCollector_stop.argoffn);
@@ -440,7 +435,6 @@ static void s_timer3_dataCollect_cbk(void *p)
 static void s_timer4_motorCntrlStart_cbk(void *p)
 {
 
-    hal_led_on(hal_led2);
 //    if(NULL != s_theSysController.cfg.sig2appMotorController.fn)
 //    {
 //        s_theSysController.cfg.sig2appMotorController.fn(s_theSysController.cfg.sig2appMotorController.argoffn);
@@ -477,7 +471,6 @@ static void s_eom_appTheSysController_startup(EOMtask *tsk, uint32_t t)
     #warning VALE --> gestisci errore in go2new state
     res = res;
 
-    hal_led_on(hal_led0);
 } 
 
 
@@ -564,8 +557,10 @@ static void s_eom_appTheSysController_srv_theBoardTransceiver_init(void)
         .hashfunction_ep2index          = s_theSysController.cfg.hashfunction_ep2index, //eo_cfg_nvsEP_eb4_fptr_hashfunction_ep2index, 
         .remotehostipv4addr             = s_theSysController.cfg.ethmod_cfg_ptr->remaddr,
         .remotehostipv4port             = s_theSysController.cfg.ethmod_cfg_ptr->remport
+        
     };
     
+    #waring VALE SE FAI UPDATE DI SYS AGGIUNGI CAMPO SIZE IN CFG TRANSCEIVER!!!!
     s_theSysController.srv.transceiver = eo_boardtransceiver_Initialise(&boardtxrxcfg);
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_theSysController.srv.transceiver), 
                      s_eobj_ownname, "error in transceiver");
@@ -604,13 +599,14 @@ static void s_eom_appTheSysController_PopulateNVmapRef(void)
  
     eOappTheNVmapRef_cfg_t cfg =
     {
-        EO_INIT(.jointsList)    s_theSysController.jointsList,
-        EO_INIT(.motorsList)    s_theSysController.motorsList,
-        EO_INIT(.sensorsList)   s_theSysController.sensorsList,
-        EO_INIT(.skinList)      s_theSysController.skinList,
-        EO_INIT(.nvsCfg)        eo_boardtransceiver_hid_GetNvsCfg(),
-        EO_INIT(.mc_endpoint)   s_theSysController.cfg.mc_endpoint, //(0x0014), //right lower arm //(0x0017)- endpoint_mc_leftlowerleg
-        EO_INIT(.sk_endpoint)   s_theSysController.cfg.sk_endpoint//(0x0034) //endpoint_sk_emsboard_rightlowerarm
+        EO_INIT(.jointsList)            s_theSysController.jointsList,
+        EO_INIT(.motorsList)            s_theSysController.motorsList,
+        EO_INIT(.sensorsStrainList)     s_theSysController.sensorsStrainList,
+        EO_INIT(.sensorsMaisList)       s_theSysController.sensorsMaisList,
+        EO_INIT(.skinList)              s_theSysController.skinList,
+        EO_INIT(.nvsCfg)                eo_boardtransceiver_hid_GetNvsCfg(),
+        EO_INIT(.mc_endpoint)           s_theSysController.cfg.mc_endpoint, //(0x0014), //right lower arm //(0x0017)- endpoint_mc_leftlowerleg
+        EO_INIT(.sk_endpoint)           s_theSysController.cfg.sk_endpoint//(0x0034) //endpoint_sk_emsboard_rightlowerarm
     };
 
 
@@ -751,18 +747,39 @@ static void s_eom_appTheSysController_GetCanConnectedStuff(void)
 {
     uint16_t jointMaxNumber = eo_cfg_nvsEP_mc_joint_numbermax_Get((eOcfg_nvsEP_mc_endpoint_t)s_theSysController.cfg.mc_endpoint);
     uint16_t motorMaxNumber = eo_cfg_nvsEP_mc_motor_numbermax_Get((eOcfg_nvsEP_mc_endpoint_t)s_theSysController.cfg.mc_endpoint);
-//    uint16_t sensorMaxNumber = eo_cfg_nvsEP_mc_joint_numbermax_Get(eOcfg_nvsEP_mc_endpoint_t ep);
+    uint16_t sensorStrainMaxNumber = eo_cfg_nvsEP_as_strain_numbermax_Get((eOcfg_nvsEP_as_endpoint_t)s_theSysController.cfg.as_endpoint);
+    uint16_t sensorMaisMaxNumber = eo_cfg_nvsEP_as_mais_numbermax_Get((eOcfg_nvsEP_as_endpoint_t)s_theSysController.cfg.as_endpoint);
     uint16_t skinMaxNumber = eo_cfg_nvsEP_sk_sknumbermax_Get((eOcfg_nvsEP_sk_endpoint_t)s_theSysController.cfg.sk_endpoint);
 
    //get joints, motors, sensors and skin from can configuration
     s_theSysController.jointsList =  eo_array_New(jointMaxNumber, sizeof(eOmc_jointId_t), NULL);
     s_theSysController.motorsList =  eo_array_New(motorMaxNumber, sizeof(eOmc_motorId_t), NULL); 
-    s_theSysController.skinList =  eo_array_New(skinMaxNumber, sizeof(eOsk_skinId_t), NULL); 
-    s_theSysController.sensorsList =  NULL;
-    
+    s_theSysController.skinList =    eo_array_New(skinMaxNumber, sizeof(eOsk_skinId_t), NULL); 
+
     eo_appCanSP_GetConnectedJoints(s_theSysController.srv.appCanSP_ptr, s_theSysController.jointsList);
     eo_appCanSP_GetConnectedMotors(s_theSysController.srv.appCanSP_ptr, s_theSysController.motorsList);
     eo_appCanSP_GetConnectedSkin(s_theSysController.srv.appCanSP_ptr, s_theSysController.skinList);
+
+
+    if( (0 != sensorStrainMaxNumber) && (0 == sensorMaisMaxNumber) )
+    {    
+        s_theSysController.sensorsStrainList = eo_array_New(sensorStrainMaxNumber, sizeof(eOsnsr_sensorId_t), NULL); 
+        s_theSysController.sensorsMaisList = NULL;
+
+        eo_appCanSP_GetConnectedSensors(s_theSysController.srv.appCanSP_ptr, s_theSysController.sensorsStrainList);
+    }
+    else if( (0 == sensorStrainMaxNumber) && (0 != sensorMaisMaxNumber) )
+    {
+        s_theSysController.sensorsMaisList = eo_array_New(sensorStrainMaxNumber, sizeof(eOsnsr_sensorId_t), NULL); 
+        s_theSysController.sensorsStrainList = NULL;
+        eo_appCanSP_GetConnectedSensors(s_theSysController.srv.appCanSP_ptr, s_theSysController.sensorsMaisList);
+
+    }
+    else
+    {
+         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "error in can-sensors cfg");
+    }
+
 }
 
 

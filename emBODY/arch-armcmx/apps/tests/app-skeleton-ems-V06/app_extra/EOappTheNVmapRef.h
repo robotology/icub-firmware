@@ -58,7 +58,8 @@ typedef struct
 {
     EOarray     *jointsList;  /**<  List of joints used by the application  */
     EOarray     *motorsList;  /**<  List of motors used by the application  */
-    EOarray     *sensorsList; /**<  List of sensors used by the application */
+    EOarray     *sensorsStrainList; /**<  List of sensors-strain used by the application */
+    EOarray     *sensorsMaisList; /**<  List of sensors-strain used by the application */    
     EOarray     *skinList;    /**<  List of sensors used by the application */
     EOnvsCfg    *nvsCfg;      /**<  Network Variable configuration          */
     eOnvEP_t    mc_endpoint;  /**<  motion control endopoint managed by the application    */

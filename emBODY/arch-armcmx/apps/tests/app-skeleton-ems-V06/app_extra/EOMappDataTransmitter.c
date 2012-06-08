@@ -316,9 +316,9 @@ static void s_eom_appDataTransmitter_taskRun_2foc_mode(EOMappDataTransmitter *p,
             return;
         }        
         
-        eo_appCanSP_SendSetPoint(p->cfg.appCanSP_ptr, 0, &mySetPoint_current);
+        eo_appCanSP_SendSetPoint(p->cfg.appCanSP_ptr, 0, &mySetPoint_current); //jid..DA VERIFICARE!!!
         
-         ((int32_t*)payload)[0]=encoder_can;
+        ((int32_t*)payload)[0]=encoder_can;
         ((int32_t*)payload)[1]=posref_can;
 
         eo_appCanSP_SendMessage_TEST(p->cfg.appCanSP_ptr, NULL, payload);

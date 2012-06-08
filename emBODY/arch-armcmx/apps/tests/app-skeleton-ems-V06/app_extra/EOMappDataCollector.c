@@ -308,13 +308,13 @@ static void s_eom_appDataCollector_taskRun_skinOnly_mode(EOMappDataCollector *p,
 
     if(eo_common_event_check(evt, EVT_GETDATA_START))
     {
-        
+        /* 1) get and process eth pkt */
         s_eom_appDataCollector_GetAndProcessEthPkt(p);
-        
-        
-        //eo_appCanSP_readOnlySkin_TEST(p->cfg.canSP_ptr);
-        s_eom_appDataCollector_readSkin(p);
+        /* 2) read and process can frame of skin */
+        s_eom_appDataCollector_readSkin(p); 
     }
+    
+    
     if(eo_common_event_check(evt, EVT_GETDATA_STOP))
     {
 
@@ -327,7 +327,6 @@ static void s_eom_appDataCollector_taskRun_skinOnly_mode(EOMappDataCollector *p,
         }
     }    
 
-    //on stop evt nothing to do
 }
 
 static void s_eom_appDataCollector_taskRun_2foc_mode(EOMappDataCollector *p, eOevent_t evt)
@@ -406,7 +405,7 @@ static void s_eom_appDataCollector_readSkin(EOMappDataCollector *p)
     sk_array = (EOarray*)memRef;
     eo_array_Reset(sk_array);
 
-    eo_appCanSP_read(p->cfg.canSP_ptr, eOcanport2, 10, NULL);
+    eo_appCanSP_read(p->cfg.canSP_ptr, eOcanport2, 10, NULL); //10 is the max size of sk_array
 
 }
 

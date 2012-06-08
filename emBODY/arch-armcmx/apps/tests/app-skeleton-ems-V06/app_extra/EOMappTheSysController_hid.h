@@ -82,7 +82,8 @@ struct EOMappTheSysController_hid
     EOMtask                                 *mytask;          /**< pointer to my task */
     EOarray                              *jointsList;  /**<  List of joints used by the application  */
     EOarray                              *motorsList;  /**<  List of motors used by the application  */
-    EOarray                              *sensorsList; /**<  List of sensors used by the application */
+    EOarray                              *sensorsStrainList; /**<  List of sensors-strain used by the application */
+    EOarray                              *sensorsMaisList; /**<  List of sensors-mais used by the application */
     EOarray                              *skinList;    /**<  List of sensors used by the application */
 
     /* services provider hendler*/

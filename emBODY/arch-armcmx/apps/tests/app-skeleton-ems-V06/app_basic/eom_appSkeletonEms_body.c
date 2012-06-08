@@ -83,8 +83,8 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 static void s_eom_appSkeletonEms_body_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info);
-
-
+static void s_eom_appSkeletonEms_body_t5_blinkgreenled_cbk(void *arg);
+static void s_eom_appSkeletonEms_body_t5_blinkredled_cbk(void *arg);
 extern const ipal_cfg_t    ipal_cfg;
 
 
@@ -138,6 +138,20 @@ extern eOnvEP_t                 sk_endpoint;
 // --------------------------------------------------------------------------------------------------------------------
 extern void eom_appSkeletonEms_body_application_init(void)
 {
+    //this timer is used to signal "application is alive"
+    hal_timer_cfg_t t5_cfg = 
+    {
+        .prescaler          = hal_timer_prescalerAUTO,         
+        .countdown          = 500000,
+        .priority           = hal_int_priority15,
+        .mode               = hal_timer_mode_periodic,
+        .callback_on_exp    = s_eom_appSkeletonEms_body_t5_blinkgreenled_cbk,
+        .arg                = NULL
+    };
+
+    hal_timer_init(hal_timer5, &t5_cfg, NULL);
+    hal_timer_start(hal_timer5);
+
     EOMappTheSysController_cfg_t cfg =
     {
         EO_INIT(.ethmod_cfg_ptr)                ethmod_cfg_ptr,
@@ -170,10 +184,24 @@ extern void eom_appSkeletonEms_body_application_start(void)
 // --------------------------------------------------------------------------------------------------------------------
 static void s_eom_appSkeletonEms_body_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info)
 {
+    hal_timer_cfg_t t5_cfg = 
+    {
+        .prescaler          = hal_timer_prescalerAUTO,         
+        .countdown          = 100000,
+        .priority           = hal_int_priority15,
+        .mode               = hal_timer_mode_periodic,
+        .callback_on_exp    = s_eom_appSkeletonEms_body_t5_blinkredled_cbk,
+        .arg                = NULL
+    };
+    
     if(errtype <= eo_errortype_warning)
     {
         return;
     }
+
+    hal_timer_stop(hal_timer5);
+    hal_timer_init(hal_timer5, &t5_cfg, NULL);
+    hal_timer_start(hal_timer5);
 
     for(;;);
 }
@@ -181,6 +209,24 @@ static void s_eom_appSkeletonEms_body_OnError(eOerrmanErrorType_t errtype, eOid0
 
 
 
+
+static void s_eom_appSkeletonEms_body_t5_blinkgreenled_cbk(void *arg)
+{
+//     hal_led_off(hal_led0);
+//     hal_led_off(hal_led2);
+//     hal_led_off(hal_led3);
+    hal_led_toggle(hal_led1);
+}
+
+
+static void s_eom_appSkeletonEms_body_t5_blinkredled_cbk(void *arg)
+{
+    hal_led_off(hal_led1);
+    hal_led_off(hal_led2);
+    hal_led_off(hal_led3);
+
+    hal_led_toggle(hal_led0); //led red
+}
 
 //static void s_eom_appSkeletonEms_body_sig2appDataCollector_start(void *arg)
 //{

@@ -198,24 +198,24 @@ extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_motors__ptr = &s
 /***********************************************************************************************/
 /*********************** **********        S E N S O R S            ***************************************/
 /***********************************************************************************************/
-//Note: no analg sensor are connected to ems
-//static const eo_emsCanNetTopo_sensorTopoInfo_t  s_cfg_canNetTopo_sensors[] = 
-//{
-//    {// 0
-//        EO_INIT(.boardAddr)                 1,
-//        EO_INIT(.canPort)                   eOcanport2,
-//        EO_INIT(.boardType)                 eobrd_strain,
-//        EO_INIT(.id)                        1
-//    
-//   }
-//};
+
+static const eo_emsCanNetTopo_sensorTopoInfo_t  s_cfg_canNetTopo_sensors[] = 
+{
+   {// 0
+       EO_INIT(.boardAddr)                 14,
+       EO_INIT(.canPort)                   eOcanport2,
+       EO_INIT(.boardType)                 eobrd_mais,
+       EO_INIT(.id)                        0
+   
+  }
+};
 
 
 const EOconstvector  s_eo_cfg_emsCanNetTopo_constvec_sensors = 
 {
-    EO_INIT(.size)              0,
-    EO_INIT(.item_size)         0,
-    EO_INIT(.item_array_data)   NULL
+    EO_INIT(.size)              sizeof(s_cfg_canNetTopo_sensors)/sizeof(eo_emsCanNetTopo_sensorTopoInfo_t), 
+    EO_INIT(.item_size)         sizeof(eo_emsCanNetTopo_sensorTopoInfo_t),
+    EO_INIT(.item_array_data)   s_cfg_canNetTopo_sensors
 };
 
 

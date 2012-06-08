@@ -82,6 +82,8 @@ static eOresult_t s_eo_appTheNVmapRef_tables_initialise(void);
 static eOresult_t s_eo_appTheNVmapRef_table_motors_initialise(void);
 static eOresult_t s_eo_appTheNVmapRef_table_joints_initialise(void);
 static eOresult_t s_eo_appTheNVmapRef_table_skin_initialise(void);
+static eOresult_t s_eo_appTheNVmapRef_table_sensorsStrain_initialise(void);
+static eOresult_t s_eo_appTheNVmapRef_table_sensorsMais_initialise(void);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -108,10 +110,8 @@ extern EOappTheNVmapRef* eo_appTheNVmapRef_Initialise(eOappTheNVmapRef_cfg_t *cf
     }
     
     retptr = &s_eo_appTheNVmapRef;
-    retptr->nvsCfg = cfg->nvsCfg;
-    retptr->mc_endpoint = cfg->mc_endpoint;
-    retptr->as_endpoint = cfg->as_endpoint;
-    retptr->sk_endpoint = cfg->sk_endpoint;
+    
+    memcpy(&retptr->cfg, cfg, sizeof(eOappTheNVmapRef_cfg_t));
 
     res = s_eo_appTheNVmapRef_tables_create(cfg);
     if(eores_OK != res)
@@ -160,10 +160,10 @@ extern eOresult_t eo_appTheNVmapRef_GetJointNVMemoryRef_test(EOappTheNVmapRef* p
     {
         return(eores_NOK_nullpointer);
     }
-    nv_id = eo_cfg_nvsEP_mc_joint_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)p->mc_endpoint, (eOcfg_nvsEP_mc_jointNumber_t)jId, (eOcfg_nvsEP_mc_jointNVindex_t) nvindex);
-    eo_nvscfg_GetIndices(p->nvsCfg, eok_ipv4addr_localhost, p->mc_endpoint, nv_id, 
+    nv_id = eo_cfg_nvsEP_mc_joint_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)p->cfg.mc_endpoint, (eOcfg_nvsEP_mc_jointNumber_t)jId, (eOcfg_nvsEP_mc_jointNVindex_t) nvindex);
+    eo_nvscfg_GetIndices(p->cfg.nvsCfg, eok_ipv4addr_localhost, p->cfg.mc_endpoint, nv_id, 
                          &ipindex, &epindex, &idindex);  
-    eo_nvscfg_GetNV(p->nvsCfg, ipindex, epindex, idindex, NULL, &nv);    
+    eo_nvscfg_GetNV(p->cfg.nvsCfg, ipindex, epindex, idindex, NULL, &nv);    
     *memRef = nv.loc;
 
      return(eores_OK);
@@ -212,14 +212,17 @@ static eOresult_t s_eo_appTheNVmapRef_tables_create(eOappTheNVmapRef_cfg_t *cfg)
     eOmc_jointId_t *jid_ptr;
     eOmc_motorId_t *mid_ptr;
     eOsk_skinId_t  *skid_ptr;
+    eOsnsr_sensorId_t *sid_ptr;
     
 
     //reset joint list
     memset(p->jointsList, 0, sizeof(p->jointsList));
     //reset motors list
     memset(p->motorsList, 0, sizeof(p->motorsList));
-    //reset sensors list
-    memset(p->sensorsList, 0, sizeof(p->sensorsList));
+    //reset sensors-strain list
+    memset(p->sensorsStrainList, 0, sizeof(p->sensorsStrainList));
+    //reset sensors-mais list
+    memset(p->sensorsMaisList, 0, sizeof(p->sensorsMaisList));
     //reset skin list
     memset(p->skinList, 0, sizeof(p->skinList));
 
@@ -264,7 +267,46 @@ static eOresult_t s_eo_appTheNVmapRef_tables_create(eOappTheNVmapRef_cfg_t *cfg)
         }
     }
 
+    size = 0;
+    //create sensorStrain-NV table
+    if(NULL != cfg->sensorsStrainList)
+    {
+        size = eo_array_Size(cfg->sensorsStrainList); //eo_fifoword_Size(cfg->skinList, &size, 0);
+      
+        for(i = 0; i<size; i++)
+        {
+            sid_ptr = (eOsnsr_sensorId_t*) eo_array_At(cfg->sensorsStrainList, i);
+            if(NULL == sid_ptr)
+            {
+                return(eores_NOK_generic);
+            }
+            p->sensorsStrainList[*sid_ptr] = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
+                                               sizeof(void*), strainNVindex_TOTALnumber);
+            
+        }
+    }
 
+    size = 0;
+    //create sensorMais-NV table
+    if(NULL != cfg->sensorsMaisList)
+    {
+        size = eo_array_Size(cfg->sensorsMaisList); //eo_fifoword_Size(cfg->skinList, &size, 0);
+      
+        for(i = 0; i<size; i++)
+        {
+            sid_ptr = (eOsnsr_sensorId_t*) eo_array_At(cfg->sensorsMaisList, i);
+            if(NULL == sid_ptr)
+            {
+                return(eores_NOK_generic);
+            }
+            p->sensorsMaisList[*sid_ptr] = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
+                                               sizeof(void*), maisNVindex_TOTALnumber);
+            
+        }
+    }
+    
+    
+    
     size = 0;
     //create skin-NV table
     if(NULL != cfg->skinList)
@@ -309,6 +351,20 @@ static eOresult_t s_eo_appTheNVmapRef_tables_initialise(void)
         return(res);
     }
 
+    
+    res = s_eo_appTheNVmapRef_table_sensorsStrain_initialise();
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    
+    res = s_eo_appTheNVmapRef_table_sensorsStrain_initialise();
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
     return(eores_OK);
 }
 
@@ -337,14 +393,14 @@ static eOresult_t s_eo_appTheNVmapRef_table_joints_initialise(void)
 
         for(jnvindex=jointNVindex_jconfig /*=0*/; jnvindex<jointNVindex_TOTALnumber; jnvindex++)
         {
-            nv_id = eo_cfg_nvsEP_mc_joint_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)p->mc_endpoint, (eOcfg_nvsEP_mc_jointNumber_t)j, jnvindex);
-            res = eo_nvscfg_GetIndices(p->nvsCfg, eok_ipv4addr_localhost, p->mc_endpoint, nv_id, 
+            nv_id = eo_cfg_nvsEP_mc_joint_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)p->cfg.mc_endpoint, (eOcfg_nvsEP_mc_jointNumber_t)j, jnvindex);
+            res = eo_nvscfg_GetIndices(p->cfg.nvsCfg, eok_ipv4addr_localhost, p->cfg.mc_endpoint, nv_id, 
                                        &ipindex, &epindex, &idindex); 
             if(eores_OK != res)
             {
                 return(res);
             }
-            nv_res_ptr = eo_nvscfg_GetNV(p->nvsCfg, ipindex, epindex, idindex, NULL, &nv);
+            nv_res_ptr = eo_nvscfg_GetNV(p->cfg.nvsCfg, ipindex, epindex, idindex, NULL, &nv);
             if(NULL == nv_res_ptr)
             {
                 return(eores_NOK_nullpointer);    
@@ -380,14 +436,14 @@ static eOresult_t s_eo_appTheNVmapRef_table_motors_initialise(void)
 
         for(mnvindex=motorNVindex_mconfig /*=0*/; mnvindex<motorNVindex_TOTALnumber; mnvindex++)
         {
-            nv_id = eo_cfg_nvsEP_mc_motor_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)p->mc_endpoint, (eOcfg_nvsEP_mc_motorNumber_t) m, mnvindex);
-            res = eo_nvscfg_GetIndices(p->nvsCfg, eok_ipv4addr_localhost, p->mc_endpoint, nv_id, 
+            nv_id = eo_cfg_nvsEP_mc_motor_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)p->cfg.mc_endpoint, (eOcfg_nvsEP_mc_motorNumber_t) m, mnvindex);
+            res = eo_nvscfg_GetIndices(p->cfg.nvsCfg, eok_ipv4addr_localhost, p->cfg.mc_endpoint, nv_id, 
                                        &ipindex, &epindex, &idindex); 
             if(eores_OK != res)
             {
                 return(res);
             }
-            nv_res_ptr = eo_nvscfg_GetNV(p->nvsCfg, ipindex, epindex, idindex, NULL, &nv);
+            nv_res_ptr = eo_nvscfg_GetNV(p->cfg.nvsCfg, ipindex, epindex, idindex, NULL, &nv);
             if(NULL == nv_res_ptr)
             {
                 return(eores_NOK_nullpointer);    
@@ -398,6 +454,106 @@ static eOresult_t s_eo_appTheNVmapRef_table_motors_initialise(void)
     }
     return(eores_OK);
 }
+
+
+static eOresult_t s_eo_appTheNVmapRef_table_sensorsStrain_initialise(void)
+{
+
+    uint8_t             s;
+    uint16_t            ipindex, epindex, idindex;
+    EOnv                nv;
+    EOnv                *nv_res_ptr;
+    eOnvID_t            nv_id;
+    eOresult_t          res;
+    EOappTheNVmapRef     *p = &s_eo_appTheNVmapRef;
+
+    eOcfg_nvsEP_as_strainNVindex_t snvindex;
+ 
+ 
+    if(NULL == p->cfg.sensorsStrainList)
+    {
+        return(eores_OK);
+    }
+    
+    for(s=0; s<strainNumberMAX; s++)
+    {
+        if(NULL == p->sensorsStrainList[s])
+        {
+            continue;
+        }
+
+        for(snvindex=strainNVindex_sconfig__mode /*=0*/; snvindex<strainNVindex_TOTALnumber; snvindex++)
+        {
+            nv_id = eo_cfg_nvsEP_as_strain_NVID_Get((eOcfg_nvsEP_as_endpoint_t)p->cfg.as_endpoint, (eOcfg_nvsEP_as_strainNumber_t)s, snvindex);
+            res = eo_nvscfg_GetIndices(p->cfg.nvsCfg, eok_ipv4addr_localhost, p->cfg.as_endpoint, nv_id, 
+                                       &ipindex, &epindex, &idindex); 
+            if(eores_OK != res)
+            {
+                return(res);
+            }
+            nv_res_ptr = eo_nvscfg_GetNV(p->cfg.nvsCfg, ipindex, epindex, idindex, NULL, &nv);
+            if(NULL == nv_res_ptr)
+            {
+                return(eores_NOK_nullpointer);    
+            }
+            
+            p->sensorsStrainList[s][snvindex] = nv.loc;               
+        } 
+    }        
+   
+   return(eores_OK);
+
+}
+
+static eOresult_t s_eo_appTheNVmapRef_table_sensorsMais_initialise(void)
+{
+
+    uint8_t             s;
+    uint16_t            ipindex, epindex, idindex;
+    EOnv                nv;
+    EOnv                *nv_res_ptr;
+    eOnvID_t            nv_id;
+    eOresult_t          res;
+    EOappTheNVmapRef     *p = &s_eo_appTheNVmapRef;
+
+    eOcfg_nvsEP_as_maisNVindex_t snvindex;
+ 
+ 
+    if(NULL == p->cfg.sensorsMaisList)
+    {
+        return(eores_OK);
+    }
+    
+    for(s=0; s<strainNumberMAX; s++)
+    {
+        if(NULL == p->sensorsMaisList[s])
+        {
+            continue;
+        }
+
+        for(snvindex=maisNVindex_mconfig__mode /*=0*/; snvindex<maisNVindex_TOTALnumber; snvindex++)
+        {
+            nv_id = eo_cfg_nvsEP_as_mais_NVID_Get((eOcfg_nvsEP_as_endpoint_t)p->cfg.as_endpoint, (eOcfg_nvsEP_as_maisNumber_t)s, snvindex);
+            res = eo_nvscfg_GetIndices(p->cfg.nvsCfg, eok_ipv4addr_localhost, p->cfg.as_endpoint, nv_id, 
+                                       &ipindex, &epindex, &idindex); 
+            if(eores_OK != res)
+            {
+                return(res);
+            }
+            nv_res_ptr = eo_nvscfg_GetNV(p->cfg.nvsCfg, ipindex, epindex, idindex, NULL, &nv);
+            if(NULL == nv_res_ptr)
+            {
+                return(eores_NOK_nullpointer);    
+            }
+            
+            p->sensorsMaisList[s][snvindex] = nv.loc;               
+        } 
+    }        
+   
+   return(eores_OK);
+
+}
+
 
 static eOresult_t s_eo_appTheNVmapRef_table_skin_initialise(void)
 {
@@ -422,14 +578,14 @@ static eOresult_t s_eo_appTheNVmapRef_table_skin_initialise(void)
 
         for(sknvindex=skinNVindex_sconfig__sigmode /*=0*/; sknvindex<skinNVindex_TOTALnumber; sknvindex++)
         {
-            nv_id = eo_cfg_nvsEP_sk_NVID_Get((eOcfg_nvsEP_sk_endpoint_t)p->sk_endpoint, sk, sknvindex);
-            res = eo_nvscfg_GetIndices(p->nvsCfg, eok_ipv4addr_localhost, p->sk_endpoint, nv_id, 
+            nv_id = eo_cfg_nvsEP_sk_NVID_Get((eOcfg_nvsEP_sk_endpoint_t)p->cfg.sk_endpoint, sk, sknvindex);
+            res = eo_nvscfg_GetIndices(p->cfg.nvsCfg, eok_ipv4addr_localhost, p->cfg.sk_endpoint, nv_id, 
                                        &ipindex, &epindex, &idindex); 
             if(eores_OK != res)
             {
                 return(res);
             }
-            nv_res_ptr = eo_nvscfg_GetNV(p->nvsCfg, ipindex, epindex, idindex, NULL, &nv);
+            nv_res_ptr = eo_nvscfg_GetNV(p->cfg.nvsCfg, ipindex, epindex, idindex, NULL, &nv);
             if(NULL == nv_res_ptr)
             {
                 return(eores_NOK_nullpointer);   

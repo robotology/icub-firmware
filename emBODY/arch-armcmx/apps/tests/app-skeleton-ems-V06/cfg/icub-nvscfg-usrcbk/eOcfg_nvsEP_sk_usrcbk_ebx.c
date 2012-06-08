@@ -30,6 +30,7 @@
 #include "stdlib.h" 
 #include "string.h"
 #include "stdio.h"
+#include "hal.h"
 
 #include "EoCommon.h"
 #include "EOarray.h"
@@ -107,9 +108,11 @@ extern void eo_cfg_nvsEP_sk_hid_UPDT_sconfig__sigmode(uint16_t n, const EOnv* nv
 
     if(snsr_sigmode_signal == *sigmode)
     {
+        hal_led_on(hal_led2);
         EOappCanSP *appCanSP_ptr = (EOappCanSP*)eom_appTheSysController_Services_Can_GetHandle(eom_appTheSysController_GetHandle());
 
         eo_appCanSP_ConfigSkin(appCanSP_ptr, 0);        
+
     }
 }
 

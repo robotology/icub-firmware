@@ -34,7 +34,7 @@
 #include "EOMotionControl.h"
 #include "eOcfg_nvsEP_sk.h"
 #include "eOcfg_nvsEP_mc.h"
-
+#include "eOcfg_nvsEP_as.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
@@ -48,24 +48,26 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
+
 /** @struct     EONtheSystem_hid
     @brief      Hidden definition. Implements private data used only internally by the 
                 public or private (static) functions of the object and protected data
                 used also by its derived objects.
  **/  
 
-
 struct EOappTheNVmapRef_hid 
 {
-    eOboolvalues_t     isInited; 
-    EOnvsCfg           *nvsCfg;
-    eOnvEP_t           mc_endpoint;
-    eOnvEP_t           as_endpoint;
-    eOnvEP_t           sk_endpoint;
-    void**             jointsList[jointNumberMAX];
-    void**             motorsList[motorNumberMAX];
-    void**             sensorsList[motorNumberMAX];   //  TODO: metti il num dei sensori
-    void**             skinList[skinNumberMAX];
+    eOboolvalues_t          isInited; 
+//     EOnvsCfg           *nvsCfg;
+//     eOnvEP_t           mc_endpoint;
+//     eOnvEP_t           as_endpoint;
+//     eOnvEP_t           sk_endpoint;
+    eOappTheNVmapRef_cfg_t  cfg;
+    void**                  jointsList[jointNumberMAX];
+    void**                  motorsList[motorNumberMAX];
+    void**                  sensorsStrainList[strainNumberMAX];
+    void**                  sensorsMaisList[maisNumberMAX];
+    void**                  skinList[skinNumberMAX];
 }; 
 
 
