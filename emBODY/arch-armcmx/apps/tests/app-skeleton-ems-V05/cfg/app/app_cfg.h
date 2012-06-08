@@ -35,7 +35,7 @@
 //   <o> local port where waiting datagram         <0-65535>
 //   <i> ....
 #ifndef LOCALPORT_ONRX            
- #define LOCALPORT_ONRX   3334
+ #define LOCALPORT_ONRX   3333
 #endif
 
 
@@ -53,18 +53,18 @@
 #endif
 //   <o> IP2 <0-255> 
 #ifndef REM_IP2
- #define REM_IP2        0
+ #define REM_IP2        5
 #endif
 //   <o> IP3 <0-255> 
 #ifndef REM_IP3
- #define REM_IP3       254
+ #define REM_IP3       2
 #endif
 //  </h> Fixed IP address
 
 //   <o> remote port where send         <0-65535>
 //   <i> ....
 #ifndef REMPORT             
- #define REMPORT   3334
+ #define REMPORT   3333
 #endif
 
 // </h> Ethernet network info
@@ -78,21 +78,21 @@
 // <i> .........
 
 #ifndef ENC1_ENABLE
- #define ENC1_ENABLE  1     
+ #define ENC1_ENABLE  0     
 #endif
 // </e>
 
 // <e> encoder 2          
 // <i> .......
 #ifndef ENC2_ENABLE
- #define ENC2_ENABLE  1     
+ #define ENC2_ENABLE  0     
 #endif
 // </e>
 
 // <e> encoder 3          
 // <i> ........
 #ifndef ENC3_ENABLE
- #define ENC3_ENABLE  1     
+ #define ENC3_ENABLE  0     
 #endif
 // </e>
 
@@ -121,21 +121,21 @@
 // <e> encoder 7          
 // <i> sssssssss
 #ifndef ENC7_ENABLE
- #define ENC7_ENABLE  1     
+ #define ENC7_ENABLE  0     
 #endif
 // </e>
 
 // <e> encoder 8          
 // <i> sssssssss
 #ifndef ENC8_ENABLE
- #define ENC8_ENABLE  1     
+ #define ENC8_ENABLE  0     
 #endif
 // </e>
 
 // <e> encoder 9          
 // <i> sssssssss
 #ifndef ENC9_ENABLE
- #define ENC9_ENABLE  1     
+ #define ENC9_ENABLE  0     
 #endif
 // </e>
 // </h> Encoders connected

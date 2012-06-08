@@ -305,7 +305,6 @@ extern eOresult_t eom_appTheSysController_Go2RunState(EOMappTheSysController *p)
 
     s_theSysController.appl_state = applstate_running;
 
-    hal_led_on(hal_led1);
     return(eores_OK);
 
 }
@@ -324,7 +323,6 @@ extern eOresult_t eom_appTheSysController_ExitFromRunState(EOMappTheSysControlle
 {
     s_eom_appTheSysController_Timers_Stop();
     s_eom_appTheSysController_ConnectedCanBoards_Stop();
-    hal_led_off(hal_led1);
     return(eores_OK);   
 }
 
@@ -409,8 +407,6 @@ static eOresult_t s_eom_appTheSysController_Timers_Init(void)
 
 static void s_timer2_appFreq_cbk(void *p)
 {
-        hal_led_on(hal_led0);
-        hal_led_off(hal_led1);
 
         DEBUG_PIN_ON;
 
@@ -424,7 +420,7 @@ static void s_timer2_appFreq_cbk(void *p)
 
 static void s_timer3_dataCollect_cbk(void *p)
 {
-    hal_led_on(hal_led2);
+
 //    if(NULL != s_theSysController.cfg.sig2appDataCollector_stop.fn)
 //    {
 //        s_theSysController.cfg.sig2appDataCollector_stop.fn(s_theSysController.cfg.sig2appDataCollector_stop.argoffn);
@@ -436,7 +432,6 @@ static void s_timer3_dataCollect_cbk(void *p)
 static void s_timer4_motorCntrlStart_cbk(void *p)
 {
 
-    hal_led_on(hal_led2);
 //    if(NULL != s_theSysController.cfg.sig2appMotorController.fn)
 //    {
 //        s_theSysController.cfg.sig2appMotorController.fn(s_theSysController.cfg.sig2appMotorController.argoffn);
@@ -473,7 +468,6 @@ static void s_eom_appTheSysController_startup(EOMtask *tsk, uint32_t t)
     #warning VALE --> gestisci errore in go2new state
     res = res;
 
-    hal_led_on(hal_led0);
 } 
 
 

@@ -31,6 +31,7 @@
 #include "string.h"
 #include "stdio.h"
 
+#include "hal.h"
 #include "EoCommon.h"
 
 #include "eOcfg_nvsEP_mn_comm_con.h"
@@ -171,6 +172,7 @@ extern void eo_cfg_nvsEP_mn_appl_usr_hid_UPDT_cmmnds__go2state(uint16_t n, const
 
         case applstate_running:
         {
+            hal_led_on(hal_led3);
             //eom_appTheSysController_exitFromConfigState(eom_appTheSysController_GetHandle());
             eom_appTheSysController_Go2RunState(eom_appTheSysController_GetHandle());    
         }break;

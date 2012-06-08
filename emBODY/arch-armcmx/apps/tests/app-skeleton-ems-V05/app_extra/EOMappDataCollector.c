@@ -254,8 +254,7 @@ static void s_eom_appDataCollector_taskRun(EOMtask *tsk, uint32_t evtmsgper)
 
     if(EVT_CHECK(evt, EVT_GETDATA_START))
     {
-        hal_led_on(hal_led1);
-        hal_led_off(hal_led0);
+
 
         /* 1) start encoder reading */
          eo_appEncReader_startRead(p->cfg.encReader_ptr);
@@ -297,7 +296,6 @@ static void s_eom_appDataCollector_taskRun(EOMtask *tsk, uint32_t evtmsgper)
     if(EVT_CHECK(evt, EVT_GETDATA_STOP))
     {
 
-        hal_led_on(hal_led3);
 //        if(eobool_true == eo_appEncReader_isReady(p->cfg.encReader_ptr))
 //        {
 //            eo_appEncReader_getValues(p->cfg.encReader_ptr, encoders_values);

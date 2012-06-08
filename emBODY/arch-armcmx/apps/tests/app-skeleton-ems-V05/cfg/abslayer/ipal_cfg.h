@@ -154,15 +154,15 @@
 #endif
 //   <o> IP1 <0-255> 
 #ifndef IPAL_IP1
- #define IPAL_IP1        10
+ #define IPAL_IP1        0
 #endif
 //   <o> IP2 <0-255> 
 #ifndef IPAL_IP2
- #define IPAL_IP2        10
+ #define IPAL_IP2        12
 #endif
 //   <o> IP3 <0-255> 
 #ifndef IPAL_IP3
- #define IPAL_IP3        6
+ #define IPAL_IP3        34
 #endif
 
 //  </h>Fixed IP address
@@ -181,7 +181,7 @@
 #endif
 //   <o> MSK2 <0-255> 
 #ifndef IPAL_MSK2
- #define IPAL_MSK2        255
+ #define IPAL_MSK2        0
 #endif
 //   <o> MSK3 <0-255> 
 #ifndef IPAL_MSK3
