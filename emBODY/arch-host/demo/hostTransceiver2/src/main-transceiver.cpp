@@ -5,6 +5,10 @@
     @date       04/07/2011
 **/
 
+//
+// Tested with revision 18333, with defined EO_NVSCFG_USE_CACHED_NVS in prot/src/EOnvsCfg.c
+//
+
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
@@ -372,27 +376,20 @@ void *skinThread(void * arg)
     for (i = 0; i< data.size(); i++ )
     	data[i]=255;
 
-    // Read the list of ports
-//	std::string root_name;
-//	root_name+="/icub/skin/";
-//
-//	std::vector<AnalogPortEntry> skinPorts;
-//
-//	// if there is no "ports" section take the name of the "skin" group as the only port name
-//	skinPorts.resize(1);
-//	skinPorts[0].offset = 0;
-//	skinPorts[0].length = -1;
-//	skinPorts[0].port_name = root_name + "testing";
-//  analogServer = new AnalogServer(skinPorts);
-//  analogServer->setRate(period);
-//  analogServer->attach(analog);
-//  analogServer->start();
-
 	printf("before open\n");
-    yarp::os::BufferedPort<yarp::sig::Vector> outPort;
-    if(!outPort.open("/icub/skin/testing"))
+    yarp::os::BufferedPort<yarp::sig::Vector> outPortHand;
+    if(!outPortHand.open("/hand/test:o"))
     {
-    	printf("Error, cannot open YARP port!!\n");
+    	printf("Error, cannot open /hand/test:o YARP port!!\n");
+    	return NULL;
+    }
+    else
+    	printf("Port opened!!\n");
+
+    yarp::os::BufferedPort<yarp::sig::Vector> outPortFAU;
+    if(!outPortFAU.open("/fau/test:o"))
+    {
+    	printf("Error, cannot open /fau/test:o YARP port!!\n");
     	return NULL;
     }
     else
@@ -407,18 +404,20 @@ void *skinThread(void * arg)
 
     while(keepGoingOn)
     {
-//    	printf(".");
-    	yarp::sig::Vector &pv = outPort.prepare();
-    	pv.clear();
+    	yarp::sig::Vector &vectorHand = outPortHand.prepare();
+    	yarp::sig::Vector &vectorFAU = outPortFAU.prepare();
+    	yarp::sig::Vector WholeData;
+    	vectorHand.clear();
+    	vectorFAU.clear();
+    	WholeData.clear();
 //    	transceiver->getNVvalue(nvRoot, (uint8_t *)&sk_array, &sizze);
+    	yarp::os::Stamp lastStateStamp;				// the last reading time stamp
 
     	memcpy( &sk_array, nvRoot->rem, sizeof(EOarray_of_10canframes));
-    	if(0 != sk_array.head.size)
-    		printf("\n--- ARRAY SIZE = %d  ---- \n", sk_array.head.size);
+//    	if(0 != sk_array.head.size)
+//   		printf("\n--- ARRAY SIZE = %d  ---- \n", sk_array.head.size);
 
-// 		'zeroing' the array
-//		for (i = 0; i< data.size(); i++ )
-//			data[i]=255;
+    	uint32_t cardId = 0;
 
     	for(i=0; i<sk_array.head.size; i++)
     	{
@@ -430,45 +429,74 @@ void *skinThread(void * arg)
 
     		if(valid)
     		{
+    			cardId = (canframe->id & 0x00f0) >> 4;
+    			switch (cardId)
+    			{
+    			case 14:
+    				mtbId = 0;
+    				break;
+    			case 13:
+    				mtbId = 1;
+    				break;
+    			case 12:
+    				mtbId = 2;
+    				break;
+    			case 11:
+    				mtbId = 3;
+    				break;
+    			case 10:
+    				mtbId = 4;
+    				break;
+    			case 9:
+    				mtbId = 5;
+    				break;
+    			case 8:
+    				mtbId = 6;
+    				break;
+    			}
     			triangle = (canframe->id & 0x000f);
     			msgtype= ((canframe->data[0])& 0x80);
-    			printf("\n data id 0x%04X, 0x", canframe->id);
 
-    			//   			for (int i=0; i<mtbId.size(); i++)
+    			int index=16*12*mtbId + triangle*12;
+
+//   			printf("%0X ", canframe->data[0]);
+    			if (msgtype)
     			{
-    				//if (id==mtbId[i])
+    				for(int k=0;k<5;k++)
     				{
-    					int index=16*12*mtbId + triangle*12;
-
-    					printf("%0X ", canframe->data[0]);
-    					if (msgtype)
-    					{
-    						for(int k=0;k<5;k++)
-    						{
-    							data[index+k+7]=canframe->data[k+1];
-    							printf("%0X ", canframe->data[k+1]);
-    						}
-    					}
-    					else
-    					{
-    						for(int k=0;k<7;k++)
-    						{
-    							data[index+k]=canframe->data[k+1];
-    							printf("%0X ", canframe->data[k+1]);
-    						}
-    					}
+    					data[index+k+7]=canframe->data[k+1];
+//						printf("%0X ", canframe->data[k+1]);
+    				}
+    			}
+    			else
+    			{
+    				for(int k=0;k<7;k++)
+    				{
+    					data[index+k]=canframe->data[k+1];
+//						printf("%0X ", canframe->data[k+1]);
     				}
     			}
     		}
-    		else
-    			printf("\n\nInvalid message\n\n\n");
+    		//else
+    			//printf("\nInvalid message\n");
     	}
 
-    	pv = data;
-    	outPort.write();
-    //	usleep(1000);
+		int firstH, lastH, firstFAU, lastFAU;
+    	firstH = 0;
+    	lastH  = 191;
+    	firstFAU = 192;
+    	lastFAU  = 383;
+        lastStateStamp.update();
+    	WholeData = data;
+    	vectorHand = WholeData.subVector(firstH, lastH);
+    	vectorFAU = WholeData.subVector(firstFAU, lastFAU);
+
+    	outPortHand.write();
+    	outPortFAU.write();
+    	usleep(1000);
     }
-    outPort.close();
+    outPortHand.close();
+	outPortFAU.close();
     return NULL;
 }
 
