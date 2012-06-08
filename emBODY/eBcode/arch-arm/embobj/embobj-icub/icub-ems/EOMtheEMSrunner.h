@@ -83,20 +83,23 @@ typedef enum
  **/
 typedef struct
 {
-     uint8_t        taskpriority[eo_emsrunner_task_numberof];
-     uint16_t       taskstacksize[eo_emsrunner_task_numberof];   
-     eOreltime_t    period;                 /**< The period of the cycle rx-do-tx. It is 1000 us. The rx task starts at beginning of the cycle.*/
-     eOreltime_t    execDOafter;            /**< The start of the do task as an offset from the beginning of the cycle. It is 500 us. */  
-     eOreltime_t    execTXafter;            /**< The start of the tx task as an offset from the beginning of the cycle. It is 750 us. */  
-     eOreltime_t    safetyGAP;              /**< The time beween two consecutive tasks before which the previous task must have finished its ececution. 50 us> */ 
+    uint8_t         taskpriority[eo_emsrunner_task_numberof];
+    uint16_t        taskstacksize[eo_emsrunner_task_numberof];   
+    eOreltime_t     period;                 /**< The period of the cycle rx-do-tx. It is 1000 us. The rx task starts at beginning of the cycle.*/
+    eOreltime_t     execDOafter;            /**< The start of the do task as an offset from the beginning of the cycle. It is 500 us. */  
+    eOreltime_t     execTXafter;            /**< The start of the tx task as an offset from the beginning of the cycle. It is 750 us. */  
+    eOreltime_t     safetyGAP;              /**< The time beween two consecutive tasks before which the previous task must have finished its execution. 50 us> */ 
+    uint16_t        maxnumofRXpackets;
+    uint16_t        maxnumofTXpackets;
 } eOemsrunner_cfg_t;
 
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg; // = {.taskpriority = {62, 61, 60}, .taskstacksize = {512, 512, 512}, 
-                                                         //    .execDOafter = 500, .execTXafter = 750, .safetyGAP = 50};
+extern const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg; // = {.taskpriority = {250, 251, 252}, .taskstacksize = {1024, 1024, 1024}, 
+                                                         //    .execDOafter = 500, .execTXafter = 750, .safetyGAP = 25,
+                                                         //    .maxnumofRXpackets = 3, maxnumofTXpackets = 1};
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -124,8 +127,9 @@ extern eOresult_t eom_emsrunner_StopAndGoTo(EOMtheEMSrunner *p, eOsmEventsEMSapp
 
 extern EOMtask * eom_emsrunner_GetTask(EOMtheEMSrunner *p, eOemsrunner_taskid_t id);
 
+eObool_t eom_emsrunner_SafetyGapTouched(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid);
 
-
+eObool_t eom_emsrunner_SafetyGapBroken(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid);
 
 
 /** @}            

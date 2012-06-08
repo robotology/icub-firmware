@@ -27,7 +27,7 @@
 #include "EoCommon.h"
 
 #include "EOMtheEMSappl.h"
-
+#include "EOMtask.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -90,7 +90,8 @@ extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(uint16_t nu
         if(3 == num)
         {
             num = 0;
-            eom_emsappl_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2run);
+//            eom_emsappl_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2run);
+            eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_go2runner);
         }
     }
 

@@ -188,7 +188,14 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
     uint16_t numberoftxrops = 0;
     eOabstime_t txtimeofrxropframe = 0;
     eOresult_t res;
+    
 
+    if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_go2runner))
+    {
+        eom_emsappl_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2run);
+        // no other event is managed anymore. a possible received packet shall be managed by teh runner
+        return;
+    }
     
     if(eobool_true == eo_common_event_check(evt, emssocket_evt_packet_received))
     {   // process the reception of a packet. it must contain a ropframe and nothing else
