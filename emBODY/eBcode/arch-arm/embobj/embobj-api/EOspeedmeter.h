@@ -53,8 +53,9 @@ extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution, int32_t f
 extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder);
 extern void eo_speedometer_EncoderError(EOspeedmeter* o);
 extern int32_t eo_speedometer_GetSpeed(EOspeedmeter* o);
-extern int32_t eo_speedometer_GetPosition(EOspeedmeter* o);
+//extern int32_t eo_speedometer_GetPosition(EOspeedmeter* o);
 extern int32_t eo_speedometer_GetDistance(EOspeedmeter* o);
+extern void eo_speedometer_EncoderCalibrate(EOspeedmeter* o, int32_t new_calibration);
 
 
 /** @}            

@@ -52,7 +52,10 @@ struct EOaxisController_hid
 
     int32_t pos_ref;
     int32_t vel_ref;
+    int32_t acc_ref;
+
     eObool_t first_run;
+    eObool_t is_calibrated;
 
     // axis limits
     int32_t pos_min;

@@ -44,7 +44,8 @@ struct EOspeedmeter_hid
     int32_t time_from_last_reading;
     int32_t last_valid_reading;
     int32_t last_reading;
-    int32_t position;
+    int32_t calibration;
+    //int32_t position;
     int32_t distance;
     int32_t speed;
   

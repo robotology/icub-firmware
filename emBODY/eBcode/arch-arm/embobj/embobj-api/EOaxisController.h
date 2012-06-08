@@ -42,10 +42,12 @@ typedef enum {
     CM_IMPEDANCE_VEL        =0x05,   //
 
     CM_CALIB_ABS_POS_SENS   =0x10,   //
+
     CM_CALIB_HARD_STOPS     =0x20,
     CM_HANDLE_HARD_STOPS    =0x30,
     CM_MARGIN_REACHED       =0x40,   // ?
     CM_CALIB_ABS_AND_INC    =0x41,   //
+
     CM_OPENLOOP             =0x50    //
 } control_mode_t;
 
