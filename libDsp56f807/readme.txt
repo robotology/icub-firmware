@@ -11,25 +11,25 @@ Folder libdsp56f807 is structured as follows:
  - common --> files  .c and .h about management of periphericals in common with all boards. 
  
  - 2BLL:
-     * library_2bll.mcp --> CodeWarrior progect file
+     * library_2bll.mcp --> CodeWarrior project file
      * source_code --> files .c that implement services for 2BLL board
      * output --> contains the output of compilation (.lib and assembly files)
 		  The file.lib shoud be included in motor controller applications for 2BLL board
     
  - 2BLLDC:
-     * library_2blldc.mcp --> CodeWarrior progect file
+     * library_2blldc.mcp --> CodeWarrior project file
      * source_code --> files .c that implements services for 2BLLDC board
      * output --> contains the output of compilation (.lib and assembly files)
                   The file.lib shoud be included in motor controller applications for 2BLLDC board
 
  - 2DC:
-     * library_2dc.mcp --> CodeWarrior progect file
+     * library_2dc.mcp --> CodeWarrior project file
      * source_code --> files .c that implements services for 2DC board
      * output --> contains the output of compilation (.lib and assembly files)
                   The file.lib shoud be included in motor controller applications for 2DC board
 
  - 4DC:
-     * library_4dc.mcp --> CodeWarrior progect file
+     * library_4dc.mcp --> CodeWarrior project file
      * source_code --> files .c that implements services for 4DC board.
      * output --> contains the output of compilation (.lib and assembly files)
                   The file.lib shoud be included in motor controller applications for 4DC board
