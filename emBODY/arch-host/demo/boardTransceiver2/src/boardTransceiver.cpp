@@ -17,7 +17,7 @@ using namespace std;
 #include "stdio.h"
 #include "string.h"
 
-
+#include "EOtransceiver.h"
 #include "boardTransceiver.hpp"
 #include "EOtheBOARDtransceiver_hid.h"
 #include "main_BOARD_transceiver.hpp"

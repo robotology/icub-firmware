@@ -204,7 +204,7 @@ extern void eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe(uint16_t n, cons
 {
 	//	printf("new callback\n");
 	// s_eo_cfg_nvsEP_sk_hid_Dump_Data(nv);
-	//	EOarray_of_10canframes *sk_array = (EOarray_of_10canframes *)nv->rem;
+	EOarray_of_10canframes *sk_array = (EOarray_of_10canframes *)nv->rem;
 
 	//	s_eo_cfg__nvsEP_sk_hid_ParseCanFrame(sk_array);
 	//	s_eo_cfg__nvsEP_sk_hid_Histogram_Print();
@@ -232,10 +232,10 @@ extern void eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe(uint16_t n, cons
 #ifdef _ICUB_CALLBACK_
 	FEAT_ID id;
 	id.type = Skin;
-
+	strcpy(id.name, "right_arm");
 //	weweweqwe;
 	void *featList;
-	printf("iCub Callback\n");
+	printf("iCub Callback, looking for %s\n", id.name);
 	getRobotFeatureList_C(&id);
 	findAndFill(&id, (char *)sk_array);
 
