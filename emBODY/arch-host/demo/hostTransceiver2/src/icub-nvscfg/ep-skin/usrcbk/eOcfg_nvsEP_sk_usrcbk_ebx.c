@@ -117,7 +117,7 @@ void s_eo_cfg_nvsEP_sk_hid_Dump_Data( const EOnv* nv)
 	for(i=0; i<sk_array.head.size; i++)
 	{
 		eOutil_canframe_t *canframe;
-		int  j, p, mtbId = 0;
+		int  j, p = 0;
 
 		canframe = (eOutil_canframe_t*) &sk_array.data[i*sizeof(eOutil_canframe_t)];
 		valid = (((canframe->id & 0x0F00) >> 8) == 3) ? 1 : 0;
@@ -228,13 +228,16 @@ extern void eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe(uint16_t n, cons
 	//
 	//	connection with iCubInterface stuff
 	//
+
 #ifdef _ICUB_CALLBACK_
 	FEAT_ID id;
 	id.type = Skin;
 
-	//	weweweqwe();
+//	weweweqwe;
 	void *featList;
+	printf("iCub Callback\n");
 	getRobotFeatureList_C(&id);
+	findAndFill(&id, (char *)sk_array);
 
 #endif
 }
