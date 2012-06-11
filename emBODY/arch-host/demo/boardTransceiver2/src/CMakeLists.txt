@@ -116,13 +116,13 @@ set(NVS_SKIN_SOURCE			${NVS_SKIN_SRC_FOLDER}eOcfg_nvsEP_sk.c
 #							${NVS_USR_SRC_FOLDER}eOcfg_nvsEP_as_wholebody_usrcbk_pippo.c
 #							${NVS_USR_SRC_FOLDER}eOcfg_nvsEP_mngmnt_usrcbk_ebx.c  )
 
-set(NVS_CBK_SOURCE			${NVS_MC_CBK_FOLDER}eOcfg_nvsEP_mc_lowerleg_usrcbk_pippo.c
-							${NVS_MC_CBK_FOLDER}eOcfg_nvsEP_mc_upperleg_usrcbk_pippo.c
-							${NVS_MC_CBK_FOLDER}eOcfg_nvsEP_mc_usrcbk_pippo.c
-							${NVS_MNGMNT_CBK_FOLDER}eOcfg_nvsEP_mngmnt_usr_ebx.c
-							${NVS_SENSORS_CBK_FOLDER}eOcfg_nvsEP_as_wholebody_usrcbk_pippo.c 
-							${NVS_SENSORS_CBK_FOLDER}eOcfg_nvsEP_as_usrcbk_pippo.c 
+set(NVS_CBK_SOURCE			${NVS_MNGMNT_CBK_FOLDER}eOcfg_nvsEP_mngmnt_usr_ebx.c
 							${NVS_SKIN_CBK_FOLDER}eOcfg_nvsEP_sk_usrcbk_ebx.c
+#							${NVS_MC_CBK_FOLDER}eOcfg_nvsEP_mc_lowerleg_usrcbk_pippo.c
+#							${NVS_MC_CBK_FOLDER}eOcfg_nvsEP_mc_usrcbk_pippo.c
+#							${NVS_MC_CBK_FOLDER}eOcfg_nvsEP_mc_upperleg_usrcbk_pippo.c
+#							${NVS_SENSORS_CBK_FOLDER}eOcfg_nvsEP_as_wholebody_usrcbk_pippo.c 
+#							${NVS_SENSORS_CBK_FOLDER}eOcfg_nvsEP_as_usrcbk_pippo.c 
 							)
 
 
@@ -236,7 +236,8 @@ set(embobj_source 		${BODY_COMMON_SOURCE}
 						${NVS_SENSORS_SOURCE} 
 						${NVS_SKIN_SOURCE} 
 						${NVS_USR_SOURCE} 
-						${EXTRA_SOURCE})
+						${EXTRA_SOURCE}
+						${NVS_CBK_SOURCE})
 
 
 #set(embobj_header 		${BODY_COMMON_SOURCE} 

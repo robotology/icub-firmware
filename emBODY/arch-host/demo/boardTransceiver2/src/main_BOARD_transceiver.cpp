@@ -42,10 +42,10 @@ using namespace std;
 // --------------------------------------------------------------------------------------------------------------------
 
 static void s_callback_button_1(void);
-static void s_callback_button_2(void);
+static void s_callback_button_2(char value);
 static void s_callback_button_3(void);
 static void s_callback_button_4(void);
-static void s_callback_button_5(void);
+static void s_callback_button_5(uint32_t mtb, uint32_t triangle, char value);
 
 
 void copyPid2eo(Pid in, eOmc_PID_t *out);
@@ -80,6 +80,7 @@ uint8_t buffer[sizeof(EOarray_of_10canframes)] = {0};
 int main(int argc, char *argv[])
 {
 	char str[STR_SIZE];
+	char value = 170;
 	// Program data
 	memset(&remote01.data, 0x00, MAX_CAPACITY_OF_PACKET);
 
@@ -200,7 +201,7 @@ int main(int argc, char *argv[])
 					break;
 
 				case '2':	// config/reset regular rops
-					s_callback_button_2();
+					s_callback_button_2(value);
 					break;
 
 				case '3':	//	send empty rop
@@ -211,9 +212,6 @@ int main(int argc, char *argv[])
 					s_callback_button_4();
 					break;
 
-				case '5':	//	send a status sig
-					s_callback_button_5();
-					break;
 
 				default:
 					printf("Command not known -->> sending an empty ropframe!\n");
@@ -290,9 +288,8 @@ void commands(void)
 	printf("q: quit\n");
 	printf("1: signaling jointNVindex_jstatus__basic joint 0\n");
 	printf("2: signaling endpoint_sk_emsboard_rightlowerarm\n");
-	printf("3: send an empty rop frame\n");
-	printf("4: send an empty rop frame\n");
-	printf("5: send an empty rop frame\n");
+	printf("3: reset skin values\n");
+	printf("4: cycling on skin values\\n");
 	printf("\n");
 }
 
@@ -341,7 +338,7 @@ static void s_callback_button_1(void)
 	snprintf(str, sizeof(str)-1, "signaling jointNVindex_jstatus__basic joint 0\n");
 }
 
-static void s_callback_button_2(void )
+static void s_callback_button_2(char value )
 {
 	char str[128];
 
@@ -374,7 +371,7 @@ static void s_callback_button_2(void )
 	uint8_t  max_triangle 	= 16;		// N triangoli nella mano destra
 	uint8_t  max_pp		 	= 12;
 
-	static uint32_t 	mtb 		= 8;
+	static uint32_t 	mtb 		= max_mtb;
 	static uint32_t	 	triangle 	= 0;  // indica... il triangolo - SensorId
 	static uint32_t	 	pp			= 0;
 	int index;
@@ -382,53 +379,52 @@ static void s_callback_button_2(void )
 	eOutil_canframe_t  canframe;
 
 	eo_array_Reset(skinData);
-//	for(int j=0; j<skinData->head.capacity; j++)
+
+
+	canframe.id =  (0x0300 | ((mtb<<4) & 0x00f0) | (triangle & 0x000f) );
+	printf("SID = 0x%04x", canframe.id);
+	printf("DATA: ");
+
+	if (first == true)
 	{
-
-		canframe.id =  ((mtb<<4) & 0x00f0) | (triangle & 0x000f);
-		printf("SID = 0x%04x", canframe.id);
-		printf("DATA: ");
-
-		if (first == true)
-		{
-			canframe.data[0] =  0x80;
-			canframe.size = 5;
-		}
-		else
-		{
-			canframe.data[0] =  0x00;
-			canframe.size = 7;
-			triangle++;
-		}
-
-
-		for(int c=1; c<=canframe.size; c++)
-		{
-			index = mtb*max_triangle*max_pp + triangle*max_pp;
-			canframe.data[c] = 170; // 255 - (index+c &0xFF);
-			printf(" %0x", canframe.data[c]);
-		}
-
-		first = !first;
-
-		if(triangle == max_triangle)
-		{
-			pp = 0;
-			triangle = 0;
-			mtb++;
-		}
-
-//		if(mtb==max_mtb)
-//		{
-//			pp=0;
-//			triangle=0;
-//			mtb=0;
-//		}
-
-		printf("\n\n");
-		eo_array_PushBack(skinData, &canframe);
-
+		canframe.data[0] =  0x80;
+		canframe.size = 5;
 	}
+	else
+	{
+		canframe.data[0] =  0x00;
+		canframe.size = 7;
+		triangle++;
+	}
+
+
+	for(int c=1; c<=canframe.size; c++)
+	{
+		index = mtb*max_triangle*max_pp + triangle*max_pp;
+		canframe.data[c] = value; // 255 - (index+c &0xFF);
+		printf(" %0x", canframe.data[c]);
+	}
+
+	first = !first;
+
+	if(triangle == max_triangle)
+	{
+		pp = 0;
+		triangle = 0;
+		mtb--;
+	}
+
+	if(mtb==7)
+	{
+		pp=0;
+		triangle=0;
+		mtb=max_mtb;
+	}
+
+	printf("\n\n");
+	eo_array_PushBack(skinData, &canframe);
+
+
 
 
 	if( eores_OK != eo_nv_Set(nvRoot, skinData, eobool_true, eo_nv_upd_dontdo))
@@ -470,23 +466,129 @@ static void s_callback_button_2(void )
 static void s_callback_button_3(void )
 {
 	char str[128];
+	char value = 255;
+	uint32_t  	max_mtb 		= 14;
+	uint32_t  	max_triangle 	= 16;		// N triangoli nella mano destra
+	uint32_t  	max_pp		 	= 12;
 
-	snprintf(str, sizeof(str)-1, "sent empty ropframe\n");
+	uint32_t 	mtb 		= max_mtb;
+	uint32_t	triangle 	= 0;  // indica... il triangolo - SensorId
+	uint32_t	pp			= 0;
+
+	int index, msg;
+
+	for (mtb=max_mtb; mtb > 7 && keepGoingOn; mtb--)
+		for(triangle=0; triangle<16 && keepGoingOn; triangle++)
+			for(msg=0; msg<2; msg++)
+			{
+				//printf("mtb=%d",mtb);
+				s_callback_button_5(mtb, triangle, value);
+				usleep(30*1000);
+			}
+	snprintf(str, sizeof(str)-1, "reset skin values\n");
 }
 
 
 static void s_callback_button_4(void )
 {
 	char str[128];
+	char value = 100;
+	uint32_t  	max_mtb 		= 14;
+	uint32_t  	max_triangle 	= 16;		// N triangoli nella mano destra
+	uint32_t  	max_pp		 	= 12;
 
-	snprintf(str, sizeof(str)-1, "sent empty ropframe\n");
+	uint32_t 	mtb 		= max_mtb;
+	uint32_t	triangle 	= 0;  // indica... il triangolo - SensorId
+	uint32_t	pp			= 0;
+
+	int index, msg;
+
+	for (mtb=max_mtb; mtb > 7 && keepGoingOn; mtb--)
+		for(triangle=0; triangle<16 && keepGoingOn; triangle++)
+			for(msg=0; msg<2; msg++)
+			{
+				//printf("mtb=%d",mtb);
+				s_callback_button_5(mtb, triangle, value);
+				usleep(30*1000);
+			}
+
+	snprintf(str, sizeof(str)-1, "cycling on skin values\n");
 }
 
 
-static void s_callback_button_5(void )
+static void s_callback_button_5(uint32_t mtb, uint32_t triangle, char value)
 {
-	char str[128];
-	snprintf(str, sizeof(str)-1, "sent empty ropframe\n");
+	uint8_t  boardAddr; // indica la MTB - CardId
+	uint8_t  max_mtb 		= 14;
+	uint8_t  max_triangle 	= 16;		// N triangoli nella mano destra
+	uint8_t  max_pp		 	= 12;
+
+	uint32_t	 	pp			= 0;
+
+	uint8_t *udppkt_data = NULL;
+	uint16_t udppkt_size = 0;
+	uint16_t							size;
+	EOnv								*nvRoot = NULL;
+	eOnvEP_t ep = endpoint_sk_emsboard_rightlowerarm;
+	eOnvID_t nvid;
+
+	static bool	first	= true;
+	eOutil_canframe_t  canframe;
+
+	nvid = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_rightlowerarm, 0, skinNVindex_sstatus__arrayof10canframe);
+	nvRoot = boardTransceiver_getNVhandler(ep, nvid);
+
+	eo_array_Reset(skinData);
+
+
+	canframe.id =  ((mtb<<4) & 0x00f0) | (triangle & 0x000f);
+	printf("SID = 0x%04x", canframe.id);
+	printf("DATA: ");
+
+	if (first == true)
+	{
+		canframe.data[0] =  0x80;
+		canframe.size = 5;
+	}
+	else
+	{
+		canframe.data[0] =  0x00;
+		canframe.size = 7;
+		triangle++;
+	}
+
+
+	for(int c=1; c<=canframe.size; c++)
+	{
+		int index = mtb*max_triangle*max_pp + triangle*max_pp;
+		canframe.data[c] = value; // 255 - (index+c &0xFF);
+		printf(" %0x", canframe.data[c]);
+	}
+
+	first = !first;
+
+	if(triangle == max_triangle)
+	{
+		pp = 0;
+		triangle = 0;
+		mtb--;
+	}
+
+	if(mtb==7)
+	{
+		pp=0;
+		triangle=0;
+		mtb=max_mtb;
+	}
+
+	printf("\n");
+	eo_array_PushBack(skinData, &canframe);
+	if( eores_OK != eo_nv_Set(nvRoot, skinData, eobool_true, eo_nv_upd_dontdo))
+		printf("error!!");
+
+	boardTransceiver_load_occasional_rop(eo_ropcode_sig, ep, nvid);
+	boardTransceiver_GetTransmit(&udppkt_data, &udppkt_size);
+	ACE_socket->send(udppkt_data, udppkt_size, remote01.addr, flags);
 }
 
 // Utilities
