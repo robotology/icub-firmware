@@ -409,8 +409,8 @@ void main(void)
 
 #if VERSION == 0x0129
 	    _position[0]= get_position_encoder(0);	
-		_position[1]= get_position_abs_ssi(AEA5); 
-		_position[2]= get_position_abs_ssi(AEA6);
+		_position[1]= get_position_abs_ssi(AEA6); 
+		_position[2]= get_position_abs_ssi(AEA5); 
 		_position[3]= extract_h( compute_filt_pos(get_position_abs_analog(3)>>3,3));					
 #endif
 

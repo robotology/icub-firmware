@@ -33,7 +33,7 @@
 #define AEA3   2   //SPIEN3
 #define AEA4   0   //SPIEN1
 #define AEA5   0   //SPIEN1
-#define AEA6   1   //SPIEN2
+#define AEA6   2   //SPIEN2
 
 #define CURRENT_BOARD_TYPE  BOARD_TYPE_4DC
 #define JN					4		/* number of axes */

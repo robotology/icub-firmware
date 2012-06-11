@@ -551,42 +551,86 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		#endif
 	}
 
-	if (type==CALIB_ABS_DIGITAL )
+	if (type==CALIB_ABS_DIGITAL )  
 	{
-		#ifdef DEBUG_CALIBRATION	
-		can_printf ("Calibration started  %d \r\n",channel);
-		#endif
+		
+		if (channel!=3)
+		{
 		
 			#ifdef DEBUG_CALIBRATION	
-		can_printf ("BC ");
-    	can_print_dword(_position[channel]);
-		#endif	
-		if (param3 >=0 && param3 <=4095) set_max_position(channel-1, param3);	
-		#ifdef DEBUG_CALIBRATION	
-		can_printf ("AC ");
-		can_print_dword(_position[channel]);
-		#endif
-		if (param2>0)
-		{
+			can_printf ("Calibration started  %d \r\n",channel);
+			#endif
+			
+				#ifdef DEBUG_CALIBRATION	
+			can_printf ("BC ");
+	    	can_print_dword(_position[channel]);
+			#endif	
+			if (channel==1)
+			{
+					if (param3 >=0 && param3 <=4095) set_max_position(AEA6, param3);	
+			}
+			if (channel==2)
+			{
+					if (param3 >=0 && param3 <=4095) set_max_position(AEA5, param3);	
+			}
 		
-		    _position[channel] = get_position_abs_ssi(channel-1);
-			_set_point[channel] = param1;
-			init_trajectory (channel, _position[channel], _set_point[channel], param2);
-			_in_position[channel] = false;
-			_calibrated[channel] = true;
-				#ifdef DEBUG_CALIBRATION
-			can_printf("Calibration ABS_DIGITAL terminated %d \r\n", channel);
-				#endif
+			#ifdef DEBUG_CALIBRATION	
+			can_printf ("AC ");
+			can_print_dword(_position[channel]);
+			#endif
+			if (param2>0)
+			{
+				if (channel==1)
+				{
+				    _position[channel] = get_position_abs_ssi(AEA6);
+				}
+				if (channel==2)
+				{
+			    	_position[channel] = get_position_abs_ssi(AEA5);
+				}
+				_set_point[channel] = param1;
+				init_trajectory (channel, _position[channel], _set_point[channel], param2);
+				_in_position[channel] = false;
+				_calibrated[channel] = true;
+					#ifdef DEBUG_CALIBRATION
+				can_printf("Calibration ABS_DIGITAL terminated %d \r\n", channel);
+					#endif
+			}
+			if (param2==0)
+			{
+				_control_mode[channel]=MODE_IDLE;	
+				_pad_enabled[channel] = false;
+				PWM_outputPadDisable(channel);
+			#ifdef DEBUG_CALIBRATION
+				can_printf("Calibration ABS_DIGITAL aborted \r\n");
+					#endif			
+			}	
 		}
-		if (param2==0)
+		else
 		{
-			_control_mode[channel]=MODE_IDLE;	
-			_pad_enabled[channel] = false;
-			PWM_outputPadDisable(channel);
-		#ifdef DEBUG_CALIBRATION
-			can_printf("Calibration ABS_DIGITAL aborted \r\n");
-				#endif			
-		}		
+			if (param2>0)
+			{
+				_set_point[channel] = param1;
+				init_trajectory(channel, _position[channel], _set_point[channel], param2);
+				_calibrated[channel] = true;
+				#ifdef DEBUG_CALIBRATION				
+				can_printf("moving from:%d");	
+				can_print_dword(_position[channel]);	
+				can_printf("moving to: %d",_set_point[channel]);	
+				can_print_dword(_set_point[channel]);	
+				can_printf("Calibration ABS_DIGITAL terminated \r\n");
+				#endif				
+			}
+			if (param2==0)
+			{
+				_control_mode[channel]=MODE_IDLE;	
+				_pad_enabled[channel] = false;
+				#ifdef DEBUG_CALIBRATION				
+				can_printf("Calibration ABS_DIGITAL aborted\r\n");
+				#endif				
+			} 		
+			
+		}
 	}
 /********	********
  *0x0120*	*0x0121*

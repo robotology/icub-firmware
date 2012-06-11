@@ -35,7 +35,7 @@ double sin(double rad)
 		sine = sine * (+0.225 * (sine - 1) + 1);
 	return sine;
 }
-
+ 
 void compute_identif_wt(int j)
 {
 	wt[j]=(2*PI*sine_freq[j]*tCount[j]/1000+wt0[j]);
