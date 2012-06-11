@@ -103,7 +103,7 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 {
 #if 1
     volatile eObool_t quit = eobool_false;
-    volatile eObool_t* touched = &p->safetyGAPtouched[eo_emsrunner_taskid_runDO];
+    //volatile eObool_t* touched = &p->safetyGAPtouched[eo_emsrunner_taskid_runDO];
     
     for(;;)
     {
@@ -151,30 +151,16 @@ static void s_delay(eOreltime_t delay)
     uint64_t startat = osal_system_nanotime_get();
     uint64_t stopat = startat + delay*1000;
     volatile uint64_t now = startat;
-//    volatile uint32_t i = 0;
-    
+   
 
     for(;;)
     {
         
         if(now >= stopat)
         {
-//             i = i;
-//             if(i<100000)
-//             {
-//                 i = 1+1;
-//             }
-//             else
-//             {
-//                 i = i-1;
-//             }
-//             i = i+1;
-//             i = i;
-//            i = i;
             break;
         }  
         now = osal_system_nanotime_get();        
-//        i++;
     }    
 }
 

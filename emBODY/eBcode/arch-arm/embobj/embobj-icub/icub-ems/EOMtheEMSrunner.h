@@ -89,8 +89,8 @@ typedef struct
     eOreltime_t     execDOafter;            /**< The start of the do task as an offset from the beginning of the cycle. It is 500 us. */  
     eOreltime_t     execTXafter;            /**< The start of the tx task as an offset from the beginning of the cycle. It is 750 us. */  
     eOreltime_t     safetyGAP;              /**< The time beween two consecutive tasks before which the previous task must have finished its execution. 50 us> */ 
-    uint16_t        maxnumofRXpackets;
-    uint16_t        maxnumofTXpackets;
+    uint16_t        maxnumofRXpackets;      /**< It allows to receive and parse up to a given number of packets */ 
+    uint16_t        maxnumofTXpackets;      /**< so far it can be only 0 or 1 */
 } eOemsrunner_cfg_t;
 
 
