@@ -47,6 +47,8 @@
 #include "EOaction_hid.h"
 #include "EOMtheCallbackManager.h"
 
+#include "eventviewer.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -68,6 +70,15 @@
 
 //#define EOMTHEEMSRUNNER_USE_HAL_TIMER_FOR_PERIOD
 
+#define idofgapof           (ev_ID_first_isr+32)
+
+#define idofgapofRX         (idofgapof+eo_emsrunner_taskid_runRX)
+#define idofgapofDO         (idofgapof+eo_emsrunner_taskid_runDO)
+#define idofgapofTX         (idofgapof+eo_emsrunner_taskid_runTX)
+
+#define idofstartRX         (ev_ID_first_isr+64)
+#define idofstartDO         (ev_ID_first_isr+65)
+#define idofstartTX         (ev_ID_first_isr+66)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -129,6 +140,14 @@ static void s_eom_emsrunner_cbk_activate_with_period_by_hal_timer(void* arg, osa
 
 static void s_eom_emsrunner_cbk_activate_with_period_by_osal_timer(void* arg);
 
+ void gapofRX(void);
+ void startDO(void);
+ void gapofDO(void);
+ void startRX(void);
+ void startTX(void);
+ void gapofTX(void);
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -179,8 +198,12 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
 #if !defined(EOMTHEEMSRUNNER_USE_HAL_TIMER_FOR_PERIOD)
     eo_errman_Assert(eo_errman_GetHandle(), ((cfg->period % osal_info_get_tick()) == 0), s_eobj_ownname, "cfg->period must be multiple of osaltick");
 #endif    
+
+    eo_errman_Assert(eo_errman_GetHandle(), (cfg->maxnumofTXpackets <= 1), s_eobj_ownname, "cfg->maxnumofTXpackets must be 0 or 1");
     
     memcpy(&s_theemsrunner.cfg, cfg, sizeof(eOemsrunner_cfg_t));
+    
+
     
     s_theemsrunner.cycleisrunning = eobool_false; 
     s_theemsrunner.event = eo_sm_emsappl_EVdummy;
@@ -211,8 +234,16 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
                                                                   (eOevent_t)(eo_emsrunner_evt_enable) | (eOevent_t)(eo_emsrunner_evt_execute), 
                                                                   eok_reltimeINFINITE, NULL, 
                                                                   tskEMSrunTX, "tskEMSrunTX");                                                              
-                                                   
-    
+     
+
+    eventviewer_load(idofgapofRX, gapofRX);
+    eventviewer_load(idofstartDO, startDO);
+    eventviewer_load(idofgapofDO, gapofDO);
+    eventviewer_load(idofstartRX, startRX);
+    eventviewer_load(idofstartTX, startTX);    
+    eventviewer_load(idofgapofTX, gapofTX);
+
+     
     return(&s_theemsrunner);
 }
 
@@ -400,6 +431,7 @@ __weak extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramrecep
     
 }
 
+#if 0
 __weak extern void eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(EOMtheEMSrunner *p)
 {
     EOpacket *rxpkt = NULL;
@@ -448,6 +480,57 @@ __weak extern void eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(E
     
     p->numofrxpackets = received;           
 }
+#else
+
+
+__weak extern void eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(EOMtheEMSrunner *p)
+{
+    EOpacket *rxpkt = NULL;
+    
+    eOsizecntnr_t remainingrxpkts = 1;    
+    uint16_t processedpkts = 0;
+    eObool_t processreception = eobool_true;
+    
+    // evaluate if we can enter in the reception loop
+    if((0 == p->cfg.maxnumofRXpackets) || (eobool_true == s_theemsrunner.safetyGAPtouched[eo_emsrunner_taskid_runRX]))
+    {
+        processreception = eobool_false;
+    }     
+    
+    // the reception loop
+    while(eobool_true == processreception)
+    {  
+        eOresult_t resrx;
+        
+        // 1. process one packet        
+        processedpkts++;
+
+        // 1.1 get the packet. we need passing just a pointer because the storage is inside the EOMtheEMSsocket       
+        resrx = eom_emssocket_Receive(eom_emssocket_GetHandle(), &rxpkt, &remainingrxpkts);
+        
+        // 1.2 process the packet with the transceiver
+        if(eores_OK == resrx)
+        {
+            uint16_t tmp = 0;
+            eom_emstransceiver_Parse(eom_emstransceiver_GetHandle(), rxpkt, &tmp, NULL);
+            p->numofrxrops += tmp;
+            p->numofrxpackets++;
+        }
+        
+        // 2. evaluate quit from the loop
+        if((0 == remainingrxpkts) || (processedpkts >= p->cfg.maxnumofRXpackets) || (eores_OK != resrx) || (eobool_true == s_theemsrunner.safetyGAPtouched[eo_emsrunner_taskid_runRX]))
+        {
+            processreception = eobool_false;
+        }        
+    
+    }
+ 
+       
+}
+
+
+#endif
+
 
 __weak extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
 {
@@ -481,6 +564,7 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtrans
     
 }
 
+#if 0
 __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmission(EOMtheEMSrunner *p)
 {
     EOpacket* txpkt = NULL;
@@ -499,6 +583,54 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmissio
     }        
            
 }
+#else
+
+__weak extern void eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmission(EOMtheEMSrunner *p)
+{
+    EOpacket *txpkt = NULL;
+    
+    uint16_t numberoftxrops = 0;    
+    uint16_t processedpkts = 0;
+    eObool_t processtransmission = eobool_true;
+    
+    // evaluate if we can enter in the transmission loop
+    if((0 == p->cfg.maxnumofTXpackets) || (eobool_true == s_theemsrunner.safetyGAPtouched[eo_emsrunner_taskid_runTX]))
+    {
+        processtransmission = eobool_false;
+    }     
+    
+        
+    // the transmission loop
+    while(eobool_true == processtransmission)
+    {
+        eOresult_t resformer;
+        eOresult_t restx;
+        
+        // 1. process one packet        
+        processedpkts++;   
+        
+        // 1.1 call the former to retrieve a tx packet (even if it is an empty ropframe)        
+        resformer = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, &numberoftxrops);
+        
+        // 1.2  send a packet back. but only if the former gave us a good one.
+        if(eores_OK == resformer)
+        {
+            restx = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
+            p->numoftxrops += numberoftxrops;
+            p->numoftxpackets++;
+        }
+
+        // 2. evaluate quit from the loop
+        //if((processedpkts >= p->cfg.maxnumofTXpackets) || (eobool_true == s_theemsrunner.safetyGAPtouched[eo_emsrunner_taskid_runTX]))
+        //{
+            processtransmission = eobool_false;
+        //}   
+        
+    }    
+           
+}
+
+#endif
 
 __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p)
 {
@@ -645,6 +777,8 @@ static void s_eom_emsrunner_start_cycle(void *arg)
 
 static void s_eom_emsrunner_start_cycle_within_osaltimer(osal_timer_t *tmr, void *arg)
 {
+    evEntityId_t prev = eventviewer_switch_to(idofstartRX);
+    
     hal_timer_cfg_t toneshot_cfg  = 
     {
         .prescaler          = hal_timer_prescalerAUTO,         
@@ -688,12 +822,29 @@ static void s_eom_emsrunner_start_cycle_within_osaltimer(osal_timer_t *tmr, void
  
     // send an event to execute taskRX
     eom_task_isrSetEvent(s_theemsrunner.task[eo_emsrunner_taskid_runRX], eo_emsrunner_evt_execute);
+    
+    eventviewer_switch_to(prev);
 }
 
 static void s_eom_emsrunner_warn_task(void *arg)
 {
     EOMtask* task = (EOMtask*) arg;
     osal_task_t *scheduledosaltask = osal_task_get(osal_callerISR);
+    evEntityId_t prev;
+    
+    { // debug
+           // search for the task which broke the time: RX, DO, or TX?
+        uint8_t i;
+        for(i=0; i<eo_emsrunner_task_numberof-1; i++)
+        {
+            if(task == s_theemsrunner.task[i])
+            {
+                break;
+            }
+        }
+        
+        prev = eventviewer_switch_to(idofgapof+i);
+    }
         
     if(task->osaltask == scheduledosaltask)
     {   // if execution is in here it means that the task has not finished its computing in the time it was given to it minus the guard
@@ -711,12 +862,15 @@ static void s_eom_emsrunner_warn_task(void *arg)
         // set the boolean variable of the given task to true.
         s_theemsrunner.safetyGAPtouched[i] = eobool_true;        
     }
-
+    
+    eventviewer_switch_to(prev);
 }
 
 
 static void s_eom_emsrunner_start_taskDO(void *arg)
 {
+    evEntityId_t prev = eventviewer_switch_to(idofstartDO);
+    
     hal_timer_cfg_t toneshot_cfg  = 
     {
         .prescaler          = hal_timer_prescalerAUTO,         
@@ -729,6 +883,7 @@ static void s_eom_emsrunner_start_taskDO(void *arg)
     EOMtask* task = (EOMtask*) arg;
     EOMtask* prevtask = s_theemsrunner.task[eo_emsrunner_taskid_runRX];
     osal_task_t *scheduledosaltask = osal_task_get(osal_callerISR);
+
     
     // set to false the safety gap touched for DO
     s_theemsrunner.safetyGAPtouched[eo_emsrunner_taskid_runDO] = eobool_false;
@@ -756,13 +911,18 @@ static void s_eom_emsrunner_start_taskDO(void *arg)
     hal_timer_start(hal_timer3);
     hal_timer_start(hal_timer4);
     
+    
     // send event to activate the task in argument (taskDO)
-     eom_task_isrSetEvent(s_theemsrunner.task[eo_emsrunner_taskid_runDO], eo_emsrunner_evt_execute);
+    eom_task_isrSetEvent(s_theemsrunner.task[eo_emsrunner_taskid_runDO], eo_emsrunner_evt_execute);
+    
+    eventviewer_switch_to(prev);
 }
 
 
 static void s_eom_emsrunner_start_taskTX(void *arg)
 {
+    evEntityId_t prev = eventviewer_switch_to(idofstartTX);
+    
     hal_timer_cfg_t toneshot_cfg  = 
     {
         .prescaler          = hal_timer_prescalerAUTO,         
@@ -775,6 +935,7 @@ static void s_eom_emsrunner_start_taskTX(void *arg)
     EOMtask* task = (EOMtask*) arg;
     EOMtask* prevtask = s_theemsrunner.task[eo_emsrunner_taskid_runDO];
     osal_task_t *scheduledosaltask = osal_task_get(osal_callerISR);
+    
     
     
     // set to false the safety gap touched for TX
@@ -802,10 +963,13 @@ static void s_eom_emsrunner_start_taskTX(void *arg)
 
     hal_timer_start(hal_timer3);
 //    hal_timer_start(hal_timer4);
-    
+
+        
     // send event to activate the task in argument (taskTX)
     //eom_task_isrSetEvent(task, eo_emsrunner_evt_execute);
     eom_task_isrSetEvent(s_theemsrunner.task[eo_emsrunner_taskid_runTX], eo_emsrunner_evt_execute);
+    
+    eventviewer_switch_to(prev);
 }
 
 
@@ -883,6 +1047,12 @@ static void s_eom_emsrunner_cbk_activate_with_period_by_osal_timer(void* arg)
 
 
 
+ void gapofRX(void){}
+ void startDO(void){}
+ void gapofDO(void){}
+ void startRX(void){}
+ void startTX(void){}
+ void gapofTX(void){}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
