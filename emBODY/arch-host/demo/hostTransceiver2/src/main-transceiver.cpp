@@ -44,6 +44,7 @@ using namespace std;
 #include "EOnv_hid.h"
 #include "EoMotionControl.h"
 #include "EoSkin.h"
+#include "EoSensors.h"
 
 #define _AC_
 //#include "IRobotInterface.h"
@@ -100,6 +101,7 @@ static void s_callback_button_2(void);
 static void s_callback_button_3(void);
 static void s_callback_button_4(void);
 static void s_callback_button_5(void);
+static void s_callback_button_6(void );
 
 //static void s_eom_hostprotoc_extra_protocoltransceiver_ask_the_board(void);
 
@@ -502,23 +504,25 @@ void *skinThread(void * arg)
 
 void commands(void)
 {
-  printf("q: quit\n");
-  printf("0: send wake up packet -> set appl state to running\n");
-  printf("1: send config  packet -> configure regulars\n");
-  printf("2: set treeroot -> set joint configuration\n");
-  printf("3: set leaves packet -> max current and maxposition\n");
-  printf("4: send type 4 packet -> send position setPoint\n");
-  printf("\n");
+	printf("q: quit\n");
+	printf("0: send wake up packet -> set appl state to running\n");
+	printf("1: send config  Right ARM -> configure regulars\n");
+	printf("2: send config  Left ARM -> configure regulars\n");
+	printf("2: set treeroot -> set joint configuration\n");
+	printf("3: set leaves packet -> max current and maxposition\n");
+	printf("4: send type 4 packet -> send position setPoint\n");
+	printf("4: send type 4 packet -> send position setPoint\n");
+	printf("\n");
 }
 
 void usage(void)
 {
-  printf("usage: "
-		 "\t\t--help		print this help\n");
-  printf("\t\t--loc-ip  <xx>	set the ip address of the local machine - needed by yarp - by default %s\n", DEFAULT_LAPTOP_IP);
-  printf("\t\t--rem-ip  <xx>	set the ip address of the remote device - by default %s\n", DEFAULT_EMS_IP);
-  printf("\t\t--port    <xx>	set the socket port - by default %d\n", DEFAULT_PORT);
-  printf("\t\t--reply		if present, then an empty ropframe is sent as an ack for each packet received - by default it's disabled\n");
+	printf("usage: "
+			"\t\t--help		print this help\n");
+	printf("\t\t--loc-ip  <xx>	set the ip address of the local machine - needed by yarp - by default %s\n", DEFAULT_LAPTOP_IP);
+	printf("\t\t--rem-ip  <xx>	set the ip address of the remote device - by default %s\n", DEFAULT_EMS_IP);
+	printf("\t\t--port    <xx>	set the socket port - by default %d\n", DEFAULT_PORT);
+	printf("\t\t--reply		if present, then an empty ropframe is sent as an ack for each packet received - by default it's disabled\n");
 }
 
 
@@ -633,15 +637,91 @@ static void s_callback_button_1(void)
     	sigcfg.id = nvid;
     	sigcfg.plustime = 0;
     	eo_array_PushBack(array, &sigcfg);
-    }
 
+    	sigcfg.ep = endpoint_as_rightlowerarm;
+		nvid = eo_cfg_nvsEP_as_mais_NVID_Get((eOcfg_nvsEP_as_endpoint_t)sigcfg.ep, 0, maisNVindex_mstatus__the15values);
+    	sigcfg.id = nvid;
+    	sigcfg.plustime = 0;
+    	eo_array_PushBack(array, &sigcfg);
+    }
     transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mn_comm, nvid_ropsigcfgassign);
+
+    eOcfg_nvsEP_as_endpoint_t ep = endpoint_as_rightlowerarm;
+    nvid = eo_cfg_nvsEP_as_mais_NVID_Get(ep, dummy, maisNVindex_mconfig__datarate);
+//	EOnv 		*nvRoot;
+	nvRoot = transceiver->getNVhandler(ep, signal);
+	dat = 1;
+	if( eores_OK != eo_nv_Set(nvRoot, &dat, eobool_true, eo_nv_upd_dontdo))
+		printf("error!!");
+	// tell agent to prepare a rop to send
+    transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
+
 
     printf("added a set<__upto10rop2signal, list>");
 
 }
 
 static void s_callback_button_2(void )
+{
+	char str[128];
+	int j = 0;
+
+	EOnv 						*cnv;
+	eOmn_ropsigcfg_command_t 	*ropsigcfgassign;
+	EOarray						*array;
+	eOropSIGcfg_t 				sigcfg;
+	eOcfg_nvsEP_mn_commNumber_t dummy = 0;
+
+	snprintf(str, sizeof(str)-1, "called set<regulars>");
+	hal_trace_puts(str);
+
+	//    eo_cfg_nvsEP_mc_endpoint_t ep = endpoint_mngmnt;
+	//    eo_cfg_nvsEP_mc_jointNVindex_t jNVindex = mngmntNVindex__ropsigcfgassign;
+
+	// get nvid from parameters
+	//#warning "aggiornare chiamate a funzione"
+	eOnvID_t signal = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_rightlowerarm, dummy, skinNVindex_sconfig__sigmode);
+	EOnv 		*nvRoot;
+	nvRoot = transceiver->getNVhandler(endpoint_sk_emsboard_rightlowerarm, signal);
+	uint8_t dat = 1;
+	if( eores_OK != eo_nv_Set(nvRoot, &dat, eobool_true, eo_nv_upd_dontdo))
+		printf("error!!");
+	// tell agent to prepare a rop to send
+	transceiver->load_occasional_rop(eo_ropcode_set, endpoint_sk_emsboard_rightlowerarm, signal);
+
+	eOnvID_t nvid_ropsigcfgassign = eo_cfg_nvsEP_mn_comm_NVID_Get(endpoint_mn_comm, dummy, commNVindex__ropsigcfgcommand);
+	cnv = transceiver->getNVhandler(endpoint_mn_comm, nvid_ropsigcfgassign);
+	ropsigcfgassign = (eOmn_ropsigcfg_command_t*) cnv->loc;
+	array = (EOarray*) &ropsigcfgassign->array;
+	eo_array_Reset(array);
+	array->head.capacity = NUMOFROPSIGCFG;
+	array->head.itemsize = sizeof(eOropSIGcfg_t);
+	ropsigcfgassign->cmmnd = ropsigcfg_cmd_assign;
+
+
+/*
+	sigcfg.ep = endpoint_mc_rightlowerarm;
+	nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(sigcfg.ep, 0, jointNVindex_jstatus__basic);
+	sigcfg.id = nvid;
+	sigcfg.plustime = 0;
+	eo_array_PushBack(array, &sigcfg);
+*/
+
+	eOnvID_t nvid;
+	sigcfg.ep = endpoint_sk_emsboard_leftlowerarm;
+	nvid = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_rightlowerarm, 0, skinNVindex_sstatus__arrayof10canframe);
+	sigcfg.id = nvid;
+	sigcfg.plustime = 0;
+	eo_array_PushBack(array, &sigcfg);
+
+	transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mn_comm, nvid_ropsigcfgassign);
+
+	printf("added a set<__upto10rop2signal, list>");
+}
+
+
+
+static void s_callback_button_3(void )
 {
 	char str[128];
 	EOnv 		*nvRoot;
@@ -698,7 +778,7 @@ static void s_callback_button_2(void )
 	snprintf(str, sizeof(str)-1, "called set motor and joint config, index %d\n", j);
 }
 
-static void s_callback_button_3(void )
+static void s_callback_button_4(void )
 {
 	char str[128];
 	EOnv 		*nvRoot;
@@ -737,7 +817,7 @@ static void s_callback_button_3(void )
 	snprintf(str, sizeof(str)-1, "called set jointNVindex_jconfig__maxpositionofjoint\n");
 }
 
-static void s_callback_button_4(void)
+static void s_callback_button_5(void)
 {
 	char str[128];
 	EOnv 		*nvRoot;
@@ -762,7 +842,7 @@ static void s_callback_button_4(void)
 	snprintf(str, sizeof(str)-1, "called setPoint position\n");
 }
 
-static void s_callback_button_5(void )
+static void s_callback_button_6(void )
 {
 	char str[128];
 	int j = 0;
