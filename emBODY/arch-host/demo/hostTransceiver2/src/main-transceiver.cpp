@@ -586,9 +586,17 @@ static void s_callback_button_1(void)
 	eOnvID_t signal = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_rightlowerarm, dummy, skinNVindex_sconfig__sigmode);
 	EOnv 		*nvRoot;
 	nvRoot = transceiver->getNVhandler(endpoint_sk_emsboard_rightlowerarm, signal);
+	if(NULL == nvRoot)
+	{
+		printf("\n>>> ERROR \ntransceiver->getNVhandler returned NULL!!\n");
+		return;
+	}
 	uint8_t dat = 1;
 	if( eores_OK != eo_nv_Set(nvRoot, &dat, eobool_true, eo_nv_upd_dontdo))
-		printf("error!!");
+	{
+		printf("\n>>> ERROR \neo_nv_Set !!\n");
+		return;
+	}
 	// tell agent to prepare a rop to send
 	transceiver->load_occasional_rop(eo_ropcode_set, endpoint_sk_emsboard_rightlowerarm, signal);
 
@@ -702,20 +710,18 @@ static void s_callback_button_2(void )
 	// get nvid from parameters
 	//#warning "aggiornare chiamate a funzione"
 	eOnvID_t signal = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_leftlowerarm, dummy, skinNVindex_sconfig__sigmode);
-	printf("signal = %d\n!!", signal);
-
 	EOnv 		*nvRoot;
 	nvRoot = transceiver->getNVhandler(endpoint_sk_emsboard_leftlowerarm, signal);
+	nvRoot = transceiver->getNVhandler(endpoint_sk_emsboard_rightlowerarm, signal);
 	if(NULL == nvRoot)
 	{
-		printf("error get handler endpoint_sk_emsboard_leftlowerarm, dummy, skinNVindex_sconfig__sigmode!!");
+		printf("\n>>> ERROR \ntransceiver->getNVhandler returned NULL!!\n");
 		return;
 	}
-
 	uint8_t dat = 1;
 	if( eores_OK != eo_nv_Set(nvRoot, &dat, eobool_true, eo_nv_upd_dontdo))
 	{
-		printf("error eo_nv_Set!!");
+		printf("\n>>> ERROR \neo_nv_Set!!\n");
 		return;
 	}
 	// tell agent to prepare a rop to send
