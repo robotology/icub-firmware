@@ -302,6 +302,7 @@ extern eOresult_t eom_appTheSysController_Go2RunState(EOMappTheSysController *p)
     // 4) start timers
     s_eom_appTheSysController_Timers_Start();
     
+    hal_led_on(hal_led3);
 
     s_theSysController.appl_state = applstate_running;
 

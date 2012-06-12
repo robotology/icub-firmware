@@ -44,6 +44,12 @@
 #include "EOnv.h"
 #include "EOnvsCfg.h"
 
+//in order to get ep number
+#include "eOcfg_nvsEP_mc.h"
+#include "eOcfg_nvsEP_as.h"
+#include "eOcfg_nvsEP_sk.h"
+
+
 
 //embobj of application
 #include "EOMappTheSysController.h"
@@ -56,8 +62,11 @@
 //#include "EOappTheNVmapRef.h"
 //
 //endpoints-cfg
+#if     defined(EP_EB4) 
 #include "eOcfg_EPs_eb4.h"
-
+#elif   defined(EP_EB2) //left lower arm
+    #include "eOcfg_EPs_eb2.h"
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -106,15 +115,6 @@ extern const eOmipnet_cfg_dtgskt_t eom_appSkeletonEms_body_dtgskt_cfg =
 extern EOethBaseModule_cfg_t    *ethmod_cfg_ptr;
 extern uint16_t                 connectedEncodersMask_cfg; 
 
-//extern const EOconstvector* const      vectorof_endpoint_cfg;
-//extern eOuint16_fp_uint16_t     hashfunction_ep2index;
-extern eOnvEP_t                 mc_endpoint;
-extern eOnvEP_t                 as_endpoint; //currently not used  /**<  analog sensor endopoint managed by the application    */
-extern eOnvEP_t                 sk_endpoint;
-
-
-
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -152,17 +152,36 @@ extern void eom_appSkeletonEms_body_application_init(void)
     hal_timer_init(hal_timer5, &t5_cfg, NULL);
     hal_timer_start(hal_timer5);
 
+#if     defined(EP_EB4)     //right lower arm
     EOMappTheSysController_cfg_t cfg =
     {
         EO_INIT(.ethmod_cfg_ptr)                ethmod_cfg_ptr,
         EO_INIT(.connectedEncodersMask_cfg)     connectedEncodersMask_cfg,
         EO_INIT(.vectorof_endpoint_cfg)         eo_cfg_EPs_vectorof_eb4,
         EO_INIT(.hashfunction_ep2index)         eo_cfg_nvsEP_eb4_fptr_hashfunction_ep2index,
-        EO_INIT(.mc_endpoint)                   mc_endpoint,       
-        EO_INIT(.as_endpoint)                   as_endpoint, 
-        EO_INIT(.sk_endpoint)                   sk_endpoint 
+        EO_INIT(.mc_endpoint)                   endpoint_mc_rightlowerarm,       
+        EO_INIT(.as_endpoint)                   0, 
+        EO_INIT(.sk_endpoint)                   endpoint_sk_emsboard_rightlowerarm 
     };
 
+
+#elif   defined(EP_EB2) //left lower arm
+    
+    EOMappTheSysController_cfg_t cfg =
+    {
+        EO_INIT(.ethmod_cfg_ptr)                ethmod_cfg_ptr,
+        EO_INIT(.connectedEncodersMask_cfg)     connectedEncodersMask_cfg,
+        EO_INIT(.vectorof_endpoint_cfg)         eo_cfg_EPs_vectorof_eb2,
+        EO_INIT(.hashfunction_ep2index)         eo_cfg_nvsEP_eb2_fptr_hashfunction_ep2index,
+        EO_INIT(.mc_endpoint)                   endpoint_mc_leftlowerarm,       
+        EO_INIT(.as_endpoint)                   0, 
+        EO_INIT(.sk_endpoint)                   endpoint_sk_emsboard_leftlowerarm 
+    };
+
+#else
+        #error choose endpoint!!!
+#endif
+    
     eom_appTheSysController_Initialise(&cfg);
 }
 

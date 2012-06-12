@@ -53,11 +53,11 @@
 #endif
 //   <o> IP2 <0-255> 
 #ifndef REM_IP2
- #define REM_IP2        5
+ #define REM_IP2        1
 #endif
 //   <o> IP3 <0-255> 
 #ifndef REM_IP3
- #define REM_IP3       2
+ #define REM_IP3       104
 #endif
 //  </h> Fixed IP address
 

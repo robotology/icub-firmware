@@ -100,16 +100,6 @@ extern uint16_t     connectedEncodersMask_cfg =( (ENC1_ENABLE << 0)| (ENC2_ENABL
                                                (ENC7_ENABLE << 6) |(ENC8_ENABLE << 7) | (ENC9_ENABLE << 8)
                                                ); 
 
-//extern const EOconstvector const * vectorof_endpoint_cfg =  eo_cfg_EPs_vectorof_eb4;
-//extern eOuint16_fp_uint16_t     hashfunction_ep2index = eo_cfg_nvsEP_eb4_fptr_hashfunction_ep2index;
-//
-
-
-extern eOnvEP_t    mc_endpoint = endpoint_mc_rightlowerarm;  /**<  motion control endopoint managed by the application    */
-extern eOnvEP_t    as_endpoint = 0; //currently not used  /**<  analog sensor endopoint managed by the application    */
-extern eOnvEP_t    sk_endpoint = endpoint_sk_emsboard_rightlowerarm;
-
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------

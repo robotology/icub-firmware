@@ -79,7 +79,7 @@
 //   <o> ETH ISR priority     <0-15>
 //   <i> The IPAL needs an ETH ISR teh priority of which can be specified (lower number, higher priority)
 #ifndef IPAL_ETH_ISRPRIO
- #define IPAL_ETH_ISRPRIO      1
+ #define IPAL_ETH_ISRPRIO      4
 #endif
 
 //  <h> MAC address
@@ -95,7 +95,7 @@
 //   <i> Free-assigned part of the MAC (last three octets).
 //   <i> Default: 0x010103
 #ifndef IPAL_MAC3OCT
- #define IPAL_MAC3OCT        10634579
+ #define IPAL_MAC3OCT        10634590
 #endif
 
 //  </h>MAC address
@@ -108,23 +108,23 @@
 //     <o> Cache table size <4-100>
 //     <i> Number of cached hardware/IP addresses
 //     <i> Default: 10
-#define IPAL_ARP_CACHESIZE    8
+#define IPAL_ARP_CACHESIZE    4
 
 //     <o> Cache Timeout [sec] <5-255><#*1000000>
 //     <i> A timeout for a cached hardware/IP addresses
 //     <i> Default: 150
-#define IPAL_ARP_CACHETIMEOUT    255000000
+#define IPAL_ARP_CACHETIMEOUT    150000000
 
 //     <o> Number of retries <0-20>
 //     <i> Number of retries to resolve an IP address
 //     <i> before ARP module gives up
 //     <i> Default: 4
-#define IPAL_ARP_RETRYMAXNUM   5
+#define IPAL_ARP_RETRYMAXNUM   4
 
 //     <o> Retry Timeout [sec] <1-10><#*1000000>
 //     <i> A timeout to resend the ARP Request
-//     <i> Default: 1
-#define IPAL_ARP_RETRYTIMEOUT     1000000
+//     <i> Default: 2
+#define IPAL_ARP_RETRYTIMEOUT     2000000
 
 //     <q> Autonotify enabled
 //     <i> When this option is enabled, the embedded host
@@ -158,11 +158,11 @@
 #endif
 //   <o> IP2 <0-255> 
 #ifndef IPAL_IP2
- #define IPAL_IP2        0
+ #define IPAL_IP2        1
 #endif
 //   <o> IP3 <0-255> 
 #ifndef IPAL_IP3
- #define IPAL_IP3        3
+ #define IPAL_IP3        11
 #endif
 
 //  </h>Fixed IP address
@@ -181,7 +181,7 @@
 #endif
 //   <o> MSK2 <0-255> 
 #ifndef IPAL_MSK2
- #define IPAL_MSK2        255
+ #define IPAL_MSK2        0
 #endif
 //   <o> MSK3 <0-255> 
 #ifndef IPAL_MSK3
@@ -209,7 +209,7 @@
 //     <o> Number of UDP sockets <1-20>
 //     <i> Number of available UDP sockets (DHCP uses one)
 //     <i> Default: 3
-#define IPAL_UDP_SOCKETNUM     5
+#define IPAL_UDP_SOCKETNUM     4
 
 // </e>UDP
 
