@@ -712,7 +712,7 @@ static void s_callback_button_2(void )
 	eOnvID_t signal = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_leftlowerarm, dummy, skinNVindex_sconfig__sigmode);
 	EOnv 		*nvRoot;
 	nvRoot = transceiver->getNVhandler(endpoint_sk_emsboard_leftlowerarm, signal);
-	nvRoot = transceiver->getNVhandler(endpoint_sk_emsboard_rightlowerarm, signal);
+
 	if(NULL == nvRoot)
 	{
 		printf("\n>>> ERROR \ntransceiver->getNVhandler returned NULL!!\n");
