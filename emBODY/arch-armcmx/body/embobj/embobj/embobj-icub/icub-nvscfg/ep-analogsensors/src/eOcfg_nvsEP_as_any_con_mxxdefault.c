@@ -76,7 +76,7 @@ const eOsnsr_mais_t eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue =
 {
     EO_INIT(.mconfig)
     {
-        EO_INIT(.mode)                          snsr_strainmode_acquirebutdonttx,
+        EO_INIT(.mode)                          snsr_maismode_acquirebutdonttx,
         EO_INIT(.datarate)                      1,    
         EO_INIT(.resolution)                    snsr_maisresolution_08,  
         EO_INIT(.filler01)                      {0xf1}
@@ -87,7 +87,16 @@ const eOsnsr_mais_t eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue =
     },
     EO_INIT(.mstatus)                       
     {
-        EO_INIT(.the15values)                   {0}
+        EO_INIT(.the15values)                   
+        {
+            EO_INIT(.head)
+            {
+                EO_INIT(.capacity)              16,//if resolution is snsr_maisresolution_08
+                EO_INIT(.itemsize)              1, //1 byte if resolution is snsr_maisresolution_08
+                EO_INIT(.size)                  0
+            },
+            EO_INIT(.data)                      {0}
+        }
     }
 }; 
 
