@@ -47,9 +47,6 @@ extern "C" {
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-#define MAX_NUM_JOINT_FOR_BODY_PART         12   //o ems??
-#define MAX_NUM_MOTOR_FOR_BODY_PART         12   //o ems??
-#define MAX_NUM_SENSOR_FOR_BODY_PART        4
 #define MAX_CAN_ADDRESS                     0XF 
 
 
@@ -96,12 +93,16 @@ struct EOemsCanNetTopo_hid
 
     eo_emsCanNetTopo_hashTbl_jm_item_t joint_Id2CanLoc_hTbl[jointNumberMAX];
     eo_emsCanNetTopo_hashTbl_jm_item_t motor_Id2CanLoc_hTbl[motorNumberMAX];
-    eo_emsCanNetTopo_hashTbl_s_item_t  sensor_Id2CanLoc_hTbl[strainNumberMAX];  //todo: max between strain and mais
+//     eo_emsCanNetTopo_hashTbl_s_item_t  sensorStrain_Id2CanLoc_hTbl[strainNumberMAX];  
+//     eo_emsCanNetTopo_hashTbl_s_item_t  sensorMais_Id2CanLoc_hTbl[maisNumberMAX];  
 
     eo_emsCanNetTopo_hashTbl_jm_item_t joint_CanLoc2Id_hTbl[eo_emsCanNetTopo_canports_num][MAX_CAN_ADDRESS][2];
     eo_emsCanNetTopo_hashTbl_jm_item_t motor_CanLoc2Id_hTbl[eo_emsCanNetTopo_canports_num][MAX_CAN_ADDRESS][2];
-    eo_emsCanNetTopo_hashTbl_s_item_t  sensor_CanLoc2Id_hTbl[eo_emsCanNetTopo_canports_num][MAX_CAN_ADDRESS];
-
+    /* since only one sensor board is connected to ems, i don't need hash table is-->canaddr.
+    moreover i may use only one ptr, inipedeting of type of sensor (mais or strain), but i prefer to use two,
+    in order to be complinet with other appl's objs*/
+    eo_emsCanNetTopo_hashTbl_s_item_t  sensorStrain_hTbl; 
+    eo_emsCanNetTopo_hashTbl_s_item_t  sensorMais_hTbl;
 };
 
 
