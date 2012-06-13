@@ -348,22 +348,10 @@ void *recvThread(void * arg)
 	{
 		// get from sockt
 		sender.addr.get_addr();
-		udppkt_size = ACE_socket->recv((void *) &sender.data, maxBytes2Read, remote01.addr, flags);
-		//	  printf("Received new packet, size = %d\n", udppkt_size);
+		udppkt_size = ACE_socket->recv((void *) &sender.data, maxBytes2Read, sender.addr, flags);
+		printf("Received new packet, size = %d\n", udppkt_size);
 
 		transceiver->SetReceived((ACE_UINT8 *)sender.data, udppkt_size);
-
-		if(1 == need2sendarop)
-		{
-			// eo_ropframe_Clear(p->ropframereply);
-			//  hostTransceiver_AddSetROP((ACE_UINT16 ) EOK_cfg_nvsEP_base_endpoint, (ACE_UINT16 ) EOK_cfg_nvsEP_base_NVID__forcerestart, &tmp, 1);
-			transceiver->getTransmit((ACE_UINT8 **)&sender.data, &udppkt_size);
-			transceiver->getTransmit((ACE_UINT8 **)&sender.data, &udppkt_size);  // repeated, just to be sure the packet got at the end is empty
-
-			// write into skt: udppkt_data, udppkt_size
-			ACE_socket->send(sender.data, udppkt_size, remote01.addr, flags);
-			printf("Sent EmbObj packet, size = %d\n", udppkt_size);
-		}
 	}
 	//pthread_exit(NULL);
 	return NULL;
@@ -525,14 +513,13 @@ void *skinThread(void * arg)
 
 void commands(void)
 {
-	printf("q: quit\n");
+	printf("\nq: quit\n");
 	printf("0: send wake up packet -> set appl state to running\n");
-	printf("1: send config  Right ARM -> configure regulars\n");
+	printf("1: send config  R/L ARM -> configure regulars\n");
 	printf("2: send config  Left ARM -> configure regulars\n");
-	printf("2: set treeroot -> set joint configuration\n");
 	printf("3: set leaves packet -> max current and maxposition\n");
-	printf("4: send type 4 packet -> send position setPoint\n");
-	printf("4: send type 4 packet -> send position setPoint\n");
+	printf("4: send max position setPoint\n");
+	printf("5: send position setPoint\n");
 	printf("\n");
 }
 
@@ -574,18 +561,30 @@ static void s_callback_button_1(void)
 	EOarray						*array;
 	eOropSIGcfg_t 				sigcfg;
 	eOcfg_nvsEP_mn_commNumber_t dummy = 0;
+	eOnvID_t 					nvid = -1;
+	EOnv 						*nvRoot = NULL;
 
-	snprintf(str, sizeof(str)-1, "called set<regulars>");
-	hal_trace_puts(str);
+	printf("Setting regulars!\n");
 
-	//    eo_cfg_nvsEP_mc_endpoint_t ep = endpoint_mngmnt;
-	//    eo_cfg_nvsEP_mc_jointNVindex_t jNVindex = mngmntNVindex__ropsigcfgassign;
+	//
+	//  1: skin sconfig = 1
+	//
+	eOnvEP_t 			ep = endpoint_sk_emsboard_rightlowerarm;
+	switch (boardN )
+	{
+	case 2:	// left
+		ep = endpoint_sk_emsboard_leftlowerarm;
+		printf("left\n");
+		break;
 
-	// get nvid from parameters
-	//#warning "aggiornare chiamate a funzione"
-	eOnvID_t signal = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_rightlowerarm, dummy, skinNVindex_sconfig__sigmode);
-	EOnv 		*nvRoot;
-	nvRoot = transceiver->getNVhandler(endpoint_sk_emsboard_rightlowerarm, signal);
+	case 4:	// right
+		ep = endpoint_sk_emsboard_rightlowerarm;
+		printf("right\n");
+		break;
+	}
+
+	nvid = eo_cfg_nvsEP_sk_NVID_Get((eOcfg_nvsEP_sk_endpoint_t)ep, dummy, skinNVindex_sconfig__sigmode);
+	nvRoot = transceiver->getNVhandler(ep, nvid);
 	if(NULL == nvRoot)
 	{
 		printf("\n>>> ERROR \ntransceiver->getNVhandler returned NULL!!\n");
@@ -598,8 +597,13 @@ static void s_callback_button_1(void)
 		return;
 	}
 	// tell agent to prepare a rop to send
-	transceiver->load_occasional_rop(eo_ropcode_set, endpoint_sk_emsboard_rightlowerarm, signal);
+	transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
 
+
+
+	//
+	// 2: Segnalazione spontanea
+	//
 	eOnvID_t nvid_ropsigcfgassign = eo_cfg_nvsEP_mn_comm_NVID_Get(endpoint_mn_comm, dummy, commNVindex__ropsigcfgcommand);
 	cnv = transceiver->getNVhandler(endpoint_mn_comm, nvid_ropsigcfgassign);
 	ropsigcfgassign = (eOmn_ropsigcfg_command_t*) cnv->loc;
@@ -609,85 +613,125 @@ static void s_callback_button_1(void)
 	array->head.itemsize = sizeof(eOropSIGcfg_t);
 	ropsigcfgassign->cmmnd = ropsigcfg_cmd_assign;
 
-	eOnvID_t nvid;
-
-	//   if(0 == reset)
+	switch (boardN )
 	{
-		/*        nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_rightlowerarm, 0, jointNVindex_jstatus__basic);
-    	sigcfg.ep = endpoint_mc_rightlowerarm;
-    	sigcfg.id = nvid;
-    	sigcfg.plustime = 0;
-    	eo_array_PushBack(array, &sigcfg);
+	case 2:  // left
+		ep = endpoint_mc_leftlowerarm;
+		break;
 
-        nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_rightlowerarm, 0, motorNVindex_mstatus__basic);
-    	sigcfg.ep = endpoint_mc_rightlowerarm;
-    	sigcfg.id = nvid;
-    	sigcfg.plustime = 0;
-    	eo_array_PushBack(array, &sigcfg);
-
-        nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_rightlowerarm, 1, jointNVindex_jstatus__basic);
-    	sigcfg.ep = endpoint_mc_rightlowerarm;
-    	sigcfg.id = nvid;
-    	sigcfg.plustime = 0;
-    	eo_array_PushBack(array, &sigcfg);
-
-        nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_rightlowerarm, 1, motorNVindex_mstatus__basic);
-    	sigcfg.ep = endpoint_mc_rightlowerarm;
-    	sigcfg.id = nvid;
-    	sigcfg.plustime = 0;
-    	eo_array_PushBack(array, &sigcfg);
-
-        nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_rightlowerarm, 0, jointNVindex_jconfig);
-    	sigcfg.ep = endpoint_mc_rightlowerarm;
-    	sigcfg.id = nvid;
-    	sigcfg.plustime = 0;
-    	eo_array_PushBack(array, &sigcfg);
-
-        nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_rightlowerarm, 0, jointNVindex_jconfig__maxpositionofjoint);
-    	sigcfg.ep = endpoint_mc_rightlowerarm;
-    	sigcfg.id = nvid;
-    	sigcfg.plustime = 0;
-    	eo_array_PushBack(array, &sigcfg);
-
-		nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_rightlowerarm, 0, motorNVindex_mconfig);
-    	sigcfg.ep = endpoint_mc_rightlowerarm;
-    	sigcfg.id = nvid;
-    	sigcfg.plustime = 0;
-    	eo_array_PushBack(array, &sigcfg);
-
-		nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(endpoint_mc_rightlowerarm, 0, motorNVindex_mconfig__maxcurrentofmotor);
-    	sigcfg.ep = endpoint_mc_rightlowerarm;
-    	sigcfg.id = nvid;
-    	sigcfg.plustime = 0;
-    	eo_array_PushBack(array, &sigcfg);
-		 */
-		nvid = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_rightlowerarm, 0, skinNVindex_sstatus__arrayof10canframe);
-		sigcfg.ep = endpoint_sk_emsboard_rightlowerarm;
-		sigcfg.id = nvid;
-		sigcfg.plustime = 0;
-		eo_array_PushBack(array, &sigcfg);
-
-		sigcfg.ep = endpoint_as_rightlowerarm;
-		nvid = eo_cfg_nvsEP_as_mais_NVID_Get((eOcfg_nvsEP_as_endpoint_t)sigcfg.ep, 0, maisNVindex_mstatus__the15values);
-		sigcfg.id = nvid;
-		sigcfg.plustime = 0;
-		eo_array_PushBack(array, &sigcfg);
+	case 4:	// right
+		ep = endpoint_mc_rightlowerarm;
+		break;
 	}
-	transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mn_comm, nvid_ropsigcfgassign);
 
-	eOcfg_nvsEP_as_endpoint_t ep = endpoint_as_rightlowerarm;
-	nvid = eo_cfg_nvsEP_as_mais_NVID_Get(ep, dummy, maisNVindex_mconfig__datarate);
-	//	EOnv 		*nvRoot;
-	nvRoot = transceiver->getNVhandler(ep, signal);
+/*
+	nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, 0, jointNVindex_jstatus__basic);
+	sigcfg.ep = ep;
+	sigcfg.id = nvid;
+	sigcfg.plustime = 0;
+	eo_array_PushBack(array, &sigcfg);
+
+	nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(ep, 0, motorNVindex_mstatus__basic);
+	sigcfg.ep = ep;
+	sigcfg.id = nvid;
+	sigcfg.plustime = 0;
+	eo_array_PushBack(array, &sigcfg);
+
+	nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, 1, jointNVindex_jstatus__basic);
+	sigcfg.ep = ep;
+	sigcfg.id = nvid;
+	sigcfg.plustime = 0;
+	eo_array_PushBack(array, &sigcfg);
+
+	nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(ep, 1, motorNVindex_mstatus__basic);
+	sigcfg.ep = endpoint_mc_rightlowerarm;
+	sigcfg.id = nvid;
+	sigcfg.plustime = 0;
+	eo_array_PushBack(array, &sigcfg);
+
+	nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, 0, jointNVindex_jconfig);
+	sigcfg.ep = ep;
+	sigcfg.id = nvid;
+	sigcfg.plustime = 0;
+	eo_array_PushBack(array, &sigcfg);
+
+	nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, 0, jointNVindex_jconfig__maxpositionofjoint);
+	sigcfg.ep = ep;
+	sigcfg.id = nvid;
+	sigcfg.plustime = 0;
+	eo_array_PushBack(array, &sigcfg);
+
+	nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(ep, 0, motorNVindex_mconfig);
+	sigcfg.ep = ep;
+	sigcfg.id = nvid;
+	sigcfg.plustime = 0;
+	eo_array_PushBack(array, &sigcfg);
+
+
+	sigcfg.ep = ep;
+	sigcfg.id = eo_cfg_nvsEP_mc_motor_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)sigcfg.ep, 0, motorNVindex_mconfig__maxcurrentofmotor);
+	sigcfg.plustime = 0;
+	eo_array_PushBack(array, &sigcfg);
+ */
+
+	switch (boardN )
+	{
+	case 2:  // left
+		ep = endpoint_sk_emsboard_leftlowerarm;
+		break;
+
+	case 4:	// right
+		ep = endpoint_sk_emsboard_rightlowerarm;
+		break;
+	}
+	sigcfg.ep = ep;
+	sigcfg.id = eo_cfg_nvsEP_sk_NVID_Get((eOcfg_nvsEP_sk_endpoint_t)sigcfg.ep, 0, skinNVindex_sstatus__arrayof10canframe);
+	sigcfg.plustime = 0;
+	eo_array_PushBack(array, &sigcfg);
+
+#ifdef _MAIS_
+	switch (boardN )
+	{
+	case 2:	// left
+		ep = endpoint_as_leftlowerarm;
+		break;
+
+	case 4:	// right
+		ep = endpoint_as_rightlowerarm;
+		break;
+	}
+
+	sigcfg.ep = ep;
+	sigcfg.id = eo_cfg_nvsEP_as_mais_NVID_Get((eOcfg_nvsEP_as_endpoint_t)sigcfg.ep, dummy, maisNVindex_mstatus__the15values);
+	sigcfg.plustime = 0;
+	eo_array_PushBack(array, &sigcfg);
+#endif
+	transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mn_comm, nvid_ropsigcfgassign);
+	//	fine della configurazione delle variabili da segnalare spontaneamente : commNVindex__ropsigcfgcommand
+
+
+#ifdef _MAIS_
+	//
+	//  3: mais sconfig = 1
+	//
+	switch (boardN )
+	{
+	case 2:	// left
+		ep = endpoint_as_leftlowerarm;
+		break;
+
+	case 4:	// right
+		ep = endpoint_as_rightlowerarm;
+		break;
+	}
+	nvid = eo_cfg_nvsEP_as_mais_NVID_Get((eOcfg_nvsEP_as_endpoint_t)ep, dummy, maisNVindex_mconfig__datarate);
+	nvRoot = transceiver->getNVhandler(ep, nvid);
 	dat = 1;
 	if( eores_OK != eo_nv_Set(nvRoot, &dat, eobool_true, eo_nv_upd_dontdo))
 		printf("error!!");
 	// tell agent to prepare a rop to send
 	transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
-
-
-	printf("added a set<__upto10rop2signal, list>");
-
+#endif
 }
 
 static void s_callback_button_2(void )
@@ -701,11 +745,6 @@ static void s_callback_button_2(void )
 	eOropSIGcfg_t 				sigcfg;
 	eOcfg_nvsEP_mn_commNumber_t dummy = 0;
 
-	snprintf(str, sizeof(str)-1, "called set<regulars>");
-	hal_trace_puts(str);
-
-	//    eo_cfg_nvsEP_mc_endpoint_t ep = endpoint_mngmnt;
-	//    eo_cfg_nvsEP_mc_jointNVindex_t jNVindex = mngmntNVindex__ropsigcfgassign;
 
 	// get nvid from parameters
 	//#warning "aggiornare chiamate a funzione"
@@ -744,6 +783,7 @@ static void s_callback_button_2(void )
 	sigcfg.plustime = 0;
 	eo_array_PushBack(array, &sigcfg);
 	 */
+
 
 	eOnvID_t nvid;
 	sigcfg.ep = endpoint_sk_emsboard_leftlowerarm;
