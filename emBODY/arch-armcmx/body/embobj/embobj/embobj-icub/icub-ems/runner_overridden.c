@@ -22,6 +22,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
+
 #include "stdlib.h"
 #include "string.h"
 #include "EoCommon.h"
@@ -148,9 +149,12 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
 static void s_delay(eOreltime_t delay)
 {
 
-    uint64_t startat = osal_system_nanotime_get();
-    uint64_t stopat = startat + delay*1000;
+#if 0
+    uint64_t startat = osal_system_nanotime_get()/1000;
+    uint64_t stopat = startat + (uint64_t)delay;
     volatile uint64_t now = startat;
+    volatile uint64_t problemat = 0;
+    volatile uint64_t tmp = 0;
    
 
     for(;;)
@@ -159,9 +163,45 @@ static void s_delay(eOreltime_t delay)
         if(now >= stopat)
         {
             break;
-        }  
-        now = osal_system_nanotime_get();        
-    }    
+        } 
+        if((stopat-now) > delay)
+        {
+            if(0 == problemat)
+            {
+                problemat = now;
+            }
+        }
+        tmp = osal_system_nanotime_get();
+        now = tmp/1000ll;        
+    } 
+#else
+
+    uint64_t startat = osal_system_abstime_get();
+    uint64_t stopat = startat + (uint64_t)delay;
+    volatile uint64_t now = startat;
+    volatile uint64_t problemat = 0;
+    volatile uint64_t tmp = 0;
+   
+
+    for(;;)
+    {
+        
+        if(now >= stopat)
+        {
+            break;
+        } 
+        if((stopat-now) > delay)
+        {
+            if(0 == problemat)
+            {
+                problemat = now;
+            }
+        }
+        tmp = osal_system_abstime_get();
+        now = tmp;        
+    } 
+
+#endif    
 }
 
 // --------------------------------------------------------------------------------------------------------------------
