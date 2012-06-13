@@ -1040,12 +1040,12 @@
       <GroupNumber>2</GroupNumber>
       <FileNumber>6</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>45</ColumnNumber>
+      <ColumnNumber>41</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>314</TopLine>
-      <CurrentLine>334</CurrentLine>
+      <TopLine>426</TopLine>
+      <CurrentLine>436</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\osal-src\osal-osiit.c</PathWithFileName>
       <FilenameWithoutPath>osal-osiit.c</FilenameWithoutPath>

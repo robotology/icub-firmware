@@ -431,24 +431,28 @@ extern void * osal_system_launcherbuffer_get(uint16_t *size)
     }
 }
 
-extern osal_abstime_t osal_system_abstime_get(void)
-{
-    return(s_osal_usec_in_tick * osiit_time_get());
-}
 
-extern void osal_system_abstime_set(osal_abstime_t tot)
+
+extern void osal_system_ticks_abstime_set(osal_abstime_t tot)
 {
     osiit_time_set(s_osal_abstime2tick(tot));
 }
 
 
+extern osal_abstime_t osal_ticks_system_abstime_get(void)
+{
+    return((uint64_t)s_osal_usec_in_tick * osiit_time_get());
+}
+
+
+extern osal_abstime_t osal_system_abstime_get(void)
+{
+    return(osiit_microtime_get());
+}
+
 extern osal_nanotime_t osal_system_nanotime_get(void)
 {
-    uint32_t secs, nano;
-    uint64_t res;
-    osiit_nanotime_get(&secs, &nano);
-    res = 1000000000*secs + nano; 
-    return(res);
+    return(osiit_nanotime_get());
 }
 
 extern void osal_system_scheduling_suspend(void)
