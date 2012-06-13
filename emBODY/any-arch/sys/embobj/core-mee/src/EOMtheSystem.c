@@ -128,7 +128,7 @@ extern EOMtheSystem * eom_sys_Initialise(const eOmsystem_cfg_t *syscfg,
     s_eom_system.thevsys = eov_sys_hid_Initialise(mpoolcfg,
                                                   errmancfg,        // error man 
                                                   (eOres_fp_voidfpvoid_t)s_eom_sys_start, s_eom_gettask, 
-                                                  osal_system_abstime_get, osal_system_abstime_set, 
+                                                  osal_system_abstime_get, osal_system_ticks_abstime_set, 
                                                   (eOuint64_fp_void_t)osal_system_nanotime_get,
                                                   hal_sys_irq_disable);
 
