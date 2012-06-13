@@ -83,10 +83,10 @@
  
 // -- the nvid of all the network variables of the mais as a function of the mais number m
 
-#define EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__mode(m)                                    EO_nv_ID(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig__mode, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_strain(m, EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__mode))
-#define EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__datarate(m)                                EO_nv_ID(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig__datarate, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_strain(m, EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__datarate))
-#define EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__resolution(m)                              EO_nv_ID(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig__resolution, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_strain(m, EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__resolution))
-#define EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mstatus__the15values(m)                             EO_nv_ID(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mstatus__the15values, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_strain(m, EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mstatus__the15values))        
+#define EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__mode(m)                                    EO_nv_ID(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig__mode, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_mais(m, EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__mode))
+#define EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__datarate(m)                                EO_nv_ID(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig__datarate, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_mais(m, EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__datarate))
+#define EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__resolution(m)                              EO_nv_ID(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig__resolution, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_mais(m, EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__resolution))
+#define EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mstatus__the15values(m)                             EO_nv_ID(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mstatus__the15values, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_mais(m, EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mstatus__the15values))        
 
        
   
