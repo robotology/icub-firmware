@@ -85,10 +85,10 @@ typedef struct
 {
     uint8_t         taskpriority[eo_emsrunner_task_numberof];
     uint16_t        taskstacksize[eo_emsrunner_task_numberof];   
-    eOreltime_t     period;                 /**< The period of the cycle rx-do-tx. It is 1000 us. The rx task starts at beginning of the cycle.*/
-    eOreltime_t     execDOafter;            /**< The start of the do task as an offset from the beginning of the cycle. It is 500 us. */  
-    eOreltime_t     execTXafter;            /**< The start of the tx task as an offset from the beginning of the cycle. It is 750 us. */  
-    eOreltime_t     safetyGAP;              /**< The time beween two consecutive tasks before which the previous task must have finished its execution. 50 us> */ 
+    eOreltime_t     period;                 /**< The period of the cycle rx-do-tx. The rx task starts at beginning of the cycle.*/
+    eOreltime_t     execDOafter;            /**< The start of the do task as an offset from the beginning of the cycle.  */  
+    eOreltime_t     execTXafter;            /**< The start of the tx task as an offset from the beginning of the cycle.  */  
+    eOreltime_t     safetyGAP;              /**< The time between two consecutive tasks before which the previous task must have finished its execution. */ 
     uint16_t        maxnumofRXpackets;      /**< It allows to receive and parse up to a given number of packets */ 
     uint16_t        maxnumofTXpackets;      /**< so far it can be only 0 or 1 */
 } eOemsrunner_cfg_t;
@@ -98,7 +98,7 @@ typedef struct
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
 extern const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg; // = {.taskpriority = {250, 251, 252}, .taskstacksize = {1024, 1024, 1024}, 
-                                                         //    .execDOafter = 500, .execTXafter = 750, .safetyGAP = 25,
+                                                         //    .execDOafter = 500, .execTXafter = 750, .safetyGAP = 50,
                                                          //    .maxnumofRXpackets = 3, maxnumofTXpackets = 1};
 
 

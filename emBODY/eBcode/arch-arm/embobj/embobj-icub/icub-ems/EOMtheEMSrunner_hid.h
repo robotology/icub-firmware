@@ -40,7 +40,8 @@ extern "C" {
 #include "eOcfg_sm_EMSappl.h"
 #include "EOtimer.h"
 #include "osal_timer.h"
-
+#include "hal.h"
+    
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
 #include "EOMtheEMSrunner.h"
@@ -48,7 +49,8 @@ extern "C" {
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
-// empty-section
+
+#define EVIEWER_ENABLED
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
@@ -66,6 +68,8 @@ struct EOMtheEMSrunner_hid
     eObool_t            cycleisrunning;
     eObool_t            safetyGAPtouched[eo_emsrunner_task_numberof]; 
     eObool_t            safetyGAPbroken[eo_emsrunner_task_numberof]; 
+    hal_timer_t         haltimer_start[eo_emsrunner_task_numberof];
+    hal_timer_t         haltimer_alert[eo_emsrunner_task_numberof];
     uint16_t            numofrxpackets;
     uint16_t            numofrxrops;
     uint16_t            numoftxpackets;
@@ -75,12 +79,26 @@ struct EOMtheEMSrunner_hid
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
+extern void tskEMSrunRX(void *p);
+extern void tskEMSrunDO(void *p);
+extern void tskEMSrunTX(void *p);
+
+
+#if defined(EVIEWER_ENABLED)
+void evRXstart(void);
+void evRXalert(void);
+void evDOstart(void);
+void evDOalert(void);
+void evTXstart(void);
+void evTXalert(void);
+#endif
+
 // default function for RX: it calls _beforedatagramreception(), _datagramreception(), _afterdatagramreception()
 extern void eom_emsrunner_hid_userdef_taskRX_activity(EOMtheEMSrunner *p);
 
-// default funtion for RX-before-datagram-reception: it is empty.
+// default function for RX-before-datagram-reception: it is empty.
 extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p);
-// default funztion for RX-datagram-reception: it repeates upto xx times: get a pkt, call the transceiver, verifies if a quit evt has arrived.
+// default function for RX-datagram-reception: it repeates upto xx times: get a pkt, call the transceiver, verifies if a quit evt has arrived.
 extern void eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(EOMtheEMSrunner *p);
 // deafult function for RX-after-datagram-reception
 extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p);
