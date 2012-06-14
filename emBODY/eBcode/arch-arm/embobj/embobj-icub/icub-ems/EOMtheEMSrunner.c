@@ -87,9 +87,12 @@ const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg =
     EO_INIT(.taskpriority)              {250,   251,    252},  
     EO_INIT(.taskstacksize)             {1024,  1024,   1024},
     EO_INIT(.period)                    1000, //500, 
-    EO_INIT(.execDOafter)               400, //150, 
-    EO_INIT(.execTXafter)               700, //250,
-    EO_INIT(.safetyGAP)                 50,
+//    EO_INIT(.execDOafter)               400, //150, 
+//    EO_INIT(.execTXafter)               700, //250,
+    EO_INIT(.timeRX)                    300, 
+    EO_INIT(.timeDO)                    650, 
+    EO_INIT(.timeTX)                    50, 
+    EO_INIT(.safetyGAP)                 25,
     EO_INIT(.maxnumofRXpackets)         3,
     EO_INIT(.maxnumofTXpackets)         1
 };
@@ -253,7 +256,7 @@ extern EOMtask * eom_emsrunner_GetTask(EOMtheEMSrunner *p, eOemsrunner_taskid_t 
 
 extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
 {
-    hal_result_t res;
+//    hal_result_t res;
     
     if(NULL == p)
     {
@@ -456,7 +459,7 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmissio
     while(eobool_true == processtransmission)
     {
         eOresult_t resformer;
-        eOresult_t restx;
+        //eOresult_t restx;
         
         // 1. process one packet        
         processedpkts++;   
@@ -467,7 +470,8 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmissio
         // 1.2  send a packet back. but only if the former gave us a good one.
         if(eores_OK == resformer)
         {
-            restx = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
+            //restx = 
+            eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
             p->numoftxrops += numberoftxrops;
             p->numoftxpackets++;
         }
@@ -530,6 +534,11 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
         hal_timer_stop(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runRX]);
     }
     
+    if(eobool_true == s_theemsrunner.safetyGAPbroken[eo_emsrunner_taskid_runRX])
+    {
+       eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "safety gap broken in taskRX");          
+    }
+    
     // Z. at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
     s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runDO], osal_callerTSK);
 }
@@ -555,6 +564,11 @@ static void s_eom_emsrunner_taskDO_run(EOMtask *p, uint32_t t)
     {
         hal_timer_stop(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runDO]);        
         hal_timer_stop(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runDO]);
+    }
+
+    if(eobool_true == s_theemsrunner.safetyGAPbroken[eo_emsrunner_taskid_runDO])
+    {
+       eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "safety gap broken in taskDO");          
     }
     
     // Z. at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
@@ -593,7 +607,13 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
         eom_emsappl_ProcessEvent(eom_emsappl_GetHandle(), ev); 
     }
     else
-    {   // at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
+    {   
+        if(eobool_true == s_theemsrunner.safetyGAPbroken[eo_emsrunner_taskid_runTX])
+        {
+           eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "safety gap broken in taskTX");          
+        }        
+        
+        // at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
         s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runRX], osal_callerTSK);
     }
 }
@@ -652,7 +672,7 @@ static void s_eom_emsrunner_6HALTIMERS_start_rxdotx_cycle_ultrabasic(osal_timer_
     
     eOemsrunner_cfg_t* cfg = &s_theemsrunner.cfg;
     uint64_t startusec = 0;
-    uint64_t nowusec   = 0;
+    //uint64_t nowusec   = 0;
     
     hal_timer_cfg_t oneshot_cfg  = 
     {
@@ -664,18 +684,17 @@ static void s_eom_emsrunner_6HALTIMERS_start_rxdotx_cycle_ultrabasic(osal_timer_
         .arg                = NULL
     }; 
     
-    hal_timer_cfg_t periodic_cfg  = 
-    {
-        .prescaler          = hal_timer_prescalerAUTO,         
-        .countdown          = 0,
-        .priority           = hal_int_priority02,
-        .mode               = hal_timer_mode_periodic,
-        .callback_on_exp    = NULL,
-        .arg                = NULL
-    };     
+//     hal_timer_cfg_t periodic_cfg  = 
+//     {
+//         .prescaler          = hal_timer_prescalerAUTO,         
+//         .countdown          = 0,
+//         .priority           = hal_int_priority02,
+//         .mode               = hal_timer_mode_periodic,
+//         .callback_on_exp    = NULL,
+//         .arg                = NULL
+//     };     
     
 
-    //startusec = osal_system_abstime_get();
     
     // start of task rx:
     oneshot_cfg.countdown         = cfg->period;
@@ -684,37 +703,43 @@ static void s_eom_emsrunner_6HALTIMERS_start_rxdotx_cycle_ultrabasic(osal_timer_
     hal_timer_init(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runRX], &oneshot_cfg, NULL); 
     startusec = osal_system_abstime_get(); // keep in here ...
     hal_timer_start(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runRX]);
-   // startusec = osal_system_abstime_get();
+    // startusec = osal_system_abstime_get();
     
     // warn for task rx:
-    oneshot_cfg.countdown          = cfg->execDOafter - cfg->safetyGAP - (osal_system_abstime_get() - startusec); // - 0;
+//    oneshot_cfg.countdown          = cfg->execDOafter - cfg->safetyGAP - (osal_system_abstime_get() - startusec); // - 0;
+    oneshot_cfg.countdown          = cfg->timeRX - cfg->safetyGAP - (osal_system_abstime_get() - startusec); // - 0;
     oneshot_cfg.callback_on_exp    = s_eom_emsrunner_6HALTIMERS_activate_warn_ultrabasic; 
     oneshot_cfg.arg                = (void*)eo_emsrunner_taskid_runRX;
     hal_timer_init(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runRX], &oneshot_cfg, NULL); 
     hal_timer_start(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runRX]);
 
     // start of task do:
-    oneshot_cfg.countdown          = cfg->execDOafter - (osal_system_abstime_get() - startusec); //- 5;
+//    oneshot_cfg.countdown          = cfg->execDOafter - (osal_system_abstime_get() - startusec); //- 5;
+    oneshot_cfg.countdown          = cfg->timeRX - (osal_system_abstime_get() - startusec); //- 5;
     oneshot_cfg.callback_on_exp    = s_eom_emsrunner_6HALTIMERS_activate_task_ultrabasic;
     oneshot_cfg.arg                = (void*)eo_emsrunner_taskid_runDO;
     hal_timer_init(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runDO], &oneshot_cfg, NULL);     
     hal_timer_start(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runDO]);  
-    // warn for task do:
-    oneshot_cfg.countdown          = cfg->execTXafter - cfg->safetyGAP - (osal_system_abstime_get() - startusec);//- 10;
+    
+    // warn for task tx:
+//    oneshot_cfg.countdown          = cfg->execTXafter - cfg->safetyGAP - (osal_system_abstime_get() - startusec);//- 10;
+    oneshot_cfg.countdown          = (cfg->timeRX + cfg->timeDO) - cfg->safetyGAP - (osal_system_abstime_get() - startusec);//- 10;
     oneshot_cfg.callback_on_exp    = s_eom_emsrunner_6HALTIMERS_activate_warn_ultrabasic;
     oneshot_cfg.arg                = (void*)eo_emsrunner_taskid_runDO;
     hal_timer_init(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runDO], &oneshot_cfg, NULL);     
     hal_timer_start(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runDO]);
     
     // start of task tx:
-    oneshot_cfg.countdown          = cfg->execTXafter - (osal_system_abstime_get() - startusec);//- 15;
+//    oneshot_cfg.countdown          = cfg->execTXafter - (osal_system_abstime_get() - startusec);//- 15;
+    oneshot_cfg.countdown          = (cfg->timeRX + cfg->timeDO) - (osal_system_abstime_get() - startusec);//- 15;
     oneshot_cfg.callback_on_exp    = s_eom_emsrunner_6HALTIMERS_activate_task_ultrabasic;
     oneshot_cfg.arg                = (void*)eo_emsrunner_taskid_runTX;
     hal_timer_init(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runTX], &oneshot_cfg, NULL);     
     hal_timer_start(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runTX]);
     
     // warn for task tx:
-    oneshot_cfg.countdown          = cfg->period - cfg->safetyGAP - (osal_system_abstime_get() - startusec);//- 20;
+//    oneshot_cfg.countdown          = cfg->period - cfg->safetyGAP - (osal_system_abstime_get() - startusec);//- 20;
+    oneshot_cfg.countdown          = (cfg->timeRX + cfg->timeDO + cfg->timeTX) - cfg->safetyGAP - (osal_system_abstime_get() - startusec);//- 20;
     oneshot_cfg.callback_on_exp    = s_eom_emsrunner_6HALTIMERS_activate_warn_ultrabasic;
     oneshot_cfg.arg                = (void*)eo_emsrunner_taskid_runTX;
     hal_timer_init(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runTX], &oneshot_cfg, NULL);  
@@ -729,7 +754,7 @@ static void s_eom_emsrunner_6HALTIMERS_start_rxdotx_cycle_ultrabasic(osal_timer_
 
 static void s_eom_emsrunner_6HALTIMERS_start_task_ultrabasic(void *arg)
 {
-    eOemsrunner_taskid_t currtaskid = (eOemsrunner_taskid_t) arg;
+    eOemsrunner_taskid_t currtaskid = (eOemsrunner_taskid_t) (int32_t)arg;
     eOemsrunner_taskid_t prevtaskid = (eo_emsrunner_taskid_runRX == currtaskid) ? (eo_emsrunner_taskid_runTX) : ((eOemsrunner_taskid_t)((uint8_t)currtaskid-1));
 #if defined(EVIEWER_ENABLED)    
     evEntityId_t preventityid = eventviewer_switch_to(EVIEWER_IDofTSKstart(currtaskid));
@@ -761,7 +786,7 @@ static void s_eom_emsrunner_6HALTIMERS_start_task_ultrabasic(void *arg)
 
 static void s_eom_emsrunner_warn_task_ultrabasic(void *arg)
 {
-    eOemsrunner_taskid_t taskid = (eOemsrunner_taskid_t) arg;
+    eOemsrunner_taskid_t taskid = (eOemsrunner_taskid_t) (int32_t)arg;
 #if defined(EVIEWER_ENABLED)    
     evEntityId_t prev = eventviewer_switch_to(EVIEWER_IDofTSKalert(taskid));
 #endif    
@@ -790,7 +815,7 @@ static void s_eom_emsrunner_warn_task_ultrabasic(void *arg)
 
 static void s_eom_emsrunner_6HALTIMERS_activate_warn_ultrabasic(void *arg)
 {
-    eOemsrunner_taskid_t taskid = (eOemsrunner_taskid_t) arg;
+    eOemsrunner_taskid_t taskid = (eOemsrunner_taskid_t) (int32_t)arg;
     
     hal_timer_cfg_t periodic_cfg  = 
     {
@@ -812,7 +837,7 @@ static void s_eom_emsrunner_6HALTIMERS_activate_warn_ultrabasic(void *arg)
 
 static void s_eom_emsrunner_6HALTIMERS_activate_task_ultrabasic(void *arg)
 {
-    eOemsrunner_taskid_t taskid = (eOemsrunner_taskid_t) arg;
+    eOemsrunner_taskid_t taskid = (eOemsrunner_taskid_t) (int32_t)arg;
     
     hal_timer_cfg_t periodic_cfg  = 
     {
@@ -833,11 +858,9 @@ static void s_eom_emsrunner_6HALTIMERS_activate_task_ultrabasic(void *arg)
 
 static void s_eom_emsrunner_6HALTIMERS_activate_taskrx_ultrabasic(void *arg)
 {
-    
     s_eom_emsrunner_6HALTIMERS_start_task_ultrabasic(arg);
     
-    s_eom_emsrunner_6HALTIMERS_activate_task_ultrabasic(arg);
-    
+    s_eom_emsrunner_6HALTIMERS_activate_task_ultrabasic(arg);    
 }
 
 
@@ -848,7 +871,6 @@ void evDOstart(void){}
 void evDOalert(void){}
 void evTXstart(void){}
 void evTXalert(void){}
-
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------
