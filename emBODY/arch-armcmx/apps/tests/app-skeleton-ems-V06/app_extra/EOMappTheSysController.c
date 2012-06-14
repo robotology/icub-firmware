@@ -307,6 +307,7 @@ extern eOresult_t eom_appTheSysController_Go2RunState(EOMappTheSysController *p)
     // 4) start timers
     s_eom_appTheSysController_Timers_Start();
     
+    hal_led_on(hal_led3);
 
     s_theSysController.appl_state = applstate_running;
 
@@ -338,6 +339,22 @@ extern eOresult_t eom_appTheSysController_Go2ErrorState(EOMappTheSysController *
     while(1)
     {;}
 
+}
+
+
+extern eObool_t eom_appTheSysController_AppIsRunningSt(EOMappTheSysController *p)
+{
+    if(NULL == p)
+    {
+        return(0);
+    }
+    
+    if(applstate_running == p->appl_state)
+    {
+        return(1);
+    }
+    
+    return(0);
 }
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -468,9 +485,7 @@ static void s_eom_appTheSysController_startup(EOMtask *tsk, uint32_t t)
 
     res = eom_appTheSysController_Go2ConfigState(p);
     eo_ethBaseModule_Activate(p->srv.ethMod_ptr);
-    #warning VALE --> gestisci errore in go2new state
-    res = res;
-
+    eo_errman_Assert(eo_errman_GetHandle(), eores_OK == res, s_eobj_ownname, "err in go to config state");
 } 
 
 
@@ -560,7 +575,7 @@ static void s_eom_appTheSysController_srv_theBoardTransceiver_init(void)
         
     };
     
-    #waring VALE SE FAI UPDATE DI SYS AGGIUNGI CAMPO SIZE IN CFG TRANSCEIVER!!!!
+    #warning VALE SE FAI UPDATE DI SYS AGGIUNGI CAMPO SIZE IN CFG TRANSCEIVER!!!!
     s_theSysController.srv.transceiver = eo_boardtransceiver_Initialise(&boardtxrxcfg);
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_theSysController.srv.transceiver), 
                      s_eobj_ownname, "error in transceiver");
@@ -605,8 +620,9 @@ static void s_eom_appTheSysController_PopulateNVmapRef(void)
         EO_INIT(.sensorsMaisList)       s_theSysController.sensorsMaisList,
         EO_INIT(.skinList)              s_theSysController.skinList,
         EO_INIT(.nvsCfg)                eo_boardtransceiver_hid_GetNvsCfg(),
-        EO_INIT(.mc_endpoint)           s_theSysController.cfg.mc_endpoint, //(0x0014), //right lower arm //(0x0017)- endpoint_mc_leftlowerleg
-        EO_INIT(.sk_endpoint)           s_theSysController.cfg.sk_endpoint//(0x0034) //endpoint_sk_emsboard_rightlowerarm
+        EO_INIT(.mc_endpoint)           s_theSysController.cfg.mc_endpoint, 
+        EO_INIT(.sk_endpoint)           s_theSysController.cfg.sk_endpoint,
+        EO_INIT(.as_endpoint)           s_theSysController.cfg.as_endpoint
     };
 
 
@@ -770,7 +786,7 @@ static void s_eom_appTheSysController_GetCanConnectedStuff(void)
     }
     else if( (0 == sensorStrainMaxNumber) && (0 != sensorMaisMaxNumber) )
     {
-        s_theSysController.sensorsMaisList = eo_array_New(sensorStrainMaxNumber, sizeof(eOsnsr_sensorId_t), NULL); 
+        s_theSysController.sensorsMaisList = eo_array_New(sensorMaisMaxNumber, sizeof(eOsnsr_sensorId_t), NULL); 
         s_theSysController.sensorsStrainList = NULL;
         eo_appCanSP_GetConnectedSensors(s_theSysController.srv.appCanSP_ptr, s_theSysController.sensorsMaisList);
 
@@ -835,8 +851,8 @@ static void s_eom_appTheSysController_GetRunMode(void)
         if(skin_isConnected)
         {
             s_theSysController.appl_runMode = applrunMode__skinAndMc4;
-                #warning ATTENZIONE!!!!!MC4ANDSKIN_RUN MODE DIVENTA SKINONLY PER TEST!!!!!!!!!
-            s_theSysController.appl_runMode = applrunMode__skinOnly;
+//                 #warning ATTENZIONE!!!!!MC4ANDSKIN_RUN MODE DIVENTA SKINONLY PER TEST!!!!!!!!!
+//             s_theSysController.appl_runMode = applrunMode__skinOnly;
 
             return;    
         }
@@ -983,29 +999,38 @@ static eOresult_t s_eom_appTheSysController_ConnectedCanBoards_Start(void)
     {
         case applrunMode__skinOnly:
         {
-            ; //nothing to do
-        
+            res = eo_appCanSP_SendOpCmd2CanConnectedBoard(s_theSysController.srv.appCanSP_ptr, eobrd_skin, eo_appCanSP_opCmd_start);
+            eo_errman_Assert(eo_errman_GetHandle(), eores_OK == res, s_eobj_ownname, "err in starting skin board");
         }break;
 
         case applrunMode__mc4Only:
         {
-            ; // start can boards sending PWM_ENA and RUN cmds.
+            res = eo_appCanSP_SendOpCmd2CanConnectedBoard(s_theSysController.srv.appCanSP_ptr, eobrd_mais, eo_appCanSP_opCmd_start);
+            eo_errman_Assert(eo_errman_GetHandle(), eores_OK == res, s_eobj_ownname, "err in starting mais board");
+
+            res = eo_appCanSP_SendOpCmd2CanConnectedBoard(s_theSysController.srv.appCanSP_ptr, eobrd_mc4, eo_appCanSP_opCmd_start);
+            eo_errman_Assert(eo_errman_GetHandle(), eores_OK == res, s_eobj_ownname, "err in starting mc4 boards");
 
         }break;
 
         case applrunMode__skinAndMc4:
         {
-           ;
+            res = eo_appCanSP_SendOpCmd2CanConnectedBoard(s_theSysController.srv.appCanSP_ptr, eobrd_mais, eo_appCanSP_opCmd_start);
+            eo_errman_Assert(eo_errman_GetHandle(), eores_OK == res, s_eobj_ownname, "err in starting mais board");
+
+            res = eo_appCanSP_SendOpCmd2CanConnectedBoard(s_theSysController.srv.appCanSP_ptr, eobrd_skin, eo_appCanSP_opCmd_start);
+            eo_errman_Assert(eo_errman_GetHandle(), eores_OK == res, s_eobj_ownname, "err in starting skin board");
+
+            res = eo_appCanSP_SendOpCmd2CanConnectedBoard(s_theSysController.srv.appCanSP_ptr, eobrd_mc4, eo_appCanSP_opCmd_start);
+            eo_errman_Assert(eo_errman_GetHandle(), eores_OK == res, s_eobj_ownname, "err in starting mc4 boards");
         }break;
 
         case applrunMode__2foc:
         {
-            // start can boards sending PWM_ENA and RUN cmds.;
+            res = eores_OK;// start can boards sending PWM_ENA and RUN cmds.;
         }break;
     
     }
-    #warning VALE-->oly 4 test
-    res = eores_OK;
     return(res);
 }
 

@@ -39,6 +39,7 @@
 #include "EoCommon.h"
 #include "EoMotionControl.h"
 #include "EoSkin.h"
+#include "EoSensors.h"
 #include "EOarray.h"
 #include "EOnvsCfg.h"
 #include "EOnv.h"
@@ -112,6 +113,9 @@ extern eOresult_t eo_appTheNVmapRef_GetMotorNVMemoryRef(EOappTheNVmapRef* p, eOm
 
 extern eOresult_t eo_appTheNVmapRef_GetSkinNVMemoryRef(EOappTheNVmapRef* p, eOsk_skinId_t skId, uint8_t nvindex, void**memRef);
 
+extern eOresult_t eo_appTheNVmapRef_GetSensorsStrainNVMemoryRef(EOappTheNVmapRef* p, eOsnsr_sensorId_t sId, uint8_t nvindex, void**memRef);
+
+extern eOresult_t eo_appTheNVmapRef_GetSensorsMaisNVMemoryRef(EOappTheNVmapRef* p, eOsnsr_sensorId_t sId, uint8_t nvindex, void**memRef);
 
 /** @}            
     end of group eo_app_TheNVmapRef  

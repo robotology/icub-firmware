@@ -106,7 +106,7 @@ extern uint16_t     connectedEncodersMask_cfg =( (ENC1_ENABLE << 0)| (ENC2_ENABL
 
 
 extern eOnvEP_t    mc_endpoint = endpoint_mc_rightlowerarm;  /**<  motion control endopoint managed by the application    */
-extern eOnvEP_t    as_endpoint = 0; //currently not used  /**<  analog sensor endopoint managed by the application    */
+extern eOnvEP_t    as_endpoint = endpoint_as_rightlowerarm;  /**<  analog sensor endopoint managed by the application    */
 extern eOnvEP_t    sk_endpoint = endpoint_sk_emsboard_rightlowerarm;
 
 

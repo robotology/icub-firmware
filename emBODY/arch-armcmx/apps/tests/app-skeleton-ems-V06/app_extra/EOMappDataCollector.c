@@ -47,8 +47,9 @@
 
 //embobj-cfg-icub
 #include "EoMotionControl.h"
+#include "EoSensors.h"
 #include "eOcfg_nvsEP_sk.h"   //==> included to clear skin array
-
+#include "eOcfg_nvsEP_as.h"   //==> included to clear mais array
 
 // application
 #include "EOappEncodersReader.h"
@@ -109,6 +110,7 @@ static void s_eom_appDataCollector_taskRun_2foc_mode(EOMappDataCollector *p, eOe
 static void s_eom_appDataCollector_taskRun_skinAndMc4_mode(EOMappDataCollector *p, eOevent_t evt);
 
 static void s_eom_appDataCollector_readSkin(EOMappDataCollector *p);
+static void s_eom_appDataCollector_readMc4andMais(EOMappDataCollector *p);
 static void s_eom_appDataCollector_GetAndProcessEthPkt(EOMappDataCollector *p);
 
 
@@ -384,8 +386,27 @@ static void s_eom_appDataCollector_taskRun_2foc_mode(EOMappDataCollector *p, eOe
 }
 static void s_eom_appDataCollector_taskRun_skinAndMc4_mode(EOMappDataCollector *p, eOevent_t evt)
 {
-    s_eom_appDataCollector_readSkin(p);
-    //something else about mc4
+    if(eo_common_event_check(evt, EVT_GETDATA_START))
+    {
+        /* 1) get eth pkt and process it*/
+        s_eom_appDataCollector_GetAndProcessEthPkt(p);
+        
+        /* 2) get can frames about skin and process them*/
+        s_eom_appDataCollector_readSkin(p);
+        
+        /* 3) get can frame from mais and mc4 board and process them */
+       s_eom_appDataCollector_readMc4andMais(p);
+        //something else about mc4 ??????
+    }
+
+    
+    if(eo_common_event_check(evt, EVT_GETDATA_STOP))
+    {
+        if(NULL != p->cfg.sig2appMotorController.fn)
+        {
+            p->cfg.sig2appMotorController.fn(p->cfg.sig2appMotorController.argoffn);            
+        }
+    }
 
 }
 
@@ -408,6 +429,30 @@ static void s_eom_appDataCollector_readSkin(EOMappDataCollector *p)
     eo_appCanSP_read(p->cfg.canSP_ptr, eOcanport2, 10, NULL); //10 is the max size of sk_array
 
 }
+
+static void s_eom_appDataCollector_readMc4andMais(EOMappDataCollector *p)
+{
+    void *memRef;
+    eOsnsr_arrayofupto36bytes_t *maisArray;
+    eOresult_t res;
+    
+    //1) reset nv array
+    res = eo_appTheNVmapRef_GetSensorsMaisNVMemoryRef(eo_appTheNVmapRef_GetHandle(), 0, maisNVindex_mstatus__the15values, &memRef);
+    if(eores_OK != res)
+    {
+        return; //TODO: error management
+    }
+
+    //reset array
+    maisArray = (eOsnsr_arrayofupto36bytes_t*)memRef;
+    maisArray->head.size = 0;
+//     memset(&maisArray->data[0], 0xAA, 20);
+    maisArray->data[0] = 0;
+
+    eo_appCanSP_read(p->cfg.canSP_ptr, eOcanport1, 2, NULL); //10 is the max size of sk_array
+
+}
+
 
 static void s_eom_appDataCollector_GetAndProcessEthPkt(EOMappDataCollector *p)
 {

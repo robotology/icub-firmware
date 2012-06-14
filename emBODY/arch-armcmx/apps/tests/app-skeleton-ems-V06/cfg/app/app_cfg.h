@@ -35,7 +35,7 @@
 //   <o> local port where waiting datagram         <0-65535>
 //   <i> ....
 #ifndef LOCALPORT_ONRX            
- #define LOCALPORT_ONRX   3334
+ #define LOCALPORT_ONRX   3333
 #endif
 
 
@@ -53,18 +53,18 @@
 #endif
 //   <o> IP2 <0-255> 
 #ifndef REM_IP2
- #define REM_IP2        0
+ #define REM_IP2        1
 #endif
 //   <o> IP3 <0-255> 
 #ifndef REM_IP3
- #define REM_IP3       254
+ #define REM_IP3       104
 #endif
 //  </h> Fixed IP address
 
 //   <o> remote port where send         <0-65535>
 //   <i> ....
 #ifndef REMPORT             
- #define REMPORT   3334
+ #define REMPORT   3333
 #endif
 
 // </h> Ethernet network info

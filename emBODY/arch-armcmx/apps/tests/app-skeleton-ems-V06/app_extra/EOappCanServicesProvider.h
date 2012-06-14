@@ -40,6 +40,7 @@
 #include "EoCommon.h"
 #include "EoMotionControl.h"
 #include "EoSkin.h"
+#include "EoSensors.h"
 #include "EoBoards.h"
 #include "EOarray.h"
 #include "EOicubCanProto_specifications.h"
@@ -65,6 +66,14 @@ typedef struct
 {
     uint32_t dummy;
 } eOappCanSP_cfg_t;
+
+
+typedef enum
+{
+    eo_appCanSP_opCmd_stop  = 0,
+    eo_appCanSP_opCmd_start = 1
+} eo_appCanSP_opCmd_t;
+
     
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
@@ -175,6 +184,18 @@ extern eOresult_t eo_appCanSP_GetMotorCanLocation(EOappCanSP *p, eOmc_motorId_t 
 
 
 
+/** @fn         extern eOresult_t eo_appCanSP_GetSensorCanLocation(EOappCanSP *p, eOsnsr_sensorId_t sId, eo_appCanSP_canLocation *canLoc, eObrd_types_t *boardType)
+    @brief      return sensor's can location ad the board type where it is connected to. 
+    @param      p               target obj
+    @param      sid             the sensor
+    @param      canLoc          in output @e canLoc contains info about sensor's can Location
+    @param      boardType       if not null, in output contains board type of sensor
+    @return     eores_OK on success
+                eores_NOK_nullpointer if p is null, or eores_NOK_nodata the mid is not connected with this ems board,
+                or eores_NOK_generic something else error case. //TODO: check better error!!!
+ **/
+extern eOresult_t eo_appCanSP_GetSensorCanLocation(EOappCanSP *p, eOsnsr_sensorId_t sId, eo_appCanSP_canLocation *canLoc, eObrd_types_t *boardType);
+
 /** @fn         extern eOresult_t eo_appCanSP_SendCmd(EOappCanSP *p, eo_appCanSP_canLocation *canLocation, eo_icubCanProto_msgCommand_t msgCmd, void *val_ptr)
     @brief      send a command to a can location 
     @param      p               target obj
@@ -199,8 +220,9 @@ extern eOresult_t eo_appCanSP_SendCmd(EOappCanSP *p, eo_appCanSP_canLocation *ca
  **/
 extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t numofcanframe, uint8_t *numofREADcanframe);
 
-/** @fn         extern eOresult_t eo_appCanSP_SendStart2CanBoard(EOappCanSP *p)
-    @brief      send start 2 boards
+
+/** @fn         extern eOresult_t eo_appCanSP_SendOpCmd2CanConnectedBoard(EOappCanSP *p)
+    @brief      send operational command(start/stop) to connected can board.
     @param      p                   target obj
     @param      numofcanframe       numofcanframe to read.
     @param      numofREADcanframe   num of frame read really. it can be NULL
@@ -208,7 +230,7 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t n
                 eores_NOK_nullpointer if p is null, or eores_NOK_nodata the mid is not connected with this ems board,
                 or eores_NOK_generic something else error case. //TODO: check better error!!!
  **/
-extern eOresult_t eo_appCanSP_SendStart2CanBoard(EOappCanSP *p);
+extern eOresult_t eo_appCanSP_SendOpCmd2CanConnectedBoard(EOappCanSP *p, eObrd_types_t board, eo_appCanSP_opCmd_t opcmd);
 
 
 

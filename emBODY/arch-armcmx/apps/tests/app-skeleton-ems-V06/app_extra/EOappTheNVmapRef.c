@@ -144,6 +144,11 @@ extern eOresult_t eo_appTheNVmapRef_GetJointNVMemoryRef(EOappTheNVmapRef* p, eOm
         return(eores_NOK_nullpointer);
     }
 
+    if(NULL == p->jointsList[jUiniqueId])
+    {
+        return(eores_NOK_generic);
+    }
+    
     *memRef = p->jointsList[jUiniqueId][nvindex];
 
      return(eores_OK);
@@ -179,15 +184,57 @@ extern eOresult_t eo_appTheNVmapRef_GetMotorNVMemoryRef(EOappTheNVmapRef* p, eOm
         return(eores_NOK_nullpointer);
     }
 
+    if(NULL == p->motorsList[mId])
+    {
+        return(eores_NOK_generic);
+    }
+
     aux = p->motorsList[mId];
     addr = aux[nvindex];
     *memRef = p->motorsList[mId][nvindex];
 
     addr = addr;
-     return(eores_OK);
+    return(eores_OK);
 
 }
 
+
+extern eOresult_t eo_appTheNVmapRef_GetSensorsMaisNVMemoryRef(EOappTheNVmapRef* p, eOsnsr_sensorId_t sId, uint8_t nvindex, void**memRef)
+{
+
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    if(NULL == p->sensorsMaisList[sId])
+    {
+        return(eores_NOK_generic);
+    }
+
+    *memRef = p->sensorsMaisList[sId][nvindex];
+
+     return(eores_OK);
+}
+
+
+extern eOresult_t eo_appTheNVmapRef_GetSensorsStrainNVMemoryRef(EOappTheNVmapRef* p, eOsnsr_sensorId_t sId, uint8_t nvindex, void**memRef)
+{
+
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(NULL == p->sensorsStrainList[sId])
+    {
+        return(eores_NOK_generic);
+    }
+
+    *memRef = p->sensorsStrainList[sId][nvindex];
+
+     return(eores_OK);
+}
 
 extern eOresult_t eo_appTheNVmapRef_GetSkinNVMemoryRef(EOappTheNVmapRef* p, eOsk_skinId_t skId, uint8_t nvindex, void**memRef)
 {
@@ -359,7 +406,7 @@ static eOresult_t s_eo_appTheNVmapRef_tables_initialise(void)
     }
 
     
-    res = s_eo_appTheNVmapRef_table_sensorsStrain_initialise();
+    res = s_eo_appTheNVmapRef_table_sensorsMais_initialise();
     if(eores_OK != res)
     {
         return(res);
@@ -524,7 +571,7 @@ static eOresult_t s_eo_appTheNVmapRef_table_sensorsMais_initialise(void)
         return(eores_OK);
     }
     
-    for(s=0; s<strainNumberMAX; s++)
+    for(s=0; s<maisNumberMAX; s++)
     {
         if(NULL == p->sensorsMaisList[s])
         {

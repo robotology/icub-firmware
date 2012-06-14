@@ -330,8 +330,20 @@ static void s_eom_appDataTransmitter_taskRun_2foc_mode(EOMappDataTransmitter *p,
 }
 static void s_eom_appDataTransmitter_taskRun_skinAndMc4_mode(EOMappDataTransmitter *p, eOevent_t evt)
 {
-;
- //remember to insert:    p->st = eOm_appDataTransmitter_st__active;
+eOresult_t res;
+    
+    if(eo_common_event_check(evt, EVT_START))
+    {
+    
+        res = s_eom_appDataTransmitter_SendRops(p);
+        if(eores_OK != res)
+        {
+            return;
+        }        
+        
+        p->st = eOm_appDataTransmitter_st__active;
+    }
+
 }
 
 static eOresult_t s_eom_appDataTransmitter_SendRops(EOMappDataTransmitter *p)

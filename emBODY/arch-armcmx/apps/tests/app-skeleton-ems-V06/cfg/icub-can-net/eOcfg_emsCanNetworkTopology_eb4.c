@@ -203,7 +203,7 @@ static const eo_emsCanNetTopo_sensorTopoInfo_t  s_cfg_canNetTopo_sensors[] =
 {
    {// 0
        EO_INIT(.boardAddr)                 14,
-       EO_INIT(.canPort)                   eOcanport2,
+       EO_INIT(.canPort)                   eOcanport1,
        EO_INIT(.boardType)                 eobrd_mais,
        EO_INIT(.id)                        0
    
@@ -234,7 +234,7 @@ static const eo_emsCanNetTopo_sensorTopoInfo_t  s_cfg_canNetTopo_skin [] =
     {// 0
         EO_INIT(.boardAddr)                 0,              //unused
         EO_INIT(.canPort)                   eOcanport2,     //important!!!
-        EO_INIT(.boardType)                 eobdr_skin,     //obvious information
+        EO_INIT(.boardType)                 eobrd_skin,     //obvious information
         EO_INIT(.id)                        0               //important!!!
    }
 };

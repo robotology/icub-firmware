@@ -112,6 +112,7 @@ extern eOresult_t eom_appTheSysController_Go2RunState(EOMappTheSysController *p)
 extern eOresult_t eom_appTheSysController_ExitFromRunState(EOMappTheSysController *p);
 extern eOresult_t eom_appTheSysController_Go2ErrorState(EOMappTheSysController *p);
 
+extern eObool_t eom_appTheSysController_AppIsRunningSt(EOMappTheSysController *p); 
 
 /** @}            
     end of group eom_appTheSysController 

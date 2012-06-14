@@ -39,7 +39,10 @@
 #include "EOappTheNVmapRef.h"
 #include "EOemsCanNetworkTopology.h"
 
+//icub api
+#include "EoSensors.h"
 //nv-cfg
+#include "eOcfg_nvsEP_as.h"
 #include "eOcfg_nvsEP_sk.h"
 
 #include "hal_debugPin.h"
@@ -105,11 +108,82 @@ extern eOresult_t eo_icubCanProto_former_pol_sb_unexpected_cmd(EOicubCanProto* p
 
 extern eOresult_t eo_icubCanProto_former_pol_sb_cmd__setTxMode(EOicubCanProto* p, void *val_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
+    eOenum08_t *txmode = (eOenum08_t *)val_ptr;
+    
+    canFrame->id = ICUBCANPROTO_POL_SB_CREATE_ID(dest.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 2;
+    canFrame->data[0] = ICUBCANPROTO_POL_SB_CMD__SET_TXMODE;
+    canFrame->data[1] = *txmode;
+    
+//     switch(*maismode)
+//     {
+//         case snsr_maismode_txdatacontinuously:
+//         {
+//                 canFrame->data[1] = 0;
+//         }break;
+//         
+//         case snsr_maismode_acquirebutdonttx:
+//         {
+//                 canFrame->data[1] = 1;
+//             
+//         }break;
+
+//         case snsr_maismode_dontacquiredonttx:
+//         {
+//                 canFrame->data[1] = 2;
+//             
+//         }break;
+
+//     };
+    
     return(eores_OK);
 }
 
 extern eOresult_t eo_icubCanProto_former_pol_sb_cmd__setCanDatarate(EOicubCanProto* p, void *val_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
+    uint8_t *datarate = (uint8_t*)val_ptr;
+    canFrame->id = ICUBCANPROTO_POL_SB_CREATE_ID(dest.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 2;
+    canFrame->data[0] = ICUBCANPROTO_POL_SB_CMD__SET_CANDATARATE;
+    canFrame->data[1] = *datarate;
+    
+    return(eores_OK);
+}
+
+extern eOresult_t eo_icubCanProto_former_pol_sb_cmd__setResolution(EOicubCanProto* p, void *val_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
+{
+    eOsnsr_maisresolution_t *maisresolution = (eOsnsr_maisresolution_t*)val_ptr;
+    
+    canFrame->id = ICUBCANPROTO_POL_SB_CREATE_ID(dest.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 2;
+    canFrame->data[0] = ICUBCANPROTO_POL_SB_CMD__SET_RESOLUTION;
+    switch(*maisresolution)
+    {
+        case snsr_maisresolution_08:
+        {
+            canFrame->data[1] = 2;
+        }break;
+        
+        case snsr_maisresolution_16:
+        {
+            canFrame->data[1] = 0;
+        }break;
+
+#ifdef _MAIS_TEST_
+        case snsr_maisresolution_debug:
+        {
+            canFrame->data[1] = 1;
+        }break;
+#endif
+
+    }
+    
     return(eores_OK);
 }
 
@@ -138,12 +212,114 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__torqueVector(EOicubCanProto
 
 extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes0to6(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
+    eOresult_t                                  res;
+    uint8_t                                     i, index;
+    eOsnsr_sensorId_t                           sId;
+    void                                        *nv_mem_ptr;
+    eOsnsr_arrayofupto36bytes_t                 *the15values_ptr;
+    eo_emsCanNetTopo_sensorCanLocation_t        canLoc;
+
+    canLoc.emscanport = canPort;
+    canLoc.canaddr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+    
+    res = eo_emsCanNetTopo_GetSensorId_BySensorCanLocation(p->emsCanNetTopo_ptr, &canLoc, &sId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    res = eo_appTheNVmapRef_GetSensorsMaisNVMemoryRef(eo_appTheNVmapRef_GetHandle(), sId, maisNVindex_mstatus__the15values, &nv_mem_ptr);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    the15values_ptr = (eOsnsr_arrayofupto36bytes_t *)nv_mem_ptr;
+
+
+    switch(the15values_ptr->data[0])
+    {
+        case 0: //array resetted
+        {
+            the15values_ptr->data[0] = 1;
+            the15values_ptr->head.size = 8;
+        }break;
+            
+        case 1: //somethig is wrong new values are avilable and i dont' send older ones.
+        {
+            ;//nothing to do ==> error count
+        }break;
+        
+        case 8: //i'm the second message
+        {
+            the15values_ptr->data[0] = 1;
+            //the15values_ptr->size = 16; the size does not change!!!  
+        }break;
+    };
+    
+    for(i=0,index = 1; i<frame->size; i++, index++)
+    {
+        the15values_ptr->data[index] = frame->data[i];
+//         #warning VALE--> 1-non copio il valore della mais solo per test!!!!
+//         the15values_ptr->data[index] = (0xC0|index);
+    }
+
     return(eores_OK);
+    
 }
 
 
 extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes7to14(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
+    eOresult_t                                  res;
+    uint8_t                                     i, index;
+    eOsnsr_sensorId_t                           sId;
+    void                                        *nv_mem_ptr;
+    eOsnsr_arrayofupto36bytes_t                 *the15values_ptr;
+    eo_emsCanNetTopo_sensorCanLocation_t        canLoc;
+
+    canLoc.emscanport = canPort;
+    canLoc.canaddr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+    
+    res = eo_emsCanNetTopo_GetSensorId_BySensorCanLocation(p->emsCanNetTopo_ptr, &canLoc, &sId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    res = eo_appTheNVmapRef_GetSensorsMaisNVMemoryRef(eo_appTheNVmapRef_GetHandle(), sId, maisNVindex_mstatus__the15values, &nv_mem_ptr);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    
+    the15values_ptr = (eOsnsr_arrayofupto36bytes_t *)nv_mem_ptr;
+    
+    switch(the15values_ptr->data[0])
+    {
+        case 0: //array resetted
+        {
+            the15values_ptr->data[0] = 8;
+            the15values_ptr->head.size = 16;
+        }break;
+            
+        case 1: //i'm the second message
+        {
+            the15values_ptr->head.size = 16;
+        }break;
+        
+        case 8: //somethig is wrong new values are avilable and i dont' send older ones.
+        {
+            ;//nothing to do ==> error count
+        }break;
+    };
+    
+    for(i=0,index = 8; i<frame->size; i++, index++)
+    {
+        the15values_ptr->data[index] = frame->data[i];
+//         #warning VALE--> 1-non copio il valore della mais solo per test!!!!
+//         the15values_ptr->data[index] = (0xC0|index);
+    }
+    
     return(eores_OK);
 }
 

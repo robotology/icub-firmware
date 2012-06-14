@@ -60,6 +60,7 @@
 
 #include "EOappTheNVmapRef.h" //==> included to clear skin array
 #include "eOcfg_nvsEP_sk.h"   //==> included to clear skin array
+#include "eOcfg_nvsEP_as.h"
 #include "EOarray.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -290,13 +291,19 @@ extern eOresult_t eo_appCanSP_GetJointCanLocation(EOappCanSP *p, eOmc_jointId_t 
 }
 
 
+extern eOresult_t eo_appCanSP_GetSensorCanLocation(EOappCanSP *p, eOsnsr_sensorId_t sId, eo_appCanSP_canLocation *canLoc, eObrd_types_t *boardType)
+{
+    return(eo_emsCanNetTopo_GetSensorCanLocation_BySensorId(p->emsCanNetTopo_ptr, sId, 
+                                                           (eo_emsCanNetTopo_sensorCanLocation_t *)canLoc, 
+                                                           boardType));
+}
+
 extern eOresult_t eo_appCanSP_GetMotorCanLocation(EOappCanSP *p, eOmc_motorId_t mId, eo_appCanSP_canLocation *canLoc, eObrd_types_t *boardType)
 {
     return(eo_emsCanNetTopo_GetMotorCanLocation_ByMotorId(p->emsCanNetTopo_ptr, mId, 
                                                           (eo_emsCanNetTopo_jointOrMotorCanLocation_t*)canLoc, 
                                                           boardType));
 }
-
 extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t numofcanframe, uint8_t *numofREADcanframe)
 {
     eOresult_t res;
@@ -312,11 +319,15 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t n
     
     for(i=0; i<numofcanframe ; i++)
     {
-        res = (eOresult_t)hal_can_get((hal_can_port_t)canport, &rec_frame, numofREADcanframe);
+        res = (eOresult_t)hal_can_get((hal_can_port_t)canport, &rec_frame, NULL);
         if(eores_OK != res) 
         {
             if(eores_NOK_nodata == res)
             {
+                if(NULL != numofREADcanframe)
+                {
+                    *numofREADcanframe = i;    
+                }
                 return(eores_OK);
             }
             else
@@ -332,6 +343,12 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t n
             return(res); //TODO error management                      
         }
     }
+    
+    if(NULL != numofREADcanframe)
+    {
+        *numofREADcanframe = i;    
+    }
+
     return(eores_OK);
 
 }
@@ -506,6 +523,66 @@ extern eOresult_t eo_appCanSP_ConfigSkin(EOappCanSP *p, eOsk_skinId_t skId)
 }
 
 
+extern eOresult_t eo_appCanSP_SendOpCmd2CanConnectedBoard(EOappCanSP *p, eObrd_types_t board, eo_appCanSP_opCmd_t opcmd)
+{
+    eOresult_t                      res;
+    eo_appCanSP_canLocation         canLoc;
+    eObrd_types_t                   boardType;
+    eo_icubCanProto_msgCommand_t    msgCmd;
+    void                            *memRef;
+    eOsnsr_maismode_t               *maismode;
+//     {
+//         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
+//         EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__SET_TXMODE
+//     };
+
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    switch(board)
+    {
+        case eobrd_mais:
+        {
+            res = eo_appTheNVmapRef_GetSensorsMaisNVMemoryRef(eo_appTheNVmapRef_GetHandle(), 0, maisNVindex_mconfig__mode, &memRef);
+            if(eores_OK != res)
+            {
+                return(eores_NOK_generic);
+            }
+
+            maismode = (eOsnsr_maismode_t*)memRef;
+//TODO: check opcmd and nvcfg comaptibility????            
+//             if((eo_appCanSP_opCmd_start == opcmd) && (*maismode != snsr_maismode_txdatacontinuously))
+//             {
+//                 return(eores_NOK_generic); //mismaching config
+//             }
+//             else if((eo_appCanSP_opCmd_stop == opcmd) && (*maismode == snsr_maismode_txdatacontinuously))
+//             {
+//                 return(eores_NOK_generic); //mismaching config
+//             }
+            
+            res = eo_appCanSP_GetSensorCanLocation(p, 0, &canLoc, &boardType);
+            if(eores_OK != res)
+            {
+                return(eores_NOK_generic);
+            }
+
+            if(eobrd_mais != boardType)
+            {
+                return(eores_NOK_generic);
+            }
+            msgCmd.class = eo_icubCanProto_msgCmdClass_pollingSensorBoard;
+            msgCmd.cmdId = ICUBCANPROTO_POL_SB_CMD__SET_TXMODE;
+
+            eo_appCanSP_SendCmd(p, &canLoc, msgCmd, (void*)maismode);    
+        }break;
+
+    };
+    
+    return(eores_OK);
+}
+
 
 
 // extern eOresult_t eo_appCanSP_ConfigMc4(EOappCanSP *p)
@@ -547,12 +624,7 @@ extern eOresult_t eo_appCanSP_SendMessage_TEST(EOappCanSP *p, eo_appCanSP_canLoc
 {
     eOresult_t                                  res;
     eOcanframe_t                                canFrame;
-    eo_icubCanProto_msgDestination_t            dest;
     eo_emsCanNetTopo_jointOrMotorCanLocation_t  *canLoc = (eo_emsCanNetTopo_jointOrMotorCanLocation_t *)canLocation;
-
-    //set destination of message 
-    dest.axis = canLoc->axis;
-    dest.canAddr = canLoc->canaddr;
 
     if(NULL == p)
     {

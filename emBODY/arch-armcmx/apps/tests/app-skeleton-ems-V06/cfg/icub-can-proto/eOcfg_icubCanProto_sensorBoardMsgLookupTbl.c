@@ -298,23 +298,31 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingSensorBoard_former(EOicub
     switch(cmdId)
     {
 
-        case ICUBCANPROTO_POL_SB_CMD__SET_TXMODE:
+        case ICUBCANPROTO_POL_SB_CMD__SET_TXMODE: //0x7
         {
             res = eo_icubCanProto_former_pol_sb_cmd__setTxMode(p, val_ptr, dest, canFrame);
         }break;
 
 
-        case ICUBCANPROTO_POL_SB_CMD__SET_CANDATARATE:
+        case ICUBCANPROTO_POL_SB_CMD__SET_CANDATARATE: //0x8
         {
             res = eo_icubCanProto_former_pol_sb_cmd__setCanDatarate(p, val_ptr, dest, canFrame);
         }break;
+        
+        
+        case ICUBCANPROTO_POL_SB_CMD__SET_RESOLUTION: //0x10
+        {
+            res = eo_icubCanProto_former_pol_sb_cmd__setResolution(p, val_ptr, dest, canFrame);
+        }break;
 
 
-        case ICUBCANPROTO_POL_SB_CMD__GET_FULL_SCALES:
+
+        case ICUBCANPROTO_POL_SB_CMD__GET_FULL_SCALES: //0x18
         {
             res = eo_icubCanProto_former_pol_sb_cmd__getFullScales(p, val_ptr, dest, canFrame);
         }break;
 
+        
         default:
         {
             res = eo_icubCanProto_former_pol_sb_unexpected_cmd(p, val_ptr, dest, canFrame);
