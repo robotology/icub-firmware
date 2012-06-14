@@ -195,7 +195,7 @@ extern eOresult_t eom_appDataTransmitter_SendData(EOMappDataTransmitter *p)
 
 extern eOresult_t eom_appDataTransmitter_SetRunMode(EOMappDataTransmitter *p, eOmn_appl_runMode_t runmode)
 {
-   if(NULL == p)
+    if(NULL == p)
     {
         return(eores_NOK_nullpointer);
     }
@@ -330,7 +330,7 @@ static void s_eom_appDataTransmitter_taskRun_2foc_mode(EOMappDataTransmitter *p,
 }
 static void s_eom_appDataTransmitter_taskRun_skinAndMc4_mode(EOMappDataTransmitter *p, eOevent_t evt)
 {
-eOresult_t res;
+    eOresult_t res;
     
     if(eo_common_event_check(evt, EVT_START))
     {

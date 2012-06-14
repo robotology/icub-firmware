@@ -566,16 +566,29 @@ static void s_eom_appTheSysController_srv_ledInit(void)
 
 static void s_eom_appTheSysController_srv_theBoardTransceiver_init(void)
 {
+#define EOK_BOARDTRANSCEIVER_capacityofpacket                   640
+#define EOK_BOARDTRANSCEIVER_capacityofrop                      192
+#define EOK_BOARDTRANSCEIVER_capacityofropframeregulars         384
+#define EOK_BOARDTRANSCEIVER_capacityofropframeoccasionals      128
+#define EOK_BOARDTRANSCEIVER_capacityofropframereplies          128 
+#define EOK_BOARDTRANSCEIVER_maxnumberofregularrops             16 
     eOboardtransceiver_cfg_t boardtxrxcfg = 
     {
         .vectorof_endpoint_cfg          = s_theSysController.cfg.vectorof_endpoint_cfg, //eo_cfg_EPs_vectorof_eb4, 
         .hashfunction_ep2index          = s_theSysController.cfg.hashfunction_ep2index, //eo_cfg_nvsEP_eb4_fptr_hashfunction_ep2index, 
         .remotehostipv4addr             = s_theSysController.cfg.ethmod_cfg_ptr->remaddr,
-        .remotehostipv4port             = s_theSysController.cfg.ethmod_cfg_ptr->remport
-        
+        .remotehostipv4port             = s_theSysController.cfg.ethmod_cfg_ptr->remport,
+        .sizes                          =
+        {
+            .capacityofpacket           = EOK_BOARDTRANSCEIVER_capacityofpacket,
+            .capacityofrop              = EOK_BOARDTRANSCEIVER_capacityofrop,
+            .capacityofropframeregulars = EOK_BOARDTRANSCEIVER_capacityofropframeregulars, 
+            .capacityofropframeoccasionals = EOK_BOARDTRANSCEIVER_capacityofropframeoccasionals,
+            .capacityofropframereplies  = EOK_BOARDTRANSCEIVER_capacityofropframereplies,
+            .maxnumberofregularrops     = EOK_BOARDTRANSCEIVER_maxnumberofregularrops
+        }
     };
     
-    #warning VALE SE FAI UPDATE DI SYS AGGIUNGI CAMPO SIZE IN CFG TRANSCEIVER!!!!
     s_theSysController.srv.transceiver = eo_boardtransceiver_Initialise(&boardtxrxcfg);
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_theSysController.srv.transceiver), 
                      s_eobj_ownname, "error in transceiver");
