@@ -162,10 +162,15 @@ typedef enum
     snsr_maismode_dontacquiredonttx                     = 5  
 } eOsnsr_maismode_t;
 
+EO_VERIFYproposition(ismaismodeCompatiblewithicubcanproto, (snsr_maismode_txdatacontinuously == 0));
+EO_VERIFYproposition(ismaismodeCompatiblewithicubcanproto, (snsr_maismode_acquirebutdonttx == 1));
+EO_VERIFYproposition(ismaismodeCompatiblewithicubcanproto, (snsr_maismode_dontacquiredonttx == 5));
+
 typedef enum
 {
     snsr_maisresolution_08                              = 0,
-    snsr_maisresolution_16                              = 1
+    snsr_maisresolution_16                              = 1,
+//    snsr_maisresolution_debug                           = 2       //this mode set mais board in debug mode: it sends triangulas and sqaure waves.
 } eOsnsr_maisresolution_t;
 
 
