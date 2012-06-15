@@ -36,10 +36,11 @@ extern "C" {
 typedef enum { 
     CM_IDLE                 =0x00,   //
     CM_POSITION             =0x01,   //
-    CM_VELOCITY             =0x02,   //
+    CM_POS_VEL              =0x02,   //
     CM_TORQUE               =0x03,   //
     CM_IMPEDANCE_POS        =0x04,   //
     CM_IMPEDANCE_VEL        =0x05,   //
+    CM_VELOCITY             =0x06,
 
     CM_CALIB_ABS_POS_SENS   =0x10,   //
 
@@ -82,15 +83,15 @@ extern void eo_axisController_ReadEncPos(EOaxisController *o, int32_t pos);
 extern void eo_axisController_SkipEncPos(EOaxisController *o);
 extern int32_t eo_axisController_GetSpeed(EOaxisController *o);
 
-extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_t vel);
-extern void eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_t acc);
+extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, uint32_t time_ms);
+extern void eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, uint32_t time_ms);
 extern void eo_axisController_SetTrqRef(EOaxisController *o, int32_t trq);
 
 extern int16_t eo_axisController_PWM(EOaxisController *o);
 
 extern void eo_axisController_Stop(EOaxisController *o);
 
-extern uint8_t eo_axisController_SetControlMode(EOaxisController *o, control_mode_t cm);
+extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, control_mode_t cm);
 
 extern void eo_axisController_SetStiffness(EOaxisController *o, int32_t stiffness);
 

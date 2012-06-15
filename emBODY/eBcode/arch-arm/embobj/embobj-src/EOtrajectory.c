@@ -17,7 +17,9 @@
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem.h"
 
-
+extern const int32_t EMS_IFREQUENCY;
+extern const float   EMS_FFREQUENCY;
+extern const float   EMS_PERIOD;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -38,6 +40,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
+#define NULL_POSITION 0x80000000
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -62,10 +65,6 @@
 
 static const char s_eobj_ownname[] = "EOtrajectory";
 
-static const int32_t FREQUENCY = 1000;         // 1 kHz
-static const float   frequency = (float)FREQUENCY;
-static const float   PERIOD = 1.0f/frequency;
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -80,78 +79,111 @@ extern EOtrajectory* eo_trajectory_New(void)
         o->v = 0.0f;
         o->a = 0.0f;
 
-        o->pf = 0;
-        o->vf = 0;
-
-        o->period_by_time2 = 0.0f;
-
-        o->steps_to_end = 0;
+        o->pf = NULL_POSITION;
+        o->vf = 0.0f;
 
         o->Kw = 0.0f;
         o->Wn = 0.0f;
-        o->Yn = 0.0f;
+        o->Xn = 0.0f;
+
+        o->Kz = 0.0f;
+        o->Zn = 0.0f;
+
+        o->pos_steps_to_end = 0;
+        o->vel_steps_to_end = 0;
     }
 
     return o;
 }
 
-extern void eo_trajectory_SetReference(EOtrajectory *o, int32_t p0, int32_t p1, int32_t v0, int32_t v1, int32_t a0, int32_t speed)
+extern void eo_trajectory_Init(EOtrajectory *o, int32_t p0, int32_t v0, int32_t a0)
 {
-    if (!speed || p0==p1)
-    {
-        o->steps_to_end = 0;
-
-        return;
-    }    
-
-    o->p = (float)p0;
-    o->v = (float)v0;
-    o->a = (float)a0;
-
-    o->pf = p1;
-    o->vf = v1;
-
-    int32_t p1p0 = p1-p0;
-
-    int32_t A =  120*p1p0-60*(v0+v1) -10*a0;//+10*a1;
-    int32_t B = -180*p1p0+96*v0+84*v1+18*a0;//-12*a1
-    int32_t C =   60*p1p0-36*v0-24*v1- 9*a0;//+ 3*a1;
-
-    o->steps_to_end = (p1p0*FREQUENCY)/speed;
-
-    if (o->steps_to_end < 0) o->steps_to_end = -o->steps_to_end;
-
-    float DT = 1.0f/((float)o->steps_to_end);
-    float DT2 = DT*DT;
-
-    float CDT  = ((float)C)*DT;
-    float BDT2 = ((float)B)*DT2;
-    float ADT3 = ((float)A)*DT2*DT;
-
-    o->period_by_time2 = DT2*frequency;
-
-    o->Kw =       6.0f*ADT3;
-    o->Wn = o->Kw+2.0f*BDT2;
-    o->Yn = ADT3+BDT2+CDT;
+    o->p = p0;
+    o->v = v0;
+    o->a = a0;
 }
 
-/** @fn         extern float eo_trajectory_Step(EOtrajectory *o)
-    @brief      Executes a trajectory step.
-    @param      o               The pointer to the trajectory object.
-    @return     The actual trajectory point value.
- **/
+extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, uint32_t time_ms, eObool_t reset)
+{
+    if (reset)
+    {
+        o->vel_steps_to_end = 0;
+        o->vf = 0.0f;
+    }
+
+    if (!time_ms)
+    {
+        o->pos_steps_to_end = 0;
+        o->pf = o->p;
+        
+        return;    
+    }
+
+    if (!o->vel_steps_to_end) o->pf = p1;
+
+    o->pos_steps_to_end = (time_ms*EMS_IFREQUENCY)/1000;
+
+    float lbyT = 1000.0f/(float)time_ms;
+    float PbyT = EMS_PERIOD*lbyT;
+
+    float DbyT2 = ((float)p1-o->p)*lbyT*lbyT;
+    float VbyT  = o->v*lbyT; 
+
+    float A3 = ( 120.0f*DbyT2-60.0f*VbyT-10.0f*o->a)*PbyT*PbyT*PbyT;
+    float A2 = (-180.0f*DbyT2+96.0f*VbyT+18.0f*o->a)*PbyT*PbyT;
+
+    o->Kw = 6.0f*A3;
+    o->Wn = 2.0f*A2+o->Kw;
+    o->Xn = (60.0f*DbyT2-36.0f*VbyT-9.0f*o->a)*PbyT+A2+A3;
+}
+
+extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t v1, uint32_t time_ms, eObool_t reset)
+{
+    if (reset)
+    {
+        o->pos_steps_to_end = 0;
+        o->pf = NULL_POSITION;
+    }
+
+    if (!time_ms)
+    {
+        o->vel_steps_to_end = 0;
+        o->vf = o->v;
+
+        return;
+    }
+    
+    o->vf = (float)v1; 
+    
+    o->vel_steps_to_end = (time_ms*EMS_IFREQUENCY)/1000;
+
+    float lbyT = 1000.0f/(float)time_ms;
+    float PbyT = EMS_PERIOD*lbyT;
+
+    float DbyT = (o->vf-o->v)*lbyT;
+    
+    o->Kz = (-12.0f*DbyT+6.0f*o->a)*PbyT*PbyT;
+    o->Zn = (  6.0f*DbyT-4.0f*o->a)*PbyT+0.5f*o->Kz;
+}
+
+extern void eo_trajectory_TimeoutVelReference(EOtrajectory *o)
+{
+    o->vel_steps_to_end = 0;
+    o->vf = 0.0f;
+}
 
 extern void eo_trajectory_Stop(EOtrajectory *o, int32_t p)
 {
-    o->pf = o->p = p;
+    o->p = p;
     o->vf = o->v = 0;
 
-    o->steps_to_end = 0;
+    o->pos_steps_to_end = 0;
+    o->vel_steps_to_end = 0;
 }
 
 extern eObool_t eo_trajectory_IsDone(EOtrajectory* o)
 {
-    return o->steps_to_end == 0;
+    return !o->vel_steps_to_end && !o->pos_steps_to_end;
 }
 
 extern int32_t eo_trajectory_GetPos(EOtrajectory* o)
@@ -164,30 +196,55 @@ extern int32_t eo_trajectory_GetVel(EOtrajectory* o)
     return (int32_t)o->v;
 }
 
+extern int32_t eo_trajectory_GetAcc(EOtrajectory* o)
+{
+    return (int32_t)o->a;
+}
+
 extern void eo_trajectory_Step(EOtrajectory* o, int32_t *p, int32_t *v, int32_t *a)
 {
-    if (o->steps_to_end == 0)
+    if (o->pos_steps_to_end)
     {
-        if (a) *a = 0;
-        if (v) *v = o->vf;
-        if (p) *p = o->pf;
+        --o->pos_steps_to_end;
 
-        return;
+        o->a  += o->Xn;
+        o->Xn += o->Wn;
+        o->Wn += o->Kw;   
     }
-    
-    --(o->steps_to_end);
 
-    o->a  += o->Yn;
-    o->Yn += o->Wn;
-    o->Wn += o->Kw;
+    if (o->vel_steps_to_end)
+    {
+        --o->vel_steps_to_end;
 
-    o->v += o->period_by_time2*o->a;
-    o->p += PERIOD*o->v;
+        o->a  += o->Zn;
+        o->Zn += o->Kz; 
+    }
+
+    if (o->vel_steps_to_end || o->pos_steps_to_end)
+    {
+        o->v += EMS_PERIOD*o->a;
+        o->p += EMS_PERIOD*o->v; 
+    }
+    else
+    {
+        o->a = 0.0f;
+        o->v = o->vf;
+
+        if (o->v == 0.0f)
+        { 
+            if (o->pf != NULL_POSITION) o->p = o->pf;
+        }
+        else
+        {
+            o->p += EMS_PERIOD*o->v;    
+        } 
+    } 
 
     if (a) *a = (int32_t) o->a;
     if (v) *v = (int32_t) o->v;
     if (p) *p = (int32_t) o->p;
 }
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

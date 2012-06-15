@@ -17,7 +17,9 @@
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem.h"
 
-
+extern const int32_t EMS_IFREQUENCY;
+extern const float   EMS_FFREQUENCY;
+extern const float   EMS_PERIOD;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -38,12 +40,12 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
+#define DELTA_THR 4
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -68,14 +70,13 @@ static const char s_eobj_ownname[] = "EOspeedmeter";
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution, int32_t frequency)
+extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution)
 {
     EOspeedmeter *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOspeedmeter), 1);
 
     if (o)
     {
-        o->FREQUENCY = frequency;
-        o->FREQUENCYxTHR = frequency * (DELTA_THR + 2);
+        o->FREQUENCYxTHR = EMS_IFREQUENCY * (DELTA_THR + 2);
         o->impulse_per_revolution = impulse_per_revolution;
         o->impulse_per_revolution_by_2 = impulse_per_revolution / 2;
         o->first_reading = eobool_true;
@@ -151,15 +152,15 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
 
     if (delta <= -DELTA_THR || delta >= DELTA_THR)
     {
-        o->speed = (15 * o->speed + (delta * o->FREQUENCY) / o->time_from_last_reading);
+        o->speed = (7 * o->speed + (delta * EMS_IFREQUENCY) / o->time_from_last_reading);
         
-        if (o->speed >= 8)        
+        if (o->speed >= 4)        
         {
-            o->speed =  ((8+o->speed)>>4);
+            o->speed =  ((4+o->speed)>>3);
         }
-        else if (o->speed <= -8)
+        else if (o->speed <= -4)
         {
-            o->speed = -((8-o->speed)>>4);
+            o->speed = -((4-o->speed)>>3);
         }
         else
         {
