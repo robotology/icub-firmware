@@ -85,8 +85,8 @@ extern void eo_emsController_ReadTorques(int32_t *torque);
 
 extern void eo_emsController_SetOffset(uint8_t joint, int16_t off);
 
-extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t vel);
-extern void eo_emsController_SetVelRef(uint8_t joint, int32_t vel, int32_t acc);
+extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, uint32_t time_ms);
+extern void eo_emsController_SetVelRef(uint8_t joint, int32_t vel, uint32_t time_ms);
 extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq);
 
 extern int16_t* eo_emsController_PWM(void);

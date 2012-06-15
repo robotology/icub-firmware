@@ -25,7 +25,6 @@ extern "C" {
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
-#define DELTA_THR 4
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
@@ -37,7 +36,6 @@ extern "C" {
 
 struct EOspeedmeter_hid 
 {
-    int32_t FREQUENCY;
     int32_t FREQUENCYxTHR;
     int32_t impulse_per_revolution;
     int32_t impulse_per_revolution_by_2;

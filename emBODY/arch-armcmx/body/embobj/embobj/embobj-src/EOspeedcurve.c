@@ -17,6 +17,9 @@
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem.h"
 
+extern const int32_t EMS_IFREQUENCY;
+extern const float   EMS_FFREQUENCY;
+extern const float   EMS_PERIOD;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -62,9 +65,6 @@
 
 static const char s_eobj_ownname[] = "EOspeedcurve";
 
-static const int32_t FREQUENCY = 1000;         // 1 kHz
-static const float   frequency = (float)FREQUENCY;
-static const float   PERIOD = 1.0f/frequency;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -113,7 +113,7 @@ extern void eo_speedcurve_SetReference(EOspeedcurve *o, int32_t p0, int32_t v0, 
     int32_t A = -6*v1v0+3*a0;//+3*a1;
     int32_t B =  6*v1v0-4*a0;//-2*a1;
 
-    o->steps_to_end = (v1v0*FREQUENCY)/acc;
+    o->steps_to_end = (v1v0*EMS_IFREQUENCY)/acc;
 
     if (o->steps_to_end < 0) o->steps_to_end = -o->steps_to_end;
 
@@ -171,7 +171,7 @@ extern void eo_speedcurve_Step(EOspeedcurve* o, int32_t *p, int32_t *v, int32_t 
         if (v) *v = o->vf;        
     }
     
-    o->p += PERIOD*o->v;
+    o->p += EMS_PERIOD*o->v;
 
     if (p) *p = (int32_t)o->p;
 }

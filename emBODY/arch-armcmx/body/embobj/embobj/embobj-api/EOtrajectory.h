@@ -64,9 +64,9 @@ extern EOtrajectory* eo_trajectory_New(void);
     @param      v0     The inital velocity.
     @param      avg_speed  The average speed.
  **/
-extern void eo_trajectory_SetReference(EOtrajectory *o, int32_t p0, int32_t p1, int32_t v0, int32_t v1, int32_t a0, int32_t speed);
-//extern void eo_trajectory_MoveReference(EOtrajectory *o, float p0, float pf, float v0, float speed);
-//extern void eo_trajectory_MoveReference(EOtrajectory *o, float pf, float speed);
+extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, uint32_t time_ms, eObool_t reset);
+extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t v1, uint32_t time_ms, eObool_t reset);
+extern void eo_trajectory_TimeoutVelReference(EOtrajectory *o);
 
 
 /** @fn         extern float eo_trajectory_Step(EOtrajectory *o)

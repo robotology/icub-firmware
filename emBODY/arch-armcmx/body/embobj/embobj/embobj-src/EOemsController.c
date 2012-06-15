@@ -44,7 +44,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-
+const int32_t EMS_IFREQUENCY = 1000;
+const float   EMS_FFREQUENCY = 1000.0f;
+const float   EMS_PERIOD     = 0.001f;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -66,6 +68,7 @@
 static const char s_eobj_ownname[] = "EOemsController";
 
 static EOemsController *s_emsc = NULL;
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -174,14 +177,14 @@ extern void eo_emsController_SetOffset(uint8_t joint, int16_t off)
     eo_axisController_SetOffset(s_emsc->axis_controller[joint], off);    
 }
 
-extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t vel)
+extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, uint32_t time_ms)
 {
-    eo_axisController_SetPosRef(s_emsc->axis_controller[joint], pos, vel);
+    eo_axisController_SetPosRef(s_emsc->axis_controller[joint], pos, time_ms);
 }
 
-extern void eo_emsController_SetVelRef(uint8_t joint, int32_t vel, int32_t acc)
+extern void eo_emsController_SetVelRef(uint8_t joint, int32_t vel, uint32_t time_ms)
 {
-    eo_axisController_SetVelRef(s_emsc->axis_controller[joint], vel, acc);
+    eo_axisController_SetVelRef(s_emsc->axis_controller[joint], vel, time_ms);
 }
 
 extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq)
@@ -220,10 +223,12 @@ extern void eo_emsController_ResetPosPid(uint8_t joint)
     eo_pid_Reset(eo_axisController_GetPosPidPtr(s_emsc->axis_controller[joint]));
 }
 
+/*
 extern void eo_emsController_ResetVelPid(uint8_t joint)
 {
     eo_pid_Reset(eo_axisController_GetVelPidPtr(s_emsc->axis_controller[joint]));
 }
+*/
 
 extern void eo_emsController_Stop(uint8_t joint)
 {
@@ -257,15 +262,18 @@ extern void eo_emsController_SetPosPidLimits(uint8_t joint, int32_t Ymax, int32_
     eo_pid_SetPidLimits(eo_axisController_GetPosPidPtr(s_emsc->axis_controller[joint]), Ymax, Imax);    
 }
 
+/*
 extern void eo_emsController_SetVelPid(uint8_t joint, int32_t kp, int32_t kd, int32_t ki, uint8_t shift)
 {
     eo_pid_SetPid(eo_axisController_GetVelPidPtr(s_emsc->axis_controller[joint]), kp, kd, ki, shift);    
-}    
+}
+*/
+/*    
 extern void eo_emsController_SetVelPidLimits(uint8_t joint, int32_t Ymax, int32_t Imax)
 {
     eo_pid_SetPidLimits(eo_axisController_GetVelPidPtr(s_emsc->axis_controller[joint]), Ymax, Imax);    
 }
-
+*/
 extern void eo_emsController_SetTrqPid(uint8_t joint, int32_t kp, int32_t kd, int32_t ki, uint8_t shift)
 {
     eo_pid_SetPid(eo_axisController_GetTrqPidPtr(s_emsc->axis_controller[joint]), kp, kd, ki, shift);    

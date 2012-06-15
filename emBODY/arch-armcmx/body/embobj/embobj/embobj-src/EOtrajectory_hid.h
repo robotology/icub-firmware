@@ -40,16 +40,18 @@ struct EOtrajectory_hid
     float v;
     float a;
 
+    int32_t pf;
+    float vf;
+
     float Kw;
     float Wn;
-    float Yn;
+    float Xn;
 
-    float period_by_time2;
+    float Kz;
+    float Zn;
 
-    int32_t pf;
-    int32_t vf;
-
-    int32_t steps_to_end;
+    int32_t pos_steps_to_end;
+    int32_t vel_steps_to_end;
 }; 
 
 

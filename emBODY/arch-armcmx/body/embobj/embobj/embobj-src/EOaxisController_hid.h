@@ -42,13 +42,13 @@ extern "C" {
 struct EOaxisController_hid 
 {
     EOpid *pidP;
-    EOpid *pidV;
+    //EOpid *pidV;
     EOpid *pidT;
 
     EOspeedmeter *speedmeter;
     EOtrajectory *trajectory;
 
-    EOspeedcurve *speedcurve;
+    //EOspeedcurve *speedcurve;
 
     int32_t pos_ref;
     int32_t vel_ref;
