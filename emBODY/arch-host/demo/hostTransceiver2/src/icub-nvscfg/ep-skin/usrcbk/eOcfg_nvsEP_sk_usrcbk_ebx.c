@@ -30,6 +30,7 @@
 #include "stdlib.h" 
 #include "string.h"
 #include "stdio.h"
+#include "ẗime.h"
 
 #ifdef _ICUB_CALLBACK_
 //#include "IRobotInterface.h"
@@ -67,6 +68,7 @@
 #define SKIN_POINTS4TRIANGLE_MAXNUM  		12 //each triangle sends 12 point (value)
 #define SKIN_RECCANFRAME4TRIANGLE_MAXNUM 	2 //each triangle sends 12 points in two can frame
 #define MAX_ACQUISITION 					1024
+#define MAX_COUNT
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -82,14 +84,16 @@ void s_eo_cfg__nvsEP_sk_hid_Histogram_Print(void);
 void s_eo_cfg_nvsEP_sk_hid_Histogram_Reset(void);
 void s_eo_cfg__nvsEP_sk_hid_ParseCanFrame(EOarray_of_10canframes *sk_array);
 void s_eo_cfg_nvsEP_sk_hid_Dump_Data( const EOnv* nv);
+void s_eo_cfg__nvsEP_sk_hid_Histogram_TV_Print(void);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 //static uint32_t s_skin_matrix_histogram[SKIN_BOARD_MAXNUM][SKIN_TRIANGLE4BOARD_MAXNUM][SKIN_POINTS4TRIANGLE_MAXNUM];
 uint32_t s_skin_matrix_histogramRecCanFrame[SKIN_BOARD_MAXNUM][SKIN_TRIANGLE4BOARD_MAXNUM][SKIN_RECCANFRAME4TRIANGLE_MAXNUM];
-
-uint32_t count;
+timeval s_skin_matrix_histogramTV[MAX_ACQUISITION][SKIN_BOARD_MAXNUM][SKIN_TRIANGLE4BOARD_MAXNUM][SKIN_RECCANFRAME4TRIANGLE_MAXNUM];
+timeval s_skin_matrix_histogramTV_zeros[SKIN_BOARD_MAXNUM][SKIN_TRIANGLE4BOARD_MAXNUM][SKIN_RECCANFRAME4TRIANGLE_MAXNUM] = {0};
+uint32_t count = 0;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables
@@ -199,55 +203,73 @@ void s_eo_cfg_nvsEP_sk_hid_Dump_Data( const EOnv* nv)
 }
 
 //sk-update
-#ifdef OVERRIDE_eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe
+//#ifdef OVERRIDE_eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe
 extern void eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-	printf("new callback\n");
-	fflush(stdout);
+	//	printf("new callback\n");
 	// s_eo_cfg_nvsEP_sk_hid_Dump_Data(nv);
 	EOarray_of_10canframes *sk_array = (EOarray_of_10canframes *)nv->rem;
 
-	//	s_eo_cfg__nvsEP_sk_hid_ParseCanFrame(sk_array);
-	//	s_eo_cfg__nvsEP_sk_hid_Histogram_Print();
-	//	s_eo_cfg_nvsEP_sk_hid_print_arrayof10canframe(sk_array);
-	//	count++;
 
-	//	popopopopopo = 666;
+		if(count < MAX_ACQUISITION)
+		{
+			//count=0;
+			s_eo_cfg__nvsEP_sk_hid_ParseCanFrame(sk_array);
 
-	//	if(count < 10000)
-	//	{
-	//		//count=0;
-	//		s_eo_cfg__nvsEP_sk_hid_ParseCanFrame(sk_array);
-	//
-	//	}
-	////	else if(count == 10000 )
-	//	{
-	//		count++; //stop to print
-	//		s_eo_cfg__nvsEP_sk_hid_Histogram_Print();
-	//	}
-
-	//
-	//	connection with iCubInterface stuff
-	//
+		}
+		else if(count == MAX_ACQUISITION )
+		{
+			count++; //stop to print
+			s_eo_cfg__nvsEP_sk_hid_Histogram_Print();
+			s_eo_cfg__nvsEP_sk_hid_Histogram_TV_Print();
+		}
 
 #ifdef _ICUB_CALLBACK_
 	FEAT_ID id;
 	id.type = Skin;
-	id.ep = nv->ep;
-//	strcpy(id.name, "right_arm");
-//	weweweqwe =
+	strcpy(id.name, "right_arm");
+//	weweweqwe;
 	void *featList;
-	printf("iCub Callback, looking for ep %d\n", id.ep);
+	printf("iCub Callback, looking for %s\n", id.name);
 	getRobotFeatureList_C(&id);
 	findAndFill(&id, (char *)sk_array);
 
 #endif
 }
-#endif
+//#endif
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static int timeval_subtract(struct timeval *_result, struct timeval *_x, struct timeval *_y)
+{
+  /* Perform the carry for the later subtraction by updating y. */
+
+  if(_x->tv_usec < _y->tv_usec)
+  {
+    int nsec    = (_y->tv_usec - _x->tv_usec) / 1000000 + 1;
+
+    _y->tv_usec -= 1000000 * nsec;
+    _y->tv_sec  += nsec;
+  }
+
+  if(_x->tv_usec - _y->tv_usec > 1000000)
+  {
+    int nsec    = (_x->tv_usec - _y->tv_usec) / 1000000;
+
+    _y->tv_usec += 1000000 * nsec;
+    _y->tv_sec  -= nsec;
+  }
+
+  /* Compute the time remaining to wait. tv_usec is certainly positive. */
+
+  _result->tv_sec  = _x->tv_sec  - _y->tv_sec;
+  _result->tv_usec = _x->tv_usec - _y->tv_usec;
+
+  /* Return 1 if result is negative. */
+
+  return _x->tv_sec < _y->tv_sec;
+}
 
 
 
@@ -297,6 +319,7 @@ void s_eo_cfg__nvsEP_sk_hid_ParseCanFrame(EOarray_of_10canframes *sk_array)
 	uint8_t row = 0;
 	uint8_t offset;
 
+	timeval tmp;
 	if(sk_array->head.size > 0)
 	{
 		count++;
@@ -328,6 +351,17 @@ void s_eo_cfg__nvsEP_sk_hid_ParseCanFrame(EOarray_of_10canframes *sk_array)
 		}
 
 		s_skin_matrix_histogramRecCanFrame[boardId][triangle][row]++;
+		int idx = s_skin_matrix_histogramRecCanFrame[boardId][triangle][row];
+		if (idx == 1)
+			gettimeofday(&s_skin_matrix_histogramTV_zeros[boardId][triangle][row], NULL);
+		else
+		{
+			gettimeofday(&tmp, NULL);
+			timeval_subtract(&s_skin_matrix_histogramTV[idx][boardId][triangle][row], &tmp, &s_skin_matrix_histogramTV_zeros[boardId][triangle][row]);
+			s_skin_matrix_histogramTV_zeros[idx][boardId][triangle][row] = tmp;
+			if( (s_skin_matrix_histogramTV[idx][boardId][triangle][row].sec > 0) || (s_skin_matrix_histogramTV[idx][boardId][triangle][row].usec > 70*1000) )
+				printf("Vai a vendere frittelle!!\n");
+		}
 		/*
 		 * 		questo può essere usato per creare la matrice di valori
 		for(i = 0; i<canframe->size; i++)
@@ -350,13 +384,34 @@ void s_eo_cfg__nvsEP_sk_hid_Histogram_Print(void)
 
 	for(i=0; i<SKIN_BOARD_MAXNUM; i++)
 	{
-
 		printf("board addr: %0x\n", i+8);
 		for(j=0; j<SKIN_TRIANGLE4BOARD_MAXNUM; j++)
 		{
 			printf("    t:%0x - %0x, %0x | ", j, s_skin_matrix_histogramRecCanFrame[i][j][0], s_skin_matrix_histogramRecCanFrame[i][j][1]);
 		}
 		printf("\n");
+	}
+}
+
+void s_eo_cfg__nvsEP_sk_hid_Histogram_TV_Print(void)
+{
+
+	uint8_t i,j,k;
+
+	for(i=0; i<SKIN_BOARD_MAXNUM; i++)
+	{
+		for(j=0; j<SKIN_TRIANGLE4BOARD_MAXNUM; j++)
+		{
+			for(k=0; k<2; k++)
+			{
+				for(l=0; l<MAX_ACQUISITION; l++)
+				{
+					printf("%d:%d:%d:%d %06d.%06d\n", i,j,k,l, s_skin_matrix_histogramTV[l][i][j][k]);
+				}
+			}
+			printf("\n");
+		}
+		printf("\n\n");
 	}
 }
 
