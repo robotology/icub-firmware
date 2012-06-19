@@ -376,7 +376,7 @@ void *skinThread(void * arg)
 
 	printf("before open\n");
 	yarp::os::BufferedPort<yarp::sig::Vector> outPortHand;
-	if(!outPortHand.open("/hand/test:o"))
+	if(!outPortHand.open("/hand"))
 	{
 		printf("Error, cannot open /hand/test:o YARP port!!\n");
 		return NULL;
@@ -385,9 +385,51 @@ void *skinThread(void * arg)
 		printf("Port opened!!\n");
 
 	yarp::os::BufferedPort<yarp::sig::Vector> outPortFAU;
-	if(!outPortFAU.open("/fau/test:o"))
+	if(!outPortFAU.open("/fau"))
 	{
 		printf("Error, cannot open /fau/test:o YARP port!!\n");
+		return NULL;
+	}
+	else
+		printf("Port opened!!\n");
+	yarp::os::BufferedPort<yarp::sig::Vector> outPortFAL;
+	if(!outPortFAL.open("/fal"))
+	{
+		printf("Error, cannot open outPortFAL YARP port!!\n");
+		return NULL;
+	}
+	else
+		printf("Port opened!!\n");
+
+	yarp::os::BufferedPort<yarp::sig::Vector> outPortAI;
+	if(!outPortAI.open("/ai"))
+	{
+		printf("Error, cannot open outPortAI YARP port!!\n");
+		return NULL;
+	}
+	else
+		printf("Port opened!!\n");
+	yarp::os::BufferedPort<yarp::sig::Vector> outPortAE;
+	if(!outPortAE.open("/ae"))
+	{
+		printf("Error, cannot open outPortAE YARP port!!\n");
+		return NULL;
+	}
+	else
+		printf("Port opened!!\n");
+
+	yarp::os::BufferedPort<yarp::sig::Vector> outPortAU;
+	if(!outPortAU.open("/au"))
+	{
+		printf("Error, cannot open outPortAU YARP port!!\n");
+		return NULL;
+	}
+	else
+		printf("Port opened!!\n");
+	yarp::os::BufferedPort<yarp::sig::Vector> outPortAL;
+	if(!outPortAL.open("/al"))
+	{
+		printf("Error, cannot open outPortAL YARP port!!\n");
 		return NULL;
 	}
 	else
@@ -412,15 +454,30 @@ void *skinThread(void * arg)
 	}
 
 	bool valid = false;
+	uint32_t cardId = 0;
+	yarp::sig::Vector WholeData;
+	WholeData.clear();
 
 	while(keepGoingOn)
 	{
-		yarp::sig::Vector &vectorHand = outPortHand.prepare();
-		yarp::sig::Vector &vectorFAU = outPortFAU.prepare();
-		yarp::sig::Vector WholeData;
-		vectorHand.clear();
-		vectorFAU.clear();
-		WholeData.clear();
+		yarp::sig::Vector &vectorHand 	= outPortHand.prepare();
+		yarp::sig::Vector &vectorFAU  	= outPortFAU.prepare();
+		yarp::sig::Vector &vectorFAL 	= outPortFAL.prepare();
+		yarp::sig::Vector &vectorAI 	= outPortAI.prepare();
+		yarp::sig::Vector &vectorAE 	= outPortAE.prepare();
+		yarp::sig::Vector &vectorAL 	= outPortAL.prepare();
+		yarp::sig::Vector &vectorAU 	= outPortAU.prepare();
+
+
+//		vectorHand.clear();
+//		vectorFAU.clear();
+//		vectorFAL.clear();
+//		vectorAI.clear();
+//		vectorAE.clear();
+//		vectorAL.clear();
+//		vectorAU.clear();
+
+
 		//    	transceiver->getNVvalue(nvRoot, (uint8_t *)&sk_array, &sizze);
 		yarp::os::Stamp lastStateStamp;				// the last reading time stamp
 
@@ -428,7 +485,7 @@ void *skinThread(void * arg)
 		//    	if(0 != sk_array.head.size)
 		//   		printf("\n--- ARRAY SIZE = %d  ---- \n", sk_array.head.size);
 
-		uint32_t cardId = 0;
+
 
 		for(i=0; i<sk_array.head.size; i++)
 		{
@@ -492,18 +549,42 @@ void *skinThread(void * arg)
 			//printf("\nInvalid message\n");
 		}
 
-		int firstH, lastH, firstFAU, lastFAU;
-		firstH = 0;
-		lastH  = 191;
-		firstFAU = 192;
-		lastFAU  = 383;
-		lastStateStamp.update();
 		WholeData = data;
-		vectorHand = WholeData.subVector(firstH, lastH);
-		vectorFAU = WholeData.subVector(firstFAU, lastFAU);
+		int first, last;
+		// Hand
+		first =	0; last = 191;
+		vectorHand = WholeData.subVector(first, last);
+		// FAU
+		first =	192; last = 383;
+		vectorFAU = WholeData.subVector(first, last);
+		//FAL
+		first =	384; last = 575;
+		vectorFAL = WholeData.subVector(first, last);
+		//AI
+		first = 576; last = 767;
+		vectorAI = WholeData.subVector(first, last);
+		//AE
+		first = 768; last = 959;
+		vectorAE = WholeData.subVector(first, last);
+		//AU
+		first = 960; last = 1151;
+		vectorAU = WholeData.subVector(first, last);
+		//AL
+		first =	1152; last = 1343;
+		vectorAL = WholeData.subVector(first, last);
+
+		lastStateStamp.update();
+
+
+
 
 		outPortHand.write();
 		outPortFAU.write();
+		outPortFAL.write();
+		outPortAI.write();
+		outPortAE.write();
+		outPortAL.write();
+		outPortAU.write();
 		usleep(1000);
 	}
 	outPortHand.close();

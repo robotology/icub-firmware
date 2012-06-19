@@ -199,10 +199,11 @@ void s_eo_cfg_nvsEP_sk_hid_Dump_Data( const EOnv* nv)
 }
 
 //sk-update
-//#ifdef OVERRIDE_eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe
+#ifdef OVERRIDE_eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe
 extern void eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-	//	printf("new callback\n");
+	printf("new callback\n");
+	fflush(stdout);
 	// s_eo_cfg_nvsEP_sk_hid_Dump_Data(nv);
 	EOarray_of_10canframes *sk_array = (EOarray_of_10canframes *)nv->rem;
 
@@ -232,16 +233,17 @@ extern void eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe(uint16_t n, cons
 #ifdef _ICUB_CALLBACK_
 	FEAT_ID id;
 	id.type = Skin;
-	strcpy(id.name, "right_arm");
-//	weweweqwe;
+	id.ep = nv->ep;
+//	strcpy(id.name, "right_arm");
+//	weweweqwe =
 	void *featList;
-	printf("iCub Callback, looking for %s\n", id.name);
+	printf("iCub Callback, looking for ep %d\n", id.ep);
 	getRobotFeatureList_C(&id);
 	findAndFill(&id, (char *)sk_array);
 
 #endif
 }
-//#endif
+#endif
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions
 // --------------------------------------------------------------------------------------------------------------------
