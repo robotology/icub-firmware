@@ -91,9 +91,18 @@ extern EOtrajectory* eo_trajectory_New(void)
 
         o->pos_steps_to_end = 0;
         o->vel_steps_to_end = 0;
+
+        o->pos_min =    0;
+        o->pos_max = 4095;
     }
 
     return o;
+}
+
+extern void eo_trajectory_SetLimits(EOtrajectory *o, int32_t pos_min, int32_t pos_max)
+{
+    o->pos_min = pos_min;
+    o->pos_max = pos_max;
 }
 
 extern void eo_trajectory_Init(EOtrajectory *o, int32_t p0, int32_t v0, int32_t a0)
@@ -117,6 +126,15 @@ extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, uint32_t 
         o->pf = o->p;
         
         return;    
+    }
+
+    if (p1 < o->pos_min)
+    { 
+        p1 = o->pos_min;
+    } 
+    else if (p1 > o->pos_max)
+    {
+        p1 = o->pos_max;
     }
 
     if (!o->vel_steps_to_end) o->pf = p1;
@@ -174,8 +192,9 @@ extern void eo_trajectory_TimeoutVelReference(EOtrajectory *o)
 
 extern void eo_trajectory_Stop(EOtrajectory *o, int32_t p)
 {
-    o->p = p;
+    o->pf = o->p = p;
     o->vf = o->v = 0;
+    o->a = 0;
 
     o->pos_steps_to_end = 0;
     o->vel_steps_to_end = 0;
@@ -239,6 +258,17 @@ extern void eo_trajectory_Step(EOtrajectory* o, int32_t *p, int32_t *v, int32_t 
             o->p += EMS_PERIOD*o->v;    
         } 
     } 
+
+    if (o->p <= o->pos_min)
+    { 
+        o->p = o->pos_min;
+        o->v = 0.0f;
+    } 
+    else if (o->p >= o->pos_max)
+    {
+        o->p = o->pos_max;
+        o->v = 0.0f;
+    }
 
     if (a) *a = (int32_t) o->a;
     if (v) *v = (int32_t) o->v;

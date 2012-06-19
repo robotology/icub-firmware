@@ -190,7 +190,7 @@ extern void eo_speedometer_EncoderError(EOspeedmeter* o)
     ++o->time_from_last_reading;
 }
 
-extern int32_t eo_speedometer_GetSpeed(EOspeedmeter* o)
+extern int32_t eo_speedometer_GetVelocity(EOspeedmeter* o)
 {
     return o->speed;
 }

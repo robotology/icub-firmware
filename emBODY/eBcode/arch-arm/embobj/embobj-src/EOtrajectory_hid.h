@@ -52,6 +52,9 @@ struct EOtrajectory_hid
 
     int32_t pos_steps_to_end;
     int32_t vel_steps_to_end;
+
+    int32_t pos_min;
+    int32_t pos_max;
 }; 
 
 
