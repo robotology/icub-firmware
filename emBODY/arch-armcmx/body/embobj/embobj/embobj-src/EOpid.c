@@ -177,7 +177,11 @@ extern int16_t eo_pid_PWM(EOpid *o, int32_t En)
 
     o->En = En;
 
-    o->KiIn += o->Ki*En;
+    int32_t KiEn = o->Ki*En;
+
+    o->KiIn += KiEn;
+
+    if (o->KiIn<0 ^ KiEn<0) o->KiIn += KiEn;
 
     if (o->KiIn > o->Imax_shift) 
         o->KiIn =  o->Imax_shift;
@@ -210,7 +214,11 @@ extern int16_t eo_pid_PWM2(EOpid *o, int32_t En, int32_t Vn)
 
     o->En = En;
 
-    o->KiIn += o->Ki*En;
+    int32_t KiEn = o->Ki*En;
+
+    o->KiIn += KiEn;
+
+    if (o->KiIn<0 ^ KiEn<0) o->KiIn += KiEn;
 
     if (o->KiIn > o->Imax_shift) 
         o->KiIn =  o->Imax_shift;

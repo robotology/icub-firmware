@@ -53,7 +53,7 @@ typedef struct EOtrajectory_hid EOtrajectory;
     @return     The pointer to the required object.
  **/
 extern EOtrajectory* eo_trajectory_New(void);
-
+extern void eo_trajectory_SetLimits(EOtrajectory *o, int32_t pos_min, int32_t pos_max);
 
 /** @fn         extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, float v0, float speed)
     @brief      Sets minimum jerk trajectory new start and end points, initial and average speed. When the time is 
@@ -68,13 +68,13 @@ extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, uint32_t 
 extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t v1, uint32_t time_ms, eObool_t reset);
 extern void eo_trajectory_TimeoutVelReference(EOtrajectory *o);
 
-
 /** @fn         extern float eo_trajectory_Step(EOtrajectory *o)
     @brief      Executes a trajectory step.
     @param      o  The pointer to the trajectory object.
     @return     The actual trajectory point value.
  **/
 extern void eo_trajectory_Step(EOtrajectory *o, int32_t *p, int32_t *v, int32_t *a);
+extern void eo_trajectory_Init(EOtrajectory *o, int32_t p0, int32_t v0, int32_t a0);
 
 /** @fn         extern void eo_trajectory_Abort(EOtrajectory *o)
     @brief      Aborts the trajectory.

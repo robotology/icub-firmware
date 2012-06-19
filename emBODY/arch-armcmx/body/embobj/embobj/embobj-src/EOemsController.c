@@ -230,6 +230,11 @@ extern void eo_emsController_ResetVelPid(uint8_t joint)
 }
 */
 
+extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_t offset, int32_t timeout_ms, int32_t max_error)
+{
+    eo_axisController_StartCalibration(s_emsc->axis_controller[joint], pos, offset, timeout_ms, max_error);
+}
+
 extern void eo_emsController_Stop(uint8_t joint)
 {
     eo_axisController_Stop(s_emsc->axis_controller[joint]);

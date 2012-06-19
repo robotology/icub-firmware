@@ -116,6 +116,8 @@ extern void eo_emsController_SetStiffness(uint8_t joint, int32_t stiffeness);
 extern void eo_emsController_SetVelMax(uint8_t joint, int32_t vel_max);
 extern void eo_emsController_SetPosLimits(uint8_t joint, int32_t pos_min, int32_t pos_max);
 
+extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_t offset, int32_t timeout_ms, int32_t max_error);
+
 /** @}            
     end of group eo_emsController  
  **/
