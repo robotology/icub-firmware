@@ -39,7 +39,7 @@ extern "C" {
 #include "EOMtask.h"
 #include "eOcfg_sm_EMSappl.h"
 #include "EOtimer.h"
-#include "osal_timer.h"
+#include "osal.h"
 #include "hal.h"
     
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -66,14 +66,17 @@ struct EOMtheEMSrunner_hid
     eOsmEventsEMSappl_t event;
     osal_timer_t*       osaltimer;
     eObool_t            cycleisrunning;
-    eObool_t            safetyGAPtouched[eo_emsrunner_task_numberof]; 
-    eObool_t            safetyGAPbroken[eo_emsrunner_task_numberof]; 
+    eObool_t            safeDurationExpired[eo_emsrunner_task_numberof]; 
+    eObool_t            overflownToNextTask[eo_emsrunner_task_numberof]; 
     hal_timer_t         haltimer_start[eo_emsrunner_task_numberof];
     hal_timer_t         haltimer_alert[eo_emsrunner_task_numberof];
     uint16_t            numofrxpackets;
     uint16_t            numofrxrops;
     uint16_t            numoftxpackets;
     uint16_t            numoftxrops;
+    eOemsrunner_mode_t  mode;
+    osal_semaphore_t*   waitudptxisdone;
+    osal_task_t*        osaltaskipnetexec;
 };
 
 
@@ -112,6 +115,73 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity(EOMtheEMSrunner *p);
 extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p);
 extern void eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmission(EOMtheEMSrunner *p);
 extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p);
+
+
+extern void eom_emsrunner_hid_userdef_onexecutionoverflow(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid);
+
+
+// - inline functions
+
+extern inline eObool_t eom_runner_hid_cansafelyexecute(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid)
+{
+    eObool_t ret = eobool_false;
+
+    switch(p->mode)
+    {
+        case eo_emsrunner_mode_besteffort:
+        {
+            ret = eobool_true;
+        } break;
+        
+        case eo_emsrunner_mode_softrealtime:
+        {
+            ret = (eobool_false == p->safeDurationExpired[taskid]) ? (eobool_true) : (eobool_false);
+        } break; 
+        
+        case eo_emsrunner_mode_hardrealtime:
+        {
+            ret = (eobool_false == p->safeDurationExpired[taskid]) ? (eobool_true) : (eobool_false);
+        } break;  
+
+        default:
+        {
+            ret = eobool_false;
+        } break;
+        
+    }   
+    
+    return(ret);
+    
+}
+
+
+extern inline eObool_t eom_runner_hid_signaloverflow(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid)
+{
+    eObool_t ret = eobool_false;
+
+    switch(p->mode)
+    {
+        case eo_emsrunner_mode_besteffort:
+        {
+            ret = eobool_false;
+        } break;
+        
+        case eo_emsrunner_mode_softrealtime:
+        case eo_emsrunner_mode_hardrealtime:
+        {
+            ret = p->overflownToNextTask[taskid];
+        } break;  
+
+        default:
+        {
+            ret = eobool_false;
+        } break;
+        
+    }   
+    
+    return(ret);
+    
+}
 
 
 #ifdef __cplusplus
