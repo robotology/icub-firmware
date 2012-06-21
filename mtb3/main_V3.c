@@ -71,6 +71,12 @@
 //  MPLAB 8.76
 //
 
+//  Rev 2.2.0 del 05/06/2012
+//  Added the selection of the triangles to be read with a CAN message for setup
+//  TO DO Temperature compensation in local, by means of Thermal pad     
+//  MPLAB 8.76
+//
+
 #include<p30f4011.h>
 #include"can_interface.h"
 #include "AD7147RegMap.h"
@@ -89,6 +95,9 @@
 
 
 //#define DEBUG
+//#define DEBUG_EMS //send a message in the triangle 0 pad 0 that goes from 0 to 255
+
+
 
 unsigned int AN2 = 0; //Accelerometer X axes
 unsigned int AN3 = 0; //Accelerometer Y axes
@@ -206,8 +215,12 @@ unsigned int SHIFT_ALL=4; //shift of the CDC value for removing the noise
 unsigned int NOLOAD=235;
 unsigned int ANALOG_ACC=0; //analog accelerometer, if one 1 messsage is sent every 10ms
 unsigned int GYRO_ACC=0; //gyro e accelerometer of the MMSP 
+unsigned int TEMP_COMPENSATION=0; //if 1 means internal temperature drift compensation 
+unsigned int OLD_SKIN=0; //if =0 means new skin with drift compensation and 10 pads
+unsigned int TRIANGLE_MASK=0xFF; //all the triangles are enabled for default
 unsigned int CONFIG_TYPE=CONFIG_SINGLE;
 unsigned int ERROR_COUNTER=0; //it counts the errors in reading the triangles.
+unsigned char counter=0;
 unsigned int ConValue[2]={0x2200, 0x2200}; //offset of the CDC reading 
 volatile unsigned int PMsgID; //pressure measurement ID 
 unsigned char acc[]={0,0,0,0,0,0,0,0}; //value of the three accelerometers
@@ -839,7 +852,22 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
 			{
 			    data[i]    = (unsigned char)   (txdata[i-1] & 0xFF); //the last 6 bits	
 		 	}  	
-		
+#ifdef DEBUG_EMS
+			if (0==triangleN)
+			{
+				data[1]=counter;
+				if (counter==255)
+				{
+					counter=0;
+					data[2]=100;
+				}
+				else
+				{
+					data[2]=0;
+					counter=counter+1;
+				}
+			}
+#endif 
 		    CAN1_send(PMsgID,1,8,data); 
 		    //Second message	
 		    data[0]=0xC0;       

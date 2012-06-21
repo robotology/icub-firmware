@@ -31,6 +31,9 @@ extern unsigned int SHIFT_ALL;
 extern unsigned int NOLOAD;
 extern unsigned int ANALOG_ACC;
 extern unsigned int GYRO_ACC;
+extern unsigned int TEMP_COMPENSATION;
+extern unsigned int OLD_SKIN;
+extern unsigned int TRIANGLE_MASK;
 extern char _additional_info[32];
 extern unsigned int ConValue[2];
 // can RX messages buffer
@@ -471,19 +474,32 @@ int CAN1_handleRx (unsigned int board_id)
 				{
 					//data[0] message CAN_TACT_SETUP2
 					//data[1] right SHIFT factor for the sensor readings (12 indipendent measurements)
-					//data[2] right SHIFT_THREE  factor for the sensor readings (3 macro areas)     
-				    //data[3] right SHIFT_ALL  factor for the sensor readings (1 macro area) 
-					//data[4] NO_LOAD value (it is set to 235 for default)
-					//data[5] ANALOG_ACC
-					//data[6] NU
-					//data[7] NU
 					
 					SHIFT       =	CANRxBuffer[canRxBufferIndex-1].CAN_data[1]&0xF;
-					SHIFT_THREE =	CANRxBuffer[canRxBufferIndex-1].CAN_data[2]&0xF;             
-					SHIFT_ALL   =	CANRxBuffer[canRxBufferIndex-1].CAN_data[3]&0xF;     
-					NOLOAD		=	CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0xFF;  
-					ANALOG_ACC  =	CANRxBuffer[canRxBufferIndex-1].CAN_data[5]&0x01;  
-					GYRO_ACC    =   CANRxBuffer[canRxBufferIndex-1].CAN_data[6]&0x01;
+					
+					//data[2](first 4bit 0xF)  right SHIFT_THREE  factor for the sensor readings (3 macro areas)     
+				    //data[2](last 4 bit 0xF0) right SHIFT_ALL  factor for the sensor readings (1 macro area) 
+				    
+				    SHIFT_THREE =	 CANRxBuffer[canRxBufferIndex-1].CAN_data[2]&0xF;             
+					SHIFT_ALL   =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[2]&0xF0)>>4;    
+					
+					//data[3] NO_LOAD value (it is set to 235 for default, it is the initial value of the sensor output) 
+					
+				    NOLOAD		=	CANRxBuffer[canRxBufferIndex-1].CAN_data[3]&0xFF;  
+					//data[4] 
+					//			bit 0: ANALOG ACCELEROMETER ON/OFF (0,1)
+					//          bit 1: DIGITAL ACCELEROMETER ON/OFF (0,1)
+					//          bit 2: DIGITAL GYROSCOPE ON/OFF (0,1)
+					//          bit 3: INTERNAL TEMPERATURE COMPENSATION ON/OFF (0,1)
+					//          bit 4: OLD SKIN YES/NO (0,1)
+					//          bit 5:
+					//          bit 6:
+					//          bit 7: 
+					
+					ANALOG_ACC  =	CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x01;
+					GYRO_ACC  =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x02)>>1;    
+					TEMP_COMPENSATION =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x04)>>2;
+					OLD_SKIN =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x08)>>3;
 					
 					if (ANALOG_ACC)
 					{
@@ -497,6 +513,19 @@ int CAN1_handleRx (unsigned int board_id)
 						 T2_Init(TIMER_VALUE2);
 
 					}
+					//data[5] each bit represents the enable/disable of the triangle (each board has 16 triangles
+					//        but not all of them are always connected to the board. In this way you can EN/DIS each triangle
+					//        i.e.
+					//
+					//data [5] bit 0 = 1; => triangle 0 enabled 
+					//data [6] bit 0 = 1; => triangle 8 enabled
+					
+					TRIANGLE_MASK= ((CANRxBuffer[canRxBufferIndex-1].CAN_data[6])<<0xF) & CANRxBuffer[canRxBufferIndex-1].CAN_data[5];
+
+					//data[7] NU
+
+					
+
 					board_MODE=CALIB;
 					EnableIntT1;
                                         

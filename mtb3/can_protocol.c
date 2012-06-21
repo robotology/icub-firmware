@@ -26,7 +26,7 @@
 //  -------  -------  -------  -------  -------  ------- 
 
 #define CAN_MSG_CLASS_PERIODIC 0x300
-// For messages of class 001 the meaning of data/ID is defined as follows:
+// For messages of class 004 the meaning of data/ID is defined as follows:
 //  -------------------------- ----------------
 // |           11b            |        8B      |
 //  -------  -------  -------  -------  ------- 
@@ -43,7 +43,7 @@
 // |class	| Source | Dest   | C type |    Payload     |
 //  -------  -------  -------  -------  -------  ------- 
 
-#define CAN_MSG_CLASS_TACTSENSOR 0x300
+#define CAN_MSG_CLASS_TACTSENSOR 0x400
 // For messages of class 011 the meaning of data/ID is defined as follows:
 //  -------------------------- ------------------------
 // |           11b            |           8B            |
@@ -59,9 +59,11 @@ Bit 7 : Message number (there are two messages for sending all the data coming f
 Bit 6 : Resolution : 8 or 10 bits  (respectively 0 and 1 ) 
 Bit 5 : NU
 Bit 4 : NU
-Bit 3:1 Pressure Measurements
+Bit 3:1 : NU
 
 B[1-7] Pressure Measurements
+
+Note: if Bit 7 of B[0] is 1 then the second message has a payload of 6 byte instead of 8 and the last two bytes are the temperature drift value
 */
 #define CAN_MSG_CLASS_LOADER   0x700
 
