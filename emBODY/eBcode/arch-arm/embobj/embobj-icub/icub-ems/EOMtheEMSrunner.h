@@ -73,9 +73,17 @@ enum { eo_emsrunner_task_numberof   = 3 };
 
 typedef enum
 {
-    eo_emsrunner_evt_enable       = 0x00000001,
-    eo_emsrunner_evt_execute      = 0x00000002
+    eo_emsrunner_evt_enable         = 0x00000001,
+    eo_emsrunner_evt_execute        = 0x00000002,
+    eo_emsrunner_evt_udptxdone      = 0x00000004
 } eOemsrunner_event_t;
+
+typedef enum
+{
+    eo_emsrunner_mode_besteffort        = 0,
+    eo_emsrunner_mode_softrealtime      = 1,
+    eo_emsrunner_mode_hardrealtime      = 2
+} eOemsrunner_mode_t;
 
 
 /**	@typedef    typedef struct eOemsrunner_cfg_t 
@@ -83,15 +91,18 @@ typedef enum
  **/
 typedef struct
 {
-    uint8_t         taskpriority[eo_emsrunner_task_numberof];
-    uint16_t        taskstacksize[eo_emsrunner_task_numberof];   
-    eOreltime_t     period;                 /**< The period of the cycle rx-do-tx. The rx task receive the execute evt at beginning of the cycle.*/
-    eOreltime_t     timeRX;                 /**< maximum time allocated to task RX before the task DO is triggered  */  
-    eOreltime_t     timeDO;                 /**< maximum time allocated to task DO before the task TX is triggered  */ 
-    eOreltime_t     timeTX;                 /**< maximum time allocated to task TX. task RX is triggered at beginning of cycle */ 
-    eOreltime_t     safetyGAP;              /**< The time between two consecutive tasks before which the previous task must have finished its execution. */ 
-    uint16_t        maxnumofRXpackets;      /**< It allows to receive and parse up to a given number of packets */ 
-    uint16_t        maxnumofTXpackets;      /**< so far it can be only 0 or 1 */
+    uint8_t             taskpriority[eo_emsrunner_task_numberof];
+    uint16_t            taskstacksize[eo_emsrunner_task_numberof];   
+    eOreltime_t         period;                 /**< The period of the cycle rx-do-tx. The rx task receive the execute evt at beginning of the cycle.*/
+    eOreltime_t         execRXafter;            /**< time of execution of RX task, measured in usec after beginning of period  */            
+    eOreltime_t         safeRXexecutiontime;    /**< safe execution time for RX task. If the task is not completed at execRXafter+safeRXexecutiontime it is issued a safe duration expired flag  */
+    eOreltime_t         execDOafter;            /**< time of execution of DO task, measured in usec after beginning of period  */
+    eOreltime_t         safeDOexecutiontime;    /**< safe execution time for DO task. If the task is not completed at execDOafter+safeDOexecutiontime it is issued a safe duration expired flag  */    
+    eOreltime_t         execTXafter;            /**< time of execution of TX task, measured in usec after beginning of period  */
+    eOreltime_t         safeTXexecutiontime;    /**< safe execution time for TX task. If the task is not completed at execTXafter+safeTXexecutiontime it is issued a safe duration expired flag  */
+    uint16_t            maxnumofRXpackets;      /**< It allows to receive and parse up to a given number of packets */ 
+    uint16_t            maxnumofTXpackets;      /**< so far it can be only 0 or 1 */
+    eOemsrunner_mode_t  modeatstartup;
 } eOemsrunner_cfg_t;
 
 
@@ -128,9 +139,13 @@ extern eOresult_t eom_emsrunner_StopAndGoTo(EOMtheEMSrunner *p, eOsmEventsEMSapp
 
 extern EOMtask * eom_emsrunner_GetTask(EOMtheEMSrunner *p, eOemsrunner_taskid_t id);
 
-eObool_t eom_emsrunner_SafetyGapTouched(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid);
+eObool_t eom_emsrunner_SafeDurationExpired(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid);
 
-eObool_t eom_emsrunner_SafetyGapBroken(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid);
+eObool_t eom_emsrunner_OverflownToNextTask(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid);
+
+extern eOresult_t eom_emsrunner_SetMode(EOMtheEMSrunner *p, eOemsrunner_mode_t mode);
+
+extern void eom_emsrunner_OnUDPpacketTransmitted(EOMtheEMSrunner *p);
 
 
 /** @}            

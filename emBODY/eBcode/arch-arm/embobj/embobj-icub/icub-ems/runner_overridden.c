@@ -72,7 +72,7 @@
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_delay(eOreltime_t delay);
+static void s_xxx_delay(eOreltime_t delay);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -84,6 +84,12 @@ static void s_delay(eOreltime_t delay);
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+static volatile uint32_t xxxcount = 0;
+
+extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p)
+{
+    xxxcount ++;
+}
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
 {
@@ -95,28 +101,51 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
     {
         totalreceived = 0;
         eom_emsrunner_StopAndGoTo(eom_emsrunner_GetHandle(), eo_sm_emsappl_EVgo2cfg);
-    }     
+    } 
+    
+
+    
+    
+    if(0 == (xxxcount % 10))
+    {
+        //s_xxx_delay(600);
+        //s_xxx_delay(200);
+    }
+
+    
 }
 
 
 
 extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 {
-#if 1
+#if 0
     volatile eObool_t quit = eobool_false;
     //volatile eObool_t* touched = &p->safetyGAPtouched[eo_emsrunner_taskid_runDO];
     
     for(;;)
     {
-        s_delay(20);
+        s_xxx_delay(20);
         //if(eobool_true == *touched)
-        if(eobool_true == eom_emsrunner_SafetyGapTouched(eom_emsrunner_GetHandle(), eo_emsrunner_taskid_runDO))
+        if(eobool_true == eom_emsrunner_SafeDurationExpired(eom_emsrunner_GetHandle(), eo_emsrunner_taskid_runDO))
         {
             return;
         }        
     }
 #else
-    s_delay(100);
+//     static uint32_t xcount = 0;
+//     
+//     xcount++;
+//     if(0 == (xcount % 10))
+//     {
+//         s_xxx_delay(500);
+//     }
+//     else
+//     {
+//         s_xxx_delay(100);
+//     }
+    
+    s_xxx_delay(100);
 #endif    
     //     
 //     //for(i=0; i<1000*2; i++)
@@ -132,10 +161,55 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 }
 
 
+extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p)
+{
+     
+
+    if(0 == (xxxcount % 20))
+    {
+        //s_xxx_delay(3500);
+        s_xxx_delay(300);
+//         s_xxx_delay(50);
+//         s_xxx_delay(50);
+//         s_xxx_delay(50);
+//         s_xxx_delay(50);
+//         s_xxx_delay(50);
+//         s_xxx_delay(50);
+//         s_xxx_delay(50);
+//         s_xxx_delay(50);
+//         s_xxx_delay(50);
+//         s_xxx_delay(50);
+    }
+    else
+    {
+    //    s_xxx_delay(50);
+    }
+}
+
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p)
 {
-    s_delay(50);
+     
+
+    if(0 == (xxxcount % 20))
+    {
+        //s_xxx_delay(3500);
+        //s_xxx_delay(400);
+         s_xxx_delay(50);
+//         s_xxx_delay(50);
+//         s_xxx_delay(50);
+//         s_xxx_delay(50);
+//         s_xxx_delay(50);
+//         s_xxx_delay(50);
+//         s_xxx_delay(50);
+//         s_xxx_delay(50);
+//         s_xxx_delay(50);
+//         s_xxx_delay(50);
+    }
+    else
+    {
+        s_xxx_delay(50);
+    }
 }
 
 
@@ -146,12 +220,12 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_delay(eOreltime_t delay)
+static void s_xxx_delay(eOreltime_t delay)
 {
 
-#if 0
-    uint64_t startat = osal_system_nanotime_get()/1000;
-    uint64_t stopat = startat + (uint64_t)delay;
+#if 1
+    uint64_t startat = osal_system_nanotime_get();
+    uint64_t stopat = startat + (uint64_t)delay*1000;
     volatile uint64_t now = startat;
     volatile uint64_t problemat = 0;
     volatile uint64_t tmp = 0;
@@ -164,15 +238,15 @@ static void s_delay(eOreltime_t delay)
         {
             break;
         } 
-        if((stopat-now) > delay)
-        {
-            if(0 == problemat)
-            {
-                problemat = now;
-            }
-        }
+//         if((stopat-now) > delay)
+//         {
+//             if(0 == problemat)
+//             {
+//                 problemat = now;
+//             }
+//         }
         tmp = osal_system_nanotime_get();
-        now = tmp/1000ll;        
+        now = tmp;///1000ll;        
     } 
 #else
 
@@ -190,13 +264,13 @@ static void s_delay(eOreltime_t delay)
         {
             break;
         } 
-        if((stopat-now) > delay)
-        {
-            if(0 == problemat)
-            {
-                problemat = now;
-            }
-        }
+//         if((stopat-now) > delay)
+//         {
+//             if(0 == problemat)
+//             {
+//                 problemat = now;
+//             }
+//         }
         tmp = osal_system_abstime_get();
         now = tmp;        
     } 

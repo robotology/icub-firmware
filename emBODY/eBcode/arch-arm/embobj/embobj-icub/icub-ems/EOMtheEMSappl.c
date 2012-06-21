@@ -360,7 +360,7 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_CFG(EOsm *s)
     EOaction onrx;
     eo_action_SetEvent(&onrx, emssocket_evt_packet_received, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
     // the socket alerts the cfg task
-    eom_emssocket_Open(eom_emssocket_GetHandle(), &onrx);
+    eom_emssocket_Open(eom_emssocket_GetHandle(), &onrx, NULL);
 }
 
 extern void eo_cfg_sm_EMSappl_hid_on_entry_ERR(EOsm *s)
@@ -368,14 +368,17 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_ERR(EOsm *s)
     EOaction onrx;
     eo_action_SetEvent(&onrx, emssocket_evt_packet_received, eom_emserror_GetTask(eom_emserror_GetHandle()));
     // the socket alerts the error task
-    eom_emssocket_Open(eom_emssocket_GetHandle(), &onrx);
+    eom_emssocket_Open(eom_emssocket_GetHandle(), &onrx, NULL);
 }
 
 
 extern void eo_cfg_sm_EMSappl_hid_on_entry_RUN(EOsm *s)
 {
-    // the socket does not alert anybody 
-    eom_emssocket_Open(eom_emssocket_GetHandle(), NULL);
+    EOaction ontxdone;
+    //eo_action_Clear(&ontxdone);
+    eo_action_SetCallback(&ontxdone, (eOcallback_t)eom_emsrunner_OnUDPpacketTransmitted, eom_emsrunner_GetHandle(), NULL);
+    // the socket does not alert anybody when it receives a pkt, but can alert the sending task
+    eom_emssocket_Open(eom_emssocket_GetHandle(), NULL, &ontxdone);
     
     // we activate the runner
     eom_emsrunner_Start(eom_emsrunner_GetHandle());

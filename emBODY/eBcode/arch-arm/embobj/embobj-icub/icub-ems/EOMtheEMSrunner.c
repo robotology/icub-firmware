@@ -34,7 +34,8 @@
 #include "EOMtask.h"
 
 #include "hal_timer.h"
-#include "osal_task.h"
+#include "osal.h"
+
 
 #include "EOMtask_hid.h" // to retrieve its osaltask pointer
 
@@ -87,14 +88,15 @@ const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg =
     EO_INIT(.taskpriority)              {250,   251,    252},  
     EO_INIT(.taskstacksize)             {1024,  1024,   1024},
     EO_INIT(.period)                    1000, //500, 
-//    EO_INIT(.execDOafter)               400, //150, 
-//    EO_INIT(.execTXafter)               700, //250,
-    EO_INIT(.timeRX)                    300, 
-    EO_INIT(.timeDO)                    650, 
-    EO_INIT(.timeTX)                    50, 
-    EO_INIT(.safetyGAP)                 25,
+    EO_INIT(.execRXafter)               0, 
+    EO_INIT(.safeRXexecutiontime)       300,
+    EO_INIT(.execDOafter)               400, 
+    EO_INIT(.safeDOexecutiontime)       250,
+    EO_INIT(.execTXafter)               700,
+    EO_INIT(.safeTXexecutiontime)       250,    
     EO_INIT(.maxnumofRXpackets)         3,
-    EO_INIT(.maxnumofTXpackets)         1
+    EO_INIT(.maxnumofTXpackets)         1,
+    EO_INIT(.modeatstartup)             eo_emsrunner_mode_softrealtime //eo_emsrunner_mode_besteffort //eo_emsrunner_mode_softrealtime
 };
 
 
@@ -139,19 +141,22 @@ static const char s_eobj_ownname[] = "EOMtheEMSrunner";
  
 static EOMtheEMSrunner s_theemsrunner = 
 {
-    EO_INIT(.cfg)               {0},
-    EO_INIT(.task)              {NULL, NULL, NULL},
-    EO_INIT(.event)             eo_sm_emsappl_EVdummy,
-    EO_INIT(.osaltimer)         NULL,
-    EO_INIT(.cycleisrunning)    eobool_false,
-    EO_INIT(.safetyGAPtouched)  {eobool_false, eobool_false, eobool_false},
-    EO_INIT(.safetyGAPbroken)   {eobool_false, eobool_false, eobool_false},
-    EO_INIT(.haltimer_start)    {hal_timer2, hal_timer3, hal_timer4},
-    EO_INIT(.haltimer_alert)    {hal_timer5, hal_timer6, hal_timer7},
-    EO_INIT(.numofrxpackets)    0,  
-    EO_INIT(.numofrxrops)       0,
-    EO_INIT(.numoftxpackets)    0,
-    EO_INIT(.numoftxrops)       0 
+    EO_INIT(.cfg)                   {0},
+    EO_INIT(.task)                  {NULL, NULL, NULL},
+    EO_INIT(.event)                 eo_sm_emsappl_EVdummy,
+    EO_INIT(.osaltimer)             NULL,
+    EO_INIT(.cycleisrunning)        eobool_false,
+    EO_INIT(.safeDurationExpired)   {eobool_false, eobool_false, eobool_false},
+    EO_INIT(.overflownToNextTask)    {eobool_false, eobool_false, eobool_false},
+    EO_INIT(.haltimer_start)        {hal_timer2, hal_timer3, hal_timer4},
+    EO_INIT(.haltimer_alert)        {hal_timer5, hal_timer6, hal_timer7},
+    EO_INIT(.numofrxpackets)        0,  
+    EO_INIT(.numofrxrops)           0,
+    EO_INIT(.numoftxpackets)        0,
+    EO_INIT(.numoftxrops)           0,
+    EO_INIT(.mode)                  eo_emsrunner_mode_softrealtime,
+    EO_INIT(.waitudptxisdone)       NULL,
+    EO_INIT(.osaltaskipnetexec)     NULL
 };
 
 
@@ -187,9 +192,12 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
 
     
     s_theemsrunner.cycleisrunning = eobool_false; 
+    s_theemsrunner.mode = cfg->modeatstartup; 
     s_theemsrunner.event = eo_sm_emsappl_EVdummy;
     
     s_theemsrunner.osaltimer = osal_timer_new();
+    
+    s_theemsrunner.waitudptxisdone = osal_semaphore_new(255, 0);
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_theemsrunner.osaltimer), s_eobj_ownname, "osaltimer is NULL");
     
     s_theemsrunner.task[eo_emsrunner_taskid_runRX] = eom_task_New(eom_mtask_OnAllEventsDriven, 
@@ -264,6 +272,15 @@ extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
     } 
     
 
+    // put in here with protection vs double iniytialisation. 
+    // we could put also in initialise, but i want to avoid that the runner is initisalised and ther eis not an osal task yet for ipnet
+    if(NULL == p->osaltaskipnetexec)
+    {   // compute it only once in life
+        EOMtask * taskipnetexec = eom_ipnet_GetTask(eom_ipnet_GetHandle(), eomipnet_task_proc);
+        p->osaltaskipnetexec = taskipnetexec->osaltask;
+    }    
+    
+
     s_eom_emsrunner_6HALTIMERS_start_oneshotosalcbk_for_rxdotx_cycle(&s_theemsrunner);
   
     return(eores_OK);
@@ -291,25 +308,45 @@ extern eOresult_t eom_emsrunner_StopAndGoTo(EOMtheEMSrunner *p, eOsmEventsEMSapp
     return(eores_OK);
 }
 
-eObool_t eom_emsrunner_SafetyGapTouched(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid)
+eObool_t eom_emsrunner_SafeDurationExpired(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid)
 {
     if(NULL == p)
     {
         return(eobool_true);
     } 
 
-    return(s_theemsrunner.safetyGAPtouched[taskid]);
+    return(s_theemsrunner.safeDurationExpired[taskid]);
 }
 
 
-eObool_t eom_emsrunner_SafetyGapBroken(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid)
+eObool_t eom_emsrunner_OverflownToNextTask(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid)
 {
     if(NULL == p)
     {
         return(eobool_true);
     } 
 
-    return(s_theemsrunner.safetyGAPbroken[taskid]);
+    return(s_theemsrunner.overflownToNextTask[taskid]);
+}
+
+extern eOresult_t eom_emsrunner_SetMode(EOMtheEMSrunner *p, eOemsrunner_mode_t mode)
+{
+
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    } 
+    
+
+    s_theemsrunner.mode = mode;
+ 
+    
+    return(eores_OK);
+}
+
+extern void eom_emsrunner_OnUDPpacketTransmitted(EOMtheEMSrunner *p)
+{
+    osal_semaphore_increment(s_theemsrunner.waitudptxisdone);
 }
 
 
@@ -344,17 +381,27 @@ __weak extern void eom_emsrunner_hid_userdef_taskRX_activity(EOMtheEMSrunner *p)
     // A. perform a first activity before datagram reception
     eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(p); 
 
+    
     // B. receive and parse datagram(s)
     eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(p);
-    
+
+
     // C. perform a third activity after datagram parsing
-    eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(p);                
+    eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(p);  
+     
 }
 
 
 __weak extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p)
 {
+   eObool_t itissafetoquit_asap = eobool_false;
     
+    if(eobool_false == eom_runner_hid_cansafelyexecute(p, eo_emsrunner_taskid_runRX))
+    {
+        itissafetoquit_asap =  eobool_true;
+    } 
+
+    // if itissafetoquit_asap then ... do nothing or very little.
 }
 
 
@@ -368,7 +415,7 @@ __weak extern void eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(E
     eObool_t processreception = eobool_true;
     
     // evaluate if we can enter in the reception loop
-    if((0 == p->cfg.maxnumofRXpackets) || (eobool_true == s_theemsrunner.safetyGAPtouched[eo_emsrunner_taskid_runRX]))
+    if((0 == p->cfg.maxnumofRXpackets) || (eobool_false == eom_runner_hid_cansafelyexecute(p, eo_emsrunner_taskid_runRX)))
     {
         processreception = eobool_false;
     }     
@@ -394,7 +441,8 @@ __weak extern void eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(E
         }
         
         // 2. evaluate quit from the loop
-        if((0 == remainingrxpkts) || (processedpkts >= p->cfg.maxnumofRXpackets) || (eores_OK != resrx) || (eobool_true == s_theemsrunner.safetyGAPtouched[eo_emsrunner_taskid_runRX]))
+        if((0 == remainingrxpkts) || (processedpkts >= p->cfg.maxnumofRXpackets) || 
+           (eores_OK != resrx) || (eobool_false == eom_runner_hid_cansafelyexecute(p, eo_emsrunner_taskid_runRX)))
         {
             processreception = eobool_false;
         }        
@@ -409,12 +457,26 @@ __weak extern void eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(E
 
 __weak extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
 {
+    eObool_t itissafetoquit_asap = eobool_false;
     
+    if(eobool_false == eom_runner_hid_cansafelyexecute(p, eo_emsrunner_taskid_runRX))
+    {
+        itissafetoquit_asap =  eobool_true;
+    }   
+    
+    // if itissafetoquit_asap then ... do nothing or very little.    
 }
 
 __weak extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 {
+   eObool_t itissafetoquit_asap = eobool_false;
     
+    if(eobool_false == eom_runner_hid_cansafelyexecute(p, eo_emsrunner_taskid_runDO))
+    {
+        itissafetoquit_asap =  eobool_true;
+    }   
+
+    // if itissafetoquit_asap then ... do nothing or very little.
 }
 
 __weak extern void eom_emsrunner_hid_userdef_taskTX_activity(EOMtheEMSrunner *p)
@@ -429,14 +491,21 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity(EOMtheEMSrunner *p)
     eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmission(p);
     
     // C. perform an user-defined function after datagram transmission
-    eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(p);           
+    eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(p);        
 }
 
 
 
 __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p)
 {
+    eObool_t itissafetoquit_asap = eobool_false;
     
+    if(eobool_false == eom_runner_hid_cansafelyexecute(p, eo_emsrunner_taskid_runTX))
+    {
+        itissafetoquit_asap =  eobool_true;
+    }   
+    
+    // if itissafetoquit_asap then ... do nothing or very little.       
 }
 
 
@@ -449,7 +518,7 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmissio
     eObool_t processtransmission = eobool_true;
     
     // evaluate if we can enter in the transmission loop
-    if((0 == p->cfg.maxnumofTXpackets) || (eobool_true == s_theemsrunner.safetyGAPtouched[eo_emsrunner_taskid_runTX]))
+    if((0 == p->cfg.maxnumofTXpackets) || (eobool_false == eom_runner_hid_cansafelyexecute(p, eo_emsrunner_taskid_runTX)))
     {
         processtransmission = eobool_false;
     }     
@@ -477,7 +546,7 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmissio
         }
 
         // 2. evaluate quit from the loop
-        //if((processedpkts >= p->cfg.maxnumofTXpackets) || (eobool_true == s_theemsrunner.safetyGAPtouched[eo_emsrunner_taskid_runTX]))
+        //if((processedpkts >= p->cfg.maxnumofTXpackets) || (eobool_true == s_theemsrunner.safeDurationExpired[eo_emsrunner_taskid_runTX]))
         //{
             processtransmission = eobool_false;
         //}   
@@ -489,10 +558,25 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmissio
 
 __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p)
 {
+    eObool_t itissafetoquit_asap = eobool_false;
     
+    if(eobool_false == eom_runner_hid_cansafelyexecute(p, eo_emsrunner_taskid_runTX))
+    {
+        itissafetoquit_asap =  eobool_true;
+    }   
+    
+    // if itissafetoquit_asap then ... do nothing or very little.       
 }
 
 
+__weak extern void eom_emsrunner_hid_userdef_onexecutionoverflow(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid)
+{
+    const char * tskname[] = {"tskRX", "tskDO", "tskTX"};
+    char str[48];
+    eOerrmanErrorType_t errortype = (eo_emsrunner_mode_hardrealtime == p->mode) ? (eo_errortype_fatal) : (eo_errortype_warning);
+    snprintf(str, sizeof(str)-1, "exec overflow of %s", tskname[taskid]); 
+    eo_errman_Error(eo_errman_GetHandle(), errortype, s_eobj_ownname, str); 
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -503,6 +587,14 @@ static eObool_t s_eom_emsrunner_timing_is_compatible(const eOemsrunner_cfg_t *cf
 {
     // verify that the cfg has timing that are compatible ... d2>d1+gap, period > d1+d2+gap
     #warning --> add code which verifies cfg->period, cfg->execDOafter etc... 
+//    ((cfg->execRXafter+cfg->safeRXexecutiontime) < cfg->execDOafter)
+//    ((cfg->execDOafter+cfg->safeDOexecutiontime) < cfg->execTXafter)
+//    ((cfg->execTXafter+cfg->safeTXexecutiontime) < cfg->period)
+    
+//    (cfg->safeRXexecutiontime > 0)
+//    (cfg->safeDOexecutiontime > 0)  
+//    (cfg->safeTXexecutiontime > 0)
+    
     return(eobool_true);
 }
 
@@ -521,9 +613,12 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
     
     //eov_ipnet_Activate(eov_ipnet_GetHandle());
     
-    // perform the rx activity     
-    eom_emsrunner_hid_userdef_taskRX_activity(&s_theemsrunner);
-  
+    // perform the rx activity    
+    if(eobool_true == eom_runner_hid_cansafelyexecute(&s_theemsrunner, eo_emsrunner_taskid_runRX))
+    {
+        eom_emsrunner_hid_userdef_taskRX_activity(&s_theemsrunner);
+    }
+      
     //eov_ipnet_Deactivate(eov_ipnet_GetHandle());
     
 
@@ -534,9 +629,9 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
         hal_timer_stop(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runRX]);
     }
     
-    if(eobool_true == s_theemsrunner.safetyGAPbroken[eo_emsrunner_taskid_runRX])
+    if(eobool_true == eom_runner_hid_signaloverflow(&s_theemsrunner, eo_emsrunner_taskid_runRX))
     {
-       eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "safety gap broken in taskRX");          
+       eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runRX); 
     }
     
     // Z. at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
@@ -555,9 +650,12 @@ static void s_eom_emsrunner_taskDO_run(EOMtask *p, uint32_t t)
 {
     // do things .... only when both eo_emsrunner_evt_enable and a eo_emsrunner_evt_execute are received.
 
-
-    // perform the do activity
-    eom_emsrunner_hid_userdef_taskDO_activity(&s_theemsrunner);   
+    if(eobool_true == eom_runner_hid_cansafelyexecute(&s_theemsrunner, eo_emsrunner_taskid_runDO))
+    {
+        // perform the do activity
+        eom_emsrunner_hid_userdef_taskDO_activity(&s_theemsrunner);
+    }
+       
     
     // Y. if someone has stopped the cycle...
     if(eobool_false == s_theemsrunner.cycleisrunning)
@@ -566,9 +664,9 @@ static void s_eom_emsrunner_taskDO_run(EOMtask *p, uint32_t t)
         hal_timer_stop(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runDO]);
     }
 
-    if(eobool_true == s_theemsrunner.safetyGAPbroken[eo_emsrunner_taskid_runDO])
+    if(eobool_true == eom_runner_hid_signaloverflow(&s_theemsrunner, eo_emsrunner_taskid_runDO))
     {
-       eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "safety gap broken in taskDO");          
+       eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runDO);     
     }
     
     // Z. at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
@@ -587,12 +685,33 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
 {
     // do things .... only when both eo_emsrunner_evt_enable and a eo_emsrunner_evt_execute are received.
     
+    s_theemsrunner.numoftxpackets = 0;
+    
     //eov_ipnet_Activate(eov_ipnet_GetHandle());
     
-    eom_emsrunner_hid_userdef_taskTX_activity(&s_theemsrunner);
+//    if(eobool_true == eom_runner_hid_cansafelyexecute(&s_theemsrunner, eo_emsrunner_taskid_runTX))
+    if(1) // always execute the transmission
+    {
+        eom_emsrunner_hid_userdef_taskTX_activity(&s_theemsrunner);
+        
+        if(0 != s_theemsrunner.numoftxpackets)
+        {
+            uint8_t i;            
+            for(i=0; i<s_theemsrunner.numoftxpackets; i++)
+            {   // must decrement a number of times equal to the number of pkts given to the socket    
+                osal_semaphore_decrement(s_theemsrunner.waitudptxisdone, osal_reltimeINFINITE);
+            }
+        }
+        
+    }
     
     //eov_ipnet_Deactivate(eov_ipnet_GetHandle());
-
+    
+    
+    if(eobool_true == eom_runner_hid_signaloverflow(&s_theemsrunner, eo_emsrunner_taskid_runTX))
+    {   // it is in this position so that ... it is still possible to send the EMS appl in ERROR state.
+        eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runTX);
+    } 
 
     if(eobool_false == s_theemsrunner.cycleisrunning)
     {   
@@ -608,10 +727,6 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
     }
     else
     {   
-        if(eobool_true == s_theemsrunner.safetyGAPbroken[eo_emsrunner_taskid_runTX])
-        {
-           eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "safety gap broken in taskTX");          
-        }        
         
         // at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
         s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runRX], osal_callerTSK);
@@ -647,13 +762,13 @@ static void s_eom_emsrunner_6HALTIMERS_start_oneshotosalcbk_for_rxdotx_cycle(voi
     onexpiry.cbk    = s_eom_emsrunner_6HALTIMERS_start_rxdotx_cycle_ultrabasic;
     onexpiry.par    = arg;        
     
-    s_theemsrunner.safetyGAPtouched[eo_emsrunner_taskid_runRX] = eobool_false;
-    s_theemsrunner.safetyGAPtouched[eo_emsrunner_taskid_runDO] = eobool_false;
-    s_theemsrunner.safetyGAPtouched[eo_emsrunner_taskid_runTX] = eobool_false; 
+    s_theemsrunner.safeDurationExpired[eo_emsrunner_taskid_runRX] = eobool_false;
+    s_theemsrunner.safeDurationExpired[eo_emsrunner_taskid_runDO] = eobool_false;
+    s_theemsrunner.safeDurationExpired[eo_emsrunner_taskid_runTX] = eobool_false; 
 
-    s_theemsrunner.safetyGAPbroken[eo_emsrunner_taskid_runRX] = eobool_false;
-    s_theemsrunner.safetyGAPbroken[eo_emsrunner_taskid_runDO] = eobool_false;
-    s_theemsrunner.safetyGAPbroken[eo_emsrunner_taskid_runTX] = eobool_false; 
+    s_theemsrunner.overflownToNextTask[eo_emsrunner_taskid_runRX] = eobool_false;
+    s_theemsrunner.overflownToNextTask[eo_emsrunner_taskid_runDO] = eobool_false;
+    s_theemsrunner.overflownToNextTask[eo_emsrunner_taskid_runTX] = eobool_false; 
     
     osal_timer_start(s_theemsrunner.osaltimer, &timing, &onexpiry, osal_callerTSK);
 
@@ -697,7 +812,7 @@ static void s_eom_emsrunner_6HALTIMERS_start_rxdotx_cycle_ultrabasic(osal_timer_
 
     
     // start of task rx:
-    oneshot_cfg.countdown         = cfg->period;
+    oneshot_cfg.countdown         = cfg->period + cfg->execRXafter;
     oneshot_cfg.callback_on_exp   = s_eom_emsrunner_6HALTIMERS_activate_taskrx_ultrabasic;
     oneshot_cfg.arg               = (void*)eo_emsrunner_taskid_runRX;
     hal_timer_init(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runRX], &oneshot_cfg, NULL); 
@@ -707,7 +822,7 @@ static void s_eom_emsrunner_6HALTIMERS_start_rxdotx_cycle_ultrabasic(osal_timer_
     
     // warn for task rx:
 //    oneshot_cfg.countdown          = cfg->execDOafter - cfg->safetyGAP - (osal_system_abstime_get() - startusec); // - 0;
-    oneshot_cfg.countdown          = cfg->timeRX - cfg->safetyGAP - (osal_system_abstime_get() - startusec); // - 0;
+    oneshot_cfg.countdown          = cfg->execRXafter + cfg->safeRXexecutiontime - (osal_system_abstime_get() - startusec); // - 0;
     oneshot_cfg.callback_on_exp    = s_eom_emsrunner_6HALTIMERS_activate_warn_ultrabasic; 
     oneshot_cfg.arg                = (void*)eo_emsrunner_taskid_runRX;
     hal_timer_init(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runRX], &oneshot_cfg, NULL); 
@@ -715,15 +830,15 @@ static void s_eom_emsrunner_6HALTIMERS_start_rxdotx_cycle_ultrabasic(osal_timer_
 
     // start of task do:
 //    oneshot_cfg.countdown          = cfg->execDOafter - (osal_system_abstime_get() - startusec); //- 5;
-    oneshot_cfg.countdown          = cfg->timeRX - (osal_system_abstime_get() - startusec); //- 5;
+    oneshot_cfg.countdown          = cfg->execDOafter - (osal_system_abstime_get() - startusec); //- 5;
     oneshot_cfg.callback_on_exp    = s_eom_emsrunner_6HALTIMERS_activate_task_ultrabasic;
     oneshot_cfg.arg                = (void*)eo_emsrunner_taskid_runDO;
     hal_timer_init(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runDO], &oneshot_cfg, NULL);     
     hal_timer_start(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runDO]);  
     
-    // warn for task tx:
+    // warn for task do:
 //    oneshot_cfg.countdown          = cfg->execTXafter - cfg->safetyGAP - (osal_system_abstime_get() - startusec);//- 10;
-    oneshot_cfg.countdown          = (cfg->timeRX + cfg->timeDO) - cfg->safetyGAP - (osal_system_abstime_get() - startusec);//- 10;
+    oneshot_cfg.countdown          = (cfg->execDOafter + cfg->safeDOexecutiontime) - (osal_system_abstime_get() - startusec);//- 10;
     oneshot_cfg.callback_on_exp    = s_eom_emsrunner_6HALTIMERS_activate_warn_ultrabasic;
     oneshot_cfg.arg                = (void*)eo_emsrunner_taskid_runDO;
     hal_timer_init(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runDO], &oneshot_cfg, NULL);     
@@ -731,7 +846,7 @@ static void s_eom_emsrunner_6HALTIMERS_start_rxdotx_cycle_ultrabasic(osal_timer_
     
     // start of task tx:
 //    oneshot_cfg.countdown          = cfg->execTXafter - (osal_system_abstime_get() - startusec);//- 15;
-    oneshot_cfg.countdown          = (cfg->timeRX + cfg->timeDO) - (osal_system_abstime_get() - startusec);//- 15;
+    oneshot_cfg.countdown          = cfg->execTXafter - (osal_system_abstime_get() - startusec);//- 15;
     oneshot_cfg.callback_on_exp    = s_eom_emsrunner_6HALTIMERS_activate_task_ultrabasic;
     oneshot_cfg.arg                = (void*)eo_emsrunner_taskid_runTX;
     hal_timer_init(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runTX], &oneshot_cfg, NULL);     
@@ -739,7 +854,7 @@ static void s_eom_emsrunner_6HALTIMERS_start_rxdotx_cycle_ultrabasic(osal_timer_
     
     // warn for task tx:
 //    oneshot_cfg.countdown          = cfg->period - cfg->safetyGAP - (osal_system_abstime_get() - startusec);//- 20;
-    oneshot_cfg.countdown          = (cfg->timeRX + cfg->timeDO + cfg->timeTX) - cfg->safetyGAP - (osal_system_abstime_get() - startusec);//- 20;
+    oneshot_cfg.countdown          = (cfg->execTXafter + cfg->safeTXexecutiontime) - (osal_system_abstime_get() - startusec);//- 20;
     oneshot_cfg.callback_on_exp    = s_eom_emsrunner_6HALTIMERS_activate_warn_ultrabasic;
     oneshot_cfg.arg                = (void*)eo_emsrunner_taskid_runTX;
     hal_timer_init(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runTX], &oneshot_cfg, NULL);  
@@ -762,17 +877,33 @@ static void s_eom_emsrunner_6HALTIMERS_start_task_ultrabasic(void *arg)
     EOMtask *currtask = s_theemsrunner.task[currtaskid];
     EOMtask* prevtask = s_theemsrunner.task[prevtaskid];
     osal_task_t *scheduledosaltask = osal_task_get(osal_callerISR);
+//    static osal_task_t *osaltaskipnetexec = NULL;
 
     
     // set to false the safety gap touched for DO
-    s_theemsrunner.safetyGAPtouched[currtaskid] = eobool_false;
-    s_theemsrunner.safetyGAPbroken[currtaskid] = eobool_false;
+    s_theemsrunner.safeDurationExpired[currtaskid] = eobool_false;
+    s_theemsrunner.overflownToNextTask[currtaskid] = eobool_false;
     
  
-    if(prevtask->osaltask == scheduledosaltask)
+    if(prevtask->osaltask == scheduledosaltask) 
     {
-        s_theemsrunner.safetyGAPbroken[prevtaskid] = eobool_true;
+        s_theemsrunner.overflownToNextTask[prevtaskid] = eobool_true;
     }
+    else if(eo_emsrunner_taskid_runTX == prevtaskid) 
+    {
+        // must also verify that task ipnet is not executing 
+        
+//        if(NULL == osaltaskipnetexec)
+//        {   // compute it only once in life
+//            EOMtask * taskipnetexec = eom_ipnet_GetTask(eom_ipnet_GetHandle(), eomipnet_task_proc);
+//            osaltaskipnetexec = taskipnetexec->osaltask;
+//        }
+        
+        if(s_theemsrunner.osaltaskipnetexec == scheduledosaltask)
+        {
+            s_theemsrunner.overflownToNextTask[prevtaskid] = eobool_true;
+        }
+    }    
       
     // send event to activate the task in argument
     eom_task_isrSetEvent(currtask, eo_emsrunner_evt_execute);
@@ -784,7 +915,7 @@ static void s_eom_emsrunner_6HALTIMERS_start_task_ultrabasic(void *arg)
 }
 
 
-static void s_eom_emsrunner_warn_task_ultrabasic(void *arg)
+static void s_eom_emsrunner_6HALTIMERS_warn_task_ultrabasic(void *arg)
 {
     eOemsrunner_taskid_t taskid = (eOemsrunner_taskid_t) (int32_t)arg;
 #if defined(EVIEWER_ENABLED)    
@@ -798,8 +929,17 @@ static void s_eom_emsrunner_warn_task_ultrabasic(void *arg)
     {   // if execution is in here it means that the task has not finished its computing in the time it was given to it minus the guard
                
         // set the boolean variable of the given task to true.
-        s_theemsrunner.safetyGAPtouched[taskid] = eobool_true;        
+        s_theemsrunner.safeDurationExpired[taskid] = eobool_true;        
     }
+    else if(eo_emsrunner_taskid_runTX == taskid) 
+    {
+        // must also verify that task ipnet is not executing 
+       
+        if(s_theemsrunner.osaltaskipnetexec == scheduledosaltask)
+        {
+            s_theemsrunner.safeDurationExpired[taskid] = eobool_true;
+        }
+    }        
 
 //     // i stop the timer ...
 //     if(eobool_false == s_theemsrunner.cycleisrunning)
@@ -828,7 +968,7 @@ static void s_eom_emsrunner_6HALTIMERS_activate_warn_ultrabasic(void *arg)
     }; 
 
     periodic_cfg.countdown         = s_theemsrunner.cfg.period;
-    periodic_cfg.callback_on_exp   = s_eom_emsrunner_warn_task_ultrabasic;
+    periodic_cfg.callback_on_exp   = s_eom_emsrunner_6HALTIMERS_warn_task_ultrabasic;
     periodic_cfg.arg               = arg;
     hal_timer_init(s_theemsrunner.haltimer_alert[taskid], &periodic_cfg, NULL); 
     hal_timer_start(s_theemsrunner.haltimer_alert[taskid]);    

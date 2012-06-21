@@ -159,7 +159,7 @@ extern EOMtheEMSsocket* eom_emssocket_GetHandle(void)
 }
 
 
-extern eOresult_t eom_emssocket_Open(EOMtheEMSsocket *p, EOaction* withactiononrx)
+extern eOresult_t eom_emssocket_Open(EOMtheEMSsocket *p, EOaction* withactiononrx, EOaction* withactionontx)
 {
     eOresult_t res;
     
@@ -170,13 +170,13 @@ extern eOresult_t eom_emssocket_Open(EOMtheEMSsocket *p, EOaction* withactiononr
     
     if(eobool_true == p->active)
     {
-        eo_socketdtg_SetActions(p->socket, withactiononrx, NULL);
+        eo_socketdtg_SetActions(p->socket, withactiononrx, withactionontx);
     }
     else
     {
     
         res = eo_socketdtg_Open(p->socket, p->cfg.localport, eo_sktdir_TXRX, eobool_false, 
-                                NULL, withactiononrx, NULL);
+                                NULL, withactiononrx, withactionontx);
         
         if(eores_OK == res)
         {
