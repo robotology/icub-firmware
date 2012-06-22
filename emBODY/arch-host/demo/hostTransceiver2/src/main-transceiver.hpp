@@ -21,9 +21,10 @@
 //#define DEFAULT_EMS_IP 		"10.0.0.2"
 
 #define DEFAULT_PORT		3333
-#define SIZE 				512
+#define SIZE 				1500
 
 #define PC104
+#define _DEEP_DEBUG_
 
 // Catch CTRL + C
 static int keepGoingOn   = TRUE;
@@ -50,7 +51,6 @@ typedef struct
 	ACE_INET_Addr	addr;
 	char 			data[SIZE];
 } Board_connect_info;
-
 
 
 

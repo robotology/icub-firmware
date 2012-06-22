@@ -50,8 +50,8 @@ using namespace std;
 //#include "IRobotInterface.h"
 //#include "FeatureInterface.h"
 #include "SkinWrapper.h"
+#include "debugFunctions.h"
 
-#undef _AC_
 
 #define hal_trace_puts(arg)		printf("%s", arg)
 
@@ -257,7 +257,6 @@ int main(int argc, char *argv[])
 	ACE_UINT8		tmp = 1;
 
 	// Start receiver thread
-	//pthread_create(&thread, NULL, recvThread, (void*) &remote01);
 	printf("Launching recvThread\n");
 	ACE_thread_t id_recvThread;
 	if(ACE_Thread::spawn((ACE_THR_FUNC)recvThread, NULL, THR_CANCEL_ENABLE, &id_recvThread)==-1)
@@ -318,6 +317,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	sleep(2);
 	//pthread_cancel(thread);
 	ACE_Thread::cancel(id_recvThread);
 	ACE_Thread::cancel(id_skinThread);
@@ -333,29 +333,43 @@ void *recvThread(void * arg)
 {
 	printf("recvThread started\n");
 
-	int  timeout = 2000;
-	Board_connect_info		sender;
-	ACE_UINT16 				udppkt_size = 0;
-	size_t					maxBytes2Read = 512;
+	FILE 						*outFile			= stdout;
+	int  						timeout 			= 2000;
+	Board_connect_info			sender;
+	ACE_UINT16 					udppkt_size 		= 0;
+	size_t						maxBytes2Read 		= 1500;
 	ACE_UINT8					tmp = 0xAA;
-	ACE_UINT8					bytesRecv = -1;
+	ACE_UINT8					bytesRecv 			= -1;
+	char 						str[SIZE];
 
+//	ACE_INET_Addr				eb2("10.0.1.2:3333");
+//	ACE_INET_Addr				eb4("10.0.1.4:3333");
+//
+//	uint8_t						board;
+//	uint32_t					prevNum[BOARD_NUM]			=	{0};
+//	uint32_t					progNum[BOARD_NUM]			=	{0};
+//
+//	eOabstime_t					txtime;
+//	ACE_UINT16 					size_ini[BOARD_NUM] 		= 	{0};
+//	EOropframe					*ropFrame;
+//
+//	ropFrame = eo_ropframe_New();
 
-	char str[SIZE];
-
-
-	while (keepGoingOn)
+	while(keepGoingOn)
 	{
-		// get from sockt
-		sender.addr.get_addr();
-		udppkt_size = ACE_socket->recv((void *) &sender.data, maxBytes2Read, sender.addr, flags);
-		printf("Received new packet, size = %d\n", udppkt_size);
+		udppkt_size = ACE_socket->recv((void *) sender.data, maxBytes2Read, sender.addr, flags);
 
-		transceiver->SetReceived((ACE_UINT8 *)sender.data, udppkt_size);
+		if(!check_received_pkt(&sender.addr, (void *) sender.data, udppkt_size))
+			printf("Error checking the packet!!!\n");
+		//transceiver->SetReceived((ACE_UINT8 *)sender.data, udppkt_size);
 	}
-	//pthread_exit(NULL);
+
+	print_data();
+
+	pthread_exit(NULL);
 	return NULL;
 }
+
 
 void *skinThread(void * arg)
 {
@@ -679,7 +693,6 @@ static void s_callback_button_1(void)
 	}
 	// tell agent to prepare a rop to send
 	transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
-
 
 
 	//
