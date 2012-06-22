@@ -53,10 +53,21 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+
+#if defined(EO_TAILOR_CODE_FOR_LINUX)
+    // put in here definition of macros which must be used with linux
+    
+    // 1. always use cached nvs, at least until we find why it crashes if not defined
+    #define EO_NVSCFG_USE_CACHED_NVS
+
+#else
+    // put in here definition of macros which are used in any other environment
+    #undef EO_NVSCFG_USE_CACHED_NVS
+
+#endif
+
+
 #define EO_NVSCFG_INIT_EVERY_NV
-
-#undef EO_NVSCFG_USE_CACHED_NVS
-
 #undef  EO_NVSCFG_USE_HASHTABLE
 
 
