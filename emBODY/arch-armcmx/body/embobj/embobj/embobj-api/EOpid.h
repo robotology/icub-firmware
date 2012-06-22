@@ -64,11 +64,11 @@ extern EOpid* eo_pid_New(void);
     @param      Ko    The constant offset.
     @param      Ymax  The output maximum value.
  **/
-extern void eo_pid_Init(EOpid *o, int32_t Kp, int32_t Ki, int32_t Kd, int32_t Ymax, int32_t Imax, uint8_t shift);
+extern void eo_pid_Init(EOpid *o, float K, float Ki, float Kd, float Ymax, float Imax);
 
-extern void eo_pid_SetPid(EOpid *o, int32_t Kp, int32_t Kd, int32_t Ki, uint8_t shift);
+extern void eo_pid_SetPid(EOpid *o, float K, float Kd, float Ki);
 
-extern void eo_pid_SetPidLimits(EOpid *o, int32_t Ymax, int32_t Imax);
+extern void eo_pid_SetPidLimits(EOpid *o, float Ymax, float Imax);
 
 extern void eo_pid_GetStatus(EOpid *o, int16_t *pwm, int32_t *err);
 
@@ -81,8 +81,8 @@ extern void eo_pid_Reset(EOpid *o);
     @param      En The error between measure and setpoint.
     @return     The actual PWM output value.
  **/
-extern int16_t eo_pid_PWM(EOpid *o, int32_t En);
-extern int16_t eo_pid_PWM2(EOpid *o, int32_t En, int32_t Vn);
+//extern int16_t eo_pid_PWM(EOpid *o, int32_t En);
+extern int16_t eo_pid_PWM2(EOpid *o, float En, float Vn);
 
 /** @}            
     end of group eo_pid  

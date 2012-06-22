@@ -58,7 +58,7 @@ struct EOaxisController_hid
     //eObool_t first_run;
     eObool_t is_calibrated;
     int32_t calib_timeout_ms;
-    int32_t calib_max_error;
+    float   calib_max_error;
 
     // axis limits
     int32_t pos_min;
