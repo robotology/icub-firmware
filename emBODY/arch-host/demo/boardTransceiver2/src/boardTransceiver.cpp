@@ -30,7 +30,7 @@ static EOtransceiver *boardTransceiver = NULL;
 static EOnvsCfg *nvsCfg = NULL;
 EOpacket*      pkt;
 
-extern EOtransceiver* boardTransceiver_new(uint32_t _localipaddr, uint32_t _remoteipaddr, uint16_t _ipport)
+extern EOtransceiver* boardTransceiver_new(uint32_t _localipaddr, uint32_t _remoteipaddr, uint16_t _ipport, uint8_t _board_n)
 {
 	eo_transceiver_sizes_t	my_sizes =
 	{
@@ -50,6 +50,51 @@ extern EOtransceiver* boardTransceiver_new(uint32_t _localipaddr, uint32_t _remo
     		EO_INIT(.remotehostipv4port)            _ipport,
     		EO_INIT(.sizes)							my_sizes
     };
+
+	switch(_board_n)
+	{
+	case 1:
+		boardTransceiverCfg.vectorof_endpoint_cfg = eo_cfg_EPs_vectorof_eb1;
+		boardTransceiverCfg.hashfunction_ep2index = eo_cfg_nvsEP_eb1_fptr_hashfunction_ep2index;
+		break;
+	case 2:
+		boardTransceiverCfg.vectorof_endpoint_cfg = eo_cfg_EPs_vectorof_eb2;
+		boardTransceiverCfg.hashfunction_ep2index = eo_cfg_nvsEP_eb2_fptr_hashfunction_ep2index;
+		break;
+	case 3:
+		boardTransceiverCfg.vectorof_endpoint_cfg = eo_cfg_EPs_vectorof_eb3;
+		boardTransceiverCfg.hashfunction_ep2index = eo_cfg_nvsEP_eb3_fptr_hashfunction_ep2index;
+		break;
+	case 4:
+		boardTransceiverCfg.vectorof_endpoint_cfg = eo_cfg_EPs_vectorof_eb4;
+		boardTransceiverCfg.hashfunction_ep2index = eo_cfg_nvsEP_eb4_fptr_hashfunction_ep2index;
+		break;
+	case 5:
+		boardTransceiverCfg.vectorof_endpoint_cfg = eo_cfg_EPs_vectorof_eb5;
+		boardTransceiverCfg.hashfunction_ep2index = eo_cfg_nvsEP_eb5_fptr_hashfunction_ep2index;
+		break;
+	case 6:
+		boardTransceiverCfg.vectorof_endpoint_cfg = eo_cfg_EPs_vectorof_eb6;
+		boardTransceiverCfg.hashfunction_ep2index = eo_cfg_nvsEP_eb6_fptr_hashfunction_ep2index;
+		break;
+	case 7:
+		boardTransceiverCfg.vectorof_endpoint_cfg = eo_cfg_EPs_vectorof_eb7;
+		boardTransceiverCfg.hashfunction_ep2index = eo_cfg_nvsEP_eb7_fptr_hashfunction_ep2index;
+		break;
+	case 8:
+		boardTransceiverCfg.vectorof_endpoint_cfg = eo_cfg_EPs_vectorof_eb8;
+		boardTransceiverCfg.hashfunction_ep2index = eo_cfg_nvsEP_eb8_fptr_hashfunction_ep2index;
+		break;
+	case 9:
+		boardTransceiverCfg.vectorof_endpoint_cfg = eo_cfg_EPs_vectorof_eb9;
+		boardTransceiverCfg.hashfunction_ep2index = eo_cfg_nvsEP_eb9_fptr_hashfunction_ep2index;
+		break;
+	default:
+		printf(">>>ERROR!!!\nUnknown board number... using EB4!!!\n");
+	}
+
+
+
     boardTransceiver = eo_boardtransceiver_Initialise(&boardTransceiverCfg);
     nvsCfg = eo_boardtransceiver_hid_GetNvsCfg();
     pkt = eo_packet_New(MAX_CAPACITY_OF_PACKET);

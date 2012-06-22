@@ -74,7 +74,7 @@ uint8_t need2sendarop = 0;
 pthread_t thread;
 EOarray				 				*skinData;
 uint8_t buffer[sizeof(EOarray_of_10canframes)] = {0};
-
+uint8_t boardN = 4;
 
 
 int main(int argc, char *argv[])
@@ -136,6 +136,13 @@ int main(int argc, char *argv[])
 				continue;
 			}
 
+			if((strcmp("-b", argv[i]) == 0) || (strcmp("--board", argv[i]) == 0))
+			{
+				if(i < (argc - 1))
+					boardN = atoi(argv[++i]);
+				continue;
+			}
+
 			if((strcmp("-h", argv[i]) == 0) || (strcmp("--help", argv[i]) == 0))
 			{
 				usage();
@@ -176,7 +183,7 @@ int main(int argc, char *argv[])
 	eOipv4port_t eOport = port;
 
 	// init object: it's a singleton, so run the program once for each ems you want to simulate
-	boardTransceiver = boardTransceiver_new(localAddr,remoteAddr, eOport);
+	boardTransceiver = boardTransceiver_new(localAddr,remoteAddr, eOport, boardN);
 
 
 	// Start receiver thread
@@ -344,21 +351,27 @@ static void s_callback_button_2(char value )
 
 	uint16_t							size;
 	EOnv								*nvRoot = NULL;
+	eOcfg_nvsEP_sk_endpoint_t 			ep = endpoint_sk_emsboard_rightlowerarm;
+	eOnvID_t nvid;
+
 	eo_transceiver_ropinfo_t 			ropinfo;
 	//	EOarray_of_10canframes 				*skinData = (EOarray_of_10canframes *)nv->rem;
 //	eOutil_canframe_t 					*canframe;
 
 
+	switch (boardN )
+	{
+	case 2:
+		ep = endpoint_sk_emsboard_leftlowerarm;
+		break;
 
+	case 4:
+		ep = endpoint_sk_emsboard_rightlowerarm;
+		break;
+	}
 
-
-	//	ropinfo.nvep = endpoint_sk_emsboard_rightlowerarm;
-	//	ropinfo.nvid = nvid;
-	eOnvEP_t ep = endpoint_sk_emsboard_rightlowerarm;
-	eOnvID_t nvid;
-
-	nvid = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_rightlowerarm, 0, skinNVindex_sstatus__arrayof10canframe);
-	nvRoot = boardTransceiver_getNVhandler(ep, nvid);
+	nvid = eo_cfg_nvsEP_sk_NVID_Get(ep, 0, skinNVindex_sstatus__arrayof10canframe);
+	nvRoot = boardTransceiver_getNVhandler( ep,  nvid);  //??
 
 #if 1
 
@@ -529,19 +542,31 @@ static void s_callback_button_5(uint32_t mtb, uint32_t triangle, char value)
 	uint16_t udppkt_size = 0;
 	uint16_t							size;
 	EOnv								*nvRoot = NULL;
-	eOnvEP_t ep = endpoint_sk_emsboard_rightlowerarm;
+	eOcfg_nvsEP_sk_endpoint_t ep = endpoint_sk_emsboard_rightlowerarm;
 	eOnvID_t nvid;
 
 	static bool	first	= true;
 	eOutil_canframe_t  canframe;
 
-	nvid = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_rightlowerarm, 0, skinNVindex_sstatus__arrayof10canframe);
-	nvRoot = boardTransceiver_getNVhandler(ep, nvid);
+
+	switch (boardN )
+	{
+	case 2:
+		ep = endpoint_sk_emsboard_leftlowerarm;
+		break;
+
+	case 4:
+		ep = endpoint_sk_emsboard_rightlowerarm;
+		break;
+	}
+
+	nvid = eo_cfg_nvsEP_sk_NVID_Get(ep, 0, skinNVindex_sstatus__arrayof10canframe);
+	nvRoot = boardTransceiver_getNVhandler( ep,  nvid);  //??
 
 	eo_array_Reset(skinData);
 
 
-	canframe.id =  ((mtb<<4) & 0x00f0) | (triangle & 0x000f);
+	canframe.id =  (0x0300 | ((mtb<<4) & 0x00f0) | (triangle & 0x000f) );
 	printf("SID = 0x%04x", canframe.id);
 	printf("DATA: ");
 
