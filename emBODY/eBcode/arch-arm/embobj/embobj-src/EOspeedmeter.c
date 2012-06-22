@@ -102,8 +102,6 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
 {
     int32_t delta;
 
-    //o->position = encoder;
-
     if (o->first_reading)
     {
         o->first_reading = eobool_false;

@@ -64,8 +64,8 @@ extern void eo_trajectory_SetLimits(EOtrajectory *o, int32_t pos_min, int32_t po
     @param      v0     The inital velocity.
     @param      avg_speed  The average speed.
  **/
-extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, uint32_t time_ms, eObool_t reset);
-extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t v1, uint32_t time_ms, eObool_t reset);
+extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, int32_t avg_vel);
+extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t v1, int32_t avg_acc, eObool_t reset);
 extern void eo_trajectory_TimeoutVelReference(EOtrajectory *o);
 
 /** @fn         extern float eo_trajectory_Step(EOtrajectory *o)
@@ -73,7 +73,7 @@ extern void eo_trajectory_TimeoutVelReference(EOtrajectory *o);
     @param      o  The pointer to the trajectory object.
     @return     The actual trajectory point value.
  **/
-extern void eo_trajectory_Step(EOtrajectory *o, int32_t *p, int32_t *v, int32_t *a);
+extern int8_t eo_trajectory_Step(EOtrajectory *o, float *p, float *v, float *a);
 extern void eo_trajectory_Init(EOtrajectory *o, int32_t p0, int32_t v0, int32_t a0);
 
 /** @fn         extern void eo_trajectory_Abort(EOtrajectory *o)

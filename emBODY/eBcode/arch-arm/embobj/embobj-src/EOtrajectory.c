@@ -17,7 +17,6 @@
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem.h"
 
-extern const int32_t EMS_IFREQUENCY;
 extern const float   EMS_FFREQUENCY;
 extern const float   EMS_PERIOD;
 
@@ -112,15 +111,12 @@ extern void eo_trajectory_Init(EOtrajectory *o, int32_t p0, int32_t v0, int32_t 
     o->a = a0;
 }
 
-extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, uint32_t time_ms, eObool_t reset)
+extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, int32_t avg_vel)
 {
-    if (reset)
-    {
-        o->vel_steps_to_end = 0;
-        o->vf = 0.0f;
-    }
+    o->vel_steps_to_end = 0;
+    o->vf = 0.0f;
 
-    if (!time_ms)
+    if (!avg_vel)
     {
         o->pos_steps_to_end = 0;
         o->pf = o->p;
@@ -139,13 +135,21 @@ extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, uint32_t 
 
     if (!o->vel_steps_to_end) o->pf = p1;
 
-    o->pos_steps_to_end = (time_ms*EMS_IFREQUENCY)/1000;
+    float D = (float)p1-o->p;
 
-    float lbyT = 1000.0f/(float)time_ms;
+    float V = (float)avg_vel;
+
+    if ((D<0.0f) ^ (V<0.0f)) V = -V;
+
+    float T = D/V;
+
+    o->pos_steps_to_end = (int32_t)(T*EMS_FFREQUENCY);
+    
+    float lbyT = 1.0f/T;
     float PbyT = EMS_PERIOD*lbyT;
 
-    float DbyT2 = ((float)p1-o->p)*lbyT*lbyT;
-    float VbyT  = o->v*lbyT; 
+    float DbyT2 = V*lbyT;
+    float VbyT = o->v*lbyT; 
 
     float A3 = ( 120.0f*DbyT2-60.0f*VbyT-10.0f*o->a)*PbyT*PbyT*PbyT;
     float A2 = (-180.0f*DbyT2+96.0f*VbyT+18.0f*o->a)*PbyT*PbyT;
@@ -155,33 +159,53 @@ extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, uint32_t 
     o->Xn = (60.0f*DbyT2-36.0f*VbyT-9.0f*o->a)*PbyT+A2+A3;
 }
 
-extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t v1, uint32_t time_ms, eObool_t reset)
+extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t v1, int32_t avg_acc, eObool_t reset)
 {
+    float D;
+
+    o->vf = (float)v1;
+
     if (reset)
     {
         o->pos_steps_to_end = 0;
-        o->pf = NULL_POSITION;
+
+        D = o->vf-o->v;
+    }
+    else
+    {
+        D = o->vf;
     }
 
-    if (!time_ms)
+    o->pf = NULL_POSITION;
+
+    if (!avg_acc)
     {
         o->vel_steps_to_end = 0;
         o->vf = o->v;
 
         return;
     }
-    
-    o->vf = (float)v1; 
-    
-    o->vel_steps_to_end = (time_ms*EMS_IFREQUENCY)/1000;
+   
+    float A = (float)avg_acc;
 
-    float lbyT = 1000.0f/(float)time_ms;
-    float PbyT = EMS_PERIOD*lbyT;
+    if ((D<0.0f) ^ (A<0.0f)) A = -A;
 
-    float DbyT = (o->vf-o->v)*lbyT;
-    
-    o->Kz = (-12.0f*DbyT+6.0f*o->a)*PbyT*PbyT;
-    o->Zn = (  6.0f*DbyT-4.0f*o->a)*PbyT+0.5f*o->Kz;
+    float T = D/A;   
+   
+    o->vel_steps_to_end = (int32_t)(T*EMS_FFREQUENCY);
+
+    float PbyT = EMS_PERIOD/T;
+
+    if (reset)
+    {
+        o->Kz = (-12.0f*A+6.0f*o->a)*PbyT*PbyT;
+        o->Zn = (  6.0f*A-4.0f*o->a)*PbyT+0.5f*o->Kz;
+    }
+    else
+    {
+        o->Kz = -12.0f*A*PbyT*PbyT;
+        o->Zn =   6.0f*A*PbyT+0.5f*o->Kz;
+    }
 }
 
 extern void eo_trajectory_TimeoutVelReference(EOtrajectory *o)
@@ -220,8 +244,10 @@ extern int32_t eo_trajectory_GetAcc(EOtrajectory* o)
     return (int32_t)o->a;
 }
 
-extern void eo_trajectory_Step(EOtrajectory* o, int32_t *p, int32_t *v, int32_t *a)
+extern int8_t eo_trajectory_Step(EOtrajectory* o, float *p, float *v, float *a)
 {
+    int8_t limit = 0;
+
     if (o->pos_steps_to_end)
     {
         --o->pos_steps_to_end;
@@ -257,22 +283,44 @@ extern void eo_trajectory_Step(EOtrajectory* o, int32_t *p, int32_t *v, int32_t 
         {
             o->p += EMS_PERIOD*o->v;    
         } 
-    } 
+    }        
 
     if (o->p <= o->pos_min)
     { 
         o->p = o->pos_min;
-        o->v = 0.0f;
+        if (o->v < 0.0f) o->v = 0.0f;
+        limit = -1;
     } 
     else if (o->p >= o->pos_max)
     {
         o->p = o->pos_max;
-        o->v = 0.0f;
+        if (o->v > 0.0f) o->v = 0.0f;
+        limit =  1;
     }
 
-    if (a) *a = (int32_t) o->a;
-    if (v) *v = (int32_t) o->v;
-    if (p) *p = (int32_t) o->p;
+    if (a) *a = o->a;
+    if (p) *p = o->p;
+    if (v) *v = o->v;
+
+    /*
+        if (!limit)
+        {
+            int32_t pp = (int32_t)o->p + ((int32_t)o->v)/10;
+
+            if (pp <= o->pos_min)
+            {
+                if (*v < 0) *v = 0;
+                limit = -1;
+            }
+            else if (pp >= o->pos_max)
+            {
+                if (*v > 0) *v = 0;
+                limit =  1;
+            }
+        }
+    */
+
+    return limit;
 }
 
 
