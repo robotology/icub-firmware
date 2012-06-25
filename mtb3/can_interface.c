@@ -21,18 +21,18 @@ extern unsigned int TIMER_VALUE2;
 extern unsigned int _board_ID;
 extern unsigned char board_MODE;
 extern unsigned char new_board_MODE;
-unsigned int board_TIMER;
 extern unsigned int PW_CONTROL; // 0x1B0 for 120 decim
 extern unsigned int TIMER_VALUE;
 extern unsigned int CONFIG_TYPE;
-extern unsigned int SHIFT;
-extern unsigned int SHIFT_THREE;
-extern unsigned int SHIFT_ALL;
-extern unsigned int NOLOAD;
-extern unsigned int ANALOG_ACC;
-extern unsigned int GYRO_ACC;
-extern unsigned int TEMP_COMPENSATION;
-extern unsigned int OLD_SKIN;
+extern unsigned char SHIFT;
+extern unsigned char SHIFT_THREE;
+extern unsigned char SHIFT_ALL;
+extern unsigned char NOLOAD;
+extern unsigned char ANALOG_ACC;
+extern unsigned char DIG_GYRO;
+extern unsigned char DIG_ACC;
+extern unsigned char TEMP_COMPENSATION;
+extern unsigned char OLD_SKIN;
 extern unsigned int TRIANGLE_MASK;
 extern char _additional_info[32];
 extern unsigned int ConValue[2];
@@ -266,7 +266,6 @@ int CAN1_handleRx (unsigned int board_id)
 {
     unsigned int IdTx;
     unsigned int i;
-    //unsigned char prova[8]={1,2,3,4,5,6,7,8};
 
     while (CAN1_getRxbufferIndex()>0)
     {
@@ -465,8 +464,8 @@ int CAN1_handleRx (unsigned int board_id)
 					board_MODE=CALIB;
 					EnableIntT1;
 
-   					if (1==ANALOG_ACC) EnableIntT2;
-   					if (1==GYRO_ACC)   EnableIntT2;
+   					if (ANALOG_ACC || DIG_ACC || DIG_ACC) EnableIntT2;
+   				
 				}
 				break;
 				
@@ -496,10 +495,11 @@ int CAN1_handleRx (unsigned int board_id)
 					//          bit 6:
 					//          bit 7: 
 					
-					ANALOG_ACC  =	CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x01;
-					GYRO_ACC  =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x02)>>1;    
-					TEMP_COMPENSATION =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x04)>>2;
-					OLD_SKIN =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x08)>>3;
+					ANALOG_ACC   = 	 CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x01;
+					DIG_ACC      =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x02)>>1;    
+					DIG_GYRO     =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x04)>>2;   
+					TEMP_COMPENSATION =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x08)>>3;
+					OLD_SKIN =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x10)>>4;
 					
 					if (ANALOG_ACC)
 					{
@@ -507,7 +507,7 @@ int CAN1_handleRx (unsigned int board_id)
 						 T2_Init(TIMER_VALUE2);
     				     ADC_Init();             //Initialize the A/D converter
 					}
-					if (GYRO_ACC)
+					if (DIG_GYRO || DIG_ACC)
 					{
 						 EnableIntT2;
 						 T2_Init(TIMER_VALUE2);

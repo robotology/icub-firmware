@@ -77,6 +77,13 @@
 //  MPLAB 8.76
 //
 
+//  Rev 2.2.0 del 21/06/2012
+//  Added the selection of the triangles to be read with a CAN message for setup
+//  Temperature compensation in local, by means of Thermal pad: p6 and p10      
+//  MPLAB 8.76
+//
+
+
 #include<p30f4011.h>
 #include"can_interface.h"
 #include "AD7147RegMap.h"
@@ -99,9 +106,7 @@
 
 
 
-unsigned int AN2 = 0; //Accelerometer X axes
-unsigned int AN3 = 0; //Accelerometer Y axes
-unsigned int AN4 = 0; //Accelerometer Z axes
+
 // inizializzazione bit di configurazione (p30f4013.h)
 _FOSC(CSW_FSCM_OFF & EC_PLL8); 
   // Clock switching disabled Fail safe Clock Monitor disabled
@@ -133,7 +138,6 @@ void TrianglesInit_all(unsigned char Channel);
 void __attribute__((interrupt, no_auto_psv)) _C1Interrupt(void);  
 
 
-
 //------------------------------------------------------------------------
 //								Global variables
 //------------------------------------------------------------------------
@@ -152,10 +156,10 @@ struct s_eeprom _EEDATA(1) ee_data =
 // Board Configuration image from EEPROM
 struct s_eeprom BoardConfig = {0}; 
 
-
 volatile char flag;
 volatile char flag2;
 unsigned int AD7147Registers[16][12];  //Element[23] = 0x17 = ID register @ 0x17
+int test=0;
 const	unsigned char AD7147_ADD[4]={0x2C,0x2D,0x2E,0x2F};
 typedef unsigned const int __prog__ * FlashAddress; //flsh address 
 unsigned int __attribute__ ((space(prog), aligned(_FLASH_PAGE*2) ))   CapOffset[16][12]={0,0,0,0,0,0,0,0,0,0,0,
@@ -209,34 +213,34 @@ char _additional_info [32]={'T','a','c','t','i','l','e',' ','S','e','n','s','o',
 unsigned int PW_CONTROL= 0x0B0; // 0x1B0 for 128 decim  
 unsigned int TIMER_VALUE=TIMER_SINGLE_256dec; // Timer duration 0x3000=> 40ms
 unsigned int TIMER_VALUE2=0x99;//0xc00;//0x99;//1ms 0xc00;//0xC00; // Timer duration 0xC00=> 10ms
-unsigned int SHIFT=2; //shift of the CDC value for removing the noise
-unsigned int SHIFT_THREE=3;// shift of the CDC value for removing the noise
-unsigned int SHIFT_ALL=4; //shift of the CDC value for removing the noise
-unsigned int NOLOAD=235;
-unsigned int ANALOG_ACC=0; //analog accelerometer, if one 1 messsage is sent every 10ms
-unsigned int GYRO_ACC=0; //gyro e accelerometer of the MMSP 
-unsigned int TEMP_COMPENSATION=0; //if 1 means internal temperature drift compensation 
-unsigned int OLD_SKIN=0; //if =0 means new skin with drift compensation and 10 pads
+unsigned char SHIFT=2; //shift of the CDC value for removing the noise
+unsigned char SHIFT_THREE=3;// shift of the CDC value for removing the noise
+unsigned char SHIFT_ALL=4; //shift of the CDC value for removing the noise
+unsigned char NOLOAD=235;
+unsigned char ANALOG_ACC=0; //analog accelerometer, if one 1 messsage is sent every 10ms
+unsigned char DIG_GYRO=0; //gyro of the MMSP 
+unsigned char DIG_ACC=0; //accelerometer of the MMSP 
+unsigned char TEMP_COMPENSATION=0; //if 1 means internal temperature drift compensation 
+int Tpad_base; //initial value of the Tpad
+int Tpad;      //current value of the Tpad
+int drift;      //current drift
+
+unsigned char OLD_SKIN=0; //if =0 means new skin with drift compensation and 10 pads
 unsigned int TRIANGLE_MASK=0xFF; //all the triangles are enabled for default
-unsigned int CONFIG_TYPE=CONFIG_SINGLE;
-unsigned int ERROR_COUNTER=0; //it counts the errors in reading the triangles.
+unsigned char CONFIG_TYPE=CONFIG_SINGLE;
+unsigned char ERROR_COUNTER=0; //it counts the errors in reading the triangles.
 unsigned char counter=0;
 unsigned int ConValue[2]={0x2200, 0x2200}; //offset of the CDC reading 
 volatile unsigned int PMsgID; //pressure measurement ID 
 unsigned char acc[]={0,0,0,0,0,0,0,0}; //value of the three accelerometers
 unsigned char gyro[]={0,0,0,0,0,0,0,0}; //value of the three gyro
-    unsigned int stagecomplete0[1][1];
-    unsigned int stagecomplete1[1][1];
-    unsigned int stagecomplete2[1][1];
-    unsigned int stagecomplete3[1][1];
+
+unsigned int AN2 = 0; //Analog Accelerometer X axes
+unsigned int AN3 = 0; //Analog Accelerometer Y axes
+unsigned int AN4 = 0; //Analog Accelerometer Z axes
 	tL3GI2COps l3g;
 	tLISI2COps l3a;
-	int gx=0;
-	int gy=0;
-	int gz=0;
-	int ax=0;
-	int ay=0;
-	int az=0;
+
 //
 //------------------------------------------------------------------------------ 
 //								External functions
@@ -251,7 +255,6 @@ extern void ConfigAD7147_ALL(unsigned char Channel, unsigned int i,unsigned int 
 //------------------------------------------------------------------------------
 void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void)
 {
-//	unsigned int m=0;
     flag=1;
  	//		led0=~led0;
     // ServiceAD7147Isr(CH0);
@@ -309,8 +312,12 @@ int main(void)
     unsigned char i,l;
     unsigned int counter;
     unsigned int led_counter;
-    unsigned int result;
-    unsigned int mean; 
+   	int gx=0;
+	int gy=0;
+	int gz=0;
+	int ax=0;
+	int ay=0;
+	int az=0;
    	//
     // EEPROM Data Recovery
     // 
@@ -339,7 +346,7 @@ if (ANALOG_ACC)
 }
 
 
-if (GYRO_ACC)
+if (DIG_GYRO || DIG_ACC)
 {
     T2_Init(TIMER_VALUE2);
 
@@ -427,41 +434,47 @@ if (GYRO_ACC)
 	led0=0;
     for (;;)
     {
-	    if ((GYRO_ACC) && (flag2))
+	    if ((DIG_GYRO || DIG_ACC) && (flag2))
 		{	  
 		flag2=0;  
-	//	L3GInit(l3g);
-	    L3GAxisBurst(&gx, &gy, &gz);  
-	    LISAxisBurst(&ax, &ay, &az);  
-	    gyro[1]=((gx &0xFF00) >>0x8); // axis X
-        gyro[0]=(gx & 0xFF);
-        gyro[3]=((gy &0xFF00) >>0x8); // axis Y
-        gyro[2]=(gy & 0xFF);
-        gyro[5]=((gz &0xFF00) >>0x8); // axis Z
-        gyro[4]=(gz & 0xFF);
-      
-	    acc[1]=((ax &0xFF00) >>0x8); // axis X
-        acc[0]=(ax & 0xFF);
-        acc[3]=((ay &0xFF00) >>0x8); // axis Y
-        acc[2]=(ay & 0xFF);
-        acc[5]=((az &0xFF00) >>0x8); // axis Z
-        acc[4]=(az & 0xFF);
-        
-        while (!CAN1IsTXReady(1));    
-        CAN1SendMessage( (CAN_TX_SID(0x550)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
-                        (CAN_TX_EID(0)) & CAN_NOR_TX_REQ, gyro, 6,1);
+		if (DIG_GYRO)
+		{
+	    	L3GAxisBurst(&gx, &gy, &gz);  
+	    	gyro[0]=((gx &0xFF00) >>0x8); // axis X
+        	gyro[1]=(gx & 0xFF);
+        	gyro[2]=((gy &0xFF00) >>0x8); // axis Y
+        	gyro[3]=(gy & 0xFF);
+        	gyro[4]=((gz &0xFF00) >>0x8); // axis Z
+        	gyro[5]=(gz & 0xFF);
+        	while (!CAN1IsTXReady(2));   
+        	PMsgID=0x600;   
+		    PMsgID |= BoardConfig.EE_CAN_BoardAddress<<4; 
+        	CAN1SendMessage( (CAN_TX_SID(PMsgID)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
+                        (CAN_TX_EID(0)) & CAN_NOR_TX_REQ, gyro, 6,2);
+  		}
+  		if (DIG_ACC)
+		{    	
+      		LISAxisBurst(&ax, &ay, &az);  
+		    acc[0]=((ax &0xFF00) >>0x8); // axis X
+	        acc[1]=(ax & 0xFF);
+	        acc[2]=((ay &0xFF00) >>0x8); // axis Y
+	        acc[3]=(ay & 0xFF);
+	        acc[4]=((az &0xFF00) >>0x8); // axis Z
+	        acc[5]=(az & 0xFF);
+	       	PMsgID=0x500;   
+		    PMsgID |= BoardConfig.EE_CAN_BoardAddress<<4; 
+	        while (!CAN1IsTXReady(1));    
+        	CAN1SendMessage( (CAN_TX_SID(PMsgID)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
+                        (CAN_TX_EID(0)) & CAN_NOR_TX_REQ, acc, 6,1);
+	    }       
        
-        while (!CAN1IsTXReady(2));    
-        CAN1SendMessage( (CAN_TX_SID(0x650)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
-                        (CAN_TX_EID(0)) & CAN_NOR_TX_REQ, acc, 6,2);
+       
 		}     
 		
         if (flag==1)
         {
         	flag=0;
            	i = 0;
-			result=0;
-			mean=0;
 			if (led_counter==20)
 			{
 				led0=~led0;
@@ -469,28 +482,7 @@ if (GYRO_ACC)
 			}	
 			led_counter++;
 			
-#ifdef DEBUG 			
-/// ADC conversion
-		while(i<15)
-        {
-			ConvertADC10();		
-			i=i+1;
-	        while(BusyADC10());
-	        result =ReadADC10(0);
-            ADCON1bits.SAMP = 1;
-			mean=result+mean;
-	        for(l=0;l<10;l++);	
-		}
- 			status[1]=(((mean>>4) &0xFF00) >>0x8); //the value of the analog input
-	        status[0]=(mean>>4) & 0xFF;
-	        status[3]=((counter &0xFF00) >>0x8); // cycle number
-	        status[2]=(counter & 0xFF);
-	        status[5]=((ERROR_COUNTER &0xFF00) >>0x8); // ERRORS in reading the I2C
-	        status[4]=(ERROR_COUNTER & 0xFF);
-	        counter++;
- 	        
- 		    		
-#endif  
+
 
  ////////////////////////////////////////////////////////				
             //debug
@@ -652,18 +644,8 @@ static void ServiceAD7147Isr(unsigned char Channel)
     
     		//Calibration configuration
 	ConfigBuffer[0]=0x8000;//0x8000;//0x220;
-/*		for (i=0;i<nets;i++)
-	    {
-		   ReadViaI2C(CH0,AD7147_ADD[i],STAGE_COMPLETE_LIMIT_INT, 1, stagecomplete0[0],stagecomplete1[0],stagecomplete2[0],stagecomplete3[0], 0);		
-		 //   WriteViaI2C(Channel,AD7147_ADD[i],AMB_COMP_CTRL0,1, ConfigBuffer, AMB_COMP_CTRL0);
-	    }
-	 	
+  
 	    for (i=0;i<nets;i++)
-	    {		
-	    // Added 0x0B because of register remapping
-	       ReadViaI2C(CH0,AD7147_ADD[i],(ADCRESULT_S0+0x0B), 2, AD7147Registers[i],AD7147Registers[i+4],AD7147Registers[i+8],AD7147Registers[i+12], ADCRESULT_S0);
-	    }	    
-*/	    for (i=0;i<nets;i++)
 	    {		
 	    // Added 0x0B because of register remapping
 	       ReadViaI2C(CH0,AD7147_ADD[i],(ADCRESULT_S0+0x0B), 12, AD7147Registers[i],AD7147Registers[i+4],AD7147Registers[i+8],AD7147Registers[i+12], ADCRESULT_S0);
@@ -681,20 +663,13 @@ static void ServiceAD7147Isr(unsigned char Channel)
 void ServiceAD7147Isr_all(unsigned char Channel)
 {
     int i=0;
-    unsigned int stagecomplete0[1];
-    unsigned int stagecomplete1[1];
-    unsigned int stagecomplete2[1];
-    unsigned int stagecomplete3[1];
+
     unsigned int ConfigBuffer[12];
     unsigned int ntriangles=4;
     
     //Calibration configuration
 	ConfigBuffer[AMB_COMP_CTRL0]=0x8000;//0x220;
 
-	    stagecomplete0[0]=0;
-		stagecomplete1[0]=0;
-		stagecomplete2[0]=0;
-		stagecomplete3[0]=0;	
 		//Read ADC Values
 //	    for (i=0;i<4;i++)
 //	    {
@@ -711,10 +686,8 @@ void ServiceAD7147Isr_all(unsigned char Channel)
 void ServiceAD7147Isr_three(unsigned char Channel)
 {
     int i=0;
-    unsigned int ConfigBuffer[12];
      unsigned int ntriangles=4;
     		//Calibration configuration
-	ConfigBuffer[AMB_COMP_CTRL0]=0x8000;//0x220;
 		//Read ADC Values
 	    for (i=0;i<ntriangles;i++)
 	    {		
@@ -805,18 +778,34 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
     unsigned int i,j,error;
     int value; //difference of the current measurement and the initial value (_pCapOffset)
     unsigned int txdata[12];
+
+    unsigned int GAIN[12]={70,96,83,38,38,70, 0,45,77,164,0,77}; //this gains are moltiplied by 128 with respect to matlab
 	int UP_LIMIT, BOT_LIMIT;	
 		error=0;
 		UP_LIMIT=((MAXVAL-NOLOAD)<<SHIFT);
 		BOT_LIMIT=(NOLOAD)<<SHIFT;
+		Tpad_base=_pCapOffset[triangleN][ADCRESULT_S6];
+		Tpad=AD7147Registers[triangleN][ADCRESULT_S6];
+		
+		
 	    for (i=0;i<12;i++)
 	    {
 		    if (((_pCapOffset[triangleN][i]!=0) && ((AD7147Registers[triangleN][ADCRESULT_S0+i]==0))))
 		    {
 			    error=1;
-			    ERROR_COUNTER++;
+			    ERROR_COUNTER++; 
 			}
-			value=(AD7147Registers[triangleN][ADCRESULT_S0+i]-_pCapOffset[triangleN][i]);    
+			test=Tpad;
+			if (Tpad>Tpad_base)
+			{
+			drift=(((Tpad-Tpad_base)>>2)*GAIN[i])>>5;
+			}
+			else
+			{
+			drift=-((((Tpad_base-Tpad)>>2)*GAIN[i])>>5);	
+			}				
+			test=drift;
+			value=(AD7147Registers[triangleN][ADCRESULT_S0+i]-_pCapOffset[triangleN][i])-drift;    
 			
 		    if (value<=-UP_LIMIT) 
 		    {
@@ -875,13 +864,13 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
 			{
 			    data[i]    = (unsigned char)   (txdata[i+6] & 0xFF); //the last 6 bits	
 		 	}
-	//	 	#warning "debug"
+		 	#warning "debug"
 		 	
 	//	 	data[6]=(unsigned char) (ERROR_COUNTER &0xFF);//stagecomplete0[0][0];
-		 //	data[7]=stagecomplete3[0][0];
+		 	data[6]=drift;
 		 //	data[7]= (unsigned char) (ERROR_COUNTER &0xFF);
 		
-		    CAN1_send(PMsgID,1,6,data);
+		    CAN1_send(PMsgID,1,7,data);
 		}
 }
 void FillCanMessages8bit_all(unsigned char Channel,unsigned char triangleN)

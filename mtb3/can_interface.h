@@ -10,12 +10,12 @@
 #define DATA_FRAME                 1
 #define REMOTE_FRAME               0
 
-#define CAN_TX_SOFTWARE_BUFFER_SIZE 64
+#define CAN_TX_SOFTWARE_BUFFER_SIZE 20
 
 #define CURRENT_BOARD_TYPE       5   //SKIN
 
 // CAN RX message buffer
-#define CAN_RX_SOFTWARE_BUFFER_SIZE 10
+#define CAN_RX_SOFTWARE_BUFFER_SIZE 5
 
 
 // unsigned char can1TxEn;

@@ -11,7 +11,7 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall -O3
+ToolArgsString=-g -Wall -O3 -fno-schedule-insns -fno-schedule-insns2
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File001]
@@ -24,7 +24,7 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall -O3
+ToolArgsString=-g -Wall -O3 -fno-schedule-insns -fno-schedule-insns2
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File002]
@@ -37,7 +37,7 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall -O3
+ToolArgsString=-g -Wall -O3 -fno-schedule-insns -fno-schedule-insns2
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File003]
@@ -50,7 +50,7 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall -O3
+ToolArgsString=-g -Wall -O3 -fno-schedule-insns -fno-schedule-insns2
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File004]
@@ -63,7 +63,7 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall -O3
+ToolArgsString=-g -Wall -O3 -fno-schedule-insns -fno-schedule-insns2
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File005]
@@ -76,7 +76,7 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall -O3
+ToolArgsString=-g -Wall -O3 -fno-schedule-insns -fno-schedule-insns2
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File006]
@@ -89,7 +89,7 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall -O3
+ToolArgsString=-g -Wall -O3 -fno-schedule-insns -fno-schedule-insns2
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File007]
@@ -102,7 +102,7 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall -O3
+ToolArgsString=-g -Wall -O3 -fno-schedule-insns -fno-schedule-insns2
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File008]
@@ -115,7 +115,7 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall -O3
+ToolArgsString=-g -Wall -O3 -fno-schedule-insns -fno-schedule-insns2
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File009]
@@ -128,7 +128,7 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall -O3
+ToolArgsString=-g -Wall -O3 -fno-schedule-insns -fno-schedule-insns2
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File010]
@@ -141,7 +141,7 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall -O3
+ToolArgsString=-g -Wall -O3 -fno-schedule-insns -fno-schedule-insns2
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File011]
@@ -154,7 +154,7 @@ LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C30\bin\pic30-gcc.ex
 PPAD=$(BINDIR)|../build/||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
 SOLK=<src>|can_interface.c|can_protocol.c|I2C.c|LED.c|main_V3.c|traps.c|AD7147 - Configuration.c|eeprom.c|timers.c|ADC.c|lis331dlh.c|l3g4200d.c||<obj>||<lib>||<lkr>|p30f4011.gld||
 SuiteArgsString=
-ToolArgsString=-g -Wall -O3
+ToolArgsString=-g -Wall -O3 -fno-schedule-insns -fno-schedule-insns2
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File012]

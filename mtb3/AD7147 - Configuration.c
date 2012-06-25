@@ -19,7 +19,7 @@ void ConfigAD7147_ALL(unsigned char Channel,unsigned int i, unsigned int pw_cont
 
 //Recal of variables from other C files
 //-------------------------------------
-extern const unsigned char AD7147_ADD[32];
+extern const unsigned char AD7147_ADD[4];
 
 //---------------------
 //Function definitions

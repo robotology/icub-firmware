@@ -76,12 +76,12 @@ void L3GAxisRead(int *x, int *y, int *z)
 {
 	char xl,xh,yl,yh,zl,zh;
 
-	yh = (unsigned char) L3GRegRead(L3G_OUT_Y_H);//(L3G_CTRL4);
-	zh = (unsigned char) L3GRegRead(L3G_OUT_Z_H);//(L3G_CTRL2);	
-	xl = (unsigned char) L3GRegRead(L3G_OUT_X_L);//(L3G_STATUS);
-    xh = (unsigned char) L3GRegRead(L3G_OUT_X_H);//(L3G_STATUS);
-    yl = (unsigned char) L3GRegRead(L3G_OUT_Y_L);//(L3G_CTRL3);
-	zl = (unsigned char) L3GRegRead(L3G_OUT_Z_L);//(L3G_CTRL5);
+	yh = (unsigned char) L3GRegRead(L3G_OUT_Y_H);
+	zh = (unsigned char) L3GRegRead(L3G_OUT_Z_H);
+	xl = (unsigned char) L3GRegRead(L3G_OUT_X_L);
+    xh = (unsigned char) L3GRegRead(L3G_OUT_X_H);
+    yl = (unsigned char) L3GRegRead(L3G_OUT_Y_L);
+	zl = (unsigned char) L3GRegRead(L3G_OUT_Z_L);
 		*x = xl | (xh<<8);
 	
 
