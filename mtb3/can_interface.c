@@ -29,6 +29,7 @@ extern unsigned char SHIFT_THREE;
 extern unsigned char SHIFT_ALL;
 extern unsigned char NOLOAD;
 extern unsigned char ANALOG_ACC;
+extern unsigned int ANALOG_ID;
 extern unsigned char DIG_GYRO;
 extern unsigned char DIG_ACC;
 extern unsigned char TEMP_COMPENSATION;
@@ -501,18 +502,6 @@ int CAN1_handleRx (unsigned int board_id)
 					TEMP_COMPENSATION =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x08)>>3;
 					OLD_SKIN =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x10)>>4;
 					
-					if (ANALOG_ACC)
-					{
-						 EnableIntT2;
-						 T2_Init(TIMER_VALUE2);
-    				     ADC_Init();             //Initialize the A/D converter
-					}
-					if (DIG_GYRO || DIG_ACC)
-					{
-						 EnableIntT2;
-						 T2_Init(TIMER_VALUE2);
-
-					}
 					//data[5] each bit represents the enable/disable of the triangle (each board has 16 triangles
 					//        but not all of them are always connected to the board. In this way you can EN/DIS each triangle
 					//        i.e.
@@ -522,8 +511,26 @@ int CAN1_handleRx (unsigned int board_id)
 					
 					TRIANGLE_MASK= ((CANRxBuffer[canRxBufferIndex-1].CAN_data[6])<<0xF) & CANRxBuffer[canRxBufferIndex-1].CAN_data[5];
 
-					//data[7] NU
+					//data[7] time in ms of the accelerometers and gyroscope. From 1 to 255
+					
+					if ((CANRxBuffer[canRxBufferIndex-1].CAN_data[7]) != 0)
+					{
+						TIMER_VALUE2=0x132*CANRxBuffer[canRxBufferIndex-1].CAN_data[7]; 
+					}
+					if (ANALOG_ACC)
+					{
+						 EnableIntT2;
+						 T2_Init(TIMER_VALUE2);
+						 ANALOG_ID=0x500;   
+    					 ANALOG_ID |= (BoardConfig.EE_CAN_BoardAddress<<4); 
+    				     ADC_Init();             //Initialize the A/D converter
+					}
+					if (DIG_GYRO || DIG_ACC)
+					{
+						 EnableIntT2;
+						 T2_Init(TIMER_VALUE2);
 
+					}
 					
 
 					board_MODE=CALIB;

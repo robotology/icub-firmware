@@ -212,12 +212,13 @@ unsigned char new_board_MODE=EIGHT_BITS;
 char _additional_info [32]={'T','a','c','t','i','l','e',' ','S','e','n','s','o','r'};
 unsigned int PW_CONTROL= 0x0B0; // 0x1B0 for 128 decim  
 unsigned int TIMER_VALUE=TIMER_SINGLE_256dec; // Timer duration 0x3000=> 40ms
-unsigned int TIMER_VALUE2=0x99;//0xc00;//0x99;//1ms 0xc00;//0xC00; // Timer duration 0xC00=> 10ms
+unsigned int TIMER_VALUE2=0x132;//0xc00;//0x99;//1ms 0xc00;//0xC00; // Timer duration 0xC00=> 10ms
 unsigned char SHIFT=2; //shift of the CDC value for removing the noise
 unsigned char SHIFT_THREE=3;// shift of the CDC value for removing the noise
 unsigned char SHIFT_ALL=4; //shift of the CDC value for removing the noise
 unsigned char NOLOAD=235;
 unsigned char ANALOG_ACC=0; //analog accelerometer, if one 1 messsage is sent every 10ms
+unsigned int ANALOG_ID=0x550; // default value
 unsigned char DIG_GYRO=0; //gyro of the MMSP 
 unsigned char DIG_ACC=0; //accelerometer of the MMSP 
 unsigned char TEMP_COMPENSATION=0; //if 1 means internal temperature drift compensation 
@@ -235,9 +236,9 @@ volatile unsigned int PMsgID; //pressure measurement ID
 unsigned char acc[]={0,0,0,0,0,0,0,0}; //value of the three accelerometers
 unsigned char gyro[]={0,0,0,0,0,0,0,0}; //value of the three gyro
 
-unsigned int AN2 = 0; //Analog Accelerometer X axes
-unsigned int AN3 = 0; //Analog Accelerometer Y axes
-unsigned int AN4 = 0; //Analog Accelerometer Z axes
+volatile  int AN2 = 0; //Analog Accelerometer X axes
+volatile  int AN3 = 0; //Analog Accelerometer Y axes
+volatile  int AN4 = 0; //Analog Accelerometer Z axes
 	tL3GI2COps l3g;
 	tLISI2COps l3a;
 
@@ -270,14 +271,18 @@ void __attribute__((interrupt, no_auto_psv)) _T2Interrupt(void)
 	flag2=1;
 	if (ANALOG_ACC)
 {
-	    acc[1]=((AN2 &0xFF00) >>0x8); // axis X
-        acc[0]=(AN2 & 0xFF);
-        acc[3]=((AN3 &0xFF00) >>0x8); // axis Y
-        acc[2]=(AN3 & 0xFF);
-        acc[5]=((AN4 &0xFF00) >>0x8); // axis Z
-        acc[4]=(AN4 & 0xFF);
+	//AN2=32767;
+	//AN3=32768;
+//	AN4=-10;
+	    acc[0]=((AN2 &0xFF00) >>0x8); // axis X
+        acc[1]=(AN2 & 0xFF);
+        acc[2]=((AN3 &0xFF00) >>0x8); // axis Y
+        acc[3]=(AN3 & 0xFF);
+        acc[4]=((AN4 &0xFF00) >>0x8); // axis Z
+        acc[5]=(AN4 & 0xFF);
+
         while (!CAN1IsTXReady(1));    
-        CAN1SendMessage( (CAN_TX_SID(0x550)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
+                	CAN1SendMessage( (CAN_TX_SID(ANALOG_ID)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
                         (CAN_TX_EID(0)) & CAN_NOR_TX_REQ, acc, 6,1);
     //executing the sampling of the
      ADCON1bits.SAMP = 1;    
@@ -342,6 +347,8 @@ int main(void)
 if (ANALOG_ACC)
 {
     T2_Init(TIMER_VALUE2);
+    ANALOG_ID=0x500;   
+    ANALOG_ID |= (BoardConfig.EE_CAN_BoardAddress<<4); 
     ADC_Init();             //Initialize the A/D converter
 }
 

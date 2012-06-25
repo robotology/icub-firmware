@@ -56,9 +56,9 @@ Author:  Hrushikesh Vasuki
 #include "p30f4011.h"
 #include "ADC.h"
 #include "LED.h"
-extern  unsigned int AN2; //Accelerometer X axes
-extern  unsigned int AN3; //Accelerometer Y axes
-extern  unsigned int AN4; //Accelerometrt Z axes
+extern   int AN2; //Accelerometer X axes
+extern   int AN3; //Accelerometer Y axes
+extern   int AN4; //Accelerometrt Z axes
 
 //Functions and Variables with Global Scope:
 
