@@ -255,7 +255,7 @@ extern void eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe(uint16_t n, cons
 	FEAT_ID id;
 	id.type = Skin;
 	id.ep = nv->ep;
-	if(nv->ep == endpoint_sk_emsboard_rightlowerarm)
+/*	if(nv->ep == endpoint_sk_emsboard_rightlowerarm)
 	{
 		for(i=0; i<sk_array->head.size; i++)
 		{
@@ -283,6 +283,7 @@ extern void eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe(uint16_t n, cons
 			}
 		}
 	}
+*/
 	//strcpy(id.name, "right_arm");
 	//	weweweqwe;
 	void *featList;
