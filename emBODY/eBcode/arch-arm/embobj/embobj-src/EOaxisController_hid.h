@@ -43,19 +43,11 @@ struct EOaxisController_hid
 {
     EOpid *pidP;
     EOpid *pidC;
-    //EOpid *pidV;
     EOpid *pidT;
 
     EOspeedmeter *speedmeter;
     EOtrajectory *trajectory;
 
-    //EOspeedcurve *speedcurve;
-
-    //int32_t pos_ref;
-    //int32_t vel_ref;
-    //int32_t acc_ref;
-
-    //eObool_t first_run;
     eObool_t is_calibrated;
     int32_t calib_timeout_ms;
     float   calib_max_error;

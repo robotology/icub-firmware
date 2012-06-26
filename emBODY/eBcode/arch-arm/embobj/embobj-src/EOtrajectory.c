@@ -39,8 +39,6 @@ extern const float   EMS_PERIOD;
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-#define NULL_POSITION 0x80000000
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
@@ -78,8 +76,9 @@ extern EOtrajectory* eo_trajectory_New(void)
         o->v = 0.0f;
         o->a = 0.0f;
 
-        o->pf = NULL_POSITION;
+        o->pf = 0.0f;
         o->vf = 0.0f;
+        o->pos_set = eobool_false;
 
         o->Kw = 0.0f;
         o->Wn = 0.0f;
@@ -113,6 +112,7 @@ extern void eo_trajectory_Init(EOtrajectory *o, int32_t p0, int32_t v0, int32_t 
 
 extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, int32_t avg_vel)
 {
+    o->pos_set = eobool_true;
     o->vel_steps_to_end = 0;
     o->vf = 0.0f;
 
@@ -120,22 +120,24 @@ extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, int32_t a
     {
         o->pos_steps_to_end = 0;
         o->pf = o->p;
-        
+ 
         return;    
     }
 
     if (p1 < o->pos_min)
     { 
-        p1 = o->pos_min;
+        o->pf = o->pos_min;
     } 
     else if (p1 > o->pos_max)
     {
-        p1 = o->pos_max;
+        o->pf = o->pos_max;
+    }
+    else
+    {
+        o->pf = p1;
     }
 
-    if (!o->vel_steps_to_end) o->pf = p1;
-
-    float D = (float)p1-o->p;
+    float D = o->pf-o->p;
 
     float V = (float)avg_vel;
 
@@ -164,7 +166,7 @@ extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t v1, int32_t a
     float D;
 
     o->vf = (float)v1;
-
+    
     if (reset)
     {
         o->pos_steps_to_end = 0;
@@ -176,7 +178,7 @@ extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t v1, int32_t a
         D = o->vf;
     }
 
-    o->pf = NULL_POSITION;
+    o->pos_set = eobool_false;
 
     if (!avg_acc)
     {
@@ -222,6 +224,7 @@ extern void eo_trajectory_Stop(EOtrajectory *o, int32_t p)
 
     o->pos_steps_to_end = 0;
     o->vel_steps_to_end = 0;
+    o->pos_set = eobool_true;
 }
 
 extern eObool_t eo_trajectory_IsDone(EOtrajectory* o)
@@ -275,14 +278,14 @@ extern int8_t eo_trajectory_Step(EOtrajectory* o, float *p, float *v, float *a)
         o->a = 0.0f;
         o->v = o->vf;
 
-        if (o->v == 0.0f)
-        { 
-            if (o->pf != NULL_POSITION) o->p = o->pf;
+        if (o->pos_set)
+        {
+            o->p = o->pf;        
         }
         else
         {
-            o->p += EMS_PERIOD*o->v;    
-        } 
+            o->p += EMS_PERIOD*o->v;
+        }
     }        
 
     if (o->p <= o->pos_min)

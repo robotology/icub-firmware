@@ -96,6 +96,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, control_mo
 extern void eo_axisController_SetStiffness(EOaxisController *o, int32_t stiffness);
 
 extern void eo_axisController_SetVelMax(EOaxisController *o, int32_t vel_max);
+extern void eo_axisController_SetVelTimeout(EOaxisController *o, int32_t vel_timeout);
 extern void eo_axisController_SetPosLimits(EOaxisController *o, int32_t pos_min, int32_t pos_max);
 
 extern void eo_axisController_SetOffset(EOaxisController *o, int16_t offset);

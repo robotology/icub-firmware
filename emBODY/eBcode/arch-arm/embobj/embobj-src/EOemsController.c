@@ -223,13 +223,6 @@ extern void eo_emsController_ResetPosPid(uint8_t joint)
     eo_pid_Reset(eo_axisController_GetPosPidPtr(s_emsc->axis_controller[joint]));
 }
 
-/*
-extern void eo_emsController_ResetVelPid(uint8_t joint)
-{
-    eo_pid_Reset(eo_axisController_GetVelPidPtr(s_emsc->axis_controller[joint]));
-}
-*/
-
 extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_t offset, int32_t timeout_ms, int32_t max_error)
 {
     eo_axisController_StartCalibration(s_emsc->axis_controller[joint], pos, offset, timeout_ms, max_error);
@@ -267,18 +260,6 @@ extern void eo_emsController_SetPosPidLimits(uint8_t joint, float Ymax, float Im
     eo_pid_SetPidLimits(eo_axisController_GetPosPidPtr(s_emsc->axis_controller[joint]), Ymax, Imax);    
 }
 
-/*
-extern void eo_emsController_SetVelPid(uint8_t joint, int32_t kp, int32_t kd, int32_t ki, uint8_t shift)
-{
-    eo_pid_SetPid(eo_axisController_GetVelPidPtr(s_emsc->axis_controller[joint]), kp, kd, ki, shift);    
-}
-*/
-/*    
-extern void eo_emsController_SetVelPidLimits(uint8_t joint, int32_t Ymax, int32_t Imax)
-{
-    eo_pid_SetPidLimits(eo_axisController_GetVelPidPtr(s_emsc->axis_controller[joint]), Ymax, Imax);    
-}
-*/
 extern void eo_emsController_SetTrqPid(uint8_t joint, float k, float kd, float ki)
 {
     eo_pid_SetPid(eo_axisController_GetTrqPidPtr(s_emsc->axis_controller[joint]), k, kd, ki);    
@@ -300,6 +281,14 @@ extern void eo_emsController_SetStiffness(uint8_t joint, int32_t stiffness)
 extern void eo_emsController_SetVelMax(uint8_t joint, int32_t vel_max)
 {
     eo_axisController_SetVelMax(s_emsc->axis_controller[joint], vel_max);
+}
+
+extern void eo_emsController_SetVelTimeout(int32_t vel_timeout)
+{
+    for (int joint=0; joint<s_emsc->nmotors; ++joint)
+    {
+        eo_axisController_SetVelTimeout(s_emsc->axis_controller[joint], vel_timeout);
+    }
 }
 
 extern void eo_emsController_SetPosLimits(uint8_t joint, int32_t pos_min, int32_t pos_max)
