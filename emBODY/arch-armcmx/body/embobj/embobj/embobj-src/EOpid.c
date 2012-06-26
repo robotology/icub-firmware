@@ -150,86 +150,6 @@ extern int16_t eo_pid_PWM2(EOpid *o, float En, float Vn)
     return (int16_t)o->pwm;
 }
 
-/*
-extern int16_t eo_pid_PWM2(EOpid *o, int32_t En, int32_t Vn)
-{
-    o->pwm = o->Kp*En+o->Kd*Vn+o->KiIn;
-
-    if (o->pwm >= o->shift_fact_by_2)
-    {
-        o->pwm =  ((o->shift_fact_by_2+o->pwm)>>o->shift);
-
-        if (o->pwm >  o->Ymax) o->pwm =  o->Ymax;        
-    }
-    else if (o-> pwm <= -o->shift_fact_by_2)
-    {
-        o->pwm = -((o->shift_fact_by_2-o->pwm)>>o->shift);
-
-        if (o->pwm < -o->Ymax) o->pwm = -o->Ymax;
-    }
-    else
-    {
-        o->pwm = 0;
-    }
-
-    int32_t KiEn = o->Ki*En;
-
-    if (o->KiIn<0 ^ KiEn<0) o->KiIn += KiEn;
-    
-    o->KiIn += KiEn;
-
-    o->En = En;
-
-    if (o->KiIn > o->Imax_shift) 
-        o->KiIn =  o->Imax_shift;
-    else if (o->KiIn < -o->Imax_shift) 
-        o->KiIn = -o->Imax_shift;
-
-    return (int16_t)o->pwm;
-}
-*/
-
-/*
-extern int16_t eo_pid_PWM(EOpid *o, int32_t En)
-{
-    o->pwm = o->Kp*En+o->Kd*o->Dn+o->KiIn;
-
-    if (o->pwm >= o->shift_fact_by_2)
-    {
-        o->pwm =  ((o->shift_fact_by_2+o->pwm)>>o->shift);
-        
-        if (o->pwm >  o->Ymax) o->pwm =  o->Ymax;        
-    }
-    else if (o-> pwm <= -o->shift_fact_by_2)
-    {
-        o->pwm = -((o->shift_fact_by_2-o->pwm)>>o->shift);
-
-        if (o->pwm < -o->Ymax) o->pwm = -o->Ymax;
-    }
-    else
-    {
-        o->pwm = 0;
-    }
-
-    int32_t KiEn = o->Ki*En;
-
-    if (o->KiIn<0 ^ KiEn<0) o->KiIn += KiEn;
-
-    o->KiIn += KiEn;
-
-    o->Dn = (15*o->Dn+(En-o->En))/16; ///
-
-    o->En = En;
-
-    if (o->KiIn > o->Imax_shift) 
-        o->KiIn =  o->Imax_shift;
-    else if (o->KiIn < -o->Imax_shift) 
-        o->KiIn = -o->Imax_shift;
-
-    return (int16_t)o->pwm;
-}
-*/
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -240,15 +160,6 @@ extern int16_t eo_pid_PWM(EOpid *o, int32_t En)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
-
-static int32_t limit(int32_t val, int32_t lim)
-{
-    if (val >=  lim) return  lim;
-
-    if (val <= -lim) return -lim;
-
-    return val;
-} 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

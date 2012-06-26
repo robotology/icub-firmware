@@ -40,8 +40,10 @@ struct EOtrajectory_hid
     float v;
     float a;
 
-    int32_t pf;
+    float pf;
     float vf;
+
+    eObool_t pos_set;
 
     float Kw;
     float Wn;

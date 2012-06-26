@@ -86,10 +86,9 @@ extern EOaxisController* eo_axisController_New(void)
         o->pidP = eo_pid_New();
         o->pidC = eo_pid_New();
 
-        eo_pid_SetPid(o->pidC, 20.0f, 20.0f, 0.0125f);
-        eo_pid_SetPidLimits(o->pidC, 2000.0f, 500.0f);
+        eo_pid_SetPid(o->pidC, 20.0f, 0.0f, 0.001f);
+        eo_pid_SetPidLimits(o->pidC, 1000.0f, 600.0f);
         
-        //o->pidV = eo_pid_New();
         //o->pidT = eo_pid_New();
         
         o->speedmeter = eo_speedmeter_New(4096); // ticks per revolution
@@ -100,7 +99,7 @@ extern EOaxisController* eo_axisController_New(void)
         o->vel_max = 2048.0f;
 
         o->vel_timer   = 0;
-        o->vel_timeout = 10*EMS_IFREQUENCY;
+        o->vel_timeout = EMS_IFREQUENCY;
 
         ///////////////////////////
         
@@ -153,6 +152,11 @@ extern void eo_axisController_SetVelMax(EOaxisController *o, int32_t vel_max)
     o->vel_max = vel_max;
 }
 
+extern void eo_axisController_SetVelTimeout(EOaxisController *o, int32_t vel_timeout)
+{
+    o->vel_timeout = vel_timeout;
+}
+
 extern void eo_axisController_SetStiffness(EOaxisController *o, int32_t stiffness)
 {
     o->stiffness = stiffness;
@@ -175,16 +179,15 @@ extern int32_t eo_axisController_GetVelocity(EOaxisController *o)
 
 extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_t avg_vel)
 {
-    if (o->control_mode == CM_IDLE || 
-        o->control_mode == CM_TORQUE || 
-        o->control_mode == CM_OPENLOOP) return;
-
     if (!o->is_calibrated) return;
 
-    //if (o->control_mode == CM_IMPEDANCE_VEL) o->control_mode = CM_IMPEDANCE_POS;
-    
     switch (o->control_mode)
     {
+    case CM_IDLE: 
+    case CM_TORQUE: 
+    case CM_OPENLOOP: 
+        return;
+
     case CM_POS_VEL:
     case CM_VELOCITY:
         o->control_mode = CM_POSITION;
@@ -203,16 +206,16 @@ extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_
 
 extern void eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_t avg_acc)
 {
-    if (o->control_mode == CM_IDLE || 
-        o->control_mode == CM_TORQUE || 
-        o->control_mode == CM_OPENLOOP) return;
-
     if (!o->is_calibrated) return;
-
-    //if (o->control_mode == CM_IMPEDANCE_POS) o->control_mode = CM_IMPEDANCE_VEL;
 
     switch (o->control_mode)
     {
+    case CM_IDLE: 
+    case CM_TORQUE: 
+    case CM_OPENLOOP:
+    case CM_CALIB_ABS_POS_SENS:
+        return;
+         
     case CM_POSITION:
         o->control_mode = CM_POS_VEL;
     case CM_POS_VEL:
@@ -241,26 +244,22 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, control_mo
 {
     if (o->control_mode == control_mode) return eobool_true;
 
+    if (!o->is_calibrated) return eobool_false;
+
     switch (control_mode)
     {
         case CM_POSITION:
         {
-            if (o->control_mode == CM_VELOCITY)
-            {
-                eo_pid_Reset(o->pidP);
-                eo_trajectory_SetPosReference(o->trajectory, eo_speedometer_GetDistance(o->speedmeter), 0);            
-            }
-           
+            eo_pid_Reset(o->pidP);
+            eo_trajectory_SetPosReference(o->trajectory, eo_speedometer_GetDistance(o->speedmeter), 0);            
+     
             break;
         }
 
         case CM_VELOCITY:
         {
-            if (o->control_mode == CM_POSITION || o->control_mode == CM_POS_VEL)
-            {
-                eo_pid_Reset(o->pidP);
-                eo_trajectory_SetVelReference(o->trajectory, eo_speedometer_GetVelocity(o->speedmeter), 0, eobool_true); 
-            }
+            eo_pid_Reset(o->pidP);
+            eo_trajectory_SetVelReference(o->trajectory, eo_speedometer_GetVelocity(o->speedmeter), 0, eobool_true); 
 
             break;
         }
@@ -285,11 +284,14 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, int16_t *p
             *err = 0;
             break;
 
+        case CM_POS_VEL:
         case CM_VELOCITY:
-            eo_pid_GetStatus(o->pidP, pwm, err);
-            break;
         case CM_POSITION:
             eo_pid_GetStatus(o->pidP, pwm, err);
+            break;
+
+        case CM_CALIB_ABS_POS_SENS:
+            eo_pid_GetStatus(o->pidC, pwm, err);
             break;
 
         case CM_TORQUE:
@@ -300,7 +302,6 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, int16_t *p
 
 extern int16_t eo_axisController_PWM(EOaxisController *o)
 {
-    /*
     if (o->vel_timer)
     {
         if (!--o->vel_timer)
@@ -308,7 +309,6 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
             eo_trajectory_TimeoutVelReference(o->trajectory);    
         }
     }
-    */
 
     switch (o->control_mode)
     {
@@ -327,7 +327,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
 
             eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref, NULL);
             
-            encoder_can = pos_ref;
+            encoder_can = pos;
             posref_can = pos_ref;           
 
             float err = pos_ref - pos;
@@ -392,13 +392,6 @@ extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o)
     return o->pidP;
 }
 
-/*
-extern EOpid* eo_axisController_GetVelPidPtr(EOaxisController *o)
-{
-    return o->pidV;
-}
-*/
-
 extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o)
 {
     return o->pidT;
@@ -425,29 +418,6 @@ static int32_t limit(int32_t x, int32_t min, int32_t max)
     if (x > max) return max;
     return x;    
 }
-
-/*
-static void check_first_run(EOaxisController *o)
-{
-    if (o->first_run)
-    {
-        o->first_run = eobool_false;
-
-        o->pos_ref = eo_speedometer_GetDistance(o->speedmeter);
-        o->vel_ref = eo_speedometer_GetSpeed(o->speedmeter);
-    }
-}
-*/
-
-/*
-static void compute_torque_ref(EOaxisController *o)
-{
-    float pos_err = o->pos_out - o->encpos_meas;
-    o->torque_damp_lp_filt = 0.9f * o->torque_damp_lp_filt + 0.1f * o->damping * (pos_err - o->torque_last_pos_err);
-    o->torque_last_pos_err = pos_err;
-    o->torque_out = o->torque_off + o->stiffness * pos_err + o->torque_damp_lp_filt;
-}
-*/
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
