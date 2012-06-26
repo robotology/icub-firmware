@@ -83,7 +83,7 @@ typedef enum
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eOemssocket_cfg_t eom_emssocket_DefaultCfg; // = {.inpdatagramnumber = 2, .outdatagramnumber = 1, 
+extern const eOemssocket_cfg_t eom_emssocket_DefaultCfg; // = {.inpdatagramnumber = 3, .outdatagramnumber = 2, 
                                                          //    .datagramsizeof = 768, .localport = 12345, .usemutex = eobool_false};
 
 

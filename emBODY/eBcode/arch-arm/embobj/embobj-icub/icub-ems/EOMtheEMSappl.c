@@ -52,6 +52,8 @@
 
 #include "EOaction_hid.h"
 
+#include "EOMtheEMSapplCfg.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -269,6 +271,8 @@ static void s_eom_emsappl_environment_init(void)
 
 static void s_eom_emsappl_ipnetwork_init(void)
 {
+    
+#if 0
     char str[128];
     eOmipnet_cfg_addr_t* eomipnet_addr = NULL;
     uint8_t *ipaddr = NULL;
@@ -312,13 +316,70 @@ static void s_eom_emsappl_ipnetwork_init(void)
     snprintf(str, sizeof(str)-1, "started EOMtheEMSappl::ipnet with IP addr: %d.%d.%d.%d\n\r", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]);
     eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);
 
+#else
+    
+    EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
+    
+    char str[128];
+    eOmipnet_cfg_addr_t* eomipnet_addr = NULL;
+    uint8_t *ipaddr = NULL;
+    const eEipnetwork_t *ipnet = NULL;
 
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // 2. initialise the parameters for ipnet with params taken from the arm-environment (or from ipal-cfg)
+
+
+
+    // retrieve the configuration for ipnetwork
+// #ifndef _FORCE_NETWORK_FROM_IPAL_CFG
+//     if(eores_OK == eov_env_IPnetwork_Get(eo_armenv_GetHandle(), &ipnet))
+//     {
+//         eomipnet_addr = (eOmipnet_cfg_addr_t*)ipnet;   //they have the same memory layout
+//         ipaddr = (uint8_t*)&(eomipnet_addr->ipaddr);
+//     }
+//     else
+// #endif
+//     {   
+//         ipnet = ipnet;
+//         eomipnet_addr = NULL;
+//         ipaddr = (uint8_t*)&(emscfg->wipnetcfg.ipalcfg->eth_ip);
+//     }
+
+    if((eobool_true == emscfg->getipaddrFROMenvironment) && (eores_OK == eov_env_IPnetwork_Get(eo_armenv_GetHandle(), &ipnet)))
+    {
+        eomipnet_addr = (eOmipnet_cfg_addr_t*)ipnet;   //they have the same memory layout
+        ipaddr = (uint8_t*)&(eomipnet_addr->ipaddr);
+    }
+    else
+    {   
+        ipnet = ipnet;
+        eomipnet_addr = NULL;
+        ipaddr = (uint8_t*)&(emscfg->wipnetcfg.ipalcfg->eth_ip);
+    }
+    
+    // ----------------------------------------------------------------------------------------------------------------
+    // 3. start the ipnet
+
+    eom_ipnet_Initialise(&emscfg->wipnetcfg.ipnetcfg,  //&eom_ipnet_DefaultCfg,
+                         emscfg->wipnetcfg.ipalcfg, //&ipal_cfg, 
+                         eomipnet_addr,
+                         &emscfg->wipnetcfg.dtgskcfg
+                         );
+
+    snprintf(str, sizeof(str)-1, "started EOMtheEMSappl::ipnet with IP addr: %d.%d.%d.%d\n\r", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]);
+    eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);    
+    
+    
+#endif
 }
 
 
 static void s_eom_emsappl_theemssocket_init(void)
 {
-    eom_emssocket_Initialise(NULL);
+    EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
+    
+    eom_emssocket_Initialise(&emscfg->socketcfg);
     
     // i try connection now, so that if the hostaddress does not change, then during transmission we dont do a connect anymore
     eom_emssocket_Connect(eom_emssocket_GetHandle(), s_emsappl_singleton.cfg.hostipv4addr);
@@ -326,27 +387,28 @@ static void s_eom_emsappl_theemssocket_init(void)
 
 static void s_eom_emsappl_theemstransceiver_init(void)
 {
-    eOemstransceiver_cfg_t cfg;
-    cfg.hostipv4addr = s_emsappl_singleton.cfg.hostipv4addr;
-    cfg.hostipv4port = s_emsappl_singleton.cfg.hostipv4port;
-    eom_emstransceiver_Initialise(&cfg);
+    EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
+    eom_emstransceiver_Initialise(&emscfg->transcfg);
 }
 
 
 static void s_eom_emsappl_theemsconfigurator_init(void)
 {
-    eom_emsconfigurator_Initialise(NULL);
+    EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
+    eom_emsconfigurator_Initialise(&emscfg->cfgobjcfg);
 }
 
 
 static void s_eom_emsappl_theemserror_init(void)
 {
-    eom_emserror_Initialise(NULL);
+    EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
+    eom_emserror_Initialise(&emscfg->errobjcfg);
 }
 
 static void s_eom_emsppl_theemsrunner_init(void)
 {
-    eom_emsrunner_Initialise(NULL);
+    EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
+    eom_emsrunner_Initialise(&emscfg->runobjcfg);
 }
 
 

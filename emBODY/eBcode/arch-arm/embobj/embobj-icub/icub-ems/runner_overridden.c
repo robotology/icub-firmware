@@ -103,7 +103,14 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
         eom_emsrunner_StopAndGoTo(eom_emsrunner_GetHandle(), eo_sm_emsappl_EVgo2cfg);
     } 
     
-
+    static uint32_t totalcalled = 0;
+    
+    totalcalled++;
+    
+    if(2 == totalreceived)
+    {
+        eom_emsrunner_SetMode(p, eo_emsrunner_mode_softrealtime);
+    }
     
     
     if(0 == (xxxcount % 10))
@@ -111,6 +118,12 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
         //s_xxx_delay(600);
         //s_xxx_delay(200);
     }
+    else
+    {
+        s_xxx_delay(300);
+    }
+    
+
 
     
 }
@@ -145,7 +158,7 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 //         s_xxx_delay(100);
 //     }
     
-    s_xxx_delay(100);
+    s_xxx_delay(100+150);
 #endif    
     //     
 //     //for(i=0; i<1000*2; i++)
@@ -168,7 +181,7 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
     if(0 == (xxxcount % 20))
     {
         //s_xxx_delay(3500);
-        s_xxx_delay(300);
+        s_xxx_delay(150);
 //         s_xxx_delay(50);
 //         s_xxx_delay(50);
 //         s_xxx_delay(50);
