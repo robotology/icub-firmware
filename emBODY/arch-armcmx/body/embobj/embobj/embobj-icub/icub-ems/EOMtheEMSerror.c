@@ -68,7 +68,7 @@
 
 const eOemserror_cfg_t eom_emserror_DefaultCfg = 
 {
-    EO_INIT(.taskpriority)             50, 
+    EO_INIT(.taskpriority)             40, 
     EO_INIT(.taskstacksize)            512
 };
 

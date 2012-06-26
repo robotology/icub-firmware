@@ -75,6 +75,7 @@ struct EOMtheEMSrunner_hid
     uint16_t            numoftxpackets;
     uint16_t            numoftxrops;
     eOemsrunner_mode_t  mode;
+    uint8_t             numofpacketsinsidesocket;
     osal_semaphore_t*   waitudptxisdone;
     osal_task_t*        osaltaskipnetexec;
 };
@@ -118,6 +119,8 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
 
 
 extern void eom_emsrunner_hid_userdef_onexecutionoverflow(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid);
+
+extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunner *p);
 
 
 // - inline functions

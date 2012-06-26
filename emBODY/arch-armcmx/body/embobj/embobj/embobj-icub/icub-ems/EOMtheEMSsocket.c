@@ -61,7 +61,7 @@
 const eOemssocket_cfg_t eom_emssocket_DefaultCfg = 
 {
     EO_INIT(.inpdatagramnumber)         3, 
-    EO_INIT(.outdatagramnumber)         1, 
+    EO_INIT(.outdatagramnumber)         2, 
     EO_INIT(.inpdatagramsizeof)         768, 
     EO_INIT(.outdatagramsizeof)         1024,
     EO_INIT(.localport)                 12345, 

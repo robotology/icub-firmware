@@ -87,7 +87,7 @@ const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg =
 {
     EO_INIT(.taskpriority)              {250,   251,    252},  
     EO_INIT(.taskstacksize)             {1024,  1024,   1024},
-    EO_INIT(.period)                    1000, //500, 
+    EO_INIT(.period)                    1000,  
     EO_INIT(.execRXafter)               0, 
     EO_INIT(.safeRXexecutiontime)       300,
     EO_INIT(.execDOafter)               400, 
@@ -96,7 +96,7 @@ const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg =
     EO_INIT(.safeTXexecutiontime)       250,    
     EO_INIT(.maxnumofRXpackets)         3,
     EO_INIT(.maxnumofTXpackets)         1,
-    EO_INIT(.modeatstartup)             eo_emsrunner_mode_softrealtime //eo_emsrunner_mode_besteffort //eo_emsrunner_mode_softrealtime
+    EO_INIT(.modeatstartup)             eo_emsrunner_mode_besteffort, //eo_emsrunner_mode_softrealtime //eo_emsrunner_mode_besteffort //eo_emsrunner_mode_softrealtime
 };
 
 
@@ -147,7 +147,7 @@ static EOMtheEMSrunner s_theemsrunner =
     EO_INIT(.osaltimer)             NULL,
     EO_INIT(.cycleisrunning)        eobool_false,
     EO_INIT(.safeDurationExpired)   {eobool_false, eobool_false, eobool_false},
-    EO_INIT(.overflownToNextTask)    {eobool_false, eobool_false, eobool_false},
+    EO_INIT(.overflownToNextTask)   {eobool_false, eobool_false, eobool_false},
     EO_INIT(.haltimer_start)        {hal_timer2, hal_timer3, hal_timer4},
     EO_INIT(.haltimer_alert)        {hal_timer5, hal_timer6, hal_timer7},
     EO_INIT(.numofrxpackets)        0,  
@@ -155,6 +155,7 @@ static EOMtheEMSrunner s_theemsrunner =
     EO_INIT(.numoftxpackets)        0,
     EO_INIT(.numoftxrops)           0,
     EO_INIT(.mode)                  eo_emsrunner_mode_softrealtime,
+    EO_INIT(.numofpacketsinsidesocket) 0,
     EO_INIT(.waitudptxisdone)       NULL,
     EO_INIT(.osaltaskipnetexec)     NULL
 };
@@ -192,10 +193,14 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
 
     
     s_theemsrunner.cycleisrunning = eobool_false; 
-    s_theemsrunner.mode = cfg->modeatstartup; 
+    
+    eom_emsrunner_SetMode(&s_theemsrunner, cfg->modeatstartup);
+    
     s_theemsrunner.event = eo_sm_emsappl_EVdummy;
     
     s_theemsrunner.osaltimer = osal_timer_new();
+    
+    s_theemsrunner.numofpacketsinsidesocket = 0;
     
     s_theemsrunner.waitudptxisdone = osal_semaphore_new(255, 0);
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_theemsrunner.osaltimer), s_eobj_ownname, "osaltimer is NULL");
@@ -278,7 +283,12 @@ extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
     {   // compute it only once in life
         EOMtask * taskipnetexec = eom_ipnet_GetTask(eom_ipnet_GetHandle(), eomipnet_task_proc);
         p->osaltaskipnetexec = taskipnetexec->osaltask;
-    }    
+    } 
+
+    
+    p->numofpacketsinsidesocket = 0;      
+    p->mode = p->cfg.modeatstartup;    
+    osal_semaphore_set(s_theemsrunner.waitudptxisdone, 0);
     
 
     s_eom_emsrunner_6HALTIMERS_start_oneshotosalcbk_for_rxdotx_cycle(&s_theemsrunner);
@@ -339,6 +349,8 @@ extern eOresult_t eom_emsrunner_SetMode(EOMtheEMSrunner *p, eOemsrunner_mode_t m
     
 
     s_theemsrunner.mode = mode;
+    
+    eo_errman_Assert(eo_errman_GetHandle(), (eo_emsrunner_mode_hardrealtime != mode), s_eobj_ownname, "eo_emsrunner_mode_hardrealtime requires a change of policy in the parsing of a ropframe");
  
     
     return(eores_OK);
@@ -400,6 +412,8 @@ __weak extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramrecep
     {
         itissafetoquit_asap =  eobool_true;
     } 
+    
+    itissafetoquit_asap = itissafetoquit_asap;
 
     // if itissafetoquit_asap then ... do nothing or very little.
 }
@@ -462,7 +476,9 @@ __weak extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramrecept
     if(eobool_false == eom_runner_hid_cansafelyexecute(p, eo_emsrunner_taskid_runRX))
     {
         itissafetoquit_asap =  eobool_true;
-    }   
+    } 
+
+    itissafetoquit_asap = itissafetoquit_asap;   
     
     // if itissafetoquit_asap then ... do nothing or very little.    
 }
@@ -474,7 +490,9 @@ __weak extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
     if(eobool_false == eom_runner_hid_cansafelyexecute(p, eo_emsrunner_taskid_runDO))
     {
         itissafetoquit_asap =  eobool_true;
-    }   
+    } 
+
+    itissafetoquit_asap = itissafetoquit_asap;    
 
     // if itissafetoquit_asap then ... do nothing or very little.
 }
@@ -504,6 +522,8 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtrans
     {
         itissafetoquit_asap =  eobool_true;
     }   
+
+    itissafetoquit_asap = itissafetoquit_asap;
     
     // if itissafetoquit_asap then ... do nothing or very little.       
 }
@@ -517,18 +537,21 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmissio
     uint16_t processedpkts = 0;
     eObool_t processtransmission = eobool_true;
     
+
+    
     // evaluate if we can enter in the transmission loop
-    if((0 == p->cfg.maxnumofTXpackets) || (eobool_false == eom_runner_hid_cansafelyexecute(p, eo_emsrunner_taskid_runTX)))
+    //if((0 == p->cfg.maxnumofTXpackets) || (eobool_false == eom_runner_hid_cansafelyexecute(p, eo_emsrunner_taskid_runTX)))
+    if(0 == p->cfg.maxnumofTXpackets)
     {
         processtransmission = eobool_false;
     }     
     
         
-    // the transmission loop
-    while(eobool_true == processtransmission)
+    // the transmission section
+    if(eobool_true == processtransmission)
     {
         eOresult_t resformer;
-        //eOresult_t restx;
+        eOresult_t restx;
         
         // 1. process one packet        
         processedpkts++;   
@@ -540,9 +563,17 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmissio
         if(eores_OK == resformer)
         {
             //restx = 
-            eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
-            p->numoftxrops += numberoftxrops;
-            p->numoftxpackets++;
+            restx = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
+            if(eores_OK == restx)
+            {
+                p->numoftxrops += numberoftxrops;
+                p->numoftxpackets++;
+                p->numofpacketsinsidesocket++;
+            }
+            else
+            {
+                eom_emsrunner_hid_userdef_onfailedtransmission(p);
+            }
         }
 
         // 2. evaluate quit from the loop
@@ -563,7 +594,9 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransm
     if(eobool_false == eom_runner_hid_cansafelyexecute(p, eo_emsrunner_taskid_runTX))
     {
         itissafetoquit_asap =  eobool_true;
-    }   
+    } 
+
+    itissafetoquit_asap = itissafetoquit_asap;
     
     // if itissafetoquit_asap then ... do nothing or very little.       
 }
@@ -579,23 +612,36 @@ __weak extern void eom_emsrunner_hid_userdef_onexecutionoverflow(EOMtheEMSrunner
 }
 
 
+__weak extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunner *p)
+{
+    char str[48];
+    eOerrmanErrorType_t errortype = (eo_emsrunner_mode_hardrealtime == p->mode) ? (eo_errortype_fatal) : (eo_errortype_warning);
+    snprintf(str, sizeof(str)-1, "failed to tx a packet, possibly because socket is full"); 
+    eo_errman_Error(eo_errman_GetHandle(), errortype, s_eobj_ownname, str); 
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
 static eObool_t s_eom_emsrunner_timing_is_compatible(const eOemsrunner_cfg_t *cfg)
 {
-    // verify that the cfg has timing that are compatible ... d2>d1+gap, period > d1+d2+gap
-    #warning --> add code which verifies cfg->period, cfg->execDOafter etc... 
-//    ((cfg->execRXafter+cfg->safeRXexecutiontime) < cfg->execDOafter)
-//    ((cfg->execDOafter+cfg->safeDOexecutiontime) < cfg->execTXafter)
-//    ((cfg->execTXafter+cfg->safeTXexecutiontime) < cfg->period)
+    // verify that the cfg has timing that are compatible ... 
+    eObool_t timingisok = eobool_true;
     
-//    (cfg->safeRXexecutiontime > 0)
-//    (cfg->safeDOexecutiontime > 0)  
-//    (cfg->safeTXexecutiontime > 0)
+    if(((cfg->execRXafter+cfg->safeRXexecutiontime)  >= cfg->execDOafter)   ||
+       ((cfg->execDOafter+cfg->safeDOexecutiontime) >= cfg->execTXafter)    ||
+       ((cfg->execTXafter+cfg->safeTXexecutiontime) >= cfg->period)         ||
+       (cfg->safeRXexecutiontime == 0)                                      ||                                                                
+       (cfg->safeDOexecutiontime == 0)                                      ||
+       (cfg->safeTXexecutiontime == 0)                                      
+      )
+      {
+            timingisok = eobool_false;
+      }
+
+    return(timingisok);
     
-    return(eobool_true);
 }
 
 
@@ -688,23 +734,42 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
     s_theemsrunner.numoftxpackets = 0;
     
     //eov_ipnet_Activate(eov_ipnet_GetHandle());
-    
+
+#if 0    
 //    if(eobool_true == eom_runner_hid_cansafelyexecute(&s_theemsrunner, eo_emsrunner_taskid_runTX))
     if(1) // always execute the transmission
     {
         eom_emsrunner_hid_userdef_taskTX_activity(&s_theemsrunner);
         
-        if(0 != s_theemsrunner.numoftxpackets)
+        if(0 != s_theemsrunner.numofpacketsinsidesocket)
         {
             uint8_t i;            
-            for(i=0; i<s_theemsrunner.numoftxpackets; i++)
+            for(i=0; i<s_theemsrunner.numofpacketsinsidesocket; i++)
             {   // must decrement a number of times equal to the number of pkts given to the socket    
                 osal_semaphore_decrement(s_theemsrunner.waitudptxisdone, osal_reltimeINFINITE);
             }
+            s_theemsrunner.numofpacketsinsidesocket = 0;
         }
         
     }
+#else
+
+    eom_emsrunner_hid_userdef_taskTX_activity(&s_theemsrunner);
     
+    for(;;)
+    {
+        if((0 == s_theemsrunner.numofpacketsinsidesocket) || (eobool_false == eom_runner_hid_cansafelyexecute(&s_theemsrunner, eo_emsrunner_taskid_runTX)))
+        {
+            break;
+        }
+        
+        osal_semaphore_decrement(s_theemsrunner.waitudptxisdone, osal_reltimeINFINITE);
+        s_theemsrunner.numofpacketsinsidesocket--;
+    }
+
+
+
+#endif    
     //eov_ipnet_Deactivate(eov_ipnet_GetHandle());
     
     
