@@ -36,27 +36,33 @@ extern "C" {
  
 struct EOtrajectory_hid 
 {
-    float p;
-    float v;
-    float a;
+    float Pn;
+    float Vn;
+    float An;
 
-    float pf;
-    float vf;
+    float Pf;
+    float Vf;
 
-    eObool_t pos_set;
-
-    float Kw;
-    float Wn;
+    float Ky;
+    float Yn;
     float Xn;
-
-    float Kz;
-    float Zn;
 
     int32_t pos_steps_to_end;
     int32_t vel_steps_to_end;
 
     float pos_min;
     float pos_max;
+    float vel_max;
+
+
+    eObool_t boost;
+    float boostVf;
+    float boostPn;
+    float boostVn;
+    float boostAn;
+    float boostKy;
+    float boostYn;
+    int32_t boost_steps_to_end;
 }; 
 
 

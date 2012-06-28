@@ -110,8 +110,7 @@ extern void eo_emsController_SetTrqPid(uint8_t joint, float kp, float kd, float 
 extern void eo_emsController_SetTrqPidLimits(uint8_t joint, float Ymax, float Imax);
 
 extern void eo_emsController_SetStiffness(uint8_t joint, int32_t stiffeness);
-extern void eo_emsController_SetPosLimits(uint8_t joint, int32_t pos_min, int32_t pos_max);
-extern void eo_emsController_SetVelMax(uint8_t joint, int32_t vel_max);
+extern void eo_emsController_SetLimits(uint8_t joint, int32_t pos_min, int32_t pos_max, int32_t vel_max);
 extern void eo_emsController_SetVelTimeout(int32_t vel_timeout);
 
 

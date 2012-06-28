@@ -278,11 +278,6 @@ extern void eo_emsController_SetStiffness(uint8_t joint, int32_t stiffness)
     eo_axisController_SetStiffness(s_emsc->axis_controller[joint], stiffness);
 }
 
-extern void eo_emsController_SetVelMax(uint8_t joint, int32_t vel_max)
-{
-    eo_axisController_SetVelMax(s_emsc->axis_controller[joint], vel_max);
-}
-
 extern void eo_emsController_SetVelTimeout(int32_t vel_timeout)
 {
     for (int joint=0; joint<s_emsc->nmotors; ++joint)
@@ -291,9 +286,9 @@ extern void eo_emsController_SetVelTimeout(int32_t vel_timeout)
     }
 }
 
-extern void eo_emsController_SetPosLimits(uint8_t joint, int32_t pos_min, int32_t pos_max)
+extern void eo_emsController_SetLimits(uint8_t joint, int32_t pos_min, int32_t pos_max, int32_t vel_max)
 {
-    eo_axisController_SetPosLimits(s_emsc->axis_controller[joint], pos_min, pos_max);
+    eo_axisController_SetLimits(s_emsc->axis_controller[joint], pos_min, pos_max, vel_max);
 }
 
 // --------------------------------------------------------------------------------------------------------------------

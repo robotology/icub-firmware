@@ -37,7 +37,8 @@ extern const float   EMS_PERIOD;
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+#define LIMIT(min, x, max) if (x < (min)) x = (min); else if (x > (max)) x = (max); 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -72,159 +73,171 @@ extern EOtrajectory* eo_trajectory_New(void)
 
     if (o)
     {
-        o->p = 0.0f;
-        o->v = 0.0f;
-        o->a = 0.0f;
+        o->Pn = 0.0f;
+        o->Vn = 0.0f;
+        o->An = 0.0f;
 
-        o->pf = 0.0f;
-        o->vf = 0.0f;
-        o->pos_set = eobool_false;
+        o->Pf = 0.0f;
+        o->Vf = 0.0f;
 
-        o->Kw = 0.0f;
-        o->Wn = 0.0f;
+        o->Ky = 0.0f;
+        o->Yn = 0.0f;
         o->Xn = 0.0f;
-
-        o->Kz = 0.0f;
-        o->Zn = 0.0f;
 
         o->pos_steps_to_end = 0;
         o->vel_steps_to_end = 0;
 
         o->pos_min =    0;
         o->pos_max = 4095;
+        o->vel_max = 2048;
+
+        o->boost = eobool_false;
+        o->boostVf = 0.0f;
+        o->boostPn = 0.0f;
+        o->boostVn = 0.0f;
+        o->boostAn = 0.0f;
+        o->boostKy = 0.0f;
+        o->boostYn = 0.0f;
+        o->boost_steps_to_end = 0;
     }
 
     return o;
 }
 
-extern void eo_trajectory_SetLimits(EOtrajectory *o, int32_t pos_min, int32_t pos_max)
+extern void eo_trajectory_SetLimits(EOtrajectory *o, int32_t pos_min, int32_t pos_max, int32_t vel_max)
 {
     o->pos_min = pos_min;
     o->pos_max = pos_max;
+    o->vel_max = vel_max;
 }
 
 extern void eo_trajectory_Init(EOtrajectory *o, int32_t p0, int32_t v0, int32_t a0)
 {
-    o->p = p0;
-    o->v = v0;
-    o->a = a0;
+    o->Pn = p0;
+    o->Vn = v0;
+    o->An = a0;
 }
 
 extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, int32_t avg_vel)
 {
-    o->pos_set = eobool_true;
     o->vel_steps_to_end = 0;
-    o->vf = 0.0f;
+    o->pos_set = eobool_true;
+    o->Vf = 0.0f;
 
     if (!avg_vel)
     {
         o->pos_steps_to_end = 0;
-        o->pf = o->p;
- 
+        o->Pf = o->Pn;
         return;    
     }
 
-    if (p1 < o->pos_min)
-    { 
-        o->pf = o->pos_min;
-    } 
-    else if (p1 > o->pos_max)
-    {
-        o->pf = o->pos_max;
-    }
-    else
-    {
-        o->pf = p1;
-    }
+    o->Pf = (float)p1;
 
-    float D = o->pf-o->p;
+    LIMIT(o->pos_min, o->Pf, o->pos_max)
 
-    float V = (float)avg_vel;
+    float D = o->Pf-o->Pn;
 
-    if ((D<0.0f) ^ (V<0.0f)) V = -V;
+    float Va = (float)avg_vel;
 
-    float T = D/V;
+    if ((D<0.0f) ^ (Va<0.0f)) Va = -Va;
+
+    float T = D/Va;
 
     o->pos_steps_to_end = (int32_t)(T*EMS_FFREQUENCY);
     
     float lbyT = 1.0f/T;
     float PbyT = EMS_PERIOD*lbyT;
 
-    float DbyT2 = V*lbyT;
-    float VbyT = o->v*lbyT; 
+    float DbyT2 =    Va*lbyT;
+    float VbyT  = o->Vn*lbyT; 
 
-    float A3 = ( 120.0f*DbyT2-60.0f*VbyT-10.0f*o->a)*PbyT*PbyT*PbyT;
-    float A2 = (-180.0f*DbyT2+96.0f*VbyT+18.0f*o->a)*PbyT*PbyT;
+    float A3 = ( 120.0f*DbyT2-60.0f*VbyT-10.0f*o->An)*PbyT*PbyT*PbyT;
+    float A2 = (-180.0f*DbyT2+96.0f*VbyT+18.0f*o->An)*PbyT*PbyT;
 
-    o->Kw = 6.0f*A3;
-    o->Wn = 2.0f*A2+o->Kw;
-    o->Xn = (60.0f*DbyT2-36.0f*VbyT-9.0f*o->a)*PbyT+A2+A3;
+    o->Ky = 6.0f*A3;
+    o->Yn = 2.0f*A2+o->Ky;
+    o->Xn = (60.0f*DbyT2-36.0f*VbyT-9.0f*o->An)*PbyT+A2+A3;
 }
 
-extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t v1, int32_t avg_acc, eObool_t reset)
+extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t v1, int32_t avg_acc)
 {
-    float D;
-
-    o->vf = (float)v1;
-    
-    if (reset)
-    {
-        o->pos_steps_to_end = 0;
-
-        D = o->vf-o->v;
-    }
-    else
-    {
-        D = o->vf;
-    }
-
-    o->pos_set = eobool_false;
+    o->pos_steps_to_end = 0;
 
     if (!avg_acc)
     {
         o->vel_steps_to_end = 0;
-        o->vf = o->v;
-
+        o->Vf = o->Vn;
         return;
     }
+
+    o->Vf = (float)v1;
+
+    LIMIT(-o->vel_max, o->Vf, o->vel_max)
+
+    float D = o->Vf-o->Vn;
    
-    float A = (float)avg_acc;
+    float Aa = (float)avg_acc;
 
-    if ((D<0.0f) ^ (A<0.0f)) A = -A;
+    if ((D<0.0f) ^ (Aa<0.0f)) Aa = -Aa;
 
-    float T = D/A;   
+    float T = D/Aa;   
    
     o->vel_steps_to_end = (int32_t)(T*EMS_FFREQUENCY);
 
     float PbyT = EMS_PERIOD/T;
 
-    if (reset)
+    o->Ky = (-12.0f*Aa+6.0f*o->An)*PbyT*PbyT;
+    o->Yn = (  6.0f*Aa-4.0f*o->An)*PbyT+0.5f*o->Ky;
+}
+
+extern void eo_trajectory_AddVelReference(EOtrajectory *o, int32_t v1, int32_t avg_acc)
+{
+    o->boost = eobool_true;
+
+    if (!avg_acc)
     {
-        o->Kz = (-12.0f*A+6.0f*o->a)*PbyT*PbyT;
-        o->Zn = (  6.0f*A-4.0f*o->a)*PbyT+0.5f*o->Kz;
+        o->boost_steps_to_end = 0;
+        o->boostVf = o->boostVn;
+        return;
     }
-    else
-    {
-        o->Kz = -12.0f*A*PbyT*PbyT;
-        o->Zn =   6.0f*A*PbyT+0.5f*o->Kz;
-    }
+
+    o->boostVf = (float)v1;
+
+    LIMIT(-o->vel_max, o->boostVf, o->vel_max)
+
+    float D = o->boostVf-o->boostVn;
+   
+    float Aa = (float)avg_acc;
+
+    if ((D<0.0f) ^ (Aa<0.0f)) Aa = -Aa;
+
+    float T = D/Aa;   
+   
+    o->boost_steps_to_end = (int32_t)(T*EMS_FFREQUENCY);
+
+    float PbyT = EMS_PERIOD/T;
+
+    o->boostKy = (-12.0f*Aa+6.0f*o->boostAn)*PbyT*PbyT;
+    o->boostYn = (  6.0f*Aa-4.0f*o->boostAn)*PbyT+0.5f*o->boostKy;
 }
 
 extern void eo_trajectory_TimeoutVelReference(EOtrajectory *o)
 {
-    o->vel_steps_to_end = 0;
-    o->vf = 0.0f;
+    o->boost = eobool_false;
+    o->Pn += o->boostPn;
+    o->Pf += o->boostPn;
+    o->boostPn = 0.0f;
+    o->boostVn = 0.0f;
+    o->boostAn = 0.0f;
 }
 
 extern void eo_trajectory_Stop(EOtrajectory *o, int32_t p)
 {
-    o->pf = o->p = p;
-    o->vf = o->v = 0;
-    o->a = 0;
-
     o->pos_steps_to_end = 0;
     o->vel_steps_to_end = 0;
-    o->pos_set = eobool_true;
+
+    o->Pf = (float)p;
+    o->Vf = 0.0f;
 }
 
 extern eObool_t eo_trajectory_IsDone(EOtrajectory* o)
@@ -234,95 +247,114 @@ extern eObool_t eo_trajectory_IsDone(EOtrajectory* o)
 
 extern int32_t eo_trajectory_GetPos(EOtrajectory* o)
 {
-    return (int32_t)o->p;
+    return (int32_t)o->Pn;
 }
 
 extern int32_t eo_trajectory_GetVel(EOtrajectory* o)
 {
-    return (int32_t)o->v;
+    return (int32_t)o->Vn;
 }
 
 extern int32_t eo_trajectory_GetAcc(EOtrajectory* o)
 {
-    return (int32_t)o->a;
+    return (int32_t)o->An;
 }
 
-extern int8_t eo_trajectory_Step(EOtrajectory* o, float *p, float *v, float *a)
+extern int8_t eo_trajectory_Step(EOtrajectory* o, float *p, float *v)
 {
-    int8_t limit = 0;
-
     if (o->pos_steps_to_end)
     {
         --o->pos_steps_to_end;
 
-        o->a  += o->Xn;
-        o->Xn += o->Wn;
-        o->Wn += o->Kw;   
+        o->An += o->Xn;
+        o->Xn += o->Yn;
+        o->Yn += o->Ky;
+        
+        o->Vn += EMS_PERIOD*o->An;
+        o->Pn += EMS_PERIOD*o->Vn;   
     }
-
-    if (o->vel_steps_to_end)
+    else if (o->vel_steps_to_end)
     {
         --o->vel_steps_to_end;
 
-        o->a  += o->Zn;
-        o->Zn += o->Kz; 
-    }
+        o->An += o->Yn;
+        o->Yn += o->Ky;
 
-    if (o->vel_steps_to_end || o->pos_steps_to_end)
-    {
-        o->v += EMS_PERIOD*o->a;
-        o->p += EMS_PERIOD*o->v; 
+        o->Vn += EMS_PERIOD*o->An;
+        o->Pn += EMS_PERIOD*o->Vn;
+
+        o->Pf = o->Pn; 
     }
     else
     {
-        o->a = 0.0f;
-        o->v = o->vf;
-
         if (o->pos_set)
         {
-            o->p = o->pf;        
+            if (o->Vf != 0.0f) o->Pf += EMS_PERIOD*o->Vf;
+            o->Vn = o->Vf;        
+            o->Pn = o->Pf;
         }
         else
         {
-            o->p += EMS_PERIOD*o->v;
+            
         }
-    }        
-
-    if (o->p <= o->pos_min)
-    { 
-        o->p = o->pos_min;
-        if (o->v < 0.0f) o->v = 0.0f;
-        limit = -1;
-    } 
-    else if (o->p >= o->pos_max)
-    {
-        o->p = o->pos_max;
-        if (o->v > 0.0f) o->v = 0.0f;
-        limit =  1;
     }
 
-    if (a) *a = o->a;
-    if (p) *p = o->p;
-    if (v) *v = o->v;
+    int8_t limit = 0;
 
-    /*
-        if (!limit)
+    if (o->Pn < o->pos_min)
+    {
+        o->pos_steps_to_end = 0;
+        o->vel_steps_to_end = 0;
+
+        o->Pf = o->Pn = o->pos_min;
+        o->Vf = o->Vn = o->An = 0.0f;
+
+        limit = -1;
+    }
+
+    if (o->Pn > o->pos_max)
+    {
+        o->pos_steps_to_end = 0;
+        o->vel_steps_to_end = 0;
+
+        o->Pf = o->Pn = o->pos_max;
+        o->Vf = o->Vn = o->An = 0.0f;
+
+        limit =  1;
+    }
+    
+    if (o->boost)
+    {
+        o->pos_set = eobool_false;
+
+        if (o->boost_steps_to_end)
         {
-            int32_t pp = (int32_t)o->p + ((int32_t)o->v)/10;
+            --o->boost_steps_to_end;
 
-            if (pp <= o->pos_min)
-            {
-                if (*v < 0) *v = 0;
-                limit = -1;
-            }
-            else if (pp >= o->pos_max)
-            {
-                if (*v > 0) *v = 0;
-                limit =  1;
-            }
+            o->boostAn += o->boostYn;
+            o->boostYn += o->boostKy;
+
+            o->boostVn += EMS_PERIOD*o->boostAn;
+            o->boostPn += EMS_PERIOD*o->boostVn;
         }
-    */
+        else
+        {
+            if (o->boostVf != 0.0f) o->boostPn += EMS_PERIOD*o->boostVf;
+        
+            o->boostVn = o->boostVf;        
+        }
 
+        *p = (int32_t)(o->Pn+o->boostPn);
+        *v = (int32_t)(o->Vn+o->boostVn);
+
+        LIMIT((int32_t)o->pos_min, *p, (int32_t)o->pos_max)
+    }
+    else
+    {
+        *p = (int32_t)o->Pn;
+        *v = (int32_t)o->Vn;
+    }
+   
     return limit;
 }
 

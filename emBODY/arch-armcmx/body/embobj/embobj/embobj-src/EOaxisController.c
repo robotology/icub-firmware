@@ -99,7 +99,7 @@ extern EOaxisController* eo_axisController_New(void)
         o->vel_max = 2048.0f;
 
         o->vel_timer   = 0;
-        o->vel_timeout = EMS_IFREQUENCY;
+        o->vel_timeout = EMS_IFREQUENCY*5;
 
         ///////////////////////////
         
@@ -139,17 +139,13 @@ extern void eo_axisController_StartCalibration(EOaxisController *o, int32_t pos,
     eo_trajectory_SetPosReference(o->trajectory, pos, 1024);
 }
 
-extern void eo_axisController_SetPosLimits(EOaxisController *o, int32_t pos_min, int32_t pos_max)
+extern void eo_axisController_SetLimits(EOaxisController *o, int32_t pos_min, int32_t pos_max, int32_t vel_max)
 {
     o->pos_min = pos_min;
     o->pos_max = pos_max;
-
-    eo_trajectory_SetLimits(o->trajectory, pos_min, pos_max);
-}
-
-extern void eo_axisController_SetVelMax(EOaxisController *o, int32_t vel_max)
-{
     o->vel_max = vel_max;
+
+    eo_trajectory_SetLimits(o->trajectory, pos_min, pos_max, vel_max);
 }
 
 extern void eo_axisController_SetVelTimeout(EOaxisController *o, int32_t vel_timeout)
@@ -188,9 +184,9 @@ extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_
     case CM_OPENLOOP: 
         return;
 
-    case CM_POS_VEL:
     case CM_VELOCITY:
         o->control_mode = CM_POSITION;
+    case CM_POS_VEL:
     case CM_POSITION:
     case CM_CALIB_ABS_POS_SENS:
         eo_trajectory_SetPosReference(o->trajectory, pos, avg_vel);
@@ -220,11 +216,11 @@ extern void eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_
         o->control_mode = CM_POS_VEL;
     case CM_POS_VEL:
         o->vel_timer = o->vel_timeout;
-        eo_trajectory_SetVelReference(o->trajectory, limit(vel, -o->vel_max, o->vel_max), avg_acc, eobool_false);
+        eo_trajectory_AddVelReference(o->trajectory, limit(vel, -o->vel_max, o->vel_max), avg_acc);
         break;
-    
+
     case CM_VELOCITY:
-        eo_trajectory_SetVelReference(o->trajectory, limit(vel, -o->vel_max, o->vel_max), avg_acc, eobool_true);
+        eo_trajectory_SetVelReference(o->trajectory, limit(vel, -o->vel_max, o->vel_max), avg_acc);
         break;
         
     case CM_IMPEDANCE_POS:
@@ -259,7 +255,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, control_mo
         case CM_VELOCITY:
         {
             eo_pid_Reset(o->pidP);
-            eo_trajectory_SetVelReference(o->trajectory, eo_speedometer_GetVelocity(o->speedmeter), 0, eobool_true); 
+            eo_trajectory_SetVelReference(o->trajectory, eo_speedometer_GetVelocity(o->speedmeter), 0); 
 
             break;
         }
@@ -306,7 +302,12 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
     {
         if (!--o->vel_timer)
         {
-            eo_trajectory_TimeoutVelReference(o->trajectory);    
+            eo_trajectory_TimeoutVelReference(o->trajectory);
+
+            if (o->control_mode == CM_POS_VEL)
+            {
+                o->control_mode = CM_POSITION;
+            }    
         }
     }
 
@@ -325,7 +326,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
             float pos_ref;
             float vel_ref;
 
-            eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref, NULL);
+            eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref);
             
             encoder_can = pos;
             posref_can = pos_ref;           
@@ -362,13 +363,13 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
             float pos_ref;
             float vel_ref;
 
-            if (eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref, NULL))
+            if (eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref))
             {
                 // position limit reached
                 //eo_pid_Reset(o->pidP);
             }
 
-            encoder_can = vel_ref;
+            encoder_can = pos;
             posref_can = pos_ref;
 
             return eo_pid_PWM2(o->pidP, pos_ref - pos, vel_ref - vel);
