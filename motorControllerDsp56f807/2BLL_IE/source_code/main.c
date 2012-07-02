@@ -34,7 +34,7 @@
 byte	_board_ID = 16;	
 char    _additional_info [32];
 UInt8    mainLoopOVF=0;
-word    _build_number = 50;
+word    _build_number = 60;
 int     _countBoardStatus[2] ={0,0};
 Int16   _flash_version=0; 
 UInt8   BUS_OFF=false;
@@ -451,7 +451,7 @@ void main(void)
 				motPosWindow[headMotPos[i]][i]=_motor_position[i];
 				_motor_speed[i] = ((motPosWindow[headMotPos[i]][i] - motPosWindow[tailMotPos[i]][i] ));
 				_motor_speed[i] <<= _motVel_est_shift[i];
-				_motor_speed[i] = (Int32)(_motor_speed[i]) / divMotPos[i];
+				_motor_speed[i] = (_motor_speed[i]) / divMotPos[i];
 				headMotPos[i]=headMotPos[i]+1; if(headMotPos[i]>=winSizeMax) headMotPos[i]=0;				
 			}
 		}
