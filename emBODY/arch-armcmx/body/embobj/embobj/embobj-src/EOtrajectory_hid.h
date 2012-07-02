@@ -53,7 +53,7 @@ struct EOtrajectory_hid
     float pos_min;
     float pos_max;
     float vel_max;
-
+    float avg_vel;
 
     eObool_t boost;
     float boostVf;
