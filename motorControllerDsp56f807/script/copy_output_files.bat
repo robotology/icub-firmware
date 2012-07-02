@@ -85,7 +85,7 @@ copy /Y ..\2BLLDC\output\*.out.S ..\..\build\
 ECHO.
 ECHO copio da \4DC a build
 copy /Y ..\4DC\output\*.out.S ..\..\build\
-goto end
+ECHO.
 ECHO copio da \2BLL_IE a build
 copy /Y ..\2BLL_IE\output\*.out.S ..\..\build\
 goto end
@@ -101,7 +101,7 @@ copy /Y ..\2BLLDC\output\*.out.S ..\..\build_testing\
 ECHO.
 ECHO copio da \4DC a build_testing
 copy /Y ..\4DC\output\*.out.S ..\..\build_testing\
-goto end
+ECHO.
 ECHO copio da \2BLL_IE a build_testing
 copy /Y ..\2BLL_IE\output\*.out.S ..\..\build_testing\
 goto end
