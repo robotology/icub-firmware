@@ -99,7 +99,7 @@ extern EOaxisController* eo_axisController_New(void)
         o->vel_max = 2048.0f;
 
         o->vel_timer   = 0;
-        o->vel_timeout = EMS_IFREQUENCY*5;
+        o->vel_timeout = EMS_IFREQUENCY;
 
         ///////////////////////////
         
@@ -129,6 +129,7 @@ extern EOaxisController* eo_axisController_New(void)
 extern void eo_axisController_StartCalibration(EOaxisController *o, int32_t pos, int32_t offset, int32_t timeout_ms, int32_t max_error)
 {
     eo_speedometer_EncoderCalibrate(o->speedmeter, offset);
+
     eo_trajectory_Init(o->trajectory, eo_speedometer_GetDistance(o->speedmeter), eo_speedometer_GetVelocity(o->speedmeter), 0);
 
     o->control_mode = CM_CALIB_ABS_POS_SENS;
@@ -219,6 +220,9 @@ extern void eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_
         eo_trajectory_AddVelReference(o->trajectory, limit(vel, -o->vel_max, o->vel_max), avg_acc);
         break;
 
+    //case CM_POSITION:
+        //o->control_mode = CM_VELOCITY;
+        //eo_trajectory_StopBoost(o->trajectory);
     case CM_VELOCITY:
         eo_trajectory_SetVelReference(o->trajectory, limit(vel, -o->vel_max, o->vel_max), avg_acc);
         break;
@@ -255,6 +259,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, control_mo
         case CM_VELOCITY:
         {
             eo_pid_Reset(o->pidP);
+            eo_trajectory_StopBoost(o->trajectory);
             eo_trajectory_SetVelReference(o->trajectory, eo_speedometer_GetVelocity(o->speedmeter), 0); 
 
             break;
@@ -385,7 +390,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
 
 extern void eo_axisController_Stop(EOaxisController *o)
 {
-    eo_trajectory_Stop(o->trajectory, eo_speedometer_GetDistance(o->speedmeter));
+    eo_trajectory_Stop(o->trajectory);
 }
 
 extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o)
