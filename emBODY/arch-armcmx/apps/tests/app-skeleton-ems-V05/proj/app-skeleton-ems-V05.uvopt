@@ -184,70 +184,6 @@
           <ExecCommand></ExecCommand>
           <Expression>\\udpnode\../app_extra/eom_applprotoc_extra.c\265</Expression>
         </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>202</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>C:\firmware_repo\emBODY\any-arch\sys\embobj\prot\src\EOrop.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>486</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>C:\firmware_repo\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V05\app_extra\EOMappTheSysController.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>175</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>C:\firmware_repo\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V05\cfg\icub-nvscfg-usrcbk\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>4</Number>
-          <Type>0</Type>
-          <LineNumber>112</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>C:\firmware_repo\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V05\cfg\icub-nvscfg-usrcbk\eOcfg_nvsEP_sk_usrcbk_ebx.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
       </Breakpoint>
       <WatchWindow1>
         <Ww>
@@ -523,70 +459,6 @@
           <ExecCommand></ExecCommand>
           <Expression>\\udpnode\../app_basic/eom_appSkeletonEms_main.c\198</Expression>
         </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>202</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>C:\firmware_repo\emBODY\any-arch\sys\embobj\prot\src\EOrop.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>486</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>C:\firmware_repo\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V05\app_extra\EOMappTheSysController.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>4</Number>
-          <Type>0</Type>
-          <LineNumber>175</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>C:\firmware_repo\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V05\cfg\icub-nvscfg-usrcbk\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>5</Number>
-          <Type>0</Type>
-          <LineNumber>112</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>C:\firmware_repo\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V05\cfg\icub-nvscfg-usrcbk\eOcfg_nvsEP_sk_usrcbk_ebx.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
       </Breakpoint>
       <WatchWindow1>
         <Ww>
@@ -766,7 +638,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ULP2CM3</Key>
-          <Name>-UP1123199 -O206 -S12 -C0 -N00("ARM CoreSight SW-DP") -D00(1BA01477) -L00(0) -TO12290 -TC72000000 -TP8 -TDX0 -TDD0 -TDS8007 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_CL -FS08000000 -FL040000</Name>
+          <Name>-UP1123199 -O206 -S12 -C0 -N00("ARM CoreSight SW-DP") -D00(1BA01477) -L00(0) -TO45059 -TC72000000 -TP8 -TDX0 -TDD0 -TDS8007 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_CL -FS08000000 -FL040000</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -799,72 +671,7 @@
           <Name>-UV0153FBE -O14 -S0 -C0 -N00("ARM CoreSight JTAG-DP") -D00(3BA00477) -L00(4) -N01("Unknown JTAG device") -D01(06418041) -L01(5) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_CL -FS08000000 -FL040000</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>202</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>C:\firmware_repo\emBODY\any-arch\sys\embobj\prot\src\EOrop.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>486</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>C:\firmware_repo\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V05\app_extra\EOMappTheSysController.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>175</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>C:\firmware_repo\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V05\cfg\icub-nvscfg-usrcbk\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>112</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>C:\firmware_repo\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V05\cfg\icub-nvscfg-usrcbk\eOcfg_nvsEP_sk_usrcbk_ebx.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-      </Breakpoint>
+      <Breakpoint/>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -880,6 +687,16 @@
           <count>2</count>
           <WinNumber>1</WinNumber>
           <ItemText>addrcfg</ItemText>
+        </Ww>
+        <Ww>
+          <count>3</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>str</ItemText>
+        </Ww>
+        <Ww>
+          <count>4</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>remainingMsg</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>
@@ -923,7 +740,7 @@
         <aLa>0</aLa>
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
-        <aSer4>0</aSer4>
+        <aSer4>1</aSer4>
         <StkLoc>0</StkLoc>
         <TrcWin>0</TrcWin>
         <newCpu>0</newCpu>
@@ -945,10 +762,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>28</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>166</TopLine>
-      <CurrentLine>185</CurrentLine>
+      <TopLine>1</TopLine>
+      <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_basic\eom_appSkeletonEms_body.c</PathWithFileName>
       <FilenameWithoutPath>eom_appSkeletonEms_body.c</FilenameWithoutPath>
@@ -994,10 +811,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>9</ColumnNumber>
+      <ColumnNumber>42</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>1074</TopLine>
+      <CurrentLine>1095</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOappCanServicesProvider.c</PathWithFileName>
       <FilenameWithoutPath>EOappCanServicesProvider.c</FilenameWithoutPath>
@@ -1036,7 +853,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>36</ColumnNumber>
+      <ColumnNumber>8</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -1050,10 +867,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>24</ColumnNumber>
+      <ColumnNumber>30</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>252</TopLine>
+      <CurrentLine>270</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOMappDataCollector.c</PathWithFileName>
       <FilenameWithoutPath>EOMappDataCollector.c</FilenameWithoutPath>
@@ -1064,10 +881,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>19</ColumnNumber>
+      <ColumnNumber>16</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>248</TopLine>
+      <CurrentLine>261</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOMappDataTransmitter.c</PathWithFileName>
       <FilenameWithoutPath>EOMappDataTransmitter.c</FilenameWithoutPath>
@@ -1078,7 +895,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>36</ColumnNumber>
+      <ColumnNumber>43</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -1092,10 +909,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>29</ColumnNumber>
+      <ColumnNumber>77</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>541</TopLine>
-      <CurrentLine>544</CurrentLine>
+      <TopLine>856</TopLine>
+      <CurrentLine>877</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOMappTheSysController.c</PathWithFileName>
       <FilenameWithoutPath>EOMappTheSysController.c</FilenameWithoutPath>
@@ -1104,7 +921,7 @@
 
   <Group>
     <GroupName>app-cfg</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -1115,7 +932,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>22</TopLine>
+      <TopLine>25</TopLine>
       <CurrentLine>30</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\cfg\app\app_cfg.c</PathWithFileName>
@@ -1139,7 +956,7 @@
 
   <Group>
     <GroupName>abslayer-lib</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -1230,7 +1047,7 @@
 
   <Group>
     <GroupName>abslayer-cfg</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -1281,10 +1098,10 @@
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>24</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>1</TopLine>
+      <CurrentLine>13</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\cfg\abslayer\hal_cfg.h</PathWithFileName>
       <FilenameWithoutPath>hal_cfg.h</FilenameWithoutPath>
@@ -1295,10 +1112,10 @@
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>20</ColumnNumber>
+      <ColumnNumber>10</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>28</TopLine>
-      <CurrentLine>16</CurrentLine>
+      <TopLine>1</TopLine>
+      <CurrentLine>15</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\cfg\abslayer\ipal_cfg.h</PathWithFileName>
       <FilenameWithoutPath>ipal_cfg.h</FilenameWithoutPath>
@@ -1680,10 +1497,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>34</ColumnNumber>
+      <ColumnNumber>20</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>1142</TopLine>
+      <CurrentLine>1148</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src\EOMtheIPnet.c</PathWithFileName>
       <FilenameWithoutPath>EOMtheIPnet.c</FilenameWithoutPath>
@@ -1892,7 +1709,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>178</TopLine>
+      <TopLine>181</TopLine>
       <CurrentLine>196</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOreceiver.c</PathWithFileName>
@@ -1906,7 +1723,7 @@
       <Focus>0</Focus>
       <ColumnNumber>58</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>193</TopLine>
+      <TopLine>196</TopLine>
       <CurrentLine>200</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOrop.c</PathWithFileName>
@@ -1920,7 +1737,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>369</TopLine>
+      <TopLine>372</TopLine>
       <CurrentLine>379</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOropframe.c</PathWithFileName>
@@ -1948,7 +1765,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>201</TopLine>
+      <TopLine>204</TopLine>
       <CurrentLine>210</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtheAgent.c</PathWithFileName>
@@ -1976,7 +1793,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>98</TopLine>
+      <TopLine>101</TopLine>
       <CurrentLine>108</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtheParser.c</PathWithFileName>
@@ -1990,7 +1807,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>144</TopLine>
+      <TopLine>147</TopLine>
       <CurrentLine>156</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtransceiver.c</PathWithFileName>
@@ -2002,10 +1819,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>5</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>359</TopLine>
+      <CurrentLine>368</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtransmitter.c</PathWithFileName>
       <FilenameWithoutPath>EOtransmitter.c</FilenameWithoutPath>
@@ -2088,7 +1905,7 @@
       <Focus>0</Focus>
       <ColumnNumber>67</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>166</TopLine>
+      <TopLine>170</TopLine>
       <CurrentLine>186</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps\eOcfg_EPs_eb4.c</PathWithFileName>
@@ -2096,13 +1913,13 @@
     </File>
     <File>
       <GroupNumber>12</GroupNumber>
-      <FileNumber>0</FileNumber>
+      <FileNumber>78</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>70</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>183</TopLine>
+      <TopLine>186</TopLine>
       <CurrentLine>202</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps\eOcfg_EPs_eb2.c</PathWithFileName>
@@ -2112,12 +1929,12 @@
 
   <Group>
     <GroupName>eo-nvs-cfg-ep-mn</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>13</GroupNumber>
-      <FileNumber>78</FileNumber>
+      <FileNumber>79</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2131,13 +1948,13 @@
     </File>
     <File>
       <GroupNumber>13</GroupNumber>
-      <FileNumber>79</FileNumber>
+      <FileNumber>80</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>27</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>171</TopLine>
+      <TopLine>174</TopLine>
       <CurrentLine>175</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn_comm_usr.c</PathWithFileName>
@@ -2145,7 +1962,7 @@
     </File>
     <File>
       <GroupNumber>13</GroupNumber>
-      <FileNumber>80</FileNumber>
+      <FileNumber>81</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2159,7 +1976,7 @@
     </File>
     <File>
       <GroupNumber>13</GroupNumber>
-      <FileNumber>81</FileNumber>
+      <FileNumber>82</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2173,7 +1990,7 @@
     </File>
     <File>
       <GroupNumber>13</GroupNumber>
-      <FileNumber>82</FileNumber>
+      <FileNumber>83</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2194,7 +2011,7 @@
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>14</GroupNumber>
-      <FileNumber>83</FileNumber>
+      <FileNumber>84</FileNumber>
       <FileType>4</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2210,12 +2027,12 @@
 
   <Group>
     <GroupName>eo-nvs-cfg-mc-any</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>15</GroupNumber>
-      <FileNumber>84</FileNumber>
+      <FileNumber>85</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2229,7 +2046,7 @@
     </File>
     <File>
       <GroupNumber>15</GroupNumber>
-      <FileNumber>85</FileNumber>
+      <FileNumber>86</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2243,7 +2060,7 @@
     </File>
     <File>
       <GroupNumber>15</GroupNumber>
-      <FileNumber>86</FileNumber>
+      <FileNumber>87</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2257,7 +2074,7 @@
     </File>
     <File>
       <GroupNumber>15</GroupNumber>
-      <FileNumber>87</FileNumber>
+      <FileNumber>88</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2271,7 +2088,7 @@
     </File>
     <File>
       <GroupNumber>15</GroupNumber>
-      <FileNumber>88</FileNumber>
+      <FileNumber>89</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2285,7 +2102,7 @@
     </File>
     <File>
       <GroupNumber>15</GroupNumber>
-      <FileNumber>89</FileNumber>
+      <FileNumber>90</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2299,7 +2116,7 @@
     </File>
     <File>
       <GroupNumber>15</GroupNumber>
-      <FileNumber>90</FileNumber>
+      <FileNumber>91</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2320,7 +2137,7 @@
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>16</GroupNumber>
-      <FileNumber>91</FileNumber>
+      <FileNumber>92</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2334,7 +2151,7 @@
     </File>
     <File>
       <GroupNumber>16</GroupNumber>
-      <FileNumber>92</FileNumber>
+      <FileNumber>93</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2350,12 +2167,12 @@
 
   <Group>
     <GroupName>eo-nvs-cfg-mc-lowerarm</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>17</GroupNumber>
-      <FileNumber>93</FileNumber>
+      <FileNumber>94</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2369,7 +2186,7 @@
     </File>
     <File>
       <GroupNumber>17</GroupNumber>
-      <FileNumber>94</FileNumber>
+      <FileNumber>95</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2385,12 +2202,12 @@
 
   <Group>
     <GroupName>eo-nvs-cfg-sk</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>18</GroupNumber>
-      <FileNumber>95</FileNumber>
+      <FileNumber>96</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2404,7 +2221,7 @@
     </File>
     <File>
       <GroupNumber>18</GroupNumber>
-      <FileNumber>96</FileNumber>
+      <FileNumber>97</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2418,7 +2235,7 @@
     </File>
     <File>
       <GroupNumber>18</GroupNumber>
-      <FileNumber>97</FileNumber>
+      <FileNumber>98</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2434,12 +2251,12 @@
 
   <Group>
     <GroupName>eo-nvs-cf-usrcbk-dependOnAppl</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>19</GroupNumber>
-      <FileNumber>98</FileNumber>
+      <FileNumber>99</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2453,13 +2270,13 @@
     </File>
     <File>
       <GroupNumber>19</GroupNumber>
-      <FileNumber>99</FileNumber>
+      <FileNumber>100</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>19</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>149</TopLine>
+      <TopLine>135</TopLine>
       <CurrentLine>136</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\cfg\icub-nvscfg-usrcbk\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</PathWithFileName>
@@ -2467,7 +2284,7 @@
     </File>
     <File>
       <GroupNumber>19</GroupNumber>
-      <FileNumber>100</FileNumber>
+      <FileNumber>101</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2488,11 +2305,11 @@
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>20</GroupNumber>
-      <FileNumber>101</FileNumber>
+      <FileNumber>102</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>14</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -2502,7 +2319,7 @@
     </File>
     <File>
       <GroupNumber>20</GroupNumber>
-      <FileNumber>102</FileNumber>
+      <FileNumber>103</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2523,7 +2340,7 @@
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>21</GroupNumber>
-      <FileNumber>103</FileNumber>
+      <FileNumber>104</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2537,14 +2354,14 @@
     </File>
     <File>
       <GroupNumber>21</GroupNumber>
-      <FileNumber>104</FileNumber>
+      <FileNumber>105</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>47</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>224</TopLine>
+      <CurrentLine>237</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\cfg\icub-can-net\eOcfg_emsCanNetworkTopology_eb4.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_emsCanNetworkTopology_eb4.c</FilenameWithoutPath>
@@ -2558,7 +2375,7 @@
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>22</GroupNumber>
-      <FileNumber>105</FileNumber>
+      <FileNumber>106</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2572,7 +2389,7 @@
     </File>
     <File>
       <GroupNumber>22</GroupNumber>
-      <FileNumber>106</FileNumber>
+      <FileNumber>107</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2586,7 +2403,7 @@
     </File>
     <File>
       <GroupNumber>22</GroupNumber>
-      <FileNumber>107</FileNumber>
+      <FileNumber>108</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2600,7 +2417,7 @@
     </File>
     <File>
       <GroupNumber>22</GroupNumber>
-      <FileNumber>108</FileNumber>
+      <FileNumber>109</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2614,11 +2431,11 @@
     </File>
     <File>
       <GroupNumber>22</GroupNumber>
-      <FileNumber>109</FileNumber>
+      <FileNumber>110</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>19</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -2628,7 +2445,7 @@
     </File>
     <File>
       <GroupNumber>22</GroupNumber>
-      <FileNumber>110</FileNumber>
+      <FileNumber>111</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2644,12 +2461,12 @@
 
   <Group>
     <GroupName>eo-motioncontrol</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>23</GroupNumber>
-      <FileNumber>111</FileNumber>
+      <FileNumber>112</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2663,11 +2480,11 @@
     </File>
     <File>
       <GroupNumber>23</GroupNumber>
-      <FileNumber>112</FileNumber>
+      <FileNumber>113</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>15</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -2677,7 +2494,7 @@
     </File>
     <File>
       <GroupNumber>23</GroupNumber>
-      <FileNumber>113</FileNumber>
+      <FileNumber>114</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2691,7 +2508,7 @@
     </File>
     <File>
       <GroupNumber>23</GroupNumber>
-      <FileNumber>114</FileNumber>
+      <FileNumber>115</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2705,7 +2522,7 @@
     </File>
     <File>
       <GroupNumber>23</GroupNumber>
-      <FileNumber>115</FileNumber>
+      <FileNumber>116</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2719,7 +2536,7 @@
     </File>
     <File>
       <GroupNumber>23</GroupNumber>
-      <FileNumber>116</FileNumber>
+      <FileNumber>117</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2733,7 +2550,7 @@
     </File>
     <File>
       <GroupNumber>23</GroupNumber>
-      <FileNumber>117</FileNumber>
+      <FileNumber>118</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2754,7 +2571,7 @@
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>24</GroupNumber>
-      <FileNumber>118</FileNumber>
+      <FileNumber>119</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2768,7 +2585,7 @@
     </File>
     <File>
       <GroupNumber>24</GroupNumber>
-      <FileNumber>119</FileNumber>
+      <FileNumber>120</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2782,7 +2599,7 @@
     </File>
     <File>
       <GroupNumber>24</GroupNumber>
-      <FileNumber>120</FileNumber>
+      <FileNumber>121</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2796,7 +2613,7 @@
     </File>
     <File>
       <GroupNumber>24</GroupNumber>
-      <FileNumber>121</FileNumber>
+      <FileNumber>122</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2810,7 +2627,7 @@
     </File>
     <File>
       <GroupNumber>24</GroupNumber>
-      <FileNumber>122</FileNumber>
+      <FileNumber>123</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2824,7 +2641,7 @@
     </File>
     <File>
       <GroupNumber>24</GroupNumber>
-      <FileNumber>123</FileNumber>
+      <FileNumber>124</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2838,7 +2655,7 @@
     </File>
     <File>
       <GroupNumber>24</GroupNumber>
-      <FileNumber>124</FileNumber>
+      <FileNumber>125</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2852,7 +2669,7 @@
     </File>
     <File>
       <GroupNumber>24</GroupNumber>
-      <FileNumber>125</FileNumber>
+      <FileNumber>126</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2866,7 +2683,7 @@
     </File>
     <File>
       <GroupNumber>24</GroupNumber>
-      <FileNumber>126</FileNumber>
+      <FileNumber>127</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2880,7 +2697,7 @@
     </File>
     <File>
       <GroupNumber>24</GroupNumber>
-      <FileNumber>127</FileNumber>
+      <FileNumber>128</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>

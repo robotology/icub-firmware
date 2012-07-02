@@ -55,6 +55,8 @@ struct EOappCanSP_hid
 {
     EOicubCanProto  *icubCanProto_ptr;
     EOemsCanNetTopo *emsCanNetTopo_ptr;
+    uint8_t         newrecframe_port2;
+    uint8_t         newrecframe_port1;
 };
 
 

@@ -116,7 +116,7 @@
 //   <o> Size of DMA TX buffers  <1=> One frame  <2=> Two frames <3=> Three frames <4=> Four frames
 //   <i> One ETH frame is 1536 bytes
 #ifndef HAL_ETH_DMA_TX_BUF
- #define HAL_ETH_DMA_TX_BUF  2     
+ #define HAL_ETH_DMA_TX_BUF  1     
 #endif
 
 
@@ -158,9 +158,9 @@
 #endif
 
 
-//   <o> Max can frames in input buffer <1-16>
+//   <o> Max can frames in input buffer <1-30>
 //   <i> Default: 4
-#define HAL_CAN2_INPBUFFCAPACITY     10
+#define HAL_CAN2_INPBUFFCAPACITY     24
 
 //   <o> Max can frames in output buffer <1-16>
 //   <i> Default: 4
@@ -174,7 +174,7 @@
 // <i> SPI1 peripheral
 
 #ifndef HAL_SPI1_ENABLE
- #define HAL_SPI1_ENABLE  1     
+ #define HAL_SPI1_ENABLE  0     
 #endif
 
 //   <h> Nothing to configure in SPI1 part

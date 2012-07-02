@@ -255,7 +255,7 @@ extern eOresult_t eo_appCanSP_ConfigMc4(EOappCanSP *p);
  **/
 extern eOresult_t eo_appCanSP_Config2foc(EOappCanSP *p);
 
-
+extern void eo_appCanSP_ResetCanFifo(EOappCanSP *p);
 /** @}            
     end of group eo_app_canServicesProvider
  **/

@@ -35,6 +35,7 @@
 //sys
 #include "stdlib.h"
 #include "string.h"
+#include "stdio.h"
 
 //abs
 #include "hal.h"
@@ -43,6 +44,7 @@
 //embobj
 #include "EoCommon.h"
 #include "EOtheMemoryPool.h"
+#include "EOtheErrorManager.h"
 #include "EOfifoWord_hid.h"
 #include "EOconstvector_hid.h"
 
@@ -83,7 +85,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+uint8_t app_canSP_flag = 0;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -95,7 +97,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-static eOresult_t s_eo_appCanSP_canPeriphInit(void);
+static eOresult_t s_eo_appCanSP_canPeriphInit(EOappCanSP *p);
 //static eOresult_t s_eo_ap_canModule_formAndSendFrame(eo_icubCanProto_msgCommand_t cmd, 
 //                                                     void *val_ptr,
 //                                                     eo_icubCanProto_msgDestination_t boardAddr,
@@ -135,12 +137,6 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg)
     };
 
 
-// 1) initialise peritheral
-    res = (eOresult_t)s_eo_appCanSP_canPeriphInit();
-    if(eores_OK != res)
-    {
-        return(retptr);
-    }
 
 //2) initialise emsCanNetTopology (the EOtheBoardTransceiver MUST be inited)
 //    emsCanNetTopo_cfg.nvsCfg = eo_boardtransceiver_hid_GetNvsCfg();
@@ -162,8 +158,16 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg)
 //4) create the obj (i get the memory for the object)
     retptr = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOappCanSP), 1);
 
+
     retptr->icubCanProto_ptr = icubCanProto_ptr;
     retptr->emsCanNetTopo_ptr = emsCanNetTopo_ptr;
+
+    // 1) initialise peritheral
+    res = (eOresult_t)s_eo_appCanSP_canPeriphInit(retptr);
+    if(eores_OK != res)
+    {
+        return(retptr);
+    }
 
     return(retptr);
 }
@@ -372,17 +376,33 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p)
 
 }
 
+extern void eo_appCanSP_ResetCanFifo(EOappCanSP *p)
+{
+    eOresult_t      res;
+    hal_can_frame_t rec_frame;
+    uint8_t         i, recCanFrame;
+    hal_can_port_t  canPort = hal_can_port2;
+    uint8_t         remainingMsg = 0;
+
+    res = (eOresult_t)hal_can_get(canPort, &rec_frame, &remainingMsg);
+    for(i = 0; i<remainingMsg; i++)
+    {
+        hal_can_get(canPort, &rec_frame, NULL);
+    }
+}
+    
 extern eOresult_t eo_appCanSP_readOnlySkin_TEST(EOappCanSP *p)
 {
 #define MOTOR_MSG_MAX_RX 10
 
     eOresult_t res;
     hal_can_frame_t rec_frame;
-    uint8_t  i;
-    uint8_t remainingMsg = 100;
+    uint8_t  i, recCanFrame;
+    uint8_t remainingMsg = 0;
     hal_can_port_t canPort = hal_can_port2;
     void *memRef = NULL;
     EOarray *sk_array = NULL;
+    char str[64];
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -399,49 +419,84 @@ extern eOresult_t eo_appCanSP_readOnlySkin_TEST(EOappCanSP *p)
     eo_array_Reset(sk_array);
 
     /* put here other init stuf before start reading from CAN */
-
-
-    //2) read messages
-    for(i=0; ((i<MOTOR_MSG_MAX_RX) && (0!= remainingMsg)) ; i++) //while(0!= remainingMsg)
+    recCanFrame = 0;
+    while((recCanFrame < MOTOR_MSG_MAX_RX) && (1 == app_canSP_flag))
     {
-        res = (eOresult_t)hal_can_get(canPort, &rec_frame, &remainingMsg);
-        if(eores_OK != res) 
+        if(p->newrecframe_port2)
         {
-            if(eores_NOK_nodata == res)
+            
+            res = (eOresult_t)hal_can_get(canPort, &rec_frame, &remainingMsg);
+            
+//             snprintf(str, sizeof(str)-1, "n = %d", remainingMsg);
+//             //eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, "", str); 
+//                 hal_trace_puts(str);
+            
+            p->newrecframe_port2 = 0;
+            if(remainingMsg>=14)
             {
-                return(eores_OK);
+//                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "", "");  
             }
-            else
+            if(res == eores_OK)
             {
-                return(res); //error management
-            }
-                                     
-        }
-//        rec_frame.id = 0x040;
-//        rec_frame.data[0] = 0;
-        DEBUG_PIN3_ON;
-        DEBUG_PIN4_ON;
-        res = eo_icubCanProto_ParseCanFrame(p->icubCanProto_ptr, (eOcanframe_t*)&rec_frame, (eOcanport_t)canPort);
-        if(eores_OK != res)
-        {
-            if(eores_NOK_generic == res) //array is full!!!
-            {
-                //verifico se e' un errore sul triangolo 5.
-                if((rec_frame.id & 0x00f) == 5)
+                recCanFrame++;
+                res = eo_icubCanProto_ParseCanFrame(p->icubCanProto_ptr, (eOcanframe_t*)&rec_frame, (eOcanport_t)canPort);
+                if(eores_OK != res)
                 {
-                    error_tr5 ++;
+                    if(eores_NOK_generic == res) //array is full!!!
+                    {
+//                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "", "");  
+                    }
                 }
-                else
-                {
-                    error_count++;
-                }    
             }
             else
             {
-                error_general++;
+                remainingMsg = 0;
             }
+            for(i = 0; ((i<remainingMsg) && (i < (MOTOR_MSG_MAX_RX- recCanFrame))); i++)
+            {
+                res = (eOresult_t)hal_can_get(canPort, &rec_frame, NULL);
+                if(res == eores_OK)
+                {
+                    recCanFrame++;
+                    res = eo_icubCanProto_ParseCanFrame(p->icubCanProto_ptr, (eOcanframe_t*)&rec_frame, (eOcanport_t)canPort);
+                    if(eores_OK != res)
+                    {
+                        if(eores_NOK_generic == res) //array is full!!!
+                        {
+//                            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "", "");  
+                        }
+                    }
+                }
 
+            }
         }
+
+            
+            
+//         if(eores_OK != res) 
+//         {
+//             if(eores_NOK_nodata == res)
+//             {
+//                 return(eores_OK);
+//             }
+//             else
+//             {
+//                 return(res); //error management
+//                 //eo_errman_Error(p, eo_errortype_fatal, "", "");  
+//             }
+//                                      
+//         }
+//         if(res == eores_OK)
+//         {
+//             res = eo_icubCanProto_ParseCanFrame(p->icubCanProto_ptr, (eOcanframe_t*)&rec_frame, (eOcanport_t)canPort);
+//             if(eores_OK != res)
+//             {
+//                 if(eores_NOK_generic == res) //array is full!!!
+//                 {
+//                     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "", "");  
+//                 }
+//             }
+//         }
     }
     return(res);
 
@@ -1123,7 +1178,20 @@ extern eOresult_t eo_appCanSP_SendSetPoint(EOappCanSP *p, eOmc_jointId_t jId, eO
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-static eOresult_t s_eo_appCanSP_canPeriphInit(void)
+static void s_eo_appCanSP_setFalgPort1(void *arg)
+{
+    EOappCanSP *p = (EOappCanSP *)arg;
+    p->newrecframe_port1 = 1;
+}
+
+
+static void s_eo_appCanSP_setFalgPort2(void *arg)
+{
+    EOappCanSP *p = (EOappCanSP *)arg;
+    p->newrecframe_port2 = 1;
+}
+
+static eOresult_t s_eo_appCanSP_canPeriphInit(EOappCanSP *p)
 {
     hal_can_cfg_t can_cfg_port1, can_cfg_port2;
     eOresult_t res;
@@ -1132,15 +1200,15 @@ static eOresult_t s_eo_appCanSP_canPeriphInit(void)
     can_cfg_port1.baudrate           = hal_can_baudrate_1mbps; 
     can_cfg_port1.priorx             = hal_int_priority11;
     can_cfg_port1.priotx             = hal_int_priority11;
-    can_cfg_port1.callback_on_rx     = NULL;
-    can_cfg_port1.arg                = NULL;
+    can_cfg_port1.callback_on_rx     = s_eo_appCanSP_setFalgPort1;
+    can_cfg_port1.arg                = (void*)p;
     
     can_cfg_port2.runmode            = hal_can_runmode_isr_1txq1rxq;
     can_cfg_port2.baudrate           = hal_can_baudrate_1mbps; 
     can_cfg_port2.priorx             = hal_int_priority11;
     can_cfg_port2.priotx             = hal_int_priority11;
-    can_cfg_port2.callback_on_rx     = NULL;
-    can_cfg_port2.arg                = NULL;
+    can_cfg_port2.callback_on_rx     = s_eo_appCanSP_setFalgPort2;
+    can_cfg_port2.arg                = (void*)p;
 
     res = (eOresult_t)hal_can_init(hal_can_port1, &can_cfg_port1);
 

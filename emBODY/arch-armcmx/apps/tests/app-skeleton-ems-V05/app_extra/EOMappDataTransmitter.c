@@ -255,7 +255,8 @@ static void s_eom_appDataTransmitter_taskRun(EOMtask *tsk, uint32_t evtmsgper)
         res = eo_ethBaseModule_TransmitPacket(p->cfg.eth_mod, pkt_ptr);
         if(eores_OK != res)
         {
-            return;
+//            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "", "");  
+           return;
         }
 //        eo_appCanSP_SendSetPoint(p->cfg.appCanSP_ptr, 0, &mySetPoint_current);
         p->st = eOm_appDataTransmitter_st__active;

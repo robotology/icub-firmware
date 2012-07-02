@@ -213,6 +213,9 @@ static void s_eom_appSkeletonEms_body_OnError(eOerrmanErrorType_t errtype, eOid0
         .arg                = NULL
     };
     
+    
+  //  hal_trace_puts(info);
+    
     if(errtype <= eo_errortype_warning)
     {
         return;

@@ -84,7 +84,7 @@
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
 extern  uint32_t ena_tx_onrx = 0;
-
+extern uint8_t app_canSP_flag;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -195,6 +195,7 @@ extern eOresult_t eom_appDataCollector_CollectDataStart(EOMappDataCollector *p)
      {
         return(eores_NOK_generic);   
      }
+     app_canSP_flag = 1;
      p->st = eOm_appDataCollector_st__collectingData;
      eom_task_isrSetEvent(p->mytask, EVT_GETDATA_START);//eom_task_SetEvent(p->mytask, EVT_GETDATA_START);
      return(eores_OK);
@@ -211,7 +212,7 @@ extern eOresult_t eom_appDataCollector_CollectDataStop(EOMappDataCollector *p)
     {
         return(eores_NOK_generic);   
     }
-
+     app_canSP_flag = 0;
      p->st = eOm_appDataCollector_st__active;
      eom_task_isrSetEvent(p->mytask, EVT_GETDATA_STOP);
      return(eores_OK);
@@ -254,8 +255,6 @@ static void s_eom_appDataCollector_taskRun(EOMtask *tsk, uint32_t evtmsgper)
 
     if(EVT_CHECK(evt, EVT_GETDATA_START))
     {
-
-
         /* 1) start encoder reading */
          eo_appEncReader_startRead(p->cfg.encReader_ptr);
  

@@ -306,6 +306,8 @@ extern eOresult_t eom_appTheSysController_Go2RunState(EOMappTheSysController *p)
 
     s_theSysController.appl_state = applstate_running;
 
+    eo_appCanSP_ResetCanFifo(s_theSysController.srv.appCanSP_ptr);
+    
     return(eores_OK);
 
 }
