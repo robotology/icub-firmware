@@ -74,6 +74,7 @@ using namespace std;
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
+#define _MAIS_	1
 
 
 
@@ -806,7 +807,7 @@ static void s_callback_button_1(void)
 
 #ifdef _MAIS_
 	//
-	//  3: mais sconfig = 1
+	//  3: mais datarate = 1millisec
 	//
 	switch (boardN )
 	{
@@ -825,6 +826,32 @@ static void s_callback_button_1(void)
 		printf("error!!");
 	// tell agent to prepare a rop to send
 	transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
+
+
+	//
+	//  4: mais datarate = contnuosly
+	//
+	switch (boardN )
+	{
+	case 2:	// left
+		ep = endpoint_as_leftlowerarm;
+		break;
+
+	case 4:	// right
+		ep = endpoint_as_rightlowerarm;
+		break;
+	}
+	nvid = eo_cfg_nvsEP_as_mais_NVID_Get((eOcfg_nvsEP_as_endpoint_t)ep, dummy, maisNVindex_mconfig__mode);
+	nvRoot = transceiver->getNVhandler(ep, nvid);
+	dat = 0;
+	if( eores_OK != eo_nv_Set(nvRoot, &dat, eobool_true, eo_nv_upd_dontdo))
+		printf("error!!");
+	// tell agent to prepare a rop to send
+	transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
+
+
+
+
 #endif
 }
 
