@@ -60,11 +60,8 @@ extern const float   EMS_PERIOD;
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
+// empty-section
 
-static int32_t limit(int32_t x, int32_t min, int32_t max);
-//static void check_first_run(EOaxisController *o);
-
-//static void compute_torque_ref(EOaxisController *o);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -97,6 +94,10 @@ extern EOaxisController* eo_axisController_New(void)
         o->pos_min = 0.0f;
         o->pos_max = 0.0f;
         o->vel_max = 2048.0f;
+
+        //o->acc_stop_boost = 4096;
+        o->acc_stop_cmode = 4096;
+        o->acc_stop_alarm = 8192;
 
         o->vel_timer   = 0;
         o->vel_timeout = EMS_IFREQUENCY;
@@ -185,9 +186,9 @@ extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_
     case CM_OPENLOOP: 
         return;
 
+    case CM_POS_VEL:
     case CM_VELOCITY:
         o->control_mode = CM_POSITION;
-    case CM_POS_VEL:
     case CM_POSITION:
     case CM_CALIB_ABS_POS_SENS:
         eo_trajectory_SetPosReference(o->trajectory, pos, avg_vel);
@@ -217,14 +218,14 @@ extern void eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_
         o->control_mode = CM_POS_VEL;
     case CM_POS_VEL:
         o->vel_timer = o->vel_timeout;
-        eo_trajectory_AddVelReference(o->trajectory, limit(vel, -o->vel_max, o->vel_max), avg_acc);
+        eo_trajectory_AddVelReference(o->trajectory, vel, avg_acc);
         break;
 
     //case CM_POSITION:
         //o->control_mode = CM_VELOCITY;
         //eo_trajectory_StopBoost(o->trajectory);
     case CM_VELOCITY:
-        eo_trajectory_SetVelReference(o->trajectory, limit(vel, -o->vel_max, o->vel_max), avg_acc);
+        eo_trajectory_SetVelReference(o->trajectory, vel, avg_acc);
         break;
         
     case CM_IMPEDANCE_POS:
@@ -251,7 +252,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, control_mo
         case CM_POSITION:
         {
             eo_pid_Reset(o->pidP);
-            eo_trajectory_SetPosReference(o->trajectory, eo_speedometer_GetDistance(o->speedmeter), 0);            
+            eo_trajectory_Stop(o->trajectory, o->acc_stop_cmode);            
      
             break;
         }
@@ -259,8 +260,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, control_mo
         case CM_VELOCITY:
         {
             eo_pid_Reset(o->pidP);
-            eo_trajectory_StopBoost(o->trajectory);
-            eo_trajectory_SetVelReference(o->trajectory, eo_speedometer_GetVelocity(o->speedmeter), 0); 
+            eo_trajectory_SetVelReference(o->trajectory, 0, o->acc_stop_cmode); 
 
             break;
         }
@@ -371,7 +371,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
             if (eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref))
             {
                 // position limit reached
-                //eo_pid_Reset(o->pidP);
+                eo_pid_Reset(o->pidP);
             }
 
             encoder_can = pos;
@@ -388,9 +388,9 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
     return 0;   
 }
 
-extern void eo_axisController_Stop(EOaxisController *o)
+extern void eo_axisController_Stop(EOaxisController *o, int32_t stop_acc)
 {
-    eo_trajectory_Stop(o->trajectory);
+    eo_trajectory_Stop(o->trajectory, stop_acc);
 }
 
 extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o)
@@ -417,13 +417,8 @@ extern void eo_axisController_SetOffset(EOaxisController *o, int16_t offset)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
+// empty-section
 
-static int32_t limit(int32_t x, int32_t min, int32_t max)
-{
-    if (x < min) return min;
-    if (x > max) return max;
-    return x;    
-}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

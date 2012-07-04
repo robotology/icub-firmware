@@ -89,7 +89,7 @@ extern void eo_axisController_SetTrqRef(EOaxisController *o, int32_t trq);
 
 extern int16_t eo_axisController_PWM(EOaxisController *o);
 
-extern void eo_axisController_Stop(EOaxisController *o);
+extern void eo_axisController_Stop(EOaxisController *o, int32_t stop_acc);
 
 extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, control_mode_t cm);
 
