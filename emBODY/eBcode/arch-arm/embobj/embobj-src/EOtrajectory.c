@@ -90,11 +90,12 @@ extern EOtrajectory* eo_trajectory_New(void)
         o->pos_min =    0;
         o->pos_max = 4095;
         o->vel_max = 2048;
-        o->avg_vel = 1024;
+
+        o->acc_stop_boost = 4096;
+        //o->acc_stop_cmode = 4096;
+        //o->acc_stop_alarm = 8192;
 
         o->boost = eobool_false;
-        o->boostVf = 0.0f;
-        o->boostPn = 0.0f;
         o->boostVn = 0.0f;
         o->boostAn = 0.0f;
         o->boostKy = 0.0f;
@@ -121,16 +122,21 @@ extern void eo_trajectory_Init(EOtrajectory *o, int32_t p0, int32_t v0, int32_t 
 
 extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, int32_t avg_vel)
 {
+    if (o->boost) eo_trajectory_StopBoost(o);
+
     o->vel_steps_to_end = 0;
     o->Vf = 0.0f;
-
-    if (!avg_vel) avg_vel = 1024;
-
-    o->avg_vel = avg_vel;
 
     o->Pf = (float)p1;
 
     LIMIT(o->pos_min, o->Pf, o->pos_max)
+
+    if (!avg_vel)
+    {
+        o->pos_steps_to_end = 0;
+        
+        return;    
+    }
 
     float D = o->Pf-o->Pn;
 
@@ -156,15 +162,53 @@ extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, int32_t a
     o->Xn = (60.0f*DbyT2-36.0f*VbyT-9.0f*o->An)*PbyT+A2+A3;
 }
 
+extern void eo_trajectory_Stop(EOtrajectory *o, int32_t stop_acc)
+{
+    if (o->boost) eo_trajectory_StopBoost(o);
+
+    o->pos_steps_to_end = 0;
+    o->vel_steps_to_end = 0;
+
+    o->Pf = o->Pn;
+    o->Vf = 0.0f;
+
+    if (!stop_acc) return;
+
+    float T = o->Vn/(float)stop_acc;
+
+    if (T < 0.0f) T = -T;
+
+    o->pos_steps_to_end = (int32_t)(T*EMS_FFREQUENCY);
+    
+    float lbyT = 1.0f/T;
+    float PbyT = EMS_PERIOD*lbyT;
+
+    float VbyT  = o->Vn*lbyT; 
+
+    float A3 = (-60.0f*VbyT-10.0f*o->An)*PbyT*PbyT*PbyT;
+    float A2 = (+96.0f*VbyT+18.0f*o->An)*PbyT*PbyT;
+
+    o->Ky = 6.0f*A3;
+    o->Yn = 2.0f*A2+o->Ky;
+    o->Xn = (-36.0f*VbyT-9.0f*o->An)*PbyT+A2+A3;
+}
+
 extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t v1, int32_t avg_acc)
 {
-    o->pos_steps_to_end = 0;
+    if (o->boost) eo_trajectory_StopBoost(o);
 
-    if (!avg_acc) avg_acc = 1024;
+    o->pos_steps_to_end = 0;
 
     o->Vf = (float)v1;
 
     LIMIT(-o->vel_max, o->Vf, o->vel_max)
+
+    if (!avg_acc)
+    {
+        o->vel_steps_to_end = 0;
+       
+        return;
+    }
 
     float D = o->Vf-o->Vn;
    
@@ -186,18 +230,18 @@ extern void eo_trajectory_AddVelReference(EOtrajectory *o, int32_t v1, int32_t a
 {
     o->boost = eobool_true;
 
+    float Vf = (float)v1;
+
+    LIMIT(-o->vel_max, Vf, o->vel_max)
+
     if (!avg_acc)
     {
-        o->boost_steps_to_end = 0;
-        o->boostVf = o->boostVn;
+        o->vel_steps_to_end = 0;
+       
         return;
     }
 
-    o->boostVf = (float)v1;
-
-    LIMIT(-o->vel_max, o->boostVf, o->vel_max)
-
-    float D = o->boostVf-o->boostVn;
+    float D = Vf - o->boostVn;
    
     float Aa = (float)avg_acc;
 
@@ -216,14 +260,12 @@ extern void eo_trajectory_AddVelReference(EOtrajectory *o, int32_t v1, int32_t a
 extern void eo_trajectory_StopBoost(EOtrajectory *o)
 {
     o->boost = eobool_false;
+    o->boost_steps_to_end = 0;
 
-    o->Pn += o->boostPn;
     o->Vn += o->boostVn;
     o->An += o->boostAn;
 
-    o->boostPn = 0.0f;
     o->boostVn = 0.0f;
-    o->boostVf = 0.0f;
     o->boostAn = 0.0f;
 }
 
@@ -231,19 +273,23 @@ extern void eo_trajectory_TimeoutVelReference(EOtrajectory *o)
 {
     if (o->boost)
     {
-        eo_trajectory_StopBoost(o);
-        eo_trajectory_SetPosReference(o, (int32_t)o->Pf, (int32_t)o->avg_vel);
+        o->boost = eobool_false;
+        eo_trajectory_AddVelReference(o, 0, o->acc_stop_boost);
     }
 }
 
+/*
 extern void eo_trajectory_Stop(EOtrajectory *o)
 {
+    if (o->boost) eo_trajectory_StopBoost(o);
+
     o->pos_steps_to_end = 0;
     o->vel_steps_to_end = 0;
 
     o->Pf = o->Pn;
     o->Vf = 0.0f;
 }
+*/
 
 extern eObool_t eo_trajectory_IsDone(EOtrajectory* o)
 {
@@ -299,57 +345,67 @@ extern int8_t eo_trajectory_Step(EOtrajectory* o, float *p, float *v)
         o->An = 0.0f;
     }
 
-    int8_t limit = 0;
+    if (o->boost_steps_to_end)
+    {
+        --o->boost_steps_to_end;
 
+        o->boostAn += o->boostYn;
+        o->boostYn += o->boostKy;
+        o->boostVn += EMS_PERIOD*o->boostAn;
+
+        float dP = EMS_PERIOD*o->boostVn;
+        o->Pn += dP;
+        o->Pf += dP;
+    }
+    else if (o->boost)
+    {
+        o->boostAn = 0.0f;
+
+        float dP = EMS_PERIOD*o->boostVn;
+        o->Pn += dP;
+        o->Pf += dP;
+    }
+    else
+    {
+        o->boostVn = 0.0f;
+    }
+        
     if (o->Pn < o->pos_min)
     {
+        if (o->boost && o->boostVn < 0.0f) eo_trajectory_StopBoost(o);
+
         o->pos_steps_to_end = 0;
         o->vel_steps_to_end = 0;
 
         o->Pf = o->Pn = o->pos_min;
         o->Vf = o->Vn = o->An = 0.0f;
 
-        limit = -1;
-    }
+        *p = (int32_t)o->Pn;
+        *v = 0;
 
+        return -1;
+    }
+    
     if (o->Pn > o->pos_max)
     {
+        if (o->boost && o->boostVn > 0.0f) eo_trajectory_StopBoost(o);
+
         o->pos_steps_to_end = 0;
         o->vel_steps_to_end = 0;
 
         o->Pf = o->Pn = o->pos_max;
         o->Vf = o->Vn = o->An = 0.0f;
 
-        limit =  1;
-    }
-    
-    if (o->boost)
-    {
-        if (o->boost_steps_to_end)
-        {
-            --o->boost_steps_to_end;
+        *p = (int32_t)o->Pn;
+        *v = 0;
 
-            o->boostAn += o->boostYn;
-            o->boostYn += o->boostKy;
-
-            o->boostVn += EMS_PERIOD*o->boostAn;
-            o->boostPn += EMS_PERIOD*o->boostVn;
-        }
-        else
-        {
-            if (o->boostVf != 0.0f) o->boostPn += EMS_PERIOD*o->boostVf;
-        
-            o->boostVn = o->boostVf;
-            o->boostAn = 0.0f;        
-        }
-
-        //LIMIT((int32_t)o->pos_min, *p, (int32_t)o->pos_max)
+        return  1;
     }
 
-    *p = (int32_t)(o->Pn+o->boostPn);
+    *p = (int32_t)o->Pn;
     *v = (int32_t)(o->Vn+o->boostVn);
-   
-    return limit;
+
+    return 0;
 }
 
 

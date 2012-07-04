@@ -228,9 +228,9 @@ extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_
     eo_axisController_StartCalibration(s_emsc->axis_controller[joint], pos, offset, timeout_ms, max_error);
 }
 
-extern void eo_emsController_Stop(uint8_t joint)
+extern void eo_emsController_Stop(uint8_t joint, int32_t stop_acc)
 {
-    eo_axisController_Stop(s_emsc->axis_controller[joint]);
+    eo_axisController_Stop(s_emsc->axis_controller[joint], stop_acc);
 }
 
 extern void eo_emsController_ResetTrqPid(uint8_t joint)

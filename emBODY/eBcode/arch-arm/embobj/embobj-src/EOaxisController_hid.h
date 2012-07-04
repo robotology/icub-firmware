@@ -56,6 +56,9 @@ struct EOaxisController_hid
     int32_t pos_min;
     int32_t pos_max;
     int32_t vel_max;
+
+    int32_t acc_stop_cmode;
+    int32_t acc_stop_alarm;
     
     // measures (read only)
     int32_t torque_meas;
