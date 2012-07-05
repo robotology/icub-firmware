@@ -283,8 +283,16 @@ extern eOresult_t eo_action_Execute(EOaction *act, eOreltime_t tout)
             eo_action_GetCallback(act, &callback, &arg, &totask);
 
             if(NULL != callback) 
-            {   // request a task to execute a callback
-                res = eov_task_tskExecCallback(totask, callback, arg, tout);
+            {   
+                if(NULL != totask)
+                {   // request a task to execute a callback
+                    res = eov_task_tskExecCallback(totask, callback, arg, tout);
+                }
+                else
+                {   // execute the callback directly
+                    res = eores_OK;
+                    callback(arg);
+                }
             }
         } break;
 
