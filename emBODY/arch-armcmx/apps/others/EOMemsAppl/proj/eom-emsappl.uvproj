@@ -162,7 +162,7 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>4100</DriverSelection>
+            <DriverSelection>4101</DriverSelection>
           </Flash1>
           <Flash2>BIN\ULP2CM3.DLL</Flash2>
           <Flash3>"" ()</Flash3>
@@ -336,7 +336,7 @@
             <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
-            <OneElfS>1</OneElfS>
+            <OneElfS>0</OneElfS>
             <Strict>0</Strict>
             <EnumInt>0</EnumInt>
             <PlainCh>0</PlainCh>
@@ -346,7 +346,7 @@
             <uThumb>0</uThumb>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO _FORCE_NETWORK_FROM_IPAL_CFG</Define>
+              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO</Define>
               <Undefine></Undefine>
               <IncludePath>..\abslayer-cfg;..\app_basic;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\app_extra;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;.;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src</IncludePath>
             </VariousControls>
@@ -392,16 +392,6 @@
               <FileName>eom_emsappl_main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_basic\eom_emsappl_main.c</FilePath>
-            </File>
-            <File>
-              <FileName>eom_emsappl_info.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\app_basic\eom_emsappl_info.c</FilePath>
-            </File>
-            <File>
-              <FileName>eom_emsappl_ebx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\app_basic\eom_emsappl_ebx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1147,6 +1137,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\configurator_overridden.c</FilePath>
             </File>
+            <File>
+              <FileName>EOMtheEMSapplCfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1156,6 +1151,16 @@
               <FileName>eventviewer.cm3.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\sys\mid\lib\eventviewer.cm3.lib</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>icub-ems-cfg</GroupName>
+          <Files>
+            <File>
+              <FileName>EOMtheEMSapplCfg_cfg.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg_cfg.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1548,16 +1553,6 @@
               <FileType>1</FileType>
               <FilePath>..\app_basic\eom_emsappl_main.c</FilePath>
             </File>
-            <File>
-              <FileName>eom_emsappl_info.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\app_basic\eom_emsappl_info.c</FilePath>
-            </File>
-            <File>
-              <FileName>eom_emsappl_ebx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\app_basic\eom_emsappl_ebx.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -2284,6 +2279,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\configurator_overridden.c</FilePath>
             </File>
+            <File>
+              <FileName>EOMtheEMSapplCfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2293,6 +2293,16 @@
               <FileName>eventviewer.cm3.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\sys\mid\lib\eventviewer.cm3.lib</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>icub-ems-cfg</GroupName>
+          <Files>
+            <File>
+              <FileName>EOMtheEMSapplCfg_cfg.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg_cfg.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2685,16 +2695,6 @@
               <FileType>1</FileType>
               <FilePath>..\app_basic\eom_emsappl_main.c</FilePath>
             </File>
-            <File>
-              <FileName>eom_emsappl_info.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\app_basic\eom_emsappl_info.c</FilePath>
-            </File>
-            <File>
-              <FileName>eom_emsappl_ebx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\app_basic\eom_emsappl_ebx.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -3421,6 +3421,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\configurator_overridden.c</FilePath>
             </File>
+            <File>
+              <FileName>EOMtheEMSapplCfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3430,6 +3435,16 @@
               <FileName>eventviewer.cm3.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\sys\mid\lib\eventviewer.cm3.lib</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>icub-ems-cfg</GroupName>
+          <Files>
+            <File>
+              <FileName>EOMtheEMSapplCfg_cfg.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg_cfg.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3822,16 +3837,6 @@
               <FileType>1</FileType>
               <FilePath>..\app_basic\eom_emsappl_main.c</FilePath>
             </File>
-            <File>
-              <FileName>eom_emsappl_info.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\app_basic\eom_emsappl_info.c</FilePath>
-            </File>
-            <File>
-              <FileName>eom_emsappl_ebx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\app_basic\eom_emsappl_ebx.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -4558,6 +4563,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\configurator_overridden.c</FilePath>
             </File>
+            <File>
+              <FileName>EOMtheEMSapplCfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4567,6 +4577,16 @@
               <FileName>eventviewer.cm3.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\sys\mid\lib\eventviewer.cm3.lib</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>icub-ems-cfg</GroupName>
+          <Files>
+            <File>
+              <FileName>EOMtheEMSapplCfg_cfg.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg_cfg.h</FilePath>
             </File>
           </Files>
         </Group>

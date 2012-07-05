@@ -140,14 +140,14 @@
 //   <i> Maximum number of tasks that will run at the same time.
 //   <i> Default: 6
 #ifndef OSAL_TASKNUM
- #define OSAL_TASKNUM     10
+ #define OSAL_TASKNUM     12
 #endif
 
 //   <o> Number of timers <0-250>
 //   <i> Define max number of timers.
 //   <i> Default: 0  (User timers disabled)
 #ifndef OSAL_TIMERNUM
- #define OSAL_TIMERNUM    4
+ #define OSAL_TIMERNUM    6
 #endif
 
 
@@ -163,7 +163,7 @@
 //   <i> Define max. number of semaphores that will run at the same time.
 //   <i> Default: 0  (Semaphores not enabled)
 #ifndef OSAL_SEMAPHORENUM
- #define OSAL_SEMAPHORENUM    4
+ #define OSAL_SEMAPHORENUM    6
 #endif
 
 
@@ -178,7 +178,7 @@
 //   <i> Define max. number of messages that can be contained in all the message queues.
 //   <i> Default: 0  (Message queues not enabled)
 #ifndef OSAL_MQUEUEELEMNUM
- #define OSAL_MQUEUEELEMNUM    64
+ #define OSAL_MQUEUEELEMNUM    80
 #endif
 
 
