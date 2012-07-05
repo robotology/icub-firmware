@@ -385,7 +385,7 @@ extern void tskEMSrunTX(void *p)
 } 
 
 
-__weak extern void eom_emsrunner_hid_userdef_taskRX_activity(EOMtheEMSrunner *p)
+/*__weak*/ extern void eom_emsrunner_hid_userdef_taskRX_activity(EOMtheEMSrunner *p)
 {   
     p->numofrxrops = 0;
     p->numofrxpackets = 0;
@@ -420,7 +420,7 @@ __weak extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramrecep
 
 
 
-__weak extern void eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(EOMtheEMSrunner *p)
+/*__weak*/ extern void eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(EOMtheEMSrunner *p)
 {
     EOpacket *rxpkt = NULL;
     
@@ -497,7 +497,7 @@ __weak extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
     // if itissafetoquit_asap then ... do nothing or very little.
 }
 
-__weak extern void eom_emsrunner_hid_userdef_taskTX_activity(EOMtheEMSrunner *p)
+/*__weak*/ extern void eom_emsrunner_hid_userdef_taskTX_activity(EOMtheEMSrunner *p)
 {
     p->numoftxrops = 0;
     p->numoftxpackets = 0;
@@ -529,7 +529,7 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtrans
 }
 
 
-__weak extern void eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmission(EOMtheEMSrunner *p)
+/*__weak*/ extern void eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmission(EOMtheEMSrunner *p)
 {
     EOpacket *txpkt = NULL;
     

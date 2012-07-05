@@ -59,28 +59,33 @@ extern "C" {
 
 
 
-/*
-//    hal, osal, 
-//    eOmsystem_cfg_t, eOmempool_cfg_t, eOerrman_cfg_t, eOmtimerman_cfg_t, eOmcallbackman_cfg_t
-    
-//    eOemsappl_cfg_t
-    state machine (eo_cfg_sm_EMSappl_Get)
-    
-//    ipal, eom_ipnet_Initialise()
-    
-//    eOemssocket_cfg_t, 
-//    eOemstransceiver_cfg_t, 
-//    eOemserror_cfg_t,
-//    eOemsconfigurator_cfg_t
-    eOemsrunner_cfg_t
-
-*/
-
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
   
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
+
+typedef enum
+{
+    eom_emsappl_boardid_eb1         = 1,
+    eom_emsappl_boardid_eb2         = 2,
+    eom_emsappl_boardid_eb3         = 3,
+    eom_emsappl_boardid_eb4         = 4,
+    eom_emsappl_boardid_eb5         = 5,
+    eom_emsappl_boardid_eb6         = 6,
+    eom_emsappl_boardid_eb7         = 7,
+    eom_emsappl_boardid_eb8         = 8,
+    eom_emsappl_boardid_eb9         = 9
+} eom_emsapplcfg_boardid_t;
+
+typedef enum
+{
+    eom_emsappl_deviceid_skin       = 1,
+    eom_emsappl_deviceid_mc4        = 2,
+    eom_emsappl_deviceid_2foc       = 3
+} eom_emsapplcfg_deviceid_t;
+
+enum {eom_emsappl_deviceid_numberof = 3};
 
 
 
@@ -93,12 +98,14 @@ typedef const struct
     eOemsappl_cfg_t         applcfg;        /**< the cfg used by the object EOMtheEMSappl initialised in eom_sys_Start() */
     eOmipnet_whole_cfg_t    wipnetcfg;      /**< the cfg used by the object EOMtheIPnet launched by the EOMtheEMSappl */
     eObool_t                getipaddrFROMenvironment;
+    eom_emsapplcfg_boardid_t boardid;
+    eObool_t                hasdevice[eom_emsappl_deviceid_numberof];
     eOemssocket_cfg_t       socketcfg;      /**< the cfg used by the object EOMtheEMSsocket launched by the EOMtheEMSappl */
     eOemstransceiver_cfg_t  transcfg;       /**< the cfg used by the object EOMtheEMStransceiver launched by the EOMtheEMSappl */
     eOemserror_cfg_t        errobjcfg;      /**<   */
     eOemsconfigurator_cfg_t cfgobjcfg;
     eOemsrunner_cfg_t       runobjcfg;
-} EOMtheEMSapplCfg;
+} EOMtheEMSapplCfg;        
 
 
 
@@ -127,6 +134,14 @@ extern EOMtheEMSapplCfg * eom_emsapplcfg_Initialise(void);
  **/
 extern EOMtheEMSapplCfg * eom_emsapplcfg_GetHandle(void);
 
+
+/** @fn         extern eObool_t eom_emsapplcfg_HasDevice(EOMtheEMSapplCfg *p, eom_emsapplcfg_deviceid_t dev)
+    @brief      tells if the application manages a given device.
+    @return     eobool_true or eobool_false
+    @warning    inside the _hid.h part it is possible to use the macros EOMTHEEMSAPPLCFG_EBX_hasSKIN, EOMTHEEMSAPPLCFG_EBX_hasMC4
+                and EOMTHEEMSAPPLCFG_EBX_has2FOC which keep a eObool_t value.
+ **/
+extern eObool_t eom_emsapplcfg_HasDevice(EOMtheEMSapplCfg *p, eom_emsapplcfg_deviceid_t dev); 
 
 /** @}            
     end of group eom_theemsapplcfg  

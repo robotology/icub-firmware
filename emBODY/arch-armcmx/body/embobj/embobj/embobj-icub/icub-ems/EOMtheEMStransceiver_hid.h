@@ -61,7 +61,9 @@ struct EOMtheEMStransceiver_hid
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern eOboardtransceiver_cfg_t* eom_emstransceiver_hid_userdef_get_cfg(const eOemstransceiver_cfg_t *cfg);
+//extern eOboardtransceiver_cfg_t* eom_emstransceiver_hid_userdef_get_cfg(const eOemstransceiver_cfg_t *cfg);
+
+//extern void eom_emstransceiver_hid_userdef_add_endpoints(eOboardtransceiver_cfg_t *brdcfg);
 
 
 #ifdef __cplusplus

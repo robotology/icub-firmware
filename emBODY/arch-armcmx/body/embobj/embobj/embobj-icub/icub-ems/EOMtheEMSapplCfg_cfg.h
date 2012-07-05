@@ -604,9 +604,71 @@ extern "C" {
 
 
 //  </h>Runner object configuration
+    
+    
 
 // </h>
+    
+    
+//  <h> Overriddable functions
+ 
 
+//  <h> EOMtheEMSappl    
+ 
+//  <o> eom_emsappl_hid_userdef_initialise()      <0=> called inside eom_emsappl_Initialise() just before entering the state machine
+#define assfef443f43gfvr4vr3bvrte 0
+    
+// </h>EOMtheEMSappl    
+    
+    
+//  <h> EOMtheEMSconfigurator    
+ 
+//  <o> eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing()      <0=> called in state CFG just after a datagram is received and parsed
+#define assfef443f43gde43fcrec4vr3bvrte 0
+    
+// </h>EOMtheEMSconfigurator    
+
+
+//  <h> EOMtheEMSerror    
+ 
+//  <o> eom_emserror_hid_userdef_DoJustAfterPacketReceived()      <0=> called in state ERR just after a datagram is received and parsed
+#define assfef443f43wdws56743fcrec4 0
+    
+// </h>EOMtheEMSerror   
+
+
+
+//  <h> EOMtheEMSrunner    
+ 
+//  <o> eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception()      <0=> called in state RUN-RX just before attempting to retrieve a datagram from EOMtheEMSsocket
+#define assfef443ferdfws56743fcrec4 0
+    
+//  <o> eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception()      <0=> called in state RUN-RX just after processing of datagram reception
+#define assfef443ferdfsded56743fcrec4 0  
+
+
+//  <o> eom_emsrunner_hid_userdef_taskDO_activity()      <0=> called in state RUN-DO as the only action to be performed
+#define assfef443ferdfs123456743fcrec4 0  
+
+
+//  <o> eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission()      <0=> called in state RUN-TX before transmission of the datagram
+#define assfe666erdfs123456743fcrec4 0  
+    
+//  <o> eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission()      <0=> called in state RUN-TX after transmission of the datagram
+#define assfe66999fs123456743fcrec4 0     
+    
+    
+//  <o> eom_emsrunner_hid_userdef_onexecutionoverflow()      <0=> called in state RUN if in realtime mode any of RX-DO-TX has overflown to the next one
+#define assfe3333355fs123456743fcrec4 0  
+
+
+//  <o> eom_emsrunner_hid_userdef_onfailedtransmission()      <0=> called inside RUN-TX if teh datagram could not be transmitted
+#define assfe66999999906743fcrec4 0  
+
+// </h>EOMtheEMSrunner   
+
+//  </h>Overriddable functions    
+    
 
 
 #ifdef __cplusplus
