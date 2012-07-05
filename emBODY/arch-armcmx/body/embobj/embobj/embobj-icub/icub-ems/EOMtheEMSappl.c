@@ -465,9 +465,6 @@ extern void eo_cfg_sm_EMSappl_hid_on_exit_RUN(EOsm *s)
     //eov_ipnet_Activate(eov_ipnet_GetHandle());
 }
 
-#warning --> quando la sm entra in RUN il skt non avvisa + nessun task. il task runRX piglia quello che gli serve. 
-#warning --> quando si entra in runDO si disabilita il IPnet, lo si riabilita in runTX, si mette il pacchetto nel socket, etc.
-
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------

@@ -127,8 +127,6 @@ extern EOMtheEMStransceiver * eom_emstransceiver_Initialise(const eOemstransceiv
     brdtransceiver_cfg.remotehostipv4port       = cfg->hostipv4port;
     memcpy(&brdtransceiver_cfg.sizes, &cfg->sizes, sizeof(eo_transceiver_sizes_t));
 
-    #warning ATTENZIONE HO RIMOSSO QUESTO 
-    //eom_emstransceiver_hid_userdef_add_endpoints(&brdtransceiver_cfg);
     
  
     //s_emstransceiver_singleton.transceiver = eo_boardtransceiver_Initialise(eom_emstransceiver_hid_userdef_get_cfg(cfg));
@@ -209,37 +207,8 @@ extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** tx
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
+// empty-section
 
-// __weak extern void eom_emstransceiver_hid_userdef_add_endpoints(eOboardtransceiver_cfg_t *brdcfg)
-// {
-//     brdcfg->vectorof_endpoint_cfg      = NULL;
-//     brdcfg->hashfunction_ep2index      = NULL;    
-// }
-
-// __weak extern eOboardtransceiver_cfg_t* eom_emstransceiver_hid_userdef_get_cfg(const eOemstransceiver_cfg_t *cfg)
-// {
-//     const eo_transceiver_sizes_t sizes =   
-//     {
-//         .capacityofpacket               = 1024,
-//         .capacityofrop                  = 256,
-//         .capacityofropframeregulars     = 768,
-//         .capacityofropframeoccasionals  = 128,
-//         .capacityofropframereplies      = 128,
-//         .maxnumberofregularrops         = 32
-//     };   
-//     static eOboardtransceiver_cfg_t boardtxrxcfg =  {0};
-
-
-// #if 0 
-//     boardtxrxcfg.vectorof_endpoint_cfg          = vectorof_endpoint_cfg;
-//     boardtxrxcfg.hashfunction_ep2index          = hashfunction_ep2index;
-//     boardtxrxcfg.remotehostipv4addr             = cfg->hostipv4addr;
-//     boardtxrxcfg.remotehostipv4port             = cfg->hostipv4port;
-// #endif
-//     memcpy(&boardtxrxcfg.sizes, &sizes, sizeof(eo_transceiver_sizes_t));
-
-//     return(&boardtxrxcfg);
-// }
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
