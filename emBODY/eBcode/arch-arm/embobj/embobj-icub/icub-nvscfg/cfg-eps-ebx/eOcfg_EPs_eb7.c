@@ -87,7 +87,6 @@ static void s_eocfg_eps_ebx_ram_retrieve(eOnvEP_t ep, void* loc, void* rem);
 
 static uint16_t s_hash(uint16_t ep);
 
-static uint16_t s_eo_cfg_nvsEP_eb7_hashfunction_ep2index(uint16_t ep);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -146,7 +145,7 @@ static void* s_eocfg_eps_ebx_ram[][3] =
     {NULL, NULL, NULL}    
 };
 
-static const EOconstvector s_eo_cfg_EPs_vectorof_eb7 = 
+extern const EOconstvector eo_cfg_EPs_vectorof_eb7_object = 
 {
     EO_INIT(.size)                  sizeof(s_eo_cfg_EPs_vectorof_eb7_data)/sizeof(const eOnvscfg_EP_t),
     EO_INIT(.item_size)             sizeof(eOnvscfg_EP_t),
@@ -160,15 +159,43 @@ static const EOconstvector s_eo_cfg_EPs_vectorof_eb7 =
 // --------------------------------------------------------------------------------------------------------------------
 
 
-const EOconstvector* const eo_cfg_EPs_vectorof_eb7 = &s_eo_cfg_EPs_vectorof_eb7;
+const EOconstvector* const eo_cfg_EPs_vectorof_eb7 = &eo_cfg_EPs_vectorof_eb7_object;
 
-const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb7_fptr_hashfunction_ep2index = s_eo_cfg_nvsEP_eb7_hashfunction_ep2index;
+const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb7_fptr_hashfunction_ep2index = eo_cfg_nvsEP_eb7_hashfunction_ep2index;
 
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
+
+extern uint16_t eo_cfg_nvsEP_eb7_hashfunction_ep2index(uint16_t ep)
+{
+    // in order to always have a hit the table s_eptable[] it must be of size equal to max{ s_hash(ep) }, thus if we
+    // use an ep of value 16 and s_hash() just keeps the lsb, then the size must be 17 
+    // if there are holes, they shall have EOK_uint16dummy in other entries. for example, if we have eps = {0, 7, 16}
+    // then the table shall be of size 17, shall contain 0xffff everywhere but in positions 0, 7, 16 where the values
+    // are ... 0, 7, 16    
+
+
+    #define EPTABLESIZE     3
+
+    static const uint16_t s_eptable[EPTABLESIZE] = 
+    { 
+        endpoint_mn_comm,        endpoint_mn_appl,          endpoint_mc_leftlowerleg
+    };
+   
+    uint16_t index = s_hash(ep);
+    
+    if((index < EPTABLESIZE) && (ep == s_eptable[index]) )
+    {
+        return(index);
+    }
+    else
+    {
+        return(EOK_uint16dummy);
+    }
+}
 
 extern void* eo_cfg_nvsEP_eb7_Get_remotelyownedRAM(eOnvEP_t ep, eOnvscfgOwnership_t ownership)
 {
@@ -226,33 +253,6 @@ static uint16_t s_hash(uint16_t ep)
     return(EOK_uint16dummy);
 }
 
-static uint16_t s_eo_cfg_nvsEP_eb7_hashfunction_ep2index(uint16_t ep)
-{
-    // in order to always have a hit the table s_eptable[] it must be of size equal to max{ s_hash(ep) }, thus if we
-    // use an ep of value 16 and s_hash() just keeps the lsb, then the size must be 17 
-    // if there are holes, they shall have EOK_uint16dummy in other entries. for example, if we have eps = {0, 7, 16}
-    // then the table shall be of size 17, shall contain 0xffff everywhere but in positions 0, 7, 16 where the values
-    // are ... 0, 7, 16    
-
-
-    #define EPTABLESIZE     3
-
-    static const uint16_t s_eptable[EPTABLESIZE] = 
-    { 
-        endpoint_mn_comm,        endpoint_mn_appl,          endpoint_mc_leftlowerleg
-    };
-   
-    uint16_t index = s_hash(ep);
-    
-    if((index < EPTABLESIZE) && (ep == s_eptable[index]) )
-    {
-        return(index);
-    }
-    else
-    {
-        return(EOK_uint16dummy);
-    }
-}
 
 static void s_eocfg_eps_ebx_ram_retrieve(eOnvEP_t ep, void* loc, void* rem)
 {

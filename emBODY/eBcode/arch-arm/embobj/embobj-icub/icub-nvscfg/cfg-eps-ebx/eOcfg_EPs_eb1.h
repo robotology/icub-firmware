@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 
-/** @file       eOcfg_EPs_eb1.h
+/** @file           
 	@brief      This header file contains a const configuration for the endpoints of board EB1 (left arm, upper)
 	@author     marco.accame@iit.it
 	@date       05/02/2012
@@ -73,6 +73,19 @@ extern "C" {
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
+extern const EOconstvector eo_cfg_EPs_vectorof_eb1_object;
+
+// EOconstvector where each element is a eOnvscfg_EP_t
+extern const EOconstvector* const eo_cfg_EPs_vectorof_eb1;
+
+// if not NULL it contains a mapping from EPs to index inside eo_cfg_EPs_vectorof_eb1
+extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb1_fptr_hashfunction_ep2index;
+
+
+// - declaration of extern public functions ---------------------------------------------------------------------------
+
+extern uint16_t eo_cfg_nvsEP_eb1_hashfunction_ep2index(uint16_t ep);
+
 /** @fn         extern void* eo_cfg_nvsEP_eb1_Get_remotelyownedRAM(eOnvEP_t ep, eOnvscfgOwnership_t ownership)
     @brief      retrieves the RAM of the endpoint remeotely owned specified by @e ep if loaded by the EOnvsCfg object with eo_cfg_EPs_vectorof_ebx .
     @param      ep              The endpoint.
@@ -87,18 +100,6 @@ extern void* eo_cfg_nvsEP_eb1_Get_remotelyownedRAM(eOnvEP_t ep, eOnvscfgOwnershi
     @return     The pointer to teh memory or NULL if the memory is not initialised yet or if the ep is not recognised
  **/
 extern void* eo_cfg_nvsEP_eb1_Get_locallyownedRAM(eOnvEP_t ep);
-
-// EOconstvector where each element is a eOnvscfg_EP_t
-extern const EOconstvector* const eo_cfg_EPs_vectorof_eb1;
-
-// if not NULL it contains a mapping from EPs to index inside eo_cfg_EPs_vectorof_eb1
-extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb1_fptr_hashfunction_ep2index;
-
-
-// - declaration of extern public functions ---------------------------------------------------------------------------
-// empty-section
-
-
 
 
 /** @}            

@@ -74,6 +74,16 @@ typedef struct
     const osal_cfg_t*           osalcfg;
     const void*                 fsalcfg; // good thing to remove the fsal, as on sourceforge it does not appear yet
 } eOmsystem_cfg_t;
+
+
+typedef struct
+{
+    eOmsystem_cfg_t             msyscfg;
+    eOmempool_cfg_t             mempoolcfg;
+    eOerrman_cfg_t              errmancfg;
+    eOmtimerman_cfg_t           tmrmancfg;
+    eOmcallbackman_cfg_t        cbkmancfg;
+} eOmsystem_whole_cfg_t;
  
 
 /** @typedef    typedef struct EOMtheSystem_hid EOMtheSystem
@@ -125,7 +135,8 @@ extern EOMtheSystem * eom_sys_Initialise(const eOmsystem_cfg_t *syscfg,
                                          const eOerrman_cfg_t *errmancfg,
                                          const eOmtimerman_cfg_t *tmrmancfg,
                                          const eOmcallbackman_cfg_t *cbkmancfg);
- 
+
+
  
 /** @fn         extern EOMtheSystem* eom_sys_GetHandle(void)
     @brief      Returns an handle to the singleton EOMtheSystem. The singleton must have been initialised otherwise 

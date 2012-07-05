@@ -83,7 +83,11 @@ typedef enum
     eo_nvscfg_devicesownership_someremote            = 3
 } eOnvscfgDevicesOwnership_t;
 
-
+typedef struct
+{
+    const EOconstvector*    vectorof_endpoint_cfg;
+    eOuint16_fp_uint16_t    hashfunction_ep2index;
+} eOnvscfg_setof_EPs_t;
 
 typedef struct                      // size is 24 bytes
 {
