@@ -62,7 +62,6 @@
 #include "osal_cfg.h"
 #include "ipal_cfg.h"
 
-#include "eom_emsappl_info.h"
 
 // -------------------------------------------------------------------------------------------------------------------
 // - declaration of extern variables defined elsewhere, for which we dont include the proper .h
@@ -99,9 +98,7 @@ extern const ipal_cfg_t    ipal_cfg;
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "eom_emsappl_ebx.h"
-//emsapplcfg
-//extern const eEmoduleInfo_t eom_emsappl_info_modinfo __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+
 extern const eEmoduleInfo_t eom_emsapplcfg_modinfo __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 {
     .info           =
