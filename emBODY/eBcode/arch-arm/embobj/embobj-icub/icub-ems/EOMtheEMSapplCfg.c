@@ -61,13 +61,16 @@
 #include "hal_cfg.h"
 #include "osal_cfg.h"
 #include "ipal_cfg.h"
-extern const hal_cfg_t     hal_cfg;
-extern const osal_cfg_t    osal_cfg;
-extern const ipal_cfg_t    ipal_cfg;
-
 
 #include "eom_emsappl_info.h"
 
+// -------------------------------------------------------------------------------------------------------------------
+// - declaration of extern variables defined elsewhere, for which we dont include the proper .h
+// -------------------------------------------------------------------------------------------------------------------
+
+extern const hal_cfg_t     hal_cfg;
+extern const osal_cfg_t    osal_cfg;
+extern const ipal_cfg_t    ipal_cfg;
 
 
 
@@ -95,7 +98,60 @@ extern const ipal_cfg_t    ipal_cfg;
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+#include "eom_emsappl_ebx.h"
+//emsapplcfg
+//extern const eEmoduleInfo_t eom_emsappl_info_modinfo __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+extern const eEmoduleInfo_t eom_emsapplcfg_modinfo __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+{
+    .info           =
+    {
+        .entity     =
+        {
+            .type       = ee_entity_process,
+            .signature  = ee_procApplication,
+            .version    = 
+            { 
+                .major = EOMTHEEMSAPPLCFG_VERSION_MAJOR, 
+                .minor = EOMTHEEMSAPPLCFG_VERSION_MINOR
+            },  
+            .builddate  = 
+            {
+                .year  = EOMTHEEMSAPPLCFG_BUILDDATE_YEAR,
+                .month = EOMTHEEMSAPPLCFG_BUILDDATE_MONTH,
+                .day   = EOMTHEEMSAPPLCFG_BUILDDATE_DAY,
+                .hour  = EOMTHEEMSAPPLCFG_BUILDDATE_HOUR,
+                .min   = EOMTHEEMSAPPLCFG_BUILDDATE_MIN
+            }
+        },
+        .rom        = 
+        {   
+            .addr   = EENV_MEMMAP_EAPPLICATION_ROMADDR,
+            .size   = EENV_MEMMAP_EAPPLICATION_ROMSIZE
+        },
+        .ram        = 
+        {   
+            .addr   = EENV_MEMMAP_EAPPLICATION_RAMADDR,
+            .size   = EENV_MEMMAP_EAPPLICATION_RAMSIZE
+        },
+        .storage    = 
+        {
+            .type   = ee_strg_none,
+            .size   = 0,
+            .addr   = 0
+        },
+        .communication  = ee_commtype_eth,  // later on we may also add can1 and can2
+        .name           = EOMTHEEMSAPPLCFG_NAME
+    },
+    .protocols  =
+    {
+        .udpprotversion  = { .major = 0, .minor = 1},
+        .can1protversion = { .major = 0, .minor = 1},
+        .can2protversion = { .major = 0, .minor = 1},
+        .gtwprotversion  = { .major = 0, .minor = 0}
+    },
+    .extra      = {0}
+};
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -162,7 +218,7 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
     },
     .applcfg        =
     {
-        .emsappinfo             = &eom_emsappl_info_modinfo,
+        .emsappinfo             = &eom_emsapplcfg_modinfo, //&eom_emsappl_info_modinfo,
         .hostipv4addr           = EO_COMMON_IPV4ADDR(EOMTHEEMSAPPLCFG_HOSTIPADDR1, EOMTHEEMSAPPLCFG_HOSTIPADDR2, EOMTHEEMSAPPLCFG_HOSTIPADDR3, EOMTHEEMSAPPLCFG_HOSTIPADDR4),
         .hostipv4port           = EOMTHEEMSAPPLCFG_HOSTIPPORT        
     },
@@ -186,6 +242,11 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
         }   
     },
     .getipaddrFROMenvironment   =   EOMTHEEMSAPPLCFG_IPADDR_FROM_ENVIRONMENT,
+    .boardid                    =   (eom_emsapplcfg_boardid_t)EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD,
+    .hasdevice                  = 
+    {
+        EOMTHEEMSAPPLCFG_EBX_hasSKIN, EOMTHEEMSAPPLCFG_EBX_hasMC4, EOMTHEEMSAPPLCFG_EBX_has2FOC
+    },
     .socketcfg      =
     {
         .inpdatagramnumber          = EOMTHEEMSAPPLCFG_SOCKET_INPDGRAMNUMBER, 
@@ -196,9 +257,20 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
         .usemutex                   = eobool_true
     },
     .transcfg       =
-    {   // the same as in applcfg ...
+    {   // the same ipv4 addr and port as in applcfg ...
+        .vectorof_endpoint_cfg  = EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg,
+        .hashfunction_ep2index  = EOMTHEEMSAPPLCFG_hashfunction_ep2index,
         .hostipv4addr           = EO_COMMON_IPV4ADDR(EOMTHEEMSAPPLCFG_HOSTIPADDR1, EOMTHEEMSAPPLCFG_HOSTIPADDR2, EOMTHEEMSAPPLCFG_HOSTIPADDR3, EOMTHEEMSAPPLCFG_HOSTIPADDR4),
-        .hostipv4port           = EOMTHEEMSAPPLCFG_HOSTIPPORT        
+        .hostipv4port           = EOMTHEEMSAPPLCFG_HOSTIPPORT,
+        .sizes                  =
+        {
+            .capacityofpacket               = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY, //1024,
+            .capacityofrop                  = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPCAPACITY, //256,
+            .capacityofropframeregulars     = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY, //768,
+            .capacityofropframeoccasionals  = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEOCCASIONALSCAPACITY, //128,
+            .capacityofropframereplies      = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY, //128,
+            .maxnumberofregularrops         = EOMTHEEMSAPPLCFG_TRANSCEIVER_MAXNUMOFREGULARROPS //32
+        }    
     },
     .errobjcfg      =
     {
@@ -264,6 +336,12 @@ extern EOMtheEMSapplCfg* eom_emsapplcfg_GetHandle(void)
 }
 
 
+extern eObool_t eom_emsapplcfg_HasDevice(EOMtheEMSapplCfg *p, eom_emsapplcfg_deviceid_t dev)
+{
+    return(s_emsapplcfg_singleton.hasdevice[dev]);
+}
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -295,9 +373,7 @@ __weak extern void eom_emsapplcfg_hid_userdef_OnError(eOerrmanErrorType_t errtyp
 
 static void s_emsapplcfg_singleton_verify(void)
 {
-    char str[64];
-    snprintf(str, sizeof(str)-1, "verified and is OK");
-    eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);
+
 }
 
 

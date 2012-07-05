@@ -59,8 +59,19 @@
 
 const eOemstransceiver_cfg_t eom_emstransceiver_DefaultCfg = 
 {
+    EO_INIT(.vectorof_endpoint_cfg)     NULL,
+    EO_INIT(.hashfunction_ep2index)     NULL,
     EO_INIT(.hostipv4addr)              EO_COMMON_IPV4ADDR(10, 0, 1, 200), 
-    EO_INIT(.hostipv4port)              12345
+    EO_INIT(.hostipv4port)              12345,
+    EO_INIT(.sizes)
+    {
+        EO_INIT(.capacityofpacket)                  1024,
+        EO_INIT(.capacityofrop)                     256,
+        EO_INIT(.capacityofropframeregulars)        768,
+        EO_INIT(.capacityofropframeoccasionals)     128,
+        EO_INIT(.capacityofropframereplies)         128,
+        EO_INIT(.maxnumberofregularrops)            32        
+    }
 };
 
 
@@ -108,8 +119,20 @@ extern EOMtheEMStransceiver * eom_emstransceiver_Initialise(const eOemstransceiv
         cfg = &eom_emstransceiver_DefaultCfg;
     }
     
+    eOboardtransceiver_cfg_t brdtransceiver_cfg;
+    
+    brdtransceiver_cfg.vectorof_endpoint_cfg    = cfg->vectorof_endpoint_cfg;
+    brdtransceiver_cfg.hashfunction_ep2index    = cfg->hashfunction_ep2index;   
+    brdtransceiver_cfg.remotehostipv4addr       = cfg->hostipv4addr;
+    brdtransceiver_cfg.remotehostipv4port       = cfg->hostipv4port;
+    memcpy(&brdtransceiver_cfg.sizes, &cfg->sizes, sizeof(eo_transceiver_sizes_t));
+
+    #warning ATTENZIONE HO RIMOSSO QUESTO 
+    //eom_emstransceiver_hid_userdef_add_endpoints(&brdtransceiver_cfg);
+    
  
-    s_emstransceiver_singleton.transceiver = eo_boardtransceiver_Initialise(eom_emstransceiver_hid_userdef_get_cfg(cfg));
+    //s_emstransceiver_singleton.transceiver = eo_boardtransceiver_Initialise(eom_emstransceiver_hid_userdef_get_cfg(cfg));
+    s_emstransceiver_singleton.transceiver = eo_boardtransceiver_Initialise(&brdtransceiver_cfg);
     
     char str[96];
     uint8_t *ipaddr = (uint8_t*) &cfg->hostipv4addr;
@@ -187,31 +210,36 @@ extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** tx
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+// __weak extern void eom_emstransceiver_hid_userdef_add_endpoints(eOboardtransceiver_cfg_t *brdcfg)
+// {
+//     brdcfg->vectorof_endpoint_cfg      = NULL;
+//     brdcfg->hashfunction_ep2index      = NULL;    
+// }
 
-__weak extern eOboardtransceiver_cfg_t* eom_emstransceiver_hid_userdef_get_cfg(const eOemstransceiver_cfg_t *cfg)
-{
-    const eo_transceiver_sizes_t sizes =   
-    {
-        .capacityofpacket               = 1024,
-        .capacityofrop                  = 256,
-        .capacityofropframeregulars     = 768,
-        .capacityofropframeoccasionals  = 128,
-        .capacityofropframereplies      = 128,
-        .maxnumberofregularrops         = 32
-    };   
-    static eOboardtransceiver_cfg_t boardtxrxcfg =  {0};
+// __weak extern eOboardtransceiver_cfg_t* eom_emstransceiver_hid_userdef_get_cfg(const eOemstransceiver_cfg_t *cfg)
+// {
+//     const eo_transceiver_sizes_t sizes =   
+//     {
+//         .capacityofpacket               = 1024,
+//         .capacityofrop                  = 256,
+//         .capacityofropframeregulars     = 768,
+//         .capacityofropframeoccasionals  = 128,
+//         .capacityofropframereplies      = 128,
+//         .maxnumberofregularrops         = 32
+//     };   
+//     static eOboardtransceiver_cfg_t boardtxrxcfg =  {0};
 
 
-#if 0 
-    boardtxrxcfg.vectorof_endpoint_cfg          = vectorof_endpoint_cfg;
-    boardtxrxcfg.hashfunction_ep2index          = hashfunction_ep2index;
-    boardtxrxcfg.remotehostipv4addr             = cfg->hostipv4addr;
-    boardtxrxcfg.remotehostipv4port             = cfg->hostipv4port;
-#endif
-    memcpy(&boardtxrxcfg.sizes, &sizes, sizeof(eo_transceiver_sizes_t));
+// #if 0 
+//     boardtxrxcfg.vectorof_endpoint_cfg          = vectorof_endpoint_cfg;
+//     boardtxrxcfg.hashfunction_ep2index          = hashfunction_ep2index;
+//     boardtxrxcfg.remotehostipv4addr             = cfg->hostipv4addr;
+//     boardtxrxcfg.remotehostipv4port             = cfg->hostipv4port;
+// #endif
+//     memcpy(&boardtxrxcfg.sizes, &sizes, sizeof(eo_transceiver_sizes_t));
 
-    return(&boardtxrxcfg);
-}
+//     return(&boardtxrxcfg);
+// }
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 

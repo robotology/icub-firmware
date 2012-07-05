@@ -65,8 +65,11 @@ typedef struct EOMtheEMStransceiver_hid EOMtheEMStransceiver;
  **/
 typedef struct
 {
-    eOipv4addr_t    hostipv4addr;
-    eOipv4port_t    hostipv4port;    
+    const EOconstvector*    vectorof_endpoint_cfg;
+    eOuint16_fp_uint16_t    hashfunction_ep2index;
+    eOipv4addr_t            hostipv4addr;
+    eOipv4port_t            hostipv4port; 
+    eo_transceiver_sizes_t  sizes;  
 } eOemstransceiver_cfg_t;
 
 
