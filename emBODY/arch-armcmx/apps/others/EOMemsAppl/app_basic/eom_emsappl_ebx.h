@@ -43,46 +43,48 @@
 
 #include "EoCommon.h"
 
-#include "eom_emsappl_ebx_usethis.h" 
+//#include "eom_emsappl_ebx_usethis.h" 
+
+#include "EOMtheEMSapplCfg_cfg.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
 // some properties of the application: hasSKIN, hasMC4, has2FOC
-#if     defined(USE_EB2) || defined(USE_EB4)
+#if     defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4)
     #define EMSAPPL_hasSKIN
     #define EMSAPPL_hasMC4
     #undef  EMSAPPL_has2FOC
-#elif   defined(USE_EB1) || defined(USE_EB3) || defined(USE_EB5) || defined(USE_EB6) || defined(USE_EB7) || defined(USE_EB8) || defined(USE_EB9)
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3) || defined(EOMTHEEMSAPPLCFG_USE_EB5) || defined(EOMTHEEMSAPPLCFG_USE_EB6) || defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB8) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
     #undef  EMSAPPL_hasSKIN
     #undef  EMSAPPL_hasMC4
     #define EMSAPPL_has2FOC
 #else
-    #error --> you must define a EBx
+    #error --> you must define an EBx
 #endif
 
 
-// the name of the application
-#if     defined(USE_EB1)
-    #define EMSAPPL_NAME "EOMemsApplEB1"
-#elif   defined(USE_EB2)
-    #define EMSAPPL_NAME "EOMemsApplEB2"
-#elif   defined(USE_EB3)
-    #define EMSAPPL_NAME "EOMemsApplEB3"
-#elif   defined(USE_EB4)
-    #define EMSAPPL_NAME "EOMemsApplEB4"
-#elif   defined(USE_EB5)
-    #define EMSAPPL_NAME "EOMemsApplEB5"
-#elif   defined(USE_EB6)
-    #define EMSAPPL_NAME "EOMemsApplEB6"
-#elif   defined(USE_EB7)
-    #define EMSAPPL_NAME "EOMemsApplEB7"    
-#elif   defined(USE_EB8)
-    #define EMSAPPL_NAME "EOMemsApplEB8"
-#elif   defined(USE_EB9)
-    #define EMSAPPL_NAME "EOMemsApplEB9"
-#else
-    #error --> you must define a EBx
-#endif
+// // the name of the application
+// #if     defined(EOMTHEEMSAPPLCFG_USE_EB1)
+//     #define EMSAPPL_NAME "EOMemsApplEB1"
+// #elif   defined(EOMTHEEMSAPPLCFG_USE_EB2)
+//     #define EMSAPPL_NAME "EOMemsApplEB2"
+// #elif   defined(EOMTHEEMSAPPLCFG_USE_EB3)
+//     #define EMSAPPL_NAME "EOMemsApplEB3"
+// #elif   defined(EOMTHEEMSAPPLCFG_USE_EB4)
+//     #define EMSAPPL_NAME "EOMemsApplEB4"
+// #elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
+//     #define EMSAPPL_NAME "EOMemsApplEB5"
+// #elif   defined(EOMTHEEMSAPPLCFG_USE_EB6)
+//     #define EMSAPPL_NAME "EOMemsApplEB6"
+// #elif   defined(EOMTHEEMSAPPLCFG_USE_EB7)
+//     #define EMSAPPL_NAME "EOMemsApplEB7"    
+// #elif   defined(EOMTHEEMSAPPLCFG_USE_EB8)
+//     #define EMSAPPL_NAME "EOMemsApplEB8"
+// #elif   defined(EOMTHEEMSAPPLCFG_USE_EB9)
+//     #define EMSAPPL_NAME "EOMemsApplEB9"
+// #else
+//     #error --> you must define an EBx
+// #endif
 
 
 

@@ -52,9 +52,8 @@
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eEmoduleInfo_t             eom_emsappl_info_modinfo;
+//extern const eEmoduleInfo_t             eom_emsappl_info_modinfo;
 
-extern const eOmsystem_cfg_t            eom_emsappl_info_syscfg;
 
 
 

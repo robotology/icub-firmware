@@ -35,7 +35,7 @@
 // - public #define  --------------------------------------------------------------------------------------------------
 
 // - configurable section (may however be configured by -D compiler option)
-#define USE_EB1
+//#define USE_EB1
 
 
 

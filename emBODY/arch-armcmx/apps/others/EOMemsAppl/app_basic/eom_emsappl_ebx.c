@@ -82,81 +82,138 @@
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-
-//__weak 
-extern eOboardtransceiver_cfg_t* eom_emstransceiver_hid_userdef_get_cfg(const eOemstransceiver_cfg_t *cfg)
+// defined as __weak elsewhere 
+extern void eom_emstransceiver_hid_userdef_add_endpoints(eOboardtransceiver_cfg_t *brdcfg)
 {
- 
-    // every board uses the same sizes even if they are dimensioned for the worst case of EB2.
-    const eo_transceiver_sizes_t sizes =   
-    {
-        .capacityofpacket               = 1024,
-        .capacityofrop                  = 256,
-        .capacityofropframeregulars     = 768,
-        .capacityofropframeoccasionals  = 128,
-        .capacityofropframereplies      = 128,
-        .maxnumberofregularrops         = 32
-    };  
-
-    static eOboardtransceiver_cfg_t boardtxrxcfg = {0};
-
-#if     defined(USE_EB1)
+    
+#if     defined(EOMTHEEMSAPPLCFG_USE_EB1)
     extern const EOconstvector* const eo_cfg_EPs_vectorof_eb1;
     extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb1_fptr_hashfunction_ep2index;  
     const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb1;
     eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb1_fptr_hashfunction_ep2index;
-#elif   defined(USE_EB2)
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB2)
     extern const EOconstvector* const eo_cfg_EPs_vectorof_eb2;
     extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb2_fptr_hashfunction_ep2index;
     const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb2;
     eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb2_fptr_hashfunction_ep2index;
-#elif   defined(USE_EB3)
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB3)
     extern const EOconstvector* const eo_cfg_EPs_vectorof_eb3;
     extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb3_fptr_hashfunction_ep2index;
     const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb3;
     eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb3_fptr_hashfunction_ep2index;
-#elif   defined(USE_EB4)
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB4)
     extern const EOconstvector* const eo_cfg_EPs_vectorof_eb4;
     extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb4_fptr_hashfunction_ep2index;
     const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb4;
     eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb4_fptr_hashfunction_ep2index;
-#elif   defined(USE_EB5)
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
     extern const EOconstvector* const eo_cfg_EPs_vectorof_eb5;
     extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb5_fptr_hashfunction_ep2index;
     const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb5;
     eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb5_fptr_hashfunction_ep2index;
-#elif   defined(USE_EB6)
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB6)
     extern const EOconstvector* const eo_cfg_EPs_vectorof_eb6;
     extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb6_fptr_hashfunction_ep2index;
     const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb6;
     eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb6_fptr_hashfunction_ep2index;
-#elif   defined(USE_EB7)
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB7)
     extern const EOconstvector* const eo_cfg_EPs_vectorof_eb7;
     extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb7_fptr_hashfunction_ep2index;
     const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb7;
     eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb7_fptr_hashfunction_ep2index;    
-#elif   defined(USE_EB8)
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB8)
     extern const EOconstvector* const eo_cfg_EPs_vectorof_eb8;
     extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb8_fptr_hashfunction_ep2index;
     const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb8;
     eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb8_fptr_hashfunction_ep2index;
-#elif   defined(USE_EB9)
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB9)
     extern const EOconstvector* const eo_cfg_EPs_vectorof_eb9;
     extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb9_fptr_hashfunction_ep2index;
     const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb9;
     eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb9_fptr_hashfunction_ep2index;
-#endif    
+#else
+    #error --> you must specify a EOMTHEEMSAPPLCFG_USE_EBx
+#endif
 
     
- 
-    boardtxrxcfg.vectorof_endpoint_cfg          = vectorof_endpoint_cfg;
-    boardtxrxcfg.hashfunction_ep2index          = hashfunction_ep2index;
-    boardtxrxcfg.remotehostipv4addr             = cfg->hostipv4addr;
-    boardtxrxcfg.remotehostipv4port             = cfg->hostipv4port;
-    memcpy(&boardtxrxcfg.sizes, &sizes, sizeof(eo_transceiver_sizes_t));
-
-    return(&boardtxrxcfg);
+    brdcfg->vectorof_endpoint_cfg      = vectorof_endpoint_cfg;
+    brdcfg->hashfunction_ep2index      = hashfunction_ep2index;    
 }
+
+// // defined as __weak elsewhere 
+// extern eOboardtransceiver_cfg_t* eom_emstransceiver_hid_userdef_get_cfg(const eOemstransceiver_cfg_t *cfg)
+// {
+//  
+//     // every board uses the same sizes even if they are dimensioned for the worst case of EB2.
+//     const eo_transceiver_sizes_t sizes =   
+//     {
+//         .capacityofpacket               = 1024,
+//         .capacityofrop                  = 256,
+//         .capacityofropframeregulars     = 768,
+//         .capacityofropframeoccasionals  = 128,
+//         .capacityofropframereplies      = 128,
+//         .maxnumberofregularrops         = 32
+//     };  
+
+//     static eOboardtransceiver_cfg_t boardtxrxcfg = {0};
+
+// #if     defined(EOMTHEEMSAPPLCFG_USE_EB1)
+//     extern const EOconstvector* const eo_cfg_EPs_vectorof_eb1;
+//     extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb1_fptr_hashfunction_ep2index;  
+//     const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb1;
+//     eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb1_fptr_hashfunction_ep2index;
+// #elif   defined(EOMTHEEMSAPPLCFG_USE_EB2)
+//     extern const EOconstvector* const eo_cfg_EPs_vectorof_eb2;
+//     extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb2_fptr_hashfunction_ep2index;
+//     const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb2;
+//     eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb2_fptr_hashfunction_ep2index;
+// #elif   defined(EOMTHEEMSAPPLCFG_USE_EB3)
+//     extern const EOconstvector* const eo_cfg_EPs_vectorof_eb3;
+//     extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb3_fptr_hashfunction_ep2index;
+//     const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb3;
+//     eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb3_fptr_hashfunction_ep2index;
+// #elif   defined(EOMTHEEMSAPPLCFG_USE_EB4)
+//     extern const EOconstvector* const eo_cfg_EPs_vectorof_eb4;
+//     extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb4_fptr_hashfunction_ep2index;
+//     const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb4;
+//     eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb4_fptr_hashfunction_ep2index;
+// #elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
+//     extern const EOconstvector* const eo_cfg_EPs_vectorof_eb5;
+//     extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb5_fptr_hashfunction_ep2index;
+//     const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb5;
+//     eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb5_fptr_hashfunction_ep2index;
+// #elif   defined(EOMTHEEMSAPPLCFG_USE_EB6)
+//     extern const EOconstvector* const eo_cfg_EPs_vectorof_eb6;
+//     extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb6_fptr_hashfunction_ep2index;
+//     const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb6;
+//     eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb6_fptr_hashfunction_ep2index;
+// #elif   defined(EOMTHEEMSAPPLCFG_USE_EB7)
+//     extern const EOconstvector* const eo_cfg_EPs_vectorof_eb7;
+//     extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb7_fptr_hashfunction_ep2index;
+//     const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb7;
+//     eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb7_fptr_hashfunction_ep2index;    
+// #elif   defined(EOMTHEEMSAPPLCFG_USE_EB8)
+//     extern const EOconstvector* const eo_cfg_EPs_vectorof_eb8;
+//     extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb8_fptr_hashfunction_ep2index;
+//     const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb8;
+//     eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb8_fptr_hashfunction_ep2index;
+// #elif   defined(EOMTHEEMSAPPLCFG_USE_EB9)
+//     extern const EOconstvector* const eo_cfg_EPs_vectorof_eb9;
+//     extern const eOuint16_fp_uint16_t eo_cfg_nvsEP_eb9_fptr_hashfunction_ep2index;
+//     const EOconstvector*        vectorof_endpoint_cfg   = eo_cfg_EPs_vectorof_eb9;
+//     eOuint16_fp_uint16_t        hashfunction_ep2index   = eo_cfg_nvsEP_eb9_fptr_hashfunction_ep2index;
+// #endif    
+
+//     
+//  
+//     boardtxrxcfg.vectorof_endpoint_cfg          = vectorof_endpoint_cfg;
+//     boardtxrxcfg.hashfunction_ep2index          = hashfunction_ep2index;
+//     boardtxrxcfg.remotehostipv4addr             = cfg->hostipv4addr;
+//     boardtxrxcfg.remotehostipv4port             = cfg->hostipv4port;
+//     memcpy(&boardtxrxcfg.sizes, &sizes, sizeof(eo_transceiver_sizes_t));
+
+//     return(&boardtxrxcfg);
+// }
 
 
 // --------------------------------------------------------------------------------------------------------------------

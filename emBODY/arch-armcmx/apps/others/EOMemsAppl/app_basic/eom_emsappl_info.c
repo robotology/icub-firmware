@@ -38,8 +38,6 @@
 #include "eom_emsappl_ebx.h"
 
 
-extern const hal_cfg_t     hal_cfg;
-extern const osal_cfg_t    osal_cfg;
 
 
 
@@ -80,64 +78,58 @@ extern const osal_cfg_t    osal_cfg;
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern const eEmoduleInfo_t eom_emsappl_info_modinfo __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
-{
-    .info           =
-    {
-        .entity     =
-        {
-            .type       = ee_entity_process,
-            .signature  = ee_procApplication,
-            .version    = 
-            { 
-                .major = 1, 
-                .minor = 0
-            },  
-            .builddate  = 
-            {
-                .year  = 2012,
-                .month = 5,
-                .day   = 21,
-                .hour  = 14,
-                .min   = 30
-            }
-        },
-        .rom        = 
-        {   
-            .addr   = EENV_MEMMAP_EAPPLICATION_ROMADDR,
-            .size   = EENV_MEMMAP_EAPPLICATION_ROMSIZE
-        },
-        .ram        = 
-        {   
-            .addr   = EENV_MEMMAP_EAPPLICATION_RAMADDR,
-            .size   = EENV_MEMMAP_EAPPLICATION_RAMSIZE
-        },
-        .storage    = 
-        {
-            .type   = ee_strg_none,
-            .size   = 0,
-            .addr   = 0
-        },
-        .communication  = ee_commtype_eth,  // later on we may also add can1 and can2
-        .name           = EMSAPPL_NAME
-    },
-    .protocols  =
-    {
-        .udpprotversion  = { .major = 0, .minor = 1},
-        .can1protversion = { .major = 0, .minor = 1},
-        .can2protversion = { .major = 0, .minor = 1},
-        .gtwprotversion  = { .major = 0, .minor = 0}
-    },
-    .extra      = {0}
-};
+// extern const eEmoduleInfo_t eom_emsappl_info_modinfo __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+// {
+//     .info           =
+//     {
+//         .entity     =
+//         {
+//             .type       = ee_entity_process,
+//             .signature  = ee_procApplication,
+//             .version    = 
+//             { 
+//                 .major = 1, 
+//                 .minor = 0
+//             },  
+//             .builddate  = 
+//             {
+//                 .year  = 2012,
+//                 .month = 5,
+//                 .day   = 21,
+//                 .hour  = 14,
+//                 .min   = 30
+//             }
+//         },
+//         .rom        = 
+//         {   
+//             .addr   = EENV_MEMMAP_EAPPLICATION_ROMADDR,
+//             .size   = EENV_MEMMAP_EAPPLICATION_ROMSIZE
+//         },
+//         .ram        = 
+//         {   
+//             .addr   = EENV_MEMMAP_EAPPLICATION_RAMADDR,
+//             .size   = EENV_MEMMAP_EAPPLICATION_RAMSIZE
+//         },
+//         .storage    = 
+//         {
+//             .type   = ee_strg_none,
+//             .size   = 0,
+//             .addr   = 0
+//         },
+//         .communication  = ee_commtype_eth,  // later on we may also add can1 and can2
+//         .name           = EMSAPPL_NAME
+//     },
+//     .protocols  =
+//     {
+//         .udpprotversion  = { .major = 0, .minor = 1},
+//         .can1protversion = { .major = 0, .minor = 1},
+//         .can2protversion = { .major = 0, .minor = 1},
+//         .gtwprotversion  = { .major = 0, .minor = 0}
+//     },
+//     .extra      = {0}
+// };
 
-extern const eOmsystem_cfg_t eom_emsappl_info_syscfg =
-{
-    .codespaceoffset    = (EENV_MEMMAP_EAPPLICATION_ROMADDR-EENV_ROMSTART),
-    .halcfg             = &hal_cfg,
-    .osalcfg            = &osal_cfg,
-    .fsalcfg            = NULL
-};
+
 
 
 

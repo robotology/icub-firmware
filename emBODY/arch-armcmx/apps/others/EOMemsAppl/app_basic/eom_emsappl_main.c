@@ -32,16 +32,15 @@
 #include "stdint.h"
 #include "stdlib.h"
 #include "string.h"
-#include "stdio.h"
-#include "hal_trace.h"
 
-#include "EoCommon.h"
+
+
 #include "EOMtheSystem.h"
-#include "EOVtheSystem.h"
-#include "EOtheErrorManager.h"
+
+#include "EOMtheEMSapplCfg.h"
 #include "EOMtheEMSappl.h"
 
-#include "eom_emsappl_info.h"
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -83,19 +82,12 @@
 
 static void s_eom_emsappl_main_init(void);
 
-static void s_eom_emsappl_main_startup_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info);
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-
-
-static const eOerrman_cfg_t  s_eom_emsappl_main_errcfg_startup = 
-{
-    .extfn.usr_on_error = s_eom_emsappl_main_startup_OnError
-};
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -105,12 +97,13 @@ static const eOerrman_cfg_t  s_eom_emsappl_main_errcfg_startup =
 
 int main(void)
 {
+    EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_Initialise();
 
-    eom_sys_Initialise( &eom_emsappl_info_syscfg,
-                        NULL,                         // mempool uses calloc
-                        &s_eom_emsappl_main_errcfg_startup,                
-                        &eom_timerman_DefaultCfg,
-                        &eom_callbackman_DefaultCfg
+    eom_sys_Initialise( &emscfg->wsyscfg.msyscfg, 
+                        &emscfg->wsyscfg.mempoolcfg,                         
+                        &emscfg->wsyscfg.errmancfg,                 
+                        &emscfg->wsyscfg.tmrmancfg, 
+                        &emscfg->wsyscfg.cbkmancfg 
                       );  
     
     eom_sys_Start(eom_sys_GetHandle(), s_eom_emsappl_main_init);
@@ -132,39 +125,15 @@ int main(void)
 
 /** @fn         static void s_eom_emsappl_main_init(void)
     @brief      It initialises the emsappl 
-     @details    bla bla bla.
+    @details    bla bla bla.
  **/
 
 static void s_eom_emsappl_main_init(void)
 {
-    eOemsappl_cfg_t cfg;
-    memcpy(&cfg, &eom_emsappl_DefaultCfg, sizeof(eOemsappl_cfg_t));
-    cfg.emsappinfo = &eom_emsappl_info_modinfo;
-    cfg.hostipv4addr = EO_COMMON_IPV4ADDR(10, 255, 72, 205);
-    //cfg.hostipv4addr = EO_COMMON_IPV4ADDR(10, 0, 0, 254);
-    cfg.hostipv4port = 33333;
+   
+    EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
     
-    eom_emsappl_Initialise(&cfg);
-}
-
-
-
-static void s_eom_emsappl_main_startup_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info)
-{
-    const char err[4][16] = {"info", "warning", "weak error", "fatal error"};
-    char str[128];
-
-    snprintf(str, sizeof(str)-1, "startup: [eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, err[(uint8_t)errtype], info);
-    hal_trace_puts(str);
-
-    if(errtype <= eo_errortype_warning)
-    {
-        return;
-    }
-    
-    eov_sys_Stop(eov_sys_GetHandle());
-
-    for(;;);
+    eom_emsappl_Initialise(&emscfg->applcfg);
 }
 
 
