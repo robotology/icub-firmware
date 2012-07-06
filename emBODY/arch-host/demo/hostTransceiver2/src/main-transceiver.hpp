@@ -25,6 +25,7 @@
 
 #define PC104
 #define _DEEP_DEBUG_
+#define _LINUX_UDP_SOCKET_
 
 // Catch CTRL + C
 static int keepGoingOn   = TRUE;

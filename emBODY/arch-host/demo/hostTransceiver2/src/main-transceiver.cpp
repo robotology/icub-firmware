@@ -52,6 +52,9 @@ using namespace std;
 #include "SkinWrapper.h"
 #include "debugFunctions.h"
 
+#ifdef _LINUX_UDP_SOCKET_
+#include "udp.h"
+#endif
 
 #define hal_trace_puts(arg)		printf("%s", arg)
 
@@ -119,8 +122,13 @@ void copyPid2eo(Pid in, eOmc_PID_t *out);
 // Connection infos
 //DSocket	UDP_socket, UDP_socket2;
 
+#ifdef _LINUX_UDP_SOCKET_
+Udp							ACE_socket;
+Udp							ACE_socket2;
+#else
 ACE_SOCK_Dgram				*ACE_socket;
 ACE_SOCK_Dgram				*ACE_socket2;
+#endif
 
 ACE_UINT16					port;
 ACE_INT8					flags = 0;
@@ -227,12 +235,42 @@ int main(int argc, char *argv[])
 
 	printf("local.address: %s\n", local.address_string.c_str());
 
+#ifdef _LINUX_UDP_SOCKET_
+	int ret = 0;
+	if(!ACE_socket.initLocal(port))
+	{
+		printf("Error initing Udp socket!!\n");
+		return -1;
+	}
+	if(!(ret = ACE_socket.connect((char *)remote01.address_string.c_str(), port)))
+	{
+		printf("Error with UDP connection to %s:%d\n", (char *)remote01.address_string.c_str(),port);
+		return 0;
+	}
+	else
+	{
+		ACE_socket.setBufferSize(EOK_HOSTTRANSCEIVER_capacityofpacket);
+		printf("done.\n");
+	}
+
+	if(!(ret = ACE_socket2.connect((char *)remote01.address_string.c_str(), port++)))
+	{
+		printf("Error with UDP connection to %s:%d\n", (char *)remote01.address_string.c_str(),port);
+		return 0;
+	}
+	else
+	{
+		ACE_socket2.setBufferSize(EOK_HOSTTRANSCEIVER_capacityofpacket);
+		printf("done.\n");
+	}
+#else
 	ACE_socket = new ACE_SOCK_Dgram();
 	if (-1 == ACE_socket->open(local.addr) )
 	{
 		printf("eStikEtzi pensa che qualcosa non abbia funzionato!!!\n");
 		return -1;
 	}
+#endif
 
 	// Set destination address_string
 	sscanf(remote01.address_string.c_str(),"%d.%d.%d.%d",&ip1,&ip2,&ip3,&ip4);
@@ -315,7 +353,11 @@ int main(int argc, char *argv[])
 			// Get the actual packet and write it into socket using udppkt_data, udppkt_size
 			// if the command isn't known, an empty ropframe wil be sent -- I guess
 			transceiver->getTransmit(&udppkt_data, &udppkt_size);
+#ifdef _LINUX_UDP_SOCKET_
+			ACE_socket.send((char*) &udppkt_data, (ssize_t) udppkt_size);
+#else
 			ACE_socket->send(udppkt_data, udppkt_size, remote01.addr, flags);
+#endif
 			printf("Sent EmbObj packet, size = %d\n", udppkt_size);
 		}
 	}
@@ -361,8 +403,11 @@ void *recvThread(void * arg)
 
 	while(keepGoingOn)
 	{
+#ifdef _LINUX_UDP_SOCKET_
+		udppkt_size = ACE_socket.recv((void *) &sender.data);
+#else
 		udppkt_size = ACE_socket->recv((void *) sender.data, maxBytes2Read, sender.addr, flags);
-
+#endif
 		if(!check_received_pkt(&sender.addr, (void *) sender.data, udppkt_size))
 			printf("Error checking the packet!!!\n");
 		//transceiver->SetReceived((ACE_UINT8 *)sender.data, udppkt_size);
@@ -384,7 +429,12 @@ void *sendThread(void * arg)
 	while(keepGoingOn)
 	{
 		transceiver->getTransmit(&udppkt_data, &udppkt_size);
+#ifdef _LINUX_UDP_SOCKET_
+		ACE_socket.send((char*) &udppkt_data, (ssize_t) udppkt_size);
+#else
 		ACE_socket->send(udppkt_data, udppkt_size, remote01.addr, flags);
+#endif
+
 		usleep(1000);
 	}
 }
@@ -1064,6 +1114,9 @@ static void s_callback_button_6(void )
 	int j = 0;
 
 	// weak up EMS
+#ifdef _LINUX_UDP_SOCKET_
+	// not used in this debug
+#else
 	str[0] = 0x01;
 
 	ACE_socket->send(str, 1, remote02.addr, flags);
@@ -1071,7 +1124,7 @@ static void s_callback_button_6(void )
 
 	str[0] = 0x02;
 	ACE_socket->send(str, 1, remote02.addr, flags);
-
+#endif
 	snprintf(str, sizeof(str)-1, "called weak up EMS\n", j);
 }
 
