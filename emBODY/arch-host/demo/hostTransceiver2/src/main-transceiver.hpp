@@ -38,7 +38,11 @@ static void sighandler(int _signum)
 static void usage(void);
 void commands(void);
 void *recvThread(void * arg);
+void *sendThread(void * arg);
 void *skinThread(void * arg);
+
+
+
 
 typedef struct
 {

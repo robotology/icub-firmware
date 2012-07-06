@@ -55,7 +55,6 @@ using namespace std;
 
 #define hal_trace_puts(arg)		printf("%s", arg)
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of external variables 
 // --------------------------------------------------------------------------------------------------------------------
@@ -268,6 +267,9 @@ int main(int argc, char *argv[])
 	if(ACE_Thread::spawn((ACE_THR_FUNC)skinThread, NULL, THR_CANCEL_ENABLE, &id_skinThread)==-1)
 		printf((LM_DEBUG,"Error in spawning id_skinThread\n"));
 
+	ACE_thread_t id_sendThread;
+	if(ACE_Thread::spawn((ACE_THR_FUNC)sendThread, NULL, THR_CANCEL_ENABLE, &id_sendThread)==-1)
+		printf((LM_DEBUG,"Error in spawning sendThread\n"));
 
 	// Send a packet to test dummy
 	while(keepGoingOn)
@@ -321,6 +323,7 @@ int main(int argc, char *argv[])
 	sleep(2);
 	//pthread_cancel(thread);
 	ACE_Thread::cancel(id_recvThread);
+	ACE_Thread::cancel(id_sendThread);
 	ACE_Thread::cancel(id_skinThread);
 	return(0);
 }
@@ -371,6 +374,20 @@ void *recvThread(void * arg)
 	return NULL;
 }
 
+
+void *sendThread(void * arg)
+{
+    uint8_t 					*udppkt_data;
+   	uint16_t 					udppkt_size;
+
+	printf("sendThread started\n");
+	while(keepGoingOn)
+	{
+		transceiver->getTransmit(&udppkt_data, &udppkt_size);
+		ACE_socket->send(udppkt_data, udppkt_size, remote01.addr, flags);
+		usleep(1000);
+	}
+}
 
 void *skinThread(void * arg)
 {
@@ -1070,6 +1087,9 @@ void copyPid2eo(Pid in, eOmc_PID_t *out)
 	out->offset = in.offset;
 	out->scale = in.scale;
 }
+
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
