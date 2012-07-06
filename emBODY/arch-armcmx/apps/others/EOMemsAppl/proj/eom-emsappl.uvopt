@@ -2594,7 +2594,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>170</TopLine>
+      <TopLine>171</TopLine>
       <CurrentLine>178</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMStransceiver.c</PathWithFileName>
@@ -2608,7 +2608,7 @@
       <Focus>0</Focus>
       <ColumnNumber>55</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>202</TopLine>
+      <TopLine>203</TopLine>
       <CurrentLine>215</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSconfigurator.c</PathWithFileName>
@@ -2706,7 +2706,7 @@
       <Focus>0</Focus>
       <ColumnNumber>26</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>77</TopLine>
+      <TopLine>78</TopLine>
       <CurrentLine>87</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_configurator.c</PathWithFileName>
