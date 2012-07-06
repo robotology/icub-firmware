@@ -91,7 +91,8 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t);
  
 static EOMtheEMSconfigurator s_emsconfigurator_singleton = 
 {
-    EO_INIT(.task)              NULL
+    EO_INIT(.task)              NULL,
+    EO_INIT(.numofrxrops)       0
 };
 
 
@@ -159,7 +160,7 @@ extern void tskEMScfg(void *p)
 } 
 
 
-__weak extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(uint16_t numberofrxrops, eOabstime_t txtimeofrxropframe)
+__weak extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSconfigurator *p)
 {
 
 } 
@@ -199,6 +200,8 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
     
     if(eobool_true == eo_common_event_check(evt, emssocket_evt_packet_received))
     {   // process the reception of a packet. it must contain a ropframe and nothing else
+        
+        s_emsconfigurator_singleton.numofrxrops = 0;
     
         // 1. get the packet. we need passing just a pointer because the storage is inside the EOMtheEMSsocket       
         res = eom_emssocket_Receive(eom_emssocket_GetHandle(), &rxpkt, &remainingrxpkts);
@@ -207,10 +210,16 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
         if(eores_OK == res)
         {
             res = eom_emstransceiver_Parse(eom_emstransceiver_GetHandle(), rxpkt, &numberofrxrops, &txtimeofrxropframe);
+            if(eores_OK == res)
+            {
+                s_emsconfigurator_singleton.numofrxrops = numberofrxrops;
+            }         
         }
         
+
+        
         // perform an user-defined function
-        eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(numberofrxrops, txtimeofrxropframe);
+        eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(&s_emsconfigurator_singleton);
         
         // 3. call the former to retrieve a tx packet (even if it is an empty ropframe)        
         res = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, &numberoftxrops);

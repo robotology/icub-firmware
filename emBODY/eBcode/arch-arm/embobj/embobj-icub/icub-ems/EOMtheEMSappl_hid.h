@@ -64,7 +64,6 @@ struct EOMtheEMSappl_hid
 
 extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p);
 
-extern eOboardtransceiver_cfg_t* eom_emsappl_hid_userdef_get_boardtransceiver_cfg(void);
 
 
 #ifdef __cplusplus

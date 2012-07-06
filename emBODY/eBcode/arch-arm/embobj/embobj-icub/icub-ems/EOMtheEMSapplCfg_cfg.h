@@ -610,7 +610,7 @@ extern "C" {
 // </h>
     
     
-//  <h> Overriddable functions
+//  <h> Overridable functions
  
 
 //  <h> EOMtheEMSappl    
@@ -667,7 +667,7 @@ extern "C" {
 
 // </h>EOMtheEMSrunner   
 
-//  </h>Overriddable functions    
+//  </h>Overridable functions    
     
 
 
