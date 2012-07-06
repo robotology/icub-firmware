@@ -159,7 +159,7 @@ extern hal_result_t hal_encoder_init(hal_encoder_t enc, const hal_encoder_cfg_t 
         case hal_encoder8:
         case hal_encoder9:
         {
-            spi4enc_cfg.baudrate = hal_spi_baudrate500kbps;
+            spi4enc_cfg.baudrate = hal_spi_baudrate1000kbps;
             spi4enc_cfg.priority    = cfg->priority;
             spi4enc_cfg.callback_on_rx = s_hal_encoder_on_rx_spi;
             spi4enc_cfg.arg = NULL;
@@ -167,7 +167,7 @@ extern hal_result_t hal_encoder_init(hal_encoder_t enc, const hal_encoder_cfg_t 
 
         default:
         {
-            spi4enc_cfg.baudrate = hal_spi_baudrate500kbps;
+            spi4enc_cfg.baudrate = hal_spi_baudrate1000kbps;
             spi4enc_cfg.priority    = cfg->priority;
             spi4enc_cfg.callback_on_rx = NULL;
             spi4enc_cfg.arg = NULL;
