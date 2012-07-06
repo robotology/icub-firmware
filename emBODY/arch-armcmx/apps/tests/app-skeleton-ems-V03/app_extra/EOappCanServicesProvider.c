@@ -347,7 +347,7 @@ extern eOresult_t eo_appCanSP_SendMessage_TEST(EOappCanSP *p, eo_appCanSP_canLoc
     }
 
     //form can frame
-    canFrame.id = 2;
+    canFrame.id = 10;
     canFrame.id_type = 0; //standard id
     canFrame.frame_type = 0; //data frame
     canFrame.size = 8;
@@ -642,7 +642,7 @@ extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOm
     dest.canAddr = canLoc.canaddr;
 
 
-    /*
+    
     // 1) send current pid
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID;
     res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, (void*)&cfg->pidcurrent, &canFrame);
@@ -656,6 +656,7 @@ extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOm
         return(res);
     }
 
+    /*
     // 2) send current pid limits
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PIDLIMITS;
     res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, (void*)&cfg->pidcurrent, &canFrame);

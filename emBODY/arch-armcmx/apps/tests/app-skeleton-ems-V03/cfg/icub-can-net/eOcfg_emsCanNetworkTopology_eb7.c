@@ -76,8 +76,10 @@
 
 static const eo_emsCanNetTopo_jointOrMotorTopoInfo_t s_cfg_canNetTopo_joints[] = 
 {
+    // ALE
+
     { // 0 
-        EO_INIT(.boardAddr)                 1,
+        EO_INIT(.boardAddr)                 2,
         EO_INIT(.axis)                      0,
         EO_INIT(.canPort)                   eOcanport1,
         EO_INIT(.boardType)                 eobrd_1foc,
@@ -85,11 +87,27 @@ static const eo_emsCanNetTopo_jointOrMotorTopoInfo_t s_cfg_canNetTopo_joints[] =
     },    
 
     { // 1 
-        EO_INIT(.boardAddr)                 2,
+        EO_INIT(.boardAddr)                 4,
         EO_INIT(.axis)                      0,
         EO_INIT(.canPort)                   eOcanport1,
         EO_INIT(.boardType)                 eobrd_1foc,
         EO_INIT(.id)                        1
+    },
+
+    { // 2 
+        EO_INIT(.boardAddr)                 1,
+        EO_INIT(.axis)                      0,
+        EO_INIT(.canPort)                   eOcanport1,
+        EO_INIT(.boardType)                 eobrd_1foc,
+        EO_INIT(.id)                        2
+    },    
+
+    { // 3 
+        EO_INIT(.boardAddr)                 3,
+        EO_INIT(.axis)                      0,
+        EO_INIT(.canPort)                   eOcanport1,
+        EO_INIT(.boardType)                 eobrd_1foc,
+        EO_INIT(.id)                        3
     }
 };
 

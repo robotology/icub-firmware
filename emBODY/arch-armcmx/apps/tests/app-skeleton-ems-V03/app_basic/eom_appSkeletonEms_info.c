@@ -117,7 +117,7 @@ extern const eEmoduleInfo_t eom_appSkeletonEms_info_modinfo __attribute__((at(EE
             .addr   = 0
         },
         .communication  = ee_commtype_eth,  // later on we may also add can1 and can2
-        .name           = "EOMeApplBasic"
+        .name           = "MotorControl1"
     },
     .protocols  =
     {

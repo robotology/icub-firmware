@@ -1445,7 +1445,7 @@
             <uThumb>0</uThumb>
             <VariousControls>
               <MiscControls>--c99 --forceinline</MiscControls>
-              <Define>STM32F10X_CL HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO _FORCE_NETWORK_FROM_IPAL_CFG</Define>
+              <Define>STM32F10X_CL HAL_USE_ARCH_ARM SHALS_MODE_STATIC</Define>
               <Undefine></Undefine>
               <IncludePath>.;..\app_basic;..\app_extra;..\cfg\abslayer;..\cfg\icub-can-proto;..\cfg\icub-can-net;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\config\nvs\common;..\..\..\..\..\any-arch\sys\embobj\config\nvs\local;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\icub-ems\src;..\..\..\..\..\any-arch\sys\embobj\icub-ems\api;..\..\..\..\sys\mid\inc;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api;..\..\..\..\..\arch-armcmx\body\embobj\embobj\embobj-src;..\..\..\..\..\arch-armcmx\body\embobj\embobj\embobj-api</IncludePath>
             </VariousControls>
@@ -1474,7 +1474,7 @@
             <useFile>0</useFile>
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
-            <ScatterFile>.\eApplication-zerooffset.sct</ScatterFile>
+            <ScatterFile>.\eApplication.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>

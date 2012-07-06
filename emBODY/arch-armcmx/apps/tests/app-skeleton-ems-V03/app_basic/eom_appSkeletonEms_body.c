@@ -264,6 +264,14 @@ static void s_eom_appSkeletonEms_body_ledInit(void)
     hal_led_off(hal_led3);
 }
 
+
+//#define EOK_BOARDTRANSCEIVER_capacityofpacket                   640
+//#define EOK_BOARDTRANSCEIVER_capacityofrop                      192
+//#define EOK_BOARDTRANSCEIVER_capacityofropframeregulars         384
+//#define EOK_BOARDTRANSCEIVER_capacityofropframeoccasionals      128
+//#define EOK_BOARDTRANSCEIVER_capacityofropframereplies          128 
+//#define EOK_BOARDTRANSCEIVER_maxnumberofregularrops             16 
+
 static void s_eom_appSkeletonEms_body_theBoardTransceiver_init(void)
 {
     eOboardtransceiver_cfg_t boardtxrxcfg = 
@@ -271,7 +279,17 @@ static void s_eom_appSkeletonEms_body_theBoardTransceiver_init(void)
         .vectorof_endpoint_cfg          = eo_cfg_EPs_vectorof_eb7,
         .hashfunction_ep2index          = eo_cfg_nvsEP_eb7_fptr_hashfunction_ep2index,
         .remotehostipv4addr             = mc_ethmod_cfg.remaddr,//0x01010101,
-        .remotehostipv4port             = mc_ethmod_cfg.remport //3334
+        .remotehostipv4port             = mc_ethmod_cfg.remport, //3334
+        .sizes =
+        {
+            .capacityofpacket   =  640,
+            .capacityofrop = 192,   
+            .capacityofropframeregulars  = 384,
+            .capacityofropframeoccasionals  =  128,
+            .capacityofropframereplies  =      128,
+            .maxnumberofregularrops  =         16
+        
+        }
     };
     
     eo_boardtransceiver_Initialise(&boardtxrxcfg);

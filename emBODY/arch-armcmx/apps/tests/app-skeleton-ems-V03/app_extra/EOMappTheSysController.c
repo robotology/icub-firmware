@@ -338,15 +338,18 @@ static void s_eom_appTheSysController_run(EOMtask *tsk, uint32_t evtmsgper)
 
 }
 
-#define MC_START       1
-#define MC_STOP        2
-#define MC_SET_POS     3
-#define MC_SET_POS_PID 4
-#define MC_SET_POS_LIM 5
-#define MC_SET_VEL     6
-#define MC_SET_VEL_PID 7
-#define MC_SET_VEL_LIM 8
-#define MC_SET_OFFSET  9
+#define MC_START           1
+#define MC_STOP            2
+#define MC_SET_POS         3
+#define MC_SET_POS_PID     4
+#define MC_SET_POS_PID_LIM 5
+#define MC_SET_VEL         6
+#define MC_SET_VEL_PID     7
+#define MC_SET_VEL_LIM     8
+#define MC_SET_OFFSET      9
+#define MC_CALIBRATE       10
+#define MC_SET_LIMITS      11
+#define MC_CONTROL_MODE    12
 
 static void s_eom_appTheSysController_recDgram_mng(EOMappTheSysController *p)
 {
@@ -361,7 +364,7 @@ static void s_eom_appTheSysController_recDgram_mng(EOMappTheSysController *p)
 
     switch(payload_ptr[0]) 
     {
-        case MC_START:  //Corrisponde a PKT QUERY in WINNODE utils appl
+        case MC_START:
         {
             if(eOm_appTheSysController_st__inited == p->st)
             {
@@ -374,19 +377,35 @@ static void s_eom_appTheSysController_recDgram_mng(EOMappTheSysController *p)
         }
         break;
 
-        case MC_STOP: //Corrisponde a ADDCLNT in WINNODE utils appl
+        case MC_STOP:
+        {   
+            eo_emsController_SetControlMode(0, CM_IDLE);
+            eo_emsController_ResetPosPid(0);
+               
+            pwm_out = 0;    
+        }
+        break;
+
+        case MC_CALIBRATE:
         {
-            if(eOm_appTheSysController_st__started == p->st)
-            {
-                p->st = eOm_appTheSysController_st__stopped;
-                //s_eom_appTheSysController_timers_stop();
-                
-                eo_emsController_Stop(0);
-                eo_emsController_ResetPosPid(0);
-                eo_emsController_ResetVelPid(0);
-                pwm_out = 0;
-            }
+            uint8_t joint = payload_ptr[1];
+            int32_t gotopos = *(int32_t*)(payload_ptr+4);
+            int32_t offset  = *(int32_t*)(payload_ptr+8);
+            int32_t timeout = *(int32_t*)(payload_ptr+12);
+            int32_t max_err = *(int32_t*)(payload_ptr+16);
             
+            eo_emsController_StartCalibration(joint, gotopos, offset, timeout, max_err);
+        }
+        break;
+
+        case MC_SET_LIMITS:
+        {
+            uint8_t joint = payload_ptr[1];
+            int32_t pos_min = *(int32_t*)(payload_ptr+4);
+            int32_t pos_max = *(int32_t*)(payload_ptr+8);
+            int32_t vel_max = *(int32_t*)(payload_ptr+12);
+            
+            eo_emsController_SetLimits(joint, pos_min, pos_max, vel_max);
         }
         break;
 
@@ -394,31 +413,9 @@ static void s_eom_appTheSysController_recDgram_mng(EOMappTheSysController *p)
         {
             uint8_t joint = payload_ptr[1];
             int32_t pos = *(int32_t*)(payload_ptr+4);
-            int32_t vel = *(int32_t*)(payload_ptr+8);
+            uint32_t time_ms = *(uint32_t*)(payload_ptr+8);
 
-            eo_emsController_SetPosRef(joint, pos, vel);
-        }
-        break;
-
-        case MC_SET_POS_PID:
-        {
-            uint8_t joint = payload_ptr[1];
-            int32_t kp = *(int32_t*)(payload_ptr+4);
-            int32_t kd = *(int32_t*)(payload_ptr+8);
-            int32_t ki = *(int32_t*)(payload_ptr+12);
-            uint8_t shift = *(uint8_t*)(payload_ptr+16);
-
-            eo_emsController_SetPosPid(joint, kp, kd, ki, shift);
-        }
-        break;
-
-        case MC_SET_POS_LIM:
-        {
-            uint8_t joint = payload_ptr[1];
-            int16_t Ymax = *(int16_t*)(payload_ptr+4);
-            int16_t Imax = *(int16_t*)(payload_ptr+8);
-
-            eo_emsController_SetPosPidLimits(joint, Ymax, Imax);
+            eo_emsController_SetPosRef(joint, pos, time_ms);
         }
         break;
 
@@ -426,31 +423,32 @@ static void s_eom_appTheSysController_recDgram_mng(EOMappTheSysController *p)
         {
             uint8_t joint = payload_ptr[1];
             int32_t vel = *(int32_t*)(payload_ptr+4);
-            int32_t acc = *(int32_t*)(payload_ptr+8);
+            uint32_t time_ms = *(uint32_t*)(payload_ptr+8);
 
-            eo_emsController_SetVelRef(joint, vel, acc);
+            eo_emsController_SetVelRef(joint, vel, time_ms);
         }
         break;
 
-        case MC_SET_VEL_PID:
+        case MC_SET_POS_PID:
         {
             uint8_t joint = payload_ptr[1];
-            int32_t kp = *(int32_t*)(payload_ptr+4);
+            int32_t k  = *(int32_t*)(payload_ptr+4);
             int32_t kd = *(int32_t*)(payload_ptr+8);
             int32_t ki = *(int32_t*)(payload_ptr+12);
             uint8_t shift = *(uint8_t*)(payload_ptr+16);
+            float rescaler = 1.0f/(float)(1<<shift);
 
-            eo_emsController_SetVelPid(joint, kp, kd, ki, shift);
+            eo_emsController_SetPosPid(joint, k*rescaler, kd*rescaler, ki*rescaler);
         }
         break;
 
-        case MC_SET_VEL_LIM:
+        case MC_SET_POS_PID_LIM:
         {
             uint8_t joint = payload_ptr[1];
             int16_t Ymax = *(int16_t*)(payload_ptr+4);
             int16_t Imax = *(int16_t*)(payload_ptr+8);
 
-            eo_emsController_SetVelPidLimits(joint, Ymax, Imax);
+            eo_emsController_SetPosPidLimits(joint, Ymax, Imax);
         }
         break;
 
@@ -463,6 +461,14 @@ static void s_eom_appTheSysController_recDgram_mng(EOMappTheSysController *p)
         }
         break;
 
+        case MC_CONTROL_MODE:
+        {
+            uint8_t joint = payload_ptr[1];
+            uint8_t cmode = payload_ptr[2];
+
+            eo_emsController_SetControlMode(joint, (control_mode_t)cmode);
+        }
+        break;
     }
 
     /*
@@ -479,9 +485,9 @@ static eOresult_t s_eom_appTheSysController_confugureSystem(EOMappTheSysControll
     { 
         EO_INIT(.pidcurrent)
         {
-            EO_INIT(.kp)                    0x1111,
-            EO_INIT(.ki)                    0x2222,
-            EO_INIT(.kd)                    0x3333,
+            EO_INIT(.kp)                    0x0BB8,
+            EO_INIT(.ki)                    0x1388,
+            EO_INIT(.kd)                    0x0000,
             EO_INIT(.limitonintegral)       0X4444,
             EO_INIT(.limitonoutput)         0x5555,
             EO_INIT(.scale)                 0x0,
@@ -493,7 +499,7 @@ static eOresult_t s_eom_appTheSysController_confugureSystem(EOMappTheSysControll
         EO_INIT(.des02FORmstatuschamaleon04)   {0}
     };
 
-#warning X ALE --> set static motor config  in cfg var
+//#warning X ALE --> set static motor config  in cfg var
 
     return(eo_appCanSP_ConfigMotor(p->cfg.canSP_ptr, mId, &cfg));
 }

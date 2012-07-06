@@ -150,11 +150,11 @@
 
 //   <o> IP0 <0-255> 
 #ifndef IPAL_IP0
- #define IPAL_IP0        1
+ #define IPAL_IP0        10
 #endif
 //   <o> IP1 <0-255> 
 #ifndef IPAL_IP1
- #define IPAL_IP1        1
+ #define IPAL_IP1        0
 #endif
 //   <o> IP2 <0-255> 
 #ifndef IPAL_IP2
@@ -181,7 +181,7 @@
 #endif
 //   <o> MSK2 <0-255> 
 #ifndef IPAL_MSK2
- #define IPAL_MSK2        255
+ #define IPAL_MSK2        0
 #endif
 //   <o> MSK3 <0-255> 
 #ifndef IPAL_MSK3
@@ -264,7 +264,7 @@
 
 // <e> TFTP server
 // <i> Enable or disable TFTP Server (single session only)
-#define IPAL_TFTP_ENABLE     0
+#define IPAL_TFTP_ENABLE     1
 
 //   <o> Port Number <1-65535>
 //   <i> Listening port number.

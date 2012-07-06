@@ -221,13 +221,11 @@ static void s_eom_appMotorController_taskStartup(EOMtask *tsk, uint32_t t)
     // ALE
     eo_emsController_Init(1, EMS_GENERIC);
 
-    eo_emsController_SetPosLimits(0, 0, 4095);
-    eo_emsController_SetVelMax(0, 4096);
-    eo_emsController_SetPosPid(0, 1024, 0, 0, 10);
-    eo_emsController_SetPosPidLimits(0, 0x7FFF, 1024);
-    eo_emsController_SetVelPid(0, 1024, 0, 0, 10);
-    eo_emsController_SetVelPidLimits(0, 4096, 1024);
-    eo_emsController_SetControlMode(0, CM_POSITION);
+    eo_emsController_SetLimits(0, -100000, 100000, 2048);
+    eo_emsController_SetPosPid(0, 100.0f, 20.0f, 0.001f);
+    eo_emsController_SetPosPidLimits(0, 8000.0f, 750.0f);
+
+    eo_emsController_SetControlMode(0, CM_IDLE);
 }
 
 static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
@@ -247,15 +245,17 @@ static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
     {
         // ALE
   
-        //if (eobool_true == eo_appEncReader_isReady(p->cfg.encReader))     
+        if (eo_appEncReader_isReady(p->cfg.encReader))
+        {     
             eo_appEncReader_getValues(p->cfg.encReader, encoder_raw);
+        }
 
         for (uint8_t b=0; b<18; ++b)
         {
-            parity_error ^= (encoder_raw[0]>>b) & 1;
+            parity_error ^= (encoder_raw[3]>>b) & 1;
         }
 
-        uint8_t bit_check = encoder_raw[0] & 0x3E;
+        uint8_t bit_check = encoder_raw[3] & 0x3E;
 
         if (parity_error || bit_check!=0x20)
         {
@@ -263,18 +263,10 @@ static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
         }
         else
         {
-            encoder_raw[0]>>=6;
-            encoder_raw[0]&=0x0FFF;
+            encoder_raw[3]>>=6;
+            encoder_raw[3]&=0x0FFF;
 
-            eo_emsController_ReadEncoders((int32_t*)encoder_raw);
-        }
-
-        static eObool_t must_reset = eobool_true;
-
-        if (must_reset)
-        {
-            eo_emsController_Stop(0);
-            must_reset = eobool_false;
+            eo_emsController_ReadEncoders((int32_t*)encoder_raw+3);
         }
 
         /* 2) pid calc */
