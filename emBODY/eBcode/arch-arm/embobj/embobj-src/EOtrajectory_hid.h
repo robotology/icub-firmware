@@ -36,16 +36,18 @@ extern "C" {
  
 struct EOtrajectory_hid 
 {
-    float Pn;
-    float Vn;
-    float An;
+    float Pos;
+    float Vel;
+    float Acc;
+    float Jerk;
+    float Snap;
+    float Crackle;
 
-    float Pf;
-    float Vf;
+    float biAcc;
+    float biJerk;
 
-    float Ky;
-    float Yn;
-    float Xn;
+    float PosF;
+    float VelF;
 
     int32_t pos_steps_to_end;
     int32_t vel_steps_to_end;
@@ -54,14 +56,16 @@ struct EOtrajectory_hid
     float pos_max;
     float vel_max;
 
-    int32_t acc_stop_boost;
+    int32_t acc_stop_hybrid;
 
-    eObool_t boost;
-    float boostVn;
-    float boostAn;
-    float boostKy;
-    float boostYn;
-    int32_t boost_steps_to_end;
+    eObool_t hybrid;
+
+    float hybridVel;
+    float hybridAcc;    
+    float hybridJerk;
+    float hybridSnap;
+
+    int32_t hybrid_steps_to_end;
 }; 
 
 

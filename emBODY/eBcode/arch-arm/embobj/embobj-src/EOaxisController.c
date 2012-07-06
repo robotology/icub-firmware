@@ -218,7 +218,7 @@ extern void eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_
         o->control_mode = CM_POS_VEL;
     case CM_POS_VEL:
         o->vel_timer = o->vel_timeout;
-        eo_trajectory_AddVelReference(o->trajectory, vel, avg_acc);
+        eo_trajectory_AddVelHybrid(o->trajectory, vel, avg_acc);
         break;
 
     //case CM_POSITION:
