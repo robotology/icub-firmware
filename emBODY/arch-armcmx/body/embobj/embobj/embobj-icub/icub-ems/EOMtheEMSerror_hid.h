@@ -62,7 +62,7 @@ struct EOMtheEMSerror_hid
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern void eom_emserror_hid_userdef_DoJustAfterPacketReceived(EOpacket *rxpkt);
+extern void eom_emserror_hid_userdef_DoJustAfterPacketReceived(EOMtheEMSerror *p, EOpacket *rxpkt);
 
 
 #ifdef __cplusplus

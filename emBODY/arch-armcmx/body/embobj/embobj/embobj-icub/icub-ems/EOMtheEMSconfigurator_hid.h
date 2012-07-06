@@ -57,12 +57,13 @@ extern "C" {
 struct EOMtheEMSconfigurator_hid 
 {
     EOMtask*    task;
+    uint16_t    numofrxrops;
 };
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(uint16_t numberofrxrops, eOabstime_t txtimeofrxropframe);
+extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSconfigurator* p);
 
 
 #ifdef __cplusplus

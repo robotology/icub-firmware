@@ -21,26 +21,18 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-
-#include "stdlib.h"
-#include "string.h"
-#include "EoCommon.h"
-
-#include "EOMtheEMSappl.h"
-#include "EOMtask.h"
+#include "EOMtheEMSappl_hid.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOMtheEMSconfigurator.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOMtheEMSconfigurator_hid.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -80,22 +72,11 @@
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSconfigurator *p)
-{
-    static uint8_t num = 0;
-    // just for debug
-    if(0 == p->numofrxrops)
-    {
-        num++;
-        if(3 == num)
-        {
-            num = 0;
-//            eom_emsappl_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2run);
-            eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_go2runner);
-        }
-    }
-
-} 
+// uncomment and develop your own code
+//extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
+//{
+//
+//}
 
 
 
