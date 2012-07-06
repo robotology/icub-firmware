@@ -1128,16 +1128,6 @@
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSrunner.c</FilePath>
             </File>
             <File>
-              <FileName>runner_overridden.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\runner_overridden.c</FilePath>
-            </File>
-            <File>
-              <FileName>configurator_overridden.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\configurator_overridden.c</FilePath>
-            </File>
-            <File>
               <FileName>EOMtheEMSapplCfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg.c</FilePath>
@@ -1161,6 +1151,26 @@
               <FileName>EOMtheEMSapplCfg_cfg.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg_cfg.h</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_configurator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_configurator.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_runner.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_runner.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_appl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_appl.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_error.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_error.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2270,16 +2280,6 @@
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSrunner.c</FilePath>
             </File>
             <File>
-              <FileName>runner_overridden.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\runner_overridden.c</FilePath>
-            </File>
-            <File>
-              <FileName>configurator_overridden.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\configurator_overridden.c</FilePath>
-            </File>
-            <File>
               <FileName>EOMtheEMSapplCfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg.c</FilePath>
@@ -2303,6 +2303,26 @@
               <FileName>EOMtheEMSapplCfg_cfg.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg_cfg.h</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_configurator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_configurator.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_runner.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_runner.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_appl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_appl.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_error.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_error.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3412,16 +3432,6 @@
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSrunner.c</FilePath>
             </File>
             <File>
-              <FileName>runner_overridden.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\runner_overridden.c</FilePath>
-            </File>
-            <File>
-              <FileName>configurator_overridden.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\configurator_overridden.c</FilePath>
-            </File>
-            <File>
               <FileName>EOMtheEMSapplCfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg.c</FilePath>
@@ -3445,6 +3455,26 @@
               <FileName>EOMtheEMSapplCfg_cfg.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg_cfg.h</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_configurator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_configurator.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_runner.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_runner.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_appl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_appl.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_error.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_error.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4554,16 +4584,6 @@
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSrunner.c</FilePath>
             </File>
             <File>
-              <FileName>runner_overridden.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\runner_overridden.c</FilePath>
-            </File>
-            <File>
-              <FileName>configurator_overridden.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\configurator_overridden.c</FilePath>
-            </File>
-            <File>
               <FileName>EOMtheEMSapplCfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg.c</FilePath>
@@ -4587,6 +4607,26 @@
               <FileName>EOMtheEMSapplCfg_cfg.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg_cfg.h</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_configurator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_configurator.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_runner.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_runner.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_appl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_appl.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_error.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_error.c</FilePath>
             </File>
           </Files>
         </Group>
