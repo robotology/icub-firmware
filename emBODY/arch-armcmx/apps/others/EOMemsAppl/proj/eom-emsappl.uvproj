@@ -386,12 +386,12 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>app_basic</GroupName>
+          <GroupName>app_main</GroupName>
           <Files>
             <File>
               <FileName>eom_emsappl_main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app_basic\eom_emsappl_main.c</FilePath>
+              <FilePath>..\app_main\eom_emsappl_main.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1556,12 +1556,12 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>app_basic</GroupName>
+          <GroupName>app_main</GroupName>
           <Files>
             <File>
               <FileName>eom_emsappl_main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app_basic\eom_emsappl_main.c</FilePath>
+              <FilePath>..\app_main\eom_emsappl_main.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2708,12 +2708,12 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>app_basic</GroupName>
+          <GroupName>app_main</GroupName>
           <Files>
             <File>
               <FileName>eom_emsappl_main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app_basic\eom_emsappl_main.c</FilePath>
+              <FilePath>..\app_main\eom_emsappl_main.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3860,12 +3860,12 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>app_basic</GroupName>
+          <GroupName>app_main</GroupName>
           <Files>
             <File>
               <FileName>eom_emsappl_main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app_basic\eom_emsappl_main.c</FilePath>
+              <FilePath>..\app_main\eom_emsappl_main.c</FilePath>
             </File>
           </Files>
         </Group>
