@@ -137,13 +137,15 @@ extern int16_t eo_pid_PWM2(EOpid *o, float En, float Vn)
 {
     float Xn = o->K*(En+o->Kd*Vn);
 
-    o->KKiIn += o->Ki*Xn;
-    
-    LIMIT(o->KKiIn, o->Imax);
-
+    if (o->KKiIn<0.0f ^ Xn<0.0f) o->KKiIn = 0.0f;
+   
     o->pwm = Xn+o->KKiIn;
 
     LIMIT(o->pwm, o->Ymax);
+
+    o->KKiIn += o->Ki*Xn;
+
+    LIMIT(o->KKiIn, o->Imax);
 
     o->En = En;
 

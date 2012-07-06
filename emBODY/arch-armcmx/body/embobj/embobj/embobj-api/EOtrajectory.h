@@ -66,7 +66,7 @@ extern void eo_trajectory_SetLimits(EOtrajectory *o, int32_t pos_min, int32_t po
  **/
 extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, int32_t avg_vel);
 extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t v1, int32_t avg_acc);
-extern void eo_trajectory_AddVelReference(EOtrajectory *o, int32_t v1, int32_t avg_acc);
+extern void eo_trajectory_AddVelHybrid(EOtrajectory *o, int32_t v1, int32_t avg_acc);
 extern void eo_trajectory_TimeoutVelReference(EOtrajectory *o);
 
 /** @fn         extern float eo_trajectory_Step(EOtrajectory *o)
@@ -82,7 +82,7 @@ extern void eo_trajectory_Init(EOtrajectory *o, int32_t p0, int32_t v0, int32_t 
     @param      o  The pointer to the trajectory object.
  **/
 extern void eo_trajectory_Stop(EOtrajectory *o, int32_t stop_acc);
-extern void eo_trajectory_StopBoost(EOtrajectory *o);
+extern void eo_trajectory_StopHybrid(EOtrajectory *o);
 
 //extern void eo_trajectory_Stop(EOtrajectory *o, float pos);
 
