@@ -348,7 +348,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO</Define>
               <Undefine></Undefine>
-              <IncludePath>..\abslayer-cfg;..\app_basic;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\app_extra;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;.;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src</IncludePath>
+              <IncludePath>.;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\sys\embobj\icub-app\api;..\..\..\..\..\any-arch\sys\embobj\icub-app\src</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1095,42 +1095,42 @@
             <File>
               <FileName>eOcfg_sm_EMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\eOcfg_sm_EMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\eOcfg_sm_EMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSappl.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMSsocket.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSsocket.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMStransceiver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMStransceiver.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMSconfigurator.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSconfigurator.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMSerror.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSerror.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMSrunner.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSrunner.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSapplCfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSapplCfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSconfigurator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSconfigurator.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSerror.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSerror.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSrunner.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSrunner.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSsocket.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSsocket.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMStransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMStransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1150,27 +1150,27 @@
             <File>
               <FileName>EOMtheEMSapplCfg_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg_cfg.h</FilePath>
+              <FilePath>..\app_cfg\EOMtheEMSapplCfg_cfg.h</FilePath>
             </File>
             <File>
-              <FileName>overridden_configurator.c</FileName>
+              <FileName>example_overridden_appl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_configurator.c</FilePath>
+              <FilePath>..\app_cfg\example_overridden_appl.c</FilePath>
             </File>
             <File>
-              <FileName>overridden_runner.c</FileName>
+              <FileName>example_overridden_configurator.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_runner.c</FilePath>
+              <FilePath>..\app_cfg\example_overridden_configurator.c</FilePath>
             </File>
             <File>
-              <FileName>overridden_appl.c</FileName>
+              <FileName>example_overridden_error.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_appl.c</FilePath>
+              <FilePath>..\app_cfg\example_overridden_error.c</FilePath>
             </File>
             <File>
-              <FileName>overridden_error.c</FileName>
+              <FileName>example_overridden_runner.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_error.c</FilePath>
+              <FilePath>..\app_cfg\example_overridden_runner.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2247,42 +2247,42 @@
             <File>
               <FileName>eOcfg_sm_EMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\eOcfg_sm_EMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\eOcfg_sm_EMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSappl.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMSsocket.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSsocket.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMStransceiver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMStransceiver.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMSconfigurator.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSconfigurator.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMSerror.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSerror.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMSrunner.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSrunner.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSapplCfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSapplCfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSconfigurator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSconfigurator.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSerror.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSerror.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSrunner.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSrunner.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSsocket.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSsocket.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMStransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMStransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2302,27 +2302,27 @@
             <File>
               <FileName>EOMtheEMSapplCfg_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg_cfg.h</FilePath>
+              <FilePath>..\app_cfg\EOMtheEMSapplCfg_cfg.h</FilePath>
             </File>
             <File>
-              <FileName>overridden_configurator.c</FileName>
+              <FileName>example_overridden_appl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_configurator.c</FilePath>
+              <FilePath>..\app_cfg\example_overridden_appl.c</FilePath>
             </File>
             <File>
-              <FileName>overridden_runner.c</FileName>
+              <FileName>example_overridden_configurator.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_runner.c</FilePath>
+              <FilePath>..\app_cfg\example_overridden_configurator.c</FilePath>
             </File>
             <File>
-              <FileName>overridden_appl.c</FileName>
+              <FileName>example_overridden_error.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_appl.c</FilePath>
+              <FilePath>..\app_cfg\example_overridden_error.c</FilePath>
             </File>
             <File>
-              <FileName>overridden_error.c</FileName>
+              <FileName>example_overridden_runner.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_error.c</FilePath>
+              <FilePath>..\app_cfg\example_overridden_runner.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3399,42 +3399,42 @@
             <File>
               <FileName>eOcfg_sm_EMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\eOcfg_sm_EMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\eOcfg_sm_EMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSappl.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMSsocket.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSsocket.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMStransceiver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMStransceiver.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMSconfigurator.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSconfigurator.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMSerror.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSerror.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMSrunner.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSrunner.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSapplCfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSapplCfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSconfigurator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSconfigurator.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSerror.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSerror.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSrunner.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSrunner.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSsocket.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSsocket.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMStransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMStransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3454,27 +3454,27 @@
             <File>
               <FileName>EOMtheEMSapplCfg_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg_cfg.h</FilePath>
+              <FilePath>..\app_cfg\EOMtheEMSapplCfg_cfg.h</FilePath>
             </File>
             <File>
-              <FileName>overridden_configurator.c</FileName>
+              <FileName>example_overridden_appl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_configurator.c</FilePath>
+              <FilePath>..\app_cfg\example_overridden_appl.c</FilePath>
             </File>
             <File>
-              <FileName>overridden_runner.c</FileName>
+              <FileName>example_overridden_configurator.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_runner.c</FilePath>
+              <FilePath>..\app_cfg\example_overridden_configurator.c</FilePath>
             </File>
             <File>
-              <FileName>overridden_appl.c</FileName>
+              <FileName>example_overridden_error.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_appl.c</FilePath>
+              <FilePath>..\app_cfg\example_overridden_error.c</FilePath>
             </File>
             <File>
-              <FileName>overridden_error.c</FileName>
+              <FileName>example_overridden_runner.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_error.c</FilePath>
+              <FilePath>..\app_cfg\example_overridden_runner.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4551,42 +4551,42 @@
             <File>
               <FileName>eOcfg_sm_EMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\eOcfg_sm_EMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\eOcfg_sm_EMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSappl.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMSsocket.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSsocket.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMStransceiver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMStransceiver.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMSconfigurator.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSconfigurator.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMSerror.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSerror.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMSrunner.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSrunner.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSapplCfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSapplCfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSconfigurator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSconfigurator.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSerror.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSerror.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSrunner.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSrunner.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSsocket.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSsocket.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMStransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMStransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4606,27 +4606,27 @@
             <File>
               <FileName>EOMtheEMSapplCfg_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg_cfg.h</FilePath>
+              <FilePath>..\app_cfg\EOMtheEMSapplCfg_cfg.h</FilePath>
             </File>
             <File>
-              <FileName>overridden_configurator.c</FileName>
+              <FileName>example_overridden_appl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_configurator.c</FilePath>
+              <FilePath>..\app_cfg\example_overridden_appl.c</FilePath>
             </File>
             <File>
-              <FileName>overridden_runner.c</FileName>
+              <FileName>example_overridden_configurator.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_runner.c</FilePath>
+              <FilePath>..\app_cfg\example_overridden_configurator.c</FilePath>
             </File>
             <File>
-              <FileName>overridden_appl.c</FileName>
+              <FileName>example_overridden_error.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_appl.c</FilePath>
+              <FilePath>..\app_cfg\example_overridden_error.c</FilePath>
             </File>
             <File>
-              <FileName>overridden_error.c</FileName>
+              <FileName>example_overridden_runner.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\overridden_error.c</FilePath>
+              <FilePath>..\app_cfg\example_overridden_runner.c</FilePath>
             </File>
           </Files>
         </Group>
