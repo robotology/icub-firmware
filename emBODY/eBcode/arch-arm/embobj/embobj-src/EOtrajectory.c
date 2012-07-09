@@ -75,13 +75,13 @@ extern EOtrajectory* eo_trajectory_New(void)
     {
         o->Pos = 0.0f;
         o->Vel = 0.0f;
-        o->Acc = 0.0f;
-        o->Jerk = 0.0f;
-        o->Snap = 0.0f;
-        o->Crackle = 0.0f;
+        o->PAcc = 0.0f;
+        o->P2Jerk = 0.0f;
+        o->P3Snap = 0.0f;
+        o->P4Crackle = 0.0f;
 
-        o->biAcc = 0.0f;
-        o->biJerk = 0.0f;
+        o->biPAcc = 0.0f;
+        o->biP2Jerk = 0.0f;
 
         o->PosF = 0.0f;
         o->VelF = 0.0f;
@@ -93,15 +93,15 @@ extern EOtrajectory* eo_trajectory_New(void)
         o->pos_max = 4095;
         o->vel_max = 2048;
 
-        o->acc_stop_hybrid = 4096;
+        o->acc_stop_hybrid = 1024;
         //o->acc_stop_cmode = 4096;
         //o->acc_stop_alarm = 8192;
 
         o->hybrid = eobool_false;
         o->hybridVel = 0.0f;
-        o->hybridAcc = 0.0f;
-        o->hybridSnap = 0.0f;
-        o->hybridJerk = 0.0f;
+        o->hybridPAcc = 0.0f;
+        o->hybridP2Jerk = 0.0f;
+        o->hybridP3Snap = 0.0f;
         o->hybrid_steps_to_end = 0;
     }
 
@@ -119,7 +119,7 @@ extern void eo_trajectory_Init(EOtrajectory *o, int32_t p0, int32_t v0, int32_t 
 {
     o->Pos = p0;
     o->Vel = v0;
-    o->Acc = a0;
+    o->PAcc = a0;
 }
 
 extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, int32_t avg_vel)
@@ -136,11 +136,16 @@ extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, int32_t a
     if (!avg_vel)
     {
         o->pos_steps_to_end = 0;
-        
         return;    
     }
 
     float D = o->PosF-o->Pos;
+
+    if (D == 0.0f)
+    {
+        o->pos_steps_to_end = 0;
+        return;
+    }
 
     float Va = (float)avg_vel;
 
@@ -150,31 +155,46 @@ extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, int32_t a
 
     o->pos_steps_to_end = (int32_t)(T*EMS_FFREQUENCY);
     
-    float lbyT = 1.0f/T;
-    float PbyT = EMS_PERIOD*lbyT;
-
-    float DbyT2 =    Va*lbyT;
-    float VbyT  = o->Vel*lbyT; 
-
-    //float A3 = ( 120.0f*DbyT2-60.0f*VbyT-10.0f*o->Acc)*PbyT*PbyT*PbyT;
-    //float A2 = (-180.0f*DbyT2+96.0f*VbyT+18.0f*o->Acc)*PbyT*PbyT;
-
-    //o->Crackle = 6.0f*A3;
-    //o->Snap = 2.0f*A2+o->Crackle;
-    //o->Jerk = (60.0f*DbyT2-36.0f*VbyT-9.0f*o->Acc)*PbyT+A2+A3;
+    float PbyT = EMS_PERIOD/T;    
+    
+    Va*=PbyT; 
+    float A3 =   80.0f*Va;
+    float A2 = -120.0f*Va;
+    float A1 =   40.0f*Va;
 
     static const float Fby3  =  4.0f/3.0f;
     static const float TWby3 = 20.0f/3.0f;
+    o->biP2Jerk = -4.0f*Va;
+    o->biPAcc   =  2.0f*Va;
 
-    float A3 = (  80.0f*DbyT2-40.0f*VbyT-TWby3*o->Acc)*PbyT*PbyT*PbyT;
-    float A2 = (-120.0f*DbyT2+64.0f*VbyT+12.0f*o->Acc)*PbyT*PbyT;
+    if (o->Vel != 0.0f)
+    {
+        float PVbyT = o->Vel*PbyT;
 
-    o->Crackle = 6.0f*A3;
-    o->Snap = 2.0f*A2+o->Crackle;
-    o->Jerk = (40.0f*DbyT2-24.0f*VbyT-6.0f*o->Acc)*PbyT+A2+A3;
+        A3 -= 40.0f*PVbyT;
+        A2 += 64.0f*PVbyT;
+        A1 -= 24.0f*PVbyT;
 
-    o->biJerk = (-4.0f*DbyT2+2.0f*VbyT)*PbyT;
-    o->biAcc  = ( 2.0f*DbyT2-Fby3*VbyT);
+        o->biP2Jerk += +2.0f*PVbyT;
+        o->biPAcc   += -Fby3*PVbyT;
+    }
+
+    o->biP2Jerk *= PbyT;
+
+    if (o->PAcc != 0.0f)
+    {
+        A3 -= TWby3*o->PAcc;
+        A2 += 12.0f*o->PAcc;
+        A1 -=  6.0f*o->PAcc;
+    }
+
+    A3 *= PbyT*PbyT*PbyT;
+    A2 *= PbyT*PbyT;
+    A1 *= PbyT;
+
+    o->P4Crackle = 6.0f*A3;
+    o->P3Snap    = 2.0f*A2+o->P4Crackle;
+    o->P2Jerk    = A1+A2+A3;
 }
 
 extern void eo_trajectory_Stop(EOtrajectory *o, int32_t stop_acc)
@@ -195,20 +215,38 @@ extern void eo_trajectory_Stop(EOtrajectory *o, int32_t stop_acc)
 
     o->pos_steps_to_end = (int32_t)(T*EMS_FFREQUENCY);
     
-    float lbyT = 1.0f/T;
-    float PbyT = EMS_PERIOD*lbyT;
+    float PbyT = EMS_PERIOD/T;
 
-    float VbyT  = o->Vel*lbyT; 
+    float A3 = 0.0f;
+    float A2 = 0.0f;
+    float A1 = 0.0f;
 
-    float A3 = (-60.0f*VbyT-10.0f*o->Acc)*PbyT*PbyT*PbyT;
-    float A2 = (+96.0f*VbyT+18.0f*o->Acc)*PbyT*PbyT;
+    if (o->Vel != 0.0f)
+    {
+        float PVbyT = o->Vel*PbyT;
 
-    o->Crackle = 6.0f*A3;
-    o->Snap = 2.0f*A2+o->Crackle;
-    o->Jerk = (-36.0f*VbyT-9.0f*o->Acc)*PbyT+A2+A3;
+        A3 += -60.0f*PVbyT;
+        A2 += +96.0f*PVbyT;
+        A1 += -36.0f*PVbyT;
+    }
 
-    o->biJerk = 0.0f;
-    o->biAcc  = 0.0f;
+    if (o->PAcc != 0.0f)
+    {
+        A3 += -10.0f*o->PAcc;
+        A2 += +18.0f*o->PAcc;
+        A1 += - 9.0f*o->PAcc;
+    } 
+
+    A3 *= PbyT*PbyT*PbyT;
+    A2 *= PbyT*PbyT;
+    A1 *= PbyT;
+
+    o->P4Crackle = 6.0f*A3;
+    o->P3Snap    = 2.0f*A2+o->P4Crackle;
+    o->P2Jerk    = A1+A2+A3;
+
+    o->biP2Jerk = 0.0f;
+    o->biPAcc   = 0.0f;
 }
 
 extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t v1, int32_t avg_acc)
@@ -224,11 +262,16 @@ extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t v1, int32_t a
     if (!avg_acc)
     {
         o->vel_steps_to_end = 0;
-       
         return;
     }
 
     float D = o->VelF-o->Vel;
+
+    if (D == 0.0f)
+    {
+        o->vel_steps_to_end = 0;
+        return;
+    }
    
     float Aa = (float)avg_acc;
 
@@ -239,19 +282,27 @@ extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t v1, int32_t a
     o->vel_steps_to_end = (int32_t)(T*EMS_FFREQUENCY);
 
     float PbyT = EMS_PERIOD/T;
+    Aa *= EMS_PERIOD;
 
-    o->Crackle = 0.0f;
-    //o->Snap = (-12.0f*Aa+6.0f*o->Acc)*PbyT*PbyT;
-    //o->Jerk = (  6.0f*Aa-4.0f*o->Acc)*PbyT+0.5f*o->Snap;
+    o->P4Crackle = 0.0f;
+    o->P3Snap = -8.0f*Aa;
+    o->P2Jerk =  4.0f*Aa;
 
     static const float lby3 = 1.0f/3.0f;
     static const float Fby3 = 4.0f/3.0f;
 
-    o->Snap = (-8.0f*Aa+4.0f*o->Acc)*PbyT*PbyT;
-    o->Jerk = ( 4.0f*Aa-Fby3*o->Acc)*PbyT+0.5f*o->Snap;
-    
-    o->biJerk = 0.0f;
-    o->biAcc  = lby3*Aa;
+    if (o->PAcc != 0.0f)
+    {
+        o->P3Snap += +4.0f*o->PAcc;
+        o->P2Jerk += -Fby3*o->PAcc;
+    }
+
+    o->P3Snap *= PbyT*PbyT;
+    o->P2Jerk *= PbyT;
+    o->P2Jerk += 0.5f*o->P3Snap;
+
+    o->biP2Jerk = 0.0f;
+    o->biPAcc   = lby3*Aa;
 }
 
 extern void eo_trajectory_AddVelHybrid(EOtrajectory *o, int32_t v1, int32_t avg_acc)
@@ -264,12 +315,18 @@ extern void eo_trajectory_AddVelHybrid(EOtrajectory *o, int32_t v1, int32_t avg_
 
     if (!avg_acc)
     {
-        o->vel_steps_to_end = 0;
-       
+        o->hybrid_steps_to_end = 0;
+        o->hybridVel = VelF;
         return;
     }
 
     float D = VelF - o->hybridVel;
+
+    if (D == 0.0f)
+    {
+        o->hybrid_steps_to_end = 0;
+        return;
+    }
    
     float Aa = (float)avg_acc;
 
@@ -280,9 +337,10 @@ extern void eo_trajectory_AddVelHybrid(EOtrajectory *o, int32_t v1, int32_t avg_
     o->hybrid_steps_to_end = (int32_t)(T*EMS_FFREQUENCY);
 
     float PbyT = EMS_PERIOD/T;
+    Aa *= EMS_PERIOD;
 
-    o->hybridSnap = (-12.0f*Aa+6.0f*o->hybridAcc)*PbyT*PbyT;
-    o->hybridJerk = (  6.0f*Aa-4.0f*o->hybridAcc)*PbyT+0.5f*o->hybridSnap;
+    o->hybridP3Snap = (-12.0f*Aa+6.0f*o->hybridPAcc)*PbyT*PbyT;
+    o->hybridP2Jerk = (  6.0f*Aa-4.0f*o->hybridPAcc)*PbyT+0.5f*o->hybridP3Snap;
 }
 
 extern void eo_trajectory_StopHybrid(EOtrajectory *o)
@@ -291,33 +349,20 @@ extern void eo_trajectory_StopHybrid(EOtrajectory *o)
     o->hybrid_steps_to_end = 0;
 
     o->Vel += o->hybridVel;
-    o->Acc += o->hybridAcc;
+    o->PAcc += o->hybridPAcc;
 
     o->hybridVel = 0.0f;
-    o->hybridAcc = 0.0f;
+    o->hybridPAcc = 0.0f;
 }
 
 extern void eo_trajectory_TimeoutVelReference(EOtrajectory *o)
 {
     if (o->hybrid)
     {
-        o->hybrid = eobool_false;
         eo_trajectory_AddVelHybrid(o, 0, o->acc_stop_hybrid);
+        o->hybrid = eobool_false;
     }
 }
-
-/*
-extern void eo_trajectory_Stop(EOtrajectory *o)
-{
-    if (o->hybrid) eo_trajectory_StopHybrid(o);
-
-    o->pos_steps_to_end = 0;
-    o->vel_steps_to_end = 0;
-
-    o->PosF = o->Pos;
-    o->VelF = 0.0f;
-}
-*/
 
 extern eObool_t eo_trajectory_IsDone(EOtrajectory* o)
 {
@@ -336,7 +381,7 @@ extern int32_t eo_trajectory_GetVel(EOtrajectory* o)
 
 extern int32_t eo_trajectory_GetAcc(EOtrajectory* o)
 {
-    return (int32_t)o->Acc;
+    return (int32_t)(EMS_FFREQUENCY*o->PAcc);
 }
 
 extern int8_t eo_trajectory_Step(EOtrajectory* o, float *p, float *v)
@@ -345,23 +390,23 @@ extern int8_t eo_trajectory_Step(EOtrajectory* o, float *p, float *v)
     {
         --o->pos_steps_to_end;
 
-        o->Acc  += o->Jerk;
-        o->Jerk += o->Snap;
-        o->Snap += o->Crackle;
+        o->PAcc += o->P2Jerk;
+        o->P2Jerk += o->P3Snap;
+        o->P3Snap += o->P4Crackle;
 
-        o->biAcc += o->biJerk;
+        o->biPAcc += o->biP2Jerk;
         
-        o->Vel += EMS_PERIOD*(o->Acc+o->biAcc);
+        o->Vel += o->PAcc+o->biPAcc;
         o->Pos += EMS_PERIOD*o->Vel;   
     }
     else if (o->vel_steps_to_end)
     {
         --o->vel_steps_to_end;
 
-        o->Acc  += o->Jerk;
-        o->Jerk += o->Snap;
+        o->PAcc   += o->P2Jerk;
+        o->P2Jerk += o->P3Snap;
 
-        o->Vel += EMS_PERIOD*(o->Acc+o->biAcc);
+        o->Vel += o->PAcc+o->biPAcc;
         o->Pos += EMS_PERIOD*o->Vel;
 
         o->PosF = o->Pos; 
@@ -372,16 +417,17 @@ extern int8_t eo_trajectory_Step(EOtrajectory* o, float *p, float *v)
 
         o->Vel = o->VelF;        
         o->Pos = o->PosF;
-        o->Acc = 0.0f;
+        o->PAcc = 0.0f;
     }
 
     if (o->hybrid_steps_to_end)
     {
         --o->hybrid_steps_to_end;
 
-        o->hybridAcc += o->hybridJerk;
-        o->hybridJerk += o->hybridSnap;
-        o->hybridVel += EMS_PERIOD*o->hybridAcc;
+        o->hybridPAcc += o->hybridP2Jerk;
+        o->hybridP2Jerk += o->hybridP3Snap;
+
+        o->hybridVel += o->hybridPAcc;
 
         float dP = EMS_PERIOD*o->hybridVel;
         o->Pos += dP;
@@ -389,7 +435,7 @@ extern int8_t eo_trajectory_Step(EOtrajectory* o, float *p, float *v)
     }
     else if (o->hybrid)
     {
-        o->hybridAcc = 0.0f;
+        o->hybridPAcc = 0.0f;
 
         float dP = EMS_PERIOD*o->hybridVel;
         o->Pos += dP;
@@ -397,7 +443,8 @@ extern int8_t eo_trajectory_Step(EOtrajectory* o, float *p, float *v)
     }
     else
     {
-        o->hybridVel = 0.0f;
+        o->hybridVel  = 0.0f;
+        o->hybridPAcc = 0.0f;
     }
         
     if (o->Pos < o->pos_min)
@@ -408,7 +455,7 @@ extern int8_t eo_trajectory_Step(EOtrajectory* o, float *p, float *v)
         o->vel_steps_to_end = 0;
 
         o->PosF = o->Pos = o->pos_min;
-        o->VelF = o->Vel = o->Acc = 0.0f;
+        o->VelF = o->Vel = o->PAcc = 0.0f;
 
         *p = (int32_t)o->Pos;
         *v = 0;
@@ -424,7 +471,7 @@ extern int8_t eo_trajectory_Step(EOtrajectory* o, float *p, float *v)
         o->vel_steps_to_end = 0;
 
         o->PosF = o->Pos = o->pos_max;
-        o->VelF = o->Vel = o->Acc = 0.0f;
+        o->VelF = o->Vel = o->PAcc = 0.0f;
 
         *p = (int32_t)o->Pos;
         *v = 0;

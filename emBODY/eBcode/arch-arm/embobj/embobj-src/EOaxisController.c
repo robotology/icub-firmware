@@ -100,7 +100,7 @@ extern EOaxisController* eo_axisController_New(void)
         o->acc_stop_alarm = 8192;
 
         o->vel_timer   = 0;
-        o->vel_timeout = EMS_IFREQUENCY;
+        o->vel_timeout = EMS_IFREQUENCY*10;
 
         ///////////////////////////
         

@@ -38,13 +38,13 @@ struct EOtrajectory_hid
 {
     float Pos;
     float Vel;
-    float Acc;
-    float Jerk;
-    float Snap;
-    float Crackle;
+    float PAcc;
+    float P2Jerk;
+    float P3Snap;
+    float P4Crackle;
 
-    float biAcc;
-    float biJerk;
+    float biPAcc;
+    float biP2Jerk;
 
     float PosF;
     float VelF;
@@ -61,9 +61,9 @@ struct EOtrajectory_hid
     eObool_t hybrid;
 
     float hybridVel;
-    float hybridAcc;    
-    float hybridJerk;
-    float hybridSnap;
+    float hybridPAcc;    
+    float hybridP2Jerk;
+    float hybridP3Snap;
 
     int32_t hybrid_steps_to_end;
 }; 
