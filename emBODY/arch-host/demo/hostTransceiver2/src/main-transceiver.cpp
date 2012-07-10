@@ -139,6 +139,8 @@ uint8_t need2sendarop = 0;
 hostTransceiver *transceiver;
 
 uint8_t boardN = 4;
+bool double_socket = false;
+
 
 int main(int argc, char *argv[])
 {
@@ -205,12 +207,19 @@ int main(int argc, char *argv[])
 					port = atoi(argv[++i]);
 				continue;
 			}
+
 			if((strcmp("-b", argv[i]) == 0) || (strcmp("--board", argv[i]) == 0))
 			{
 				if(i < (argc - 1))
 					boardN = atoi(argv[++i]);
 				continue;
 			}
+
+			if( (strcmp("--double", argv[i]) == 0) )
+			{
+				double_socket = true;
+			}
+
 
 			if((strcmp("-h", argv[i]) == 0) || (strcmp("--help", argv[i]) == 0))
 			{
@@ -237,14 +246,14 @@ int main(int argc, char *argv[])
 
 #ifdef _LINUX_UDP_SOCKET_
 	int ret = 0;
-	if(!ACE_socket.initLocal(port))
+	if(!ACE_socket.initLocal(port, local.address_string.c_str()) )
 	{
 		printf("Error initing Udp socket!!\n");
 		return -1;
 	}
 	if(!(ret = ACE_socket.connect((char *)remote01.address_string.c_str(), port)))
 	{
-		printf("Error with UDP connection to %s:%d\n", (char *)remote01.address_string.c_str(),port);
+		printf("Error with UDP connection to socket1-%s:%d\n", (char *)remote01.address_string.c_str(),port);
 		return 0;
 	}
 	else
@@ -253,9 +262,11 @@ int main(int argc, char *argv[])
 		printf("done.\n");
 	}
 
-	if(!(ret = ACE_socket2.connect((char *)remote01.address_string.c_str(), port++)))
+if(double_socket)
+{
+	if(!(ret = ACE_socket2.connect((char *)remote01.address_string.c_str(), port, ++port)))
 	{
-		printf("Error with UDP connection to %s:%d\n", (char *)remote01.address_string.c_str(),port);
+		printf("Error with UDP connection to socket2 %s:%d\n", (char *)remote01.address_string.c_str(),port);
 		return 0;
 	}
 	else
@@ -263,6 +274,8 @@ int main(int argc, char *argv[])
 		ACE_socket2.setBufferSize(EOK_HOSTTRANSCEIVER_capacityofpacket);
 		printf("done.\n");
 	}
+}
+
 #else
 	ACE_socket = new ACE_SOCK_Dgram();
 	if (-1 == ACE_socket->open(local.addr) )
@@ -354,13 +367,18 @@ int main(int argc, char *argv[])
 			// if the command isn't known, an empty ropframe wil be sent -- I guess
 			transceiver->getTransmit(&udppkt_data, &udppkt_size);
 #ifdef _LINUX_UDP_SOCKET_
-			ACE_socket.send((char*) &udppkt_data, (ssize_t) udppkt_size);
+			ACE_socket2.send((char*) &udppkt_data, (ssize_t) udppkt_size);
 #else
-			ACE_socket->send(udppkt_data, udppkt_size, remote01.addr, flags);
+			ACE_socket2->send(udppkt_data, udppkt_size, remote01.addr, flags);
 #endif
 			printf("Sent EmbObj packet, size = %d\n", udppkt_size);
 		}
 	}
+
+#ifdef _LINUX_UDP_SOCKET_
+	ACE_socket.disconnect();
+	ACE_socket2.disconnect();
+#endif
 
 	sleep(2);
 	//pthread_cancel(thread);
@@ -401,15 +419,20 @@ void *recvThread(void * arg)
 //
 //	ropFrame = eo_ropframe_New();
 
+	sockaddr					sender_addr;
 	while(keepGoingOn)
 	{
 #ifdef _LINUX_UDP_SOCKET_
-		udppkt_size = ACE_socket.recv((void *) &sender.data);
+		udppkt_size = ACE_socket.recv((void *) &sender.data, &sender_addr);
+		//sender.addr.set(&sender_addr, 512);
+		if(!check_received_pkt(&sender_addr, (void *) sender.data, udppkt_size))
+			printf("Error checking the packet!!!\n");
 #else
 		udppkt_size = ACE_socket->recv((void *) sender.data, maxBytes2Read, sender.addr, flags);
-#endif
+
 		if(!check_received_pkt(&sender.addr, (void *) sender.data, udppkt_size))
 			printf("Error checking the packet!!!\n");
+#endif
 		//transceiver->SetReceived((ACE_UINT8 *)sender.data, udppkt_size);
 	}
 
@@ -430,7 +453,7 @@ void *sendThread(void * arg)
 	{
 		transceiver->getTransmit(&udppkt_data, &udppkt_size);
 #ifdef _LINUX_UDP_SOCKET_
-		ACE_socket.send((char*) &udppkt_data, (ssize_t) udppkt_size);
+		ACE_socket2.send((char*) &udppkt_data, (ssize_t) udppkt_size);
 #else
 		ACE_socket->send(udppkt_data, udppkt_size, remote01.addr, flags);
 #endif
