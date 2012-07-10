@@ -185,9 +185,6 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jx
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
     eo_appCanSP_SendCmd(appCanSP_ptr, &canLoc, msgCmd, (void*)&cfg->controlmode);
 
-    // 9) set speed etim shift DA CHIEDERE!!!TOLGO ANCHE QUESTA XKE' OBSOLETA?????COME SPEED SHIFT???
-
-    
 }
 
 
@@ -568,6 +565,29 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__stoptrajectory(eOcfg_nvsEP_mc_
 }
 
 
+extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eOresult_t                          res;
+    eo_appCanSP_canLocation             canLoc;
+    eOmc_calibrator_t                   *calibrator = (eOmc_calibrator_t*)nv->loc;
+    eo_icubCanProto_msgCommand_t        msgCmd = 
+    {
+        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__CALIBRATE_ENCODER
+    };
+
+    EOappCanSP *appCanSP_ptr = (EOappCanSP*)eom_appTheSysController_Services_Can_GetHandle(eom_appTheSysController_GetHandle());
+
+    res = eo_appCanSP_GetJointCanLocation(appCanSP_ptr, jxx, &canLoc, NULL);
+    if(eores_OK != res)
+    {
+        return;
+    }
+   
+    eo_appCanSP_SendCmd(appCanSP_ptr, &canLoc, msgCmd, (void*)calibrator);
+}
+
+
 /********************************************************************************************************************************/
 /*************************************   M O T O R S  ****************************************************************************/
 /********************************************************************************************************************************/
@@ -593,6 +613,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig(eOcfg_nvsEP_mc_motorNumber_t mx
 {
     eOresult_t                      res;
     eo_appCanSP_canLocation         canLoc;
+    eObrd_types_t                   boardType;
     eOmc_motor_config_t             *cfg_ptr = (eOmc_motor_config_t*)nv->loc;
     eo_icubCanProto_msgCommand_t    msgCmd = 
     {
@@ -602,21 +623,23 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig(eOcfg_nvsEP_mc_motorNumber_t mx
 
     EOappCanSP *appCanSP_ptr = (EOappCanSP*)eom_appTheSysController_Services_Can_GetHandle(eom_appTheSysController_GetHandle());
 
-    res = eo_appCanSP_GetMotorCanLocation(appCanSP_ptr, mxx, &canLoc, NULL);
+    res = eo_appCanSP_GetMotorCanLocation(appCanSP_ptr, mxx, &canLoc, &boardType);
     if(eores_OK != res)
     {
         return;
     }
 
+    if(eobrd_1foc == boardType)
+    {
+        // 1) send current pid
+        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID;
+        eo_appCanSP_SendCmd(appCanSP_ptr, &canLoc, msgCmd, (void*)&cfg_ptr->pidcurrent);
 
-    // 1) send current pid
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID;
-    eo_appCanSP_SendCmd(appCanSP_ptr, &canLoc, msgCmd, (void*)&cfg_ptr->pidcurrent);
-
-    // 2) send current pid limits
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PIDLIMITS;
-    eo_appCanSP_SendCmd(appCanSP_ptr, &canLoc, msgCmd, (void*)&cfg_ptr->pidcurrent);
-
+        // 2) send current pid limits
+        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PIDLIMITS;
+        eo_appCanSP_SendCmd(appCanSP_ptr, &canLoc, msgCmd, (void*)&cfg_ptr->pidcurrent);
+    }
+    
     // 2) set max velocity   
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_MAX_VELOCITY;
     eo_appCanSP_SendCmd(appCanSP_ptr, &canLoc, msgCmd, (void*)&cfg_ptr->maxvelocityofmotor);
@@ -624,9 +647,6 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig(eOcfg_nvsEP_mc_motorNumber_t mx
     // 3) set current limit  
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_LIMIT;
     eo_appCanSP_SendCmd(appCanSP_ptr, &canLoc, msgCmd, (void*)&cfg_ptr->maxcurrentofmotor);
-
-#warning: VALE-> give default values to i2t !!!!
-    // 5) set i2t param      MISSING!!! 
 
 }
 

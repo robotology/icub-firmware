@@ -448,6 +448,11 @@
               <FileType>1</FileType>
               <FilePath>..\app_extra\EOMappTheSysController.c</FilePath>
             </File>
+            <File>
+              <FileName>EOappTheCanBoardsManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_extra\EOappTheCanBoardsManager.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1050,6 +1055,11 @@
               <FileType>1</FileType>
               <FilePath>..\cfg\icub-nvscfg-usrcbk\eOcfg_nvsEP_sk_usrcbk_ebx.c</FilePath>
             </File>
+            <File>
+              <FileName>eOcfg_nvsEP_as_usrcbk_ebx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\icub-nvscfg-usrcbk\eOcfg_nvsEP_as_usrcbk_ebx.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1064,6 +1074,11 @@
               <FileName>EOemsCanNetworkTopology.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-ems\src\EOemsCanNetworkTopology.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOVcanProto.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-ems\src\EOVcanProto.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1109,11 +1124,6 @@
               <FileName>eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\cfg\icub-can-proto\eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOVcanProto.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOVcanProto.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1655,6 +1665,11 @@
               <FileName>EOMappTheSysController.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_extra\EOMappTheSysController.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOappTheCanBoardsManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_extra\EOappTheCanBoardsManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2339,6 +2354,11 @@
               <FileType>1</FileType>
               <FilePath>..\cfg\icub-nvscfg-usrcbk\eOcfg_nvsEP_sk_usrcbk_ebx.c</FilePath>
             </File>
+            <File>
+              <FileName>eOcfg_nvsEP_as_usrcbk_ebx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\icub-nvscfg-usrcbk\eOcfg_nvsEP_as_usrcbk_ebx.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2353,6 +2373,11 @@
               <FileName>EOemsCanNetworkTopology.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-ems\src\EOemsCanNetworkTopology.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOVcanProto.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-ems\src\EOVcanProto.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2437,11 +2462,6 @@
               <FileName>eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\cfg\icub-can-proto\eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOVcanProto.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOVcanProto.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3062,6 +3082,11 @@
               <FileType>1</FileType>
               <FilePath>..\app_extra\EOMappTheSysController.c</FilePath>
             </File>
+            <File>
+              <FileName>EOappTheCanBoardsManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_extra\EOappTheCanBoardsManager.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3745,6 +3770,11 @@
               <FileType>1</FileType>
               <FilePath>..\cfg\icub-nvscfg-usrcbk\eOcfg_nvsEP_sk_usrcbk_ebx.c</FilePath>
             </File>
+            <File>
+              <FileName>eOcfg_nvsEP_as_usrcbk_ebx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\icub-nvscfg-usrcbk\eOcfg_nvsEP_as_usrcbk_ebx.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3759,6 +3789,11 @@
               <FileName>EOemsCanNetworkTopology.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-ems\src\EOemsCanNetworkTopology.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOVcanProto.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-ems\src\EOVcanProto.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3843,11 +3878,6 @@
               <FileName>eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\cfg\icub-can-proto\eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOVcanProto.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOVcanProto.c</FilePath>
             </File>
           </Files>
         </Group>

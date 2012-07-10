@@ -72,112 +72,174 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+//board 
+
+#define MC4_ADDRCAN_3_BID       0
+#define MC4_ADDRCAN_4_BID       1
+#define MC4_ADDRCAN_5_BID       2
+#define MC4_ADDRCAN_6_BID       3
+#define MC4_ADDRCAN_7_BID       4
+#define MC4_ADDRCAN_8_BID       5
+#define MAIS_ADDRCAN_14_BID     6
+#define SKIN_BID                7
+
+static const eo_emsCanNetTopo_boardTopoInfo_t s_cfg_canNetTopo_boards[] = 
+{
+    { // 0 == MC4_ADDRCAN_3_BID 
+        EO_INIT(.canaddr)                 3,
+        EO_INIT(.emscanport)              eOcanport1,
+        EO_INIT(.boardtype)               eobrd_mc4,
+    },
+
+    { // 1 == MC4_ADDRCAN_4_BID
+        EO_INIT(.canaddr)                 4,
+        EO_INIT(.emscanport)              eOcanport1,
+        EO_INIT(.boardtype)               eobrd_mc4,
+    },    
+
+    { // 2  == MC4_ADDRCAN_5_BID
+        EO_INIT(.canaddr)                 5,
+        EO_INIT(.emscanport)              eOcanport1,
+        EO_INIT(.boardtype)               eobrd_mc4,
+    },
+
+    { // 3 == MC4_ADDRCAN_6_BID
+        EO_INIT(.canaddr)                 6,
+        EO_INIT(.emscanport)              eOcanport1,
+        EO_INIT(.boardtype)               eobrd_mc4,
+    },    
+ 
+    { // 4  == MC4_ADDRCAN_7_BID
+        EO_INIT(.canaddr)                 7,
+        EO_INIT(.emscanport)              eOcanport1,
+        EO_INIT(.boardtype)               eobrd_mc4,
+    },
+
+    { // 5 == MC4_ADDRCAN_8_BID
+        EO_INIT(.canaddr)                 8,
+        EO_INIT(.emscanport)              eOcanport1,
+        EO_INIT(.boardtype)               eobrd_mc4,
+    },
+
+    { // 6  == MAIS_ADDRCAN_14_BID
+        EO_INIT(.canaddr)                 14,
+        EO_INIT(.emscanport)              eOcanport1,
+        EO_INIT(.boardtype)               eobrd_mais,
+    },     
+    
+    { // 7  == SKIN_BID
+        EO_INIT(.canaddr)                 8, //unused becaouse currently all skin can frame are forwarded to pc104 and not parsed!!!, 
+                                              //but can addr can not be 0 else application goes in error state!!!
+        EO_INIT(.emscanport)              eOcanport2,
+        EO_INIT(.boardtype)               eobrd_skin,
+    }     
+};
+
+
+const EOconstvector  s_eo_cfg_emsCanNetTopo_constvec_boards = 
+{
+    EO_INIT(.size)              sizeof(s_cfg_canNetTopo_boards)/sizeof(eo_emsCanNetTopo_boardTopoInfo_t), //EOK_cfg_nvsEP_joint_numberof,
+    EO_INIT(.item_size)         sizeof(eo_emsCanNetTopo_boardTopoInfo_t),
+    EO_INIT(.item_array_data)   s_cfg_canNetTopo_boards
+};
+
+extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_boards__ptr = &s_eo_cfg_emsCanNetTopo_constvec_boards;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*definition of left leg can net topology (ems 1) */
 
-static const eo_emsCanNetTopo_jointOrMotorTopoInfo_t s_cfg_canNetTopo_joints[] = 
+static const eo_emsCanNetTopo_jointTopoInfo_t s_cfg_canNetTopo_joints[] = 
 {
     { // 0 
-        EO_INIT(.boardAddr)                 3,
-        EO_INIT(.axis)                      0,
-        EO_INIT(.canPort)                   eOcanport1,
-        EO_INIT(.boardType)                 eobrd_mc4,
-        EO_INIT(.id)                        0
+        EO_INIT(.bid)                       MC4_ADDRCAN_3_BID,
+        EO_INIT(.j_idInBoard)               eo_emsCanNetTopo_jm_index_first,
+        EO_INIT(.jid)                       0
     },    
 
     { // 1 
-        EO_INIT(.boardAddr)                 3,
-        EO_INIT(.axis)                      1,
-        EO_INIT(.canPort)                   eOcanport1,
-        EO_INIT(.boardType)                 eobrd_mc4,
-        EO_INIT(.id)                        1
+        EO_INIT(.bid)                       MC4_ADDRCAN_3_BID,
+        EO_INIT(.j_idInBoard)               eo_emsCanNetTopo_jm_index_second,
+        EO_INIT(.jid)                       1
     },
 
     { // 2 
-        EO_INIT(.boardAddr)                 4,
-        EO_INIT(.axis)                      0,
-        EO_INIT(.canPort)                   eOcanport1,
-        EO_INIT(.boardType)                 eobrd_mc4,
-        EO_INIT(.id)                        2
+        EO_INIT(.bid)                       MC4_ADDRCAN_4_BID,
+        EO_INIT(.j_idInBoard)               eo_emsCanNetTopo_jm_index_first,
+        EO_INIT(.jid)                       2
     },    
 
     { // 3 
-        EO_INIT(.boardAddr)                 4,
-        EO_INIT(.axis)                      1,
-        EO_INIT(.canPort)                   eOcanport1,
-        EO_INIT(.boardType)                 eobrd_mc4,
-        EO_INIT(.id)                        3
+        EO_INIT(.bid)                       MC4_ADDRCAN_4_BID,
+        EO_INIT(.j_idInBoard)               eo_emsCanNetTopo_jm_index_second,
+        EO_INIT(.jid)                       3
     },
 
     { // 4 
-        EO_INIT(.boardAddr)                 5,
-        EO_INIT(.axis)                      0,
-        EO_INIT(.canPort)                   eOcanport1,
-        EO_INIT(.boardType)                 eobrd_mc4,
-        EO_INIT(.id)                        4
+        EO_INIT(.bid)                       MC4_ADDRCAN_5_BID,
+        EO_INIT(.j_idInBoard)               eo_emsCanNetTopo_jm_index_first,
+        EO_INIT(.jid)                       4
     },    
 
     { // 5 
-        EO_INIT(.boardAddr)                 5,
-        EO_INIT(.axis)                      1,
-        EO_INIT(.canPort)                   eOcanport1,
-        EO_INIT(.boardType)                 eobrd_mc4,
-        EO_INIT(.id)                        5
+        EO_INIT(.bid)                       MC4_ADDRCAN_5_BID,
+        EO_INIT(.j_idInBoard)               eo_emsCanNetTopo_jm_index_second,
+        EO_INIT(.jid)                       5
     },
 
     { // 6 
-        EO_INIT(.boardAddr)                 6,
-        EO_INIT(.axis)                      0,
-        EO_INIT(.canPort)                   eOcanport1,
-        EO_INIT(.boardType)                 eobrd_mc4,
-        EO_INIT(.id)                        6
+        EO_INIT(.bid)                       MC4_ADDRCAN_6_BID,
+        EO_INIT(.j_idInBoard)               eo_emsCanNetTopo_jm_index_first,
+        EO_INIT(.jid)                       6
     },    
 
     { // 7 
-        EO_INIT(.boardAddr)                 6,
-        EO_INIT(.axis)                      1,
-        EO_INIT(.canPort)                   eOcanport1,
-        EO_INIT(.boardType)                 eobrd_mc4,
-        EO_INIT(.id)                        7
+        EO_INIT(.bid)                       MC4_ADDRCAN_6_BID,
+        EO_INIT(.j_idInBoard)               eo_emsCanNetTopo_jm_index_second,
+        EO_INIT(.jid)                       7
     },
 
     { // 8 
-        EO_INIT(.boardAddr)                 7,
-        EO_INIT(.axis)                      0,
-        EO_INIT(.canPort)                   eOcanport1,
-        EO_INIT(.boardType)                 eobrd_mc4,
-        EO_INIT(.id)                        8
+        EO_INIT(.bid)                       MC4_ADDRCAN_7_BID,
+        EO_INIT(.j_idInBoard)               eo_emsCanNetTopo_jm_index_first,
+        EO_INIT(.jid)                       8
     },    
 
     { // 9 
-        EO_INIT(.boardAddr)                 7,
-        EO_INIT(.axis)                      1,
-        EO_INIT(.canPort)                   eOcanport1,
-        EO_INIT(.boardType)                 eobrd_mc4,
-        EO_INIT(.id)                        9
+        EO_INIT(.bid)                       MC4_ADDRCAN_7_BID,
+        EO_INIT(.j_idInBoard)               eo_emsCanNetTopo_jm_index_second,
+        EO_INIT(.jid)                       9
     },
 
     { // 10 
-        EO_INIT(.boardAddr)                 8,
-        EO_INIT(.axis)                      0,
-        EO_INIT(.canPort)                   eOcanport1,
-        EO_INIT(.boardType)                 eobrd_mc4,
-        EO_INIT(.id)                        10
+        EO_INIT(.bid)                       MC4_ADDRCAN_8_BID,
+        EO_INIT(.j_idInBoard)               eo_emsCanNetTopo_jm_index_first,
+        EO_INIT(.jid)                       10
     },    
 
     { // 11 
-        EO_INIT(.boardAddr)                 8,
-        EO_INIT(.axis)                      1,
-        EO_INIT(.canPort)                   eOcanport1,
-        EO_INIT(.boardType)                 eobrd_mc4,
-        EO_INIT(.id)                        11
+        EO_INIT(.bid)                       MC4_ADDRCAN_8_BID,
+        EO_INIT(.j_idInBoard)               eo_emsCanNetTopo_jm_index_second,
+        EO_INIT(.jid)                       11
     }
 };
 
 
 const EOconstvector  s_eo_cfg_emsCanNetTopo_constvec_joints = 
 {
-    EO_INIT(.size)              sizeof(s_cfg_canNetTopo_joints)/sizeof(eo_emsCanNetTopo_jointOrMotorTopoInfo_t), //EOK_cfg_nvsEP_joint_numberof,
-    EO_INIT(.item_size)         sizeof(eo_emsCanNetTopo_jointOrMotorTopoInfo_t),
+    EO_INIT(.size)              sizeof(s_cfg_canNetTopo_joints)/sizeof(eo_emsCanNetTopo_jointTopoInfo_t),
+    EO_INIT(.item_size)         sizeof(eo_emsCanNetTopo_jointTopoInfo_t),
     EO_INIT(.item_array_data)   s_cfg_canNetTopo_joints
 };
 
@@ -194,18 +256,15 @@ extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_motors__ptr = &s
 
 
 
-
 /***********************************************************************************************/
-/*********************** **********        S E N S O R S            ***************************************/
+/*****************************        S E N S O R S         ************************************/
 /***********************************************************************************************/
 
 static const eo_emsCanNetTopo_sensorTopoInfo_t  s_cfg_canNetTopo_sensors[] = 
 {
    {// 0
-       EO_INIT(.boardAddr)                 14,
-       EO_INIT(.canPort)                   eOcanport1,
-       EO_INIT(.boardType)                 eobrd_mais,
-       EO_INIT(.id)                        0
+       EO_INIT(.bid)                       MAIS_ADDRCAN_14_BID,
+       EO_INIT(.sid)                       0
    
   }
 };
@@ -232,10 +291,8 @@ extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_sensors__ptr = &
 static const eo_emsCanNetTopo_sensorTopoInfo_t  s_cfg_canNetTopo_skin [] = 
 {
     {// 0
-        EO_INIT(.boardAddr)                 0,              //unused
-        EO_INIT(.canPort)                   eOcanport2,     //important!!!
-        EO_INIT(.boardType)                 eobrd_skin,     //obvious information
-        EO_INIT(.id)                        0               //important!!!
+        EO_INIT(.bid)                 SKIN_BID,
+        EO_INIT(.sid)                 0              
    }
 };
 

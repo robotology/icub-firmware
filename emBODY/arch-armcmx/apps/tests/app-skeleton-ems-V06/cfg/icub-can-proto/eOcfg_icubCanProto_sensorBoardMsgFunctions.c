@@ -61,10 +61,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-#define EMS_CAN_ADDR                                    0
-#define ICUBCANPROTO_POL_SB_ID_DEFAULT                  ((ICUBCANPROTO_CLASS_POLLING_SENSORBOARD << 8) | (0x0<<4))
-#define ICUBCANPROTO_POL_SB_CREATE_ID(destBoardAddr)    ((ICUBCANPROTO_CLASS_POLLING_SENSORBOARD << 8) | (EMS_CAN_ADDR<<4) | (destBoardAddr&0xF))
-#define ICUBCANPROTO_POL_SK_CREATE_ID(destBoardAddr)     ICUBCANPROTO_POL_SB_CREATE_ID(destBoardAddr)
+#define EMS_CAN_ADDR                                            0
+#define ICUBCANPROTO_POL_SB_ID_DEFAULT                          ((ICUBCANPROTO_CLASS_POLLING_SENSORBOARD << 8) | (0x0<<4))
+#define ICUBCANPROTO_POL_SB_CREATE_ID(destBoardAddr)            ((ICUBCANPROTO_CLASS_POLLING_SENSORBOARD << 8) | (EMS_CAN_ADDR<<4) | (destBoardAddr&0xF))
+#define ICUBCANPROTO_POL_SK_CREATE_ID(destBoardAddr)            ((ICUBCANPROTO_CLASS_POLLING_SENSORBOARD << 8)|  (EMS_CAN_ADDR<<4) | (destBoardAddr&0xF))
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -329,7 +329,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes7to14(EOicubCanProto* p,
 
 
 /***********************************************************************************************************************************/
-/*******************************  S K I N     F U N C T I O N    *******************************************************************/
+/*******************************  S K I N     F U N C T I O N S    *******************************************************************/
 /***********************************************************************************************************************************/
 
 extern eOresult_t eo_icubCanProto_parser_per_sk_cmd__allSkinMsg(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)

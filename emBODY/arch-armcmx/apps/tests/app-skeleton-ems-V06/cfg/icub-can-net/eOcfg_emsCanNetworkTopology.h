@@ -63,6 +63,8 @@ extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_joints__ptr;
 extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_motors__ptr;
 extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_sensors__ptr;
 extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_skin__ptr;
+extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_boards__ptr;
+
 // - declaration of extern public functions ---------------------------------------------------------------------------
 // empty-section
 

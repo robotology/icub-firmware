@@ -95,10 +95,7 @@ int32_t posref_can = 0;
 void s_eom_appMotorController_taskInit(void *p);
 static void s_eom_appMotorController_taskStartup(EOMtask *p, uint32_t t);
 static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper); 
-
-static void s_eom_appMotorController_PIDcalc(void);
-static void s_eom_appMotorController_PIDresetVal(void);
-static void s_eom_appMotorController_PIDmoltiply(void);
+static eOresult_t s_eom_appMotorController_SetCurrentsetpoint(EOMappMotorController *p, int16_t *pwmList, uint8_t size);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -265,6 +262,9 @@ static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
 
         pwm_out = (int16_t)pwm[0];
 
+        /* 4) prepare and punt in rx queue new setpoint */
+        s_eom_appMotorController_SetCurrentsetpoint(p, pwm, 0);
+        
         /* 3) reset my state */
         p->st = eOm_appMotorController_st__active;
 
@@ -273,38 +273,34 @@ static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
     }
 }
 
-static void s_eom_appMotorController_PIDcalc(void)
+
+
+static eOresult_t s_eom_appMotorController_SetCurrentsetpoint(EOMappMotorController *p, int16_t *pwmList, uint8_t size)
 {
-    uint8_t i;
-    for(i=0; i<1; i++)
+    eOresult_t res;
+    eo_icubCanProto_msgCommand_t msgCmd = 
     {
-        s_eom_appMotorController_PIDmoltiply();
-        s_eom_appMotorController_PIDresetVal();
-    }
-    return;
-}
-
-static void s_eom_appMotorController_PIDresetVal(void)
-{
-    uint8_t i;
-        
-    for(i=0; i<100; i++)
+        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__SET_DISIRED_CURRENT
+    };
+    eOmc_setpoint_t     mySetPoint_current = 
     {
-        pidVal[i] = i+1;
-    }
+        EO_INIT(.type)       eomc_setpoint_current,
+        EO_INIT(.to)
+        {
+            EO_INIT(.current)
+            {
+                EO_INIT(.value)     0
+            }   
+        }
+    };
 
-}
-
-static void s_eom_appMotorController_PIDmoltiply(void)
-{
-    uint8_t i;
+    mySetPoint_current.to.current.value = pwmList[0];
     
-    for(i=2; i<100; i++)
-    {
-        pidVal[i] =pidVal[i-1]* pidVal[i-2];
-    }
-
-
+    /*Since in run mode the frame are sent on demnad...here i can punt in tx queue frame to send.
+    they will be sent by transmitter */
+    res = eo_appCanSP_SendCmd2Joint(p->cfg.appCanSP_ptr, 0/*jid*/, msgCmd, (void*)&mySetPoint_current);
+    return(res);
 }
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

@@ -448,6 +448,11 @@
               <FileType>1</FileType>
               <FilePath>..\app_extra\EOMappTheSysController.c</FilePath>
             </File>
+            <File>
+              <FileName>EOappTheCanBoardsManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_extra\EOappTheCanBoardsManager.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1665,6 +1670,11 @@
               <FileName>EOMappTheSysController.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_extra\EOMappTheSysController.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOappTheCanBoardsManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_extra\EOappTheCanBoardsManager.c</FilePath>
             </File>
           </Files>
         </Group>

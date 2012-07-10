@@ -56,7 +56,8 @@ typedef struct EOMappMotorController_hid EOMappMotorController;
 
 typedef struct
 {
-    EOappEncReader              *encReader;    
+    EOappEncReader              *encReader;
+    EOappCanSP                  *appCanSP_ptr;
     eOcallbackData_t            sig2appDataTransmitter;
 } EOMappMotorController_cfg_t;
     

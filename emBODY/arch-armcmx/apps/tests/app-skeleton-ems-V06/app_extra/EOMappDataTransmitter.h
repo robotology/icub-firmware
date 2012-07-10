@@ -107,6 +107,8 @@ extern eOresult_t eom_appDataTransmitter_SendData(EOMappDataTransmitter *p);
 extern eOresult_t eom_appDataTransmitter_SetRunMode(EOMappDataTransmitter *p, eOmn_appl_runMode_t runmode);
 
 
+extern eOresult_t eom_appDataTransmitter_SetMotionmonitorMode(EOMappDataTransmitter *p, eOmc_motionmonitormode_t monitormode);
+
 // - doxy end ---------------------------------------------------------------------------------------------------------
 
 /** @}            

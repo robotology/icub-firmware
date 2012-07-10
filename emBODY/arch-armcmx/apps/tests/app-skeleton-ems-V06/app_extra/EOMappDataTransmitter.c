@@ -233,40 +233,76 @@ static void s_eom_appDataTransmitter_taskStartup(EOMtask *tsk, uint32_t t)
 static void s_eom_appDataTransmitter_taskRun(EOMtask *tsk, uint32_t evtmsgper)
 {
     eOevent_t evt;
+    eOresult_t res;
+    uint8_t payload[8]; //only 4 test purpose
     
     EOMappDataTransmitter *p = (EOMappDataTransmitter*)eom_task_GetExternalData(tsk);
 
     evt = (eOevent_t)evtmsgper;   
    
-
-    switch(p->appl_runMode)
+//following activities are independent on runmode
+    
+    if(eo_common_event_check(evt, EVT_START))
     {
-        case applrunMode__skinOnly:
+    
+        res = s_eom_appDataTransmitter_SendRops(p);
+        if(eores_OK != res)
         {
-            s_eom_appDataTransmitter_taskRun_skinOnly_mode(p, evt);
-        }break;
+            return;
+        }        
         
-        case applrunMode__2foc:
+        res = eo_appCanSP_TransmitCanFrames(p->cfg.appCanSP_ptr, eOcanport1);
+        if(eores_OK != res)
         {
-            s_eom_appDataTransmitter_taskRun_2foc_mode(p, evt);
-        }break;
-        
-        case applrunMode__skinAndMc4:
-        {
-            s_eom_appDataTransmitter_taskRun_skinAndMc4_mode(p, evt);
-        }break;
-        
-        case applrunMode__mc4Only:
-        {
-            ;
-        }break;
+            return;
+        }        
 
-        default:
+        eo_appCanSP_TransmitCanFrames(p->cfg.appCanSP_ptr, eOcanport2);
+        if(eores_OK != res)
         {
-            ;
-        };
+            return;
+        }        
+        
+        ((int32_t*)payload)[0]=encoder_can;
+        ((int32_t*)payload)[1]=posref_can;
 
-    };
+        eo_appCanSP_SendMessage_TEST(p->cfg.appCanSP_ptr, NULL, payload);
+
+        p->st = eOm_appDataTransmitter_st__active;
+    }
+
+    
+//     
+//     
+//     
+//     switch(p->appl_runMode)
+//     {
+//         case applrunMode__skinOnly:
+//         {
+//             s_eom_appDataTransmitter_taskRun_skinOnly_mode(p, evt);
+//         }break;
+//         
+//         case applrunMode__2foc:
+//         {
+//             s_eom_appDataTransmitter_taskRun_2foc_mode(p, evt);
+//         }break;
+//         
+//         case applrunMode__skinAndMc4:
+//         {
+//             s_eom_appDataTransmitter_taskRun_skinAndMc4_mode(p, evt);
+//         }break;
+//         
+//         case applrunMode__mc4Only:
+//         {
+//             ;
+//         }break;
+
+//         default:
+//         {
+//             ;
+//         };
+
+//     };
 
 
 }
@@ -316,7 +352,7 @@ static void s_eom_appDataTransmitter_taskRun_2foc_mode(EOMappDataTransmitter *p,
             return;
         }        
         
-        eo_appCanSP_SendSetPoint(p->cfg.appCanSP_ptr, 0, &mySetPoint_current); //jid..DA VERIFICARE!!!
+//        eo_appCanSP_SendSetPoint(p->cfg.appCanSP_ptr, 0, &mySetPoint_current); //jid..DA VERIFICARE!!!
         
         ((int32_t*)payload)[0]=encoder_can;
         ((int32_t*)payload)[1]=posref_can;
@@ -339,8 +375,15 @@ static void s_eom_appDataTransmitter_taskRun_skinAndMc4_mode(EOMappDataTransmitt
         if(eores_OK != res)
         {
             return;
-        }        
-        
+        }
+
+        eo_appCanSP_TransmitCanFrames(p->cfg.appCanSP_ptr, eOcanport1);
+        eo_appCanSP_TransmitCanFrames(p->cfg.appCanSP_ptr, eOcanport2);
+//         if( (eomc_motionmonitormode_untilreached == p->monitormode) || (eomc_motionmonitormode_forever == p->monitormode))
+//         {
+//            #warning VALE--> invia motion done
+//             
+//         }
         p->st = eOm_appDataTransmitter_st__active;
     }
 

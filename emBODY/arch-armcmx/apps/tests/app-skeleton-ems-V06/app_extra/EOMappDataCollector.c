@@ -133,15 +133,7 @@ extern EOMappDataCollector* eom_appDataCollector_New(EOMappDataCollector_cfg_t *
         return(retptr);
     }
 
-//    EOethBaseModule_cfg_t eth_mod_cfg = 
-//    {
-//        EO_INIT(.dtagramQueue_itemNum)  2,
-//        EO_INIT(.dtagramQueue_itemSize) 128,
-//        EO_INIT(.remaddr)               0x01010102,
-//        EO_INIT(.localport)             3334,
-//        EO_INIT(.action_onRec)          NULL,
-//        EO_INIT(.periodTx)              0
-//    };    
+ 
     
        
     retptr = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOMappDataCollector), 1);
@@ -176,7 +168,6 @@ extern eOresult_t eom_appDataCollector_Activate(EOMappDataCollector *p)
         return(eores_NOK_nullpointer);
     }
 
-//    eo_ethBaseModule_Activate(p->eth_mod);
     p->st = eOm_appDataCollector_st__active;
 
      return(eores_OK);
@@ -189,7 +180,7 @@ extern eOresult_t eom_appDataCollector_Deactivate(EOMappDataCollector *p)
     {
         return(eores_NOK_nullpointer);
     }
-//    eo_ethBaseModule_Deactivate(p->eth_mod);
+    
     p->st = eOm_appDataCollector_st__idle;
 
      return(eores_OK);
@@ -270,8 +261,7 @@ static void s_eom_appDataCollector_taskRun(EOMtask *tsk, uint32_t evtmsgper)
 
     eOevent_t evt = (eOevent_t)evtmsgper;   
 
-    hal_led_on(hal_led1);
-    hal_led_off(hal_led0);
+
 
     switch(p->appl_runMode)
     {
@@ -319,8 +309,6 @@ static void s_eom_appDataCollector_taskRun_skinOnly_mode(EOMappDataCollector *p,
     
     if(eo_common_event_check(evt, EVT_GETDATA_STOP))
     {
-
-        hal_led_on(hal_led3);
         //on stop evt nothing to do, only send evt
 
         if(NULL != p->cfg.sig2appMotorController.fn)
@@ -346,25 +334,25 @@ static void s_eom_appDataCollector_taskRun_2foc_mode(EOMappDataCollector *p, eOe
         eo_appCanSP_read(p->cfg.canSP_ptr, eOcanport1, 4, NULL); 
 
 
-       /* 4) get encoders values*/
-       if(eobool_true == eo_appEncReader_isReady(p->cfg.encReader_ptr))
-       {
-           eo_appEncReader_getValues(p->cfg.encReader_ptr, encoders_values);
-       }
-       else
-       {
-           //Soluzione 1: mi invio un evento dedicato alla lettura dell'encoder 
-           //nella gestione di questo evento verifico se i valorio sono pronti:
-           //  se si ==>  ok
-           //  altrimenti mi rinvio l'evento
+//        /* 4) get encoders values*/
+//        if(eobool_true == eo_appEncReader_isReady(p->cfg.encReader_ptr))
+//        {
+//            eo_appEncReader_getValues(p->cfg.encReader_ptr, encoders_values);
+//        }
+//        else
+//        {
+//            //Soluzione 1: mi invio un evento dedicato alla lettura dell'encoder 
+//            //nella gestione di questo evento verifico se i valorio sono pronti:
+//            //  se si ==>  ok
+//            //  altrimenti mi rinvio l'evento
 
-           //Soluzione 2: faccio una lettura degli encoder su ricezione dell'evt_stop.
-           
+//            //Soluzione 2: faccio una lettura degli encoder su ricezione dell'evt_stop.
+//            
 
-           //soluzione 3: faccio una get degli encoder letti nel motion control, tanto e' inutile farla qui,
-           //copiare i valori e passarli al motion control
-           //ho deciso di adottare questa soluzione e quindi ho commentato le letture degli encoder
-       }
+//            //soluzione 3: faccio una get degli encoder letti nel motion control, tanto e' inutile farla qui,
+//            //copiare i valori e passarli al motion control
+//            //ho deciso di adottare questa soluzione e quindi ho commentato le letture degli encoder
+//        }
      
  
     }
@@ -372,11 +360,11 @@ static void s_eom_appDataCollector_taskRun_2foc_mode(EOMappDataCollector *p, eOe
     if(eo_common_event_check(evt, EVT_GETDATA_STOP))
     {
 
-        hal_led_on(hal_led3);
-       if(eobool_true == eo_appEncReader_isReady(p->cfg.encReader_ptr))
-       {
-           eo_appEncReader_getValues(p->cfg.encReader_ptr, encoders_values);
-       }
+//         hal_led_on(hal_led3);
+//        if(eobool_true == eo_appEncReader_isReady(p->cfg.encReader_ptr))
+//        {
+//            eo_appEncReader_getValues(p->cfg.encReader_ptr, encoders_values);
+//        }
 
         if(NULL != p->cfg.sig2appMotorController.fn)
         {
@@ -395,7 +383,8 @@ static void s_eom_appDataCollector_taskRun_skinAndMc4_mode(EOMappDataCollector *
         s_eom_appDataCollector_readSkin(p);
         
         /* 3) get can frame from mais and mc4 board and process them */
-       s_eom_appDataCollector_readMc4andMais(p);
+        s_eom_appDataCollector_readMc4andMais(p);
+        
         //something else about mc4 ??????
     }
 
@@ -418,10 +407,7 @@ static void s_eom_appDataCollector_readSkin(EOMappDataCollector *p)
     
     //1) reset nv array
     res = eo_appTheNVmapRef_GetSkinNVMemoryRef(eo_appTheNVmapRef_GetHandle(), 0, skinNVindex_sstatus__arrayof10canframe, &memRef);
-    if(eores_OK != res)
-    {
-        return; //TODO: error management
-    }
+    eo_errman_Assert(eo_errman_GetHandle(), eores_OK == res, s_eobj_ownname, "err in GetSkinNVMemoryRef");
 
     sk_array = (EOarray*)memRef;
     eo_array_Reset(sk_array);
@@ -438,18 +424,14 @@ static void s_eom_appDataCollector_readMc4andMais(EOMappDataCollector *p)
     
     //1) reset nv array
     res = eo_appTheNVmapRef_GetSensorsMaisNVMemoryRef(eo_appTheNVmapRef_GetHandle(), 0, maisNVindex_mstatus__the15values, &memRef);
-    if(eores_OK != res)
-    {
-        return; //TODO: error management
-    }
+    eo_errman_Assert(eo_errman_GetHandle(), eores_OK == res, s_eobj_ownname, "err in GetSensorsMaisNVMemoryRef");
 
     //reset array
     maisArray = (eOsnsr_arrayofupto36bytes_t*)memRef;
     maisArray->head.size = 0;
-//     memset(&maisArray->data[0], 0xAA, 20);
     maisArray->data[0] = 0;
 
-    eo_appCanSP_read(p->cfg.canSP_ptr, eOcanport1, 2, NULL); //10 is the max size of sk_array
+    eo_appCanSP_read(p->cfg.canSP_ptr, eOcanport1, 2, NULL); //2...boh!!!
 
 }
 

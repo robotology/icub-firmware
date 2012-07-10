@@ -55,9 +55,10 @@ struct EOappCanSP_hid
 {
     EOicubCanProto  *icubCanProto_ptr;
     EOemsCanNetTopo *emsCanNetTopo_ptr;
+    eo_appCanSP_runMode_t   runmode;
 };
 
-
+typedef eo_emsCanNetTopo_boardTopoInfo_t  eo_EOappCanSP_boardTopoInfo_hid_t;
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 // empty-section
 

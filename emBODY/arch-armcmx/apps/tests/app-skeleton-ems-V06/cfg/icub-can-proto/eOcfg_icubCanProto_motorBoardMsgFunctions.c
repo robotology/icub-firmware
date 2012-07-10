@@ -98,104 +98,104 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_unexpected_cmd(EOicubCanProto* p
 extern eOresult_t eo_icubCanProto_parser_test(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
 
-    eOresult_t res;
-    static eOmc_joint_status_t j;
-    eo_emsCanNetTopo_jointOrMotorCanLocation_t canLoc;
-    eOmc_jointId_t jId;
-    eOmc_motorId_t mId;
-    void *memRef1, *memRef2, *pidVel_NVptr;
-    eOmc_PID_t pidVel, pidPos1, pidPos2;
-    eOmc_joint_config_t /*jc1,*/ jc2;
-    eOmc_motor_config_t  mc;
-     
-    eo_icubCanProto_canBoardAddress_t boardAddr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
-//DEBUG_PIN4_OFF;
+//     eOresult_t res;
+//     static eOmc_joint_status_t j;
+//     eo_emsCanNetTopo_jointOrMotorCanLocation_t canLoc;
+//     eOmc_jointId_t jId;
+//     eOmc_motorId_t mId;
+//     void *memRef1, *memRef2, *pidVel_NVptr;
+//     eOmc_PID_t pidVel, pidPos1, pidPos2;
+//     eOmc_joint_config_t /*jc1,*/ jc2;
+//     eOmc_motor_config_t  mc;
+//      
+//     eo_icubCanProto_canBoardAddress_t boardAddr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+// //DEBUG_PIN4_OFF;
 
-//      res = eo_emsCanNetTopo_GetMotorBoardNV_Status_ByCanLocation(p->emsCanNetTopo_ptr, canPort, boardAddr,
-//                                                       eo_icubCanProto_mAxis_0, &nvt_ptr);
-    canLoc.emscanport = canPort;
-    canLoc.canaddr = boardAddr;
-    canLoc.axis = eo_icubCanProto_mAxis_0;
-    res = eo_emsCanNetTopo_GetJointId_ByJointCanLocation(p->emsCanNetTopo_ptr, &canLoc, &jId);
-    if(eores_OK != res)
-    {
-        return(res);
-    }
+// //      res = eo_emsCanNetTopo_GetMotorBoardNV_Status_ByCanLocation(p->emsCanNetTopo_ptr, canPort, boardAddr,
+// //                                                       eo_emsCanNetTopo_jm_index_first, &nvt_ptr);
+//     canLoc.emscanport = canPort;
+//     canLoc.canaddr = boardAddr;
+//     canLoc.jm_idInBoard = 0;
+//     res = eo_emsCanNetTopo_GetJointId_ByJointCanLocation(p->emsCanNetTopo_ptr, &canLoc, &jId);
+//     if(eores_OK != res)
+//     {
+//         return(res);
+//     }
 
-//    res = eo_appTheNVmapRef_GetJointNVMemoryRef_test(eo_appTheNVmapRef_GetHandle(), jId, jointNVindex_jconfig, &memRef1);
-//    if(eores_OK != res)
-//    {
-//        return(res);
-//    }
-
-
-    res = eo_appTheNVmapRef_GetJointNVMemoryRef(eo_appTheNVmapRef_GetHandle(), jId, jointNVindex_jconfig, &memRef2);
-    if(eores_OK != res)
-    {
-        return(res);
-    }
-
-    if(memRef1 == memRef2)
-    {
-        j.basic.velocity = 1;
-    }
-    else
-    {
-        j.basic.velocity = 2;
-    }
-    j=j;
-//    memcpy(&jc1, memRef1, sizeof(eOmc_joint_config_t));  memref1 uset for test
-
-    memcpy(&jc2, memRef2, sizeof(eOmc_joint_config_t));
-//DEBUG_PIN3_OFF;
-
-//pidPos
-    res = eo_appTheNVmapRef_GetJointNVMemoryRef_test(eo_appTheNVmapRef_GetHandle(), jId, jointNVindex_jconfig__pidposition, &memRef1);
-    if(eores_OK != res)
-    {
-        return(res);
-    }
+// //    res = eo_appTheNVmapRef_GetJointNVMemoryRef_test(eo_appTheNVmapRef_GetHandle(), jId, jointNVindex_jconfig, &memRef1);
+// //    if(eores_OK != res)
+// //    {
+// //        return(res);
+// //    }
 
 
-    res = eo_appTheNVmapRef_GetJointNVMemoryRef(eo_appTheNVmapRef_GetHandle(), jId, jointNVindex_jconfig__pidposition, &memRef2);
-    if(eores_OK != res)
-    {
-        return(res);
-    }
+//     res = eo_appTheNVmapRef_GetJointNVMemoryRef(eo_appTheNVmapRef_GetHandle(), jId, jointNVindex_jconfig, &memRef2);
+//     if(eores_OK != res)
+//     {
+//         return(res);
+//     }
 
-    memcpy(&pidPos1, memRef1, sizeof(eOmc_PID_t)); 
-    memcpy(&pidPos2, memRef2, sizeof(eOmc_PID_t)); 
+//     if(memRef1 == memRef2)
+//     {
+//         j.basic.velocity = 1;
+//     }
+//     else
+//     {
+//         j.basic.velocity = 2;
+//     }
+//     j=j;
+// //    memcpy(&jc1, memRef1, sizeof(eOmc_joint_config_t));  memref1 uset for test
+
+//     memcpy(&jc2, memRef2, sizeof(eOmc_joint_config_t));
+// //DEBUG_PIN3_OFF;
+
+// //pidPos
+//     res = eo_appTheNVmapRef_GetJointNVMemoryRef_test(eo_appTheNVmapRef_GetHandle(), jId, jointNVindex_jconfig__pidposition, &memRef1);
+//     if(eores_OK != res)
+//     {
+//         return(res);
+//     }
 
 
+//     res = eo_appTheNVmapRef_GetJointNVMemoryRef(eo_appTheNVmapRef_GetHandle(), jId, jointNVindex_jconfig__pidposition, &memRef2);
+//     if(eores_OK != res)
+//     {
+//         return(res);
+//     }
 
-    //pidvel
-    res = eo_appTheNVmapRef_GetJointNVMemoryRef(eo_appTheNVmapRef_GetHandle(), jId, jointNVindex_jconfig__pidvelocity, &pidVel_NVptr);
-    memcpy(&pidVel,pidVel_NVptr, sizeof(eOmc_PID_t)); 
-
-    pidVel.kd = 0x1010;
+//     memcpy(&pidPos1, memRef1, sizeof(eOmc_PID_t)); 
+//     memcpy(&pidPos2, memRef2, sizeof(eOmc_PID_t)); 
 
 
 
+//     //pidvel
+//     res = eo_appTheNVmapRef_GetJointNVMemoryRef(eo_appTheNVmapRef_GetHandle(), jId, jointNVindex_jconfig__pidvelocity, &pidVel_NVptr);
+//     memcpy(&pidVel,pidVel_NVptr, sizeof(eOmc_PID_t)); 
 
-/*************************************************************************************/
-/*              motor                      */
+//     pidVel.kd = 0x1010;
 
-    res = eo_emsCanNetTopo_GetMotorId_ByMotorCanLocation(p->emsCanNetTopo_ptr, &canLoc, &mId);
-    if(eores_OK != res)
-    {
-        return(res);
-    }
 
-    res = eo_appTheNVmapRef_GetMotorNVMemoryRef(eo_appTheNVmapRef_GetHandle(), mId, motorNVindex_mconfig, &memRef1);
-    if(eores_OK != res)
-    {
-        return(res);
-    }
-    memcpy(&mc, memRef1, sizeof(eOmc_motor_config_t));
 
-//DEBUG_PIN3_OFF;
-//    nvJoint_ptr->axis.position = frame->data[1];
-//    nvJoint_ptr->axis.velocity = frame->data[2]; 
+
+// /*************************************************************************************/
+// /*              motor                      */
+
+//     res = eo_emsCanNetTopo_GetMotorId_ByMotorCanLocation(p->emsCanNetTopo_ptr, &canLoc, &mId);
+//     if(eores_OK != res)
+//     {
+//         return(res);
+//     }
+
+//     res = eo_appTheNVmapRef_GetMotorNVMemoryRef(eo_appTheNVmapRef_GetHandle(), mId, motorNVindex_mconfig, &memRef1);
+//     if(eores_OK != res)
+//     {
+//         return(res);
+//     }
+//     memcpy(&mc, memRef1, sizeof(eOmc_motor_config_t));
+
+// //DEBUG_PIN3_OFF;
+// //    nvJoint_ptr->jm_idInBoard.position = frame->data[1];
+// //    nvJoint_ptr->jm_idInBoard.velocity = frame->data[2]; 
     return(eores_OK);
 }
 
@@ -331,7 +331,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getControlMode(EOicubCanPro
 
     canLoc.emscanport = canPort;
     canLoc.canaddr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
-    canLoc.axis = eo_icubCanProto_hid_getmotorAxisFromFrame(frame);
+    canLoc.jm_idInBoard = eo_icubCanProto_hid_getmotorAxisFromFrame(frame);
     
     res = eo_emsCanNetTopo_GetJointId_ByJointCanLocation(p->emsCanNetTopo_ptr, &canLoc, &jId);
     if(eores_OK != res)
@@ -377,7 +377,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__motionDone(EOicubCanProto* 
 
     canLoc.emscanport = canPort;
     canLoc.canaddr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
-    canLoc.axis = eo_icubCanProto_hid_getmotorAxisFromFrame(frame);
+    canLoc.jm_idInBoard = eo_icubCanProto_hid_getmotorAxisFromFrame(frame);
     
     res = eo_emsCanNetTopo_GetJointId_ByJointCanLocation(p->emsCanNetTopo_ptr, &canLoc, &jId);
     if(eores_OK != res)
@@ -426,7 +426,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setControlMode(EOicubCanPro
     canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
-    canFrame->size = 1;
+    canFrame->size = 2;
 
     /* 2) set can command */
     canFrame->data[0] = ((dest.axis&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
@@ -457,7 +457,23 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setAdditionalInfo(EOicubCan
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setSpeedEtimShift(EOicubCanProto* p, void *val_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    //obsolete
+    eOmc_estimShift_t *estimShift_ptr = (eOmc_estimShift_t*)val_ptr;
+
+    /* 1) prepare base information*/
+    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 5;
+
+    /* 2 set can command */
+    canFrame->data[0] = ((dest.axis&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_SPEED_ESTIM_SHIFT;
+
+    /*3) set command's params */
+    *((uint8_t*)(&canFrame->data[1])) = estimShift_ptr->estimShiftJointVel;
+    *((uint8_t*)(&canFrame->data[2])) = estimShift_ptr->estimShiftJointAcc;
+    *((uint8_t*)(&canFrame->data[3])) = estimShift_ptr->estimShiftMotorVel;
+    *((uint8_t*)(&canFrame->data[4])) = estimShift_ptr->estimShiftMotorAcc;
+    
     return(eores_OK);
 }
 
@@ -696,19 +712,36 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setCurrentLimit(EOicubCanPr
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setBcastPolicy(EOicubCanProto* p, void *val_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
+    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 5;
+    canFrame->data[0] = ((dest.axis&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_BCAST_POLICY;
+    
+    if(NULL == val_ptr)
+    {
+        canFrame->data[1] = ICUBCANPROTO_PER_MB_CMD_POSITION;
+        canFrame->data[2] = ICUBCANPROTO_PER_MB_CMD_PID_VAL;
+        canFrame->data[3] = ICUBCANPROTO_PER_MB_CMD_STATUS;
+        canFrame->data[4] = ICUBCANPROTO_PER_MB_CMD_OVERFLOW;
+    }
+    else
+    {
+            #warning VALE--> bcast policy set default only!!!!
+    }
     return(eores_OK);
 }
 
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setVelShift(EOicubCanProto* p, void *val_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-//OBSOLETE!!!!
-//    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.canAddr);
-//    canFrame->id_type = 0; //standard id
-//    canFrame->frame_type = 0; //data frame
-//    canFrame->size = 3;
-//    canFrame->data[0] = ((dest.axis&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_VEL_SHIFT;
-//    *((uint16_t*)(&canFrame->data[1])) = *((uint16_t*)val_ptr);
+
+   canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.canAddr);
+   canFrame->id_type = 0; //standard id
+   canFrame->frame_type = 0; //data frame
+   canFrame->size = 3;
+   canFrame->data[0] = ((dest.axis&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_VEL_SHIFT;
+   *((uint16_t*)(&canFrame->data[1])) = *((uint16_t*)val_ptr);
     return(eores_OK);
 }
 
@@ -1087,6 +1120,16 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setPeriodicContents(EOicubC
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setI2TParams(EOicubCanProto* p, void *val_ptr, eo_icubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
+    
+    eOmc_i2tParams_t *i2tParams_ptr = (eOmc_i2tParams_t*)val_ptr;
+    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 5;
+    canFrame->data[0] = ((dest.axis&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_I2T_PARAMS;
+    *((uint16_t*)(&canFrame->data[1])) = i2tParams_ptr->time;
+    *((uint16_t*)(&canFrame->data[3])) = i2tParams_ptr->tresh;
+    
     return(eores_OK);
 }
 extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getI2TParams(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
@@ -1128,7 +1171,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* p,
 // set position about axis 0
     canLoc.emscanport = canPort;
     canLoc.canaddr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
-    canLoc.axis = eo_icubCanProto_mAxis_0;
+    canLoc.jm_idInBoard = eo_emsCanNetTopo_jm_index_first;
     
     res = eo_emsCanNetTopo_GetJointId_ByJointCanLocation(p->emsCanNetTopo_ptr, &canLoc, &jId);
     if(eores_OK != res)
@@ -1147,7 +1190,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* p,
 
 
 // set position about axis 1
-    canLoc.axis = eo_icubCanProto_mAxis_1;
+    canLoc.jm_idInBoard = eo_emsCanNetTopo_jm_index_second;
     
     res = eo_emsCanNetTopo_GetJointId_ByJointCanLocation(p->emsCanNetTopo_ptr, &canLoc, &jId);
     if(eores_OK != res)
@@ -1180,7 +1223,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p, e
 // set position about axis 0
     canLoc.emscanport = canPort;
     canLoc.canaddr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
-    canLoc.axis = eo_icubCanProto_mAxis_0;
+    canLoc.jm_idInBoard = eo_emsCanNetTopo_jm_index_first;
     
     res = eo_emsCanNetTopo_GetJointId_ByJointCanLocation(p->emsCanNetTopo_ptr, &canLoc, &jId);
     if(eores_OK != res)
@@ -1199,7 +1242,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p, e
 
 
 // set position about axis 1
-    canLoc.axis = eo_icubCanProto_mAxis_1;
+    canLoc.jm_idInBoard = eo_emsCanNetTopo_jm_index_second;
     
     res = eo_emsCanNetTopo_GetJointId_ByJointCanLocation(p->emsCanNetTopo_ptr, &canLoc, &jId);
     if(eores_OK != res)
@@ -1240,7 +1283,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, 
 // set position about axis 0
     canLoc.emscanport = canPort;
     canLoc.canaddr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
-    canLoc.axis = eo_icubCanProto_mAxis_0;
+    canLoc.jm_idInBoard = eo_emsCanNetTopo_jm_index_first;
     
     res = eo_emsCanNetTopo_GetMotorId_ByMotorCanLocation(p->emsCanNetTopo_ptr, &canLoc, &mId);
     if(eores_OK != res)
@@ -1259,7 +1302,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, 
 
 
 // set position about axis 1
-    canLoc.axis = eo_icubCanProto_mAxis_1;
+    canLoc.jm_idInBoard = eo_emsCanNetTopo_jm_index_second;
     
     res = eo_emsCanNetTopo_GetJointId_ByJointCanLocation(p->emsCanNetTopo_ptr, &canLoc, &mId);
     if(eores_OK != res)
@@ -1301,10 +1344,10 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* p,
 
     eOmc_motor_status_basic_t  *mstatusbasic_ptr;
 
-// set position about axis 0
+// set position about jm_idInBoard 0
     canLoc.emscanport = canPort;
     canLoc.canaddr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
-    canLoc.axis = eo_icubCanProto_mAxis_0;
+    canLoc.jm_idInBoard = eo_emsCanNetTopo_jm_index_first;
     
     res = eo_emsCanNetTopo_GetMotorId_ByMotorCanLocation(p->emsCanNetTopo_ptr, &canLoc, &mId);
     if(eores_OK != res)
@@ -1323,7 +1366,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* p,
 
 
 // set position about axis 1
-    canLoc.axis = eo_icubCanProto_mAxis_1;
+    canLoc.jm_idInBoard = eo_emsCanNetTopo_jm_index_second;
     
     res = eo_emsCanNetTopo_GetJointId_ByJointCanLocation(p->emsCanNetTopo_ptr, &canLoc, &mId);
     if(eores_OK != res)
@@ -1354,10 +1397,10 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__pidError(EOicubCanProto* p,
 
     eOmc_joint_status_ofpid_t  *jstatuspid_ptr;
 
-// set position about axis 0
+// set position about jm_idInBoard 0
     canLoc.emscanport = canPort;
     canLoc.canaddr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
-    canLoc.axis = eo_icubCanProto_mAxis_0;
+    canLoc.jm_idInBoard = eo_emsCanNetTopo_jm_index_first;
     
     res = eo_emsCanNetTopo_GetJointId_ByJointCanLocation(p->emsCanNetTopo_ptr, &canLoc, &jId);
     if(eores_OK != res)
@@ -1375,8 +1418,8 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__pidError(EOicubCanProto* p,
     jstatuspid_ptr->error =  *((uint16_t*)&(frame->data[0]));
 
 
-// set position about axis 1
-    canLoc.axis = eo_icubCanProto_mAxis_1;
+// set position about jm_idInBoard 1
+    canLoc.jm_idInBoard = eo_emsCanNetTopo_jm_index_second;
     
     res = eo_emsCanNetTopo_GetJointId_ByJointCanLocation(p->emsCanNetTopo_ptr, &canLoc, &jId);
     if(eores_OK != res)

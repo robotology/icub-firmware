@@ -105,13 +105,14 @@
 extern void eo_cfg_nvsEP_sk_hid_UPDT_sconfig__sigmode(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eOskin_sigmode_t  *sigmode = (eOskin_sigmode_t*)nv->loc;
-
+/* NOTE: corrently any skin board starts to send can frame when it finishes its initilisation. 
+    appSysController sends the skin configuration during its init phase. */
     if(snsr_sigmode_signal == *sigmode)
     {
         hal_led_on(hal_led2);
-        EOappCanSP *appCanSP_ptr = (EOappCanSP*)eom_appTheSysController_Services_Can_GetHandle(eom_appTheSysController_GetHandle());
+//         EOappCanSP *appCanSP_ptr = (EOappCanSP*)eom_appTheSysController_Services_Can_GetHandle(eom_appTheSysController_GetHandle());
 
-        eo_appCanSP_ConfigSkin(appCanSP_ptr, 0);        
+//         eo_appCanSP_ConfigSkin(appCanSP_ptr, 0);        
 
     }
 }

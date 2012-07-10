@@ -44,12 +44,14 @@
 #include "EoBoards.h"
 #include "EOarray.h"
 #include "EOicubCanProto_specifications.h"
+#include "EOemsCanNetworkTopology.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
  
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 typedef struct EOappCanSP_hid   EOappCanSP;
+
 
 //this declaretion is equal to eo_emsCanNetTopo_jointOrMotorCanLocation_t.
 typedef struct
@@ -68,11 +70,18 @@ typedef struct
 } eOappCanSP_cfg_t;
 
 
+// typedef enum
+// {
+//     eo_appCanSP_opCmd_stop  = 0,
+//     eo_appCanSP_opCmd_start = 1
+// } eo_appCanSP_opCmd_t;
+
 typedef enum
 {
-    eo_appCanSP_opCmd_stop  = 0,
-    eo_appCanSP_opCmd_start = 1
-} eo_appCanSP_opCmd_t;
+    eo_appCanSP_runMode__onEvent    = 0,
+    eo_appCanSP_runMode__onDemand   = 1    
+} eo_appCanSP_runMode_t;
+
 
     
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
@@ -221,88 +230,111 @@ extern eOresult_t eo_appCanSP_SendCmd(EOappCanSP *p, eo_appCanSP_canLocation *ca
 extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t numofcanframe, uint8_t *numofREADcanframe);
 
 
-/** @fn         extern eOresult_t eo_appCanSP_SendOpCmd2CanConnectedBoard(EOappCanSP *p)
-    @brief      send operational command(start/stop) to connected can board.
-    @param      p                   target obj
-    @param      numofcanframe       numofcanframe to read.
-    @param      numofREADcanframe   num of frame read really. it can be NULL
-    @return     eores_OK on success
-                eores_NOK_nullpointer if p is null, or eores_NOK_nodata the mid is not connected with this ems board,
-                or eores_NOK_generic something else error case. //TODO: check better error!!!
- **/
-extern eOresult_t eo_appCanSP_SendOpCmd2CanConnectedBoard(EOappCanSP *p, eObrd_types_t board, eo_appCanSP_opCmd_t opcmd);
 
 
-
-/** @fn         extern eOresult_t eo_appCanSP_SendSetPoint(EOappCanSP *p, eOmc_jointId_t jId, eOmc_setpoint_t *setPoint)
-    @brief      sends set point to joint. (this joint is managed by a CAN board)
+/** @fn         extern eOresult_t eo_appCanSP_SetRunMode(EOappCanSP *p, eo_appCanSP_runMode_t runmode);
+    @brief      set run mode: if on evt the transmission is performed always, on demand canframes to transmit are put in queue, but transmitted on demand.
     @param      p                       target obj
-    @param      jId               identifies the joint.
-    @param      cfg                     motor's configuration 
-    @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
+    @param      runmode                 runmode
+    @return     eores_OK or eores_NOK_nullpointer if p
  **/
-extern eOresult_t eo_appCanSP_SendSetPoint(EOappCanSP *p, eOmc_jointId_t jId, eOmc_setpoint_t *setPoint);
+extern eOresult_t eo_appCanSP_SetRunMode(EOappCanSP *p, eo_appCanSP_runMode_t runmode);
 
+extern eOresult_t eo_appCanSP_TransmitCanFrames(EOappCanSP *p, eOcanport_t canport);
 
-//test porpouse
-extern eOresult_t eo_appCanSP_readOnlySkin_TEST(EOappCanSP *p); //test porpouse
-
-//following functions are obsolete!!!
-
-/** @fn         extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointId_t jId, eOmc_joint_config_t *cfg)
-    @brief      sends can messages to can board to configure one of its joint 
-    @param      p                       target obj
-    @param      jId               identifies the joint to config.
-    @param      cfg                     joint's configuration 
-    @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
- **/
-//extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointId_t jId, eOmc_joint_config_t *cfg);
-extern eOresult_t eo_appCanSP_jointWholeConfig_Send(EOappCanSP *p, eOmc_jointId_t jId, eOmc_joint_config_t *cfg);
-
-
-/** @fn         extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointId_t jId, eOmc_joint_config_t *cfg)
-    @brief      sends can messages to can board to configure one of its motor 
-    @param      p                       target obj
-    @param      jId               identifies the motor to config.
-    @param      cfg                     motor's configuration 
-    @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
- **/
-extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOmc_motor_config_t *cfg);
-
-
-
-
-/** @fn         extern eOresult_t eo_appCanSP_ReadSkin(EOappCanSP *p, eOsk_skinId_t skId)
-    @brief      .......
-    @param      p                       target obj
-    @param      jId               identifies the joint.
-    @param      cfg                     motor's configuration 
-    @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
- **/
-extern eOresult_t eo_appCanSP_ReadSkin(EOappCanSP *p, eOsk_skinId_t skId);  //boh!!!
-
-extern eOresult_t eo_appCanSP_ConfigSkin(EOappCanSP *p, eOsk_skinId_t skId);
-
-/** @fn         extern eOresult_t eo_appCanSP_ConfigMc4(EOappCanSP *p)
-    @brief      WIP!!! sends command to configure an mc4 board with commands don't send by pc104
-    @param      p                  target obj
-    @param      ...
-    @param      ....
-    @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
- **/
-//extern eOresult_t eo_appCanSP_ConfigMc4(EOappCanSP *p); tolte perche' appcanservice e' non deve conoscere le schede ma solo gli oggetti joint motore skin
-
-
-/** @fn         extern eOresult_t eo_appCanSP_ConfigMc4(EOappCanSP *p)
-    @brief      WIP!!! sends command to configure an 2foc board with commands don't send by pc104
-    @param      p                  target obj
-    @param      ...
-    @param      ....
-    @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
- **/
-//extern eOresult_t eo_appCanSP_Config2foc(EOappCanSP *p);//tolte perche' appcanservice e' non deve conoscere le schede ma solo gli oggetti joint motore skin
 
 extern eOresult_t eo_appCanSP_SendMessage_TEST(EOappCanSP *p, eo_appCanSP_canLocation *canLocation, uint8_t *payload_ptr);
+
+
+extern EOemsCanNetTopo* eo_appCanSP_GetEmsCanNetTopoHandle(EOappCanSP *p);
+
+// //following functions are obsolete!!!
+
+// /** @fn         extern eOresult_t eo_appCanSP_SendOpCmd2CanConnectedBoard(EOappCanSP *p)
+//     @brief      send operational command(start/stop) to connected can board.
+//     @param      p                   target obj
+//     @param      numofcanframe       numofcanframe to read.
+//     @param      numofREADcanframe   num of frame read really. it can be NULL
+//     @return     eores_OK on success
+//                 eores_NOK_nullpointer if p is null, or eores_NOK_nodata the mid is not connected with this ems board,
+//                 or eores_NOK_generic something else error case. //TODO: check better error!!!
+//  **/
+// extern eOresult_t eo_appCanSP_SendOpCmd2CanConnectedBoard(EOappCanSP *p, eObrd_types_t board, eo_appCanSP_opCmd_t opcmd);
+
+
+
+// /** @fn         extern eOresult_t eo_appCanSP_SendSetPoint(EOappCanSP *p, eOmc_jointId_t jId, eOmc_setpoint_t *setPoint)
+//     @brief      sends set point to joint. (this joint is managed by a CAN board)
+//     @param      p                       target obj
+//     @param      jId               identifies the joint.
+//     @param      cfg                     motor's configuration 
+//     @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
+//  **/
+// extern eOresult_t eo_appCanSP_SendSetPoint(EOappCanSP *p, eOmc_jointId_t jId, eOmc_setpoint_t *setPoint);
+
+// extern eOresult_t eo_appCanSP_readOnlySkin_TEST(EOappCanSP *p); //test porpouse
+
+
+
+// /** @fn         extern eOresult_t eo_appCanSP_ConfigMc4(EOappCanSP *p)
+//     @brief      WIP!!! sends command to configure an mc4 board with commands don't send by pc104
+//     @param      p                  target obj
+//     @param      ...
+//     @param      ....
+//     @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
+//  **/
+// //extern eOresult_t eo_appCanSP_ConfigMc4(EOappCanSP *p); //tolte perche' appcanservice e' non deve conoscere le schede ma solo gli oggetti joint motore skin
+// extern eOresult_t eo_appCanSP_SendAdditionalConfig2AllMC4(EOappCanSP *p, uint8_t jointMaxNum, uint8_t motorMaxNum);
+
+// /** @fn         extern eOresult_t eo_appCanSP_ConfigMc4(EOappCanSP *p)
+//     @brief      WIP!!! sends command to configure an 2foc board with commands don't send by pc104
+//     @param      p                  target obj
+//     @param      ...
+//     @param      ....
+//     @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
+//  **/
+// // extern eOresult_t eo_appCanSP_Config2FOC(EOappCanSP *p);
+// extern eOresult_t eo_appCanSP_SendAdditionalConfig2All2FOC(EOappCanSP *p, uint8_t jointMaxNum, uint8_t motorMaxNum);
+
+
+
+
+// /** @fn         extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointId_t jId, eOmc_joint_config_t *cfg)
+//     @brief      sends can messages to can board to configure one of its joint 
+//     @param      p                       target obj
+//     @param      jId               identifies the joint to config.
+//     @param      cfg                     joint's configuration 
+//     @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
+//  **/
+// //extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointId_t jId, eOmc_joint_config_t *cfg);
+// extern eOresult_t eo_appCanSP_jointWholeConfig_Send(EOappCanSP *p, eOmc_jointId_t jId, eOmc_joint_config_t *cfg);
+
+
+// /** @fn         extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointId_t jId, eOmc_joint_config_t *cfg)
+//     @brief      sends can messages to can board to configure one of its motor 
+//     @param      p                       target obj
+//     @param      jId               identifies the motor to config.
+//     @param      cfg                     motor's configuration 
+//     @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
+//  **/
+// extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOmc_motor_config_t *cfg);
+
+
+
+
+// /** @fn         extern eOresult_t eo_appCanSP_ReadSkin(EOappCanSP *p, eOsk_skinId_t skId)
+//     @brief      .......
+//     @param      p                       target obj
+//     @param      jId               identifies the joint.
+//     @param      cfg                     motor's configuration 
+//     @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
+//  **/
+// extern eOresult_t eo_appCanSP_ReadSkin(EOappCanSP *p, eOsk_skinId_t skId);  //boh!!!
+
+// extern eOresult_t eo_appCanSP_ConfigSkin(EOappCanSP *p, eOsk_skinId_t skId);
+
+
+
 /** @}            
     end of group eo_app_canServicesProvider
  **/

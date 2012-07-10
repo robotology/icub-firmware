@@ -27,7 +27,7 @@
 //   <o> control datagram payload size         <64-1000>
 //   <i> ....
 #ifndef DGRAMPAYLOAD_SIZE   
- #define DGRAMPAYLOAD_SIZE   256
+ #define DGRAMPAYLOAD_SIZE   700
 #endif
 
 

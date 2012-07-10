@@ -64,6 +64,7 @@
 #include "EOappTheNVmapRef.h"
 #include "EOappCanServicesProvider.h"
 #include "EOappEncodersReader.h"
+#include "EOappTheCanBoardsManager.h"
 //appl - act
 #include "EOMappDataCollector.h"
 #include "EOMappDatatransmitter.h"
@@ -135,6 +136,7 @@ static void s_eom_appTheSysController_srv_theBoardTransceiver_init(void);
 static void s_eom_appTheSysController_srv_CanServicesProvider_init(void);
 static void s_eom_appTheSysController_srv_EncodersReader_init(void);
 static void s_eom_appTheSysController_srv_ethService_init(void);
+static void s_eom_appTheSysController_srv_CanBoardsManager_init(void);
 
 /* functions about init actors */
 static void s_eom_appTheSysController_actors_init(void);
@@ -145,10 +147,11 @@ static void s_eom_appTheSysController_actors_start(void);
 static void s_eom_appTheSysController_actors_setRunMode(void);
 
 /* fn on cfg */
-static eOresult_t s_eom_appTheSysController_ConnectedCanBoards_Configure(void);
-static eOresult_t s_eom_appTheSysController_ConnectedCanBoards_Start(void);
-static eOresult_t s_eom_appTheSysController_ConnectedCanBoards_Stop(void);
-static eOresult_t s_eom_appTheSysController_ConfigAllMotors(void);
+static eOresult_t s_eom_appTheSysController_ConnectedCanBoards_Configure(void); //sends cofig data don't send by pc104
+static eOresult_t s_eom_appTheSysController_ConnectedCanBoards_Start(void); //send can cmd to start control loop on can board
+static eOresult_t s_eom_appTheSysController_ConnectedCanBoards_Stop(void);  //send stop cmd to stop control loop on can board
+//static eOresult_t s_eom_appTheSysController_ConfigAllMotors(void);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -252,11 +255,20 @@ extern eOresult_t eom_appTheSysController_Go2ConfigState(EOMappTheSysController 
     if(eOm_appTheSysController_st__started != p->st)
     {
         return(eores_NOK_generic);
-    }    
-    // 1) set ethbase mod based on evt
+    }  
+
+    
+    // 2) set ethbase mod based on evt
     s_eom_appTheSysController_SetSocketRunMode(eOm_appTheSysController_sockRunMode__onEvent);
 
-    // 2) configure connected can boards
+    // 3) set appCanSP mode based on evt
+    res = eo_appCanSP_SetRunMode(s_theSysController.srv.appCanSP_ptr, eo_appCanSP_runMode__onEvent);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    
+    // 1) configure connected can boards
     res = s_eom_appTheSysController_ConnectedCanBoards_Configure();
     if(eores_OK != res)
     {
@@ -264,7 +276,7 @@ extern eOresult_t eom_appTheSysController_Go2ConfigState(EOMappTheSysController 
     }
 
 
-    // 3) initialise its timers
+    // 4) initialise its timers
     res = s_eom_appTheSysController_Timers_Init();
     if(eores_OK != res)
     {
@@ -290,21 +302,25 @@ extern eOresult_t eom_appTheSysController_Go2RunState(EOMappTheSysController *p)
     if(eOm_appTheSysController_st__started != p->st)
     {
         return(eores_NOK_generic);
-    }    
-    // 1) set ethbase mod based on evt
-    s_eom_appTheSysController_SetSocketRunMode(eOm_appTheSysController_sockRunMode__onDemand);
+    }  
 
-    // 2) start all can boards
+    // 1) start all can boards
     res = s_eom_appTheSysController_ConnectedCanBoards_Start();
-        if(eores_OK != res)
+    if(eores_OK != res)
     {
         return(res);
     }
+    
+    // 2) set ethbase mod based on evt
+    s_eom_appTheSysController_SetSocketRunMode(eOm_appTheSysController_sockRunMode__onDemand);
 
-    // 3) start all actors
+    // 3) set can sp to send frame only on demand    
+    eo_appCanSP_SetRunMode(s_theSysController.srv.appCanSP_ptr, eo_appCanSP_runMode__onDemand);
+    
+    // 4) start all actors
     s_eom_appTheSysController_actors_start();
 
-    // 4) start timers
+    // 5) start timers
     s_eom_appTheSysController_Timers_Start();
     
     hal_led_on(hal_led3);
@@ -544,8 +560,11 @@ static void s_eom_appTheSysController_services_init(void)
 
 /* 4) init encoder reader */
     s_eom_appTheSysController_srv_EncodersReader_init();
+    
+/* 5) init encoder reader */
+    s_eom_appTheSysController_srv_CanBoardsManager_init();
 
-/* 5) init eth services */
+/* 6) init eth services */
     s_eom_appTheSysController_srv_ethService_init(); 
     
 }
@@ -617,6 +636,22 @@ static void s_eom_appTheSysController_srv_EncodersReader_init(void)
 
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_theSysController.srv.appEncReader_ptr), 
                      s_eobj_ownname, "error in appEncReader_New");
+
+}
+
+
+static void s_eom_appTheSysController_srv_CanBoardsManager_init(void)
+{
+    EOappTheCanBrdsMng* canbrdMng_ptr = NULL;
+    eOappTheCanBrdsMng_cfg_t  cfg = 
+    {
+        EO_INIT(.appCanSP_ptr)          s_theSysController.srv.appCanSP_ptr
+    };
+
+    canbrdMng_ptr = eo_appTheCanBrdsMng_Initialise(&cfg);
+
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != canbrdMng_ptr), 
+                     s_eobj_ownname, "error in eo_appTheCanBrdsMng_Initialise");
 
 }
 
@@ -708,6 +743,7 @@ static void s_eom_appTheSysController_act_appMotorController_init(void)
     EOMappMotorController_cfg_t cfg =
     {
         EO_INIT(.encReader)                 s_theSysController.srv.appEncReader_ptr,
+        EO_INIT(.appCanSP_ptr)              s_theSysController.srv.appCanSP_ptr,
         EO_INIT(.sig2appDataTransmitter)
         {                                      
             EO_INIT(.fn)                    s_eom_appTheSysController_act_sig2appDataTransmitter,
@@ -767,6 +803,14 @@ static void s_eom_appTheSysController_actors_start(void)
 
 static void s_eom_appThesysController_ConfigValidityCheck(void)
 {
+    // check if ethmod is configured in compatible way witj transceiver
+    if(s_theSysController.cfg.ethmod_cfg_ptr->dtagramQueue_itemSize < EOK_BOARDTRANSCEIVER_capacityofpacket)
+    {
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "socket_size < BOARDTRANSCEIVER_capacityofpacket");
+    }
+    
+    
+    
     //TODO: campare size of constvector of emscannettopo with size opf joint in used enpont
     return;
 }
@@ -823,7 +867,6 @@ static void s_eom_appTheSysController_GetRunMode(void)
     eObool_t mc4_isConnected = eobool_false;
     eObool_t foc_isConnected = eobool_false;
 
-    
     size = eo_array_Size(s_theSysController.jointsList);
 //    res =  eo_fifoword_Size(s_theSysController.jointsList, &size, 0);
 //    eo_errman_Assert(eo_errman_GetHandle(), (eores_OK != res), 
@@ -915,168 +958,175 @@ static void s_eom_appTheSysController_SetSocketRunMode(eOm_appTheSysController_s
     }
 }
 
-
+//this function send all configuration data don't send by icub interface
 static eOresult_t s_eom_appTheSysController_ConnectedCanBoards_Configure(void)
 {
     eOresult_t res = eores_NOK_generic;
 
-    switch(s_theSysController.appl_runMode)
-    {
-        case applrunMode__skinOnly:
-        {
-            //only one skin per ems.
-            res = eo_appCanSP_ConfigSkin(s_theSysController.srv.appCanSP_ptr, 0);
-        
-        }break;
+    res = eo_appTheCanBrdsMng_ConfigAllBoards(eo_appTheCanBrdsMng_GetHandle()); 
 
-        case applrunMode__mc4Only:
-        {
-            ////qui metti configurazione schede mc4 + configurazione giunti + configurazione motori (s_eom_appTheSysController_ConfigAllMotors)
-            ;//res = eo_appCanSP_ConfigMc4(s_theSysController.srv.appCanSP_ptr);
-
-        }break;
-
-        case applrunMode__skinAndMc4:
-        {
-            res = eo_appCanSP_ConfigSkin(s_theSysController.srv.appCanSP_ptr, 0);
-            if(eores_OK != res)
-            {
-                return(res);
-            }
-            //qui metti configurazione schede mc4 + configurazione giunti + configurazione motori (s_eom_appTheSysController_ConfigAllMotors)
-            //res = eo_appCanSP_ConfigMc4(s_theSysController.srv.appCanSP_ptr);
-        }break;
-
-        case applrunMode__2foc:
-        {
-           // res = eo_appCanSP_Config2foc(s_theSysController.srv.appCanSP_ptr);
-            res = s_eom_appTheSysController_ConfigAllMotors();
-        }break;
-    
-    }
     return(res);
+
+
+
+//     switch(s_theSysController.appl_runMode)
+//     {
+//         case applrunMode__skinOnly:
+//         {
+//            ;
+//         }break;
+
+//         case applrunMode__mc4Only:
+//         {
+//             res = eo_appCanSP_SendAdditionalConfig2AllMC4(s_theSysController.srv.appCanSP_ptr, eo_array_Size(s_theSysController.jointsList), eo_array_Size(s_theSysController.motorsList));
+//         }break;
+
+//         case applrunMode__skinAndMc4:
+//         {
+//             res = eo_appCanSP_SendAdditionalConfig2AllMC4(s_theSysController.srv.appCanSP_ptr, eo_array_Size(s_theSysController.jointsList), eo_array_Size(s_theSysController.motorsList));
+//         }break;
+
+//         case applrunMode__2foc:
+//         {
+//             //res = eo_appCanSP_Config2FOC(s_theSysController.srv.appCanSP_ptr);
+//             res = eo_appCanSP_SendAdditionalConfig2All2FOC(s_theSysController.srv.appCanSP_ptr, eo_array_Size(s_theSysController.jointsList), eo_array_Size(s_theSysController.motorsList));
+//             res = s_eom_appTheSysController_ConfigAllMotors(); //only for test
+//         }break;
+//     
+//     }
+//     return(res);
 }
 
-static eOresult_t s_eom_appTheSysController_ConfigAllMotors(void)
-{
-    uint8_t size;
-    uint8_t i;
-    eOmc_motorId_t *mId_ptr = NULL;
-    eOresult_t res;
-    
-    eOmc_motor_config_t cfg =
-    { 
-        EO_INIT(.pidcurrent)
-        {
-            EO_INIT(.kp)                    0x1111,
-            EO_INIT(.ki)                    0x2222,
-            EO_INIT(.kd)                    0x3333,
-            EO_INIT(.limitonintegral)       0X4444,
-            EO_INIT(.limitonoutput)         0x5555,
-            EO_INIT(.scale)                 0x0,
-            EO_INIT(.offset)                0x6666,
-            EO_INIT(.filler03)              {0xf1, 0xf2, 0xf3}
-        },
-        EO_INIT(.maxvelocityofmotor)        0xAA,
-        EO_INIT(.maxcurrentofmotor)         0xBB,
-        EO_INIT(.des02FORmstatuschamaleon04)   {0}
-    };
-
-#warning VALE--> qual'e' config di default per motore?????
-    size = eo_array_Size(s_theSysController.motorsList);   
-
-    for(i=0; i<size; i++)
-    {
-        mId_ptr = (eOmc_motorId_t*) eo_array_At(s_theSysController.motorsList, i);
-        if(NULL == mId_ptr)
-        {
-            return(eores_NOK_generic);
-        }
-    
-        res = eo_appCanSP_ConfigMotor(s_theSysController.srv.appCanSP_ptr, *mId_ptr, &cfg);
-        if(eores_OK != res)
-        {
-            return(res);
-        }
-    
-    }
-    return(eores_OK);
 
 
-}
+// static eOresult_t s_eom_appTheSysController_ConfigAllMotors(void)
+// {
+//     uint8_t size;
+//     uint8_t i;
+//     eOmc_motorId_t *mId_ptr = NULL;
+//     eOresult_t res;
+//     
+//     eOmc_motor_config_t cfg =
+//     { 
+//         EO_INIT(.pidcurrent)
+//         {
+//             EO_INIT(.kp)                    0x1111,
+//             EO_INIT(.ki)                    0x2222,
+//             EO_INIT(.kd)                    0x3333,
+//             EO_INIT(.limitonintegral)       0X4444,
+//             EO_INIT(.limitonoutput)         0x5555,
+//             EO_INIT(.scale)                 0x0,
+//             EO_INIT(.offset)                0x6666,
+//             EO_INIT(.filler03)              {0xf1, 0xf2, 0xf3}
+//         },
+//         EO_INIT(.maxvelocityofmotor)        0xAA,
+//         EO_INIT(.maxcurrentofmotor)         0xBB,
+//         EO_INIT(.des02FORmstatuschamaleon04)   {0}
+//     };
+
+// #warning VALE--> qual'e' config di default per motore?????
+//     size = eo_array_Size(s_theSysController.motorsList);   
+
+//     for(i=0; i<size; i++)
+//     {
+//         mId_ptr = (eOmc_motorId_t*) eo_array_At(s_theSysController.motorsList, i);
+//         if(NULL == mId_ptr)
+//         {
+//             return(eores_NOK_generic);
+//         }
+//     
+//         res = eo_appCanSP_ConfigMotor(s_theSysController.srv.appCanSP_ptr, *mId_ptr, &cfg);
+//         if(eores_OK != res)
+//         {
+//             return(res);
+//         }
+//     
+//     }
+//     return(eores_OK);
+
+
+// }
 static eOresult_t s_eom_appTheSysController_ConnectedCanBoards_Start(void)
 {
     eOresult_t res = eores_NOK_generic;
-
-    switch(s_theSysController.appl_runMode)
-    {
-        case applrunMode__skinOnly:
-        {
-            res = eo_appCanSP_SendOpCmd2CanConnectedBoard(s_theSysController.srv.appCanSP_ptr, eobrd_skin, eo_appCanSP_opCmd_start);
-            eo_errman_Assert(eo_errman_GetHandle(), eores_OK == res, s_eobj_ownname, "err in starting skin board");
-        }break;
-
-        case applrunMode__mc4Only:
-        {
-            res = eo_appCanSP_SendOpCmd2CanConnectedBoard(s_theSysController.srv.appCanSP_ptr, eobrd_mais, eo_appCanSP_opCmd_start);
-            eo_errman_Assert(eo_errman_GetHandle(), eores_OK == res, s_eobj_ownname, "err in starting mais board");
-
-            res = eo_appCanSP_SendOpCmd2CanConnectedBoard(s_theSysController.srv.appCanSP_ptr, eobrd_mc4, eo_appCanSP_opCmd_start);
-            eo_errman_Assert(eo_errman_GetHandle(), eores_OK == res, s_eobj_ownname, "err in starting mc4 boards");
-
-        }break;
-
-        case applrunMode__skinAndMc4:
-        {
-            res = eo_appCanSP_SendOpCmd2CanConnectedBoard(s_theSysController.srv.appCanSP_ptr, eobrd_mais, eo_appCanSP_opCmd_start);
-            eo_errman_Assert(eo_errman_GetHandle(), eores_OK == res, s_eobj_ownname, "err in starting mais board");
-
-            res = eo_appCanSP_SendOpCmd2CanConnectedBoard(s_theSysController.srv.appCanSP_ptr, eobrd_skin, eo_appCanSP_opCmd_start);
-            eo_errman_Assert(eo_errman_GetHandle(), eores_OK == res, s_eobj_ownname, "err in starting skin board");
-
-            res = eo_appCanSP_SendOpCmd2CanConnectedBoard(s_theSysController.srv.appCanSP_ptr, eobrd_mc4, eo_appCanSP_opCmd_start);
-            eo_errman_Assert(eo_errman_GetHandle(), eores_OK == res, s_eobj_ownname, "err in starting mc4 boards");
-        }break;
-
-        case applrunMode__2foc:
-        {
-            res = eores_OK;// start can boards sending PWM_ENA and RUN cmds.;
-        }break;
     
-    }
+    res = eo_appTheCanBrdsMng_StartAllBoards(eo_appTheCanBrdsMng_GetHandle());
+    
     return(res);
+
+//     switch(s_theSysController.appl_runMode)
+//     {
+//         case applrunMode__skinOnly:
+//         {
+//             res = eo_appCanSP_SendOpCmd2CanConnectedBoard(s_theSysController.srv.appCanSP_ptr, eobrd_skin, eo_appCanSP_opCmd_start);
+//             eo_errman_Assert(eo_errman_GetHandle(), eores_OK == res, s_eobj_ownname, "err in starting skin board");
+//         }break;
+
+//         case applrunMode__mc4Only:
+//         {
+//             res = eo_appCanSP_SendOpCmd2CanConnectedBoard(s_theSysController.srv.appCanSP_ptr, eobrd_mais, eo_appCanSP_opCmd_start);
+//             eo_errman_Assert(eo_errman_GetHandle(), eores_OK == res, s_eobj_ownname, "err in starting mais board");
+
+//             res = eo_appCanSP_SendOpCmd2CanConnectedBoard(s_theSysController.srv.appCanSP_ptr, eobrd_mc4, eo_appCanSP_opCmd_start);
+//             eo_errman_Assert(eo_errman_GetHandle(), eores_OK == res, s_eobj_ownname, "err in starting mc4 boards");
+
+//         }break;
+
+//         case applrunMode__skinAndMc4:
+//         {
+//             res = eo_appCanSP_SendOpCmd2CanConnectedBoard(s_theSysController.srv.appCanSP_ptr, eobrd_mais, eo_appCanSP_opCmd_start);
+//             eo_errman_Assert(eo_errman_GetHandle(), eores_OK == res, s_eobj_ownname, "err in starting mais board");
+
+//             res = eo_appCanSP_SendOpCmd2CanConnectedBoard(s_theSysController.srv.appCanSP_ptr, eobrd_skin, eo_appCanSP_opCmd_start);
+//             eo_errman_Assert(eo_errman_GetHandle(), eores_OK == res, s_eobj_ownname, "err in starting skin board");
+
+//             res = eo_appCanSP_SendOpCmd2CanConnectedBoard(s_theSysController.srv.appCanSP_ptr, eobrd_mc4, eo_appCanSP_opCmd_start);
+//             eo_errman_Assert(eo_errman_GetHandle(), eores_OK == res, s_eobj_ownname, "err in starting mc4 boards");
+//         }break;
+
+//         case applrunMode__2foc:
+//         {
+//             res = eores_OK;// start can boards sending PWM_ENA and RUN cmds.;
+//         }break;
+//     
+//     }
+//     return(res);
 }
 
 static eOresult_t s_eom_appTheSysController_ConnectedCanBoards_Stop(void)
 {
     eOresult_t res = eores_NOK_generic;
-
-    switch(s_theSysController.appl_runMode)
-    {
-        case applrunMode__skinOnly:
-        {
-            ;
-        
-        }break;
-
-        case applrunMode__mc4Only:
-        {
-            ;
-
-        }break;
-
-        case applrunMode__skinAndMc4:
-        {
-            ;
-        }break;
-
-        case applrunMode__2foc:
-        {
-            ;
-        }break;
     
-    }
+    res = eo_appTheCanBrdsMng_StopAllBoards(eo_appTheCanBrdsMng_GetHandle());
+
     return(res);
+
+//     switch(s_theSysController.appl_runMode)
+//     {
+//         case applrunMode__skinOnly:
+//         {
+//             ;
+//         
+//         }break;
+
+//         case applrunMode__mc4Only:
+//         {
+//             ;
+
+//         }break;
+
+//         case applrunMode__skinAndMc4:
+//         {
+//             ;
+//         }break;
+
+//         case applrunMode__2foc:
+//         {
+//             ;
+//         }break;
+//     
+//     }
+//     return(res);
 }
 
 
