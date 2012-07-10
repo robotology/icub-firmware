@@ -118,7 +118,7 @@ void SetReceived(uint8_t *data, uint16_t size, uint32_t remoteipaddr, uint16_t p
     eo_packet_Payload_Set(pkt, data, size);
     eo_packet_Addressing_Set(pkt, remoteipaddr, port);
     eo_transceiver_Receive(boardTransceiver, pkt, &numofrops, &txtime);
-    printf("Number of rop received: %d\n", numofrops);
+   // printf("Number of rop received: %d\n", numofrops);
 }
 
 void boardTransceiver_load_occasional_rop(eOropcode_t opc, uint16_t ep, uint16_t nvid)
