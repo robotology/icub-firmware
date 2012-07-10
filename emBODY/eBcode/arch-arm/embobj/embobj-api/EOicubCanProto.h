@@ -69,7 +69,7 @@ typedef struct
                                                                lookup table indexed by can message of that class. 
                                                                The last lookup table contains parser and former funaction for
                                                                each can message*/
-    EOemsCanNetTopo         *emsCanNetTopo__ptr;          /**< reference to configuration of ems can network topology */
+    EOemsCanNetTopo         *emsCanNetTopo__ptr;          /**< rreference to configuration of ems can network topology */
 } eo_icubCanProto_cfg_t;
 
     

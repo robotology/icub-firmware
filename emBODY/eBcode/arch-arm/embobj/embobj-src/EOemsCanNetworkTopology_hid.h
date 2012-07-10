@@ -48,39 +48,42 @@ extern "C" {
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
 #define MAX_CAN_ADDRESS                     0XF 
-
-
-//tipi non dipendenti dal protocollo can
-//typedef struct
-//{
-//    eo_icubCanProto_canBoardAddress_t      boardAddr;
-//    eo_icubCanProto_motorAxis_t            axis;
-//    eOcanport_t                            canPort;
-//    eo_icubCanProto_boardType_t            boardType;
-//    uint32_t                               id; //id del motore o del joint
-//} eo_emsCanNetTopo_jointOrMotorTopoInfo_t;
-
-//typedef struct
-//{
-//    eo_icubCanProto_canBoardAddress_t      boardAddr;
-//    eOcanport_t                            canPort;
-//    eo_icubCanProto_boardType_t            boardType;
-//    uint32_t                               id; //sensor id
-//} eo_emsCanNetTopo_sensorTopoInfo_t;
+#define joint_idNULL                        jointNumberMAX + 1
+#define motor_idNULL                        motorNumberMAX + 1
 
 typedef struct
 {
-    eo_emsCanNetTopo_jointOrMotorTopoInfo_t     *ptr; //is the pointer to the element of vector that describes CAN network topology of this board
-} eo_emsCanNetTopo_hashTbl_jm_item_t; //eo_emsCanNetTopo_hashTbl_jm_item_t;
-
+    eo_emsCanNetTopo_jointTopoInfo_t     *j_ptr; //is the pointer to the element of vector that describes CAN network topology of this board
+    eo_emsCanNetTopo_boardTopoInfo_t     *b_ptr;
+} eo_emsCanNetTopo_hashTbl_j_item_t;
 
 
 typedef struct
 {
-    eo_emsCanNetTopo_sensorTopoInfo_t     *ptr;
+    eo_emsCanNetTopo_motorTopoInfo_t     *m_ptr; //is the pointer to the element of vector that describes CAN network topology of this board
+    eo_emsCanNetTopo_boardTopoInfo_t     *b_ptr;
+} eo_emsCanNetTopo_hashTbl_m_item_t;
+
+
+typedef struct
+{
+    eo_emsCanNetTopo_sensorTopoInfo_t    *s_ptr;
+    eo_emsCanNetTopo_boardTopoInfo_t     *b_ptr;
 } eo_emsCanNetTopo_hashTbl_s_item_t; //eo_emsCanNetTopo_hashTbl_jm_item_t;
 
+typedef enum
+{
+    eo_emsCanNetTopo_hashTbl_itemType__joint        = 0,
+    eo_emsCanNetTopo_hashTbl_itemType__motor        = 1,
+    eo_emsCanNetTopo_hashTbl_itemType__sensor       = 2,
+    eo_emsCanNetTopo_hashTbl_itemType__skin         = 3
+} eo_emsCanNetTopo_hashTbl_itemType_t;
 
+typedef struct
+{
+    eo_emsCanNetTopo_hashTbl_itemType_t itemType;
+    uint16_t id;
+} eo_emsCanNetTopo_hashTbl_jm_addr2item;
 
 /** @struct     EOemsCanNetTopo_hid
     @brief      Hidden definition. Implements private data used only internally by the 
@@ -91,62 +94,31 @@ struct EOemsCanNetTopo_hid
 {
     eo_emsCanNetTopo_cfg_t cfg;
 
-    eo_emsCanNetTopo_hashTbl_jm_item_t joint_Id2CanLoc_hTbl[jointNumberMAX];
-    eo_emsCanNetTopo_hashTbl_jm_item_t motor_Id2CanLoc_hTbl[motorNumberMAX];
-//     eo_emsCanNetTopo_hashTbl_s_item_t  sensorStrain_Id2CanLoc_hTbl[strainNumberMAX];  
-//     eo_emsCanNetTopo_hashTbl_s_item_t  sensorMais_Id2CanLoc_hTbl[maisNumberMAX];  
+//     eo_emsCanNetTopo_hashTbl_jm_item_t joint_Id2CanLoc_hTbl[jointNumberMAX];
+//     eo_emsCanNetTopo_hashTbl_jm_item_t motor_Id2CanLoc_hTbl[motorNumberMAX];  
 
-    eo_emsCanNetTopo_hashTbl_jm_item_t joint_CanLoc2Id_hTbl[eo_emsCanNetTopo_canports_num][MAX_CAN_ADDRESS][2];
-    eo_emsCanNetTopo_hashTbl_jm_item_t motor_CanLoc2Id_hTbl[eo_emsCanNetTopo_canports_num][MAX_CAN_ADDRESS][2];
-    /* since only one sensor board is connected to ems, i don't need hash table is-->canaddr.
+//     eo_emsCanNetTopo_hashTbl_jm_item_t joint_CanLoc2Id_hTbl[eo_emsCanNetTopo_canports_num][MAX_CAN_ADDRESS][2];
+//     eo_emsCanNetTopo_hashTbl_jm_item_t motor_CanLoc2Id_hTbl[eo_emsCanNetTopo_canports_num][MAX_CAN_ADDRESS][2];
+//     /* since only one sensor board is connected to ems, i don't need hash table id-->canaddr.
+//     moreover i may use only one ptr, inipedeting of type of sensor (mais or strain), but i prefer to use two,
+//     in order to be complinet with other appl's objs*/
+//     eo_emsCanNetTopo_hashTbl_s_item_t  sensorStrain_hTbl; 
+//     eo_emsCanNetTopo_hashTbl_s_item_t  sensorMais_hTbl;
+
+    eo_emsCanNetTopo_hashTbl_j_item_t   joint_Id2CanLoc_hTbl[jointNumberMAX];
+    eo_emsCanNetTopo_hashTbl_m_item_t   motor_Id2CanLoc_hTbl[motorNumberMAX];  
+    /* since only one sensor board is connected to ems, i don't need hash table id-->canaddr.
     moreover i may use only one ptr, inipedeting of type of sensor (mais or strain), but i prefer to use two,
     in order to be complinet with other appl's objs*/
-    eo_emsCanNetTopo_hashTbl_s_item_t  sensorStrain_hTbl; 
-    eo_emsCanNetTopo_hashTbl_s_item_t  sensorMais_hTbl;
+    eo_emsCanNetTopo_hashTbl_s_item_t   sensorStrain_hTbl; 
+    eo_emsCanNetTopo_hashTbl_s_item_t   sensorMais_hTbl;
+    
+    eOmc_jointId_t      joint_CanLoc2Id_hTbl[eo_emsCanNetTopo_canports_num][MAX_CAN_ADDRESS][eo_emsCanNetTopo_jm_indexInBoard_max];
+    eOmc_motorId_t      motor_CanLoc2Id_hTbl[eo_emsCanNetTopo_canports_num][MAX_CAN_ADDRESS][eo_emsCanNetTopo_jm_indexInBoard_max];
+
+
 };
 
-
-
-/********* type definitions for can location ==> netvar ptr *************************************/
-
-//
-//typedef enum
-//{
-//  nvsType_joint_cfg             = 0,
-//  nvsType_joint_setPoint        = 1,
-//  nvsType_joint_status          = 2  
-//} eo_emsCanNetTopo_nvsType_joint_t;
-//
-//enum {eo_emsCanNetTopo_nvsType_joint_maxnum = 3};
-//
-//typedef struct
-//{
-//    eo_icubCanProto_canBoardAddress_t      boardAddr;
-//    eo_icubCanProto_motorAxis_t            axis;
-//    eo_icubCanProto_boardType_t            boardType;
-//    eOnvEPID_t                             joint_nvid_list[eo_emsCanNetTopo_nvsType_joint_maxnum];
-//} eo_emsCanNetTopo_hid_LUTbl_item_boardNvsReferences_t;
-
-
-///********* type definitions for joint/sensor ==> can location *************************************/
-//
-//typedef struct
-//{
-//    eOcanport_t                         canPort;
-//    eo_icubCanProto_canBoardAddress_t   boardAddr;
-//    eo_icubCanProto_motorAxis_t         axis4board; 
-//} eo_emsCanNetTopo_hid_LUTbl_item_joint2BoardCanLocation_t;
-//
-//
-//
-//typedef struct
-//{
-//    eOcanport_t                        canPort;
-//    eo_icubCanProto_canBoardAddress_t  boardAddr; 
-//} eo_emsCanNetTopo_hid_LUTbl_item_sensor2BoardCanLocation_t;
-//
-//
-//#define EO_emsCanNetTopo_BOARD_CAN_ADDR_NULL             255 /**< this value is usend in joint2BoardLocation_lookupTbl */
 
 
 
