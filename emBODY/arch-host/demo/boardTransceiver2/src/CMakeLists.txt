@@ -22,7 +22,7 @@ include_directories(${YARP_INCLUDE_DIRS})
 
 # Debug messages
 # message(INFO " BASE=${BASE}")
- message(INFO " hosttrans - ${NVS_SENSORS_CBK_FOLDER} - embObj_includes: ${embObj_includes}")
+# message(INFO " hosttrans - ${NVS_SENSORS_CBK_FOLDER} - embObj_includes: ${embObj_includes}")
   	
 # get all files needed, collected in different lists for better organization and handling
 

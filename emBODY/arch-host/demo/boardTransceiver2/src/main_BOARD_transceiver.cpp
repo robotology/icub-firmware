@@ -46,7 +46,7 @@ static void s_callback_button_2(char value);
 static void s_callback_button_3(void);
 static void s_callback_button_4(void);
 static void s_callback_button_5(uint32_t mtb, uint32_t triangle, char value);
-
+static void s_callback_button_6(void);
 
 void copyPid2eo(Pid in, eOmc_PID_t *out);
 // --------------------------------------------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ EOarray				 				*skinData;
 uint8_t buffer[sizeof(EOarray_of_10canframes)] = {0};
 uint8_t boardN = 4;
 
-
+bool verbose = false;
 int main(int argc, char *argv[])
 {
 	char str[STR_SIZE];
@@ -140,6 +140,12 @@ int main(int argc, char *argv[])
 			{
 				if(i < (argc - 1))
 					boardN = atoi(argv[++i]);
+				continue;
+			}
+
+			if((strcmp("-v", argv[i]) == 0) || (strcmp("--verbose", argv[i]) == 0))
+			{
+				verbose = true;
 				continue;
 			}
 
@@ -219,6 +225,9 @@ int main(int argc, char *argv[])
 					s_callback_button_4();
 					break;
 
+				case '6':	//
+					s_callback_button_6();
+					break;
 
 				default:
 					printf("Command not known -->> sending an empty ropframe!\n");
@@ -261,7 +270,8 @@ void *recvThread(void * arg)
 	while (keepGoingOn)
 	{
 		udppkt_size = ACE_socket->recv((void *) &sender.data, MAX_CAPACITY_OF_PACKET, remote01.addr, flags);
-		printf("Received new packet, size = %d\n", udppkt_size);
+		if(verbose)
+			printf("Received new packet, size = %d\n", udppkt_size);
 
 		uint16_t remPort 	= remote01.addr.get_port_number();
 		string remIp(remote01.addr.get_host_addr());
@@ -278,7 +288,7 @@ void *recvThread(void * arg)
 		// se ho una risposta da inviare, la dimensione del pacchetto sarà per forza > 20 byte... a meno che si voglia
 		// volutamente mandare un pacchetto vuoto. Modo grezzo per vedere se c'è una risposta da mandare e nel caso farlo.
 		// da miglorare
-		if(20 < udppkt_size)
+		if(20 > udppkt_size)
 		{
 			// write into skt: udppkt_data, udppkt_size
 			ACE_socket->send(udppkt_data, udppkt_size, remote01.addr, flags);
@@ -615,6 +625,21 @@ static void s_callback_button_5(uint32_t mtb, uint32_t triangle, char value)
 	boardTransceiver_GetTransmit(&udppkt_data, &udppkt_size);
 	ACE_socket->send(udppkt_data, udppkt_size, remote01.addr, flags);
 }
+
+
+static void s_callback_button_6(void )
+{
+	uint8_t *udppkt_data = NULL;
+	uint16_t udppkt_size = 0;
+
+	while (keepGoingOn)
+	{
+		boardTransceiver_GetTransmit(&udppkt_data, &udppkt_size);
+		ACE_socket->send(udppkt_data, udppkt_size, remote01.addr, flags);
+		usleep(800);
+	}
+}
+
 
 // Utilities
 
