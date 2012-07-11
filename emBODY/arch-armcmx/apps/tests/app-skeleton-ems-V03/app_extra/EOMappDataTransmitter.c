@@ -83,6 +83,7 @@ extern  uint32_t ena_tx_onrx;
 extern  int16_t pwm_out;
 extern int32_t encoder_can;
 extern int32_t posref_can;
+extern uint8_t can_msg[8];
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -262,7 +263,7 @@ static void s_eom_appDataTransmitter_taskRun(EOMtask *tsk, uint32_t evtmsgper)
     
         ((int32_t*)payload)[0]=encoder_can;
         ((int32_t*)payload)[1]=posref_can;
-
+        
         eo_appCanSP_SendMessage_TEST(p->cfg.appCanSP_ptr, NULL, payload);
         p->st = eOm_appDataTransmitter_st__active;
     }

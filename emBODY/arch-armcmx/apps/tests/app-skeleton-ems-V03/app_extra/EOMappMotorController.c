@@ -228,6 +228,8 @@ static void s_eom_appMotorController_taskStartup(EOMtask *tsk, uint32_t t)
     eo_emsController_SetControlMode(0, CM_IDLE);
 }
 
+uint8_t can_msg[8];
+
 static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
 {
     int16_t *pwm;
@@ -236,6 +238,8 @@ static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
     uint32_t encoder_raw[6];
     
     uint8_t parity_error = 0;
+    uint8_t bit_check = 0;
+    eObool_t encoder_valid = eobool_false;
 
     EOMappMotorController *p = (EOMappMotorController*)eom_task_GetExternalData(tsk);
 
@@ -248,31 +252,45 @@ static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
         if (eo_appEncReader_isReady(p->cfg.encReader))
         {     
             eo_appEncReader_getValues(p->cfg.encReader, encoder_raw);
+
+            encoder_valid = eobool_true;
+
+            for (int8_t e=0; e<4; ++e)
+            {
+                parity_error = 0;
+                
+                for (uint8_t b=0; b<18; ++b)
+                {
+                    parity_error ^= (encoder_raw[e]>>b) & 1;
+                }
+
+                bit_check = encoder_raw[e] & 0x38;
+
+                if (parity_error || bit_check!=0x20)
+                {
+                    if (e==1) encoder_valid = eobool_false;
+                }
+                else
+                {
+                    encoder_raw[e]>>=6;
+                    encoder_raw[e]&=0x0FFF;
+                }
+            }
         }
 
-        for (uint8_t b=0; b<18; ++b)
+        if (encoder_valid)
         {
-            parity_error ^= (encoder_raw[3]>>b) & 1;
-        }
-
-        uint8_t bit_check = encoder_raw[3] & 0x3E;
-
-        if (parity_error || bit_check!=0x20)
-        {
-            eo_emsController_SkipEncoders();
+            eo_emsController_ReadEncoders((int32_t*)encoder_raw+1);
         }
         else
         {
-            encoder_raw[3]>>=6;
-            encoder_raw[3]&=0x0FFF;
-
-            eo_emsController_ReadEncoders((int32_t*)encoder_raw+3);
+            eo_emsController_SkipEncoders();
         }
-
+        
         /* 2) pid calc */
         pwm = eo_emsController_PWM();
         
-        pwm_out = -pwm[0];
+        pwm_out = pwm[0];
 
         /* 3) reset my state */
         p->st = eOm_appMotorController_st__active;

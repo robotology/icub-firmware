@@ -577,7 +577,7 @@
 
   <Group>
     <GroupName>app-extra</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -586,10 +586,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>3</ColumnNumber>
+      <ColumnNumber>28</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>57</TopLine>
-      <CurrentLine>62</CurrentLine>
+      <TopLine>261</TopLine>
+      <CurrentLine>261</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOappCanServicesProvider.c</PathWithFileName>
       <FilenameWithoutPath>EOappCanServicesProvider.c</FilenameWithoutPath>
@@ -600,10 +600,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>19</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>147</TopLine>
-      <CurrentLine>154</CurrentLine>
+      <TopLine>142</TopLine>
+      <CurrentLine>142</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOappEncodersReader.c</PathWithFileName>
       <FilenameWithoutPath>EOappEncodersReader.c</FilenameWithoutPath>
@@ -656,10 +656,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>42</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>175</TopLine>
-      <CurrentLine>182</CurrentLine>
+      <TopLine>252</TopLine>
+      <CurrentLine>265</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOMappDataTransmitter.c</PathWithFileName>
       <FilenameWithoutPath>EOMappDataTransmitter.c</FilenameWithoutPath>
@@ -670,10 +670,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>50</ColumnNumber>
+      <ColumnNumber>18</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>224</TopLine>
-      <CurrentLine>230</CurrentLine>
+      <TopLine>266</TopLine>
+      <CurrentLine>266</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOMappMotorController.c</PathWithFileName>
       <FilenameWithoutPath>EOMappMotorController.c</FilenameWithoutPath>
@@ -684,10 +684,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>82</ColumnNumber>
+      <ColumnNumber>36</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>247</TopLine>
+      <CurrentLine>247</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_extra\EOMappTheSysController.c</PathWithFileName>
       <FilenameWithoutPath>EOMappTheSysController.c</FilenameWithoutPath>
@@ -2117,12 +2117,12 @@
       <GroupNumber>21</GroupNumber>
       <FileNumber>104</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>391</TopLine>
+      <CurrentLine>406</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-src\EOaxisController.c</PathWithFileName>
       <FilenameWithoutPath>EOaxisController.c</FilenameWithoutPath>
@@ -2147,10 +2147,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>1</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>230</TopLine>
+      <CurrentLine>230</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-src\EOemsController.c</PathWithFileName>
       <FilenameWithoutPath>EOemsController.c</FilenameWithoutPath>
@@ -2163,8 +2163,8 @@
       <Focus>0</Focus>
       <ColumnNumber>45</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>37</TopLine>
-      <CurrentLine>49</CurrentLine>
+      <TopLine>1</TopLine>
+      <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-src\EOpid.c</PathWithFileName>
       <FilenameWithoutPath>EOpid.c</FilenameWithoutPath>
@@ -2189,10 +2189,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>54</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>198</TopLine>
+      <CurrentLine>198</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-src\EOtrajectory.c</PathWithFileName>
       <FilenameWithoutPath>EOtrajectory.c</FilenameWithoutPath>
@@ -2251,6 +2251,84 @@
     </WindowPosition>
   </AlienFiles>
 
+  <AlienFiles>
+    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\apps\tests\app-skeleton-ems-V03\app_extra\EOappEncodersReader.h</PathWithFilename>
+    <TopLine>56</TopLine>
+    <CurrentLine>62</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-api\EOaxisController.h</PathWithFilename>
+    <TopLine>91</TopLine>
+    <CurrentLine>91</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-src\EOaxisController_hid.h</PathWithFilename>
+    <TopLine>31</TopLine>
+    <CurrentLine>45</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
   <MDIGroups>
     <Orientation>1</Orientation>
     <ActiveMDIGroup>0</ActiveMDIGroup>
@@ -2259,10 +2337,76 @@
       <ActiveTab>0</ActiveTab>
       <Documents>
         <Doc>
+          <Name>..\app_extra\EOMappMotorController.c</Name>
+          <ColumnNumber>18</ColumnNumber>
+          <TopLine>266</TopLine>
+          <CurrentLine>266</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-src\EOaxisController.c</Name>
+          <ColumnNumber>0</ColumnNumber>
+          <TopLine>391</TopLine>
+          <CurrentLine>406</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\..\..\..\..\arch-armcmx\body\embobj\embobj\embobj-src\EOaxisController_hid.h</Name>
+          <ColumnNumber>6</ColumnNumber>
+          <TopLine>31</TopLine>
+          <CurrentLine>45</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\..\..\..\..\arch-armcmx\body\embobj\embobj\embobj-api\EOaxisController.h</Name>
+          <ColumnNumber>50</ColumnNumber>
+          <TopLine>91</TopLine>
+          <CurrentLine>91</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOMappDataTransmitter.c</Name>
+          <ColumnNumber>42</ColumnNumber>
+          <TopLine>252</TopLine>
+          <CurrentLine>265</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOappEncodersReader.h</Name>
+          <ColumnNumber>18</ColumnNumber>
+          <TopLine>56</TopLine>
+          <CurrentLine>62</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOappEncodersReader.c</Name>
+          <ColumnNumber>19</ColumnNumber>
+          <TopLine>142</TopLine>
+          <CurrentLine>142</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-src\EOemsController.c</Name>
+          <ColumnNumber>1</ColumnNumber>
+          <TopLine>230</TopLine>
+          <CurrentLine>230</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOappCanServicesProvider.c</Name>
+          <ColumnNumber>28</ColumnNumber>
+          <TopLine>261</TopLine>
+          <CurrentLine>261</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\app_extra\EOMappTheSysController.c</Name>
+          <ColumnNumber>36</ColumnNumber>
+          <TopLine>247</TopLine>
+          <CurrentLine>247</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-src\EOtrajectory.c</Name>
+          <ColumnNumber>54</ColumnNumber>
+          <TopLine>198</TopLine>
+          <CurrentLine>198</CurrentLine>
+        </Doc>
+        <Doc>
           <Name>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\arch-armcmx\body\embobj\embobj\embobj-src\EOpid.c</Name>
           <ColumnNumber>45</ColumnNumber>
-          <TopLine>37</TopLine>
-          <CurrentLine>49</CurrentLine>
+          <TopLine>1</TopLine>
+          <CurrentLine>1</CurrentLine>
         </Doc>
         <Doc>
           <Name>C:\Users\user\IIT_Projects\iCub\firmware\emBODY\any-arch\sys\embobj\mc\src\EOaxisController.c</Name>
@@ -2299,12 +2443,6 @@
           <ColumnNumber>0</ColumnNumber>
           <TopLine>48</TopLine>
           <CurrentLine>54</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>..\app_extra\EOMappMotorController.c</Name>
-          <ColumnNumber>50</ColumnNumber>
-          <TopLine>224</TopLine>
-          <CurrentLine>230</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\..\..\..\..\any-arch\sys\embobj\prot\api\EOtransceiver.h</Name>
