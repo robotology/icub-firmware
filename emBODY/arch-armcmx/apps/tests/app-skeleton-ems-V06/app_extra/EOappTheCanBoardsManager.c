@@ -94,7 +94,21 @@ static eOresult_t s_eo_appTheCanBrdsMng_StopMotorboard(EOappTheCanBrdsMng *p, eo
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-EOappTheCanBrdsMng s_theCanBrdsManager = 
+static const eO_appTheCanBrdsMng_mc4Config_hid_t s_mc4_const_cfg =
+{
+    EO_INIT(.estimShiftFactor)
+    {
+        EO_INIT(.estimShiftJointVel)      8,
+        EO_INIT(.estimShiftJointAcc)      8,
+        EO_INIT(.estimShiftMotorVel)      8,
+        EO_INIT(.estimShiftMotorAcc)      8
+    },
+    EO_INIT(.velShiftFactor)              8
+};
+
+
+
+static EOappTheCanBrdsMng s_theCanBrdsManager = 
 {
     EO_INIT(.st)    eO_appTheCanBrdsMng_st__NOTinited
 };
@@ -274,7 +288,7 @@ static eOresult_t s_eo_appTheCanBrdsMng_ConfigMC4(EOappTheCanBrdsMng *p, eo_emsC
 
     // 2) set vel shift
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_VEL_SHIFT;
-    res = eo_appCanSP_SendCmd(p->cfg.appCanSP_ptr, &canLoc, msgCmd, NULL/*(void*)&addInfo_ptr->velocityShift*/);
+    res = eo_appCanSP_SendCmd(p->cfg.appCanSP_ptr, &canLoc, msgCmd, (void*)&s_mc4_const_cfg.velShiftFactor);
     if(eores_OK != res)
     {
         return(res);
@@ -283,7 +297,7 @@ static eOresult_t s_eo_appTheCanBrdsMng_ConfigMC4(EOappTheCanBrdsMng *p, eo_emsC
         
     // 3) set estim vel shift
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_SPEED_ESTIM_SHIFT;
-    res = eo_appCanSP_SendCmd(p->cfg.appCanSP_ptr, &canLoc, msgCmd, NULL/*(void*)&addInfo_ptr->estimShift*/);
+    res = eo_appCanSP_SendCmd(p->cfg.appCanSP_ptr, &canLoc, msgCmd, (void*)&s_mc4_const_cfg.estimShiftFactor);
     if(eores_OK != res)
     {
         return(res);
@@ -297,7 +311,6 @@ static eOresult_t s_eo_appTheCanBrdsMng_ConfigMC4(EOappTheCanBrdsMng *p, eo_emsC
         return(res);
     }
         
-#warning VALE-->i valori di cfg delle MC4 sono nulli!!!!!
     return(eores_OK);
 }
 
@@ -366,8 +379,9 @@ static eOresult_t s_eo_appTheCanBrdsMng_Config1FOC(EOappTheCanBrdsMng *p, eo_ems
 
 #ifdef _USE_PROTO_TEST_
     return(eo_appCanSP_ConfigMotor(p->cfg.appCanSP_ptr, 3, &cfg));
-#endif
+#else
     return(eores_OK);
+#endif
 }
 
 static eOresult_t s_eo_appTheCanBrdsMng_ConfigSkin(EOappTheCanBrdsMng *p, eo_emsCanNetTopo_boardTopoInfo_t *board_ptr)

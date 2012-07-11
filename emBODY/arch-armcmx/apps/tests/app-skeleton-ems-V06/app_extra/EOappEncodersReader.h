@@ -52,16 +52,29 @@ typedef struct
     void* callback_arg;                                 /**< argument of callback */
 } eOappEncReader_cfg_t;
 
-    
+typedef enum
+{
+    eOeOappEncReader_encoder0 = 0,   /**< is the encoder connected to P6 on ems board */
+    eOeOappEncReader_encoder1 = 1,   /**< is the encoder connected to P7 on ems board */
+    eOeOappEncReader_encoder2 = 2,   /**< is the encoder connected to P8 on ems board */
+    eOeOappEncReader_encoder3 = 3,   /**< is the encoder connected to P9 on ems board */
+    eOeOappEncReader_encoder4 = 4,   /**< is the encoder connected to P10 on ems board: currently is not connected */ 
+    eOeOappEncReader_encoder5 = 5    /**< is the encoder connected to P11 on ems board: currently is not connected */
+} eOeOappEncReader_encoder_t;
+
+enum {eOeOappEncReader_encoderMaxNum = 6};
+
+
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 extern EOappEncReader* eo_appEncReader_New(eOappEncReader_cfg_t *cfg);
-extern eOresult_t eo_appEncReader_startRead(EOappEncReader *p);
+extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p);
 extern eOresult_t eo_appEncReader_getValues(EOappEncReader *p, uint32_t *data_ptr); //dataptr must be vector of[6]
 __inline extern eOboolvalues_t eo_appEncReader_isReady(EOappEncReader *p);  //p is not checked
 
+extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOeOappEncReader_encoder_t enc, uint32_t *value);
 /** @}            
     end of group eo_app_encodersReader
  **/

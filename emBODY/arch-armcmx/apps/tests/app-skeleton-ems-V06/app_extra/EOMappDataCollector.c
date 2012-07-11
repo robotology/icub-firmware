@@ -329,7 +329,7 @@ static void s_eom_appDataCollector_taskRun_2foc_mode(EOMappDataCollector *p, eOe
     if(eo_common_event_check(evt, EVT_GETDATA_START))
     {
         /* 1) start encoder reading */
-        eo_appEncReader_startRead(p->cfg.encReader_ptr);
+        eo_appEncReader_StartRead(p->cfg.encReader_ptr);
  
         /* 2) get and process eth pkt */
         s_eom_appDataCollector_GetAndProcessEthPkt(p);

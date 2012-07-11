@@ -81,12 +81,20 @@ static void s_eo_appEncReader_isrCbk_onLastEncRead_SPI3(void *arg);
 
 static void s_eo_appEncReader_readConnectedEncConfg(EOappEncReader *p, EOappEncReader_configEncSPIXReadSequence_hid_t *cfgEncSPIX, hal_encoder_t startEnc, hal_encoder_t endEnc);
 static void s_eo_appEncReader_configureConnectedEncoders(EOappEncReader *p, hal_encoder_t startEnc, hal_encoder_t endEnc, EOappEncReader_configEncSPIXReadSequence_hid_t *cfgEncSPIX);
-
+static eOboolvalues_t s_eo_appEncReader_IsValidValue(uint32_t *valueraw);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-
+static const hal_encoder_t encoderMap[eOeOappEncReader_encoderMaxNum] =
+{
+    /* 0 */     hal_encoder1,
+    /* 1 */     hal_encoder7,
+    /* 2 */     hal_encoder2,
+    /* 3 */     hal_encoder8,
+    /* 4 */     hal_encoder3,
+    /* 5 */     hal_encoder9
+};
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -116,7 +124,7 @@ extern EOappEncReader* eo_appEncReader_New(eOappEncReader_cfg_t *cfg)
     return(retptr);
 }
 
-extern eOresult_t eo_appEncReader_startRead(EOappEncReader *p)
+extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p)
 {
     if(NULL == p)
     {
@@ -139,7 +147,7 @@ extern eOresult_t eo_appEncReader_startRead(EOappEncReader *p)
     return(eores_OK);
 }
 
-extern eOresult_t  eo_appEncReader_getValues(EOappEncReader *p, uint32_t *data_ptr)
+extern eOresult_t  eo_appEncReader_GetValuesRaw(EOappEncReader *p, uint32_t *data_ptr)
 {
 //    hal_encoder_t i;
 
@@ -170,6 +178,31 @@ extern eOresult_t  eo_appEncReader_getValues(EOappEncReader *p, uint32_t *data_p
 
     return(eores_OK);
 }
+
+
+extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOeOappEncReader_encoder_t enc, uint32_t *value)
+{
+    uint32_t val_raw;
+    eOresult_t res;
+    
+    res = (eOresult_t)hal_encoder_get_value(encoderMap[enc], &val_raw);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+
+    if( s_eo_appEncReader_IsValidValue(&val_raw) == eobool_false )
+    {
+        return(eores_NOK_generic);
+    }
+
+    val_raw >>= 6;
+    *value = val_raw & 0x0FFF;
+    return(eores_OK);
+}
+
+
 
 __inline extern eOboolvalues_t eo_appEncReader_isReady(EOappEncReader *p)
 {
@@ -291,7 +324,26 @@ static void s_eo_appEncReader_isrCbk_onLastEncRead_SPI3(void *arg)
    }
 }
 
+static eOboolvalues_t s_eo_appEncReader_IsValidValue(uint32_t *valueraw)
+{
+    uint8_t parity_error = 0;
+    uint8_t bit_check = 0;
+    uint8_t b = 0;
+                
+    for (b=0; b<18; ++b)
+    {
+        parity_error ^= ((*valueraw)>>b) & 1;
+    }
 
+    bit_check = (*valueraw) & 0x38;
+
+    if (parity_error || bit_check!=0x20)
+    {
+        return(eobool_false);
+    }
+    
+    return(eobool_true);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

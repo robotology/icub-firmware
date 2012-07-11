@@ -250,10 +250,12 @@ static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
 {
     int16_t *pwm;
     eOevent_t evt;
+    eOresult_t res = eores_NOK_generic;
+    uint32_t encvalue;
 
-    uint32_t encoder_raw[6];
-    
-    uint8_t parity_error = 0;
+//     uint32_t encoder_raw[6];
+//     
+//     uint8_t parity_error = 0;
 
     EOMappMotorController *p = (EOMappMotorController*)eom_task_GetExternalData(tsk);
 
@@ -261,36 +263,51 @@ static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
 
     if(EVT_CHECK(evt, EVT_CALC_START))
     {
-    // ALE
-  
+
         if (eo_appEncReader_isReady(p->cfg.encReader))
         {     
-            eo_appEncReader_getValues(p->cfg.encReader, encoder_raw);
+            res = eo_appEncReader_GetValue(p->cfg.encReader, eOeOappEncReader_encoder3, &encvalue);
         }
 
-        for (uint8_t b=0; b<18; ++b)
-        {
-            parity_error ^= (encoder_raw[3]>>b) & 1;
-        }
-
-        uint8_t bit_check = encoder_raw[3] & 0x3E;
-
-        if (parity_error || bit_check!=0x20)
+        if(eores_OK != res)
         {
             eo_emsController_SkipEncoders();
         }
         else
         {
-            encoder_raw[3]>>=6;
-            encoder_raw[3]&=0x0FFF;
-
-            eo_emsController_ReadEncoders((int32_t*)encoder_raw+3);
+            eo_emsController_ReadEncoders((int32_t*)&encvalue);
         }
+        
+//     // ALE
+//   
+//         if (eo_appEncReader_isReady(p->cfg.encReader))
+//         {     
+//             eo_appEncReader_getValues(p->cfg.encReader, encoder_raw);
+//         }
+
+//         for (uint8_t b=0; b<18; ++b)
+//         {
+//             parity_error ^= (encoder_raw[3]>>b) & 1;
+//         }
+
+//         uint8_t bit_check = encoder_raw[3] & 0x3E;
+
+//         if (parity_error || bit_check!=0x20)
+//         {
+//             eo_emsController_SkipEncoders();
+//         }
+//         else
+//         {
+//             encoder_raw[3]>>=6;
+//             encoder_raw[3]&=0x0FFF;
+
+//             eo_emsController_ReadEncoders((int32_t*)encoder_raw+3);
+//         }
         
         /* 2) pid calc */
         pwm = eo_emsController_PWM();
 
-        pwm_out = -pwm[0];
+        pwm_out = pwm[0];
         
 #ifndef _USE_PROTO_TEST_
         /* 4) prepare and punt in rx queue new setpoint */

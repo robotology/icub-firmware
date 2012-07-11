@@ -58,7 +58,12 @@ struct EOappTheCanBrdsMng_hid
     eO_appTheCanBrdsMng_states_hid_t    st;
     
 }; 
-
+/*this struct contains data configuration for mc4 only: this data are not sent by pc104 and are equal for all mc4*/
+typedef struct
+{
+    eOmc_estimShift_t estimShiftFactor;
+    uint8_t           velShiftFactor;
+} eO_appTheCanBrdsMng_mc4Config_hid_t;
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
