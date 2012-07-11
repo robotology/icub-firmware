@@ -129,7 +129,6 @@ int main(void)
                         &eom_callbackman_DefaultCfg
                       );  
     
-//    #error compile with EO_NVSCFG_USE_CACHED_NVS not defined in file EOnvsCfg.c
     eom_sys_Start(eom_sys_GetHandle(), s_eom_appSkeletonEms_main_init);
 
 }

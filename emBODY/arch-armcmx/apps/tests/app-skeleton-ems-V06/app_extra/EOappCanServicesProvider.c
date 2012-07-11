@@ -1030,48 +1030,48 @@ extern EOemsCanNetTopo* eo_appCanSP_GetEmsCanNetTopoHandle(EOappCanSP *p)
 
 
 
+#ifdef _USE_PROTO_TEST_
+extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOmc_motor_config_t *cfg)
+{
+    eOresult_t res;
+    eOcanframe_t canFrame;
+    eo_icubCanProto_msgDestination_t dest;
+    eo_emsCanNetTopo_jointOrMotorCanLocation_t canLoc;
+    eo_icubCanProto_msgCommand_t msgCmd = 
+    {
+        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.cmdId) 0
+    };
 
-// extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOmc_motor_config_t *cfg)
-// {
-//     eOresult_t res;
-//     eOcanframe_t canFrame;
-//     eo_icubCanProto_msgDestination_t dest;
-//     eo_emsCanNetTopo_jointOrMotorCanLocation_t canLoc;
-//     eo_icubCanProto_msgCommand_t msgCmd = 
-//     {
-//         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
-//         EO_INIT(.cmdId) 0
-//     };
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
 
-//     if(NULL == p)
-//     {
-//         return(eores_NOK_nullpointer);
-//     }
+    res = eo_emsCanNetTopo_GetMotorCanLocation_ByMotorId(p->emsCanNetTopo_ptr, mId, &canLoc, NULL);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
 
-//     res = eo_emsCanNetTopo_GetMotorCanLocation_ByMotorId(p->emsCanNetTopo_ptr, mId, &canLoc, NULL);
-//     if(eores_OK != res)
-//     {
-//         return(res);
-//     }
-
-//     //set destination of message (one for all msg)
-//     dest.axis = canLoc.jm_idInBoard;
-//     dest.canAddr = canLoc.canaddr;
+    //set destination of message (one for all msg)
+    dest.axis = canLoc.jm_idInBoard;
+    dest.canAddr = canLoc.canaddr;
 
 
-//     // 1) send current pid
-//     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID;
-//     res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, (void*)&cfg->pidcurrent, &canFrame);
-//     if(eores_OK != res)
-//     {
-//         return(res);
-//     }
-//     res = (eOresult_t)hal_can_put((hal_can_port_t)canLoc.emscanport, (hal_can_frame_t*)&canFrame,
-//                                   ((p->runmode == eo_appCanSP_runMode__onEvent)? hal_can_send_normprio_now : hal_can_send_normprio_later));
-//     if(eores_OK != res)
-//     {
-//         return(res);
-//     }
+    // 1) send current pid
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID;
+    res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, (void*)&cfg->pidcurrent, &canFrame);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    res = (eOresult_t)hal_can_put((hal_can_port_t)canLoc.emscanport, (hal_can_frame_t*)&canFrame,
+                                  ((p->runmode == eo_appCanSP_runMode__onEvent)? hal_can_send_normprio_now : hal_can_send_normprio_later));
+    if(eores_OK != res)
+    {
+        return(res);
+    }
 
 //     // 2) send current pid limits
 //     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PIDLIMITS;
@@ -1186,9 +1186,9 @@ extern EOemsCanNetTopo* eo_appCanSP_GetEmsCanNetTopoHandle(EOappCanSP *p)
 // //    {
 // //        return(res);
 // //    }
-//     return(eores_OK);
-// }
-
+    return(eores_OK);
+}
+#endif
 
 // extern eOresult_t eo_appCanSP_SendStart2MotorBoard(EOappCanSP *p)
 // {
@@ -1245,6 +1245,7 @@ extern EOemsCanNetTopo* eo_appCanSP_GetEmsCanNetTopoHandle(EOappCanSP *p)
 // //     }
 // return(eores_OK);
 // }
+
 
 
 
@@ -1317,83 +1318,83 @@ extern EOemsCanNetTopo* eo_appCanSP_GetEmsCanNetTopoHandle(EOappCanSP *p)
 
 
 
+#ifdef _USE_PROTO_TEST_
+extern eOresult_t eo_appCanSP_SendSetPoint(EOappCanSP *p, eOmc_jointId_t jId, eOmc_setpoint_t *setPoint)
+{
+    eOresult_t res;
+    eOcanframe_t canFrame;
+    eo_icubCanProto_msgDestination_t dest;
+    eo_emsCanNetTopo_jointOrMotorCanLocation_t canLoc;
+    void *val_ptr = NULL;
+    eo_icubCanProto_msgCommand_t msgCmd = 
+    {
+        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.cmdId) 0
+    };
 
-// extern eOresult_t eo_appCanSP_SendSetPoint(EOappCanSP *p, eOmc_jointId_t jId, eOmc_setpoint_t *setPoint)
-// {
-//     eOresult_t res;
-//     eOcanframe_t canFrame;
-//     eo_icubCanProto_msgDestination_t dest;
-//     eo_emsCanNetTopo_jointOrMotorCanLocation_t canLoc;
-//     void *val_ptr = NULL;
-//     eo_icubCanProto_msgCommand_t msgCmd = 
-//     {
-//         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
-//         EO_INIT(.cmdId) 0
-//     };
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    res = eo_emsCanNetTopo_GetJointCanLocation_ByJointId(p->emsCanNetTopo_ptr, jId, &canLoc, NULL);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
 
-//     if(NULL == p)
-//     {
-//         return(eores_NOK_nullpointer);
-//     }
-//     res = eo_emsCanNetTopo_GetJointCanLocation_ByJointId(p->emsCanNetTopo_ptr, jId, &canLoc, NULL);
-//     if(eores_OK != res)
-//     {
-//         return(res);
-//     }
-
-//     dest.axis = canLoc.jm_idInBoard;
-//     dest.canAddr = canLoc.canaddr;
+    dest.axis = canLoc.jm_idInBoard;
+    dest.canAddr = canLoc.canaddr;
 
 
-//     switch( setPoint->type)
-//     {
-//         case eomc_setpoint_position:
-//         {
-//             msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__POSITION_MOVE; 
-//             val_ptr =  &(setPoint->to.position);    
-//         }break;
+    switch( setPoint->type)
+    {
+        case eomc_setpoint_position:
+        {
+            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__POSITION_MOVE; 
+            val_ptr =  &(setPoint->to.position);    
+        }break;
 
-//         case eomc_setpoint_velocity:
-//         {
-//             msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__VELOCITY_MOVE;                 
-//             val_ptr =  &(setPoint->to.velocity);    
-//         }break;
+        case eomc_setpoint_velocity:
+        {
+            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__VELOCITY_MOVE;                 
+            val_ptr =  &(setPoint->to.velocity);    
+        }break;
 
-//         case eomc_setpoint_torque:
-//         {
-//             msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_DESIRED_TORQUE;           
-//             val_ptr =  &(setPoint->to.torque.value);    
-//         }break;
+        case eomc_setpoint_torque:
+        {
+            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_DESIRED_TORQUE;           
+            val_ptr =  &(setPoint->to.torque.value);    
+        }break;
 
-//         case eomc_setpoint_current:
-//         {
-//             msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_DISIRED_CURRENT;                             
-//             val_ptr =  &(setPoint->to.current.value);    
-//         }break;
+        case eomc_setpoint_current:
+        {
+            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_DISIRED_CURRENT;                             
+            val_ptr =  &(setPoint->to.current.value);    
+        }break;
 
-//         default:
-//         {
-//             return(eores_NOK_unsupported);
-//         }
-//     }
+        default:
+        {
+            return(eores_NOK_unsupported);
+        }
+    }
 
-//     res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, (void*)val_ptr, &canFrame);
-//     if(eores_OK != res)
-//     {
-//         return(res);
-//     }
+    res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, (void*)val_ptr, &canFrame);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
 
-//     res = (eOresult_t)hal_can_put((hal_can_port_t)canLoc.emscanport, (hal_can_frame_t*)&canFrame,
-//                                   ((p->runmode == eo_appCanSP_runMode__onEvent)? hal_can_send_normprio_now : hal_can_send_normprio_later));
+    res = (eOresult_t)hal_can_put((hal_can_port_t)canLoc.emscanport, (hal_can_frame_t*)&canFrame,
+                                  ((p->runmode == eo_appCanSP_runMode__onEvent)? hal_can_send_normprio_now : hal_can_send_normprio_later));
 
-//     if(eores_OK != res)
-//     {
-//         return(res);
-//     }
+    if(eores_OK != res)
+    {
+        return(res);
+    }
 
-//     return(eores_OK);
-// }
-
+    return(eores_OK);
+}
+#endif
 
 
 

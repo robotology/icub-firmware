@@ -239,12 +239,30 @@ static void s_eom_appDataTransmitter_taskRun(EOMtask *tsk, uint32_t evtmsgper)
     EOMappDataTransmitter *p = (EOMappDataTransmitter*)eom_task_GetExternalData(tsk);
 
     evt = (eOevent_t)evtmsgper;   
+    
+    #ifdef _USE_PROTO_TEST_
+    eOmc_setpoint_t     mySetPoint_current = 
+    {
+        EO_INIT(.type)       eomc_setpoint_current,
+        EO_INIT(.to)
+        {
+            EO_INIT(.current)
+            {
+                EO_INIT(.value)     0
+            }   
+        }
+    };
+    #endif
    
 //following activities are independent on runmode
     
     if(eo_common_event_check(evt, EVT_START))
     {
-    
+#ifdef _USE_PROTO_TEST_
+    mySetPoint_current.to.current.value = pwm_out;
+    eo_appCanSP_SendSetPoint(p->cfg.appCanSP_ptr, 3, &mySetPoint_current);    
+        
+#else        
         res = s_eom_appDataTransmitter_SendRops(p);
         if(eores_OK != res)
         {
@@ -262,7 +280,7 @@ static void s_eom_appDataTransmitter_taskRun(EOMtask *tsk, uint32_t evtmsgper)
         {
             return;
         }        
-        
+#endif        
         ((int32_t*)payload)[0]=encoder_can;
         ((int32_t*)payload)[1]=posref_can;
 

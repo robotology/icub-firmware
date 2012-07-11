@@ -262,15 +262,16 @@ extern EOemsCanNetTopo* eo_appCanSP_GetEmsCanNetTopoHandle(EOappCanSP *p);
 // extern eOresult_t eo_appCanSP_SendOpCmd2CanConnectedBoard(EOappCanSP *p, eObrd_types_t board, eo_appCanSP_opCmd_t opcmd);
 
 
-
-// /** @fn         extern eOresult_t eo_appCanSP_SendSetPoint(EOappCanSP *p, eOmc_jointId_t jId, eOmc_setpoint_t *setPoint)
-//     @brief      sends set point to joint. (this joint is managed by a CAN board)
-//     @param      p                       target obj
-//     @param      jId               identifies the joint.
-//     @param      cfg                     motor's configuration 
-//     @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
-//  **/
-// extern eOresult_t eo_appCanSP_SendSetPoint(EOappCanSP *p, eOmc_jointId_t jId, eOmc_setpoint_t *setPoint);
+#ifdef _USE_PROTO_TEST_
+/** @fn         extern eOresult_t eo_appCanSP_SendSetPoint(EOappCanSP *p, eOmc_jointId_t jId, eOmc_setpoint_t *setPoint)
+    @brief      sends set point to joint. (this joint is managed by a CAN board)
+    @param      p                       target obj
+    @param      jId               identifies the joint.
+    @param      cfg                     motor's configuration 
+    @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
+ **/
+extern eOresult_t eo_appCanSP_SendSetPoint(EOappCanSP *p, eOmc_jointId_t jId, eOmc_setpoint_t *setPoint);
+#endif
 
 // extern eOresult_t eo_appCanSP_readOnlySkin_TEST(EOappCanSP *p); //test porpouse
 
@@ -309,16 +310,16 @@ extern EOemsCanNetTopo* eo_appCanSP_GetEmsCanNetTopoHandle(EOappCanSP *p);
 // //extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointId_t jId, eOmc_joint_config_t *cfg);
 // extern eOresult_t eo_appCanSP_jointWholeConfig_Send(EOappCanSP *p, eOmc_jointId_t jId, eOmc_joint_config_t *cfg);
 
-
-// /** @fn         extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointId_t jId, eOmc_joint_config_t *cfg)
-//     @brief      sends can messages to can board to configure one of its motor 
-//     @param      p                       target obj
-//     @param      jId               identifies the motor to config.
-//     @param      cfg                     motor's configuration 
-//     @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
-//  **/
-// extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOmc_motor_config_t *cfg);
-
+#ifdef _USE_PROTO_TEST_
+/** @fn         extern eOresult_t eo_appCanSP_ConfigJoint(EOappCanSP *p, eOmc_jointId_t jId, eOmc_joint_config_t *cfg)
+    @brief      sends can messages to can board to configure one of its motor 
+    @param      p                       target obj
+    @param      jId               identifies the motor to config.
+    @param      cfg                     motor's configuration 
+    @return     eores_OK or eores_NOK_nullpointer if p or connectedJointsList are null, or eores_NOK_nodata if no joint are connected to ems
+ **/
+extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOmc_motor_config_t *cfg);
+#endif
 
 
 

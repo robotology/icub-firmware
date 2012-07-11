@@ -232,6 +232,12 @@ static eOresult_t s_eo_appTheCanBrdsMng_ConfigBoard(EOappTheCanBrdsMng *p, eo_em
         {
             res = eores_OK; //config by pc104
         }break; 
+
+        case eobrd_strain:
+        {
+            res = eores_OK; //config by pc104
+        }break; 
+
         
         default:
         {
@@ -307,13 +313,41 @@ static eOresult_t s_eo_appTheCanBrdsMng_Config1FOC(EOappTheCanBrdsMng *p, eo_ems
         EO_INIT(.cmdId) 0
     };
 
+    eOmc_i2tParams_t i2tParams = 
+    {
+        EO_INIT(.tresh)  0xAA,
+        EO_INIT(.time)   0xBB
+    };
+    
+#ifdef _USE_PROTO_TEST_
+
+    eOmc_motor_config_t cfg =
+    { 
+        EO_INIT(.pidcurrent)
+        {
+            EO_INIT(.kp)                    0x0BB8,
+            EO_INIT(.ki)                    0x1388,
+            EO_INIT(.kd)                    0x0000,
+            EO_INIT(.limitonintegral)       0X4444,
+            EO_INIT(.limitonoutput)         0x5555,
+            EO_INIT(.scale)                 0x0,
+            EO_INIT(.offset)                0x6666,
+            EO_INIT(.filler03)              {0xf1, 0xf2, 0xf3}
+        },
+        EO_INIT(.maxvelocityofmotor)        0xAA,
+        EO_INIT(.maxcurrentofmotor)         0xBB,
+        EO_INIT(.des02FORmstatuschamaleon04)   {0}
+    };
+#endif
     canLoc.emscanport = board_ptr->emscanport;
     canLoc.canaddr = board_ptr->canaddr;
 
 
+#warning VALE --> i2t params sono a caso!!!!
+
     // 1) set i2t params
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_I2T_PARAMS;
-    res = eo_appCanSP_SendCmd(p->cfg.appCanSP_ptr, &canLoc, msgCmd, NULL/*(void*)&addInfo_ptr->i2tParams*/);
+    res = eo_appCanSP_SendCmd(p->cfg.appCanSP_ptr, &canLoc, msgCmd, &i2tParams);
     if(eores_OK != res)
     {
         return(res);
@@ -328,7 +362,11 @@ static eOresult_t s_eo_appTheCanBrdsMng_Config1FOC(EOappTheCanBrdsMng *p, eo_ems
         return(res);
     }
         
-#warning VALE-->i valori di cfg delle 1FOC sono nulli!!!!!
+
+
+#ifdef _USE_PROTO_TEST_
+    return(eo_appCanSP_ConfigMotor(p->cfg.appCanSP_ptr, 3, &cfg));
+#endif
     return(eores_OK);
 }
 
@@ -378,6 +416,11 @@ static eOresult_t s_eo_appTheCanBrdsMng_StartBoard(EOappTheCanBrdsMng *p, eo_ems
         }break; 
 
         case eobrd_mais:
+        {
+            res = eores_OK;; //nothing to do
+        }break; 
+
+        case eobrd_strain:
         {
             res = eores_OK;; //nothing to do
         }break; 

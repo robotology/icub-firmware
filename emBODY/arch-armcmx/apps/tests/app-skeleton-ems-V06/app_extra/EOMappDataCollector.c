@@ -57,6 +57,10 @@
 #include "EOappTheNVmapRef.h" //==> included to clear skin array
 
 
+#ifdef _USE_PROTO_TEST_
+#include "proto_test.h"
+#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -443,11 +447,25 @@ static void s_eom_appDataCollector_GetAndProcessEthPkt(EOMappDataCollector *p)
     eOabstime_t txtime;
     eOresult_t res;
     
+    #ifdef _USE_PROTO_TEST_
+    uint8_t *payload;
+    uint16_t size;
+    #endif
+    
     /* process received eth packet*/
     res = eo_ethBaseModule_GetPacket(p->cfg.eth_mod, &pkt_ptr);
     if(eores_OK == res)
     {
+        #ifdef _USE_PROTO_TEST_
+        res = eo_packet_Payload_Get(pkt_ptr, &payload, &size);
+        if(eores_OK != res)
+        {
+            return;
+        }
+        proto_test_parse(payload);
+        #else
         eo_transceiver_Receive(eo_boardtransceiver_GetHandle(), pkt_ptr, &numberofrops, &txtime);
+        #endif
     }
 
 }

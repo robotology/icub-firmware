@@ -453,6 +453,11 @@
               <FileType>1</FileType>
               <FilePath>..\app_extra\EOappTheCanBoardsManager.c</FilePath>
             </File>
+            <File>
+              <FileName>proto_test.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_extra\proto_test.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -915,6 +920,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\cfg-eps-ebx\eOcfg_EPs_eb4.c</FilePath>
             </File>
+            <File>
+              <FileName>eOcfg_EPs_eb6.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\cfg-eps-ebx\eOcfg_EPs_eb6.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -989,6 +999,21 @@
               <FileName>eOcfg_nvsEP_mc_any_con_mxxdefault.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_mxxdefault.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-nvs-cfg-mc-upperleg</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_upperleg_usr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_upperleg_usr.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_upperleg_con.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_upperleg_con.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1099,6 +1124,11 @@
               <FileName>eOcfg_emsCanNetworkTopology_eb4.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\cfg\icub-can-net\eOcfg_emsCanNetworkTopology_eb4.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_emsCanNetworkTopology_eb6.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\icub-can-net\eOcfg_emsCanNetworkTopology_eb6.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1569,7 +1599,7 @@
             <uThumb>0</uThumb>
             <VariousControls>
               <MiscControls>--c99 --forceinline</MiscControls>
-              <Define>STM32F10X_CL HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO _FORCE_NETWORK_FROM_IPAL_CFG SKIN_IS_CONNECTED</Define>
+              <Define>STM32F10X_CL HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO _FORCE_NETWORK_FROM_IPAL_CFG _USE_PROTO_TEST_ EP_EB6</Define>
               <Undefine></Undefine>
               <IncludePath>.;..\app_basic;..\app_extra;..\cfg\abslayer;..\cfg\icub-can-proto;..\cfg\icub-can-net;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\sys\mid\inc;..\..\..\..\..\porting;..\..\..\..\body\embobj\embobj\embobj-src;..\..\..\..\body\embobj\embobj\embobj-api;..\..\..\..\body\embobj\embobj\embobj-icub\icub\api;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\cfg-eps-ebx;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-analogsensors\api;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-analogsensors\src;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-management\api;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-management\src;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-skin\api;..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\body\embenv\envcom</IncludePath>
             </VariousControls>
@@ -1675,6 +1705,11 @@
               <FileName>EOappTheCanBoardsManager.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_extra\EOappTheCanBoardsManager.c</FilePath>
+            </File>
+            <File>
+              <FileName>proto_test.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_extra\proto_test.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2158,6 +2193,50 @@
               <FileName>eOcfg_EPs_eb4.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\cfg-eps-ebx\eOcfg_EPs_eb4.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>eOcfg_EPs_eb6.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\cfg-eps-ebx\eOcfg_EPs_eb6.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2233,6 +2312,21 @@
               <FileName>eOcfg_nvsEP_mc_any_con_mxxdefault.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_mxxdefault.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-nvs-cfg-mc-upperleg</GroupName>
+          <Files>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_upperleg_usr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_upperleg_usr.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_nvsEP_mc_upperleg_con.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_upperleg_con.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2336,11 +2430,89 @@
               <FileName>eOcfg_nvsEP_mc_lowerarm_usr.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_lowerarm_usr.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
             <File>
               <FileName>eOcfg_nvsEP_mc_lowerarm_con.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_lowerarm_con.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
           </Files>
         </Group>
@@ -2460,6 +2632,50 @@
               <FileName>eOcfg_emsCanNetworkTopology_eb4.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\cfg\icub-can-net\eOcfg_emsCanNetworkTopology_eb4.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>eOcfg_emsCanNetworkTopology_eb6.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\icub-can-net\eOcfg_emsCanNetworkTopology_eb6.c</FilePath>
             </File>
           </Files>
         </Group>

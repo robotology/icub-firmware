@@ -70,6 +70,9 @@
 #include "EOMappDatatransmitter.h"
 #include "EOMappMotorController.h"
 
+#ifdef _USE_PROTO_TEST_
+#include "proto_test.h"
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -529,11 +532,25 @@ static void s_eom_appTheSysController_recDgram_mng(EOMappTheSysController *p)
     uint16_t numberofrops;
     eOabstime_t txtime;
     eOresult_t res;
-
+    
+    #ifdef _USE_PROTO_TEST_
+    uint8_t *payload;
+    uint16_t size;
+    #endif
+    
     res = eo_ethBaseModule_GetPacket(p->srv.ethMod_ptr, &pkt_ptr);
     if(eores_OK == res)
     {
+        #ifdef _USE_PROTO_TEST_
+        res = eo_packet_Payload_Get(pkt_ptr, &payload, &size);
+        if(eores_OK != res)
+        {
+            return;
+        }
+        proto_test_parse(payload);
+        #else
         eo_transceiver_Receive(p->srv.transceiver, pkt_ptr, &numberofrops, &txtime);
+        #endif
     }
 
 }

@@ -236,6 +236,12 @@ static void s_eom_appMotorController_taskStartup(EOMtask *tsk, uint32_t t)
 
     // ALE
     eo_emsController_Init(1, EMS_GENERIC);
+
+    eo_emsController_SetLimits(0, -100000, 100000, 2048);
+    eo_emsController_SetPosPid(0, 100.0f, 20.0f, 0.001f);
+    eo_emsController_SetPosPidLimits(0, 8000.0f, 750.0f);
+
+    eo_emsController_SetControlMode(0, CM_IDLE);
 }
 
 
@@ -244,7 +250,10 @@ static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
 {
     int16_t *pwm;
     eOevent_t evt;
-    uint32_t encoders_values[6];
+
+    uint32_t encoder_raw[6];
+    
+    uint8_t parity_error = 0;
 
     EOMappMotorController *p = (EOMappMotorController*)eom_task_GetExternalData(tsk);
 
@@ -253,18 +262,40 @@ static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
     if(EVT_CHECK(evt, EVT_CALC_START))
     {
     // ALE
-        /* 1) get encoders' value */
-        eo_appEncReader_getValues(p->cfg.encReader, encoders_values);
-//        eo_emsController_ReadEncoder(0, (encoders_values[0]>>6)&0x0FFF);
+  
+        if (eo_appEncReader_isReady(p->cfg.encReader))
+        {     
+            eo_appEncReader_getValues(p->cfg.encReader, encoder_raw);
+        }
+
+        for (uint8_t b=0; b<18; ++b)
+        {
+            parity_error ^= (encoder_raw[3]>>b) & 1;
+        }
+
+        uint8_t bit_check = encoder_raw[3] & 0x3E;
+
+        if (parity_error || bit_check!=0x20)
+        {
+            eo_emsController_SkipEncoders();
+        }
+        else
+        {
+            encoder_raw[3]>>=6;
+            encoder_raw[3]&=0x0FFF;
+
+            eo_emsController_ReadEncoders((int32_t*)encoder_raw+3);
+        }
         
         /* 2) pid calc */
         pwm = eo_emsController_PWM();
 
-        pwm_out = (int16_t)pwm[0];
-
+        pwm_out = -pwm[0];
+        
+#ifndef _USE_PROTO_TEST_
         /* 4) prepare and punt in rx queue new setpoint */
         s_eom_appMotorController_SetCurrentsetpoint(p, pwm, 0);
-        
+#endif        
         /* 3) reset my state */
         p->st = eOm_appMotorController_st__active;
 

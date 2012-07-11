@@ -56,8 +56,11 @@
 //#include "EOappTheNVmapRef.h"
 //
 //endpoints-cfg
+#if     defined(EP_EB4) 
 #include "eOcfg_EPs_eb4.h"
-
+#elif   defined(EP_EB6) //left lower arm
+    #include "eOcfg_EPs_eb6.h"
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -152,16 +155,47 @@ extern void eom_appSkeletonEms_body_application_init(void)
     hal_timer_init(hal_timer5, &t5_cfg, NULL);
     hal_timer_start(hal_timer5);
 
+//     EOMappTheSysController_cfg_t cfg =
+//     {
+//         EO_INIT(.ethmod_cfg_ptr)                ethmod_cfg_ptr,
+//         EO_INIT(.connectedEncodersMask_cfg)     connectedEncodersMask_cfg,
+//         EO_INIT(.vectorof_endpoint_cfg)         eo_cfg_EPs_vectorof_eb4,
+//         EO_INIT(.hashfunction_ep2index)         eo_cfg_nvsEP_eb4_fptr_hashfunction_ep2index,
+//         EO_INIT(.mc_endpoint)                   mc_endpoint,       
+//         EO_INIT(.as_endpoint)                   as_endpoint, 
+//         EO_INIT(.sk_endpoint)                   sk_endpoint 
+//     };
+    
+    
+#if     defined(EP_EB4)     //right lower arm
     EOMappTheSysController_cfg_t cfg =
     {
         EO_INIT(.ethmod_cfg_ptr)                ethmod_cfg_ptr,
         EO_INIT(.connectedEncodersMask_cfg)     connectedEncodersMask_cfg,
         EO_INIT(.vectorof_endpoint_cfg)         eo_cfg_EPs_vectorof_eb4,
         EO_INIT(.hashfunction_ep2index)         eo_cfg_nvsEP_eb4_fptr_hashfunction_ep2index,
-        EO_INIT(.mc_endpoint)                   mc_endpoint,       
-        EO_INIT(.as_endpoint)                   as_endpoint, 
-        EO_INIT(.sk_endpoint)                   sk_endpoint 
+        EO_INIT(.mc_endpoint)                   endpoint_mc_rightlowerarm,       
+        EO_INIT(.as_endpoint)                   endpoint_as_rightlowerarm, 
+        EO_INIT(.sk_endpoint)                   endpoint_sk_emsboard_rightlowerarm 
     };
+#error ckeck to define SKIN_IS_CONNECTED in project
+
+#elif   defined(EP_EB6) //left lower arm
+    
+    EOMappTheSysController_cfg_t cfg =
+    {
+        EO_INIT(.ethmod_cfg_ptr)                ethmod_cfg_ptr,
+        EO_INIT(.connectedEncodersMask_cfg)     connectedEncodersMask_cfg,
+        EO_INIT(.vectorof_endpoint_cfg)         eo_cfg_EPs_vectorof_eb6,
+        EO_INIT(.hashfunction_ep2index)         eo_cfg_nvsEP_eb6_fptr_hashfunction_ep2index,
+        EO_INIT(.mc_endpoint)                   endpoint_mc_leftupperleg,      
+        EO_INIT(.as_endpoint)                   endpoint_as_leftupperleg, 
+        EO_INIT(.sk_endpoint)                   0 
+    };
+//#error ckeck to undef SKIN_IS_CONNECTED from project
+#else
+        #error choose endpoint!!!
+#endif
 
     eom_appTheSysController_Initialise(&cfg);
 }
