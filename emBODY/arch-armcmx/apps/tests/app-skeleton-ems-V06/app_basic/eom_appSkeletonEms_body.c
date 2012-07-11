@@ -180,7 +180,7 @@ extern void eom_appSkeletonEms_body_application_init(void)
     };
 #error ckeck to define SKIN_IS_CONNECTED in project
 
-#elif   defined(EP_EB6) //left lower arm
+#elif   defined(EP_EB6) //left upper leg
     
     EOMappTheSysController_cfg_t cfg =
     {

@@ -391,7 +391,7 @@ extern eOresult_t eo_appCanSP_SendMessage_TEST(EOappCanSP *p, eo_appCanSP_canLoc
     }
 
     //form can frame
-    canFrame.id = 2;
+    canFrame.id = 10;
     canFrame.id_type = 0; //standard id
     canFrame.frame_type = 0; //data frame
     canFrame.size = 8;

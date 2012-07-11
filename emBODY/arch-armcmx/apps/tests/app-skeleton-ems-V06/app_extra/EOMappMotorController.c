@@ -45,6 +45,7 @@
 
 // application
 #include "EOMappDataTransmitter.h"
+#include "EOappEncodersReader.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -253,9 +254,9 @@ static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
     eOresult_t res = eores_NOK_generic;
     uint32_t encvalue;
 
-//     uint32_t encoder_raw[6];
-//     
-//     uint8_t parity_error = 0;
+     uint32_t encoder_raw[6];
+     
+     uint8_t parity_error = 0;
 
     EOMappMotorController *p = (EOMappMotorController*)eom_task_GetExternalData(tsk);
 
@@ -278,36 +279,36 @@ static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
             eo_emsController_ReadEncoders((int32_t*)&encvalue);
         }
         
-//     // ALE
-//   
+     // ALE
+   
 //         if (eo_appEncReader_isReady(p->cfg.encReader))
 //         {     
-//             eo_appEncReader_getValues(p->cfg.encReader, encoder_raw);
+//             eo_appEncReader_getValuesRaw(p->cfg.encReader, encoder_raw);
 //         }
-
+//
 //         for (uint8_t b=0; b<18; ++b)
 //         {
-//             parity_error ^= (encoder_raw[3]>>b) & 1;
+//             parity_error ^= (encoder_raw[1]>>b) & 1;
 //         }
-
-//         uint8_t bit_check = encoder_raw[3] & 0x3E;
-
+//
+//         uint8_t bit_check = encoder_raw[1] & 0x38;
+//
 //         if (parity_error || bit_check!=0x20)
 //         {
 //             eo_emsController_SkipEncoders();
 //         }
 //         else
 //         {
-//             encoder_raw[3]>>=6;
-//             encoder_raw[3]&=0x0FFF;
-
-//             eo_emsController_ReadEncoders((int32_t*)encoder_raw+3);
+//             encoder_raw[1]>>=6;
+//             encoder_raw[1]&=0x0FFF;
+//
+//             eo_emsController_ReadEncoders((int32_t*)encoder_raw+1);
 //         }
         
         /* 2) pid calc */
         pwm = eo_emsController_PWM();
 
-        pwm_out = pwm[0];
+        pwm_out = -pwm[0];
         
 #ifndef _USE_PROTO_TEST_
         /* 4) prepare and punt in rx queue new setpoint */
@@ -347,7 +348,7 @@ static eOresult_t s_eom_appMotorController_SetCurrentsetpoint(EOMappMotorControl
     
     /*Since in run mode the frame are sent on demnad...here i can punt in tx queue frame to send.
     they will be sent by transmitter */
-    res = eo_appCanSP_SendCmd2Joint(p->cfg.appCanSP_ptr, 0/*jid*/, msgCmd, (void*)&mySetPoint_current);
+    res = eo_appCanSP_SendCmd2Joint(p->cfg.appCanSP_ptr, 3/*jid*/, msgCmd, (void*)&mySetPoint_current);
     return(res);
 }
 // --------------------------------------------------------------------------------------------------------------------

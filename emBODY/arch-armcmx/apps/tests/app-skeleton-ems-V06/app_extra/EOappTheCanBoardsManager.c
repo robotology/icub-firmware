@@ -355,8 +355,7 @@ static eOresult_t s_eo_appTheCanBrdsMng_Config1FOC(EOappTheCanBrdsMng *p, eo_ems
     canLoc.emscanport = board_ptr->emscanport;
     canLoc.canaddr = board_ptr->canaddr;
 
-
-#warning VALE --> i2t params sono a caso!!!!
+    /* use default i2t value in 2FOC firmware
 
     // 1) set i2t params
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_I2T_PARAMS;
@@ -366,7 +365,8 @@ static eOresult_t s_eo_appTheCanBrdsMng_Config1FOC(EOappTheCanBrdsMng *p, eo_ems
         return(res);
     }
 
-    
+    */    
+
     //2) set disable control loop
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_IDLE;
     res = eo_appCanSP_SendCmd(p->cfg.appCanSP_ptr, &canLoc, msgCmd, NULL);
@@ -374,8 +374,6 @@ static eOresult_t s_eo_appTheCanBrdsMng_Config1FOC(EOappTheCanBrdsMng *p, eo_ems
     {
         return(res);
     }
-        
-
 
 #ifdef _USE_PROTO_TEST_
     return(eo_appCanSP_ConfigMotor(p->cfg.appCanSP_ptr, 3, &cfg));

@@ -147,7 +147,7 @@ extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p)
     return(eores_OK);
 }
 
-extern eOresult_t  eo_appEncReader_GetValuesRaw(EOappEncReader *p, uint32_t *data_ptr)
+extern eOresult_t  eo_appEncReader_getValuesRaw(EOappEncReader *p, uint32_t *data_ptr)
 {
 //    hal_encoder_t i;
 
