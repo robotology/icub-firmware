@@ -141,23 +141,32 @@ extern eOresult_t eo_appEncReader_startRead(EOappEncReader *p)
 
 extern eOresult_t  eo_appEncReader_getValues(EOappEncReader *p, uint32_t *data_ptr)
 {
-    hal_encoder_t i;
+//    hal_encoder_t i;
 
     if((NULL == p) || (NULL == data_ptr))
     {
         return(eores_NOK_nullpointer);
     }
 
+    hal_encoder_get_value(hal_encoder1, &data_ptr[0]);
+    hal_encoder_get_value(hal_encoder2, &data_ptr[2]);
+    hal_encoder_get_value(hal_encoder3, &data_ptr[4]);
 
-    for(i = hal_encoder1; i <= hal_encoder3; i++)
-    {
-        hal_encoder_get_value(i, &data_ptr[i]);
-    }
+    hal_encoder_get_value(hal_encoder7, &data_ptr[1]);
+    hal_encoder_get_value(hal_encoder8, &data_ptr[3]);
+    hal_encoder_get_value(hal_encoder9, &data_ptr[5]);
 
-    for(i = hal_encoder7; i <= hal_encoder9; i++)
-    {
-        hal_encoder_get_value(i, &data_ptr[i-3]);
-    }
+    
+    
+//     for(i = hal_encoder1; i <= hal_encoder3; i++)
+//     {
+//         hal_encoder_get_value(i, &data_ptr[i]);
+//     }
+
+//     for(i = hal_encoder7; i <= hal_encoder9; i++)
+//     {
+//         hal_encoder_get_value(i, &data_ptr[i-3]);
+//     }
 
     return(eores_OK);
 }
