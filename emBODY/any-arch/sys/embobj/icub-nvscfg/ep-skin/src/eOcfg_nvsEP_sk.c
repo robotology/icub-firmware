@@ -158,18 +158,15 @@ __weak extern void eo_cfg_nvsEP_sk_hid_UPDT_sconfig__sigmode(uint16_t n, const E
     ep = ep;
 }
 
-#ifdef OVERRIDE_eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe
 __weak extern void eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {   // n is always 0
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
     
-    eterter;
-
     theOwnershipIsLocal = theOwnershipIsLocal;
     ep = ep;
 }
-#endif
+
 
 
 
