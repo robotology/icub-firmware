@@ -143,6 +143,11 @@ typedef enum
     eomc_calibration_type4_abs_and_incremental      = 4
 } eOmc_calibration_type_t;
 
+EO_VERIFYproposition(isCalibrationTypeCompatiblewithicubcanproto, (eomc_calibration_type0_hard_stops == 0));
+EO_VERIFYproposition(isCalibrationTypeCompatiblewithicubcanproto, (eomc_calibration_type1_abs_sens_analog == 1));
+EO_VERIFYproposition(isCalibrationTypeCompatiblewithicubcanproto, (eomc_calibration_type2_hard_stops_diff == 2));
+EO_VERIFYproposition(isCalibrationTypeCompatiblewithicubcanproto, (eomc_calibration_type3_abs_sens_digital == 3));
+EO_VERIFYproposition(isCalibrationTypeCompatiblewithicubcanproto, (eomc_calibration_type4_abs_and_incremental == 4));
 
 
 // -- all the possible data service structures
@@ -619,6 +624,22 @@ typedef struct                  // size is 8+8+8+0 = 24
     eOmc_controller_commands_t  ccmmnds;                    /**< controller commands  */
 } eOmc_controller_t;            EO_VERIFYsizeof(eOmc_controller_t, 24); 
 
+
+
+
+typedef struct
+{
+    uint16_t tresh; /**< Current threshold  */
+    uint16_t time;  /**< Filter time parameter  */
+} eOmc_i2tParams_t;
+
+typedef struct
+{
+    uint8_t estimShiftJointVel;
+    uint8_t estimShiftJointAcc;
+    uint8_t estimShiftMotorVel;
+    uint8_t estimShiftMotorAcc;
+} eOmc_estimShift_t;
 
  
 // some considerations by acemor.
