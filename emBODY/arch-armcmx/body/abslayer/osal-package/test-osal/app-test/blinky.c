@@ -337,7 +337,7 @@ void mytask(void *p)
 
     p = p;
 
-    res = osal_semaphore_increment(sem);
+    res = osal_semaphore_increment(sem, osal_callerTSK);
 
     aa[0] = aa[0];
 

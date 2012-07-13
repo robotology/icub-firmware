@@ -97,11 +97,12 @@ extern osal_result_t osal_semaphore_decrement(osal_semaphore_t *sem, osal_reltim
                 at creation time with @e osal_semaphore_new().
                 The osal_semaphore_increment() function can be used by a task to un-block another task
                 which is waiting to decrement the same semaphore.
-    @param      sem             The sempahore
+    @param      sem             The semaphore
+    @param      caller          The caller of the function
     @return     A value of osal_res_OK upon successful increment, of osal_res_NOK_generic if internal tokens have already
                 reached the maximum number, of osal_res_NOK_nullpointer upon calls with a NULL semaphore.
 **/
-extern osal_result_t osal_semaphore_increment(osal_semaphore_t *sem);
+extern osal_result_t osal_semaphore_increment(osal_semaphore_t *sem, osal_caller_t caller);
 
 
 /* @}            

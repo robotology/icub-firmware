@@ -737,7 +737,7 @@ extern osal_result_t osal_messagequeue_get(osal_messagequeue_t *mq, osal_message
             *pmsg = (osal_message_t)p;
         }        
     }
-    else if(osal_callerISR == caller)
+    else // we allow to call is also insied the timer manager ..... if(osal_callerISR == caller)
     {
         // RTOScall-rtx:    OS_RESULT isr_mbx_receive(OS_ID mailbox, void**msg),
         //                  where:  OS_RESULT is U32 w/ values 
@@ -783,7 +783,7 @@ extern osal_message_t osal_messagequeue_getquick(osal_messagequeue_t *mq, osal_r
         osiit_mbx_wait(mq, &p, s_osal_timeout2tick(tout));
 
     }
-    else if(osal_callerISR == caller)
+    else // we allow the caller to be also the timer manager .... if(osal_callerISR == caller)
     {
         // RTOScall-rtx:    OS_RESULT isr_mbx_receive(OS_ID mailbox, void**msg),
         //                  where:  OS_RESULT is U32 w/ values 
@@ -841,7 +841,7 @@ extern osal_result_t osal_messagequeue_put(osal_messagequeue_t *mq, osal_message
             res = osal_res_OK;
         }
     }
-    else if(osal_callerISR == caller)
+    else // we allw the caller to be also the timer manager .... if(osal_callerISR == caller)
     {
         // RTOScall-rtx:    void isr_mbx_send(OS_ID mailbox, void*msg)
         // RTOScall-rtx:    OS_RESULT isr_mbx_check(OS_ID mailbox, void*msg) returns number of msg that can be added
@@ -872,7 +872,7 @@ extern osal_result_t osal_eventflag_set(osal_eventflag_t flag, osal_task_t * tot
         // RTOScall-rtx:    extern void osiit_evt_set(U32 wait_flags, OS_TID taskid), where: OS_TID is uint32_t
         osiit_evt_set(flag, totask->rtosid);       
     }
-    else if(osal_callerISR == caller)
+    else // allow also teh trm manager .... if(osal_callerISR == caller)
     {
         // RTOScall-rtx:    extern void osiit_isr_evt_set(U32 event_flags, OS_TID task_id), where: OS_TID is uint32_t
         osiit_isr_evt_set(flag, totask->rtosid);
@@ -1099,7 +1099,7 @@ extern osal_result_t osal_semaphore_decrement(osal_semaphore_t *sem, osal_reltim
     return(res);
 }
 
-extern osal_result_t osal_semaphore_increment(osal_semaphore_t *sem)
+extern osal_result_t osal_semaphore_increment(osal_semaphore_t *sem, osal_caller_t caller)
 {
     U32 r;
     
@@ -1107,9 +1107,17 @@ extern osal_result_t osal_semaphore_increment(osal_semaphore_t *sem)
     {
         return(osal_res_NOK_nullpointer); 
     }
-
-    // RTOScall-rtx:    OS_RESULT os_sem_send(OS_ID semaphore) returns: OS_R_OK if it can increment
-    r = osiit_sem_send(sem);
+    
+    if(osal_callerTSK == caller)
+    {
+        // RTOScall-rtx:    OS_RESULT os_sem_send(OS_ID semaphore) returns: OS_R_OK if it can increment
+        r = osiit_sem_send(sem);
+    }
+    else
+    {
+        isr_sem_send(sem);
+        r = OS_R_OK;
+    }
   
     return((OS_R_OK == r) ? (osal_res_OK) : (osal_res_NOK_generic));
 }
