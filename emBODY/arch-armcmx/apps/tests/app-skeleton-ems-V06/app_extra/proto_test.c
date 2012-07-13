@@ -100,8 +100,8 @@ extern eOresult_t proto_test_parse(uint8_t *payload)
 
         case MC_STOP:
         {   
-            eo_emsController_SetControlMode(0, CM_IDLE);
-            eo_emsController_ResetPosPid(0);
+            eo_emsController_SetControlMode(3, CM_IDLE);
+            eo_emsController_ResetPosPid(3);
                
 //            pwm_out = 0; non l'ho aggiunta!!!   
         }

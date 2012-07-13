@@ -471,6 +471,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
 {
     eOresult_t                          res;
     eo_appCanSP_canLocation             canLoc;
+    eObrd_types_t                       boardType;
     eOmc_setpoint_t                     *setPoint = (eOmc_setpoint_t*)nv->loc;
     void                                *val_ptr = NULL;
     eo_icubCanProto_msgCommand_t        msgCmd = 
@@ -481,8 +482,13 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
 
     EOappCanSP *appCanSP_ptr = (EOappCanSP*)eom_appTheSysController_Services_Can_GetHandle(eom_appTheSysController_GetHandle());
 
-    res = eo_appCanSP_GetJointCanLocation(appCanSP_ptr, jxx, &canLoc, NULL);
+    res = eo_appCanSP_GetJointCanLocation(appCanSP_ptr, jxx, &canLoc, &boardType);
     if(eores_OK != res)
+    {
+        return;
+    }
+
+    if(eobrd_1foc == boardType)
     {
         return;
     }

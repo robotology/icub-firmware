@@ -102,7 +102,6 @@ static eOresult_t s_eom_appMotorController_SetCurrentsetpoint(EOMappMotorControl
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 static const char s_eobj_ownname[] = "EOMappMotorController";
-static uint32_t pidVal[100];
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -236,13 +235,14 @@ static void s_eom_appMotorController_taskStartup(EOMtask *tsk, uint32_t t)
     eo_errman_Assert(eo_errman_GetHandle(), NULL != p, s_eobj_ownname, "extdata() is NULL");
 
     // ALE
-    eo_emsController_Init(1, EMS_GENERIC);
+    eo_emsController_Init(EMS_GENERIC);
+    eo_emsController_AddAxis(3);
 
-    eo_emsController_SetLimits(0, -100000, 100000, 2048);
-    eo_emsController_SetPosPid(0, 100.0f, 20.0f, 0.001f);
-    eo_emsController_SetPosPidLimits(0, 8000.0f, 750.0f);
+    eo_emsController_SetLimits(3, -100000, 100000, 2048);
+    eo_emsController_SetPosPid(3, 100.0f, 20.0f, 0.001f);
+    eo_emsController_SetPosPidLimits(3, 8000.0f, 750.0f);
 
-    eo_emsController_SetControlMode(0, CM_IDLE);
+    eo_emsController_SetControlMode(3, CM_IDLE);
 }
 
 
@@ -252,11 +252,7 @@ static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
     int16_t *pwm;
     eOevent_t evt;
     eOresult_t res = eores_NOK_generic;
-    uint32_t encvalue;
-
-     uint32_t encoder_raw[6];
-     
-     uint8_t parity_error = 0;
+    uint32_t encvalue[6];
 
     EOMappMotorController *p = (EOMappMotorController*)eom_task_GetExternalData(tsk);
 
@@ -264,10 +260,9 @@ static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
 
     if(EVT_CHECK(evt, EVT_CALC_START))
     {
-
         if (eo_appEncReader_isReady(p->cfg.encReader))
         {     
-            res = eo_appEncReader_GetValue(p->cfg.encReader, eOeOappEncReader_encoder3, &encvalue);
+            res = eo_appEncReader_GetValue(p->cfg.encReader, eOeOappEncReader_encoder3, &encvalue[3]);
         }
 
         if(eores_OK != res)
@@ -279,36 +274,10 @@ static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
             eo_emsController_ReadEncoders((int32_t*)&encvalue);
         }
         
-     // ALE
-   
-//         if (eo_appEncReader_isReady(p->cfg.encReader))
-//         {     
-//             eo_appEncReader_getValuesRaw(p->cfg.encReader, encoder_raw);
-//         }
-//
-//         for (uint8_t b=0; b<18; ++b)
-//         {
-//             parity_error ^= (encoder_raw[1]>>b) & 1;
-//         }
-//
-//         uint8_t bit_check = encoder_raw[1] & 0x38;
-//
-//         if (parity_error || bit_check!=0x20)
-//         {
-//             eo_emsController_SkipEncoders();
-//         }
-//         else
-//         {
-//             encoder_raw[1]>>=6;
-//             encoder_raw[1]&=0x0FFF;
-//
-//             eo_emsController_ReadEncoders((int32_t*)encoder_raw+1);
-//         }
-        
         /* 2) pid calc */
         pwm = eo_emsController_PWM();
 
-        pwm_out = -pwm[0];
+        pwm_out = pwm[3];
         
 #ifndef _USE_PROTO_TEST_
         /* 4) prepare and punt in rx queue new setpoint */
