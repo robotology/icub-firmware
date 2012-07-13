@@ -921,7 +921,7 @@ static void s_eom_ipnet_OnReceptionDatagram(void *arg, ipal_udpsocket_t *skt, ip
     if(eobool_true == dtgskt->socket->block2wait4packet)
     {
         // unblock the reception
-        osal_semaphore_increment(dtgskt->socket->blkgethandle);
+        osal_semaphore_increment(dtgskt->socket->blkgethandle, osal_callerTSK);
     }
 
   
@@ -959,7 +959,7 @@ static void s_eom_ipnet_process_command(void)
                     s_eom_theipnet.cmd.repeatcmd = 0;
                     s_eom_theipnet.cmd.tout = 0;
                     // release the caller
-                    osal_semaphore_increment(s_eom_theipnet.cmd.semaphore);
+                    osal_semaphore_increment(s_eom_theipnet.cmd.semaphore, osal_callerTSK);
                 }
                 else if(0 != s_eom_theipnet.cmd.tout)
                 {
@@ -983,7 +983,7 @@ static void s_eom_ipnet_process_command(void)
             s_eom_ipnet_attach_proc_dtgsocket((EOsocketDatagram*)sdrv);
 
             // increment the semaphore to allow execution of the caller
-            osal_semaphore_increment(s_eom_theipnet.cmd.semaphore); 
+            osal_semaphore_increment(s_eom_theipnet.cmd.semaphore, osal_callerTSK); 
 
         } break;
 
@@ -1015,7 +1015,7 @@ static void s_eom_ipnet_process_command(void)
 
 
             // increment the semaphore to allow execution of the caller
-            osal_semaphore_increment(s_eom_theipnet.cmd.semaphore); 
+            osal_semaphore_increment(s_eom_theipnet.cmd.semaphore, osal_callerTSK); 
                               
         } break;
 
@@ -1060,7 +1060,7 @@ static void s_eom_ipnet_repeat_command(void)
                         s_eom_theipnet.cmd.tout = 0;
                     }
                     // release the caller
-                    osal_semaphore_increment(s_eom_theipnet.cmd.semaphore);
+                    osal_semaphore_increment(s_eom_theipnet.cmd.semaphore, osal_callerTSK);
                 }
 
             }
@@ -1080,7 +1080,7 @@ static void s_eom_ipnet_repeat_command(void)
                     s_eom_theipnet.cmd.tout = 0;
                 }
                 // release the caller
-                osal_semaphore_increment(s_eom_theipnet.cmd.semaphore);                
+                osal_semaphore_increment(s_eom_theipnet.cmd.semaphore, osal_callerTSK);                
             } 
  
         } break;
