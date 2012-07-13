@@ -42,7 +42,7 @@ extern "C" {
 struct EOaxisController_hid 
 {
     EOpid *pidP;
-    EOpid *pidC;
+    //EOpid *pidC;
     EOpid *pidT;
 
     EOspeedmeter *speedmeter;
