@@ -316,7 +316,7 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
                                           "ipnet.tick");
 #else
     // and task which ticks the timers. it is an event based task with timeout. 
-    // this solution is not really periodic, but it can be good enough because we just need to increment some delays for tcp/ip retransmission.
+    // this solution is  not really periodic, but it can be good enough because we just need to increment some delays for tcp/ip retransmission.
     // we use this solution in the particular case of the object EOMtheEMSrunner with hw timer (but not with osaltimer) to avoid the ipnettick to delay start of rx task
     s_eom_theipnet.tsktick = eom_task_New(eom_mtask_EventDriven, ipnetcfg->tickpriority, ipnetcfg->tickstacksize,
                                           NULL, s_eom_ipnet_tsktick_forever,
@@ -391,6 +391,15 @@ extern eOresult_t eom_ipnet_IGMPgroupLeave(EOMtheIPnet *ip, eOipv4addr_t igmp)
     }
 
     return(eov_ipnet_IGMPgroupLeave(ip->ipnet, igmp));
+}
+
+extern EOMtask* eom_ipnet_GetTask(EOMtheIPnet *ip, eOmipnet_taskid_t tskid)
+{
+    if(NULL == ip)
+    {
+        return(NULL);
+    }
+    return((eomipnet_task_proc == tskid) ? (ip->tskproc) : (ip->tsktick));
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -912,7 +921,7 @@ static void s_eom_ipnet_OnReceptionDatagram(void *arg, ipal_udpsocket_t *skt, ip
     if(eobool_true == dtgskt->socket->block2wait4packet)
     {
         // unblock the reception
-        osal_semaphore_increment(dtgskt->socket->blkgethandle);
+        osal_semaphore_increment(dtgskt->socket->blkgethandle, osal_callerTSK);
     }
 
   
@@ -950,7 +959,7 @@ static void s_eom_ipnet_process_command(void)
                     s_eom_theipnet.cmd.repeatcmd = 0;
                     s_eom_theipnet.cmd.tout = 0;
                     // release the caller
-                    osal_semaphore_increment(s_eom_theipnet.cmd.semaphore);
+                    osal_semaphore_increment(s_eom_theipnet.cmd.semaphore, osal_callerTSK);
                 }
                 else if(0 != s_eom_theipnet.cmd.tout)
                 {
@@ -974,7 +983,7 @@ static void s_eom_ipnet_process_command(void)
             s_eom_ipnet_attach_proc_dtgsocket((EOsocketDatagram*)sdrv);
 
             // increment the semaphore to allow execution of the caller
-            osal_semaphore_increment(s_eom_theipnet.cmd.semaphore); 
+            osal_semaphore_increment(s_eom_theipnet.cmd.semaphore, osal_callerTSK); 
 
         } break;
 
@@ -1006,7 +1015,7 @@ static void s_eom_ipnet_process_command(void)
 
 
             // increment the semaphore to allow execution of the caller
-            osal_semaphore_increment(s_eom_theipnet.cmd.semaphore); 
+            osal_semaphore_increment(s_eom_theipnet.cmd.semaphore, osal_callerTSK); 
                               
         } break;
 
@@ -1051,7 +1060,7 @@ static void s_eom_ipnet_repeat_command(void)
                         s_eom_theipnet.cmd.tout = 0;
                     }
                     // release the caller
-                    osal_semaphore_increment(s_eom_theipnet.cmd.semaphore);
+                    osal_semaphore_increment(s_eom_theipnet.cmd.semaphore, osal_callerTSK);
                 }
 
             }
@@ -1071,7 +1080,7 @@ static void s_eom_ipnet_repeat_command(void)
                     s_eom_theipnet.cmd.tout = 0;
                 }
                 // release the caller
-                osal_semaphore_increment(s_eom_theipnet.cmd.semaphore);                
+                osal_semaphore_increment(s_eom_theipnet.cmd.semaphore, osal_callerTSK);                
             } 
  
         } break;

@@ -43,6 +43,7 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
+#include "EOMtask.h"
 
 #include "ipal.h"
 
@@ -61,6 +62,15 @@ extern "C" {
                 object only with the proper public functions. 
  **/  
 typedef struct EOMtheIPnet_hid EOMtheIPnet;
+
+/**	@typedef    typedef enum eOmipnet_taskid_t 
+ 	@brief      Contains the identifiers of the tasks inside the EOMtheIPnet. 
+ **/ 
+typedef enum
+{
+    eomipnet_task_proc      = 0,            /**< it is the task which performs efefctive processing of teh ipal calls. it send and receives packets */ 
+    eomipnet_task_tick      = 1             /**< it is teh task which periodically increment timeouts of TCP/IP stack */
+} eOmipnet_taskid_t;
 
 
 /**	@typedef    typedef struct eOmipnet_cfg_t 
@@ -96,10 +106,18 @@ typedef struct
     eOipv4addr_t    ipmask;
 } eOmipnet_cfg_addr_t;
 
+
+typedef struct
+{
+    eOmipnet_cfg_t          ipnetcfg;
+    const ipal_cfg_t*       ipalcfg; 
+    eOmipnet_cfg_addr_t*    addrcfg;
+    eOmipnet_cfg_dtgskt_t   dtgskcfg;
+} eOmipnet_whole_cfg_t;
    
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eOmipnet_cfg_t eom_ipnet_DefaultCfg; // = {220, 1024, 10000, eobool_true, 219, 128};
+extern const eOmipnet_cfg_t eom_ipnet_DefaultCfg; // = {220, 1024, 20000, eobool_true, 219, 128};
 
 extern const eOmipnet_cfg_dtgskt_t eom_ipnet_dtgskt_DefaultCfg; // = {2, 8};
 
@@ -195,6 +213,7 @@ extern eOresult_t eom_ipnet_IGMPgroupLeave(EOMtheIPnet *ip, eOipv4addr_t igmp);
 
 
 
+extern EOMtask* eom_ipnet_GetTask(EOMtheIPnet *ip, eOmipnet_taskid_t tskid);
 
 
 /** @}            
