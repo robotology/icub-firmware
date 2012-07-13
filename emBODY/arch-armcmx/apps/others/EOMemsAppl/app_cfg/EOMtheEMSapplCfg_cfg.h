@@ -466,7 +466,7 @@ extern "C" {
 
 //  <o> IP listening port <1-65000>
 //  <i> default: 12345
-#define EOMTHEEMSAPPLCFG_SOCKET_LOCALPORT                       54321
+#define EOMTHEEMSAPPLCFG_SOCKET_LOCALPORT                       12345
 
 //  <h> datagrams in socket
 
