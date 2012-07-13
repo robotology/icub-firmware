@@ -358,7 +358,7 @@ extern eOresult_t eom_emsrunner_SetMode(EOMtheEMSrunner *p, eOemsrunner_mode_t m
 
 extern void eom_emsrunner_OnUDPpacketTransmitted(EOMtheEMSrunner *p)
 {
-    osal_semaphore_increment(s_theemsrunner.waitudptxisdone);
+    osal_semaphore_increment(s_theemsrunner.waitudptxisdone, osal_callerTSK);
 }
 
 
