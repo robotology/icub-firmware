@@ -103,7 +103,6 @@ extern void eo_axisController_SetOffset(EOaxisController *o, int16_t offset);
 extern void eo_axisController_GetActivePidStatus(EOaxisController *o, int16_t *pwm, int32_t *err);
 
 extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o);
-extern EOpid* eo_axisController_GetVelPidPtr(EOaxisController *o);
 extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o);
 
 extern void eo_axisController_StartCalibration(EOaxisController *o, int32_t pos, int32_t offset, int32_t timeout_ms, int32_t max_error);

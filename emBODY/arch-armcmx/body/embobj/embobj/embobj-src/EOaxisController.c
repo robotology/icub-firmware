@@ -81,10 +81,10 @@ extern EOaxisController* eo_axisController_New(void)
     if (o)
     {
         o->pidP = eo_pid_New();
-        o->pidC = eo_pid_New();
+        //o->pidC = eo_pid_New();
 
-        eo_pid_SetPid(o->pidC, 20.0f, 0.0f, 0.001f);
-        eo_pid_SetPidLimits(o->pidC, 1000.0f, 600.0f);
+        eo_pid_SetPid(o->pidP, 25.0f, 20.0f, 0.001f);
+        eo_pid_SetPidLimits(o->pidP, 2000.0f, 600.0f);
         
         //o->pidT = eo_pid_New();
         
@@ -100,7 +100,7 @@ extern EOaxisController* eo_axisController_New(void)
         o->acc_stop_alarm = 8192;
 
         o->vel_timer   = 0;
-        o->vel_timeout = EMS_IFREQUENCY*10;
+        o->vel_timeout = EMS_IFREQUENCY;
 
         ///////////////////////////
         
@@ -138,7 +138,7 @@ extern void eo_axisController_StartCalibration(EOaxisController *o, int32_t pos,
     o->is_calibrated = eobool_false;
     o->calib_max_error = max_error;
 
-    eo_trajectory_SetPosReference(o->trajectory, pos, 1024);
+    eo_trajectory_SetPosReference(o->trajectory, pos, 2024);
 }
 
 extern void eo_axisController_SetLimits(EOaxisController *o, int32_t pos_min, int32_t pos_max, int32_t vel_max)
@@ -288,11 +288,8 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, int16_t *p
         case CM_POS_VEL:
         case CM_VELOCITY:
         case CM_POSITION:
-            eo_pid_GetStatus(o->pidP, pwm, err);
-            break;
-
         case CM_CALIB_ABS_POS_SENS:
-            eo_pid_GetStatus(o->pidC, pwm, err);
+            eo_pid_GetStatus(o->pidP, pwm, err);
             break;
 
         case CM_TORQUE:
@@ -319,7 +316,11 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
     switch (o->control_mode)
     {
         case CM_IDLE:
+        {
+            encoder_can = eo_speedometer_GetDistance(o->speedmeter);
+            
             return 0;
+        }
 
         case CM_OPENLOOP:
             return o->pwm_offset;
@@ -356,7 +357,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
                 }
             } 
 
-            return eo_pid_PWM2(o->pidC, err, vel_ref - vel);
+            return eo_pid_PWM2(o->pidP, err, vel_ref - vel);
         }
 
         case CM_POS_VEL:

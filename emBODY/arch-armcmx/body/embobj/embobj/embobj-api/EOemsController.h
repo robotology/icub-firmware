@@ -63,7 +63,8 @@ typedef struct EOemsController_hid EOemsController;
     @brief      Creates a new trajectory object 
     @return     The pointer to the required object.
  **/
-extern EOemsController* eo_emsController_Init(uint8_t nmotors, emsBoardType_t board_type);
+extern EOemsController* eo_emsController_Init(emsBoardType_t board_type);
+extern eObool_t eo_emsController_AddAxis(uint8_t naxis);
 
 
 /* @fn         extern void eo_trajectory_Set(EOtrajectory *o, float p0, float pf, float v0, float speed)
