@@ -91,6 +91,20 @@ enum { osal_info_entity_numberof = osal_info_entity_message+1 }; // put the max 
 extern osal_info_status_t osal_info_get_status(void);
 
 
+/** @fn         extern osal_reltime_t osal_info_get_tick(void)
+    @brief      Gets the time tick of the OSAL.
+    @return     The time tick of OSAL
+ **/
+extern osal_reltime_t osal_info_get_tick(void);
+
+
+/** @fn         extern const osal_cfg_t* osal_info_get_config(void)
+    @brief      Gets the configuration of of OSAL.
+    @return     Pointer to the configuration of OSAL or NULL if not initialised yet
+ **/
+extern const osal_cfg_t* osal_info_get_config(void);
+
+
 /** @fn         extern void osal_info_entities_get_stats(const uint16_t **used, const uint16_t **free)
     @brief      Gives back statistics about entities of OSAL which are in use or available.  
     @param      used       Gets back a pointer with used entities. It is to be indexed with osal_info_entity_t type.

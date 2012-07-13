@@ -86,22 +86,31 @@ extern void osal_system_start(void (*launcher_fn)(void));
 extern void * osal_system_launcherbuffer_get(uint16_t *size);
 
 
+/** @fn         extern void osal_system_ticks_abstime_set(osal_abstime_t tot)
+    @brief      Sets the total time of life in micro seconds but truncated to 
+                the lowest multiple of the configured tick time.
+    @param      tot     The target time of life in usec.
+ **/
+extern void osal_system_ticks_abstime_set(osal_abstime_t tot);
+
+
+/** @fn         extern osal_abstime_t osal_system_ticks_abstime_get(void)
+    @brief      Returns total time of life in micro seconds but multiples of 
+                the configured tick time
+    @return     The time of life in usec.
+ **/
+extern osal_abstime_t osal_system_ticks_abstime_get(void);
+
+
 /** @fn         extern osal_abstime_t osal_system_abstime_get(void)
-    @brief      Returns total time of life in micro seconds.
-    @return     Time of life in usec.
+    @brief      Returns total time of life in micro seconds with the best possible resolution.
+    @return     The time of life in usec.
  **/
 extern osal_abstime_t osal_system_abstime_get(void);
 
 
-/** @fn         extern void osal_system_abstime_set(osal_abstime_t tot)
-    @brief      Sets the total time of life in micro seconds.
-    @return     Time of life in usec.
- **/
-extern void osal_system_abstime_set(osal_abstime_t tot);
-
-
 /** @fn         extern osal_nanotime_t osal_system_nanotime_get(void)
-    @brief      Retrieves total time of life in nano time format.
+    @brief      Retrieves total time of life in nano seconds with the best possible resolution.
     @return     The time of life expressed in nano-seconds
  **/
 extern osal_nanotime_t osal_system_nanotime_get(void);
