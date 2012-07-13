@@ -54,6 +54,8 @@
 
 #include "EOMtheEMSapplCfg.h"
 
+#include "EOMtheEMSdiscoverylistener.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -82,8 +84,9 @@
 
 const eOemsappl_cfg_t eom_emsappl_DefaultCfg = 
 {
+    EO_INIT(.emsappinfo)        NULL,
     EO_INIT(.hostipv4addr)      EO_COMMON_IPV4ADDR(10, 0, 1, 200), 
-    EO_INIT(.hostipv4port)      12345
+//    EO_INIT(.hostipv4port)      12345
 };
 
 
@@ -101,7 +104,7 @@ const eOemsappl_cfg_t eom_emsappl_DefaultCfg =
 static void s_eom_emsappl_environment_init(void);
 static void s_eom_emsappl_ipnetwork_init(void);
 
-
+static void s_eom_emsappl_thelistener_init(void);
 static void s_eom_emsappl_theemssocket_init(void);
 
 static void s_eom_emsappl_theemstransceiver_init(void);
@@ -126,7 +129,7 @@ static EOMtheEMSappl s_emsappl_singleton =
 	EO_INIT(.cfg) 
     {   
         EO_INIT(.hostipv4addr)      EO_COMMON_IPV4ADDR(10, 0, 0, 254), 
-        EO_INIT(.hostipv4port)      12345
+//        EO_INIT(.hostipv4port)      12345
     }
 };
 
@@ -174,6 +177,9 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
     // 2. initialise the environment and the ip network.
     s_eom_emsappl_environment_init();
     s_eom_emsappl_ipnetwork_init();
+    
+    // 2.bis initialise the listener
+    s_eom_emsappl_thelistener_init();
     
     // 3. initialise the EOMtheEMSsocket and the EOMtheEMStransceiver   
     s_eom_emsappl_theemssocket_init();    
@@ -374,6 +380,13 @@ static void s_eom_emsappl_ipnetwork_init(void)
 #endif
 }
 
+
+static void s_eom_emsappl_thelistener_init(void)
+{
+    EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
+    
+    eom_emsdiscoverylistener_Initialise(&emscfg->disclistcfg);
+}
 
 static void s_eom_emsappl_theemssocket_init(void)
 {

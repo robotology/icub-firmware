@@ -109,6 +109,27 @@ extern "C" {
 //-------- <<< Use Configuration Wizard in Context Menu >>> -----------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------------------
 
+//  <h> Remote Host (PC104 or other)
+
+//  <o> host IP1 address <1-255>
+//  <i> default: 10
+#define EOMTHEEMSAPPLCFG_HOSTIPADDR1                            10
+
+//  <o> host IP2 address <1-255>
+//  <i> default: 255
+#define EOMTHEEMSAPPLCFG_HOSTIPADDR2                            255
+
+//  <o> host IP3 address <1-255>
+//  <i> default: 72
+#define EOMTHEEMSAPPLCFG_HOSTIPADDR3                            72
+
+//  <o> host IP4 address <1-255>
+//  <i> default: 205
+#define EOMTHEEMSAPPLCFG_HOSTIPADDR4                            205
+
+
+//  </h>Remote Host
+
 // <h> Choice of EMS board
 // <i> It holds ...
 
@@ -122,7 +143,7 @@ extern "C" {
       
 // </h>Choice of EMS board
 
-// <h> Info about application
+// <h> Info about EMS application
 // <i> It holds configuration for ...
 
 //  <o> name           <0=> EOMemsApplEBx, where x is the same number of the chosen EBx  
@@ -275,7 +296,7 @@ extern "C" {
 //  </h>ipal
 
 
-//  <h> addresses (mac address, ipv4 address, ipv4 netmask)       
+//  <h> local addresses (mac address, ipv4 address, ipv4 netmask)       
 //  <i> info: those used by ... 
 
 //  <o> addresses       <0=> from eeprom 
@@ -288,7 +309,7 @@ extern "C" {
     #define EOMTHEEMSAPPLCFG_IPADDR_FROM_ENVIRONMENT        1
 #endif
 
-//   </h>addresses 
+//   </h>local addresses 
 
 
 //   <h> proc and tick tasks of EOMtheIPnet     
@@ -355,7 +376,7 @@ extern "C" {
 
 //  <o> number of UDP sockets <1-4>
 //  <i> default: 1
-#define EOMTHEEMSAPPLCFG_IPNET_MAXNUMOFSOCKETS   1
+#define EOMTHEEMSAPPLCFG_IPNET_MAXNUMOFSOCKETS   2
 
 //  <o>  max number of packets in wait for transmission <1-16>
 //  <i> default: 4
@@ -367,7 +388,87 @@ extern "C" {
 //  </h>IP network
 
 
+//  <h> Discovery Listener configuration (for EOMtheEMSdiscoveryListener)
+
+//  <o> IP listening port <3333=> 3333
+//  <i> default: 3333
+#define EOMTHEEMSAPPLCFG_DISCOVERY_LOCALPORT                       3333
+
+
+//  <h> datagrams in socket
+
+//  <o> max number of input datagrams <1-8>
+//  <i> default: 2
+#define EOMTHEEMSAPPLCFG_DISCOVERY_INPDGRAMNUMBER                  2
+
+//  <o> max size of input datagrams <16-64>
+//  <i> default: 16
+#define EOMTHEEMSAPPLCFG_DISCOVERY_INPDGRAMSIZEOF                  16
+
+//  <o> max number of output datagrams <1-8>
+//  <i> default: 1 
+#define EOMTHEEMSAPPLCFG_DISCOVERY_OUTDGRAMNUMBER                  1
+
+//  <o> max size of output datagrams <16-128>
+//  <i> default: 32
+#define EOMTHEEMSAPPLCFG_DISCOVERY_OUTDGRAMSIZEOF                  32
+
+//  </h>datagrams in socket
+
+//  <h> destination address
+
+//  <o> IP address <0=> The same as Remote Host  <1=> The same as the incoming packet
+//  <i> default: 1
+#define EOMTHEEMSAPPLCFG_DISCOVERY_REMOTEIPADDR_MODE                   1
+
+#if   (0 == EOMTHEEMSAPPLCFG_DISCOVERY_REMOTEIPADDR_MODE)
+    #define EOMTHEEMSAPPLCFG_DISCOVERY_REMOTEIPADDR1    EOMTHEEMSAPPLCFG_HOSTIPADDR1
+    #define EOMTHEEMSAPPLCFG_DISCOVERY_REMOTEIPADDR2    EOMTHEEMSAPPLCFG_HOSTIPADDR2
+    #define EOMTHEEMSAPPLCFG_DISCOVERY_REMOTEIPADDR3    EOMTHEEMSAPPLCFG_HOSTIPADDR3
+    #define EOMTHEEMSAPPLCFG_DISCOVERY_REMOTEIPADDR4    EOMTHEEMSAPPLCFG_HOSTIPADDR4
+#elif (1 == EOMTHEEMSAPPLCFG_DISCOVERY_REMOTEIPADDR_MODE)
+    #define EOMTHEEMSAPPLCFG_DISCOVERY_REMOTEIPADDR1    127
+    #define EOMTHEEMSAPPLCFG_DISCOVERY_REMOTEIPADDR2    0
+    #define EOMTHEEMSAPPLCFG_DISCOVERY_REMOTEIPADDR3    0
+    #define EOMTHEEMSAPPLCFG_DISCOVERY_REMOTEIPADDR4    1    
+#endif
+
+//  <o> IP port <3333=> 3333
+//  <i> default: 3333
+#define EOMTHEEMSAPPLCFG_DISCOVERY_REMOTEPORT                3333
+
+//  </h>destination address
+
+
+//  <h> protocol
+
+//  <o> type of protocol    <0=> ETHloader reduced set: only CMD_SCAN, CMD_RESET, and CMD_UPD_ONCE
+#define EOMTHEEMSAPPLCFG_DISCOVERY_PROTOCOL                0
+
+//  </h>protocol
+
+//  <h> listener task
+
+//  <o> task priority <2-251>
+//  <i> default: 41
+#define EOMTHEEMSAPPLCFG_LISTENER_TASK_PRIORITYof   41
+
+//  <o> task stack size <256-1024:128>
+//  <i> default: 512
+#define EOMTHEEMSAPPLCFG_LISTENER_TASK_STACKSIZEof   512
+
+//  </h>listener task
+
+
+// </h>Discovery Listener configuration
+
 //  <h> Socket configuration (for EOMtheEMSsocket)
+
+//  <o> IP listening port <1-65000>
+//  <i> default: 12345
+#define EOMTHEEMSAPPLCFG_SOCKET_LOCALPORT                       54321
+
+//  <h> datagrams in socket
 
 //  <o> max number of input datagrams <1-8>
 //  <i> default: 3
@@ -385,39 +486,31 @@ extern "C" {
 //  <i> default: 1024
 #define EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF                  1024
 
-//  <o> local IP listing port <1-65000>
-//  <i> default: 12345
-#define EOMTHEEMSAPPLCFG_SOCKET_LOCALPORT                       54321
+//  </h>datagrams in socket
+
 
 // </h>Socket configuration
 
 
 //  <h> Transceiver configuration
 
-//  <h> host address
+//  <h> destination address
 
-//  <o> host IP1 address <1-255>
-//  <i> default: 10
-#define EOMTHEEMSAPPLCFG_HOSTIPADDR1                            10
+//  <o> IP address <0=>    The same as Remote Host
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_HOSTIPADDR2USE             0
 
-//  <o> host IP2 address <1-255>
-//  <i> default: 255
-#define EOMTHEEMSAPPLCFG_HOSTIPADDR2                            255
-
-//  <o> host IP3 address <1-255>
-//  <i> default: 72
-#define EOMTHEEMSAPPLCFG_HOSTIPADDR3                            72
-
-//  <o> host IP4 address <1-255>
-//  <i> default: 205
-#define EOMTHEEMSAPPLCFG_HOSTIPADDR4                            205
-
-//  <o> host IP listening port <1-65000>
+//  <o> IP port <1-65000>
 //  <i> default: 33333
-#define EOMTHEEMSAPPLCFG_HOSTIPPORT                             33333
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_HOSTIPPORT                33333
 
-//  </h>host address
+//  </h>destination address
 
+//  <h> protocol
+
+//  <o> type of protocol    <0=> nv ropframe (udp contains a frame of rops on network variables)
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_PROTOCOL                0
+
+//  <h> format
 
 //  <h> ropframe
 
@@ -427,11 +520,15 @@ extern "C" {
 #define ROPFRAMECAPACITY_AUTOMATIC  1  
 
 #if(1 == ROPFRAMECAPACITY_AUTOMATIC)
-    #if(EOMTHEEMSAPPLCFG_SOCKET_INPDGRAMSIZEOF > EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF)
-        #define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY   EOMTHEEMSAPPLCFG_SOCKET_INPDGRAMSIZEOF
-    #else
-        #define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY   EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF
-    #endif   
+//     #if(EOMTHEEMSAPPLCFG_SOCKET_INPDGRAMSIZEOF > EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF)
+//         #define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY   EOMTHEEMSAPPLCFG_SOCKET_INPDGRAMSIZEOF
+//     #else
+//         #define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY   EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF
+//     #endif  
+ 
+
+    #define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY   EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF
+
 #else
     #error specify capacity of ropframe
 #endif
@@ -474,6 +571,10 @@ extern "C" {
 #define ASFIDANKEN098672346780425  0  
 
 //  </h>rop
+
+//  </h>format
+
+//  </h>protocol
 
 
 //  </h>Transceiver configuration

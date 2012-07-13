@@ -36,6 +36,8 @@ extern "C" {
 #include "EoCommon.h"
 
 #include "EOsm.h"
+    
+#include "EOsocketDatagram.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  

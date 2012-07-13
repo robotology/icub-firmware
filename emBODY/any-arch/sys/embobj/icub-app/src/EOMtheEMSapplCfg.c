@@ -168,7 +168,7 @@ static void s_emsapplcfg_singleton_verify(void);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const char s_eobj_ownname[] = "EOMtheEMSapplCfg";
+//static const char s_eobj_ownname[] = "EOMtheEMSapplCfg";
 
 static eObool_t s_emsapplcfg_singleton_verified = eobool_false;
 
@@ -216,8 +216,8 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
     .applcfg        =
     {
         .emsappinfo             = &eom_emsapplcfg_modinfo, //&eom_emsappl_info_modinfo,
-        .hostipv4addr           = EO_COMMON_IPV4ADDR(EOMTHEEMSAPPLCFG_HOSTIPADDR1, EOMTHEEMSAPPLCFG_HOSTIPADDR2, EOMTHEEMSAPPLCFG_HOSTIPADDR3, EOMTHEEMSAPPLCFG_HOSTIPADDR4),
-        .hostipv4port           = EOMTHEEMSAPPLCFG_HOSTIPPORT        
+        .hostipv4addr           = EO_COMMON_IPV4ADDR(EOMTHEEMSAPPLCFG_HOSTIPADDR1, EOMTHEEMSAPPLCFG_HOSTIPADDR2, EOMTHEEMSAPPLCFG_HOSTIPADDR3, EOMTHEEMSAPPLCFG_HOSTIPADDR4)
+//        .hostipv4port           = EOMTHEEMSAPPLCFG_TRANSCEIVER_HOSTIPPORT        
     },
     .wipnetcfg      =
     {
@@ -244,6 +244,19 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
     {
         EOMTHEEMSAPPLCFG_EBX_hasSKIN, EOMTHEEMSAPPLCFG_EBX_hasMC4, EOMTHEEMSAPPLCFG_EBX_has2FOC
     },
+    .disclistcfg    =
+    {
+        .taskpriority           = EOMTHEEMSAPPLCFG_LISTENER_TASK_PRIORITYof,
+        .taskstacksize          = EOMTHEEMSAPPLCFG_LISTENER_TASK_STACKSIZEof,
+        .inpdatagramnumber      = EOMTHEEMSAPPLCFG_DISCOVERY_INPDGRAMNUMBER,
+        .outdatagramnumber      = EOMTHEEMSAPPLCFG_DISCOVERY_OUTDGRAMNUMBER,
+        .inpdatagramsizeof      = EOMTHEEMSAPPLCFG_DISCOVERY_INPDGRAMSIZEOF,
+        .outdatagramsizeof      = EOMTHEEMSAPPLCFG_DISCOVERY_OUTDGRAMSIZEOF,
+        .localport              = EOMTHEEMSAPPLCFG_DISCOVERY_LOCALPORT, 
+        .remoteport             = EOMTHEEMSAPPLCFG_DISCOVERY_REMOTEPORT,
+        .remoteipaddr           = EO_COMMON_IPV4ADDR(EOMTHEEMSAPPLCFG_DISCOVERY_REMOTEIPADDR1, EOMTHEEMSAPPLCFG_DISCOVERY_REMOTEIPADDR2, EOMTHEEMSAPPLCFG_DISCOVERY_REMOTEIPADDR3, EOMTHEEMSAPPLCFG_DISCOVERY_REMOTEIPADDR4),
+        .usemutex               = eobool_true                   
+    },
     .socketcfg      =
     {
         .inpdatagramnumber          = EOMTHEEMSAPPLCFG_SOCKET_INPDGRAMNUMBER, 
@@ -258,7 +271,7 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
         .vectorof_endpoint_cfg  = EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg,
         .hashfunction_ep2index  = EOMTHEEMSAPPLCFG_hashfunction_ep2index,
         .hostipv4addr           = EO_COMMON_IPV4ADDR(EOMTHEEMSAPPLCFG_HOSTIPADDR1, EOMTHEEMSAPPLCFG_HOSTIPADDR2, EOMTHEEMSAPPLCFG_HOSTIPADDR3, EOMTHEEMSAPPLCFG_HOSTIPADDR4),
-        .hostipv4port           = EOMTHEEMSAPPLCFG_HOSTIPPORT,
+        .hostipv4port           = EOMTHEEMSAPPLCFG_TRANSCEIVER_HOSTIPPORT,
         .sizes                  =
         {
             .capacityofpacket               = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY, //1024,

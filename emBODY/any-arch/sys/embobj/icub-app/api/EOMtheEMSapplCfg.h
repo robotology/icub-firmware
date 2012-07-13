@@ -48,6 +48,8 @@ extern "C" {
 
 #include "EOMtheEMSappl.h"
 
+#include "EOMtheEMSdiscoverylistener.h"
+#include "EOMtheEMSdiscoverytransceiver.h"
 #include "EOMtheEMSsocket.h"
 
 #include "EOMtheIPnet.h"
@@ -94,17 +96,18 @@ enum {eom_emsappl_deviceid_numberof = 3};
  **/  
 typedef const struct
 {
-    eOmsystem_whole_cfg_t   wsyscfg;        /**< the cfg used by the principal object EOMtheSystem */
-    eOemsappl_cfg_t         applcfg;        /**< the cfg used by the object EOMtheEMSappl initialised in eom_sys_Start() */
-    eOmipnet_whole_cfg_t    wipnetcfg;      /**< the cfg used by the object EOMtheIPnet launched by the EOMtheEMSappl */
-    eObool_t                getipaddrFROMenvironment;
-    eom_emsapplcfg_boardid_t boardid;
-    eObool_t                hasdevice[eom_emsappl_deviceid_numberof];
-    eOemssocket_cfg_t       socketcfg;      /**< the cfg used by the object EOMtheEMSsocket launched by the EOMtheEMSappl */
-    eOemstransceiver_cfg_t  transcfg;       /**< the cfg used by the object EOMtheEMStransceiver launched by the EOMtheEMSappl */
-    eOemserror_cfg_t        errobjcfg;      /**<   */
-    eOemsconfigurator_cfg_t cfgobjcfg;
-    eOemsrunner_cfg_t       runobjcfg;
+    eOmsystem_whole_cfg_t           wsyscfg;        /**< the cfg used by the principal object EOMtheSystem */
+    eOemsappl_cfg_t                 applcfg;        /**< the cfg used by the object EOMtheEMSappl initialised in eom_sys_Start() */
+    eOmipnet_whole_cfg_t            wipnetcfg;      /**< the cfg used by the object EOMtheIPnet launched by the EOMtheEMSappl */
+    eObool_t                        getipaddrFROMenvironment;
+    eom_emsapplcfg_boardid_t        boardid;
+    eObool_t                        hasdevice[eom_emsappl_deviceid_numberof];
+    eOemsdiscoverylistener_cfg_t    disclistcfg;
+    eOemssocket_cfg_t               socketcfg;      /**< the cfg used by the object EOMtheEMSsocket launched by the EOMtheEMSappl */
+    eOemstransceiver_cfg_t          transcfg;       /**< the cfg used by the object EOMtheEMStransceiver launched by the EOMtheEMSappl */
+    eOemserror_cfg_t                errobjcfg;      /**<   */
+    eOemsconfigurator_cfg_t         cfgobjcfg;
+    eOemsrunner_cfg_t               runobjcfg;
 } EOMtheEMSapplCfg;        
 
 
