@@ -162,10 +162,15 @@ typedef enum
     snsr_maismode_dontacquiredonttx                     = 5  
 } eOsnsr_maismode_t;
 
+EO_VERIFYproposition(ismaismodeCompatiblewithicubcanproto, (snsr_maismode_txdatacontinuously == 0));
+EO_VERIFYproposition(ismaismodeCompatiblewithicubcanproto, (snsr_maismode_acquirebutdonttx == 1));
+EO_VERIFYproposition(ismaismodeCompatiblewithicubcanproto, (snsr_maismode_dontacquiredonttx == 5));
+
 typedef enum
 {
     snsr_maisresolution_08                              = 0,
-    snsr_maisresolution_16                              = 1
+    snsr_maisresolution_16                              = 1,
+//    snsr_maisresolution_debug                           = 2       //this mode set mais board in debug mode: it sends triangulas and sqaure waves.
 } eOsnsr_maisresolution_t;
 
 
@@ -183,6 +188,10 @@ typedef struct
     uint8_t                         filler04[4];                               
 } eOsnsr_mais_inputs_t;             EO_VERIFYsizeof(eOsnsr_mais_inputs_t, 4);
 
+
+/*NOTE: mais board sends 2 can frame: first contains values of  channels between 0 to 6th and the second contains values of channel between 7th to 15th; they are saved in the15values.data[ch-num +1].
+in the15values.data[0]  there is the offset that indicate from wich channel the values ahve meaning. For example in case of only canframece containing values of channel between 7 to 15,
+offset has value (ch-7+1 ) = 8 and that vaules are savde from the15values.data[ch-7 +1] to the15values.data[ch-15 +1] */
 typedef struct                      // size is: 40+0 = 40                     
 {
     eOsnsr_arrayofupto36bytes_t     the15values;                        /**< the 15 values of the mais, either at 1 byte or 2 bytes resolution. */                  
