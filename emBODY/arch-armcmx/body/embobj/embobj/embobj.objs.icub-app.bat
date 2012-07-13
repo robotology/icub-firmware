@@ -13,7 +13,7 @@ set D_SRC=src
 set D_CFG=cfg
 
 set TYP=icub-app
-set LST=(eOcfg_sm_EMSappl EOMtheEMSappl EOMtheEMSconfigurator EOMtheEMSerror EOMtheEMSrunner EOMtheEMSsocket EOMtheEMStransceiver EOMtheEMSapplCfg)
+set LST=(eOcfg_sm_EMSappl EOMtheEMSappl EOMtheEMSconfigurator EOMtheEMSerror EOMtheEMSrunner EOMtheEMSsocket EOMtheEMStransceiver EOMtheEMSapplCfg EOMtheEMSdiscoverylistener EOMtheEMSdiscoverytransceiver)
 
 echo. -- copying "%TYP%" files
 
