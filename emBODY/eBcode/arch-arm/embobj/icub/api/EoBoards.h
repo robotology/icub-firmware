@@ -62,7 +62,7 @@ typedef enum
     eobrd_mais                      = 3,
     eobrd_ems                       = 4,
     eobdr_aea                       = 5,
-    eobdr_skin                       = 6 	
+    eobrd_skin                       = 6 	
 } eObrd_types_t;
 
 
