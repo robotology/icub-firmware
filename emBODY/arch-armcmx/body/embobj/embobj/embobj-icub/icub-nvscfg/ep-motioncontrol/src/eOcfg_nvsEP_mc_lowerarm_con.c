@@ -3618,7 +3618,7 @@ extern uint16_t eo_cfg_nvsEP_mc_lowerarm_hashfunction_id2index(uint16_t id)
 
 typedef uint8_t sdfg[ ( EOK_cfg_nvsEP_mc_any_con_jxx_maxnumof_nvs_in_joint == 32 ) ? (1) : (0)];
 typedef uint8_t redf[ ( EOK_cfg_nvsEP_mc_any_con_mxx_maxnumof_nvs_in_motor == 16 ) ? (1) : (0)];
-typedef uint8_t sdfg[ ( EOK_cfg_nvsEP_mc_any_con_cxx_maxnumof_nvs_in_controller == 32 ) ? (1) : (0)];
+typedef uint8_t sdfh[ ( EOK_cfg_nvsEP_mc_any_con_cxx_maxnumof_nvs_in_controller == 32 ) ? (1) : (0)];
 
 
 static uint16_t s_hash(uint16_t id)
