@@ -151,6 +151,20 @@ typedef struct                      // size is 8+8+8 = 24 bytes
 } eOmn_appl_t;                      EO_VERIFYsizeof(eOmn_appl_t, 24);
 
 
+/** @typedef    typedef enum eOmn_appl_runMode_t;
+    @brief      contains ems application's run mode.
+                Currently runMode is not set to ems by pc104, but application its self undestands its runmode
+                depending on connected CAN boards.
+ **/
+typedef enum
+{
+    applrunMode__default       = 0,
+    applrunMode__skinOnly      = 1,
+    applrunMode__mc4Only       = 2,
+    applrunMode__skinAndMc4    = 3,
+    applrunMode__2foc          = 4
+} eOmn_appl_runMode_t;
+
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
 
