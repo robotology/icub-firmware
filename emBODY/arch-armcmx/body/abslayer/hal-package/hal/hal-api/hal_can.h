@@ -145,7 +145,9 @@ typedef struct
     hal_interrupt_priority_t    priorx;
     hal_interrupt_priority_t    priotx;
     void (*callback_on_rx)(void *arg);
-    void *arg;
+    void *arg_cb_rx;
+    void (*callback_on_tx)(void *arg);
+    void *arg_cb_tx;
 } hal_can_cfg_t;
 
 
@@ -203,9 +205,9 @@ extern hal_result_t hal_can_transmit(hal_can_port_t port);
 
 
 /** @fn         extern hal_result_t hal_can_received(hal_can_port_t port, uint8_t *numberof)
-    @brief      This function gets number of frames in queue (FIFO).
+    @brief      This function gets number of frames in rx queue (FIFO).
     @param      port            identifies CAN port (CAN1 or CAN2)
-    @param      numberof        contains numbers of frames. (it can be NULL)
+    @param      numberof        contains numbers of frames.
     @return     hal_res_NOK_generic in case wrong port or NULL argument, else hal_res_OK.
   */
 extern hal_result_t hal_can_received(hal_can_port_t port, uint8_t *numberof);
@@ -244,6 +246,13 @@ extern hal_result_t hal_can_receptionfilter_set(hal_can_port_t port, uint8_t mas
                                                 uint32_t identifier_val, hal_can_frameID_format_t idformat);
 
 
+/** @fn         extern hal_result_t hal_can_out_get(hal_can_port_t port, uint8_t *numberof)
+    @brief      This function gets number of frames in tx queue (FIFO).
+    @param      port            identifies CAN port (CAN1 or CAN2)
+    @param      numberof        contains numbers of frames.
+    @return     hal_res_NOK_generic in case wrong port or NULL argument, else hal_res_OK.
+  */
+extern hal_result_t hal_can_out_get(hal_can_port_t port, uint8_t *numberof);
 
 
 /** @}            

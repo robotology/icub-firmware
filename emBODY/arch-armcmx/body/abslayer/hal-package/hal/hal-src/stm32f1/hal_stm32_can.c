@@ -107,7 +107,9 @@ const hal_can_cfg_t hal_can_cfg_default =
     .priorx             = hal_int_priority06,
     .priotx             = hal_int_priority06,
     .callback_on_rx     = NULL,
-    .arg                = NULL
+    .arg_cb_rx          = NULL,
+    .callback_on_tx     = NULL,
+    .arg_cb_tx          = NULL
 };
 
 
@@ -403,6 +405,20 @@ extern hal_result_t hal_can_receptionfilter_set(hal_can_port_t port, uint8_t mas
     return(hal_res_NOK_unsupported);
 }
 
+extern hal_result_t hal_can_out_get(hal_can_port_t port, uint8_t *numberof) 
+{
+    hal_can_portdatastructure_t *cport = s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
+
+    // disable interrupt rx
+    s_hal_can_isr_rx_disable(port);
+    
+    *numberof = hal_canfifo_hid_size(&cport->canframes_tx_norm);
+    
+    // enable interrupt rx
+    s_hal_can_isr_rx_enable(port);
+    
+    return(hal_res_OK);
+}
 
 
 
@@ -579,6 +595,10 @@ static void s_hal_can_isr_sendframes_canx(hal_can_port_t port)
         if(res != CAN_NO_MB)
         {
         	hal_canfifo_hid_pop(&cport->canframes_tx_norm);
+            if(NULL != cport->cfg.callback_on_tx)
+            {
+                cport->cfg.callback_on_tx(cport->cfg.arg_cb_tx);
+            }
         }
 
     }
@@ -626,7 +646,7 @@ static void s_hal_can_isr_recvframe_canx(hal_can_port_t port)
     //if call back is set, invoke it
     if(NULL != cport->cfg.callback_on_rx )
     {
-    	cport->cfg.callback_on_rx(cport->cfg.arg);
+    	cport->cfg.callback_on_rx(cport->cfg.arg_cb_rx);
     }
 
 }
