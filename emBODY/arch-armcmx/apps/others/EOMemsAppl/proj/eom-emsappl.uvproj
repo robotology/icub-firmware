@@ -1132,6 +1132,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMStransceiver.c</FilePath>
             </File>
+            <File>
+              <FileName>EOMtheEMSdiscoverylistener.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSdiscoverylistener.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSdiscoverytransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSdiscoverytransceiver.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2283,6 +2293,16 @@
               <FileName>EOMtheEMStransceiver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMStransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSdiscoverylistener.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSdiscoverylistener.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSdiscoverytransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSdiscoverytransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3436,6 +3456,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMStransceiver.c</FilePath>
             </File>
+            <File>
+              <FileName>EOMtheEMSdiscoverylistener.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSdiscoverylistener.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSdiscoverytransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSdiscoverytransceiver.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4587,6 +4617,16 @@
               <FileName>EOMtheEMStransceiver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMStransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSdiscoverylistener.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSdiscoverylistener.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSdiscoverytransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSdiscoverytransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
