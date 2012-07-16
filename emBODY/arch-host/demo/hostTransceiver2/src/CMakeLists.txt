@@ -20,7 +20,9 @@ set(ICUB_INTERFACE_CORE_FOLDER	$ENV{ICUB_ROOT}/main/src/core/iCubInterface-branc
 
 #add_definitions( -D_AC_="STRINGA" )
 
+set(CMAKE_MODULE_PATH ../../)
 
+find_package(ACE)
 
 include(embObjLib.conf)
 find_package(YARP)
@@ -259,7 +261,7 @@ SOURCE_GROUP("EmbObj Source Files" FILES ${folder_source})
 add_executable(${PROJECTNAME} ${embobj_source})
 #set_target_properties(${PROJECTNAME} PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
 
-target_link_libraries(${PROJECTNAME} ${YARP_LIBRARIES})
+target_link_libraries(${PROJECTNAME} ${ACE_LIBRARIES} ${YARP_LIBRARIES})
 
 # ${embobj_header})
 

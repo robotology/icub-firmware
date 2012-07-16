@@ -247,6 +247,7 @@ int main(int argc, char *argv[])
 
 #ifdef _LINUX_UDP_SOCKET_
 	int ret = 0;
+	printf("!!!! Using LINUX sockets!!!!\n");
 	if(!ACE_socket.initLocal(port, local.address_string.c_str()) )
 	{
 		printf("Error initing Udp socket!!\n");
@@ -278,12 +279,21 @@ int main(int argc, char *argv[])
 	}
 
 #else
+	printf("!!!! Using ACE sockets!!!!\n");
 	ACE_socket = new ACE_SOCK_Dgram();
 	if (-1 == ACE_socket->open(local.addr) )
 	{
 		printf("eStikEtzi pensa che qualcosa non abbia funzionato!!!\n");
 		return -1;
 	}
+	int n;
+	int m = sizeof(n);
+	ACE_socket->get_option(SOL_SOCKET,SO_RCVBUF,(void *)&n, &m);
+	printf("SO_RCVBUF %d\n", n);
+	ACE_socket->get_option(SOL_SOCKET,SO_SNDBUF,(void *)&n, &m);
+	printf("SO_SNDBUF %d\n", n);
+	ACE_socket->get_option(SOL_SOCKET,SO_RCVLOWAT,(void *)&n, &m);
+	printf("SO_RCVLOWAT %d\n", n);
 #endif
 
 	// Set destination address_string
@@ -312,16 +322,16 @@ int main(int argc, char *argv[])
 	printf("Launching recvThread\n");
 	ACE_thread_t id_recvThread;
 	if(ACE_Thread::spawn((ACE_THR_FUNC)recvThread, NULL, THR_CANCEL_ENABLE, &id_recvThread)==-1)
-		printf((LM_DEBUG,"Error in spawning recvThread\n"));
+		printf(("Error in spawning recvThread\n"));
 
 	printf("Launching skinThread\n");
 	ACE_thread_t id_skinThread;
 	if(ACE_Thread::spawn((ACE_THR_FUNC)skinThread, NULL, THR_CANCEL_ENABLE, &id_skinThread)==-1)
-		printf((LM_DEBUG,"Error in spawning id_skinThread\n"));
+		printf(("Error in spawning id_skinThread\n"));
 
 	ACE_thread_t id_sendThread;
 	if(ACE_Thread::spawn((ACE_THR_FUNC)sendThread, NULL, THR_CANCEL_ENABLE, &id_sendThread)==-1)
-		printf((LM_DEBUG,"Error in spawning sendThread\n"));
+		printf(("Error in spawning sendThread\n"));
 
 	// Send a packet to test dummy
 	while(keepGoingOn)
@@ -336,9 +346,11 @@ int main(int argc, char *argv[])
 			case 'q':  	// quit
 				keepGoingOn = FALSE;
 				break;
+
 			case '0':
 				s_callback_button_0();
 				break;
+
 			case '1':	//	send one ask rop
 				s_callback_button_1();
 				break;
@@ -357,6 +369,10 @@ int main(int argc, char *argv[])
 
 			case '5':	//	send a status sig
 				s_callback_button_5();
+				break;
+
+			case 'p':  	// quit
+				print_data();
 				break;
 
 			default:
@@ -386,6 +402,8 @@ int main(int argc, char *argv[])
 			printf("Sent EmbObj packet, size = %d\n", udppkt_size);
 		}
 	}
+
+	print_data();
 
 #ifdef _LINUX_UDP_SOCKET_
 	ACE_socket.disconnect();
@@ -432,6 +450,7 @@ void *recvThread(void * arg)
 //	ropFrame = eo_ropframe_New();
 
 	sockaddr					sender_addr;
+
 	while(keepGoingOn)
 	{
 #ifdef _LINUX_UDP_SOCKET_
@@ -448,7 +467,7 @@ void *recvThread(void * arg)
 		//transceiver->SetReceived((ACE_UINT8 *)sender.data, udppkt_size);
 	}
 
-	print_data();
+
 
 	pthread_exit(NULL);
 	return NULL;
@@ -537,6 +556,7 @@ void *skinThread(void * arg)
 	}
 	else
 		printf("Port opened!!\n");
+
 	yarp::os::BufferedPort<yarp::sig::Vector> outPortAE;
 	if(!outPortAE.open("/ae"))
 	{
