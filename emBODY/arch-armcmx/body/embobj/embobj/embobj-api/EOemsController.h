@@ -81,6 +81,8 @@ extern eObool_t eo_emsController_AddAxis(uint8_t naxis);
 extern void eo_emsController_ReadEncoders(int32_t *pos);
 extern void eo_emsController_SkipEncoders(void);
 
+extern void eo_emsController_ReadSpeed(uint8_t axis, int32_t speed);
+
 extern void eo_emsController_ReadTorques(int32_t *torque);
 
 extern float eo_emsController_GetVelocity(uint8_t joint);

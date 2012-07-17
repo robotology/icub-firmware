@@ -42,10 +42,11 @@ struct EOpid_hid
     float Kd;
 
     float En;
-    float KKiIn;
+    float KIn;
 
     float Ymax;
     float Imax;
+    float KImax;
     
     int32_t pwm;
     

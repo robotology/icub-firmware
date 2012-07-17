@@ -78,12 +78,13 @@ extern EOpid* eo_pid_New(void)
         o->Kd = 0.0f;
 
         o->En = 0.0f;        
-        o->KKiIn = 0.0f;
+        o->KIn = 0.0f;
          
         o->pwm = 0.0f;
 
         o->Ymax = 0.0f;
         o->Imax = 0.0f;
+        o->KImax = 0.0f;
 
         o->initialized = eobool_false;
     }
@@ -107,12 +108,16 @@ extern void eo_pid_SetPid(EOpid *o, float K, float Kd, float Ki)
     o->K  = K;
     o->Kd = Kd*EMS_PERIOD;
     o->Ki = Ki;
+
+    o->KImax = o->Ki!=0.0f ? o->Imax/o->Ki : 0.0f;
 }
 
 extern void eo_pid_SetPidLimits(EOpid *o, float Ymax, float Imax)
 {
     o->Ymax = Ymax;
     o->Imax = Imax;
+    
+    o->KImax = o->Ki!=0.0f ? o->Imax/o->Ki : 0.0f;
 }
 
 extern void eo_pid_GetStatus(EOpid *o, int16_t *pwm, int32_t *err)
@@ -130,20 +135,41 @@ extern void eo_pid_Reset(EOpid *o)
 {
     o->En = 0.0f;
     o->pwm = 0.0f;
-    o->KKiIn = 0.0f; 
+    o->KIn = 0.0f; 
 }
 
-extern int16_t eo_pid_PWM2(EOpid *o, float En, float Vn)
+extern int16_t eo_pid_PWM2(EOpid *o, float En, float Vref,float Venc)
 {
-    float Xn = o->K*(En+o->Kd*Vn);
+    if (-200.0f<Vref && Vref<200.0f)
+    {
+        // low speed great workaround (=tapullo)
 
-    //if (o->KKiIn<0.0f ^ Xn<0.0f) o->KKiIn = 0.0f;
+        float k = (Vref>0.0f ? 0.005f : -0.005f)*Vref; 
+
+        o->KIn = 0.0f;
+
+        float w = 0.5*k+0.5;
+
+        o->pwm = (1.0f-w)*o->pwm + w*(o->K*((1.0f+5.0f*(1.0f-k))*En+k*k*o->Kd*(Vref-Venc)));
+    }
+    else
+    {
+        float Xn = o->K*(En+o->Kd*(Vref-Venc));
+
+        if ((o->KIn<0.0f) ^ (Xn<0.0f)) o->KIn = 0.0f;
    
-    o->KKiIn += o->Ki*Xn;
+        o->KIn += Xn;
 
-    LIMIT(o->KKiIn, o->Imax);
+        LIMIT(o->KIn, o->KImax);
 
-    o->pwm = Xn+o->KKiIn;
+        o->pwm = Xn+o->Ki*o->KIn;
+    }
+    
+    // dead zone suppression
+    if (Vref>0.5f)
+        o->pwm += 600.0f;
+    else if (Vref<-0.5f)
+        o->pwm -= 600.0f; 
 
     LIMIT(o->pwm, o->Ymax);
 

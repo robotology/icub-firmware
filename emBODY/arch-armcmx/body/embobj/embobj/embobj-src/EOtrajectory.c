@@ -158,7 +158,8 @@ extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, int32_t a
     
     float PbyT = EMS_PERIOD/T;    
     
-    Va*=PbyT; 
+    Va*=PbyT;
+        
     float A3 =  120.0f*Va;
     float A2 = -180.0f*Va;
     float A1 =   60.0f*Va;
@@ -527,7 +528,7 @@ extern int8_t eo_trajectory_Step(EOtrajectory* o, float *p, float *v)
         //o->biPAcc += o->biP2Jerk;
         
         o->Vel += o->PAcc;//+o->biPAcc;
-        o->Pos += EMS_PERIOD*o->Vel;   
+        o->Pos += EMS_PERIOD*o->Vel;
     }
     else if (o->vel_steps_to_end)
     {
@@ -560,16 +561,16 @@ extern int8_t eo_trajectory_Step(EOtrajectory* o, float *p, float *v)
         o->hybridVel += o->hybridPAcc;
 
         float dP = EMS_PERIOD*o->hybridVel;
-        o->Pos += dP;
         o->PosF += dP;
+        o->Pos  += dP;
     }
     else if (o->hybrid)
     {
         o->hybridPAcc = 0.0f;
 
         float dP = EMS_PERIOD*o->hybridVel;
-        o->Pos += dP;
         o->PosF += dP;
+        o->Pos  += dP;
     }
     else
     {
@@ -587,8 +588,8 @@ extern int8_t eo_trajectory_Step(EOtrajectory* o, float *p, float *v)
         o->PosF = o->Pos = o->pos_min;
         o->VelF = o->Vel = o->PAcc = 0.0f;
 
-        *p = (int32_t)o->Pos;
-        *v = 0;
+        *p = o->Pos;
+        *v = 0.0f;
 
         return -1;
     }
@@ -603,14 +604,14 @@ extern int8_t eo_trajectory_Step(EOtrajectory* o, float *p, float *v)
         o->PosF = o->Pos = o->pos_max;
         o->VelF = o->Vel = o->PAcc = 0.0f;
 
-        *p = (int32_t)o->Pos;
-        *v = 0;
+        *p = o->Pos;
+        *v = 0.0f;
 
         return  1;
     }
 
-    *p = (int32_t)o->Pos;
-    *v = (int32_t)(o->Vel+o->hybridVel);
+    *p = o->Pos;
+    *v = o->Vel+o->hybridVel;
 
     return 0;
 }
