@@ -160,6 +160,7 @@ extern void eo_emsController_SkipEncoders(void)
 
 extern void eo_emsController_ReadSpeed(uint8_t axis, int32_t speed)
 {
+    eo_axisController_ReadSpeed(s_emsc->axis_controller[axis], speed);    
 }
 
 extern float eo_emsController_GetVelocity(uint8_t joint)

@@ -89,11 +89,11 @@ extern EOtrajectory* eo_trajectory_New(void)
         o->pos_steps_to_end = 0;
         o->vel_steps_to_end = 0;
 
-        o->pos_min =    0;
-        o->pos_max = 4095;
-        o->vel_max = 2048;
+        o->pos_min =       0;
+        o->pos_max = 0x10000;
+        o->vel_max = 0x08000;
 
-        o->acc_stop_hybrid = 4096;
+        o->acc_stop_hybrid = 0x10000;
 
         o->hybrid = eobool_false;
         o->hybridVel = 0.0f;

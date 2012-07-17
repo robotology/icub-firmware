@@ -83,21 +83,20 @@ extern EOaxisController* eo_axisController_New(void)
         o->pidP = eo_pid_New();
         //o->pidC = eo_pid_New();
 
-        eo_pid_SetPid(o->pidP, 25.0f, 20.0f, 0.001f);
-        eo_pid_SetPidLimits(o->pidP, 2000.0f, 600.0f);
+        eo_pid_SetPid(o->pidP, 6.25f, 20.0f, 0.001f);
+        eo_pid_SetPidLimits(o->pidP, 4000.0f, 750.0f);
         
         //o->pidT = eo_pid_New();
         
-        o->speedmeter = eo_speedmeter_New(4096); // ticks per revolution
+        o->speedmeter = eo_speedmeter_New(0x10000); // ticks per revolution
         o->trajectory = eo_trajectory_New();
 
         o->pos_min = 0.0f;
         o->pos_max = 0.0f;
-        o->vel_max = 2048.0f;
+        o->vel_max = 32768.0f;
 
-        //o->acc_stop_boost = 4096;
-        o->acc_stop_cmode = 4096;
-        o->acc_stop_alarm = 8192;
+        o->acc_stop_cmode = 0x10000;
+        o->acc_stop_alarm = 0x20000;
 
         o->vel_timer   = 0;
         o->vel_timeout = EMS_IFREQUENCY;
@@ -120,8 +119,8 @@ extern EOaxisController* eo_axisController_New(void)
         o->control_mode = CM_IDLE;
 
         o->is_calibrated = eobool_false;
-        o->calib_timeout_ms = 0;
-        o->calib_max_error  = 1;
+        o->calib_timeout_ms = 5000;
+        o->calib_max_error  = 64;
     }
 
     return o;
@@ -138,7 +137,7 @@ extern void eo_axisController_StartCalibration(EOaxisController *o, int32_t pos,
     o->is_calibrated = eobool_false;
     o->calib_max_error = max_error;
 
-    eo_trajectory_SetPosReference(o->trajectory, pos, 512);
+    eo_trajectory_SetPosReference(o->trajectory, pos, 8192);
 }
 
 extern void eo_axisController_SetLimits(EOaxisController *o, int32_t pos_min, int32_t pos_max, int32_t vel_max)
@@ -169,6 +168,11 @@ extern void eo_axisController_SkipEncPos(EOaxisController *o)
 {
     eo_speedometer_EncoderError(o->speedmeter);
 }
+
+extern void eo_axisController_ReadSpeed(EOaxisController *o, int32_t speed)
+{
+    eo_speedometer_ReadSpeed(o->speedmeter, speed);
+} 
 
 extern int32_t eo_axisController_GetVelocity(EOaxisController *o)
 {
