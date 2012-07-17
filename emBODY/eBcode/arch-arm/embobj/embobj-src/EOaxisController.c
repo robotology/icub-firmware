@@ -138,7 +138,7 @@ extern void eo_axisController_StartCalibration(EOaxisController *o, int32_t pos,
     o->is_calibrated = eobool_false;
     o->calib_max_error = max_error;
 
-    eo_trajectory_SetPosReference(o->trajectory, pos, 2024);
+    eo_trajectory_SetPosReference(o->trajectory, pos, 512);
 }
 
 extern void eo_axisController_SetLimits(EOaxisController *o, int32_t pos_min, int32_t pos_max, int32_t vel_max)
@@ -335,7 +335,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
             eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref);
             
             encoder_can = pos;
-            posref_can = pos_ref;           
+            posref_can  = pos_ref;           
 
             float err = pos_ref - pos;
 
@@ -357,7 +357,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
                 }
             } 
 
-            return eo_pid_PWM2(o->pidP, err, vel_ref - vel);
+            return eo_pid_PWM2(o->pidP, err, vel_ref, vel);
         }
 
         case CM_POS_VEL:
@@ -375,10 +375,10 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
                 eo_pid_Reset(o->pidP);
             }
 
-            encoder_can = pos;
-            posref_can = pos_ref;
+            encoder_can = vel;
+            posref_can  = pos;
 
-            return eo_pid_PWM2(o->pidP, pos_ref - pos, vel_ref - vel);
+            return eo_pid_PWM2(o->pidP, pos_ref - pos, vel_ref, vel);
         }
        
         //case CM_IMPEDANCE_POS:
