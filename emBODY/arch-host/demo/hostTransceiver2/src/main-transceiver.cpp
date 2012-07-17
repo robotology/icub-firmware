@@ -386,7 +386,7 @@ int main(int argc, char *argv[])
 			if(!double_socket)
 			{
 #ifdef _LINUX_UDP_SOCKET_
-				ACE_socket.send((char*) &udppkt_data, (ssize_t) udppkt_size);
+				ACE_socket.send((char*) &udppkt_data, (ssize_t) udppkt_size, 0);
 #else
 				ACE_socket->send(udppkt_data, udppkt_size, remote01.addr, flags);
 #endif
@@ -394,7 +394,7 @@ int main(int argc, char *argv[])
 			else
 			{
 #ifdef _LINUX_UDP_SOCKET_
-				ACE_socket2.send((char*) &udppkt_data, (ssize_t) udppkt_size);
+				ACE_socket2.send((char*) &udppkt_data, (ssize_t) udppkt_size, 0);
 #else
 				ACE_socket2->send(udppkt_data, udppkt_size, remote01.addr, flags);
 #endif
@@ -486,7 +486,7 @@ void *sendThread(void * arg)
 		if(!double_socket)
 		{
 #ifdef _LINUX_UDP_SOCKET_
-			ACE_socket.send((char*) &udppkt_data, (ssize_t) udppkt_size);
+			ACE_socket.send((char*) &udppkt_data, (ssize_t) udppkt_size, 0);
 #else
 			ACE_socket->send(udppkt_data, udppkt_size, remote01.addr, flags);
 #endif
@@ -494,7 +494,7 @@ void *sendThread(void * arg)
 		else
 		{
 #ifdef _LINUX_UDP_SOCKET_
-			ACE_socket2.send((char*) &udppkt_data, (ssize_t) udppkt_size);
+			ACE_socket2.send((char*) &udppkt_data, (ssize_t) udppkt_size, 0);
 #else
 			ACE_socket2->send(udppkt_data, udppkt_size, remote01.addr, flags);
 #endif
