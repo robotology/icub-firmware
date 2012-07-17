@@ -81,6 +81,8 @@ extern EOaxisController* eo_axisController_New(void);
 
 extern void eo_axisController_ReadEncPos(EOaxisController *o, int32_t pos); 
 extern void eo_axisController_SkipEncPos(EOaxisController *o);
+extern void eo_axisController_ReadSpeed(EOaxisController *o, int32_t speed);
+
 extern int32_t eo_axisController_GetVelocity(EOaxisController *o);
 
 extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_t avg_vel);
