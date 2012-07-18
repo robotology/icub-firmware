@@ -579,6 +579,8 @@ void can_send_broadcast(void)
 	unsigned char  FAULT_ABS1 = 0;
 	unsigned char  FAULT_HLL0 = 0;
 	unsigned char  FAULT_HLL1 = 0;
+	unsigned char  FAULT_OPTICAL0 = 0;
+	unsigned char  FAULT_OPTICAL1 = 0;
 	
 	// Absolute encoder errors			
 	#if (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOARD_TYPE == BOARD_TYPE_2BLLDC)
@@ -807,6 +809,13 @@ void can_send_broadcast(void)
 			sendA=true;
 		}
 	
+		//Optical Encoder drift detected
+		if (FAULT_OPTICAL0)
+		{
+			_canmsg.CAN_data[0] |=0x40;
+			sendA=true;
+		}
+	
 		//  --- Control Mode axes 0 ---
 		_canmsg.CAN_data[1]= _control_mode[0];	
 		if (_control_mode[0] != old_control_mode[0])
@@ -839,6 +848,14 @@ void can_send_broadcast(void)
 			_canmsg.CAN_data[2] |=0x20;	
 			sendA=true;
 		}
+		
+		//Optical Encoder drift detected
+		if (FAULT_OPTICAL1)
+		{
+			_canmsg.CAN_data[2] |=0x40;
+			sendA=true;
+		}
+		
 	#endif
 		//  --- Control Mode axes 1 ---
 		_canmsg.CAN_data[3]= _control_mode[1]; 		
