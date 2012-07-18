@@ -494,8 +494,8 @@ static eOresult_t s_eo_emsCanNetTopo_hashTbls_init(EOemsCanNetTopo *p)
 static eOresult_t s_eo_emsCanNetTopo_hashTbl_joint_init(EOemsCanNetTopo *p)
 {
     uint8_t i,j,k; //i indexes the motorBoardCanLoc2NvsRef lookup tbl
-    eo_emsCanNetTopo_jointTopoInfo_t *j_topoinfo_ptr = (eo_emsCanNetTopo_jointTopoInfo_t*)(p->cfg.emsCanNetTopo_joints__ptr->item_array_data);
-    eo_emsCanNetTopo_boardTopoInfo_t *b_topoinfo_ptr = (eo_emsCanNetTopo_boardTopoInfo_t*)(p->cfg.emsCanNetTopo_canBoards__ptr->item_array_data);
+    eo_emsCanNetTopo_jointTopoInfo_t *j_topoinfo_ptr;
+    eo_emsCanNetTopo_boardTopoInfo_t *b_topoinfo_ptr;
     eo_emsCanNetTopo_boardTopoInfo_t *b_aux_ptr;
     
     // 1) reset hashtbl
@@ -513,12 +513,15 @@ static eOresult_t s_eo_emsCanNetTopo_hashTbl_joint_init(EOemsCanNetTopo *p)
 
    
     // 2) init hastbl   if joints are cfg
-    if((NULL == j_topoinfo_ptr) || (0 == p->cfg.emsCanNetTopo_joints__ptr->size)) 
+    if((NULL == p->cfg.emsCanNetTopo_joints__ptr) || (0 == p->cfg.emsCanNetTopo_joints__ptr->size)) 
     {
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_weak, s_eobj_ownname, "no joints are config"); 
         return(eores_OK);
     } 
-    
+ 
+    j_topoinfo_ptr = (eo_emsCanNetTopo_jointTopoInfo_t*)(p->cfg.emsCanNetTopo_joints__ptr->item_array_data);
+    b_topoinfo_ptr = (eo_emsCanNetTopo_boardTopoInfo_t*)(p->cfg.emsCanNetTopo_canBoards__ptr->item_array_data);
+
     for(i = 0; i< p->cfg.emsCanNetTopo_joints__ptr->size; i++)
     {
         b_aux_ptr = &b_topoinfo_ptr[j_topoinfo_ptr[i].bid];
@@ -543,8 +546,8 @@ static eOboolvalues_t s_eo_emsCanNetTopo_jointcfgIsValid(EOemsCanNetTopo *p, eo_
 static eOresult_t s_eo_emsCanNetTopo_hashTbl_motor_init(EOemsCanNetTopo *p)
 {
     uint8_t i, j, k; //i indexes the motorBoardCanLoc2NvsRef lookup tbl
-    eo_emsCanNetTopo_motorTopoInfo_t *m_topoinfo_ptr = (eo_emsCanNetTopo_motorTopoInfo_t*)(p->cfg.emsCanNetTopo_motors__ptr->item_array_data);
-    eo_emsCanNetTopo_boardTopoInfo_t *b_topoinfo_ptr = (eo_emsCanNetTopo_boardTopoInfo_t*)(p->cfg.emsCanNetTopo_canBoards__ptr->item_array_data);
+    eo_emsCanNetTopo_motorTopoInfo_t *m_topoinfo_ptr;
+    eo_emsCanNetTopo_boardTopoInfo_t *b_topoinfo_ptr;
     eo_emsCanNetTopo_boardTopoInfo_t *b_aux_ptr;
 
     // 1) reset hashtbl
@@ -561,11 +564,14 @@ static eOresult_t s_eo_emsCanNetTopo_hashTbl_motor_init(EOemsCanNetTopo *p)
     }
 
     // 2) init hastbl if motors are cfg   
-    if((NULL == m_topoinfo_ptr) || (0 == p->cfg.emsCanNetTopo_motors__ptr->size)) 
+    if((NULL == p->cfg.emsCanNetTopo_motors__ptr) || (0 == p->cfg.emsCanNetTopo_motors__ptr->size)) 
     {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_weak, s_eobj_ownname, "no motors are config"); 
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "no motors are config"); 
         return(eores_OK);
     }
+
+    m_topoinfo_ptr = (eo_emsCanNetTopo_motorTopoInfo_t*)(p->cfg.emsCanNetTopo_motors__ptr->item_array_data);
+    b_topoinfo_ptr = (eo_emsCanNetTopo_boardTopoInfo_t*)(p->cfg.emsCanNetTopo_canBoards__ptr->item_array_data);
 
     for(i = 0; i< p->cfg.emsCanNetTopo_motors__ptr->size; i++)
     {
@@ -690,19 +696,22 @@ static eOresult_t s_eo_emsCanNetTopo_checkConfiguration(eo_emsCanNetTopo_cfg_t *
 static eOresult_t s_eo_emsCanNetTopo_hashTbl_sensor_init(EOemsCanNetTopo *p)
 {
     //uint8_t i; //i indexes the motorBoardCanLoc2NvsRef lookup tbl
-    eo_emsCanNetTopo_sensorTopoInfo_t *s_topoinfo_ptr = (eo_emsCanNetTopo_sensorTopoInfo_t*)(p->cfg.emsCanNetTopo_sensors__ptr->item_array_data);
-    eo_emsCanNetTopo_boardTopoInfo_t *b_topoinfo_ptr = (eo_emsCanNetTopo_boardTopoInfo_t*)(p->cfg.emsCanNetTopo_canBoards__ptr->item_array_data);
+    eo_emsCanNetTopo_sensorTopoInfo_t *s_topoinfo_ptr;
+    eo_emsCanNetTopo_boardTopoInfo_t *b_topoinfo_ptr;
 
     //reset hashtbl
      memset(&p->sensorStrain_hTbl, 0x0, sizeof(p->sensorStrain_hTbl));  
-     memset(&p->sensorMais_hTbl, 0x0, sizeof(p->sensorMais_hTbl));  
-    
-    
-    if((NULL == s_topoinfo_ptr) || (0 == p->cfg.emsCanNetTopo_sensors__ptr->size))
+     memset(&p->sensorMais_hTbl, 0x0, sizeof(p->sensorMais_hTbl)); 
+
+    if((NULL == p->cfg.emsCanNetTopo_sensors__ptr) || (0 == p->cfg.emsCanNetTopo_sensors__ptr->size))
     {
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, s_eobj_ownname, "no can-sensors are config"); 
         return(eores_OK); //some ems hasn't sensors
     }
+    
+    s_topoinfo_ptr = (eo_emsCanNetTopo_sensorTopoInfo_t*)(p->cfg.emsCanNetTopo_sensors__ptr->item_array_data);
+    b_topoinfo_ptr = (eo_emsCanNetTopo_boardTopoInfo_t*)(p->cfg.emsCanNetTopo_canBoards__ptr->item_array_data);
+    
     
     switch(b_topoinfo_ptr[s_topoinfo_ptr->bid].boardtype)
     {
