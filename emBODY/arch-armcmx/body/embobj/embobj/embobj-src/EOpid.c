@@ -140,23 +140,25 @@ extern void eo_pid_Reset(EOpid *o)
 
 extern int16_t eo_pid_PWM2(EOpid *o, float En, float Vref,float Venc)
 {
+    /*
     if (-3200.0f<Vref && Vref<3200.0f)
     {
-        // low speed great workaround (=tapullo)
+        // low speed great workaround (tapullo)
 
-        float k = (Vref>0.0f ? 0.0003125f : -0.0003125f)*Vref; 
-
+        float k = (Vref>0.0f ? 0.0003125f : -0.0003125f)*Vref;
+         
         o->KIn = 0.0f;
 
         float w = 0.5*k+0.5;
-
-        o->pwm = (1.0f-w)*o->pwm + w*(o->K*((1.0f+3.0f*(1.0f-k))*En+o->Kd*(Vref-Venc)));
+        
+        o->pwm = (1.0f-w)*o->pwm + w*(o->K*((1.0f+4.0f*(1.0f-k))*En+o->Kd*(Vref-Venc)));
     }
     else
+    */
     {
         float Xn = o->K*(En+o->Kd*(Vref-Venc));
 
-        if ((o->KIn<0.0f) ^ (Xn<0.0f)) o->KIn = 0.0f;
+        //if ((o->KIn<0.0f) ^ (Xn<0.0f)) o->KIn = 0.0f;
    
         o->KIn += Xn;
 
@@ -166,10 +168,10 @@ extern int16_t eo_pid_PWM2(EOpid *o, float En, float Vref,float Venc)
     }
     
     // dead zone suppression
-    if (Vref>8.0f)
-        o->pwm += 600.0f;
-    else if (Vref<-8.0f)
-        o->pwm -= 600.0f; 
+    if (Vref>0.0f)
+        o->pwm += 500.0f;
+    else if (Vref<0.0f)
+        o->pwm -= 500.0f; 
 
     LIMIT(o->pwm, o->Ymax);
 
