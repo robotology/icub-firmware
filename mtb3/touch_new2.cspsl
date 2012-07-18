@@ -8,4 +8,5 @@
            4	 	 	 	              0	 	       527	00000020F	 	  8	4C	11	01	03	00	30	00	06	
            5	 	 	 	              0	 	       527	00000020F	 	  8	4C	21	01	03	00	70	00	03	
            6	 	 	 	              0	analog acc	       517	000000205	 	  8	4E	02	22	FF	01	00	01	01	
-           7	 	 	 	              0	digital acc and analog plus palm	       517	000000205	 	  8	4E	02	22	E0	26	01	01	01	
+           7	 	 	 	              0	digital acc and analog plus palm	       517	000000205	 	  8	4E	02	22	E0	26	FF	FF	01	
+           8	 	 	 	              0	 	       517	000000205	 	  8	4E	02	22	E0	22	0F	00	00	
