@@ -85,11 +85,19 @@
 extern void eo_cfg_sm_EMSappl_hid_on_trans_CFG_EVgo2run(EOsm *s)
 {
     EOappTheSP* appTheSP = eo_appTheSP_GetHandle();
-    EOappCanSP* canSP = eo_appTheSP_GetCanServiceHandle(appTheSP);
-    
-    eo_appCanSP_SetRunMode(canSP, eo_appCanSP_runMode__onDemand);
+
+    eo_appCanSP_SetRunMode(eo_appTheSP_GetCanServiceHandle(appTheSP), eo_appCanSP_runMode__onDemand);
+    eo_appTheCanBrdsMng_StartAllBoards(eo_appTheSP_GetTheCanBrdsMngHandle(appTheSP));
 }
 
+
+extern void eo_cfg_sm_EMSappl_hid_on_trans_RUN_EVgo2cfg(EOsm *s)
+{
+    EOappTheSP* appTheSP = eo_appTheSP_GetHandle();
+    
+    eo_appCanSP_SetRunMode(eo_appTheSP_GetCanServiceHandle(appTheSP), eo_appCanSP_runMode__onEvent);
+    eo_appTheCanBrdsMng_StopAllBoards(eo_appTheSP_GetTheCanBrdsMngHandle(appTheSP));
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
