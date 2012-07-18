@@ -61,15 +61,28 @@ extern "C" {
 typedef struct EOemsCanNetTopo_hid EOemsCanNetTopo;
 
 
+//indice del joint o del motor interno alla board. ogni board gestisce al piu' due motori/joint
+typedef enum 
+{
+    eo_emsCanNetTopo_jm_index_first = 0,
+    eo_emsCanNetTopo_jm_index_second = 1
+} eo_emsCanNetTopo_jm_indexInBoard; 
+
+EO_VERIFYproposition(isjm_indexInBoard_Compatiblewithicubcanproto, (eo_emsCanNetTopo_jm_index_first == 0));
+EO_VERIFYproposition(isjm_indexInBoard_Compatiblewithicubcanproto, (eo_emsCanNetTopo_jm_index_second == 1));
+
+
+
+enum {eo_emsCanNetTopo_jm_indexInBoard_max = 2};
 /** @typedef    typedef     struct             eo_emsCanNetTopo_jointOrMotorLocation_t
     @brief      contains information to identify a joint or a motor managed by an ems univocally on that ems.
  **/
 typedef struct
 {
-    eOcanport_t         emscanport;	
-    uint8_t             canaddr;        /**< CAN address of board liked with joint/motor.
-                                             if this struct is used with icubCanProtocol canaddr's values must be complient with eo_icubCanProto_canBoardAddress_t*/
-    uint8_t             axis;	        /**< number of joint/ motor, said axis generally.
+    eOcanport_t                         emscanport;	
+    uint8_t                             canaddr;        /**< CAN address of board liked with joint/motor.
+                                                            if this struct is used with icubCanProtocol canaddr's values must be complient with eo_icubCanProto_canBoardAddress_t*/
+    eo_emsCanNetTopo_jm_indexInBoard    jm_idInBoard;	        /**< number of joint/ motor, said axis generally.
                                              if this struct is used with icubCanProtocol axis's values must be complient with eo_icubCanProto_motorAxis_t*/
 } eo_emsCanNetTopo_jointOrMotorCanLocation_t;
 
@@ -100,6 +113,7 @@ typedef struct
     const EOconstvector* const emsCanNetTopo_motors__ptr;  /**< list of motors managed by an EMS board */
     const EOconstvector* const emsCanNetTopo_sensors__ptr; /**< list of sensors managed by an EMS board */
     const EOconstvector* const emsCanNetTopo_skin__ptr;    /**< list of skin managed by an EMS board */
+    const EOconstvector* const emsCanNetTopo_canBoards__ptr; /**< list of CAN boars connected to ems by can */
 } eo_emsCanNetTopo_cfg_t;
 
 
@@ -108,25 +122,48 @@ typedef struct
     @warning    pay attention to eOcanport_t define d in eOcommon.h
  **/
 enum { eo_emsCanNetTopo_canports_num = 2 }; 
- 
- 
-    
-typedef struct
-{
-    uint8_t                 boardAddr;
-    uint8_t                 axis;
-    eOcanport_t             canPort;
-    eObrd_types_t           boardType;
-    uint16_t                id;         //it must be complient with eOmc_jointId_t and eOmc_motorId_t
-} eo_emsCanNetTopo_jointOrMotorTopoInfo_t;
+
+// typedef eOcfg_nvsEP_mc_jointNumber_t eo_emsCanNetTopo_jointNumber_t;
+// typedef eOcfg_nvsEP_mc_motorNumber_t eo_emsCanNetTopo_motorNumber_t;
+typedef uint16_t                     eo_emsCanNetTopo_boardId_t;
+
+
 
 typedef struct
 {
-    uint8_t                 boardAddr;
-    eOcanport_t             canPort;
-    eObrd_types_t           boardType;
-    uint16_t                id;         //it must be complient with eOmc_sensorId_t and eOmc_skinId_t
+    uint8_t                         canaddr;
+    eOcanport_t                     emscanport;
+    eObrd_types_t                   boardtype;
+    eo_emsCanNetTopo_boardId_t      bid;
+} eo_emsCanNetTopo_boardTopoInfo_t; 
+
+
+typedef struct
+{
+    eo_emsCanNetTopo_jm_indexInBoard    j_idInBoard;
+    eo_emsCanNetTopo_boardId_t          bid;
+    eOmc_jointId_t                      jid;  
+} eo_emsCanNetTopo_jointTopoInfo_t;
+
+
+
+typedef struct
+{
+    eo_emsCanNetTopo_jm_indexInBoard    m_idInBoard;
+    eo_emsCanNetTopo_boardId_t          bid;
+    eOmc_motorId_t                      mid;  
+} eo_emsCanNetTopo_motorTopoInfo_t;
+
+
+typedef struct
+{
+    eo_emsCanNetTopo_boardId_t      bid;
+    eOsnsr_sensorId_t               sid;
 } eo_emsCanNetTopo_sensorTopoInfo_t;
+
+
+
+
 
 
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
@@ -163,7 +200,7 @@ extern eOresult_t eo_emsCanNetTopo_GetConnectedMotors(EOemsCanNetTopo *p, EOarra
 extern eOresult_t eo_emsCanNetTopo_GetConnectedSensors(EOemsCanNetTopo *p, EOarray *connectedSensorsList);
 extern eOresult_t eo_emsCanNetTopo_GetConnectedSkin(EOemsCanNetTopo *p, EOarray *connectedSkinList);
 
-
+extern const EOconstvector* eo_emsCanNetTopo_GetCfgCanBoards(EOemsCanNetTopo *p);
 
 /*VALE: aggiungi funzione che dato joint id ritorna il tipo di board che lo gestisce! idem per il kotor. puo' venire utile??*/
 
