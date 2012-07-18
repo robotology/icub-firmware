@@ -68,9 +68,10 @@
 
 const hal_encoder_cfg_t hal_encoder_cfg_default = 
 {
-    .priority = hal_int_priority15, 
-    .callback_on_rx = NULL, 
-    .arg = NULL
+    .priority                   = hal_int_priority15, 
+    .bitrate                    = hal_encoder_bitrate_500kbps,
+    .callback_on_rx             = NULL, 
+    .arg                        = NULL
 };
 
 
@@ -127,6 +128,11 @@ extern hal_result_t hal_encoder_init(hal_encoder_t enc, const hal_encoder_cfg_t 
     {
         cfg = &hal_encoder_cfg_default;
     }
+    
+    if((hal_encoder_bitrate_500kbps != cfg->bitrate) && (hal_encoder_bitrate_1000kbps != cfg->bitrate))
+    {
+        return(hal_res_NOK_unsupported);
+    }
 
     memcpy(&s_hal_encoder_cfgs[HAL_encoder_t2index(enc)], cfg, sizeof(hal_encoder_cfg_t));
 
@@ -139,38 +145,38 @@ extern hal_result_t hal_encoder_init(hal_encoder_t enc, const hal_encoder_cfg_t 
         case hal_encoder2:
         case hal_encoder3:
         {
-            spi4enc_cfg.baudrate = hal_spi_baudrate1000kbps;
-            spi4enc_cfg.priority    = cfg->priority;
-            spi4enc_cfg.callback_on_rx = s_hal_encoder_on_rx_spi;
-            spi4enc_cfg.arg = NULL;//(hal_spi4encoder_encoderReadData_t*) &(hal_SPI4ENCODER_GET(hal_spi_port1)->enc_data);
+            spi4enc_cfg.baudrate        = (hal_encoder_bitrate_500kbps == cfg->bitrate) ? hal_spi_baudrate500kbps : hal_spi_baudrate1000kbps;
+            spi4enc_cfg.priority        = cfg->priority;
+            spi4enc_cfg.callback_on_rx  = s_hal_encoder_on_rx_spi;
+            spi4enc_cfg.arg             = NULL;//(hal_spi4encoder_encoderReadData_t*) &(hal_SPI4ENCODER_GET(hal_spi_port1)->enc_data);
         } break;
 
         case hal_encoder4:
         case hal_encoder5:
         case hal_encoder6:
         {
-            spi4enc_cfg.baudrate = hal_spi_baudrate1000kbps;
-            spi4enc_cfg.priority    = cfg->priority;
-            spi4enc_cfg.callback_on_rx = s_hal_encoder_on_rx_spi;
-            spi4enc_cfg.arg = NULL;//&s_hal_encoder_ids[HAL_encoder_t2index(enc)];
+            spi4enc_cfg.baudrate        = (hal_encoder_bitrate_500kbps == cfg->bitrate) ? hal_spi_baudrate500kbps : hal_spi_baudrate1000kbps;
+            spi4enc_cfg.priority        = cfg->priority;
+            spi4enc_cfg.callback_on_rx  = s_hal_encoder_on_rx_spi;
+            spi4enc_cfg.arg             = NULL;//&s_hal_encoder_ids[HAL_encoder_t2index(enc)];
         } break;
 
         case hal_encoder7:
         case hal_encoder8:
         case hal_encoder9:
         {
-            spi4enc_cfg.baudrate = hal_spi_baudrate1000kbps;
-            spi4enc_cfg.priority    = cfg->priority;
-            spi4enc_cfg.callback_on_rx = s_hal_encoder_on_rx_spi;
-            spi4enc_cfg.arg = NULL;
+            spi4enc_cfg.baudrate        = (hal_encoder_bitrate_500kbps == cfg->bitrate) ? hal_spi_baudrate500kbps : hal_spi_baudrate1000kbps;
+            spi4enc_cfg.priority        = cfg->priority;
+            spi4enc_cfg.callback_on_rx  = s_hal_encoder_on_rx_spi;
+            spi4enc_cfg.arg             = NULL;
         } break;
 
         default:
         {
-            spi4enc_cfg.baudrate = hal_spi_baudrate1000kbps;
-            spi4enc_cfg.priority    = cfg->priority;
-            spi4enc_cfg.callback_on_rx = NULL;
-            spi4enc_cfg.arg = NULL;
+            spi4enc_cfg.baudrate        = (hal_encoder_bitrate_500kbps == cfg->bitrate) ? hal_spi_baudrate500kbps : hal_spi_baudrate1000kbps;
+            spi4enc_cfg.priority        = cfg->priority;
+            spi4enc_cfg.callback_on_rx  = NULL;
+            spi4enc_cfg.arg             = NULL;
         } break;
     }
 
