@@ -2652,12 +2652,12 @@
       <GroupNumber>21</GroupNumber>
       <FileNumber>118</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>26</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>268</TopLine>
-      <CurrentLine>279</CurrentLine>
+      <TopLine>72</TopLine>
+      <CurrentLine>80</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\body\embobj\embobj\embobj-icub\icub-ems\EOMtheEMSapplCfg.c</PathWithFileName>
       <FilenameWithoutPath>EOMtheEMSapplCfg.c</FilenameWithoutPath>
