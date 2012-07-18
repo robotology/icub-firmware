@@ -68,15 +68,25 @@ typedef enum
 
 enum { hal_encoders_num = 9 };
 
+/** @typedef    typedef enum hal_encoder_bitrate_t 
+    @brief      hal_encoder_baudrate_t contains every possible bitrate for the peripheral.
+ **/ 
+typedef enum  
+{ 
+	hal_encoder_bitrate_500kbps     = 1,
+    hal_encoder_bitrate_1000kbps    = 2
+} hal_encoder_bitrate_t;
+
 
 /** @typedef    typedef struct hal_encoder_cfg_t;
     @brief      contains configuration data of encoder peripheral.
  **/
 typedef struct
 {
-    hal_interrupt_priority_t priority;          /**< the priority if the ISR underlying the encoder */
+    hal_interrupt_priority_t    priority;       /**< the priority if the ISR underlying the encoder */
+    hal_encoder_bitrate_t       bitrate;         
     void (*callback_on_rx)(void *arg);          /**< callback called when new data for the encoder is available     */
-    void* arg;                                  /**< argument of the callback                                       */
+    void*                       arg;            /**< argument of the callback                                       */
 } hal_encoder_cfg_t;
 
  
