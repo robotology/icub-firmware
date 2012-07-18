@@ -137,7 +137,7 @@ extern void eo_axisController_StartCalibration(EOaxisController *o, int32_t pos,
     o->is_calibrated = eobool_false;
     o->calib_max_error = max_error;
 
-    eo_trajectory_SetPosReference(o->trajectory, pos, 8192);
+    eo_trajectory_SetPosReference(o->trajectory, pos, 4096);
 }
 
 extern void eo_axisController_SetLimits(EOaxisController *o, int32_t pos_min, int32_t pos_max, int32_t vel_max)
@@ -379,8 +379,8 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
                 eo_pid_Reset(o->pidP);
             }
 
-            encoder_can = vel;
-            posref_can  = pos;
+            encoder_can = pos;
+            posref_can  = pos_ref;
 
             return eo_pid_PWM2(o->pidP, pos_ref - pos, vel_ref, vel);
         }

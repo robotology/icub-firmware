@@ -86,6 +86,7 @@ extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution)
         o->calibration = 0;
         o->distance = 0;
         o->speed = 0;
+        o->odo_x_1000 = 0;
     }
 
     return o;
@@ -99,7 +100,8 @@ extern void eo_speedometer_EncoderCalibrate(EOspeedmeter* o, int32_t new_calibra
 
 extern void eo_speedometer_ReadSpeed(EOspeedmeter* o, int32_t speed)
 {
-    o->speed = speed;
+    o->speed = (o->speed+speed+1)/2;
+    o->odo_x_1000 += o->speed;
 }
 
 extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
@@ -114,6 +116,7 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
         o->last_reading = encoder;
         o->distance = encoder;
         o->speed = 0;
+        o->odo_x_1000 = 0;
         
         return;
     }
@@ -201,7 +204,11 @@ extern int32_t eo_speedometer_GetVelocity(EOspeedmeter* o)
 
 extern int32_t eo_speedometer_GetDistance(EOspeedmeter* o)
 {
+#ifdef USE_2FOC_FAST_ENCODER
+    return o->distance + (o->odo_x_1000/1000)%16;
+#else
     return o->distance;
+#endif
 }
 
 // --------------------------------------------------------------------------------------------------------------------

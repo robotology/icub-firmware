@@ -45,6 +45,7 @@ struct EOspeedmeter_hid
     int32_t calibration;
     int32_t distance;
     int32_t speed;
+    int32_t odo_x_1000;
   
     eObool_t first_reading;
 }; 
