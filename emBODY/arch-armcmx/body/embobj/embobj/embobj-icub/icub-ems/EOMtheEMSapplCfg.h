@@ -84,13 +84,24 @@ typedef enum
 
 typedef enum
 {
-    eom_emsappl_deviceid_skin       = 1,
-    eom_emsappl_deviceid_mc4        = 2,
-    eom_emsappl_deviceid_2foc       = 3
+    eom_emsappl_deviceid_skin       = 0,
+    eom_emsappl_deviceid_mc4        = 1,
+    eom_emsappl_deviceid_2foc       = 2
 } eom_emsapplcfg_deviceid_t;
 
 enum {eom_emsappl_deviceid_numberof = 3};
 
+
+typedef enum
+{
+    eom_emsappl_eptype_mc           = 0,
+    eom_emsappl_eptype_as           = 1,
+    eom_emsappl_eptype_sk           = 2
+} eom_emsapplcfg_eptype_t;
+
+// ok, but better move it elsewhere .... in the same place where we define teh endpoint categories
+
+enum {eom_emsappl_eptype_numberof = 3};
 
 
 /** @typedef    typedef const struct EOMtheEMSapplCfg
@@ -104,6 +115,7 @@ typedef const struct
     eObool_t                        getipaddrFROMenvironment;
     eom_emsapplcfg_boardid_t        boardid;
     eObool_t                        hasdevice[eom_emsappl_deviceid_numberof];
+    eOnvEP_t                        eps[eom_emsappl_eptype_numberof];
     eOemsdiscoverylistener_cfg_t    disclistcfg;
     eOemssocket_cfg_t               socketcfg;      /**< the cfg used by the object EOMtheEMSsocket launched by the EOMtheEMSappl */
     eOemstransceiver_cfg_t          transcfg;       /**< the cfg used by the object EOMtheEMStransceiver launched by the EOMtheEMSappl */
@@ -148,6 +160,14 @@ extern EOMtheEMSapplCfg * eom_emsapplcfg_GetHandle(void);
                 and EOMTHEEMSAPPLCFG_EBX_has2FOC which keep a eObool_t value.
  **/
 extern eObool_t eom_emsapplcfg_HasDevice(EOMtheEMSapplCfg *p, eom_emsapplcfg_deviceid_t dev); 
+
+
+/** @fn         extern eOnvEP_t eom_emsapplcfg_Get_nvEPfor(EOMtheEMSapplCfg *p, eom_emsapplcfg_eptype_t eptype)
+    @brief      tells the ep for a given category of endpoint.
+    @return     teh ep value or 0xffff if the ep type is not present
+ **/
+extern eOnvEP_t eom_emsapplcfg_Get_nvEPfor(EOMtheEMSapplCfg *p, eom_emsapplcfg_eptype_t eptype); 
+
 
 /** @}            
     end of group eom_theemsapplcfg  

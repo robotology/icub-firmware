@@ -246,6 +246,10 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
     {
         EOMTHEEMSAPPLCFG_EBX_hasSKIN, EOMTHEEMSAPPLCFG_EBX_hasMC4, EOMTHEEMSAPPLCFG_EBX_has2FOC
     },
+    .eps                        =
+    {
+        EOMTHEEMSAPPLCFG_EBX_endpoint_mc, EOMTHEEMSAPPLCFG_EBX_endpoint_as, EOMTHEEMSAPPLCFG_EBX_endpoint_sk
+    },
     .disclistcfg    =
     {
         .taskpriority           = EOMTHEEMSAPPLCFG_LISTENER_TASK_PRIORITYof,
@@ -364,6 +368,11 @@ extern EOMtheEMSapplCfg* eom_emsapplcfg_GetHandle(void)
 extern eObool_t eom_emsapplcfg_HasDevice(EOMtheEMSapplCfg *p, eom_emsapplcfg_deviceid_t dev)
 {
     return(s_emsapplcfg_singleton.hasdevice[dev]);
+}
+
+extern eOnvEP_t eom_emsapplcfg_Get_nvEPfor(EOMtheEMSapplCfg *p, eom_emsapplcfg_eptype_t eptype)
+{
+    return(s_emsapplcfg_singleton.eps[eptype]);
 }
 
 
