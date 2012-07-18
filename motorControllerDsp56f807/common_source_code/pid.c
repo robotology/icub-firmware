@@ -83,13 +83,13 @@ Int32 _position_enc_old[JN] = INIT_ARRAY (0);	 // incremental encoder position
 Int32 _real_position[JN]= INIT_ARRAY (0);
 Int32 _real_position_old[JN]= INIT_ARRAY (0);
 Int32 _desired[JN] = INIT_ARRAY (0);		 
-Int16 _desired_absolute[JN] = INIT_ARRAY (0); // PD ref value for the calibration 
-Int32 _set_point[JN] = INIT_ARRAY (0);  	  // set point for position [user specified] 
+Int16 _desired_absolute[JN] = INIT_ARRAY (0);    // PD ref value for the calibration 
+Int32 _set_point[JN] = INIT_ARRAY (0);  	     // set point for position [user specified] 
 
 Int32 _min_position[JN] = INIT_ARRAY (-DEFAULT_MAX_POSITION);
 Int32 _max_position[JN] = INIT_ARRAY (DEFAULT_MAX_POSITION);
 Int32 _max_real_position[JN]=INIT_ARRAY (0);
-
+Int16 _optical_ratio[JN]=INIT_ARRAY (0);         //  optical encoder ratio	
 
 // SPEED VARIABLES
 Int16 _speed[JN] = INIT_ARRAY (0);			 	 		// encoder speed 

@@ -123,7 +123,8 @@ extern Int32 _set_point[JN] ;			// set point for position [user specified]
 extern Int32 _min_position[JN] ;		// software position limits 
 extern Int32 _max_position[JN] ;		// software position limits 
 extern Int16 _max_position_enc[JN];     // max allowed position for encoder while controlling with absolute position sensors
-extern Int32 _max_real_position[JN];										
+extern Int32 _max_real_position[JN];		
+extern Int16 _optical_ratio[JN];        //  optical encoder ratio								
 
 
 // SPEED VARIABLES
