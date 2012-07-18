@@ -17,9 +17,9 @@
 */
 
 /* @file       eOcfg_emsCanNetworkTopology.c
-    @brief      This file keeps ems EB7 can network configuration
+    @brief      This file keeps ems EB3 (left upper leg) can network configuration
     @author     valentina.gaggero@iit.it
-    @date       03/12/2012
+    @date       07/10/2012
 **/
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -73,8 +73,12 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 //board 
+
 #define FOC_ADDRCAN_1_BID       0
 #define FOC_ADDRCAN_2_BID       1
+#define FOC_ADDRCAN_3_BID       2
+#define FOC_ADDRCAN_4_BID       3
+#define STRAIN_ADDRCAN_14_BID   4
 
 static const eo_emsCanNetTopo_boardTopoInfo_t s_cfg_canNetTopo_boards[] = 
 {
@@ -85,11 +89,30 @@ static const eo_emsCanNetTopo_boardTopoInfo_t s_cfg_canNetTopo_boards[] =
     },
 
     { // 1 == FOC_ADDRCAN_2_BID
+        EO_INIT(.canaddr)                 2,
+        EO_INIT(.emscanport)              eOcanport1,
+        EO_INIT(.boardtype)               eobrd_1foc,
+    },    
+
+    { // 2  == FOC_ADDRCAN_3_BID
+        EO_INIT(.canaddr)                 3,
+        EO_INIT(.emscanport)              eOcanport1,
+        EO_INIT(.boardtype)               eobrd_1foc,
+    },
+
+    { // 3 == FOC_ADDRCAN_4_BID
         EO_INIT(.canaddr)                 4,
         EO_INIT(.emscanport)              eOcanport1,
         EO_INIT(.boardtype)               eobrd_1foc,
-    }    
+    },    
+ 
+    { // 4  == STRAIN_ADDRCAN_14_BID
+        EO_INIT(.canaddr)                 14,
+        EO_INIT(.emscanport)              eOcanport1,
+        EO_INIT(.boardtype)               eobrd_strain,
+    }
 };
+
 
 const EOconstvector  s_eo_cfg_emsCanNetTopo_constvec_boards = 
 {
@@ -100,24 +123,42 @@ const EOconstvector  s_eo_cfg_emsCanNetTopo_constvec_boards =
 
 extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_boards__ptr = &s_eo_cfg_emsCanNetTopo_constvec_boards;
 
-/*definition of left leg can net topology (ems 7) */
+
+
+
+
+
+/*definition of left leg can net topology (ems 3) */
 
 static const eo_emsCanNetTopo_jointTopoInfo_t s_cfg_canNetTopo_joints[] = 
 {
-   { // 0 
-        EO_INIT(.bid)                       FOC_ADDRCAN_1_BID,
+    { // 0 
+        EO_INIT(.bid)                       FOC_ADDRCAN_3_BID,
         EO_INIT(.j_idInBoard)               eo_emsCanNetTopo_jm_index_first,
         EO_INIT(.jid)                       0
     },    
 
     { // 1 
-        EO_INIT(.bid)                       FOC_ADDRCAN_2_BID,
+        EO_INIT(.bid)                       FOC_ADDRCAN_4_BID,
         EO_INIT(.j_idInBoard)               eo_emsCanNetTopo_jm_index_first,
         EO_INIT(.jid)                       1
     },
 
+    { // 2 
+        EO_INIT(.bid)                       FOC_ADDRCAN_1_BID,
+        EO_INIT(.j_idInBoard)               eo_emsCanNetTopo_jm_index_first,
+        EO_INIT(.jid)                       2
+    },    
 
-cconst EOconstvector  s_eo_cfg_emsCanNetTopo_constvec_joints = 
+    { // 3 
+        EO_INIT(.bid)                       FOC_ADDRCAN_2_BID,
+        EO_INIT(.j_idInBoard)               eo_emsCanNetTopo_jm_index_first,
+        EO_INIT(.jid)                       3
+    }
+};
+
+
+const EOconstvector  s_eo_cfg_emsCanNetTopo_constvec_joints = 
 {
     EO_INIT(.size)              sizeof(s_cfg_canNetTopo_joints)/sizeof(eo_emsCanNetTopo_jointTopoInfo_t),
     EO_INIT(.item_size)         sizeof(eo_emsCanNetTopo_jointTopoInfo_t),
@@ -125,6 +166,7 @@ cconst EOconstvector  s_eo_cfg_emsCanNetTopo_constvec_joints =
 };
 
 extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_joints__ptr = &s_eo_cfg_emsCanNetTopo_constvec_joints;
+
 
 
 /***********************************************************************************************/
@@ -136,36 +178,53 @@ extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_motors__ptr = &s
 
 
 
-
 /***********************************************************************************************/
-/*********************** **********        S E N S O R S            ***************************************/
+/*****************************        S E N S O R S         ************************************/
 /***********************************************************************************************/
-//Note: no analg sensor are connected to ems 7
 
-// const EOconstvector  s_eo_cfg_emsCanNetTopo_constvec_sensors = 
-// {
-//     EO_INIT(.size)              0,
-//     EO_INIT(.item_size)         0,
-//     EO_INIT(.item_array_data)   NULL
-// };
+static const eo_emsCanNetTopo_sensorTopoInfo_t  s_cfg_canNetTopo_sensors[] = 
+{
+   {// 0
+       EO_INIT(.bid)                       STRAIN_ADDRCAN_14_BID,
+       EO_INIT(.sid)                       0
+   
+  }
+};
 
 
-// extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_sensors__ptr = &s_eo_cfg_emsCanNetTopo_constvec_sensors;
-extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_sensors__ptr = NULL;
+const EOconstvector  s_eo_cfg_emsCanNetTopo_constvec_sensors = 
+{
+    EO_INIT(.size)              sizeof(s_cfg_canNetTopo_sensors)/sizeof(eo_emsCanNetTopo_sensorTopoInfo_t), 
+    EO_INIT(.item_size)         sizeof(eo_emsCanNetTopo_sensorTopoInfo_t),
+    EO_INIT(.item_array_data)   s_cfg_canNetTopo_sensors
+};
+
+
+extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_sensors__ptr = &s_eo_cfg_emsCanNetTopo_constvec_sensors;
+
 
 
 
 /***********************************************************************************************/
 /**********************************        S K I N       ***************************************/
 /***********************************************************************************************/
-//eb7 ems doesn't manage skin
-// const EOconstvector  s_eo_cfg_emsCanNetTopo_constvec_skin= 
+// //Note: since EMS doesn't manage skin, but it is only a gataway between skin boards and pc104, 
+// //the configuration says tahe skin is connected.
+// static const eo_emsCanNetTopo_sensorTopoInfo_t  s_cfg_canNetTopo_skin [] = 
 // {
-//     EO_INIT(.size)              0,
-//     EO_INIT(.item_size)         0
-//     EO_INIT(.item_array_data)   NULL
+//     {// 0
+//         EO_INIT(.bid)                 SKIN_BID,
+//         EO_INIT(.sid)                 0              
+//    }
 // };
 
 
-// extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_skin__ptr = &s_eo_cfg_emsCanNetTopo_constvec_skin;
-extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_skin__ptr = NULL;
+// const EOconstvector  s_eo_cfg_emsCanNetTopo_constvec_skin = 
+// {
+//     EO_INIT(.size)              sizeof(s_cfg_canNetTopo_skin)/sizeof(eo_emsCanNetTopo_sensorTopoInfo_t), //EOK_cfg_nvsEP_joint_numberof,
+//     EO_INIT(.item_size)         sizeof(eo_emsCanNetTopo_sensorTopoInfo_t),
+//     EO_INIT(.item_array_data)   s_cfg_canNetTopo_skin
+// };
+
+//==> ATTENTION: this ems is not connected to skin so eo_cfg_emsCanNetTopo_constvec_skin__ptr is NULL
+extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_skin__ptr = NULL; //&s_eo_cfg_emsCanNetTopo_constvec_skin;

@@ -263,10 +263,11 @@ static void s_eo_appEncReader_readConnectedEncConfg(EOappEncReader *p, EOappEncR
 static void s_eo_appEncReader_configureConnectedEncoders(EOappEncReader *p, hal_encoder_t startEnc, hal_encoder_t endEnc, EOappEncReader_configEncSPIXReadSequence_hid_t *cfgEncSPIX)
 {
     uint8_t i;
-    hal_encoder_cfg_t enc_cfg;
-
-    enc_cfg.priority = INTPRIO_SPI_ENCODERS;
-
+    hal_encoder_cfg_t enc_cfg =
+    {
+        .priority = INTPRIO_SPI_ENCODERS,
+        .bitrate = hal_encoder_bitrate_500kbps
+    };
 
     for(i=startEnc; i<=endEnc; i++)
     {
