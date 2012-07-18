@@ -47,6 +47,8 @@ extern "C" {
 #include "EOMtheEMSapplCfg_cfg.h"
 
 
+
+
 // - derived #define -------------------------------------------------------------------------------------------------
 
 #if     (1 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
@@ -119,6 +121,85 @@ extern "C" {
     #error --> you must define an EBx
 #endif
 
+
+
+//encoders configuration
+#define ENC_ENA     1   /* If encoder is connected*/
+#define ENC_DISA    0   /* If encoder is NOT connected*/
+#if     defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3)  || defined(EOMTHEEMSAPPLCFG_USE_EB6)  || defined(EOMTHEEMSAPPLCFG_USE_EB8)
+        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (ENC_ENA << eOeOappEncReader_encoder0)  |   \
+                                                        (ENC_ENA << eOeOappEncReader_encoder1)  |   \
+                                                        (ENC_ENA << eOeOappEncReader_encoder2)  |   \
+                                                        (ENC_ENA << eOeOappEncReader_encoder3)  |   \
+                                                        (ENC_DISA << eOeOappEncReader_encoder4) |   \
+                                                        (ENC_DISA << eOeOappEncReader_encoder5) |   \
+                                                    )
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
+        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (ENC_ENA << eOeOappEncReader_encoder0)  |   \
+                                                        (ENC_ENA << eOeOappEncReader_encoder1)  |   \
+                                                        (ENC_DISA << eOeOappEncReader_encoder2) |   \
+                                                        (ENC_DISA << eOeOappEncReader_encoder3) |   \
+                                                        (ENC_DISA << eOeOappEncReader_encoder4) |   \
+                                                        (ENC_DISA << eOeOappEncReader_encoder5) |   \
+                                                    )
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
+        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (ENC_ENA << eOeOappEncReader_encoder0)  |
+                                                        (ENC_ENA << eOeOappEncReader_encoder1)  |
+                                                        (ENC_ENA << eOeOappEncReader_encoder2)  |
+                                                        (ENC_DISA << eOeOappEncReader_encoder3) |
+                                                        (ENC_DISA << eOeOappEncReader_encoder4) |
+                                                        (ENC_DISA << eOeOappEncReader_encoder5) |
+                                                    )
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4)
+//         #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (ENC_DISA << eOeOappEncReader_encoder0)  |  \
+//                                                         (ENC_DISA << eOeOappEncReader_encoder1)  |  \
+//                                                         (ENC_DISA << eOeOappEncReader_encoder2)  |  \
+//                                                         (ENC_DISA << eOeOappEncReader_encoder3) |  \
+//                                                         (ENC_DISA << eOeOappEncReader_encoder4) |  \
+//                                                         (ENC_DISA << eOeOappEncReader_encoder5) |  \
+//                                                     )
+        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (ENC_DISA << eOeOappEncReader_encoder0)  | (ENC_DISA << eOeOappEncReader_encoder1)  |(ENC_DISA << eOeOappEncReader_encoder2)  |(ENC_DISA << eOeOappEncReader_encoder3) |(ENC_DISA << eOeOappEncReader_encoder4) |(ENC_DISA << eOeOappEncReader_encoder5) )
+
+#else
+    #error --> you must define an EBx
+#endif
+
+
+//ems controller configuration
+#if     defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3)  || defined(EOMTHEEMSAPPLCFG_USE_EB6)  || defined(EOMTHEEMSAPPLCFG_USE_EB8)
+        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_NUMOFMOTOR       4
+        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_GENERIC
+        
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
+        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_NUMOFMOTOR       2
+        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_GENERIC
+        
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
+        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_NUMOFMOTOR       3
+        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_GENERIC
+
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4)
+        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_NUMOFMOTOR       1   //il valore corretto e' 0
+        #warning VALE --> aspetta la modifica di ale che accetti come parametro numofmotor=0
+        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_GENERIC
+
+
+#else
+    #error --> you must define an EBx
+#endif
+
+//definition on num of endpoint -- put here only for test!!!!! --
+#if     defined(EOMTHEEMSAPPLCFG_USE_EB4)
+#include "eOcfg_nvsEP_sk.h"
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    endpoint_mc_rightlowerarm       
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    endpoint_as_rightlowerarm 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    endpoint_sk_emsboard_rightlowerarm 
+
+#else
+    #error --> the appl ca not works with board different from eb4!!!
+    //unless you have already added function to get mc, as and sk endpoint number and use them to initialise appTheNVmapRef obj!!!
+    //Remember: remove from include eOcfg_nvsEP_sk.h 
+#endif
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------

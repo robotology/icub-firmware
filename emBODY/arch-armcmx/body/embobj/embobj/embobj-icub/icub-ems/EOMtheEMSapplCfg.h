@@ -58,6 +58,8 @@ extern "C" {
 #include "EOMtheEMSconfigurator.h"
 #include "EOMtheEMSrunner.h"
 
+#include "EOappTheServicesProvider.h"
+
 
 
 
@@ -108,6 +110,7 @@ typedef const struct
     eOemserror_cfg_t                errobjcfg;      /**<   */
     eOemsconfigurator_cfg_t         cfgobjcfg;
     eOemsrunner_cfg_t               runobjcfg;
+    eOappTheSP_cfg_t                srvcfg;         /**<  the cfg used by services provider */
 } EOMtheEMSapplCfg;        
 
 
