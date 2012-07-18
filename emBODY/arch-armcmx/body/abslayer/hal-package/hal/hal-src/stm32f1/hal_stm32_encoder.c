@@ -104,7 +104,7 @@ static hal_spi_mux_t s_hal_encoder_from_encoder_to_spiportmux(hal_encoder_t enc)
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_encoder_cfg_t s_hal_encoder_cfgs[hal_encoders_num] = {hal_int_priorityNONE, NULL, NULL};
+static hal_encoder_cfg_t s_hal_encoder_cfgs[hal_encoders_num] = {hal_int_priorityNONE, hal_encoder_bitrate_500kbps, NULL, NULL};
 
 static hal_boolval_t s_hal_encoder_initted[hal_encoders_num] = { hal_false };
 

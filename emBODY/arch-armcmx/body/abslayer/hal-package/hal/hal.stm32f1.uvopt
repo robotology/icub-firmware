@@ -1102,10 +1102,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>38</ColumnNumber>
+      <ColumnNumber>116</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>85</TopLine>
+      <CurrentLine>107</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\hal-src\stm32f1\hal_stm32_encoder.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_encoder.c</FilenameWithoutPath>
@@ -1116,10 +1116,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>2</ColumnNumber>
+      <ColumnNumber>16</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>402</TopLine>
+      <CurrentLine>417</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\hal-src\stm32f1\hal_stm32_eth.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_eth.c</FilenameWithoutPath>
@@ -1256,10 +1256,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>23</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>407</TopLine>
-      <CurrentLine>420</CurrentLine>
+      <TopLine>565</TopLine>
+      <CurrentLine>584</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\hal-src\stm32f1\hal_stm32_can.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_can.c</FilenameWithoutPath>
@@ -1277,10 +1277,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>46</ColumnNumber>
+      <ColumnNumber>120</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>192</TopLine>
+      <CurrentLine>210</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\hal-src\stm32f1\hal_stm32_spi4encoder.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_spi4encoder.c</FilenameWithoutPath>

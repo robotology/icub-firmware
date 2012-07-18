@@ -344,6 +344,7 @@
             <Rwpi>0</Rwpi>
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
               <Define>STM32F10X_CL HAL_USE_ARCH_ARM HAL_BOARD_MCBSTM32C</Define>
@@ -359,6 +360,7 @@
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -890,6 +892,7 @@
             <Rwpi>0</Rwpi>
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
               <Define>STM32F10X_CL HAL_USE_ARCH_ARM HAL_BOARD_MCBSTM32C HAL_SLIM_MODE</Define>
@@ -905,6 +908,7 @@
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -1436,6 +1440,7 @@
             <Rwpi>0</Rwpi>
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
               <Define>STM32F10X_CL HAL_USE_ARCH_ARM HAL_BOARD_EMS001</Define>
@@ -1451,6 +1456,7 @@
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -1982,6 +1988,7 @@
             <Rwpi>0</Rwpi>
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
               <Define>STM32F10X_CL HAL_USE_ARCH_ARM HAL_BOARD_EMS001 HAL_SLIM_MODE</Define>
@@ -1997,6 +2004,7 @@
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
