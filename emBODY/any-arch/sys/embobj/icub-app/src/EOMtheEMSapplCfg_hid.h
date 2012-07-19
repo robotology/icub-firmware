@@ -132,7 +132,7 @@ extern "C" {
                                                         (ENC_ENA << eOeOappEncReader_encoder2)  |   \
                                                         (ENC_ENA << eOeOappEncReader_encoder3)  |   \
                                                         (ENC_DISA << eOeOappEncReader_encoder4) |   \
-                                                        (ENC_DISA << eOeOappEncReader_encoder5) |   \
+                                                        (ENC_DISA << eOeOappEncReader_encoder5)     \
                                                     )
 #elif   defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
         #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (ENC_ENA << eOeOappEncReader_encoder0)  |   \
@@ -140,25 +140,24 @@ extern "C" {
                                                         (ENC_DISA << eOeOappEncReader_encoder2) |   \
                                                         (ENC_DISA << eOeOappEncReader_encoder3) |   \
                                                         (ENC_DISA << eOeOappEncReader_encoder4) |   \
-                                                        (ENC_DISA << eOeOappEncReader_encoder5) |   \
+                                                        (ENC_DISA << eOeOappEncReader_encoder5)     \
                                                     )
 #elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
-        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (ENC_ENA << eOeOappEncReader_encoder0)  |
-                                                        (ENC_ENA << eOeOappEncReader_encoder1)  |
-                                                        (ENC_ENA << eOeOappEncReader_encoder2)  |
-                                                        (ENC_DISA << eOeOappEncReader_encoder3) |
-                                                        (ENC_DISA << eOeOappEncReader_encoder4) |
-                                                        (ENC_DISA << eOeOappEncReader_encoder5) |
+        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (ENC_ENA << eOeOappEncReader_encoder0)  |   \
+                                                        (ENC_ENA << eOeOappEncReader_encoder1)  |   \
+                                                        (ENC_ENA << eOeOappEncReader_encoder2)  |   \
+                                                        (ENC_DISA << eOeOappEncReader_encoder3) |   \
+                                                        (ENC_DISA << eOeOappEncReader_encoder4) |   \
+                                                        (ENC_DISA << eOeOappEncReader_encoder5)     \
                                                     )
 #elif   defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4)
-//         #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (ENC_DISA << eOeOappEncReader_encoder0)  |  \
-//                                                         (ENC_DISA << eOeOappEncReader_encoder1)  |  \
-//                                                         (ENC_DISA << eOeOappEncReader_encoder2)  |  \
-//                                                         (ENC_DISA << eOeOappEncReader_encoder3) |  \
-//                                                         (ENC_DISA << eOeOappEncReader_encoder4) |  \
-//                                                         (ENC_DISA << eOeOappEncReader_encoder5) |  \
-//                                                     )
-        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (ENC_DISA << eOeOappEncReader_encoder0)  | (ENC_DISA << eOeOappEncReader_encoder1)  |(ENC_DISA << eOeOappEncReader_encoder2)  |(ENC_DISA << eOeOappEncReader_encoder3) |(ENC_DISA << eOeOappEncReader_encoder4) |(ENC_DISA << eOeOappEncReader_encoder5) )
+        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (ENC_DISA << eOeOappEncReader_encoder0) |  \
+                                                        (ENC_DISA << eOeOappEncReader_encoder1) |  \
+                                                        (ENC_DISA << eOeOappEncReader_encoder2) |  \
+                                                        (ENC_DISA << eOeOappEncReader_encoder3) |  \
+                                                        (ENC_DISA << eOeOappEncReader_encoder4) |  \
+                                                        (ENC_DISA << eOeOappEncReader_encoder5)    \
+                                                    )
 
 #else
     #error --> you must define an EBx
@@ -188,15 +187,55 @@ extern "C" {
     #error --> you must define an EBx
 #endif
 
-//definition on num of endpoint -- put here only for test!!!!! --
-#if     defined(EOMTHEEMSAPPLCFG_USE_EB4)
-#include "eOcfg_nvsEP_sk.h"
+//definition on num of endpoint
+#if     defined(EOMTHEEMSAPPLCFG_USE_EB1)
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    endpoint_mc_leftupperarm       
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    endpoint_as_leftupperarm 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
+        
+#elif     defined(EOMTHEEMSAPPLCFG_USE_EB2)
+        #include "eOcfg_nvsEP_sk.h"
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    endpoint_mc_leftlowerarm       
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    endpoint_as_leftlowerarm 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    endpoint_sk_emsboard_leftlowerarm 
+        
+#elif     defined(EOMTHEEMSAPPLCFG_USE_EB3)
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    endpoint_mc_rightupperarm       
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    endpoint_as_rightupperarm 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
+
+#elif     defined(EOMTHEEMSAPPLCFG_USE_EB4)
+        #include "eOcfg_nvsEP_sk.h"
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    endpoint_mc_rightlowerarm       
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    endpoint_as_rightlowerarm 
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    endpoint_sk_emsboard_rightlowerarm 
 
+#elif     defined(EOMTHEEMSAPPLCFG_USE_EB5)
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    endpoint_mc_torso       
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    EOK_uint16dummy 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
+
+#elif     defined(EOMTHEEMSAPPLCFG_USE_EB6)
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    endpoint_mc_leftupperleg       
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    endpoint_as_leftupperleg 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
+        
+#elif     defined(EOMTHEEMSAPPLCFG_USE_EB7)
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    endpoint_mc_leftlowerleg       
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    EOK_uint16dummy 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
+
+#elif     defined(EOMTHEEMSAPPLCFG_USE_EB8)
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    endpoint_mc_rightupperleg       
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    endpoint_as_rightupperleg 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
+
+#elif     defined(EOMTHEEMSAPPLCFG_USE_EB9)
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    endpoint_mc_rightlowerleg       
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    EOK_uint16dummy 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
 #else
-    #error --> the appl ca not works with board different from eb4!!!
+    #error --> you must define an EBx
     //unless you have already added function to get mc, as and sk endpoint number and use them to initialise appTheNVmapRef obj!!!
     //Remember: remove from include eOcfg_nvsEP_sk.h 
 #endif
