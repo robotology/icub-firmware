@@ -200,6 +200,11 @@ extern eOresult_t eo_emsCanNetTopo_GetConnectedMotors(EOemsCanNetTopo *p, EOarra
 extern eOresult_t eo_emsCanNetTopo_GetConnectedSensors(EOemsCanNetTopo *p, EOarray *connectedSensorsList);
 extern eOresult_t eo_emsCanNetTopo_GetConnectedSkin(EOemsCanNetTopo *p, EOarray *connectedSkinList);
 
+extern eOresult_t eo_emsCanNetTopo_GetBoardOfJoint(EOemsCanNetTopo *p, eOmc_jointId_t jId, eObrd_types_t *boardType);
+extern eOresult_t eo_emsCanNetTopo_GetBoardOfMotor(EOemsCanNetTopo *p, eOmc_motorId_t mId, eObrd_types_t *boardType);
+extern eOresult_t eo_emsCanNetTopo_GetBoardOfSensor(EOemsCanNetTopo *p, eOsnsr_sensorId_t sId, eObrd_types_t *boardType);
+
+
 extern const EOconstvector* eo_emsCanNetTopo_GetCfgCanBoards(EOemsCanNetTopo *p);
 
 /*VALE: aggiungi funzione che dato joint id ritorna il tipo di board che lo gestisce! idem per il kotor. puo' venire utile??*/
