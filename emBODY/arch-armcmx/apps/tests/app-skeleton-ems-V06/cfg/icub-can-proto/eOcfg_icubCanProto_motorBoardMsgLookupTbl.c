@@ -512,7 +512,7 @@ static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_periodicMotorB
 extern const EOconstLookupTbl icubCanProto_periodicMotorBoardMsg_parser_LUTbl = 
 {
     EO_INIT(.capacity)                      eo_icubCanProto_periodicMotorBoardMsg_inTbl_max,
-    EO_INIT(.offset)                        64,
+    EO_INIT(.offset)                        0,
     EO_INIT(.exceptionMngFn)                s_eo_icubCanProto_periodicMotorBoardMsg_parser_excFn,                                        
     EO_INIT(.itemsList)                     &s_periodicMotorBoardMsg_parserFn_list[0]
 };

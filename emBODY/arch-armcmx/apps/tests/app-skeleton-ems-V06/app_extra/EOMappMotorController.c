@@ -275,7 +275,7 @@ static void s_eom_appMotorController_taskRun(EOMtask *tsk, uint32_t evtmsgper)
         }
         
         /* 2) pid calc */
-        pwm = eo_emsController_PWM();
+        pwm = eo_emsController_PWM(); 
 
         pwm_out = pwm[3];
         

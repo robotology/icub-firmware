@@ -36,6 +36,7 @@
 
 #include "EoMotionControl.h"
 #include "EOnv_hid.h"
+#include "EOemsController.h"
 
 #include "EOemsCanNetworkTopology.h"
 #include "EOappTheNVmapRef.h"
@@ -1270,7 +1271,6 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
     return(eores_OK);
 }
 
-
 extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
     eOresult_t              res;
@@ -1298,9 +1298,18 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, 
     }
 
     mstatusbasic_ptr = (eOmc_motor_status_basic_t*)nv_mem_ptr;    
-    mstatusbasic_ptr->current =  *((uint16_t*)&(frame->data[0]));
+    mstatusbasic_ptr->current = ((uint16_t*)frame->data)[0];
 
+    // ALE
 
+#ifdef USE_2FOC_FAST_ENCODER
+    if (frame->id==0x124)
+    {
+        eo_emsController_ReadSpeed(mId, 5*(int32_t)((int16_t*)frame->data)[1]);
+    }
+#endif
+
+    /*
 // set position about axis 1
     canLoc.jm_idInBoard = eo_emsCanNetTopo_jm_index_second;
     
@@ -1318,6 +1327,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, 
 
     mstatusbasic_ptr = (eOmc_motor_status_basic_t*)nv_mem_ptr;    
     mstatusbasic_ptr->current =  *((uint16_t*)&(frame->data[2]));
+    */
 
     return(eores_OK);
 }
