@@ -447,6 +447,75 @@ extern const EOconstvector* eo_emsCanNetTopo_GetCfgCanBoards(EOemsCanNetTopo *p)
     return(p->cfg.emsCanNetTopo_canBoards__ptr);
 }
 
+
+
+
+extern eOresult_t eo_emsCanNetTopo_GetBoardOfJoint(EOemsCanNetTopo *p, eOmc_jointId_t jId, eObrd_types_t *boardType)
+{
+    if((NULL == p) || (NULL == boardType))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if( NULL == p->joint_Id2CanLoc_hTbl[jId].j_ptr)
+    {
+        return(eores_NOK_nodata);
+    }
+    
+    *boardType = p->joint_Id2CanLoc_hTbl[jId].b_ptr->boardtype;
+
+    return(eores_OK);
+}
+
+extern eOresult_t eo_emsCanNetTopo_GetBoardOfMotor(EOemsCanNetTopo *p, eOmc_motorId_t mId, eObrd_types_t *boardType)
+{
+    if((NULL == p) || (NULL == boardType))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if( NULL == p->motor_Id2CanLoc_hTbl[mId].m_ptr)
+    {
+        return(eores_NOK_nodata);
+    }
+
+    *boardType = p->motor_Id2CanLoc_hTbl[mId].b_ptr->boardtype;
+
+    return(eores_OK);
+}
+
+
+
+extern eOresult_t eo_emsCanNetTopo_GetBoardOfSensor(EOemsCanNetTopo *p, eOsnsr_sensorId_t sId, eObrd_types_t *boardType)
+{
+    eo_emsCanNetTopo_hashTbl_s_item_t *s_item_ptr = NULL;
+    
+    if((NULL == p) || (NULL == boardType))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    
+    if( (NULL != p->sensorStrain_hTbl.s_ptr) && (sId < strainNumberMAX) )
+    {
+        s_item_ptr = &p->sensorStrain_hTbl;
+    }
+    else if( (NULL != p->sensorMais_hTbl.s_ptr) && (sId < maisNumberMAX) )
+    {
+        s_item_ptr = &p->sensorMais_hTbl;
+    }
+    else
+    {
+        return(eores_NOK_nodata);
+    }
+    
+    *boardType = s_item_ptr->b_ptr->boardtype;;
+
+    return(eores_OK);
+}
+
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -515,7 +584,7 @@ static eOresult_t s_eo_emsCanNetTopo_hashTbl_joint_init(EOemsCanNetTopo *p)
     // 2) init hastbl   if joints are cfg
     if((NULL == p->cfg.emsCanNetTopo_joints__ptr) || (0 == p->cfg.emsCanNetTopo_joints__ptr->size)) 
     {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_weak, s_eobj_ownname, "no joints are config"); 
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "no joints are config"); 
         return(eores_OK);
     } 
  
@@ -618,7 +687,7 @@ static eOresult_t s_eo_emsCanNetTopo_checkConfiguration(eo_emsCanNetTopo_cfg_t *
     {
         if( (b_topoinfo_ptr[i].canaddr == 0) || (b_topoinfo_ptr[i].canaddr >= 0xF)) //check can addr range
         {
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_weak, s_eobj_ownname, "can addr is not valid");
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "can addr is not valid");
             return(eores_NOK_generic);
         }                
     }
@@ -631,7 +700,7 @@ static eOresult_t s_eo_emsCanNetTopo_checkConfiguration(eo_emsCanNetTopo_cfg_t *
         {
             if( (j_topoinfo_ptr[i].jid >= jointNumberMAX ) || (j_topoinfo_ptr[i].bid >= cfg->emsCanNetTopo_canBoards__ptr->size ) )
             {
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_weak, s_eobj_ownname, "joint cfg is not valid");
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "joint cfg is not valid");
                 return(eores_NOK_generic);
             }                
         }
@@ -645,7 +714,7 @@ static eOresult_t s_eo_emsCanNetTopo_checkConfiguration(eo_emsCanNetTopo_cfg_t *
         {
             if( (m_topoinfo_ptr[i].mid >= motorNumberMAX ) || (m_topoinfo_ptr[i].bid >= cfg->emsCanNetTopo_canBoards__ptr->size ) )
             {
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_weak, s_eobj_ownname, "motor cfg is not valid");
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "motor cfg is not valid");
                 return(eores_NOK_generic);
             }                
         }
@@ -657,20 +726,20 @@ static eOresult_t s_eo_emsCanNetTopo_checkConfiguration(eo_emsCanNetTopo_cfg_t *
         s_topoinfo_ptr = (eo_emsCanNetTopo_sensorTopoInfo_t*)(cfg->emsCanNetTopo_sensors__ptr->item_array_data);
         if( (cfg->emsCanNetTopo_sensors__ptr->size > 1) ||  (s_topoinfo_ptr[0].bid > cfg->emsCanNetTopo_canBoards__ptr->size) )
         {
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_weak, s_eobj_ownname, "error in sensor cfg"); 
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "error in sensor cfg"); 
             return(eores_NOK_generic);
         }
         
         //check if sensor is mais or strain
         if((eobrd_strain == b_topoinfo_ptr[s_topoinfo_ptr[0].bid].boardtype) && (s_topoinfo_ptr[0].sid >= strainNumberMAX) )
         {
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_weak, s_eobj_ownname, "error in strain cfg"); 
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "error in strain cfg"); 
             return(eores_NOK_generic);
         }
         
         if((eobrd_mais == b_topoinfo_ptr[s_topoinfo_ptr[0].bid].boardtype) && (s_topoinfo_ptr[0].sid >= maisNumberMAX) )
         {
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_weak, s_eobj_ownname, "error in mais cfg"); 
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "error in mais cfg"); 
             return(eores_NOK_generic);
         }
         
@@ -684,7 +753,7 @@ static eOresult_t s_eo_emsCanNetTopo_checkConfiguration(eo_emsCanNetTopo_cfg_t *
         if( (cfg->emsCanNetTopo_skin__ptr->size > 1) || (s_topoinfo_ptr[0].sid > skinNumberMAX) || 
             (s_topoinfo_ptr[0].bid > cfg->emsCanNetTopo_canBoards__ptr->size) || (b_topoinfo_ptr[s_topoinfo_ptr[0].bid].boardtype !=  eobrd_skin) )
         {
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_weak, s_eobj_ownname, "error in skin cfg"); 
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "error in skin cfg"); 
             return(eores_NOK_generic);
         }
     }

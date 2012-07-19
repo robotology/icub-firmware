@@ -195,8 +195,8 @@ static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_
     eOresult_t                                          res;
 
 
-#ifdef SKIN_IS_CONNECTED 
-
+    //NOTE: when skin messages will belong to a particular class message,(not to analog sensor message class)
+    //remove following if-else and leave only eo_icubCanProto_hid_getMsgClassFromFrameId function
     res = eo_emsCanNetTopo_GetskinCanLocation_BySkinId(p->emsCanNetTopo_ptr, 0, &canLoc);
         
     if((eores_OK == res) && (canPortRX == canLoc.emscanport))
@@ -207,9 +207,6 @@ static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_
     {
         msgClass = eo_icubCanProto_hid_getMsgClassFromFrameId(frame->id);    
     }
-#else
-    msgClass = eo_icubCanProto_hid_getMsgClassFromFrameId(frame->id);
-#endif
 
 
     tbl = s_eo_icubCanProto_LUTbl_GetParserTbl(p, msgClass);
