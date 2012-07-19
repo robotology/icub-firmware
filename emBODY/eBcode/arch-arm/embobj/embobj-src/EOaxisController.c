@@ -83,7 +83,7 @@ extern EOaxisController* eo_axisController_New(void)
         o->pidP = eo_pid_New();
         //o->pidC = eo_pid_New();
 
-        eo_pid_SetPid(o->pidP, 6.25f, 20.0f, 0.001f);
+        eo_pid_SetPid(o->pidP, 10.0f, 100.0f, 0.001f);
         eo_pid_SetPidLimits(o->pidP, 4000.0f, 750.0f);
         
         //o->pidT = eo_pid_New();
