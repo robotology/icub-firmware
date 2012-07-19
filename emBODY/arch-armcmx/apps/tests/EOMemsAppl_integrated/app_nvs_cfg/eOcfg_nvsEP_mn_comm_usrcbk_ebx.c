@@ -41,6 +41,7 @@
 #include "EOtheBOARDtransceiver.h"
 
 //application
+#include "EOMtheEMSconfigurator.h"
 #include "EOappTheServicesProvider.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -170,8 +171,7 @@ extern void eo_cfg_nvsEP_mn_appl_usr_hid_UPDT_cmmnds__go2state(uint16_t n, const
 
         case applstate_running:
         {
-//             //eom_appTheSysController_exitFromConfigState(eom_appTheSysController_GetHandle());
-//             eom_appTheSysController_Go2RunState(eom_appTheSysController_GetHandle());    
+            eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_go2runner);    
         }break;
 
         case applstate_error:

@@ -501,7 +501,7 @@ extern "C" {
 
 //  <o> IP port <1-65000>
 //  <i> default: 33333
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_HOSTIPPORT                33333
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_HOSTIPPORT                12345
 
 //  </h>destination address
 

@@ -36,6 +36,7 @@
 
 #include "EoMotionControl.h"
 #include "EOnv_hid.h"
+#include "EOemsController.h"
 
 #include "EOemsCanNetworkTopology.h"
 #include "EOappTheNVmapRef.h"
@@ -1273,12 +1274,12 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
 
 extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
-    eOresult_t              res;
-    eOmc_motorId_t          mId;
-    void                    *nv_mem_ptr;
+    eOresult_t                                  res;
+    eOmc_motorId_t                              mId;
+    void                                        *nv_mem_ptr;
     eo_emsCanNetTopo_jointOrMotorCanLocation_t  canLoc;
-
-    eOmc_motor_status_basic_t  *mstatusbasic_ptr;
+    eObrd_types_t                               boardType;
+    eOmc_motor_status_basic_t                   *mstatusbasic_ptr;
 
 // set position about axis 0
     canLoc.emscanport = canPort;
@@ -1291,6 +1292,12 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, 
         return(res);
     }
 
+    res = eo_emsCanNetTopo_GetBoardOfMotor(p->emsCanNetTopo_ptr, mId, &boardType);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
     res = eo_appTheNVmapRef_GetJointNVMemoryRef(eo_appTheNVmapRef_GetHandle(), mId, motorNVindex_mstatus__basic, &nv_mem_ptr);
     if(eores_OK != res)
     {
@@ -1298,27 +1305,39 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, 
     }
 
     mstatusbasic_ptr = (eOmc_motor_status_basic_t*)nv_mem_ptr;    
-    mstatusbasic_ptr->current =  *((uint16_t*)&(frame->data[0]));
+    mstatusbasic_ptr->current = ((uint16_t*)frame->data)[0];
 
+    if(eobrd_1foc == boardType)
+    {
+        // ALE
 
+#ifdef USE_2FOC_FAST_ENCODER
+        if (frame->id==0x124)
+        {
+            eo_emsController_ReadSpeed(mId, 5*(int32_t)((int16_t*)frame->data)[1]);
+        }
+#endif
+    }
+    else //mc4
+    {
 // set position about axis 1
-    canLoc.jm_idInBoard = eo_emsCanNetTopo_jm_index_second;
-    
-    res = eo_emsCanNetTopo_GetJointId_ByJointCanLocation(p->emsCanNetTopo_ptr, &canLoc, &mId);
-    if(eores_OK != res)
-    {
-        return(res);
+        canLoc.jm_idInBoard = eo_emsCanNetTopo_jm_index_second;
+        
+        res = eo_emsCanNetTopo_GetJointId_ByJointCanLocation(p->emsCanNetTopo_ptr, &canLoc, &mId);
+        if(eores_OK != res)
+        {
+            return(res);
+        }
+
+        res = eo_appTheNVmapRef_GetJointNVMemoryRef(eo_appTheNVmapRef_GetHandle(), mId, motorNVindex_mstatus__basic, &nv_mem_ptr);
+        if(eores_OK != res)
+        {
+            return(res);
+        }
+
+        mstatusbasic_ptr = (eOmc_motor_status_basic_t*)nv_mem_ptr;    
+        mstatusbasic_ptr->current =  ((uint16_t*)frame->data)[2];
     }
-
-    res = eo_appTheNVmapRef_GetJointNVMemoryRef(eo_appTheNVmapRef_GetHandle(), mId, motorNVindex_mstatus__basic, &nv_mem_ptr);
-    if(eores_OK != res)
-    {
-        return(res);
-    }
-
-    mstatusbasic_ptr = (eOmc_motor_status_basic_t*)nv_mem_ptr;    
-    mstatusbasic_ptr->current =  *((uint16_t*)&(frame->data[2]));
-
     return(eores_OK);
 }
 

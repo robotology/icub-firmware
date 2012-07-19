@@ -48,6 +48,7 @@
 
 typedef struct
 {
+    eOboolvalues_t      waitenable;
     uint8_t             numoftxframe2send;
     osal_semaphore_t*   waittxisdone;
 } eOappCanSP_waitTxIsDone_datastruct_t;

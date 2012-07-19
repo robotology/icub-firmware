@@ -227,6 +227,9 @@ static void s_eo_appTheSP_services_init(EOappTheSP *p)
 /*  6) get app run mode*/
     s_eo_apptheSP_GetAppRunMode(p);
 
+/*  7) config connected can boards */
+    eo_appTheCanBrdsMng_ConfigAllBoards(p->srv.appTheCanBrdsMng);
+
 }
 
 
@@ -342,15 +345,15 @@ static void s_eo_appTheSP_srv_NVmapRef_init(EOappTheSP *p)
 
 static void s_eo_appTheSP_srv_EmsController_init(EOappTheSP *p)
 {
-    p->srv.emsController = eo_emsController_Init(p->cfg.emsControllerCfg.numofmotors, p->cfg.emsControllerCfg.emsboard_type);
+    p->srv.emsController = eo_emsController_Init(p->cfg.emsControllerCfg.emsboard_type);
 
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != p->srv.emsController), 
                      s_eobj_ownname, "error in emsController_init");
 #warning VALE--> mettere qui la corretta init del ems controller con dfault values
    //io ho messo questi, ma non so se sono giusti
-    eo_emsController_SetLimits(0, -100000, 100000, 2048);
-    eo_emsController_SetPosPid(0, 100.0f, 20.0f, 0.001f);
-    eo_emsController_SetPosPidLimits(0, 8000.0f, 750.0f);
+//     eo_emsController_SetLimits(0, -100000, 100000, 2048);
+//     eo_emsController_SetPosPid(0, 100.0f, 20.0f, 0.001f);
+//     eo_emsController_SetPosPidLimits(0, 8000.0f, 750.0f);
 
     eo_emsController_SetControlMode(0, CM_IDLE);
 

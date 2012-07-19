@@ -167,16 +167,16 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
     uint32_t encvalue;
     int16_t *pwm;
 
-    if(applrunMode__skinAndMc4 == runmode)
-    {
-        #warning VALE--> remove this code after test on semaphore-can
-        s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
-        s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
-        s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
-        s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
-        s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
-        s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
-    }
+//     if(applrunMode__skinAndMc4 == runmode)
+//     {
+//         #warning VALE--> remove this code after test on semaphore-can
+//         s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
+//         s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
+//         s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
+//         s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
+//         s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
+//         s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
+//     }
     
     if(applrunMode__2foc != runmode)
     {

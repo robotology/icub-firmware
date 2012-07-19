@@ -104,6 +104,7 @@ static eOresult_t s_eo_appCanSP_canPeriphInit(EOappCanSP *p);
 //                                                     eOcanframe_t *frame);
 static void s_eo_appCanSP_callbackOnTx_port1_waittransmission(void *arg);
 static void s_eo_appCanSP_callbackOnTx_port2_waittransmission(void *arg);
+static void s_eo_appCanSP_callbackOnTx_portx_waittransmission(void *arg, hal_can_port_t port);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -169,9 +170,12 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg)
     retptr->emsCanNetTopo_ptr = emsCanNetTopo_ptr;
     retptr->runmode = eo_appCanSP_runMode__onEvent;
     
-    //can port 1
+    //wait machanism
     retptr->waittxdata[hal_can_port1].numoftxframe2send = 0;
     retptr->waittxdata[hal_can_port2].numoftxframe2send = 0;
+    
+    retptr->waittxdata[hal_can_port1].waitenable = eobool_false;
+    retptr->waittxdata[hal_can_port2].waitenable = eobool_false;
     
     if(cfg->waitallframesaresent)
     {
@@ -405,6 +409,14 @@ extern eOresult_t eo_appCanSP_SetRunMode(EOappCanSP *p, eo_appCanSP_runMode_t ru
     
     p->runmode = runmode;
     
+    if(eo_appCanSP_runMode__onDemand ==  p->runmode)
+    {
+        p->waittxdata[hal_can_port1].waitenable = eobool_true;
+    }
+    else
+    {
+        p->waittxdata[hal_can_port1].waitenable = eobool_false;
+    }
     return(eores_OK);
 }
 
@@ -1556,26 +1568,30 @@ static eOresult_t s_eo_appCanSP_canPeriphInit(EOappCanSP *p)
 
 static void s_eo_appCanSP_callbackOnTx_port1_waittransmission(void *arg)
 {
-    EOappCanSP *p = (EOappCanSP *)arg;
-    p->waittxdata[hal_can_port1].numoftxframe2send --;
-    
-    if(0 == p->waittxdata[hal_can_port1].numoftxframe2send)
-    {
-        osal_semaphore_increment(p->waittxdata[hal_can_port1].waittxisdone, osal_callerISR);
-    }
+    s_eo_appCanSP_callbackOnTx_portx_waittransmission(arg, hal_can_port1);
 }
 
 static void s_eo_appCanSP_callbackOnTx_port2_waittransmission(void *arg)
 {
-    EOappCanSP *p = (EOappCanSP *)arg;
-    p->waittxdata[hal_can_port2].numoftxframe2send --;
-    
-    if(0 == p->waittxdata[hal_can_port2].numoftxframe2send)
-    {
-        osal_semaphore_increment(p->waittxdata[hal_can_port2].waittxisdone, osal_callerISR);
-    }
+    s_eo_appCanSP_callbackOnTx_portx_waittransmission(arg, hal_can_port2);
 }
 
+
+static void s_eo_appCanSP_callbackOnTx_portx_waittransmission(void *arg, hal_can_port_t port)
+{
+    EOappCanSP *p = (EOappCanSP *)arg;
+    if(eobool_false == p->waittxdata[port].waitenable)
+    {
+        return;
+    }
+    
+    p->waittxdata[port].numoftxframe2send --;
+    
+    if(0 == p->waittxdata[port].numoftxframe2send)
+    {
+        osal_semaphore_increment(p->waittxdata[port].waittxisdone, osal_callerISR);
+    }
+}
 
 //__inline static eOresult_t s_eo_ap_canModule_formAndSendFrame(eo_icubCanProto_msgCommand_t cmd, 
 //                                                              void *val_ptr,

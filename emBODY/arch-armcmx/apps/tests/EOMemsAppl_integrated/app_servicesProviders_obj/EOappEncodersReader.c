@@ -154,8 +154,6 @@ extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p)
 
 extern eOresult_t  eo_appEncReader_getValuesRaw(EOappEncReader *p, uint32_t *data_ptr)
 {
-//    hal_encoder_t i;
-
     if((NULL == p) || (NULL == data_ptr))
     {
         return(eores_NOK_nullpointer);
@@ -168,18 +166,6 @@ extern eOresult_t  eo_appEncReader_getValuesRaw(EOappEncReader *p, uint32_t *dat
     hal_encoder_get_value(hal_encoder7, &data_ptr[1]);
     hal_encoder_get_value(hal_encoder8, &data_ptr[3]);
     hal_encoder_get_value(hal_encoder9, &data_ptr[5]);
-
-    
-    
-//     for(i = hal_encoder1; i <= hal_encoder3; i++)
-//     {
-//         hal_encoder_get_value(i, &data_ptr[i]);
-//     }
-
-//     for(i = hal_encoder7; i <= hal_encoder9; i++)
-//     {
-//         hal_encoder_get_value(i, &data_ptr[i-3]);
-//     }
 
     return(eores_OK);
 }
@@ -202,8 +188,12 @@ extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOeOappEncReader_
         return(eores_NOK_generic);
     }
 
-    val_raw >>= 6;
-    *value = val_raw & 0x0FFF;
+    //val_raw >>= 6;
+    //*value = (val_raw & 0x0FFF);
+    //*value <<= 4; // 65536 ticks/revolution normalization;
+    
+    *value = (val_raw>>2) & 0xFFF0; 
+    
     return(eores_OK);
 }
 
@@ -333,7 +323,6 @@ static void s_eo_appEncReader_isrCbk_onLastEncRead_SPI3(void *arg)
 static eOboolvalues_t s_eo_appEncReader_IsValidValue(uint32_t *valueraw)
 {
     uint8_t parity_error = 0;
-    uint8_t bit_check = 0;
     uint8_t b = 0;
                 
     for (b=0; b<18; ++b)
@@ -341,9 +330,7 @@ static eOboolvalues_t s_eo_appEncReader_IsValidValue(uint32_t *valueraw)
         parity_error ^= ((*valueraw)>>b) & 1;
     }
 
-    bit_check = (*valueraw) & 0x38;
-
-    if (parity_error || bit_check!=0x20)
+    if (parity_error || ((0x38 & *valueraw) != 0x20))
     {
         return(eobool_false);
     }

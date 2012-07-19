@@ -91,7 +91,7 @@ extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSco
         {
             num = 0;
 //            eom_emsappl_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2run);
-            eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_go2runner);
+//            eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_go2runner);
         }
     }
 

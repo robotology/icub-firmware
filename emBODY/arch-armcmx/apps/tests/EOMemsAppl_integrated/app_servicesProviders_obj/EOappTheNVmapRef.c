@@ -84,13 +84,14 @@ static eOresult_t s_eo_appTheNVmapRef_table_joints_initialise(void);
 static eOresult_t s_eo_appTheNVmapRef_table_skin_initialise(void);
 static eOresult_t s_eo_appTheNVmapRef_table_sensorsStrain_initialise(void);
 static eOresult_t s_eo_appTheNVmapRef_table_sensorsMais_initialise(void);
+static eOresult_t s_eo_appTheNVmapRef_checkConfiguration(eOappTheNVmapRef_cfg_t *cfg);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
 
-//static const char s_eobj_ownname[] = "EOappTheNVmapRef";
+static const char s_eobj_ownname[] = "EOappTheNVmapRef";
 
 static EOappTheNVmapRef s_eo_appTheNVmapRef;
 
@@ -109,6 +110,7 @@ extern EOappTheNVmapRef* eo_appTheNVmapRef_Initialise(eOappTheNVmapRef_cfg_t *cf
         return(retptr);
     }
     
+    s_eo_appTheNVmapRef_checkConfiguration(cfg);
     retptr = &s_eo_appTheNVmapRef;
     
     memcpy(&retptr->cfg, cfg, sizeof(eOappTheNVmapRef_cfg_t));
@@ -250,6 +252,41 @@ extern eOresult_t eo_appTheNVmapRef_GetSkinNVMemoryRef(EOappTheNVmapRef* p, eOsk
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
+static eOresult_t s_eo_appTheNVmapRef_checkConfiguration(eOappTheNVmapRef_cfg_t *cfg)
+{
+    if(eo_array_Size(cfg->jointsList) == 0)
+    {
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_weak, s_eobj_ownname, "no joints are config"); 
+        return(eores_OK);
+    }
+    
+    if(eo_array_Size(cfg->motorsList) == 0)
+    {
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_weak, s_eobj_ownname, "no motorss are config"); 
+        return(eores_OK);
+    }
+    
+    //if array cfg contains a mais or board, but cfg hasn't ep_as, then error!
+    if(((eo_array_Size(cfg->sensorsStrainList) > 0) || (eo_array_Size(cfg->sensorsStrainList) > 0)) &&
+       (cfg->as_endpoint == EOK_uint16dummy))
+    {
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "mismatch in sesnsor cfg"); 
+        return(eores_NOK_generic);
+    }
+    //if array cfg contains a mais or board, but cfg hasn't ep_as, then error!
+    if((eo_array_Size(cfg->skinList) > 0) && (cfg->sk_endpoint == EOK_uint16dummy))
+    {
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "mismatch in skin cfg"); 
+        return(eores_NOK_generic);
+    }
+    
+    return(eores_OK);
+    
+}
+
+
+
+
 static eOresult_t s_eo_appTheNVmapRef_tables_create(eOappTheNVmapRef_cfg_t *cfg)
 {
 
