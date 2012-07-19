@@ -43,9 +43,6 @@ struct EOtrajectory_hid
     float P3Snap;
     float P4Crackle;
 
-    float biPAcc;
-    float biP2Jerk;
-
     float PosF;
     float VelF;
 
