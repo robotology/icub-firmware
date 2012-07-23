@@ -29,6 +29,8 @@ extern "C" {
 
 #define USE_2FOC_FAST_ENCODER
 
+#define SPEED_2FOC_TO_EMS(speed) (5*((int32_t)(speed)))
+
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
  

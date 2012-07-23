@@ -17,9 +17,8 @@
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem.h"
 
-extern const int32_t EMS_IFREQUENCY;
-extern const float   EMS_FFREQUENCY;
-extern const float   EMS_PERIOD;
+extern const int32_t EMS_FREQUENCY_INT32;
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -76,7 +75,7 @@ extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution)
 
     if (o)
     {
-        o->FREQUENCYxTHR = EMS_IFREQUENCY * (DELTA_THR + DELTA_THR/2);
+        o->FREQUENCYxTHR = EMS_FREQUENCY_INT32 * (DELTA_THR + DELTA_THR/2);
         o->impulse_per_revolution = impulse_per_revolution;
         o->impulse_per_revolution_by_2 = impulse_per_revolution/2;
         o->first_reading = eobool_true;
@@ -158,7 +157,7 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
 
     if (delta <= -DELTA_THR || delta >= DELTA_THR)
     {
-        o->speed = (7*o->speed+(delta*EMS_IFREQUENCY)/o->time_from_last_reading);
+        o->speed = (7*o->speed+(delta*EMS_FREQUENCY_INT32)/o->time_from_last_reading);
         
         if (o->speed >= DELTA_THR)        
         {
