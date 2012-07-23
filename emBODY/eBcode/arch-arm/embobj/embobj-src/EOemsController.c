@@ -44,9 +44,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-const int32_t EMS_IFREQUENCY = 1000;
-const float   EMS_FFREQUENCY = 1000.0f;
-const float   EMS_PERIOD     = 0.001f;
+const float   EMS_PERIOD = 0.001f;
+const int32_t EMS_FREQUENCY_INT32 = 1000;
+const float   EMS_FREQUENCY_FLOAT = 1000.0f;
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope

@@ -39,30 +39,26 @@ struct EOtrajectory_hid
     float Pos;
     float Vel;
     float PAcc;
-    float P2Jerk;
-    float P3Snap;
-    float P4Crackle;
 
     float PosF;
     float VelF;
 
-    int32_t pos_steps_to_end;
-    int32_t vel_steps_to_end;
-
     float pos_min;
     float pos_max;
-    float vel_max;
+    
+    int32_t vel_max;
+
+    int32_t PosTimer;
+    int32_t VelTimer;
+
+    float Tstop;
 
     int32_t acc_stop_hybrid;
 
     eObool_t hybrid;
 
     float hybridVel;
-    float hybridPAcc;    
-    float hybridP2Jerk;
-    float hybridP3Snap;
-
-    int32_t hybrid_steps_to_end;
+    float hybridPAcc;
 }; 
 
 

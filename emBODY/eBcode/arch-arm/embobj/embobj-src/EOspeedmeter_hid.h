@@ -24,7 +24,7 @@ extern "C" {
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
-
+// - empty-section
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 

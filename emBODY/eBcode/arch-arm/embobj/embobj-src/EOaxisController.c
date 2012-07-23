@@ -20,9 +20,9 @@
 extern int16_t posref_can;
 extern int16_t encoder_can;
 
-extern const int32_t EMS_IFREQUENCY;
-extern const float   EMS_FFREQUENCY;
-extern const float   EMS_PERIOD;
+
+
+extern const int32_t EMS_FREQUENCY_INT32;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -99,7 +99,7 @@ extern EOaxisController* eo_axisController_New(void)
         o->acc_stop_alarm = 0x20000;
 
         o->vel_timer   = 0;
-        o->vel_timeout = EMS_IFREQUENCY;
+        o->vel_timeout = EMS_FREQUENCY_INT32;
 
         ///////////////////////////
         
@@ -336,7 +336,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
             float pos_ref;
             float vel_ref;
 
-            eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref);
+            eo_trajectory_PosStep(o->trajectory, &pos_ref, &vel_ref);
             
             encoder_can = pos;
             posref_can  = pos_ref;           
@@ -373,7 +373,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
             float pos_ref;
             float vel_ref;
 
-            if (eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref))
+            if (eo_trajectory_PosStep(o->trajectory, &pos_ref, &vel_ref))
             {
                 // position limit reached
                 eo_pid_Reset(o->pidP);
