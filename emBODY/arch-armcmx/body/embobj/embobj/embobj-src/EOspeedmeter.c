@@ -127,20 +127,21 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
 
     if (delta > o->impulse_per_revolution_by_2)
     {
-        o->distance += delta - o->impulse_per_revolution;
+        delta -= o->impulse_per_revolution;
     }
     else if (delta < -o->impulse_per_revolution_by_2)
     {
-        o->distance += delta + o->impulse_per_revolution;
-    }
-    else
-    {
-        o->distance += delta;
+        delta += o->impulse_per_revolution;
     }
 
-    ////////////////////////////////////////
+    o->distance += delta;
 
-#ifndef USE_2FOC_FAST_ENCODER
+#ifdef USE_2FOC_FAST_ENCODER
+
+    if (delta) o->odo_x_1000 -= delta*1000;
+
+#else
+ 
     delta = encoder - o->last_valid_reading;
 
     if (delta > o->impulse_per_revolution_by_2)
@@ -188,6 +189,7 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
             o->speed = -max_speed;
         }
     }
+
 #endif
 }
 
@@ -204,7 +206,7 @@ extern int32_t eo_speedometer_GetVelocity(EOspeedmeter* o)
 extern int32_t eo_speedometer_GetDistance(EOspeedmeter* o)
 {
 #ifdef USE_2FOC_FAST_ENCODER
-    return o->distance + (o->odo_x_1000/1000)%16;
+    return o->distance + o->odo_x_1000/1000;
 #else
     return o->distance;
 #endif
