@@ -45,20 +45,21 @@ struct EOtrajectory_hid
 
     float pos_min;
     float pos_max;
-    
     int32_t vel_max;
 
     int32_t PosTimer;
     int32_t VelTimer;
-
-    float Tstop;
-
-    int32_t acc_stop_hybrid;
-
-    eObool_t hybrid;
-
-    float hybridVel;
-    float hybridPAcc;
+    
+    // pos-vel boost
+   
+    eObool_t boost;
+    eObool_t boostIsBraking;
+    float    boostPos;
+    float    boostVel;
+    float    boostVelF;
+    float    boostPAcc;
+    int32_t  boostTimer;
+    int32_t  acc_stop_boost;
 }; 
 
 
