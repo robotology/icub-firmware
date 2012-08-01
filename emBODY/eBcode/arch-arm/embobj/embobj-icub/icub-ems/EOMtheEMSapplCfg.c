@@ -52,8 +52,9 @@
 
 #include "EOaction_hid.h"
 
+#if !defined(EMSAPPL_USE_CORE)
 #include "EOappEncodersReader.h"
-
+#endif
 
 
 
@@ -318,21 +319,22 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
         .maxnumofRXpackets          = EOMTHEEMSAPPLCFG_RUNOBJ_RX_MAXPACKETS,                // add a control that is is lower equal to inpdatagramnumber.
         .maxnumofTXpackets          = EOMTHEEMSAPPLCFG_RUNOBJ_TX_MAXPACKETS,                // so far it can be only 0 or 1 
         .modeatstartup              = (eOemsrunner_mode_t) EOMTHEEMSAPPLCFG_RUNOBJ_MODE_AT_STARTUP    
-    },
-    
-    .srvcfg     =
-    {
-        .connectedEncodersMask      = EOMTHEEMSAPPLCFG_EBX_encodersMASK,
-        .emsControllerCfg           =
-        {
-            .numofmotors            = EOMTHEEMSAPPLCFG_EBX_emscontroller_NUMOFMOTOR,
-            .emsboard_type          = EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE
-        },
-        .mc_endpoint                = EOMTHEEMSAPPLCFG_EBX_endpoint_mc,   
-        .as_endpoint                = EOMTHEEMSAPPLCFG_EBX_endpoint_as,
-        .sk_endpoint                = EOMTHEEMSAPPLCFG_EBX_endpoint_sk 
     }
-       
+#if !defined(EMSAPPL_USE_CORE)    
+     ,
+     .srvcfg     =
+     {
+         .connectedEncodersMask      = EOMTHEEMSAPPLCFG_EBX_encodersMASK,
+         .emsControllerCfg           =
+         {
+             .numofmotors            = EOMTHEEMSAPPLCFG_EBX_emscontroller_NUMOFMOTOR,
+             .emsboard_type          = EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE
+         },
+         .mc_endpoint                = EOMTHEEMSAPPLCFG_EBX_endpoint_mc,   
+         .as_endpoint                = EOMTHEEMSAPPLCFG_EBX_endpoint_as,
+         .sk_endpoint                = EOMTHEEMSAPPLCFG_EBX_endpoint_sk 
+     }
+#endif       
 };
 
 
