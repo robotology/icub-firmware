@@ -36,11 +36,6 @@
 #include "RTX_Config.h"
 #include "rt_HAL_CM.h"
 
-// IIT-EXT
-#if defined(DBG_MSG)
-#include "api/eventviewer.h"
-#endif
-
 
 /*----------------------------------------------------------------------------
  *      Global Variables
@@ -132,13 +127,10 @@ void rt_ret_val2(P_TCB p_TCB, U32 v0, U32 v1) {
   ret[0] = v0;
   ret[1] = v1;
 }
-  
 
 #if 0 //IIT-EXT: removed
 
 /*--------------------------- dbg_init --------------------------------------*/
-
-
 
 #ifdef DBG_MSG
 void dbg_init (void) {
@@ -171,77 +163,6 @@ void dbg_task_switch (U32 task_id) {
 #endif
 
 #endif  //IIT-EXT
-
-
-/*--------------------------- dbg_init --------------------------------------*/
-
-// IIT-EXT-begin
-#if 0
-void dbg_init (void) {
-  if ((DEMCR & DEMCR_TRCENA)     && 
-      (ITM_CONTROL & ITM_ITMENA) &&
-      (ITM_ENABLE & (1UL << 31))) {
-    dbg_msg = __TRUE;
-  }
-}
-#else
-#if defined(DBG_MSG)
-void dbg_init(void) 
-{
-    if(1 == eventviewer_init())
-    {
-        dbg_msg = __TRUE;
-    }
-}
-
-#endif    
-#endif
-
-
-/*--------------------------- dbg_task_notify -------------------------------*/
-
-#if 0
-void dbg_task_notify (P_TCB p_tcb, BOOL create) {
-  while (ITM_PORT31_U32 == 0);
-  ITM_PORT31_U32 = (U32)p_tcb->ptask;
-  while (ITM_PORT31_U32 == 0);
-  ITM_PORT31_U16 = (create << 8) | p_tcb->task_id;
-}
-#else
-#if defined(DBG_MSG)
-void dbg_task_notify (P_TCB p_tcb, BOOL create)
-{
-    if(1 == create)
-    {
-        eventviewer_load(ev_ID_first_ostask+p_tcb->task_id, p_tcb->ptask);
-    }
-    else
-    {
-        eventviewer_unload(ev_ID_first_ostask+p_tcb->task_id, p_tcb->ptask);
-    }
-}
-
-#endif    
-#endif
-
-/*--------------------------- dbg_task_switch -------------------------------*/
-
-#if 0
-void dbg_task_switch (U32 task_id) {
-  while (ITM_PORT31_U32 == 0);
-  ITM_PORT31_U8 = task_id;
-}
-#else
-#if defined(DBG_MSG)
-void dbg_task_switch (U32 task_id)
-{
-    U8 id = (255==task_id) ? (ev_ID_idle) : (ev_ID_first_ostask+(U8)task_id);
-    eventviewer_switch_to(id);
-}
-
-#endif    
-#endif
-// IIT-EXT-end
 
 
 
