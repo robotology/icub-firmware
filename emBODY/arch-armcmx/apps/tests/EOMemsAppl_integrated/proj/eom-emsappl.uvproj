@@ -344,6 +344,7 @@
             <Rwpi>0</Rwpi>
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO</Define>
@@ -359,6 +360,7 @@
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--cpreproc</MiscControls>
               <Define></Define>
@@ -1332,11 +1334,6 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOpid.c</FilePath>
             </File>
-            <File>
-              <FileName>EOspeedcurve.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOspeedcurve.c</FilePath>
-            </File>
           </Files>
         </Group>
       </Groups>
@@ -1679,6 +1676,7 @@
             <Rwpi>0</Rwpi>
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC _FORCE_NETWORK_FROM_IPAL_CFG</Define>
@@ -1694,6 +1692,7 @@
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--cpreproc</MiscControls>
               <Define></Define>
@@ -2648,11 +2647,6 @@
               <FileName>EOpid.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOpid.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOspeedcurve.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOspeedcurve.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2996,6 +2990,7 @@
             <Rwpi>0</Rwpi>
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC</Define>
@@ -3011,6 +3006,7 @@
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--cpreproc</MiscControls>
               <Define></Define>
@@ -3910,6 +3906,7 @@
                     <Rwpi>2</Rwpi>
                     <wLevel>0</wLevel>
                     <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
                     <VariousControls>
                       <MiscControls></MiscControls>
                       <Define></Define>
@@ -3964,6 +3961,7 @@
                     <Rwpi>2</Rwpi>
                     <wLevel>0</wLevel>
                     <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
                     <VariousControls>
                       <MiscControls></MiscControls>
                       <Define></Define>
@@ -4043,11 +4041,6 @@
               <FileName>EOpid.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOpid.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOspeedcurve.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOspeedcurve.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4391,6 +4384,7 @@
             <Rwpi>0</Rwpi>
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO _FORCE_NETWORK_FROM_IPAL_CFG</Define>
@@ -4406,6 +4400,7 @@
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--cpreproc</MiscControls>
               <Define></Define>
@@ -5305,6 +5300,7 @@
                     <Rwpi>2</Rwpi>
                     <wLevel>0</wLevel>
                     <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
                     <VariousControls>
                       <MiscControls></MiscControls>
                       <Define></Define>
@@ -5359,6 +5355,7 @@
                     <Rwpi>2</Rwpi>
                     <wLevel>0</wLevel>
                     <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
                     <VariousControls>
                       <MiscControls></MiscControls>
                       <Define></Define>
@@ -5438,11 +5435,6 @@
               <FileName>EOpid.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOpid.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOspeedcurve.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOspeedcurve.c</FilePath>
             </File>
           </Files>
         </Group>

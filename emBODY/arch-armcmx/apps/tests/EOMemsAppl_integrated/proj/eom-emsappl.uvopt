@@ -953,10 +953,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>2</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>87</TopLine>
-      <CurrentLine>99</CurrentLine>
+      <TopLine>89</TopLine>
+      <CurrentLine>100</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_main\eom_emsappl_main.c</PathWithFileName>
       <FilenameWithoutPath>eom_emsappl_main.c</FilenameWithoutPath>
@@ -1032,8 +1032,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>157</TopLine>
-      <CurrentLine>175</CurrentLine>
+      <TopLine>334</TopLine>
+      <CurrentLine>345</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_servicesProviders_obj\EOappTheServicesProvider.c</PathWithFileName>
       <FilenameWithoutPath>EOappTheServicesProvider.c</FilenameWithoutPath>
@@ -3170,7 +3170,7 @@
 
   <Group>
     <GroupName>eo-motor-controller</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -3256,20 +3256,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOpid.c</PathWithFileName>
       <FilenameWithoutPath>EOpid.c</FilenameWithoutPath>
-    </File>
-    <File>
-      <GroupNumber>27</GroupNumber>
-      <FileNumber>153</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOspeedcurve.c</PathWithFileName>
-      <FilenameWithoutPath>EOspeedcurve.c</FilenameWithoutPath>
     </File>
   </Group>
 
