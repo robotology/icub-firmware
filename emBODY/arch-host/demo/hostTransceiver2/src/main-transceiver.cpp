@@ -319,19 +319,26 @@ int main(int argc, char *argv[])
 	ACE_UINT8		tmp = 1;
 
 	// Start receiver thread
-	printf("Launching recvThread\n");
 	ACE_thread_t id_recvThread;
-	if(ACE_Thread::spawn((ACE_THR_FUNC)recvThread, NULL, THR_CANCEL_ENABLE, &id_recvThread)==-1)
-		printf(("Error in spawning recvThread\n"));
+	//if(!need2sendarop)
+	{
+		printf("Launching recvThread\n");
+		if(ACE_Thread::spawn((ACE_THR_FUNC)recvThread, NULL, THR_CANCEL_ENABLE, &id_recvThread)==-1)
+			printf(("Error in spawning recvThread\n"));
+	}
 
-	printf("Launching skinThread\n");
 	ACE_thread_t id_skinThread;
-	if(ACE_Thread::spawn((ACE_THR_FUNC)skinThread, NULL, THR_CANCEL_ENABLE, &id_skinThread)==-1)
-		printf(("Error in spawning id_skinThread\n"));
+//	printf("Launching skinThread\n");
+//	if(ACE_Thread::spawn((ACE_THR_FUNC)skinThread, NULL, THR_CANCEL_ENABLE, &id_skinThread)==-1)
+//		printf(("Error in spawning id_skinThread\n"));
 
 	ACE_thread_t id_sendThread;
-	if(ACE_Thread::spawn((ACE_THR_FUNC)sendThread, NULL, THR_CANCEL_ENABLE, &id_sendThread)==-1)
-		printf(("Error in spawning sendThread\n"));
+	//if(need2sendarop)
+	{
+		printf("Launching id_sendThread\n");
+		if(ACE_Thread::spawn((ACE_THR_FUNC)sendThread, NULL, THR_CANCEL_ENABLE, &id_sendThread)==-1)
+			printf(("Error in spawning sendThread\n"));
+	}
 
 	// Send a packet to test dummy
 	while(keepGoingOn)
@@ -413,8 +420,8 @@ int main(int argc, char *argv[])
 	sleep(2);
 	//pthread_cancel(thread);
 	ACE_Thread::cancel(id_recvThread);
-	ACE_Thread::cancel(id_sendThread);
-	ACE_Thread::cancel(id_skinThread);
+//	ACE_Thread::cancel(id_sendThread);
+//	ACE_Thread::cancel(id_skinThread);
 	return(0);
 }
 
@@ -453,18 +460,20 @@ void *recvThread(void * arg)
 
 	while(keepGoingOn)
 	{
+		memset(&sender.data, 0xAA, maxBytes2Read);
+
 #ifdef _LINUX_UDP_SOCKET_
 		udppkt_size = ACE_socket.recv((void *) &sender.data, &sender_addr);
 		//sender.addr.set(&sender_addr, 512);
-		if(!check_received_pkt(&sender_addr, (void *) sender.data, udppkt_size))
-			printf("Error checking the packet!!!\n");
+//		if(!check_received_pkt(&sender_addr, (void *) sender.data, udppkt_size))
+//			printf("Error checking the packet!!!\n");
 #else
 		udppkt_size = ACE_socket->recv((void *) sender.data, maxBytes2Read, sender.addr, flags);
 
 		if(!check_received_pkt(&sender.addr, (void *) sender.data, udppkt_size))
 			printf("Error checking the packet!!!\n");
 #endif
-		//transceiver->SetReceived((ACE_UINT8 *)sender.data, udppkt_size);
+		transceiver->SetReceived((ACE_UINT8 *)sender.data, udppkt_size);
 	}
 
 
@@ -500,6 +509,9 @@ void *sendThread(void * arg)
 #endif
 		}
 
+//		float pp=3.75;
+//		for(int kk=0; kk<200*1000; kk++)
+//			pp += pp*pp;
 		usleep(1000);
 	}
 }
@@ -1050,8 +1062,6 @@ static void s_callback_button_2(void )
 
 	printf("added a set<__upto10rop2signal, list>");
 }
-
-
 
 static void s_callback_button_3(void )
 {

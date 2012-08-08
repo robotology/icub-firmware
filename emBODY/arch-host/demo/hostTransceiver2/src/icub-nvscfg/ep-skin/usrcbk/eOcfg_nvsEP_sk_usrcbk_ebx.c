@@ -213,87 +213,59 @@ void s_eo_cfg_nvsEP_sk_hid_Dump_Data( const EOnv* nv)
 //#ifdef OVERRIDE_eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe
 extern void eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-	//	printf("new callback\n");
+	//printf("new callback\n");
 	// s_eo_cfg_nvsEP_sk_hid_Dump_Data(nv);
 	EOarray_of_10canframes *sk_array = (EOarray_of_10canframes *)nv->rem;
 	int i;
-//	if(nv->ep == endpoint_sk_emsboard_rightlowerarm)
-//	{
-//		if(keepGoingOn)
-//		{
-//			s_eo_cfg__nvsEP_sk_hid_ParseCanFrame(sk_array);
-//
-//		}
-//		else if(!printed )
-//		{
-//			outFile1 = fopen("/usr/local/src/robot/pc104-logs/logHistogram.txt", "w+");
-//			printf("fopen: %s\n",strerror(errno));
-//			if(NULL == outFile1)
-//			{
-//				printf(" Te piacerebbe!\n");
-//				outFile1 = stdout;
-//			}
-//			outFile2 = fopen("/usr/local/src/robot/pc104-logs/logTimestamp.txt", "w+");
-//			printf("fopen: %s\n",strerror(errno));
-//			if(NULL == outFile2)
-//			{
-//				printf(" Te piacerebbe!\n");
-//				outFile2 = stdout;
-//			}
-//			s_eo_cfg__nvsEP_sk_hid_Histogram_Print();
-//			s_eo_cfg__nvsEP_sk_hid_Histogram_TV_Print();
-//			printf("fprintf: %s\n",strerror(errno));
-//			fclose(outFile1);
-//			fclose(outFile2);
-//			printf("fclose: %s\n",strerror(errno));
-//			printed = true;
-//			printf("Catched 'sk_array->head.size' bigger or equal to 9 %d times\n", count);
-//		}
-//	}
+/*	Vale stats
+  	if(nv->ep == endpoint_sk_emsboard_rightlowerarm)
+	{
+		if(keepGoingOn)
+		{
+			s_eo_cfg__nvsEP_sk_hid_ParseCanFrame(sk_array);
+
+		}
+		else if(!printed )
+		{
+			outFile1 = fopen("/usr/local/src/robot/pc104-logs/logHistogram.txt", "w+");
+			printf("fopen: %s\n",strerror(errno));
+			if(NULL == outFile1)
+			{
+				printf(" Te piacerebbe!\n");
+				outFile1 = stdout;
+			}
+			outFile2 = fopen("/usr/local/src/robot/pc104-logs/logTimestamp.txt", "w+");
+			printf("fopen: %s\n",strerror(errno));
+			if(NULL == outFile2)
+			{
+				printf(" Te piacerebbe!\n");
+				outFile2 = stdout;
+			}
+			s_eo_cfg__nvsEP_sk_hid_Histogram_Print();
+			s_eo_cfg__nvsEP_sk_hid_Histogram_TV_Print();
+			printf("fprintf: %s\n",strerror(errno));
+			fclose(outFile1);
+			fclose(outFile2);
+			printf("fclose: %s\n",strerror(errno));
+			printed = true;
+			printf("Catched 'sk_array->head.size' bigger or equal to 9 %d times\n", count);
+		}
+	}
+*/
 
 #ifdef _ICUB_CALLBACK_
 	FEAT_ID id;
 	id.type = Skin;
 	id.ep = nv->ep;
-/*	if(nv->ep == endpoint_sk_emsboard_rightlowerarm)
-	{
-		for(i=0; i<sk_array->head.size; i++)
-		{
-			eOutil_canframe_t *canframe;
-			uint8_t  j, mtbId =0;
-			uint8_t  cardId, valid = 0;
 
-			canframe = (eOutil_canframe_t*) &sk_array->data[i*sizeof(eOutil_canframe_t)];
-			valid = (((canframe->id & 0x0F00) >> 8) == 3) ? 1 : 0;
-
-			if(valid)
-			{
-				cardId = (canframe->id & 0x00f0) >> 4;
-				switch (cardId)
-				{
-				case 11:
-					canframe->id &= 0xFF0F;
-					canframe->id |= 0x0080;
-					break;
-				case 8:
-					canframe->id &= 0xFF0F;
-					canframe->id |= 0x00b0;
-					break;
-				}
-			}
-		}
-	}
-*/
-	//strcpy(id.name, "right_arm");
-	//	weweweqwe;
 	void *featList;
 	//	printf("iCub Callback, looking for %s\n", id.name);
-	getRobotFeatureList_C(&id);
-	findAndFill(&id, (char *)sk_array);
 
+	findAndFill(&id, (char *)sk_array);
 #endif
 }
 //#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions
 // --------------------------------------------------------------------------------------------------------------------
