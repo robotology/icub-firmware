@@ -15,6 +15,8 @@ set(BASE 				$ENV{ICUB_ROOT}/firmware/emBODY/)
 set(EXTRA_FOLDER  		${CMAKE_CURRENT_SOURCE_DIR}/)
 set(TRANSCEIVER_FOLDER	$ENV{ICUB_ROOT}/main/src/libraries/icubmod/embObjLib/ )
 
+set(CMAKE_MODULE_PATH ../../)
+find_package(ACE)
 
 include(embObjLib.conf)
 find_package(YARP)
@@ -254,7 +256,7 @@ SOURCE_GROUP("EmbObj Source Files" FILES ${folder_source})
 #add_executable(${PROJECTNAME} ${embobj_source} ${embobj_header})
 add_executable(${PROJECTNAME} ${embobj_source})
 
-target_link_libraries(${PROJECTNAME} ${YARP_LIBRARIES})
+target_link_libraries(${PROJECTNAME} ${ACE_LIBRARIES} ${YARP_LIBRARIES})
 
 # ${embobj_header})
 

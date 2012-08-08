@@ -26,6 +26,7 @@ using namespace std;
 #include "EOtheBOARDtransceiver.h"
 #include "EoUtilities.h"
 
+#include "EOropframe.h"
 
 
 //BoardTransceiver 	boardTransceiver;
@@ -76,6 +77,11 @@ EOarray				 				*skinData;
 uint8_t buffer[sizeof(EOarray_of_10canframes)] = {0};
 uint8_t boardN = 4;
 
+// for the prog num in pachet
+static uint64_t 	progNum = 0;
+char	*tmp;
+
+
 bool verbose = false;
 int main(int argc, char *argv[])
 {
@@ -87,6 +93,8 @@ int main(int argc, char *argv[])
 	// Utility stuff
 	int i;
 	ACE_UINT32 ip1,ip2,ip3,ip4;
+
+	eOabstime_t	age 		= 0x00;
 
 	//	Register handler to catch CTRL+C
 	if(signal(SIGINT, sighandler) == SIG_IGN)
@@ -236,7 +244,12 @@ int main(int argc, char *argv[])
 
 			// Get the actual packet and write it into socket using udppkt_data, udppkt_size
 			// if the command isn't known, an empty ropframe wil be sent -- I guess
+			progNum++;
+
+			age = ( (progNum & 0xFFFFFFFF) << 32);// | gettimeofday();
 			boardTransceiver_GetTransmit(&udppkt_data, &udppkt_size);
+			tmp = ((char*) udppkt_data);
+			memcpy( (&tmp[8]), &age, 8);
 			ACE_socket->send(udppkt_data, udppkt_size, remote01.addr, flags);
 			printf("Sent EmbObj packet, size = %d\n", udppkt_size);
 		}
@@ -506,11 +519,10 @@ static void s_callback_button_3(void )
 			{
 				//printf("mtb=%d",mtb);
 				s_callback_button_5(mtb, triangle, value);
-				usleep(30*1000);
+				usleep(800);
 			}
 	snprintf(str, sizeof(str)-1, "reset skin values\n");
 }
-
 
 static void s_callback_button_4(void )
 {
@@ -537,7 +549,6 @@ static void s_callback_button_4(void )
 
 	snprintf(str, sizeof(str)-1, "cycling on skin values\n");
 }
-
 
 static void s_callback_button_5(uint32_t mtb, uint32_t triangle, char value)
 {
@@ -577,8 +588,8 @@ static void s_callback_button_5(uint32_t mtb, uint32_t triangle, char value)
 
 
 	canframe.id =  (0x0300 | ((mtb<<4) & 0x00f0) | (triangle & 0x000f) );
-	printf("SID = 0x%04x", canframe.id);
-	printf("DATA: ");
+//	printf("SID = 0x%04x", canframe.id);
+//	printf("DATA: ");
 
 	if (first == true)
 	{
@@ -597,7 +608,7 @@ static void s_callback_button_5(uint32_t mtb, uint32_t triangle, char value)
 	{
 		int index = mtb*max_triangle*max_pp + triangle*max_pp;
 		canframe.data[c] = value; // 255 - (index+c &0xFF);
-		printf(" %0x", canframe.data[c]);
+//		printf(" %0x", canframe.data[c]);
 	}
 
 	first = !first;
@@ -616,7 +627,7 @@ static void s_callback_button_5(uint32_t mtb, uint32_t triangle, char value)
 		mtb=max_mtb;
 	}
 
-	printf("\n");
+//	printf("\n");
 	eo_array_PushBack(skinData, &canframe);
 	if( eores_OK != eo_nv_Set(nvRoot, skinData, eobool_true, eo_nv_upd_dontdo))
 		printf("error!!");
@@ -626,16 +637,33 @@ static void s_callback_button_5(uint32_t mtb, uint32_t triangle, char value)
 	ACE_socket->send(udppkt_data, udppkt_size, remote01.addr, flags);
 }
 
-
 static void s_callback_button_6(void )
 {
-	uint8_t *udppkt_data = NULL;
-	uint16_t udppkt_size = 0;
+	uint8_t *udppkt_data 	= NULL;
+	uint16_t udppkt_size 	= 0;
+	eOabstime_t	age 		= 0x00;
+	struct timeval 	time;
+	//printf("size of struct timeval %d\n", sizeof(struct timeval) );
 
+	char		local[1024];
 	while (keepGoingOn)
 	{
+		progNum++;
+		if(progNum == 20000)
+			progNum = 20005;
+		age = ( (progNum & 0xFFFFFFFF) << 32);// | gettimeofday();
 		boardTransceiver_GetTransmit(&udppkt_data, &udppkt_size);
-		ACE_socket->send(udppkt_data, udppkt_size, remote01.addr, flags);
+		memcpy(&local, udppkt_data, udppkt_size);
+//		tmp = ((char*) udppkt_data);
+//		memcpy( (&local[8]), &age, 8);
+//		for(int i=8; i<16; i++)
+//			printf("%02X-", (char) udppkt_data[i]);
+//		printf("\n");
+		//eo_ropframe_age_Set( (EOropframe*) &udppkt_data,  age);
+		ACE_socket->send(&local, udppkt_size, remote01.addr, flags);
+//		float pp=3.75;
+//		for(int kk=0; kk<150*1000; kk++)
+//			pp += pp*pp;
 		usleep(800);
 	}
 }
