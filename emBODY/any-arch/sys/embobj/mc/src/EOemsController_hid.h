@@ -49,8 +49,6 @@ struct EOemsController_hid
     float vel_ref[MAX_MOTORS];
     float acc_ref[MAX_MOTORS];
     float trq_ref[MAX_MOTORS];
-
-    uint8_t nmotors;
 }; 
 
 

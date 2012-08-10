@@ -53,7 +53,7 @@ typedef struct EOtrajectory_hid EOtrajectory;
     @return     The pointer to the required object.
  **/
 extern EOtrajectory* eo_trajectory_New(void);
-
+extern void eo_trajectory_SetLimits(EOtrajectory *o, int32_t pos_min, int32_t pos_max, int32_t vel_max);
 
 /** @fn         extern void eo_trajectory_SetReference(EOtrajectory *o, float p0, float pf, float v0, float speed)
     @brief      Sets minimum jerk trajectory new start and end points, initial and average speed. When the time is 
@@ -64,23 +64,25 @@ extern EOtrajectory* eo_trajectory_New(void);
     @param      v0     The inital velocity.
     @param      avg_speed  The average speed.
  **/
-extern void eo_trajectory_SetReference(EOtrajectory *o, int32_t p0, int32_t pf, int32_t v0, int32_t vf, int32_t speed);
-//extern void eo_trajectory_MoveReference(EOtrajectory *o, float p0, float pf, float v0, float speed);
-//extern void eo_trajectory_MoveReference(EOtrajectory *o, float pf, float speed);
-
+extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, int32_t avg_vel);
+extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t v1, int32_t avg_acc);
+extern void eo_trajectory_BoostStart(EOtrajectory *o, int32_t v1, int32_t avg_acc);
+extern void eo_trajectory_BoostTimeout(EOtrajectory *o);
 
 /** @fn         extern float eo_trajectory_Step(EOtrajectory *o)
     @brief      Executes a trajectory step.
     @param      o  The pointer to the trajectory object.
     @return     The actual trajectory point value.
  **/
-extern void eo_trajectory_Step(EOtrajectory *o, int32_t *p, int32_t *v, int32_t *a);
+extern int8_t eo_trajectory_PosStep(EOtrajectory *o, float *p, float *v);
+extern void eo_trajectory_Init(EOtrajectory *o, int32_t p0, int32_t v0, int32_t a0);
 
 /** @fn         extern void eo_trajectory_Abort(EOtrajectory *o)
     @brief      Aborts the trajectory.
     @param      o  The pointer to the trajectory object.
  **/
-extern void eo_trajectory_Stop(EOtrajectory *o, int32_t p);
+extern void eo_trajectory_Stop(EOtrajectory *o, int32_t stop_acc);
+extern void eo_trajectory_BoostStop(EOtrajectory *o);
 
 //extern void eo_trajectory_Stop(EOtrajectory *o, float pos);
 
