@@ -63,6 +63,16 @@
 	@brief      This header file implements public interface to the IIT extension for some calls of RTX.
 	@author     marco.accame@iit.it
 	@date       07/27/2012
+    @warning    this file contains parts of code taken from various files coming from the free distribution of the
+                "CMSIS-RTOS RTX Implementation" version 4.20. the code has been modified to add support to 32 bit 
+                timing and to dynamic retrieval of memory used by the rtos objects. the modification is done in the
+                following way:
+                - if a function of RTX needs a different behaviour but keeps its declation, we just redefine it in this
+                  file. obviously in its original file the funtion was made __weak.
+                - if a function of RTX needs also different parameters in its number of type, we just create a new
+                  function in this file with name prefixed with "iitchanged_". the old function is left unchanged in 
+                  its original file. 
+                hence, we attach in here the copyrigth notice of KEIL.
 **/
 
 /* @defgroup changes Changes and add-ons for CMSIS-RTOS RTX
@@ -75,15 +85,23 @@
 
 #include "stdint.h"
 
-#if defined(DBG_MSG_SYSTICK) | defined(DBG_MSG_SVC) | defined(DBG_MSG_PENDSV)
+#include "oosiit.h"
+
+#if defined(OOSIIT_DBG_ENABLE_ALL)
+#define OOSIIT_DBG_ENABLE
+#define OOSIIT_DBG_SYSTICK
+#define OOSIIT_DBG_SVC
+#define OOSIIT_DBG_PENDSV
+#endif
+
+#if defined(OOSIIT_DBG_ENABLE)
 #include "api/eventviewer.h"
 #endif
 
-//#include "rt_Typedef.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-#if defined(DBG_MSG_SYSTICK) | defined(DBG_MSG_SVC) | defined(DBG_MSG_PENDSV)
+#if defined(OOSIIT_DBG_ENABLE)
 #define	RT_IIT_SYSCALL_ID_SYSTICK   ev_ID_systick	
 #define	RT_IIT_SYSCALL_ID_PENDSV    ev_ID_pendsv
 #define	RT_IIT_SYSCALL_ID_SVC       ev_ID_svc
@@ -91,6 +109,16 @@
   
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
+
+// typedef void (*oosiit_tskfn_t)(void);
+// typedef struct
+// {
+//     uint8_t         priority;
+//     uint16_t        stacksize;
+//     uint64_t*       stackdata;
+//     oosiit_tskfn_t  execfn;         
+// } oosiit_task_properties_t;
+
 
 #if 1
 
@@ -136,13 +164,12 @@ typedef struct OS_TCB *P_TCB_Opaque;
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-
-//extern volatile uint64_t oosiit_time;
-//extern volatile uint64_t oosiit_idletime;
-extern U32 os_iit_ns_per_unit_of_systick;
-extern U32 os_iit_num_units_of_systick;
+// empty-section
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
+
+// - sys routines -
+extern void rt_iit_sys_start(oosiit_task_properties_t* inittsk, oosiit_task_properties_t* idletsk);
 
 // - init routines -
 extern void rt_iit_params_init(void);
@@ -195,6 +222,12 @@ extern void iitchanged_rt_chk_robin(void);
 
 
 // - debug routines -
+
+extern void rt_iit_dbg_init(void);
+
+extern void rt_iit_dbg_task_notify(void* ptcb, BOOL create);
+extern void rt_iit_dbg_task_switch(U32 task_id);
+
 extern void rt_iit_dbg_syscall_register (U8 id);
 
 extern void rt_iit_dbg_systick_enter(void);

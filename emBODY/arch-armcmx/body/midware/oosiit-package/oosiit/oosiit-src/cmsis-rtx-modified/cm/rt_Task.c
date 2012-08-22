@@ -41,11 +41,6 @@
 #include "rt_Robin.h"
 #include "rt_HAL_CM.h"
 
-
-#include "rt_iit_AdvTimer.h"		//IIT-EXT
-#include "oosiit_hid.h"             //IIT-EXT
-#include "rt_iit_memory.h"		    //IIT-EXT
-
 /*----------------------------------------------------------------------------
  *      Global Variables
  *---------------------------------------------------------------------------*/
@@ -56,17 +51,15 @@ struct OS_TSK os_tsk;
 /* Task Control Blocks of idle demon */
 struct OS_TCB os_idle_TCB;
 
-static U8 osiit_init_task_started = 0; // IIT-EXT: allows to give tid 1 only to init_task
-
 
 /*----------------------------------------------------------------------------
  *      Local Functions
  *---------------------------------------------------------------------------*/
-
-static OS_TID rt_get_TID (void) {
+//IIT-EXT: made it overridable (and extern)
+__weak OS_TID rt_get_TID (void) {
   U32 tid;
-//  for (tid = 1; tid <= os_maxtaskrun; tid++) {                               // IIT-EXT: removed
-  for (tid = (1+osiit_init_task_started); tid <= os_maxtaskrun; tid++) {       // IIT-EXT: added
+
+  for (tid = 1; tid <= os_maxtaskrun; tid++) {
     if (os_active_TCB[tid-1] == NULL) {
       return ((OS_TID)tid);
     }
@@ -76,8 +69,8 @@ static OS_TID rt_get_TID (void) {
 
 
 /*--------------------------- rt_init_context -------------------------------*/
-
-static void rt_init_context (P_TCB p_TCB, U8 priority, FUNCP task_body) {
+//IIT-EXT: made it extern so that the function can be called also elsewhere
+void rt_init_context (P_TCB p_TCB, U8 priority, FUNCP task_body) {
   /* Initialize general part of the Task Control Block. */
   p_TCB->cb_type = TCB;
   p_TCB->state   = READY;
@@ -88,7 +81,6 @@ static void rt_init_context (P_TCB p_TCB, U8 priority, FUNCP task_body) {
   p_TCB->p_blnk  = NULL;
   p_TCB->delta_time    = 0;
   p_TCB->interval_time = 0;
-//  p_TCB->total_run_time = 0; //IIT-EXT
   p_TCB->events  = 0;
   p_TCB->waits   = 0;
   p_TCB->stack_frame = 0;
@@ -163,16 +155,12 @@ void rt_tsk_pass (void) {
   /* Allow tasks of same priority level to run cooperatively.*/
   P_TCB p_new;
 
-  
-
   p_new = rt_get_same_rdy_prio();
   if (p_new != NULL) {
     rt_put_prio ((P_XCB)&os_rdy, os_tsk.run);
     os_tsk.run->state = READY;
     rt_switch_req (p_new);
   }
-
-  
 }
 
 
@@ -193,8 +181,6 @@ OS_RESULT rt_tsk_prio (OS_TID task_id, U8 new_prio) {
   /* Change execution priority of a task to "new_prio". */
   P_TCB p_task;
 
-  
-
   if (task_id == 0) {
     /* Change execution priority of calling task. */
     os_tsk.run->prio = new_prio;
@@ -203,13 +189,11 @@ run:if (rt_rdy_prio() > new_prio) {
       os_tsk.run->state   = READY;
       rt_dispatch (NULL);
     }
-	
     return (OS_R_OK);
   }
 
   /* Find the task in the "os_active_TCB" array. */
   if (task_id > os_maxtaskrun || os_active_TCB[task_id-1] == NULL) {
-    
     /* Task with "task_id" not found or not started. */
     return (OS_R_NOK);
   }
@@ -224,7 +208,6 @@ run:if (rt_rdy_prio() > new_prio) {
     p_task = rt_get_first (&os_rdy);
     rt_dispatch (p_task);
   }
- 
   return (OS_R_OK);
 }
 
@@ -236,15 +219,12 @@ OS_TID rt_tsk_create (FUNCP task, U32 prio_stksz, void *stk, void *argv) {
   P_TCB task_context;
   U32 i;
 
-  
-
   /* Priority 0 is reserved for idle task! */
   if ((prio_stksz & 0xFF) == 0) {
     prio_stksz += 1;
   }
   task_context = rt_alloc_box (mp_tcb);
   if (task_context == NULL) {
-    
     return (0);
   }
   /* If "size != 0" use a private user provided stack. */
@@ -261,7 +241,6 @@ OS_TID rt_tsk_create (FUNCP task, U32 prio_stksz, void *stk, void *argv) {
   task_context->task_id = i;
   DBG_TASK_NOTIFY(task_context, __TRUE);
   rt_dispatch (task_context);
-  
   return ((OS_TID)i);
 }
 
@@ -271,8 +250,6 @@ OS_TID rt_tsk_create (FUNCP task, U32 prio_stksz, void *stk, void *argv) {
 OS_RESULT rt_tsk_delete (OS_TID task_id) {
   /* Terminate the task identified with "task_id". */
   P_TCB task_context;
-
-  
 
   if (task_id == 0 || task_id == os_tsk.run->task_id) {
     /* Terminate itself. */
@@ -289,7 +266,6 @@ OS_RESULT rt_tsk_delete (OS_TID task_id) {
   else {
     /* Find the task in the "os_active_TCB" array. */
     if (task_id > os_maxtaskrun || os_active_TCB[task_id-1] == NULL) {
-	  
       /* Task with "task_id" not found or not started. */
       return (OS_R_NOK);
     }
@@ -302,55 +278,26 @@ OS_RESULT rt_tsk_delete (OS_TID task_id) {
     DBG_TASK_NOTIFY(task_context, __FALSE);
     rt_free_box (mp_tcb, task_context);
   }
-
- 
   return (OS_R_OK);
 }
 
 
 /*--------------------------- rt_sys_init -----------------------------------*/
 
-extern U16 os_time;     //IIT-EXT
-extern struct OS_XTMR os_tmr; //IIT-EXT
-
-
-void rt_sys_init (FUNCP first_task, U32 prio_stksz, void *stk) {
+//IIT-EXT: made it overridable
+__weak void rt_sys_init (FUNCP first_task, U32 prio_stksz, void *stk) {
   /* Initialize system and start up task declared with "first_task". */
   U32 i;
 
   DBG_INIT();
-  
-  os_time = 0;                   //IIT-EXT
-  os_tsk.run = NULL;             //IIT-EXT
-  os_tsk.new = NULL;             //IIT-EXT
-  osiit_init_task_started = 0;   //IIT-EXT
-  oosiit_time = 0;               //IIT-EXT
-  oosiit_idletime = 0;           //IIT-EXT
-  rt_iit_params_init();          //IIT-EXT
-
-#ifdef DBG_MSG_SYSTICK
-  rt_iit_dbg_syscall_register(RT_IIT_SYSCALL_ID_SYSTICK);		//IIT-EXT
-#endif
-#ifdef DBG_MSG_PENDSV
-  rt_iit_dbg_syscall_register(RT_IIT_SYSCALL_ID_PENDSV);		//IIT-EXT
-#endif
-#ifdef DBG_MSG_SVC
-  rt_iit_dbg_syscall_register(RT_IIT_SYSCALL_ID_SVC);			//IIT-EXT
-#endif
-
 
   /* Initialize dynamic memory and task TCB pointers to NULL. */
   for (i = 0; i < os_maxtaskrun; i++) {
     os_active_TCB[i] = NULL;
   }
-  rt_init_box (mp_tcb, mp_tcb_size, sizeof(struct OS_TCB));                 //IIT-EXT
-  rt_init_box (mp_stk, mp_stk_size, BOX_ALIGN_8 | (U16)(os_stackinfo));     //IIT-EXT
+  rt_init_box (&mp_tcb, mp_tcb_size, sizeof(struct OS_TCB));
+  rt_init_box (&mp_stk, mp_stk_size, BOX_ALIGN_8 | (U16)(os_stackinfo));
   rt_init_box ((U32 *)m_tmr, mp_tmr_size, sizeof(struct OS_TMR));
-  os_tmr.next = NULL;                                                       //IIT-EXT
-  os_tmr.tcnt = 0;                                                          //IIT-EXT
-
-  rt_iit_advtmr_init();			//IIT-EXT
-  rt_iit_memory_init();         //IIT-EXT
 
   /* Set up TCB of idle demon */
   os_idle_TCB.task_id    = 255;
@@ -379,10 +326,7 @@ void rt_sys_init (FUNCP first_task, U32 prio_stksz, void *stk) {
 
   /* Intitialize system clock timer */
   rt_tmr_init ();
-  // rt_init_robin ();          //IIT-EXT
-  iitchanged_rt_init_robin ();  //IIT-EXT
-
-  rt_psh_req();					//IIT-EXT
+  rt_init_robin ();
 
   /* Start up first user task before entering the endless loop */
   rt_tsk_create (first_task, prio_stksz, stk, NULL);

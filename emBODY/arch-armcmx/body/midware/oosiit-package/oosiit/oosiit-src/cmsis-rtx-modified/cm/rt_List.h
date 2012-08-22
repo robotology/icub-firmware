@@ -40,7 +40,6 @@
 #define SCB             2
 #define MUCB            3
 #define HCB             4
-#define ATCB            5 //IIT-EXT: for AdvancedTimers
 
 /* Variables */
 extern struct OS_XCB os_rdy;

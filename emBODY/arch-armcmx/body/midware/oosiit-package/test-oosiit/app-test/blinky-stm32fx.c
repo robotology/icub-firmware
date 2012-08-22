@@ -40,6 +40,10 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
+extern void oosiit_idle(void* p);
+
+extern void oosiit_init(void* p);
+
 extern void tskInit(void);
 
 extern void tskPhaseA(void *p);
@@ -73,7 +77,7 @@ extern void tskRrobin02(void *p);
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define TF 10
+#define TF 1
 
 
 
@@ -92,10 +96,15 @@ static void signal_func(oosiit_taskid_t task);
 
 static void advtmr_callback_strange(void* tmr, void* arg);
 
+static void gotoerrormode(void);
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
+
+static uint32_t tickconversion = 1;
 
 static oosiit_objptr_t tmr1sec  = NULL;
 static oosiit_objptr_t tmr1     = NULL;
@@ -160,7 +169,9 @@ int main(void)
     uint32_t *ram32data = NULL;
     uint64_t *ram64data = NULL;
     uint64_t stackinit[128];
-
+    uint64_t *inittskstackdata = NULL;
+    uint16_t inittskstacksize = 0;
+    
 
     // cmsis init
     SystemInit(); 
@@ -183,12 +194,73 @@ int main(void)
 
     oosiit_memory_load(oosiit_params_cfgMINE, ram32data, ram64data);
 
-    oosiit_sys_init(tskInit, 250, stackinit, sizeof(stackinit)/sizeof(stackinit[0]));     
+    
+#if 0
+    inittskstacksize = sizeof(stackinit) / sizeof(stackinit[0]);
+    inittskstackdata = &stackinit[0];
+#else
+    inittskstacksize = 256;
+    inittskstackdata = oosiit_memory_getstack(inittskstacksize);
+    if(NULL == inittskstackdata)
+    {
+        gotoerrormode();
+    }    
+#endif
+
+
+#if 0    
+    oosiit_sys_init(tskInit, 250, inittskstackdata, inittskstacksize);   
+#else
+    oosiit_task_properties_t tskinit =
+    {
+        .function       = oosiit_init,
+        .param          = (void*) 0x11, //NULL,
+        .priority       = 249,
+        .stacksize      = inittskstacksize,
+        .stackdata      = inittskstackdata
+    };
+    static uint64_t idletskstackdata[256/8] = {0};
+    oosiit_task_properties_t tskidle =
+    {
+        .function       = oosiit_idle,
+        .param          = (void*) mbxdata, //NULL,
+        .priority       = 0,
+        .stacksize      = 256,
+        .stackdata      = idletskstackdata        
+    };
+    oosiit_sys_start(&tskinit, &tskidle);
+#endif
+    
+    // never in here .... unless an error
+    for(;;);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
+
+extern void oosiit_idle(void *p) 
+{
+    uint32_t *arrayof6 = (uint32_t*)p;
+    uint32_t i = 0;
+    for(;;) 
+    {
+        // idle
+        p = p;
+        if(arrayof6[2] == 2)
+        {
+            i++;
+        }
+    }
+}
+
+extern void oosiit_init(void* p) 
+{
+    p = p;
+    
+    //oosiit_tsk_delete(oosiit_tsk_self());
+    tskInit();
+}
 
 
 extern void tskInit(void) 
@@ -206,6 +278,7 @@ extern void tskInit(void)
      
     uint16_t  tskstacksize = 256;
     uint64_t* tskstackdata = NULL;
+    oosiit_task_properties_t tskprop;
 
    
     mailbox1 = oosiit_mbx_create(sizeof(mbxdata)/sizeof(mbxdata[0])); // 6
@@ -213,32 +286,63 @@ extern void tskInit(void)
     sem = oosiit_sem_create(255, 0);
 
     tskstacksize = 256;
-    tskstackdata = oosiit_stack_getmem(tskstacksize);
-    t_myperiodic = oosiit_tsk_create(tskMyperiodic, NULL, 20, tskstackdata, tskstacksize);  
+    tskstackdata = oosiit_memory_getstack(tskstacksize);
+    if(NULL == tskstackdata)
+    {
+        gotoerrormode();
+    }
+    tskprop.function    = tskMyperiodic;
+    tskprop.param       = NULL;
+    tskprop.priority    = 20;
+    tskprop.stacksize   = tskstacksize;
+    tskprop.stackdata   = tskstackdata;
+    //t_myperiodic = oosiit_tsk_create_oldversion(tskMyperiodic, NULL, 20, tskstackdata, tskstacksize);  
+    t_myperiodic = oosiit_tsk_create(&tskprop);
+
 
     tskstacksize = 256;
-    tskstackdata = oosiit_stack_getmem(tskstacksize);
-    t_phaseA = oosiit_tsk_create(tskPhaseA, NULL, 14, tskstackdata, tskstacksize);  
+    tskstackdata = oosiit_memory_getstack(tskstacksize);
+    if(NULL == tskstackdata)
+    {
+        gotoerrormode();
+    }
+    t_phaseA = oosiit_tsk_create_oldversion(tskPhaseA, NULL, 14, tskstackdata, tskstacksize);  
   
     tskstacksize = 256;
-    tskstackdata = oosiit_stack_getmem(tskstacksize);
-    t_phaseB = oosiit_tsk_create(tskPhaseB, NULL, 13, tskstackdata, tskstacksize);  
+    tskstackdata = oosiit_memory_getstack(tskstacksize);
+    if(NULL == tskstackdata)
+    {
+        gotoerrormode();
+    }
+    t_phaseB = oosiit_tsk_create_oldversion(tskPhaseB, NULL, 13, tskstackdata, tskstacksize);  
   
     tskstacksize = 256;
-    tskstackdata = oosiit_stack_getmem(tskstacksize);
-    t_phaseC = oosiit_tsk_create(tskPhaseC, NULL, 12, tskstackdata, tskstacksize); 
+    tskstackdata = oosiit_memory_getstack(tskstacksize);
+    t_phaseC = oosiit_tsk_create_oldversion(tskPhaseC, NULL, 12, tskstackdata, tskstacksize); 
   
     tskstacksize = 256;
-    tskstackdata = oosiit_stack_getmem(tskstacksize);
-    t_phaseD = oosiit_tsk_create(tskPhaseD, NULL, 11, tskstackdata, tskstacksize);  
+    tskstackdata = oosiit_memory_getstack(tskstacksize);
+    if(NULL == tskstackdata)
+    {
+        gotoerrormode();
+    }
+    t_phaseD = oosiit_tsk_create_oldversion(tskPhaseD, NULL, 11, tskstackdata, tskstacksize);  
   
     tskstacksize = 256;
-    tskstackdata = oosiit_stack_getmem(tskstacksize);
-    t_clock  = oosiit_tsk_create(tskClock, NULL, 15, tskstackdata, tskstacksize);   
+    tskstackdata = oosiit_memory_getstack(tskstacksize);
+    if(NULL == tskstackdata)
+    {
+        gotoerrormode();
+    }
+    t_clock  = oosiit_tsk_create_oldversion(tskClock, NULL, 15, tskstackdata, tskstacksize);   
   
     tskstacksize = 256;
-    tskstackdata = oosiit_stack_getmem(tskstacksize);
-    t_lsd    = oosiit_tsk_create(tskLSD, NULL, 16, tskstackdata, tskstacksize);     
+    tskstackdata = oosiit_memory_getstack(tskstacksize);
+    if(NULL == tskstackdata)
+    {
+        gotoerrormode();
+    }
+    t_lsd    = oosiit_tsk_create_oldversion(tskLSD, NULL, 16, tskstackdata, tskstacksize);     
 
 
     sem1 = oosiit_sem_create(255, 0);
@@ -246,17 +350,17 @@ extern void tskInit(void)
     mut1 = oosiit_mut_create();
     mbx1 = oosiit_mbx_create(30);
     mbx2 = oosiit_mbx_create(10);
-    stk1 = oosiit_stack_getmem(8);
-    stk1 = oosiit_stack_getmem(7);
+    stk1 = oosiit_memory_getstack(8);
+    stk1 = oosiit_memory_getstack(7);
 
     nanotime = oosiit_nanotime_get();
 
 
-    oosiit_sem_wait(sem1, 50);
+ //   oosiit_sem_wait(sem1, 50);
 
-    oosiit_sem_set(sem1, 2);
+ //   oosiit_sem_set(sem1, 2);
 
-    oosiit_sem_wait(sem1, 50);
+ //   oosiit_sem_wait(sem1, 50);
 
     nanotime = oosiit_nanotime_get();
 
@@ -267,16 +371,28 @@ extern void tskInit(void)
 
 
     tskstacksize = 256;
-    tskstackdata = oosiit_stack_getmem(tskstacksize);
-    t_evtbased00 = oosiit_tsk_create(tskEvtbased00, NULL, 50, tskstackdata, tskstacksize);
+    tskstackdata = oosiit_memory_getstack(tskstacksize);
+    if(NULL == tskstackdata)
+    {
+        gotoerrormode();
+    }
+    t_evtbased00 = oosiit_tsk_create_oldversion(tskEvtbased00, NULL, 50, tskstackdata, tskstacksize);
   
-    tskstacksize = 256;
-    tskstackdata = oosiit_stack_getmem(tskstacksize);
-    t_rrobin01 = oosiit_tsk_create(tskRrobin01, NULL, 3, tskstackdata, tskstacksize);
-  
-    tskstacksize = 256;
-    tskstackdata = oosiit_stack_getmem(tskstacksize);
-    t_rrobin02 = oosiit_tsk_create(tskRrobin02, NULL, 4, tskstackdata, tskstacksize);
+//     tskstacksize = 256;
+//     tskstackdata = oosiit_memory_getstack(tskstacksize);
+//     if(NULL == tskstackdata)
+//     {
+//         gotoerrormode();
+//     }
+//     t_rrobin01 = oosiit_tsk_create_oldversion(tskRrobin01, NULL, 3, tskstackdata, tskstacksize);
+//   
+//     tskstacksize = 256;
+//     tskstackdata = oosiit_memory_getstack(tskstacksize);
+//     if(NULL == tskstackdata)
+//     {
+//         gotoerrormode();
+//     }
+//     t_rrobin02 = oosiit_tsk_create_oldversion(tskRrobin02, NULL, 4, tskstackdata, tskstacksize);
 
 
     // finally it deletes itself
@@ -701,6 +817,19 @@ static void advtmr_callback_strange(void* tmr, void* arg)
 }
 
 
+static void gotoerrormode(void)
+{
+    static volatile uint8_t aa = 0;
+    
+    for(;;)
+    {
+        aa++;
+        if(200 == aa)
+        {
+            aa = 0;
+        }
+    }
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------

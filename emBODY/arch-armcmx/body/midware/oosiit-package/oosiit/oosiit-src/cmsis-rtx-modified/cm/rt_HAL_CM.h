@@ -240,10 +240,18 @@ extern void dbg_task_switch (U32 task_id);
 #define DBG_TASK_SWITCH(task_id)      if (dbg_msg && (os_tsk.new!=os_tsk.run)) \
                                                    dbg_task_switch(task_id)
 #else
-#define DBG_INIT()
-#define DBG_TASK_NOTIFY(p_tcb,create)
-#define DBG_TASK_SWITCH(task_id)
+//IIT-EXT: removed this and ...
+// #define DBG_INIT()
+// #define DBG_TASK_NOTIFY(p_tcb,create)
+// #define DBG_TASK_SWITCH(task_id)
 #endif
+
+#include "rt_iit_changes.h"
+
+#define DBG_INIT()                          rt_iit_dbg_init()
+#define DBG_TASK_NOTIFY(p_tcb,create)       rt_iit_dbg_task_notify(p_tcb,create)
+#define DBG_TASK_SWITCH(task_id)            rt_iit_dbg_task_switch(task_id)
+
 
 /*----------------------------------------------------------------------------
  * end of file

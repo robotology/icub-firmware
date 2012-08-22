@@ -28,7 +28,7 @@ extern "C" {
 
 /** @file       oosiit_svc.h
 	@brief      This header file contains svc interface to the IIT extension to open source CMSIS-RTOS RTX kernel
-                The code in here is taken from rt_CMSIS.c file, of whcih we retain the original copyright note
+                The code in here is taken from rt_CMSIS.c file, of which we retain the original copyright note
 	@author     marco.accame@iit.it
 	@date       07/23/2012
 **/
@@ -116,7 +116,7 @@ extern "C" {
 
 // Service Calls defines
 
-//IIT-EXT: beg of the definition of svc macros on compilers: armcc, gcc, iar
+//IIT-EXT: beginning of the definition of svc macros on compilers: armcc, gcc, iar
 #if defined (__CC_ARM)          /* ARM Compiler */
 
 #define __NO_RETURN __declspec(noreturn)
@@ -144,6 +144,14 @@ __svc_indirect(0) t  _##f (t(*)(t1),t1);                                       \
 __attribute__((always_inline))                                                 \
 static __inline   t __##f (t1 a1) {                                            \
   return _##f(f,a1);                                                           \
+}
+
+#define SVC_2_0(f,t,t1,t2,...)                                                 \
+__svc_indirect(0) t  _##f (t(*)(t1,t2),t1,t2);                                 \
+                  t     f (t1 a1, t2 a2);                                      \
+__attribute__((always_inline))                                                 \
+static __inline   t __##f (t1 a1, t2 a2) {                                     \
+   _##f(f,a1,a2);                                                        \
 }
 
 #define SVC_2_1(f,t,t1,t2,...)                                                 \
@@ -424,7 +432,7 @@ static inline t __##f (t1 a1, t2 a2) {                                         \
 //IIT-EXT: end of the definition of svc macros on compilers: armcc, gcc, iar
 
 
-//IIT-EXT: removed the rest of the file rt_CMSIS ...
+//IIT-EXT: removed the rest of the file rt_CMSIS.c as it contains a wrapper to functions which we dont need
 
  
 #ifdef __cplusplus

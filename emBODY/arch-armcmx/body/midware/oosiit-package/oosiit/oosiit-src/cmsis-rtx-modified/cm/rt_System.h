@@ -33,7 +33,8 @@
  *---------------------------------------------------------------------------*/
 
 /* Variables */
-//#define os_psq  ((P_PSQ)&os_fifo)	    //IIT-EXT: changed into the following line
+//IIT-EXT: need to change the following to make it work ...
+//#define os_psq  ((P_PSQ)&os_fifo)	    //IIT-EXT
 #define os_psq  ((P_PSQ)os_fifo)        //IIT-EXT
 
 /* Functions */

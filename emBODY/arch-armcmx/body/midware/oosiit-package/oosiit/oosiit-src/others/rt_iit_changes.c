@@ -20,12 +20,19 @@
 	@brief      This file implements internal implementation of the IIT extension for some calls of RTX.
 	@author     marco.accame@iit.it
     @date       07/30/2012
+    @warning    this file contains parts of code taken from various files coming from the free distribution of the
+                "CMSIS-RTOS RTX Implementation" version 4.20. the code has been modified to add support to 32 bit 
+                timing and to dynamic retrieval of memory used by the rtos objects. the modification is done in the
+                following way:
+                - if a function of RTX needs a different behaviour but keeps its declation, we just redefine it in this
+                  file. obviously in its original file the funtion was made __weak.
+                - if a function of RTX needs also different parameters in its number of type, we just create a new
+                  function in this file with name prefixed with "iitchanged_". the old function is left unchanged in 
+                  its original file. 
+                hence, we attach in here the copyrigth notice of KEIL.
 **/
 
-// this file contains parts of code taken from various files coming from the free distribution of the
-// "CMSIS-RTOS RTX Implementation" version 4.20. the code has been modified to add support to 32 bit 
-// timing and to dynamic retrieval of memory used by the rtos objects.
-// as such, we attach in here the copyrigth notice which applies only to functions with prefix: iitchanged_
+
 
 /*-----------------------------------------------------------------------------
 
@@ -142,25 +149,18 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-
-//static U32* s_rt_iit_getstdlib32data(void);
-
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-//volatile WIDETIME_t     osiit_time = 0;
-//volatile WIDETIME_t     osiit_idletime = 0;
 
-
-//U32 os_iit_ns_per_unit_of_systick = 0;
-//U32 os_iit_num_units_of_systick = 0;
-
-#if defined(DBG_MSG_SYSTICK) | defined(DBG_MSG_SVC) | defined(DBG_MSG_PENDSV)
-static uint8_t previous_id = ev_ID_idle;
+#if defined(OOSIIT_DBG_ENABLE)
+static uint8_t s_dbg_previous_id = ev_ID_idle;
 #endif
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -197,10 +197,13 @@ extern void rt_iit_params_init(void)
 
     oosiit_hid_params_get_ram64(oosiit_params_cfg, ram64size);
 
-    os_maxtaskrun = oosiit_params_cfg->numTask;
+    os_maxtaskrun = oosiit_params_cfg->maxnumofusertasks;
+//     os_stackinfo  = (oosiit_params_cfg->checkStack << 24) |
+//                     (oosiit_params_cfg->numTaskWithUserProvidedStack << 16) |
+//                     (oosiit_params_cfg->sizeStack*4);
     os_stackinfo  = (oosiit_params_cfg->checkStack << 24) |
-                    (oosiit_params_cfg->numTaskWithUserProvidedStack << 16) |
-                    (oosiit_params_cfg->sizeStack*4);
+                    (oosiit_params_cfg->maxnumofusertasks << 16) |
+                    (0*4);    
     os_rrobin_use  = (0 == oosiit_params_cfg->roundRobin) ? (0) : (1);
     os_rrobin_tout = oosiit_params_cfg->roundRobinTimeout;
 
@@ -210,7 +213,8 @@ extern void rt_iit_params_init(void)
     os_flags      = oosiit_params_cfg->priviledgeMode; 
 
     os_clockrate  =  oosiit_params_cfg->osTick;
-    os_timernum   = (0 << 16) | oosiit_params_cfg->numTimer;    // in cm3, OS_TIMER is 0
+    //os_timernum   = (0 << 16) | oosiit_params_cfg->numTimer;    // in cm3, OS_TIMER is 0
+    os_timernum   = (0 << 16) | 0;    // in cm3, OS_TIMER is 0
  
     
     if(0 != ram32size[0])
@@ -362,9 +366,12 @@ extern void rt_iit_params_init(void)
     {
         extern BIT os_lock;             //IIT-EXT
         extern BIT os_psh_flag;         //IIT-EXT
+        extern U8  pend_flags;          //IIT-EXT
 
         os_lock = 0;
         os_psh_flag = 0;
+        pend_flags = 0;    
+
     }
     
         
@@ -420,7 +427,6 @@ extern void rt_iit_time_set(U32 low, U32 high)
 
     // adjust the absolute-time data-structure: advanced timers
     rt_iit_advtmr_synchronise(current);
-
 	
 }
 
@@ -428,7 +434,206 @@ extern void rt_iit_time_set(U32 low, U32 high)
 
 // - system task management routines: rt_System.c ---------------------------------------------------------------------
 
-#warning --> mettere la rt_systick qui???
+#include "rt_Timer.h"
+
+#define IIT_EXEC_ONPENDSV_IN_SYSTICK //IIT-EXT
+
+//IIT-EXT: made them global
+extern BIT os_lock;
+extern BIT os_psh_flag;
+extern U8  pend_flags;
+
+void rt_tsk_lock (void) {
+  /* Prevent task switching by locking out scheduler */
+  // IIT-EXT: we need to read the register in order to clear bit 16, the COUNTFLAG
+  volatile U32 nvicstctrl = NVIC_ST_CTRL;
+  
+  nvicstctrl = nvicstctrl;
+  OS_LOCK();
+  os_lock = __TRUE;
+  OS_UNPEND (&pend_flags);
+  ;
+}
+
+void rt_tsk_unlock (void) {
+  /* Unlock scheduler and re-enable task switching */
+  // IIT-EXT: added the execution of teh systick if the timer was expired in the meantime.
+  // warning: the systick executes only one even if the lock lastd for more than one period
+  volatile U32 nvicstctrl = NVIC_ST_CTRL;
+  					 
+  if(0x00010000 == (nvicstctrl & 0x00010000))
+  { // bit 16 is the COUNTFLAG: reads as 1 if counter reaches 0 since this is the last time this register
+    // is read. clear to 0 automatically when read or when current counter value is cleared.
+	// in our case, OS_LOCK() cleared it.
+  	pend_flags |= 1; // in position 1 there is the systick flag
+  }
+
+  OS_UNLOCK();
+  os_lock = __FALSE;
+  OS_PEND (pend_flags, os_psh_flag);
+  os_psh_flag = __FALSE;
+  
+}
+
+#ifdef IIT_EXEC_ONPENDSV_IN_SYSTICK
+void rt_iit_pop_req_base (void) {
+  struct OS_XCB *p_CB;
+  U32  idx;
+
+  idx = os_psq->last;
+  while (os_psq->count) {
+    p_CB = os_psq->q[idx].id;
+    if (p_CB->cb_type == TCB) {
+      /* Is of TCB type */
+      // rt_evt_psh ((P_TCB)p_CB, (U16)os_psq->q[idx].arg);     //IIT-EXT
+      iitchanged_rt_evt_psh ((U32)p_CB, (U32)os_psq->q[idx].arg);    //IIT-EXT
+    }
+    else if (p_CB->cb_type == MCB) {
+      /* Is of MCB type */
+      rt_mbx_psh ((P_MCB)p_CB, (void *)os_psq->q[idx].arg);
+      // if we want send2front: rt_iit_mbx_psh((P_MCB)p_CB, (void *)os_psq->q[idx].arg, os_psq->q[idx].flags); //IIT-EXT
+    }
+    else if (p_CB->cb_type == ATCB) { //IIT-EXT
+      rt_advtmr_psh ((OS_ID)p_CB, (U32)os_psq->q[idx].arg); //IIT-EXT
+    } //IIT-EXT
+    else if (p_CB->cb_type == SCB) { //IIT-EXT
+      /* Must be of SCB type */
+      //rt_sem_psh ((P_SCB)p_CB); //IIT-EXT
+      iitchanged_rt_sem_psh((P_SCB)p_CB);
+    }
+    if (++idx == os_psq->size) idx = 0;
+    rt_dec (&os_psq->count);
+  }
+  os_psq->last = idx;
+
+}
+#endif 
+
+#ifdef IIT_EXEC_ONPENDSV_IN_SYSTICK
+void rt_iit_pop_req_inside_systick (void) {
+
+  	if((1<<28) == ((1<<28) & (NVIC_INT_CTRL)))
+  	{
+		rt_iit_pop_req_base();
+  		// clear
+  		NVIC_INT_CTRL  |= (1<<27);
+	}
+
+}
+#endif
+
+void rt_pop_req (void) {
+  /* Process an ISR post service requests. */
+#ifdef IIT_EXEC_ONPENDSV_IN_SYSTICK
+  
+  P_TCB next;
+
+  rt_iit_dbg_pendsv_enter(); // IIT-EXT
+
+  os_tsk.run->state = READY;
+  rt_put_rdy_first (os_tsk.run);
+
+  rt_iit_pop_req_base();
+
+  next = rt_get_first (&os_rdy);
+  rt_switch_req (next);
+
+  rt_iit_dbg_pendsv_exit(); // IIT-EXT
+
+#else
+
+  struct OS_XCB *p_CB;
+  P_TCB next;
+  U32  idx;
+
+  rt_iit_dbg_pendsv_enter(); // IIT-EXT
+
+  os_tsk.run->state = READY;
+  rt_put_rdy_first (os_tsk.run);
+
+  idx = os_psq->last;
+  while (os_psq->count) {
+    p_CB = os_psq->q[idx].id;
+    if (p_CB->cb_type == TCB) {
+      /* Is of TCB type */
+      // rt_evt_psh ((P_TCB)p_CB, (U16)os_psq->q[idx].arg);     //IIT-EXT: removed
+      rt_iit_evt_psh ((U32)p_CB, (U32)os_psq->q[idx].arg);    //IIT-EXT: added
+    }
+    else if (p_CB->cb_type == MCB) {
+      /* Is of MCB type */
+      rt_mbx_psh ((P_MCB)p_CB, (void *)os_psq->q[idx].arg);
+      // if we want send2front: rt_iit_mbx_psh((P_MCB)p_CB, (void *)os_psq->q[idx].arg, os_psq->q[idx].flags); //IIT-EXT
+    }
+    else if (p_CB->cb_type == ATCB) { //IIT-EXT
+      rt_advtmr_psh ((OS_ID)p_CB, (U32)os_psq->q[idx].arg); //IIT-EXT
+    } //IIT-EXT
+    else {
+      /* Must be of SCB type */
+      //rt_sem_psh ((P_SCB)p_CB); //IIT-EXT
+      rt_iit_sem_psh((P_SCB)p_CB);
+    }
+    if (++idx == os_psq->size) idx = 0;
+    rt_dec (&os_psq->count);
+  }
+  os_psq->last = idx;
+
+  next = rt_get_first (&os_rdy);
+  rt_switch_req (next);
+
+  rrt_iit_dbg_pendsv_exit(); // IIT-EXT
+
+#endif
+}
+
+#ifdef __CMSIS_RTOS
+extern void sysTimerTick(void);
+#endif
+
+void rt_systick (void) {
+  /* Check for system clock update, suspend running task. */
+  P_TCB next;
+
+  rt_iit_dbg_systick_enter(); // IIT-EXT
+
+  os_tsk.run->state = READY;
+  rt_put_rdy_first (os_tsk.run);
+
+  if(0 == os_tsk.run->prio)		//IIT-EXT
+  {								//IIT-EXT
+        oosiit_idletime++; 	//IIT-EXT
+  }								//IIT-EXT
+
+//  os_tsk.run->total_run_time++; //IIT-EXT
+
+  /* Check Round Robin timeout. */
+  iitchanged_rt_chk_robin ();			//IIT-EXT
+
+  /* Update delays. */
+  os_time++;
+  oosiit_time++;				//IIT-EXT
+  iitchanged_rt_dec_dly ();			//IIT-EXT
+
+
+  /* Check the user timers. */
+#ifdef __CMSIS_RTOS
+  sysTimerTick();
+  rt_iit_advtmr_tick();			//IIT-EXT
+#else
+  rt_tmr_tick ();
+  rt_iit_advtmr_tick();			//IIT-EXT
+#endif
+
+#ifdef IIT_EXEC_ONPENDSV_IN_SYSTICK	
+  rt_iit_pop_req_inside_systick(); //IIT-EXT
+#endif
+
+  /* Switch back to highest ready task */
+  next = rt_get_first (&os_rdy);
+  rt_switch_req (next);
+
+
+  rt_iit_dbg_systick_exit();	// IIT-EXT
+}
 
 
 // - time management routines: rt_Time.c ------------------------------------------------------------------------------
@@ -1251,6 +1456,11 @@ void iitchanged_rt_sem_psh (void *p) {
 
 // - from rt_task: rt_Task.c ------------------------------------------------------------------------------------------
 
+#include "rt_MemBox.h"
+#include "rt_iit_memory.h"
+
+extern void rt_init_context (P_TCB p_TCB, U8 priority, FUNCP task_body);
+
 extern BIT os_lock;             //IIT-EXT
 
 #warning --> durante lo scheduling suspend la osal potrebbe fare un context swith se il task manda un evt (non bloccante) ad altro task + prioritario
@@ -1285,27 +1495,195 @@ void iitchanged_rt_block (TIME_t timeout, U8 block_state, const TIME_t notimeout
 } 
 
 
-//U64 rt_iit_tsk_activetime_get(OS_TID task_id) {
-//
-//  P_TCB p_task;
-//
-//  if (task_id == 0) {
-//    /* the calling task. */
-//    return (os_tsk.run->total_run_time);
-//  }
-//
-//  /* Find the task in the "os_active_TCB" array. */
-//  if (task_id > os_maxtaskrun || os_active_TCB[task_id-1] == NULL) {
-//    /* Task with "task_id" not found or not started. */
-//    return (0);
-//  }
-// 
-//  p_task = os_active_TCB[task_id-1];
-//  p_task = p_task;
-//   
-//  return (p_task->total_run_time);
-//}
 
+extern U16 os_time;     //IIT-EXT
+extern struct OS_XTMR os_tmr; //IIT-EXT
+
+static U8 osiit_init_task_started = 0; // IIT-EXT: allows to give tid 1 only to init_task
+
+OS_TID rt_get_TID (void) {
+  U32 tid;
+//  for (tid = 1; tid <= os_maxtaskrun; tid++) {                               // IIT-EXT: removed
+  for (tid = (1+osiit_init_task_started); tid <= os_maxtaskrun; tid++) {       // IIT-EXT: added
+    if (os_active_TCB[tid-1] == NULL) {
+      return ((OS_TID)tid);
+    }
+  }
+  return (0);
+}
+
+
+        
+
+void rt_iit_sys_start(oosiit_task_properties_t* inittsk, oosiit_task_properties_t* idletsk) 
+{ 
+    uint32_t i;
+  
+    os_time = 0;                      //IIT-EXT
+    os_tsk.run = NULL;                //IIT-EXT
+    os_tsk.new = NULL;                //IIT-EXT
+    osiit_init_task_started = 0;      //IIT-EXT
+    oosiit_time = 0;                  //IIT-EXT
+    oosiit_idletime = 0;              //IIT-EXT
+//  rt_iit_params_init();             //IIT-EXT
+//  rt_iit_memory_init();             //IIT-EXT
+
+
+#ifdef OOSIIT_DBG_ENABLE  
+    rt_iit_dbg_init();              
+#endif
+    
+#ifdef OOSIIT_DBG_SYSTICK
+    rt_iit_dbg_syscall_register(RT_IIT_SYSCALL_ID_SYSTICK);		
+#endif
+#ifdef OOSIIT_DBG_PENDSV
+    rt_iit_dbg_syscall_register(RT_IIT_SYSCALL_ID_PENDSV);		
+#endif
+#ifdef OOSIIT_DBG_SVC
+    rt_iit_dbg_syscall_register(RT_IIT_SYSCALL_ID_SVC);			
+#endif
+
+
+    // Initialize dynamic memory and task TCB pointers to NULL. 
+    for(i=0; i<os_maxtaskrun; i++) 
+    {
+        os_active_TCB[i] = NULL;
+    }
+    rt_init_box(mp_tcb, mp_tcb_size, sizeof(struct OS_TCB));                 //IIT-EXT
+    rt_init_box(mp_stk, mp_stk_size, BOX_ALIGN_8 | (U16)(os_stackinfo));     //IIT-EXT
+    rt_init_box((U32 *)m_tmr, mp_tmr_size, sizeof(struct OS_TMR));
+    os_tmr.next = NULL;                                                       //IIT-EXT
+    os_tmr.tcnt = 0;                                                          //IIT-EXT
+
+    rt_iit_advtmr_init();			//IIT-EXT
+  
+
+
+    // idle task
+    os_idle_TCB.task_id         = 255;
+    os_idle_TCB.stack           = (uint32_t*)idletsk->stackdata; 
+    os_idle_TCB.priv_stack      = idletsk->stacksize;
+    os_idle_TCB.msg             = idletsk->param;
+    rt_init_context (&os_idle_TCB, 0, (FUNCP)idletsk->function);
+ 
+    
+    /* Set up ready list: initially empty */
+    os_rdy.cb_type = HCB;
+    os_rdy.p_lnk   = NULL;
+    /* Set up delay list: initially empty */
+    os_dly.cb_type = HCB;
+    os_dly.p_dlnk  = NULL;
+    os_dly.p_blnk  = NULL;
+    os_dly.delta_time = 0;
+
+
+    /* Fix SP and systemvariables to assume idle task is running  */
+    /* Transform main program into idle task by assuming idle TCB */
+    rt_set_PSP (os_idle_TCB.tsk_stack+32);
+    os_tsk.run = &os_idle_TCB;
+    os_tsk.run->state = RUNNING;
+
+
+    /* Initialize ps queue */
+    os_psq->first = 0;
+    os_psq->last  = 0;
+    os_psq->size  = os_fifo_size;
+
+    /* Intitialize system clock timer */
+    rt_tmr_init ();
+    // rt_init_robin ();          //IIT-EXT
+    iitchanged_rt_init_robin ();  //IIT-EXT
+
+    rt_psh_req();					//IIT-EXT
+
+
+    /* Start up first user task before entering the endless loop */
+    //rt_tsk_create(first_task, prio_stksz, stk, NULL);
+    uint32_t stacksize24priority08 = ((((uint32_t)(inittsk->stacksize)) << 8)&0xffffff00) | (inittsk->priority&0xff);
+    rt_tsk_create((FUNCP)inittsk->function, stacksize24priority08, (uint32_t*)inittsk->stackdata, inittsk->param);     
+}
+
+
+
+// void rt_sys_init (FUNCP first_task, U32 prio_stksz, void *stk) {
+//   /* Initialize system and start up task declared with "first_task". */
+//   U32 i;
+
+//   //DBG_INIT(); //IIT-EXT: substituted with the iit version
+// #ifdef OOSIIT_DBG_ENABLE  
+//   rt_iit_dbg_init();             //IIT-EXT
+// #endif
+//   
+//   os_time = 0;                      //IIT-EXT
+//   os_tsk.run = NULL;                //IIT-EXT
+//   os_tsk.new = NULL;                //IIT-EXT
+//   osiit_init_task_started = 0;      //IIT-EXT
+//   oosiit_time = 0;                  //IIT-EXT
+//   oosiit_idletime = 0;              //IIT-EXT
+// //  rt_iit_params_init();             //IIT-EXT
+// //  rt_iit_memory_init();             //IIT-EXT
+
+// #ifdef OOSIIT_DBG_SYSTICK
+//   rt_iit_dbg_syscall_register(RT_IIT_SYSCALL_ID_SYSTICK);		//IIT-EXT
+// #endif
+// #ifdef OOSIIT_DBG_PENDSV
+//   rt_iit_dbg_syscall_register(RT_IIT_SYSCALL_ID_PENDSV);		//IIT-EXT
+// #endif
+// #ifdef OOSIIT_DBG_SVC
+//   rt_iit_dbg_syscall_register(RT_IIT_SYSCALL_ID_SVC);			//IIT-EXT
+// #endif
+
+
+//   /* Initialize dynamic memory and task TCB pointers to NULL. */
+//   for (i = 0; i < os_maxtaskrun; i++) {
+//     os_active_TCB[i] = NULL;
+//   }
+//   rt_init_box (mp_tcb, mp_tcb_size, sizeof(struct OS_TCB));                 //IIT-EXT
+//   rt_init_box (mp_stk, mp_stk_size, BOX_ALIGN_8 | (U16)(os_stackinfo));     //IIT-EXT
+//   rt_init_box ((U32 *)m_tmr, mp_tmr_size, sizeof(struct OS_TMR));
+//   os_tmr.next = NULL;                                                       //IIT-EXT
+//   os_tmr.tcnt = 0;                                                          //IIT-EXT
+
+//   rt_iit_advtmr_init();			//IIT-EXT
+//   
+
+//   /* Set up TCB of idle demon */
+//   os_idle_TCB.task_id    = 255;
+//   os_idle_TCB.stack = NULL; //IIT-EXT
+//   os_idle_TCB.priv_stack = 0;
+//   rt_init_context (&os_idle_TCB, 0, os_idle_demon);
+
+//   /* Set up ready list: initially empty */
+//   os_rdy.cb_type = HCB;
+//   os_rdy.p_lnk   = NULL;
+//   /* Set up delay list: initially empty */
+//   os_dly.cb_type = HCB;
+//   os_dly.p_dlnk  = NULL;
+//   os_dly.p_blnk  = NULL;
+//   os_dly.delta_time = 0;
+
+//   /* Fix SP and systemvariables to assume idle task is running  */
+//   /* Transform main program into idle task by assuming idle TCB */
+//   rt_set_PSP (os_idle_TCB.tsk_stack+32);
+//   os_tsk.run = &os_idle_TCB;
+//   os_tsk.run->state = RUNNING;
+
+
+//   /* Initialize ps queue */
+//   os_psq->first = 0;
+//   os_psq->last  = 0;
+//   os_psq->size  = os_fifo_size;
+
+//   /* Intitialize system clock timer */
+//   rt_tmr_init ();
+//   // rt_init_robin ();          //IIT-EXT
+//   iitchanged_rt_init_robin ();  //IIT-EXT
+
+//   rt_psh_req();					//IIT-EXT
+
+//   /* Start up first user task before entering the endless loop */
+//   rt_tsk_create (first_task, prio_stksz, stk, NULL);
+// }
 
 // - from rt_list: rt_List.c ------------------------------------------------------------------------------------------
 
@@ -1442,13 +1820,22 @@ void os_tmr_call(uint16_t info)
   info = info;
 }
 
+void os_idle_demon (void) {
+  /* The idle demon is a system thread, running when no other thread is      */
+  /* ready to run.                                                           */
+
+  for (;;) {
+  /* HERE: include optional user code to be executed when no thread runs.*/
+  }
+}
+
 
 
 // - management of system calls with itm ------------------------------------------------------------------------------
 
 // added funtions to signal to itm manager the execution of sys calls: systick, pendsv, svc
 
-#ifdef DBG_MSG
+#ifdef OOSIIT_DBG_ENABLE
 
 extern void oosiit_systick(void)
 {
@@ -1468,35 +1855,67 @@ extern void oosiit_svc(void)
 	aa = aa;
 }
 
-#if 0
-extern void rt_iit_dbg_syscall_register (U8 id) {
-  FUNCP fptr = NULL;
-  switch(id) {
-    case RT_IIT_SYSCALL_ID_SYSTICK:   fptr = oosiit_systick;		break;
-	case RT_IIT_SYSCALL_ID_PENDSV:    fptr = oosiit_pendsv;     	break;
-	case RT_IIT_SYSCALL_ID_SVC:       fptr = oosiit_svc;        	break;
-	default: 				          fptr = NULL;       		break;
-  };
-  while (ITM_PORT31_U32 == 0);
-  ITM_PORT31_U32 = (U32)fptr;
-  while (ITM_PORT31_U32 == 0);
-  ITM_PORT31_U16 = (1 << 8) | id;	 // here 1 << 8 means that we register the syscall to uvision environment
-}
-#else
+static uint8_t oosiit_dbg_initted = 0;
 
-extern void rt_iit_dbg_syscall_register (U8 id) {
+extern void rt_iit_dbg_init(void)
+{
+  if ((DEMCR & DEMCR_TRCENA)     && 
+      (ITM_CONTROL & ITM_ITMENA) &&
+      (ITM_ENABLE & (1UL << 31))) {
+    oosiit_dbg_initted = 1;
+  } 
+  else {
+    oosiit_dbg_initted = 0;
+  }   
+  oosiit_dbg_initted = oosiit_dbg_initted; 
+}
+
+
+
+
+extern void rt_iit_dbg_task_notify(void* ptcb, BOOL create)
+{
+    P_TCB p_tcb = (P_TCB) ptcb;
+    if(0 == oosiit_dbg_initted)
+    {
+        return;
+    }
+    
+    if(1 == create)
+    {
+        eventviewer_load(ev_ID_first_ostask+p_tcb->task_id, p_tcb->ptask);
+    }
+    else
+    {
+        eventviewer_unload(ev_ID_first_ostask+p_tcb->task_id, p_tcb->ptask);
+    }
+}
+
+extern void rt_iit_dbg_task_switch(U32 task_id)
+{
+    U8 id = (255==task_id) ? (ev_ID_idle) : (ev_ID_first_ostask+(U8)task_id);
+    
+    if((0 == oosiit_dbg_initted) || (os_tsk.new == os_tsk.run))
+    {
+        return;
+    }
+    
+    eventviewer_switch_to(id);
+}
+
+extern void rt_iit_dbg_syscall_register(U8 id) 
+{
   FUNCP fptr = NULL;
   uint8_t idev = 0;
   switch(id) {
-    case RT_IIT_SYSCALL_ID_SYSTICK:   fptr = oosiit_systick; idev = ev_ID_systick;   break;
-	case RT_IIT_SYSCALL_ID_PENDSV:    fptr = oosiit_pendsv;  idev = ev_ID_pendsv;    break;
-	case RT_IIT_SYSCALL_ID_SVC:       fptr = oosiit_svc;     idev = ev_ID_svc;       break;
-	default: 				          fptr = NULL;       	idev = 0;               break;
+    case RT_IIT_SYSCALL_ID_SYSTICK:   fptr = oosiit_systick;    idev = ev_ID_systick;   break;
+	case RT_IIT_SYSCALL_ID_PENDSV:    fptr = oosiit_pendsv;     idev = ev_ID_pendsv;    break;
+	case RT_IIT_SYSCALL_ID_SVC:       fptr = oosiit_svc;        idev = ev_ID_svc;       break;
+	default: 				          fptr = NULL;       	    idev = 0;               break;
   };
   eventviewer_load(idev, fptr);
 }
 
-#endif
 
 //extern void rt_iit_dbg_syscall_enter (U8 id) {
 //  while (ITM_PORT31_U32 == 0);
@@ -1513,67 +1932,73 @@ extern void rt_iit_dbg_syscall_exit (void)
   {
     //uint8_t id = (255 == os_tsk.run->task_id) ? (ev_ID_idle) : (ev_ID_first_osaltask+os_tsk.run->task_id); 
     //eventviewer_switch_to(id); 
-    eventviewer_switch_to(previous_id);
+    eventviewer_switch_to(s_dbg_previous_id);
   }
   else
   {
-    //previous_id;
+    //s_dbg_previous_id;
   }
   //eventviewer_switch_to
 }
 
-#ifdef DBG_MSG_SYSTICK
+#ifdef OOSIIT_DBG_SYSTICK
 extern void rt_iit_dbg_systick_enter(void)
 {
 	//rt_iit_dbg_syscall_enter(RT_IIT_SYSCALL_ID_SYSTICK);
-    previous_id = eventviewer_switch_to(ev_ID_systick);
+    s_dbg_previous_id = eventviewer_switch_to(ev_ID_systick);
 }
 extern void rt_iit_dbg_systick_exit(void)
 {
  	rt_iit_dbg_syscall_exit();
-    //eventviewer_switch_to(previous_id);
+    //eventviewer_switch_to(s_dbg_previous_id);
 }
-#else//DBG_MSG_SYSTICK
+#else//OOSIIT_DBG_SYSTICK
 extern void rt_iit_dbg_systick_enter(void){;}
 extern void rt_iit_dbg_systick_exit(void){;}
-#endif//DBG_MSG_SYSTICK
+#endif//OOSIIT_DBG_SYSTICK
 
 
-#ifdef DBG_MSG_PENDSV
+#ifdef OOSIIT_DBG_PENDSV
 extern void rt_iit_dbg_pendsv_enter(void)
 {
 	//rt_iit_dbg_syscall_enter(RT_IIT_SYSCALL_ID_PENDSV);
-    previous_id = eventviewer_switch_to(ev_ID_pendsv);
+    s_dbg_previous_id = eventviewer_switch_to(ev_ID_pendsv);
 }
 extern void rt_iit_dbg_pendsv_exit(void)
 {
  	rt_iit_dbg_syscall_exit();
-    //eventviewer_switch_to(previous_id);
+    //eventviewer_switch_to(s_dbg_previous_id);
 }
-#else//DBG_MSG_PENDSV
+#else//OOSIIT_DBG_PENDSV
 extern void rt_iit_dbg_pendsv_enter(void){;}
 extern void rt_iit_dbg_pendsv_exit(void){;}
-#endif//DBG_MSG_PENDSV
+#endif//OOSIIT_DBG_PENDSV
 
 
-#ifdef DBG_MSG_SVC
+#ifdef OOSIIT_DBG_SVC
 extern void rt_iit_dbg_svc_enter(void)
 {
 	//rt_iit_dbg_syscall_enter(RT_IIT_SYSCALL_ID_SVC);
-    previous_id = eventviewer_switch_to(ev_ID_svc);
+    s_dbg_previous_id = eventviewer_switch_to(ev_ID_svc);
 }
 extern void rt_iit_dbg_svc_exit(void)
 {
  	rt_iit_dbg_syscall_exit();
-    //eventviewer_switch_to(previous_id);
+    //eventviewer_switch_to(s_dbg_previous_id);
 }
 #else
 extern void rt_iit_dbg_svc_enter(void){;}
 extern void rt_iit_dbg_svc_exit(void){;}
-#endif//DBG_MSG_SVC
+#endif//OOSIIT_DBG_SVC
 
 
-#else//DBG_MSG
+#else//OOSIIT_DBG_ENABLE is not defined
+
+extern void rt_iit_dbg_init(void){;}
+
+extern void rt_iit_dbg_task_notify(void* ptcb, BOOL create){;}
+extern void rt_iit_dbg_task_switch(U32 task_id){;}
+    
 extern void rt_iit_dbg_syscall_register (U8 id){;}
 //extern void rt_iit_dbg_syscall_enter (U8 id){;}
 extern void rt_iit_dbg_syscall_exit (void){;}
@@ -1584,6 +2009,7 @@ extern void rt_iit_dbg_pendsv_enter(void){;}
 extern void rt_iit_dbg_pendsv_exit(void){;}
 extern void rt_iit_dbg_svc_enter(void){;}
 extern void rt_iit_dbg_svc_exit(void){;}
+
 #endif
 
 

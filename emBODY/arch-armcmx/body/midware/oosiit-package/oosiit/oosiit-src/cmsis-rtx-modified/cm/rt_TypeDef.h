@@ -36,10 +36,10 @@
 #ifndef _RT_TYPEDEF_H_              //IIT-EXT: added include guards
 #define _RT_TYPEDEF_H_              //IIT-EXT: added include guards
 
-#include "rt_iit_changes.h"			//IIT-EXT
+#include "rt_iit_changes.h"			//IIT-EXT: needed to see extention to 32 bit and to 64 bit of some types
 
 /* Types */
-typedef char               S8;		
+typedef char               S8;
 typedef unsigned char      U8;
 typedef short              S16;
 typedef unsigned short     U16;
@@ -68,7 +68,6 @@ typedef struct OS_TCB {
   TIME_t delta_time;              /* Time until time out                     */ //IIT-EXT: was U16
   TIME_t interval_time;           /* Time interval for periodic waits        */ //IIT-EXT: was U16
   EVENT_t events;                 /* Event flags                             */ //IIT-EXT: was U16
-//  WIDETIME_t total_run_time;                                                    //IIT-EXT: added in here because it must be 8-byte aligned
   EVENT_t waits;                  /* Wait flags                              */ //IIT-EXT: was U16
 //  U8     msgsendmode;               //IIT-EXT: for sent2front added 0 is toback, 1 tofront
 //  U8     dummy1;                    //IIT-EXT: for sent2front
@@ -137,8 +136,8 @@ typedef struct OS_MCB {
 typedef struct OS_SCB {
   U8     cb_type;                 /* Control Block Type                      */
   U8     mask;                    /* Semaphore token mask                    */
+  U8     tokens;                  /* Semaphore tokens                        */  //IIT-EXT: changed from u16 to u8 to accomodate maxtokens                */
   U8     maxtokens;               //IIT-EXT: added to set a limit to the number of tokens contained in semaphore
-  U8     tokens;                  //IIT-EXT: changed from u16 to u8 /* Semaphore tokens                        */                 */
   struct OS_TCB *p_lnk;           /* Chain of tasks waiting for tokens       */
 } *P_SCB;
 

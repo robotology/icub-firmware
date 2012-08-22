@@ -71,6 +71,7 @@ void rt_init_stack (P_TCB p_TCB, FUNCP task_body) {
   }
 
   stk -= 16;
+  
 
   /* Default xPSR and initial PC */
   stk[15] = INITIAL_xPSR;
@@ -128,7 +129,6 @@ void rt_ret_val2(P_TCB p_TCB, U32 v0, U32 v1) {
   ret[1] = v1;
 }
 
-#if 0 //IIT-EXT: removed
 
 /*--------------------------- dbg_init --------------------------------------*/
 
@@ -161,9 +161,6 @@ void dbg_task_switch (U32 task_id) {
   ITM_PORT31_U8 = task_id;
 }
 #endif
-
-#endif  //IIT-EXT
-
 
 
 /*----------------------------------------------------------------------------

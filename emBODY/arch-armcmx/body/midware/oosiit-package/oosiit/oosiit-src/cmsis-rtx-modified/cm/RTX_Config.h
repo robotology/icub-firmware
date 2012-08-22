@@ -44,51 +44,34 @@
 #define _declare_box8(pool,size,cnt)  U64 pool[(((size)+7)/8)*(cnt) + 2]
 #define _init_box8(pool,size,bsize)   _init_box (pool,size,(bsize) | BOX_ALIGN_8)
 
-///* Variables */ // IIT-EXT: removed the following
-//extern U32 mp_tcb[];
-//extern U64 mp_stk[];
-//extern U32 os_fifo[];
-//extern void *os_active_TCB[];
-
-///* Constants */
-//extern U16 const os_maxtaskrun;
-//extern U32 const os_trv;
-//extern U8  const os_flags;
-//extern U32 const os_stackinfo;
-//extern U32 const os_rrobin;
-//extern U32 const os_clockrate;
-//extern U32 const os_timernum;
-//extern U16 const mp_tcb_size;
-//extern U32 const mp_stk_size;
-//extern U32 const *m_tmr;
-//extern U16 const mp_tmr_size;
-//extern U8  const os_fifo_size;
-
-// IIT-EXT: added
+// IIT-EXT: changed variables and constant with pointers and non constants...
 #if 0
-extern U32 *mp_tcb;
-extern U64 *mp_stk;
-extern U32 *os_fifo;
-extern void **os_active_TCB;
-extern U16  os_maxtaskrun;
-extern U32  os_trv;
-extern U8   os_flags;
-extern U32  os_stackinfo;
-extern U32 os_rrobin;
-extern U32  os_rrobin_tout;
-extern U8   os_rrobin_use;
-extern U32  os_clockrate;
-extern U32  os_timernum;
-extern U16  mp_tcb_size;
-extern U32  mp_stk_size;
-extern U32  *m_tmr;
-extern U16  mp_tmr_size;
-extern U8   os_fifo_size;
 
-#warning --> add the oosiit_storage_hid.h
+/* Variables */
+extern U32 mp_tcb[];
+extern U64 mp_stk[];
+extern U32 os_fifo[];
+extern void *os_active_TCB[];
+
+/* Constants */
+extern U16 const os_maxtaskrun;
+extern U32 const os_trv;
+extern U8  const os_flags;
+extern U32 const os_stackinfo;
+extern U32 const os_rrobin;
+extern U32 const os_clockrate;
+extern U32 const os_timernum;
+extern U16 const mp_tcb_size;
+extern U32 const mp_stk_size;
+extern U32 const *m_tmr;
+extern U16 const mp_tmr_size;
+extern U8  const os_fifo_size;
+
 #else
 #include "oosiit_storage_hid.h"
 #endif
+
+
 
 /* Functions */
 extern void os_idle_demon   (void);

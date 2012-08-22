@@ -78,15 +78,11 @@ OS_ID rt_tmr_create (U16 tcnt, U16 info)  {
   P_TMR p_tmr, p;
   U32 delta,itcnt = tcnt;
 
-  
-
   if (tcnt == 0 || m_tmr == NULL)  {
-    
     return (NULL);
   }
   p_tmr = rt_alloc_box ((U32 *)m_tmr);
   if (!p_tmr)  {
-    
     return (NULL);
   }
   p_tmr->info = info;
@@ -101,8 +97,6 @@ OS_ID rt_tmr_create (U16 tcnt, U16 info)  {
   p_tmr->tcnt = (U16)(delta - itcnt);
   p->next = p_tmr;
   p->tcnt -= p_tmr->tcnt;
-
-  
   return (p_tmr);
 }
 
@@ -112,14 +106,11 @@ OS_ID rt_tmr_kill (OS_ID timer)  {
   /* Remove user timer from the chained timer list. */
   P_TMR p, p_tmr;
 
-  
-
   p_tmr = (P_TMR)timer;
   p = (P_TMR)&os_tmr;
   /* Search timer list for requested timer */
   while (p->next != p_tmr)  {
     if (p->next == NULL) {
-	  
       /* Failed, "timer" is not in the timer list */
       return (p_tmr);
     }
@@ -129,8 +120,6 @@ OS_ID rt_tmr_kill (OS_ID timer)  {
   p->next = p_tmr->next;
   p->tcnt += p_tmr->tcnt;
   rt_free_box ((U32 *)m_tmr, p_tmr);
-
-  
   /* Timer killed */
   return (NULL);
 }

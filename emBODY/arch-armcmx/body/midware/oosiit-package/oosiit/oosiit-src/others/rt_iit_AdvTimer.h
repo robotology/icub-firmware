@@ -24,9 +24,47 @@
 /* @file       rt_iit_AdvTimer.h
 	@brief      This header file implements public interface to the IIT advaned tiemrs.
 	@author     marco.accame@iit.it
-	@date       11/27/2009
+	@date       08/20/2012
+    @warning    the inspiration of the code in here comes from the file rt_Timer.c from the free distribution of the
+                "CMSIS-RTOS RTX Implementation" version 4.20. of this file we have retained some ideas and some data 
+                types but the implementation is different. even if this should be consider new code and not a modification
+                of the original code owned by KEIL-ARM, we retain in here the orginal copyrigth notice.     
 **/
 
+/*----------------------------------------------------------------------------
+ *      RL-ARM - RTX
+ *----------------------------------------------------------------------------
+ *      Name:    RT_TIMER.C
+ *      Purpose: User timer functions
+ *      Rev.:    V4.20
+ *----------------------------------------------------------------------------
+ *
+ * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
+ * All rights reserved.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *  - Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *  - Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *  - Neither the name of ARM  nor the names of its contributors may be used 
+ *    to endorse or promote products derived from this software without 
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS AND CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *---------------------------------------------------------------------------*/
+ 
 /* @defgroup advtimer Advanced timers
     
     @{		
@@ -38,7 +76,8 @@
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
-// empty-section
+
+#define ATCB            5 //IIT-EXT: for AdvancedTimers
   
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 

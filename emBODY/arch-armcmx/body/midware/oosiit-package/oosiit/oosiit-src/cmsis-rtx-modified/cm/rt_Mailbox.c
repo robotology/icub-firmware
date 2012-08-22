@@ -53,8 +53,6 @@ void rt_mbx_init (OS_ID mailbox, U16 mbx_size) {
   /* Initialize a mailbox */
   P_MCB p_MCB = mailbox;
 
-  
-
   p_MCB->cb_type = MCB;
   p_MCB->state   = 0;
   p_MCB->isr_st  = 0;
@@ -64,8 +62,6 @@ void rt_mbx_init (OS_ID mailbox, U16 mbx_size) {
   p_MCB->count   = 0;
   p_MCB->size    = (mbx_size + sizeof(void *) - sizeof(struct OS_MCB)) /
                                                      (U32)sizeof (void *);
-
-
 }
 
 
@@ -191,8 +187,6 @@ OS_RESULT rt_mbx_check (OS_ID mailbox) {
   /* that can be stored to a mailbox. It returns 0 when mailbox is full.   */
   P_MCB p_MCB = mailbox;
 
-
-
   return (p_MCB->size - p_MCB->count);
 }
 
@@ -238,10 +232,8 @@ OS_RESULT isr_mbx_receive (OS_ID mailbox, void **message) {
 void rt_mbx_psh (P_MCB p_CB, void *p_msg) {
   /* Store the message to the mailbox queue or pass it to task directly. */
   P_TCB p_TCB;
-#ifdef __CMSIS_RTOS
   void *mem;
-#endif
-    
+
   switch (p_CB->state) {
 #ifdef __CMSIS_RTOS
     case 3:

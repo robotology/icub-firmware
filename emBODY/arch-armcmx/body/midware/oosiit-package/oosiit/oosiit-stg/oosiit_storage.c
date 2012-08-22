@@ -149,7 +149,7 @@ uint32_t* oosiit_cfg_mutex_memory               = NULL;
 uint32_t* mp_tcb                                = NULL;      
 uint16_t mp_tcb_size                            = 0;
 
-// -- fiso queue buffer for isr requests
+// -- fifo queue buffer for isr requests
 uint32_t* os_fifo                               = NULL;
 uint8_t  os_fifo_size                           = 0;
 

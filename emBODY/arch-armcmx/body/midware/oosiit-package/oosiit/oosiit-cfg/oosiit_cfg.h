@@ -16,8 +16,6 @@
  * Public License for more details
 */
 
-
-
  
 // - include guard ----------------------------------------------------------------------------------------------------
 #ifndef _OOSIIT_CFG_H_
@@ -45,92 +43,76 @@
 // we have removed the user-timer section of CMSIS-RTOS RTX as the timers are implemented as an IIT extension
 // #/IIT comment#
 
-// <h>Task Configuration
+// <h> task configuration
 // =====================
 //
-//   <o>Number of concurrent running tasks <0-250>
-//   <i> Define max. number of tasks that will run at the same time.
+//   <o> max number of user tasks <0-250>
 //   <i> Default: 6
-#ifndef OS_TASKCNT
- #define OS_TASKCNT     14
+#ifndef OOSIIT_TASKCNT
+ #define OOSIIT_TASKCNT     14
 #endif
 
-//   <o>Number of tasks with user-provided stack <0-250>
-//   <i> Define the number of tasks that will use a bigger stack.
-//   <i> The memory space for the stack is provided by the user.
-//   <i> Default: 0
-#ifndef OS_PRIVCNT
- #define OS_PRIVCNT     0
-#endif
 
-//   <o>Task stack size [bytes] <20-4096:8><#/4>
-//   <i> Set the stack size for tasks which is assigned by the system.
-//   <i> Default: 200
-#ifndef OS_STKSIZE
- #define OS_STKSIZE     64
-#endif
-
-// <q>Check for the stack overflow
+// <q> check stack overflow
 // ===============================
 // <i> Include the stack checking code for a stack overflow.
-// <i> Note that additional code reduces the Kernel performance.
-#ifndef OS_STKCHECK
- #define OS_STKCHECK    1
+// <i> Note that additional code reduces the kernel performance.
+#ifndef OOSIIT_STKCHECK
+ #define OOSIIT_STKCHECK    1
 #endif
 
-// <q>Run in privileged mode
+// <q> run in cmx privileded mode
 // =========================
-// <i> Run all Tasks in privileged mode.
-// <i> Default: Unprivileged
-#ifndef OS_RUNPRIV
- #define OS_RUNPRIV     1
+// <i> run all tasks in privileged mode.
+// <i> default: privileged
+#ifndef OOSIIT_RUNPRIV
+ #define OOSIIT_RUNPRIV     1
 #endif
 
 // </h>
-// <h>SysTick Timer Configuration
+// <h> systick timer configuration
 // =============================
-//   <o>Timer clock value [Hz] <1-1000000000>
-//   <i> Set the timer clock value for selected timer.
-//   <i> Default: 6000000  (6MHz)
-#ifndef OS_CLOCK
- #define OS_CLOCK       72000000
+//   <o> timer clock value [Hz] <1-1000000000>
+//   <i> set the timer clock value for selected timer.
+//   <i> Default: 72000000  (72MHz)
+#ifndef OOSIIT_CLOCK
+ #define OOSIIT_CLOCK       72000000
 #endif
 
-//   <o>Timer tick value [us] <1-1000000>
-//   <i> Set the timer tick value for selected timer.
-//   <i> Default: 10000  (10ms)
-#ifndef OS_TICK
- #define OS_TICK        1000
+//   <o> timer tick value [us] <1-1000000>
+//   <i> set the timer tick value for selected timer.
+//   <i> Default: 1000  (1ms)
+#ifndef OOSIIT_TICK
+ #define OOSIIT_TICK        1000
 #endif
 
 // </h>
 
-// <h>System Configuration
+// <h>system configuration
 // =======================
-// <e>Round-Robin Task switching
+// <e>round-robin task switching
 // =============================
-// <i> Enable Round-Robin Task switching.
-#ifndef OS_ROBIN
- #define OS_ROBIN       1
+// <i> enable round-robin task switching.
+#ifndef OOSIIT_ROBIN
+ #define OOSIIT_ROBIN       1
 #endif
 
-//   <o>Round-Robin Timeout [ticks] <1-1000>
-//   <i> Define how long a task will execute before a task switch.
-//   <i> Default: 5
-#ifndef OS_ROBINTOUT
- #define OS_ROBINTOUT   50
+//   <o>round-robin timeout [ticks] <1-1000>
+//   <i> define how long a task will execute before a task switch.
+//   <i> default: 5
+#ifndef OOSIIT_ROBINTOUT
+ #define OOSIIT_ROBINTOUT   50
 #endif
 
 // </e>
 
-#warning ---> REMOVE USER TIMER and align it with CMSIS version
 
-//   <o>Number of user timers <0-250>
-//   <i> Define max. number of user timers that will run at the same time.
-//   <i> Default: 0  (User timers disabled)
-#ifndef OS_TIMERCNT
- #define OS_TIMERCNT    4
-#endif
+//   o>Number of user timers 0-250>
+//   i> Define max. number of user timers that will run at the same time.
+//   i> Default: 0  (User timers disabled)
+//#ifndef OOSIIT_TIMERCNT
+// #define OOSIIT_TIMERCNT    0
+//#endif
 
 //   <o>ISR FIFO Queue size<4=>   4 entries  <8=>   8 entries
 //                         <12=> 12 entries  <16=> 16 entries
@@ -140,8 +122,8 @@
 //   <i> ISR functions store requests to this buffer,
 //   <i> when they are called from the interrupt handler.
 //   <i> Default: 16 entries
-#ifndef OS_FIFOSZ
- #define OS_FIFOSZ      16
+#ifndef OOSIIT_FIFOSZ
+ #define OOSIIT_FIFOSZ      16
 #endif
 
 // </h>
@@ -152,50 +134,50 @@
 // <h> IIT extension
 // <i> It holds IIT extension
 
-//   <o>Number of advanced IIT timers <0-250>
+//   <o> number of advanced timers <0-250>
 //   <i> Define max. number of user timers that will run at the same time.
 //   <i> Default: 0  (User timers disabled)
-#ifndef OSIIT_ADVTIMERCNT
- #define OSIIT_ADVTIMERCNT    6
+#ifndef OOSIIT_ADVTIMERCNT
+ #define OOSIIT_ADVTIMERCNT    6
 #endif
 
 
-//   <o>Number of mutexes <0-250>
+//   <o> number of mutexes <0-250>
 //   <i> Define max. number of mutexes that will run at the same time.
 //   <i> Default: 0  (Mutexes not enabled)
-#ifndef OSIIT_MUTEXCNT
- #define OSIIT_MUTEXCNT    5
+#ifndef OOSIIT_MUTEXCNT
+ #define OOSIIT_MUTEXCNT    5
 #endif
 
 
-//   <o>Number of semaphores <0-250>
+//   <o> number of semaphores <0-250>
 //   <i> Define max. number of semaphores that will run at the same time.
 //   <i> Default: 0  (Semaphores not enabled)
-#ifndef OSIIT_SEMAPHORECNT
- #define OSIIT_SEMAPHORECNT    5
+#ifndef OOSIIT_SEMAPHORECNT
+ #define OOSIIT_SEMAPHORECNT    5
 #endif
 
 
-//   <o>Number of message boxes <0-250>
+//   <o> number of message boxes <0-250>
 //   <i> Define max. number of message boxes that that will run at the same time.
 //   <i> Default: 0  (Message boxes not enabled)
-#ifndef OSIIT_MBOXCNT
- #define OSIIT_MBOXCNT    5
+#ifndef OOSIIT_MBOXCNT
+ #define OOSIIT_MBOXCNT    5
 #endif
 
-//   <o>Total max number of elements in message boxes <0-1000>
+//   <o> total max number of elements in message boxes <0-1000>
 //   <i> Define max. number of elements that can be contained in every message box.
 //   <i> Default: 0  (Message boxes not enabled)
-#ifndef OSIIT_MBOXELEMENTCNT
- #define OSIIT_MBOXELEMENTCNT    20
+#ifndef OOSIIT_MBOXELEMENTCNT
+ #define OOSIIT_MBOXELEMENTCNT    20
 #endif
 
 
-//   <o>Total max size for overall user defined stack [bytes] <0-16384:8>
+//   <o> total internal stack [bytes] <0-16384:8>
 //   <i> Define max. size in bytes of the global stack.
-//   <i> Default: 0  (user defined stack not enabled)
-#ifndef OSIIT_GLOBALSTACK
- #define OSIIT_GLOBALSTACK    4096
+//   <i> Default: 0  
+#ifndef OOSIIT_GLOBALSTACK
+ #define OOSIIT_GLOBALSTACK    4096
 #endif
 
 

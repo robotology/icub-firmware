@@ -121,7 +121,7 @@ extern void rt_iit_memory_init(void)
         memset(s_index_semaphore, 0, oosiit_cfg_semaphore_size);
     }
    
-   // init iit memory which cannot be accessed with fixed blocks.
+    // init iit memory which cannot be accessed with fixed blocks.
     if(NULL != oosiit_cfg_mbox)
     {
         s_index_mbox = (U32 *)oosiit_cfg_mbox;
@@ -142,6 +142,7 @@ extern void rt_iit_memory_init(void)
     }
    
 }
+
 
 
 

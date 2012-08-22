@@ -49,45 +49,10 @@
 
 // --------------------------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------------------
-// - user change-able function definitions for RL-RTX standard (V4.10). 
-// - This part is the one contained into the RTX_Conf_CM.c after the the end of configuration section.  
+// - user change-able function definitions for RL-RTX  
 // --------------------------------------------------------------------------------------------------------------------
 
 
-// Standard library system mutexes
-// ===============================
-//  Define max. number system mutexes that are used to protect 
-//  the arm standard runtime library. For microlib they are not used.
-//#ifndef OS_MUTEXCNT
-// #define OS_MUTEXCNT    0
-//#endif
-
-/*----------------------------------------------------------------------------
- *      RTX User configuration part END
- *---------------------------------------------------------------------------*/
- 
-//#define OS_TRV          ((uint32_t)(((double)OS_CLOCK*(double)OS_TICK)/1E6)-1)
-
-
-/*----------------------------------------------------------------------------
- *      Global Functions
- *---------------------------------------------------------------------------*/
-
-
-
-/*--------------------------- os_idle_demon ---------------------------------*/
-
-void os_idle_demon (void) {
-  /* The idle demon is a system thread, running when no other thread is      */
-  /* ready to run.                                                           */
-
-  for (;;) {
-  /* HERE: include optional user code to be executed when no thread runs.*/
-  }
-}
-
-
-/*--------------------------- os_error --------------------------------------*/
 
 void os_error (uint32_t err_code) {
   /* This function is called when a runtime error is detected. Parameter */
@@ -102,36 +67,31 @@ void os_error (uint32_t err_code) {
 
 // --------------------------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------------------
-// - storage and some other function definitions for IIT extension and for RL-RTX standard (V4.10). 
+// - storage and some other function definitions for IIT extension and for RL-RTX. 
 // - ...  
 // --------------------------------------------------------------------------------------------------------------------
 
 
-
-
 static const oosiit_params_cfg_t s_cfg =
 {
-    // rtx v 4.13: task configuration
-    OS_TASKCNT,             // uint8_t         numTask;                                // OS_TASKCNT
-    OS_PRIVCNT,             // uint16_t        numTaskWithUserProvidedStack;           // OS_PRIVCNT
-    OS_STKSIZE,             // uint16_t        sizeStack;                              // OS_STKSIZE
-    OS_STKCHECK,            // uint8_t         checkStack;     // 1 bit                // OS_STKCHECK
-    OS_RUNPRIV,             // uint8_t         priviledgeMode; // 1 bit                // OS_RUNPRIV
-    // rtx v 4.13: systick timer configuration
-    OS_CLOCK,               // uint32_t        osClock;                                // OS_CLOCK
-    OS_TICK,                // uint32_t        osTick;                                 // OS_TICK
-    // rtx v 4.13: system configuration
-    OS_ROBIN,               // uint8_t         roundRobin; // 1 bit                    // OS_ROBIN
-    OS_ROBINTOUT,           // uint32_t        roundRobinTimeout;                      // OS_ROBINTOUT
-    OS_TIMERCNT,            // uint8_t         numTimer;                               // OS_TIMERCNT
-    OS_FIFOSZ,              // uin8_t          sizeISRFIFO;                            // OS_FIFOSZ
+    // task configuration
+    .maxnumofusertasks              = OOSIIT_TASKCNT,             
+    .checkStack                     = OOSIIT_STKCHECK,           
+    .priviledgeMode                 = OOSIIT_RUNPRIV,             
+    // systick timer configuration
+    .osClock                        = OOSIIT_CLOCK,               
+    .osTick                         = OOSIIT_TICK,                
+    // system configuration
+    .roundRobin                     = OOSIIT_ROBIN,               
+    .roundRobinTimeout              = OOSIIT_ROBINTOUT,           
+    .sizeISRFIFO                    = OOSIIT_FIFOSZ,              
     // iit extension
-    OSIIT_ADVTIMERCNT,      // uint8_t         numAdvTimer;                            // OSIIT_ADVTIMERCNT 
-    OSIIT_MUTEXCNT,         // uint8_t         numMutex;                               // OSIIT_MUTEXCNT
-    OSIIT_SEMAPHORECNT,     // uint8_t         numSemaphore;                           // OSIIT_SEMAPHORECNT
-    OSIIT_MBOXCNT,          // uint8_t         numMessageBox;                          // OSIIT_MBOXCNT
-    OSIIT_MBOXELEMENTCNT,   // uint16_t        numMessageBoxElements;                  // OSIIT_MBOXELEMENTCNT
-    OSIIT_GLOBALSTACK/8     // uint16_t        numElements64Stack;                     // OSIIT_GLOBALSTACK
+    .numAdvTimer                    = OOSIIT_ADVTIMERCNT,      
+    .numMutex                       = OOSIIT_MUTEXCNT,         
+    .numSemaphore                   = OOSIIT_SEMAPHORECNT,     
+    .numMessageBox                  = OOSIIT_MBOXCNT,          
+    .numMessageBoxElements          = OOSIIT_MBOXELEMENTCNT,   
+    .sizeof64alignedStack           = OOSIIT_GLOBALSTACK     
 };
 
 

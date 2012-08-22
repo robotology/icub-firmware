@@ -40,8 +40,6 @@
 #include "rt_MemBox.h"
 
 
-
-
 /*----------------------------------------------------------------------------
  *      Functions
  *---------------------------------------------------------------------------*/
@@ -111,8 +109,6 @@ __asm int _free_box (void *box_mem, void *box) {
 
 /*-------------------------- SVC_Handler ------------------------------------*/
 
-#if 1
-
 __asm void SVC_Handler (void) {
         PRESERVE8
 
@@ -126,12 +122,8 @@ __asm void SVC_Handler (void) {
         CMP     R1,#0
         BNE     SVC_User
 
-
         LDM     R0,{R0-R3,R12}          ; Read R0-R3,R12 from stack
-        ;IIT-EXT
-        ;BL      __cpp(rt_iit_dbg_svc_enter)
         BLX     R12                     ; Call SVC Function 
-        ;BL      __cpp(rt_iit_dbg_svc_exit)
 
         MRS     R12,PSP                 ; Read PSP
         STM     R12,{R0-R2}             ; Store return values
@@ -182,87 +174,6 @@ SVC_Done
 
         ALIGN
 }
-
-#else
-
-
-__asm void SVC_Handler (void) {
-        PRESERVE8
-
-        IMPORT  SVC_Count
-        IMPORT  SVC_Table
-        IMPORT  rt_stk_check
-
-        MRS     R0,PSP                  ; Read PSP
-        LDR     R1,[R0,#24]             ; Read Saved PC from Stack
-        LDRH    R1,[R1,#-2]             ; Load Halfword
-        BICS    R1,R1,#0xFF00           ; Extract SVC Number
-        BNE     SVC_User
-
-        LDM     R0,{R0-R3,R12}          ; Read R0-R3,R12 from stack
-
-		;BL      __cpp(rt_iit_dbg_svc_enter)
-        BLX     R12                     ; Call SVC Function 
-	    ;BL      __cpp(rt_iit_dbg_svc_exit)
-
-        MRS     R12,PSP                 ; Read PSP
-        LDR     R3,=__cpp(&os_tsk)
-        LDM     R3,{R1,R2}              ; os_tsk.run, os_tsk.new
-        CMP     R1,R2
-        BEQ     SVC_Exit                ; no task switch
-
-        PUSH    {R2,R3}
-        MOV     R3,#1
-        CMP     R1,#0                   ; Runtask deleted?
-        STRBNE  R3,[R1,#TCB_RETUPD]     ; os_tsk.run->ret_upd = 1
-        STMDBNE R12!,{R4-R11}           ; Save Old context
-        STRNE   R12,[R1,#TCB_TSTACK]    ; Update os_tsk.run->tsk_stack
-        BLNE    rt_stk_check            ; Check for Stack overflow
-
-        POP     {R2,R3}
-        STR     R2,[R3]                 ; os_tsk.run = os_tsk.new
-
-        LDR     R12,[R2,#TCB_TSTACK]    ; os_tsk.new->tsk_stack
-        LDMIA   R12!,{R4-R11}           ; Restore New Context
-        LDRB    R3,[R2,#TCB_RETUPD]     ; Update ret_val?
-        MSR     PSP,R12                 ; Write PSP
-
-        CBZ     R3,SVC_Return
-        LDRB    R0,[R2,#TCB_RETVAL]     ; Write os_tsk.new->ret_val
-
-SVC_Exit
-        STR     R0,[R12]                ; Function return value
-
-SVC_Return
-        MVN     LR,#:NOT:0xFFFFFFFD     ; set EXC_RETURN value
-        BX      LR
-
-        /*------------------- User SVC ------------------------------*/
-
-SVC_User
-        PUSH    {R4,LR}                 ; Save Registers
-        LDR     R2,=SVC_Count
-        LDR     R2,[R2]
-        CMP     R1,R2
-        BHI     SVC_Done                ; Overflow
-
-        LDR     R4,=SVC_Table-4
-        LDR     R4,[R4,R1,LSL #2]       ; Load SVC Function Address
-
-        LDM     R0,{R0-R3,R12}          ; Read R0-R3,R12 from stack
-        BLX     R4                      ; Call SVC Function
-
-        MRS     R12,PSP
-        STM     R12,{R0-R3}             ; Function return values
-SVC_Done
-        POP     {R4,PC}                 ; RETI
-
-        ALIGN
-}
-
-
-
-#endif
 
 
 /*-------------------------- Sys_Handler ------------------------------------*/
