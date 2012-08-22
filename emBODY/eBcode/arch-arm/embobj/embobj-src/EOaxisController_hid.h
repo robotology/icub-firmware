@@ -19,7 +19,6 @@ extern "C" {
 #include "EoCommon.h"
 #include "EOpid.h"
 #include "EOtrajectory.h"
-#include "EOspeedcurve.h"
 #include "EOspeedmeter.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
