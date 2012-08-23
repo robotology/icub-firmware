@@ -16,10 +16,10 @@
  * Public License for more details
 */
 
-/* @file       eOcfg_emsCanNetworkTopology_eb3.c
-    @brief      This file keeps ems EB3 (right upper arm) can network configuration
+/* @file       eOcfg_emsCanNetworkTopology.c
+    @brief      This file keeps ems EB8 (right upper leg) can network configuration
     @author     valentina.gaggero@iit.it
-    @date       07/10/2012
+    @date       08/23/2012
 **/
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -128,7 +128,7 @@ extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_boards__ptr = &s
 
 
 
-/*definition of left leg can net topology (ems 3) */
+/*definition of left leg can net topology (ems 6) */
 
 static const eo_emsCanNetTopo_jointTopoInfo_t s_cfg_canNetTopo_joints[] = 
 {

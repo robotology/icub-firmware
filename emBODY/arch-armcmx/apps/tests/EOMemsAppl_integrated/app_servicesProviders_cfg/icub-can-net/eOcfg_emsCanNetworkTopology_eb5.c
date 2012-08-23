@@ -16,10 +16,10 @@
  * Public License for more details
 */
 
-/* @file       eOcfg_emsCanNetworkTopology_eb3.c
-    @brief      This file keeps ems EB3 (right upper arm) can network configuration
+/* @file       eOcfg_emsCanNetworkTopology.c
+    @brief      This file keeps ems EB5 (torso) can network configuration
     @author     valentina.gaggero@iit.it
-    @date       07/10/2012
+    @date       08/23/2012
 **/
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -78,7 +78,6 @@
 #define FOC_ADDRCAN_2_BID       1
 #define FOC_ADDRCAN_3_BID       2
 #define FOC_ADDRCAN_4_BID       3
-#define STRAIN_ADDRCAN_14_BID   4
 
 static const eo_emsCanNetTopo_boardTopoInfo_t s_cfg_canNetTopo_boards[] = 
 {
@@ -104,12 +103,6 @@ static const eo_emsCanNetTopo_boardTopoInfo_t s_cfg_canNetTopo_boards[] =
         EO_INIT(.canaddr)                 4,
         EO_INIT(.emscanport)              eOcanport1,
         EO_INIT(.boardtype)               eobrd_1foc,
-    },    
- 
-    { // 4  == STRAIN_ADDRCAN_14_BID
-        EO_INIT(.canaddr)                 14,
-        EO_INIT(.emscanport)              eOcanport1,
-        EO_INIT(.boardtype)               eobrd_strain,
     }
 };
 
@@ -128,7 +121,7 @@ extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_boards__ptr = &s
 
 
 
-/*definition of left leg can net topology (ems 3) */
+/*definition of left leg can net topology (ems 5) */
 
 static const eo_emsCanNetTopo_jointTopoInfo_t s_cfg_canNetTopo_joints[] = 
 {
@@ -148,12 +141,6 @@ static const eo_emsCanNetTopo_jointTopoInfo_t s_cfg_canNetTopo_joints[] =
         EO_INIT(.bid)                       FOC_ADDRCAN_1_BID,
         EO_INIT(.j_idInBoard)               eo_emsCanNetTopo_jm_index_first,
         EO_INIT(.jid)                       2
-    },    
-
-    { // 3 
-        EO_INIT(.bid)                       FOC_ADDRCAN_2_BID,
-        EO_INIT(.j_idInBoard)               eo_emsCanNetTopo_jm_index_first,
-        EO_INIT(.jid)                       3
     }
 };
 
@@ -181,8 +168,8 @@ extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_motors__ptr = &s
 /***********************************************************************************************/
 /*****************************        S E N S O R S         ************************************/
 /***********************************************************************************************/
-
-static const eo_emsCanNetTopo_sensorTopoInfo_t  s_cfg_canNetTopo_sensors[] = 
+//No sensors are connected to EB5
+/* static const eo_emsCanNetTopo_sensorTopoInfo_t  s_cfg_canNetTopo_sensors[] = 
 {
    {// 0
        EO_INIT(.bid)                       STRAIN_ADDRCAN_14_BID,
@@ -198,9 +185,9 @@ const EOconstvector  s_eo_cfg_emsCanNetTopo_constvec_sensors =
     EO_INIT(.item_size)         sizeof(eo_emsCanNetTopo_sensorTopoInfo_t),
     EO_INIT(.item_array_data)   s_cfg_canNetTopo_sensors
 };
+ */
 
-
-extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_sensors__ptr = &s_eo_cfg_emsCanNetTopo_constvec_sensors;
+extern const EOconstvector* const eo_cfg_emsCanNetTopo_constvec_sensors__ptr = NULL; //&s_eo_cfg_emsCanNetTopo_constvec_sensors;
 
 
 

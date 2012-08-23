@@ -1307,6 +1307,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, 
     mstatusbasic_ptr = (eOmc_motor_status_basic_t*)nv_mem_ptr;    
     mstatusbasic_ptr->current = ((uint16_t*)frame->data)[0];
 
+/* TAG_ALE */
     if(eobrd_1foc == boardType)
     {
         // ALE

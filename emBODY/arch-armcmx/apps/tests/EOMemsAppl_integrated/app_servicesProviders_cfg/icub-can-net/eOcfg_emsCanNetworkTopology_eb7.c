@@ -17,7 +17,7 @@
 */
 
 /* @file       eOcfg_emsCanNetworkTopology.c
-    @brief      This file keeps ems EB7 can network configuration
+    @brief      This file keeps ems EB7(left lower leg) can network configuration
     @author     valentina.gaggero@iit.it
     @date       03/12/2012
 **/

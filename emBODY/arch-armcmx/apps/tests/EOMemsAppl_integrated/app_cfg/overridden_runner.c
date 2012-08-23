@@ -109,7 +109,7 @@ static void s_eom_emsrunner_hid_readMc4andMais(EOappTheSP *p);
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
-
+/* TAG_ALE*/
 
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p)
@@ -161,12 +161,12 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
 
 extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 {
-    eOresult_t res;
+    eOresult_t res = eores_NOK_generic;
     EOappTheSP* appTheSP = eo_appTheSP_GetHandle();
     eOmn_appl_runMode_t runmode =  eo_appTheSP_GetAppRunMode(appTheSP);
     uint32_t encvalue;
     int16_t *pwm;
-
+/* TAG_ALE */
 //     if(applrunMode__skinAndMc4 == runmode)
 //     {
 //         #warning VALE--> remove this code after test on semaphore-can
@@ -217,7 +217,7 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
     EOappTheSP* appTheSP = eo_appTheSP_GetHandle();
     eOresult_t res;
     
-    #ifdef _USE_PROTO_TEST_
+#ifdef _USE_PROTO_TEST_
     eOmc_setpoint_t     mySetPoint_current = 
     {
         EO_INIT(.type)       eomc_setpoint_current,
@@ -229,7 +229,7 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
             }   
         }
     };
-    #endif
+#endif
    
 //following activities are independent on runmode
     
@@ -283,7 +283,9 @@ static void s_eom_emsrunner_hid_taskRX_act_afterdgramrec_skinOnly_mode(EOappTheS
 
 static void s_eom_emsrunner_hid_taskRX_act_afterdgramrec_2foc_mode(EOappTheSP *p)
 {
+	/* TAG_ALE*/
     eo_appCanSP_read(eo_appTheSP_GetCanServiceHandle(p), eOcanport1, 4, NULL); 
+	/*TAG_VALE: perche' non leggo la strain???*/
 }
 static void s_eom_emsrunner_hid_taskRX_act_afterdgramrec_skinAndMc4_mode(EOappTheSP *p)
 {

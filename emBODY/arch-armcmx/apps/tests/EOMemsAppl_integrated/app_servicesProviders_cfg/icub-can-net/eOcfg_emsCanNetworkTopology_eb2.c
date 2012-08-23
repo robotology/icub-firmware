@@ -16,8 +16,8 @@
  * Public License for more details
 */
 
-/* @file       eOcfg_emsCanNetworkTopology.c
-    @brief      This file keeps ems EB2 can network configuration
+/* @file       eOcfg_emsCanNetworkTopology_eb2.c
+    @brief      This file keeps ems EB2(left lower arm) can network configuration
     @author     valentina.gaggero@iit.it
     @date       05/17/2012
 **/

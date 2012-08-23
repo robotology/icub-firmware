@@ -349,6 +349,7 @@ static void s_eo_appTheSP_srv_EmsController_init(EOappTheSP *p)
 
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != p->srv.emsController), 
                      s_eobj_ownname, "error in emsController_init");
+	/* TAG_ALE*/
 #warning VALE--> mettere qui la corretta init del ems controller con dfault values
    //io ho messo questi, ma non so se sono giusti
 //     eo_emsController_SetLimits(0, -100000, 100000, 2048);
