@@ -155,7 +155,7 @@ static oosiit_advtmr_action_t action = {advtmr_callback, (void*)0x666};
 extern uint64_t oosiit_time;                
 
 // from the configuration
-extern const oosiit_params_cfg_t *oosiit_params_cfgMINE;
+extern const oosiit_cfg_t *oosiit_cfg_USERptr;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -181,7 +181,7 @@ int main(void)
     // init the leds
     brd_mcbstm32x_led_init();
     
-    oosiit_memory_getsize(oosiit_params_cfgMINE, &ram32num, &ram64num);
+    oosiit_memory_getsize(oosiit_cfg_USERptr, &ram32num, &ram64num);
 
     ram32data = (uint32_t*)calloc(ram32num/4, sizeof(uint32_t));
     ram64data = (uint64_t*)calloc(ram64num/8, sizeof(uint64_t));
@@ -192,7 +192,7 @@ int main(void)
         for(;;);
     }
 
-    oosiit_memory_load(oosiit_params_cfgMINE, ram32data, ram64data);
+    oosiit_memory_load(oosiit_cfg_USERptr, ram32data, ram64data);
 
     
 #if 0

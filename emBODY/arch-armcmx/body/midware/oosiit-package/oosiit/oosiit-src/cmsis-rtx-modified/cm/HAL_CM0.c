@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------------
  *      Name:    HAL_CM0.C
  *      Purpose: Hardware Abstraction Layer for Cortex-M0
- *      Rev.:    V4.20
+ *      Rev.:    V4.50
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
@@ -49,6 +49,14 @@
 
 __asm void rt_set_PSP (U32 stack) {
         MSR     PSP,R0
+        BX      LR
+}
+
+
+/*--------------------------- rt_get_PSP ------------------------------------*/
+
+__asm U32 rt_get_PSP (void) {
+        MRS     R0,PSP
         BX      LR
 }
 
@@ -211,15 +219,11 @@ SVC_Done
 }
 
 
-/*-------------------------- Sys_Handler ------------------------------------*/
+/*-------------------------- PendSV_Handler ---------------------------------*/
 
-__asm void Sys_Handler (void) {
+__asm void PendSV_Handler (void) {
         PRESERVE8
 
-        EXPORT  SysTick_Handler
-        EXPORT  PendSV_Handler
-
-PendSV_Handler
         BL      __cpp(rt_pop_req)
 
 Sys_Switch
@@ -262,7 +266,28 @@ Sys_Exit
         MVNS    R0,R0
         BX      R0                      ; RETI to Thread Mode, use PSP
 
-SysTick_Handler
+        ALIGN
+}
+
+
+/*-------------------------- SysTick_Handler --------------------------------*/
+
+__asm void SysTick_Handler (void) {
+        PRESERVE8
+
+        BL      __cpp(rt_systick)
+        B       Sys_Switch
+
+        ALIGN
+}
+
+
+/*-------------------------- OS_Tick_Handler --------------------------------*/
+
+__asm void OS_Tick_Handler (void) {
+        PRESERVE8
+
+        BL      __cpp(os_tick_irqack)
         BL      __cpp(rt_systick)
         B       Sys_Switch
 

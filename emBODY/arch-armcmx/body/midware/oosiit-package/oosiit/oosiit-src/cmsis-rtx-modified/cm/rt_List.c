@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_LIST.C
  *      Purpose: Functions for the management of different lists
- *      Rev.:    V4.20
+ *      Rev.:    V4.50
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
@@ -231,7 +231,7 @@ void rt_dec_dly (void) {
     os_dly.delta_time = p_rdy->delta_time;
     if (p_rdy->state == WAIT_ITV) {
       /* Calculate the next time for interval wait. */
-      p_rdy->delta_time = p_rdy->interval_time + os_time;
+      p_rdy->delta_time = p_rdy->interval_time + (U16)os_time;
     }
     p_rdy->state   = READY;
     os_dly.p_dlnk = p_rdy->p_dlnk;

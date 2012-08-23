@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_MAILBOX.C
  *      Purpose: Implements waits and wake-ups for mailbox messages
- *      Rev.:    V4.20
+ *      Rev.:    V4.50
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
@@ -232,8 +232,10 @@ OS_RESULT isr_mbx_receive (OS_ID mailbox, void **message) {
 void rt_mbx_psh (P_MCB p_CB, void *p_msg) {
   /* Store the message to the mailbox queue or pass it to task directly. */
   P_TCB p_TCB;
+#ifdef __CMSIS_RTOS //IIT-EXT: to remove compiler warning about non referenced variable
   void *mem;
-
+#endif
+    
   switch (p_CB->state) {
 #ifdef __CMSIS_RTOS
     case 3:

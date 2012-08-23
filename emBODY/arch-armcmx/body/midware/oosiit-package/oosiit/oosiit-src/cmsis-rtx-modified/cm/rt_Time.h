@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_TIME.H
  *      Purpose: Delay and interval wait functions definitions
- *      Rev.:    V4.20
+ *      Rev.:    V4.50
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
@@ -33,9 +33,10 @@
  *---------------------------------------------------------------------------*/
 
 /* Variables */
-extern U16 os_time;
+extern U32 os_time;
 
 /* Functions */
+extern U32  rt_time_get (void);
 extern void rt_dly_wait (U16 delay_time);
 extern void rt_itv_set  (U16 interval_time);
 extern void rt_itv_wait (void);

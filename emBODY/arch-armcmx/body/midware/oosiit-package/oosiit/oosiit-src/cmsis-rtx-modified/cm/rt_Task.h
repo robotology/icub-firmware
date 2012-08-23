@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_TASK.H
  *      Purpose: Task functions and system start up.
- *      Rev.:    V4.20
+ *      Rev.:    V4.50
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
@@ -69,7 +69,12 @@ extern OS_TID    rt_tsk_self   (void);
 extern OS_RESULT rt_tsk_prio   (OS_TID task_id, U8 new_prio);
 extern OS_TID    rt_tsk_create (FUNCP task, U32 prio_stksz, void *stk, void *argv);
 extern OS_RESULT rt_tsk_delete (OS_TID task_id);
+#ifdef __CMSIS_RTOS
+extern void      rt_sys_init   (void);
+extern void      rt_sys_start  (void);
+#else
 extern void      rt_sys_init   (FUNCP first_task, U32 prio_stksz, void *stk);
+#endif
 
 /*----------------------------------------------------------------------------
  * end of file

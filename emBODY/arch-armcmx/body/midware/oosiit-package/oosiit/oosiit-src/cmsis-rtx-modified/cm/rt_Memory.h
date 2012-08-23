@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_MEMORY.H
  *      Purpose: Interface functions for Dynamic Memory Management System
- *      Rev.:    V4.20
+ *      Rev.:    V4.50
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH

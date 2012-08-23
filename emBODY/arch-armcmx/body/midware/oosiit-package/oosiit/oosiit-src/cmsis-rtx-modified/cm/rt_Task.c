@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_TASK.C
  *      Purpose: Task functions and system start up.
- *      Rev.:    V4.20
+ *      Rev.:    V4.50
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
@@ -253,7 +253,9 @@ OS_RESULT rt_tsk_delete (OS_TID task_id) {
 
   if (task_id == 0 || task_id == os_tsk.run->task_id) {
     /* Terminate itself. */
-    os_tsk.run->state = INACTIVE;
+    os_tsk.run->state     = INACTIVE;
+    os_tsk.run->tsk_stack = rt_get_PSP ();
+    rt_stk_check ();
     os_active_TCB[os_tsk.run->task_id-1] = NULL;
     rt_free_box (mp_stk, os_tsk.run->stack);
     os_tsk.run->stack = NULL;
@@ -284,8 +286,12 @@ OS_RESULT rt_tsk_delete (OS_TID task_id) {
 
 /*--------------------------- rt_sys_init -----------------------------------*/
 
+#ifdef __CMSIS_RTOS
+void rt_sys_init (void) {
+#else
 //IIT-EXT: made it overridable
 __weak void rt_sys_init (FUNCP first_task, U32 prio_stksz, void *stk) {
+#endif
   /* Initialize system and start up task declared with "first_task". */
   U32 i;
 
@@ -315,7 +321,9 @@ __weak void rt_sys_init (FUNCP first_task, U32 prio_stksz, void *stk) {
 
   /* Fix SP and systemvariables to assume idle task is running  */
   /* Transform main program into idle task by assuming idle TCB */
+#ifndef __CMSIS_RTOS
   rt_set_PSP (os_idle_TCB.tsk_stack+32);
+#endif
   os_tsk.run = &os_idle_TCB;
   os_tsk.run->state = RUNNING;
 
@@ -324,13 +332,37 @@ __weak void rt_sys_init (FUNCP first_task, U32 prio_stksz, void *stk) {
   os_psq->last  = 0;
   os_psq->size  = os_fifo_size;
 
-  /* Intitialize system clock timer */
-  rt_tmr_init ();
   rt_init_robin ();
+
+  /* Intitialize SVC and PendSV */
+  rt_svc_init ();
+
+#ifndef __CMSIS_RTOS
+  /* Intitialize and start system clock timer */
+  os_tick_irqn = os_tick_init ();
+  if (os_tick_irqn >= 0) {
+    OS_X_INIT(os_tick_irqn);
+  }
 
   /* Start up first user task before entering the endless loop */
   rt_tsk_create (first_task, prio_stksz, stk, NULL);
+#endif
 }
+
+
+/*--------------------------- rt_sys_start ----------------------------------*/
+
+#ifdef __CMSIS_RTOS
+void rt_sys_start (void) {
+  /* Start system */
+
+  /* Intitialize and start system clock timer */
+  os_tick_irqn = os_tick_init ();
+  if (os_tick_irqn >= 0) {
+    OS_X_INIT(os_tick_irqn);
+  }
+}
+#endif
 
 /*----------------------------------------------------------------------------
  * end of file

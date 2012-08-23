@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------------
  *      Name:    HAL_CM3.C
  *      Purpose: Hardware Abstraction Layer for Cortex-M3
- *      Rev.:    V4.20
+ *      Rev.:    V4.50
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
@@ -49,6 +49,14 @@
 
 __asm void rt_set_PSP (U32 stack) {
         MSR     PSP,R0
+        BX      LR
+}
+
+
+/*--------------------------- rt_get_PSP ------------------------------------*/
+
+__asm U32 rt_get_PSP (void) {
+        MRS     R0,PSP
         BX      LR
 }
 
@@ -119,8 +127,7 @@ __asm void SVC_Handler (void) {
         MRS     R0,PSP                  ; Read PSP
         LDR     R1,[R0,#24]             ; Read Saved PC from Stack
         LDRB    R1,[R1,#-2]             ; Load SVC Number
-        CMP     R1,#0
-        BNE     SVC_User
+        CBNZ    R1,SVC_User
 
         LDM     R0,{R0-R3,R12}          ; Read R0-R3,R12 from stack
         BLX     R12                     ; Call SVC Function 
@@ -176,15 +183,11 @@ SVC_Done
 }
 
 
-/*-------------------------- Sys_Handler ------------------------------------*/
+/*-------------------------- PendSV_Handler ---------------------------------*/
 
-__asm void Sys_Handler (void) {
+__asm void PendSV_Handler (void) {
         PRESERVE8
 
-        EXPORT  SysTick_Handler
-        EXPORT  PendSV_Handler
-
-PendSV_Handler
         BL      __cpp(rt_pop_req)
 
 Sys_Switch
@@ -211,7 +214,28 @@ Sys_Exit
         MVN     LR,#:NOT:0xFFFFFFFD     ; set EXC_RETURN value
         BX      LR                      ; Return to Thread Mode
 
-SysTick_Handler
+        ALIGN
+}
+
+
+/*-------------------------- SysTick_Handler --------------------------------*/
+
+__asm void SysTick_Handler (void) {
+        PRESERVE8
+
+        BL      __cpp(rt_systick)
+        B       Sys_Switch
+
+        ALIGN
+}
+
+
+/*-------------------------- OS_Tick_Handler --------------------------------*/
+
+__asm void OS_Tick_Handler (void) {
+        PRESERVE8
+
+        BL      __cpp(os_tick_irqack)
         BL      __cpp(rt_systick)
         B       Sys_Switch
 

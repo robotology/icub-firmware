@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_SEMAPHORE.C
  *      Purpose: Implements binary and counting semaphores
- *      Rev.:    V4.20
+ *      Rev.:    V4.50
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
@@ -56,6 +56,37 @@ void rt_sem_init (OS_ID semaphore, U16 token_count) {
   p_SCB->p_lnk  = NULL;
   p_SCB->tokens = token_count;
 }
+
+
+/*--------------------------- rt_sem_delete ---------------------------------*/
+
+#ifdef __CMSIS_RTOS
+OS_RESULT rt_sem_delete (OS_ID semaphore) {
+  /* Delete semaphore */
+  P_SCB p_SCB = semaphore;
+  P_TCB p_TCB;
+
+  while (p_SCB->p_lnk != NULL) {
+    /* A task is waiting for token */
+    p_TCB = rt_get_first ((P_XCB)p_SCB);
+    rt_ret_val(p_TCB, 0);
+    rt_rmv_dly(p_TCB);
+    p_TCB->state = READY;
+    rt_put_prio (&os_rdy, p_TCB);
+  }
+
+  if (os_rdy.p_lnk && (os_rdy.p_lnk->prio > os_tsk.run->prio)) {
+    /* preempt running task */
+    rt_put_prio (&os_rdy, os_tsk.run);
+    os_tsk.run->state = READY;
+    rt_dispatch (NULL);
+  }
+
+  p_SCB->cb_type = 0;
+
+  return (OS_R_OK);
+}
+#endif
 
 
 /*--------------------------- rt_sem_send -----------------------------------*/

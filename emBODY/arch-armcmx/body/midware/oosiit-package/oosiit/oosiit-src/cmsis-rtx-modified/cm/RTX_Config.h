@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------------
  *      Name:    RTX_CONFIG.H
  *      Purpose: Exported functions of RTX_Config.c
- *      Rev.:    V4.20
+ *      Rev.:    V4.50
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
@@ -75,6 +75,8 @@ extern U8  const os_fifo_size;
 
 /* Functions */
 extern void os_idle_demon   (void);
+extern int  os_tick_init    (void);
+extern void os_tick_irqack  (void);
 extern void os_tmr_call     (U16  info);
 extern void os_error        (U32 err_code);
 

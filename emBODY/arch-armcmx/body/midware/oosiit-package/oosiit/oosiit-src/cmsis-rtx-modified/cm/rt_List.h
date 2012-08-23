@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_LIST.H
  *      Purpose: Functions for the management of different lists
- *      Rev.:    V4.20
+ *      Rev.:    V4.50
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH

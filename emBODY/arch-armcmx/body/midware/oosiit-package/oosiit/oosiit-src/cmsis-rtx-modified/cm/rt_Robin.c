@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_ROBIN.C
  *      Purpose: Round Robin Task switching
- *      Rev.:    V4.20
+ *      Rev.:    V4.50
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
@@ -68,9 +68,9 @@ __weak void rt_chk_robin (void) {
   if (os_robin.task != os_rdy.p_lnk) {
     /* New task was suspended, reset Round Robin timeout. */
     os_robin.task = os_rdy.p_lnk;
-    os_robin.time = os_time + os_robin.tout - 1;
+    os_robin.time = (U16)os_time + os_robin.tout - 1;
   }
-  if (os_robin.time == os_time) {
+  if (os_robin.time == (U16)os_time) {
     /* Round Robin timeout has expired, swap Robin tasks. */
     os_robin.task = NULL;
     p_new = rt_get_first (&os_rdy);

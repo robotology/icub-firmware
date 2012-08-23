@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------------
  *      Name:    HAL_CM.C
  *      Purpose: Hardware Abstraction Layer for Cortex-M
- *      Rev.:    V4.20
+ *      Rev.:    V4.50
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
@@ -71,7 +71,6 @@ void rt_init_stack (P_TCB p_TCB, FUNCP task_body) {
   }
 
   stk -= 16;
-  
 
   /* Default xPSR and initial PC */
   stk[15] = INITIAL_xPSR;

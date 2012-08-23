@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_SYSTEM.C
  *      Purpose: System Task Manager
- *      Rev.:    V4.22
+ *      Rev.:    V4.50
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
@@ -46,6 +46,12 @@
 #include "rt_HAL_CM.h"
 
 /*----------------------------------------------------------------------------
+ *      Global Variables
+ *---------------------------------------------------------------------------*/
+
+int os_tick_irqn;
+
+/*----------------------------------------------------------------------------
  *      Local Variables
  *---------------------------------------------------------------------------*/
 //IIT-EXT: made them global so that externally overridden functions can use them 
@@ -63,18 +69,104 @@ __asm void $$RTX$$version (void) {
 
                 EXPORT  __RL_RTX_VER
 
-__RL_RTX_VER    EQU     0x422
+__RL_RTX_VER    EQU     0x450
 }
 #endif
 
 
-/*--------------------------- rt_tsk_lock -----------------------------------*/
+/*--------------------------- rt_suspend ------------------------------------*/
+//IIT-EXT: made it overridable
+__weak U32 rt_suspend (void) {
+  /* Suspend OS scheduler */
+  U32 delta = 0xFFFF;
+  
+  rt_tsk_lock();
+  
+  if (os_dly.p_dlnk) {
+    delta = os_dly.delta_time;
+  }
+#ifndef __CMSIS_RTOS
+  if (os_tmr.next) {
+    if (os_tmr.tcnt < delta) delta = os_tmr.tcnt;
+  }
+#endif
 
+  return (delta);
+}
+
+
+/*--------------------------- rt_resume -------------------------------------*/
+//IIT-EXT: made it overridable
+__weak void rt_resume (U32 sleep_time) {
+  /* Resume OS scheduler after suspend */
+  P_TCB next;
+  U32   delta;
+
+  os_tsk.run->state = READY;
+  rt_put_rdy_first (os_tsk.run);
+
+  os_robin.task = NULL;
+
+  /* Update delays. */
+  if (os_dly.p_dlnk) {
+    delta = sleep_time;
+    if (delta >= os_dly.delta_time) {
+      delta   -= os_dly.delta_time;
+      os_time += os_dly.delta_time;
+      os_dly.delta_time = 1;
+      while (os_dly.p_dlnk) {
+        rt_dec_dly();
+        if (delta == 0) break;
+        delta--;
+        os_time++;
+      }
+    } else {
+      os_time           += delta;
+      os_dly.delta_time -= delta;
+    }
+  } else {
+    os_time += sleep_time;
+  }
+
+#ifndef __CMSIS_RTOS
+  /* Check the user timers. */
+  if (os_tmr.next) {
+    delta = sleep_time;
+    if (delta >= os_tmr.tcnt) {
+      delta   -= os_tmr.tcnt;
+      os_tmr.tcnt = 1;
+      while (os_tmr.next) {
+        rt_tmr_tick();
+        if (delta == 0) break;
+        delta--;
+      }
+    } else {
+      os_tmr.tcnt -= delta;
+    }
+  }
+#endif
+
+  /* Switch back to highest ready task */
+  next = rt_get_first (&os_rdy);
+  rt_switch_req (next);
+
+  rt_tsk_unlock();
+}
+
+
+/*--------------------------- rt_tsk_lock -----------------------------------*/
+//IIT-EXT: made it overridable
 __weak void rt_tsk_lock (void) {
   /* Prevent task switching by locking out scheduler */
-  OS_LOCK();
-  os_lock = __TRUE;
-  OS_UNPEND (&pend_flags);
+  if (os_tick_irqn < 0) {
+    OS_LOCK();
+    os_lock = __TRUE;
+    OS_UNPEND (&pend_flags);
+  } else {
+    OS_X_LOCK(os_tick_irqn);
+    os_lock = __TRUE;
+    OS_X_UNPEND (&pend_flags);
+  }
 }
 
 
@@ -82,10 +174,17 @@ __weak void rt_tsk_lock (void) {
 //IIT-EXT: made it overridable
 __weak void rt_tsk_unlock (void) {
   /* Unlock scheduler and re-enable task switching */
-  OS_UNLOCK();
-  os_lock = __FALSE;
-  OS_PEND (pend_flags, os_psh_flag);
-  os_psh_flag = __FALSE;
+  if (os_tick_irqn < 0) {
+    OS_UNLOCK();
+    os_lock = __FALSE;
+    OS_PEND (pend_flags, os_psh_flag);
+    os_psh_flag = __FALSE;
+  } else {
+    OS_X_UNLOCK(os_tick_irqn);
+    os_lock = __FALSE;
+    OS_X_PEND (pend_flags, os_psh_flag);
+    os_psh_flag = __FALSE;
+  }
 }
 
 
@@ -135,6 +234,22 @@ __weak void rt_pop_req (void) {
 
   next = rt_get_first (&os_rdy);
   rt_switch_req (next);
+}
+
+
+/*--------------------------- os_tick_init ----------------------------------*/
+
+__weak int os_tick_init (void) {
+  /* Initialize SysTick timer as system tick timer. */
+  rt_systick_init ();
+  return (-1);  /* Return IRQ number of SysTick timer */
+}
+
+
+/*--------------------------- os_tick_irqack --------------------------------*/
+
+__weak void os_tick_irqack (void) {
+  /* Acknowledge timer interrupt. */
 }
 
 

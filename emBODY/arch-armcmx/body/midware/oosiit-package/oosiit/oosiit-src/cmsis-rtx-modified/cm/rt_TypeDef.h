@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_TYPEDEF.H
  *      Purpose: Type Definitions
- *      Rev.:    V4.20
+ *      Rev.:    V4.50
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
@@ -90,7 +90,7 @@ typedef struct OS_TCB {
 typedef struct OS_PSFE {          /* Post Service Fifo Entry                 */
   void  *id;                      /* Object Identification                   */
   U32    arg;                     /* Object Argument                         */
-//  U32    flags;                 //IIT-EXT: for send2front                                                  //IIT-EXT: we could implement the add in front of mbx w/ this field
+//  U32    flags;                 //IIT-EXT: for send2front. but not used                                                  //IIT-EXT: we could implement the add in front of mbx w/ this field
 } *P_PSFE;
 
 typedef struct OS_PSQ {           /* Post Service Queue                      */

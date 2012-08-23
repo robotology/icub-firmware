@@ -28,7 +28,7 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#if defined(DBG_MSG_SYSTICK) | defined(DBG_MSG_SVC) | defined(DBG_MSG_PENDSV)
+#if defined(OOSIIT_DBG_ENABLE)
 #include "api/eventviewer.h"
 #endif
 
@@ -97,7 +97,10 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern const oosiit_params_cfg_t *oosiit_params_cfg = NULL;
+extern const uint32_t oosiit_notimeout = OOSIIT_NOTIMEOUT;
+extern const uint64_t oosiit_asaptime = OOSIIT_ASAPTIME;
+
+extern const oosiit_cfg_t *oosiit_cfg_in_use = NULL;
 
 // it must point to an array of proper size, given by ...
 extern       uint32_t *oosiit_params_ram32data = NULL;
@@ -110,7 +113,7 @@ extern       uint32_t *oosiit_params_stdlib32data = NULL;
 
 
 extern volatile uint64_t oosiit_time = 0;
-extern volatile uint64_t oosiit_idletime = 0;
+//extern volatile uint64_t oosiit_idletime = 0;
 extern uint32_t oosiit_ns_per_unit_of_systick = 0;
 extern uint32_t oosiit_num_units_of_systick = 0;
 
@@ -125,8 +128,8 @@ extern uint32_t oosiit_num_units_of_systick = 0;
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static uint16_t s_oosiit_params_get_ram32size(const oosiit_params_cfg_t *cfg);
-static uint16_t s_oosiit_params_get_ram64size(const oosiit_params_cfg_t *cfg);
+static uint16_t s_oosiit_params_get_ram32size(const oosiit_cfg_t *cfg);
+static uint16_t s_oosiit_params_get_ram64size(const oosiit_cfg_t *cfg);
 
 
 static __INLINE oosiit_taskid_t isr_oosiit_tsk_self(void);
@@ -210,8 +213,8 @@ SVC_1_1(svc_oosiit_advtmr_delete,       oosiit_result_t,    void*,              
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
+static volatile uint8_t s_oosiit_started = 0;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of externally defined functions whuch dont have a .h file
@@ -225,7 +228,7 @@ extern void os_set_env(void);
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern oosiit_result_t oosiit_memory_getsize(const oosiit_params_cfg_t *cfg, uint16_t *size04aligned, uint16_t *size08aligned)
+extern oosiit_result_t oosiit_memory_getsize(const oosiit_cfg_t *cfg, uint16_t *size04aligned, uint16_t *size08aligned)
 {
     if(NULL == cfg)
     {
@@ -244,7 +247,7 @@ extern oosiit_result_t oosiit_memory_getsize(const oosiit_params_cfg_t *cfg, uin
     return(oosiit_res_OK);
 }
 
-extern oosiit_result_t oosiit_memory_load(const oosiit_params_cfg_t *cfg, uint32_t *data04aligned, uint64_t *data08aligned)
+extern oosiit_result_t oosiit_memory_load(const oosiit_cfg_t *cfg, uint32_t *data04aligned, uint64_t *data08aligned)
 {
     if((NULL == cfg) || (NULL == data04aligned) || (NULL == data08aligned) )
     {
@@ -256,13 +259,18 @@ extern oosiit_result_t oosiit_memory_load(const oosiit_params_cfg_t *cfg, uint32
         return(oosiit_res_NOK);
     } 
     
-    oosiit_params_cfg            = cfg;
+    if(1 == s_oosiit_started)
+    {   // already started
+        return(oosiit_res_NOK);
+    }
+    
+    oosiit_cfg_in_use            = cfg;
     oosiit_params_stdlib32data   = data04aligned;
     oosiit_params_ram32data      = data04aligned + ((SIZEOF_STDLIB32_ELEM/4)*cfg->maxnumofusertasks);   
     oosiit_params_ram64data      = data08aligned;
 
     // need to initialise os_flags now because os_sys_init* calls os_set_env() which use it before rt_sys_init() is called
-    os_flags      = oosiit_params_cfg->priviledgeMode;
+    os_flags      = 1; //oosiit_cfg_in_use->priviledgeMode;
     
     // set the environment to privileged / unprivileged
     os_set_env();
@@ -280,6 +288,11 @@ extern oosiit_result_t oosiit_memory_load(const oosiit_params_cfg_t *cfg, uint32
 
 extern oosiit_result_t oosiit_sys_start(oosiit_task_properties_t* tskinit, oosiit_task_properties_t* tskidle)
 {
+    if(1 == s_oosiit_started)
+    {
+        return(oosiit_res_NOK);
+    }
+    
     if(0 != __get_IPSR()) 
     {   // inside isr
         return(oosiit_res_NOK);
@@ -297,6 +310,8 @@ extern oosiit_result_t oosiit_sys_start(oosiit_task_properties_t* tskinit, oosii
     {
         // set the environment to privileged / unprivileged
         os_set_env();
+        // set the os as started
+        s_oosiit_started = 1;
         // call svc
         __svc_oosiit_sys_start(tskinit, tskidle);
     }
@@ -307,6 +322,11 @@ extern oosiit_result_t oosiit_sys_start(oosiit_task_properties_t* tskinit, oosii
 
 extern oosiit_result_t oosiit_sys_init(void (*inittskfn)(void), uint8_t inittskpriority, void* inittskstackdata, uint16_t inittskstacksize)
 {
+    if(1 == s_oosiit_started)
+    {
+        return(oosiit_res_NOK);
+    }
+    
     if(0 != __get_IPSR()) 
     {   // inside isr
         return(oosiit_res_NOK);
@@ -319,6 +339,8 @@ extern oosiit_result_t oosiit_sys_init(void (*inittskfn)(void), uint8_t inittskp
     { 
         // set the environment to privileged / unprivileged
         os_set_env();
+        // set the os as started
+        s_oosiit_started = 1;        
         // call svc
         __svc_oosiit_sys_init_user(inittskfn, inittskpriority, inittskstackdata, inittskstacksize);
     }
@@ -365,9 +387,13 @@ extern uint64_t* oosiit_memory_getstack(uint16_t bytes)
     {   // inside isr
         return(NULL);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
         return(__svc_oosiit_stack_getmem(bytes));
+    }
+    else
+    {   // dont call svc
+        return(rt_iit_memory_getstack(bytes));
     }
     
 }
@@ -503,7 +529,7 @@ extern uint64_t oosiit_microtime_get(void)
     // if it is equal to 1, then extranano = ... (osTick*1000)/(systick_reload_value_reg+1)
 
     nanosecs = oosiit_ns_per_unit_of_systick * (oosiit_num_units_of_systick - reg0xE000E018);
-    microsecs = (oosiit_time * oosiit_params_cfg->osTick) + nanosecs/1000LL;
+    microsecs = (oosiit_time * oosiit_cfg_in_use->osTick) + nanosecs/1000LL;
 
     return(microsecs);    
 }
@@ -518,7 +544,7 @@ extern uint64_t oosiit_nanotime_get(void)
     // if it is equal to 1, then extranano = ... (osTick*1000)/(systick_reload_value_reg+1)
 
     nanosecs = oosiit_ns_per_unit_of_systick * (oosiit_num_units_of_systick - reg0xE000E018);
-    nanosecs += (oosiit_time * oosiit_params_cfg->osTick * 1000LL);
+    nanosecs += (oosiit_time * oosiit_cfg_in_use->osTick * 1000LL);
 
     return(nanosecs);
 }
@@ -940,7 +966,7 @@ extern oosiit_result_t oosiit_advtmr_delete(oosiit_objptr_t timer)
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern uint16_t oosiit_hid_params_get_stdlib32(const oosiit_params_cfg_t *cfg, uint16_t *stdlib32size)
+extern uint16_t oosiit_hid_params_get_stdlib32(const oosiit_cfg_t *cfg, uint16_t *stdlib32size)
 {
     uint16_t stdlib32datasizetot = 0;
 
@@ -956,7 +982,7 @@ extern uint16_t oosiit_hid_params_get_stdlib32(const oosiit_params_cfg_t *cfg, u
 
 }
 
-extern uint16_t oosiit_hid_params_get_ram32(const oosiit_params_cfg_t *cfg, uint16_t *ram32size)
+extern uint16_t oosiit_hid_params_get_ram32(const oosiit_cfg_t *cfg, uint16_t *ram32size)
 {
     uint16_t ram32datasizetot = 0;
 
@@ -988,7 +1014,7 @@ extern uint16_t oosiit_hid_params_get_ram32(const oosiit_params_cfg_t *cfg, uint
     return(ram32datasizetot);
 }
 
-extern uint16_t oosiit_hid_params_get_ram64(const oosiit_params_cfg_t *cfg, uint16_t *ram64size)
+extern uint16_t oosiit_hid_params_get_ram64(const oosiit_cfg_t *cfg, uint16_t *ram64size)
 {
     uint16_t ram64datasizetot = 0;
 
@@ -1012,7 +1038,7 @@ extern uint16_t oosiit_hid_params_get_ram64(const oosiit_params_cfg_t *cfg, uint
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static uint16_t s_oosiit_params_get_ram32size(const oosiit_params_cfg_t *cfg)
+static uint16_t s_oosiit_params_get_ram32size(const oosiit_cfg_t *cfg)
 {
     uint16_t ram32datasizetot = 0;
 
@@ -1050,7 +1076,7 @@ static uint16_t s_oosiit_params_get_ram32size(const oosiit_params_cfg_t *cfg)
     return(ram32datasizetot);
 }
 
-static uint16_t s_oosiit_params_get_ram64size(const oosiit_params_cfg_t *cfg)
+static uint16_t s_oosiit_params_get_ram64size(const oosiit_cfg_t *cfg)
 {
     uint16_t ram64datasizetot = 0;
 
@@ -1494,6 +1520,8 @@ extern oosiit_result_t svc_oosiit_advtmr_delete(oosiit_objptr_t timer)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static inline functions 
 // --------------------------------------------------------------------------------------------------------------------
+
+
 
 static __INLINE oosiit_taskid_t isr_oosiit_tsk_self(void)
 {

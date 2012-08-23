@@ -21,7 +21,7 @@
 	@author     marco.accame@iit.it
     @date       08/20/2012
     @warning    the inspiration of the code in here comes from the file rt_Timer.c from the free distribution of the
-                "CMSIS-RTOS RTX Implementation" version 4.20. of this file we have retained some ideas and some data 
+                "CMSIS-RTOS RTX Implementation" version 4.20 or successive. of this file we have retained some ideas and some data 
                 types but the implementation is different. even if this should be consider new code and not a modification
                 of the original code owned by KEIL-ARM, we retain in here the orginal copyrigth notice. 
 **/
@@ -31,7 +31,7 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_TIMER.C
  *      Purpose: User timer functions
- *      Rev.:    V4.20
+ *      Rev.:    V4.50
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
@@ -284,7 +284,7 @@ void rt_iit_advtmr_tick (void) {
    s_rt_iit_advtmr_debug_read_list_of_active_timers();
 #endif
 
-   while (os_iit_advtmr.tcnt == 0 && (p = os_iit_advtmr.next) != NULL) {
+   while ((os_iit_advtmr.tcnt == 0) && ((p = os_iit_advtmr.next) != NULL)) {
 
       // compute for next timer
       os_iit_advtmr.tcnt = p->tcnt;

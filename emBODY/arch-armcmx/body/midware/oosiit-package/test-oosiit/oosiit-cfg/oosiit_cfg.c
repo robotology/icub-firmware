@@ -72,19 +72,17 @@ void os_error (uint32_t err_code) {
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static const oosiit_params_cfg_t s_cfg =
+extern const oosiit_cfg_t oosiit_cfg_USER =
 {
-    // task configuration
+    // from cmsis-rtx
     .maxnumofusertasks              = OOSIIT_TASKCNT,             
-    .checkStack                     = OOSIIT_STKCHECK,           
-    .priviledgeMode                 = OOSIIT_RUNPRIV,             
-    // systick timer configuration
+    .checkStack                     = OOSIIT_STKCHECK,       
+    .sizeISRFIFO                    = OOSIIT_FIFOSZ,       
+    .roundRobin                     = OOSIIT_ROBIN,         
     .osClock                        = OOSIIT_CLOCK,               
-    .osTick                         = OOSIIT_TICK,                
-    // system configuration
-    .roundRobin                     = OOSIIT_ROBIN,               
+    .osTick                         = OOSIIT_TICK,      
     .roundRobinTimeout              = OOSIIT_ROBINTOUT,           
-    .sizeISRFIFO                    = OOSIIT_FIFOSZ,              
+           
     // iit extension
     .numAdvTimer                    = OOSIIT_ADVTIMERCNT,      
     .numMutex                       = OOSIIT_MUTEXCNT,         
@@ -95,7 +93,7 @@ static const oosiit_params_cfg_t s_cfg =
 };
 
 
-extern const oosiit_params_cfg_t *oosiit_params_cfgMINE = &s_cfg;
+extern const oosiit_cfg_t *oosiit_cfg_USERptr = &oosiit_cfg_USER;
 
 
 

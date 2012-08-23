@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_MUTEX.H
  *      Purpose: Implements mutex synchronization objects
- *      Rev.:    V4.20
+ *      Rev.:    V4.50
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
@@ -34,6 +34,7 @@
 
 /* Functions */
 extern void      rt_mut_init    (OS_ID mutex);
+extern OS_RESULT rt_mut_delete  (OS_ID mutex);
 extern OS_RESULT rt_mut_release (OS_ID mutex);
 extern OS_RESULT rt_mut_wait    (OS_ID mutex, U16 timeout);
 

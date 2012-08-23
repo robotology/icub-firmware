@@ -80,7 +80,7 @@ typedef uint32_t oosiit_taskid_t;
 typedef void* oosiit_objptr_t;
 
 
-/** @typedef    typedef struct oosiit_params_cfg_t
+/** @typedef    typedef struct oosiit_cfg_t
     @brief      keeps configuration of oosiit which can be loaded in runtime.
  **/
 typedef struct
@@ -88,12 +88,12 @@ typedef struct
     // from cmsis-rtx
     uint8_t         maxnumofusertasks;              /**< max number of user tasks (init and idle task are not counted as they are system tasks) */                   
     uint8_t         checkStack;                     /**< if 1 at every context switch its is verified if there is a stack overflow. if 0 no check is done. */                
-    uint8_t         priviledgeMode;                 /**< if 1 it forces CMx to run in priviledge mode. USE IT 1 if you want use HW resources. */               
+    uint8_t         sizeISRFIFO;                    /**< the size of FIFO which contains events to be processed in the postPEND following a call of a oosiit function from inside an ISR */ 
+    uint8_t         roundRobin;                     /**< if 1 it allows round-robin between the task of same priority. if 0 rr is disabled. */ 
     uint32_t        osClock;                        /**< the clock speed of teh MPU in hz. */                                
-    uint32_t        osTick;                         /**< the tick period in micro-seconds. */                                 
-    uint8_t         roundRobin;                     /**< if 1 it allows round-robin between the task of same priority. if 0 rr is disabled. */                     
+    uint32_t        osTick;                         /**< the tick period in micro-seconds. */                                                     
     uint32_t        roundRobinTimeout;              /**< the timeslice assigned to each task. in ticks. */                                                     
-    uint8_t         sizeISRFIFO;                    /**< the size of FIFO which contains events to be processed in the postPEND following a call of a oosiit function from inside an ISR */                            
+                               
     // from iit extension
     uint8_t         numAdvTimer;                    /**< max number of advanced timers */                            
     uint8_t         numMutex;                       /**< max number of mutexes */                                              
@@ -101,7 +101,7 @@ typedef struct
     uint8_t         numMessageBox;                  /**< max number of message boxes */                      
     uint16_t        numMessageBoxElements;          /**< max number of messages in all the message boxes */                  
     uint32_t        sizeof64alignedStack;           /**< size of internally allocated memory for the stack of tasks. If 0 all the stacks must be externally generated */                    
-} oosiit_params_cfg_t;
+} oosiit_cfg_t;
 
 
 /** @typedef    typedef enum oosiit_evt_wait_mode_t 
@@ -152,7 +152,9 @@ typedef struct
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-// empty-section
+
+extern const uint32_t oosiit_notimeout; // = OOSIIT_NOTIMEOUT
+extern const uint64_t oosiit_asaptime;  // = OOSIIT_ASAPTIME
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -168,10 +170,10 @@ typedef struct
     @param      size08aligned   The number of bytes of eigth-aligned required memory.
     @return     if succesuful oosiit_res_OK, otherwise it returns oosiit_res_NOK (for instance if called with incorrect parameters)
  **/ 
-extern oosiit_result_t oosiit_memory_getsize(const oosiit_params_cfg_t *cfg, uint16_t *size04aligned, uint16_t *size08aligned);
+extern oosiit_result_t oosiit_memory_getsize(const oosiit_cfg_t *cfg, uint16_t *size04aligned, uint16_t *size08aligned);
 
 
-/** @fn         extern oosiit_result_t oosiit_memory_set(const oosiit_params_cfg_t *cfg, uint32_t *data04aligned, uint64_t *data08aligned)
+/** @fn         extern oosiit_result_t oosiit_memory_set(const oosiit_cfg_t *cfg, uint32_t *data04aligned, uint64_t *data08aligned)
     @brief      Loads to the internals of oosiit the references to the configuration and of required memory. 
                 If any is NULL, any successive attempt to run the oosiit will fail due to lack of memory.
     @param      cfg             A pointer to the wanted configuration.
@@ -179,7 +181,7 @@ extern oosiit_result_t oosiit_memory_getsize(const oosiit_params_cfg_t *cfg, uin
     @param      data08aligned   The eigth-aligned required memory.
     @return     if succesuful oosiit_res_OK, otherwise it returns oosiit_res_NOK (for instance if called with incorrect parameters)
  **/ 
-extern oosiit_result_t oosiit_memory_load(const oosiit_params_cfg_t *cfg, uint32_t *data04aligned, uint64_t *data08aligned);
+extern oosiit_result_t oosiit_memory_load(const oosiit_cfg_t *cfg, uint32_t *data04aligned, uint64_t *data08aligned);
 
 
 /** @fn         extern uint64_t* oosiit_memory_getstack(uint16_t bytes)

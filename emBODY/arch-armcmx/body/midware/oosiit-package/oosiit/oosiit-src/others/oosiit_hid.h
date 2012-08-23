@@ -45,7 +45,7 @@ extern "C" {
 
 // - declaration of externally defined variables ----------------------------------------------------------------------
 
-extern const oosiit_params_cfg_t *oosiit_params_cfg;
+extern const oosiit_cfg_t *oosiit_cfg_in_use;
 
 // it must point to an array of proper size, given by ...
 extern       uint32_t *oosiit_params_ram32data;
@@ -59,7 +59,7 @@ extern       uint32_t *oosiit_params_stdlib32data;
 
 
 extern volatile uint64_t oosiit_time;
-extern volatile uint64_t oosiit_idletime;
+//extern volatile uint64_t oosiit_idletime;
 extern uint32_t oosiit_ns_per_unit_of_systick;
 extern uint32_t oosiit_num_units_of_systick;
 
@@ -99,9 +99,9 @@ typedef U32 TMRSIG_iit;
 
 //void oosiit_hid_initialise(void);
 
-extern uint16_t oosiit_hid_params_get_stdlib32(const oosiit_params_cfg_t *cfg, uint16_t *stdlib32size);;
-extern uint16_t oosiit_hid_params_get_ram32(const oosiit_params_cfg_t *cfg, uint16_t *ram32size);
-extern uint16_t oosiit_hid_params_get_ram64(const oosiit_params_cfg_t *cfg, uint16_t *ram64size);
+extern uint16_t oosiit_hid_params_get_stdlib32(const oosiit_cfg_t *cfg, uint16_t *stdlib32size);;
+extern uint16_t oosiit_hid_params_get_ram32(const oosiit_cfg_t *cfg, uint16_t *ram32size);
+extern uint16_t oosiit_hid_params_get_ram64(const oosiit_cfg_t *cfg, uint16_t *ram64size);
 
 
 #ifdef __cplusplus

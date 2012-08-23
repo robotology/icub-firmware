@@ -215,10 +215,10 @@ typedef uint32_t __attribute__((vector_size(16))) ret128;
 #define osCallback_ret     (ret64) {(uint32_t)ret.fp, (uint32_t)ret.arg}
 
 #define SVC_ArgN(n) \
-  register int __r##n asm("r"#n);
+  register int __r##n __asm("r"#n);
 
 #define SVC_ArgR(n,t,a) \
-  register t   __r##n asm("r"#n) = a;
+  register t   __r##n __asm("r"#n) = a;
 
 #define SVC_Arg0()                                                             \
   SVC_ArgN(0)                                                                  \
@@ -252,7 +252,7 @@ typedef uint32_t __attribute__((vector_size(16))) ret128;
 
 #if (defined (__CORTEX_M0))
 #define SVC_Call(f)                                                            \
-  asm volatile                                                                 \
+  __asm volatile                                                                 \
   (                                                                            \
     "ldr r7,="#f"\n\t"                                                         \
     "mov r12,r7\n\t"                                                           \
@@ -263,7 +263,7 @@ typedef uint32_t __attribute__((vector_size(16))) ret128;
   );
 #else
 #define SVC_Call(f)                                                            \
-  asm volatile                                                                 \
+  __asm volatile                                                                 \
   (                                                                            \
     "ldr r12,="#f"\n\t"                                                        \
     "svc 0"                                                                    \
@@ -334,13 +334,13 @@ static inline  t __##f (t1 a1, t2 a2, t3 a3, t4 a4) {                          \
 #define osCallback_ret     ((uint64_t)ret.fp | ((uint64_t)ret.arg)<<32)
 
 #define SVC_Setup(f)                                                           \
-  asm(                                                                         \
+  __asm(                                                                         \
     "mov r12,%0\n"                                                             \
     :: "r"(&f): "r12"                                                          \
   );
 
 #define SVC_Ret3()                                                             \
-  asm(                                                                         \
+  __asm(                                                                         \
     "ldr r0,[sp,#0]\n"                                                         \
     "ldr r1,[sp,#4]\n"                                                         \
     "ldr r2,[sp,#8]\n"                                                         \
@@ -393,7 +393,7 @@ static inline t __##f (t1 a1) {                                                \
   t ret;                                                                       \
   SVC_Setup(f);                                                                \
   _##f(a1);                                                                    \
-  asm("" : rr : :);                                                            \
+  __asm("" : rr : :);                                                            \
   return ret;                                                                  \
 }
 
@@ -408,7 +408,7 @@ static inline t __##f (t1 a1) {                                                \
   t ret;                                                                       \
   SVC_Setup(f##_);                                                             \
   _##f(a1);                                                                    \
-  asm("" : rr : :);                                                            \
+  __asm("" : rr : :);                                                            \
   return ret;                                                                  \
 }
 
@@ -423,7 +423,7 @@ static inline t __##f (t1 a1, t2 a2) {                                         \
   t ret;                                                                       \
   SVC_Setup(f##_);                                                             \
   _##f(a1,a2);                                                                 \
-  asm("" : rr : :);                                                            \
+  __asm("" : rr : :);                                                            \
   return ret;                                                                  \
 }
 

@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_MUTEX.C
  *      Purpose: Implements mutex synchronization objects
- *      Rev.:    V4.20
+ *      Rev.:    V4.50
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
@@ -47,7 +47,6 @@
 
 /*--------------------------- rt_mut_init -----------------------------------*/
 
-
 void rt_mut_init (OS_ID mutex) {
   /* Initialize a mutex object */
   P_MUCB p_MCB = mutex;
@@ -60,20 +59,57 @@ void rt_mut_init (OS_ID mutex) {
 }
 
 
+/*--------------------------- rt_mut_delete ---------------------------------*/
+
+#ifdef __CMSIS_RTOS
+OS_RESULT rt_mut_delete (OS_ID mutex) {
+  /* Delete a mutex object */
+  P_MUCB p_MCB = mutex;
+  P_TCB  p_TCB;
+
+  /* Restore owner task's priority. */
+  if (p_MCB->level != 0) {
+    p_MCB->owner->prio = p_MCB->prio;
+    if (p_MCB->owner != os_tsk.run) {
+      rt_resort_prio (p_MCB->owner);
+    }
+  }
+
+  while (p_MCB->p_lnk != NULL) {
+    /* A task is waiting for mutex. */
+    p_TCB = rt_get_first ((P_XCB)p_MCB);
+    rt_ret_val(p_TCB, 0/*osOK*/);
+    rt_rmv_dly(p_TCB);
+    p_TCB->state = READY;
+    rt_put_prio (&os_rdy, p_TCB);
+  }
+
+  if (os_rdy.p_lnk && (os_rdy.p_lnk->prio > os_tsk.run->prio)) {
+    /* preempt running task */
+    rt_put_prio (&os_rdy, os_tsk.run);
+    os_tsk.run->state = READY;
+    rt_dispatch (NULL);
+  }
+
+  p_MCB->cb_type = 0;
+
+  return (OS_R_OK);
+}
+#endif
+
+
 /*--------------------------- rt_mut_release --------------------------------*/
 
 OS_RESULT rt_mut_release (OS_ID mutex) {
   /* Release a mutex object */
   P_MUCB p_MCB = mutex;
   P_TCB  p_TCB;
-  
 
   if (p_MCB->level == 0 || p_MCB->owner != os_tsk.run) {
     /* Unbalanced mutex release or task is not the owner */
     return (OS_R_NOK);
   }
   if (--p_MCB->level != 0) {
-    
     return (OS_R_OK);
   }
   /* Restore owner task's priority. */
@@ -112,8 +148,6 @@ OS_RESULT rt_mut_release (OS_ID mutex) {
       rt_dispatch (NULL);
     }
   }
-
-  
   return (OS_R_OK);
 }
 

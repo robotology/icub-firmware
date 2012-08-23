@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_TIME.C
  *      Purpose: Delay and interval wait functions
- *      Rev.:    V4.20
+ *      Rev.:    V4.50
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
@@ -42,12 +42,20 @@
  *---------------------------------------------------------------------------*/
 
 /* Free running system tick counter */
-U16 os_time;
+U32 os_time;
 
 
 /*----------------------------------------------------------------------------
  *      Functions
  *---------------------------------------------------------------------------*/
+
+
+/*--------------------------- rt_time_get -----------------------------------*/
+
+U32 rt_time_get (void) {
+  /* Get system time tick */
+  return (os_time);
+}
 
 
 /*--------------------------- rt_dly_wait -----------------------------------*/
@@ -63,7 +71,7 @@ void rt_dly_wait (U16 delay_time) {
 void rt_itv_set (U16 interval_time) {
   /* Set interval length and define start of first interval */
   os_tsk.run->interval_time = interval_time;
-  os_tsk.run->delta_time = interval_time + os_time;
+  os_tsk.run->delta_time = interval_time + (U16)os_time;
 }
 
 
@@ -73,7 +81,7 @@ void rt_itv_wait (void) {
   /* Wait for interval end and define start of next one */
   U16 delta;
 
-  delta = os_tsk.run->delta_time - os_time;
+  delta = os_tsk.run->delta_time - (U16)os_time;
   os_tsk.run->delta_time += os_tsk.run->interval_time;
   if ((delta & 0x8000) == 0) {
     rt_block (delta, WAIT_ITV);

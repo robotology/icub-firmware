@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_SYSTEM.H
  *      Purpose: System Task Manager definitions
- *      Rev.:    V4.20
+ *      Rev.:    V4.50
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
@@ -36,8 +36,11 @@
 //IIT-EXT: need to change the following to make it work ...
 //#define os_psq  ((P_PSQ)&os_fifo)	    //IIT-EXT
 #define os_psq  ((P_PSQ)os_fifo)        //IIT-EXT
+extern int os_tick_irqn;
 
 /* Functions */
+extern U32  rt_suspend    (void);
+extern void rt_resume     (U32 sleep_time);
 extern void rt_tsk_lock   (void);
 extern void rt_tsk_unlock (void);
 extern void rt_psh_req    (void);
