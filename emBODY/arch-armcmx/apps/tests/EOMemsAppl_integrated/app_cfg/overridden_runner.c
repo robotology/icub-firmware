@@ -166,7 +166,8 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
     eOmn_appl_runMode_t runmode =  eo_appTheSP_GetAppRunMode(appTheSP);
     uint32_t encvalue;
     int16_t *pwm;
-/* TAG_ALE */
+
+    /* TAG_ALE */
 //     if(applrunMode__skinAndMc4 == runmode)
 //     {
 //         #warning VALE--> remove this code after test on semaphore-can
@@ -197,11 +198,10 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
         eo_emsController_ReadEncoders((int32_t*)&encvalue);
     }
         
-        
     /* 2) pid calc */
     pwm = eo_emsController_PWM();
-
-    pwm_out = -pwm[0];
+     
+    pwm_out = pwm[3];
         
 #ifndef _USE_PROTO_TEST_
         /* 4) prepare and punt in rx queue new setpoint */

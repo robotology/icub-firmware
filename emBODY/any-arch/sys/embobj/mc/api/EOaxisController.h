@@ -40,16 +40,13 @@ typedef enum {
     CM_TORQUE               =0x03,   //
     CM_IMPEDANCE_POS        =0x04,   //
     CM_IMPEDANCE_VEL        =0x05,   //
-    CM_VELOCITY             =0x06,
+    CM_CURRENT              =0x06,
+    CM_VELOCITY             =0x07,
 
     CM_CALIB_ABS_POS_SENS   =0x10,   //
 
-    CM_CALIB_HARD_STOPS     =0x20,
-    CM_HANDLE_HARD_STOPS    =0x30,
-    CM_MARGIN_REACHED       =0x40,   // ?
-    CM_CALIB_ABS_AND_INC    =0x41,   //
-
-    CM_OPENLOOP             =0x50    //
+    CM_OPENLOOP             =0x50,   //
+    CM_SWITCH_OFF           =0xF0
 } control_mode_t;
 
 /** @typedef    typedef struct EOaxisController_hid EOaxisController
@@ -91,7 +88,7 @@ extern void eo_axisController_SetTrqRef(EOaxisController *o, int32_t trq);
 
 extern int16_t eo_axisController_PWM(EOaxisController *o);
 
-extern void eo_axisController_Stop(EOaxisController *o, int32_t stop_acc);
+extern void eo_axisController_Stop(EOaxisController *o);
 
 extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, control_mode_t cm);
 
@@ -99,6 +96,9 @@ extern void eo_axisController_SetStiffness(EOaxisController *o, int32_t stiffnes
 
 extern void eo_axisController_SetVelTimeout(EOaxisController *o, int32_t vel_timeout);
 extern void eo_axisController_SetLimits(EOaxisController *o, int32_t pos_min, int32_t pos_max, int32_t vel_max);
+extern void eo_axisController_SetPosMin(EOaxisController *o, int32_t pos_min);
+extern void eo_axisController_SetPosMax(EOaxisController *o, int32_t pos_max);
+extern void eo_axisController_SetVelMax(EOaxisController *o, int32_t vel_max);
 
 extern void eo_axisController_SetOffset(EOaxisController *o, int16_t offset);
 
@@ -107,7 +107,7 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, int16_t *p
 extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o);
 extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o);
 
-extern void eo_axisController_StartCalibration(EOaxisController *o, int32_t pos, int32_t offset, int32_t timeout_ms, int32_t max_error);
+extern void eo_axisController_StartCalibration(EOaxisController *o, int32_t pos, int32_t vel, int32_t offset);
 
 /** @}            
     end of group eo_axisController  

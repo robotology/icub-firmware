@@ -209,6 +209,12 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidposition(eOcfg_nvsEP_mc_joi
     //(currently no pid velocity is sent to 2foc)
     if(eobrd_1foc == boardType)
     {
+        float rescaler = 1.0f/(float)(1<<pid_ptr->scale);
+
+        eo_emsController_SetOffset(jxx, pid_ptr->offset);
+        eo_emsController_SetPosPidLimits(jxx, pid_ptr->limitonoutput, pid_ptr->limitonintegral);
+        eo_emsController_SetPosPid(jxx, pid_ptr->kp*rescaler, pid_ptr->kd*rescaler, pid_ptr->ki*rescaler);
+        
         return;
     }
 
@@ -244,6 +250,12 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidtorque(eOcfg_nvsEP_mc_joint
     //(currently no pid velocity is sent to 2foc)
     if(eobrd_1foc == boardType)
     {
+        float rescaler = 1.0f/(float)(1<<pid_ptr->scale);
+
+        eo_emsController_SetOffset(jxx, pid_ptr->offset);
+        eo_emsController_SetTrqPidLimits(jxx, pid_ptr->limitonoutput, pid_ptr->limitonintegral);
+        eo_emsController_SetTrqPid(jxx, pid_ptr->kp*rescaler, pid_ptr->kd*rescaler, pid_ptr->ki*rescaler);
+
         return;
     }
 
@@ -282,6 +294,8 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__impedance(eOcfg_nvsEP_mc_joint
     //(currently no pid velocity is sent to 2foc)
     if(eobrd_1foc == boardType)
     {
+        // ALE: to be implemented 
+
         return;
     }
 
@@ -317,6 +331,8 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__minpositionofjoint(eOcfg_nvsEP
     //(currently no pid velocity is sent to 2foc)
     if(eobrd_1foc == boardType)
     {
+        eo_emsController_SetPosMin(jxx, *pos_ptr);
+        
         return;
     }
     // set min position
@@ -350,6 +366,8 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__maxpositionofjoint(eOcfg_nvsEP
     //(currently no pid velocity is sent to 2foc)
     if(eobrd_1foc == boardType)
     {
+        eo_emsController_SetPosMax(jxx, *pos_ptr);
+
         return;
     }
     // set min position
@@ -383,6 +401,8 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__velocitysetpointtimeout(eOcfg_
     //(currently no pid velocity is sent to 2foc)
     if(eobrd_1foc == boardType)
     {
+        eo_emsController_SetVelTimeout(jxx, *time_ptr);
+
         return;
     }
     // set vel timeout
@@ -429,6 +449,8 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__controlmode(eOcfg_nvsEP_mc_joi
     //(currently no pid velocity is sent to 2foc)
     if(eobrd_1foc == boardType)
     {
+        eo_emsController_SetControlMode(jxx, *controlmode_ptr);       
+
         return;
     }
     // send control mode
@@ -487,6 +509,34 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
 
     if(eobrd_1foc == boardType)
     {
+        switch (setPoint->type)
+        {
+            case eomc_setpoint_position:
+            {
+                eo_emsController_SetPosRef(jxx, setPoint->to.position.value, setPoint->to.position.withvelocity);
+            }break;
+            
+            case eomc_setpoint_velocity:
+            {
+                eo_emsController_SetVelRef(jxx, setPoint->to.velocity.value, setPoint->to.velocity.withacceleration);    
+            }break;
+
+            case eomc_setpoint_torque:
+            {
+                eo_emsController_SetTrqRef(jxx, setPoint->to.torque.value);
+            }break;
+
+            case eomc_setpoint_current:
+            {    
+                eo_emsController_SetOffset(jxx, setPoint->to.current.value);
+            }break;
+
+            default:
+            {
+                return;
+            }
+        }
+
         return;
     }
 
@@ -560,9 +610,11 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__stoptrajectory(eOcfg_nvsEP_mc_
             //does start-traj cmd exist??? 
         }
     }
-    else
+    else if(eobrd_1foc == boardType)
     {
-        //ems stuff
+        eo_emsController_Stop(jxx);
+        
+        return;    
     }
 
 }
@@ -572,6 +624,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
 {
     eOresult_t                          res;
     eo_appCanSP_canLocation             canLoc;
+    eObrd_types_t                       boardType;
     eOmc_calibrator_t                   *calibrator = (eOmc_calibrator_t*)nv->loc;
     eo_icubCanProto_msgCommand_t        msgCmd = 
     {
@@ -581,12 +634,22 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
 
     EOappCanSP *appCanSP_ptr = eo_appTheSP_GetCanServiceHandle(eo_appTheSP_GetHandle());
 
-    res = eo_appCanSP_GetJointCanLocation(appCanSP_ptr, jxx, &canLoc, NULL);
+    res = eo_appCanSP_GetJointCanLocation(appCanSP_ptr, jxx, &canLoc, &boardType);
     if(eores_OK != res)
     {
         return;
     }
-   
+
+    if(eobrd_1foc == boardType)
+    {
+        eo_emsController_StartCalibration(jxx, 
+                                          calibrator->params.type3.position, 
+                                          calibrator->params.type3.velocity,
+                                          calibrator->params.type3.offset); 
+
+        return;
+    }
+
     eo_appCanSP_SendCmd(appCanSP_ptr, &canLoc, msgCmd, (void*)calibrator);
 }
 
