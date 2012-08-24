@@ -1464,7 +1464,7 @@ extern void rt_init_context (P_TCB p_TCB, U8 priority, FUNCP task_body);
 
 extern BIT os_lock;             //IIT-EXT
 
-#warning --> durante lo scheduling suspend la osal potrebbe fare un context swith se il task manda un evt (non bloccante) ad altro task + prioritario
+//#warning --> durante lo scheduling suspend oosiit potrebbe fare un context swith se il task manda un evt (non bloccante) ad altro task + prioritario
 
 void iitchanged_rt_block (TIME_t timeout, U8 block_state, const TIME_t notimeout) {
    /* Block running task and choose next ready task.                         */
