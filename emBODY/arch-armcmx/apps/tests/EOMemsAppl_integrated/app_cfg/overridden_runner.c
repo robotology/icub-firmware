@@ -285,7 +285,6 @@ static void s_eom_emsrunner_hid_taskRX_act_afterdgramrec_2foc_mode(EOappTheSP *p
 {
 	/* TAG_ALE*/
     eo_appCanSP_read(eo_appTheSP_GetCanServiceHandle(p), eOcanport1, 4, NULL); 
-	/*TAG_VALE: perche' non leggo la strain???*/
 }
 static void s_eom_emsrunner_hid_taskRX_act_afterdgramrec_skinAndMc4_mode(EOappTheSP *p)
 {
