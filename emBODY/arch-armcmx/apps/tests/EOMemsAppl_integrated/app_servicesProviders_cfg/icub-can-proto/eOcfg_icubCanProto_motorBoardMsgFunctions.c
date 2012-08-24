@@ -1307,15 +1307,13 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, 
     mstatusbasic_ptr = (eOmc_motor_status_basic_t*)nv_mem_ptr;    
     mstatusbasic_ptr->current = ((uint16_t*)frame->data)[0];
 
-/* TAG_ALE */
+    /* TAG_ALE */
     if(eobrd_1foc == boardType)
     {
-        // ALE
-
 #ifdef USE_2FOC_FAST_ENCODER
-        if ((frame->id & 0xFFFFFFCF) == 0x104)
+        if ((frame->id & 0xFFFFFF0F) == 0x104)
         {
-            eo_emsController_ReadSpeed(mId, 5*(int32_t)((int16_t*)frame->data)[1]);
+            eo_emsController_ReadSpeed(mId, SPEED_2FOC_TO_EMS(((int16_t*)frame->data)[1]));
         }
 #endif
     }
