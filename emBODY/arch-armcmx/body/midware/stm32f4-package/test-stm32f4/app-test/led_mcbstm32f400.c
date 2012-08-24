@@ -156,112 +156,112 @@ extern void led_mcbstm32f400_off (led_mcbstm32f400_t led)
 
 
 
-static void LED_Init (void) {
-  /* Enable clock for GPIOG, GPIOH and GPIOI                                  */
-  RCC->AHB1ENR |= (1UL << 6) | (1UL << 7) | (1UL << 8) ;
+// static void LED_Init (void) {
+//   /* Enable clock for GPIOG, GPIOH and GPIOI                                  */
+//   RCC->AHB1ENR |= (1UL << 6) | (1UL << 7) | (1UL << 8) ;
 
-  /* Configure Port G pins PG6, PG7, PG8:                                     */
-  /* Pins in Push-pull output mode, 50 MHz Fast Speed with Pull-up resistors  */
-  GPIOG->MODER   &= ~((3UL << 2*6) | (3UL << 2*7) | (3UL << 2*8));
-  GPIOG->MODER   |=  ((1UL << 2*6) | (1UL << 2*7) | (1UL << 2*8));
-  GPIOG->OTYPER  &= ~((1UL <<   6) | (1UL <<   7) | (1UL <<   8));
-  GPIOG->OSPEEDR &= ~((3UL << 2*6) | (3UL << 2*7) | (3UL << 2*8));
-  GPIOG->OSPEEDR |=  ((2UL << 2*6) | (2UL << 2*7) | (2UL << 2*8));
-  GPIOG->PUPDR   &= ~((3UL << 2*6) | (3UL << 2*7) | (3UL << 2*8));
-  GPIOG->PUPDR   |=  ((1UL << 2*6) | (1UL << 2*7) | (1UL << 2*8));
+//   /* Configure Port G pins PG6, PG7, PG8:                                     */
+//   /* Pins in Push-pull output mode, 50 MHz Fast Speed with Pull-up resistors  */
+//   GPIOG->MODER   &= ~((3UL << 2*6) | (3UL << 2*7) | (3UL << 2*8));
+//   GPIOG->MODER   |=  ((1UL << 2*6) | (1UL << 2*7) | (1UL << 2*8));
+//   GPIOG->OTYPER  &= ~((1UL <<   6) | (1UL <<   7) | (1UL <<   8));
+//   GPIOG->OSPEEDR &= ~((3UL << 2*6) | (3UL << 2*7) | (3UL << 2*8));
+//   GPIOG->OSPEEDR |=  ((2UL << 2*6) | (2UL << 2*7) | (2UL << 2*8));
+//   GPIOG->PUPDR   &= ~((3UL << 2*6) | (3UL << 2*7) | (3UL << 2*8));
+//   GPIOG->PUPDR   |=  ((1UL << 2*6) | (1UL << 2*7) | (1UL << 2*8));
 
-  /* Configure Port H: PH2, PH3, PH6, PH7                                     */
-  /* Pins in Push-pull output mode, 50 MHz Fast Speed with Pull-up resistors  */
-  GPIOH->MODER   &= ~((3UL << 2*2) | (3UL << 2*3) | (3UL << 2*6) | (3UL << 2*7));
-  GPIOH->MODER   |=  ((1UL << 2*2) | (1UL << 2*3) | (1UL << 2*6) | (1UL << 2*7));
-  GPIOH->OTYPER  &= ~((1UL <<   2) | (1UL <<   3) | (1UL <<   6) | (1UL <<   7));
-  GPIOH->OSPEEDR &= ~((3UL << 2*2) | (3UL << 2*3) | (3UL << 2*6) | (3UL << 2*7));
-  GPIOH->OSPEEDR |=  ((2UL << 2*2) | (2UL << 2*3) | (2UL << 2*6) | (2UL << 2*7));
-  GPIOH->PUPDR   &= ~((3UL << 2*2) | (3UL << 2*3) | (3UL << 2*6) | (3UL << 2*7));
-  GPIOH->PUPDR   |=  ((1UL << 2*2) | (1UL << 2*3) | (1UL << 2*6) | (1UL << 2*7));
+//   /* Configure Port H: PH2, PH3, PH6, PH7                                     */
+//   /* Pins in Push-pull output mode, 50 MHz Fast Speed with Pull-up resistors  */
+//   GPIOH->MODER   &= ~((3UL << 2*2) | (3UL << 2*3) | (3UL << 2*6) | (3UL << 2*7));
+//   GPIOH->MODER   |=  ((1UL << 2*2) | (1UL << 2*3) | (1UL << 2*6) | (1UL << 2*7));
+//   GPIOH->OTYPER  &= ~((1UL <<   2) | (1UL <<   3) | (1UL <<   6) | (1UL <<   7));
+//   GPIOH->OSPEEDR &= ~((3UL << 2*2) | (3UL << 2*3) | (3UL << 2*6) | (3UL << 2*7));
+//   GPIOH->OSPEEDR |=  ((2UL << 2*2) | (2UL << 2*3) | (2UL << 2*6) | (2UL << 2*7));
+//   GPIOH->PUPDR   &= ~((3UL << 2*2) | (3UL << 2*3) | (3UL << 2*6) | (3UL << 2*7));
+//   GPIOH->PUPDR   |=  ((1UL << 2*2) | (1UL << 2*3) | (1UL << 2*6) | (1UL << 2*7));
 
-  /* Configure Port I pin PI10:                                               */
-  /* Pins in Push-pull output mode, 50 MHz Fast Speed with Pull-up resistors  */
-  GPIOI->MODER   &= ~(3UL << 2*10);
-  GPIOI->MODER   |=  (1UL << 2*10);
-  GPIOI->OTYPER  &= ~(1UL <<   10);
-  GPIOI->OSPEEDR &= ~(3UL << 2*10);
-  GPIOI->OSPEEDR |=  (2UL << 2*10);
-  GPIOI->PUPDR   &= ~(3UL << 2*10);
-  GPIOI->PUPDR   |=  (1UL << 2*10);
-}
+//   /* Configure Port I pin PI10:                                               */
+//   /* Pins in Push-pull output mode, 50 MHz Fast Speed with Pull-up resistors  */
+//   GPIOI->MODER   &= ~(3UL << 2*10);
+//   GPIOI->MODER   |=  (1UL << 2*10);
+//   GPIOI->OTYPER  &= ~(1UL <<   10);
+//   GPIOI->OSPEEDR &= ~(3UL << 2*10);
+//   GPIOI->OSPEEDR |=  (2UL << 2*10);
+//   GPIOI->PUPDR   &= ~(3UL << 2*10);
+//   GPIOI->PUPDR   |=  (1UL << 2*10);
+// }
 
-static void LED_Config(void) {
+// static void LED_Config(void) {
 
-//  RCC->APB2ENR |=  1 <<  6;                     /* Enable GPIOE clock          */
-//  GPIOE->CRH    = 0x33333333;                   /* Configure the GPIO for LEDs */
+// //  RCC->APB2ENR |=  1 <<  6;                     /* Enable GPIOE clock          */
+// //  GPIOE->CRH    = 0x33333333;                   /* Configure the GPIO for LEDs */
 
-#if 0 
-    GPIO_InitTypeDef  GPIO_InitStructure;
+// #if 0 
+//     GPIO_InitTypeDef  GPIO_InitStructure;
 
-    GPIO_DeInit(GPIOI);
+//     GPIO_DeInit(GPIOI);
 
-    /* Enable the GPIO_LED Clock */
-    RCC_APB1PeriphClockCmd(RCC_AHB1Periph_GPIOI, ENABLE); 
- 
-    GPIO_StructInit(&GPIO_InitStructure);
-    /* Configure the GPIO_LED pin */
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT; 
-    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOI, &GPIO_InitStructure);
-#else
-    /* Enable clock for GPIOI                                  */
-    RCC->AHB1ENR |= (1UL << 6) | (1UL << 7) | (1UL << 8) ;
+//     /* Enable the GPIO_LED Clock */
+//     RCC_APB1PeriphClockCmd(RCC_AHB1Periph_GPIOI, ENABLE); 
+//  
+//     GPIO_StructInit(&GPIO_InitStructure);
+//     /* Configure the GPIO_LED pin */
+//     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
+//     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT; 
+//     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+//     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+//     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//     GPIO_Init(GPIOI, &GPIO_InitStructure);
+// #else
+//     /* Enable clock for GPIOI                                  */
+//     RCC->AHB1ENR |= (1UL << 6) | (1UL << 7) | (1UL << 8) ;
 
-    /* Configure Port I pin PI10:                                               */
-    /* Pins in Push-pull output mode, 50 MHz Fast Speed with Pull-up resistors  */
-    GPIOI->MODER   &= ~(3UL << 2*10);
-    GPIOI->MODER   |=  (1UL << 2*10);
-    GPIOI->OTYPER  &= ~(1UL <<   10);
-    GPIOI->OSPEEDR &= ~(3UL << 2*10);
-    GPIOI->OSPEEDR |=  (2UL << 2*10);
-    GPIOI->PUPDR   &= ~(3UL << 2*10);
-    GPIOI->PUPDR   |=  (1UL << 2*10);
+//     /* Configure Port I pin PI10:                                               */
+//     /* Pins in Push-pull output mode, 50 MHz Fast Speed with Pull-up resistors  */
+//     GPIOI->MODER   &= ~(3UL << 2*10);
+//     GPIOI->MODER   |=  (1UL << 2*10);
+//     GPIOI->OTYPER  &= ~(1UL <<   10);
+//     GPIOI->OSPEEDR &= ~(3UL << 2*10);
+//     GPIOI->OSPEEDR |=  (2UL << 2*10);
+//     GPIOI->PUPDR   &= ~(3UL << 2*10);
+//     GPIOI->PUPDR   |=  (1UL << 2*10);
 
-#endif
-}
+// #endif
+// }
 
 
 /*------------------------------------------------------------------------------
   Switch on LEDs
  *------------------------------------------------------------------------------*/
-static void LED_On (uint32_t pin) {
-    
-    uint8_t val = 3;
+// static void LED_On (uint32_t pin) {
+//     
+//     uint8_t val = 3;
 
-#if 0
-    GPIOI->BSRRL = 1UL << 10;                          /* Turn On  LED */
-#else
-    GPIO_WriteBit(GPIOI, GPIO_Pin_10, Bit_SET);
-#endif
-    val = GPIO_ReadOutputDataBit(GPIOI, GPIO_Pin_10);
-    val = val;
-}
+// #if 0
+//     GPIOI->BSRRL = 1UL << 10;                          /* Turn On  LED */
+// #else
+//     GPIO_WriteBit(GPIOI, GPIO_Pin_10, Bit_SET);
+// #endif
+//     val = GPIO_ReadOutputDataBit(GPIOI, GPIO_Pin_10);
+//     val = val;
+// }
 
 
 /*------------------------------------------------------------------------------
   Switch off LEDs
  *------------------------------------------------------------------------------*/
-static void LED_Off (uint32_t pin) {
+// static void LED_Off (uint32_t pin) {
 
-uint8_t val = 3;
-#if 0
-    GPIOI->BSRRH = 1UL << 10;                          /* Turn On  LED */
-#else
-    GPIO_WriteBit(GPIOI, GPIO_Pin_10, Bit_RESET);
-#endif
-    val = GPIO_ReadOutputDataBit(GPIOI, GPIO_Pin_10);
-    val = val;
+// uint8_t val = 3;
+// #if 0
+//     GPIOI->BSRRH = 1UL << 10;                          /* Turn On  LED */
+// #else
+//     GPIO_WriteBit(GPIOI, GPIO_Pin_10, Bit_RESET);
+// #endif
+//     val = GPIO_ReadOutputDataBit(GPIOI, GPIO_Pin_10);
+//     val = val;
 
-}
+// }
 
 
 
