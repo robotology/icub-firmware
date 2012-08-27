@@ -9,6 +9,7 @@ attrib +R ..\..\..\..\sys\mid\inc\*.*
 
 attrib -R ..\..\..\..\sys\mid\lib\*.lib
 copy eventviewer-lib\eventviewer.cm3.lib ..\..\..\..\sys\mid\lib
+copy eventviewer-lib\eventviewer.cm4.lib ..\..\..\..\sys\mid\lib
 attrib +R ..\..\..\..\sys\mid\lib\*.lib
 
 attrib -R ..\..\..\..\sys\mid\cfg\*.*
