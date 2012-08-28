@@ -172,6 +172,7 @@
           <Name>-O207 -S0 -C0 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F2xx_1024 -FS08000000 -FL0100000)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
+      <Breakpoint/>
       <WatchWindow1>
         <Ww>
           <count>0</count>
