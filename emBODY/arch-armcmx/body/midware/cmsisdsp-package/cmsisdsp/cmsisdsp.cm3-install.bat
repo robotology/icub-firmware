@@ -9,6 +9,7 @@ attrib +R ..\..\..\..\sys\mid\inc\*.*
 
 attrib -R ..\..\..\..\sys\mid\lib\*.lib
 copy cmsisdsp-lib\cmsisdsp.cm3.lib ..\..\..\..\sys\mid\lib
+copy cmsisdsp-lib\cmsisdsp.cm4.lib ..\..\..\..\sys\mid\lib
 attrib +R ..\..\..\..\sys\mid\lib\*.lib
 
 attrib -R ..\..\..\..\sys\mid\cfg\*.*
