@@ -17,22 +17,14 @@
 */
 
 #include "brd_mcbstm32x.h"
-
 #if     defined(USE_BRD_MCBSTM32_C)
-
     #include "brd_mcbstm32c.c" 
-
 #elif   defined(USE_BRD_MCBSTM32_F200)
-
-    #error --> missing file
     #include "brd_mcbstm32f200.c" 
-
 #elif   defined(USE_BRD_MCBSTM32_F400)
-    
     #include "brd_mcbstm32f400.c" 
-
 #else
-    #error --> define a MCBSTM32 board
+    #error --> define a board
 #endif
 
 
