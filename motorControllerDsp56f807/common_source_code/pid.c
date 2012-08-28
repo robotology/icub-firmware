@@ -193,7 +193,7 @@ Int32  _adjustment[JN] = INIT_ARRAY (0);		// the actual adjustment (compensation
 Int32  _delta_adj[JN] = INIT_ARRAY (0);			// velocity over the adjustment
 #endif
 
-#if ((VERSION == 0x0121) || (VERSION == 0x0128) || (VERSION == 0x0130))
+#if ((VERSION == 0x0121) || (VERSION == 0x0128) || (VERSION == 0x0130) || (VERSION == 0x0228) || (VERSION == 0x0230))
 Int32  _adjustment[JN]=INIT_ARRAY (0);          // the sum of the three value coming from the MAIS board
 #endif
 
@@ -226,9 +226,10 @@ Int16 smoothing_step[JN]=INIT_ARRAY(0);
 Int16 smoothing_tip[JN]=INIT_ARRAY(0);
 #endif
 
-#if ((VERSION == 0x0120) || (VERSION == 0x0121) || (VERSION == 0x0128) || (VERSION == 0x0130))
+#if ((VERSION == 0x0120) || (VERSION == 0x0121) || (VERSION == 0x0128) || (VERSION == 0x0130) || (VERSION == 0x0228) || (VERSION == 0x0230))
 // max allowed position for encoder while controlling with absolute position sensors
 Int16 _max_position_enc[JN] = INIT_ARRAY (0);
+Int16 _min_position_enc[JN] = INIT_ARRAY (0);
 #endif
 
 

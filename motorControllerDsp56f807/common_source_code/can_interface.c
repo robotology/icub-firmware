@@ -257,7 +257,7 @@ byte can_interface (void)
 				_strain_wtd[strain_num] = STRAIN_SAFE;
 			}
 			else 
-#elif (VERSION == 0x0121 || VERSION == 0x0128 || VERSION == 0x0130)
+#elif (VERSION == 0x0121 || VERSION == 0x0128 || VERSION == 0x0130 || VERSION == 0x0228 || VERSION == 0x0230)
 
 			if (_canmsg.CAN_ID_class == CLASS_PERIODIC_SENS)
 			{
@@ -1321,7 +1321,7 @@ void set_can_masks()
 			create_F_M(&filter1, &mask1,CLASS_POLLING_DSP,0xFF, _board_ID, CLASS_PERIODIC_SENS, 0xFF, 0xFF);   
 			create_F_M(&filter2, &mask2,CLASS_CANLOADER,  0x00, 0xFF, 	   CLASS_PERIODIC_DSP, 	1, 0xFF);  		
 		}			
-	#elif (VERSION == 0x0119 || VERSION == 0x0121 || VERSION == 0x0128 || VERSION == 0x0130)
+	#elif (VERSION == 0x0119 || VERSION == 0x0121 || VERSION == 0x0128 || VERSION == 0x0130 || VERSION == 0x0228 || VERSION == 0x0230)
 		{
 			create_F_M(&filter1, &mask1,CLASS_POLLING_DSP,0xFF, _board_ID  , CLASS_PERIODIC_SENS, 0xFF, 0xFF);   
 			create_F_M(&filter2, &mask2,CLASS_POLLING_DSP,0xFF, _board_ID+1, CLASS_CANLOADER,     0x00, 0xFF);  

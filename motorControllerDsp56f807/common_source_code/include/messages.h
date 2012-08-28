@@ -674,7 +674,7 @@
 	else \
 		_general_board_error = ERROR_FMT; \
 }
-#elif VERSION == 0x0130
+#elif ((VERSION == 0x0130 || VERSION==0x0230))
 #define CAN_SET_ACTIVE_ENCODER_POSITION_HANDLER(x) \
 { \
 	byte HES04,HES05,HES06,HES07,HES08,HES11,HES12,HES13; \
@@ -703,7 +703,7 @@
 		_general_board_error = ERROR_NONE; \
 	} \
 }
-#elif VERSION == 0x0128
+#elif ((VERSION == 0x0128) || (VERSION == 0x0228))
 #define CAN_SET_ACTIVE_ENCODER_POSITION_HANDLER(x) \
 { \
 	byte HES00,HES01,HES02,HES03; \

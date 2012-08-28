@@ -123,6 +123,7 @@ extern Int32 _set_point[JN] ;			// set point for position [user specified]
 extern Int32 _min_position[JN] ;		// software position limits 
 extern Int32 _max_position[JN] ;		// software position limits 
 extern Int16 _max_position_enc[JN];     // max allowed position for encoder while controlling with absolute position sensors
+extern Int16 _min_position_enc[JN];     // min allowed position for encoder while controlling with absolute position sensors
 extern Int32 _max_real_position[JN];		
 extern Int16 _optical_ratio[JN];        //  optical encoder ratio								
 
@@ -241,7 +242,7 @@ extern Int32  _adjustment[JN] ;		// the actual adjustment (compensation)
 extern Int32  _delta_adj[JN] ;		// velocity over the adjustment 
 #endif
 
-#if ((VERSION == 0x0121) || (VERSION == 0x0128) || (VERSION == 0x0130))
+#if ((VERSION == 0x0121) || (VERSION == 0x0128) || (VERSION == 0x0130) || (VERSION == 0x0228) || (VERSION == 0x0230))
 extern Int32  _adjustment[JN];         // the sum of the three value coming from the MAIS board
 #endif
 
@@ -359,6 +360,33 @@ extern float _filt_pid[JN] ;			// filtered pid control
 	else /*MAX_POS <= 0*/\
 	{\
 		if (POS > 0 && PID > 0) \
+		{ \
+			PID = 0; \
+		} \
+		if ((POS < MAX_POS ) && PID < 0) \
+		{ \
+			PID = 0;\
+		} \
+	}\
+}
+#define ENFORCE_ENC_LIMITS_HANDV2(PID, POS, MIN_POS, MAX_POS) \
+{\
+	if (MAX_POS>0)\
+	{\
+		if ((POS<MIN_POS) && (PID<0))\
+		{\
+			/*can_printf("+ %d, %d, %d", PID, POS, MAX_POS);*/ \
+			PID = 0;\
+		}\
+		if ((POS>MAX_POS) && (PID>0))\
+		{\
+			/*can_printf("- %d, %d, %d", PID, POS, MAX_POS);*/ \
+			PID = 0; \
+		}\
+	}\
+	else /*MAX_POS <= 0*/\
+	{\
+		if (POS > MIN_POS && PID > 0) \
 		{ \
 			PID = 0; \
 		} \
