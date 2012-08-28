@@ -30,7 +30,7 @@
 #include "stdlib.h" 
 #include "string.h"
 #include "stdio.h"
-#include </usr/include/bits/time.h>
+#include <bits/time.h>
 
 #include  "errno.h"
 
