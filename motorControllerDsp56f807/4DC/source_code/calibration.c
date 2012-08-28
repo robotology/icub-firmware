@@ -21,7 +21,7 @@
 #	error "No valid version specified"
 #endif
 
-#if ((VERSION == 0x0120) || (VERSION == 0x0121) || (VERSION == 0x0128) || (VERSION == 0x0130))
+#if ((VERSION == 0x0120) || (VERSION == 0x0121) || (VERSION == 0x0128) || (VERSION == 0x0130) || (VERSION == 0x0228) || (VERSION == 0x0230))
 Int16 _max_position_enc_tmp[JN] = INIT_ARRAY (0);
 /* max allowd position for encoder while 
 controlling with absolute position sensors*/
@@ -76,23 +76,44 @@ void check_in_position_calib(byte jnt)
 			return;
 		}
 #endif		
-#if ((VERSION == 0x0128))
+#if ((VERSION == 0x0128) || (VERSION == 0x0228))
 		if (jnt!=0)
 		{
 			_max_position_enc[jnt] = _max_position_enc_tmp[jnt];
 			#ifdef DEBUG_CALIBRATION
 			can_printf("maxPosEnc: %d", _max_position_enc[jnt]);
 			#endif			
+			
+			_min_position_enc[1]=-1800; //Thumb proximal right and left
+			if (_max_position_enc[2]>0)
+			_min_position_enc[2]=-3000; //Thumb distal
+   			 else 
+   			 _min_position_enc[2]=3000; //Thumb distal
+  
+			_min_position_enc[3]=-300; //Index proximal  right and left
+			
 			_calibrated[jnt] = true;
 			return;
 		}		
 #endif
-#if ((VERSION == 0x0130))
+#if ((VERSION == 0x0130) || (VERSION == 0x0230))
 		{
 			_max_position_enc[jnt] = _max_position_enc_tmp[jnt];
 			#ifdef DEBUG_CALIBRATION
 			can_printf("maxPosEnc: %d", _max_position_enc[jnt]);
-			#endif			
+			#endif
+			
+			if (_max_position_enc[0]>0)
+			_min_position_enc[0]=-3000; //Index distal
+			else
+			_min_position_enc[0]=3000; //Index distal
+			_min_position_enc[1]=-300; //Middle proximal right and left
+			if (_max_position_enc[2]>0)
+			_min_position_enc[2]=-3000; //Middle distal
+			else
+			_min_position_enc[2]=3000; //Middle distal	
+			_min_position_enc[3]=0; //little fingers  right and left
+				
 			_calibrated[jnt] = true;
 			return;
 		}						
@@ -704,7 +725,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
  *0x0128*	 
  ********/
  
-#elif ((VERSION == 0x0128) )
+#elif ((VERSION == 0x0128) ||(VERSION == 0x0228) )
 
 	if (type==CALIB_ABS_POS_SENS)
 	{
@@ -781,7 +802,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
  *0x0130*	 
  ********/
  
-#elif ((VERSION == 0x0130) )
+#elif ((VERSION == 0x0130) || (VERSION == 0x0230))
 
 if (type==CALIB_ABS_POS_SENS)
 	{
