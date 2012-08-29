@@ -54,9 +54,9 @@ void TI1_interrupt (void)
 				_pad_enabled[i] = false;
 				highcurrent[i]=true;
 				PWM_outputPadDisable(i);
-#ifdef DEBUG_CAN_MSG
+
 				can_printf("j%d curr %f",i,get_current(i));
-#endif
+
 			}
 			check_current(i, (_pid[i] > 0));		
 			compute_i2t(i);
@@ -66,9 +66,9 @@ void TI1_interrupt (void)
 				_pad_enabled[i] = false;
 				highcurrent[i]=true;
 				PWM_outputPadDisable(i);
-#ifdef DEBUG_CAN_MSG
+
 				can_printf("j%d filtcurr %f",i,_filt_current[i]);
-#endif	
+	
 			}			
 		}
 		

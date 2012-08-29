@@ -34,7 +34,7 @@
 byte	_board_ID = 16;	
 char    _additional_info [32];
 UInt8    mainLoopOVF=0;
-word    _build_number = 60;
+word    _build_number = 61;
 int     _countBoardStatus[2] ={0,0};
 Int16   _flash_version=0; 
 UInt8   BUS_OFF=false;
@@ -168,9 +168,11 @@ void main(void)
 	setRegBits(IPR, 0xFE00); 
 
 	// enable FAULT
-	__ENIGROUP (61, 3);
+	__ENIGROUP (61, 3); 
+	#if VERSION == 0x0254
+	#else
 	__ENIGROUP (60, 3);
-		
+	#endif	
 	// enable SCI
 	__ENIGROUP (52, 4);
 	__ENIGROUP (53, 4);
@@ -191,9 +193,12 @@ void main(void)
 	__ENIGROUP (54, 6);
 	
 	//enable PWM reload 
-	__ENIGROUP (58, 7);
-	__ENIGROUP (59, 7);
+	__ENIGROUP (59, 7); // PMWA
 	
+	#if VERSION == 0x0254
+	#else	
+	__ENIGROUP (58, 7); // PWMB
+	#endif
 	// enable timers
 	// TIMER_A
 	__ENIGROUP (45, 7); //Timer for the encoder commutation if used
@@ -237,12 +242,18 @@ void main(void)
 	__EI();
 
 	init_leds  			  ();
-
-   Init_Brushless_Comm	  (JN,HALL); 
-  			 
-
-	can_interface_init    (JN);
 	
+	#if VERSION == 0x0254
+	
+	Init_Brushless_Comm	  (1,HALL); 
+  	
+  	#else 
+
+	Init_Brushless_Comm	  (JN,HALL); 
+  	
+  	#endif
+	can_interface_init    (JN);
+	 
 #ifdef TORQUE_CNTRL
     init_strain ();
 #endif 	
@@ -332,7 +343,7 @@ void main(void)
 		if (getCanBusOffstatus() )
 		{
 			#ifdef DEBUG_CAN_MSG
-				can_printf("DIASBLE BUS OFF");
+				can_printf("DISABLE BUS OFF");
 			#endif	
 			for (i=0; i<JN; i++) _control_mode[i]=MODE_IDLE;
 			led1_off
@@ -391,7 +402,7 @@ void main(void)
 
 ///////////////////////////////////////////DEBUG////////////
 // ADDED VERSION !=0x0171
-#if (VERSION !=0x0254) || (VERSION !=0x0258)
+#if (VERSION !=0x0254) && (VERSION !=0x0258)
 	    for (i=0; i<JN; i++) 
 		{		
 		   if (get_error_abs_ssi(i)==ERR_ABS_SSI)
@@ -406,8 +417,8 @@ void main(void)
 		}  
 #endif
 	
-#warning "here we should put a control for 0x0258"	
-#if (VERSION ==0x0254) || (VERSION ==0x0258)
+#warning "here we should put a control for 0x0258 and 0x255"	
+#if (VERSION ==0x0254) || (VERSION ==0x0258) || (VERSION ==0x0255)
 		   if (get_error_abs_ssi(0)==ERR_ABS_SSI)
 		   {
 					_control_mode[0] = MODE_IDLE;	
@@ -570,7 +581,7 @@ led0_off
 #warning "***** IDENTIFICATION MODE ON *****"
 		can_send_broadcast_identification(IDENTIF); //IDENTIF is the axis number 
 #endif
-	
+	 
 
 //	Check for the MAIN LOOP duration
  
