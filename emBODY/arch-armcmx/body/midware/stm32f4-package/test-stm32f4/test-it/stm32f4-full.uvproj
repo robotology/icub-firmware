@@ -29,7 +29,7 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>SFD\ST\STM32F4xx\STM32F4xx.sfr</SFDFile>
+          <SFDFile>SFD\ST\STM32F4xx\STM32F40x.sfr</SFDFile>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
           <IncludePath></IncludePath>
@@ -100,7 +100,7 @@
         </CommonProperty>
         <DllOption>
           <SimDllName>SARMCM3.DLL</SimDllName>
-          <SimDllArguments>-MPU</SimDllArguments>
+          <SimDllArguments>-MPU -REMAP</SimDllArguments>
           <SimDlgDll>DCM.DLL</SimDlgDll>
           <SimDlgDllArguments>-pCM4</SimDlgDllArguments>
           <TargetDllName>SARMCM3.DLL</TargetDllName>
@@ -151,7 +151,7 @@
             <CpuDllArguments></CpuDllArguments>
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
-            <InitializationFile>.\STM32F4xx_TP.ini</InitializationFile>
+            <InitializationFile>.\stm32-cfg.ini</InitializationFile>
             <Driver>BIN\ULP2CM3.DLL</Driver>
           </TargetDlls>
         </DebugOption>
@@ -162,10 +162,10 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>4101</DriverSelection>
+            <DriverSelection>4100</DriverSelection>
           </Flash1>
           <Flash2>BIN\ULP2CM3.DLL</Flash2>
-          <Flash3>"" ()</Flash3>
+          <Flash3></Flash3>
           <Flash4></Flash4>
         </Utilities>
         <TargetArmAds>
@@ -333,8 +333,8 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
-            <oTime>1</oTime>
+            <Optim>1</Optim>
+            <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>0</OneElfS>
             <Strict>0</Strict>
@@ -342,21 +342,21 @@
             <PlainCh>0</PlainCh>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
-            <wLevel>2</wLevel>
+            <wLevel>0</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>STM32F4XX</Define>
+              <Define>STM32F4XX USE_STDPERIPH_DRIVER USE_BRD_MCBSTM32_F400</Define>
               <Undefine></Undefine>
-              <IncludePath>..\app-test;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc</IncludePath>
+              <IncludePath>..\..\stm32f4\stm32f4-api;..\..\stm32f4\stm32f4-inc;..\app-test;..\..\stm32f4\stm32f4-ext;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
             <interw>1</interw>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
-            <thumb>0</thumb>
+            <thumb>1</thumb>
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
@@ -388,7 +388,7 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>cmsis-from-sys</GroupName>
+          <GroupName>cmsis</GroupName>
           <Files>
             <File>
               <FileName>system_stm32f4xx.c</FileName>
@@ -398,7 +398,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>cmsis-cfg-local</GroupName>
+          <GroupName>cmsis-cfg</GroupName>
           <Files>
             <File>
               <FileName>startup_stm32f4xx.s</FileName>
@@ -411,24 +411,179 @@
           <GroupName>application</GroupName>
           <Files>
             <File>
-              <FileName>led_mcbstm32f400.c</FileName>
+              <FileName>blinky-stm32f4-stm32fx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app-test\led_mcbstm32f400.c</FilePath>
+              <FilePath>..\app-test\blinky-stm32f4-stm32fx.c</FilePath>
             </File>
             <File>
-              <FileName>main_STM32F407.c</FileName>
+              <FileName>brd_mcbstm32x.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app-test\main_STM32F407.c</FilePath>
+              <FilePath>..\app-test\brd_mcbstm32x.c</FilePath>
+            </File>
+            <File>
+              <FileName>systickservices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app-test\systickservices.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>lib</GroupName>
+          <GroupName>stm32f4</GroupName>
           <Files>
             <File>
-              <FileName>stm32f4.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\mid\lib\stm32f4.lib</FilePath>
+              <FileName>stm32f4xx__misc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx__misc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_can.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_crc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_crc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_cryp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_cryp.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_cryp_aes.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_cryp_aes.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_cryp_des.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_cryp_des.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_cryp_tdes.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_cryp_tdes.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_dac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_dac.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_dbgmcu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_dbgmcu.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_dcmi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_dcmi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_exti.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_fsmc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_fsmc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_hash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_hash.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_hash_md5.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_hash_md5.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_hash_sha1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_hash_sha1.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_iwdg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_iwdg.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_pwr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_pwr.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_rcc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_rcc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_rng.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_sdio.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_syscfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_syscfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_tim.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_wwdg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\stm32f4\stm32f4-src\stm32f4xx_wwdg.c</FilePath>
             </File>
           </Files>
         </Group>

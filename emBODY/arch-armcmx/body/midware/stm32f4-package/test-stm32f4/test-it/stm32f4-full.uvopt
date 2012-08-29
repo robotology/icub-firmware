@@ -82,10 +82,20 @@
           <Title>Reference Manual</Title>
           <Path>DATASHTS\ST\STM32F4xx.PDF</Path>
         </Book>
+        <Book>
+          <Number>1</Number>
+          <Title>Technical Reference Manual</Title>
+          <Path>datashts\arm\cortex_m4\r0p1\DDI0439C_CORTEX_M4_R0P1_TRM.PDF</Path>
+        </Book>
+        <Book>
+          <Number>2</Number>
+          <Title>Generic User Guide</Title>
+          <Path>datashts\arm\cortex_m4\r0p1\DUI0553A_CORTEX_M4_DGUG.PDF</Path>
+        </Book>
       </Books>
       <DllOpt>
         <SimDllName>SARMCM3.DLL</SimDllName>
-        <SimDllArguments>-MPU</SimDllArguments>
+        <SimDllArguments>-MPU -REMAP</SimDllArguments>
         <SimDlgDllName>DCM.DLL</SimDlgDllName>
         <SimDlgDllArguments>-pCM4</SimDlgDllArguments>
         <TargetDllName>SARMCM3.DLL</TargetDllName>
@@ -122,14 +132,14 @@
         <tDllPa></tDllPa>
         <tDlgDll></tDlgDll>
         <tDlgPa></tDlgPa>
-        <tIfile>.\STM32F4xx_TP.ini</tIfile>
+        <tIfile>.\stm32-cfg.ini</tIfile>
         <pMon>BIN\ULP2CM3.DLL</pMon>
       </DebugOpt>
       <TargetDriverDllRegistry>
         <SetRegEntry>
           <Number>0</Number>
           <Key>ULP2CM3</Key>
-          <Name>-UP1123158 -O207 -S8 -C0 -P00 -N00("ARM CoreSight SW-DP") -D00(2BA01477) -L00(0) -TO4115 -TC168000000 -TP8 -TDX0 -TDD0 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_1024 -FS08000000 -FL0100000</Name>
+          <Name>-UP1123158 -O207 -S8 -C0 -P00 -N00("ARM CoreSight SW-DP") -D00(2BA01477) -L00(0) -TO18 -TC168000000 -TP18 -TDX0 -TDD0 -TDS8000 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_1024 -FS08000000 -FL0100000</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -169,7 +179,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>UL2CM3</Key>
-          <Name>-O207 -S0 -C0 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_1024 -FS08000000 -FL0100000)</Name>
+          <Name>-UV0153FBE -O206 -S0 -C0 -N00("ARM CoreSight SW-DP") -D00(1BA01477) -L00(0) -TO2 -TC72000000 -TP21 -TDS803D -TDT2 -TDC1F -TIEFFFFFFFF -TIP9 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_512 -FS08000000 -FL040000</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
       <Breakpoint/>
@@ -182,46 +192,19 @@
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
+          <ItemText>SystemCoreClock,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>2</count>
+          <WinNumber>1</WinNumber>
           <ItemText>delta,0x0A</ItemText>
         </Ww>
-        <Ww>
-          <count>2</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>prev</ItemText>
-        </Ww>
-        <Ww>
-          <count>3</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>TIM_TimeBaseStructure</ItemText>
-        </Ww>
       </WatchWindow1>
-      <WatchWindow2>
-        <Ww>
-          <count>0</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>xxxx</ItemText>
-        </Ww>
-        <Ww>
-          <count>1</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>yyyy</ItemText>
-        </Ww>
-        <Ww>
-          <count>2</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>adr</ItemText>
-        </Ww>
-        <Ww>
-          <count>3</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>orig</ItemText>
-        </Ww>
-      </WatchWindow2>
       <MemoryWindow1>
         <Mm>
           <WinNumber>1</WinNumber>
           <SubType>0</SubType>
-          <ItemText>&amp;RCC-&gt;APB1ENR</ItemText>
+          <ItemText>flashaddr</ItemText>
         </Mm>
       </MemoryWindow1>
       <DebugFlag>
@@ -256,7 +239,7 @@
   </Target>
 
   <Group>
-    <GroupName>cmsis-from-body</GroupName>
+    <GroupName>cmsis</GroupName>
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -266,38 +249,24 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>1</ColumnNumber>
+      <ColumnNumber>11</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>189</TopLine>
+      <CurrentLine>189</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\cmsis-package\cmsis\cmsis-src\core\core_cm3.c</PathWithFileName>
-      <FilenameWithoutPath>core_cm3.c</FilenameWithoutPath>
-    </File>
-    <File>
-      <GroupNumber>1</GroupNumber>
-      <FileNumber>2</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>14</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\cmsis-package\cmsis\cmsis-src\dev-stm32\system_stm32f4xx.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\sys\mid\src\system_stm32f4xx.c</PathWithFileName>
       <FilenameWithoutPath>system_stm32f4xx.c</FilenameWithoutPath>
     </File>
   </Group>
 
   <Group>
-    <GroupName>cmsis-cfg-local</GroupName>
-    <tvExp>0</tvExp>
+    <GroupName>cmsis-cfg</GroupName>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>2</GroupNumber>
-      <FileNumber>3</FileNumber>
+      <FileNumber>2</FileNumber>
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -313,22 +282,36 @@
 
   <Group>
     <GroupName>application</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <File>
+      <GroupNumber>3</GroupNumber>
+      <FileNumber>3</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>90</TopLine>
+      <CurrentLine>94</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\app-test\blinky-stm32f4-stm32fx.c</PathWithFileName>
+      <FilenameWithoutPath>blinky-stm32f4-stm32fx.c</FilenameWithoutPath>
+    </File>
     <File>
       <GroupNumber>3</GroupNumber>
       <FileNumber>4</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>4</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>83</TopLine>
-      <CurrentLine>264</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\app-test\led_mcbstm32f400.c</PathWithFileName>
-      <FilenameWithoutPath>led_mcbstm32f400.c</FilenameWithoutPath>
+      <PathWithFileName>..\app-test\brd_mcbstm32x.c</PathWithFileName>
+      <FilenameWithoutPath>brd_mcbstm32x.c</FilenameWithoutPath>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -338,11 +321,11 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>40</TopLine>
-      <CurrentLine>41</CurrentLine>
+      <TopLine>98</TopLine>
+      <CurrentLine>102</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\app-test\main_STM32F407.c</PathWithFileName>
-      <FilenameWithoutPath>main_STM32F407.c</FilenameWithoutPath>
+      <PathWithFileName>..\app-test\systickservices.c</PathWithFileName>
+      <FilenameWithoutPath>systickservices.c</FilenameWithoutPath>
     </File>
   </Group>
 
@@ -401,8 +384,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>88</TopLine>
-      <CurrentLine>88</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\stm32f4\stm32f4-src\stm32f4xx_crc.c</PathWithFileName>
       <FilenameWithoutPath>stm32f4xx_crc.c</FilenameWithoutPath>

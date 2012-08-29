@@ -16,25 +16,18 @@
  * Public License for more details
 */
 
-// - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _LED_MCBSTM32F400_H_
-#define _LED_MCBSTM32F400_H_
-
-#include "stdint.h"
-
-typedef enum
-{
-    led_mcbstm32f400_0 = 0,
-    led_mcbstm32f400_1, led_mcbstm32f400_2, led_mcbstm32f400_3, led_mcbstm32f400_4, led_mcbstm32f400_5,
-    led_mcbstm32f400_6, led_mcbstm32f400_7
-} led_mcbstm32f400_t;
-
-extern void led_mcbstm32f400_init (void);
-extern void led_mcbstm32f400_on (led_mcbstm32f400_t led);
-extern void led_mcbstm32f400_off (led_mcbstm32f400_t led);
-
-
+#include "brd_mcbstm32x.h"
+#if     defined(USE_BRD_MCBSTM32_C)
+    #include "brd_mcbstm32c.c" 
+#elif   defined(USE_BRD_MCBSTM32_F200)
+    #include "brd_mcbstm32f200.c" 
+#elif   defined(USE_BRD_MCBSTM32_F400)
+    #include "brd_mcbstm32f400.c" 
+#else
+    #error --> define a board
 #endif
+
+
 
 
 
