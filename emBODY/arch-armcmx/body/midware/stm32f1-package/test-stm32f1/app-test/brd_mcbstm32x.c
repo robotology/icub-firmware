@@ -1,9 +1,5 @@
-
-// flash.h
-
-
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -20,17 +16,18 @@
  * Public License for more details
 */
 
-extern uint32_t hal_FLASH_Lock(void);
+#include "brd_mcbstm32x.h"
+#if     defined(USE_BRD_MCBSTM32_C)
+    #include "brd_mcbstm32c.c" 
+#elif   defined(USE_BRD_MCBSTM32_F200)
+    #include "brd_mcbstm32f200.c" 
+#elif   defined(USE_BRD_MCBSTM32_F400)
+    #include "brd_mcbstm32f400.c" 
+#else
+    #error --> define a board
+#endif
 
-extern uint32_t hal_FLASH_Unlock(void);
-
-extern uint32_t hal_FLASH_SetLatency(uint32_t lat);
-
-extern uint32_t hal_FLASH_ErasePage(uint32_t addr);
-
-extern uint32_t hal_FLASH_WriteWord(uint32_t addr, uint32_t data);
-
-extern uint32_t hal_FLASH_WritePage(uint32_t addr, uint32_t size, uint8_t *buff);
 
 
-extern uint32_t hal_FLASH_WriteU16(uint32_t addr, uint16_t hword);
+
+

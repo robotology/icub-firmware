@@ -27,9 +27,9 @@
 	@date       07/29/2010
 **/
 
-/* @defgroup stm32f1 
+/* @defgroup stm32f1 HW library for STM32F1x series 
     
-    @todo   maybe to place in here some decription of the api used for tha hal ...
+    @todo   maybe to place in here some decription of the api used for the stm32f1 ...
     
     @{		
  **/
