@@ -10,7 +10,7 @@ typedef struct sPwmControlBL_tag
 {
 	UWord16    Mask;
 	UWord16    MaskOut;
-} sPwmControlBL;
+} sPwmControlBL; 
 
 #define NORMAL_COMMUTATION_INTERVAL  342   //resolution of the encoder for an electric turn (8192/4)/6=341.3       
 #define SHORT_COMMUTATION_INTERVAL   338    //(2048-(5*342) this step is longer to compensate the 0.3 tick each step 
