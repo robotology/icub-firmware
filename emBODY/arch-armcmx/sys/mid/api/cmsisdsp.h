@@ -27,7 +27,7 @@
 	@date       12/15/2010
 **/
 
-/* @defgroup cmsisdsp 
+/* @defgroup cmsisdsp CMSIS DSP
     
     @todo   maybe to place in here some decription of the api used for ...
     
