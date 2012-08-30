@@ -150,7 +150,7 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_rt_iit_debug_global_init(void);
+extern void rt_iit_debug_global_init(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1533,7 +1533,7 @@ void rt_iit_sys_start(oosiit_task_properties_t* inittsk, oosiit_task_properties_
 // moved earlier when loading the cfg: rt_iit_memory_init();               //IIT-EXT
 
 //    DBG_INIT();                       //IIT-EXT    
-    s_rt_iit_debug_global_init();       //IIT-EXT
+//    s_rt_iit_debug_global_init();       //IIT-EXT
 
 
     // Initialize dynamic memory and task TCB pointers to NULL. 
@@ -1594,7 +1594,7 @@ void rt_iit_sys_start(oosiit_task_properties_t* inittsk, oosiit_task_properties_
     }
 
 
-    rt_psh_req();					    //IIT-EXT ???
+    rt_psh_req();					    //IIT-EXT: just to force a pendsv call after this function call
 
     
     /* Start up first user task before entering the endless loop */
@@ -1751,6 +1751,19 @@ void os_idle_demon (void) {
   }
 }
 
+void os_error(uint32_t errorcode) 
+{
+    if( (OS_ERR_STK_OVF == errorcode) || (OS_ERR_FIFO_OVF == errorcode) || (OS_ERR_MBX_OVF == errorcode) )
+    {
+        oosiit_sys_error((oosiit_error_code_t) errorcode);
+    }
+    else
+    {
+        oosiit_sys_error(oosiit_error_unknown);
+    }
+
+}
+
 
 
 // - management of system calls with itm ------------------------------------------------------------------------------
@@ -1781,15 +1794,23 @@ static uint8_t oosiit_dbg_initted = 0;
 
 extern void rt_iit_dbg_init(void)
 {
-  if ((DEMCR & DEMCR_TRCENA)     && 
-      (ITM_CONTROL & ITM_ITMENA) &&
-      (ITM_ENABLE & (1UL << 31))) {
-    oosiit_dbg_initted = 1;
-  } 
-  else {
-    oosiit_dbg_initted = 0;
-  }   
-  oosiit_dbg_initted = oosiit_dbg_initted; 
+//   if ((DEMCR & DEMCR_TRCENA)     && 
+//       (ITM_CONTROL & ITM_ITMENA) &&
+//       (ITM_ENABLE & (1UL << 31))) {
+//     oosiit_dbg_initted = 1;
+//   } 
+//   else {
+//     oosiit_dbg_initted = 0;
+//   } 
+    if(ev_res_OK == eventviewer_init())
+    {
+        oosiit_dbg_initted = 1;
+    } 
+    else
+    {
+        oosiit_dbg_initted = 0;
+    }
+    oosiit_dbg_initted = oosiit_dbg_initted; 
 }
 
 
@@ -1942,7 +1963,7 @@ extern void rt_iit_dbg_svc_exit(void){;}
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_rt_iit_debug_global_init(void)
+extern void rt_iit_dbg_global_init(void)
 {
 #ifdef OOSIIT_DBG_ENABLE  
     rt_iit_dbg_init();              

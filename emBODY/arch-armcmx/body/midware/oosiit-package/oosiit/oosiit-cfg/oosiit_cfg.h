@@ -30,11 +30,11 @@
 // <i> It holds params both for CMSIS-RTOS RTX and for IIT extension
 
 
-// <h> CMSIS-RTOS RTX (V4.20)
+// <h> CMSIS-RTOS RTX
 // <i> The same as the CMSIS-RTOS RTX configuration
 
 // #IIT comment#
-// the following code is adapted from file RTX_Conf_CM.C, V4.20, in the section between:
+// the following code is adapted from file RTX_Conf_CM.C, V4.20 or successive, in the section between:
 // RTX User configuration part BEGIN
 // and: 
 // end of configuration section
@@ -61,13 +61,13 @@
  #define OOSIIT_STKCHECK    1
 #endif
 
-// <q> run in cmx privileded mode
-// =========================
-// <i> run all tasks in privileged mode.
-// <i> default: privileged
-#ifndef OOSIIT_RUNPRIV
- #define OOSIIT_RUNPRIV     1
-#endif
+// // q> run in cmx privileded mode
+// // =========================
+// // i> run all tasks in privileged mode.
+// // i> default: privileged
+// #ifndef OOSIIT_RUNPRIV
+//  #define OOSIIT_RUNPRIV     0
+// #endif
 
 // </h>
 // <h> systick timer configuration
@@ -135,8 +135,8 @@
 // <i> It holds IIT extension
 
 //   <o> number of advanced timers <0-250>
-//   <i> Define max. number of user timers that will run at the same time.
-//   <i> Default: 0  (User timers disabled)
+//   <i> define max. number of timers that will run at the same time.
+//   <i> default: 0  (timers disabled)
 #ifndef OOSIIT_ADVTIMERCNT
  #define OOSIIT_ADVTIMERCNT    6
 #endif
@@ -169,7 +169,7 @@
 //   <i> Define max. number of elements that can be contained in every message box.
 //   <i> Default: 0  (Message boxes not enabled)
 #ifndef OOSIIT_MBOXELEMENTCNT
- #define OOSIIT_MBOXELEMENTCNT    20
+ #define OOSIIT_MBOXELEMENTCNT    40
 #endif
 
 

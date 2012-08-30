@@ -47,6 +47,7 @@ extern "C" {
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
+#define OOSIIT_MAXWAIT      0xfffffffe
 #define OOSIIT_NOTIMEOUT    0xffffffff
 #define OOSIIT_ASAPTIME     0xffffffffffffffff
 
@@ -150,9 +151,24 @@ typedef struct
 } oosiit_task_properties_t;
 
 
+/** @typedef    typedef enum oosiit_error_code_t 
+    @brief      contains all possible types of error managed by oosiit.
+ **/ 
+typedef enum
+{
+    oosiit_error_unknown                = 0,        /**< nasty one */
+    oosiit_error_stackoverflow          = 1,        /**< a task has used all its stack */
+    oosiit_error_isrfifooverflow        = 2,        /**< too many calls from an ISR */
+    oosiit_error_mbxoverflow            = 3,        /**< to be undestood */
+    oosiit_error_internal_stdlibspace   = 10,       /**< there is no stdlib space available */
+    oosiit_error_internal_sysmutex      = 11        /**< too many calls to system mutex */
+} oosiit_error_code_t;
+
+
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
+extern const uint32_t oosiit_maxwait;
 extern const uint32_t oosiit_notimeout; // = OOSIIT_NOTIMEOUT
 extern const uint64_t oosiit_asaptime;  // = OOSIIT_ASAPTIME
 
@@ -233,6 +249,12 @@ extern oosiit_result_t oosiit_sys_suspend(void);
  **/
 extern oosiit_result_t oosiit_sys_resume(void);
 
+
+/** @fn         extern void oosiit_sys_error(oosiit_error_code_t errorcode)
+    @brief      called in case of errors. the user can redefine it as it is internally defined as weak.
+    @param      errorcode       tells what happened.    
+ **/ 
+extern void oosiit_sys_error(oosiit_error_code_t errorcode);
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

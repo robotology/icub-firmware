@@ -223,6 +223,8 @@ extern void iitchanged_rt_chk_robin(void);
 
 // - debug routines -
 
+extern void rt_iit_dbg_global_init(void);
+
 extern void rt_iit_dbg_init(void);
 
 extern void rt_iit_dbg_task_notify(void* ptcb, BOOL create);

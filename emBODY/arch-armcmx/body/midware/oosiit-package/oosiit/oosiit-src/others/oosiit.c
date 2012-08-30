@@ -312,6 +312,8 @@ extern oosiit_result_t oosiit_sys_start(oosiit_task_properties_t* tskinit, oosii
         os_set_env();
         // set the os as started
         s_oosiit_started = 1;
+        // init debug (if any)
+        rt_iit_dbg_global_init();
         // call svc
         __svc_oosiit_sys_start(tskinit, tskidle);
     }
@@ -377,6 +379,11 @@ extern oosiit_result_t oosiit_sys_resume(void)
     }
     
     return(oosiit_res_OK);
+}
+
+__weak void extern oosiit_sys_error(oosiit_error_code_t errorcode)
+{
+    for(;;);
 }
 
 // - miscellanea ------------------------------------------------------------------------------------------------------

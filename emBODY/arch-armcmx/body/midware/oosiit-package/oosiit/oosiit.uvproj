@@ -1343,9 +1343,9 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>__CORTEX_M3 NDBG_MSG NDBG_MSG_SVC NDBG_MSG_PENDSV NDBG_MSG_SYSTICK</Define>
+              <Define>__CORTEX_M3 NDBG_MSG</Define>
               <Undefine></Undefine>
-              <IncludePath>.\oosiit-api;.\oosiit-src\cmsis-rtx-modified\cm;.\oosiit-src\others;..\..\..\..\sys\mid</IncludePath>
+              <IncludePath>.\oosiit-api;.\oosiit-src\cmsis-rtx-modified\cm;.\oosiit-src\others;..\..\..\..\sys\mid; ..\..\..\..\sys\mid\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1541,7 +1541,7 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>osiit-cm3-dbg-le</TargetName>
+      <TargetName>oosiit-cm3-dbg-le</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -1578,7 +1578,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Obj\</OutputDirectory>
-          <OutputName>osiit.cm3.dbg</OutputName>
+          <OutputName>oosiit.cm3.dbg</OutputName>
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -1609,7 +1609,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\osiit.cm3.dbg.lib .\osiit-lib\osiit.cm3.dbg.lib</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\oosiit.cm3.dbg.lib .\oosiit-lib\oosiit.cm3.dbg.lib</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -1881,9 +1881,9 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>__CORTEX_M3 OOSIIT_DBG_ENABLE OOSIIT_DBG_ENABLE OOSIIT_DBG_SYSTICK OOSIIT_DBG_SVC OOSIIT_DBG_PENDSV</Define>
+              <Define>__CORTEX_M3 OOSIIT_DBG_ENABLE</Define>
               <Undefine></Undefine>
-              <IncludePath>.\oosiit-api;.\oosiit-src\cmsis-rtx-modified\cm;.\oosiit-src\others;..\..\..\..\sys\mid</IncludePath>
+              <IncludePath>.\oosiit-api;.\oosiit-src\cmsis-rtx-modified\cm;.\oosiit-src\others;..\..\..\..\sys\mid; ..\..\..\..\sys\mid\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -3075,7 +3075,7 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>osiit-cm4-le</TargetName>
+      <TargetName>oosiit-cm4-le</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -3112,7 +3112,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Obj\</OutputDirectory>
-          <OutputName>osiit.cm4</OutputName>
+          <OutputName>oosiit.cm4</OutputName>
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -3143,7 +3143,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\osiit.cm4.lib .\osiit-lib\osiit.cm4.lib</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\oosiit.cm4.lib .\oosiit-lib\oosiit.cm4.lib</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -3415,9 +3415,9 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>NDBG_MSG NDBG_MSG_SVC NDBG_MSG_PENDSV NDBG_MSG_SYSTICK</Define>
+              <Define>__CORTEX_M4 __FPU_PRESENT</Define>
               <Undefine></Undefine>
-              <IncludePath>.\rl-rtx-modified\CM;.\osiit-api;.\osiit-ext\CM;.\osiit-strg;.\osiit-inc</IncludePath>
+              <IncludePath>.\oosiit-api;.\oosiit-src\cmsis-rtx-modified\cm;.\oosiit-src\others;..\..\..\..\sys\mid; ..\..\..\..\sys\mid\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -3613,7 +3613,7 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>osiit-cm4-dbg-le</TargetName>
+      <TargetName>oosiit-cm4-dbg-le</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -3650,7 +3650,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Obj\</OutputDirectory>
-          <OutputName>osiit.cm4.dbg</OutputName>
+          <OutputName>oosiit.cm4.dbg</OutputName>
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -3681,7 +3681,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\osiit.cm4.dbg.lib .\osiit-lib\osiit.cm4.dbg.lib</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\oosiit.cm4.dbg.lib .\oosiit-lib\oosiit.cm4.dbg.lib</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -3953,9 +3953,9 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>DBG_MSG DBG_MSG_SVC DBG_MSG_PENDSV DBG_MSG_SYSTICK</Define>
+              <Define>__CORTEX_M4 __FPU_PRESENT OOSIIT_DBG_ENABLE</Define>
               <Undefine></Undefine>
-              <IncludePath>.\rl-rtx-modified\CM;.\osiit-api;.\osiit-ext\CM;.\osiit-strg;.\osiit-inc;..\..\..\..\sys\mid</IncludePath>
+              <IncludePath>.\oosiit-api;.\oosiit-src\cmsis-rtx-modified\cm;.\oosiit-src\others;..\..\..\..\sys\mid; ..\..\..\..\sys\mid\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>

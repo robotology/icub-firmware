@@ -210,7 +210,7 @@ __USED uint32_t os_timernum                     = 0;
 #if defined (__CC_ARM) && !defined (__MICROLIB)
 
 #ifndef OSIIT_USE_EXTERNAL_TREADSAFETY
-extern void os_error(uint32_t err_code);
+
 
 /*--------------------------- __user_perthread_libspace ---------------------*/
 
@@ -226,7 +226,7 @@ void *__user_perthread_libspace (void) {
 
     if(NULL == std_libspace)
     {
-        os_error(0x60000003);    
+        oosiit_sys_error(oosiit_error_internal_stdlibspace);    
     }
 
   return ((void *)&std_libspace[idx-1]);
@@ -248,7 +248,7 @@ int _mutex_initialize(OS_ID *mutex)
     if(nr_mutex_hidden >= OSIIT_SYSMUTEXCNT_HIDDEN) 
     {
         // if in here, you need to increase OSIIT_SYSMUTEXCNT_HIDDEN
-        os_error(0x60000004);
+        oosiit_sys_error(oosiit_error_internal_sysmutex);
     }
 
 
