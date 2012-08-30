@@ -34,7 +34,7 @@
 byte	_board_ID = 16;	
 char    _additional_info [32];
 UInt8    mainLoopOVF=0;
-word    _build_number = 61;
+word    _build_number = 62;
 int     _countBoardStatus[2] ={0,0};
 Int16   _flash_version=0; 
 UInt8   BUS_OFF=false;
@@ -484,7 +484,6 @@ void main(void)
 		for (i=0; i<JN; i++)  check_range(i, _safeband[i], PWMoutput);
 
 //******************************************* COMPUTES CONTROLS *****************************/
-led0_on	
 
 		//FT sensor watchdog update 
 		for (i=0; i<STRAIN_MAX; i++) 
@@ -522,9 +521,7 @@ led0_on
 #else
 		decouple_dutycycle(PWMoutput);				
 #endif
-
-
-led0_off	
+	
 		
 //******************************************* SATURATES CONTROLS ***************************/                
 		/* back emf compensation + controls saturation (if necessary) */
