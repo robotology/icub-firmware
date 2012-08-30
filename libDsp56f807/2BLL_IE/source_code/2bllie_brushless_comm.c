@@ -128,7 +128,6 @@ void TD0_interrupt(void)
 {
 	UInt8 tmp,val;
 	static Int16 counter = 0;
-led1_on;
 
 	if ((status0==0x00) || (status0==0x07))
 	{
@@ -138,7 +137,7 @@ led1_on;
 	{
     	hall_error[1] |=HALL_ERROR_TD0;
 	}
-
+   
 	if (DutyCycleReq[0].Duty < MIN_DUTY)
 		DutyCycleReq[0].Duty=MIN_DUTY;
 	if (DutyCycleReq[0].Duty > MAX_DUTY)
@@ -178,14 +177,7 @@ led1_on;
 				
 			} 
 		    // after a direction change the pwm must be changed immediately, before a hall sensor changed  
-		if (COMMUTATION_MODE==HALL)
-		{
-				status0=HALLSENSOR0; 
-		}
-		else 
-  		{
-  		 	// do not read the status here.
-  		}
+		status0=HALLSENSOR0; 
 		
 			PWMState[0] = pTable0[status0];
 			tmp = getReg(PWMA_PMOUT) & 0x8000;
@@ -205,7 +197,6 @@ led1_on;
 				if (DutyCycleReq[0].Duty-DutyCycle[0].Duty>=STEP)
 				{
 					DutyCycle[0].Duty=DutyCycle[0].Duty+STEP;
-					led1_off;
 				}		
 				else
 					DutyCycle[0].Duty=DutyCycleReq[0].Duty;

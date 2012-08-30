@@ -110,22 +110,27 @@ void PWMAReload_Interrupt(void)
 			{
 				hall_error[0]=HALL_ERROR_TABLE;
 				PWM_outputPadDisable(0);
-				#warning "debug"
+			#ifdef DEBUG_CAN_MSG	
 				can_printf("HALL ERROR 0");
+			#endif
 			} 
 
 	}
+	/* //controllo già fatto nel TD0
 	else 
 	{
+	
 		if ((status0==0x0) || (status0==0x07))
 		{
 			hall_error[0]=HALL_ERROR_TABLE;
 			PWM_outputPadDisable(0);
-			#warning "debug"
+		#ifdef DEBUG_CAN_MSG
 			can_printf("HALL ERROR 0");
-//	 		phase_changed[0]=0;	
+		#endif	
 		}
+	
 	}
+	*/
 
 
 
@@ -134,7 +139,7 @@ void PWMAReload_Interrupt(void)
 
 
 
-#pragma interrupt saveall
+#pragma interrupt 
 void PWMBReload_Interrupt(void)
 {	
 	//clear the interrupt flag of the pwm reload interrupt
@@ -168,24 +173,26 @@ void PWMBReload_Interrupt(void)
 			else
 			{
 				hall_error[1]=HALL_ERROR_TABLE;
-	
 				PWM_outputPadDisable(1);
-				#warning "debug"
+			#ifdef DEBUG_CAN_MSG
 				can_printf("HALL ERROR 1");
-		
+			#endif
 			}    
 
 	}
+	/*
 	else
 	{		
 		if ((status1==0x0) || (status1==0x07))
 		{
 			hall_error[1]=HALL_ERROR_TABLE;
-			#warning "debug"
+		
 			can_printf("HALL ERROR 1");
+	
 			PWM_outputPadDisable(1);
 		}
 	}
+	*/
 }
 
 #pragma interrupt called

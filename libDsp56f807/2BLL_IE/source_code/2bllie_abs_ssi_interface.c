@@ -49,10 +49,19 @@ void init_position_abs_ssi()
 	//SPIEN2: GPIOA1
 	setRegBits(GPIO_A_DDR,GPIO_A1);   
 	clrRegBits(GPIO_A_PER,GPIO_A1); 
+	//SPIEN3: GPIOB0	
+	setRegBits(GPIO_B_DDR,GPIO_B0);   
+	clrRegBits(GPIO_B_PER,GPIO_B0); 
+	//SPIEN4: GPIOB1
+	setRegBits(GPIO_B_DDR,GPIO_B1);   
+	clrRegBits(GPIO_B_PER,GPIO_B1); 
 	
 	setRegBits(GPIO_E_DR,0x04);
 	setRegBits(GPIO_A_DR,GPIO_A0);
 	setRegBits(GPIO_A_DR,GPIO_A1);
+	
+	setRegBits(GPIO_B_DR,GPIO_B0);
+	setRegBits(GPIO_B_DR,GPIO_B1);
 	
 	max_real_position[0]=4095;
 	max_real_position[1]=4095;	
@@ -102,7 +111,8 @@ UInt16 get_absolute_real_position_abs_ssi(byte jnt)
 	byte   mask=(1<<jnt);
 		
 	setRegBits(GPIO_E_DR,GPIO_E4); //CLK
-	clrRegBits(GPIO_A_DR,mask);	//ENABLE
+	clrRegBits(GPIO_A_DR,mask);	//ENABLE SPIEN1 o 2
+	clrRegBits(GPIO_B_DR,mask);	//ENABLE SPIEN3 o 4
 	for(j=0;j<=5;j++)
 	asm
 	{
@@ -132,7 +142,9 @@ UInt16 get_absolute_real_position_abs_ssi(byte jnt)
 		 	status[jnt].wordbb[i-12]=getRegBits(GPIO_E_DR,GPIO_E6);	 	
 		}
 	}
-	setRegBits(GPIO_A_DR,mask); //DISABLE	
+	setRegBits(GPIO_A_DR,mask); //DISABLE	SPIEN1 o 2
+    setRegBits(GPIO_B_DR,mask);	//DISABLE SPIEN3 o 4
+	
 	return (UInt16) value;
 }
 

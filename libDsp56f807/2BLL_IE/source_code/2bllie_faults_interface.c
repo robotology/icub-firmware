@@ -105,6 +105,7 @@ void FaultB_Interrupt(void)
 /**
  * 
  ******************************************************************************/
+#pragma interrupt called
 void FaultInterruptDisable(byte axis)
 {
 	if 		(axis==0) 

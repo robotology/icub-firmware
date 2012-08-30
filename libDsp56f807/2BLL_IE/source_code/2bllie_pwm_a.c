@@ -94,7 +94,7 @@ void PWM_A_outputPadEnable (word mask)
 }
 
 /**************************************************************************************/
-
+#pragma interrupt called
 void PWM_A_outputPadDisable (word mask)
 {
 	clrRegBit(PWMA_PMOUT,PAD_EN);

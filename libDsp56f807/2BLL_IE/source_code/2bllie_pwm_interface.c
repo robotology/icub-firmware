@@ -36,11 +36,13 @@ void init_pwm(void)
  * This method disables the PWM generation on the specified channel
  * @param axis is the axis number
  ***************************************************************************/
+#pragma interrupt called
 void PWM_outputPadDisable(byte axis)
 {
-
+	#ifdef DEBUG_CAN_MSG
 	can_printf("PWM DIS CH%d", axis);
-
+	#endif
+	
 	if (axis == 0)
 	{  
 		led0_off
@@ -119,17 +121,15 @@ void PWM_generate_BLL(byte i, Int16 pwm_value)
 		PWM_A_setDuty (0, (unsigned char)(pwm_value & 0x7fff));
 		PWM_A_setDuty (2, (unsigned char)(pwm_value & 0x7fff));
 		PWM_A_setDuty (4, (unsigned char)(pwm_value & 0x7fff));
+		PWM_A_load();
 	}
 	else if (i==1)
 	{
 		PWM_B_setDuty (0, (unsigned char)(pwm_value & 0x7fff));
 		PWM_B_setDuty (2, (unsigned char)(pwm_value & 0x7fff));
 		PWM_B_setDuty (4, (unsigned char)(pwm_value & 0x7fff));
-	}
-	
-
-	if  (i==0)  PWM_A_load();
-	else		PWM_B_load();
+		PWM_B_load();
+	}	
 }
 
 /***************************************************************************/
