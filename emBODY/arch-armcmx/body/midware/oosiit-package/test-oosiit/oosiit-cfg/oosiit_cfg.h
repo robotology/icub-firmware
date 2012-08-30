@@ -169,7 +169,7 @@
 //   <i> Define max. number of elements that can be contained in every message box.
 //   <i> Default: 0  (Message boxes not enabled)
 #ifndef OOSIIT_MBOXELEMENTCNT
- #define OOSIIT_MBOXELEMENTCNT    20
+ #define OOSIIT_MBOXELEMENTCNT    40
 #endif
 
 

@@ -37,29 +37,22 @@
 #include "oosiit_cfg.h"
 
 
-// --------------------------------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------------------------------
-// - user change-able function definitions for IIT extension. 
-// - .....  
-// --------------------------------------------------------------------------------------------------------------------
-
-// empty
-
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------------------
-// - user change-able function definitions for RL-RTX  
+// - overriddable functions  
 // --------------------------------------------------------------------------------------------------------------------
 
 
+extern void oosiit_sys_error(oosiit_error_code_t errorcode) 
+{
+    volatile static uint32_t err = 0;
 
-void os_error (uint32_t err_code) {
-  /* This function is called when a runtime error is detected. Parameter */
-  /* 'err_code' holds the runtime error code (defined in RTL.H).         */
-
-  /* HERE: include optional code to be executed on runtime error. */
-  for (;;);
+    for(;;)
+    {
+        err = errorcode;
+        err = err;
+    }
 }
 
 
@@ -71,6 +64,10 @@ void os_error (uint32_t err_code) {
 // - ...  
 // --------------------------------------------------------------------------------------------------------------------
 
+#if defined(USE_BRD_MCBSTM32_F400)
+    #undef OOSIIT_CLOCK
+    #define OOSIIT_CLOCK 168000000
+#endif
 
 extern const oosiit_cfg_t oosiit_cfg_USER =
 {
