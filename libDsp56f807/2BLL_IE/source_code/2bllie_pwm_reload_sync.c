@@ -74,7 +74,7 @@ void Init_Hall_Effect_1(void)
 *********************************************************/
 
 
-#pragma interrupt saveall 
+#pragma interrupt
 void PWMAReload_Interrupt(void)
 {	
 	//clear the interrupt flag of the pwm reload interrupt
