@@ -5,6 +5,8 @@
 #include "timer.h"
 #include "ADC.h"
 #include "timers.h"
+#include "l3g4200d.h"
+#include "lis331dlh.h"
 
 /// CAN TX BUFFER 
 static int canTxBufferIndex;
@@ -32,8 +34,10 @@ extern unsigned char ANALOG_ACC;
 extern unsigned int ANALOG_ID;
 extern unsigned char DIG_GYRO;
 extern unsigned char DIG_ACC;
+extern 	tL3GI2COps l3g;
+extern 	tLISI2COps l3a;
 extern unsigned char TEMP_COMPENSATION;
-extern unsigned char OLD_SKIN;
+extern unsigned char SKIN_TYPE;
 extern unsigned int TRIANGLE_MASK;
 extern char _additional_info[32];
 extern unsigned int ConValue[2];
@@ -391,6 +395,7 @@ int CAN1_handleRx (unsigned int board_id)
 					
 					CONFIG_TYPE=(CANRxBuffer[canRxBufferIndex-1].CAN_data[1]&0xF0)>>4;
 					
+					
 					switch (CONFIG_TYPE)
 					{ 
 						case CONFIG_SINGLE:
@@ -430,6 +435,24 @@ int CAN1_handleRx (unsigned int board_id)
 								TIMER_VALUE=TIMER_THREE; // for 64 decim
 							}
 						}	
+						case CONFIG_FINGERTIP:
+						{
+							if ((CANRxBuffer[canRxBufferIndex-1].CAN_data[2]&0xf)==0x1)
+							{	
+								PW_CONTROL= 0x10; // for 256 decim
+					  			TIMER_VALUE=TIMER_SINGLE_256dec; // for 256 decim
+							}
+							if ((CANRxBuffer[canRxBufferIndex-1].CAN_data[2]&0xf)==0x2)
+							{
+								PW_CONTROL= 0x110; // for 128 decim
+								TIMER_VALUE=TIMER_SINGLE_128dec; // for 128 decim
+							}
+							if ((CANRxBuffer[canRxBufferIndex-1].CAN_data[2]&0xf)==0x3)
+							{
+								PW_CONTROL= 0x210; // for 64 decim
+								TIMER_VALUE=TIMER_SINGLE_256dec; // for 64 decim
+							}
+						}	
 						break;
 						case CONFIG_ALL:
 						{
@@ -460,7 +483,9 @@ int CAN1_handleRx (unsigned int board_id)
 		
 						ConValue[0]=(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]) | (CANRxBuffer[canRxBufferIndex-1].CAN_data[5]<<8);
 						ConValue[1]=(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]) | (CANRxBuffer[canRxBufferIndex-1].CAN_data[5]<<8);
-					
+	//					#warning "only for the fingertips"
+						
+	//					ConValue[0]=0x3000;
 					//main();
 					board_MODE=CALIB;
 					EnableIntT1;
@@ -491,8 +516,8 @@ int CAN1_handleRx (unsigned int board_id)
 					//          bit 1: DIGITAL ACCELEROMETER ON/OFF (0,1)
 					//          bit 2: DIGITAL GYROSCOPE ON/OFF (0,1)
 					//          bit 3: INTERNAL TEMPERATURE COMPENSATION ON/OFF (0,1)
-					//          bit 4: OLD SKIN YES/NO (0,1)
-					//          bit 5:
+					//          bit 4: SKIN_TYPE   
+					//          bit 5: SKIN_TYPE          0,1,2  
 					//          bit 6:
 					//          bit 7: 
 					
@@ -500,7 +525,7 @@ int CAN1_handleRx (unsigned int board_id)
 					DIG_ACC      =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x02)>>1;    
 					DIG_GYRO     =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x04)>>2;   
 					TEMP_COMPENSATION =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x08)>>3;
-					OLD_SKIN =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x10)>>4;
+					SKIN_TYPE =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x30)>>4;
 					
 					//data[5] each bit represents the enable/disable of the triangle (each board has 16 triangles
 					//        but not all of them are always connected to the board. In this way you can EN/DIS each triangle
@@ -509,7 +534,7 @@ int CAN1_handleRx (unsigned int board_id)
 					//data [5] bit 0 = 1; => triangle 0 enabled 
 					//data [6] bit 0 = 1; => triangle 8 enabled
 					
-					TRIANGLE_MASK= ((CANRxBuffer[canRxBufferIndex-1].CAN_data[6])<<0xF) & CANRxBuffer[canRxBufferIndex-1].CAN_data[5];
+					TRIANGLE_MASK= ((CANRxBuffer[canRxBufferIndex-1].CAN_data[6])<<8) | CANRxBuffer[canRxBufferIndex-1].CAN_data[5];
 
 					//data[7] time in ms of the accelerometers and gyroscope. From 1 to 255
 					
@@ -529,7 +554,9 @@ int CAN1_handleRx (unsigned int board_id)
 					{
 						 EnableIntT2;
 						 T2_Init(TIMER_VALUE2);
-
+						 L3GInit(l3g);
+				        
+				   	LISInit(l3a);
 					}
 					
 

@@ -67,22 +67,26 @@
 //  MPLAB 8.76
 //
 //  Rev 2.1.0 del 05/04/2012
-//  Added the I2C accelerometer and gyroscope reading for the palm.  
+//  TO DO Added the I2C accelerometer and gyroscope reading for the palm.  
 //  MPLAB 8.76
 //
 
 //  Rev 2.2.0 del 05/06/2012
-//  Added the selection of the triangles to be read with a CAN message for setup
+//  TO DO Added the selection of the triangles to be read with a CAN message for setup
 //  TO DO Temperature compensation in local, by means of Thermal pad     
 //  MPLAB 8.76
 //
 
 //  Rev 2.2.0 del 21/06/2012
-//  Added the selection of the triangles to be read with a CAN message for setup
+//  TO DO Added the selection of the triangles to be read with a CAN message for setup
 //  Temperature compensation in local, by means of Thermal pad: p6 and p10      
 //  MPLAB 8.76
 //
-
+//  Rev 2.2.1 del 17/07/2012
+//  Added the selection of the triangles to be read with a CAN message for setup
+//  Temperature compensation in local, by means of Thermal pad: p6 for the skin_2 and p11 for the palm      
+//  MPLAB 8.76
+//
 
 #include<p30f4011.h>
 #include"can_interface.h"
@@ -124,10 +128,12 @@ _FGS(CODE_PROT_OFF); // Code protection disabled
 //------------------------------------------------------------------------
 static void ServiceAD7147Isr(unsigned char Channel);
 void ServiceAD7147Isr_three(unsigned char Channel);
+static void ServiceAD7147Isr_fingertip(unsigned char Channel);
 void ServiceAD7147Isr_all(unsigned char Channel);
 void Wait(unsigned int value);
 static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN);
 void FillCanMessages8bit_three(unsigned char Channel,unsigned char triangleN);
+static void FillCanMessages8bit_fingertip(unsigned char Channel,unsigned char triangleN);
 void FillCanMessages8bit_all(unsigned char Channel,unsigned char triangleN);
 void FillCanMessages16bit(unsigned char Channel,unsigned char triangleN);
 void FillCanMessages16bit_all(unsigned char Channel,unsigned char triangleN);
@@ -162,7 +168,7 @@ unsigned int AD7147Registers[16][12];  //Element[23] = 0x17 = ID register @ 0x17
 int test=0;
 const	unsigned char AD7147_ADD[4]={0x2C,0x2D,0x2E,0x2F};
 typedef unsigned const int __prog__ * FlashAddress; //flsh address 
-unsigned int __attribute__ ((space(prog), aligned(_FLASH_PAGE*2) ))   CapOffset[16][12]={0,0,0,0,0,0,0,0,0,0,0,
+unsigned int __attribute__ ((space(prog), aligned(_FLASH_PAGE*2)))   CapOffset[16][12]={0,0,0,0,0,0,0,0,0,0,0,
 																						 0,0,0,0,0,0,0,0,0,0,0,
 																					     0,0,0,0,0,0,0,0,0,0,0,
 																					     0,0,0,0,0,0,0,0,0,0,0,
@@ -182,7 +188,7 @@ unsigned int __attribute__ ((space(prog), aligned(_FLASH_PAGE*2) ))   CapOffset[
 const FlashAddress _pCapOffset[16]={&CapOffset[0],&CapOffset[1],&CapOffset[2],&CapOffset[3],&CapOffset[4],&CapOffset[5],&CapOffset[6],&CapOffset[7],
 							     &CapOffset[8],&CapOffset[9],&CapOffset[10],&CapOffset[11],&CapOffset[12],&CapOffset[13],&CapOffset[14],&CapOffset[15]
 							      }; 
-unsigned int __attribute__ ((space(prog), aligned(_FLASH_PAGE*2) ))   CapOffset_all[16][3]={      
+unsigned int __attribute__((space(prog), aligned(_FLASH_PAGE*2) ))   CapOffset_all[16][3]={      
 												                                         0,0,0,
 																				         0,0,0,
 																					     0,0,0,
@@ -221,13 +227,15 @@ unsigned char ANALOG_ACC=0; //analog accelerometer, if one 1 messsage is sent ev
 unsigned int ANALOG_ID=0x550; // default value
 unsigned char DIG_GYRO=0; //gyro of the MMSP 
 unsigned char DIG_ACC=0; //accelerometer of the MMSP 
-unsigned char TEMP_COMPENSATION=0; //if 1 means internal temperature drift compensation 
+unsigned char TEMP_COMPENSATION=1; //if 1 means internal temperature drift compensation 
 int Tpad_base; //initial value of the Tpad
 int Tpad;      //current value of the Tpad
+int Tpad_palm_base; //initial value of the Tpad in the palm
+int Tpad_palm;      //current value of the Tpad in the palm
 int drift;      //current drift
 
-unsigned char OLD_SKIN=0; //if =0 means new skin with drift compensation and 10 pads
-unsigned int TRIANGLE_MASK=0xFF; //all the triangles are enabled for default
+unsigned char SKIN_TYPE=SKIN_2; //if =0 means new skin with drift compensation and 10 pads
+unsigned int TRIANGLE_MASK=0xFFFF; //all the triangles are enabled for default
 unsigned char CONFIG_TYPE=CONFIG_SINGLE;
 unsigned char ERROR_COUNTER=0; //it counts the errors in reading the triangles.
 unsigned char counter=0;
@@ -249,6 +257,7 @@ volatile  int AN4 = 0; //Analog Accelerometer Z axes
 
 extern void ConfigAD7147(unsigned char Channel, unsigned int i,unsigned int pw_control_val, unsigned int * convalue);
 extern void ConfigAD7147_THREE(unsigned char Channel, unsigned int i,unsigned int pw_control_val, unsigned int * convalue);
+extern void ConfigAD7147_FINGERTIP(unsigned char Channel, unsigned int i,unsigned int pw_control_val, unsigned int * convalue);
 extern void ConfigAD7147_ALL(unsigned char Channel, unsigned int i,unsigned int pw_control_val, unsigned int * convalue);
 
 //------------------------------------------------------------------------------
@@ -257,13 +266,6 @@ extern void ConfigAD7147_ALL(unsigned char Channel, unsigned int i,unsigned int 
 void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void)
 {
     flag=1;
- 	//		led0=~led0;
-    // ServiceAD7147Isr(CH0);
- /*  	 for (m=0;m<16;m++)
-	 {
-		FillCanMessages8bit(CH0,m); 	
-     }
-   */
      _T1IF = 0;
 }
 void __attribute__((interrupt, no_auto_psv)) _T2Interrupt(void)
@@ -271,9 +273,6 @@ void __attribute__((interrupt, no_auto_psv)) _T2Interrupt(void)
 	flag2=1;
 	if (ANALOG_ACC)
 {
-	//AN2=32767;
-	//AN3=32768;
-//	AN4=-10;
 	    acc[0]=((AN2 &0xFF00) >>0x8); // axis X
         acc[1]=(AN2 & 0xFF);
         acc[2]=((AN3 &0xFF00) >>0x8); // axis Y
@@ -284,8 +283,8 @@ void __attribute__((interrupt, no_auto_psv)) _T2Interrupt(void)
         while (!CAN1IsTXReady(1));    
                 	CAN1SendMessage( (CAN_TX_SID(ANALOG_ID)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
                         (CAN_TX_EID(0)) & CAN_NOR_TX_REQ, acc, 6,1);
-    //executing the sampling of the
-     ADCON1bits.SAMP = 1;    
+        //executing the sampling of the
+        ADCON1bits.SAMP = 1;    
 } 
 	
     _T2IF = 0;
@@ -410,6 +409,25 @@ if (DIG_GYRO || DIG_ACC)
 		        TrianglesInit_all(CH0);
 		}
 		break;
+		case CONFIG_FINGERTIP:
+		{
+			  for (i=0;i<4;i++)
+    		    {
+        	 		ConfigAD7147_FINGERTIP(CH0,i,PW_CONTROL,ConValue); 
+  		       	}
+  		     	flag=0;
+    			init=0;
+  		     	WriteTimer1(0);
+    			counter=0;
+		        while (flag==0); 
+		        // Calibration
+		        ServiceAD7147Isr_fingertip(CH0);
+		        flag=0;
+		       	WriteTimer1(0);
+                while (flag==0);
+		        TrianglesInit_all(CH0);
+		}
+		break;
 		case CONFIG_ALL:
 		{
 		    for (i=0;i<4;i++)
@@ -506,7 +524,10 @@ if (DIG_GYRO || DIG_ACC)
 	            				 ServiceAD7147Isr(CH0);
 					    	 	 for (i=0;i<16;i++)
 	            				 {
-		 							FillCanMessages8bit(CH0,i); 	
+		            				if (TRIANGLE_MASK & (0x1<<i))
+		            				{   
+		 							FillCanMessages8bit(CH0,i);
+		 							}
 		      					 }
 		      		
 		      				}
@@ -517,6 +538,15 @@ if (DIG_GYRO || DIG_ACC)
 			      				for (i=0;i<16;i++)					
 		            			{
 		 						    FillCanMessages8bit_three(CH0,i); 	
+			      				}
+		      				}
+		      				break;
+		      				case CONFIG_FINGERTIP:
+		      				{
+			      				ServiceAD7147Isr_fingertip(CH0);
+			      				for (i=0;i<16;i++)					
+		            			{
+		 						    FillCanMessages8bit_fingertip(CH0,i); 	
 			      				}
 		      				}
 		      				break;
@@ -568,7 +598,10 @@ if (DIG_GYRO || DIG_ACC)
 					}
 					break;		
 					case  (CALIB):
-					{
+					{ 
+
+						
+						
 						board_MODE=new_board_MODE;
 						switch (CONFIG_TYPE)
 						{
@@ -605,6 +638,25 @@ if (DIG_GYRO || DIG_ACC)
 							        while (flag==0); 
 							        // Calibration
 							        ServiceAD7147Isr_three(CH0);
+							        flag=0;
+							       	WriteTimer1(0);
+					                while (flag==0);
+							        TrianglesInit_all(CH0);
+							}
+							break;
+							case CONFIG_FINGERTIP:
+							{
+								  for (i=0;i<4;i++)
+					    		    {
+					        	 		ConfigAD7147_FINGERTIP(CH0,i,PW_CONTROL,ConValue); 
+					  		       	}
+					  		     	flag=0;
+					    			init=0;
+					  		     	WriteTimer1(0);
+					    			counter=0;
+							        while (flag==0); 
+							        // Calibration
+							        ServiceAD7147Isr_fingertip(CH0);
 							        flag=0;
 							       	WriteTimer1(0);
 					                while (flag==0);
@@ -702,6 +754,21 @@ void ServiceAD7147Isr_three(unsigned char Channel)
 	       ReadViaI2C(CH0,AD7147_ADD[i],(ADCRESULT_S0+0x0B), 3, AD7147Registers[i],AD7147Registers[i+4],AD7147Registers[i+8],AD7147Registers[i+12], ADCRESULT_S0);
 	    }
 }
+static void ServiceAD7147Isr_fingertip(unsigned char Channel)
+{
+    unsigned int i=0;
+   unsigned int ConfigBuffer[0];
+   unsigned int nets=4;
+    
+    		//Calibration configuration
+	ConfigBuffer[0]=0x8000;//0x8000;//0x220;
+  
+	    for (i=0;i<nets;i++)
+	    {		
+	    // Added 0x0B because of register remapping
+	       ReadViaI2C(CH0,AD7147_ADD[i],(ADCRESULT_S0+0x0B), 2, AD7147Registers[i],AD7147Registers[i+4],AD7147Registers[i+8],AD7147Registers[i+12], ADCRESULT_S0);
+	    }
+}
 //------------------------------------------------------------------------
 //					This is just a simple delay routine.
 //------------------------------------------------------------------------
@@ -787,13 +854,17 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
     unsigned int txdata[12];
 
     unsigned int GAIN[12]={70,96,83,38,38,70, 0,45,77,164,0,77}; //this gains are moltiplied by 128 with respect to matlab
+	unsigned int GAIN_PALM[12]={0,0,0,0,0,0,0,0,0,0,0,0}; //this gains are moltiplied by 128 with respect to matlab
 	int UP_LIMIT, BOT_LIMIT;	
 		error=0;
 		UP_LIMIT=((MAXVAL-NOLOAD)<<SHIFT);
 		BOT_LIMIT=(NOLOAD)<<SHIFT;
-		Tpad_base=_pCapOffset[triangleN][ADCRESULT_S6];
-		Tpad=AD7147Registers[triangleN][ADCRESULT_S6];
 		
+		Tpad_base=_pCapOffset[triangleN][ADCRESULT_S6];
+		Tpad=AD7147Registers[triangleN][ADCRESULT_S6];	
+		
+		Tpad_palm_base=_pCapOffset[triangleN][ADCRESULT_S11];
+		Tpad_palm=AD7147Registers[triangleN][ADCRESULT_S11];
 		
 	    for (i=0;i<12;i++)
 	    {
@@ -802,18 +873,48 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
 			    error=1;
 			    ERROR_COUNTER++; 
 			}
-			test=Tpad;
-			if (Tpad>Tpad_base)
+			if (TEMP_COMPENSATION==1)
 			{
-			drift=(((Tpad-Tpad_base)>>2)*GAIN[i])>>5;
-			}
-			else
-			{
-			drift=-((((Tpad_base-Tpad)>>2)*GAIN[i])>>5);	
-			}				
-			test=drift;
-			value=(AD7147Registers[triangleN][ADCRESULT_S0+i]-_pCapOffset[triangleN][i])-drift;    
+				switch (SKIN_TYPE)
+				{
+				case SKIN_2:
+				{
+					if (Tpad>Tpad_base)
+					{
+					drift=(((Tpad-Tpad_base)>>2)*GAIN[i])>>5;
+					}
+					else
+					{
+					drift=-((((Tpad_base-Tpad)>>2)*GAIN[i])>>5);	
+					}				
+					test=drift;
+				}
+				break;
+				
+				case SKIN_PALM:
+				{
+					if (Tpad_palm>Tpad_palm_base)
+					{
+					drift=(((Tpad_palm-Tpad_palm_base)>>2)*GAIN_PALM[i])>>5;
+					}
+					else
+					{
+					drift=-((((Tpad_palm_base-Tpad_palm)>>2)*GAIN_PALM[i])>>5);	
+					}				
+					test=drift;
+				}
+				break;
+				default: 
+				{
+					drift=0;
+				}
+				break;
+				}
+			}	
+			else drift=0;
 			
+			value=(AD7147Registers[triangleN][ADCRESULT_S0+i]-_pCapOffset[triangleN][i])-drift;    
+		    
 		    if (value<=-UP_LIMIT) 
 		    {
 		    	txdata[i]=MAXVAL; // out of range, pressure too low
@@ -878,6 +979,85 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
 		 //	data[7]= (unsigned char) (ERROR_COUNTER &0xFF);
 		
 		    CAN1_send(PMsgID,1,7,data);
+		}
+}
+static void FillCanMessages8bit_fingertip(unsigned char Channel,unsigned char triangleN)
+{
+    unsigned char data[8];
+    unsigned int i,j,error;
+    int value; //difference of the current measurement and the initial value (_pCapOffset)
+    unsigned int txdata[12];
+	int UP_LIMIT, BOT_LIMIT;	
+		error=0;
+		UP_LIMIT=((MAXVAL-NOLOAD)<<SHIFT);
+		BOT_LIMIT=(NOLOAD)<<SHIFT;
+	
+	    for (i=0;i<2;i++)
+	    {
+		    if (((_pCapOffset_all[triangleN][i]!=0) && ((AD7147Registers[triangleN][ADCRESULT_S0+i]==0))))
+		    {
+			    error=1;
+			    ERROR_COUNTER++; 
+			}
+			value=(AD7147Registers[triangleN][ADCRESULT_S0+i]-_pCapOffset_all[triangleN][i]);    
+			
+		    if (value<=-UP_LIMIT) 
+		    {
+		    	txdata[i]=MAXVAL; // out of range, pressure too low
+		    }
+		    if (value>=BOT_LIMIT) 
+		    {
+		    	txdata[i]=MINVAL; // out of range, pressure too high    	
+		    }
+		    if ((value>-UP_LIMIT) && (value<BOT_LIMIT))
+		    {   
+		            txdata[i]=NOLOAD-(value>>SHIFT);
+		    } 
+	    }
+	    //copy the same value to the other pads
+	    txdata[0]=txdata[0];
+	    txdata[2]=txdata[0];
+	    txdata[8]=txdata[0];
+	    txdata[9]=txdata[0];
+	    txdata[10]=txdata[0];
+	    txdata[11]=txdata[0];
+	    
+	    txdata[3]=txdata[1];
+	    txdata[4]=txdata[1];
+	    txdata[5]=txdata[1];
+	    txdata[6]=txdata[1];
+	    txdata[7]=txdata[1];
+	    txdata[1]=txdata[0];
+	    
+	    if (error==1)
+	    {
+	//	      for (j=0;j<4;j++)
+			  
+				j=(triangleN/4);
+				ConfigAD7147(CH0,j,PW_CONTROL,ConValue); //0 is the number of the device
+	    
+			  	
+			  return;
+			   }
+		else 
+		{
+		    PMsgID=0x300;   
+		    PMsgID |= ((triangleN) | BoardConfig.EE_CAN_BoardAddress<<4);
+		    //First message	
+		    data[0]=0x40;       
+			for (i=1;i<8;i++)
+			{
+			    data[i]    = (unsigned char)   (txdata[i-1] & 0xFF); //the last 6 bits	
+		 	}  	
+		    CAN1_send(PMsgID,1,8,data); 
+		    //Second message	
+		    data[0]=0xC0;       
+		   	for (i=1;i<6;i++)
+			{
+			    data[i]    = (unsigned char)   (txdata[i+6] & 0xFF); //the last 6 bits	
+		 	}
+		
+		    CAN1_send(PMsgID,1,6,data);
 		}
 }
 void FillCanMessages8bit_all(unsigned char Channel,unsigned char triangleN)

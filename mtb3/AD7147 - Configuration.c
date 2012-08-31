@@ -14,6 +14,7 @@
 //===============
 void ConfigAD7147(unsigned char Channel,    unsigned int i, unsigned int pw_control_val, unsigned int * convalue); //i is the number of the triangle
 void ConfigAD7147_THREE(unsigned char Channel,unsigned int i,unsigned int pw_control_val, unsigned int *convalue);
+void ConfigAD7147_FINGERTIP(unsigned char Channel,unsigned int i,unsigned int pw_control_val, unsigned int *convalue);
 void ConfigAD7147_ALL(unsigned char Channel,unsigned int i, unsigned int pw_control_val, unsigned int * convalue); //i is the number of the triangle
 
 
@@ -487,6 +488,67 @@ void ConfigAD7147_THREE(unsigned char Channel,unsigned int i,unsigned int pw_con
 	ConfigBuffer[6]=100;
 	ConfigBuffer[7]=100;
 	WriteViaI2C(Channel,AD7147_ADD[i],STAGE2_CONNECTION, 8, ConfigBuffer, 0);//Stage 11 connection registers - Start address in RAM 0xD8
+	
+	//=============================================
+	//= Configure 1st register bank
+	//=============================================
+	//Initialisation of the first register bank but not the AMBCOMPCTL_REG0
+	ConfigBuffer[PWR_CONTROL]=pw_control_val;	// Full power mode enabled at 32ms - 4 sequences - 256 decimation factor
+//	WriteViaI2C(Channel,AD7147_ADD[i],PWR_CONTROL, 1, ConfigBuffer, PWR_CONTROL);
+	// Run data path for all sequences
+
+//	WriteViaI2C(Channel,AD7147_ADD[i],STAGE_CAL_EN, 1, ConfigBuffer, STAGE_CAL_EN);
+	ConfigBuffer[STAGE_CAL_EN]=0x0;//0x0FFF;	
+	//Calibration configuration
+	ConfigBuffer[AMB_COMP_CTRL0]=0x3230;//0x220;
+	ConfigBuffer[AMB_COMP_CTRL1]=0x14C8;//0x14c8
+	ConfigBuffer[AMB_COMP_CTRL2]=0x0832;//0xBFF;//0x0832;
+	//Interrupt configuration
+	ConfigBuffer[STAGE_LOW_INT_EN]=0x0000;
+	ConfigBuffer[STAGE_HIGH_INT_EN]=0x0000;
+	ConfigBuffer[STAGE_COMPLETE_INT_EN]=0x800;//0x0001;
+//	ConfigBuffer[STAGE_LOW_LIMIT_INT]=0x0000;
+//	ConfigBuffer[STAGE_HIGH_LIMIT_INT]=0x0000;
+//	ConfigBuffer[STAGE_COMPLETE_LIMIT_INT]=0xFFF;//0x0FFF;
+//	WriteViaI2C(Channel,AD7147_ADD[i],AMB_COMP_CTRL0, 9, ConfigBuffer, AMB_COMP_CTRL0);
+//	WriteViaI2C(Channel,AD7147_ADD[i],AMB_COMP_CTRL0, 6, ConfigBuffer, AMB_COMP_CTRL0);
+
+	WriteViaI2C(Channel,AD7147_ADD[i],PWR_CONTROL, 8, ConfigBuffer, PWR_CONTROL);
+	// Run data path for all sequences
+	ConfigBuffer[STAGE_CAL_EN]=0x0FFF;//0x0FFF;
+	WriteViaI2C(Channel,AD7147_ADD[i],STAGE_CAL_EN, 1, ConfigBuffer, STAGE_CAL_EN);
+}
+void ConfigAD7147_FINGERTIP(unsigned char Channel,unsigned int i,unsigned int pw_control_val, unsigned int *convalue)
+{
+	unsigned int ConfigBuffer[12];
+	
+	//=============================================
+	//= Stage 0 - Connected to Vbias
+	//=============================================
+	ConfigBuffer[0]=0xFF2A;//0xFFFF; // (CIN0,CIN1,CIN2)
+	ConfigBuffer[1]=0x1FFF;
+//	ConfigBuffer[1]=0x1EAB;//0x1FFF;//0x3FFF;  (CIN8,CIN9,CIN10,CIN11)
+	ConfigBuffer[2]=convalue[0];
+	ConfigBuffer[3]=0x2626;
+	ConfigBuffer[4]=50;
+	ConfigBuffer[5]=50;
+	ConfigBuffer[6]=100;
+	ConfigBuffer[7]=100;
+	WriteViaI2C(Channel,AD7147_ADD[i],STAGE0_CONNECTION, 8, ConfigBuffer, 0);	//Stage 9 connection registers - Start address in RAM 0xC8
+	
+	//=============================================
+	//= Stage 1 - Connected to Vbias
+	//=============================================
+	ConfigBuffer[0]=0x2ABF;//0xEAFF; 5_6_7_8 (CIN3,CIN4,CIN5,CIN6,CIN7)
+	ConfigBuffer[1]=0x1FFe;//0x3FF2;
+	ConfigBuffer[2]=convalue[0];
+	ConfigBuffer[3]=0x2626;
+	ConfigBuffer[4]=50;
+	ConfigBuffer[5]=50;
+	ConfigBuffer[6]=100;
+	ConfigBuffer[7]=100;
+	WriteViaI2C(Channel,AD7147_ADD[i],STAGE1_CONNECTION, 8, ConfigBuffer, 0);//Stage 10 connection registers - Start address in RAM 0xD0
+	
 	
 	//=============================================
 	//= Configure 1st register bank
