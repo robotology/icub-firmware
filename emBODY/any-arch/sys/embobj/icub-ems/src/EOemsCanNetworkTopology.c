@@ -76,9 +76,12 @@ static eOresult_t s_eo_emsCanNetTopo_hashTbl_motor_init(EOemsCanNetTopo *p);
 static eOresult_t s_eo_emsCanNetTopo_hashTbl_sensor_init(EOemsCanNetTopo *p);
 static eOresult_t s_eo_emsCanNetTopo_hashTbl_skin_init(EOemsCanNetTopo *p);
 static eOresult_t s_eo_emsCanNetTopo_checkConfiguration(eo_emsCanNetTopo_cfg_t *cfg);
-static eOboolvalues_t s_eo_emsCanNetTopo_jointcfgIsValid(EOemsCanNetTopo *p, eo_emsCanNetTopo_jointTopoInfo_t *j_topoinfo_ptr);
-static eOboolvalues_t s_eo_emsCanNetTopo_motorcfgIsValid(EOemsCanNetTopo *p, eo_emsCanNetTopo_motorTopoInfo_t *m_topoinfo_ptr);
-static void s_eo_emsCanNetTopo_addInfo_check(EOemsCanNetTopo *p);
+
+//old functions
+//static eOboolvalues_t s_eo_emsCanNetTopo_jointcfgIsValid(EOemsCanNetTopo *p, eo_emsCanNetTopo_jointTopoInfo_t *j_topoinfo_ptr);
+//static eOboolvalues_t s_eo_emsCanNetTopo_motorcfgIsValid(EOemsCanNetTopo *p, eo_emsCanNetTopo_motorTopoInfo_t *m_topoinfo_ptr);
+//static void s_eo_emsCanNetTopo_addInfo_check(EOemsCanNetTopo *p);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -602,16 +605,16 @@ static eOresult_t s_eo_emsCanNetTopo_hashTbl_joint_init(EOemsCanNetTopo *p)
     return(eores_OK);
 }
 
-static eOboolvalues_t s_eo_emsCanNetTopo_jointcfgIsValid(EOemsCanNetTopo *p, eo_emsCanNetTopo_jointTopoInfo_t *j_topoinfo_ptr)
-{
+// static eOboolvalues_t s_eo_emsCanNetTopo_jointcfgIsValid(EOemsCanNetTopo *p, eo_emsCanNetTopo_jointTopoInfo_t *j_topoinfo_ptr)
+// {
 //     if( (j_topoinfo_ptr->boardAddr > 0xF) || (j_topoinfo_ptr->id >= jointNumberMAX)  
 //         || (j_topoinfo_ptr->bid >= p->cfg.emsCanNetTopo_canBoards__ptr->size) )
 //     {
 //         return(eobool_false);
 //     }
 
-    return(eobool_true);
-}
+//     return(eobool_true);
+// }
 static eOresult_t s_eo_emsCanNetTopo_hashTbl_motor_init(EOemsCanNetTopo *p)
 {
     uint8_t i, j, k; //i indexes the motorBoardCanLoc2NvsRef lookup tbl
@@ -653,16 +656,16 @@ static eOresult_t s_eo_emsCanNetTopo_hashTbl_motor_init(EOemsCanNetTopo *p)
     return(eores_OK);
 }
 
-static eOboolvalues_t s_eo_emsCanNetTopo_motorcfgIsValid(EOemsCanNetTopo *p, eo_emsCanNetTopo_motorTopoInfo_t *m_topoinfo_ptr)
-{
+// static eOboolvalues_t s_eo_emsCanNetTopo_motorcfgIsValid(EOemsCanNetTopo *p, eo_emsCanNetTopo_motorTopoInfo_t *m_topoinfo_ptr)
+// {
 //     if( (m_topoinfo_ptr->boardAddr > 0xF) || (m_topoinfo_ptr->id >= motorNumberMAX) 
 //         || (j_topoinfo_ptr->bid >= p->cfg.emsCanNetTopo_canBoards__ptr->size) )
 //     {
 //         return(eobool_false);
 //     }
 
-    return(eobool_true);
-}
+//     return(eobool_true);
+// }
 
 
 

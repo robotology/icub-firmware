@@ -332,7 +332,15 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
          },
          .mc_endpoint                = EOMTHEEMSAPPLCFG_EBX_endpoint_mc,   
          .as_endpoint                = EOMTHEEMSAPPLCFG_EBX_endpoint_as,
-         .sk_endpoint                = EOMTHEEMSAPPLCFG_EBX_endpoint_sk 
+         .sk_endpoint                = EOMTHEEMSAPPLCFG_EBX_endpoint_sk,
+         .measConvCfg                =
+         {
+             .jointvelocityShift                    = 8,
+             .motorVelocityEstimationShift          = 1,
+             .motorAccelerationEstimationShift      = 1,
+             .jointVelocityEstimationShift          = 5,
+             .jointAccelerationEstimationShift      = 5
+         }
      }
 #endif       
 };
