@@ -1295,11 +1295,6 @@
           <GroupName>eo-ems-can</GroupName>
           <Files>
             <File>
-              <FileName>EOVcanProto.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-ems\src\EOVcanProto.c</FilePath>
-            </File>
-            <File>
               <FileName>EOemsCanNetworkTopology.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-ems\src\EOemsCanNetworkTopology.c</FilePath>
@@ -2623,11 +2618,6 @@
         <Group>
           <GroupName>eo-ems-can</GroupName>
           <Files>
-            <File>
-              <FileName>EOVcanProto.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-ems\src\EOVcanProto.c</FilePath>
-            </File>
             <File>
               <FileName>EOemsCanNetworkTopology.c</FileName>
               <FileType>1</FileType>
@@ -4033,11 +4023,6 @@
           <GroupName>eo-ems-can</GroupName>
           <Files>
             <File>
-              <FileName>EOVcanProto.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-ems\src\EOVcanProto.c</FilePath>
-            </File>
-            <File>
               <FileName>EOemsCanNetworkTopology.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-ems\src\EOemsCanNetworkTopology.c</FilePath>
@@ -5441,11 +5426,6 @@
         <Group>
           <GroupName>eo-ems-can</GroupName>
           <Files>
-            <File>
-              <FileName>EOVcanProto.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-ems\src\EOVcanProto.c</FilePath>
-            </File>
             <File>
               <FileName>EOemsCanNetworkTopology.c</FileName>
               <FileType>1</FileType>
