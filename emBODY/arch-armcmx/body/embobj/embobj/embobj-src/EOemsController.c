@@ -248,14 +248,14 @@ extern void eo_emsController_ResetPosPid(uint8_t joint)
     eo_pid_Reset(eo_axisController_GetPosPidPtr(s_emsc->axis_controller[joint]));
 }
 
-extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_t offset, int32_t timeout_ms, int32_t max_error)
+extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_t vel, int32_t offset)
 {
-    eo_axisController_StartCalibration(s_emsc->axis_controller[joint], pos, offset, timeout_ms, max_error);
+    eo_axisController_StartCalibration(s_emsc->axis_controller[joint], pos, vel, offset);
 }
 
-extern void eo_emsController_Stop(uint8_t joint, int32_t stop_acc)
+extern void eo_emsController_Stop(uint8_t joint)
 {
-    eo_axisController_Stop(s_emsc->axis_controller[joint], stop_acc);
+    eo_axisController_Stop(s_emsc->axis_controller[joint]);
 }
 
 extern void eo_emsController_ResetTrqPid(uint8_t joint)
@@ -303,20 +303,29 @@ extern void eo_emsController_SetStiffness(uint8_t joint, int32_t stiffness)
     eo_axisController_SetStiffness(s_emsc->axis_controller[joint], stiffness);
 }
 
-extern void eo_emsController_SetVelTimeout(int32_t vel_timeout)
+extern void eo_emsController_SetVelTimeout(uint8_t joint, int32_t vel_timeout)
 {
-    for (int joint=0; joint<MAX_MOTORS; ++joint)
-    {
-        if (s_emsc->axis_controller[joint])
-        {
-            eo_axisController_SetVelTimeout(s_emsc->axis_controller[joint], vel_timeout);
-        }
-    }
+    eo_axisController_SetVelTimeout(s_emsc->axis_controller[joint], vel_timeout);
 }
 
 extern void eo_emsController_SetLimits(uint8_t joint, int32_t pos_min, int32_t pos_max, int32_t vel_max)
 {
     eo_axisController_SetLimits(s_emsc->axis_controller[joint], pos_min, pos_max, vel_max);
+}
+
+extern void eo_emsController_SetPosMin(uint8_t joint, int32_t pos_min)
+{
+    eo_axisController_SetPosMin(s_emsc->axis_controller[joint], pos_min);
+}
+
+extern void eo_emsController_SetPosMax(uint8_t joint, int32_t pos_max)
+{
+    eo_axisController_SetPosMax(s_emsc->axis_controller[joint], pos_max);
+}
+
+extern void eo_emsController_SetVelMax(uint8_t joint, int32_t vel_max)
+{
+    eo_axisController_SetVelMax(s_emsc->axis_controller[joint], vel_max);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
