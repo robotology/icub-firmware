@@ -27,6 +27,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
+#include "string.h"
 #include "EOcommon.h"
 #include "EOicubCanProto.h"
 #include "EOicubCanProto_specifications.h"
@@ -202,11 +203,193 @@ extern eOresult_t eo_icubCanProto_former_pol_sb_cmd__getFullScales(EOicubCanProt
 //********************** P A R S E R       PERIODIC     F U N C T I O N S  ******************************************************
 extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__forceVector(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
+    eOresult_t                                  res;
+    eOsnsr_sensorId_t                           sId;
+    void                                        *nv_mem_ptr;
+    eOsnsr_strainmode_t                         *txmode;
+    eOsnsr_arrayofupto12bytes_t                 *ftarray;
+    eo_emsCanNetTopo_sensorCanLocation_t        canLoc;
+
+    /* 1) get can location */
+    canLoc.emscanport = canPort;
+    canLoc.canaddr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+    
+    res = eo_emsCanNetTopo_GetSensorId_BySensorCanLocation(p->emsCanNetTopo_ptr, &canLoc, &sId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    /* 2) get strain transmission mode (parsing depends on transmission mode)*/
+    res = eo_appTheNVmapRef_GetSensorsStrainNVMemoryRef(eo_appTheNVmapRef_GetHandle(), sId, strainNVindex_sconfig__mode, &nv_mem_ptr);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    txmode = (eOsnsr_strainmode_t*)nv_mem_ptr;
+    
+    /* 3) get pointer to nv var where save incoming force values */
+    ftarray->head.size = 12;
+    #warning VALE-->capire come usare questi array!!!!
+    
+    switch(*txmode)
+    {
+        case snsr_strainmode_txcalibrateddatacontinuously:
+        case snsr_strainmode_txalldatacontinuously:
+        {
+            res = eo_appTheNVmapRef_GetSensorsStrainNVMemoryRef(eo_appTheNVmapRef_GetHandle(), sId, strainNVindex_sstatus__calibratedvalues, &nv_mem_ptr);
+            if(eores_OK != res)
+            {
+                return(res);
+            }
+            ftarray = (eOsnsr_arrayofupto12bytes_t*)nv_mem_ptr;
+            memcpy(&ftarray->data[0], &frame->data[0], 6);
+        }break;
+
+        case snsr_strainmode_txuncalibrateddatacontinuously:
+        {
+            res = eo_appTheNVmapRef_GetSensorsStrainNVMemoryRef(eo_appTheNVmapRef_GetHandle(), sId, strainNVindex_sstatus__uncalibratedvalues, &nv_mem_ptr);
+            if(eores_OK != res)
+            {
+                return(res);
+            }
+            ftarray = (eOsnsr_arrayofupto12bytes_t*)nv_mem_ptr;
+            memcpy(&ftarray->data[0], &frame->data[0], 6);
+        }break;
+        
+        default:
+        {
+            //i must never be here!
+            return(eores_NOK_generic);
+        }
+    };
+    
     return(eores_OK);
 }
 
 extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__torqueVector(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
+    eOresult_t                                  res;
+    eOsnsr_sensorId_t                           sId;
+    void                                        *nv_mem_ptr;
+    eOsnsr_strainmode_t                         *txmode;
+    eOsnsr_arrayofupto12bytes_t                 *ftarray;
+    eo_emsCanNetTopo_sensorCanLocation_t        canLoc;
+
+    /* 1) get can location */
+    canLoc.emscanport = canPort;
+    canLoc.canaddr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+    
+    res = eo_emsCanNetTopo_GetSensorId_BySensorCanLocation(p->emsCanNetTopo_ptr, &canLoc, &sId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    /* 2) get strain transmission mode (parsing depends on transmission mode)*/
+    res = eo_appTheNVmapRef_GetSensorsStrainNVMemoryRef(eo_appTheNVmapRef_GetHandle(), sId, strainNVindex_sconfig__mode, &nv_mem_ptr);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    /* 3) get pointer to nv var where save incoming force values */
+    ftarray->head.size = 12;
+    #warning VALE-->capire come usare questi array!!!!
+    
+    txmode = (eOsnsr_strainmode_t*)nv_mem_ptr;
+    switch(*txmode)
+    {
+        case snsr_strainmode_txcalibrateddatacontinuously:
+        case snsr_strainmode_txalldatacontinuously:
+        {
+            res = eo_appTheNVmapRef_GetSensorsStrainNVMemoryRef(eo_appTheNVmapRef_GetHandle(), sId, strainNVindex_sstatus__calibratedvalues, &nv_mem_ptr);
+            if(eores_OK != res)
+            {
+                return(res);
+            }
+            ftarray = (eOsnsr_arrayofupto12bytes_t*)nv_mem_ptr;
+            memcpy(&ftarray->data[6], &frame->data[0], 6);
+        }break;
+
+        case snsr_strainmode_txuncalibrateddatacontinuously:
+        {
+            res = eo_appTheNVmapRef_GetSensorsStrainNVMemoryRef(eo_appTheNVmapRef_GetHandle(), sId, strainNVindex_sstatus__uncalibratedvalues, &nv_mem_ptr);
+            if(eores_OK != res)
+            {
+                return(res);
+            }
+            ftarray = (eOsnsr_arrayofupto12bytes_t*)nv_mem_ptr;
+            memcpy(&ftarray->data[6], &frame->data[0], 6);
+        }break;
+        
+        default:
+        {
+            //i must never be here!
+            return(eores_NOK_generic);
+        }
+    };
+    
+    return(eores_OK);
+}
+
+
+
+extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibForceVectorDebugmode(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
+{
+    eOresult_t                                  res;
+    eOsnsr_sensorId_t                           sId;
+    void                                        *nv_mem_ptr;
+    eOsnsr_arrayofupto12bytes_t                 *ftarray;
+    eo_emsCanNetTopo_sensorCanLocation_t        canLoc;
+
+    /* 1) get can location */
+    canLoc.emscanport = canPort;
+    canLoc.canaddr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+    
+    res = eo_emsCanNetTopo_GetSensorId_BySensorCanLocation(p->emsCanNetTopo_ptr, &canLoc, &sId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    
+    res = eo_appTheNVmapRef_GetSensorsStrainNVMemoryRef(eo_appTheNVmapRef_GetHandle(), sId, strainNVindex_sstatus__uncalibratedvalues, &nv_mem_ptr);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    ftarray = (eOsnsr_arrayofupto12bytes_t*)nv_mem_ptr;
+    memcpy(&ftarray->data[0], &frame->data[0], 6);
+
+    return(eores_OK);
+}
+
+extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibTorqueVectorDebugmode(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
+{
+    eOresult_t                                  res;
+    eOsnsr_sensorId_t                           sId;
+    void                                        *nv_mem_ptr;
+    eOsnsr_arrayofupto12bytes_t                 *ftarray;
+    eo_emsCanNetTopo_sensorCanLocation_t        canLoc;
+
+    /* 1) get can location */
+    canLoc.emscanport = canPort;
+    canLoc.canaddr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+    
+    res = eo_emsCanNetTopo_GetSensorId_BySensorCanLocation(p->emsCanNetTopo_ptr, &canLoc, &sId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    
+    res = eo_appTheNVmapRef_GetSensorsStrainNVMemoryRef(eo_appTheNVmapRef_GetHandle(), sId, strainNVindex_sstatus__uncalibratedvalues, &nv_mem_ptr);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    ftarray = (eOsnsr_arrayofupto12bytes_t*)nv_mem_ptr;
+    memcpy(&ftarray->data[6], &frame->data[0], 6);
+
     return(eores_OK);
 }
 

@@ -53,22 +53,23 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-/*currently only one message per class is managed (test porpouse)*/
-#define eo_icubCanProto_pollingSensorBoardMsg_inTbl_max        1//ICUBCANPROTO_POL_SB_CMD_MAXNUM
-#define eo_icubCanProto_pollingSensorBoardMsgClass_maxNum           ICUBCANPROTO_POL_SB_CMD_MAXNUM
+
+/* Note: currently polling sensor board messages are managed by exception functions (both parser and former)
+because they are few mesages 
+and with id not continuos. */
+#define eo_icubCanProto_pollingSensorBoardMsg_inTbl_max        1   //ICUBCANPROTO_POL_SB_CMD_MAXNUM
+#define eo_icubCanProto_pollingSensorBoardMsgClass_maxNum      ICUBCANPROTO_POL_SB_CMD__CMD_MAXNUM
+
+#define eo_icubCanProto_periodicSensorBoardMsg_inTbl_max       ICUBCANPROTO_PER_SB_CMD__CMD_MAXNUM 
+#define eo_icubCanProto_periodicSensorBoardMsg_maxNum          ICUBCANPROTO_PER_SB_CMD__CMD_MAXNUM
 
 /*currently only one message per class is managed (test porpouse)*/
-#define eo_icubCanProto_periodicSensorBoardMsg_inTbl_max       4//ICUBCANPROTO_PER_SB_CMD_MAXNUM 
-#define eo_icubCanProto_periodicSensorBoardMsg_maxNum          ICUBCANPROTO_PER_SB_CMD_MAXNUM
+#define eo_icubCanProto_pollingSkinMsg_inTbl_max               1//ICUBCANPROTO_POL_SB_CMD_MAXNUM
+#define eo_icubCanProto_pollingSkinMsgClass_maxNum             ICUBCANPROTO_POL_SK_CMD_MAXNUM
 
 /*currently only one message per class is managed (test porpouse)*/
-#define eo_icubCanProto_pollingSkinMsg_inTbl_max        1//ICUBCANPROTO_POL_SB_CMD_MAXNUM
-#define eo_icubCanProto_pollingSkinMsgClass_maxNum           ICUBCANPROTO_POL_SK_CMD_MAXNUM
-
-/*currently only one message per class is managed (test porpouse)*/
-#define eo_icubCanProto_periodicSkinMsg_inTbl_max       1//ICUBCANPROTO_PER_SB_CMD_MAXNUM 
-#define eo_icubCanProto_periodicSkinMsg_maxNum          ICUBCANPROTO_PER_SK_CMD_MAXNUM
-
+#define eo_icubCanProto_periodicSkinMsg_inTbl_max              1//ICUBCANPROTO_PER_SB_CMD_MAXNUM 
+#define eo_icubCanProto_periodicSkinMsg_maxNum                 ICUBCANPROTO_PER_SK_CMD_MAXNUM
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -95,7 +96,7 @@ static eOresult_t s_eo_icubCanProto_periodicSensorBoardMsg_parser_excFn(void *ar
 /*                 POLLING     SENSOR     BOARD     MESSAGES     LOOKUP     TABLE                             */
 /**************************************************************************************************************/
 
-/* Note: currently polling sensor board are managed by exception function becouse they are few mesages 
+/* Note: currently polling sensor board messages are managed by exception function because they are few mesages 
 and with id not continuos. */
 
 /* DECLARATION OF POLLING SENSOR BOARD PARSER BODY TBL */
@@ -150,11 +151,17 @@ extern const EOconstLookupTbl* const icubCanProto_pollingSensorBoardMsg_former_L
 /* DECLARATION OF PERIODIC SENSOR BOARD PARSER BODY TBL */
 static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_periodicSensorBoardMsg_parserFn_list[eo_icubCanProto_periodicSensorBoardMsg_inTbl_max] = 
 {
+    {   // 8 ICUBCANPROTO_PER_SB_CMD__UNCALIBFORCE_VECTOR_DEBUGMODE 			
+        EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__uncalibForceVectorDebugmode
+    },
+    {   // 9 ICUBCANPROTO_PER_SB_CMD__UNCALIBTORQUE_VECTOR_DEBUGMODE 			
+        EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__uncalibTorqueVectorDebugmode
+    },    
     {   // 10 ICUBCANPROTO_PER_SB_CMD__FORCE_VECTOR 			
         EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__forceVector
     },
     {   // 11 ICUBCANPROTO_PER_SB_CMD__TORQUE_VECTOR 			
-        EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__forceVector
+        EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__torqueVector
     },
     {   // 12 ICUBCANPROTO_PER_SB_CMD__HES0TO6 			
         EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__hes0to6
@@ -168,7 +175,7 @@ extern const EOconstLookupTbl icubCanProto_periodicSensorBoardMsg_parser_LUTbl =
 {                                        
 
     EO_INIT(.capacity)          eo_icubCanProto_periodicSensorBoardMsg_inTbl_max,
-    EO_INIT(.offset)            10,
+    EO_INIT(.offset)            8,
     EO_INIT(.exceptionMngFn)    s_eo_icubCanProto_periodicSensorBoardMsg_parser_excFn,
     EO_INIT(.itemsList)         &s_periodicSensorBoardMsg_parserFn_list[0]                          
 };

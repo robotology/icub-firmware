@@ -38,6 +38,8 @@
 #include "EoManagement.h"
 #include "eOcfg_nvsEP_sk.h"   //==> included to clear skin array
 #include "eOcfg_nvsEP_as.h"   //==> included to clear mais array
+#include "eOcfg_nvsEP_mc.h"   //==>inlcluded to get joint's nvindex
+
 
 
 
@@ -85,13 +87,17 @@ static void s_eom_emsrunner_hid_taskRX_act_afterdgramrec_skinOnly_mode(EOappTheS
 static void s_eom_emsrunner_hid_taskRX_act_afterdgramrec_skinAndMc4_mode(EOappTheSP *p);
 static void s_eom_emsrunner_hid_taskRX_act_afterdgramrec_2foc_mode(EOappTheSP *p);
 
-
+//DO
+static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p);
+static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p);
 
 
 //utils
 static void s_eom_emsrunner_hid_readSkin(EOappTheSP *p);
 static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOappTheSP *p, int16_t *pwmList, uint8_t size);
 static void s_eom_emsrunner_hid_readMc4andMais(EOappTheSP *p);
+static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p);
+static void s_eom_emsrunner_hid_UpdateMotorstatus(EOMtheEMSrunner *p);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -118,8 +124,7 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EO
     if(applrunMode__2foc == runmode)
     {
          eo_appEncReader_StartRead(eo_appTheSP_GetEncoderReaderHandle(eo_appTheSP_GetHandle()));
-    }
-    
+    }    
 }
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
@@ -161,11 +166,8 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
 
 extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 {
-    eOresult_t res = eores_NOK_generic;
     EOappTheSP* appTheSP = eo_appTheSP_GetHandle();
     eOmn_appl_runMode_t runmode =  eo_appTheSP_GetAppRunMode(appTheSP);
-    uint32_t encvalue;
-    int16_t *pwm;
 
     /* TAG_ALE */
 //     if(applrunMode__skinAndMc4 == runmode)
@@ -179,34 +181,31 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 //         s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
 //     }
     
-    if(applrunMode__2foc != runmode)
-    {
-        return; //bohh !!per ora non c'e' ninente da fare se la ems e' connessa a mc4 quindi ritorno
-    }
 
-   if (eo_appEncReader_isReady(eo_appTheSP_GetEncoderReaderHandle(appTheSP)))
-    {     
-        res = eo_appEncReader_GetValue(eo_appTheSP_GetEncoderReaderHandle(appTheSP), eOeOappEncReader_encoder3, &encvalue);
-    }
 
-    if(eores_OK != res)
+    switch(runmode)
     {
-        eo_emsController_SkipEncoders();
-    }
-    else
-    {
-        eo_emsController_ReadEncoders((int32_t*)&encvalue);
-    }
+        case applrunMode__2foc:
+        {
+            s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(p);
+        }break;
         
-    /* 2) pid calc */
-    pwm = eo_emsController_PWM();
-     
-    pwm_out = pwm[3];
+        case applrunMode__mc4Only:
+        case applrunMode__skinAndMc4:
+        {
+            s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(p);
+        }break;
         
-#ifndef _USE_PROTO_TEST_
-        /* 4) prepare and punt in rx queue new setpoint */
-        s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
-#endif        
+        case applrunMode__skinOnly:
+        {
+            return; //currently nothing to do 
+        }//break;
+        
+        default:
+        {
+            return;
+        }
+    };
   
 }
 
@@ -363,6 +362,181 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOappTheSP *p, int16_t 
     they will be sent by transmitter */
     res = eo_appCanSP_SendCmd2Joint(eo_appTheSP_GetCanServiceHandle(p), 3/*jid*/, msgCmd, (void*)&mySetPoint_current);
     return(res);
+}
+
+
+
+static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
+{
+    eOresult_t          res;
+    EOappTheSP          *appTheSP = eo_appTheSP_GetHandle();
+    uint32_t            encvalue;
+    int16_t             *pwm;
+
+    if (eo_appEncReader_isReady(eo_appTheSP_GetEncoderReaderHandle(appTheSP)))
+    {     
+        res = eo_appEncReader_GetValue(eo_appTheSP_GetEncoderReaderHandle(appTheSP), eOeOappEncReader_encoder3, &encvalue);
+    }
+
+    if(eores_OK != res)
+    {
+        eo_emsController_SkipEncoders();
+    }
+    else
+    {
+        eo_emsController_ReadEncoders((int32_t*)&encvalue);
+    }
+        
+    /* 2) pid calc */
+    pwm = eo_emsController_PWM();
+     
+    pwm_out = pwm[3];
+        
+#ifndef _USE_PROTO_TEST_
+        /* 4) prepare and punt in rx queue new setpoint */
+        s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
+#endif   
+#warning VALE--> for ALE: put in s_eom_emsrunner_hid_UpdateJointstatus update status of joint.    
+
+    s_eom_emsrunner_hid_UpdateJointstatus(p);
+    s_eom_emsrunner_hid_UpdateMotorstatus(p);
+}
+
+
+static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p)
+{
+    eOmc_joint_status_ofpid_t       *jstatus_ofpid_ptr = NULL;
+    eOmc_joint_status_basic_t       *jstatus_basic_ptr = NULL;
+    eOmc_jointId_t                  jId;
+    void                            *nv_mem_ptr;
+    eOresult_t                      res;
+    
+    for(jId = 0; jId<jointNumberMAX; jId++)
+    {    
+        res = eo_appTheNVmapRef_GetJointNVMemoryRef(eo_appTheNVmapRef_GetHandle(), jId, jointNVindex_jstatus__basic, &nv_mem_ptr);
+        if(eores_OK != res)
+        {
+            if(eores_NOK_nodata == res)
+            {
+                continue; //this jId is not manage by this board
+            }
+            else
+            {
+                return; //error
+            }
+        }
+        jstatus_basic_ptr = jstatus_basic_ptr; //delete this when set values to jstatus. Put here to remove warning.
+//         jstatus_basic_ptr = (eOmc_joint_status_basic_t*)nv_mem_ptr;
+//         jstatus_basic_ptr->position =  
+//         jstatus_basic_ptr->velocity =  
+//         jstatus_basic_ptr->acceleration =  
+//         jstatus_basic_ptr->torque =  
+//         jstatus_basic_ptr->motionmonitorstatus =  
+        
+        
+        res = eo_appTheNVmapRef_GetJointNVMemoryRef(eo_appTheNVmapRef_GetHandle(), jId, jointNVindex_jstatus__ofpid, &nv_mem_ptr);
+        if(eores_OK != res)
+        {
+            if(eores_NOK_nodata == res)
+            {
+                continue; //this jId is not manage by this board
+            }
+            else
+            {
+                return; //error
+            }
+        }
+        jstatus_ofpid_ptr = jstatus_ofpid_ptr;  //delete this when set values to jstatus. Put here to remove warning.
+//         jstatus_ofpid_ptr = (eOmc_joint_status_ofpid_t*)nv_mem_ptr;
+//         jstatus_ofpid_ptr->reference = 
+//         jstatus_ofpid_ptr->error = 
+//         jstatus_ofpid_ptr->output = 
+        
+
+    }
+}
+
+
+
+static void s_eom_emsrunner_hid_UpdateMotorstatus(EOMtheEMSrunner *p)
+{
+    eOmc_motor_status_basic_t       *mstatus_basic_ptr = NULL;
+    eOmc_motorId_t                  mId;
+    void                            *nv_mem_ptr;
+    eOresult_t                      res;
+    
+    for(mId = 0; mId<motorNumberMAX; mId++)
+    {    
+        res = eo_appTheNVmapRef_GetMotorNVMemoryRef(eo_appTheNVmapRef_GetHandle(), mId, motorNVindex_mstatus__basic, &nv_mem_ptr);
+        if(eores_OK != res)
+        {
+            if(eores_NOK_nodata == res)
+            {
+                continue; //this jId is not manage by this board
+            }
+            else
+            {
+                return; //error
+            }
+        }
+        mstatus_basic_ptr = mstatus_basic_ptr; //delete this when set values to jstatus. Put here to remove warning.
+//         mstatus_basic_ptr = (mstatus_basic_ptr*)nv_mem_ptr;
+//         mstatus_basic_ptr->position =  
+//         mstatus_basic_ptr->velocity =  
+//         mstatus_basic_ptr->current =  
+    }
+
+
+
+}
+
+static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
+{
+    eOresult_t                      res;
+    eo_appCanSP_canLocation         canLoc;
+    eOmc_jointId_t                  jId;
+    void                            *nv_mem_ptr;
+    eOmc_joint_status_basic_t       *jstatusbasic_ptr;
+    eo_icubCanProto_msgCommand_t    msgCmd = 
+    {
+        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__MOTION_DONE
+    };
+
+    EOappCanSP *appCanSP_ptr = eo_appTheSP_GetCanServiceHandle(eo_appTheSP_GetHandle());
+    
+    for(jId = 0; jId<jointNumberMAX; jId++)
+    {    
+        res = eo_appTheNVmapRef_GetJointNVMemoryRef(eo_appTheNVmapRef_GetHandle(), jId, jointNVindex_jstatus__basic, &nv_mem_ptr);
+        if(eores_OK != res)
+        {
+            if(eores_NOK_nodata == res)
+            {
+                continue; //this jId is not manage by this board
+            }
+            else
+            {
+                return; //error
+            }
+        }
+
+        jstatusbasic_ptr = (eOmc_joint_status_basic_t*)nv_mem_ptr;
+        
+        if(jstatusbasic_ptr->motionmonitorstatus != eomc_motionmonitorstatus_setpointnotreachedyet)
+        {
+            /* if motionmonitorstatus is different from _setpointnotreachedyet, 
+            that is it is _notmonitored or _setpointisreached, 
+            i don't need to send motion done message, so return. */
+            continue;
+        }
+
+        res = eo_appCanSP_GetJointCanLocation(appCanSP_ptr, jId, &canLoc, NULL);
+        if(eores_OK != res)
+        {
+            return; //I should never be here!!!
+        }
+        eo_appCanSP_SendCmd(appCanSP_ptr, &canLoc, msgCmd, NULL);
+    }   
 }
 
 // --------------------------------------------------------------------------------------------------------------------

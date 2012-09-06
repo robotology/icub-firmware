@@ -74,6 +74,7 @@ struct EOappTheSP_hid
         EOappTheNVmapRef                    *appTheNVmapRef;
         EOappEncReader                      *appEncReader;
         EOemsController                     *emsController;
+        EOappMeasConv                       *appMeasConv;
     }srv;
 }; 
 

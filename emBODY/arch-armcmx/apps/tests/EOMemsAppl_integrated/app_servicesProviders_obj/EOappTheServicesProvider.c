@@ -90,6 +90,7 @@ static void s_eo_appTheSP_srv_CanBoardsManager_init(EOappTheSP *p);
 static void s_eo_appTheSP_GetCanConnectedStuff(EOappTheSP *p);
 static void s_eo_appTheSP_srv_NVmapRef_init(EOappTheSP *p);
 static void s_eo_appTheSP_srv_EmsController_init(EOappTheSP *p);
+static void s_eo_apptheSP_srv_MeasuresConverter_init(EOappTheSP *p);
 static void s_eo_apptheSP_GetAppRunMode(EOappTheSP *p);
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -193,6 +194,16 @@ extern eOmn_appl_runMode_t eo_appTheSP_GetAppRunMode(EOappTheSP *p)
     return(p->appRunMode);
 }
 
+
+extern EOappMeasConv* eo_appTheSP_GetMeasuresConverterHandle(EOappTheSP *p)
+{
+    if(NULL == p)
+    {
+        return(NULL);
+    }
+    return(p->srv.appMeasConv);
+
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -224,10 +235,13 @@ static void s_eo_appTheSP_services_init(EOappTheSP *p)
 /*  5) init emsController */
     s_eo_appTheSP_srv_EmsController_init(p);
 
-/*  6) get app run mode*/
+/*  6) get app run mode */
     s_eo_apptheSP_GetAppRunMode(p);
 
-/*  7) config connected can boards */
+/*  7) init measures converter */
+    s_eo_apptheSP_srv_MeasuresConverter_init(p);
+
+/*  8) config connected can boards */
     eo_appTheCanBrdsMng_ConfigAllBoards(p->srv.appTheCanBrdsMng);
 
 }
@@ -365,6 +379,16 @@ static void s_eo_apptheSP_GetAppRunMode(EOappTheSP *p)
     eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), 
                      s_eobj_ownname, "error in GetAppRunMode");
 }
+
+static void s_eo_apptheSP_srv_MeasuresConverter_init(EOappTheSP *p)
+{
+    p->srv.appMeasConv = eo_appMeasConv_New(&p->cfg.measConvCfg);
+
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != p->srv.appMeasConv), 
+                     s_eobj_ownname, "error in appMeasConv_New");
+
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------

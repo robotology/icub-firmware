@@ -171,7 +171,7 @@ extern eOresult_t  eo_appEncReader_getValuesRaw(EOappEncReader *p, uint32_t *dat
 }
 
 
-extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOeOappEncReader_encoder_t enc, uint32_t *value)
+extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_encoder_t enc, uint32_t *value)
 {
     uint32_t val_raw;
     eOresult_t res;

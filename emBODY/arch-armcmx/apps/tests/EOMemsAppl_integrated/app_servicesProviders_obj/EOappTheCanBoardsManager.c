@@ -42,6 +42,7 @@
 #include "EOappCanServicesProvider.h"
 #include "EOemsCanNetworkTopology.h"
 
+#include "EOMtheEMSapplCfg.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -94,20 +95,6 @@ static eOresult_t s_eo_appTheCanBrdsMng_StopMotorboard(EOappTheCanBrdsMng *p, eo
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-static const eO_appTheCanBrdsMng_mc4Config_hid_t s_mc4_const_cfg =
-{
-    EO_INIT(.estimShiftFactor)
-    {
-        EO_INIT(.estimShiftJointVel)      8,
-        EO_INIT(.estimShiftJointAcc)      8,
-        EO_INIT(.estimShiftMotorVel)      8,
-        EO_INIT(.estimShiftMotorAcc)      8
-    },
-    EO_INIT(.velShiftFactor)              8
-};
-
-
-
 static EOappTheCanBrdsMng s_theCanBrdsManager = 
 {
     EO_INIT(.st)    eO_appTheCanBrdsMng_st__NOTinited
@@ -341,41 +328,57 @@ static eOresult_t s_eo_appTheCanBrdsMng_ConfigMC4(EOappTheCanBrdsMng *p, eo_emsC
 {
     eOresult_t                              res;
     eo_appCanSP_canLocation                 canLoc;
-    //eo_emsCanNetTopo_jointAdditionalInfo_t  *addInfo_ptr;
-    eo_icubCanProto_msgCommand_t    msgCmd = 
+    EOMtheEMSapplCfg                        *applCfg;
+    eo_icubCanProto_motorAxis_t             axis;
+    eo_icubCanProto_msgCommand_t            msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
         EO_INIT(.cmdId) 0
     };
+    //it is possible set only 4 info to broadcast.
+    uint8_t                                 bcastMsg_payload[4] = 
+    {
+        ICUBCANPROTO_PER_MB_CMD_POSITION,
+        ICUBCANPROTO_PER_MB_CMD_PID_VAL,
+        ICUBCANPROTO_PER_MB_CMD_PID_ERROR,
+        ICUBCANPROTO_PER_MB_CMD_VELOCITY
+    };    
 
     canLoc.emscanport = board_ptr->emscanport;
     canLoc.canaddr = board_ptr->canaddr;
     
+    //get application config
+    applCfg = eom_emsapplcfg_GetHandle();
 
-    // 1) set bcast policy
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_BCAST_POLICY;
-    res = eo_appCanSP_SendCmd(p->cfg.appCanSP_ptr, &canLoc, msgCmd, NULL); //NULL==>set default value
-    if(eores_OK != res)
+    for(axis=eo_icubCanProto_mAxis_0; axis < eo_icubCanProtomotorAxis_maxNum4CanBoard; axis++)
     {
-        return(res);
-    }
-    
-
-    // 2) set vel shift
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_VEL_SHIFT;
-    res = eo_appCanSP_SendCmd(p->cfg.appCanSP_ptr, &canLoc, msgCmd, (void*)&s_mc4_const_cfg.velShiftFactor);
-    if(eores_OK != res)
-    {
-        return(res);
-    }
-
+        canLoc.axis = axis;
         
-    // 3) set estim vel shift
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_SPEED_ESTIM_SHIFT;
-    res = eo_appCanSP_SendCmd(p->cfg.appCanSP_ptr, &canLoc, msgCmd, (void*)&s_mc4_const_cfg.estimShiftFactor);
-    if(eores_OK != res)
-    {
-        return(res);
+        // 1) set bcast policy
+        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_BCAST_POLICY;
+        res = eo_appCanSP_SendCmd(p->cfg.appCanSP_ptr, &canLoc, msgCmd, bcastMsg_payload);
+        if(eores_OK != res)
+        {
+            return(res);
+        }
+        
+
+        // 2) set vel shift
+        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_VEL_SHIFT;
+        res = eo_appCanSP_SendCmd(p->cfg.appCanSP_ptr, &canLoc, msgCmd, (void*)&applCfg->srvcfg.measConvCfg.jointvelocityShift);
+        if(eores_OK != res)
+        {
+            return(res);
+        }
+
+            
+        // 3) set estim vel shift
+        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_SPEED_ESTIM_SHIFT;
+        res = eo_appCanSP_SendCmd(p->cfg.appCanSP_ptr, &canLoc, msgCmd, (void*)&applCfg->srvcfg.measConvCfg.jointVelocityEstimationShift);
+        if(eores_OK != res)
+        {
+            return(res);
+        }
     }
     
     //4) set disable control loop
@@ -401,11 +404,11 @@ static eOresult_t s_eo_appTheCanBrdsMng_Config1FOC(EOappTheCanBrdsMng *p, eo_ems
         EO_INIT(.cmdId) 0
     };
 
-    eOmc_i2tParams_t i2tParams = 
-    {
-        EO_INIT(.tresh)  0xAA,
-        EO_INIT(.time)   0xBB
-    };
+//     eOmc_i2tParams_t i2tParams = 
+//     {
+//         EO_INIT(.tresh)  0xAA,
+//         EO_INIT(.time)   0xBB
+//     };
     
 #ifdef _USE_PROTO_TEST_
 

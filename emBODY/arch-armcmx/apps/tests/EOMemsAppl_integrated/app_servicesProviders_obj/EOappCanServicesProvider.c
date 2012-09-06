@@ -179,17 +179,18 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg)
     
     if(cfg->waitallframesaresent)
     {
+        extern const hal_cfg_t *hal_cfgMINE;
         //can port 1
-        retptr->waittxdata[hal_can_port1].waittxisdone = osal_semaphore_new(20/*maxtokens*/, 0/*current num of token*/);
-        #warning VALE--> prendi da hal_cfg il numero di maxtoken del semaforo
+        //the max num of token in semaphore is equal to the max num of frame in can out queue.
+        retptr->waittxdata[hal_can_port1].waittxisdone = osal_semaphore_new(hal_cfgMINE->can1_txqnorm_num/*maxtokens*/, 0/*current num of token*/);
         if(NULL == retptr->waittxdata[hal_can_port1].waittxisdone)
         {
             return(NULL);
         }
         
         //can port 2
-        retptr->waittxdata[hal_can_port2].waittxisdone = osal_semaphore_new(20/*maxtokens*/, 0/*current num of token*/);
-        #warning VALE--> prendi da hal_cfg il numero di maxtoken del semaforo
+        //the max num of token in semaphore is equal to the max num of frame in can out queue.
+        retptr->waittxdata[hal_can_port2].waittxisdone = osal_semaphore_new(hal_cfgMINE->can1_txqnorm_num/*maxtokens*/, 0/*current num of token*/);
         if(NULL == retptr->waittxdata[hal_can_port2].waittxisdone)
         {
             return(NULL);
@@ -466,7 +467,6 @@ extern eOresult_t eo_appCanSP_SendMessage_TEST(EOappCanSP *p, eo_appCanSP_canLoc
 {
     eOresult_t                                  res;
     eOcanframe_t                                canFrame;
-    eo_emsCanNetTopo_jointOrMotorCanLocation_t  *canLoc = (eo_emsCanNetTopo_jointOrMotorCanLocation_t *)canLocation;
 
     if(NULL == p)
     {

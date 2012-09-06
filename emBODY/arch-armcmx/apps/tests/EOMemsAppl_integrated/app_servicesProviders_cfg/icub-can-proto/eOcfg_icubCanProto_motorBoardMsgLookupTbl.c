@@ -502,7 +502,17 @@ static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_periodicMotorB
 
     {   // 9 ICUBCANPROTO_PER_MB_CMD_DEBUG		
         EO_INIT(.parser)    eo_icubCanProto_parser_per_mb_cmd__debug
-    }
+    },
+    
+    {   // 10 ICUBCANPROTO_PER_MB_CMD_MOTOR_POSITION	
+        EO_INIT(.parser)    eo_icubCanProto_parser_per_mb_cmd__motorPosition
+    },
+
+    {   // 11 ICUBCANPROTO_PER_MB_CMD_MOTOR_SPEED		
+        EO_INIT(.parser)    eo_icubCanProto_parser_per_mb_cmd__motorSpeed
+    },
+    
+    
 };        
 
 

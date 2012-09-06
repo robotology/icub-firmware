@@ -138,7 +138,7 @@ extern EOappTheNVmapRef* eo_appTheNVmapRef_GetHandle(void)
     return(&s_eo_appTheNVmapRef);
 }
 
-extern eOresult_t eo_appTheNVmapRef_GetJointNVMemoryRef(EOappTheNVmapRef* p, eOmc_jointId_t jUiniqueId, uint8_t nvindex, void**memRef)
+extern eOresult_t eo_appTheNVmapRef_GetJointNVMemoryRef(EOappTheNVmapRef* p, eOmc_jointId_t jId, uint8_t nvindex, void**memRef)
 {
 
     if(NULL == p)
@@ -146,12 +146,17 @@ extern eOresult_t eo_appTheNVmapRef_GetJointNVMemoryRef(EOappTheNVmapRef* p, eOm
         return(eores_NOK_nullpointer);
     }
 
-    if(NULL == p->jointsList[jUiniqueId])
+    if((jId >= jointNumberMAX) || (nvindex >= jointNVindex_TOTALnumber))
     {
         return(eores_NOK_generic);
     }
     
-    *memRef = p->jointsList[jUiniqueId][nvindex];
+    if(NULL == p->jointsList[jId])
+    {
+        return(eores_NOK_nodata);
+    }
+    
+    *memRef = p->jointsList[jId][nvindex];
 
      return(eores_OK);
 
@@ -179,23 +184,24 @@ extern eOresult_t eo_appTheNVmapRef_GetJointNVMemoryRef_test(EOappTheNVmapRef* p
 
 extern eOresult_t eo_appTheNVmapRef_GetMotorNVMemoryRef(EOappTheNVmapRef* p, eOmc_motorId_t mId, uint8_t nvindex, void**memRef)
 {
-    void **aux;
-    void *addr = 0;
+    
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
     }
 
-    if(NULL == p->motorsList[mId])
+    if((mId >= motorNumberMAX) || (nvindex >= motorNVindex_TOTALnumber))
     {
         return(eores_NOK_generic);
     }
+        
+    if(NULL == p->motorsList[mId])
+    {
+        return(eores_NOK_nodata);
+    }
 
-    aux = p->motorsList[mId];
-    addr = aux[nvindex];
     *memRef = p->motorsList[mId][nvindex];
 
-    addr = addr;
     return(eores_OK);
 
 }

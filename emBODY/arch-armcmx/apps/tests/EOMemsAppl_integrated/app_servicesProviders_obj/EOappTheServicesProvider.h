@@ -44,6 +44,7 @@
 #include "EOappTheNVmapRef.h"
 #include "EOappEncodersReader.h"
 #include "EOemsController.h"
+#include "EOappMeasuresConverter.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -65,8 +66,7 @@ typedef struct
     eOnvEP_t                 mc_endpoint;  /**<  motion control endopoint managed by the application    */
     eOnvEP_t                 as_endpoint;  /**<  analog sensor endopoint managed by the application    */
     eOnvEP_t                 sk_endpoint;  /**<  skin endopoint managed by the application    */
-
-    
+    eOappMeasConv_cfg_t      measConvCfg;  /**<  configuration of mesures converter    */
 } eOappTheSP_cfg_t;
 
     
@@ -90,6 +90,8 @@ extern EOappEncReader* eo_appTheSP_GetEncoderReaderHandle(EOappTheSP *p);
 extern EOemsController* eo_appTheSP_GetEmsControllerHandle(EOappTheSP *p);
 
 extern eOmn_appl_runMode_t eo_appTheSP_GetAppRunMode(EOappTheSP *p);
+
+extern EOappMeasConv* eo_appTheSP_GetMeasuresConverterHandle(EOappTheSP *p);
 /** @}            
     end of group appTheSP
  **/

@@ -425,6 +425,11 @@
               <FileType>1</FileType>
               <FilePath>..\app_servicesProviders_obj\EOappTheServicesProvider.c</FilePath>
             </File>
+            <File>
+              <FileName>EOappMeasuresConverter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_servicesProviders_obj\EOappMeasuresConverter.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -459,6 +464,11 @@
               <FileName>eOcfg_emsCanNetworkTopology_ebx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_servicesProviders_cfg\icub-can-net\eOcfg_emsCanNetworkTopology_ebx.c</FilePath>
+            </File>
+            <File>
+              <FileName>measuresConvFuncOveridden.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_servicesProviders_cfg\measures-converter\measuresConvFuncOveridden.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1762,6 +1772,11 @@
               <FileType>1</FileType>
               <FilePath>..\app_servicesProviders_obj\EOappTheServicesProvider.c</FilePath>
             </File>
+            <File>
+              <FileName>EOappMeasuresConverter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_servicesProviders_obj\EOappMeasuresConverter.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1796,6 +1811,11 @@
               <FileName>eOcfg_emsCanNetworkTopology_ebx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_servicesProviders_cfg\icub-can-net\eOcfg_emsCanNetworkTopology_ebx.c</FilePath>
+            </File>
+            <File>
+              <FileName>measuresConvFuncOveridden.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_servicesProviders_cfg\measures-converter\measuresConvFuncOveridden.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3081,6 +3101,11 @@
               <FileType>1</FileType>
               <FilePath>..\app_servicesProviders_obj\EOappTheServicesProvider.c</FilePath>
             </File>
+            <File>
+              <FileName>EOappMeasuresConverter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_servicesProviders_obj\EOappMeasuresConverter.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3115,6 +3140,11 @@
               <FileName>eOcfg_emsCanNetworkTopology_ebx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_servicesProviders_cfg\icub-can-net\eOcfg_emsCanNetworkTopology_ebx.c</FilePath>
+            </File>
+            <File>
+              <FileName>measuresConvFuncOveridden.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_servicesProviders_cfg\measures-converter\measuresConvFuncOveridden.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4480,6 +4510,11 @@
               <FileType>1</FileType>
               <FilePath>..\app_servicesProviders_obj\EOappTheServicesProvider.c</FilePath>
             </File>
+            <File>
+              <FileName>EOappMeasuresConverter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_servicesProviders_obj\EOappMeasuresConverter.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4514,6 +4549,11 @@
               <FileName>eOcfg_emsCanNetworkTopology_ebx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_servicesProviders_cfg\icub-can-net\eOcfg_emsCanNetworkTopology_ebx.c</FilePath>
+            </File>
+            <File>
+              <FileName>measuresConvFuncOveridden.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_servicesProviders_cfg\measures-converter\measuresConvFuncOveridden.c</FilePath>
             </File>
           </Files>
         </Group>

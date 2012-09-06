@@ -99,16 +99,27 @@ extern EOappTheNVmapRef* eo_appTheNVmapRef_GetHandle(void);
 /** @fn         extern eOresult_t eo_appTheNVmapRef_GetJointNVMemoryRef(EOappTheNVmapRef* p, eOmc_jointId_t jUiniqueId, uint8_t nvindex, void**memRef);
     @brief      given joint id and network variable index about joint return a poiter to ram where there is nv's value.
     @param      
-    @return     
-    @waring:   use eo_cfg_nvsEP_mc_any_con_bodypart_jointNVindex_t for nvindex
+    @return    returns:
+               - eores_NOK_nullpointer if p is NULL
+               - eores_NOK_generic is jId or Nvindex are out of range
+               - eores_NOK_nodata if joint identified by @e jId is not managed, by this board
+               - eores_OK on success
  **/
-extern eOresult_t eo_appTheNVmapRef_GetJointNVMemoryRef(EOappTheNVmapRef* p, eOmc_jointId_t jUiniqueId, uint8_t nvindex, void**memRef);
+extern eOresult_t eo_appTheNVmapRef_GetJointNVMemoryRef(EOappTheNVmapRef* p, eOmc_jointId_t jId, uint8_t nvindex, void**memRef);
 
 
-extern eOresult_t eo_appTheNVmapRef_GetJointNVMemoryRef_test(EOappTheNVmapRef* p, eOmc_jointId_t jUiniqueId, uint8_t nvindex, void**memRef);
+extern eOresult_t eo_appTheNVmapRef_GetJointNVMemoryRef_test(EOappTheNVmapRef* p, eOmc_jointId_t jId, uint8_t nvindex, void**memRef);
 
-
-extern eOresult_t eo_appTheNVmapRef_GetMotorNVMemoryRef(EOappTheNVmapRef* p, eOmc_motorId_t mUiniqueId, uint8_t nvindex, void**memRef);
+/** @fn         extern eOresult_t eo_appTheNVmapRef_GetMotorNVMemoryRef(EOappTheNVmapRef* p, eOmc_motorId_t mId, uint8_t nvindex, void**memRef)
+    @brief      given motor id and network variable index about motor return a poiter to ram where there is nv's value.
+    @param      
+    @return    returns:
+               - eores_NOK_nullpointer if p is NULL
+               - eores_NOK_generic is mId or Nvindex are out of range
+               - eores_NOK_nodata if motor identified by @e mId is not managed, by this board
+               - eores_OK on success
+ **/
+extern eOresult_t eo_appTheNVmapRef_GetMotorNVMemoryRef(EOappTheNVmapRef* p, eOmc_motorId_t mId, uint8_t nvindex, void**memRef);
 
 
 extern eOresult_t eo_appTheNVmapRef_GetSkinNVMemoryRef(EOappTheNVmapRef* p, eOsk_skinId_t skId, uint8_t nvindex, void**memRef);
