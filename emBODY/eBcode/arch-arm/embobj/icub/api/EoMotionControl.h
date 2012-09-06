@@ -350,6 +350,10 @@ typedef struct                  // size is 1+3+4*3 = 16
 
 typedef eOmc_calibrator32_t eOmc_calibrator_t;
 
+/*  This proposition is used to check if used calibrator is eOmc_calibrator32_t.
+    This check is important because calibrators'params are sent to can and so conrveted. 
+    If used calibrator is a different one, please modify converter object. */
+EO_VERIFYproposition(isusedcalibrator32, (sizeof(eOmc_calibrator_t) == sizeof(eOmc_calibrator32_t)));
 
 
 /** @typedef    typedef struct eOmc_setpoint_t

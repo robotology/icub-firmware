@@ -23,7 +23,7 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-
+#include "EoMotionControl.h"
 #include "EOpid.h"
 #include "EOaxisController_hid.h"
 
@@ -34,19 +34,19 @@ extern "C" {
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 typedef enum { 
-    CM_IDLE                 =0x00,   //
-    CM_POSITION             =0x01,   //
-    CM_POS_VEL              =0x02,   //
-    CM_TORQUE               =0x03,   //
-    CM_IMPEDANCE_POS        =0x04,   //
-    CM_IMPEDANCE_VEL        =0x05,   //
-    CM_CURRENT              =0x06,
-    CM_VELOCITY             =0x07,
+    CM_IDLE                 = eomc_controlmode_idle,                // = 0x00  
+    CM_POSITION             = eomc_controlmode_position,            // = 0x01
+    CM_POS_VEL              = eomc_controlmode_velocity,            // = 0x02
+    CM_TORQUE               = eomc_controlmode_torque,              // = 0x03
+    CM_IMPEDANCE_POS        = eomc_controlmode_impedance_pos,       // = 0x04
+    CM_IMPEDANCE_VEL        = eomc_controlmode_impedance_vel,       // = 0x05
+    CM_CURRENT              = eomc_controlmode_current,
+    CM_VELOCITY             = 0x07,
 
-    CM_CALIB_ABS_POS_SENS   =0x10,   //
+    CM_CALIB_ABS_POS_SENS   = eomc_controlmode_calib_abs_pos_sens,   // = 0x10
 
-    CM_OPENLOOP             =0x50,   //
-    CM_SWITCH_OFF           =0xF0
+    CM_OPENLOOP             = eomc_controlmode_openloop,             // = 0x50
+    CM_SWITCH_OFF           = eomc_controlmode_switch_everything_off // = 0xF0
 } control_mode_t;
 
 /** @typedef    typedef struct EOaxisController_hid EOaxisController
