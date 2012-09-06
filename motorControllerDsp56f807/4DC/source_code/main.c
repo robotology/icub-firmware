@@ -689,7 +689,7 @@ void main(void)
 			if (_calibrated[i]==true) 
 			{
 				temp_swap = get_position_encoder(i);
-				ENFORCE_ENC_LIMITS_HAND((_pid[i]), temp_swap, ((Int32)_max_position_enc[i]));
+				ENFORCE_ENC_LIMITS((_pid[i]), temp_swap, ((Int32)_max_position_enc[i]));
 	
 			}
 			// check for encoder drift
