@@ -65,8 +65,10 @@ extern "C" {
 #define ICUBCANPROTO_PER_MB_CMD_VELOCITY			        7
 #define ICUBCANPROTO_PER_MB_CMD_PID_ERROR			        8
 #define ICUBCANPROTO_PER_MB_CMD_DEBUG				        9
+#define ICUBCANPROTO_PER_MB_CMD_MOTOR_POSITION              10
+#define ICUBCANPROTO_PER_MB_CMD_MOTOR_SPEED                 11
 
-#define ICUBCANPROTO_PER_MB_CMD_MAXNUM			            ICUBCANPROTO_PER_MB_CMD_DEBUG + 1
+#define ICUBCANPROTO_PER_MB_CMD_MAXNUM			            ICUBCANPROTO_PER_MB_CMD_MOTOR_SPEED + 1
 
 
 /***************************************************************************/
@@ -223,6 +225,8 @@ ICUBCANPROTO_PER_SB_CMD_
 #define ICUBCANPROTO_PER_SB_CMD__TORQUE_VECTOR     0xB // Transmit Force  values f1 f1 f2 f2 f3 f3
 #define ICUBCANPROTO_PER_SB_CMD__HES0TO6           0xC //hall effect sensors from 0  to 6  *8bits
 #define ICUBCANPROTO_PER_SB_CMD__HES7TO14          0xD //hall effect sensors from 7  to 14  *8bits
+#define ICUBCANPROTO_PER_SB_CMD__UNCALIBFORCE_VECTOR_DEBUGMODE      0x8 // Transmit Torque values t1 t1 t2 t2 t3 t3
+#define ICUBCANPROTO_PER_SB_CMD__UNCALIBTORQUE_VECTOR_DEBUGMODE     0x9 // Transmit Force  values f1 f1 f2 f2 f3 f3
 
 
 //the following msg are unused!!!
@@ -233,7 +237,6 @@ ICUBCANPROTO_PER_SB_CMD_
 //there there aren't skin's messages!!!
 
 #define ICUBCANPROTO_PER_SB_CMD__CMD_MAXNUM         6
-
 
 
 
@@ -275,6 +278,7 @@ typedef enum
                 CAN address on the same CAN bus.
                 Each CAN board can manage two axis at most, 
                 but a physical board can manage 4 axises at most.
+    @warning    If you change this enum pay attention to eo_emsCanNetTopo_jm_indexInBoard in EOicubCanProto_specifications.h
  **/
 typedef enum
 {
@@ -282,6 +286,11 @@ typedef enum
     eo_icubCanProto_mAxis_1 = 1
 } eo_icubCanProto_motorAxis_t;
 
+
+/** @typedef    enum{eo_icubCanProtomotorAxis_maxNum4CanBoard = 2};
+    @brief      this is the max numeber of motor axis for each canBoard
+ **/
+enum{eo_icubCanProtomotorAxis_maxNum4CanBoard = 2};
 
 /** @typedef    typedef     uint8_t             eo_icubCanProto_canBoardAddress_t
     @brief      contains can address of board. 
@@ -345,6 +354,207 @@ typedef struct
 #define ICUBCANPROTO_MSGCOMMAND_CREATE(class, cmdId)   ((eo_icubCanProto_msgCommand_t)(class<<8 |cmdId))
 
 
+/** @typedef    typedef int32_t             eOicubCanProto_position_t
+    @brief      eOicubCanProto_position_t contains the position values.
+                it is expressed in encoder ticks.                 
+ **/
+typedef int32_t             eOicubCanProto_position_t;
+
+
+
+/** @typedef    typedef int16_t              eOicubCanProto_velocity_t
+    @brief      eOicubCanProto_velocity_t contains the velocity values.
+ **/
+typedef int16_t              eOicubCanProto_velocity_t;
+
+
+/** @typedef    typedef int16_t              eOicubCanProto_acceleration_t
+    @brief      eOicubCanProto_acceleration_t contains the acceleration values.
+ **/
+typedef int16_t              eOicubCanProto_acceleration_t;
+
+
+/** @typedef    typedef int16_t             eOicubCanProto_force_t
+    @brief      eOicubCanProto_force_t contains the force values.
+ **/
+typedef int16_t             eOicubCanProto_force_t;
+
+
+/** @typedef    typedef int16_t             eOicubCanProto_torque_t
+    @brief      eOicubCanProto_torque_t contains the torque values.
+ **/
+typedef int16_t             eOicubCanProto_torque_t;
+
+
+/** @typedef    typedef uint32_t             eOicubCanProto_stiffness_t
+    @brief      eOicubCanProto_stiffness_t contains the stiffness values.
+ **/
+typedef uint16_t            eOicubCanProto_stiffness_t;
+
+
+/** @typedef    typedef uint32_t             eOicubCanProto_damping_t
+    @brief      eOicubCanProto_damping_t contains the damping values.
+ **/
+typedef uint16_t            eOicubCanProto_damping_t;
+
+
+/** @typedef    typedef int16_t             eOicubCanProto_current_t
+    @brief      eOicubCanProto_current_t contains the current values.
+                the measurement unit is equal to imA (icub milli Ampere)
+                imA = 25000 mA / 32K = 0.762939453125 mA 
+ **/
+typedef int16_t             eOicubCanProto_current_t;
+
+
+/** @typedef    typedef enum eOicubCanProto_setpoint_type_t
+    @brief      contains the possible types of setpoints.
+                this is compatible with eOicubCanProto_setpoint_type_t.
+ **/
+typedef enum
+{
+    eoicubCanProto_setpoint_position                      = 0,
+    eoicubCanProto_setpoint_velocity                      = 1,
+    eoicubCanProto_setpoint_torque                        = 2,
+    eoicubCanProto_setpoint_current                       = 3
+} eOicubCanProto_setpoint_type_t;
+
+/** @typedef    typedef struct eOicubCanProto_setpoint_position_t
+    @brief      eOicubCanProto_setpoint_position_t contains the position setpoint to be sent can board by can bus
+ **/
+typedef struct
+{
+    eOicubCanProto_position_t       value; 
+    eOicubCanProto_velocity_t       withvelocity; 
+} eOicubCanProto_setpoint_position_t; 
+
+
+/** @typedef    typedef struct eOicubCanProto_setpoint_velocity_t
+    @brief      eOicubCanProto_setpoint_velocity_t contains the velocity setpoint to be sent can board by can bus
+ **/
+typedef struct
+{
+    eOicubCanProto_velocity_t       value; 
+    eOicubCanProto_acceleration_t   withacceleration; 
+} eOicubCanProto_setpoint_velocity_t; 
+
+
+/** @typedef    typedef struct eOicubCanProto_setpoint_torque_t
+    @brief      eOicubCanProto_setpoint_torque_t contains the torque setpoint to be sent can board by can bus
+ **/
+typedef struct
+{
+    eOicubCanProto_torque_t        value; 
+} eOicubCanProto_setpoint_torque_t; 
+
+
+/** @typedef    typedef struct eOicubCanProto_setpoint_current_t
+    @brief      eOicubCanProto_setpoint_current_t contains the current setpoint to be sent can board by can bus
+ **/
+typedef struct
+{
+    eOicubCanProto_current_t       value; 
+} eOicubCanProto_setpoint_current_t; 
+
+
+
+/** @typedef    typedef struct eOicubCanProto_calibrator_params_type0_hard_stops_t
+    @brief      contains the params in case of eOicubCanProto_calibration_type0_hard_stops
+ **/
+typedef struct  
+{
+    int16_t                             pwmlimit;
+    eOicubCanProto_velocity_t           velocity;
+} eOicubCanProto_calibrator_params_type0_hard_stops_t;
+
+
+/** @typedef    typedef struct eOicubCanProto_calibrator_params_type1_abs_sens_analog_t
+    @brief      contains the params in case of eOicubCanProto_calibration_type1_abs_sens_analog_t
+ **/
+typedef struct  
+{
+    eOicubCanProto_position_t           position;
+    eOicubCanProto_velocity_t           velocity;
+} eOicubCanProto_calibrator_params_type1_abs_sens_analog_t;
+
+
+/** @typedef    typedef struct eOicubCanProto_calibrator_params_type2_hard_stops_diff_t
+    @brief      contains the params in case of eOicubCanProto_calibration_type2_hard_stops_diff_t
+ **/
+typedef struct  
+{
+    int16_t                             pwmlimit;
+    eOicubCanProto_velocity_t           velocity;
+} eOicubCanProto_calibrator_params_type2_hard_stops_diff_t;
+
+
+/** @typedef    typedef struct eOicubCanProto_calibrator_params_type3_abs_sens_digital_t
+    @brief      contains the params in case of eOicubCanProto_calibration_type3_abs_sens_digital_t
+ **/
+typedef struct  
+{
+    eOicubCanProto_position_t           position;
+    eOicubCanProto_velocity_t           velocity;
+    int32_t                             offset;
+} eOicubCanProto_calibrator_params_type3_abs_sens_digital_t;
+
+
+/** @typedef    typedef struct eOicubCanProto_calibrator_params_type4_abs_and_incremental_t
+    @brief      contains the params in case of eOicubCanProto_calibration_type4_abs_and_incremental_t
+ **/
+typedef struct  
+{
+    eOicubCanProto_position_t           position;
+    eOicubCanProto_velocity_t           velocity;
+    uint32_t                            maxencoder;
+} eOicubCanProto_calibrator_params_type4_abs_and_incremental_t;
+
+
+
+/** @typedef    typedef enum eOicubCanProto_calibration_type_t
+    @brief      contains the possible types of calibration.
+    @warniing   this type is equal to eOmc_calibration_type_t.
+                Pay attention to mantain these types synchronized
+ **/
+typedef enum
+{
+    eoicubCanProto_calibration_type0_hard_stops               = 0,
+    eoicubCanProto_calibration_type1_abs_sens_analog          = 1,
+    eoicubCanProto_calibration_type2_hard_stops_diff          = 2,
+    eoicubCanProto_calibration_type3_abs_sens_digital         = 3,
+    eoicubCanProto_calibration_type4_abs_and_incremental      = 4
+} eOicubCanProto_calibration_type_t;
+
+
+
+/** @typedef    typedef struct eOicubCanProto_calibrator_t
+    @brief      eOicubCanProto_calibrator32_t specifies a calibrator with type and parameters for teh new definition of measures
+    @warning    this type is similar to eOmc_calibrator32_t, witout padding. Pay attention to mantain these types synchronized
+ **/
+typedef struct 
+{
+    eOicubCanProto_calibration_type_t                  type; 
+    union                           
+    {
+        eOicubCanProto_calibrator_params_type0_hard_stops_t               type0;
+        eOicubCanProto_calibrator_params_type1_abs_sens_analog_t          type1;
+        eOicubCanProto_calibrator_params_type2_hard_stops_diff_t          type2;
+        eOicubCanProto_calibrator_params_type3_abs_sens_digital_t         type3;
+        eOicubCanProto_calibrator_params_type4_abs_and_incremental_t      type4;
+    } params;                                                       /**< the params of the calibrator */   
+} eOicubCanProto_calibrator_t;
+
+
+
+/** @typedef    typedef struct eOmc_impedance_t
+    @brief      eOmc_impedance_t specifies a the parameters used in control of kind 
+                eomc_controlmode_impedance_pos or eomc_controlmode_impedance_vel.
+ **/
+typedef struct
+{
+    eOicubCanProto_stiffness_t          stiffness;                          /**< the Ks parameter */
+    eOicubCanProto_damping_t            damping;                            /**< the Kd parameter */
+    eOicubCanProto_torque_t             offset;                             /**< the Ko parameter */                      
+} eOicubCanProto_impedance_t;
     
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
