@@ -41,7 +41,6 @@ extern "C" {
 
 #include "EOemsCanNetworkTopology.h"
 
-#include "EOVcanProto.h"
 // - declaration of extern public interface ---------------------------------------------------------------------------
 #include "EOicubCanProto.h"
 
@@ -50,7 +49,6 @@ extern "C" {
 // - definition of the hidden struct implementing the object ---------------------------------------------------------- 
 struct EOicubCanProto_hid 
 {
-    EOVcanProto             *proto;
     const EOconstLookupTbl  *msgClasses_LUTbl__ptr;  /**< ....             */      
     EOemsCanNetTopo         *emsCanNetTopo_ptr;      /**< ....             */
 };

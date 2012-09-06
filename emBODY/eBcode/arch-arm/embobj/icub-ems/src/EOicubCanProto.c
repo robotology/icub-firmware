@@ -29,7 +29,6 @@
 #include "string.h"
 #include "EoCommon.h"
 #include "EOtheMemoryPool.h"
-#include "EOVcanProto_hid.h"
 #include "EOconstLookupTbl.h"
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -104,12 +103,8 @@ extern EOicubCanProto* eo_icubCanProto_New(eo_icubCanProto_cfg_t *cfg)
     // i get the memory for the object
     retptr = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOicubCanProto), 1);
     
-    retptr->proto = eov_canProto_hid_New();
     retptr->emsCanNetTopo_ptr = cfg->emsCanNetTopo__ptr;
     retptr->msgClasses_LUTbl__ptr = cfg->msgClasses_LUTbl__ptr;
-
-    eov_canProto_hid_SetVTABLE(retptr->proto, (eOres_fp_canProto_parserFn_t)s_eo_icubCanProto_ParseCanFrame, 
-                               (eOres_fp_canProto_formerFn_t)s_eo_icubCanProto_FormCanFrame);
 
     return(retptr);
 } 
@@ -123,8 +118,6 @@ extern eOresult_t eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_t 
         return(eores_NOK_nullpointer);
     }
 
-    //return(eov_canProto_ParseCanFrame(p, frame, canPortRX));
-    //use this in oreder to remove overhead
     return(s_eo_icubCanProto_ParseCanFrame(p, frame, canPortRX));
 }
 
@@ -142,10 +135,6 @@ extern eOresult_t eo_icubCanProto_FormCanFrame(EOicubCanProto* p,
         return(eores_NOK_nullpointer);
     }
 
-//   return(eov_canProto_FormCanFrame(p, (eo_canProto_msgCommand_t)command, 
-//                                          (eo_canProto_msgDestination_t) dest,
-//                                          value, frame));
-     //use this in oreder to remove overhead
     return(s_eo_icubCanProto_FormCanFrame(p, *((eo_canProto_msgCommand_t*)&command), 
                                           *((eo_canProto_msgDestination_t*)&dest),
                                           value, frame));
