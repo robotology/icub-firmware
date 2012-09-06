@@ -61,7 +61,9 @@ extern "C" {
 typedef struct EOicubCanProto_hid EOicubCanProto;
 
 
+typedef uint32_t 	    eo_canProto_msgCommand_t;
 
+typedef uint32_t        eo_canProto_msgDestination_t;
 
 typedef struct
 {
