@@ -31,10 +31,10 @@
 
 // <h> Porting specifics 
 // <i> sssssssss
-//   <o> RTOS type         <0=>   IITmodified-RTXARM
-//   <i> Only IITmodified-RTXARM is now supported.
+//   <o> RTOS type         <0=>   IITmodified-RTXARM    <1=>    OOSIIT
+//   <i> Only IITmodified-RTXARM and OOSIIT are so far supported.
 #ifndef OSAL_RTOSTYPE
- #define OSAL_RTOSTYPE      0
+ #define OSAL_RTOSTYPE      1
 #endif
 
 
@@ -50,6 +50,7 @@
 // <h> Embedded System 
 // <i> sssssssss
 
+
 //   <o> CPU family         <0=>   Cortex M3 <1=>   Cortex M4
 //   <i> Only Cortex M3 and M4 are now supported.
 #ifndef OSAL_CPUFAM
@@ -58,7 +59,7 @@
 
 //   <o> CPU Frequency [Hz] <1-1000000000>
 //   <i> Specify CPU frequency.
-//   <i> Default: 72000000  (72MHz on STM32F107, 168Mhz on STM32F407)
+//   <i> Default: 72000000  (72MHz on STM32F107)
 #ifndef OSAL_CPUFREQ
  #define OSAL_CPUFREQ       72000000
 #endif
@@ -197,8 +198,8 @@
 
 // - some controls ----------------------------------------------------------------------------------------------------
 
-#if(0 != OSAL_RTOSTYPE)
-    #error only arm-rtx modified by iit is supported so far
+#if(OSAL_RTOSTYPE > 1)
+    #error only arm-rtx modified by iit and oosiit are supported so far
 #endif
 
 

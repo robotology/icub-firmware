@@ -31,8 +31,8 @@
 
 // <h> Porting specifics 
 // <i> sssssssss
-//   <o> RTOS type         <0=>   IITmodified-RTXARM
-//   <i> Only IITmodified-RTXARM is now supported.
+//   <o> RTOS type         <0=>   IITmodified-RTXARM    <1=>    OOSIIT
+//   <i> Only IITmodified-RTXARM and OOSIIT are so far supported.
 #ifndef OSAL_RTOSTYPE
  #define OSAL_RTOSTYPE      0
 #endif
@@ -50,8 +50,8 @@
 // <h> Embedded System 
 // <i> sssssssss
 
-//   <o> CPU family         <0=>   Cortex M3 <1=> Cortex M4
-//   <i> Only Cortex M3 is now supported.
+//   <o> CPU family         <0=>   Cortex M3 <1=>   Cortex M4
+//   <i> Only Cortex M3 and M4 are now supported.
 #ifndef OSAL_CPUFAM
  #define OSAL_CPUFAM      1
 #endif
@@ -197,8 +197,8 @@
 
 // - some controls ----------------------------------------------------------------------------------------------------
 
-#if(0 != OSAL_RTOSTYPE)
-    #error only arm-rtx modified by iit is supported so far
+#if(OSAL_RTOSTYPE > 1)
+    #error only arm-rtx modified by iit and oosiit are supported so far
 #endif
 
 

@@ -75,6 +75,8 @@ extern void LED_toggle(void);
 
 void init(void);
 
+void stay(void);
+
 void mytask(void *p);
 void yotask(void *p);
 void wotask(void *p);
@@ -143,7 +145,7 @@ void init(void)
     //osal_timer_new(1*100, tmr_period, s_toggle_led_cbk, (void*)&s_gpiotmr);
 
 
-    run_test_4_bug_scheduling_disable_testnumber = 3;
+    run_test_4_bug_scheduling_disable_testnumber = 0;
     if(1 == run_test_4_bug_scheduling_disable_testnumber)
     {
         tsk200 = osal_task_new(f200task, (void*)0x0, 200, 128);
@@ -164,6 +166,29 @@ void init(void)
     osal_info_entities_get_stats(&myused, &myfree);
     memcpy(osal_used, myused, sizeof(osal_used));
     memcpy(osal_free, myfree, sizeof(osal_free));
+    
+    stay();
+}
+
+
+void stay(void)
+{
+    volatile uint8_t aaa = 0;
+    // lower its priority to .... 220
+    osal_task_priority_set(osal_task_get(osal_callerTSK), 220);
+    
+    // set periodic call
+    osal_task_period_set(500*1000);
+    
+ 
+    for(;;)
+    {
+        osal_task_period_wait();
+        
+        aaa++;
+        aaa = aaa;       
+    }
+    
 }
 
 void f200task(void* p)

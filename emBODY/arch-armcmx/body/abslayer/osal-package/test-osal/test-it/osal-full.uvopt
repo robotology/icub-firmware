@@ -73,7 +73,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>1</IsCurrentTarget>
+        <IsCurrentTarget>0</IsCurrentTarget>
       </OPTFL>
       <CpuCode>255</CpuCode>
       <Books>
@@ -286,7 +286,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>0</IsCurrentTarget>
+        <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
       <CpuCode>255</CpuCode>
       <Books>
@@ -465,11 +465,11 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>413</TopLine>
-      <CurrentLine>420</CurrentLine>
+      <TopLine>111</TopLine>
+      <CurrentLine>116</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\app-test\blinky.c</PathWithFileName>
-      <FilenameWithoutPath>blinky.c</FilenameWithoutPath>
+      <PathWithFileName>..\app-test\blinky-osal-stm32fx.c</PathWithFileName>
+      <FilenameWithoutPath>blinky-osal-stm32fx.c</FilenameWithoutPath>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -482,8 +482,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\app-test\hwservices.c</PathWithFileName>
-      <FilenameWithoutPath>hwservices.c</FilenameWithoutPath>
+      <PathWithFileName>..\app-test\brd_mcbstm32x.c</PathWithFileName>
+      <FilenameWithoutPath>brd_mcbstm32x.c</FilenameWithoutPath>
     </File>
   </Group>
 
@@ -495,20 +495,6 @@
     <File>
       <GroupNumber>2</GroupNumber>
       <FileNumber>3</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\sys\mid\src\core_cm3.c</PathWithFileName>
-      <FilenameWithoutPath>core_cm3.c</FilenameWithoutPath>
-    </File>
-    <File>
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>4</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -529,13 +515,13 @@
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>3</GroupNumber>
-      <FileNumber>5</FileNumber>
+      <FileNumber>4</FileNumber>
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>151</TopLine>
+      <TopLine>153</TopLine>
       <CurrentLine>158</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app-test\startup_stm32f10x_cl.s</PathWithFileName>
@@ -550,7 +536,7 @@
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>4</GroupNumber>
-      <FileNumber>6</FileNumber>
+      <FileNumber>5</FileNumber>
       <FileType>4</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -571,28 +557,28 @@
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>5</GroupNumber>
-      <FileNumber>7</FileNumber>
+      <FileNumber>6</FileNumber>
       <FileType>5</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\osal-cfg\osal_cfg.h</PathWithFileName>
-      <FilenameWithoutPath>osal_cfg.h</FilenameWithoutPath>
-    </File>
-    <File>
-      <GroupNumber>5</GroupNumber>
-      <FileNumber>8</FileNumber>
-      <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\osal-cfg\osal_cfg.h</PathWithFileName>
+      <FilenameWithoutPath>osal_cfg.h</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>5</GroupNumber>
+      <FileNumber>7</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>84</TopLine>
+      <CurrentLine>89</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\osal-cfg\osal_cfg.c</PathWithFileName>
       <FilenameWithoutPath>osal_cfg.c</FilenameWithoutPath>
@@ -606,14 +592,14 @@
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>6</GroupNumber>
-      <FileNumber>9</FileNumber>
+      <FileNumber>8</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>77</ColumnNumber>
+      <ColumnNumber>101</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>250</TopLine>
-      <CurrentLine>262</CurrentLine>
+      <TopLine>948</TopLine>
+      <CurrentLine>958</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\osal\osal-src\osal-osiit.c</PathWithFileName>
       <FilenameWithoutPath>osal-osiit.c</FilenameWithoutPath>
@@ -627,7 +613,7 @@
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>10</FileNumber>
+      <FileNumber>9</FileNumber>
       <FileType>4</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -641,7 +627,7 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>11</FileNumber>
+      <FileNumber>10</FileNumber>
       <FileType>4</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -655,7 +641,7 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>12</FileNumber>
+      <FileNumber>11</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -676,7 +662,7 @@
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>8</GroupNumber>
-      <FileNumber>13</FileNumber>
+      <FileNumber>12</FileNumber>
       <FileType>4</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>

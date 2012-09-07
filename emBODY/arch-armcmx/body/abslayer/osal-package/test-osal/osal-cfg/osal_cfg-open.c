@@ -16,8 +16,8 @@
  * Public License for more details
 */
 
-/* @file       osal_cfg.c
-	@brief      This file keeps internal implementation of the osal.
+/* @file       osal_cfg-open.c
+	@brief      This file keeps internal configuration of the osal.
 	@author     marco.accame@iit.it
     @date       11/27/2009
 **/
@@ -37,10 +37,11 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
+
 #if defined(USE_BRD_MCBSTM32_C)
-    #include "osal_cfg-stm32f1.h"
+    #include "osal_cfg-open-stm32f1.h"
 #elif defined(USE_BRD_MCBSTM32_F400)
-    #include "osal_cfg-stm32f4.h"
+    #include "osal_cfg-open-stm32f4.h"
 #else
     #error --> you must define a board
 #endif
@@ -81,7 +82,6 @@ extern const osal_cfg_t osal_cfg =
 };
 
 
-extern const osal_cfg_t *osal_cfgMINE = &osal_cfg;
 extern const osal_cfg_t *osal_cfg_USERptr = &osal_cfg;
 
 

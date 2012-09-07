@@ -347,7 +347,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>DBG_MSG OSIIT_USE_EXTERNAL_TREADSAFETY STM32F10X_CL</Define>
+              <Define>STM32F10X_CL OOSIIT_USE_EXTERNAL_TREADSAFETY OSAL_CPUFAM_CM3</Define>
               <Undefine></Undefine>
               <IncludePath>..\app-test;..\..\osal\osal-api;..\..\osal\osal-cfg;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc</IncludePath>
             </VariousControls>
@@ -441,14 +441,14 @@
           <GroupName>osal-cfg</GroupName>
           <Files>
             <File>
-              <FileName>osal_cfg.h</FileName>
+              <FileName>osal_cfg-open.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\osal-cfg\osal_cfg.h</FilePath>
+              <FilePath>..\osal-cfg\osal_cfg-open.h</FilePath>
             </File>
             <File>
-              <FileName>osal_cfg.c</FileName>
+              <FileName>osal_cfg-open.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\osal-cfg\osal_cfg.c</FilePath>
+              <FilePath>..\osal-cfg\osal_cfg-open.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -456,9 +456,9 @@
           <GroupName>osal</GroupName>
           <Files>
             <File>
-              <FileName>osal-osiit.c</FileName>
+              <FileName>osal-oosiit.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\osal\osal-src\osal-osiit.c</FilePath>
+              <FilePath>..\..\osal\osal-src\osal-oosiit.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -466,9 +466,9 @@
           <GroupName>osiit</GroupName>
           <Files>
             <File>
-              <FileName>osiit.cm3.dbg.lib</FileName>
+              <FileName>oosiit.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\mid\lib\osiit.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\..\sys\mid\lib\oosiit.cm3.dbg.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -489,14 +489,14 @@
               </FileOption>
             </File>
             <File>
-              <FileName>osiit.cm3.lib</FileName>
+              <FileName>oosiit.cm3.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\mid\lib\osiit.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\..\sys\mid\lib\oosiit.cm3.lib</FilePath>
             </File>
             <File>
-              <FileName>osiit_storage.c</FileName>
+              <FileName>oosiit_storage.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\mid\inc\osiit_storage.c</FilePath>
+              <FilePath>..\..\..\..\..\sys\mid\inc\oosiit_storage.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -853,7 +853,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>DBG_MSG OSIIT_USE_EXTERNAL_TREADSAFETY STM32F10X_CL</Define>
+              <Define>STM32F10X_CL OOSIIT_USE_EXTERNAL_TREADSAFETY</Define>
               <Undefine></Undefine>
               <IncludePath>..\app-test;..\..\osal\osal-api;..\..\osal\osal-cfg;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc</IncludePath>
             </VariousControls>
@@ -947,14 +947,14 @@
           <GroupName>osal-cfg</GroupName>
           <Files>
             <File>
-              <FileName>osal_cfg.h</FileName>
+              <FileName>osal_cfg-open.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\osal-cfg\osal_cfg.h</FilePath>
+              <FilePath>..\osal-cfg\osal_cfg-open.h</FilePath>
             </File>
             <File>
-              <FileName>osal_cfg.c</FileName>
+              <FileName>osal_cfg-open.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\osal-cfg\osal_cfg.c</FilePath>
+              <FilePath>..\osal-cfg\osal_cfg-open.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -962,9 +962,9 @@
           <GroupName>osal</GroupName>
           <Files>
             <File>
-              <FileName>osal-osiit.c</FileName>
+              <FileName>osal-oosiit.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\osal\osal-src\osal-osiit.c</FilePath>
+              <FilePath>..\..\osal\osal-src\osal-oosiit.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -972,14 +972,14 @@
           <GroupName>osiit</GroupName>
           <Files>
             <File>
-              <FileName>osiit.cm3.dbg.lib</FileName>
+              <FileName>oosiit.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\mid\lib\osiit.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\..\sys\mid\lib\oosiit.cm3.dbg.lib</FilePath>
             </File>
             <File>
-              <FileName>osiit.cm3.lib</FileName>
+              <FileName>oosiit.cm3.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\mid\lib\osiit.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\..\sys\mid\lib\oosiit.cm3.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1000,9 +1000,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>osiit_storage.c</FileName>
+              <FileName>oosiit_storage.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\mid\inc\osiit_storage.c</FilePath>
+              <FilePath>..\..\..\..\..\sys\mid\inc\oosiit_storage.c</FilePath>
             </File>
           </Files>
         </Group>

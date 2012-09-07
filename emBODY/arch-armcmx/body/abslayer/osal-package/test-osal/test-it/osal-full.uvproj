@@ -347,7 +347,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>DBG_MSG OSIIT_USE_EXTERNAL_TREADSAFETY STM32F10X_CL</Define>
+              <Define>STM32F10X_CL USE_BRD_MCBSTM32_C  OSIIT_USE_EXTERNAL_TREADSAFETY</Define>
               <Undefine></Undefine>
               <IncludePath>..\app-test;..\..\osal\osal-api;..\..\osal\osal-cfg;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc</IncludePath>
             </VariousControls>
@@ -391,25 +391,20 @@
           <GroupName>app</GroupName>
           <Files>
             <File>
-              <FileName>blinky.c</FileName>
+              <FileName>blinky-osal-stm32fx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app-test\blinky.c</FilePath>
+              <FilePath>..\app-test\blinky-osal-stm32fx.c</FilePath>
             </File>
             <File>
-              <FileName>hwservices.c</FileName>
+              <FileName>brd_mcbstm32x.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app-test\hwservices.c</FilePath>
+              <FilePath>..\app-test\brd_mcbstm32x.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
           <GroupName>cmsis</GroupName>
           <Files>
-            <File>
-              <FileName>core_cm3.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\mid\src\core_cm3.c</FilePath>
-            </File>
             <File>
               <FileName>system_stm32f10x.c</FileName>
               <FileType>1</FileType>
@@ -853,7 +848,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>DBG_MSG OSIIT_USE_EXTERNAL_TREADSAFETY STM32F10X_CL</Define>
+              <Define>STM32F10X_CL USE_BRD_MCBSTM32_C  OSIIT_USE_EXTERNAL_TREADSAFETY</Define>
               <Undefine></Undefine>
               <IncludePath>..\app-test;..\..\osal\osal-api;..\..\osal\osal-cfg;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc</IncludePath>
             </VariousControls>
@@ -897,25 +892,20 @@
           <GroupName>app</GroupName>
           <Files>
             <File>
-              <FileName>blinky.c</FileName>
+              <FileName>blinky-osal-stm32fx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app-test\blinky.c</FilePath>
+              <FilePath>..\app-test\blinky-osal-stm32fx.c</FilePath>
             </File>
             <File>
-              <FileName>hwservices.c</FileName>
+              <FileName>brd_mcbstm32x.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app-test\hwservices.c</FilePath>
+              <FilePath>..\app-test\brd_mcbstm32x.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
           <GroupName>cmsis</GroupName>
           <Files>
-            <File>
-              <FileName>core_cm3.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\sys\mid\src\core_cm3.c</FilePath>
-            </File>
             <File>
               <FileName>system_stm32f10x.c</FileName>
               <FileType>1</FileType>

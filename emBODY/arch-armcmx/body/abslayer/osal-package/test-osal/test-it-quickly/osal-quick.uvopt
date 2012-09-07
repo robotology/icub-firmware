@@ -134,7 +134,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ULP2CM3</Key>
-          <Name>-UP1123158 -O206 -S8 -C0 -N00("ARM CoreSight SW-DP") -D00(1BA01477) -L00(0) -TO12307 -TC72000000 -TP8 -TDX0 -TDD0 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_CL -FS08000000 -FL040000</Name>
+          <Name>-UP1123158 -O206 -S8 -C0 -P00 -N00("ARM CoreSight SW-DP") -D00(1BA01477) -L00(0) -TO12307 -TC72000000 -TP8 -TDX0 -TDD0 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_CL -FS08000000 -FL040000</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -242,8 +242,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>286</TopLine>
-      <CurrentLine>301</CurrentLine>
+      <TopLine>312</TopLine>
+      <CurrentLine>316</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app-test\blinky.c</PathWithFileName>
       <FilenameWithoutPath>blinky.c</FilenameWithoutPath>
@@ -312,7 +312,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>158</TopLine>
+      <TopLine>151</TopLine>
       <CurrentLine>158</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app-test\startup_stm32f10x_cl.s</PathWithFileName>
@@ -392,8 +392,22 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\sys\abs\lib\osal.cm3.lib</PathWithFileName>
-      <FilenameWithoutPath>osal.cm3.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\sys\abs\lib\osal.cm3.dbg.lib</PathWithFileName>
+      <FilenameWithoutPath>osal.cm3.dbg.lib</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>10</FileNumber>
+      <FileType>4</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\sys\mid\lib\eventviewer.cm3.lib</PathWithFileName>
+      <FilenameWithoutPath>eventviewer.cm3.lib</FilenameWithoutPath>
     </File>
   </Group>
 
