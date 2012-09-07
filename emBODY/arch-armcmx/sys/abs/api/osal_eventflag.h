@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -60,7 +60,7 @@ typedef uint32_t                            osal_eventflag_t;
 typedef enum 
 {
     osal_waitALLflags = 0,       /** < waits for every bit set in the eventflag */          
-    osal_waitANYflag             /** < waits for only the first available in the bits set in the eventflag */ 
+    osal_waitANYflag  = 1        /** < waits for only the first available in the bits set in the eventflag */ 
 } osal_eventflag_waitmode_t;
 
    
@@ -76,10 +76,10 @@ typedef enum
     @brief      Sends an event flag to a given task.
     @param      msk             The event mask.
     @param      totask          A valid handle to the destination task 
-    @param      caller          The caller mode.  Use osal_callerTSK if teh caller is a normal task and
-                                osal_callerISR is the caller is an ISR or a function executed directly by
-                                the scheduler (as a timer callback).
-    @return     A a osal_res_OK upon success and osal_res_NOK_nullpointer if task handle is NULL.
+    @param      caller          The caller mode.  Use osal_callerTSK if the caller is a normal task and
+                                osal_callerISR if the caller is an ISR, or osal_callerTMRMAN if it is a function executed by
+                                the timer manager (hence by the scheduler).
+    @return     The value of osal_res_OK upon success and osal_res_NOK_nullpointer if task handle is NULL.
 **/
 extern osal_result_t osal_eventflag_set(osal_eventflag_t flag, osal_task_t * totask, osal_caller_t caller); 
 
@@ -91,7 +91,7 @@ extern osal_result_t osal_eventflag_set(osal_eventflag_t flag, osal_task_t * tot
                                 the bits whcih are set in the waitmsk.
     @param      rxmsk           The received mask.  It contains a valid content only if result is not osal_res_NOK_timeout.
     @param      tout            The timeout of teh operation
-    @return     A osal_res_OK upon success or a osal_res_NOK_timeout if timeout expired.
+    @return     The value of osal_res_OK upon success or a osal_res_NOK_timeout if timeout expired.
 **/
 extern osal_result_t osal_eventflag_get(osal_eventflag_t waitmsk, osal_eventflag_waitmode_t waitmode, osal_eventflag_t *rxmsk, osal_reltime_t tout);
 

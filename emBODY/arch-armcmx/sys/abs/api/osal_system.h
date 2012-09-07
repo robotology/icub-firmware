@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -67,23 +67,22 @@
                                 data structures and to start tasks.  Finally it shall return or enter a forever loop.  
                                 This function runs at highest priority in the system (osal_prio_systsk_launcher = 254) 
                                 and allows other tasks to execute only when it returns or blocks itself in a forever loop 
-                                or if its priority is lowered. 
-    @param      launcherstacksize   Dimension in bytes if the stack used by the launcher task which runs launcher_fn.
+                                or if its priority is lowered.
     @return     The function never returns. If launcher_fn is NULL it calls the error manager, otherwise it starts the 
                 scheduler.
  **/
 extern void osal_system_start(void (*launcher_fn)(void));
 
 
-/** @fn         extern void * osal_system_launcherbuffer_get(uint16_t *size)
-    @brief      Retrieves the memory area which was used by the launcher task as its stack.  This function
-                can be called only by an ordinary running task. It has a protection which returns NULL if the
-                launcher tasks has not been launched yet or if it is still running. 
-                after .
-    @param      size        Points to the size of the returned memory.
-    @return     The required memory or NULL.
- **/
-extern void * osal_system_launcherbuffer_get(uint16_t *size);
+// /** @fn         extern void * osal_system_launcherbuffer_get(uint16_t *size)
+//     @brief      Retrieves the memory area which was used by the launcher task as its stack.  This function
+//                 can be called only by an ordinary running task. It has a protection which returns NULL if the
+//                 launcher tasks has not been launched yet or if it is still running.
+//                 after .
+//     @param      size        Points to the size of the returned memory.
+//     @return     The required memory or NULL.
+//  **/
+//extern void * osal_system_launcherbuffer_get(uint16_t *size);
 
 
 /** @fn         extern void osal_system_ticks_abstime_set(osal_abstime_t tot)

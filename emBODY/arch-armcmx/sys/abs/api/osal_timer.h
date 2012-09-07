@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -93,8 +93,8 @@ typedef struct
 
 /** @fn         extern osal_timer_t * osal_timer_new(void)
     @brief      Creates a timer which will allow the task timermanager to execute a callback function at its priority
-                osal_prio_systsk_timerman_*.  In osal_rtostype_iitmod_rtxarm, the timer manager is directly run by the
-                scheduler, hence there is maximum priority.
+                osal_prio_systsk_timerman_*.  In osal_rtostype_iitmod_rtxarm and osal_rtostype_oosiit the timer manager 
+                is directly run by the scheduler, hence there is maximum priority.
     @return     A not NULL handle to the timer or NULL upon failure.
 **/
 extern osal_timer_t * osal_timer_new(void);

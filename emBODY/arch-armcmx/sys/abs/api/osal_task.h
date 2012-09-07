@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -58,6 +58,18 @@ typedef struct osal_task_opaque_t           osal_task_t;
  **/
 typedef uint8_t osal_task_id_t;  
 
+
+/** @typedef    typedef struct osal_task_properties_t
+    @brief      Contains the properties used to launch a task.
+ **/
+typedef struct
+{
+    void(*function)(void* param);       /**< the function executed by the task. typically it is a forever loop. */
+    void*               param;          /**< the param of the function executed by the task.  */
+    uint8_t             priority;       /**< the priority of the task. Valid values are between osal_prio_usrtsk_min (1) and osal_prio_usrtsk_max (253) */
+    uint16_t            stacksize;      /**< the stack size */
+} osal_task_properties_t;
+
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
@@ -83,12 +95,29 @@ typedef uint8_t osal_task_id_t;
 extern osal_task_t * osal_task_new(void (*run_fn)(void*), void *run_arg, uint8_t prio, uint16_t stksize);
 
 
+/** @fn         extern osal_task_t * osal_task_new1(osal_task_properties_t *tskprop)
+    @brief      Starts a task with a given execution function and argument running at a given priority and with a stack
+                made available by the osal.
+    @param      tskprop         A pointer to a struct containing the necessary params.
+    @return     A not NULL handle to the task or NULL upon failure.
+**/
+extern osal_task_t * osal_task_new1(osal_task_properties_t *tskprop);
+
+
 /** @fn         extern osal_task_t * osal_task_get(osal_caller_t caller)
     @brief      Gets the handle of the running task (or interrupted by the ISR or timer manager)
     @param      caller      the caller.
     @return     A not NULL handle to the task.
 **/
 extern osal_task_t * osal_task_get(osal_caller_t caller);
+
+
+/** @fn         extern void * osal_task_stack_get(uint16_t *size)
+    @brief      Gets the stack of the running task
+    @param      size        pointer to stack size
+    @return     pointer to the stack.
+**/
+extern void * osal_task_stack_get(uint16_t *size);
 
 
 /** @fn         extern osal_result_t osal_task_priority_get(osal_task_t *tsk, uint8_t *prio)
@@ -171,6 +200,15 @@ extern osal_result_t osal_task_period_set(osal_reltime_t period);
     @return     Always osal_res_OK.
  **/
 extern osal_result_t osal_task_period_wait(void);
+
+
+/** @fn         extern osal_result_t osal_task_delete(osal_task_t *tsk)
+    @brief      Deletes a task and free some resources. If memory model is static, it does not free the stack of the
+                function.
+    @param      tsk             The handle to the task.
+    @return     On success: osal_res_OK, otherwise: osal_res_NOK_nullpointer.
+ **/
+extern osal_result_t osal_task_delete(osal_task_t *tsk);
 
 
 /* @}            
