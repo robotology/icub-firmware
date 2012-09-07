@@ -436,9 +436,9 @@
           <GroupName>osal-cfg</GroupName>
           <Files>
             <File>
-              <FileName>osal_cfg.h</FileName>
+              <FileName>osal_cfg-stm32f1.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\osal-cfg\osal_cfg.h</FilePath>
+              <FilePath>..\osal-cfg\osal_cfg-stm32f1.h</FilePath>
             </File>
             <File>
               <FileName>osal_cfg.c</FileName>
@@ -937,9 +937,9 @@
           <GroupName>osal-cfg</GroupName>
           <Files>
             <File>
-              <FileName>osal_cfg.h</FileName>
+              <FileName>osal_cfg-stm32f1.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\osal-cfg\osal_cfg.h</FilePath>
+              <FilePath>..\osal-cfg\osal_cfg-stm32f1.h</FilePath>
             </File>
             <File>
               <FileName>osal_cfg.c</FileName>
