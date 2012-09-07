@@ -31,8 +31,8 @@
 
 // <h> Porting specifics 
 // <i> sssssssss
-//   <o> RTOS type         <0=>   IITmodified-RTXARM
-//   <i> Only IITmodified-RTXARM is now supported.
+//   <o> RTOS type         <0=>   IITmodified-RTXARM    <1=>    OOSIIT
+//   <i> Only IITmodified-RTXARM and OOSIIT are so far supported.
 #ifndef OSAL_RTOSTYPE
  #define OSAL_RTOSTYPE      0
 #endif
