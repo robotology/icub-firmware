@@ -139,8 +139,11 @@ int main(void)
     
     oosiit_memory_getsize(oosiit_cfg_USERptr, &ram32num, &ram64num);
 
-    ram32data = (uint32_t*)calloc(ram32num/4, sizeof(uint32_t));
-    ram64data = (uint64_t*)calloc(ram64num/8, sizeof(uint64_t));
+//     ram32data = (uint32_t*)calloc(ram32num/4, sizeof(uint32_t));
+//     ram64data = (uint64_t*)calloc(ram64num/8, sizeof(uint64_t));
+
+    ram32data = (uint32_t*)oosiit_memory_new(ram32num);
+    ram64data = (uint64_t*)oosiit_memory_new(ram64num);
     
     if((NULL == ram32data) || (NULL == ram64data))
     {

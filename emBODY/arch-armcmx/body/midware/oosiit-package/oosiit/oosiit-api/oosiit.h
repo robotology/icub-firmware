@@ -179,12 +179,28 @@ extern const uint64_t oosiit_asaptime;  // = OOSIIT_ASAPTIME
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // memory functions
 
+/** @fn         extern void* oosiit_memory_new(uint32_t size)
+    @brief      Thread safe memory allocator. It cannot be called from within an ISR. 
+    @param      size            the size of the requested memory in bytes.
+    @return     if successful a proper 8-aligned memory pointer, otherwise it returns NULL.
+ **/ 
+extern void* oosiit_memory_new(uint32_t size);
+
+
+/** @fn         extern oosiit_result_t oosiit_memory_del(void* mem)
+    @brief      Thread-safe memory free. It cannot be called from within an ISR. 
+    @param      mem             the pointer to the memory to be de-allocated.
+    @return     if successful oosiit_res_OK, otherwise it returns oosiit_res_NOK (for instance if called with NULL pointer)
+ **/ 
+extern oosiit_result_t oosiit_memory_del(void* mem);
+
+
 /** @fn         extern void oosiit_memory_getsize(const oosiit_params_cfg_t *cfg, uint16_t *num04aligned, uint16_t *num08aligned)
     @brief      Gives back the size in bytes of the memory required by the oosiit. 
     @param      cfg             A pointer to a configuration. If NULL, return values are non-valid (both zero).
     @param      size04aligned   The number of bytes of four-aligned required memory.
     @param      size08aligned   The number of bytes of eigth-aligned required memory.
-    @return     if succesuful oosiit_res_OK, otherwise it returns oosiit_res_NOK (for instance if called with incorrect parameters)
+    @return     if successful oosiit_res_OK, otherwise it returns oosiit_res_NOK (for instance if called with incorrect parameters)
  **/ 
 extern oosiit_result_t oosiit_memory_getsize(const oosiit_cfg_t *cfg, uint16_t *size04aligned, uint16_t *size08aligned);
 
@@ -439,8 +455,8 @@ extern oosiit_result_t oosiit_evt_set(uint32_t flags, oosiit_taskid_t tskid);
     @param      timeout         the timeout.
     @param      waitmode        if oosiit_evt_wait_mode_any, the function waits until any of the flags becomes available; 
                                 else if oosiit_evt_wait_mode_all, it waits until all the flags become available
-    @return     oosiit_res_TMO is the function exits for timeout. oosiit_res_EVT the condition specified by @e waitflag and @e waitmode
-                is satisfied within the specifeid timeout. oosiit_res_NOK if the function is called from inside an ISR.
+    @return     oosiit_res_TMO if the function exits for timeout. oosiit_res_EVT if the condition specified by @e waitflag and @e waitmode
+                is satisfied within the specified timeout. oosiit_res_NOK if the function is called from inside an ISR.
     @warning    the internal flags are not reset. the caller must retrieve them with oosiit_evt_get() and reset them with oosiit_evt_clr().
  **/ 
 extern oosiit_result_t oosiit_evt_wait(uint32_t waitflags,  uint32_t timeout, oosiit_evt_wait_mode_t waitmode); 
@@ -502,7 +518,7 @@ extern oosiit_result_t oosiit_sem_send(oosiit_objptr_t sem);
     @param      sem             The handler to the semaphore
     @param      timeout         maximum wait time.
     @return     oosiit_res_OK upon immediate success, oosiit_res_SEM upon success after some wait time, oosiit_res_TMO if timeout failure,
-                finally oosiit_res_OK if called from an ISR or if the semaphore is invalid
+                finally oosiit_res_NOK if called from an ISR or if the semaphore is invalid
  **/ 
 extern oosiit_result_t oosiit_sem_wait(oosiit_objptr_t sem, uint32_t timeout);
 

@@ -891,8 +891,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>199</TopLine>
-      <CurrentLine>204</CurrentLine>
+      <TopLine>191</TopLine>
+      <CurrentLine>206</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app-test\blinky-stm32fx.c</PathWithFileName>
       <FilenameWithoutPath>blinky-stm32fx.c</FilenameWithoutPath>
@@ -1055,12 +1055,12 @@
       <GroupNumber>5</GroupNumber>
       <FileNumber>11</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>18</ColumnNumber>
+      <ColumnNumber>30</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>43</TopLine>
-      <CurrentLine>47</CurrentLine>
+      <TopLine>4</TopLine>
+      <CurrentLine>14</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\oosiit-cfg\oosiit_cfg.c</PathWithFileName>
       <FilenameWithoutPath>oosiit_cfg.c</FilenameWithoutPath>
@@ -1148,10 +1148,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>33</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>12</CurrentLine>
+      <TopLine>139</TopLine>
+      <CurrentLine>152</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\oosiit\oosiit-src\cmsis-rtx-modified\cm\rt_Mutex.c</PathWithFileName>
       <FilenameWithoutPath>rt_Mutex.c</FilenameWithoutPath>
@@ -1204,10 +1204,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>16</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>12</CurrentLine>
+      <TopLine>168</TopLine>
+      <CurrentLine>175</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\oosiit\oosiit-src\cmsis-rtx-modified\cm\rt_Task.c</PathWithFileName>
       <FilenameWithoutPath>rt_Task.c</FilenameWithoutPath>
@@ -1330,10 +1330,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>30</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>377</TopLine>
-      <CurrentLine>384</CurrentLine>
+      <TopLine>258</TopLine>
+      <CurrentLine>278</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\oosiit\oosiit-src\others\oosiit.c</PathWithFileName>
       <FilenameWithoutPath>oosiit.c</FilenameWithoutPath>
@@ -1358,10 +1358,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>19</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1742</TopLine>
-      <CurrentLine>1762</CurrentLine>
+      <TopLine>672</TopLine>
+      <CurrentLine>675</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\oosiit\oosiit-src\others\rt_iit_changes.c</PathWithFileName>
       <FilenameWithoutPath>rt_iit_changes.c</FilenameWithoutPath>

@@ -209,7 +209,7 @@ __USED uint32_t os_timernum                     = 0;
 
 #if defined (__CC_ARM) && !defined (__MICROLIB)
 
-#ifndef OSIIT_USE_EXTERNAL_TREADSAFETY
+#ifndef OOSIIT_USE_EXTERNAL_TREADSAFETY
 
 
 /*--------------------------- __user_perthread_libspace ---------------------*/
@@ -283,7 +283,7 @@ __attribute__((used)) void _mutex_release (OS_ID *mutex) {
   }
 }
 
-#endif//OSIIT_USE_EXTERNAL_TREADSAFETY
+#endif//OOSIIT_USE_EXTERNAL_TREADSAFETY
 
 
 #endif //defined (__CC_ARM) && !defined (__MICROLIB)

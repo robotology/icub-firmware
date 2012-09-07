@@ -28,6 +28,8 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "stdlib.h"
+
 #if defined(OOSIIT_DBG_ENABLE)
 #include "api/eventviewer.h"
 #endif
@@ -149,16 +151,25 @@ static __INLINE oosiit_result_t isr_oosiit_advtmr_delete(oosiit_objptr_t timer);
 // --------------------------------------------------------------------------------------------------------------------
 //      fname                           rettype             arg1type            arg2type                arg3type        arg4type        return register   
 
+
+// - memory
+SVC_1_1(svc_oosiit_memory_new,          void*,             uint32_t,                                                                   RET_pointer);
+SVC_1_1(svc_oosiit_memory_del,          oosiit_result_t,   void*,                                                                      RET_int32_t);
+
+
+
+SVC_1_1(svc_oosiit_memory_getstack,     uint64_t*,          uint16_t,                                                                   RET_pointer);
+
+
+
 // - system
 //SVC_4_1(svc_oosiit_sys_init_user,       int32_t,            void (*)(void),      uint8_t,                void*,          uint16_t,       RET_int32_t);
-SVC_2_1(svc_oosiit_sys_start,           uint32_t,    oosiit_task_properties_t*, oosiit_task_properties_t*,                       RET_int32_t);
+SVC_2_1(svc_oosiit_sys_start,           uint32_t,    oosiit_task_properties_t*, oosiit_task_properties_t*,                       RET_uint32_t);
 //SVC_2_0(svc_oosiit_sys_start,           void,    oosiit_task_properties_t*, oosiit_task_properties_t*,                       RET_int32_t);
 SVC_4_1(svc_oosiit_sys_init_user,       oosiit_result_t,    FAKE_VOID_FP_VOID,  uint8_t,                void*,          uint16_t,       RET_int32_t);
 SVC_0_1(svc_oosiit_sys_suspend,         oosiit_result_t,                                                                                RET_int32_t);
 SVC_0_1(svc_oosiit_sys_resume,          oosiit_result_t,                                                                                RET_int32_t);
 
-// - miscellanea
-SVC_1_1(svc_oosiit_stack_getmem,        uint64_t*,          uint16_t,                                                                   RET_pointer);
 
 // - task
 SVC_4_1(svc_oosiit_tsk_create,          oosiit_taskid_t,    FAKE_VOID_FP_VOIDP, void*,                  void*,          uint32_t,       RET_uint32_t);
@@ -227,6 +238,47 @@ extern void os_set_env(void);
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+extern void* oosiit_memory_new(uint32_t size)
+{
+    if(0 == size)
+    {
+        return(NULL);
+    }    
+    else if(0 != __get_IPSR()) 
+    {   // inside isr
+        return(NULL);
+    }     
+    else if(1 == s_oosiit_started)
+    {    
+        return(__svc_oosiit_memory_new(size));
+    }
+    else
+    {
+        return(calloc(size, 1));
+    }
+}
+
+extern oosiit_result_t oosiit_memory_del(void* mem)
+{
+    if(NULL == mem)
+    {
+        return(oosiit_res_NOK);
+    }    
+    else if(0 != __get_IPSR()) 
+    {   // inside isr
+        return(oosiit_res_NOK);
+    }
+    else if(1 == s_oosiit_started) 
+    {        
+        return(__svc_oosiit_memory_del(mem));
+    }
+    else
+    {
+        free(mem);
+        return(oosiit_res_OK);
+    }
+
+}
 
 extern oosiit_result_t oosiit_memory_getsize(const oosiit_cfg_t *cfg, uint16_t *size04aligned, uint16_t *size08aligned)
 {
@@ -396,7 +448,7 @@ extern uint64_t* oosiit_memory_getstack(uint16_t bytes)
     } 
     else if(1 == s_oosiit_started)
     {   // call svc
-        return(__svc_oosiit_stack_getmem(bytes));
+        return(__svc_oosiit_memory_getstack(bytes));
     }
     else
     {   // dont call svc
@@ -1102,6 +1154,33 @@ static uint16_t s_oosiit_params_get_ram64size(const oosiit_cfg_t *cfg)
 
 // ------------------------------------------- svc functions -----------------------------------------------------------
 
+
+// - memory
+
+extern void* svc_oosiit_memory_new(uint32_t size)
+{
+    return(calloc(size, 1));
+}
+
+extern oosiit_result_t svc_oosiit_memory_del(void* mem)
+{
+    free(mem);
+    return(oosiit_res_OK);
+}
+
+extern uint64_t* svc_oosiit_memory_getstack(uint16_t bytes)
+{
+    uint64_t *ret;
+    rt_iit_dbg_svc_enter();
+    
+    ret = rt_iit_memory_getstack(bytes);
+    
+    rt_iit_dbg_svc_exit();
+    return(ret);
+}
+
+
+
 // - system 
 
 
@@ -1151,18 +1230,6 @@ extern oosiit_result_t svc_oosiit_sys_resume(void)
     return(oosiit_res_OK);
 }
 
-// - miscellanea
-
-extern uint64_t* svc_oosiit_stack_getmem(uint16_t bytes)
-{
-    uint64_t *ret;
-    rt_iit_dbg_svc_enter();
-    
-    ret = rt_iit_memory_getstack(bytes);
-    
-    rt_iit_dbg_svc_exit();
-    return(ret);
-}
 
 // - task
 
@@ -1171,9 +1238,9 @@ extern oosiit_taskid_t svc_oosiit_tsk_create(FAKE_VOID_FP_VOIDP tskfn, void *tsk
     // void (*tskfn)(void *)
     oosiit_taskid_t tid;
     rt_iit_dbg_svc_enter();
-    
+       
     tid = rt_tsk_create((FUNCP)tskfn, tskstacksize24tskpriority08, tskstackdata, tskfnarg);
-    
+       
     rt_iit_dbg_svc_exit();
     return(tid);
 }
