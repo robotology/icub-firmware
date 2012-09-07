@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -71,12 +71,11 @@ extern osal_mutex_t * osal_mutex_new(void);
                 task takes mulytiple times the same mutex, then the function returns immediately after it has
                 incremented an internal counter. If some other task holds the mutex, the caller task waits
                 up to @e tout microseconds. The mutex offers priority-inversion, so that a calling task 
-                whcih is blocked by a lower-priority task whcih is owner of the mutex passes its priority
+                whcih is blocked by a lower-priority task which is owner of the mutex passes its priority
                 to the owner.
-                a higher priority passes its 
     @param      tout            The timeout of the operation
-    @return     A value of osal_res_OK on successful take, osal_res_NOK_timeout upon timeout failure, or a 
-                osal_res_NOK_nullpointer if mutex is NULL.
+    @return     A value of osal_res_OK on successful take, osal_res_NOK_timeout upon timeout failure,  
+                osal_res_NOK_nullpointer if mutex is NULL, or osal_res_NOK_generic if called from an ISR.
 **/
 extern osal_result_t osal_mutex_take(osal_mutex_t *mutex, osal_reltime_t tout);
 
@@ -85,11 +84,18 @@ extern osal_result_t osal_mutex_take(osal_mutex_t *mutex, osal_reltime_t tout);
     @brief      The caller tasks releases the mutex. If it called osal_mutex_take() multiple times then
                 the mutex is released only when it has called osal_mutex_release() for the same number of
                 times (aka, when the internal counter is zero again).
-    @return     A value of osal_res_OK upon successful release, osal_res_NOK_generic upon generic failure, or
-                a osal_res_NOK_nullpointer if mutex is NULL.
+    @return     A value of osal_res_OK upon successful release, osal_res_NOK_generic upon generic failure, 
+                osal_res_NOK_nullpointer if mutex is NULL, or osal_res_NOK_generic if called from an ISR.
 **/
 extern osal_result_t osal_mutex_release(osal_mutex_t *mutex);
 
+
+/** @fn         extern osal_result_t osal_mutex_delete(osal_mutex_t *mutex)
+    @brief      The mutex is deleted. 
+    @return     A value of osal_res_OK upon successful release, osal_res_NOK_generic upon generic failure, 
+                osal_res_NOK_nullpointer if mutex is NULL, or osal_res_NOK_generic if called from an ISR.
+**/
+extern osal_result_t osal_mutex_delete(osal_mutex_t *mutex);
 
 /* @}            
     end of group osal_mutex  

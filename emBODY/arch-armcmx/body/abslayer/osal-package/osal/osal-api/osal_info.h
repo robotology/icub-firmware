@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -116,6 +116,7 @@ extern void osal_info_entities_get_stats(const uint16_t **used, const uint16_t *
 /** @fn         extern osal_abstime_t osal_info_idletime_get(void)
     @brief      Returns total time of idle life in micro seconds.
     @return     Time of idle life in usec.
+    @warning    It is not supported. It always returns 0.
  **/
 extern osal_abstime_t osal_info_idletime_get(void);
 

@@ -7,19 +7,19 @@
 
   <Targets>
     <Target>
-      <TargetName>osal.cm3.lib</TargetName>
+      <TargetName>osal.open.cm3</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
         <TargetCommonOption>
-          <Device>STM32F107VC</Device>
-          <Vendor>STMicroelectronics</Vendor>
-          <Cpu>IRAM(0x20000000-0x2000FFFF) IROM(0x8000000-0x803FFFF) CLOCK(25000000) CPUTYPE("Cortex-M3")</Cpu>
+          <Device>Cortex-M3</Device>
+          <Vendor>ARM</Vendor>
+          <Cpu>CLOCK(12000000) CPUTYPE("Cortex-M3") ESEL ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
-          <StartupFile>"STARTUP\ST\STM32F10x.s" ("STM32 Startup Code")</StartupFile>
-          <FlashDriverDll>UL2CM3(-O14 -S0 -C0 -N00("ARM Cortex-M3") -D00(1BA00477) -L00(4) -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_CL -FS08000000 -FL040000)</FlashDriverDll>
-          <DeviceId>4889</DeviceId>
-          <RegisterFile>stm32f10x_lib.h</RegisterFile>
+          <StartupFile></StartupFile>
+          <FlashDriverDll></FlashDriverDll>
+          <DeviceId>4349</DeviceId>
+          <RegisterFile></RegisterFile>
           <MemoryEnv></MemoryEnv>
           <Cmp></Cmp>
           <Asm></Asm>
@@ -44,7 +44,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Obj\</OutputDirectory>
-          <OutputName>osal.cm3</OutputName>
+          <OutputName>osal.open.cm3</OutputName>
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -75,7 +75,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\osal.cm3.lib .\osal-lib\osal.cm3.lib</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\osal.open.cm3.lib .\osal-lib\osal.open.cm3.lib</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -101,12 +101,12 @@
         <DllOption>
           <SimDllName>SARMCM3.DLL</SimDllName>
           <SimDllArguments></SimDllArguments>
-          <SimDlgDll>DARMSTM.DLL</SimDlgDll>
-          <SimDlgDllArguments>-pSTM32F107VC</SimDlgDllArguments>
+          <SimDlgDll>DCM.DLL</SimDlgDll>
+          <SimDlgDllArguments>-pCM3</SimDlgDllArguments>
           <TargetDllName>SARMCM3.DLL</TargetDllName>
           <TargetDllArguments></TargetDllArguments>
-          <TargetDlgDll>TARMSTM.DLL</TargetDlgDll>
-          <TargetDlgDllArguments>-pSTM32F107VC</TargetDlgDllArguments>
+          <TargetDlgDll>TCM.DLL</TargetDlgDll>
+          <TargetDlgDllArguments>-pCM3</TargetDlgDllArguments>
         </DllOption>
         <DebugOption>
           <OPTHX>
@@ -202,16 +202,16 @@
             <mOS>0</mOS>
             <uocRom>0</uocRom>
             <uocRam>0</uocRam>
-            <hadIROM>1</hadIROM>
-            <hadIRAM>1</hadIRAM>
+            <hadIROM>0</hadIROM>
+            <hadIRAM>0</hadIRAM>
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
-            <StupSel>8</StupSel>
+            <StupSel>0</StupSel>
             <useUlib>0</useUlib>
-            <EndSel>0</EndSel>
+            <EndSel>1</EndSel>
             <uLtcg>0</uLtcg>
             <RoSelD>3</RoSelD>
             <RwSelD>5</RwSelD>
@@ -225,12 +225,12 @@
             <Ro1Chk>0</Ro1Chk>
             <Ro2Chk>0</Ro2Chk>
             <Ro3Chk>0</Ro3Chk>
-            <Ir1Chk>1</Ir1Chk>
+            <Ir1Chk>0</Ir1Chk>
             <Ir2Chk>0</Ir2Chk>
             <Ra1Chk>0</Ra1Chk>
             <Ra2Chk>0</Ra2Chk>
             <Ra3Chk>0</Ra3Chk>
-            <Im1Chk>1</Im1Chk>
+            <Im1Chk>0</Im1Chk>
             <Im2Chk>0</Im2Chk>
             <OnChipMemories>
               <Ocm1>
@@ -295,8 +295,8 @@
               </OCR_RVCT3>
               <OCR_RVCT4>
                 <Type>1</Type>
-                <StartAddress>0x8000000</StartAddress>
-                <Size>0x40000</Size>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -320,8 +320,8 @@
               </OCR_RVCT8>
               <OCR_RVCT9>
                 <Type>0</Type>
-                <StartAddress>0x20000000</StartAddress>
-                <Size>0x10000</Size>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
               </OCR_RVCT9>
               <OCR_RVCT10>
                 <Type>0</Type>
@@ -347,7 +347,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>OSIIT_USE_EXTERNAL_TREADSAFETY</Define>
+              <Define>OOSIIT_USE_EXTERNAL_TREADSAFETY OSAL_CPUFAM_CM3</Define>
               <Undefine></Undefine>
               <IncludePath>..\osal\osal-api;..\..\..\..\sys\mid\api;..\..\..\..\sys\mid\inc</IncludePath>
             </VariousControls>
@@ -388,17 +388,17 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>osiit-from-sys</GroupName>
+          <GroupName>oosiit-from-sys</GroupName>
           <Files>
             <File>
-              <FileName>osiit.cm3.lib</FileName>
+              <FileName>oosiit.cm3.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\osiit.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\sys\mid\lib\oosiit.cm3.lib</FilePath>
             </File>
             <File>
-              <FileName>osiit.cm3.dbg.lib</FileName>
+              <FileName>oosiit.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\osiit.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\sys\mid\lib\oosiit.cm3.dbg.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -419,9 +419,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>osiit.cm4.lib</FileName>
+              <FileName>oosiit.cm4.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\osiit.cm4.lib</FilePath>
+              <FilePath>..\..\..\..\sys\mid\lib\oosiit.cm4.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -442,9 +442,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>osiit.cm4.dbg.lib</FileName>
+              <FileName>oosiit.cm4.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\osiit.cm4.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\sys\mid\lib\oosiit.cm4.dbg.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -465,9 +465,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>osiit_storage.c</FileName>
+              <FileName>oosiit_storage.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\mid\inc\osiit_storage.c</FilePath>
+              <FilePath>..\..\..\..\sys\mid\inc\oosiit_storage.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -475,28 +475,28 @@
           <GroupName>osal</GroupName>
           <Files>
             <File>
-              <FileName>osal-osiit.c</FileName>
+              <FileName>osal-oosiit.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\osal-src\osal-osiit.c</FilePath>
+              <FilePath>.\osal-src\osal-oosiit.c</FilePath>
             </File>
           </Files>
         </Group>
       </Groups>
     </Target>
     <Target>
-      <TargetName>osal.cm3.dbg.lib</TargetName>
+      <TargetName>osal.open.cm3.dbg</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
         <TargetCommonOption>
-          <Device>STM32F107VC</Device>
-          <Vendor>STMicroelectronics</Vendor>
-          <Cpu>IRAM(0x20000000-0x2000FFFF) IROM(0x8000000-0x803FFFF) CLOCK(25000000) CPUTYPE("Cortex-M3")</Cpu>
+          <Device>Cortex-M3</Device>
+          <Vendor>ARM</Vendor>
+          <Cpu>CLOCK(12000000) CPUTYPE("Cortex-M3") ESEL ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
-          <StartupFile>"STARTUP\ST\STM32F10x.s" ("STM32 Startup Code")</StartupFile>
-          <FlashDriverDll>UL2CM3(-O14 -S0 -C0 -N00("ARM Cortex-M3") -D00(1BA00477) -L00(4) -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_CL -FS08000000 -FL040000)</FlashDriverDll>
-          <DeviceId>4889</DeviceId>
-          <RegisterFile>stm32f10x_lib.h</RegisterFile>
+          <StartupFile></StartupFile>
+          <FlashDriverDll></FlashDriverDll>
+          <DeviceId>4349</DeviceId>
+          <RegisterFile></RegisterFile>
           <MemoryEnv></MemoryEnv>
           <Cmp></Cmp>
           <Asm></Asm>
@@ -521,7 +521,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Obj\</OutputDirectory>
-          <OutputName>osal.cm3.dbg</OutputName>
+          <OutputName>osal.open.cm3.dbg</OutputName>
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -552,7 +552,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\osal.cm3.dbg.lib .\osal-lib\osal.cm3.dbg.lib</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\osal.open.cm3.dbg.lib .\osal-lib\osal.open.cm3.dbg.lib</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -578,12 +578,12 @@
         <DllOption>
           <SimDllName>SARMCM3.DLL</SimDllName>
           <SimDllArguments></SimDllArguments>
-          <SimDlgDll>DARMSTM.DLL</SimDlgDll>
-          <SimDlgDllArguments>-pSTM32F107VC</SimDlgDllArguments>
+          <SimDlgDll>DCM.DLL</SimDlgDll>
+          <SimDlgDllArguments>-pCM3</SimDlgDllArguments>
           <TargetDllName>SARMCM3.DLL</TargetDllName>
           <TargetDllArguments></TargetDllArguments>
-          <TargetDlgDll>TARMSTM.DLL</TargetDlgDll>
-          <TargetDlgDllArguments>-pSTM32F107VC</TargetDlgDllArguments>
+          <TargetDlgDll>TCM.DLL</TargetDlgDll>
+          <TargetDlgDllArguments>-pCM3</TargetDlgDllArguments>
         </DllOption>
         <DebugOption>
           <OPTHX>
@@ -679,16 +679,16 @@
             <mOS>0</mOS>
             <uocRom>0</uocRom>
             <uocRam>0</uocRam>
-            <hadIROM>1</hadIROM>
-            <hadIRAM>1</hadIRAM>
+            <hadIROM>0</hadIROM>
+            <hadIRAM>0</hadIRAM>
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
-            <StupSel>8</StupSel>
+            <StupSel>0</StupSel>
             <useUlib>0</useUlib>
-            <EndSel>0</EndSel>
+            <EndSel>1</EndSel>
             <uLtcg>0</uLtcg>
             <RoSelD>3</RoSelD>
             <RwSelD>5</RwSelD>
@@ -702,12 +702,12 @@
             <Ro1Chk>0</Ro1Chk>
             <Ro2Chk>0</Ro2Chk>
             <Ro3Chk>0</Ro3Chk>
-            <Ir1Chk>1</Ir1Chk>
+            <Ir1Chk>0</Ir1Chk>
             <Ir2Chk>0</Ir2Chk>
             <Ra1Chk>0</Ra1Chk>
             <Ra2Chk>0</Ra2Chk>
             <Ra3Chk>0</Ra3Chk>
-            <Im1Chk>1</Im1Chk>
+            <Im1Chk>0</Im1Chk>
             <Im2Chk>0</Im2Chk>
             <OnChipMemories>
               <Ocm1>
@@ -772,8 +772,8 @@
               </OCR_RVCT3>
               <OCR_RVCT4>
                 <Type>1</Type>
-                <StartAddress>0x8000000</StartAddress>
-                <Size>0x40000</Size>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -797,8 +797,8 @@
               </OCR_RVCT8>
               <OCR_RVCT9>
                 <Type>0</Type>
-                <StartAddress>0x20000000</StartAddress>
-                <Size>0x10000</Size>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
               </OCR_RVCT9>
               <OCR_RVCT10>
                 <Type>0</Type>
@@ -824,7 +824,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>OSIIT_USE_EXTERNAL_TREADSAFETY</Define>
+              <Define>OOSIIT_USE_EXTERNAL_TREADSAFETY OSAL_CPUFAM_CM3</Define>
               <Undefine></Undefine>
               <IncludePath>..\osal\osal-api;..\..\..\..\sys\mid\api;..\..\..\..\sys\mid\inc</IncludePath>
             </VariousControls>
@@ -865,12 +865,12 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>osiit-from-sys</GroupName>
+          <GroupName>oosiit-from-sys</GroupName>
           <Files>
             <File>
-              <FileName>osiit.cm3.lib</FileName>
+              <FileName>oosiit.cm3.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\osiit.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\sys\mid\lib\oosiit.cm3.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -891,14 +891,14 @@
               </FileOption>
             </File>
             <File>
-              <FileName>osiit.cm3.dbg.lib</FileName>
+              <FileName>oosiit.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\osiit.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\sys\mid\lib\oosiit.cm3.dbg.lib</FilePath>
             </File>
             <File>
-              <FileName>osiit.cm4.lib</FileName>
+              <FileName>oosiit.cm4.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\osiit.cm4.lib</FilePath>
+              <FilePath>..\..\..\..\sys\mid\lib\oosiit.cm4.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -919,9 +919,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>osiit.cm4.dbg.lib</FileName>
+              <FileName>oosiit.cm4.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\osiit.cm4.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\sys\mid\lib\oosiit.cm4.dbg.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -942,9 +942,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>osiit_storage.c</FileName>
+              <FileName>oosiit_storage.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\mid\inc\osiit_storage.c</FilePath>
+              <FilePath>..\..\..\..\sys\mid\inc\oosiit_storage.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -952,28 +952,28 @@
           <GroupName>osal</GroupName>
           <Files>
             <File>
-              <FileName>osal-osiit.c</FileName>
+              <FileName>osal-oosiit.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\osal-src\osal-osiit.c</FilePath>
+              <FilePath>.\osal-src\osal-oosiit.c</FilePath>
             </File>
           </Files>
         </Group>
       </Groups>
     </Target>
     <Target>
-      <TargetName>osal.cm4.lib</TargetName>
+      <TargetName>osal.open.cm4</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
         <TargetCommonOption>
-          <Device>STM32F407IE</Device>
-          <Vendor>STMicroelectronics</Vendor>
-          <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x807FFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
+          <Device>Cortex-M4 FPU</Device>
+          <Vendor>ARM</Vendor>
+          <Cpu>CLOCK(12000000) CPUTYPE("Cortex-M4") ESEL ELITTLE FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
-          <StartupFile>"Startup\ST\STM32F4xx\startup_stm32f4xx.s" ("STM32F4xx Startup Code")</StartupFile>
-          <FlashDriverDll>UL2CM3(-O207 -S0 -C0 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_1024 -FS08000000 -FL080000)</FlashDriverDll>
-          <DeviceId>6108</DeviceId>
-          <RegisterFile>stm32f4xx.h</RegisterFile>
+          <StartupFile></StartupFile>
+          <FlashDriverDll></FlashDriverDll>
+          <DeviceId>5237</DeviceId>
+          <RegisterFile></RegisterFile>
           <MemoryEnv></MemoryEnv>
           <Cmp></Cmp>
           <Asm></Asm>
@@ -983,7 +983,7 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>SFD\ST\STM32F4xx\STM32F4xx.sfr</SFDFile>
+          <SFDFile></SFDFile>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
           <IncludePath></IncludePath>
@@ -998,7 +998,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Obj\</OutputDirectory>
-          <OutputName>osal.cm4</OutputName>
+          <OutputName>osal.open.cm4</OutputName>
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -1029,7 +1029,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\osal.cm4.lib .\osal-lib\osal.cm4.lib</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\osal.open.cm4.lib .\osal-lib\osal.open.cm4.lib</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -1054,11 +1054,11 @@
         </CommonProperty>
         <DllOption>
           <SimDllName>SARMCM3.DLL</SimDllName>
-          <SimDllArguments>-MPU</SimDllArguments>
+          <SimDllArguments></SimDllArguments>
           <SimDlgDll>DCM.DLL</SimDlgDll>
           <SimDlgDllArguments>-pCM4</SimDlgDllArguments>
           <TargetDllName>SARMCM3.DLL</TargetDllName>
-          <TargetDllArguments>-MPU</TargetDllArguments>
+          <TargetDllArguments></TargetDllArguments>
           <TargetDlgDll>TCM.DLL</TargetDlgDll>
           <TargetDlgDllArguments>-pCM4</TargetDlgDllArguments>
         </DllOption>
@@ -1156,16 +1156,16 @@
             <mOS>0</mOS>
             <uocRom>0</uocRom>
             <uocRam>0</uocRam>
-            <hadIROM>1</hadIROM>
-            <hadIRAM>1</hadIRAM>
+            <hadIROM>0</hadIROM>
+            <hadIRAM>0</hadIRAM>
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>2</RvdsVP>
-            <hadIRAM2>1</hadIRAM2>
+            <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
-            <StupSel>8</StupSel>
+            <StupSel>0</StupSel>
             <useUlib>0</useUlib>
-            <EndSel>0</EndSel>
+            <EndSel>1</EndSel>
             <uLtcg>0</uLtcg>
             <RoSelD>3</RoSelD>
             <RwSelD>5</RwSelD>
@@ -1179,12 +1179,12 @@
             <Ro1Chk>0</Ro1Chk>
             <Ro2Chk>0</Ro2Chk>
             <Ro3Chk>0</Ro3Chk>
-            <Ir1Chk>1</Ir1Chk>
+            <Ir1Chk>0</Ir1Chk>
             <Ir2Chk>0</Ir2Chk>
             <Ra1Chk>0</Ra1Chk>
             <Ra2Chk>0</Ra2Chk>
             <Ra3Chk>0</Ra3Chk>
-            <Im1Chk>1</Im1Chk>
+            <Im1Chk>0</Im1Chk>
             <Im2Chk>0</Im2Chk>
             <OnChipMemories>
               <Ocm1>
@@ -1249,8 +1249,8 @@
               </OCR_RVCT3>
               <OCR_RVCT4>
                 <Type>1</Type>
-                <StartAddress>0x8000000</StartAddress>
-                <Size>0x80000</Size>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -1274,13 +1274,13 @@
               </OCR_RVCT8>
               <OCR_RVCT9>
                 <Type>0</Type>
-                <StartAddress>0x20000000</StartAddress>
-                <Size>0x20000</Size>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
               </OCR_RVCT9>
               <OCR_RVCT10>
                 <Type>0</Type>
-                <StartAddress>0x10000000</StartAddress>
-                <Size>0x10000</Size>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
               </OCR_RVCT10>
             </OnChipMemories>
             <RvctStartVector></RvctStartVector>
@@ -1301,7 +1301,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>OSIIT_USE_EXTERNAL_TREADSAFETY</Define>
+              <Define>OOSIIT_USE_EXTERNAL_TREADSAFETY OSAL_CPUFAM_CM4</Define>
               <Undefine></Undefine>
               <IncludePath>..\osal\osal-api;..\..\..\..\sys\mid\api;..\..\..\..\sys\mid\inc</IncludePath>
             </VariousControls>
@@ -1342,12 +1342,12 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>osiit-from-sys</GroupName>
+          <GroupName>oosiit-from-sys</GroupName>
           <Files>
             <File>
-              <FileName>osiit.cm3.lib</FileName>
+              <FileName>oosiit.cm3.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\osiit.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\sys\mid\lib\oosiit.cm3.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1368,9 +1368,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>osiit.cm3.dbg.lib</FileName>
+              <FileName>oosiit.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\osiit.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\sys\mid\lib\oosiit.cm3.dbg.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1391,14 +1391,14 @@
               </FileOption>
             </File>
             <File>
-              <FileName>osiit.cm4.lib</FileName>
+              <FileName>oosiit.cm4.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\osiit.cm4.lib</FilePath>
+              <FilePath>..\..\..\..\sys\mid\lib\oosiit.cm4.lib</FilePath>
             </File>
             <File>
-              <FileName>osiit.cm4.dbg.lib</FileName>
+              <FileName>oosiit.cm4.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\osiit.cm4.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\sys\mid\lib\oosiit.cm4.dbg.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1419,9 +1419,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>osiit_storage.c</FileName>
+              <FileName>oosiit_storage.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\mid\inc\osiit_storage.c</FilePath>
+              <FilePath>..\..\..\..\sys\mid\inc\oosiit_storage.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1429,28 +1429,28 @@
           <GroupName>osal</GroupName>
           <Files>
             <File>
-              <FileName>osal-osiit.c</FileName>
+              <FileName>osal-oosiit.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\osal-src\osal-osiit.c</FilePath>
+              <FilePath>.\osal-src\osal-oosiit.c</FilePath>
             </File>
           </Files>
         </Group>
       </Groups>
     </Target>
     <Target>
-      <TargetName>osal.cm4.dbg.lib</TargetName>
+      <TargetName>osal.open.cm4.dbg</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
         <TargetCommonOption>
-          <Device>STM32F407IE</Device>
-          <Vendor>STMicroelectronics</Vendor>
-          <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x807FFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
+          <Device>Cortex-M4 FPU</Device>
+          <Vendor>ARM</Vendor>
+          <Cpu>CLOCK(12000000) CPUTYPE("Cortex-M4") ESEL ELITTLE FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
-          <StartupFile>"Startup\ST\STM32F4xx\startup_stm32f4xx.s" ("STM32F4xx Startup Code")</StartupFile>
-          <FlashDriverDll>UL2CM3(-O207 -S0 -C0 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_1024 -FS08000000 -FL080000)</FlashDriverDll>
-          <DeviceId>6108</DeviceId>
-          <RegisterFile>stm32f4xx.h</RegisterFile>
+          <StartupFile></StartupFile>
+          <FlashDriverDll></FlashDriverDll>
+          <DeviceId>5237</DeviceId>
+          <RegisterFile></RegisterFile>
           <MemoryEnv></MemoryEnv>
           <Cmp></Cmp>
           <Asm></Asm>
@@ -1460,7 +1460,7 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>SFD\ST\STM32F4xx\STM32F4xx.sfr</SFDFile>
+          <SFDFile></SFDFile>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
           <IncludePath></IncludePath>
@@ -1475,7 +1475,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Obj\</OutputDirectory>
-          <OutputName>osal.cm4.dbg</OutputName>
+          <OutputName>osal.open.cm4.dbg</OutputName>
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -1506,7 +1506,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\osal.cm4.dbg.lib .\osal-lib\osal.cm4.dbg.lib</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\osal.open.cm4.dbg.lib .\osal-lib\osal.open.cm4.dbg.lib</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -1531,11 +1531,11 @@
         </CommonProperty>
         <DllOption>
           <SimDllName>SARMCM3.DLL</SimDllName>
-          <SimDllArguments>-MPU</SimDllArguments>
+          <SimDllArguments></SimDllArguments>
           <SimDlgDll>DCM.DLL</SimDlgDll>
           <SimDlgDllArguments>-pCM4</SimDlgDllArguments>
           <TargetDllName>SARMCM3.DLL</TargetDllName>
-          <TargetDllArguments>-MPU</TargetDllArguments>
+          <TargetDllArguments></TargetDllArguments>
           <TargetDlgDll>TCM.DLL</TargetDlgDll>
           <TargetDlgDllArguments>-pCM4</TargetDlgDllArguments>
         </DllOption>
@@ -1633,16 +1633,16 @@
             <mOS>0</mOS>
             <uocRom>0</uocRom>
             <uocRam>0</uocRam>
-            <hadIROM>1</hadIROM>
-            <hadIRAM>1</hadIRAM>
+            <hadIROM>0</hadIROM>
+            <hadIRAM>0</hadIRAM>
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>2</RvdsVP>
-            <hadIRAM2>1</hadIRAM2>
+            <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
-            <StupSel>8</StupSel>
+            <StupSel>0</StupSel>
             <useUlib>0</useUlib>
-            <EndSel>0</EndSel>
+            <EndSel>1</EndSel>
             <uLtcg>0</uLtcg>
             <RoSelD>3</RoSelD>
             <RwSelD>5</RwSelD>
@@ -1656,12 +1656,12 @@
             <Ro1Chk>0</Ro1Chk>
             <Ro2Chk>0</Ro2Chk>
             <Ro3Chk>0</Ro3Chk>
-            <Ir1Chk>1</Ir1Chk>
+            <Ir1Chk>0</Ir1Chk>
             <Ir2Chk>0</Ir2Chk>
             <Ra1Chk>0</Ra1Chk>
             <Ra2Chk>0</Ra2Chk>
             <Ra3Chk>0</Ra3Chk>
-            <Im1Chk>1</Im1Chk>
+            <Im1Chk>0</Im1Chk>
             <Im2Chk>0</Im2Chk>
             <OnChipMemories>
               <Ocm1>
@@ -1726,8 +1726,8 @@
               </OCR_RVCT3>
               <OCR_RVCT4>
                 <Type>1</Type>
-                <StartAddress>0x8000000</StartAddress>
-                <Size>0x80000</Size>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -1751,13 +1751,13 @@
               </OCR_RVCT8>
               <OCR_RVCT9>
                 <Type>0</Type>
-                <StartAddress>0x20000000</StartAddress>
-                <Size>0x20000</Size>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
               </OCR_RVCT9>
               <OCR_RVCT10>
                 <Type>0</Type>
-                <StartAddress>0x10000000</StartAddress>
-                <Size>0x10000</Size>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
               </OCR_RVCT10>
             </OnChipMemories>
             <RvctStartVector></RvctStartVector>
@@ -1778,7 +1778,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>OSIIT_USE_EXTERNAL_TREADSAFETY</Define>
+              <Define>OOSIIT_USE_EXTERNAL_TREADSAFETY OSAL_CPUFAM_CM4</Define>
               <Undefine></Undefine>
               <IncludePath>..\osal\osal-api;..\..\..\..\sys\mid\api;..\..\..\..\sys\mid\inc</IncludePath>
             </VariousControls>
@@ -1819,12 +1819,12 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>osiit-from-sys</GroupName>
+          <GroupName>oosiit-from-sys</GroupName>
           <Files>
             <File>
-              <FileName>osiit.cm3.lib</FileName>
+              <FileName>oosiit.cm3.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\osiit.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\sys\mid\lib\oosiit.cm3.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1845,9 +1845,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>osiit.cm3.dbg.lib</FileName>
+              <FileName>oosiit.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\osiit.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\sys\mid\lib\oosiit.cm3.dbg.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1868,9 +1868,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>osiit.cm4.lib</FileName>
+              <FileName>oosiit.cm4.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\osiit.cm4.lib</FilePath>
+              <FilePath>..\..\..\..\sys\mid\lib\oosiit.cm4.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1891,14 +1891,14 @@
               </FileOption>
             </File>
             <File>
-              <FileName>osiit.cm4.dbg.lib</FileName>
+              <FileName>oosiit.cm4.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\osiit.cm4.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\sys\mid\lib\oosiit.cm4.dbg.lib</FilePath>
             </File>
             <File>
-              <FileName>osiit_storage.c</FileName>
+              <FileName>oosiit_storage.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\mid\inc\osiit_storage.c</FilePath>
+              <FilePath>..\..\..\..\sys\mid\inc\oosiit_storage.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1906,9 +1906,9 @@
           <GroupName>osal</GroupName>
           <Files>
             <File>
-              <FileName>osal-osiit.c</FileName>
+              <FileName>osal-oosiit.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\osal-src\osal-osiit.c</FilePath>
+              <FilePath>.\osal-src\osal-oosiit.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -47,6 +47,16 @@
  **/
 #define     OSAL_reltimeZERO                               (0)
 
+/** @def        OSAL_reltime1ms
+    @brief      Equals 1 ms 
+ **/
+#define     OSAL_reltime1ms                               (1000)
+
+/** @def        OSAL_reltime1sec
+    @brief      Equals 1 sec 
+ **/
+#define     OSAL_reltime1sec                               (1000000)
+
 /** @def        OSAL_abstimeMAX
     @brief      Equals 4294 seconds and is the maximum relative time available
  **/
@@ -77,32 +87,32 @@ typedef enum
 //    osal_res_OK_butwaited         = +2,   // the task has gained the resource waiting for some time
     osal_res_NOK_generic            = -1,   /**< generic error */
     osal_res_NOK_nullpointer        = -2,   /**< error due to a null pointer */
-    osal_res_NOK_timeout            = -3,   /**< the task did not get the resource after it waited for some time (or also zero time). */
-    osal_res_NOK_isrnowait          = -4    /**< the isr did not get the resource when called the non-waiting version of the lock */
+    osal_res_NOK_timeout            = -3    /**< the task did not get the resource after it waited for some time (or also zero time). */
+//    osal_res_NOK_isrnowait          = -4    /**< the isr did not get the resource when called the non-waiting version of the lock */
 } osal_result_t;
 
 
 /** @typedef    typedef enum osal_cpufamily_t 
-    @brief      osl_cpufamily_t contains all possible families of CPUs supported by OSAL
+    @brief      osal_cpufamily_t contains all possible families of CPUs supported by OSAL
  **/ 
 typedef enum
 {
-    osal_cpufam_armcm3              = 0,    /**< the only supported so far */
-    osal_cpufam_armcm4              = 1,
-    osal_cpufam_dspic               = 2
+    osal_cpufam_armcm3              = 0,    /**< ARM Cortex M3 */
+    osal_cpufam_armcm4              = 1,    /**< ARM Cortex M4 with FPU */
+    osal_cpufam_dspic               = 2     /**< not supported */
 } osal_cpufamily_t;
 
 
 /** @typedef    typedef enum osal_cputype_t 
-    @brief      osal_cputype_t contains a type of CPU within a given family
+    @brief      osal_cputype_t contains a type of CPU within a given family. we leave 32 possible CPU types for each
+                CPU family.
  **/ 
 typedef enum
 {
-    osal_cputyp_stm32f1x            = 0,
-    osal_cputyp_stm32f2x            = 1,
-    osal_cputyp_stm32f4x            = 2,
-    osal_cputyp_stellaris           = 3,
-    osal_cputyp_dspic33             = 4
+    osal_cputyp_stm32f1x            = 0,    /**< STM32F1x processors */
+    osal_cputyp_stm32f2x            = 1,    /**< STM32F2x processors */
+    osal_cputyp_stm32f4x            = 32,   /**< STM32F4x processors */
+    osal_cputyp_dspic33             = 64    /**< not supported */
 } osal_cputype_t;
 
 
@@ -111,21 +121,30 @@ typedef enum
  **/ 
 typedef enum
 {
-    osal_rtostype_iitmod_rtxarm     = 0,    /**< the only supported so far */
-    osal_rtostype_iitmod_freertos   = 1,
-    osal_rtostype_iitmod_ucosii     = 2,
-    osal_rtostype_iitmod_ucosiii    = 3
+    osal_rtostype_iitmod_rtxarm     = 0,    /**< a version of commercial RTX by Keil, enhanced by IIT with some extra features */
+    osal_rtostype_oosiit            = 1,    /**< a version of the open-source RTX by Keil, enhanced by IIT with some extra features */
+    osal_rtostype_iitmod_freertos   = 2,    /**< not supported so far */
+    osal_rtostype_iitmod_ucosii     = 3,    /**< not supported so far */
+    osal_rtostype_iitmod_ucosiii    = 4     /**< not supported so far */
 } osal_rtostype_t;
 
 
 /** @typedef    typedef enum osal_memorymodel_t 
     @brief      osal_memorymodel_t contains all possible memory models supported by OSAL
+    @details    With static memory mode, we mean a behaviour in which the OSAL loads beforehands all the memory it needs to offer 
+                the services specified by a given configuration.  For instance, if the configuration specifies
+                7 user tasks, then the OSAL needs to be initialised with all the externally provided memory for the 7 user tasks.
+                At the creation of a new object, a task in our example, the OSAL shall use the memory buffer it has loaded and does not
+                perform any dynamical allocation (e.g., with malloc() or the likes of it).
+                With dynamic memory mode, we mean a a behaviour in which the OSAL does not load any memory beforehands and it performs
+                dynamically allocation in runtime as long as the user needs an object.
  **/ 
 typedef enum
 {
-    osal_memmode_static             = 0,    /**< uses statically allocated memory, the only supported so far */
-    osal_memmode_dynamic            = 1     /**< uses memory allocated at run time on the heap, not supported so far */,
+    osal_memmode_static             = 0,    /**< uses statically allocated memory. the only supported so far */
+    osal_memmode_dynamic            = 1     /**< uses memory allocated at run time from the heap. not supported so far */,
 } osal_memorymodel_t;
+
 
 
 /** @typedef    typedef enum osal_fatalerror_t 
@@ -152,8 +171,6 @@ typedef enum
 
 /** @typedef    typedef enum osal_boolval_t 
     @brief      osal_boolval_t contains values for bool type (osal_bool_t).
-    @warning    C99 contains bool, true, and false. To use C99 include "stdbool.h" and -c99 compiler option.
-                At this point please redefine osal_false and osal_true to be equal to false and true.
  **/ 
 typedef enum
 {
@@ -163,7 +180,7 @@ typedef enum
 
 
 /** @typedef    typedef enum osl_bool_t 
-    @brief      osal_bool_t is the bool type. If C99 is available, use bool instead of uint8_t.
+    @brief      osal_bool_t is the bool type. 
  **/ 
 typedef uint8_t     osal_bool_t;
 
@@ -200,9 +217,10 @@ typedef uint64_t    osal_nanotime_t;
  **/  
 typedef enum 
 {
-    osal_callerTSK      = 0,     /** < the caller is a task */
-    osal_callerISR      = 1,     /** < the caller is an ISR */
-    osal_callerTMRMAN   = 2      /** < the caller is the timer manager */
+    osal_callerTSK                          = 0,     /** < the caller is a task */
+    osal_callerISR                          = 1,     /** < the caller is an ISR */
+    osal_callerTMRMAN                       = 2,     /** < the caller is the timer manager */
+    osal_callerAUTOdetect                   = 3      /** < the OSAL automatcically detects the caller (supported only with OOSIIT on CMx) */
 } osal_caller_t; 
 
 
@@ -254,7 +272,7 @@ typedef struct
     uint16_t            idlestacksize;          /**< The stack size (in bytes) of the idle task                 */
     uint16_t            globalstacksize;        /**< The global stack size (in bytes) reserved for all other tasks        */
     osal_bool_t         roundrobin;             /**< If osal_true the OSAL uses round robin on tasks of equal priority, else it does not  */
-    uint32_t            roundrobintick;         /**< The maximum timeslot used for round robin expressed in micro-sec */
+    osal_reltime_t      roundrobintick;         /**< The maximum timeslot used for round robin expressed in micro-sec */
     uint8_t             tasknum;                /**< The maximum number of user tasks managed by OSAl (apart launcher and idle tasks)*/
     uint8_t             timernum;               /**< The maximum number of timers managed by OSAl */
     uint8_t             mutexnum;               /**< The maximum number of mutexes managed by OSAl */    
@@ -274,6 +292,16 @@ typedef struct
     @brief      Equals 0 micro seconds and can be used to avoid blocking in functions with timeout
  **/
 extern const osal_reltime_t osal_reltimeZERO;
+
+/** @var        extern const osal_reltime_t osal_reltime1ms
+    @brief      Equals 1 ms
+ **/
+extern const osal_reltime_t osal_reltime1ms;
+
+/** @var        extern const osal_reltime_t osal_reltime1sec
+    @brief      Equals 1 sec
+ **/
+extern const osal_reltime_t osal_reltime1sec;
 
 /** @var        extern const osal_reltime_t osal_reltimeMAX
     @brief      Equals 4294 seconds and is the maximum relative time available
@@ -303,6 +331,21 @@ extern const osal_abstime_t osal_abstimeNONE;
     @return     The size the 8-byte aligned memory which is required to run the osal
  **/
 extern uint32_t osal_base_memory_getsize(const osal_cfg_t *cfg, uint32_t *size08aligned);
+
+/** @fn         extern void* osal_base_memory_new(uint32_t size)
+    @brief      Thread safe memory allocator. It cannot be called from within an ISR. 
+    @param      size            the size of the requested memory in bytes.
+    @return     if successful a proper 8-aligned memory pointer, otherwise it returns NULL.
+ **/ 
+extern void* osal_base_memory_new(uint32_t size);
+
+
+/** @fn         extern oosiit_result_t osal_base_memory_del(void* mem)
+    @brief      Thread-safe memory free. It cannot be called from within an ISR. 
+    @param      mem             the pointer to the memory to be de-allocated.
+    @return     if successful osal_res_OK, otherwise it returns osal_res_NOK_generic (for instance if called with NULL pointer)
+ **/ 
+extern osal_result_t osal_base_memory_del(void* mem);
 
 
 /** @fn         extern osal_result_t osal_base_initialise(const osal_cfg_t *cfg, uint64_t *data08aligned)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -81,12 +81,13 @@ extern osal_messagequeue_t * osal_messagequeue_new(uint16_t maxmsg);
     @param      pmsg            The pointer to the message to be retrieved or NULL upon failure.  
                                 If pmymsg is a mytype_t *, then you can retrieve it by using (osal_message_t*)&pmymsg as 
                                 function parameter.
-    @param      tout            The timeout on operation in microseconds.
+    @param      tout            The timeout on operation in microseconds (if the caller is an ISR the used timeout shall 
+                                be zero irrespectively of the value of @e tout)
     @param      caller          The caller mode.  Use osal_callerTSK if the caller is a normal task and
-                                osal_callerISR is the caller is an ISR or a function executed directly by
-                                the scheduler (as a timer callback).
+                                osal_callerISR is the caller is an ISR, or osal_callerTMRMAN if it is a function executed by
+                                the timer manager (hence by the scheduler).
     @return     If success, a osal_res_OK. A osal_res_NOK_nullpointer value upon NULL pointer, a osal_res_NOK_timeout 
-                if timeout expired without a valid retrieval or osal_res_NOK_isrnowait if caller is an ISR. 
+                if timeout expired without a valid retrieval (even if called by an ISR). 
 **/
 extern osal_result_t osal_messagequeue_get(osal_messagequeue_t *mq, osal_message_t *pmsg, osal_reltime_t tout, osal_caller_t caller);
 
@@ -94,9 +95,9 @@ extern osal_result_t osal_messagequeue_get(osal_messagequeue_t *mq, osal_message
 /** @fn         extern osal_message_t osal_messagequeue_getquick(osal_messagequeue_t *mq, osal_caller_t caller, osal_reltime_t tout) 
     @brief      Gets a message from a messagequeue in a quicker way, but without internal controls.
     @param      mq              A valid handler to a messagequeue. It must not be NULL.
-    @param      caller          The caller mode.  Use osal_callerTSK if teh caller is a normal task and
-                                osal_callerISR is the caller is an ISR or a function executed directly by
-                                the scheduler (as a timer callback).
+    @param      caller          The caller mode.  Use osal_callerTSK if the caller is a normal task and
+                                osal_callerISR is the caller is an ISR, or osal_callerTMRMAN if it is a function executed by
+                                the timer manager (hence by the scheduler).
     @param      tout            The timeout on operation in microseconds.
     @return     A pointer to the message or NULL upon failure.
 **/
@@ -107,8 +108,8 @@ extern osal_message_t osal_messagequeue_getquick(osal_messagequeue_t *mq, osal_r
     @brief      Gets the number of messages which can still be placed inside a messagequeue.
     @param      mq              A valid handler to a messagequeue. It must not be NULL.
     @param      caller          The caller mode.  Use osal_callerTSK if teh caller is a normal task and
-                                osal_callerISR is the caller is an ISR or a function executed directly by
-                                the scheduler (as a timer callback).
+                                osal_callerISR is the caller is an ISR, or osal_callerTMRMAN if it is a function executed by
+                                the timer manager (hence by the scheduler).
     @return     The number of messages which can still be put inside the messagequeue. It returns zero if mq is NULL.
 **/
 extern uint16_t osal_messagequeue_available(osal_messagequeue_t *mq, osal_caller_t caller);
@@ -118,8 +119,8 @@ extern uint16_t osal_messagequeue_available(osal_messagequeue_t *mq, osal_caller
     @brief      Gets the number of messages which already are inside a messagequeue.
     @param      mq              A valid handler to a messagequeue. 
     @param      caller          The caller mode.  Use osal_callerTSK if teh caller is a normal task and
-                                osal_callerISR is the caller is an ISR or a function executed directly by
-                                the scheduler (as a timer callback).
+                                osal_callerISR is the caller is an ISR, or osal_callerTMRMAN if it is a function executed by
+                                the timer manager (hence by the scheduler).
     @return     The number of messages which already are inside the messagequeue. It returns zero if mq is NULL. 
 **/
 extern uint16_t osal_messagequeue_size(osal_messagequeue_t *mq, osal_caller_t caller);
@@ -130,14 +131,21 @@ extern uint16_t osal_messagequeue_size(osal_messagequeue_t *mq, osal_caller_t ca
     @param      mq              A valid handler to a messagequeue.
     @param      msg             The message to be put inside 
     @param      tout            The timeout of the operation
-    @param      caller          The caller mode.  Use osal_callerTSK if teh caller is a normal task and
-                                osal_callerISR is the caller is an ISR or a function executed directly by
-                                the scheduler (as a timer callback).
-    @return     If success, a osal_res_OK. A osal_res_NOK_timeout value upon NULL pointer, a osal_res_NOK_timeout if timeout expired
-                without having access to the messagequeue or osal_res_NOK_isrnowait is caller is an ISR. 
+    @param      caller          The caller mode.  Use osal_callerTSK if the caller is a normal task and
+                                osal_callerISR is the caller is an ISR, or osal_callerTMRMAN if it is a function executed by
+                                the timer manager (hence by the scheduler).
+    @return     If success, a osal_res_OK. A osal_res_NOK_nullpointer value upon NULL pointer, a osal_res_NOK_timeout if timeout expired
+                without having access to the messagequeue (even if called by an ISR). 
 **/
 extern osal_result_t osal_messagequeue_put(osal_messagequeue_t *mq, osal_message_t msg, osal_reltime_t tout, osal_caller_t caller);
 
+
+/** @fn         extern osal_result_t osal_messagequeue_delete(osal_messagequeue_t *mq)
+    @brief      The messagequeue is deleted. 
+    @return     A value of osal_res_OK upon successful release, osal_res_NOK_generic upon generic failure, 
+                osal_res_NOK_nullpointer if mutex is NULL, or osal_res_NOK_generic if called from an ISR.
+**/
+extern osal_result_t osal_messagequeue_delete(osal_messagequeue_t *mq);
 
 /* @}            
     end of group osal_messagequeue  

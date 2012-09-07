@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -72,7 +72,8 @@ extern osal_semaphore_t * osal_semaphore_new(uint8_t maxtokens, uint8_t tokens);
     @brief      Sets the number of tokens of a semaphore.
     @param      sem             The semaphore
     @param      tokens          The number of token in the semaphore.
-    @return     A not NULL handle to the sempahore or NULL upon failure.
+    @return     A value of osal_res_OK on success, osal_res_NOK_generic upon failure, or  
+                osal_res_NOK_nullpointer if sem is NULL.
 **/
 extern osal_result_t osal_semaphore_set(osal_semaphore_t *sem, uint8_t tokens);
 
@@ -104,6 +105,13 @@ extern osal_result_t osal_semaphore_decrement(osal_semaphore_t *sem, osal_reltim
 **/
 extern osal_result_t osal_semaphore_increment(osal_semaphore_t *sem, osal_caller_t caller);
 
+
+/** @fn         extern osal_result_t osal_semaphore_delete(osal_semaphore_t *sem)
+    @brief      The semaphore is deleted. 
+    @return     A value of osal_res_OK upon successful release, osal_res_NOK_generic upon generic failure, 
+                osal_res_NOK_nullpointer if mutex is NULL, or osal_res_NOK_generic if called from an ISR.
+**/
+extern osal_result_t osal_semaphore_delete(osal_semaphore_t *sem);
 
 /* @}            
     end of group osal_semaphore  

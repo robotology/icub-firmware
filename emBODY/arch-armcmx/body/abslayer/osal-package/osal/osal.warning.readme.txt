@@ -1,5 +1,6 @@
 
-    until publication on sourceforge of osiit-package, the osal cannot be compiled or used.
+    the osal.open can be compiled by use of the oosiit library.
+    the original osal cannot be compiled unless the library osiit is used.
 
 
 
