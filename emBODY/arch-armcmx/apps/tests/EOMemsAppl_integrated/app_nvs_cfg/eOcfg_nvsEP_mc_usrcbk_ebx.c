@@ -309,7 +309,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__impedance(eOcfg_nvsEP_mc_joint
     //(currently no pid velocity is sent to 2foc)
     if(eobrd_1foc == boardType)
     {
-        // ALE: to be implemented 
+        #warning (ALE) to be implemented 
 
         return;
     }

@@ -399,7 +399,6 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
 #warning VALE--> for ALE: put in s_eom_emsrunner_hid_UpdateJointstatus update status of joint.    
 
     s_eom_emsrunner_hid_UpdateJointstatus(p);
-    s_eom_emsrunner_hid_UpdateMotorstatus(p);
 }
 
 
@@ -425,14 +424,11 @@ static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p)
                 return; //error
             }
         }
-        jstatus_basic_ptr = jstatus_basic_ptr; //delete this when set values to jstatus. Put here to remove warning.
-//         jstatus_basic_ptr = (eOmc_joint_status_basic_t*)nv_mem_ptr;
-//         jstatus_basic_ptr->position =  
-//         jstatus_basic_ptr->velocity =  
-//         jstatus_basic_ptr->acceleration =  
-//         jstatus_basic_ptr->torque =  
-//         jstatus_basic_ptr->motionmonitorstatus =  
         
+        jstatus_basic_ptr = (eOmc_joint_status_basic_t*)nv_mem_ptr;
+
+        eo_emsGetJointStatus(jId, jstatus_basic_ptr);
+         
         
         res = eo_appTheNVmapRef_GetJointNVMemoryRef(eo_appTheNVmapRef_GetHandle(), jId, jointNVindex_jstatus__ofpid, &nv_mem_ptr);
         if(eores_OK != res)
@@ -446,48 +442,11 @@ static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p)
                 return; //error
             }
         }
-        jstatus_ofpid_ptr = jstatus_ofpid_ptr;  //delete this when set values to jstatus. Put here to remove warning.
-//         jstatus_ofpid_ptr = (eOmc_joint_status_ofpid_t*)nv_mem_ptr;
-//         jstatus_ofpid_ptr->reference = 
-//         jstatus_ofpid_ptr->error = 
-//         jstatus_ofpid_ptr->output = 
-        
 
+        jstatus_ofpid_ptr = (eOmc_joint_status_ofpid_t*)nv_mem_ptr;
+
+        eo_emsGetActivePidStatus(jId, jstatus_ofpid_ptr); 
     }
-}
-
-
-
-static void s_eom_emsrunner_hid_UpdateMotorstatus(EOMtheEMSrunner *p)
-{
-    eOmc_motor_status_basic_t       *mstatus_basic_ptr = NULL;
-    eOmc_motorId_t                  mId;
-    void                            *nv_mem_ptr;
-    eOresult_t                      res;
-    
-    for(mId = 0; mId<motorNumberMAX; mId++)
-    {    
-        res = eo_appTheNVmapRef_GetMotorNVMemoryRef(eo_appTheNVmapRef_GetHandle(), mId, motorNVindex_mstatus__basic, &nv_mem_ptr);
-        if(eores_OK != res)
-        {
-            if(eores_NOK_nodata == res)
-            {
-                continue; //this jId is not manage by this board
-            }
-            else
-            {
-                return; //error
-            }
-        }
-        mstatus_basic_ptr = mstatus_basic_ptr; //delete this when set values to jstatus. Put here to remove warning.
-//         mstatus_basic_ptr = (mstatus_basic_ptr*)nv_mem_ptr;
-//         mstatus_basic_ptr->position =  
-//         mstatus_basic_ptr->velocity =  
-//         mstatus_basic_ptr->current =  
-    }
-
-
-
 }
 
 static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)

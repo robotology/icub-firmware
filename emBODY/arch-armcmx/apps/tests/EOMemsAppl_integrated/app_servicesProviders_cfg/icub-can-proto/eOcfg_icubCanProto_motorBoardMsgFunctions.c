@@ -1324,8 +1324,11 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, 
 #ifdef USE_2FOC_FAST_ENCODER
         if ((frame->id & 0xFFFFFF0F) == 0x104)
         {
-            eo_emsController_ReadSpeed(mId, SPEED_2FOC_TO_EMS(((int16_t*)frame->data)[1]));
+            mstatusbasic_ptr->velocity = ((int16_t*)frame->data)[1];
+            eo_emsController_ReadSpeed(mId, SPEED_2FOC_TO_EMS(mstatusbasic_ptr->velocity));
         }
+#else
+        mstatusbasic_ptr->velocity = 0;    
 #endif
     }
     else //mc4
