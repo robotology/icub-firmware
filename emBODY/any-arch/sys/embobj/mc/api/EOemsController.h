@@ -26,6 +26,7 @@ extern "C" {
 #include "EoCommon.h"
 #include "EOdecoupler.h"
 #include "EOaxisController.h"
+#include "EoMotionControl.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -39,9 +40,10 @@ typedef enum {
 } emsMotorDecoupler_t;
 
 typedef enum {
-    EMS_GENERIC  = 0,
-    EMS_WAIST    = 1,
-    EMS_SHOULDER = 2
+    EMS_NULL     = 0,
+    EMS_GENERIC  = 1,
+    EMS_WAIST    = 2,
+    EMS_SHOULDER = 3
 } emsBoardType_t;
 
 /* @typedef    typedef struct EOtrajectory_hid EOtrajectory
@@ -100,7 +102,8 @@ extern void eo_emsController_SetControlMode(uint8_t joint, control_mode_t mode);
 extern void eo_emsController_ResetPosPid(uint8_t joint);
 extern void eo_emsController_ResetTrqPid(uint8_t joint);
 extern void eo_emsController_Stop(uint8_t joint);
-extern void eo_emsGetActivePidStatus(uint8_t joint, int16_t *pwm, int32_t *err);
+//extern void eo_emsGetActivePidStatus(uint8_t joint, int16_t *pwm, int32_t *err);
+extern void eo_emsGetActivePidStatus(uint8_t joint, eOmc_joint_status_ofpid_t* pidStatus);
 
 // configuration
 

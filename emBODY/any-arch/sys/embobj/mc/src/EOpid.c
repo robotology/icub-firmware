@@ -120,9 +120,9 @@ extern void eo_pid_SetPidLimits(EOpid *o, float Ymax, float Imax)
     o->KImax = o->Ki!=0.0f ? o->Imax/o->Ki : 0.0f;
 }
 
-extern void eo_pid_GetStatus(EOpid *o, int16_t *pwm, int32_t *err)
+extern void eo_pid_GetStatus(EOpid *o, int32_t *pwm, int32_t *err)
 {
-    *pwm = (int16_t)o->pwm;
+    *pwm = (int32_t)o->pwm;
     *err = (int32_t)o->En;
 }
 
