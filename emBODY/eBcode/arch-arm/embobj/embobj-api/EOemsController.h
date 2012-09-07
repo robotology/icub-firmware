@@ -26,6 +26,7 @@ extern "C" {
 #include "EoCommon.h"
 #include "EOdecoupler.h"
 #include "EOaxisController.h"
+#include "EoMotionControl.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -39,9 +40,10 @@ typedef enum {
 } emsMotorDecoupler_t;
 
 typedef enum {
-    EMS_GENERIC  = 0,
-    EMS_WAIST    = 1,
-    EMS_SHOULDER = 2
+    EMS_NULL     = 0,
+    EMS_GENERIC  = 1,
+    EMS_WAIST    = 2,
+    EMS_SHOULDER = 3
 } emsBoardType_t;
 
 /* @typedef    typedef struct EOtrajectory_hid EOtrajectory
@@ -95,12 +97,13 @@ extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq);
 extern int16_t* eo_emsController_PWM(void);
 
 // asynchronous
-extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_t offset, int32_t timeout_ms, int32_t max_error);
+extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_t vel, int32_t offset);
 extern void eo_emsController_SetControlMode(uint8_t joint, control_mode_t mode);
 extern void eo_emsController_ResetPosPid(uint8_t joint);
 extern void eo_emsController_ResetTrqPid(uint8_t joint);
-extern void eo_emsController_Stop(uint8_t joint, int32_t stop_acc);
-extern void eo_emsGetActivePidStatus(uint8_t joint, int16_t *pwm, int32_t *err);
+extern void eo_emsController_Stop(uint8_t joint);
+//extern void eo_emsGetActivePidStatus(uint8_t joint, int16_t *pwm, int32_t *err);
+extern void eo_emsGetActivePidStatus(uint8_t joint, eOmc_joint_status_ofpid_t* pidStatus);
 
 // configuration
 
@@ -114,8 +117,11 @@ extern void eo_emsController_SetTrqPidLimits(uint8_t joint, float Ymax, float Im
 
 extern void eo_emsController_SetStiffness(uint8_t joint, int32_t stiffeness);
 extern void eo_emsController_SetLimits(uint8_t joint, int32_t pos_min, int32_t pos_max, int32_t vel_max);
-extern void eo_emsController_SetVelTimeout(int32_t vel_timeout);
+extern void eo_emsController_SetVelTimeout(uint8_t joint, int32_t vel_timeout);
 
+extern void eo_emsController_SetPosMin(uint8_t joint, int32_t pos_min);
+extern void eo_emsController_SetPosMax(uint8_t joint, int32_t pos_max);
+extern void eo_emsController_SetVelMax(uint8_t joint, int32_t vel_max);
 
 /** @}            
     end of group eo_emsController  
