@@ -70,7 +70,7 @@ extern void eo_pid_SetPid(EOpid *o, float K, float Kd, float Ki);
 
 extern void eo_pid_SetPidLimits(EOpid *o, float Ymax, float Imax);
 
-extern void eo_pid_GetStatus(EOpid *o, int16_t *pwm, int32_t *err);
+extern void eo_pid_GetStatus(EOpid *o, int32_t *pwm, int32_t *err);
 
 extern uint8_t eo_pid_IsInitialized(EOpid *o);
 extern void eo_pid_Reset(EOpid *o);
