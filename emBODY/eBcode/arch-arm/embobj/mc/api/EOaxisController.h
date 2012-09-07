@@ -102,7 +102,8 @@ extern void eo_axisController_SetVelMax(EOaxisController *o, int32_t vel_max);
 
 extern void eo_axisController_SetOffset(EOaxisController *o, int16_t offset);
 
-extern void eo_axisController_GetActivePidStatus(EOaxisController *o, int16_t *pwm, int32_t *err);
+extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint_status_ofpid_t* pidStatus);
+extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_status_basic_t* jointStatus);
 
 extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o);
 extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o);

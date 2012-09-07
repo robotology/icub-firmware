@@ -50,6 +50,8 @@ struct EOaxisController_hid
     eObool_t is_calibrated;
     int32_t calib_timeout_ms;
     float   calib_max_error;
+    float   reach_max_error;
+    float   err;
 
     // axis limits
     int32_t pos_min;
