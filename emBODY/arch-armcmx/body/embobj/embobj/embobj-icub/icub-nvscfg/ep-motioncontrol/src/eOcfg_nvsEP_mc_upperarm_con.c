@@ -428,7 +428,7 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
         EO_INIT(.dchildren) NULL        
     },
     {   //25
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jcmmnds__holder01FFU01,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j00_jcmmnds__cmdcontrolxmode,
         EO_INIT(.index)     Jindex( 0,25),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL        
@@ -607,7 +607,7 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
         EO_INIT(.dchildren) NULL        
     },
     {   //25
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jcmmnds__holder01FFU01,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j01_jcmmnds__cmdcontrolxmode,
         EO_INIT(.index)     Jindex( 1,25),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL        
@@ -786,7 +786,7 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
         EO_INIT(.dchildren) NULL        
     },
     {   //25
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jcmmnds__holder01FFU01,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j02_jcmmnds__cmdcontrolxmode,
         EO_INIT(.index)     Jindex( 2,25),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL        
@@ -965,7 +965,7 @@ EOtreenode eo_cfg_nvsEP_mc_upperarm_tree_con[] =
         EO_INIT(.dchildren) NULL        
     },
     {   //25
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jcmmnds__holder01FFU01,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_upperarm_j03_jcmmnds__cmdcontrolxmode,
         EO_INIT(.index)     Jindex( 3,25),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL        
@@ -1299,7 +1299,7 @@ extern uint16_t eo_cfg_nvsEP_mc_upperarm_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__externallymeasuredtorque(0),    EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder02FFU01(0),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder04FFU02(0),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__calibration(0),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__setpoint(0),
-        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__stoptrajectory(0),              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__holder01FFU01(0),
+        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__stoptrajectory(0),              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__cmdcontrolxmode(0),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__holder01FFU02(0),               EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__holder01FFU03(0),    
  
         // j01
@@ -1316,7 +1316,7 @@ extern uint16_t eo_cfg_nvsEP_mc_upperarm_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__externallymeasuredtorque(1),    EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder02FFU01(1),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder04FFU02(1),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__calibration(1),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__setpoint(1),
-        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__stoptrajectory(1),              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__holder01FFU01(1),
+        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__stoptrajectory(1),              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__cmdcontrolxmode(1),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__holder01FFU02(1),               EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__holder01FFU03(1),   
         
         // j02
@@ -1333,7 +1333,7 @@ extern uint16_t eo_cfg_nvsEP_mc_upperarm_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__externallymeasuredtorque(2),    EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder02FFU01(2),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder04FFU02(2),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__calibration(2),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__setpoint(2),
-        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__stoptrajectory(2),              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__holder01FFU01(2),
+        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__stoptrajectory(2),              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__cmdcontrolxmode(2),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__holder01FFU02(2),               EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__holder01FFU03(2),  
         
         // j03
@@ -1350,7 +1350,7 @@ extern uint16_t eo_cfg_nvsEP_mc_upperarm_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__externallymeasuredtorque(3),    EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder02FFU01(3),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder04FFU02(3),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__calibration(3),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__setpoint(3),
-        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__stoptrajectory(3),              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__holder01FFU01(3),
+        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__stoptrajectory(3),              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__cmdcontrolxmode(3),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__holder01FFU02(3),               EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__holder01FFU03(3),          
 
         

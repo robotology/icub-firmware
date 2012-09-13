@@ -82,7 +82,7 @@
 #define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__calibration                          (22)
 #define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__setpoint                             (23)
 #define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__stoptrajectory                       (24)
-#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__holder01FFU01                        (25)
+#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__cmdcontrolxmode                        (25)
 #define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__holder01FFU02                        (26)
 #define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__holder01FFU03                        (27)
 
@@ -125,7 +125,7 @@
 #define EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__calibration                          EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_pkd)
 #define EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__setpoint                             EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_pkd)
 #define EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__stoptrajectory                       EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_u08)
-#define EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__holder01FFU01                        EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_u08)
+#define EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__cmdcontrolxmode                        EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_u08)
 #define EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__holder01FFU02                        EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_u08)
 #define EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__holder01FFU03                        EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_u08)
 

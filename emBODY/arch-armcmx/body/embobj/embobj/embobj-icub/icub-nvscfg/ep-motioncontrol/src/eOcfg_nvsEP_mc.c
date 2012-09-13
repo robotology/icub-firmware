@@ -110,7 +110,7 @@ EO_VERIFYproposition(xxx, jointNVindex_jinputs__holder04FFU02               == E
 EO_VERIFYproposition(xxx, jointNVindex_jcmmnds__calibration                 == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__calibration);
 EO_VERIFYproposition(xxx, jointNVindex_jcmmnds__setpoint                    == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__setpoint);
 EO_VERIFYproposition(xxx, jointNVindex_jcmmnds__stoptrajectory              == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__stoptrajectory);
-EO_VERIFYproposition(xxx, jointNVindex_jcmmnds__holder01FFU01               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__holder01FFU01);
+EO_VERIFYproposition(xxx, jointNVindex_jcmmnds__cmdcontrolxmode               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__cmdcontrolxmode);
 EO_VERIFYproposition(xxx, jointNVindex_jcmmnds__holder01FFU02               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__holder01FFU02);
 EO_VERIFYproposition(xxx, jointNVindex_jcmmnds__holder01FFU03               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__holder01FFU03);
 
@@ -497,8 +497,8 @@ __weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__stoptrajectory(eOcfg_nv
 }
 #endif
 
-#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__holder01FFU01)
-__weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__holder01FFU01(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__cmdcontrolxmode)
+__weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__cmdcontrolxmode(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -808,8 +808,8 @@ __weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__stoptrajectory(eOcfg_nv
 }
 #endif
 
-#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__holder01FFU01)
-__weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__holder01FFU01(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__cmdcontrolxmode)
+__weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__cmdcontrolxmode(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;

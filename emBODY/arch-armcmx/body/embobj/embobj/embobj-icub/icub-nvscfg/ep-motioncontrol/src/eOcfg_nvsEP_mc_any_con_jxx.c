@@ -109,7 +109,7 @@ const uint8_t eo_cfg_nvsEP_mc_any_con_jxx_funtyp[] =
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__calibration,
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__setpoint,
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__stoptrajectory,
-    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__holder01FFU01,
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__cmdcontrolxmode,
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__holder01FFU02,
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__holder01FFU03
     

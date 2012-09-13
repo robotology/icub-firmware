@@ -299,7 +299,7 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_upperleg_usr_array_of_EOnv_usr[] =
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j00 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_upperleg_j00_ebx_jcmmnds__holder01FFU01,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_upperleg_j00_ebx_jcmmnds__cmdcontrolxmode,
         EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
@@ -440,7 +440,7 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_upperleg_usr_array_of_EOnv_usr[] =
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j01 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_upperleg_j01_ebx_jcmmnds__holder01FFU01,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_upperleg_j01_ebx_jcmmnds__cmdcontrolxmode,
         EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
@@ -581,7 +581,7 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_upperleg_usr_array_of_EOnv_usr[] =
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j02 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_upperleg_j02_ebx_jcmmnds__holder01FFU01,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_upperleg_j02_ebx_jcmmnds__cmdcontrolxmode,
         EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
@@ -722,7 +722,7 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_upperleg_usr_array_of_EOnv_usr[] =
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j03 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_upperleg_j03_ebx_jcmmnds__holder01FFU01,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_upperleg_j03_ebx_jcmmnds__cmdcontrolxmode,
         EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
@@ -1196,11 +1196,11 @@ __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jcmmnds__stoptrajec
     eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__stoptrajectory((eOcfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
-__weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jcmmnds__holder01FFU01(uint16_t xx, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jcmmnds__cmdcontrolxmode(uint16_t xx, const EOnv* nv)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__holder01FFU01((eOcfg_nvsEP_mc_jointNumber_t)xx, nv);
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__cmdcontrolxmode((eOcfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_INIT_Jxx_jcmmnds__holder01FFU02(uint16_t xx, const EOnv* nv)
@@ -1407,11 +1407,11 @@ __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jcmmnds__stoptrajec
     eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__stoptrajectory((eOcfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
-__weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jcmmnds__holder01FFU01(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jcmmnds__cmdcontrolxmode(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__holder01FFU01((eOcfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__cmdcontrolxmode((eOcfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_upperleg_usr_hid_UPDT_Jxx_jcmmnds__holder01FFU02(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)

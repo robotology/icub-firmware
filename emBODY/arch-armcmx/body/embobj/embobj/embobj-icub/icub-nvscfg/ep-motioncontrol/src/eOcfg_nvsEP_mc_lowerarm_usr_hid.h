@@ -79,7 +79,7 @@ extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_INIT_Jxx_jinputs__holder04FFU02(uin
 extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_INIT_Jxx_jcmmnds__calibration(uint16_t xx, const EOnv* nv);
 extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_INIT_Jxx_jcmmnds__setpoint(uint16_t xx, const EOnv* nv);
 extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_INIT_Jxx_jcmmnds__stoptrajectory(uint16_t xx, const EOnv* nv);
-extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_INIT_Jxx_jcmmnds__holder01FFU01(uint16_t xx, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_INIT_Jxx_jcmmnds__cmdcontrolxmode(uint16_t xx, const EOnv* nv);
 extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_INIT_Jxx_jcmmnds__holder01FFU02(uint16_t xx, const EOnv* nv);
 extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_INIT_Jxx_jcmmnds__holder01FFU03(uint16_t xx, const EOnv* nv);
 
@@ -113,7 +113,7 @@ extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_UPDT_Jxx_jinputs__holder04FFU02(uin
 extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_UPDT_Jxx_jcmmnds__calibration(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_UPDT_Jxx_jcmmnds__setpoint(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_UPDT_Jxx_jcmmnds__stoptrajectory(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
-extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_UPDT_Jxx_jcmmnds__holder01FFU01(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_UPDT_Jxx_jcmmnds__cmdcontrolxmode(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_UPDT_Jxx_jcmmnds__holder01FFU02(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 extern void eo_cfg_nvsEP_mc_lowerarm_usr_hid_UPDT_Jxx_jcmmnds__holder01FFU03(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 

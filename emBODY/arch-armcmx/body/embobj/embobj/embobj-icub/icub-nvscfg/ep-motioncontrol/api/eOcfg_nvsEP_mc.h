@@ -122,7 +122,7 @@ typedef enum
     jointNVindex_jcmmnds__calibration                       = 22,
     jointNVindex_jcmmnds__setpoint                          = 23,
     jointNVindex_jcmmnds__stoptrajectory                    = 24,
-    jointNVindex_jcmmnds__holder01FFU01                     = 25,
+    jointNVindex_jcmmnds__cmdcontrolxmode                   = 25,
     jointNVindex_jcmmnds__holder01FFU02                     = 26,
     jointNVindex_jcmmnds__holder01FFU03                     = 27,
 } eOcfg_nvsEP_mc_jointNVindex_t;

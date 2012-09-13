@@ -497,7 +497,7 @@ typedef struct                  // size is 16+12+1+1+1+1+0 = 32
     eOmc_calibrator_t           calibration;                /**< the calibrator to use */
     eOmc_setpoint_t             setpoint;                   /**< the setpoint of the joint */
     eObool_t                    stoptrajectory;             /**< it is an order to stop the current trajectory on the joint*/
-    uint8_t                     holder01FFU01;              /**< holder of a variable for future use */
+    eOenum08_t                  cmdcontrolxmode;            /**< use values from eOmc_controlmode_t*/
     uint8_t                     holder01FFU02;              /**< holder of a variable for future use */
     uint8_t                     holder01FFU03;              /**< holder of a variable for future use */
 } eOmc_joint_commands_t;        EO_VERIFYsizeof(eOmc_joint_commands_t, 32);
