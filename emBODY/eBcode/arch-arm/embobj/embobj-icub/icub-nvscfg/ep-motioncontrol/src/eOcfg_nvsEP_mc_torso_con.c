@@ -301,7 +301,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
             EO_INIT(.dchildren) NULL
         },  
         {   // 8
-            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j00_jconfig__controlmode,
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j00_jconfig__holder01FFU00,
             EO_INIT(.index)     Jindex( 0, 8),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) NULL
@@ -410,7 +410,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
         EO_INIT(.dchildren) NULL        
     },
     {   //25
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j00_jcmmnds__cmdcontrolxmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j00_jcmmnds__controlmode,
         EO_INIT(.index)     Jindex( 0,25),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL        
@@ -479,7 +479,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
             EO_INIT(.dchildren) NULL
         },  
         {   // 8
-            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j01_jconfig__controlmode,
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j01_jconfig__holder01FFU00,
             EO_INIT(.index)     Jindex( 1, 8),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) NULL
@@ -588,7 +588,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
         EO_INIT(.dchildren) NULL        
     },
     {   //25
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j01_jcmmnds__cmdcontrolxmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j01_jcmmnds__controlmode,
         EO_INIT(.index)     Jindex( 1,25),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL        
@@ -658,7 +658,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
             EO_INIT(.dchildren) NULL
         },  
         {   // 8
-            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j02_jconfig__controlmode,
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j02_jconfig__holder01FFU00,
             EO_INIT(.index)     Jindex( 2, 8),
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) NULL
@@ -767,7 +767,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
         EO_INIT(.dchildren) NULL        
     },
     {   //25
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j02_jcmmnds__cmdcontrolxmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j02_jcmmnds__controlmode,
         EO_INIT(.index)     Jindex( 2,25),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL        
@@ -1038,7 +1038,7 @@ extern uint16_t eo_cfg_nvsEP_mc_torso_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidvelocity(0),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidtorque(0), 
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__impedance(0),                   EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__minpositionofjoint(0),      
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__maxpositionofjoint(0),          EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__velocitysetpointtimeout(0), 
-        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__controlmode(0),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__motionmonitormode(0),       
+        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder01FFU00(0),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__motionmonitormode(0),       
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__des02FORjstatuschamaleon04(0),  EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder01FFU01(0),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder01FFU02(0),               EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder02FFU03(0),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder02FFU04(0),
@@ -1047,7 +1047,7 @@ extern uint16_t eo_cfg_nvsEP_mc_torso_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__externallymeasuredtorque(0),    EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder02FFU01(0),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder04FFU02(0),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__calibration(0),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__setpoint(0),
-        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__stoptrajectory(0),              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__cmdcontrolxmode(0),
+        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__stoptrajectory(0),              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__controlmode(0),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__holder01FFU02(0),               EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__holder01FFU03(0),    
  
         // j01
@@ -1055,7 +1055,7 @@ extern uint16_t eo_cfg_nvsEP_mc_torso_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidvelocity(1),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidtorque(1), 
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__impedance(1),                   EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__minpositionofjoint(1),      
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__maxpositionofjoint(1),          EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__velocitysetpointtimeout(1), 
-        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__controlmode(1),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__motionmonitormode(1),       
+        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder01FFU00(1),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__motionmonitormode(1),       
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__des02FORjstatuschamaleon04(1),  EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder01FFU01(1),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder01FFU02(1),               EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder02FFU03(1),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder02FFU04(1),
@@ -1064,7 +1064,7 @@ extern uint16_t eo_cfg_nvsEP_mc_torso_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__externallymeasuredtorque(1),    EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder02FFU01(1),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder04FFU02(1),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__calibration(1),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__setpoint(1),
-        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__stoptrajectory(1),              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__cmdcontrolxmode(1),
+        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__stoptrajectory(1),              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__controlmode(1),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__holder01FFU02(1),               EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__holder01FFU03(1),   
         
         // j02
@@ -1072,7 +1072,7 @@ extern uint16_t eo_cfg_nvsEP_mc_torso_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidvelocity(2),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__pidtorque(2), 
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__impedance(2),                   EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__minpositionofjoint(2),      
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__maxpositionofjoint(2),          EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__velocitysetpointtimeout(2), 
-        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__controlmode(2),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__motionmonitormode(2),       
+        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder01FFU00(2),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__motionmonitormode(2),       
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__des02FORjstatuschamaleon04(2),  EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder01FFU01(2),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder01FFU02(2),               EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder02FFU03(2),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder02FFU04(2),
@@ -1081,7 +1081,7 @@ extern uint16_t eo_cfg_nvsEP_mc_torso_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__externallymeasuredtorque(2),    EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder02FFU01(2),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder04FFU02(2),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__calibration(2),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__setpoint(2),
-        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__stoptrajectory(2),              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__cmdcontrolxmode(2),
+        EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__stoptrajectory(2),              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__controlmode(2),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__holder01FFU02(2),               EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__holder01FFU03(2),  
               
 

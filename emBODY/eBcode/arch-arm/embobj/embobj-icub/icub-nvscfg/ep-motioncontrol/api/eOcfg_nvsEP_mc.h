@@ -102,7 +102,7 @@ typedef enum
     jointNVindex_jconfig__minpositionofjoint                =  5,
     jointNVindex_jconfig__maxpositionofjoint                =  6,
     jointNVindex_jconfig__velocitysetpointtimeout           =  7,
-    jointNVindex_jconfig__controlmode                       =  8,
+    jointNVindex_jconfig__holder01FFU00                     =  8,
     jointNVindex_jconfig__motionmonitormode                 =  9,
     jointNVindex_jconfig__des02FORjstatuschamaleon04        = 10,
     jointNVindex_jconfig__holder01FFU01                     = 11,
@@ -122,7 +122,7 @@ typedef enum
     jointNVindex_jcmmnds__calibration                       = 22,
     jointNVindex_jcmmnds__setpoint                          = 23,
     jointNVindex_jcmmnds__stoptrajectory                    = 24,
-    jointNVindex_jcmmnds__cmdcontrolxmode                   = 25,
+    jointNVindex_jcmmnds__controlmode                   = 25,
     jointNVindex_jcmmnds__holder01FFU02                     = 26,
     jointNVindex_jcmmnds__holder01FFU03                     = 27,
 } eOcfg_nvsEP_mc_jointNVindex_t;

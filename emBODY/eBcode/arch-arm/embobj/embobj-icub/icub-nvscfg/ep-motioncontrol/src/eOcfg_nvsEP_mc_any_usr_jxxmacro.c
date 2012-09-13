@@ -233,7 +233,7 @@
 #define NVMACRO_BSTR        JXXMACRO_BOARD
 #define NVMACRO_NVSTR1      JXXMACRO_JSTR
 #define NVMACRO_NVNUM1      JXXMACRO_JNUM
-#define NVMACRO_NVSTR2      _jconfig__controlmode
+#define NVMACRO_NVSTR2      _jconfig__holder01FFU00
 
 #define NVMACRO_USE_INIT    1
 #define NVMACRO_USE_UPDT    1
@@ -507,7 +507,7 @@
 #define NVMACRO_BSTR        JXXMACRO_BOARD
 #define NVMACRO_NVSTR1      JXXMACRO_JSTR
 #define NVMACRO_NVNUM1      JXXMACRO_JNUM
-#define NVMACRO_NVSTR2      _jcmmnds__cmdcontrolxmode
+#define NVMACRO_NVSTR2      _jcmmnds__controlmode
 
 #define NVMACRO_USE_INIT    1
 #define NVMACRO_USE_UPDT    1
