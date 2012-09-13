@@ -453,21 +453,21 @@ EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__stoptrajecto
 #define OFFSETafter_jcmmnds__stoptrajectory           (OFFSETof_jcmmnds__stoptrajectory+CAPACITY_jcmmnds__stoptrajectory)
 
 
-#define OFFSETof_jcmmnds__holder01FFU01                  (OFFSETafter_jcmmnds__stoptrajectory)
-#define CAPACITY_jcmmnds__holder01FFU01                   (1)
-EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__holder01FFU01) =
+#define OFFSETof_jcmmnds__cmdcontrolxmode                  (OFFSETafter_jcmmnds__stoptrajectory)
+#define CAPACITY_jcmmnds__cmdcontrolxmode                   (1)
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__cmdcontrolxmode) =
 {   
-    EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jcmmnds__holder01FFU01, JMACRO_JNUM),
-    EO_INIT(.capacity)  CAPACITY_jcmmnds__holder01FFU01,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.jcmmnds.holder01FFU01,
-    EO_INIT(.offset)    OFFSETof_jcmmnds__holder01FFU01,
-    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__holder01FFU01),
-    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__holder01FFU01)
+    EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jcmmnds__cmdcontrolxmode, JMACRO_JNUM),
+    EO_INIT(.capacity)  CAPACITY_jcmmnds__cmdcontrolxmode,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.jcmmnds.cmdcontrolxmode,
+    EO_INIT(.offset)    OFFSETof_jcmmnds__cmdcontrolxmode,
+    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__cmdcontrolxmode),
+    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__cmdcontrolxmode)
 };
-#define OFFSETafter_jcmmnds__holder01FFU01           (OFFSETof_jcmmnds__holder01FFU01+CAPACITY_jcmmnds__holder01FFU01)
+#define OFFSETafter_jcmmnds__cmdcontrolxmode           (OFFSETof_jcmmnds__cmdcontrolxmode+CAPACITY_jcmmnds__cmdcontrolxmode)
 
 
-#define OFFSETof_jcmmnds__holder01FFU02                  (OFFSETafter_jcmmnds__holder01FFU01)
+#define OFFSETof_jcmmnds__holder01FFU02                  (OFFSETafter_jcmmnds__cmdcontrolxmode)
 #define CAPACITY_jcmmnds__holder01FFU02                   (1)
 EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__holder01FFU02) =
 {   

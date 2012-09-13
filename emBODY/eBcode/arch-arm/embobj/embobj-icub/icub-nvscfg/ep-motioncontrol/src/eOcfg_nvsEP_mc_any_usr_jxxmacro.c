@@ -507,7 +507,7 @@
 #define NVMACRO_BSTR        JXXMACRO_BOARD
 #define NVMACRO_NVSTR1      JXXMACRO_JSTR
 #define NVMACRO_NVNUM1      JXXMACRO_JNUM
-#define NVMACRO_NVSTR2      _jcmmnds__holder01FFU01
+#define NVMACRO_NVSTR2      _jcmmnds__cmdcontrolxmode
 
 #define NVMACRO_USE_INIT    1
 #define NVMACRO_USE_UPDT    1
