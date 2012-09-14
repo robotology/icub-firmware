@@ -584,59 +584,66 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
 
     // jinputs
     {   //21
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j00_jinputs__externallymeasuredtorque,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j00_jinputs,
         EO_INIT(.index)     Jindex( 0,21),
-        EO_INIT(.nchildren) 0,
+        EO_INIT(.nchildren) 3,
         EO_INIT(.dchildren) NULL
-    },  
-    {   //22
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j00_jinputs__holder02FFU01,
-        EO_INIT(.index)     Jindex( 0,22),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    },  
-    {   //23
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j00_jinputs__holder04FFU02,
-        EO_INIT(.index)     Jindex( 0,23),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
+    },        
 
+        // jinputs
+        {   //22
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j00_jinputs__externallymeasuredtorque,
+            EO_INIT(.index)     Jindex( 0,22),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //23
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j00_jinputs__holder02FFU01,
+            EO_INIT(.index)     Jindex( 0,23),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //24
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j00_jinputs__holder04FFU02,
+            EO_INIT(.index)     Jindex( 0,24),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        }, 
     
     // jcmmnds
-    {   //24
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j00_jcmmnds__calibration,
-        EO_INIT(.index)     Jindex( 0,24),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
     {   //25
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j00_jcmmnds__setpoint,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j00_jcmmnds__calibration,
         EO_INIT(.index)     Jindex( 0,25),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    }, 
     {   //26
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j00_jcmmnds__stoptrajectory,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j00_jcmmnds__setpoint,
         EO_INIT(.index)     Jindex( 0,26),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },
+    },        
     {   //27
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j00_jcmmnds__controlmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j00_jcmmnds__stoptrajectory,
         EO_INIT(.index)     Jindex( 0,27),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },    
+    },
     {   //28
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j00_jcmmnds__holder01FFU02,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j00_jcmmnds__controlmode,
         EO_INIT(.index)     Jindex( 0,28),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    },    
     {   //29
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j00_jcmmnds__holder01FFU03,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j00_jcmmnds__holder01FFU02,
         EO_INIT(.index)     Jindex( 0,29),
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.dchildren) NULL
+    },        
+    {   //30
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j00_jcmmnds__holder01FFU03,
+        EO_INIT(.index)     Jindex( 0,30),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
     },    
@@ -774,63 +781,69 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
 
     // jinputs
     {   //21
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j01_jinputs__externallymeasuredtorque,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j01_jinputs,
         EO_INIT(.index)     Jindex( 1,21),
-        EO_INIT(.nchildren) 0,
+        EO_INIT(.nchildren) 3,
         EO_INIT(.dchildren) NULL
-    },  
-    {   //22
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j01_jinputs__holder02FFU01,
-        EO_INIT(.index)     Jindex( 1,22),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    },  
-    {   //23
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j01_jinputs__holder04FFU02,
-        EO_INIT(.index)     Jindex( 1,23),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
+    },        
 
+        // jinputs
+        {   //22
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j01_jinputs__externallymeasuredtorque,
+            EO_INIT(.index)     Jindex( 1,22),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //23
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j01_jinputs__holder02FFU01,
+            EO_INIT(.index)     Jindex( 1,23),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //24
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j01_jinputs__holder04FFU02,
+            EO_INIT(.index)     Jindex( 1,24),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        }, 
     
     // jcmmnds
-    {   //24
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j01_jcmmnds__calibration,
-        EO_INIT(.index)     Jindex( 1,24),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
     {   //25
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j01_jcmmnds__setpoint,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j01_jcmmnds__calibration,
         EO_INIT(.index)     Jindex( 1,25),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    }, 
     {   //26
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j01_jcmmnds__stoptrajectory,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j01_jcmmnds__setpoint,
         EO_INIT(.index)     Jindex( 1,26),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },
+    },        
     {   //27
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j01_jcmmnds__controlmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j01_jcmmnds__stoptrajectory,
         EO_INIT(.index)     Jindex( 1,27),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },    
+    },
     {   //28
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j01_jcmmnds__holder01FFU02,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j01_jcmmnds__controlmode,
         EO_INIT(.index)     Jindex( 1,28),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    },    
     {   //29
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j01_jcmmnds__holder01FFU03,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j01_jcmmnds__holder01FFU02,
         EO_INIT(.index)     Jindex( 1,29),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
+    },        
+    {   //30
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j01_jcmmnds__holder01FFU03,
+        EO_INIT(.index)     Jindex( 1,30),
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.dchildren) NULL
     },    
-    
 
     // joint-j02
     // jconfig
@@ -965,63 +978,69 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
 
     // jinputs
     {   //21
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j02_jinputs__externallymeasuredtorque,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j02_jinputs,
         EO_INIT(.index)     Jindex( 2,21),
-        EO_INIT(.nchildren) 0,
+        EO_INIT(.nchildren) 3,
         EO_INIT(.dchildren) NULL
-    },  
-    {   //22
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j02_jinputs__holder02FFU01,
-        EO_INIT(.index)     Jindex( 2,22),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    },  
-    {   //23
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j02_jinputs__holder04FFU02,
-        EO_INIT(.index)     Jindex( 2,23),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
+    },        
 
+        // jinputs
+        {   //22
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j02_jinputs__externallymeasuredtorque,
+            EO_INIT(.index)     Jindex( 2,22),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //23
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j02_jinputs__holder02FFU01,
+            EO_INIT(.index)     Jindex( 2,23),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //24
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j02_jinputs__holder04FFU02,
+            EO_INIT(.index)     Jindex( 2,24),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        }, 
     
     // jcmmnds
-    {   //24
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j02_jcmmnds__calibration,
-        EO_INIT(.index)     Jindex( 2,24),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
     {   //25
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j02_jcmmnds__setpoint,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j02_jcmmnds__calibration,
         EO_INIT(.index)     Jindex( 2,25),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    }, 
     {   //26
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j02_jcmmnds__stoptrajectory,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j02_jcmmnds__setpoint,
         EO_INIT(.index)     Jindex( 2,26),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },
+    },        
     {   //27
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j02_jcmmnds__controlmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j02_jcmmnds__stoptrajectory,
         EO_INIT(.index)     Jindex( 2,27),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },    
+    },
     {   //28
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j02_jcmmnds__holder01FFU02,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j02_jcmmnds__controlmode,
         EO_INIT(.index)     Jindex( 2,28),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    },    
     {   //29
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j02_jcmmnds__holder01FFU03,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j02_jcmmnds__holder01FFU02,
         EO_INIT(.index)     Jindex( 2,29),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },    
-
+    },        
+    {   //30
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j02_jcmmnds__holder01FFU03,
+        EO_INIT(.index)     Jindex( 2,30),
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.dchildren) NULL
+    },
 
     // joint-j03
     // jconfig
@@ -1156,63 +1175,70 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
 
     // jinputs
     {   //21
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j03_jinputs__externallymeasuredtorque,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j03_jinputs,
         EO_INIT(.index)     Jindex( 3,21),
-        EO_INIT(.nchildren) 0,
+        EO_INIT(.nchildren) 3,
         EO_INIT(.dchildren) NULL
-    },  
-    {   //22
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j03_jinputs__holder02FFU01,
-        EO_INIT(.index)     Jindex( 3,22),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    },  
-    {   //23
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j03_jinputs__holder04FFU02,
-        EO_INIT(.index)     Jindex( 3,23),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
+    },        
 
+        // jinputs
+        {   //22
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j03_jinputs__externallymeasuredtorque,
+            EO_INIT(.index)     Jindex( 3,22),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //23
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j03_jinputs__holder02FFU01,
+            EO_INIT(.index)     Jindex( 3,23),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //24
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j03_jinputs__holder04FFU02,
+            EO_INIT(.index)     Jindex( 3,24),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        }, 
     
     // jcmmnds
-    {   //24
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j03_jcmmnds__calibration,
-        EO_INIT(.index)     Jindex( 3,24),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
     {   //25
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j03_jcmmnds__setpoint,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j03_jcmmnds__calibration,
         EO_INIT(.index)     Jindex( 3,25),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    }, 
     {   //26
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j03_jcmmnds__stoptrajectory,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j03_jcmmnds__setpoint,
         EO_INIT(.index)     Jindex( 3,26),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },
+    },        
     {   //27
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j03_jcmmnds__controlmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j03_jcmmnds__stoptrajectory,
         EO_INIT(.index)     Jindex( 3,27),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },    
+    },
     {   //28
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j03_jcmmnds__holder01FFU02,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j03_jcmmnds__controlmode,
         EO_INIT(.index)     Jindex( 3,28),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    },    
     {   //29
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j03_jcmmnds__holder01FFU03,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j03_jcmmnds__holder01FFU02,
         EO_INIT(.index)     Jindex( 3,29),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },    
-       
+    },        
+    {   //30
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j03_jcmmnds__holder01FFU03,
+        EO_INIT(.index)     Jindex( 3,30),
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.dchildren) NULL
+    },
+	
     // joint-j04
     // jconfig
     {   // 0
@@ -1346,63 +1372,69 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
 
     // jinputs
     {   //21
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j04_jinputs__externallymeasuredtorque,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j04_jinputs,
         EO_INIT(.index)     Jindex( 4,21),
-        EO_INIT(.nchildren) 0,
+        EO_INIT(.nchildren) 3,
         EO_INIT(.dchildren) NULL
-    },  
-    {   //22
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j04_jinputs__holder02FFU01,
-        EO_INIT(.index)     Jindex( 4,22),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    },  
-    {   //23
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j04_jinputs__holder04FFU02,
-        EO_INIT(.index)     Jindex( 4,23),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
+    },        
 
+        // jinputs
+        {   //22
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j04_jinputs__externallymeasuredtorque,
+            EO_INIT(.index)     Jindex( 4,22),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //23
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j04_jinputs__holder02FFU01,
+            EO_INIT(.index)     Jindex( 4,23),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //24
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j04_jinputs__holder04FFU02,
+            EO_INIT(.index)     Jindex( 4,24),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        }, 
     
     // jcmmnds
-    {   //24
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j04_jcmmnds__calibration,
-        EO_INIT(.index)     Jindex( 4,24),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
     {   //25
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j04_jcmmnds__setpoint,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j04_jcmmnds__calibration,
         EO_INIT(.index)     Jindex( 4,25),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    }, 
     {   //26
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j04_jcmmnds__stoptrajectory,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j04_jcmmnds__setpoint,
         EO_INIT(.index)     Jindex( 4,26),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },
+    },        
     {   //27
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j04_jcmmnds__controlmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j04_jcmmnds__stoptrajectory,
         EO_INIT(.index)     Jindex( 4,27),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },    
+    },
     {   //28
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j04_jcmmnds__holder01FFU02,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j04_jcmmnds__controlmode,
         EO_INIT(.index)     Jindex( 4,28),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    },    
     {   //29
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j04_jcmmnds__holder01FFU03,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j04_jcmmnds__holder01FFU02,
         EO_INIT(.index)     Jindex( 4,29),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },    
-       
+    },        
+    {   //30
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j04_jcmmnds__holder01FFU03,
+        EO_INIT(.index)     Jindex( 4,30),
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.dchildren) NULL
+    },       
     
     // joint-j05
     // jconfig
@@ -1537,63 +1569,70 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
 
     // jinputs
     {   //21
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j05_jinputs__externallymeasuredtorque,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j05_jinputs,
         EO_INIT(.index)     Jindex( 5,21),
-        EO_INIT(.nchildren) 0,
+        EO_INIT(.nchildren) 3,
         EO_INIT(.dchildren) NULL
-    },  
-    {   //22
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j05_jinputs__holder02FFU01,
-        EO_INIT(.index)     Jindex( 5,22),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    },  
-    {   //23
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j05_jinputs__holder04FFU02,
-        EO_INIT(.index)     Jindex( 5,23),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
+    },        
 
+        // jinputs
+        {   //22
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j05_jinputs__externallymeasuredtorque,
+            EO_INIT(.index)     Jindex( 5,22),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //23
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j05_jinputs__holder02FFU01,
+            EO_INIT(.index)     Jindex( 5,23),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //24
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j05_jinputs__holder04FFU02,
+            EO_INIT(.index)     Jindex( 5,24),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        }, 
     
     // jcmmnds
-    {   //24
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j05_jcmmnds__calibration,
-        EO_INIT(.index)     Jindex( 5,24),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
     {   //25
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j05_jcmmnds__setpoint,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j05_jcmmnds__calibration,
         EO_INIT(.index)     Jindex( 5,25),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    }, 
     {   //26
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j05_jcmmnds__stoptrajectory,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j05_jcmmnds__setpoint,
         EO_INIT(.index)     Jindex( 5,26),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },
+    },        
     {   //27
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j05_jcmmnds__controlmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j05_jcmmnds__stoptrajectory,
         EO_INIT(.index)     Jindex( 5,27),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },    
+    },
     {   //28
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j05_jcmmnds__holder01FFU02,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j05_jcmmnds__controlmode,
         EO_INIT(.index)     Jindex( 5,28),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    },    
     {   //29
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j05_jcmmnds__holder01FFU03,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j05_jcmmnds__holder01FFU02,
         EO_INIT(.index)     Jindex( 5,29),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },    
-       
+    },        
+    {   //30
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j05_jcmmnds__holder01FFU03,
+        EO_INIT(.index)     Jindex( 5,30),
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.dchildren) NULL
+    },
+	
     // joint-j06
     // jconfig
     {   // 0
@@ -1724,65 +1763,72 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) NULL
         },  
-
+		
     // jinputs
     {   //21
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j06_jinputs__externallymeasuredtorque,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j06_jinputs,
         EO_INIT(.index)     Jindex( 6,21),
-        EO_INIT(.nchildren) 0,
+        EO_INIT(.nchildren) 3,
         EO_INIT(.dchildren) NULL
-    },  
-    {   //22
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j06_jinputs__holder02FFU01,
-        EO_INIT(.index)     Jindex( 6,22),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    },  
-    {   //23
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j06_jinputs__holder04FFU02,
-        EO_INIT(.index)     Jindex( 6,23),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
+    },        
 
+        // jinputs
+        {   //22
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j06_jinputs__externallymeasuredtorque,
+            EO_INIT(.index)     Jindex( 6,22),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //23
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j06_jinputs__holder02FFU01,
+            EO_INIT(.index)     Jindex( 6,23),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //24
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j06_jinputs__holder04FFU02,
+            EO_INIT(.index)     Jindex( 6,24),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        }, 
     
     // jcmmnds
-    {   //24
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j06_jcmmnds__calibration,
-        EO_INIT(.index)     Jindex( 6,24),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
     {   //25
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j06_jcmmnds__setpoint,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j06_jcmmnds__calibration,
         EO_INIT(.index)     Jindex( 6,25),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    }, 
     {   //26
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j06_jcmmnds__stoptrajectory,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j06_jcmmnds__setpoint,
         EO_INIT(.index)     Jindex( 6,26),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },
+    },        
     {   //27
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j06_jcmmnds__controlmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j06_jcmmnds__stoptrajectory,
         EO_INIT(.index)     Jindex( 6,27),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },    
+    },
     {   //28
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j06_jcmmnds__holder01FFU02,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j06_jcmmnds__controlmode,
         EO_INIT(.index)     Jindex( 6,28),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    },    
     {   //29
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j06_jcmmnds__holder01FFU03,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j06_jcmmnds__holder01FFU02,
         EO_INIT(.index)     Jindex( 6,29),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },    
+    },        
+    {   //30
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j06_jcmmnds__holder01FFU03,
+        EO_INIT(.index)     Jindex( 6,30),
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.dchildren) NULL
+    },
        
     // joint-j07
     // jconfig
@@ -1917,62 +1963,69 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
 
     // jinputs
     {   //21
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j07_jinputs__externallymeasuredtorque,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j07_jinputs,
         EO_INIT(.index)     Jindex( 7,21),
-        EO_INIT(.nchildren) 0,
+        EO_INIT(.nchildren) 3,
         EO_INIT(.dchildren) NULL
-    },  
-    {   //22
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j07_jinputs__holder02FFU01,
-        EO_INIT(.index)     Jindex( 7,22),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    },  
-    {   //23
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j07_jinputs__holder04FFU02,
-        EO_INIT(.index)     Jindex( 7,23),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
+    },        
 
+        // jinputs
+        {   //22
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j07_jinputs__externallymeasuredtorque,
+            EO_INIT(.index)     Jindex( 7,22),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //23
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j07_jinputs__holder02FFU01,
+            EO_INIT(.index)     Jindex( 7,23),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //24
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j07_jinputs__holder04FFU02,
+            EO_INIT(.index)     Jindex( 7,24),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        }, 
     
     // jcmmnds
-    {   //24
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j07_jcmmnds__calibration,
-        EO_INIT(.index)     Jindex( 7,24),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
     {   //25
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j07_jcmmnds__setpoint,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j07_jcmmnds__calibration,
         EO_INIT(.index)     Jindex( 7,25),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    }, 
     {   //26
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j07_jcmmnds__stoptrajectory,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j07_jcmmnds__setpoint,
         EO_INIT(.index)     Jindex( 7,26),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },
+    },        
     {   //27
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j07_jcmmnds__controlmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j07_jcmmnds__stoptrajectory,
         EO_INIT(.index)     Jindex( 7,27),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },    
+    },
     {   //28
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j07_jcmmnds__holder01FFU02,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j07_jcmmnds__controlmode,
         EO_INIT(.index)     Jindex( 7,28),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    },    
     {   //29
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j07_jcmmnds__holder01FFU03,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j07_jcmmnds__holder01FFU02,
         EO_INIT(.index)     Jindex( 7,29),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },    
+    },        
+    {   //30
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j07_jcmmnds__holder01FFU03,
+        EO_INIT(.index)     Jindex( 7,30),
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.dchildren) NULL
+    },
     
 
     // joint-j08
@@ -2108,62 +2161,69 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
 
     // jinputs
     {   //21
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j08_jinputs__externallymeasuredtorque,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j08_jinputs,
         EO_INIT(.index)     Jindex( 8,21),
-        EO_INIT(.nchildren) 0,
+        EO_INIT(.nchildren) 3,
         EO_INIT(.dchildren) NULL
-    },  
-    {   //22
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j08_jinputs__holder02FFU01,
-        EO_INIT(.index)     Jindex( 8,22),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    },  
-    {   //23
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j08_jinputs__holder04FFU02,
-        EO_INIT(.index)     Jindex( 8,23),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
+    },        
 
+        // jinputs
+        {   //22
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j08_jinputs__externallymeasuredtorque,
+            EO_INIT(.index)     Jindex( 8,22),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //23
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j08_jinputs__holder02FFU01,
+            EO_INIT(.index)     Jindex( 8,23),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //24
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j08_jinputs__holder04FFU02,
+            EO_INIT(.index)     Jindex( 8,24),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        }, 
     
     // jcmmnds
-    {   //24
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j08_jcmmnds__calibration,
-        EO_INIT(.index)     Jindex( 8,24),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
     {   //25
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j08_jcmmnds__setpoint,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j08_jcmmnds__calibration,
         EO_INIT(.index)     Jindex( 8,25),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    }, 
     {   //26
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j08_jcmmnds__stoptrajectory,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j08_jcmmnds__setpoint,
         EO_INIT(.index)     Jindex( 8,26),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },
+    },        
     {   //27
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j08_jcmmnds__controlmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j08_jcmmnds__stoptrajectory,
         EO_INIT(.index)     Jindex( 8,27),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },    
+    },
     {   //28
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j08_jcmmnds__holder01FFU02,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j08_jcmmnds__controlmode,
         EO_INIT(.index)     Jindex( 8,28),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    },    
     {   //29
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j08_jcmmnds__holder01FFU03,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j08_jcmmnds__holder01FFU02,
         EO_INIT(.index)     Jindex( 8,29),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },    
+    },        
+    {   //30
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j08_jcmmnds__holder01FFU03,
+        EO_INIT(.index)     Jindex( 8,30),
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.dchildren) NULL
+    },
 
 
     // joint-j09
@@ -2299,62 +2359,69 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
 
     // jinputs
     {   //21
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j09_jinputs__externallymeasuredtorque,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j09_jinputs,
         EO_INIT(.index)     Jindex( 9,21),
-        EO_INIT(.nchildren) 0,
+        EO_INIT(.nchildren) 3,
         EO_INIT(.dchildren) NULL
-    },  
-    {   //22
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j09_jinputs__holder02FFU01,
-        EO_INIT(.index)     Jindex( 9,22),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    },  
-    {   //23
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j09_jinputs__holder04FFU02,
-        EO_INIT(.index)     Jindex( 9,23),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
+    },        
 
+        // jinputs
+        {   //22
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j09_jinputs__externallymeasuredtorque,
+            EO_INIT(.index)     Jindex( 9,22),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //23
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j09_jinputs__holder02FFU01,
+            EO_INIT(.index)     Jindex( 9,23),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //24
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j09_jinputs__holder04FFU02,
+            EO_INIT(.index)     Jindex( 9,24),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        }, 
     
     // jcmmnds
-    {   //24
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j09_jcmmnds__calibration,
-        EO_INIT(.index)     Jindex( 9,24),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
     {   //25
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j09_jcmmnds__setpoint,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j09_jcmmnds__calibration,
         EO_INIT(.index)     Jindex( 9,25),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    }, 
     {   //26
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j09_jcmmnds__stoptrajectory,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j09_jcmmnds__setpoint,
         EO_INIT(.index)     Jindex( 9,26),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },
+    },        
     {   //27
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j09_jcmmnds__controlmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j09_jcmmnds__stoptrajectory,
         EO_INIT(.index)     Jindex( 9,27),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },    
+    },
     {   //28
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j09_jcmmnds__holder01FFU02,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j09_jcmmnds__controlmode,
         EO_INIT(.index)     Jindex( 9,28),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    },    
     {   //29
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j09_jcmmnds__holder01FFU03,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j09_jcmmnds__holder01FFU02,
         EO_INIT(.index)     Jindex( 9,29),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },    
+    },        
+    {   //30
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j09_jcmmnds__holder01FFU03,
+        EO_INIT(.index)     Jindex( 9,30),
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.dchildren) NULL
+    },
        
     // joint-j10
     // jconfig
@@ -2489,62 +2556,69 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
 
     // jinputs
     {   //21
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j10_jinputs__externallymeasuredtorque,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j10_jinputs,
         EO_INIT(.index)     Jindex(10,21),
-        EO_INIT(.nchildren) 0,
+        EO_INIT(.nchildren) 3,
         EO_INIT(.dchildren) NULL
-    },  
-    {   //22
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j10_jinputs__holder02FFU01,
-        EO_INIT(.index)     Jindex(10,22),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    },  
-    {   //23
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j10_jinputs__holder04FFU02,
-        EO_INIT(.index)     Jindex(10,23),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
+    },        
 
+        // jinputs
+        {   //22
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j10_jinputs__externallymeasuredtorque,
+            EO_INIT(.index)     Jindex(10,22),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //23
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j10_jinputs__holder02FFU01,
+            EO_INIT(.index)     Jindex(10,23),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //24
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j10_jinputs__holder04FFU02,
+            EO_INIT(.index)     Jindex(10,24),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        }, 
     
     // jcmmnds
-    {   //24
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j10_jcmmnds__calibration,
-        EO_INIT(.index)     Jindex(10,24),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
     {   //25
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j10_jcmmnds__setpoint,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j10_jcmmnds__calibration,
         EO_INIT(.index)     Jindex(10,25),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    }, 
     {   //26
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j10_jcmmnds__stoptrajectory,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j10_jcmmnds__setpoint,
         EO_INIT(.index)     Jindex(10,26),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },
+    },        
     {   //27
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j10_jcmmnds__controlmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j10_jcmmnds__stoptrajectory,
         EO_INIT(.index)     Jindex(10,27),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },    
+    },
     {   //28
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j10_jcmmnds__holder01FFU02,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j10_jcmmnds__controlmode,
         EO_INIT(.index)     Jindex(10,28),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    },    
     {   //29
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j10_jcmmnds__holder01FFU03,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j10_jcmmnds__holder01FFU02,
         EO_INIT(.index)     Jindex(10,29),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },    
+    },        
+    {   //30
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j10_jcmmnds__holder01FFU03,
+        EO_INIT(.index)     Jindex(10,30),
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.dchildren) NULL
+    },
        
     
     // joint-j11
@@ -2680,62 +2754,70 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
 
     // jinputs
     {   //21
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j11_jinputs__externallymeasuredtorque,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j11_jinputs,
         EO_INIT(.index)     Jindex(11,21),
-        EO_INIT(.nchildren) 0,
+        EO_INIT(.nchildren) 3,
         EO_INIT(.dchildren) NULL
-    },  
-    {   //22
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j11_jinputs__holder02FFU01,
-        EO_INIT(.index)     Jindex(11,22),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    },  
-    {   //23
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j11_jinputs__holder04FFU02,
-        EO_INIT(.index)     Jindex(11,23),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
+    },        
 
+        // jinputs
+        {   //22
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j11_jinputs__externallymeasuredtorque,
+            EO_INIT(.index)     Jindex(11,22),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //23
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j11_jinputs__holder02FFU01,
+            EO_INIT(.index)     Jindex(11,23),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   //24
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j11_jinputs__holder04FFU02,
+            EO_INIT(.index)     Jindex(11,24),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        }, 
     
     // jcmmnds
-    {   //24
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j11_jcmmnds__calibration,
-        EO_INIT(.index)     Jindex(11,24),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }, 
     {   //25
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j11_jcmmnds__setpoint,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j11_jcmmnds__calibration,
         EO_INIT(.index)     Jindex(11,25),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    }, 
     {   //26
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j11_jcmmnds__stoptrajectory,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j11_jcmmnds__setpoint,
         EO_INIT(.index)     Jindex(11,26),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },
+    },        
     {   //27
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j11_jcmmnds__controlmode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j11_jcmmnds__stoptrajectory,
         EO_INIT(.index)     Jindex(11,27),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },    
+    },
     {   //28
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j11_jcmmnds__holder01FFU02,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j11_jcmmnds__controlmode,
         EO_INIT(.index)     Jindex(11,28),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },        
+    },    
     {   //29
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j11_jcmmnds__holder01FFU03,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j11_jcmmnds__holder01FFU02,
         EO_INIT(.index)     Jindex(11,29),
         EO_INIT(.nchildren) 0,
         EO_INIT(.dchildren) NULL
-    },           
+    },        
+    {   //30
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j11_jcmmnds__holder01FFU03,
+        EO_INIT(.index)     Jindex(11,30),
+        EO_INIT(.nchildren) 0,
+        EO_INIT(.dchildren) NULL
+    },
+          
       
 
       
@@ -3481,6 +3563,7 @@ extern uint16_t eo_cfg_nvsEP_mc_lowerarm_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder02FFU04(0),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus(0),                              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__basic(0),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__ofpid(0),                       EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__chamaleon04(0),
+		EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs(0),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__externallymeasuredtorque(0),    EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder02FFU01(0),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder04FFU02(0),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__calibration(0),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__setpoint(0),
@@ -3499,6 +3582,7 @@ extern uint16_t eo_cfg_nvsEP_mc_lowerarm_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder02FFU04(1),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus(1),                              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__basic(1),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__ofpid(1),                       EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__chamaleon04(1),
+		EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs(1),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__externallymeasuredtorque(1),    EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder02FFU01(1),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder04FFU02(1),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__calibration(1),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__setpoint(1),
@@ -3517,6 +3601,7 @@ extern uint16_t eo_cfg_nvsEP_mc_lowerarm_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder02FFU04(2),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus(2),                              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__basic(2),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__ofpid(2),                       EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__chamaleon04(2),
+		EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs(2),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__externallymeasuredtorque(2),    EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder02FFU01(2),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder04FFU02(2),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__calibration(2),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__setpoint(2),
@@ -3535,6 +3620,7 @@ extern uint16_t eo_cfg_nvsEP_mc_lowerarm_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder02FFU04(3),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus(3),                              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__basic(3),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__ofpid(3),                       EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__chamaleon04(3),
+		EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs(3),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__externallymeasuredtorque(3),    EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder02FFU01(3),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder04FFU02(3),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__calibration(3),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__setpoint(3),
@@ -3553,6 +3639,7 @@ extern uint16_t eo_cfg_nvsEP_mc_lowerarm_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder02FFU04(4),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus(4),                              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__basic(4),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__ofpid(4),                       EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__chamaleon04(4),
+		EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs(4),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__externallymeasuredtorque(4),    EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder02FFU01(4),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder04FFU02(4),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__calibration(4),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__setpoint(4),
@@ -3571,6 +3658,7 @@ extern uint16_t eo_cfg_nvsEP_mc_lowerarm_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder02FFU04(5),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus(5),                              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__basic(5),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__ofpid(5),                       EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__chamaleon04(5),
+		EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs(5),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__externallymeasuredtorque(5),    EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder02FFU01(5),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder04FFU02(5),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__calibration(5),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__setpoint(5),
@@ -3589,6 +3677,7 @@ extern uint16_t eo_cfg_nvsEP_mc_lowerarm_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder02FFU04(6),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus(6),                              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__basic(6),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__ofpid(6),                       EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__chamaleon04(6),
+		EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs(6),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__externallymeasuredtorque(6),    EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder02FFU01(6),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder04FFU02(6),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__calibration(6),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__setpoint(6),
@@ -3607,6 +3696,7 @@ extern uint16_t eo_cfg_nvsEP_mc_lowerarm_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder02FFU04(7),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus(7),                              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__basic(7),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__ofpid(7),                       EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__chamaleon04(7),
+		EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs(7),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__externallymeasuredtorque(7),    EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder02FFU01(7),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder04FFU02(7),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__calibration(7),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__setpoint(7),
@@ -3625,6 +3715,7 @@ extern uint16_t eo_cfg_nvsEP_mc_lowerarm_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder02FFU04(8),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus(8),                              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__basic(8),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__ofpid(8),                       EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__chamaleon04(8),
+		EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs(8),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__externallymeasuredtorque(8),    EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder02FFU01(8),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder04FFU02(8),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__calibration(8),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__setpoint(8),
@@ -3643,6 +3734,7 @@ extern uint16_t eo_cfg_nvsEP_mc_lowerarm_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder02FFU04(9),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus(9),                              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__basic(9),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__ofpid(9),                       EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__chamaleon04(9),
+		EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs(9),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__externallymeasuredtorque(9),    EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder02FFU01(9),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder04FFU02(9),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__calibration(9),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__setpoint(9),
@@ -3661,6 +3753,7 @@ extern uint16_t eo_cfg_nvsEP_mc_lowerarm_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder02FFU04(10),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus(10),                              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__basic(10),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__ofpid(10),                       EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__chamaleon04(10),
+		EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs(10),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__externallymeasuredtorque(10),    EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder02FFU01(10),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder04FFU02(10),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__calibration(10),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__setpoint(10),
@@ -3679,6 +3772,7 @@ extern uint16_t eo_cfg_nvsEP_mc_lowerarm_hashfunction_id2index(uint16_t id)
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jconfig__holder02FFU04(11),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus(11),                              EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__basic(11),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__ofpid(11),                       EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jstatus__chamaleon04(11),
+		EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs(11),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__externallymeasuredtorque(11),    EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder02FFU01(11),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jinputs__holder04FFU02(11),
         EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__calibration(11),                 EOK_cfg_nvsEP_mc_any_con_bodypart_NVID_jxx_jcmmnds__setpoint(11),
