@@ -117,19 +117,20 @@ typedef enum
     jointNVindex_jstatus__ofpid                             = 19,
     jointNVindex_jstatus__chamaleon04                       = 20,
     
-    jointNVindex_jinputs__externallymeasuredtorque          = 21,    
-    jointNVindex_jinputs__holder02FFU01                     = 22,
-    jointNVindex_jinputs__holder04FFU02                     = 23,
+    jointNVindex_jinputs                                    = 21,
+    jointNVindex_jinputs__externallymeasuredtorque          = 22,    
+    jointNVindex_jinputs__holder02FFU01                     = 23,
+    jointNVindex_jinputs__holder04FFU02                     = 24,
     
-    jointNVindex_jcmmnds__calibration                       = 24,
-    jointNVindex_jcmmnds__setpoint                          = 25,
-    jointNVindex_jcmmnds__stoptrajectory                    = 26,
-    jointNVindex_jcmmnds__controlmode                       = 27,
-    jointNVindex_jcmmnds__holder01FFU02                     = 28,
-    jointNVindex_jcmmnds__holder01FFU03                     = 29,
+    jointNVindex_jcmmnds__calibration                       = 25,
+    jointNVindex_jcmmnds__setpoint                          = 26,
+    jointNVindex_jcmmnds__stoptrajectory                    = 27,
+    jointNVindex_jcmmnds__controlmode                       = 28,
+    jointNVindex_jcmmnds__holder01FFU02                     = 29,
+    jointNVindex_jcmmnds__holder01FFU03                     = 30,
 } eOcfg_nvsEP_mc_jointNVindex_t;
 
-enum { jointNVindex_TOTALnumber = 30};
+enum { jointNVindex_TOTALnumber = 31};
 
 
 

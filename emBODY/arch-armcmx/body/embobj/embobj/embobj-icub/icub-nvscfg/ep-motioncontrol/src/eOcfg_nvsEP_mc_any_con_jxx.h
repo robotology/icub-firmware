@@ -77,20 +77,21 @@
 #define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jstatus__ofpid                                (19)
 #define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jstatus__chamaleon04                          (20)
 
-#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jinputs__externallymeasuredtorque             (21)
-#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jinputs__holder02FFU01                        (22)
-#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jinputs__holder04FFU02                        (23)
+#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jinputs                                       (21)
+#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jinputs__externallymeasuredtorque             (22)
+#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jinputs__holder02FFU01                        (23)
+#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jinputs__holder04FFU02                        (24)
 
-#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__calibration                          (24)
-#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__setpoint                             (25)
-#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__stoptrajectory                       (26)
-#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__controlmode                          (27)
-#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__holder01FFU02                        (28)
-#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__holder01FFU03                        (29)
+#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__calibration                          (25)
+#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__setpoint                             (26)
+#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__stoptrajectory                       (27)
+#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__controlmode                          (28)
+#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__holder01FFU02                        (29)
+#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__holder01FFU03                        (30)
 
 // -- the total number of network variables inside a joint
 
-#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber                                   (30)
+#define EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_TOTALnumber                                   (31)
 
 
 
@@ -122,6 +123,7 @@
 #define EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jstatus__ofpid                                EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd)
 #define EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jstatus__chamaleon04                          EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_u32)
 
+#define EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jinputs                                       EO_nv_FUNTYP(eo_nv_FUN_out, eo_nv_TYP_pkd)
 #define EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jinputs__externallymeasuredtorque             EO_nv_FUNTYP(eo_nv_FUN_out, eo_nv_TYP_u16)
 #define EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jinputs__holder02FFU01                        EO_nv_FUNTYP(eo_nv_FUN_out, eo_nv_TYP_u16)                       
 #define EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jinputs__holder04FFU02                        EO_nv_FUNTYP(eo_nv_FUN_out, eo_nv_TYP_u32)

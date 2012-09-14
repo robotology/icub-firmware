@@ -102,6 +102,7 @@ EO_VERIFYproposition(xxx, jointNVindex_jstatus__basic                       == E
 EO_VERIFYproposition(xxx, jointNVindex_jstatus__ofpid                       == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jstatus__ofpid);
 EO_VERIFYproposition(xxx, jointNVindex_jstatus__chamaleon04                 == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jstatus__chamaleon04);
 
+EO_VERIFYproposition(xxx, jointNVindex_jinputs                              == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jinputs);
 EO_VERIFYproposition(xxx, jointNVindex_jinputs__externallymeasuredtorque    == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jinputs__externallymeasuredtorque);
 EO_VERIFYproposition(xxx, jointNVindex_jinputs__holder02FFU01               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jinputs__holder02FFU01);
 EO_VERIFYproposition(xxx, jointNVindex_jinputs__holder04FFU02               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jinputs__holder04FFU02);
@@ -453,6 +454,17 @@ __weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jstatus__chamaleon04(eOcfg_nvsEP
 }
 #endif
 
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_INIT_Jxx_jinputs)
+__weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jinputs(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
 #if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_INIT_Jxx_jinputs__externallymeasuredtorque)
 __weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jinputs__externallymeasuredtorque(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
 {
@@ -785,6 +797,18 @@ __weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jstatus__chamaleon04(eOcfg_nvsEP
     ep = ep;
 }
 #endif
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs)
+__weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs__externallymeasuredtorque)
 __weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs__externallymeasuredtorque(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)

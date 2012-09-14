@@ -393,6 +393,19 @@ EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jstatus__chamaleon04)
 // guard on alignement of variables. if it doesnt compile then ... the compiler has surely inserted some holes
 //MACRO_VERIFYSIZEOF(JMACRO_JNUM, eOmc_joint_status_t, OFFSETafter_jstatus-OFFSETafter_jconfig__filler04-JMACRO_JOFF);
 
+#define OFFSETof_jinputs                                        (OFFSETafter_jstatus)
+#define CAPACITY_jinputs                                        sizeof(eOmc_joint_inputs_t)
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jinputs) =
+{   
+    EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jinputs, JMACRO_JNUM),
+    EO_INIT(.capacity)  CAPACITY_jinputs,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.jinputs,
+    EO_INIT(.offset)    OFFSETof_jinputs,
+    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jinputs),
+    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jinputs)
+};
+#define OFFSETafter_jinputs                                     (OFFSETof_jinputs+CAPACITY_jinputs)
+
 
 #define OFFSETof_jinputs__externallymeasuredtorque                  (OFFSETafter_jstatus)
 #define CAPACITY_jinputs__externallymeasuredtorque              sizeof(eOmeas_torque_t)
@@ -435,7 +448,7 @@ EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jinputs__holder04FFU0
 };
 #define OFFSETafter_jinputs__holder04FFU02           (OFFSETof_jinputs__holder04FFU02+CAPACITY_jinputs__holder04FFU02)
 
-#define OFFSETafter_jinputs                          OFFSETafter_jinputs__holder04FFU02
+//#define OFFSETafter_jinputs                          OFFSETafter_jinputs__holder04FFU02
 
 #define OFFSETof_jcmmnds__calibration                  (OFFSETafter_jinputs)
 #define CAPACITY_jcmmnds__calibration                   (sizeof(eOmc_calibrator_t))

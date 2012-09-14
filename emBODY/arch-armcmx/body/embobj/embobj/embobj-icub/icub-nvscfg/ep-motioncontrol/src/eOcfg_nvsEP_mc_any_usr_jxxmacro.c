@@ -428,6 +428,19 @@
 #include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
 
 
+#define NVMACRO_FUN_INIT    JXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    JXXMACRO_UPDT
+
+#define NVMACRO_PSTR        JXXMACRO_PART
+#define NVMACRO_BSTR        JXXMACRO_BOARD
+#define NVMACRO_NVSTR1      JXXMACRO_JSTR
+#define NVMACRO_NVNUM1      JXXMACRO_JNUM
+#define NVMACRO_NVSTR2      _jinputs
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_mc_any_usr_nvmacro.c"
 
 
 #define NVMACRO_FUN_INIT    JXXMACRO_INIT

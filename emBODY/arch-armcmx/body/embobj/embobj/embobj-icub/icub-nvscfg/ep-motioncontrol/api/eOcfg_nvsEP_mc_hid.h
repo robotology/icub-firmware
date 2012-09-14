@@ -109,6 +109,8 @@ extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jstatus__ofpid(eOcfg_nvsEP_mc_jointNumb
 
 extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jstatus__chamaleon04(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv);
 
+extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jinputs(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv);
+
 extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jinputs__externallymeasuredtorque(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv);
 
 extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jinputs__holder02FFU01(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv);
@@ -170,6 +172,8 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jstatus__basic(eOcfg_nvsEP_mc_jointNumb
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jstatus__ofpid(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jstatus__chamaleon04(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+
+extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs__externallymeasuredtorque(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
