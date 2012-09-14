@@ -233,7 +233,34 @@ EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__motionmonito
 #define OFFSETafter_jconfig__motionmonitormode          (OFFSETof_jconfig__motionmonitormode+CAPACITY_jconfig__motionmonitormode)
 
 
-#define OFFSETof_jconfig__des02FORjstatuschamaleon04            (OFFSETafter_jconfig__motionmonitormode)
+#define OFFSETof_jconfig__encoderconversionfactor            (OFFSETafter_jconfig__motionmonitormode)
+#define CAPACITY_jconfig__encoderconversionfactor            (sizeof(eOutil_emulfloat32_t))
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__encoderconversionfactor) =
+{   
+    EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jconfig__encoderconversionfactor, JMACRO_JNUM),    
+    EO_INIT(.capacity)  CAPACITY_jconfig__encoderconversionfactor,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.jconfig.encoderconversionfactor,
+    EO_INIT(.offset)    OFFSETof_jconfig__encoderconversionfactor,
+    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__encoderconversionfactor),
+    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__encoderconversionfactor)
+};
+#define OFFSETafter_jconfig__encoderconversionfactor          (OFFSETof_jconfig__encoderconversionfactor+CAPACITY_jconfig__encoderconversionfactor)
+
+#define OFFSETof_jconfig__encoderconversionoffset            (OFFSETafter_jconfig__encoderconversionfactor)
+#define CAPACITY_jconfig__encoderconversionoffset            (sizeof(eOutil_emulfloat32_t))
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__encoderconversionoffset) =
+{   
+    EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jconfig__encoderconversionoffset, JMACRO_JNUM),    
+    EO_INIT(.capacity)  CAPACITY_jconfig__encoderconversionoffset,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.jconfig.encoderconversionoffset,
+    EO_INIT(.offset)    OFFSETof_jconfig__encoderconversionoffset,
+    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__encoderconversionoffset),
+    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__encoderconversionoffset)
+};
+#define OFFSETafter_jconfig__encoderconversionoffset          (OFFSETof_jconfig__encoderconversionoffset+CAPACITY_jconfig__encoderconversionoffset)
+
+
+#define OFFSETof_jconfig__des02FORjstatuschamaleon04            (OFFSETafter_jconfig__encoderconversionoffset)
 #define CAPACITY_jconfig__des02FORjstatuschamaleon04            (2*sizeof(eOutil_chameleon_descr_t))
 EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__des02FORjstatuschamaleon04) =
 {   
@@ -303,7 +330,7 @@ EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__holder02FFU0
 
 //EO_VERIFYproposition(xxx, (OFFSETafter_jconfig__motionmonitormode-JMACRO_JOFF) == (16+16+16+12+4+4+2+1+1) );
 
-// guard on alignement of variables. if it doesnt compile then ... the compiler has surely inserted some holes
+// guard on alignement of variables. if it doesnt compile then ... there are holes
 MACRO_VERIFYSIZEOF(JMACRO_JNUM, eOmc_joint_config_t, OFFSETafter_jconfig__holder02FFU04-JMACRO_JOFF);
 
 

@@ -61,6 +61,8 @@ extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jconfig__maxpositionofjoint(u
 extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jconfig__velocitysetpointtimeout(uint16_t xx, const EOnv* nv);
 extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jconfig__holder01FFU00(uint16_t xx, const EOnv* nv);
 extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jconfig__motionmonitormode(uint16_t xx, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jconfig__encoderconversionfactor(uint16_t xx, const EOnv* nv);
+extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jconfig__encoderconversionoffset(uint16_t xx, const EOnv* nv);
 extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jconfig__des02FORjstatuschamaleon04(uint16_t xx, const EOnv* nv);
 extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jconfig__holder01FFU01(uint16_t xx, const EOnv* nv);
 extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jconfig__holder01FFU02(uint16_t xx, const EOnv* nv);
@@ -95,6 +97,8 @@ extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jconfig__maxpositionofjoint(u
 extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jconfig__velocitysetpointtimeout(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jconfig__holder01FFU00(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jconfig__motionmonitormode(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jconfig__encoderconversionfactor(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jconfig__encoderconversionoffset(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jconfig__des02FORjstatuschamaleon04(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jconfig__holder01FFU01(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jconfig__holder01FFU02(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);

@@ -187,7 +187,17 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_lowerleg_usr_array_of_EOnv_usr[] =
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerleg_j00_ebx_jconfig__motionmonitormode,
         EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
-    },    
+    },  
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerleg_j00_ebx_jconfig__encoderconversionfactor,
+        EONV_ONROPRECEPTION_IS_NULL                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerleg_j00_ebx_jconfig__encoderconversionoffset,
+        EONV_ONROPRECEPTION_IS_NULL                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },        
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerleg_j00_ebx_jconfig__des02FORjstatuschamaleon04,
         EONV_ONROPRECEPTION_IS_NULL                
@@ -328,7 +338,17 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_lowerleg_usr_array_of_EOnv_usr[] =
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerleg_j01_ebx_jconfig__motionmonitormode,
         EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
-    },    
+    }, 
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerleg_j01_ebx_jconfig__encoderconversionfactor,
+        EONV_ONROPRECEPTION_IS_NULL                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerleg_j01_ebx_jconfig__encoderconversionoffset,
+        EONV_ONROPRECEPTION_IS_NULL                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },      
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_lowerleg_j01_ebx_jconfig__des02FORjstatuschamaleon04,
         EONV_ONROPRECEPTION_IS_NULL                
@@ -683,6 +703,20 @@ __weak extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_INIT_Jxx_jconfig__motionmoni
     eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__motionmonitormode((eOcfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
+__weak extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_INIT_Jxx_jconfig__encoderconversionfactor(uint16_t xx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__encoderconversionfactor((eOcfg_nvsEP_mc_jointNumber_t)xx, nv);
+}
+
+__weak extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_INIT_Jxx_jconfig__encoderconversionoffset(uint16_t xx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__encoderconversionoffset((eOcfg_nvsEP_mc_jointNumber_t)xx, nv);
+}   
+
 __weak extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_INIT_Jxx_jconfig__des02FORjstatuschamaleon04(uint16_t xx, const EOnv* nv)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
@@ -892,6 +926,20 @@ __weak extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Jxx_jconfig__motionmoni
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
     eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__motionmonitormode((eOcfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
+}
+
+__weak extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Jxx_jconfig__encoderconversionfactor(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__encoderconversionfactor((eOcfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
+}
+
+__weak extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Jxx_jconfig__encoderconversionoffset(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__encoderconversionoffset((eOcfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_lowerleg_usr_hid_UPDT_Jxx_jconfig__des02FORjstatuschamaleon04(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)

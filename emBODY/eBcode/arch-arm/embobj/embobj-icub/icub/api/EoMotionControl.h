@@ -422,7 +422,7 @@ typedef uint16_t  eOmc_jointId_t;
 /** @typedef    typedef struct eOmc_joint_config_t
     @brief      eOmc_joint_config_t contains the values required to configure a joint
  **/
-typedef struct                  // size is: 16+16+16+12+4+4+2+1+1+2+1+1+2+2+0 = 80
+typedef struct                  // size is: 16+16+16+12+4+4+2+1+1+4+4+2+1+1+2+2+0 = 88
 {
     eOmc_PID_t                  pidposition;                /**< the pid for position control */
     eOmc_PID_t                  pidvelocity;                /**< the pid for velocity control */
@@ -433,12 +433,14 @@ typedef struct                  // size is: 16+16+16+12+4+4+2+1+1+2+1+1+2+2+0 = 
     eOmeas_time_t               velocitysetpointtimeout;    /**< max time between two setpoints in eomc_controlmode_velocity before going back to eomc_controlmode_position */
     eOenum08_t                  holder01FFU00;              /**< holder of a variable for future use */                              
     eOenum08_t                  motionmonitormode;          /**< use values from eOmc_motionmonitormode_t. it tells if and how to monitor the motion. the result is placed inside jstatus.jstatusbasic.motionmonitorstatus */
+    eOutil_emulfloat32_t        encoderconversionfactor;
+    eOutil_emulfloat32_t        encoderconversionoffset;
     eOutil_chameleon_descr_t    des02FORjstatuschamaleon04[2]; /**< accomodates up to 2 descriptors for a chameleon of 4 byte in the joint status. */
     uint8_t                     holder01FFU01;              /**< holder of a variable for future use */
     uint8_t                     holder01FFU02;              /**< holder of a variable for future use */
     uint16_t                    holder02FFU03;              /**< holder of a variable for future use */
     uint16_t                    holder02FFU04;              /**< holder of a variable for future use */
-} eOmc_joint_config_t;          EO_VERIFYsizeof(eOmc_joint_config_t, 80);
+} eOmc_joint_config_t;          EO_VERIFYsizeof(eOmc_joint_config_t, 88);
 
 
 
@@ -503,13 +505,13 @@ typedef struct                  // size is 16+12+1+1+1+1+0 = 32
 } eOmc_joint_commands_t;        EO_VERIFYsizeof(eOmc_joint_commands_t, 32);
 
 
-typedef struct                  // size is 80+32+8+32+0 = 152
+typedef struct                  // size is 88+32+8+32+0 = 160
 {
     eOmc_joint_config_t         jconfig;                    /**< the configuration of the joint */
     eOmc_joint_status_t         jstatus;                    /**< the status of the joint */
     eOmc_joint_inputs_t         jinputs;                    /**< it contains all the values that a host can send to a joint as inputs */
     eOmc_joint_commands_t       jcmmnds;                    /**< it contains all the commands that a host can send to a joint */
-} eOmc_joint_t;                 EO_VERIFYsizeof(eOmc_joint_t, 152);
+} eOmc_joint_t;                 EO_VERIFYsizeof(eOmc_joint_t, 160);
 
 
 
