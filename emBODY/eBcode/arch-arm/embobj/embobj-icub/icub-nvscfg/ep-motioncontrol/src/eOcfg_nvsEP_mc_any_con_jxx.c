@@ -104,6 +104,7 @@ const uint8_t eo_cfg_nvsEP_mc_any_con_jxx_funtyp[] =
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jstatus__ofpid,
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jstatus__chamaleon04,
     
+    EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jinputs,
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jinputs__externallymeasuredtorque,
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jinputs__holder02FFU01,
     EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jinputs__holder04FFU02,
