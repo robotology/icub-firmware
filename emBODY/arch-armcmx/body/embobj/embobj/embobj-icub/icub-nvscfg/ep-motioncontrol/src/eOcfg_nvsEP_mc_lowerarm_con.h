@@ -113,12 +113,12 @@ enum {varsMClowerarm_TOTALnumber = controllerNVindex_TOTALnumber + jointLowerArm
 /** @typedef    typedef struct eo_cfg_nvsEP_mc_lowerarm_t;
     @brief      contains all the variables in the lowerarm.
  **/
-typedef struct                  // 152*12+40*12+24 = 2304               
+typedef struct                  // 160*12+40*12+24 = 2424               
 {
     eOmc_joint_t                joints[jointLowerArm_TOTALnumber]; 
     eOmc_motor_t                motors[motorLowerArm_TOTALnumber];
     eOmc_controller_t           thecontroller;
-} eo_cfg_nvsEP_mc_lowerarm_t;   EO_VERIFYsizeof(eo_cfg_nvsEP_mc_lowerarm_t, 2328);
+} eo_cfg_nvsEP_mc_lowerarm_t;   EO_VERIFYsizeof(eo_cfg_nvsEP_mc_lowerarm_t, 2424);
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------

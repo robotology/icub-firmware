@@ -87,6 +87,10 @@ extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__holder01FFU00(eOcfg_nvsEP_mc_j
 
 extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__motionmonitormode(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv);
 
+extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__encoderconversionfactor(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv);
+
+extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__encoderconversionoffset(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv);
+
 extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__des02FORjstatuschamaleon04(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv);
 
 extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__holder01FFU01(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv);
@@ -144,6 +148,10 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__velocitysetpointtimeout(eOcfg_
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__holder01FFU00(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__motionmonitormode(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+
+extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__encoderconversionfactor(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
+
+extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__encoderconversionoffset(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__des02FORjstatuschamaleon04(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign);
 

@@ -331,6 +331,29 @@ __weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__motionmonitormode(eOcfg
 }
 #endif
 
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__encoderconversionfactor)
+__weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__encoderconversionfactor(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__encoderconversionoffset)
+__weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__encoderconversionoffset(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
+
 #if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__des02FORjstatuschamaleon04)
 __weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__des02FORjstatuschamaleon04(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
 {
@@ -633,6 +656,28 @@ __weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__holder01FFU00(eOcfg_nvs
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__motionmonitormode)
 __weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__motionmonitormode(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__encoderconversionfactor)
+__weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__encoderconversionfactor(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__encoderconversionoffset)
+__weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__encoderconversionoffset(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
