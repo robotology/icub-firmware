@@ -64,9 +64,11 @@
 #define sEETimeout              (s_stm32ee_generics.timeout)
 
 
-// -- others 
-#define sEE_DIRECTION_TX                 0
-#define sEE_DIRECTION_RX                 1  
+
+#define sEE_DIRECTION_TX 1
+#define sEE_DIRECTION_RX 0
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -75,6 +77,8 @@
 extern const stm32ee_cfg_t stm32_cfg_default = 
 { 
     .device             = stm32ee_device_st_m24lr64, 
+    .i2cspeed           = 400000,
+    .usedmatransfer     = 0,
     .functioni2cinit    = NULL, 
     .parameteri2cinit   = NULL, 
     .functioni2cdeinit  = NULL 
@@ -98,6 +102,14 @@ typedef struct
     volatile uint32_t       timeout;
 } stm32ee_generic_container_t;
 
+
+typedef struct
+{
+    uint32_t* data;
+    uint32_t* size;
+    uint32_t* dir;
+} stm32ee_dma_extracfg_t;
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -105,7 +117,7 @@ typedef struct
 static void s_stm32ee_i2c_gpio_init(void);
 static void s_stm32ee_dma_init(void);
 static void s_stm32ee_i2c_enable(void);
-
+static void s_stm32ee_dma_i2c_enable(void);
 
 static void s_stm32ee_i2c_disable(void);
 static void s_stm32ee_i2c_gpio_deinit(void);
@@ -121,6 +133,10 @@ static stm32ee_result_t s_stm32ee_writebuffer(uint8_t* pBuffer, uint16_t WriteAd
 static stm32ee_result_t s_stm32ee_timeoutexpired(void);
 static stm32ee_result_t s_stm32ee_waiteepromstandbystate(void);
 
+static void s_stm32ee_dma_config_tx(uint32_t pBuffer, uint32_t BufferSize);
+
+static void s_stm32ee_dma_config_rx(uint32_t pBuffer, uint32_t BufferSize);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -134,6 +150,8 @@ static stm32ee_generic_container_t s_stm32ee_generics =
     .cfg                        =
     {
         .device                     = stm32ee_device_none, 
+        .i2cspeed                   = 400000,
+        .usedmatransfer             = 0,
         .functioni2cinit            = NULL, 
         .parameteri2cinit           = NULL, 
         .functioni2cdeinit          = NULL,
@@ -142,11 +160,13 @@ static stm32ee_generic_container_t s_stm32ee_generics =
     .prt2bytes2read             = NULL,
     .prt2bytes2write            = NULL,
     .numberofbyte2writeinpage   = 0,
-    .timeout                    = sEE_LONG_TIMEOUT    
+    .timeout                    = 0    
 };
 
 
-DMA_InitTypeDef    sEEDMA_InitStructure;
+static DMA_InitTypeDef          sEEDMA_InitStructure;
+
+static stm32ee_dma_extracfg_t   s_stm32ee_dma_extracfg = {NULL, NULL, NULL};
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -176,8 +196,18 @@ extern stm32ee_result_t stm32ee_init(const stm32ee_cfg_t *cfg)
     
     // per ora uso le funzioni interne. poi penseremo a passarle dall'esterno (se e' il caso).
     s_stm32ee_i2c_gpio_init();
-    s_stm32ee_dma_init();
+    
+    if(1 == s_stm32ee_generics.cfg.usedmatransfer)
+    {
+        s_stm32ee_dma_init();
+    }
+    
     s_stm32ee_i2c_enable();
+    
+    if(1 == s_stm32ee_generics.cfg.usedmatransfer)
+    {
+        s_stm32ee_dma_i2c_enable();
+    }
     
     // init the generics according to the device
     
@@ -226,8 +256,11 @@ extern stm32ee_result_t stm32ee_init(const stm32ee_cfg_t *cfg)
         } break;
     }
     
+    // apply extra bits
+    s_stm32ee_generics.hwaddress |= stm32ee_hid_hwaddressbits1and2;
     
-
+    
+    
     return(stm32ee_res_OK);
 }
 
@@ -238,7 +271,10 @@ extern stm32ee_result_t stm32ee_deinit(void)
     
     s_stm32ee_i2c_disable();
     s_stm32ee_i2c_gpio_deinit();
-    s_stm32ee_dma_deinit();
+    if(1 == s_stm32ee_generics.cfg.usedmatransfer)
+    {
+        s_stm32ee_dma_deinit();
+    }
 
     return(stm32ee_res_OK);
 }
@@ -301,87 +337,90 @@ extern stm32ee_result_t stm32ee_write(uint32_t address, uint32_t size, uint8_t* 
 // ---- isr of the module: begin ----
 
 #if     defined(USE_STM32F4)
-void stm32ee_I2C_DMA_TX_IRQHandler(void)
+void stm32ee_hid_dma_I2C_DMA_TX_IRQHandler(void)
 {
     /* Check if the DMA transfer is complete */
-    if(DMA_GetFlagStatus(stm32ee_I2C_DMA_STREAMorCHANNEL_TX, sEE_TX_DMA_FLAG_TCIF) != RESET)
+    if(DMA_GetFlagStatus(stm32ee_hid_dma_stream_tx, stm32ee_hid_dma_flags_tx_completed) != RESET)
     {  
         /* Disable the DMA Tx Stream and Clear TC flag */  
-        DMA_Cmd(stm32ee_I2C_DMA_STREAMorCHANNEL_TX, DISABLE);
-        DMA_ClearFlag(stm32ee_I2C_DMA_STREAMorCHANNEL_TX, sEE_TX_DMA_FLAG_TCIF);
+        DMA_Cmd(stm32ee_hid_dma_stream_tx, DISABLE);
+        DMA_ClearFlag(stm32ee_hid_dma_stream_tx, stm32ee_hid_dma_flags_tx_completed);
 
         /*!< Wait till all data have been physically transferred on the bus */
-        sEETimeout = sEE_LONG_TIMEOUT;
-        while(!I2C_GetFlagStatus(sEE_I2C, I2C_FLAG_BTF))
+        sEETimeout = stm32ee_hid_timeout_long;
+        while(!I2C_GetFlagStatus(stm32ee_hid_i2c_port, I2C_FLAG_BTF))
         {
         if((sEETimeout--) == 0) s_stm32ee_timeoutexpired();
         }
     
         /*!< Send STOP condition */
-        I2C_GenerateSTOP(sEE_I2C, ENABLE);
+        I2C_GenerateSTOP(stm32ee_hid_i2c_port, ENABLE);
+        
+        /* Perform a read on SR1 and SR2 register to clear eventually pending flags */
+        (void)stm32ee_hid_i2c_port->SR1;
+        (void)stm32ee_hid_i2c_port->SR2;
     
         /* Reset the variable holding the number of data to be written */
         *sEEDataWritePointer = 0;  
     }
 }
 
-void stm32ee_I2C_DMA_RX_IRQHandler(void)
+void stm32ee_hid_dma_I2C_DMA_RX_IRQHandler(void)
 {
     /* Check if the DMA transfer is complete */
-    if(DMA_GetFlagStatus(stm32ee_I2C_DMA_STREAMorCHANNEL_RX, sEE_RX_DMA_FLAG_TCIF) != RESET)
+    if(DMA_GetFlagStatus(stm32ee_hid_dma_stream_rx, stm32ee_hid_dma_flags_rx_completed) != RESET)
     {      
         /*!< Send STOP Condition */
-        I2C_GenerateSTOP(sEE_I2C, ENABLE);    
+        I2C_GenerateSTOP(stm32ee_hid_i2c_port, ENABLE);    
     
         /* Disable the DMA Rx Stream and Clear TC Flag */  
-        DMA_Cmd(stm32ee_I2C_DMA_STREAMorCHANNEL_RX, DISABLE);
-        DMA_ClearFlag(stm32ee_I2C_DMA_STREAMorCHANNEL_RX, sEE_RX_DMA_FLAG_TCIF);
+        DMA_Cmd(stm32ee_hid_dma_stream_rx, DISABLE);
+        DMA_ClearFlag(stm32ee_hid_dma_stream_rx, stm32ee_hid_dma_flags_rx_completed);
     
         /* Reset the variable holding the number of data to be read */
         *sEEDataReadPointer = 0;
     }
 }
 #elif   defined(USE_STM32F1)
-
-void stm32ee_I2C_DMA_TX_IRQHandler(void)
+void stm32ee_hid_dma_I2C_DMA_TX_IRQHandler(void)
 {
   /* Check if the DMA transfer is complete */ 
-  if(DMA_GetFlagStatus(sEE_I2C_DMA_FLAG_TX_TC) != RESET)
+  if(DMA_GetFlagStatus(stm32ee_hid_dma_flags_tx_completed) != RESET)
   {  
     /* Disable the DMA Tx Channel and Clear all its Flags */  
-    DMA_Cmd(stm32ee_I2C_DMA_STREAMorCHANNEL_TX, DISABLE);
-    DMA_ClearFlag(sEE_I2C_DMA_FLAG_TX_GL);
+    DMA_Cmd(stm32ee_hid_dma_stream_tx, DISABLE);
+    DMA_ClearFlag(stm32ee_hid_dma_flags_tx_all);
 
     /*!< Wait till all data have been physically transferred on the bus */
-    sEETimeout = sEE_LONG_TIMEOUT;
-    while(!I2C_GetFlagStatus(sEE_I2C, I2C_FLAG_BTF))
+    sEETimeout = stm32ee_hid_timeout_long;
+    while(!I2C_GetFlagStatus(stm32ee_hid_i2c_port, I2C_FLAG_BTF))
     {
       if((sEETimeout--) == 0) s_stm32ee_timeoutexpired();
     }
     
     /*!< Send STOP condition */
-    I2C_GenerateSTOP(sEE_I2C, ENABLE);
+    I2C_GenerateSTOP(stm32ee_hid_i2c_port, ENABLE);
     
     /* Perform a read on SR1 and SR2 register to clear eventualaly pending flags */
-    (void)sEE_I2C->SR1;
-    (void)sEE_I2C->SR2;
+    (void)stm32ee_hid_i2c_port->SR1;
+    (void)stm32ee_hid_i2c_port->SR2;
     
     /* Reset the variable holding the number of data to be written */
     *sEEDataWritePointer = 0;  
   }
 }
 
-void stm32ee_I2C_DMA_RX_IRQHandler(void)
+void stm32ee_hid_dma_I2C_DMA_RX_IRQHandler(void)
 {
   /* Check if the DMA transfer is complete */
-  if(DMA_GetFlagStatus(sEE_I2C_DMA_FLAG_RX_TC) != RESET)
+  if(DMA_GetFlagStatus(stm32ee_hid_dma_flags_rx_completed) != RESET)
   {      
     /*!< Send STOP Condition */
-    I2C_GenerateSTOP(sEE_I2C, ENABLE);    
+    I2C_GenerateSTOP(stm32ee_hid_i2c_port, ENABLE);    
     
     /* Disable the DMA Rx Channel and Clear all its Flags */  
-    DMA_Cmd(stm32ee_I2C_DMA_STREAMorCHANNEL_RX, DISABLE);
-    DMA_ClearFlag(sEE_I2C_DMA_FLAG_RX_GL);
+    DMA_Cmd(stm32ee_hid_dma_stream_rx, DISABLE);
+    DMA_ClearFlag(stm32ee_hid_dma_flags_rx_all);
     
     /* Reset the variable holding the number of data to be read */
     *sEEDataReadPointer = 0;
@@ -433,6 +472,33 @@ static void s_stm32ee_i2c_software_reset(void)
 static void s_stm32ee_i2c_gpio_init(void)
 {   
 #if defined(USE_STM32F4)    
+#if 1
+   // i2c periph clock enable
+    RCC_APB1PeriphClockCmd(stm32ee_hid_i2c_clock, ENABLE);
+    
+    // sda and scl periph clock enable
+    RCC_AHB1PeriphClockCmd(stm32ee_hid_i2c_gpio_scl_clock | stm32ee_hid_i2c_gpio_sda_clock, ENABLE);
+
+    // afio periph clock enable
+    RCC_APB2PeriphClockCmd(stm32ee_hid_i2c_gpio_remap_clock, ENABLE);
+    
+    // reset i2c input
+    RCC_APB1PeriphResetCmd(stm32ee_hid_i2c_clock, ENABLE);
+  
+    // release reset signal for i2c input
+    RCC_APB1PeriphResetCmd(stm32ee_hid_i2c_clock, DISABLE);
+    
+    // i2c remapping     
+    GPIO_PinAFConfig(stm32ee_hid_i2c_gpio_scl_port, stm32ee_hid_i2c_gpio_scl_pinnum, stm32ee_hid_i2c_gpio_remap);
+    GPIO_PinAFConfig(stm32ee_hid_i2c_gpio_sda_port, stm32ee_hid_i2c_gpio_sda_pinnum, stm32ee_hid_i2c_gpio_remap); 
+        
+    // configure gpio for scl
+    GPIO_Init(stm32ee_hid_i2c_gpio_scl_port, (GPIO_InitTypeDef*)&stm32ee_hid_i2c_gpio_scl_pin);
+    
+    // configure gpio for sda
+    GPIO_Init(stm32ee_hid_i2c_gpio_sda_port, (GPIO_InitTypeDef*)&stm32ee_hid_i2c_gpio_sda_pin);    
+
+#else
     
     GPIO_InitTypeDef  GPIO_InitStructure; 
        
@@ -467,9 +533,36 @@ static void s_stm32ee_i2c_gpio_init(void)
     /*!< Configure sEE_I2C pins: SDA */
     GPIO_InitStructure.GPIO_Pin = sEE_I2C_SDA_PIN;
     GPIO_Init(sEE_I2C_SDA_GPIO_PORT, &GPIO_InitStructure);
+#endif
     
 #elif   defined(USE_STM32F1)
+#if 1
+    
+    // i2c periph clock enable
+    RCC_APB1PeriphClockCmd(stm32ee_hid_i2c_clock, ENABLE);
+    
+    // sda and scl periph clock enable
+    RCC_APB2PeriphClockCmd(stm32ee_hid_i2c_gpio_scl_clock | stm32ee_hid_i2c_gpio_sda_clock, ENABLE);
 
+    // afio periph clock enable
+    RCC_APB2PeriphClockCmd(stm32ee_hid_i2c_gpio_remap_clock, ENABLE);
+    
+    // reset i2c input
+    RCC_APB1PeriphResetCmd(stm32ee_hid_i2c_clock, ENABLE);
+  
+    // release reset signal for i2c input
+    RCC_APB1PeriphResetCmd(stm32ee_hid_i2c_clock, DISABLE);
+    
+    // i2c remapping   
+    GPIO_PinRemapConfig(stm32ee_hid_i2c_gpio_remap, ENABLE);    
+        
+    // configure gpio for scl
+    GPIO_Init(stm32ee_hid_i2c_gpio_scl_port, (GPIO_InitTypeDef*)&stm32ee_hid_i2c_gpio_scl_pin);
+    
+    // configure gpio for sda
+    GPIO_Init(stm32ee_hid_i2c_gpio_sda_port, (GPIO_InitTypeDef*)&stm32ee_hid_i2c_gpio_sda_pin);    
+    
+#else
     GPIO_InitTypeDef  GPIO_InitStructure;
     
     /*!< sEE_I2C Periph clock enable */
@@ -503,6 +596,7 @@ static void s_stm32ee_i2c_gpio_init(void)
     /*!< Configure sEE_I2C pins: SDA */
     GPIO_InitStructure.GPIO_Pin = sEE_I2C_SDA_PIN;
     GPIO_Init(sEE_I2C_SDA_GPIO_PORT, &GPIO_InitStructure); 
+#endif
 
 #endif
 //   GPIO_InitTypeDef  GPIO_InitStructure;
@@ -534,7 +628,44 @@ static void s_stm32ee_i2c_gpio_init(void)
 static void s_stm32ee_dma_init(void)
 {
 #if defined(USE_STM32F4)
+#if 1
+    // init nvic for dma tx and rx
+    NVIC_Init((NVIC_InitTypeDef*)&stm32ee_hid_dma_nvic_tx_enable);
+    NVIC_Init((NVIC_InitTypeDef*)&stm32ee_hid_dma_nvic_rx_enable);
     
+    // enable dma clock
+    RCC_AHB1PeriphClockCmd(stm32ee_hid_dma_clock, ENABLE);
+    
+    
+    // clear pending flags on tx
+    DMA_ClearFlag(stm32ee_hid_dma_stream_tx, stm32ee_hid_dma_flags_tx);
+    // Disable the EE I2C Tx DMA stream 
+    DMA_Cmd(stm32ee_hid_dma_stream_tx, DISABLE);
+    
+    // Configure the DMA stream for the EE I2C peripheral TX direction 
+    DMA_DeInit(stm32ee_hid_dma_stream_tx);
+    #warning --> thou shall remove memcpy
+    memcpy(&sEEDMA_InitStructure, &stm32ee_hid_dma_cfg_init, sizeof(DMA_InitTypeDef));
+    s_stm32ee_dma_extracfg.data         = &sEEDMA_InitStructure.DMA_Memory0BaseAddr;
+    s_stm32ee_dma_extracfg.size         = &sEEDMA_InitStructure.DMA_BufferSize;
+    s_stm32ee_dma_extracfg.dir          = &sEEDMA_InitStructure.DMA_DIR;
+    DMA_Init(stm32ee_hid_dma_stream_tx, (DMA_InitTypeDef*)&stm32ee_hid_dma_cfg_init);    
+
+    
+    // clear pending flags on rx
+    DMA_ClearFlag(stm32ee_hid_dma_stream_rx, stm32ee_hid_dma_flags_rx);
+    /* Disable the EE I2C DMA Rx stream */
+    DMA_Cmd(stm32ee_hid_dma_stream_rx, DISABLE);
+    
+    /* Configure the DMA stream for the EE I2C peripheral RX direction */
+    DMA_DeInit(stm32ee_hid_dma_stream_rx);
+    DMA_Init(stm32ee_hid_dma_stream_rx, (DMA_InitTypeDef*)&stm32ee_hid_dma_cfg_init);
+    
+    /* Enable the DMA Channels Interrupts */
+    DMA_ITConfig(stm32ee_hid_dma_stream_tx, DMA_IT_TC, ENABLE);
+    DMA_ITConfig(stm32ee_hid_dma_stream_rx, DMA_IT_TC, ENABLE);  
+    
+#else    
     NVIC_InitTypeDef   NVIC_InitStructure;
 
     /* Configure and enable I2C DMA TX Channel interrupt */
@@ -549,6 +680,7 @@ static void s_stm32ee_dma_init(void)
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = sEE_I2C_DMA_PREPRIO;
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = sEE_I2C_DMA_SUBPRIO;
     NVIC_Init(&NVIC_InitStructure);  
+
 
     /*!< I2C DMA TX and RX channels configuration */
     /* Enable the DMA clock */
@@ -586,14 +718,56 @@ static void s_stm32ee_dma_init(void)
     /* Configure the DMA stream for the EE I2C peripheral RX direction */
     DMA_DeInit(stm32ee_I2C_DMA_STREAMorCHANNEL_RX);
     DMA_Init(stm32ee_I2C_DMA_STREAMorCHANNEL_RX, &sEEDMA_InitStructure);
+    
+
 
     /* Enable the DMA Channels Interrupts */
     DMA_ITConfig(stm32ee_I2C_DMA_STREAMorCHANNEL_TX, DMA_IT_TC, ENABLE);
     DMA_ITConfig(stm32ee_I2C_DMA_STREAMorCHANNEL_RX, DMA_IT_TC, ENABLE);  
-
+    
+#endif
 #elif   defined(USE_STM32F1)
 
-    NVIC_InitTypeDef   NVIC_InitStructure;
+#if 1
+    // init nvic for dma tx and rx
+    NVIC_Init((NVIC_InitTypeDef*)&stm32ee_hid_dma_nvic_tx_enable);
+    NVIC_Init((NVIC_InitTypeDef*)&stm32ee_hid_dma_nvic_rx_enable);
+    
+    // enable dma clock
+    RCC_AHBPeriphClockCmd(stm32ee_hid_dma_clock, ENABLE);
+    
+
+//    // clear pending flags on tx
+//    DMA_ClearFlag(stm32ee_hid_dma_stream_tx, stm32ee_hid_dma_flags_tx);
+//    // Disable the EE I2C Tx DMA stream 
+//    DMA_Cmd(stm32ee_hid_dma_stream_tx, DISABLE);
+    
+    // Configure the DMA stream for the EE I2C peripheral TX direction 
+    DMA_DeInit(stm32ee_hid_dma_stream_tx);
+    #warning --> thou shall remove memcpy
+    memcpy(&sEEDMA_InitStructure, &stm32ee_hid_dma_cfg_init, sizeof(DMA_InitTypeDef));
+    s_stm32ee_dma_extracfg.data         = &sEEDMA_InitStructure.DMA_MemoryBaseAddr;
+    s_stm32ee_dma_extracfg.size         = &sEEDMA_InitStructure.DMA_BufferSize;
+    s_stm32ee_dma_extracfg.dir          = &sEEDMA_InitStructure.DMA_DIR;
+    DMA_Init(stm32ee_hid_dma_stream_tx, (DMA_InitTypeDef*)&stm32ee_hid_dma_cfg_init);    
+
+    
+//    // clear pending flags on rx
+//    DMA_ClearFlag(stm32ee_hid_dma_stream_rx, stm32ee_hid_dma_flags_rx);
+//    /* Disable the EE I2C DMA Rx stream */
+//    DMA_Cmd(stm32ee_hid_dma_stream_rx, DISABLE);
+    
+    /* Configure the DMA stream for the EE I2C peripheral RX direction */
+    DMA_DeInit(stm32ee_hid_dma_stream_rx);
+    DMA_Init(stm32ee_hid_dma_stream_rx, (DMA_InitTypeDef*)&stm32ee_hid_dma_cfg_init);
+    
+    /* Enable the DMA Channels Interrupts */
+    DMA_ITConfig(stm32ee_hid_dma_stream_tx, DMA_IT_TC, ENABLE);
+    DMA_ITConfig(stm32ee_hid_dma_stream_rx, DMA_IT_TC, ENABLE);  
+        
+
+#else
+   NVIC_InitTypeDef   NVIC_InitStructure;
 
   /* Configure and enable I2C DMA TX Channel interrupt */
   NVIC_InitStructure.NVIC_IRQChannel = sEE_I2C_DMA_TX_IRQn;
@@ -607,10 +781,12 @@ static void s_stm32ee_dma_init(void)
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = sEE_I2C_DMA_PREPRIO;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = sEE_I2C_DMA_SUBPRIO;
   NVIC_Init(&NVIC_InitStructure);  
+
   
   /*!< I2C DMA TX and RX channels configuration */
   /* Enable the DMA clock */
   RCC_AHBPeriphClockCmd(sEE_I2C_DMA_CLK, ENABLE);
+
 
   /* I2C TX DMA Channel configuration */
   DMA_DeInit(stm32ee_I2C_DMA_STREAMorCHANNEL_TX);
@@ -634,13 +810,25 @@ static void s_stm32ee_dma_init(void)
   /* Enable the DMA Channels Interrupts */
   DMA_ITConfig(stm32ee_I2C_DMA_STREAMorCHANNEL_TX, DMA_IT_TC, ENABLE);
   DMA_ITConfig(stm32ee_I2C_DMA_STREAMorCHANNEL_RX, DMA_IT_TC, ENABLE);   
+  
+#endif
 #endif
 }
 
 static void s_stm32ee_i2c_disable(void)
 {   
 #if     defined(USE_STM32F1) || defined(USE_STM32F4)    
-   
+#if 1
+    // i2c disable
+    I2C_Cmd(stm32ee_hid_i2c_port, DISABLE);
+ 
+    // i2c deinit
+    I2C_DeInit(stm32ee_hid_i2c_port);
+
+    // i2c clock disable
+    RCC_APB1PeriphClockCmd(stm32ee_hid_i2c_clock, DISABLE);
+
+#else   
     /* sEE_I2C Peripheral Disable */
     I2C_Cmd(sEE_I2C, DISABLE);
  
@@ -649,6 +837,7 @@ static void s_stm32ee_i2c_disable(void)
 
     /*!< sEE_I2C Periph clock disable */
     RCC_APB1PeriphClockCmd(sEE_I2C_CLK, DISABLE);
+#endif
 
 #endif    
 }
@@ -656,6 +845,11 @@ static void s_stm32ee_i2c_disable(void)
 static void s_stm32ee_i2c_gpio_deinit(void)
 {   
 #if defined(USE_STM32F4)    
+#if 1
+    // configure scl and sda as floating pin
+    GPIO_Init(stm32ee_hid_i2c_gpio_scl_port, (GPIO_InitTypeDef*)&stm32ee_hid_i2c_gpio_scl_floatingpin);
+    GPIO_Init(stm32ee_hid_i2c_gpio_sda_port, (GPIO_InitTypeDef*)&stm32ee_hid_i2c_gpio_sda_floatingpin);
+#else
     // for stm32f4
     GPIO_InitTypeDef  GPIO_InitStructure; 
 
@@ -669,9 +863,16 @@ static void s_stm32ee_i2c_gpio_deinit(void)
     /*!< Configure sEE_I2C pins: SDA */
     GPIO_InitStructure.GPIO_Pin = sEE_I2C_SDA_PIN;
     GPIO_Init(sEE_I2C_SDA_GPIO_PORT, &GPIO_InitStructure);
+#endif
 
 #elif   defined(USE_STM32F1)
+#if 1
 
+    // configure scl and sda as floating pin
+    GPIO_Init(stm32ee_hid_i2c_gpio_scl_port, (GPIO_InitTypeDef*)&stm32ee_hid_i2c_gpio_scl_floatingpin);
+    GPIO_Init(stm32ee_hid_i2c_gpio_sda_port, (GPIO_InitTypeDef*)&stm32ee_hid_i2c_gpio_sda_floatingpin);
+
+#else
      GPIO_InitTypeDef  GPIO_InitStructure;
 
     /*!< GPIO configuration */  
@@ -684,13 +885,27 @@ static void s_stm32ee_i2c_gpio_deinit(void)
     /*!< Configure sEE_I2C pins: SDA */
     GPIO_InitStructure.GPIO_Pin = sEE_I2C_SDA_PIN;
     GPIO_Init(sEE_I2C_SDA_GPIO_PORT, &GPIO_InitStructure);
+#endif
     
 #endif
 }
 
 static void s_stm32ee_dma_deinit(void)
 {   
-#if defined(USE_STM32F4)    
+#if defined(USE_STM32F4)  
+#if 1
+
+    // disable tx and rx dma interrupts
+    NVIC_Init((NVIC_InitTypeDef*)&stm32ee_hid_dma_nvic_tx_disable);
+    NVIC_Init((NVIC_InitTypeDef*)&stm32ee_hid_dma_nvic_rx_disable);
+
+    // disable and deinitialise the dma streams
+    DMA_Cmd(stm32ee_hid_dma_stream_tx, DISABLE);
+    DMA_Cmd(stm32ee_hid_dma_stream_rx, DISABLE);
+    DMA_DeInit(stm32ee_hid_dma_stream_tx);
+    DMA_DeInit(stm32ee_hid_dma_stream_rx);
+ 
+#else  
     // for stm32f4
     NVIC_InitTypeDef   NVIC_InitStructure;
 
@@ -712,8 +927,21 @@ static void s_stm32ee_dma_deinit(void)
     DMA_Cmd(stm32ee_I2C_DMA_STREAMorCHANNEL_RX, DISABLE);
     DMA_DeInit(stm32ee_I2C_DMA_STREAMorCHANNEL_TX);
     DMA_DeInit(stm32ee_I2C_DMA_STREAMorCHANNEL_RX);
-
+#endif
 #elif   defined(USE_STM32F1)
+#if 1
+
+    // disable tx and rx dma interrupts
+    NVIC_Init((NVIC_InitTypeDef*)&stm32ee_hid_dma_nvic_tx_disable);
+    NVIC_Init((NVIC_InitTypeDef*)&stm32ee_hid_dma_nvic_rx_disable);
+
+    // disable and deinitialise the dma streams
+    DMA_Cmd(stm32ee_hid_dma_stream_tx, DISABLE);
+    DMA_Cmd(stm32ee_hid_dma_stream_rx, DISABLE);
+    DMA_DeInit(stm32ee_hid_dma_stream_tx);
+    DMA_DeInit(stm32ee_hid_dma_stream_rx);
+
+#else
 
     NVIC_InitTypeDef   NVIC_InitStructure;
     
@@ -735,6 +963,7 @@ static void s_stm32ee_dma_deinit(void)
   DMA_Cmd(stm32ee_I2C_DMA_STREAMorCHANNEL_RX, DISABLE);
   DMA_DeInit(stm32ee_I2C_DMA_STREAMorCHANNEL_TX);
   DMA_DeInit(stm32ee_I2C_DMA_STREAMorCHANNEL_RX);
+#endif
 
 #endif
 }
@@ -743,6 +972,17 @@ static void s_stm32ee_dma_deinit(void)
 static void s_stm32ee_i2c_enable(void)
 {
 #if defined(USE_STM32F1) || defined(USE_STM32F4)  
+#if 1
+    I2C_InitTypeDef i2c_cfg;
+    memcpy(&i2c_cfg, &stm32ee_hid_i2c_cfg, sizeof(I2C_InitTypeDef));
+    // apply the clockspeed 
+    i2c_cfg.I2C_ClockSpeed = s_stm32ee_generics.cfg.i2cspeed;
+    // i2c peripheral enable
+    I2C_Cmd(stm32ee_hid_i2c_port, ENABLE);
+    // apply configuration
+    I2C_Init(stm32ee_hid_i2c_port, &i2c_cfg);
+     
+#else
     
     I2C_InitTypeDef  I2C_InitStructure;
 
@@ -764,13 +1004,41 @@ static void s_stm32ee_i2c_enable(void)
     
     /* Enable the sEE_I2C peripheral DMA requests */
     I2C_DMACmd(sEE_I2C, ENABLE);  
-  
+
+#endif 
+ 
 #endif
 }
 
+static void s_stm32ee_dma_i2c_enable(void)
+{
+    I2C_DMACmd(stm32ee_hid_i2c_port, ENABLE);  
+}
 
+static void s_stm32ee_dma_config_tx(uint32_t pBuffer, uint32_t BufferSize)
+{ 
+    *s_stm32ee_dma_extracfg.data    = (uint32_t)pBuffer;
+    *s_stm32ee_dma_extracfg.size    = BufferSize;
+    *s_stm32ee_dma_extracfg.dir     = stm32ee_hid_dma_dir_MEMORY2PERIPHERAL;
+    
+    DMA_Init(stm32ee_hid_dma_stream_tx, &sEEDMA_InitStructure); 
+}
+
+static void s_stm32ee_dma_config_rx(uint32_t pBuffer, uint32_t BufferSize)
+{ 
+    *s_stm32ee_dma_extracfg.data    = (uint32_t)pBuffer;
+    *s_stm32ee_dma_extracfg.size    = BufferSize;
+    *s_stm32ee_dma_extracfg.dir     = stm32ee_hid_dma_dir_PERIPHERAL2MEMORY;
+    
+    DMA_Init(stm32ee_hid_dma_stream_rx, &sEEDMA_InitStructure); 
+}
+
+
+#if 0
 static void s_stm32ee_dma_config(uint32_t pBuffer, uint32_t BufferSize, uint32_t Direction)
 { 
+
+
 #if defined(USE_STM32F4)      
     
   /* Initialize the DMA with the new parameters */
@@ -814,7 +1082,7 @@ static void s_stm32ee_dma_config(uint32_t pBuffer, uint32_t BufferSize, uint32_t
 
 #endif  
 }
-
+#endif
 
 static stm32ee_result_t s_stm32_readbuffer(uint8_t* pBuffer, uint16_t ReadAddr, uint16_t* NumByteToRead)
 {  
@@ -825,28 +1093,28 @@ static stm32ee_result_t s_stm32_readbuffer(uint8_t* pBuffer, uint16_t ReadAddr, 
   sEEDataReadPointer = NumByteToRead;
   
   /*!< While the bus is busy */
-  sEETimeout = sEE_LONG_TIMEOUT;
-  while(I2C_GetFlagStatus(sEE_I2C, I2C_FLAG_BUSY))
+  sEETimeout = stm32ee_hid_timeout_long;
+  while(I2C_GetFlagStatus(stm32ee_hid_i2c_port, I2C_FLAG_BUSY))
   {
     if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
   }
   
   /*!< Send START condition */
-  I2C_GenerateSTART(sEE_I2C, ENABLE);
+  I2C_GenerateSTART(stm32ee_hid_i2c_port, ENABLE);
   
   /*!< Test on EV5 and clear it (cleared by reading SR1 then writing to DR) */
-  sEETimeout = sEE_FLAG_TIMEOUT;
-  while(!I2C_CheckEvent(sEE_I2C, I2C_EVENT_MASTER_MODE_SELECT))
+  sEETimeout = stm32ee_hid_timeout_flag;
+  while(!I2C_CheckEvent(stm32ee_hid_i2c_port, I2C_EVENT_MASTER_MODE_SELECT))
   {
     if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
   }
   
   /*!< Send EEPROM address for write */
-  I2C_Send7bitAddress(sEE_I2C, sEEAddress, I2C_Direction_Transmitter);
+  I2C_Send7bitAddress(stm32ee_hid_i2c_port, sEEAddress, I2C_Direction_Transmitter);
 
   /*!< Test on EV6 and clear it */
-  sEETimeout = sEE_FLAG_TIMEOUT;
-  while(!I2C_CheckEvent(sEE_I2C, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))
+  sEETimeout = stm32ee_hid_timeout_flag;
+  while(!I2C_CheckEvent(stm32ee_hid_i2c_port, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))
   {
     if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
   } 
@@ -855,115 +1123,171 @@ static stm32ee_result_t s_stm32_readbuffer(uint8_t* pBuffer, uint16_t ReadAddr, 
 //#elif defined (sEE_M24C64_32)
 
   /*!< Send the EEPROM's internal address to read from: MSB of the address first */
-  I2C_SendData(sEE_I2C, (uint8_t)((ReadAddr & 0xFF00) >> 8));    
+  I2C_SendData(stm32ee_hid_i2c_port, (uint8_t)((ReadAddr & 0xFF00) >> 8));    
 
   /*!< Test on EV8 and clear it */
-  sEETimeout = sEE_FLAG_TIMEOUT;
-  while(!I2C_CheckEvent(sEE_I2C, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
+  sEETimeout = stm32ee_hid_timeout_flag;
+  while(!I2C_CheckEvent(stm32ee_hid_i2c_port, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
   {
     if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
   }
 
   /*!< Send the EEPROM's internal address to read from: LSB of the address */
-  I2C_SendData(sEE_I2C, (uint8_t)(ReadAddr & 0x00FF));    
+  I2C_SendData(stm32ee_hid_i2c_port, (uint8_t)(ReadAddr & 0x00FF));    
   
 //#endif /*!< sEE_M24C08 */
 
   /*!< Test on EV8 and clear it */
-  sEETimeout = sEE_FLAG_TIMEOUT;
-  while(I2C_GetFlagStatus(sEE_I2C, I2C_FLAG_BTF) == RESET)
+  sEETimeout = stm32ee_hid_timeout_flag;
+  while(I2C_GetFlagStatus(stm32ee_hid_i2c_port, I2C_FLAG_BTF) == RESET)
   {
     if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
   }
   
   /*!< Send START condition a second time */  
-  I2C_GenerateSTART(sEE_I2C, ENABLE);
+  I2C_GenerateSTART(stm32ee_hid_i2c_port, ENABLE);
   
   /*!< Test on EV5 and clear it (cleared by reading SR1 then writing to DR) */
-  sEETimeout = sEE_FLAG_TIMEOUT;
-  while(!I2C_CheckEvent(sEE_I2C, I2C_EVENT_MASTER_MODE_SELECT))
+  sEETimeout = stm32ee_hid_timeout_flag;
+  while(!I2C_CheckEvent(stm32ee_hid_i2c_port, I2C_EVENT_MASTER_MODE_SELECT))
   {
     if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
   } 
   
   /*!< Send EEPROM address for read */
-  I2C_Send7bitAddress(sEE_I2C, sEEAddress, I2C_Direction_Receiver);  
+  I2C_Send7bitAddress(stm32ee_hid_i2c_port, sEEAddress, I2C_Direction_Receiver);  
   
   /* If number of data to be read is 1, then DMA couldn't be used */
   /* One Byte Master Reception procedure (POLLING) ---------------------------*/
   if ((uint16_t)(*NumByteToRead) < 2)
   {
     /* Wait on ADDR flag to be set (ADDR is still not cleared at this level */
-    sEETimeout = sEE_FLAG_TIMEOUT;
-    while(I2C_GetFlagStatus(sEE_I2C, I2C_FLAG_ADDR) == RESET)
+    sEETimeout = stm32ee_hid_timeout_flag;
+    while(I2C_GetFlagStatus(stm32ee_hid_i2c_port, I2C_FLAG_ADDR) == RESET)
     {
       if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
     }     
     
     /*!< Disable Acknowledgement */
-    I2C_AcknowledgeConfig(sEE_I2C, DISABLE);   
+    I2C_AcknowledgeConfig(stm32ee_hid_i2c_port, DISABLE);   
     
     
     #warning --> in stm32f1 they use a sEE_EnterCriticalSection_UserCallback(); it generally disalbe interrupts
     
     /* Clear ADDR register by reading SR1 then SR2 register (SR1 has already been read) */
-    (void)sEE_I2C->SR2;
+    (void)stm32ee_hid_i2c_port->SR2;
     
     /*!< Send STOP Condition */
-    I2C_GenerateSTOP(sEE_I2C, ENABLE);
+    I2C_GenerateSTOP(stm32ee_hid_i2c_port, ENABLE);
         
     
         #warning --> in stm32f1 they use a sEE_ExitCriticalSection_UserCallback();
    
     /* Wait for the byte to be received */
-    sEETimeout = sEE_FLAG_TIMEOUT;
-    while(I2C_GetFlagStatus(sEE_I2C, I2C_FLAG_RXNE) == RESET)
+    sEETimeout = stm32ee_hid_timeout_flag;
+    while(I2C_GetFlagStatus(stm32ee_hid_i2c_port, I2C_FLAG_RXNE) == RESET)
     {
       if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
     }
     
     /*!< Read the byte received from the EEPROM */
-    *pBuffer = I2C_ReceiveData(sEE_I2C);
+    *pBuffer = I2C_ReceiveData(stm32ee_hid_i2c_port);
     
     /*!< Decrement the read bytes counter */
     (uint16_t)(*NumByteToRead)--;        
     
     /* Wait to make sure that STOP control bit has been cleared */
-    sEETimeout = sEE_FLAG_TIMEOUT;
-    while(sEE_I2C->CR1 & I2C_CR1_STOP)
+    sEETimeout = stm32ee_hid_timeout_flag;
+    while(stm32ee_hid_i2c_port->CR1 & I2C_CR1_STOP)
     {
       if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
     }  
     
     /*!< Re-Enable Acknowledgement to be ready for another reception */
-    I2C_AcknowledgeConfig(sEE_I2C, ENABLE);    
+    I2C_AcknowledgeConfig(stm32ee_hid_i2c_port, ENABLE);    
     
     return(stm32ee_res_OK);
   }
-  else/* More than one Byte Master Reception procedure (DMA) -----------------*/
+  else if(1 == s_stm32ee_generics.cfg.usedmatransfer) /* More than one Byte Master Reception procedure (DMA) -----------------*/
   {
     /*!< Test on EV6 and clear it */
-    sEETimeout = sEE_FLAG_TIMEOUT;
-    while(!I2C_CheckEvent(sEE_I2C, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED))
+    sEETimeout = stm32ee_hid_timeout_flag;
+    while(!I2C_CheckEvent(stm32ee_hid_i2c_port, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED))
     {
       if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
     }  
     
     /* Configure the DMA Rx Channel with the buffer address and the buffer size */
-    s_stm32ee_dma_config((uint32_t)pBuffer, (uint16_t)(*NumByteToRead), sEE_DIRECTION_RX);
+    //s_stm32ee_dma_config((uint32_t)pBuffer, (uint16_t)(*NumByteToRead), sEE_DIRECTION_RX);
+    s_stm32ee_dma_config_rx((uint32_t)pBuffer, (uint16_t)(*NumByteToRead));
     
     /* Inform the DMA that the next End Of Transfer Signal will be the last one */
-    I2C_DMALastTransferCmd(sEE_I2C, ENABLE); 
+    I2C_DMALastTransferCmd(stm32ee_hid_i2c_port, ENABLE); 
     
     /* Enable the DMA Rx Stream */
-    DMA_Cmd(stm32ee_I2C_DMA_STREAMorCHANNEL_RX, ENABLE);  
+    DMA_Cmd(stm32ee_hid_dma_stream_rx, ENABLE);  
 
         // and now ... waits for the dma reception
-        sEETimeout = sEE_LONG_TIMEOUT;
+        sEETimeout = stm32ee_hid_timeout_long;
         while ((*sEEDataReadPointer) > 0)
         {
             if((sEETimeout--) == 0) {return s_stm32ee_timeoutexpired();};
         }
+    
+  }
+    else
+    {   // must use transfer without dma
+        #warning --> to be done....................
+        
+
+        /*!< Test on EV6 and clear it */
+        sEETimeout = stm32ee_hid_timeout_flag;
+        while(!I2C_CheckEvent(stm32ee_hid_i2c_port, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED))
+        {
+            if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
+        }  
+
+        while(*NumByteToRead)
+        {
+        
+            if(1 == (*NumByteToRead))
+            {
+                /*!< Disable Acknowledgement */
+                I2C_AcknowledgeConfig(stm32ee_hid_i2c_port, DISABLE);          
+                /* Clear ADDR register by reading SR1 then SR2 register (SR1 has already been read) */
+                (void)stm32ee_hid_i2c_port->SR2;
+                /*!< Send STOP Condition */
+                I2C_GenerateSTOP(stm32ee_hid_i2c_port, ENABLE);            
+            }
+        
+            /* Wait for the byte to be received */
+            sEETimeout = stm32ee_hid_timeout_flag;
+            while(I2C_GetFlagStatus(stm32ee_hid_i2c_port, I2C_FLAG_RXNE) == RESET)
+            {
+              if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
+            }
+            
+            /*!< Read the byte received from the EEPROM */
+            *pBuffer = I2C_ReceiveData(stm32ee_hid_i2c_port);
+            
+            pBuffer++;
+            
+            /*!< Decrement the read bytes counter */
+            (uint16_t)(*NumByteToRead)--;              
+        
+        }
+    
+    
+        /* Wait to make sure that STOP control bit has been cleared */
+        sEETimeout = stm32ee_hid_timeout_flag;
+        while(stm32ee_hid_i2c_port->CR1 & I2C_CR1_STOP)
+        {
+          if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
+        }  
+        
+        /*!< Re-Enable Acknowledgement to be ready for another reception */
+        I2C_AcknowledgeConfig(stm32ee_hid_i2c_port, ENABLE);    
+   
     
   }
   
@@ -1026,7 +1350,7 @@ static stm32ee_result_t s_stm32ee_writebuffer(uint8_t* pBuffer, uint16_t WriteAd
       /* Start writing data */
       s_stm32ee_writepage(pBuffer, WriteAddr, (uint16_t*)(&sEEDataNum));
       /* Wait transfer through DMA to be complete */
-      sEETimeout = sEE_LONG_TIMEOUT;
+      sEETimeout = stm32ee_hid_timeout_long;
       while (sEEDataNum > 0)
       {
         if((sEETimeout--) == 0) {return s_stm32ee_timeoutexpired();};
@@ -1041,8 +1365,8 @@ static stm32ee_result_t s_stm32ee_writebuffer(uint8_t* pBuffer, uint16_t WriteAd
         /* Store the number of data to be written */
         sEEDataNum = sEE_PAGESIZE;        
         s_stm32ee_writepage(pBuffer, WriteAddr, (uint16_t*)(&sEEDataNum)); 
-        /* Wait transfer through DMA to be complete */
-        sEETimeout = sEE_LONG_TIMEOUT;
+        /* Wait transfer to be complete */
+        sEETimeout = stm32ee_hid_timeout_long;
         while (sEEDataNum > 0)
         {
           if((sEETimeout--) == 0) {return s_stm32ee_timeoutexpired();};
@@ -1057,8 +1381,8 @@ static stm32ee_result_t s_stm32ee_writebuffer(uint8_t* pBuffer, uint16_t WriteAd
         /* Store the number of data to be written */
         sEEDataNum = NumOfSingle;          
         s_stm32ee_writepage(pBuffer, WriteAddr, (uint16_t*)(&sEEDataNum));
-        /* Wait transfer through DMA to be complete */
-        sEETimeout = sEE_LONG_TIMEOUT;
+        /* Wait transfer to be complete */
+        sEETimeout = stm32ee_hid_timeout_long;
         while (sEEDataNum > 0)
         {
           if((sEETimeout--) == 0) {return s_stm32ee_timeoutexpired();};
@@ -1081,8 +1405,8 @@ static stm32ee_result_t s_stm32ee_writebuffer(uint8_t* pBuffer, uint16_t WriteAd
         sEEDataNum = count;        
         /*!< Write the data contained in same page */
         s_stm32ee_writepage(pBuffer, WriteAddr, (uint16_t*)(&sEEDataNum));
-        /* Wait transfer through DMA to be complete */
-        sEETimeout = sEE_LONG_TIMEOUT;
+        /* Wait transfer to be complete */
+        sEETimeout = stm32ee_hid_timeout_long;
         while (sEEDataNum > 0)
         {
           if((sEETimeout--) == 0) {return s_stm32ee_timeoutexpired();};
@@ -1093,8 +1417,8 @@ static stm32ee_result_t s_stm32ee_writebuffer(uint8_t* pBuffer, uint16_t WriteAd
         sEEDataNum = (NumByteToWrite - count);          
         /*!< Write the remaining data in the following page */
         s_stm32ee_writepage((uint8_t*)(pBuffer + count), (WriteAddr + count), (uint16_t*)(&sEEDataNum));
-        /* Wait transfer through DMA to be complete */
-        sEETimeout = sEE_LONG_TIMEOUT;
+        /* Wait transfer to be complete */
+        sEETimeout = stm32ee_hid_timeout_long;
         while (sEEDataNum > 0)
         {
           if((sEETimeout--) == 0) {return s_stm32ee_timeoutexpired();};
@@ -1106,8 +1430,8 @@ static stm32ee_result_t s_stm32ee_writebuffer(uint8_t* pBuffer, uint16_t WriteAd
         /* Store the number of data to be written */
         sEEDataNum = NumOfSingle;         
         s_stm32ee_writepage(pBuffer, WriteAddr, (uint16_t*)(&sEEDataNum));
-        /* Wait transfer through DMA to be complete */
-        sEETimeout = sEE_LONG_TIMEOUT;
+        /* Wait transfer to be complete */
+        sEETimeout = stm32ee_hid_timeout_long;
         while (sEEDataNum > 0)
         {
           if((sEETimeout--) == 0) {return s_stm32ee_timeoutexpired();};
@@ -1127,8 +1451,8 @@ static stm32ee_result_t s_stm32ee_writebuffer(uint8_t* pBuffer, uint16_t WriteAd
         /* Store the number of data to be written */
         sEEDataNum = count;         
         s_stm32ee_writepage(pBuffer, WriteAddr, (uint16_t*)(&sEEDataNum));
-        /* Wait transfer through DMA to be complete */
-        sEETimeout = sEE_LONG_TIMEOUT;
+        /* Wait transfer to be complete */
+        sEETimeout = stm32ee_hid_timeout_long;
         while (sEEDataNum > 0)
         {
           if((sEETimeout--) == 0) {return s_stm32ee_timeoutexpired();};
@@ -1143,8 +1467,8 @@ static stm32ee_result_t s_stm32ee_writebuffer(uint8_t* pBuffer, uint16_t WriteAd
         /* Store the number of data to be written */
         sEEDataNum = sEE_PAGESIZE;          
         s_stm32ee_writepage(pBuffer, WriteAddr, (uint16_t*)(&sEEDataNum));
-        /* Wait transfer through DMA to be complete */
-        sEETimeout = sEE_LONG_TIMEOUT;
+        /* Wait transfer to be complete */
+        sEETimeout = stm32ee_hid_timeout_long;
         while (sEEDataNum > 0)
         {
           if((sEETimeout--) == 0) {return s_stm32ee_timeoutexpired();};
@@ -1158,8 +1482,8 @@ static stm32ee_result_t s_stm32ee_writebuffer(uint8_t* pBuffer, uint16_t WriteAd
         /* Store the number of data to be written */
         sEEDataNum = NumOfSingle;           
         s_stm32ee_writepage(pBuffer, WriteAddr, (uint16_t*)(&sEEDataNum)); 
-        /* Wait transfer through DMA to be complete */
-        sEETimeout = sEE_LONG_TIMEOUT;
+        /* Wait transfer to be complete */
+        sEETimeout = stm32ee_hid_timeout_long;
         while (sEEDataNum > 0)
         {
           if((sEETimeout--) == 0) {return s_stm32ee_timeoutexpired();};
@@ -1183,29 +1507,29 @@ static stm32ee_result_t s_stm32ee_writepage(uint8_t* pBuffer, uint16_t WriteAddr
   sEEDataWritePointer = NumByteToWrite;  
   
   /*!< While the bus is busy */
-  sEETimeout = sEE_LONG_TIMEOUT;
-  while(I2C_GetFlagStatus(sEE_I2C, I2C_FLAG_BUSY))
+  sEETimeout = stm32ee_hid_timeout_long;
+  while(I2C_GetFlagStatus(stm32ee_hid_i2c_port, I2C_FLAG_BUSY))
   {
     if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
   }
   
   /*!< Send START condition */
-  I2C_GenerateSTART(sEE_I2C, ENABLE);
+  I2C_GenerateSTART(stm32ee_hid_i2c_port, ENABLE);
   
   /*!< Test on EV5 and clear it */
-  sEETimeout = sEE_FLAG_TIMEOUT;
-  while(!I2C_CheckEvent(sEE_I2C, I2C_EVENT_MASTER_MODE_SELECT))
+  sEETimeout = stm32ee_hid_timeout_flag;
+  while(!I2C_CheckEvent(stm32ee_hid_i2c_port, I2C_EVENT_MASTER_MODE_SELECT))
   {
     if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
   }
   
   /*!< Send EEPROM address for write */
-  sEETimeout = sEE_FLAG_TIMEOUT;
-  I2C_Send7bitAddress(sEE_I2C, sEEAddress, I2C_Direction_Transmitter);
+  sEETimeout = stm32ee_hid_timeout_flag;
+  I2C_Send7bitAddress(stm32ee_hid_i2c_port, sEEAddress, I2C_Direction_Transmitter);
 
   /*!< Test on EV6 and clear it */
-  sEETimeout = sEE_FLAG_TIMEOUT;
-  while(!I2C_CheckEvent(sEE_I2C, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))
+  sEETimeout = stm32ee_hid_timeout_flag;
+  while(!I2C_CheckEvent(stm32ee_hid_i2c_port, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))
   {
     if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
   }
@@ -1213,37 +1537,70 @@ static stm32ee_result_t s_stm32ee_writepage(uint8_t* pBuffer, uint16_t WriteAddr
 //#ifdef sEE_M24C08
 //  
 //  /*!< Send the EEPROM's internal address to write to : only one byte Address */
-//  I2C_SendData(sEE_I2C, WriteAddr);
+//  I2C_SendData(stm32ee_hid_i2c_port, WriteAddr);
 //  
 //#elif defined(sEE_M24C64_32)
   
+  
   /*!< Send the EEPROM's internal address to write to : MSB of the address first */
-  I2C_SendData(sEE_I2C, (uint8_t)((WriteAddr & 0xFF00) >> 8));
+  I2C_SendData(stm32ee_hid_i2c_port, (uint8_t)((WriteAddr & 0xFF00) >> 8));
 
   /*!< Test on EV8 and clear it */
-  sEETimeout = sEE_FLAG_TIMEOUT;  
-  while(!I2C_CheckEvent(sEE_I2C, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
+  sEETimeout = stm32ee_hid_timeout_flag;  
+  while(!I2C_CheckEvent(stm32ee_hid_i2c_port, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
   {
     if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
   }  
   
   /*!< Send the EEPROM's internal address to write to : LSB of the address */
-  I2C_SendData(sEE_I2C, (uint8_t)(WriteAddr & 0x00FF));
+  I2C_SendData(stm32ee_hid_i2c_port, (uint8_t)(WriteAddr & 0x00FF));
   
 //#endif /*!< sEE_M24C08 */  
   
   /*!< Test on EV8 and clear it */
-  sEETimeout = sEE_FLAG_TIMEOUT; 
-  while(!I2C_CheckEvent(sEE_I2C, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
+  sEETimeout = stm32ee_hid_timeout_flag; 
+  while(!I2C_CheckEvent(stm32ee_hid_i2c_port, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
   {
     if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
-  }  
-  
-  /* Configure the DMA Tx Channel with the buffer address and the buffer size */
-  s_stm32ee_dma_config((uint32_t)pBuffer, (uint32_t)(*NumByteToWrite), sEE_DIRECTION_TX);
-  
-  /* Enable the DMA Tx Stream */
-  DMA_Cmd(stm32ee_I2C_DMA_STREAMorCHANNEL_TX, ENABLE);
+  } 
+
+    if(1 == s_stm32ee_generics.cfg.usedmatransfer)
+    { 
+        /* Configure the DMA Tx Channel with the buffer address and the buffer size */
+        //s_stm32ee_dma_config((uint32_t)pBuffer, (uint32_t)(*NumByteToWrite), sEE_DIRECTION_TX);
+        s_stm32ee_dma_config_tx((uint32_t)pBuffer, (uint32_t)(*NumByteToWrite));
+
+        /* Enable the DMA Tx Stream */
+        DMA_Cmd(stm32ee_hid_dma_stream_tx, ENABLE);
+    }
+    else
+    {
+        #warning --> the transfer w/out dma is to be done
+        
+        while(*NumByteToWrite)
+        {       
+            /*!< Send the byte to be written */
+            I2C_SendData(stm32ee_hid_i2c_port, *pBuffer); 
+            
+            pBuffer++;
+            (*NumByteToWrite)--;
+            
+            /*!< Test on EV8 and clear it */
+            sEETimeout = stm32ee_hid_timeout_flag; 
+            while(!I2C_CheckEvent(stm32ee_hid_i2c_port, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
+            {
+                if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
+            }  
+        }        
+ 
+        /*!< Send STOP condition */
+        I2C_GenerateSTOP(stm32ee_hid_i2c_port, ENABLE);
+        
+        /* Perform a read on SR1 and SR2 register to clear eventualaly pending flags */
+        (void)stm32ee_hid_i2c_port->SR1;
+        (void)stm32ee_hid_i2c_port->SR2;        
+        // end        
+    }
   
   /* If all operations OK, return OK (0) */
   return stm32ee_res_OK;
@@ -1256,36 +1613,36 @@ static stm32ee_result_t s_stm32ee_waiteepromstandbystate(void)
   volatile uint32_t sEETrials = 0;
 
   /*!< While the bus is busy */
-  sEETimeout = sEE_LONG_TIMEOUT;
-  while(I2C_GetFlagStatus(sEE_I2C, I2C_FLAG_BUSY))
+  sEETimeout = stm32ee_hid_timeout_long;
+  while(I2C_GetFlagStatus(stm32ee_hid_i2c_port, I2C_FLAG_BUSY))
   {
     if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
   }
 
   /* Keep looping till the slave acknowledge his address or maximum number 
-     of trials is reached (this number is defined by sEE_MAX_TRIALS_NUMBER define
+     of trials is reached (this number is defined by stm32ee_hid_ackaddress_maxtrials define
      in stm324xg_eval_i2c_ee.h file) */
   while (1)
   {
     /*!< Send START condition */
-    I2C_GenerateSTART(sEE_I2C, ENABLE);
+    I2C_GenerateSTART(stm32ee_hid_i2c_port, ENABLE);
 
     /*!< Test on EV5 and clear it */
-    sEETimeout = sEE_FLAG_TIMEOUT;
-    while(!I2C_CheckEvent(sEE_I2C, I2C_EVENT_MASTER_MODE_SELECT))
+    sEETimeout = stm32ee_hid_timeout_flag;
+    while(!I2C_CheckEvent(stm32ee_hid_i2c_port, I2C_EVENT_MASTER_MODE_SELECT))
     {
       if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
     }    
 
     /*!< Send EEPROM address for write */
-    I2C_Send7bitAddress(sEE_I2C, sEEAddress, I2C_Direction_Transmitter);
+    I2C_Send7bitAddress(stm32ee_hid_i2c_port, sEEAddress, I2C_Direction_Transmitter);
     
     /* Wait for ADDR flag to be set (Slave acknowledged his address) */
-    sEETimeout = sEE_LONG_TIMEOUT;
+    sEETimeout = stm32ee_hid_timeout_long;
     do
     {     
       /* Get the current value of the SR1 register */
-      tmpSR1 = sEE_I2C->SR1;
+      tmpSR1 = stm32ee_hid_i2c_port->SR1;
       
       /* Update the timeout value and exit if it reach 0 */
       if((sEETimeout--) == 0) return s_stm32ee_timeoutexpired();
@@ -1299,10 +1656,10 @@ static stm32ee_result_t s_stm32ee_waiteepromstandbystate(void)
     {
       /* Clear ADDR Flag by reading SR1 then SR2 registers (SR1 have already 
          been read) */
-      (void)sEE_I2C->SR2;
+      (void)stm32ee_hid_i2c_port->SR2;
       
       /*!< STOP condition */    
-      I2C_GenerateSTOP(sEE_I2C, ENABLE);
+      I2C_GenerateSTOP(stm32ee_hid_i2c_port, ENABLE);
         
       /* Exit the function */
       return stm32ee_res_OK;
@@ -1310,11 +1667,11 @@ static stm32ee_result_t s_stm32ee_waiteepromstandbystate(void)
     else
     {
       /*!< Clear AF flag */
-      I2C_ClearFlag(sEE_I2C, I2C_FLAG_AF);                  
+      I2C_ClearFlag(stm32ee_hid_i2c_port, I2C_FLAG_AF);                  
     }
     
     /* Check if the maximum allowed number of trials has bee reached */
-    if (sEETrials++ == sEE_MAX_TRIALS_NUMBER)
+    if (sEETrials++ == stm32ee_hid_ackaddress_maxtrials)
     {
       /* If the maximum number of trials has been reached, exit the function */
       return s_stm32ee_timeoutexpired();

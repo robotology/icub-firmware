@@ -95,8 +95,9 @@ typedef void (*stm32ee_void_fp_voidp_t) (void* p);
 typedef struct
 {
     stm32ee_device_t        device;
+    uint32_t                i2cspeed;
     uint8_t                 i2cbus; // ?
-    uint8_t                 usedma; // ?
+    uint8_t                 usedmatransfer; // ?
     uint8_t                 dmachannel; // ?
     stm32ee_void_fp_voidp_t functioni2cinit;
     void*                   parameteri2cinit;
