@@ -27,6 +27,53 @@
 #define _DEEP_DEBUG_
 
 
+
+#include "stdint.h"
+#include "stdlib.h"
+#include "stdio.h"
+#include <string>
+#include <signal.h>
+#include <iostream>
+
+using namespace std;
+// Ace stuff
+#include <ace/ACE.h>
+#include "ace/SOCK_Dgram.h"
+#include "ace/Addr.h"
+#include "ace/Thread.h"
+#include "ace/Logging_Strategy.h"	// for logging stuff
+
+#include "main-transceiver.hpp"
+#include "hostTransceiver.hpp"
+
+#include <yarp/os/Network.h>
+#include <yarp/os/BufferedPort.h>
+#include <yarp/dev/DeviceDriver.h>
+#include <yarp/dev/CanBusInterface.h>
+#include <yarp/dev/PolyDriver.h>
+#include <yarp/os/RateThread.h>
+#include <yarp/dev/ControlBoardInterfacesImpl.h>
+#include "yarp/dev/ControlBoardInterfacesImpl.inl" //ControlBoardHelper
+
+#include "EOnv_hid.h"
+#include "EoMotionControl.h"
+#include "EoSkin.h"
+#include "EoSensors.h"
+
+#define _AC_
+//#include "IRobotInterface.h"
+//#include "FeatureInterface.h"
+#include "SkinWrapper.h"
+#include "debugFunctions.h"
+
+#ifdef _LINUX_UDP_SOCKET_
+#include "udp.h"
+#endif
+
+#define hal_trace_puts(arg)		printf("%s", arg)
+
+
+
 // Catch CTRL + C
 static int keepGoingOn   = TRUE;
 
@@ -43,7 +90,8 @@ void *sendThread(void * arg);
 void *skinThread(void * arg);
 
 
-
+extern hostTransceiver *transceiver;
+extern uint8_t boardN;
 
 typedef struct
 {
@@ -58,5 +106,13 @@ typedef struct
 } Board_connect_info;
 
 
+// Callback functions
+void s_callback_button_0(void);
+void s_callback_button_1(void);
+void s_callback_button_2(void);
+void s_callback_button_3(void);
+void s_callback_button_4(void);
+void s_callback_button_5(void);
+void s_callback_button_6(void);
 
 #endif /* MAIN_TRANSCEIVER_HPP_ */

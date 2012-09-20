@@ -20,8 +20,10 @@ set(ICUB_INTERFACE_CORE_FOLDER	$ENV{ICUB_ROOT}/main/src/core/iCubInterface-branc
 
 #add_definitions( -D_AC_="STRINGA" )
 
-set(CMAKE_MODULE_PATH ../../)
+set(MY_CALLBACK template_buttons.cpp)
+set(CMAKE_MODULE_PATH  ${CMAKE_SOURCE_DIR}/../../)
 
+message(INFO, "${CMAKE_SOURCE_DIR}")
 find_package(ACE)
 
 include(embObjLib.conf)
@@ -44,7 +46,8 @@ set(BODY_COMMON_HEADER 		${BODY_COMMON_FOLDER}/eEcommon.h)
 #set(ICUB_INTERFACE_SOURCE	${ICUB_INTERFACE_CORE_FOLDER}RobotInterfaceRemap.cpp)
 
 # Network Variable configuration
-set(NVS_EB_SOURCE 			${NVS_EB_SRC_FOLDER}eOcfg_EPs_eb1.c  
+set(NVS_EB_SOURCE 			${NVS_EB_SRC_FOLDER}eOcfg_EPs_board.c
+                            ${NVS_EB_SRC_FOLDER}eOcfg_EPs_eb1.c  
 							${NVS_EB_SRC_FOLDER}eOcfg_EPs_eb2.c
 							${NVS_EB_SRC_FOLDER}eOcfg_EPs_eb3.c  
 							${NVS_EB_SRC_FOLDER}eOcfg_EPs_eb4.c
@@ -121,10 +124,7 @@ set(NVS_SKIN_SOURCE			${NVS_SKIN_SRC_FOLDER}eOcfg_nvsEP_sk.c
 
 set(NVS_CBK_SOURCE			${NVS_MNGMNT_CBK_FOLDER}eOcfg_nvsEP_mngmnt_usr_ebx.c
 							${NVS_SKIN_CBK_FOLDER}eOcfg_nvsEP_sk_usrcbk_ebx.c
-#							${NVS_MC_CBK_FOLDER}eOcfg_nvsEP_mc_lowerleg_usrcbk_pippo.c
-#							${NVS_MC_CBK_FOLDER}eOcfg_nvsEP_mc_usrcbk_pippo.c
-#							${NVS_MC_CBK_FOLDER}eOcfg_nvsEP_mc_upperleg_usrcbk_pippo.c
-#							${NVS_SENSORS_CBK_FOLDER}eOcfg_nvsEP_as_wholebody_usrcbk_pippo.c 
+							${NVS_MC_CBK_FOLDER}eOcfg_nvsEP_mc_usrcbk_pippo.c
 							${NVS_SENSORS_CBK_FOLDER}eOcfg_nvsEP_as_usrcbk_pippo.c 
 							)
 
@@ -243,7 +243,8 @@ set(embobj_source 		${BODY_COMMON_SOURCE}
 						${NVS_CBK_SOURCE}
 						${NVS_USR_SOURCE} 
 						${NVS_SKIN_SOURCE} 
-						${ICUB_INTERFACE_SOURCE})
+						${ICUB_INTERFACE_SOURCE}
+						${MY_CALLBACK})
 
 
 #set(embobj_header 		${BODY_COMMON_SOURCE} 
