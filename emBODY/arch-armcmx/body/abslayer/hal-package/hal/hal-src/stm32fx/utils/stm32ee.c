@@ -240,7 +240,35 @@ static const I2C_InitTypeDef   s_stm32ee_i2c_cfg                 =
 
 #if     defined(USE_STM32F1)
 
-    #error --> add things
+static const uint32_t s_stm32ee_i2c_gpio_thegpioclocks[]    = { RCC_APB2Periph_GPIOA, RCC_APB2Periph_GPIOB, RCC_APB2Periph_GPIOC, 
+                                                                RCC_APB2Periph_GPIOD, RCC_APB2Periph_GPIOE, RCC_APB2Periph_GPIOF, 
+                                                                RCC_APB2Periph_GPIOG };  
+static const GPIO_TypeDef* s_stm32ee_i2c_gpio_thegpioports[]= { GPIOA, GPIOB, GPIOC, 
+                                                                GPIOD, GPIOE, GPIOF, 
+                                                                GPIOG };  
+static const uint8_t  s_stm32ee_i2c_gpio_thepinnums[]       = { 0,  1,  2,  3,
+                                                                4,  5,  6,  7,
+                                                                8,  9,  10, 11,
+                                                                12, 13, 14, 15 }; 
+static const uint16_t  s_stm32ee_i2c_gpio_thepins[]         = { GPIO_Pin_0,  GPIO_Pin_1,  GPIO_Pin_2,  GPIO_Pin_3,
+                                                                GPIO_Pin_4,  GPIO_Pin_5,  GPIO_Pin_6,  GPIO_Pin_7,
+                                                                GPIO_Pin_8,  GPIO_Pin_9,  GPIO_Pin_10, GPIO_Pin_11,
+                                                                GPIO_Pin_12, GPIO_Pin_13, GPIO_Pin_14, GPIO_Pin_15 }; 
+                                                                
+ 
+static const GPIO_InitTypeDef  s_stm32ee_i2c_gpio_sxx_pin  =
+{
+    .GPIO_Pin       = GPIO_Pin_All,
+    .GPIO_Speed     = GPIO_Speed_50MHz,
+    .GPIO_Mode      = GPIO_Mode_AF_OD,
+}; 
+
+static const GPIO_InitTypeDef  s_stm32ee_i2c_gpio_sxx_floatpin  =
+{
+    .GPIO_Pin       = GPIO_Pin_All,
+    .GPIO_Speed     = GPIO_Speed_2MHz,
+    .GPIO_Mode      = GPIO_Mode_IN_FLOATING,
+}; 
     
 #elif   defined(USE_STM32F4)
 
