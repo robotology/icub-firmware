@@ -88,6 +88,62 @@ typedef void (*stm32ee_void_fp_void_t) (void);
  **/
 typedef void (*stm32ee_void_fp_voidp_t) (void* p);
 
+// keep same values as hal_gpio_port_t
+typedef enum 
+{
+    stm32ee_gpio_portA = 0,
+    stm32ee_gpio_portB,
+    stm32ee_gpio_portC,
+    stm32ee_gpio_portD,
+    stm32ee_gpio_portE,
+    stm32ee_gpio_portF,
+    stm32ee_gpio_portG,
+    stm32ee_gpio_portH,
+    stm32ee_gpio_portI,
+    stm32ee_gpio_portNONE = 255
+} stm32ee_gpio_port_t;
+
+typedef enum 
+{
+    stm32ee_gpio_pin0 = 0,
+    stm32ee_gpio_pin1,
+    stm32ee_gpio_pin2,
+    stm32ee_gpio_pin3,
+    stm32ee_gpio_pin4,
+    stm32ee_gpio_pin5,
+    stm32ee_gpio_pin6,
+    stm32ee_gpio_pin7,
+    stm32ee_gpio_pin8,
+    stm32ee_gpio_pin9,
+    stm32ee_gpio_pin10,  
+    stm32ee_gpio_pin11,
+    stm32ee_gpio_pin12,
+    stm32ee_gpio_pin13,
+    stm32ee_gpio_pin14,
+    stm32ee_gpio_pin15,
+    stm32ee_gpio_pinNONE = 255    
+} stm32ee_gpio_pin_t; 
+
+typedef struct
+{
+    stm32ee_gpio_port_t     port;
+    stm32ee_gpio_pin_t      pin;
+} stm32ee_gpio_t;  
+
+typedef struct
+{
+    uint8_t                 dontinit;       /**< if 1, then initialisation is already done externally. */
+    uint8_t                 i2cspeed;       /**< in multiples of 100K. valid values are only 1 and 4. */
+    stm32ee_gpio_t          scl;
+    stm32ee_gpio_t          sda;
+} stm32ee_i2c_cfg_t;
+
+
+typedef struct
+{
+    uint8_t                 dontuse;       /**< if 1, then initialisation is already done externally. */
+} stm32ee_dma_cfg_t;
+
 
 /** @typedef    typedef struct stm32ee_cfg_t;
     @brief      contains configuration data of eeprom.
@@ -95,18 +151,10 @@ typedef void (*stm32ee_void_fp_voidp_t) (void* p);
 typedef struct
 {
     stm32ee_device_t        device;
-    uint32_t                i2cspeed;
-    uint8_t                 i2cbus; // ?
-    uint8_t                 usedmatransfer; // ?
-    uint8_t                 dmachannel; // ?
-    stm32ee_void_fp_voidp_t functioni2cinit;
-    void*                   parameteri2cinit;
-    stm32ee_void_fp_void_t  functioni2cdeinit;
+    uint8_t                 i2cport;            /**< it can be 1, 2, 3. so far only port 1 is supported. */
+    stm32ee_i2c_cfg_t       i2ccfg;
+    stm32ee_dma_cfg_t       dmacfg;
     stm32ee_void_fp_void_t  functionontimeout;
-    // useofdma?
-    // external wait functions?
-    // waitparam?
-    // external error function?
 } stm32ee_cfg_t;
 
 // remember to implement sw reset as seen in atmel datasheet.
@@ -131,7 +179,7 @@ extern stm32ee_result_t stm32ee_init(const stm32ee_cfg_t *cfg);
     @brief      This function de-initialises internal memory and the eeprom device.
     @return     In case of successful initialisation is stm32ee_res_OK, in case of error stm32ee_res_NOK.
   */
-extern stm32ee_result_t stm32ee_deinit(void);
+extern stm32ee_result_t stm32ee_deinit(const stm32ee_cfg_t *cfg);
 
 
 /** @fn    	    extern stm32ee_result_t stm32ee_read(uint32_t address, uint32_t size, uint8_t* buffer)

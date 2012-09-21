@@ -18,6 +18,7 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
+
 #ifndef _STM32EE_HID_H_
 #define _STM32EE_HID_H_
 
@@ -45,6 +46,8 @@
 
 #define stm32ee_BASICTIMEOUT                ((uint32_t)0x00111000)
 
+// -- these are the irq handler of the dma tx and rx transfers. they have to be changed in here and also in _cfg.c
+
 #if   defined(USE_STM32F4)
 
 #define stm32ee_hid_dma_I2C_DMA_TX_IRQHandler    DMA1_Stream6_IRQHandler
@@ -64,138 +67,74 @@
 // empty-section
 
 
-extern const uint32_t          stm32ee_hid_timeout_flag;
-extern const uint32_t          stm32ee_hid_timeout_long;
-extern const uint32_t          stm32ee_hid_ackaddress_maxtrials;
+// -- delays 
+
+extern const uint32_t           stm32ee_hid_timeout_flag;
+extern const uint32_t           stm32ee_hid_timeout_long;
+extern const uint32_t           stm32ee_hid_ackaddress_maxtrials;
+
+// -- the three bit address which depends on how the A2 A1 A0 pins of eeprom are connected to the board
+
+extern const uint8_t            stm32ee_hid_hwaddressa2a1a0;
 
 
-extern const uint8_t           stm32ee_hid_hwaddressbits1and2;
+// -- i2c ports
+
+extern const I2C_TypeDef *      stm32ee_hid_i2cx_port[3];
+extern const uint32_t           stm32ee_hid_i2cx_clock[3];  
+extern const uint32_t           stm32ee_hid_i2cx_gpio_remap_clock[3];  
+extern const uint32_t           stm32ee_hid_i2cx_gpio_remap[3];
 
 
-#if     defined(USE_STM32F4)
+// -- i2c pins
 
-// -- i2c
+extern const uint32_t           stm32ee_hid_i2c_gpio_scl_clock;       
+extern const GPIO_TypeDef *     stm32ee_hid_i2c_gpio_scl_port;
+extern const uint16_t           stm32ee_hid_i2c_gpio_scl_pinnum;
+extern const GPIO_InitTypeDef   stm32ee_hid_i2c_gpio_scl_pin;
 
-extern const uint8_t           stm32ee_hid_i2c_portnum;
-extern I2C_TypeDef *           stm32ee_hid_i2c_port;
-extern const uint32_t          stm32ee_hid_i2c_clock;  
+extern const GPIO_InitTypeDef   stm32ee_hid_i2c_gpio_scl_floatingpin;
 
-// INTERNAL: static non const or ..  const but use a temporary var 
-extern const I2C_InitTypeDef   stm32ee_hid_i2c_cfg;
-
-extern const uint32_t          stm32ee_hid_i2c_gpio_scl_clock;       
-extern GPIO_TypeDef *          stm32ee_hid_i2c_gpio_scl_port;
-extern const uint16_t          stm32ee_hid_i2c_gpio_scl_pinnum;
-extern const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_scl_pin;
-
-extern const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_scl_floatingpin;
-
-extern const uint32_t          stm32ee_hid_i2c_gpio_sda_clock;       
-extern GPIO_TypeDef *          stm32ee_hid_i2c_gpio_sda_port;
-extern const uint16_t          stm32ee_hid_i2c_gpio_sda_pinnum;
-extern const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_sda_pin;
-extern const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_sda_floatingpin;
-
-extern const uint32_t          stm32ee_hid_i2c_gpio_remap_clock;  
-extern const uint32_t          stm32ee_hid_i2c_gpio_remap;
+extern const uint32_t           stm32ee_hid_i2c_gpio_sda_clock;       
+extern const GPIO_TypeDef *     stm32ee_hid_i2c_gpio_sda_port;
+extern const uint16_t           stm32ee_hid_i2c_gpio_sda_pinnum;
+extern const GPIO_InitTypeDef   stm32ee_hid_i2c_gpio_sda_pin;
+extern const GPIO_InitTypeDef   stm32ee_hid_i2c_gpio_sda_floatingpin;
 
 
 // -- dma
 
-// PARAM
-//extern const uint8_t  stm32ee_hid_dma_useit    = 0;
+extern const NVIC_InitTypeDef   stm32ee_hid_dma_nvic_tx_enable;
 
-extern const NVIC_InitTypeDef  stm32ee_hid_dma_nvic_tx_enable;
+extern const NVIC_InitTypeDef   stm32ee_hid_dma_nvic_rx_enable;
 
-extern const NVIC_InitTypeDef  stm32ee_hid_dma_nvic_rx_enable;
+extern const NVIC_InitTypeDef   stm32ee_hid_dma_nvic_tx_disable;
 
-extern const NVIC_InitTypeDef  stm32ee_hid_dma_nvic_tx_disable;
+extern const NVIC_InitTypeDef   stm32ee_hid_dma_nvic_rx_disable;
 
-extern const NVIC_InitTypeDef  stm32ee_hid_dma_nvic_rx_disable;
+extern const uint32_t           stm32ee_hid_dma_clock; 
 
-extern const uint32_t          stm32ee_hid_dma_clock; 
+extern DMA_TypeDef *            stm32ee_hid_dma;
 
-extern DMA_TypeDef *           stm32ee_hid_dma;
-extern DMA_Stream_TypeDef *    stm32ee_hid_dma_stream_tx;
-extern DMA_Stream_TypeDef *    stm32ee_hid_dma_stream_rx;
-
-
-extern const DMA_InitTypeDef         stm32ee_hid_dma_cfg_init;
-
-extern const uint32_t          stm32ee_hid_dma_flags_tx;
-extern const uint32_t          stm32ee_hid_dma_flags_rx;
-
-extern const uint32_t          stm32ee_hid_dma_flags_tx_completed;
-extern const uint32_t          stm32ee_hid_dma_flags_rx_completed;
-
-// INTERNAL
-extern const uint32_t          stm32ee_hid_dma_dir_MEMORY2PERIPHERAL;
-extern const uint32_t          stm32ee_hid_dma_dir_PERIPHERAL2MEMORY;
-
-
-
-#elif   defined(USE_STM32F1)
-
-// -- i2c
-
-extern const uint8_t           stm32ee_hid_i2c_portnum;
-extern I2C_TypeDef *           stm32ee_hid_i2c_port;
-extern const uint32_t          stm32ee_hid_i2c_clock;
-
-// INTERNAL: static non extern const or ..  extern const but use a temporary var 
-extern const I2C_InitTypeDef   stm32ee_hid_i2c_cfg;
-
-extern const uint32_t          stm32ee_hid_i2c_gpio_scl_clock;     
-extern GPIO_TypeDef *          stm32ee_hid_i2c_gpio_scl_port;
-extern const uint16_t          stm32ee_hid_i2c_gpio_scl_pinnum;
-extern const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_scl_pin;
-extern const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_scl_floatingpin;
-
-extern const uint32_t          stm32ee_hid_i2c_gpio_sda_clock;       
-extern GPIO_TypeDef *          stm32ee_hid_i2c_gpio_sda_port;
-extern const uint16_t          stm32ee_hid_i2c_gpio_sda_pinnum;
-extern const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_sda_pin;
-extern const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_sda_floatingpin;
-
-extern const uint32_t          stm32ee_hid_i2c_gpio_remap_clock;  
-extern const uint32_t          stm32ee_hid_i2c_gpio_remap;
-
-// -- dma
-
-// PARAM
-//extern const uint8_t  stm32ee_hid_dma_useit    = 0;
-
-extern const NVIC_InitTypeDef  stm32ee_hid_dma_nvic_tx_enable;
-
-extern const NVIC_InitTypeDef  stm32ee_hid_dma_nvic_rx_enable;
-
-extern const NVIC_InitTypeDef  stm32ee_hid_dma_nvic_tx_disable;
-
-extern const NVIC_InitTypeDef  stm32ee_hid_dma_nvic_rx_disable;
-extern const uint32_t          stm32ee_hid_dma_clock; 
-
-extern DMA_TypeDef *           stm32ee_hid_dma;
-extern DMA_Channel_TypeDef *   stm32ee_hid_dma_stream_tx;
-extern DMA_Channel_TypeDef *   stm32ee_hid_dma_stream_rx;
-
-
-extern const DMA_InitTypeDef         stm32ee_hid_dma_cfg_init;
-
-extern const uint32_t          stm32ee_hid_dma_flags_tx;
-extern const uint32_t          stm32ee_hid_dma_flags_rx;
-
-extern const uint32_t          stm32ee_hid_dma_flags_tx_completed;
-extern const uint32_t          stm32ee_hid_dma_flags_rx_completed;
-
-extern const uint32_t          stm32ee_hid_dma_flags_tx_all;
-extern const uint32_t          stm32ee_hid_dma_flags_rx_all;
-
-// INTERNAL
-extern const uint32_t          stm32ee_hid_dma_dir_MEMORY2PERIPHERAL;
-extern const uint32_t          stm32ee_hid_dma_dir_PERIPHERAL2MEMORY;
-
-
+#if     defined(USE_STM32F1)
+extern DMA_Channel_TypeDef *    stm32ee_hid_dma_stream_tx;
+extern DMA_Channel_TypeDef *    stm32ee_hid_dma_stream_rx;
+#elif   defined(USE_STM32F4)
+extern DMA_Stream_TypeDef *     stm32ee_hid_dma_stream_tx;
+extern DMA_Stream_TypeDef *     stm32ee_hid_dma_stream_rx;
 #endif
+
+extern const DMA_InitTypeDef    stm32ee_hid_dma_cfg_init;
+
+extern const uint32_t           stm32ee_hid_dma_flags_tx;
+extern const uint32_t           stm32ee_hid_dma_flags_rx;
+
+extern const uint32_t           stm32ee_hid_dma_flags_tx_completed;
+extern const uint32_t           stm32ee_hid_dma_flags_rx_completed;
+
+extern const uint32_t           stm32ee_hid_dma_flags_tx_all;
+extern const uint32_t           stm32ee_hid_dma_flags_rx_all;
+
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
