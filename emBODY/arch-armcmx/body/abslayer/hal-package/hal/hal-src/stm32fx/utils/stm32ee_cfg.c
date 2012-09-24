@@ -52,9 +52,9 @@
 
 #define stm32ee_BASICTIMEOUT                ((uint32_t)0x00111000)
 #define stm32ee_MAXTRIALS                   (300)
-#define stm32ee_HWADDR_A2                   (0)
-#define stm32ee_HWADDR_A1                   (0)
-#define stm32ee_HWADDR_A0                   (0)
+//#define stm32ee_HWADDR_A2                   (0)
+//#define stm32ee_HWADDR_A1                   (0)
+//#define stm32ee_HWADDR_A0                   (0)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -64,7 +64,7 @@ const uint32_t          stm32ee_hid_timeout_flag            = stm32ee_BASICTIMEO
 const uint32_t          stm32ee_hid_timeout_long            = 10 * stm32ee_BASICTIMEOUT;
 const uint32_t          stm32ee_hid_ackaddress_maxtrials    = stm32ee_MAXTRIALS;
 
-const uint8_t           stm32ee_hid_hwaddressa2a1a0         = (stm32ee_HWADDR_A2 << 3) | (stm32ee_HWADDR_A1 << 2) | (stm32ee_HWADDR_A0 << 1);
+//const uint8_t           stm32ee_hid_hwaddressa2a1a0         = (stm32ee_HWADDR_A2 << 3) | (stm32ee_HWADDR_A1 << 2) | (stm32ee_HWADDR_A0 << 1);
 
 
 #if     defined(USE_STM32F1)
@@ -76,39 +76,39 @@ const uint32_t           stm32ee_hid_i2cx_clock[3]              = {RCC_APB1Perip
 const uint32_t           stm32ee_hid_i2cx_gpio_remap_clock[3]   = {RCC_APB2Periph_AFIO, 1, 1}; // 1 means that i dont know if it is correct     
 const uint32_t           stm32ee_hid_i2cx_gpio_remap[3]         = {GPIO_Remap_I2C1, GPIO_Remap_I2C1, GPIO_Remap_I2C1};
 
-// -- i2c pins
+// -- i2c pins: not used anymore ...
+//
+// const uint32_t          stm32ee_hid_i2c_gpio_scl_clock      = RCC_APB2Periph_GPIOB;       
+// const GPIO_TypeDef *    stm32ee_hid_i2c_gpio_scl_port       = GPIOB;
+// const uint16_t          stm32ee_hid_i2c_gpio_scl_pinnum     = 8;
+// const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_scl_pin        =
+// {
+//     .GPIO_Pin       = GPIO_Pin_8,
+//     .GPIO_Speed     = GPIO_Speed_50MHz,
+//     .GPIO_Mode      = GPIO_Mode_AF_OD
+// };
+// const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_scl_floatingpin =
+// {
+//     .GPIO_Pin       = GPIO_Pin_8,
+//     .GPIO_Speed     = GPIO_Speed_2MHz,
+//     .GPIO_Mode      = GPIO_Mode_IN_FLOATING,
+// };
 
-const uint32_t          stm32ee_hid_i2c_gpio_scl_clock      = RCC_APB2Periph_GPIOB;       
-const GPIO_TypeDef *    stm32ee_hid_i2c_gpio_scl_port       = GPIOB;
-const uint16_t          stm32ee_hid_i2c_gpio_scl_pinnum     = 8;
-const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_scl_pin        =
-{
-    .GPIO_Pin       = GPIO_Pin_8,
-    .GPIO_Speed     = GPIO_Speed_50MHz,
-    .GPIO_Mode      = GPIO_Mode_AF_OD
-};
-const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_scl_floatingpin =
-{
-    .GPIO_Pin       = GPIO_Pin_8,
-    .GPIO_Speed     = GPIO_Speed_2MHz,
-    .GPIO_Mode      = GPIO_Mode_IN_FLOATING,
-};
-
-const uint32_t          stm32ee_hid_i2c_gpio_sda_clock      = RCC_APB2Periph_GPIOB;       
-const GPIO_TypeDef *    stm32ee_hid_i2c_gpio_sda_port       = GPIOB;
-const uint16_t          stm32ee_hid_i2c_gpio_sda_pinnum     = 9;
-const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_sda_pin        =
-{
-    .GPIO_Pin       = GPIO_Pin_9,
-    .GPIO_Speed     = GPIO_Speed_50MHz,
-    .GPIO_Mode      = GPIO_Mode_AF_OD,
-};
-const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_sda_floatingpin =
-{
-    .GPIO_Pin       = GPIO_Pin_9,
-    .GPIO_Speed     = GPIO_Speed_2MHz,
-    .GPIO_Mode      = GPIO_Mode_IN_FLOATING,
-};
+// const uint32_t          stm32ee_hid_i2c_gpio_sda_clock      = RCC_APB2Periph_GPIOB;       
+// const GPIO_TypeDef *    stm32ee_hid_i2c_gpio_sda_port       = GPIOB;
+// const uint16_t          stm32ee_hid_i2c_gpio_sda_pinnum     = 9;
+// const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_sda_pin        =
+// {
+//     .GPIO_Pin       = GPIO_Pin_9,
+//     .GPIO_Speed     = GPIO_Speed_50MHz,
+//     .GPIO_Mode      = GPIO_Mode_AF_OD,
+// };
+// const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_sda_floatingpin =
+// {
+//     .GPIO_Pin       = GPIO_Pin_9,
+//     .GPIO_Speed     = GPIO_Speed_2MHz,
+//     .GPIO_Mode      = GPIO_Mode_IN_FLOATING,
+// };
 
 
 // -- dma
@@ -194,45 +194,45 @@ const uint32_t           stm32ee_hid_i2cx_gpio_remap[3]         = {GPIO_AF_I2C1,
 
 // -- i2c pins
 
-const uint32_t          stm32ee_hid_i2c_gpio_scl_clock      = RCC_AHB1Periph_GPIOB;       
-const GPIO_TypeDef *    stm32ee_hid_i2c_gpio_scl_port       = GPIOB;
-const uint16_t          stm32ee_hid_i2c_gpio_scl_pinnum     = GPIO_PinSource8;
-const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_scl_pin        =
-{
-    .GPIO_Pin       = GPIO_Pin_8,
-    .GPIO_Mode      = GPIO_Mode_AF,
-    .GPIO_Speed     = GPIO_Speed_50MHz,
-    .GPIO_OType     = GPIO_OType_OD,
-    .GPIO_PuPd      = GPIO_PuPd_NOPULL
-};
-const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_scl_floatingpin =
-{
-    .GPIO_Pin       = GPIO_Pin_8,
-    .GPIO_Mode      = GPIO_Mode_IN,
-    .GPIO_Speed     = GPIO_Speed_2MHz,
-    .GPIO_OType     = GPIO_OType_PP,
-    .GPIO_PuPd      = GPIO_PuPd_NOPULL
-};
+// const uint32_t          stm32ee_hid_i2c_gpio_scl_clock      = RCC_AHB1Periph_GPIOB;       
+// const GPIO_TypeDef *    stm32ee_hid_i2c_gpio_scl_port       = GPIOB;
+// const uint16_t          stm32ee_hid_i2c_gpio_scl_pinnum     = GPIO_PinSource8;
+// const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_scl_pin        =
+// {
+//     .GPIO_Pin       = GPIO_Pin_8,
+//     .GPIO_Mode      = GPIO_Mode_AF,
+//     .GPIO_Speed     = GPIO_Speed_50MHz,
+//     .GPIO_OType     = GPIO_OType_OD,
+//     .GPIO_PuPd      = GPIO_PuPd_NOPULL
+// };
+// const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_scl_floatingpin =
+// {
+//     .GPIO_Pin       = GPIO_Pin_8,
+//     .GPIO_Mode      = GPIO_Mode_IN,
+//     .GPIO_Speed     = GPIO_Speed_2MHz,
+//     .GPIO_OType     = GPIO_OType_PP,
+//     .GPIO_PuPd      = GPIO_PuPd_NOPULL
+// };
 
-const uint32_t          stm32ee_hid_i2c_gpio_sda_clock      = RCC_AHB1Periph_GPIOB;       
-const GPIO_TypeDef *    stm32ee_hid_i2c_gpio_sda_port       = GPIOB;
-const uint16_t          stm32ee_hid_i2c_gpio_sda_pinnum     = GPIO_PinSource9;
-const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_sda_pin        =
-{
-    .GPIO_Pin       = GPIO_Pin_9,
-    .GPIO_Mode      = GPIO_Mode_AF,
-    .GPIO_Speed     = GPIO_Speed_50MHz,
-    .GPIO_OType     = GPIO_OType_OD,
-    .GPIO_PuPd      = GPIO_PuPd_NOPULL
-};
-const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_sda_floatingpin =
-{
-    .GPIO_Pin       = GPIO_Pin_9,
-    .GPIO_Mode      = GPIO_Mode_IN,
-    .GPIO_Speed     = GPIO_Speed_2MHz,
-    .GPIO_OType     = GPIO_OType_PP,
-    .GPIO_PuPd      = GPIO_PuPd_NOPULL
-};
+// const uint32_t          stm32ee_hid_i2c_gpio_sda_clock      = RCC_AHB1Periph_GPIOB;       
+// const GPIO_TypeDef *    stm32ee_hid_i2c_gpio_sda_port       = GPIOB;
+// const uint16_t          stm32ee_hid_i2c_gpio_sda_pinnum     = GPIO_PinSource9;
+// const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_sda_pin        =
+// {
+//     .GPIO_Pin       = GPIO_Pin_9,
+//     .GPIO_Mode      = GPIO_Mode_AF,
+//     .GPIO_Speed     = GPIO_Speed_50MHz,
+//     .GPIO_OType     = GPIO_OType_OD,
+//     .GPIO_PuPd      = GPIO_PuPd_NOPULL
+// };
+// const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_sda_floatingpin =
+// {
+//     .GPIO_Pin       = GPIO_Pin_9,
+//     .GPIO_Mode      = GPIO_Mode_IN,
+//     .GPIO_Speed     = GPIO_Speed_2MHz,
+//     .GPIO_OType     = GPIO_OType_PP,
+//     .GPIO_PuPd      = GPIO_PuPd_NOPULL
+// };
 
 
 

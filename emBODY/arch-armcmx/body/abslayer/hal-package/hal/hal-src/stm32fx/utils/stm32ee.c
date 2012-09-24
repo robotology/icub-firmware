@@ -76,12 +76,13 @@ extern const stm32ee_cfg_t stm32_cfg_default =
     {
         .device                 = stm32ee_device_st_m24lr64, 
         .i2cport                = 1,  
+        .hwaddra2a1a0           = (0 << 2) | (0 << 1) | (0 << 0),
+        .wpval                  = 0,
         .wppin                  =
         {
             .port                   = stm32ee_gpio_portNONE,
             .pin                    = stm32ee_gpio_pinNONE        
         },
-        .wpval                  = 0,
         .functionontimeout      = NULL            
     },
 
@@ -157,8 +158,8 @@ typedef struct
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static stm32ee_result_t s_stm32ee_i2c_common_init(void);
-static stm32ee_result_t s_stm32ee_i2c_common_deinit(void);
+static stm32ee_result_t s_stm32ee_i2c_common_init(const stm32ee_i2c_cfg_t *i2ccfg);
+static stm32ee_result_t s_stm32ee_i2c_common_deinit(const stm32ee_i2c_cfg_t *i2ccfg);
 
 
 static stm32ee_result_t s_stm32ee_wp_init(void);
@@ -166,7 +167,7 @@ static stm32ee_result_t s_stm32ee_wp_deinit(void);
 static stm32ee_result_t s_stm32ee_wp_enable(void);
 static stm32ee_result_t s_stm32ee_wp_disable(void);
 
-static stm32ee_result_t s_stm32ee_i2c_prepare_data(const uint8_t usefloatingpins);
+static stm32ee_result_t s_stm32ee_i2c_prepare_data(const stm32ee_i2c_cfg_t *i2ccfg, const uint8_t usefloatingpins);
 
 static void s_stm32ee_i2c_gpio_init(void);
 static void s_stm32ee_dma_init(void);
@@ -207,13 +208,14 @@ static stm32ee_generic_container_t s_stm32ee_generics =
         .devcfg                 =
         {
             .device                 = stm32ee_device_none, 
-            .i2cport                = 1,  
+            .i2cport                = 1, 
+            .hwaddra2a1a0           = (0 << 2) | (0 << 1) | (0 << 0),
+            .wpval                  = 0,            
             .wppin                  =
             {
                 .port                   = stm32ee_gpio_portNONE,
                 .pin                    = stm32ee_gpio_pinNONE        
             },
-            .wpval                  = 0,
             .functionontimeout      = NULL            
         },
         .i2ccfg                         =
@@ -437,7 +439,7 @@ extern stm32ee_result_t stm32ee_init(const stm32ee_cfg_t *cfg)
     }
     
     // apply extra bits
-    s_stm32ee_generics.hwaddress |= stm32ee_hid_hwaddressa2a1a0;
+    s_stm32ee_generics.hwaddress |= ((s_stm32ee_generics.cfg.devcfg.hwaddra2a1a0 & 0x07) << 1);
     
     // init wp if needed
     if((stm32ee_gpio_portNONE != s_stm32ee_generics.cfg.devcfg.wppin.port) && (stm32ee_gpio_pinNONE != s_stm32ee_generics.cfg.devcfg.wppin.pin) && ((255 != s_stm32ee_generics.cfg.devcfg.wpval)))
@@ -450,7 +452,7 @@ extern stm32ee_result_t stm32ee_init(const stm32ee_cfg_t *cfg)
     // init i2c if needed
     if(0 == s_stm32ee_generics.cfg.i2ccfg.dontinit)
     {
-        res = s_stm32ee_i2c_common_init();
+        res = s_stm32ee_i2c_common_init(&s_stm32ee_generics.cfg.i2ccfg);
         if(stm32ee_res_NOK == res)
         {
             return(stm32ee_res_NOK);
@@ -474,7 +476,6 @@ extern stm32ee_result_t stm32ee_init(const stm32ee_cfg_t *cfg)
 
 extern stm32ee_result_t stm32ee_deinit(const stm32ee_cfg_t *cfg)
 {
-
     if(NULL == cfg)
     {
         cfg = &stm32_cfg_default;
@@ -482,7 +483,7 @@ extern stm32ee_result_t stm32ee_deinit(const stm32ee_cfg_t *cfg)
     
     if(0 == cfg->i2ccfg.dontinit)
     {
-        s_stm32ee_i2c_common_deinit();
+        s_stm32ee_i2c_common_deinit(&cfg->i2ccfg);
     }
     
     s_stm32ee_dma_deinit(); // always deinit
@@ -698,7 +699,7 @@ static void s_stm32ee_i2c_software_reset(void)
     
 }
 
-static stm32ee_result_t s_stm32ee_i2c_prepare_data(const uint8_t usefloatingpins)
+static stm32ee_result_t s_stm32ee_i2c_prepare_data(const stm32ee_i2c_cfg_t *i2ccfg, const uint8_t usefloatingpins)
 {
 #if 0
     const GPIO_InitTypeDef* pin = NULL;
@@ -723,29 +724,29 @@ static stm32ee_result_t s_stm32ee_i2c_prepare_data(const uint8_t usefloatingpins
 
     const GPIO_InitTypeDef* pin = NULL;
     
-    s_stm32ee_generics.i2c_gpio_scl.clock   = s_stm32ee_i2c_gpio_thegpioclocks[s_stm32ee_generics.cfg.i2ccfg.scl.port];
-    s_stm32ee_generics.i2c_gpio_scl.port    = (GPIO_TypeDef*)s_stm32ee_i2c_gpio_thegpioports[s_stm32ee_generics.cfg.i2ccfg.scl.port];
-    s_stm32ee_generics.i2c_gpio_scl.pinnum  = s_stm32ee_i2c_gpio_thepinnums[s_stm32ee_generics.cfg.i2ccfg.scl.pin];
+    s_stm32ee_generics.i2c_gpio_scl.clock   = s_stm32ee_i2c_gpio_thegpioclocks[i2ccfg->scl.port];
+    s_stm32ee_generics.i2c_gpio_scl.port    = (GPIO_TypeDef*)s_stm32ee_i2c_gpio_thegpioports[i2ccfg->scl.port];
+    s_stm32ee_generics.i2c_gpio_scl.pinnum  = s_stm32ee_i2c_gpio_thepinnums[i2ccfg->scl.pin];
     pin = (0 == usefloatingpins) ? (&s_stm32ee_i2c_gpio_sxx_pin) : (&s_stm32ee_i2c_gpio_sxx_floatpin);
     memcpy(&s_stm32ee_generics.i2c_gpio_scl.pin, pin, sizeof(GPIO_InitTypeDef));
-    s_stm32ee_generics.i2c_gpio_scl.pin.GPIO_Pin = s_stm32ee_i2c_gpio_thepins[s_stm32ee_generics.cfg.i2ccfg.scl.pin];
+    s_stm32ee_generics.i2c_gpio_scl.pin.GPIO_Pin = s_stm32ee_i2c_gpio_thepins[i2ccfg->scl.pin];
         
-    s_stm32ee_generics.i2c_gpio_sda.clock   = s_stm32ee_i2c_gpio_thegpioclocks[s_stm32ee_generics.cfg.i2ccfg.sda.port];
-    s_stm32ee_generics.i2c_gpio_sda.port    = (GPIO_TypeDef*)s_stm32ee_i2c_gpio_thegpioports[s_stm32ee_generics.cfg.i2ccfg.sda.port];
-    s_stm32ee_generics.i2c_gpio_sda.pinnum  = s_stm32ee_i2c_gpio_thepinnums[s_stm32ee_generics.cfg.i2ccfg.sda.pin];
+    s_stm32ee_generics.i2c_gpio_sda.clock   = s_stm32ee_i2c_gpio_thegpioclocks[i2ccfg->sda.port];
+    s_stm32ee_generics.i2c_gpio_sda.port    = (GPIO_TypeDef*)s_stm32ee_i2c_gpio_thegpioports[i2ccfg->sda.port];
+    s_stm32ee_generics.i2c_gpio_sda.pinnum  = s_stm32ee_i2c_gpio_thepinnums[i2ccfg->sda.pin];
     pin = (0 == usefloatingpins) ? (&s_stm32ee_i2c_gpio_sxx_pin) : (&s_stm32ee_i2c_gpio_sxx_floatpin);
     memcpy(&s_stm32ee_generics.i2c_gpio_sda.pin, pin, sizeof(GPIO_InitTypeDef));
-    s_stm32ee_generics.i2c_gpio_sda.pin.GPIO_Pin = s_stm32ee_i2c_gpio_thepins[s_stm32ee_generics.cfg.i2ccfg.sda.pin];
+    s_stm32ee_generics.i2c_gpio_sda.pin.GPIO_Pin = s_stm32ee_i2c_gpio_thepins[i2ccfg->sda.pin];
 
 
 #endif    
     return(stm32ee_res_OK);
 }
 
-static stm32ee_result_t s_stm32ee_i2c_common_init(void)
+static stm32ee_result_t s_stm32ee_i2c_common_init(const stm32ee_i2c_cfg_t *i2ccfg)
 {
     const uint8_t usefloatingpins = 0;
-    if(stm32ee_res_NOK == s_stm32ee_i2c_prepare_data(usefloatingpins))
+    if(stm32ee_res_NOK == s_stm32ee_i2c_prepare_data(i2ccfg, usefloatingpins))
     {
         return(stm32ee_res_NOK);
     }
@@ -757,11 +758,11 @@ static stm32ee_result_t s_stm32ee_i2c_common_init(void)
 }
 
 
-static stm32ee_result_t s_stm32ee_i2c_common_deinit(void)
+static stm32ee_result_t s_stm32ee_i2c_common_deinit(const stm32ee_i2c_cfg_t *i2ccfg)
 {
 
     const uint8_t usefloatingpins = 1;
-    if(stm32ee_res_NOK == s_stm32ee_i2c_prepare_data(usefloatingpins))
+    if(stm32ee_res_NOK == s_stm32ee_i2c_prepare_data(i2ccfg, usefloatingpins))
     {
         return(stm32ee_res_NOK);
     }
@@ -979,12 +980,19 @@ static void s_stm32ee_i2c_disable(void)
 
 static void s_stm32ee_i2c_gpio_deinit(void)
 { 
+#if 0    
 #if     defined(USE_STM32F1) || defined(USE_STM32F4)
     // configure scl and sda as floating pin
     GPIO_Init((GPIO_TypeDef*)s_stm32ee_generics.i2c_gpio_scl.port, (GPIO_InitTypeDef*)&stm32ee_hid_i2c_gpio_scl_floatingpin);
     GPIO_Init((GPIO_TypeDef*)s_stm32ee_generics.i2c_gpio_sda.port, (GPIO_InitTypeDef*)&stm32ee_hid_i2c_gpio_sda_floatingpin); 
 #endif
-
+#else
+#if     defined(USE_STM32F1) || defined(USE_STM32F4)
+    // configure scl and sda as floating pin using values filled beforehands in i2c_gpio_scl and i2c_gpio_sda
+    GPIO_Init((GPIO_TypeDef*)s_stm32ee_generics.i2c_gpio_scl.port, (GPIO_InitTypeDef*)&s_stm32ee_generics.i2c_gpio_scl.pin);
+    GPIO_Init((GPIO_TypeDef*)s_stm32ee_generics.i2c_gpio_sda.port, (GPIO_InitTypeDef*)&s_stm32ee_generics.i2c_gpio_sda.pin); 
+#endif    
+#endif
 }
 
 static void s_stm32ee_dma_deinit(void)

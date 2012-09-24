@@ -75,7 +75,7 @@ extern const uint32_t           stm32ee_hid_ackaddress_maxtrials;
 
 // -- the three bit address which depends on how the A2 A1 A0 pins of eeprom are connected to the board
 
-extern const uint8_t            stm32ee_hid_hwaddressa2a1a0;
+//extern const uint8_t            stm32ee_hid_hwaddressa2a1a0;
 
 
 // -- i2c ports
@@ -86,20 +86,20 @@ extern const uint32_t           stm32ee_hid_i2cx_gpio_remap_clock[3];
 extern const uint32_t           stm32ee_hid_i2cx_gpio_remap[3];
 
 
-// -- i2c pins
+// -- i2c pins: not used anymore ...
+//
+// extern const uint32_t           stm32ee_hid_i2c_gpio_scl_clock;       
+// extern const GPIO_TypeDef *     stm32ee_hid_i2c_gpio_scl_port;
+// extern const uint16_t           stm32ee_hid_i2c_gpio_scl_pinnum;
+// extern const GPIO_InitTypeDef   stm32ee_hid_i2c_gpio_scl_pin;
 
-extern const uint32_t           stm32ee_hid_i2c_gpio_scl_clock;       
-extern const GPIO_TypeDef *     stm32ee_hid_i2c_gpio_scl_port;
-extern const uint16_t           stm32ee_hid_i2c_gpio_scl_pinnum;
-extern const GPIO_InitTypeDef   stm32ee_hid_i2c_gpio_scl_pin;
+// extern const GPIO_InitTypeDef   stm32ee_hid_i2c_gpio_scl_floatingpin;
 
-extern const GPIO_InitTypeDef   stm32ee_hid_i2c_gpio_scl_floatingpin;
-
-extern const uint32_t           stm32ee_hid_i2c_gpio_sda_clock;       
-extern const GPIO_TypeDef *     stm32ee_hid_i2c_gpio_sda_port;
-extern const uint16_t           stm32ee_hid_i2c_gpio_sda_pinnum;
-extern const GPIO_InitTypeDef   stm32ee_hid_i2c_gpio_sda_pin;
-extern const GPIO_InitTypeDef   stm32ee_hid_i2c_gpio_sda_floatingpin;
+// extern const uint32_t           stm32ee_hid_i2c_gpio_sda_clock;       
+// extern const GPIO_TypeDef *     stm32ee_hid_i2c_gpio_sda_port;
+// extern const uint16_t           stm32ee_hid_i2c_gpio_sda_pinnum;
+// extern const GPIO_InitTypeDef   stm32ee_hid_i2c_gpio_sda_pin;
+// extern const GPIO_InitTypeDef   stm32ee_hid_i2c_gpio_sda_floatingpin;
 
 
 // -- dma

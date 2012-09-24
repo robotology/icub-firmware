@@ -148,8 +148,9 @@ typedef struct
 {
     stm32ee_device_t        device;
     uint8_t                 i2cport;            /**< it can be 1, 2, 3. so far only port 1 is supported. */
-    stm32ee_gpio_t          wppin;
+    uint8_t                 hwaddra2a1a0;       /**< put a 1 in pos 2, 1, 0 if the a2, a1, a0 is high. */
     uint8_t                 wpval;              /**< 1 if protection is high, 0, if it is low, 255 if not used */
+    stm32ee_gpio_t          wppin;
     stm32ee_void_fp_void_t  functionontimeout;
 } stm32ee_dev_cfg_t;
 
