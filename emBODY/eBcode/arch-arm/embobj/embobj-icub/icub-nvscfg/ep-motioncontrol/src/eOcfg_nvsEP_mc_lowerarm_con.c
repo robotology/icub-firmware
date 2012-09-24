@@ -456,7 +456,7 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j00_jconfig,
         EO_INIT(.index)     Jindex( 0, 0),
-        EO_INIT(.nchildren) 14,
+        EO_INIT(.nchildren) 16,
         EO_INIT(.dchildren) NULL
     },
         {   // 1
@@ -653,7 +653,7 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j01_jconfig,
         EO_INIT(.index)     Jindex( 1, 0),
-        EO_INIT(.nchildren) 14,
+        EO_INIT(.nchildren) 16,
         EO_INIT(.dchildren) NULL
     },
         {   // 1
@@ -850,7 +850,7 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j02_jconfig,
         EO_INIT(.index)     Jindex( 2, 0),
-        EO_INIT(.nchildren) 14,
+        EO_INIT(.nchildren) 16,
         EO_INIT(.dchildren) NULL
     },
         {   // 1
@@ -1047,7 +1047,7 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j03_jconfig,
         EO_INIT(.index)     Jindex( 3, 0),
-        EO_INIT(.nchildren) 14,
+        EO_INIT(.nchildren) 16,
         EO_INIT(.dchildren) NULL
     },
         {   // 1
@@ -1244,7 +1244,7 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j04_jconfig,
         EO_INIT(.index)     Jindex( 4, 0),
-        EO_INIT(.nchildren) 14,
+        EO_INIT(.nchildren) 16,
         EO_INIT(.dchildren) NULL
     },
         {   // 1
@@ -1441,7 +1441,7 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j05_jconfig,
         EO_INIT(.index)     Jindex( 5, 0),
-        EO_INIT(.nchildren) 14,
+        EO_INIT(.nchildren) 16,
         EO_INIT(.dchildren) NULL
     },
         {   // 1
@@ -1638,7 +1638,7 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j06_jconfig,
         EO_INIT(.index)     Jindex( 6, 0),
-        EO_INIT(.nchildren) 14,
+        EO_INIT(.nchildren) 16,
         EO_INIT(.dchildren) NULL
     },
         {   // 1
@@ -1835,7 +1835,7 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j07_jconfig,
         EO_INIT(.index)     Jindex( 7, 0),
-        EO_INIT(.nchildren) 14,
+        EO_INIT(.nchildren) 16,
         EO_INIT(.dchildren) NULL
     },
         {   // 1
@@ -2033,7 +2033,7 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j08_jconfig,
         EO_INIT(.index)     Jindex( 8, 0),
-        EO_INIT(.nchildren) 14,
+        EO_INIT(.nchildren) 16,
         EO_INIT(.dchildren) NULL
     },
         {   // 1
@@ -2231,7 +2231,7 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j09_jconfig,
         EO_INIT(.index)     Jindex( 9, 0),
-        EO_INIT(.nchildren) 14,
+        EO_INIT(.nchildren) 16,
         EO_INIT(.dchildren) NULL
     },
         {   // 1
@@ -2428,7 +2428,7 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j10_jconfig,
         EO_INIT(.index)     Jindex(10, 0),
-        EO_INIT(.nchildren) 14,
+        EO_INIT(.nchildren) 16,
         EO_INIT(.dchildren) NULL
     },
         {   // 1
@@ -2626,7 +2626,7 @@ EOtreenode eo_cfg_nvsEP_mc_lowerarm_tree_con[] =
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_lowerarm_j11_jconfig,
         EO_INIT(.index)     Jindex(11, 0),
-        EO_INIT(.nchildren) 14,
+        EO_INIT(.nchildren) 16,
         EO_INIT(.dchildren) NULL
     },
         {   // 1

@@ -255,7 +255,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j00_jconfig,
         EO_INIT(.index)     Jindex( 0, 0),
-        EO_INIT(.nchildren) 14,
+        EO_INIT(.nchildren) 16,
         EO_INIT(.dchildren) NULL
     },
         {   // 1
@@ -452,7 +452,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j01_jconfig,
         EO_INIT(.index)     Jindex( 1, 0),
-        EO_INIT(.nchildren) 14,
+        EO_INIT(.nchildren) 16,
         EO_INIT(.dchildren) NULL
     },
         {   // 1
@@ -650,7 +650,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j02_jconfig,
         EO_INIT(.index)     Jindex( 2, 0),
-        EO_INIT(.nchildren) 14,
+        EO_INIT(.nchildren) 16,
         EO_INIT(.dchildren) NULL
     },
         {   // 1
