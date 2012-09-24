@@ -72,24 +72,35 @@
 
 extern const stm32ee_cfg_t stm32_cfg_default = 
 { 
-    .device                 = stm32ee_device_st_m24lr64, 
-    .i2cport                = 1,
+    .devcfg                 =
+    {
+        .device                 = stm32ee_device_st_m24lr64, 
+        .i2cport                = 1,  
+        .wppin                  =
+        {
+            .port                   = stm32ee_gpio_portNONE,
+            .pin                    = stm32ee_gpio_pinNONE        
+        },
+        .wpval                  = 0,
+        .functionontimeout      = NULL            
+    },
+
     .i2ccfg                 =
     {
         .dontinit               = 0,
         .i2cspeed               = 4
     },
+    
     .dmacfg                 =
     {
         .dontuse                = 0
-    },
+    }
 //    .i2cspeed               = 400000,
 //    .i2cextinit             = 0,
 //    .usedmatransfer         = 1,
 //    .functioni2cinit    = NULL, 
 //    .parameteri2cinit   = NULL, 
 //    .functioni2cdeinit  = NULL 
-    .functionontimeout      = NULL
 };
 
 
@@ -149,6 +160,12 @@ typedef struct
 static stm32ee_result_t s_stm32ee_i2c_common_init(void);
 static stm32ee_result_t s_stm32ee_i2c_common_deinit(void);
 
+
+static stm32ee_result_t s_stm32ee_wp_init(void);
+static stm32ee_result_t s_stm32ee_wp_deinit(void);
+static stm32ee_result_t s_stm32ee_wp_enable(void);
+static stm32ee_result_t s_stm32ee_wp_disable(void);
+
 static stm32ee_result_t s_stm32ee_i2c_prepare_data(const uint8_t usefloatingpins);
 
 static void s_stm32ee_i2c_gpio_init(void);
@@ -187,8 +204,18 @@ static stm32ee_generic_container_t s_stm32ee_generics =
     .totalsize                  = 0,
     .cfg                        =
     {
-        .device                         = stm32ee_device_none, 
-        .i2cport                        = 1,
+        .devcfg                 =
+        {
+            .device                 = stm32ee_device_none, 
+            .i2cport                = 1,  
+            .wppin                  =
+            {
+                .port                   = stm32ee_gpio_portNONE,
+                .pin                    = stm32ee_gpio_pinNONE        
+            },
+            .wpval                  = 0,
+            .functionontimeout      = NULL            
+        },
         .i2ccfg                         =
         {
             .dontinit                       = 0,
@@ -197,14 +224,14 @@ static stm32ee_generic_container_t s_stm32ee_generics =
         .dmacfg                         =
         {
             .dontuse                        = 0
-        },        
+        }        
 //        .i2cspeed                       = 400000,
 //        .i2cextinit                     = 0,
 //        .usedmatransfer                 = 0,
 //        .functioni2cinit                = NULL, 
 //        .parameteri2cinit               = NULL, 
 //        .functioni2cdeinit              = NULL,
-        .functionontimeout              = NULL
+
     },
     .i2cx                       = NULL,
     .i2cx_cfg               =
@@ -321,13 +348,13 @@ extern stm32ee_result_t stm32ee_init(const stm32ee_cfg_t *cfg)
         cfg = &stm32_cfg_default;
     }
     
-    if((stm32ee_device_none == cfg->device) || (stm32ee_device_none != s_stm32ee_generics.cfg.device))
+    if((stm32ee_device_none == cfg->devcfg.device) || (stm32ee_device_none != s_stm32ee_generics.cfg.devcfg.device))
     {
         return(stm32ee_res_NOK);
     }
     
     // it can be only port 1 (so far)
-    if(1 != cfg->i2cport)
+    if(1 != cfg->devcfg.i2cport)
     {
         return(stm32ee_res_NOK);
     }
@@ -350,21 +377,21 @@ extern stm32ee_result_t stm32ee_init(const stm32ee_cfg_t *cfg)
     
     
     // init some data
-    if(1 == s_stm32ee_generics.cfg.i2cport)
+    if(1 == s_stm32ee_generics.cfg.devcfg.i2cport)
     {
-        s_stm32ee_generics.i2cx                         = (I2C_TypeDef*)stm32ee_hid_i2cx_port[s_stm32ee_generics.cfg.i2cport-1];
-        s_stm32ee_generics.i2cx_cfg.clock               = stm32ee_hid_i2cx_clock[s_stm32ee_generics.cfg.i2cport-1];
-        s_stm32ee_generics.i2cx_cfg.gpio_remap          = stm32ee_hid_i2cx_gpio_remap[s_stm32ee_generics.cfg.i2cport-1];
-        s_stm32ee_generics.i2cx_cfg.gpio_remap_clock    = stm32ee_hid_i2cx_gpio_remap_clock[s_stm32ee_generics.cfg.i2cport-1];
+        s_stm32ee_generics.i2cx                         = (I2C_TypeDef*)stm32ee_hid_i2cx_port[s_stm32ee_generics.cfg.devcfg.i2cport-1];
+        s_stm32ee_generics.i2cx_cfg.clock               = stm32ee_hid_i2cx_clock[s_stm32ee_generics.cfg.devcfg.i2cport-1];
+        s_stm32ee_generics.i2cx_cfg.gpio_remap          = stm32ee_hid_i2cx_gpio_remap[s_stm32ee_generics.cfg.devcfg.i2cport-1];
+        s_stm32ee_generics.i2cx_cfg.gpio_remap_clock    = stm32ee_hid_i2cx_gpio_remap_clock[s_stm32ee_generics.cfg.devcfg.i2cport-1];
     }
     else
     {
-        // in here use the other ports
+        return(stm32ee_res_NOK);
     }
     
     // init the generics according to the device
     
-    switch(s_stm32ee_generics.cfg.device)
+    switch(s_stm32ee_generics.cfg.devcfg.device)
     {
         case stm32ee_device_st_m24lr64:
         {
@@ -411,6 +438,13 @@ extern stm32ee_result_t stm32ee_init(const stm32ee_cfg_t *cfg)
     
     // apply extra bits
     s_stm32ee_generics.hwaddress |= stm32ee_hid_hwaddressa2a1a0;
+    
+    // init wp if needed
+    if((stm32ee_gpio_portNONE != s_stm32ee_generics.cfg.devcfg.wppin.port) && (stm32ee_gpio_pinNONE != s_stm32ee_generics.cfg.devcfg.wppin.pin) && ((255 != s_stm32ee_generics.cfg.devcfg.wpval)))
+    {
+        s_stm32ee_wp_init();
+        s_stm32ee_wp_enable();    
+    }
     
     
     // init i2c if needed
@@ -501,10 +535,16 @@ extern stm32ee_result_t stm32ee_write(uint32_t address, uint32_t size, uint8_t* 
     {
         return(stm32ee_res_NOK);
     } 
+    
+    
+    s_stm32ee_wp_disable();
 
     uint16_t WriteAddr = (uint16_t) address;
     uint16_t NumByteToWrite = (uint16_t) size;
     res = s_stm32ee_writebuffer(buffer, WriteAddr, NumByteToWrite);
+    
+    
+    s_stm32ee_wp_enable();
 
     if(NULL != writtenbytes)
     {
@@ -728,6 +768,38 @@ static stm32ee_result_t s_stm32ee_i2c_common_deinit(void)
     s_stm32ee_i2c_disable();
     s_stm32ee_i2c_gpio_deinit();
     
+    return(stm32ee_res_OK);
+}
+
+
+static stm32ee_result_t s_stm32ee_wp_init(void)
+{
+
+    return(stm32ee_res_OK);
+}
+
+static stm32ee_result_t s_stm32ee_wp_deinit(void)
+{
+
+    return(stm32ee_res_OK);
+}
+
+static stm32ee_result_t s_stm32ee_wp_enable(void)
+{
+    if(255 != s_stm32ee_generics.cfg.devcfg.wpval)
+    {
+        // set s_stm32ee_generics.cfg.wppin to value equal to 1 if s_stm32ee_generics.cfg.wpval is 1, else 0
+    }
+ 
+    return(stm32ee_res_OK);
+}
+
+static stm32ee_result_t s_stm32ee_wp_disable(void)
+{
+    if(255 != s_stm32ee_generics.cfg.devcfg.wpval)
+    {
+        // set s_stm32ee_generics.cfg.wppin to value equal to 0 if s_stm32ee_generics.cfg.wpval is 1, else 1
+    }
     return(stm32ee_res_OK);
 }
 
@@ -1168,7 +1240,7 @@ static stm32ee_result_t s_stm32_readbuffer(uint8_t* pBuffer, uint16_t ReadAddr, 
 
 static stm32ee_result_t s_stm32ee_verify_rw_bounds(uint32_t address, uint32_t *size, uint8_t* buffer)
 {   
-    if((stm32ee_device_none == s_stm32ee_generics.cfg.device) || (NULL == buffer) || (0 == *size) || (address >= s_stm32ee_generics.totalsize))
+    if((stm32ee_device_none == s_stm32ee_generics.cfg.devcfg.device) || (NULL == buffer) || (0 == *size) || (address >= s_stm32ee_generics.totalsize))
     {
         return(stm32ee_res_NOK);
     }
@@ -1553,9 +1625,9 @@ static stm32ee_result_t s_stm32ee_waiteepromstandbystate(void)
 
 static stm32ee_result_t s_stm32ee_timeoutexpired(void) 
 {
-    if(NULL != s_stm32ee_generics.cfg.functionontimeout)
+    if(NULL != s_stm32ee_generics.cfg.devcfg.functionontimeout)
     {
-        s_stm32ee_generics.cfg.functionontimeout();
+        s_stm32ee_generics.cfg.devcfg.functionontimeout();
         return(stm32ee_res_NOK);
     }
     else

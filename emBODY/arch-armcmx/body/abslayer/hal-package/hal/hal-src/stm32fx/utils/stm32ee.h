@@ -144,17 +144,23 @@ typedef struct
     uint8_t                 dontuse;       /**< if 1, then initialisation is already done externally. */
 } stm32ee_dma_cfg_t;
 
+typedef struct
+{
+    stm32ee_device_t        device;
+    uint8_t                 i2cport;            /**< it can be 1, 2, 3. so far only port 1 is supported. */
+    stm32ee_gpio_t          wppin;
+    uint8_t                 wpval;              /**< 1 if protection is high, 0, if it is low, 255 if not used */
+    stm32ee_void_fp_void_t  functionontimeout;
+} stm32ee_dev_cfg_t;
 
 /** @typedef    typedef struct stm32ee_cfg_t;
     @brief      contains configuration data of eeprom.
  **/
 typedef struct
 {
-    stm32ee_device_t        device;
-    uint8_t                 i2cport;            /**< it can be 1, 2, 3. so far only port 1 is supported. */
+    stm32ee_dev_cfg_t       devcfg;
     stm32ee_i2c_cfg_t       i2ccfg;
     stm32ee_dma_cfg_t       dmacfg;
-    stm32ee_void_fp_void_t  functionontimeout;
 } stm32ee_cfg_t;
 
 // remember to implement sw reset as seen in atmel datasheet.
