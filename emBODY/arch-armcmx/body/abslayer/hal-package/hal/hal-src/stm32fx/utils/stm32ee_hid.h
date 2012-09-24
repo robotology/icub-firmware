@@ -73,35 +73,6 @@ extern const uint32_t           stm32ee_hid_timeout_flag;
 extern const uint32_t           stm32ee_hid_timeout_long;
 extern const uint32_t           stm32ee_hid_ackaddress_maxtrials;
 
-// -- the three bit address which depends on how the A2 A1 A0 pins of eeprom are connected to the board
-
-//extern const uint8_t            stm32ee_hid_hwaddressa2a1a0;
-
-
-// -- i2c ports
-
-extern const I2C_TypeDef *      stm32ee_hid_i2cx_port[3];
-extern const uint32_t           stm32ee_hid_i2cx_clock[3];  
-extern const uint32_t           stm32ee_hid_i2cx_gpio_remap_clock[3];  
-extern const uint32_t           stm32ee_hid_i2cx_gpio_remap[3];
-
-
-// -- i2c pins: not used anymore ...
-//
-// extern const uint32_t           stm32ee_hid_i2c_gpio_scl_clock;       
-// extern const GPIO_TypeDef *     stm32ee_hid_i2c_gpio_scl_port;
-// extern const uint16_t           stm32ee_hid_i2c_gpio_scl_pinnum;
-// extern const GPIO_InitTypeDef   stm32ee_hid_i2c_gpio_scl_pin;
-
-// extern const GPIO_InitTypeDef   stm32ee_hid_i2c_gpio_scl_floatingpin;
-
-// extern const uint32_t           stm32ee_hid_i2c_gpio_sda_clock;       
-// extern const GPIO_TypeDef *     stm32ee_hid_i2c_gpio_sda_port;
-// extern const uint16_t           stm32ee_hid_i2c_gpio_sda_pinnum;
-// extern const GPIO_InitTypeDef   stm32ee_hid_i2c_gpio_sda_pin;
-// extern const GPIO_InitTypeDef   stm32ee_hid_i2c_gpio_sda_floatingpin;
-
-
 // -- dma
 
 extern const NVIC_InitTypeDef   stm32ee_hid_dma_nvic_tx_enable;
@@ -114,14 +85,14 @@ extern const NVIC_InitTypeDef   stm32ee_hid_dma_nvic_rx_disable;
 
 extern const uint32_t           stm32ee_hid_dma_clock; 
 
-extern DMA_TypeDef *            stm32ee_hid_dma;
+//extern DMA_TypeDef *            stm32ee_hid_dma;
 
 #if     defined(USE_STM32F1)
-extern DMA_Channel_TypeDef *    stm32ee_hid_dma_stream_tx;
-extern DMA_Channel_TypeDef *    stm32ee_hid_dma_stream_rx;
+extern DMA_Channel_TypeDef * const  stm32ee_hid_dma_stream_tx;
+extern DMA_Channel_TypeDef * const  stm32ee_hid_dma_stream_rx;
 #elif   defined(USE_STM32F4)
-extern DMA_Stream_TypeDef *     stm32ee_hid_dma_stream_tx;
-extern DMA_Stream_TypeDef *     stm32ee_hid_dma_stream_rx;
+extern DMA_Stream_TypeDef * const   stm32ee_hid_dma_stream_tx;
+extern DMA_Stream_TypeDef * const   stm32ee_hid_dma_stream_rx;
 #endif
 
 extern const DMA_InitTypeDef    stm32ee_hid_dma_cfg_init;

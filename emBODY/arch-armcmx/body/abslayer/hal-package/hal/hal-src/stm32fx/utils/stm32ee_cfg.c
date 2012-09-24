@@ -52,9 +52,7 @@
 
 #define stm32ee_BASICTIMEOUT                ((uint32_t)0x00111000)
 #define stm32ee_MAXTRIALS                   (300)
-//#define stm32ee_HWADDR_A2                   (0)
-//#define stm32ee_HWADDR_A1                   (0)
-//#define stm32ee_HWADDR_A0                   (0)
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -64,51 +62,8 @@ const uint32_t          stm32ee_hid_timeout_flag            = stm32ee_BASICTIMEO
 const uint32_t          stm32ee_hid_timeout_long            = 10 * stm32ee_BASICTIMEOUT;
 const uint32_t          stm32ee_hid_ackaddress_maxtrials    = stm32ee_MAXTRIALS;
 
-//const uint8_t           stm32ee_hid_hwaddressa2a1a0         = (stm32ee_HWADDR_A2 << 3) | (stm32ee_HWADDR_A1 << 2) | (stm32ee_HWADDR_A0 << 1);
-
 
 #if     defined(USE_STM32F1)
-
-// -- i2c ports
-
-const I2C_TypeDef *      stm32ee_hid_i2cx_port[3]               = {I2C1, I2C2, NULL};
-const uint32_t           stm32ee_hid_i2cx_clock[3]              = {RCC_APB1Periph_I2C1, RCC_APB1Periph_I2C2, 0};  
-const uint32_t           stm32ee_hid_i2cx_gpio_remap_clock[3]   = {RCC_APB2Periph_AFIO, 1, 1}; // 1 means that i dont know if it is correct     
-const uint32_t           stm32ee_hid_i2cx_gpio_remap[3]         = {GPIO_Remap_I2C1, GPIO_Remap_I2C1, GPIO_Remap_I2C1};
-
-// -- i2c pins: not used anymore ...
-//
-// const uint32_t          stm32ee_hid_i2c_gpio_scl_clock      = RCC_APB2Periph_GPIOB;       
-// const GPIO_TypeDef *    stm32ee_hid_i2c_gpio_scl_port       = GPIOB;
-// const uint16_t          stm32ee_hid_i2c_gpio_scl_pinnum     = 8;
-// const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_scl_pin        =
-// {
-//     .GPIO_Pin       = GPIO_Pin_8,
-//     .GPIO_Speed     = GPIO_Speed_50MHz,
-//     .GPIO_Mode      = GPIO_Mode_AF_OD
-// };
-// const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_scl_floatingpin =
-// {
-//     .GPIO_Pin       = GPIO_Pin_8,
-//     .GPIO_Speed     = GPIO_Speed_2MHz,
-//     .GPIO_Mode      = GPIO_Mode_IN_FLOATING,
-// };
-
-// const uint32_t          stm32ee_hid_i2c_gpio_sda_clock      = RCC_APB2Periph_GPIOB;       
-// const GPIO_TypeDef *    stm32ee_hid_i2c_gpio_sda_port       = GPIOB;
-// const uint16_t          stm32ee_hid_i2c_gpio_sda_pinnum     = 9;
-// const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_sda_pin        =
-// {
-//     .GPIO_Pin       = GPIO_Pin_9,
-//     .GPIO_Speed     = GPIO_Speed_50MHz,
-//     .GPIO_Mode      = GPIO_Mode_AF_OD,
-// };
-// const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_sda_floatingpin =
-// {
-//     .GPIO_Pin       = GPIO_Pin_9,
-//     .GPIO_Speed     = GPIO_Speed_2MHz,
-//     .GPIO_Mode      = GPIO_Mode_IN_FLOATING,
-// };
 
 
 // -- dma
@@ -148,9 +103,9 @@ const NVIC_InitTypeDef  stm32ee_hid_dma_nvic_rx_disable =
 
 const uint32_t          stm32ee_hid_dma_clock       = RCC_AHBPeriph_DMA1; 
 
-DMA_TypeDef *           stm32ee_hid_dma             = DMA1;
-DMA_Channel_TypeDef *   stm32ee_hid_dma_stream_tx   = DMA1_Channel6;
-DMA_Channel_TypeDef *   stm32ee_hid_dma_stream_rx   = DMA1_Channel7;
+//DMA_TypeDef *           stm32ee_hid_dma             = DMA1;
+DMA_Channel_TypeDef * const  stm32ee_hid_dma_stream_tx   = DMA1_Channel6;
+DMA_Channel_TypeDef * const  stm32ee_hid_dma_stream_rx   = DMA1_Channel7;
 
 #define stm32ee_hid_dma_I2C_DMA_TX_IRQHandler    DMA1_Channel6_IRQHandler
 #define stm32ee_hid_dma_I2C_DMA_RX_IRQHandler    DMA1_Channel7_IRQHandler   
@@ -182,59 +137,6 @@ const uint32_t          stm32ee_hid_dma_flags_rx_all            = (DMA1_IT_GL7);
 
 
 #elif   defined(USE_STM32F4)
-
-// -- i2c ports
-
-
-const I2C_TypeDef *      stm32ee_hid_i2cx_port[3]               = {I2C1, I2C2, I2C3};
-const uint32_t           stm32ee_hid_i2cx_clock[3]              = {RCC_APB1Periph_I2C1, RCC_APB1Periph_I2C2, RCC_APB1Periph_I2C3};  
-const uint32_t           stm32ee_hid_i2cx_gpio_remap_clock[3]   = {RCC_APB2Periph_SYSCFG, 1, 1}; // 1 means that i dont know if it is correct     
-const uint32_t           stm32ee_hid_i2cx_gpio_remap[3]         = {GPIO_AF_I2C1, GPIO_AF_I2C2, GPIO_AF_I2C3};
-
-
-// -- i2c pins
-
-// const uint32_t          stm32ee_hid_i2c_gpio_scl_clock      = RCC_AHB1Periph_GPIOB;       
-// const GPIO_TypeDef *    stm32ee_hid_i2c_gpio_scl_port       = GPIOB;
-// const uint16_t          stm32ee_hid_i2c_gpio_scl_pinnum     = GPIO_PinSource8;
-// const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_scl_pin        =
-// {
-//     .GPIO_Pin       = GPIO_Pin_8,
-//     .GPIO_Mode      = GPIO_Mode_AF,
-//     .GPIO_Speed     = GPIO_Speed_50MHz,
-//     .GPIO_OType     = GPIO_OType_OD,
-//     .GPIO_PuPd      = GPIO_PuPd_NOPULL
-// };
-// const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_scl_floatingpin =
-// {
-//     .GPIO_Pin       = GPIO_Pin_8,
-//     .GPIO_Mode      = GPIO_Mode_IN,
-//     .GPIO_Speed     = GPIO_Speed_2MHz,
-//     .GPIO_OType     = GPIO_OType_PP,
-//     .GPIO_PuPd      = GPIO_PuPd_NOPULL
-// };
-
-// const uint32_t          stm32ee_hid_i2c_gpio_sda_clock      = RCC_AHB1Periph_GPIOB;       
-// const GPIO_TypeDef *    stm32ee_hid_i2c_gpio_sda_port       = GPIOB;
-// const uint16_t          stm32ee_hid_i2c_gpio_sda_pinnum     = GPIO_PinSource9;
-// const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_sda_pin        =
-// {
-//     .GPIO_Pin       = GPIO_Pin_9,
-//     .GPIO_Mode      = GPIO_Mode_AF,
-//     .GPIO_Speed     = GPIO_Speed_50MHz,
-//     .GPIO_OType     = GPIO_OType_OD,
-//     .GPIO_PuPd      = GPIO_PuPd_NOPULL
-// };
-// const GPIO_InitTypeDef  stm32ee_hid_i2c_gpio_sda_floatingpin =
-// {
-//     .GPIO_Pin       = GPIO_Pin_9,
-//     .GPIO_Mode      = GPIO_Mode_IN,
-//     .GPIO_Speed     = GPIO_Speed_2MHz,
-//     .GPIO_OType     = GPIO_OType_PP,
-//     .GPIO_PuPd      = GPIO_PuPd_NOPULL
-// };
-
-
 
 // -- dma
 
@@ -272,9 +174,9 @@ const NVIC_InitTypeDef  stm32ee_hid_dma_nvic_rx_disable =
 
 const uint32_t          stm32ee_hid_dma_clock       = RCC_AHB1Periph_DMA1; 
 
-DMA_TypeDef *           stm32ee_hid_dma             = DMA1;
-DMA_Stream_TypeDef *    stm32ee_hid_dma_stream_tx   = DMA1_Stream6;
-DMA_Stream_TypeDef *    stm32ee_hid_dma_stream_rx   = DMA1_Stream0;
+//DMA_TypeDef *           stm32ee_hid_dma             = DMA1;
+DMA_Stream_TypeDef * const   stm32ee_hid_dma_stream_tx   = DMA1_Stream6;
+DMA_Stream_TypeDef * const   stm32ee_hid_dma_stream_rx   = DMA1_Stream0;
 
 #define stm32ee_hid_dma_I2C_DMA_TX_IRQHandler    DMA1_Stream6_IRQHandler
 #define stm32ee_hid_dma_I2C_DMA_RX_IRQHandler    DMA1_Stream0_IRQHandler   

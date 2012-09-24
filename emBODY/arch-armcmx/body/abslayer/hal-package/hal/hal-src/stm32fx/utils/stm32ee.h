@@ -83,10 +83,9 @@ typedef enum
 typedef void (*stm32ee_void_fp_void_t) (void);
 
 
-/** @typedef    typedef void (*stm32ee_void_fp_voidp_t) (void* p)
-    @brief      stm32ee_void_fp_voidp_t is a pointer to a function which returns void and has a void pointer argument.
- **/
-typedef void (*stm32ee_void_fp_voidp_t) (void* p);
+
+
+typedef int8_t (*stm32ee_int8_fp_uint8_voidp_t) (uint8_t, void* p);
 
 // keep same values as hal_gpio_port_t
 typedef enum 
@@ -132,10 +131,9 @@ typedef struct
 
 typedef struct
 {
-    uint8_t                 dontinit;       /**< if 1, then initialisation is already done externally. */
-    uint8_t                 i2cspeed;       /**< in multiples of 100K. valid values are only 1 and 4. */
-    stm32ee_gpio_t          scl;
-    stm32ee_gpio_t          sda;
+    stm32ee_int8_fp_uint8_voidp_t   i2cinit;
+    stm32ee_int8_fp_uint8_voidp_t   i2cdeinit;
+    void*                           i2cpar;
 } stm32ee_i2c_cfg_t;
 
 
@@ -147,12 +145,13 @@ typedef struct
 typedef struct
 {
     stm32ee_device_t        device;
-    uint8_t                 i2cport;            /**< it can be 1, 2, 3. so far only port 1 is supported. */
+    uint8_t                 i2cport;            /**< it can be 1, 2, 3. */
     uint8_t                 hwaddra2a1a0;       /**< put a 1 in pos 2, 1, 0 if the a2, a1, a0 is high. */
     uint8_t                 wpval;              /**< 1 if protection is high, 0, if it is low, 255 if not used */
     stm32ee_gpio_t          wppin;
     stm32ee_void_fp_void_t  functionontimeout;
 } stm32ee_dev_cfg_t;
+
 
 /** @typedef    typedef struct stm32ee_cfg_t;
     @brief      contains configuration data of eeprom.

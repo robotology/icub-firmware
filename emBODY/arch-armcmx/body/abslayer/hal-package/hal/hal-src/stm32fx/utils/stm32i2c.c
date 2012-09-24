@@ -166,7 +166,7 @@ static const I2C_InitTypeDef   s_stm32i2c_i2c_cfg       =
 
 static const uint8_t s_stm32i2c_maxports                    = 2;
 
-static const I2C_TypeDef *      s_stm32i2c_i2cx_port[3]               = {I2C1, I2C2, NULL};
+static I2C_TypeDef* const       s_stm32i2c_i2cx_port[3]               = {I2C1, I2C2, NULL};
 static const uint32_t           s_stm32i2c_i2cx_clock[3]              = {RCC_APB1Periph_I2C1, RCC_APB1Periph_I2C2, 0};  
 static const uint32_t           s_stm32i2c_i2cx_gpio_remap_clock[3]   = {RCC_APB2Periph_AFIO, 1, 1}; // 1 means that i dont know if it is correct     
 static const uint32_t           s_stm32i2c_i2cx_gpio_remap[3]         = {GPIO_Remap_I2C1, GPIO_Remap_I2C1, GPIO_Remap_I2C1};
@@ -175,7 +175,7 @@ static const uint32_t           s_stm32i2c_i2cx_gpio_remap[3]         = {GPIO_Re
 static const uint32_t s_stm32i2c_i2c_gpio_thegpioclocks[]    = { RCC_APB2Periph_GPIOA, RCC_APB2Periph_GPIOB, RCC_APB2Periph_GPIOC, 
                                                                 RCC_APB2Periph_GPIOD, RCC_APB2Periph_GPIOE, RCC_APB2Periph_GPIOF, 
                                                                 RCC_APB2Periph_GPIOG };  
-static const GPIO_TypeDef* s_stm32i2c_i2c_gpio_thegpioports[]= { GPIOA, GPIOB, GPIOC, 
+static GPIO_TypeDef* const s_stm32i2c_i2c_gpio_thegpioports[]= { GPIOA, GPIOB, GPIOC, 
                                                                 GPIOD, GPIOE, GPIOF, 
                                                                 GPIOG };  
 static const uint8_t  s_stm32i2c_i2c_gpio_thepinnums[]       = { 0,  1,  2,  3,
@@ -208,7 +208,7 @@ static const uint8_t s_stm32i2c_maxports                    = 3;
 
 
 
-static const I2C_TypeDef *      s_stm32i2c_i2cx_port[3]               = {I2C1, I2C2, I2C3};
+static  I2C_TypeDef* const      s_stm32i2c_i2cx_port[3]               = {I2C1, I2C2, I2C3};
 static const uint32_t           s_stm32i2c_i2cx_clock[3]              = {RCC_APB1Periph_I2C1, RCC_APB1Periph_I2C2, RCC_APB1Periph_I2C3};  
 static const uint32_t           s_stm32i2c_i2cx_gpio_remap_clock[3]   = {RCC_APB2Periph_SYSCFG, 1, 1}; // 1 means that i dont know if it is correct     
 static const uint32_t           s_stm32i2c_i2cx_gpio_remap[3]         = {GPIO_AF_I2C1, GPIO_AF_I2C2, GPIO_AF_I2C3};
@@ -217,7 +217,7 @@ static const uint32_t           s_stm32i2c_i2cx_gpio_remap[3]         = {GPIO_AF
 static const uint32_t s_stm32i2c_i2c_gpio_thegpioclocks[]    = { RCC_AHB1Periph_GPIOA, RCC_AHB1Periph_GPIOB, RCC_AHB1Periph_GPIOC, 
                                                                 RCC_AHB1Periph_GPIOD, RCC_AHB1Periph_GPIOE, RCC_AHB1Periph_GPIOF, 
                                                                 RCC_AHB1Periph_GPIOG, RCC_AHB1Periph_GPIOH, RCC_AHB1Periph_GPIOI };  
-static const GPIO_TypeDef* s_stm32i2c_i2c_gpio_thegpioports[]= { GPIOA, GPIOB, GPIOC, 
+static GPIO_TypeDef* const s_stm32i2c_i2c_gpio_thegpioports[]= { GPIOA, GPIOB, GPIOC, 
                                                                 GPIOD, GPIOE, GPIOF, 
                                                                 GPIOG, GPIOH, GPIOI };  
 static const uint8_t  s_stm32i2c_i2c_gpio_thepinnums[]       = { GPIO_PinSource0,  GPIO_PinSource1,  GPIO_PinSource2,  GPIO_PinSource3,

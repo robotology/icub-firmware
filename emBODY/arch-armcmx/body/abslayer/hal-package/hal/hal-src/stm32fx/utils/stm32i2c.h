@@ -65,17 +65,6 @@ typedef enum
 
 
 
-/** @typedef    typedef void (*stm32i2c_void_fp_void_t) (void)
-    @brief      stm32i2c_void_fp_void_t is a pointer to a function which returns void and has a void argument.
- **/
-typedef void (*stm32i2c_void_fp_void_t) (void);
-
-
-/** @typedef    typedef void (*stm32i2c_void_fp_voidp_t) (void* p)
-    @brief      stm32i2c_void_fp_voidp_t is a pointer to a function which returns void and has a void pointer argument.
- **/
-typedef void (*stm32i2c_void_fp_voidp_t) (void* p);
-
 // keep same values as hal_gpio_port_t
 typedef enum 
 {
