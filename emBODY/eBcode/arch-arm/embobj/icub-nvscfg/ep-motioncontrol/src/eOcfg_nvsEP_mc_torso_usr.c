@@ -215,12 +215,22 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_torso_usr_array_of_EOnv_usr[] =
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j00 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j00_ebx_jconfig__controlmode,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j00_ebx_jconfig__holder01FFU00,
         EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j00_ebx_jconfig__motionmonitormode,
+        EONV_ONROPRECEPTION_IS_NULL                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },  
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j00_ebx_jconfig__encoderconversionfactor,
+        EONV_ONROPRECEPTION_IS_NULL                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j00_ebx_jconfig__encoderconversionoffset,
         EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },    
@@ -268,7 +278,12 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_torso_usr_array_of_EOnv_usr[] =
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j00_ebx_jstatus__chamaleon04,
         EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
-    },  
+    }, 
+    {   // j00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j00_ebx_jinputs,
+        EONV_ONROPRECEPTION_IS_NULL                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },    
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j00_ebx_jinputs__externallymeasuredtorque,
         EONV_ONROPRECEPTION_IS_NULL                
@@ -300,7 +315,7 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_torso_usr_array_of_EOnv_usr[] =
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j00 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j00_ebx_jcmmnds__holder01FFU01,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j00_ebx_jcmmnds__controlmode,
         EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
@@ -356,12 +371,22 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_torso_usr_array_of_EOnv_usr[] =
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j01 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j01_ebx_jconfig__controlmode,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j01_ebx_jconfig__holder01FFU00,
         EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j01_ebx_jconfig__motionmonitormode,
+        EONV_ONROPRECEPTION_IS_NULL                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j01_ebx_jconfig__encoderconversionfactor,
+        EONV_ONROPRECEPTION_IS_NULL                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j01_ebx_jconfig__encoderconversionoffset,
         EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },    
@@ -409,7 +434,12 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_torso_usr_array_of_EOnv_usr[] =
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j01_ebx_jstatus__chamaleon04,
         EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
-    },  
+    },
+    {   // j01 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j01_ebx_jinputs,
+        EONV_ONROPRECEPTION_IS_NULL                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },     
     {   // j01 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j01_ebx_jinputs__externallymeasuredtorque,
         EONV_ONROPRECEPTION_IS_NULL                
@@ -441,7 +471,7 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_torso_usr_array_of_EOnv_usr[] =
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j01 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j01_ebx_jcmmnds__holder01FFU01,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j01_ebx_jcmmnds__controlmode,
         EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
@@ -497,12 +527,22 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_torso_usr_array_of_EOnv_usr[] =
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j02 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j02_ebx_jconfig__controlmode,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j02_ebx_jconfig__holder01FFU00,
         EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j02_ebx_jconfig__motionmonitormode,
+        EONV_ONROPRECEPTION_IS_NULL                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },
+    {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j02_ebx_jconfig__encoderconversionfactor,
+        EONV_ONROPRECEPTION_IS_NULL                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    }, 
+    {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j02_ebx_jconfig__encoderconversionoffset,
         EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },    
@@ -550,7 +590,12 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_torso_usr_array_of_EOnv_usr[] =
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j02_ebx_jstatus__chamaleon04,
         EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
-    },  
+    }, 
+    {   // j02 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j02_ebx_jinputs,
+        EONV_ONROPRECEPTION_IS_NULL                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },    
     {   // j02 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j02_ebx_jinputs__externallymeasuredtorque,
         EONV_ONROPRECEPTION_IS_NULL                
@@ -582,7 +627,7 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_mc_torso_usr_array_of_EOnv_usr[] =
         EO_INIT(.stg_address)           EOK_uint32dummy       
     },  
     {   // j02 
-        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j02_ebx_jcmmnds__holder01FFU01,
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_torso_j02_ebx_jcmmnds__controlmode,
         EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
     }, 
@@ -889,11 +934,11 @@ __weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jconfig__velocitysetpo
 }
 
 
-__weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jconfig__controlmode(uint16_t xx, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jconfig__holder01FFU00(uint16_t xx, const EOnv* nv)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__controlmode((eOcfg_nvsEP_mc_jointNumber_t)xx, nv);
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__holder01FFU00((eOcfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jconfig__motionmonitormode(uint16_t xx, const EOnv* nv)
@@ -902,6 +947,20 @@ __weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jconfig__motionmonitor
     theOwnershipIsLocal = theOwnershipIsLocal;
     eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__motionmonitormode((eOcfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
+
+__weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jconfig__encoderconversionfactor(uint16_t xx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__encoderconversionfactor((eOcfg_nvsEP_mc_jointNumber_t)xx, nv);
+}
+
+__weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jconfig__encoderconversionoffset(uint16_t xx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__encoderconversionoffset((eOcfg_nvsEP_mc_jointNumber_t)xx, nv);
+}    
 
 __weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jconfig__des02FORjstatuschamaleon04(uint16_t xx, const EOnv* nv)
 {
@@ -971,6 +1030,13 @@ __weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jstatus__chamaleon04(u
     eo_cfg_nvsEP_mc_hid_INIT_Jxx_jstatus__chamaleon04((eOcfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
+__weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jinputs(uint16_t xx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jinputs((eOcfg_nvsEP_mc_jointNumber_t)xx, nv);
+}
+
 __weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jinputs__externallymeasuredtorque(uint16_t xx, const EOnv* nv)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
@@ -1015,11 +1081,11 @@ __weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jcmmnds__stoptrajector
     eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__stoptrajectory((eOcfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
-__weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jcmmnds__holder01FFU01(uint16_t xx, const EOnv* nv)
+__weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jcmmnds__controlmode(uint16_t xx, const EOnv* nv)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__holder01FFU01((eOcfg_nvsEP_mc_jointNumber_t)xx, nv);
+    eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__controlmode((eOcfg_nvsEP_mc_jointNumber_t)xx, nv);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_INIT_Jxx_jcmmnds__holder01FFU02(uint16_t xx, const EOnv* nv)
@@ -1100,11 +1166,11 @@ __weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jconfig__velocitysetpo
 }
 
 
-__weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jconfig__controlmode(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jconfig__holder01FFU00(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__controlmode((eOcfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__holder01FFU00((eOcfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jconfig__motionmonitormode(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
@@ -1112,6 +1178,20 @@ __weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jconfig__motionmonitor
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
     eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__motionmonitormode((eOcfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
+}
+
+__weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jconfig__encoderconversionfactor(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__encoderconversionfactor((eOcfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
+}
+
+__weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jconfig__encoderconversionoffset(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__encoderconversionoffset((eOcfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jconfig__des02FORjstatuschamaleon04(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
@@ -1182,6 +1262,13 @@ __weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jstatus__chamaleon04(u
     eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jstatus__chamaleon04((eOcfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
+__weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jinputs(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs((eOcfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
+}
+
 __weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jinputs__externallymeasuredtorque(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
@@ -1226,11 +1313,11 @@ __weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jcmmnds__stoptrajector
     eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__stoptrajectory((eOcfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
-__weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jcmmnds__holder01FFU01(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+__weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jcmmnds__controlmode(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
-    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__holder01FFU01((eOcfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
+    eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode((eOcfg_nvsEP_mc_jointNumber_t)xx, nv, time, sign);
 }
 
 __weak extern void eo_cfg_nvsEP_mc_torso_usr_hid_UPDT_Jxx_jcmmnds__holder01FFU02(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)

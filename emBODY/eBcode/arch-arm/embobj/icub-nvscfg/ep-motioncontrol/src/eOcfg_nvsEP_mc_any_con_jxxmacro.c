@@ -205,21 +205,21 @@ EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__velocitysetp
 #define OFFSETafter_jconfig__velocitysetpointtimeout            (OFFSETof_jconfig__velocitysetpointtimeout+CAPACITY_jconfig__velocitysetpointtimeout)
 
 
-#define OFFSETof_jconfig__controlmode            (OFFSETafter_jconfig__velocitysetpointtimeout)
-#define CAPACITY_jconfig__controlmode            (sizeof(eOenum08_t))
-EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__controlmode) =
+#define OFFSETof_jconfig__holder01FFU00            (OFFSETafter_jconfig__velocitysetpointtimeout)
+#define CAPACITY_jconfig__holder01FFU00            (sizeof(eOenum08_t))
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__holder01FFU00) =
 {   
-    EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jconfig__controlmode, JMACRO_JNUM),    
-    EO_INIT(.capacity)  CAPACITY_jconfig__controlmode,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.jconfig.controlmode,
-    EO_INIT(.offset)    OFFSETof_jconfig__controlmode,
-    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__controlmode),
-    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__controlmode)
+    EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jconfig__holder01FFU00, JMACRO_JNUM),    
+    EO_INIT(.capacity)  CAPACITY_jconfig__holder01FFU00,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.jconfig.holder01FFU00,
+    EO_INIT(.offset)    OFFSETof_jconfig__holder01FFU00,
+    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__holder01FFU00),
+    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__holder01FFU00)
 };
-#define OFFSETafter_jconfig__controlmode          (OFFSETof_jconfig__controlmode+CAPACITY_jconfig__controlmode)
+#define OFFSETafter_jconfig__holder01FFU00          (OFFSETof_jconfig__holder01FFU00+CAPACITY_jconfig__holder01FFU00)
 
 
-#define OFFSETof_jconfig__motionmonitormode            (OFFSETafter_jconfig__controlmode)
+#define OFFSETof_jconfig__motionmonitormode            (OFFSETafter_jconfig__holder01FFU00)
 #define CAPACITY_jconfig__motionmonitormode            (sizeof(eOenum08_t))
 EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__motionmonitormode) =
 {   
@@ -233,7 +233,34 @@ EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__motionmonito
 #define OFFSETafter_jconfig__motionmonitormode          (OFFSETof_jconfig__motionmonitormode+CAPACITY_jconfig__motionmonitormode)
 
 
-#define OFFSETof_jconfig__des02FORjstatuschamaleon04            (OFFSETafter_jconfig__motionmonitormode)
+#define OFFSETof_jconfig__encoderconversionfactor            (OFFSETafter_jconfig__motionmonitormode)
+#define CAPACITY_jconfig__encoderconversionfactor            (sizeof(eOutil_emulfloat32_t))
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__encoderconversionfactor) =
+{   
+    EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jconfig__encoderconversionfactor, JMACRO_JNUM),    
+    EO_INIT(.capacity)  CAPACITY_jconfig__encoderconversionfactor,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.jconfig.encoderconversionfactor,
+    EO_INIT(.offset)    OFFSETof_jconfig__encoderconversionfactor,
+    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__encoderconversionfactor),
+    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__encoderconversionfactor)
+};
+#define OFFSETafter_jconfig__encoderconversionfactor          (OFFSETof_jconfig__encoderconversionfactor+CAPACITY_jconfig__encoderconversionfactor)
+
+#define OFFSETof_jconfig__encoderconversionoffset            (OFFSETafter_jconfig__encoderconversionfactor)
+#define CAPACITY_jconfig__encoderconversionoffset            (sizeof(eOutil_emulfloat32_t))
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__encoderconversionoffset) =
+{   
+    EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jconfig__encoderconversionoffset, JMACRO_JNUM),    
+    EO_INIT(.capacity)  CAPACITY_jconfig__encoderconversionoffset,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.jconfig.encoderconversionoffset,
+    EO_INIT(.offset)    OFFSETof_jconfig__encoderconversionoffset,
+    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__encoderconversionoffset),
+    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jconfig__encoderconversionoffset)
+};
+#define OFFSETafter_jconfig__encoderconversionoffset          (OFFSETof_jconfig__encoderconversionoffset+CAPACITY_jconfig__encoderconversionoffset)
+
+
+#define OFFSETof_jconfig__des02FORjstatuschamaleon04            (OFFSETafter_jconfig__encoderconversionoffset)
 #define CAPACITY_jconfig__des02FORjstatuschamaleon04            (2*sizeof(eOutil_chameleon_descr_t))
 EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__des02FORjstatuschamaleon04) =
 {   
@@ -303,7 +330,7 @@ EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jconfig__holder02FFU0
 
 //EO_VERIFYproposition(xxx, (OFFSETafter_jconfig__motionmonitormode-JMACRO_JOFF) == (16+16+16+12+4+4+2+1+1) );
 
-// guard on alignement of variables. if it doesnt compile then ... the compiler has surely inserted some holes
+// guard on alignement of variables. if it doesnt compile then ... there are holes
 MACRO_VERIFYSIZEOF(JMACRO_JNUM, eOmc_joint_config_t, OFFSETafter_jconfig__holder02FFU04-JMACRO_JOFF);
 
 
@@ -366,6 +393,19 @@ EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jstatus__chamaleon04)
 // guard on alignement of variables. if it doesnt compile then ... the compiler has surely inserted some holes
 //MACRO_VERIFYSIZEOF(JMACRO_JNUM, eOmc_joint_status_t, OFFSETafter_jstatus-OFFSETafter_jconfig__filler04-JMACRO_JOFF);
 
+#define OFFSETof_jinputs                                        (OFFSETafter_jstatus)
+#define CAPACITY_jinputs                                        sizeof(eOmc_joint_inputs_t)
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jinputs) =
+{   
+    EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jinputs, JMACRO_JNUM),
+    EO_INIT(.capacity)  CAPACITY_jinputs,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.jinputs,
+    EO_INIT(.offset)    OFFSETof_jinputs,
+    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jinputs),
+    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jinputs)
+};
+#define OFFSETafter_jinputs                                     (OFFSETof_jinputs+CAPACITY_jinputs)
+
 
 #define OFFSETof_jinputs__externallymeasuredtorque                  (OFFSETafter_jstatus)
 #define CAPACITY_jinputs__externallymeasuredtorque              sizeof(eOmeas_torque_t)
@@ -408,7 +448,7 @@ EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jinputs__holder04FFU0
 };
 #define OFFSETafter_jinputs__holder04FFU02           (OFFSETof_jinputs__holder04FFU02+CAPACITY_jinputs__holder04FFU02)
 
-#define OFFSETafter_jinputs                          OFFSETafter_jinputs__holder04FFU02
+//#define OFFSETafter_jinputs                          OFFSETafter_jinputs__holder04FFU02
 
 #define OFFSETof_jcmmnds__calibration                  (OFFSETafter_jinputs)
 #define CAPACITY_jcmmnds__calibration                   (sizeof(eOmc_calibrator_t))
@@ -453,21 +493,21 @@ EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__stoptrajecto
 #define OFFSETafter_jcmmnds__stoptrajectory           (OFFSETof_jcmmnds__stoptrajectory+CAPACITY_jcmmnds__stoptrajectory)
 
 
-#define OFFSETof_jcmmnds__holder01FFU01                  (OFFSETafter_jcmmnds__stoptrajectory)
-#define CAPACITY_jcmmnds__holder01FFU01                   (1)
-EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__holder01FFU01) =
+#define OFFSETof_jcmmnds__controlmode                  (OFFSETafter_jcmmnds__stoptrajectory)
+#define CAPACITY_jcmmnds__controlmode                   (1)
+EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__controlmode) =
 {   
-    EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jcmmnds__holder01FFU01, JMACRO_JNUM),
-    EO_INIT(.capacity)  CAPACITY_jcmmnds__holder01FFU01,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.jcmmnds.holder01FFU01,
-    EO_INIT(.offset)    OFFSETof_jcmmnds__holder01FFU01,
-    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__holder01FFU01),
-    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__holder01FFU01)
+    EO_INIT(.id)        MACRO_GETNVID(JMACRO_EXTERNALPREFIX_GETID, _jcmmnds__controlmode, JMACRO_JNUM),
+    EO_INIT(.capacity)  CAPACITY_jcmmnds__controlmode,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.jcmmnds.controlmode,
+    EO_INIT(.offset)    OFFSETof_jcmmnds__controlmode,
+    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__controlmode),
+    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_jxx_NVFUNTYP_jcmmnds__controlmode)
 };
-#define OFFSETafter_jcmmnds__holder01FFU01           (OFFSETof_jcmmnds__holder01FFU01+CAPACITY_jcmmnds__holder01FFU01)
+#define OFFSETafter_jcmmnds__controlmode           (OFFSETof_jcmmnds__controlmode+CAPACITY_jcmmnds__controlmode)
 
 
-#define OFFSETof_jcmmnds__holder01FFU02                  (OFFSETafter_jcmmnds__holder01FFU01)
+#define OFFSETof_jcmmnds__holder01FFU02                  (OFFSETafter_jcmmnds__controlmode)
 #define CAPACITY_jcmmnds__holder01FFU02                   (1)
 EOnv_con_t MACRO_NAMEOFVARIABLE(JMACRO_PSTR, JMACRO_JSTR, _jcmmnds__holder01FFU02) =
 {   

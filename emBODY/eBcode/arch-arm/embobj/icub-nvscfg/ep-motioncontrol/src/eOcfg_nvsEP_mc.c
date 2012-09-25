@@ -70,7 +70,6 @@
 #endif
 
 
-#warning --> remember to move controlmode (and motionmonitormode?) into eOmc_joint_commands_t ...
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -90,7 +89,7 @@ EO_VERIFYproposition(xxx, jointNVindex_jconfig__impedance                   == E
 EO_VERIFYproposition(xxx, jointNVindex_jconfig__minpositionofjoint          == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__minpositionofjoint);
 EO_VERIFYproposition(xxx, jointNVindex_jconfig__maxpositionofjoint          == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__maxpositionofjoint);
 EO_VERIFYproposition(xxx, jointNVindex_jconfig__velocitysetpointtimeout     == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__velocitysetpointtimeout);
-EO_VERIFYproposition(xxx, jointNVindex_jconfig__controlmode                 == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__controlmode);
+EO_VERIFYproposition(xxx, jointNVindex_jconfig__holder01FFU00                 == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__holder01FFU00);
 EO_VERIFYproposition(xxx, jointNVindex_jconfig__motionmonitormode           == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__motionmonitormode);
 EO_VERIFYproposition(xxx, jointNVindex_jconfig__des02FORjstatuschamaleon04  == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__des02FORjstatuschamaleon04);
 EO_VERIFYproposition(xxx, jointNVindex_jconfig__holder01FFU01               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jconfig__holder01FFU01);
@@ -103,6 +102,7 @@ EO_VERIFYproposition(xxx, jointNVindex_jstatus__basic                       == E
 EO_VERIFYproposition(xxx, jointNVindex_jstatus__ofpid                       == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jstatus__ofpid);
 EO_VERIFYproposition(xxx, jointNVindex_jstatus__chamaleon04                 == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jstatus__chamaleon04);
 
+EO_VERIFYproposition(xxx, jointNVindex_jinputs                              == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jinputs);
 EO_VERIFYproposition(xxx, jointNVindex_jinputs__externallymeasuredtorque    == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jinputs__externallymeasuredtorque);
 EO_VERIFYproposition(xxx, jointNVindex_jinputs__holder02FFU01               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jinputs__holder02FFU01);
 EO_VERIFYproposition(xxx, jointNVindex_jinputs__holder04FFU02               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jinputs__holder04FFU02);
@@ -110,7 +110,7 @@ EO_VERIFYproposition(xxx, jointNVindex_jinputs__holder04FFU02               == E
 EO_VERIFYproposition(xxx, jointNVindex_jcmmnds__calibration                 == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__calibration);
 EO_VERIFYproposition(xxx, jointNVindex_jcmmnds__setpoint                    == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__setpoint);
 EO_VERIFYproposition(xxx, jointNVindex_jcmmnds__stoptrajectory              == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__stoptrajectory);
-EO_VERIFYproposition(xxx, jointNVindex_jcmmnds__holder01FFU01               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__holder01FFU01);
+EO_VERIFYproposition(xxx, jointNVindex_jcmmnds__controlmode               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__controlmode);
 EO_VERIFYproposition(xxx, jointNVindex_jcmmnds__holder01FFU02               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__holder01FFU02);
 EO_VERIFYproposition(xxx, jointNVindex_jcmmnds__holder01FFU03               == EOK_cfg_nvsEP_mc_any_con_jxx_jnvindex_jcmmnds__holder01FFU03);
 
@@ -310,8 +310,8 @@ __weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__velocitysetpointtimeout
 }
 #endif
 
-#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__controlmode)
-__weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__controlmode(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__holder01FFU00)
+__weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__holder01FFU00(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -331,6 +331,29 @@ __weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__motionmonitormode(eOcfg
     ep = ep;
 }
 #endif
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__encoderconversionfactor)
+__weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__encoderconversionfactor(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__encoderconversionoffset)
+__weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__encoderconversionoffset(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__des02FORjstatuschamaleon04)
 __weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig__des02FORjstatuschamaleon04(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
@@ -431,6 +454,17 @@ __weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jstatus__chamaleon04(eOcfg_nvsEP
 }
 #endif
 
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_INIT_Jxx_jinputs)
+__weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jinputs(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
 #if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_INIT_Jxx_jinputs__externallymeasuredtorque)
 __weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jinputs__externallymeasuredtorque(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
 {
@@ -497,8 +531,8 @@ __weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__stoptrajectory(eOcfg_nv
 }
 #endif
 
-#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__holder01FFU01)
-__weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__holder01FFU01(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__controlmode)
+__weak extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -621,8 +655,8 @@ __weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__velocitysetpointtimeout
 }
 #endif
 
-#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__controlmode)
-__weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__controlmode(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__holder01FFU00)
+__weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__holder01FFU00(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -634,6 +668,28 @@ __weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__controlmode(eOcfg_nvsEP
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__motionmonitormode)
 __weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__motionmonitormode(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__encoderconversionfactor)
+__weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__encoderconversionfactor(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__encoderconversionoffset)
+__weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__encoderconversionoffset(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -742,6 +798,18 @@ __weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jstatus__chamaleon04(eOcfg_nvsEP
 }
 #endif
 
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs)
+__weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
+
 #if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs__externallymeasuredtorque)
 __weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs__externallymeasuredtorque(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
@@ -808,8 +876,8 @@ __weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__stoptrajectory(eOcfg_nv
 }
 #endif
 
-#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__holder01FFU01)
-__weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__holder01FFU01(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+#if !defined(OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode)
+__weak extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
