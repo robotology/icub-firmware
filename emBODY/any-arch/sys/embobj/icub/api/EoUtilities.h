@@ -54,6 +54,10 @@ extern "C" {
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
+typedef int32_t eOutil_emulfloat32_t;
+#define EOUTIL_EMULFLOAT32_ONE      1
+#define EOUTIL_EMULFLOAT32_ZERO     0
+
 
 //typedef uint8_t eOutil_chameleon_id_t;      // invalid chameleon is 0xff
 typedef struct
