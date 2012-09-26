@@ -439,26 +439,32 @@ extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_sta
     jointStatus->acceleration        = 0; //eo_speedometer_GetAcceleration(o->speedmeter);       
     jointStatus->torque              = 0;
     
+}
+
+extern eObool_t eo_axisController_GetMotionDone(EOaxisController *o)
+{
     switch (o->control_mode)
     {
         case CM_IDLE:
         case CM_OPENLOOP:
-            jointStatus->motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;
-            break;
+            return eobool_false;
 
-        case CM_VELOCITY:
         case CM_POS_VEL:
         case CM_POSITION:
+        case CM_VELOCITY:
         case CM_CALIB_ABS_POS_SENS:
-            jointStatus->motionmonitorstatus = (eOenum08_t)SET_POINT_REACHED(o->reach_max_error);
-            break;
-
+            return eo_trajectory_IsDone(o->trajectory);
+       
+        case CM_IMPEDANCE_POS:
         case CM_TORQUE:
-            #warning (ALE) to be implemented
-            jointStatus->motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;
-            break;
-    } 
+        case CM_IMPEDANCE_VEL:
+        #warning (ALE) to be implemented
+            return eobool_false;
+    }
+    
+    return eobool_false;
 }
+
 
 extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint_status_ofpid_t* pidStatus)
 {
