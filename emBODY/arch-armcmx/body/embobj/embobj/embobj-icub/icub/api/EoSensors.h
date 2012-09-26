@@ -206,11 +206,16 @@ typedef struct                      // size is: 4+4+40+0 = 48
 
     
 
-/** @typedef    typedef uint8_t  eOsnsr_sensorId_t
-    @brief      eOsnsr_sensorId_t contains the values required to identify a sensor board in robot.
+/** @typedef    typedef uint8_t  eOsnsr_maisId_t
+    @brief      eOsnsr_maisId_t contains the values required to identify a mais sensor board in robot.
  **/
-typedef uint8_t  eOsnsr_sensorId_t;
+typedef uint16_t  eOsnsr_maisId_t;
     
+/** @typedef    typedef uint8_t  eOsnsr_strainId_t
+    @brief      eOsnsr_strainId_t contains the values required to identify a strain sensor board in robot.
+ **/
+typedef uint16_t  eOsnsr_strainId_t;
+
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
 
