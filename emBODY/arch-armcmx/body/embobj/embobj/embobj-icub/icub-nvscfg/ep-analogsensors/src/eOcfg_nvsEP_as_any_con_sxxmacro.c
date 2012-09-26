@@ -86,10 +86,23 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
+#define SOFFSETof_sconfig                                              (SMACRO_OFF)
+#define SCAPACITY_sconfig                                              sizeof(eOsnsr_strain_config_t)
+EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sconfig) =
+{   
+ 
+    EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sconfig, SMACRO_NUM),
+    EO_INIT(.capacity)  SCAPACITY_sconfig,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.sconfig,
+    EO_INIT(.offset)    SOFFSETof_sconfig,
+    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig),
+    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig)
+};
+#define SOFFSETafter_sconfig                                           (SOFFSETof_sconfig+SCAPACITY_sconfig)
 
 
 
-#define SOFFSETof_sconfig__mode                                        (SMACRO_OFF)
+#define SOFFSETof_sconfig__mode                                        (SOFFSETof_sconfig)
 #define SCAPACITY_sconfig__mode                                        sizeof(eOenum08_t)
 EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sconfig__mode) =
 {   
@@ -137,10 +150,26 @@ EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sconfig__signaloncefu
 //
 #define SOFFSETafter_sconfig_filler01                                    (SOFFSETof_sconfig_filler01+SCAPACITY_sconfig_filler01)
 
-#define SOFFSETof_sinputs_filler04                                       (SOFFSETafter_sconfig_filler01)
+#define SOFFSETof_sinputs_filler04                                       (SOFFSETafter_sconfig)//(SOFFSETafter_sconfig_filler01)
 #define SCAPACITY_sinputs_filler04                                       (4)
 //
 #define SOFFSETafter_sinputs_filler04                                    (SOFFSETof_sinputs_filler04+SCAPACITY_sinputs_filler04)
+
+
+
+#define SOFFSETof_sstatus                                                (SOFFSETafter_sinputs_filler04)
+#define SCAPACITY_sstatus                                                sizeof(eOsnsr_strain_status_t)
+EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sstatus) =
+{   
+ 
+    EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sstatus, SMACRO_NUM),
+    EO_INIT(.capacity)  SCAPACITY_sstatus,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.sstatus,
+    EO_INIT(.offset)    SOFFSETof_sstatus,
+    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus),
+    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus)
+};
+#define SOFFSETafter_sstatus                                           (SOFFSETof_sstatus+SCAPACITY_sstatus)
 
 
 #define SOFFSETof_sstatus__fullscale                                        (SOFFSETafter_sinputs_filler04)

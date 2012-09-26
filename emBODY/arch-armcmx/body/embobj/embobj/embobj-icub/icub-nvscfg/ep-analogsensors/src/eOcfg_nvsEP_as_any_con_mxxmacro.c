@@ -86,10 +86,21 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
+#define MOFFSETof_mconfig                                               (MMACRO_OFF)
+#define MCAPACITY_mconfig                                               sizeof(eOsnsr_mais_config_t)
+EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mconfig) =
+{   
+ 
+    EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mconfig, MMACRO_NUM),
+    EO_INIT(.capacity)  MCAPACITY_mconfig,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue.mconfig,
+    EO_INIT(.offset)    MOFFSETof_mconfig,
+    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig),
+    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig)
+};
+#define MOFFSETafter_mconfig                                           (MOFFSETof_mconfig+MCAPACITY_mconfig)
 
-
-
-#define MOFFSETof_mconfig__mode                                        (MMACRO_OFF)
+#define MOFFSETof_mconfig__mode                                        (MOFFSETof_mconfig)
 #define MCAPACITY_mconfig__mode                                        sizeof(eOenum08_t)
 EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mconfig__mode) =
 {   
@@ -137,10 +148,25 @@ EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mconfig__resolution) 
 //
 #define MOFFSETafter_sconfig_filler01                                     (MOFFSETof_sconfig_filler01+MCAPACITY_sconfig_filler01)
 
-#define MOFFSETof_minputs_filler04                                       (MOFFSETafter_sconfig_filler01)
+#define MOFFSETof_minputs_filler04                                       (MOFFSETafter_mconfig)//(MOFFSETafter_sconfig_filler01)
 #define MCAPACITY_minputs_filler04                                       (4)
 //
 #define MOFFSETafter_minputs_filler04                                     (MOFFSETof_minputs_filler04+MCAPACITY_minputs_filler04)
+
+
+#define MOFFSETof_mstatus                                                   (MOFFSETafter_minputs_filler04) //(MOFFSETafter_mconfig)
+#define MCAPACITY_mstatus                                                   sizeof(eOsnsr_mais_status_t)
+EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mstatus) =
+{   
+ 
+    EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mstatus, MMACRO_NUM),
+    EO_INIT(.capacity)  MCAPACITY_mstatus,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue.mstatus,
+    EO_INIT(.offset)    MOFFSETof_mstatus,
+    EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mstatus),
+    EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mstatus)
+};
+#define MOFFSETafter_mstatus                                                (MOFFSETof_mstatus+MCAPACITY_mstatus)
 
 
 #define MOFFSETof_mstatus__the15values                                        (MOFFSETafter_minputs_filler04)

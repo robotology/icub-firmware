@@ -155,41 +155,55 @@ EOtreenode eo_cfg_nvsEP_as_onestrain_tree_con[] =
 {
     // strain s00
     {   // 0
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_s00_sconfig__mode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_s00_sconfig,
         EO_INIT(.index)     Sindex(0, 0),
-        EO_INIT(.nchildren) 0,
+        EO_INIT(.nchildren) 3,
         EO_INIT(.dchildren) NULL
     },
-    {   // 1
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_s00_sconfig__datarate,
-        EO_INIT(.index)     Sindex(0, 1),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    },  
-    {   // 2
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_s00_sconfig__signaloncefullscale,
-        EO_INIT(.index)     Sindex(0, 2),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    },
-    {   // 3
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_s00_sstatus__fullscale,
-        EO_INIT(.index)     Sindex(0, 3),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    },  
+
+        {   // 1
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_s00_sconfig__mode,
+            EO_INIT(.index)     Sindex(0, 1),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },
+        {   // 2
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_s00_sconfig__datarate,
+            EO_INIT(.index)     Sindex(0, 2),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   // 3
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_s00_sconfig__signaloncefullscale,
+            EO_INIT(.index)     Sindex(0, 3),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },
+        
     {   // 4
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_s00_sstatus__calibratedvalues,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_s00_sstatus,
         EO_INIT(.index)     Sindex(0, 4),
-        EO_INIT(.nchildren) 0,
+        EO_INIT(.nchildren) 3,
         EO_INIT(.dchildren) NULL
     },  
-    {   // 5
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_s00_sstatus__uncalibratedvalues,
-        EO_INIT(.index)     Sindex(0, 5),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }   
+        {   // 5
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_s00_sstatus__fullscale,
+            EO_INIT(.index)     Sindex(0, 5),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   // 6
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_s00_sstatus__calibratedvalues,
+            EO_INIT(.index)     Sindex(0, 6),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   // 7
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onestrain_s00_sstatus__uncalibratedvalues,
+            EO_INIT(.index)     Sindex(0, 7),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        }   
     
      
     
@@ -263,9 +277,10 @@ extern uint16_t eo_cfg_nvsEP_as_onestrain_hashfunction_id2index(uint16_t id)
     static const uint16_t s_idtable[] = 
     { 
         // s00
-        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__mode(0),                   EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__datarate(0),
-        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__signaloncefullscale(0),    EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__fullscale(0), 
-        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__calibratedvalues(0),       EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__uncalibratedvalues(0)  
+        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig(0),                         EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__mode(0),
+        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__datarate(0),               EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__signaloncefullscale(0),    
+        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus(0),                         EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__fullscale(0),
+        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__calibratedvalues(0),       EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__uncalibratedvalues(0) 
         
         // m00
 //        EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__mode(0),                   EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__datarate(0),

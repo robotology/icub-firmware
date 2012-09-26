@@ -90,15 +90,17 @@ enum { strainNumberMAX = 1};
  **/
 typedef enum
 {
-    strainNVindex_sconfig__mode                                     =  0,
-    strainNVindex_sconfig__datarate                                 =  1,
-    strainNVindex_sconfig__signaloncefullscale                      =  2,
-    strainNVindex_sstatus__fullscale                                =  3,
-    strainNVindex_sstatus__calibratedvalues                         =  4,
-    strainNVindex_sstatus__uncalibratedvalues                       =  5
+    strainNVindex_sconfig                                           =  0,
+    strainNVindex_sconfig__mode                                     =  1,
+    strainNVindex_sconfig__datarate                                 =  2,
+    strainNVindex_sconfig__signaloncefullscale                      =  3,
+    strainNVindex_sstatus                                           =  4,
+    strainNVindex_sstatus__fullscale                                =  5,
+    strainNVindex_sstatus__calibratedvalues                         =  6,
+    strainNVindex_sstatus__uncalibratedvalues                       =  7
 } eOcfg_nvsEP_as_strainNVindex_t;
 
-enum { strainNVindex_TOTALnumber = 6};
+enum { strainNVindex_TOTALnumber = 8};
 
 
 
@@ -117,13 +119,15 @@ enum { maisNumberMAX = 1};
  **/
 typedef enum
 {
-    maisNVindex_mconfig__mode                                       =  0,
-    maisNVindex_mconfig__datarate                                   =  1,
-    maisNVindex_mconfig__resolution                                 =  2,
-    maisNVindex_mstatus__the15values                                =  3
+    maisNVindex_mconfig                                             =  0,
+    maisNVindex_mconfig__mode                                       =  1,
+    maisNVindex_mconfig__datarate                                   =  2,
+    maisNVindex_mconfig__resolution                                 =  3,
+    maisNVindex_mstatus                                             =  4,
+    maisNVindex_mstatus__the15values                                =  5
 } eOcfg_nvsEP_as_maisNVindex_t;
 
-enum { maisNVindex_TOTALnumber = 4};
+enum { maisNVindex_TOTALnumber = 6};
 
 
     

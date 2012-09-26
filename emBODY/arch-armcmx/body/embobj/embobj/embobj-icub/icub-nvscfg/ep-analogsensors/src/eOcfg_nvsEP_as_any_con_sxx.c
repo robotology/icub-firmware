@@ -80,9 +80,11 @@
 
 const uint8_t eo_cfg_nvsEP_as_any_con_sxx_funtyp[] =
 {
+    EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig,
     EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__mode,
     EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__datarate,
     EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__signaloncefullscale,
+    EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus,
     EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__fullscale,
     EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__calibratedvalues,
     EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__uncalibratedvalues    

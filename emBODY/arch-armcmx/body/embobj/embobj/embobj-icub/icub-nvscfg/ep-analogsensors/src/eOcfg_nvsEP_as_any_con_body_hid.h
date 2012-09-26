@@ -74,18 +74,22 @@
 
 // -- the nvid of all the network variables of the strain as a function of the strain number s
 
+#define EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig(s)                                          EO_nv_ID(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_strain(s, EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sconfig))
 #define EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__mode(s)                                    EO_nv_ID(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__mode, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_strain(s, EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sconfig__mode))
 #define EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__datarate(s)                                EO_nv_ID(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__datarate, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_strain(s, EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sconfig__datarate))
 #define EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sconfig__signaloncefullscale(s)                     EO_nv_ID(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__signaloncefullscale, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_strain(s, EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sconfig__signaloncefullscale))
+#define EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus(s)                                          EO_nv_ID(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_strain(s, EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sstatus))        
 #define EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__fullscale(s)                               EO_nv_ID(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__fullscale, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_strain(s, EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sstatus__fullscale))        
 #define EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__calibratedvalues(s)                        EO_nv_ID(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__calibratedvalues, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_strain(s, EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sstatus__calibratedvalues))  
 #define EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__uncalibratedvalues(s)                      EO_nv_ID(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__uncalibratedvalues, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_strain(s, EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sstatus__uncalibratedvalues))  
  
 // -- the nvid of all the network variables of the mais as a function of the mais number m
 
+#define EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig(m)                                          EO_nv_ID(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_mais(m, EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig))
 #define EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__mode(m)                                    EO_nv_ID(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig__mode, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_mais(m, EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__mode))
 #define EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__datarate(m)                                EO_nv_ID(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig__datarate, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_mais(m, EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__datarate))
 #define EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__resolution(m)                              EO_nv_ID(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig__resolution, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_mais(m, EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__resolution))
+#define EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mstatus(m)                                          EO_nv_ID(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mstatus, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_mais(m, EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mstatus))        
 #define EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mstatus__the15values(m)                             EO_nv_ID(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mstatus__the15values, EOK_cfg_nvsEP_as_any_con_body_NVIDoff_of_mais(m, EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mstatus__the15values))        
 
        
