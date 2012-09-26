@@ -42,7 +42,7 @@ extern "C" {
 #include "EoUtilities.h"
 #include "EoMotionControl.h"
 #include "EoconstLookuptbl.h"
-#include "EOemsCanNetworkTopology.h"
+
 
 
 #include "EOicubCanProto_specifications.h"
@@ -61,17 +61,12 @@ extern "C" {
 typedef struct EOicubCanProto_hid EOicubCanProto;
 
 
-typedef uint32_t 	    eo_canProto_msgCommand_t;
-
-typedef uint32_t        eo_canProto_msgDestination_t;
-
 typedef struct
 {
     const EOconstLookupTbl* const msgClasses_LUTbl__ptr;  /**< the lookup table that contains for each message class 
                                                                lookup table indexed by can message of that class. 
                                                                The last lookup table contains parser and former funaction for
                                                                each can message*/
-    EOemsCanNetTopo         *emsCanNetTopo__ptr;          /**< rreference to configuration of ems can network topology */
 } eo_icubCanProto_cfg_t;
 
     
@@ -116,8 +111,8 @@ extern eOresult_t eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_t 
     @return     eores_NOK_nullpointer if p or frame are NULL, else the result of callback function.
  **/
 extern eOresult_t eo_icubCanProto_FormCanFrame(EOicubCanProto* p,
-                                               eo_icubCanProto_msgCommand_t command, 
-                                               eo_icubCanProto_msgDestination_t dest,
+                                               eOicubCanProto_msgCommand_t command, 
+                                               eOicubCanProto_msgDestination_t dest,
                                                void *value,
                                                eOcanframe_t *frame);
 

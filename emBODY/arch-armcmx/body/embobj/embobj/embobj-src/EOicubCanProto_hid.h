@@ -39,7 +39,6 @@ extern "C" {
 #include "EOconstLookupTbl.h"
 #include "EOconstLookupTbl_hid.h"
 
-#include "EOemsCanNetworkTopology.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 #include "EOicubCanProto.h"
@@ -50,36 +49,35 @@ extern "C" {
 struct EOicubCanProto_hid 
 {
     const EOconstLookupTbl  *msgClasses_LUTbl__ptr;  /**< ....             */      
-    EOemsCanNetTopo         *emsCanNetTopo_ptr;      /**< ....             */
 };
 
 typedef enum
 {
-  eo_icubCanProto_hid_opParse = 0,
-  eo_icubCanProto_hid_opForm = 1  
+    eo_icubCanProto_hid_opParse     = 0,
+    eo_icubCanProto_hid_opForm      = 1  
 } eo_icubCanProto_hid_operation_t;
 
 
 /*this struct contains the needed information to exception function */
 typedef struct
 {
-    eo_icubCanProto_hid_operation_t op;
-    EOicubCanProto                  *iproto_ptr;
+    eo_icubCanProto_hid_operation_t             op;
+    EOicubCanProto                              *iproto_ptr;
     union
     {
         struct 
         {
-            eo_icubCanProto_msgCommand_cmdId_t  cmdId;
-            eOcanframe_t                   *frame;
-            eOcanport_t                    canPort;        
+            eOicubCanProto_msgCommand_cmdId_t   cmdId;
+            eOcanframe_t                        *frame;
+            eOcanport_t                         canPort;        
         }p_arg;
         
         struct
         {
-            eo_icubCanProto_msgCommand_cmdId_t  cmdId;
-            eo_icubCanProto_msgDestination_t    dest;
+            eOicubCanProto_msgCommand_cmdId_t   cmdId;
+            eOicubCanProto_msgDestination_t     dest;
             void                                *value;                              
-            eOcanframe_t                   *frame;      
+            eOcanframe_t                        *frame;      
         }f_arg;    
     }u;            
 } eo_icubCanProto_hid_exceptionFn_argument_t;
@@ -93,7 +91,7 @@ typedef eOresult_t  (*eo_icubCanProto_hid_parserFn_t)  (EOicubCanProto* p, eOcan
 /** @typedef     eo_icubCanProto_former_fn_t
     @brief       ptr to former-function.
  **/
-typedef eOresult_t  (*eo_icubCanProto_hid_formerFn_t)  (EOicubCanProto* p, void*, eo_icubCanProto_msgDestination_t, eOcanframe_t*);
+typedef eOresult_t  (*eo_icubCanProto_hid_formerFn_t)  (EOicubCanProto* p, void*, eOicubCanProto_msgDestination_t, eOcanframe_t*);
 
 /** @typedef     eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t
     @brief       it is an item in parser-table. it contains fn ptr to parser function. 
@@ -123,34 +121,34 @@ typedef struct
 {
     const EOconstLookupTbl           *const parserTbl;
     const EOconstLookupTbl           *const formerTbl;
-    eo_icubCanProto_msgCommand_cmdId_t (*eo_icubCanProto_getCmdId_fromFrame) (eOcanframe_t *canFrame);
+    eOicubCanProto_msgCommand_cmdId_t (*eo_icubCanProto_getCmdId_fromFrame) (eOcanframe_t *canFrame);
 } eo_icubCanProto_hid_LUTbl_item_classMsgTblReference_t;
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
-extern __inline eOboolvalues_t eo_icubCanProto_hid_LUTbl_indexIsInTbl(const EOconstLookupTbl *tbl, uint8_t index)
+EO_extern_inline eOboolvalues_t eo_icubCanProto_hid_LUTbl_indexIsInTbl(const EOconstLookupTbl *tbl, uint8_t index)
 {
     return((eOboolvalues_t)((index >= tbl->offset) &&((index - tbl->offset)< tbl->capacity)));
 }
 
-extern __inline eOresult_t eo_icubCanProto_hid_LUTbl_excParse(EOicubCanProto* p,
+EO_extern_inline eOresult_t eo_icubCanProto_hid_LUTbl_excParse(EOicubCanProto* p,
                                                               const EOconstLookupTbl *tbl, // lookup table
-                                                              eo_icubCanProto_msgCommand_cmdId_t cmdId,                     //command used to select parser func
+                                                              eOicubCanProto_msgCommand_cmdId_t cmdId,                     //command used to select parser func
                                                               eOcanframe_t *frame,                          //frame to parser
                                                               eOcanport_t canPortRX)                        //port where was received
 {
 
      eo_icubCanProto_hid_exceptionFn_argument_t exFn_arg = 
      {
-        EO_INIT(.op)          eo_icubCanProto_hid_opParse,
-        EO_INIT(.iproto_ptr)    p,
+        EO_INIT(.op)                    eo_icubCanProto_hid_opParse,
+        EO_INIT(.iproto_ptr)            p,
         EO_INIT(.u)
         {
             EO_INIT(.p_arg)
             {
-                EO_INIT(.cmdId)     cmdId,
-                EO_INIT(.frame)     frame,
-                EO_INIT(.canPort)   canPortRX,
+                EO_INIT(.cmdId)         cmdId,
+                EO_INIT(.frame)         frame,
+                EO_INIT(.canPort)       canPortRX,
             }      
         }
      
@@ -158,11 +156,11 @@ extern __inline eOresult_t eo_icubCanProto_hid_LUTbl_excParse(EOicubCanProto* p,
     return(tbl->exceptionMngFn((void*)&exFn_arg));    
 }
                                                              
-extern __inline eOresult_t eo_icubCanProto_hid_LUTbl_excForm(EOicubCanProto* p,
+EO_extern_inline eOresult_t eo_icubCanProto_hid_LUTbl_excForm(EOicubCanProto* p,
                                                              const EOconstLookupTbl *tbl, // lookup table
-                                                             eo_icubCanProto_msgCommand_cmdId_t cmdId,                     //command used to select parser func 
+                                                             eOicubCanProto_msgCommand_cmdId_t cmdId,                     //command used to select parser func 
                                                              void *value,                                       //value to set in frame
-                                                             eo_icubCanProto_msgDestination_t dest,                  //axis of joint
+                                                             eOicubCanProto_msgDestination_t dest,                  //axis of joint
                                                              eOcanframe_t *frame)                          //output frame
 {
      eo_icubCanProto_hid_exceptionFn_argument_t exFn_arg = 
@@ -184,19 +182,19 @@ extern __inline eOresult_t eo_icubCanProto_hid_LUTbl_excForm(EOicubCanProto* p,
 }
 
 
-extern __inline eo_icubCanProto_msgCommand_class_t eo_icubCanProto_hid_getMsgClassFromFrameId(uint32_t frame_id)
+EO_extern_inline eOicubCanProto_msgCommand_class_t eo_icubCanProto_hid_getMsgClassFromFrameId(uint32_t frame_id)
 {
-    return((eo_icubCanProto_msgCommand_class_t)((frame_id & 0x700) >> 8));
+    return((eOicubCanProto_msgCommand_class_t)((frame_id & 0x700) >> 8));
 }
 
-extern __inline eo_icubCanProto_canBoardAddress_t eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(uint32_t frame_id)
+EO_extern_inline eOicubCanProto_canBoardAddress_t eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(uint32_t frame_id)
 {
-    return((eo_icubCanProto_canBoardAddress_t)((frame_id & 0x0F0) >> 4));
+    return((eOicubCanProto_canBoardAddress_t)((frame_id & 0x0F0) >> 4));
 }
 
-extern __inline eo_icubCanProto_motorAxis_t eo_icubCanProto_hid_getmotorAxisFromFrame(eOcanframe_t *frame)
+EO_extern_inline eOicubCanProto_jm_indexinBoard_t eo_icubCanProto_hid_getjmIndexInBOardFromFrame(eOcanframe_t *frame)
 {
-    return((eo_icubCanProto_motorAxis_t)((frame->data[0] & 0x8) >> 4));
+    return((eOicubCanProto_jm_indexinBoard_t)((frame->data[0] & 0x8) >> 4));
 }
 
 
