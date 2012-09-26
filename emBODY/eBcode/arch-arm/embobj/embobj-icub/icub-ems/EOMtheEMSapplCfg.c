@@ -322,24 +322,38 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
     }
 #if !defined(EMSAPPL_USE_CORE)    
      ,
-     .srvcfg     =
+     .applbodycfg     =
      {
          .connectedEncodersMask      = EOMTHEEMSAPPLCFG_EBX_encodersMASK,
          .emsControllerCfg           =
          {
-             .numofmotors            = EOMTHEEMSAPPLCFG_EBX_emscontroller_NUMOFMOTOR,
              .emsboard_type          = EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE
          },
-         .mc_endpoint                = EOMTHEEMSAPPLCFG_EBX_endpoint_mc,   
-         .as_endpoint                = EOMTHEEMSAPPLCFG_EBX_endpoint_as,
-         .sk_endpoint                = EOMTHEEMSAPPLCFG_EBX_endpoint_sk,
-         .measConvCfg                =
+		 .endpoints                  =
          {
-             .jointvelocityShift                    = 8,
-             .motorVelocityEstimationShift          = 1,
-             .motorAccelerationEstimationShift      = 1,
-             .jointVelocityEstimationShift          = 5,
-             .jointAccelerationEstimationShift      = 5
+             .mc_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_mc,   
+             .as_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_as,
+             .sk_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_sk,
+         },
+         .configdataofMC4boards      =
+         {
+             .shiftvalues            =
+            {
+             .jointVelocityShift     =  8,
+             .jointVelocityEstimationShift = 8,
+             .jointAccelerationEstimationShift = 5
+            },
+             .bcastpolicy            =
+             {
+                 .val2bcastList      =
+                 {
+                    /* 0 */ ICUBCANPROTO_PER_MB_CMD_POSITION,
+                    /* 1 */ ICUBCANPROTO_PER_MB_CMD_PID_VAL,
+                    /* 2 */ ICUBCANPROTO_PER_MB_CMD_PID_ERROR,
+                    /* 3 */ ICUBCANPROTO_PER_MB_CMD_VELOCITY
+                 }
+             }
+            
          }
      }
 #endif       

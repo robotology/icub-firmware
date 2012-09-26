@@ -104,6 +104,7 @@ extern void eo_emsController_ResetTrqPid(uint8_t joint);
 extern void eo_emsController_Stop(uint8_t joint);
 //extern void eo_emsGetActivePidStatus(uint8_t joint, int16_t *pwm, int32_t *err);
 extern void eo_emsGetActivePidStatus(uint8_t joint, eOmc_joint_status_ofpid_t* pidStatus);
+extern void eo_emsGetJointStatus(uint8_t joint, eOmc_joint_status_basic_t* jointStatus);
 
 // configuration
 

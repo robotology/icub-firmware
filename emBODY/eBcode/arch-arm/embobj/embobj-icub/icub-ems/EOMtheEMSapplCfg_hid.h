@@ -166,20 +166,15 @@ extern "C" {
 
 //ems controller configuration
 #if     defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3)  || defined(EOMTHEEMSAPPLCFG_USE_EB6)  || defined(EOMTHEEMSAPPLCFG_USE_EB8)
-        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_NUMOFMOTOR       4
         #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_GENERIC
         
 #elif   defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
-        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_NUMOFMOTOR       2
         #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_GENERIC
         
 #elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
-        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_NUMOFMOTOR       3
         #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_GENERIC
 
 #elif   defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4)
-        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_NUMOFMOTOR       1   //il valore corretto e' 0
-        #warning VALE --> aspetta la modifica di ale che accetti come parametro numofmotor=0
         #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_GENERIC
 
 
