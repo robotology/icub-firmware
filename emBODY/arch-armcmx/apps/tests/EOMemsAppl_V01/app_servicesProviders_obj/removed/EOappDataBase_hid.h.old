@@ -1,0 +1,147 @@
+/*
+ * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Author:  Valentina Gaggero
+ * email:   valentina.gaggero@iit.it
+ * website: www.robotcub.org
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * A copy of the license can be found at
+ * http://www.robotcub.org/icub/license/gpl.txt
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
+*/
+
+
+// - include guard ----------------------------------------------------------------------------------------------------
+#ifndef _EOAPPDATABASE_HID_H_
+#define _EOAPPDATABASE_HID_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+// - doxy -------------------------------------------------------------------------------------------------------------
+/* @file       EOappEncodersReader.h
+    @brief     This file provides hidden interface to encodersReader obj.
+    @author    valentina.gaggero@iit.it
+    @date      09/11/2012
+**/
+
+
+// - external dependencies --------------------------------------------------------------------------------------------
+
+
+
+// - declaration of extern public interface ---------------------------------------------------------------------------
+#include "EOappDataBase.h"
+
+
+// - definition of the hidden struct implementing the object ----------------------------------------------------------
+
+typedef struct
+{
+    eOappTheDB_cfg_canBoardInfo_t         *cfg_ptr;
+    union
+    {
+        struct
+        {
+            eOmc_jointId_t                    *connectedjoints;
+            eOmc_motorId_t                    *connectedmotors;
+        }jm;
+        eOsnsr_sensorId_t                 *connectedsensors;
+    }u;
+//    eObrd_boardId                       bid;      Eliminato perche' non so se mi serve!!
+} eOappTheDB_hid_canBoardInfo_t;
+
+typedef struct
+{
+    eOappTheDB_cfg_jointOrMotorInfo_t   *cfg_ptr;
+    eOappEncReader_encoder_t            connectedEnc;  /**< currently i assumed: the encoder connected to joint with jointId=x, has encoderid=x */
+    eOmc_motorId_t                      ref2motor;     /**< currently i assumed: the motor connected to joint with jointId=x, has motorid=x */
+} eOappTheDB_hid_jointInfo;
+
+
+typedef struct
+{
+    eOappTheDB_cfg_jointOrMotorInfo_t   *cfg_ptr;
+    eOmc_jointId_t                      ref2joint;
+} eOappTheDB_hid_motorInfo;
+
+
+
+
+typedef struct
+{
+    eOappTheDB_cfg_snrMaisInfo_t       *cfg_ptr;
+} eOappTheDB_hid_snrMaisInfo;
+
+typedef struct
+{
+    eOappTheDB_cfg_snrMaisInfo_t       *cfg_ptr;
+} eOappTheDB_hid_snrStrainInfo;
+
+
+typedef struct
+{
+    eOappTheDB_cfg_SkinInfo_t       *cfg_ptr;
+} eOappTheDB_hid_skinInfo;
+
+
+typedef struct
+{
+    uint16_t                            numberofconnectedjoints;
+    uint16_t                            numberofconnectedmotors;
+    uint16_t                            numberofsensormais;
+    uint16_t                            numberofsensorstrain;
+    eOicubCanProto_canBoardAddress_t    maxusedcanaddr4motorboard;
+} eOappTheDB_hid_generaldata_t;
+
+
+struct EOappTheDB_hid
+{
+    eOboolvalues_t                     isinitted;
+    eOappTheDB_hid_generaldata_t       generaldata;
+    eOappTheDB_hid_canBoardInfo        *canboardsList;
+    eOappTheDB_hid_jointInfo           *jointsList;
+    eOappTheDB_hid_motorInfo           *motorsList;
+    eOappTheDB_hid_sensorInfo          *sensorsList;
+    eOappTheDB_hid_skinInfo            *skinList;
+    eObrd_boardId_t                    *canaddressLookuptbl;
+};
+
+
+// - declaration of extern hidden functions ---------------------------------------------------------------------------
+
+__inline eOappTheDB_hid_canBoardInfo* eo_appTheDB_hid_GetBoardOfJoint(EOappTheDB *p, eOmc_jointId_t jId)
+{
+    return(&(p->canboardsList[p->jointList[jId].cfg->belong2board]));
+}
+
+__inline eOappTheDB_hid_canBoardInfo* eo_appTheDB_hid_GetBoardOfMotor(EOappTheDB *p, eOmc_motorId_t mId)
+{
+    return(&(p->canboardsList[p->motorsList[mId].cfg->belong2board]));
+}
+
+
+__inline eOappTheDB_hid_canBoardInfo* eo_appTheDB_hid_GetBoardWithAddress(EOappTheDB *p, eOicubCanProto_canBoardAddress_t addr)
+{
+    return(&(p->canboardsList[p->canaddressLookuptbl[addr]]));
+}
+
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+
+
+#endif  // include guard
+
+// - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+
+
+
