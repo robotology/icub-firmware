@@ -398,7 +398,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>app-services-providers</GroupName>
+          <GroupName>app-body</GroupName>
           <Files>
             <File>
               <FileName>EOappCanServicesProvider.c</FileName>
@@ -428,7 +428,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>app-services-providers-Cfg</GroupName>
+          <GroupName>app-body-Cfg</GroupName>
           <Files>
             <File>
               <FileName>eOcfg_icubCanProto_messagesLookupTbl.c</FileName>
@@ -1177,6 +1177,16 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>eventviewer</GroupName>
+          <Files>
+            <File>
+              <FileName>eventviewer.cm3.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\sys\mid\lib\eventviewer.cm3.lib</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>icub-ems</GroupName>
           <Files>
             <File>
@@ -1228,16 +1238,6 @@
               <FileName>EOMtheEMSdiscoverylistener.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSdiscoverylistener.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>eventviewer</GroupName>
-          <Files>
-            <File>
-              <FileName>eventviewer.cm3.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\eventviewer.cm3.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1725,7 +1725,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>app-services-providers</GroupName>
+          <GroupName>app-body</GroupName>
           <Files>
             <File>
               <FileName>EOappCanServicesProvider.c</FileName>
@@ -1755,7 +1755,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>app-services-providers-Cfg</GroupName>
+          <GroupName>app-body-Cfg</GroupName>
           <Files>
             <File>
               <FileName>eOcfg_icubCanProto_messagesLookupTbl.c</FileName>
@@ -2486,6 +2486,16 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>eventviewer</GroupName>
+          <Files>
+            <File>
+              <FileName>eventviewer.cm3.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\sys\mid\lib\eventviewer.cm3.lib</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>icub-ems</GroupName>
           <Files>
             <File>
@@ -2537,16 +2547,6 @@
               <FileName>EOMtheEMSdiscoverylistener.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSdiscoverylistener.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>eventviewer</GroupName>
-          <Files>
-            <File>
-              <FileName>eventviewer.cm3.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\eventviewer.cm3.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -3034,7 +3034,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>app-services-providers</GroupName>
+          <GroupName>app-body</GroupName>
           <Files>
             <File>
               <FileName>EOappCanServicesProvider.c</FileName>
@@ -3064,7 +3064,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>app-services-providers-Cfg</GroupName>
+          <GroupName>app-body-Cfg</GroupName>
           <Files>
             <File>
               <FileName>eOcfg_icubCanProto_messagesLookupTbl.c</FileName>
@@ -3795,6 +3795,16 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>eventviewer</GroupName>
+          <Files>
+            <File>
+              <FileName>eventviewer.cm3.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\sys\mid\lib\eventviewer.cm3.lib</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>icub-ems</GroupName>
           <Files>
             <File>
@@ -3846,16 +3856,6 @@
               <FileName>EOMtheEMSdiscoverylistener.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSdiscoverylistener.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>eventviewer</GroupName>
-          <Files>
-            <File>
-              <FileName>eventviewer.cm3.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\eventviewer.cm3.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -4423,7 +4423,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>app-services-providers</GroupName>
+          <GroupName>app-body</GroupName>
           <Files>
             <File>
               <FileName>EOappCanServicesProvider.c</FileName>
@@ -4453,7 +4453,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>app-services-providers-Cfg</GroupName>
+          <GroupName>app-body-Cfg</GroupName>
           <Files>
             <File>
               <FileName>eOcfg_icubCanProto_messagesLookupTbl.c</FileName>
@@ -5184,6 +5184,16 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>eventviewer</GroupName>
+          <Files>
+            <File>
+              <FileName>eventviewer.cm3.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\sys\mid\lib\eventviewer.cm3.lib</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>icub-ems</GroupName>
           <Files>
             <File>
@@ -5235,16 +5245,6 @@
               <FileName>EOMtheEMSdiscoverylistener.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSdiscoverylistener.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>eventviewer</GroupName>
-          <Files>
-            <File>
-              <FileName>eventviewer.cm3.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\eventviewer.cm3.lib</FilePath>
             </File>
           </Files>
         </Group>

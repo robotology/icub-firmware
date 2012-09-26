@@ -119,14 +119,17 @@ extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jstatus(eOcfg_nvsEP_mc_jointNumber_t jx
 //joint-update
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
+    eOresult_t              res;
     float                   rescaler_pos;
     float                   rescaler_trq;
+    eOmc_joint_status_t     *jstatus_ptr = NULL;
     eOmc_joint_config_t     *cfg = (eOmc_joint_config_t*)nv->loc;
 
     //currently no joint config param must be sent to 2foc board. (for us called 1foc :) )
     //(currently no pid velocity is sent to 2foc)
-    //use joint config to configure ems motor controller.
+ 
 
+    
     // 1) set pid position 
     rescaler_pos = 1.0f/(float)(1<<cfg->pidposition.scale);
     eo_emsController_SetOffset(jxx, cfg->pidposition.offset);
@@ -141,7 +144,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jx
 
     // 3) set velocity pid:    to be implemented
    
-   // 4) set min position    
+    // 4) set min position    
     eo_emsController_SetPosMin(jxx, cfg->minpositionofjoint);
         
     // 5) set max position
@@ -151,6 +154,23 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jx
     eo_emsController_SetVelTimeout(jxx, cfg->velocitysetpointtimeout);
         
     // 7) set impedance : to be implemented  
+    
+    // 8) set monitormode status
+    res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx,  &jstatus_ptr);
+    if(eores_OK != res)
+    {
+        return;
+    }
+
+    if(eomc_motionmonitormode_dontmonitor == cfg->motionmonitormode)
+    {
+        jstatus_ptr->basic.motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;  
+    }
+    else
+    {
+        jstatus_ptr->basic.motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_setpointnotreachedyet;
+    }
+
 }
 
 
@@ -312,7 +332,6 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eOresult_t                              res;
-    eOmc_joint_status_t                     *jstatus_ptr;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOmc_controlmode_t                      *controlmode_ptr = (eOmc_controlmode_t*)nv->loc;
     eOicubCanProto_msgDestination_t         msgdest;
@@ -325,17 +344,8 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
 
 
-    // 1) set control mode in status nv (a mirror nv)
-    res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx, &jstatus_ptr);
-    if(eores_OK != res)
-    {
-        return;
-    }
-    jstatus_ptr->basic.controlmodestatus = *controlmode_ptr;
 
-
-
-    // 2) send control mode value to 2foc
+    // 1) send control mode value to 2foc
     res = eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), jxx,  &canLoc, NULL);
     if(eores_OK != res)
     {
@@ -376,7 +386,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
         
     }
     
-    // 3) set control mode to ems controller
+    // 2) set control mode to ems controller
     eo_emsController_SetControlMode(jxx, (control_mode_t)(*controlmode_ptr));       
 
 }

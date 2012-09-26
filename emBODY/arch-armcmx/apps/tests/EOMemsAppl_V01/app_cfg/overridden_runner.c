@@ -376,13 +376,13 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, in
 static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
 {
     eOresult_t          res;
-    EOtheEMSapplBody          *appTheSP = eo_emsapplBody_GetHandle();
+    EOtheEMSapplBody    *emsappbody_ptr = eo_emsapplBody_GetHandle();
     uint32_t            encvalue;
     int16_t             *pwm;
 
-    if (eo_appEncReader_isReady(eo_emsapplBody_GetEncoderReaderHandle(appTheSP)))
+    if (eo_appEncReader_isReady(eo_emsapplBody_GetEncoderReaderHandle(emsappbody_ptr)))
     {     
-        res = eo_appEncReader_GetValue(eo_emsapplBody_GetEncoderReaderHandle(appTheSP), eOeOappEncReader_encoder3, &encvalue);
+        res = eo_appEncReader_GetValue(eo_emsapplBody_GetEncoderReaderHandle(emsappbody_ptr), eOeOappEncReader_encoder3, &encvalue);
     }
 
     if(eores_OK != res)
@@ -401,7 +401,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
         
 #ifndef _USE_PROTO_TEST_
         /* 4) prepare and punt in rx queue new setpoint */
-        s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
+        s_eom_emsrunner_hid_SetCurrentsetpoint(emsappbody_ptr, pwm, 0);
 #endif   
 
     s_eom_emsrunner_hid_UpdateJointstatus(p);
@@ -425,9 +425,11 @@ static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p)
             return; //error
         }
         
-        eo_emsGetJointStatus(jId, &jstatus_ptr->basic);
+        eo_emsController_GetJointStatus(jId, &jstatus_ptr->basic);
         
-        eo_emsGetActivePidStatus(jId, &jstatus_ptr->ofpid); 
+        eo_emsController_GetActivePidStatus(jId, &jstatus_ptr->ofpid); 
+        
+        #error VALE--> aggiungi qui getmotionDone
     }
 }
 

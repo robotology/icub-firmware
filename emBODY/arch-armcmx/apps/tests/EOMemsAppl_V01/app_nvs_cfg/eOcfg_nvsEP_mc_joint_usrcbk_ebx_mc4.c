@@ -122,6 +122,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jx
     eOresult_t                              res;    
     eOmc_joint_config_t                     *cfg = (eOmc_joint_config_t*)nv->loc;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOmc_joint_status_t                     *jstatus_ptr = NULL;
     eOappTheDB_jointShiftValues_t           *shiftval_ptr;
     eOicubCanProto_bcastpolicy_t            *bcastpolicy_ptr;
     eOicubCanProto_position_t               pos_icubCanProtValue;
@@ -204,6 +205,23 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jx
     // 10) set estim vel shift
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_SPEED_ESTIM_SHIFT;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(shiftval_ptr->jointVelocityEstimationShift));
+    
+    // 11) set monitormode status
+    res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx,  &jstatus_ptr);
+    if(eores_OK != res)
+    {
+        return;
+    }
+
+    if(eomc_motionmonitormode_dontmonitor == cfg->motionmonitormode)
+    {
+        jstatus_ptr->basic.motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;  
+    }
+    else
+    {
+        jstatus_ptr->basic.motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_setpointnotreachedyet;
+    }
+
 }
 
 

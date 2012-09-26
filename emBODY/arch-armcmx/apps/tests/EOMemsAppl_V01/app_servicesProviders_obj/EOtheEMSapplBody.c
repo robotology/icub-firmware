@@ -342,17 +342,25 @@ static void s_eo_emsapplBody_encodersReader_init(EOtheEMSapplBody *p)
 
 static void s_eo_emsapplBody_emsController_init(EOtheEMSapplBody *p)
 {
+    uint16_t i, numofjoint = 0;
+    
     p->bodyobjs.emsController = eo_emsController_Init(p->cfg_ptr->emsControllerCfg.emsboard_type);
 
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != p->bodyobjs.emsController), 
                      s_eobj_ownname, "error in emsController_init");
-	
+    
+    numofjoint =  eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
+    for(i=0; i<numofjoint; i++)
+    {
+        eo_emsController_AddAxis(i);
+	}
+    
     /* TAG_ALE*/
-    eo_emsController_AddAxis(3);
-    eo_emsController_SetLimits(3, -65535, 65535, 2048);
-    eo_emsController_SetPosPid(3, 100.0f, 20.0f, 0.001f);
-    eo_emsController_SetPosPidLimits(3, 8000.0f, 750.0f);
-    eo_emsController_SetControlMode(3, CM_IDLE);
+//     eo_emsController_AddAxis(3);
+//     eo_emsController_SetLimits(3, -65535, 65535, 2048);
+//     eo_emsController_SetPosPid(3, 100.0f, 20.0f, 0.001f);
+//     eo_emsController_SetPosPidLimits(3, 8000.0f, 750.0f);
+//     eo_emsController_SetControlMode(3, CM_IDLE);
 }
 
 

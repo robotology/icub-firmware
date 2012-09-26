@@ -152,7 +152,7 @@ static const eOappTheDB_cfg_jointInfo_t s_cfg_appDB_joints[] =
         EO_INIT(.canLoc)
         {
             EO_INIT(.belong2board)               FOC_ADDRCAN_4_BID,
-            EO_INIT(.indexinboard)               eo_icubCanProto_jm_index_second,
+            EO_INIT(.indexinboard)               eo_icubCanProto_jm_index_first,
         }
     },
 
@@ -168,7 +168,7 @@ static const eOappTheDB_cfg_jointInfo_t s_cfg_appDB_joints[] =
         EO_INIT(.canLoc)
         {
             EO_INIT(.belong2board)               FOC_ADDRCAN_2_BID,
-            EO_INIT(.indexinboard)               eo_icubCanProto_jm_index_second,
+            EO_INIT(.indexinboard)               eo_icubCanProto_jm_index_first,
         }
     }
 };
