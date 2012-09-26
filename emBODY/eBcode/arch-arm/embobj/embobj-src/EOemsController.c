@@ -304,7 +304,7 @@ extern void eo_emsGetActivePidStatus(uint8_t joint, int16_t *pwm, int32_t *err)
 }
 */
 
-extern void eo_emsGetActivePidStatus(uint8_t joint, eOmc_joint_status_ofpid_t* pidStatus)
+extern void eo_emsController_GetActivePidStatus(uint8_t joint, eOmc_joint_status_ofpid_t* pidStatus)
 {
     if (s_emsc && s_emsc->axis_controller[joint])
     {
@@ -318,7 +318,7 @@ extern void eo_emsGetActivePidStatus(uint8_t joint, eOmc_joint_status_ofpid_t* p
     }
 }
 
-extern void eo_emsGetJointStatus(uint8_t joint, eOmc_joint_status_basic_t* jointStatus)
+extern void eo_emsController_GetJointStatus(uint8_t joint, eOmc_joint_status_basic_t* jointStatus)
 {
     if (s_emsc && s_emsc->axis_controller[joint])
     {
@@ -332,6 +332,18 @@ extern void eo_emsGetJointStatus(uint8_t joint, eOmc_joint_status_basic_t* joint
         jointStatus->torque              = 0;  // the torque of the joint when locally measured
         jointStatus->motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;  // use eOmc_motionmonitorstatus_t. it is eomc_motionmonitorstatus_notmonitored unless the monitor is activated in jconfig.motionmonitormode  
         jointStatus->controlmodestatus   = CM_IDLE;  // use eOmc_controlmode_t. it is a readonly shadow copy of jconfig.controlmode used to remind the host of teh current controlmode
+    }
+}
+
+extern eObool_t eo_emsController_GetMotionDone(uint8_t joint)
+{
+    if (s_emsc && s_emsc->axis_controller[joint])
+    {
+        return eo_axisController_GetMotionDone(s_emsc->axis_controller[joint]);
+    }
+    else
+    {
+        return eobool_false;
     }
 }
 
