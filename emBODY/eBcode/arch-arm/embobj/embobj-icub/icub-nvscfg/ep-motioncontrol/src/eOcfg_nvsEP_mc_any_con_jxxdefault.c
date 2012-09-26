@@ -131,7 +131,13 @@ const eOmc_joint_t eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue =
     },
     EO_INIT(.jstatus)                       {0},
     EO_INIT(.jinputs)                       {0},
-    EO_INIT(.jcmmnds)                       {0}
+    EO_INIT(.jcmmnds)                       
+	{
+		EO_INIT(.calibration)               {0},
+		EO_INIT(.setpoint)                  {0},
+		EO_INIT(.stoptrajectory)            0,
+		EO_INIT(.controlmode)				eomc_controlmode_switch_everything_off
+	}
 }; 
 
 
