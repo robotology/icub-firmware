@@ -80,6 +80,7 @@ typedef enum
     stm32i2c_gpio_portNONE = 255
 } stm32i2c_gpio_port_t;
 
+// keep same values as hal_gpio_pin_t
 typedef enum 
 {
     stm32i2c_gpio_pin0 = 0,
@@ -101,11 +102,12 @@ typedef enum
     stm32i2c_gpio_pinNONE = 255    
 } stm32i2c_gpio_pin_t; 
 
+
 typedef struct
 {
-    stm32i2c_gpio_port_t     port;
-    stm32i2c_gpio_pin_t      pin;
-} stm32i2c_gpio_t;  
+    stm32i2c_gpio_port_t    port;
+    stm32i2c_gpio_pin_t     pin;
+} stm32i2c_gpio_t;          // 2B  
 
 
 /** @typedef    typedef struct stm32i2c_cfg_t;
@@ -113,21 +115,21 @@ typedef struct
  **/
 typedef struct
 {
-    uint8_t                 speed;      /**< in multiples of 100K. valid values are only 1 and 4. */
+    uint32_t                speed;      /**< valid values are only 100k, 200k, and 400k. */
     stm32i2c_gpio_t         scl;
     stm32i2c_gpio_t         sda;
-} stm32i2c_cfg_t;
+} stm32i2c_cfg_t;           // 8B
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
 //extern const stm32i2c_cfg_t stm32i2c_cfg_default;   // = { .device = stm32i2c_device_st_m24lr64, .i2cbus = 0, .functioni2cinit = NULL, .parameteri2cinit = NULL, .functioni2cdeinit = NULL };
 
-// port is 0, 1, 2
+// port is 1, 2, 3
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn    	    xtern stm32i2c_result_t stm32i2c_init(uint8_t port, const stm32i2c_cfg_t *cfg)
+/** @fn    	    extern stm32i2c_result_t stm32i2c_init(uint8_t port, const stm32i2c_cfg_t *cfg)
     @brief      This function initialises i2c. Initialisation can be done only once.
                 If one wants to initialise once more, he/she must call stm32i2c_deinit() first.
     @param      cfg             The configuration. If NULL an error is returned. 

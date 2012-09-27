@@ -264,7 +264,7 @@ extern stm32i2c_result_t stm32i2c_init(uint8_t port, const stm32i2c_cfg_t *cfg)
     }
  
     
-    if((1 != cfg->speed) && (4 != cfg->speed))
+    if((100000 != cfg->speed) && (200000 != cfg->speed) && (400000 != cfg->speed))
     {
         return(stm32i2c_res_NOK);
     }
@@ -321,7 +321,7 @@ extern stm32i2c_result_t stm32i2c_deinit(uint8_t port, const stm32i2c_cfg_t *cfg
     }
  
     
-    if((1 != cfg->speed) && (4 != cfg->speed))
+    if((100000 != cfg->speed) && (200000 != cfg->speed) && (400000 != cfg->speed))
     {
         return(stm32i2c_res_NOK);
     }
@@ -511,7 +511,7 @@ static void s_stm32i2c_i2c_enable(void)
     I2C_InitTypeDef i2c_cfg;
     memcpy(&i2c_cfg, &s_stm32i2c_i2c_cfg, sizeof(I2C_InitTypeDef));
     // apply the clockspeed 
-    i2c_cfg.I2C_ClockSpeed = 100000 * s_stm32i2c_generics.cfg.speed;
+    i2c_cfg.I2C_ClockSpeed = s_stm32i2c_generics.cfg.speed;
     // i2c peripheral enable
     I2C_Cmd(s_stm32i2c_generics.i2cx, ENABLE);
     // apply configuration
