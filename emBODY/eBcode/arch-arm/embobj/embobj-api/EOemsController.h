@@ -31,6 +31,8 @@ extern "C" {
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
+#define ENC_INVALID 0xFFFFFFFF
+
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 typedef enum {
