@@ -127,29 +127,50 @@ extern eObool_t eo_emsController_AddAxis(uint8_t naxis)
 
 extern void eo_emsController_ReadEncoders(int32_t *enc)
 {
-    if (!s_emsc) return;
-
+    static float encs_pos[MAX_MOTORS];
     static float axis_pos[MAX_MOTORS];
 
-    float *pos = s_emsc->encoder_pos;
-
-    for (int i=0; i<MAX_MOTORS; ++i)
-    {
-        s_emsc->encoder_pos[i] = (float)enc[i];
-    }
+    if (!s_emsc) return;
 
     if (s_emsc->decoupler[DECOUPLER_POS])
     {
-        eo_decoupler_Mult(s_emsc->decoupler[DECOUPLER_POS], s_emsc->encoder_pos, axis_pos);
-     
-        pos = axis_pos;       
-    }
-
-    for (uint8_t i=0; i<MAX_MOTORS; ++i)
-    {
-        if (s_emsc->axis_controller[i])
+        for (uint8_t i=0; i<MAX_MOTORS; ++i)
         {
-            eo_axisController_ReadEncPos(s_emsc->axis_controller[i], pos[i]);
+            if (enc[i]==(int32_t)ENC_INVALID)
+            {
+                eo_emsController_SkipEncoders();
+
+                return;
+            }
+            
+            encs_pos[i]=(float)enc[i];
+        }
+
+        eo_decoupler_Mult(s_emsc->decoupler[DECOUPLER_POS], encs_pos, axis_pos);
+     
+        for (uint8_t i=0; i<MAX_MOTORS; ++i)
+        {
+            if (s_emsc->axis_controller[i])
+            {
+                eo_axisController_ReadEncPos(s_emsc->axis_controller[i], (int32_t)axis_pos[i]);
+            }
+        }     
+    }
+    else
+    {
+        for (uint8_t i=0; i<MAX_MOTORS; ++i)
+        {
+            if (s_emsc->axis_controller[i])
+            {
+                if (enc[i]==(int32_t)ENC_INVALID)
+                {
+                    eo_axisController_SkipEncPos(s_emsc->axis_controller[i]);
+                }
+                else
+                {
+                    eo_axisController_ReadEncPos(s_emsc->axis_controller[i], enc[i]);
+                }
+            }
         }
     }
 }
