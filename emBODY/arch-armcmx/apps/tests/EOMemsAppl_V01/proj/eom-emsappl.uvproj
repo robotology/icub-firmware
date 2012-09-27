@@ -1160,9 +1160,9 @@
               <FilePath>..\app_nvs_cfg\eOcfg_nvsEP_sk_usrcbk_ebx.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_nvsEP_mc_usrcbk_ebx2.c</FileName>
+              <FileName>eOcfg_nvsEP_mc_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx2.c</FilePath>
+              <FilePath>..\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2469,9 +2469,9 @@
               <FilePath>..\app_nvs_cfg\eOcfg_nvsEP_sk_usrcbk_ebx.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_nvsEP_mc_usrcbk_ebx2.c</FileName>
+              <FileName>eOcfg_nvsEP_mc_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx2.c</FilePath>
+              <FilePath>..\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3778,9 +3778,9 @@
               <FilePath>..\app_nvs_cfg\eOcfg_nvsEP_sk_usrcbk_ebx.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_nvsEP_mc_usrcbk_ebx2.c</FileName>
+              <FileName>eOcfg_nvsEP_mc_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx2.c</FilePath>
+              <FilePath>..\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -5167,9 +5167,9 @@
               <FilePath>..\app_nvs_cfg\eOcfg_nvsEP_sk_usrcbk_ebx.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_nvsEP_mc_usrcbk_ebx2.c</FileName>
+              <FileName>eOcfg_nvsEP_mc_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx2.c</FilePath>
+              <FilePath>..\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx.c</FilePath>
             </File>
           </Files>
         </Group>

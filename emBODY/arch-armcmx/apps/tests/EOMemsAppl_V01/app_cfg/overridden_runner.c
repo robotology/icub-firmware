@@ -428,8 +428,22 @@ static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p)
         eo_emsController_GetJointStatus(jId, &jstatus_ptr->basic);
         
         eo_emsController_GetActivePidStatus(jId, &jstatus_ptr->ofpid); 
-        
-        #error VALE--> aggiungi qui getmotionDone
+
+        if(eomc_motionmonitorstatus_setpointnotreachedyet == jstatus_ptr->basic.motionmonitorstatus)
+        {
+            /* if motionmonitorstatus is equal to _setpointnotreachedyet, i send motion done message. 
+            - if (motionmonitorstatus == eomc_motionmonitorstatus_setpointisreached), i don't send
+            message because the setpoint is alredy reached. this means that:
+                - if monitormode is forever, no new set point has been configured 
+                - if monitormode is _untilreached, the joint reached the setpoint already.
+            - if (motionmonitorstatus == eomc_motionmonitorstatus_notmonitored), i don't send
+            message because pc104 is not interested in getting motion done.
+            */
+            if(eo_emsController_GetMotionDone(jId))
+            {
+                jstatus_ptr->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointisreached;
+            }
+        }
     }
 }
 
@@ -457,15 +471,18 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
             return; //error
         }
         
-        if(jstatus_ptr->basic.motionmonitorstatus != eomc_motionmonitorstatus_setpointnotreachedyet)
+        if(jstatus_ptr->basic.motionmonitorstatus == eomc_motionmonitorstatus_setpointnotreachedyet)
         {
-            /* if motionmonitorstatus is different from _setpointnotreachedyet, 
-            that is it is _notmonitored or _setpointisreached, 
-            i don't need to send motion done message, so return. */
-            continue;
+            /* if motionmonitorstatus is equal to _setpointnotreachedyet, i send motion done message. 
+            - if (motionmonitorstatus == eomc_motionmonitorstatus_setpointisreached), i don't send
+            message because the setpoint is alredy reached. this means that:
+                - if monitormode is forever, no new set point has been configured 
+                - if monitormode is _untilreached, the joint reached the setpoint already.
+            - if (motionmonitorstatus == eomc_motionmonitorstatus_notmonitored), i don't send
+            message because pc104 is not interested in getting motion done.
+            */
+            eo_appCanSP_SendCmd2Joint(appCanSP_ptr, jId, msgCmd, NULL);
         }
-
-        eo_appCanSP_SendCmd2Joint(appCanSP_ptr, jId, msgCmd, NULL);
 
     }   
 }
