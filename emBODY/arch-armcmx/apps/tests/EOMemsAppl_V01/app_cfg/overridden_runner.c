@@ -68,7 +68,7 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 //da usare finche' si usa proto test
-int16_t pwm_out = 0;
+//int16_t pwm_out = 0;
 int32_t encoder_can = 0;
 int32_t posref_can = 0;
 
@@ -345,7 +345,8 @@ static void s_eom_emsrunner_hid_readMc4andMais(EOtheEMSapplBody *p)
 
 static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size)
 {
-    eOresult_t res;
+    eOresult_t err;
+    eOresult_t res = eores_OK;
     eOicubCanProto_msgCommand_t msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
@@ -362,12 +363,24 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, in
             }   
         }
     };
+
 #warning VALE --> put here for cicle to send all setpoints
-    mySetPoint_current.to.current.value = pwmList[0];
+
+    for (uint8_t jid = 0; jid < 4; ++jid)
+    {
+        mySetPoint_current.to.current.value = pwmList[jid];
     
-    /*Since in run mode the frame are sent on demnad...here i can punt in tx queue frame to send.
-    they will be sent by transmitter */
-    res = eo_appCanSP_SendCmd2Joint(eo_emsapplBody_GetCanServiceHandle(p), 3/*jid*/, msgCmd, (void*)&mySetPoint_current);
+        /*Since in run mode the frame are sent on demnad...here i can punt in tx queue frame to send.
+        they will be sent by transmitter */
+
+        err = eo_appCanSP_SendCmd2Joint(eo_emsapplBody_GetCanServiceHandle(p), jid, msgCmd, (void*)&mySetPoint_current);
+        
+        if (err != eores_OK)
+        {
+            res = err;
+        }
+    }
+    
     return(res);
 }
 
@@ -375,34 +388,36 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, in
 
 static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
 {
-    eOresult_t          res;
+    //eOresult_t          res;
     EOtheEMSapplBody    *emsappbody_ptr = eo_emsapplBody_GetHandle();
-    uint32_t            encvalue;
+    uint32_t            encvalue[4] = {ENC_INVALID, ENC_INVALID, ENC_INVALID, ENC_INVALID};
     int16_t             *pwm;
 
-    if (eo_appEncReader_isReady(eo_emsapplBody_GetEncoderReaderHandle(emsappbody_ptr)))
-    {     
-        res = eo_appEncReader_GetValue(eo_emsapplBody_GetEncoderReaderHandle(emsappbody_ptr), eOeOappEncReader_encoder3, &encvalue);
-    }
+    uint16_t numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
 
-    if(eores_OK != res)
-    {
-        eo_emsController_SkipEncoders();
+    if (eo_appEncReader_isReady(eo_emsapplBody_GetEncoderReaderHandle(emsappbody_ptr)))
+    {    
+        for (uint8_t enc = 0; enc < numofjoint; ++enc)
+        {
+            eo_appEncReader_GetValue(eo_emsapplBody_GetEncoderReaderHandle(emsappbody_ptr), (eOappEncReader_encoder_t)enc, &(encvalue[enc]));
+        }
+
+        eo_emsController_ReadEncoders((int32_t*)encvalue);
     }
     else
     {
-        eo_emsController_ReadEncoders((int32_t*)&encvalue);
+        eo_emsController_SkipEncoders();
     }
         
     /* 2) pid calc */
     pwm = eo_emsController_PWM();
      
-    pwm_out = pwm[3];
+    //pwm_out = pwm[3];
         
-#ifndef _USE_PROTO_TEST_
+//#ifndef _USE_PROTO_TEST_
         /* 4) prepare and punt in rx queue new setpoint */
         s_eom_emsrunner_hid_SetCurrentsetpoint(emsappbody_ptr, pwm, 0);
-#endif   
+//#endif   
 
     s_eom_emsrunner_hid_UpdateJointstatus(p);
     /*Note: motor status is updated with data sent by 2foc by can */
@@ -428,22 +443,8 @@ static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p)
         eo_emsController_GetJointStatus(jId, &jstatus_ptr->basic);
         
         eo_emsController_GetActivePidStatus(jId, &jstatus_ptr->ofpid); 
-
-        if(eomc_motionmonitorstatus_setpointnotreachedyet == jstatus_ptr->basic.motionmonitorstatus)
-        {
-            /* if motionmonitorstatus is equal to _setpointnotreachedyet, i send motion done message. 
-            - if (motionmonitorstatus == eomc_motionmonitorstatus_setpointisreached), i don't send
-            message because the setpoint is alredy reached. this means that:
-                - if monitormode is forever, no new set point has been configured 
-                - if monitormode is _untilreached, the joint reached the setpoint already.
-            - if (motionmonitorstatus == eomc_motionmonitorstatus_notmonitored), i don't send
-            message because pc104 is not interested in getting motion done.
-            */
-            if(eo_emsController_GetMotionDone(jId))
-            {
-                jstatus_ptr->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointisreached;
-            }
-        }
+        
+        #warning VALE--> aggiungi qui getmotionDone
     }
 }
 
@@ -471,18 +472,15 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
             return; //error
         }
         
-        if(jstatus_ptr->basic.motionmonitorstatus == eomc_motionmonitorstatus_setpointnotreachedyet)
+        if(jstatus_ptr->basic.motionmonitorstatus != eomc_motionmonitorstatus_setpointnotreachedyet)
         {
-            /* if motionmonitorstatus is equal to _setpointnotreachedyet, i send motion done message. 
-            - if (motionmonitorstatus == eomc_motionmonitorstatus_setpointisreached), i don't send
-            message because the setpoint is alredy reached. this means that:
-                - if monitormode is forever, no new set point has been configured 
-                - if monitormode is _untilreached, the joint reached the setpoint already.
-            - if (motionmonitorstatus == eomc_motionmonitorstatus_notmonitored), i don't send
-            message because pc104 is not interested in getting motion done.
-            */
-            eo_appCanSP_SendCmd2Joint(appCanSP_ptr, jId, msgCmd, NULL);
+            /* if motionmonitorstatus is different from _setpointnotreachedyet, 
+            that is it is _notmonitored or _setpointisreached, 
+            i don't need to send motion done message, so return. */
+            continue;
         }
+
+        eo_appCanSP_SendCmd2Joint(appCanSP_ptr, jId, msgCmd, NULL);
 
     }   
 }
