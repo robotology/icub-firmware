@@ -320,13 +320,39 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__stoptrajectory(eOcfg_nvsEP_mc_
 
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
+    eOresult_t                              res;
     eOmc_calibrator_t                       *calibrator = (eOmc_calibrator_t*)nv->loc;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOmc_controlmode_t                      controlmode_2foc = eomc_controlmode_current;
+    eOicubCanProto_msgDestination_t         msgdest;
+    eOicubCanProto_msgCommand_t             msgCmd = 
+    {
+        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.cmdId) 0
+    };
+
+    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+    // 1) send current control mode and pwm ena to 2foc
+    res = eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), jxx,  &canLoc, NULL);
+    if(eores_OK != res)
+    {
+        return;
+    }
+
+    //set destination of all messages 
+    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+
+
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
+    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
+
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;
+    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
 
     eo_emsController_StartCalibration(jxx, 
                                       calibrator->params.type3.position, 
                                       calibrator->params.type3.velocity,
                                       calibrator->params.type3.offset); 
-
 }
 
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
@@ -334,6 +360,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
     eOresult_t                              res;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOmc_controlmode_t                      *controlmode_ptr = (eOmc_controlmode_t*)nv->loc;
+    eOmc_controlmode_t                      controlmode_2foc = eomc_controlmode_current;
     eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t            msgCmd = 
     {
@@ -375,10 +402,10 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
             eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
         }break;
         
-        default: // pos-controlmode, vel-controlmode, etc (see enum type eOmc_controlmode_t) 
+        default: //2foc control mode is always current
         {
             msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
-            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, controlmode_ptr);
+            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
             
             msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;
             eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);

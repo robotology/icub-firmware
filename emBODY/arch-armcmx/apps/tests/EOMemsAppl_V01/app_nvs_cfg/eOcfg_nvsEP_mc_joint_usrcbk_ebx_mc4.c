@@ -529,14 +529,18 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
     eOicubCanProto_msgCommand_t            msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__CALIBRATE_ENCODER
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN
     };
 
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     /*Since icub can proto uses encoder tacks like position unit, i need of the converter: from icub to encoder*/
     EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
 
-    // 1)prepare data to send
+    // 1) send controller run
+    eo_appCanSP_SendCmd2Joint(appCanSP_ptr, (eOmc_jointId_t)jxx, msgCmd, NULL);
+    
+    // 2)prepare calibration data to send
+     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CALIBRATE_ENCODER;
     iCubCanProtCalibrator.type = (eOicubCanProto_calibration_type_t)calibrator->type;
     switch(calibrator->type)
     {
@@ -574,7 +578,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
         
     }
 
-    // 2) send message
+    // 3) send calibration message
     eo_appCanSP_SendCmd2Joint(appCanSP_ptr, (eOmc_jointId_t)jxx, msgCmd, &iCubCanProtCalibrator);
 }
 
