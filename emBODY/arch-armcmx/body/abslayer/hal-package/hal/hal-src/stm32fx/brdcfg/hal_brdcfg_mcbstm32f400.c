@@ -540,7 +540,7 @@ extern void hal_brdcfg_switch__reg_write_byI2C(uint8_t* pBuffer, uint16_t WriteA
 
 extern void hal_brdcfg_eth__phy_start(void)
 {
-/* NOTE: this function can initilises only A1 pin because the PHY (called also ethernet transceiver) 
+/* NOTE: this function can initialises only A1 pin because the PHY (called also ethernet transceiver) 
    is reset on start up and it is configured to work at 100Mb.
    The configuration of PHY is made by MIIM
    interface (MII Management).
@@ -555,8 +555,10 @@ extern void hal_brdcfg_eth__phy_start(void)
 //    GPIOA->CRL   &= 0xFFFFFF0F;
 //    GPIOA->CRL   |= 0x00000040;    /* set pin 1 in reset state and 2 in alternFunc 50MHz */
 
-    // questo e' per stm32f4
-    // PA1 -> ETH_RMII_REF_CLK, PA2 -> ETH _MDIO, PA7 -> ETH_RMII _CRS_DV, PA8 -> MCO1 
+    
+    #warning --> e' necessario prima configurare rmii e solo dopo il phy. 
+//     // questo e' per stm32f4
+//     // PA1 -> ETH_RMII_REF_CLK, PA2 -> ETH _MDIO, PA7 -> ETH_RMII _CRS_DV, PA8 -> MCO1 
     GPIOA->MODER   &= ~0x0000000C;              // reset pa1
     GPIOA->MODER   |=  0x00000008;              /* Pin to alternate function */
     GPIOA->OTYPER  &= ~0x00000002;              /* Pins in push-pull mode     */

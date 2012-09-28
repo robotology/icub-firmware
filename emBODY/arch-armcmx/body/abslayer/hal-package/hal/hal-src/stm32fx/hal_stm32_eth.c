@@ -202,12 +202,12 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     eventviewer_load(ev_ID_first_isr+hal_arch_arm_ETH_IRQn, ETH_IRQHandler);
 #endif
 
-    // this code is board-dependent
+
+
+
+    s_hal_eth_rmii_init();     
+    
     hal_brdcfg_eth__phy_start(); 
-
-
-    // code from here is common to every board
-    s_hal_eth_rmii_init();
 
 // #if 0
 // // -----------------------------------------------------------------------------------------------------------
@@ -677,6 +677,12 @@ extern uint16_t read_PHY (uint16_t PHYAddr, uint16_t PhyReg)
 // acemor-facenda-eth-stm32x: cambiata
 static void s_hal_eth_RCC_conf(void)
 {
+    
+// #if     defined(USE_STM32F1)
+// #elif   defined(USE_STM32F4)
+//       // enable system configuration controller clock
+//       RCC->APB2ENR |= (1 << 14);  
+// #endif    
 #if     defined(USE_STM32F1)    
 
     // step 1.
@@ -693,14 +699,15 @@ static void s_hal_eth_RCC_conf(void)
     
 #elif   defined(USE_STM32F4)
 
-    // step 1.
-    /* Reset Ethernet MAC */
+    // step 1. enable system configuration controller clock
+    RCC->APB2ENR |= (1 << 14);  
+    
+    // step 2. Reset Ethernet MAC 
     RCC->AHB1RSTR |=  0x02000000;
     SYSCFG->PMC |=  (1 << 23);              // if mii and not rmii: SYSCFG->PMC &= ~(1 << 23);
     RCC->AHB1RSTR &= ~0x02000000;
     
-    // step 2.
-    /* Enable Ethernet (RX, TX, MAC) and GPIOA, GPIOB, GPIOC, GPIOG clocks */ // if also PTP clock: 0x1E000047
+    // step 3. Enable Ethernet (RX, TX, MAC) and GPIOA, GPIOB, GPIOC, GPIOG clocks // if also PTP clock: 0x1E000047
     RCC->AHB1ENR |= 0x0E000047;
 
 #endif    
@@ -752,11 +759,6 @@ static void s_hal_eth_rmii_init(void)
     so, in case of switch, it can work even if eth is not initilized.
 */
   
-#if     defined(USE_STM32F1)
-#elif   defined(USE_STM32F4)
-      // enable system configuration controller clock
-      RCC->APB2ENR |= (1 << 14);  
-#endif    
 
     // enable clock for GPIO ports and MAC
     s_hal_eth_RCC_conf();   
@@ -816,6 +818,8 @@ static void s_hal_eth_GPIO_conf(void)
 #elif   defined(USE_STM32F4)
 
 #warning --> PA1 is PA1 -> ETH_RMII_REF_CLK. is is used also for ems?
+    
+#if 1
     /* Configure Port A ethernet pins (PA.1, PA.2, PA.7, PA.8) */
     // PA1 -> ETH_RMII_REF_CLK, PA2 -> ETH _MDIO, PA7 -> ETH_RMII _CRS_DV, PA8 -> MCO1 
     GPIOA->MODER   &= ~0x0003C03C;              // reset pa1, pa2, pa7, pa8
@@ -828,7 +832,18 @@ static void s_hal_eth_GPIO_conf(void)
     GPIOA->AFR[0]  |=  0xB0000BB0;              /* Pins to AF11 (Ethernet)    */
     GPIOA->AFR[1]  &= ~0x0000000F;              
     GPIOA->AFR[1]  |=  0x00000000;              /* Pin to AF0 (MCO1)          */
+#else
+    GPIOA->MODER   &= ~0x0003C030;              // reset pa1, pa2, pa7, pa8
+    GPIOA->MODER   |=  0x00028020;              /* Pins to alternate function */
+    GPIOA->OTYPER  &= ~0x00000184;              /* Pins in push-pull mode     */
+    GPIOA->OSPEEDR |=  0x0003C030;              /* Slew rate as 100MHz pin    */
+    GPIOA->PUPDR   &= ~0x0003C030;              /* No pull up, no pull down   */
 
+    GPIOA->AFR[0]  &= ~0xF0000F00;
+    GPIOA->AFR[0]  |=  0xB0000B00;              /* Pins to AF11 (Ethernet)    */
+    GPIOA->AFR[1]  &= ~0x0000000F;              
+    GPIOA->AFR[1]  |=  0x00000000;              /* Pin to AF0 (MCO1)          */
+#endif
     //#ifdef _MII_
     //  /* Configure Port B ethernet pin (PB8) */
     //  GPIOB->MODER   &= ~0x00030000;
