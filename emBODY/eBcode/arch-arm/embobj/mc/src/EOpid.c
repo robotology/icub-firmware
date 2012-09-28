@@ -82,6 +82,7 @@ extern EOpid* eo_pid_New(void)
          
         o->pwm = 0.0f;
 
+        o->Yoff = 0.0f;
         o->Ymax = 0.0f;
         o->Imax = 0.0f;
         o->KImax = 0.0f;
@@ -92,31 +93,25 @@ extern EOpid* eo_pid_New(void)
     return o;
 }
 
-extern void eo_pid_Init(EOpid *o, float K, float Kd, float Ki, float Ymax, float Imax)
+extern void eo_pid_Init(EOpid *o, float K, float Kd, float Ki, float Ymax, float Imax, float Yoff)
 {
-    eo_pid_SetPid(o, K, Kd, Ki);
-
-    eo_pid_SetPidLimits(o, Ymax, Imax);
+    eo_pid_SetPid(o, K, Kd, Ki, Ymax, Imax, Yoff);
 
     eo_pid_Reset(o);
 
     o->initialized = eobool_true;
 }
 
-extern void eo_pid_SetPid(EOpid *o, float K, float Kd, float Ki)
+extern void eo_pid_SetPid(EOpid *o, float K, float Kd, float Ki, float Ymax, float Imax, float Yoff)
 {
     o->K  = K;
     o->Kd = Kd*EMS_PERIOD;
     o->Ki = Ki;
 
-    o->KImax = o->Ki!=0.0f ? o->Imax/o->Ki : 0.0f;
-}
-
-extern void eo_pid_SetPidLimits(EOpid *o, float Ymax, float Imax)
-{
     o->Ymax = Ymax;
     o->Imax = Imax;
-    
+    o->Yoff = Yoff;
+
     o->KImax = o->Ki!=0.0f ? o->Imax/o->Ki : 0.0f;
 }
 
@@ -148,7 +143,7 @@ extern int16_t eo_pid_PWM2(EOpid *o, float En, float Vref,float Venc)
 
     LIMIT(o->KIn, o->KImax);
 
-    o->pwm = Xn+o->Ki*o->KIn;
+    o->pwm = Xn + o->Ki*o->KIn + o->Yoff;
      
     // dead zone suppression
     // motor moves with pwm > 680
