@@ -80,8 +80,9 @@ extern void eo_axisController_ReadEncPos(EOaxisController *o, int32_t pos);
 extern void eo_axisController_SkipEncPos(EOaxisController *o);
 extern void eo_axisController_ReadSpeed(EOaxisController *o, int32_t speed);
 
-extern int32_t eo_axisController_GetVelocity(EOaxisController *o);
+//extern int32_t eo_axisController_GetVelocity(EOaxisController *o);
 
+extern void eo_axisController_SetOutput(EOaxisController *o, int16_t out);
 extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_t avg_vel);
 extern void eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_t avg_acc);
 extern void eo_axisController_SetTrqRef(EOaxisController *o, int32_t trq);
@@ -100,14 +101,15 @@ extern void eo_axisController_SetPosMin(EOaxisController *o, int32_t pos_min);
 extern void eo_axisController_SetPosMax(EOaxisController *o, int32_t pos_max);
 extern void eo_axisController_SetVelMax(EOaxisController *o, int32_t vel_max);
 
-extern void eo_axisController_SetOffset(EOaxisController *o, int16_t offset);
-
 extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint_status_ofpid_t* pidStatus);
 extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_status_basic_t* jointStatus);
 extern eObool_t eo_axisController_GetMotionDone(EOaxisController *o);
 
 extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o);
 extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o);
+
+extern void eo_axisController_SetPosPid(EOaxisController *o, float K, float Kd, float Ki, float Ymax, float Imax, float Yoff);
+extern void eo_axisController_SetTrqPid(EOaxisController *o, float K, float Kd, float Ki, float Ymax, float Imax, float Yoff);
 
 extern void eo_axisController_StartCalibration(EOaxisController *o, int32_t pos, int32_t vel, int32_t offset);
 

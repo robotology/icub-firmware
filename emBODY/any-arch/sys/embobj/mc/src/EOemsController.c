@@ -125,6 +125,19 @@ extern eObool_t eo_emsController_AddAxis(uint8_t naxis)
     return eobool_true;
 }
 
+extern void eo_emsController_SkipEncoders(void)
+{
+    if (!s_emsc) return;
+
+    for (uint8_t i=0; i<MAX_MOTORS; ++i)
+    {
+        if (s_emsc->axis_controller[i])
+        {
+            eo_axisController_SkipEncPos(s_emsc->axis_controller[i]);
+        }
+    }
+}
+
 extern void eo_emsController_ReadEncoders(int32_t *enc)
 {
     static float encs_pos[MAX_MOTORS];
@@ -175,34 +188,12 @@ extern void eo_emsController_ReadEncoders(int32_t *enc)
     }
 }
 
-extern void eo_emsController_SkipEncoders(void)
-{
-    if (!s_emsc) return;
-
-    for (uint8_t i=0; i<MAX_MOTORS; ++i)
-    {
-        if (s_emsc->axis_controller[i])
-        {
-            eo_axisController_SkipEncPos(s_emsc->axis_controller[i]);
-        }
-    }
-}
-
 extern void eo_emsController_ReadSpeed(uint8_t axis, int32_t speed)
 {
     if (!s_emsc) return;
 
     eo_axisController_ReadSpeed(s_emsc->axis_controller[axis], speed);    
 }
-
-/*
-extern float eo_emsController_GetVelocity(uint8_t joint)
-{
-    if (!s_emsc) return 0.0f;
-
-    return eo_axisController_GetVelocity(s_emsc->axis_controller[joint]);                
-}
-*/
 
 extern void eo_emsController_ReadTorques(int32_t *torque)
 {
@@ -231,11 +222,20 @@ extern void eo_emsController_ReadTorques(int32_t *torque)
     }
 }
 
-extern void eo_emsController_SetOffset(uint8_t joint, int16_t off)
+/*
+extern float eo_emsController_GetVelocity(uint8_t joint)
+{
+    if (!s_emsc) return 0.0f;
+
+    return eo_axisController_GetVelocity(s_emsc->axis_controller[joint]);                
+}
+*/
+
+extern void eo_emsController_SetOutput(uint8_t joint, int16_t out)
 {
     if (!s_emsc) return;
 
-    eo_axisController_SetOffset(s_emsc->axis_controller[joint], off);    
+    eo_axisController_SetOutput(s_emsc->axis_controller[joint], out);    
 }
 
 extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_vel)
@@ -379,33 +379,18 @@ extern void eo_emsController_SetDecoupler(emsMotorDecoupler_t dec_type, float ma
 
 ///////////////////////
 // PID configurations
-
-extern void eo_emsController_SetPosPid(uint8_t joint, float k, float kd, float ki)
+extern void eo_emsController_SetPosPid(uint8_t joint, float K, float Kd, float Ki, float Ymax, float Imax, float Yoff)
 {
     if (!s_emsc) return;
 
-    eo_pid_SetPid(eo_axisController_GetPosPidPtr(s_emsc->axis_controller[joint]), k, kd, ki);    
+    eo_axisController_SetPosPid(s_emsc->axis_controller[joint], K, Kd, Ki, Ymax, Imax, Yoff);    
 }   
-extern void eo_emsController_SetPosPidLimits(uint8_t joint, float Ymax, float Imax)
+extern void eo_emsController_SetTrqPid(uint8_t joint, float K, float Kd, float Ki, float Ymax, float Imax, float Yoff)
 {
     if (!s_emsc) return;
 
-    eo_pid_SetPidLimits(eo_axisController_GetPosPidPtr(s_emsc->axis_controller[joint]), Ymax, Imax);    
-}
-
-extern void eo_emsController_SetTrqPid(uint8_t joint, float k, float kd, float ki)
-{
-    if (!s_emsc) return;
-
-    eo_pid_SetPid(eo_axisController_GetTrqPidPtr(s_emsc->axis_controller[joint]), k, kd, ki);    
+    eo_axisController_SetTrqPid(s_emsc->axis_controller[joint], K, Kd, Ki, Ymax, Imax, Yoff);    
 }   
-extern void eo_emsController_SetTrqPidLimits(uint8_t joint, float Ymax, float Imax)
-{
-    if (!s_emsc) return;
-
-    eo_pid_SetPidLimits(eo_axisController_GetTrqPidPtr(s_emsc->axis_controller[joint]), Ymax, Imax);    
-}
-
 // PID configurations
 ///////////////////////
 
