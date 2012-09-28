@@ -28,6 +28,17 @@ extern "C" {
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
+// required
+#define MASK_POS_PID     0x0001
+#define MASK_TRQ_PID     0x0002
+#define MASK_MIN_POS     0x0004
+#define MASK_MAX_POS     0x0008
+#define MASK_VEL_TOUT    0x0010
+// optional
+#define MASK_MAX_VEL     0x0020
+ 
+#define MASK_INIT_REQ    0x001F
+ 
 #define eo_axisController_ReadTorque_hid(axis_controller, torque) axis_controller->torque_meas = torque
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
@@ -78,9 +89,11 @@ struct EOaxisController_hid
     int32_t stiffness;
     int32_t damping;
 
-    int16_t pwm_offset;
+    int16_t openloop_out;
 
     uint8_t control_mode;
+
+    uint16_t ready_mask;
 }; 
 
 
