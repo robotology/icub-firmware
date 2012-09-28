@@ -195,12 +195,14 @@ extern void eo_emsController_ReadSpeed(uint8_t axis, int32_t speed)
     eo_axisController_ReadSpeed(s_emsc->axis_controller[axis], speed);    
 }
 
+/*
 extern float eo_emsController_GetVelocity(uint8_t joint)
 {
     if (!s_emsc) return 0.0f;
 
     return eo_axisController_GetVelocity(s_emsc->axis_controller[joint]);                
 }
+*/
 
 extern void eo_emsController_ReadTorques(int32_t *torque)
 {
