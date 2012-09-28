@@ -104,6 +104,7 @@ extern void eo_axisController_SetOffset(EOaxisController *o, int16_t offset);
 
 extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint_status_ofpid_t* pidStatus);
 extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_status_basic_t* jointStatus);
+extern eObool_t eo_axisController_GetMotionDone(EOaxisController *o);
 
 extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o);
 extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o);

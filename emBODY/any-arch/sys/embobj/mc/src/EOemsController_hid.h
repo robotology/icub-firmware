@@ -42,13 +42,14 @@ struct EOemsController_hid
 
     EOaxisController *axis_controller[MAX_MOTORS];
 
-    float encoder_pos[MAX_MOTORS];
     float torque_meas[MAX_MOTORS];
 
-    float pos_ref[MAX_MOTORS];
-    float vel_ref[MAX_MOTORS];
-    float acc_ref[MAX_MOTORS];
-    float trq_ref[MAX_MOTORS];
+    //float encoder_pos[MAX_MOTORS];
+    
+    //float pos_ref[MAX_MOTORS];
+    //float vel_ref[MAX_MOTORS];
+    //float acc_ref[MAX_MOTORS];
+    //float trq_ref[MAX_MOTORS];
 }; 
 
 
