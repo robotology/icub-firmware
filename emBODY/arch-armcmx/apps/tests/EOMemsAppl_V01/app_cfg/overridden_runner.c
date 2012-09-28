@@ -67,10 +67,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
-//da usare finche' si usa proto test
-//int16_t pwm_out = 0;
-int32_t encoder_can = 0;
-int32_t posref_can = 0;
+// empty-section
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -236,8 +233,8 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
 #ifdef _USE_PROTO_TEST_
     mySetPoint_current.to.current.value = pwm_out;
     eo_appCanSP_SendSetPoint(p->cfg.appCanSP_ptr, 3, &mySetPoint_current);  
-    ((int32_t*)payload)[0]=encoder_can;
-    ((int32_t*)payload)[1]=posref_can;
+    //((int32_t*)payload)[0]=encoder_can;
+    //((int32_t*)payload)[1]=posref_can;
 
     eo_appCanSP_SendMessage_TEST(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), payload);    
         
