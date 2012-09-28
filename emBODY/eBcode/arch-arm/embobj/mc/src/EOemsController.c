@@ -127,29 +127,50 @@ extern eObool_t eo_emsController_AddAxis(uint8_t naxis)
 
 extern void eo_emsController_ReadEncoders(int32_t *enc)
 {
-    if (!s_emsc) return;
-
+    static float encs_pos[MAX_MOTORS];
     static float axis_pos[MAX_MOTORS];
 
-    float *pos = s_emsc->encoder_pos;
-
-    for (int i=0; i<MAX_MOTORS; ++i)
-    {
-        s_emsc->encoder_pos[i] = (float)enc[i];
-    }
+    if (!s_emsc) return;
 
     if (s_emsc->decoupler[DECOUPLER_POS])
     {
-        eo_decoupler_Mult(s_emsc->decoupler[DECOUPLER_POS], s_emsc->encoder_pos, axis_pos);
-     
-        pos = axis_pos;       
-    }
-
-    for (uint8_t i=0; i<MAX_MOTORS; ++i)
-    {
-        if (s_emsc->axis_controller[i])
+        for (uint8_t i=0; i<MAX_MOTORS; ++i)
         {
-            eo_axisController_ReadEncPos(s_emsc->axis_controller[i], pos[i]);
+            if (enc[i]==(int32_t)ENC_INVALID)
+            {
+                eo_emsController_SkipEncoders();
+
+                return;
+            }
+            
+            encs_pos[i]=(float)enc[i];
+        }
+
+        eo_decoupler_Mult(s_emsc->decoupler[DECOUPLER_POS], encs_pos, axis_pos);
+     
+        for (uint8_t i=0; i<MAX_MOTORS; ++i)
+        {
+            if (s_emsc->axis_controller[i])
+            {
+                eo_axisController_ReadEncPos(s_emsc->axis_controller[i], (int32_t)axis_pos[i]);
+            }
+        }     
+    }
+    else
+    {
+        for (uint8_t i=0; i<MAX_MOTORS; ++i)
+        {
+            if (s_emsc->axis_controller[i])
+            {
+                if (enc[i]==(int32_t)ENC_INVALID)
+                {
+                    eo_axisController_SkipEncPos(s_emsc->axis_controller[i]);
+                }
+                else
+                {
+                    eo_axisController_ReadEncPos(s_emsc->axis_controller[i], enc[i]);
+                }
+            }
         }
     }
 }
@@ -174,12 +195,14 @@ extern void eo_emsController_ReadSpeed(uint8_t axis, int32_t speed)
     eo_axisController_ReadSpeed(s_emsc->axis_controller[axis], speed);    
 }
 
+/*
 extern float eo_emsController_GetVelocity(uint8_t joint)
 {
     if (!s_emsc) return 0.0f;
 
     return eo_axisController_GetVelocity(s_emsc->axis_controller[joint]);                
 }
+*/
 
 extern void eo_emsController_ReadTorques(int32_t *torque)
 {
@@ -304,7 +327,7 @@ extern void eo_emsGetActivePidStatus(uint8_t joint, int16_t *pwm, int32_t *err)
 }
 */
 
-extern void eo_emsGetActivePidStatus(uint8_t joint, eOmc_joint_status_ofpid_t* pidStatus)
+extern void eo_emsController_GetActivePidStatus(uint8_t joint, eOmc_joint_status_ofpid_t* pidStatus)
 {
     if (s_emsc && s_emsc->axis_controller[joint])
     {
@@ -318,7 +341,7 @@ extern void eo_emsGetActivePidStatus(uint8_t joint, eOmc_joint_status_ofpid_t* p
     }
 }
 
-extern void eo_emsGetJointStatus(uint8_t joint, eOmc_joint_status_basic_t* jointStatus)
+extern void eo_emsController_GetJointStatus(uint8_t joint, eOmc_joint_status_basic_t* jointStatus)
 {
     if (s_emsc && s_emsc->axis_controller[joint])
     {
@@ -332,6 +355,18 @@ extern void eo_emsGetJointStatus(uint8_t joint, eOmc_joint_status_basic_t* joint
         jointStatus->torque              = 0;  // the torque of the joint when locally measured
         jointStatus->motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;  // use eOmc_motionmonitorstatus_t. it is eomc_motionmonitorstatus_notmonitored unless the monitor is activated in jconfig.motionmonitormode  
         jointStatus->controlmodestatus   = CM_IDLE;  // use eOmc_controlmode_t. it is a readonly shadow copy of jconfig.controlmode used to remind the host of teh current controlmode
+    }
+}
+
+extern eObool_t eo_emsController_GetMotionDone(uint8_t joint)
+{
+    if (s_emsc && s_emsc->axis_controller[joint])
+    {
+        return eo_axisController_GetMotionDone(s_emsc->axis_controller[joint]);
+    }
+    else
+    {
+        return eobool_false;
     }
 }
 

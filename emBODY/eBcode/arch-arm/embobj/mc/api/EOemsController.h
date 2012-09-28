@@ -31,6 +31,8 @@ extern "C" {
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
+#define ENC_INVALID 0xFFFFFFFF
+
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 typedef enum {
@@ -103,7 +105,9 @@ extern void eo_emsController_ResetPosPid(uint8_t joint);
 extern void eo_emsController_ResetTrqPid(uint8_t joint);
 extern void eo_emsController_Stop(uint8_t joint);
 //extern void eo_emsGetActivePidStatus(uint8_t joint, int16_t *pwm, int32_t *err);
-extern void eo_emsGetActivePidStatus(uint8_t joint, eOmc_joint_status_ofpid_t* pidStatus);
+extern void eo_emsController_GetActivePidStatus(uint8_t joint, eOmc_joint_status_ofpid_t* pidStatus);
+extern void eo_emsController_GetJointStatus(uint8_t joint, eOmc_joint_status_basic_t* jointStatus);
+extern eObool_t eo_emsController_GetMotionDone(uint8_t joint);
 
 // configuration
 
