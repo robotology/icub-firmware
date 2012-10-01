@@ -40,6 +40,7 @@
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
+
 #define HAL_ETH_PHY_WR_TIMEOUT		    0x10000
 
 #define HAL_ETH_AUTONEG_MASK			0x0020
@@ -63,9 +64,19 @@ extern uint32_t hal_eth_hid_getsize(const hal_cfg_t *cfg);
 
 extern hal_result_t hal_eth_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory);
 
-extern  void write_PHY (uint16_t PHYAddr, uint16_t PhyReg, uint16_t value);
+extern void hal_eth_hid_rmii_prepare(void);
+extern void hal_eth_hid_rmii_refclock_init(void);
+extern void hal_eth_hid_rmii_tx_init(void);
+extern void hal_eth_hid_rmii_rx_init(void);
 
-extern uint16_t read_PHY (uint16_t PHYAddr, uint16_t PhyReg);
+extern void hal_eth_hid_microcontrollerclockoutput_init(void);
+
+
+extern void hal_eth_hid_smi_init(void);
+
+extern void hal_eth_hid_smi_write(uint8_t PHYAddr, uint8_t PhyReg, uint16_t value);
+
+extern uint16_t hal_eth_hid_smi_read(uint8_t PHYAddr, uint8_t PhyReg);
 
 
 

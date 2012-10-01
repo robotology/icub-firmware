@@ -38,7 +38,7 @@
 #include "hal_stm32_base_hid.h" 
 #include "hal_i2c4hal.h" //devo usare i2c per accedere allo switch
 
-#include "hal_stm32_switch_hid.h"  //serve.attualemnte non esiste
+#include "hal_stm32_i2c4hal_hid.h"
 
 #include "hal_brdcfg.h"
 
@@ -54,8 +54,8 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-//#include "hal_stm32_switch_hid.h"  //serve.attualemnte non esiste
-#include "hal_stm32_i2c4hal_hid.h"
+#include "hal_stm32_switch_hid.h" 
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -228,7 +228,7 @@ static hal_result_t s_hal_switch_init(const hal_switch_cfg_t *cfg)
 
     //congigure pin A1(Reference clock for switch. )
     GPIOA->CRL   &= 0xFFFFFF0F;
-    GPIOA->CRL   |= 0x00000040;    /*set pin 1 in reset state and 2 in alternFunc 50MHz*/
+    GPIOA->CRL   |= 0x00000040;    /* set pin 1 in reset state */
     // il clock sulla porta A e' abilitato all'inizio nella eth init.
     GPIOA->CRH   &= 0xFFFFFFF0;
     GPIOA->CRH   |= 0x0000000B;	/*Pin 8 is congigured in AlterFunc 50MHz*/
@@ -236,8 +236,8 @@ static hal_result_t s_hal_switch_init(const hal_switch_cfg_t *cfg)
     
     //config pin of reset state ( pin B2)
     GPIOB->CRL   &= 0xFFFFF0FF;
-    GPIOB->CRL   |= 0x00000200;    /*GPout 2MHz*/ 
-    GPIOB->BSRR  |= 0x00000004;  /* Exit phy from reset state */
+    GPIOB->CRL   |= 0x00000200;    /* GPout 2MHz */ 
+    GPIOB->BSRR  |= 0x00000004;    /* Exit phy from reset state */
 
 
     res = s_hal_switch_reg_config(cfg);

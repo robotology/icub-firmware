@@ -66,9 +66,6 @@
 
 #include "hal_stm32_eth_def.h" 
 
-// from NET_CONFIG.H       
-//#define ETH_MTU         1514      /* Ethernet Frame Max Transfer Unit        */
-//#define     STM3210C 1
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -109,17 +106,15 @@ static hal_boolval_t s_hal_eth_supported_is(void);
 static void s_hal_eth_initted_set(void);
 static hal_boolval_t s_hal_eth_initted_is(void);
 
-// keep teh same names of the tcpnet driver, without s_ prefix
+// keep the same names of the tcpnet driver, without s_ prefix
 static void rx_descr_init (void);
 static void tx_descr_init (void);
-//static void write_PHY (uint16_t PHYAddr, uint16_t PhyReg, uint16_t value);
-//static uint16_t read_PHY (uint16_t PHYAddr, uint16_t PhyReg);
-static void s_hal_eth_RCC_conf(void);
-
+//static void s_hal_eth_RCC_conf(void);
 static void s_hal_eth_GPIO_conf(void);
-//static hal_result_t s_hal_eth_phyStatus_checkAndWait(uint16_t PHYAddr, uint16_t PhyReg, uint16_t checkMask);
 
 static void s_hal_eth_rmii_init(void);
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -170,15 +165,6 @@ extern void ETH_IRQHandler(void);
 // acemor-facenda-eth-stm32x: change something
 extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
 {
-    /* Initialize the ETH ethernet controller. */
-//    uint32_t regv;
-//    hal_result_t res;
-//    uint8_t set_full_mode =1;
-//    uint8_t set_100mb = 1;
-//    uint8_t i;
-//    uint8_t all_links_are_down = 1;
-//    uint8_t phy_link_is_up[HAL_BRDCFG_ETH__PHY_DEVICE_NUM];
-
 
     if(hal_true != s_hal_eth_supported_is())
     {
@@ -203,127 +189,15 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
 #endif
 
 
-
-
     s_hal_eth_rmii_init();     
     
     hal_brdcfg_eth__phy_start(); 
 
-// #if 0
-// // -----------------------------------------------------------------------------------------------------------
-
-// /*Valentina: 
-// ho eliminato la possibilita' di configurare i link a 10MBIT  o a 100MB o auto negoziare
-// in quanto questa configurazione poteva essere fatta solo a compile time definendo una macro che
-// ti faceva scegliere una delle 3 opzioni.
-// Fino ad oggi non usavamo nessuna macro quindi applicavamo la autonegoziazione.
-// Ma visti i problemi incontrati nella configurazione dello switch 
-// conviene configurare di default tutti i link a 100MB.
-// Ho lasciato comunque il codice per non buttarlo via...
-// */
-
-
-//     /* Configure all PHY devices */
-//     #if defined (_10MBIT_)
-//     
-//     for(i=0; i< PHY_DEVICE_NUM; i++)
-//     {
-//         write_PHY (hal_brdcfg_eth__phy_device_list[i], PHY_REG_BMCR, PHY_FULLD_10M); /* Connect at 10MBit */
-//     }
-//     /* Note: I must not set any bit in ethernet register, 
-//        because in order to configure 10 Mbit FES bit in eTH register must be  equal to zero.  */
-//     
-//     #elif defined (_100MBIT_)
-//     
-//     for(i=0; i< HAL_BRDCFG_ETH__PHY_DEVICE_NUM; i++)
-//     {
-//         write_PHY (hal_brdcfg_eth__phy_device_list[i], PHY_REG_BMCR, PHY_FULLD_100M); /* Connect at 100MBit */
-//     }
-
-//     ETH->MACCR |= MCR_FES;
-
-//     #else
-//     /* Use autonegotiation about the link speed. */
-//  
-//     for(i=0; i< HAL_BRDCFG_ETH__PHY_DEVICE_NUM; i++)
-//     {
-//         write_PHY (hal_brdcfg_eth__phy_device_list[i], PHY_REG_BMCR, PHY_AUTO_NEG);
-//         res = s_hal_eth_phyStatus_checkAndWait(hal_brdcfg_eth__phy_device_list[i], PHY_REG_BMSR, HAL_ETH_AUTONEG_MASK);
-//         if (hal_res_OK != res)
-//         {
-//             //if autonegotiantion isn't completed then force link to 100Mb
-//             write_PHY (hal_brdcfg_eth__phy_device_list[i], PHY_REG_BMCR, PHY_FULLD_100M);
-//             //hal_on_fatalerror(hal_error_eth_cfgincorrect, "Autonegotiation incomplete\n");
-//             //return; //TODO: specify type of error: Autonegotiation incomplete.
-//         }
-//     }
-
-
-//     /* Verify link status*/
-//     for(i=0; i< HAL_BRDCFG_ETH__PHY_DEVICE_NUM; i++)
-//     {
-//         res = s_hal_eth_phyStatus_checkAndWait(hal_brdcfg_eth__phy_device_list[i], PHY_REG_BMSR, HAL_ETH_LINK_UP_MASK);
-//         if (hal_res_OK == res)
-//         {
-//             all_links_are_down &= 0x0;
-//             phy_link_is_up[i] = 1;
-//             
-//         }
-//         else
-//         {
-//              phy_link_is_up[i] = 0;
-//         }
-//     }
-
-//     /* Initialize MAC control register */
-//     
-//     
-//     ETH->MACCR  = MCR_ROD;  /* Receive own disable: the MAC disables the reception of frames in Half-duplex mode
-//                                 This bit is not applicable if the MAC is operating in Full-duplex mode*/
-//     
-//     
-//     //if all links are down then configure eth with default values (100Mb and full duplex)
-//     //verify if all phy devices, which has link up, are configured in the same way
-//     if(!all_links_are_down)
-//     {
-//         i=0;
-//         while(i< HAL_BRDCFG_ETH__PHY_DEVICE_NUM)
-//         {
-//             if(phy_link_is_up[i])
-//             {
-//                 regv = read_PHY (hal_brdcfg_eth__phy_device_list[i], PHY_REG_BMSR);
-//                 set_full_mode = (set_full_mode && IS_FULL_MODE(regv)) ? 1 :0;
-//                 set_100mb = (set_full_mode && IS_100MBIT_MODE(regv)) ? 1 :0;
-//             }
-//             i++;
-//         }
-//     }
-//     
-//     /* Configure Full/Half Duplex mode. */
-//     if (set_full_mode)
-//     {
-//         ETH->MACCR |= MCR_DM;
-//     }
-
-
-
-//     /* Configure 100MBit/10MBit mode. */
-//     
-//     if (set_100mb) 
-//     {
-//         ETH->MACCR |= MCR_FES;
-//     }
-
-//     //TODO: ci sarebbero altre cose da configurare....vedi stam_eth.c della ixxat.
-//     #endif
-
-// #endif
-// --------------------------------------------------------------------------------------------------------------
 
     // initialise mac control register
     ETH->MACCR  = 0x00008000;       // clear
-    ETH->MACCR |= MCR_FES;          // config 100Mb (Fast Eth)
-    ETH->MACCR |= MCR_DM;           // config duplex Mode
+    ETH->MACCR |= MCR_FES;          // config 100mbs 
+    ETH->MACCR |= MCR_DM;           // config full duplex mode
 
     
     
@@ -623,19 +497,19 @@ static void tx_descr_init (void) {
 }
 // acemor-facenda-eth-stm32x: ok
 /**
-  * @brief  writes @value in @PhyReg of physical addressed by @PHYAddr and
+  * @brief  writes @value in @MIIreg of physical addressed by @PHYaddr and
   *         waits until operation is completed for max MII_WR_TOUT.
-  * @param      PHYAddr: address of physical
-  *             PhyReg: address of physical's register
+  * @param      PHYaddr: address of physical
+  *             MIIreg: address of physical's register
   *             value: value to write
   * @retval none
   */
-extern void write_PHY (uint16_t PHYAddr, uint16_t PhyReg, uint16_t value)
+extern void hal_eth_hid_smi_write(uint8_t PHYaddr, uint8_t MIIreg, uint16_t value)
 {
     U32 tout;
     
     ETH->MACMIIDR = value;
-    ETH->MACMIIAR = PHYAddr<< 11 | PhyReg << 6 | MMAR_MW | MMAR_MB;
+    ETH->MACMIIAR = ((PHYaddr & 0x1F) << 11) | ((MIIreg & 0x1F) << 6) | MMAR_MW | MMAR_MB;
     
     /* Wait utill operation completed */
     tout = 0;
@@ -647,20 +521,21 @@ extern void write_PHY (uint16_t PHYAddr, uint16_t PhyReg, uint16_t value)
         }
     }
 }
+
 // acemor-facenda-eth-stm32x: ok
 /**
-  * @brief  reads @PhyReg values of physical addressed by @PHYAddr and
+  * @brief  reads @MIIreg values of physical addressed by @PHYaddr and
   *         waits until operation is completed for max MII_RD_TOUT.
-  * @param      PHYAddr: address of physical
-  *             PhyReg: address of physical's register
+  * @param      PHYaddr: address of physical
+  *             MIIreg: address of physical's register
   *             value: value to write
-  * @retval  @PhyReg values
+  * @retval  @MIIreg values
   */
-extern uint16_t read_PHY (uint16_t PHYAddr, uint16_t PhyReg)
+extern uint16_t hal_eth_hid_smi_read(uint8_t PHYaddr, uint8_t MIIreg)
 {
     uint32_t tout;
     
-    ETH->MACMIIAR = PHYAddr << 11 | PhyReg << 6 | MMAR_MB;
+    ETH->MACMIIAR = ((PHYaddr & 0x1F) << 11) | ((MIIreg & 0x1F) << 6) | MMAR_MB;
     
     /* Wait until operation completed */
     tout = 0;
@@ -671,59 +546,21 @@ extern uint16_t read_PHY (uint16_t PHYAddr, uint16_t PhyReg)
             break;
         }
     }
-    return (ETH->MACMIIDR & MMDR_MD);
+    return(ETH->MACMIIDR & MMDR_MD);
 }
 
-// acemor-facenda-eth-stm32x: cambiata
-static void s_hal_eth_RCC_conf(void)
-{
-    
-// #if     defined(USE_STM32F1)
-// #elif   defined(USE_STM32F4)
-//       // enable system configuration controller clock
-//       RCC->APB2ENR |= (1 << 14);  
-// #endif    
-#if     defined(USE_STM32F1)    
-
-    // step 1.
-    /* Reset Ethernet MAC */
-    RCC->AHBRSTR  |= 0x00004000;
-    RCC->AHBRSTR  &=~0x00004000;
-
-    // step 2.
-    /* Since eth uses pin on ports A,B,C,D then enable clock on these ports */
-    RCC->APB2ENR |= 0x0000003D;
-
-    /* Enable clock for MAC, MAC-RX and MAC-TX. */
-    RCC->AHBENR  |= 0x0001C000;
-    
-#elif   defined(USE_STM32F4)
-
-    // step 1. enable system configuration controller clock
-    RCC->APB2ENR |= (1 << 14);  
-    
-    // step 2. Reset Ethernet MAC 
-    RCC->AHB1RSTR |=  0x02000000;
-    SYSCFG->PMC |=  (1 << 23);              // if mii and not rmii: SYSCFG->PMC &= ~(1 << 23);
-    RCC->AHB1RSTR &= ~0x02000000;
-    
-    // step 3. Enable Ethernet (RX, TX, MAC) and GPIOA, GPIOB, GPIOC, GPIOG clocks // if also PTP clock: 0x1E000047
-    RCC->AHB1ENR |= 0x0E000047;
-
-#endif    
-}
 
 // #if 0
 // /**
-//   * @brief  checks @checkMask bitmsk is true in if @PhyReg values 
-//   *         of physical addressed by @PHYAddr  and
+//   * @brief  checks @checkMask bitmsk is true in if @MIIreg values 
+//   *         of physical addressed by @PHYaddr  and
 //   *         waits until operation is completed for max TIMEOUT.
-//   * @param      PHYAddr: address of physical
-//   *             PhyReg: address of physical's register
+//   * @param      PHYaddr: address of physical
+//   *             MIIreg: address of physical's register
 //   *             checkMask: bit mask
-//   * @retval  @PhyReg values
+//   * @retval  @MIIreg values
 //   */
-// static hal_result_t s_hal_eth_phyStatus_checkAndWait(uint16_t PHYAddr, uint16_t PhyReg, uint16_t checkMask)
+// static hal_result_t s_hal_eth_phyStatus_checkAndWait(uint16_t PHYaddr, uint16_t MIIreg, uint16_t checkMask)
 // {            
 //     uint32_t tout, regv;
 
@@ -731,7 +568,7 @@ static void s_hal_eth_RCC_conf(void)
 //     do
 //     {
 //       tout++;
-//       regv = read_PHY (PHYAddr, PhyReg);
+//       regv = read_PHY (PHYaddr, MIIreg);
 
 //     }
 //     while( (tout<HAL_ETH_PHY_WR_TIMEOUT) && (!(regv & checkMask)) );
@@ -751,7 +588,7 @@ static void s_hal_eth_RCC_conf(void)
 
 static void s_hal_eth_rmii_init(void)
 {
-    #warning --> acemor: see this note about possibility of initialising phy after rmii and not before
+    #warning --> acemor: see this note ....
 /*
     Note: Ref_clock pin (A1) in initialized in  hal_brdcfg_eth__phy_start, 
     even if it belongs to rmii port.
@@ -760,150 +597,617 @@ static void s_hal_eth_rmii_init(void)
 */
   
 
-    // enable clock for GPIO ports and MAC
-    s_hal_eth_RCC_conf();   
-
+//  remove rcc_conf()      
+//    // enable clock for GPIO ports and MAC
+//    s_hal_eth_RCC_conf();  
     
-    s_hal_eth_GPIO_conf();
+    hal_eth_hid_rmii_prepare();
 
-    /* Software Reset DMA */
+    hal_eth_hid_rmii_rx_init(); 
+    hal_eth_hid_rmii_tx_init();    
+    
+    hal_eth_hid_microcontrollerclockoutput_init();
+
+//  remove gpio_conf()    
+//    s_hal_eth_GPIO_conf();
+    
+
+    // cannot remove hal_eth_hid_rmii_refclock_init() from here. it is unclear if it can be used also inside the hal_brdcfg_eth__phy_start()
+    hal_eth_hid_rmii_refclock_init();
+    
+    hal_eth_hid_smi_init();
+
+
+    // software reset dma: wait until done
     ETH->DMABMR  |= DBMR_SR;
-    while (ETH->DMABMR & DBMR_SR);
- 
-#if     defined(USE_STM32F1)
-    /* Set MDC Clock range 60-72MHz. 
-    MDC = Management data clock. (RMII signal)*/
-    ETH->MACMIIAR = 0x00000000;
-#elif   defined(USE_STM32F4)
-  // bits 4:2 CR: clock range. value 1 -> HCLK = 100-168 MHz, MDC Clock = HCLK/62
-  ETH->MACMIIAR = 0x00000004; 
-#endif    
-
-
+    while(ETH->DMABMR & DBMR_SR); 
 }
 
-// cambiata
-static void s_hal_eth_GPIO_conf(void)
+
+
+extern void hal_eth_hid_rmii_rx_init(void)
 {
 #if     defined(USE_STM32F1) 
     
-    /* Enable RMII and remap following pins:
-    RX_DV-CRS_DV--> PD8,  RDX0-->PD9 RXD1-->PD10, RDX2-->PD11, RXD3-->PD12 */
-    AFIO->MAPR   |= 0x00A00000;
+    AFIO->MAPR      |= (1 << 21);               // Ethernet MAC I/O remapping to: RX_DV-CRS_DV/PD8, RXD0/PD9, RXD1/PD10, RXD2/PD11, RXD3/PD12 
+ 
+    // enable clock for port d
+    RCC->APB2ENR    |= 0x00000021
     
-    /* these pins must be configured in this way on all boards.
-    They dipend on micro. (see table 176 of datasheet)*/
-    
-    // in latest stm32f1 it is used also pa1 as floating input
-    // /* Configure Port A ethernet pins. */ PA1 in floating input
-    // GPIOA->CRL   &= 0xFFFFF00F;
-    // GPIOA->CRL   |= 0x00000B40;
-    /* Configure Port A ethernet pin: PA2-->MDIO */
-    GPIOA->CRL   &= 0xFFFFF0FF;
-    GPIOA->CRL   |= 0x00000B00;  
-  
-    /* Configure Port B ethernet pins: PB11 -->TXEN, PB12-->TX0, PB13-->TX1 */
-    GPIOB->CRH   &= 0xFF000FFF;
-    GPIOB->CRH   |= 0x00BBB000;    /*All pins are congigured in AlterFunc 50MHz*/
-
-  
-    /* Configure Port C ethernet pin: PC1-->MDC (Ethernet MIIM interface clock)*/
-    GPIOC->CRL   &= 0xFFFFFF0F;
-    GPIOC->CRL   |= 0x000000B0;    /*Pin 1 is congigured in AlterFunc 50MHz*/ 
-         
-    /* Configure Port D ethernet pins (RXD0, RXD1 AND CRSDV=CARRIER SENSE DATA VALID) */
-    GPIOD->CRH   &= 0xFFFFF000;
-    GPIOD->CRH   |= 0x00000444;     /*All pins are congigured reset state*/
+    // ETH_RMII_CRS_DV (PD8), ETH_RMII_RXD0 (PD9), ETH_RMII_RXD1 (PD10) ... as remapped by setting bit 21 of AFIO->MAPR
+    GPIOD->CRH      &= 0xFFFFF000;              // reset pd8, pd9, pd10
+    GPIOD->CRH      |= 0x00000444;              // pins configured in reset state (floating input)
     
 #elif   defined(USE_STM32F4)
 
-#warning --> PA1 is PA1 -> ETH_RMII_REF_CLK. is is used also for ems?
+    // enable system configuration controller clock
+    RCC->APB2ENR    |= (1 << 14);  
     
-#if 1
-    /* Configure Port A ethernet pins (PA.1, PA.2, PA.7, PA.8) */
-    // PA1 -> ETH_RMII_REF_CLK, PA2 -> ETH _MDIO, PA7 -> ETH_RMII _CRS_DV, PA8 -> MCO1 
-    GPIOA->MODER   &= ~0x0003C03C;              // reset pa1, pa2, pa7, pa8
-    GPIOA->MODER   |=  0x00028028;              /* Pins to alternate function */
-    GPIOA->OTYPER  &= ~0x00000186;              /* Pins in push-pull mode     */
-    GPIOA->OSPEEDR |=  0x0003C03C;              /* Slew rate as 100MHz pin    */
-    GPIOA->PUPDR   &= ~0x0003C03C;              /* No pull up, no pull down   */
+    // clocks port a and port c
+    RCC->AHB1ENR    |= 0x00000005;
+    
+    // ETH_RMII_CRS_DV (PA7)
+    
+    GPIOA->MODER    &= ~0x0000C000;              // reset pa7
+    GPIOA->MODER    |=  0x00008000;              // alternate function
+    GPIOA->OTYPER   &= ~0x00000080;              // output push-pull (reset state) 
+    GPIOA->OSPEEDR  |=  0x0000C000;              // slew rate as 100MHz pin 
+    GPIOA->PUPDR    &= ~0x0000C000;              // no pull up, pull down 
 
-    GPIOA->AFR[0]  &= ~0xF0000FF0;
-    GPIOA->AFR[0]  |=  0xB0000BB0;              /* Pins to AF11 (Ethernet)    */
-    GPIOA->AFR[1]  &= ~0x0000000F;              
-    GPIOA->AFR[1]  |=  0x00000000;              /* Pin to AF0 (MCO1)          */
-#else
-    GPIOA->MODER   &= ~0x0003C030;              // reset pa1, pa2, pa7, pa8
-    GPIOA->MODER   |=  0x00028020;              /* Pins to alternate function */
-    GPIOA->OTYPER  &= ~0x00000184;              /* Pins in push-pull mode     */
-    GPIOA->OSPEEDR |=  0x0003C030;              /* Slew rate as 100MHz pin    */
-    GPIOA->PUPDR   &= ~0x0003C030;              /* No pull up, no pull down   */
+    GPIOA->AFR[0]   &= ~0xF0000000;
+    GPIOA->AFR[0]   |=  0xB0000000;              // AF11 (ethernet)
+  
 
-    GPIOA->AFR[0]  &= ~0xF0000F00;
-    GPIOA->AFR[0]  |=  0xB0000B00;              /* Pins to AF11 (Ethernet)    */
-    GPIOA->AFR[1]  &= ~0x0000000F;              
-    GPIOA->AFR[1]  |=  0x00000000;              /* Pin to AF0 (MCO1)          */
-#endif
-    //#ifdef _MII_
-    //  /* Configure Port B ethernet pin (PB8) */
-    //  GPIOB->MODER   &= ~0x00030000;
-    //  GPIOB->MODER   |=  0x00020000;              /* Pins to alternate function */
-    //  GPIOB->OTYPER  &= ~0x00000100;              /* Pin in push-pull mode      */
-    //  GPIOB->OSPEEDR |=  0x00030000;              /* Slew rate as 100MHz pin    */
-    //  GPIOB->PUPDR   &= ~0x00030000;              /* No pull up, no pull down   */
-    //
-    //  GPIOB->AFR[1]  &= ~0x0000000F;
-    //  GPIOB->AFR[1]  |=  0x0000000B;              /* Pin to AF11 (Ethernet)     */
-    //
-    //  /* Configure Port C ethernet pins (PC.1, PC.2, PC.3, PC.4, PC.5) */
-    //  GPIOC->MODER   &= ~0x00000FFC;
-    //  GPIOC->MODER   |=  0x00000AA8;              /* Pins to alternate function */
-    //  GPIOC->OTYPER  &= ~0x0000003E;              /* Pins in push-pull mode     */
-    //  GPIOC->OSPEEDR |=  0x00000FFC;              /* Slew rate as 100MHz pin    */
-    //  GPIOC->PUPDR   &= ~0x00000FFC;              /* No pull up, no pull down   */
-    //
-    //  GPIOC->AFR[0]  &= ~0x00FFFFF0;
-    //  GPIOC->AFR[0]  |=  0x00BBBBB0;              /* Pins to AF11 (Ethernet)    */
-    //#else
-    /* Configure Port C ethernet pins (PC.1, PC.4, PC.5) */
-    // PC1 -> ETH _MDC, PC4 -> ETH_RMII_RXD0, PC5 ->ETH_RMII_RXD1
-    GPIOC->MODER   &= ~0x00000F0C;
-    GPIOC->MODER   |=  0x00000A08;              /* Pins to alternate function */
-    GPIOC->OTYPER  &= ~0x00000032;              /* Pins in push-pull mode     */
-    GPIOC->OSPEEDR |=  0x00000F0C;              /* Slew rate as 100MHz pin    */
-    GPIOC->PUPDR   &= ~0x00000F0C;              /* No pull up, no pull down   */
-
-    GPIOC->AFR[0]  &= ~0x00FF00F0;
-    GPIOC->AFR[0]  |=  0x00BB00B0;              /* Pins to AF11 (Ethernet)    */
-    //#endif
-
-    /* Configure Port G ethernet pins (PG.11, PG.13, PG.14) */
-    // PG11 -> ETH _RMII_TX_EN, PG13 -> ETH _RMII_TXD0, PG14 -> ETH _RMII_TXD1
-    GPIOG->MODER   &= ~0x3CC00000;
-    GPIOG->MODER   |=  0x28800000;              /* Pin to alternate function  */
-    GPIOG->OTYPER  &= ~0x00006800;              /* Pin in push-pull mode      */
-    GPIOG->OSPEEDR |=  0x3CC00000;              /* Slew rate as 100MHz pin    */
-    GPIOG->PUPDR   &= ~0x3CC00000;              /* No pull up, no pull down   */
-
-    GPIOG->AFR[1]  &= ~0x0FF0F000;
-    GPIOG->AFR[1]  |=  0x0BB0B000;              /* Pin to AF11 (Ethernet)     */
-
-    //#ifdef _MII_
-    //  /* Configure Port H ethernet pins (PH.0, PH.2, PH.3, PH.6, PH.7) */
-    //  GPIOH->MODER   &= ~0x0000F0F3;
-    //  GPIOH->MODER   |=  0x0000A0A2;              /* Pins to alternate function */
-    //  GPIOH->OTYPER  &= ~0x000000CD;              /* Pins in push-pull mode     */
-    //  GPIOH->OSPEEDR |=  0x0000F0F3;              /* Slew rate as 100MHz pin    */
-    //  GPIOH->PUPDR   &= ~0x0000F0F3;              /* No pull up, no pull down   */
-    //
-    //  GPIOH->AFR[0]  &= ~0xFF00FF0F;
-    //  GPIOH->AFR[0]  |=  0xBB00BB0B;              /* Pins to AF11 (Ethernet)    */  
-    //#endif
+    // ETH_RMII_RXD0 (PC4), ETH_RMII_RXD1 (PC5)
+ 
+    GPIOC->MODER   &= ~0x00000F00;              // reset pc4 and pc5
+    GPIOC->MODER   |=  0x00000A00;              // alternate function
+    GPIOC->OTYPER  &= ~0x00000030;              // output push-pull (reset state)  
+    GPIOC->OSPEEDR |=  0x00000F00;              // slew rate as 100MHz pin
+    GPIOC->PUPDR   &= ~0x00000F00;              // no pull up, pull down
+    GPIOC->AFR[0]  &= ~0x00FF0000;
+    GPIOC->AFR[0]  |=  0x00BB0000;              // AF11 (ethernet) 
 
 #endif
 }
 
+// cambiata
+extern void hal_eth_hid_rmii_tx_init(void)
+{
+#if     defined(USE_STM32F1) 
+    
+    // enable clock for port b
+    RCC->APB2ENR    |= 0x00000009
+  
+    //  ETH_RMII_TX_EN (PB11), ETH _RMII_TXD0 (PB12), ETH _RMII_TXD1 (PB13)
+    GPIOB->CRH      &= 0xFF000FFF;              // reset pb11, pb12, pb13
+    GPIOB->CRH      |= 0x00BBB000;              // output max 50mhz, alternate function output push-pull.
+
+    
+#elif   defined(USE_STM32F4)
+
+    // enable system configuration controller clock
+    RCC->APB2ENR    |= (1 << 14);  
+    
+    // clock port g
+    RCC->AHB1ENR    |= 0x00000040;
+
+    // ETH_RMII_TX_EN (PG11), ETH _RMII_TXD0 (PG13), ETH _RMII_TXD1 (PG14)
+    GPIOG->MODER   &= ~0x3CC00000;              // reset pg11, pg13, pg14
+    GPIOG->MODER   |=  0x28800000;              // alternate function 
+    GPIOG->OTYPER  &= ~0x00006800;              // output push-pull (reset state) 
+    GPIOG->OSPEEDR |=  0x3CC00000;              // slew rate as 100MHz pin
+    GPIOG->PUPDR   &= ~0x3CC00000;              // no pull up, pull down 
+
+    GPIOG->AFR[1]  &= ~0x0FF0F000;
+    GPIOG->AFR[1]  |=  0x0BB0B000;              // AF11 (ethernet) 
+
+#endif
+}
+
+extern void hal_eth_hid_smi_init(void)
+{
+#if     defined(USE_STM32F1) 
+    
+    // 0. clocks port a and port c as alternate functions   
+    RCC->APB2ENR    |= 0x00000015
+
+    // 1. MDC:          configure Port C ethernet pin: PC1-->MDC (Ethernet MIIM interface clock)
+    GPIOC->CRL      &= 0xFFFFFF0F;              // reset pc1
+    GPIOC->CRL      |= 0x000000B0;              // output max 50mhz, alternate function output push-pull.   
+    
+    // 2. MDIO:         configure Port A ethernet pin: PA2-->MDIO
+    GPIOA->CRL      &= 0xFFFFF0FF;              // reset pa2
+    GPIOA->CRL      |= 0x00000B00;              // output max 50mhz, alternate function output push-pull.      
+    
+    // MDC Clock range: 60-72MHz. MDC = Management data clock. (RMII signal)
+    ETH->MACMIIAR   = 0x00000000;
+    
+#elif   defined(USE_STM32F4) 
+    
+    // enable system configuration controller clock
+    RCC->APB2ENR    |= (1 << 14);  
+    
+    // 0. clocks port a and port c
+    RCC->AHB1ENR    |= 0x00000005;
+    
+    // 1. MDC:              PC1 -> ETH_MDC
+    GPIOC->MODER    &= ~0x0000000C;             // reset pc1
+    GPIOC->MODER    |=  0x00000008;             // alternate function
+    GPIOC->OTYPER   &= ~0x00000002;             // output push-pull (reset state) 
+    GPIOC->OSPEEDR  |=  0x0000000C;             // slew rate as 100MHz pin
+    GPIOC->PUPDR    &= ~0x0000000C;             // no pull up, pull down
+    
+    GPIOC->AFR[0]   &= ~0x000000F0;
+    GPIOC->AFR[0]   |=  0x000000B0;             // AF11 (ethernet)
+    
+    
+    // 2. MDIO:             PA2 -> ETH_MDIO 
+    GPIOA->MODER    &= ~0x00000030;             // reset pa1, pa2, pa7, pa8
+    GPIOA->MODER    |=  0x00000020;             // alternate function
+    GPIOA->OTYPER   &= ~0x00000004;             // output push-pull (reset state) 
+    GPIOA->OSPEEDR  |=  0x00000030;             // slew rate as 100MHz pin 
+    GPIOA->PUPDR    &= ~0x00000030;             // no pull up, pull down
+
+    GPIOA->AFR[0]   &= ~0x00000F00;
+    GPIOA->AFR[0]   |=  0x00000B00;             // AF11 (ethernet)
+    
+    // 3. MDC clock range:  bits 4:2 CR: clock range. value 1 -> HCLK = 100-168 MHz, MDC Clock = HCLK/62
+    ETH->MACMIIAR   = 0x00000004; 
+#endif    
+}
+
+
+extern void hal_eth_hid_rmii_refclock_init(void)
+{   // used by mac but also by external phy or switch
+#if     defined(USE_STM32F1) 
+    
+    // clock gpioa as alternate function
+    RCC->APB2ENR    |= 0x00000005;
+    
+    // init the ETH_RMII_REF_CLK (PA1)
+    GPIOA->CRL      &= 0xFFFFFF0F;              // reset pa1
+    GPIOA->CRL      |= 0x00000040;              // pin configured in reset state (floating input)
+    
+#elif   defined(USE_STM32F4) 
+        
+    // enable system configuration controller clock
+    RCC->APB2ENR    |= (1 << 14);      
+    
+    // enable GPIOA clock
+    RCC->AHB1ENR    |= 0x00000001;    
+
+    // init the ETH_RMII_REF_CLK (PA1)
+    GPIOA->MODER    &= ~0x0000000C;              // reset pa1
+    GPIOA->MODER    |=  0x00000008;              // alternate function
+    GPIOA->OTYPER   &= ~0x00000002;              // output push-pull (reset state) 
+    GPIOA->OSPEEDR  |=  0x0000000C;              //  slew rate as 100MHz pin
+    GPIOA->PUPDR    &= ~0x0000000C;              // no pull up, pull down
+
+    GPIOA->AFR[0]   &= ~0x000000F0;
+    GPIOA->AFR[0]   |=  0x000000B0;              // AF11 (ethernet)    
+
+#endif    
+}
+
+
+extern void hal_eth_hid_microcontrollerclockoutput_init(void)
+{
+#if     defined(USE_STM32F1) 
+
+    #error --> what about the MCO in stm32f1 ???
+
+#elif   defined(USE_STM32F4) 
+
+    // enable system configuration controller clock
+    RCC->APB2ENR    |= (1 << 14);  
+    
+    // enable GPIOA clock
+    RCC->AHB1ENR    |= 0x00000001;   
+    
+    // init the MCO1 (PA8) 
+    GPIOA->MODER    &= ~0x00030000;              // reset pa8
+    GPIOA->MODER    |=  0x00020000;              // alternate function
+    GPIOA->OTYPER   &= ~0x00000100;              // output push-pull (reset state) 
+    GPIOA->OSPEEDR  |=  0x00030000;              // slew rate as 100MHz pin 
+    GPIOA->PUPDR    &= ~0x00030000;              // no pull up, pull down
+
+    GPIOA->AFR[1]   &= ~0x0000000F;              
+    GPIOA->AFR[1]   |=  0x00000000;              // AF0 (MCO1)          
+
+#endif    
+}
+
+extern void hal_eth_hid_rmii_prepare(void)
+{
+#if     defined(USE_STM32F1)    
+
+    // step 1.
+    // reset Ethernet MAC
+    RCC->AHBRSTR    |= 0x00004000;              // put ethernet mac in reset mode
+    // no need to do anything in here as in the stm32f4x
+    RCC->AHBRSTR    &=~0x00004000;              // remove ethernet mac from reset mode
+    
+   
+    // enable RMII and remap rx pins:
+    AFIO->MAPR      |= (1 << 23);               // impose rmii 
+    //AFIO->MAPR      |= (1 << 21);             // Ethernet MAC I/O remapping to: RX_DV-CRS_DV/PD8, RXD0/PD9, RXD1/PD10, RXD2/PD11, RXD3/PD12    
+    // moved in rmii_rx_init
+
+// moved in different functions
+//    // step 2.
+//    /* Since eth uses pin on ports A,B,C,D then enable clock on these ports */
+//    RCC->APB2ENR |= 0x0000003D;
+
+    // enable clocks for ethernet (RX, TX, MAC)
+    RCC->AHBENR     |= 0x0001C000;
+    
+#elif   defined(USE_STM32F4)
+
+    // step 1. enable system configuration controller clock
+    RCC->APB2ENR    |= (1 << 14);  
+    
+    // step 2. in strict order: reset ethernet mac, set rmii (or mii) on register syscfg_pmc. only after that enable the mac clocks 
+    //         see reference manual of stm32f4 in section of SYSCFG_PMC register.     
+    RCC->AHB1RSTR   |=  (1 << 25);              // put ethernet mac in reset mode
+    SYSCFG->PMC     |=  (1 << 23);              // imposet rmii {if one wanted mii and not rmii: SYSCFG->PMC &= ~(1 << 23);}
+    RCC->AHB1RSTR   &= ~(1 << 25);              // remove ethernet mac from reset mode
+    
+    // step 3. enable clocks for ethernet (RX, TX, MAC) 
+    RCC->AHB1ENR |= 0x0E000000;
+
+#endif    
+}
+
+
+#if     defined(USE_STM32F1) 
+#elif   defined(USE_STM32F4) 
+#endif
+
 #endif//HAL_USE_ETH
+
+
+// removed
+
+// // acemor-facenda-eth-stm32x: cambiata
+// static void s_hal_eth_RCC_conf(void)
+// {
+//     
+// // #if     defined(USE_STM32F1)
+// // #elif   defined(USE_STM32F4)
+// //       // enable system configuration controller clock
+// //       RCC->APB2ENR |= (1 << 14);  
+// // #endif    
+// #if     defined(USE_STM32F1)    
+
+//     // step 1.
+//     /* Reset Ethernet MAC */
+//     RCC->AHBRSTR  |= 0x00004000;
+//     RCC->AHBRSTR  &=~0x00004000;
+
+//     // step 2.
+//     /* Since eth uses pin on ports A,B,C,D then enable clock on these ports */
+//     RCC->APB2ENR |= 0x0000003D;
+
+//     /* Enable clock for MAC, MAC-RX and MAC-TX. */
+//     RCC->AHBENR  |= 0x0001C000;
+//     
+// #elif   defined(USE_STM32F4)
+
+
+//     // step 1. enable system configuration controller clock
+//     RCC->APB2ENR    |= (1 << 14);  
+//     
+//     // step 2. in strict order: reset ethernet mac, set rmii (or mii) on register syscfg_pmc. only after enable the mac clocks 
+//     //         see reference manual of stm32f4 in section of SYSCFG_PMC register.     
+//     RCC->AHB1RSTR   |=  (1 << 25);          // put ethernet mac in reset mode
+//     SYSCFG->PMC     |=  (1 << 23);          // imposet rmii {if one wanted mii and not rmii: SYSCFG->PMC &= ~(1 << 23);}
+//     RCC->AHB1RSTR   &= ~(1 << 25);          // remove ethernet mac from reset mode
+//     
+//     // step 3. enable Ethernet (RX, TX, MAC) and GPIOA, GPIOB, GPIOC, GPIOG clocks // if also PTP clock: 0x1E000047
+//     RCC->AHB1ENR |= 0x0E000047;
+
+// #endif    
+// }
+
+
+// // cambiata
+// static void s_hal_eth_GPIO_conf(void)
+// {
+// #if     defined(USE_STM32F1) 
+//     
+//     /* Enable RMII and remap following pins:
+//     RX_DV-CRS_DV--> PD8,  RDX0-->PD9 RXD1-->PD10, RDX2-->PD11, RXD3-->PD12 */  
+//     AFIO->MAPR      |= (1 << 23);       // impose rmii 
+//     AFIO->MAPR      |= (1 << 21);       // Ethernet MAC I/O remapping to: RX_DV-CRS_DV/PD8, RXD0/PD9, RXD1/PD10, RXD2/PD11, RXD3/PD12
+//     
+//     
+//     /* these pins must be configured in this way on all boards.
+//     They dipend on micro. (see table 176 of datasheet)*/
+//     
+//     // in latest stm32f1 it is used also pa1 as floating input. 
+//     // however, we do that for mcbstm32c in hal_brdcfg_eth__phy_start()
+//     // and we dont do that inside the same function for ems001. in ems001 how is it configured the pin A1???
+//     // /* Configure Port A ethernet pins. */ PA1 in floating input
+//     // GPIOA->CRL   &= 0xFFFFF00F;
+//     // GPIOA->CRL   |= 0x00000B40;
+
+//     // moved to smi_init()
+// //     /* Configure Port A ethernet pin: PA2-->MDIO */
+// //     GPIOA->CRL   &= 0xFFFFF0FF;
+// //     GPIOA->CRL   |= 0x00000B00;  
+//   
+//     /* Configure Port B ethernet pins: PB11 -->TXEN, PB12-->TX0, PB13-->TX1 */
+//     GPIOB->CRH   &= 0xFF000FFF;
+//     GPIOB->CRH   |= 0x00BBB000;    /*All pins are congigured in AlterFunc 50MHz*/
+
+
+//     // moved to smi_init()
+// //     /* Configure Port C ethernet pin: PC1-->MDC (Ethernet MIIM interface clock)*/
+// //     GPIOC->CRL   &= 0xFFFFFF0F;
+// //     GPIOC->CRL   |= 0x000000B0;    /*Pin 1 is congigured in AlterFunc 50MHz*/ 
+//          
+//     /* Configure Port D ethernet pins (RXD0, RXD1 AND CRSDV=CARRIER SENSE DATA VALID) */
+//     GPIOD->CRH   &= 0xFFFFF000;
+//     GPIOD->CRH   |= 0x00000444;     /*All pins are congigured reset state*/
+//     
+// #elif   defined(USE_STM32F4)
+
+// #warning --> PA1 is PA1 -> ETH_RMII_REF_CLK. is is used also for ems?
+//     
+// #if 1
+
+//     // port a: ETH_RMII_REF_CLK (PA1), ETH_RMII_CRS_DV (PA7), MCO1 (PA8) 
+//     // pa1, pa7, pa8
+//     // PA1 -> ETH_RMII_REF_CLK, PA7 -> ETH_RMII_CRS_DV, PA8 -> MCO1
+// //     GPIOA->MODER   &= ~0x0003C00C;              // reset pa1, pa7, pa8
+// //     GPIOA->MODER   |=  0x00028008;              /* Pins to alternate function */
+// //     GPIOA->OTYPER  &= ~0x00000182;              /* Pins in push-pull mode     */
+// //     GPIOA->OSPEEDR |=  0x0003C00C;              /* Slew rate as 100MHz pin    */
+// //     GPIOA->PUPDR   &= ~0x0003C00C;              /* No pull up, no pull down   */
+
+// //     GPIOA->AFR[0]  &= ~0xF00000F0;
+// //     GPIOA->AFR[0]  |=  0xB00000B0;              /* Pins to AF11 (Ethernet)    */
+// //     GPIOA->AFR[1]  &= ~0x0000000F;              
+// //     GPIOA->AFR[1]  |=  0x00000000;              /* Pin to AF0 (MCO1)          */   
+
+// //     // port a: ETH_RMII_CRS_DV (PA7), MCO1 (PA8) 
+// //     GPIOA->MODER    &= ~0x0003C000;              // reset pa7, pa8
+// //     GPIOA->MODER    |=  0x00028000;              /* Pins to alternate function */
+// //     GPIOA->OTYPER   &= ~0x00000180;              /* Pins in push-pull mode     */
+// //     GPIOA->OSPEEDR  |=  0x0003C000;              /* Slew rate as 100MHz pin    */
+// //     GPIOA->PUPDR    &= ~0x0003C000;              /* No pull up, no pull down   */
+
+// //     GPIOA->AFR[0]   &= ~0xF0000000;
+// //     GPIOA->AFR[0]   |=  0xB0000000;              /* Pins to AF11 (Ethernet)    */
+// //     GPIOA->AFR[1]   &= ~0x0000000F;              
+// //     GPIOA->AFR[1]   |=  0x00000000;              /* Pin to AF0 (MCO1)          */   
+
+//     // port a: ETH_RMII_CRS_DV (PA7) 
+//     GPIOA->MODER    &= ~0x0000C000;              // reset pa7
+//     GPIOA->MODER    |=  0x00008000;              /* Pins to alternate function */
+//     GPIOA->OTYPER   &= ~0x00000080;              /* Pins in push-pull mode     */
+//     GPIOA->OSPEEDR  |=  0x0000C000;              /* Slew rate as 100MHz pin    */
+//     GPIOA->PUPDR    &= ~0x0000C000;              /* No pull up, no pull down   */
+
+//     GPIOA->AFR[0]   &= ~0xF0000000;
+//     GPIOA->AFR[0]   |=  0xB0000000;              /* Pins to AF11 (Ethernet)    */
+//   
+
+
+// //     /* Configure Port A ethernet pins (PA.1, PA.2, PA.7, PA.8) */
+// //     // PA1 -> ETH_RMII_REF_CLK, PA2 -> ETH _MDIO, PA7 -> ETH_RMII _CRS_DV, PA8 -> MCO1 
+// //     GPIOA->MODER   &= ~0x0003C03C;              // reset pa1, pa2, pa7, pa8
+// //     GPIOA->MODER   |=  0x00028028;              /* Pins to alternate function */
+// //     GPIOA->OTYPER  &= ~0x00000186;              /* Pins in push-pull mode     */
+// //     GPIOA->OSPEEDR |=  0x0003C03C;              /* Slew rate as 100MHz pin    */
+// //     GPIOA->PUPDR   &= ~0x0003C03C;              /* No pull up, no pull down   */
+
+// //     GPIOA->AFR[0]  &= ~0xF0000FF0;
+// //     GPIOA->AFR[0]  |=  0xB0000BB0;              /* Pins to AF11 (Ethernet)    */
+// //     GPIOA->AFR[1]  &= ~0x0000000F;              
+// //     GPIOA->AFR[1]  |=  0x00000000;              /* Pin to AF0 (MCO1)          */
+// #else
+// //     GPIOA->MODER   &= ~0x0003C030;              // reset pa2, pa7, pa8 but NOT PA1 !!!
+// //     GPIOA->MODER   |=  0x00028020;              /* Pins to alternate function */
+// //     GPIOA->OTYPER  &= ~0x00000184;              /* Pins in push-pull mode     */
+// //     GPIOA->OSPEEDR |=  0x0003C030;              /* Slew rate as 100MHz pin    */
+// //     GPIOA->PUPDR   &= ~0x0003C030;              /* No pull up, no pull down   */
+
+// //     GPIOA->AFR[0]  &= ~0xF0000F00;
+// //     GPIOA->AFR[0]  |=  0xB0000B00;              /* Pins to AF11 (Ethernet)    */
+// //     GPIOA->AFR[1]  &= ~0x0000000F;              
+// //     GPIOA->AFR[1]  |=  0x00000000;              /* Pin to AF0 (MCO1)          */
+// #endif
+//     //#ifdef _MII_
+//     //  /* Configure Port B ethernet pin (PB8) */
+//     //  GPIOB->MODER   &= ~0x00030000;
+//     //  GPIOB->MODER   |=  0x00020000;              /* Pins to alternate function */
+//     //  GPIOB->OTYPER  &= ~0x00000100;              /* Pin in push-pull mode      */
+//     //  GPIOB->OSPEEDR |=  0x00030000;              /* Slew rate as 100MHz pin    */
+//     //  GPIOB->PUPDR   &= ~0x00030000;              /* No pull up, no pull down   */
+//     //
+//     //  GPIOB->AFR[1]  &= ~0x0000000F;
+//     //  GPIOB->AFR[1]  |=  0x0000000B;              /* Pin to AF11 (Ethernet)     */
+//     //
+//     //  /* Configure Port C ethernet pins (PC.1, PC.2, PC.3, PC.4, PC.5) */
+//     //  GPIOC->MODER   &= ~0x00000FFC;
+//     //  GPIOC->MODER   |=  0x00000AA8;              /* Pins to alternate function */
+//     //  GPIOC->OTYPER  &= ~0x0000003E;              /* Pins in push-pull mode     */
+//     //  GPIOC->OSPEEDR |=  0x00000FFC;              /* Slew rate as 100MHz pin    */
+//     //  GPIOC->PUPDR   &= ~0x00000FFC;              /* No pull up, no pull down   */
+//     //
+//     //  GPIOC->AFR[0]  &= ~0x00FFFFF0;
+//     //  GPIOC->AFR[0]  |=  0x00BBBBB0;              /* Pins to AF11 (Ethernet)    */
+//     //#else
+//     #warning --> separare pc1 dal pc4 e pc5
+//     /* Configure Port C ethernet pins (PC.1, PC.4, PC.5) */
+//     // PC1 -> ETH _MDC, PC4 -> ETH_RMII_RXD0, PC5 ->ETH_RMII_RXD1
+// //     GPIOC->MODER   &= ~0x00000F0C;
+// //     GPIOC->MODER   |=  0x00000A08;              /* Pins to alternate function */
+// //     GPIOC->OTYPER  &= ~0x00000032;              /* Pins in push-pull mode     */
+// //     GPIOC->OSPEEDR |=  0x00000F0C;              /* Slew rate as 100MHz pin    */
+// //     GPIOC->PUPDR   &= ~0x00000F0C;              /* No pull up, no pull down   */
+
+// //     GPIOC->AFR[0]  &= ~0x00FF00F0;
+// //     GPIOC->AFR[0]  |=  0x00BB00B0;              /* Pins to AF11 (Ethernet)    */
+//     
+//     // port c: ETH_RMII_RXD0 (PC4), ETH_RMII_RXD1 (PC5)
+//     // PC4 -> ETH_RMII_RXD0, PC5 ->ETH_RMII_RXD1
+//     GPIOC->MODER   &= ~0x00000F00;
+//     GPIOC->MODER   |=  0x00000A00;              /* Pins to alternate function */
+//     GPIOC->OTYPER  &= ~0x00000030;              /* Pins in push-pull mode     */
+//     GPIOC->OSPEEDR |=  0x00000F00;              /* Slew rate as 100MHz pin    */
+//     GPIOC->PUPDR   &= ~0x00000F00;              /* No pull up, no pull down   */
+//     GPIOC->AFR[0]  &= ~0x00FF0000;
+//     GPIOC->AFR[0]  |=  0x00BB0000;              /* Pins to AF11 (Ethernet)    */
+
+//     //#endif
+
+//     // port g: ETH_RMII_TX_EN (PG11), ETH _RMII_TXD0 (PG13), ETH _RMII_TXD1 (PG14).
+//     /* Configure Port G ethernet pins (PG.11, PG.13, PG.14) */
+//     // PG11 -> ETH_RMII_TX_EN, PG13 -> ETH _RMII_TXD0, PG14 -> ETH _RMII_TXD1
+//     GPIOG->MODER   &= ~0x3CC00000;
+//     GPIOG->MODER   |=  0x28800000;              /* Pin to alternate function  */
+//     GPIOG->OTYPER  &= ~0x00006800;              /* Pin in push-pull mode      */
+//     GPIOG->OSPEEDR |=  0x3CC00000;              /* Slew rate as 100MHz pin    */
+//     GPIOG->PUPDR   &= ~0x3CC00000;              /* No pull up, no pull down   */
+
+//     GPIOG->AFR[1]  &= ~0x0FF0F000;
+//     GPIOG->AFR[1]  |=  0x0BB0B000;              /* Pin to AF11 (Ethernet)     */
+
+//     //#ifdef _MII_
+//     //  /* Configure Port H ethernet pins (PH.0, PH.2, PH.3, PH.6, PH.7) */
+//     //  GPIOH->MODER   &= ~0x0000F0F3;
+//     //  GPIOH->MODER   |=  0x0000A0A2;              /* Pins to alternate function */
+//     //  GPIOH->OTYPER  &= ~0x000000CD;              /* Pins in push-pull mode     */
+//     //  GPIOH->OSPEEDR |=  0x0000F0F3;              /* Slew rate as 100MHz pin    */
+//     //  GPIOH->PUPDR   &= ~0x0000F0F3;              /* No pull up, no pull down   */
+//     //
+//     //  GPIOH->AFR[0]  &= ~0xFF00FF0F;
+//     //  GPIOH->AFR[0]  |=  0xBB00BB0B;              /* Pins to AF11 (Ethernet)    */  
+//     //#endif
+
+// #endif
+// }
+
+
+// void inside_hal_init(void)
+// {
+// // #if 0
+// // // -----------------------------------------------------------------------------------------------------------
+
+// // /*Valentina: 
+// // ho eliminato la possibilita' di configurare i link a 10MBIT  o a 100MB o auto negoziare
+// // in quanto questa configurazione poteva essere fatta solo a compile time definendo una macro che
+// // ti faceva scegliere una delle 3 opzioni.
+// // Fino ad oggi non usavamo nessuna macro quindi applicavamo la autonegoziazione.
+// // Ma visti i problemi incontrati nella configurazione dello switch 
+// // conviene configurare di default tutti i link a 100MB.
+// // Ho lasciato comunque il codice per non buttarlo via...
+// // */
+
+
+// //     /* Configure all PHY devices */
+// //     #if defined (_10MBIT_)
+// //     
+// //     for(i=0; i< PHY_DEVICE_NUM; i++)
+// //     {
+// //         write_PHY (hal_brdcfg_eth__phy_device_list[i], PHY_REG_BMCR, PHY_FULLD_10M); /* Connect at 10MBit */
+// //     }
+// //     /* Note: I must not set any bit in ethernet register, 
+// //        because in order to configure 10 Mbit FES bit in eTH register must be  equal to zero.  */
+// //     
+// //     #elif defined (_100MBIT_)
+// //     
+// //     for(i=0; i< HAL_BRDCFG_ETH__PHY_DEVICE_NUM; i++)
+// //     {
+// //         write_PHY (hal_brdcfg_eth__phy_device_list[i], PHY_REG_BMCR, PHY_FULLD_100M); /* Connect at 100MBit */
+// //     }
+
+// //     ETH->MACCR |= MCR_FES;
+
+// //     #else
+// //     /* Use autonegotiation about the link speed. */
+// //  
+// //     for(i=0; i< HAL_BRDCFG_ETH__PHY_DEVICE_NUM; i++)
+// //     {
+// //         write_PHY (hal_brdcfg_eth__phy_device_list[i], PHY_REG_BMCR, PHY_AUTO_NEG);
+// //         res = s_hal_eth_phyStatus_checkAndWait(hal_brdcfg_eth__phy_device_list[i], PHY_REG_BMSR, HAL_ETH_AUTONEG_MASK);
+// //         if (hal_res_OK != res)
+// //         {
+// //             //if autonegotiantion isn't completed then force link to 100Mb
+// //             write_PHY (hal_brdcfg_eth__phy_device_list[i], PHY_REG_BMCR, PHY_FULLD_100M);
+// //             //hal_on_fatalerror(hal_error_eth_cfgincorrect, "Autonegotiation incomplete\n");
+// //             //return; //TODO: specify type of error: Autonegotiation incomplete.
+// //         }
+// //     }
+
+
+// //     /* Verify link status*/
+// //     for(i=0; i< HAL_BRDCFG_ETH__PHY_DEVICE_NUM; i++)
+// //     {
+// //         res = s_hal_eth_phyStatus_checkAndWait(hal_brdcfg_eth__phy_device_list[i], PHY_REG_BMSR, HAL_ETH_LINK_UP_MASK);
+// //         if (hal_res_OK == res)
+// //         {
+// //             all_links_are_down &= 0x0;
+// //             phy_link_is_up[i] = 1;
+// //             
+// //         }
+// //         else
+// //         {
+// //              phy_link_is_up[i] = 0;
+// //         }
+// //     }
+
+// //     /* Initialize MAC control register */
+// //     
+// //     
+// //     ETH->MACCR  = MCR_ROD;  /* Receive own disable: the MAC disables the reception of frames in Half-duplex mode
+// //                                 This bit is not applicable if the MAC is operating in Full-duplex mode*/
+// //     
+// //     
+// //     //if all links are down then configure eth with default values (100Mb and full duplex)
+// //     //verify if all phy devices, which has link up, are configured in the same way
+// //     if(!all_links_are_down)
+// //     {
+// //         i=0;
+// //         while(i< HAL_BRDCFG_ETH__PHY_DEVICE_NUM)
+// //         {
+// //             if(phy_link_is_up[i])
+// //             {
+// //                 regv = read_PHY (hal_brdcfg_eth__phy_device_list[i], PHY_REG_BMSR);
+// //                 set_full_mode = (set_full_mode && IS_FULL_MODE(regv)) ? 1 :0;
+// //                 set_100mb = (set_full_mode && IS_100MBIT_MODE(regv)) ? 1 :0;
+// //             }
+// //             i++;
+// //         }
+// //     }
+// //     
+// //     /* Configure Full/Half Duplex mode. */
+// //     if (set_full_mode)
+// //     {
+// //         ETH->MACCR |= MCR_DM;
+// //     }
+
+
+
+// //     /* Configure 100MBit/10MBit mode. */
+// //     
+// //     if (set_100mb) 
+// //     {
+// //         ETH->MACCR |= MCR_FES;
+// //     }
+
+// //     //TODO: ci sarebbero altre cose da configurare....vedi stam_eth.c della ixxat.
+// //     #endif
+
+// // #endif
+// // --------------------------------------------------------------------------------------------------------------
+//     
+// }
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

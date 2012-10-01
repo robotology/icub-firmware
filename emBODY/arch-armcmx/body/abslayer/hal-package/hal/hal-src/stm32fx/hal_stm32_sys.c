@@ -108,6 +108,7 @@ extern hal_result_t hal_sys_systeminit(void)
 
     SystemInit();
 
+    #warning --> DONT config the clock or the gpio default in hal !!!
     hal_brdcfg_sys__clock_config();
     hal_brdcfg_sys__gpio_default_init();
 
