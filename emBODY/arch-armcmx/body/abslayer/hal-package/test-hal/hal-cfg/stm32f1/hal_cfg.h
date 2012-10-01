@@ -34,20 +34,20 @@
 //   <o> CPU family         <0=>   Cortex M3  <1=>   Cortex M4
 //   <i> Only Cortex M3 / M4 are now supported.
 #ifndef HAL_CPUFAM
- #define HAL_CPUFAM      1
+ #define HAL_CPUFAM      0
 #endif
 
 //   <o> CPU type  <0x00=>   STM32F1x   <0x01=>   STM32F4x
 //   <i> Only STM32F1x / STM32F4x are now supported.
 #ifndef HAL_CPUTYPE
- #define HAL_CPUTYPE       0x01
+ #define HAL_CPUTYPE       0x00
 #endif
 
 
 //   <o> CPU frequency  <72000000=>   72 MHz    <168000000=> 168 MHz
 //   <i> Only 72 / 168 MHz are supported for now.
 #ifndef HAL_CPUFREQ
- #define HAL_CPUFREQ       168000000
+ #define HAL_CPUFREQ       72000000
 #endif
 
 // </h>Target
