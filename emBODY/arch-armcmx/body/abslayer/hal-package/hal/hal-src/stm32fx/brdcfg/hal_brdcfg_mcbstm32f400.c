@@ -133,7 +133,7 @@
 
 #ifdef HAL_USE_ETH
     extern const uint8_t hal_brdcfg_eth__supported_mask             = 0x01;
-    extern const uint16_t hal_brdcfg_eth__phy_device_list[HAL_BRDCFG_ETH__PHY_DEVICE_NUM] = { 0x1 };
+    //extern const uint8_t hal_brdcfg_eth__phy_device_list[HAL_BRDCFG_ETH__PHY_DEVICE_NUM] = { 0x1 };
 #endif//HAL_USE_ETH
 
 
@@ -540,64 +540,57 @@ extern void hal_brdcfg_switch__reg_write_byI2C(uint8_t* pBuffer, uint16_t WriteA
 
 extern void hal_brdcfg_eth__phy_start(void)
 {
-/* NOTE: this function can initialises only A1 pin because the PHY (called also ethernet transceiver) 
-   is reset on start up and it is configured to work at 100Mb.
-   The configuration of PHY is made by MIIM
-   interface (MII Management).
-   The PHY of this board is DP83848C.
-*/
     uint8_t i;
     uint16_t regv;
     uint32_t tout;
 
-    // questo e' per la stm32f1
-//    // configure pin PA1 (Reference clock for switch)
-//    GPIOA->CRL   &= 0xFFFFFF0F;
-//    GPIOA->CRL   |= 0x00000040;    /* set pin 1 in reset state and 2 in alternFunc 50MHz */
+//     // questo e' per la stm32f1
+// //    // configure pin PA1 (Reference clock for switch)
+// //    GPIOA->CRL   &= 0xFFFFFF0F;
+// //    GPIOA->CRL   |= 0x00000040;    /* set pin 1 in reset state and 2 in alternFunc 50MHz */
 
+//     
+//     // init the ETH_RMII_REF_CLK (PA1)
+//     GPIOA->MODER    &= ~0x0000000C;              // reset pa1
+//     GPIOA->MODER    |=  0x00000008;              /* Pin to alternate function */
+//     GPIOA->OTYPER   &= ~0x00000002;              /* Pins in push-pull mode     */
+//     GPIOA->OSPEEDR  |=  0x0000000C;              /* Slew rate as 100MHz pin    */
+//     GPIOA->PUPDR    &= ~0x0000000C;              /* No pull up, no pull down   */
+
+//     GPIOA->AFR[0]   &= ~0x000000F0;
+//     GPIOA->AFR[0]   |=  0x000000B0;              /* Pin to AF11 (Ethernet)    */
     
-    #warning --> e' necessario prima configurare rmii e solo dopo il phy. 
-//     // questo e' per stm32f4
-//     // PA1 -> ETH_RMII_REF_CLK, PA2 -> ETH _MDIO, PA7 -> ETH_RMII _CRS_DV, PA8 -> MCO1 
-    GPIOA->MODER   &= ~0x0000000C;              // reset pa1
-    GPIOA->MODER   |=  0x00000008;              /* Pin to alternate function */
-    GPIOA->OTYPER  &= ~0x00000002;              /* Pins in push-pull mode     */
-    GPIOA->OSPEEDR |=  0x0000000C;              /* Slew rate as 100MHz pin    */
-    GPIOA->PUPDR   &= ~0x0000000C;              /* No pull up, no pull down   */
 
-    GPIOA->AFR[0]  &= ~0x000000F0;
-    GPIOA->AFR[0]  |=  0x000000B0;              /* Pin to AF11 (Ethernet)    */
-  
+#if defined(ONEWANTS2_INIT_REFCLOCK_IN_HERE)
+    hal_eth_hid_rmii_refclock_init();   
+#endif
 
-	// reset all phy devices
-	for(i=0; i< HAL_BRDCFG_ETH__PHY_DEVICE_NUM; i++)
-	{
-		write_PHY (hal_brdcfg_eth__phy_device_list[i], PHY_REG_BMCR, PHY_Reset);
-	}
+#if defined(ONEWANTS2_INIT_SMI_IN_HERE)
+    hal_eth_hid_smi_init();
+#endif  
 
-	/* Wait for hardware reset to end for all phy devices. */
-	for(i=0; i< HAL_BRDCFG_ETH__PHY_DEVICE_NUM; i++)    
-	{
-		for (tout = 0; tout < HAL_ETH_PHY_WR_TIMEOUT; tout++) 
-		{
-			regv = read_PHY (hal_brdcfg_eth__phy_device_list[i], PHY_REG_BMCR);
-			if (!HAL_BRDCFG_ETH__ETH_IS_IN_RESET_STATE(regv))
-			{
-				/* Reset complete, device not Power Down. */
-				break;
-			}
-		}
-        if(HAL_ETH_PHY_WR_TIMEOUT == tout) //ethernet is still in reset state 
+	// reset the phy device (address is 1)
+    hal_eth_hid_smi_write(0x01, PHY_REG_BMCR, PHY_Reset);
+
+	// wait for hardware reset to end 
+    for(tout = 0; tout<HAL_ETH_PHY_WR_TIMEOUT; tout++) 
+    {
+        regv = hal_eth_hid_smi_read(0x01, PHY_REG_BMCR);
+        if (!HAL_BRDCFG_ETH__ETH_IS_IN_RESET_STATE(regv))
         {
-            hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "hal_eth_phy_start(): ETH is still in reset state");
+            // reset complete
+            break;
         }
     }
-
-    // configure in full duplex and 100MB
-    for(i=0; i< HAL_BRDCFG_ETH__PHY_DEVICE_NUM; i++)
+    
+    if(HAL_ETH_PHY_WR_TIMEOUT == tout) //ethernet is still in reset state 
     {
-        write_PHY (hal_brdcfg_eth__phy_device_list[i], PHY_REG_BMCR, PHY_FULLD_100M); /* Connect at 100MBit */
+        hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "hal_brdcfg_eth__phy_start(): PHY is still in reset state");
     }
+
+
+    // configure phy in full duplex and 100MB
+    hal_eth_hid_smi_write(0x01, PHY_REG_BMCR, PHY_FULLD_100M); 
 }
 
 #endif//HAL_USE_ETH
@@ -605,8 +598,10 @@ extern void hal_brdcfg_eth__phy_start(void)
 #ifdef HAL_USE_SYS
 extern void hal_brdcfg_sys__clock_config(void)
 {
-   ; /* On this board this function is dummy, because 
-       is not necessary configure MCO ar something else for thsi board */
+    /* On this board this function is dummy, because it is not not necessary 
+       configure MCO or something else
+     */
+    #warning --> a cosa serve il hal_brdcfg_sys__clock_config() ?? il MCO viene configurato in hal_eth_hid_microcontrollerclockoutput_init() 
 }
 
 

@@ -129,7 +129,7 @@
 
 #ifdef HAL_USE_ETH
     extern const uint8_t hal_brdcfg_eth__supported_mask; //         = 0x01;
-    extern const uint16_t hal_brdcfg_eth__phy_device_list[];
+//    extern const uint8_t hal_brdcfg_eth__phy_device_list[];
 #endif//HAL_USE_ETH
 
 #ifdef HAL_USE_GPIO
