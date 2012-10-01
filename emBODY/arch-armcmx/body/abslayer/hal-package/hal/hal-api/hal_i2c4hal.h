@@ -60,9 +60,10 @@ typedef enum
 {
     hal_i2c_port1 = 0,
     hal_i2c_port2 = 1,
+    hal_i2c_port3 = 2
 } hal_i2c_port_t;
 
-enum { hal_i2c_ports_number = 2 };
+enum { hal_i2c_ports_number = 3 };
 
 
 /** @typedef    typedef enum hal_i2c_cfg_t 
