@@ -197,29 +197,41 @@ EOtreenode eo_cfg_nvsEP_as_onemais_tree_con[] =
 
     // mais_00
     {   // 0
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onemais_m00_mconfig__mode,
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onemais_m00_mconfig,
         EO_INIT(.index)     Mindex(0, 0),
-        EO_INIT(.nchildren) 0,
+        EO_INIT(.nchildren) 3,
         EO_INIT(.dchildren) NULL
     },
-    {   // 1
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onemais_m00_mconfig__datarate,
-        EO_INIT(.index)     Mindex(0, 1),
-        EO_INIT(.nchildren) 0,
+        {   // 1
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onemais_m00_mconfig__mode,
+            EO_INIT(.index)     Mindex(0, 1),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },
+        {   // 2
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onemais_m00_mconfig__datarate,
+            EO_INIT(.index)     Mindex(0, 2),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },  
+        {   // 3
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onemais_m00_mconfig__resolution,
+            EO_INIT(.index)     Mindex(0, 3),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        },
+    {   // 4
+        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onemais_m00_mstatus,
+        EO_INIT(.index)     Mindex(0, 4),
+        EO_INIT(.nchildren) 1,
         EO_INIT(.dchildren) NULL
     },  
-    {   // 2
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onemais_m00_mconfig__resolution,
-        EO_INIT(.index)     Mindex(0, 2),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    },
-    {   // 3
-        EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onemais_m00_mstatus__the15values,
-        EO_INIT(.index)     Mindex(0, 3),
-        EO_INIT(.nchildren) 0,
-        EO_INIT(.dchildren) NULL
-    }
+        {   // 5
+            EO_INIT(.data)      (void*)&eo_cfg_nvsEP_as_onemais_m00_mstatus__the15values,
+            EO_INIT(.index)     Mindex(0, 5),
+            EO_INIT(.nchildren) 0,
+            EO_INIT(.dchildren) NULL
+        }
     
 #endif
        
@@ -267,8 +279,9 @@ extern uint16_t eo_cfg_nvsEP_as_onemais_hashfunction_id2index(uint16_t id)
 //         EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__calibratedvalues(0),        EOK_cfg_nvsEP_as_any_con_body_NVID_sxx_sstatus__uncalibratedvalues(0)  
         
         // m00
-         EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__mode(0),                    EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__datarate(0),
-         EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__resolution(0),              EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mstatus__the15values(0), 
+         EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig(0),                          EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__mode(0),
+         EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__datarate(0),                EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mconfig__resolution(0),
+         EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mstatus(0),                          EOK_cfg_nvsEP_as_any_con_body_NVID_mxx_mstatus__the15values(0) 
     
     };  EO_VERIFYsizeof(s_idtable, sizeof(uint16_t)*(IDTABLESIZE));
     

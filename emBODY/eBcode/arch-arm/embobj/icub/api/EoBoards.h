@@ -54,6 +54,9 @@ extern "C" {
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
+typedef uint16_t eObrd_boardId_t;
+
+
 typedef enum
 {
     eobrd_mc4                       = 0,

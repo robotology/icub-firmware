@@ -17,8 +17,8 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EO_ICUBCANPROTOCOL_SPECIFICATION_H_
-#define _EO_ICUBCANPROTOCOL_SPECIFICATION_H_
+#ifndef _EO_ICUBCANPROTOCOL_SPECIFICATIONS_H_
+#define _EO_ICUBCANPROTOCOL_SPECIFICATIONS_H_
 
 
 #ifdef __cplusplus
@@ -27,7 +27,7 @@ extern "C" {
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/* @file       eo_ICUBCANPROTOcol_messages.h
+/* @file       EOicubCanProtocol_specifications.h
     @brief      This file provides interface to ICUBCANPROTOcol
     @author    valentina.gaggero@iit.it
     @date       14/02/2012
@@ -249,11 +249,10 @@ ICUBCANPROTO_PER_SB_CMD_
  
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-/** @typedef    typedef     enum             eo_icubCanProto_boardType_t
+/** @typedef    typedef     enum             eOicubCanProto_boardType_t
     @brief      contains board type can be mounted on robot.
                 Important: its values are defined in according with icubInterface 
                 (see downloader.h in canLoader module)
-                VALE: utile qui in interfaccia o da mettere in hid???
  **/
 typedef enum
 {
@@ -268,67 +267,69 @@ typedef enum
     eo_icubCanProto_boardType__2foc    = 8,
     eo_icubCanProto_boardType__6sg     = 9,
     eo_icubCanProto_boardType__unknown = 255
-} eo_icubCanProto_boardType_t;
+} eOicubCanProto_boardType_t;
 
 
-/** @typedef    typedef     enum             eo_icubCanProto_motorAxis_t
+/** @typedef    typedef     enum             eOicubCanProto_motorAxis_t
     @brief      each CAN board can manage two axises.
                 Note: a can board is different from a physical board: the seccond can combine
                 two CAN board in a single board object. a Can board ca be identified by unique 
                 CAN address on the same CAN bus.
                 Each CAN board can manage two axis at most, 
                 but a physical board can manage 4 axises at most.
-    @warning    If you change this enum pay attention to eo_emsCanNetTopo_jm_indexInBoard in EOicubCanProto_specifications.h
  **/
 typedef enum
 {
-    eo_icubCanProto_mAxis_0 = 0,
-    eo_icubCanProto_mAxis_1 = 1
-} eo_icubCanProto_motorAxis_t;
+    eo_icubCanProto_jm_index_first      = 0,
+    eo_icubCanProto_jm_index_second     = 1
+} eOicubCanProto_jm_indexinBoard_t;
 
 
-/** @typedef    enum{eo_icubCanProtomotorAxis_maxNum4CanBoard = 2};
-    @brief      this is the max numeber of motor axis for each canBoard
+/** @typedef    enum{eOicubCanProto_jm_indexInBoard_max = 2};
+    @brief      this is the max numeber of joint or motor for each canBoard
  **/
-enum{eo_icubCanProtomotorAxis_maxNum4CanBoard = 2};
+enum{eOicubCanProto_jm_indexInBoard_max = 2};
 
-/** @typedef    typedef     uint8_t             eo_icubCanProto_canBoardAddress_t
+/** @typedef    typedef     uint8_t             eOicubCanProto_canBoardAddress_t
     @brief      contains can address of board. 
                 the value must be in the range [1, E] 
-    @todo       VALE: fare enum?????
  **/
-typedef     uint8_t             eo_icubCanProto_canBoardAddress_t;
+typedef     uint8_t             eOicubCanProto_canBoardAddress_t;
 
 
 
-/** @typedef    typedef     struct             eo_icubCanProto_msgDestination_t
+/** @typedef    typedef     struct             eOicubCanProto_msgDestination_t
     @brief      The destination of message belong to icub can protocol is a 
                 particuar axis managed by a board.
  **/
-typedef struct
+typedef union
 {
-    uint32_t axis:4;          // usa eo_icubCanProto_motorAxis_t
-    uint32_t canAddr:4;       //eo_icubCanProto_canBoardAddress_t;
-} eo_icubCanProto_msgDestination_t;
-                                     
-#define ICUBCANPROTO_MSGDEST_CREATE(axis, canAddr)   ((eo_icubCanProto_msgDestination_t)(axis<<4 |canAddr))
+    struct 
+    {
+        uint16_t canAddr:8;                 /**< use  eOicubCanProto_canBoardAddress_t */
+        uint16_t jm_indexInBoard:8;         /**< use eOicubCanProto_jm_indexinBoard_t.
+                                                if the destination is not joint or motor, this filed values 0 */
+    }s;
+    
+    uint16_t dest;
+} eOicubCanProto_msgDestination_t;
+
+//#define ICUBCANPROTO_MSGDEST_CREATE(jm_indexInBoard, canAddr)   ((eOicubCanProto_msgDestination_t)(jm_indexInBoard<<8 | canAddr))
+#define ICUBCANPROTO_MSGDEST_CREATE(jm_indexInBoard, canAddr)   ((uint16_t)(jm_indexInBoard<<8 | canAddr))
+#define ICUBCANPROTO_MSGDEST_GET_INDEXINBOARD(msgdest)          (((eOicubCanProto_msgDestination_t)(msgdest)).jm_indexInBoard)
 
 
-
-
-
-/** @typedef    typedef     uint8_t             eo_icubCanProto_command_t
+/** @typedef    typedef     uint8_t             eOicubCanProto_command_t
     @brief      contains command belong to icib can protocol.
-                its values are defined in eo_icubCanProtocol_messages.h 
+                its values are defined in eOicubCanProtocol_messages.h TODO
  **/
-typedef     uint8_t             eo_icubCanProto_msgCommand_cmdId_t;
+typedef     uint8_t             eOicubCanProto_msgCommand_cmdId_t;
 
 
 
-/** @typedef    typedef     uint8_t             eo_icubCanProto_msgCommand_class_t
+/** @typedef    typedef     uint8_t             eOicubCanProto_msgCommand_class_t
     @brief      contains command belong to icib can protocol.
-                its values are defined in eo_icubCanProtocol_messages.h 
-                VALE: e' utile messo qui o va messo nel _hid??
+                its values are defined in eOicubCanProtocol_messages.h 
  **/
 typedef enum
 {
@@ -338,20 +339,36 @@ typedef enum
     eo_icubCanProto_msgCmdClass_periodicSensorBoard    = 3,
     eo_icubCanProto_msgCmdClass_skinBoard              = 4, //ATTENTION: currently it is not used by other fw. Insert here to manage skin message like other calss messages.
     eo_icubCanProto_msgCmdClass_loader                 = 7    
-}eo_icubCanProto_msgCommand_class_t;
+}eOicubCanProto_msgCommand_class_t;
 
 
-/** @typedef    typedef     uint8_t             eo_icubCanProto_msgCommand_t
+/** @typedef    typedef     uint8_t             eOicubCanProto_msgCommand_t
     @brief      contains command belong to icib can protocol.
-                its values are defined in eo_icubCanProtocol_messages.h 
-                VALE: e' utile messo qui o va messo nel _hid??
+                its values are defined in eOicubCanProtocol_messages.h 
  **/
+// typedef union
+// {
+//     struct
+//     {
+//         uint16_t class:8;                   /**< use  eOicubCanProto_msgCommand_class_t */
+//         uint16_t cmdId:8;                   /**< use  eOicubCanProto_msgCommand_cmdId_t */
+//     }s;
+//     
+//     uint16_t command;
+// } eOicubCanProto_msgCommand_t;
 typedef struct
 {
-    uint16_t class:8;          //eo_icubCanProto_msgCommand_class_t
-    uint16_t cmdId:8;         //eo_icubCanProto_msgCommand_id_t;
-} eo_icubCanProto_msgCommand_t;
-#define ICUBCANPROTO_MSGCOMMAND_CREATE(class, cmdId)   ((eo_icubCanProto_msgCommand_t)(class<<8 |cmdId))
+    uint16_t class:8;                   /**< use  eOicubCanProto_msgCommand_class_t */
+    uint16_t cmdId:8;                   /**< use  eOicubCanProto_msgCommand_cmdId_t */
+} eOicubCanProto_msgCommand_t;
+#define ICUBCANPROTO_MSGCOMMAND_CREATE(class, cmdId)   ((eOicubCanProto_msgCommand_t)(class<<8 | cmdId))
+
+
+typedef struct
+{
+    uint8_t val2bcastList[4];           //list of value to broadcast
+} eOicubCanProto_bcastpolicy_t;
+
 
 
 /** @typedef    typedef int32_t             eOicubCanProto_position_t
@@ -517,11 +534,11 @@ typedef struct
  **/
 typedef enum
 {
-    eoicubCanProto_calibration_type0_hard_stops               = 0,
-    eoicubCanProto_calibration_type1_abs_sens_analog          = 1,
-    eoicubCanProto_calibration_type2_hard_stops_diff          = 2,
-    eoicubCanProto_calibration_type3_abs_sens_digital         = 3,
-    eoicubCanProto_calibration_type4_abs_and_incremental      = 4
+    eo_icubCanProto_calibration_type0_hard_stops               = 0,
+    eo_icubCanProto_calibration_type1_abs_sens_analog          = 1,
+    eo_icubCanProto_calibration_type2_hard_stops_diff          = 2,
+    eo_icubCanProto_calibration_type3_abs_sens_digital         = 3,
+    eo_icubCanProto_calibration_type4_abs_and_incremental      = 4
 } eOicubCanProto_calibration_type_t;
 
 

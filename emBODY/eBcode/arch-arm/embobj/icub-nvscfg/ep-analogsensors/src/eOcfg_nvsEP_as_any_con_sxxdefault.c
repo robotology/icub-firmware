@@ -87,9 +87,36 @@ const eOsnsr_strain_t eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue =
     },
     EO_INIT(.sstatus)                       
     {
-        EO_INIT(.fullscale)                     {0},
-        EO_INIT(.calibratedvalues)              {0},
-        EO_INIT(.uncalibratedvalues)            {0}
+        EO_INIT(.fullscale)                     
+        {
+            EO_INIT(.head)
+            {
+                EO_INIT(.capacity)              12,
+                EO_INIT(.itemsize)              2,
+                EO_INIT(.size)                  12
+            },
+            EO_INIT(.data)                      {0}
+        },
+        EO_INIT(.calibratedvalues)
+        {
+            EO_INIT(.head)
+            {
+                EO_INIT(.capacity)              12,
+                EO_INIT(.itemsize)              2,
+                EO_INIT(.size)                  12
+            },
+            EO_INIT(.data)                      {0}
+        },
+        EO_INIT(.uncalibratedvalues)            
+        {
+            EO_INIT(.head)
+            {
+                EO_INIT(.capacity)              12,
+                EO_INIT(.itemsize)              2,
+                EO_INIT(.size)                  12
+            },
+            EO_INIT(.data)                      {0}
+        }
     }
 }; 
 

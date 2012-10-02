@@ -30,6 +30,7 @@
 #include "EoCommon.h"
 #include "EOtheMemoryPool.h"
 #include "EOconstLookupTbl.h"
+#include "EOappTheDataBase.h"
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -65,22 +66,17 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-static eo_icubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_LUTbl_GetCmdIdFromFrame(EOicubCanProto* p,
-                                                                                    eo_icubCanProto_msgCommand_class_t class,
+static eOicubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_LUTbl_GetCmdIdFromFrame(EOicubCanProto* p,
+                                                                                    eOicubCanProto_msgCommand_class_t class,
                                                                                     eOcanframe_t *frame );
 static const EOconstLookupTbl* s_eo_icubCanProto_LUTbl_GetParserTbl(EOicubCanProto* p,
-                                                                    eo_icubCanProto_msgCommand_class_t class);
+                                                                    eOicubCanProto_msgCommand_class_t class);
 
 static const EOconstLookupTbl*  s_eo_icubCanProto_LUTbl_GetFormerTbl(EOicubCanProto* p,
-                                                                     eo_icubCanProto_msgCommand_class_t class);
+                                                                     eOicubCanProto_msgCommand_class_t class);
 
 static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPortRX);
 
-static eOresult_t s_eo_icubCanProto_FormCanFrame(EOicubCanProto* p,
-                                                 eo_canProto_msgCommand_t command, 
-                                                 eo_canProto_msgDestination_t dest,
-                                                 void *value,
-                                                 eOcanframe_t *frame);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -103,7 +99,6 @@ extern EOicubCanProto* eo_icubCanProto_New(eo_icubCanProto_cfg_t *cfg)
     // i get the memory for the object
     retptr = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOicubCanProto), 1);
     
-    retptr->emsCanNetTopo_ptr = cfg->emsCanNetTopo__ptr;
     retptr->msgClasses_LUTbl__ptr = cfg->msgClasses_LUTbl__ptr;
 
     return(retptr);
@@ -121,23 +116,35 @@ extern eOresult_t eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_t 
     return(s_eo_icubCanProto_ParseCanFrame(p, frame, canPortRX));
 }
 
-
-
 extern eOresult_t eo_icubCanProto_FormCanFrame(EOicubCanProto* p,
-                                               eo_icubCanProto_msgCommand_t command, 
-                                               eo_icubCanProto_msgDestination_t dest,
+                                               eOicubCanProto_msgCommand_t command, 
+                                               eOicubCanProto_msgDestination_t dest,
                                                void *value,
                                                eOcanframe_t *frame)
 {
 
+    const EOconstLookupTbl                            *tbl;
+    eo_icubCanProto_hid_LUTbl_item_formerFnHandling_t *itemsList;
+    
     if((NULL == p) || (NULL == frame))
     {
         return(eores_NOK_nullpointer);
     }
+    
+    tbl = s_eo_icubCanProto_LUTbl_GetFormerTbl(p, (eOicubCanProto_msgCommand_class_t)(command.class));
 
-    return(s_eo_icubCanProto_FormCanFrame(p, *((eo_canProto_msgCommand_t*)&command), 
-                                          *((eo_canProto_msgDestination_t*)&dest),
-                                          value, frame));
+    if(NULL == tbl)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    if(!eo_icubCanProto_hid_LUTbl_indexIsInTbl(tbl, command.cmdId))    
+    {
+        return(eo_icubCanProto_hid_LUTbl_excForm(p, tbl, command.cmdId, value, dest, frame));
+    }
+
+    itemsList = (eo_icubCanProto_hid_LUTbl_item_formerFnHandling_t*)tbl->itemsList;
+    return(itemsList[command.cmdId - tbl->offset].former(p, value, dest, frame));
 }
 
 
@@ -178,15 +185,15 @@ static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_
 {
     const EOconstLookupTbl                             *tbl;
     eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  *itemList;
-    eo_icubCanProto_msgCommand_cmdId_t                  cmdId;
-    eo_icubCanProto_msgCommand_class_t                  msgClass;
-    eo_emsCanNetTopo_sensorCanLocation_t                canLoc;
+    eOicubCanProto_msgCommand_cmdId_t                   cmdId;
+    eOicubCanProto_msgCommand_class_t                   msgClass;
+    eOappTheDB_SkinCanLocation_t                        canLoc;
     eOresult_t                                          res;
 
 
     //NOTE: when skin messages will belong to a particular class message,(not to analog sensor message class)
     //remove following if-else and leave only eo_icubCanProto_hid_getMsgClassFromFrameId function
-    res = eo_emsCanNetTopo_GetskinCanLocation_BySkinId(p->emsCanNetTopo_ptr, 0, &canLoc);
+    res = eo_appTheDB_GetSkinCanLocation(eo_appTheDB_GetHandle(), 0, &canLoc);
         
     if((eores_OK == res) && (canPortRX == canLoc.emscanport))
     {
@@ -218,41 +225,11 @@ static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_
 
 
 
-static eOresult_t s_eo_icubCanProto_FormCanFrame(EOicubCanProto* p,
-                                                 eo_canProto_msgCommand_t command, 
-                                                 eo_canProto_msgDestination_t dest,
-                                                 void *value,
-                                                 eOcanframe_t *frame)
-{
-
-    const EOconstLookupTbl                            *tbl;
-    eo_icubCanProto_hid_LUTbl_item_formerFnHandling_t *itemsList;
-    eo_icubCanProto_msgCommand_t *icommand = (eo_icubCanProto_msgCommand_t*)&command; 
-    eo_icubCanProto_msgDestination_t *idest = (eo_icubCanProto_msgDestination_t*)&dest;
-
-    tbl = s_eo_icubCanProto_LUTbl_GetFormerTbl(p, (eo_icubCanProto_msgCommand_class_t)icommand->class);
-
-    if(NULL == tbl)
-    {
-        return(eores_NOK_nullpointer);
-    }
-
-    if(!eo_icubCanProto_hid_LUTbl_indexIsInTbl(tbl, icommand->cmdId))    
-    {
-        return(eo_icubCanProto_hid_LUTbl_excForm(p, tbl, icommand->cmdId, value, *idest, frame));
-    }
-
-    itemsList = (eo_icubCanProto_hid_LUTbl_item_formerFnHandling_t*)tbl->itemsList;
-    return(itemsList[icommand->cmdId - tbl->offset].former(p, value, *idest, frame));
-
-}
 
 
 
-
-
-static eo_icubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_LUTbl_GetCmdIdFromFrame(EOicubCanProto* p,
-                                                                                    eo_icubCanProto_msgCommand_class_t class,
+static eOicubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_LUTbl_GetCmdIdFromFrame(EOicubCanProto* p,
+                                                                                    eOicubCanProto_msgCommand_class_t class,
                                                                                     eOcanframe_t *frame )
 {
     eo_icubCanProto_hid_LUTbl_item_classMsgTblReference_t* itemsList;
@@ -265,7 +242,7 @@ static eo_icubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_LUTbl_GetCmdIdFromFr
 
 
 static const EOconstLookupTbl*  s_eo_icubCanProto_LUTbl_GetParserTbl(EOicubCanProto* p,
-                                                                     eo_icubCanProto_msgCommand_class_t class)
+                                                                     eOicubCanProto_msgCommand_class_t class)
 {
     eo_icubCanProto_hid_LUTbl_item_classMsgTblReference_t* itemsList;
 
@@ -282,7 +259,7 @@ static const EOconstLookupTbl*  s_eo_icubCanProto_LUTbl_GetParserTbl(EOicubCanPr
 }
 
 static const EOconstLookupTbl*  s_eo_icubCanProto_LUTbl_GetFormerTbl(EOicubCanProto* p,
-                                                                     eo_icubCanProto_msgCommand_class_t class)
+                                                                     eOicubCanProto_msgCommand_class_t class)
 {
     eo_icubCanProto_hid_LUTbl_item_classMsgTblReference_t* itemsList;
 

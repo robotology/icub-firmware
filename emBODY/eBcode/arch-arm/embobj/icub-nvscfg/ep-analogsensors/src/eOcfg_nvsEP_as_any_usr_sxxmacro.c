@@ -108,6 +108,22 @@
 #define NVMACRO_BSTR        SXXMACRO_BOARD
 #define NVMACRO_NVSTR1      SXXMACRO_SSTR
 #define NVMACRO_NVNUM1      SXXMACRO_SNUM
+#define NVMACRO_NVSTR2      _sconfig
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_as_any_usr_nvmacro.c"
+
+
+
+#define NVMACRO_FUN_INIT    SXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    SXXMACRO_UPDT
+
+#define NVMACRO_PSTR        SXXMACRO_PART
+#define NVMACRO_BSTR        SXXMACRO_BOARD
+#define NVMACRO_NVSTR1      SXXMACRO_SSTR
+#define NVMACRO_NVNUM1      SXXMACRO_SNUM
 #define NVMACRO_NVSTR2      _sconfig__mode
 
 #define NVMACRO_USE_INIT    1
@@ -130,6 +146,7 @@
 #define NVMACRO_USE_UPDT    1
 
 #include "eOcfg_nvsEP_as_any_usr_nvmacro.c"
+
 
 
 #define NVMACRO_FUN_INIT    SXXMACRO_INIT
@@ -155,12 +172,29 @@
 #define NVMACRO_BSTR        SXXMACRO_BOARD
 #define NVMACRO_NVSTR1      SXXMACRO_SSTR
 #define NVMACRO_NVNUM1      SXXMACRO_SNUM
+#define NVMACRO_NVSTR2      _sstatus
+
+#define NVMACRO_USE_INIT    1
+#define NVMACRO_USE_UPDT    1
+
+#include "eOcfg_nvsEP_as_any_usr_nvmacro.c"
+
+
+
+#define NVMACRO_FUN_INIT    SXXMACRO_INIT
+#define NVMACRO_FUN_UPDT    SXXMACRO_UPDT
+
+#define NVMACRO_PSTR        SXXMACRO_PART
+#define NVMACRO_BSTR        SXXMACRO_BOARD
+#define NVMACRO_NVSTR1      SXXMACRO_SSTR
+#define NVMACRO_NVNUM1      SXXMACRO_SNUM
 #define NVMACRO_NVSTR2      _sstatus__fullscale
 
 #define NVMACRO_USE_INIT    1
 #define NVMACRO_USE_UPDT    1
 
 #include "eOcfg_nvsEP_as_any_usr_nvmacro.c"
+
 
 
 #define NVMACRO_FUN_INIT    SXXMACRO_INIT

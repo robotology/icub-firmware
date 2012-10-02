@@ -80,9 +80,11 @@
 
 
 
+EO_VERIFYproposition(xxx, strainNVindex_sconfig                             == EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sconfig);
 EO_VERIFYproposition(xxx, strainNVindex_sconfig__mode                       == EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sconfig__mode);
 EO_VERIFYproposition(xxx, strainNVindex_sconfig__datarate                   == EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sconfig__datarate);
 EO_VERIFYproposition(xxx, strainNVindex_sconfig__signaloncefullscale        == EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sconfig__signaloncefullscale);
+EO_VERIFYproposition(xxx, strainNVindex_sstatus                             == EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sstatus);
 EO_VERIFYproposition(xxx, strainNVindex_sstatus__fullscale                  == EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sstatus__fullscale);
 EO_VERIFYproposition(xxx, strainNVindex_sstatus__calibratedvalues           == EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sstatus__calibratedvalues);
 EO_VERIFYproposition(xxx, strainNVindex_sstatus__uncalibratedvalues         == EOK_cfg_nvsEP_as_any_con_sxx_snvindex_sstatus__uncalibratedvalues);
@@ -90,9 +92,11 @@ EO_VERIFYproposition(xxx, strainNVindex_sstatus__uncalibratedvalues         == E
 EO_VERIFYproposition(xxx, strainNVindex_TOTALnumber                         == EOK_cfg_nvsEP_as_any_con_sxx_snvindex_TOTALnumber);
 
 
+EO_VERIFYproposition(xxx, maisNVindex_mconfig                               == EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig);
 EO_VERIFYproposition(xxx, maisNVindex_mconfig__mode                         == EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__mode);
 EO_VERIFYproposition(xxx, maisNVindex_mconfig__datarate                     == EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__datarate);
 EO_VERIFYproposition(xxx, maisNVindex_mconfig__resolution                   == EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__resolution);
+EO_VERIFYproposition(xxx, maisNVindex_mstatus                               == EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mstatus);
 EO_VERIFYproposition(xxx, maisNVindex_mstatus__the15values                  == EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mstatus__the15values);
 
 
@@ -204,6 +208,17 @@ __weak extern void eo_cfg_nvsEP_as_hid_INITIALISE(eOnvEP_t ep, void *loc, void *
 
 // sxx-init:
 
+#if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig)
+__weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__mode)
 __weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__mode(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv)
 {
@@ -228,6 +243,17 @@ __weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__datarate(eOcfg_nvsEP_as
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__signaloncefullscale)
 __weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sconfig__signaloncefullscale(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus)
+__weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -272,6 +298,17 @@ __weak extern void eo_cfg_nvsEP_as_hid_INIT_Sxx_sstatus__uncalibratedvalues(eOcf
 
 // sxx-updt:
 
+#if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig)
+__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__mode)
 __weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__mode(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
@@ -296,6 +333,17 @@ __weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__datarate(eOcfg_nvsEP_as
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__signaloncefullscale)
 __weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sconfig__signaloncefullscale(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus)
+__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus(eOcfg_nvsEP_as_strainNumber_t sxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
@@ -340,6 +388,17 @@ __weak extern void eo_cfg_nvsEP_as_hid_UPDT_Sxx_sstatus__uncalibratedvalues(eOcf
 
 // mxx-init:
 
+#if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig)
+__weak extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__mode)
 __weak extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__mode(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv)
 {
@@ -373,6 +432,17 @@ __weak extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__resolution(eOcfg_nvsEP_
 }
 #endif
 
+#if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_INIT_Mxx_mstatus)
+__weak extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mstatus(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_INIT_Mxx_mstatus__the15values)
 __weak extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mstatus__the15values(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv)
 {
@@ -385,6 +455,17 @@ __weak extern void eo_cfg_nvsEP_as_hid_INIT_Mxx_mstatus__the15values(eOcfg_nvsEP
 #endif
 
 // mxx-updt:
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig)
+__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__mode)
 __weak extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__mode(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
@@ -410,6 +491,17 @@ __weak extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__datarate(eOcfg_nvsEP_as
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__resolution)
 __weak extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__resolution(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    eOnvEP_t ep = nv->ep;
+    
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    ep = ep;
+}
+#endif
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_as_hid_UPDT_Mxx_mstatus)
+__weak extern void eo_cfg_nvsEP_as_hid_UPDT_Mxx_mstatus(eOcfg_nvsEP_as_maisNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
     eOnvEP_t ep = nv->ep;
