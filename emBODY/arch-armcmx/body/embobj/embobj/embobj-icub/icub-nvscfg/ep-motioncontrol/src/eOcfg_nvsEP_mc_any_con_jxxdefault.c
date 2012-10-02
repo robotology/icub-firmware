@@ -129,7 +129,20 @@ const eOmc_joint_t eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue =
         EO_INIT(.holder02FFU03)             0xe3e3,
         EO_INIT(.holder02FFU04)             0xe4e3
     },
-    EO_INIT(.jstatus)                       {0},
+    EO_INIT(.jstatus)                       
+    {
+        EO_INIT(.basic)
+        {
+            EO_INIT(.position)              0,
+            EO_INIT(.velocity)              0,       
+            EO_INIT(.acceleration)          0,     
+            EO_INIT(.torque)                0,
+            EO_INIT(.motionmonitorstatus)   eomc_motionmonitorstatus_notmonitored,
+            EO_INIT(.controlmodestatus)     eomc_controlmode_switch_everything_off,
+        },
+        EO_INIT(.ofpid)                     {0},
+        EO_INIT(.chamaleon04)               {0xd1, 0xd2, 0xd3, 0xd4}
+    },
     EO_INIT(.jinputs)                       {0},
     EO_INIT(.jcmmnds)                       
 	{
