@@ -36,10 +36,6 @@
 #include "EoMotionControl.h"
 #include "EoSensors.h"
 #include "EoManagement.h"
-// #include "eOcfg_nvsEP_sk.h"   //==> included to clear skin array
-// #include "eOcfg_nvsEP_as.h"   //==> included to clear mais array
-// #include "eOcfg_nvsEP_mc.h"   //==>inlcluded to get joint's nvindex
-
 
 
 
@@ -112,8 +108,6 @@ static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p);
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
-/* TAG_ALE*/
-
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p)
 {
@@ -360,10 +354,10 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, in
             }   
         }
     };
+    uint16_t numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
 
-#warning VALE --> put here for cicle to send all setpoints
 
-    for (uint8_t jid = 0; jid < 4; ++jid)
+    for (uint8_t jid = 0; jid <numofjoint; ++jid)
     {
         mySetPoint_current.to.current.value = pwmList[jid];
     
@@ -409,13 +403,11 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
     /* 2) pid calc */
     pwm = eo_emsController_PWM();
      
-    //pwm_out = pwm[3];
-        
-//#ifndef _USE_PROTO_TEST_
-        /* 4) prepare and punt in rx queue new setpoint */
-        s_eom_emsrunner_hid_SetCurrentsetpoint(emsappbody_ptr, pwm, 0);
-//#endif   
 
+    /* 3) prepare and punt in rx queue new setpoint */
+    s_eom_emsrunner_hid_SetCurrentsetpoint(emsappbody_ptr, pwm, 0/*unused param*/);
+ 
+    /* 4) update joint status */
     s_eom_emsrunner_hid_UpdateJointstatus(p);
     /*Note: motor status is updated with data sent by 2foc by can */
 }
@@ -476,7 +468,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     
     numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
-    
+        
     for(jId = 0; jId<numofjoint; jId++)
     {
         res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), jId, &jstatus_ptr);
