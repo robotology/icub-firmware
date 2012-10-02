@@ -42,6 +42,7 @@
 //embobj
 #include "EoCommon.h"
 #include "EOtheMemoryPool.h"
+#include "EOtheErrorManager.h"
 
 //embobj-icub
 #include "EOicubCanProto.h"
@@ -99,8 +100,10 @@ static void s_eo_appCanSP_callbackOnTx_portx_waittransmission(void *arg, hal_can
 // --------------------------------------------------------------------------------------------------------------------
 static eOappCanSP_cfg_t defaultcfg = 
 {
-    .waitallframesaresent   = eobool_false
+    .waitallframesaresent   = eobool_true
 };
+
+static const char s_eobj_ownname[] = "EOappCanSP";
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -111,10 +114,13 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg)
     EOappCanSP      *retptr = NULL;
     EOicubCanProto  *icubCanProto_ptr;
 
-    if(NULL == cfg)
-    {
-        cfg = &defaultcfg;
-    }
+//     if(NULL == cfg)
+//     {
+//         cfg = &defaultcfg;
+//     }
+    //I would like use only defalt cfg,
+    //in order to enable "wait all frames are sent during tx phase in application's running mode
+    cfg = &defaultcfg;
     
 
     eo_icubCanProto_cfg_t icubCanProto_cfg = 
@@ -150,16 +156,16 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg)
         extern const hal_cfg_t *hal_cfgMINE;
         //can port 1
         //the max num of token in semaphore is equal to the max num of frame in can out queue.
-        retptr->waittxdata[hal_can_port1].waittxisdone = osal_semaphore_new(hal_cfgMINE->can1_txqnorm_num/*maxtokens*/, 0/*current num of token*/);
-        if(NULL == retptr->waittxdata[hal_can_port1].waittxisdone)
+        retptr->waittxdata[hal_can_port1].semaphore = osal_semaphore_new(hal_cfgMINE->can1_txqnorm_num/*maxtokens*/, 0/*current num of token*/);
+        if(NULL == retptr->waittxdata[hal_can_port1].semaphore)
         {
             return(NULL);
         }
         
         //can port 2
         //the max num of token in semaphore is equal to the max num of frame in can out queue.
-        retptr->waittxdata[hal_can_port2].waittxisdone = osal_semaphore_new(hal_cfgMINE->can1_txqnorm_num/*maxtokens*/, 0/*current num of token*/);
-        if(NULL == retptr->waittxdata[hal_can_port2].waittxisdone)
+        retptr->waittxdata[hal_can_port2].semaphore = osal_semaphore_new(hal_cfgMINE->can1_txqnorm_num/*maxtokens*/, 0/*current num of token*/);
+        if(NULL == retptr->waittxdata[hal_can_port2].semaphore)
         {
             return(NULL);
         }
@@ -167,8 +173,8 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg)
     }
     else
     {
-        retptr->waittxdata[hal_can_port1].waittxisdone = NULL;
-        retptr->waittxdata[hal_can_port2].waittxisdone = NULL;
+        retptr->waittxdata[hal_can_port1].semaphore = NULL;
+        retptr->waittxdata[hal_can_port2].semaphore = NULL;
     }
 
 // 4) initialise peritheral
@@ -200,16 +206,11 @@ extern eOresult_t eo_appCanSP_SendCmd2Joint(EOappCanSP *p, eOmc_jointId_t jId, e
     }
 
 
-    //set destination of message (one for all msg)
-//     #warning VALE-->valuta se il passaggio dei parametri e corretto!!! altrimenti usa questo:
-//     dest.jm_indexInBoard = indexinboard;
-//     dest.canAddr = canLoc.canaddr;
-//    res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, val_ptr, &canFrame);
+    //set destination of message
     msgdest.dest =ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+   
     res = s_eo_appCanSP_formAndSendFrame(p, canLoc.emscanport, msgdest, msgCmd, val_ptr);
-    
     return(res);
-    
 }
 
 
@@ -230,11 +231,9 @@ extern eOresult_t eo_appCanSP_SendCmd2Motor(EOappCanSP *p, eOmc_motorId_t mId, e
         return(res);
     }
 
-    //set destination of message (one for all msg)
-//     dest.axis = canLoc.jm_idInBoard;
-//     dest.canAddr = canLoc.canaddr;
-//     res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, val_ptr, &canFrame);
+    //set destination of message 
     msgdest.dest =ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+    
     res = s_eo_appCanSP_formAndSendFrame(p, canLoc.emscanport, msgdest, msgCmd, val_ptr);
     return(res);
 }
@@ -380,16 +379,16 @@ extern eOresult_t eo_appCanSP_StartTransmitCanFrames(EOappCanSP *p, eOcanport_t 
     {
         return(eores_NOK_nullpointer);
     }
-    if(p->cfg.waitallframesaresent)
-    {
-        //res = (eOresult_t) hal_can_out_get((hal_can_port_t)canport, &(p->waittxdata[canport].numoftxframe2send));
+    //Commented because always true
+//     if(p->cfg.waitallframesaresent)
+//     {
         res = (eOresult_t) hal_can_out_get((hal_can_port_t)canport, &numofoutframe);
         if(eores_OK != res)
         {
             return(res);
         }
         p->waittxdata[canport].numoftxframe2send = numofoutframe;
-    }
+//    }
     return((eOresult_t)hal_can_transmit((hal_can_port_t)canport));
 }
 
@@ -399,17 +398,16 @@ extern void eo_appCanSP_WaitTransmitCanFrames(EOappCanSP *p, eOcanport_t canport
     {
         return;
     }
-
-    if(!p->cfg.waitallframesaresent)
-    {
-        return;
-    }
+    //Commented because always true
+//     if(!p->cfg.waitallframesaresent)
+//     {
+//         return;
+//     }
     
-    if(p->waittxdata[canport].numoftxframe2send > 0) //if some frames wait to be sent
+    if(p->waittxdata[canport].numoftxframe2send > 0) //if some frames wait to be sent, then suspend me
     {
-        osal_semaphore_decrement(p->waittxdata[canport].waittxisdone, osal_reltimeINFINITE);
+        osal_semaphore_decrement(p->waittxdata[canport].semaphore, osal_reltimeINFINITE);
     }
-
 }
 
 
@@ -793,7 +791,7 @@ static void s_eo_appCanSP_callbackOnTx_portx_waittransmission(void *arg, hal_can
     
     if(0 == p->waittxdata[port].numoftxframe2send)
     {
-        osal_semaphore_increment(p->waittxdata[port].waittxisdone, osal_callerISR);
+        osal_semaphore_increment(p->waittxdata[port].semaphore, osal_callerISR);
     }
 }
 
@@ -808,11 +806,47 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
     {
         return(res);
     }
-    res = (eOresult_t)hal_can_put((hal_can_port_t)emscanport, (hal_can_frame_t*)&canFrame,
-                                   ((p->runmode == eo_appCanSP_runMode__onEvent)? hal_can_send_normprio_now : hal_can_send_normprio_later));
-
+    if(eo_appCanSP_runMode__onEvent == p->runmode)
+    {
+        res = (eOresult_t)hal_can_put((hal_can_port_t)emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now );
+        if(eores_OK != res)
+        {
+            if(eores_NOK_busy == res)
+            {
+                hal_arch_arm_irqn_t irqn = (eOcanport1 == emscanport)? hal_arch_arm_CAN1_TX_IRQn : hal_arch_arm_CAN2_TX_IRQn;
+                
+                hal_sys_irqn_disable(irqn);
+                p->waittxdata[emscanport].waitenable = eobool_true;
+                p->waittxdata[emscanport].numoftxframe2send = 1;
+                hal_sys_irqn_enable(irqn);
+                
+                osal_semaphore_decrement(p->waittxdata[emscanport].semaphore, osal_reltimeINFINITE);
+                
+                //if i'm here i just wake up
+                hal_sys_irqn_disable(irqn);
+                p->waittxdata[emscanport].waitenable = eobool_false;
+                hal_sys_irqn_enable(irqn);
+                res = (eOresult_t)hal_can_put((hal_can_port_t)emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now );
+                if(eores_OK != res)
+                {
+                   eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "error in hal_can_put!"); 
+                }
+            }
+            else
+            {
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "error in hal_can_put");
+            }
+        }
+    }
+    else // eo_appCanSP_runMode__onDemand
+    {
+        res = (eOresult_t)hal_can_put((hal_can_port_t)emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_later);
+        if(eores_NOK_busy == res)
+        {
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "lost can frame (out-queue full)");
+        }
+    }
     return(res);
-
 }
 
 // --------------------------------------------------------------------------------------------------------------------

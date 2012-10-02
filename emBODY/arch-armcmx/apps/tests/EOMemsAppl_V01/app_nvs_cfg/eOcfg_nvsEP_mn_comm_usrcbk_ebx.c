@@ -160,6 +160,7 @@ extern void eo_cfg_nvsEP_mn_appl_usr_hid_UPDT_cmmnds__go2state(uint16_t n, const
 
     eOmn_appl_state_t *newstate_ptr = (eOmn_appl_state_t *)nv->loc;
 
+    #warning VALE-->aggiungi controllo per verificare se sei gia in running state!
     switch(*newstate_ptr)
     {
         case applstate_config:

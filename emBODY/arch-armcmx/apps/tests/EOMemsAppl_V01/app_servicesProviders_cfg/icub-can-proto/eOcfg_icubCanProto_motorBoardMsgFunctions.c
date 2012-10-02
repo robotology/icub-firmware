@@ -219,7 +219,7 @@ extern eOresult_t eo_icubCanProto_former_test(EOicubCanProto* p, void *val_ptr, 
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 3;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1) <<8) | ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1) <<7) | ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;
     canFrame->data[1] = *((uint8_t*)val_ptr);
     canFrame->data[2] = *(((uint8_t*)val_ptr) +1);
     return(eores_OK);
@@ -231,7 +231,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__controllerRun(EOicubCanProt
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 1;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;
     return(eores_OK);
 }
 
@@ -241,7 +241,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__controllerIdle(EOicubCanPro
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 1;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__CONTROLLER_IDLE;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__CONTROLLER_IDLE;
     return(eores_OK);
 }
 
@@ -260,7 +260,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__calibrateEncoder(EOicubCanP
     canFrame->size = 8;
 
     /* 2 set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__CALIBRATE_ENCODER;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__CALIBRATE_ENCODER;
 
     /*3) set command's params */
     canFrame->data[1] = calib_ptr->type;
@@ -314,7 +314,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__enablePwmPad(EOicubCanProto
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 1;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__ENABLE_PWM_PAD;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__ENABLE_PWM_PAD;
     return(eores_OK);
 }
 
@@ -325,7 +325,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__disablePwmPad(EOicubCanProt
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 1;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__DISABLE_PWM_PAD;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__DISABLE_PWM_PAD;
     return(eores_OK);
 }
 
@@ -367,7 +367,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getControlMode(EOicubCanPro
     canFrame->size = 1;
 
     /* 2) set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__GET_CONTROL_MODE;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__GET_CONTROL_MODE;
 
     /* this command hasn't params */
 
@@ -414,7 +414,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__motionDone(EOicubCanProto* 
     canFrame->size = 1;
 
     /* 2) set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__MOTION_DONE;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__MOTION_DONE;
 
     /* this command hasn't params */
 
@@ -433,7 +433,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setControlMode(EOicubCanPro
     canFrame->size = 2;
 
     /* 2) set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
 
     /* 3) set command's params */
     canFrame->data[1] = *controlMode_ptr;
@@ -470,7 +470,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setSpeedEtimShift(EOicubCan
     canFrame->size = 5;
 
     /* 2 set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_SPEED_ESTIM_SHIFT;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_SPEED_ESTIM_SHIFT;
 
     /*3) set command's params */
     *((uint8_t*)(&canFrame->data[1])) = estimShift_ptr->estimShiftJointVel;
@@ -519,7 +519,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__positionMove(EOicubCanProto
     canFrame->size = 7;
 
     /* 2 set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__POSITION_MOVE;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__POSITION_MOVE;
 
     /* 3) set command's params */
     *((eOicubCanProto_position_t*)(&canFrame->data[1])) = pos_setpoint_ptr->value;
@@ -541,7 +541,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__velocityMove(EOicubCanProto
     canFrame->size = 5;
 
     /* 2 set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__VELOCITY_MOVE;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__VELOCITY_MOVE;
 
     /*3) set command's params */
     *((eOicubCanProto_velocity_t*)(&canFrame->data[1])) = vel_setpoint_ptr->value;
@@ -569,7 +569,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setDesiredTorque(EOicubCanP
     canFrame->size = 5;
 
     /* 2 set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_DESIRED_TORQUE;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_DESIRED_TORQUE;
 
     /*3) set command's params */
     *((eOicubCanProto_torque_t*)(&canFrame->data[1])) = torque_setpoint_ptr->value;
@@ -595,7 +595,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getDesiredTorque(EOicubCanP
     canFrame->size = 1;
 
     /* 2) set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__GET_DESIRED_TORQUE;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__GET_DESIRED_TORQUE;
 
     /* this command hasn't params */
 
@@ -612,7 +612,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__stopTrajectory(EOicubCanPro
     canFrame->size = 1;
 
     /* 2) set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__STOP_TRAJECTORY;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__STOP_TRAJECTORY;
 
     /* this command hasn't params */
 
@@ -636,7 +636,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setMinPosition(EOicubCanPro
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_MIN_POSITION;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_MIN_POSITION;
     *((eOicubCanProto_position_t*)(&canFrame->data[1])) = *((eOicubCanProto_position_t*)val_ptr);
     return(eores_OK);
 
@@ -660,7 +660,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setMaxPosition(EOicubCanPro
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_MAX_POSITION;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_MAX_POSITION;
     *((eOicubCanProto_position_t*)(&canFrame->data[1])) = *((eOicubCanProto_position_t*)val_ptr);
     return(eores_OK);
 }
@@ -685,7 +685,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setMaxVelocity(EOicubCanPro
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 3;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_MAX_VELOCITY;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_MAX_VELOCITY;
     *((eOicubCanProto_velocity_t*)(&canFrame->data[1])) = *((eOicubCanProto_velocity_t*)val_ptr);
     return(eores_OK);
 }
@@ -710,7 +710,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setCurrentLimit(EOicubCanPr
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_LIMIT;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_LIMIT;
     *((eOmeas_current_t*)(&canFrame->data[1])) = *motor_currentlimit_ptr;
     
     /* Note: eo-protocol uses 16 bits for current, while icubcanprotocol uses 32bits */
@@ -725,7 +725,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setBcastPolicy(EOicubCanPro
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_BCAST_POLICY;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_BCAST_POLICY;
     
     memcpy(&canFrame->data[1], payload_ptr, 4);
     return(eores_OK);
@@ -739,7 +739,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setVelShift(EOicubCanProto*
    canFrame->id_type = 0; //standard id
    canFrame->frame_type = 0; //data frame
    canFrame->size = 3;
-   canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_VEL_SHIFT;
+   canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_VEL_SHIFT;
    *((uint16_t*)(&canFrame->data[1])) = *((uint16_t*)val_ptr);
     return(eores_OK);
 }
@@ -773,7 +773,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setTorquePid(EOicubCanProto
     canFrame->size = 8;
 
     /* 2) set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_TORQUE_PID;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_TORQUE_PID;
 
     /* 3) set command's params */
     *((uint16_t*)(&canFrame->data[1])) = torque_pid_ptr->kp;
@@ -807,7 +807,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setTorquePidLimits(EOicubCa
                             so i left size=8 even if correct size is 7 */
 
     /* 2) set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_TORQUE_PIDLIMITS;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_TORQUE_PIDLIMITS;
 
     /* 3) set command's params */
     *((uint16_t*)(&canFrame->data[1])) = torque_pid_ptr->offset;
@@ -841,7 +841,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setPosPid(EOicubCanProto* p
     canFrame->size = 8;
 
     /* 2) set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_POS_PID;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_POS_PID;
 
     /* 3) set command's params */
     *((uint16_t*)(&canFrame->data[1])) = pos_pid_ptr->kp;
@@ -876,7 +876,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setPosPidLimits(EOicubCanPr
                             so i left size=8 even if correct size is 7 */
 
     /* 2) set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_POS_PIDLIMITS;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_POS_PIDLIMITS;
 
     /* 3) set command's params */
     *((uint16_t*)(&canFrame->data[1])) = pos_pid_ptr->offset;
@@ -903,7 +903,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setVelTimeout(EOicubCanProt
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 3;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_VEL_TIMEOUT;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_VEL_TIMEOUT;
     *((uint16_t*)(&canFrame->data[1])) = *((uint16_t*)val_ptr);
     return(eores_OK);
 }
@@ -917,7 +917,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setImpedanceParams(EOicubCa
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_IMPEDANCE_PARAMS;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_IMPEDANCE_PARAMS;
 
     //stiffnes and damping are uint16_t
     *((eOicubCanProto_stiffness_t*)(&canFrame->data[1])) = (eOicubCanProto_stiffness_t)imp_ptr->stiffness;
@@ -945,7 +945,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setImpedanceOffset(EOicubCa
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 3;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_IMPEDANCE_OFFSET;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_IMPEDANCE_OFFSET;
 
     *((eOicubCanProto_torque_t*)(&canFrame->data[1])) = *((eOicubCanProto_torque_t*)(impOffset_ptr));
 
@@ -982,7 +982,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setCurrentPid(EOicubCanProt
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 7;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID;
     *((uint16_t*)(&canFrame->data[1])) = cur_pid_ptr->kp;
     *((uint16_t*)(&canFrame->data[3])) = cur_pid_ptr->ki;
     *((uint16_t*)(&canFrame->data[5])) = cur_pid_ptr->kd;
@@ -1008,7 +1008,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setCurrentPidLimits(EOicubC
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 7;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PIDLIMITS;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PIDLIMITS;
 
     *((uint16_t*)(&canFrame->data[1])) = cur_pid_ptr->offset;
     *((uint16_t*)(&canFrame->data[3])) = cur_pid_ptr->limitonoutput;
@@ -1037,7 +1037,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setVelocityPid(EOicubCanPro
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 7;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_VELOCITY_PID;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_VELOCITY_PID;
     *((uint16_t*)(&canFrame->data[1])) = vel_pid_ptr->kp;
     *((uint16_t*)(&canFrame->data[3])) = vel_pid_ptr->ki;
     *((uint16_t*)(&canFrame->data[5])) = vel_pid_ptr->kd;
@@ -1064,7 +1064,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setVelocityPidLimits(EOicub
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 7;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_VELOCITY_PIDLIMITS;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_VELOCITY_PIDLIMITS;
 
     *((uint16_t*)(&canFrame->data[1])) = vel_pid_ptr->offset;
     *((uint16_t*)(&canFrame->data[3])) = vel_pid_ptr->limitonoutput;
@@ -1092,7 +1092,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setDesiredCurrent(EOicubCan
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_DISIRED_CURRENT;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_DISIRED_CURRENT;
     *((eOmeas_current_t*)(&canFrame->data[1])) = *currentVal_ptr;
     canFrame->data[3]= 0; //LSB Id
     canFrame->data[4]= 0; //MSB Id
@@ -1126,7 +1126,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setI2TParams(EOicubCanProto
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<8) | ICUBCANPROTO_POL_MB_CMD__SET_I2T_PARAMS;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_I2T_PARAMS;
     *((uint16_t*)(&canFrame->data[1])) = i2tParams_ptr->time;
     *((uint16_t*)(&canFrame->data[3])) = i2tParams_ptr->tresh;
     

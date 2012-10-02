@@ -77,6 +77,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 {
     EOMtheEMSapplCfg *appCfg =  eom_emsapplcfg_GetHandle();
     eo_emsapplBody_Initialise(&appCfg->applbodycfg);
+    
 }
 
 

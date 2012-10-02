@@ -53,7 +53,12 @@ typedef struct EOappCanSP_hid   EOappCanSP;
 
 typedef struct
 {
-    eOboolvalues_t  waitallframesaresent;
+    eOboolvalues_t  waitallframesaresent; /**< if true then the objcet when is in eo_appCanSP_runMode__onDemand
+                                               doesn't send can frame immediately, but only when  
+                                               eo_appCanSP_StartTransmitCanFrames function is called. 
+                                               NOTE: Currently, this config param is meanless because the object behaves
+                                               like waitallframesaresent is true and ignores configuration param 
+                                               in eo_appCanSP_New function.*/
 } eOappCanSP_cfg_t;
 
 

@@ -1197,7 +1197,7 @@ static eOresult_t s_appTheDB_nvsrefmaps_init(EOappTheDB *p)
     
 //mais
     size = eo_array_Capacity(p->snsrMaisList);
-    p->nvsrefMaps.mnvMap = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(void**), size);
+    p->nvsrefMaps.snsrMaisnvMap = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(void**), size);
       
     for(i=0; i<size; i++)
     {
@@ -1232,7 +1232,7 @@ static eOresult_t s_appTheDB_nvsrefmaps_init(EOappTheDB *p)
     
 //skin
     size = eo_array_Capacity(p->skinList);
-    p->nvsrefMaps.mnvMap = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(void**), size);
+    p->nvsrefMaps.skinnvMap = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(void**), size);
       
     for(i=0; i<size; i++)
     {
@@ -1327,6 +1327,7 @@ static eOresult_t s_appTheDB_nvsrefmaps_snsrMaismap_fill(EOappTheDB *p, eOsnsr_m
     eOnvID_t                            nv_id;
     eOresult_t                          res;
     eOappTheDB_hid_snsrMaisNVindex_t   snvindex;
+    
 
     for(snvindex=eOappTheDB_hid_snsrMaisNVindex_mconfig /*=0*/; snvindex<eOappTheDB_hid_snsrMaisNVindex_TOTALnumber; snvindex++)
     {
@@ -1334,7 +1335,7 @@ static eOresult_t s_appTheDB_nvsrefmaps_snsrMaismap_fill(EOappTheDB *p, eOsnsr_m
                                                (eOcfg_nvsEP_as_maisNumber_t)sId, 
                                                eo_appTheDB_hid_GetASmaisNVindex(snvindex));
             
-        res = eo_nvscfg_GetIndices(p->cfg.nvsCfg, eok_ipv4addr_localhost, p->cfg.mc_endpoint, nv_id, 
+        res = eo_nvscfg_GetIndices(p->cfg.nvsCfg, eok_ipv4addr_localhost, p->cfg.as_endpoint, nv_id, 
                                    &ipindex, &epindex, &idindex); 
         if(eores_OK != res)
         {
@@ -1399,7 +1400,7 @@ static eOresult_t s_appTheDB_nvsrefmaps_skinmap_fill(EOappTheDB *p, eOsk_skinId_
                                          (eOcfg_nvsEP_sk_skinNumber_t)skId, 
                                           eo_appTheDB_hid_GetSKskinNVindex(sknvindex));
             
-        res = eo_nvscfg_GetIndices(p->cfg.nvsCfg, eok_ipv4addr_localhost, p->cfg.mc_endpoint, nv_id, 
+        res = eo_nvscfg_GetIndices(p->cfg.nvsCfg, eok_ipv4addr_localhost, p->cfg.sk_endpoint, nv_id, 
                                    &ipindex, &epindex, &idindex); 
         if(eores_OK != res)
         {

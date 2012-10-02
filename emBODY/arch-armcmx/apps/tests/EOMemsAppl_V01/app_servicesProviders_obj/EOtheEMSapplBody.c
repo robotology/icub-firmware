@@ -129,19 +129,13 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOtheEMSappBody_cfg_t *
     retptr->appRunMode = applrunMode__default;
     
     s_eo_emsapplBody_objs_init(retptr); //if a obj init doesn't success, it calls errorManager with fatal error
-    
+    eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, "obj-body inited OK");
     
     res = s_eo_emsapplBody_sendConfig2canboards(retptr);
-    if(eores_OK != res)
-    {
-        return(NULL);
-    }
+    eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in sending cfg 2 canboards");
     
     res = s_eo_emsapplBody_getRunMode(retptr); //the run mode is depending on connected can board (mc4, 2foc, only skin, etc)
-    if(eores_OK != res)
-    {
-        return(NULL);
-    }
+    eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in getting run mode");
     
     retptr->st = eo_emsApplBody_st__inited;
     
@@ -418,7 +412,7 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
         eOappTheDB_jointOrMotorCanLocation_t    canLoc; //here I don't use eOappTheDB_SkinCanLocation_t because i need jmindexId filed to set triangle id
         eOappTheDB_SkinCanLocation_t            skincanLoc;
 
-        msgCmd.class = eo_icubCanProto_msgCmdClass_periodicSensorBoard; //currently skin doesn't manage skin class
+        msgCmd.class =  eo_icubCanProto_msgCmdClass_skinBoard; //currently this class not exist and it is remaped on sensor class
         msgCmd.cmdId =  ICUBCANPROTO_POL_SK_CMD__TACT_SETUP;
 
 
