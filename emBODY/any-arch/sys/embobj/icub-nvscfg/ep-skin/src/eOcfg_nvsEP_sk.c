@@ -106,7 +106,11 @@ const eOskin_someskin_t* eo_cfg_nvsEP_sk_someskin_defaultvalue = &eo_cfg_nvsEP_s
 
 extern uint16_t eo_cfg_nvsEP_sk_sknumbermax_Get(eOcfg_nvsEP_sk_endpoint_t ep)
 {
-    return(skinNumberMAX);
+    if((endpoint_sk_emsboard_leftlowerarm == ep ) || (endpoint_sk_emsboard_rightlowerarm == ep ) )
+    {
+        return(skinNumberMAX);
+    }
+    return(0);
 }
 extern eOnvID_t eo_cfg_nvsEP_sk_NVID_Get(eOcfg_nvsEP_sk_endpoint_t ep, eOcfg_nvsEP_sk_skinNumber_t s, eOcfg_nvsEP_sk_skinNVindex_t snvindex)
 {
@@ -158,7 +162,7 @@ __weak extern void eo_cfg_nvsEP_sk_hid_UPDT_sconfig__sigmode(uint16_t n, const E
     ep = ep;
 }
 
-#ifdef OVERRIDE_eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe
+#if !defined(OVERRIDE_eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe)
 __weak extern void eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {   // n is always 0
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;

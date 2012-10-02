@@ -151,6 +151,11 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_as_onemais_usr_array_of_EOnv_usr[] =
     
     
     {   // m00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_as_onemais_m00_ebx_mconfig,
+        EONV_ONROPRECEPTION_IS_NULL                 
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },
+    {   // m00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_as_onemais_m00_ebx_mconfig__mode,
         EONV_ONROPRECEPTION_IS_NULL                 
         EO_INIT(.stg_address)           EOK_uint32dummy       
@@ -164,7 +169,12 @@ static const EOnv_usr_t s_eo_cfg_nvsEP_as_onemais_usr_array_of_EOnv_usr[] =
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_as_onemais_m00_ebx_mconfig__resolution,
         EONV_ONROPRECEPTION_IS_NULL                
         EO_INIT(.stg_address)           EOK_uint32dummy       
-    },     
+    },
+    {   // m00 
+        EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_as_onemais_m00_ebx_mstatus,
+        EONV_ONROPRECEPTION_IS_NULL                
+        EO_INIT(.stg_address)           EOK_uint32dummy       
+    },    
     {   // m00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_as_onemais_m00_ebx_mstatus__the15values,
         EONV_ONROPRECEPTION_IS_NULL                
@@ -331,6 +341,12 @@ __weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_INITIALISE(eOnvEP_t ep, void 
 
 
 // mxx-init:
+__weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Mxx_mconfig(uint16_t xx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig((eOcfg_nvsEP_as_maisNumber_t)xx, nv);
+}
 
 __weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Mxx_mconfig__mode(uint16_t xx, const EOnv* nv)
 {
@@ -354,6 +370,13 @@ __weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Mxx_mconfig__resolution(
     eo_cfg_nvsEP_as_hid_INIT_Mxx_mconfig__resolution((eOcfg_nvsEP_as_maisNumber_t)xx, nv);
 }
 
+__weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Mxx_mstatus(uint16_t xx, const EOnv* nv)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_as_hid_INIT_Mxx_mstatus((eOcfg_nvsEP_as_maisNumber_t)xx, nv);
+}
+
 
 __weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Mxx_mstatus__the15values(uint16_t xx, const EOnv* nv)
 {
@@ -366,6 +389,13 @@ __weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Mxx_mstatus__the15values
 
 // mxx-updt:
 
+
+__weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig((eOcfg_nvsEP_as_maisNumber_t)xx, nv, time, sign);
+}
 
 __weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig__mode(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
@@ -389,6 +419,13 @@ __weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig__resolution(
     eo_cfg_nvsEP_as_hid_UPDT_Mxx_mconfig__resolution((eOcfg_nvsEP_as_maisNumber_t)xx, nv, time, sign);
 }
 
+
+__weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mstatus(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    theOwnershipIsLocal = theOwnershipIsLocal;
+    eo_cfg_nvsEP_as_hid_UPDT_Mxx_mstatus((eOcfg_nvsEP_as_maisNumber_t)xx, nv, time, sign);
+}
 
 __weak extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mstatus__the15values(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {

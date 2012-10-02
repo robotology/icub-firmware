@@ -53,15 +53,17 @@
 
 // -- the index of the network variables inside a mais
 
-#define EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__mode                                 (0)
-#define EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__datarate                             (1)
-#define EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__resolution                           (2)
-#define EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mstatus__the15values                          (3)
+#define EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig                                       (0)
+#define EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__mode                                 (1)
+#define EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__datarate                             (2)
+#define EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mconfig__resolution                           (3)
+#define EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mstatus                                       (4)
+#define EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_mstatus__the15values                          (5)
 
 
 // -- the total number of network variables inside a mais
 
-#define EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber                                   (4)
+#define EOK_cfg_nvsEP_as_any_con_mxx_mnvindex_TOTALnumber                                   (6)
 
 
 
@@ -70,9 +72,11 @@
 
 // -- the fun and typ of all the network variables in the mais
 
+#define EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig                                       EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd)
 #define EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig__mode                                 EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08)
 #define EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig__datarate                             EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08)
 #define EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig__resolution                           EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08)
+#define EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mstatus                                       EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd)
 #define EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mstatus__the15values                          EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_arr)
 
 
