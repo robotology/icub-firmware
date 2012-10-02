@@ -306,9 +306,9 @@ typedef union
 {
     struct 
     {
+        uint16_t canAddr:8;                 /**< use  eOicubCanProto_canBoardAddress_t */
         uint16_t jm_indexInBoard:8;         /**< use eOicubCanProto_jm_indexinBoard_t.
                                                 if the destination is not joint or motor, this filed values 0 */
-        uint16_t canAddr:8;                 /**< use  eOicubCanProto_canBoardAddress_t */
     }s;
     
     uint16_t dest;
