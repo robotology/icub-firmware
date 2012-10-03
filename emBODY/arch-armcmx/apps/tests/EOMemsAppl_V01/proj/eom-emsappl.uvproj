@@ -1255,11 +1255,6 @@
               <FilePath>..\app_cfg\example_overridden_appl.c</FilePath>
             </File>
             <File>
-              <FileName>example_overridden_configurator.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\app_cfg\example_overridden_configurator.c</FilePath>
-            </File>
-            <File>
               <FileName>example_overridden_error.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\example_overridden_error.c</FilePath>
@@ -1283,6 +1278,11 @@
               <FileName>overridden_sm.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\overridden_sm.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_configurator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\overridden_configurator.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2564,11 +2564,6 @@
               <FilePath>..\app_cfg\example_overridden_appl.c</FilePath>
             </File>
             <File>
-              <FileName>example_overridden_configurator.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\app_cfg\example_overridden_configurator.c</FilePath>
-            </File>
-            <File>
               <FileName>example_overridden_error.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\example_overridden_error.c</FilePath>
@@ -2592,6 +2587,11 @@
               <FileName>overridden_sm.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\overridden_sm.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_configurator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\overridden_configurator.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3913,11 +3913,6 @@
               </FileOption>
             </File>
             <File>
-              <FileName>example_overridden_configurator.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\app_cfg\example_overridden_configurator.c</FilePath>
-            </File>
-            <File>
               <FileName>example_overridden_error.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\example_overridden_error.c</FilePath>
@@ -3981,6 +3976,11 @@
               <FileName>overridden_sm.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\overridden_sm.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_configurator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\overridden_configurator.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -5302,11 +5302,6 @@
               </FileOption>
             </File>
             <File>
-              <FileName>example_overridden_configurator.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\app_cfg\example_overridden_configurator.c</FilePath>
-            </File>
-            <File>
               <FileName>example_overridden_error.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\example_overridden_error.c</FilePath>
@@ -5370,6 +5365,11 @@
               <FileName>overridden_sm.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\overridden_sm.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_configurator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\overridden_configurator.c</FilePath>
             </File>
           </Files>
         </Group>

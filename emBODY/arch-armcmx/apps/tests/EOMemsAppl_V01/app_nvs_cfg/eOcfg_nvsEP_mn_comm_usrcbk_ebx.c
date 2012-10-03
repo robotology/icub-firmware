@@ -83,7 +83,7 @@ static void s_eo_cfg_nvsEP_mngmnt_usr_ebx_generic_ropsigcfgcommand(eOmn_ropsigcf
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
-
+extern eOboolvalues_t go2run_received;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -160,22 +160,25 @@ extern void eo_cfg_nvsEP_mn_appl_usr_hid_UPDT_cmmnds__go2state(uint16_t n, const
 
     eOmn_appl_state_t *newstate_ptr = (eOmn_appl_state_t *)nv->loc;
 
-    #warning VALE-->aggiungi controllo per verificare se sei gia in running state!
+    #warning VALE--> think about go to new state.
     switch(*newstate_ptr)
     {
         case applstate_config:
         {
+            go2run_received = eobool_false;
 //              eom_appTheSysController_ExitFromRunState(eom_appTheSysController_GetHandle());
 //             eom_appTheSysController_Go2ConfigState(eom_appTheSysController_GetHandle());
         }break;
 
         case applstate_running:
         {
-            eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_go2runner);    
+            go2run_received = eobool_true;
+//            eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_go2runner);    
         }break;
 
         case applstate_error:
         {
+            go2run_received = eobool_false;
 //             eom_appTheSysController_Go2ErrorState(eom_appTheSysController_GetHandle());    
         }break;
 
