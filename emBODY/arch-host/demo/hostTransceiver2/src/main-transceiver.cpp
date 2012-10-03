@@ -33,7 +33,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-#define _MAIS_	1
+//#define _MAIS_	1
 
 
 
@@ -91,20 +91,19 @@ hostTransceiver *transceiver;
 
 uint8_t boardN = 4;
 bool double_socket = false;
+extern bool enableSender;
 
 
 int main(int argc, char *argv[])
 {
-
-	//#define www(sname, ssize)    typedef uint8_t GUARD##sname[ ( ssize == sizeof(sname) ) ? (1) : ( 0x12345678 )];
-	//	www(char, 2);
-
 	yarp::os::Network yarp;
-
-	//	EO_VERIFYproposition(name,  (sizeof(int*) == 4));
-
 	char str[SIZE];
-	// Program data
+	eOipv4port_t eOport;
+	ACE_thread_t id_recvThread; //thread manages rx pkt
+	ACE_thread_t id_skinThread; //opens yarp port and send data to app skin
+	ACE_thread_t id_sendThread; //send data to ems every 1 milli
+
+	// reset buffer remote board
 	memset(&remote01.data, 0x00, SIZE);
 
 	// Utility stuff
@@ -251,45 +250,42 @@ int main(int argc, char *argv[])
 	sscanf(remote01.address_string.c_str(),"%d.%d.%d.%d",&ip1,&ip2,&ip3,&ip4);
 	remote01.addr.set(port, (ip1<<24)|(ip2<<16)|(ip3<<8)|ip4 );
 	remote02.addr.set(3333, (ip1<<24)|(ip2<<16)|(ip3<<8)|ip4 );
-
+	remoteAddr = eo_common_ipv4addr(ip1,ip2,ip3,ip4);
 
 	printf("remote01.address: %s\n", remote01.address_string.c_str());
 	printf("port is : %d\n\n", port);
+	//check boardN
+	if((boardN<1) || (boardN >9))
+		boardN = 4;
+	printf("ems board is : %d\n\n", boardN);
 
 	remoteAddr = eo_common_ipv4addr(ip1,ip2,ip3,ip4); // marco (10, 255, 39, 151)
-	eOipv4port_t eOport = port;
-
+	eOport = port;
 
 
 	// init object: one per ems
-	//hostTransceiver_Init(localAddr,remoteAddr, eOport, EOK_HOSTTRANSCEIVER_capacityofpacket);
 	transceiver= new hostTransceiver;
 	transceiver->init(localAddr,remoteAddr, eOport, EOK_HOSTTRANSCEIVER_capacityofpacket, boardN);
 
 	transceiver->getTransmit(&udppkt_data, &udppkt_size);
-	ACE_UINT8		tmp = 1;
+
 
 	// Start receiver thread
-	ACE_thread_t id_recvThread;
-	//if(!need2sendarop)
-	{
-		printf("Launching recvThread\n");
-		if(ACE_Thread::spawn((ACE_THR_FUNC)recvThread, NULL, THR_CANCEL_ENABLE, &id_recvThread)==-1)
-			printf(("Error in spawning recvThread\n"));
-	}
+	printf("Launching recvThread\n");
+	if(ACE_Thread::spawn((ACE_THR_FUNC)recvThread, NULL, THR_CANCEL_ENABLE, &id_recvThread)==-1)
+		printf(("Error in spawning recvThread\n"));
 
-	ACE_thread_t id_skinThread;
-//	printf("Launching skinThread\n");
-//	if(ACE_Thread::spawn((ACE_THR_FUNC)skinThread, NULL, THR_CANCEL_ENABLE, &id_skinThread)==-1)
-//		printf(("Error in spawning id_skinThread\n"));
 
-	ACE_thread_t id_sendThread;
-	//if(need2sendarop)
-	{
-		printf("Launching id_sendThread\n");
-		if(ACE_Thread::spawn((ACE_THR_FUNC)sendThread, NULL, THR_CANCEL_ENABLE, &id_sendThread)==-1)
-			printf(("Error in spawning sendThread\n"));
-	}
+	// Start skin thread
+	printf("Launching skinThread\n");
+	if(ACE_Thread::spawn((ACE_THR_FUNC)skinThread, NULL, THR_CANCEL_ENABLE, &id_skinThread)==-1)
+		printf(("Error in spawning id_skinThread\n"));
+
+	// Start send thread
+	printf("Launching id_sendThread\n");
+	if(ACE_Thread::spawn((ACE_THR_FUNC)sendThread, NULL, THR_CANCEL_ENABLE, &id_sendThread)==-1)
+		printf(("Error in spawning sendThread\n"));
+
 
 	// Send a packet to test dummy
 	while(keepGoingOn)
@@ -329,7 +325,23 @@ int main(int argc, char *argv[])
 				s_callback_button_5();
 				break;
 
-			case 'p':  	// quit
+			case '6':	//	send a status sig
+				s_callback_button_6();
+				break;
+
+			case '7':	//	send a status sig
+				s_callback_button_7();
+				break;
+
+			case '8':	//	send a status sig
+				s_callback_button_8();
+				break;
+
+			case '9':	//	send a status sig
+				s_callback_button_9();
+				break;
+
+			case 'p':  	// print
 				print_data();
 				break;
 
@@ -341,23 +353,14 @@ int main(int argc, char *argv[])
 			// Get the actual packet and write it into socket using udppkt_data, udppkt_size
 			// if the command isn't known, an empty ropframe wil be sent -- I guess
 			transceiver->getTransmit(&udppkt_data, &udppkt_size);
-			if(!double_socket)
-			{
+
 #ifdef _LINUX_UDP_SOCKET_
-				ACE_socket.send((char*) &udppkt_data, (ssize_t) udppkt_size, 0);
+			ACE_socket.send((char*) &udppkt_data, (ssize_t) udppkt_size, 0);
 #else
-				ACE_socket->send(udppkt_data, udppkt_size, remote01.addr, flags);
+			ACE_socket->send(udppkt_data, udppkt_size, remote01.addr, flags);
 #endif
-			}
-			else
-			{
-#ifdef _LINUX_UDP_SOCKET_
-				ACE_socket2.send((char*) &udppkt_data, (ssize_t) udppkt_size, 0);
-#else
-				ACE_socket2->send(udppkt_data, udppkt_size, remote01.addr, flags);
-#endif
-			}
-			printf("Sent EmbObj packet, size = %d\n", udppkt_size);
+
+			//printf("Sent EmbObj packet, size = %d\n", udppkt_size);
 		}
 	}
 
@@ -371,8 +374,8 @@ int main(int argc, char *argv[])
 	sleep(2);
 	//pthread_cancel(thread);
 	ACE_Thread::cancel(id_recvThread);
-//	ACE_Thread::cancel(id_sendThread);
-//	ACE_Thread::cancel(id_skinThread);
+	ACE_Thread::cancel(id_sendThread);
+	ACE_Thread::cancel(id_skinThread);
 	return(0);
 }
 
@@ -415,14 +418,14 @@ void *recvThread(void * arg)
 
 #ifdef _LINUX_UDP_SOCKET_
 		udppkt_size = ACE_socket.recv((void *) &sender.data, &sender_addr);
-		//sender.addr.set(&sender_addr, 512);
+		//sender.addr.set(&sender_addr, 512);sendThread
 //		if(!check_received_pkt(&sender_addr, (void *) sender.data, udppkt_size))
 //			printf("Error checking the packet!!!\n");
 #else
 		udppkt_size = ACE_socket->recv((void *) sender.data, maxBytes2Read, sender.addr, flags);
 
-		if(!check_received_pkt(&sender.addr, (void *) sender.data, udppkt_size))
-			printf("Error checking the packet!!!\n");
+//		if(!check_received_pkt(&sender.addr, (void *) sender.data, udppkt_size))
+//			printf("Error checking the packet!!!\n");
 #endif
 		transceiver->SetReceived((ACE_UINT8 *)sender.data, udppkt_size);
 	}
@@ -442,27 +445,15 @@ void *sendThread(void * arg)
 	printf("sendThread started\n");
 	while(keepGoingOn)
 	{
-		transceiver->getTransmit(&udppkt_data, &udppkt_size);
-		if(!double_socket)
+		if(enableSender)
 		{
+			transceiver->getTransmit(&udppkt_data, &udppkt_size);
 #ifdef _LINUX_UDP_SOCKET_
 			ACE_socket.send((char*) &udppkt_data, (ssize_t) udppkt_size, 0);
 #else
 			ACE_socket->send(udppkt_data, udppkt_size, remote01.addr, flags);
 #endif
 		}
-		else
-		{
-#ifdef _LINUX_UDP_SOCKET_
-			ACE_socket2.send((char*) &udppkt_data, (ssize_t) udppkt_size, 0);
-#else
-			ACE_socket2->send(udppkt_data, udppkt_size, remote01.addr, flags);
-#endif
-		}
-
-//		float pp=3.75;
-//		for(int kk=0; kk<200*1000; kk++)
-//			pp += pp*pp;
 		usleep(1000);
 	}
 }
@@ -703,17 +694,7 @@ void *skinThread(void * arg)
 	return NULL;
 }
 
-void commands(void)
-{
-	printf("\nq: quit\n");
-	printf("0: send wake up packet -> set appl state to running\n");
-	printf("1: send config  R/L ARM -> configure regulars\n");
-	printf("2: send config  Left ARM -> configure regulars\n");
-	printf("3: set leaves packet -> max current and maxposition\n");
-	printf("4: send max position setPoint\n");
-	printf("5: send position setPoint\n");
-	printf("\n");
-}
+
 
 void usage(void)
 {
@@ -723,6 +704,7 @@ void usage(void)
 	printf("\t\t--rem-ip  <xx>	set the ip address of the remote device - by default %s\n", DEFAULT_EMS_IP);
 	printf("\t\t--port    <xx>	set the socket port - by default %d\n", DEFAULT_PORT);
 	printf("\t\t--reply		if present, then an empty ropframe is sent as an ack for each packet received - by default it's disabled\n");
+	printf("\t\t--board		indicates the ems used. [1-9] (default=4)\n");
 }
 
 

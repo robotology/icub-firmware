@@ -114,5 +114,7 @@ void s_callback_button_3(void);
 void s_callback_button_4(void);
 void s_callback_button_5(void);
 void s_callback_button_6(void);
-
+void s_callback_button_7(void);
+void s_callback_button_8(void);
+void s_callback_button_9(void);
 #endif /* MAIN_TRANSCEIVER_HPP_ */
