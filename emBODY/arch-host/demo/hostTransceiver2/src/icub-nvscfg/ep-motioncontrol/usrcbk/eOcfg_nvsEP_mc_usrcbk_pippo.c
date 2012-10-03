@@ -115,7 +115,6 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t xx
     printf("jConfig->pidposition.scale 		= 0x%X\n",	jConfig->pidposition.scale);
     printf("jConfig->minpositionofjoint		= 0x%X\n",	jConfig->minpositionofjoint);
 	printf("jConfig->maxpositionofjoint		= 0x%X\n",	jConfig->maxpositionofjoint);
-    printf("jConfig->controlmode			= 0x%X\n",	jConfig->controlmode);
 	printf("ep = 0x%X\n", nv->ep);
 
 }
