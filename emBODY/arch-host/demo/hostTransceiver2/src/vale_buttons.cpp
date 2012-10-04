@@ -18,7 +18,10 @@ double		encoderconvoffset = 0; //configured during joint configuration
 // - definition of callback functions
 // --------------------------------------------------------------------------------------------------------------------
 static eOcfg_nvsEP_mc_endpoint_t s_get_mc_ep_byBoardNum(uint8_t boardnum);
+static eOcfg_nvsEP_as_endpoint_t s_get_as_ep_byBoardNum(uint8_t boardnum);
+static eOcfg_nvsEP_sk_endpoint_t s_get_sk_ep_byBoardNum(uint8_t boardnum);
 static bool s_getJointNum_frominput(eOcfg_nvsEP_mc_endpoint_t ep, eOcfg_nvsEP_mc_jointNumber_t 	*j);
+static bool s_getMotorNum_frominput(eOcfg_nvsEP_mc_endpoint_t ep, eOcfg_nvsEP_mc_motorNumber_t 	*m);
 static bool s_get_pidvalues_frominput(eOmc_PID_t *pid_ptr);
 static int32_t s_posA2E(eOmeas_position_t posA, double covfactor, double convoffset);
 
@@ -26,11 +29,14 @@ void commands(void)
 {
 	printf("\nq: quit\n");
 	printf("0: send wake up packet -> set appl state to running\n");
-	printf("1: configure regulars  R/L ARM \n");
+	printf("1: configure regulars \n");
 	printf("2: configure skin  R/L ARM \n");
 	printf("3: configure mais\n");
-	printf("4 <jId>: configure joint and motor with id=jId\n");
-	printf("5: send position setPoint\n");
+	printf("4: send a static config to joint and motor with id=jId\n");
+	printf("5: config joint with user param\n");
+	printf("6: send pid to a motor or a joint\n");
+	printf("7: config motor\n");
+
 	printf("\n");
 }
 
@@ -50,21 +56,21 @@ void s_callback_button_0(void)
 	transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mn_appl, nvid_go2state);
 }
 
+//configure regulars
 void s_callback_button_1(void)
 {
 	char str[128];
-	EOnv 						*cnv;
-	eOmn_ropsigcfg_command_t 	*ropsigcfgassign;
-	EOarray						*array;
-	eOropSIGcfg_t 				sigcfg;
-	eOcfg_nvsEP_mn_commNumber_t dummy = 0;
-	eOnvID_t 					nvid = -1;
-	EOnv 						*nvRoot = NULL;
-	eOcfg_nvsEP_mc_endpoint_t   ep;
+	EOnv 							*cnv;
+	eOmn_ropsigcfg_command_t 		*ropsigcfgassign;
+	EOarray							*array;
+	eOropSIGcfg_t 					sigcfg;
+	eOcfg_nvsEP_mn_commNumber_t 	dummy = 0;
+	eOnvID_t 						nvid = -1;
+	EOnv 							*nvRoot = NULL;
 
 	printf("Setting regulars!\n");
 
-
+	// get array of sif cfg
 	eOnvID_t nvid_ropsigcfgassign = eo_cfg_nvsEP_mn_comm_NVID_Get(endpoint_mn_comm, dummy, commNVindex__ropsigcfgcommand);
 	cnv = transceiver->getNVhandler(endpoint_mn_comm, nvid_ropsigcfgassign);
 	ropsigcfgassign = (eOmn_ropsigcfg_command_t*) cnv->loc;
@@ -74,82 +80,77 @@ void s_callback_button_1(void)
 	array->head.itemsize = sizeof(eOropSIGcfg_t);
 	ropsigcfgassign->cmmnd = ropsigcfg_cmd_assign;
 
-	switch (boardN )
-	{
-	case 2:  // left
-		ep = endpoint_mc_leftlowerarm;
-		break;
 
-	case 4:	// right
-		ep = endpoint_mc_rightlowerarm;
-		break;
+
+	printf("add mc regulars? [y/n]\n");
+	gets(str);
+	if((strcmp("y", str) == 0 ))
+	{
+		eOcfg_nvsEP_mc_jointNumber_t 	j = 0;
+		eOcfg_nvsEP_mc_motorNumber_t 	m = 0;
+
+		// 1) get correct ep
+		sigcfg.ep = s_get_mc_ep_byBoardNum(boardN);
+
+		// 2) get jid
+		if(!s_getJointNum_frominput((eOcfg_nvsEP_mc_endpoint_t)sigcfg.ep, &j))
+		{
+			return;
+		}
+
+		// 3) get mid
+		if(!s_getMotorNum_frominput((eOcfg_nvsEP_mc_endpoint_t)sigcfg.ep, &m))
+		{
+			return;
+		}
+
+		nvid = eo_cfg_nvsEP_mc_joint_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)sigcfg.ep, j, jointNVindex_jstatus__basic);
+		sigcfg.id = nvid;
+		sigcfg.plustime = 0;
+		eo_array_PushBack(array, &sigcfg);
+
+		nvid = eo_cfg_nvsEP_mc_joint_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)sigcfg.ep, j, jointNVindex_jstatus__ofpid);
+		sigcfg.id = nvid;
+		sigcfg.plustime = 0;
+		eo_array_PushBack(array, &sigcfg);
+
+		nvid = eo_cfg_nvsEP_mc_motor_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)sigcfg.ep, m, motorNVindex_mstatus__basic);
+		sigcfg.id = nvid;
+		sigcfg.plustime = 0;
+		eo_array_PushBack(array, &sigcfg);
 	}
 
-/*
-	nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, 0, jointNVindex_jstatus__basic);
-	sigcfg.ep = ep;
-	sigcfg.id = nvid;
-	sigcfg.plustime = 0;
-	eo_array_PushBack(array, &sigcfg);
 
-	nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(ep, 0, motorNVindex_mstatus__basic);
-	sigcfg.ep = ep;
-	sigcfg.id = nvid;
-	sigcfg.plustime = 0;
-	eo_array_PushBack(array, &sigcfg);
+	printf("add skin regulars? [y/n]\n");
+	gets(str);
+	if((strcmp("y", str) == 0 ))
+	{
+		eOcfg_nvsEP_sk_skinNumber_t 	sk = 0;
 
-	nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, 1, jointNVindex_jstatus__basic);
-	sigcfg.ep = ep;
-	sigcfg.id = nvid;
-	sigcfg.plustime = 0;
-	eo_array_PushBack(array, &sigcfg);
+		sigcfg.ep = s_get_sk_ep_byBoardNum(boardN);
+		sigcfg.id = eo_cfg_nvsEP_sk_NVID_Get((eOcfg_nvsEP_sk_endpoint_t)sigcfg.ep, sk, skinNVindex_sstatus__arrayof10canframe);
+		sigcfg.plustime = 0;
+		eo_array_PushBack(array, &sigcfg);
 
-	nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(ep, 1, motorNVindex_mstatus__basic);
-	sigcfg.ep = endpoint_mc_rightlowerarm;
-	sigcfg.id = nvid;
-	sigcfg.plustime = 0;
-	eo_array_PushBack(array, &sigcfg);
-
-	nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, 0, jointNVindex_jconfig);
-	sigcfg.ep = ep;
-	sigcfg.id = nvid;
-	sigcfg.plustime = 0;
-	eo_array_PushBack(array, &sigcfg);
-
-	nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, 0, jointNVindex_jconfig__maxpositionofjoint);
-	sigcfg.ep = ep;
-	sigcfg.id = nvid;
-	sigcfg.plustime = 0;
-	eo_array_PushBack(array, &sigcfg);
-
-	nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(ep, 0, motorNVindex_mconfig);
-	sigcfg.ep = ep;
-	sigcfg.id = nvid;
-	sigcfg.plustime = 0;
-	eo_array_PushBack(array, &sigcfg);
+	}
 
 
-	sigcfg.ep = ep;
-	sigcfg.id = eo_cfg_nvsEP_mc_motor_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)sigcfg.ep, 0, motorNVindex_mconfig__maxcurrentofmotor);
-	sigcfg.plustime = 0;
-	eo_array_PushBack(array, &sigcfg);
- */
+	printf("add mais regulars? [y/n]\n");
+	gets(str);
+	if((strcmp("y", str) == 0 ))
+	{
+		eOcfg_nvsEP_as_maisNumber_t 	s = 0;
 
-//skin
-	sigcfg.ep = ep;
-	sigcfg.id = eo_cfg_nvsEP_sk_NVID_Get((eOcfg_nvsEP_sk_endpoint_t)sigcfg.ep, 0, skinNVindex_sstatus__arrayof10canframe);
-	sigcfg.plustime = 0;
-	eo_array_PushBack(array, &sigcfg);
+		sigcfg.ep = s_get_as_ep_byBoardNum(boardN);
+		sigcfg.id = eo_cfg_nvsEP_as_mais_NVID_Get((eOcfg_nvsEP_as_endpoint_t)sigcfg.ep, s, maisNVindex_mstatus__the15values);
+		sigcfg.plustime = 0;
+		eo_array_PushBack(array, &sigcfg);
 
-//mais
-	sigcfg.ep = ep;
-	sigcfg.id = eo_cfg_nvsEP_as_mais_NVID_Get((eOcfg_nvsEP_as_endpoint_t)sigcfg.ep, dummy, maisNVindex_mstatus__the15values);
-	sigcfg.plustime = 0;
-	eo_array_PushBack(array, &sigcfg);
+	}
 
 	transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mn_comm, nvid_ropsigcfgassign);
-	//	fine della configurazione delle variabili da segnalare spontaneamente : commNVindex__ropsigcfgcommand
 }
+
 
 //skin config
 void s_callback_button_2(void)
@@ -360,12 +361,15 @@ void s_callback_button_5(void )
 //	jData.encoderconversionoffset = atoi(str);
 	encoderconvoffset = atoi(str);
 	jData.encoderconversionoffset = 0;
+
 	jData.motionmonitormode = eomc_motionmonitormode_dontmonitor;
 
 	// 8) conversion of position values from degree to enc ticks
-	jData.minpositionofjoint = s_posA2E(jData.minpositionofjoint, encoderconvfactor, encoderconvoffset);
-	jData.maxpositionofjoint = s_posA2E(jData.maxpositionofjoint, encoderconvfactor, encoderconvoffset);
-
+	if((boardN == 2) || (boardN ==4))
+	{
+		jData.minpositionofjoint = s_posA2E(jData.minpositionofjoint, encoderconvfactor, encoderconvoffset);
+		jData.maxpositionofjoint = s_posA2E(jData.maxpositionofjoint, encoderconvfactor, encoderconvoffset);
+	}
 	// 9) prepare data to send
 	eOnvID_t nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, j, jNVindex);
 	nvRoot = transceiver->getNVhandler(ep, nvid);
@@ -376,14 +380,117 @@ void s_callback_button_5(void )
 
 }
 
+// send pid to a motor or a joint
 void s_callback_button_6(void)
 {
-	printf("not implemented\n");
+	char							str[30];
+	char							numjointstr[5];
+	EOnv 							*nvRoot;
+	eOresult_t 						res;
+	eOnvID_t 						nvid;
+	eOmc_PID_t 						pid;
+	eOcfg_nvsEP_mc_endpoint_t 		ep;
+
+	memset(&pid, 0x00, sizeof(eOmc_PID_t));
+
+	printf("send pid to joint? [y/n]\n");
+	gets(str);
+	if((strcmp("y", str) == 0 ))
+	{
+		eOcfg_nvsEP_mc_jointNumber_t 	j = 0;
+		eOcfg_nvsEP_mc_jointNVindex_t 	jNVindex = jointNVindex_jconfig__pidposition;
+
+		// 1) get correct ep
+		ep = s_get_mc_ep_byBoardNum(boardN);
+
+		// 2) get jid
+		if(!s_getJointNum_frominput(ep, &j))
+		{
+			return;
+		}
+
+		nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, j, jNVindex);
+	}
+	else //motor
+	{
+
+		eOcfg_nvsEP_mc_motorNumber_t 	m = 0;
+		eOcfg_nvsEP_mc_motorNVindex_t 	mNVindex = motorNVindex_mconfig__pidcurrent;
+
+		// 1) get correct ep
+		ep = s_get_mc_ep_byBoardNum(boardN);
+
+		// 2) get mid
+		if(!s_getMotorNum_frominput(ep, &m))
+		{
+			return;
+		}
+		nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(ep, m, mNVindex);
+
+	}
+
+
+	// 3) get pos pid
+	if(! (s_get_pidvalues_frominput(&pid)))
+	{
+		return;
+	}
+
+	// 9) prepare data to send
+	nvRoot = transceiver->getNVhandler(ep, nvid);
+	if( eores_OK != eo_nv_Set(nvRoot, &pid, eobool_true, eo_nv_upd_dontdo))
+		printf("error in nv set\n ");
+	// tell agent to prepare a rop to send
+	transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
+
 }
 
 void s_callback_button_7(void )
 {
-	printf("not implemented\n");
+	char							str[30];
+	char							numjointstr[5];
+	EOnv 							*nvRoot;
+	eOresult_t 						res;
+	eOcfg_nvsEP_mc_endpoint_t 		ep;
+	eOcfg_nvsEP_mc_motorNumber_t 	m = 0;
+	eOcfg_nvsEP_mc_motorNVindex_t 	mNVindex = motorNVindex_mconfig;
+	eOmc_motor_config_t 			mData;
+
+	memset(&mData, 0x00, sizeof(eOmc_motor_config_t));
+
+	// 1) get correct ep
+	ep = s_get_mc_ep_byBoardNum(boardN);
+
+	// 2) get jid
+	if(!s_getMotorNum_frominput(ep, &m))
+	{
+		return;
+	}
+
+	// 3) get current pid
+	if(! (s_get_pidvalues_frominput(&mData.pidcurrent)))
+	{
+		return;
+	}
+
+	// 4) get max velocity of motor
+	printf("get max velocity of motor: ");
+	gets(str);
+	mData.maxvelocityofmotor = atoi(str);
+
+	// 5) get min pos of joint
+	printf("get max current of motor: ");
+	gets(str);
+	mData.maxcurrentofmotor = atoi(str);
+
+
+	// 6) prepare data to send
+	eOnvID_t nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(ep, m, mNVindex);
+	nvRoot = transceiver->getNVhandler(ep, nvid);
+	if( eores_OK != eo_nv_Set(nvRoot, &mData, eobool_true, eo_nv_upd_dontdo))
+		printf("error in nv set\n ");
+	// tell agent to prepare a rop to send
+	transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
 }
 
 
@@ -416,6 +523,46 @@ static eOcfg_nvsEP_mc_endpoint_t s_get_mc_ep_byBoardNum(uint8_t boardnum)
 	return(ep_map[(boardnum-1)]);
 
 }
+
+
+static eOcfg_nvsEP_sk_endpoint_t s_get_sk_ep_byBoardNum(uint8_t boardnum)
+{
+	eOcfg_nvsEP_sk_endpoint_t ep;
+
+	switch (boardnum )
+	{
+	case 2:  // left
+		ep = endpoint_sk_emsboard_leftlowerarm;
+		break;
+
+	case 4:	// right
+		ep = endpoint_sk_emsboard_rightlowerarm;
+		break;
+	}
+
+	return(ep);
+}
+
+static eOcfg_nvsEP_as_endpoint_t s_get_as_ep_byBoardNum(uint8_t boardnum)
+{
+	static eOcfg_nvsEP_as_endpoint_t ep_map[9] =
+	{
+			endpoint_as_leftupperarm,   /**< used by EB1 board */
+			endpoint_as_leftlowerarm,   /**< used by EB2 board */
+			endpoint_as_rightupperarm,  /**< used by EB3 board */
+			endpoint_as_rightlowerarm,  /**< used by EB4 board */
+			(eOcfg_nvsEP_as_endpoint_t)0,   						/**< used by EB5 board */
+			endpoint_as_leftupperleg,   /**< used by EB6 board */
+			(eOcfg_nvsEP_as_endpoint_t)0,						    /**< used by EB7 board */
+			endpoint_as_rightupperleg,  /**< used by EB8 board */
+			(eOcfg_nvsEP_as_endpoint_t)0   						/**< used by EB9 board */
+	};
+	//boardnum is in [1,9] ==> -1
+	return(ep_map[(boardnum-1)]);
+
+}
+
+
 
 static bool s_get_pidvalues_frominput(eOmc_PID_t *pid_ptr)
 {
@@ -482,10 +629,29 @@ static bool s_getJointNum_frominput(eOcfg_nvsEP_mc_endpoint_t ep, eOcfg_nvsEP_mc
 	gets(str);
 	*j = atoi(str);
 
-	printf("joint to cfg is %d, max is %d\n", *j, maxNumOfJointInEp);
+	printf("joint is %d, max is %d\n", *j, maxNumOfJointInEp);
 	if(*j >= maxNumOfJointInEp)
 	{
 		printf("error: num of joint not valid\n");
+		return(false);
+	}
+	return(true);
+}
+
+
+static bool s_getMotorNum_frominput(eOcfg_nvsEP_mc_endpoint_t ep, eOcfg_nvsEP_mc_motorNumber_t 	*m)
+{
+	char	 str[30];
+	uint16_t maxNumOfMotorInEp = eo_cfg_nvsEP_mc_motor_numbermax_Get(ep);
+
+	printf("motor num: ");
+	gets(str);
+	*m = atoi(str);
+
+	printf("motor id is %d, max is %d\n", *m, maxNumOfMotorInEp);
+	if(*m >= maxNumOfMotorInEp)
+	{
+		printf("error: num of motor not valid \n");
 		return(false);
 	}
 	return(true);
