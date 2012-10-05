@@ -107,7 +107,7 @@ extern void eo_pid_SetPid(EOpid *o, float K, float Kd, float Ki, float Ymax, flo
     o->K  = K;
     o->Kd = Kd*EMS_PERIOD;
     o->Ki = Ki;
-
+	
     o->Ymax = Ymax;
     o->Imax = Imax;
     o->Yoff = Yoff;

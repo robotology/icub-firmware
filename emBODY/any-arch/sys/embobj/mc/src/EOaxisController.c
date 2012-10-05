@@ -118,7 +118,7 @@ extern EOaxisController* eo_axisController_New(void)
 
         o->control_mode = CM_IDLE;
 
-        o->is_calibrated = eobool_false;
+        o->is_calibrated = eobool_true;
 
         #warning (ALE) hard coded config values
         o->calib_timeout_ms = 5000;
@@ -139,7 +139,7 @@ extern void eo_axisController_StartCalibration(EOaxisController *o, int32_t pos,
     eo_trajectory_Init(o->trajectory, eo_speedometer_GetDistance(o->speedmeter), eo_speedometer_GetVelocity(o->speedmeter), 0);
 
     o->control_mode = CM_CALIB_ABS_POS_SENS;
-    o->is_calibrated = eobool_false;
+    //o->is_calibrated = eobool_false;
 
     //o->calib_timeout_ms = timeout_ms;    
     //o->calib_max_error = max_error;
@@ -370,6 +370,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
             {
                 if (!o->calib_timeout_ms)
                 {
+										o->is_calibrated = eobool_true;
                     o->control_mode = CM_IDLE;
                 
                     return 0;
