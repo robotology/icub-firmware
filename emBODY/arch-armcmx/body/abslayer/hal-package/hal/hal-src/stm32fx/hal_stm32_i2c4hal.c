@@ -281,7 +281,7 @@ extern hal_boolval_t hal_i2c4hal_hid_initted_is(hal_i2c_port_t port)
         return(hal_true);
     }
 
-
+#warning --> rivedi hal_i2c4hal_hid_initted_is() e non guardare piu' i registri ma solo la ram. quindi: inizializza sempre i2c ....
     if (hal_i2c_port1 == port)
     {
         I2Cx = I2C1;

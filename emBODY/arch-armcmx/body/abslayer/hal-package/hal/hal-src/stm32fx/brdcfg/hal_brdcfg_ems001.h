@@ -17,15 +17,15 @@
 */
   
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_BRDCFG_MCBSTM32C_H_
-#define _HAL_BRDCFG_MCBSTM32C_H_
+#ifndef _HAL_BRDCFG_EMS001_H_
+#define _HAL_BRDCFG_EMS001_H_
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/* @file       hal_brdcfg_mcbstm32c.h
+/* @file       hal_brdcfg_ems001.h
     @brief      This header file defines Interface Pins, eval-board depend macro and low level function prototypes.
     @author     valentina.gaggero@iit.it, marco.accame@iit.it
-    @date       10/09/2010
+    @date       11/16/2010
  **/
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
@@ -67,30 +67,14 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-//#ifdef HAL_USE_CAN
-//    // empty-section
-//#endif//HAL_USE_CAN
-//
-//#ifdef HAL_USE_DISPLAY
-//    // empty-section
-//#endif//HAL_USE_DISPLAY  
-
-// #ifdef HAL_USE_I2C4HAL
-//     #define HAL_BRDCFG_I2C4HAL__PERIPHERAL                          I2C1    // i2c peripheral used by eeprom 01 and ...
-// #endif//HAL_USE_I2C4HAL  
-
 
 #ifdef HAL_USE_SPI4ENCODER
-    #define HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOB
-    #define HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOB
-    #define HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOB  
+
+    #define HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOD
+    #define HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOD
+    #define HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOD  
+
 #endif//HAL_USE_SPI4ENCODER
-
-
-
-// #ifdef HAL_USE_ETH
-//     #define HAL_BRDCFG_ETH__PHY_DEVICE_NUM                          1
-// #endif//HAL_USE_ETH
 
 
 
@@ -101,23 +85,23 @@
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
 #ifdef HAL_USE_CAN
-    extern const uint8_t hal_brdcfg_can__supported_mask;//             = 0x03;
-    extern const uint32_t hal_brdcfg_can__gpio_clock_canx_rx[];//      = {RCC_APB2Periph_GPIOD, RCC_APB2Periph_GPIOB};
+    extern const uint8_t hal_brdcfg_can__supported_mask; //           = 0x03;
+   extern const uint32_t hal_brdcfg_can__gpio_clock_canx_rx[];//      = {RCC_APB2Periph_GPIOD, RCC_APB2Periph_GPIOB};
     extern const uint32_t hal_brdcfg_can__gpio_clock_canx_tx[];//      = {RCC_APB2Periph_GPIOD, RCC_APB2Periph_GPIOB};
     extern const uint8_t hal_brdcfg_can__gpio_pinsource_canx_rx[];//   = {0, 5};
     extern const uint8_t hal_brdcfg_can__gpio_pinsource_canx_tx[];//   = {1, 6};
     extern const uint16_t hal_brdcfg_can__gpio_pin_canx_rx[];//        = {GPIO_Pin_0, GPIO_Pin_5};
     extern const uint16_t hal_brdcfg_can__gpio_pin_canx_tx[];//        = {GPIO_Pin_1, GPIO_Pin_6};
     extern GPIO_TypeDef* const hal_brdcfg_can__gpio_port_canx_rx[];//  = {GPIOD, GPIOB};
-    extern GPIO_TypeDef* const hal_brdcfg_can__gpio_port_canx_tx[];//  = {GPIOD, GPIOB};
+    extern GPIO_TypeDef* const hal_brdcfg_can__gpio_port_canx_tx[];//  = {GPIOD, GPIOB};         
 #endif//HAL_USE_CAN
 
 #ifdef HAL_USE_CRC
-    extern const uint8_t hal_brdcfg_crc__supported_mask; //           = 0x03;
+    extern const uint8_t hal_brdcfg_crc__supported_mask; //           = 0x01;
 #endif//HAL_USE_CRC
 
 #ifdef HAL_USE_DISPLAY
-    extern const uint8_t hal_brdcfg_display__supported_mask; //         = 0x01;
+    extern const uint8_t hal_brdcfg_display__supported_mask; //         = 0x00;
 #endif//HAL_USE_DISPLAY
 
 #ifdef HAL_USE_EEPROM
@@ -125,7 +109,7 @@
     extern const uint32_t hal_brdcfg_eeprom__emflash_baseaddress;//    = 0x08000000;
     extern const uint32_t hal_brdcfg_eeprom__emflash_totalsize;//      = 256*1024;
     extern const uint32_t hal_brdcfg_eeprom__i2c_01_baseaddress;//     = 0;
-    extern const uint32_t hal_brdcfg_eeprom__i2c_01_totalsize;//       = 8*1024;
+    extern const uint32_t hal_brdcfg_eeprom__i2c_01_totalsize;//       = 64*1024;
     extern const stm32ee_cfg_t hal_brdcfg_eeprom__stm32eecfg;
 #endif//HAL_USE_EEPROM
 
@@ -145,6 +129,7 @@
 
 #ifdef HAL_USE_ETH
     extern const uint8_t hal_brdcfg_eth__supported_mask; //         = 0x01;
+    extern const uint16_t hal_brdcfg_eth__phy_device_list[];
 #endif//HAL_USE_ETH
 
 #ifdef HAL_USE_GPIO
@@ -173,11 +158,11 @@
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
-
 #ifdef HAL_USE_SYS
     extern void hal_brdcfg_sys__clock_config(void);
     extern void hal_brdcfg_sys__gpio_default_init(void);
 #endif
+
 
 #ifdef HAL_USE_CAN
     extern void hal_brdcfg_can__phydevices_init(hal_can_port_t port);
@@ -186,16 +171,9 @@
 #endif//HAL_USE_CAN
 
 
-// #ifdef HAL_USE_I2C4HAL
-//     extern void hal_brdcfg_i2c4hal__LowLevel_Init(void); 
-//     extern void hal_brdcfg_i2c4hal__LowLevel_DeInit(void);  
-// #endif//HAL_USE_I2C4HAL 
 
 #ifdef HAL_USE_EEPROM
     extern void hal_brdcfg_eeprom__ontimeouterror(void);
-//    extern void hal_brdcfg_eeprom__writeprotection_init(void);
-//    extern void hal_brdcfg_eeprom__writeprotection_disable(void);
-//    extern void hal_brdcfg_eeprom__writeprotection_enable(void);
 #endif//HAL_USE_EEPROM   
 
 
@@ -206,15 +184,13 @@
 #endif//HAL_USE_SPI4ENCODER
 
 
-
-#ifdef HAL_USE_ETH 
+#ifdef HAL_USE_ETH
     extern void hal_brdcfg_eth__phy_initialise(void);
     extern void hal_brdcfg_eth__phy_configure(void);
-#endif//HAL_USE_ETH
+#endif
 
 
 #ifdef HAL_USE_SWITCH  
-    // but the swicth is not present in the mcbstm32c
     extern void hal_brdcfg_switch__MCO_config(void);
     extern void hal_brdcfg_switch__reg_read_byI2C(uint8_t* pBuffer, uint16_t ReadAddr);
     extern void hal_brdcfg_switch__reg_write_byI2C(uint8_t* pBuffer, uint16_t WriteAddr);
@@ -225,5 +201,8 @@
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+
+
+
 
 

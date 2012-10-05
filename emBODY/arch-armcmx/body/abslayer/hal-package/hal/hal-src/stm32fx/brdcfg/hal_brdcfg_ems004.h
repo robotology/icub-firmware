@@ -1,31 +1,14 @@
-/*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
- * Author: Valentina Gaggero, Marco Accame
- * email:   valentina.gaggero@iit.it, marco.accame@iit.it
- * website: www.robotcub.org
- * Permission is granted to copy, distribute, and/or modify this program
- * under the terms of the GNU General Public License, version 2 or any
- * later version published by the Free Software Foundation.
- *
- * A copy of the license can be found at
- * http://www.robotcub.org/icub/license/gpl.txt
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details
-*/
   
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_BRDCFG_MCBSTM32C_H_
-#define _HAL_BRDCFG_MCBSTM32C_H_
+#ifndef _HAL_BRDCFG_EMS004_H_
+#define _HAL_BRDCFG_EMS004_H_
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/* @file       hal_brdcfg_mcbstm32c.h
+/* @file       hal_brdcfg_ems004.h
     @brief      This header file defines Interface Pins, eval-board depend macro and low level function prototypes.
     @author     valentina.gaggero@iit.it, marco.accame@iit.it
-    @date       10/09/2010
+    @date       10/03/2012
  **/
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
@@ -102,22 +85,23 @@
 
 #ifdef HAL_USE_CAN
     extern const uint8_t hal_brdcfg_can__supported_mask;//             = 0x03;
-    extern const uint32_t hal_brdcfg_can__gpio_clock_canx_rx[];//      = {RCC_APB2Periph_GPIOD, RCC_APB2Periph_GPIOB};
-    extern const uint32_t hal_brdcfg_can__gpio_clock_canx_tx[];//      = {RCC_APB2Periph_GPIOD, RCC_APB2Periph_GPIOB};
-    extern const uint8_t hal_brdcfg_can__gpio_pinsource_canx_rx[];//   = {0, 5};
-    extern const uint8_t hal_brdcfg_can__gpio_pinsource_canx_tx[];//   = {1, 6};
-    extern const uint16_t hal_brdcfg_can__gpio_pin_canx_rx[];//        = {GPIO_Pin_0, GPIO_Pin_5};
-    extern const uint16_t hal_brdcfg_can__gpio_pin_canx_tx[];//        = {GPIO_Pin_1, GPIO_Pin_6};
-    extern GPIO_TypeDef* const hal_brdcfg_can__gpio_port_canx_rx[];//  = {GPIOD, GPIOB};
-    extern GPIO_TypeDef* const hal_brdcfg_can__gpio_port_canx_tx[];//  = {GPIOD, GPIOB};
+    
+    extern const uint32_t hal_brdcfg_can__gpio_clock_canx_rx[];//      = {RCC_AHB1Periph_GPIOH, B};
+    extern const uint32_t hal_brdcfg_can__gpio_clock_canx_tx[];//      = {RCC_AHB1Periph_GPIOI, B};
+    extern const uint8_t hal_brdcfg_can__gpio_pinsource_canx_rx[];//   = {13, 5};
+    extern const uint8_t hal_brdcfg_can__gpio_pinsource_canx_tx[];//   = {9, 13};
+    extern const uint16_t hal_brdcfg_can__gpio_pin_canx_rx[];//        = {GPIO_Pin_13, GPIO_Pin_5};
+    extern const uint16_t hal_brdcfg_can__gpio_pin_canx_tx[];//        = {GPIO_Pin_9, GPIO_Pin_13};
+    extern GPIO_TypeDef* const hal_brdcfg_can__gpio_port_canx_rx[];//  = {GPIOH, GPIOB};
+    extern GPIO_TypeDef* const hal_brdcfg_can__gpio_port_canx_tx[];//  = {GPIOI, GPIOB};  
 #endif//HAL_USE_CAN
 
 #ifdef HAL_USE_CRC
-    extern const uint8_t hal_brdcfg_crc__supported_mask; //           = 0x03;
+    extern const uint8_t hal_brdcfg_crc__supported_mask; //            = 0x03;
 #endif//HAL_USE_CRC
 
 #ifdef HAL_USE_DISPLAY
-    extern const uint8_t hal_brdcfg_display__supported_mask; //         = 0x01;
+    extern const uint8_t hal_brdcfg_display__supported_mask; //         = 0x00;
 #endif//HAL_USE_DISPLAY
 
 #ifdef HAL_USE_EEPROM
@@ -193,9 +177,9 @@
 
 #ifdef HAL_USE_EEPROM
     extern void hal_brdcfg_eeprom__ontimeouterror(void);
-//    extern void hal_brdcfg_eeprom__writeprotection_init(void);
-//    extern void hal_brdcfg_eeprom__writeprotection_disable(void);
-//    extern void hal_brdcfg_eeprom__writeprotection_enable(void);
+//     extern void hal_brdcfg_eeprom__writeprotection_init(void);
+//     extern void hal_brdcfg_eeprom__writeprotection_disable(void);
+//     extern void hal_brdcfg_eeprom__writeprotection_enable(void);
 #endif//HAL_USE_EEPROM   
 
 
@@ -207,9 +191,8 @@
 
 
 
-#ifdef HAL_USE_ETH 
-    extern void hal_brdcfg_eth__phy_initialise(void);
-    extern void hal_brdcfg_eth__phy_configure(void);
+#ifdef HAL_USE_ETH  
+    extern void hal_brdcfg_eth__phy_start(void);
 #endif//HAL_USE_ETH
 
 

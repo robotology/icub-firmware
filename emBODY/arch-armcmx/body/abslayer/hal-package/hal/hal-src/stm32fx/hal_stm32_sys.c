@@ -40,7 +40,7 @@
 #include "hal_arch_arm.h"
 
 #include "hal_brdcfg.h"
-
+#include "hal_flash.h"
  
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -93,6 +93,8 @@ static void (*s_hal_sys_SYSTICK_handler_fn)(void) = NULL;
 
 
 
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -108,11 +110,11 @@ extern hal_result_t hal_sys_systeminit(void)
 
     SystemInit();
 
-    #warning --> DONT config the clock or the gpio default in hal !!!
+    #warning --> DO NOT config the  hal_brdcfg_sys_  _clock or _gpio_default in hal !!!
     hal_brdcfg_sys__clock_config();
     hal_brdcfg_sys__gpio_default_init();
 
-#warning --> verify differences between stm32 and stm32f4
+    #warning --> verify differences between stm32 and stm32f4
 
     // configure once and only once the nvic to hold 4 bits for interrupt priorities and 0 for subpriorities
     // in stm32 lib ... NVIC_PriorityGroup_4 is 0x300, thus cmsis priority group number 3, thus
@@ -123,6 +125,49 @@ extern hal_result_t hal_sys_systeminit(void)
     // acemor: added to remove dependencies from NZI data
     s_cs_takes = 0;
     s_hal_sys_SYSTICK_handler_fn = NULL;
+
+    return(hal_res_OK);
+}
+
+uint8_t hal_sys_howmanyARMv7ops(void)
+{
+#if     defined(USE_STM32F1)
+    return(3+3);
+#elif   defined(USE_STM32F4)
+    return(3+1);
+#endif    
+}
+__asm void hal_sys_someARMv7ops(uint32_t numberof) 
+{   // it takes 3+p cycles: 1+1+1+p, p = 1, 2, or 3. where p is what is needed to fill the pipeline
+    // cm3: http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0337i/index.html
+    ALIGN
+loop
+    CBZ     r0, exit
+    SUB     r0,#1
+    B       loop
+exit
+    BX      LR     
+
+    ALIGN
+}
+
+
+extern hal_result_t hal_sys_delay(hal_reltime_t reltime)
+{
+    static uint32_t s_hal_sys_numof6ops1usec = 0;
+    if(0 == s_hal_sys_numof6ops1usec)
+    {
+        if(0 == SystemCoreClock)
+        {
+            return(hal_res_NOK_generic);
+        }
+        // to occupy a microsec i execute an operation for a number of times which depends on: SystemCoreCloc and 1.25 dmips/mhz, 
+        //s_hal_sys_numofinstructions1usec = ((SystemCoreClock/1000000) * 125l) / 100l;
+        s_hal_sys_numof6ops1usec = (SystemCoreClock/1000000) / hal_sys_howmanyARMv7ops();
+    }
+        
+    //hal_sys_sixARMv7ops(s_hal_sys_numof6ops1usec * reltime);
+    hal_sys_someARMv7ops(s_hal_sys_numof6ops1usec * reltime);
 
     return(hal_res_OK);
 }
@@ -138,19 +183,21 @@ extern hal_result_t hal_sys_systemreset(void)
 
 extern hal_result_t hal_sys_canexecuteataddress(uint32_t addr)
 {
+#ifdef HAL_USE_FLASH    
     // test if user code is programmed starting from address addr
     // so far it is a simple condition which is pretty general for every CM3 ... where:
     // the reset vector is at beginning of flash
 
-    extern const uint32_t hal_flash_BASEADDR;
-    extern const uint32_t hal_flash_TOTALSIZE;
+    uint32_t flash_BASEADDR = hal_flash_get_baseaddress();
+    uint32_t flash_TOTALSIZE = hal_flash_get_totalsize();
     
-    if((addr < hal_flash_BASEADDR) || (addr >= (hal_flash_BASEADDR+hal_flash_TOTALSIZE)))
+    if((addr < flash_BASEADDR) || (addr >= (flash_BASEADDR+flash_TOTALSIZE)))
     {
         // out of valid flash ...
         return(hal_res_NOK_generic);
     }
-
+#endif
+    
     if(((*(volatile uint32_t*)addr) & 0x2FFE0000 ) == 0x20000000)
     {
         return(hal_res_OK);

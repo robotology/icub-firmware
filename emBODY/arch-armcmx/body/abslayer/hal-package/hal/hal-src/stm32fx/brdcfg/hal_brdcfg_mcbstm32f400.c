@@ -43,16 +43,16 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-#warning --> the | RCC_APB2Periph_AFIO in HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_CLK ??? 
-#ifdef HAL_USE_I2C4HAL
-    #define HAL_BRDCFG_I2C4HAL__I2C_CLK                          RCC_APB1Periph_I2C1
-    #define HAL_BRDCFG_I2C4HAL__I2C_SCL_PIN                      GPIO_Pin_8 
-    #define HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_PORT                GPIOB
-    #define HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_CLK                 ( RCC_AHB1Periph_GPIOB ) // Enable alternate function.     
-    #define HAL_BRDCFG_I2C4HAL__I2C_SDA_PIN                  	 GPIO_Pin_9                  
-    #define HAL_BRDCFG_I2C4HAL__I2C_SDA_GPIO_PORT                GPIOB                       
-    #define HAL_BRDCFG_I2C4HAL__I2C_SDA_GPIO_CLK                 RCC_AHB1Periph_GPIOB
-#endif//HAL_USE_I2C4HAL  
+// #warning --> the | RCC_APB2Periph_AFIO in HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_CLK ??? 
+// #ifdef HAL_USE_I2C4HAL
+//     #define HAL_BRDCFG_I2C4HAL__I2C_CLK                          RCC_APB1Periph_I2C1
+//     #define HAL_BRDCFG_I2C4HAL__I2C_SCL_PIN                      GPIO_Pin_8 
+//     #define HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_PORT                GPIOB
+//     #define HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_CLK                 ( RCC_AHB1Periph_GPIOB ) // Enable alternate function.     
+//     #define HAL_BRDCFG_I2C4HAL__I2C_SDA_PIN                  	 GPIO_Pin_9                  
+//     #define HAL_BRDCFG_I2C4HAL__I2C_SDA_GPIO_PORT                GPIOB                       
+//     #define HAL_BRDCFG_I2C4HAL__I2C_SDA_GPIO_CLK                 RCC_AHB1Periph_GPIOB
+// #endif//HAL_USE_I2C4HAL  
 
 
 #ifdef HAL_USE_SPI4ENCODER
@@ -111,8 +111,6 @@
 
 #ifdef HAL_USE_CAN
     extern const uint8_t hal_brdcfg_can__supported_mask             = 0x03;
-    
-    
     extern const uint32_t hal_brdcfg_can__gpio_clock_canx_rx[]      = {RCC_AHB1Periph_GPIOH, RCC_AHB1Periph_GPIOB};
     extern const uint32_t hal_brdcfg_can__gpio_clock_canx_tx[]      = {RCC_AHB1Periph_GPIOI, RCC_AHB1Periph_GPIOB};
     extern const uint8_t hal_brdcfg_can__gpio_pinsource_canx_rx[]   = {13, 5};
@@ -133,7 +131,6 @@
 
 #ifdef HAL_USE_ETH
     extern const uint8_t hal_brdcfg_eth__supported_mask             = 0x01;
-    //extern const uint8_t hal_brdcfg_eth__phy_device_list[HAL_BRDCFG_ETH__PHY_DEVICE_NUM] = { 0x1 };
 #endif//HAL_USE_ETH
 
 
@@ -314,14 +311,20 @@
 
 #ifdef HAL_USE_CAN
 
-extern void hal_brdcfg_can__phydevices_enable(hal_can_port_t port)
+extern void hal_brdcfg_can__phydevices_init(hal_can_port_t port)
 {
-	return;
+    // nothing to do
+    hal_brdcfg_can__phydevices_disable(port);
+}
+
+extern void hal_brdcfg_can__phydevices_enable(hal_can_port_t port)
+{   
+    // nothing to do
 }
 
 extern void hal_brdcfg_can__phydevices_disable(hal_can_port_t port)
 {
-   ;
+    // nothing to do
 }
 
 #endif//HAL_USE_CAN
@@ -330,65 +333,65 @@ extern void hal_brdcfg_can__phydevices_disable(hal_can_port_t port)
 #ifdef HAL_USE_I2C4HAL
 
 
-extern void hal_brdcfg_i2c4hal__LowLevel_DeInit(void)
-{
-  GPIO_InitTypeDef  GPIO_InitStructure; 
-   
-  /* sEE_I2C Peripheral Disable */
-  I2C_Cmd(HAL_BRDCFG_I2C4HAL__PERIPHERAL, DISABLE);
- 
-  /* sEE_I2C DeInit */
-  I2C_DeInit(HAL_BRDCFG_I2C4HAL__PERIPHERAL);
+// extern void hal_brdcfg_i2c4hal__LowLevel_DeInit(void)
+// {
+//   GPIO_InitTypeDef  GPIO_InitStructure; 
+//    
+//   /* sEE_I2C Peripheral Disable */
+//   I2C_Cmd(HAL_BRDCFG_I2C4HAL__PERIPHERAL, DISABLE);
+//  
+//   /* sEE_I2C DeInit */
+//   I2C_DeInit(HAL_BRDCFG_I2C4HAL__PERIPHERAL);
 
-  /*!< sEE_I2C Periph clock disable */
-  RCC_APB1PeriphClockCmd(HAL_BRDCFG_I2C4HAL__I2C_CLK, DISABLE);
-    
-  /*!< GPIO configuration */  
-  /*!< Configure sEE_I2C pins: SCL */
-//  GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_I2C4HAL__I2C_SCL_PIN;
-//  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-//  GPIO_Init(HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_PORT, &GPIO_InitStructure);
+//   /*!< sEE_I2C Periph clock disable */
+//   RCC_APB1PeriphClockCmd(HAL_BRDCFG_I2C4HAL__I2C_CLK, DISABLE);
+//     
+//   /*!< GPIO configuration */  
+//   /*!< Configure sEE_I2C pins: SCL */
+// //  GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_I2C4HAL__I2C_SCL_PIN;
+// //  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+// //  GPIO_Init(HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_PORT, &GPIO_InitStructure);
 
-  /*!< Configure sEE_I2C pins: SDA */
-//  GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_I2C4HAL__I2C_SDA_PIN;
-//  GPIO_Init(HAL_BRDCFG_I2C4HAL__I2C_SDA_GPIO_PORT, &GPIO_InitStructure);
-}
+//   /*!< Configure sEE_I2C pins: SDA */
+// //  GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_I2C4HAL__I2C_SDA_PIN;
+// //  GPIO_Init(HAL_BRDCFG_I2C4HAL__I2C_SDA_GPIO_PORT, &GPIO_InitStructure);
+// }
 
 #endif//HAL_USE_I2C4HAL
 
 
 #ifdef HAL_USE_I2C4HAL
 
-extern void hal_brdcfg_i2c4hal__LowLevel_Init(void)
-{
-  GPIO_InitTypeDef  GPIO_InitStructure; 
-    
-  /*!< sEE_I2C_SCL_GPIO_CLK and sEE_I2C_SDA_GPIO_CLK Periph clock enable */
-  RCC_APB2PeriphClockCmd(HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_CLK | HAL_BRDCFG_I2C4HAL__I2C_SDA_GPIO_CLK, ENABLE);
+// extern void hal_brdcfg_i2c4hal__LowLevel_Init(void)
+// {
+//   GPIO_InitTypeDef  GPIO_InitStructure; 
+//     
+//   /*!< sEE_I2C_SCL_GPIO_CLK and sEE_I2C_SDA_GPIO_CLK Periph clock enable */
+//   RCC_APB2PeriphClockCmd(HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_CLK | HAL_BRDCFG_I2C4HAL__I2C_SDA_GPIO_CLK, ENABLE);
 
-  /*!< sEE_I2C Periph clock enable */
-  RCC_APB1PeriphClockCmd(HAL_BRDCFG_I2C4HAL__I2C_CLK, ENABLE);
+//   /*!< sEE_I2C Periph clock enable */
+//   RCC_APB1PeriphClockCmd(HAL_BRDCFG_I2C4HAL__I2C_CLK, ENABLE);
 
-    #warning --> mettere AFIO
-//  AFIO->MAPR |= AFIO_MAPR_I2C1_REMAP;  /* I2C1 remapping */
-    
-    GPIO_PinAFConfig(GPIOB, GPIO_PinSource8, GPIO_AF_I2C1);
-    GPIO_PinAFConfig(GPIOB, GPIO_PinSource9, GPIO_AF_I2C1);
-    
-    
-  /*!< GPIO configuration */  
-  /*!< Configure sEE_I2C pins: SCL */
-  GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_I2C4HAL__I2C_SCL_PIN;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;    //GPIO_Mode_AF_OD;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_Init(HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_PORT, &GPIO_InitStructure);
+//     #warning --> mettere AFIO
+// //  AFIO->MAPR |= AFIO_MAPR_I2C1_REMAP;  /* I2C1 remapping */
+//     
+//     GPIO_PinAFConfig(GPIOB, GPIO_PinSource8, GPIO_AF_I2C1);
+//     GPIO_PinAFConfig(GPIOB, GPIO_PinSource9, GPIO_AF_I2C1);
+//     
+//     
+//   /*!< GPIO configuration */  
+//   /*!< Configure sEE_I2C pins: SCL */
+//   GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_I2C4HAL__I2C_SCL_PIN;
+//   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;    //GPIO_Mode_AF_OD;
+//   GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+//   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+//   GPIO_Init(HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_PORT, &GPIO_InitStructure);
 
-  /*!< Configure sEE_I2C pins: SDA */
-  GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_I2C4HAL__I2C_SDA_PIN;
-  GPIO_Init(HAL_BRDCFG_I2C4HAL__I2C_SDA_GPIO_PORT, &GPIO_InitStructure);
-}
+//   /*!< Configure sEE_I2C pins: SDA */
+//   GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_I2C4HAL__I2C_SDA_PIN;
+//   GPIO_Init(HAL_BRDCFG_I2C4HAL__I2C_SDA_GPIO_PORT, &GPIO_InitStructure);
+// }
 
 #endif//HAL_USE_I2C4HAL
 
@@ -401,19 +404,19 @@ extern void hal_brdcfg_eeprom__ontimeouterror(void)
     hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "timeout in eeprom");
 }
 
-extern void hal_brdcfg_eeprom__writeprotection_init(void)
-{
-    ;
-}
+// extern void hal_brdcfg_eeprom__writeprotection_init(void)
+// {
+//     ;
+// }
 
-extern void hal_brdcfg_eeprom__writeprotection_disable(void)
-{
-    ;
-}
-extern void hal_brdcfg_eeprom__writeprotection_enable(void)
-{
-    ;
-}
+// extern void hal_brdcfg_eeprom__writeprotection_disable(void)
+// {
+//     ;
+// }
+// extern void hal_brdcfg_eeprom__writeprotection_enable(void)
+// {
+//     ;
+// }
 
 #endif//HAL_USE_EEPROM
 

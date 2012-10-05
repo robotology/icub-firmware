@@ -183,7 +183,7 @@ static hal_boolval_t s_hal_can_initted[hal_can_ports_num] = { hal_false };
 static const GPIO_InitTypeDef s_hal_can_gpio_inittypeded_canx_rx      =
 {
     .GPIO_Pin       = 0,
-    .GPIO_Mode      = GPIO_Mode_IPU
+    .GPIO_Mode      = GPIO_Mode_IPU,
     .GPIO_Speed     = GPIO_Speed_2MHz
 };
 static const GPIO_InitTypeDef s_hal_can_gpio_inittypeded_canx_tx      =
@@ -249,20 +249,18 @@ extern hal_result_t hal_can_init(hal_can_port_t port, const hal_can_cfg_t *cfg)
     hal_canfifo_hid_reset(&cport->canframes_rx_norm);
     hal_canfifo_hid_reset(&cport->canframes_tx_norm);
     
-    // init low level
-    hal_brdcfg_can__phydevices_enable(port); /* Enable physical can device */
-
+    // init the phy of can
+    hal_brdcfg_can__phydevices_init(port);
+    
+    // enable the phy of can
+    hal_brdcfg_can__phydevices_enable(port); 
+    
     // init gpios
     s_hal_can_hw_gpio_init(port);
     
     // init clock
     s_hal_can_hw_clock_init(port);
     
-//    s_hal_can_hw_nvic_init(port);
-    
- //   s_hal_can_RCC_conf(port); /* System clocks configuration */
-
-//    s_hal_can_GPIO_conf(port); /* GPIO configuration */
 
     s_hal_can_hw_nvic_init(port); /* NVIC configuration */
 
@@ -618,7 +616,7 @@ static hal_boolval_t s_hal_can_initted_is(hal_can_port_t port)
 
 
 /*
-  * @brief  called by ISR for trasmiting.
+  * @brief  called by ISR for transmission.
   * @param  port identifies CAN port 
   * @retval none
   */
@@ -675,7 +673,7 @@ static void s_hal_can_isr_sendframes_canx(hal_can_port_t port)
 
 
 /*
-  * @brief  called by ISR for receiving.
+  * @brief  called by ISR for reception.
   * @param  port identifies CAN port 
   * @retval none
   */
@@ -727,7 +725,7 @@ static void s_hal_can_hw_gpio_init(hal_can_port_t port)
     GPIO_Init(hal_brdcfg_can__gpio_port_canx_tx[HAL_can_port2index(port)], &GPIO_InitStructure);  
 
     // Remap GPIOs 
-    GPIO_PinRemapConfig((hal_can_port1 == port) ? (GPIO_REMAP_CAN1) : (GPIO_REMAP_CAN2), ENABLE);    
+    GPIO_PinRemapConfig((hal_can_port1 == port) ? (GPIO_Remap2_CAN1) : (GPIO_Remap_CAN2), ENABLE);    
 
 #elif   defined(USE_STM32F4)    
 

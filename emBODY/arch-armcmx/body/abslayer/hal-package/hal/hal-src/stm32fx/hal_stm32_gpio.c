@@ -94,16 +94,46 @@ static hal_boolval_t s_hal_gpio_output_is(hal_gpio_port_t port, hal_gpio_pin_t p
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static GPIO_TypeDef *const s_GPIO_PORT[9] = 
+#if     defined(USE_STM32F1)
+static GPIO_TypeDef *const s_GPIO_PORT[hal_gpio_ports_number] = 
+{
+    GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, NULL, NULL
+};
+
+static const uint32_t s_GPIO_CLK[hal_gpio_ports_number] = 
+{
+    RCC_APB2Periph_GPIOA, RCC_APB2Periph_GPIOB, RCC_APB2Periph_GPIOC, RCC_APB2Periph_GPIOD, 
+    RCC_APB2Periph_GPIOE, RCC_APB2Periph_GPIOF, RCC_APB2Periph_GPIOG, NULL,
+    NULL
+};
+
+static const uint8_t s_GPIO_speeds[hal_gpio_speeds_number] = 
+{ 
+    GPIO_Speed_2MHz,        // hal_gpio_speed_default
+    GPIO_Speed_2MHz,        // hal_gpio_speed_low
+    GPIO_Speed_10MHz,       // hal_gpio_speed_medium
+    GPIO_Speed_50MHz        // hal_gpio_speed_medium   
+};
+#elif   defined(USE_STM32F4)
+static GPIO_TypeDef *const s_GPIO_PORT[hal_gpio_ports_number] = 
 {
     GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI
 };
 
-static const uint32_t s_GPIO_CLK[9] = 
+static const uint32_t s_GPIO_CLK[hal_gpio_ports_number] = 
 {
     RCC_AHB1Periph_GPIOA, RCC_AHB1Periph_GPIOB, RCC_AHB1Periph_GPIOC, RCC_AHB1Periph_GPIOD, 
-    RCC_AHB1Periph_GPIOE, RCC_AHB1Periph_GPIOF, RCC_AHB1Periph_GPIOG, RCC_AHB1Periph_GPIOH, RCC_AHB1Periph_GPIOI
+    RCC_AHB1Periph_GPIOE, RCC_AHB1Periph_GPIOF, RCC_AHB1Periph_GPIOG, RCC_AHB1Periph_GPIOH, 
+    RCC_AHB1Periph_GPIOI
 };
+static const uint8_t s_GPIO_speeds[hal_gpio_speeds_number] = 
+{ 
+    GPIO_Speed_2MHz,        // hal_gpio_speed_default
+    GPIO_Speed_2MHz,        // hal_gpio_speed_low
+    GPIO_Speed_25MHz,       // hal_gpio_speed_medium
+    GPIO_Speed_50MHz        // hal_gpio_speed_medium   
+};
+#endif
 
 static uint16_t s_hal_gpio_initted_mask[hal_gpio_ports_number] = { 0x0000 };
 static uint16_t s_hal_gpio_output_mask[hal_gpio_ports_number] = { 0x0000 };
@@ -134,15 +164,23 @@ extern hal_result_t hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_
     
     if(hal_gpio_dirOUT == dir)
     {
-        GPIOSpeed_TypeDef stm32speed = ((hal_gpio_speed_high == speed) ? (GPIO_Speed_50MHz) : ( (hal_gpio_speed_medium==speed)?(GPIO_Speed_25MHz):( GPIO_Speed_2MHz) ) );
-        /* Enable the GPIO_LED Clock */
+#if     defined(USE_STM32F1)
+        // enable GPIO clock 
+        RCC_APB2PeriphClockCmd(s_GPIO_CLK[port], ENABLE);    
+        // Configure the GPIO pin
+        GPIO_InitStructure.GPIO_Pin     = (uint16_t)(0x0001 << pin);
+        GPIO_InitStructure.GPIO_Speed   = (GPIOSpeed_TypeDef)s_GPIO_speeds[(uint8_t)speed];
+        GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_Out_PP;
+#elif   defined(USE_STM32F4)
+        // enable GPIO clock 
         RCC_AHB1PeriphClockCmd(s_GPIO_CLK[port], ENABLE);    
-        /* Configure the GPIO_LED pin */
-        GPIO_InitStructure.GPIO_Pin = (uint16_t)(0x0001 << pin);
-        GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-        GPIO_InitStructure.GPIO_Speed = stm32speed;
-        GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-        GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP; 
+        // Configure the GPIO pin
+        GPIO_InitStructure.GPIO_Pin     = (uint16_t)(0x0001 << pin);
+        GPIO_InitStructure.GPIO_Speed   = (GPIOSpeed_TypeDef)s_GPIO_speeds[(uint8_t)speed];
+        GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_OUT;
+        GPIO_InitStructure.GPIO_OType   = GPIO_OType_PP;
+        GPIO_InitStructure.GPIO_PuPd    = GPIO_PuPd_UP; 
+#endif
        
         GPIO_Init(s_GPIO_PORT[port], &GPIO_InitStructure);
 
@@ -150,16 +188,21 @@ extern hal_result_t hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_
     } 
     else if(hal_gpio_dirINP == dir)
     {
-        /* Enable Button GPIO clock */            
-        #warning acemor stm32f2: verify if RCC_APB2Periph_AFIO is required
+#if     defined(USE_STM32F1)
+        #warning acemor stm32f1: verify if RCC_APB2Periph_AFIO is required
+        // enable GPIO clock
+        RCC_APB2PeriphClockCmd(s_GPIO_CLK[port] | RCC_APB2Periph_AFIO, ENABLE);
+        // configure pin as input floating
+        GPIO_InitStructure.GPIO_Pin     = (uint16_t)(0x0001 << pin);
+        GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_IN_FLOATING;
+#elif   defined(USE_STM32F4)    
+        // enable GPIO clock                  
         RCC_AHB1PeriphClockCmd(s_GPIO_CLK[port], ENABLE);        
-        /* Configure Button pin as input floating */
-        GPIO_InitStructure.GPIO_Pin = (uint16_t)(0x0001 << pin);
-        GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-        // does not apply to input: GPIO_InitStructure.GPIO_Speed = stm32speed;
-        // does not apply to input: GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-        #warning acemor stm32f2: verify if GPIO_PuPd is required for input pins
-        // does not apply to input: GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+        /// configure pin as input floating
+        GPIO_InitStructure.GPIO_Pin     = (uint16_t)(0x0001 << pin);
+        GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_IN;
+#endif
+        
         GPIO_Init(s_GPIO_PORT[port], &GPIO_InitStructure);
 
         s_hal_gpio_output_clear(port, pin);
@@ -189,9 +232,8 @@ extern hal_result_t hal_gpio_setval(hal_gpio_port_t port, hal_gpio_pin_t pin, ha
         return(hal_res_NOK_generic);
     }
 
-
         
-    GPIO_WriteBit(s_GPIO_PORT[port], (uint16_t)(0x0001 << pin), (0 == val) ? (Bit_RESET) : (Bit_SET)); 
+    GPIO_WriteBit(s_GPIO_PORT[port], (uint16_t)(0x0001 << pin), (hal_gpio_valLOW == val) ? (Bit_RESET) : (Bit_SET)); 
     
     return(hal_res_OK);
 }

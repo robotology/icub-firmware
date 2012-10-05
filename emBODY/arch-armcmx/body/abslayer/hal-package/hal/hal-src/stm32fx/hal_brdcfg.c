@@ -35,6 +35,8 @@
 	#include "brdcfg/hal_brdcfg_ems001.c"
 #elif defined(HAL_BOARD_MCBSTM32F400) 
     #include "brdcfg/hal_brdcfg_mcbstm32f400.c"
+#elif defined(HAL_BOARD_EMS004) 
+    #include "brdcfg/hal_brdcfg_ems004.c"    
 #else
 	#error "Please select board XXX w/ HAL_BOARD_XXX"
 #endif                        

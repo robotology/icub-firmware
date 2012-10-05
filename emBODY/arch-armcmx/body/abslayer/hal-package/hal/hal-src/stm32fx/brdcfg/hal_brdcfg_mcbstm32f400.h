@@ -58,9 +58,9 @@
 //    // empty-section
 //#endif//HAL_USE_DISPLAY  
 
-#ifdef HAL_USE_I2C4HAL
-    #define HAL_BRDCFG_I2C4HAL__PERIPHERAL                          I2C1    // i2c peripheral used by eeprom 01 and ...
-#endif//HAL_USE_I2C4HAL  
+// #ifdef HAL_USE_I2C4HAL
+//     #define HAL_BRDCFG_I2C4HAL__PERIPHERAL                          I2C1    // i2c peripheral used by eeprom 01 and ...
+// #endif//HAL_USE_I2C4HAL  
 
 
 #ifdef HAL_USE_SPI4ENCODER
@@ -71,9 +71,9 @@
 
 
 
-#ifdef HAL_USE_ETH
-    #define HAL_BRDCFG_ETH__PHY_DEVICE_NUM                          1
-#endif//HAL_USE_ETH
+// #ifdef HAL_USE_ETH
+//     #define HAL_BRDCFG_ETH__PHY_DEVICE_NUM                          1
+// #endif//HAL_USE_ETH
 
 
 
@@ -129,7 +129,6 @@
 
 #ifdef HAL_USE_ETH
     extern const uint8_t hal_brdcfg_eth__supported_mask; //         = 0x01;
-//    extern const uint8_t hal_brdcfg_eth__phy_device_list[];
 #endif//HAL_USE_ETH
 
 #ifdef HAL_USE_GPIO
@@ -170,16 +169,16 @@
 #endif//HAL_USE_CAN
 
 
-#ifdef HAL_USE_I2C4HAL
-    extern void hal_brdcfg_i2c4hal__LowLevel_Init(void); 
-    extern void hal_brdcfg_i2c4hal__LowLevel_DeInit(void);  
-#endif//HAL_USE_I2C4HAL 
+// #ifdef HAL_USE_I2C4HAL
+//     extern void hal_brdcfg_i2c4hal__LowLevel_Init(void); 
+//     extern void hal_brdcfg_i2c4hal__LowLevel_DeInit(void);  
+// #endif//HAL_USE_I2C4HAL 
 
 #ifdef HAL_USE_EEPROM
     extern void hal_brdcfg_eeprom__ontimeouterror(void);
-    extern void hal_brdcfg_eeprom__writeprotection_init(void);
-    extern void hal_brdcfg_eeprom__writeprotection_disable(void);
-    extern void hal_brdcfg_eeprom__writeprotection_enable(void);
+//     extern void hal_brdcfg_eeprom__writeprotection_init(void);
+//     extern void hal_brdcfg_eeprom__writeprotection_disable(void);
+//     extern void hal_brdcfg_eeprom__writeprotection_enable(void);
 #endif//HAL_USE_EEPROM   
 
 

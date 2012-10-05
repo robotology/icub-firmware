@@ -187,11 +187,16 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
 #if defined(HAL_USE_EVENTVIEWER_ETH)
     eventviewer_load(ev_ID_first_isr+hal_arch_arm_ETH_IRQn, ETH_IRQHandler);
 #endif
+    
+    #warning --> vedi qui .... per la ems devo anticipare questa cosa.
+    // potrei ... prima fare init del phy. e dopo il rmii init potrei fare la configurazione
 
-
+    hal_brdcfg_eth__phy_initialise(); 
+    
     s_hal_eth_rmii_init();     
     
-    hal_brdcfg_eth__phy_start(); 
+    // senza switch deve essere qui.
+    hal_brdcfg_eth__phy_configure(); 
 
 
     // initialise mac control register
@@ -632,7 +637,7 @@ extern void hal_eth_hid_rmii_rx_init(void)
     AFIO->MAPR      |= (1 << 21);               // Ethernet MAC I/O remapping to: RX_DV-CRS_DV/PD8, RXD0/PD9, RXD1/PD10, RXD2/PD11, RXD3/PD12 
  
     // enable clock for port d
-    RCC->APB2ENR    |= 0x00000021
+    RCC->APB2ENR    |= 0x00000021;
     
     // ETH_RMII_CRS_DV (PD8), ETH_RMII_RXD0 (PD9), ETH_RMII_RXD1 (PD10) ... as remapped by setting bit 21 of AFIO->MAPR
     GPIOD->CRH      &= 0xFFFFF000;              // reset pd8, pd9, pd10
@@ -677,7 +682,7 @@ extern void hal_eth_hid_rmii_tx_init(void)
 #if     defined(USE_STM32F1) 
     
     // enable clock for port b
-    RCC->APB2ENR    |= 0x00000009
+    RCC->APB2ENR    |= 0x00000009;
   
     //  ETH_RMII_TX_EN (PB11), ETH _RMII_TXD0 (PB12), ETH _RMII_TXD1 (PB13)
     GPIOB->CRH      &= 0xFF000FFF;              // reset pb11, pb12, pb13
@@ -710,7 +715,7 @@ extern void hal_eth_hid_smi_init(void)
 #if     defined(USE_STM32F1) 
     
     // 0. clocks port a and port c as alternate functions   
-    RCC->APB2ENR    |= 0x00000015
+    RCC->APB2ENR    |= 0x00000015;
 
     // 1. MDC:          configure Port C ethernet pin: PC1-->MDC (Ethernet MIIM interface clock)
     GPIOC->CRL      &= 0xFFFFFF0F;              // reset pc1
@@ -781,7 +786,7 @@ extern void hal_eth_hid_rmii_refclock_init(void)
     GPIOA->MODER    &= ~0x0000000C;              // reset pa1
     GPIOA->MODER    |=  0x00000008;              // alternate function
     GPIOA->OTYPER   &= ~0x00000002;              // output push-pull (reset state) 
-    GPIOA->OSPEEDR  |=  0x0000000C;              //  slew rate as 100MHz pin
+    GPIOA->OSPEEDR  |=  0x0000000C;              // slew rate as 100MHz pin
     GPIOA->PUPDR    &= ~0x0000000C;              // no pull up, pull down
 
     GPIOA->AFR[0]   &= ~0x000000F0;
@@ -791,14 +796,30 @@ extern void hal_eth_hid_rmii_refclock_init(void)
 }
 
 
+
+
+#warning MCO --> the MCO is used neither with mcbstm32c nor with mcbstm32f400 because they dont need 
+#warning MCO --> to feed the phy with a ref clock from the MPU.
+#warning MCO --> but it is used by the emsxxx because its swicth needs a clock ... 
+#warning MCO --> THUS ... move the MCO somewhere else so that it can be used by the hal_switch file. 
 extern void hal_eth_hid_microcontrollerclockoutput_init(void)
 {
 #if     defined(USE_STM32F1) 
 
-    #error --> what about the MCO in stm32f1 ???
-
+#if 0
+    // clock gpioa as alternate function
+    RCC->APB2ENR    |= 0x00000005;
+    
+    // init the MCO (PA8)
+    GPIOA->CRH      &= 0xFFFFFFF0;              // reset pa8
+    GPIOA->CRH      |= 0x00000004;              // pin configured in reset state (floating input)
+    
+    // ok... but it does not emit any signal
+#endif
+    
 #elif   defined(USE_STM32F4) 
 
+#if 0    
     // enable system configuration controller clock
     RCC->APB2ENR    |= (1 << 14);  
     
@@ -813,7 +834,10 @@ extern void hal_eth_hid_microcontrollerclockoutput_init(void)
     GPIOA->PUPDR    &= ~0x00030000;              // no pull up, pull down
 
     GPIOA->AFR[1]   &= ~0x0000000F;              
-    GPIOA->AFR[1]   |=  0x00000000;              // AF0 (MCO1)          
+    GPIOA->AFR[1]   |=  0x00000000;              // AF0 (MCO1)       
+
+    // ok... but it does not emit any signal
+#endif
 
 #endif    
 }

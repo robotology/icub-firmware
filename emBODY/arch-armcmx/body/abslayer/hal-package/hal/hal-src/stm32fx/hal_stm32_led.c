@@ -114,6 +114,8 @@ extern hal_result_t hal_led_init(hal_led_t led, const hal_led_cfg_t *cfg)
     {
         return(res);
     }
+    
+    hal_gpio_setval(gc->port, gc->pin, hal_brdcfg_led__value_off);
  
     s_hal_led_initted_set(led);
     return(hal_res_OK);

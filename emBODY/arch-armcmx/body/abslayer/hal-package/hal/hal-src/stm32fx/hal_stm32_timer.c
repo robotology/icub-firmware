@@ -64,7 +64,17 @@
 #define HAL_timer_t2index(t)           ((uint8_t)((t)))
 
 
-
+#if     defined(USE_STM32F1)
+    #define TIM1_IRQn           TIM1_UP_IRQn
+    #define TIM1_IRQHandler     TIM1_UP_IRQHandler
+    #define TIM6_IRQn           TIM6_IRQn
+    #define TIM6_IRQHandler     TIM6_DAC_IRQHandler
+#elif   defined(USE_STM32F4)
+    #define TIM1_IRQn           TIM1_UP_TIM10_IRQn
+    #define TIM1_IRQHandler     TIM1_UP_TIM10_IRQHandler
+    #define TIM6_IRQn           TIM6_DAC_IRQn
+    #define TIM6_IRQHandler     TIM6_DAC_IRQHandler
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -124,7 +134,7 @@ static const hal_timer_stm32_regs_t s_hal_timer_stm32regs[hal_timers_num] =
     {   // timer1   
         .TIMx                   = TIM1,
         .RCC_APB1Periph_TIMx    = RCC_APB2Periph_TIM1, 
-        .TIMx_IRQn              = TIM1_UP_TIM10_IRQn 
+        .TIMx_IRQn              = TIM1_IRQn 
     },
     {   // timer2   
         .TIMx                   = TIM2,
@@ -149,7 +159,7 @@ static const hal_timer_stm32_regs_t s_hal_timer_stm32regs[hal_timers_num] =
     {   // timer6   
         .TIMx                   = TIM6,
         .RCC_APB1Periph_TIMx    = RCC_APB1Periph_TIM6, 
-        .TIMx_IRQn              = TIM6_DAC_IRQn 
+        .TIMx_IRQn              = TIM6_IRQn 
     },
     {   // timer7   
         .TIMx                   = TIM7,
@@ -401,7 +411,7 @@ extern hal_timer_status_t hal_timer_status_get(hal_timer_t timer)
 
 // ---- isr of the module: begin ----
 
-void TIM1_UP_TIM10_IRQHandler(void)
+void TIM1_IRQHandler(void)
 {
     // Clear TIMx update interrupt 
     TIM_ClearITPendingBit(TIM1, TIM_IT_Update);
@@ -438,7 +448,7 @@ void TIM5_IRQHandler(void)
     s_hal_timer_callback(hal_timer5);
 }
 
-void TIM6_DAC_IRQHandler(void)
+void TIM6_IRQHandler(void)
 {
     // Clear TIMx update interrupt 
     TIM_ClearITPendingBit(TIM6, TIM_IT_Update);

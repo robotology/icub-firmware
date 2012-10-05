@@ -371,13 +371,6 @@ extern stm32i2c_result_t stm32i2c_deinit(uint8_t port, const stm32i2c_cfg_t *cfg
 //    return(0x12345678);
 //}
 
-static void hal_delay(uint32_t microsecs)
-{
-    volatile uint32_t i;
-    uint32_t cnt = 72*microsecs;
-
-    for(i = cnt; i; i--);
-}
     
     
 

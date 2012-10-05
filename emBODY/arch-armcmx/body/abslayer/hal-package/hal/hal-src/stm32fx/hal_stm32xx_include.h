@@ -39,6 +39,11 @@
     #include "cmsis_stm32f4.h"   
     #define cmsis_stm32xx_hid_set_system_core_clock     cmsis_stm32f4_hid_set_system_core_clock
     #define USE_STM32F4
+#elif defined(HAL_BOARD_EMS004)
+	#include "stm32f4.h"
+    #include "cmsis_stm32f4.h"   
+    #define cmsis_stm32xx_hid_set_system_core_clock     cmsis_stm32f4_hid_set_system_core_clock
+    #define USE_STM32F4    
 #else 
 	#error "Please select board XXX w/ HAL_BOARD_XXX"
 #endif        

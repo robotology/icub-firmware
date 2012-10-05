@@ -65,12 +65,48 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
-extern const uint32_t hal_flash_BASEADDR        = 0x08000000;
-extern const uint32_t hal_flash_TOTALSIZE       = 1024*1024;
+// empty-section
 
-extern const uint32_t hal_flash_PAGESNUM        = 12;
 
-extern const uint32_t hal_flash_PAGESIZES[12]   = 
+
+// --------------------------------------------------------------------------------------------------------------------
+// - typedef with internal scope
+// --------------------------------------------------------------------------------------------------------------------
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - declaration of static functions
+// --------------------------------------------------------------------------------------------------------------------
+
+static uint32_t s_hal_flash_pageindex_get(uint32_t addr);
+
+static uint32_t s_hal_flash_quickget_pagesize(uint32_t addr);
+#if     defined(USE_STM32F4)
+static uint32_t s_hal_flash_stm32f4_sector_get(uint32_t addr);
+#endif
+static hal_result_t s_hal_flash_erasepage(uint32_t addr);
+static hal_result_t s_hal_flash_writedata(uint32_t addr, uint32_t size, uint32_t *data);
+static hal_result_t s_hal_flash_writehalfword(uint32_t addr, uint16_t hword);
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static variables
+// --------------------------------------------------------------------------------------------------------------------
+
+static const uint32_t s_hal_flash_BASEADDR          = 0x08000000;
+
+#if     defined(USE_STM32F1)
+
+static const uint32_t s_hal_flash_TOTALSIZE         = 256*1024;
+static const uint32_t s_hal_flash_PAGESIZE          = 2*1024;
+
+#elif   defined(USE_STM32F4)
+
+static const uint32_t s_hal_flash_TOTALSIZE         = 1024*1024;
+
+static const uint32_t s_hal_flash_PAGESNUM          = 12;
+
+static const uint32_t s_hal_flash_PAGESIZES[12]     = 
 {
     16*1024,    
     16*1024,
@@ -86,45 +122,23 @@ extern const uint32_t hal_flash_PAGESIZES[12]   =
     128*1024
 };
 
-extern const uint32_t hal_flash_PAGEADDRS[12]   = 
+static const uint32_t s_hal_flash_PAGEADDRS[12]     = 
 {
-    0x08000000,         // hal_flash_BASEADDR
-    0x08004000,         // hal_flash_BASEADDR +  16k
-    0x08008000,         // hal_flash_BASEADDR +  32k
-    0x0800C000,         // hal_flash_BASEADDR +  48k
-    0x08010000,         // hal_flash_BASEADDR +  64k
-    0x08020000,         // hal_flash_BASEADDR + 128k
-    0x08040000,         // hal_flash_BASEADDR + 256k
-    0x08060000,         // hal_flash_BASEADDR + 384k
-    0x08080000,         // hal_flash_BASEADDR + 512k
-    0x080A0000,         // hal_flash_BASEADDR + 640k
-    0x080C0000,         // hal_flash_BASEADDR + 768k
-    0x080E0000          // hal_flash_BASEADDR + 896k
+    0x08000000,         // s_hal_flash_BASEADDR
+    0x08004000,         // s_hal_flash_BASEADDR +  16k
+    0x08008000,         // s_hal_flash_BASEADDR +  32k
+    0x0800C000,         // s_hal_flash_BASEADDR +  48k
+    0x08010000,         // s_hal_flash_BASEADDR +  64k
+    0x08020000,         // s_hal_flash_BASEADDR + 128k
+    0x08040000,         // s_hal_flash_BASEADDR + 256k
+    0x08060000,         // s_hal_flash_BASEADDR + 384k
+    0x08080000,         // s_hal_flash_BASEADDR + 512k
+    0x080A0000,         // s_hal_flash_BASEADDR + 640k
+    0x080C0000,         // s_hal_flash_BASEADDR + 768k
+    0x080E0000          // s_hal_flash_BASEADDR + 896k
 };
 
-
-// --------------------------------------------------------------------------------------------------------------------
-// - typedef with internal scope
-// --------------------------------------------------------------------------------------------------------------------
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - declaration of static functions
-// --------------------------------------------------------------------------------------------------------------------
-
-static uint32_t s_hal_flash_pageindex_get(uint32_t addr);
-
-static uint32_t s_hal_flash_stm32f4_sector_get(uint32_t addr);
-
-static hal_result_t s_hal_flash_erasepage(uint32_t addr);
-static hal_result_t s_hal_flash_writedata(uint32_t addr, uint32_t size, uint32_t *data);
-static hal_result_t s_hal_flash_writehalfword(uint32_t addr, uint16_t hword);
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition (and initialisation) of static variables
-// --------------------------------------------------------------------------------------------------------------------
-// empty-section
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -153,7 +167,8 @@ extern hal_result_t hal_flash_erase(uint32_t addr, uint32_t size)
 {
     hal_result_t res = hal_res_NOK_generic;
 
-    uint32_t pageindex;
+    //uint32_t pageindex;
+    uint32_t pagesize;
 
     if(hal_false == hal_flash_address_isvalid(addr))
     {
@@ -165,9 +180,11 @@ extern hal_result_t hal_flash_erase(uint32_t addr, uint32_t size)
         return(hal_res_NOK_generic);    
     }
 
-    pageindex = s_hal_flash_pageindex_get(addr);
-
-    size += (addr % hal_flash_PAGESIZES[pageindex]);
+    //pageindex = s_hal_flash_pageindex_get(addr);
+    //size += (addr % s_hal_flash_PAGESIZES[pageindex]);   
+    pagesize = s_hal_flash_quickget_pagesize(addr);
+    size += (addr % pagesize);
+    
     
     for( ; size > 0; )
     {
@@ -178,13 +195,19 @@ extern hal_result_t hal_flash_erase(uint32_t addr, uint32_t size)
             return(hal_res_NOK_generic);
         }
 
-        pageindex = s_hal_flash_pageindex_get(addr);
-        addr += hal_flash_PAGESIZES[pageindex];
+        //pageindex = s_hal_flash_pageindex_get(addr);
+        //addr += s_hal_flash_PAGESIZES[pageindex];
+        pagesize = s_hal_flash_quickget_pagesize(addr);
+        addr += pagesize;
 
-        if(size >= hal_flash_PAGESIZES[pageindex])
+        //if(size >= s_hal_flash_PAGESIZES[pageindex])
+        //{
+        //    size -= s_hal_flash_PAGESIZES[pageindex];
+        //}
+        if(size >= pagesize)
         {
-            size -= hal_flash_PAGESIZES[pageindex];
-        }
+            size -= pagesize;
+        }        
         else
         {
             size = 0;
@@ -325,7 +348,7 @@ extern hal_result_t hal_flash_read(uint32_t addr, uint32_t size, void *data)
 
 extern uint32_t hal_flash_get_baseaddress(void)
 {
-    return(hal_flash_BASEADDR);
+    return(s_hal_flash_BASEADDR);
 }
 
 
@@ -345,35 +368,35 @@ extern hal_boolval_t hal_flash_address_isvalid(uint32_t addr)
 
 extern uint32_t hal_flash_get_pagesize(uint32_t addr)
 {
-    uint32_t pageindex = 0;
-
     if(hal_false == hal_flash_address_isvalid(addr))
     {
         return(hal_NA32);
     }
-
-    pageindex = s_hal_flash_pageindex_get(addr);
-   
-    return(hal_flash_PAGESIZES[pageindex]);
+    
+    return(s_hal_flash_quickget_pagesize(addr));
 }
 
 extern uint32_t hal_flash_get_pageaddr(uint32_t addr)
 {
-    uint32_t pageindex = 0;
-
     if(hal_false == hal_flash_address_isvalid(addr))
     {
         return(hal_NA32);
     }
 
-    pageindex = s_hal_flash_pageindex_get(addr);
-   
-    return(hal_flash_PAGEADDRS[pageindex]);
+#if     defined(USE_STM32F1)
+    // every page is 2k
+    addr >>= 11;
+    addr <<= 11;
+    return(addr);
+#elif   defined(USE_STM32F4)    
+    uint32_t pageindex = s_hal_flash_pageindex_get(addr);   
+    return(s_hal_flash_PAGEADDRS[pageindex]);
+#endif    
 }
 
 extern uint32_t hal_flash_get_totalsize(void)
 {
-    return(hal_flash_TOTALSIZE);
+    return(s_hal_flash_TOTALSIZE);
 }
 
 // for stm32f1 there is ...
@@ -436,22 +459,22 @@ extern hal_result_t hal_flash_hid_setlatency(hal_flash_cycles_t ncycles)
 static hal_result_t s_hal_flash_erasepage(uint32_t addr)
 {
     FLASH_Status status = FLASH_COMPLETE;
-    uint32_t flashsector = 0;
-    
 
     if(hal_false == hal_flash_address_isvalid(addr))
     {
         return(hal_res_NOK_generic);
     }
-
-    // find pageindex;
-
-    flashsector = s_hal_flash_stm32f4_sector_get(addr);
     
+#if     defined(USE_STM32F1)
+    // find beginning of page
+    addr = hal_flash_get_pageaddr(addr);
+    FLASH_ClearFlag(FLASH_FLAG_BSY | FLASH_FLAG_EOP | FLASH_FLAG_PGERR | FLASH_FLAG_WRPRTERR);
+    status = FLASH_ErasePage(addr);
+#elif   defined(USE_STM32F4)
     FLASH_ClearFlag(FLASH_FLAG_BSY | FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR | FLASH_FLAG_PGAERR | FLASH_FLAG_PGPERR | FLASH_FLAG_PGSERR);
-
     // important: FLASH_EraseSector() DOES NOT use the pageindex, but its own values. 
-    status = FLASH_EraseSector(flashsector, VoltageRange_3);
+    status = FLASH_EraseSector(s_hal_flash_stm32f4_sector_get(addr), VoltageRange_3);
+#endif  
 
     return((FLASH_COMPLETE==status)?(hal_res_OK):(hal_res_NOK_generic));
 }
@@ -569,20 +592,26 @@ static hal_result_t s_hal_flash_writedata(uint32_t addr, uint32_t size, uint32_t
 
 static uint32_t s_hal_flash_pageindex_get(uint32_t addr)
 {
+#if     defined(USE_STM32F1)
+    addr -= s_hal_flash_BASEADDR;
+    return(addr / s_hal_flash_PAGESIZE);
+    #warning --> optimise it
+#elif   defined(USE_STM32F4)
     uint8_t i;
 
-    for(i=0; i<(hal_flash_PAGESNUM-1); i++)
+    for(i=0; i<(s_hal_flash_PAGESNUM-1); i++)
     {
-        if(addr < hal_flash_PAGEADDRS[i+1])
+        if(addr < s_hal_flash_PAGEADDRS[i+1])
         {
             return(i);
         }
     }
 
-    return(hal_flash_PAGESNUM-1);    
+    return(s_hal_flash_PAGESNUM-1);  
+#endif    
 }
 
-
+#if     defined(USE_STM32F4)
 static uint32_t s_hal_flash_stm32f4_sector_get(uint32_t addr)
 {
     static const uint16_t FLASH_Sectors[12] =
@@ -599,6 +628,17 @@ static uint32_t s_hal_flash_stm32f4_sector_get(uint32_t addr)
     // find pageindex;
 
     return(FLASH_Sectors[s_hal_flash_pageindex_get(addr)]);    
+}
+#endif
+
+static uint32_t s_hal_flash_quickget_pagesize(uint32_t addr)
+{
+#if     defined(USE_STM32F1)
+    return(s_hal_flash_PAGESIZE);
+#elif   defined(USE_STM32F4)    
+    uint32_t pageindex = s_hal_flash_pageindex_get(addr);   
+    return(s_hal_flash_PAGESIZES[pageindex]);
+#endif    
 }
 
 
