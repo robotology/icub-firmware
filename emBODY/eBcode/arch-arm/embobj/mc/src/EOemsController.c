@@ -17,6 +17,7 @@
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem.h"
 
+#include <string.h>
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -259,9 +260,9 @@ extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq)
     eo_axisController_SetTrqRef(s_emsc->axis_controller[joint], trq);
 }
 
-extern int16_t* eo_emsController_PWM()
+extern void /*int16_t*/ eo_emsController_PWM(int16_t* pwm)
 {
-    if (!s_emsc) return NULL;
+    if (!s_emsc) return;// NULL;
 
     static int16_t pwm_axis[MAX_MOTORS];
     static int16_t pwm_motor[MAX_MOTORS];
@@ -277,11 +278,12 @@ extern int16_t* eo_emsController_PWM()
     if (s_emsc->decoupler[DECOUPLER_PWM])
     {
         //eo_decoupler_Mult(s_emsc->decoupler[DECOUPLER_PWM], pwm_axis, pwm_motor);
-        
-        return pwm_motor;    
+        memcpy(pwm, pwm_motor, 2*MAX_MOTORS);
+        //return pwm_motor;    
     }
 
-    return pwm_axis;
+		memcpy(pwm, pwm_axis, 2*MAX_MOTORS);
+    //return pwm_axis;
 }
 
 
