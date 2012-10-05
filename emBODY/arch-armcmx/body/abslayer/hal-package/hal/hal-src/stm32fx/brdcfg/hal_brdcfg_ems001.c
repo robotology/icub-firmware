@@ -346,8 +346,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-
-static void s_hal_ems001_i2c_wait2micro(void);
+// empty-section
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -710,7 +709,7 @@ void  hal_brdcfg_spi4encoder__chipSelect_init(hal_spi_port_t spix)
 //	
 //}
 
-
+#if 0
 extern void hal_brdcfg_switch__reg_write_byI2C(uint8_t* pBuffer, uint16_t WriteAddr)
 { 
     #define HAL_BRDCFG_I2C4HAL__PERIPHERAL I2C1
@@ -758,6 +757,8 @@ extern void hal_brdcfg_switch__reg_write_byI2C(uint8_t* pBuffer, uint16_t WriteA
 
 extern void hal_brdcfg_switch__reg_read_byI2C(uint8_t* pBuffer, uint16_t ReadAddr)
 {
+    #define HAL_BRDCFG_I2C4HAL__PERIPHERAL I2C1
+    
     /*!< wait while the bus is busy */
     while(I2C_GetFlagStatus(HAL_BRDCFG_I2C4HAL__PERIPHERAL, I2C_FLAG_BUSY))
     {
@@ -817,6 +818,8 @@ extern void hal_brdcfg_switch__reg_read_byI2C(uint8_t* pBuffer, uint16_t ReadAdd
     I2C_AcknowledgeConfig(HAL_BRDCFG_I2C4HAL__PERIPHERAL, ENABLE);
 
 }
+#endif
+
 #endif//HAL_USE_SWITCH
 
 
@@ -841,7 +844,6 @@ extern void hal_brdcfg_eth__phy_initialise(void)
 //    }
 //#else
 
-
     #warning --> in here we just init the switch ... put in reset mode, exit from reset, do the mco, init the i2c if not initted, etc. 
     if(hal_false == hal_switch_initted_is())
     {
@@ -853,6 +855,7 @@ extern void hal_brdcfg_eth__phy_initialise(void)
 extern void hal_brdcfg_eth__phy_configure(void)
 {
     #warning --> in here we configure the switch ... in full duplex 100mbps for instance
+    hal_switch_start();
 }
 
 //extern  void hal_brdcfg_eth__clock_config(void)

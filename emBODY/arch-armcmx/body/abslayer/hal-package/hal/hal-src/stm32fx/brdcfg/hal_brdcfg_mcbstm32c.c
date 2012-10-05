@@ -547,6 +547,30 @@ extern void hal_brdcfg_switch__reg_write_byI2C(uint8_t* pBuffer, uint16_t WriteA
 
 extern void hal_brdcfg_eth__phy_initialise(void)
 {
+    uint16_t regv;
+    uint32_t tout;
+    
+    // 1. initialises smi
+    hal_eth_hid_smi_init();
+    
+	// reset the phy device (address is 1)
+    hal_eth_hid_smi_write(0x01, PHY_REG_BMCR, PHY_Reset);
+
+	// wait for hardware reset to end 
+    for(tout = 0; tout<HAL_ETH_PHY_WR_TIMEOUT; tout++) 
+    {
+        regv = hal_eth_hid_smi_read(0x01, PHY_REG_BMCR);
+        if (!HAL_BRDCFG_ETH__ETH_IS_IN_RESET_STATE(regv))
+        {
+            // reset complete
+            break;
+        }
+    }
+    
+    if(HAL_ETH_PHY_WR_TIMEOUT == tout) //ethernet is still in reset state 
+    {
+        hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "hal_brdcfg_eth__phy_start(): PHY is still in reset state");
+    }    
 
 }
 
@@ -580,24 +604,24 @@ extern void hal_brdcfg_eth__phy_configure(void)
     hal_eth_hid_smi_init();
 #endif  
 
-	// reset the phy device (address is 1)
-    hal_eth_hid_smi_write(0x01, PHY_REG_BMCR, PHY_Reset);
+// 	// reset the phy device (address is 1)
+//     hal_eth_hid_smi_write(0x01, PHY_REG_BMCR, PHY_Reset);
 
-	// wait for hardware reset to end 
-    for(tout = 0; tout<HAL_ETH_PHY_WR_TIMEOUT; tout++) 
-    {
-        regv = hal_eth_hid_smi_read(0x01, PHY_REG_BMCR);
-        if (!HAL_BRDCFG_ETH__ETH_IS_IN_RESET_STATE(regv))
-        {
-            // reset complete
-            break;
-        }
-    }
-    
-    if(HAL_ETH_PHY_WR_TIMEOUT == tout) //ethernet is still in reset state 
-    {
-        hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "hal_brdcfg_eth__phy_start(): PHY is still in reset state");
-    }
+// 	// wait for hardware reset to end 
+//     for(tout = 0; tout<HAL_ETH_PHY_WR_TIMEOUT; tout++) 
+//     {
+//         regv = hal_eth_hid_smi_read(0x01, PHY_REG_BMCR);
+//         if (!HAL_BRDCFG_ETH__ETH_IS_IN_RESET_STATE(regv))
+//         {
+//             // reset complete
+//             break;
+//         }
+//     }
+//     
+//     if(HAL_ETH_PHY_WR_TIMEOUT == tout) //ethernet is still in reset state 
+//     {
+//         hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "hal_brdcfg_eth__phy_start(): PHY is still in reset state");
+//     }
 
 
     // configure phy in full duplex and 100MB

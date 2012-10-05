@@ -133,6 +133,8 @@ static hal_boolval_t s_hal_i2c4hal_initted[hal_i2c_ports_number] = { hal_false, 
 //};
 
 
+static I2C_TypeDef* const       s_hal_i2c4hal_i2cx[2]               = {I2C1, I2C2};
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -238,6 +240,201 @@ extern hal_result_t hal_i2c4hal_init(hal_i2c_port_t port, const hal_i2c_cfg_t *c
     return(res);
 }
 
+extern hal_result_t hal_i2c4hal_read(hal_i2c_port_t port, uint8_t devaddr, uint8_t regaddr, uint8_t* data, uint16_t size)
+{
+    hal_result_t res = hal_res_NOK_generic;
+
+    if(hal_true != s_hal_i2c4hal_supported_is(port))
+    {
+        return(hal_res_NOK_unsupported);
+    }
+
+    if(hal_false == hal_i2c4hal_hid_initted_is(port))
+    {
+        return(hal_res_NOK_generic);
+    }
+    
+    I2C_TypeDef* i2cx = s_hal_i2c4hal_i2cx[HAL_i2c_port2index(port)];
+    
+    
+    // wait until the bus is not busy anymore 
+    while(I2C_GetFlagStatus(i2cx, I2C_FLAG_BUSY))
+    {
+    }
+    
+    // send START condition
+    I2C_GenerateSTART(i2cx, ENABLE);
+ 
+    // test on ev5
+    while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_MODE_SELECT))
+    {
+    }
+    
+    // send address of device
+    I2C_Send7bitAddress(i2cx, devaddr, I2C_Direction_Transmitter);
+    
+    // test on ev6
+    while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))
+    {
+    }
+    
+    
+     // send address of register to read inside the device
+    #warning --> if two bytes, then the msb first, the lbs after
+    I2C_SendData(i2cx, regaddr & 0xFF);    
+    
+    
+    // test on ev8 and clear it
+    while(I2C_GetFlagStatus(i2cx, I2C_FLAG_BTF) == RESET)
+    {
+    }
+    
+    // send START condition a second time 
+    I2C_GenerateSTART(i2cx, ENABLE);
+ 
+    // test on ev5
+    while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_MODE_SELECT))
+    {
+    }
+
+   
+    // send address for read
+    I2C_Send7bitAddress(i2cx, devaddr, I2C_Direction_Receiver);
+    
+   
+    //while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED))
+    //{
+    //}
+    // wait on addr flag to be set
+    while(I2C_GetFlagStatus(i2cx, I2C_FLAG_ADDR) == RESET)
+    {
+    }    
+    
+    
+    while(size)
+    {
+    
+        if(1 == size)
+        {
+            // disable acknowledgement
+            I2C_AcknowledgeConfig(i2cx, DISABLE);   
+
+            // clear addr by reading sr1 and then sr2
+            (void)(i2cx)->SR1;
+            (void)(i2cx)->SR2;
+            
+            // send stop condition
+            I2C_GenerateSTOP(i2cx, ENABLE);
+        }
+        
+        // wait for the byte to be received
+        while(I2C_GetFlagStatus(i2cx, I2C_FLAG_RXNE) == RESET)
+        {
+        }
+        
+        // read received byte
+        *data = I2C_ReceiveData(i2cx);
+        
+        // increment received data and decrement the size (bytes to be received yet)
+        data++;
+        size--;          
+    }
+    
+    // wait to make sure that the stop bit has been cleared
+    while((i2cx)->CR1 & I2C_CR1_STOP)
+    {
+    }  
+
+    // re-enable acknowledgement to be ready for another reception 
+    I2C_AcknowledgeConfig(i2cx, ENABLE);    
+
+    
+    return(hal_res_OK);
+}
+
+
+
+extern hal_result_t hal_i2c4hal_write(hal_i2c_port_t port, uint8_t devaddr, uint8_t regaddr, uint8_t* data, uint16_t size)
+{
+    hal_result_t res = hal_res_NOK_generic;
+
+    if(hal_true != s_hal_i2c4hal_supported_is(port))
+    {
+        return(hal_res_NOK_unsupported);
+    }
+
+    if(hal_false == hal_i2c4hal_hid_initted_is(port))
+    {
+        return(hal_res_NOK_generic);
+    }
+    
+    I2C_TypeDef* i2cx = s_hal_i2c4hal_i2cx[HAL_i2c_port2index(port)];
+    
+
+    
+    
+ ///////////////////////////////////////   
+    
+  
+    
+    // wait until the bus is not busy anymore 
+    while(I2C_GetFlagStatus(i2cx, I2C_FLAG_BUSY))
+    {
+    }
+
+    // send START condition
+    I2C_GenerateSTART(i2cx, ENABLE);
+    
+    // test on ev5
+    while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_MODE_SELECT))
+    {
+    } 
+
+   // send address of device
+    I2C_Send7bitAddress(i2cx, devaddr, I2C_Direction_Transmitter);
+    
+    // test on ev6
+    while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))
+    {
+    }    
+
+    // send address of register inside the device
+    #warning --> if two bytes, then the msb first, the lbs after
+    I2C_SendData(i2cx, regaddr & 0xFF);    
+ 
+    // test on ev8
+    while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
+    {
+    } 
+    
+    while(size) 
+    {
+  
+        // send the byte to be written 
+        I2C_SendData(i2cx, *data); 
+        
+        data++;
+        size--;
+        
+        // test on ev8 (or ev8_2 = I2C_EVENT_MASTER_BYTE_TRANSMITTED which is slower but more reliable)    
+        while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
+        {
+        }
+    
+    }
+    
+    // send stop condition
+    I2C_GenerateSTOP(i2cx, ENABLE);
+    
+     // perform a read on SR1 and SR2 register to clear eventually pending flags 
+    (void)(i2cx)->SR1;
+    (void)(i2cx)->SR2; 
+    
+    
+/////////////////////////////////////////////////////////////
+    
+    return(hal_res_OK);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

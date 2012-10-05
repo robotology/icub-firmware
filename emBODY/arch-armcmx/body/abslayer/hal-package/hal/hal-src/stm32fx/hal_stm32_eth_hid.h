@@ -73,11 +73,8 @@ extern void hal_eth_hid_microcontrollerclockoutput_init(void);
 
 
 extern void hal_eth_hid_smi_init(void);
-
-extern void hal_eth_hid_smi_write(uint8_t PHYAddr, uint8_t PhyReg, uint16_t value);
-
-extern uint16_t hal_eth_hid_smi_read(uint8_t PHYAddr, uint8_t PhyReg);
-
+extern uint16_t hal_eth_hid_smi_read(uint8_t PHYaddr, uint8_t REGaddr);
+extern void hal_eth_hid_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t value);
 
 
 #endif  // include guard

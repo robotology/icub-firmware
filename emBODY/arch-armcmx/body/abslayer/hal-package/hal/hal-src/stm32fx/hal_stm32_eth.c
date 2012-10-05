@@ -114,6 +114,9 @@ static void s_hal_eth_GPIO_conf(void);
 
 static void s_hal_eth_rmii_init(void);
 
+static void s_hal_eth_mac_reset(void);
+static void s_hal_eth_mac_init(const hal_eth_cfg_t *cfg);
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -191,49 +194,26 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     #warning --> vedi qui .... per la ems devo anticipare questa cosa.
     // potrei ... prima fare init del phy. e dopo il rmii init potrei fare la configurazione
 
+    // in here we allow a specific board to init all what is related to the phy.
+    // in case of a phy accessed through the smi, this function must: a. init the smi, b. reset the phy, ... that's it.
+    // instead in case of a switch accessed through i2c, this function must: a. init the i2c, reset the switch, that's it.    
     hal_brdcfg_eth__phy_initialise(); 
     
-    s_hal_eth_rmii_init();     
+  
+    // the rmii is initted
+    s_hal_eth_rmii_init(); 
+
+    // hal_eth_hid_smi_init(); // it is not required in here. it can be called inside hal_brdcfg_eth__phy_initialise()   
+
+    // s_hal_eth_mac_reset();  // can be moved just after configuration of mac register  
     
-    // senza switch deve essere qui.
+    // in here we allow a specific board to configure and start the phy. with a mode (full/half) and a speed (10/100).
+    // in case of a phy accessed through the smi, this function must set the mode and the speed and return the result
+    // instead in case of a switch accessed through i2c, this function must configure mode and speed and put the swicth operative. 
     hal_brdcfg_eth__phy_configure(); 
-
-
-    // initialise mac control register
-    ETH->MACCR  = 0x00008000;       // clear
-    ETH->MACCR |= MCR_FES;          // config 100mbs 
-    ETH->MACCR |= MCR_DM;           // config full duplex mode
-
     
     
-    /* MAC address filter register, accept multicast packets. */
-    ETH->MACFFR = MFFR_HPF | MFFR_PAM;  // config Hash or perfect address filter and pass all multicast(PAM)
-
-    /* Ethernet MAC flow control register */
-    ETH->MACFCR = MFCR_ZQPD;   //Zero-quanta pause disable
-    
-    /* Set the Ethernet MAC Address registers */
-    ETH->MACA0HR = ((U32)s_hal_mac[5] <<  8) | (U32)s_hal_mac[4];
-    ETH->MACA0LR = ((U32)s_hal_mac[3] << 24) | (U32)s_hal_mac[2] << 16 | ((U32)s_hal_mac[1] <<  8) | (U32)s_hal_mac[0];
-    
-    /* Initialize Tx and Rx DMA Descriptors */
-    rx_descr_init ();
-    tx_descr_init ();
-    
-    /* Flush FIFO, start DMA Tx and Rx */
-    ETH->DMAOMR = DOMR_FTF | DOMR_ST | DOMR_SR;
-    
-    /* Enable receiver and transmiter */
-    ETH->MACCR |= MCR_TE | MCR_RE;
-    
-    /* Reset all interrupts */
-    ETH->DMASR  = 0xFFFFFFFF;
-    
-    /* Enable Rx and Tx interrupts. */
-    ETH->DMAIER = INT_NISE | INT_AISE | INT_RBUIE | INT_RIE;
-
-    // acemor on 31 oct 2011: added priority support for ETH_IRQn
-    hal_sys_irqn_priority_set(ETH_IRQn, cfg->priority);
+    s_hal_eth_mac_init(cfg);
 
 
     s_hal_eth_initted_set();
@@ -500,59 +480,7 @@ static void tx_descr_init (void) {
   }
   ETH->DMATDLAR = (U32)&Tx_Desc[0];
 }
-// acemor-facenda-eth-stm32x: ok
-/**
-  * @brief  writes @value in @MIIreg of physical addressed by @PHYaddr and
-  *         waits until operation is completed for max MII_WR_TOUT.
-  * @param      PHYaddr: address of physical
-  *             MIIreg: address of physical's register
-  *             value: value to write
-  * @retval none
-  */
-extern void hal_eth_hid_smi_write(uint8_t PHYaddr, uint8_t MIIreg, uint16_t value)
-{
-    U32 tout;
-    
-    ETH->MACMIIDR = value;
-    ETH->MACMIIAR = ((PHYaddr & 0x1F) << 11) | ((MIIreg & 0x1F) << 6) | MMAR_MW | MMAR_MB;
-    
-    /* Wait utill operation completed */
-    tout = 0;
-    for (tout = 0; tout < MII_WR_TOUT; tout++)
-    {
-        if ((ETH->MACMIIAR & MMAR_MB) == 0)
-        {
-            break;
-        }
-    }
-}
 
-// acemor-facenda-eth-stm32x: ok
-/**
-  * @brief  reads @MIIreg values of physical addressed by @PHYaddr and
-  *         waits until operation is completed for max MII_RD_TOUT.
-  * @param      PHYaddr: address of physical
-  *             MIIreg: address of physical's register
-  *             value: value to write
-  * @retval  @MIIreg values
-  */
-extern uint16_t hal_eth_hid_smi_read(uint8_t PHYaddr, uint8_t MIIreg)
-{
-    uint32_t tout;
-    
-    ETH->MACMIIAR = ((PHYaddr & 0x1F) << 11) | ((MIIreg & 0x1F) << 6) | MMAR_MB;
-    
-    /* Wait until operation completed */
-    tout = 0;
-    for (tout = 0; tout < MII_RD_TOUT; tout++)
-    {
-        if ((ETH->MACMIIAR & MMAR_MB) == 0)
-        {
-            break;
-        }
-    }
-    return(ETH->MACMIIDR & MMDR_MD);
-}
 
 
 // #if 0
@@ -611,7 +539,7 @@ static void s_hal_eth_rmii_init(void)
     hal_eth_hid_rmii_rx_init(); 
     hal_eth_hid_rmii_tx_init();    
     
-    hal_eth_hid_microcontrollerclockoutput_init();
+//    hal_eth_hid_microcontrollerclockoutput_init();
 
 //  remove gpio_conf()    
 //    s_hal_eth_GPIO_conf();
@@ -620,15 +548,69 @@ static void s_hal_eth_rmii_init(void)
     // cannot remove hal_eth_hid_rmii_refclock_init() from here. it is unclear if it can be used also inside the hal_brdcfg_eth__phy_start()
     hal_eth_hid_rmii_refclock_init();
     
+#if 0    
     hal_eth_hid_smi_init();
+#endif
 
-
+#if 0
     // software reset dma: wait until done
     ETH->DMABMR  |= DBMR_SR;
     while(ETH->DMABMR & DBMR_SR); 
+#endif    
+}
+
+static void s_hal_eth_mac_reset(void)
+{
+    // software reset of the mac: wait until done
+    // When this bit is set, the MAC DMA controller resets all MAC Subsystem internal registers
+    // and logic. It is cleared automatically after the reset operation has completed in all of the core
+    // clock domains. Read a 0 value in this bit before re-programming any register of the core.
+    ETH->DMABMR  |= 0x00000001;
+    while(ETH->DMABMR & 0x00000001); 
 }
 
 
+static void s_hal_eth_mac_init(const hal_eth_cfg_t *cfg)
+{
+    // reset mac register
+    s_hal_eth_mac_reset(); 
+    
+    // initialise mac control register
+    ETH->MACCR  = 0x00008000;       // clear
+    ETH->MACCR |= MCR_FES;          // config 100mbs 
+    ETH->MACCR |= MCR_DM;           // config full duplex mode
+
+    
+    /* MAC address filter register, accept multicast packets. */
+    ETH->MACFFR = MFFR_HPF | MFFR_PAM;  // config Hash or perfect address filter and pass all multicast(PAM)
+
+    /* Ethernet MAC flow control register */
+    ETH->MACFCR = MFCR_ZQPD;   //Zero-quanta pause disable
+    
+    /* Set the Ethernet MAC Address registers */
+    ETH->MACA0HR = ((U32)s_hal_mac[5] <<  8) | (U32)s_hal_mac[4];
+    ETH->MACA0LR = ((U32)s_hal_mac[3] << 24) | (U32)s_hal_mac[2] << 16 | ((U32)s_hal_mac[1] <<  8) | (U32)s_hal_mac[0];
+   
+   
+    /* Initialize Tx and Rx DMA Descriptors */
+    rx_descr_init ();
+    tx_descr_init ();
+    
+    /* Flush FIFO, start DMA Tx and Rx */
+    ETH->DMAOMR = DOMR_FTF | DOMR_ST | DOMR_SR;
+    
+    /* Enable receiver and transmiter */
+    ETH->MACCR |= MCR_TE | MCR_RE;
+    
+    /* Reset all interrupts */
+    ETH->DMASR  = 0xFFFFFFFF;
+    
+    /* Enable Rx and Tx interrupts. */
+    ETH->DMAIER = INT_NISE | INT_AISE | INT_RBUIE | INT_RIE;
+
+    // acemor on 31 oct 2011: added priority support for ETH_IRQn
+    hal_sys_irqn_priority_set(ETH_IRQn, cfg->priority);    
+}
 
 extern void hal_eth_hid_rmii_rx_init(void)
 {
@@ -761,6 +743,43 @@ extern void hal_eth_hid_smi_init(void)
     ETH->MACMIIAR   = 0x00000004; 
 #endif    
 }
+
+// reads the 16 bits of register REGaddr in the physical with address PHYaddr. both REGaddr and PHYaddr range is 0-31
+extern uint16_t hal_eth_hid_smi_read(uint8_t PHYaddr, uint8_t REGaddr)
+{
+    uint32_t tout;
+    
+    ETH->MACMIIAR = ((PHYaddr & 0x1F) << 11) | ((REGaddr & 0x1F) << 6) | MMAR_MB;
+    
+    // wait until operation is completed 
+    for(tout=0; tout<MII_RD_TOUT; tout++)
+    {
+        if(0 == (ETH->MACMIIAR & MMAR_MB))
+        {
+            break;
+        }
+    }
+    return(ETH->MACMIIDR & MMDR_MD);
+}
+
+// writes the 16 bits of value in register REGaddr in the physical with address PHYaddr. both REGaddr and PHYaddr range is 0-31
+extern void hal_eth_hid_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t value)
+{
+    uint32_t tout;
+    
+    ETH->MACMIIDR = value;
+    ETH->MACMIIAR = ((PHYaddr & 0x1F) << 11) | ((REGaddr & 0x1F) << 6) | MMAR_MW | MMAR_MB;
+    
+    // wait until operation is completed
+    for(tout=0; tout < MII_WR_TOUT; tout++)
+    {
+        if(0 == (ETH->MACMIIAR & MMAR_MB))
+        {
+            break;
+        }
+    }
+}
+
 
 
 extern void hal_eth_hid_rmii_refclock_init(void)

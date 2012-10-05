@@ -191,9 +191,9 @@
 
 
 #ifdef HAL_USE_SWITCH  
-    extern void hal_brdcfg_switch__MCO_config(void);
-    extern void hal_brdcfg_switch__reg_read_byI2C(uint8_t* pBuffer, uint16_t ReadAddr);
-    extern void hal_brdcfg_switch__reg_write_byI2C(uint8_t* pBuffer, uint16_t WriteAddr);
+//    extern void hal_brdcfg_switch__MCO_config(void);
+//    extern void hal_brdcfg_switch__reg_read_byI2C(uint8_t* pBuffer, uint16_t ReadAddr);
+//    extern void hal_brdcfg_switch__reg_write_byI2C(uint8_t* pBuffer, uint16_t WriteAddr);
 #endif//HAL_USE_SWITCH
 
 
