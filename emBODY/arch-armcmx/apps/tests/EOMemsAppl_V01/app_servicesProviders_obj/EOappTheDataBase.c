@@ -1215,7 +1215,7 @@ static eOresult_t s_appTheDB_nvsrefmaps_init(EOappTheDB *p)
 
 //strain
     size = eo_array_Capacity(p->snsrStrainList);
-    p->nvsrefMaps.mnvMap = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(void**), size);
+    p->nvsrefMaps.snsrStrainnvMap = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(void**), size);
       
     for(i=0; i<size; i++)
     {
@@ -1367,7 +1367,7 @@ static eOresult_t s_appTheDB_nvsrefmaps_snsrStrainmap_fill(EOappTheDB *p, eOsnsr
                                                (eOcfg_nvsEP_as_strainNumber_t)sId, 
                                                eo_appTheDB_hid_GetASstrainNVindex(snvindex));
             
-        res = eo_nvscfg_GetIndices(p->cfg.nvsCfg, eok_ipv4addr_localhost, p->cfg.mc_endpoint, nv_id, 
+        res = eo_nvscfg_GetIndices(p->cfg.nvsCfg, eok_ipv4addr_localhost, p->cfg.as_endpoint, nv_id, 
                                    &ipindex, &epindex, &idindex); 
         if(eores_OK != res)
         {
