@@ -604,13 +604,15 @@ static int s_canIcubProtoParser_parse_periodicMsg(unsigned char permsg_type, tCa
     {
         case ICUBPROTO_PERIODICCMD_EMSTO2FOC_DESIRED_CURRENT:
         {
-            if(canprotoparser_bid*2 > rxlen)
+            if((canprotoparser_bid*2) > rxlen)
             {
                 ICUBPROTO_PAYLOAD_ERROR_SET(txpayload, txlen, CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS);
                 return(0);
             }
              // Torque control references
-            CtrlReferences.qIqRef = rxpayload->w[canprotoparser_bid]; 
+            CtrlReferences.qIqRef = rxpayload->w[canprotoparser_bid-1];
+            // set reference value for toggling torque
+            TorqueTogglingReference = CtrlReferences.qIqRef;            
 #ifdef SYNC_2FOC_TO_EMS
             CanIcubProtoTrasmitterSendPeriodicData();          
 #endif   

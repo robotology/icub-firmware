@@ -107,7 +107,7 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
 
     if(txlen>0)
     {
-        txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBPROTO_CLASS_PERIODIC_MOTORBOARD, canprototransmitter_bid, ICUBPROTO_PERIODICCMD_CURRENT);
+        txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBPROTO_CLASS_PERIODIC_MOTORBOARD, canprototransmitter_bid, ICUBPROTO_PERIODICCMD_2FOC);
         ECANSend(txid, 8, &txpayload);
     }
 }
