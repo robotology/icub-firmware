@@ -94,7 +94,7 @@ extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_v
 extern void eo_emsController_SetVelRef(uint8_t joint, int32_t vel, int32_t avg_acc);
 extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq);
 
-extern int16_t* eo_emsController_PWM(void);
+extern /*int16_t*/ void eo_emsController_PWM(int16_t* pwm);
 
 // asynchronous
 extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_t vel, int32_t offset);
