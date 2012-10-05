@@ -8,7 +8,7 @@
 #include "asc.h"
 #include "ti1.h"
 #include "pid.h"
-#include "calibration.h"
+#include "calibration.h"   
 #include "trajectory.h"
 #include "can_interface.h"
 #include "serial_interface.h"
@@ -34,7 +34,7 @@
 byte	_board_ID = 16;	
 char    _additional_info [32];
 UInt8    mainLoopOVF=0;
-word    _build_number = 62;
+word    _build_number = 63;
 int     _countBoardStatus[2] ={0,0};
 Int16   _flash_version=0; 
 UInt8   BUS_OFF=false;
