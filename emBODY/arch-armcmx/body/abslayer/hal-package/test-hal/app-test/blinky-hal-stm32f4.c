@@ -26,6 +26,8 @@
  
 #include "hal.h"  
 
+#include "hal_brdcfg_modules.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -61,8 +63,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 static void myledsinit(void);
-static void myled00toggle(void);
+static void myled00toggle(void* p);
 static void myled01toggle(void* p);
+static void myled02toggle(void* p);
 static void myonsystick(void);
 
 static void test_flash(void);
@@ -100,6 +103,8 @@ int main(void)
     static hal_arch_arm_uniqueid64_t uniqueid = 0;
     
     test_eeprom();
+    
+    test_flash();
 
     uniqueid = hal_arch_arm_uniqueid64_get();
     uniqueid = uniqueid;
@@ -127,13 +132,14 @@ int main(void)
     res = hal_sys_systick_sethandler(myonsystick, 1000, hal_int_priority00);
     res =  res;
     
-   
     
-    //test_eeprom();
-    
-    test_flash();
-    
-    test_timer(200);    
+    test_timer(200); 
+
+    for(;;)
+    {
+        hal_sys_delay(500*1000);
+        myled02toggle(NULL);       
+    }
     
     for(;;);   
 }
@@ -154,12 +160,13 @@ int main(void)
 
 static void test_flash(void)
 {
+#ifdef HAL_USE_FLASH
     uint32_t address = 0x08010000; //+64*1024;
     uint8_t dataread[64] = {0};
     uint8_t datawrite[64] = {0x1};
     hal_result_t res;
 
-    return;
+    //return;
 
     res = hal_flash_unlock();
     res = res;
@@ -182,33 +189,21 @@ static void test_flash(void)
     res = hal_flash_read(address-4, 64, dataread);
     res = res;    
     
-    
+#endif    
 }
 
-#define TEST_STM32EE
-#undef TEST_ORIGINALEE
-
-#if defined(TEST_STM32EE)
-#include "utils/stm32ee.h"
-#include "utils/stm32i2c.h"
-#endif
-
-#if defined(TEST_ORIGINALEE)
-#include "stm32_utility/mcbstm32f400_eval_i2c_ee.h"
-#endif
-
-#include "hal_i2c4hal.h"
+//#include "hal_i2c4hal.h"
 
 static void test_eeprom(void)
 {
-#if 1
+#ifdef HAL_USE_EEPROM
     static uint8_t data[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
     
     static uint8_t tmp[64] = {0};
     
     hal_result_t res;
     
-    hal_i2c4hal_init(hal_i2c_port1, NULL);
+    //hal_i2c4hal_init(hal_i2c_port1, NULL);
 
     res = hal_eeprom_init(hal_eeprom_i2c_01, NULL);
     res =  res;
@@ -221,234 +216,22 @@ static void test_eeprom(void)
     res = hal_eeprom_erase(hal_eeprom_i2c_01, 0, 256);
     res =  res;
     
-    res = hal_eeprom_write(hal_eeprom_i2c_01, 0, 8, data);
-    res =  res;
-    
     res = hal_eeprom_read(hal_eeprom_i2c_01, 0, 12, tmp);
+    res =  res;    
+    
+    res = hal_eeprom_write(hal_eeprom_i2c_01, 0, 12, data);
     res =  res;
-#elif defined(TEST_STM32EE)
-
-#if 1
-    stm32i2c_cfg_t i2ccfg =
-    {
-        .speed              = 4,
-        .scl                =
-        {
-            .port               = stm32i2c_gpio_portB,
-            .pin                = stm32i2c_gpio_pin8
-        }, 
-        .sda                =
-        {
-            .port               = stm32i2c_gpio_portB,
-            .pin                = stm32i2c_gpio_pin9
-        }                
-    };
     
-    stm32ee_cfg_t cfg = 
-    {
-        .devcfg             =
-        {
-            .device             = stm32ee_device_st_m24lr64,
-            .i2cport            = 1, 
-            .hwaddra2a1a0       = 0,
-            .wpval              = 1,//255,
-            .wppin              =
-            {
-                .port               = stm32ee_gpio_portH,//stm32ee_gpio_portNONE,
-                .pin                = stm32ee_gpio_pin7//stm32ee_gpio_pinNONE
-            }, 
-            .functionontimeout  = NULL                        
-        },
-
-        .i2ccfg             =
-        {
-            .i2cinit            = (stm32ee_int8_fp_uint8_voidp_t)stm32i2c_init,
-            .i2cdeinit          = (stm32ee_int8_fp_uint8_voidp_t)stm32i2c_deinit,
-            .i2cpar             = &i2ccfg
-        },
-        .dmacfg             =
-        {
-            .dontuse            = 0
-        }
-
-    };
-#else
-    
-    stm32ee_cfg_t cfg = 
-    {
-        .devcfg             =
-        {
-            .device             = stm32ee_device_st_m24lr64,
-            .i2cport            = 1, 
-            .hwaddra2a1a0       = 0,
-            .wpval              = 255,
-            .wppin              =
-            {
-                .port               = stm32ee_gpio_portNONE,
-                .pin                = stm32ee_gpio_pinNONE
-            }, 
-            .functionontimeout  = NULL                        
-        },
-
-        .i2ccfg             =
-        {
-            .i2cinit            = NULL,
-            .i2cdeinit          = NULL,
-            .i2cpar             = NULL
-        },
-        .dmacfg             =
-        {
-            .dontuse            = 0
-        }
-
-    }; 
-    
-    stm32i2c_cfg_t i2ccfg =
-    {
-        .speed              = 4,
-        .scl                =
-        {
-            .port               = stm32i2c_gpio_portB,
-            .pin                = stm32i2c_gpio_pin8
-        }, 
-        .sda                =
-        {
-            .port               = stm32i2c_gpio_portB,
-            .pin                = stm32i2c_gpio_pin9
-        }                
-    };
-    
-    stm32i2c_init(1, &i2ccfg);
-    
-
-    
-#endif
-    
-    stm32ee_result_t res;
-    uint32_t address = 0;
-    uint32_t size = 64;
-    static uint8_t buffer[128] = {0};
-    uint32_t writtenbytes = 0;
-    uint32_t readbytes = 0;
-    
-    buffer[0] = buffer[1] = 0;
-
-//    res = stm32ee_deinit(&cfg);
-    res =  res;
-
-    
-
-    res = stm32ee_init(&cfg);
-    
-    res = stm32ee_deinit(&cfg);
-    
-    res = stm32ee_init(&cfg);
-    
-    memset(buffer, 0, 64);
-    res = stm32ee_read(address, size, buffer, &readbytes); 
-    readbytes = readbytes;
-    res = res;       
-    if(0 == buffer[0])
-    {
-        for(;;);
-    }
-    
-    
-    memset(buffer, 0xa1, 64);
-    res = stm32ee_write(address, size, buffer, &writtenbytes);    
-    writtenbytes = writtenbytes;
-    res = res;
-    if(0 == buffer[0])
-    {
-        for(;;);
-    }
-
-    
-    memset(buffer, 0, 64);
-    res = stm32ee_read(address, 96, buffer, &readbytes); 
-    readbytes = readbytes;
-    res = res;
-    if(0 == buffer[0])
-    {
-        for(;;);
-    }
-
-
-#elif defined(TEST_ORIGINALEE)
-    uint32_t res = 0;
-    uint8_t pBuffer[64] = {0};
-    uint16_t ReadAddr = 32;
-    volatile uint16_t NumByteToRead = 16;
-    uint16_t NumByteToWrite = 16;
-    uint8_t writebuffer[32] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
-    //uint8_t writebuffer[32] = {0};
-    uint16_t address = 32;
-    const uint8_t offset = 0;
-    const uint8_t size = 16;
-    const uint8_t readaddroffset = 0;
-    uint8_t off = 0;
-
-//    sEE_DeInit();    
-    sEE_Init();
-    
-    NumByteToRead =  size;
-    res = sEE_ReadBuffer(pBuffer, ReadAddr+readaddroffset, (uint16_t*)&NumByteToRead);
-
-    for(;NumByteToRead>0;);
-        
-    off = off;
-
-#if 1
-    NumByteToWrite = size;
-    sEE_WriteBuffer(&writebuffer[0+off], address, NumByteToWrite);
-#else
-    NumByteToWrite = 4;
-    sEE_WriteBuffer(&writebuffer[0+off], address, NumByteToWrite);   
-    NumByteToWrite = 4;
-    sEE_WriteBuffer(&writebuffer[4+off], address+4, NumByteToWrite);
-    NumByteToWrite = 4;
-    sEE_WriteBuffer(&writebuffer[8+off], address+8, NumByteToWrite); 
-    NumByteToWrite = 4;
-    sEE_WriteBuffer(&writebuffer[12+off], address+12, NumByteToWrite);    
-    memset(pBuffer, 0, sizeof(pBuffer));    
-#endif
-
-#if 1
-    NumByteToRead =  size;
-    res = sEE_ReadBuffer(pBuffer, ReadAddr+readaddroffset, (uint16_t*)&NumByteToRead);
-
-    for(;NumByteToRead>0;);
-#else
-
-    NumByteToRead =  4;
-    res = sEE_ReadBuffer(&pBuffer[0], ReadAddr+readaddroffset+0, (uint16_t*)&NumByteToRead);
-
-    for(;NumByteToRead>0;);
-
-    NumByteToRead =  4;
-    res = sEE_ReadBuffer(&pBuffer[4], ReadAddr+readaddroffset+4, (uint16_t*)&NumByteToRead);
-
-    for(;NumByteToRead>0;);
-    
-    NumByteToRead =  4;
-    res = sEE_ReadBuffer(&pBuffer[8], ReadAddr+readaddroffset+8, (uint16_t*)&NumByteToRead);
-
-    for(;NumByteToRead>0;);    
-
-    NumByteToRead =  4;
-    res = sEE_ReadBuffer(&pBuffer[12], ReadAddr+readaddroffset+12, (uint16_t*)&NumByteToRead);
-
-    for(;NumByteToRead>0;);
-#endif
+    res = hal_eeprom_read(hal_eeprom_i2c_01, 0, 16, tmp);
     res =  res;
 
 #endif
-
 }
 
 
 static void myledsinit(void)
 {
+#ifdef HAL_USE_LED 
     hal_result_t res;
     
     res = hal_led_init(hal_led0, NULL);
@@ -456,24 +239,47 @@ static void myledsinit(void)
     
     res = hal_led_init(hal_led1, NULL);
     res =  res;
+    
+    res = hal_led_init(hal_led2, NULL);
+    res =  res;
+    
+//    res = hal_led_off(hal_led0);
+//    res =  res;    
+    
+//    res = hal_led_off(hal_led1);
+//    res =  res;
+#endif    
 }
 
-static void myled00toggle(void)
+static void myled00toggle(void* p)
 {
+#ifdef HAL_USE_LED 
     hal_result_t res;
     
     res = hal_led_toggle(hal_led0);
     res =  res;
+#endif    
 }
 
 static void myled01toggle(void* p)
 {
+#ifdef HAL_USE_LED 
     hal_result_t res;
     
     res = hal_led_toggle(hal_led1);
     res =  res;
+#endif    
 }
 
+static void myled02toggle(void* p)
+{
+#ifdef HAL_USE_LED 
+    hal_result_t res;
+    
+    res = hal_led_toggle(hal_led2);
+    res =  res;
+#endif    
+}
 static void myonsystick(void)
 {
     static uint32_t count = 0;
@@ -484,7 +290,7 @@ static void myonsystick(void)
     if(max == count)
     {
         count = 0;
-        myled00toggle();
+        myled00toggle(NULL);
     }
 }
 
@@ -492,6 +298,7 @@ static void myonsystick(void)
 
 static void test_timer(uint16_t microsecs)
 {
+#ifdef HAL_USE_TIMER
     hal_timer_cfg_t cfgx = 
     {
         .prescaler          = hal_timer_prescalerAUTO,         
@@ -505,7 +312,7 @@ static void test_timer(uint16_t microsecs)
 
     hal_timer_init(hal_timer2, &cfgx, NULL);
     hal_timer_start(hal_timer2);
-    
+#endif    
 }
 
 

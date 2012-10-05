@@ -456,7 +456,7 @@ static void s_test_hal_can(void)
     my_can_cfg_default.priorx             = hal_int_priority00;
     my_can_cfg_default.priotx             = hal_int_priority00;
     my_can_cfg_default.callback_on_rx     = s_can_callbkb_onrec;
-    my_can_cfg_default.arg                = NULL;
+    my_can_cfg_default.arg_cb_rx          = NULL;
 
 
     //it is necessary initilize canframe fileds!!
