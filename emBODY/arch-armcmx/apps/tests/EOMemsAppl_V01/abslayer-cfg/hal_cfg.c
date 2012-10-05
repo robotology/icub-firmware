@@ -86,12 +86,18 @@ extern const hal_cfg_t *hal_cfgMINE = &hal_cfg;
 static void s_hal_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char * errormsg)
 {
     char str[80];
+    hal_led_cfg_t cfg = {.dummy=0};
+
     errorcode = errorcode;
     if(NULL != errormsg)
     {
         sprintf(str, "fatal error #%d: %s\n", errorcode, errormsg);
         hal_trace_puts(str);
     }
+    
+    hal_led_init(hal_led3, &cfg);
+
+    hal_led_on(hal_led3);
 
     for(;;);
 

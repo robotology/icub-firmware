@@ -85,13 +85,26 @@
 extern void eo_cfg_sm_EMSappl_hid_on_trans_CFG_EVgo2run(EOsm *s)
 {
     eo_appCanSP_SetRunMode(eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle()), eo_appCanSP_runMode__onDemand);
+    eo_emsapplBody_SetLed4Runmode(eo_emsapplBody_GetHandle());
 }
 
 
 extern void eo_cfg_sm_EMSappl_hid_on_trans_RUN_EVgo2cfg(EOsm *s)
 {
     eo_appCanSP_SetRunMode(eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle()), eo_appCanSP_runMode__onEvent);
+    eo_emsapplBody_SetLed4Configmode(eo_emsapplBody_GetHandle());
 }
+
+extern void eo_cfg_sm_EMSappl_hid_on_trans_RUN_EVgo2err(EOsm *s)
+{
+    eo_emsapplBody_SetLed4Errormode(eo_emsapplBody_GetHandle());
+}
+
+extern void eo_cfg_sm_EMSappl_hid_on_trans_CFG_EVgo2err(EOsm *s)
+{
+    eo_emsapplBody_SetLed4Errormode(eo_emsapplBody_GetHandle());
+}
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

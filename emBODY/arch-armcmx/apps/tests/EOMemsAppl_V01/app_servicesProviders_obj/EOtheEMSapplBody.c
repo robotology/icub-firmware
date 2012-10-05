@@ -34,6 +34,9 @@
 #include "stdlib.h"
 #include "string.h"
 
+//hal
+#include "hal.h"
+
 #include "eOcommon.h"
 #include "EOtheErrorManager.h"
 #include "EOtheBOARDtransceiver_hid.h" //==>in order to get nvcfg
@@ -69,7 +72,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-
+#define applBody_ledred     hal_led0
+#define applBody_ledgreen   hal_led1 
+#define applBody_ledyellow  hal_led2
+#define applBody_orange     hal_led3
 
 
 
@@ -88,7 +94,8 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 static void s_eo_emsapplBody_objs_init(EOtheEMSapplBody *p);
-
+static void s_eo_emsapplBody_leds_init(EOtheEMSapplBody *p);
+static void s_eo_emsapplBody_ledgreenStart(EOtheEMSapplBody *p);
 static void s_eo_emsapplBody_theDataBase_init(EOtheEMSapplBody *p);
 static void s_eo_emsapplBody_canServicesProvider_init(EOtheEMSapplBody *p);
 static void s_eo_emsapplBody_encodersReader_init(EOtheEMSapplBody *p);
@@ -128,6 +135,8 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOtheEMSappBody_cfg_t *
     
     retptr->appRunMode = applrunMode__default;
     
+    s_eo_emsapplBody_leds_init(retptr);
+    
     s_eo_emsapplBody_objs_init(retptr); //if a obj init doesn't success, it calls errorManager with fatal error
     eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, "obj-body inited OK");
     
@@ -138,6 +147,8 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOtheEMSappBody_cfg_t *
     eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in getting run mode");
     
     retptr->st = eo_emsApplBody_st__inited;
+    
+    s_eo_emsapplBody_ledgreenStart(retptr);
     
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, s_eobj_ownname, "body appl init OK");
     return(retptr);
@@ -207,6 +218,39 @@ extern EOappMeasConv* eo_emsapplBody_GetMeasuresConverterHandle(EOtheEMSapplBody
     return(p->bodyobjs.appMeasConv);
 
 }
+
+extern void eo_emsapplBody_SetLed4Runmode(EOtheEMSapplBody *p)
+{
+    if(NULL == p)
+    {
+        return;
+    }
+   hal_led_off(applBody_ledgreen);
+   hal_led_on(applBody_ledyellow); 
+}
+
+extern void eo_emsapplBody_SetLed4Errormode(EOtheEMSapplBody *p)
+{
+    if(NULL == p)
+    {
+        return;
+    }
+   hal_led_off(applBody_ledgreen);
+   hal_led_off(applBody_ledyellow); 
+   hal_led_on(applBody_ledred);
+}
+
+extern void eo_emsapplBody_SetLed4Configmode(EOtheEMSapplBody *p)
+{
+    if(NULL == p)
+    {
+        return;
+    }
+   hal_led_on(applBody_ledgreen);
+   hal_led_off(applBody_ledyellow); 
+   hal_led_off(applBody_ledred);
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -216,6 +260,23 @@ extern EOappMeasConv* eo_emsapplBody_GetMeasuresConverterHandle(EOtheEMSapplBody
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
+static void s_eo_emsapplBody_leds_init(EOtheEMSapplBody *p)
+{
+    hal_led_cfg_t cfg = {.dummy=0};
+
+//    p->ledtimer = eo_timer_New();
+    
+    hal_led_init(hal_led0, &cfg);
+    hal_led_off(hal_led0);
+    hal_led_init(hal_led1, &cfg); //led green
+    hal_led_off(hal_led1);
+    hal_led_init(hal_led2, &cfg);
+    hal_led_off(hal_led2);
+    hal_led_init(hal_led3, &cfg);
+    hal_led_off(hal_led3);
+
+}
+
 static void s_eo_emsapplBody_objs_init(EOtheEMSapplBody *p)
 {
 
@@ -474,6 +535,16 @@ static eOresult_t s_eo_emsapplBody_getRunMode(EOtheEMSapplBody *p)
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "applrunmode is not valid");
     return(eores_NOK_generic);
 }
+
+static void s_eo_emsapplBody_ledgreenStart(EOtheEMSapplBody *p)
+{
+
+//extern eOresult_t eo_timer_Start(p->ledtimer, eok_abstimeNOW, 500000, eo_tmrmode_FOREVER, EOaction *action);
+
+  //  p->ledtimer = 
+    hal_led_on(applBody_ledgreen);
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
