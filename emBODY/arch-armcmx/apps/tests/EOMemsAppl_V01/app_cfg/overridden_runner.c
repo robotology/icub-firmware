@@ -336,35 +336,27 @@ static void s_eom_emsrunner_hid_readMc4andMais(EOtheEMSapplBody *p)
 
 static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size)
 {
-    eOresult_t err;
-    eOresult_t res = eores_OK;
+    eOresult_t 				err;
+    eOresult_t 				res = eores_OK;
+		eOmeas_current_t  value;
     eOicubCanProto_msgCommand_t msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__SET_DISIRED_CURRENT
     };
-    eOmc_setpoint_t     mySetPoint_current = 
-    {
-        EO_INIT(.type)       eomc_setpoint_current,
-        EO_INIT(.to)
-        {
-            EO_INIT(.current)
-            {
-                EO_INIT(.value)     0
-            }   
-        }
-    };
+		
+
     uint16_t numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
 
 
     for (uint8_t jid = 0; jid <numofjoint; ++jid)
     {
-        mySetPoint_current.to.current.value = pwmList[jid];
+        value = pwmList[jid];
     
         /*Since in run mode the frame are sent on demnad...here i can punt in tx queue frame to send.
         they will be sent by transmitter */
 
-        err = eo_appCanSP_SendCmd2Joint(eo_emsapplBody_GetCanServiceHandle(p), jid, msgCmd, (void*)&mySetPoint_current);
+        err = eo_appCanSP_SendCmd2Joint(eo_emsapplBody_GetCanServiceHandle(p), jid, msgCmd, (void*)&value);
         
         if (err != eores_OK)
         {
@@ -382,7 +374,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
     //eOresult_t          res;
     EOtheEMSapplBody    *emsappbody_ptr = eo_emsapplBody_GetHandle();
     uint32_t            encvalue[4] = {ENC_INVALID, ENC_INVALID, ENC_INVALID, ENC_INVALID};
-    int16_t             *pwm;
+    int16_t             pwm[4];
 
     uint16_t numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
 
@@ -401,7 +393,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
     }
         
     /* 2) pid calc */
-    pwm = eo_emsController_PWM();
+    eo_emsController_PWM(pwm);
      
 
     /* 3) prepare and punt in rx queue new setpoint */
