@@ -27,6 +27,7 @@
 #include "hal.h"  
 #include "ipal.h"  
 
+#include "hal_switch.h"
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -80,7 +81,7 @@ static void s_udp_init(void);
 static void s_udp_transmit(void);
 static void s_udp_onreception(void *arg, ipal_udpsocket_t *skt, ipal_packet_t *pkt, ipal_ipv4addr_t adr, ipal_port_t por);
 
-
+static void test_eeprom(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -138,12 +139,22 @@ int main(void)
     res = hal_sys_systick_sethandler(myonsystick, 1000, hal_int_priority00);
     res =  res;
     
+   hal_switch_init(NULL);
+   hal_switch_start();
+//    for(;;);
+    
+ 
+
+    test_eeprom();    
+    
     
     ipal_base_memory_getsize(ipal_cfgMINE, &size04aligned);
     if(0 != size04aligned)
     {
         data32aligned = (uint32_t*)calloc(size04aligned/4, sizeof(uint32_t));   
     }
+    
+
 
     ipal_base_initialise(ipal_cfgMINE, data32aligned);
     ipal_sys_start();  
@@ -233,6 +244,11 @@ static void myonsystick(void)
     if(0 == (msTicks%100))
     {
         s_tick = 1;
+    }
+    
+    if(10000 == msTicks)
+    {
+//        hal_sys_systemreset();       
     }
 }
 
@@ -346,6 +362,41 @@ static void s_udp_onreception(void *arg, ipal_udpsocket_t *skt, ipal_packet_t *p
     adr = adr;
     por = por;
 
+}
+
+
+static void test_eeprom(void)
+{
+//#ifdef HAL_USE_EEPROM
+    static uint8_t data[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
+    
+    static uint8_t tmp[64] = {0};
+    
+    hal_result_t res;
+    
+    //hal_i2c4hal_init(hal_i2c_port1, NULL);
+
+    res = hal_eeprom_init(hal_eeprom_i2c_01, NULL);
+    res =  res;
+    
+    res = hal_eeprom_read(hal_eeprom_i2c_01, 0, 12, tmp);
+    res =  res;  
+    
+    //return;   
+    
+    res = hal_eeprom_erase(hal_eeprom_i2c_01, 0, 256);
+    res =  res;
+    
+    res = hal_eeprom_read(hal_eeprom_i2c_01, 0, 12, tmp);
+    res =  res;    
+    
+    res = hal_eeprom_write(hal_eeprom_i2c_01, 0, 12, data);
+    res =  res;
+    
+    res = hal_eeprom_read(hal_eeprom_i2c_01, 0, 16, tmp);
+    res =  res;
+
+//#endif
 }
 
 
