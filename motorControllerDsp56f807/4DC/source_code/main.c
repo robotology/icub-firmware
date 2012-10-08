@@ -31,7 +31,7 @@
 	
 byte	_board_ID = 15;	
 char    _additional_info [32];
-byte    _build_number = 46;
+byte    _build_number = 47;
 byte    _my_can_protocol_major = 1;
 byte    _my_can_protocol_minor = 1;
 bool    _can_protocol_ack = false;
@@ -97,8 +97,8 @@ Int16 _version = 0x0120;
 Int16 _version = 0x0121;
 #elif VERSION == 0x0128
 Int16 _version = 0x0128;
-#elif VERSION == 0x0129
-Int16 _version = 0x0129;
+#elif VERSION == 0x0219
+Int16 _version = 0x0219;
 #elif VERSION == 0x0130
 Int16 _version = 0x0130;
 #elif VERSION == 0x0125
@@ -213,7 +213,7 @@ void main(void)
     init_pwm			  ();	 
     init_faults           (true,true,true);	 
     init_position_encoder ();
-   	#if (VERSION==0x0129) || (VERSION==0x0215)		
+   	#if (VERSION==0x0219) || (VERSION==0x0215)		
 
 	init_position_abs_ssi();
 
@@ -413,7 +413,7 @@ void main(void)
 		_position[3]= _adjustment[3]; 					
 #endif
 
-#if VERSION == 0x0129
+#if VERSION == 0x0219
 	    _position[0]= get_position_encoder(0);	
 		_position[1]= get_position_abs_ssi(AEA6); 
 		_position[2]= get_position_abs_ssi(AEA5); 
@@ -568,7 +568,7 @@ void main(void)
 #endif 
 
 		/*differential controls*/
-#if VERSION == 0x0129 
+#if VERSION == 0x0219 
 	/*  Wrist Differential coupling 
 		|Me1| |  1    -1 |  |Je1|
 		|Me2|=| -1     0 |* |Je2|    */
@@ -835,7 +835,7 @@ void decouple_positions(void)
 #elif VERSION == 0x0119
 		//_position[1] = _position[1];		//omitted
 		_position[2] = _position[1] + _position[2];		
-#elif VERSION == 0x0129
+#elif VERSION == 0x0219
 		//_position[1] = _position[1];		//omitted
 		//_position[2] = _position[2];		//omitted
 #endif

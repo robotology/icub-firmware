@@ -112,7 +112,7 @@
 			} \
 		} \
 	}
-#elif (VERSION == 0x0129) 
+#elif (VERSION == 0x0219) 
 #define CAN_CONTROLLER_RUN_HANDLER(x) \
 	{ \
 		if ((axis>0) && (axis<3))\
@@ -248,7 +248,7 @@
 			can_printf("calib failed 0&1"); \
 		} \
 	}
-#elif VERSION == 0x0129 
+#elif VERSION == 0x0219 
 	#define CAN_ENABLE_PWM_PAD_HANDLER(x) \
 	{ \
 		if (_can_protocol_ack == false) \
@@ -363,7 +363,7 @@
 		_general_board_error = ERROR_NONE; \
 		can_printf("PWM DIS COUPLED:0 & 1");\
 	}
-#elif VERSION == 0x0129
+#elif VERSION == 0x0219
 	#define CAN_DISABLE_PWM_PAD_HANDLER(x) \
 	{ \
 		if ((axis>0) && (axis<3))\
@@ -848,10 +848,10 @@
 { \
 	PREPARE_HEADER; \
 		CAN_LEN = 5; \
-		CAN_DATA[1] = BYTE_4(_set_point[axis]); \
-		CAN_DATA[2] = BYTE_3(_set_point[axis]); \
-		CAN_DATA[3] = BYTE_2(_set_point[axis]); \
-		CAN_DATA[4] = BYTE_1(_set_point[axis]); \
+		CAN_DATA[1] = BYTE_4(_desired[axis]); \
+		CAN_DATA[2] = BYTE_3(_desired[axis]); \
+		CAN_DATA[3] = BYTE_2(_desired[axis]); \
+		CAN_DATA[4] = BYTE_1(_desired[axis]); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
 		_general_board_error = ERROR_NONE; \
 }

@@ -540,9 +540,9 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		}	
 	}
 /********
- *0x0129*
+ *0x0219*
  ********/	
-#elif VERSION ==0x0129
+#elif VERSION ==0x0219
 
 	if ((type==CALIB_HARD_STOPS) && (channel==0))
 	{

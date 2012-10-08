@@ -317,7 +317,7 @@ Int32 compute_pwm(byte j)
 		read_force_data (1, WDT_JNT_STRAIN_11,0); //wrist pitch disabled
 		read_force_data (2, WDT_JNT_STRAIN_11,1); //wrist yaw   disabled
 		read_force_data (3, -1               ,0); //fingers disabled
-#elif   VERSION == 0x0129
+#elif   VERSION == 0x0219
     	//armV2
     	read_force_data (0, WDT_JNT_STRAIN_12,4); //wrist pronosupination
 		read_force_data (1, WDT_JNT_STRAIN_11,0); //@@@TODO differential 1 for icubV2

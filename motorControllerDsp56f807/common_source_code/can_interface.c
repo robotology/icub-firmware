@@ -225,7 +225,8 @@ byte can_interface (void)
 			else
 #endif
 
-#if VERSION == 0x0119 || VERSION == 0x0150 || VERSION == 0x0151 || VERSION == 0x0152 || VERSION == 0x0154 || VERSION == 0x0157 || VERSION == 0x0140 || VERSION == 0x0147 || VERSION==0x0250 || VERSION == 0x0251 || VERSION==0x0257 || VERSION==0x0252 || VERSION==0x0254  
+#if VERSION == 0x0119 || VERSION == 0x0150 || VERSION == 0x0151 || VERSION == 0x0152 || VERSION == 0x0154 || VERSION == 0x0157 || VERSION == 0x0140 || VERSION == 0x0147 || \
+    VERSION == 0x0219 || VERSION == 0x0250 || VERSION == 0x0251 || VERSION == 0x0252 || VERSION == 0x0254 || VERSION == 0x0257 
 			if (_canmsg.CAN_ID_class == CLASS_PERIODIC_SENS)
 			{
 				if 		(_canmsg.CAN_ID_src==CAN_ID_JNT_STRAIN_11)  strain_num=WDT_JNT_STRAIN_11;
@@ -1321,7 +1322,7 @@ void set_can_masks()
 			create_F_M(&filter1, &mask1,CLASS_POLLING_DSP,0xFF, _board_ID, CLASS_PERIODIC_SENS, 0xFF, 0xFF);   
 			create_F_M(&filter2, &mask2,CLASS_CANLOADER,  0x00, 0xFF, 	   CLASS_PERIODIC_DSP, 	1, 0xFF);  		
 		}			
-	#elif (VERSION == 0x0119 || VERSION == 0x0121 || VERSION == 0x0128 || VERSION == 0x0130 || VERSION == 0x0228 || VERSION == 0x0230)
+	#elif (VERSION == 0x0119 || VERSION == 0x0219 || VERSION == 0x0121 || VERSION == 0x0128 || VERSION == 0x0130 || VERSION == 0x0228 || VERSION == 0x0230)
 		{
 			create_F_M(&filter1, &mask1,CLASS_POLLING_DSP,0xFF, _board_ID  , CLASS_PERIODIC_SENS, 0xFF, 0xFF);   
 			create_F_M(&filter2, &mask2,CLASS_POLLING_DSP,0xFF, _board_ID+1, CLASS_CANLOADER,     0x00, 0xFF);  
