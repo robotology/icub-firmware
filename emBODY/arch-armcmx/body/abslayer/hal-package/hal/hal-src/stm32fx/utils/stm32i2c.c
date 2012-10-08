@@ -117,6 +117,8 @@ static void s_stm32i2c_i2c_enable(void);
 static void s_stm32i2c_i2c_disable(void);
 static void s_stm32i2c_i2c_gpio_deinit(void);
 
+//static stm32i2c_result_t s_stm32i2c_i2c_waitdevicestandbystate(uint8_t port, uint8_t devaddr);
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -346,6 +348,328 @@ extern stm32i2c_result_t stm32i2c_deinit(uint8_t port, const stm32i2c_cfg_t *cfg
 
 
 
+
+extern stm32i2c_result_t stm32i2c_read(uint8_t port, uint8_t devaddr, stm32i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
+{
+    stm32i2c_result_t res = stm32i2c_res_NOK;
+    uint8_t reg1byteadr = 0;
+
+    if((0 == port) || (port > s_stm32i2c_maxports))
+    {
+        return(stm32i2c_res_NOK);
+    }
+
+   
+    if((0 == regaddr.numofbytes) || (regaddr.numofbytes > 3))
+    {
+        return(stm32i2c_res_NOK);
+    } 
+
+    
+    I2C_TypeDef* i2cx = s_stm32i2c_i2cx_port[port-1];
+    
+    
+    // wait until the bus is not busy anymore 
+    while(I2C_GetFlagStatus(i2cx, I2C_FLAG_BUSY))
+    {
+    }
+    
+    // send START condition
+    I2C_GenerateSTART(i2cx, ENABLE);
+ 
+    // test on ev5
+    while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_MODE_SELECT))
+    {
+    }
+    
+    // send address of device
+    I2C_Send7bitAddress(i2cx, devaddr, I2C_Direction_Transmitter);
+    
+    // test on ev6
+    while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))
+    {
+    }
+    
+    
+    // send address of register to read inside the device
+    if(1 == regaddr.numofbytes)
+    {
+        reg1byteadr = regaddr.bytes.one;
+        I2C_SendData(i2cx, reg1byteadr);           
+        // test on ev8 and clear it
+        while(I2C_GetFlagStatus(i2cx, I2C_FLAG_BTF) == RESET)
+        {
+        }               
+    }
+    else if(2 == regaddr.numofbytes)
+    {   
+        reg1byteadr = regaddr.bytes.two & 0xFF00;               // msb first
+        I2C_SendData(i2cx, reg1byteadr);           
+        // test on ev8 and clear it
+        while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
+        {
+        }  
+        
+        reg1byteadr = regaddr.bytes.two & 0x00FF;               // then lsb
+        I2C_SendData(i2cx, reg1byteadr);           
+        // test on ev8 and clear it
+        while(I2C_GetFlagStatus(i2cx, I2C_FLAG_BTF) == RESET)
+        {
+        }               
+    }
+    
+    // send START condition a second time 
+    I2C_GenerateSTART(i2cx, ENABLE);
+ 
+    // test on ev5
+    while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_MODE_SELECT))
+    {
+    }
+
+   
+    // send address for read
+    I2C_Send7bitAddress(i2cx, devaddr, I2C_Direction_Receiver);
+    
+    #warning --> w/ I2C_GetFlagStatus the eeprom does not work. 
+    while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED))
+    {
+    }
+    // wait on addr flag to be set
+    //while(I2C_GetFlagStatus(i2cx, I2C_FLAG_ADDR) == RESET)
+    //{
+    //}    
+    
+    
+    while(size)
+    {
+    
+        if(1 == size)
+        {
+            // disable acknowledgement
+            I2C_AcknowledgeConfig(i2cx, DISABLE);   
+
+            // clear addr by reading sr1 and then sr2
+            (void)(i2cx)->SR1;
+            (void)(i2cx)->SR2;
+            
+            // send stop condition
+            I2C_GenerateSTOP(i2cx, ENABLE);
+        }
+        
+        // wait for the byte to be received
+        while(I2C_GetFlagStatus(i2cx, I2C_FLAG_RXNE) == RESET)
+        {
+        }
+        
+        // read received byte
+        *data = I2C_ReceiveData(i2cx);
+        
+        // increment received data and decrement the size (bytes to be received yet)
+        data++;
+        size--;          
+    }
+    
+    // wait to make sure that the stop bit has been cleared
+    while((i2cx)->CR1 & I2C_CR1_STOP)
+    {
+    }  
+
+    // re-enable acknowledgement to be ready for another reception 
+    I2C_AcknowledgeConfig(i2cx, ENABLE);    
+
+    
+    return(stm32i2c_res_OK);
+}
+
+
+
+extern stm32i2c_result_t stm32i2c_write(uint8_t port, uint8_t devaddr, stm32i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
+{
+    stm32i2c_result_t res = stm32i2c_res_NOK;
+    uint8_t reg1byteadr = 0;
+
+    if((0 == port) || (port > s_stm32i2c_maxports))
+    {
+        return(stm32i2c_res_NOK);
+    }
+
+   
+    if((0 == regaddr.numofbytes) || (regaddr.numofbytes > 3))
+    {
+        return(stm32i2c_res_NOK);
+    } 
+
+    
+    I2C_TypeDef* i2cx = s_stm32i2c_i2cx_port[port-1];
+
+       
+ ///////////////////////////////////////   
+    
+    
+    
+    // wait until the bus is not busy anymore 
+    while(I2C_GetFlagStatus(i2cx, I2C_FLAG_BUSY))
+    {
+    }
+
+    // send START condition
+    I2C_GenerateSTART(i2cx, ENABLE);
+    
+    // test on ev5
+    while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_MODE_SELECT))
+    {
+    } 
+
+    // send address of device
+    I2C_Send7bitAddress(i2cx, devaddr, I2C_Direction_Transmitter);
+    
+    // test on ev6
+    while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))
+    {
+    }    
+
+    // send address of register inside the device
+    if(1 == regaddr.numofbytes)
+    {
+        reg1byteadr = regaddr.bytes.one;
+        I2C_SendData(i2cx, reg1byteadr);    
+     
+        // test on ev8
+        while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
+        {
+        } 
+    }
+    else if(2 == regaddr.numofbytes)
+    {   
+        reg1byteadr = regaddr.bytes.two & 0xFF00;           // msb first
+        I2C_SendData(i2cx, reg1byteadr);    
+     
+        // test on ev8
+        while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
+        {
+        }  
+
+        reg1byteadr = regaddr.bytes.two & 0x00FF;           // then lsb
+        I2C_SendData(i2cx, reg1byteadr);    
+     
+        // test on ev8
+        while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
+        {
+        }           
+    }
+    
+    // now we decide if it is dma or direct send
+    
+    while(size) 
+    {
+  
+        // send the byte to be written 
+        I2C_SendData(i2cx, *data); 
+        
+        data++;
+        size--;
+        
+        // test on ev8 (or ev8_2 = I2C_EVENT_MASTER_BYTE_TRANSMITTED which is slower but more reliable)    
+        while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
+        {
+        }
+    
+    }
+    
+    // send stop condition
+    I2C_GenerateSTOP(i2cx, ENABLE);
+    
+     // perform a read on SR1 and SR2 register to clear eventually pending flags 
+    (void)(i2cx)->SR1;
+    (void)(i2cx)->SR2; 
+    
+    
+/////////////////////////////////////////////////////////////
+
+    //s_stm32i2c_i2c_waitdevicestandbystate(port, devaddr);
+    
+    return(stm32i2c_res_OK);
+}
+
+
+
+extern stm32i2c_result_t stm32i2c_waitdevicestandbystate(uint8_t port, uint8_t devaddr)      
+{
+    volatile uint16_t tmpSR1 = 0;
+    volatile uint32_t sEETrials = 0;
+    
+    I2C_TypeDef* i2cx = s_stm32i2c_i2cx_port[port-1];
+    
+ 
+    // While the bus is busy 
+//    s_stm32ee_generics.timeout = stm32ee_hid_timeout_long;
+    while(I2C_GetFlagStatus(i2cx, I2C_FLAG_BUSY))
+    {
+//        if((s_stm32ee_generics.timeout--) == 0) return s_stm32ee_timeoutexpired();
+    }
+
+    /*  Keep looping till the slave acknowledge his address or maximum number 
+        of trials is reached (this number is defined by stm32ee_hid_ackaddress_maxtrials define
+        in stm324xg_eval_i2c_ee.h file) */
+    while(1)
+    {
+        /*!< Send START condition */
+        I2C_GenerateSTART(i2cx, ENABLE);
+
+        /*!< Test on EV5 and clear it */
+//        s_stm32ee_generics.timeout = stm32ee_hid_timeout_flag;
+        while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_MODE_SELECT))
+        {
+//            if((s_stm32ee_generics.timeout--) == 0) return s_stm32ee_timeoutexpired();
+        }    
+
+        /*!< Send EEPROM address for write */
+        I2C_Send7bitAddress(i2cx, devaddr, I2C_Direction_Transmitter);
+
+        /* Wait for ADDR flag to be set (Slave acknowledged his address) */
+//        s_stm32ee_generics.timeout = stm32ee_hid_timeout_long;
+        do
+        {     
+            /* Get the current value of the SR1 register */
+            tmpSR1 = (i2cx)->SR1;
+
+            /* Update the timeout value and exit if it reach 0 */
+//            if((s_stm32ee_generics.timeout--) == 0) return s_stm32ee_timeoutexpired();
+        }
+        /* Keep looping till the Address is acknowledged or the AF flag is 
+        set (address not acknowledged at time) */
+        while((tmpSR1 & (I2C_SR1_ADDR | I2C_SR1_AF)) == 0);
+
+        /* Check if the ADDR flag has been set */
+        if (tmpSR1 & I2C_SR1_ADDR)
+        {
+            /* Clear ADDR Flag by reading SR1 then SR2 registers (SR1 have already 
+            been read) */
+            (void)(i2cx)->SR2;
+
+            /*!< STOP condition */    
+            I2C_GenerateSTOP(i2cx, ENABLE);
+
+            /* Exit the function */
+            return stm32i2c_res_OK;
+        }
+        else
+        {
+            /*!< Clear AF flag */
+            I2C_ClearFlag(i2cx, I2C_FLAG_AF);                  
+        }
+
+//        /* Check if the maximum allowed number of trials has bee reached */
+//        if (sEETrials++ == stm32ee_hid_ackaddress_maxtrials)
+//        {
+//            /* If the maximum number of trials has been reached, exit the function */
+//            return s_stm32ee_timeoutexpired();
+//        }
+    }
+}
+
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -539,6 +863,7 @@ static void s_stm32i2c_i2c_gpio_deinit(void)
     GPIO_Init((GPIO_TypeDef*)s_stm32i2c_generics.i2c_gpio_sda.port, (GPIO_InitTypeDef*)&s_stm32i2c_generics.i2c_gpio_sda.pin); 
 #endif    
 }
+
 
 
 

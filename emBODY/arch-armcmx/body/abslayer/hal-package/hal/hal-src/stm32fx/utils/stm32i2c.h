@@ -120,6 +120,16 @@ typedef struct
     stm32i2c_gpio_t         sda;
 } stm32i2c_cfg_t;           // 8B
 
+typedef struct 
+{
+    uint8_t     numofbytes;         // only 1, 2, 3
+    union
+    {
+        uint8_t     three[3];
+        uint16_t    two;
+        uint8_t     one;
+    } bytes;
+} stm32i2c_regaddr_t;
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
@@ -145,6 +155,12 @@ extern stm32i2c_result_t stm32i2c_init(uint8_t port, const stm32i2c_cfg_t *cfg);
 extern stm32i2c_result_t stm32i2c_deinit(uint8_t port, const stm32i2c_cfg_t *cfg);
 
 
+
+extern stm32i2c_result_t stm32i2c_read(uint8_t port, uint8_t devaddr, stm32i2c_regaddr_t regaddr, uint8_t* data, uint16_t size);
+
+extern stm32i2c_result_t stm32i2c_write(uint8_t port, uint8_t devaddr, stm32i2c_regaddr_t regaddr, uint8_t* data, uint16_t size);
+
+extern stm32i2c_result_t stm32i2c_waitdevicestandbystate(uint8_t port, uint8_t devaddr);
 
 /** @}            
     end of group arm_hal_stm32i2c  

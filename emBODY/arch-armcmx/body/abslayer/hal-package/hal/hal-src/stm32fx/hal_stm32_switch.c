@@ -577,32 +577,33 @@ static hal_result_t s_hal_switch_reg_config(void)
     uint8_t buff_write = 0x60; // FORCE FULL DUPLEX AND 100T
     uint8_t buff_read = 0xFF; 
     volatile uint32_t i = 1;
+    hal_i2c_regaddr_t regadr = {.numofbytes = 1, .bytes.one = 0};
 
-//#if defined(DDDEBUGGG)
-    hal_i2c4hal_read(hal_i2c_port1, 0xBE, 0x01, &buff_read, 1);
+    regadr.bytes.one = 0x01;
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
     if((buff_read&0x01))
     {
         return(hal_res_OK);
     }
-//#endif
+
     
    
-    // 1. configure  switch's ports 1 and 2 in full duplex and 100T
-    buff_write = 0x60; // FORCE FULL DUPLEX AND 100T
-    //hal_brdcfg_switch__reg_write_byI2C(&buff_write, 0x1C);
-    hal_i2c4hal_write(hal_i2c_port1, 0xBE, 0x1C, &buff_write, 1);
-    //hal_brdcfg_switch__reg_write_byI2C(&buff_write, 0x2C);
-    hal_i2c4hal_write(hal_i2c_port1, 0xBE, 0x2C, &buff_write, 1);
+    // 1. configure  switch's ports 1 and 2 in full duplex and 100mbps
+    buff_write = 0x60;      
+    regadr.bytes.one = 0x1C;
+    hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
+    regadr.bytes.one = 0x2C;
+    hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
 
     // 2. start the switch
-    buff_write = 0x1;    
-    //hal_brdcfg_switch__reg_write_byI2C(&buff_write, 0x01);
-        hal_i2c4hal_write(hal_i2c_port1, 0xBE, 0x01, &buff_write, 1);
-    //TODO: reader from register to verify if it si started
+    buff_write = 0x1;  
+    regadr.bytes.one = 0x01;    
+    hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
+    
 
     // 3. read back to verify
-    //hal_brdcfg_switch__reg_read_byI2C(&buff_read, 0x1);
-    hal_i2c4hal_read(hal_i2c_port1, 0xBE, 0x01, &buff_read, 1);
+    regadr.bytes.one = 0x01;
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
     if(!(buff_read&0x01))
     {
         hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "s_hal_switch_reg_config(): SWITCH not configured");

@@ -231,7 +231,7 @@ extern hal_result_t hal_i2c4hal_init(hal_i2c_port_t port, const hal_i2c_cfg_t *c
 #else
 
    
-    res = (hal_result_t) stm32i2c_init((uint8_t)port + 1, &hal_brdcfg_i2c4hal__i2ccfg);
+    res = (hal_result_t) stm32i2c_init(HAL_i2c_port2index(port)+1, &hal_brdcfg_i2c4hal__i2ccfg);
 
 #endif    
 
@@ -240,9 +240,10 @@ extern hal_result_t hal_i2c4hal_init(hal_i2c_port_t port, const hal_i2c_cfg_t *c
     return(res);
 }
 
-extern hal_result_t hal_i2c4hal_read(hal_i2c_port_t port, uint8_t devaddr, uint8_t regaddr, uint8_t* data, uint16_t size)
+extern hal_result_t hal_i2c4hal_read(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
 {
     hal_result_t res = hal_res_NOK_generic;
+    uint8_t reg1byteadr = 0;
 
     if(hal_true != s_hal_i2c4hal_supported_is(port))
     {
@@ -253,6 +254,17 @@ extern hal_result_t hal_i2c4hal_read(hal_i2c_port_t port, uint8_t devaddr, uint8
     {
         return(hal_res_NOK_generic);
     }
+    
+    if((0 == regaddr.numofbytes) || (regaddr.numofbytes > 3))
+    {
+        return(hal_res_NOK_unsupported);
+    }  
+
+#if 1
+    stm32i2c_regaddr_t i2cregaddr;
+    memcpy(&i2cregaddr, &regaddr, sizeof(stm32i2c_regaddr_t));
+    return((hal_result_t) stm32i2c_read(HAL_i2c_port2index(port)+1, devaddr, i2cregaddr, data, size));
+#else    
     
     I2C_TypeDef* i2cx = s_hal_i2c4hal_i2cx[HAL_i2c_port2index(port)];
     
@@ -281,7 +293,8 @@ extern hal_result_t hal_i2c4hal_read(hal_i2c_port_t port, uint8_t devaddr, uint8
     
      // send address of register to read inside the device
     #warning --> if two bytes, then the msb first, the lbs after
-    I2C_SendData(i2cx, regaddr & 0xFF);    
+    reg1byteadr = regaddr.bytes.one;
+    I2C_SendData(i2cx, reg1byteadr);    
     
     
     // test on ev8 and clear it
@@ -350,13 +363,17 @@ extern hal_result_t hal_i2c4hal_read(hal_i2c_port_t port, uint8_t devaddr, uint8
 
     
     return(hal_res_OK);
+    
+#endif
+    
 }
 
 
 
-extern hal_result_t hal_i2c4hal_write(hal_i2c_port_t port, uint8_t devaddr, uint8_t regaddr, uint8_t* data, uint16_t size)
+extern hal_result_t hal_i2c4hal_write(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
 {
     hal_result_t res = hal_res_NOK_generic;
+    uint8_t reg1byteadr = 0;
 
     if(hal_true != s_hal_i2c4hal_supported_is(port))
     {
@@ -367,6 +384,18 @@ extern hal_result_t hal_i2c4hal_write(hal_i2c_port_t port, uint8_t devaddr, uint
     {
         return(hal_res_NOK_generic);
     }
+    
+    if((0 == regaddr.numofbytes) || (regaddr.numofbytes > 3))
+    {
+        return(hal_res_NOK_unsupported);
+    }  
+
+    
+#if 1
+    stm32i2c_regaddr_t i2cregaddr;
+    memcpy(&i2cregaddr, &regaddr, sizeof(stm32i2c_regaddr_t));
+    return((hal_result_t) stm32i2c_write(HAL_i2c_port2index(port)+1, devaddr, i2cregaddr, data, size));
+#else     
     
     I2C_TypeDef* i2cx = s_hal_i2c4hal_i2cx[HAL_i2c_port2index(port)];
     
@@ -400,7 +429,8 @@ extern hal_result_t hal_i2c4hal_write(hal_i2c_port_t port, uint8_t devaddr, uint
 
     // send address of register inside the device
     #warning --> if two bytes, then the msb first, the lbs after
-    I2C_SendData(i2cx, regaddr & 0xFF);    
+    reg1byteadr = regaddr.bytes.one;
+    I2C_SendData(i2cx, reg1byteadr);    
  
     // test on ev8
     while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
@@ -434,6 +464,8 @@ extern hal_result_t hal_i2c4hal_write(hal_i2c_port_t port, uint8_t devaddr, uint
 /////////////////////////////////////////////////////////////
     
     return(hal_res_OK);
+    
+#endif    
 }
 
 // --------------------------------------------------------------------------------------------------------------------

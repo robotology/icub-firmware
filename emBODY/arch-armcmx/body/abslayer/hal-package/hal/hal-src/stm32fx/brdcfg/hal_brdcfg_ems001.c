@@ -222,7 +222,11 @@
         {
             .i2cinit            = NULL,
             .i2cdeinit          = NULL,
-            .i2cpar             = NULL
+            .i2cpar             = NULL,
+            .i2cread            = (stm32ee_int8_fp_uint8_uint8_regaddr_uint8p_uint16_t)stm32i2c_read,
+            .i2cwrite           = (stm32ee_int8_fp_uint8_uint8_regaddr_uint8p_uint16_t)stm32i2c_write,
+            .i2cstandbydevice   = (stm32ee_int8_fp_uint8_uint8_t)stm32i2c_waitdevicestandbystate
+            
         },
         .dmacfg             =
         {

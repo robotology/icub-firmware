@@ -66,6 +66,8 @@
 
 
 
+#define STM32EE_USE_OLDMODE
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
@@ -90,7 +92,9 @@ extern const stm32ee_cfg_t stm32_cfg_default =
     {
         .i2cinit                = NULL,
         .i2cdeinit              = NULL,
-        .i2cpar                 = NULL
+        .i2cpar                 = NULL,
+        .i2cread                = NULL,
+        .i2cwrite               = NULL
     },
     
     .dmacfg                 =
@@ -164,6 +168,8 @@ static void s_stm32ee_dma_config_tx(uint32_t pBuffer, uint32_t BufferSize);
 
 static void s_stm32ee_dma_config_rx(uint32_t pBuffer, uint32_t BufferSize);
 
+static stm32ee_result_t s_stm32ee_wait4operation2complete(void);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -194,7 +200,9 @@ static stm32ee_generic_container_t s_stm32ee_generics =
         {
             .i2cinit                = NULL,
             .i2cdeinit              = NULL,
-            .i2cpar                 = NULL
+            .i2cpar                 = NULL,
+            .i2cread                = NULL,
+            .i2cwrite               = NULL
         },
         .dmacfg                         =
         {
@@ -435,7 +443,7 @@ extern stm32ee_result_t stm32ee_deinit(const stm32ee_cfg_t *cfg)
     }
     
     s_stm32ee_dma_deinit();         // always deinit
-    s_stm32ee_dma_i2c_disable();    // alwways disable
+    s_stm32ee_dma_i2c_disable();    // always disable
     
     if((stm32ee_gpio_portNONE != cfg->devcfg.wppin.port) && (stm32ee_gpio_pinNONE != cfg->devcfg.wppin.pin) && ((255 != cfg->devcfg.wpval)))
     {
@@ -464,9 +472,19 @@ extern stm32ee_result_t stm32ee_read(uint32_t address, uint32_t size, uint8_t* b
     }
     
     
+ 
+#if defined(STM32EE_USE_OLDMODE)
     uint16_t ReadAddr = (uint16_t) address;
-    uint16_t NumByteToRead = (uint16_t) size;
+    uint16_t NumByteToRead = (uint16_t) size;    
     res = s_stm32_readbuffer(buffer, ReadAddr, &NumByteToRead);
+#else
+    stm32ee_regaddr_t regaddr;
+    regaddr.numofbytes = 2;
+    regaddr.bytes.two = (uint16_t) address;
+    res = (stm32ee_result_t)s_stm32ee_generics.cfg.i2ccfg.i2cread(s_stm32ee_generics.cfg.devcfg.i2cport, s_stm32ee_generics.hwaddress, regaddr, buffer, (uint16_t) size);
+#endif
+
+
     
     if(NULL != readbytes)
     {
@@ -722,6 +740,10 @@ static void s_stm32ee_dma_init(void)
     s_stm32ee_generics.dma_cfg_mirror.size         = &s_stm32ee_generics.dma_cfg.DMA_BufferSize;
     s_stm32ee_generics.dma_cfg_mirror.dir          = &s_stm32ee_generics.dma_cfg.DMA_DIR;
     DMA_Init(stm32ee_hid_dma_stream_tx, (DMA_InitTypeDef*)&stm32ee_hid_dma_cfg_init);    
+//     DMA_InitTypeDef xxx;
+//     memcpy(&xxx, &stm32ee_hid_dma_cfg_init, sizeof(DMA_InitTypeDef));
+//     xxx.DMA_PeripheralBaseAddr = (uint32_t)(&(I2C1->DR));    
+//     DMA_Init(stm32ee_hid_dma_stream_tx, &xxx); 
 
     
     // clear pending flags on rx
@@ -1089,11 +1111,10 @@ static stm32ee_result_t s_stm32ee_writebuffer(uint8_t* pBuffer, uint16_t WriteAd
             s_stm32ee_generics.numberofbyte2writeinpage = NumOfSingle;
             /* Start writing data */
             s_stm32ee_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_stm32ee_generics.numberofbyte2writeinpage));
-            /* Wait transfer through DMA to be complete */
-            s_stm32ee_generics.timeout = stm32ee_hid_timeout_long;
-            while (s_stm32ee_generics.numberofbyte2writeinpage > 0)
+            /* Wait operation to be complete */
+            if(stm32ee_res_NOK == s_stm32ee_wait4operation2complete())
             {
-                if((s_stm32ee_generics.timeout--) == 0) {return s_stm32ee_timeoutexpired();};
+                return(stm32ee_res_NOK);
             }
             s_stm32ee_waiteepromstandbystate();
         }
@@ -1105,12 +1126,11 @@ static stm32ee_result_t s_stm32ee_writebuffer(uint8_t* pBuffer, uint16_t WriteAd
                 /* Store the number of data to be written */
                 s_stm32ee_generics.numberofbyte2writeinpage = s_stm32ee_generics.pagesize;        
                 s_stm32ee_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_stm32ee_generics.numberofbyte2writeinpage)); 
-                /* Wait transfer to be complete */
-                s_stm32ee_generics.timeout = stm32ee_hid_timeout_long;
-                while (s_stm32ee_generics.numberofbyte2writeinpage > 0)
+                /* Wait operation to be complete */
+                if(stm32ee_res_NOK == s_stm32ee_wait4operation2complete())
                 {
-                    if((s_stm32ee_generics.timeout--) == 0) {return s_stm32ee_timeoutexpired();};
-                }      
+                    return(stm32ee_res_NOK);
+                }
                 s_stm32ee_waiteepromstandbystate();
                 WriteAddr +=  s_stm32ee_generics.pagesize;
                 pBuffer += s_stm32ee_generics.pagesize;
@@ -1121,12 +1141,11 @@ static stm32ee_result_t s_stm32ee_writebuffer(uint8_t* pBuffer, uint16_t WriteAd
                 /* Store the number of data to be written */
                 s_stm32ee_generics.numberofbyte2writeinpage = NumOfSingle;          
                 s_stm32ee_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_stm32ee_generics.numberofbyte2writeinpage));
-                /* Wait transfer to be complete */
-                s_stm32ee_generics.timeout = stm32ee_hid_timeout_long;
-                while (s_stm32ee_generics.numberofbyte2writeinpage > 0)
+                /* Wait operation to be complete */
+                if(stm32ee_res_NOK == s_stm32ee_wait4operation2complete())
                 {
-                    if((s_stm32ee_generics.timeout--) == 0) {return s_stm32ee_timeoutexpired();};
-                }    
+                    return(stm32ee_res_NOK);
+                }
                 s_stm32ee_waiteepromstandbystate();
             }
         }
@@ -1145,38 +1164,35 @@ static stm32ee_result_t s_stm32ee_writebuffer(uint8_t* pBuffer, uint16_t WriteAd
                 s_stm32ee_generics.numberofbyte2writeinpage = count;        
                 /*!< Write the data contained in same page */
                 s_stm32ee_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_stm32ee_generics.numberofbyte2writeinpage));
-                /* Wait transfer to be complete */
-                s_stm32ee_generics.timeout = stm32ee_hid_timeout_long;
-                while (s_stm32ee_generics.numberofbyte2writeinpage > 0)
+                /* Wait operation to be complete */
+                if(stm32ee_res_NOK == s_stm32ee_wait4operation2complete())
                 {
-                    if((s_stm32ee_generics.timeout--) == 0) {return s_stm32ee_timeoutexpired();};
-                }          
-                s_stm32ee_waiteepromstandbystate();      
+                    return(stm32ee_res_NOK);
+                }
+                s_stm32ee_waiteepromstandbystate();  
                 
                 /* Store the number of data to be written */
                 s_stm32ee_generics.numberofbyte2writeinpage = (NumByteToWrite - count);          
                 /*!< Write the remaining data in the following page */
                 s_stm32ee_writepage((uint8_t*)(pBuffer + count), (WriteAddr + count), (uint16_t*)(&s_stm32ee_generics.numberofbyte2writeinpage));
-                /* Wait transfer to be complete */
-                s_stm32ee_generics.timeout = stm32ee_hid_timeout_long;
-                while (s_stm32ee_generics.numberofbyte2writeinpage > 0)
+                /* Wait operation to be complete */
+                if(stm32ee_res_NOK == s_stm32ee_wait4operation2complete())
                 {
-                    if((s_stm32ee_generics.timeout--) == 0) {return s_stm32ee_timeoutexpired();};
-                }     
-                s_stm32ee_waiteepromstandbystate();        
+                    return(stm32ee_res_NOK);
+                }
+                s_stm32ee_waiteepromstandbystate();   
             }      
             else      
             {
                 /* Store the number of data to be written */
                 s_stm32ee_generics.numberofbyte2writeinpage = NumOfSingle;         
                 s_stm32ee_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_stm32ee_generics.numberofbyte2writeinpage));
-                /* Wait transfer to be complete */
-                s_stm32ee_generics.timeout = stm32ee_hid_timeout_long;
-                while (s_stm32ee_generics.numberofbyte2writeinpage > 0)
+                /* Wait operation to be complete */
+                if(stm32ee_res_NOK == s_stm32ee_wait4operation2complete())
                 {
-                    if((s_stm32ee_generics.timeout--) == 0) {return s_stm32ee_timeoutexpired();};
-                }          
-                s_stm32ee_waiteepromstandbystate();        
+                    return(stm32ee_res_NOK);
+                }
+                s_stm32ee_waiteepromstandbystate();  
             }     
         }
         /*!< If NumByteToWrite > s_stm32ee_generics.pagesize */
@@ -1191,12 +1207,11 @@ static stm32ee_result_t s_stm32ee_writebuffer(uint8_t* pBuffer, uint16_t WriteAd
                 /* Store the number of data to be written */
                 s_stm32ee_generics.numberofbyte2writeinpage = count;         
                 s_stm32ee_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_stm32ee_generics.numberofbyte2writeinpage));
-                /* Wait transfer to be complete */
-                s_stm32ee_generics.timeout = stm32ee_hid_timeout_long;
-                while (s_stm32ee_generics.numberofbyte2writeinpage > 0)
+                /* Wait operation to be complete */
+                if(stm32ee_res_NOK == s_stm32ee_wait4operation2complete())
                 {
-                    if((s_stm32ee_generics.timeout--) == 0) {return s_stm32ee_timeoutexpired();};
-                }     
+                    return(stm32ee_res_NOK);
+                }
                 s_stm32ee_waiteepromstandbystate();
                 WriteAddr += count;
                 pBuffer += count;
@@ -1207,12 +1222,11 @@ static stm32ee_result_t s_stm32ee_writebuffer(uint8_t* pBuffer, uint16_t WriteAd
                 /* Store the number of data to be written */
                 s_stm32ee_generics.numberofbyte2writeinpage = s_stm32ee_generics.pagesize;          
                 s_stm32ee_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_stm32ee_generics.numberofbyte2writeinpage));
-                /* Wait transfer to be complete */
-                s_stm32ee_generics.timeout = stm32ee_hid_timeout_long;
-                while (s_stm32ee_generics.numberofbyte2writeinpage > 0)
+                /* Wait operation to be complete */
+                if(stm32ee_res_NOK == s_stm32ee_wait4operation2complete())
                 {
-                    if((s_stm32ee_generics.timeout--) == 0) {return s_stm32ee_timeoutexpired();};
-                }        
+                    return(stm32ee_res_NOK);
+                }
                 s_stm32ee_waiteepromstandbystate();
                 WriteAddr +=  s_stm32ee_generics.pagesize;
                 pBuffer += s_stm32ee_generics.pagesize;  
@@ -1222,12 +1236,11 @@ static stm32ee_result_t s_stm32ee_writebuffer(uint8_t* pBuffer, uint16_t WriteAd
                 /* Store the number of data to be written */
                 s_stm32ee_generics.numberofbyte2writeinpage = NumOfSingle;           
                 s_stm32ee_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_stm32ee_generics.numberofbyte2writeinpage)); 
-                /* Wait transfer to be complete */
-                s_stm32ee_generics.timeout = stm32ee_hid_timeout_long;
-                while (s_stm32ee_generics.numberofbyte2writeinpage > 0)
+                /* Wait operation to be complete */
+                if(stm32ee_res_NOK == s_stm32ee_wait4operation2complete())
                 {
-                    if((s_stm32ee_generics.timeout--) == 0) {return s_stm32ee_timeoutexpired();};
-                }         
+                    return(stm32ee_res_NOK);
+                }
                 s_stm32ee_waiteepromstandbystate();
             }
         }
@@ -1240,6 +1253,20 @@ static stm32ee_result_t s_stm32ee_writebuffer(uint8_t* pBuffer, uint16_t WriteAd
 
 static stm32ee_result_t s_stm32ee_writepage(uint8_t* pBuffer, uint16_t WriteAddr, uint16_t* NumByteToWrite)
 { 
+
+#if !defined(STM32EE_USE_OLDMODE)
+
+    stm32ee_result_t res;
+
+    stm32ee_regaddr_t regaddr;
+    regaddr.numofbytes = 2;
+    regaddr.bytes.two = (uint16_t) WriteAddr;
+    res = (stm32ee_result_t)s_stm32ee_generics.cfg.i2ccfg.i2cwrite(s_stm32ee_generics.cfg.devcfg.i2cport, s_stm32ee_generics.hwaddress, regaddr, pBuffer, *NumByteToWrite);
+    *NumByteToWrite = 0; 
+    
+    return(res);
+
+#else
     /*  Set the pointer to the Number of data to be written. This pointer will be used 
         by the DMA Transfer Completer interrupt Handler in order to reset the 
         variable to 0. User should check on this variable in order to know if the 
@@ -1343,11 +1370,15 @@ static stm32ee_result_t s_stm32ee_writepage(uint8_t* pBuffer, uint16_t WriteAddr
   
     /* If all operations OK, return OK (0) */
     return stm32ee_res_OK;
+    
+#endif   
 }
 
 
 static stm32ee_result_t s_stm32ee_waiteepromstandbystate(void)      
 {
+#if defined(STM32EE_USE_OLDMODE)   
+ 
     volatile uint16_t tmpSR1 = 0;
     volatile uint32_t sEETrials = 0;
 
@@ -1416,6 +1447,11 @@ static stm32ee_result_t s_stm32ee_waiteepromstandbystate(void)
             return s_stm32ee_timeoutexpired();
         }
     }
+#else   
+
+    stm32ee_result_t res = (stm32ee_result_t)s_stm32ee_generics.cfg.i2ccfg.i2cstandbydevice(s_stm32ee_generics.cfg.devcfg.i2cport, s_stm32ee_generics.hwaddress); 
+    return stm32ee_res_OK;
+#endif    
 }
 
 
@@ -1434,6 +1470,19 @@ static stm32ee_result_t s_stm32ee_timeoutexpired(void)
     
     return(stm32ee_res_NOK);
 }
+
+
+static stm32ee_result_t s_stm32ee_wait4operation2complete(void)
+{
+    s_stm32ee_generics.timeout = stm32ee_hid_timeout_long;
+    
+    while (s_stm32ee_generics.numberofbyte2writeinpage > 0)
+    {
+        if((s_stm32ee_generics.timeout--) == 0) {return s_stm32ee_timeoutexpired();};
+    }      
+    
+    return(stm32ee_res_OK);    
+}    
 
 
 //#endif//HAL_USE_EEPROM
