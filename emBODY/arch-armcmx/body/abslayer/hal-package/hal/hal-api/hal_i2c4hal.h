@@ -66,6 +66,18 @@ typedef enum
 enum { hal_i2c_ports_number = 3 };
 
 
+typedef struct 
+{
+    uint8_t     numofbytes;         // only 1, 2, 3
+    union
+    {
+        uint8_t     three[3];
+        uint16_t    two;
+        uint8_t     one;
+    } bytes;
+} hal_i2c_regaddr_t;
+
+
 /** @typedef    typedef enum hal_i2c_cfg_t 
     @brief      hal_i2c_cfg_t contains the configuation for i2c
  **/
@@ -90,6 +102,10 @@ extern const hal_i2c_cfg_t hal_i2c_cfg_default; // = { dummy = 0 };
   * @warning    this function is used just for ... the eeprom ... thus shoudl not be used by the user
   */
 extern hal_result_t hal_i2c4hal_init(hal_i2c_port_t port, const hal_i2c_cfg_t *cfg);
+
+extern hal_result_t hal_i2c4hal_read(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size);
+
+extern hal_result_t hal_i2c4hal_write(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size);
 
 
 /** @}            

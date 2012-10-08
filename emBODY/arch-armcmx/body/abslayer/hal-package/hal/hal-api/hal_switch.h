@@ -74,6 +74,8 @@ extern const hal_switch_cfg_t hal_switch_cfg_default;   // = { .dummy = 0};
   */
 extern hal_result_t hal_switch_init(const hal_switch_cfg_t *cfg);
 
+extern hal_result_t hal_switch_start(void);
+
 
 /** @fn			extern hal_bool_t hal_switch_initted_is(void)
     @brief  	This function tells if the switch is already initialsied.
