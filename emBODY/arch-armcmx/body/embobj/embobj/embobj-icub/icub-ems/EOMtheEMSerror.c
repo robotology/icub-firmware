@@ -40,6 +40,7 @@
 //#include "EOsm.h"
 
 #include "EOMtheEMSappl.h"
+#include "EOMtheEMSapplCfg.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -226,13 +227,16 @@ static void s_eom_emserror_task_run(EOMtask *p, uint32_t t)
 static void s_eom_emserror_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info)
 {
   
-   
     const char err[4][16] = {"info", "warning", "weak error", "fatal error"};
     char str[192];
+    EOMtheEMSapplCfg *emsapplcfg = eom_emsapplcfg_GetHandle();
 
-    snprintf(str, sizeof(str)-1, "EOMtheEMSerror: [eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, err[(uint8_t)errtype], info);
-    hal_trace_puts(str);
-
+    if(emsapplcfg->errmng_haltrace_enabled)
+    {
+        snprintf(str, sizeof(str)-1, "EOMtheEMSerror: [eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, err[(uint8_t)errtype], info);        
+        hal_trace_puts(str);
+    }
+    
     if(errtype <= eo_errortype_warning)
     {
         return;

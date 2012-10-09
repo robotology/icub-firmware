@@ -115,11 +115,11 @@ extern "C" {
 //  <i> default: 10
 #define EOMTHEEMSAPPLCFG_HOSTIPADDR1                            10
 
-//  <o> host IP2 address <1-255>
+//  <o> host IP2 address <0-255>
 //  <i> default: 255
 #define EOMTHEEMSAPPLCFG_HOSTIPADDR2                            255
 
-//  <o> host IP3 address <1-255>
+//  <o> host IP3 address <0-255>
 //  <i> default: 72
 #define EOMTHEEMSAPPLCFG_HOSTIPADDR3                            72
 
@@ -204,7 +204,10 @@ extern "C" {
 
 //  <h> error manager
 //  <o> on error   <0=>   redefine __weak eom_emsapplcfg_hid_userdef_OnError() 
-#define sdfefe004       0
+//  <o> printf on debug window enabled   <0=>   false
+//                                                          <1=>   true
+//#define sdfefe004       0
+#define HALTRACE_ENABLED    0
 //  </h>error manager
 
 
