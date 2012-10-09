@@ -113,7 +113,8 @@ typedef const struct
     eOmsystem_whole_cfg_t           wsyscfg;        /**< the cfg used by the principal object EOMtheSystem */
     eOemsappl_cfg_t                 applcfg;        /**< the cfg used by the object EOMtheEMSappl initialised in eom_sys_Start() */
     eOmipnet_whole_cfg_t            wipnetcfg;      /**< the cfg used by the object EOMtheIPnet launched by the EOMtheEMSappl */
-    eObool_t                        getipaddrFROMenvironment;
+    eObool_t                        getipaddrFROMenvironment;   
+    eObool_t                        errmng_haltrace_enabled;  /**< if true enable hal trace in error manager to write to debug window */
     eom_emsapplcfg_boardid_t        boardid;
     eObool_t                        hasdevice[eom_emsappl_deviceid_numberof];
     eOnvEP_t                        eps[eom_emsappl_eptype_numberof];
