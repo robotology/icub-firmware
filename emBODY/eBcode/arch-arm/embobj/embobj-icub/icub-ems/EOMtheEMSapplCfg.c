@@ -242,6 +242,7 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
         }   
     },
     .getipaddrFROMenvironment   =   EOMTHEEMSAPPLCFG_IPADDR_FROM_ENVIRONMENT,
+    .errmng_haltrace_enabled    =   HALTRACE_ENABLED,
     .boardid                    =   (eom_emsapplcfg_boardid_t)EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD,
     .hasdevice                  = 
     {
@@ -409,10 +410,13 @@ __weak extern void eom_emsapplcfg_hid_userdef_OnError(eOerrmanErrorType_t errtyp
 {
     const char err[4][16] = {"info", "warning", "weak error", "fatal error"};
     char str[128];
+    EOMtheEMSapplCfg *emsapplcfg = eom_emsapplcfg_GetHandle();
 
-    snprintf(str, sizeof(str)-1, "startup: [eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, err[(uint8_t)errtype], info);
-    hal_trace_puts(str);
-
+    if(emsapplcfg->errmng_haltrace_enabled)
+    {
+        snprintf(str, sizeof(str)-1, "startup: [eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, err[(uint8_t)errtype], info);
+        hal_trace_puts(str);
+    }
     if(errtype <= eo_errortype_warning)
     {
         return;

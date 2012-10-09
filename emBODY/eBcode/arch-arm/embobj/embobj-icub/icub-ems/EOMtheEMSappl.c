@@ -23,6 +23,7 @@
 
 #include "stdlib.h"
 #include "string.h"
+#include "hal.h"
 #include "EoCommon.h"
 #include "EOsm.h"
 #include "eOcfg_sm_EMSappl.h"
@@ -75,7 +76,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+#define emsappl_ledred          hal_led0
+#define emsappl_ledgreen        hal_led1 
+#define emsappl_ledyellow       hal_led2
+#define emsappl_ledorange       hal_led3
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -115,6 +119,12 @@ static void s_eom_emsappl_theemsconfigurator_init(void);
 
 static void s_eom_emsppl_theemsrunner_init(void);
 
+static void s_eom_emsrunner_emsappl_toogleled(osal_timer_t* tmr, void* par);
+
+static void s_eom_emsappl_startBlinkLed(void);
+
+static void s_eom_emsappl_InitLeds(void);
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -130,7 +140,8 @@ static EOMtheEMSappl s_emsappl_singleton =
     {   
         EO_INIT(.hostipv4addr)      EO_COMMON_IPV4ADDR(10, 0, 0, 254), 
 //        EO_INIT(.hostipv4port)      12345
-    }
+    },
+    EO_INIT(.timer4led)      NULL
 };
 
 
@@ -170,40 +181,43 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
 
     // do whatever is needed
     
-    // 1. create the sm.
+    // 1. init timer 4 blinking led 
+    s_eom_emsappl_InitLeds();
+    s_eom_emsappl_startBlinkLed();
+    
+    // 2. create the sm.
     s_emsappl_singleton.sm = eo_sm_New(eo_cfg_sm_EMSappl_Get());
     
     
-    // 2. initialise the environment and the ip network.
+    // 3. initialise the environment and the ip network.
     s_eom_emsappl_environment_init();
     s_eom_emsappl_ipnetwork_init();
-    
-    // 2.bis initialise the listener
+
+    // 4. initialise the listener
     s_eom_emsappl_thelistener_init();
     
-    // 3. initialise the EOMtheEMSsocket and the EOMtheEMStransceiver   
+    // 5. initialise the EOMtheEMSsocket and the EOMtheEMStransceiver   
     s_eom_emsappl_theemssocket_init();    
     s_eom_emsappl_theemstransceiver_init();
     
-    // 4. initialise the EOMtheEMSerror
+    // 6. initialise the EOMtheEMSerror
     s_eom_emsappl_theemserror_init();    
-    
-    // 5. initialise the EOMtheEMSconfigurator
+
+    // 7. initialise the EOMtheEMSconfigurator
     s_eom_emsappl_theemsconfigurator_init();
     
-    // 6. initialise the EOMtheEMSrunner, 
-    
+    // 8. initialise the EOMtheEMSrunner,   
     s_eom_emsppl_theemsrunner_init();
 
     // call usrdef initialise
     eom_emsappl_hid_userdef_initialise(&s_emsappl_singleton);
     
-    
     // tell things  
     // tells how much ram we have used so far.
+
     snprintf(str, sizeof(str)-1, "used %d bytes of HEAP out of %d so far", eo_mempool_SizeOfAllocated(eo_mempool_GetHandle()), eom_sys_GetHeapSize(eom_sys_GetHandle()));  
     eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);    
-    
+ 
     // finally ... start the state machine which enters in cfg mode    
     eo_sm_Start(s_emsappl_singleton.sm);
         
@@ -436,32 +450,89 @@ static void s_eom_emsppl_theemsrunner_init(void)
 }
 
 
+static void s_eom_emsappl_InitLeds(void)
+{
+    hal_led_cfg_t cfg = {.dummy=0};
+    
+    hal_led_init(emsappl_ledred, &cfg);
+    hal_led_off(emsappl_ledred);
+    hal_led_init(emsappl_ledgreen, &cfg); //led green
+    hal_led_off(emsappl_ledgreen);
+    hal_led_init(emsappl_ledyellow, &cfg);
+    hal_led_off(emsappl_ledyellow);
+    hal_led_init(emsappl_ledorange, &cfg);
+    hal_led_off(emsappl_ledorange);    
+}
 
+static void s_eom_emsappl_startBlinkLed(void)
+{
+    osal_timer_timing_t timing;
+    osal_timer_onexpiry_t onexpiry;
+    
+    timing.startat  = OSAL_abstimeNONE;
+    timing.count    = 500 * osal_info_get_tick(); 
+    timing.mode     = osal_tmrmodeFOREVER; 
+
+    onexpiry.cbk    = s_eom_emsrunner_emsappl_toogleled;
+    onexpiry.par    = &s_emsappl_singleton;        
+
+
+
+    s_emsappl_singleton.timer4led = osal_timer_new(); 
+    osal_timer_start(s_emsappl_singleton.timer4led, &timing, &onexpiry, osal_callerTSK);
+}
+
+static void s_eom_emsrunner_emsappl_toogleled(osal_timer_t* tmr, void* par)
+{
+    hal_led_toggle(emsappl_ledorange);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // redefinition of functions of state machine
 
 extern void eo_cfg_sm_EMSappl_hid_on_entry_CFG(EOsm *s)
 {
+    
     EOaction onrx;
+    
+    hal_led_on(emsappl_ledgreen);
+    
     eo_action_SetEvent(&onrx, emssocket_evt_packet_received, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
     // the socket alerts the cfg task
     eom_emssocket_Open(eom_emssocket_GetHandle(), &onrx, NULL);
 }
 
+
+extern void eo_cfg_sm_EMSappl_hid_on_exit_CFG(EOsm *s)
+{
+    hal_led_off(emsappl_ledgreen);
+}
+
 extern void eo_cfg_sm_EMSappl_hid_on_entry_ERR(EOsm *s)
 {
     EOaction onrx;
+    
+    hal_led_on(emsappl_ledred);
+    
     eo_action_SetEvent(&onrx, emssocket_evt_packet_received, eom_emserror_GetTask(eom_emserror_GetHandle()));
     // the socket alerts the error task
     eom_emssocket_Open(eom_emssocket_GetHandle(), &onrx, NULL);
 }
 
 
+extern void eo_cfg_sm_EMSappl_hid_on_exit_ERR(EOsm *s)
+{
+    hal_led_off(emsappl_ledred);
+ }
+
 extern void eo_cfg_sm_EMSappl_hid_on_entry_RUN(EOsm *s)
 {
     EOaction ontxdone;
     //eo_action_Clear(&ontxdone);
+        
+    hal_led_on(emsappl_ledyellow);
+    
+
     eo_action_SetCallback(&ontxdone, (eOcallback_t)eom_emsrunner_OnUDPpacketTransmitted, eom_emsrunner_GetHandle(), NULL);
     // the socket does not alert anybody when it receives a pkt, but can alert the sending task
     eom_emssocket_Open(eom_emssocket_GetHandle(), NULL, &ontxdone);
@@ -475,8 +546,10 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_RUN(EOsm *s)
 
 extern void eo_cfg_sm_EMSappl_hid_on_exit_RUN(EOsm *s)
 {
+    hal_led_off(emsappl_ledyellow);
     //eov_ipnet_Activate(eov_ipnet_GetHandle());
 }
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
