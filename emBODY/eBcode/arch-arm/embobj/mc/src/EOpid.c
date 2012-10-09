@@ -128,6 +128,8 @@ extern eObool_t eo_pid_IsInitialized(EOpid *o)
 
 extern void eo_pid_Reset(EOpid *o)
 {
+    if (!o) return;
+	
     o->En = 0.0f;
     o->pwm = 0.0f;
     o->KIn = 0.0f; 
