@@ -1127,7 +1127,7 @@ static eOresult_t s_appTheDB_canaddressLookuptbl_init(EOappTheDB *p)
         //  - connected 2 ems port used to commnd joint (joints and motors are connected to a different can bus of sensors) AND
         //  - belong to motor baord (1 foc and mc4)
 		if( (db_emscanportconnected2motorboard == b_cfg_ptr[i].canLoc.emscanport) &&
-            (eobrd_1foc != b_cfg_ptr[i].type) && (eobrd_mc4 != b_cfg_ptr[i].type) &&
+            ((eobrd_1foc == b_cfg_ptr[i].type) || (eobrd_mc4 == b_cfg_ptr[i].type)) &&
             (maxusedcanaddr < b_cfg_ptr[i].canLoc.addr))
 		{
 			maxusedcanaddr = b_cfg_ptr[i].canLoc.addr;
