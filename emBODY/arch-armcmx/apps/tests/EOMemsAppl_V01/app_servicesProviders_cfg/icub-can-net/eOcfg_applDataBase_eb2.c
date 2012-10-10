@@ -264,7 +264,7 @@ static const eOappTheDB_cfg_jointInfo_t s_cfg_appDB_joints[] =
     { // 11
         EO_INIT(.canLoc)
         {
-            EO_INIT(.belong2board)               MC4_ADDRCAN_7_BID,
+            EO_INIT(.belong2board)               MC4_ADDRCAN_8_BID,
             EO_INIT(.indexinboard)               eo_icubCanProto_jm_index_second,
         }
     }
