@@ -44,6 +44,7 @@
 #include "hal_watchdog.h"
 #include "hal_switch.h"
 #include "utils/stm32ee.h"
+#include "utils/stm32gpio.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -140,7 +141,7 @@
 
 
 #if defined(HAL_USE_ETH)
-    
+#if 0   
     //#define HAL_BRDCFG_ETH__ETH_IS_IN_RESET_STATE(x)	    (x & 0x8800)
     #define HAL_BRDCFG_ETH_I2C_ADDRESS_WRITE_OP 0xBE        /* eth switch(micrel) device's address on I2C bus  for write operation */
     #define HAL_BRDCFG_ETH_I2C_ADDRESS_READ_OP  0xBF        /* eth switch(micrel) device's address on I2C bus  for read operation */
@@ -165,6 +166,7 @@
     //#define PHY_address 		DP83848C_DEF_ADR
     #define AL_BRDCFG_ETH__HAL_ETH_RESET_STATE_MASK		0x77FF//0x8800 DA SISTEMARE!!!!
     // acemor on 16 sept 2011: the previous are un-used ...
+#endif
 #endif//HAL_USE_ETH
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -173,6 +175,7 @@
 
 #ifdef HAL_USE_CAN
     extern const uint8_t hal_brdcfg_can__supported_mask             = 0x03;
+    #warning --> mettere qui solo i gpio del can1rx, can1tx, can2rx, can2tx ... non tutto il resto
     extern const uint32_t hal_brdcfg_can__gpio_clock_canx_rx[]      = {RCC_APB2Periph_GPIOD, RCC_APB2Periph_GPIOB};
     extern const uint32_t hal_brdcfg_can__gpio_clock_canx_tx[]      = {RCC_APB2Periph_GPIOD, RCC_APB2Periph_GPIOB};
     extern const uint8_t hal_brdcfg_can__gpio_pinsource_canx_rx[]   = {0, 5};
@@ -209,29 +212,23 @@
             .device             = stm32ee_device_atmel_at24c512b, //stm32ee_device_atmel_at24c1024b,
             .i2cport            = 1,        // is equivalent to hal_i2c_port1
             .hwaddra2a1a0       = 0,        // a0 = a1 = a2 = 0
-            .wpval              = 1,        // write protection is on value high       
+            .wpval              = stm32gpio_valHIGH,        // write protection is on value high       
             .wppin              =
             {
-                .port               = stm32ee_gpio_portB,
-                .pin                = stm32ee_gpio_pin10
-            }, 
-            .functionontimeout  = hal_brdcfg_eeprom__ontimeouterror //NULL                        
+                .port               = stm32gpio_portB,
+                .pin                = stm32gpio_pin10
+            }            
         },
 
-        .i2ccfg             =
-        {
-            .i2cinit            = NULL,
+        .i2cext             =
+        {   // does not init/deinit. only use read/write/standby
+            .i2cinit            = NULL,         
             .i2cdeinit          = NULL,
             .i2cpar             = NULL,
             .i2cread            = (stm32ee_int8_fp_uint8_uint8_regaddr_uint8p_uint16_t)stm32i2c_read,
             .i2cwrite           = (stm32ee_int8_fp_uint8_uint8_regaddr_uint8p_uint16_t)stm32i2c_write,
-            .i2cstandbydevice   = (stm32ee_int8_fp_uint8_uint8_t)stm32i2c_waitdevicestandbystate
-            
-        },
-        .dmacfg             =
-        {
-            .dontuse            = 0
-        }       
+            .i2cstandby         = (stm32ee_int8_fp_uint8_uint8_t)stm32i2c_standby            
+        }    
     };
     
 #endif//HAL_USE_EEPROM     
@@ -244,15 +241,16 @@
         .speed              = 400000,        // 400 mhz
         .scl                =
         {
-            .port               = stm32i2c_gpio_portB,
-            .pin                = stm32i2c_gpio_pin8
+            .port               = stm32gpio_portB,
+            .pin                = stm32gpio_pin8
         }, 
         .sda                =
         {
-            .port               = stm32i2c_gpio_portB,
-            .pin                = stm32i2c_gpio_pin9
-        }                    
-    
+            .port               = stm32gpio_portB,
+            .pin                = stm32gpio_pin9
+        },
+        .usedma             = 0,
+        .ontimeout          = NULL
     };
 #endif//HAL_USE_I2C4HAL
 
@@ -363,10 +361,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #ifdef HAL_USE_CAN
-
+#if 1
 extern void hal_brdcfg_can__phydevices_init(hal_can_port_t port)
-{
-    // i could instead use hal_gpio_init(hal_gpio_portB, hal_gpio_pinxx, hal_gpio_speed_low); 
+{   // the phy are connected to the can bus pin using an enable circuit driven by a gpio. then just init the pin
+   #warning --> i could instead use hal_gpio_init(hal_gpio_portB, hal_gpio_pinxx, hal_gpio_speed_low); 
 
     GPIO_InitTypeDef hal_brdcfg_can__gpio_canx_enable =
     {   // output low speed
@@ -419,151 +417,21 @@ extern void hal_brdcfg_can__phydevices_disable(hal_can_port_t port)
         GPIO_WriteBit(GPIOB, GPIO_Pin_15, Bit_SET);
 	}
 }
-
+#endif
 #endif//HAL_USE_CAN
 
 
 #ifdef HAL_USE_I2C4HAL
 
-
-// extern void hal_brdcfg_i2c4hal__LowLevel_DeInit(void)
-// {
-//   GPIO_InitTypeDef  GPIO_InitStructure; 
-//    
-//   /* sEE_I2C Peripheral Disable */
-//   I2C_Cmd(HAL_BRDCFG_I2C4HAL__PERIPHERAL, DISABLE);
-//  
-//   /* sEE_I2C DeInit */
-//   I2C_DeInit(HAL_BRDCFG_I2C4HAL__PERIPHERAL);
-
-// //   /*!< sEE_I2C Periph clock disable */
-// //   RCC_APB1PeriphClockCmd(HAL_BRDCFG_I2C4HAL__I2C_CLK, DISABLE);
-// //     
-// //   /*!< GPIO configuration */  
-// //   /*!< Configure sEE_I2C pins: SCL */
-// //   GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_I2C4HAL__I2C_SCL_PIN;
-// //   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-// //   GPIO_Init(HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_PORT, &GPIO_InitStructure);
-
-// //   /*!< Configure sEE_I2C pins: SDA */
-// //   GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_I2C4HAL__I2C_SDA_PIN;
-// //   GPIO_Init(HAL_BRDCFG_I2C4HAL__I2C_SDA_GPIO_PORT, &GPIO_InitStructure);
-// // }
-
-
-#endif//HAL_USE_I2C4HAL
-
-
-#ifdef HAL_USE_I2C4HAL
-
-// extern void hal_brdcfg_i2c4hal__LowLevel_Init(void)
-// {
-//   GPIO_InitTypeDef  GPIO_InitStructure;
-//   uint8_t count = 0;
-//   
-//   /* This sequence is strongly recommended after each board reset.
-//      This is necessary because I2C bus standard doesn't provide signal to 
-//      inizialize communication, so there is the possibility that some device
-//      connect to the bus don't start properly after system reset.
-//      (See EMS001 Refernce Manual chapter 6.) 
-//     */
-//   RCC->APB2ENR |= 0x00000008; //enable clock on port B
-//   
-//   //step 1
-//   GPIOB->CRH &= 0xFFFFFF00;//Reset Pin 8 and 9.
-//   GPIOB->CRH |= 0x000000DD; //Configure pin 8 and 9 as General Purpose output Open Drain 50Mhz
-
-//   GPIOB->BSRR |= 0x00000300; // Set Pin 8 and 9 HIGH
-//   
-//   //step 2 and 3
-//   while( (!(GPIOB->ODR & 0x200)) && (count < 9))//finche' non e' settato il pin 9
-//   {
-//     //pulse PB8   (al max posso farlo per 9 volte)
-//     GPIOB->BRR |= 0x00000100;  // PB8LOW
-//     //wait 2 microsec at least TODO: Verify
-//     s_hal_ems001_i2c_wait2micro();
-
-//     GPIOB->BSRR |= 0x00000100;  // PB8 HIGH
-//     //wait 2 microsec at least
-//     s_hal_ems001_i2c_wait2micro();
-
-//     count++;
-//   }
-//   if(9 == count)
-//   {
-//     return; //error
-//   } 
-
-//   //step 4: perform start condition
-//   GPIOB->BSRR |= 0x00000100; //Pin B8 HIGH
-//   GPIOB->BRR  |= 0x00000200;  //Pin B9 LOW 
-//   GPIOB->BRR  |= 0x00000100;  //Pin B8 LOW 
-
-//   //step 5
-//   GPIOB->BSRR |= 0x00000100; //Pin B9 HIGH
-
-//   //step 6 ==> //pulse pin 8 for 9 times
-//   for(count = 0; count < 9; count ++)
-//   {
-//     
-//     GPIOB->BSRR |= 0x00000100;  // PB8 HIGH
-//     //wait 2 microsec at least
-//     s_hal_ems001_i2c_wait2micro();
-
-//     //pulse PB8   (al max posso farlo per 9 volte)
-//     GPIOB->BRR |= 0x00000100;  // PB8LOW
-//     //wait 2 microsec at least TODO: Verify
-//     s_hal_ems001_i2c_wait2micro();
-
-//   }
-//   
-//   //step 7 perform start condition
-//   GPIOB->BSRR |= 0x00000100; //Pin B8 HIGH
-//   GPIOB->BRR  |= 0x00000200;  //Pin B9 LOW 
-//   GPIOB->BRR  |= 0x00000100;  //Pin B8 LOW
-
-//   //step 8 perform stop condition
-//   GPIOB->BSRR |= 0x00000200; // Set Pin 8 HIGH
-//   GPIOB->BSRR |= 0x00000100; // Set Pin 9 HIGH
-
-
-
-//   /*!< sEE_I2C_SCL_GPIO_CLK and sEE_I2C_SDA_GPIO_CLK Periph clock enable */
-//   RCC_APB2PeriphClockCmd(HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_CLK | HAL_BRDCFG_I2C4HAL__I2C_SDA_GPIO_CLK, ENABLE);
-
-//   /*!< sEE_I2C Periph clock enable */
-//   RCC_APB1PeriphClockCmd(HAL_BRDCFG_I2C4HAL__I2C_CLK, ENABLE);
-
-//   AFIO->MAPR |= AFIO_MAPR_I2C1_REMAP;  /* I2C1 remapping */
-//     
-//   /*!< GPIO configuration */  
-//   /*!< Configure sEE_I2C pins: SCL */
-//   GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_I2C4HAL__I2C_SCL_PIN;
-//   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-//   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD;
-//   GPIO_Init(HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_PORT, &GPIO_InitStructure);
-
-//   /*!< Configure sEE_I2C pins: SDA */
-//   GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_I2C4HAL__I2C_SDA_PIN;
-//   GPIO_Init(HAL_BRDCFG_I2C4HAL__I2C_SDA_GPIO_PORT, &GPIO_InitStructure);
-
-// // acemor moved in anotehr function
-// //  //configure pin B10 for eeprom write protect 
-// //  GPIOB->CRH &= 0xFFFFF0FF;//Reset Pin 10.
-// //  GPIOB->CRH |= 0x00000200; //Configure pin 10 as General Purpose output Push Pull 2Mhz
-// //  GPIOB->BSRR |= 0x0400;  //disable write on eeprom
-// }
+extern void hal_brdcfg_i2c__ontimeouterror(void)
+{
+    hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "timeout in eeprom");
+}
 
 #endif//HAL_USE_I2C4HAL
 
 
 #ifdef HAL_USE_EEPROM
-
-extern void hal_brdcfg_eeprom__ontimeouterror(void)
-{
-    hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "timeout in eeprom");
-}
-
 
 #endif//HAL_USE_EEPROM
 
@@ -653,176 +521,6 @@ void  hal_brdcfg_spi4encoder__chipSelect_init(hal_spi_port_t spix)
                      
 #ifdef HAL_USE_SWITCH
  
-//extern  void hal_brdcfg_switch__MCO_config(void)
-//{
-//
-////  GPIO_InitTypeDef  GPIO_InitStructure;
-////  
-////  
-////  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
-////  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-////  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-////  GPIO_Init(GPIOA, &GPIO_InitStructure);
-////
-////  /* set PLL3 clock output to 50MHz (25MHz /5 *10 =50MHz) */
-////  RCC_PLL3Config(RCC_PLL3Mul_10);
-////  /* Enable PLL3 */
-////  RCC_PLL3Cmd(ENABLE);
-////  /* Wait till PLL3 is ready */
-////  while (RCC_GetFlagStatus(RCC_FLAG_PLL3RDY) == RESET)
-////  {}
-////
-////  /* Get clock PLL3 clock on PA8 pin */
-////  RCC_MCOConfig(RCC_MCO_PLL3CLK);
-//	
-// // GPIO_InitTypeDef  GPIO_InitStructure;
-//  uint32_t tmpreg = 0;
-//  
-////  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
-////  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-////  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-////  GPIO_Init(GPIOA, &GPIO_InitStructure);
-//
-//// il clock sulla porta A e' abilitato all'inizio nella eth init.
-//  	GPIOA->CRH   &= 0xFFFFFFF0;
-//	GPIOA->CRH   |= 0x0000000B;	/*Pin 8 is congigured in AlterFunc 50MHz*/	
-//
-//  /* set PLL3 clock output to 50MHz (25MHz /5 *10 =50MHz) */
-// // RCC_PLL3Config(RCC_PLL3Mul_10);
-//#define CFGR2_PLL3MUL                   ((uint32_t)0x0000F000)
-//#define  RCC_PLL3Mul_10                 ((uint32_t)0x00008000)  
-//  tmpreg = RCC->CFGR2;
-//  /* Clear PLL3Mul[3:0] bits */
-//  tmpreg &= ~CFGR2_PLL3MUL;
-//  /* Set the PLL3 configuration bits */
-//  tmpreg |= RCC_PLL3Mul_10;
-//  /* Store the new value */
-//  RCC->CFGR2 = tmpreg;
-//
-//
-//
-//  /* Enable PLL3 */
-//  //RCC_PLL3Cmd(ENABLE);
-//  RCC->CR |=0x10000000;
-//  /* Wait till PLL3 is ready */
-//  while (RCC_GetFlagStatus(RCC_FLAG_PLL3RDY) == RESET)
-//  {}
-//
-//  /* Get clock PLL3 clock on PA8 pin */
-//  RCC_MCOConfig(RCC_MCO_PLL3CLK);
-//	
-//}
-
-#if 0
-extern void hal_brdcfg_switch__reg_write_byI2C(uint8_t* pBuffer, uint16_t WriteAddr)
-{ 
-    #define HAL_BRDCFG_I2C4HAL__PERIPHERAL I2C1
-
-    /*!< While the bus is busy */
-    while(I2C_GetFlagStatus(HAL_BRDCFG_I2C4HAL__PERIPHERAL, I2C_FLAG_BUSY))
-    {
-    }
-
-    /*!< Send STRAT condition */
-    I2C_GenerateSTART(HAL_BRDCFG_I2C4HAL__PERIPHERAL, ENABLE);
-    
-    while(!I2C_CheckEvent(HAL_BRDCFG_I2C4HAL__PERIPHERAL, I2C_EVENT_MASTER_MODE_SELECT))
-    {
-    }  
-    
-    /*!< Send  address for write */
-    I2C_Send7bitAddress(HAL_BRDCFG_I2C4HAL__PERIPHERAL, HAL_BRDCFG_ETH_I2C_ADDRESS_WRITE_OP, I2C_Direction_Transmitter);
-    
-    while(!I2C_CheckEvent(HAL_BRDCFG_I2C4HAL__PERIPHERAL, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))
-    {
-    }
-    
-    //micrel phy register can be addressd by 8 bits.
-    
-    /*!< Send the physical's internal address to write */
-    I2C_SendData(HAL_BRDCFG_I2C4HAL__PERIPHERAL, (uint8_t)(WriteAddr & 0x00FF));
-
-    while(!I2C_CheckEvent(HAL_BRDCFG_I2C4HAL__PERIPHERAL, I2C_EVENT_MASTER_BYTE_TRANSMITTED))
-    {
-    }
-    
-    /*!< Send the byte to be written */
-    I2C_SendData(HAL_BRDCFG_I2C4HAL__PERIPHERAL, *pBuffer); 
-    
-    while(!I2C_CheckEvent(HAL_BRDCFG_I2C4HAL__PERIPHERAL, I2C_EVENT_MASTER_BYTE_TRANSMITTED))
-    {
-    }
-    
-    /*!< Send STOP condition */
-    I2C_GenerateSTOP(HAL_BRDCFG_I2C4HAL__PERIPHERAL, ENABLE);
-
-}
-
-
-extern void hal_brdcfg_switch__reg_read_byI2C(uint8_t* pBuffer, uint16_t ReadAddr)
-{
-    #define HAL_BRDCFG_I2C4HAL__PERIPHERAL I2C1
-    
-    /*!< wait while the bus is busy */
-    while(I2C_GetFlagStatus(HAL_BRDCFG_I2C4HAL__PERIPHERAL, I2C_FLAG_BUSY))
-    {
-    }
-    /*!< Send STRAT condition */
-    I2C_GenerateSTART(HAL_BRDCFG_I2C4HAL__PERIPHERAL, ENABLE);
- 
-    
-    while(!I2C_CheckEvent(HAL_BRDCFG_I2C4HAL__PERIPHERAL, I2C_EVENT_MASTER_MODE_SELECT))
-    {
-    }
-    
-    /*!< Send physical's address for read */
-    I2C_Send7bitAddress(HAL_BRDCFG_I2C4HAL__PERIPHERAL, HAL_BRDCFG_ETH_I2C_ADDRESS_WRITE_OP, I2C_Direction_Transmitter);
-    
-    while(!I2C_CheckEvent(HAL_BRDCFG_I2C4HAL__PERIPHERAL, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))
-    {
-    }
-    
-    
-    ///micrel physical register can be addressd by 8 bits.
-    /* Send the physical's internal address to read from: LSB of the address */
-    I2C_SendData(HAL_BRDCFG_I2C4HAL__PERIPHERAL, (uint8_t)(ReadAddr & 0x00FF));    
-    
-    while(!I2C_CheckEvent(HAL_BRDCFG_I2C4HAL__PERIPHERAL, I2C_EVENT_MASTER_BYTE_TRANSMITTED))
-    {
-    }
-    
-    //I2C_AcknowledgeConfig(HAL_BRDCFG_I2C4HAL__PERIPHERAL, DISABLE);
-
-    /* Send STRAT condition a second time */  
-    I2C_GenerateSTART(HAL_BRDCFG_I2C4HAL__PERIPHERAL, ENABLE);
- 
-    while(!I2C_CheckEvent(HAL_BRDCFG_I2C4HAL__PERIPHERAL, I2C_EVENT_MASTER_MODE_SELECT))
-    {
-    }
-
-   
-    /* Send physical address for read */
-    I2C_Send7bitAddress(HAL_BRDCFG_I2C4HAL__PERIPHERAL, HAL_BRDCFG_ETH_I2C_ADDRESS_READ_OP, I2C_Direction_Receiver);
-    
-    while(!I2C_CheckEvent(HAL_BRDCFG_I2C4HAL__PERIPHERAL, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED))
-    {
-    }
-
-
-    /* Enable Acknowledgement to be ready for another reception */
-    I2C_AcknowledgeConfig(HAL_BRDCFG_I2C4HAL__PERIPHERAL, DISABLE);
-    /* Send STOP Condition */
-    I2C_GenerateSTOP(HAL_BRDCFG_I2C4HAL__PERIPHERAL, ENABLE);
-
-    while(!I2C_CheckEvent(HAL_BRDCFG_I2C4HAL__PERIPHERAL, I2C_EVENT_MASTER_BYTE_RECEIVED))
-    {
-    }
-    *pBuffer = I2C_ReceiveData(HAL_BRDCFG_I2C4HAL__PERIPHERAL);
-
-    I2C_AcknowledgeConfig(HAL_BRDCFG_I2C4HAL__PERIPHERAL, ENABLE);
-
-}
-#endif
 
 #endif//HAL_USE_SWITCH
 
@@ -831,29 +529,13 @@ extern void hal_brdcfg_switch__reg_read_byI2C(uint8_t* pBuffer, uint16_t ReadAdd
 
 extern void hal_brdcfg_eth__phy_initialise(void)
 {
-//#ifdef 0
-//    // the phy is withing the switch
-//
-//    uint8_t buff_write = 0x1;
-//    
-//    hal_i2c4eeprom_init(hal_i2c_port1, NULL); //use default configuration
-//    
-//    hal_brdcfg_switch__reg_write_byI2C(&buff_write, 0x01);
-//    //TODO: reader from register to verify if it si started
-//
-//    hal_brdcfg_switch__reg_read_byI2C(&buff_write, 0x1);
-//    if(!(buff_write&0x01))
-//    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "hal_brdcfg_eth__phy_start(): ETH is still in reset state");
-//    }
-//#else
 
     #warning --> in here we just init the switch ... put in reset mode, exit from reset, do the mco, init the i2c if not initted, etc. 
     if(hal_false == hal_switch_initted_is())
     {
         hal_switch_init(NULL);
     }
-//#endif
+
 }
 
 extern void hal_brdcfg_eth__phy_configure(void)
@@ -861,31 +543,6 @@ extern void hal_brdcfg_eth__phy_configure(void)
     #warning --> in here we configure the switch ... in full duplex 100mbps for instance
     hal_switch_start();
 }
-
-//extern  void hal_brdcfg_eth__clock_config(void)
-//{
-//    //su questa board il clock tx e rx e' connesso all'MCO.
-//    //quindi devo configurare MCO.
-//    
-//    // il clock sulla porta A e' abilitato all'inizio nella eth init.
-//    GPIOA->CRH   &= 0xFFFFFFF0;
-//    GPIOA->CRH   |= 0x0000000B;	/*Pin 8 is congigured in AlterFunc 50MHz*/	
-//    
-//    /* set PLL3 clock output to 50MHz (25MHz /5 *10 =50MHz) */
-//    RCC_PLL3Config(RCC_PLL3Mul_10);
-//    
-//    
-//    /* Enable PLL3 */
-//    RCC_PLL3Cmd(ENABLE);
-//    
-//    /* Wait till PLL3 is ready */
-//    while (RCC_GetFlagStatus(RCC_FLAG_PLL3RDY) == RESET)
-//    {}
-//    
-//    /* Get clock PLL3 clock on PA8 pin */
-//    RCC_MCOConfig(RCC_MCO_PLL3CLK);
-//
-//}
 
 
 #endif//HAL_USE_ETH
@@ -1098,6 +755,32 @@ extern void hal_brdcfg_sys__gpio_default_init(void)
 #endif
 
 
+///// -----------------  OLDIES ---------------------------------------------------------------------------------------
+
+//extern  void hal_brdcfg_eth__clock_config(void)
+//{
+//    //su questa board il clock tx e rx e' connesso all'MCO.
+//    //quindi devo configurare MCO.
+//    
+//    // il clock sulla porta A e' abilitato all'inizio nella eth init.
+//    GPIOA->CRH   &= 0xFFFFFFF0;
+//    GPIOA->CRH   |= 0x0000000B;	/*Pin 8 is congigured in AlterFunc 50MHz*/	
+//    
+//    /* set PLL3 clock output to 50MHz (25MHz /5 *10 =50MHz) */
+//    RCC_PLL3Config(RCC_PLL3Mul_10);
+//    
+//    
+//    /* Enable PLL3 */
+//    RCC_PLL3Cmd(ENABLE);
+//    
+//    /* Wait till PLL3 is ready */
+//    while (RCC_GetFlagStatus(RCC_FLAG_PLL3RDY) == RESET)
+//    {}
+//    
+//    /* Get clock PLL3 clock on PA8 pin */
+//    RCC_MCOConfig(RCC_MCO_PLL3CLK);
+//
+//}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

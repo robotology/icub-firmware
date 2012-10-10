@@ -60,15 +60,6 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-// #ifdef HAL_USE_I2C4HAL
-//     #define HAL_BRDCFG_I2C4HAL__I2C_CLK                          RCC_APB1Periph_I2C1
-//     #define HAL_BRDCFG_I2C4HAL__I2C_SCL_PIN                      GPIO_Pin_8 
-//     #define HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_PORT                GPIOB
-//     #define HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_CLK                 ( RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO) //Enable alternate function.     
-//     #define HAL_BRDCFG_I2C4HAL__I2C_SDA_PIN                  	GPIO_Pin_9                  
-//     #define HAL_BRDCFG_I2C4HAL__I2C_SDA_GPIO_PORT                GPIOB                       
-//     #define HAL_BRDCFG_I2C4HAL__I2C_SDA_GPIO_CLK                 RCC_APB2Periph_GPIOB
-// #endif//HAL_USE_I2C4HAL  
 
 
 #ifdef HAL_USE_SPI4ENCODER
@@ -127,6 +118,7 @@
 
 #ifdef HAL_USE_CAN
     extern const uint8_t hal_brdcfg_can__supported_mask             = 0x03;
+    #warning --> mettere qui solo i gpio del can1rx, can1tx, can2rx, can2tx ... non tutto il resto
     extern const uint32_t hal_brdcfg_can__gpio_clock_canx_rx[]      = {RCC_APB2Periph_GPIOD, RCC_APB2Periph_GPIOB};
     extern const uint32_t hal_brdcfg_can__gpio_clock_canx_tx[]      = {RCC_APB2Periph_GPIOD, RCC_APB2Periph_GPIOB};
     extern const uint8_t hal_brdcfg_can__gpio_pinsource_canx_rx[]   = {0, 5};
@@ -164,27 +156,23 @@
             .device             = stm32ee_device_st_m24c64,
             .i2cport            = 1,        // is equivalent to hal_i2c_port1
             .hwaddra2a1a0       = 0,        // a0 = a1 = a2 = 0
-            .wpval              = 255,      // no write protection
+            .wpval              = stm32gpio_valNONE,      // no write protection
             .wppin              =
             {
-                .port               = stm32ee_gpio_portNONE,
-                .pin                = stm32ee_gpio_pinNONE
-            }, 
-            .functionontimeout  = hal_brdcfg_eeprom__ontimeouterror //NULL                        
+                .port               = stm32gpio_portNONE,
+                .pin                = stm32gpio_pinNONE
+            }                    
         },
 
-        .i2ccfg             =
-        {
-            .i2cinit            = NULL,
+        .i2cext             =
+        {   // does not init/deinit. only use read/write/standby
+            .i2cinit            = NULL,         
             .i2cdeinit          = NULL,
             .i2cpar             = NULL,
             .i2cread            = (stm32ee_int8_fp_uint8_uint8_regaddr_uint8p_uint16_t)stm32i2c_read,
-            .i2cwrite           = (stm32ee_int8_fp_uint8_uint8_regaddr_uint8p_uint16_t)stm32i2c_write
-        },
-        .dmacfg             =
-        {
-            .dontuse            = 1
-        }       
+            .i2cwrite           = (stm32ee_int8_fp_uint8_uint8_regaddr_uint8p_uint16_t)stm32i2c_write,
+            .i2cstandby         = (stm32ee_int8_fp_uint8_uint8_t)stm32i2c_standby            
+        }    
     };
 #endif//HAL_USE_EEPROM 
 
@@ -196,15 +184,16 @@
         .speed              = 400000,        // 400 mhz
         .scl                =
         {
-            .port               = stm32i2c_gpio_portB,
-            .pin                = stm32i2c_gpio_pin8
+            .port               = stm32gpio_portB,
+            .pin                = stm32gpio_pin8
         }, 
         .sda                =
         {
-            .port               = stm32i2c_gpio_portB,
-            .pin                = stm32i2c_gpio_pin9
-        }                    
-    
+            .port               = stm32gpio_portB,
+            .pin                = stm32gpio_pin9
+        }, 
+        .usedma             = 0,
+        .ontimeout          = NULL                          
     };
 #endif//HAL_USE_I2C4HAL
 
@@ -347,82 +336,17 @@ extern void hal_brdcfg_can__phydevices_disable(hal_can_port_t port)
 
 #ifdef HAL_USE_I2C4HAL
 
-// extern void hal_brdcfg_i2c4hal__LowLevel_DeInit(void)
-// {
-//   GPIO_InitTypeDef  GPIO_InitStructure; 
-//    
-//   /* sEE_I2C Peripheral Disable */
-//   I2C_Cmd(HAL_BRDCFG_I2C4HAL__PERIPHERAL, DISABLE);
-//  
-//   /* sEE_I2C DeInit */
-//   I2C_DeInit(HAL_BRDCFG_I2C4HAL__PERIPHERAL);
-
-//   /*!< sEE_I2C Periph clock disable */
-//   RCC_APB1PeriphClockCmd(HAL_BRDCFG_I2C4HAL__I2C_CLK, DISABLE);
-//     
-//   /*!< GPIO configuration */  
-//   /*!< Configure sEE_I2C pins: SCL */
-//   GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_I2C4HAL__I2C_SCL_PIN;
-//   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-//   GPIO_Init(HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_PORT, &GPIO_InitStructure);
-
-//   /*!< Configure sEE_I2C pins: SDA */
-//   GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_I2C4HAL__I2C_SDA_PIN;
-//   GPIO_Init(HAL_BRDCFG_I2C4HAL__I2C_SDA_GPIO_PORT, &GPIO_InitStructure);
-// }
-
-#endif//HAL_USE_I2C4HAL
-
-
-#ifdef HAL_USE_I2C4HAL
-
-// extern void hal_brdcfg_i2c4hal__LowLevel_Init(void)
-// {
-//   GPIO_InitTypeDef  GPIO_InitStructure; 
-//     
-//   /*!< sEE_I2C_SCL_GPIO_CLK and sEE_I2C_SDA_GPIO_CLK Periph clock enable */
-//   RCC_APB2PeriphClockCmd(HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_CLK | HAL_BRDCFG_I2C4HAL__I2C_SDA_GPIO_CLK, ENABLE);
-
-//   /*!< sEE_I2C Periph clock enable */
-//   RCC_APB1PeriphClockCmd(HAL_BRDCFG_I2C4HAL__I2C_CLK, ENABLE);
-
-//   AFIO->MAPR |= AFIO_MAPR_I2C1_REMAP;  /* I2C1 remapping */
-//     
-//   /*!< GPIO configuration */  
-//   /*!< Configure sEE_I2C pins: SCL */
-//   GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_I2C4HAL__I2C_SCL_PIN;
-//   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-//   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD;
-//   GPIO_Init(HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_PORT, &GPIO_InitStructure);
-
-//   /*!< Configure sEE_I2C pins: SDA */
-//   GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_I2C4HAL__I2C_SDA_PIN;
-//   GPIO_Init(HAL_BRDCFG_I2C4HAL__I2C_SDA_GPIO_PORT, &GPIO_InitStructure);
-// }
+extern void hal_brdcfg_i2c__ontimeouterror(void)
+{
+    hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "timeout in i2c");
+}
 
 #endif//HAL_USE_I2C4HAL
 
 
 #ifdef HAL_USE_EEPROM
 
-extern void hal_brdcfg_eeprom__ontimeouterror(void)
-{
-    hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "timeout in eeprom");
-}
 
-// extern void hal_brdcfg_eeprom__writeprotection_init(void)
-// {
-//     ;
-// }
-
-// extern void hal_brdcfg_eeprom__writeprotection_disable(void)
-// {
-//     ;
-// }
-// extern void hal_brdcfg_eeprom__writeprotection_enable(void)
-// {
-//     ;
-// }
 
 #endif//HAL_USE_EEPROM
 
@@ -523,23 +447,6 @@ extern void hal_brdcfg_spi4encoder__chipSelect_init(hal_spi_port_t spix )
 
 #ifdef HAL_USE_SWITCH  
 
-extern void hal_brdcfg_switch__MCO_config(void)
-{
-    // dummy
-    #error -> mcbstm32c does not have a switch
-}
-
-extern void hal_brdcfg_switch__reg_read_byI2C(uint8_t* pBuffer, uint16_t ReadAddr)
-{
-    // dummy
-    #error -> mcbstm32c does not have a switch
-}
-
-extern void hal_brdcfg_switch__reg_write_byI2C(uint8_t* pBuffer, uint16_t WriteAddr)
-{
-    // dummy
-    #error -> mcbstm32c does not have a switch
-}
 
 #endif//HAL_USE_SWITCH
 
@@ -578,110 +485,16 @@ extern void hal_brdcfg_eth__phy_initialise(void)
 
 extern void hal_brdcfg_eth__phy_configure(void)
 {
-    uint16_t regv;
-    uint32_t tout;
-
-//     // questo e' per la stm32f1
-// //    // configure pin PA1 (Reference clock for switch)
-// //    GPIOA->CRL   &= 0xFFFFFF0F;
-// //    GPIOA->CRL   |= 0x00000040;    /* set pin 1 in reset state and 2 in alternFunc 50MHz */
-
-//     
-//     // init the ETH_RMII_REF_CLK (PA1)
-//     GPIOA->MODER    &= ~0x0000000C;              // reset pa1
-//     GPIOA->MODER    |=  0x00000008;              /* Pin to alternate function */
-//     GPIOA->OTYPER   &= ~0x00000002;              /* Pins in push-pull mode     */
-//     GPIOA->OSPEEDR  |=  0x0000000C;              /* Slew rate as 100MHz pin    */
-//     GPIOA->PUPDR    &= ~0x0000000C;              /* No pull up, no pull down   */
-
-//     GPIOA->AFR[0]   &= ~0x000000F0;
-//     GPIOA->AFR[0]   |=  0x000000B0;              /* Pin to AF11 (Ethernet)    */
-    
-
-#if defined(ONEWANTS2_INIT_REFCLOCK_IN_HERE)
-    hal_eth_hid_rmii_refclock_init();   
-#endif
-
-#if defined(ONEWANTS2_INIT_SMI_IN_HERE)
-    hal_eth_hid_smi_init();
-#endif  
-
-// 	// reset the phy device (address is 1)
-//     hal_eth_hid_smi_write(0x01, PHY_REG_BMCR, PHY_Reset);
-
-// 	// wait for hardware reset to end 
-//     for(tout = 0; tout<HAL_ETH_PHY_WR_TIMEOUT; tout++) 
-//     {
-//         regv = hal_eth_hid_smi_read(0x01, PHY_REG_BMCR);
-//         if (!HAL_BRDCFG_ETH__ETH_IS_IN_RESET_STATE(regv))
-//         {
-//             // reset complete
-//             break;
-//         }
-//     }
-//     
-//     if(HAL_ETH_PHY_WR_TIMEOUT == tout) //ethernet is still in reset state 
-//     {
-//         hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "hal_brdcfg_eth__phy_start(): PHY is still in reset state");
-//     }
-
 
     // configure phy in full duplex and 100MB
     hal_eth_hid_smi_write(0x01, PHY_REG_BMCR, PHY_FULLD_100M); 
 }
 
 
-// extern void hal_brdcfg_eth__phy_start(void)
-// {
-// /* NOTE: this function can initilises only A1 pin because the PHY (called also ethernet transceiver) 
-//    is reset on start up and it is configured to work at 100Mb.
-//    The configuration of PHY is made by MIIM
-//    interface (MII Management).
-//    The PHY of this board is DP83848C.
-// */
-//     uint8_t i;
-//     uint16_t regv;
-//     uint32_t tout;
-
-//     // configure pin A1 (Reference clock for switch. )
-//     GPIOA->CRL   &= 0xFFFFFF0F;
-//     GPIOA->CRL   |= 0x00000040;    /*set pin 1 in reset state and 2 in alternFunc 50MHz*/
-
-
-// 	// reset all phy devices
-// 	for(i=0; i< HAL_BRDCFG_ETH__PHY_DEVICE_NUM; i++)
-// 	{
-// 		write_PHY (hal_brdcfg_eth__phy_device_list[i], PHY_REG_BMCR, PHY_Reset);
-// 	}
-
-// 	/* Wait for hardware reset to end for all phy devices. */
-// 	for(i=0; i< HAL_BRDCFG_ETH__PHY_DEVICE_NUM; i++)    
-// 	{
-// 		for (tout = 0; tout < HAL_ETH_PHY_WR_TIMEOUT; tout++) 
-// 		{
-// 			regv = read_PHY (hal_brdcfg_eth__phy_device_list[i], PHY_REG_BMCR);
-// 			if (!HAL_BRDCFG_ETH__ETH_IS_IN_RESET_STATE(regv))
-// 			{
-// 				/* Reset complete, device not Power Down. */
-// 				break;
-// 			}
-// 		}
-//         if(HAL_ETH_PHY_WR_TIMEOUT == tout) //ethernet is still in reset state 
-//         {
-//             hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "hal_eth_phy_start(): ETH is still in reset state");
-//         }
-//     }
-
-//     // configure in full duplex and 100MB
-//     for(i=0; i< HAL_BRDCFG_ETH__PHY_DEVICE_NUM; i++)
-//     {
-//         write_PHY (hal_brdcfg_eth__phy_device_list[i], PHY_REG_BMCR, PHY_FULLD_100M); /* Connect at 100MBit */
-//     }
-// }
-
 #endif//HAL_USE_ETH
 
 #ifdef HAL_USE_SYS
+
 extern void hal_brdcfg_sys__clock_config(void)
 {
    ; /* On this board this function is dummy, because 
@@ -693,6 +506,7 @@ extern void hal_brdcfg_sys__gpio_default_init(void)
 {
    ; /* On this board this function is dummy */
 }
+
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------
