@@ -142,7 +142,7 @@ ICUBCANPROTO_PER_SB_CMD_
 #define ICUBCANPROTO_POL_MB_CMD__SET_ACTIVE_ENCODER_POSITION    71
 #define ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_LIMIT			    72
 #define ICUBCANPROTO_POL_MB_CMD__SET_BCAST_POLICY			    73
-#define ICUBCANPROTO_POL_MB_CMD__SET_VEL_SHIFT			        74
+#define ICUBCANPROTO_POL_MB_CMD__SET_VEL_SHIFT			        74 //0x4A
 #define ICUBCANPROTO_POL_MB_CMD__SET_OFFSET_ABS_ENCODER         75
 #define ICUBCANPROTO_POL_MB_CMD__GET_OFFSET_ABS_ENCODER         76
 #define ICUBCANPROTO_POL_MB_CMD__SET_SMOOTH_PID                 77
@@ -572,7 +572,17 @@ typedef struct
     eOicubCanProto_damping_t            damping;                            /**< the Kd parameter */
     eOicubCanProto_torque_t             offset;                             /**< the Ko parameter */                      
 } eOicubCanProto_impedance_t;
-    
+
+typedef uint16_t                eOicubCanProto_velocityShift_t;
+
+typedef struct
+{
+    uint8_t estimShiftJointVel;
+    uint8_t estimShiftJointAcc;
+    uint8_t estimShiftMotorVel;
+    uint8_t estimShiftMotorAcc;
+} eOicubCanProto_estimShift_t;
+
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
 
