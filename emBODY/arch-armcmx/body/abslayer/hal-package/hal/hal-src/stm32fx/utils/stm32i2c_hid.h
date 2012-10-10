@@ -19,12 +19,12 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _STM32EE_HID_H_
-#define _STM32EE_HID_H_
+#ifndef _STM32I2C_HID_H_
+#define _STM32I2C_HID_H_
 
 
-/* @file       stm32ee_hid.h
-    @brief      This header file contains hidden interface for the management of some i2c EEPROMs using stm32 apis.
+/* @file       stm32i2c_hid.h
+    @brief      This header file contains hidden interface for....
     @author     marco.accame@iit.it
     @date       09/14/2012
  **/
@@ -37,11 +37,16 @@
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "stm32ee.h"
+#include "stm32i2c.h"
 
 
 // - #define used with hidden structs ---------------------------------------------------------------------------------
 // empty-section
+
+
+
+
+// -- these are the irq handler of the dma tx and rx transfers. they have to be changed in here and also in _cfg.c
 
 
 
@@ -52,10 +57,9 @@
 // empty-section
 
 
-
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-//extern uint32_t stm32ee_hid_myfunction(void);
+//extern uint32_t stm32i2c_hid_myfunction(void);
 
 // - definition of extern hidden inline functions ---------------------------------------------------------------------
 // empty-section

@@ -19,12 +19,12 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _STM32EE_HID_H_
-#define _STM32EE_HID_H_
+#ifndef _STM32GPIO_HID_H_
+#define _STM32GPIO_HID_H_
 
 
-/* @file       stm32ee_hid.h
-    @brief      This header file contains hidden interface for the management of some i2c EEPROMs using stm32 apis.
+/* @file       stm32gpio_hid.h
+    @brief      This header file contains hidden interface for....
     @author     marco.accame@iit.it
     @date       09/14/2012
  **/
@@ -37,7 +37,7 @@
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "stm32ee.h"
+#include "stm32gpio.h"
 
 
 // - #define used with hidden structs ---------------------------------------------------------------------------------
@@ -49,13 +49,18 @@
 // empty-section
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
-// empty-section
+
+extern const uint8_t stm32gpio_hid_maxports;
 
 
+extern const uint32_t stm32gpio_hid_thegpioclocks[];
+extern GPIO_TypeDef* const stm32gpio_hid_thegpioports[];
+extern const uint8_t  stm32gpio_hid_thepinnums[]; 
+extern const uint16_t  stm32gpio_hid_thepins[];
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-//extern uint32_t stm32ee_hid_myfunction(void);
+//extern uint32_t stm32i2c_hid_myfunction(void);
 
 // - definition of extern hidden inline functions ---------------------------------------------------------------------
 // empty-section

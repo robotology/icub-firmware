@@ -45,6 +45,8 @@
 
 #include "stdint.h"
 
+#include "stm32gpio.h"
+
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -64,50 +66,11 @@ typedef enum
 } stm32i2c_result_t;
 
 
+/** @typedef    typedef void (*stm32i2c_void_fp_void_t) (void)
+    @brief      pointer to a function which returns void and has a void argument.
+ **/
+typedef void (*stm32i2c_void_fp_void_t) (void);
 
-// keep same values as hal_gpio_port_t
-typedef enum 
-{
-    stm32i2c_gpio_portA = 0,
-    stm32i2c_gpio_portB,
-    stm32i2c_gpio_portC,
-    stm32i2c_gpio_portD,
-    stm32i2c_gpio_portE,
-    stm32i2c_gpio_portF,
-    stm32i2c_gpio_portG,
-    stm32i2c_gpio_portH,
-    stm32i2c_gpio_portI,
-    stm32i2c_gpio_portNONE = 255
-} stm32i2c_gpio_port_t;
-
-// keep same values as hal_gpio_pin_t
-typedef enum 
-{
-    stm32i2c_gpio_pin0 = 0,
-    stm32i2c_gpio_pin1,
-    stm32i2c_gpio_pin2,
-    stm32i2c_gpio_pin3,
-    stm32i2c_gpio_pin4,
-    stm32i2c_gpio_pin5,
-    stm32i2c_gpio_pin6,
-    stm32i2c_gpio_pin7,
-    stm32i2c_gpio_pin8,
-    stm32i2c_gpio_pin9,
-    stm32i2c_gpio_pin10,  
-    stm32i2c_gpio_pin11,
-    stm32i2c_gpio_pin12,
-    stm32i2c_gpio_pin13,
-    stm32i2c_gpio_pin14,
-    stm32i2c_gpio_pin15,
-    stm32i2c_gpio_pinNONE = 255    
-} stm32i2c_gpio_pin_t; 
-
-
-typedef struct
-{
-    stm32i2c_gpio_port_t    port;
-    stm32i2c_gpio_pin_t     pin;
-} stm32i2c_gpio_t;          // 2B  
 
 
 /** @typedef    typedef struct stm32i2c_cfg_t;
@@ -116,9 +79,11 @@ typedef struct
 typedef struct
 {
     uint32_t                speed;      /**< valid values are only 100k, 200k, and 400k. */
-    stm32i2c_gpio_t         scl;
-    stm32i2c_gpio_t         sda;
-} stm32i2c_cfg_t;           // 8B
+    stm32gpio_gpio_t        scl;
+    stm32gpio_gpio_t        sda;
+    uint8_t                 usedma;     /**< so far only i2c1 can have dma */
+    stm32i2c_void_fp_void_t ontimeout;
+} stm32i2c_cfg_t;           
 
 typedef struct 
 {
@@ -130,6 +95,7 @@ typedef struct
         uint8_t     one;
     } bytes;
 } stm32i2c_regaddr_t;
+
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
@@ -158,9 +124,11 @@ extern stm32i2c_result_t stm32i2c_deinit(uint8_t port, const stm32i2c_cfg_t *cfg
 
 extern stm32i2c_result_t stm32i2c_read(uint8_t port, uint8_t devaddr, stm32i2c_regaddr_t regaddr, uint8_t* data, uint16_t size);
 
+
 extern stm32i2c_result_t stm32i2c_write(uint8_t port, uint8_t devaddr, stm32i2c_regaddr_t regaddr, uint8_t* data, uint16_t size);
 
-extern stm32i2c_result_t stm32i2c_waitdevicestandbystate(uint8_t port, uint8_t devaddr);
+
+extern stm32i2c_result_t stm32i2c_standby(uint8_t port, uint8_t devaddr);
 
 /** @}            
     end of group arm_hal_stm32i2c  

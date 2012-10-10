@@ -45,6 +45,7 @@
 
 #include "stdint.h"
 
+#include "stm32gpio.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -64,7 +65,7 @@ typedef enum
 } stm32ee_result_t;
 
 /** @typedef    typedef enum stm32ee_device_t 
-    @brief      hal_eeprom_t contains every possible eeprom device.
+    @brief      contains every possible eeprom device.
  **/ 
 typedef enum  
 { 
@@ -77,22 +78,19 @@ typedef enum
 } stm32ee_device_t;
 
 
+/** @typedef    typedef struct stm32ee_regaddr_t 
+    @brief      contains the address of register of an eeprom.
+ **/
 typedef struct 
 {
-    uint8_t     numofbytes;         // only 1, 2, 3
+    uint8_t     numofbytes;         /**< only 1, 2, 3 */
     union
     {
         uint8_t     three[3];
         uint16_t    two;
         uint8_t     one;
-    } bytes;
+    } bytes;                        /**< teh address */
 } stm32ee_regaddr_t;
-
-
-/** @typedef    typedef void (*stm32ee_void_fp_void_t) (void)
-    @brief      stm32ee_void_fp_void_t is a pointer to a function which returns void and has a void argument.
- **/
-typedef void (*stm32ee_void_fp_void_t) (void);
 
 
 
@@ -104,48 +102,6 @@ typedef int8_t (*stm32ee_int8_fp_uint8_uint8_regaddr_uint8p_uint16_t) (uint8_t, 
 typedef int8_t (*stm32ee_int8_fp_uint8_uint8_t) (uint8_t, uint8_t);
 
 
-// keep same values as hal_gpio_port_t
-typedef enum 
-{
-    stm32ee_gpio_portA = 0,
-    stm32ee_gpio_portB,
-    stm32ee_gpio_portC,
-    stm32ee_gpio_portD,
-    stm32ee_gpio_portE,
-    stm32ee_gpio_portF,
-    stm32ee_gpio_portG,
-    stm32ee_gpio_portH,
-    stm32ee_gpio_portI,
-    stm32ee_gpio_portNONE = 255
-} stm32ee_gpio_port_t;
-
-typedef enum 
-{
-    stm32ee_gpio_pin0 = 0,
-    stm32ee_gpio_pin1,
-    stm32ee_gpio_pin2,
-    stm32ee_gpio_pin3,
-    stm32ee_gpio_pin4,
-    stm32ee_gpio_pin5,
-    stm32ee_gpio_pin6,
-    stm32ee_gpio_pin7,
-    stm32ee_gpio_pin8,
-    stm32ee_gpio_pin9,
-    stm32ee_gpio_pin10,  
-    stm32ee_gpio_pin11,
-    stm32ee_gpio_pin12,
-    stm32ee_gpio_pin13,
-    stm32ee_gpio_pin14,
-    stm32ee_gpio_pin15,
-    stm32ee_gpio_pinNONE = 255    
-} stm32ee_gpio_pin_t; 
-
-typedef struct
-{
-    stm32ee_gpio_port_t     port;
-    stm32ee_gpio_pin_t      pin;
-} stm32ee_gpio_t;  
-
 typedef struct
 {
     stm32ee_int8_fp_uint8_voidp_t                           i2cinit;
@@ -153,23 +109,17 @@ typedef struct
     void*                                                   i2cpar;
     stm32ee_int8_fp_uint8_uint8_regaddr_uint8p_uint16_t     i2cread;
     stm32ee_int8_fp_uint8_uint8_regaddr_uint8p_uint16_t     i2cwrite;
-    stm32ee_int8_fp_uint8_uint8_t                           i2cstandbydevice;
-} stm32ee_i2c_cfg_t;
+    stm32ee_int8_fp_uint8_uint8_t                           i2cstandby;
+} stm32ee_i2c_ext_t;
 
-
-typedef struct
-{
-    uint8_t                 dontuse;       /**< if 1, then initialisation is already done externally. */
-} stm32ee_dma_cfg_t;
 
 typedef struct
 {
     stm32ee_device_t        device;
     uint8_t                 i2cport;            /**< it can be 1, 2, 3. */
     uint8_t                 hwaddra2a1a0;       /**< put a 1 in pos 2, 1, 0 if the a2, a1, a0 is high. */
-    uint8_t                 wpval;              /**< 1 if protection is high, 0, if it is low, 255 if not used */
-    stm32ee_gpio_t          wppin;
-    stm32ee_void_fp_void_t  functionontimeout;
+    stm32gpio_val_t         wpval;              /**< 1 if protection is high, 0, if it is low, 3 if not used */
+    stm32gpio_gpio_t        wppin;
 } stm32ee_dev_cfg_t;
 
 
@@ -179,15 +129,14 @@ typedef struct
 typedef struct
 {
     stm32ee_dev_cfg_t       devcfg;
-    stm32ee_i2c_cfg_t       i2ccfg;
-    stm32ee_dma_cfg_t       dmacfg;
+    stm32ee_i2c_ext_t       i2cext;
 } stm32ee_cfg_t;
 
 // remember to implement sw reset as seen in atmel datasheet.
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const stm32ee_cfg_t stm32_cfg_default;   // = { .device = stm32ee_device_st_m24lr64, .i2cbus = 0, .functioni2cinit = NULL, .parameteri2cinit = NULL, .functioni2cdeinit = NULL };
+extern const stm32ee_cfg_t stm32_cfg_default;   
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
