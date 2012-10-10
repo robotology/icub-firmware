@@ -276,31 +276,33 @@
 #define DMA_RX_RCH          0x00004000  /* Second address chained            */
 #define DMA_RX_RBS1         0x00003FFF  /* Receive buffer 1 size             */
 
-/* Common PHY Registers addresses */
-#define PHY_REG_BMCR        0x00        /* Basic Mode Control Register       */
-#define PHY_REG_BMSR        0x01        /* Basic Mode Status Register        */
-#define PHY_REG_IDR1        0x02        /* PHY Identifier 1                  */
-#define PHY_REG_IDR2        0x03        /* PHY Identifier 2                  */
-#define PHY_REG_ANAR        0x04        /* Auto-Negotiation Advertisement    */
-#define PHY_REG_ANLPAR      0x05        /* Auto-Neg. Link Partner Abitily    */
+// removed because they are value related to an external phy and not to the mpu.
+// the values are defined inside the specific board which uses a given phy
+// /* Common PHY Registers addresses */
+// #define PHY_REG_BMCR        0x00        /* Basic Mode Control Register       */
+// #define PHY_REG_BMSR        0x01        /* Basic Mode Status Register        */
+// #define PHY_REG_IDR1        0x02        /* PHY Identifier 1                  */
+// #define PHY_REG_IDR2        0x03        /* PHY Identifier 2                  */
+// #define PHY_REG_ANAR        0x04        /* Auto-Negotiation Advertisement    */
+// #define PHY_REG_ANLPAR      0x05        /* Auto-Neg. Link Partner Abitily    */
+//
+// /* Common PHY Registers values */
+// #define PHY_FULLD_100M      0x2100      /* Full Duplex 100Mbit               */
+// #define PHY_HALFD_100M      0x2000      /* Half Duplex 100Mbit               */
+// #define PHY_FULLD_10M       0x0100      /* Full Duplex 10Mbit                */
+// #define PHY_HALFD_10M       0x0000      /* Half Duplex 10MBit                */
+// #define PHY_AUTO_NEG        0x3000      /* Select Auto Negotiation           */
 
-/* Common PHY Registers values */
-#define PHY_FULLD_100M      0x2100      /* Full Duplex 100Mbit               */
-#define PHY_HALFD_100M      0x2000      /* Half Duplex 100Mbit               */
-#define PHY_FULLD_10M       0x0100      /* Full Duplex 10Mbit                */
-#define PHY_HALFD_10M       0x0000      /* Half Duplex 10MBit                */
-#define PHY_AUTO_NEG        0x3000      /* Select Auto Negotiation           */
-
-#define PHY_Reset                       ((uint16_t)0x8000)      /* PHY Reset */
-#define PHY_Loopback                    ((uint16_t)0x4000)      /* Select loop-back mode */
-#define PHY_FULLDUPLEX_100M             ((uint16_t)0x2100)      /* Set the full-duplex mode at 100 Mb/s */
-#define PHY_HALFDUPLEX_100M             ((uint16_t)0x2000)      /* Set the half-duplex mode at 100 Mb/s */
-#define PHY_FULLDUPLEX_10M              ((uint16_t)0x0100)      /* Set the full-duplex mode at 10 Mb/s */
-#define PHY_HALFDUPLEX_10M              ((uint16_t)0x0000)      /* Set the half-duplex mode at 10 Mb/s */
-#define PHY_AutoNegotiation             ((uint16_t)0x1000)      /* Enable auto-negotiation function */
-#define PHY_Restart_AutoNegotiation     ((uint16_t)0x0200)      /* Restart auto-negotiation function */
-#define PHY_Powerdown                   ((uint16_t)0x0800)      /* Select the power down mode */
-#define PHY_Isolate                     ((uint16_t)0x0400)      /* Isolate PHY from MII */
+// #define PHY_Reset                       ((uint16_t)0x8000)      /* PHY Reset */
+// #define PHY_Loopback                    ((uint16_t)0x4000)      /* Select loop-back mode */
+// #define PHY_FULLDUPLEX_100M             ((uint16_t)0x2100)      /* Set the full-duplex mode at 100 Mb/s */
+// #define PHY_HALFDUPLEX_100M             ((uint16_t)0x2000)      /* Set the half-duplex mode at 100 Mb/s */
+// #define PHY_FULLDUPLEX_10M              ((uint16_t)0x0100)      /* Set the full-duplex mode at 10 Mb/s */
+// #define PHY_HALFDUPLEX_10M              ((uint16_t)0x0000)      /* Set the half-duplex mode at 10 Mb/s */
+// #define PHY_AutoNegotiation             ((uint16_t)0x1000)      /* Enable auto-negotiation function */
+// #define PHY_Restart_AutoNegotiation     ((uint16_t)0x0200)      /* Restart auto-negotiation function */
+// #define PHY_Powerdown                   ((uint16_t)0x0800)      /* Select the power down mode */
+// #define PHY_Isolate                     ((uint16_t)0x0400)      /* Isolate PHY from MII */
 
 
 // - constants --------------------------------------------------------------------------------------------------------

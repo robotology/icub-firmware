@@ -87,29 +87,22 @@
 
 #ifdef HAL_USE_ETH
 
-    #define HAL_BRDCFG_ETH__ETH_IS_IN_RESET_STATE(x)	    (x & 0x8800)
+// the phy used by this board is the DP83848x. of this phy we just use the Basic Mode Control Register (BMCR) and impose 100mbps full duplex
 
-//     // acemor on 16 sept 2011: the following are un-used ...
-//     #define HAL_BRDCFG_ETH__PHY_REG_ANER        0x06        /* Auto-Neg. Expansion Register      */
-//     #define HAL_BRDCFG_ETH__PHY_REG_ANNPTR      0x07        /* Auto-Neg. Next Page TX            */
-//      /* PHY Extended Registers */
-//     #define HAL_BRDCFG_ETH__PHY_REG_STS         0x10        /* Status Register                   */
-//     #define HAL_BRDCFG_ETH__PHY_REG_MICR        0x11        /* MII Interrupt Control Register    */
-//     #define HAL_BRDCFG_ETH__PHY_REG_MISR        0x12        /* MII Interrupt Status Register     */
-//     #define HAL_BRDCFG_ETH__PHY_REG_FCSCR       0x14        /* False Carrier Sense Counter       */
-//     #define HAL_BRDCFG_ETH__PHY_REG_RECR        0x15        /* Receive Error Counter             */
-//     #define HAL_BRDCFG_ETH__PHY_REG_PCSR        0x16        /* PCS Sublayer Config. and Status   */
-//     #define HAL_BRDCFG_ETH__PHY_REG_RBR         0x17        /* RMII and Bypass Register          */
-//     #define HAL_BRDCFG_ETH__PHY_REG_LEDCR       0x18        /* LED Direct Control Register       */
-//     #define HAL_BRDCFG_ETH__PHY_REG_PHYCR       0x19        /* PHY Control Register              */
-//     #define HAL_BRDCFG_ETH__PHY_REG_10BTSCR     0x1A        /* 10Base-T Status/Control Register  */
-//     #define HAL_BRDCFG_ETH__PHY_REG_CDCTRL1     0x1B        /* CD Test Control and BIST Extens.  */
-//     #define HAL_BRDCFG_ETH__PHY_REG_EDCR        0x1D        /* Energy Detect Control Register    */
-//     #define AL_BRDCFG_ETH__DP83848C_DEF_ADR    0x01        /* Default PHY device address        */
-//     #define AL_BRDCFG_ETH__DP83848C_ID         0x20005C90  /* PHY Identifier                    */
-//     //#define PHY_address 		DP83848C_DEF_ADR
-//     #define AL_BRDCFG_ETH__HAL_ETH_RESET_STATE_MASK		0x77FF//0x8800 DA SISTEMARE!!!!
-//     // acemor on 16 sept 2011: the previous are un-used ...
+#define HAL_BRDCFG_ETH__PHYDEV_ADR                              0x01
+    
+#define HAL_BRDCFG_ETH__PHYREG_BMRC_ADR                         0x00
+
+#define HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_RESET                   (1 << 15)
+#define HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_100M                    (1 << 13)
+#define HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_POWERDOWN               (1 << 11)
+#define HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_FULLDUPLEX              (1 << 8)
+
+
+#define HAL_BRDCFG_ETH__PHYDEV_IS_IN_RESET_STATE(bmrcval)	    ((bmrcval) & (HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_RESET | HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_POWERDOWN))
+
+#define HAL_BRDCFG_ETH__PHYREG_WRITE_TIMEOUT                    0x10000
+
 #endif//HAL_USE_ETH
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -454,6 +447,8 @@ extern void hal_brdcfg_spi4encoder__chipSelect_init(hal_spi_port_t spix )
 
 #ifdef HAL_USE_ETH
 
+//#define HAL_BRDCFG_ETH__PHYDEV_IS_IN_RESET_STATE(x)	    (x & 0x8800)
+
 extern void hal_brdcfg_eth__phy_initialise(void)
 {
     uint16_t regv;
@@ -463,20 +458,20 @@ extern void hal_brdcfg_eth__phy_initialise(void)
     hal_eth_hid_smi_init();
     
 	// reset the phy device (address is 1)
-    hal_eth_hid_smi_write(0x01, PHY_REG_BMCR, PHY_Reset);
+    hal_eth_hid_smi_write(HAL_BRDCFG_ETH__PHYDEV_ADR, HAL_BRDCFG_ETH__PHYREG_BMRC_ADR, HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_RESET);
 
 	// wait for hardware reset to end 
-    for(tout = 0; tout<HAL_ETH_PHY_WR_TIMEOUT; tout++) 
+    for(tout = 0; tout<HAL_BRDCFG_ETH__PHYREG_WRITE_TIMEOUT; tout++) 
     {
-        regv = hal_eth_hid_smi_read(0x01, PHY_REG_BMCR);
-        if (!HAL_BRDCFG_ETH__ETH_IS_IN_RESET_STATE(regv))
+        regv = hal_eth_hid_smi_read(HAL_BRDCFG_ETH__PHYDEV_ADR, HAL_BRDCFG_ETH__PHYREG_BMRC_ADR);
+        if (!HAL_BRDCFG_ETH__PHYDEV_IS_IN_RESET_STATE(regv))
         {
             // reset complete
             break;
         }
     }
     
-    if(HAL_ETH_PHY_WR_TIMEOUT == tout) //ethernet is still in reset state 
+    if(HAL_BRDCFG_ETH__PHYREG_WRITE_TIMEOUT == tout) //ethernet is still in reset state 
     {
         hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "hal_brdcfg_eth__phy_start(): PHY is still in reset state");
     }    
@@ -485,9 +480,14 @@ extern void hal_brdcfg_eth__phy_initialise(void)
 
 extern void hal_brdcfg_eth__phy_configure(void)
 {
-
     // configure phy in full duplex and 100MB
-    hal_eth_hid_smi_write(0x01, PHY_REG_BMCR, PHY_FULLD_100M); 
+    hal_eth_hid_smi_write(HAL_BRDCFG_ETH__PHYDEV_ADR, HAL_BRDCFG_ETH__PHYREG_BMRC_ADR, HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_FULLDUPLEX | HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_100M); 
+//     uint16_t regv;
+//     uint32_t tout;
+//     static uint16_t aaa = 0;    
+//     regv = hal_eth_hid_smi_read(HAL_BRDCFG_ETH__PHYDEV_ADR, 3);    
+//     aaa = regv;
+//     for(;;);
 }
 
 

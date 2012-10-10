@@ -172,10 +172,6 @@
 
 
 
-#ifdef HAL_USE_EEPROM
-    extern void hal_brdcfg_eeprom__ontimeouterror(void);
-#endif//HAL_USE_EEPROM   
-
 
 #ifdef HAL_USE_SPI4ENCODER
     extern void hal_brdcfg_spi4encoder__chipSelect_init(hal_spi_port_t spix);
@@ -189,11 +185,12 @@
     extern void hal_brdcfg_eth__phy_configure(void);
 #endif
 
+#ifdef HAL_USE_I2C4HAL
+    extern void hal_brdcfg_i2c4hal__ontimeouterror(void);
+#endif//HAL_USE_I2C4HAL   
 
 #ifdef HAL_USE_SWITCH  
-//    extern void hal_brdcfg_switch__MCO_config(void);
-//    extern void hal_brdcfg_switch__reg_read_byI2C(uint8_t* pBuffer, uint16_t ReadAddr);
-//    extern void hal_brdcfg_switch__reg_write_byI2C(uint8_t* pBuffer, uint16_t WriteAddr);
+
 #endif//HAL_USE_SWITCH
 
 

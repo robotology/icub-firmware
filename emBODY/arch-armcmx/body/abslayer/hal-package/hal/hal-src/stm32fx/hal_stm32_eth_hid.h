@@ -41,15 +41,16 @@
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
-#define HAL_ETH_PHY_WR_TIMEOUT		    0x10000
+// removed them .... as they are related to a particula phy used with the micro.
+// #define HAL_ETH_PHY_WR_TIMEOUT		    0x10000
 
-#define HAL_ETH_AUTONEG_MASK			0x0020
-#define HAL_ETH_LINK_UP_MASK			0x0004
+// #define HAL_ETH_AUTONEG_MASK			0x0020
+// #define HAL_ETH_LINK_UP_MASK			0x0004
 
-#define HAL_ETH_IS_AUTONEG_DONE(x)		(x & 0x0020)
-#define HAL_ETH_IS_LINK_UP(x) 			(x & 0x0004)
-#define IS_FULL_MODE(x)			        ((x) & 0x0004)
-#define IS_100MBIT_MODE(x)  		    (((x) & 0x0002) == 0)
+// #define HAL_ETH_IS_AUTONEG_DONE(x)		(x & 0x0020)
+// #define HAL_ETH_IS_LINK_UP(x) 			(x & 0x0004)
+// #define IS_FULL_MODE(x)			        ((x) & 0x0004)
+// #define IS_100MBIT_MODE(x)  		    (((x) & 0x0002) == 0)
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 // empty-section
