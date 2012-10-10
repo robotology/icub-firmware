@@ -119,6 +119,7 @@ typedef struct
     uint8_t     jointVelocityShift;
     uint8_t     jointVelocityEstimationShift;
     uint8_t     jointAccelerationEstimationShift;
+    uint8_t     dummy;
     /* put here ather shift values like: 
             uint8_t     motorVelocityEstimationShift;
             uint8_t     motorAccelerationEstimationShift;
