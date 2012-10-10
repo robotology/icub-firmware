@@ -113,12 +113,6 @@ extern eOmn_appl_runMode_t eo_emsapplBody_GetAppRunMode(EOtheEMSapplBody *p);
 
 extern EOappMeasConv* eo_emsapplBody_GetMeasuresConverterHandle(EOtheEMSapplBody *p);
 
-extern void eo_emsapplBody_SetLed4Runmode(EOtheEMSapplBody *p);
-extern void eo_emsapplBody_SetLed4Errormode(EOtheEMSapplBody *p);
-extern void eo_emsapplBody_SetLed4Configmode(EOtheEMSapplBody *p);
- 
-
-
 /** @}            
     end of group eo_TheEmsAppBody
  **/
