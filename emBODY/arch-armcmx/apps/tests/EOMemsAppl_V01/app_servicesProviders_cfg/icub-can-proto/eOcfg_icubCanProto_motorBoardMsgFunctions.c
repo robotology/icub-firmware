@@ -461,7 +461,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setAdditionalInfo(EOicubCan
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setSpeedEtimShift(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    eOmc_estimShift_t *estimShift_ptr = (eOmc_estimShift_t*)val_ptr;
+    eOicubCanProto_estimShift_t *estimShift_ptr = (eOicubCanProto_estimShift_t*)val_ptr;
 
     /* 1) prepare base information*/
     canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
@@ -734,13 +734,13 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setBcastPolicy(EOicubCanPro
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setVelShift(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-
+   eOicubCanProto_velocityShift_t shift = *((eOicubCanProto_velocityShift_t*)val_ptr);
    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
    canFrame->id_type = 0; //standard id
    canFrame->frame_type = 0; //data frame
    canFrame->size = 3;
    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_VEL_SHIFT;
-   *((uint16_t*)(&canFrame->data[1])) = *((uint16_t*)val_ptr);
+   *((uint16_t*)(&canFrame->data[1])) = shift;
     return(eores_OK);
 }
 
@@ -1151,8 +1151,44 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getI2TParams(EOicubCanProto
 
 extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__2foc(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
-    /* qui devo sapere come interpretare i valori che mi arrivano quindi devo essere in grado di reperire la bcastpolicy*/
+    /* 2foc sends: current (2 bytes), velocity(2 bytes), position(4 bytes)*/
+    eOresult_t                              res;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOmc_motorId_t   		                mId;
+    eOmc_motor_status_t                     *mstatus_ptr;
+
+
+    // set position about the first motor in board
+    canLoc.emscanport = canPort;
+    canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+    canLoc.indexinboard = eo_icubCanProto_jm_index_first;    
     
+    res = eo_appTheDB_GetMotorId_ByMotorCanLocation(eo_appTheDB_GetHandle(), &canLoc, &mId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    res = eo_appTheDB_GetMotorStatusPtr(eo_appTheDB_GetHandle(), mId,  &mstatus_ptr);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    mstatus_ptr->basic.current = *((int16_t*)&(frame->data[0]));
+    mstatus_ptr->basic.velocity = *((int16_t*)&(frame->data[2]));
+    mstatus_ptr->basic.position = *((int32_t*)&(frame->data[4]));
+     
+    
+    
+    /* TAG_ALE */
+#ifdef USE_2FOC_FAST_ENCODER
+    if ((frame->id & 0xFFFFFF0F) == 0x104)
+    {
+        eo_emsController_ReadSpeed(mId, SPEED_2FOC_TO_EMS(((int16_t*)frame->data)[1]));
+    }
+#endif
+
     
     
     return(eores_OK);
@@ -1214,7 +1250,55 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p, e
 
 extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
+    eOresult_t                              res;
+    eOmc_jointId_t   		                jId;
+    eOmc_joint_status_t                     *jstatus_ptr;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+
+    
+    // set position about the first joint in board
+    canLoc.emscanport = canPort;
+    canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+    canLoc.indexinboard = eo_icubCanProto_jm_index_first;    
+
+    
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), &canLoc, &jId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), jId,  &jstatus_ptr);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    jstatus_ptr->chamaleon04[0] = frame->data[0]; //fault axis 0
+    jstatus_ptr->chamaleon04[1] = frame->data[4]; //can fault 
+
+    
+    canLoc.indexinboard = eo_icubCanProto_jm_index_second;
+    
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), &canLoc, &jId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), jId,  &jstatus_ptr);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    
+    jstatus_ptr->chamaleon04[0] = frame->data[2]; //fault axis 1
+    jstatus_ptr->chamaleon04[1] = frame->data[4]; //can fault
+	
+    
     return(eores_OK);
+
 }
 
 
@@ -1413,7 +1497,6 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p
     eOresult_t res;
     eOmc_motorId_t   		                mId;
     eOmc_motor_status_t                     *mstatus_ptr;
-    eOmn_appl_runMode_t                     applrunmode;
     
     res = eo_appTheDB_GetMotorId_ByMotorCanLocation(eo_appTheDB_GetHandle(), canloc_ptr, &mId);
     if(eores_OK != res)
@@ -1437,18 +1520,6 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p
         mstatus_ptr->basic.current = *((uint16_t*)&(frame->data[2]));
     }
 
-
-    /* TAG_ALE */
-    applrunmode = eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
-    if(applrunMode__2foc == applrunmode)
-    {
-#ifdef USE_2FOC_FAST_ENCODER
-        if ((frame->id & 0xFFFFFF0F) == 0x104)
-        {
-            eo_emsController_ReadSpeed(mId, SPEED_2FOC_TO_EMS(((int16_t*)frame->data)[1]));
-        }
-#endif
-    }   
     return(eores_OK);
 }
 
