@@ -422,6 +422,16 @@
           <WinNumber>1</WinNumber>
           <ItemText>tmp</ItemText>
         </Ww>
+        <Ww>
+          <count>3</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>cfg</ItemText>
+        </Ww>
+        <Ww>
+          <count>4</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>i2ccfg</ItemText>
+        </Ww>
       </WatchWindow1>
       <MemoryWindow1>
         <Mm>
@@ -472,10 +482,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>19</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>105</TopLine>
-      <CurrentLine>112</CurrentLine>
+      <TopLine>131</TopLine>
+      <CurrentLine>119</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app-test\blinky-hal-stm32f4-ipal.c</PathWithFileName>
       <FilenameWithoutPath>blinky-hal-stm32f4-ipal.c</FilenameWithoutPath>
@@ -486,10 +496,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>32</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>120</TopLine>
-      <CurrentLine>140</CurrentLine>
+      <TopLine>220</TopLine>
+      <CurrentLine>230</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app-test\blinky-hal-stm32f4.c</PathWithFileName>
       <FilenameWithoutPath>blinky-hal-stm32f4.c</FilenameWithoutPath>
@@ -565,7 +575,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>183</TopLine>
+      <TopLine>186</TopLine>
       <CurrentLine>192</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-stg\hal_stm32f1_startup.s</PathWithFileName>
@@ -633,10 +643,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>61</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>707</TopLine>
-      <CurrentLine>733</CurrentLine>
+      <TopLine>22</TopLine>
+      <CurrentLine>26</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\stm32fx\hal_stm32_can.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_can.c</FilenameWithoutPath>
@@ -703,10 +713,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>2</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>356</TopLine>
-      <CurrentLine>377</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\stm32fx\hal_stm32_eeprom.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_eeprom.c</FilenameWithoutPath>
@@ -731,10 +741,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>34</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>180</TopLine>
-      <CurrentLine>194</CurrentLine>
+      <TopLine>268</TopLine>
+      <CurrentLine>272</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\stm32fx\hal_stm32_eth.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_eth.c</FilenameWithoutPath>
@@ -759,10 +769,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>34</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>247</TopLine>
-      <CurrentLine>254</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\stm32fx\hal_stm32_gpio.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_gpio.c</FilenameWithoutPath>
@@ -787,10 +797,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>30</ColumnNumber>
+      <ColumnNumber>28</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>126</TopLine>
-      <CurrentLine>152</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\stm32fx\hal_stm32_switch.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_switch.c</FilenameWithoutPath>
@@ -801,10 +811,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>39</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>140</TopLine>
-      <CurrentLine>154</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\stm32fx\hal_stm32_sys.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_sys.c</FilenameWithoutPath>
@@ -831,8 +841,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>115</TopLine>
-      <CurrentLine>121</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\stm32fx\hal_stm32_trace.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_trace.c</FilenameWithoutPath>
@@ -864,7 +874,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>27</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -918,8 +928,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\hal\hal-src\stm32fx\utils\stm32ee_cfg.c</PathWithFileName>
-      <FilenameWithoutPath>stm32ee_cfg.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\hal\hal-src\stm32fx\utils\stm32i2c.c</PathWithFileName>
+      <FilenameWithoutPath>stm32i2c.c</FilenameWithoutPath>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -927,13 +937,13 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>1</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\hal\hal-src\stm32fx\utils\stm32i2c.c</PathWithFileName>
-      <FilenameWithoutPath>stm32i2c.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\hal\hal-src\stm32fx\utils\stm32gpio.c</PathWithFileName>
+      <FilenameWithoutPath>stm32gpio.c</FilenameWithoutPath>
     </File>
   </Group>
 
@@ -946,9 +956,9 @@
       <GroupNumber>9</GroupNumber>
       <FileNumber>31</FileNumber>
       <FileType>1</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>30</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
