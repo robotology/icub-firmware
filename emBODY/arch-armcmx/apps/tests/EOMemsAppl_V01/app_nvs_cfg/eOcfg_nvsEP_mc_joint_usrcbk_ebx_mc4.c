@@ -125,7 +125,9 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jx
     eOmc_joint_status_t                     *jstatus_ptr = NULL;
     eOappTheDB_jointShiftValues_t           *shiftval_ptr;
     eOicubCanProto_bcastpolicy_t            *bcastpolicy_ptr;
+    eOicubCanProto_estimShift_t             estimshift;
     eOicubCanProto_position_t               pos_icubCanProtValue;
+    eOicubCanProto_velocityShift_t          shift_icubCanProtValue;
     eOicubCanProto_impedance_t              impedence_icubCanProtValues;
     eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t             msgCmd = 
@@ -195,16 +197,22 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jx
     eo_appTheDB_GetJointBcastpolicyPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx, &bcastpolicy_ptr);
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(bcastpolicy_ptr->val2bcastList[0]));
     
-
+    //get shift values from DB
+    eo_appTheDB_GetShiftValuesOfJointPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx, &shiftval_ptr);
+    
     // 9) set vel shift
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_VEL_SHIFT;
-    eo_appTheDB_GetShiftValuesOfJointPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx, &shiftval_ptr);
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(shiftval_ptr->jointVelocityShift));
+    shift_icubCanProtValue = shiftval_ptr->jointVelocityShift;
+    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&shift_icubCanProtValue);
     
             
     // 10) set estim vel shift
+    estimshift.estimShiftJointVel= shiftval_ptr->jointVelocityEstimationShift;
+    estimshift.estimShiftJointAcc = 0;
+    estimshift.estimShiftMotorVel = 0;
+    estimshift.estimShiftMotorAcc = 0;
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_SPEED_ESTIM_SHIFT;
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(shiftval_ptr->jointVelocityEstimationShift));
+    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&estimshift);
     
     // 11) set monitormode status
     res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx,  &jstatus_ptr);
@@ -529,18 +537,15 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
     eOicubCanProto_msgCommand_t            msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__CALIBRATE_ENCODER
     };
 
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     /*Since icub can proto uses encoder tacks like position unit, i need of the converter: from icub to encoder*/
     EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
 
-    // 1) send controller run
-    eo_appCanSP_SendCmd2Joint(appCanSP_ptr, (eOmc_jointId_t)jxx, msgCmd, NULL);
-    
-    // 2)prepare calibration data to send
-     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CALIBRATE_ENCODER;
+ 
+    //prepare calibration data to send
     iCubCanProtCalibrator.type = (eOicubCanProto_calibration_type_t)calibrator->type;
     switch(calibrator->type)
     {
@@ -571,7 +576,14 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
 
         case eomc_calibration_type4_abs_and_incremental:
         {
-            iCubCanProtCalibrator.params.type4.position = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, calibrator->params.type3.position);
+            eOicubCanProto_position_t pos = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, calibrator->params.type4.position);
+            //here position is in int16_t ==> so i must verify if pos is out of int16_t range
+            if((pos > INT16_MAX) || (pos < INT16_MIN))
+            {
+                return;
+                #warning VALE --> how to manage this error???
+            }
+            iCubCanProtCalibrator.params.type4.position = pos;
             iCubCanProtCalibrator.params.type4.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, calibrator->params.type4.velocity);           
             iCubCanProtCalibrator.params.type4.maxencoder = calibrator->params.type4.maxencoder;
         }break;
@@ -606,7 +618,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
         return;
     }
     jstatus_ptr->basic.controlmodestatus = *controlmode_ptr;
-
+    #warning VALE-->check if PWM can be enable?? see fault.
 
 
     // 2) send control mode value to mc4
@@ -616,40 +628,29 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
         return;
     }
 
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
+    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, controlmode_ptr);
+
     //set destination of all messages 
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
 
-    switch(*controlmode_ptr)
+    if(eomc_controlmode_idle == *controlmode_ptr)
     {
-        case eomc_controlmode_switch_everything_off:
-        {
-            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__DISABLE_PWM_PAD;
-            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
 
-            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_IDLE;
-            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
-        }break;
-        
-        case eomc_controlmode_idle:
-        {
-            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__ENABLE_PWM_PAD;
-            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__DISABLE_PWM_PAD;
+        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
 
-            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_IDLE;
-            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
-        }break;
-        
-        default: // pos-controlmode, vel-controlmode, etc (see enum type eOmc_controlmode_t) 
-        {
-            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
-            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, controlmode_ptr);
-            
-            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;
-            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
-        }
-        
+        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_IDLE;
+        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
     }
-
+    else // pos-controlmode, vel-controlmode, etc (see enum type eOmc_controlmode_t) 
+    {
+        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__ENABLE_PWM_PAD;
+        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+    
+        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;
+        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+    }
 }
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
