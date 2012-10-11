@@ -13,7 +13,7 @@ bool 		enableSender = false;
 double		encoderconvfactor = 1; //configured during joint configuration
 double		encoderconvoffset = 0; //configured during joint configuration
 
-
+#error would you like use send thread???
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of callback functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -32,10 +32,12 @@ void commands(void)
 	printf("1: configure regulars \n");
 	printf("2: configure skin  R/L ARM \n");
 	printf("3: configure mais\n");
-	printf("4: send a static config to joint and motor with id=jId\n");
+	printf("4: send pos setpoint to joint with id=jId\n");
 	printf("5: config joint with user param\n");
-	printf("6: send pid to a motor or a joint\n");
-	printf("7: config motor\n");
+	printf("6: send pid to a motor (current pid) or a joint(pos pid)\n");
+	printf("7: config motor with user param\n");
+	printf("8: send calib data\n");
+	printf("9: send control mode");
 
 	printf("\n");
 }
@@ -104,20 +106,26 @@ void s_callback_button_1(void)
 			return;
 		}
 
-		nvid = eo_cfg_nvsEP_mc_joint_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)sigcfg.ep, j, jointNVindex_jstatus__basic);
-		sigcfg.id = nvid;
-		sigcfg.plustime = 0;
-		eo_array_PushBack(array, &sigcfg);
+//		nvid = eo_cfg_nvsEP_mc_joint_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)sigcfg.ep, j, jointNVindex_jstatus__basic);
+//		sigcfg.id = nvid;
+//		sigcfg.plustime = 0;
+//		eo_array_PushBack(array, &sigcfg);
+//
+//		nvid = eo_cfg_nvsEP_mc_joint_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)sigcfg.ep, j, jointNVindex_jstatus__ofpid);
+//		sigcfg.id = nvid;
+//		sigcfg.plustime = 0;
+//		eo_array_PushBack(array, &sigcfg);
 
-		nvid = eo_cfg_nvsEP_mc_joint_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)sigcfg.ep, j, jointNVindex_jstatus__ofpid);
+		nvid = eo_cfg_nvsEP_mc_joint_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)sigcfg.ep, j, jointNVindex_jstatus);
 		sigcfg.id = nvid;
 		sigcfg.plustime = 0;
 		eo_array_PushBack(array, &sigcfg);
+		printf("ep=%d, NVID= %d", sigcfg.ep, nvid);
 
-		nvid = eo_cfg_nvsEP_mc_motor_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)sigcfg.ep, m, motorNVindex_mstatus__basic);
-		sigcfg.id = nvid;
-		sigcfg.plustime = 0;
-		eo_array_PushBack(array, &sigcfg);
+//		nvid = eo_cfg_nvsEP_mc_motor_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)sigcfg.ep, m, motorNVindex_mstatus__basic);
+//		sigcfg.id = nvid;
+//		sigcfg.plustime = 0;
+//		eo_array_PushBack(array, &sigcfg);
 	}
 
 
@@ -239,69 +247,31 @@ void s_callback_button_3(void)
 //configure joint and motor with id=jId
 void s_callback_button_4(void )
 {
-	char 							str[128];
-	char							numjointstr[5];
-	EOnv 							*nvRoot;
-	eOresult_t 						res;
-	eOcfg_nvsEP_mc_endpoint_t 		ep;
-	eOcfg_nvsEP_mc_jointNumber_t 	j = 0;
-	eOcfg_nvsEP_mc_jointNVindex_t 	jNVindex = jointNVindex_jconfig;
-	uint16_t 						maxNumOfJointInEp;
-	eOmc_joint_config_t 			jData;
-	eOmc_motor_config_t 			mData;
+   int joint,pos,vel;
 
-	// 1) get correct ep
-	ep = s_get_mc_ep_byBoardNum(boardN);
+	printf("\nsetpos <joint> <pos> <vel>: ");
+	scanf("%d %d %d",&joint,&pos,&vel);
 
-	// 2) get jid
-	if(!s_getJointNum_frominput(ep, &j))
-	{
-		return;
-	}
+	EOnv *nvRoot;
 
-	// 3) get nvid from parameters
+	eOcfg_nvsEP_mc_endpoint_t ep           = s_get_mc_ep_byBoardNum(boardN);
+	eOcfg_nvsEP_mc_jointNumber_t j         = joint;
+	eOcfg_nvsEP_mc_jointNVindex_t jNVindex = jointNVindex_jcmmnds__setpoint;
+
 	eOnvID_t nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, j, jNVindex);
 	nvRoot = transceiver->getNVhandler(ep, nvid);
 
+	eOmc_setpoint_t setPoint;
+	setPoint.type                       = eomc_setpoint_position;
+	setPoint.to.position.value 			= pos;//s_posA2E(pos, encoderconvfactor, encoderconvoffset);
+	setPoint.to.position.withvelocity 	= vel;
 
-	memset(&jData, 0x00, sizeof(eOmc_joint_config_t));
-	jData.pidposition.kp 				= 0x1AAA;
-	jData.pidposition.ki 				= 0x1BBB;
-	jData.pidposition.kd 				= 0x1CCC;
-	jData.pidposition.limitonintegral 	= 0x1DDD;
-	jData.pidposition.limitonoutput 	= 0X1EEE;
-	jData.pidposition.offset 			= 0X1FFF;
-	jData.pidposition.scale 			= 0X11;
-	jData.minpositionofjoint			= 0x22333322;
-	jData.maxpositionofjoint			= 0x44555544;
-	if( eores_OK != eo_nv_Set(nvRoot, &jData, eobool_true, eo_nv_upd_dontdo))
-		printf("error!!");
-	// tell agent to prepare a rop to send
+	if (eores_OK != eo_nv_Set(nvRoot, &setPoint, eobool_true, eo_nv_upd_always))
+		{
+			printf("ERROR\n");
+		}
+
 	transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
-
-	//--
-	// get nvid from parameters
-	eOcfg_nvsEP_mc_motorNVindex_t mNVindex = motorNVindex_mconfig;
-	nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(ep, j, mNVindex);
-	nvRoot = transceiver->getNVhandler(ep, nvid);
-
-
-	memset(&mData, 0x00, sizeof(eOmc_motor_config_t));
-	mData.pidcurrent.kp					= 0x6AAA;
-	mData.pidcurrent.ki					= 0x6BBB;
-	mData.pidcurrent.kd					= 0x6CCC;
-	mData.pidcurrent.limitonintegral	= 0x6DDD;
-	mData.pidcurrent.limitonoutput		= 0x6EEE;
-	mData.pidcurrent.offset				= 0x6FFF;
-	mData.pidcurrent.scale				= 0x66;
-	mData.maxvelocityofmotor			= 0x77888877;
-	mData.maxcurrentofmotor				= 0x9999;
-	if( eores_OK != eo_nv_Set(nvRoot, &mData, eobool_true, eo_nv_upd_dontdo))
-		printf("error!!");
-	// tell agent to prepare a rop to send
-	transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
-
-	snprintf(str, sizeof(str)-1, "called set motor and joint config, index %d\n", j);
 }
 
 
@@ -496,12 +466,112 @@ void s_callback_button_7(void )
 
 void s_callback_button_8(void )
 {
-	printf("not implemented\n");
+    int joint,type, pos,vel,offset;
+
+    printf("\ncalibrate <joint> <type>: ");
+    scanf("%d %d",&joint,&type);
+
+	EOnv *nvRoot;
+	eOmc_calibrator_t calibData;
+	eOcfg_nvsEP_mc_endpoint_t ep           = s_get_mc_ep_byBoardNum(boardN);
+	eOcfg_nvsEP_mc_jointNumber_t j         = joint;
+	eOcfg_nvsEP_mc_jointNVindex_t jNVindex = jointNVindex_jcmmnds__calibration;
+
+	eOnvID_t nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, j, jNVindex);
+	nvRoot = transceiver->getNVhandler(ep, nvid);
+
+    calibData.type = type;
+
+    switch(calibData.type)
+    {
+    	case eomc_calibration_type0_hard_stops:
+    	{
+    		int pwmlimit, velocity;
+    		printf("eomc_calibration_type0_hard_stops\n");
+    		printf("<pwmlimit>  <velocity>");
+    		scanf("%d %d ",&pwmlimit,&velocity);
+    		calibData.params.type0.pwmlimit = pwmlimit;
+    		calibData.params.type0.velocity = velocity;
+    	}break;
+
+    	case eomc_calibration_type1_abs_sens_analog:
+    	{
+    		int position, velocity;
+    		printf("eomc_calibration_type1_abs_sens_analog\n");
+    		printf("<position>  <velocity>");
+    		scanf("%d %d ",&position,&velocity);
+    		calibData.params.type1.position = position;
+    		calibData.params.type1.velocity = velocity;
+    	}break;
+
+    	case eomc_calibration_type2_hard_stops_diff:
+    	{
+       		int pwmlimit, velocity;
+       		printf("eomc_calibration_type2_hard_stops_diff\n");
+			printf("<pwmlimit>  <velocity>");
+			scanf("%d %d ",&pwmlimit,&velocity);
+			calibData.params.type2.pwmlimit = pwmlimit;
+			calibData.params.type2.velocity = velocity;
+    	}break;
+
+    	case eomc_calibration_type3_abs_sens_digital:
+    	{
+    		int position, velocity, offset;
+    		printf("eomc_calibration_type3_abs_sens_digital\n");
+    		printf("<position>  <velocity> <offset>");
+    		scanf("%d %d %d",&position,&velocity, &offset);
+    		calibData.params.type3.position = position;
+    		calibData.params.type3.velocity = velocity;
+    		calibData.params.type3.offset = offset;
+    	}break;
+
+    	case eomc_calibration_type4_abs_and_incremental:
+    	{
+    		int position, velocity, maxencoder;
+    		printf("eomc_calibration_type4_abs_and_incremental\n");
+    		printf("<position>  <velocity> <maxencoder>");
+    		scanf("%d %d %d",&position,&velocity, &maxencoder);
+    		calibData.params.type4.position = position;
+    		calibData.params.type4.velocity = velocity;
+    		calibData.params.type4.maxencoder = maxencoder;
+    	}break;
+    	default:
+    	{
+        	printf("err calib type: 0-4\n");
+        	return;
+
+    	}
+    }
+
+	if (eores_OK != eo_nv_Set(nvRoot, &calibData, eobool_true, eo_nv_upd_always))
+	{
+		printf("ERROR\n");
+	}
+
+	transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
 }
 
 void s_callback_button_9(void )
 {
-	printf("not implemented\n");
+    int joint,cm;
+
+    printf("\ncontrolmode <joint> <cm>: ");
+    scanf("%d %d",&joint,&cm);
+
+	EOnv *nvRoot;
+
+	eOcfg_nvsEP_mc_endpoint_t ep           = s_get_mc_ep_byBoardNum(boardN);
+	eOcfg_nvsEP_mc_jointNumber_t j         = joint;
+	eOcfg_nvsEP_mc_jointNVindex_t jNVindex = jointNVindex_jcmmnds__controlmode;
+
+	eOnvID_t nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, j, jNVindex);
+	nvRoot = transceiver->getNVhandler(ep, nvid);
+
+    eOmc_controlmode_t controlMode = (eOmc_controlmode_t)cm;
+
+	if (eores_OK != eo_nv_Set(nvRoot, &controlMode, eobool_true, eo_nv_upd_always)) printf("ERROR\n");
+
+	transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
 }
 
 
@@ -660,4 +730,74 @@ static bool s_getMotorNum_frominput(eOcfg_nvsEP_mc_endpoint_t ep, eOcfg_nvsEP_mc
 static int32_t s_posA2E(eOmeas_position_t posA, double covfactor, double convoffset)
 {
 	return((posA + convoffset)*covfactor);
+}
+
+static void old_func(void)
+{
+
+
+	char 							str[128];
+	char							numjointstr[5];
+	EOnv 							*nvRoot;
+	eOresult_t 						res;
+	eOcfg_nvsEP_mc_endpoint_t 		ep;
+	eOcfg_nvsEP_mc_jointNumber_t 	j = 0;
+	eOcfg_nvsEP_mc_jointNVindex_t 	jNVindex = jointNVindex_jconfig;
+	uint16_t 						maxNumOfJointInEp;
+	eOmc_joint_config_t 			jData;
+	eOmc_motor_config_t 			mData;
+
+	// 1) get correct ep
+	ep = s_get_mc_ep_byBoardNum(boardN);
+
+	// 2) get jid
+	if(!s_getJointNum_frominput(ep, &j))
+	{
+		return;
+	}
+
+	// 3) get nvid from parameters
+	eOnvID_t nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, j, jNVindex);
+	nvRoot = transceiver->getNVhandler(ep, nvid);
+
+
+	memset(&jData, 0x00, sizeof(eOmc_joint_config_t));
+	jData.pidposition.kp 				= 0x1AAA;
+	jData.pidposition.ki 				= 0x1BBB;
+	jData.pidposition.kd 				= 0x1CCC;
+	jData.pidposition.limitonintegral 	= 0x1DDD;
+	jData.pidposition.limitonoutput 	= 0X1EEE;
+	jData.pidposition.offset 			= 0X1FFF;
+	jData.pidposition.scale 			= 0X11;
+	jData.minpositionofjoint			= 0x22333322;
+	jData.maxpositionofjoint			= 0x44555544;
+	if( eores_OK != eo_nv_Set(nvRoot, &jData, eobool_true, eo_nv_upd_dontdo))
+		printf("error!!");
+	// tell agent to prepare a rop to send
+	transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
+
+	//--
+	// get nvid from parameters
+	eOcfg_nvsEP_mc_motorNVindex_t mNVindex = motorNVindex_mconfig;
+	nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(ep, j, mNVindex);
+	nvRoot = transceiver->getNVhandler(ep, nvid);
+
+
+	memset(&mData, 0x00, sizeof(eOmc_motor_config_t));
+	mData.pidcurrent.kp					= 0x6AAA;
+	mData.pidcurrent.ki					= 0x6BBB;
+	mData.pidcurrent.kd					= 0x6CCC;
+	mData.pidcurrent.limitonintegral	= 0x6DDD;
+	mData.pidcurrent.limitonoutput		= 0x6EEE;
+	mData.pidcurrent.offset				= 0x6FFF;
+	mData.pidcurrent.scale				= 0x66;
+	mData.maxvelocityofmotor			= 0x77888877;
+	mData.maxcurrentofmotor				= 0x9999;
+	if( eores_OK != eo_nv_Set(nvRoot, &mData, eobool_true, eo_nv_upd_dontdo))
+		printf("error!!");
+	// tell agent to prepare a rop to send
+	transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
+
+	snprintf(str, sizeof(str)-1, "called set motor and joint config, index %d\n", j);
+
 }
