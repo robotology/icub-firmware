@@ -46,6 +46,7 @@
 #include "EoCommon.h"
 #include "eOcfg_nvsEP_mc_hid.h"
 #include "EOnv_hid.h"
+#include "eOcfg_nvsEP_mc_overridden_pc104.h"
 
 typedef struct
 {
@@ -76,6 +77,56 @@ static MYmotionController themotioncontrollers[3];
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
+#define isOverCurrent(status)						((status) & (0x08))
+#define isFaultUndervoltage(status)					((status) & (0x01))
+#define isFaultExternal(status)						((status) & (0x04))
+#define isFaultOverload(status)						((status) & 0x02)
+#define isHallSensorError(status)					((status) & 0x10)
+#define isAbsEncoderError(status)					((status) & 0x20)
+//can fault
+#define isCanTxOverflow(status)						((status) & 0x01)
+#define isCanBusOff(status)							((status) & 0x02)
+#define isCanTxError(status)						((status) & 0x04)
+#define isCanRxError(status)						((status) & 0x08)
+#define isCanTxOverrun(status)						((status) & 0x10)
+#define isCanRxWarning(status)						((status) & 0x20)
+#define isCanRxOverrun(status)						((status) & 0x4)
+
+extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jstatus(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+	eOmc_joint_status_t *jstatus = nv->rem;
+	printf("joint %d position %d\n", jxx, jstatus->basic.position);
+
+	printf("joint %d fault: ", jxx);
+	if(isOverCurrent(jstatus->chamaleon04[0]))
+		printf("overcurrent, ");
+	if(isFaultUndervoltage(jstatus->chamaleon04[0]))
+		printf("Undervoltage, ");
+	if(isFaultExternal(jstatus->chamaleon04[0]))
+		printf("FaultExternal, ");
+	if(isFaultOverload(jstatus->chamaleon04[0]))
+		printf("FaultOverload, ");
+	if(isHallSensorError(jstatus->chamaleon04[0]))
+		printf("HallSensorError, ");
+	if(isAbsEncoderError(jstatus->chamaleon04[0]))
+		printf("AbsEncoderError, ");
+//can fault
+	if(isCanTxOverflow(jstatus->chamaleon04[1]))
+		printf("CanTxOverflow, ");
+	if(isCanBusOff(jstatus->chamaleon04[1]))
+		printf("CanBusOff, ");
+	if(isCanTxError(jstatus->chamaleon04[1]))
+		printf("isCanTxError, ");
+	if(isCanTxOverrun(jstatus->chamaleon04[1]))
+		printf("CanTxOverrun, ");
+	if(isCanRxWarning(jstatus->chamaleon04[1]))
+		printf("isCanRxWarning, ");
+	if(isCanRxOverrun(jstatus->chamaleon04[1]))
+		printf("isCanRxOverrun, ");
+
+	printf("\n");
+
+}
 
 
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jstatus__basic(eOcfg_nvsEP_mc_jointNumber_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
