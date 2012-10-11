@@ -28,10 +28,11 @@
 #include "abs_ssi_interface.h"
 #include "strain_board.h"
 #include "check_range.h"
+#include "decoupling.h"
 	
 byte	_board_ID = 15;	
 char    _additional_info [32];
-byte    _build_number = 47;
+byte    _build_number = 48;
 byte    _my_can_protocol_major = 1;
 byte    _my_can_protocol_minor = 1;
 bool    _can_protocol_ack = false;
@@ -67,7 +68,6 @@ Int16 hall_temp=0;
 // Local prototypes
 //********************
 
-void decouple_positions(void);
 void check_encoder_hall_drift(byte jnt);
 /*
  * version specific global variables.
@@ -481,123 +481,9 @@ void main(void)
 //******************************************************************************************/		
 // 							  		COMPUTE CONTROLS FOR COUPLED JOINTS                                    
 // 							     /* computes controls */
-//******************************************************************************************/ 		
-#if VERSION == 0x0115 
-
-		if ( ! ((_control_mode[0] == MODE_CALIB_HARD_STOPS ) ||
-			    (_control_mode[1] == MODE_CALIB_HARD_STOPS ) ) )
-		{
-			/*
-			PWMoutput[0] = (PWMoutput[0] + PWMoutput[1]) >> 1;
-			PWMoutput[1] = PWMoutput[0] - PWMoutput[1];	
-			PWMoutput[1] = -PWMoutput[1];
-			*/
-			temp_swap 	 = PWMoutput[0];
-			PWMoutput[0] = (PWMoutput[0] + PWMoutput[1]) >> 1;
-			PWMoutput[1] = (temp_swap    - PWMoutput[1]) >> 1;	
+//******************************************************************************************/ 
+		decouple_dutycycle	(PWMoutput);
 			
-				if (_control_mode[0] == MODE_IDLE || 
-				_control_mode[1] == MODE_IDLE)
-			{
-				PWMoutput[0] = 0;
-				PWMoutput[1] = 0;
-			}
-			/*
-			_pd[0] = (_pd[0] + _pd[1]) >> 1;
-			_pd[1] = _pd[0] - _pd[1];	
-			_pd[1] = -_pd[1];
-			*/
-			temp_swap = _pd[0];
-			_pd[0] = (_pd[0] 	+ _pd[1]) >> 1;
-			_pd[1] = (temp_swap - _pd[1]) >> 1;		
-		}		
-
-		if (_control_mode[0] == MODE_CALIB_HARD_STOPS) PWMoutput[1] = 0;
-		if (_control_mode[1] == MODE_CALIB_HARD_STOPS) PWMoutput[0] = 0;	
-#endif
-//******************************************************************************************/		
-// 							  		COMPUTE CONTROLS FOR COUPLED JOINTS                                    
-// 							     /* computes controls */
-//******************************************************************************************/ 		
-#if VERSION == 0x0215 
-
-		if ( ! ((_control_mode[2] == MODE_CALIB_HARD_STOPS ) ||
-			    (_control_mode[3] == MODE_CALIB_HARD_STOPS ) ) )
-		{
-		
-			temp_swap 	 = PWMoutput[2];
-			PWMoutput[2] = (PWMoutput[2] + PWMoutput[3]) >> 1;
-			PWMoutput[3] = (temp_swap    - PWMoutput[3]) >> 1;			
-				if (_control_mode[2] == MODE_IDLE || 
-				_control_mode[3] == MODE_IDLE)
-			{
-				PWMoutput[2] = 0;
-				PWMoutput[3] = 0;
-			}	
-			temp_swap = _pd[2];
-			_pd[2] = (_pd[2] 	+ _pd[3]) >> 1;
-			_pd[3] = (temp_swap - _pd[3]) >> 1;		
-		}		
-
-		if (_control_mode[2] == MODE_CALIB_HARD_STOPS) PWMoutput[3] = 0;
-		if (_control_mode[3] == MODE_CALIB_HARD_STOPS) PWMoutput[2] = 0;	
-#endif
-		/*differential controls*/
-#if VERSION == 0x0119 
-			//PWMoutput[1] = PWMoutput[1];	//omitted
-			PWMoutput[2] = (PWMoutput[2] - PWMoutput[1]);
-			if (_control_mode[1] == MODE_IDLE || _control_mode[2] == MODE_IDLE)
-			{
-				PWMoutput[1] = 0;
-	 			PWMoutput[2] = 0;
-			}
-			//_pd[1] = _pd[1];				//omitted
-			_pd[2] = _pd[2] - _pd[1];
-			
-			if ((_control_mode[1] == MODE_CALIB_HARD_STOPS) || (_control_mode[2] == MODE_CALIB_HARD_STOPS))
-			{
-				if 	(PWMoutput[1]> _pwm_calibration[1])
-				  	PWMoutput[1] = _pwm_calibration[1];
-				if 	(PWMoutput[1] < -_pwm_calibration[1])	
-					PWMoutput[1] = -_pwm_calibration[1];
-				if 	(PWMoutput[2]> _pwm_calibration[2])
-				  	PWMoutput[2] = _pwm_calibration[2];
-				if 	(PWMoutput[2] < -_pwm_calibration[2])	
-					PWMoutput[2] = -_pwm_calibration[2];		
-			}	
-#endif 
-
-		/*differential controls*/
-#if VERSION == 0x0219 
-	/*  Wrist Differential coupling 
-		|Me1| |  1    -1 |  |Je1|
-		|Me2|=| -1     0 |* |Je2|    */
-	
-
-
-			PWMoutput[1] = PWMoutput[1]-PWMoutput[2];	
-			PWMoutput[2] = -PWMoutput[2];
-			if (_control_mode[1] == MODE_IDLE || _control_mode[2] == MODE_IDLE)
-			{
-				PWMoutput[1] = 0;
-	 			PWMoutput[2] = 0;
-			}
-			_pd[1] = _pd[1]-_pd[2];			
-			_pd[2] = -_pd[2];
-			
-			if ((_control_mode[1] == MODE_CALIB_HARD_STOPS) || (_control_mode[2] == MODE_CALIB_HARD_STOPS))
-			{
-				if 	(PWMoutput[1]> _pwm_calibration[1])
-				   	PWMoutput[1] = _pwm_calibration[1];
-				if 	(PWMoutput[1] < -_pwm_calibration[1])	
-					PWMoutput[1] = -_pwm_calibration[1];
-				if 	(PWMoutput[2]> _pwm_calibration[2])
-				  	PWMoutput[2] = _pwm_calibration[2];
-				if 	(PWMoutput[2] < -_pwm_calibration[2])	
-					PWMoutput[2] = -_pwm_calibration[2];		
-			}	
-#endif 
-//-------------------------------------------------------------------------------------------
 
 //******************************************************************************************/		
 // 							  		CONTROL SATURATIONS                                  
@@ -790,56 +676,6 @@ void main(void)
 	} /* end for(;;) */
 }/* end main()*/
 
-
-
-
-
-
-
-
-
-
-
-	
-/***************************************************************************/
-/**
- * this function decouple encoder readings.
- ***************************************************************************/
-void decouple_positions(void)
-{
-#if VERSION == 0x0112
-		/* (de)couple encoder readings */
-		_position[0] = L_sub(_position[0], _position[1]);
-				
-		
-#elif VERSION == 0x0113		
-		/* beware of the first cycle when _old has no meaning */		
-		_position[0] = L_add(_position[0], _adjustment[0] >> 1);
-		_position[0] = L_sub(_position[0], _adjustment[0] / 7);
-		_position[0] = L_sub(_position[0], _adjustment[1] >> 2);  // last >>2 must be 11/41
-				
-		_adjustment[0] = L_add(_adjustment[0], _delta_adj[0]);
-		_adjustment[1] = L_add(_adjustment[1], _delta_adj[1]);
-				
-#elif VERSION == 0x0115
-		//_position[0] = _position[0] - _position[1];
-		//_position[1] = _position[0] + 2*_position[1];
-		//vergence / version inverted
-		_position[0] = _position[0] + _position[1];
-		_position[1] = _position[0] - 2*_position[1];
-#elif VERSION == 0x0215
-
-		_position[2] = _position[2] + _position[3];
-		_position[3] = _position[2] - 2*_position[3];	
-			
-#elif VERSION == 0x0119
-		//_position[1] = _position[1];		//omitted
-		_position[2] = _position[1] + _position[2];		
-#elif VERSION == 0x0219
-		//_position[1] = _position[1];		//omitted
-		//_position[2] = _position[2];		//omitted
-#endif
-}
 
 /***************************************************************************/
 /**
