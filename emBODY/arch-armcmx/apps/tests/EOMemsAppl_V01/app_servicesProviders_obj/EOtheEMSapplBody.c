@@ -391,14 +391,12 @@ static void s_eo_emsapplBody_measuresConverter_init(EOtheEMSapplBody *p)
 static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
 {
     eOresult_t                              res;
-    uint16_t                                numofjoint, i, numofboard;
+    uint16_t                                numofjoint, i;
     eOmc_controlmode_t                      controlmode = eomc_controlmode_idle;
     eOappTheDB_jointShiftValues_t           *shiftval_ptr;
     eOicubCanProto_bcastpolicy_t            *bcastpolicy_ptr;
     eOicubCanProto_estimShift_t             estimshift;
     eOicubCanProto_velocityShift_t          shift_icubCanProtValue;
-    eOappTheDB_cfg_canBoardInfo_t           *cfg_canbrd_ptr;
-    eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t             msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
