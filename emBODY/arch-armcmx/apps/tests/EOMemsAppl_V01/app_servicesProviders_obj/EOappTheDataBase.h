@@ -235,6 +235,8 @@ extern eOresult_t eo_appTheDB_GetSnsrStrainCanLocation(EOappTheDB *p, eOsnsr_str
 
 extern eOresult_t eo_appTheDB_GetSkinCanLocation(EOappTheDB *p, eOsk_skinId_t skId, eOappTheDB_SkinCanLocation_t *canloc_ptr);
 
+extern eOresult_t eo_appTheDB_GetCanBoardCfg(EOappTheDB *p, eObrd_boardId_t bid, eOappTheDB_cfg_canBoardInfo_t **cfg_canbrd_ptr);
+
 
 extern eOresult_t eo_appTheDB_GetJointConfigPtr(EOappTheDB *p, eOmc_jointId_t jId,  eOmc_joint_config_t **jconfig_ptr);
 extern eOresult_t eo_appTheDB_GetJointStatusPtr(EOappTheDB *p, eOmc_jointId_t jId,  eOmc_joint_status_t **jstatus_ptr);

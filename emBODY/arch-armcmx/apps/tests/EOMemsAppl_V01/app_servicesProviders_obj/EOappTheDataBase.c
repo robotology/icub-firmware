@@ -806,6 +806,22 @@ extern eOresult_t eo_appTheDB_GetSkinStArray10CanFramesPtr(EOappTheDB *p,eOsk_sk
 
 }
 
+extern eOresult_t eo_appTheDB_GetCanBoardCfg(EOappTheDB *p, eObrd_boardId_t bid, eOappTheDB_cfg_canBoardInfo_t **cfg_canbrd_ptr)
+{
+    eOappTheDB_hid_canBoardInfo_t *b_ptr;
+	if((NULL == p) || (NULL == cfg_canbrd_ptr))
+	{
+        return(eores_NOK_nullpointer);
+	}
+    
+    if(bid >= eo_array_Capacity(p->canboardsList))
+    {
+        return(eores_NOK_nodata);
+    }
+    b_ptr = (eOappTheDB_hid_canBoardInfo_t*)eo_array_At(p->canboardsList, bid);
+    *cfg_canbrd_ptr = b_ptr->cfg_ptr;
+    return(eores_OK);
+}
 
 // extern eOresult_t eo_appTheDB_GetSkinConfigPtr(EOappTheDB *p,eOsk_skinId_t sId,  eOskin_config_t **skconfig_ptr)
 // {
