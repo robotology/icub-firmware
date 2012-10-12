@@ -12,6 +12,7 @@
 #include "pwm_interface.h"
 
 #include "abs_ssi_interface.h"
+#include "encoders_interface.h"
 #include "calibration.h"
 
 #ifndef VERSION   
@@ -48,7 +49,11 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 #elif (VERSION==0x0250 || VERSION==0x0251 || VERSION==0x0252 || VERSION==0x0254 || VERSION==0x0255 || VERSION==0x0257 ) 
 
 	//	AS1_printStringEx ("Calibration ABS_DIGITAL started \r\n");
-		if (param3 >=0 && param3 <=4095) set_max_position(channel, param3);	
+		if (param3 >=0 && param3 <=4095) 
+		{
+			set_max_position(channel, param3);	
+			set_position_encoder(channel,0);
+		}
 		if (param2>0)
 		{
 		    _position[channel] = get_position_abs_ssi(channel);

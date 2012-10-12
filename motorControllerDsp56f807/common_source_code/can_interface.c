@@ -229,10 +229,11 @@ byte can_interface (void)
     VERSION == 0x0219 || VERSION == 0x0250 || VERSION == 0x0251 || VERSION == 0x0252 || VERSION == 0x0254 || VERSION == 0x0257 
 			if (_canmsg.CAN_ID_class == CLASS_PERIODIC_SENS)
 			{
-				if 		(_canmsg.CAN_ID_src==CAN_ID_JNT_STRAIN_11)  strain_num=WDT_JNT_STRAIN_11;
-				else if (_canmsg.CAN_ID_src==CAN_ID_JNT_STRAIN_12)  strain_num=WDT_JNT_STRAIN_12;
-				else if (_canmsg.CAN_ID_src==CAN_ID_6AX_STRAIN_13)  strain_num=WDT_6AX_STRAIN_13;
-				else if (_canmsg.CAN_ID_src==CAN_ID_6AX_STRAIN_14)  strain_num=WDT_6AX_STRAIN_14;			
+				if 		(_canmsg.CAN_ID_src==CAN_ID_JNT_STRAIN_11)  { strain_num=WDT_JNT_STRAIN_11; }
+				else if (_canmsg.CAN_ID_src==CAN_ID_JNT_STRAIN_12)  { strain_num=WDT_JNT_STRAIN_12; }
+				else if (_canmsg.CAN_ID_src==CAN_ID_6AX_STRAIN_13)  { strain_num=WDT_6AX_STRAIN_13; }
+				else if (_canmsg.CAN_ID_src==CAN_ID_6AX_STRAIN_14)  { strain_num=WDT_6AX_STRAIN_14;	}
+				else if (_canmsg.CAN_ID_src==0x01)		            {} //ankle sensor, do nothing
 				else    										 
 				{
 					can_printf("ERR: UNKNOWN STRAIN!");
