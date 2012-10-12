@@ -44,8 +44,11 @@ typedef enum {
     CM_VELOCITY             = 0x07,
 
     CM_CALIB_ABS_POS_SENS   = eomc_controlmode_calib_abs_pos_sens,   // = 0x10
-
+    
     CM_OPENLOOP             = eomc_controlmode_openloop,             // = 0x50
+    
+    CM_FORCE_POSITION       = 101,
+    
     CM_SWITCH_OFF           = eomc_controlmode_switch_everything_off // = 0xF0
 } control_mode_t;
 

@@ -70,14 +70,14 @@ static float K60byP = 0.0f;
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOtrajectory* eo_trajectory_New(void) 
+extern EOtrajectory* eo_trajectory_New(int32_t ticks_per_rev) 
 {
     EOtrajectory *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOtrajectory), 1);
 
     if (o)
     {
-        o->Pos = 0.0f;
-        o->Vel = 0.0f;
+        o->Pos  = 0.0f;
+        o->Vel  = 0.0f;
         o->PAcc = 0.0f;
 
         o->PosF = 0.0f;
@@ -86,15 +86,15 @@ extern EOtrajectory* eo_trajectory_New(void)
         o->PosTimer = 0;
         o->VelTimer = 0;
 
-        o->pos_min =       0;
-        o->pos_max = 0x10000;
-        o->vel_max = 0x08000;
+        o->pos_min        = 0;
+        o->pos_max        = ticks_per_rev;
+        o->vel_max        = ticks_per_rev/2;
+        o->acc_stop_boost = ticks_per_rev;
 
         // boost
-
-        o->boost = eobool_false;
+        o->boost          = eobool_false;
         o->boostIsBraking = eobool_false;
-        o->acc_stop_boost = 0x10000;
+         
         o->boostPos  = 0.0f;
         o->boostVel  = 0.0f;
         o->boostVelF = 0.0f;
@@ -107,25 +107,32 @@ extern EOtrajectory* eo_trajectory_New(void)
     return o;
 }
 
-extern void eo_trajectory_SetLimits(EOtrajectory *o, int32_t pos_min, int32_t pos_max, int32_t vel_max)
+extern void eo_trajectory_SetPosMin(EOtrajectory *o, int32_t pos_min)
 {
     o->pos_min = (float)pos_min;
-    o->pos_max = (float)pos_max;
+}
 
+extern void eo_trajectory_SetPosMax(EOtrajectory *o, int32_t pos_max)
+{
+    o->pos_max = (float)pos_max;
+}
+
+extern void eo_trajectory_SetVelMax(EOtrajectory *o, int32_t vel_max)
+{
     o->vel_max = vel_max;
 }
 
 extern void eo_trajectory_Init(EOtrajectory *o, int32_t p0, int32_t v0, int32_t a0)
 {
-    o->Pos = p0;
-    o->Vel = v0;
+    o->Pos  = p0;
+    o->Vel  = v0;
     o->PAcc = EMS_PERIOD*a0;
 
     o->PosTimer = 0;
     o->VelTimer = 0;
 
     o->boostTimer = 0;
-    o->boost = eobool_false;
+    o->boost          = eobool_false;
     o->boostIsBraking = eobool_false;
     o->boostPos  = 0.0f;
     o->boostVel  = 0.0f;

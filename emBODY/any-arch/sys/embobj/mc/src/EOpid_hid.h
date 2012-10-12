@@ -51,7 +51,7 @@ struct EOpid_hid
     
     int32_t pwm;
     
-    eObool_t initialized;
+    eObool_t safe_mode;
 }; 
 
 
