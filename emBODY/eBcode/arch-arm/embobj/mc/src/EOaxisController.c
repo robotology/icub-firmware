@@ -21,7 +21,6 @@
 //extern int16_t encoder_can;
 
 
-
 extern const int32_t EMS_FREQUENCY_INT32;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -43,6 +42,8 @@ extern const int32_t EMS_FREQUENCY_INT32;
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
+#define TICKS_PER_REVOLUTION 0x10000
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -60,9 +61,12 @@ extern const int32_t EMS_FREQUENCY_INT32;
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
 #define SET_POINT_REACHED(thr) (-(thr)<=o->err && o->err<=(thr) && eo_trajectory_IsDone(o->trajectory))
+
+#define SET_BIT(bits) o->ready_mask |=  (bits)
+#define RST_BIT(bits) o->ready_mask &= ~(bits)
+#define CHK_BIT(bits) ((o->ready_mask & (bits)) == (bits))
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -81,25 +85,23 @@ extern EOaxisController* eo_axisController_New(void)
 
     if (o)
     {
-        o->pidP = eo_pid_New();
-        //o->pidC = eo_pid_New();
-
-        eo_pid_SetPid(o->pidP, 10.0f, 100.0f, 0.001f, 4000.0f, 750.0f, 0.0f);
+        o->pidP = eo_pid_New();    
+        o->pidT = NULL;
         
-        //o->pidT = eo_pid_New();
+        o->speedmeter = eo_speedmeter_New(TICKS_PER_REVOLUTION); // ticks per revolution
+        o->trajectory = eo_trajectory_New(TICKS_PER_REVOLUTION);
         
-        o->speedmeter = eo_speedmeter_New(0x10000); // ticks per revolution
-        o->trajectory = eo_trajectory_New();
-
-        o->pos_min = 0.0f;
-        o->pos_max = 0.0f;
-        o->vel_max = 32768.0f;
-
-        o->acc_stop_cmode = 0x10000;
-        o->acc_stop_alarm = 0x20000;
-
+        ///////////////////////////////////////
+        #warning (ALE) hard coded config values
+        o->acc_stop_cmode   = TICKS_PER_REVOLUTION;
+        o->acc_stop_alarm   = TICKS_PER_REVOLUTION*2;
+        o->calib_timeout_ms = 5000;
+        o->calib_max_error  = TICKS_PER_REVOLUTION/1024;
+        o->reach_max_error  = TICKS_PER_REVOLUTION/1024;
+        ///////////////////////////////////////
+        
         o->vel_timer   = 0;
-        o->vel_timeout = EMS_FREQUENCY_INT32;
+        o->vel_timeout = EMS_FREQUENCY_INT32/50;
 
         ///////////////////////////
         
@@ -118,12 +120,6 @@ extern EOaxisController* eo_axisController_New(void)
 
         o->control_mode = CM_IDLE;
 
-        o->is_calibrated = eobool_true;
-
-        #warning (ALE) hard coded config values
-        o->calib_timeout_ms = 5000;
-        o->calib_max_error  = 64.0f;
-        o->reach_max_error  = 64.0f;
         o->err = 0.0f;
 
         o->ready_mask = 0;
@@ -134,79 +130,96 @@ extern EOaxisController* eo_axisController_New(void)
 
 extern void eo_axisController_StartCalibration(EOaxisController *o, int32_t pos, int32_t vel, int32_t offset)
 {
+    if (!o) return;
+    
+    if (!CHK_BIT(MASK_MIN_POS|MASK_MAX_POS|MASK_POS_PID)) return;
+    
     eo_speedometer_EncoderCalibrate(o->speedmeter, offset);
-
+	
     eo_trajectory_Init(o->trajectory, eo_speedometer_GetDistance(o->speedmeter), eo_speedometer_GetVelocity(o->speedmeter), 0);
 
-    o->control_mode = CM_CALIB_ABS_POS_SENS;
-    //o->is_calibrated = eobool_false;
+    SET_BIT(MASK_CALIB_OK);
+    
+    return;
+    
+    RST_BIT(MASK_CALIB_OK);
 
     //o->calib_timeout_ms = timeout_ms;    
     //o->calib_max_error = max_error;
 
+    o->control_mode = CM_CALIB_ABS_POS_SENS;
+    
     eo_trajectory_SetPosReference(o->trajectory, pos, vel);
 }
 
 extern void eo_axisController_SetLimits(EOaxisController *o, int32_t pos_min, int32_t pos_max, int32_t vel_max)
 {
-    o->ready_mask |= MASK_MAX_VEL | MASK_MIN_POS | MASK_MAX_POS;    
+    if (!o) return;
+    
+    SET_BIT(MASK_MAX_VEL|MASK_MIN_POS|MASK_MAX_POS);    
 
-    o->pos_min = pos_min;
-    o->pos_max = pos_max;
-    o->vel_max = vel_max;
-
-    eo_trajectory_SetLimits(o->trajectory, pos_min, pos_max, vel_max);
+    eo_trajectory_SetPosMin(o->trajectory, pos_min);
+    eo_trajectory_SetPosMax(o->trajectory, pos_max);
+    eo_trajectory_SetVelMax(o->trajectory, vel_max);
 }
 
 extern void eo_axisController_SetPosMin(EOaxisController *o, int32_t pos_min)
 {
-    o->ready_mask |= MASK_MIN_POS;
+    if (!o) return;
+    
+    SET_BIT(MASK_MIN_POS);
 
-    o->pos_min = pos_min;
-
-    eo_trajectory_SetLimits(o->trajectory, o->pos_min, o->pos_max, o->vel_max);
+    eo_trajectory_SetPosMin(o->trajectory, pos_min);
 }
 extern void eo_axisController_SetPosMax(EOaxisController *o, int32_t pos_max)
 {
-    o->ready_mask |= MASK_MAX_POS;
+    SET_BIT(MASK_MAX_POS);
 
-    o->pos_max = pos_max;
-
-    eo_trajectory_SetLimits(o->trajectory, o->pos_min, o->pos_max, o->vel_max);
+    eo_trajectory_SetPosMax(o->trajectory, pos_max);
 }
 extern void eo_axisController_SetVelMax(EOaxisController *o, int32_t vel_max)
 {
-    o->ready_mask |= MASK_MAX_VEL;
+    if (!o) return;
+    
+    SET_BIT(MASK_MAX_VEL);
 
-    o->vel_max = vel_max;
-
-    eo_trajectory_SetLimits(o->trajectory, o->pos_min, o->pos_max, o->vel_max);
+    eo_trajectory_SetVelMax(o->trajectory, vel_max);
 }
 
 extern void eo_axisController_SetVelTimeout(EOaxisController *o, int32_t vel_timeout)
 {
-    o->ready_mask |= MASK_VEL_TOUT;
+    if (!o) return;
+    
+    SET_BIT(MASK_VEL_TOUT);
 
     o->vel_timeout = vel_timeout;
 }
 
 extern void eo_axisController_SetStiffness(EOaxisController *o, int32_t stiffness)
 {
+    if (!o) return;
+    
     o->stiffness = stiffness;
 }                 
 
 extern void eo_axisController_ReadEncPos(EOaxisController *o, int32_t pos)
 {
+    if (!o) return;
+    
     eo_speedometer_EncoderValid(o->speedmeter, pos);
 } 
 
 extern void eo_axisController_SkipEncPos(EOaxisController *o)
 {
+    if (!o) return;
+    
     eo_speedometer_EncoderError(o->speedmeter);
 }
 
 extern void eo_axisController_ReadSpeed(EOaxisController *o, int32_t speed)
 {
+    if (!o) return;
+    
     eo_speedometer_ReadSpeed(o->speedmeter, speed);
 } 
 
@@ -219,12 +232,16 @@ extern int32_t eo_axisController_GetVelocity(EOaxisController *o)
 
 extern void eo_axisController_SetOutput(EOaxisController *o, int16_t out)
 {
+    if (!o) return;
+    
     o->openloop_out = out;
 }
 
 extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_t avg_vel)
 {
-    if (!o->is_calibrated) return;
+    if (!o) return;
+    
+    if (!CHK_BIT(MASK_POS_INIT_OK)) return;
 
     switch (o->control_mode)
     {
@@ -251,8 +268,10 @@ extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_
 
 extern void eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_t avg_acc)
 {
-    if (!o->is_calibrated) return;
-
+    if (!o) return;
+    
+    if (!CHK_BIT(MASK_POS_INIT_OK)) return;
+    
     switch (o->control_mode)
     {
     case CM_IDLE: 
@@ -285,42 +304,49 @@ extern void eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_
 
 extern void eo_axisController_SetTrqRef(EOaxisController *o, int32_t trq)
 {
+    if (!o) return;
+    
+    if (!CHK_BIT(MASK_TRQ_INIT_OK)) return;
+    
+    #warning (ALE) to be implemented
     o->torque_ref = trq;
 }
 
 extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, control_mode_t control_mode)
 {
+    if (!o) return eobool_false;
+    
     if (o->control_mode == control_mode) return eobool_true;
-
-    if (!o->is_calibrated) return eobool_false;
 
     switch (control_mode)
     {
         case CM_POSITION:
-        {
+            if (!CHK_BIT(MASK_POS_INIT_OK)) return eobool_false;
+        
+        case CM_FORCE_POSITION:
             eo_pid_Reset(o->pidP);
             eo_trajectory_Stop(o->trajectory, o->acc_stop_cmode);            
-     
+            o->control_mode = CM_POSITION;
+            
             break;
-        }
 
+        
         case CM_VELOCITY:
-        {
+            if (!CHK_BIT(MASK_POS_INIT_OK)) return eobool_false;
+            
             eo_pid_Reset(o->pidP);
             eo_trajectory_SetVelReference(o->trajectory, 0, o->acc_stop_cmode); 
-
+            
             break;
-        }
 
+        
         case CM_IDLE:
-        {
             eo_pid_Reset(o->pidP);
             eo_pid_Reset(o->pidT);
 
             eo_trajectory_Stop(o->trajectory, o->acc_stop_cmode);
 
             break;
-        }
     }
 
     o->control_mode = control_mode;
@@ -330,6 +356,14 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, control_mo
 
 extern int16_t eo_axisController_PWM(EOaxisController *o)
 {
+    if (!o) return 0;
+    
+    float pos_ref;
+    float vel_ref;
+    
+    int32_t pos = eo_speedometer_GetDistance(o->speedmeter);
+    int32_t vel = eo_speedometer_GetVelocity(o->speedmeter);
+    
     if (o->vel_timer)
     {
         if (!--o->vel_timer)
@@ -342,26 +376,25 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
             }    
         }
     }
-
+    
     switch (o->control_mode)
     {
         case CM_IDLE:
         {
+            eo_trajectory_Init(o->trajectory, pos, vel, 0);
             o->err = 0.0f;
             return 0;
         }
 
         case CM_OPENLOOP:
+        {
+            eo_trajectory_Init(o->trajectory, pos, vel, 0);
             o->err = 0.0f;
             return o->openloop_out;
-
+        }
+        
         case CM_CALIB_ABS_POS_SENS:
         {
-            int32_t pos = eo_speedometer_GetDistance(o->speedmeter);
-            int32_t vel = eo_speedometer_GetVelocity(o->speedmeter);
-            float pos_ref;
-            float vel_ref;
-
             eo_trajectory_PosStep(o->trajectory, &pos_ref, &vel_ref);
             
             o->err = pos_ref - pos;
@@ -370,7 +403,9 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
             {
                 if (!o->calib_timeout_ms)
                 {
-										o->is_calibrated = eobool_true;
+                    RST_BIT(MASK_CALIB_OK);
+                    eo_pid_SafeMode(o->pidP, eobool_true);
+                    eo_pid_SafeMode(o->pidT, eobool_true);
                     o->control_mode = CM_IDLE;
                 
                     return 0;
@@ -380,7 +415,9 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
                 
                 if (SET_POINT_REACHED(o->calib_max_error))
                 {
-                    o->is_calibrated = eobool_true;
+                    SET_BIT(MASK_CALIB_OK);
+                    eo_pid_SafeMode(o->pidP, eobool_false);
+                    eo_pid_SafeMode(o->pidT, eobool_false);
                     o->control_mode = CM_POSITION;
                 }
             } 
@@ -392,15 +429,9 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
         case CM_POSITION:
         case CM_VELOCITY:
         {
-            int32_t pos = eo_speedometer_GetDistance(o->speedmeter);
-            int32_t vel = eo_speedometer_GetVelocity(o->speedmeter);
-            float pos_ref;
-            float vel_ref;
-
             if (eo_trajectory_PosStep(o->trajectory, &pos_ref, &vel_ref))
             {
-                // position limit reached
-                eo_pid_Reset(o->pidP);
+                eo_pid_Reset(o->pidP); // position limit reached
             }
 
             o->err = pos_ref - pos;
@@ -411,7 +442,8 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
         case CM_IMPEDANCE_POS:
         case CM_TORQUE:
         case CM_IMPEDANCE_VEL:
-        #warning (ALE) to be implemented
+            eo_trajectory_Init(o->trajectory, pos, vel, 0);
+            #warning (ALE) to be implemented
             break;     
     }
     
@@ -420,34 +452,46 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
 
 extern void eo_axisController_Stop(EOaxisController *o)
 {
+    if (!o) return;
+    
     eo_trajectory_Stop(o->trajectory, o->acc_stop_cmode);
 }
 
 extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o)
 {
+    if (!o) return NULL;
+    
     return o->pidP;
 }
 
 extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o)
 {
+    if (!o) return NULL;
+    
     return o->pidT;
 }
 
 extern void eo_axisController_SetPosPid(EOaxisController *o, float K, float Kd, float Ki, float Ymax, float Imax, float Yoff)
 {
-    o->ready_mask |= MASK_POS_PID;
+    if (!o) return;
+    
+    SET_BIT(MASK_POS_PID);
 
     eo_pid_SetPid(o->pidP, K, Kd, Ki, Ymax, Imax, Yoff);
 }
 extern void eo_axisController_SetTrqPid(EOaxisController *o, float K, float Kd, float Ki, float Ymax, float Imax, float Yoff)
 {
-    o->ready_mask |= MASK_TRQ_PID;
+    if (!o) return;
+    
+    SET_BIT(MASK_TRQ_PID);
 
     eo_pid_SetPid(o->pidT, K, Kd, Ki, Ymax, Imax, Yoff);
 }
 
 extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_status_basic_t* jointStatus)
 {
+    if (!o) return;
+    
     jointStatus->controlmodestatus   = o->control_mode;
     jointStatus->position            = eo_speedometer_GetDistance(o->speedmeter);           
     jointStatus->velocity            = eo_speedometer_GetVelocity(o->speedmeter);          
@@ -460,6 +504,8 @@ extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_sta
 
 extern eObool_t eo_axisController_GetMotionDone(EOaxisController *o)
 {
+    if (!o) return eobool_false;
+    
     switch (o->control_mode)
     {
         case CM_IDLE:
@@ -485,6 +531,15 @@ extern eObool_t eo_axisController_GetMotionDone(EOaxisController *o)
 
 extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint_status_ofpid_t* pidStatus)
 {
+    if (!o)
+    {
+        pidStatus->reference = 0;
+        pidStatus->output    = 0;
+        pidStatus->error     = 0;
+        
+        return;
+    }
+    
     switch (o->control_mode)
     {
         case CM_IDLE:
@@ -531,6 +586,7 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
