@@ -639,13 +639,13 @@ typedef struct
     uint16_t time;  /**< Filter time parameter  */
 } eOmc_i2tParams_t;
 
-typedef struct
-{
-    uint8_t estimShiftJointVel;
-    uint8_t estimShiftJointAcc;
-    uint8_t estimShiftMotorVel;
-    uint8_t estimShiftMotorAcc;
-} eOmc_estimShift_t;
+// typedef struct
+// {
+    // uint8_t estimShiftJointVel;
+    // uint8_t estimShiftJointAcc;
+    // uint8_t estimShiftMotorVel;
+    // uint8_t estimShiftMotorAcc;
+// } eOmc_estimShift_t;
 
  
 // some considerations by acemor.
