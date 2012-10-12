@@ -123,11 +123,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jx
     eOmc_joint_config_t                     *cfg = (eOmc_joint_config_t*)nv->loc;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOmc_joint_status_t                     *jstatus_ptr = NULL;
-    eOappTheDB_jointShiftValues_t           *shiftval_ptr;
-    eOicubCanProto_bcastpolicy_t            *bcastpolicy_ptr;
-    eOicubCanProto_estimShift_t             estimshift;
     eOicubCanProto_position_t               pos_icubCanProtValue;
-    eOicubCanProto_velocityShift_t          shift_icubCanProtValue;
     eOicubCanProto_impedance_t              impedence_icubCanProtValues;
     eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t             msgCmd = 
@@ -192,27 +188,6 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jx
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_IMPEDANCE_OFFSET;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&impedence_icubCanProtValues.offset);
     
-    // 8) set bcast policy
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_BCAST_POLICY;
-    eo_appTheDB_GetJointBcastpolicyPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx, &bcastpolicy_ptr);
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(bcastpolicy_ptr->val2bcastList[0]));
-    
-    //get shift values from DB
-    eo_appTheDB_GetShiftValuesOfJointPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx, &shiftval_ptr);
-    
-    // 9) set vel shift
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_VEL_SHIFT;
-    shift_icubCanProtValue = shiftval_ptr->jointVelocityShift;
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&shift_icubCanProtValue);
-    
-            
-    // 10) set estim vel shift
-    estimshift.estimShiftJointVel= shiftval_ptr->jointVelocityEstimationShift;
-    estimshift.estimShiftJointAcc = 0;
-    estimshift.estimShiftMotorVel = 0;
-    estimshift.estimShiftMotorAcc = 0;
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_SPEED_ESTIM_SHIFT;
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&estimshift);
     
     // 11) set monitormode status
     res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx,  &jstatus_ptr);
