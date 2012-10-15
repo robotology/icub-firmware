@@ -50,30 +50,12 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-//#ifdef HAL_USE_CAN
-//    // empty-section
-//#endif//HAL_USE_CAN
-//
-//#ifdef HAL_USE_DISPLAY
-//    // empty-section
-//#endif//HAL_USE_DISPLAY  
-
-// #ifdef HAL_USE_I2C4HAL
-//     #define HAL_BRDCFG_I2C4HAL__PERIPHERAL                          I2C1    // i2c peripheral used by eeprom 01 and ...
-// #endif//HAL_USE_I2C4HAL  
-
 
 #ifdef HAL_USE_SPI4ENCODER
     #define HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOB
     #define HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOB
     #define HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOB  
 #endif//HAL_USE_SPI4ENCODER
-
-
-
-// #ifdef HAL_USE_ETH
-//     #define HAL_BRDCFG_ETH__PHY_DEVICE_NUM                          1
-// #endif//HAL_USE_ETH
 
 
 
@@ -129,6 +111,19 @@
 
 #ifdef HAL_USE_ETH
     extern const uint8_t hal_brdcfg_eth__supported_mask; //         = 0x01;
+    
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_REF_CLK;
+    
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_TX_EN;
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_TXD0;
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_TXD1;
+    
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_CRS_DV;
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_RXD0;
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_RXD1;  
+    
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDC;
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDIO;      
 #endif//HAL_USE_ETH
 
 #ifdef HAL_USE_GPIO
@@ -170,16 +165,11 @@
 #endif//HAL_USE_CAN
 
 
-// #ifdef HAL_USE_I2C4HAL
-//     extern void hal_brdcfg_i2c4hal__LowLevel_Init(void); 
-//     extern void hal_brdcfg_i2c4hal__LowLevel_DeInit(void);  
-// #endif//HAL_USE_I2C4HAL 
+#ifdef HAL_USE_I2C4HAL
+    extern void hal_brdcfg_i2c4hal__ontimeouterror(void);
+#endif//HAL_USE_I2C4HAL 
 
 #ifdef HAL_USE_EEPROM
-    extern void hal_brdcfg_eeprom__ontimeouterror(void);
-//     extern void hal_brdcfg_eeprom__writeprotection_init(void);
-//     extern void hal_brdcfg_eeprom__writeprotection_disable(void);
-//     extern void hal_brdcfg_eeprom__writeprotection_enable(void);
 #endif//HAL_USE_EEPROM   
 
 
@@ -192,15 +182,13 @@
 
 
 #ifdef HAL_USE_ETH  
-    extern void hal_brdcfg_eth__phy_start(void);
+    extern void hal_brdcfg_eth__phy_initialise(void);
+    extern void hal_brdcfg_eth__phy_configure(void);
 #endif//HAL_USE_ETH
 
 
 #ifdef HAL_USE_SWITCH  
-    // but the swicth is not present in the mcbstm32c
-    extern void hal_brdcfg_switch__MCO_config(void);
-    extern void hal_brdcfg_switch__reg_read_byI2C(uint8_t* pBuffer, uint16_t ReadAddr);
-    extern void hal_brdcfg_switch__reg_write_byI2C(uint8_t* pBuffer, uint16_t WriteAddr);
+    extern void hal_brdcfg_switch__initialise(void);
 #endif//HAL_USE_SWITCH
 
 

@@ -96,7 +96,7 @@ static hal_boolval_t s_hal_switch_started_is(void);
 static hal_result_t s_hal_switch_reg_config(void);
 static hal_result_t s_hal_switch_lowlevel_init(const hal_switch_cfg_t *cfg);
 static hal_result_t s_hal_switch_lowlevel_start(void);
-static void init_mco(void);
+
 
 
 
@@ -412,6 +412,8 @@ static void s_hal_switch_started_set(void)
 
 // }
 
+#if 0
+// stm32f1
 static void init_mco(void)
 {
     // this function initialises MCO in order to provide clock ref to switch.
@@ -437,7 +439,7 @@ static void init_mco(void)
     // connect mco on pa8 with pll3
     RCC_MCOConfig(RCC_MCO_PLL3CLK);
 }
-
+#endif
 
 static hal_result_t s_hal_switch_init_old(const hal_switch_cfg_t *cfg)
 {
@@ -477,6 +479,11 @@ static hal_result_t s_hal_switch_init_old(const hal_switch_cfg_t *cfg)
 static hal_result_t s_hal_switch_lowlevel_init(const hal_switch_cfg_t *cfg)
 {
     
+#if 1
+    hal_brdcfg_switch__initialise();
+    return(hal_res_OK);    
+#else    
+    
     // --- reset pin: PB2
     // clock gpioa as normal gpio, reset pin 2, and set it as: Output mode, max speed 2 MHz + General purpose output push-pull
     RCC->APB2ENR |= 0x00000008;
@@ -503,6 +510,8 @@ static hal_result_t s_hal_switch_lowlevel_init(const hal_switch_cfg_t *cfg)
     hal_i2c4hal_init(hal_i2c_port1, NULL); // use default configuration
     
     return(hal_res_OK);
+    
+#endif    
 }
 #else
 // tentativo di inizializzare solo se lo switch non si e' spento, ma sfortunatamente si spegne sempre con un sw reset e quindi con 
@@ -574,6 +583,8 @@ static hal_result_t s_hal_switch_lowlevel_start(void)
 
 static hal_result_t s_hal_switch_reg_config(void)
 {
+    const uint8_t fd100 = 0x60;
+    const uint8_t fd010 = 0x20;
     uint8_t buff_write = 0x60; // FORCE FULL DUPLEX AND 100T
     uint8_t buff_read = 0xFF; 
     volatile uint32_t i = 1;
@@ -582,18 +593,27 @@ static hal_result_t s_hal_switch_reg_config(void)
     regadr.bytes.one = 0x01;
     hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
     if((buff_read&0x01))
-    {
+    {   // already initted. to be initted again must pass through a reset
         return(hal_res_OK);
     }
-
-    
+ 
+//     // configure mii port at 10mbps. default is 100mbps
+//     regadr.bytes.one = 0x06;
+//     hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+//     buff_write = buff_read | 0x10;
+//     hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
+//     hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
    
+    #warning --> set 100mbps back .............. with 0x60
     // 1. configure  switch's ports 1 and 2 in full duplex and 100mbps
-    buff_write = 0x60;      
+    buff_write = fd010;      
     regadr.bytes.one = 0x1C;
     hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+     
     regadr.bytes.one = 0x2C;
-    hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
+    hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);   
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
 
     // 2. start the switch
     buff_write = 0x1;  

@@ -141,32 +141,6 @@
 
 
 #if defined(HAL_USE_ETH)
-#if 0   
-    //#define HAL_BRDCFG_ETH__ETH_IS_IN_RESET_STATE(x)	    (x & 0x8800)
-    #define HAL_BRDCFG_ETH_I2C_ADDRESS_WRITE_OP 0xBE        /* eth switch(micrel) device's address on I2C bus  for write operation */
-    #define HAL_BRDCFG_ETH_I2C_ADDRESS_READ_OP  0xBF        /* eth switch(micrel) device's address on I2C bus  for read operation */
-    // acemor on 16 sept 2011: the following are un-used ...
-    #define HAL_BRDCFG_ETH__PHY_REG_ANER        0x06        /* Auto-Neg. Expansion Register      */
-    #define HAL_BRDCFG_ETH__PHY_REG_ANNPTR      0x07        /* Auto-Neg. Next Page TX            */
-    /* PHY Extended Registers */
-    #define HAL_BRDCFG_ETH__PHY_REG_STS         0x10        /* Status Register                   */
-    #define HAL_BRDCFG_ETH__PHY_REG_MICR        0x11        /* MII Interrupt Control Register    */
-    #define HAL_BRDCFG_ETH__PHY_REG_MISR        0x12        /* MII Interrupt Status Register     */
-    #define HAL_BRDCFG_ETH__PHY_REG_FCSCR       0x14        /* False Carrier Sense Counter       */
-    #define HAL_BRDCFG_ETH__PHY_REG_RECR        0x15        /* Receive Error Counter             */
-    #define HAL_BRDCFG_ETH__PHY_REG_PCSR        0x16        /* PCS Sublayer Config. and Status   */
-    #define HAL_BRDCFG_ETH__PHY_REG_RBR         0x17        /* RMII and Bypass Register          */
-    #define HAL_BRDCFG_ETH__PHY_REG_LEDCR       0x18        /* LED Direct Control Register       */
-    #define HAL_BRDCFG_ETH__PHY_REG_PHYCR       0x19        /* PHY Control Register              */
-    #define HAL_BRDCFG_ETH__PHY_REG_10BTSCR     0x1A        /* 10Base-T Status/Control Register  */
-    #define HAL_BRDCFG_ETH__PHY_REG_CDCTRL1     0x1B        /* CD Test Control and BIST Extens.  */
-    #define HAL_BRDCFG_ETH__PHY_REG_EDCR        0x1D        /* Energy Detect Control Register    */
-    #define AL_BRDCFG_ETH__DP83848C_DEF_ADR    0x01        /* Default PHY device address        */
-    #define AL_BRDCFG_ETH__DP83848C_ID         0x20005C90  /* PHY Identifier                    */
-    //#define PHY_address 		DP83848C_DEF_ADR
-    #define AL_BRDCFG_ETH__HAL_ETH_RESET_STATE_MASK		0x77FF//0x8800 DA SISTEMARE!!!!
-    // acemor on 16 sept 2011: the previous are un-used ...
-#endif
 #endif//HAL_USE_ETH
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -196,6 +170,19 @@
 
 #ifdef HAL_USE_ETH
     extern const uint8_t hal_brdcfg_eth__supported_mask             = 0x01;
+    
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_REF_CLK = { .port = stm32gpio_portA, .pin = stm32gpio_pin1  }; 
+    
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_TX_EN   = { .port = stm32gpio_portB, .pin = stm32gpio_pin11 };
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_TXD0    = { .port = stm32gpio_portB, .pin = stm32gpio_pin12 };
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_TXD1    = { .port = stm32gpio_portB, .pin = stm32gpio_pin13 };
+    
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_CRS_DV  = { .port = stm32gpio_portD, .pin = stm32gpio_pin8  };
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_RXD0    = { .port = stm32gpio_portD, .pin = stm32gpio_pin9  };
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_RXD1    = { .port = stm32gpio_portD, .pin = stm32gpio_pin10 };    
+    
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDC          = { .port = stm32gpio_portC, .pin = stm32gpio_pin1  };
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDIO         = { .port = stm32gpio_portA, .pin = stm32gpio_pin2  };     
 #endif//HAL_USE_ETH
 
 
@@ -520,6 +507,62 @@ void  hal_brdcfg_spi4encoder__chipSelect_init(hal_spi_port_t spix)
 
                      
 #ifdef HAL_USE_SWITCH
+
+static void hal_brdcfg_switch__mco_initialise(void)
+{
+    // this function initialises MCO in order to provide clock ref to switch.
+    // PA8 is MCO. it must be configured = Output mode, max speed 50 MHz + Alternate function output Push-pull (B)
+    // also, we connect pll3 at 50mhz to it
+    
+    // clock gpioa as alternate function
+    RCC->APB2ENR    |= 0x00000005;
+    // init pa8
+    GPIOA->CRH   &= 0xFFFFFFF0;
+    GPIOA->CRH   |= 0x0000000B;	
+
+
+    // set pll3 clock output to 50mhz: (25mhz/5)*10 = 50mhz, thus we use multiplier 10
+    RCC_PLL3Config(RCC_PLL3Mul_10);
+        
+    // enable pll3 
+    RCC_PLL3Cmd(ENABLE);
+    
+    // wait until it is ready
+    while(RCC_GetFlagStatus(RCC_FLAG_PLL3RDY) == RESET);
+    
+    // connect mco on pa8 with pll3
+    RCC_MCOConfig(RCC_MCO_PLL3CLK);
+}
+
+extern void hal_brdcfg_switch__initialise(void)
+{
+    // --- reset pin: PB2
+#if 0    
+    // clock gpioa as normal gpio, reset pin 2, and set it as: Output mode, max speed 2 MHz + General purpose output push-pull
+    RCC->APB2ENR |= 0x00000008;
+    GPIOB->CRL   &= 0xFFFFF0FF;
+    GPIOB->CRL   |= 0x00000200;    // out 2mhz
+    // put in reset state (low) for some time ... 10 ms according to datasheet.
+    GPIOB->BRR   |= (1 << 2); 
+    hal_sys_delay(10*1000);
+    // put value high to exit from reset state
+    GPIOB->BSRR  |= (1 << 2);
+    // now wait for 100 usec before using i2c etc.
+    hal_sys_delay(100);
+#else
+    hal_gpio_init(hal_gpio_portB, hal_gpio_pin2, hal_gpio_dirOUT, hal_gpio_speed_low);
+    hal_gpio_setval(hal_gpio_portB, hal_gpio_pin2, hal_gpio_valLOW);
+    hal_sys_delay(10*1000);
+    hal_gpio_setval(hal_gpio_portB, hal_gpio_pin2, hal_gpio_valHIGH);
+    hal_sys_delay(100);
+#endif    
+    
+    // --- mco: PA8
+    hal_brdcfg_switch__mco_initialise();  
+
+    // --- i2c for communication 
+    hal_i2c4hal_init(hal_i2c_port1, NULL); // use default configuration        
+}
  
 
 #endif//HAL_USE_SWITCH
@@ -529,7 +572,6 @@ void  hal_brdcfg_spi4encoder__chipSelect_init(hal_spi_port_t spix)
 
 extern void hal_brdcfg_eth__phy_initialise(void)
 {
-
     #warning --> in here we just init the switch ... put in reset mode, exit from reset, do the mco, init the i2c if not initted, etc. 
     if(hal_false == hal_switch_initted_is())
     {

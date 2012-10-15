@@ -128,8 +128,20 @@
 #endif//HAL_USE_SPI4ENCODER
 
 #ifdef HAL_USE_ETH
-    extern const uint8_t hal_brdcfg_eth__supported_mask; //         = 0x01;
-    extern const uint16_t hal_brdcfg_eth__phy_device_list[];
+    extern const uint8_t hal_brdcfg_eth__supported_mask; 
+    
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_REF_CLK;
+    
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_TX_EN;
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_TXD0;
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_TXD1;
+    
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_CRS_DV;
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_RXD0;
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_RXD1;  
+    
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDC;
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDIO;     
 #endif//HAL_USE_ETH
 
 #ifdef HAL_USE_GPIO
@@ -190,7 +202,7 @@
 #endif//HAL_USE_I2C4HAL   
 
 #ifdef HAL_USE_SWITCH  
-
+    extern void hal_brdcfg_switch__initialise(void);
 #endif//HAL_USE_SWITCH
 
 

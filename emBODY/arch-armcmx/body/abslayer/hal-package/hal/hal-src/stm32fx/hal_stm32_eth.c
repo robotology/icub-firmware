@@ -40,6 +40,8 @@
 #include "hal_brdcfg.h"
 #include "hal_switch.h"
 
+#include "utils/stm32gpio_hid.h"
+
 //#define HAL_USE_EVENTVIEWER_ETH
 
 #if defined(HAL_USE_EVENTVIEWER_ETH)
@@ -117,7 +119,7 @@ static void s_hal_eth_rmii_init(void);
 static void s_hal_eth_mac_reset(void);
 static void s_hal_eth_mac_init(const hal_eth_cfg_t *cfg);
 
-
+static int8_t s_hal_eth_gpioeth_init(stm32gpio_gpio_t gpio, uint8_t mode);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -577,15 +579,16 @@ static void s_hal_eth_mac_init(const hal_eth_cfg_t *cfg)
     
     // initialise mac control register
     ETH->MACCR  = 0x00008000;       // clear
+    // if 10mbps remove or with MCR_FES. remember to impose the 10mbps on the phy connected to rmii as well
     ETH->MACCR |= MCR_FES;          // config 100mbs 
     ETH->MACCR |= MCR_DM;           // config full duplex mode
 
     
     /* MAC address filter register, accept multicast packets. */
-    ETH->MACFFR = MFFR_HPF | MFFR_PAM;  // config Hash or perfect address filter and pass all multicast(PAM)
+    ETH->MACFFR = MFFR_HPF | MFFR_PAM;  // config hash or perfect address filter and pass all multicast (PAM)
 
     /* Ethernet MAC flow control register */
-    ETH->MACFCR = MFCR_ZQPD;   //Zero-quanta pause disable
+    ETH->MACFCR = MFCR_ZQPD;   // xero-quanta pause disable
     
     /* Set the Ethernet MAC Address registers */
     ETH->MACA0HR = ((U32)s_hal_mac[5] <<  8) | (U32)s_hal_mac[4];
@@ -616,6 +619,8 @@ extern void hal_eth_hid_rmii_rx_init(void)
 {
 #if     defined(USE_STM32F1) 
     
+#if 0    
+    
     AFIO->MAPR      |= (1 << 21);               // Ethernet MAC I/O remapping to: RX_DV-CRS_DV/PD8, RXD0/PD9, RXD1/PD10, RXD2/PD11, RXD3/PD12 
  
     // enable clock for port d
@@ -624,9 +629,20 @@ extern void hal_eth_hid_rmii_rx_init(void)
     // ETH_RMII_CRS_DV (PD8), ETH_RMII_RXD0 (PD9), ETH_RMII_RXD1 (PD10) ... as remapped by setting bit 21 of AFIO->MAPR
     GPIOD->CRH      &= 0xFFFFF000;              // reset pd8, pd9, pd10
     GPIOD->CRH      |= 0x00000444;              // pins configured in reset state (floating input)
+
+#else
+    hal_boolval_t eth_remap = (stm32gpio_portD == hal_brdcfg_eth__gpio_ETH_RMII_CRS_DV.port) ? (hal_true) : (hal_false); 
+    // actually is true if also other things are satisfied ... 
+    // if true then: RX_DV-CRS_DV->PD8, RXD0->PD9, RXD1->PD10; else: RX_DV-CRS_DV->PA7, RXD0->PC4, RXD1->PC5.
+    GPIO_PinRemapConfig(GPIO_Remap_ETH, (hal_true == eth_remap) ? ENABLE : DISABLE);
+    s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_CRS_DV, 1);
+    s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_RXD0, 1);
+    s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_RXD1, 1);    
+#endif
     
 #elif   defined(USE_STM32F4)
 
+#if 0 
     // enable system configuration controller clock
     RCC->APB2ENR    |= (1 << 14);  
     
@@ -638,7 +654,7 @@ extern void hal_eth_hid_rmii_rx_init(void)
     GPIOA->MODER    &= ~0x0000C000;              // reset pa7
     GPIOA->MODER    |=  0x00008000;              // alternate function
     GPIOA->OTYPER   &= ~0x00000080;              // output push-pull (reset state) 
-    GPIOA->OSPEEDR  |=  0x0000C000;              // slew rate as 100MHz pin 
+    GPIOA->OSPEEDR  |=  0x0000C000;              // slew rate as 100MHz pin (0x0000C000) or 50mhz (0x00008000)
     GPIOA->PUPDR    &= ~0x0000C000;              // no pull up, pull down 
 
     GPIOA->AFR[0]   &= ~0xF0000000;
@@ -650,11 +666,15 @@ extern void hal_eth_hid_rmii_rx_init(void)
     GPIOC->MODER   &= ~0x00000F00;              // reset pc4 and pc5
     GPIOC->MODER   |=  0x00000A00;              // alternate function
     GPIOC->OTYPER  &= ~0x00000030;              // output push-pull (reset state)  
-    GPIOC->OSPEEDR |=  0x00000F00;              // slew rate as 100MHz pin
+    GPIOC->OSPEEDR |=  0x00000F00;              // slew rate as 100MHz pin (0x00000F00) or 50mhz (0x00000A00)
     GPIOC->PUPDR   &= ~0x00000F00;              // no pull up, pull down
     GPIOC->AFR[0]  &= ~0x00FF0000;
     GPIOC->AFR[0]  |=  0x00BB0000;              // AF11 (ethernet) 
-
+#else
+    s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_CRS_DV, 0);
+    s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_RXD0, 0);
+    s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_RXD1, 0);
+#endif
 #endif
 }
 
@@ -662,40 +682,156 @@ extern void hal_eth_hid_rmii_rx_init(void)
 extern void hal_eth_hid_rmii_tx_init(void)
 {
 #if     defined(USE_STM32F1) 
-    
+#if 0    
     // enable clock for port b
     RCC->APB2ENR    |= 0x00000009;
   
     //  ETH_RMII_TX_EN (PB11), ETH _RMII_TXD0 (PB12), ETH _RMII_TXD1 (PB13)
     GPIOB->CRH      &= 0xFF000FFF;              // reset pb11, pb12, pb13
     GPIOB->CRH      |= 0x00BBB000;              // output max 50mhz, alternate function output push-pull.
-
+#else
+    s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_TX_EN, 0);
+    s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_TXD0, 0);
+    s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_TXD1, 0);     
+#endif    
     
 #elif   defined(USE_STM32F4)
 
+    #warning --> the mapping of teh pins in rmii_tx depends on the board: ems004 uses pb11, pb12, pb13.
+#if 0
     // enable system configuration controller clock
     RCC->APB2ENR    |= (1 << 14);  
     
     // clock port g
     RCC->AHB1ENR    |= 0x00000040;
 
-    // ETH_RMII_TX_EN (PG11), ETH _RMII_TXD0 (PG13), ETH _RMII_TXD1 (PG14)
+    // ETH_RMII_TX_EN (PG11), ETH_RMII_TXD0 (PG13), ETH _RMII_TXD1 (PG14)
     GPIOG->MODER   &= ~0x3CC00000;              // reset pg11, pg13, pg14
     GPIOG->MODER   |=  0x28800000;              // alternate function 
     GPIOG->OTYPER  &= ~0x00006800;              // output push-pull (reset state) 
-    GPIOG->OSPEEDR |=  0x3CC00000;              // slew rate as 100MHz pin
+    GPIOG->OSPEEDR |=  0x3CC00000;              // slew rate as 100MHz pin (0x3CC00000) or 50mhz (0x28800000)
     GPIOG->PUPDR   &= ~0x3CC00000;              // no pull up, pull down 
 
     GPIOG->AFR[1]  &= ~0x0FF0F000;
     GPIOG->AFR[1]  |=  0x0BB0B000;              // AF11 (ethernet) 
+#else
+
+    #warning --> trying to parametrrise the pins
+    
+    int8_t ret = 0;
+    static int8_t asdf = 0;
+    asdf++;
+#if 0
+
+    // enable system configuration controller clock
+    RCC->APB2ENR    |= (1 << 14);  
+    
+    // clock port b
+    RCC->AHB1ENR    |= 0x00000002;
+
+    // ETH_RMII_TX_EN (PB11), ETH_RMII_TXD0 (PB12), ETH _RMII_TXD1 (PB13)
+    GPIOB->MODER   &= ~0x0FC00000;              // reset pb11, pb12, pb13
+    GPIOB->MODER   |=  0x0A800000;              // alternate function 
+    GPIOB->OTYPER  &= ~0x00003800;              // output push-pull (reset state) 
+    GPIOB->OSPEEDR |=  0x0FC00000;              // slew rate as 100MHz pin (0x0FC00000) or 50mhz (0x0A800000)
+    GPIOB->PUPDR   &= ~0x0FC00000;              // no pull up, pull down 
+
+    GPIOB->AFR[1]  &= ~0x00FFF000;
+    GPIOB->AFR[1]  |=  0x00BBB000;              // AF11 (ethernet) 
+
+#else
+
+    s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_TX_EN, 0);
+    s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_TXD0, 0);
+    s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_TXD1, 0);   
 
 #endif
+
+    asdf--;
+#endif
+#endif
+}
+ 
+// mode 1 is input, mode 0 is output
+static int8_t s_hal_eth_gpioeth_init(stm32gpio_gpio_t gpio, uint8_t mode)
+{  
+#if     defined(USE_STM32F1) 
+    static const GPIO_InitTypeDef ethgpioinit = 
+    {
+        .GPIO_Pin       = GPIO_Pin_All,
+        .GPIO_Speed     = GPIO_Speed_50MHz,
+        .GPIO_Mode      = GPIO_Mode_AF_PP,        
+    };
+    
+    GPIO_InitTypeDef gpioinit;
+    
+    // sys clock for af
+    //RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+    
+    // port clock with alternate function
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO | stm32gpio_hid_thegpioclocks[(uint8_t)gpio.port], ENABLE);
+    
+    // config port-pin
+    memcpy(&gpioinit, &ethgpioinit, sizeof(GPIO_InitTypeDef));
+    gpioinit.GPIO_Pin = stm32gpio_hid_thepins[(uint8_t)gpio.pin];
+    if(1 == mode)
+    {
+        gpioinit.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+    }
+    GPIO_Init(stm32gpio_hid_thegpioports[(uint8_t)gpio.port], &gpioinit);
+
+    // config af-eth
+    //GPIO_PinAFConfig(stm32gpio_hid_thegpioports[(uint8_t)gpio.port], stm32gpio_hid_thepinnums[(uint8_t)gpio.pin], GPIO_AF_ETH);
+
+    return(0);    
+
+
+#elif   defined(USE_STM32F4) 
+
+// safe    
+//     static const GPIO_InitTypeDef ethgpioinit = 
+//     {   // safe one
+//         .GPIO_Pin       = GPIO_Pin_All,
+//         .GPIO_Mode      = GPIO_Mode_AF,
+//         .GPIO_Speed     = GPIO_Speed_100MHz,
+//         .GPIO_OType     = GPIO_OType_PP,
+//         .GPIO_PuPd      = GPIO_PuPd_NOPULL    
+//     };
+    
+    static const GPIO_InitTypeDef ethgpioinit = 
+    {   // test
+        .GPIO_Pin       = GPIO_Pin_All,
+        .GPIO_Mode      = GPIO_Mode_AF,
+        .GPIO_Speed     = GPIO_Speed_100MHz,
+        .GPIO_OType     = GPIO_OType_PP,
+        .GPIO_PuPd      = GPIO_PuPd_NOPULL    
+    };    
+    
+    GPIO_InitTypeDef gpioinit;
+    
+    // sys clock for af
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+    
+    // port clock
+    RCC_AHB1PeriphClockCmd(stm32gpio_hid_thegpioclocks[(uint8_t)gpio.port], ENABLE);
+    
+    // config port-pin
+    memcpy(&gpioinit, &ethgpioinit, sizeof(GPIO_InitTypeDef));
+    gpioinit.GPIO_Pin = stm32gpio_hid_thepins[(uint8_t)gpio.pin];
+    GPIO_Init(stm32gpio_hid_thegpioports[(uint8_t)gpio.port], &gpioinit);
+
+    // config af-eth
+    GPIO_PinAFConfig(stm32gpio_hid_thegpioports[(uint8_t)gpio.port], stm32gpio_hid_thepinnums[(uint8_t)gpio.pin], GPIO_AF_ETH);
+
+    return(0);
+#endif    
 }
 
 extern void hal_eth_hid_smi_init(void)
 {
 #if     defined(USE_STM32F1) 
-    
+
+#if 0    
     // 0. clocks port a and port c as alternate functions   
     RCC->APB2ENR    |= 0x00000015;
 
@@ -709,9 +845,16 @@ extern void hal_eth_hid_smi_init(void)
     
     // MDC Clock range: 60-72MHz. MDC = Management data clock. (RMII signal)
     ETH->MACMIIAR   = 0x00000000;
-    
+#else
+    s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_MDC, 0);
+    s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_MDIO, 0);
+    // MDC Clock range: 60-72MHz. MDC = Management data clock. (RMII signal)
+    ETH->MACMIIAR   = 0x00000000;
+#endif    
 #elif   defined(USE_STM32F4) 
-    
+ 
+ 
+#if 0 
     // enable system configuration controller clock
     RCC->APB2ENR    |= (1 << 14);  
     
@@ -722,7 +865,7 @@ extern void hal_eth_hid_smi_init(void)
     GPIOC->MODER    &= ~0x0000000C;             // reset pc1
     GPIOC->MODER    |=  0x00000008;             // alternate function
     GPIOC->OTYPER   &= ~0x00000002;             // output push-pull (reset state) 
-    GPIOC->OSPEEDR  |=  0x0000000C;             // slew rate as 100MHz pin
+    GPIOC->OSPEEDR  |=  0x0000000C;             // slew rate as 100MHz pin (0x0000000C) or 50mhz (0x00000008)
     GPIOC->PUPDR    &= ~0x0000000C;             // no pull up, pull down
     
     GPIOC->AFR[0]   &= ~0x000000F0;
@@ -730,10 +873,10 @@ extern void hal_eth_hid_smi_init(void)
     
     
     // 2. MDIO:             PA2 -> ETH_MDIO 
-    GPIOA->MODER    &= ~0x00000030;             // reset pa1, pa2, pa7, pa8
+    GPIOA->MODER    &= ~0x00000030;             // reset pa2
     GPIOA->MODER    |=  0x00000020;             // alternate function
     GPIOA->OTYPER   &= ~0x00000004;             // output push-pull (reset state) 
-    GPIOA->OSPEEDR  |=  0x00000030;             // slew rate as 100MHz pin 
+    GPIOA->OSPEEDR  |=  0x00000030;             // slew rate as 100MHz pin (0x00000030) or 50mhz (0x00000020)
     GPIOA->PUPDR    &= ~0x00000030;             // no pull up, pull down
 
     GPIOA->AFR[0]   &= ~0x00000F00;
@@ -741,6 +884,16 @@ extern void hal_eth_hid_smi_init(void)
     
     // 3. MDC clock range:  bits 4:2 CR: clock range. value 1 -> HCLK = 100-168 MHz, MDC Clock = HCLK/62
     ETH->MACMIIAR   = 0x00000004; 
+#else
+    
+    s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_MDC, 0);
+    s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_MDIO, 0);
+    
+    // MDC clock range:  bits 4:2 CR: clock range. value 1 -> HCLK = 100-168 MHz, MDC Clock = HCLK/62
+    ETH->MACMIIAR   = 0x00000004; 
+
+#endif    
+    
 #endif    
 }
 
@@ -785,15 +938,21 @@ extern void hal_eth_hid_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t val
 extern void hal_eth_hid_rmii_refclock_init(void)
 {   // used by mac but also by external phy or switch
 #if     defined(USE_STM32F1) 
-    
+
+#if 0    
     // clock gpioa as alternate function
     RCC->APB2ENR    |= 0x00000005;
     
     // init the ETH_RMII_REF_CLK (PA1)
     GPIOA->CRL      &= 0xFFFFFF0F;              // reset pa1
     GPIOA->CRL      |= 0x00000040;              // pin configured in reset state (floating input)
+#else
+    s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_REF_CLK, 1);
+#endif
     
 #elif   defined(USE_STM32F4) 
+
+#if 0
         
     // enable system configuration controller clock
     RCC->APB2ENR    |= (1 << 14);      
@@ -805,11 +964,15 @@ extern void hal_eth_hid_rmii_refclock_init(void)
     GPIOA->MODER    &= ~0x0000000C;              // reset pa1
     GPIOA->MODER    |=  0x00000008;              // alternate function
     GPIOA->OTYPER   &= ~0x00000002;              // output push-pull (reset state) 
-    GPIOA->OSPEEDR  |=  0x0000000C;              // slew rate as 100MHz pin
+    GPIOA->OSPEEDR  |=  0x0000000C;              // slew rate as 100MHz pin (0x0000000C) or 50mhz (0x00000008)
     GPIOA->PUPDR    &= ~0x0000000C;              // no pull up, pull down
 
     GPIOA->AFR[0]   &= ~0x000000F0;
     GPIOA->AFR[0]   |=  0x000000B0;              // AF11 (ethernet)    
+
+#else
+    s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_REF_CLK, 0);
+#endif
 
 #endif    
 }
@@ -867,13 +1030,15 @@ extern void hal_eth_hid_rmii_prepare(void)
 
     // step 1.
     // reset Ethernet MAC
-    RCC->AHBRSTR    |= 0x00004000;              // put ethernet mac in reset mode
+    //RCC->AHBRSTR    |= 0x00004000;              // put ethernet mac in reset mode
+    RCC_AHBPeriphResetCmd(RCC_AHBPeriph_ETH_MAC, ENABLE);
     // no need to do anything in here as in the stm32f4x
-    RCC->AHBRSTR    &=~0x00004000;              // remove ethernet mac from reset mode
-    
+    //RCC->AHBRSTR    &=~0x00004000;              // remove ethernet mac from reset mode
+    RCC_AHBPeriphResetCmd(RCC_AHBPeriph_ETH_MAC, DISABLE);
    
     // enable RMII and remap rx pins:
-    AFIO->MAPR      |= (1 << 23);               // impose rmii 
+    //AFIO->MAPR      |= (1 << 23);               // impose rmii 
+    GPIO_ETH_MediaInterfaceConfig(GPIO_ETH_MediaInterface_RMII);
     //AFIO->MAPR      |= (1 << 21);             // Ethernet MAC I/O remapping to: RX_DV-CRS_DV/PD8, RXD0/PD9, RXD1/PD10, RXD2/PD11, RXD3/PD12    
     // moved in rmii_rx_init
 
@@ -883,7 +1048,8 @@ extern void hal_eth_hid_rmii_prepare(void)
 //    RCC->APB2ENR |= 0x0000003D;
 
     // enable clocks for ethernet (RX, TX, MAC)
-    RCC->AHBENR     |= 0x0001C000;
+    //RCC->AHBENR     |= 0x0001C000;
+    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_ETH_MAC | RCC_AHBPeriph_ETH_MAC_Tx | RCC_AHBPeriph_ETH_MAC_Rx, ENABLE);
     
 #elif   defined(USE_STM32F4)
 

@@ -56,11 +56,11 @@
 //    #undef  HAL_USE_CAN
     #undef  HAL_USE_DISPLAY
     #undef  HAL_USE_ENCODER
-    #undef  HAL_USE_ETH
+//    #undef  HAL_USE_ETH
 //    #undef  HAL_USE_EEPROM
 //    #undef  HAL_USE_FLASH
 //    #undef  HAL_USE_LED
-    #undef  HAL_USE_SWITCH
+//    #undef  HAL_USE_SWITCH
 //    #undef  HAL_USE_TIMER
 //    #undef  HAL_USE_WATCHDOG
 #endif
