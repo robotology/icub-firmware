@@ -281,10 +281,10 @@ int main(int argc, char *argv[])
 	if(ACE_Thread::spawn((ACE_THR_FUNC)skinThread, NULL, THR_CANCEL_ENABLE, &id_skinThread)==-1)
 		printf(("Error in spawning id_skinThread\n"));
 
-	// Start send thread
-	printf("Launching id_sendThread\n");
-	if(ACE_Thread::spawn((ACE_THR_FUNC)sendThread, NULL, THR_CANCEL_ENABLE, &id_sendThread)==-1)
-		printf(("Error in spawning sendThread\n"));
+//	// Start send thread
+//	printf("Launching id_sendThread\n");
+//	if(ACE_Thread::spawn((ACE_THR_FUNC)sendThread, NULL, THR_CANCEL_ENABLE, &id_sendThread)==-1)
+//		printf(("Error in spawning sendThread\n"));
 
 
 	// Send a packet to test dummy
@@ -353,18 +353,21 @@ int main(int argc, char *argv[])
 			// Get the actual packet and write it into socket using udppkt_data, udppkt_size
 			// if the command isn't known, an empty ropframe wil be sent -- I guess
 			transceiver->getTransmit(&udppkt_data, &udppkt_size);
+		    for(int i=0; i< udppkt_size; i++)
+		    	printf("%02X ", udppkt_data[i]);
 
 #ifdef _LINUX_UDP_SOCKET_
-			ACE_socket.send((char*) &udppkt_data, (ssize_t) udppkt_size, 0);
+			ACE_socket.send((char*) udppkt_data, (ssize_t) udppkt_size, 0);
 #else
 			ACE_socket->send(udppkt_data, udppkt_size, remote01.addr, flags);
 #endif
 
 			//printf("Sent EmbObj packet, size = %d\n", udppkt_size);
 		}
+
 	}
 
-	print_data();
+//	print_data();
 
 #ifdef _LINUX_UDP_SOCKET_
 	ACE_socket.disconnect();
@@ -372,10 +375,13 @@ int main(int argc, char *argv[])
 #endif
 
 	sleep(2);
+
+
 	//pthread_cancel(thread);
 	ACE_Thread::cancel(id_recvThread);
-	ACE_Thread::cancel(id_sendThread);
+//	ACE_Thread::cancel(id_sendThread);
 	ACE_Thread::cancel(id_skinThread);
+
 	return(0);
 }
 
@@ -448,8 +454,10 @@ void *sendThread(void * arg)
 		if(enableSender)
 		{
 			transceiver->getTransmit(&udppkt_data, &udppkt_size);
+
+
 #ifdef _LINUX_UDP_SOCKET_
-			ACE_socket.send((char*) &udppkt_data, (ssize_t) udppkt_size, 0);
+			ACE_socket.send((char*) udppkt_data, (ssize_t) udppkt_size, 0);
 #else
 			ACE_socket->send(udppkt_data, udppkt_size, remote01.addr, flags);
 #endif
