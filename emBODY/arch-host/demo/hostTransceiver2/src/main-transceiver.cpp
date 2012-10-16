@@ -353,8 +353,8 @@ int main(int argc, char *argv[])
 			// Get the actual packet and write it into socket using udppkt_data, udppkt_size
 			// if the command isn't known, an empty ropframe wil be sent -- I guess
 			transceiver->getTransmit(&udppkt_data, &udppkt_size);
-		    for(int i=0; i< udppkt_size; i++)
-		    	printf("%02X ", udppkt_data[i]);
+//		    for(int i=0; i< udppkt_size; i++)
+//		    	printf("%02X ", udppkt_data[i]);
 
 #ifdef _LINUX_UDP_SOCKET_
 			ACE_socket.send((char*) udppkt_data, (ssize_t) udppkt_size, 0);

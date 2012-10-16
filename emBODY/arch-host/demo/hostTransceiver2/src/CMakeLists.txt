@@ -20,7 +20,8 @@ set(ICUB_INTERFACE_CORE_FOLDER	$ENV{ICUB_ROOT}/main/src/core/iCubInterface-branc
 
 #add_definitions( -D_AC_="STRINGA" )
 
-set(MY_CALLBACK template_buttons.cpp)
+set(MY_CALLBACK vale_buttons.cpp)
+#set(MY_CALLBACK AC_buttons.cpp)
 set(CMAKE_MODULE_PATH  ${CMAKE_SOURCE_DIR}/../../)
 
 find_package(ACE)

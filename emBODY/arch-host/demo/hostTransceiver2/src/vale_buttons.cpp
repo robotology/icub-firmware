@@ -13,7 +13,7 @@ bool 		enableSender = false;
 double		encoderconvfactor = 1; //configured during joint configuration
 double		encoderconvoffset = 0; //configured during joint configuration
 
-#error would you like use send thread???
+//#error would you like use send thread???
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of callback functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -51,11 +51,15 @@ void s_callback_button_0(void)
 	EOnv 	*nv_p 				= transceiver->getNVhandler(endpoint_mn_appl, nvid_go2state);
 	eOmn_appl_state_t  desired 	= applstate_running;
 
+	if(NULL == nv_p)
+		printf("\nnv pointer not found\n");
+
 	printf("nvid = %d (0X%04X", nvid_go2state, nvid_go2state);
 	if( eores_OK != eo_nv_Set(nv_p, &desired, eobool_true, eo_nv_upd_dontdo))
-		printf("error!!");
+		printf("\nerror eo_nv_Set!!");
 	// tell agent to prepare a rop to send
-	transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mn_appl, nvid_go2state);
+	if (eores_OK != transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mn_appl, nvid_go2state))
+		printf("\nerror load_occasional_rop.");
 }
 
 //configure regulars

@@ -205,7 +205,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig__maxcurrentofmotor(eOcfg_nvsEP_
 
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidposition(eOcfg_nvsEP_mc_motorNumber_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-	printf("jconfig__pidposition Callback\n");
+	printf("jconfig__pidposition Callback HostTransceiver2\n");
 }
 
 

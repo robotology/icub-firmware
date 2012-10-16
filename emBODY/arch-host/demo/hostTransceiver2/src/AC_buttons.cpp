@@ -13,12 +13,33 @@
 // - definition of callback functions
 // --------------------------------------------------------------------------------------------------------------------
 
+bool 		enableSender = true;
+
+void commands(void)
+{
+
+}
+
 void s_callback_button_0(void)
 {
 	char str[128];
 	eOcfg_nvsEP_mn_applNumber_t dummy = 0;
 	eOnvID_t nvid_go2state 		= eo_cfg_nvsEP_mn_appl_NVID_Get(endpoint_mn_appl, dummy, applNVindex_cmmnds__go2state);
+	if(EOK_uint16dummy == nvid_go2state)
+	{
+		printf("nvid_go2state error ");
+		return;
+	}
+
+
 	EOnv 	*nv_p 				= transceiver->getNVhandler(endpoint_mn_appl, nvid_go2state);
+	if(NULL == nv_p)
+	{
+		printf("nv pointer error ");
+		return;
+	}
+
+
 	eOmn_appl_state_t  desired 	= applstate_running;
 
 	printf("nvid = %d (0X%04X", nvid_go2state, nvid_go2state);
@@ -322,8 +343,7 @@ void s_callback_button_3(void )
 	jData.pidposition.offset 			= 0X1FFF;
 	jData.pidposition.scale 			= 0X11;
 	jData.minpositionofjoint			= 0x22333322;
-	jData.maxpositionofjoint			= 0x44555544,
-			jData.controlmode					= 0x66;
+	jData.maxpositionofjoint			= 0x44555544;
 	if( eores_OK != eo_nv_Set(nvRoot, &jData, eobool_true, eo_nv_upd_dontdo))
 		printf("error!!");
 	// tell agent to prepare a rop to send
@@ -436,4 +456,20 @@ void s_callback_button_6(void )
 	ACE_socket->send(str, 1, remote02.addr, flags);
 #endif
 	snprintf(str, sizeof(str)-1, "called weak up EMS\n", j);
+}
+
+
+void s_callback_button_7(void )
+{
+
+}
+
+void s_callback_button_8(void )
+{
+
+}
+
+void s_callback_button_9(void )
+{
+
 }
