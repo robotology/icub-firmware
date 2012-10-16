@@ -112,7 +112,7 @@ void decouple_dutycycle(Int32 *pwm)
 		if (_control_mode[3] == MODE_CALIB_HARD_STOPS) pwm[2] = 0;	
 #endif
 //-----------------------------------------------------------------------------------
-#if VERSION == 0x0119 
+#if VERSION == 0x0119 || VERSION == 0x0219 
 			//pwm[1] = pwm[1];	//omitted
 			pwm[2] = (pwm[2] - pwm[1]);
 			if (_control_mode[1] == MODE_IDLE || _control_mode[2] == MODE_IDLE)
@@ -127,34 +127,6 @@ void decouple_dutycycle(Int32 *pwm)
 			{
 				if 	(pwm[1]> _pwm_calibration[1])
 				  	pwm[1] = _pwm_calibration[1];
-				if 	(pwm[1] < -_pwm_calibration[1])	
-					pwm[1] = -_pwm_calibration[1];
-				if 	(pwm[2]> _pwm_calibration[2])
-				  	pwm[2] = _pwm_calibration[2];
-				if 	(pwm[2] < -_pwm_calibration[2])	
-					pwm[2] = -_pwm_calibration[2];		
-			}	
-#endif 
-//-----------------------------------------------------------------------------------
-#if VERSION == 0x0219 
-	/*  Wrist Differential coupling 
-		|Me1| |  1    -1 |  |Je1|
-		|Me2|=| -1     0 |* |Je2|    */
-	
-			pwm[1] = pwm[1]-pwm[2];	
-			pwm[2] = -pwm[2];
-			if (_control_mode[1] == MODE_IDLE || _control_mode[2] == MODE_IDLE)
-			{
-				pwm[1] = 0;
-	 			pwm[2] = 0;
-			}
-			_pd[1] = _pd[1]-_pd[2];			
-			_pd[2] = -_pd[2];
-			
-			if ((_control_mode[1] == MODE_CALIB_HARD_STOPS) || (_control_mode[2] == MODE_CALIB_HARD_STOPS))
-			{
-				if 	(pwm[1]> _pwm_calibration[1])
-				   	pwm[1] = _pwm_calibration[1];
 				if 	(pwm[1] < -_pwm_calibration[1])	
 					pwm[1] = -_pwm_calibration[1];
 				if 	(pwm[2]> _pwm_calibration[2])
