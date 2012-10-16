@@ -34,6 +34,7 @@
 #include "stdlib.h"
 #include "hal_base.h"
 #include "hal_sys.h"
+#include "string.h"
 #include "hal_stm32_base_hid.h"
 #include "hal_stm32_spi4encoder_hid.h"
 #include "hal_stm32_eth_hid.h"
@@ -182,7 +183,9 @@
     extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_RXD1    = { .port = stm32gpio_portD, .pin = stm32gpio_pin10 };    
     
     extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDC          = { .port = stm32gpio_portC, .pin = stm32gpio_pin1  };
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDIO         = { .port = stm32gpio_portA, .pin = stm32gpio_pin2  };     
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDIO         = { .port = stm32gpio_portA, .pin = stm32gpio_pin2  };  
+
+    extern const hal_eth_phymode_t hal_brdcfg_eth__phymode              = { .mux = hal_eth_mux_fullduplex, .speed = hal_eth_speed_100 };    
 #endif//HAL_USE_ETH
 
 
@@ -563,27 +566,168 @@ extern void hal_brdcfg_switch__initialise(void)
     // --- i2c for communication 
     hal_i2c4hal_init(hal_i2c_port1, NULL); // use default configuration        
 }
+
+static void s_hal_brdcfg_switch__mii_phymode_get(hal_eth_phymode_t* phymode)
+{
+    #define MIIHALFD    (1 << 6)
+    #define MII10MBS    (1 << 4)
+    uint8_t read = 0xFF; 
+    hal_i2c_regaddr_t regadr = {.numofbytes = 1, .bytes.one = 0};
+    regadr.bytes.one = 0x06;
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &read, 1);
+    if( (MIIHALFD & read) == MIIHALFD)
+    {
+        phymode->mux = hal_eth_mux_halfduplex;
+    }
+    else
+    {
+        phymode->mux = hal_eth_mux_fullduplex;
+    }
+    if( (MII10MBS & read) == MII10MBS)
+    {
+        phymode->speed = hal_eth_speed_10;
+    }
+    else
+    {
+        phymode->speed = hal_eth_speed_100;
+    }
+}
  
+extern void hal_brdcfg_switch__configure(hal_eth_phymode_t* phymode)
+{
+    hal_eth_phymode_t phymode2use = {.mux = hal_eth_mux_fullduplex, .speed = hal_eth_speed_100};
+    const uint8_t fd100 = 0x60;
+    const uint8_t fd010 = 0x20;
+    uint8_t buff_write = 0x60; // FORCE FULL DUPLEX AND 100T
+    uint8_t buff_read = 0xFF; 
+    volatile uint32_t i = 1;
+    hal_i2c_regaddr_t regadr = {.numofbytes = 1, .bytes.one = 0};
+    
+    if(NULL != phymode)
+    {
+        memcpy(&phymode2use, phymode, sizeof(hal_eth_phymode_t));
+    }
+
+    regadr.bytes.one = 0x01;
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    if((buff_read&0x01))
+    {   // already initted. to be initted again must pass through a reset
+        s_hal_brdcfg_switch__mii_phymode_get(phymode);
+        return;
+    }
+    
+    
+//    if((hal_eth_mux_auto == phymode2use.mux) || (hal_eth_mux_none == phymode2use.mux) || (hal_eth_speed_auto == phymode2use.speed) || (hal_eth_speed_none == phymode2use.speed))
+    if((hal_eth_mux_none == phymode2use.mux) || (hal_eth_speed_none == phymode2use.speed))
+    {
+        if(NULL != phymode)
+        {
+            phymode->speed  = hal_eth_speed_none;
+            phymode->mux    = hal_eth_mux_none;        
+        }   
+        return;        
+    }
+
+
+    
+
+#if 0    
+    // configure mii
+    regadr.bytes.one = 0x06;
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    buff_write  = buff_read;
+    buff_write |= 0x10; 
+    hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+#endif
+
+    // 1. configure  switch's ports 1 and 2
+    if((hal_eth_mux_auto == phymode2use.mux) || (hal_eth_speed_auto == phymode2use.speed))
+    {
+        buff_write = 0x9F;
+    }
+    else    
+    {
+        buff_write  = 0;
+        buff_write  = (hal_eth_speed_100 == phymode2use.speed)    ? (0x40) : (0x00);     
+        buff_write |= (hal_eth_mux_fullduplex == phymode2use.mux) ? (0x20) : (0x00);  
+    }
+    
+    // port 1
+    regadr.bytes.one = 0x1C;
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+     
+    // port 2 
+    regadr.bytes.one = 0x2C;
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);   
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+
+    // 2. start the switch
+    buff_write = 0x1;  
+    regadr.bytes.one = 0x01;    
+    hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
+    
+
+    // 3. read back to verify
+    regadr.bytes.one = 0x01;
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    if(!(buff_read&0x01))
+    {
+        hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "s_hal_switch_reg_config(): SWITCH not configured");
+    }
+    
+    s_hal_brdcfg_switch__mii_phymode_get(phymode);
+    
+//    if(NULL != phymode)
+//    {
+//        phymode->speed = hal_eth_speed_100; // the one of mii
+//        phymode->mux   = phymode2use.mux;
+//    }
+
+}
 
 #endif//HAL_USE_SWITCH
 
 
 #ifdef HAL_USE_ETH
 
-extern void hal_brdcfg_eth__phy_initialise(void)
+extern hal_bool_t hal_brdcfg_eth__phy_initialise(void)
 {
     #warning --> in here we just init the switch ... put in reset mode, exit from reset, do the mco, init the i2c if not initted, etc. 
     if(hal_false == hal_switch_initted_is())
     {
         hal_switch_init(NULL);
     }
-
+    
+    return(hal_true);
 }
 
-extern void hal_brdcfg_eth__phy_configure(void)
+extern void hal_brdcfg_eth__phy_configure(hal_eth_phymode_t *phymode)
 {
-    #warning --> in here we configure the switch ... in full duplex 100mbps for instance
-    hal_switch_start();
+    hal_eth_phymode_t target;
+    memcpy(&target, &hal_brdcfg_eth__phymode, sizeof(hal_eth_phymode_t));
+    
+//    if((hal_eth_mux_auto == target.mux) || (hal_eth_mux_none == target.mux) || (hal_eth_speed_auto == target.speed) || (hal_eth_speed_none == target.speed))
+    if((hal_eth_mux_none == target.mux) || (hal_eth_speed_none == target.speed))
+    {
+        if(NULL != phymode)
+        {
+            phymode->speed  = hal_eth_speed_none;
+            phymode->mux    = hal_eth_mux_none;        
+        }   
+        return;        
+    }    
+    
+    hal_switch_start(&target);
+    
+    if(NULL != phymode)
+    {
+        phymode->speed  = target.speed;
+        phymode->mux    = target.mux;         
+    }
 }
 
 

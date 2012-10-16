@@ -14,7 +14,9 @@
 
 #include "hal_stm32xx_include.h"
 
+#include "hal.h"
 #include "stdlib.h"
+#include "string.h"
 #include "hal_base.h"
 #include "hal_stm32_base_hid.h"
 #include "hal_stm32_spi4encoder_hid.h"
@@ -68,34 +70,6 @@
 
 
 
-#ifdef HAL_USE_ETH
-
-    #define HAL_BRDCFG_ETH__ETH_IS_IN_RESET_STATE(x)	    (x & 0x8800)
-
-//     // acemor on 16 sept 2011: the following are un-used ...
-//     #define HAL_BRDCFG_ETH__PHY_REG_ANER        0x06        /* Auto-Neg. Expansion Register      */
-//     #define HAL_BRDCFG_ETH__PHY_REG_ANNPTR      0x07        /* Auto-Neg. Next Page TX            */
-//     /* PHY Extended Registers */
-//     #define HAL_BRDCFG_ETH__PHY_REG_STS         0x10        /* Status Register                   */
-//     #define HAL_BRDCFG_ETH__PHY_REG_MICR        0x11        /* MII Interrupt Control Register    */
-//     #define HAL_BRDCFG_ETH__PHY_REG_MISR        0x12        /* MII Interrupt Status Register     */
-//     #define HAL_BRDCFG_ETH__PHY_REG_FCSCR       0x14        /* False Carrier Sense Counter       */
-//     #define HAL_BRDCFG_ETH__PHY_REG_RECR        0x15        /* Receive Error Counter             */
-//     #define HAL_BRDCFG_ETH__PHY_REG_PCSR        0x16        /* PCS Sublayer Config. and Status   */
-//     #define HAL_BRDCFG_ETH__PHY_REG_RBR         0x17        /* RMII and Bypass Register          */
-//     #define HAL_BRDCFG_ETH__PHY_REG_LEDCR       0x18        /* LED Direct Control Register       */
-//     #define HAL_BRDCFG_ETH__PHY_REG_PHYCR       0x19        /* PHY Control Register              */
-//     #define HAL_BRDCFG_ETH__PHY_REG_10BTSCR     0x1A        /* 10Base-T Status/Control Register  */
-//     #define HAL_BRDCFG_ETH__PHY_REG_CDCTRL1     0x1B        /* CD Test Control and BIST Extens.  */
-//     #define HAL_BRDCFG_ETH__PHY_REG_EDCR        0x1D        /* Energy Detect Control Register    */
-//     #define AL_BRDCFG_ETH__DP83848C_DEF_ADR    0x01        /* Default PHY device address        */
-//     #define AL_BRDCFG_ETH__DP83848C_ID         0x20005C90  /* PHY Identifier                    */
-//     //#define PHY_address 		DP83848C_DEF_ADR
-//     #define AL_BRDCFG_ETH__HAL_ETH_RESET_STATE_MASK		0x77FF//0x8800 DA SISTEMARE!!!!
-//     // acemor on 16 sept 2011: the previous are un-used ...
-
-#endif//HAL_USE_ETH
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
@@ -139,17 +113,17 @@
     extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDC          = { .port = stm32gpio_portC, .pin = stm32gpio_pin1  };
     extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDIO         = { .port = stm32gpio_portA, .pin = stm32gpio_pin2  };   
    
-    
+    extern const hal_eth_phymode_t hal_brdcfg_eth__phymode              = { .mux = hal_eth_mux_fullduplex, .speed = hal_eth_speed_10 };
 #endif//HAL_USE_ETH
 
 
 #ifdef HAL_USE_EEPROM
-    extern const uint8_t  hal_brdcfg_eeprom__supported_mask         = (1 << hal_eeprom_i2c_01);
-    extern const uint32_t hal_brdcfg_eeprom__emflash_baseaddress    = 0x08000000;
-    extern const uint32_t hal_brdcfg_eeprom__emflash_totalsize      = 0;
-    extern const uint32_t hal_brdcfg_eeprom__i2c_01_baseaddress     = 0;
-    extern const uint32_t hal_brdcfg_eeprom__i2c_01_totalsize       = 8*1024; 
-    extern const stm32ee_cfg_t hal_brdcfg_eeprom__stm32eecfg =
+    extern const uint8_t  hal_brdcfg_eeprom__supported_mask             = (1 << hal_eeprom_i2c_01);
+    extern const uint32_t hal_brdcfg_eeprom__emflash_baseaddress        = 0x08000000;
+    extern const uint32_t hal_brdcfg_eeprom__emflash_totalsize          = 0;
+    extern const uint32_t hal_brdcfg_eeprom__i2c_01_baseaddress         = 0;
+    extern const uint32_t hal_brdcfg_eeprom__i2c_01_totalsize           = 8*1024; 
+    extern const stm32ee_cfg_t hal_brdcfg_eeprom__stm32eecfg            =
     {
         .devcfg             =
         {
@@ -376,12 +350,6 @@ extern void hal_brdcfg_i2c4hal__ontimeouterror(void)
 #endif//HAL_USE_I2C4HAL
 
 
-#ifdef HAL_USE_EEPROM
-
-
-#endif//HAL_USE_EEPROM
-
-
 
 
 
@@ -478,7 +446,7 @@ extern void hal_brdcfg_spi4encoder__chipSelect_init(hal_spi_port_t spix )
 
 #ifdef HAL_USE_SWITCH  
 
-
+#if 0
 static void hal_brdcfg_switch__mco1_init(void)
 {
     // configure pa8 af, push pull, 50mhz
@@ -497,9 +465,12 @@ static void hal_brdcfg_switch__mco1_init(void)
     GPIOA->AFR[1]  |=  0x00000000;              // AF0 (system) 
 
 }
+#endif
 
 static void hal_brdcfg_switch__mco2_init(void)
 {
+    #define SLR100MHZ               0x000C0000
+    #define SLR050MHZ               0x00080000
     // configure pc9 af, push pull, 50mhz
     // enable system configuration controller clock
     RCC->APB2ENR    |= (1 << 14);  
@@ -509,60 +480,16 @@ static void hal_brdcfg_switch__mco2_init(void)
     GPIOC->MODER    &= ~0x000C0000;              // reset pc9
     GPIOC->MODER    |=  0x00080000;              // alternate function
     GPIOC->OTYPER   &= ~0x00000200;              // output push-pull (reset state)  
-    GPIOC->OSPEEDR  |=  0x00080000;              // slew rate as 100MHz pin (0x000C0000) or 50mhz (0x00080000)
+    GPIOC->OSPEEDR  |=  SLR100MHZ;               // slew rate as 100MHz pin (0x000C0000) or 50mhz (0x00080000)
     GPIOC->PUPDR    &= ~0x000C0000;              // no pull up, pull down
 
     GPIOC->AFR[1]   &= ~0x000000F0;
     GPIOC->AFR[1]   |=  0x00000000;              // AF0 (system) 
-
 }
 
 static void hal_brdcfg_switch__mco_initialise(void)
 {
-#if 0
-    // this function initialises MCO in order to provide clock ref to switch.
-    // PA8 is MCO. it must be configured = Output mode, max speed 50 MHz + Alternate function output Push-pull (B)
-    // also, we connect pll3 at 50mhz to it
-    
-    // clock gpioa as alternate function
-    RCC->APB2ENR    |= 0x00000005;
-    // init pa8
-    GPIOA->CRH   &= 0xFFFFFFF0;
-    GPIOA->CRH   |= 0x0000000B;	
 
-
-    // set pll3 clock output to 50mhz: (25mhz/5)*10 = 50mhz, thus we use multiplier 10
-    RCC_PLL3Config(RCC_PLL3Mul_10);
-        
-    // enable pll3 
-    RCC_PLL3Cmd(ENABLE);
-    
-    // wait until it is ready
-    while(RCC_GetFlagStatus(RCC_FLAG_PLL3RDY) == RESET);
-    
-    // connect mco on pa8 with pll3
-    RCC_MCOConfig(RCC_MCO_PLL3CLK);
-#endif  
-
-#if 0
-    // configure pc9 af, push pull, 50mhz
-    // enable system configuration controller clock
-    RCC->APB2ENR    |= (1 << 14);  
-    // clocks port port c
-    RCC->AHB1ENR    |= 0x00000004;
-
-    GPIOC->MODER    &= ~0x000C0000;              // reset pc9
-    GPIOC->MODER    |=  0x00080000;              // alternate function
-    GPIOC->OTYPER   &= ~0x00000200;              // output push-pull (reset state)  
-    GPIOC->OSPEEDR  |=  0x00080000;              // slew rate as 100MHz pin (C) or 50mhz (8)
-    GPIOC->PUPDR    &= ~0x000C0000;              // no pull up, pull down
-
-    GPIOC->AFR[1]   &= ~0x000000F0;
-    GPIOC->AFR[1]   |=  0x00000000;              // AF0 (system) 
-#endif
-
-    //hal_brdcfg_switch__mco1_init();
-   
     hal_brdcfg_switch__mco2_init();
      
     RCC_PLLI2SCmd(DISABLE);
@@ -592,24 +519,11 @@ extern void hal_brdcfg_switch__initialise(void)
 //    hal_brdcfg_switch__mco_initialise();  
     
      // --- reset pin: PB2
-#if 0    
-    // clock gpioa as normal gpio, reset pin 2, and set it as: Output mode, max speed 2 MHz + General purpose output push-pull
-    do it ...
-    // put in reset state (low) for some time ... 10 ms according to datasheet.
-    do it ...
-    hal_sys_delay(10*1000);
-    // put value high to exit from reset state
-    do it ...
-    // now wait for 100 usec before using i2c etc.
-    hal_sys_delay(100);
-#else
-    #define F 1
     hal_gpio_init(hal_gpio_portB, hal_gpio_pin2, hal_gpio_dirOUT, hal_gpio_speed_low);
     hal_gpio_setval(hal_gpio_portB, hal_gpio_pin2, hal_gpio_valLOW);
-    hal_sys_delay(F*10*1000);
+    hal_sys_delay(10*1000);
     hal_gpio_setval(hal_gpio_portB, hal_gpio_pin2, hal_gpio_valHIGH);
-    hal_sys_delay(F*100);
-#endif    
+    hal_sys_delay(100);
   
     // proviamo anche questo ....
 //    hal_eth_hid_rmii_refclock_init();
@@ -624,26 +538,157 @@ extern void hal_brdcfg_switch__initialise(void)
 
 }
 
+static void s_hal_brdcfg_switch__mii_phymode_get(hal_eth_phymode_t* phymode)
+{
+    #define MIIHALFD    (1 << 6)
+    #define MII10MBS    (1 << 4)
+    uint8_t read = 0xFF; 
+    hal_i2c_regaddr_t regadr = {.numofbytes = 1, .bytes.one = 0};
+    regadr.bytes.one = 0x06;
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &read, 1);
+    if( (MIIHALFD & read) == MIIHALFD)
+    {
+        phymode->mux = hal_eth_mux_halfduplex;
+    }
+    else
+    {
+        phymode->mux = hal_eth_mux_fullduplex;
+    }
+    if( (MII10MBS & read) == MII10MBS)
+    {
+        phymode->speed = hal_eth_speed_10;
+    }
+    else
+    {
+        phymode->speed = hal_eth_speed_100;
+    }
+}
+ 
+extern void hal_brdcfg_switch__configure(hal_eth_phymode_t* phymode)
+{
+    hal_eth_phymode_t phymode2use = {.mux = hal_eth_mux_fullduplex, .speed = hal_eth_speed_100};
+    const uint8_t fd100 = 0x60;
+    const uint8_t fd010 = 0x20;
+    uint8_t buff_write = 0x60; // FORCE FULL DUPLEX AND 100T
+    uint8_t buff_read = 0xFF; 
+    volatile uint32_t i = 1;
+    hal_i2c_regaddr_t regadr = {.numofbytes = 1, .bytes.one = 0};
+    
+    if(NULL != phymode)
+    {
+        memcpy(&phymode2use, phymode, sizeof(hal_eth_phymode_t));
+    }
+
+    regadr.bytes.one = 0x01;
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    if((buff_read&0x01))
+    {   // already initted. to be initted again must pass through a reset
+        s_hal_brdcfg_switch__mii_phymode_get(phymode);
+        return;
+    }
+    
+    
+//    if((hal_eth_mux_auto == phymode2use.mux) || (hal_eth_mux_none == phymode2use.mux) || (hal_eth_speed_auto == phymode2use.speed) || (hal_eth_speed_none == phymode2use.speed))
+    if((hal_eth_mux_none == phymode2use.mux) || (hal_eth_speed_none == phymode2use.speed))
+    {
+        if(NULL != phymode)
+        {
+            phymode->speed  = hal_eth_speed_none;
+            phymode->mux    = hal_eth_mux_none;        
+        }   
+        return;        
+    }
+
+
+    
+
+#if 0    
+    // configure mii
+    regadr.bytes.one = 0x06;
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    buff_write  = buff_read;
+    buff_write |= 0x10; 
+    hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+#endif
+
+    // 1. configure  switch's ports 1 and 2
+    if((hal_eth_mux_auto == phymode2use.mux) || (hal_eth_speed_auto == phymode2use.speed))
+    {
+        buff_write = 0x9F;
+    }
+    else    
+    {
+        buff_write  = 0;
+        buff_write  = (hal_eth_speed_100 == phymode2use.speed)    ? (0x40) : (0x00);     
+        buff_write |= (hal_eth_mux_fullduplex == phymode2use.mux) ? (0x20) : (0x00);  
+    }
+    
+    // port 1
+    regadr.bytes.one = 0x1C;
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+     
+    // port 2 
+    regadr.bytes.one = 0x2C;
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);   
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+
+    // 2. start the switch
+    buff_write = 0x1;  
+    regadr.bytes.one = 0x01;    
+    hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
+    
+
+    // 3. read back to verify
+    regadr.bytes.one = 0x01;
+    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    if(!(buff_read&0x01))
+    {
+        hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "s_hal_switch_reg_config(): SWITCH not configured");
+    }
+    
+    s_hal_brdcfg_switch__mii_phymode_get(phymode);
+    
+//    if(NULL != phymode)
+//    {
+//        phymode->speed = hal_eth_speed_100; // the one of mii
+//        phymode->mux   = phymode2use.mux;
+//    }
+
+}
+
 #endif//HAL_USE_SWITCH
 
 
 
 #ifdef HAL_USE_ETH
 
-extern void hal_brdcfg_eth__phy_initialise(void)
+extern hal_bool_t hal_brdcfg_eth__phy_initialise(void)
 {
     #warning --> in here we just init the switch ... put in reset mode, exit from reset, do the mco, init the i2c if not initted, etc. 
     if(hal_false == hal_switch_initted_is())
     {
         hal_switch_init(NULL);
     }
-
+    
+    return(hal_true);
 }
 
-extern void hal_brdcfg_eth__phy_configure(void)
+extern void hal_brdcfg_eth__phy_configure(hal_eth_phymode_t *phymode)
 {
-    #warning --> in here we configure the switch ... in full duplex 100mbps for instance
-    hal_switch_start();
+    hal_eth_phymode_t target;
+    memcpy(&target, &hal_brdcfg_eth__phymode, sizeof(hal_eth_phymode_t));
+    
+    hal_switch_start(&target);
+    
+    if(NULL != phymode)
+    {
+        phymode->speed  = target.speed;
+        phymode->mux    = target.mux;         
+    }
 }
 
 #endif//HAL_USE_ETH
@@ -651,16 +696,13 @@ extern void hal_brdcfg_eth__phy_configure(void)
 #ifdef HAL_USE_SYS
 extern void hal_brdcfg_sys__clock_config(void)
 {
-    /* On this board this function is dummy, because it is not not necessary 
-       configure MCO or something else
-     */
-    #warning --> a cosa serve il hal_brdcfg_sys__clock_config() ?? il MCO viene configurato in hal_eth_hid_microcontrollerclockoutput_init() 
+
 }
 
 
 extern void hal_brdcfg_sys__gpio_default_init(void)
 {
-   ; /* On this board this function is dummy */
+
 }
 #endif
 

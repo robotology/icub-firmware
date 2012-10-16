@@ -16,6 +16,7 @@
 
 #include "stdlib.h"
 #include "hal_base.h"
+#include "string.h"
 #include "hal_stm32_base_hid.h"
 #include "hal_stm32_spi4encoder_hid.h"
 #include "hal_stm32_eth_hid.h"
@@ -128,6 +129,8 @@
     
     extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDC          = { .port = stm32gpio_portC, .pin = stm32gpio_pin1  };
     extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDIO         = { .port = stm32gpio_portA, .pin = stm32gpio_pin2  };   
+    
+    extern const hal_eth_phymode_t hal_brdcfg_eth__phymode              = { .mux = hal_eth_mux_fullduplex, .speed = hal_eth_speed_100 };
     
 #endif//HAL_USE_ETH
 
@@ -537,9 +540,8 @@ extern void hal_brdcfg_switch__reg_write_byI2C(uint8_t* pBuffer, uint16_t WriteA
 
 #ifdef HAL_USE_ETH
 
-//#define HAL_BRDCFG_ETH__PHYDEV_IS_IN_RESET_STATE(x)	    (x & 0x8800)
 
-extern void hal_brdcfg_eth__phy_initialise(void)
+extern hal_bool_t hal_brdcfg_eth__phy_initialise(void)
 {
     uint16_t regv;
     uint32_t tout;
@@ -565,15 +567,20 @@ extern void hal_brdcfg_eth__phy_initialise(void)
     if(HAL_BRDCFG_ETH__PHYREG_WRITE_TIMEOUT == tout) //ethernet is still in reset state 
     {
         hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "hal_brdcfg_eth__phy_start(): PHY is still in reset state");
-    }    
+        return(hal_false);
+    }  
 
+    return(hal_true);
 }
 
-extern void hal_brdcfg_eth__phy_configure(void)
+extern void hal_brdcfg_eth__phy_configure(hal_eth_phymode_t *phymode)
 {
-
+#if 0
     // configure phy in full duplex and 100MB
     hal_eth_hid_smi_write(HAL_BRDCFG_ETH__PHYDEV_ADR, HAL_BRDCFG_ETH__PHYREG_BMRC_ADR, HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_FULLDUPLEX | HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_100M); 
+    
+    phymode->speed  = hal_eth_speed_100;
+    phymode->mux    = hal_eth_mux_fullduplex;
  
 //     uint16_t regv;
 //     uint32_t tout;
@@ -581,6 +588,39 @@ extern void hal_brdcfg_eth__phy_configure(void)
 //     regv = hal_eth_hid_smi_read(HAL_BRDCFG_ETH__PHYDEV_ADR, 2);    
 //     aaa = regv;
 //     for(;;);
+#else
+    
+    hal_eth_phymode_t target;
+    memcpy(&target, &hal_brdcfg_eth__phymode, sizeof(hal_eth_phymode_t));
+    
+    if((hal_eth_mux_auto == target.mux) || (hal_eth_mux_none == target.mux) || (hal_eth_speed_auto == target.speed) || (hal_eth_speed_none == target.speed))
+    {
+        if(NULL != phymode)
+        {
+            phymode->speed  = hal_eth_speed_none;
+            phymode->mux    = hal_eth_mux_none;        
+        }   
+        return;        
+    }
+    
+    // configure phy according to the target mux and speed
+    uint16_t val = 0x0000;
+    val  = (hal_eth_speed_100 == target.speed) ? (HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_100M) : (0x0000);
+    val |= (hal_eth_mux_fullduplex == target.mux) ? (HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_FULLDUPLEX) : (0x0000);
+    hal_eth_hid_smi_write(HAL_BRDCFG_ETH__PHYDEV_ADR, HAL_BRDCFG_ETH__PHYREG_BMRC_ADR, val); 
+    
+    val = 0;
+    val = hal_eth_hid_smi_read(HAL_BRDCFG_ETH__PHYDEV_ADR, HAL_BRDCFG_ETH__PHYREG_BMRC_ADR); 
+    val = val;
+    
+    // gives back the used mux and speed
+    if(NULL != phymode)
+    {
+        phymode->speed  = ((val & HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_100M) == HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_100M) ? hal_eth_speed_100 : hal_eth_speed_10;
+        phymode->mux    = ((val & HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_FULLDUPLEX) == HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_FULLDUPLEX) ? hal_eth_mux_fullduplex : hal_eth_mux_halfduplex;        
+    }
+
+#endif
 }
 
 

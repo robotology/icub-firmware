@@ -53,7 +53,7 @@
 // #define IS_100MBIT_MODE(x)  		    (((x) & 0x0002) == 0)
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
-// empty-section
+
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------

@@ -44,6 +44,10 @@
     #include "utils/stm32ee.h" 
 #endif//HAL_USE_EEPROM
 
+#ifdef HAL_USE_ETH
+    #include "hal_eth.h"
+#endif//HAL_USE_ETH
+
 #ifdef HAL_USE_GPIO
     #include "hal_gpio.h"
 #endif//HAL_USE_GPIO
@@ -139,7 +143,9 @@
     extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_RXD1;  
     
     extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDC;
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDIO;      
+    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDIO; 
+
+    extern const hal_eth_phymode_t hal_brdcfg_eth__phymode;
 #endif//HAL_USE_ETH
 
 #ifdef HAL_USE_GPIO
@@ -196,8 +202,8 @@
 
 
 #ifdef HAL_USE_ETH 
-    extern void hal_brdcfg_eth__phy_initialise(void);
-    extern void hal_brdcfg_eth__phy_configure(void);
+    extern hal_bool_t hal_brdcfg_eth__phy_initialise(void);
+    extern void hal_brdcfg_eth__phy_configure(hal_eth_phymode_t *phymode);
 #endif//HAL_USE_ETH
 
 
