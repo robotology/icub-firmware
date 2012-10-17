@@ -20,7 +20,22 @@ set(ICUB_INTERFACE_CORE_FOLDER	$ENV{ICUB_ROOT}/main/src/core/iCubInterface-branc
 
 #add_definitions( -D_AC_="STRINGA" )
 
-set(MY_CALLBACK vale_buttons.cpp)
+SET(BUTTON_FILE " " CACHE PATH "")
+
+
+IF ("${BUTTON_FILE}" STREQUAL "")
+  MESSAGE(STATUS "No button file")
+ELSE ("${BUTTON_FILE}" STREQUAL "")
+    SET(BUTTON_FILE "../src/${BUTTON_FILE}")
+  IF (EXISTS ${BUTTON_FILE})
+        SET(MY_CALLBACK ${BUTTON_FILE})
+        MESSAGE(STATUS " Button file ${BUTTON_FILE}")
+    ELSE ("${BUTTON_FILE}" STREQUAL "")
+        MESSAGE(ERROR " Button file ${BUTTON_FILE} not found")
+    ENDIF(EXISTS ${BUTTON_FILE})
+ENDIF ("${BUTTON_FILE}" STREQUAL "")
+
+#set(MY_CALLBACK vale_buttons.cpp)
 #set(MY_CALLBACK AC_buttons.cpp)
 set(CMAKE_MODULE_PATH  ${CMAKE_SOURCE_DIR}/../../)
 
@@ -32,7 +47,7 @@ find_package(ICUB)
 include_directories(${YARP_INCLUDE_DIRS} ${ICUB_INCLUDE_DIRS})
 
 # Debug messages
-# message(INFO " BASE=${BASE}")
+#message(INFO " BASE=${BASE}")
  #message(INFO " hosttrans - ${NVS_SENSORS_CBK_FOLDER} - embObj_includes: ${embObj_includes}")
   	
 # get all files needed, collected in different lists for better organization and handling
@@ -41,9 +56,6 @@ include_directories(${YARP_INCLUDE_DIRS} ${ICUB_INCLUDE_DIRS})
 set(BODY_COMMON_SOURCE 		${BODY_COMMON_FOLDER}/eEcommon.c)
 set(BODY_COMMON_HEADER 		${BODY_COMMON_FOLDER}/eEcommon.h)
 
-
-
-#set(ICUB_INTERFACE_SOURCE	${ICUB_INTERFACE_CORE_FOLDER}RobotInterfaceRemap.cpp)
 
 # Network Variable configuration
 set(NVS_EB_SOURCE 			${NVS_EB_SRC_FOLDER}eOcfg_EPs_board.c
@@ -65,15 +77,11 @@ set(NVS_MC_SOURCE 			${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc.c
 							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_any_con_bodypart.c
 							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_any_con_jxx.c
 							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_any_con_jxxdefault.c
-#							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_any_con_jxxmacro.c
 							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_any_con_mxx.c
 							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_any_con_mxxdefault.c
-#							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_any_con_mxxmacro.c
-#							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_any_usr_jxxmacro.c
-#							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_any_usr_mxxmacro.c
-#							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_any_usr_nvmacro.c
 							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_any_con_cxx.c
 							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_any_con_cxxdefault.c
+							
 #							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_leg_con.c
 #							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_leg_usr.c
 #							${NVS_MC_SRC_FOLDER}eOcfg_nvsEP_mc_leg_usr_pippo.c
@@ -145,45 +153,9 @@ set(CORE_FOLDER_SOURCE  	${CORE_FOLDER}/EOarray.c
 
 set(CORE_VEE_SOURCE			${CORE_VEE_FOLDER}/EOVmutex.c
 							${CORE_VEE_FOLDER}/EOVtask.c
-							${CORE_VEE_FOLDER}/EOVtheSystem.c
-#							${CORE_API}/EOVmutex_hid.h
-#							${CORE_API}/EOVstorage_hid.h
-#							${CORE_API}/EOVtask_hid.h
-#							${CORE_API}/EOVtheSystem_hid.h
-							)
+							${CORE_VEE_FOLDER}/EOVtheSystem.c	)
 						
-set(CORE_API_HEADER	  		${CORE_API}/EOarray.h
-						${CORE_API}/EoCommon.h
-						${CORE_API}/EOconstarray.h
-						${CORE_API}/EOconstvector.h
-						${CORE_API}/EOdeque.h
-						${CORE_API}/EOfifo.h
-						${CORE_API}/EOfifoByte.h
-						${CORE_API}/EOfifoWord.h
-						${CORE_API}/EOlist.h
-						${CORE_API}/EOtheErrorManager.h
-						${CORE_API}/EOtheMemoryPool.h
-						${CORE_API}/EOvector.h
-#						${CORE_API}/EOVmutex.h
-#						${CORE_API}/EOVstorage.h
-#						${CORE_API}/EOVtask.h
-#						${CORE_API}/EOVtheSystem.h
-						)						
-
-						
-set(CORE_FOLDER_HEADER	  			${CORE_API}/EOarray_hid.h
-						${CORE_API}/EoCommon_hid.h
-						${CORE_API}/EOconstarray_hid.h
-						${CORE_API}/EOconstvector_hid.h
-						${CORE_API}/EOdeque_hid.h
-						${CORE_API}/EOfifo_hid.h
-						${CORE_API}/EOfifoByte_hid.h
-						${CORE_API}/EOfifoWord_hid.h
-						${CORE_API}/EOlist_hid.h
-						${CORE_API}/EOtheErrorManager_hid.h
-						${CORE_API}/EOtheMemoryPool_hid.h
-						${CORE_API}/EOvector_hid.h
-						)
+					
 
 # EmbObj-NV & Protocol files
 set(PROT_SOURCE  				
@@ -203,7 +175,7 @@ set(PROT_SOURCE
 						${PROT_FOLDER}/EOVstorage.c
 						${PROT_FOLDER}EOmatrix3d.c)
 
-set(PROT_HEADER  				${PROT_FOLDER}/EOhostTransceiver_hid.h
+set(PROT_HEADER  		${PROT_FOLDER}/EOhostTransceiver_hid.h
 						${PROT_FOLDER}/EOnv_hid.h
 						${PROT_FOLDER}/EOnvsCfg_hid.h
 						${PROT_FOLDER}/EOreceiver_hid.h
@@ -247,22 +219,16 @@ set(embobj_source 		${BODY_COMMON_SOURCE}
 						${MY_CALLBACK})
 
 
-#set(embobj_header 		${BODY_COMMON_SOURCE} 
-#						${CORE_API_HEADER} 
-#						${PROT_HEADER} 
-#						${IPNET_HEADER}
-#						${NVS_COMMON_HEADER} 
-#						${NVS_REMOTE_HEADER}
-#						${NVS_MC_EP_HEADER})
 
-SOURCE_GROUP("EmbObj Source Files" FILES ${folder_source})
+
+#SOURCE_GROUP("EmbObj Source Files" FILES ${folder_source})
 #SOURCE_GROUP("EmbObj Header Files" FILES ${folder_header})
   
 #add_executable(${PROJECTNAME} ${embobj_source} ${embobj_header})
 add_executable(${PROJECTNAME} ${embobj_source})
 #set_target_properties(${PROJECTNAME} PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
 
-target_link_libraries(${PROJECTNAME} ${ACE_LIBRARIES} ${YARP_LIBRARIES})
+target_link_libraries(${PROJECTNAME} debugStream ${ACE_LIBRARIES} ${YARP_LIBRARIES})
 
 # ${embobj_header})
 

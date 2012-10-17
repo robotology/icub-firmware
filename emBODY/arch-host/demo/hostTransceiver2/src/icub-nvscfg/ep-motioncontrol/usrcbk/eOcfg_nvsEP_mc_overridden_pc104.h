@@ -55,7 +55,7 @@
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 //#define OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidposition
-#define OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jstatus
+// #define OVERRIDE_eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jstatus
 
 
 

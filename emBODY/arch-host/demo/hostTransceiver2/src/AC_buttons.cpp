@@ -17,7 +17,17 @@ bool 		enableSender = true;
 
 void commands(void)
 {
-
+	printf("Buttons:\n");
+	printf("0: Go to running mode\n");
+	printf("1: Set ropSigCfg\n");
+	printf("2: Set pid\n");
+	printf("3: Set maxpositionofjoint & maxcurrentmotor\n");
+	printf("4: Send setpoint\n");
+	printf("5: \n");
+	printf("6: \n");
+	printf("7: \n");
+	printf("8: \n");
+	printf("9: \n");
 }
 
 void s_callback_button_0(void)
@@ -86,6 +96,7 @@ void s_callback_button_1(void)
 		printf("\n>>> ERROR \ntransceiver->getNVhandler returned NULL!!\n");
 		return;
 	}
+
 	uint8_t dat = 1;
 	if( eores_OK != eo_nv_Set(nvRoot, &dat, eobool_true, eo_nv_upd_dontdo))
 	{
@@ -119,70 +130,70 @@ void s_callback_button_1(void)
 		break;
 	}
 
-/*
-	nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, 0, jointNVindex_jstatus__basic);
+
+	nvid = eo_cfg_nvsEP_mc_joint_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)ep, 0, jointNVindex_jstatus__basic);
 	sigcfg.ep = ep;
 	sigcfg.id = nvid;
 	sigcfg.plustime = 0;
 	eo_array_PushBack(array, &sigcfg);
 
-	nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(ep, 0, motorNVindex_mstatus__basic);
+	nvid = eo_cfg_nvsEP_mc_motor_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)ep, 0, motorNVindex_mstatus__basic);
 	sigcfg.ep = ep;
 	sigcfg.id = nvid;
 	sigcfg.plustime = 0;
 	eo_array_PushBack(array, &sigcfg);
 
-	nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, 1, jointNVindex_jstatus__basic);
+	nvid = eo_cfg_nvsEP_mc_joint_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)ep, 1, jointNVindex_jstatus__basic);
 	sigcfg.ep = ep;
 	sigcfg.id = nvid;
 	sigcfg.plustime = 0;
 	eo_array_PushBack(array, &sigcfg);
 
-	nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(ep, 1, motorNVindex_mstatus__basic);
+	nvid = eo_cfg_nvsEP_mc_motor_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)ep, 1, motorNVindex_mstatus__basic);
 	sigcfg.ep = endpoint_mc_rightlowerarm;
 	sigcfg.id = nvid;
 	sigcfg.plustime = 0;
 	eo_array_PushBack(array, &sigcfg);
 
-	nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, 0, jointNVindex_jconfig);
-	sigcfg.ep = ep;
-	sigcfg.id = nvid;
-	sigcfg.plustime = 0;
-	eo_array_PushBack(array, &sigcfg);
+//	nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, 0, jointNVindex_jconfig);
+//	sigcfg.ep = ep;
+//	sigcfg.id = nvid;
+//	sigcfg.plustime = 0;
+//	eo_array_PushBack(array, &sigcfg);
+//
+//	nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, 0, jointNVindex_jconfig__maxpositionofjoint);
+//	sigcfg.ep = ep;
+//	sigcfg.id = nvid;
+//	sigcfg.plustime = 0;
+//	eo_array_PushBack(array, &sigcfg);
+//
+//	nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(ep, 0, motorNVindex_mconfig);
+//	sigcfg.ep = ep;
+//	sigcfg.id = nvid;
+//	sigcfg.plustime = 0;
+//	eo_array_PushBack(array, &sigcfg);
 
-	nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, 0, jointNVindex_jconfig__maxpositionofjoint);
-	sigcfg.ep = ep;
-	sigcfg.id = nvid;
-	sigcfg.plustime = 0;
-	eo_array_PushBack(array, &sigcfg);
 
-	nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(ep, 0, motorNVindex_mconfig);
-	sigcfg.ep = ep;
-	sigcfg.id = nvid;
-	sigcfg.plustime = 0;
-	eo_array_PushBack(array, &sigcfg);
+//	sigcfg.ep = ep;
+//	sigcfg.id = eo_cfg_nvsEP_mc_motor_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)sigcfg.ep, 0, motorNVindex_mconfig__maxcurrentofmotor);
+//	sigcfg.plustime = 0;
+//	eo_array_PushBack(array, &sigcfg);
 
 
-	sigcfg.ep = ep;
-	sigcfg.id = eo_cfg_nvsEP_mc_motor_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)sigcfg.ep, 0, motorNVindex_mconfig__maxcurrentofmotor);
-	sigcfg.plustime = 0;
-	eo_array_PushBack(array, &sigcfg);
- */
-
-	switch (boardN )
-	{
-	case 2:  // left
-		ep = endpoint_sk_emsboard_leftlowerarm;
-		break;
-
-	case 4:	// right
-		ep = endpoint_sk_emsboard_rightlowerarm;
-		break;
-	}
-	sigcfg.ep = ep;
-	sigcfg.id = eo_cfg_nvsEP_sk_NVID_Get((eOcfg_nvsEP_sk_endpoint_t)sigcfg.ep, 0, skinNVindex_sstatus__arrayof10canframe);
-	sigcfg.plustime = 0;
-	eo_array_PushBack(array, &sigcfg);
+//	switch (boardN )
+//	{
+//	case 2:  // left
+//		ep = endpoint_sk_emsboard_leftlowerarm;
+//		break;
+//
+//	case 4:	// right
+//		ep = endpoint_sk_emsboard_rightlowerarm;
+//		break;
+//	}
+//	sigcfg.ep = ep;
+//	sigcfg.id = eo_cfg_nvsEP_sk_NVID_Get((eOcfg_nvsEP_sk_endpoint_t)sigcfg.ep, 0, skinNVindex_sstatus__arrayof10canframe);
+//	sigcfg.plustime = 0;
+//	eo_array_PushBack(array, &sigcfg);
 
 #ifdef _MAIS_
 	switch (boardN )
@@ -461,6 +472,13 @@ void s_callback_button_6(void )
 
 void s_callback_button_7(void )
 {
+	eOnvID_t nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(endpoint_mc_rightlowerarm, (eOcfg_nvsEP_mc_jointNumber_t)0, jointNVindex_jconfig__pidposition);
+	EOnv	*nvRoot = transceiver->getNVhandler( endpoint_mc_rightlowerarm,  nvid);
+
+	if(NULL == nvRoot)
+		printf("\nnv pointer not found\n");
+
+		transceiver->load_occasional_rop(eo_ropcode_ask, endpoint_mc_rightlowerarm, nvid);
 
 }
 
