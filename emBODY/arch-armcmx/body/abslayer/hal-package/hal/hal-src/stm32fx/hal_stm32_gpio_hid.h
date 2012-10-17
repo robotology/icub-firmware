@@ -33,6 +33,8 @@
 
 #include "hal_base.h"
 
+#include "hal_stm32xx_include.h"
+
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
@@ -43,15 +45,32 @@
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 // empty-section
 
+#define HAL_GPIO_AFNAME_NONE     0x00000000
+#define HAL_GPIO_AFMODE_NONE     0xFFFFFFFF
+
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
-// empty-section
+
+struct hal_gpio_hid_altcfg_t 
+{
+    GPIO_InitTypeDef        gpioext;
+    uint32_t                afname;     // HAL_GPIO_AFNAME_NONE, and other specific such as GPIO_Remap_ETH (stm32f1) or others
+    uint32_t                afmode;     // HAL_GPIO_AFMODE_NONE, ENABLE, DISABLE (latter two are enum FunctionalState type)
+};
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
-// empty-section
+
+extern const uint8_t hal_gpio_hid_maxports;
+extern GPIO_TypeDef *const hal_gpio_hid_ports[];
+extern const uint32_t hal_gpio_hid_clocks[];
+extern const uint8_t hal_gpio_hid_speeds[];
+extern const uint8_t  hal_gpio_hid_pinpositions[];
+extern const uint16_t  hal_gpio_hid_pins[]; 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
+
+
 
 extern uint32_t hal_gpio_hid_getsize(const hal_cfg_t *cfg);
 

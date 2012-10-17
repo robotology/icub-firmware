@@ -172,20 +172,20 @@
 #ifdef HAL_USE_ETH
     extern const uint8_t hal_brdcfg_eth__supported_mask             = 0x01;
     
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_REF_CLK = { .port = stm32gpio_portA, .pin = stm32gpio_pin1  }; 
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_REF_CLK   = { .port = hal_gpio_portA, .pin = hal_gpio_pin1,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max  }; 
     
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_TX_EN   = { .port = stm32gpio_portB, .pin = stm32gpio_pin11 };
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_TXD0    = { .port = stm32gpio_portB, .pin = stm32gpio_pin12 };
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_TXD1    = { .port = stm32gpio_portB, .pin = stm32gpio_pin13 };
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_TX_EN     = { .port = hal_gpio_portB, .pin = hal_gpio_pin11,  .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max };
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_TXD0      = { .port = hal_gpio_portB, .pin = hal_gpio_pin12,  .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max };
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_TXD1      = { .port = hal_gpio_portB, .pin = hal_gpio_pin13,  .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max };
     
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_CRS_DV  = { .port = stm32gpio_portD, .pin = stm32gpio_pin8  };
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_RXD0    = { .port = stm32gpio_portD, .pin = stm32gpio_pin9  };
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_RXD1    = { .port = stm32gpio_portD, .pin = stm32gpio_pin10 };    
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_CRS_DV    = { .port = hal_gpio_portD, .pin = hal_gpio_pin8,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max };
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_RXD0      = { .port = hal_gpio_portD, .pin = hal_gpio_pin9,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max };
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_RXD1      = { .port = hal_gpio_portD, .pin = hal_gpio_pin10,  .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max };    
     
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDC          = { .port = stm32gpio_portC, .pin = stm32gpio_pin1  };
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDIO         = { .port = stm32gpio_portA, .pin = stm32gpio_pin2  };  
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_MDC            = { .port = hal_gpio_portC, .pin = hal_gpio_pin1,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max  };
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_MDIO           = { .port = hal_gpio_portA, .pin = hal_gpio_pin2,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max };     
 
-    extern const hal_eth_phymode_t hal_brdcfg_eth__phymode              = { .mux = hal_eth_mux_fullduplex, .speed = hal_eth_speed_100 };    
+    extern const hal_eth_phymode_t hal_brdcfg_eth__phymode              = hal_eth_phymode_fullduplex100mbps; //hal_eth_phymode_auto   
 #endif//HAL_USE_ETH
 
 
@@ -571,31 +571,38 @@ static void s_hal_brdcfg_switch__mii_phymode_get(hal_eth_phymode_t* phymode)
 {
     #define MIIHALFD    (1 << 6)
     #define MII10MBS    (1 << 4)
+    uint8_t mux = 0;
+    uint8_t speed = 0;
     uint8_t read = 0xFF; 
     hal_i2c_regaddr_t regadr = {.numofbytes = 1, .bytes.one = 0};
     regadr.bytes.one = 0x06;
     hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &read, 1);
     if( (MIIHALFD & read) == MIIHALFD)
     {
-        phymode->mux = hal_eth_mux_halfduplex;
+        mux = 0;
     }
     else
     {
-        phymode->mux = hal_eth_mux_fullduplex;
+        mux = 1;
     }
     if( (MII10MBS & read) == MII10MBS)
     {
-        phymode->speed = hal_eth_speed_10;
+        speed = 0;
     }
     else
     {
-        phymode->speed = hal_eth_speed_100;
+        speed = 1;
     }
+    if((0==mux)&&(0==speed))        *phymode = hal_eth_phymode_halfduplex10mbps;
+    else if((0==mux)&&(1==speed))   *phymode = hal_eth_phymode_halfduplex100mbps; 
+    else if((1==mux)&&(0==speed))   *phymode = hal_eth_phymode_fullduplex10mbps; 
+    else if((1==mux)&&(1==speed))   *phymode = hal_eth_phymode_fullduplex100mbps;          
+    
 }
  
 extern void hal_brdcfg_switch__configure(hal_eth_phymode_t* phymode)
 {
-    hal_eth_phymode_t phymode2use = {.mux = hal_eth_mux_fullduplex, .speed = hal_eth_speed_100};
+    hal_eth_phymode_t phymode2use = hal_eth_phymode_fullduplex100mbps;
     const uint8_t fd100 = 0x60;
     const uint8_t fd010 = 0x20;
     uint8_t buff_write = 0x60; // FORCE FULL DUPLEX AND 100T
@@ -605,8 +612,9 @@ extern void hal_brdcfg_switch__configure(hal_eth_phymode_t* phymode)
     
     if(NULL != phymode)
     {
-        memcpy(&phymode2use, phymode, sizeof(hal_eth_phymode_t));
+        phymode2use = *phymode;
     }
+
 
     regadr.bytes.one = 0x01;
     hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
@@ -617,13 +625,11 @@ extern void hal_brdcfg_switch__configure(hal_eth_phymode_t* phymode)
     }
     
     
-//    if((hal_eth_mux_auto == phymode2use.mux) || (hal_eth_mux_none == phymode2use.mux) || (hal_eth_speed_auto == phymode2use.speed) || (hal_eth_speed_none == phymode2use.speed))
-    if((hal_eth_mux_none == phymode2use.mux) || (hal_eth_speed_none == phymode2use.speed))
+    if(hal_eth_phymode_none == phymode2use)
     {
         if(NULL != phymode)
         {
-            phymode->speed  = hal_eth_speed_none;
-            phymode->mux    = hal_eth_mux_none;        
+            *phymode = hal_eth_phymode_none;    
         }   
         return;        
     }
@@ -642,16 +648,16 @@ extern void hal_brdcfg_switch__configure(hal_eth_phymode_t* phymode)
 #endif
 
     // 1. configure  switch's ports 1 and 2
-    if((hal_eth_mux_auto == phymode2use.mux) || (hal_eth_speed_auto == phymode2use.speed))
+    switch(phymode2use)
     {
-        buff_write = 0x9F;
-    }
-    else    
-    {
-        buff_write  = 0;
-        buff_write  = (hal_eth_speed_100 == phymode2use.speed)    ? (0x40) : (0x00);     
-        buff_write |= (hal_eth_mux_fullduplex == phymode2use.mux) ? (0x20) : (0x00);  
-    }
+        case hal_eth_phymode_auto:                  buff_write = 0x9F; break;
+        case hal_eth_phymode_halfduplex10mbps:      buff_write = 0x00; break;
+        case hal_eth_phymode_halfduplex100mbps:     buff_write = 0x40; break;
+        case hal_eth_phymode_fullduplex10mbps:      buff_write = 0x20; break;
+        case hal_eth_phymode_fullduplex100mbps:     buff_write = 0x60; break;
+        default:                                    buff_write = 0x00; break;
+    }    
+    
     
     // port 1
     regadr.bytes.one = 0x1C;
@@ -681,12 +687,6 @@ extern void hal_brdcfg_switch__configure(hal_eth_phymode_t* phymode)
     
     s_hal_brdcfg_switch__mii_phymode_get(phymode);
     
-//    if(NULL != phymode)
-//    {
-//        phymode->speed = hal_eth_speed_100; // the one of mii
-//        phymode->mux   = phymode2use.mux;
-//    }
-
 }
 
 #endif//HAL_USE_SWITCH
@@ -707,16 +707,14 @@ extern hal_bool_t hal_brdcfg_eth__phy_initialise(void)
 
 extern void hal_brdcfg_eth__phy_configure(hal_eth_phymode_t *phymode)
 {
-    hal_eth_phymode_t target;
-    memcpy(&target, &hal_brdcfg_eth__phymode, sizeof(hal_eth_phymode_t));
-    
+    hal_eth_phymode_t target = hal_brdcfg_eth__phymode;
+ 
 //    if((hal_eth_mux_auto == target.mux) || (hal_eth_mux_none == target.mux) || (hal_eth_speed_auto == target.speed) || (hal_eth_speed_none == target.speed))
-    if((hal_eth_mux_none == target.mux) || (hal_eth_speed_none == target.speed))
+    if(hal_eth_phymode_none == target)
     {
         if(NULL != phymode)
         {
-            phymode->speed  = hal_eth_speed_none;
-            phymode->mux    = hal_eth_mux_none;        
+            *phymode  = hal_eth_phymode_none;
         }   
         return;        
     }    
@@ -725,8 +723,7 @@ extern void hal_brdcfg_eth__phy_configure(hal_eth_phymode_t *phymode)
     
     if(NULL != phymode)
     {
-        phymode->speed  = target.speed;
-        phymode->mux    = target.mux;         
+        *phymode  = target;     
     }
 }
 

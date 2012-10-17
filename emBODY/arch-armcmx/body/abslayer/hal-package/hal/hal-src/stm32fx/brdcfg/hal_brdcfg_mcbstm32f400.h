@@ -116,18 +116,18 @@
 #ifdef HAL_USE_ETH
     extern const uint8_t hal_brdcfg_eth__supported_mask; //         = 0x01;
     
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_REF_CLK;
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_REF_CLK;
     
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_TX_EN;
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_TXD0;
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_TXD1;
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_TX_EN;
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_TXD0;
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_TXD1;
     
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_CRS_DV;
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_RXD0;
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_RXD1;  
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_CRS_DV;
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_RXD0;
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_RXD1;  
     
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDC;
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDIO;    
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_MDC;
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_MDIO;    
 
     extern const hal_eth_phymode_t hal_brdcfg_eth__phymode;    
 #endif//HAL_USE_ETH

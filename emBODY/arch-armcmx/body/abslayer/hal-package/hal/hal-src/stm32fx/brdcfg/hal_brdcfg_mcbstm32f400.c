@@ -117,20 +117,20 @@
 #ifdef HAL_USE_ETH
     extern const uint8_t hal_brdcfg_eth__supported_mask             = 0x01;
     
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_REF_CLK = { .port = stm32gpio_portA, .pin = stm32gpio_pin1  }; 
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_REF_CLK   = { .port = hal_gpio_portA, .pin = hal_gpio_pin1,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max  }; 
     
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_TX_EN   = { .port = stm32gpio_portG, .pin = stm32gpio_pin11 };
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_TXD0    = { .port = stm32gpio_portG, .pin = stm32gpio_pin13 };
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_TXD1    = { .port = stm32gpio_portG, .pin = stm32gpio_pin14 };
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_TX_EN     = { .port = hal_gpio_portG, .pin = hal_gpio_pin11,  .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max };
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_TXD0      = { .port = hal_gpio_portG, .pin = hal_gpio_pin13,  .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max };
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_TXD1      = { .port = hal_gpio_portG, .pin = hal_gpio_pin14,  .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max };
     
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_CRS_DV  = { .port = stm32gpio_portA, .pin = stm32gpio_pin7  };
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_RXD0    = { .port = stm32gpio_portC, .pin = stm32gpio_pin4  };
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_RMII_RXD1    = { .port = stm32gpio_portC, .pin = stm32gpio_pin5  };    
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_CRS_DV    = { .port = hal_gpio_portA, .pin = hal_gpio_pin7,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max  };
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_RXD0      = { .port = hal_gpio_portC, .pin = hal_gpio_pin4,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max  };
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_RXD1      = { .port = hal_gpio_portC, .pin = hal_gpio_pin5,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max  };    
     
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDC          = { .port = stm32gpio_portC, .pin = stm32gpio_pin1  };
-    extern const stm32gpio_gpio_t hal_brdcfg_eth__gpio_ETH_MDIO         = { .port = stm32gpio_portA, .pin = stm32gpio_pin2  };   
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_MDC            = { .port = hal_gpio_portC, .pin = hal_gpio_pin1,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max  };
+    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_MDIO           = { .port = hal_gpio_portA, .pin = hal_gpio_pin2,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max  };   
     
-    extern const hal_eth_phymode_t hal_brdcfg_eth__phymode              = { .mux = hal_eth_mux_fullduplex, .speed = hal_eth_speed_100 };
+    extern const hal_eth_phymode_t hal_brdcfg_eth__phymode              = hal_eth_phymode_fullduplex100mbps;
     
 #endif//HAL_USE_ETH
 
@@ -579,8 +579,7 @@ extern void hal_brdcfg_eth__phy_configure(hal_eth_phymode_t *phymode)
     // configure phy in full duplex and 100MB
     hal_eth_hid_smi_write(HAL_BRDCFG_ETH__PHYDEV_ADR, HAL_BRDCFG_ETH__PHYREG_BMRC_ADR, HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_FULLDUPLEX | HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_100M); 
     
-    phymode->speed  = hal_eth_speed_100;
-    phymode->mux    = hal_eth_mux_fullduplex;
+    *phymode = hal_eth_phymode_fullduplex100mbps;;
  
 //     uint16_t regv;
 //     uint32_t tout;
@@ -590,23 +589,28 @@ extern void hal_brdcfg_eth__phy_configure(hal_eth_phymode_t *phymode)
 //     for(;;);
 #else
     
-    hal_eth_phymode_t target;
-    memcpy(&target, &hal_brdcfg_eth__phymode, sizeof(hal_eth_phymode_t));
+    hal_eth_phymode_t target = hal_brdcfg_eth__phymode;
     
-    if((hal_eth_mux_auto == target.mux) || (hal_eth_mux_none == target.mux) || (hal_eth_speed_auto == target.speed) || (hal_eth_speed_none == target.speed))
+    if((hal_eth_phymode_auto == target) || (hal_eth_phymode_none == target))
     {
         if(NULL != phymode)
         {
-            phymode->speed  = hal_eth_speed_none;
-            phymode->mux    = hal_eth_mux_none;        
+            *phymode = hal_eth_phymode_none;
         }   
         return;        
     }
     
     // configure phy according to the target mux and speed
     uint16_t val = 0x0000;
-    val  = (hal_eth_speed_100 == target.speed) ? (HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_100M) : (0x0000);
-    val |= (hal_eth_mux_fullduplex == target.mux) ? (HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_FULLDUPLEX) : (0x0000);
+    switch(target)
+    {
+        case hal_eth_phymode_halfduplex10mbps:      val = 0x0000; break;
+        case hal_eth_phymode_halfduplex100mbps:     val = HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_100M; break;
+        case hal_eth_phymode_fullduplex10mbps:      val = HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_FULLDUPLEX; break;
+        case hal_eth_phymode_fullduplex100mbps:     val = HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_FULLDUPLEX | HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_100M; break;
+        default:                                    val = 0x0000; break;
+    }
+ 
     hal_eth_hid_smi_write(HAL_BRDCFG_ETH__PHYDEV_ADR, HAL_BRDCFG_ETH__PHYREG_BMRC_ADR, val); 
     
     val = 0;
@@ -616,8 +620,12 @@ extern void hal_brdcfg_eth__phy_configure(hal_eth_phymode_t *phymode)
     // gives back the used mux and speed
     if(NULL != phymode)
     {
-        phymode->speed  = ((val & HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_100M) == HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_100M) ? hal_eth_speed_100 : hal_eth_speed_10;
-        phymode->mux    = ((val & HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_FULLDUPLEX) == HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_FULLDUPLEX) ? hal_eth_mux_fullduplex : hal_eth_mux_halfduplex;        
+        uint8_t speed  = ((val & HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_100M) == HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_100M) ? 1 : 0;
+        uint8_t mux    = ((val & HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_FULLDUPLEX) == HAL_BRDCFG_ETH__PHYREG_BMRC_VAL_FULLDUPLEX) ? 1 : 0; 
+        if((0==mux)&&(0==speed))        *phymode = hal_eth_phymode_halfduplex10mbps;
+        else if((0==mux)&&(1==speed))   *phymode = hal_eth_phymode_halfduplex100mbps; 
+        else if((1==mux)&&(0==speed))   *phymode = hal_eth_phymode_fullduplex10mbps; 
+        else if((1==mux)&&(1==speed))   *phymode = hal_eth_phymode_fullduplex100mbps;         
     }
 
 #endif
