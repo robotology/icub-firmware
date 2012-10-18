@@ -277,31 +277,31 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__calibrateEncoder(EOicubCanP
 
         case eo_icubCanProto_calibration_type1_abs_sens_analog:
         {
-            *((uint16_t*)(&canFrame->data[1])) = calib_ptr->params.type1.position;
-            *((uint16_t*)(&canFrame->data[3])) = calib_ptr->params.type1.velocity;
+            *((uint16_t*)(&canFrame->data[2])) = calib_ptr->params.type1.position;
+            *((uint16_t*)(&canFrame->data[4])) = calib_ptr->params.type1.velocity;
             memset(&canFrame->data[6], 0, 2); //pad with 0          
         }break;
 
-        case eo_icubCanProto_calibration_type2_hard_stops_diff :
+        case eo_icubCanProto_calibration_type2_hard_stops_diff:
         {
-            *((uint16_t*)(&canFrame->data[1])) = calib_ptr->params.type2.pwmlimit;
-            *((uint16_t*)(&canFrame->data[3])) = calib_ptr->params.type2.velocity;
+            *((uint16_t*)(&canFrame->data[2])) = calib_ptr->params.type2.pwmlimit;
+            *((uint16_t*)(&canFrame->data[4])) = calib_ptr->params.type2.velocity;
             memset(&canFrame->data[6], 0, 2); //pad with 0          
         }break;
 
 
-        case eo_icubCanProto_calibration_type3_abs_sens_digital :
+        case eo_icubCanProto_calibration_type3_abs_sens_digital:
         {
-            *((uint16_t*)(&canFrame->data[1])) = calib_ptr->params.type3.position;
-            *((uint16_t*)(&canFrame->data[3])) = calib_ptr->params.type3.velocity;
-            *((uint16_t*)(&canFrame->data[5])) = calib_ptr->params.type3.offset;        
+            *((uint16_t*)(&canFrame->data[2])) = calib_ptr->params.type3.position;
+            *((uint16_t*)(&canFrame->data[4])) = calib_ptr->params.type3.velocity;
+            *((uint16_t*)(&canFrame->data[6])) = calib_ptr->params.type3.offset;        
         }break;
 
-        case eo_icubCanProto_calibration_type4_abs_and_incremental  :
+        case eo_icubCanProto_calibration_type4_abs_and_incremental:
         {
-            *((uint16_t*)(&canFrame->data[1])) = calib_ptr->params.type4.position;
-            *((uint16_t*)(&canFrame->data[3])) = calib_ptr->params.type4.velocity;
-            *((uint16_t*)(&canFrame->data[5])) = calib_ptr->params.type4.maxencoder;        
+            *((uint16_t*)(&canFrame->data[2])) = calib_ptr->params.type4.position;
+            *((uint16_t*)(&canFrame->data[4])) = calib_ptr->params.type4.velocity;
+            *((uint16_t*)(&canFrame->data[6])) = calib_ptr->params.type4.maxencoder;        
         }break;
 
     }
@@ -705,15 +705,16 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getMaxVelocity(EOicubCanPro
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setCurrentLimit(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
     eOmeas_current_t *motor_currentlimit_ptr = (eOmeas_current_t*)val_ptr;
+    int32_t maxcurrent = *motor_currentlimit_ptr;
+    /* Note: eo-protocol uses 16 bits for current, while icubcanprotocol uses 32bits */
 
     canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
     canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_LIMIT;
-    *((eOmeas_current_t*)(&canFrame->data[1])) = *motor_currentlimit_ptr;
+    *((int32_t*)(&canFrame->data[1])) = maxcurrent;
     
-    /* Note: eo-protocol uses 16 bits for current, while icubcanprotocol uses 32bits */
     return(eores_OK);
 }
 
@@ -882,6 +883,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setPosPidLimits(EOicubCanPr
     *((uint16_t*)(&canFrame->data[1])) = pos_pid_ptr->offset;
     *((uint16_t*)(&canFrame->data[3])) = pos_pid_ptr->limitonoutput;
     *((uint16_t*)(&canFrame->data[5])) = pos_pid_ptr->limitonintegral;
+    canFrame->data[7] = 0; //add this to clear values becaiuse len is 8 and not 7.
 
     return(eores_OK);
 }
