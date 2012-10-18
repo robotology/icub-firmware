@@ -262,6 +262,7 @@ static void s_eo_emsapplBody_objs_init(EOtheEMSapplBody *p)
 static void s_eo_emsapplBody_theDataBase_init(EOtheEMSapplBody *p)
 {
     eOresult_t                          res;
+    uint8_t                             i;
     eOappTheDB_jointShiftValues_t       *shiftval_ptr;
     eOicubCanProto_bcastpolicy_t        *bcastpolicy_ptr;
     
@@ -319,8 +320,23 @@ static void s_eo_emsapplBody_theDataBase_init(EOtheEMSapplBody *p)
     res = eo_appTheDB_GetJointBcastpolicyPtr(eo_appTheDB_GetHandle(), 0, &bcastpolicy_ptr);
     eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in _GetJointBcastpolicyPtr");
     
-    memcpy(&bcastpolicy_ptr->val2bcastList, p->cfg_ptr->configdataofMC4boards.bcastpolicy.val2bcastList, 4);
-
+    //set bacast value as mask
+    memset(bcastpolicy_ptr, 0, sizeof(eOicubCanProto_bcastpolicy_t)); //reset
+    for(i=0; i<eOicubCanProto_bcastpolicy_maxsize; i++)
+    {
+        if(0 == p->cfg_ptr->configdataofMC4boards.bcastpolicy.val2bcastList[i])
+        {
+            continue;
+        }
+        if(p->cfg_ptr->configdataofMC4boards.bcastpolicy.val2bcastList[i]<9)
+        {
+            bcastpolicy_ptr->val2bcastList[0] |= (1 <<(p->cfg_ptr->configdataofMC4boards.bcastpolicy.val2bcastList[i]-1));
+        }
+        else if(p->cfg_ptr->configdataofMC4boards.bcastpolicy.val2bcastList[i]<17)
+        {
+            bcastpolicy_ptr->val2bcastList[1] |= (1<<(p->cfg_ptr->configdataofMC4boards.bcastpolicy.val2bcastList[i]-1));
+        }
+    }
 }
 
 static void s_eo_emsapplBody_canServicesProvider_init(EOtheEMSapplBody *p)
@@ -434,7 +450,7 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
             return(res);
         }
         msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_BCAST_POLICY;
-        res  = eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, (void*)&(bcastpolicy_ptr->val2bcastList[0]));
+        eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, (void*)&(bcastpolicy_ptr->val2bcastList[0]));
 
         
         //get shift values from DB
