@@ -137,20 +137,37 @@ void decouple_dutycycle(Int32 *pwm)
 #endif 
 //-----------------------------------------------------------------------------------
 #if   VERSION == 0x0228
-	//decoupling of the thumb
-	/*temp32 	     = pwm[0];
-	pwm[0] = (pwm[0] - pwm[1])>>1;
-	pwm[1] = (temp32         + pwm[1])>>1;	
-				
-	if (_control_mode[0] == MODE_IDLE || 
-		_control_mode[1] == MODE_IDLE)
+	//decoupling of the thumb abduction vs thumb proximal
+	
+	if (_kp[0] > 0)
 	{
-		pwm[0] = 0;
-		pwm[1] = 0;
+		//right hand
+		//pwm[0] = pwm[0];
+   		pwm[1] = pwm[1] + pwm[0];
+    	//pwm[2] = pwm[2];
+		//_pd[0] = _pd[0];
+    	_pd[1] = _pd[1] + _pd[0];
+    	//_pd[2] = _pd[2];	
 	}
-	temp32   = _pd[0];
-	_pd[0] = (_pd[0] - _pd[1])>>1;
-	_pd[1] = (temp32   + _pd[1])>>1;*/
+	else
+	{
+		//left hand
+		//pwm[0] = pwm[0];
+	    pwm[1] = pwm[1] - pwm[0];
+	    //pwm[2] = pwm[2];
+		//_pd[0] = _pd[0];
+	    _pd[1] = _pd[1] - _pd[0];
+	    //_pd[2] = _pd[2];		
+	}
+#endif
+//-----------------------------------------------------------------------------------
+#if   VERSION == 0x0230
+	//index dist (0), middle prox (1) and dist (2), ring and pinky (3)
+	
+	//This is currently disabled because it is not so important (better to save cpu time).
+	//tempf= pwm[1];
+	//tempf= tempf * 0.75;
+	//pwm[2] = pwm[2] + tempf;
 #endif
 }
 

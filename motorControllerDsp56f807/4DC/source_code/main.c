@@ -32,7 +32,7 @@
 	
 byte	_board_ID = 15;	
 char    _additional_info [32];
-byte    _build_number = 48;
+byte    _build_number = 49;
 byte    _my_can_protocol_major = 1;
 byte    _my_can_protocol_minor = 1;
 bool    _can_protocol_ack = false;
@@ -410,7 +410,11 @@ void main(void)
 		_position[0]= extract_h( compute_filt_pos(get_position_abs_analog(0)>>3,0));	
 		_position[1]= _adjustment[1];
 		_position[2]= _adjustment[2];
-		_position[3]= _adjustment[3]; 					
+		_position[3]= _adjustment[3]; 	
+		_position_enc[0]= get_position_encoder(0);	
+		_position_enc[1]= get_position_encoder(1);
+		_position_enc[2]= get_position_encoder(2);
+		_position_enc[3]= get_position_encoder(3);				
 #endif
 
 #if VERSION == 0x0219
@@ -422,7 +426,11 @@ void main(void)
 
 
 #if (VERSION == 0x0130 || VERSION==0x0230)
-		for (i=0; i<JN; i++) _position[i]=_adjustment[i];					
+		for (i=0; i<JN; i++) _position[i]=_adjustment[i];	
+		_position_enc[0]= get_position_encoder(0);	
+		_position_enc[1]= get_position_encoder(1);
+		_position_enc[2]= get_position_encoder(2);
+		_position_enc[3]= get_position_encoder(3);
 #endif
 #if VERSION == 0x0215
 	    _position[0]= get_position_abs_ssi(AEA3);	
