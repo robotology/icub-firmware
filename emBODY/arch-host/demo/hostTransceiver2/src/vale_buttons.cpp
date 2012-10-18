@@ -64,8 +64,8 @@ void s_callback_button_0(void)
 	if( eores_OK != eo_nv_Set(nv_p, &desired, eobool_true, eo_nv_upd_dontdo))
 		printf("\nerror eo_nv_Set!!");
 	// tell agent to prepare a rop to send
-	if (eores_OK != transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mn_appl, nvid_go2state))
-		printf("\nerror load_occasional_rop.");
+	transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mn_appl, nvid_go2state);
+
 }
 
 //configure regulars
@@ -411,7 +411,8 @@ void s_callback_button_5(void )
 		eOmeas_current_t            	maxcurrentofmotor = 0;
 		eOcfg_nvsEP_mc_motorNVindex_t 	mNVindex = motorNVindex_mconfig__maxcurrentofmotor;
 		printf("get max current of motor: ");
-		scanf("%d", & maxcurrentofmotor);
+		scanf("%d", &maxcurrentofmotor);
+		printf("maxcurrenof motor: %d\n", maxcurrentofmotor);
 		// 10.1) prepare data to send
 		eOnvID_t nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(ep, j, mNVindex);
 		nvRoot = transceiver->getNVhandler(ep, nvid);
@@ -945,6 +946,7 @@ static void s_print_jstatusInfo(eOcfg_nvsEP_mc_jointNumber_t j, eOmc_joint_statu
 	}
 
 	printf("joint %d position %d\n", j, jstatus->basic.position);
+	printf("joint %d controlmode %d\n", j, jstatus->basic.controlmodestatus);
 
 	printf("joint %d fault: ", j);
 	if(isOverCurrent(jstatus->chamaleon04[0]))
