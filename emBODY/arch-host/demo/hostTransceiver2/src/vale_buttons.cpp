@@ -6,12 +6,15 @@
  */
 
 #include "main-transceiver.hpp"
+#include "EOtheBOARDtransceiver_hid.h"
+#include "hostTransceiver.hpp"
 
 
 
 bool 		enableSender = false;
 double		encoderconvfactor = 1; //configured during joint configuration
 double		encoderconvoffset = 0; //configured during joint configuration
+extern hostTransceiver *transceiver;
 
 //#error would you like use send thread???
 // --------------------------------------------------------------------------------------------------------------------
@@ -24,13 +27,16 @@ static bool s_getJointNum_frominput(eOcfg_nvsEP_mc_endpoint_t ep, eOcfg_nvsEP_mc
 static bool s_getMotorNum_frominput(eOcfg_nvsEP_mc_endpoint_t ep, eOcfg_nvsEP_mc_motorNumber_t 	*m);
 static bool s_get_pidvalues_frominput(eOmc_PID_t *pid_ptr);
 static int32_t s_posA2E(eOmeas_position_t posA, double covfactor, double convoffset);
+static eOmc_joint_status_t* s_get_jstatus_ptr(eOcfg_nvsEP_mc_endpoint_t ep, eOcfg_nvsEP_mc_jointNumber_t j);
+static void s_print_jstatusInfo(eOcfg_nvsEP_mc_jointNumber_t j, eOmc_joint_status_t *jstatus);
 
 void commands(void)
 {
 	printf("\nq: quit\n");
 	printf("0: send wake up packet -> set appl state to running\n");
 	printf("1: configure regulars \n");
-	printf("2: configure skin  R/L ARM \n");
+	//printf("2: configure skin  R/L ARM \n");
+	printf("2: read jconfig \n");
 	printf("3: configure mais\n");
 	printf("4: send pos setpoint to joint with id=jId\n");
 	printf("5: config joint with user param\n");
@@ -165,48 +171,93 @@ void s_callback_button_1(void)
 
 
 //skin config
+//void s_callback_button_2(void)
+//{
+//	char str[128];
+//	EOnv 						*cnv;
+//	eOmn_ropsigcfg_command_t 	*ropsigcfgassign;
+//	EOarray						*array;
+//	eOropSIGcfg_t 				sigcfg;
+//	eOcfg_nvsEP_mn_commNumber_t dummy = 0;
+//	eOnvID_t 					nvid = -1;
+//	EOnv 						*nvRoot = NULL;
+//
+//	printf("send skin config!\n");
+//
+//	eOnvEP_t 			ep = endpoint_sk_emsboard_rightlowerarm;
+//	switch (boardN )
+//	{
+//	case 2:	// left
+//		ep = endpoint_sk_emsboard_leftlowerarm;
+//		printf("left\n");
+//		break;
+//
+//	case 4:	// right
+//		ep = endpoint_sk_emsboard_rightlowerarm;
+//		printf("right\n");
+//		break;
+//	}
+//
+//	nvid = eo_cfg_nvsEP_sk_NVID_Get((eOcfg_nvsEP_sk_endpoint_t)ep, dummy, skinNVindex_sconfig__sigmode);
+//	nvRoot = transceiver->getNVhandler(ep, nvid);
+//	if(NULL == nvRoot)
+//	{
+//		printf("\n>>> ERROR \ntransceiver->getNVhandler returned NULL!!\n");
+//		return;
+//	}
+//	uint8_t dat = 1;
+//	if( eores_OK != eo_nv_Set(nvRoot, &dat, eobool_true, eo_nv_upd_dontdo))
+//	{
+//		printf("\n>>> ERROR \neo_nv_Set !!\n");
+//		return;
+//	}
+//	// tell agent to prepare a rop to send
+//	transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
+//
+//}
+//get joint status
 void s_callback_button_2(void)
 {
-	char str[128];
-	EOnv 						*cnv;
-	eOmn_ropsigcfg_command_t 	*ropsigcfgassign;
-	EOarray						*array;
-	eOropSIGcfg_t 				sigcfg;
-	eOcfg_nvsEP_mn_commNumber_t dummy = 0;
-	eOnvID_t 					nvid = -1;
-	EOnv 						*nvRoot = NULL;
+	uint16_t                        ipindex, epindex, idindex;
+	EOnv                            nv;
+	EOnv                            *nv_res_ptr;
+	eOnvID_t                        nv_id;
+	eOresult_t                      res;
+	eOcfg_nvsEP_mc_endpoint_t 		ep;
+	eOcfg_nvsEP_mc_jointNumber_t 	j = 0;
+	eOmc_joint_status_t 			*jstatus;
+	uint32_t						i, ntimes = 0, nmillisec;
 
-	printf("send skin config!\n");
-
-	eOnvEP_t 			ep = endpoint_sk_emsboard_rightlowerarm;
-	switch (boardN )
+	// 1) get jid
+	ep = s_get_mc_ep_byBoardNum(boardN);
+	if(!s_getJointNum_frominput(ep, &j))
 	{
-	case 2:	// left
-		ep = endpoint_sk_emsboard_leftlowerarm;
-		printf("left\n");
-		break;
-
-	case 4:	// right
-		ep = endpoint_sk_emsboard_rightlowerarm;
-		printf("right\n");
-		break;
-	}
-
-	nvid = eo_cfg_nvsEP_sk_NVID_Get((eOcfg_nvsEP_sk_endpoint_t)ep, dummy, skinNVindex_sconfig__sigmode);
-	nvRoot = transceiver->getNVhandler(ep, nvid);
-	if(NULL == nvRoot)
-	{
-		printf("\n>>> ERROR \ntransceiver->getNVhandler returned NULL!!\n");
 		return;
 	}
-	uint8_t dat = 1;
-	if( eores_OK != eo_nv_Set(nvRoot, &dat, eobool_true, eo_nv_upd_dontdo))
+	printf("\nprint times: <n times>  ");
+	scanf("%d", &ntimes);
+
+	printf("\n ntimes = %d\n", ntimes);
+
+	printf("\nsleep of num of milli: <n millisec>  ");
+	scanf("%d", &nmillisec);
+
+	printf("\n nmillisec = %d\n", nmillisec);
+
+	jstatus = s_get_jstatus_ptr(ep,  j);
+	if(NULL == jstatus)
 	{
-		printf("\n>>> ERROR \neo_nv_Set !!\n");
+
+		printf("error in getting jstatus_ptr\n");
 		return;
 	}
-	// tell agent to prepare a rop to send
-	transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
+
+
+	for(i=0; i<ntimes; i++)
+	{
+		s_print_jstatusInfo(j, jstatus);
+		usleep(nmillisec*1000);
+	}
 
 }
 
@@ -352,6 +403,27 @@ void s_callback_button_5(void )
 	// tell agent to prepare a rop to send
 	transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
 
+	// 10) send maxcurrentof motor
+	printf("would you like send max current of motor ? [y/n]\n");
+	gets(str);
+	if((strcmp("y", str) == 0 ))
+	{
+		eOmeas_current_t            	maxcurrentofmotor = 0;
+		eOcfg_nvsEP_mc_motorNVindex_t 	mNVindex = motorNVindex_mconfig__maxcurrentofmotor;
+		printf("get max current of motor: ");
+		scanf("%d", & maxcurrentofmotor);
+		// 10.1) prepare data to send
+		eOnvID_t nvid = eo_cfg_nvsEP_mc_motor_NVID_Get(ep, j, mNVindex);
+		nvRoot = transceiver->getNVhandler(ep, nvid);
+		if( eores_OK != eo_nv_Set(nvRoot, &maxcurrentofmotor, eobool_true, eo_nv_upd_dontdo))
+			printf("error in nv set\n ");
+		// tell agent to prepare a rop to send
+		transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
+
+
+	}
+
+
 }
 
 // send pid to a motor or a joint
@@ -452,7 +524,7 @@ void s_callback_button_7(void )
 	gets(str);
 	mData.maxvelocityofmotor = atoi(str);
 
-	// 5) get min pos of joint
+	// 5) get max current of motor
 	printf("get max current of motor: ");
 	gets(str);
 	mData.maxcurrentofmotor = atoi(str);
@@ -803,5 +875,104 @@ static void old_func(void)
 	transceiver->load_occasional_rop(eo_ropcode_set, ep, nvid);
 
 	snprintf(str, sizeof(str)-1, "called set motor and joint config, index %d\n", j);
+
+}
+
+static eOmc_joint_status_t* s_get_jstatus_ptr(eOcfg_nvsEP_mc_endpoint_t ep, eOcfg_nvsEP_mc_jointNumber_t j)
+{
+	uint16_t                        ipindex, epindex, idindex;
+	EOnv                            nv;
+	EOnv                            *nv_res_ptr;
+	eOnvID_t                        nv_id;
+	eOresult_t                      res;
+	eOmc_joint_status_t 			*jstatus = NULL;
+	eOcfg_nvsEP_mc_jointNVindex_t   jnvindex = jointNVindex_jstatus;
+
+	nv_id = eo_cfg_nvsEP_mc_joint_NVID_Get(ep, j, jnvindex);
+
+	nv_res_ptr = transceiver->getNVhandler(ep, nv_id);
+	if(NULL == nv_res_ptr)
+	{
+		printf("e2\n");
+		return(jstatus);
+	}
+
+//	EOnv* hostTransceiver::getNVhandler(uint16_t endpoint, uint16_t id)
+//
+//	res = eo_nvscfg_GetIndices(eo_boardtransceiver_hid_GetNvsCfg(), eok_ipv4addr_localhost, ep, nv_id,
+//							   &ipindex, &epindex, &idindex);
+//	if(eores_OK != res)
+//	{
+//		printf("e1\n");
+//		return(jstatus);
+//	}
+//
+//	nv_res_ptr = eo_nvscfg_GetNV( eo_boardtransceiver_hid_GetNvsCfg(), ipindex, epindex, idindex, NULL, &nv);
+//	if(NULL == nv_res_ptr)
+//	{
+//		printf("e2\n");
+//		return(jstatus);
+//	}
+//	jstatus =  (eOmc_joint_status_t*)nv.loc;
+
+	jstatus =  (eOmc_joint_status_t*)nv_res_ptr->rem;
+	return(jstatus);
+}
+
+
+#define isOverCurrent(status)						((status) & (0x08))
+#define isFaultUndervoltage(status)					((status) & (0x01))
+#define isFaultExternal(status)						((status) & (0x04))
+#define isFaultOverload(status)						((status) & 0x02)
+#define isHallSensorError(status)					((status) & 0x10)
+#define isAbsEncoderError(status)					((status) & 0x20)
+//can fault
+#define isCanTxOverflow(status)						((status) & 0x01)
+#define isCanBusOff(status)							((status) & 0x02)
+#define isCanTxError(status)						((status) & 0x04)
+#define isCanRxError(status)						((status) & 0x08)
+#define isCanTxOverrun(status)						((status) & 0x10)
+#define isCanRxWarning(status)						((status) & 0x20)
+#define isCanRxOverrun(status)						((status) & 0x4)
+
+static void s_print_jstatusInfo(eOcfg_nvsEP_mc_jointNumber_t j, eOmc_joint_status_t* jstatus)
+{
+	if(NULL == jstatus)
+	{
+
+		printf("error in getting jstatus_ptr\n");
+		return;
+	}
+
+	printf("joint %d position %d\n", j, jstatus->basic.position);
+
+	printf("joint %d fault: ", j);
+	if(isOverCurrent(jstatus->chamaleon04[0]))
+		printf("overcurrent, ");
+	if(isFaultUndervoltage(jstatus->chamaleon04[0]))
+		printf("Undervoltage, ");
+	if(isFaultExternal(jstatus->chamaleon04[0]))
+		printf("FaultExternal, ");
+	if(isFaultOverload(jstatus->chamaleon04[0]))
+		printf("FaultOverload, ");
+	if(isHallSensorError(jstatus->chamaleon04[0]))
+		printf("HallSensorError, ");
+	if(isAbsEncoderError(jstatus->chamaleon04[0]))
+		printf("AbsEncoderError, ");
+//can fault
+	if(isCanTxOverflow(jstatus->chamaleon04[1]))
+		printf("CanTxOverflow, ");
+	if(isCanBusOff(jstatus->chamaleon04[1]))
+		printf("CanBusOff, ");
+	if(isCanTxError(jstatus->chamaleon04[1]))
+		printf("isCanTxError, ");
+	if(isCanTxOverrun(jstatus->chamaleon04[1]))
+		printf("CanTxOverrun, ");
+	if(isCanRxWarning(jstatus->chamaleon04[1]))
+		printf("isCanRxWarning, ");
+	if(isCanRxOverrun(jstatus->chamaleon04[1]))
+		printf("isCanRxOverrun, ");
+
+	printf("\n");
 
 }
