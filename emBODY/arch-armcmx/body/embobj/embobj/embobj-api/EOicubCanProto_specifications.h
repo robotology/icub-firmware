@@ -363,10 +363,11 @@ typedef struct
 } eOicubCanProto_msgCommand_t;
 #define ICUBCANPROTO_MSGCOMMAND_CREATE(class, cmdId)   ((eOicubCanProto_msgCommand_t)(class<<8 | cmdId))
 
+enum {eOicubCanProto_bcastpolicy_maxsize = 4 };
 
 typedef struct
 {
-    uint8_t val2bcastList[4];           //list of value to broadcast
+    uint8_t val2bcastList[eOicubCanProto_bcastpolicy_maxsize];           //list of value to broadcast
 } eOicubCanProto_bcastpolicy_t;
 
 
@@ -473,6 +474,14 @@ typedef struct
 } eOicubCanProto_setpoint_current_t; 
 
 
+/** @typedef    typedef int16_t    eOicubCanProto_position4calib_t
+    @brief      contains position on 16 bits. this type is use only to send position in calibration command.
+ **/
+typedef int16_t    eOicubCanProto_position4calib_t;
+
+/* NOTE: velocity is expreess in 16 bits already. */
+
+
 
 /** @typedef    typedef struct eOicubCanProto_calibrator_params_type0_hard_stops_t
     @brief      contains the params in case of eOicubCanProto_calibration_type0_hard_stops
@@ -483,13 +492,12 @@ typedef struct
     eOicubCanProto_velocity_t           velocity;
 } eOicubCanProto_calibrator_params_type0_hard_stops_t;
 
-
 /** @typedef    typedef struct eOicubCanProto_calibrator_params_type1_abs_sens_analog_t
     @brief      contains the params in case of eOicubCanProto_calibration_type1_abs_sens_analog_t
  **/
 typedef struct  
 {
-    eOicubCanProto_position_t           position;
+    eOicubCanProto_position4calib_t     position;
     eOicubCanProto_velocity_t           velocity;
 } eOicubCanProto_calibrator_params_type1_abs_sens_analog_t;
 
@@ -509,9 +517,9 @@ typedef struct
  **/
 typedef struct  
 {
-    eOicubCanProto_position_t           position;
+    eOicubCanProto_position4calib_t     position;
     eOicubCanProto_velocity_t           velocity;
-    int32_t                             offset;
+    int16_t                             offset;
 } eOicubCanProto_calibrator_params_type3_abs_sens_digital_t;
 
 
@@ -520,9 +528,9 @@ typedef struct
  **/
 typedef struct  
 {
-    eOicubCanProto_position_t           position;
+    eOicubCanProto_position4calib_t     position;
     eOicubCanProto_velocity_t           velocity;
-    uint32_t                            maxencoder;
+    int16_t                            maxencoder;
 } eOicubCanProto_calibrator_params_type4_abs_and_incremental_t;
 
 
