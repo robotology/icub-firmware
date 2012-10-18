@@ -172,7 +172,24 @@
           <Name>-UV0153FBE -O207 -S0 -C0 -N00("ARM CoreSight SW-DP") -D00(1BA01477) -L00(0) -TO3 -TC72000000 -TP21 -TDS803D -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO15 -FD20000000 -FC800 -FN1 -FF0STM32F10x_128 -FS08000000 -FL020000</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>195</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>C:\Users\acemor\sourceforge\emBODY\arch-armcmx\body\abslayer\hal-package\test-hal\app-test\blinky-hal-stm32f4-ipal.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -390,7 +407,24 @@
           <Name>-UV0153FBE -O207 -S0 -C0 -N00("ARM CoreSight SW-DP") -D00(1BA01477) -L00(0) -TO3 -TC72000000 -TP21 -TDS803D -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO15 -FD20000000 -FC800 -FN1 -FF0STM32F10x_128 -FS08000000 -FL020000</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>195</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>C:\Users\acemor\sourceforge\emBODY\arch-armcmx\body\abslayer\hal-package\test-hal\app-test\blinky-hal-stm32f4-ipal.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -472,10 +506,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>34</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>117</TopLine>
-      <CurrentLine>135</CurrentLine>
+      <TopLine>154</TopLine>
+      <CurrentLine>186</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app-test\blinky-hal-stm32f4-ipal.c</PathWithFileName>
       <FilenameWithoutPath>blinky-hal-stm32f4-ipal.c</FilenameWithoutPath>
@@ -544,8 +578,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>84</TopLine>
-      <CurrentLine>103</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\hal-cfg\stm32f4\hal_cfg.c</PathWithFileName>
       <FilenameWithoutPath>hal_cfg.c</FilenameWithoutPath>
@@ -565,7 +599,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>197</TopLine>
+      <TopLine>198</TopLine>
       <CurrentLine>203</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-stg\hal_stm32f4_startup.s</PathWithFileName>
@@ -582,12 +616,12 @@
       <GroupNumber>5</GroupNumber>
       <FileNumber>7</FileNumber>
       <FileType>1</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>218</TopLine>
-      <CurrentLine>229</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\sys\mid\src\system_stm32f4xx.c</PathWithFileName>
       <FilenameWithoutPath>system_stm32f4xx.c</FilenameWithoutPath>
@@ -596,7 +630,7 @@
 
   <Group>
     <GroupName>hal-src-stm32</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -633,10 +667,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>2</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>249</TopLine>
+      <CurrentLine>253</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\stm32fx\hal_stm32_can.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_can.c</FilenameWithoutPath>
@@ -705,8 +739,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>44</TopLine>
+      <CurrentLine>48</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\stm32fx\hal_stm32_eeprom.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_eeprom.c</FilenameWithoutPath>
@@ -729,12 +763,12 @@
       <GroupNumber>6</GroupNumber>
       <FileNumber>17</FileNumber>
       <FileType>1</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>6</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>202</TopLine>
-      <CurrentLine>213</CurrentLine>
+      <TopLine>736</TopLine>
+      <CurrentLine>740</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\stm32fx\hal_stm32_eth.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_eth.c</FilenameWithoutPath>
@@ -761,8 +795,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>252</TopLine>
-      <CurrentLine>254</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\stm32fx\hal_stm32_gpio.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_gpio.c</FilenameWithoutPath>
@@ -785,12 +819,12 @@
       <GroupNumber>6</GroupNumber>
       <FileNumber>21</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>161</TopLine>
-      <CurrentLine>172</CurrentLine>
+      <TopLine>1</TopLine>
+      <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\stm32fx\hal_stm32_switch.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_switch.c</FilenameWithoutPath>
@@ -864,10 +898,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>74</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>123</TopLine>
+      <CurrentLine>139</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\stm32fx\hal_stm32_i2c4hal.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_i2c4hal.c</FilenameWithoutPath>
@@ -939,14 +973,14 @@
 
   <Group>
     <GroupName>hal-stm32-board</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>9</GroupNumber>
       <FileNumber>31</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>38</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -995,7 +1029,7 @@
 
   <Group>
     <GroupName>ipal</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
