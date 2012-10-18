@@ -28,6 +28,8 @@
 
 #include "hal_brdcfg_modules.h"
 
+#include "hal_switch.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -126,13 +128,17 @@ int main(void)
     
     myledsinit();
     
-    //test_eeprom();
 
     // 1 millisec.
     res = hal_sys_systick_sethandler(myonsystick, 1000, hal_int_priority00);
     res =  res;
     
-    
+#ifdef  HAL_USE_SWITCH    
+   hal_switch_init(NULL);
+   hal_switch_start();
+//    for(;;);
+#endif  
+
     test_timer(200); 
 
     for(;;)

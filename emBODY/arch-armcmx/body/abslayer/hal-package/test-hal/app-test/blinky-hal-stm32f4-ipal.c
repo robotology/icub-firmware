@@ -27,7 +27,10 @@
 #include "hal.h"  
 #include "ipal.h"  
 
+#include "hal_brdcfg_modules.h"
+
 #include "hal_switch.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -49,6 +52,12 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
+
+
+extern void pippo(void)
+{
+   hal_gpio_init(hal_gpio_portA, hal_gpio_pin1, hal_gpio_dirNONE, hal_gpio_speed_default);
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -83,6 +92,7 @@ static void s_udp_onreception(void *arg, ipal_udpsocket_t *skt, ipal_packet_t *p
 
 static void test_eeprom(void);
 
+static void s_test_mco2(void);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -98,11 +108,36 @@ static mydata mmm = {1, 2, 3, 4};
 
 static uint8_t send_msg = 0;
 
+static const hal_gpio_cfg_t user_button = 
+{
+#if     defined(HAL_BOARD_MCBSTM32F400)    
+    .port   = hal_gpio_portG,
+    .pin    = hal_gpio_pin15,
+    .speed  = hal_gpio_speed_low,
+    .dir    = hal_gpio_dirINP
+#elif   defined(HAL_BOARD_MCBSTM32C)
+    .port   = hal_gpio_portB,
+    .pin    = hal_gpio_pin7,
+    .speed  = hal_gpio_speed_low,
+    .dir    = hal_gpio_dirINP
+#else
+    .dir    = hal_gpio_dirNONE 
+#endif    
+};
+
+static const hal_gpio_val_t user_notpushed_value = 
+#if     defined(HAL_BOARD_MCBSTM32F400)    
+    hal_gpio_valHIGH;
+#elif   defined(HAL_BOARD_MCBSTM32C)
+    hal_gpio_valHIGH; 
+#else
+    hal_gpio_valNONE; 
+#endif    
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of externally defined functions or variable which dont have a .h file
 // --------------------------------------------------------------------------------------------------------------------
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -127,9 +162,10 @@ int main(void)
     }
 
     hal_base_initialise(hal_cfgMINE, data32aligned);
+    
 
     hal_sys_systeminit();
-
+    
     
     myledsinit();
     
@@ -139,13 +175,24 @@ int main(void)
     res = hal_sys_systick_sethandler(myonsystick, 1000, hal_int_priority00);
     res =  res;
     
-   hal_switch_init(NULL);
-   hal_switch_start();
-//    for(;;);
     
+#if 0    
+    s_test_mco2();
+    for(;;);
+#endif
+    
+    
+#ifdef  HAL_USE_SWITCH   
+    extern const hal_eth_phymode_t hal_brdcfg_eth__phymode;
+    hal_eth_phymode_t phymode; 
+    memcpy(&phymode, &hal_brdcfg_eth__phymode, sizeof(hal_eth_phymode_t));
+    hal_switch_init(NULL);
+    hal_switch_start(&phymode);
+    for(;;);
+#endif    
  
 
-    test_eeprom();    
+//    test_eeprom();    
     
     
     ipal_base_memory_getsize(ipal_cfgMINE, &size04aligned);
@@ -255,15 +302,26 @@ static void myonsystick(void)
 
 static void button_init(void)
 {
-    hal_gpio_init(hal_gpio_portG, hal_gpio_pin15, hal_gpio_dirINP, hal_gpio_speed_low);
+    if(hal_gpio_dirINP == user_button.dir)
+    {
+        hal_gpio_configure(user_button, NULL);
+        //hal_gpio_init(user_button.port, user_button.pin, user_button.dir, user_button.speed);
+    }
 }
 
 static uint8_t button_ispushed(void)
 {
-    static uint8_t v = 0;
-    v = hal_gpio_getval(hal_gpio_portG, hal_gpio_pin15);
-
-    return((1==v) ? 0 : 1);
+    hal_gpio_val_t v = user_notpushed_value;
+    
+    if(hal_gpio_dirINP == user_button.dir)
+    {
+        v = hal_gpio_getval(user_button.port, user_button.pin);
+        return((user_notpushed_value == v) ? 0 : 1);        
+    }
+    else
+    {
+        return(0);
+    }
 }
 
 
@@ -399,8 +457,41 @@ static void test_eeprom(void)
 //#endif
 }
 
+#include "hal_stm32xx_include.h"
+#ifdef USE_STM32F4
+static void hal_brdcfg_switch__mco2_init(void)
+{
+    // configure pc9 af, push pull, 50mhz
+    // enable system configuration controller clock
+    RCC->APB2ENR    |= (1 << 14);  
+    // clocks port port c
+    RCC->AHB1ENR    |= 0x00000004;
 
+    GPIOC->MODER   &= ~0x000C0000;              // reset pc9
+    GPIOC->MODER   |=  0x00080000;              // alternate function
+    GPIOC->OTYPER  &= ~0x00000200;              // output push-pull (reset state)  
+    GPIOC->OSPEEDR |=  0x000C0000;              // slew rate as 100MHz pin (C) or 50mhz (8)
+    GPIOC->PUPDR   &= ~0x000C0000;              // no pull up, pull down
 
+    GPIOC->AFR[1]  &= ~0x000000F0;
+    GPIOC->AFR[1]  |=  0x00000000;              // AF0 (system) 
+
+}
+
+static void s_test_mco2(void)
+{   
+    hal_brdcfg_switch__mco2_init();
+     
+    RCC_PLLI2SCmd(DISABLE);
+    RCC_PLLI2SConfig(200, 2); // 50mhz: 1mhz*200/10 = 100
+    RCC_PLLI2SCmd(ENABLE);
+    // wait until it is ready
+    while(RCC_GetFlagStatus(RCC_FLAG_PLLI2SRDY) == RESET);
+    // connect mco2 with plli2s divided by 2
+    RCC_MCO2Config(RCC_MCO2Source_PLLI2SCLK, RCC_MCO2Div_2);
+    
+}
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
