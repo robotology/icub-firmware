@@ -111,28 +111,40 @@ typedef struct
 } hal_eth_network_functions_t;
 
 
-typedef enum
-{
-    hal_eth_speed_auto      = 0,
-    hal_eth_speed_10        = 1,
-    hal_eth_speed_100       = 2,
-    hal_eth_speed_none      = 255
-} hal_eth_speed_t;
+// typedef enum
+// {
+//     hal_eth_speed_auto      = 0,
+//     hal_eth_speed_10        = 1,
+//     hal_eth_speed_100       = 2,
+//     hal_eth_speed_none      = 255
+// } hal_eth_speed_t;
+
+// typedef enum
+// {
+//     hal_eth_mux_auto        = 0,
+//     hal_eth_mux_halfduplex  = 1,
+//     hal_eth_mux_fullduplex  = 2,
+//     hal_eth_mux_none       = 255
+// } hal_eth_mux_t;
+
+
+// typedef struct 
+// {
+//     hal_eth_mux_t       mux;
+//     hal_eth_speed_t     speed;
+// } hal_eth_phycfg_t;
+
 
 typedef enum
 {
-    hal_eth_mux_auto        = 0,
-    hal_eth_mux_halfduplex  = 1,
-    hal_eth_mux_fullduplex  = 2,
-    hal_eth_mux_none       = 255
-} hal_eth_mux_t;
-
-
-typedef struct 
-{
-    hal_eth_mux_t       mux;
-    hal_eth_speed_t     speed;
+    hal_eth_phymode_auto                = 0,
+    hal_eth_phymode_halfduplex10mbps    = 1,
+    hal_eth_phymode_halfduplex100mbps   = 2,
+    hal_eth_phymode_fullduplex10mbps    = 3,
+    hal_eth_phymode_fullduplex100mbps   = 4,
+    hal_eth_phymode_none                = 255
 } hal_eth_phymode_t;
+
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section

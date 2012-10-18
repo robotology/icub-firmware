@@ -107,25 +107,26 @@ typedef enum
     hal_gpio_speed_default  = 0,        /**< in case we dont care about driving clock of the gpio */
     hal_gpio_speed_low      = 1,        /**< use a driving clock with low speed */
     hal_gpio_speed_medium   = 2,        /**< use a driving clock with medium speed */
-    hal_gpio_speed_high     = 3         /**< use a driving clock fast speed */
+    hal_gpio_speed_high     = 3,        /**< use a driving clock with fast speed */
+    hal_gpio_speed_max      = 4         /**< use a driving clock with maximum speed */
 } hal_gpio_speed_t;
 
-enum { hal_gpio_speeds_number = 4 };
+enum { hal_gpio_speeds_number = 5 };
 
 /** @typedef    typedef enum hal_gpio_dir_t 
-    @brief      hal_gpio_dir_t contains all possible directions that a silicon GPIO can have.
+    @brief      hal_gpio_dir_t contains all possible directions that a silicon pin can have.
  **/
 typedef enum  
 {
-    hal_gpio_dirNONE = 0,      /**< Not defined direction. It must be used very carefully and NEVER as function argument   */
+    hal_gpio_dirNONE = 0,      /**< Not defined direction. It must be used very carefully */
     hal_gpio_dirINP  = 1,      /**< Input direction            */
-    hal_gpio_dirOUT  = 2       /**< Output direction           */
+    hal_gpio_dirOUT  = 2,      /**< Output direction           */
+    hal_gpio_dirALT  = 3
 } hal_gpio_dir_t;
 
  
 /** @typedef    typedef enum hal_gpio_val_t 
-    @brief      hal_gpio_val_t contains the values that a pin can have. This value is used by every object derived 
-                from EoIOPin
+    @brief      hal_gpio_val_t contains the values that a silicon pin can have.
  **/
 typedef enum  
 { 
@@ -136,21 +137,24 @@ typedef enum
  
 
 /** @typedef    typedef enum hal_gpio_cfg_t 
-    @brief      hal_gpio_cfg_t contains the configuation for a gpio
+    @brief      hal_gpio_cfg_t contains the configuration for a gpio
  **/
 typedef struct 
 {
     hal_gpio_port_t     port;
     hal_gpio_pin_t      pin;
-    hal_gpio_speed_t    speed;
     hal_gpio_dir_t      dir;
+    hal_gpio_speed_t    speed;
 } hal_gpio_cfg_t;
+
+typedef struct hal_gpio_hid_altcfg_t hal_gpio_altcfg_t;
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
 
 
+extern void pippo(void);
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
@@ -163,6 +167,8 @@ typedef struct
     @return     Always hal_res_OK
  **/
 extern hal_result_t hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_gpio_dir_t dir, hal_gpio_speed_t speed);
+
+extern hal_result_t hal_gpio_configure(hal_gpio_cfg_t cfg, const hal_gpio_altcfg_t* altcfg);
 
 
 /** @fn         extern hal_result_t hal_gpio_setval(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_gpio_val_t val)

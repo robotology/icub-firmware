@@ -65,6 +65,13 @@ typedef enum
 
 enum { hal_i2c_ports_number = 3 };
 
+typedef enum
+{
+    hal_i2c_speed_100kbps       = 1,
+    hal_i2c_speed_200kbps       = 2,
+    hal_i2c_speed_400kbps       = 4
+} hal_i2c_speed_t;
+
 
 typedef struct 
 {
