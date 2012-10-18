@@ -883,7 +883,7 @@ extern void hal_eth_hid_rmii_rx_init(void)
 //     
 //     AFIO->MAPR      |= (1 << 21);               // Ethernet MAC I/O remapping to: RX_DV-CRS_DV/PD8, RXD0/PD9, RXD1/PD10, RXD2/PD11, RXD3/PD12 
 //  
-//     // enable clock for port d
+//     // enable clock for port d in alt fun
 //     RCC->APB2ENR    |= 0x00000021;
 //     
 //     // ETH_RMII_CRS_DV (PD8), ETH_RMII_RXD0 (PD9), ETH_RMII_RXD1 (PD10) ... as remapped by setting bit 21 of AFIO->MAPR

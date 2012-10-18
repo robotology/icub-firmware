@@ -44,7 +44,26 @@
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
-// empty-section
+
+typedef enum
+{
+    hal_eeprom_device_st_m24lr64       = 0,    /**< capacity 8kbytes; page size 4 bytes; i2c speeds: 400khz. it is also wireless, but we don't care. */
+    hal_eeprom_device_st_m24c64        = 1,    /**< capacity 8kbytes; page size 32 bytes; i2c speeds: 1mhz, 400khz, 100khz.  */
+    hal_eeprom_device_st_m24512        = 2,    /**< capacity 64kbytes; page size 128 bytes; i2c speeds: 1mhz, 400khz, 100khz. */
+    hal_eeprom_device_atmel_at24c512b  = 3,    /**< capacity 64kbytes; page size 128 bytes; i2c speeds: 1mhz, 400khz.  */
+    hal_eeprom_device_atmel_at24c1024b = 4,    /**< capacity 128kbytes; page size 256 bytes; i2c speeds: 1mhz, 400khz.  */
+    hal_eeprom_device_none             = 255   /**< just no device ... yet. */    
+    
+} hal_eeprom_device_t;
+
+typedef struct
+{
+    hal_eeprom_device_t     device;
+//    uint8_t                 i2cport;            // it can be 1, 2, 3. */
+    uint8_t                 hwaddra2a1a0;       // put a 1 in pos 2, 1, 0 if the a2, a1, a0 is high. */
+    hal_gpio_val_t          wpval;              // hal_gpio_valHIGH if protection is high, hal_gpio_valLOW if it is low, hal_gpio_valNONE if not used */
+    hal_gpio_cfg_t          wppin;
+} hal_eeprom_hw_cfg_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------

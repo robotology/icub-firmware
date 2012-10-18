@@ -32,6 +32,7 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "hal_base.h"
+#include "hal_gpio.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -45,7 +46,15 @@
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
-// empty-section
+
+typedef struct
+{
+    hal_i2c_speed_t         speed;      
+    hal_gpio_cfg_t          scl;
+    hal_gpio_cfg_t          sda;
+    hal_bool_t              usedma;     /**< so far only i2c1 can have dma */
+    hal_void_fp_void_t      ontimeout;    
+} hal_i2c_hw_cfg_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------

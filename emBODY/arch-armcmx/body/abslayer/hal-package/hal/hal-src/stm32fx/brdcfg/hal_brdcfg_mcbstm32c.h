@@ -54,6 +54,7 @@
 
 #ifdef HAL_USE_I2C4HAL
     #include "utils/stm32i2c.h"
+    #include "hal_stm32_i2c4hal_hid.h"
 #endif//HAL_USE_I2C4HAL
 
 #ifdef HAL_USE_LED
@@ -112,12 +113,16 @@
     extern const uint32_t hal_brdcfg_eeprom__emflash_totalsize;//      = 256*1024;
     extern const uint32_t hal_brdcfg_eeprom__i2c_01_baseaddress;//     = 0;
     extern const uint32_t hal_brdcfg_eeprom__i2c_01_totalsize;//       = 8*1024;
+    
+    extern const hal_eeprom_hw_cfg_t hal_brdcfg_eeprom__devicecfg;
+    
     extern const stm32ee_cfg_t hal_brdcfg_eeprom__stm32eecfg;
 #endif//HAL_USE_EEPROM
 
 #ifdef HAL_USE_I2C4HAL
     extern const uint8_t hal_brdcfg_i2c4hal__supported_mask;
-    extern const stm32i2c_cfg_t hal_brdcfg_i2c4hal__i2ccfg;
+    extern const hal_i2c_hw_cfg_t  hal_brdcfg_i2c4hal__hwcfg;
+//    extern const stm32i2c_cfg_t hal_brdcfg_i2c4hal__i2ccfg;
 #endif//HAL_USE_I2C4HAL
 
 

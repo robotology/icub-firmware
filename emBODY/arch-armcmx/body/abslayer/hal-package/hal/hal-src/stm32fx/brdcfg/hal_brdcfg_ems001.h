@@ -35,6 +35,7 @@
 
 #include "hal_base.h"
 
+
 #ifdef HAL_USE_CAN
     #include "hal_can.h"
 #endif//HAL_USE_CAN
@@ -54,6 +55,7 @@
 
 #ifdef HAL_USE_I2C4HAL
     #include "utils/stm32i2c.h"
+    #include "hal_stm32_i2c4hal_hid.h"
 #endif//HAL_USE_I2C4HAL
 
 #ifdef HAL_USE_LED
@@ -119,6 +121,7 @@
 
 #ifdef HAL_USE_I2C4HAL
     extern const uint8_t hal_brdcfg_i2c4hal__supported_mask;
+    extern const hal_i2c_hw_cfg_t  hal_brdcfg_i2c4hal__hwcfg;
     extern const stm32i2c_cfg_t hal_brdcfg_i2c4hal__i2ccfg;
 #endif//HAL_USE_I2C4HAL
 
@@ -163,6 +166,7 @@
 
 #ifdef HAL_USE_SWITCH
     extern const hal_boolval_t hal_brdcfg_switch__supported;
+    extern const hal_gpio_cfg_t hal_brdcfg_switch__gpio_reset; 
 #endif//HAL_USE_SWITCH
 
 #ifdef HAL_USE_TIMER

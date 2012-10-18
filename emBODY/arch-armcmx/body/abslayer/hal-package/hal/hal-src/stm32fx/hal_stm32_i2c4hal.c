@@ -76,7 +76,7 @@ const hal_i2c_cfg_t hal_i2c_cfg_default =
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-
+//sto mettendo nuove variabili di inizializzazione al i2c: hal_brdcfg_i2c4hal_hwcfg
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -84,6 +84,8 @@ const hal_i2c_cfg_t hal_i2c_cfg_default =
 
 static hal_boolval_t s_hal_i2c4hal_supported_is(hal_i2c_port_t port);
 static void s_hal_i2c4hal_initted_set(hal_i2c_port_t port);
+
+static void s_hal_i2c4hal_ontimeout(void);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -103,6 +105,23 @@ static hal_boolval_t s_hal_i2c4hal_initted[hal_i2c_ports_number] = { hal_false, 
 extern hal_result_t hal_i2c4hal_init(hal_i2c_port_t port, const hal_i2c_cfg_t *cfg)
 {
     hal_result_t res = hal_res_NOK_generic;
+    
+    stm32i2c_cfg_t i2ccfg          = 
+    {
+        .speed              = 400000,        // 400 mhz
+        .scl                =
+        {
+            .port               = stm32gpio_portB,
+            .pin                = stm32gpio_pin8
+        }, 
+        .sda                =
+        {
+            .port               = stm32gpio_portB,
+            .pin                = stm32gpio_pin9
+        }, 
+        .usedma             = 0,
+        .ontimeout          = s_hal_i2c4hal_ontimeout                          
+    };
 
     //const hal_i2c_4eeprom_cfg_t *somecfg = &hal_i2c_some_cfg_default;
 
@@ -117,8 +136,15 @@ extern hal_result_t hal_i2c4hal_init(hal_i2c_port_t port, const hal_i2c_cfg_t *c
         return(hal_res_OK);
     }
 
- 
-    res = (hal_result_t) stm32i2c_init(HAL_i2c_port2index(port)+1, &hal_brdcfg_i2c4hal__i2ccfg);
+    i2ccfg.speed        = 100 * 1000 * (uint32_t)hal_brdcfg_i2c4hal__hwcfg.speed;
+    i2ccfg.scl.port     = (stm32gpio_port_t)hal_brdcfg_i2c4hal__hwcfg.scl.port;
+    i2ccfg.scl.pin      = (stm32gpio_pin_t)hal_brdcfg_i2c4hal__hwcfg.scl.pin;
+    i2ccfg.sda.port     = (stm32gpio_port_t)hal_brdcfg_i2c4hal__hwcfg.sda.port;
+    i2ccfg.sda.pin      = (stm32gpio_pin_t)hal_brdcfg_i2c4hal__hwcfg.sda.pin;  
+    i2ccfg.usedma       = (hal_true == hal_brdcfg_i2c4hal__hwcfg.usedma) ? 1 : 0;
+    i2ccfg.ontimeout    = (NULL == hal_brdcfg_i2c4hal__hwcfg.ontimeout) ? (s_hal_i2c4hal_ontimeout) : (hal_brdcfg_i2c4hal__hwcfg.ontimeout);
+    res = (hal_result_t) stm32i2c_init(HAL_i2c_port2index(port)+1, &i2ccfg);
+    //res = (hal_result_t) stm32i2c_init(HAL_i2c_port2index(port)+1, &hal_brdcfg_i2c4hal__i2ccfg);
 
     if(hal_res_OK != res)
     {
@@ -264,6 +290,10 @@ static void s_hal_i2c4hal_initted_set(hal_i2c_port_t port)
 }
 
 
+static void s_hal_i2c4hal_ontimeout(void)
+{   
+    hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "timeout error in i2c operations");
+}
 
 #endif//HAL_USE_I2C4HAL
 

@@ -74,7 +74,7 @@ typedef enum
     stm32ee_device_st_m24512        = 2,    /**< capacity 64kbytes; page size 128 bytes; i2c speeds: 1mhz, 400khz, 100khz. */
     stm32ee_device_atmel_at24c512b  = 3,    /**< capacity 64kbytes; page size 128 bytes; i2c speeds: 1mhz, 400khz.  */
     stm32ee_device_atmel_at24c1024b = 4,    /**< capacity 128kbytes; page size 256 bytes; i2c speeds: 1mhz, 400khz.  */
-    stm32ee_device_none                     /**< just no device ... yet. */
+    stm32ee_device_none             = 255   /**< just no device ... yet. */
 } stm32ee_device_t;
 
 

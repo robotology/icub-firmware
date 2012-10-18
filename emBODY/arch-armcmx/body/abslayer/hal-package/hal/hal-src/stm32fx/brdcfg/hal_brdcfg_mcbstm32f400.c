@@ -171,6 +171,26 @@
 
 #ifdef HAL_USE_I2C4HAL
     extern const uint8_t hal_brdcfg_i2c4hal__supported_mask = (1 << hal_i2c_port1); 
+    extern const hal_i2c_hw_cfg_t  hal_brdcfg_i2c4hal__hwcfg        =
+    {
+        .speed          = hal_i2c_speed_400kbps,      
+        .scl            = 
+        {
+            .port       = hal_gpio_portB,
+            .pin        = hal_gpio_pin8,        
+            .dir        = hal_gpio_dirALT,
+            .speed      = hal_gpio_speed_default
+        },
+        .sda            =
+       {
+            .port       = hal_gpio_portB,
+            .pin        = hal_gpio_pin9,        
+            .dir        = hal_gpio_dirALT,
+            .speed      = hal_gpio_speed_default
+        },        
+        .usedma         = hal_false,
+        .ontimeout      = NULL   
+    };    
     extern const stm32i2c_cfg_t hal_brdcfg_i2c4hal__i2ccfg = 
     {
         .speed              = 400000,        // 400 mhz

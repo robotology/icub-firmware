@@ -113,7 +113,7 @@
     extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_MDC            = { .port = hal_gpio_portC, .pin = hal_gpio_pin1,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max  };
     extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_MDIO           = { .port = hal_gpio_portA, .pin = hal_gpio_pin2,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max  };   
    
-    extern const hal_eth_phymode_t hal_brdcfg_eth__phymode              = hal_eth_phymode_fullduplex10mbps;
+    extern const hal_eth_phymode_t hal_brdcfg_eth__phymode              = hal_eth_phymode_fullduplex100mbps;
 #endif//HAL_USE_ETH
 
 
@@ -154,6 +154,26 @@
 
 #ifdef HAL_USE_I2C4HAL
     extern const uint8_t hal_brdcfg_i2c4hal__supported_mask = (1 << hal_i2c_port1); 
+    extern const hal_i2c_hw_cfg_t  hal_brdcfg_i2c4hal__hwcfg        =
+    {
+        .speed          = hal_i2c_speed_400kbps,      
+        .scl            = 
+        {
+            .port       = hal_gpio_portB,
+            .pin        = hal_gpio_pin8,        
+            .dir        = hal_gpio_dirALT,
+            .speed      = hal_gpio_speed_default
+        },
+        .sda            =
+       {
+            .port       = hal_gpio_portB,
+            .pin        = hal_gpio_pin9,        
+            .dir        = hal_gpio_dirALT,
+            .speed      = hal_gpio_speed_default
+        },        
+        .usedma         = hal_false,
+        .ontimeout      = NULL   
+    };     
     extern const stm32i2c_cfg_t hal_brdcfg_i2c4hal__i2ccfg = 
     {
         .speed              = 400000,        // 400 mhz
@@ -250,6 +270,7 @@
 
 #ifdef HAL_USE_SWITCH
     extern const hal_boolval_t hal_brdcfg_switch__supported         = hal_true;
+    extern const hal_gpio_cfg_t hal_brdcfg_switch__gpio_reset       = { .port = hal_gpio_portB, .pin = hal_gpio_pin2,   .dir = hal_gpio_dirOUT, .speed = hal_gpio_speed_low  }; 
 #endif//HAL_USE_SWITCH
 
 #ifdef HAL_USE_WATCHDOG
@@ -489,11 +510,13 @@ static void hal_brdcfg_switch__mco2_init(void)
 
 static void hal_brdcfg_switch__mco_initialise(void)
 {
-
+    
     hal_brdcfg_switch__mco2_init();
      
     RCC_PLLI2SCmd(DISABLE);
-    RCC_PLLI2SConfig(200, 2); // 50mhz: 1mhz*200/10 = 100
+    RCC_PLLI2SConfig(200, 2); // 50mhz: 1mhz*200/2 = 100.  then we divide by 2 again
+    //RCC_PLLI2SConfig(400, 4); // 50mhz: 1mhz*400/4 = 100
+    //RCC_PLLI2SConfig(200, 4); // 50mhz: 1mhz*200/2 = 100
     RCC_PLLI2SCmd(ENABLE);
     // wait until it is ready
     while(RCC_GetFlagStatus(RCC_FLAG_PLLI2SRDY) == RESET);
@@ -516,22 +539,22 @@ extern void hal_brdcfg_switch__initialise(void)
 {
     
     // --- mco2: PC9
-//    hal_brdcfg_switch__mco_initialise();  
+    hal_brdcfg_switch__mco_initialise();  
     
      // --- reset pin: PB2
-    hal_gpio_init(hal_gpio_portB, hal_gpio_pin2, hal_gpio_dirOUT, hal_gpio_speed_low);
-    hal_gpio_setval(hal_gpio_portB, hal_gpio_pin2, hal_gpio_valLOW);
+    hal_gpio_configure(hal_brdcfg_switch__gpio_reset, NULL);
+    hal_gpio_setval(hal_brdcfg_switch__gpio_reset.port, hal_brdcfg_switch__gpio_reset.pin, hal_gpio_valLOW);
     hal_sys_delay(10*1000);
-    hal_gpio_setval(hal_gpio_portB, hal_gpio_pin2, hal_gpio_valHIGH);
+    hal_gpio_setval(hal_brdcfg_switch__gpio_reset.port, hal_brdcfg_switch__gpio_reset.pin, hal_gpio_valHIGH);
     hal_sys_delay(100);
   
     // proviamo anche questo ....
 //    hal_eth_hid_rmii_refclock_init();
     
     // --- mco: PC9
-    hal_brdcfg_switch__mco_initialise();  
+//    hal_brdcfg_switch__mco_initialise();  
     
-    //hal_brdcfg_switch__rmii_init();
+    hal_brdcfg_switch__rmii_init();
 
     // --- i2c for communication 
     hal_i2c4hal_init(hal_i2c_port1, NULL); // use default configuration    
