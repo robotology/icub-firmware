@@ -335,7 +335,8 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getControlMode(EOicubCanPro
     eOresult_t                              res;
     eOmc_jointId_t                          jId;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
-    eOmc_controlmode_t                      *jcmdcontrolmode_ptr;
+//    eOmc_controlmode_t                      *jcmdcontrolmode_ptr;
+    eOmc_joint_status_t                     *jstatus_ptr;
 
     canLoc.emscanport = canPort;
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
@@ -347,13 +348,20 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getControlMode(EOicubCanPro
         return(res);
     }
 
-    res = eo_appTheDB_GetJointCmdControlmodePtr(eo_appTheDB_GetHandle(), jId,  &jcmdcontrolmode_ptr);
+    res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), jId, &jstatus_ptr);
     if(eores_OK != res)
     {
         return(res);
     }
 
-    *jcmdcontrolmode_ptr = ((eOmc_controlmode_t)frame->data[1]);
+//     res = eo_appTheDB_GetJointCmdControlmodePtr(eo_appTheDB_GetHandle(), jId,  &jcmdcontrolmode_ptr);
+//     if(eores_OK != res)
+//     {
+//         return(res);
+//     }
+
+//     *jcmdcontrolmode_ptr = ((eOmc_controlmode_t)frame->data[1]);
+    jstatus_ptr->basic.controlmodestatus = ((eOmc_controlmode_t)frame->data[1]);
     
     return(eores_OK);
 }
