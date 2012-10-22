@@ -160,7 +160,7 @@ static void s_stm32i2c_dma_config_tx(uint32_t pBuffer, uint32_t BufferSize);
 static void s_stm32i2c_dma_config_rx(uint32_t pBuffer, uint32_t BufferSize);
 // --- dma support: end
 
-static stm32i2c_result_t s_stm32i2c_timeoutexpired(void);
+static stm32i2c_result_t s_i2c4hal_timeoutexpired(void);
 
 static void s_stm32i2c_read_bytes(I2C_TypeDef* i2cx, uint8_t* data, uint16_t size);
 static void s_stm32i2c_read_withdma(I2C_TypeDef* i2cx, uint8_t* data, uint16_t size);
@@ -233,7 +233,7 @@ static const uint8_t s_stm32i2c_maxports                                = 2;
 static I2C_TypeDef* const       s_stm32i2c_i2cx_port[3]                 = {I2C1, I2C2, NULL};
 static const uint32_t           s_stm32i2c_i2cx_clock[3]                = {RCC_APB1Periph_I2C1, RCC_APB1Periph_I2C2, 0};  
 static const uint32_t           s_stm32i2c_i2cx_gpio_remap_clock[3]     = {RCC_APB2Periph_AFIO, 1, 1}; // 1 means that i dont know if it is correct     
-static const uint32_t           s_stm32i2c_i2cx_gpio_remap[3]           = {GPIO_Remap_I2C1, GPIO_Remap_I2C1, GPIO_Remap_I2C1};
+static const uint32_t           s_stm32i2c_i2cx_gpio_remap[3]           = {GPIO_Remap_I2C1, GPIO_Remap_I2C1, 0};
                                                                 
  
 static const GPIO_InitTypeDef  s_stm32i2c_i2c_gpio_sxx_pin  =
@@ -441,7 +441,7 @@ extern stm32i2c_result_t stm32i2c_init(uint8_t port, const stm32i2c_cfg_t *cfg)
 {
     stm32i2c_result_t res = stm32i2c_res_NOK;
     
-    if((0 == port) || (port > s_stm32i2c_maxports) || (NULL == cfg))
+    if((port >= s_stm32i2c_maxports) || (NULL == cfg))
     {
         return(stm32i2c_res_NOK);
     }
@@ -460,7 +460,7 @@ extern stm32i2c_result_t stm32i2c_init(uint8_t port, const stm32i2c_cfg_t *cfg)
     
     // do other controls over cfg ....
           
-    if(1 == s_stm32i2c_generics.initted[port-1])
+    if(1 == s_stm32i2c_generics.initted[port])
     {
         return(stm32i2c_res_NOK);
     }
@@ -472,10 +472,10 @@ extern stm32i2c_result_t stm32i2c_init(uint8_t port, const stm32i2c_cfg_t *cfg)
     
     
     // init some data
-    s_stm32i2c_generics.i2cx                         = (I2C_TypeDef*)s_stm32i2c_i2cx_port[port-1];
-    s_stm32i2c_generics.i2cx_cfg.clock               = s_stm32i2c_i2cx_clock[port-1];
-    s_stm32i2c_generics.i2cx_cfg.gpio_remap          = s_stm32i2c_i2cx_gpio_remap[port-1];
-    s_stm32i2c_generics.i2cx_cfg.gpio_remap_clock    = s_stm32i2c_i2cx_gpio_remap_clock[port-1];
+    s_stm32i2c_generics.i2cx                         = (I2C_TypeDef*)s_stm32i2c_i2cx_port[port];
+    s_stm32i2c_generics.i2cx_cfg.clock               = s_stm32i2c_i2cx_clock[port];
+    s_stm32i2c_generics.i2cx_cfg.gpio_remap          = s_stm32i2c_i2cx_gpio_remap[port];
+    s_stm32i2c_generics.i2cx_cfg.gpio_remap_clock    = s_stm32i2c_i2cx_gpio_remap_clock[port];
     
     
 
@@ -486,21 +486,21 @@ extern stm32i2c_result_t stm32i2c_init(uint8_t port, const stm32i2c_cfg_t *cfg)
     
 #if defined(STM32I2C_USE_DMA_ON_I2C1)
     
-    if(1 == port)
+    if(0 == port)
     {
-        s_stm32i2c_generics.use_dma[port-1] = cfg->usedma;        
+        s_stm32i2c_generics.use_dma[port] = cfg->usedma;        
     }
     else
     {
-        s_stm32i2c_generics.use_dma[port-1] = 0;
+        s_stm32i2c_generics.use_dma[port] = 0;
     }
 
 #else
-    s_stm32i2c_generics.use_dma[port-1] = 0;
+    s_stm32i2c_generics.use_dma[port] = 0;
 #endif
     
     // init dma if needed
-    if(1 == s_stm32i2c_generics.use_dma[port-1])
+    if(1 == s_stm32i2c_generics.use_dma[port])
     {
         s_stm32i2c_dma_init();
         s_stm32i2c_dma_i2c_enable();
@@ -508,12 +508,12 @@ extern stm32i2c_result_t stm32i2c_init(uint8_t port, const stm32i2c_cfg_t *cfg)
     
     if(stm32i2c_res_NOK == res)
     {
-        s_stm32i2c_generics.initted[port-1]  = 0;
+        s_stm32i2c_generics.initted[port]  = 0;
         return(stm32i2c_res_NOK);
     }
     else
     {
-        s_stm32i2c_generics.initted[port-1]  = 1;   
+        s_stm32i2c_generics.initted[port]  = 1;   
     }        
         
     return(stm32i2c_res_OK);
@@ -522,7 +522,7 @@ extern stm32i2c_result_t stm32i2c_init(uint8_t port, const stm32i2c_cfg_t *cfg)
 
 extern stm32i2c_result_t stm32i2c_deinit(uint8_t port, const stm32i2c_cfg_t *cfg)
 {
-    if((0 == port) || (port > s_stm32i2c_maxports) || (NULL == cfg))
+    if((port >= s_stm32i2c_maxports) || (NULL == cfg))
     {
         return(stm32i2c_res_NOK);
     }
@@ -540,21 +540,21 @@ extern stm32i2c_result_t stm32i2c_deinit(uint8_t port, const stm32i2c_cfg_t *cfg
 
 
     // init some data
-    s_stm32i2c_generics.i2cx                         = (I2C_TypeDef*)s_stm32i2c_i2cx_port[port-1];
-    s_stm32i2c_generics.i2cx_cfg.clock               = s_stm32i2c_i2cx_clock[port-1];
-    s_stm32i2c_generics.i2cx_cfg.gpio_remap          = s_stm32i2c_i2cx_gpio_remap[port-1];
-    s_stm32i2c_generics.i2cx_cfg.gpio_remap_clock    = s_stm32i2c_i2cx_gpio_remap_clock[port-1];
+    s_stm32i2c_generics.i2cx                         = (I2C_TypeDef*)s_stm32i2c_i2cx_port[port];
+    s_stm32i2c_generics.i2cx_cfg.clock               = s_stm32i2c_i2cx_clock[port];
+    s_stm32i2c_generics.i2cx_cfg.gpio_remap          = s_stm32i2c_i2cx_gpio_remap[port];
+    s_stm32i2c_generics.i2cx_cfg.gpio_remap_clock    = s_stm32i2c_i2cx_gpio_remap_clock[port];
     
     s_stm32i2c_i2c_common_deinit(cfg);
 
-    if(1 == s_stm32i2c_generics.use_dma[port-1])
+    if(1 == s_stm32i2c_generics.use_dma[port])
     {
         s_stm32i2c_dma_deinit();        
         s_stm32i2c_dma_i2c_disable();    
-        s_stm32i2c_generics.use_dma[port-1] = 0;
+        s_stm32i2c_generics.use_dma[port] = 0;
     }
     
-    s_stm32i2c_generics.initted[port-1]  = 0;
+    s_stm32i2c_generics.initted[port]  = 0;
     
     return(stm32i2c_res_OK);
 }
@@ -566,7 +566,7 @@ extern stm32i2c_result_t stm32i2c_read(uint8_t port, uint8_t devaddr, stm32i2c_r
     stm32i2c_result_t res = stm32i2c_res_NOK;
     uint8_t reg1byteadr = 0;
 
-    if((0 == port) || (port > s_stm32i2c_maxports))
+    if((port >= s_stm32i2c_maxports))
     {
         return(stm32i2c_res_NOK);
     }
@@ -578,15 +578,15 @@ extern stm32i2c_result_t stm32i2c_read(uint8_t port, uint8_t devaddr, stm32i2c_r
     } 
 
     
-    I2C_TypeDef* i2cx = s_stm32i2c_i2cx_port[port-1];
-    uint8_t usedma = s_stm32i2c_generics.use_dma[port-1];
+    I2C_TypeDef* i2cx = s_stm32i2c_i2cx_port[port];
+    uint8_t usedma = s_stm32i2c_generics.use_dma[port];
     
     
     // wait until the bus is not busy anymore 
     s_stm32i2c_generics.timeout = stm32i2c_hid_timeout_long;
     while(I2C_GetFlagStatus(i2cx, I2C_FLAG_BUSY))
     {
-        if(0 == (s_stm32i2c_generics.timeout--)) return s_stm32i2c_timeoutexpired();
+        if(0 == (s_stm32i2c_generics.timeout--)) return s_i2c4hal_timeoutexpired();
     }
     
     // send START condition
@@ -596,7 +596,7 @@ extern stm32i2c_result_t stm32i2c_read(uint8_t port, uint8_t devaddr, stm32i2c_r
     s_stm32i2c_generics.timeout = stm32i2c_hid_timeout_flag;
     while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_MODE_SELECT))
     {
-        if(0 == (s_stm32i2c_generics.timeout--)) return s_stm32i2c_timeoutexpired();
+        if(0 == (s_stm32i2c_generics.timeout--)) return s_i2c4hal_timeoutexpired();
     }
     
     // send address of device
@@ -606,7 +606,7 @@ extern stm32i2c_result_t stm32i2c_read(uint8_t port, uint8_t devaddr, stm32i2c_r
     s_stm32i2c_generics.timeout = stm32i2c_hid_timeout_flag;
     while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))
     {
-        if(0 == (s_stm32i2c_generics.timeout--)) return s_stm32i2c_timeoutexpired();
+        if(0 == (s_stm32i2c_generics.timeout--)) return s_i2c4hal_timeoutexpired();
     }
     
     
@@ -619,7 +619,7 @@ extern stm32i2c_result_t stm32i2c_read(uint8_t port, uint8_t devaddr, stm32i2c_r
         s_stm32i2c_generics.timeout = stm32i2c_hid_timeout_flag;
         while(I2C_GetFlagStatus(i2cx, I2C_FLAG_BTF) == RESET)
         {
-            if(0 == (s_stm32i2c_generics.timeout--)) return s_stm32i2c_timeoutexpired();
+            if(0 == (s_stm32i2c_generics.timeout--)) return s_i2c4hal_timeoutexpired();
         }               
     }
     else if(2 == regaddr.numofbytes)
@@ -630,7 +630,7 @@ extern stm32i2c_result_t stm32i2c_read(uint8_t port, uint8_t devaddr, stm32i2c_r
         s_stm32i2c_generics.timeout = stm32i2c_hid_timeout_flag;
         while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
         {
-            if(0 == (s_stm32i2c_generics.timeout--)) return s_stm32i2c_timeoutexpired();
+            if(0 == (s_stm32i2c_generics.timeout--)) return s_i2c4hal_timeoutexpired();
         }  
         
         reg1byteadr = regaddr.bytes.two & 0x00FF;               // then lsb
@@ -639,7 +639,7 @@ extern stm32i2c_result_t stm32i2c_read(uint8_t port, uint8_t devaddr, stm32i2c_r
         s_stm32i2c_generics.timeout = stm32i2c_hid_timeout_flag;
         while(I2C_GetFlagStatus(i2cx, I2C_FLAG_BTF) == RESET)
         {
-            if(0 == (s_stm32i2c_generics.timeout--)) return s_stm32i2c_timeoutexpired();
+            if(0 == (s_stm32i2c_generics.timeout--)) return s_i2c4hal_timeoutexpired();
         }               
     }
     
@@ -650,7 +650,7 @@ extern stm32i2c_result_t stm32i2c_read(uint8_t port, uint8_t devaddr, stm32i2c_r
     s_stm32i2c_generics.timeout = stm32i2c_hid_timeout_flag;
     while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_MODE_SELECT))
     {
-        if(0 == (s_stm32i2c_generics.timeout--)) return s_stm32i2c_timeoutexpired();
+        if(0 == (s_stm32i2c_generics.timeout--)) return s_i2c4hal_timeoutexpired();
     }
 
    
@@ -665,7 +665,7 @@ extern stm32i2c_result_t stm32i2c_read(uint8_t port, uint8_t devaddr, stm32i2c_r
     s_stm32i2c_generics.timeout = stm32i2c_hid_timeout_flag;
     while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED))
     {
-        if(0 == (s_stm32i2c_generics.timeout--)) return s_stm32i2c_timeoutexpired();
+        if(0 == (s_stm32i2c_generics.timeout--)) return s_i2c4hal_timeoutexpired();
     }
   
     
@@ -695,7 +695,7 @@ extern stm32i2c_result_t stm32i2c_write(uint8_t port, uint8_t devaddr, stm32i2c_
     stm32i2c_result_t res = stm32i2c_res_NOK;
     uint8_t reg1byteadr = 0;
 
-    if((0 == port) || (port > s_stm32i2c_maxports))
+    if((port >= s_stm32i2c_maxports))
     {
         return(stm32i2c_res_NOK);
     }
@@ -707,8 +707,8 @@ extern stm32i2c_result_t stm32i2c_write(uint8_t port, uint8_t devaddr, stm32i2c_
     } 
 
     
-    I2C_TypeDef* i2cx = s_stm32i2c_i2cx_port[port-1];
-    uint8_t usedma = s_stm32i2c_generics.use_dma[port-1];
+    I2C_TypeDef* i2cx = s_stm32i2c_i2cx_port[port];
+    uint8_t usedma = s_stm32i2c_generics.use_dma[port];
 
        
  ///////////////////////////////////////   
@@ -719,7 +719,7 @@ extern stm32i2c_result_t stm32i2c_write(uint8_t port, uint8_t devaddr, stm32i2c_
     s_stm32i2c_generics.timeout = stm32i2c_hid_timeout_long;
     while(I2C_GetFlagStatus(i2cx, I2C_FLAG_BUSY))
     {
-        if(0 == (s_stm32i2c_generics.timeout--)) return s_stm32i2c_timeoutexpired();
+        if(0 == (s_stm32i2c_generics.timeout--)) return s_i2c4hal_timeoutexpired();
     }
 
     // send START condition
@@ -729,7 +729,7 @@ extern stm32i2c_result_t stm32i2c_write(uint8_t port, uint8_t devaddr, stm32i2c_
     s_stm32i2c_generics.timeout = stm32i2c_hid_timeout_flag;
     while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_MODE_SELECT))
     {
-        if(0 == (s_stm32i2c_generics.timeout--)) return s_stm32i2c_timeoutexpired();
+        if(0 == (s_stm32i2c_generics.timeout--)) return s_i2c4hal_timeoutexpired();
     } 
 
     // send address of device
@@ -739,7 +739,7 @@ extern stm32i2c_result_t stm32i2c_write(uint8_t port, uint8_t devaddr, stm32i2c_
     s_stm32i2c_generics.timeout = stm32i2c_hid_timeout_flag;
     while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))
     {
-        if(0 == (s_stm32i2c_generics.timeout--)) return s_stm32i2c_timeoutexpired();
+        if(0 == (s_stm32i2c_generics.timeout--)) return s_i2c4hal_timeoutexpired();
     }    
 
     // send address of register inside the device
@@ -752,7 +752,7 @@ extern stm32i2c_result_t stm32i2c_write(uint8_t port, uint8_t devaddr, stm32i2c_
         s_stm32i2c_generics.timeout = stm32i2c_hid_timeout_flag;
         while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
         {
-            if(0 == (s_stm32i2c_generics.timeout--)) return s_stm32i2c_timeoutexpired();
+            if(0 == (s_stm32i2c_generics.timeout--)) return s_i2c4hal_timeoutexpired();
         } 
     }
     else if(2 == regaddr.numofbytes)
@@ -764,7 +764,7 @@ extern stm32i2c_result_t stm32i2c_write(uint8_t port, uint8_t devaddr, stm32i2c_
         s_stm32i2c_generics.timeout = stm32i2c_hid_timeout_flag;
         while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
         {
-            if(0 == (s_stm32i2c_generics.timeout--)) return s_stm32i2c_timeoutexpired();
+            if(0 == (s_stm32i2c_generics.timeout--)) return s_i2c4hal_timeoutexpired();
         }  
 
         reg1byteadr = regaddr.bytes.two & 0x00FF;           // then lsb
@@ -774,7 +774,7 @@ extern stm32i2c_result_t stm32i2c_write(uint8_t port, uint8_t devaddr, stm32i2c_
         s_stm32i2c_generics.timeout = stm32i2c_hid_timeout_flag;
         while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
         {
-            if(0 == (s_stm32i2c_generics.timeout--)) return s_stm32i2c_timeoutexpired();
+            if(0 == (s_stm32i2c_generics.timeout--)) return s_i2c4hal_timeoutexpired();
         }           
     }
     
@@ -811,14 +811,14 @@ extern stm32i2c_result_t stm32i2c_standby(uint8_t port, uint8_t devaddr)
     volatile uint16_t tmpSR1 = 0;
     volatile uint32_t trials = 0;
     
-    I2C_TypeDef* i2cx = s_stm32i2c_i2cx_port[port-1];
+    I2C_TypeDef* i2cx = s_stm32i2c_i2cx_port[port];
     
  
     // While the bus is busy 
     s_stm32i2c_generics.timeout = stm32i2c_hid_timeout_long;
     while(I2C_GetFlagStatus(i2cx, I2C_FLAG_BUSY))
     {
-        if(0 == (s_stm32i2c_generics.timeout--)) return s_stm32i2c_timeoutexpired();
+        if(0 == (s_stm32i2c_generics.timeout--)) return s_i2c4hal_timeoutexpired();
     }
 
     /*  Keep looping till the slave acknowledge his address or maximum number 
@@ -833,7 +833,7 @@ extern stm32i2c_result_t stm32i2c_standby(uint8_t port, uint8_t devaddr)
         s_stm32i2c_generics.timeout = stm32i2c_hid_timeout_flag;
         while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_MODE_SELECT))
         {
-            if(0 == (s_stm32i2c_generics.timeout--)) return s_stm32i2c_timeoutexpired();
+            if(0 == (s_stm32i2c_generics.timeout--)) return s_i2c4hal_timeoutexpired();
         }    
 
         /*!< Send EEPROM address for write */
@@ -847,7 +847,7 @@ extern stm32i2c_result_t stm32i2c_standby(uint8_t port, uint8_t devaddr)
             tmpSR1 = (i2cx)->SR1;
 
             /* Update the timeout value and exit if it reach 0 */
-            if(0 == (s_stm32i2c_generics.timeout--)) return s_stm32i2c_timeoutexpired();
+            if(0 == (s_stm32i2c_generics.timeout--)) return s_i2c4hal_timeoutexpired();
         }
         /* Keep looping till the Address is acknowledged or the AF (ack failure) flag is 
         set (address not acknowledged at time) */
@@ -876,7 +876,7 @@ extern stm32i2c_result_t stm32i2c_standby(uint8_t port, uint8_t devaddr)
         if (stm32i2c_hid_ackaddress_maxtrials == trials++)
         {
             /* If the maximum number of trials has been reached, exit the function */
-            return s_stm32i2c_timeoutexpired();
+            return s_i2c4hal_timeoutexpired();
         }
     }
 }
@@ -914,7 +914,7 @@ void stm32i2c_hid_dma_I2C_DMA_TX_IRQHandler(void)
         timeout   =   stm32i2c_hid_timeout_long; // timeout must be local
         while(!I2C_GetFlagStatus(s_stm32i2c_generics.i2cx, I2C_FLAG_BTF))
         {
-            if(0 == (timeout--)) s_stm32i2c_timeoutexpired();
+            if(0 == (timeout--)) s_i2c4hal_timeoutexpired();
         }
     
         /*!< Send STOP condition */
@@ -968,7 +968,7 @@ void stm32i2c_hid_dma_I2C_DMA_TX_IRQHandler(void)
         timeout   =   stm32i2c_hid_timeout_long; // timeout must be local
         while(!I2C_GetFlagStatus(s_stm32i2c_generics.i2cx, I2C_FLAG_BTF))
         {
-            if(0 == (timeout--)) s_stm32i2c_timeoutexpired();
+            if(0 == (timeout--)) s_i2c4hal_timeoutexpired();
         }
     
         /*!< Send STOP condition */
@@ -1318,7 +1318,7 @@ static void s_stm32i2c_dma_config_rx(uint32_t pBuffer, uint32_t BufferSize)
 
 // --- dma support: end
 
-static stm32i2c_result_t s_stm32i2c_timeoutexpired(void)
+static stm32i2c_result_t s_i2c4hal_timeoutexpired(void)
 {
      if(NULL != s_stm32i2c_generics.cfg.ontimeout)
      {
@@ -1356,7 +1356,7 @@ static void s_stm32i2c_read_bytes(I2C_TypeDef* i2cx, uint8_t* data, uint16_t siz
         s_stm32i2c_generics.timeout = stm32i2c_hid_timeout_flag;
         while(I2C_GetFlagStatus(i2cx, I2C_FLAG_RXNE) == RESET)
         {                    
-            if(0 == (s_stm32i2c_generics.timeout--)) {s_stm32i2c_timeoutexpired(); return;}
+            if(0 == (s_stm32i2c_generics.timeout--)) {s_i2c4hal_timeoutexpired(); return;}
         }
         
         // read received byte
@@ -1371,7 +1371,7 @@ static void s_stm32i2c_read_bytes(I2C_TypeDef* i2cx, uint8_t* data, uint16_t siz
     s_stm32i2c_generics.timeout = stm32i2c_hid_timeout_flag;
     while((i2cx)->CR1 & I2C_CR1_STOP)
     {
-        if(0 == (s_stm32i2c_generics.timeout--)) {s_stm32i2c_timeoutexpired(); return;}
+        if(0 == (s_stm32i2c_generics.timeout--)) {s_i2c4hal_timeoutexpired(); return;}
     }  
 
     // re-enable acknowledgement to be ready for another reception 
@@ -1396,7 +1396,7 @@ static void s_stm32i2c_read_withdma(I2C_TypeDef* i2cx, uint8_t* data, uint16_t s
     s_stm32i2c_generics.timeout = stm32i2c_hid_timeout_long;
     while ((s_stm32i2c_generics.bytes2read) > 0)
     {
-        if(0 == (s_stm32i2c_generics.timeout--)) {s_stm32i2c_timeoutexpired(); return;}
+        if(0 == (s_stm32i2c_generics.timeout--)) {s_i2c4hal_timeoutexpired(); return;}
     }
     
 }
@@ -1416,7 +1416,7 @@ static void s_stm32i2c_write_bytes(I2C_TypeDef* i2cx, uint8_t* data, uint16_t si
         s_stm32i2c_generics.timeout = stm32i2c_hid_timeout_flag;
         while(!I2C_CheckEvent(i2cx, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
         {
-            if(0 == (s_stm32i2c_generics.timeout--)) {s_stm32i2c_timeoutexpired(); return;}
+            if(0 == (s_stm32i2c_generics.timeout--)) {s_i2c4hal_timeoutexpired(); return;}
         }
     
     }

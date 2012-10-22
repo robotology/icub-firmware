@@ -101,7 +101,7 @@ typedef struct
 
 //extern const stm32i2c_cfg_t stm32i2c_cfg_default;   // = { .device = stm32i2c_device_st_m24lr64, .i2cbus = 0, .functioni2cinit = NULL, .parameteri2cinit = NULL, .functioni2cdeinit = NULL };
 
-// port is 1, 2, 3
+// port is 0, 1, 2
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
