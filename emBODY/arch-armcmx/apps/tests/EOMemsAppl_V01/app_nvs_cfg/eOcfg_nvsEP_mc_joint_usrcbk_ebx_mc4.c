@@ -532,7 +532,13 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
             
         case eomc_calibration_type1_abs_sens_analog:
         {
-            iCubCanProtCalibrator.params.type1.position = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, calibrator->params.type1.position);
+            eOicubCanProto_position_t pos = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, calibrator->params.type1.position);
+            /*sice pos param is a word of 16 bits i must check min and max*/
+            if((pos < INT16_MIN)||(pos>INT16_MAX))
+            {
+                return;
+            }
+            iCubCanProtCalibrator.params.type1.position = (eOicubCanProto_position4calib_t)pos; 
             iCubCanProtCalibrator.params.type1.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, calibrator->params.type1.velocity);           
         }break;
 
@@ -544,7 +550,13 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
 
         case eomc_calibration_type3_abs_sens_digital:
         {
-            iCubCanProtCalibrator.params.type3.position = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, calibrator->params.type3.position);
+             eOicubCanProto_position_t pos = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, calibrator->params.type3.position);
+            /*sice pos param is a word of 16 bits i must check min and max*/
+            if((pos < INT16_MIN)||(pos>INT16_MAX))
+            {
+                return;
+            }
+            iCubCanProtCalibrator.params.type1.position = (eOicubCanProto_position4calib_t)pos; 
             iCubCanProtCalibrator.params.type3.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, calibrator->params.type3.velocity);           
             iCubCanProtCalibrator.params.type3.offset = calibrator->params.type3.offset;
         }break;
@@ -558,8 +570,8 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
                 return;
                 #warning VALE --> how to manage this error???
             }
-            iCubCanProtCalibrator.params.type4.position = pos;
-            iCubCanProtCalibrator.params.type4.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, calibrator->params.type4.velocity);           
+            iCubCanProtCalibrator.params.type4.position = (eOicubCanProto_position4calib_t)pos; 
+            iCubCanProtCalibrator.params.type4.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, calibrator->params.type4.velocity);            
             iCubCanProtCalibrator.params.type4.maxencoder = calibrator->params.type4.maxencoder;
         }break;
         
@@ -603,11 +615,11 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
         return;
     }
 
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, controlmode_ptr);
-
     //set destination of all messages 
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
+    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, controlmode_ptr);
 
     if(eomc_controlmode_idle == *controlmode_ptr)
     {
