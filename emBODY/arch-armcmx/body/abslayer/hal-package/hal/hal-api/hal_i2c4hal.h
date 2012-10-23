@@ -29,7 +29,7 @@
     @date       09/09/2011
 **/
 
-/** @defgroup arm_hal_i2c_4eeprom HAL I2C4HAL
+/** @defgroup arm_hal_i2c4hal HAL I2C4HAL
 
     The HAL I2C is so far just used for the EEPROM thus is incomplete and incoherent. SO ... DONT USE IT!
     In teh future this .h file may become the interface to a i2c module
@@ -53,24 +53,24 @@
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
-/** @typedef    typedef enum hal_i2c_port_t 
-    @brief      hal_i2c_port_t contains the possible I2C ports 
+/** @typedef    typedef enum hal_i2c4hal_port_t 
+    @brief      hal_i2c4hal_port_t contains the possible I2C ports 
  **/
 typedef enum
 {
-    hal_i2c_port1 = 0,
-    hal_i2c_port2 = 1,
-    hal_i2c_port3 = 2
-} hal_i2c_port_t;
+    hal_i2c4hal_port1 = 0,
+    hal_i2c4hal_port2 = 1,
+    hal_i2c4hal_port3 = 2
+} hal_i2c4hal_port_t;
 
-enum { hal_i2c_ports_number = 3 };
+enum { hal_i2c4hal_ports_number = 3 };
 
 typedef enum
 {
-    hal_i2c_speed_100kbps       = 1,
-    hal_i2c_speed_200kbps       = 2,
-    hal_i2c_speed_400kbps       = 4
-} hal_i2c_speed_t;
+    hal_i2c4hal_speed_100kbps       = 1,
+    hal_i2c4hal_speed_200kbps       = 2,
+    hal_i2c4hal_speed_400kbps       = 4
+} hal_i2c4hal_speed_t;
 
 
 typedef struct 
@@ -82,42 +82,42 @@ typedef struct
         uint16_t    two;
         uint8_t     one;
     } bytes;
-} hal_i2c_regaddr_t;
+} hal_i2c4hal_regaddr_t;
 
 
-/** @typedef    typedef enum hal_i2c_cfg_t 
-    @brief      hal_i2c_cfg_t contains the configuation for i2c
+/** @typedef    typedef enum hal_i2c4hal_cfg_t 
+    @brief      hal_i2c4hal_cfg_t contains the configuation for i2c
  **/
 typedef struct
 {
-   hal_i2c_speed_t          speed;  
+   hal_i2c4hal_speed_t          speed;  
    hal_bool_t               usedma;   // not supported yet 
-} hal_i2c_cfg_t;
+} hal_i2c4hal_cfg_t;
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const hal_i2c_cfg_t hal_i2c_cfg_default; // = { speed = hal_i2c_speed_400kbps, .usedma = hal_false };
+extern const hal_i2c4hal_cfg_t hal_i2c4hal_cfg_default; // = { speed = hal_i2c4hal_speed_400kbps, .usedma = hal_false };
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-/** @fn			extern hal_result_t hal_i2c_init(hal_i2c_port_t port, const hal_i2c_cfg_t *cfg)
+/** @fn			extern hal_result_t hal_i2c4hal_init(hal_i2c4hal_port_t port, const hal_i2c4hal_cfg_t *cfg)
   * @brief  	This function initializes i2c interface
   * @param  	i2cx	        I2C port
   * @param  	cfg 	        pointer to configuration data
   * @return 	hal_res_NOK_generic on error else hal_res_OK
   * @warning    this function is used just for ... the eeprom ... thus shoudl not be used by the user
   */
-extern hal_result_t hal_i2c4hal_init(hal_i2c_port_t port, const hal_i2c_cfg_t *cfg);
+extern hal_result_t hal_i2c4hal_init(hal_i2c4hal_port_t port, const hal_i2c4hal_cfg_t *cfg);
 
-extern hal_result_t hal_i2c4hal_read(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size);
+extern hal_result_t hal_i2c4hal_read(hal_i2c4hal_port_t port, uint8_t devaddr, hal_i2c4hal_regaddr_t regaddr, uint8_t* data, uint16_t size);
 
-extern hal_result_t hal_i2c4hal_write(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size);
+extern hal_result_t hal_i2c4hal_write(hal_i2c4hal_port_t port, uint8_t devaddr, hal_i2c4hal_regaddr_t regaddr, uint8_t* data, uint16_t size);
 
 
 /** @}            
-    end of group arm_hal_i2c_4eeprom  
+    end of group arm_hal_i2c4hal
  **/
 
 #endif  // include-guard
