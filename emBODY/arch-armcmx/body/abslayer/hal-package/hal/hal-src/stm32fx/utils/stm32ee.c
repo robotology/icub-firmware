@@ -36,7 +36,7 @@
 #include "string.h"
 #include "hal_stm32xx_include.h"
 
-#include "stm32gpio_hid.h"
+//#include "stm32gpio_hid.h"
 
 //#include "hal_brdcfg.h"
  
@@ -70,14 +70,15 @@ extern const stm32ee_cfg_t stm32_cfg_default =
     .devcfg                 =
     {
         .device                 = stm32ee_device_st_m24lr64, 
-        .i2cport                = 1,  
-        .hwaddra2a1a0           = (0 << 2) | (0 << 1) | (0 << 0),
-        .wpval                  = stm32gpio_valNONE,
-        .wppin                  =
-        {
-            .port                   = stm32gpio_portNONE,
-            .pin                    = stm32gpio_pinNONE        
-        }          
+        .i2cport                = 0,  
+        .hwaddra2a1a0           = (0 << 2) | (0 << 1) | (0 << 0)
+//        ,
+//        .wpval                  = stm32gpio_valNONE,
+//        .wppin                  =
+//        {
+//            .port                   = stm32gpio_portNONE,
+//            .pin                    = stm32gpio_pinNONE        
+//        }          
     },
 
     .i2cext                 =
@@ -106,7 +107,7 @@ typedef struct
     uint16_t                    pagesize;
     uint32_t                    totalsize;
     stm32ee_cfg_t               cfg;
-    I2C_TypeDef*                i2cx;
+//    I2C_TypeDef*                i2cx;
     volatile uint16_t           numberofbyte2writeinpage;
     volatile uint32_t           timeout;
 } stm32ee_generic_container_t;
@@ -117,11 +118,18 @@ typedef struct
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+#warning --> u may take out the wp initialisation and use three (or four) function pointers ...
 
-static stm32ee_result_t s_stm32ee_wp_init(const stm32ee_dev_cfg_t *devcfg);
-static stm32ee_result_t s_stm32ee_wp_deinit(const stm32ee_dev_cfg_t *devcfg);
-static stm32ee_result_t s_stm32ee_wp_enable(const stm32ee_dev_cfg_t *devcfg);
-static stm32ee_result_t s_stm32ee_wp_disable(const stm32ee_dev_cfg_t *devcfg);
+static stm32ee_result_t s_stm32ee_wpext_init(void);
+static stm32ee_result_t s_stm32ee_wpext_deinit(void);
+static stm32ee_result_t s_stm32ee_wpext_enable(void);
+static stm32ee_result_t s_stm32ee_wpext_disable(void);
+
+
+//static stm32ee_result_t s_stm32ee_wp_init(const stm32ee_dev_cfg_t *devcfg);
+//static stm32ee_result_t s_stm32ee_wp_deinit(const stm32ee_dev_cfg_t *devcfg);
+//static stm32ee_result_t s_stm32ee_wp_enable(const stm32ee_dev_cfg_t *devcfg);
+//static stm32ee_result_t s_stm32ee_wp_disable(const stm32ee_dev_cfg_t *devcfg);
 
 
 
@@ -159,14 +167,15 @@ static stm32ee_generic_container_t s_stm32ee_generics =
         .devcfg                 =
         {
             .device                 = stm32ee_device_none, 
-            .i2cport                = 1, 
-            .hwaddra2a1a0           = (0 << 2) | (0 << 1) | (0 << 0),
-            .wpval                  = stm32gpio_valNONE,            
-            .wppin                  =
-            {
-                .port                   = stm32gpio_portNONE,
-                .pin                    = stm32gpio_pinNONE        
-            }          
+            .i2cport                = 0, 
+            .hwaddra2a1a0           = (0 << 2) | (0 << 1) | (0 << 0)
+//            ,
+//            .wpval                  = stm32gpio_valNONE,            
+//            .wppin                  =
+//            {
+//                .port                   = stm32gpio_portNONE,
+//                .pin                    = stm32gpio_pinNONE        
+//            }          
         },
         .i2cext                         =
         {
@@ -176,9 +185,16 @@ static stm32ee_generic_container_t s_stm32ee_generics =
             .i2cread                = NULL,
             .i2cwrite               = NULL,
             .i2cstandby             = NULL
-        }      
+        },
+        .wpext                          =
+        {
+            .wpinit                 = NULL,
+            .wpdeinit               = NULL,
+            .wpenable               = NULL,
+            .wpdisable              = NULL
+        },    
     },
-    .i2cx                       = NULL,
+//    .i2cx                       = NULL,
     .numberofbyte2writeinpage   = 0,
     .timeout                    = 0
 };
@@ -188,7 +204,6 @@ static stm32ee_generic_container_t s_stm32ee_generics =
 
 #if     defined(USE_STM32F1)
 
-static I2C_TypeDef * const      s_stm32ee_i2cx_port[3]      = {I2C1, I2C2, NULL};
                                                                
 static const GPIO_InitTypeDef  s_stm32ee_gpio_wp_pin  =
 {
@@ -205,8 +220,6 @@ static const GPIO_InitTypeDef  s_stm32ee_gpio_wp_floatpin  =
 };                                                                 
     
 #elif   defined(USE_STM32F4)
-
-static I2C_TypeDef * const      s_stm32ee_i2cx_port[3]      = {I2C1, I2C2, I2C3};
 
 static const GPIO_InitTypeDef  s_stm32ee_gpio_wp_pin  =
 {
@@ -245,10 +258,11 @@ extern stm32ee_result_t stm32ee_init(const stm32ee_cfg_t *cfg)
         return(stm32ee_res_NOK);
     }
     
-    if((0 == cfg->devcfg.i2cport) || (cfg->devcfg.i2cport > 3))
-    {
-        return(stm32ee_res_NOK);
-    }
+ 
+   if(cfg->devcfg.i2cport > 4)
+   {
+       return(stm32ee_res_NOK);
+   }
     
      
     // do other controls over cfg ....
@@ -257,16 +271,8 @@ extern stm32ee_result_t stm32ee_init(const stm32ee_cfg_t *cfg)
     // ok, cfg is good. i copy it into ...
     
     memcpy(&s_stm32ee_generics.cfg, cfg, sizeof(stm32ee_cfg_t));
-    
-    
-    // init some data
-    s_stm32ee_generics.i2cx                         = (I2C_TypeDef*)s_stm32ee_i2cx_port[s_stm32ee_generics.cfg.devcfg.i2cport-1];
-    
-    if(NULL == s_stm32ee_generics.i2cx)
-    {   // not supported ... this i2cport.
-        return(stm32ee_res_NOK);
-    }
-    
+
+ 
     // init the generics according to the device
     
     switch(s_stm32ee_generics.cfg.devcfg.device)
@@ -317,12 +323,15 @@ extern stm32ee_result_t stm32ee_init(const stm32ee_cfg_t *cfg)
     // apply extra bits
     s_stm32ee_generics.hwaddress |= ((s_stm32ee_generics.cfg.devcfg.hwaddra2a1a0 & 0x07) << 1);
     
-    // init wp if needed
-    if((stm32gpio_portNONE != s_stm32ee_generics.cfg.devcfg.wppin.port) && (stm32gpio_pinNONE != s_stm32ee_generics.cfg.devcfg.wppin.pin) && ((stm32gpio_valNONE != s_stm32ee_generics.cfg.devcfg.wpval)))
-    {
-        s_stm32ee_wp_init(&s_stm32ee_generics.cfg.devcfg);
-        s_stm32ee_wp_enable(&s_stm32ee_generics.cfg.devcfg);    
-    }
+   
+    s_stm32ee_wpext_init();
+    s_stm32ee_wpext_enable();
+//    // init wp if needed
+//    if((stm32gpio_portNONE != s_stm32ee_generics.cfg.devcfg.wppin.port) && (stm32gpio_pinNONE != s_stm32ee_generics.cfg.devcfg.wppin.pin) && ((stm32gpio_valNONE != s_stm32ee_generics.cfg.devcfg.wpval)))
+//    {
+//        s_stm32ee_wp_init(&s_stm32ee_generics.cfg.devcfg);
+//        s_stm32ee_wp_enable(&s_stm32ee_generics.cfg.devcfg);    
+//    }
     
     
     // init i2c 
@@ -360,10 +369,10 @@ extern stm32ee_result_t stm32ee_deinit(const stm32ee_cfg_t *cfg)
         cfg = &stm32_cfg_default;
     }
 
-    if((0 == cfg->devcfg.i2cport) || (cfg->devcfg.i2cport > 3))
-    {
-        return(stm32ee_res_NOK);
-    }
+   if(cfg->devcfg.i2cport > 4)
+   {
+       return(stm32ee_res_NOK);
+   }
     
     
     if((NULL == cfg->i2cext.i2cdeinit))
@@ -376,11 +385,13 @@ extern stm32ee_result_t stm32ee_deinit(const stm32ee_cfg_t *cfg)
     {
         return(stm32ee_res_NOK);
     }
+    
+    s_stm32ee_wpext_deinit();
        
-    if((stm32gpio_portNONE != cfg->devcfg.wppin.port) && (stm32gpio_pinNONE != cfg->devcfg.wppin.pin) && ((stm32gpio_valNONE != cfg->devcfg.wpval)))
-    {
-        s_stm32ee_wp_deinit(&cfg->devcfg);  
-    } 
+//    if((stm32gpio_portNONE != cfg->devcfg.wppin.port) && (stm32gpio_pinNONE != cfg->devcfg.wppin.pin) && ((stm32gpio_valNONE != cfg->devcfg.wpval)))
+//    {
+//        s_stm32ee_wp_deinit(&cfg->devcfg);  
+//    } 
 
     s_stm32ee_generics.initted  = 0;     
     
@@ -439,15 +450,15 @@ extern stm32ee_result_t stm32ee_write(uint32_t address, uint32_t size, uint8_t* 
         return(stm32ee_res_NOK);
     } 
     
-    
-    s_stm32ee_wp_disable(&s_stm32ee_generics.cfg.devcfg);
+    s_stm32ee_wpext_disable();
+    //s_stm32ee_wp_disable(&s_stm32ee_generics.cfg.devcfg);
 
     uint16_t WriteAddr = (uint16_t) address;
     uint16_t NumByteToWrite = (uint16_t) size;
     res = s_stm32ee_writebuffer(buffer, WriteAddr, NumByteToWrite);
     
-    
-    s_stm32ee_wp_enable(&s_stm32ee_generics.cfg.devcfg);
+    s_stm32ee_wpext_enable();
+    //s_stm32ee_wp_enable(&s_stm32ee_generics.cfg.devcfg);
 
     if(NULL != writtenbytes)
     {
@@ -488,6 +499,47 @@ extern stm32ee_result_t stm32ee_write(uint32_t address, uint32_t size, uint8_t* 
 
 // -- functions which manage write protection
 
+static stm32ee_result_t s_stm32ee_wpext_init(void)
+{
+    stm32ee_result_t res = stm32ee_res_OK;
+    if(NULL != s_stm32ee_generics.cfg.wpext.wpinit)
+    {
+        res = (stm32ee_result_t)s_stm32ee_generics.cfg.wpext.wpinit();
+    }
+    return(res);
+}
+
+static stm32ee_result_t s_stm32ee_wpext_deinit(void)
+{
+    stm32ee_result_t res = stm32ee_res_OK;
+    if(NULL != s_stm32ee_generics.cfg.wpext.wpdeinit)
+    {
+        res = (stm32ee_result_t)s_stm32ee_generics.cfg.wpext.wpdeinit();
+    }
+    return(res);
+}
+
+static stm32ee_result_t s_stm32ee_wpext_enable(void)
+{
+    stm32ee_result_t res = stm32ee_res_OK;
+    if(NULL != s_stm32ee_generics.cfg.wpext.wpenable)
+    {
+        res = (stm32ee_result_t)s_stm32ee_generics.cfg.wpext.wpenable();
+    }
+    return(res);
+}
+
+static stm32ee_result_t s_stm32ee_wpext_disable(void)
+{
+    stm32ee_result_t res = stm32ee_res_OK;
+    if(NULL != s_stm32ee_generics.cfg.wpext.wpdisable)
+    {
+        res = (stm32ee_result_t)s_stm32ee_generics.cfg.wpext.wpdisable();
+    }
+    return(res);
+}
+
+#if 0
 static stm32ee_result_t s_stm32ee_wp_init(const stm32ee_dev_cfg_t *devcfg)
 {
     // configure as a output low speed.
@@ -547,7 +599,7 @@ static stm32ee_result_t s_stm32ee_wp_disable(const stm32ee_dev_cfg_t *devcfg)
 
     return(stm32ee_res_OK);
 }
-
+#endif
 
 // --- utility functions
 

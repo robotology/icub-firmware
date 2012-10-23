@@ -45,7 +45,7 @@
 
 #include "stdint.h"
 
-#include "stm32gpio.h"
+//#include "stm32gpio.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -101,6 +101,7 @@ typedef int8_t (*stm32ee_int8_fp_uint8_uint8_regaddr_uint8p_uint16_t) (uint8_t, 
 
 typedef int8_t (*stm32ee_int8_fp_uint8_uint8_t) (uint8_t, uint8_t);
 
+typedef int8_t (*stm32ee_int8_fp_void_t) (void);
 
 typedef struct
 {
@@ -116,12 +117,19 @@ typedef struct
 typedef struct
 {
     stm32ee_device_t        device;
-    uint8_t                 i2cport;            /**< it can be 1, 2, 3. */
+    uint8_t                 i2cport;            /**< it can be 0, 1, 2. */
     uint8_t                 hwaddra2a1a0;       /**< put a 1 in pos 2, 1, 0 if the a2, a1, a0 is high. */
-    stm32gpio_val_t         wpval;              /**< 1 if protection is high, 0, if it is low, 3 if not used */
-    stm32gpio_gpio_t        wppin;
+//    stm32gpio_val_t         wpval;              /**< 1 if protection is high, 0, if it is low, 3 if not used */
+//    stm32gpio_gpio_t        wppin;
 } stm32ee_dev_cfg_t;
 
+typedef struct
+{
+    stm32ee_int8_fp_void_t  wpinit;
+    stm32ee_int8_fp_void_t  wpdeinit;
+    stm32ee_int8_fp_void_t  wpenable;
+    stm32ee_int8_fp_void_t  wpdisable;
+} stm32ee_wp_cfg_t;
 
 /** @typedef    typedef struct stm32ee_cfg_t;
     @brief      contains configuration data of eeprom.
@@ -130,6 +138,7 @@ typedef struct
 {
     stm32ee_dev_cfg_t       devcfg;
     stm32ee_i2c_ext_t       i2cext;
+    stm32ee_wp_cfg_t        wpext;
 } stm32ee_cfg_t;
 
 // remember to implement sw reset as seen in atmel datasheet.
