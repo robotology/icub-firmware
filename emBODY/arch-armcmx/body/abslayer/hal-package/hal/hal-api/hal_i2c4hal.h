@@ -90,12 +90,13 @@ typedef struct
  **/
 typedef struct
 {
-    uint32_t                    dummy;   
+   hal_i2c_speed_t          speed;  
+   hal_bool_t               usedma;   // not supported yet 
 } hal_i2c_cfg_t;
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const hal_i2c_cfg_t hal_i2c_cfg_default; // = { dummy = 0 };
+extern const hal_i2c_cfg_t hal_i2c_cfg_default; // = { speed = hal_i2c_speed_400kbps, .usedma = hal_false };
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
