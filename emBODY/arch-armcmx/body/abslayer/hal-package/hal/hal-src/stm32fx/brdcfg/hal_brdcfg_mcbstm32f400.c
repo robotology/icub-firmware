@@ -95,15 +95,49 @@
 
 #ifdef HAL_USE_CAN
     extern const uint8_t hal_brdcfg_can__supported_mask             = 0x03;
-    #warning --> mettere qui solo i gpio del can1rx, can1tx, can2rx, can2tx ... non tutto il resto
-    extern const uint32_t hal_brdcfg_can__gpio_clock_canx_rx[]      = {RCC_AHB1Periph_GPIOH, RCC_AHB1Periph_GPIOB};
-    extern const uint32_t hal_brdcfg_can__gpio_clock_canx_tx[]      = {RCC_AHB1Periph_GPIOI, RCC_AHB1Periph_GPIOB};
-    extern const uint8_t hal_brdcfg_can__gpio_pinsource_canx_rx[]   = {13, 5};
-    extern const uint8_t hal_brdcfg_can__gpio_pinsource_canx_tx[]   = {9, 13};
-    extern const uint16_t hal_brdcfg_can__gpio_pin_canx_rx[]        = {GPIO_Pin_13, GPIO_Pin_5};
-    extern const uint16_t hal_brdcfg_can__gpio_pin_canx_tx[]        = {GPIO_Pin_9, GPIO_Pin_13};
-    extern GPIO_TypeDef* const hal_brdcfg_can__gpio_port_canx_rx[]  = {GPIOH, GPIOB};
-    extern GPIO_TypeDef* const hal_brdcfg_can__gpio_port_canx_tx[]  = {GPIOI, GPIOB};                
+//     #warning --> mettere qui solo i gpio del can1rx, can1tx, can2rx, can2tx ... non tutto il resto
+//     extern const uint32_t hal_brdcfg_can__gpio_clock_canx_rx[]      = {RCC_AHB1Periph_GPIOH, RCC_AHB1Periph_GPIOB};
+//     extern const uint32_t hal_brdcfg_can__gpio_clock_canx_tx[]      = {RCC_AHB1Periph_GPIOI, RCC_AHB1Periph_GPIOB};
+//     extern const uint8_t hal_brdcfg_can__gpio_pinsource_canx_rx[]   = {13, 5};
+//     extern const uint8_t hal_brdcfg_can__gpio_pinsource_canx_tx[]   = {9, 13};
+//     extern const uint16_t hal_brdcfg_can__gpio_pin_canx_rx[]        = {GPIO_Pin_13, GPIO_Pin_5};
+//     extern const uint16_t hal_brdcfg_can__gpio_pin_canx_tx[]        = {GPIO_Pin_9, GPIO_Pin_13};
+//     extern GPIO_TypeDef* const hal_brdcfg_can__gpio_port_canx_rx[]  = {GPIOH, GPIOB};
+//     extern GPIO_TypeDef* const hal_brdcfg_can__gpio_port_canx_tx[]  = {GPIOI, GPIOB};    
+
+    extern const hal_gpio_cfg_t hal_brdcfg_can__gpio_canx_rx[]      =
+    {
+        {   // can1
+            .port     = hal_gpio_portI, // ems4 -> PD0
+            .pin      = hal_gpio_pin9,        
+            .dir      = hal_gpio_dirALT,
+            .speed    = hal_gpio_speed_default
+        },
+        
+        {   // can2
+            .port     = hal_gpio_portB, // // ems4 -> PB5
+            .pin      = hal_gpio_pin5,        
+            .dir      = hal_gpio_dirALT,
+            .speed    = hal_gpio_speed_default        
+        }
+    };
+    extern const hal_gpio_cfg_t hal_brdcfg_can__gpio_canx_tx[]      =
+    {
+        {   // can1
+            .port     = hal_gpio_portH, // ems4 -> PD1
+            .pin      = hal_gpio_pin13,        
+            .dir      = hal_gpio_dirALT,
+            .speed    = hal_gpio_speed_default
+        },
+        
+        {   // can2
+            .port     = hal_gpio_portB, // ems4 -> PB6
+            .pin      = hal_gpio_pin13,        
+            .dir      = hal_gpio_dirALT,
+            .speed    = hal_gpio_speed_default        
+        }
+    };
+    
 #endif//HAL_USE_CAN
 
 #ifdef HAL_USE_CRC
@@ -130,8 +164,7 @@
     extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_MDC            = { .port = hal_gpio_portC, .pin = hal_gpio_pin1,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max  };
     extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_MDIO           = { .port = hal_gpio_portA, .pin = hal_gpio_pin2,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max  };   
     
-    extern const hal_eth_phymode_t hal_brdcfg_eth__phymode              = hal_eth_phymode_fullduplex100mbps;
-    
+    extern const hal_eth_phymode_t hal_brdcfg_eth__phymode              = hal_eth_phymode_fullduplex100mbps;   
 #endif//HAL_USE_ETH
 
 
@@ -141,36 +174,48 @@
     extern const uint32_t hal_brdcfg_eeprom__emflash_totalsize      = 0;
     extern const uint32_t hal_brdcfg_eeprom__i2c_01_baseaddress     = 0;
     extern const uint32_t hal_brdcfg_eeprom__i2c_01_totalsize       = 8*1024; 
-    extern const stm32ee_cfg_t hal_brdcfg_eeprom__stm32eecfg =
+    extern const hal_eeprom_hw_cfg_t hal_brdcfg_eeprom__i2c_01_device   =
     {
-        .devcfg             =
-        {
-            .device             = stm32ee_device_st_m24lr64,
-            .i2cport            = 1,        // is equivalent to hal_i2c_port1
-            .hwaddra2a1a0       = 0,        // a0 = a1 = a2 = 0
-            .wpval              = stm32gpio_valNONE,      // no write protection
-            .wppin              =
-            {
-                .port               = stm32gpio_portNONE,
-                .pin                = stm32gpio_pinNONE
-            }                  
-        },
-        .i2cext             =
-        {   // does not init/deinit. only use read/write/standby
-            .i2cinit            = NULL,         
-            .i2cdeinit          = NULL,
-            .i2cpar             = NULL,
-            .i2cread            = (stm32ee_int8_fp_uint8_uint8_regaddr_uint8p_uint16_t)stm32i2c_read,
-            .i2cwrite           = (stm32ee_int8_fp_uint8_uint8_regaddr_uint8p_uint16_t)stm32i2c_write,
-            .i2cstandby         = (stm32ee_int8_fp_uint8_uint8_t)stm32i2c_standby            
-        }  
-    };
-    
+        .device             = hal_eeprom_device_st_m24lr64,
+        .hwaddra2a1a0       = 0        // a0 = a1 = a2 = 0
+    };        
 #endif//HAL_USE_EEPROM 
 
 
 #ifdef HAL_USE_I2C4HAL
     extern const uint8_t hal_brdcfg_i2c4hal__supported_mask = (1 << hal_i2c_port1); 
+    extern const hal_gpio_cfg_t hal_brdcfg_i2c__scl[]               =
+    {
+       {
+            .port       = hal_gpio_portB,
+            .pin        = hal_gpio_pin8,        
+            .dir        = hal_gpio_dirALT,
+            .speed      = hal_gpio_speed_default
+        },
+        {
+            .port       = hal_gpio_portNONE,
+            .pin        = hal_gpio_pinNONE,        
+            .dir        = hal_gpio_dirALT,
+            .speed      = hal_gpio_speed_default
+        }            
+    };
+        
+    extern const hal_gpio_cfg_t hal_brdcfg_i2c__sda[]               =
+    {
+        {
+            .port       = hal_gpio_portB,
+            .pin        = hal_gpio_pin9,        
+            .dir        = hal_gpio_dirALT,
+            .speed      = hal_gpio_speed_default
+        }, 
+        {
+            .port       = hal_gpio_portNONE,
+            .pin        = hal_gpio_pinNONE,        
+            .dir        = hal_gpio_dirALT,
+            .speed      = hal_gpio_speed_default
+        }        
+    };
+    
     extern const hal_i2c_hw_cfg_t  hal_brdcfg_i2c4hal__hwcfg        =
     {
         .speed          = hal_i2c_speed_400kbps,      
@@ -182,7 +227,7 @@
             .speed      = hal_gpio_speed_default
         },
         .sda            =
-       {
+        {
             .port       = hal_gpio_portB,
             .pin        = hal_gpio_pin9,        
             .dir        = hal_gpio_dirALT,
@@ -190,23 +235,8 @@
         },        
         .usedma         = hal_false,
         .ontimeout      = NULL   
-    };    
-    extern const stm32i2c_cfg_t hal_brdcfg_i2c4hal__i2ccfg = 
-    {
-        .speed              = 400000,        // 400 mhz
-        .scl                =
-        {
-            .port               = stm32gpio_portB,
-            .pin                = stm32gpio_pin8
-        }, 
-        .sda                =
-        {
-            .port               = stm32gpio_portB,
-            .pin                = stm32gpio_pin9
-        },
-        .usedma             = 0,
-        .ontimeout          = NULL              
-    };
+    };  
+    
 #endif//HAL_USE_I2C4HAL
 
 
@@ -244,50 +274,50 @@
         {   // hal_led0 
             .port     = hal_gpio_portH,
             .pin      = hal_gpio_pin2,        
-            .speed    = hal_gpio_speed_low,
-            .dir      = hal_gpio_dirOUT
+            .dir      = hal_gpio_dirOUT,
+            .speed    = hal_gpio_speed_low
         },
         {   // hal_led1 
             .port     = hal_gpio_portG,
             .pin      = hal_gpio_pin8,        
-            .speed    = hal_gpio_speed_low,
-            .dir      = hal_gpio_dirOUT
+            .dir      = hal_gpio_dirOUT,
+            .speed    = hal_gpio_speed_low
         },
         {   // hal_led2 
             .port     = hal_gpio_portG,
             .pin      = hal_gpio_pin7,        
-            .speed    = hal_gpio_speed_low,
-            .dir      = hal_gpio_dirOUT
+            .dir      = hal_gpio_dirOUT,
+            .speed    = hal_gpio_speed_low
         },
         {   // hal_led3 
             .port     = hal_gpio_portG,
             .pin      = hal_gpio_pin6,        
-            .speed    = hal_gpio_speed_low,
-            .dir      = hal_gpio_dirOUT
+            .dir      = hal_gpio_dirOUT,
+            .speed    = hal_gpio_speed_low
         },
         {   // hal_led4 
             .port     = hal_gpio_portI,
             .pin      = hal_gpio_pin10,        
-            .speed    = hal_gpio_speed_low,
-            .dir      = hal_gpio_dirOUT
+            .dir      = hal_gpio_dirOUT,
+            .speed    = hal_gpio_speed_low
         },
         {   // hal_led5 
             .port     = hal_gpio_portH,
             .pin      = hal_gpio_pin7,        
-            .speed    = hal_gpio_speed_low,
-            .dir      = hal_gpio_dirOUT
+            .dir      = hal_gpio_dirOUT,
+            .speed    = hal_gpio_speed_low
         },
         {   // hal_led6 
             .port     = hal_gpio_portH,
             .pin      = hal_gpio_pin6,        
-            .speed    = hal_gpio_speed_low,
-            .dir      = hal_gpio_dirOUT
+            .dir      = hal_gpio_dirOUT,
+            .speed    = hal_gpio_speed_low
         }, 
         {   // hal_led7 
             .port     = hal_gpio_portH,
             .pin      = hal_gpio_pin3,        
-            .speed    = hal_gpio_speed_low,
-            .dir      = hal_gpio_dirOUT
+            .dir      = hal_gpio_dirOUT,
+            .speed    = hal_gpio_speed_low
         }  
     };
 #endif//HAL_USE_LED
@@ -349,93 +379,26 @@ extern void hal_brdcfg_can__phydevices_disable(hal_can_port_t port)
 #endif//HAL_USE_CAN
 
 
-#ifdef HAL_USE_I2C4HAL
 
 
-// extern void hal_brdcfg_i2c4hal__LowLevel_DeInit(void)
-// {
-//   GPIO_InitTypeDef  GPIO_InitStructure; 
-//    
-//   /* sEE_I2C Peripheral Disable */
-//   I2C_Cmd(HAL_BRDCFG_I2C4HAL__PERIPHERAL, DISABLE);
-//  
-//   /* sEE_I2C DeInit */
-//   I2C_DeInit(HAL_BRDCFG_I2C4HAL__PERIPHERAL);
-
-//   /*!< sEE_I2C Periph clock disable */
-//   RCC_APB1PeriphClockCmd(HAL_BRDCFG_I2C4HAL__I2C_CLK, DISABLE);
-//     
-//   /*!< GPIO configuration */  
-//   /*!< Configure sEE_I2C pins: SCL */
-// //  GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_I2C4HAL__I2C_SCL_PIN;
-// //  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-// //  GPIO_Init(HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_PORT, &GPIO_InitStructure);
-
-//   /*!< Configure sEE_I2C pins: SDA */
-// //  GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_I2C4HAL__I2C_SDA_PIN;
-// //  GPIO_Init(HAL_BRDCFG_I2C4HAL__I2C_SDA_GPIO_PORT, &GPIO_InitStructure);
-// }
-
-#endif//HAL_USE_I2C4HAL
-
-
-#ifdef HAL_USE_I2C4HAL
-
-// extern void hal_brdcfg_i2c4hal__LowLevel_Init(void)
-// {
-//   GPIO_InitTypeDef  GPIO_InitStructure; 
-//     
-//   /*!< sEE_I2C_SCL_GPIO_CLK and sEE_I2C_SDA_GPIO_CLK Periph clock enable */
-//   RCC_APB2PeriphClockCmd(HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_CLK | HAL_BRDCFG_I2C4HAL__I2C_SDA_GPIO_CLK, ENABLE);
-
-//   /*!< sEE_I2C Periph clock enable */
-//   RCC_APB1PeriphClockCmd(HAL_BRDCFG_I2C4HAL__I2C_CLK, ENABLE);
-
-//     #warning --> mettere AFIO
-// //  AFIO->MAPR |= AFIO_MAPR_I2C1_REMAP;  /* I2C1 remapping */
-//     
-//     GPIO_PinAFConfig(GPIOB, GPIO_PinSource8, GPIO_AF_I2C1);
-//     GPIO_PinAFConfig(GPIOB, GPIO_PinSource9, GPIO_AF_I2C1);
-//     
-//     
-//   /*!< GPIO configuration */  
-//   /*!< Configure sEE_I2C pins: SCL */
-//   GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_I2C4HAL__I2C_SCL_PIN;
-//   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-//   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;    //GPIO_Mode_AF_OD;
-//   GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
-//   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-//   GPIO_Init(HAL_BRDCFG_I2C4HAL__I2C_SCL_GPIO_PORT, &GPIO_InitStructure);
-
-//   /*!< Configure sEE_I2C pins: SDA */
-//   GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_I2C4HAL__I2C_SDA_PIN;
-//   GPIO_Init(HAL_BRDCFG_I2C4HAL__I2C_SDA_GPIO_PORT, &GPIO_InitStructure);
-// }
-
-#endif//HAL_USE_I2C4HAL
 
 
 #ifdef HAL_USE_EEPROM
 
-
-extern void hal_brdcfg_eeprom__ontimeouterror(void)
+extern hal_result_t hal_brdcfg_eeprom__wp_init(void)
 {
-    hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "timeout in eeprom");
+    return(hal_res_OK);
 }
 
-// extern void hal_brdcfg_eeprom__writeprotection_init(void)
-// {
-//     ;
-// }
+extern hal_result_t hal_brdcfg_eeprom__wp_enable(void)
+{
+    return(hal_res_OK);
+}
 
-// extern void hal_brdcfg_eeprom__writeprotection_disable(void)
-// {
-//     ;
-// }
-// extern void hal_brdcfg_eeprom__writeprotection_enable(void)
-// {
-//     ;
-// }
+extern hal_result_t hal_brdcfg_eeprom__wp_disable(void)
+{
+    return(hal_res_OK);
+}
 
 #endif//HAL_USE_EEPROM
 
@@ -535,25 +498,7 @@ extern void hal_brdcfg_spi4encoder__chipSelect_init(hal_spi_port_t spix )
 
 
 #ifdef HAL_USE_SWITCH  
-
-extern void hal_brdcfg_switch__MCO_config(void)
-{
-    // dummy
-    #error -> mcbstm32c does not have a switch
-}
-
-extern void hal_brdcfg_switch__reg_read_byI2C(uint8_t* pBuffer, uint16_t ReadAddr)
-{
-    // dummy
-    #error -> mcbstm32c does not have a switch
-}
-
-extern void hal_brdcfg_switch__reg_write_byI2C(uint8_t* pBuffer, uint16_t WriteAddr)
-{
-    // dummy
-    #error -> mcbstm32c does not have a switch
-}
-
+    #error -> mcbstm32f400 does not have a switch
 #endif//HAL_USE_SWITCH
 
 

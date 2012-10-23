@@ -24,7 +24,7 @@
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
-  
+
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
@@ -34,6 +34,7 @@
 #include "stdlib.h"
 #include "string.h"
 #include "hal_base.h"
+#include "hal_sys.h"
 #include "hal_stm32_base_hid.h"
 #include "hal_stm32_spi4encoder_hid.h"
 #include "hal_stm32_eth_hid.h"
@@ -113,14 +114,48 @@
 #ifdef HAL_USE_CAN
     extern const uint8_t hal_brdcfg_can__supported_mask             = 0x03;
     #warning --> mettere qui solo i gpio del can1rx, can1tx, can2rx, can2tx ... non tutto il resto
-    extern const uint32_t hal_brdcfg_can__gpio_clock_canx_rx[]      = {RCC_APB2Periph_GPIOD, RCC_APB2Periph_GPIOB};
-    extern const uint32_t hal_brdcfg_can__gpio_clock_canx_tx[]      = {RCC_APB2Periph_GPIOD, RCC_APB2Periph_GPIOB};
-    extern const uint8_t hal_brdcfg_can__gpio_pinsource_canx_rx[]   = {0, 5};
-    extern const uint8_t hal_brdcfg_can__gpio_pinsource_canx_tx[]   = {1, 6};
-    extern const uint16_t hal_brdcfg_can__gpio_pin_canx_rx[]        = {GPIO_Pin_0, GPIO_Pin_5};
-    extern const uint16_t hal_brdcfg_can__gpio_pin_canx_tx[]        = {GPIO_Pin_1, GPIO_Pin_6};
-    extern GPIO_TypeDef* const hal_brdcfg_can__gpio_port_canx_rx[]  = {GPIOD, GPIOB};
-    extern GPIO_TypeDef* const hal_brdcfg_can__gpio_port_canx_tx[]  = {GPIOD, GPIOB};     
+//    extern const uint32_t hal_brdcfg_can__gpio_clock_canx_rx[]      = {RCC_APB2Periph_GPIOD, RCC_APB2Periph_GPIOB};
+//    extern const uint32_t hal_brdcfg_can__gpio_clock_canx_tx[]      = {RCC_APB2Periph_GPIOD, RCC_APB2Periph_GPIOB};
+//    extern const uint8_t hal_brdcfg_can__gpio_pinsource_canx_rx[]   = {0, 5};
+//    extern const uint8_t hal_brdcfg_can__gpio_pinsource_canx_tx[]   = {1, 6};
+//    extern const uint16_t hal_brdcfg_can__gpio_pin_canx_rx[]        = {GPIO_Pin_0, GPIO_Pin_5};
+//    extern const uint16_t hal_brdcfg_can__gpio_pin_canx_tx[]        = {GPIO_Pin_1, GPIO_Pin_6};
+//    extern GPIO_TypeDef* const hal_brdcfg_can__gpio_port_canx_rx[]  = {GPIOD, GPIOB};
+//    extern GPIO_TypeDef* const hal_brdcfg_can__gpio_port_canx_tx[]  = {GPIOD, GPIOB}; 
+
+    extern const hal_gpio_cfg_t hal_brdcfg_can__gpio_canx_rx[]      =
+    {
+        {   // can1
+            .port     = hal_gpio_portD,
+            .pin      = hal_gpio_pin0,        
+            .dir      = hal_gpio_dirALT,
+            .speed    = hal_gpio_speed_default
+        },
+        
+        {   // can2
+            .port     = hal_gpio_portB,
+            .pin      = hal_gpio_pin5,        
+            .dir      = hal_gpio_dirALT,
+            .speed    = hal_gpio_speed_default        
+        }
+    };
+    extern const hal_gpio_cfg_t hal_brdcfg_can__gpio_canx_tx[]      =
+    {
+        {   // can1
+            .port     = hal_gpio_portD,
+            .pin      = hal_gpio_pin1,        
+            .dir      = hal_gpio_dirALT,
+            .speed    = hal_gpio_speed_default
+        },
+        
+        {   // can2
+            .port     = hal_gpio_portB,
+            .pin      = hal_gpio_pin6,        
+            .dir      = hal_gpio_dirALT,
+            .speed    = hal_gpio_speed_default        
+        }
+    };
+    
 #endif//HAL_USE_CAN
 
 #ifdef HAL_USE_CRC
@@ -156,75 +191,47 @@
     extern const uint32_t hal_brdcfg_eeprom__emflash_baseaddress        = 0x08000000;
     extern const uint32_t hal_brdcfg_eeprom__emflash_totalsize          = 256*1024;
     extern const uint32_t hal_brdcfg_eeprom__i2c_01_baseaddress         = 0;
-    extern const uint32_t hal_brdcfg_eeprom__i2c_01_totalsize           = 8*1024; 
-
-    extern const stm32ee_cfg_t hal_brdcfg_eeprom__stm32eecfg            =
+    extern const uint32_t hal_brdcfg_eeprom__i2c_01_totalsize           = 8*1024;    
+    extern const hal_eeprom_hw_cfg_t hal_brdcfg_eeprom__i2c_01_device   =
     {
-        .devcfg             =
-        {
-            .device             = stm32ee_device_st_m24c64,
-            .i2cport            = 1,        // is equivalent to hal_i2c_port1
-            .hwaddra2a1a0       = 0,        // a0 = a1 = a2 = 0
-            .wpval              = stm32gpio_valNONE,      // no write protection
-            .wppin              =
-            {
-                .port               = stm32gpio_portNONE,
-                .pin                = stm32gpio_pinNONE
-            }                    
-        },
-
-        .i2cext             =
-        {   // does not init/deinit. only use read/write/standby
-            .i2cinit            = NULL,         
-            .i2cdeinit          = NULL,
-            .i2cpar             = NULL,
-            .i2cread            = (stm32ee_int8_fp_uint8_uint8_regaddr_uint8p_uint16_t)stm32i2c_read,
-            .i2cwrite           = (stm32ee_int8_fp_uint8_uint8_regaddr_uint8p_uint16_t)stm32i2c_write,
-            .i2cstandby         = (stm32ee_int8_fp_uint8_uint8_t)stm32i2c_standby            
-        }    
+        .device             = hal_eeprom_device_st_m24c64,
+        .hwaddra2a1a0       = 0        // a0 = a1 = a2 = 0                                 
     };
 #endif//HAL_USE_EEPROM 
 
 
 #ifdef HAL_USE_I2C4HAL
     extern const uint8_t hal_brdcfg_i2c4hal__supported_mask             = (1 << hal_i2c_port1); 
-    extern const hal_i2c_hw_cfg_t  hal_brdcfg_i2c4hal__hwcfg            =
+    extern const hal_gpio_cfg_t hal_brdcfg_i2c__scl[]                   =
     {
-        .speed          = hal_i2c_speed_400kbps,      
-        .scl            = 
-        {
+       {
             .port       = hal_gpio_portB,
             .pin        = hal_gpio_pin8,        
             .dir        = hal_gpio_dirALT,
             .speed      = hal_gpio_speed_default
         },
-        .sda            =
-       {
+        {
+            .port       = hal_gpio_portNONE,
+            .pin        = hal_gpio_pinNONE,        
+            .dir        = hal_gpio_dirALT,
+            .speed      = hal_gpio_speed_default
+        }            
+    };       
+    extern const hal_gpio_cfg_t hal_brdcfg_i2c__sda[]                   =
+    {
+        {
             .port       = hal_gpio_portB,
             .pin        = hal_gpio_pin9,        
             .dir        = hal_gpio_dirALT,
             .speed      = hal_gpio_speed_default
-        },        
-        .usedma         = hal_false,
-        .ontimeout      = NULL   
+        }, 
+        {
+            .port       = hal_gpio_portNONE,
+            .pin        = hal_gpio_pinNONE,        
+            .dir        = hal_gpio_dirALT,
+            .speed      = hal_gpio_speed_default
+        }        
     };
-    
-//     extern const stm32i2c_cfg_t hal_brdcfg_i2c4hal__i2ccfg              = 
-//     {
-//         .speed              = 400000,        // 400 mhz
-//         .scl                =
-//         {
-//             .port               = stm32gpio_portB,
-//             .pin                = stm32gpio_pin8
-//         }, 
-//         .sda                =
-//         {
-//             .port               = stm32gpio_portB,
-//             .pin                = stm32gpio_pin9
-//         }, 
-//         .usedma             = 0,
-//         .ontimeout          = NULL                          
-//     };
 #endif//HAL_USE_I2C4HAL
 
 
@@ -261,49 +268,49 @@
             .port     = hal_gpio_portE,
             .pin      = hal_gpio_pin8,        
             .dir      = hal_gpio_dirOUT,
-            .speed    = hal_gpio_speed_low,
+            .speed    = hal_gpio_speed_low
         },
         {   // hal_led1 
             .port     = hal_gpio_portE,
             .pin      = hal_gpio_pin9,        
-            .speed    = hal_gpio_speed_low,
-            .dir      = hal_gpio_dirOUT
+            .dir      = hal_gpio_dirOUT,
+            .speed    = hal_gpio_speed_low
         },
         {   // hal_led2 
             .port     = hal_gpio_portE,
             .pin      = hal_gpio_pin10,        
-            .speed    = hal_gpio_speed_low,
-            .dir      = hal_gpio_dirOUT
+            .dir      = hal_gpio_dirOUT,
+            .speed    = hal_gpio_speed_low
         },
         {   // hal_led3 
             .port     = hal_gpio_portE,
             .pin      = hal_gpio_pin11,        
-            .speed    = hal_gpio_speed_low,
-            .dir      = hal_gpio_dirOUT
+            .dir      = hal_gpio_dirOUT,
+            .speed    = hal_gpio_speed_low
         },
         {   // hal_led4 
             .port     = hal_gpio_portE,
             .pin      = hal_gpio_pin12,        
-            .speed    = hal_gpio_speed_low,
-            .dir      = hal_gpio_dirOUT
+            .dir      = hal_gpio_dirOUT,
+            .speed    = hal_gpio_speed_low
         },
         {   // hal_led5 
             .port     = hal_gpio_portE,
             .pin      = hal_gpio_pin13,        
-            .speed    = hal_gpio_speed_low,
-            .dir      = hal_gpio_dirOUT
+            .dir      = hal_gpio_dirOUT,
+            .speed    = hal_gpio_speed_low
         },
         {   // hal_led6 
             .port     = hal_gpio_portE,
             .pin      = hal_gpio_pin14,        
-            .speed    = hal_gpio_speed_low,
-            .dir      = hal_gpio_dirOUT
+            .dir      = hal_gpio_dirOUT,
+            .speed    = hal_gpio_speed_low
         }, 
         {   // hal_led7 
             .port     = hal_gpio_portE,
             .pin      = hal_gpio_pin15,        
-            .speed    = hal_gpio_speed_low,
-            .dir      = hal_gpio_dirOUT
+            .dir      = hal_gpio_dirOUT,
+            .speed    = hal_gpio_speed_low
         }  
     };
 #endif//HAL_USE_LED
@@ -316,6 +323,7 @@
 
 #ifdef HAL_USE_SWITCH
     extern const hal_boolval_t hal_brdcfg_switch__supported         = hal_false;
+    extern const hal_gpio_cfg_t hal_brdcfg_switch__gpio_reset       = { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE,   .dir = hal_gpio_dirNONE, .speed = hal_gpio_speed_default  };
 #endif//HAL_USE_SWITCH
 
 #ifdef HAL_USE_WATCHDOG
@@ -376,6 +384,20 @@ extern void hal_brdcfg_i2c__ontimeouterror(void)
 
 #ifdef HAL_USE_EEPROM
 
+extern hal_result_t hal_brdcfg_eeprom__wp_init(void)
+{
+    return(hal_res_OK);
+}
+
+extern hal_result_t hal_brdcfg_eeprom__wp_enable(void)
+{
+    return(hal_res_OK);
+}
+
+extern hal_result_t hal_brdcfg_eeprom__wp_disable(void)
+{
+    return(hal_res_OK);
+}
 
 
 #endif//HAL_USE_EEPROM
@@ -476,8 +498,7 @@ extern void hal_brdcfg_spi4encoder__chipSelect_init(hal_spi_port_t spix )
 
 
 #ifdef HAL_USE_SWITCH  
-
-
+    #error -> mcbstm32c does not have a switch
 #endif//HAL_USE_SWITCH
 
 

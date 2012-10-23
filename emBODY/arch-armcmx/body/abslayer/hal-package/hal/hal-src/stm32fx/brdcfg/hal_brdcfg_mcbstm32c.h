@@ -41,7 +41,7 @@
 
 #ifdef HAL_USE_EEPROM
     #include "hal_eeprom.h"
-    #include "utils/stm32ee.h" 
+    #include "hal_stm32_eeprom_hid.h"
 #endif//HAL_USE_EEPROM
 
 #ifdef HAL_USE_ETH
@@ -53,7 +53,6 @@
 #endif//HAL_USE_GPIO
 
 #ifdef HAL_USE_I2C4HAL
-    #include "utils/stm32i2c.h"
     #include "hal_stm32_i2c4hal_hid.h"
 #endif//HAL_USE_I2C4HAL
 
@@ -89,14 +88,17 @@
 
 #ifdef HAL_USE_CAN
     extern const uint8_t hal_brdcfg_can__supported_mask;//             = 0x03;
-    extern const uint32_t hal_brdcfg_can__gpio_clock_canx_rx[];//      = {RCC_APB2Periph_GPIOD, RCC_APB2Periph_GPIOB};
-    extern const uint32_t hal_brdcfg_can__gpio_clock_canx_tx[];//      = {RCC_APB2Periph_GPIOD, RCC_APB2Periph_GPIOB};
-    extern const uint8_t hal_brdcfg_can__gpio_pinsource_canx_rx[];//   = {0, 5};
-    extern const uint8_t hal_brdcfg_can__gpio_pinsource_canx_tx[];//   = {1, 6};
-    extern const uint16_t hal_brdcfg_can__gpio_pin_canx_rx[];//        = {GPIO_Pin_0, GPIO_Pin_5};
-    extern const uint16_t hal_brdcfg_can__gpio_pin_canx_tx[];//        = {GPIO_Pin_1, GPIO_Pin_6};
-    extern GPIO_TypeDef* const hal_brdcfg_can__gpio_port_canx_rx[];//  = {GPIOD, GPIOB};
-    extern GPIO_TypeDef* const hal_brdcfg_can__gpio_port_canx_tx[];//  = {GPIOD, GPIOB};
+//    extern const uint32_t hal_brdcfg_can__gpio_clock_canx_rx[];//      = {RCC_APB2Periph_GPIOD, RCC_APB2Periph_GPIOB};
+//    extern const uint32_t hal_brdcfg_can__gpio_clock_canx_tx[];//      = {RCC_APB2Periph_GPIOD, RCC_APB2Periph_GPIOB};
+//    extern const uint8_t hal_brdcfg_can__gpio_pinsource_canx_rx[];//   = {0, 5};
+//    extern const uint8_t hal_brdcfg_can__gpio_pinsource_canx_tx[];//   = {1, 6};
+//    extern const uint16_t hal_brdcfg_can__gpio_pin_canx_rx[];//        = {GPIO_Pin_0, GPIO_Pin_5};
+//    extern const uint16_t hal_brdcfg_can__gpio_pin_canx_tx[];//        = {GPIO_Pin_1, GPIO_Pin_6};
+//    extern GPIO_TypeDef* const hal_brdcfg_can__gpio_port_canx_rx[];//  = {GPIOD, GPIOB};
+//    extern GPIO_TypeDef* const hal_brdcfg_can__gpio_port_canx_tx[];//  = {GPIOD, GPIOB};
+    
+    extern const hal_gpio_cfg_t hal_brdcfg_can__gpio_canx_rx[];
+    extern const hal_gpio_cfg_t hal_brdcfg_can__gpio_canx_tx[];
 #endif//HAL_USE_CAN
 
 #ifdef HAL_USE_CRC
@@ -112,17 +114,15 @@
     extern const uint32_t hal_brdcfg_eeprom__emflash_baseaddress;//    = 0x08000000;
     extern const uint32_t hal_brdcfg_eeprom__emflash_totalsize;//      = 256*1024;
     extern const uint32_t hal_brdcfg_eeprom__i2c_01_baseaddress;//     = 0;
-    extern const uint32_t hal_brdcfg_eeprom__i2c_01_totalsize;//       = 8*1024;
-    
-    extern const hal_eeprom_hw_cfg_t hal_brdcfg_eeprom__devicecfg;
-    
-    extern const stm32ee_cfg_t hal_brdcfg_eeprom__stm32eecfg;
+    extern const uint32_t hal_brdcfg_eeprom__i2c_01_totalsize;
+    extern const hal_eeprom_hw_cfg_t hal_brdcfg_eeprom__i2c_01_device;
 #endif//HAL_USE_EEPROM
 
 #ifdef HAL_USE_I2C4HAL
     extern const uint8_t hal_brdcfg_i2c4hal__supported_mask;
     extern const hal_i2c_hw_cfg_t  hal_brdcfg_i2c4hal__hwcfg;
-//    extern const stm32i2c_cfg_t hal_brdcfg_i2c4hal__i2ccfg;
+    extern const hal_gpio_cfg_t hal_brdcfg_i2c__scl[];
+    extern const hal_gpio_cfg_t hal_brdcfg_i2c__sda[];
 #endif//HAL_USE_I2C4HAL
 
 
@@ -135,7 +135,7 @@
 #endif//HAL_USE_SPI4ENCODER
 
 #ifdef HAL_USE_ETH
-    extern const uint8_t hal_brdcfg_eth__supported_mask; //         = 0x01;
+    extern const uint8_t hal_brdcfg_eth__supported_mask; 
     
     extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_REF_CLK;
     
@@ -166,6 +166,7 @@
 
 #ifdef HAL_USE_SWITCH
     extern const hal_boolval_t hal_brdcfg_switch__supported;
+    extern const hal_gpio_cfg_t hal_brdcfg_switch__gpio_reset; 
 #endif//HAL_USE_SWITCH
 
 #ifdef HAL_USE_TIMER
@@ -192,10 +193,11 @@
 #endif//HAL_USE_CAN
 
 
- #ifdef HAL_USE_I2C4HAL
-    extern void hal_brdcfg_i2c4hal__ontimeouterror(void);
- #endif//HAL_USE_I2C4HAL 
-
+#ifdef HAL_USE_EEPROM
+    extern hal_result_t hal_brdcfg_eeprom__wp_init(void);
+    extern hal_result_t hal_brdcfg_eeprom__wp_enable(void);
+    extern hal_result_t hal_brdcfg_eeprom__wp_disable(void);
+#endif//HAL_USE_EEPROM   
 
 
 #ifdef HAL_USE_SPI4ENCODER
@@ -205,12 +207,19 @@
 #endif//HAL_USE_SPI4ENCODER
 
 
-
-#ifdef HAL_USE_ETH 
+#ifdef HAL_USE_ETH
     extern hal_bool_t hal_brdcfg_eth__phy_initialise(void);
     extern void hal_brdcfg_eth__phy_configure(hal_eth_phymode_t *phymode);
-#endif//HAL_USE_ETH
+#endif
 
+#ifdef HAL_USE_I2C4HAL
+    extern void hal_brdcfg_i2c4hal__ontimeouterror(void);
+#endif//HAL_USE_I2C4HAL   
+
+#ifdef HAL_USE_SWITCH  
+    extern void hal_brdcfg_switch__initialise(void);
+    extern void hal_brdcfg_switch__configure(hal_eth_phymode_t* phymode);
+#endif//HAL_USE_SWITCH
 
 
 #endif  // include-guard
