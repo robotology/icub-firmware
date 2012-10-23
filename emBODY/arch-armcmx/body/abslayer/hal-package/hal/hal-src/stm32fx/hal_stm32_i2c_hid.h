@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Valentina Gaggero, Marco Accame
  * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
@@ -18,12 +18,12 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_STM32_I2C4HAL_HID_H_
-#define _HAL_STM32_I2C4HAL_HID_H_
+#ifndef _HAL_STM32_I2C_HID_H_
+#define _HAL_STM32_I2C_HID_H_
 
 
-/* @file       hal_stm32_i2c4hal_hid.h
-    @brief      This header file implements hidden interface to i2c4hal.
+/* @file       hal_stm32_i2c_hid.h
+    @brief      This header file implements hidden interface to i2c.
     @author     marco.accame@iit.it
     @date       09/12/2011
  **/
@@ -37,7 +37,7 @@
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_i2c4hal.h"
+#include "hal_i2c.h"
 
 
 
@@ -49,12 +49,12 @@
 
 typedef struct
 {
-    hal_i2c4hal_speed_t         speed;      
+    hal_i2c_speed_t         speed;      
     hal_gpio_cfg_t          scl;
     hal_gpio_cfg_t          sda;
-    hal_bool_t              usedma;     /**< so far only i2c1 can have dma */
+    hal_bool_t              usedma;     // not supported yet
     hal_void_fp_void_t      ontimeout;    
-} hal_i2c4hal_hw_cfg_t;
+} hal_i2c_hw_cfg_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
@@ -62,13 +62,13 @@ typedef struct
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern uint32_t hal_i2c4hal_hid_getsize(const hal_cfg_t *cfg);
+extern uint32_t hal_i2c_hid_getsize(const hal_cfg_t *cfg);
 
-extern hal_result_t hal_i2c4hal_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory);
+extern hal_result_t hal_i2c_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory);
 
-extern hal_boolval_t hal_i2c4hal_hid_initted_is(hal_i2c4hal_port_t port);
+extern hal_boolval_t hal_i2c_hid_initted_is(hal_i2c_port_t port);
 
-extern hal_result_t hal_i2c4hal_hid_standby(hal_i2c4hal_port_t port, uint8_t devaddr) ;
+extern hal_result_t hal_i2c_hid_standby(hal_i2c_port_t port, uint8_t devaddr) ;
 
 
 

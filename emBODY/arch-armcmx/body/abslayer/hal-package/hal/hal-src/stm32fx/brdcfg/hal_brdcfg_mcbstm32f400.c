@@ -181,9 +181,8 @@
     };        
 #endif//HAL_USE_EEPROM 
 
-
-#ifdef HAL_USE_I2C4HAL
-    extern const uint8_t hal_brdcfg_i2c4hal__supported_mask = (1 << hal_i2c_port1); 
+#ifdef HAL_USE_I2C
+    extern const uint8_t hal_brdcfg_i2c__supported_mask = (1 << hal_i2c_port1); 
     extern const hal_gpio_cfg_t hal_brdcfg_i2c__scl[]               =
     {
        {
@@ -216,9 +215,67 @@
         }        
     };
     
-    extern const hal_i2c_hw_cfg_t  hal_brdcfg_i2c4hal__hwcfg        =
+    extern const hal_i2c_hw_cfg_t  hal_brdcfg_i2c__hwcfg        =
     {
         .speed          = hal_i2c_speed_400kbps,      
+        .scl            = 
+        {
+            .port       = hal_gpio_portB,
+            .pin        = hal_gpio_pin8,        
+            .dir        = hal_gpio_dirALT,
+            .speed      = hal_gpio_speed_default
+        },
+        .sda            =
+        {
+            .port       = hal_gpio_portB,
+            .pin        = hal_gpio_pin9,        
+            .dir        = hal_gpio_dirALT,
+            .speed      = hal_gpio_speed_default
+        },        
+        .usedma         = hal_false,
+        .ontimeout      = NULL   
+    };  
+    
+#endif//HAL_USE_I2C
+
+
+#ifdef HAL_USE_I2C4HAL
+    extern const uint8_t hal_brdcfg_i2c4hal__supported_mask = (1 << hal_i2c4hal_port1); 
+    extern const hal_gpio_cfg_t hal_brdcfg_i2c4hal__scl[]               =
+    {
+       {
+            .port       = hal_gpio_portB,
+            .pin        = hal_gpio_pin8,        
+            .dir        = hal_gpio_dirALT,
+            .speed      = hal_gpio_speed_default
+        },
+        {
+            .port       = hal_gpio_portNONE,
+            .pin        = hal_gpio_pinNONE,        
+            .dir        = hal_gpio_dirALT,
+            .speed      = hal_gpio_speed_default
+        }            
+    };
+        
+    extern const hal_gpio_cfg_t hal_brdcfg_i2c4hal__sda[]               =
+    {
+        {
+            .port       = hal_gpio_portB,
+            .pin        = hal_gpio_pin9,        
+            .dir        = hal_gpio_dirALT,
+            .speed      = hal_gpio_speed_default
+        }, 
+        {
+            .port       = hal_gpio_portNONE,
+            .pin        = hal_gpio_pinNONE,        
+            .dir        = hal_gpio_dirALT,
+            .speed      = hal_gpio_speed_default
+        }        
+    };
+    
+    extern const hal_i2c4hal_hw_cfg_t  hal_brdcfg_i2c4hal__hwcfg        =
+    {
+        .speed          = hal_i2c4hal_speed_400kbps,      
         .scl            = 
         {
             .port       = hal_gpio_portB,

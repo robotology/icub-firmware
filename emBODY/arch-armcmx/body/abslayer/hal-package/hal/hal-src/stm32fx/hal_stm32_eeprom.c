@@ -142,7 +142,7 @@ extern hal_result_t hal_eeprom_init(hal_eeprom_t eep, const hal_eeprom_cfg_t *cf
 
         case hal_eeprom_i2c_01:
         {
-            res = hal_i2c4hal_init(hal_i2c_port1, NULL);   // i use default configuration
+            res = hal_i2c4hal_init(hal_i2c4hal_port1, NULL);   // i use default configuration
             if(hal_res_OK != res)
             {
                 return(res);
@@ -182,7 +182,7 @@ extern hal_result_t hal_eeprom_init(hal_eeprom_t eep, const hal_eeprom_cfg_t *cf
             };
             
             stm32eecfg.devcfg.device        = (stm32ee_device_t)hal_brdcfg_eeprom__i2c_01_device.device;
-            stm32eecfg.devcfg.i2cport       = hal_i2c_port1; // for i2c1 i2cport must be 0
+            stm32eecfg.devcfg.i2cport       = hal_i2c4hal_port1; // for i2c1 i2cport must be 0
             stm32eecfg.devcfg.hwaddra2a1a0  = hal_brdcfg_eeprom__i2c_01_device.hwaddra2a1a0;
 //             stm32eecfg.devcfg.wpval         = (stm32gpio_val_t)hal_brdcfg_eeprom__i2c_01_device.wpval;
 //             stm32eecfg.devcfg.wppin.port    = (stm32gpio_port_t)hal_brdcfg_eeprom__i2c_01_device.wppin.port;

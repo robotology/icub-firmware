@@ -42,6 +42,7 @@
 #define     HAL_USE_ETH
 #define     HAL_USE_FLASH
 #define     HAL_USE_GPIO
+#define     HAL_USE_I2C
 #define     HAL_USE_LED
 #undef  HAL_USE_SWITCH
 #define     HAL_USE_SYS

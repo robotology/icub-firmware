@@ -37,6 +37,10 @@
 #endif//HAL_USE_GPIO
 
 #ifdef HAL_USE_I2C4HAL
+    #include "hal_stm32_i2c_hid.h"
+#endif//HAL_USE_I2C4HAL
+
+#ifdef HAL_USE_I2C4HAL
     #include "hal_stm32_i2c4hal_hid.h"
 #endif//HAL_USE_I2C4HAL
 
@@ -103,11 +107,20 @@
     extern const hal_eeprom_hw_cfg_t hal_brdcfg_eeprom__i2c_01_device;
 #endif//HAL_USE_EEPROM
 
-#ifdef HAL_USE_I2C4HAL
-    extern const uint8_t hal_brdcfg_i2c4hal__supported_mask;
+
+#ifdef HAL_USE_I2C
+    extern const uint8_t hal_brdcfg_i2c__supported_mask;
     extern const hal_gpio_cfg_t hal_brdcfg_i2c__scl[];
     extern const hal_gpio_cfg_t hal_brdcfg_i2c__sda[]; 
-    extern const hal_i2c_hw_cfg_t  hal_brdcfg_i2c4hal__hwcfg;
+    extern const hal_i2c_hw_cfg_t  hal_brdcfg_i2c__hwcfg;
+#endif//HAL_USE_I2C
+
+
+#ifdef HAL_USE_I2C4HAL
+    extern const uint8_t hal_brdcfg_i2c4hal__supported_mask;
+    extern const hal_gpio_cfg_t hal_brdcfg_i2c4hal__scl[];
+    extern const hal_gpio_cfg_t hal_brdcfg_i2c4hal__sda[]; 
+    extern const hal_i2c4hal_hw_cfg_t  hal_brdcfg_i2c4hal__hwcfg;
 #endif//HAL_USE_I2C4HAL
 
 
@@ -177,9 +190,7 @@
 #endif//HAL_USE_CAN
 
 
-#ifdef HAL_USE_I2C4HAL
-    extern void hal_brdcfg_i2c4hal__ontimeouterror(void);
-#endif//HAL_USE_I2C4HAL 
+
 
 #ifdef HAL_USE_EEPROM
     extern hal_result_t hal_brdcfg_eeprom__wp_init(void);
@@ -187,6 +198,13 @@
     extern hal_result_t hal_brdcfg_eeprom__wp_disable(void);
 #endif//HAL_USE_EEPROM   
 
+#ifdef HAL_USE_I2C
+    extern void hal_brdcfg_i2c__ontimeouterror(void);
+#endif//HAL_USE_I2C 
+
+#ifdef HAL_USE_I2C4HAL
+    extern void hal_brdcfg_i2c4hal__ontimeouterror(void);
+#endif//HAL_USE_I2C4HAL 
 
 #ifdef HAL_USE_SPI4ENCODER
     extern void hal_brdcfg_spi4encoder__chipSelect_init(hal_spi_port_t spix);

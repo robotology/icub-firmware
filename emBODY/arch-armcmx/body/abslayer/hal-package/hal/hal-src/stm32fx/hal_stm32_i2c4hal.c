@@ -57,7 +57,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_i2c_port2index(p)       ((uint8_t)(p))
+#define HAL_i2c4hal_port2index(p)       ((uint8_t)(p))
 
 
 
@@ -65,9 +65,9 @@
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
 
-const hal_i2c_cfg_t hal_i2c_cfg_default = 
+const hal_i2c4hal_cfg_t hal_i2c4hal_cfg_default = 
 { 
-    .speed      = hal_i2c_speed_400kbps,
+    .speed      = hal_i2c4hal_speed_400kbps,
     .usedma     = hal_false    
 };
 
@@ -83,21 +83,21 @@ const hal_i2c_cfg_t hal_i2c_cfg_default =
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_i2c4hal_supported_is(hal_i2c_port_t port);
-static void s_hal_i2c4hal_initted_set(hal_i2c_port_t port);
+static hal_boolval_t s_hal_i2c4hal_supported_is(hal_i2c4hal_port_t port);
+static void s_hal_i2c4hal_initted_set(hal_i2c4hal_port_t port);
 
 
-static hal_result_t s_hal_i2c_init(hal_i2c_port_t port, const hal_i2c_cfg_t *cfg);
+static hal_result_t s_hal_i2c4hal_init(hal_i2c4hal_port_t port, const hal_i2c4hal_cfg_t *cfg);
 
-static void s_hal_i2c_hw_init(hal_i2c_port_t port);
-static void s_hal_i2c_hw_gpio_init(hal_i2c_port_t port);
-static void s_hal_i2c_hw_enable(hal_i2c_port_t port, hal_i2c_speed_t speed);
+static void s_hal_i2c4hal_hw_init(hal_i2c4hal_port_t port);
+static void s_hal_i2c4hal_hw_gpio_init(hal_i2c4hal_port_t port);
+static void s_hal_i2c4hal_hw_enable(hal_i2c4hal_port_t port, hal_i2c4hal_speed_t speed);
 
-static hal_result_t s_i2c4hal_read(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size);
+static hal_result_t s_i2c4hal_read(hal_i2c4hal_port_t port, uint8_t devaddr, hal_i2c4hal_regaddr_t regaddr, uint8_t* data, uint16_t size);
 static void s_hal_i2c4hal_read_bytes(I2C_TypeDef* I2Cx, uint8_t* data, uint16_t size);
 
 
-static hal_result_t s_hal_i2c4hal_write(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size);
+static hal_result_t s_hal_i2c4hal_write(hal_i2c4hal_port_t port, uint8_t devaddr, hal_i2c4hal_regaddr_t regaddr, uint8_t* data, uint16_t size);
 static void s_hal_i2c4hal_write_bytes(I2C_TypeDef* I2Cx, uint8_t* data, uint16_t size);
 
 static hal_result_t s_hal_i2c4hal_timeoutexpired(void);
@@ -106,13 +106,13 @@ static hal_result_t s_hal_i2c4hal_timeoutexpired(void);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_i2c4hal_initted[hal_i2c_ports_number] = { hal_false, hal_false, hal_false };
+static hal_boolval_t s_hal_i2c4hal_initted[hal_i2c4hal_ports_number] = { hal_false, hal_false, hal_false };
 
 static const uint32_t s_hal_i2c4hal_timeout_flag = 0x00100;
 static const uint32_t s_hal_i2c4hal_timeout_long = 0x10000;
 static const uint32_t s_hal_i2c4hal_ackaddress_maxtrials = 100000;
 
-static const I2C_InitTypeDef   s_hal_i2c_stm32_cfg =
+static const I2C_InitTypeDef   s_hal_i2c4hal_stm32_cfg =
 {
     .I2C_Mode                   = I2C_Mode_I2C,
     .I2C_DutyCycle              = I2C_DutyCycle_2,
@@ -128,12 +128,12 @@ static const I2C_InitTypeDef   s_hal_i2c_stm32_cfg =
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern hal_result_t hal_i2c4hal_init(hal_i2c_port_t port, const hal_i2c_cfg_t *cfg)
+extern hal_result_t hal_i2c4hal_init(hal_i2c4hal_port_t port, const hal_i2c4hal_cfg_t *cfg)
 {
-    return(s_hal_i2c_init(port, cfg));
+    return(s_hal_i2c4hal_init(port, cfg));
 }
 
-extern hal_result_t hal_i2c4hal_read(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
+extern hal_result_t hal_i2c4hal_read(hal_i2c4hal_port_t port, uint8_t devaddr, hal_i2c4hal_regaddr_t regaddr, uint8_t* data, uint16_t size)
 {
 
     if(hal_true != s_hal_i2c4hal_supported_is(port))
@@ -166,7 +166,7 @@ extern hal_result_t hal_i2c4hal_read(hal_i2c_port_t port, uint8_t devaddr, hal_i
 }
 
 
-extern hal_result_t hal_i2c4hal_write(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
+extern hal_result_t hal_i2c4hal_write(hal_i2c4hal_port_t port, uint8_t devaddr, hal_i2c4hal_regaddr_t regaddr, uint8_t* data, uint16_t size)
 {
 
     if(hal_true != s_hal_i2c4hal_supported_is(port))
@@ -229,10 +229,10 @@ extern hal_result_t hal_i2c4hal_hid_setmem(const hal_cfg_t *cfg, uint32_t *memor
     return(hal_res_OK);
 }
 
-extern hal_boolval_t hal_i2c4hal_hid_initted_is(hal_i2c_port_t port)
+extern hal_boolval_t hal_i2c4hal_hid_initted_is(hal_i2c4hal_port_t port)
 {
 
-    if(hal_true == s_hal_i2c4hal_initted[HAL_i2c_port2index(port)]) 
+    if(hal_true == s_hal_i2c4hal_initted[HAL_i2c4hal_port2index(port)]) 
     {
         return(hal_true);
     }
@@ -243,11 +243,11 @@ extern hal_boolval_t hal_i2c4hal_hid_initted_is(hal_i2c_port_t port)
 #if 0    
     I2C_TypeDef* I2Cx = NULL;
     // this code allows to understand if the registers are already initted. useful to avoid another init in a jump from bootloader .... but bettere to re-init anyway. 
-    if (hal_i2c_port1 == port)
+    if (hal_i2c4hal_port1 == port)
     {
         I2Cx = I2C1;
     }
-    else if(hal_i2c_port2 == port)
+    else if(hal_i2c4hal_port2 == port)
     {
         I2Cx = I2C2;
     }
@@ -265,13 +265,13 @@ extern hal_boolval_t hal_i2c4hal_hid_initted_is(hal_i2c_port_t port)
 
 
 
-extern hal_result_t hal_i2c4hal_hid_standby(hal_i2c_port_t port, uint8_t devaddr)      
+extern hal_result_t hal_i2c4hal_hid_standby(hal_i2c4hal_port_t port, uint8_t devaddr)      
 {
     volatile uint16_t tmpSR1 = 0;
     volatile uint32_t trials = 0;
     volatile uint32_t timeout = 0;
     
-    I2C_TypeDef* I2Cx = (hal_i2c_port1 == port) ? (I2C1) : (I2C2);
+    I2C_TypeDef* I2Cx = (hal_i2c4hal_port1 == port) ? (I2C1) : (I2C2);
     #warning --> ci sono tre i2c errore ...........
  
     // While the bus is busy 
@@ -343,27 +343,27 @@ extern hal_result_t hal_i2c4hal_hid_standby(hal_i2c_port_t port, uint8_t devaddr
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_i2c4hal_supported_is(hal_i2c_port_t port)
+static hal_boolval_t s_hal_i2c4hal_supported_is(hal_i2c4hal_port_t port)
 {
-    return(hal_base_hid_byte_bitcheck(hal_brdcfg_i2c4hal__supported_mask, HAL_i2c_port2index(port)) );
+    return(hal_base_hid_byte_bitcheck(hal_brdcfg_i2c4hal__supported_mask, HAL_i2c4hal_port2index(port)) );
 }
 
-static void s_hal_i2c4hal_initted_set(hal_i2c_port_t port)
+static void s_hal_i2c4hal_initted_set(hal_i2c4hal_port_t port)
 {
-    s_hal_i2c4hal_initted[HAL_i2c_port2index(port)] = hal_true;
+    s_hal_i2c4hal_initted[HAL_i2c4hal_port2index(port)] = hal_true;
 }
 
 
 
-static hal_result_t s_hal_i2c_init(hal_i2c_port_t port, const hal_i2c_cfg_t *cfg)
+static hal_result_t s_hal_i2c4hal_init(hal_i2c4hal_port_t port, const hal_i2c4hal_cfg_t *cfg)
 {
     // this function uses ...
     hal_result_t res = hal_res_NOK_generic;
     
-    //const hal_i2c_4eeprom_cfg_t *somecfg = &hal_i2c_some_cfg_default;
+    //const hal_i2c4hal_4eeprom_cfg_t *somecfg = &hal_i2c4hal_some_cfg_default;
     if(NULL == cfg)
     {
-        cfg = &hal_i2c_cfg_default;
+        cfg = &hal_i2c4hal_cfg_default;
     }
     
 
@@ -383,9 +383,9 @@ static hal_result_t s_hal_i2c_init(hal_i2c_port_t port, const hal_i2c_cfg_t *cfg
     // init the scl and sda gpio before calling hw_init. 
     // because if the i2c is already initted and it detects sda or scl low it sets
     // register I2C_SR2.BUSY to 1, which makes things hang up.
-    s_hal_i2c_hw_gpio_init(port);
-    s_hal_i2c_hw_init(port);
-    s_hal_i2c_hw_enable(port, cfg->speed);
+    s_hal_i2c4hal_hw_gpio_init(port);
+    s_hal_i2c4hal_hw_init(port);
+    s_hal_i2c4hal_hw_enable(port, cfg->speed);
         
     
     s_hal_i2c4hal_initted_set(port);
@@ -394,14 +394,14 @@ static hal_result_t s_hal_i2c_init(hal_i2c_port_t port, const hal_i2c_cfg_t *cfg
 }
 
 
-static void s_hal_i2c_hw_init(hal_i2c_port_t port)
+static void s_hal_i2c4hal_hw_init(hal_i2c4hal_port_t port)
 {
 #if     defined(USE_STM32F1) || defined(USE_STM32F4)
 
-    uint32_t RCC_APB1Periph_I2Cx = (hal_i2c_port1 == port) ? (RCC_APB1Periph_I2C1) : (RCC_APB1Periph_I2C2);
+    uint32_t RCC_APB1Periph_I2Cx = (hal_i2c4hal_port1 == port) ? (RCC_APB1Periph_I2C1) : (RCC_APB1Periph_I2C2);
     
 //    // system configuration controller clock
-    #warning --> in stm32f4 removed "RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);" from i2c_hw_init() and it still works....
+    #warning --> in stm32f4 removed "RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);" from i2c4hal_hw_init() and it still works....
 //    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
     
     // i2c periph clock enable
@@ -417,12 +417,12 @@ static void s_hal_i2c_hw_init(hal_i2c_port_t port)
 }
 
 
-static void s_hal_i2c_hw_gpio_init(hal_i2c_port_t port)
+static void s_hal_i2c4hal_hw_gpio_init(hal_i2c4hal_port_t port)
 {
     
 #if     defined(USE_STM32F1)
 
-    static const GPIO_InitTypeDef  s_hal_i2c_sclsda_altcfg  =
+    static const GPIO_InitTypeDef  s_hal_i2c4hal_sclsda_altcfg  =
     {
         .GPIO_Pin       = 0,
         .GPIO_Speed     = GPIO_Speed_50MHz,
@@ -437,12 +437,12 @@ static void s_hal_i2c_hw_gpio_init(hal_i2c_port_t port)
     hal_bool_t found = hal_false;
 
     
-    hal_gpio_port_t portscl = hal_brdcfg_i2c__scl[HAL_i2c_port2index(port)].port;
-    hal_gpio_pin_t  pinscl  = hal_brdcfg_i2c__scl[HAL_i2c_port2index(port)].pin;
-    hal_gpio_port_t portsda = hal_brdcfg_i2c__sda[HAL_i2c_port2index(port)].port;
-    hal_gpio_pin_t  pinsda  = hal_brdcfg_i2c__sda[HAL_i2c_port2index(port)].pin;    
+    hal_gpio_port_t portscl = hal_brdcfg_i2c4hal__scl[HAL_i2c4hal_port2index(port)].port;
+    hal_gpio_pin_t  pinscl  = hal_brdcfg_i2c4hal__scl[HAL_i2c4hal_port2index(port)].pin;
+    hal_gpio_port_t portsda = hal_brdcfg_i2c4hal__sda[HAL_i2c4hal_port2index(port)].port;
+    hal_gpio_pin_t  pinsda  = hal_brdcfg_i2c4hal__sda[HAL_i2c4hal_port2index(port)].pin;    
     
-    if(hal_i2c_port1 == port)
+    if(hal_i2c4hal_port1 == port)
     {        
         if((hal_gpio_portB == portscl) && (hal_gpio_portB == portsda) && (hal_gpio_pin6 == pinscl) && (hal_gpio_pin7 == pinsda))
         {
@@ -453,7 +453,7 @@ static void s_hal_i2c_hw_gpio_init(hal_i2c_port_t port)
             afname = GPIO_Remap_I2C1;       afmode = ENABLE;                    found = hal_true;
         }            
     }
-    else if(hal_i2c_port2 == port)
+    else if(hal_i2c4hal_port2 == port)
     {
         if((hal_gpio_portB == portscl) && (hal_gpio_portB == portsda) && (hal_gpio_pin10 == pinscl) && (hal_gpio_pin11 == pinsda))
         {
@@ -463,26 +463,26 @@ static void s_hal_i2c_hw_gpio_init(hal_i2c_port_t port)
     
     if(hal_false == found)
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_i2c_init(): incorrect pin mapping");
+        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_i2c4hal_init(): incorrect pin mapping");
     }
 
-    hal_gpio_altcfg_t hal_i2c_scl_altcfg;
-    hal_gpio_altcfg_t hal_i2c_sda_altcfg;
+    hal_gpio_altcfg_t hal_i2c4hal_scl_altcfg;
+    hal_gpio_altcfg_t hal_i2c4hal_sda_altcfg;
     
     // prepare the altcfg for scl and sda pins
-    memcpy(&hal_i2c_scl_altcfg, &s_hal_i2c_sclsda_altcfg, sizeof(hal_gpio_altcfg_t));
-    memcpy(&hal_i2c_sda_altcfg, &s_hal_i2c_sclsda_altcfg, sizeof(hal_gpio_altcfg_t));
-    hal_i2c_scl_altcfg.afname = hal_i2c_sda_altcfg.afname = afname;
-    hal_i2c_scl_altcfg.afmode = hal_i2c_sda_altcfg.afmode = afmode;
+    memcpy(&hal_i2c4hal_scl_altcfg, &s_hal_i2c4hal_sclsda_altcfg, sizeof(hal_gpio_altcfg_t));
+    memcpy(&hal_i2c4hal_sda_altcfg, &s_hal_i2c4hal_sclsda_altcfg, sizeof(hal_gpio_altcfg_t));
+    hal_i2c4hal_scl_altcfg.afname = hal_i2c4hal_sda_altcfg.afname = afname;
+    hal_i2c4hal_scl_altcfg.afmode = hal_i2c4hal_sda_altcfg.afmode = afmode;
     
     // configure scl and sda pins
-    hal_gpio_configure(hal_brdcfg_i2c__scl[HAL_i2c_port2index(port)], &hal_i2c_scl_altcfg);    
-    hal_gpio_configure(hal_brdcfg_i2c__sda[HAL_i2c_port2index(port)], &hal_i2c_sda_altcfg);
+    hal_gpio_configure(hal_brdcfg_i2c4hal__scl[HAL_i2c4hal_port2index(port)], &hal_i2c4hal_scl_altcfg);    
+    hal_gpio_configure(hal_brdcfg_i2c4hal__sda[HAL_i2c4hal_port2index(port)], &hal_i2c4hal_sda_altcfg);
 
 
 #elif   defined(USE_STM32F4)    
 
-    static const GPIO_InitTypeDef  s_hal_i2c_sclsda_altcfg  =
+    static const GPIO_InitTypeDef  s_hal_i2c4hal_sclsda_altcfg  =
     {
         .GPIO_Pin       = GPIO_Pin_All,
         .GPIO_Mode      = GPIO_Mode_AF,
@@ -503,12 +503,12 @@ static void s_hal_i2c_hw_gpio_init(hal_i2c_port_t port)
     hal_bool_t foundsda = hal_false;
 
     
-    hal_gpio_port_t portscl = hal_brdcfg_i2c__scl[HAL_i2c_port2index(port)].port;
-    hal_gpio_pin_t  pinscl  = hal_brdcfg_i2c__scl[HAL_i2c_port2index(port)].pin;
-    hal_gpio_port_t portsda = hal_brdcfg_i2c__sda[HAL_i2c_port2index(port)].port;
-    hal_gpio_pin_t  pinsda  = hal_brdcfg_i2c__sda[HAL_i2c_port2index(port)].pin;       
+    hal_gpio_port_t portscl = hal_brdcfg_i2c4hal__scl[HAL_i2c4hal_port2index(port)].port;
+    hal_gpio_pin_t  pinscl  = hal_brdcfg_i2c4hal__scl[HAL_i2c4hal_port2index(port)].pin;
+    hal_gpio_port_t portsda = hal_brdcfg_i2c4hal__sda[HAL_i2c4hal_port2index(port)].port;
+    hal_gpio_pin_t  pinsda  = hal_brdcfg_i2c4hal__sda[HAL_i2c4hal_port2index(port)].pin;       
     
-    if(hal_i2c_port1 == port)
+    if(hal_i2c4hal_port1 == port)
     { 
         afname = GPIO_AF_I2C1;  afmode = ENABLE;
         
@@ -524,7 +524,7 @@ static void s_hal_i2c_hw_gpio_init(hal_i2c_port_t port)
             foundsda = hal_true;
         }
     }
-    else if(hal_i2c_port2 == port)
+    else if(hal_i2c4hal_port2 == port)
     {   
         afname = GPIO_AF_I2C2;
         
@@ -542,7 +542,7 @@ static void s_hal_i2c_hw_gpio_init(hal_i2c_port_t port)
             foundsda = hal_true;
         }
     }
-    else if(hal_i2c_port3 == port)
+    else if(hal_i2c4hal_port3 == port)
     {
         afname = GPIO_AF_I2C3;
         
@@ -563,41 +563,41 @@ static void s_hal_i2c_hw_gpio_init(hal_i2c_port_t port)
     
     if((hal_false == foundscl) || (hal_false == foundsda))
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_i2c_init(): incorrect pin mapping");
+        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_i2c4hal_init(): incorrect pin mapping");
     }
     
    
-    hal_gpio_altcfg_t hal_i2c_scl_altcfg;
-    hal_gpio_altcfg_t hal_i2c_sda_altcfg;
+    hal_gpio_altcfg_t hal_i2c4hal_scl_altcfg;
+    hal_gpio_altcfg_t hal_i2c4hal_sda_altcfg;
     
     // prepare the altcfg for scl and sda pins
-    memcpy(&hal_i2c_scl_altcfg, &s_hal_i2c_sclsda_altcfg, sizeof(hal_gpio_altcfg_t));
-    memcpy(&hal_i2c_sda_altcfg, &s_hal_i2c_sclsda_altcfg, sizeof(hal_gpio_altcfg_t));
-    hal_i2c_scl_altcfg.afname = hal_i2c_sda_altcfg.afname = afname;
-    hal_i2c_scl_altcfg.afmode = hal_i2c_sda_altcfg.afmode = afmode;
+    memcpy(&hal_i2c4hal_scl_altcfg, &s_hal_i2c4hal_sclsda_altcfg, sizeof(hal_gpio_altcfg_t));
+    memcpy(&hal_i2c4hal_sda_altcfg, &s_hal_i2c4hal_sclsda_altcfg, sizeof(hal_gpio_altcfg_t));
+    hal_i2c4hal_scl_altcfg.afname = hal_i2c4hal_sda_altcfg.afname = afname;
+    hal_i2c4hal_scl_altcfg.afmode = hal_i2c4hal_sda_altcfg.afmode = afmode;
     
     // configure scl and sda pins
-    hal_gpio_configure(hal_brdcfg_i2c__scl[HAL_i2c_port2index(port)], &hal_i2c_scl_altcfg);    
-    hal_gpio_configure(hal_brdcfg_i2c__sda[HAL_i2c_port2index(port)], &hal_i2c_sda_altcfg);    
+    hal_gpio_configure(hal_brdcfg_i2c4hal__scl[HAL_i2c4hal_port2index(port)], &hal_i2c4hal_scl_altcfg);    
+    hal_gpio_configure(hal_brdcfg_i2c4hal__sda[HAL_i2c4hal_port2index(port)], &hal_i2c4hal_sda_altcfg);    
 
     
 #endif
 }
 
-static void s_hal_i2c_hw_enable(hal_i2c_port_t port, hal_i2c_speed_t speed)
+static void s_hal_i2c4hal_hw_enable(hal_i2c4hal_port_t port, hal_i2c4hal_speed_t speed)
 {
 #if     defined(USE_STM32F1) || defined(USE_STM32F4)
 
-    I2C_TypeDef* I2Cx = (hal_i2c_port1 == port) ? (I2C1) : (I2C2);
+    I2C_TypeDef* I2Cx = (hal_i2c4hal_port1 == port) ? (I2C1) : (I2C2);
     
-    I2C_InitTypeDef i2c_cfg;
-    memcpy(&i2c_cfg, &s_hal_i2c_stm32_cfg, sizeof(I2C_InitTypeDef));
+    I2C_InitTypeDef i2c4hal_cfg;
+    memcpy(&i2c4hal_cfg, &s_hal_i2c4hal_stm32_cfg, sizeof(I2C_InitTypeDef));
     // apply the clockspeed 
-    i2c_cfg.I2C_ClockSpeed = (uint32_t)speed * 100000;
+    i2c4hal_cfg.I2C_ClockSpeed = (uint32_t)speed * 100000;
     // i2c peripheral enable
     I2C_Cmd(I2Cx, ENABLE);
     // apply configuration
-    I2C_Init(I2Cx, &i2c_cfg);
+    I2C_Init(I2Cx, &i2c4hal_cfg);
 
 #endif
 
@@ -605,14 +605,14 @@ static void s_hal_i2c_hw_enable(hal_i2c_port_t port, hal_i2c_speed_t speed)
 }
 
 
-static hal_result_t s_i2c4hal_read(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
+static hal_result_t s_i2c4hal_read(hal_i2c4hal_port_t port, uint8_t devaddr, hal_i2c4hal_regaddr_t regaddr, uint8_t* data, uint16_t size)
 {
     hal_result_t res = hal_res_NOK_generic;
     uint8_t reg1byteadr = 0;
     volatile uint32_t timeout = 0;
     
-    I2C_TypeDef* I2Cx = (hal_i2c_port1 == port) ? (I2C1) : (I2C2);
-//    uint8_t usedma = s_stm32i2c_generics.use_dma[port-1];
+    I2C_TypeDef* I2Cx = (hal_i2c4hal_port1 == port) ? (I2C1) : (I2C2);
+//    uint8_t usedma = s_stm32i2c4hal_generics.use_dma[port-1];
     
     
     // wait until the bus is not busy anymore 
@@ -721,7 +721,7 @@ static hal_result_t s_i2c4hal_read(hal_i2c_port_t port, uint8_t devaddr, hal_i2c
 //    }
 //    else
 //    {
-//        s_stm32i2c_read_withdma(I2Cx, data, size);
+//        s_stm32i2c4hal_read_withdma(I2Cx, data, size);
 //    }
     
 
@@ -790,14 +790,14 @@ static void s_hal_i2c4hal_read_bytes(I2C_TypeDef* I2Cx, uint8_t* data, uint16_t 
 
 
 
-static hal_result_t s_hal_i2c4hal_write(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
+static hal_result_t s_hal_i2c4hal_write(hal_i2c4hal_port_t port, uint8_t devaddr, hal_i2c4hal_regaddr_t regaddr, uint8_t* data, uint16_t size)
 {
     hal_result_t res = hal_res_NOK_generic;
     uint8_t reg1byteadr = 0;
     volatile uint32_t timeout = 0;
     
-    I2C_TypeDef* I2Cx = (hal_i2c_port1 == port) ? (I2C1) : (I2C2);
-//    uint8_t usedma = s_stm32i2c_generics.use_dma[port-1];
+    I2C_TypeDef* I2Cx = (hal_i2c4hal_port1 == port) ? (I2C1) : (I2C2);
+//    uint8_t usedma = s_stm32i2c4hal_generics.use_dma[port-1];
     
        
  ///////////////////////////////////////   
@@ -881,14 +881,14 @@ static hal_result_t s_hal_i2c4hal_write(hal_i2c_port_t port, uint8_t devaddr, ha
 //    }
 //    else
 //    {
-//        s_stm32i2c_write_withdma(I2Cx, data, size);
+//        s_stm32i2c4hal_write_withdma(I2Cx, data, size);
 //    }    
     
     
     
 /////////////////////////////////////////////////////////////
 
-    //s_stm32i2c_i2c_waitdevicestandbystate(port, devaddr);
+    //s_stm32i2c4hal_i2c4hal_waitdevicestandbystate(port, devaddr);
     
     return(hal_res_OK);
 

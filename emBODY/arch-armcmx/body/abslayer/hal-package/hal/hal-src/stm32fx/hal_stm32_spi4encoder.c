@@ -103,7 +103,6 @@ extern SPI_TypeDef * const hal_spi4encoder_interf_map[hal_spi_ports_number] = {S
 
 
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
@@ -142,7 +141,7 @@ extern hal_result_t hal_spi4encoder_init(hal_spi_port_t port, hal_spi4encoder_cf
 
     SPI_InitTypeDef SPI_InitStructure;
 
-    SPI_TypeDef * spi_per = hal_SPI4ENCODER_PERIPH_GET(port);
+    SPI_TypeDef * SPIx = hal_SPI4ENCODER_PERIPH_GET(port);
 
 
     if(hal_true != s_hal_spi4encoder_supported_is(port))
@@ -187,8 +186,8 @@ extern hal_result_t hal_spi4encoder_init(hal_spi_port_t port, hal_spi4encoder_cf
     s_hal_spi4encoder_GPIO_conf(port);
     
     //reset spi periph registers
-    spi_per->CR1  = 0x0000;
-    spi_per->CR2  = 0x0000;
+    SPIx->CR1  = 0x0000;
+    SPIx->CR2  = 0x0000;
     
     // SPI configuration 
     SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
@@ -215,7 +214,7 @@ extern hal_result_t hal_spi4encoder_init(hal_spi_port_t port, hal_spi4encoder_cf
     }
     SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
     SPI_InitStructure.SPI_CRCPolynomial = 0x7; //Reset value
-    SPI_Init(spi_per, &SPI_InitStructure);
+    SPI_Init(SPIx, &SPI_InitStructure);
     
     return(hal_res_OK);
 }
@@ -318,9 +317,9 @@ extern hal_result_t hal_spi4encoder_hid_setmem(const hal_cfg_t *cfg, uint32_t *m
 */
 extern void hal_spi4encoder_hid_disa(hal_spi_port_t port) //s_hal_spi_disa
 {
-    SPI_TypeDef * spi_per = hal_SPI4ENCODER_PERIPH_GET(port);
+    SPI_TypeDef * SPIx = hal_SPI4ENCODER_PERIPH_GET(port);
 
-    while(SPI_I2S_GetFlagStatus(spi_per, SPI_I2S_FLAG_BSY) == SET);
+    while(SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_BSY) == SET);
 
     hal_SPI4ENCODER_DISA(port);
 }
@@ -348,17 +347,17 @@ static void s_hal_spi4encoder_encoder_read_isr(hal_spi_port_t port)
 {
     uint32_t tmp = 0;
 	uint8_t dummytx = 0x0;
-    SPI_TypeDef * spi_per = hal_SPI4ENCODER_PERIPH_GET(port);
+    SPI_TypeDef * SPIx = hal_SPI4ENCODER_PERIPH_GET(port);
     hal_spi_mux_t mux = (hal_spi_mux_t)hal_SPI4ENCODER_ENCODER_ID_GET(port);
     hal_encoder_t enc = hal_encoder_hid_from_spiportmux_to_encoder(port, mux);
 
-	hal_SPI4ENCODER_ENCDATA_GET(port).buff_encoder[hal_SPI4ENCODER_READBYTE_POS_GET(port)] = SPI_I2S_ReceiveData(spi_per);
+	hal_SPI4ENCODER_ENCDATA_GET(port).buff_encoder[hal_SPI4ENCODER_READBYTE_POS_GET(port)] = SPI_I2S_ReceiveData(SPIx);
 	hal_SPI4ENCODER_READBYTE_POS_INCR(port);
 	
 	if(3 == hal_SPI4ENCODER_READBYTE_POS_GET(port))
 	{
 		//before disabling peripheral, it is necessary wait until it's free
-		while( SPI_I2S_GetFlagStatus(spi_per, SPI_I2S_FLAG_BSY) != RESET );
+		while( SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_BSY) != RESET );
 		
         hal_spi4encoder_hid_disa(port); //disable peripheral
  		hal_brdcfg_spi4encoder__encoder_disable(port, mux);		
@@ -389,7 +388,7 @@ static void s_hal_spi4encoder_encoder_read_isr(hal_spi_port_t port)
 	}
 	else
 	{
-		SPI_I2S_SendData(spi_per, dummytx);       
+		SPI_I2S_SendData(SPIx, dummytx);       
 	}
 }
 
@@ -432,7 +431,7 @@ static void s_hal_spi4encoder_GPIO_conf(hal_spi_port_t port)
   uint32_t pos;
   uint8_t high_pin;
 
-
+#warning --> in stm example .... sck and mosi are GPIO_Speed_50MHz / GPIO_Mode_AF_PP (OK as in here) but miso is GPIO_Mode_IN_FLOATING
 
 	switch(port)
 	{
@@ -443,7 +442,7 @@ static void s_hal_spi4encoder_GPIO_conf(hal_spi_port_t port)
 		if(high_pin)
 		{
 			SPI1_GPIO_PORT->CRH &= ~(0xF << (pos*4 ));
-			SPI1_GPIO_PORT->CRH |= (0xB << (pos*4 ));
+			SPI1_GPIO_PORT->CRH |= (0xB << (pos*4 ));   // out max 50mhz, altfun push pull
 		}
 		else
 		{
@@ -452,12 +451,13 @@ static void s_hal_spi4encoder_GPIO_conf(hal_spi_port_t port)
 		}
 
 
+        
 		s_hal_spi4encoder_get_pospin(SPI1_GPIO_PIN_MOSI, &pos, &high_pin);
 
 		if(high_pin)
 		{
 			SPI1_GPIO_PORT->CRH &= ~(0xF << (pos*4 ));
-			SPI1_GPIO_PORT->CRH |= (0xB << (pos*4 ));
+			SPI1_GPIO_PORT->CRH |= (0xB << (pos*4 ));   // out max 50mhz, altfun push pull
 		}
 		else
 		{
@@ -471,12 +471,13 @@ static void s_hal_spi4encoder_GPIO_conf(hal_spi_port_t port)
 		if(high_pin)
 		{
 			SPI1_GPIO_PORT->CRH &= ~(0xF << (pos*4 ));
-			SPI1_GPIO_PORT->CRH |= (0x8 << (pos*4 ));
+			SPI1_GPIO_PORT->CRH |= (0x8 << (pos*4 ));   // input with pull-up / pull-down
+            #warning --> acemor says: it is strange that the miso is not configured in af mode .....
 		}
 		else
 		{
 			SPI1_GPIO_PORT->CRL &= ~(0xF << (pos*4 ));
-			SPI1_GPIO_PORT->CRL |= (0x8 << (pos*4 ));
+			SPI1_GPIO_PORT->CRL |= (0x8 << (pos*4 ));   
 		}
 			  break;
 	  }
