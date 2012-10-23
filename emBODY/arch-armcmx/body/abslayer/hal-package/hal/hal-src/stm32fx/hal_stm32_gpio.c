@@ -421,7 +421,7 @@ static hal_result_t s_hal_gpio_altfun_configure(hal_gpio_cfg_t cfg, const hal_gp
         GPIO_InitStructure.GPIO_Speed = (GPIOSpeed_TypeDef)hal_gpio_hid_speeds[cfg.speed];
     }
     else
-    {   // else we use the spped in gpioext
+    {   // else we use the speed in gpioext
         GPIO_InitStructure.GPIO_Speed = GPIO_InitStructure.GPIO_Speed;
     }
     

@@ -1,4 +1,4 @@
-/*
+    /*
  * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Author:  Valentina Gaggero, Marco Accame
  * email:   valentina.gaggero@iit.it, marco.accame@iit.it
@@ -39,6 +39,7 @@
 
 #include "hal_brdcfg.h"
 #include "hal_stm32_base_hid.h" 
+#include "hal_stm32_gpio_hid.h" 
 #include "hal_stm32_sys_hid.h"
 #include "hal_stm32_canfifo_hid.h"
 
@@ -64,7 +65,8 @@
 
 
 #if     defined(USE_STM32F1)
-    // the clock is half the max frequency of 72 mhz. 
+    // the clock APB1 is 36mhz, half the max frequency of 72 mhz. (see page 49/1096 of stm32f1x reference manual Doc ID 13902 Rev 14) 
+    // the clock APB2 operates at full speed of 72 mhz. (see page 49/1096 of stm32f1x reference manual Doc ID 13902 Rev 14)
     // we give a total of 9 time quanta for the duration of a can bit. we split in 1+5+3
     #define HAL_STM32_CAN_CLK	  		    36000000
     #define HAL_STM32_CAN_TQ_TOTAL          9
@@ -72,7 +74,8 @@
     #define HAL_STM32_CAN_TQ_BS1            CAN_BS1_5tq
     #define HAL_STM32_CAN_TQ_BS2            CAN_BS2_3tq
 #elif    defined(USE_STM32F4)
-    // the clock is a fourth the max frequency of 168 mhz. 
+    // the clock APB1 is 42mhz, a fourth the max frequency of 168 mhz. (see page 23/180 of stm32f4x datasheet Doc ID 022152 Rev 3)
+    // the clock APB2 is 84mhz, a halh the max frequency of 168 mhz. (see page 23/180 of stm32f4x datasheet Doc ID 022152 Rev 3)
     // we give a total of 7 time quanta for the duration of a can bit. we split in 1+4+2
     #define HAL_STM32_CAN_CLK	  			42000000
     #define HAL_STM32_CAN_TQ_TOTAL          7
@@ -81,33 +84,7 @@
     #define HAL_STM32_CAN_TQ_BS2            CAN_BS2_2tq    
 #endif
 
-#if 0
-//CAN 1 pins
-#define RCC_APB2Periph_GPIO_CAN1    RCC_APB2Periph_GPIOD
-#define GPIO_REMAP_CAN1             GPIO_Remap2_CAN1
-#define GPIO_CAN1                   GPIOD  
-#define GPIO_Pin_CAN1_RX            GPIO_Pin_0
-#define GPIO_Pin_CAN1_TX            GPIO_Pin_1
-
-//CAN 2 pins
-#define RCC_APB2Periph_GPIO_CAN2    RCC_APB2Periph_GPIOB
-#define GPIO_REMAP_CAN2             GPIO_Remap_CAN2
-#define GPIO_CAN2                   GPIOB  
-#define GPIO_Pin_CAN2_RX            GPIO_Pin_5
-#define GPIO_Pin_CAN2_TX            GPIO_Pin_6
-#endif
-
-
-// enable and disable interupt on receive
-#define CAN_IT_RX_ENA(p) 	CAN_ITConfig( ( ( hal_can_port1 == (p) ) ? (CAN1) : (CAN2) ), CAN_IT_FMP0, ENABLE);
-#define CAN_IT_RX_DISA(p)	CAN_ITConfig( ( ( hal_can_port1 == (p) ) ? (CAN1) : (CAN2) ), CAN_IT_FMP0, DISABLE);
-
-///enable and disable interupt on trasmission
-#define CAN_IT_TX_ENA(p)	CAN_ITConfig( ( ( hal_can_port1 == (p) ) ? (CAN1) : (CAN2) ), CAN_IT_TME, ENABLE);
-#define CAN_IT_TX_DISA(p)	CAN_ITConfig( ( ( hal_can_port1 == (p) ) ? (CAN1) : (CAN2) ), CAN_IT_TME, DISABLE);
-
-
-
+#define HAL_can_port2peripheral(p)     ( ( hal_can_port1 == (p) ) ? (CAN1) : (CAN2) )
 
 
 
@@ -169,6 +146,8 @@ static void s_hal_can_isr_tx_disable(hal_can_port_t port);
 static void s_hal_can_isr_rx_enable(hal_can_port_t port);
 static void s_hal_can_isr_rx_disable(hal_can_port_t port);
 
+// enable or disab
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -180,35 +159,87 @@ static hal_boolval_t s_hal_can_initted[hal_can_ports_num] = { hal_false };
 
 
 #if     defined(USE_STM32F1)
-static const GPIO_InitTypeDef s_hal_can_gpio_inittypeded_canx_rx      =
+static const hal_gpio_altcfg_t s_hal_can_canx_rx_altcfg         = 
 {
-    .GPIO_Pin       = 0,
-    .GPIO_Mode      = GPIO_Mode_IPU,
-    .GPIO_Speed     = GPIO_Speed_2MHz
+    .gpioext    =
+    {
+        .GPIO_Pin       = 0,
+        .GPIO_Speed     = GPIO_Speed_2MHz,
+        .GPIO_Mode      = GPIO_Mode_IPU,  
+    },
+    .afname     = HAL_GPIO_AFNAME_NONE,
+    .afmode     = HAL_GPIO_AFMODE_NONE
 };
-static const GPIO_InitTypeDef s_hal_can_gpio_inittypeded_canx_tx      =
+static const hal_gpio_altcfg_t s_hal_can_canx_tx_altcfg = 
 {
-    .GPIO_Pin       = 0,
-    .GPIO_Mode      = GPIO_Mode_AF_PP,
-    .GPIO_Speed     = GPIO_Speed_50MHz
+    .gpioext    =
+    {
+        .GPIO_Pin       = 0,
+        .GPIO_Speed     = GPIO_Speed_50MHz,
+        .GPIO_Mode      = GPIO_Mode_AF_PP,  
+    },
+    .afname     = HAL_GPIO_AFNAME_NONE,
+    .afmode     = HAL_GPIO_AFMODE_NONE
 };
+
+
+// static const GPIO_InitTypeDef s_hal_can_gpio_inittypeded_canx_rx      =
+// {
+//     .GPIO_Pin       = 0,
+//     .GPIO_Mode      = GPIO_Mode_IPU,
+//     .GPIO_Speed     = GPIO_Speed_2MHz
+// };
+// static const GPIO_InitTypeDef s_hal_can_gpio_inittypeded_canx_tx      =
+// {
+//     .GPIO_Pin       = 0,
+//     .GPIO_Mode      = GPIO_Mode_AF_PP,
+//     .GPIO_Speed     = GPIO_Speed_50MHz
+// };
 #elif   defined(USE_STM32F4)
-static const GPIO_InitTypeDef s_hal_can_gpio_inittypeded_canx_rx      =
+
+static const hal_gpio_altcfg_t s_hal_can_canx_rx_altcfg         = 
 {
-    .GPIO_Pin       = 0,
-    .GPIO_Mode      = GPIO_Mode_AF,
-    .GPIO_Speed     = GPIO_Speed_50MHz,
-    .GPIO_OType     = GPIO_OType_PP,
-    .GPIO_PuPd      = GPIO_PuPd_UP
+    .gpioext    =
+    {
+        .GPIO_Pin       = 0,
+        .GPIO_Mode      = GPIO_Mode_AF,
+        .GPIO_Speed     = GPIO_Speed_50MHz,
+        .GPIO_OType     = GPIO_OType_PP,
+        .GPIO_PuPd      = GPIO_PuPd_UP
+    },
+    .afname     = HAL_GPIO_AFNAME_NONE,
+    .afmode     = HAL_GPIO_AFMODE_NONE
 };
-static const GPIO_InitTypeDef s_hal_can_gpio_inittypeded_canx_tx      =
+static const hal_gpio_altcfg_t s_hal_can_canx_tx_altcfg = 
 {
-    .GPIO_Pin       = 0,
-    .GPIO_Mode      = GPIO_Mode_AF,
-    .GPIO_Speed     = GPIO_Speed_50MHz,
-    .GPIO_OType     = GPIO_OType_PP,
-    .GPIO_PuPd      = GPIO_PuPd_UP
+    .gpioext    =
+    {
+        .GPIO_Pin       = 0,
+        .GPIO_Mode      = GPIO_Mode_AF,
+        .GPIO_Speed     = GPIO_Speed_50MHz,
+        .GPIO_OType     = GPIO_OType_PP,
+        .GPIO_PuPd      = GPIO_PuPd_UP
+    },
+    .afname     = HAL_GPIO_AFNAME_NONE,
+    .afmode     = HAL_GPIO_AFMODE_NONE
 };
+
+// static const GPIO_InitTypeDef s_hal_can_gpio_inittypeded_canx_rx      =
+// {
+//     .GPIO_Pin       = 0,
+//     .GPIO_Mode      = GPIO_Mode_AF,
+//     .GPIO_Speed     = GPIO_Speed_50MHz,
+//     .GPIO_OType     = GPIO_OType_PP,
+//     .GPIO_PuPd      = GPIO_PuPd_UP
+// };
+// static const GPIO_InitTypeDef s_hal_can_gpio_inittypeded_canx_tx      =
+// {
+//     .GPIO_Pin       = 0,
+//     .GPIO_Mode      = GPIO_Mode_AF,
+//     .GPIO_Speed     = GPIO_Speed_50MHz,
+//     .GPIO_OType     = GPIO_OType_PP,
+//     .GPIO_PuPd      = GPIO_PuPd_UP
+// };
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -239,12 +270,11 @@ extern hal_result_t hal_can_init(hal_can_port_t port, const hal_can_cfg_t *cfg)
         hal_base_hid_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "hal_can_init():wrong runmode");
         return(hal_res_NOK_unsupported);  
     }
-
-    
+   
     // set config
     memcpy(&cport->cfg, cfg, sizeof(hal_can_cfg_t));
 
-
+    
     //  reset fifos
     hal_canfifo_hid_reset(&cport->canframes_rx_norm);
     hal_canfifo_hid_reset(&cport->canframes_tx_norm);
@@ -300,9 +330,8 @@ extern hal_result_t hal_can_enable(hal_can_port_t port)
 
     cport->enabled = 1;
 
-    // registers
-    CAN_IT_RX_ENA(port);
-    CAN_IT_TX_ENA(port);
+    // configure interrupts on rx (CAN_IT_FMP0 -> FIFO 0 message pending) and tx (CAN_IT_TME -> transmit mailbox empty)
+    CAN_ITConfig(HAL_can_port2peripheral(port), (CAN_IT_FMP0 | CAN_IT_TME), ENABLE);
 
     // nvic 
     s_hal_can_isr_rx_enable(port);
@@ -336,9 +365,8 @@ extern hal_result_t hal_can_disable(hal_can_port_t port)
 
     cport->enabled = 0;
 
-    // registers
-    CAN_IT_RX_DISA(port);
-    CAN_IT_TX_DISA(port);
+    // deconfigure interrupts on rx (CAN_IT_FMP0 -> FIFO 0 message pending) and tx (CAN_IT_TME -> transmit mailbox empty)
+    CAN_ITConfig(HAL_can_port2peripheral(port), (CAN_IT_FMP0 | CAN_IT_TME), DISABLE);
 
     // nvic 
     s_hal_can_isr_rx_disable(port);
@@ -351,7 +379,7 @@ extern hal_result_t hal_can_disable(hal_can_port_t port)
     return(hal_res_OK);
 }
 
-/*the function does't check hal_can_send_mode: the function will behave ok only if sm == hal_can_send_normprio_now*/
+// the function doesn't check hal_can_send_mode: the function will behave ok only if sm == hal_can_send_normprio_now
 extern hal_result_t hal_can_put(hal_can_port_t port, hal_can_frame_t *frame, hal_can_send_mode_t sm) 
 {
     return (s_hal_can_tx_normprio(port, frame, sm));
@@ -365,6 +393,7 @@ extern hal_result_t hal_can_transmit(hal_can_port_t port)
     s_hal_can_isr_sendframes_canx(port);
     return(hal_res_OK);
 }
+
 
 extern hal_result_t hal_can_received(hal_can_port_t port, uint8_t *numberof) 
 {
@@ -406,7 +435,7 @@ extern hal_result_t hal_can_get(hal_can_port_t port, hal_can_frame_t *frame, uin
     
     if(NULL != remaining)
     {
-         *remaining = hal_canfifo_hid_size(&cport->canframes_rx_norm);
+        *remaining = hal_canfifo_hid_size(&cport->canframes_rx_norm);
     }
 
     return(hal_res_OK);
@@ -462,6 +491,11 @@ extern hal_result_t hal_can_receptionfilter_set(hal_can_port_t port, uint8_t mas
 extern hal_result_t hal_can_out_get(hal_can_port_t port, uint8_t *numberof) 
 {
     hal_can_portdatastructure_t *cport = s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
+    
+    if(NULL == numberof)
+    {
+        return(hal_res_NOK_generic);
+    }
 
     // disable interrupt rx
     s_hal_can_isr_rx_disable(port);
@@ -485,35 +519,27 @@ extern hal_result_t hal_can_out_get(hal_can_port_t port, uint8_t *numberof)
 
 void CAN1_TX_IRQHandler	(void)
 {
-//  if (CAN1->TSR & (1 << 0)) {                     /* request completed mbx 0 */
-//    CAN1->TSR |= (1 << 0);                   /* reset request complete mbx 0 */
-//
-//	//s_hal_can_isr_sendframes_canx(hal_can_port1);
-//
-//    }
+    // as we configured with CAN_IT_TME, the isr is triggered when any of the output mailboxes in can-1 peripheral gets empty. 
     s_hal_can_isr_sendframes_canx(hal_can_port1);
 }
 
 
 void CAN2_TX_IRQHandler	(void)
 {
-//  if (CAN2->TSR & (1 << 0)) {                     /* request completed mbx 0 */
-//    CAN2->TSR |= (1 << 0);                   /* reset request complete mbx 0 */
-//
-//	//s_hal_can_isr_sendframes_canx(hal_can_port2);
-//
-//    }
+    // as we configured with CAN_IT_TME, the isr is triggered when any of the output mailboxes in can2 peripheral gets empty.
 	s_hal_can_isr_sendframes_canx(hal_can_port2);
 }
 
 void CAN1_RX0_IRQHandler(void)
 {
+    // as we configured with CAN_IT_FMP0, the isr is triggered when a frame is received on fifo-0 of can1 peripheral
 	s_hal_can_isr_recvframe_canx(hal_can_port1);
 }
 
 
 void CAN2_RX0_IRQHandler(void)
 {
+    // as we configured with CAN_IT_FMP0, the isr is triggered when a frame is received on fifo-0 of can2 peripheral
 	s_hal_can_isr_recvframe_canx(hal_can_port2);
 }
 
@@ -625,49 +651,48 @@ static void s_hal_can_isr_sendframes_canx(hal_can_port_t port)
     hal_canfifo_item_t *canframe_ptr;
     CanTxMsg TxMessage =
     {
-        .IDE   = CAN_ID_STD,     //only stdid are managed
-        .ExtId = 0,              // since frame-id is std it is not used by stm32lib
-        .RTR   = CAN_RTR_DATA   //only data frame are managed    
+        .IDE   = CAN_ID_STD,        // only stdid are managed
+        .ExtId = 0,                 // since frame-id is std it is not used by stm32lib
+        .RTR   = CAN_RTR_DATA       // only data frame are managed    
     };
 
-
     hal_can_portdatastructure_t *cport = s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
-	uint8_t res = 0;
 
     s_hal_can_isr_tx_disable(port);
 
-    while( (hal_canfifo_hid_size(&cport->canframes_tx_norm) > 0) && (res != CAN_NO_MB) )
+    while( (hal_canfifo_hid_size(&cport->canframes_tx_norm) > 0) )
     {
-
+        uint8_t res = 0;
+        
         canframe_ptr = hal_canfifo_hid_front(&cport->canframes_tx_norm);
         TxMessage.StdId = canframe_ptr->id & 0x7FF;
         TxMessage.DLC = canframe_ptr->size;
         *(uint64_t*)TxMessage.Data = *((uint64_t*)canframe_ptr->data);
 
-       	res = CAN_Transmit( ((hal_can_port1 == port) ? (CAN1) : (CAN2)), &TxMessage);
+        // CAN_Transmit() returns the number of mailbox used in transmission or CAN_TxStatus_NoMailBox if there is no empty mailbox
+       	res = CAN_Transmit(HAL_can_port2peripheral(port), &TxMessage);
 
-        if(res != CAN_NO_MB)
-        {
+        if(res != CAN_TxStatus_NoMailBox)
+        {   // if the CAN_Transmit() was succesful ... remove the sent from from fifo-tx and call the user-defined callback
         	hal_canfifo_hid_pop(&cport->canframes_tx_norm);
             if(NULL != cport->cfg.callback_on_tx)
             {
                 cport->cfg.callback_on_tx(cport->cfg.arg_cb_tx);
             }
         }
+        else
+        {   // there is no empty mailbox to assign our frame ... we exit the loop without checking if there are still frames in fifo-tx.
+            break;
+        }
 
     }
 
     if(hal_canfifo_hid_size(&cport->canframes_tx_norm) > 0)
-	{
+	{   // we still have some frames to send, thus we enable the isr on tx which triggers as soon any of the transmit mailboxes gets empty.
     	s_hal_can_isr_tx_enable(port);
- //       CAN_ITConfig( CAN1, CAN_IT_TME, ENABLE);
 	}
  
-    //s_hal_can_isr_tx_disable(port);
-    
 }
-
-
 
 
 
@@ -683,21 +708,22 @@ static void s_hal_can_isr_recvframe_canx(hal_can_port_t port)
     CanRxMsg RxMessage;
     hal_can_portdatastructure_t *cport = s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
 
-
     canframe_ptr = hal_canfifo_hid_getFirstFree(&cport->canframes_rx_norm);
     if(NULL == canframe_ptr)
-    {
-        //fifo is full
+    {   // rx-fifo is full ...  we remove oldest frame
         hal_canfifo_hid_pop(&cport->canframes_rx_norm); //remove the oldest frame
         canframe_ptr = hal_canfifo_hid_getFirstFree(&cport->canframes_rx_norm);
     }
-    CAN_Receive( ((hal_can_port1 == port) ? (CAN1) : (CAN2)), /*FIFO0*/0, &RxMessage);
     
+    // get the message from fifo-0 of canx peripheral
+    CAN_Receive(HAL_can_port2peripheral(port), CAN_FIFO0, &RxMessage);
+    
+    // build the canframe inside the rx-fifo with the message content
     canframe_ptr->id = RxMessage.StdId;
     canframe_ptr->size = RxMessage.DLC;
     *((uint64_t*)canframe_ptr->data) = *((uint64_t*)RxMessage.Data);
 
-    //if call back is set, invoke it
+    // if a callback is set, invoke it
     if(NULL != cport->cfg.callback_on_rx )
     {
     	cport->cfg.callback_on_rx(cport->cfg.arg_cb_rx);
@@ -708,10 +734,12 @@ static void s_hal_can_isr_recvframe_canx(hal_can_port_t port)
 
 static void s_hal_can_hw_gpio_init(hal_can_port_t port)
 {
-    GPIO_InitTypeDef  GPIO_InitStructure;
     
 #if     defined(USE_STM32F1)
 
+#if 0
+    GPIO_InitTypeDef  GPIO_InitStructure;
+    
     // enable gpio clock for can1 tx and rx and its afio clock
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO | hal_brdcfg_can__gpio_clock_canx_rx[HAL_can_port2index(port)] | hal_brdcfg_can__gpio_clock_canx_tx[HAL_can_port2index(port)], ENABLE);
     
@@ -726,9 +754,73 @@ static void s_hal_can_hw_gpio_init(hal_can_port_t port)
 
     // Remap GPIOs 
     GPIO_PinRemapConfig((hal_can_port1 == port) ? (GPIO_Remap2_CAN1) : (GPIO_Remap_CAN2), ENABLE);    
+#else
 
+    // 1. prepare af.
+    // for can1 (rx, tx): no-remap if it is (PA11, PA12). GPIO_Remap1_CAN1 if it is (PB8, PB9). GPIO_Remap2_CAN1 if it is (PD0, PD1) 
+    // for can2 (tx, rx): no remap if it is (PB12, PB13). GPIO_Remap_CAN2 if it is (PB5, PB6)
+    uint32_t afname = HAL_GPIO_AFNAME_NONE;
+    uint32_t afmode = HAL_GPIO_AFMODE_NONE;
+    hal_bool_t found = hal_false;
+
+    
+    hal_gpio_port_t portrx = hal_brdcfg_can__gpio_canx_rx[HAL_can_port2index(port)].port;
+    hal_gpio_pin_t  pinrx  = hal_brdcfg_can__gpio_canx_rx[HAL_can_port2index(port)].pin;
+    hal_gpio_port_t porttx = hal_brdcfg_can__gpio_canx_tx[HAL_can_port2index(port)].port;
+    hal_gpio_pin_t  pintx  = hal_brdcfg_can__gpio_canx_tx[HAL_can_port2index(port)].pin;    
+    
+    if(hal_can_port1 == port)
+    {        
+        if((hal_gpio_portA == portrx) && (hal_gpio_portA == porttx) && (hal_gpio_pin11 == pinrx) && (hal_gpio_pin12 == pintx))
+        {
+            afname = HAL_GPIO_AFNAME_NONE;  afmode = HAL_GPIO_AFMODE_NONE;      found = hal_true;
+        }
+        else if((hal_gpio_portB == portrx) && (hal_gpio_portB == porttx) && (hal_gpio_pin8 == pinrx) && (hal_gpio_pin9 == pintx))
+        {
+            afname = GPIO_Remap1_CAN1;      afmode = ENABLE;                    found = hal_true;
+        }
+        else if((hal_gpio_portD == portrx) && (hal_gpio_portD == porttx) && (hal_gpio_pin0 == pinrx) && (hal_gpio_pin1 == pintx))
+        {
+            afname = GPIO_Remap2_CAN1;      afmode = ENABLE;                    found = hal_true;
+        }               
+    }
+    else if(hal_can_port2 == port)
+    {
+       if((hal_gpio_portB == portrx) && (hal_gpio_portB == porttx) && (hal_gpio_pin12 == pinrx) && (hal_gpio_pin13 == pintx))
+        {
+            afname = HAL_GPIO_AFNAME_NONE;  afmode = HAL_GPIO_AFMODE_NONE;      found = hal_true;
+        }
+        else if((hal_gpio_portB == portrx) && (hal_gpio_portB == porttx) && (hal_gpio_pin5 == pinrx) && (hal_gpio_pin6 == pintx))
+        {
+            afname = GPIO_Remap_CAN2;       afmode = ENABLE;                    found = hal_true;
+        }    
+    }
+    
+    if(hal_false == found)
+    {
+        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_can_init(): incorrect pin mapping");
+    }
+
+    hal_gpio_altcfg_t hal_can_canx_rx_altcfg;
+    hal_gpio_altcfg_t hal_can_canx_tx_altcfg;
+    
+    // prepare the altcfg for rx and tx pins
+    memcpy(&hal_can_canx_rx_altcfg, &s_hal_can_canx_rx_altcfg, sizeof(hal_gpio_altcfg_t));
+    memcpy(&hal_can_canx_tx_altcfg, &s_hal_can_canx_tx_altcfg, sizeof(hal_gpio_altcfg_t));
+    hal_can_canx_rx_altcfg.afname = hal_can_canx_tx_altcfg.afname = afname;
+    hal_can_canx_rx_altcfg.afmode = hal_can_canx_tx_altcfg.afmode = afmode;
+    
+    // configure rx and tx pins
+    hal_gpio_configure(hal_brdcfg_can__gpio_canx_rx[HAL_can_port2index(port)], &hal_can_canx_rx_altcfg);    
+    hal_gpio_configure(hal_brdcfg_can__gpio_canx_tx[HAL_can_port2index(port)], &hal_can_canx_tx_altcfg);
+
+#endif
 #elif   defined(USE_STM32F4)    
-
+ 
+#if 0
+ 
+    GPIO_InitTypeDef  GPIO_InitStructure;
+    
     // enable gpio clock for can1 tx and rx
     RCC_AHB1PeriphClockCmd(hal_brdcfg_can__gpio_clock_canx_rx[HAL_can_port2index(port)] | hal_brdcfg_can__gpio_clock_canx_tx[HAL_can_port2index(port)], ENABLE);
 
@@ -746,8 +838,83 @@ static void s_hal_can_hw_gpio_init(hal_can_port_t port)
     GPIO_Init(hal_brdcfg_can__gpio_port_canx_tx[HAL_can_port2index(port)], &GPIO_InitStructure);
     
     // connect can pins to afio
-    GPIO_PinAFConfig(hal_brdcfg_can__gpio_port_canx_rx[HAL_can_port2index(port)], hal_brdcfg_can__gpio_pinsource_canx_rx[HAL_can_port2index(port)], GPIO_AF_CAN1);
-    GPIO_PinAFConfig(hal_brdcfg_can__gpio_port_canx_tx[HAL_can_port2index(port)], hal_brdcfg_can__gpio_pinsource_canx_tx[HAL_can_port2index(port)], GPIO_AF_CAN1); 
+    GPIO_PinAFConfig(hal_brdcfg_can__gpio_port_canx_rx[HAL_can_port2index(port)], hal_brdcfg_can__gpio_pinsource_canx_rx[HAL_can_port2index(port)], GPIO_AF_CAN1); or GPIO_AF_CAN2
+    GPIO_PinAFConfig(hal_brdcfg_can__gpio_port_canx_tx[HAL_can_port2index(port)], hal_brdcfg_can__gpio_pinsource_canx_tx[HAL_can_port2index(port)], GPIO_AF_CAN1); or GPIO_AF_CAN2
+
+#else
+
+    // 1. prepare af.
+    // for can1 (rx, tx): rx -> PI9, PA11, PD0, PB8.    tx ->PA12, PH13, PD1, PB9. 
+    // for can2 (tx, rx): rx -> PB5, PB12.              tx ->PB13, PB6. 
+    
+    uint32_t afname = HAL_GPIO_AFNAME_NONE;
+    uint32_t afmode = HAL_GPIO_AFMODE_NONE;
+    hal_bool_t foundrx = hal_false;
+    hal_bool_t foundtx = hal_false;
+
+    
+    hal_gpio_port_t portrx = hal_brdcfg_can__gpio_canx_rx[HAL_can_port2index(port)].port;
+    hal_gpio_pin_t  pinrx  = hal_brdcfg_can__gpio_canx_rx[HAL_can_port2index(port)].pin;
+    hal_gpio_port_t porttx = hal_brdcfg_can__gpio_canx_tx[HAL_can_port2index(port)].port;
+    hal_gpio_pin_t  pintx  = hal_brdcfg_can__gpio_canx_tx[HAL_can_port2index(port)].pin;    
+    
+    if(hal_can_port1 == port)
+    { 
+        afname = GPIO_AF_CAN1;  afmode = ENABLE;
+        
+        if( ((hal_gpio_portI == portrx) && (hal_gpio_pin9 == pinrx))  ||
+            ((hal_gpio_portA == portrx) && (hal_gpio_pin11 == pinrx)) ||
+            ((hal_gpio_portD == portrx) && (hal_gpio_pin0 == pinrx))  ||
+            ((hal_gpio_portB == portrx) && (hal_gpio_pin8 == pinrx))  )
+        {
+            foundrx = hal_true;
+        }
+        
+        if( ((hal_gpio_portA == porttx) && (hal_gpio_pin12 == pintx))  ||
+            ((hal_gpio_portH == porttx) && (hal_gpio_pin13 == pintx)) ||
+            ((hal_gpio_portD == porttx) && (hal_gpio_pin1 == pintx))  ||
+            ((hal_gpio_portB == porttx) && (hal_gpio_pin9 == pintx))  )
+        {
+            foundtx = hal_true;
+        }
+    }
+    else if(hal_can_port2 == port)
+    {
+    
+        afname = GPIO_AF_CAN2;
+        
+        if( ((hal_gpio_portB == portrx) && (hal_gpio_pin5 == pinrx))  ||
+            ((hal_gpio_portB == portrx) && (hal_gpio_pin12 == pinrx))  )
+        {
+            foundrx = hal_true;
+        }
+        
+        if( ((hal_gpio_portB == porttx) && (hal_gpio_pin13 == pintx))  ||
+            ((hal_gpio_portB == porttx) && (hal_gpio_pin6 == pintx))   )
+        {
+            foundtx = hal_true;
+        }
+    }
+    
+    if((hal_false == foundrx) || (hal_false == foundtx))
+    {
+        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_can_init(): incorrect pin mapping");
+    }
+
+    hal_gpio_altcfg_t hal_can_canx_rx_altcfg;
+    hal_gpio_altcfg_t hal_can_canx_tx_altcfg;
+    
+    // prepare the altcfg for rx and tx pins
+    memcpy(&hal_can_canx_rx_altcfg, &s_hal_can_canx_rx_altcfg, sizeof(hal_gpio_altcfg_t));
+    memcpy(&hal_can_canx_tx_altcfg, &s_hal_can_canx_tx_altcfg, sizeof(hal_gpio_altcfg_t));
+    hal_can_canx_rx_altcfg.afname = hal_can_canx_tx_altcfg.afname = afname;
+    hal_can_canx_rx_altcfg.afmode = hal_can_canx_tx_altcfg.afmode = afmode;
+    
+    // configure rx and tx pins
+    hal_gpio_configure(hal_brdcfg_can__gpio_canx_rx[HAL_can_port2index(port)], &hal_can_canx_rx_altcfg);    
+    hal_gpio_configure(hal_brdcfg_can__gpio_canx_tx[HAL_can_port2index(port)], &hal_can_canx_tx_altcfg);
+
+#endif
     
 #endif
 }
@@ -763,7 +930,6 @@ static void s_hal_can_hw_clock_init(hal_can_port_t port)
 
 static void s_hal_can_hw_nvic_init(hal_can_port_t port)
 {
-#if 1
     hal_can_portdatastructure_t *cport = s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
     IRQn_Type CANx_RX0_IRQn = (hal_can_port1 == port) ? (CAN1_RX0_IRQn) : (CAN2_RX0_IRQn);
     IRQn_Type CANx_TX_IRQn  = (hal_can_port1 == port) ? (CAN1_TX_IRQn) : (CAN2_TX_IRQn);
@@ -781,50 +947,13 @@ static void s_hal_can_hw_nvic_init(hal_can_port_t port)
         hal_sys_irqn_priority_set(CANx_TX_IRQn, cport->cfg.priotx);
         hal_sys_irqn_disable(CANx_TX_IRQn);
     }
-
-#else
-    // old mode....
-//    hal_can_portdatastructure_t *cport = s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
-
-	NVIC_InitTypeDef  NVIC_InitStructure;
-
-    #warning --> acemor removed it to maintain 16 priorities                                                        
-	//NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-
-    //#warning -> so far the priorities of rx and tx can are not used (subprio 0/1 and 2/3 are used instead)
-    // they are available in cport->priorx and cport->priotx
-
-	if(hal_can_port1 == port) /* Configure CAN1 */
-	{
-	  NVIC_InitStructure.NVIC_IRQChannel = CAN1_RX0_IRQn;
-	  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0;
-	  NVIC_Init(&NVIC_InitStructure);
-
-	  NVIC_InitStructure.NVIC_IRQChannel = CAN1_TX_IRQn;
-	  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x2;
-	  NVIC_Init(&NVIC_InitStructure);
-
-	}
-	else /* Configure CAN2 */
-	{
-	  NVIC_InitStructure.NVIC_IRQChannel = CAN2_RX0_IRQn;
-	  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x1;
-	  NVIC_Init(&NVIC_InitStructure);
-
-	  NVIC_InitStructure.NVIC_IRQChannel = CAN2_TX_IRQn;
-	  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x3;
-	  NVIC_Init(&NVIC_InitStructure);
-	}
-#endif
 }
 
 
 static hal_result_t s_hal_can_hw_registers_init(hal_can_port_t port)
 {
     hal_can_portdatastructure_t*    cport  = s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
-    CAN_TypeDef*                    CANx   = (hal_can_port1 == port) ? (CAN1) : (CAN2); 
+    CAN_TypeDef*                    CANx   = HAL_can_port2peripheral(port); 
 	CAN_InitTypeDef                 CAN_InitStructure;
 	CAN_FilterInitTypeDef           CAN_FilterInitStructure;
 	uint32_t			            baudrate;   
@@ -840,31 +969,35 @@ static hal_result_t s_hal_can_hw_registers_init(hal_can_port_t port)
 
 
 	CAN_StructInit(&CAN_InitStructure);
-
-	// CAN cell init 
-	CAN_InitStructure.CAN_TTCM      = DISABLE;
-	CAN_InitStructure.CAN_ABOM      = DISABLE;
-	CAN_InitStructure.CAN_AWUM      = DISABLE;
-	CAN_InitStructure.CAN_NART      = DISABLE;
-	CAN_InitStructure.CAN_RFLM      = DISABLE;
-	CAN_InitStructure.CAN_TXFP      = ENABLE;    // hardware manages tx frames as fifo
+    
+    // CAN_Prescaler is the prescaler to apply to HAL_STM32_CAN_CLK so that the bit has HAL_STM32_CAN_TQ_TOTAL time quanta (or ticks of the clock)
+    // also ... HAL_STM32_CAN_TQ_TOTAL = HAL_STM32_CAN_TQ_BS1 + 1 + HAL_STM32_CAN_TQ_BS2
+    CAN_InitStructure.CAN_Prescaler = (HAL_STM32_CAN_CLK / HAL_STM32_CAN_TQ_TOTAL) / baudrate;  
+    CAN_InitStructure.CAN_Mode      = CAN_Mode_Normal;      // operating mode
+    CAN_InitStructure.CAN_SJW       = HAL_STM32_CAN_TQ_SJW; // max num of time quanta the hw is allowed to stretch a bit in order to re-synch
+	CAN_InitStructure.CAN_BS1       = HAL_STM32_CAN_TQ_BS1; // number of time quanta in bit-segment-1 (the one before the sampling time quantum)
+	CAN_InitStructure.CAN_BS2       = HAL_STM32_CAN_TQ_BS2; // number of time quanta in bit-segment-2 (the one after the sampling time quantum)
+	CAN_InitStructure.CAN_TTCM      = DISABLE;              // time-triggered communication mode
+	CAN_InitStructure.CAN_ABOM      = DISABLE;              // automatic bus-off
+	CAN_InitStructure.CAN_AWUM      = DISABLE;              // automatic wake-up
+	CAN_InitStructure.CAN_NART      = DISABLE;              // no-automatic retransmission mode 
+	CAN_InitStructure.CAN_RFLM      = DISABLE;              // receive fifo locked mode
+	CAN_InitStructure.CAN_TXFP      = ENABLE;               // transmit fifo priority (if ENABLEd, priority amongst the pending mailboxes is driven by the request order)
     
 
-	CAN_InitStructure.CAN_Mode      = CAN_Mode_Normal;
-	CAN_InitStructure.CAN_SJW       = HAL_STM32_CAN_TQ_SJW;;
-	CAN_InitStructure.CAN_BS1       = HAL_STM32_CAN_TQ_BS1;
-	CAN_InitStructure.CAN_BS2       = HAL_STM32_CAN_TQ_BS2;
-	CAN_InitStructure.CAN_Prescaler = (HAL_STM32_CAN_CLK / HAL_STM32_CAN_TQ_TOTAL) / baudrate;
-
-	if(CANINITFAILED == CAN_Init(CANx, &CAN_InitStructure))
+	if(CAN_InitStatus_Failed == CAN_Init(CANx, &CAN_InitStructure))
 	{
 		return(hal_res_NOK_generic);
 	}
 
-	//TODO: rendere configurabile i filtri
-#warning VALE->filter doesn't work!!!
+	// TODO: rendere configurabile i filtri
+    // #warning VALE->filter doesn't work!!!
+    // acemor on 19-oct-2012: FILTERNUM_CAN2 era 14 che e' un valore non valido ...
+    //                        quindi lascio i filtri 0->6 per il can1 ed i filtri 7->13 per il can2
+    #define FILTERNUM_CAN1                              0
+    #define FILTERNUM_CAN2                              7
 
-    // NOTE VALE: in order to receive msg, i had to init filter fore receive all.
+    // NOTE VALE: in order to receive msg, i had to init filter for receive all.
 	// CAN filter init
 	CAN_FilterInitStructure.CAN_FilterMode              = CAN_FilterMode_IdMask;
 	CAN_FilterInitStructure.CAN_FilterScale             = CAN_FilterScale_32bit;
@@ -874,11 +1007,10 @@ static hal_result_t s_hal_can_hw_registers_init(hal_can_port_t port)
 	CAN_FilterInitStructure.CAN_FilterMaskIdLow         = 0x0000;
 	CAN_FilterInitStructure.CAN_FilterFIFOAssignment    = 0;
 	CAN_FilterInitStructure.CAN_FilterActivation        = ENABLE;
-    CAN_FilterInitStructure.CAN_FilterNumber            = (hal_can_port1 == port) ? (0) : (14);
+    CAN_FilterInitStructure.CAN_FilterNumber            = (hal_can_port1 == port) ? (FILTERNUM_CAN1) : (FILTERNUM_CAN2);
 
     CAN_FilterInit(&CAN_FilterInitStructure);
-
-    
+   
 	return(hal_res_OK);
 }
 
@@ -891,8 +1023,7 @@ static hal_result_t s_hal_can_tx_normprio(hal_can_port_t port, hal_can_frame_t *
     hal_result_t res = hal_res_NOK_generic;
    
     
-    // disable interrupt in can 1 or 2 for tx depending on value of port
-    //CAN_IT_TX_DISA(port);
+    // disable interrupt in can 1 or 2 for tx depending on value of port: use the nvic
     s_hal_can_isr_tx_disable(port);
 
     // put frame in fifo out normal priority

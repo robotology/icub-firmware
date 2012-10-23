@@ -45,8 +45,6 @@
 
 #include "utils/stm32ee.h"  
 
-#warning --> if stm32f4xx the flash page is nasty .... thus dont use eeprom emulated in flash
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -66,6 +64,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #define HAL_eeprom_t2index(t)               ((uint8_t)(t))
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -109,12 +108,7 @@ static hal_eeprom_cfg_t s_hal_eeprom_emulated_flash_cfg = {0};
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-/*
-    @details    On MCBSTM32C and EMS001 boards the used EEPROM device is the M24C64 (page size = 32) which is a I2C-based device.
-    	        The used I2C port is I2C1.
-    	        I2C1 is configured in Master transmitter during write operation and in
-    	        Master receiver during read operation from I2C EEPROM. The speed is set to 200kHz.
-*/
+
 
 extern hal_result_t hal_eeprom_init(hal_eeprom_t eep, const hal_eeprom_cfg_t *cfg)
 {
@@ -154,14 +148,48 @@ extern hal_result_t hal_eeprom_init(hal_eeprom_t eep, const hal_eeprom_cfg_t *cf
                 return(res);
             }
             
-            res = (hal_result_t) stm32ee_init(&hal_brdcfg_eeprom__stm32eecfg);
+            stm32ee_cfg_t stm32eecfg            =
+            {
+                .devcfg             = 
+               {
+                    .device             = stm32ee_device_none,
+                    .i2cport            = 1,        // is equivalent to hal_i2c_port1
+                    .hwaddra2a1a0       = 0         // a0 = a1 = a2 = 0
+//                     .wpval              = stm32gpio_valNONE,      // no write protection
+//                     .wppin              =
+//                     {
+//                         .port               = stm32gpio_portNONE,
+//                         .pin                = stm32gpio_pinNONE
+//                     }                    
+                },
 
-            #warning --> acemor removed hal_brdcfg_eeprom__writeprotection_*() as now it is embedded inside stm32ee.c
-            //hal_brdcfg_eeprom__writeprotection_init();
-
-            // acemor: removed because it is a dummy function
-            //sEE_Init_without_i2c();
+                .i2cext             =
+                {   // does not init/deinit. only use read/write/standby
+                    .i2cinit            = NULL,         
+                    .i2cdeinit          = NULL,
+                    .i2cpar             = NULL,
+                    .i2cread            = (stm32ee_int8_fp_uint8_uint8_regaddr_uint8p_uint16_t)hal_i2c4hal_read,  // cannot put hal_i2c4hal_read()
+                    .i2cwrite           = (stm32ee_int8_fp_uint8_uint8_regaddr_uint8p_uint16_t)hal_i2c4hal_write, // or .. _write()
+                    .i2cstandby         = (stm32ee_int8_fp_uint8_uint8_t)hal_i2c4hal_hid_standby            
+                },
+                .wpext              =
+                {
+                    .wpinit             = hal_brdcfg_eeprom__wp_init,
+                    .wpdeinit           = NULL,
+                    .wpenable           = hal_brdcfg_eeprom__wp_enable,
+                    .wpdisable          = hal_brdcfg_eeprom__wp_disable                   
+                }
+            };
             
+            stm32eecfg.devcfg.device        = (stm32ee_device_t)hal_brdcfg_eeprom__i2c_01_device.device;
+            stm32eecfg.devcfg.i2cport       = hal_i2c_port1; // for i2c1 i2cport must be 0
+            stm32eecfg.devcfg.hwaddra2a1a0  = hal_brdcfg_eeprom__i2c_01_device.hwaddra2a1a0;
+//             stm32eecfg.devcfg.wpval         = (stm32gpio_val_t)hal_brdcfg_eeprom__i2c_01_device.wpval;
+//             stm32eecfg.devcfg.wppin.port    = (stm32gpio_port_t)hal_brdcfg_eeprom__i2c_01_device.wppin.port;
+//             stm32eecfg.devcfg.wppin.pin     = (stm32gpio_pin_t)hal_brdcfg_eeprom__i2c_01_device.wppin.pin;
+            
+            res = (hal_result_t) stm32ee_init(&stm32eecfg);
+
         } break;
 
         default:
@@ -224,12 +252,10 @@ extern hal_result_t hal_eeprom_erase(hal_eeprom_t eep, uint32_t addr, uint32_t s
         {
             num8 = size / factor;
             rem8 = size % factor;
-            //hal_brdcfg_eeprom__writeprotection_disable();
 
             for(i=0; i<num8; i++)
             {
                 res = (hal_result_t)stm32ee_write(addr, factor, (uint8_t*)&value8, NULL);
-                //rr = sEE_WriteBuffer((uint8_t*)&value8, (uint16_t)addr, (uint16_t)factor);
                 if(hal_res_OK != res) return(hal_res_NOK_generic);
                 addr += factor;
             }
@@ -237,22 +263,9 @@ extern hal_result_t hal_eeprom_erase(hal_eeprom_t eep, uint32_t addr, uint32_t s
             if(0 != rem8)
             {
                 res = (hal_result_t)stm32ee_write(addr, rem8, (uint8_t*)&value8, NULL);
-                //rr = sEE_WriteBuffer((uint8_t*)&value8, (uint16_t)addr, (uint16_t)rem8);
                 if(hal_res_OK != res) return(hal_res_NOK_generic);
             }
 
-            //hal_brdcfg_eeprom__writeprotection_enable();
-
-//#if 0 // acemor on 14 ott 2011: it does not work.
-//    hal_brdcfg_eeprom__writeprotection_disable();
-//
-//    for(end = addr + size; addr < end; addr++)
-//    {
-//	    sEE_WriteByte(&value, (uint16_t)addr);
-//    }
-//
-//    hal_brdcfg_eeprom__writeprotection_enable();
-//#endif
 
         } break;
 
@@ -304,12 +317,7 @@ extern hal_result_t hal_eeprom_write(hal_eeprom_t eep, uint32_t addr, uint32_t s
 
         case hal_eeprom_i2c_01:
         {
-            //hal_brdcfg_eeprom__writeprotection_disable();
             res = (hal_result_t)stm32ee_write(addr, size, (uint8_t*)data, NULL);
-        	//rr = sEE_WriteBuffer((uint8_t*)data, (uint16_t)addr, (uint16_t)size);
-            //hal_brdcfg_eeprom__writeprotection_enable();
-            //if(sEE_OK != rr)     res = hal_res_NOK_generic;
-            //else                 res = hal_res_OK;
         } break;
 
         default:
@@ -327,8 +335,6 @@ extern hal_result_t hal_eeprom_write(hal_eeprom_t eep, uint32_t addr, uint32_t s
 extern hal_result_t hal_eeprom_read(hal_eeprom_t eep, uint32_t addr, uint32_t size, void *data)
 {
     hal_result_t res = hal_res_NOK_generic;
-    //uint16_t numbytes2read = (uint16_t)size;
-    //uint32_t rr = 0;
 
     if(hal_true != s_hal_eeprom_initted_is(eep))
     {
@@ -359,10 +365,7 @@ extern hal_result_t hal_eeprom_read(hal_eeprom_t eep, uint32_t addr, uint32_t si
 
         case hal_eeprom_i2c_01:
         {
-            //rr = sEE_ReadBuffer((uint8_t*)data, (uint16_t)addr, (uint16_t)numbytes2read);
             res = (hal_result_t)stm32ee_read(addr, size, (uint8_t*)data, NULL);
-            //if(sEE_OK != rr)    res = hal_res_NOK_generic;
-            //else                res = hal_res_OK;
         } break;
 
         default:
@@ -505,18 +508,6 @@ extern hal_result_t hal_eeprom_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory
     return(hal_res_OK); 
 }
 
-
-//extern hal_result_t hal_eeprom_hid_waitstandbystate(hal_eeprom_t eep)
-//{
-//    if(hal_true != s_hal_eeprom_initted_is(eep))
-//    {
-//        return(hal_res_NOK_generic);
-//    }
-//
-//	sEE_WaitEepromStandbyState();
-//
-//    return(hal_res_OK); 
-//}
 
 
 // --------------------------------------------------------------------------------------------------------------------

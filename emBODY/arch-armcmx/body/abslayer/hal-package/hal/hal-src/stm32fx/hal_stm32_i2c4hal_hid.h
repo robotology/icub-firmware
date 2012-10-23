@@ -68,6 +68,8 @@ extern hal_result_t hal_i2c4hal_hid_setmem(const hal_cfg_t *cfg, uint32_t *memor
 
 extern hal_boolval_t hal_i2c4hal_hid_initted_is(hal_i2c_port_t port);
 
+extern hal_result_t hal_i2c4hal_hid_standby(hal_i2c_port_t port, uint8_t devaddr) ;
+
 
 
 #endif  // include guard

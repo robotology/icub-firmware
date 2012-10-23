@@ -80,7 +80,7 @@ const hal_encoder_cfg_t hal_encoder_cfg_default =
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_encoder_t2index(t)               ((uint8_t)(t))
+#define HAL_encoder2index(t)               ((uint8_t)(t))
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -134,7 +134,7 @@ extern hal_result_t hal_encoder_init(hal_encoder_t enc, const hal_encoder_cfg_t 
         return(hal_res_NOK_unsupported);
     }
 
-    memcpy(&s_hal_encoder_cfgs[HAL_encoder_t2index(enc)], cfg, sizeof(hal_encoder_cfg_t));
+    memcpy(&s_hal_encoder_cfgs[HAL_encoder2index(enc)], cfg, sizeof(hal_encoder_cfg_t));
 
 
     // the mapping of the encoder onto the spi is fixed and is defined in here.
@@ -158,7 +158,7 @@ extern hal_result_t hal_encoder_init(hal_encoder_t enc, const hal_encoder_cfg_t 
             spi4enc_cfg.baudrate        = (hal_encoder_bitrate_500kbps == cfg->bitrate) ? hal_spi_baudrate500kbps : hal_spi_baudrate1000kbps;
             spi4enc_cfg.priority        = cfg->priority;
             spi4enc_cfg.callback_on_rx  = s_hal_encoder_on_rx_spi;
-            spi4enc_cfg.arg             = NULL;//&s_hal_encoder_ids[HAL_encoder_t2index(enc)];
+            spi4enc_cfg.arg             = NULL;//&s_hal_encoder_ids[HAL_encoder2index(enc)];
         } break;
 
         case hal_encoder7:
@@ -329,14 +329,13 @@ extern hal_result_t hal_encoder_get_value(hal_encoder_t enc, uint32_t *result )
 		return(hal_res_NOK_generic);
     }
 
-//  we allow a read of the value of the encoder also if the isr is astive .... be careful
+//  we allow a read of the value of the encoder also if the isr is active .... be careful
 //	while(hal_SPI4ENCODER_IS_IT_RX_ENA(spix)) ;
 
 
 	*result = hal_SPI4ENCODER_ENCDATA_GET(spix).encoder_result[encoder];
     return(hal_res_OK);
 }
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -376,23 +375,23 @@ extern hal_encoder_t hal_encoder_hid_from_spiportmux_to_encoder(hal_spi_port_t s
 
 static hal_boolval_t s_hal_encoder_supported_is(hal_encoder_t enc)
 {
-    return(hal_base_hid_word_bitcheck(hal_brdcfg_encoder__supported_mask, HAL_encoder_t2index(enc)) );
+    return(hal_base_hid_word_bitcheck(hal_brdcfg_encoder__supported_mask, HAL_encoder2index(enc)) );
 }
 
 static void s_hal_encoder_initted_set(hal_encoder_t enc)
 {
-    s_hal_encoder_initted[HAL_encoder_t2index(enc)] = hal_true;
+    s_hal_encoder_initted[HAL_encoder2index(enc)] = hal_true;
 }
 
 static hal_boolval_t s_hal_encoder_initted_is(hal_encoder_t enc)
 {
-    return(s_hal_encoder_initted[HAL_encoder_t2index(enc)]);
+    return(s_hal_encoder_initted[HAL_encoder2index(enc)]);
 }
 
 static void s_hal_encoder_on_rx_spi(void* p)
 {
     hal_encoder_t enc = (hal_encoder_t)((uint32_t)p);  // ok, i know that there is a conversion to a smaller integer but i dont care
-    uint8_t index = HAL_encoder_t2index(enc);
+    uint8_t index = HAL_encoder2index(enc);
 
     if(NULL != s_hal_encoder_cfgs[index].callback_on_rx)
     {
