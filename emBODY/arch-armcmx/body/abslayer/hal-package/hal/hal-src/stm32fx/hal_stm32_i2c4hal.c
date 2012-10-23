@@ -641,19 +641,23 @@ static hal_result_t s_i2c4hal_read(hal_i2c_port_t port, uint8_t devaddr, hal_i2c
     {
         if(0 == (timeout--)) return s_hal_i2c4hal_timeoutexpired();
     }
-    
-    
+       
     // send address of register to read inside the device
     if(1 == regaddr.numofbytes)
     {
         reg1byteadr = regaddr.bytes.one;
         I2C_SendData(I2Cx, reg1byteadr);           
-        // test on ev8 and clear it
+        // test on ev8 and clear it (ev8 is I2C_EVENT_MASTER_BYTE_TRANSMITTING ...)
         timeout = s_hal_i2c4hal_timeout_flag;
+#if 0                
         while(I2C_GetFlagStatus(I2Cx, I2C_FLAG_BTF) == RESET)
+#else
+        while(!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
+#endif        
         {
             if(0 == (timeout--)) return s_hal_i2c4hal_timeoutexpired();
-        }               
+        }  
+    
     }
     else if(2 == regaddr.numofbytes)
     {   
@@ -668,9 +672,13 @@ static hal_result_t s_i2c4hal_read(hal_i2c_port_t port, uint8_t devaddr, hal_i2c
         
         reg1byteadr = regaddr.bytes.two & 0x00FF;               // then lsb
         I2C_SendData(I2Cx, reg1byteadr);           
-        // test on ev8 and clear it
+        // test on ev8 and clear it (ev8 is I2C_EVENT_MASTER_BYTE_TRANSMITTING ...)       
         timeout = s_hal_i2c4hal_timeout_flag;
+#if 0                
         while(I2C_GetFlagStatus(I2Cx, I2C_FLAG_BTF) == RESET)
+#else
+        while(!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
+#endif 
         {
             if(0 == (timeout--)) return s_hal_i2c4hal_timeoutexpired();
         }               
@@ -723,10 +731,12 @@ static hal_result_t s_i2c4hal_read(hal_i2c_port_t port, uint8_t devaddr, hal_i2c
 
 static void s_hal_i2c4hal_read_bytes(I2C_TypeDef* I2Cx, uint8_t* data, uint16_t size)
 {
+    #undef PRE_SEND_STOP
     volatile uint32_t timeout = 0;
     
-    while(size)
+    while(size > 0)
     {
+#if defined(PRE_SEND_STOP)    
         if(1 == size)
         {
             // disable acknowledgement
@@ -739,7 +749,7 @@ static void s_hal_i2c4hal_read_bytes(I2C_TypeDef* I2Cx, uint8_t* data, uint16_t 
             // send stop condition
             I2C_GenerateSTOP(I2Cx, ENABLE);
         }
-        
+#endif        
         // wait for the byte to be received
         timeout = s_hal_i2c4hal_timeout_flag;
         while(I2C_GetFlagStatus(I2Cx, I2C_FLAG_RXNE) == RESET)
@@ -754,6 +764,18 @@ static void s_hal_i2c4hal_read_bytes(I2C_TypeDef* I2Cx, uint8_t* data, uint16_t 
         data++;
         size--;          
     }
+
+#if !defined(PRE_SEND_STOP)    
+    // disable acknowledgement
+    I2C_AcknowledgeConfig(I2Cx, DISABLE);   
+
+    // clear addr by reading sr1 and then sr2
+    (void)(I2Cx)->SR1;
+    (void)(I2Cx)->SR2;
+    
+    // send stop condition
+    I2C_GenerateSTOP(I2Cx, ENABLE);
+#endif
     
     // wait to make sure that the stop bit has been cleared
     timeout = s_hal_i2c4hal_timeout_flag;
@@ -880,7 +902,7 @@ static void s_hal_i2c4hal_write_bytes(I2C_TypeDef* I2Cx, uint8_t* data, uint16_t
     
     while(size) 
     {
-  
+ 
         // send the byte to be written 
         I2C_SendData(I2Cx, *data); 
         
