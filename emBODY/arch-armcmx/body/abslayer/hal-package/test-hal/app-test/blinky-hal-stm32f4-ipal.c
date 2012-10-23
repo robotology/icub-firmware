@@ -92,6 +92,8 @@ static void s_udp_onreception(void *arg, ipal_udpsocket_t *skt, ipal_packet_t *p
 
 static void test_eeprom(void);
 
+static void test_can(void);
+
 static void s_test_mco2(void);
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -183,16 +185,17 @@ int main(void)
     
     
 #ifdef  HAL_USE_SWITCH   
-    extern const hal_eth_phymode_t hal_brdcfg_eth__phymode;
-    hal_eth_phymode_t phymode; 
-    memcpy(&phymode, &hal_brdcfg_eth__phymode, sizeof(hal_eth_phymode_t));
-    hal_switch_init(NULL);
-    hal_switch_start(&phymode);
-    for(;;);
+//     extern const hal_eth_phymode_t hal_brdcfg_eth__phymode;
+//     hal_eth_phymode_t phymode = hal_brdcfg_eth__phymode; 
+//     hal_switch_init(NULL);
+//     hal_switch_start(&phymode);
+//     for(;;);
 #endif    
  
 
-//    test_eeprom();    
+    test_eeprom();   
+
+    test_can();
     
     
     ipal_base_memory_getsize(ipal_cfgMINE, &size04aligned);
@@ -420,6 +423,12 @@ static void s_udp_onreception(void *arg, ipal_udpsocket_t *skt, ipal_packet_t *p
     adr = adr;
     por = por;
 
+}
+
+static void test_can(void)
+{
+    hal_can_init(hal_can_port1, NULL);
+    hal_can_init(hal_can_port2, NULL);
 }
 
 
