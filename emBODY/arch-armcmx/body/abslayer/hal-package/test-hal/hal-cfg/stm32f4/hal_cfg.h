@@ -106,7 +106,7 @@
 
 // <e> Ethernet 
 
-#define HAL_ETH_ON      0
+#define HAL_ETH_ON      1
 
 // <o> ETH mode         <1=> ETH w/ ISR + DMA 
 // <i> sssssssss
@@ -141,7 +141,7 @@
 // <i> sssssssss
 
 #ifndef HAL_CAN1_ENABLE
- #define HAL_CAN1_ENABLE  0     
+ #define HAL_CAN1_ENABLE  1     
 #endif
 
 
@@ -162,7 +162,7 @@
 // <i> sssssssss
 
 #ifndef HAL_CAN2_ENABLE
- #define HAL_CAN2_ENABLE  0     
+ #define HAL_CAN2_ENABLE  1     
 #endif
 
 
