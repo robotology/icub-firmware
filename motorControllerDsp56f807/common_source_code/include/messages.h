@@ -1367,6 +1367,7 @@ else \
 		_kd[axis] = BYTE_W(CAN_DATA[5], CAN_DATA[6]); \
 		_kr[axis] = (CAN_DATA[7]); \
 		_general_board_error = ERROR_NONE; \
+		_received_pid[axis].rec_pid |=0x4F; \
 	} \
 	else \
 		_general_board_error = ERROR_FMT; \
@@ -1397,6 +1398,7 @@ else \
 		_pid_limit[axis] 		= BYTE_W(CAN_DATA[3], CAN_DATA[4]); \
 		_integral_limit[axis] 	= BYTE_W(CAN_DATA[5], CAN_DATA[6]); \
 		_general_board_error = ERROR_NONE; \
+		_received_pid[axis].rec_pid |=0x30; \
 	} \
 	else \
 		_general_board_error = ERROR_FMT; \
