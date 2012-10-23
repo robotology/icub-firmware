@@ -576,7 +576,7 @@ extern void hal_eth_hid_rmii_rx_init(void)
     {
         .gpioext    =
         {
-            .GPIO_Pin       = GPIO_Pin_All,
+            .GPIO_Pin       = 0,
             .GPIO_Speed     = GPIO_Speed_50MHz,
             .GPIO_Mode      = GPIO_Mode_IN_FLOATING,  
         },
@@ -590,7 +590,7 @@ extern void hal_eth_hid_rmii_rx_init(void)
     {
         .gpioext    =
         {
-             .GPIO_Pin       = GPIO_Pin_All,
+             .GPIO_Pin       = 0,
              .GPIO_Mode      = GPIO_Mode_AF,
              .GPIO_Speed     = GPIO_Speed_100MHz,
              .GPIO_OType     = GPIO_OType_PP,
@@ -614,7 +614,7 @@ extern void hal_eth_hid_rmii_tx_init(void)
     {
         .gpioext    =
         {
-            .GPIO_Pin       = GPIO_Pin_All,
+            .GPIO_Pin       = 0,
             .GPIO_Speed     = GPIO_Speed_50MHz,
             .GPIO_Mode      = GPIO_Mode_AF_PP, 
         },
@@ -626,7 +626,7 @@ extern void hal_eth_hid_rmii_tx_init(void)
     {
         .gpioext    =
         {
-             .GPIO_Pin       = GPIO_Pin_All,
+             .GPIO_Pin       = 0,
              .GPIO_Mode      = GPIO_Mode_AF,
              .GPIO_Speed     = GPIO_Speed_100MHz,
              .GPIO_OType     = GPIO_OType_PP,
@@ -651,7 +651,7 @@ extern void hal_eth_hid_smi_init(void)
     {
         .gpioext    =
         {
-            .GPIO_Pin       = GPIO_Pin_All,
+            .GPIO_Pin       = 0,
             .GPIO_Speed     = GPIO_Speed_50MHz,
             .GPIO_Mode      = GPIO_Mode_AF_PP, 
         },
@@ -664,7 +664,7 @@ extern void hal_eth_hid_smi_init(void)
     {
         .gpioext    =
         {
-             .GPIO_Pin       = GPIO_Pin_All,
+             .GPIO_Pin       = 0,
              .GPIO_Mode      = GPIO_Mode_AF,
              .GPIO_Speed     = GPIO_Speed_100MHz,
              .GPIO_OType     = GPIO_OType_PP,
@@ -727,7 +727,7 @@ extern void hal_eth_hid_rmii_refclock_init(void)
     {
         .gpioext    =
         {
-            .GPIO_Pin       = GPIO_Pin_All,
+            .GPIO_Pin       = 0,
             .GPIO_Speed     = GPIO_Speed_50MHz,
             .GPIO_Mode      = GPIO_Mode_IN_FLOATING,  
         },
@@ -739,7 +739,7 @@ extern void hal_eth_hid_rmii_refclock_init(void)
     {
         .gpioext    =
         {
-             .GPIO_Pin       = GPIO_Pin_All,
+             .GPIO_Pin       = 0,
              .GPIO_Mode      = GPIO_Mode_AF,
              .GPIO_Speed     = GPIO_Speed_100MHz,
              .GPIO_OType     = GPIO_OType_PP,
@@ -801,7 +801,7 @@ static int8_t s_hal_eth_gpioeth_init(stm32gpio_gpio_t gpio, uint8_t mode)
 #if     defined(USE_STM32F1) 
     static const GPIO_InitTypeDef ethgpioinit = 
     {
-        .GPIO_Pin       = GPIO_Pin_All,
+        .GPIO_Pin       = 0,
         .GPIO_Speed     = GPIO_Speed_50MHz,
         .GPIO_Mode      = GPIO_Mode_AF_PP,        
     };
@@ -827,7 +827,7 @@ static int8_t s_hal_eth_gpioeth_init(stm32gpio_gpio_t gpio, uint8_t mode)
   
      static const GPIO_InitTypeDef ethgpioinit = 
      {   // safe one
-         .GPIO_Pin       = GPIO_Pin_All,
+         .GPIO_Pin       = 0,
          .GPIO_Mode      = GPIO_Mode_AF,
          .GPIO_Speed     = GPIO_Speed_100MHz,
          .GPIO_OType     = GPIO_OType_PP,
@@ -864,7 +864,7 @@ extern void hal_eth_hid_rmii_rx_init(void)
     {
         .gpioext    =
         {
-            .GPIO_Pin       = GPIO_Pin_All,
+            .GPIO_Pin       = 0,
             .GPIO_Speed     = GPIO_Speed_50MHz,
             .GPIO_Mode      = GPIO_Mode_IN_FLOATING,  
         },
@@ -906,7 +906,7 @@ extern void hal_eth_hid_rmii_rx_init(void)
     {
         .gpioext    =
         {
-             .GPIO_Pin       = GPIO_Pin_All,
+             .GPIO_Pin       = 0,
              .GPIO_Mode      = GPIO_Mode_AF,
              .GPIO_Speed     = GPIO_Speed_100MHz,
              .GPIO_OType     = GPIO_OType_PP,
@@ -965,7 +965,7 @@ extern void hal_eth_hid_rmii_tx_init(void)
     {
         .gpioext    =
         {
-            .GPIO_Pin       = GPIO_Pin_All,
+            .GPIO_Pin       = 0,
             .GPIO_Speed     = GPIO_Speed_50MHz,
             .GPIO_Mode      = GPIO_Mode_AF_PP, 
         },
@@ -996,7 +996,7 @@ extern void hal_eth_hid_rmii_tx_init(void)
     {
         .gpioext    =
         {
-             .GPIO_Pin       = GPIO_Pin_All,
+             .GPIO_Pin       = 0,
              .GPIO_Mode      = GPIO_Mode_AF,
              .GPIO_Speed     = GPIO_Speed_100MHz,
              .GPIO_OType     = GPIO_OType_PP,
@@ -1065,7 +1065,7 @@ extern void hal_eth_hid_smi_init(void)
     {
         .gpioext    =
         {
-            .GPIO_Pin       = GPIO_Pin_All,
+            .GPIO_Pin       = 0,
             .GPIO_Speed     = GPIO_Speed_50MHz,
             .GPIO_Mode      = GPIO_Mode_AF_PP, 
         },
@@ -1105,7 +1105,7 @@ extern void hal_eth_hid_smi_init(void)
     {
         .gpioext    =
         {
-             .GPIO_Pin       = GPIO_Pin_All,
+             .GPIO_Pin       = 0,
              .GPIO_Mode      = GPIO_Mode_AF,
              .GPIO_Speed     = GPIO_Speed_100MHz,
              .GPIO_OType     = GPIO_OType_PP,
@@ -1170,7 +1170,7 @@ extern void hal_eth_hid_rmii_refclock_init(void)
     {
         .gpioext    =
         {
-            .GPIO_Pin       = GPIO_Pin_All,
+            .GPIO_Pin       = 0,
             .GPIO_Speed     = GPIO_Speed_50MHz,
             .GPIO_Mode      = GPIO_Mode_IN_FLOATING,  
         },
@@ -1195,11 +1195,11 @@ extern void hal_eth_hid_rmii_refclock_init(void)
     
 #elif   defined(USE_STM32F4) 
 
-        static const hal_gpio_altcfg_t rmii_clk_altcfg = 
+    static const hal_gpio_altcfg_t rmii_clk_altcfg = 
     {
         .gpioext    =
         {
-             .GPIO_Pin       = GPIO_Pin_All,
+             .GPIO_Pin       = 0,
              .GPIO_Mode      = GPIO_Mode_AF,
              .GPIO_Speed     = GPIO_Speed_100MHz,
              .GPIO_OType     = GPIO_OType_PP,
