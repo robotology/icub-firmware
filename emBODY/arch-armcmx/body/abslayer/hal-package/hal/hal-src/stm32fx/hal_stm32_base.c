@@ -44,6 +44,7 @@
 #include "hal_stm32_display_hid.h" 
 #include "hal_stm32_flash_hid.h" 
 #include "hal_stm32_gpio_hid.h" 
+#include "hal_stm32_i2c_hid.h"
 #include "hal_stm32_led_hid.h" 
 #include "hal_stm32_eeprom_hid.h"
 #include "hal_stm32_switch_hid.h"
@@ -54,10 +55,8 @@
 #include "hal_stm32_watchdog_hid.h"
 
 #include "hal_spi4encoder.h"
-#include "hal_i2c4hal.h"
-#include "hal_stm32_i2c4hal_hid.h"
 
- 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -185,10 +184,18 @@ extern uint32_t hal_base_memory_getsize(const hal_cfg_t *cfg, uint32_t *size04al
     retval += hal_gpio_hid_getsize(cfg);
 #endif//HAL_USE_GPIO
 
+#ifdef HAL_USE_I2C
+    retval += hal_i2c_hid_getsize(cfg);
+#endif//HAL_USE_I2C
+
 #ifdef HAL_USE_LED
     retval += hal_led_hid_getsize(cfg);
 #endif//HAL_USE_LED            
-    
+
+#ifdef HAL_USE_SPI4ENCODER
+    retval += hal_spi4encoder_hid_getsize(cfg);
+#endif//HAL_USE_SPI4ENCODER 
+
 #ifdef HAL_USE_SWITCH
     retval += hal_switch_hid_getsize(cfg);
 #endif//HAL_USE_SWITCH 
@@ -342,7 +349,16 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
     }
     data04aligned += hal_gpio_hid_getsize(cfg)/4;
 #endif//HAL_USE_GPIO
+    
+#ifdef HAL_USE_I2C
+    if(hal_res_OK != hal_i2c_hid_setmem(cfg, data04aligned))
+    {
+        return(hal_res_NOK_generic);
+    }
+    data04aligned += hal_i2c_hid_getsize(cfg)/4;
+#endif//HAL_USE_I2C     
 
+    
 #ifdef HAL_USE_LED
     if(hal_res_OK != hal_led_hid_setmem(cfg, data04aligned))
     {
@@ -359,6 +375,16 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
     data04aligned += hal_switch_hid_getsize(cfg)/4;
 #endif//HAL_USE_SWITCH
 
+    
+#ifdef HAL_USE_SPI4ENCODER
+    if(hal_res_OK != hal_spi4encoder_hid_setmem(cfg, data04aligned))
+    {
+        return(hal_res_NOK_generic);
+    }
+    data04aligned += hal_spi4encoder_hid_getsize(cfg)/4;
+#endif//HAL_USE_SPI4ENCODER
+
+    
 #ifdef HAL_USE_SYS
     if(hal_res_OK != hal_sys_hid_setmem(cfg, data04aligned))
     {
@@ -606,7 +632,7 @@ void hal_hid_link_to_all_files(void)
     hal_gpio_hid_getsize(NULL);
 #endif
 #ifdef HAL_USE_I2C
-    hal_i2c4hal_hid_getsize(NULL);
+    hal_i2c_hid_getsize(NULL);
 #endif
 #ifdef HAL_USE_LED
     hal_gpio_hid_getsize(NULL);

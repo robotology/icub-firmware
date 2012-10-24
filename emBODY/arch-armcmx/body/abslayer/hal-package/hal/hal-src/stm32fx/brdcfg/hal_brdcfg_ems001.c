@@ -41,7 +41,7 @@
 #include "hal_stm32_eth_def.h"
 #include "hal_eeprom.h"
 #include "hal_timer.h"
-#include "hal_i2c4hal.h"
+#include "hal_i2c.h"
 #include "hal_watchdog.h"
 #include "hal_switch.h"
 
@@ -235,8 +235,8 @@
 #endif//HAL_USE_EEPROM 
 
 
-#ifdef HAL_USE_I2C4HAL
-    extern const uint8_t hal_brdcfg_i2c4hal__supported_mask             = (1 << hal_i2c_port1); 
+#ifdef HAL_USE_I2C
+    extern const uint8_t hal_brdcfg_i2c__supported_mask                 = (1 << hal_i2c_port1); 
     extern const hal_gpio_cfg_t hal_brdcfg_i2c__scl[]                   =
     {
        {
@@ -267,7 +267,7 @@
             .speed      = hal_gpio_speed_default
         }        
     };    
-#endif//HAL_USE_I2C4HAL
+#endif//HAL_USE_I2C
 
 
 #ifdef HAL_USE_ENCODER
@@ -275,9 +275,6 @@
     extern const uint32_t hal_brdcfg_encoder__supported_mask = 0x01ff; // tutti e 9 gli encoder ...
 #endif//HAL_USE_ENCODER
 
-#ifdef HAL_USE_SPI4ENCODER
-    extern const uint8_t hal_brdcfg_spi4encoder__supported_mask = 0x05;  // spi1 and spi3
-#endif//HAL_USE_SPI4ENCODER
 
 #ifdef HAL_USE_GPIO
     extern const uint16_t hal_brdcfg_gpio__supported_mask[hal_gpio_ports_number]        =
@@ -339,17 +336,22 @@
     };
 #endif//HAL_USE_LED
 
-#ifdef HAL_USE_TIMER
-    extern const uint8_t hal_brdcfg_timer__supported_mask           = 
-    (0 << hal_timer1) | (1 << hal_timer2) | (1 << hal_timer3) | (1 << hal_timer4) |
-    (1 << hal_timer5) | (1 << hal_timer6) | (1 << hal_timer7);
-#endif//HAL_USE_TIMER
 
 #ifdef HAL_USE_SWITCH
     extern const hal_boolval_t hal_brdcfg_switch__supported         = hal_true;
     extern const hal_gpio_cfg_t hal_brdcfg_switch__gpio_reset       = { .port = hal_gpio_portB, .pin = hal_gpio_pin2,   .dir = hal_gpio_dirOUT, .speed = hal_gpio_speed_low  }; 
 #endif//HAL_USE_SWITCH
 
+#ifdef HAL_USE_SPI4ENCODER
+    extern const uint8_t hal_brdcfg_spi4encoder__supported_mask = 0x05;  // spi1 and spi3
+#endif//HAL_USE_SPI4ENCODER
+    
+#ifdef HAL_USE_TIMER
+    extern const uint8_t hal_brdcfg_timer__supported_mask           = 
+    (0 << hal_timer1) | (1 << hal_timer2) | (1 << hal_timer3) | (1 << hal_timer4) |
+    (1 << hal_timer5) | (1 << hal_timer6) | (1 << hal_timer7);
+#endif//HAL_USE_TIMER
+    
 #ifdef HAL_USE_WATCHDOG
     extern const uint8_t hal_brdcfg_watchdog__supported_mask        = (1 << hal_watchdog_normal) | (1 << hal_watchdog_window);
 #endif//HAL_USE_WATCHDOG
@@ -435,14 +437,14 @@ extern void hal_brdcfg_can__phydevices_disable(hal_can_port_t port)
 #endif//HAL_USE_CAN
 
 
-#ifdef HAL_USE_I2C4HAL
+#ifdef HAL_USE_I2C
 
 extern void hal_brdcfg_i2c__ontimeouterror(void)
 {
     hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "timeout in i2c");
 }
 
-#endif//HAL_USE_I2C4HAL
+#endif//HAL_USE_I2C
 
 
 #ifdef HAL_USE_EEPROM
@@ -614,7 +616,7 @@ extern void hal_brdcfg_switch__initialise(void)
     hal_brdcfg_switch__mco_initialise();  
 
     // --- i2c for communication 
-    hal_i2c4hal_init(hal_i2c_port1, NULL); // use default configuration        
+    hal_i2c_init(hal_i2c_port1, NULL); // use default configuration        
 }
 
 static void s_hal_brdcfg_switch__mii_phymode_get(hal_eth_phymode_t* phymode)
@@ -626,7 +628,7 @@ static void s_hal_brdcfg_switch__mii_phymode_get(hal_eth_phymode_t* phymode)
     uint8_t read = 0xFF; 
     hal_i2c_regaddr_t regadr = {.numofbytes = 1, .bytes.one = 0};
     regadr.bytes.one = 0x06;
-    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &read, 1);
+    hal_i2c_read(hal_i2c_port1, 0xBE, regadr, &read, 1);
     if( (MIIHALFD & read) == MIIHALFD)
     {
         mux = 0;
@@ -667,7 +669,7 @@ extern void hal_brdcfg_switch__configure(hal_eth_phymode_t* phymode)
 
 
     regadr.bytes.one = 0x01;
-    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    hal_i2c_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
     if((buff_read&0x01))
     {   // already initted. to be initted again must pass through a reset
         s_hal_brdcfg_switch__mii_phymode_get(phymode);
@@ -690,11 +692,11 @@ extern void hal_brdcfg_switch__configure(hal_eth_phymode_t* phymode)
 #if 0    
     // configure mii
     regadr.bytes.one = 0x06;
-    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    hal_i2c_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
     buff_write  = buff_read;
     buff_write |= 0x10; 
-    hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
-    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    hal_i2c_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
+    hal_i2c_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
 #endif
 
     // 1. configure  switch's ports 1 and 2
@@ -711,25 +713,25 @@ extern void hal_brdcfg_switch__configure(hal_eth_phymode_t* phymode)
     
     // port 1
     regadr.bytes.one = 0x1C;
-    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
-    hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
-    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    hal_i2c_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    hal_i2c_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
+    hal_i2c_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
      
     // port 2 
     regadr.bytes.one = 0x2C;
-    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
-    hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);   
-    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    hal_i2c_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    hal_i2c_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);   
+    hal_i2c_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
 
     // 2. start the switch
     buff_write = 0x1;  
     regadr.bytes.one = 0x01;    
-    hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
+    hal_i2c_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
     
 
     // 3. read back to verify
     regadr.bytes.one = 0x01;
-    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    hal_i2c_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
     if(!(buff_read&0x01))
     {
         hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "s_hal_switch_reg_config(): SWITCH not configured");
@@ -1025,28 +1027,6 @@ extern void hal_brdcfg_sys__gpio_default_init(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-#ifdef HAL_USE_I2C4HAL
-/*Note: mcu runs @ 72Mhz, 1.25 MIPS/Hz ==> 72 * 1.25 = 90 MIPS
-        in 2 microsec about 180 istructions.
-*/
-static void s_hal_ems001_i2c_wait2micro(void)   
-{
-#if 0
-    volatile uint8_t i, aux = 0;
-
-    for(i = 0; i<180; i++)
-    {
-       aux++; //istruzione per occupare un po' la cpu
-       if(255 == aux)
-       {
-        aux = 0;
-       }
-    }
-#else
-    hal_sys_delay(2);
-#endif    
-}
-#endif//HAL_USE_I2C4HAL
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

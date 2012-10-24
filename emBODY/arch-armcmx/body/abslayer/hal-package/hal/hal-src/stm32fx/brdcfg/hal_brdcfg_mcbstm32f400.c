@@ -23,7 +23,7 @@
 #include "hal_stm32_eth_def.h"
 #include "hal_eeprom.h"
 #include "hal_timer.h"
-#include "hal_i2c4hal.h"
+#include "hal_i2c.h"
 #include "hal_watchdog.h"
 #include "hal_switch.h"
 #include "utils/stm32ee.h"
@@ -181,6 +181,27 @@
     };        
 #endif//HAL_USE_EEPROM 
 
+
+#ifdef HAL_USE_ENCODER
+    extern const uint32_t hal_brdcfg_encoder__supported_mask = 0x01ff; // tutti e 9 gli encoder ...
+#endif//HAL_USE_ENCODER
+
+
+#ifdef HAL_USE_GPIO
+    extern const uint16_t hal_brdcfg_gpio__supported_mask[hal_gpio_ports_number]    =
+    {   // ok, i enable every pin of every port. however i should enable only those used a true gpio
+        0xffff,     // port a
+        0xffff,     // port b
+        0xffff,     // port c
+        0xffff,     // port d
+        0xffff,     // port e
+        0xffff,     // port f
+        0xffff,     // port g
+        0xffff,     // port h
+        0xffff      // port i
+    };
+#endif//HAL_USE_GPIO
+
 #ifdef HAL_USE_I2C
     extern const uint8_t hal_brdcfg_i2c__supported_mask = (1 << hal_i2c_port1); 
     extern const hal_gpio_cfg_t hal_brdcfg_i2c__scl[]               =
@@ -239,89 +260,6 @@
 #endif//HAL_USE_I2C
 
 
-#ifdef HAL_USE_I2C4HAL
-    extern const uint8_t hal_brdcfg_i2c4hal__supported_mask = (1 << hal_i2c4hal_port1); 
-    extern const hal_gpio_cfg_t hal_brdcfg_i2c4hal__scl[]               =
-    {
-       {
-            .port       = hal_gpio_portB,
-            .pin        = hal_gpio_pin8,        
-            .dir        = hal_gpio_dirALT,
-            .speed      = hal_gpio_speed_default
-        },
-        {
-            .port       = hal_gpio_portNONE,
-            .pin        = hal_gpio_pinNONE,        
-            .dir        = hal_gpio_dirALT,
-            .speed      = hal_gpio_speed_default
-        }            
-    };
-        
-    extern const hal_gpio_cfg_t hal_brdcfg_i2c4hal__sda[]               =
-    {
-        {
-            .port       = hal_gpio_portB,
-            .pin        = hal_gpio_pin9,        
-            .dir        = hal_gpio_dirALT,
-            .speed      = hal_gpio_speed_default
-        }, 
-        {
-            .port       = hal_gpio_portNONE,
-            .pin        = hal_gpio_pinNONE,        
-            .dir        = hal_gpio_dirALT,
-            .speed      = hal_gpio_speed_default
-        }        
-    };
-    
-    extern const hal_i2c4hal_hw_cfg_t  hal_brdcfg_i2c4hal__hwcfg        =
-    {
-        .speed          = hal_i2c4hal_speed_400kbps,      
-        .scl            = 
-        {
-            .port       = hal_gpio_portB,
-            .pin        = hal_gpio_pin8,        
-            .dir        = hal_gpio_dirALT,
-            .speed      = hal_gpio_speed_default
-        },
-        .sda            =
-        {
-            .port       = hal_gpio_portB,
-            .pin        = hal_gpio_pin9,        
-            .dir        = hal_gpio_dirALT,
-            .speed      = hal_gpio_speed_default
-        },        
-        .usedma         = hal_false,
-        .ontimeout      = NULL   
-    };  
-    
-#endif//HAL_USE_I2C4HAL
-
-
-#ifdef HAL_USE_ENCODER
-    extern const uint32_t hal_brdcfg_encoder__supported_mask = 0x01ff; // tutti e 9 gli encoder ...
-#endif//HAL_USE_ENCODER
-
-#ifdef HAL_USE_SPI4ENCODER
-    extern const uint8_t hal_brdcfg_spi4encoder__supported_mask = 0x07;  // tutte e 3 le spi 
-#endif//HAL_USE_SPI4ENCODER
-
-#ifdef HAL_USE_GPIO
-    extern const uint16_t hal_brdcfg_gpio__supported_mask[hal_gpio_ports_number]    =
-    {   // ok, i enable every pin of every port. however i should enable only those used a true gpio
-        0xffff,     // port a
-        0xffff,     // port b
-        0xffff,     // port c
-        0xffff,     // port d
-        0xffff,     // port e
-        0xffff,     // port f
-        0xffff,     // port g
-        0xffff,     // port h
-        0xffff      // port i
-    };
-#endif//HAL_USE_GPIO
-
-#warning --> the leds are alright
-
 #ifdef HAL_USE_LED
     extern const hal_gpio_val_t hal_brdcfg_led__value_on          = hal_gpio_valHIGH;
     extern const hal_gpio_val_t hal_brdcfg_led__value_off         = hal_gpio_valLOW;
@@ -379,6 +317,16 @@
     };
 #endif//HAL_USE_LED
 
+    
+#ifdef HAL_USE_SPI4ENCODER
+    extern const uint8_t hal_brdcfg_spi4encoder__supported_mask = 0x07;  // tutte e 3 le spi 
+#endif//HAL_USE_SPI4ENCODER
+    
+    
+#ifdef HAL_USE_SWITCH
+    extern const hal_boolval_t hal_brdcfg_switch__supported         = hal_false;
+#endif//HAL_USE_SWITCH
+    
 #ifdef HAL_USE_TIMER
     extern const uint8_t hal_brdcfg_timer__supported_mask           = 
     (0 << hal_timer1) | (1 << hal_timer2) | (1 << hal_timer3) | (1 << hal_timer4) |
@@ -386,9 +334,6 @@
     #warning --> on stm32f4 there are more timers ...
 #endif//HAL_USE_TIMER
 
-#ifdef HAL_USE_SWITCH
-    extern const hal_boolval_t hal_brdcfg_switch__supported         = hal_false;
-#endif//HAL_USE_SWITCH
 
 #ifdef HAL_USE_WATCHDOG
     extern const uint8_t hal_brdcfg_watchdog__supported_mask        = (1 << hal_watchdog_normal) | (1 << hal_watchdog_window);

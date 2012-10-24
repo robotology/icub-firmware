@@ -114,12 +114,14 @@ static hal_result_t s_hal_i2c_transaction_begin(hal_i2c_port_t port, hal_i2c_dev
 static hal_result_t s_hal_i2c_transaction_tx(hal_i2c_port_t port,  hal_i2c_devaddr_t devaddr, uint8_t* data, uint16_t size, hal_bool_t sendstart, hal_bool_t sendstop);
 static hal_result_t s_hal_i2c_transaction_rx(hal_i2c_port_t port,  hal_i2c_devaddr_t devaddr, uint8_t* data, uint16_t size, hal_bool_t sendstart, hal_bool_t sendnack, hal_bool_t sendstop);
 
-//static hal_result_t s_i2c_read(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size);
-//static void s_hal_i2c_read_bytes(I2C_TypeDef* I2Cx, uint8_t* data, uint16_t size);
+static hal_result_t s_i2c_read(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size);
+static void s_hal_i2c_read_bytes(I2C_TypeDef* I2Cx, uint8_t* data, uint16_t size);
 
 
-//static hal_result_t s_hal_i2c_write(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size);
-//static void s_hal_i2c_write_bytes(I2C_TypeDef* I2Cx, uint8_t* data, uint16_t size);
+static hal_result_t s_hal_i2c_write(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size);
+static void s_hal_i2c_write_bytes(I2C_TypeDef* I2Cx, uint8_t* data, uint16_t size);
+
+static hal_result_t s_hal_i2c_standby(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr);
 
 static hal_result_t s_hal_i2c_timeoutexpired(void);
 
@@ -145,7 +147,11 @@ static const I2C_InitTypeDef   s_hal_i2c_stm32_cfg =
     .I2C_ClockSpeed             = 400000                        // PARAMETER
 };
 
+#if     defined(USE_STM32F1)
+static I2C_TypeDef* const s_hal_i2c_stmI2Cmap[] = { I2C1, I2C2, NULL };
+#elif   defined(USE_STM32F4)
 static I2C_TypeDef* const s_hal_i2c_stmI2Cmap[] = { I2C1, I2C2, I2C3 };
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -270,48 +276,21 @@ extern hal_result_t hal_i2c_transaction_receive(hal_i2c_port_t port, uint8_t* da
 
 
 
-#if 0
-extern hal_result_t hal_i2c_read(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
+
+extern hal_result_t hal_i2c_read(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
 {
+    hal_result_t res;
 
     if(hal_false == hal_i2c_hid_initted_is(port))
     {
         return(hal_res_NOK_generic);
     }
     
-    if((0 == regaddr.numofbytes) || (regaddr.numofbytes > 3))
-    {
-        return(hal_res_NOK_unsupported);
-    }  
-    
-    if(NULL == data)
-    {
-        return(hal_res_NOK_nullpointer);
-    }
-    
-    if(0 == size)
-    {
-        return(hal_res_OK);
-    }
-
-
-    return(s_i2c_read(port, devaddr, regaddr, data, size));
-}
-
-
-extern hal_result_t hal_i2c_write(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
-{
-
-    if(hal_true != s_hal_i2c_supported_is(port))
-    {
-        return(hal_res_NOK_unsupported);
-    }
-
-    if(hal_false == hal_i2c_hid_initted_is(port))
+    if(0 == devaddr)
     {
         return(hal_res_NOK_generic);
     }
-    
+
     if((0 == regaddr.numofbytes) || (regaddr.numofbytes > 3))
     {
         return(hal_res_NOK_unsupported);
@@ -327,11 +306,117 @@ extern hal_result_t hal_i2c_write(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_
         return(hal_res_OK);
     }
     
-    return(s_hal_i2c_write(port, devaddr, regaddr, data, size));
+    s_hal_i2c_scheduling_suspend();    
+    if(hal_true == s_hal_i2c_is_status_locked(port))
+    {
+        s_hal_i2c_scheduling_restart();
+        return(hal_res_NOK_generic);
+    }
+    s_hal_i2c_status_set(port, hal_true, devaddr);
+    s_hal_i2c_scheduling_restart();
+    
 
+    res = s_i2c_read(port, devaddr, regaddr, data, size);
+    
+    
+    s_hal_i2c_scheduling_suspend();
+    s_hal_i2c_status_set(port, hal_false, 0);
+    s_hal_i2c_scheduling_restart();    
+    
+    return(res);
 }
 
-#endif
+
+extern hal_result_t hal_i2c_write(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
+{
+    hal_result_t res;
+    
+    if(hal_false == hal_i2c_hid_initted_is(port))
+    {
+        return(hal_res_NOK_generic);
+    }
+
+    if(0 == devaddr)
+    {
+        return(hal_res_NOK_generic);
+    }    
+    
+    if((0 == regaddr.numofbytes) || (regaddr.numofbytes > 3))
+    {
+        return(hal_res_NOK_unsupported);
+    }  
+    
+    if(NULL == data)
+    {
+        return(hal_res_NOK_nullpointer);
+    }
+    
+    if(0 == size)
+    {
+        return(hal_res_OK);
+    }
+    
+    
+    s_hal_i2c_scheduling_suspend();    
+    if(hal_true == s_hal_i2c_is_status_locked(port))
+    {
+        s_hal_i2c_scheduling_restart();
+        return(hal_res_NOK_generic);
+    }
+    s_hal_i2c_status_set(port, hal_true, devaddr);
+    s_hal_i2c_scheduling_restart();
+    
+
+    res = s_hal_i2c_write(port, devaddr, regaddr, data, size);
+    
+    
+    s_hal_i2c_scheduling_suspend();
+    s_hal_i2c_status_set(port, hal_false, 0);
+    s_hal_i2c_scheduling_restart();    
+    
+    return(res);    
+}
+
+
+
+
+extern hal_result_t hal_i2c_standby(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr)      
+{
+    hal_result_t res;
+    
+    if(hal_false == hal_i2c_hid_initted_is(port))
+    {
+        return(hal_res_NOK_generic);
+    }
+    
+    if(0 == devaddr)
+    {
+        return(hal_res_NOK_generic);
+    }
+    
+    
+    s_hal_i2c_scheduling_suspend();    
+    if(hal_true == s_hal_i2c_is_status_locked(port))
+    {
+        s_hal_i2c_scheduling_restart();
+        return(hal_res_NOK_generic);
+    }
+    s_hal_i2c_status_set(port, hal_true, devaddr);
+    s_hal_i2c_scheduling_restart();
+    
+
+    res = s_hal_i2c_standby(port, devaddr);
+    
+    
+    s_hal_i2c_scheduling_suspend();
+    s_hal_i2c_status_set(port, hal_false, 0);
+    s_hal_i2c_scheduling_restart();    
+    
+    return(res);    
+}
+
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -399,79 +484,6 @@ extern hal_boolval_t hal_i2c_hid_initted_is(hal_i2c_port_t port)
 }
 
 
-
-extern hal_result_t hal_i2c_hid_standby(hal_i2c_port_t port, uint8_t devaddr)      
-{
-    volatile uint16_t tmpSR1 = 0;
-    volatile uint32_t trials = 0;
-    volatile uint32_t timeout = 0;
-    
-    I2C_TypeDef* I2Cx = HAL_i2c_port2stmI2C(port);
- 
-    // While the bus is busy 
-    timeout = s_hal_i2c_timeout_long;
-    while(I2C_GetFlagStatus(I2Cx, I2C_FLAG_BUSY))
-    {
-        if(0 == (timeout--)) return s_hal_i2c_timeoutexpired();
-    }
-
-    //  keep looping till the slave acknowledge his address or maximum number of trials is reached
-    while(1)
-    {
-        /*!< Send START condition */
-        I2C_GenerateSTART(I2Cx, ENABLE);
-
-        /*!< Test on EV5 and clear it */
-        timeout = s_hal_i2c_timeout_flag;
-        while(!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_MODE_SELECT))
-        {
-            if(0 == (timeout--)) return s_hal_i2c_timeoutexpired();
-        }    
-
-        /*!< Send EEPROM address for write */
-        I2C_Send7bitAddress(I2Cx, devaddr, I2C_Direction_Transmitter);
-
-        /* Wait for ADDR flag to be set (Slave acknowledged his address) */
-        timeout = s_hal_i2c_timeout_long;
-        do
-        {     
-            /* Get the current value of the SR1 register */
-            tmpSR1 = (I2Cx)->SR1;
-
-            /* Update the timeout value and exit if it reach 0 */
-            if(0 == (timeout--)) return s_hal_i2c_timeoutexpired();
-        }
-        /* Keep looping till the Address is acknowledged or the AF (ack failure) flag is 
-        set (address not acknowledged at time) */
-        while((tmpSR1 & (I2C_SR1_ADDR | I2C_SR1_AF)) == 0);
-
-        /* Check if the ADDR flag has been set */
-        if (tmpSR1 & I2C_SR1_ADDR)
-        {
-            /* Clear ADDR Flag by reading SR1 then SR2 registers (SR1 have already 
-            been read) */
-            (void)(I2Cx)->SR2;
-
-            /*!< STOP condition */    
-            I2C_GenerateSTOP(I2Cx, ENABLE);
-
-            /* Exit the function */
-            return hal_res_OK;
-        }
-        else
-        {
-            /*!< Clear AF flag */
-            I2C_ClearFlag(I2Cx, I2C_FLAG_AF);                  
-        }
-
-        /* Check if the maximum allowed number of trials has been reached */
-        if (s_hal_i2c_ackaddress_maxtrials == trials++)
-        {
-            /* If the maximum number of trials has been reached, exit the function */
-            return s_hal_i2c_timeoutexpired();
-        }
-    }
-}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
@@ -764,8 +776,7 @@ static hal_result_t s_hal_i2c_transaction_begin(hal_i2c_port_t port, hal_i2c_dev
     volatile uint32_t timeout = 0;
     
     I2C_TypeDef* I2Cx = HAL_i2c_port2stmI2C(port);
-
-    
+   
     // wait until the bus is not busy anymore 
     timeout = s_hal_i2c_timeout_long;
     while(I2C_GetFlagStatus(I2Cx, I2C_FLAG_BUSY))
@@ -802,13 +813,13 @@ static hal_result_t s_hal_i2c_transaction_tx(hal_i2c_port_t port,  hal_i2c_devad
     volatile uint32_t timeout = 0;    
     I2C_TypeDef* I2Cx = HAL_i2c_port2stmI2C(port);
     
-    #warning --> ci vuole il wait del flag busy ??
-    // wait until the bus is not busy anymore 
-    timeout = s_hal_i2c_timeout_long;
-    while(I2C_GetFlagStatus(I2Cx, I2C_FLAG_BUSY))
-    {
-        if(0 == (timeout--)) return s_hal_i2c_timeoutexpired();
-    }
+//     #warning --> ci vuole il wait del flag busy ?? NO
+//     // wait until the bus is not busy anymore 
+//     timeout = s_hal_i2c_timeout_long;
+//     while(I2C_GetFlagStatus(I2Cx, I2C_FLAG_BUSY))
+//     {
+//         if(0 == (timeout--)) return s_hal_i2c_timeoutexpired();
+//     }
 
     if(hal_true == sendstart)
     {
@@ -870,13 +881,13 @@ static hal_result_t s_hal_i2c_transaction_rx(hal_i2c_port_t port,  hal_i2c_devad
     volatile uint32_t timeout = 0;    
     I2C_TypeDef* I2Cx = HAL_i2c_port2stmI2C(port);
     
-    #warning --> ci vuole il wait del flag busy ??
-    // wait until the bus is not busy anymore 
-    timeout = s_hal_i2c_timeout_long;
-    while(I2C_GetFlagStatus(I2Cx, I2C_FLAG_BUSY))
-    {
-        if(0 == (timeout--)) return s_hal_i2c_timeoutexpired();
-    }
+//    #warning --> ci vuole il wait del flag busy ?? NO
+//     // wait until the bus is not busy anymore 
+//     timeout = s_hal_i2c_timeout_long;
+//     while(I2C_GetFlagStatus(I2Cx, I2C_FLAG_BUSY))
+//     {
+//         if(0 == (timeout--)) return s_hal_i2c_timeoutexpired();
+//     }
 
     if(hal_true == sendstart)
     {
@@ -889,7 +900,7 @@ static hal_result_t s_hal_i2c_transaction_rx(hal_i2c_port_t port,  hal_i2c_devad
         {
             if(0 == (timeout--)) return s_hal_i2c_timeoutexpired();
         }
-       
+
         // send address for read
         I2C_Send7bitAddress(I2Cx, devaddr, I2C_Direction_Receiver);
         
@@ -904,7 +915,7 @@ static hal_result_t s_hal_i2c_transaction_rx(hal_i2c_port_t port,  hal_i2c_devad
             if(0 == (timeout--)) return s_hal_i2c_timeoutexpired();
         }    
       
-    }    
+    }
 
  
  
@@ -988,9 +999,34 @@ static hal_result_t s_hal_i2c_transaction_rx(hal_i2c_port_t port,  hal_i2c_devad
 }    
     
     
-#if 0
-static hal_result_t s_i2c_read(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
+
+static hal_result_t s_i2c_read(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
 {
+#if 0
+    uint8_t addr[3] = {0};
+
+    hal_i2c_transaction_begin(port, devaddr);
+    if(1 == regaddr.numofbytes)
+    {
+        addr[0] = regaddr.bytes.one;
+    }
+    else if(2 == regaddr.numofbytes)
+    {
+        addr[0] = (regaddr.bytes.two >> 8) & 0x00FF;
+        addr[1] = (regaddr.bytes.two     ) & 0x00FF;
+    }   
+    else if(3 == regaddr.numofbytes)
+    {
+        addr[0] = regaddr.bytes.three[2]; 
+        addr[1] = regaddr.bytes.three[1];  
+        addr[2] = regaddr.bytes.three[0];          
+    }        
+    hal_i2c_transaction_transmit(port, &addr[0], regaddr.numofbytes,  hal_false, hal_false);
+    hal_i2c_transaction_receive(port, data, size,  hal_true, hal_true, hal_true);
+    hal_i2c_transaction_end(port, devaddr);
+    return(hal_res_OK);
+#else    
+
     hal_result_t res = hal_res_NOK_generic;
     uint8_t reg1byteadr = 0;
     volatile uint32_t timeout = 0;
@@ -1025,7 +1061,11 @@ static hal_result_t s_i2c_read(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_reg
     {
         if(0 == (timeout--)) return s_hal_i2c_timeoutexpired();
     }
-       
+    
+    
+    // end of transaction_begin
+    
+           
     // send address of register to read inside the device
     if(1 == regaddr.numofbytes)
     {
@@ -1045,7 +1085,7 @@ static hal_result_t s_i2c_read(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_reg
     }
     else if(2 == regaddr.numofbytes)
     {   
-        reg1byteadr = regaddr.bytes.two & 0xFF00;               // msb first
+        reg1byteadr = (regaddr.bytes.two >> 8 ) & 0xFF00;               // msb first
         I2C_SendData(I2Cx, reg1byteadr);           
         // test on ev8 and clear it
         timeout = s_hal_i2c_timeout_flag;
@@ -1109,8 +1149,9 @@ static hal_result_t s_i2c_read(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_reg
 //    }
     
 
-    
+
     return(hal_res_OK);
+#endif    
 }
 
 static void s_hal_i2c_read_bytes(I2C_TypeDef* I2Cx, uint8_t* data, uint16_t size)
@@ -1174,15 +1215,38 @@ static void s_hal_i2c_read_bytes(I2C_TypeDef* I2Cx, uint8_t* data, uint16_t size
 
 
 
-static hal_result_t s_hal_i2c_write(hal_i2c_port_t port, uint8_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
+static hal_result_t s_hal_i2c_write(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
 {
+#if 0
+    uint8_t addr[3] = {0};
+    hal_i2c_transaction_begin(port, devaddr);
+    if(1 == regaddr.numofbytes)
+    {
+        addr[0] = regaddr.bytes.one;
+    }
+    else if(2 == regaddr.numofbytes)
+    {
+        addr[0] = (regaddr.bytes.two >> 8) & 0x00FF;
+        addr[1] = (regaddr.bytes.two     ) & 0x00FF;
+    }
+    else if(3 == regaddr.numofbytes)
+    {
+        addr[0] = regaddr.bytes.three[2]; 
+        addr[1] = regaddr.bytes.three[1];  
+        addr[2] = regaddr.bytes.three[0];          
+    }      
+    hal_i2c_transaction_transmit(port, &addr[0], regaddr.numofbytes,  hal_false, hal_false);
+    hal_i2c_transaction_transmit(port, data, size,  hal_false, hal_true);
+    hal_i2c_transaction_end(port, devaddr);
+    
+    return(hal_res_OK);
+#else    
     hal_result_t res = hal_res_NOK_generic;
     uint8_t reg1byteadr = 0;
     volatile uint32_t timeout = 0;
     
     I2C_TypeDef* I2Cx = HAL_i2c_port2stmI2C(port);
-//    uint8_t usedma = s_stm32i2c_generics.use_dma[port-1];
-    
+
        
  ///////////////////////////////////////   
     
@@ -1213,7 +1277,10 @@ static hal_result_t s_hal_i2c_write(hal_i2c_port_t port, uint8_t devaddr, hal_i2
     while(!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))
     {
         if(0 == (timeout--)) return s_hal_i2c_timeoutexpired();
-    }    
+    } 
+
+    // end of transaction_begin
+    
 
     // send address of register inside the device
     if(1 == regaddr.numofbytes)
@@ -1230,7 +1297,7 @@ static hal_result_t s_hal_i2c_write(hal_i2c_port_t port, uint8_t devaddr, hal_i2
     }
     else if(2 == regaddr.numofbytes)
     {   
-        reg1byteadr = regaddr.bytes.two & 0xFF00;           // msb first
+        reg1byteadr = (regaddr.bytes.two >> 8) & 0xFF00;           // msb first
         I2C_SendData(I2Cx, reg1byteadr);    
      
         // test on ev8
@@ -1275,7 +1342,7 @@ static hal_result_t s_hal_i2c_write(hal_i2c_port_t port, uint8_t devaddr, hal_i2
     //s_stm32i2c_i2c_waitdevicestandbystate(port, devaddr);
     
     return(hal_res_OK);
-
+#endif
 }
 
 
@@ -1310,7 +1377,80 @@ static void s_hal_i2c_write_bytes(I2C_TypeDef* I2Cx, uint8_t* data, uint16_t siz
     (void)(I2Cx)->SR2; 
 }
 
-#endif
+
+static hal_result_t s_hal_i2c_standby(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr)      
+{
+    volatile uint16_t tmpSR1 = 0;
+    volatile uint32_t trials = 0;
+    volatile uint32_t timeout = 0;
+    
+    I2C_TypeDef* I2Cx = HAL_i2c_port2stmI2C(port);
+ 
+    // While the bus is busy 
+    timeout = s_hal_i2c_timeout_long;
+    while(I2C_GetFlagStatus(I2Cx, I2C_FLAG_BUSY))
+    {
+        if(0 == (timeout--)) return s_hal_i2c_timeoutexpired();
+    }
+
+    //  keep looping till the slave acknowledge his address or maximum number of trials is reached
+    while(1)
+    {
+        /*!< Send START condition */
+        I2C_GenerateSTART(I2Cx, ENABLE);
+
+        /*!< Test on EV5 and clear it */
+        timeout = s_hal_i2c_timeout_flag;
+        while(!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_MODE_SELECT))
+        {
+            if(0 == (timeout--)) return s_hal_i2c_timeoutexpired();
+        }    
+
+        /*!< Send EEPROM address for write */
+        I2C_Send7bitAddress(I2Cx, devaddr, I2C_Direction_Transmitter);
+
+        /* Wait for ADDR flag to be set (Slave acknowledged his address) */
+        timeout = s_hal_i2c_timeout_long;
+        do
+        {     
+            /* Get the current value of the SR1 register */
+            tmpSR1 = (I2Cx)->SR1;
+
+            /* Update the timeout value and exit if it reach 0 */
+            if(0 == (timeout--)) return s_hal_i2c_timeoutexpired();
+        }
+        /* Keep looping till the Address is acknowledged or the AF (ack failure) flag is 
+        set (address not acknowledged at time) */
+        while((tmpSR1 & (I2C_SR1_ADDR | I2C_SR1_AF)) == 0);
+
+        /* Check if the ADDR flag has been set */
+        if (tmpSR1 & I2C_SR1_ADDR)
+        {
+            /* Clear ADDR Flag by reading SR1 then SR2 registers (SR1 have already 
+            been read) */
+            (void)(I2Cx)->SR2;
+
+            /*!< STOP condition */    
+            I2C_GenerateSTOP(I2Cx, ENABLE);
+
+            /* Exit the function */
+            return hal_res_OK;
+        }
+        else
+        {
+            /*!< Clear AF flag */
+            I2C_ClearFlag(I2Cx, I2C_FLAG_AF);                  
+        }
+
+        /* Check if the maximum allowed number of trials has been reached */
+        if (s_hal_i2c_ackaddress_maxtrials == trials++)
+        {
+            /* If the maximum number of trials has been reached, exit the function */
+            return s_hal_i2c_timeoutexpired();
+        }
+    }
+}
+
 
 static hal_result_t s_hal_i2c_timeoutexpired(void)
 {

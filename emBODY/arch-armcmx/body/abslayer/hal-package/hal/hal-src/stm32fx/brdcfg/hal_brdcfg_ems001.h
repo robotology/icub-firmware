@@ -52,9 +52,9 @@
     #include "hal_gpio.h"
 #endif//HAL_USE_GPIO
 
-#ifdef HAL_USE_I2C4HAL
-    #include "hal_stm32_i2c4hal_hid.h"
-#endif//HAL_USE_I2C4HAL
+#ifdef HAL_USE_I2C
+    #include "hal_stm32_i2c_hid.h"
+#endif//HAL_USE_I2C
 
 #ifdef HAL_USE_LED
     #include "hal_led.h"
@@ -112,20 +112,11 @@
     extern const hal_eeprom_hw_cfg_t hal_brdcfg_eeprom__i2c_01_device;
 #endif//HAL_USE_EEPROM
 
-#ifdef HAL_USE_I2C4HAL
-    extern const uint8_t hal_brdcfg_i2c4hal__supported_mask;
-    extern const hal_gpio_cfg_t hal_brdcfg_i2c__scl[];
-    extern const hal_gpio_cfg_t hal_brdcfg_i2c__sda[];
-#endif//HAL_USE_I2C4HAL
-
 
 #ifdef HAL_USE_ENCODER
     extern const uint32_t hal_brdcfg_encoder__supported_mask; //         = 0x01ff;
 #endif//HAL_USE_ENCODER
 
-#ifdef HAL_USE_SPI4ENCODER
-    extern const uint8_t hal_brdcfg_spi4encoder__supported_mask; 
-#endif//HAL_USE_SPI4ENCODER
 
 #ifdef HAL_USE_ETH
     extern const uint8_t hal_brdcfg_eth__supported_mask; 
@@ -150,12 +141,24 @@
     extern const uint16_t hal_brdcfg_gpio__supported_mask[];
 #endif//HAL_USE_GPIO
 
+
+#ifdef HAL_USE_I2C
+    extern const uint8_t hal_brdcfg_i2c__supported_mask;
+    extern const hal_gpio_cfg_t hal_brdcfg_i2c__scl[];
+    extern const hal_gpio_cfg_t hal_brdcfg_i2c__sda[];
+#endif//HAL_USE_I2C
+
+
 #ifdef HAL_USE_LED
     extern const hal_gpio_val_t hal_brdcfg_led__value_on;
     extern const hal_gpio_val_t hal_brdcfg_led__value_off;
     extern const uint8_t hal_brdcfg_led__supported_mask;
     extern const hal_gpio_cfg_t hal_brdcfg_led__cfg[];    
 #endif//HAL_USE_LED 
+
+#ifdef HAL_USE_SPI4ENCODER
+    extern const uint8_t hal_brdcfg_spi4encoder__supported_mask; 
+#endif//HAL_USE_SPI4ENCODER
 
 #ifdef HAL_USE_SWITCH
     extern const hal_boolval_t hal_brdcfg_switch__supported;
@@ -206,9 +209,9 @@
     extern void hal_brdcfg_eth__phy_configure(hal_eth_phymode_t *phymode);
 #endif
 
-#ifdef HAL_USE_I2C4HAL
-    extern void hal_brdcfg_i2c4hal__ontimeouterror(void);
-#endif//HAL_USE_I2C4HAL   
+#ifdef HAL_USE_I2C
+    extern void hal_brdcfg_i2c__ontimeouterror(void);
+#endif//HAL_USE_I2C
 
 #ifdef HAL_USE_SWITCH  
     extern void hal_brdcfg_switch__initialise(void);

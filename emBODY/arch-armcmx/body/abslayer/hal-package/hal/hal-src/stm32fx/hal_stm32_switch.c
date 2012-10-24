@@ -36,12 +36,12 @@
 #include "string.h"
 #include "hal_stm32xx_include.h"
 #include "hal_stm32_base_hid.h" 
-#include "hal_i2c4hal.h" 
+#include "hal_i2c.h" 
 
 #include "hal_sys.h"
 #include "hal_stm32_eth_hid.h"
 
-#include "hal_stm32_i2c4hal_hid.h"
+#include "hal_stm32_i2c_hid.h"
 
 #include "hal_brdcfg.h"
 
@@ -272,7 +272,7 @@ static hal_result_t s_hal_switch_reg_config(void)
     hal_i2c_regaddr_t regadr = {.numofbytes = 1, .bytes.one = 0};
 
     regadr.bytes.one = 0x01;
-    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    hal_i2c_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
     if((buff_read&0x01))
     {   // already initted. to be initted again must pass through a reset
         return(hal_res_OK);
@@ -280,31 +280,31 @@ static hal_result_t s_hal_switch_reg_config(void)
  
 //     // configure mii port at 10mbps. default is 100mbps
 //     regadr.bytes.one = 0x06;
-//     hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+//     hal_i2c_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
 //     buff_write = buff_read | 0x10;
-//     hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
-//     hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+//     hal_i2c_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
+//     hal_i2c_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
    
     #warning --> set 100mbps back .............. with 0x60
     // 1. configure  switch's ports 1 and 2 in full duplex and 100mbps
     buff_write = fd010;      
     regadr.bytes.one = 0x1C;
-    hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
-    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    hal_i2c_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
+    hal_i2c_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
      
     regadr.bytes.one = 0x2C;
-    hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);   
-    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    hal_i2c_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);   
+    hal_i2c_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
 
     // 2. start the switch
     buff_write = 0x1;  
     regadr.bytes.one = 0x01;    
-    hal_i2c4hal_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
+    hal_i2c_write(hal_i2c_port1, 0xBE, regadr, &buff_write, 1);
     
 
     // 3. read back to verify
     regadr.bytes.one = 0x01;
-    hal_i2c4hal_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
+    hal_i2c_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
     if(!(buff_read&0x01))
     {
         hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "s_hal_switch_reg_config(): SWITCH not configured");

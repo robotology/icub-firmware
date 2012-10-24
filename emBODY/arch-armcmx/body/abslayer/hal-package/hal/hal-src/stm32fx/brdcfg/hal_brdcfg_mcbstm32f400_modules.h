@@ -79,7 +79,7 @@
 // - cross dependencies -----------------------------------------------------------------------------------------------
 
 #ifdef  HAL_USE_EEPROM
-    #define HAL_USE_I2C4HAL
+    #define HAL_USE_I2C
 #endif//HAL_USE_EEPROM      
 
 #ifdef  HAL_USE_ENCODER
@@ -87,7 +87,7 @@
 #endif//HAL_USE_ENCODER
 
 #ifdef  HAL_USE_SWITCH
-    #define HAL_USE_I2C4EEPROM
+    #define HAL_USE_I2C
 #endif//HAL_USE_SWITCH   
 
 
