@@ -74,6 +74,8 @@ extern "C" {
     #define float32_t       float    
 	#define __weak __attribute__((weak))
     #define EO_TAILOR_CODE_FOR_LINUX
+	#define EOCFG_NVSEP_MC_OVERRIDE
+	#define DEOCFG_NVSEP_SK_OVERRIDE
 #elif defined(__arm__)
     // __arm__ or __ARMCC_VERSION are always defined in armcc compiler
     #define EO_extern_inline        extern inline
