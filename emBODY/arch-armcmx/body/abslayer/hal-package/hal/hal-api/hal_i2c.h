@@ -124,6 +124,8 @@ extern const hal_i2c_cfg_t hal_i2c_cfg_default; // = { .mode = hal_i2c_mode_mast
   */
 extern hal_result_t hal_i2c_init(hal_i2c_port_t port, const hal_i2c_cfg_t *cfg);
 
+//extern hal_result_t hal_i2c_simpleread(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size);
+
 /** @fn			extern hal_result_t hal_i2c_transaction_begin(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr)
     @brief  	this function begins a transaction: locks the bus for other attempts of hal_i2c_transaction_begin(), sends a START, write 
                 the address of the device to talk to.
