@@ -125,8 +125,13 @@ void can_receive_additional_info();
 #define CAN_GET_IMPEDANCE_OFFSET    90
 
 #define CAN_GET_FIRMWARE_VERSION    91
+#define CAN_SET_OPTICAL_ENC_RATIO   92
+#define CAN_SET_POS_STICTION_PARAMS     93
+#define CAN_GET_POS_STICTION_PARAMS     94
+#define CAN_SET_TORQUE_STICTION_PARAMS  95
+#define CAN_GET_TORQUE_STICTION_PARAMS  96
 
-#define NUM_OF_MESSAGES				92
+#define NUM_OF_MESSAGES				97
 
 // class 1 messages, broadcast 
 // when in bcast mode, messages are sent periodically by the controller

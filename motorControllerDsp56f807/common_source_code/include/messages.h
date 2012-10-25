@@ -920,6 +920,18 @@
 }
 
 //-------------------------------------------------------------------
+#define CAN_SET_OPTICAL_ENC_RATIO_HANDLER(x) \
+{ \
+	if (CAN_LEN == 3) \
+	{ \
+		_optical_ratio[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
+		_general_board_error = ERROR_NONE; \
+	} \
+	else \
+		_general_board_error = ERROR_FMT; \
+}
+
+//-------------------------------------------------------------------
 #define CAN_GET_OFFSET_ABS_ENCODER_HANDLER(x) \
 { \
 	Int32  value = get_max_position(axis); \
@@ -1536,6 +1548,58 @@ else \
 		CAN_LEN = 3; \
 		CAN_DATA[1] = BYTE_H(_ko[axis]); \
 		CAN_DATA[2] = BYTE_L(_ko[axis]); \
+		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
+		_general_board_error = ERROR_NONE; \
+}
+
+//-------------------------------------------------------------------
+#define CAN_SET_POS_STICTION_PARAMS_HANDLER(x) \
+{ \
+	if (CAN_LEN == 5) \
+	{ \
+		_kstp[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
+		_kstn[axis] = BYTE_W(CAN_DATA[3], CAN_DATA[4]); \
+		_general_board_error = ERROR_NONE; \
+	} \
+	else \
+		_general_board_error = ERROR_FMT; \
+}
+
+//-------------------------------------------------------------------
+#define CAN_GET_POS_STICTION_PARAMS_HANDLER(x) \
+{ \
+	PREPARE_HEADER; \
+		CAN_LEN = 5; \
+		CAN_DATA[1] = BYTE_H(_kstp[axis]); \
+		CAN_DATA[2] = BYTE_L(_kstp[axis]); \
+		CAN_DATA[3] = BYTE_H(_kstn[axis]); \
+		CAN_DATA[4] = BYTE_L(_kstn[axis]); \
+		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
+		_general_board_error = ERROR_NONE; \
+}
+
+//-------------------------------------------------------------------
+#define CAN_SET_TORQUE_STICTION_PARAMS_HANDLER(x) \
+{ \
+	if (CAN_LEN == 5) \
+	{ \
+		_kstp_torque[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
+		_kstn_torque[axis] = BYTE_W(CAN_DATA[3], CAN_DATA[4]); \
+		_general_board_error = ERROR_NONE; \
+	} \
+	else \
+		_general_board_error = ERROR_FMT; \
+}
+
+//-------------------------------------------------------------------
+#define CAN_GET_TORQUE_STICTION_PARAMS_HANDLER(x) \
+{ \
+	PREPARE_HEADER; \
+		CAN_LEN = 5; \
+		CAN_DATA[1] = BYTE_H(_kstp_torque[axis]); \
+		CAN_DATA[2] = BYTE_L(_kstp_torque[axis]); \
+		CAN_DATA[3] = BYTE_H(_kstn_torque[axis]); \
+		CAN_DATA[4] = BYTE_L(_kstn_torque[axis]); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
 		_general_board_error = ERROR_NONE; \
 }
