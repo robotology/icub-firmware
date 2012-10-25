@@ -8,6 +8,8 @@
 #include "main-transceiver.hpp"
 #include "EOtheBOARDtransceiver_hid.h"
 #include "hostTransceiver.hpp"
+#include "eOcfg_nvsEP_as.h"
+#include "EoSensors.h"
 
 
 
@@ -90,7 +92,7 @@ void s_callback_button_1(void)
 	eo_array_Reset(array);
 	array->head.capacity = NUMOFROPSIGCFG;
 	array->head.itemsize = sizeof(eOropSIGcfg_t);
-	ropsigcfgassign->cmmnd = ropsigcfg_cmd_assign;
+	ropsigcfgassign->cmmnd = ropsigcfg_cmd_append;
 
 
 
@@ -566,7 +568,7 @@ void s_callback_button_8(void )
     		int pwmlimit, velocity;
     		printf("eomc_calibration_type0_hard_stops\n");
     		printf("<pwmlimit>  <velocity>");
-    		scanf("%d %d ",&pwmlimit,&velocity);
+    		scanf("%d %d",&pwmlimit,&velocity);
     		calibData.params.type0.pwmlimit = pwmlimit;
     		calibData.params.type0.velocity = velocity;
     	}break;
@@ -576,7 +578,7 @@ void s_callback_button_8(void )
     		int position, velocity;
     		printf("eomc_calibration_type1_abs_sens_analog\n");
     		printf("<position>  <velocity>");
-    		scanf("%d %d ",&position,&velocity);
+    		scanf("%d %d",&position,&velocity);
     		calibData.params.type1.position = position;
     		calibData.params.type1.velocity = velocity;
     	}break;
@@ -586,7 +588,7 @@ void s_callback_button_8(void )
        		int pwmlimit, velocity;
        		printf("eomc_calibration_type2_hard_stops_diff\n");
 			printf("<pwmlimit>  <velocity>");
-			scanf("%d %d ",&pwmlimit,&velocity);
+			scanf("%d %d",&pwmlimit,&velocity);
 			calibData.params.type2.pwmlimit = pwmlimit;
 			calibData.params.type2.velocity = velocity;
     	}break;
