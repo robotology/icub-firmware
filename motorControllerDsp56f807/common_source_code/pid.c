@@ -136,6 +136,8 @@ Int16  _kd[JN] = INIT_ARRAY (40);				// ... derivative  ...
 Int16  _ki[JN] = INIT_ARRAY (0);				// ... integral
 Int16  _ko[JN] = INIT_ARRAY (0);				// offset 
 Int16  _kr[JN] = INIT_ARRAY (3);				// scale factor (negative power of two) 
+Int16  _kstp[JN] = INIT_ARRAY (0);              // stiction compensation: positive val
+Int16  _kstn[JN] = INIT_ARRAY (0);              // stiction compensation: negative val
 
 
 // TORQUE PID
@@ -149,6 +151,8 @@ Int16  _kd_torque[JN] = INIT_ARRAY (0);			// ... derivative  ...
 Int16  _ki_torque[JN] = INIT_ARRAY (0);			// ... integral
 Int16  _ko_torque[JN] = INIT_ARRAY (0);			// offset 
 Int16  _kr_torque[JN] = INIT_ARRAY (10);		// scale factor (negative power of two) 
+Int16  _kstp_torque[JN] = INIT_ARRAY (0);       // stiction compensation: positive val
+Int16  _kstn_torque[JN] = INIT_ARRAY (0);       // stiction compensation: negative val
 
 // SPEED PID (iKart)
 Int16  _error_speed[JN] = INIT_ARRAY (0);	    // actual feedback error 

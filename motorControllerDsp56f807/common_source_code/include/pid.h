@@ -176,7 +176,8 @@ extern Int16  _kd[JN] ;					// ... derivative  ...
 extern Int16  _ki[JN] ;					// ... integral
 extern Int16  _ko[JN] ;					// offset 
 extern Int16  _kr[JN] ;					// scale factor (negative power of two) 
-
+extern Int16  _kstp[JN] ;               // stiction compensation: positive val
+extern Int16  _kstn[JN] ;               // stiction compensation: negative val
 
 
 // TORQUE PID
@@ -191,6 +192,8 @@ extern Int16  _kd_torque[JN] ;				// ... derivative  ...
 extern Int16  _ki_torque[JN] ;				// ... integral
 extern Int16  _ko_torque[JN] ;				// offset 
 extern Int16  _kr_torque[JN] ;				// scale factor (negative power of two) 
+extern Int16  _kstp_torque[JN] ;            // stiction compensation: positive val
+extern Int16  _kstn_torque[JN] ;            // stiction compensation: negative val
 
 // SPEED PID (iKart)
 extern Int16  _error_speed[JN];	            // actual feedback error 
