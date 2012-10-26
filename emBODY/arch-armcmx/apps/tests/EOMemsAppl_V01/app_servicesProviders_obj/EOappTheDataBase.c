@@ -823,6 +823,31 @@ extern eOresult_t eo_appTheDB_GetCanBoardCfg(EOappTheDB *p, eObrd_boardId_t bid,
     return(eores_OK);
 }
 
+
+extern eOresult_t eo_appTheDB_GetCanBoardId_ByCanLocation(EOappTheDB *p, eOappTheDB_canBoardCanLocation_t *canloc_ptr, eObrd_boardId_t *bid_ptr)
+{
+    eObrd_boardId_t i;
+    eOappTheDB_hid_canBoardInfo_t *b_ptr;
+    uint16_t numofboard = 0;
+    
+	if((NULL == p) || (NULL == canloc_ptr) || (NULL == bid_ptr))
+	{
+        return(eores_NOK_nullpointer);
+	}
+    
+    numofboard = eo_array_Capacity(p->canboardsList);    
+    for(i=0; i<numofboard; i++)
+    {
+        b_ptr = (eOappTheDB_hid_canBoardInfo_t*)eo_array_At(p->canboardsList, i);
+        if( (b_ptr->cfg_ptr->canLoc.emscanport == canloc_ptr->emscanport) && (b_ptr->cfg_ptr->canLoc.addr == canloc_ptr->addr) )
+        {
+            *bid_ptr = (eObrd_boardId_t)i;
+            return(eores_OK);
+        }
+    }
+    
+    return(eores_NOK_nodata);
+}
 // extern eOresult_t eo_appTheDB_GetSkinConfigPtr(EOappTheDB *p,eOsk_skinId_t sId,  eOskin_config_t **skconfig_ptr)
 // {
 // 	if((NULL == p) || (NULL == skconfig_ptr))
