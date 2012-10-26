@@ -64,7 +64,7 @@ enum { hal_sensor_gyro_number = 1 };
 
 
 /** @typedef    typedef int8_t hal_sensor_gyro_angular_rate_t 
-    @brief      expresses the angular rate in milli degrees per second with range [-250, +250].
+    @brief      expresses the angular rate in milli degrees per second.
  **/
 typedef struct
 {

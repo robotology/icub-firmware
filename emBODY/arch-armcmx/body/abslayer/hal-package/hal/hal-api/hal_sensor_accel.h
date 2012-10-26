@@ -18,20 +18,20 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _HAL_SENSOR_TEMP_H_
-#define _HAL_SENSOR_TEMP_H_
+#ifndef _HAL_SENSOR_ACCEL_H_
+#define _HAL_SENSOR_ACCEL_H_
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/** @file       hal_sensor_temp.h
-    @brief      This header file implements interface to a generic hal sensor temperature module
+/** @file       hal_sensor_accel.h
+    @brief      This header file implements interface to a generic hal accelation sensor 
     @author     marco.accame@iit.it
-    @date       10/24/2012
+    @date       10/26/2012
 **/
 
-/** @defgroup arm_hal_sensor_temp HAL SNSR_TEMP
+/** @defgroup arm_hal_sensor_accel HAL SNSR_ACCEL
 
-    The HAL SNSR_TEMP is a high level module whcih manages a temperature sensor
+    The HAL SNSR_TEMP is a high level module whcih manages ...
  
     @todo acemor-facenda: review documentation.
     
@@ -52,60 +52,65 @@
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
-/** @typedef    typedef enum hal_sensor_temp_t 
-    @brief      hal_sensor_temp_t contains the possible SNSR_TEMP ports 
+/** @typedef    typedef enum hal_sensor_accel_t 
+    @brief      hal_sensor_accel_t contains the possible sensors
  **/
 typedef enum
 {
-    hal_sensor_temp1 = 0
-} hal_sensor_temp_t;
+    hal_sensor_accel1 = 0
+} hal_sensor_accel_t;
 
-enum { hal_sensor_temp_number = 1 };
+enum { hal_sensor_accel_number = 1 };
 
 
-/** @typedef    typedef int8_t hal_sensor_temp_degree_t 
-    @brief      expresses temperature in celsius degrees with range [-128, +127] and 1 degree resulution.
+/** @typedef    typedef int8_t hal_sensor_accel_acceleration_t 
+    @brief      expresses the acceleration in milli-G.
  **/
-typedef int16_t hal_sensor_temp_degree_t;
+typedef struct
+{
+    int32_t     xac;
+    int32_t     yac;
+    int32_t     zac;
+} hal_sensor_accel_acceleration_t;
 
 
-/** @typedef    typedef enum hal_sensor_temp_cfg_t 
-    @brief      hal_sensor_temp_cfg_t contains the configuration for the temperature sensor.
+/** @typedef    typedef enum hal_sensor_accel_cfg_t 
+    @brief      hal_sensor_accel_cfg_t contains the configuration for the sensor.
  **/
 typedef struct
 {
     uint8_t         dummy;
-} hal_sensor_temp_cfg_t;
+} hal_sensor_accel_cfg_t;
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const hal_sensor_temp_cfg_t hal_sensor_temp_cfg_default; // = { .dummy = 0 };
+extern const hal_sensor_accel_cfg_t hal_sensor_accel_cfg_default; // = { .dummy = 0 };
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-/** @fn			extern hal_result_t hal_sensor_temp_init(hal_sensor_temp_t sensor, const hal_sensor_temp_cfg_t *cfg)
-    @brief  	this function initializes a temperature sensor on a given sensor
+/** @fn			extern hal_result_t hal_sensor_accel_init(hal_sensor_accel_t sensor, const hal_sensor_accel_cfg_t *cfg)
+    @brief  	this function initializes a given accel sensor 
     @param  	sensor	        the sensor
     @param  	cfg 	        pointer to configuration data
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_sensor_temp_init(hal_sensor_temp_t sensor, const hal_sensor_temp_cfg_t *cfg);
+extern hal_result_t hal_sensor_accel_init(hal_sensor_accel_t sensor, const hal_sensor_accel_cfg_t *cfg);
 
 
-/** @fn			extern hal_result_t hal_sensor_temp_read(hal_sensor_temp_t sensor, hal_sensor_temp_degree_t* degrees)
+/** @fn			extern hal_result_t hal_sensor_accel_read(hal_sensor_accel_t sensor, hal_sensor_accel_acceleration_t* acceler)
     @brief  	this function reads temperatures on a given sensor.
     @param  	sensor	        the sensor
-    @param  	degrees 	    the read degrees
+    @param  	acceler 	    the read accelration
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_sensor_temp_read(hal_sensor_temp_t sensor, hal_sensor_temp_degree_t* degrees);
+extern hal_result_t hal_sensor_accel_read(hal_sensor_accel_t sensor, hal_sensor_accel_acceleration_t* acceler);
 
 
 /** @}            
-    end of group arm_hal_sensor_temp  
+    end of group arm_hal_sensor_accel  
  **/
 
 #endif  // include-guard

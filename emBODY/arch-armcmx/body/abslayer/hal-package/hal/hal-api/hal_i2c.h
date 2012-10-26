@@ -171,6 +171,15 @@ extern hal_result_t hal_i2c_transaction_receive(hal_i2c_port_t port, uint8_t* da
 extern hal_result_t hal_i2c_transaction_end(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr);
 
 
+/** @fn			extern hal_result_t hal_i2c_ping(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr)
+    @brief  	this function is used to verify if a device with a given address is present on the bus.
+    @param  	port	        the port
+    @param  	devaddr 	    the address of the device
+    @return 	hal_res_NOK_generic on error or if the device does not respond, else hal_res_OK
+  */
+extern hal_result_t hal_i2c_ping(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr);
+
+
 /** @fn			extern hal_result_t hal_i2c_read(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
     @brief  	this function is a typical reading transaction, where the master wants to read @e size bytes from the register @e regaddr of the device with
                 address @e devaddr.
