@@ -64,8 +64,11 @@ typedef struct
 } eOappMeasConv_cfg_t;
 
 
-typedef eOutil_emulfloat32_t eOappMeasConv_encConversionFactor_t;  /**< expressed in encoder_ticks/idegree  */
-typedef eOutil_emulfloat32_t eOappMeasConv_encConversionOffset_t;  /**< express in idg  */
+// typedef eOutil_emulfloat32_t eOappMeasConv_encConversionFactor_t;  /**< expressed in encoder_ticks/idegree  */
+// typedef eOutil_emulfloat32_t eOappMeasConv_encConversionOffset_t;  /**< express in idg  */
+
+typedef float eOappMeasConv_encConversionFactor_t;  /**< expressed in encoder_ticks/idegree  */
+typedef float eOappMeasConv_encConversionOffset_t;  /**< express in idg  */
 
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
