@@ -111,6 +111,8 @@ extern "C" {
 #define EOK_uint32dummy                     (0xffffffffL)
 #define EOK_uint64dummy                     (0xffffffffffffffffLL)
 
+#define EOK_int08dummy                      (0xff)
+
 #define EOK_reltimeZERO                     (0)
 #define EOK_reltime1ms                      (1000)
 #define EOK_reltime10ms                     (10*1000)
@@ -495,6 +497,12 @@ typedef struct
 } eObasicabstr_fsal_fn_t;
 
 
+/** @typedef    typedef int32_t  eOq17_14_t
+    @brief      Q17_14_t represents a number in fixed point format: 1 bit is used for the sign,
+                17 bits are used for real part of numeber and 14 bist for factional part of number.
+ **/  
+typedef int32_t                     eOq17_14_t;
+
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
@@ -555,10 +563,36 @@ EO_extern_inline eObool_t eo_common_event_check(eOevent_t event, eOevent_t mask)
     return( (mask == (event & mask)) ? (eobool_true) : (eobool_false) );
 }
 
+EO_extern_inline eOq17_14_t eo_common_float_to_Q17_14(float f_num)
+{
+    return((eOq17_14_t)(f_num * 16384.0) ); //note: 16384.0 = 2^14
+}
 
+EO_extern_inline float eo_common_Q17_14_to_float(eOq17_14_t q_num)
+{
+    return((float)(q_num / 16384.0) ); //note: 16384.0 = 2^14
+}
 
+EO_extern_inline eOresult_t eo_common_Q17_14_mult(eOq17_14_t q_num1, eOq17_14_t q_num2, eOq17_14_t *q_res)
+{
+    int64_t tmp;
+    
+    tmp = ((int64_t)q_num1) * ((int64_t)q_num2);
+    if(tmp >= 0x200000000000)
+    {
+        return(eores_NOK_generic);
+    }
+    
+    *q_res = (tmp + (1<<13))>>14;
+    return(eores_OK);
+}
 
-
+EO_extern_inline eOresult_t eo_common_Q17_14_division(eOq17_14_t q_num1, eOq17_14_t q_num2, eOq17_14_t *q_res)
+{
+    
+    *q_res = (((int64_t)q_num1) <<14) / q_num2;
+    return(eores_OK);
+}
 
 /** @}            
     end of group eo_common  
