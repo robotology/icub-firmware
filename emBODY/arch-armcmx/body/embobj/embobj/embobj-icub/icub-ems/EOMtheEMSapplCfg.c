@@ -325,6 +325,11 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
      ,
      .applbodycfg     =
      {
+         .icubcanprotoimplementedversion =
+         {
+            .major                   = 1,
+            .minor                   = 1
+         },
          .connectedEncodersMask      = EOMTHEEMSAPPLCFG_EBX_encodersMASK,
          .emsControllerCfg           =
          {
@@ -349,9 +354,9 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
                  .val2bcastList      =
                  {
                     /* 0 */ ICUBCANPROTO_PER_MB_CMD_POSITION,
-                    /* 1 */ ICUBCANPROTO_PER_MB_CMD_PID_VAL,
-                    /* 2 */ ICUBCANPROTO_PER_MB_CMD_PID_ERROR,
-                    /* 3 */ ICUBCANPROTO_PER_MB_CMD_VELOCITY
+                    /* 1 */ ICUBCANPROTO_PER_MB_CMD_STATUS,
+                    /* 2 */ ICUBCANPROTO_PER_MB_CMD_PRINT,
+                    /* 3 */ 0
                  }
              }
             
