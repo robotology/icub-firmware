@@ -975,14 +975,41 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getImpedanceOffset(EOicubCa
 
 extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getFirmwareVersion(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
+    eOresult_t                              res;
+    eOappTheDB_canBoardCanLocation_t        canLoc;
+    eObrd_boardId_t                         bid;
+
+    canLoc.emscanport = canPort;
+    canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id); 
+    
+    res = eo_appTheDB_GetCanBoardId_ByCanLocation(eo_appTheDB_GetHandle(), &canLoc, &bid); 
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    
+    if(1 != frame->data[7])
+    {
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "parse can cmd", "getFirmwareVersion: proto ver mismatch");    
+    }
     return(eores_OK);
 }
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getFirmwareVersion(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
+    eOicubCanProto_protocolVersion_t *protover_ptr = (eOicubCanProto_protocolVersion_t *)val_ptr;
+
+    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 3;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__GET_FIRMWARE_VERSION;
+
+    canFrame->data[1] = protover_ptr->major;
+    canFrame->data[2] = protover_ptr->minor;
+    
     return(eores_OK);
 }
-
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setCurrentPid(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
