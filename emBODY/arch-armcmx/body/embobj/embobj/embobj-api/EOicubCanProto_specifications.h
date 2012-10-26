@@ -537,7 +537,7 @@ typedef struct
 
 /** @typedef    typedef enum eOicubCanProto_calibration_type_t
     @brief      contains the possible types of calibration.
-    @warniing   this type is equal to eOmc_calibration_type_t.
+    @warning   this type is equal to eOmc_calibration_type_t.
                 Pay attention to mantain these types synchronized
  **/
 typedef enum
@@ -590,6 +590,12 @@ typedef struct
     uint8_t estimShiftMotorVel;
     uint8_t estimShiftMotorAcc;
 } eOicubCanProto_estimShift_t;
+
+typedef struct 
+{
+    uint8_t major;
+    uint8_t minor;
+} eOicubCanProto_protocolVersion_t;
 
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
