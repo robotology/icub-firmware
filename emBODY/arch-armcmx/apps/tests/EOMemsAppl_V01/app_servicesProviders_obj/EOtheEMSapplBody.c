@@ -133,11 +133,11 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOtheEMSappBody_cfg_t *
     s_eo_emsapplBody_objs_init(retptr); //if a obj init doesn't success, it calls errorManager with fatal error
     eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, "obj-body inited OK");
     
-    res = s_eo_emsapplBody_sendConfig2canboards(retptr);
-    eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in sending cfg 2 canboards");
-    
     res = s_eo_emsapplBody_getRunMode(retptr); //the run mode is depending on connected can board (mc4, 2foc, only skin, etc)
     eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in getting run mode");
+
+    res = s_eo_emsapplBody_sendConfig2canboards(retptr);
+    eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in sending cfg 2 canboards");
     
     retptr->st = eo_emsApplBody_st__inited;
         
@@ -407,30 +407,63 @@ static void s_eo_emsapplBody_measuresConverter_init(EOtheEMSapplBody *p)
 static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
 {
     eOresult_t                              res;
-    uint16_t                                numofjoint, i;
+    uint16_t                                numofjoint, i, numofboard;
     eOmc_controlmode_t                      controlmode = eomc_controlmode_idle;
     eOappTheDB_jointShiftValues_t           *shiftval_ptr;
     eOicubCanProto_bcastpolicy_t            *bcastpolicy_ptr;
     eOicubCanProto_estimShift_t             estimshift;
     eOicubCanProto_velocityShift_t          shift_icubCanProtValue;
+    eOappTheDB_cfg_canBoardInfo_t           *cfg_canbrd_ptr;
     eOicubCanProto_msgCommand_t             msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
         EO_INIT(.cmdId) 0
     };
 
-    //config joints
+    // 1) config can board if mc4 boars are connected to this ems 
+    if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
+    {
+        eOicubCanProto_msgDestination_t     msgdest;
+        EOMtheEMSapplCfg                    *emsapplCfg_ptr = eom_emsapplcfg_GetHandle();
+        
+        numofboard = eo_appTheDB_GetNumeberOfCanboards(eo_appTheDB_GetHandle());
+        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__GET_FIRMWARE_VERSION;
+        
+        for(i=0; i<numofboard; i++)
+        {
+            res = eo_appTheDB_GetCanBoardCfg(eo_appTheDB_GetHandle(), (eObrd_boardId_t)i, &cfg_canbrd_ptr);
+            if(eores_OK != res)
+            {
+                continue;
+            }
+            
+            if(eobrd_mc4 != cfg_canbrd_ptr->type)
+            {
+                continue;
+            }
+            
+            msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, cfg_canbrd_ptr->canLoc.addr);
+            res = eo_appCanSP_SendCmd(p->bodyobjs.appCanSP, cfg_canbrd_ptr->canLoc.emscanport, msgdest, msgCmd, (void*)&emsapplCfg_ptr->applbodycfg.icubcanprotoimplementedversion);
+            if(eores_OK != res)
+            {
+                return(res);
+            }        
+        }
+    }   
+
+    // 2) config joints
     numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
     
     for(i=0; i<numofjoint; i++)
     {
-        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__DISABLE_PWM_PAD;
+        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_IDLE;
         res  = eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, NULL);
         if(eores_OK != res)
         {
             return(res);
         }
-        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_IDLE;
+        
+        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__DISABLE_PWM_PAD;
         res  = eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, NULL);
         if(eores_OK != res)
         {
@@ -443,34 +476,38 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
         {
             return(res);
         }
-        //get bcast policy from db
-        res = eo_appTheDB_GetJointBcastpolicyPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)i, &bcastpolicy_ptr);
-        if(eores_OK != res)
+        
+        if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
         {
-            return(res);
-        }
-        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_BCAST_POLICY;
-        eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, (void*)&(bcastpolicy_ptr->val2bcastList[0]));
+            //get bcast policy from db
+            res = eo_appTheDB_GetJointBcastpolicyPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)i, &bcastpolicy_ptr);
+            if(eores_OK != res)
+            {
+                return(res);
+            }
+            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_BCAST_POLICY;
+            eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, (void*)&(bcastpolicy_ptr->val2bcastList[0]));
 
-        
-        //get shift values from DB
-        eo_appTheDB_GetShiftValuesOfJointPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)i, &shiftval_ptr);
-        
-        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_VEL_SHIFT;
-        shift_icubCanProtValue = shiftval_ptr->jointVelocityShift;
-        eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i,  msgCmd, (void*)&shift_icubCanProtValue);
-    
             
-        //set estim vel shift
-        estimshift.estimShiftJointVel= shiftval_ptr->jointVelocityEstimationShift;
-        estimshift.estimShiftJointAcc = 0;
-        estimshift.estimShiftMotorVel = 0;
-        estimshift.estimShiftMotorAcc = 0;
-        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_SPEED_ESTIM_SHIFT;
-        eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i,  msgCmd, (void*)&estimshift);
+            //get shift values from DB
+            eo_appTheDB_GetShiftValuesOfJointPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)i, &shiftval_ptr);
+            
+            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_VEL_SHIFT;
+            shift_icubCanProtValue = shiftval_ptr->jointVelocityShift;
+            eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i,  msgCmd, (void*)&shift_icubCanProtValue);
         
+                
+            //set estim vel shift
+            estimshift.estimShiftJointVel= shiftval_ptr->jointVelocityEstimationShift;
+            estimshift.estimShiftJointAcc = 0;
+            estimshift.estimShiftMotorVel = 0;
+            estimshift.estimShiftMotorAcc = 0;
+            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_SPEED_ESTIM_SHIFT;
+            eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i,  msgCmd, (void*)&estimshift);
+        }
     }
     
+   
     //config skin if connected
     if(eo_appTheDB_isSkinConnected(eo_appTheDB_GetHandle()))
     {

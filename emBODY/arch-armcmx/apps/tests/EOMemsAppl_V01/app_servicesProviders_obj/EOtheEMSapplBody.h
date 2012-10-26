@@ -58,16 +58,17 @@ typedef struct EOtheEMSapplBody_hid  EOtheEMSapplBody;
 
 typedef struct
 {
-    uint16_t                        connectedEncodersMask;
+    eOicubCanProto_protocolVersion_t    icubcanprotoimplementedversion;
+    uint16_t                            connectedEncodersMask;
     struct
     {
-        emsBoardType_t              emsboard_type;
+        emsBoardType_t                  emsboard_type;
     }emsControllerCfg;
     struct
     {
-        eOnvEP_t                     mc_endpoint;  /**<  motion control endopoint managed by the application    */
-        eOnvEP_t                     as_endpoint;  /**<  analog sensor endopoint managed by the application    */
-        eOnvEP_t                     sk_endpoint;  /**<  skin endopoint managed by the application    */
+        eOnvEP_t                        mc_endpoint;  /**<  motion control endopoint managed by the application    */
+        eOnvEP_t                        as_endpoint;  /**<  analog sensor endopoint managed by the application    */
+        eOnvEP_t                        sk_endpoint;  /**<  skin endopoint managed by the application    */
 
     } endpoints;
     
@@ -75,14 +76,14 @@ typedef struct
     {
         struct
         {
-            uint8_t     jointVelocityShift;
-            uint8_t     jointVelocityEstimationShift;
-            uint8_t     jointAccelerationEstimationShift;
+            uint8_t                     jointVelocityShift;
+            uint8_t                     jointVelocityEstimationShift;
+            uint8_t                     jointAccelerationEstimationShift;
         } shiftvalues;       /**<  values of shifts to send to motor can board (MC4 only, because 2foc use a different way to coding data)    */  
         
         struct
         {
-            uint8_t val2bcastList[4];
+            uint8_t                     val2bcastList[4];
         } bcastpolicy;       /**<  broadcast policy to set to motor can boards (MC4 only, because 2FOC don't use icubCanProto)    */
     } configdataofMC4boards; /**<  in actual fact, all config data of mc4 boards are about joints: they should be one for each joint managed by mc4 board;
                                    anyway these data are not configured by pc104, so we use one data for any joint.    */
