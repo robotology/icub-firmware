@@ -17,14 +17,14 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_STM32_SENSOR_GYRO_HID_H_
-#define _HAL_STM32_SENSOR_GYRO_HID_H_
+#ifndef _HAL_STM32_SENSOR_ACCEL_HID_H_
+#define _HAL_STM32_SENSOR_ACCEL_HID_H_
 
 
-/* @file       hal_device_st_l3g4200d_hid.h
+/* @file       hal_stm32_sensor_accel_hid.h
     @brief      This header file implements hidden interface to crc
     @author     marco.accame@iit.it
-    @date       10/25/2012
+    @date       10/26/2012
  **/
 
 
@@ -36,7 +36,7 @@
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_device_st_l3g4200d.h"
+#include "hal_sensor_accel.h"
 
 
 
@@ -53,9 +53,9 @@
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern uint32_t hal_device_st_l3g4200d_hid_getsize(const hal_cfg_t *cfg);
+extern uint32_t hal_sensor_accel_hid_getsize(const hal_cfg_t *cfg);
 
-extern hal_result_t hal_device_st_l3g4200d_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory);
+extern hal_result_t hal_sensor_accel_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory);
 
 
 #endif  // include guard

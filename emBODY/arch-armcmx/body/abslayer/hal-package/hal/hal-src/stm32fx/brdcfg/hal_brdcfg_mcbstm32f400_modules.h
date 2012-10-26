@@ -52,7 +52,9 @@
 
 #define     HAL_USE_SENSOR_TEMP
 #define     HAL_USE_SENSOR_GYRO
+#define     HAL_USE_SENSOR_ACCEL
 #define     HAL_USE_DEVICE_ST_L3G4200D
+#define     HAL_USE_DEVICE_ST_LIS3DH
 
 
 // - exceptions -------------------------------------------------------------------------------------------------------

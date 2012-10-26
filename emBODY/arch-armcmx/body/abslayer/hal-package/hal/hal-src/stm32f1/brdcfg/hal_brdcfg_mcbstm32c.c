@@ -515,7 +515,7 @@ extern void hal_brdcfg_eth__phy_start(void)
     uint16_t regv;
     uint32_t tout;
 
-    //congigure pin A1(Reference clock for switch. )
+    // configure pin A1 (Reference clock for switch. )
     GPIOA->CRL   &= 0xFFFFFF0F;
     GPIOA->CRL   |= 0x00000040;    /*set pin 1 in reset state and 2 in alternFunc 50MHz*/
 

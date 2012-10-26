@@ -717,7 +717,7 @@ extern void hal_brdcfg_switch__reg_write_byI2C(uint8_t* pBuffer, uint16_t WriteA
     {
     }  
     
-    /*!< Send EEPROM address for write */
+    /*!< Send  address for write */
     I2C_Send7bitAddress(HAL_BRDCFG_I2C4HAL__PERIPHERAL, HAL_BRDCFG_ETH_I2C_ADDRESS_WRITE_OP, I2C_Direction_Transmitter);
     
     while(!I2C_CheckEvent(HAL_BRDCFG_I2C4HAL__PERIPHERAL, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))

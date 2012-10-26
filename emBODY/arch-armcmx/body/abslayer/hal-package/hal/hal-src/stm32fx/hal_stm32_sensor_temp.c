@@ -43,6 +43,7 @@
 #include "hal_stm32xx_include.h"
 
 #include "utils/hal_device_st_l3g4200d.h"
+//#include "utils/hal_device_st_lis3dh.h"
 
 
 
@@ -150,7 +151,10 @@ extern hal_result_t hal_sensor_temp_read(hal_sensor_temp_t sensor, hal_sensor_te
 
     //hal_sensor_temp_cfg_t* cfg = NULL;
     hal_sensor_temp_info_t *info = NULL;
-    uint8_t data = 0;
+    int8_t data08 = 0;
+//    int16_t data16 = 0;   
+//    static uint8_t one = 0;
+//    one = (0 == one) ? (1) : (0);
 
  
     if(NULL == degrees)
@@ -164,8 +168,18 @@ extern hal_result_t hal_sensor_temp_read(hal_sensor_temp_t sensor, hal_sensor_te
         return(hal_res_NOK_generic);
     }
 
-    return(hal_hal_device_st_l3g4200d_temp_get(degrees));
+//    if(0 == one)
+//    {
+        res = hal_device_st_l3g4200d_temp_get(&data08);
+        *degrees = (int16_t) data08;  
+//    }
+//    else
+//    {
+//        res = hal_device_st_lis3dh_temp_get(&data16);
+//        *degrees = (int16_t) data16;  
+//    }
     
+    return(res);    
 }
 
 
@@ -225,7 +239,12 @@ static hal_boolval_t s_hal_sensor_temp_initted_is(hal_sensor_temp_t sensor)
 
 static hal_result_t s_hal_sensor_temp_hw_init(const hal_sensor_temp_cfg_t *cfg)
 {
-     return(hal_device_st_l3g4200d_init(NULL));
+    hal_result_t res;
+
+    res = hal_device_st_l3g4200d_init(NULL);
+//    res = hal_device_st_lis3dh_init(NULL);
+    
+    return(res);
 }
 
 
