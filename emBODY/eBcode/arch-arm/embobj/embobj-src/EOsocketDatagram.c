@@ -220,7 +220,9 @@ extern eOresult_t eo_socketdtg_SetActions(EOsocketDatagram *p, EOaction *onrx, E
         
         eo_socket_hid_derived_SetActions(p, onrx, ontx);
         
-        eov_ipnet_Activate(eov_ipnet_GetHandle());       
+        eov_ipnet_Activate(eov_ipnet_GetHandle());
+        
+        res = eores_OK;
     }
     
     return(res);

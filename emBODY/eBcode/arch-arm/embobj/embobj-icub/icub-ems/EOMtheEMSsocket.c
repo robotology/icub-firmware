@@ -170,7 +170,7 @@ extern eOresult_t eom_emssocket_Open(EOMtheEMSsocket *p, EOaction* withactiononr
     
     if(eobool_true == p->active)
     {
-        eo_socketdtg_SetActions(p->socket, withactiononrx, withactionontx);
+        res = eo_socketdtg_SetActions(p->socket, withactiononrx, withactionontx);
     }
     else
     {

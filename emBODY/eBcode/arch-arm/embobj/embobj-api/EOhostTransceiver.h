@@ -47,12 +47,12 @@ extern "C" {
 
 //#warning --> instead of 20 ... can i put 0? answer: seems yes  .. but be carefule w/ eo_ropframe_ROP_NumberOf_quickversion()
 
-#define EOK_HOSTTRANSCEIVER_capacityofpacket                   640
-#define EOK_HOSTTRANSCEIVER_capacityofrop                      192
-#define EOK_HOSTTRANSCEIVER_capacityofropframeregulars         20
-#define EOK_HOSTTRANSCEIVER_capacityofropframeoccasionals      (EOK_HOSTTRANSCEIVER_capacityofpacket-4-4)
-#define EOK_HOSTTRANSCEIVER_capacityofropframereplies          20 
-#define EOK_HOSTTRANSCEIVER_maxnumberofregularrops             4     
+#define EOK_HOSTTRANSCEIVER_capacityofpacket                   1408
+#define EOK_HOSTTRANSCEIVER_capacityofrop                      256
+#define EOK_HOSTTRANSCEIVER_capacityofropframeregulars         1024
+#define EOK_HOSTTRANSCEIVER_capacityofropframeoccasionals      128//(EOK_HOSTTRANSCEIVER_capacityofpacket-4-4)
+#define EOK_HOSTTRANSCEIVER_capacityofropframereplies          256
+#define EOK_HOSTTRANSCEIVER_maxnumberofregularrops             32
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
