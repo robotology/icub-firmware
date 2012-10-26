@@ -102,9 +102,9 @@ typedef enum
  **/
 typedef enum
 {
-    eomc_motionmonitorstatus_notmonitored           = 255,          /**< the motion is not monitored vs a desired setpoint */
-    eomc_motionmonitorstatus_setpointnotreachedyet  = 0,            /**< the motion is monitored but the desired setpoint is not reached yet */
-    eomc_motionmonitorstatus_setpointisreached      = 1             /**< the motion is monitored and the desired setpoint is reached */
+    eomc_motionmonitorstatus_notmonitored           = EOK_int08dummy,       /**< the motion is not monitored vs a desired setpoint */
+    eomc_motionmonitorstatus_setpointnotreachedyet  = 0,                    /**< the motion is monitored but the desired setpoint is not reached yet */
+    eomc_motionmonitorstatus_setpointisreached      = 1                     /**< the motion is monitored and the desired setpoint is reached */
 } eOmc_motionmonitorstatus_t;
 
 
