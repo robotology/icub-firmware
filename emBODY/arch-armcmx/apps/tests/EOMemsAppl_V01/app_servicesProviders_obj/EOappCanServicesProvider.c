@@ -350,6 +350,16 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t n
 
 }
 
+extern eOresult_t eo_appCanSP_GetNumOfRecCanframe(EOappCanSP *p, eOcanport_t canport, uint8_t *numofRXcanframe)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    // here not check if numofRXcanframe is null because hal function already do it.   
+    return((eOresult_t)hal_can_out_get((hal_can_port_t)canport, numofRXcanframe));
+}
 
 extern eOresult_t eo_appCanSP_SetRunMode(EOappCanSP *p, eo_appCanSP_runMode_t runmode)
 {

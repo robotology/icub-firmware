@@ -163,6 +163,15 @@ extern eOresult_t eo_appCanSP_SendCmd(EOappCanSP *p, eOcanport_t emscanport, eOi
 extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t numofcanframe, uint8_t *numofREADcanframe);
 
 
+/** @fn         extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t *numofRXcanframe)
+    @brief      gets number of received can frame on port @e canport
+    @param      p                   target obj
+    @param      numofRXcanframe     in output contains number of received can frame.
+    @return     eores_OK on success
+                eores_NOK_nullpointer if p is null, or eores_NOK_nodata the mid is not connected with this ems board,
+                or eores_NOK_generic something else error case. //TODO: check better error!!!
+ **/
+extern eOresult_t eo_appCanSP_GetNumOfRecCanframe(EOappCanSP *p, eOcanport_t canport, uint8_t *numofRXcanframe);
 
 
 /** @fn         extern eOresult_t eo_appCanSP_SetRunMode(EOappCanSP *p, eo_appCanSP_runMode_t runmode);
