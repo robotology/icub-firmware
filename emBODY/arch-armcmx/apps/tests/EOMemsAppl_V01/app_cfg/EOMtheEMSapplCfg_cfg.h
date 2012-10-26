@@ -117,15 +117,15 @@ extern "C" {
 
 //  <o> host IP2 address <0-255>
 //  <i> default: 255
-#define EOMTHEEMSAPPLCFG_HOSTIPADDR2                            255
+#define EOMTHEEMSAPPLCFG_HOSTIPADDR2                            0
 
 //  <o> host IP3 address <0-255>
 //  <i> default: 72
-#define EOMTHEEMSAPPLCFG_HOSTIPADDR3                            72
+#define EOMTHEEMSAPPLCFG_HOSTIPADDR3                            1
 
 //  <o> host IP4 address <1-255>
 //  <i> default: 205
-#define EOMTHEEMSAPPLCFG_HOSTIPADDR4                            211
+#define EOMTHEEMSAPPLCFG_HOSTIPADDR4                            104
 
 
 //  </h>Remote Host
@@ -304,7 +304,7 @@ extern "C" {
 
 //  <o> addresses       <0=> from eeprom 
 //                      <1=> from ipal_cfg.h                               
-#define ADDR_USEIPAL   1
+#define ADDR_USEIPAL   0
 
 #if (1 == ADDR_USEIPAL)
     #define EOMTHEEMSAPPLCFG_IPADDR_FROM_ENVIRONMENT        0
@@ -487,7 +487,7 @@ extern "C" {
 
 //  <o> max size of output datagrams <64-1500>
 //  <i> default: 1024
-#define EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF                  1024
+#define EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF                  1408
 
 //  </h>datagrams in socket
 
@@ -538,7 +538,7 @@ extern "C" {
 
 //  <o> capacity of the ropframe of regular rops    <16-1440:8>
 //  <i> default: 768
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY  768  
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY  1024  
 
 //  <o> capacity of the ropframe of occasional rops    <16-1440:8>
 //  <i> default: 128
@@ -546,7 +546,7 @@ extern "C" {
 
 //  <o> capacity of the ropframe of reply rops    <16-1440:8>
 //  <i> default: 128
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY  128  
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY  256  
 
 
 
