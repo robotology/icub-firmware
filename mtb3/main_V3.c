@@ -234,7 +234,7 @@ int Tpad_palm_base; //initial value of the Tpad in the palm
 int Tpad_palm;      //current value of the Tpad in the palm
 int drift;      //current drift
 
-unsigned char SKIN_TYPE=SKIN_2; //if =0 means new skin with drift compensation and 10 pads
+unsigned char SKIN_TYPE=0; //SKIN_2; //if =0 means new skin with drift compensation and 10 pads
 unsigned int TRIANGLE_MASK=0xFFFF; //all the triangles are enabled for default
 unsigned char CONFIG_TYPE=CONFIG_SINGLE;
 unsigned char ERROR_COUNTER=0; //it counts the errors in reading the triangles.

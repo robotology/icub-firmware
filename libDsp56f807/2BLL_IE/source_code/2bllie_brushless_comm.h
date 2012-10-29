@@ -13,7 +13,7 @@ typedef struct sDutyControl_tag
  
 
 
-#define  MIN_DUTY 5  // MIN_DUTY has to be bigger then DEAD_TIME  8 a 200KHz 8 a 50KHz 8 a 30KHz at 48V it moves even at min duty
+#define  MIN_DUTY 4  // MIN_DUTY has to be bigger then DEAD_TIME  8 a 200KHz 8 a 50KHz 8 a 30KHz at 48V it moves even at min duty
 #define  MAX_DUTY 780// 190 a 200KHz  760 a 50KHz 1250 a 30KHz 
 #define  DEAD_TIME 3 //deadtime  
 #define  STEP 10//10     // 1 a 200KHz  4 a 50KHz 6 a 30KHz   

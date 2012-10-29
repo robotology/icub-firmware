@@ -8,9 +8,11 @@
 #define EIGHT_BITS      1
 #define TEN_BITS        2
 #define CALIB           3
-
+#define SKIN_2          0
+#define SKIN_PALM       1
 #define CONFIG_SINGLE 0
 #define CONFIG_THREE 1
+#define CONFIG_FINGERTIP 4
 #define CONFIG_ALL 2
 
 //#define SHIFT        0   //
