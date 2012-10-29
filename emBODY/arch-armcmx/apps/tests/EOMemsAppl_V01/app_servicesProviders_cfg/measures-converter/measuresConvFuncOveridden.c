@@ -134,7 +134,7 @@ extern eOmeas_velocity_t eo_appMeasConv_jntVelocity_E2I(EOappMeasConv *p, eOmc_j
 
 extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
 {
-     uint32_t vel_factor;
+
 #ifdef _APPMEASCONV_SAFE_
     if(NULL == p)
     {
@@ -147,8 +147,7 @@ extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E(EOappMeasConv *p
     }
 #endif
     
-    
-    return(((i_vel * eo_appMeasConv_hid_GetEncConv_factor(p, jId))/1000)<<eo_appMeasConv_hid_GetVelShift(p, jId));
+    return(((eOicubCanProto_velocity_t)((i_vel * eo_appMeasConv_hid_GetEncConv_factor(p, jId))/1000))<<eo_appMeasConv_hid_GetVelShift(p, jId));
 }
 
 
@@ -189,6 +188,7 @@ extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I(EOappMeasConv *p
 
 extern eOicubCanProto_acceleration_t eo_appMeasConv_jntAcceleration_I2E(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_acceleration_t i_acc)
 {
+
 #ifdef _APPMEASCONV_SAFE_
     if(NULL == p)
     {
@@ -200,8 +200,8 @@ extern eOicubCanProto_acceleration_t eo_appMeasConv_jntAcceleration_I2E(EOappMea
         return(eores_NOK_nodata);
     }
 #endif
-        
-    return((i_acc * eo_appMeasConv_hid_GetEncConv_factor(p, jId))<<eo_appMeasConv_hid_GetVelShift(p, jId));
+   
+    return(((eOicubCanProto_acceleration_t)(i_acc * eo_appMeasConv_hid_GetEncConv_factor(p, jId)))<<eo_appMeasConv_hid_GetVelShift(p, jId));
 }
 
 
