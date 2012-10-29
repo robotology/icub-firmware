@@ -36,6 +36,7 @@
 
 #include "EoCommon.h"
 #include "EOnv_hid.h"
+//#include "EOtheErrorManager.h"
 
 #include "EOMotionControl.h"
 #include "eOcfg_nvsEP_mc.h"
@@ -450,6 +451,8 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__encoderconversionoffset(eOcfg_
 
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
+ //   char str[96];
+    
     eOresult_t                              res;
     eOmc_setpoint_t                         *setPoint = (eOmc_setpoint_t*)nv->loc;
     void                                    *val_ptr = NULL;
@@ -499,7 +502,12 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
             setpoint_pos.value = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, setPoint->to.position.value);
             setpoint_pos.withvelocity = eo_appMeasConv_jntVelocity_I2E_forSetVelRefMC4(appMeasConv_ptr,jxx, setPoint->to.position.withvelocity);           
             msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__POSITION_MOVE; 
-            val_ptr =  &setpoint_pos;    
+            val_ptr =  &setpoint_pos; 
+
+//             snprintf(str, sizeof(str)-1, "POSIZIONE: rec_pos=%x rec_vel=%x pos=%d, vel=%d", 
+//                      setPoint->to.position.value, setPoint->to.position.withvelocity,
+//                      setpoint_pos.value, setpoint_pos.withvelocity);  
+//             eo_errman_Info(eo_errman_GetHandle(), "SET POINT", str);            
         }break;
 
         case eomc_setpoint_velocity:
@@ -515,7 +523,10 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
             }            
             
             msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__VELOCITY_MOVE;                 
-            val_ptr =  &setpoint_vel;    
+            val_ptr =  &setpoint_vel;   
+//             snprintf(str, sizeof(str)-1, "VELOCITA: vel=%d, acc=%d", setpoint_vel.value, setpoint_vel.withacceleration);  
+//             eo_errman_Info(eo_errman_GetHandle(), "SET POINT", str);            
+            
         }break;
 
         case eomc_setpoint_torque:
@@ -595,61 +606,71 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
     
  
     //prepare calibration data to send
+    /*Note: currently calibration params are raw, so they doesn't need to be converted in icub can proto measures;
+    but i prepare code for future: when calibration param used new measure unit.*/
     iCubCanProtCalibrator.type = (eOicubCanProto_calibration_type_t)calibrator->type;
     switch(calibrator->type)
     {
         case eomc_calibration_type0_hard_stops:
         {
             iCubCanProtCalibrator.params.type0.pwmlimit = calibrator->params.type0.pwmlimit;
-            iCubCanProtCalibrator.params.type0.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, calibrator->params.type0.velocity);           
+//            iCubCanProtCalibrator.params.type0.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, calibrator->params.type0.velocity);           
+            iCubCanProtCalibrator.params.type0.velocity = calibrator->params.type0.velocity;
             enableAMPbeforeCalib = eobool_true;
         }break;
             
         case eomc_calibration_type1_abs_sens_analog:
         {
-            eOicubCanProto_position_t pos = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, calibrator->params.type1.position);
-            /*sice pos param is a word of 16 bits i must check min and max*/
-            if((pos < INT16_MIN)||(pos>INT16_MAX))
-            {
-                return;
-            }
-            iCubCanProtCalibrator.params.type1.position = (eOicubCanProto_position4calib_t)pos; 
-            iCubCanProtCalibrator.params.type1.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, calibrator->params.type1.velocity);
+//             eOicubCanProto_position_t pos = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, calibrator->params.type1.position);
+//             /*sice pos param is a word of 16 bits i must check min and max*/
+//             if((pos < INT16_MIN)||(pos>INT16_MAX))
+//             {
+//                 return;
+//             }
+//             iCubCanProtCalibrator.params.type1.position = (eOicubCanProto_position4calib_t)pos; 
+//             iCubCanProtCalibrator.params.type1.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, calibrator->params.type1.velocity);
+             iCubCanProtCalibrator.params.type1.position = calibrator->params.type1.position; 
+             iCubCanProtCalibrator.params.type1.velocity =  calibrator->params.type1.velocity;
             enableAMPbeforeCalib = eobool_false;
         }break;
 
         case eomc_calibration_type2_hard_stops_diff:
         {
             iCubCanProtCalibrator.params.type2.pwmlimit = calibrator->params.type2.pwmlimit;
-            iCubCanProtCalibrator.params.type2.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, calibrator->params.type2.velocity);           
+//            iCubCanProtCalibrator.params.type2.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, calibrator->params.type2.velocity);           
+            iCubCanProtCalibrator.params.type2.velocity = calibrator->params.type2.velocity;           
             enableAMPbeforeCalib = eobool_true;
         }break;
 
         case eomc_calibration_type3_abs_sens_digital:
         {
-             eOicubCanProto_position_t pos = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, calibrator->params.type3.position);
-            /*sice pos param is a word of 16 bits i must check min and max*/
-            if((pos < INT16_MIN)||(pos>INT16_MAX))
-            {
-                return;
-            }
-            iCubCanProtCalibrator.params.type1.position = (eOicubCanProto_position4calib_t)pos; 
-            iCubCanProtCalibrator.params.type3.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, calibrator->params.type3.velocity);           
+//              eOicubCanProto_position_t pos = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, calibrator->params.type3.position);
+//             /*sice pos param is a word of 16 bits i must check min and max*/
+//             if((pos < INT16_MIN)||(pos>INT16_MAX))
+//             {
+//                 return;
+//             }
+//             iCubCanProtCalibrator.params.type1.position = (eOicubCanProto_position4calib_t)pos; 
+//             iCubCanProtCalibrator.params.type3.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, calibrator->params.type3.velocity);           
+            iCubCanProtCalibrator.params.type1.position = calibrator->params.type3.position; 
+            iCubCanProtCalibrator.params.type3.velocity = calibrator->params.type3.velocity;            
             iCubCanProtCalibrator.params.type3.offset = calibrator->params.type3.offset;
             enableAMPbeforeCalib = eobool_false;
         }break;
 
         case eomc_calibration_type4_abs_and_incremental:
         {
-            eOicubCanProto_position_t pos = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, calibrator->params.type4.position);
-            //here position is in int16_t ==> so i must verify if pos is out of int16_t range
-            if((pos > INT16_MAX) || (pos < INT16_MIN))
-            {
-                return;
-                #warning VALE --> how to manage this error???
-            }
-            iCubCanProtCalibrator.params.type4.position = (eOicubCanProto_position4calib_t)pos; 
-            iCubCanProtCalibrator.params.type4.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, calibrator->params.type4.velocity);            
+//             eOicubCanProto_position_t pos = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, calibrator->params.type4.position);
+//             //here position is in int16_t ==> so i must verify if pos is out of int16_t range
+//             if((pos > INT16_MAX) || (pos < INT16_MIN))
+//             {
+//                 return;
+//                 #warning VALE --> how to manage this error???
+//             }
+//             iCubCanProtCalibrator.params.type4.position = (eOicubCanProto_position4calib_t)pos; 
+//            iCubCanProtCalibrator.params.type4.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, calibrator->params.type4.velocity);            
+            iCubCanProtCalibrator.params.type4.position = calibrator->params.type4.position;
+            iCubCanProtCalibrator.params.type4.velocity = calibrator->params.type4.velocity;
             iCubCanProtCalibrator.params.type4.maxencoder = calibrator->params.type4.maxencoder;
             enableAMPbeforeCalib = eobool_false;
         }break;
