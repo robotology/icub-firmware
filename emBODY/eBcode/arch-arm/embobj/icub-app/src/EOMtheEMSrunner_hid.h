@@ -50,7 +50,7 @@ extern "C" {
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
-#define EVIEWER_ENABLED
+//#define EVIEWER_ENABLED
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
