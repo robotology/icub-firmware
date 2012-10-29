@@ -66,6 +66,20 @@ struct EOMtheEMSappl_hid
 extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p);
 
 
+extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p);
+
+extern void eom_emsappl_hid_userdef_on_exit_CFG(EOMtheEMSappl* p);
+
+
+extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p);
+
+extern void eom_emsappl_hid_userdef_on_exit_ERR(EOMtheEMSappl* p);
+
+
+extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p);
+
+extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p);
+
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"

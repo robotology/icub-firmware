@@ -144,9 +144,9 @@ typedef int dummy[(s_events_number > 32) ? -1 : 1];
 
 typedef enum 
 {
-     index00State_CFG                  = 0,     /**< state CFG */
-     index01State_RUN                  = 1,     /**< state RUN */
-     index02State_ERR                  = 2      /**< state ERR */
+     index00State_CFG                  = eo_sm_emsappl_STcfg, /*0*/     /**< state CFG */
+     index01State_RUN                  = eo_sm_emsappl_STrun, /*1*/    /**< state RUN */
+     index02State_ERR                  = eo_sm_emsappl_STerr  /*2*/    /**< state ERR */
 } eOsmcfgStatesIndex_t;
 
 static const eOsmState_t s_smcfg_EMSappl_states_table_global[] = 
