@@ -53,7 +53,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
-eOboolvalues_t go2run_received = eobool_false;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -83,9 +82,9 @@ eOboolvalues_t go2run_received = eobool_false;
 
 extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSconfigurator *p)
 {
-    eOresult_t  res;
-    uint8_t     numofRXcanframe = 0;
-    EOappCanSP  *appcanSP = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+//     eOresult_t  res;
+//     uint8_t     numofRXcanframe = 0;
+//     EOappCanSP  *appcanSP = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
 #warning VALE --> read or not read can frame in configuration state??    
 //     res = eo_appCanSP_GetNumOfRecCanframe(appcanSP, eOcanport1, &numofRXcanframe);
 //     if(eores_OK != res)
@@ -102,10 +101,6 @@ extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSco
 //     }
 //     eo_appCanSP_read(appcanSP, eOcanport2, numofRXcanframe, NULL);
     
-    if(eobool_true == go2run_received)
-    {
-            eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_go2runner);
-    }
 }
 
 

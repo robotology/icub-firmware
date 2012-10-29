@@ -41,7 +41,8 @@
 #include "EOtheBOARDtransceiver.h"
 
 //application
-#include "EOMtheEMSconfigurator.h"
+// #include "EOMtheEMSconfigurator.h"
+#include "EOMtheEMSappl.h"
 #include "EOtheEMSapplBody.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -83,7 +84,7 @@ static void s_eo_cfg_nvsEP_mngmnt_usr_ebx_generic_ropsigcfgcommand(eOmn_ropsigcf
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
-extern eOboolvalues_t go2run_received;
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -160,26 +161,22 @@ extern void eo_cfg_nvsEP_mn_appl_usr_hid_UPDT_cmmnds__go2state(uint16_t n, const
 
     eOmn_appl_state_t *newstate_ptr = (eOmn_appl_state_t *)nv->loc;
 
-    #warning VALE--> think about go to new state.
     switch(*newstate_ptr)
     {
         case applstate_config:
         {
-            go2run_received = eobool_false;
-//              eom_appTheSysController_ExitFromRunState(eom_appTheSysController_GetHandle());
-//             eom_appTheSysController_Go2ConfigState(eom_appTheSysController_GetHandle());
+            eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STcfg);
         }break;
 
         case applstate_running:
         {
-            go2run_received = eobool_true;
-//            eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_go2runner);    
+            eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
         }break;
-
+        
         case applstate_error:
         {
-            go2run_received = eobool_false;
-//             eom_appTheSysController_Go2ErrorState(eom_appTheSysController_GetHandle());    
+            //I don't expect to receive go to error cmd
+            eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STerr);
         }break;
 
     }

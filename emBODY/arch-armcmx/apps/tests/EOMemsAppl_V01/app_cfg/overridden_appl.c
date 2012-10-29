@@ -81,7 +81,20 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 }
 
 
+extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p)
+{
+    eo_appCanSP_SetRunMode(eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle()), eo_appCanSP_runMode__onEvent);
+}
 
+extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
+{
+    eo_appCanSP_SetRunMode(eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle()), eo_appCanSP_runMode__onDemand);
+}
+
+extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
+{
+    eo_appCanSP_SetRunMode(eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle()), eo_appCanSP_runMode__onEvent);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
