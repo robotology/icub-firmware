@@ -125,6 +125,7 @@ static void s_eom_emsappl_startBlinkLed(void);
 
 static void s_eom_emsappl_InitLeds(void);
 
+EO_static_inline eOsmStatesEMSappl_t s_eom_emsappl_GetCurrentState(EOMtheEMSappl *p);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -260,11 +261,100 @@ extern eOresult_t eom_emsappl_ProcessEvent(EOMtheEMSappl *p, eOsmEventsEMSappl_t
 
 
 
+extern eOresult_t eom_emsappl_ProcessGo2stateRequest(EOMtheEMSappl *p, eOsmStatesEMSappl_t newstate)
+{
+    eOsmStatesEMSappl_t     currentstate;
+    eOresult_t              res;
+    
+    
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    //get current state
+    currentstate = s_eom_emsappl_GetCurrentState(p);
+    
+    if((eo_sm_emsappl_STerr == newstate) || (eo_sm_emsappl_STerr == currentstate))
+    {
+        return(eores_NOK_unsupported); //currently is not possible go to err with a command or exit from it with a command
+    }
+    
+    if(currentstate == newstate)
+    {
+        return(eores_OK); 
+    }
+    
+    switch(currentstate)
+    {
+         case eo_sm_emsappl_STcfg:
+        {
+            //if i'm here means newstate is eo_emsappl_STrun
+            res = eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_go2runner);
+        }break;
+        
+        case eo_sm_emsappl_STrun:
+        {
+            res = eom_emsrunner_StopAndGoTo(eom_emsrunner_GetHandle(), eo_sm_emsappl_EVgo2cfg); //pay attention: currently is not possible go to err by cmd    
+        }break;
+        
+        // case eo_sm_emsappl_STerr:
+        // {
+            // res = eores_NOK_unsupported;//currently is inpossible go to any other state!!
+        // }break;
+
+    }
+    return(res);
+}
+
+extern eOresult_t eom_emsappl_GetCurrentState(EOMtheEMSappl *p, eOsmStatesEMSappl_t *currentstate)
+{
+    if((NULL == p) || (NULL == currentstate))
+    {
+        return(eores_NOK_nullpointer);
+    }    
+
+    *currentstate = s_eom_emsappl_GetCurrentState(p);
+    
+    return(eores_OK);
+}
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
 __weak extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
+{
+
+}
+
+__weak extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p)
+{
+
+}
+
+__weak extern void eom_emsappl_hid_userdef_on_exit_CFG(EOMtheEMSappl* p)
+{
+
+}
+
+__weak extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
+{
+
+}
+
+__weak extern void eom_emsappl_hid_userdef_on_exit_ERR(EOMtheEMSappl* p)
+{
+
+}
+
+__weak extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
+{
+
+}
+
+__weak extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
 {
 
 }
@@ -487,6 +577,11 @@ static void s_eom_emsrunner_emsappl_toogleled(osal_timer_t* tmr, void* par)
     hal_led_toggle(emsappl_ledorange);
 }
 
+EO_static_inline eOsmStatesEMSappl_t s_eom_emsappl_GetCurrentState(EOMtheEMSappl *p)
+{
+    return((eOsmStatesEMSappl_t)eo_sm_GetActiveState(p->sm));
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // redefinition of functions of state machine
 
@@ -500,12 +595,16 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_CFG(EOsm *s)
     eo_action_SetEvent(&onrx, emssocket_evt_packet_received, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
     // the socket alerts the cfg task
     eom_emssocket_Open(eom_emssocket_GetHandle(), &onrx, NULL);
+    
+    eom_emsappl_hid_userdef_on_entry_CFG(&s_emsappl_singleton);
 }
 
 
 extern void eo_cfg_sm_EMSappl_hid_on_exit_CFG(EOsm *s)
 {
     hal_led_off(emsappl_ledgreen);
+    
+    eom_emsappl_hid_userdef_on_exit_CFG(&s_emsappl_singleton);
 }
 
 extern void eo_cfg_sm_EMSappl_hid_on_entry_ERR(EOsm *s)
@@ -517,12 +616,18 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_ERR(EOsm *s)
     eo_action_SetEvent(&onrx, emssocket_evt_packet_received, eom_emserror_GetTask(eom_emserror_GetHandle()));
     // the socket alerts the error task
     eom_emssocket_Open(eom_emssocket_GetHandle(), &onrx, NULL);
+    
+    eom_emsappl_hid_userdef_on_entry_ERR(&s_emsappl_singleton);
+    
 }
 
 
 extern void eo_cfg_sm_EMSappl_hid_on_exit_ERR(EOsm *s)
 {
     hal_led_off(emsappl_ledred);
+    
+    eom_emsappl_hid_userdef_on_exit_ERR(&s_emsappl_singleton);
+
  }
 
 extern void eo_cfg_sm_EMSappl_hid_on_entry_RUN(EOsm *s)
@@ -541,6 +646,8 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_RUN(EOsm *s)
     eom_emsrunner_Start(eom_emsrunner_GetHandle());
     
     //eov_ipnet_Deactivate(eov_ipnet_GetHandle());
+    
+    eom_emsappl_hid_userdef_on_entry_RUN(&s_emsappl_singleton);
 }
 
 
@@ -548,6 +655,8 @@ extern void eo_cfg_sm_EMSappl_hid_on_exit_RUN(EOsm *s)
 {
     hal_led_off(emsappl_ledyellow);
     //eov_ipnet_Activate(eov_ipnet_GetHandle());
+    
+    eom_emsappl_hid_userdef_on_exit_RUN(&s_emsappl_singleton);
 }
 
 

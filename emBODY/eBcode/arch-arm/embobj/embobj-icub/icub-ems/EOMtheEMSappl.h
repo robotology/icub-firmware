@@ -102,8 +102,24 @@ extern EOMtheEMSappl * eom_emsappl_GetHandle(void);
 
 
 extern eOresult_t eom_emsappl_ProcessEvent(EOMtheEMSappl *p, eOsmEventsEMSappl_t ev);
- 
 
+/** @fn         eOresult_t eom_emsappl_ProcessGo2stateRequest(EOMtheEMSappl *p, eOemsappl_applstate_t newstate)
+    @brief      say the application to go to new state as soon as possible. In some case the tarnsition can not be done immediatly,
+                so it is necessary waiting current activity finished.
+                if new state is equal to current state any trnasition is performed, and return ok.
+                if current state is error, this function returns eores_NOK_unsupported, becoause is not possible live error state.
+                if new state is error, this function returns eores_NOK_unsupported, becoause is not possible go to aerror state with command, but only because an interal error happened.
+    @arg        p           EOMtheEMSappl handle
+                newstate    the new state of application
+    @return     eores_OK on success
+                eores_NOK_unsupported if transition is not possible
+                eores_NOK_nullpointer if p is null.
+    @note       the user can overriden eom_emsappl_hid_userdef_ProcessGo2stateRequest, in order to notify to its obj transition toward newstate.
+ **/
+extern eOresult_t eom_emsappl_ProcessGo2stateRequest(EOMtheEMSappl *p, eOsmStatesEMSappl_t newstate);
+
+ 
+extern eOresult_t eom_emsappl_GetCurrentState(EOMtheEMSappl *p, eOsmStatesEMSappl_t *currentstate);
 
 
 

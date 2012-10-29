@@ -65,6 +65,18 @@ typedef enum
 enum { eo_sm_emsappl_EVnumberof = 3 };
 
 
+/**	@typedef    typedef enum eOsmStatesEMSappl_t
+ 	@brief 		the states to be used by a state machine configured with ...
+ **/ 
+typedef enum 
+{
+	eo_sm_emsappl_STcfg             = (eOsmEvent_t) 0,		/**< state CFG */
+	eo_sm_emsappl_STrun 	        = (eOsmEvent_t) 1,		/**< state RUN */
+	eo_sm_emsappl_STerr 	        = (eOsmEvent_t) 2		/**< state ERR */
+} eOsmStatesEMSappl_t;
+
+enum { eo_sm_emsappl_STnumberof = 3 };
+
 /** @typedef    typedef struct eOsmDynamicDataEMSappl_t
     @brief      contains the dynamic data structure used in the functions of this state machine. It will be responsibility 
                 of the state machine object to allocate RAM for this struct.
