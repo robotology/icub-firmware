@@ -57,30 +57,48 @@ extern "C" {
 // -- all the possible enum
 
 
+/** @typedef    typedef enum eOmc_controlmode_command_t
+    @brief      eOmc_controlmode_command_t contains command to set the control mode.
+    @warning    On an EMS only modes eomc_controlmode_cmd_idle, eomc_controlmode_cmd_position, eomc_controlmode_cmd_velocity, eomc_controlmode_cmd_torque,
+                eomc_controlmode_cmd_impedance_pos, eomc_controlmode_cmd_impedance_vel, and eomc_controlmode_cmd_openloop are allowed.
+                On a 2FOC the only possible mode is eomc_controlmode_cmd_current.                
+ **/
+typedef enum
+{
+    eomc_controlmode_cmd_position                   = 0x01,
+    eomc_controlmode_cmd_torque                     = 0x03,
+    eomc_controlmode_cmd_impedance_pos              = 0x04,
+    eomc_controlmode_cmd_impedance_vel              = 0x05,
+    eomc_controlmode_cmd_current                    = 0x06,
+    eomc_controlmode_cmd_velocity                   = 0x07,      /**< velocity control loop */ 
+    eomc_controlmode_cmd_openloop                   = 0x50,
+    eomc_controlmode_cmd_switch_everything_off      = 0xf0      /**< it imposes a zero current on the motor and also turns the pwm off */    
+} eOmc_controlmode_command_t;
+
+
 /** @typedef    typedef enum eOmc_controlmode_t
     @brief      eOmc_controlmode_t contains all the possible modes for motion control.
     @warning    On an EMS only modes eomc_controlmode_idle, eomc_controlmode_position, eomc_controlmode_velocity, eomc_controlmode_torque,
                 eomc_controlmode_impedance_pos, eomc_controlmode_impedance_vel, and eomc_controlmode_openloop are allowed.
-                On a 2FOC the only possible mode is eomc_controlmode_current.                
+                On a 2FOC the only possible mode is eomc_controlmode_current.
+                when command eomc_controlmode_cmd_switch_everything_off is received the motor controller is in eomc_controlmode_idle.
+                when command calibration (see eOmc_calibrator_t in joint commands) the motor control is in eomc_controlmode_calib.
  **/
 typedef enum
 {
-    eomc_controlmode_idle                       = 0x00,     /**< it imposes a zero current on the motor (to the current pid actually), but does not turn the pwm off*/
+    eomc_controlmode_idle                       = 0x00,     /**< pid and pwm off*/
     eomc_controlmode_position                   = 0x01,
-    eomc_controlmode_velocity                   = 0x02,
+    eomc_controlmode_velocity_pos               = 0x02,     /**< control mode is in position, but the control mode switch to eomc_controlmode_velocity_pos
+                                                                 automatically when it receives a velocity set setpoint. 
+                                                                 This mode is called "velocity" in icub can proto */ 
     eomc_controlmode_torque                     = 0x03,
     eomc_controlmode_impedance_pos              = 0x04,
     eomc_controlmode_impedance_vel              = 0x05,
-    eomc_controlmode_current                    = 0x06,
-    eomc_controlmode_calib_abs_pos_sens         = 0x10,
-    eomc_controlmode_calib_hard_stops           = 0x20,
-    eomc_controlmode_handle_hard_stops          = 0x30,
-    eomc_controlmode_margin_reached             = 0x40,
-    eomc_controlmode_calib_abs_and_inc          = 0x41,
+    eomc_controlmode_current                    = 0x06, 
+    eomc_controlmode_cmd_velocity               = 0x07,      /**< velocity control loop */     
     eomc_controlmode_openloop                   = 0x50,
-    eomc_controlmode_switch_everything_off      = 0xf0      /**< it imposes a zero current on the motor and also turns the pwm off */    
+    eomc_controlmode_calib                      = 0xfe      /**< it means joint is in calibration, without specifing wich type of calibartion joint is using. this value doesn't belong to icub can proto. */ 
 } eOmc_controlmode_t;
-
 
 /** @typedef    typedef enum eOmc_motionmonitormode_t
     @brief      contains all the possible modes for motion monitoring.
@@ -455,7 +473,7 @@ typedef struct                  // size is: 4+4+4+2+1+1+0 = 16
     eOmeas_acceleration_t       acceleration;               /**< the acceleration of the joint */       
     eOmeas_torque_t             torque;                     /**< the torque of the joint when locally measured */
     eOenum08_t                  motionmonitorstatus;        /**< use eOmc_motionmonitorstatus_t. it is eomc_motionmonitorstatus_notmonitored unless the monitor is activated in jconfig.motionmonitormode */  
-    eOenum08_t                  controlmodestatus;          /**< use eOmc_controlmode_t. it is a readonly shadow copy of latest jcmmnds.controlmode used to remind the host of teh current controlmode */
+    eOenum08_t                  controlmodestatus;          /**< use eOmc_controlmode_t. */
 } eOmc_joint_status_basic_t;    EO_VERIFYsizeof(eOmc_joint_status_basic_t, 16);
 
 
@@ -499,7 +517,7 @@ typedef struct                  // size is 16+12+1+1+1+1+0 = 32
     eOmc_calibrator_t           calibration;                /**< the calibrator to use */
     eOmc_setpoint_t             setpoint;                   /**< the setpoint of the joint */
     eObool_t                    stoptrajectory;             /**< it is an order to stop the current trajectory on the joint*/
-    eOenum08_t                  controlmode;            /**< use values from eOmc_controlmode_t*/
+    eOenum08_t                  controlmode;            /**< use values from eOmc_controlmode_command_t*/
     uint8_t                     holder01FFU02;              /**< holder of a variable for future use */
     uint8_t                     holder01FFU03;              /**< holder of a variable for future use */
 } eOmc_joint_commands_t;        EO_VERIFYsizeof(eOmc_joint_commands_t, 32);
