@@ -61,7 +61,8 @@ extern "C" {
     @brief      eOmc_controlmode_command_t contains command to set the control mode.
     @warning    On an EMS only modes eomc_controlmode_cmd_idle, eomc_controlmode_cmd_position, eomc_controlmode_cmd_velocity, eomc_controlmode_cmd_torque,
                 eomc_controlmode_cmd_impedance_pos, eomc_controlmode_cmd_impedance_vel, and eomc_controlmode_cmd_openloop are allowed.
-                On a 2FOC the only possible mode is eomc_controlmode_cmd_current.                
+                On a 2FOC the only possible mode is eomc_controlmode_cmd_current.  
+                Pay attention if you change numbers. they must be align with eOmc_controlmode_t.
  **/
 typedef enum
 {
@@ -83,6 +84,7 @@ typedef enum
                 On a 2FOC the only possible mode is eomc_controlmode_current.
                 when command eomc_controlmode_cmd_switch_everything_off is received the motor controller is in eomc_controlmode_idle.
                 when command calibration (see eOmc_calibrator_t in joint commands) the motor control is in eomc_controlmode_calib.
+                Pay attention if you change numbers. they must be align with eOmc_controlmode_command_t.
  **/
 typedef enum
 {
@@ -99,6 +101,17 @@ typedef enum
     eomc_controlmode_openloop                   = 0x50,
     eomc_controlmode_calib                      = 0xfe      /**< it means joint is in calibration, without specifing wich type of calibartion joint is using. this value doesn't belong to icub can proto. */ 
 } eOmc_controlmode_t;
+
+
+EO_VERIFYproposition(xxx, (eomc_controlmode_cmd_position == eomc_controlmode_position));
+EO_VERIFYproposition(xxx, (eomc_controlmode_cmd_torque == eomc_controlmode_torque));
+EO_VERIFYproposition(xxx, (eomc_controlmode_cmd_impedance_pos == eomc_controlmode_impedance_pos));
+EO_VERIFYproposition(xxx, (eomc_controlmode_cmd_impedance_vel == eomc_controlmode_impedance_vel));
+EO_VERIFYproposition(xxx, (eomc_controlmode_cmd_current == eomc_controlmode_current));
+EO_VERIFYproposition(xxx, (eomc_controlmode_cmd_velocity == eomc_controlmode_velocity));
+EO_VERIFYproposition(xxx, (eomc_controlmode_cmd_openloop == eomc_controlmode_openloop));
+
+
 
 /** @typedef    typedef enum eOmc_motionmonitormode_t
     @brief      contains all the possible modes for motion monitoring.
