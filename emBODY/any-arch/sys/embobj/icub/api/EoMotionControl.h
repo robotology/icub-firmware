@@ -95,7 +95,7 @@ typedef enum
     eomc_controlmode_impedance_pos              = 0x04,
     eomc_controlmode_impedance_vel              = 0x05,
     eomc_controlmode_current                    = 0x06, 
-    eomc_controlmode_cmd_velocity               = 0x07,      /**< velocity control loop */     
+    eomc_controlmode_velocity                   = 0x07,      /**< velocity control loop */     
     eomc_controlmode_openloop                   = 0x50,
     eomc_controlmode_calib                      = 0xfe      /**< it means joint is in calibration, without specifing wich type of calibartion joint is using. this value doesn't belong to icub can proto. */ 
 } eOmc_controlmode_t;
