@@ -287,11 +287,18 @@ extern void /*int16_t*/ eo_emsController_PWM(int16_t* pwm)
 }
 
 
-extern void eo_emsController_SetControlMode(uint8_t joint, control_mode_t mode)
+extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_command_t mode)
 {
     if (!s_emsc) return;
 
     eo_axisController_SetControlMode(s_emsc->axis_controller[joint], mode);
+}
+
+extern eOmc_controlmode_t eo_emsController_GetControlMode(uint8_t joint)
+{
+    if (!s_emsc) return eomc_controlmode_idle;
+
+    return eo_axisController_GetControlMode(s_emsc->axis_controller[joint]);
 }
 
 extern void eo_emsController_ResetPosPid(uint8_t joint)
@@ -356,7 +363,7 @@ extern void eo_emsController_GetJointStatus(uint8_t joint, eOmc_joint_status_bas
         jointStatus->acceleration        = 0;  // the acceleration of the joint       
         jointStatus->torque              = 0;  // the torque of the joint when locally measured
         jointStatus->motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;  // use eOmc_motionmonitorstatus_t. it is eomc_motionmonitorstatus_notmonitored unless the monitor is activated in jconfig.motionmonitormode  
-        jointStatus->controlmodestatus   = CM_IDLE;  // use eOmc_controlmode_t. it is a readonly shadow copy of jconfig.controlmode used to remind the host of teh current controlmode
+        jointStatus->controlmodestatus   = eomc_controlmode_idle;  // use eOmc_controlmode_t. it is a readonly shadow copy of jconfig.controlmode used to remind the host of teh current controlmode
     }
 }
 

@@ -1549,14 +1549,24 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p
 
     
     if(eo_icubCanProto_jm_index_first == canloc_ptr->indexinboard)
-	{
+    {
         mstatus_ptr->basic.current = *((uint16_t*)&(frame->data[0]));
+				
+        #ifdef USE_2FOC_FAST_ENCODER
+        if ((frame->id & 0xFFFFFF0F) == 0x104)
+        {
+            applrunmode = eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
+            if(applrunMode__2foc == applrunmode)
+            {
+                eo_emsController_ReadSpeed(mId, SPEED_2FOC_TO_EMS(((int16_t*)frame->data)[1]));
+            }
+        }
+        #endif
     }
     else
     {
         mstatus_ptr->basic.current = *((uint16_t*)&(frame->data[2]));
     }
-
     return(eores_OK);
 }
 

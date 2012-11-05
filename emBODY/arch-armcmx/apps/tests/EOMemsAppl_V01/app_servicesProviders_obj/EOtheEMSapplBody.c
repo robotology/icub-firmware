@@ -383,14 +383,7 @@ static void s_eo_emsapplBody_emsController_init(EOtheEMSapplBody *p)
     for(i=0; i<numofjoint; i++)
     {
         eo_emsController_AddAxis(i);
-	}
-    
-    /* TAG_ALE*/
-//     eo_emsController_AddAxis(3);
-//     eo_emsController_SetLimits(3, -65535, 65535, 2048);
-//     eo_emsController_SetPosPid(3, 100.0f, 20.0f, 0.001f);
-//     eo_emsController_SetPosPidLimits(3, 8000.0f, 750.0f);
-//     eo_emsController_SetControlMode(3, CM_IDLE);
+    }
 }
 
 

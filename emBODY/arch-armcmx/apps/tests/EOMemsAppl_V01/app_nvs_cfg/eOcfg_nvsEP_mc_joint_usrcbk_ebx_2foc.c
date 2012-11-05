@@ -369,15 +369,22 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
     eo_emsController_StartCalibration(jxx, 
                                       calibrator->params.type3.position, 
                                       calibrator->params.type3.velocity,
-                                      calibrator->params.type3.offset); 
+                                      calibrator->params.type3.offset);
+		
+		/*
+		    eo_emsController_StartCalibration(jxx, 
+                                      calibrator->params.type3.position, 
+                                      calibrator->params.type3.velocity,
+                                      0);
+		*/
 }
 
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eOresult_t                              res;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
-    eOmc_controlmode_t                      *controlmode_ptr = (eOmc_controlmode_t*)nv->loc;
-    eOmc_controlmode_t                      controlmode_2foc = eomc_controlmode_current;
+    eOmc_controlmode_command_t              *controlmode_ptr = (eOmc_controlmode_command_t*)nv->loc;
+    eOmc_controlmode_command_t              controlmode_2foc = eomc_controlmode_cmd_current;
     eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t            msgCmd = 
     {
@@ -401,7 +408,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
 
     switch(*controlmode_ptr)
     {
-        case eomc_controlmode_switch_everything_off:
+        case eomc_controlmode_cmd_switch_everything_off:
         {
             msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__DISABLE_PWM_PAD;
             eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
@@ -410,29 +417,22 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
             eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
         }break;
         
-        case eomc_controlmode_idle:
-        {
-            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__ENABLE_PWM_PAD;
-            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
-
-            #warning VALE--> i'm not sure!
-//             msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_IDLE;
-//             eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
-        }break;
-        
         default: //2foc control mode is always current
         {
-            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
-            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
+            if (eo_emsController_GetControlMode(jxx) == eomc_controlmode_idle)
+            {
+                msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
+                eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
             
-            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;
-            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+                msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;
+                eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+            }
         }
         
     }
     
     // 2) set control mode to ems controller
-    eo_emsController_SetControlMode(jxx, (control_mode_t)(*controlmode_ptr));       
+    eo_emsController_SetControlMode(jxx, (eOmc_controlmode_command_t)(*controlmode_ptr));       
 
 }
 // --------------------------------------------------------------------------------------------------------------------

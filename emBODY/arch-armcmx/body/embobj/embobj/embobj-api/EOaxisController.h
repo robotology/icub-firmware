@@ -33,6 +33,7 @@ extern "C" {
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
+/*
 typedef enum { 
     CM_IDLE                 = eomc_controlmode_idle,                // = 0x00  
     CM_POSITION             = eomc_controlmode_position,            // = 0x01
@@ -43,11 +44,15 @@ typedef enum {
     CM_CURRENT              = eomc_controlmode_current,
     CM_VELOCITY             = 0x07,
 
-    CM_CALIB_ABS_POS_SENS   = eomc_controlmode_calib_abs_pos_sens,   // = 0x10
-
+    //CM_CALIB_ABS_POS_SENS   = eomc_controlmode_calib_abs_pos_sens,   // = 0x10
+    
     CM_OPENLOOP             = eomc_controlmode_openloop,             // = 0x50
-    CM_SWITCH_OFF           = eomc_controlmode_switch_everything_off // = 0xF0
+    
+    CM_FORCE_POSITION       = 101//,
+    
+    //CM_SWITCH_OFF           = eomc_controlmode_switch_everything_off // = 0xF0
 } control_mode_t;
+*/
 
 /** @typedef    typedef struct EOaxisController_hid EOaxisController
     @brief      EOtrajectory is an opaque struct. It is used to implement data abstraction for the 
@@ -91,7 +96,8 @@ extern int16_t eo_axisController_PWM(EOaxisController *o);
 
 extern void eo_axisController_Stop(EOaxisController *o);
 
-extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, control_mode_t cm);
+extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_controlmode_command_t cmc);
+extern eOmc_controlmode_t eo_axisController_GetControlMode(EOaxisController *o);
 
 extern void eo_axisController_SetStiffness(EOaxisController *o, int32_t stiffness);
 

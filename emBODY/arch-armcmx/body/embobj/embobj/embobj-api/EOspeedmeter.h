@@ -27,7 +27,7 @@ extern "C" {
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-#define USE_2FOC_FAST_ENCODER
+//#define USE_2FOC_FAST_ENCODER
 
 #define SPEED_2FOC_TO_EMS(speed) (5*((int32_t)(speed)))
 

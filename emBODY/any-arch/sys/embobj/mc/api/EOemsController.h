@@ -98,7 +98,8 @@ extern /*int16_t*/ void eo_emsController_PWM(int16_t* pwm);
 
 // asynchronous
 extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_t vel, int32_t offset);
-extern void eo_emsController_SetControlMode(uint8_t joint, control_mode_t mode);
+extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_command_t mode);
+extern eOmc_controlmode_t eo_emsController_GetControlMode(uint8_t joint);
 extern void eo_emsController_ResetPosPid(uint8_t joint);
 extern void eo_emsController_ResetTrqPid(uint8_t joint);
 extern void eo_emsController_Stop(uint8_t joint);

@@ -29,15 +29,19 @@ extern "C" {
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
 // required
-#define MASK_POS_PID     0x0001
-#define MASK_TRQ_PID     0x0002
-#define MASK_MIN_POS     0x0004
-#define MASK_MAX_POS     0x0008
-#define MASK_VEL_TOUT    0x0010
-// optional
-#define MASK_MAX_VEL     0x0020
- 
-#define MASK_INIT_REQ    0x001F
+
+#define MASK_MIN_POS           0x0001
+#define MASK_MAX_POS           0x0002
+#define MASK_VEL_TOUT          0x0004
+#define MASK_MAX_VEL           0x0008
+
+#define MASK_POS_PID           0x0010
+#define MASK_TRQ_PID           0x0020
+
+#define MASK_CALIB_OK          0x0100
+
+#define MASK_POS_INIT_OK       0x0113
+#define MASK_TRQ_INIT_OK       0x0123
  
 #define eo_axisController_ReadTorque_hid(axis_controller, torque) axis_controller->torque_meas = torque
 
@@ -52,22 +56,15 @@ extern "C" {
 struct EOaxisController_hid 
 {
     EOpid *pidP;
-    //EOpid *pidC;
     EOpid *pidT;
 
     EOspeedmeter *speedmeter;
     EOtrajectory *trajectory;
 
-    eObool_t is_calibrated;
     int32_t calib_timeout_ms;
     float   calib_max_error;
     float   reach_max_error;
     float   err;
-
-    // axis limits
-    int32_t pos_min;
-    int32_t pos_max;
-    int32_t vel_max;
 
     int32_t acc_stop_cmode;
     int32_t acc_stop_alarm;
