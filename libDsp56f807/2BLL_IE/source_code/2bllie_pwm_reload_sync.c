@@ -116,23 +116,6 @@ void PWMAReload_Interrupt(void)
 			} 
 
 	}
-	/* //controllo già fatto nel TD0
-	else 
-	{
-	
-		if ((status0==0x0) || (status0==0x07))
-		{
-			hall_error[0]=HALL_ERROR_TABLE;
-			PWM_outputPadDisable(0);
-		#ifdef DEBUG_CAN_MSG
-			can_printf("HALL ERROR 0");
-		#endif	
-		}
-	
-	}
-	*/
-
-
 
 		
 }
@@ -180,19 +163,6 @@ void PWMBReload_Interrupt(void)
 			}    
 
 	}
-	/*
-	else
-	{		
-		if ((status1==0x0) || (status1==0x07))
-		{
-			hall_error[1]=HALL_ERROR_TABLE;
-		
-			can_printf("HALL ERROR 1");
-	
-			PWM_outputPadDisable(1);
-		}
-	}
-	*/
 }
 
 #pragma interrupt called
