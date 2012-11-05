@@ -138,7 +138,7 @@ const eOmc_joint_t eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue =
             EO_INIT(.acceleration)          0,     
             EO_INIT(.torque)                0,
             EO_INIT(.motionmonitorstatus)   eomc_motionmonitorstatus_notmonitored,
-            EO_INIT(.controlmodestatus)     eomc_controlmode_switch_everything_off,
+            EO_INIT(.controlmodestatus)      eomc_controlmode_idle,
         },
         EO_INIT(.ofpid)                     {0},
         EO_INIT(.chamaleon04)               {0} //{0xd1, 0xd2, 0xd3, 0xd4}
@@ -149,7 +149,7 @@ const eOmc_joint_t eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue =
 		EO_INIT(.calibration)               {0},
 		EO_INIT(.setpoint)                  {0},
 		EO_INIT(.stoptrajectory)            0,
-		EO_INIT(.controlmode)				eomc_controlmode_switch_everything_off
+		EO_INIT(.controlmode)				eomc_controlmode_cmd_switch_everything_off
 	}
 }; 
 
