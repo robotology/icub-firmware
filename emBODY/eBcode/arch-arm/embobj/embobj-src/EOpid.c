@@ -36,7 +36,13 @@ extern const float   EMS_PERIOD;
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-#define LIMIT(x,L) if (x>L) x=L; else if (x<-L) x=-L
+
+#define LIMIT(x,L) if (x>(L)) x=(L); else if (x<-(L)) x=-(L)
+
+#define SAFE_MAX_CURRENT 900.0f
+
+#define ZERO_ROTATION_TORQUE      680.0f
+#define ZERO_ROTATION_TORQUE_SLOW 720.0f
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -77,33 +83,32 @@ extern EOpid* eo_pid_New(void)
         o->Ki = 0.0f;
         o->Kd = 0.0f;
 
-        o->En = 0.0f;        
+        o->En  = 0.0f;        
         o->KIn = 0.0f;
-         
         o->pwm = 0.0f;
-
-        o->Yoff = 0.0f;
-        o->Ymax = 0.0f;
-        o->Imax = 0.0f;
+        
+        o->Yoff  = 0.0f;
+        o->Ymax  = 0.0f;
+        o->Imax  = 0.0f;
         o->KImax = 0.0f;
 
-        o->initialized = eobool_false;
+        o->safe_mode = eobool_false;
     }
 
     return o;
 }
 
-extern void eo_pid_Init(EOpid *o, float K, float Kd, float Ki, float Ymax, float Imax, float Yoff)
+extern void eo_pid_SafeMode(EOpid *o, eObool_t on_off)
 {
-    eo_pid_SetPid(o, K, Kd, Ki, Ymax, Imax, Yoff);
-
-    eo_pid_Reset(o);
-
-    o->initialized = eobool_true;
+    if (!o) return;
+    
+    o->safe_mode = on_off;
 }
 
 extern void eo_pid_SetPid(EOpid *o, float K, float Kd, float Ki, float Ymax, float Imax, float Yoff)
 {
+    if (!o) return;
+    
     o->K  = K;
     o->Kd = Kd*EMS_PERIOD;
     o->Ki = Ki;
@@ -117,43 +122,100 @@ extern void eo_pid_SetPid(EOpid *o, float K, float Kd, float Ki, float Ymax, flo
 
 extern void eo_pid_GetStatus(EOpid *o, int32_t *pwm, int32_t *err)
 {
+    if (!o)
+    {
+        *pwm = *err = 0;
+        
+        return;
+    }
+    
     *pwm = (int32_t)o->pwm;
     *err = (int32_t)o->En;
 }
 
-extern eObool_t eo_pid_IsInitialized(EOpid *o)
-{
-    return o->initialized;
-}
-
 extern void eo_pid_Reset(EOpid *o)
 {
-    o->En = 0.0f;
-    o->pwm = 0.0f;
-    o->KIn = 0.0f; 
+    if (!o) return;
+	
+    o->En   = 0.0f;
+    o->pwm  = 0.0f;
+    o->KIn  = 0.0f;
 }
 
-extern int16_t eo_pid_PWM2(EOpid *o, float En, float Vref,float Venc)
+extern int16_t eo_pid_PWM(EOpid *o, float En, float Vref)
 {
-    float Xn = o->K*(En+o->Kd*(Vref-Venc));
+    if (!o) return 0;
+    
+    float Xn = o->K*En;
 
-    //if ((o->KIn<0.0f) ^ (Xn<0.0f)) o->KIn = 0.0f;
-   
+    o->KIn += Xn;
+
+    LIMIT(o->KIn, o->KImax);
+            
+    o->pwm = Xn + o->Ki*o->KIn;
+    
+    if (Vref>0.0f)
+    {
+        o->pwm += ZERO_ROTATION_TORQUE;
+    }
+    else if (Vref<0.0f)
+    {
+        o->pwm -= ZERO_ROTATION_TORQUE; 
+    }
+    /*
+    else
+    {
+        o->KIn += Xn;
+
+        LIMIT(o->KIn, o->KImax);
+        
+        o->pwm += o->KIn; 
+    }
+    */
+    
+    if (o->safe_mode)
+    {
+        LIMIT(o->pwm, SAFE_MAX_CURRENT);
+    }
+    else
+    {
+        LIMIT(o->pwm, o->Ymax);
+    }
+
+    o->En = En;
+
+    return (int16_t)o->pwm;
+}
+
+extern int16_t eo_pid_PWM2(EOpid *o, float En, float Vref, float Venc)
+{
+    if (!o) return 0;
+    
+    float Xn = o->K*(En+o->Kd*(Vref-Venc));
+    
     o->KIn += Xn;
 
     LIMIT(o->KIn, o->KImax);
 
     o->pwm = Xn + o->Ki*o->KIn + o->Yoff;
-     
-    // dead zone suppression
-    // motor moves with pwm > 680
-    if (Vref>0.0f) 
-        o->pwm += 680.0f;
-    else 
-    if (Vref<0.0f)
-        o->pwm -= 680.0f; 
-
-    LIMIT(o->pwm, o->Ymax);
+    
+    if (Vref>0.0f)
+    {
+        o->pwm += ZERO_ROTATION_TORQUE;
+    }
+    else if (Vref<0.0f)
+    {
+        o->pwm -= ZERO_ROTATION_TORQUE; 
+    }
+    
+    if (o->safe_mode)
+    {
+        LIMIT(o->pwm, SAFE_MAX_CURRENT);
+    }
+    else
+    {
+        LIMIT(o->pwm, o->Ymax);
+    }
 
     o->En = En;
 

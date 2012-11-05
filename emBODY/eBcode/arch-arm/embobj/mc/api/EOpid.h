@@ -81,6 +81,7 @@ extern void eo_pid_Reset(EOpid *o);
  **/
 //extern int16_t eo_pid_PWM(EOpid *o, int32_t En);
 extern int16_t eo_pid_PWM2(EOpid *o, float En, float Vref, float Venc);
+extern int16_t eo_pid_PWM(EOpid *o, float En, float Vref);
 
 /** @}            
     end of group eo_pid  

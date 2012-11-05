@@ -41,7 +41,8 @@ extern const float   EMS_PERIOD;
 
 #define SAFE_MAX_CURRENT 900.0f
 
-#define ZERO_ROTATION_TORQUE 680.0f
+#define ZERO_ROTATION_TORQUE      680.0f
+#define ZERO_ROTATION_TORQUE_SLOW 720.0f
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -85,7 +86,7 @@ extern EOpid* eo_pid_New(void)
         o->En  = 0.0f;        
         o->KIn = 0.0f;
         o->pwm = 0.0f;
-
+        
         o->Yoff  = 0.0f;
         o->Ymax  = 0.0f;
         o->Imax  = 0.0f;
@@ -136,17 +137,62 @@ extern void eo_pid_Reset(EOpid *o)
 {
     if (!o) return;
 	
-    o->En  = 0.0f;
-    o->pwm = 0.0f;
-    o->KIn = 0.0f; 
+    o->En   = 0.0f;
+    o->pwm  = 0.0f;
+    o->KIn  = 0.0f;
 }
 
-extern int16_t eo_pid_PWM2(EOpid *o, float En, float Vref,float Venc)
+extern int16_t eo_pid_PWM(EOpid *o, float En, float Vref)
+{
+    if (!o) return 0;
+    
+    float Xn = o->K*En;
+
+    o->KIn += Xn;
+
+    LIMIT(o->KIn, o->KImax);
+            
+    o->pwm = Xn + o->Ki*o->KIn;
+    
+    if (Vref>0.0f)
+    {
+        o->pwm += ZERO_ROTATION_TORQUE;
+    }
+    else if (Vref<0.0f)
+    {
+        o->pwm -= ZERO_ROTATION_TORQUE; 
+    }
+    /*
+    else
+    {
+        o->KIn += Xn;
+
+        LIMIT(o->KIn, o->KImax);
+        
+        o->pwm += o->KIn; 
+    }
+    */
+    
+    if (o->safe_mode)
+    {
+        LIMIT(o->pwm, SAFE_MAX_CURRENT);
+    }
+    else
+    {
+        LIMIT(o->pwm, o->Ymax);
+    }
+
+    o->En = En;
+
+    return (int16_t)o->pwm;
+}
+
+extern int16_t eo_pid_PWM2(EOpid *o, float En, float Vref, float Venc)
 {
     if (!o) return 0;
     
     float Xn = o->K*(En+o->Kd*(Vref-Venc));
-   
+    
     o->KIn += Xn;
 
     LIMIT(o->KIn, o->KImax);
