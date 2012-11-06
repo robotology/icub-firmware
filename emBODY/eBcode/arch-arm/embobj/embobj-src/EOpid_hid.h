@@ -41,6 +41,7 @@ struct EOpid_hid
     float Ki;
     float Kd;
 
+    float Dn;
     float En;
     float KIn;
     
@@ -48,6 +49,9 @@ struct EOpid_hid
     float Ymax;
     float Imax;
     float KImax;
+    
+    float A;
+    float B;
     
     int32_t pwm;
     

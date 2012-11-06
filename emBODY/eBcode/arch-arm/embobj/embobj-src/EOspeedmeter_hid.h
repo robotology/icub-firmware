@@ -46,15 +46,9 @@ struct EOspeedmeter_hid
     int32_t distance;
     
     int32_t odo_x_freq;
-    int32_t speed;
     int32_t speed_filt;
-    
-    int32_t integral;
-    int32_t window;
+    int32_t speed;
     int32_t dir;
-    
-    int32_t Vmin;
-    int32_t Vmax;
   
     eObool_t first_reading;
 }; 

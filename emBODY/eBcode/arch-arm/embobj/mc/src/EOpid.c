@@ -18,6 +18,7 @@
 #include "EOVtheSystem.h"
 
 extern const float   EMS_PERIOD;
+extern const float   EMS_FREQUENCY_FLOAT;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -83,6 +84,7 @@ extern EOpid* eo_pid_New(void)
         o->Ki = 0.0f;
         o->Kd = 0.0f;
 
+        o->Dn  = 0.0f;
         o->En  = 0.0f;        
         o->KIn = 0.0f;
         o->pwm = 0.0f;
@@ -93,6 +95,9 @@ extern EOpid* eo_pid_New(void)
         o->KImax = 0.0f;
 
         o->safe_mode = eobool_false;
+        
+        o->A = 0.0f;
+        o->B = 0.0f;
     }
 
     return o;
@@ -118,6 +123,14 @@ extern void eo_pid_SetPid(EOpid *o, float K, float Kd, float Ki, float Ymax, flo
     o->Yoff = Yoff;
 
     o->KImax = o->Ki!=0.0f ? o->Imax/o->Ki : 0.0f;
+    
+    //float N = 10.0;
+    //float T = o->Kd/N;
+    //float Q = 2.0f*T*EMS_FREQUENCY_FLOAT; 
+
+    o->A = 39.0/41.0;
+    //o->A = (Q-1.0f)/(Q+1.0f);
+    o->B = EMS_FREQUENCY_FLOAT*(1.0f-o->A);
 }
 
 extern void eo_pid_GetStatus(EOpid *o, int32_t *pwm, int32_t *err)
@@ -137,6 +150,7 @@ extern void eo_pid_Reset(EOpid *o)
 {
     if (!o) return;
 	
+    o->Dn   = 0.0f;
     o->En   = 0.0f;
     o->pwm  = 0.0f;
     o->KIn  = 0.0f;
@@ -145,13 +159,20 @@ extern void eo_pid_Reset(EOpid *o)
 extern int16_t eo_pid_PWM(EOpid *o, float En, float Vref)
 {
     if (!o) return 0;
+                
+    //float Dn = o->A*o->Dn + o->B*(En - o->En); 
     
-    float Xn = o->K*En;
+    o->En = En;
+    //o->Dn = Dn;
+    
+    //float Xn = o->K*(En + Dn);
 
+    float Xn = o->K*En;
+    
     o->KIn += Xn;
 
     LIMIT(o->KIn, o->KImax);
-            
+
     o->pwm = Xn + o->Ki*o->KIn;
     
     if (Vref>0.0f)
@@ -162,16 +183,6 @@ extern int16_t eo_pid_PWM(EOpid *o, float En, float Vref)
     {
         o->pwm -= ZERO_ROTATION_TORQUE; 
     }
-    /*
-    else
-    {
-        o->KIn += Xn;
-
-        LIMIT(o->KIn, o->KImax);
-        
-        o->pwm += o->KIn; 
-    }
-    */
     
     if (o->safe_mode)
     {
@@ -181,8 +192,6 @@ extern int16_t eo_pid_PWM(EOpid *o, float En, float Vref)
     {
         LIMIT(o->pwm, o->Ymax);
     }
-
-    o->En = En;
 
     return (int16_t)o->pwm;
 }
