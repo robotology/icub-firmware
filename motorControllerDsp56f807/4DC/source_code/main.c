@@ -32,7 +32,7 @@
 	
 byte	_board_ID = 15;	
 char    _additional_info [32];
-byte    _build_number = 50;
+byte    _build_number = 51;
 byte    _my_can_protocol_major = 1;
 byte    _my_can_protocol_minor = 1;
 bool    _can_protocol_ack = false;
@@ -105,6 +105,8 @@ Int16 _version = 0x0130;
 Int16 _version = 0x0125;
 #elif VERSION == 0x0131
 Int16 _version = 0x0131;
+#elif VERSION == 0x0214
+Int16 _version = 0x0214;
 #elif VERSION == 0x0215
 Int16 _version = 0x0215;
 #elif VERSION == 0x0228
@@ -213,7 +215,7 @@ void main(void)
     init_pwm			  ();	 
     init_faults           (true,true,true);	 
     init_position_encoder ();
-   	#if (VERSION==0x0219) || (VERSION==0x0215)		
+   	#if (VERSION==0x0219) || (VERSION==0x0215) || (VERSION==0x0214)		
 
 	init_position_abs_ssi();
 
@@ -437,6 +439,11 @@ void main(void)
 		_position[1]= get_position_abs_ssi(AEA4);
 		_position[2]= get_position_encoder(2);
 		_position[3]= get_position_encoder(3);					
+#endif
+#if VERSION == 0x0214
+	    _position[0]= get_position_abs_ssi(AEA4);	
+		_position[1]= get_position_encoder(1);
+					
 #endif
 //-------------------------------------------------------------------------------------------
 
