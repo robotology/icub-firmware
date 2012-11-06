@@ -549,17 +549,18 @@ void *skinThread(void * arg)
 	EOarray_of_10canframes sk_array;
 	eOnvID_t nvid;
 	EOnv	*nvRoot;
+	EOnv	tmp;
 
 	switch (boardN )
 	{
 	case 2:
 		nvid = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_leftlowerarm, 0, skinNVindex_sstatus__arrayof10canframe);
-		nvRoot = transceiver->getNVhandler( endpoint_sk_emsboard_leftlowerarm,  nvid);  //??
+		nvRoot = transceiver->getNVhandler( endpoint_sk_emsboard_leftlowerarm,  nvid, &tmp);  //??
 		break;
 
 	case 4:
 		nvid = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_rightlowerarm, 0, skinNVindex_sstatus__arrayof10canframe);
-		nvRoot = transceiver->getNVhandler( endpoint_sk_emsboard_rightlowerarm,  nvid);  //??
+		nvRoot = transceiver->getNVhandler( endpoint_sk_emsboard_rightlowerarm,  nvid, &tmp);  //??
 		break;
 	}
 

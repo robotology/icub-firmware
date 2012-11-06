@@ -94,43 +94,44 @@ static MYmotionController themotioncontrollers[3];
 
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jstatus(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-	eOmc_joint_status_t *jstatus = nv->rem;
-	printf("joint %d position %d\n", jxx, jstatus->basic.position);
-
-	printf("joint %d fault: ", jxx);
-	if(isOverCurrent(jstatus->chamaleon04[0]))
-		printf("overcurrent, ");
-	if(isFaultUndervoltage(jstatus->chamaleon04[0]))
-		printf("Undervoltage, ");
-	if(isFaultExternal(jstatus->chamaleon04[0]))
-		printf("FaultExternal, ");
-	if(isFaultOverload(jstatus->chamaleon04[0]))
-		printf("FaultOverload, ");
-	if(isHallSensorError(jstatus->chamaleon04[0]))
-		printf("HallSensorError, ");
-	if(isAbsEncoderError(jstatus->chamaleon04[0]))
-		printf("AbsEncoderError, ");
-//can fault
-	if(isCanTxOverflow(jstatus->chamaleon04[1]))
-		printf("CanTxOverflow, ");
-	if(isCanBusOff(jstatus->chamaleon04[1]))
-		printf("CanBusOff, ");
-	if(isCanTxError(jstatus->chamaleon04[1]))
-		printf("isCanTxError, ");
-	if(isCanTxOverrun(jstatus->chamaleon04[1]))
-		printf("CanTxOverrun, ");
-	if(isCanRxWarning(jstatus->chamaleon04[1]))
-		printf("isCanRxWarning, ");
-	if(isCanRxOverrun(jstatus->chamaleon04[1]))
-		printf("isCanRxOverrun, ");
-
-	printf("\n");
+//	eOmc_joint_status_t *jstatus = nv->rem;
+//	printf("joint %d position %d\n", jxx, jstatus->basic.position);
+//
+//	printf("joint %d fault: ", jxx);
+//	if(isOverCurrent(jstatus->chamaleon04[0]))
+//		printf("overcurrent, ");
+//	if(isFaultUndervoltage(jstatus->chamaleon04[0]))
+//		printf("Undervoltage, ");
+//	if(isFaultExternal(jstatus->chamaleon04[0]))
+//		printf("FaultExternal, ");
+//	if(isFaultOverload(jstatus->chamaleon04[0]))
+//		printf("FaultOverload, ");
+//	if(isHallSensorError(jstatus->chamaleon04[0]))
+//		printf("HallSensorError, ");
+//	if(isAbsEncoderError(jstatus->chamaleon04[0]))
+//		printf("AbsEncoderError, ");
+////can fault
+//	if(isCanTxOverflow(jstatus->chamaleon04[1]))
+//		printf("CanTxOverflow, ");
+//	if(isCanBusOff(jstatus->chamaleon04[1]))
+//		printf("CanBusOff, ");
+//	if(isCanTxError(jstatus->chamaleon04[1]))
+//		printf("isCanTxError, ");
+//	if(isCanTxOverrun(jstatus->chamaleon04[1]))
+//		printf("CanTxOverrun, ");
+//	if(isCanRxWarning(jstatus->chamaleon04[1]))
+//		printf("isCanRxWarning, ");
+//	if(isCanRxOverrun(jstatus->chamaleon04[1]))
+//		printf("isCanRxOverrun, ");
+//
+//	printf("\n");
 
 }
 
 
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jstatus__basic(eOcfg_nvsEP_mc_jointNumber_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
+/*
 	eOmc_joint_status_basic_t *jstatus_b = nv->rem;
 	printf("\njstatus__basic for Joint num = %d\n", xx);
 	printf("ep = 0x%X\n", nv->ep);
@@ -140,10 +141,12 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jstatus__basic(eOcfg_nvsEP_mc_jointNumb
 	printf("jstatus_b->position = 0x%X\n", jstatus_b->position);
 	printf("jstatus_b->torque = 0x%X\n", jstatus_b->torque);
 	printf("jstatus_b->velocity = 0x%X\n", jstatus_b->velocity);
+*/
 }
 
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mstatus__basic(eOcfg_nvsEP_mc_motorNumber_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
+/*
 	eOmc_motor_status_basic_t *mstatus_b = nv->rem;
 	printf("\nmstatus__basic for motor num = %d\n", xx);
 	printf("ep = 0x%X\n", nv->ep);
@@ -151,10 +154,12 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mstatus__basic(eOcfg_nvsEP_mc_motorNumb
 	printf("mstatus_b->filler02 = 0x%X\n", *mstatus_b->filler02);
 	printf("mstatus_b->position = 0x%X\n", mstatus_b->position);
 	printf("mstatus_b->velocity = 0x%X\n", mstatus_b->velocity);
+*/
 }
 
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
+/*
 	eOmc_joint_config_t *jConfig = nv->rem;
 	printf("\nmaxpositionofjoint for Joint num = %d\n", xx);
 	printf("jConfig->pidposition.kp 	= 0x%X\n",	jConfig->pidposition.kp		);
@@ -167,11 +172,12 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t xx
     printf("jConfig->minpositionofjoint		= 0x%X\n",	jConfig->minpositionofjoint);
 	printf("jConfig->maxpositionofjoint		= 0x%X\n",	jConfig->maxpositionofjoint);
 	printf("ep = 0x%X\n", nv->ep);
-
+*/
 }
 
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig(eOcfg_nvsEP_mc_motorNumber_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
+/*
 	eOmc_motor_config_t *jConfig = nv->rem;
 	printf("\nmaxpositionofjoint for Joint num = %d\n", xx);
 	printf("mConfig->pidcurrent.kp 	= 0x%X\n",	jConfig->pidcurrent.kp		);
@@ -184,7 +190,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig(eOcfg_nvsEP_mc_motorNumber_t xx
     printf("mConfig->maxvelocityofmotor		= 0x%X\n",	jConfig->maxvelocityofmotor);
 	printf("mConfig->maxcurrentofmotor		= 0x%X\n",	jConfig->maxcurrentofmotor);
 	printf("ep = 0x%X\n", nv->ep);
-
+*/
 }
 
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__maxpositionofjoint(eOcfg_nvsEP_mc_jointNumber_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)

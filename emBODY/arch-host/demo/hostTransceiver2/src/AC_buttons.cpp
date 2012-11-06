@@ -41,8 +41,8 @@ void s_callback_button_0(void)
 		return;
 	}
 
-
-	EOnv 	*nv_p 				= transceiver->getNVhandler(endpoint_mn_appl, nvid_go2state);
+	EOnv 	tmp;
+	EOnv 	*nv_p 				= transceiver->getNVhandler(endpoint_mn_appl, nvid_go2state, &tmp);
 	if(NULL == nv_p)
 	{
 		printf("nv pointer error ");
@@ -63,12 +63,13 @@ void s_callback_button_1(void)
 {
 	char str[128];
 	EOnv 						*cnv;
+	EOnv 						*nvRoot = NULL;
+	EOnv						tmp, tmp_cnv;
 	eOmn_ropsigcfg_command_t 	*ropsigcfgassign;
 	EOarray						*array;
 	eOropSIGcfg_t 				sigcfg;
 	eOcfg_nvsEP_mn_commNumber_t dummy = 0;
 	eOnvID_t 					nvid = -1;
-	EOnv 						*nvRoot = NULL;
 
 	printf("Setting regulars!\n");
 
@@ -90,7 +91,7 @@ void s_callback_button_1(void)
 	}
 
 	nvid = eo_cfg_nvsEP_sk_NVID_Get((eOcfg_nvsEP_sk_endpoint_t)ep, dummy, skinNVindex_sconfig__sigmode);
-	nvRoot = transceiver->getNVhandler(ep, nvid);
+	nvRoot = transceiver->getNVhandler(ep, nvid, &tmp);
 	if(NULL == nvRoot)
 	{
 		printf("\n>>> ERROR \ntransceiver->getNVhandler returned NULL!!\n");
@@ -111,7 +112,7 @@ void s_callback_button_1(void)
 	// 2: Segnalazione spontanea
 	//
 	eOnvID_t nvid_ropsigcfgassign = eo_cfg_nvsEP_mn_comm_NVID_Get(endpoint_mn_comm, dummy, commNVindex__ropsigcfgcommand);
-	cnv = transceiver->getNVhandler(endpoint_mn_comm, nvid_ropsigcfgassign);
+	cnv = transceiver->getNVhandler(endpoint_mn_comm, nvid_ropsigcfgassign, &tmp_cnv);
 	ropsigcfgassign = (eOmn_ropsigcfg_command_t*) cnv->loc;
 	array = (EOarray*) &ropsigcfgassign->array;
 	eo_array_Reset(array);
@@ -231,7 +232,7 @@ void s_callback_button_1(void)
 		break;
 	}
 	nvid = eo_cfg_nvsEP_as_mais_NVID_Get((eOcfg_nvsEP_as_endpoint_t)ep, dummy, maisNVindex_mconfig__datarate);
-	nvRoot = transceiver->getNVhandler(ep, nvid);
+	nvRoot = transceiver->getNVhandler(ep, nvid, &tmp);
 	dat = 1;
 	if( eores_OK != eo_nv_Set(nvRoot, &dat, eobool_true, eo_nv_upd_dontdo))
 		printf("error!!");
@@ -253,7 +254,7 @@ void s_callback_button_1(void)
 		break;
 	}
 	nvid = eo_cfg_nvsEP_as_mais_NVID_Get((eOcfg_nvsEP_as_endpoint_t)ep, dummy, maisNVindex_mconfig__mode);
-	nvRoot = transceiver->getNVhandler(ep, nvid);
+	nvRoot = transceiver->getNVhandler(ep, nvid, &tmp);
 	dat = 0;
 	if( eores_OK != eo_nv_Set(nvRoot, &dat, eobool_true, eo_nv_upd_dontdo))
 		printf("error!!");
@@ -268,71 +269,74 @@ void s_callback_button_1(void)
 
 void s_callback_button_2(void )
 {
-	char str[128];
-	int j = 0;
-
-	EOnv 						*cnv;
-	eOmn_ropsigcfg_command_t 	*ropsigcfgassign;
-	EOarray						*array;
-	eOropSIGcfg_t 				sigcfg;
-	eOcfg_nvsEP_mn_commNumber_t dummy = 0;
-
-
-	// get nvid from parameters
-	//#warning "aggiornare chiamate a funzione"
-	eOnvID_t signal = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_leftlowerarm, dummy, skinNVindex_sconfig__sigmode);
-	EOnv 		*nvRoot;
-	nvRoot = transceiver->getNVhandler(endpoint_sk_emsboard_leftlowerarm, signal);
-
-	if(NULL == nvRoot)
-	{
-		printf("\n>>> ERROR \ntransceiver->getNVhandler returned NULL!!\n");
-		return;
-	}
-	uint8_t dat = 1;
-	if( eores_OK != eo_nv_Set(nvRoot, &dat, eobool_true, eo_nv_upd_dontdo))
-	{
-		printf("\n>>> ERROR \neo_nv_Set!!\n");
-		return;
-	}
-	// tell agent to prepare a rop to send
-	transceiver->load_occasional_rop(eo_ropcode_set, endpoint_sk_emsboard_leftlowerarm, signal);
-
-	eOnvID_t nvid_ropsigcfgassign = eo_cfg_nvsEP_mn_comm_NVID_Get(endpoint_mn_comm, dummy, commNVindex__ropsigcfgcommand);
-	cnv = transceiver->getNVhandler(endpoint_mn_comm, nvid_ropsigcfgassign);
-	ropsigcfgassign = (eOmn_ropsigcfg_command_t*) cnv->loc;
-	array = (EOarray*) &ropsigcfgassign->array;
-	eo_array_Reset(array);
-	array->head.capacity = NUMOFROPSIGCFG;
-	array->head.itemsize = sizeof(eOropSIGcfg_t);
-	ropsigcfgassign->cmmnd = ropsigcfg_cmd_assign;
-
-
-	/*
-	sigcfg.ep = endpoint_mc_rightlowerarm;
-	nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(sigcfg.ep, 0, jointNVindex_jstatus__basic);
-	sigcfg.id = nvid;
-	sigcfg.plustime = 0;
-	eo_array_PushBack(array, &sigcfg);
-	 */
-
-
-	eOnvID_t nvid;
-	sigcfg.ep = endpoint_sk_emsboard_leftlowerarm;
-	nvid = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_leftlowerarm, 0, skinNVindex_sstatus__arrayof10canframe);
-	sigcfg.id = nvid;
-	sigcfg.plustime = 0;
-	eo_array_PushBack(array, &sigcfg);
-
-	transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mn_comm, nvid_ropsigcfgassign);
-
-	printf("added a set<__upto10rop2signal, list>");
+//	char str[128];
+//	int j = 0;
+//
+//	EOnv 						*signal;
+//	EOnv 						*nvRoot;
+//	EOnv						tmp_cnv, tmp_cnv;
+//	eOmn_ropsigcfg_command_t 	*ropsigcfgassign;
+//	EOarray						*array;
+//	eOropSIGcfg_t 				sigcfg;
+//	eOcfg_nvsEP_mn_commNumber_t dummy = 0;
+//
+//
+//	// get nvid from parameters
+//	//#warning "aggiornare chiamate a funzione"
+//	eOnvID_t signal = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_leftlowerarm, dummy, skinNVindex_sconfig__sigmode);
+//
+//	nvRoot = transceiver->getNVhandler(endpoint_sk_emsboard_leftlowerarm, signal, &tmp);
+//
+//	if(NULL == nvRoot)
+//	{
+//		printf("\n>>> ERROR \ntransceiver->getNVhandler returned NULL!!\n");
+//		return;
+//	}
+//	uint8_t dat = 1;
+//	if( eores_OK != eo_nv_Set(nvRoot, &dat, eobool_true, eo_nv_upd_dontdo))
+//	{
+//		printf("\n>>> ERROR \neo_nv_Set!!\n");
+//		return;
+//	}
+//	// tell agent to prepare a rop to send
+//	transceiver->load_occasional_rop(eo_ropcode_set, endpoint_sk_emsboard_leftlowerarm, signal);
+//
+//	eOnvID_t nvid_ropsigcfgassign = eo_cfg_nvsEP_mn_comm_NVID_Get(endpoint_mn_comm, dummy, commNVindex__ropsigcfgcommand);
+//	cnv = transceiver->getNVhandler(endpoint_mn_comm, nvid_ropsigcfgassign);
+//	ropsigcfgassign = (eOmn_ropsigcfg_command_t*) cnv->loc;
+//	array = (EOarray*) &ropsigcfgassign->array;
+//	eo_array_Reset(array);
+//	array->head.capacity = NUMOFROPSIGCFG;
+//	array->head.itemsize = sizeof(eOropSIGcfg_t);
+//	ropsigcfgassign->cmmnd = ropsigcfg_cmd_assign;
+//
+//
+//	/*
+//	sigcfg.ep = endpoint_mc_rightlowerarm;
+//	nvid = eo_cfg_nvsEP_mc_joint_NVID_Get(sigcfg.ep, 0, jointNVindex_jstatus__basic);
+//	sigcfg.id = nvid;
+//	sigcfg.plustime = 0;
+//	eo_array_PushBack(array, &sigcfg);
+//	 */
+//
+//
+//	eOnvID_t nvid;
+//	sigcfg.ep = endpoint_sk_emsboard_leftlowerarm;
+//	nvid = eo_cfg_nvsEP_sk_NVID_Get(endpoint_sk_emsboard_leftlowerarm, 0, skinNVindex_sstatus__arrayof10canframe);
+//	sigcfg.id = nvid;
+//	sigcfg.plustime = 0;
+//	eo_array_PushBack(array, &sigcfg);
+//
+//	transceiver->load_occasional_rop(eo_ropcode_set, endpoint_mn_comm, nvid_ropsigcfgassign);
+//
+//	printf("added a set<__upto10rop2signal, list>");
 }
 
 void s_callback_button_3(void )
 {
 	char str[128];
 	EOnv 		*nvRoot;
+	EOnv		tmp;
 	eOresult_t res;
 
 	//--
