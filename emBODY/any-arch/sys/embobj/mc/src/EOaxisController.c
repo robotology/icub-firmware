@@ -448,8 +448,8 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
 
             o->err = pos_ref - pos;
 
-            return eo_pid_PWM(o->pidP, o->err, vel_ref);
-            //return eo_pid_PWM2(o->pidP, o->err, vel_ref, vel);
+            //return eo_pid_PWM(o->pidP, o->err, vel_ref);
+            return eo_pid_PWM2(o->pidP, o->err, vel_ref, vel);
         }
        
         case eomc_controlmode_torque:
