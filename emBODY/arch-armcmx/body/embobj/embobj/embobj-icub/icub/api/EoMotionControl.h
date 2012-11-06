@@ -67,11 +67,11 @@ extern "C" {
 typedef enum
 {
     eomc_controlmode_cmd_position                   = 0x01,
+    eomc_controlmode_cmd_velocity                   = 0x02,      /**< velocity control loop */ 
     eomc_controlmode_cmd_torque                     = 0x03,
     eomc_controlmode_cmd_impedance_pos              = 0x04,
     eomc_controlmode_cmd_impedance_vel              = 0x05,
     eomc_controlmode_cmd_current                    = 0x06,
-    eomc_controlmode_cmd_velocity                   = 0x07,      /**< velocity control loop */ 
     eomc_controlmode_cmd_openloop                   = 0x50,
     eomc_controlmode_cmd_switch_everything_off      = 0xf0      /**< it imposes a zero current on the motor and also turns the pwm off */    
 } eOmc_controlmode_command_t;
@@ -90,14 +90,15 @@ typedef enum
 {
     eomc_controlmode_idle                       = 0x00,     /**< pid and pwm off*/
     eomc_controlmode_position                   = 0x01,
-    eomc_controlmode_velocity_pos               = 0x02,     /**< control mode is in position, but the control mode switch to eomc_controlmode_velocity_pos
-                                                                 automatically when it receives a velocity set setpoint. 
-                                                                 This mode is called "velocity" in icub can proto */ 
+    eomc_controlmode_velocity                   = 0x02,      /**< velocity control loop */    
     eomc_controlmode_torque                     = 0x03,
     eomc_controlmode_impedance_pos              = 0x04,
     eomc_controlmode_impedance_vel              = 0x05,
     eomc_controlmode_current                    = 0x06, 
-    eomc_controlmode_velocity                   = 0x07,      /**< velocity control loop */     
+    eomc_controlmode_velocity_pos               = 0x07,     /**< The controller is in position, but the controller switches to eomc_controlmode_velocity_pos
+                                                                 automatically when it receives a velocity set setpoint. 
+                                                                 In icub can proto there is not differences between velocity and velocity_pos */ 
+ 
     eomc_controlmode_openloop                   = 0x50,
     eomc_controlmode_calib                      = 0xfe      /**< it means joint is in calibration, without specifing wich type of calibartion joint is using. this value doesn't belong to icub can proto. */ 
 } eOmc_controlmode_t;
