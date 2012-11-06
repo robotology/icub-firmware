@@ -1555,8 +1555,7 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p
         #ifdef USE_2FOC_FAST_ENCODER
         if ((frame->id & 0xFFFFFF0F) == 0x104)
         {
-            applrunmode = eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
-            if(applrunMode__2foc == applrunmode)
+            if(applrunMode__2foc == eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle()))
             {
                 eo_emsController_ReadSpeed(mId, SPEED_2FOC_TO_EMS(((int16_t*)frame->data)[1]));
             }
