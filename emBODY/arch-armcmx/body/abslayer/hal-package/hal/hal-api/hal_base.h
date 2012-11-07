@@ -229,7 +229,7 @@ typedef struct
 {   
     hal_cpufamily_t cpu_family;                 /**< The CPU family: an enum hal_cpufamily_t                */
     hal_cputype_t   cpu_type;                   /**< The CPU type: an enum hal_cputype_t                    */
-    uint32_t        cpu_freq;                   /**< The CPU frequency in Hz                                */
+    uint32_t        cpu_freq;                   /**< The max CPU frequency in Hz                            */
     uint32_t        sys_stacksize;              /**< The size of stack available to the system in bytes     */
     uint32_t        sys_heapsize;               /**< The size of heap available to the system in bytes      */
     hal_boolval_t   display_enable;             /**< Enable of the display: 1 if enabled, 0 not             */
