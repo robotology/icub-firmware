@@ -97,7 +97,7 @@ static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-
+static uint16_t motionDoneJoin2Use = 0;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -449,7 +449,6 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
 {
     eOresult_t                      res;
     uint16_t                        numofjoint;
-    eOmc_jointId_t                  jId;
     eOmc_joint_status_t             *jstatus_ptr;
     eOicubCanProto_msgCommand_t    msgCmd = 
     {
@@ -460,29 +459,55 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     
     numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
-        
-    for(jId = 0; jId<numofjoint; jId++)
-    {
-        res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), jId, &jstatus_ptr);
-        if(eores_OK != res)
-        {
-            return; //error
-        }
-        
-        if(jstatus_ptr->basic.motionmonitorstatus == eomc_motionmonitorstatus_setpointnotreachedyet)
-        {
-            /* if motionmonitorstatus is equal to _setpointnotreachedyet, i send motion done message. 
-            - if (motionmonitorstatus == eomc_motionmonitorstatus_setpointisreached), i don't send
-            message because the setpoint is alredy reached. this means that:
-                - if monitormode is forever, no new set point has been configured 
-                - if monitormode is _untilreached, the joint reached the setpoint already.
-            - if (motionmonitorstatus == eomc_motionmonitorstatus_notmonitored), i don't send
-            message because pc104 is not interested in getting motion done.
-            */
-            eo_appCanSP_SendCmd2Joint(appCanSP_ptr, jId, msgCmd, NULL);
-        }
 
-    }   
+    res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), motionDoneJoin2Use, &jstatus_ptr);
+    if(eores_OK != res)
+    {
+        return; //error
+    }
+    
+    if(jstatus_ptr->basic.motionmonitorstatus == eomc_motionmonitorstatus_setpointnotreachedyet)
+    {
+        /* if motionmonitorstatus is equal to _setpointnotreachedyet, i send motion done message. 
+        - if (motionmonitorstatus == eomc_motionmonitorstatus_setpointisreached), i don't send
+        message because the setpoint is alredy reached. this means that:
+            - if monitormode is forever, no new set point has been configured 
+            - if monitormode is _untilreached, the joint reached the setpoint already.
+        - if (motionmonitorstatus == eomc_motionmonitorstatus_notmonitored), i don't send
+        message because pc104 is not interested in getting motion done.
+        */
+        eo_appCanSP_SendCmd2Joint(appCanSP_ptr, motionDoneJoin2Use, msgCmd, NULL);
+    }
+    
+    motionDoneJoin2Use++;
+    if(motionDoneJoin2Use == numofjoint)
+    {
+        motionDoneJoin2Use = 0;
+    }
+
+    
+//     for(jId = 0; jId<numofjoint; jId++)
+//     {
+//         res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), jId, &jstatus_ptr);
+//         if(eores_OK != res)
+//         {
+//             return; //error
+//         }
+//         
+//         if(jstatus_ptr->basic.motionmonitorstatus == eomc_motionmonitorstatus_setpointnotreachedyet)
+//         {
+//             /* if motionmonitorstatus is equal to _setpointnotreachedyet, i send motion done message. 
+//             - if (motionmonitorstatus == eomc_motionmonitorstatus_setpointisreached), i don't send
+//             message because the setpoint is alredy reached. this means that:
+//                 - if monitormode is forever, no new set point has been configured 
+//                 - if monitormode is _untilreached, the joint reached the setpoint already.
+//             - if (motionmonitorstatus == eomc_motionmonitorstatus_notmonitored), i don't send
+//             message because pc104 is not interested in getting motion done.
+//             */
+//             eo_appCanSP_SendCmd2Joint(appCanSP_ptr, jId, msgCmd, NULL);
+//         }
+
+//     }   
 }
 
 // --------------------------------------------------------------------------------------------------------------------
