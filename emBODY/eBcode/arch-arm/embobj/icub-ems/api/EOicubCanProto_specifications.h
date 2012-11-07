@@ -597,6 +597,23 @@ typedef struct
     uint8_t minor;
 } eOicubCanProto_protocolVersion_t;
 
+
+typedef enum
+{
+    eo_icubCanProto_controlmode_idle					    = 0x00,
+    eo_icubCanProto_controlmode_position 					= 0x01,
+    eo_icubCanProto_controlmode_velocity					= 0x02,
+    eo_icubCanProto_controlmode_torque						= 0x03,
+    eo_icubCanProto_controlmode_impedance_pos				= 0x04,
+    eo_icubCanProto_controlmode_impedance_vel				= 0x05,
+    eo_icubCanProto_controlmode_calib_abs_pos_sens			= 0x10,
+    eo_icubCanProto_controlmode_calib_hard_stops			= 0x20,
+    eo_icubCanProto_controlmode_handle_hard_stops			= 0x30,
+    eo_icubCanProto_controlmode_margin_reached    			= 0x40,
+    eo_icubCanProto_controlmode_calib_abs_and_incremental	= 0x41,
+    eo_icubCanProto_controlmode_openloop               	    = 0x50
+} eOicubCanProto_controlmode_t;
+
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
 

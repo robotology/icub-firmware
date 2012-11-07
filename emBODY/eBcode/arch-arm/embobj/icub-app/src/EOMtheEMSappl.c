@@ -302,6 +302,10 @@ extern eOresult_t eom_emsappl_ProcessGo2stateRequest(EOMtheEMSappl *p, eOsmState
         // {
             // res = eores_NOK_unsupported;//currently is inpossible go to any other state!!
         // }break;
+        default:
+        {
+            res = eores_NOK_generic;
+        }
 
     }
     return(res);
