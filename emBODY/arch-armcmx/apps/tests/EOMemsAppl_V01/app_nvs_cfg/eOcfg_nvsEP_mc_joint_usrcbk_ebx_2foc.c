@@ -340,7 +340,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
     eOresult_t                              res;
     eOmc_calibrator_t                       *calibrator = (eOmc_calibrator_t*)nv->loc;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
-    eOmc_controlmode_t                      controlmode_2foc = eomc_controlmode_current;
+    eOicubCanProto_controlmode_t            controlmode_2foc = eo_icubCanProto_controlmode_current;
     eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t             msgCmd = 
     {
