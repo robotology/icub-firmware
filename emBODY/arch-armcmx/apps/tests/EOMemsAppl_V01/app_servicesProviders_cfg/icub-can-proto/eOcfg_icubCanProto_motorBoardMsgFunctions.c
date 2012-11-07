@@ -80,7 +80,7 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p,
 static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr);
 static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr);
 static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidError(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr);
-
+static eOresult_t s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode(eOicubCanProto_controlmode_t icubcanProto_controlmode, eOmc_controlmode_t *eomc_controlmode);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -432,7 +432,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__motionDone(EOicubCanProto* 
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setControlMode(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    eOenum08_t *controlMode_ptr = (eOenum08_t *)val_ptr;
+    eOicubCanProto_controlmode_t *controlMode_ptr = (eOicubCanProto_controlmode_t*)val_ptr;
 
     /* 1) prepare base information*/
     canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
@@ -1291,6 +1291,8 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
     eOmc_jointId_t   		                jId;
     eOmc_joint_status_t                     *jstatus_ptr;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOmc_controlmode_t                      eomc_controlmode;
+    
 
     
     // set position about the first joint in board
@@ -1313,7 +1315,12 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
 
     jstatus_ptr->chamaleon04[0] = frame->data[0]; //fault axis 0
     jstatus_ptr->chamaleon04[1] = frame->data[4]; //can fault 
+    
+    //set control mode status
+    s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((eOicubCanProto_controlmode_t) frame->data[1],
+                                                                         &eomc_controlmode);
 
+    jstatus_ptr->basic.controlmodestatus = eomc_controlmode;
     
     canLoc.indexinboard = eo_icubCanProto_jm_index_second;
     
@@ -1332,7 +1339,12 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
     
     jstatus_ptr->chamaleon04[0] = frame->data[2]; //fault axis 1
     jstatus_ptr->chamaleon04[1] = frame->data[4]; //can fault
-	
+
+    //set control mode status
+    s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((eOicubCanProto_controlmode_t) frame->data[3],
+                                                                         &eomc_controlmode);
+
+    jstatus_ptr->basic.controlmodestatus = eomc_controlmode;
     
     return(eores_OK);
 
@@ -1494,6 +1506,8 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* 
 
     jstatus_ptr->basic.position = eo_appMeasConv_jntPosition_E2I(appMeasConv_ptr, jId, pos_icubCanProtValue); 
     
+    
+//    jstatus_ptr->basic.position++;
     return(eores_OK);
 }
 
@@ -1659,6 +1673,57 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidError(EOicubCanProto* 
     return(eores_OK);
 }
 
+
+static eOresult_t s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode(eOicubCanProto_controlmode_t icubcanProto_controlmode,
+                                                                                      eOmc_controlmode_t *eomc_controlmode)
+{
+    switch(icubcanProto_controlmode)
+    {
+        case eo_icubCanProto_controlmode_idle:
+        {
+            *eomc_controlmode = eomc_controlmode_idle;
+        }break;
+
+        case eo_icubCanProto_controlmode_position:
+        {
+            *eomc_controlmode = eomc_controlmode_position;
+        }break;
+
+        case eo_icubCanProto_controlmode_velocity:
+        {
+            *eomc_controlmode = eomc_controlmode_velocity;
+        }break;
+        case eo_icubCanProto_controlmode_torque:
+        {
+            *eomc_controlmode = eomc_controlmode_torque;
+        }break;
+
+        case eo_icubCanProto_controlmode_impedance_pos:
+        {
+            *eomc_controlmode = eomc_controlmode_impedance_pos;
+        }break;
+
+        case eo_icubCanProto_controlmode_impedance_vel:
+        {
+            *eomc_controlmode = eomc_controlmode_impedance_vel;
+        }break;
+
+        case  eo_icubCanProto_controlmode_calib_abs_pos_sens:
+        case  eo_icubCanProto_controlmode_calib_hard_stops:
+        case  eo_icubCanProto_controlmode_handle_hard_stops:
+        case  eo_icubCanProto_controlmode_margin_reached:
+        case  eo_icubCanProto_controlmode_calib_abs_and_incremental:
+        {
+            *eomc_controlmode = eomc_controlmode_calib;
+        }break;
+        
+        case eo_icubCanProto_controlmode_openloop:
+        {
+            *eomc_controlmode = eomc_controlmode_openloop;
+        }break;
+    }
+    return(eores_OK);
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
