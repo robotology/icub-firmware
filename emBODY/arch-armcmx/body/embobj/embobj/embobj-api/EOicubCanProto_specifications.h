@@ -606,6 +606,7 @@ typedef enum
     eo_icubCanProto_controlmode_torque						= 0x03,
     eo_icubCanProto_controlmode_impedance_pos				= 0x04,
     eo_icubCanProto_controlmode_impedance_vel				= 0x05,
+    eo_icubCanProto_controlmode_current				        = 0x06,
     eo_icubCanProto_controlmode_calib_abs_pos_sens			= 0x10,
     eo_icubCanProto_controlmode_calib_hard_stops			= 0x20,
     eo_icubCanProto_controlmode_handle_hard_stops			= 0x30,
