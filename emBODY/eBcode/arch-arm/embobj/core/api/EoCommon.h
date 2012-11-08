@@ -578,7 +578,7 @@ EO_extern_inline eOresult_t eo_common_Q17_14_mult(eOq17_14_t q_num1, eOq17_14_t 
     int64_t tmp;
     
     tmp = ((int64_t)q_num1) * ((int64_t)q_num2);
-    if(tmp >= 0x200000000000)
+    if(tmp >= 0x200000000000LL)
     {
         return(eores_NOK_generic);
     }
