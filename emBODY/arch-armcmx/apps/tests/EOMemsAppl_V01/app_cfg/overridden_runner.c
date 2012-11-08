@@ -319,6 +319,7 @@ static void s_eom_emsrunner_hid_readMc4andMais(EOtheEMSapplBody *p)
     eOsnsr_maisId_t                 sId = 0; //only one mais per ems
     eOsnsr_mais_status_t            *sstatus_ptr;
     eOresult_t                      res;
+    uint8_t                         numofRXcanframe = 10; //default num
     
     //1) reset nv array
     res = eo_appTheDB_GetSnrMaisStatusPtr(eo_appTheDB_GetHandle(), sId,  &sstatus_ptr);
@@ -328,7 +329,10 @@ static void s_eom_emsrunner_hid_readMc4andMais(EOtheEMSapplBody *p)
     sstatus_ptr->the15values.head.size = 0;
     sstatus_ptr->the15values.data[0] = 0;
 
-    eo_appCanSP_read(eo_emsapplBody_GetCanServiceHandle(p), eOcanport1, 2, NULL); //2...boh!!!
+    res = eo_appCanSP_GetNumOfRecCanframe(eo_emsapplBody_GetCanServiceHandle(p), eOcanport1, &numofRXcanframe);
+    eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "emsrunner_hid", "err in GetNumOfRecCanframe");
+
+    eo_appCanSP_read(eo_emsapplBody_GetCanServiceHandle(p), eOcanport1, numofRXcanframe, NULL); //2...boh!!!
 
 }
 
