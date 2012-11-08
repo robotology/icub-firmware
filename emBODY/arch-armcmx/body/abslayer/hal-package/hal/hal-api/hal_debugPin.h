@@ -41,6 +41,7 @@
     @{        
  **/
 
+#warning --> acemor says on 2012 nov 8: dont use this file anymore. it is not portable and will be dismissed in 6 months. use hal_gpio_quickest_setval() function instead. 
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
