@@ -195,6 +195,8 @@ extern hal_gpio_val_t hal_gpio_getval(hal_gpio_port_t port, hal_gpio_pin_t pin);
                 all safety checks which are available in hal_gpio_setval are here removed. Thus, pay particular
                 attention to manipulate gpios already initted as output. And never and never use hal_gpio_portNONE
                 or hal_gpio_pinNONE otherwise a SW crash is inevitable. needless to say don't ever use hal_gpio_valNONE. 
+                On STM32F107 @ 72MHz, the execution time is around 1 usec vs. about 1.7 usec of hal_gpio_setval().
+                On STM32F407 @ 168MHz, the execution time is around 0.2 usec vs. about 0.4 usec of hal_gpio_setval().
     @param      pin             The pin. 
     @param      port            The port. 
     @param      value           The target value.
