@@ -24,7 +24,7 @@
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_sensor_accel.h
-    @brief      This header file implements interface to a generic hal accelation sensor 
+    @brief      This header file implements interface to a generic hal acceleration sensor 
     @author     marco.accame@iit.it
     @date       10/26/2012
 **/
