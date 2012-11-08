@@ -9,7 +9,7 @@ echo. -- Setting the variables...
 :: Here you need to make some changes to suit your system.
 set SOURCE=./externals
 set SVN=C:\Program Files\TortoiseSVN\bin
-set URL=https://svn.cognitivehumanoids.eu/sdl/embedded/addons2sourceforge/arm-sys-env-bin
+set URL=https://svn.icub.iit.local/repos/sdl/embedded/addons2sourceforge/arm-sys-env-bin
 
 :: Unless you want to modify the script, this is enough.
 
