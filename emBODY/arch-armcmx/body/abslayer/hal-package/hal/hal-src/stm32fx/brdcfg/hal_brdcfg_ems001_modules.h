@@ -38,7 +38,7 @@
 #define     HAL_USE_CRC
 #undef  HAL_USE_DISPLAY  
 #define     HAL_USE_EEPROM
-#define     HAL_USE_ENCODER
+//#define     HAL_USE_ENCODER
 #define     HAL_USE_ETH
 #define     HAL_USE_FLASH
 #define     HAL_USE_GPIO
@@ -81,9 +81,6 @@
     #define HAL_USE_I2C
 #endif//HAL_USE_EEPROM      
 
-#ifdef  HAL_USE_ENCODER
-    #define HAL_USE_SPI4ENCODER
-#endif//HAL_USE_ENCODER
 
 #ifdef  HAL_USE_LED
     #define HAL_USE_GPIO

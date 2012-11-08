@@ -47,14 +47,15 @@
 #include "hal_stm32_i2c_hid.h"
 #include "hal_stm32_led_hid.h" 
 #include "hal_stm32_eeprom_hid.h"
+#include "hal_stm32_spi_hid.h"
 #include "hal_stm32_switch_hid.h"
 #include "hal_stm32_sys_hid.h"
 #include "hal_stm32_trace_hid.h"
 #include "hal_stm32_timer_hid.h"
-#include "hal_stm32_encoder_hid.h"
+//#include "hal_stm32_encoder_hid.h"
 #include "hal_stm32_watchdog_hid.h"
 
-#include "hal_spi4encoder.h"
+//#include "hal_spi4encoder.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -192,9 +193,9 @@ extern uint32_t hal_base_memory_getsize(const hal_cfg_t *cfg, uint32_t *size04al
     retval += hal_led_hid_getsize(cfg);
 #endif//HAL_USE_LED            
 
-#ifdef HAL_USE_SPI4ENCODER
-    retval += hal_spi4encoder_hid_getsize(cfg);
-#endif//HAL_USE_SPI4ENCODER 
+#ifdef HAL_USE_SPI
+    retval += hal_spi_hid_getsize(cfg);
+#endif//HAL_USE_SPI
 
 #ifdef HAL_USE_SWITCH
     retval += hal_switch_hid_getsize(cfg);
@@ -241,11 +242,11 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
 
 
 
-    if(cfg->cpu_freq != SystemCoreClock)
-    {   
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_base_initialise(): incorrect frequency");
-        return(hal_res_NOK_generic);
-    }
+//     if(cfg->cpu_freq != SystemCoreClock)
+//     {   
+//         hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_base_initialise(): incorrect frequency");
+//         return(hal_res_NOK_generic);
+//     }
 
 #if 0 
     // removed by acemor on 09-mar-2011 to avoid problems of ... 
@@ -366,6 +367,14 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
     }
     data04aligned += hal_led_hid_getsize(cfg)/4;
 #endif//HAL_USE_LED
+    
+#ifdef HAL_USE_SPI
+    if(hal_res_OK != hal_spi_hid_setmem(cfg, data04aligned))
+    {
+        return(hal_res_NOK_generic);
+    }
+    data04aligned += hal_spi_hid_getsize(cfg)/4;
+#endif//HAL_USE_SPI    
 
 #ifdef HAL_USE_SWITCH
     if(hal_res_OK != hal_switch_hid_setmem(cfg, data04aligned))
@@ -374,16 +383,6 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
     }
     data04aligned += hal_switch_hid_getsize(cfg)/4;
 #endif//HAL_USE_SWITCH
-
-    
-#ifdef HAL_USE_SPI4ENCODER
-    if(hal_res_OK != hal_spi4encoder_hid_setmem(cfg, data04aligned))
-    {
-        return(hal_res_NOK_generic);
-    }
-    data04aligned += hal_spi4encoder_hid_getsize(cfg)/4;
-#endif//HAL_USE_SPI4ENCODER
-
     
 #ifdef HAL_USE_SYS
     if(hal_res_OK != hal_sys_hid_setmem(cfg, data04aligned))
@@ -452,114 +451,125 @@ extern hal_result_t hal_base_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
     return(hal_res_OK); 
 }
 
-
-void hal_base_hid_genericfifo_init(hal_genericfifo_t *gf, uint8_t capacity, uint8_t sizeofitem, uint8_t *data)
-{
-    // avoid checks .... be careful in calling
-    
-    gf->capacity = capacity;
-    gf->sizeofitem = sizeofitem;
-    gf->data = data;
-    
-    hal_base_hid_genericfifo_reset(gf);
-}
-
-
-void hal_base_hid_genericfifo_reset(hal_genericfifo_t *gf)
-{
-    // avoid checks .... be careful in calling
-    
-    gf->size = 0;
-    gf->index = 0;
-}
+// #if 0
+// // use hal_tools_fifo_ instead
+// void hal_base_hid_genericfifo_init(hal_base_genericfifo_t *gf, uint8_t capacity, uint8_t sizeofitem, uint8_t *data)
+// {
+//     // avoid checks .... be careful in calling
+//     
+//     gf->capacity = capacity;
+//     gf->sizeofitem = sizeofitem;
+//     gf->data = data;
+//     
+//     hal_base_hid_genericfifo_reset(gf);
+// }
 
 
-hal_result_t hal_base_hid_genericfifo_put(hal_genericfifo_t *gf, uint8_t *data)
-{
-    // avoid checks .... be careful in calling
-    
-    if(gf->size == gf->capacity)
-    {
-        return(hal_res_NOK_generic);
-    }
-    
-    memcpy(gf->data + (gf->sizeofitem)*(gf->index), data, gf->sizeofitem);
-    gf->size ++;
-    gf->index ++;
-    if(gf->index == gf->capacity)
-    {
-        gf->index = 0;
-    }
-    
-     return(hal_res_OK);
-}
+// void hal_base_hid_genericfifo_reset(hal_base_genericfifo_t *gf)
+// {
+//     // avoid checks .... be careful in calling
+//     
+//     gf->size = 0;
+//     gf->index = 0;
+// }
+
+// void hal_base_hid_genericfifo_clear(hal_base_genericfifo_t *gf)
+// {
+//     // avoid checks .... be careful in calling
+//     
+//     memset(gf->data, 0, gf->capacity * gf->sizeofitem);
+//     
+//     gf->size = 0;
+//     gf->index = 0;
+// }
 
 
-hal_result_t hal_base_hid_genericfifo_get(hal_genericfifo_t *gf, uint8_t *data, uint8_t *size)
-{
-    // avoid checks .... be careful in calling
-    
-    uint8_t start = 0;
-    
-    if(0 == gf->size)
-    {
-        return(hal_res_NOK_nodata);
-    }
-    
-    start = (gf->capacity + gf->index - gf->size);
-    if(start >= gf->capacity)
-    {
-        start -= gf->capacity;
-    }
-    
-    memcpy(data, gf->data + (gf->sizeofitem)*(start), gf->sizeofitem);
-    gf->size --;
-	
-	*size = gf->size;
-    
-    return(hal_res_OK);
-}
+// hal_result_t hal_base_hid_genericfifo_put(hal_base_genericfifo_t *gf, uint8_t *data)
+// {
+//     // avoid checks .... be careful in calling
+//     
+//     if(gf->size == gf->capacity)
+//     {
+//         return(hal_res_NOK_generic);
+//     }
+//     
+//     memcpy(gf->data + (gf->sizeofitem)*(gf->index), data, gf->sizeofitem);
+//     gf->size ++;
+//     gf->index ++;
+//     if(gf->index == gf->capacity)
+//     {
+//         gf->index = 0;
+//     }
+//     
+//     return(hal_res_OK);
+// }
 
 
-uint8_t * hal_base_hid_genericfifo_front(hal_genericfifo_t *gf)
-{
-    // avoid checks .... be careful in calling
-    
-    uint8_t start = 0;
-    
-    if(0 == gf->size)
-    {
-        return(NULL);
-    }
-    
-    start = (gf->capacity + gf->index - gf->size);
-    if(start >= gf->capacity)
-    {
-        start -= gf->capacity;
-    }
-    
-    return(gf->data + (gf->sizeofitem)*(start));
-}
+// hal_result_t hal_base_hid_genericfifo_get(hal_base_genericfifo_t *gf, uint8_t *data, uint8_t *size)
+// {
+//     // avoid checks .... be careful in calling
+//     
+//     uint8_t start = 0;
+//     
+//     if(0 == gf->size)
+//     {
+//         return(hal_res_NOK_nodata);
+//     }
+//     
+//     start = (gf->capacity + gf->index - gf->size);
+//     if(start >= gf->capacity)
+//     {
+//         start -= gf->capacity;
+//     }
+//     
+//     memcpy(data, gf->data + (gf->sizeofitem)*(start), gf->sizeofitem);
+//     gf->size --;
+// 	
+// 	*size = gf->size;
+//     
+//     return(hal_res_OK);
+// }
 
 
-void hal_base_hid_genericfifo_pop(hal_genericfifo_t *gf)
-{
-    // avoid checks .... be careful in calling
+// uint8_t * hal_base_hid_genericfifo_front(hal_base_genericfifo_t *gf)
+// {
+//     // avoid checks .... be careful in calling
+//     
+//     uint8_t start = 0;
+//     
+//     if(0 == gf->size)
+//     {
+//         return(NULL);
+//     }
+//     
+//     start = (gf->capacity + gf->index - gf->size);
+//     if(start >= gf->capacity)
+//     {
+//         start -= gf->capacity;
+//     }
+//     
+//     return(gf->data + (gf->sizeofitem)*(start));
+// }
 
-    if(0 != gf->size)
-    {
-        gf->size --;
-    }
-    
-    return;
-}
+
+// void hal_base_hid_genericfifo_pop(hal_base_genericfifo_t *gf)
+// {
+//     // avoid checks .... be careful in calling
+
+//     if(0 != gf->size)
+//     {
+//         gf->size --;
+//     }
+//     
+//     return;
+// }
 
 
-uint8_t hal_base_hid_genericfifo_size(hal_genericfifo_t *gf)
-{
-    return(gf->size);
-}
-
+// uint8_t hal_base_hid_genericfifo_size(hal_base_genericfifo_t *gf)
+// {
+//     return(gf->size);
+// }
+// #endif
 
 extern void hal_base_hid_osal_scheduling_suspend(void)
 {
@@ -638,7 +648,7 @@ void hal_hid_link_to_all_files(void)
     hal_gpio_hid_getsize(NULL);
 #endif
 #ifdef HAL_USE_SPI
-    hal_spi4encoder_hid_getsize(NULL);
+    hal_spi_hid_getsize(NULL);
 #endif
 #ifdef HAL_USE_SYS
     hal_sys_hid_getsize(NULL);
@@ -659,9 +669,6 @@ extern void hal_base_hid_ram_basic_init(void)
 {
     // in here we set values of memory which is required in hal_base_memory_getsize() and in hal_base_initialise()
     // before any specific initialisation.
-
-    // the SystemCoreClock needs to be non-zero 
-    cmsis_stm32xx_hid_set_system_core_clock();
 
     // for nzi data
     memset(&hal_base_hid_params, 0, sizeof(hal_base_hid_params));

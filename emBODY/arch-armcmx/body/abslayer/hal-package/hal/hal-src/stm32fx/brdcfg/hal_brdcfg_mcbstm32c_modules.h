@@ -38,7 +38,7 @@
 #define     HAL_USE_CRC
 #undef     HAL_USE_DISPLAY  
 #define     HAL_USE_EEPROM
-#define     HAL_USE_ENCODER
+//#define     HAL_USE_ENCODER
 #define     HAL_USE_ETH
 #define     HAL_USE_FLASH
 #define     HAL_USE_GPIO
@@ -46,6 +46,7 @@
 #undef  HAL_USE_SWITCH
 #define     HAL_USE_SYS
 #define     HAL_USE_TIMER
+#define     HAL_USE_TOOLS
 #define     HAL_USE_TRACE
 #define     HAL_USE_WATCHDOG
 

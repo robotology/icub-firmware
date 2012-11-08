@@ -46,6 +46,8 @@
 
 #include "utils/stm32ee.h"  
 
+#include "utils/hal_tools.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -517,7 +519,7 @@ extern hal_result_t hal_eeprom_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory
 
 static hal_boolval_t s_hal_eeprom_supported_is(hal_eeprom_t eep)
 {
-    return(hal_base_hid_byte_bitcheck(hal_brdcfg_eeprom__supported_mask, HAL_eeprom_t2index(eep)) );
+    return(hal_tools_bitoperator_byte_bitcheck(hal_brdcfg_eeprom__supported_mask, HAL_eeprom_t2index(eep)) );
 }
 
 static void s_hal_eeprom_initted_set(hal_eeprom_t eep)

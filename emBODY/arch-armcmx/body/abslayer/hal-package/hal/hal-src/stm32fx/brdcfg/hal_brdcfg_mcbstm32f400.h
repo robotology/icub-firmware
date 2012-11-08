@@ -44,6 +44,15 @@
     #include "hal_led.h"
 #endif//HAL_USE_LED
 
+#ifdef HAL_USE_SPI
+    #include "hal_spi.h"
+#endif//HAL_USE_SPI
+
+
+#ifdef HAL_USE_SYS
+    #include "hal_stm32_sys_hid.h"
+#endif//HAL_USE_SYS
+
 #ifdef HAL_USE_SPI4ENCODER
     #include "hal_spi4encoder.h" 
 #endif//HAL_USE_SPI4ENCODER
@@ -149,10 +158,20 @@
     extern const hal_gpio_cfg_t hal_brdcfg_led__cfg[];    
 #endif//HAL_USE_LED 
 
+#ifdef HAL_USE_SPI
+    extern const uint8_t hal_brdcfg_spi__supported_mask;
+    extern const hal_gpio_cfg_t hal_brdcfg_spi__miso[];
+    extern const hal_gpio_cfg_t hal_brdcfg_spi__mosi[];
+    extern const hal_gpio_cfg_t hal_brdcfg_spi__sck[];
+#endif//HAL_USE_SPI
+
 #ifdef HAL_USE_SPI4ENCODER
     extern const uint8_t hal_brdcfg_spi4encoder__supported_mask; 
 #endif//HAL_USE_SPI4ENCODER
 
+#ifdef  HAL_USE_SYS
+    extern const hal_sys_hid_clock_cfg_t hal_brdcfg_sys__clockcfg;
+#endif//HAL_USE_SYS            
 
 #ifdef HAL_USE_SWITCH
     extern const hal_boolval_t hal_brdcfg_switch__supported;

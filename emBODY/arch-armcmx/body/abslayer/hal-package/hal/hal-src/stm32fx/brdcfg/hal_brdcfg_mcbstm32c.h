@@ -61,9 +61,12 @@
 #endif//HAL_USE_LED
 
 #ifdef HAL_USE_SPI4ENCODER
-    #include "hal_spi4encoder.h" 
+//    #include "hal_spi4encoder.h" 
 #endif//HAL_USE_SPI4ENCODER
 
+#ifdef  HAL_USE_SYS
+    #include "hal_stm32_sys_hid.h" 
+#endif//HAL_USE_SYS
 
 #include "hal_stm32xx_include.h"
 
@@ -169,9 +172,15 @@
     extern const hal_gpio_cfg_t hal_brdcfg_switch__gpio_reset; 
 #endif//HAL_USE_SWITCH
 
+
 #ifdef HAL_USE_TIMER
     extern const uint8_t hal_brdcfg_timer__supported_mask;
 #endif//HAL_USE_TIMER
+
+
+#ifdef  HAL_USE_SYS
+    extern const hal_sys_hid_clock_cfg_t hal_brdcfg_sys__clockcfg;
+#endif//HAL_USE_SYS    
 
 #ifdef HAL_USE_WATCHDOG
     extern const uint8_t hal_brdcfg_watchdog__supported_mask;

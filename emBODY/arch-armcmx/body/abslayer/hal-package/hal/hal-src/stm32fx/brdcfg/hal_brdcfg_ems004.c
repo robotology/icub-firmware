@@ -19,7 +19,6 @@
 #include "string.h"
 #include "hal_base.h"
 #include "hal_stm32_base_hid.h"
-#include "hal_stm32_spi4encoder_hid.h"
 #include "hal_stm32_eth_hid.h"
 #include "hal_stm32_eth_def.h"
 #include "hal_eeprom.h"
@@ -146,7 +145,7 @@
     extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_MDC            = { .port = hal_gpio_portC, .pin = hal_gpio_pin1,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max  };
     extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_MDIO           = { .port = hal_gpio_portA, .pin = hal_gpio_pin2,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max  };   
    
-    extern const hal_eth_phymode_t hal_brdcfg_eth__phymode              = hal_eth_phymode_fullduplex10mbps;
+    extern const hal_eth_phymode_t hal_brdcfg_eth__phymode              = hal_eth_phymode_fullduplex100mbps;
 #endif//HAL_USE_ETH
 
 
@@ -277,6 +276,29 @@
     extern const hal_gpio_cfg_t hal_brdcfg_switch__gpio_reset       = { .port = hal_gpio_portB, .pin = hal_gpio_pin2,   .dir = hal_gpio_dirOUT, .speed = hal_gpio_speed_low  }; 
 #endif//HAL_USE_SWITCH
     
+
+#ifdef  HAL_USE_SYS
+    extern const hal_sys_hid_clock_cfg_t hal_brdcfg_sys__clockcfg =
+    {
+        .sourceclock        = hal_sys_refclock_pll_on_external_osc, 
+        .intclockspeed      = 16000000,
+        .extclockspeed      = 50000000,
+        .targetspeeds       =
+        {   
+            .cpu                = 168000000,
+            .fastbus            =  84000000,
+            .slowbus            =  42000000
+        },
+        .pllcfg             =
+        {   // pllfreq = n*(source/m), speedcpu = pllfreq/p, 48mhz = pllfreq/q 
+            .m                  =  25, 
+            .n                  = 168,
+            .p                  = 2,
+            .q                  = 7
+        }
+    };        
+#endif//HAL_USE_SYS    
+
     
 #ifdef HAL_USE_TIMER
     extern const uint8_t hal_brdcfg_timer__supported_mask           = 
@@ -548,21 +570,28 @@ static void hal_brdcfg_switch__mco2_init(void)
     GPIOC->AFR[1]   |=  0x00000000;              // AF0 (system) 
 }
 
+#define HAL_SWITCH_USE_HSE
+
 static void hal_brdcfg_switch__mco_initialise(void)
 {
-    
+   
     hal_brdcfg_switch__mco2_init();
-     
+
+#if     defined(HAL_SWITCH_USE_PLLI2S)    
     RCC_PLLI2SCmd(DISABLE);
     RCC_PLLI2SConfig(200, 2); // 50mhz: 1mhz*200/2 = 100.  then we divide by 2 again
-    //RCC_PLLI2SConfig(400, 4); // 50mhz: 1mhz*400/4 = 100
-    //RCC_PLLI2SConfig(200, 4); // 50mhz: 1mhz*200/2 = 100
     RCC_PLLI2SCmd(ENABLE);
     // wait until it is ready
     while(RCC_GetFlagStatus(RCC_FLAG_PLLI2SRDY) == RESET);
     // connect mco2 with plli2s divided by 2
     RCC_MCO2Config(RCC_MCO2Source_PLLI2SCLK, RCC_MCO2Div_2);
-
+#elif   defined(HAL_SWITCH_USE_HSE)
+ 
+    // connect mco2 with hse divided by 1
+    RCC_MCO2Config(RCC_MCO2Source_HSE, RCC_MCO2Div_1);
+#endif    
+    
+    
     //hal_eth_hid_rmii_refclock_init();
 }
 

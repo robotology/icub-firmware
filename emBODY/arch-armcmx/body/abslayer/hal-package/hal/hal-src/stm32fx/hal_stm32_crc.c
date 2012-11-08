@@ -36,6 +36,8 @@
 #include "hal_stm32_base_hid.h" 
 #include "hal_brdcfg.h"
 
+#include "utils/hal_tools.h"
+
 #include "../utils/crc16.h"
 #include "../utils/crc32.h"
 
@@ -285,7 +287,7 @@ extern hal_result_t hal_crc_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
 
 static hal_boolval_t s_hal_crc_supported_is(hal_crc_t crc)
 {
-    return(hal_base_hid_byte_bitcheck(hal_brdcfg_crc__supported_mask, HAL_crc_t2index(crc)) );
+    return(hal_tools_bitoperator_byte_bitcheck(hal_brdcfg_crc__supported_mask, HAL_crc_t2index(crc)) );
 }
 
 static void s_hal_crc_initted_set(hal_crc_t crc)

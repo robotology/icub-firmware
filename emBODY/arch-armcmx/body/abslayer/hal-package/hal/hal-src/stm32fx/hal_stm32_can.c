@@ -41,8 +41,8 @@
 #include "hal_stm32_base_hid.h" 
 #include "hal_stm32_gpio_hid.h" 
 #include "hal_stm32_sys_hid.h"
-#include "hal_stm32_canfifo_hid.h"
-
+//#include "hal_stm32_canfifo_hid.h"
+#include "utils/hal_tools.h"
  
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -75,7 +75,7 @@
     #define HAL_STM32_CAN_TQ_BS2            CAN_BS2_3tq
 #elif    defined(USE_STM32F4)
     // the clock APB1 is 42mhz, a fourth the max frequency of 168 mhz. (see page 23/180 of stm32f4x datasheet Doc ID 022152 Rev 3)
-    // the clock APB2 is 84mhz, a halh the max frequency of 168 mhz. (see page 23/180 of stm32f4x datasheet Doc ID 022152 Rev 3)
+    // the clock APB2 is 84mhz, a half the max frequency of 168 mhz. (see page 23/180 of stm32f4x datasheet Doc ID 022152 Rev 3)
     // we give a total of 7 time quanta for the duration of a can bit. we split in 1+4+2
     #define HAL_STM32_CAN_CLK	  			42000000
     #define HAL_STM32_CAN_TQ_TOTAL          7
@@ -112,8 +112,10 @@ const hal_can_cfg_t hal_can_cfg_default =
 typedef struct
 {
     hal_can_cfg_t               cfg;
-    hal_canfifo_t               canframes_rx_norm;
-    hal_canfifo_t               canframes_tx_norm;
+    //hal_canfifo_t               canframes_rx_norm;
+    //hal_canfifo_t               canframes_tx_norm;
+    hal_tools_fifo_t            canframes_rx_norm;
+    hal_tools_fifo_t            canframes_tx_norm;    
     uint8_t                     enabled;
 } hal_can_portdatastructure_t;
 
@@ -276,8 +278,10 @@ extern hal_result_t hal_can_init(hal_can_port_t port, const hal_can_cfg_t *cfg)
 
     
     //  reset fifos
-    hal_canfifo_hid_reset(&cport->canframes_rx_norm);
-    hal_canfifo_hid_reset(&cport->canframes_tx_norm);
+    //hal_canfifo_hid_reset(&cport->canframes_rx_norm);
+    //hal_canfifo_hid_reset(&cport->canframes_tx_norm);
+    hal_tools_fifo_reset(&cport->canframes_rx_norm);
+    hal_tools_fifo_reset(&cport->canframes_tx_norm);    
     
     // init the phy of can
     hal_brdcfg_can__phydevices_init(port);
@@ -401,7 +405,8 @@ extern hal_result_t hal_can_received(hal_can_port_t port, uint8_t *numberof)
     // disable interrupt rx
     s_hal_can_isr_rx_disable(port);
     
-    *numberof = hal_canfifo_hid_size(&cport->canframes_rx_norm);
+    //*numberof = hal_canfifo_hid_size(&cport->canframes_rx_norm);
+    *numberof = hal_tools_fifo_size(&cport->canframes_rx_norm);
     
     // enable interrupt rx
     s_hal_can_isr_rx_enable(port);
@@ -413,32 +418,46 @@ extern hal_result_t hal_can_received(hal_can_port_t port, uint8_t *numberof)
 extern hal_result_t hal_can_get(hal_can_port_t port, hal_can_frame_t *frame, uint8_t *remaining) 
 {
     hal_can_portdatastructure_t *cport  =   s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
-    hal_canfifo_item_t *fifoframe_ptr   =   NULL;
+    hal_tools_fifo_t* fiforx = &cport->canframes_rx_norm;
+    hal_result_t res = hal_res_NOK_nodata;
   
     // disable interrupt rx
     s_hal_can_isr_rx_disable(port);
-
-    fifoframe_ptr = hal_canfifo_hid_front(&cport->canframes_rx_norm);
-    if(NULL == fifoframe_ptr)
-    {
-        // enable interrupt rx
-        s_hal_can_isr_rx_enable(port);
-        return(hal_res_NOK_nodata); //the fifo is empty
-    }
     
-    memcpy(frame, fifoframe_ptr, sizeof(hal_canfifo_item_t));
+    res = hal_tools_fifo_get16(fiforx, (uint8_t*)frame, remaining);
 
-    hal_canfifo_hid_pop(&cport->canframes_rx_norm);
     // enable interrupt rx
     s_hal_can_isr_rx_enable(port);
     
+    return(res);
     
-    if(NULL != remaining)
-    {
-        *remaining = hal_canfifo_hid_size(&cport->canframes_rx_norm);
-    }
+//     hal_can_portdatastructure_t *cport  =   s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
+//     hal_canfifo_item_t *fifoframe_ptr   =   NULL;
+//   
+//     // disable interrupt rx
+//     s_hal_can_isr_rx_disable(port);
 
-    return(hal_res_OK);
+//     fifoframe_ptr = hal_canfifo_hid_front(&cport->canframes_rx_norm);
+//     if(NULL == fifoframe_ptr)
+//     {
+//         // enable interrupt rx
+//         s_hal_can_isr_rx_enable(port);
+//         return(hal_res_NOK_nodata); //the fifo is empty
+//     }
+//     
+//     memcpy(frame, fifoframe_ptr, sizeof(hal_canfifo_item_t));
+
+//     hal_canfifo_hid_pop(&cport->canframes_rx_norm);
+//     // enable interrupt rx
+//     s_hal_can_isr_rx_enable(port);
+//     
+//     
+//     if(NULL != remaining)
+//     {
+//         *remaining = hal_canfifo_hid_size(&cport->canframes_rx_norm);
+//     }
+
+//     return(hal_res_OK);    
 }
 
 
@@ -500,7 +519,8 @@ extern hal_result_t hal_can_out_get(hal_can_port_t port, uint8_t *numberof)
     // disable interrupt rx
     s_hal_can_isr_rx_disable(port);
     
-    *numberof = hal_canfifo_hid_size(&cport->canframes_tx_norm);
+    //*numberof = hal_canfifo_hid_size(&cport->canframes_tx_norm);
+    *numberof = hal_tools_fifo_size(&cport->canframes_tx_norm);
     
     // enable interrupt rx
     s_hal_can_isr_rx_enable(port);
@@ -553,15 +573,15 @@ extern uint32_t hal_can_hid_getsize(const hal_cfg_t *cfg)
     if(0 != cfg->can1_enable)
     {
         size += sizeof(hal_can_portdatastructure_t);
-        size += (cfg->can1_rxqnorm_num * sizeof(hal_canfifo_item_t));
-        size += (cfg->can1_txqnorm_num * sizeof(hal_canfifo_item_t));         
+        size += (cfg->can1_rxqnorm_num * sizeof(hal_can_frame_t));
+        size += (cfg->can1_txqnorm_num * sizeof(hal_can_frame_t));         
     }
     
     if(0 != cfg->can2_enable)
     {
         size += sizeof(hal_can_portdatastructure_t);
-        size += (cfg->can2_rxqnorm_num * sizeof(hal_canfifo_item_t));
-        size += (cfg->can2_txqnorm_num * sizeof(hal_canfifo_item_t));         
+        size += (cfg->can2_rxqnorm_num * sizeof(hal_can_frame_t));
+        size += (cfg->can2_txqnorm_num * sizeof(hal_can_frame_t));         
     }
 
     return(size);
@@ -572,6 +592,16 @@ extern hal_result_t hal_can_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
 {
     uint8_t *ram08 = (uint8_t*)memory;
     uint8_t i=0;
+    
+    const hal_can_frame_t defcanframe =
+    {
+        .id         = 0,
+        .id_type    = hal_can_frameID_std,
+        .frame_type = hal_can_frame_data,
+        .size       = 0,
+        .unused     = 0,
+        .data       = {0}      
+    };
 
     // removed dependancy from NZI ram
     for(i=0; i<hal_can_ports_num; i++)
@@ -595,11 +625,13 @@ extern hal_result_t hal_can_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
         s_hal_can_portdatastruct_ptr[0] = (hal_can_portdatastructure_t*)ram08;
         ram08 += sizeof(hal_can_portdatastructure_t);
         
-        hal_canfifo_hid_init(&s_hal_can_portdatastruct_ptr[0]->canframes_rx_norm, cfg->can1_rxqnorm_num, ram08);
-        ram08 += (cfg->can1_rxqnorm_num * sizeof(hal_canfifo_item_t));
+        //hal_canfifo_hid_init(&s_hal_can_portdatastruct_ptr[0]->canframes_rx_norm, cfg->can1_rxqnorm_num, ram08);
+        hal_tools_fifo_init(&s_hal_can_portdatastruct_ptr[0]->canframes_rx_norm, cfg->can1_rxqnorm_num, sizeof(hal_can_frame_t), ram08, (uint8_t*)&defcanframe);
+        ram08 += (cfg->can1_rxqnorm_num * sizeof(hal_can_frame_t));
         
-        hal_canfifo_hid_init(&s_hal_can_portdatastruct_ptr[0]->canframes_tx_norm, cfg->can1_txqnorm_num, ram08);
-        ram08 += (cfg->can1_txqnorm_num * sizeof(hal_canfifo_item_t));
+        //hal_canfifo_hid_init(&s_hal_can_portdatastruct_ptr[0]->canframes_tx_norm, cfg->can1_txqnorm_num, ram08);
+        hal_tools_fifo_init(&s_hal_can_portdatastruct_ptr[0]->canframes_tx_norm, cfg->can1_txqnorm_num, sizeof(hal_can_frame_t), ram08, (uint8_t*)&defcanframe);
+        ram08 += (cfg->can1_txqnorm_num * sizeof(hal_can_frame_t));
     }
     
     if(0 != cfg->can2_enable)
@@ -607,11 +639,13 @@ extern hal_result_t hal_can_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
         s_hal_can_portdatastruct_ptr[1] = (hal_can_portdatastructure_t*)ram08;
         ram08 += sizeof(hal_can_portdatastructure_t);
  
-        hal_canfifo_hid_init(&s_hal_can_portdatastruct_ptr[1]->canframes_rx_norm, cfg->can2_rxqnorm_num, ram08);
-        ram08 += (cfg->can2_rxqnorm_num * sizeof(hal_canfifo_item_t));
+        //hal_canfifo_hid_init(&s_hal_can_portdatastruct_ptr[1]->canframes_rx_norm, cfg->can2_rxqnorm_num, ram08);
+        hal_tools_fifo_init(&s_hal_can_portdatastruct_ptr[1]->canframes_rx_norm, cfg->can2_rxqnorm_num, sizeof(hal_can_frame_t), ram08, (uint8_t*)&defcanframe);
+        ram08 += (cfg->can2_rxqnorm_num * sizeof(hal_can_frame_t));
         
-        hal_canfifo_hid_init(&s_hal_can_portdatastruct_ptr[1]->canframes_tx_norm, cfg->can2_txqnorm_num, ram08);
-        ram08 += (cfg->can2_txqnorm_num * sizeof(hal_canfifo_item_t));
+        //hal_canfifo_hid_init(&s_hal_can_portdatastruct_ptr[1]->canframes_tx_norm, cfg->can2_txqnorm_num, ram08);
+        hal_tools_fifo_init(&s_hal_can_portdatastruct_ptr[1]->canframes_tx_norm, cfg->can2_txqnorm_num, sizeof(hal_can_frame_t), ram08, (uint8_t*)&defcanframe);
+        ram08 += (cfg->can2_txqnorm_num * sizeof(hal_can_frame_t));
     }
 
     return(hal_res_OK);
@@ -627,7 +661,7 @@ extern hal_result_t hal_can_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
 
 static hal_boolval_t s_hal_can_supported_is(hal_can_port_t port)
 {
-    return(hal_base_hid_byte_bitcheck(hal_brdcfg_can__supported_mask, HAL_can_port2index(port)) );
+    return(hal_tools_bitoperator_byte_bitcheck(hal_brdcfg_can__supported_mask, HAL_can_port2index(port)) );
 }
 
 static void s_hal_can_initted_set(hal_can_port_t port)
@@ -648,33 +682,38 @@ static hal_boolval_t s_hal_can_initted_is(hal_can_port_t port)
   */
 static void s_hal_can_isr_sendframes_canx(hal_can_port_t port)
 {
-    hal_canfifo_item_t *canframe_ptr;
-    CanTxMsg TxMessage =
+    static CanTxMsg TxMessage =
     {
-        .IDE   = CAN_ID_STD,        // only stdid are managed
-        .ExtId = 0,                 // since frame-id is std it is not used by stm32lib
-        .RTR   = CAN_RTR_DATA       // only data frame are managed    
-    };
-
+        .StdId  = 0,                // can be changed. it is a uint32_t
+        .ExtId  = 0,                // fixed: not used as frame-id is always std
+        .IDE    = CAN_Id_Standard,  // fixed: always std
+        .RTR    = CAN_RTR_Data,     // fixed: always data frames
+        .DLC    = 0,                // can be changed. it is a uint8_t
+        .Data   = {0}               // can be changed. it is ... 8 bytes        
+    }; 
+    
+    uint32_t* const txmsgiden = &TxMessage.StdId;
+    uint8_t*  const txmsgsize = &TxMessage.DLC;
+    uint64_t* const txmsgdata = (uint64_t*) TxMessage.Data;  
+    
     hal_can_portdatastructure_t *cport = s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
+    hal_tools_fifo_t *fifotx = &cport->canframes_tx_norm;
 
     s_hal_can_isr_tx_disable(port);
 
-    while( (hal_canfifo_hid_size(&cport->canframes_tx_norm) > 0) )
+    while( (hal_tools_fifo_size(fifotx) > 0) )
     {
-        uint8_t res = 0;
+        hal_can_frame_t* pcanframe = (hal_can_frame_t*) hal_tools_fifo_front16(fifotx);
         
-        canframe_ptr = hal_canfifo_hid_front(&cport->canframes_tx_norm);
-        TxMessage.StdId = canframe_ptr->id & 0x7FF;
-        TxMessage.DLC = canframe_ptr->size;
-        *(uint64_t*)TxMessage.Data = *((uint64_t*)canframe_ptr->data);
+        // 
+        *txmsgiden      = pcanframe->id & 0x7FF; // acemor: we could remove 0x7ff because CAN_Transmit() shifts it 21 positions up.
+        *txmsgsize      = pcanframe->size;
+        *txmsgdata      = *((uint64_t*)pcanframe->data);
 
-        // CAN_Transmit() returns the number of mailbox used in transmission or CAN_TxStatus_NoMailBox if there is no empty mailbox
-       	res = CAN_Transmit(HAL_can_port2peripheral(port), &TxMessage);
-
-        if(res != CAN_TxStatus_NoMailBox)
-        {   // if the CAN_Transmit() was succesful ... remove the sent from from fifo-tx and call the user-defined callback
-        	hal_canfifo_hid_pop(&cport->canframes_tx_norm);
+        // CAN_Transmit() returns the number of the mailbox used in transmission or CAN_TxStatus_NoMailBox if there is no empty mailbox
+        if(CAN_TxStatus_NoMailBox != CAN_Transmit(HAL_can_port2peripheral(port), &TxMessage))
+        {   // if the CAN_Transmit() was succesful ... remove the sent frame from from fifo-tx and call the user-defined callback
+        	hal_tools_fifo_pop(fifotx);
             if(NULL != cport->cfg.callback_on_tx)
             {
                 cport->cfg.callback_on_tx(cport->cfg.arg_cb_tx);
@@ -682,15 +721,64 @@ static void s_hal_can_isr_sendframes_canx(hal_can_port_t port)
         }
         else
         {   // there is no empty mailbox to assign our frame ... we exit the loop without checking if there are still frames in fifo-tx.
+            // SEE (@#): s_hal_can_isr_tx_enable(port);
             break;
         }
 
     }
 
-    if(hal_canfifo_hid_size(&cport->canframes_tx_norm) > 0)
+    // we exit from teh previous loop either if the fifo is empty (thus the following control is useless) but also if CAN_Transmit() fails.
+    // in such latter case we need the control in here. (@#) however we could move s_hal_can_isr_tx_enable(port) just before the break and avoid
+    // this call of hal_tools_fifo_size() > 0.
+    if(hal_tools_fifo_size(fifotx) > 0)
 	{   // we still have some frames to send, thus we enable the isr on tx which triggers as soon any of the transmit mailboxes gets empty.
     	s_hal_can_isr_tx_enable(port);
 	}
+    
+    
+//     hal_canfifo_item_t *canframe_ptr;
+//     CanTxMsg TxMessage =
+//     {
+//         .IDE   = CAN_ID_STD,        // only stdid are managed
+//         .ExtId = 0,                 // since frame-id is std it is not used by stm32lib
+//         .RTR   = CAN_RTR_DATA       // only data frame are managed    
+//     };
+
+//     hal_can_portdatastructure_t *cport = s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
+
+//     s_hal_can_isr_tx_disable(port);
+
+//     while( (hal_canfifo_hid_size(&cport->canframes_tx_norm) > 0) )
+//     {
+//         uint8_t res = 0;
+//         
+//         canframe_ptr = hal_canfifo_hid_front(&cport->canframes_tx_norm);
+//         TxMessage.StdId = canframe_ptr->id & 0x7FF;
+//         TxMessage.DLC = canframe_ptr->size;
+//         *(uint64_t*)TxMessage.Data = *((uint64_t*)canframe_ptr->data);
+
+//         // CAN_Transmit() returns the number of mailbox used in transmission or CAN_TxStatus_NoMailBox if there is no empty mailbox
+//        	res = CAN_Transmit(HAL_can_port2peripheral(port), &TxMessage);
+
+//         if(res != CAN_TxStatus_NoMailBox)
+//         {   // if the CAN_Transmit() was succesful ... remove the sent from from fifo-tx and call the user-defined callback
+//         	hal_canfifo_hid_pop(&cport->canframes_tx_norm);
+//             if(NULL != cport->cfg.callback_on_tx)
+//             {
+//                 cport->cfg.callback_on_tx(cport->cfg.arg_cb_tx);
+//             }
+//         }
+//         else
+//         {   // there is no empty mailbox to assign our frame ... we exit the loop without checking if there are still frames in fifo-tx.
+//             break;
+//         }
+
+//     }
+
+//     if(hal_canfifo_hid_size(&cport->canframes_tx_norm) > 0)
+// 	{   // we still have some frames to send, thus we enable the isr on tx which triggers as soon any of the transmit mailboxes gets empty.
+//     	s_hal_can_isr_tx_enable(port);
+// 	}
  
 }
 
@@ -704,30 +792,76 @@ static void s_hal_can_isr_sendframes_canx(hal_can_port_t port)
   */
 static void s_hal_can_isr_recvframe_canx(hal_can_port_t port)
 {
-    hal_canfifo_item_t *canframe_ptr;
-    CanRxMsg RxMessage;
-    hal_can_portdatastructure_t *cport = s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
-
-    canframe_ptr = hal_canfifo_hid_getFirstFree(&cport->canframes_rx_norm);
-    if(NULL == canframe_ptr)
-    {   // rx-fifo is full ...  we remove oldest frame
-        hal_canfifo_hid_pop(&cport->canframes_rx_norm); //remove the oldest frame
-        canframe_ptr = hal_canfifo_hid_getFirstFree(&cport->canframes_rx_norm);
-    }
+    static hal_can_frame_t canframe =
+    {
+        .id         = 0,
+        .id_type    = hal_can_frameID_std,
+        .frame_type = hal_can_frame_data,
+        .size       = 0,
+        .unused     = 0,
+        .data       = {0}      
+    };
     
+    uint64_t* const data = (uint64_t*) canframe.data;
+    
+    hal_can_portdatastructure_t *cport = s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
+    hal_tools_fifo_t* fiforx = &cport->canframes_rx_norm;
+    
+    //hal_can_frame_t* pcanframe =  NULL;
+    CanRxMsg RxMessage;    
+    
+    if(hal_true == hal_tools_fifo_full(fiforx))
+    {   // remove oldest frame
+        hal_tools_fifo_pop(fiforx);        
+    }
+
+    //pcanframe = hal_tools_fifo_next_free(fiforx); // the pointer of the position where a new canframe would be put.
+    
+        
     // get the message from fifo-0 of canx peripheral
     CAN_Receive(HAL_can_port2peripheral(port), CAN_FIFO0, &RxMessage);
     
     // build the canframe inside the rx-fifo with the message content
-    canframe_ptr->id = RxMessage.StdId;
-    canframe_ptr->size = RxMessage.DLC;
-    *((uint64_t*)canframe_ptr->data) = *((uint64_t*)RxMessage.Data);
+    //pcanframe->id   = RxMessage.StdId;
+    //pcanframe->size = RxMessage.DLC;
+    //*((uint64_t*)pcanframe->data) = *((uint64_t*)RxMessage.Data);
+    canframe.id     = RxMessage.StdId;
+    canframe.size   = RxMessage.DLC;
+    *data           = *((uint64_t*)RxMessage.Data);
+    
+    hal_tools_fifo_put16(fiforx, (uint8_t*)&canframe);
 
     // if a callback is set, invoke it
     if(NULL != cport->cfg.callback_on_rx )
     {
     	cport->cfg.callback_on_rx(cport->cfg.arg_cb_rx);
-    }
+    }   
+    
+    
+//     hal_canfifo_item_t *canframe_ptr;
+//     CanRxMsg RxMessage;
+//     hal_can_portdatastructure_t *cport = s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
+
+//     canframe_ptr = hal_canfifo_hid_getFirstFree(&cport->canframes_rx_norm);
+//     if(NULL == canframe_ptr)
+//     {   // rx-fifo is full ...  we remove oldest frame
+//         hal_canfifo_hid_pop(&cport->canframes_rx_norm); //remove the oldest frame
+//         canframe_ptr = hal_canfifo_hid_getFirstFree(&cport->canframes_rx_norm);
+//     }
+//     
+//     // get the message from fifo-0 of canx peripheral
+//     CAN_Receive(HAL_can_port2peripheral(port), CAN_FIFO0, &RxMessage);
+//     
+//     // build the canframe inside the rx-fifo with the message content
+//     canframe_ptr->id = RxMessage.StdId;
+//     canframe_ptr->size = RxMessage.DLC;
+//     *((uint64_t*)canframe_ptr->data) = *((uint64_t*)RxMessage.Data);
+
+//     // if a callback is set, invoke it
+//     if(NULL != cport->cfg.callback_on_rx )
+//     {
+//     	cport->cfg.callback_on_rx(cport->cfg.arg_cb_rx);
+//     }
 
 }
 
@@ -1027,7 +1161,7 @@ static hal_result_t s_hal_can_tx_normprio(hal_can_port_t port, hal_can_frame_t *
     s_hal_can_isr_tx_disable(port);
 
     // put frame in fifo out normal priority
-    res = hal_canfifo_hid_put(&cport->canframes_tx_norm, frame->id, frame->size, frame->data);
+    res = hal_tools_fifo_put16(&cport->canframes_tx_norm, (uint8_t*)frame);
 
     // failed to put in fifo
     if(hal_res_OK != res)
@@ -1066,8 +1200,57 @@ static hal_result_t s_hal_can_tx_normprio(hal_can_port_t port, hal_can_frame_t *
         s_hal_can_isr_sendframes_canx(port); //s_hal_can_sendframes_canx(port);
     }
 
-    return(res);
-
+    return(res);    
+    
+//     hal_can_portdatastructure_t *cport = s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
+//
+//     hal_result_t res = hal_res_NOK_generic;
+//    
+//     
+//     // disable interrupt in can 1 or 2 for tx depending on value of port: use the nvic
+//     s_hal_can_isr_tx_disable(port);
+//
+//     // put frame in fifo out normal priority
+//     res = hal_canfifo_hid_put(&cport->canframes_tx_norm, frame->id, frame->size, frame->data);
+//
+//     // failed to put in fifo
+//     if(hal_res_OK != res)
+//     {   // if i cannot tx means that the queue is full, thus ... 
+//         if(hal_can_send_normprio_now == sm)
+//         {   // if send-now i empty the queue
+//             s_hal_can_isr_sendframes_canx(port); //s_hal_can_sendframes_canx(port);
+//         }
+//         else
+//         {   // if send-later i dont empty the queue
+//             ;
+//         }
+//
+//         return(hal_res_NOK_busy);
+//
+//     	/* Non posso abilitare qui interrupt in tx, perche' nel caso in cui la CAN_put sia 
+//     	gia' stata invocata con flag "send now", vengono spediti anche i pachetti aggiunti 
+//     	successivamente in coda con flag "send later" */
+//     
+//     
+//         /* Se mi e' stato chiesto di spedire chiamo isr indipendentemente all'esito della put.
+//         Se la put ritorna ok, allora significa che ha inserito il frame in input e lo ha spedito;
+//         altrimenti significa che la coda e' piena e quindi ho spedito i frame presenti in coda e
+//         il frame passato in input e' andato perso.
+//         Per spedirlo occorre invocare un'altra volta la can_put */
+//     
+//     }
+//     else
+//     {   // i could put a frame inside the queue .
+//         // good for you
+//     }
+//
+//     // if i must send now ... i transmit 
+//     if(hal_can_send_normprio_now == sm)
+//     {
+//         s_hal_can_isr_sendframes_canx(port); //s_hal_can_sendframes_canx(port);
+//     }
+//
+//     return(res);
 }
 
 

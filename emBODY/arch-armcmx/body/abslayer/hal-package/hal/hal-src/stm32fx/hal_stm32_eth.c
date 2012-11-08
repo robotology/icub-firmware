@@ -43,6 +43,8 @@
 
 #include "hal_stm32_gpio_hid.h"
 
+#include "utils/hal_tools.h"
+
 
 //#define HAL_USE_EVENTVIEWER_ETH
 
@@ -439,7 +441,7 @@ extern hal_result_t hal_eth_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
 
 static hal_boolval_t s_hal_eth_supported_is(void)
 {
-    return(hal_base_hid_byte_bitcheck(hal_brdcfg_eth__supported_mask, 0) );
+    return(hal_tools_bitoperator_byte_bitcheck(hal_brdcfg_eth__supported_mask, 0) );
 }
 
 static void s_hal_eth_initted_set(void)

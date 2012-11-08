@@ -37,6 +37,7 @@
 #include "hal_stm32_base_hid.h" 
 #include "hal_gpio.h"
 #include "hal_brdcfg.h"
+#include "utils/hal_tools.h"
 
 
 
@@ -219,7 +220,7 @@ extern hal_result_t hal_led_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
 
 static hal_boolval_t s_hal_led_supported_is(hal_led_t led)
 {
-    return(hal_base_hid_byte_bitcheck(hal_brdcfg_led__supported_mask, HAL_led_t2index(led)) );
+    return(hal_tools_bitoperator_byte_bitcheck(hal_brdcfg_led__supported_mask, HAL_led_t2index(led)) );
 }
 
 static void s_hal_led_initted_set(hal_led_t led)

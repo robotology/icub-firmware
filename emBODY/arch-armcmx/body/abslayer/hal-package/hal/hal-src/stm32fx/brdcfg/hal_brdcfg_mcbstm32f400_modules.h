@@ -45,16 +45,19 @@
 #define     HAL_USE_I2C
 #define     HAL_USE_LED
 #undef  HAL_USE_SWITCH
+//#define     HAL_USE_SPI
+#undef      HAL_USE_SPI4ENCODER
 #define     HAL_USE_SYS
 #define     HAL_USE_TIMER
+#define     HAL_USE_TOOLS
 #define     HAL_USE_TRACE
 #define     HAL_USE_WATCHDOG
 
-#define     HAL_USE_SENSOR_TEMP
-#define     HAL_USE_SENSOR_GYRO
-#define     HAL_USE_SENSOR_ACCEL
-#define     HAL_USE_DEVICE_ST_L3G4200D
-#define     HAL_USE_DEVICE_ST_LIS3DH
+// #define     HAL_USE_SENSOR_TEMP
+// #define     HAL_USE_SENSOR_GYRO
+// #define     HAL_USE_SENSOR_ACCEL
+// #define     HAL_USE_DEVICE_ST_L3G4200D
+// #define     HAL_USE_DEVICE_ST_LIS3DH
 
 
 // - exceptions -------------------------------------------------------------------------------------------------------

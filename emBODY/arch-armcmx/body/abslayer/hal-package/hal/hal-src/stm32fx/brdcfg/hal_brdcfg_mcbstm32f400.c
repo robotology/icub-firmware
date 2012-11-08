@@ -18,7 +18,7 @@
 #include "hal_base.h"
 #include "string.h"
 #include "hal_stm32_base_hid.h"
-#include "hal_stm32_spi4encoder_hid.h"
+#include "hal_stm32_spi_hid.h"
 #include "hal_stm32_eth_hid.h"
 #include "hal_stm32_eth_def.h"
 #include "hal_eeprom.h"
@@ -317,11 +317,103 @@
     };
 #endif//HAL_USE_LED
 
+   
+#ifdef HAL_USE_SPI
+    extern const uint8_t hal_brdcfg_spi__supported_mask             = (1 << hal_spi_port1) | (1 << hal_spi_port2) | (1 << hal_i2c_port3);
+
+    extern const hal_gpio_cfg_t hal_brdcfg_spi__miso[]      =
+    {
+        {   // spi1
+            .port     = hal_gpio_portA, 
+            .pin      = hal_gpio_pin6,        
+            .dir      = hal_gpio_dirALT,
+            .speed    = hal_gpio_speed_default
+        },
+        
+        {   // spi2
+            .port     = hal_gpio_portC, 
+            .pin      = hal_gpio_pin2,        
+            .dir      = hal_gpio_dirALT,
+            .speed    = hal_gpio_speed_default        
+        },
+        {   // spi3
+            .port     = hal_gpio_portB, 
+            .pin      = hal_gpio_pin4,        
+            .dir      = hal_gpio_dirALT,
+            .speed    = hal_gpio_speed_default        
+        }        
+    };
+    extern const hal_gpio_cfg_t hal_brdcfg_spi__mosi[]      =
+    {
+        {   // spi1
+            .port     = hal_gpio_portB, 
+            .pin      = hal_gpio_pin5,        
+            .dir      = hal_gpio_dirALT,
+            .speed    = hal_gpio_speed_default
+        },
+        
+        {   // spi2
+            .port     = hal_gpio_portC, 
+            .pin      = hal_gpio_pin3,        
+            .dir      = hal_gpio_dirALT,
+            .speed    = hal_gpio_speed_default        
+        },
+        {   // spi3
+            .port     = hal_gpio_portC, 
+            .pin      = hal_gpio_pin12,        
+            .dir      = hal_gpio_dirALT,
+            .speed    = hal_gpio_speed_default        
+        }     
+    };
+    extern const hal_gpio_cfg_t hal_brdcfg_spi__sck[]      =
+    {
+        {   // spi1
+            .port     = hal_gpio_portA, 
+            .pin      = hal_gpio_pin5,        
+            .dir      = hal_gpio_dirALT,
+            .speed    = hal_gpio_speed_default
+        },
+        
+        {   // spi2
+            .port     = hal_gpio_portB, 
+            .pin      = hal_gpio_pin10,        
+            .dir      = hal_gpio_dirALT,
+            .speed    = hal_gpio_speed_default        
+        },
+        {   // spi3
+            .port     = hal_gpio_portC, 
+            .pin      = hal_gpio_pin10,        
+            .dir      = hal_gpio_dirALT,
+            .speed    = hal_gpio_speed_default        
+        }     
+    };    
+#endif//HAL_USE_SPI
     
 #ifdef HAL_USE_SPI4ENCODER
     extern const uint8_t hal_brdcfg_spi4encoder__supported_mask = 0x07;  // tutte e 3 le spi 
 #endif//HAL_USE_SPI4ENCODER
     
+#ifdef  HAL_USE_SYS
+    extern const hal_sys_hid_clock_cfg_t hal_brdcfg_sys__clockcfg =
+    {
+        .sourceclock        = hal_sys_refclock_pll_on_external_xtl,  
+        .intclockspeed      = 16000000,
+        .extclockspeed      = 25000000,
+        .targetspeeds       =
+        {   
+            .cpu                = 168000000,
+            .fastbus            =  84000000,
+            .slowbus            =  42000000
+        },
+        .pllcfg             =
+        {
+            .m                  =  25, 
+            .n                  = 336,
+            .p                  = 2,
+            .q                  = 7
+        }
+    };        
+#endif//HAL_USE_SYS            
     
 #ifdef HAL_USE_SWITCH
     extern const hal_boolval_t hal_brdcfg_switch__supported         = hal_false;

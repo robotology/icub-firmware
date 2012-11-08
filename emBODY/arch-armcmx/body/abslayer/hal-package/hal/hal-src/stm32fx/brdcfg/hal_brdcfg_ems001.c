@@ -36,7 +36,6 @@
 #include "hal_base.h"
 #include "hal_sys.h"
 #include "hal_stm32_base_hid.h"
-#include "hal_stm32_spi4encoder_hid.h"
 #include "hal_stm32_eth_hid.h"
 #include "hal_stm32_eth_def.h"
 #include "hal_eeprom.h"
@@ -342,9 +341,27 @@
     extern const hal_gpio_cfg_t hal_brdcfg_switch__gpio_reset       = { .port = hal_gpio_portB, .pin = hal_gpio_pin2,   .dir = hal_gpio_dirOUT, .speed = hal_gpio_speed_low  }; 
 #endif//HAL_USE_SWITCH
 
-#ifdef HAL_USE_SPI4ENCODER
-    extern const uint8_t hal_brdcfg_spi4encoder__supported_mask = 0x05;  // spi1 and spi3
-#endif//HAL_USE_SPI4ENCODER
+#ifdef  HAL_USE_SYS
+    extern const hal_sys_hid_clock_cfg_t hal_brdcfg_sys__clockcfg =
+    {
+        .sourceclock        = hal_sys_refclock_pll_on_external_xtl, 
+        .intclockspeed      =  8000000,
+        .extclockspeed      = 25000000,
+        .targetspeeds       =
+        {   
+            .cpu                = 72000000,
+            .fastbus            = 72000000,
+            .slowbus            = 36000000
+        },
+        .pllcfg             =
+        {   // pll2clock = pll2mul*(hse/prediv2), speedcpu = pllmul*(pll2clock/prediv1) 
+            .prediv2            = 5, 
+            .pll2mul            = 8,
+            .prediv1            = 5,
+            .pllmul             = 9
+        }
+    };       
+#endif//HAL_USE_SYS    
     
 #ifdef HAL_USE_TIMER
     extern const uint8_t hal_brdcfg_timer__supported_mask           = 

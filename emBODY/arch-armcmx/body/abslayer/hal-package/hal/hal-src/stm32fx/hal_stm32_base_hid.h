@@ -42,14 +42,14 @@
 
 // - definition of hidden structs -------------------------------------------------------------------------------------
 
-typedef struct
-{
-    uint8_t capacity;
-    uint8_t size;
-    uint8_t index;
-    uint8_t sizeofitem;
-    uint8_t *data;
-} hal_genericfifo_t;
+// typedef struct
+// {
+//     uint8_t capacity;
+//     uint8_t size;
+//     uint8_t index;
+//     uint8_t sizeofitem;
+//     uint8_t *data;
+// } hal_base_genericfifo_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
@@ -63,103 +63,106 @@ extern hal_result_t hal_base_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory);
 
 extern void hal_base_hid_on_fatalerror(hal_fatalerror_t errorcode, const char * errormsg);
 
-extern void hal_base_hid_genericfifo_init(hal_genericfifo_t *gf, uint8_t capacity, uint8_t sizeofitem, uint8_t *data);
-extern void hal_base_hid_genericfifo_reset(hal_genericfifo_t *gf);
-extern hal_result_t hal_base_hid_genericfifo_put(hal_genericfifo_t *gf, uint8_t *data);
-extern hal_result_t hal_base_hid_genericfifo_get(hal_genericfifo_t *gf, uint8_t *data, uint8_t *size);
-extern uint8_t * hal_base_hid_genericfifo_front(hal_genericfifo_t *gf);
-extern void hal_base_hid_genericfifo_pop(hal_genericfifo_t *gf);
-extern uint8_t hal_base_hid_genericfifo_size(hal_genericfifo_t *gf);
-
+// #if 0
+// extern void hal_base_hid_genericfifo_init(hal_base_genericfifo_t *gf, uint8_t capacity, uint8_t sizeofitem, uint8_t *data);
+// extern void hal_base_hid_genericfifo_reset(hal_base_genericfifo_t *gf);
+// extern void hal_base_hid_genericfifo_clear(hal_base_genericfifo_t *gf);
+// extern hal_result_t hal_base_hid_genericfifo_put(hal_base_genericfifo_t *gf, uint8_t *data);
+// extern hal_result_t hal_base_hid_genericfifo_get(hal_base_genericfifo_t *gf, uint8_t *data, uint8_t *size);
+// extern uint8_t * hal_base_hid_genericfifo_front(hal_base_genericfifo_t *gf);
+// extern void hal_base_hid_genericfifo_pop(hal_base_genericfifo_t *gf);
+// extern uint8_t hal_base_hid_genericfifo_size(hal_base_genericfifo_t *gf);
+// #endif
 extern void hal_base_hid_osal_scheduling_suspend(void);
 extern void hal_base_hid_osal_scheduling_restart(void);
 
 
 // - definition of extern hidden inline functions ---------------------------------------------------------------------
 
+// #if 0
+// inline extern hal_boolval_t hal_base_hid_byte_bitcheck(uint8_t byte, uint8_t bit)
+// {
 
-inline extern hal_boolval_t hal_base_hid_byte_bitcheck(uint8_t byte, uint8_t bit)
-{
+//     if(byte & (1<<bit))
+//     {
+//         return(hal_true);
+//     }
+//     else
+//     {
+//         return(hal_false);
+//     }  
+// }
 
-    if(byte & (1<<bit))
-    {
-        return(hal_true);
-    }
-    else
-    {
-        return(hal_false);
-    }  
-}
+// inline extern void hal_base_hid_byte_bitset(uint8_t* byte, uint8_t bit)
+// {
+//     (*byte) |= (1<<bit);    
+// }
 
-inline extern void hal_base_hid_byte_bitset(uint8_t* byte, uint8_t bit)
-{
-    (*byte) |= (1<<bit);    
-}
+// inline extern void hal_base_hid_byte_bitclear(uint8_t* byte, uint8_t bit)
+// {
+//     (*byte) &= (~(1<<bit));    
+// }
 
-inline extern void hal_base_hid_byte_bitclear(uint8_t* byte, uint8_t bit)
-{
-    (*byte) &= (~(1<<bit));    
-}
+// inline extern void hal_base_hid_byte_bittoggle(uint8_t* byte, uint8_t bit)
+// {
+//     (*byte) ^= (1<<bit);    
+// }
 
-inline extern void hal_base_hid_byte_bittoggle(uint8_t* byte, uint8_t bit)
-{
-    (*byte) ^= (1<<bit);    
-}
+// inline extern hal_boolval_t hal_base_hid_halfword_bitcheck(uint16_t hword, uint8_t bit)
+// {
+//     if(hword & (1<<bit))
+//     {
+//         return(hal_true);
+//     }
+//     else
+//     {
+//         return(hal_false);
+//     }
+// }
 
-inline extern hal_boolval_t hal_base_hid_halfword_bitcheck(uint16_t hword, uint8_t bit)
-{
-    if(hword & (1<<bit))
-    {
-        return(hal_true);
-    }
-    else
-    {
-        return(hal_false);
-    }
-}
+// inline extern void hal_base_hid_halfword_bitset(uint16_t* hword, uint8_t bit)
+// {
+//     (*hword) |= (1<<bit);    
+// }
 
-inline extern void hal_base_hid_halfword_bitset(uint16_t* hword, uint8_t bit)
-{
-    (*hword) |= (1<<bit);    
-}
+// inline extern void hal_base_hid_halfword_bitclear(uint16_t* hword, uint8_t bit)
+// {
+//     (*hword) &= (~(1<<bit));    
+// }
 
-inline extern void hal_base_hid_halfword_bitclear(uint16_t* hword, uint8_t bit)
-{
-    (*hword) &= (~(1<<bit));    
-}
+// inline extern void hal_base_hid_halfword_bittoggle(uint16_t* hword, uint8_t bit)
+// {
+//     (*hword) ^= (1<<bit);    
+// }
 
-inline extern void hal_base_hid_halfword_bittoggle(uint16_t* hword, uint8_t bit)
-{
-    (*hword) ^= (1<<bit);    
-}
+// inline extern hal_boolval_t hal_base_hid_word_bitcheck(uint32_t word, uint8_t bit)
+// {
+//     if(word & (1<<bit))
+//     {
+//         return(hal_true);
+//     }
+//     else
+//     {
+//         return(hal_false);
+//     }
+//  
+// }
 
-inline extern hal_boolval_t hal_base_hid_word_bitcheck(uint32_t word, uint8_t bit)
-{
-    if(word & (1<<bit))
-    {
-        return(hal_true);
-    }
-    else
-    {
-        return(hal_false);
-    }
- 
-}
+// inline extern void hal_base_hid_word_bitset(uint32_t* word, uint8_t bit)
+// {
+//     (*word) |= (1<<bit);    
+// }
 
-inline extern void hal_base_hid_word_bitset(uint32_t* word, uint8_t bit)
-{
-    (*word) |= (1<<bit);    
-}
+// inline extern void hal_base_hid_word_bitclear(uint32_t* word, uint8_t bit)
+// {
+//     (*word) &= (~(1<<bit));    
+// }
 
-inline extern void hal_base_hid_word_bitclear(uint32_t* word, uint8_t bit)
-{
-    (*word) &= (~(1<<bit));    
-}
-
-inline extern void hal_base_hid_word_bittoggle(uint32_t* word, uint8_t bit)
-{
-    (*word) ^= (1<<bit);    
-}
+// inline extern void hal_base_hid_word_bittoggle(uint32_t* word, uint8_t bit)
+// {
+//     (*word) ^= (1<<bit);    
+// }
+// #endif
 
 #endif  // include guard
 

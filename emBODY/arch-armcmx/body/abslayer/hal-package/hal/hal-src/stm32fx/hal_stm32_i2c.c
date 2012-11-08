@@ -38,6 +38,8 @@
 #include "hal_stm32_base_hid.h"
 #include "hal_stm32_gpio_hid.h"
 
+#include "utils/hal_tools.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -151,8 +153,10 @@ static const I2C_InitTypeDef   s_hal_i2c_stm32_cfg =
 
 #if     defined(USE_STM32F1)
 static I2C_TypeDef* const s_hal_i2c_stmI2Cmap[] = { I2C1, I2C2, NULL };
+static const uint32_t s_hal_i2c_hw_rcc[] = { RCC_APB1Periph_I2C1, RCC_APB1Periph_I2C2, 0 };
 #elif   defined(USE_STM32F4)
 static I2C_TypeDef* const s_hal_i2c_stmI2Cmap[] = { I2C1, I2C2, I2C3 };
+static const uint32_t s_hal_i2c_hw_rcc[] = { RCC_APB1Periph_I2C1, RCC_APB1Periph_I2C2, RCC_APB1Periph_I2C3 };
 #endif
 
 
@@ -547,7 +551,7 @@ extern hal_boolval_t hal_i2c_hid_initted_is(hal_i2c_port_t port)
 
 static hal_boolval_t s_hal_i2c_supported_is(hal_i2c_port_t port)
 {
-    return(hal_base_hid_byte_bitcheck(hal_brdcfg_i2c__supported_mask, HAL_i2c_port2index(port)) );
+    return(hal_tools_bitoperator_byte_bitcheck(hal_brdcfg_i2c__supported_mask, HAL_i2c_port2index(port)) );
 }
 
 static void s_hal_i2c_initted_set(hal_i2c_port_t port)
@@ -619,8 +623,8 @@ static hal_result_t s_hal_i2c_init(hal_i2c_port_t port, const hal_i2c_cfg_t *cfg
 static void s_hal_i2c_hw_init(hal_i2c_port_t port)
 {
 #if     defined(USE_STM32F1) || defined(USE_STM32F4)
-
-    uint32_t RCC_APB1Periph_I2Cx = (hal_i2c_port1 == port) ? (RCC_APB1Periph_I2C1) : (RCC_APB1Periph_I2C2);
+    
+    uint32_t RCC_APB1Periph_I2Cx = s_hal_i2c_hw_rcc[HAL_i2c_port2index(port)];
     
 //    // system configuration controller clock
     #warning --> in stm32f4 removed "RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);" from i2c_hw_init() and it still works....
@@ -748,7 +752,7 @@ static void s_hal_i2c_hw_gpio_init(hal_i2c_port_t port)
     }
     else if(hal_i2c_port2 == port)
     {   
-        afname = GPIO_AF_I2C2;
+        afname = GPIO_AF_I2C2;  afmode = ENABLE;
         
         if( ((hal_gpio_portF == portscl) && (hal_gpio_pin1 == pinscl))  ||
             ((hal_gpio_portH == portscl) && (hal_gpio_pin4 == pinscl))  ||
@@ -766,7 +770,7 @@ static void s_hal_i2c_hw_gpio_init(hal_i2c_port_t port)
     }
     else if(hal_i2c_port3 == port)
     {
-        afname = GPIO_AF_I2C3;
+        afname = GPIO_AF_I2C3;  afmode = ENABLE;
         
         if( ((hal_gpio_portH == portscl) && (hal_gpio_pin7 == pinscl))  ||
             ((hal_gpio_portA == portscl) && (hal_gpio_pin8 == pinscl))  )
@@ -810,7 +814,7 @@ static void s_hal_i2c_hw_enable(hal_i2c_port_t port, const hal_i2c_cfg_t* cfg)
 {
 #if     defined(USE_STM32F1) || defined(USE_STM32F4)
     
-    #define HAL_i2c_port2stmI2C(p)          (s_hal_i2c_stmI2Cmap[HAL_i2c_port2index(p)])
+//    #define HAL_i2c_port2stmI2C(p)          (s_hal_i2c_stmI2Cmap[HAL_i2c_port2index(p)])
 
     I2C_TypeDef* I2Cx = HAL_i2c_port2stmI2C(port);
     

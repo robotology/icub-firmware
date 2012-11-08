@@ -27,11 +27,14 @@
     @date       09/12/2011
  **/
 
+// - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
+#include "hal_brdcfg_modules.h"
+
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
+#include "hal_stm32xx_include.h"
 #include "hal_base.h"
-
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
@@ -44,7 +47,52 @@
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
-// empty-section
+
+typedef enum 
+{
+    hal_sys_refclock_internal               = 0,
+    hal_sys_refclock_external_xtl           = 1,
+    hal_sys_refclock_external_osc           = 2,
+    hal_sys_refclock_pll_on_internal        = 3,
+    hal_sys_refclock_pll_on_external_xtl    = 4,   
+    hal_sys_refclock_pll_on_external_osc    = 5   
+} hal_sys_hid_sourceclock_t;
+
+#if     defined(USE_STM32F1)
+typedef struct 
+{   // pll2clock = pll2mul*(hse/prediv2), speedcpu = pllmul*(pll2clock/prediv1) 
+    uint32_t                        prediv2;    
+    uint32_t                        pll2mul;
+    uint32_t                        prediv1;
+    uint32_t                        pllmul;
+} hal_sys_hid_pll_cfg_t;
+#elif   defined(USE_STM32F4)
+typedef struct 
+{   // pllfreq = n*(source/m), speedcpu = pllfreq/p, 48mhz = pllfreq/q 
+    uint32_t                        m;    
+    uint32_t                        n;
+    uint32_t                        p;
+    uint32_t                        q;
+} hal_sys_hid_pll_cfg_t;
+#endif
+
+typedef struct 
+{
+    uint32_t                        cpu;
+    uint32_t                        fastbus;
+    uint32_t                        slowbus;
+} hal_sys_hid_target_speeds_t;
+
+
+typedef struct 
+{
+    hal_sys_hid_sourceclock_t       sourceclock;
+    uint32_t                        intclockspeed;    
+    uint32_t                        extclockspeed;
+    hal_sys_hid_target_speeds_t     targetspeeds;
+    hal_sys_hid_pll_cfg_t           pllcfg;
+} hal_sys_hid_clock_cfg_t;
+
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
