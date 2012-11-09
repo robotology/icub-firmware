@@ -104,13 +104,13 @@ typedef enum
 } eOmc_controlmode_t;
 
 
-EO_VERIFYproposition(xxx, (eomc_controlmode_cmd_position == eomc_controlmode_position));
-EO_VERIFYproposition(xxx, (eomc_controlmode_cmd_torque == eomc_controlmode_torque));
-EO_VERIFYproposition(xxx, (eomc_controlmode_cmd_impedance_pos == eomc_controlmode_impedance_pos));
-EO_VERIFYproposition(xxx, (eomc_controlmode_cmd_impedance_vel == eomc_controlmode_impedance_vel));
-EO_VERIFYproposition(xxx, (eomc_controlmode_cmd_current == eomc_controlmode_current));
-EO_VERIFYproposition(xxx, (eomc_controlmode_cmd_velocity == eomc_controlmode_velocity));
-EO_VERIFYproposition(xxx, (eomc_controlmode_cmd_openloop == eomc_controlmode_openloop));
+EO_VERIFYproposition(check, (eomc_controlmode_cmd_position == eomc_controlmode_position));
+EO_VERIFYproposition(check, (eomc_controlmode_cmd_torque == eomc_controlmode_torque));
+EO_VERIFYproposition(check, (eomc_controlmode_cmd_impedance_pos == eomc_controlmode_impedance_pos));
+EO_VERIFYproposition(check, (eomc_controlmode_cmd_impedance_vel == eomc_controlmode_impedance_vel));
+EO_VERIFYproposition(check, (eomc_controlmode_cmd_current == eomc_controlmode_current));
+EO_VERIFYproposition(check, (eomc_controlmode_cmd_velocity == eomc_controlmode_velocity));
+EO_VERIFYproposition(check, (eomc_controlmode_cmd_openloop == eomc_controlmode_openloop));
 
 
 
