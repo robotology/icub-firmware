@@ -207,7 +207,7 @@ extern const EOconstvector* const eo_cfg_appDB_constvec_motors__ptr = &s_eo_cfg_
 //};
 
 //No mais boards are coccented to eb6
-const EOconstvector  s_eo_cfg_appDB_constvec_sensors = 
+const EOconstvector  s_eo_cfg_appDB_constvec_snsrMais = 
 {
     EO_INIT(.size)              0, //sizeof(s_cfg_appDB_snrMais)/sizeof(eOappTheDB_cfg_snsrMaisInfo_t), 
     EO_INIT(.item_size)         0, //sizeof(eOappTheDB_cfg_snsrMaisInfo_t),
@@ -229,9 +229,9 @@ static const eOappTheDB_cfg_snsrStrainInfo_t  s_cfg_appDB_snsrStrain[] =
 };
 
 
-const EOconstvector  s_eo_cfg_appDB_constvec_sensors = 
+const EOconstvector  s_eo_cfg_appDB_constvec_snsrStrain = 
 {
-    EO_INIT(.size)              sizeof(s_cfg_appDB_snrStrain)/sizeof(eOappTheDB_cfg_snsrStrainInfo_t), 
+    EO_INIT(.size)              sizeof(s_cfg_appDB_snsrStrain)/sizeof(eOappTheDB_cfg_snsrStrainInfo_t), 
     EO_INIT(.item_size)         sizeof(eOappTheDB_cfg_snsrStrainInfo_t),
     EO_INIT(.item_array_data)   s_cfg_appDB_snsrStrain
 };
