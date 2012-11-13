@@ -260,12 +260,13 @@ static const eOappTheDB_cfg_jointInfo_t s_cfg_appDB_joints[] =
             EO_INIT(.indexinboard)               eo_icubCanProto_jm_index_first,
         }
     },    
-
+    { // 11
         EO_INIT(.canLoc)
         {
             EO_INIT(.belong2board)               MC4_ADDRCAN_8_BID,
             EO_INIT(.indexinboard)               eo_icubCanProto_jm_index_second,
         }
+    }
 };
 
 
@@ -301,9 +302,9 @@ static const eOappTheDB_cfg_snsrMaisInfo_t  s_cfg_appDB_snsrMais[] =
 };
 
 //one mais board is coccented to eb2
-const EOconstvector  s_eo_cfg_appDB_constvec_sensors = 
+const EOconstvector  s_eo_cfg_appDB_constvec_snsrMais = 
 {
-    EO_INIT(.size)              sizeof(s_cfg_appDB_snrMais)/sizeof(eOappTheDB_cfg_snsrMaisInfo_t), 
+    EO_INIT(.size)              sizeof(s_cfg_appDB_snsrMais)/sizeof(eOappTheDB_cfg_snsrMaisInfo_t), 
     EO_INIT(.item_size)         sizeof(eOappTheDB_cfg_snsrMaisInfo_t),
     EO_INIT(.item_array_data)   s_cfg_appDB_snsrMais
 };
@@ -323,7 +324,7 @@ extern const EOconstvector* const eo_cfg_appDB_constvec_snsrMais__ptr = &s_eo_cf
 //};
 
 //no strain board are connected to ems4
-const EOconstvector  s_eo_cfg_appDB_constvec_sensors = 
+const EOconstvector  s_eo_cfg_appDB_constvec_snsrStrain = 
 {
     EO_INIT(.size)              0, //sizeof(s_cfg_appDB_snrStrain)/sizeof(eOappTheDB_cfg_snsrStrainInfo_t), 
     EO_INIT(.item_size)         0, //sizeof(eOappTheDB_cfg_snsrStrainInfo_t),
