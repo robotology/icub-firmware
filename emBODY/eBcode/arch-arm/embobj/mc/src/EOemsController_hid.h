@@ -38,11 +38,15 @@ extern "C" {
  
 struct EOemsController_hid 
 {
+    emsBoardType_t boardType;
+    
     EOdecoupler *decoupler[3];
 
     EOaxisController *axis_controller[MAX_MOTORS];
 
     float torque_meas[MAX_MOTORS];
+    
+    int32_t enc_vel[MAX_MOTORS];
 
     //float encoder_pos[MAX_MOTORS];
     

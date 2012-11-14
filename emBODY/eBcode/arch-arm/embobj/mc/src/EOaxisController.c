@@ -141,6 +141,8 @@ extern void eo_axisController_StartCalibration(EOaxisController *o, int32_t pos,
 
     SET_BIT(MASK_CALIB_OK);
     
+    eo_pid_SafeMode(o->pidP, eobool_false);
+    
     return;
     
     RST_BIT(MASK_CALIB_OK);
@@ -207,21 +209,14 @@ extern void eo_axisController_ReadEncPos(EOaxisController *o, int32_t pos)
 {
     if (!o) return;
     
-    eo_speedometer_EncoderValid(o->speedmeter, pos);
+    eo_speedometer_SlowEncoderRead(o->speedmeter, pos);
 } 
 
-extern void eo_axisController_SkipEncPos(EOaxisController *o)
+extern void eo_axisController_ReadEncVel(EOaxisController *o, int32_t vel)
 {
     if (!o) return;
     
-    eo_speedometer_EncoderError(o->speedmeter);
-}
-
-extern void eo_axisController_ReadSpeed(EOaxisController *o, int32_t speed)
-{
-    if (!o) return;
-    
-    eo_speedometer_ReadSpeed(o->speedmeter, speed);
+    eo_speedometer_FastEncoderRead(o->speedmeter, vel);
 } 
 
 /*
@@ -370,11 +365,13 @@ extern int16_t eo_axisController_PWM(EOaxisController *o)
     int32_t pos = eo_speedometer_GetDistance(o->speedmeter);
     int32_t vel = eo_speedometer_GetVelocity(o->speedmeter);
     
+    /*
     if (CHK_BIT(MASK_CALIB_OK))
     {
         encoder_can_pos = pos;
         encoder_can_vel = vel;
     }
+    */
     
     if (o->vel_timer)
     {

@@ -43,18 +43,17 @@ struct EOpid_hid
 
     float Dn;
     float En;
-    float KIn;
+    float KKiIn;
     
     float Yoff;
-    float Ymax;
     float Imax;
-    float KImax;
+    
+    int32_t pwm_max;
+    int32_t pwm;
     
     float A;
     float B;
-    
-    int32_t pwm;
-    
+
     eObool_t safe_mode;
 }; 
 

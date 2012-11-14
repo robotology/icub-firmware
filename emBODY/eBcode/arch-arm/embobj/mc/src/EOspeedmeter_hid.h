@@ -36,21 +36,21 @@ extern "C" {
 
 struct EOspeedmeter_hid 
 {
-    int32_t FREQUENCYxTHR;
     int32_t impulse_per_revolution;
     int32_t impulse_per_revolution_by_2;
-    int32_t time_from_last_reading;
-    int32_t last_valid_reading;
-    int32_t last_reading;
+    
+    int32_t time_from_last_change;
+    
     int32_t calibration;
     int32_t distance;
+    int32_t pos;
     
     int32_t odo_x_freq;
     int32_t speed_filt;
     int32_t speed;
     int32_t dir;
   
-    eObool_t first_reading;
+    eObool_t first;
 }; 
 
 

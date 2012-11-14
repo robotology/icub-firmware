@@ -42,8 +42,6 @@ extern const int32_t EMS_FREQUENCY_INT32;
 
 #define LIMIT(min,x,max) if (x>(max)) x=(max); else if (x<(min)) x=(min)
 
-#define DELTA_THR 64
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
@@ -78,15 +76,15 @@ extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution)
 
     if (o)
     {
-        o->FREQUENCYxTHR = EMS_FREQUENCY_INT32 * (DELTA_THR + DELTA_THR/2);
         o->impulse_per_revolution = impulse_per_revolution;
         o->impulse_per_revolution_by_2 = impulse_per_revolution/2;
-        o->first_reading = eobool_true;
-        o->time_from_last_reading = 0;
-        o->last_valid_reading = 0;
-        o->last_reading = 0;
+        
+        o->time_from_last_change = 0;
+        o->first = eobool_true;
+        
         o->calibration = 0;
-        o->distance  = 0;
+        o->distance = 0;
+        o->pos = 0;
         
         o->odo_x_freq = 0;
         o->speed_filt = 0;
@@ -95,23 +93,6 @@ extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution)
     }
 
     return o;
-}
-
-extern void eo_speedometer_EncoderCalibrate(EOspeedmeter* o, int32_t new_calibration)
-{
-    o->distance += new_calibration - o->calibration;
-    o->calibration = new_calibration; 
-}
-
-extern void eo_speedometer_ReadSpeed(EOspeedmeter* o, int32_t speed)
-{
-    o->speed_filt = (o->speed_filt + speed + 1)/2;
-    o->odo_x_freq += o->speed_filt;
-}
-
-extern void eo_speedometer_EncoderError(EOspeedmeter* o)
-{
-    ++o->time_from_last_reading;
 }
 
 extern int32_t eo_speedometer_GetVelocity(EOspeedmeter* o)
@@ -124,15 +105,30 @@ extern int32_t eo_speedometer_GetDistance(EOspeedmeter* o)
     return o->distance + o->odo_x_freq/EMS_FREQUENCY_INT32;
 }
 
-extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
+extern void eo_speedometer_EncoderCalibrate(EOspeedmeter* o, int32_t new_calibration)
 {
-    if (o->first_reading)
-    {
-        o->first_reading = eobool_false;
-        o->time_from_last_reading = 0;
-        o->last_reading = encoder;
-        o->distance = encoder;
+    o->distance += new_calibration - o->calibration;
+    o->calibration = new_calibration; 
+}
 
+extern void eo_speedometer_FastEncoderRead(EOspeedmeter* o, int32_t vel)
+{
+    #ifdef USE_2FOC_FAST_ENCODER
+    o->speed_filt = (o->speed_filt + vel + 1)/2;
+    o->odo_x_freq += o->speed_filt;
+    #endif
+}
+
+extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t pos)
+{
+    if (o->first)
+    {
+        o->first = eobool_false;
+        o->time_from_last_change = 0;
+        
+        o->distance = pos;
+        o->pos = pos;
+        
         o->odo_x_freq = 0;
         o->speed_filt = 0;
         o->speed = 0;
@@ -143,7 +139,11 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
 
     ////////////////////////////////////////
     
-    int32_t delta = encoder - o->last_reading;
+    ++o->time_from_last_change;
+    
+    if (pos == ENC_INVALID) return;
+    
+    int32_t delta = pos - o->pos;
 
     if (delta > o->impulse_per_revolution_by_2)
     {
@@ -161,12 +161,12 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
         o->distance   += delta;
         o->odo_x_freq -= delta*EMS_FREQUENCY_INT32;
         
-        o->last_reading = encoder;
+        LIMIT(-16000, o->odo_x_freq, 16000);
+        
+        o->pos = pos;
     }
     
     #else
-    
-    ++o->time_from_last_reading;
     
     if (delta<=-32 || delta>=32 || (delta<0 && o->dir==-1) || (delta>0 && o->dir==1))
     {
@@ -175,22 +175,38 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
         o->distance   += delta;
         o->odo_x_freq -= delta_x_freq;
 
-        o->last_reading = encoder;
+        o->pos = pos;
         
-        o->speed = delta_x_freq / o->time_from_last_reading;
+        o->speed = delta_x_freq / o->time_from_last_change;
         
-        if (delta<0 ^ o->speed_filt<0) o->speed_filt = o->speed;
+        //int32_t speed_max = (o->time_from_last_change>2) ? delta_x_freq/(o->time_from_last_change-1) : delta_x_freq;
         
-        o->time_from_last_reading = 0;
+        if (delta > 0)
+        {
+            //if (o->speed_filt > speed_max) o->speed_filt = speed_max;
+            if (o->speed_filt > o->speed) o->speed_filt = o->speed;
+            
+            o->dir =  1;
+        }
+        else
+        {
+            //if (o->speed_filt < speed_max) o->speed_filt = speed_max;
+            if (o->speed_filt < o->speed) o->speed_filt = o->speed;
+            
+            o->dir = -1;
+        }
+        
+        o->time_from_last_change = 0;
     }
     else
     {
-        int32_t speed_max = 16000 / o->time_from_last_reading;
+        int32_t speed_max = 16000 / o->time_from_last_change;
         
         LIMIT(-speed_max, o->speed, speed_max);
+        LIMIT(-speed_max, o->speed_filt, speed_max);
     }
     
-    if (o->time_from_last_reading > 500)
+    if (o->time_from_last_change > 500)
     {
         o->odo_x_freq = 0;
         o->speed_filt = 0;
@@ -199,7 +215,14 @@ extern void eo_speedometer_EncoderValid(EOspeedmeter* o, int32_t encoder)
     }
     else
     {
-        o->speed_filt = (3*o->speed_filt + o->speed + 2) / 4;
+        if (!o->speed_filt || (o->speed_filt<0 ^ o->speed<0))
+        {
+            o->speed_filt = o->speed;
+        }
+        else
+        {
+            o->speed_filt = (7*o->speed_filt + o->speed + 4)/8;
+        }
         
         o->odo_x_freq += o->speed_filt;
         
