@@ -200,29 +200,29 @@ extern const EOconstvector* const eo_cfg_appDB_constvec_motors__ptr = &s_eo_cfg_
 /*****************************        S E N S O R S         ************************************/
 /***********************************************************************************************/
 
-//static const eOappTheDB_cfg_snsrMaisInfo_t  s_cfg_appDB_snsrMais[] = 
-//{
-//    {// 0
-//       EO_INIT(.belong2board)                       MAIS_ADDRCAN_14_BID,
-//    }
-//};
+// static const eOappTheDB_cfg_snsrMaisInfo_t  s_cfg_appDB_snsrMais[] = 
+// {
+    // {// 0
+       // EO_INIT(.belong2board)                       MAIS_ADDRCAN_14_BID,
+    // }
+// };
 
-//No mais boards are coccented to eb1
-const EOconstvector  s_eo_cfg_appDB_constvec_sensors = 
+//one mais board is coccented to eb2
+const EOconstvector  s_eo_cfg_appDB_constvec_snsrMais = 
 {
-    EO_INIT(.size)              0, //sizeof(s_cfg_appDB_snrMais)/sizeof(eOappTheDB_cfg_snsrMaisInfo_t), 
+    EO_INIT(.size)              0, //sizeof(s_cfg_appDB_snsrMais)/sizeof(eOappTheDB_cfg_snsrMaisInfo_t), 
     EO_INIT(.item_size)         0, //sizeof(eOappTheDB_cfg_snsrMaisInfo_t),
     EO_INIT(.item_array_data)   NULL //s_cfg_appDB_snsrMais
 };
 
 
-extern const EOconstvector* const eo_cfg_appDB_constvec_snsrMais__ptr = &s_eo_cfg_appDB_constvec;
+extern const EOconstvector* const eo_cfg_appDB_constvec_snsrMais__ptr = &s_eo_cfg_appDB_constvec_snsrMais;
 
 
 
 
 
-static const eOappTheDB_cfg_snsrStrainInfo_t  s_cfg_appDB_snsrStrain[] = 
+static const eOappTheDB_cfg_snsrStrainInfo_t  s_cfg_appDB_snsrStrain[] =
 {
     {// 0
        EO_INIT(.belong2board)                       STRAIN_ADDRCAN_14_BID,
@@ -230,11 +230,11 @@ static const eOappTheDB_cfg_snsrStrainInfo_t  s_cfg_appDB_snsrStrain[] =
 };
 
 
-const EOconstvector  s_eo_cfg_appDB_constvec_sensors = 
+const EOconstvector  s_eo_cfg_appDB_constvec_snsrStrain = 
 {
-    EO_INIT(.size)              sizeof(s_cfg_appDB_snrStrain)/sizeof(eOappTheDB_cfg_snsrStrainInfo_t), 
+    EO_INIT(.size)              sizeof(s_cfg_appDB_snsrStrain)/sizeof(eOappTheDB_cfg_snsrStrainInfo_t), 
     EO_INIT(.item_size)         sizeof(eOappTheDB_cfg_snsrStrainInfo_t),
-    EO_INIT(.item_array_data)   s_cfg_appDB_snsrStrain
+    EO_INIT(.item_array_data)  s_cfg_appDB_snsrStrain
 };
 
 
