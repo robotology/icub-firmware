@@ -97,6 +97,7 @@ static void s_hal_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char * err
     errorcode = errorcode;
     if(NULL != errormsg)
     {
+        hal_trace_puts(errormsg);
 //        hal_display_putstring(4, (uint8_t*)errormsg);
     }
 
