@@ -84,9 +84,12 @@ extern EOemsController* eo_emsController_Init(emsBoardType_t board_type)
 
     if (s_emsc)
     {
+        s_emsc->boardType = board_type;
+        
         for (uint8_t m=0; m<MAX_MOTORS; ++m)
         {
-            s_emsc->axis_controller[m] = NULL;     
+            s_emsc->axis_controller[m] = NULL;
+            s_emsc->enc_vel[m] = 0;
         }
 
         s_emsc->decoupler[DECOUPLER_POS] = NULL;
@@ -99,13 +102,13 @@ extern EOemsController* eo_emsController_Init(emsBoardType_t board_type)
                 break;
 
             case EMS_WAIST:
-                eo_emsController_SetDecoupler(DECOUPLER_PWM, decoupler_waist_pwm);
+                //eo_emsController_SetDecoupler(DECOUPLER_PWM, decoupler_waist_pwm);
                 break;
 
             case EMS_SHOULDER:
-                eo_emsController_SetDecoupler(DECOUPLER_POS, decoupler_shoulder_pos);
-                eo_emsController_SetDecoupler(DECOUPLER_TRQ, decoupler_shoulder_trq);
-                eo_emsController_SetDecoupler(DECOUPLER_PWM, decoupler_shoulder_pwm);
+                //eo_emsController_SetDecoupler(DECOUPLER_POS, decoupler_shoulder_pos);
+                //eo_emsController_SetDecoupler(DECOUPLER_TRQ, decoupler_shoulder_trq);
+                //eo_emsController_SetDecoupler(DECOUPLER_PWM, decoupler_shoulder_pwm);
                 break;
         }
     }
@@ -126,74 +129,51 @@ extern eObool_t eo_emsController_AddAxis(uint8_t naxis)
     return eobool_true;
 }
 
-extern void eo_emsController_SkipEncoders(void)
+extern void eo_emsController_ReadEncoders(int32_t *enc_pos)
 {
+    static int32_t axis_pos[MAX_MOTORS];
+    static int32_t axis_vel[MAX_MOTORS];
+
     if (!s_emsc) return;
 
     for (uint8_t i=0; i<MAX_MOTORS; ++i)
     {
+        axis_pos[i] = enc_pos[i];
+        axis_vel[i] = s_emsc->enc_vel[i];
+    }
+    
+    switch (s_emsc->boardType)
+    {
+    case EMS_SHOULDER:
+        if (enc_pos[0]==ENC_INVALID || enc_pos[1]==ENC_INVALID || enc_pos[2]==ENC_INVALID)
+        {
+            axis_pos[2] = ENC_INVALID;
+        }
+        else
+        {
+            axis_pos[2] += (65*(enc_pos[0]-enc_pos[1]))/40;
+        }
+        
+        axis_vel[2] += (65*(axis_vel[0]-axis_vel[1]))/40;
+        
+        break;
+    } // end switch
+    
+    for (uint8_t i=0; i<MAX_MOTORS; ++i)
+    {
         if (s_emsc->axis_controller[i])
         {
-            eo_axisController_SkipEncPos(s_emsc->axis_controller[i]);
-        }
-    }
-}
-
-extern void eo_emsController_ReadEncoders(int32_t *enc)
-{
-    static float encs_pos[MAX_MOTORS];
-    static float axis_pos[MAX_MOTORS];
-
-    if (!s_emsc) return;
-
-    if (s_emsc->decoupler[DECOUPLER_POS])
-    {
-        for (uint8_t i=0; i<MAX_MOTORS; ++i)
-        {
-            if (enc[i]==(int32_t)ENC_INVALID)
-            {
-                eo_emsController_SkipEncoders();
-
-                return;
-            }
-            
-            encs_pos[i]=(float)enc[i];
-        }
-
-        eo_decoupler_Mult(s_emsc->decoupler[DECOUPLER_POS], encs_pos, axis_pos);
-     
-        for (uint8_t i=0; i<MAX_MOTORS; ++i)
-        {
-            if (s_emsc->axis_controller[i])
-            {
-                eo_axisController_ReadEncPos(s_emsc->axis_controller[i], (int32_t)axis_pos[i]);
-            }
-        }     
-    }
-    else
-    {
-        for (uint8_t i=0; i<MAX_MOTORS; ++i)
-        {
-            if (s_emsc->axis_controller[i])
-            {
-                if (enc[i]==(int32_t)ENC_INVALID)
-                {
-                    eo_axisController_SkipEncPos(s_emsc->axis_controller[i]);
-                }
-                else
-                {
-                    eo_axisController_ReadEncPos(s_emsc->axis_controller[i], enc[i]);
-                }
-            }
+            eo_axisController_ReadEncPos(s_emsc->axis_controller[i], axis_pos[i]);
+            #ifdef USE_2FOC_FAST_ENCODER
+            eo_axisController_ReadEncVel(s_emsc->axis_controller[i], axis_vel[i]);
+            #endif
         }
     }
 }
 
 extern void eo_emsController_ReadSpeed(uint8_t axis, int32_t speed)
 {
-    if (!s_emsc) return;
-
-    eo_axisController_ReadSpeed(s_emsc->axis_controller[axis], speed);    
+    if (s_emsc) s_emsc->enc_vel[axis] = speed;   
 }
 
 extern void eo_emsController_ReadTorques(int32_t *torque)
@@ -210,7 +190,7 @@ extern void eo_emsController_ReadTorques(int32_t *torque)
 
     if (s_emsc->decoupler[DECOUPLER_TRQ])
     {
-        eo_decoupler_Mult(s_emsc->decoupler[DECOUPLER_TRQ], s_emsc->torque_meas, axis_trq);
+        //eo_decoupler_Mult(s_emsc->decoupler[DECOUPLER_TRQ], s_emsc->torque_meas, axis_trq);
         trq = axis_trq;
     }
 
@@ -260,30 +240,24 @@ extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq)
     eo_axisController_SetTrqRef(s_emsc->axis_controller[joint], trq);
 }
 
-extern void /*int16_t*/ eo_emsController_PWM(int16_t* pwm)
+extern void eo_emsController_PWM(int16_t* pwm)
 {
-    if (!s_emsc) return;// NULL;
-
-    static int16_t pwm_axis[MAX_MOTORS];
-    static int16_t pwm_motor[MAX_MOTORS];
+    if (!s_emsc) return;
 
     for (uint8_t i=0; i<MAX_MOTORS; ++i)
     {
         if (s_emsc->axis_controller[i])
         {
-            pwm_axis[i] = eo_axisController_PWM(s_emsc->axis_controller[i]);
+            pwm[i] = eo_axisController_PWM(s_emsc->axis_controller[i]);
         }
     }
-
-    if (s_emsc->decoupler[DECOUPLER_PWM])
+    
+    switch (s_emsc->boardType)
     {
-        //eo_decoupler_Mult(s_emsc->decoupler[DECOUPLER_PWM], pwm_axis, pwm_motor);
-        memcpy(pwm, pwm_motor, 2*MAX_MOTORS);
-        //return pwm_motor;    
+    case EMS_SHOULDER:
+        pwm[2] -= (65*(pwm[0]-pwm[1])/40);
+        break;
     }
-
-		memcpy(pwm, pwm_axis, 2*MAX_MOTORS);
-    //return pwm_axis;
 }
 
 

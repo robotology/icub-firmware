@@ -82,8 +82,7 @@ extern float decoupler_waist_pwm[4][4];
 extern EOaxisController* eo_axisController_New(void);
 
 extern void eo_axisController_ReadEncPos(EOaxisController *o, int32_t pos); 
-extern void eo_axisController_SkipEncPos(EOaxisController *o);
-extern void eo_axisController_ReadSpeed(EOaxisController *o, int32_t speed);
+extern void eo_axisController_ReadEncVel(EOaxisController *o, int32_t vel);
 
 //extern int32_t eo_axisController_GetVelocity(EOaxisController *o);
 

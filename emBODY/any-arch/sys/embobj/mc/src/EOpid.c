@@ -42,8 +42,7 @@ extern const float   EMS_FREQUENCY_FLOAT;
 
 #define SAFE_MAX_CURRENT 900.0f
 
-#define ZERO_ROTATION_TORQUE      680.0f
-#define ZERO_ROTATION_TORQUE_SLOW 720.0f
+#define ZERO_ROTATION_TORQUE 680.0f
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -86,18 +85,18 @@ extern EOpid* eo_pid_New(void)
 
         o->Dn  = 0.0f;
         o->En  = 0.0f;        
-        o->KIn = 0.0f;
-        o->pwm = 0.0f;
+        o->KKiIn = 0.0f;
         
-        o->Yoff  = 0.0f;
-        o->Ymax  = 0.0f;
-        o->Imax  = 0.0f;
-        o->KImax = 0.0f;
+        o->Yoff = 0.0f;
+        o->Imax = 0.0f;
 
-        o->safe_mode = eobool_false;
+        o->pwm = 0;
+        o->pwm_max = 0;
         
         o->A = 0.0f;
         o->B = 0.0f;
+        
+        o->safe_mode = eobool_true;
     }
 
     return o;
@@ -118,18 +117,16 @@ extern void eo_pid_SetPid(EOpid *o, float K, float Kd, float Ki, float Ymax, flo
     o->Kd = Kd*EMS_PERIOD;
     o->Ki = Ki;
 	
-    o->Ymax = Ymax;
-    o->Imax = Imax;
     o->Yoff = Yoff;
-
-    o->KImax = o->Ki!=0.0f ? o->Imax/o->Ki : 0.0f;
+    o->Imax = Imax;
     
-    //float N = 10.0;
-    //float T = o->Kd/N;
-    //float Q = 2.0f*T*EMS_FREQUENCY_FLOAT; 
+    o->pwm_max = (int32_t)Ymax;
+    
+    float N = 10.0;
+    float T = o->Kd/N;
+    float Q = 2.0f*T*EMS_FREQUENCY_FLOAT; 
 
-    o->A = 39.0/41.0;
-    //o->A = (Q-1.0f)/(Q+1.0f);
+    o->A = (Q-1.0f)/(Q+1.0f);
     o->B = EMS_FREQUENCY_FLOAT*(1.0f-o->A);
 }
 
@@ -142,7 +139,7 @@ extern void eo_pid_GetStatus(EOpid *o, int32_t *pwm, int32_t *err)
         return;
     }
     
-    *pwm = (int32_t)o->pwm;
+    *pwm = o->pwm;
     *err = (int32_t)o->En;
 }
 
@@ -152,28 +149,27 @@ extern void eo_pid_Reset(EOpid *o)
 	
     o->Dn   = 0.0f;
     o->En   = 0.0f;
-    o->pwm  = 0.0f;
-    o->KIn  = 0.0f;
+    o->KKiIn  = 0.0f;
+    
+    o->pwm  = 0;
 }
 
 extern int16_t eo_pid_PWM(EOpid *o, float En, float Vref)
 {
     if (!o) return 0;
                 
-    //float Dn = o->A*o->Dn + o->B*(En - o->En); 
+    float Dn = o->A*o->Dn + o->B*(En - o->En);
     
     o->En = En;
-    //o->Dn = Dn;
-    
-    //float Xn = o->K*(En + Dn);
+    o->Dn = Dn;
 
     float Xn = o->K*En;
     
-    o->KIn += Xn;
+    o->KKiIn += o->Ki*Xn;
 
-    LIMIT(o->KIn, o->KImax);
+    LIMIT(o->KKiIn, o->Imax);
 
-    o->pwm = Xn + o->Ki*o->KIn;
+    o->pwm = Xn + o->K*Dn + o->KKiIn + o->Yoff;
     
     if (Vref>0.0f)
     {
@@ -190,7 +186,7 @@ extern int16_t eo_pid_PWM(EOpid *o, float En, float Vref)
     }
     else
     {
-        LIMIT(o->pwm, o->Ymax);
+        LIMIT(o->pwm, o->pwm_max);
     }
 
     return (int16_t)o->pwm;
@@ -200,35 +196,37 @@ extern int16_t eo_pid_PWM2(EOpid *o, float En, float Vref, float Venc)
 {
     if (!o) return 0;
     
-    float Xn = o->K*(En+o->Kd*(Vref-Venc));
+    o->En = En;
     
-    o->KIn += Xn;
+    float Xn = o->K*(En+o->Kd*(Vref-Venc));
+     
+    o->KKiIn += o->Ki*Xn;
 
-    LIMIT(o->KIn, o->KImax);
+    LIMIT(o->KKiIn, o->Imax);
 
-    o->pwm = Xn + o->Ki*o->KIn + o->Yoff;
+    int32_t pwm = (int32_t)(Xn + o->KKiIn + o->Yoff);
     
     if (Vref>0.0f)
     {
-        o->pwm += ZERO_ROTATION_TORQUE;
+        pwm += ZERO_ROTATION_TORQUE;
     }
     else if (Vref<0.0f)
     {
-        o->pwm -= ZERO_ROTATION_TORQUE; 
+        pwm -= ZERO_ROTATION_TORQUE; 
     }
     
     if (o->safe_mode)
     {
-        LIMIT(o->pwm, SAFE_MAX_CURRENT);
+        LIMIT(pwm, SAFE_MAX_CURRENT);
     }
     else
     {
-        LIMIT(o->pwm, o->Ymax);
+        LIMIT(pwm, o->pwm_max);
     }
 
-    o->En = En;
-
-    return (int16_t)o->pwm;
+    return (int16_t)(o->pwm = (o->pwm + pwm + 1)/2);
+    
+    //return (int16_t)o->pwm;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
