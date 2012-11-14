@@ -47,15 +47,14 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
+
+
 typedef struct
 {
-    hal_i2c_speed_t         speed;      
-    hal_gpio_cfg_t          scl;
-    hal_gpio_cfg_t          sda;
-    hal_bool_t              usedma;     // not supported yet
-    hal_void_fp_void_t      ontimeout;    
-} hal_i2c_hw_cfg_t;
-
+    uint8_t             supported_mask;                     /**< bit in position hal_can_portx must be 1 if portx is supported */
+    hal_gpio_cfg_t      gpio_scl[hal_i2c_ports_number];     /**< in position hal_i2c_portx there is configuration of gpio used for scl pin */
+    hal_gpio_cfg_t      gpio_sda[hal_i2c_ports_number];     /**< in position hal_i2c_portx there is configuration of gpio used for sda pin */
+} hal_i2c_hid_brdcfg_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 // empty-section
@@ -66,9 +65,7 @@ extern uint32_t hal_i2c_hid_getsize(const hal_cfg_t *cfg);
 
 extern hal_result_t hal_i2c_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory);
 
-extern hal_boolval_t hal_i2c_hid_initted_is(hal_i2c_port_t port);
 
-extern hal_result_t hal_i2c_hid_standby(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr) ;
 
 
 

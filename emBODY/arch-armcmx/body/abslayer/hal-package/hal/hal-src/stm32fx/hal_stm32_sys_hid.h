@@ -56,7 +56,8 @@ typedef enum
     hal_sys_refclock_pll_on_internal        = 3,
     hal_sys_refclock_pll_on_external_xtl    = 4,   
     hal_sys_refclock_pll_on_external_osc    = 5   
-} hal_sys_hid_sourceclock_t;
+} hal_sys_hid_refclock_t;
+
 
 #if     defined(USE_STM32F1)
 typedef struct 
@@ -76,6 +77,7 @@ typedef struct
 } hal_sys_hid_pll_cfg_t;
 #endif
 
+
 typedef struct 
 {
     uint32_t                        cpu;
@@ -86,13 +88,19 @@ typedef struct
 
 typedef struct 
 {
-    hal_sys_hid_sourceclock_t       sourceclock;
+    hal_sys_hid_refclock_t          refclock;
     uint32_t                        intclockspeed;    
     uint32_t                        extclockspeed;
     hal_sys_hid_target_speeds_t     targetspeeds;
     hal_sys_hid_pll_cfg_t           pllcfg;
 } hal_sys_hid_clock_cfg_t;
 
+
+typedef struct
+{
+    hal_bool_t                      keepinternalclockatstartup;  // if hal_true: it runs at intclockspeed at startup and changes to refclock after hal_sys_systeminit()
+    hal_sys_hid_clock_cfg_t         clock;
+} hal_sys_hid_brdcfg_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------

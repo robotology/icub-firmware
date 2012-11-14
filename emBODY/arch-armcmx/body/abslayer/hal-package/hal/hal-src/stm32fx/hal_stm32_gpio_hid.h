@@ -59,7 +59,15 @@ struct hal_gpio_hid_altcfg_t
 };
 
 
+typedef struct
+{
+    uint16_t supported_mask_byport[hal_gpio_ports_number];    /**< the bit in position j-th of supported_mask_port[i] tells if port i and pin j is supported */
+} hal_gpio_hid_brdcfg_t;
+
+
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
+
+// used by other peripherals which need to initialise their pins
 
 extern const uint8_t hal_gpio_hid_maxports;
 extern GPIO_TypeDef *const hal_gpio_hid_ports[];

@@ -190,6 +190,7 @@
     extern const uint8_t hal_brdcfg_eeprom__supported_mask              = (1 << hal_eeprom_emulatedflash) | (1 << hal_eeprom_i2c_01);
     extern const uint32_t hal_brdcfg_eeprom__emflash_baseaddress        = 0x08000000;
     extern const uint32_t hal_brdcfg_eeprom__emflash_totalsize          = 256*1024;
+    extern const hal_i2c_port_t hal_brdcfg_eeprom__i2c_01_i2cport       = hal_i2c_port1;
     extern const uint32_t hal_brdcfg_eeprom__i2c_01_baseaddress         = 0;
     extern const uint32_t hal_brdcfg_eeprom__i2c_01_totalsize           = 8*1024;    
     extern const hal_eeprom_hw_cfg_t hal_brdcfg_eeprom__i2c_01_device   =
@@ -255,6 +256,7 @@
         }        
     };
 #endif//HAL_USE_I2C
+
 
 
 #ifdef HAL_USE_LED
@@ -376,6 +378,37 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
+
+
+extern uint32_t hal_brdcfg_devices__getsize(const hal_cfg_t *cfg)
+{
+    uint32_t ret = 0;
+    
+    // no memory needed 
+    // ...
+       
+    // or calls ret += all the devices we need
+    return(ret);
+}
+
+extern hal_result_t hal_brdcfg_devices__setmem(const hal_cfg_t *cfg, uint32_t *memory)
+{
+   if(NULL == memory)
+   {
+       hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_brdcfg_devices__setmem(): memory missing");
+       return(hal_res_NOK_generic);
+   }
+ 
+   // no memory needed
+   // ...
+   
+   // or calls all the devices we need
+   
+   return(hal_res_OK);
+}
+
+
+extern hal_result_t hal_device_display_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory);
 
 #ifdef HAL_USE_CAN
 

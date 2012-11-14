@@ -41,9 +41,10 @@
 #include "hal_stm32_base_hid.h" 
 #include "hal_stm32_gpio_hid.h" 
 #include "hal_stm32_sys_hid.h"
-//#include "hal_stm32_canfifo_hid.h"
-#include "utils/hal_tools.h"
- 
+#include "utils/hal_utility_fifo.h"
+#include "utils/hal_utility_bits.h" 
+#include "hal_device_cantransceiver.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -114,8 +115,8 @@ typedef struct
     hal_can_cfg_t               cfg;
     //hal_canfifo_t               canframes_rx_norm;
     //hal_canfifo_t               canframes_tx_norm;
-    hal_tools_fifo_t            canframes_rx_norm;
-    hal_tools_fifo_t            canframes_tx_norm;    
+    hal_utility_fifo_t            canframes_rx_norm;
+    hal_utility_fifo_t            canframes_tx_norm;    
     uint8_t                     enabled;
 } hal_can_portdatastructure_t;
 
@@ -280,14 +281,14 @@ extern hal_result_t hal_can_init(hal_can_port_t port, const hal_can_cfg_t *cfg)
     //  reset fifos
     //hal_canfifo_hid_reset(&cport->canframes_rx_norm);
     //hal_canfifo_hid_reset(&cport->canframes_tx_norm);
-    hal_tools_fifo_reset(&cport->canframes_rx_norm);
-    hal_tools_fifo_reset(&cport->canframes_tx_norm);    
+    hal_utility_fifo_reset(&cport->canframes_rx_norm);
+    hal_utility_fifo_reset(&cport->canframes_tx_norm);    
     
     // init the phy of can
-    hal_brdcfg_can__phydevices_init(port);
+    hal_device_cantransceiver_init(port, NULL);
     
     // enable the phy of can
-    hal_brdcfg_can__phydevices_enable(port); 
+    hal_device_cantransceiver_enable(port); 
     
     // init gpios
     s_hal_can_hw_gpio_init(port);
@@ -406,7 +407,7 @@ extern hal_result_t hal_can_received(hal_can_port_t port, uint8_t *numberof)
     s_hal_can_isr_rx_disable(port);
     
     //*numberof = hal_canfifo_hid_size(&cport->canframes_rx_norm);
-    *numberof = hal_tools_fifo_size(&cport->canframes_rx_norm);
+    *numberof = hal_utility_fifo_size(&cport->canframes_rx_norm);
     
     // enable interrupt rx
     s_hal_can_isr_rx_enable(port);
@@ -418,13 +419,13 @@ extern hal_result_t hal_can_received(hal_can_port_t port, uint8_t *numberof)
 extern hal_result_t hal_can_get(hal_can_port_t port, hal_can_frame_t *frame, uint8_t *remaining) 
 {
     hal_can_portdatastructure_t *cport  =   s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
-    hal_tools_fifo_t* fiforx = &cport->canframes_rx_norm;
+    hal_utility_fifo_t* fiforx = &cport->canframes_rx_norm;
     hal_result_t res = hal_res_NOK_nodata;
   
     // disable interrupt rx
     s_hal_can_isr_rx_disable(port);
     
-    res = hal_tools_fifo_get16(fiforx, (uint8_t*)frame, remaining);
+    res = hal_utility_fifo_get16(fiforx, (uint8_t*)frame, remaining);
 
     // enable interrupt rx
     s_hal_can_isr_rx_enable(port);
@@ -520,7 +521,7 @@ extern hal_result_t hal_can_out_get(hal_can_port_t port, uint8_t *numberof)
     s_hal_can_isr_rx_disable(port);
     
     //*numberof = hal_canfifo_hid_size(&cport->canframes_tx_norm);
-    *numberof = hal_tools_fifo_size(&cport->canframes_tx_norm);
+    *numberof = hal_utility_fifo_size(&cport->canframes_tx_norm);
     
     // enable interrupt rx
     s_hal_can_isr_rx_enable(port);
@@ -626,11 +627,11 @@ extern hal_result_t hal_can_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
         ram08 += sizeof(hal_can_portdatastructure_t);
         
         //hal_canfifo_hid_init(&s_hal_can_portdatastruct_ptr[0]->canframes_rx_norm, cfg->can1_rxqnorm_num, ram08);
-        hal_tools_fifo_init(&s_hal_can_portdatastruct_ptr[0]->canframes_rx_norm, cfg->can1_rxqnorm_num, sizeof(hal_can_frame_t), ram08, (uint8_t*)&defcanframe);
+        hal_utility_fifo_init(&s_hal_can_portdatastruct_ptr[0]->canframes_rx_norm, cfg->can1_rxqnorm_num, sizeof(hal_can_frame_t), ram08, (uint8_t*)&defcanframe);
         ram08 += (cfg->can1_rxqnorm_num * sizeof(hal_can_frame_t));
         
         //hal_canfifo_hid_init(&s_hal_can_portdatastruct_ptr[0]->canframes_tx_norm, cfg->can1_txqnorm_num, ram08);
-        hal_tools_fifo_init(&s_hal_can_portdatastruct_ptr[0]->canframes_tx_norm, cfg->can1_txqnorm_num, sizeof(hal_can_frame_t), ram08, (uint8_t*)&defcanframe);
+        hal_utility_fifo_init(&s_hal_can_portdatastruct_ptr[0]->canframes_tx_norm, cfg->can1_txqnorm_num, sizeof(hal_can_frame_t), ram08, (uint8_t*)&defcanframe);
         ram08 += (cfg->can1_txqnorm_num * sizeof(hal_can_frame_t));
     }
     
@@ -640,11 +641,11 @@ extern hal_result_t hal_can_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
         ram08 += sizeof(hal_can_portdatastructure_t);
  
         //hal_canfifo_hid_init(&s_hal_can_portdatastruct_ptr[1]->canframes_rx_norm, cfg->can2_rxqnorm_num, ram08);
-        hal_tools_fifo_init(&s_hal_can_portdatastruct_ptr[1]->canframes_rx_norm, cfg->can2_rxqnorm_num, sizeof(hal_can_frame_t), ram08, (uint8_t*)&defcanframe);
+        hal_utility_fifo_init(&s_hal_can_portdatastruct_ptr[1]->canframes_rx_norm, cfg->can2_rxqnorm_num, sizeof(hal_can_frame_t), ram08, (uint8_t*)&defcanframe);
         ram08 += (cfg->can2_rxqnorm_num * sizeof(hal_can_frame_t));
         
         //hal_canfifo_hid_init(&s_hal_can_portdatastruct_ptr[1]->canframes_tx_norm, cfg->can2_txqnorm_num, ram08);
-        hal_tools_fifo_init(&s_hal_can_portdatastruct_ptr[1]->canframes_tx_norm, cfg->can2_txqnorm_num, sizeof(hal_can_frame_t), ram08, (uint8_t*)&defcanframe);
+        hal_utility_fifo_init(&s_hal_can_portdatastruct_ptr[1]->canframes_tx_norm, cfg->can2_txqnorm_num, sizeof(hal_can_frame_t), ram08, (uint8_t*)&defcanframe);
         ram08 += (cfg->can2_txqnorm_num * sizeof(hal_can_frame_t));
     }
 
@@ -661,7 +662,7 @@ extern hal_result_t hal_can_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
 
 static hal_boolval_t s_hal_can_supported_is(hal_can_port_t port)
 {
-    return(hal_tools_bitoperator_byte_bitcheck(hal_brdcfg_can__supported_mask, HAL_can_port2index(port)) );
+    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_can__theconfig.supported_mask, HAL_can_port2index(port)));
 }
 
 static void s_hal_can_initted_set(hal_can_port_t port)
@@ -697,13 +698,13 @@ static void s_hal_can_isr_sendframes_canx(hal_can_port_t port)
     uint64_t* const txmsgdata = (uint64_t*) TxMessage.Data;  
     
     hal_can_portdatastructure_t *cport = s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
-    hal_tools_fifo_t *fifotx = &cport->canframes_tx_norm;
+    hal_utility_fifo_t *fifotx = &cport->canframes_tx_norm;
 
     s_hal_can_isr_tx_disable(port);
 
-    while( (hal_tools_fifo_size(fifotx) > 0) )
+    while( (hal_utility_fifo_size(fifotx) > 0) )
     {
-        hal_can_frame_t* pcanframe = (hal_can_frame_t*) hal_tools_fifo_front16(fifotx);
+        hal_can_frame_t* pcanframe = (hal_can_frame_t*) hal_utility_fifo_front16(fifotx);
         
         // 
         *txmsgiden      = pcanframe->id & 0x7FF; // acemor: we could remove 0x7ff because CAN_Transmit() shifts it 21 positions up.
@@ -713,7 +714,7 @@ static void s_hal_can_isr_sendframes_canx(hal_can_port_t port)
         // CAN_Transmit() returns the number of the mailbox used in transmission or CAN_TxStatus_NoMailBox if there is no empty mailbox
         if(CAN_TxStatus_NoMailBox != CAN_Transmit(HAL_can_port2peripheral(port), &TxMessage))
         {   // if the CAN_Transmit() was succesful ... remove the sent frame from from fifo-tx and call the user-defined callback
-        	hal_tools_fifo_pop(fifotx);
+        	hal_utility_fifo_pop(fifotx);
             if(NULL != cport->cfg.callback_on_tx)
             {
                 cport->cfg.callback_on_tx(cport->cfg.arg_cb_tx);
@@ -729,8 +730,8 @@ static void s_hal_can_isr_sendframes_canx(hal_can_port_t port)
 
     // we exit from teh previous loop either if the fifo is empty (thus the following control is useless) but also if CAN_Transmit() fails.
     // in such latter case we need the control in here. (@#) however we could move s_hal_can_isr_tx_enable(port) just before the break and avoid
-    // this call of hal_tools_fifo_size() > 0.
-    if(hal_tools_fifo_size(fifotx) > 0)
+    // this call of hal_utility_fifo_size() > 0.
+    if(hal_utility_fifo_size(fifotx) > 0)
 	{   // we still have some frames to send, thus we enable the isr on tx which triggers as soon any of the transmit mailboxes gets empty.
     	s_hal_can_isr_tx_enable(port);
 	}
@@ -805,17 +806,17 @@ static void s_hal_can_isr_recvframe_canx(hal_can_port_t port)
     uint64_t* const data = (uint64_t*) canframe.data;
     
     hal_can_portdatastructure_t *cport = s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
-    hal_tools_fifo_t* fiforx = &cport->canframes_rx_norm;
+    hal_utility_fifo_t* fiforx = &cport->canframes_rx_norm;
     
     //hal_can_frame_t* pcanframe =  NULL;
     CanRxMsg RxMessage;    
     
-    if(hal_true == hal_tools_fifo_full(fiforx))
+    if(hal_true == hal_utility_fifo_full(fiforx))
     {   // remove oldest frame
-        hal_tools_fifo_pop(fiforx);        
+        hal_utility_fifo_pop(fiforx);        
     }
 
-    //pcanframe = hal_tools_fifo_next_free(fiforx); // the pointer of the position where a new canframe would be put.
+    //pcanframe = hal_utility_fifo_next_free(fiforx); // the pointer of the position where a new canframe would be put.
     
         
     // get the message from fifo-0 of canx peripheral
@@ -829,7 +830,7 @@ static void s_hal_can_isr_recvframe_canx(hal_can_port_t port)
     canframe.size   = RxMessage.DLC;
     *data           = *((uint64_t*)RxMessage.Data);
     
-    hal_tools_fifo_put16(fiforx, (uint8_t*)&canframe);
+    hal_utility_fifo_put16(fiforx, (uint8_t*)&canframe);
 
     // if a callback is set, invoke it
     if(NULL != cport->cfg.callback_on_rx )
@@ -880,11 +881,11 @@ static void s_hal_can_hw_gpio_init(hal_can_port_t port)
     // configure rx can
     memcpy(&GPIO_InitStructure, &s_hal_can_gpio_inittypeded_canx_rx, sizeof(GPIO_InitTypeDef));
     GPIO_InitStructure.GPIO_Pin = hal_brdcfg_can__gpio_pin_canx_rx[HAL_can_port2index(port)];
-    GPIO_Init(hal_brdcfg_can__gpio_port_canx_rx[HAL_can_port2index(port)], &GPIO_InitStructure);
+    GPIO_Init(hal_brdcfg_can__theconfig.gpio_rx[HAL_can_port2index(port)], &GPIO_InitStructure);
     // configure tx can
     memcpy(&GPIO_InitStructure, &s_hal_can_gpio_inittypeded_canx_tx, sizeof(GPIO_InitTypeDef));
     GPIO_InitStructure.GPIO_Pin = hal_brdcfg_can__gpio_pin_canx_tx[HAL_can_port2index(port)];
-    GPIO_Init(hal_brdcfg_can__gpio_port_canx_tx[HAL_can_port2index(port)], &GPIO_InitStructure);  
+    GPIO_Init(hal_brdcfg_can__theconfig.gpio_tx[HAL_can_port2index(port)], &GPIO_InitStructure);  
 
     // Remap GPIOs 
     GPIO_PinRemapConfig((hal_can_port1 == port) ? (GPIO_Remap2_CAN1) : (GPIO_Remap_CAN2), ENABLE);    
@@ -898,10 +899,10 @@ static void s_hal_can_hw_gpio_init(hal_can_port_t port)
     hal_bool_t found = hal_false;
 
     
-    hal_gpio_port_t portrx = hal_brdcfg_can__gpio_canx_rx[HAL_can_port2index(port)].port;
-    hal_gpio_pin_t  pinrx  = hal_brdcfg_can__gpio_canx_rx[HAL_can_port2index(port)].pin;
-    hal_gpio_port_t porttx = hal_brdcfg_can__gpio_canx_tx[HAL_can_port2index(port)].port;
-    hal_gpio_pin_t  pintx  = hal_brdcfg_can__gpio_canx_tx[HAL_can_port2index(port)].pin;    
+    hal_gpio_port_t portrx = hal_brdcfg_can__theconfig.gpio_rx[HAL_can_port2index(port)].port;
+    hal_gpio_pin_t  pinrx  = hal_brdcfg_can__theconfig.gpio_rx[HAL_can_port2index(port)].pin;
+    hal_gpio_port_t porttx = hal_brdcfg_can__theconfig.gpio_tx[HAL_can_port2index(port)].port;
+    hal_gpio_pin_t  pintx  = hal_brdcfg_can__theconfig.gpio_tx[HAL_can_port2index(port)].pin;    
     
     if(hal_can_port1 == port)
     {        
@@ -945,8 +946,8 @@ static void s_hal_can_hw_gpio_init(hal_can_port_t port)
     hal_can_canx_rx_altcfg.afmode = hal_can_canx_tx_altcfg.afmode = afmode;
     
     // configure rx and tx pins
-    hal_gpio_configure(hal_brdcfg_can__gpio_canx_rx[HAL_can_port2index(port)], &hal_can_canx_rx_altcfg);    
-    hal_gpio_configure(hal_brdcfg_can__gpio_canx_tx[HAL_can_port2index(port)], &hal_can_canx_tx_altcfg);
+    hal_gpio_configure(hal_brdcfg_can__theconfig.gpio_rx[HAL_can_port2index(port)], &hal_can_canx_rx_altcfg);    
+    hal_gpio_configure(hal_brdcfg_can__theconfig.gpio_tx[HAL_can_port2index(port)], &hal_can_canx_tx_altcfg);
 
 #endif
 #elif   defined(USE_STM32F4)    
@@ -965,15 +966,15 @@ static void s_hal_can_hw_gpio_init(hal_can_port_t port)
     // configure rx can
     memcpy(&GPIO_InitStructure, &s_hal_can_gpio_inittypeded_canx_rx, sizeof(GPIO_InitTypeDef));
     GPIO_InitStructure.GPIO_Pin = hal_brdcfg_can__gpio_pin_canx_rx[HAL_can_port2index(port)];
-    GPIO_Init(hal_brdcfg_can__gpio_port_canx_rx[HAL_can_port2index(port)], &GPIO_InitStructure);
+    GPIO_Init(hal_brdcfg_can__theconfig.gpio_rx[HAL_can_port2index(port)], &GPIO_InitStructure);
     // configure tx can
     memcpy(&GPIO_InitStructure, &s_hal_can_gpio_inittypeded_canx_tx, sizeof(GPIO_InitTypeDef));
     GPIO_InitStructure.GPIO_Pin = hal_brdcfg_can__gpio_pin_canx_tx[HAL_can_port2index(port)];
-    GPIO_Init(hal_brdcfg_can__gpio_port_canx_tx[HAL_can_port2index(port)], &GPIO_InitStructure);
+    GPIO_Init(hal_brdcfg_can__theconfig.gpio_tx[HAL_can_port2index(port)], &GPIO_InitStructure);
     
     // connect can pins to afio
-    GPIO_PinAFConfig(hal_brdcfg_can__gpio_port_canx_rx[HAL_can_port2index(port)], hal_brdcfg_can__gpio_pinsource_canx_rx[HAL_can_port2index(port)], GPIO_AF_CAN1); or GPIO_AF_CAN2
-    GPIO_PinAFConfig(hal_brdcfg_can__gpio_port_canx_tx[HAL_can_port2index(port)], hal_brdcfg_can__gpio_pinsource_canx_tx[HAL_can_port2index(port)], GPIO_AF_CAN1); or GPIO_AF_CAN2
+    GPIO_PinAFConfig(hal_brdcfg_can__theconfig.gpio_rx[HAL_can_port2index(port)], hal_brdcfg_can__gpio_pinsource_canx_rx[HAL_can_port2index(port)], GPIO_AF_CAN1); or GPIO_AF_CAN2
+    GPIO_PinAFConfig(hal_brdcfg_can__theconfig.gpio_tx[HAL_can_port2index(port)], hal_brdcfg_can__gpio_pinsource_canx_tx[HAL_can_port2index(port)], GPIO_AF_CAN1); or GPIO_AF_CAN2
 
 #else
 
@@ -987,10 +988,10 @@ static void s_hal_can_hw_gpio_init(hal_can_port_t port)
     hal_bool_t foundtx = hal_false;
 
     
-    hal_gpio_port_t portrx = hal_brdcfg_can__gpio_canx_rx[HAL_can_port2index(port)].port;
-    hal_gpio_pin_t  pinrx  = hal_brdcfg_can__gpio_canx_rx[HAL_can_port2index(port)].pin;
-    hal_gpio_port_t porttx = hal_brdcfg_can__gpio_canx_tx[HAL_can_port2index(port)].port;
-    hal_gpio_pin_t  pintx  = hal_brdcfg_can__gpio_canx_tx[HAL_can_port2index(port)].pin;    
+    hal_gpio_port_t portrx = hal_brdcfg_can__theconfig.gpio_rx[HAL_can_port2index(port)].port;
+    hal_gpio_pin_t  pinrx  = hal_brdcfg_can__theconfig.gpio_rx[HAL_can_port2index(port)].pin;
+    hal_gpio_port_t porttx = hal_brdcfg_can__theconfig.gpio_tx  [HAL_can_port2index(port)].port;
+    hal_gpio_pin_t  pintx  = hal_brdcfg_can__theconfig.gpio_tx[HAL_can_port2index(port)].pin;    
     
     if(hal_can_port1 == port)
     { 
@@ -1045,8 +1046,8 @@ static void s_hal_can_hw_gpio_init(hal_can_port_t port)
     hal_can_canx_rx_altcfg.afmode = hal_can_canx_tx_altcfg.afmode = afmode;
     
     // configure rx and tx pins
-    hal_gpio_configure(hal_brdcfg_can__gpio_canx_rx[HAL_can_port2index(port)], &hal_can_canx_rx_altcfg);    
-    hal_gpio_configure(hal_brdcfg_can__gpio_canx_tx[HAL_can_port2index(port)], &hal_can_canx_tx_altcfg);
+    hal_gpio_configure(hal_brdcfg_can__theconfig.gpio_rx[HAL_can_port2index(port)], &hal_can_canx_rx_altcfg);    
+    hal_gpio_configure(hal_brdcfg_can__theconfig.gpio_tx[HAL_can_port2index(port)], &hal_can_canx_tx_altcfg);
 
 #endif
     
@@ -1161,7 +1162,7 @@ static hal_result_t s_hal_can_tx_normprio(hal_can_port_t port, hal_can_frame_t *
     s_hal_can_isr_tx_disable(port);
 
     // put frame in fifo out normal priority
-    res = hal_tools_fifo_put16(&cport->canframes_tx_norm, (uint8_t*)frame);
+    res = hal_utility_fifo_put16(&cport->canframes_tx_norm, (uint8_t*)frame);
 
     // failed to put in fifo
     if(hal_res_OK != res)

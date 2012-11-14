@@ -45,8 +45,11 @@
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
-// empty-section
 
+typedef struct
+{
+    uint8_t             supported_mask;                 /**< bit in position hal_crcx must be 1 if crcx is supported */
+} hal_crc_hid_brdcfg_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 // empty-section

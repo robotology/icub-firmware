@@ -44,8 +44,11 @@
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
-// empty-section
 
+typedef struct
+{
+    uint8_t                 supported_mask;
+} hal_watchdog_hid_brdcfg_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 // empty-section

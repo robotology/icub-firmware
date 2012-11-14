@@ -32,6 +32,7 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "hal_base.h"
+#include "hal_gpio.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -41,19 +42,50 @@
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
-// removed them .... as they are related to a particula phy used with the micro.
-// #define HAL_ETH_PHY_WR_TIMEOUT		    0x10000
-
-// #define HAL_ETH_AUTONEG_MASK			0x0020
-// #define HAL_ETH_LINK_UP_MASK			0x0004
-
-// #define HAL_ETH_IS_AUTONEG_DONE(x)		(x & 0x0020)
-// #define HAL_ETH_IS_LINK_UP(x) 			(x & 0x0004)
-// #define IS_FULL_MODE(x)			        ((x) & 0x0004)
-// #define IS_100MBIT_MODE(x)  		    (((x) & 0x0002) == 0)
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
+typedef enum
+{   // mif: media interface
+    hal_eth_mif_rmii    = 0,
+    hal_eth_mif_mii     = 1
+} hal_eth_hid_mif_t;
+
+typedef struct
+{   // RMII: Reduced Media Independent Interface   
+    hal_gpio_cfg_t      ETH_RMII_REF_CLK;           /**< configuration of gpio used for ETH_RMII_REF_CLK pin */
+    hal_gpio_cfg_t      ETH_RMII_TX_EN;             /**< configuration of gpio used for ETH_RMII_TX_EN pin */
+    hal_gpio_cfg_t      ETH_RMII_TXD0;              /**< configuration of gpio used for ETH_RMII_TXD0 pin */
+    hal_gpio_cfg_t      ETH_RMII_TXD1;              /**< configuration of gpio used for ETH_RMII_TXD1 pin */
+    hal_gpio_cfg_t      ETH_RMII_CRS_DV;            /**< configuration of gpio used for ETH_RMII_CRS_DV pin */
+    hal_gpio_cfg_t      ETH_RMII_RXD0;              /**< configuration of gpio used for ETH_RMII_RXD0 pin */
+    hal_gpio_cfg_t      ETH_RMII_RXD1;              /**< configuration of gpio used for ETH_RMII_RXD1 pin */
+} hal_eth_hid_gpio_rmii_t;
+
+typedef struct
+{   // MII: Media Independent Interface
+    uint8_t             tobedone;
+} hal_eth_hid_gpio_mii_t;
+
+typedef union
+{   // media interface between the mac and a phy chip
+    hal_eth_hid_gpio_rmii_t     rmii;
+    hal_eth_hid_gpio_mii_t      mii;
+} hal_eth_hid_gpio_mif_t;
+
+typedef struct
+{   // SMI: Serial Management Interface
+    hal_gpio_cfg_t      ETH_MDC;                    /**< configuration of gpio used for ETH_MDC pin */
+    hal_gpio_cfg_t      ETH_MDIO;                   /**< configuration of gpio used for ETH_MDIO pin */
+} hal_eth_hid_gpio_smi_t;
+
+typedef struct
+{
+    hal_bool_t                  supported;          /**< hal_true if supported */
+    hal_eth_hid_mif_t           mif;                /**< always rmii  */
+    hal_eth_hid_gpio_mif_t      gpio_mif;    
+    hal_eth_hid_gpio_smi_t      gpio_smi;
+} hal_eth_hid_brdcfg_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------

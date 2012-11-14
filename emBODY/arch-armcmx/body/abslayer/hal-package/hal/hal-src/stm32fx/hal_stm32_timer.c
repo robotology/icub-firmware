@@ -36,7 +36,7 @@
 #include "hal_stm32_base_hid.h" 
 #include "hal_stm32_sys_hid.h"
 #include "hal_brdcfg.h"
-#include "utils/hal_tools.h"
+#include "utils/hal_utility_bits.h" 
 
 
 #include "hal_stm32xx_include.h" 
@@ -511,7 +511,7 @@ extern hal_result_t hal_timer_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
 
 static hal_boolval_t s_hal_timer_supported_is(hal_timer_t timer)
 {
-    return(hal_tools_bitoperator_byte_bitcheck(hal_brdcfg_timer__supported_mask, HAL_timer_t2index(timer)) );
+    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_timer__theconfig.supported_mask, HAL_timer_t2index(timer)));
 }
 
 static void s_hal_timer_initted_set(hal_timer_t timer)

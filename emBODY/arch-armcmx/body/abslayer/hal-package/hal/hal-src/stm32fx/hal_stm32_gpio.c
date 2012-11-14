@@ -38,7 +38,8 @@
 
 
 #include "hal_stm32_base_hid.h" 
-#include "utils/hal_tools.h" 
+
+#include "utils/hal_utility_bits.h" 
 
 #include "hal_brdcfg.h"
  
@@ -318,16 +319,6 @@ extern void hal_gpio_quickest_setval(hal_gpio_port_t port, hal_gpio_pin_t pin, h
 }
 
 
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of extern hidden functions 
-// --------------------------------------------------------------------------------------------------------------------
-
-
-// ---- isr of the module: begin ----
-// empty-section
-// ---- isr of the module: end ------
-
-
 extern hal_result_t hal_gpio_configure(hal_gpio_cfg_t cfg, const hal_gpio_altcfg_t* altcfg) 
 {
     if(hal_gpio_dirALT != cfg.dir)
@@ -338,6 +329,16 @@ extern hal_result_t hal_gpio_configure(hal_gpio_cfg_t cfg, const hal_gpio_altcfg
     return(s_hal_gpio_altfun_configure(cfg, altcfg));
  
 }
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of extern hidden functions 
+// --------------------------------------------------------------------------------------------------------------------
+
+
+// ---- isr of the module: begin ----
+// empty-section
+// ---- isr of the module: end ------
+
 
 extern uint32_t hal_gpio_hid_getsize(const hal_cfg_t *cfg)
 {
@@ -368,39 +369,39 @@ extern hal_result_t hal_gpio_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
 
 static hal_boolval_t s_hal_gpio_supported_is(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {
-    uint16_t p = hal_brdcfg_gpio__supported_mask[HAL_gpio_port2index(port)];
-    return(hal_tools_bitoperator_halfword_bitcheck(p, HAL_gpio_pin2index(pin)) );
+    uint16_t p = hal_brdcfg_gpio__theconfig.supported_mask_byport[HAL_gpio_port2index(port)];
+    return(hal_utility_bits_halfword_bitcheck(p, HAL_gpio_pin2index(pin)) );
 }
 
 
 static void s_hal_gpio_initted_set(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {   // cannot be called with port and pin of value NONE
     uint16_t *pp = &s_hal_gpio_initted_mask[HAL_gpio_port2index(port)];
-    hal_tools_bitoperator_halfword_bitset(pp, HAL_gpio_pin2index(pin));
+    hal_utility_bits_halfword_bitset(pp, HAL_gpio_pin2index(pin));
 }
 
 static hal_boolval_t s_hal_gpio_initted_is(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {   // cannot be called with port and pin of value NONE
     uint16_t p = s_hal_gpio_initted_mask[HAL_gpio_port2index(port)];
-    return(hal_tools_bitoperator_halfword_bitcheck(p, HAL_gpio_pin2index(pin)) );
+    return(hal_utility_bits_halfword_bitcheck(p, HAL_gpio_pin2index(pin)) );
 }
 
 static void s_hal_gpio_output_set(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {
     uint16_t *pp = &s_hal_gpio_output_mask[HAL_gpio_port2index(port)];
-    hal_tools_bitoperator_halfword_bitset(pp, HAL_gpio_pin2index(pin));
+    hal_utility_bits_halfword_bitset(pp, HAL_gpio_pin2index(pin));
 }
 
 static void s_hal_gpio_output_clear(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {
     uint16_t *pp = &s_hal_gpio_output_mask[HAL_gpio_port2index(port)];
-    hal_tools_bitoperator_halfword_bitclear(pp, HAL_gpio_pin2index(pin));
+    hal_utility_bits_halfword_bitclear(pp, HAL_gpio_pin2index(pin));
 }
 
 static hal_boolval_t s_hal_gpio_output_is(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {
     uint16_t p = s_hal_gpio_output_mask[HAL_gpio_port2index(port)];
-    return(hal_tools_bitoperator_halfword_bitcheck(p, HAL_gpio_pin2index(pin)) );
+    return(hal_utility_bits_halfword_bitcheck(p, HAL_gpio_pin2index(pin)) );
 }
 
 static hal_result_t s_hal_gpio_altfun_configure(hal_gpio_cfg_t cfg, const hal_gpio_altcfg_t* altcfg)

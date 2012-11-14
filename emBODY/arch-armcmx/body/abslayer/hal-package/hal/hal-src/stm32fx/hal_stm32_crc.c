@@ -36,19 +36,18 @@
 #include "hal_stm32_base_hid.h" 
 #include "hal_brdcfg.h"
 
-#include "utils/hal_tools.h"
 
-#include "../utils/crc16.h"
-#include "../utils/crc32.h"
+#include "utils/hal_utility_bits.h" 
+
+
+#include "utils/hal_utility_crc16.h"
+#include "utils/hal_utility_crc32.h"
 
 
 #include "hal_trace.h"
 #include "stdio.h"
 
 #include "hal_stm32xx_include.h"
-
-// i am not sure that in crc16.c there is good code. we could also use http://zorc.breitbandkatze.de/crctester.c
-// and http://zorc.breitbandkatze.de/crc.html
 
 
 
@@ -156,12 +155,12 @@ extern hal_result_t hal_crc_init(hal_crc_t crc, const hal_crc_cfg_t *cfg)
 
             if(hal_crc_poly_crc16_ccitt == info->cfg.polynomial)
             {   // for crc16-ccitt use rom-ed table
-                info->cfg.crctblram = (void*)crc16_table_0x1021;
+                info->cfg.crctblram = (void*)hal_utility_crc16_table_0x1021;
                 res = hal_res_OK;
             } 
             else if(NULL != info->cfg.crctblram)
             {   // else compute it.
-                crc16_table_get(info->cfg.polynomial, info->cfg.crctblram);
+                hal_utility_crc16_table_get(info->cfg.polynomial, info->cfg.crctblram);
                 res = hal_res_OK;
             }
         } break;
@@ -175,7 +174,7 @@ extern hal_result_t hal_crc_init(hal_crc_t crc, const hal_crc_cfg_t *cfg)
             }
             else if(NULL != info->cfg.crctblram)
             {
-                crc32_table_get(info->cfg.polynomial, info->cfg.crctblram);
+                hal_utility_crc32_table_get(info->cfg.polynomial, info->cfg.crctblram);
                 res = hal_res_OK;
             }
         } break;
@@ -231,12 +230,12 @@ extern hal_result_t hal_crc_compute(hal_crc_t crc, hal_crc_compute_mode_t mode, 
     }
     else if(hal_crc_order_16 == info->cfg.order)
     {
-        //*out = info->initialvalue = crc16_compute(info->cfg.crctblram, (uint16_t)info->initialvalue, (uint8_t*)data, size);
+        //*out = info->initialvalue = hal_utility_crc16_compute(info->cfg.crctblram, (uint16_t)info->initialvalue, (uint8_t*)data, size);
         *out = info->initialvalue = s_hal_crc16_sw_compute(info, data, size);
     }
     else if(hal_crc_order_32 == info->cfg.order)
     {
-        //*out = info->initialvalue = crc32_compute(info->cfg.crctblram, info->initialvalue, (uint8_t*)data, size);
+        //*out = info->initialvalue = hal_utility_crc32_compute(info->cfg.crctblram, info->initialvalue, (uint8_t*)data, size);
         *out = info->initialvalue = s_hal_crc32_sw_compute(info, data, size);
     }
     else
@@ -287,7 +286,7 @@ extern hal_result_t hal_crc_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
 
 static hal_boolval_t s_hal_crc_supported_is(hal_crc_t crc)
 {
-    return(hal_tools_bitoperator_byte_bitcheck(hal_brdcfg_crc__supported_mask, HAL_crc_t2index(crc)) );
+    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_crc__theconfig.supported_mask, HAL_crc_t2index(crc)) );
 }
 
 static void s_hal_crc_initted_set(hal_crc_t crc)
@@ -341,14 +340,14 @@ static uint32_t s_hal_crc32_sw_compute(hal_crc_info_t *info, const void *data, u
 
     uint32_t size4 = size-tailsize;
 
-    info->initialvalue = crc32_compute(info->cfg.crctblram, info->initialvalue, (uint8_t*)data, size4);
+    info->initialvalue = hal_utility_crc32_compute(info->cfg.crctblram, info->initialvalue, (uint8_t*)data, size4);
    
     if(0 != (tailsize))
     {
         uint8_t tail[4];
         memset(tail, 0, 4);
         memcpy(tail, ((uint8_t*)data) + size-tailsize, tailsize);
-        info->initialvalue = crc32_compute(info->cfg.crctblram, info->initialvalue, tail, 4); 
+        info->initialvalue = hal_utility_crc32_compute(info->cfg.crctblram, info->initialvalue, tail, 4); 
     }
 
     return(info->initialvalue);
@@ -361,14 +360,14 @@ static uint32_t s_hal_crc16_sw_compute(hal_crc_info_t *info, const void *data, u
 
     uint32_t size4 = size-tailsize;
 
-    info->initialvalue = crc16_compute(info->cfg.crctblram, info->initialvalue, (uint8_t*)data, size4);
+    info->initialvalue = hal_utility_crc16_compute(info->cfg.crctblram, info->initialvalue, (uint8_t*)data, size4);
    
     if(0 != (tailsize))
     {
         uint8_t tail[4];
         memset(tail, 0, 4);
         memcpy(tail, ((uint8_t*)data) + size-tailsize, tailsize);
-        info->initialvalue = crc16_compute(info->cfg.crctblram, info->initialvalue, tail, 4); 
+        info->initialvalue = hal_utility_crc16_compute(info->cfg.crctblram, info->initialvalue, tail, 4); 
     }
 
     return(info->initialvalue);

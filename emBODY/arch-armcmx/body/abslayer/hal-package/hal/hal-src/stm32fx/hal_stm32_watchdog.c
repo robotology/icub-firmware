@@ -37,7 +37,7 @@
 #include "hal_stm32_base_hid.h" 
 #include "hal_stm32_sys_hid.h"
 #include "hal_brdcfg.h"
-#include "utils/hal_tools.h"
+#include "utils/hal_utility_bits.h" 
 
 #include "hal_stm32xx_include.h" 
 
@@ -311,7 +311,7 @@ extern hal_result_t hal_watchdog_hid_setmem(const hal_cfg_t *cfg, uint32_t *memo
 
 static hal_boolval_t s_hal_watchdog_supported_is(hal_watchdog_t watchdog)
 {
-    return(hal_tools_bitoperator_byte_bitcheck(hal_brdcfg_watchdog__supported_mask, HAL_watchdog_t2index(watchdog)) );
+    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_watchdog__theconfig.supported_mask, HAL_watchdog_t2index(watchdog)));
 }
 
 static void s_hal_watchdog_initted_set(hal_watchdog_t watchdog)

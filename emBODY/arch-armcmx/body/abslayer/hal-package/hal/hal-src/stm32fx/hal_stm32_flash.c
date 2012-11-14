@@ -413,6 +413,14 @@ extern uint32_t hal_flash_get_unitsize(uint32_t addr)
 }
 #endif
 
+
+extern hal_result_t hal_flash_setlatency(hal_flash_cycles_t ncycles)
+{
+    FLASH_SetLatency(ncycles);
+//    hal_on_fatalerror(0, msgerr);
+    return(hal_res_OK);
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -441,12 +449,7 @@ extern hal_result_t hal_flash_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
 }
 
 
-extern hal_result_t hal_flash_hid_setlatency(hal_flash_cycles_t ncycles)
-{
-    FLASH_SetLatency(ncycles);
-//    hal_on_fatalerror(0, msgerr);
-    return(hal_res_OK);
-}
+
   
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -68,7 +68,11 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-extern uint32_t SystemCoreClock = HSI_VALUE;
+#if     defined(USE_STM32F1)
+extern uint32_t SystemCoreClock =  72000000; //HSI_VALUE;
+#elif   defined(USE_STM32F4)
+extern uint32_t SystemCoreClock = 168000000; //HSI_VALUE;
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -113,17 +117,20 @@ extern hal_result_t hal_sys_systeminit(void)
     // the internal clock and does not use any prescaling for internal buses.
     
     // hence, ... we need to configure a proper clock and update the system core clock 
+    
+    if(hal_true == hal_brdcfg_sys__theconfig.keepinternalclockatstartup)
+    {
+        s_hal_sys_set_sys_clock(hal_base_hid_params.cpu_freq);
+        s_hal_sys_system_core_clock_update();
+    }
+    else
+    {
+        s_hal_sys_system_core_clock_update();
+    }
 
-    s_hal_sys_set_sys_clock(hal_base_hid_params.cpu_freq);
-    // the redefined version ...
-    s_hal_sys_system_core_clock_update();
 
-
-    #warning --> DO NOT config the  hal_brdcfg_sys_  _clock or _gpio_default in hal !!!
-    hal_brdcfg_sys__clock_config();
-    hal_brdcfg_sys__gpio_default_init();
-
-    #warning --> verify differences between stm32 and stm32f4
+//     hal_brdcfg_sys__clock_config();
+//     hal_brdcfg_sys__gpio_default_init();
 
     // configure once and only once the nvic to hold 4 bits for interrupt priorities and 0 for subpriorities
     // in stm32 lib ... NVIC_PriorityGroup_4 is 0x300, thus cmsis priority group number 3, thus
@@ -163,8 +170,8 @@ exit
 
 extern hal_result_t hal_sys_delay(hal_reltime_t reltime)
 {
-    static uint32_t s_hal_sys_numof6ops1usec = 0;
-    if(0 == s_hal_sys_numof6ops1usec)
+    static uint32_t s_hal_sys_numofops1usec = 0;
+    if(0 == s_hal_sys_numofops1usec)
     {
         if(0 == SystemCoreClock)
         {
@@ -172,11 +179,10 @@ extern hal_result_t hal_sys_delay(hal_reltime_t reltime)
         }
         // to occupy a microsec i execute an operation for a number of times which depends on: SystemCoreCloc and 1.25 dmips/mhz, 
         //s_hal_sys_numofinstructions1usec = ((SystemCoreClock/1000000) * 125l) / 100l;
-        s_hal_sys_numof6ops1usec = (SystemCoreClock/1000000) / hal_sys_howmanyARMv7ops();
+        s_hal_sys_numofops1usec = (SystemCoreClock/1000000) / hal_sys_howmanyARMv7ops();
     }
         
-    //hal_sys_sixARMv7ops(s_hal_sys_numof6ops1usec * reltime);
-    hal_sys_someARMv7ops(s_hal_sys_numof6ops1usec * reltime);
+    hal_sys_someARMv7ops(s_hal_sys_numofops1usec * reltime);
 
     return(hal_res_OK);
 }
@@ -393,7 +399,7 @@ extern void hal_sys_atomic_bitwiseAND(volatile uint32_t *value, uint32_t mask)
 
 #if     defined(USE_STM32F1)
 
-// redefinition of function weakly defined in system_stm32f10x.c so that the mpus uses hsi and runs at 8MHz
+// redefinition of function weakly defined in system_stm32f10x.c so that the mpus uses hsi and runs at 8MHz (16MHz on CM4)
 void SystemInit(void)
 {
 
@@ -455,8 +461,18 @@ void SystemInit(void)
 
     SCB->VTOR = FLASH_BASE; /* Vector Table Relocation in Internal FLASH. */
 
-    // IIT-changed: added to refresh the value of SystemCoreClock
-    SystemCoreClockUpdate();    
+    // now the HSI is selected as system clock, and no prescaler is used     
+
+    if(hal_false == hal_brdcfg_sys__theconfig.keepinternalclockatstartup)
+    {   // apply the clock straigth away
+        s_hal_sys_set_sys_clock(72000000);
+        s_hal_sys_system_core_clock_update();        
+    }
+    else
+    {   // keep the hsi
+        // update value ...
+        SystemCoreClockUpdate();
+    }
 }
 
 extern const volatile uint8_t AHBPrescTable[16];
@@ -486,11 +502,11 @@ void SystemCoreClockUpdate(void)
         
         case 0x04:  /* HSE used as system clock */
         {
-            if(0 == hal_brdcfg_sys__clockcfg.extclockspeed)
+            if(0 == hal_brdcfg_sys__theconfig.clock.extclockspeed)
             {
                 hal_base_hid_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "SystemCoreClockUpdate() called with HSE mode but HSE clock is not defined");
             }
-            SystemCoreClock = hal_brdcfg_sys__clockcfg.extclockspeed;
+            SystemCoreClock = hal_brdcfg_sys__theconfig.clock.extclockspeed;
         } break;
             
         case 0x08:  /* PLL used as system clock */
@@ -512,16 +528,16 @@ void SystemCoreClockUpdate(void)
     #if defined (STM32F10X_LD_VL) || defined (STM32F10X_MD_VL) || (defined STM32F10X_HD_VL)
                 prediv1factor = (RCC->CFGR2 & RCC_CFGR2_PREDIV1) + 1;
                 /* HSE oscillator clock selected as PREDIV1 clock entry */
-                SystemCoreClock = (hal_brdcfg_sys__clockcfg.extclockspeed / prediv1factor) * pllmull; 
+                SystemCoreClock = (hal_brdcfg_sys__theconfig.clock.extclockspeed / prediv1factor) * pllmull; 
     #else //defined (STM32F10X_LD_VL) || defined (STM32F10X_MD_VL) || (defined STM32F10X_HD_VL)
                 /* HSE selected as PLL clock entry */
                 if ((RCC->CFGR & RCC_CFGR_PLLXTPRE) != (uint32_t)RESET)
                 {/* HSE oscillator clock divided by 2 */
-                    SystemCoreClock = (hal_brdcfg_sys__clockcfg.extclockspeed >> 1) * pllmull;
+                    SystemCoreClock = (hal_brdcfg_sys__theconfig.clock.extclockspeed >> 1) * pllmull;
                 }
                 else
                 {
-                    SystemCoreClock = hal_brdcfg_sys__clockcfg.extclockspeed * pllmull;
+                    SystemCoreClock = hal_brdcfg_sys__theconfig.clock.extclockspeed * pllmull;
                 }
     #endif //defined (STM32F10X_LD_VL) || defined (STM32F10X_MD_VL) || (defined STM32F10X_HD_VL)
             }
@@ -552,7 +568,7 @@ void SystemCoreClockUpdate(void)
                 if (prediv1source == 0)
                 { 
                     /* HSE oscillator clock selected as PREDIV1 clock entry */
-                    SystemCoreClock = (hal_brdcfg_sys__clockcfg.extclockspeed / prediv1factor) * pllmull;          
+                    SystemCoreClock = (hal_brdcfg_sys__theconfig.clock.extclockspeed / prediv1factor) * pllmull;          
                 }
                 else
                 {/* PLL2 clock selected as PREDIV1 clock entry */
@@ -560,7 +576,7 @@ void SystemCoreClockUpdate(void)
                     /* Get PREDIV2 division factor and PLL2 multiplication factor */
                     prediv2factor = ((RCC->CFGR2 & RCC_CFGR2_PREDIV2) >> 4) + 1;
                     pll2mull = ((RCC->CFGR2 & RCC_CFGR2_PLL2MUL) >> 8 ) + 2; 
-                    SystemCoreClock = (((hal_brdcfg_sys__clockcfg.extclockspeed / prediv2factor) * pll2mull) / prediv1factor) * pllmull;                         
+                    SystemCoreClock = (((hal_brdcfg_sys__theconfig.clock.extclockspeed / prediv2factor) * pll2mull) / prediv1factor) * pllmull;                         
                 }
             }
 #endif // STM32F10X_CL
@@ -627,11 +643,18 @@ void SystemInit(void)
 
     SCB->VTOR = FLASH_BASE; /* Vector Table Relocation in Internal FLASH */
     
-    
-    // now the HSI is selected as system clock, and no prescaler is used 
-    
-    // update value ...
-    SystemCoreClockUpdate();
+    // now the HSI is selected as system clock, and no prescaler is used     
+
+    if(hal_false == hal_brdcfg_sys__theconfig.keepinternalclockatstartup)
+    {   // apply the clock straigth away
+        s_hal_sys_set_sys_clock(168000000);
+        s_hal_sys_system_core_clock_update();        
+    }
+    else
+    {   // keep the hsi
+        // update value ...
+        SystemCoreClockUpdate();
+    }
 }
 
 extern const volatile uint8_t AHBPrescTable[16];
@@ -653,11 +676,11 @@ void SystemCoreClockUpdate(void)
         
         case 0x04:  /* HSE used as system clock source */
         {
-            if(0 == hal_brdcfg_sys__clockcfg.extclockspeed)
+            if(0 == hal_brdcfg_sys__theconfig.clock.extclockspeed)
             {
                 hal_base_hid_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "SystemCoreClockUpdate() called with HSE mode but HSE clock is not defined");
             }
-            SystemCoreClock = hal_brdcfg_sys__clockcfg.extclockspeed;
+            SystemCoreClock = hal_brdcfg_sys__theconfig.clock.extclockspeed;
         } break;
         
         case 0x08:  /* PLL used as system clock source */
@@ -671,11 +694,11 @@ void SystemCoreClockUpdate(void)
             if (pllsource != 0)
             {
                 /* HSE used as PLL clock source */
-                if(0 == hal_brdcfg_sys__clockcfg.extclockspeed)
+                if(0 == hal_brdcfg_sys__theconfig.clock.extclockspeed)
                 {
                     hal_base_hid_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "SystemCoreClockUpdate() called with PLL w/ HSE ref mode but HSE clock is not defined");
                 }
-                pllvco = (hal_brdcfg_sys__clockcfg.extclockspeed / pllm) * ((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> 6);
+                pllvco = (hal_brdcfg_sys__theconfig.clock.extclockspeed / pllm) * ((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> 6);
             }
             else
             {
@@ -752,11 +775,11 @@ extern hal_result_t hal_sys_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
 static void s_hal_sys_set_sys_clock(uint32_t maxcpufreq)
 {   // only valid for 72 mhz
     
-    if((72000000                                != hal_brdcfg_sys__clockcfg.targetspeeds.cpu)       ||
-       (72000000                                != hal_brdcfg_sys__clockcfg.targetspeeds.fastbus)   ||
-       (36000000                                != hal_brdcfg_sys__clockcfg.targetspeeds.slowbus)   ||
-       (hal_sys_refclock_pll_on_external_xtl    != hal_brdcfg_sys__clockcfg.sourceclock)            ||
-       (25000000                                != hal_brdcfg_sys__clockcfg.extclockspeed) 
+    if((72000000                                != hal_brdcfg_sys__theconfig.clock.targetspeeds.cpu)       ||
+       (72000000                                != hal_brdcfg_sys__theconfig.clock.targetspeeds.fastbus)   ||
+       (36000000                                != hal_brdcfg_sys__theconfig.clock.targetspeeds.slowbus)   ||
+       (hal_sys_refclock_pll_on_external_xtl    != hal_brdcfg_sys__theconfig.clock.refclock)            ||
+       (25000000                                != hal_brdcfg_sys__theconfig.clock.extclockspeed) 
       )
     {
             hal_base_hid_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "s_hal_sys_set_sys_clock() supports only 72MHz and external xtl of 25MHz");
@@ -870,13 +893,13 @@ static void s_hal_sys_set_sys_clock(uint32_t maxcpufreq)
     
     // --- if specified, then init the external clock: xtal or oscillator
     
-    if(0 != hal_brdcfg_sys__clockcfg.extclockspeed)
+    if(0 != hal_brdcfg_sys__theconfig.clock.extclockspeed)
     {
         __IO uint32_t StartUpCounter = 0, HSEStatus = 0;
             
         // we enable the bypass only if we want using an external oscillator, either directly or through pll
-        if( (hal_sys_refclock_external_osc        == hal_brdcfg_sys__clockcfg.sourceclock) ||
-            (hal_sys_refclock_pll_on_external_osc == hal_brdcfg_sys__clockcfg.sourceclock) )
+        if( (hal_sys_refclock_external_osc        == hal_brdcfg_sys__theconfig.clock.refclock) ||
+            (hal_sys_refclock_pll_on_external_osc == hal_brdcfg_sys__theconfig.clock.refclock) )
         {
             // enable hse bypass     
             RCC->CR |= ((uint32_t)RCC_CR_HSEBYP);
@@ -927,7 +950,7 @@ static void s_hal_sys_set_sys_clock(uint32_t maxcpufreq)
     uint32_t ppre2_div   = 0; //RCC_CFGR_PPRE2_DIV2;
     uint32_t ppre1_div   = 0; //RCC_CFGR_PPRE1_DIV4;
     
-    uint8_t factorfast = hal_brdcfg_sys__clockcfg.targetspeeds.cpu / hal_brdcfg_sys__clockcfg.targetspeeds.fastbus;   
+    uint8_t factorfast = hal_brdcfg_sys__theconfig.clock.targetspeeds.cpu / hal_brdcfg_sys__theconfig.clock.targetspeeds.fastbus;   
     switch(factorfast)
     {   // APB2 is fast bus
         default:
@@ -952,7 +975,7 @@ static void s_hal_sys_set_sys_clock(uint32_t maxcpufreq)
         } break;         
     }
 
-    uint8_t factorslow = hal_brdcfg_sys__clockcfg.targetspeeds.cpu / hal_brdcfg_sys__clockcfg.targetspeeds.slowbus;    
+    uint8_t factorslow = hal_brdcfg_sys__theconfig.clock.targetspeeds.cpu / hal_brdcfg_sys__theconfig.clock.targetspeeds.slowbus;    
     switch(factorslow)
     {   // APB2 is slow bus
         default:
@@ -989,14 +1012,14 @@ static void s_hal_sys_set_sys_clock(uint32_t maxcpufreq)
     
     // --- if required, configure the pll  
         
-    if( (hal_sys_refclock_pll_on_internal     == hal_brdcfg_sys__clockcfg.sourceclock) ||
-        (hal_sys_refclock_pll_on_external_xtl == hal_brdcfg_sys__clockcfg.sourceclock) ||
-        (hal_sys_refclock_pll_on_external_osc == hal_brdcfg_sys__clockcfg.sourceclock) )
+    if( (hal_sys_refclock_pll_on_internal     == hal_brdcfg_sys__theconfig.clock.refclock) ||
+        (hal_sys_refclock_pll_on_external_xtl == hal_brdcfg_sys__theconfig.clock.refclock) ||
+        (hal_sys_refclock_pll_on_external_osc == hal_brdcfg_sys__theconfig.clock.refclock) )
     {
-        uint32_t pll_m = hal_brdcfg_sys__clockcfg.pllcfg.m;
-        uint32_t pll_n = hal_brdcfg_sys__clockcfg.pllcfg.n;
-        uint32_t pll_p = hal_brdcfg_sys__clockcfg.pllcfg.p;
-        uint32_t pll_q = hal_brdcfg_sys__clockcfg.pllcfg.q;
+        uint32_t pll_m = hal_brdcfg_sys__theconfig.clock.pllcfg.m;
+        uint32_t pll_n = hal_brdcfg_sys__theconfig.clock.pllcfg.n;
+        uint32_t pll_p = hal_brdcfg_sys__theconfig.clock.pllcfg.p;
+        uint32_t pll_q = hal_brdcfg_sys__theconfig.clock.pllcfg.q;
 
         // configure the main PLL 
         RCC->PLLCFGR =  pll_m | ( pll_n << 6) | ((( pll_p >> 1) -1) << 16) |
@@ -1020,7 +1043,7 @@ static void s_hal_sys_set_sys_clock(uint32_t maxcpufreq)
     
     uint32_t clockcfg = 0;
     uint32_t clocksta = 0;
-    switch(hal_brdcfg_sys__clockcfg.sourceclock)
+    switch(hal_brdcfg_sys__theconfig.clock.refclock)
     {  
         default:
         case hal_sys_refclock_internal:

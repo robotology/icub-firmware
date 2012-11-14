@@ -39,11 +39,13 @@
 #include "hal_stm32_base_hid.h" 
 #include "hal_stm32_sys_hid.h"
 #include "hal_brdcfg.h"
-#include "hal_switch.h"
+//#include "hal_switch.h"
 
 #include "hal_stm32_gpio_hid.h"
 
-#include "utils/hal_tools.h"
+
+#include "utils/hal_utility_bits.h" 
+
 
 
 //#define HAL_USE_EVENTVIEWER_ETH
@@ -70,7 +72,274 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_stm32_eth_def.h" 
+#define ETH_BUF_SIZE        1536        /* ETH Receive/Transmit buffer size  */
+#define ETH_MTU             1514        /* Eth Maximum Transmission Unit */
+
+/* MAC Configuration Register */
+#define MCR_WD              0x00800000  /* Watchdog disable                  */
+#define MCR_JD              0x00400000  /* Jabber disable                    */
+#define MCR_IFG             0x000E0000  /* Interframe gap mask               */
+#define MCR_CSD             0x00010000  /* Carrier sense disable             */
+#define MCR_FES             0x00004000  /* Fast 100 Mb ethernet speed        */
+#define MCR_ROD             0x00002000  /* Receive own disable               */
+#define MCR_LM              0x00001000  /* Loopback mode                     */
+#define MCR_DM              0x00000800  /* Duplex mode                       */
+#define MCR_IPCO            0x00000400  /* IPv4 checksum offload             */
+#define MCR_RD              0x00000200  /* Retry disable                     */
+#define MCR_APCS            0x00000080  /* Automatic pad / CRC stripping     */
+#define MCR_BL              0x00000060  /* Back-off limit mask               */
+#define MCR_DC              0x00000010  /* Deferral check                    */
+#define MCR_TE              0x00000008  /* Transmitter enable                */
+#define MCR_RE              0x00000004  /* Receiver enable                   */
+
+/* MAC Frame Filter Register */
+#define MFFR_RA             0x80000000  /* Receive all                       */
+#define MFFR_HPF            0x00000400  /* Hash or Perfect filter            */
+#define MFFR_SAF            0x00000200  /* Source address filter             */
+#define MFFR_SAIF           0x00000100  /* Source address inverse filtering  */
+#define MFFR_PCF            0x000000C0  /* Pass control frames mask          */
+#define MFFR_BFD            0x00000020  /* Broadcast frames disable          */
+#define MFFR_PAM            0x00000010  /* Pass all multicast                */
+#define MFFR_DAIF           0x00000008  /* Dest. address inverse filtering   */
+#define MFFR_HM             0x00000004  /* Hash multicast                    */
+#define MFFR_HU             0x00000002  /* Hash unicast                      */
+#define MFFR_PM             0x00000001  /* Promiscuous mode                  */
+
+/* MAC MII Address Register */
+#define MMAR_PA             0x0000F800  /* PHY address mask                  */
+#define MMAR_MR             0x000007C0  /* MII register address mask         */
+#define MMAR_CR             0x0000001C  /* Clock range                       */
+#define MMAR_MW             0x00000002  /* MII write                         */
+#define MMAR_MB             0x00000001  /* MII busy                          */
+
+/* MAC MII Data Register */
+#define MMDR_MD             0x0000FFFF  /* MII 16-bit rw data                */
+
+/* MII Management Time out values */
+#define MII_WR_TOUT         0x00050000  /* MII Write timeout count           */
+#define MII_RD_TOUT         0x00050000  /* MII Read timeout count            */
+
+/* MAC Flow Control Register */
+#define MFCR_PT             0xFFFF0000  /* Pause time mask                   */
+#define MFCR_ZQPD           0x00000080  /* Zero-quanta pause disable         */
+#define MFCR_PLT            0x00000030  /* Pause low threshold               */
+#define MFCR_UPFD           0x00000008  /* Unicaste pause frame detect       */
+#define MFCR_RFCE           0x00000004  /* Receive flow control enable       */
+#define MFCR_TFCE           0x00000002  /* Transmit flow control enable      */
+#define MFCR_FCB_BPA        0x00000001  /* Flow ctrl busy/back pressure act. */
+
+/* MAC VLAN Tag Register */
+#define MVTR_VLANTC         0x00010000  /* 12-bit VLAN tag comparison        */
+#define MVTR_VLANTI         0x0000FFFF  /* VLAN tag identifier for rx frames */
+
+/* MAC PMT Contrl and Status Register */
+#define MPCSR_WFFRPR        0x80000000  /* Wakeup frame filter reg.ptr reset */
+#define MPCSR_GU            0x00000200  /* Global unicast                    */
+#define MPCSR_WFR           0x00000040  /* Wakeup frame received             */
+#define MPCSR_MPR           0x00000020  /* Magic packet received             */
+#define MPCSR_WFE           0x00000004  /* Wakeup frame enable               */
+#define MPCSR_MPE           0x00000002  /* Magic packet enable               */
+#define MPCSR_PD            0x00000001  /* Power down                        */
+
+/* MAC Interrupt Status Register */
+#define MSR_TSTS            0x00000200  /* Time stamp trigger status         */
+#define MSR_MMCTS           0x00000040  /* MMC transmit status               */
+#define MSR_MMCRS           0x00000020  /* MMC receive status                */
+#define MSR_MMCS            0x00000010  /* MMC status                        */
+#define MSR_PMTS            0x00000008  /* PMT status                        */
+
+/* MAC Interrupt Mask Register */
+#define MIMR_TSTIM          0x00000200  /* Time stamp trigger mask           */
+#define MIMR_PMTIM          0x00000008  /* PMT interrupt mask                */
+
+/* MAC Address Hi Control bits */
+#define MADR_AE             0x80000000  /* Address enable                    */
+#define MADR_SA             0x40000000  /* Source address compare            */
+#define MADR_MBC            0x3F000000  /* Mask byte control                 */
+#define MADR_AH             0x0000FFFF  /* MAC Address high                  */
+
+/* MMC Control Register */
+#define MMCR_MCF            0x00000008  /* MMC counter freeze                */
+#define MMCR_ROR            0x00000004  /* Reset on read                     */
+#define MMCR_CSR            0x00000002  /* Counter stop rollover             */
+#define MMCR_CR             0x00000001  /* Counter reset                     */
+
+/* MMC Receive Interrupt/Mask Registers */
+#define MMRI_RGUFS          0x00020000  /* Received good ucast frames status */
+#define MMRI_RFAES          0x00000040  /* Received frames align.error status*/
+#define MMRI_RFCES          0x00000020  /* Receive frames CRC error status   */
+
+/* MMC Transmit Interrupt/Mask Registers */
+#define MMTIR_TGFS          0x00200000  /* Transmitted good frames status    */
+#define MMTIR_TGFMSCS       0x00008000  /* Tx good frm.more single col.status*/
+#define MMTIR_TGFSCS        0x00004000  /* Tx good frm.single collision stat.*/
+
+/* PTP Time Stamp Register */
+#define PTSCR_TTSARU        0x00000020  /* Time stamp addend register update */
+#define PTSCR_TSITE         0x00000010  /* TS interrupt trigger enable       */
+#define PTSCR_TSSTU         0x00000008  /* TS system time update             */
+#define PTSCR_TSSTI         0x00000004  /* TS system time initialize         */
+#define PTSCR_TSFCU         0x00000002  /* TS fine or coarse update          */
+#define PTSCR_TSE           0x00000001  /* Time stamp enable                 */
+
+/* DMA Bus Mode Register */
+#define DBMR_AAB            0x02000000  /* Address-aligned beats             */
+#define DBMR_FPM            0x01000000  /* 4xPBL mode                        */
+#define DBMR_USP            0x00800000  /* Use separate PBL                  */
+#define DBMR_RDP            0x007E0000  /* Rx DMA PBL mask                   */
+#define DBMR_FB             0x00010000  /* Fixed burst                       */
+#define DBMR_RTPR           0x0000C000  /* Rx Tx priority ratio              */
+#define DBMR_PBL            0x00003F00  /* Programmable burst length mask    */
+#define DBMR_DSL            0x0000007C  /* Descriptor skip length            */
+#define DBMR_DA             0x00000002  /* DMA arbitration                   */
+#define DBMR_SR             0x00000001  /* Software reset                    */
+
+/* DMA Status Register */
+#define DSR_TSTS            0x20000000  /* Timestamp trigger status          */
+#define DSR_PMTS            0x10000000  /* PMT status                        */
+#define DSR_MMCS            0x08000000  /* MMC status                        */
+#define DSR_EBS             0x03800000  /* Error bits status mask            */
+#define DSR_TPS             0x00700000  /* Transmit process state            */
+#define DSR_RPS             0x000E0000  /* Receive process state             */
+#define DSR_NIS             0x00010000  /* Normal interrupt summary          */
+#define DSR_AIS             0x00008000  /* Abnormal interrupt summary        */
+#define DSR_ERS             0x00004000  /* Early receive status              */
+#define DSR_FBES            0x00002000  /* Fatal bus error status            */
+#define DSR_ETS             0x00000400  /* Early transmit status             */
+#define DSR_RWTS            0x00000200  /* Receive watchdog timeout status   */
+#define DSR_RPSS            0x00000100  /* Receive process stopped status    */
+#define DSR_RBUS            0x00000080  /* Receive buffer unavailable status */
+#define DSR_RS              0x00000040  /* Receive status                    */
+#define DSR_TUS             0x00000020  /* Transmit underflow status         */
+#define DSR_ROS             0x00000010  /* Receive overflow status           */
+#define DSR_TJTS            0x00000008  /* Transmit jabber timeout status    */
+#define DSR_TBUS            0x00000004  /* Transmit buffer unavailable status*/
+#define DSR_TPSS            0x00000002  /* Transmit process stopped status   */
+#define DSR_TS              0x00000001  /* Transmit status                   */
+
+/* DMA Operation Mode Register */
+#define DOMR_DTCEFD         0x04000000  /* Dropping of TCP/IP chksum err dis.*/
+#define DOMR_RSF            0x02000000  /* Receive store and forward         */
+#define DOMR_DFRF           0x01000000  /* Disable flushing of received frms */
+#define DOMR_TSF            0x00200000  /* Transmit storea and forward       */
+#define DOMR_FTF            0x00100000  /* Flush transmit FIFO               */
+#define DOMR_TTC            0x0001C000  /* Transmit treshold control mask    */
+#define DOMR_ST             0x00002000  /* Start/stop transmission           */
+#define DOMR_FEF            0x00000080  /* Forward error frames              */
+#define DOMR_FUGF           0x00000040  /* Forward undersized good frames    */
+#define DOMR_RTC            0x00000018  /* Receive threshold control mask    */
+#define DOMR_OSF            0x00000004  /* Operate on second frame           */
+#define DOMR_SR             0x00000002  /* Start/stop receive                */
+
+/* DMA Interrupt Enable Register */
+#define INT_NISE            0x00010000  /* Normal interrupt summary          */
+#define INT_AISE            0x00008000  /* Abnormal interrupt summary        */
+#define INT_ERIE            0x00004000  /* Early receive interrupt           */
+#define INT_FBEIE           0x00002000  /* Fatal bus error interrupt         */
+#define INT_ETIE            0x00000400  /* Early transmit interrupt          */
+#define INT_RWTIE           0x00000200  /* Receive watchdog timeout interrupt*/
+#define INT_RPSIE           0x00000100  /* Receive process stopped intterrupt*/
+#define INT_RBUIE           0x00000080  /* Receive buffer unavailable inter. */
+#define INT_RIE             0x00000040  /* Receive interrupt                 */
+#define INT_TUIE            0x00000020  /* Transmit underflow interrupt      */
+#define INT_ROIE            0x00000010  /* Receive overflow interrupt        */
+#define INT_TJTIE           0x00000008  /* Transmit jabber timeout interrupt */
+#define INT_TBUIE           0x00000004  /* Transmit buffer unavailable inter.*/
+#define INT_TPSIE           0x00000002  /* Transmit process stopped interrupt*/
+#define INT_TIE             0x00000001  /* Transmit interrupt                */
+
+/* DMA Missed Frame and Buffer Overflow Counter Register */
+#define DMFBOC_OFOC         0x10000000  /* Overflow bit for FIFO ovfl cntr.  */
+#define DMFBOC_MFA          0x0FFE0000  /* Missed frames by the application  */
+#define DMFBOC_OMFC         0x00010000  /* Ovfl bit for missed frame counter */
+#define DMFBOC_MFC          0x0000FFFF  /* Missed frames by controller       */
+
+/* DMA Descriptor TX Packet Control/Status */
+#define DMA_TX_OWN          0x80000000  /* Own bit 1=DMA,0=CPU               */
+#define DMA_TX_IC           0x40000000  /* Interrupt on completition         */
+#define DMA_TX_LS           0x20000000  /* Last segment                      */
+#define DMA_TX_FS           0x10000000  /* First segment                     */
+#define DMA_TX_DC           0x08000000  /* Disable CRC                       */
+#define DMA_TX_DP           0x04000000  /* Disable pad                       */
+#define DMA_TX_TTSE         0x02000000  /* Transmit time stamp enable        */
+#define DMA_TX_CIC          0x00C00000  /* Checksum insertion control        */
+#define DMA_TX_TER          0x00200000  /* Transmit end of ring              */
+#define DMA_TX_TCH          0x00100000  /* Second address chained            */
+#define DMA_TX_TTSS         0x00020000  /* Transmit time stamp status        */
+#define DMA_TX_IHE          0x00010000  /* IP header error status            */
+#define DMA_TX_ES           0x00008000  /* Error summary                     */
+#define DMA_TX_JT           0x00004000  /* Jabber timeout                    */
+#define DMA_TX_FF           0x00002000  /* Frame flushed                     */
+#define DMA_TX_IPE          0x00001000  /* IP payload error                  */
+#define DMA_TX_LC           0x00000800  /* Loss of carrier                   */
+#define DMA_TX_NC           0x00000400  /* No carrier                        */
+#define DMA_TX_LCOL         0x00000200  /* Late collision                    */
+#define DMA_TX_EC           0x00000100  /* Excessive collision               */
+#define DMA_TX_VF           0x00000080  /* VLAN frame                        */
+#define DMA_TX_CC           0x00000078  /* Collision count                   */
+#define DMA_TX_ED           0x00000004  /* Excessive deferral                */
+#define DMA_TX_UF           0x00000002  /* Underflow error                   */
+#define DMA_TX_DB           0x00000001  /* Deferred bit                      */
+
+/* DMA Descriptor RX Packet Status */
+#define DMA_RX_OWN          0x80000000  /* Own bit 1=DMA,0=CPU               */
+#define DMA_RX_AFM          0x40000000  /* Destination address filter fail   */
+#define DMA_RX_FL           0x3FFF0000  /* Frame length mask                 */
+#define DMA_RX_ES           0x00008000  /* Error summary                     */
+#define DMA_RX_DE           0x00004000  /* Descriptor error                  */
+#define DMA_RX_SAF          0x00002000  /* Source address filter fail        */
+#define DMA_RX_LE           0x00001000  /* Length error                      */
+#define DMA_RX_OE           0x00000800  /* Overflow error                    */
+#define DMA_RX_VLAN         0x00000400  /* VLAN tag                          */
+#define DMA_RX_FS           0x00000200  /* First descriptor                  */
+#define DMA_RX_LS           0x00000100  /* Last descriptor                   */
+#define DMA_RX_IPHCE        0x00000080  /* IPv4 header checksum error        */
+#define DMA_RX_LC           0x00000040  /* late collision                    */
+#define DMA_RX_FT           0x00000020  /* Frame type                        */
+#define DMA_RX_RWT          0x00000010  /* Receive watchdog timeout          */
+#define DMA_RX_RE           0x00000008  /* Receive error                     */
+#define DMA_RX_DRE          0x00000004  /* Dribble bit error                 */
+#define DMA_RX_CE           0x00000002  /* CRC error                         */
+#define DMA_RX_RMAM         0x00000001  /* Rx MAC adr.match/payload cks.error*/
+
+#define DMA_RX_ERROR_MASK   (DMA_RX_ES | DMA_RX_LE | DMA_RX_RWT | \
+                             DMA_RX_RE | DMA_RX_CE)
+#define DMA_RX_SEG_MASK     (DMA_RX_FS | DMA_RX_LS)
+
+/* DMA Descriptor RX Packet Control */
+#define DMA_RX_DIC          0x80000000  /* Disable interrupt on completition */
+#define DMA_RX_RBS2         0x1FFF0000  /* Receive buffer 2 size             */
+#define DMA_RX_RER          0x00008000  /* Receove end of ring               */
+#define DMA_RX_RCH          0x00004000  /* Second address chained            */
+#define DMA_RX_RBS1         0x00003FFF  /* Receive buffer 1 size             */
+
+// removed because they are value related to an external phy and not to the mpu.
+// the values are defined inside the specific board which uses a given phy
+// /* Common PHY Registers addresses */
+// #define PHY_REG_BMCR        0x00        /* Basic Mode Control Register       */
+// #define PHY_REG_BMSR        0x01        /* Basic Mode Status Register        */
+// #define PHY_REG_IDR1        0x02        /* PHY Identifier 1                  */
+// #define PHY_REG_IDR2        0x03        /* PHY Identifier 2                  */
+// #define PHY_REG_ANAR        0x04        /* Auto-Negotiation Advertisement    */
+// #define PHY_REG_ANLPAR      0x05        /* Auto-Neg. Link Partner Abitily    */
+//
+// /* Common PHY Registers values */
+// #define PHY_FULLD_100M      0x2100      /* Full Duplex 100Mbit               */
+// #define PHY_HALFD_100M      0x2000      /* Half Duplex 100Mbit               */
+// #define PHY_FULLD_10M       0x0100      /* Full Duplex 10Mbit                */
+// #define PHY_HALFD_10M       0x0000      /* Half Duplex 10MBit                */
+// #define PHY_AUTO_NEG        0x3000      /* Select Auto Negotiation           */
+
+// #define PHY_Reset                       ((uint16_t)0x8000)      /* PHY Reset */
+// #define PHY_Loopback                    ((uint16_t)0x4000)      /* Select loop-back mode */
+// #define PHY_FULLDUPLEX_100M             ((uint16_t)0x2100)      /* Set the full-duplex mode at 100 Mb/s */
+// #define PHY_HALFDUPLEX_100M             ((uint16_t)0x2000)      /* Set the half-duplex mode at 100 Mb/s */
+// #define PHY_FULLDUPLEX_10M              ((uint16_t)0x0100)      /* Set the full-duplex mode at 10 Mb/s */
+// #define PHY_HALFDUPLEX_10M              ((uint16_t)0x0000)      /* Set the half-duplex mode at 10 Mb/s */
+// #define PHY_AutoNegotiation             ((uint16_t)0x1000)      /* Enable auto-negotiation function */
+// #define PHY_Restart_AutoNegotiation     ((uint16_t)0x0200)      /* Restart auto-negotiation function */
+// #define PHY_Powerdown                   ((uint16_t)0x0800)      /* Select the power down mode */
+// #define PHY_Isolate                     ((uint16_t)0x0400)      /* Isolate PHY from MII */
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -105,7 +374,7 @@ typedef struct {
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_eth_supported_is(void);
+static hal_bool_t s_hal_eth_supported_is(void);
 static void s_hal_eth_initted_set(void);
 static hal_boolval_t s_hal_eth_initted_is(void);
 
@@ -169,7 +438,7 @@ extern void ETH_IRQHandler(void);
 
 extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
 {
-    hal_eth_phymode_t phymode;
+    hal_eth_phymode_t usedphymode;
 
     if(hal_true != s_hal_eth_supported_is())
     {
@@ -196,9 +465,9 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     // in here we allow a specific board to init all what is related to the phy.
     // in case of a phy accessed through the smi, this function must: a. init the smi, b. reset the phy, ... that's it.
     // instead in case of a switch accessed through i2c, this function must: a. init the i2c, reset the switch, that's it.    
-    if(hal_false == hal_brdcfg_eth__phy_initialise())
+    if(hal_res_NOK_generic == hal_device_ethtransceiver_init(NULL))
     {
-         hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() called hal_brdcfg_eth__phy_initialise() which has failed");
+         hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() called hal_device_ethtransceiver_init() which failed");
     }        
     
   
@@ -212,17 +481,18 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     // but which we retrieve
     // in case of a phy accessed through the smi, this function must set the mode and the speed and return the result
     // instead in case of a switch accessed through i2c, this function must configure mode and speed and put the swicth operative. 
-    phymode = hal_brdcfg_eth__phymode;
-    hal_brdcfg_eth__phy_configure(&phymode); 
+
+    hal_device_ethtransceiver_config(hal_eth_phymode_auto, &usedphymode);
     
     
-    if(hal_eth_phymode_none == phymode)
+    if(hal_eth_phymode_none == usedphymode)
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() called hal_brdcfg_eth__phy_configure() which does not support a phy mode");
+        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() called hal_device_ethtransceiver_config() which does not support a phy mode");
     }
     
-    
-    s_hal_eth_mac_init(cfg, phymode);
+    // for rmii we use the same config at the phy ...
+    hal_eth_phymode_t rmiiphymode = usedphymode;
+    s_hal_eth_mac_init(cfg, rmiiphymode);
     
 
     s_hal_eth_initted_set();
@@ -439,9 +709,9 @@ extern hal_result_t hal_eth_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_eth_supported_is(void)
+static hal_bool_t s_hal_eth_supported_is(void)
 {
-    return(hal_tools_bitoperator_byte_bitcheck(hal_brdcfg_eth__supported_mask, 0) );
+    return(hal_brdcfg_eth__theconfig.supported);
 }
 
 static void s_hal_eth_initted_set(void)
@@ -586,7 +856,7 @@ extern void hal_eth_hid_rmii_rx_init(void)
         .afmode     = HAL_GPIO_AFMODE_NONE
     };
     rmii_rx_altcfg.afname = GPIO_Remap_ETH;
-    rmii_rx_altcfg.afmode = (hal_gpio_portD == hal_brdcfg_eth__gpio_ETH_RMII_CRS_DV.port) ? (ENABLE) : (DISABLE);    
+    rmii_rx_altcfg.afmode = (hal_gpio_portD == hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_CRS_DV.port) ? (ENABLE) : (DISABLE);    
 #elif   defined(USE_STM32F4)
     static const hal_gpio_altcfg_t rmii_rx_altcfg = 
     {
@@ -602,10 +872,9 @@ extern void hal_eth_hid_rmii_rx_init(void)
         .afmode     = ENABLE
     };
 #endif    
-    
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_RMII_CRS_DV, &rmii_rx_altcfg);    
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_RMII_RXD0, &rmii_rx_altcfg);   
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_RMII_RXD1, &rmii_rx_altcfg);    
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_CRS_DV, &rmii_rx_altcfg);    
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_RXD0, &rmii_rx_altcfg);   
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_RXD1, &rmii_rx_altcfg);    
 }
 
 // cambiata
@@ -639,9 +908,9 @@ extern void hal_eth_hid_rmii_tx_init(void)
     };
 #endif
     
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_RMII_TX_EN, &rmii_tx_altcfg);    
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_RMII_TXD0, &rmii_tx_altcfg);   
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_RMII_TXD1, &rmii_tx_altcfg);        
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TX_EN, &rmii_tx_altcfg);    
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TXD0, &rmii_tx_altcfg);   
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TXD1, &rmii_tx_altcfg);        
 }
  
 
@@ -678,8 +947,8 @@ extern void hal_eth_hid_smi_init(void)
     const uint32_t mdcclockrange = 0x00000004; // MDC clock range:  bits 4:2 CR: clock range. value 1 -> HCLK = 100-168 MHz, MDC Clock = HCLK/62
 #endif    
         
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_MDC, &smi_altcfg);    
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_MDIO, &smi_altcfg);  
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_smi.ETH_MDC, &smi_altcfg);    
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_smi.ETH_MDIO, &smi_altcfg);  
      
     // MDC Clock range
     ETH->MACMIIAR   = mdcclockrange;   
@@ -752,7 +1021,7 @@ extern void hal_eth_hid_rmii_refclock_init(void)
     };        
 #endif
     
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_RMII_REF_CLK, &rmii_clk_altcfg);      
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_REF_CLK, &rmii_clk_altcfg);      
 }
 
 
@@ -875,11 +1144,11 @@ extern void hal_eth_hid_rmii_rx_init(void)
     };
         
     rmii_rx_altcfg.afname = GPIO_Remap_ETH;
-    rmii_rx_altcfg.afmode = (hal_gpio_portD == hal_brdcfg_eth__gpio_ETH_RMII_CRS_DV.port) ? (ENABLE) : (DISABLE);
+    rmii_rx_altcfg.afmode = (hal_gpio_portD == hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_CRS_DV.port) ? (ENABLE) : (DISABLE);
     
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_RMII_CRS_DV, &rmii_rx_altcfg);    
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_RMII_RXD0, &rmii_rx_altcfg);   
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_RMII_RXD1, &rmii_rx_altcfg);    
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_CRS_DV, &rmii_rx_altcfg);    
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_RXD0, &rmii_rx_altcfg);   
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_RXD1, &rmii_rx_altcfg);    
     
 // #if 0    
 //     
@@ -893,13 +1162,13 @@ extern void hal_eth_hid_rmii_rx_init(void)
 //     GPIOD->CRH      |= 0x00000444;              // pins configured in reset state (floating input)
 
 // #else
-//     hal_boolval_t eth_remap = (stm32gpio_portD == hal_brdcfg_eth__gpio_ETH_RMII_CRS_DV.port) ? (hal_true) : (hal_false); 
+//     hal_boolval_t eth_remap = (stm32gpio_portD == hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_CRS_DV.port) ? (hal_true) : (hal_false); 
 //     // actually is true if also other things are satisfied ... 
 //     // if true then: RX_DV-CRS_DV->PD8, RXD0->PD9, RXD1->PD10; else: RX_DV-CRS_DV->PA7, RXD0->PC4, RXD1->PC5.
 //     GPIO_PinRemapConfig(GPIO_Remap_ETH, (hal_true == eth_remap) ? ENABLE : DISABLE);
-//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_CRS_DV, 1);
-//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_RXD0, 1);
-//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_RXD1, 1);    
+//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_CRS_DV, 1);
+//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_RXD0, 1);
+//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_RXD1, 1);    
 // #endif
     
 #elif   defined(USE_STM32F4)
@@ -918,9 +1187,9 @@ extern void hal_eth_hid_rmii_rx_init(void)
         .afmode     = ENABLE
     };
 
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_RMII_CRS_DV, &rmii_rx_altcfg);    
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_RMII_RXD0, &rmii_rx_altcfg);   
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_RMII_RXD1, &rmii_rx_altcfg); 
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_CRS_DV, &rmii_rx_altcfg);    
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_RXD0, &rmii_rx_altcfg);   
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_RXD1, &rmii_rx_altcfg); 
 
 // #if 0 
 //     // enable system configuration controller clock
@@ -951,9 +1220,9 @@ extern void hal_eth_hid_rmii_rx_init(void)
 //     GPIOC->AFR[0]  &= ~0x00FF0000;
 //     GPIOC->AFR[0]  |=  0x00BB0000;              // AF11 (ethernet) 
 // #else
-//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_CRS_DV, 0);
-//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_RXD0, 0);
-//    s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_RXD1, 0);   
+//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_CRS_DV, 0);
+//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_RXD0, 0);
+//    s_hal_eth_gpioeth_init(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_RXD1, 0);   
 // #endif
 #endif
 }
@@ -975,9 +1244,9 @@ extern void hal_eth_hid_rmii_tx_init(void)
         .afmode     = HAL_GPIO_AFMODE_NONE
     };
         
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_RMII_TX_EN, &rmii_tx_altcfg);    
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_RMII_TXD0, &rmii_tx_altcfg);   
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_RMII_TXD1, &rmii_tx_altcfg);        
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TX_EN, &rmii_tx_altcfg);    
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TXD0, &rmii_tx_altcfg);   
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TXD1, &rmii_tx_altcfg);        
     
 // #if 0    
 //     // enable clock for port b
@@ -987,9 +1256,9 @@ extern void hal_eth_hid_rmii_tx_init(void)
 //     GPIOB->CRH      &= 0xFF000FFF;              // reset pb11, pb12, pb13
 //     GPIOB->CRH      |= 0x00BBB000;              // output max 50mhz, alternate function output push-pull.
 // #else
-//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_TX_EN, 0);
-//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_TXD0, 0);
-//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_TXD1, 0);     
+//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TX_EN, 0);
+//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TXD0, 0);
+//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TXD1, 0);     
 // #endif    
     
 #elif   defined(USE_STM32F4)
@@ -1008,9 +1277,9 @@ extern void hal_eth_hid_rmii_tx_init(void)
         .afmode     = ENABLE
     };
 
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_RMII_TX_EN, &rmii_tx_altcfg);    
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_RMII_TXD0, &rmii_tx_altcfg);   
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_RMII_TXD1, &rmii_tx_altcfg);
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TX_EN, &rmii_tx_altcfg);    
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TXD0, &rmii_tx_altcfg);   
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TXD1, &rmii_tx_altcfg);
 
 // #if 0
 //     if(portg)
@@ -1050,9 +1319,9 @@ extern void hal_eth_hid_rmii_tx_init(void)
 //         GPIOB->AFR[1]  |=  0x00BBB000;              // AF11 (ethernet)        
 //     }
 // #else
-//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_TX_EN, 0);
-//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_TXD0, 0);
-//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_TXD1, 0);   
+//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TX_EN, 0);
+//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TXD0, 0);
+//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TXD1, 0);   
 // #endif
 #endif
 }
@@ -1075,8 +1344,8 @@ extern void hal_eth_hid_smi_init(void)
         .afmode     = HAL_GPIO_AFMODE_NONE
     };
         
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_MDC, &smi_altcfg);    
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_MDIO, &smi_altcfg);  
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_smi.ETH_MDC, &smi_altcfg);    
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_smi.ETH_MDIO, &smi_altcfg);  
      
     // MDC Clock range: 60-72MHz. MDC = Management data clock. (RMII signal)
     ETH->MACMIIAR   = 0x00000000;
@@ -1096,8 +1365,8 @@ extern void hal_eth_hid_smi_init(void)
 //     // MDC Clock range: 60-72MHz. MDC = Management data clock. (RMII signal)
 //     ETH->MACMIIAR   = 0x00000000;
 // #else
-//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_MDC, 0);
-//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_MDIO, 0);
+//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__theconfig.gpio_smi.ETH_MDC, 0);
+//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__theconfig.gpio_smi.ETH_MDIO, 0);
 //     // MDC Clock range: 60-72MHz. MDC = Management data clock. (RMII signal)
 //     ETH->MACMIIAR   = 0x00000000;
 // #endif    
@@ -1117,8 +1386,8 @@ extern void hal_eth_hid_smi_init(void)
         .afmode     = ENABLE
     };
 
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_MDC, &smi_altcfg);    
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_MDIO, &smi_altcfg);   
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_smi.ETH_MDC, &smi_altcfg);    
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_smi.ETH_MDIO, &smi_altcfg);   
    
     // MDC clock range:  bits 4:2 CR: clock range. value 1 -> HCLK = 100-168 MHz, MDC Clock = HCLK/62
     ETH->MACMIIAR   = 0x00000004;  
@@ -1154,8 +1423,8 @@ extern void hal_eth_hid_smi_init(void)
 //     // 3. MDC clock range:  bits 4:2 CR: clock range. value 1 -> HCLK = 100-168 MHz, MDC Clock = HCLK/62
 //     ETH->MACMIIAR   = 0x00000004; 
 // #else   
-//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_MDC, 0);
-//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_MDIO, 0);    
+//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__theconfig.gpio_smi.ETH_MDC, 0);
+//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__theconfig.gpio_smi.ETH_MDIO, 0);    
 //     // MDC clock range:  bits 4:2 CR: clock range. value 1 -> HCLK = 100-168 MHz, MDC Clock = HCLK/62
 //     ETH->MACMIIAR   = 0x00000004; 
 // #endif    
@@ -1181,7 +1450,7 @@ extern void hal_eth_hid_rmii_refclock_init(void)
     };
         
     
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_RMII_REF_CLK, &rmii_clk_altcfg);    
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_REF_CLK, &rmii_clk_altcfg);    
 
 
 // #if 0    
@@ -1192,7 +1461,7 @@ extern void hal_eth_hid_rmii_refclock_init(void)
 //     GPIOA->CRL      &= 0xFFFFFF0F;              // reset pa1
 //     GPIOA->CRL      |= 0x00000040;              // pin configured in reset state (floating input)
 // #else
-//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_REF_CLK, 1);
+//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_REF_CLK, 1);
 // #endif
     
 #elif   defined(USE_STM32F4) 
@@ -1211,7 +1480,7 @@ extern void hal_eth_hid_rmii_refclock_init(void)
         .afmode     = ENABLE
     };
 
-    hal_gpio_configure(hal_brdcfg_eth__gpio_ETH_RMII_REF_CLK, &rmii_clk_altcfg);    
+    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_REF_CLK, &rmii_clk_altcfg);    
 
 // #if 0        
 //     // enable system configuration controller clock
@@ -1231,7 +1500,7 @@ extern void hal_eth_hid_rmii_refclock_init(void)
 //     GPIOA->AFR[0]   |=  0x000000B0;              // AF11 (ethernet)    
 
 // #else
-//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__gpio_ETH_RMII_REF_CLK, 0);
+//     s_hal_eth_gpioeth_init(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_REF_CLK, 0);
 // #endif
 
 #endif    

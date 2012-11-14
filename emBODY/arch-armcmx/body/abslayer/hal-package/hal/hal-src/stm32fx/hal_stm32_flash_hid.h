@@ -46,15 +46,11 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-/* @typedef    typedef enum hal_flash_cycles_t 
-    @brief      hal_flash_cycles_t contains the number of cycles that FLASH can be configured to have
- **/
-typedef enum  
-{ 
-    hal_flash_0cycles = 0,          /**< 0 wait cycles         */
-    hal_flash_1cycles = 1,          /**< 1 wait cycles         */
-    hal_flash_2cycles = 2           /**< 0 wait cycles         */
-} hal_flash_cycles_t; 
+typedef struct
+{
+    uint8_t             nonesofar;          /**< none so far */
+} hal_flash_hid_brdcfg_t;
+
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 // empty-section
@@ -66,12 +62,6 @@ extern uint32_t hal_flash_hid_getsize(const hal_cfg_t *cfg);
 extern hal_result_t hal_flash_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory);
 
 
-/** @fn         extern hal_result_t hal_flash_hid_setlatency(hal_flash_cycles_t ncycles)
-    @brief      Sets the latency of the FLASH 
-    @param      ncycles         The number of waiting cycles. 
-    @return     Always hal_res_OK.
- **/
-extern hal_result_t hal_flash_hid_setlatency(hal_flash_cycles_t ncycles);
 
 
 
