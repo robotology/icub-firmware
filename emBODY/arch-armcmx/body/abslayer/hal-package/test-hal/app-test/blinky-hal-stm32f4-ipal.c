@@ -29,7 +29,20 @@
 
 #include "hal_brdcfg_modules.h"
 
-#include "hal_switch.h"
+#include "hal_device_switch.h"
+#include "hal_actuator_led.h"
+#include "hal_spi.h"
+
+#include "hal_sensor_temp.h"
+#include "hal_sensor_gyro.h"
+#include "hal_sensor_accel.h"
+
+#include "utils/hal_utility_fifo.h"
+
+#include "hal_brdcfg.h"
+
+
+#include "eventviewer.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -76,6 +89,19 @@ typedef struct
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+void idle(void);
+void userdef1(void);
+void userdef2(void);
+void userdef3(void);
+void userdef4(void);
+static void s_eventviewer_init(void);
+
+static void s_test_fifo(void);
+static void s_test_fifoold(void);
+static void s_test_fifonew(void);
+static void s_test_fifoultra(void);
+//static void s_test_fifomega(void);
+
 static void myledsinit(void);
 static void myled00toggle(void);
 static void myled01toggle(void* p);
@@ -95,6 +121,11 @@ static void test_eeprom(void);
 static void test_can(void);
 
 static void s_test_mco2(void);
+
+static void s_myfuntxspima(void* p);
+static void s_myfunrxspima(void* p);
+static void s_myfuntxspisl(void* p);
+static void s_myfunrxspisl(void* p);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -154,7 +185,7 @@ int main(void)
     uint32_t *data32aligned = NULL;
     hal_result_t res = hal_res_OK;
     
-
+    
 
     hal_base_memory_getsize(hal_cfgMINE, &size04aligned); 
 
@@ -168,6 +199,13 @@ int main(void)
 
     hal_sys_systeminit();
     
+    s_eventviewer_init();
+    
+//    s_test_fifo();
+    
+//    s_test_fifo();
+    
+    
     
     myledsinit();
     
@@ -177,6 +215,14 @@ int main(void)
     res = hal_sys_systick_sethandler(myonsystick, 1000, hal_int_priority00);
     res =  res;
     
+//    for(;;);
+    
+//     for(;;)
+//     {
+//                 myled01toggle(NULL);
+//                 hal_sys_delay(500*1000);
+//         
+//     }
     
 #if 0    
     s_test_mco2();
@@ -184,18 +230,58 @@ int main(void)
 #endif
     
     
-#ifdef  HAL_USE_SWITCH   
-//     extern const hal_eth_phymode_t hal_brdcfg_eth__phymode;
-//     hal_eth_phymode_t phymode = hal_brdcfg_eth__phymode; 
-//     hal_switch_init(NULL);
-//     hal_switch_start(&phymode);
-//     for(;;);
+#ifdef  HAL_USE_SPI  
+    hal_spi_cfg_t cfgg;
+    memcpy(&cfgg, &hal_spi_cfg_default, sizeof(hal_spi_cfg_t));
+    cfgg.onframetransm  = s_myfuntxspima;
+    cfgg.onframereceiv  = s_myfunrxspima;
+    cfgg.ownership      = hal_spi_ownership_master;
+    //cfgg.activity = hal_spi_act_continuous;
+    hal_spi_init(hal_spi_port1, &cfgg);
+
+    cfgg.onframetransm  = s_myfuntxspisl;
+    cfgg.onframereceiv  = s_myfunrxspisl;
+    cfgg.ownership      = hal_spi_ownership_slave;
+    hal_spi_init(hal_spi_port2, &cfgg);
+    
+    hal_test_spima_spisl();
+    
+//     uint8_t mydata[4] = {1, 2, 3, 4};
+//     uint8_t ymdata[4] = {5, 6, 7, 8};
+//     hal_spi_put(hal_spi_port2, mydata, 4, hal_false);
+//     hal_spi_put(hal_spi_port2, ymdata, 4, hal_true);
+//     
+    hal_sys_delay(10000);
+    
+//    hal_spi_stop(hal_spi_port2);
+    
+    hal_sys_delay(10000);
+    
+    for(;;);
+#endif   
+    
+    
+#ifdef  HAL_USE_DEVICE_SWITCH   
+    extern const hal_device_switch_hid_brdcfg_t hal_brdcfg_device_switch__theconfig;
+    hal_eth_phymode_t phymode = hal_eth_phymode_none; 
+    hal_device_switch_init(NULL);
+    hal_device_switch_configure(hal_brdcfg_device_switch__theconfig.devcfg.targetphymode, &phymode);
+//    for(;;);
 #endif    
  
 
     test_eeprom();   
 
-    test_can();
+//    test_can();
+#ifdef HAL_USE_SENSOR_ACCEL
+    hal_sensor_accel_init(hal_sensor_accel1, NULL);
+#endif
+#ifdef HAL_USE_SENSOR_GYRO
+    hal_sensor_gyro_init(hal_sensor_gyro1, NULL);
+#endif
+#ifdef HAL_USE_SENSOR_TEMP
+    hal_sensor_temp_init(hal_sensor_temp1, NULL);
+#endif
     
     
     ipal_base_memory_getsize(ipal_cfgMINE, &size04aligned);
@@ -212,11 +298,37 @@ int main(void)
 
     s_udp_init();
     
+    uint8_t read = 255;
+    
     for(;;)
     {
+        if(0 == read--)
+        {
+        #ifdef HAL_USE_SENSOR_TEMP    
+            hal_sensor_temp_degree_t degrees;
+            hal_sensor_temp_read(hal_sensor_temp1, &degrees);
+            degrees = degrees;    
+        #endif
+        #ifdef HAL_USE_SENSOR_GYRO            
+            hal_sensor_gyro_angular_rate_t angrate;
+            hal_sensor_gyro_read(hal_sensor_gyro1, &angrate);
+            angrate.xar = angrate.xar;      
+        #endif
+        #ifdef HAL_USE_SENSOR_ACCEL    
+            hal_sensor_accel_acceleration_t accel;
+            hal_sensor_accel_read(hal_sensor_accel1, &accel);
+            accel.xac = accel.xac;
+        #endif    
+        }
+        
         if(1 == button_ispushed())
         {
+            #ifdef HAL_USE_SENSOR_TEMP
+            hal_sensor_temp_degree_t degrees;
             send_msg = 1;
+            hal_sensor_temp_read(hal_sensor_temp1, &degrees);
+            degrees = degrees;
+            #endif
         }
 
         timer_poll();
@@ -233,7 +345,7 @@ int main(void)
         }    
     
     }
-    
+ 
 }
 
 
@@ -249,24 +361,58 @@ int main(void)
 // - definition of static functions 
 // -------------------------------------------------------------------------------------------------------------------- 
 
+void idle(void){}
+void userdef1(void){}
+void userdef2(void){}
+void userdef3(void){}
+void userdef4(void){}
+    
+static void s_eventviewer_init(void)
+{
+    evEntityId_t prev;
 
+    eventviewer_init();
+    eventviewer_load(ev_ID_idle, idle);  
+    eventviewer_load(ev_ID_systick, myonsystick);  
+    eventviewer_load(ev_ID_first_usrdef+1, userdef1); 
+    eventviewer_load(ev_ID_first_usrdef+2, userdef2);
+    eventviewer_load(ev_ID_first_usrdef+3, userdef3);
+    eventviewer_load(ev_ID_first_usrdef+4, userdef4);
+    
+    // the eventviewer shall stay most of time in idle
+    // apart from some specific actions: systick, userdef1 and userdef2
+    eventviewer_switch_to(ev_ID_idle);
+}
 
 static void myledsinit(void)
 {
+    evEntityId_t prev;
     hal_result_t res;
     
-    res = hal_led_init(hal_led0, NULL);
+    res = hal_actuator_led_init(hal_actuator_led0, NULL);
     res =  res;
     
-    res = hal_led_init(hal_led1, NULL);
+    res = hal_actuator_led_init(hal_actuator_led1, NULL);
     res =  res;
+
+    prev = eventviewer_switch_to(ev_ID_first_usrdef+1);
+    hal_gpio_quickest_setval(hal_brdcfg_actuator_led__theconfig.gpiocfg[0].port, hal_brdcfg_actuator_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
+    hal_gpio_quickest_setval(hal_brdcfg_actuator_led__theconfig.gpiocfg[0].port, hal_brdcfg_actuator_led__theconfig.gpiocfg[0].pin, hal_gpio_valHIGH);
+    hal_gpio_quickest_setval(hal_brdcfg_actuator_led__theconfig.gpiocfg[0].port, hal_brdcfg_actuator_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
+    eventviewer_switch_to(prev); 
+    
+    prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
+    hal_gpio_setval(hal_brdcfg_actuator_led__theconfig.gpiocfg[0].port, hal_brdcfg_actuator_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
+    hal_gpio_setval(hal_brdcfg_actuator_led__theconfig.gpiocfg[0].port, hal_brdcfg_actuator_led__theconfig.gpiocfg[0].pin, hal_gpio_valHIGH);
+    hal_gpio_setval(hal_brdcfg_actuator_led__theconfig.gpiocfg[0].port, hal_brdcfg_actuator_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
+    eventviewer_switch_to(prev);     
 }
 
 static void myled00toggle(void)
 {
     hal_result_t res;
     
-    res = hal_led_toggle(hal_led0);
+    res = hal_actuator_led_toggle(hal_actuator_led0);
     res =  res;
 }
 
@@ -274,12 +420,14 @@ static void myled01toggle(void* p)
 {
     hal_result_t res;
     
-    res = hal_led_toggle(hal_led1);
+    res = hal_actuator_led_toggle(hal_actuator_led1);
     res =  res;
 }
 
 static void myonsystick(void)
 {
+    evEntityId_t prev = eventviewer_switch_to(ev_ID_systick);
+
     static uint32_t count = 0;
     static const uint32_t max = 500;
     msTicks++;
@@ -300,6 +448,8 @@ static void myonsystick(void)
     {
 //        hal_sys_systemreset();       
     }
+    
+    eventviewer_switch_to(prev);       
 }
 
 
@@ -437,30 +587,30 @@ static void test_eeprom(void)
 //#ifdef HAL_USE_EEPROM
     static uint8_t data[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
     
-    static uint8_t tmp[64] = {0};
+    static uint8_t tmp[512] = {0};
     
     hal_result_t res;
     
     //hal_i2c4hal_init(hal_i2c_port1, NULL);
 
-    res = hal_eeprom_init(hal_eeprom_i2c_01, NULL);
+    res = hal_device_eeprom_init(hal_device_eeprom_i2c_01, NULL);
     res =  res;
     
-    res = hal_eeprom_read(hal_eeprom_i2c_01, 0, 12, tmp);
+    res = hal_device_eeprom_read(hal_device_eeprom_i2c_01, 258, 12, tmp);
     res =  res;  
     
-    //return;   
+//    return;   
     
-    res = hal_eeprom_erase(hal_eeprom_i2c_01, 0, 256);
+    res = hal_device_eeprom_erase(hal_device_eeprom_i2c_01, 0, 512);
     res =  res;
     
-    res = hal_eeprom_read(hal_eeprom_i2c_01, 0, 12, tmp);
+    res = hal_device_eeprom_read(hal_device_eeprom_i2c_01, 258, 12, tmp);
     res =  res;    
     
-    res = hal_eeprom_write(hal_eeprom_i2c_01, 0, 12, data);
+    res = hal_device_eeprom_write(hal_device_eeprom_i2c_01, 256, 12, data);
     res =  res;
     
-    res = hal_eeprom_read(hal_eeprom_i2c_01, 0, 16, tmp);
+    res = hal_device_eeprom_read(hal_device_eeprom_i2c_01, 256, 16, tmp);
     res =  res;
 
 //#endif
@@ -500,7 +650,552 @@ static void s_test_mco2(void)
     RCC_MCO2Config(RCC_MCO2Source_PLLI2SCLK, RCC_MCO2Div_2);
     
 }
+
+static void s_myfuntxspima(void* p)
+{
+    static uint8_t mio = 0;
+    mio++;
+}
+static void s_myfunrxspima(void* p)
+{
+    static uint8_t mio = 0;
+    mio++;
+}
+
+static void s_myfuntxspisl(void* p)
+{
+    static uint8_t mio = 0;
+    mio++;
+}
+
+static void s_myfunrxspisl(void* p)
+{
+    static uint8_t mio = 0;
+    mio++;
+}
+
+
+
+
 #endif
+
+static void s_test_fifo(void)
+{
+    evEntityId_t prev;
+//     prev = eventviewer_switch_to(ev_ID_first_usrdef+1);
+//     s_test_fifoold();
+//     eventviewer_switch_to(prev);
+    prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
+    s_test_fifonew();
+    eventviewer_switch_to(prev);
+    prev = eventviewer_switch_to(ev_ID_first_usrdef+3);
+    s_test_fifoultra();
+    eventviewer_switch_to(prev);
+//     prev = eventviewer_switch_to(ev_ID_first_usrdef+4);
+//     s_test_fifomega();
+//     eventviewer_switch_to(prev);    
+}
+
+// static void s_test_fifomega(void)
+// {
+// #if 1    
+//     static hal_utility_fifo_t fifo16;
+//     static uint8_t data12x16[12*16];
+//     uint8_t *zz;
+//     uint8_t size = 0;
+//     hal_can_frame_t xx;
+//     
+//     hal_can_frame_t canframe = 
+//     {
+//         .id = 0, .id_type = hal_can_frameID_std, 
+//         .frame_type = hal_can_frame_data, .size = 0, .unused = 0xF1, .data = {0}
+//     };
+
+//     
+//     static hal_can_frame_t udatacanframes[12];
+//     
+//     hal_utility_fifo_init(&fifo16, 12, 16, (uint8_t*)&udatacanframes);
+//     
+//     uint32_t i;
+//     for(i=0; i<100; i++)
+//     {
+//     
+//         canframe.id = 0x12345678;
+//         hal_utility_fifo_putxx(&fifo16, (uint8_t*)&canframe);
+//         canframe.id = 0xaabbccdd;
+//         canframe.data[0] = 0x11; canframe.data[7] = 0x77;
+//         hal_utility_fifo_putxx(&fifo16, (uint8_t*)&canframe);
+//         canframe.id = 0xdeaddead;
+//         hal_utility_fifo_putxx(&fifo16, (uint8_t*)&canframe);
+//         canframe.id = 0x10101010;
+//         hal_utility_fifo_putxx(&fifo16, (uint8_t*)&canframe);
+//         
+//         zz = hal_utility_fifo_frontxx(&fifo16);
+//         hal_utility_fifo_pop(&fifo16);
+//         hal_utility_fifo_getxx(&fifo16, (uint8_t*)&xx, &size);
+//         size = size;
+//         hal_utility_fifo_reset(&fifo16);
+//     }
+// #elif 1
+//     // 8 bytes
+//     static hal_utility_fifo_t thefifo;
+//     static uint8_t thebuffer[12*8];
+//     uint8_t *zz;
+//     uint8_t size = 0;
+//     uint64_t thebytes;
+//     uint64_t xx;
+//     
+//     hal_utility_fifo_init(&thefifo, 12, 8, (uint8_t*)&thebuffer);
+//     
+//     uint32_t i;
+//     for(i=0; i<100; i++)
+//     {
+//     
+//         thebytes = 0x12345678;
+//         hal_utility_fifo_put08(&thefifo, (uint8_t*)&thebytes);
+//         thebytes = 0xabcdef0012345678;
+//         hal_utility_fifo_put08(&thefifo, (uint8_t*)&thebytes);
+//         thebytes = 0x1111111111111111;
+//         hal_utility_fifo_put08(&thefifo, (uint8_t*)&thebytes);
+//         thebytes = 0x2222222222222222;
+//         hal_utility_fifo_put08(&thefifo, (uint8_t*)&thebytes);
+//         
+//         zz = hal_utility_fifo_front08(&thefifo);
+//         hal_utility_fifo_pop(&thefifo);
+//         hal_utility_fifo_get08(&thefifo, (uint8_t*)&xx, &size);
+//         size = size;
+//         hal_utility_fifo_reset(&thefifo);
+//     }    
+// #endif    
+// }
+
+
+// #include "hal_stm32_base_hid.h"
+// static void s_test_fifoold(void)
+// {
+// #if 1    
+//     static hal_base_genericfifo_t gfifo16;
+//     uint8_t *zz;
+//     uint8_t size = 0;
+//     hal_can_frame_t xx;
+//     
+//     hal_can_frame_t canframe = 
+//     {
+//         .id = 0, .id_type = hal_can_frameID_std, 
+//         .frame_type = hal_can_frame_data, .size = 0, .unused = 0xF1, .data = {0}
+//     };
+
+//     
+//     static hal_can_frame_t gdatacanframes[12];
+//     
+//     hal_base_hid_genericfifo_init(&gfifo16, 12, 16, (uint8_t*)&gdatacanframes);
+//     
+//     uint32_t i;
+//     for(i=0; i<100; i++)
+//     {
+//     
+//         canframe.id = 0x12345678;
+//         hal_base_hid_genericfifo_put(&gfifo16, (uint8_t*)&canframe);
+//         canframe.id = 0xaabbccdd;
+//         canframe.data[0] = 0x11; canframe.data[7] = 0x77;
+//         hal_base_hid_genericfifo_put(&gfifo16, (uint8_t*)&canframe);
+//         canframe.id = 0xdeaddead;
+//         hal_base_hid_genericfifo_put(&gfifo16, (uint8_t*)&canframe);
+//         canframe.id = 0x10101010;
+//         hal_base_hid_genericfifo_put(&gfifo16, (uint8_t*)&canframe);
+//         
+//         zz = hal_base_hid_genericfifo_front(&gfifo16);
+//         hal_base_hid_genericfifo_pop(&gfifo16);
+//         hal_base_hid_genericfifo_get(&gfifo16, (uint8_t*)&xx, &size);
+//         size = size;
+//         zz = hal_base_hid_genericfifo_front(&gfifo16);
+//         hal_base_hid_genericfifo_pop(&gfifo16);        
+//         hal_base_hid_genericfifo_reset(&gfifo16);
+//     }
+// #elif 0
+//     // 8 bytes
+//     static hal_base_genericfifo_t    thefifo;
+//     static uint8_t thebuffer[12*8];
+//     uint8_t *zz;
+//     uint8_t size = 0;
+//     uint64_t thebytes;
+//     uint64_t xx;
+//     
+//     hal_base_hid_genericfifo_init(&thefifo, 12, 8, (uint8_t*)&thebuffer);
+//     
+//     uint32_t i;
+//     for(i=0; i<100; i++)
+//     {
+//     
+//         thebytes = 0x12345678;
+//         hal_base_hid_genericfifo_put(&thefifo, (uint8_t*)&thebytes);
+//         thebytes = 0xabcdef0012345678;
+//         hal_base_hid_genericfifo_put(&thefifo, (uint8_t*)&thebytes);
+//         thebytes = 0x1111111111111111;
+//         hal_base_hid_genericfifo_put(&thefifo, (uint8_t*)&thebytes);
+//         thebytes = 0x2222222222222222;
+//         hal_base_hid_genericfifo_put(&thefifo, (uint8_t*)&thebytes);
+//         
+//         zz = hal_base_hid_genericfifo_front(&thefifo);
+//         hal_base_hid_genericfifo_pop(&thefifo);
+//         hal_base_hid_genericfifo_get(&thefifo, (uint8_t*)&xx, &size);
+//         size = size;
+//         zz = hal_base_hid_genericfifo_front(&thefifo);
+//         hal_base_hid_genericfifo_pop(&thefifo);        
+//         hal_base_hid_genericfifo_reset(&thefifo);
+//     }    
+// #endif    
+// }
+
+
+static void s_test_fifonew(void)
+{
+#if 1 
+    // 16 bytes    
+    static hal_utility_fifo_t fifo16;
+    static uint8_t data12x16[12*16];
+    uint8_t *zz;
+    uint8_t size = 0;
+    hal_can_frame_t xx;
+    
+    hal_can_frame_t canframe = 
+    {
+        .id = 0, .id_type = hal_can_frameID_std, 
+        .frame_type = hal_can_frame_data, .size = 0, .unused = 0xF1, .data = {0}
+    };
+
+    
+    static hal_can_frame_t datacanframes[12];
+    
+    hal_utility_fifo_init(&fifo16, 12, 16, (uint8_t*)&datacanframes, NULL);
+    
+    uint32_t i;
+    for(i=0; i<100; i++)
+    {
+    
+        canframe.id = 0x12345678;
+        hal_utility_fifo_put(&fifo16, (uint8_t*)&canframe);
+        canframe.id = 0xaabbccdd;
+        canframe.data[0] = 0x11; canframe.data[7] = 0x77;
+        hal_utility_fifo_put(&fifo16, (uint8_t*)&canframe);
+        canframe.id = 0xdeaddead;
+        hal_utility_fifo_put(&fifo16, (uint8_t*)&canframe);
+        canframe.id = 0x10101010;
+        hal_utility_fifo_put(&fifo16, (uint8_t*)&canframe);
+        
+        zz = hal_utility_fifo_front(&fifo16);
+        hal_utility_fifo_pop(&fifo16);
+        hal_utility_fifo_get(&fifo16, (uint8_t*)&xx, &size);
+        size = size;
+        zz = hal_utility_fifo_front(&fifo16);
+        hal_utility_fifo_pop(&fifo16);
+        hal_utility_fifo_reset(&fifo16);
+    }
+#elif 1
+    // 8 bytes
+    static hal_utility_fifo_t thefifo;
+    static uint8_t thebuffer[12*8];
+    uint8_t *zz;
+    uint8_t size = 0;
+    uint64_t thebytes;
+    uint64_t xx;
+    
+    hal_utility_fifo_init(&thefifo, 12, 8, (uint8_t*)&thebuffer, NULL);
+    
+    uint32_t i;
+    for(i=0; i<100; i++)
+    {
+    
+        thebytes = 0x12345678;
+        hal_utility_fifo_put(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0xabcdef0012345678;
+        hal_utility_fifo_put(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0x1111111111111111;
+        hal_utility_fifo_put(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0x2222222222222222;
+        hal_utility_fifo_put(&thefifo, (uint8_t*)&thebytes);
+        
+        zz = hal_utility_fifo_front(&thefifo);
+        hal_utility_fifo_pop(&thefifo);
+        hal_utility_fifo_get(&thefifo, (uint8_t*)&xx, &size);
+        size = size;
+        zz = hal_utility_fifo_front(&thefifo);
+        hal_utility_fifo_pop(&thefifo);
+        hal_utility_fifo_reset(&thefifo);
+    } 
+#elif 1    
+    // 4 bytes
+    static hal_utility_fifo_t thefifo;
+    static uint8_t thebuffer[12*4];
+    uint8_t *zz;
+    uint8_t size = 0;
+    uint32_t thebytes;
+    uint32_t xx;
+    
+    hal_utility_fifo_init(&thefifo, 12, 4, (uint8_t*)&thebuffer, NULL);
+    
+    uint32_t i;
+    for(i=0; i<100; i++)
+    {
+    
+        thebytes = 0x12345678;
+        hal_utility_fifo_put(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0xabcdef00;
+        hal_utility_fifo_put(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0x11111111;
+        hal_utility_fifo_put(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0x22222222;
+        hal_utility_fifo_put(&thefifo, (uint8_t*)&thebytes);
+        
+        zz = hal_utility_fifo_front(&thefifo);
+        hal_utility_fifo_pop(&thefifo);
+        hal_utility_fifo_get(&thefifo, (uint8_t*)&xx, &size);
+        size = size;
+        zz = hal_utility_fifo_front(&thefifo);
+        hal_utility_fifo_pop(&thefifo);
+        hal_utility_fifo_reset(&thefifo);
+    } 
+#elif 1    
+    // 2 bytes
+    static hal_utility_fifo_t thefifo;
+    static uint8_t thebuffer[12*2];
+    uint8_t *zz;
+    uint8_t size = 0;
+    uint16_t thebytes;
+    uint16_t xx;
+    
+    hal_utility_fifo_init(&thefifo, 12, 2, (uint8_t*)&thebuffer, NULL);
+    
+    uint32_t i;
+    for(i=0; i<100; i++)
+    {
+    
+        thebytes = 0x1234;
+        hal_utility_fifo_put(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0xabcd;
+        hal_utility_fifo_put(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0x1111;
+        hal_utility_fifo_put(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0x2222;
+        hal_utility_fifo_put(&thefifo, (uint8_t*)&thebytes);
+        
+        zz = hal_utility_fifo_front(&thefifo);
+        hal_utility_fifo_pop(&thefifo);
+        hal_utility_fifo_get(&thefifo, (uint8_t*)&xx, &size);
+        size = size;
+        zz = hal_utility_fifo_front(&thefifo);
+        hal_utility_fifo_pop(&thefifo);
+        hal_utility_fifo_reset(&thefifo);
+    } 
+#elif 1    
+    // 1 bytes
+    static hal_utility_fifo_t thefifo;
+    static uint8_t thebuffer[12*1];
+    uint8_t *zz;
+    uint8_t size = 0;
+    uint8_t thebytes;
+    uint8_t xx;
+    
+    hal_utility_fifo_init(&thefifo, 12, 1, (uint8_t*)&thebuffer, NULL);
+    
+    uint32_t i;
+    for(i=0; i<100; i++)
+    {
+    
+        thebytes = 0x12;
+        hal_utility_fifo_put(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0xab;
+        hal_utility_fifo_put(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0x11;
+        hal_utility_fifo_put(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0x22;
+        hal_utility_fifo_put(&thefifo, (uint8_t*)&thebytes);
+        
+        zz = hal_utility_fifo_front(&thefifo);
+        hal_utility_fifo_pop(&thefifo);
+        hal_utility_fifo_get(&thefifo, (uint8_t*)&xx, &size);
+        size = size;
+        zz = hal_utility_fifo_front(&thefifo);
+        hal_utility_fifo_pop(&thefifo);
+        hal_utility_fifo_reset(&thefifo);
+    }      
+#endif   
+}
+
+
+static void s_test_fifoultra(void)
+{
+#if 1    
+    static hal_utility_fifo_t fifo16;
+    static uint8_t data12x16[12*16];
+    uint8_t *zz;
+    uint8_t size = 0;
+    hal_can_frame_t xx;
+    
+    hal_can_frame_t canframe = 
+    {
+        .id = 0, .id_type = hal_can_frameID_std, 
+        .frame_type = hal_can_frame_data, .size = 0, .unused = 0xF1, .data = {0}
+    };
+
+    
+    static hal_can_frame_t udatacanframes[12];
+    
+    hal_utility_fifo_init(&fifo16, 12, 16, (uint8_t*)&udatacanframes, NULL);
+    
+    uint32_t i;
+    for(i=0; i<100; i++)
+    {
+    
+        canframe.id = 0x12345678;
+        hal_utility_fifo_put16(&fifo16, (uint8_t*)&canframe);
+        canframe.id = 0xaabbccdd;
+        canframe.data[0] = 0x11; canframe.data[7] = 0x77;
+        hal_utility_fifo_put16(&fifo16, (uint8_t*)&canframe);
+        canframe.id = 0xdeaddead;
+        hal_utility_fifo_put16(&fifo16, (uint8_t*)&canframe);
+        canframe.id = 0x10101010;
+        hal_utility_fifo_put16(&fifo16, (uint8_t*)&canframe);
+        
+        zz = hal_utility_fifo_front16(&fifo16);
+        hal_utility_fifo_pop(&fifo16);
+        hal_utility_fifo_get16(&fifo16, (uint8_t*)&xx, &size);
+        size = size;
+        zz = hal_utility_fifo_front16(&fifo16);
+        hal_utility_fifo_pop(&fifo16);        
+        hal_utility_fifo_reset(&fifo16);
+    }
+#elif 1
+    // 8 bytes
+    static hal_utility_fifo_t thefifo;
+    static uint8_t thebuffer[12*8];
+    uint8_t *zz;
+    uint8_t size = 0;
+    uint64_t thebytes;
+    uint64_t xx;
+    
+    hal_utility_fifo_init(&thefifo, 12, 8, (uint8_t*)&thebuffer, NULL);
+    
+    uint32_t i;
+    for(i=0; i<100; i++)
+    {
+    
+        thebytes = 0x12345678;
+        hal_utility_fifo_put08(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0xabcdef0012345678;
+        hal_utility_fifo_put08(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0x1111111111111111;
+        hal_utility_fifo_put08(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0x2222222222222222;
+        hal_utility_fifo_put08(&thefifo, (uint8_t*)&thebytes);
+        
+        zz = hal_utility_fifo_front08(&thefifo);
+        hal_utility_fifo_pop(&thefifo);
+        hal_utility_fifo_get08(&thefifo, (uint8_t*)&xx, &size);
+        size = size;
+        zz = hal_utility_fifo_front08(&thefifo);
+        hal_utility_fifo_pop(&thefifo);        
+        hal_utility_fifo_reset(&thefifo);
+    }    
+#elif 1
+    // 4 bytes
+    static hal_utility_fifo_t thefifo;
+    static uint8_t thebuffer[12*4];
+    uint8_t *zz;
+    uint8_t size = 0;
+    uint32_t thebytes;
+    uint32_t xx;
+    
+    hal_utility_fifo_init(&thefifo, 12, 4, (uint8_t*)&thebuffer, NULL);
+    
+    uint32_t i;
+    for(i=0; i<100; i++)
+    {
+    
+        thebytes = 0x12345678;
+        hal_utility_fifo_put04(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0xabcdef00;
+        hal_utility_fifo_put04(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0x11111111;
+        hal_utility_fifo_put04(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0x22222222;
+        hal_utility_fifo_put04(&thefifo, (uint8_t*)&thebytes);
+        
+        zz = hal_utility_fifo_front04(&thefifo);
+        hal_utility_fifo_pop(&thefifo);
+        hal_utility_fifo_get04(&thefifo, (uint8_t*)&xx, &size);
+        size = size;
+        zz = hal_utility_fifo_front04(&thefifo);
+        hal_utility_fifo_pop(&thefifo);        
+        hal_utility_fifo_reset(&thefifo);
+    }  
+#elif 1
+    // 2 bytes
+    static hal_utility_fifo_t thefifo;
+    static uint8_t thebuffer[12*4];
+    uint8_t *zz;
+    uint8_t size = 0;
+    uint16_t thebytes;
+    uint16_t xx;
+    
+    hal_utility_fifo_init(&thefifo, 12, 2, (uint8_t*)&thebuffer, NULL);
+    
+    uint32_t i;
+    for(i=0; i<100; i++)
+    {
+    
+        thebytes = 0x1234;
+        hal_utility_fifo_put02(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0xabcd;
+        hal_utility_fifo_put02(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0x1111;
+        hal_utility_fifo_put02(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0x2222;
+        hal_utility_fifo_put02(&thefifo, (uint8_t*)&thebytes);
+        
+        zz = hal_utility_fifo_front02(&thefifo);
+        hal_utility_fifo_pop(&thefifo);
+        hal_utility_fifo_get02(&thefifo, (uint8_t*)&xx, &size);
+        size = size;
+        zz = hal_utility_fifo_front02(&thefifo);
+        hal_utility_fifo_pop(&thefifo);        
+        hal_utility_fifo_reset(&thefifo);
+    }      
+#elif 1
+    // 1 bytes
+    static hal_utility_fifo_t thefifo;
+    static uint8_t thebuffer[12*1];
+    uint8_t *zz;
+    uint8_t size = 0;
+    uint8_t thebytes;
+    uint8_t xx;
+    
+    hal_utility_fifo_init(&thefifo, 12, 1, (uint8_t*)&thebuffer, NULL);
+    
+    uint32_t i;
+    for(i=0; i<100; i++)
+    {
+    
+        thebytes = 0x12;
+        hal_utility_fifo_put01(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0xab;
+        hal_utility_fifo_put01(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0x11;
+        hal_utility_fifo_put01(&thefifo, (uint8_t*)&thebytes);
+        thebytes = 0x22;
+        hal_utility_fifo_put01(&thefifo, (uint8_t*)&thebytes);
+        
+        zz = hal_utility_fifo_front01(&thefifo);
+        hal_utility_fifo_pop(&thefifo);
+        hal_utility_fifo_get01(&thefifo, (uint8_t*)&xx, &size);
+        size = size;
+        zz = hal_utility_fifo_front01(&thefifo);
+        hal_utility_fifo_pop(&thefifo);        
+        hal_utility_fifo_reset(&thefifo);
+    }          
+#endif    
+}
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
