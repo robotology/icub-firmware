@@ -151,7 +151,7 @@
             <CpuDllArguments></CpuDllArguments>
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
-            <InitializationFile>.\eventviewer-stm32f4-cfg.ini</InitializationFile>
+            <InitializationFile>.\eventviewer-stm32-cfg.ini</InitializationFile>
             <Driver>BIN\ULP2CM3.DLL</Driver>
           </TargetDlls>
         </DebugOption>
@@ -199,7 +199,7 @@
             <GenPPlst>0</GenPPlst>
             <AdsCpuType>"Cortex-M4"</AdsCpuType>
             <RvctDeviceName></RvctDeviceName>
-            <mOS>0</mOS>
+            <mOS>1</mOS>
             <uocRom>0</uocRom>
             <uocRam>0</uocRam>
             <hadIROM>1</hadIROM>
@@ -478,7 +478,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-src-cmsis</GroupName>
+          <GroupName>hal-cmsis</GroupName>
           <Files>
             <File>
               <FileName>system_stm32f4xx.c</FileName>
@@ -488,7 +488,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-src-stm32</GroupName>
+          <GroupName>hal-base</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_stm32_base.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_base.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-mpu</GroupName>
           <Files>
             <File>
               <FileName>hal_stm32_arch.c</FileName>
@@ -496,44 +506,14 @@
               <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_arch.c</FilePath>
             </File>
             <File>
-              <FileName>hal_stm32_base.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_base.c</FilePath>
-            </File>
-            <File>
               <FileName>hal_stm32_can.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_can.c</FilePath>
             </File>
             <File>
-              <FileName>hal_stm32_canfifo_hid.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_canfifo_hid.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_stm32_can-with-isr.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_can-with-isr.c</FilePath>
-            </File>
-            <File>
               <FileName>hal_stm32_crc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_crc.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_stm32_display.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_display.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_stm32_eeprom.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_eeprom.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_stm32_encoder.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_encoder.c</FilePath>
             </File>
             <File>
               <FileName>hal_stm32_eth.c</FileName>
@@ -551,14 +531,14 @@
               <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_gpio.c</FilePath>
             </File>
             <File>
-              <FileName>hal_stm32_led.c</FileName>
+              <FileName>hal_stm32_i2c.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_led.c</FilePath>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_i2c.c</FilePath>
             </File>
             <File>
-              <FileName>hal_stm32_switch.c</FileName>
+              <FileName>hal_stm32_spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_switch.c</FilePath>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_spi.c</FilePath>
             </File>
             <File>
               <FileName>hal_stm32_sys.c</FileName>
@@ -583,42 +563,142 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-src-stm32-extra</GroupName>
+          <GroupName>hal-actuators</GroupName>
           <Files>
             <File>
-              <FileName>hal_stm32_i2c4hal.c</FileName>
+              <FileName>hal_actuator_led.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_i2c4hal.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_stm32_spi4encoder.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_spi4encoder.c</FilePath>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_actuator_led.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-stm32-utils</GroupName>
+          <GroupName>hal-devices</GroupName>
           <Files>
             <File>
-              <FileName>stm32ee.c</FileName>
+              <FileName>hal_device_cantransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\utils\stm32ee.c</FilePath>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_device_cantransceiver.c</FilePath>
             </File>
             <File>
-              <FileName>stm32gpio.c</FileName>
+              <FileName>hal_device_display.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\utils\stm32gpio.c</FilePath>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_device_display.c</FilePath>
             </File>
             <File>
-              <FileName>stm32i2c.c</FileName>
+              <FileName>hal_device_eeprom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\utils\stm32i2c.c</FilePath>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_device_eeprom.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_ethtransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_device_ethtransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_switch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_device_switch.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-stm32-board</GroupName>
+          <GroupName>hal-sensors</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_sensor_accel.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_sensor_accel.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_sensor_encoder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_sensor_encoder.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>hal_sensor_gyro.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_sensor_gyro.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_sensor_temp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_sensor_temp.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-chips</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_chip_generic_ethtransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\utils\hal_chip_generic_ethtransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_chip_st_l3g4200d.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\utils\hal_chip_st_l3g4200d.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_chip_st_lis3dh.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\utils\hal_chip_st_lis3dh.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_chip_micrel_ks8893.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\utils\hal_chip_micrel_ks8893.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_chip_xx_eeprom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\utils\hal_chip_xx_eeprom.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-board</GroupName>
           <Files>
             <File>
               <FileName>hal_brdcfg.c</FileName>
@@ -628,17 +708,27 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-utils</GroupName>
+          <GroupName>hal-utilities</GroupName>
           <Files>
             <File>
-              <FileName>crc32.c</FileName>
+              <FileName>hal_utility_bits.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utils\crc32.c</FilePath>
+              <FilePath>..\..\hal\hal-src\stm32fx\utils\hal_utility_bits.c</FilePath>
             </File>
             <File>
-              <FileName>crc16.c</FileName>
+              <FileName>hal_utility_crc16.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utils\crc16.c</FilePath>
+              <FilePath>..\..\hal\hal-src\stm32fx\utils\hal_utility_crc16.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_utility_crc32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\utils\hal_utility_crc32.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_utility_fifo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\utils\hal_utility_fifo.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -659,6 +749,16 @@
               <FileName>ipal_cfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app-test\ipal_cfg.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eviewer</GroupName>
+          <Files>
+            <File>
+              <FileName>eventviewer.cm4.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\sys\mid\lib\eventviewer.cm4.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1136,7 +1236,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-src-cmsis</GroupName>
+          <GroupName>hal-cmsis</GroupName>
           <Files>
             <File>
               <FileName>system_stm32f4xx.c</FileName>
@@ -1146,7 +1246,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-src-stm32</GroupName>
+          <GroupName>hal-base</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_stm32_base.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_base.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-mpu</GroupName>
           <Files>
             <File>
               <FileName>hal_stm32_arch.c</FileName>
@@ -1154,44 +1264,14 @@
               <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_arch.c</FilePath>
             </File>
             <File>
-              <FileName>hal_stm32_base.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_base.c</FilePath>
-            </File>
-            <File>
               <FileName>hal_stm32_can.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_can.c</FilePath>
             </File>
             <File>
-              <FileName>hal_stm32_canfifo_hid.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_canfifo_hid.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_stm32_can-with-isr.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_can-with-isr.c</FilePath>
-            </File>
-            <File>
               <FileName>hal_stm32_crc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_crc.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_stm32_display.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_display.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_stm32_eeprom.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_eeprom.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_stm32_encoder.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_encoder.c</FilePath>
             </File>
             <File>
               <FileName>hal_stm32_eth.c</FileName>
@@ -1209,14 +1289,14 @@
               <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_gpio.c</FilePath>
             </File>
             <File>
-              <FileName>hal_stm32_led.c</FileName>
+              <FileName>hal_stm32_i2c.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_led.c</FilePath>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_i2c.c</FilePath>
             </File>
             <File>
-              <FileName>hal_stm32_switch.c</FileName>
+              <FileName>hal_stm32_spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_switch.c</FilePath>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_spi.c</FilePath>
             </File>
             <File>
               <FileName>hal_stm32_sys.c</FileName>
@@ -1241,42 +1321,142 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-src-stm32-extra</GroupName>
+          <GroupName>hal-actuators</GroupName>
           <Files>
             <File>
-              <FileName>hal_stm32_i2c4hal.c</FileName>
+              <FileName>hal_actuator_led.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_i2c4hal.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_stm32_spi4encoder.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\hal_stm32_spi4encoder.c</FilePath>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_actuator_led.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-stm32-utils</GroupName>
+          <GroupName>hal-devices</GroupName>
           <Files>
             <File>
-              <FileName>stm32ee.c</FileName>
+              <FileName>hal_device_cantransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\utils\stm32ee.c</FilePath>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_device_cantransceiver.c</FilePath>
             </File>
             <File>
-              <FileName>stm32gpio.c</FileName>
+              <FileName>hal_device_display.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\utils\stm32gpio.c</FilePath>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_device_display.c</FilePath>
             </File>
             <File>
-              <FileName>stm32i2c.c</FileName>
+              <FileName>hal_device_eeprom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\stm32fx\utils\stm32i2c.c</FilePath>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_device_eeprom.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_ethtransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_device_ethtransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_switch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_device_switch.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-stm32-board</GroupName>
+          <GroupName>hal-sensors</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_sensor_accel.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_sensor_accel.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_sensor_encoder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_sensor_encoder.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>hal_sensor_gyro.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_sensor_gyro.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_sensor_temp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\hal_sensor_temp.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-chips</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_chip_generic_ethtransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\utils\hal_chip_generic_ethtransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_chip_st_l3g4200d.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\utils\hal_chip_st_l3g4200d.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_chip_st_lis3dh.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\utils\hal_chip_st_lis3dh.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_chip_micrel_ks8893.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\utils\hal_chip_micrel_ks8893.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_chip_xx_eeprom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\utils\hal_chip_xx_eeprom.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-board</GroupName>
           <Files>
             <File>
               <FileName>hal_brdcfg.c</FileName>
@@ -1286,17 +1466,27 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-utils</GroupName>
+          <GroupName>hal-utilities</GroupName>
           <Files>
             <File>
-              <FileName>crc32.c</FileName>
+              <FileName>hal_utility_bits.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utils\crc32.c</FilePath>
+              <FilePath>..\..\hal\hal-src\stm32fx\utils\hal_utility_bits.c</FilePath>
             </File>
             <File>
-              <FileName>crc16.c</FileName>
+              <FileName>hal_utility_crc16.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utils\crc16.c</FilePath>
+              <FilePath>..\..\hal\hal-src\stm32fx\utils\hal_utility_crc16.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_utility_crc32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\utils\hal_utility_crc32.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_utility_fifo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\stm32fx\utils\hal_utility_fifo.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1317,6 +1507,16 @@
               <FileName>ipal_cfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app-test\ipal_cfg.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eviewer</GroupName>
+          <Files>
+            <File>
+              <FileName>eventviewer.cm4.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\sys\mid\lib\eventviewer.cm4.lib</FilePath>
             </File>
           </Files>
         </Group>
