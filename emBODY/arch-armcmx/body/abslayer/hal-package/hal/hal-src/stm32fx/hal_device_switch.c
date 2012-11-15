@@ -35,13 +35,13 @@
 #include "stdlib.h"
 #include "string.h"
 //#include "hal_stm32xx_include.h"  no need as it is a device
-#include "hal_stm32_base_hid.h" 
+#include "hal_base_hid.h" 
 #include "hal_i2c.h" 
 
 #include "hal_sys.h"
-#include "hal_stm32_eth_hid.h"
+#include "hal_mpu_eth_hid.h"
 
-#include "hal_stm32_i2c_hid.h"
+#include "hal_mpu_i2c_hid.h"
 
 #include "hal_brdcfg.h"
 

@@ -37,27 +37,27 @@
 
 
 #ifdef  HAL_USE_CAN
-    #include "hal_stm32_can_hid.h"
+    #include "hal_mpu_can_hid.h"
 #endif//HAL_USE_CAN
 
 #ifdef  HAL_USE_CRC
-    #include "hal_stm32_crc_hid.h"
+    #include "hal_mpu_crc_hid.h"
 #endif//HAL_USE_CRC
 
 #ifdef HAL_USE_ETH
-    #include "hal_stm32_eth_hid.h"
+    #include "hal_mpu_eth_hid.h"
 #endif//HAL_USE_ETH
 
 #ifdef HAL_USE_FLASH
-    #include "hal_stm32_flash_hid.h"
+    #include "hal_mpu_flash_hid.h"
 #endif//HAL_USE_FLASH
 
 #ifdef HAL_USE_GPIO
-    #include "hal_stm32_gpio_hid.h"
+    #include "hal_mpu_gpio_hid.h"
 #endif//HAL_USE_GPIO
 
 #ifdef HAL_USE_I2C
-    #include "hal_stm32_i2c_hid.h"
+    #include "hal_mpu_i2c_hid.h"
 #endif//HAL_USE_I2C
 
 #ifdef HAL_USE_SPI
@@ -65,15 +65,15 @@
 #endif//HAL_USE_SPI
 
 #ifdef HAL_USE_SYS
-    #include "hal_stm32_sys_hid.h"
+    #include "hal_mpu_sys_hid.h"
 #endif//HAL_USE_SYS
 
 #ifdef  HAL_USE_TIMER
-    #include "hal_stm32_timer_hid.h"  
+    #include "hal_mpu_timer_hid.h"  
 #endif//HAL_USE_TIMER
 
 #ifdef  HAL_USE_WATCHDOG
-    #include "hal_stm32_watchdog_hid.h"  
+    #include "hal_mpu_watchdog_hid.h"  
 #endif//HAL_USE_WATCHDOG
 
 

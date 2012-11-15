@@ -35,8 +35,8 @@
 #include "stdlib.h"
 #include "string.h"
 #include "hal_base.h"
-#include "hal_stm32_base_hid.h"
-#include "hal_stm32_eth_hid.h"
+#include "hal_base_hid.h"
+#include "hal_mpu_eth_hid.h"
 #include "hal_device_eeprom.h"
 #include "hal_timer.h"
 #include "hal_i2c.h"
@@ -45,11 +45,11 @@
 #include "hal_device_switch.h"
 #include "hal_device_ethtransceiver_hid.h"
 
-#include "utils/hal_chip_xx_eeprom_hid.h"
-#include "utils/hal_chip_st_l3g4200d_hid.h"
-#include "utils/hal_chip_st_lis3dh_hid.h"
-#include "utils/hal_chip_micrel_ks8893_hid.h"
-#include "utils/hal_chip_generic_ethtransceiver_hid.h"
+#include "hal_chip_xx_eeprom_hid.h"
+#include "hal_chip_st_l3g4200d_hid.h"
+#include "hal_chip_st_lis3dh_hid.h"
+#include "hal_chip_micrel_ks8893_hid.h"
+#include "hal_chip_generic_ethtransceiver_hid.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface

@@ -38,11 +38,11 @@
 #include "hal_flash.h"
 #include "hal_i2c.h"
 #include "hal_brdcfg.h"
-#include "hal_stm32_base_hid.h" 
-#include "hal_stm32_sys_hid.h"
+#include "hal_base_hid.h" 
+#include "hal_mpu_sys_hid.h"
 
 
-#include "utils/hal_utility_bits.h" 
+#include "hal_utility_bits.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------

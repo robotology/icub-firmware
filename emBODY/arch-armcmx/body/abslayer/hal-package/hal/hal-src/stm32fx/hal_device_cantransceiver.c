@@ -38,7 +38,7 @@
 
 #include "hal_brdcfg.h"
 
-#include "utils/hal_utility_bits.h" 
+#include "hal_utility_bits.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 
 
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Valentina Gaggero, Marco Accame
  * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
@@ -24,26 +24,26 @@
 #define _HAL_STM32XX_INCLUDE_H_
 
 
-#if   defined(HAL_BOARD_MCBSTM32C)
+#if   defined(HAL_BOARD_MCBSTM32C) || defined(HAL_BOARD_EMS001)
 	#include "stm32f1.h"
     #include "cmsis_stm32f1.h"
-    #define cmsis_stm32xx_hid_set_system_core_clock     cmsis_stm32f1_hid_set_system_core_clock
+    //#define cmsis_stm32xx_hid_set_system_core_clock     cmsis_stm32f1_hid_set_system_core_clock
     #define USE_STM32F1
-#elif defined(HAL_BOARD_EMS001)
-	#include "stm32f1.h"
-    #include "cmsis_stm32f1.h"
-    #define cmsis_stm32xx_hid_set_system_core_clock     cmsis_stm32f1_hid_set_system_core_clock
-    #define USE_STM32F1
-#elif defined(HAL_BOARD_MCBSTM32F400)
+//#elif defined(HAL_BOARD_EMS001)
+//	#include "stm32f1.h"
+//    #include "cmsis_stm32f1.h"
+//    //#define cmsis_stm32xx_hid_set_system_core_clock     cmsis_stm32f1_hid_set_system_core_clock
+//    #define USE_STM32F1
+#elif defined(HAL_BOARD_MCBSTM32F400) || defined(HAL_BOARD_EMS004)
 	#include "stm32f4.h"
     #include "cmsis_stm32f4.h"   
-    #define cmsis_stm32xx_hid_set_system_core_clock     cmsis_stm32f4_hid_set_system_core_clock
+    //#define cmsis_stm32xx_hid_set_system_core_clock     cmsis_stm32f4_hid_set_system_core_clock
     #define USE_STM32F4
-#elif defined(HAL_BOARD_EMS004)
-	#include "stm32f4.h"
-    #include "cmsis_stm32f4.h"   
-    #define cmsis_stm32xx_hid_set_system_core_clock     cmsis_stm32f4_hid_set_system_core_clock
-    #define USE_STM32F4    
+//#elif defined(HAL_BOARD_EMS004)
+//	#include "stm32f4.h"
+//    #include "cmsis_stm32f4.h"   
+//    //#define cmsis_stm32xx_hid_set_system_core_clock     cmsis_stm32f4_hid_set_system_core_clock
+//    #define USE_STM32F4    
 #else 
 	#error "Please select board XXX w/ HAL_BOARD_XXX"
 #endif        

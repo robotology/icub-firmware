@@ -16,37 +16,33 @@
  * Public License for more details
 */
 
-
-/* @file       hal_stm32_led.c
-	@brief      This file implements internal implementation of the hal led module.
-	@author     marco.accame@iit.it, valentina.gaggero@iit.it
-    @date       09/16/2011
+/* @file       hal_trace.c
+	@brief      This file implements internal implementation of the hal trace module.
+	@author     marco.accame@iit.it
+    @date       09/12/2011
 **/
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_ACTUATOR_LED
+#ifdef HAL_USE_TRACE
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "stdlib.h"
-#include "string.h"
-//#include "hal_stm32_base_hid.h" 
-#include "hal_gpio.h"
-#include "hal_brdcfg.h"
-#include "hal_utility_bits.h" 
 
+#include "hal_stm32xx_include.h"
 
+#include "hal_base_hid.h" 
 
  
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_actuator_led.h"
+#include "hal_trace.h"
 
 
 
@@ -54,42 +50,38 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_actuator_led_hid.h"
+#include "hal_mpu_trace_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_actuator_led_act2index(t)              ((uint8_t)((t)))
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
-// emty-section
+
+extern volatile int32_t ITM_RxBuffer = ITM_RXBUFFER_EMPTY;
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_actuator_led_supported_is(hal_actuator_led_t led);
-static void s_hal_actuator_led_initted_set(hal_actuator_led_t led);
-static hal_boolval_t s_hal_actuator_led_initted_is(hal_actuator_led_t led);
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
+// empty-section
 
-static hal_boolval_t s_hal_actuator_led_initted[hal_actuator_leds_num] = { hal_false };
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -97,92 +89,42 @@ static hal_boolval_t s_hal_actuator_led_initted[hal_actuator_leds_num] = { hal_f
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern hal_result_t hal_actuator_led_init(hal_actuator_led_t led, const hal_actuator_led_cfg_t *cfg)
+extern void hal_trace_init(void)
 {
-    const hal_gpio_cfg_t *gc = NULL;
-    hal_result_t res = hal_res_NOK_generic;
+    ITM_RxBuffer = ITM_RXBUFFER_EMPTY;
+}
 
-    if(hal_false == s_hal_actuator_led_supported_is(led))
+
+extern int hal_trace_getchar(void) 
+{
+//    return(-1);
+    while(ITM_CheckChar() != 1);
+    return(ITM_ReceiveChar());
+}    
+
+
+extern int hal_trace_putchar(int ch) 
+{
+//    return(-1);
+    return(ITM_SendChar(ch));    
+}
+
+extern int hal_trace_puts(const char * str) 
+{
+//    return(0);
+    uint32_t ch;
+    int16_t num = 0;
+    while('\0' != (ch = *str))
     {
-        return(hal_res_NOK_generic);
+        ITM_SendChar(ch);
+        str++;
+        num++;
     }
      
-    gc = &hal_brdcfg_actuator_led__theconfig.gpiocfg[HAL_actuator_led_act2index(led)];
-    
-    res = hal_gpio_init(gc->port, gc->pin, gc->dir, gc->speed);
-    
-    if(hal_res_OK != res)
-    {
-        return(res);
-    }
-    
-    hal_gpio_setval(gc->port, gc->pin, hal_brdcfg_actuator_led__theconfig.value_off);
- 
-    s_hal_actuator_led_initted_set(led);
-    return(hal_res_OK);
+    ITM_SendChar('\n');
+    return(++num);    
 }
 
-
-extern hal_result_t hal_actuator_led_on(hal_actuator_led_t led)
-{
-    const hal_gpio_cfg_t *gc = NULL;
-    
-    if(hal_false == s_hal_actuator_led_initted_is(led))
-    {
-        return(hal_res_NOK_generic);
-    }
-
-    // do something 
-    gc = &hal_brdcfg_actuator_led__theconfig.gpiocfg[HAL_actuator_led_act2index(led)];
-    
-    return(hal_gpio_setval(gc->port, gc->pin, hal_brdcfg_actuator_led__theconfig.value_on));
-}
-
-
-
-extern hal_result_t hal_actuator_led_off(hal_actuator_led_t led)
-{
-    const hal_gpio_cfg_t *gc = NULL;
-    
-    if(hal_false == s_hal_actuator_led_initted_is(led))
-    {
-        return(hal_res_NOK_generic);
-    }
-
-    // do something 
-    gc = &hal_brdcfg_actuator_led__theconfig.gpiocfg[HAL_actuator_led_act2index(led)];
-    
-    return(hal_gpio_setval(gc->port, gc->pin, hal_brdcfg_actuator_led__theconfig.value_off));
-}
-
-
-
-extern hal_result_t hal_actuator_led_toggle(hal_actuator_led_t led)
-{
-    const hal_gpio_cfg_t *gc = NULL;
-    hal_gpio_val_t val = hal_gpio_valNONE;
-    
-    if(hal_false == s_hal_actuator_led_initted_is(led))
-    {
-        return(hal_res_NOK_generic);
-    }
-
-    // do something 
-    gc = &hal_brdcfg_actuator_led__theconfig.gpiocfg[HAL_actuator_led_act2index(led)];
-    
-    val = hal_gpio_getval(gc->port, gc->pin);
-    
-    if(hal_brdcfg_actuator_led__theconfig.value_off == val)
-    {
-        val = hal_brdcfg_actuator_led__theconfig.value_on;
-    }
-    else
-    {
-        val = hal_brdcfg_actuator_led__theconfig.value_off;
-    }
-
-    return(hal_gpio_setval(gc->port, gc->pin, val));
-}
 
 
 
@@ -190,18 +132,19 @@ extern hal_result_t hal_actuator_led_toggle(hal_actuator_led_t led)
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+
 // ---- isr of the module: begin ----
 // empty-section
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_actuator_led_hid_getsize(const hal_cfg_t *cfg)
+extern uint32_t hal_trace_hid_getsize(const hal_cfg_t *cfg)
 {
     // no memory needed
     return(0);
 }
 
-extern hal_result_t hal_actuator_led_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_trace_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
 {
     // no memory needed
 //    if(NULL == memory)
@@ -210,33 +153,19 @@ extern hal_result_t hal_actuator_led_hid_setmem(const hal_cfg_t *cfg, uint32_t *
 //        return(hal_res_NOK_generic);
 //    }
 
-    memset(s_hal_actuator_led_initted, hal_false, sizeof(s_hal_actuator_led_initted));
+    // remvoed dependency from nzi data
+    hal_trace_init();
     return(hal_res_OK);  
 }
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-
-static hal_boolval_t s_hal_actuator_led_supported_is(hal_actuator_led_t led)
-{
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_actuator_led__theconfig.supported_mask, HAL_actuator_led_act2index(led)) );
-}
-
-static void s_hal_actuator_led_initted_set(hal_actuator_led_t led)
-{
-    s_hal_actuator_led_initted[HAL_actuator_led_act2index(led)] = hal_true;
-}
-
-static hal_boolval_t s_hal_actuator_led_initted_is(hal_actuator_led_t led)
-{
-    return(s_hal_actuator_led_initted[HAL_actuator_led_act2index(led)]);
-}
+// empty-section
 
 
 
-
-#endif//HAL_USE_ACTUATOR_LED
+#endif//HAL_USE_TRACE
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

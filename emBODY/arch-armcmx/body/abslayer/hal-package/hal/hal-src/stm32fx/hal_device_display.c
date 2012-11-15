@@ -34,9 +34,9 @@
 #include "stdlib.h"
 
 //#include "stm32f1.h"
-//#include "stm32_utility/hal_stm32_display_GLCD.h"
+//#include "stm32_utility/hal_mpu_display_GLCD.h"
 
-#include "hal_stm32_base_hid.h" 
+#include "hal_base_hid.h" 
 
 #include "hal_brdcfg.h"
  

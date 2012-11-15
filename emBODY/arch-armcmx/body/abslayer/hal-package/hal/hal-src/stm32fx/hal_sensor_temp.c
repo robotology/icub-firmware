@@ -33,7 +33,7 @@
 
 #include "stdlib.h"
 #include "string.h"
-#include "hal_stm32_base_hid.h" 
+#include "hal_base_hid.h" 
 #include "hal_brdcfg.h"
 
 
@@ -42,7 +42,7 @@
 
 //#include "hal_stm32xx_include.h"
 
-#include "utils/hal_utility_bits.h"
+#include "hal_utility_bits.h"
 
 //#include "utils/hal_chip_st_l3g4200d.h"
 
