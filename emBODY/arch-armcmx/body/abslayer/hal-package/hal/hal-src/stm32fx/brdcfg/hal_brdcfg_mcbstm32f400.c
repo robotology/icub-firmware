@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
+ * Author:  Valentina Gaggero, Marco Accame
+ * email:   valentina.gaggero@iit.it, marco.accame@iit.it
+ * website: www.robotcub.org
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * A copy of the license can be found at
+ * http://www.robotcub.org/icub/license/gpl.txt
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
+*/
 
 /* @file       hal_brdcfg_mcbstmf400.c
 	@brief      This file implements low level functions which depend on board.
@@ -121,7 +138,6 @@
             }
         }         
     };
-
 #endif//HAL_USE_CAN
 
 #ifdef  HAL_USE_CRC
@@ -470,7 +486,7 @@
                     .totalsize      = 0,
                     .i2cport        = hal_i2c_port1,
                     .chipif         =
-                    {   // use the chip xx_eeprom
+                    {   // dont use any chip
                         .init           = NULL,
                         .initpar        = NULL,
                         .read           = NULL,

@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
+ * Author:  Valentina Gaggero, Marco Accame
+ * email:   valentina.gaggero@iit.it, marco.accame@iit.it
+ * website: www.robotcub.org
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * A copy of the license can be found at
+ * http://www.robotcub.org/icub/license/gpl.txt
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
+*/
     
 /* @file       hal_brdcfg_ems004.c
 	@brief      This file implements low level functions which depend on board.
@@ -33,6 +50,7 @@
 #include "utils/hal_chip_st_lis3dh_hid.h"
 #include "utils/hal_chip_micrel_ks8893_hid.h"
 #include "utils/hal_chip_generic_ethtransceiver_hid.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -118,7 +136,6 @@
             }
         }         
     };
-
 #endif//HAL_USE_CAN
 
 #ifdef  HAL_USE_CRC
@@ -129,8 +146,7 @@
 #endif//HAL_USE_CRC
 
 
-#ifdef  HAL_USE_ETH
-    
+#ifdef  HAL_USE_ETH    
     extern const hal_eth_hid_brdcfg_t hal_brdcfg_eth__theconfig     =
     {
         .supported          = hal_true,
@@ -151,7 +167,6 @@
             .ETH_MDIO           = { .port = hal_gpio_portA, .pin = hal_gpio_pin2,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max }       
         }
     };
-
 #endif//HAL_USE_ETH
 
 
@@ -347,8 +362,7 @@
 #endif//HAL_USE_ACTUATOR_LED
 
 
-#ifdef  HAL_USE_DEVICE_CANTRANSCEIVER
-    
+#ifdef  HAL_USE_DEVICE_CANTRANSCEIVER    
     static hal_result_t s_hal_device_cantransceiver_simple_init(hal_can_port_t port, void* initpar);
     static hal_result_t s_hal_device_cantransceiver_simple_enable(hal_can_port_t port);
     static hal_result_t s_hal_device_cantransceiver_simple_disable(hal_can_port_t port);

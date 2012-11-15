@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
- * Author: Valentina Gaggero, Marco Accame
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
+ * Author:  Valentina Gaggero, Marco Accame
  * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
@@ -32,22 +32,49 @@
 
 // - modules to be built ----------------------------------------------------------------------------------------------
 
+// -- mpu
 #define     HAL_USE_ARCH
 #define     HAL_USE_BASE
 #define     HAL_USE_CAN
 #define     HAL_USE_CRC
-#undef  HAL_USE_DISPLAY  
-#define     HAL_USE_EEPROM
-//#define     HAL_USE_ENCODER
 #define     HAL_USE_ETH
 #define     HAL_USE_FLASH
 #define     HAL_USE_GPIO
-#define     HAL_USE_LED
-#define     HAL_USE_SWITCH
+#define     HAL_USE_I2C
+//#define     HAL_USE_SPI
 #define     HAL_USE_SYS
 #define     HAL_USE_TIMER
 #define     HAL_USE_TRACE
 #define     HAL_USE_WATCHDOG
+
+// -- actuators
+#define     HAL_USE_ACTUATOR_LED
+
+// -- devices
+#define     HAL_USE_DEVICE_CANTRANSCEIVER
+#undef   HAL_USE_DEVICE_DISPLAY  
+#define     HAL_USE_DEVICE_EEPROM
+#undef   HAL_USE_DEVICE_ENCODER
+#define     HAL_USE_DEVICE_SWITCH
+#define     HAL_USE_DEVICE_ETHTRANSCEIVER
+
+// -- sensors
+#undef   HAL_USE_SENSOR_TEMP
+#undef   HAL_USE_SENSOR_GYRO
+#undef   HAL_USE_SENSOR_ACCEL
+
+// -- utilities
+#define     HAL_USE_UTILITY_BITS
+#define     HAL_USE_UTILITY_FIFO
+#define     HAL_USE_UTILITY_CRC16
+#define     HAL_USE_UTILITY_CRC32
+
+// -- chips
+#undef   HAL_USE_CHIP_GENERIC_ETHTRANSCEIVER
+#undef     HAL_USE_CHIP_ST_L3G4200D
+#undef     HAL_USE_CHIP_ST_LIS3DH
+#define     HAL_USE_CHIP_MICREL_KS8893
+#define     HAL_USE_CHIP_XX_EEPROM
 
 
 // - exceptions -------------------------------------------------------------------------------------------------------

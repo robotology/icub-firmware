@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
- * Author: Valentina Gaggero, Marco Accame
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
+ * Author:  Valentina Gaggero, Marco Accame
  * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
@@ -35,50 +35,101 @@
 
 #include "hal_base.h"
 
-#ifdef HAL_USE_CAN
-    #include "hal_can.h"
+
+#ifdef  HAL_USE_CAN
+    #include "hal_stm32_can_hid.h"
 #endif//HAL_USE_CAN
 
-#ifdef HAL_USE_EEPROM
-    #include "hal_eeprom.h"
-    #include "hal_stm32_eeprom_hid.h"
-#endif//HAL_USE_EEPROM
+#ifdef  HAL_USE_CRC
+    #include "hal_stm32_crc_hid.h"
+#endif//HAL_USE_CRC
 
 #ifdef HAL_USE_ETH
-    #include "hal_eth.h"
+    #include "hal_stm32_eth_hid.h"
 #endif//HAL_USE_ETH
 
+#ifdef HAL_USE_FLASH
+    #include "hal_stm32_flash_hid.h"
+#endif//HAL_USE_FLASH
+
 #ifdef HAL_USE_GPIO
-    #include "hal_gpio.h"
+    #include "hal_stm32_gpio_hid.h"
 #endif//HAL_USE_GPIO
 
 #ifdef HAL_USE_I2C
     #include "hal_stm32_i2c_hid.h"
 #endif//HAL_USE_I2C
 
-#ifdef HAL_USE_LED
-    #include "hal_led.h"
-#endif//HAL_USE_LED
+#ifdef HAL_USE_SPI
+    #include "hal_spi.h"
+#endif//HAL_USE_SPI
 
-#ifdef  HAL_USE_SYS
+#ifdef HAL_USE_SYS
     #include "hal_stm32_sys_hid.h"
-#endif//HAL_USE_SYS 
+#endif//HAL_USE_SYS
+
+#ifdef  HAL_USE_TIMER
+    #include "hal_stm32_timer_hid.h"  
+#endif//HAL_USE_TIMER
+
+#ifdef  HAL_USE_WATCHDOG
+    #include "hal_stm32_watchdog_hid.h"  
+#endif//HAL_USE_WATCHDOG
+
+
+
+#ifdef  HAL_USE_ACTUATOR_LED
+    #include "hal_actuator_led_hid.h"
+#endif//HAL_USE_ACTUATOR_LED
+
+
+#ifdef  HAL_USE_DEVICE_CANTRANSCEIVER
+    #include "hal_device_cantransceiver_hid.h" 
+#endif//HAL_USE_DEVICE_CANTRANSCEIVER
+
+#ifdef  HAL_USE_DEVICE_EEPROM
+    #include "hal_device_eeprom_hid.h" 
+//    #include "utils/hal_chip_xx_eeprom.h"
+#endif//HAL_USE_DEVICE_EEPROM
+
+#ifdef  HAL_USE_DEVICE_ETHTRANSCEIVER
+    #include "hal_device_ethtransceiver_hid.h" 
+#endif//HAL_USE_DEVICE_ETHTRANSCEIVER
+
+#ifdef  HAL_USE_DEVICE_SWITCH
+    #include "hal_device_switch_hid.h" 
+#endif//HAL_USE_DEVICE_SWITCH
+
+#ifdef  HAL_USE_SENSOR_ACCEL
+    #include "hal_sensor_accel_hid.h"
+#endif//HAL_USE_SENSOR_ACCEL
+
+#ifdef  HAL_USE_SENSOR_GYRO
+    #include "hal_sensor_gyro_hid.h"
+#endif//HAL_USE_SENSOR_GYRO
+    
+#ifdef  HAL_USE_SENSOR_TEMP
+    #include "hal_sensor_temp_hid.h" 
+#endif//HAL_USE_SENSOR_TEMP
 
 
 #include "hal_stm32xx_include.h"
 
 
 
+
 // - public #define  --------------------------------------------------------------------------------------------------
 
 
-#ifdef HAL_USE_SPI4ENCODER
+#if defined(HAL_USE_ETH) || defined(HAL_USE_DEVICE_ETHTRANSCEIVER) || defined(HAL_USE_DEVICE_SWITCH)
+    #define HAL_ETH_PHYMODE_THEONE2USE     hal_eth_phymode_fullduplex100mbps
+#endif
 
-    #define HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOD
-    #define HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOD
-    #define HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOD  
-
-#endif//HAL_USE_SPI4ENCODER
+//#ifdef HAL_USE_SPI4ENCODER
+//    #define HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOD
+//    #define HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOD
+//    #define HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOD  
+//#endif//HAL_USE_SPI4ENCODER
 
 
 
@@ -88,139 +139,103 @@
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-#ifdef HAL_USE_CAN
-    extern const uint8_t hal_brdcfg_can__supported_mask;//             = 0x03;
-    
-    extern const hal_gpio_cfg_t hal_brdcfg_can__gpio_canx_rx[];
-    extern const hal_gpio_cfg_t hal_brdcfg_can__gpio_canx_tx[];
+#ifdef  HAL_USE_CAN
+    extern const hal_can_hid_brdcfg_t hal_brdcfg_can__theconfig;
 #endif//HAL_USE_CAN
 
-#ifdef HAL_USE_CRC
-    extern const uint8_t hal_brdcfg_crc__supported_mask; //           = 0x01;
+#ifdef  HAL_USE_CRC
+    extern const hal_crc_hid_brdcfg_t hal_brdcfg_crc__theconfig;
 #endif//HAL_USE_CRC
 
-#ifdef HAL_USE_DISPLAY
-    extern const uint8_t hal_brdcfg_display__supported_mask; //         = 0x00;
-#endif//HAL_USE_DISPLAY
-
-#ifdef HAL_USE_EEPROM
-    extern const uint8_t hal_brdcfg_eeprom__supported_mask; //         = (1 << hal_eeprom_emulatedflash)||(1 << hal_eeprom_i2c_01);
-    extern const uint32_t hal_brdcfg_eeprom__emflash_baseaddress;//    = 0x08000000;
-    extern const uint32_t hal_brdcfg_eeprom__emflash_totalsize;//      = 256*1024;
-    extern const uint32_t hal_brdcfg_eeprom__i2c_01_baseaddress;//     = 0;
-    extern const uint32_t hal_brdcfg_eeprom__i2c_01_totalsize;
-    extern const hal_eeprom_hw_cfg_t hal_brdcfg_eeprom__i2c_01_device;
-#endif//HAL_USE_EEPROM
-
-
-#ifdef HAL_USE_ENCODER
-    extern const uint32_t hal_brdcfg_encoder__supported_mask; //         = 0x01ff;
-#endif//HAL_USE_ENCODER
-
-
-#ifdef HAL_USE_ETH
-    extern const uint8_t hal_brdcfg_eth__supported_mask; 
-    
-    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_REF_CLK;
-    
-    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_TX_EN;
-    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_TXD0;
-    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_TXD1;
-    
-    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_CRS_DV;
-    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_RXD0;
-    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_RMII_RXD1;  
-    
-    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_MDC;
-    extern const hal_gpio_cfg_t hal_brdcfg_eth__gpio_ETH_MDIO; 
-
-    extern const hal_eth_phymode_t hal_brdcfg_eth__phymode;
+#ifdef  HAL_USE_ETH
+    extern const hal_eth_hid_brdcfg_t hal_brdcfg_eth__theconfig;
 #endif//HAL_USE_ETH
 
-#ifdef HAL_USE_GPIO
-    extern const uint16_t hal_brdcfg_gpio__supported_mask[];
+#ifdef  HAL_USE_FLASH
+    extern const hal_flash_hid_brdcfg_t hal_brdcfg_flash__theconfig;
+#endif//HAL_USE_FLASH
+
+#ifdef  HAL_USE_GPIO
+    extern const hal_gpio_hid_brdcfg_t hal_brdcfg_gpio__theconfig;
 #endif//HAL_USE_GPIO
 
-
-#ifdef HAL_USE_I2C
-    extern const uint8_t hal_brdcfg_i2c__supported_mask;
-    extern const hal_gpio_cfg_t hal_brdcfg_i2c__scl[];
-    extern const hal_gpio_cfg_t hal_brdcfg_i2c__sda[];
+#ifdef  HAL_USE_I2C
+    extern const hal_i2c_hid_brdcfg_t hal_brdcfg_i2c__theconfig;
 #endif//HAL_USE_I2C
 
+#ifdef  HAL_USE_SPI
+    extern const hal_spi_hid_brdcfg_t hal_brdcfg_spi__theconfig;
+    tobedone
+    extern const uint8_t hal_brdcfg_spi__supported_mask;
+    extern const hal_gpio_cfg_t hal_brdcfg_spi__miso[];
+    extern const hal_gpio_cfg_t hal_brdcfg_spi__mosi[];
+    extern const hal_gpio_cfg_t hal_brdcfg_spi__sck[];
+#endif//HAL_USE_SPI
 
-#ifdef HAL_USE_LED
-    extern const hal_gpio_val_t hal_brdcfg_led__value_on;
-    extern const hal_gpio_val_t hal_brdcfg_led__value_off;
-    extern const uint8_t hal_brdcfg_led__supported_mask;
-    extern const hal_gpio_cfg_t hal_brdcfg_led__cfg[];    
-#endif//HAL_USE_LED 
-
-#ifdef HAL_USE_SPI4ENCODER
-    extern const uint8_t hal_brdcfg_spi4encoder__supported_mask; 
-#endif//HAL_USE_SPI4ENCODER
-
-#ifdef HAL_USE_SWITCH
-    extern const hal_boolval_t hal_brdcfg_switch__supported;
-    extern const hal_gpio_cfg_t hal_brdcfg_switch__gpio_reset; 
-#endif//HAL_USE_SWITCH
 
 #ifdef  HAL_USE_SYS
-    extern const hal_sys_hid_clock_cfg_t hal_brdcfg_sys__clockcfg;
-#endif//HAL_USE_SYS 
+    extern const hal_sys_hid_brdcfg_t hal_brdcfg_sys__theconfig;
+#endif//HAL_USE_SYS            
 
-#ifdef HAL_USE_TIMER
-    extern const uint8_t hal_brdcfg_timer__supported_mask;
+#ifdef  HAL_USE_TIMER
+    extern const hal_timer_hid_brdcfg_t hal_brdcfg_timer__theconfig;  
 #endif//HAL_USE_TIMER
 
-#ifdef HAL_USE_WATCHDOG
-    extern const uint8_t hal_brdcfg_watchdog__supported_mask;
+#ifdef  HAL_USE_WATCHDOG
+    extern const hal_watchdog_hid_brdcfg_t hal_brdcfg_watchdog__theconfig;
 #endif//HAL_USE_WATCHDOG
+
+#ifdef  HAL_USE_ACTUATOR_LED
+    extern const hal_actuator_led_hid_brdcfg_t hal_brdcfg_actuator_led__theconfig;
+#endif//HAL_USE_ACTUATOR_LED 
+
+#ifdef  HAL_USE_DEVICE_CANTRANSCEIVER
+    extern const hal_device_cantransceiver_hid_brdcfg_t hal_brdcfg_device_cantransceiver__theconfig;
+#endif//HAL_USE_DEVICE_CANTRANSCEIVER 
+
+#ifdef  HAL_USE_DEVICE_DISPLAY
+    extern const hal_device_display_hid_brdcfg_t hal_brdcfg_display_encoder__theconfig
+#endif//HAL_USE_DEVICE_DISPLAY
+
+#ifdef  HAL_USE_DEVICE_EEPROM
+    extern const hal_device_eeprom_hid_brdcfg_t hal_brdcfg_device_eeprom__theconfig;   
+#endif//HAL_USE_DEVICE_EEPROM 
+
+#ifdef  HAL_USE_DEVICE_ETHTRANSCEIVER
+    extern const hal_device_ethtransceiver_hid_brdcfg_t hal_brdcfg_device_ethtransceiver__theconfig;
+#endif//HAL_USE_DEVICE_ETHTRANSCEIVER
+
+#ifdef HAL_USE_DEVICE_SWITCH
+    extern const hal_device_switch_hid_brdcfg_t hal_brdcfg_device_switch__theconfig;
+#endif//HAL_USE_DEVICE_SWITCH
+
+
+#ifdef  HAL_USE_SENSOR_ACCEL
+    extern const hal_sensor_accel_hid_brdcfg_t hal_brdcfg_sensor_accel__theconfig;
+#endif//HAL_USE_SENSOR_ACCEL
+
+
+#ifdef  HAL_USE_SENSOR_ENCODER
+    extern const hal_sensor_encoder_hid_brdcfg_t hal_brdcfg_sensor_encoder__theconfig;
+#endif//HAL_USE_SENSOR_ENCODER
+
+
+#ifdef  HAL_USE_SENSOR_GYRO
+    extern const hal_sensor_gyro_hid_brdcfg_t hal_brdcfg_sensor_gyro__theconfig;
+#endif//HAL_USE_SENSOR_GYRO
+
+#ifdef  HAL_USE_SENSOR_TEMP
+    extern const hal_sensor_temp_hid_brdcfg_t hal_brdcfg_sensor_temp__theconfig;
+#endif//HAL_USE_SENSOR_TEMP
+
 
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-#ifdef HAL_USE_SYS
-    extern void hal_brdcfg_sys__clock_config(void);
-    extern void hal_brdcfg_sys__gpio_default_init(void);
-#endif
+extern uint32_t hal_brdcfg_chips__getsize(const hal_cfg_t *cfg);
+extern hal_result_t hal_brdcfg_chips__setmem(const hal_cfg_t *cfg, uint32_t *memory);
 
-
-#ifdef HAL_USE_CAN
-    extern void hal_brdcfg_can__phydevices_init(hal_can_port_t port);
-    extern void hal_brdcfg_can__phydevices_enable(hal_can_port_t port);
-    extern void hal_brdcfg_can__phydevices_disable(hal_can_port_t port);
-#endif//HAL_USE_CAN
-
-
-#ifdef HAL_USE_EEPROM
-    extern hal_result_t hal_brdcfg_eeprom__wp_init(void);
-    extern hal_result_t hal_brdcfg_eeprom__wp_enable(void);
-    extern hal_result_t hal_brdcfg_eeprom__wp_disable(void);
-#endif//HAL_USE_EEPROM   
-
-
-#ifdef HAL_USE_SPI4ENCODER
-    extern void hal_brdcfg_spi4encoder__chipSelect_init(hal_spi_port_t spix);
-    extern void hal_brdcfg_spi4encoder__encoder_enable(hal_spi_port_t spix, hal_spi_mux_t e);
-    extern void hal_brdcfg_spi4encoder__encoder_disable(hal_spi_port_t spix, hal_spi_mux_t e);  
-#endif//HAL_USE_SPI4ENCODER
-
-
-#ifdef HAL_USE_ETH
-    extern hal_bool_t hal_brdcfg_eth__phy_initialise(void);
-    extern void hal_brdcfg_eth__phy_configure(hal_eth_phymode_t *phymode);
-#endif
-
-#ifdef HAL_USE_I2C
-    extern void hal_brdcfg_i2c__ontimeouterror(void);
-#endif//HAL_USE_I2C
-
-#ifdef HAL_USE_SWITCH  
-    extern void hal_brdcfg_switch__initialise(void);
-    extern void hal_brdcfg_switch__configure(hal_eth_phymode_t* phymode);
-#endif//HAL_USE_SWITCH
 
 
 #endif  // include-guard

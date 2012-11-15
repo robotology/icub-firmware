@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
+ * Author:  Valentina Gaggero, Marco Accame
+ * email:   valentina.gaggero@iit.it, marco.accame@iit.it
+ * website: www.robotcub.org
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * A copy of the license can be found at
+ * http://www.robotcub.org/icub/license/gpl.txt
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
+*/
   
 // - include guard ----------------------------------------------------------------------------------------------------
 #ifndef _HAL_BRDCFG_MCBSTMF400_H_
@@ -72,7 +89,6 @@
 
 #ifdef  HAL_USE_DEVICE_EEPROM
     #include "hal_device_eeprom_hid.h" 
-    #include "utils/hal_chip_xx_eeprom.h"
 #endif//HAL_USE_DEVICE_EEPROM
 
 
@@ -204,19 +220,6 @@
 
 extern uint32_t hal_brdcfg_chips__getsize(const hal_cfg_t *cfg);
 extern hal_result_t hal_brdcfg_chips__setmem(const hal_cfg_t *cfg, uint32_t *memory);
-
-
-// #ifdef HAL_USE_SYS
-//     extern void hal_brdcfg_sys__clock_config(void);
-//     extern void hal_brdcfg_sys__gpio_default_init(void);
-// #endif
-
-#ifdef HAL_USE_CAN
-    extern void hal_brdcfg_can__phydevices_init(hal_can_port_t port);
-    extern void hal_brdcfg_can__phydevices_enable(hal_can_port_t port);
-    extern void hal_brdcfg_can__phydevices_disable(hal_can_port_t port);
-#endif//HAL_USE_CAN
-
 
 
 
