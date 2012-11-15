@@ -77,8 +77,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-
+#if   defined(USE_STM32F4)  
 static uint32_t s_hal_flash_pageindex_get(uint32_t addr);
+#endif
 
 static uint32_t s_hal_flash_quickget_pagesize(uint32_t addr);
 #if     defined(USE_STM32F4)
@@ -414,12 +415,12 @@ extern uint32_t hal_flash_get_unitsize(uint32_t addr)
 #endif
 
 
-extern hal_result_t hal_flash_setlatency(hal_flash_cycles_t ncycles)
-{
-    FLASH_SetLatency(ncycles);
+//extern hal_result_t hal_flash_setlatency(hal_flash_cycles_t ncycles)
+//{
+//    FLASH_SetLatency(ncycles);
 //    hal_on_fatalerror(0, msgerr);
-    return(hal_res_OK);
-}
+//    return(hal_res_OK);
+//}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -593,12 +594,15 @@ static hal_result_t s_hal_flash_writedata(uint32_t addr, uint32_t size, uint32_t
     return((FLASH_COMPLETE == status) ? (hal_res_OK) :(hal_res_NOK_generic));
 }
 
+#if   defined(USE_STM32F4)  
 static uint32_t s_hal_flash_pageindex_get(uint32_t addr)
 {
 #if     defined(USE_STM32F1)
     addr -= s_hal_flash_BASEADDR;
-    return(addr / s_hal_flash_PAGESIZE);
-    #warning --> optimise it
+    //return(addr / s_hal_flash_PAGESIZE);
+    // if s_hal_flash_PAGESIZE is 2k (= 2^11) -> division is equivalent to shift by 11 bits
+    addr >>= 11;
+    return(addr);
 #elif   defined(USE_STM32F4)
     uint8_t i;
 
@@ -613,6 +617,7 @@ static uint32_t s_hal_flash_pageindex_get(uint32_t addr)
     return(s_hal_flash_PAGESNUM-1);  
 #endif    
 }
+#endif
 
 #if     defined(USE_STM32F4)
 static uint32_t s_hal_flash_stm32f4_sector_get(uint32_t addr)
