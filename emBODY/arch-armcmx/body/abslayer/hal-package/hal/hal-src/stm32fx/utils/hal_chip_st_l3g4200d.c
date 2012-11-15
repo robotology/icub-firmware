@@ -33,7 +33,7 @@
 
 #include "stdlib.h"
 #include "string.h"
-#include "hal_stm32_base_hid.h" 
+#include "hal_base_hid.h" 
 #include "hal_brdcfg.h"
 
 
