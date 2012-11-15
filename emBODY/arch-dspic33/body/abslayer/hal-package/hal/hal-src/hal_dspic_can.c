@@ -89,7 +89,9 @@ const hal_can_cfg_t hal_can_cfg_default =
     .priorx             = hal_int_priority06,
     .priotx             = hal_int_priority06,
     .callback_on_rx     = NULL,
-    .arg                = NULL
+    .arg_cb_rx          = NULL,
+    .callback_on_tx     = NULL,
+    .arg_cb_tx          = NULL
 };
 
 
@@ -754,7 +756,7 @@ void __attribute__((interrupt, no_auto_psv)) _DMA1Interrupt(void)
     
     if(NULL != cport->cfg.callback_on_rx)
     {
-       cport->cfg.callback_on_rx(cport->cfg.arg); 
+       cport->cfg.callback_on_rx(cport->cfg.arg_cb_rx); 
     }  
  
     // Clear the DMA1 Interrupt Flag;
