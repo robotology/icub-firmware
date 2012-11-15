@@ -154,8 +154,6 @@ typedef struct hal_gpio_hid_altcfg_t hal_gpio_altcfg_t;
 // empty-section
 
 
-extern void pippo(void);
-
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 /** @fn         extern hal_result_t hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_gpio_dir_t dir)

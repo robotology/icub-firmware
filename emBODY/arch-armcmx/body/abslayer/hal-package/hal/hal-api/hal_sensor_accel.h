@@ -60,7 +60,7 @@ typedef enum
     hal_sensor_accel1 = 0
 } hal_sensor_accel_t;
 
-enum { hal_sensor_accel_number = 1 };
+enum { hal_sensor_accels_number = 1 };
 
 
 /** @typedef    typedef int8_t hal_sensor_accel_acceleration_t 

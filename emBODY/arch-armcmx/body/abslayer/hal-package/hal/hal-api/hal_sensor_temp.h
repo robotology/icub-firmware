@@ -60,7 +60,7 @@ typedef enum
     hal_sensor_temp1 = 0
 } hal_sensor_temp_t;
 
-enum { hal_sensor_temp_number = 1 };
+enum { hal_sensor_temps_number = 1 };
 
 
 /** @typedef    typedef int8_t hal_sensor_temp_degree_t 

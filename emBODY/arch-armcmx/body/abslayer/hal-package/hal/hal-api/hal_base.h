@@ -164,6 +164,18 @@ typedef uint64_t    hal_abstime_t;
 typedef uint64_t    hal_nanotime_t;
 
 
+/** @typedef    typedef hal_result_t (*hal_res_fp_void_t) (void)
+    @brief      hal_res_fp_void_t is a pointer to a function which returns a hal_result_t and has a void argument.
+ **/
+typedef hal_result_t (*hal_res_fp_void_t) (void);
+
+
+/** @typedef    typedef hal_result_t (*hal_res_fp_voidp_t) (void)
+    @brief      hal_res_fp_voidp_t is a pointer to a function which returns a hal_result_t and has a void pointer argument.
+ **/
+typedef hal_result_t (*hal_res_fp_voidp_t) (void* p);
+
+
 /** @typedef    typedef void (*hal_void_fp_void_t) (void)
     @brief      hal_void_fp_void_t is a pointer to a function which returns void and has a void argument.
  **/

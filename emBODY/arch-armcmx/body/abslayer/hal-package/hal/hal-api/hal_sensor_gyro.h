@@ -60,7 +60,7 @@ typedef enum
     hal_sensor_gyro1 = 0
 } hal_sensor_gyro_t;
 
-enum { hal_sensor_gyro_number = 1 };
+enum { hal_sensor_gyros_number = 1 };
 
 
 /** @typedef    typedef int8_t hal_sensor_gyro_angular_rate_t 
