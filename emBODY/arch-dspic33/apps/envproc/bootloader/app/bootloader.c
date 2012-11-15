@@ -139,7 +139,7 @@ static const eEmoduleInfo_t s_bl_moduleinfo =
             .signature  = ee_procApplication,
             .version    = 
             { 
-                .major = 1, 
+                .major = 100, 
                 .minor = 0
             },  
             .builddate  = 
@@ -190,7 +190,7 @@ static const eEmoduleInfo_t s_bl_moduleinfo =
             .signature  = ee_procLoader,
             .version    = 
             { 
-                .major = 1, 
+                .major = 2, 
                 .minor = 0
             },  
             .builddate  = 
@@ -495,7 +495,9 @@ static void s_bl_can_start(void)
         .priorx         = hal_int_priorityNONE,
         .priotx         = hal_int_priorityNONE,
         .callback_on_rx = NULL,
-        .arg            = NULL
+        .arg_cb_rx      = NULL,
+        .callback_on_tx = NULL,
+        .arg_cb_tx      = NULL,
     };
 
 s_bl_updt_canaddress = BOOTLOADER_UPDT_CANADDRESS;
