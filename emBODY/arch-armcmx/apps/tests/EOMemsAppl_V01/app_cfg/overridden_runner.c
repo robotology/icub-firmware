@@ -65,6 +65,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
+extern int32_t encoder_can_pos;
+extern int32_t encoder_can_vel;
+
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
@@ -223,17 +226,13 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
    
 //following activities are independent on runmode
     
-
-#ifdef _USE_PROTO_TEST_
-    mySetPoint_current.to.current.value = pwm_out;
-    eo_appCanSP_SendSetPoint(p->cfg.appCanSP_ptr, 3, &mySetPoint_current);  
-    //((int32_t*)payload)[0]=encoder_can;
-    //((int32_t*)payload)[1]=posref_can;
-
+    /*
+    uint8_t payload[8];
+    ((int32_t*)payload)[0]=encoder_can_pos;
+    ((int32_t*)payload)[1]=encoder_can_vel;
     eo_appCanSP_SendMessage_TEST(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), payload);    
-        
-#else        
-        
+    */
+    
     res = eo_appCanSP_StartTransmitCanFrames(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1);
     if(eores_OK != res)
     {
@@ -245,9 +244,6 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
     {
         return;
     }        
-#endif        
-
-
 }
 
 
@@ -377,7 +373,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
 {
     //eOresult_t          res;
     EOtheEMSapplBody    *emsappbody_ptr = eo_emsapplBody_GetHandle();
-    uint32_t            encvalue[4] = {ENC_INVALID, ENC_INVALID, ENC_INVALID, ENC_INVALID};
+    uint32_t            encvalue[4] = {(uint32_t)ENC_INVALID, (uint32_t)ENC_INVALID, (uint32_t)ENC_INVALID, (uint32_t)ENC_INVALID};
     int16_t             pwm[4];
 
     uint16_t numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
@@ -387,18 +383,13 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
         for (uint8_t enc = 0; enc < numofjoint; ++enc)
         {
             eo_appEncReader_GetValue(eo_emsapplBody_GetEncoderReaderHandle(emsappbody_ptr), (eOappEncReader_encoder_t)enc, &(encvalue[enc]));
-        }
+        }        
+    }
 
-        eo_emsController_ReadEncoders((int32_t*)encvalue);
-    }
-    else
-    {
-        eo_emsController_SkipEncoders();
-    }
+    eo_emsController_ReadEncoders((int32_t*)encvalue);
         
     /* 2) pid calc */
     eo_emsController_PWM(pwm);
-     
 
     /* 3) prepare and punt in rx queue new setpoint */
     s_eom_emsrunner_hid_SetCurrentsetpoint(emsappbody_ptr, pwm, 0/*unused param*/);
