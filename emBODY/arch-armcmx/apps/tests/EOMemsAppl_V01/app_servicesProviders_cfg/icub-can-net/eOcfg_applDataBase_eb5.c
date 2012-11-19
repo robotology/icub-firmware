@@ -131,7 +131,7 @@ static const eOappTheDB_cfg_jointInfo_t s_cfg_appDB_joints[] =
     { // 0 
         EO_INIT(.canLoc)
         {
-            EO_INIT(.belong2board)               FOC_ADDRCAN_3_BID,
+            EO_INIT(.belong2board)               FOC_ADDRCAN_1_BID,
             EO_INIT(.indexinboard)               eo_icubCanProto_jm_index_first,
         }
     },    
@@ -139,7 +139,7 @@ static const eOappTheDB_cfg_jointInfo_t s_cfg_appDB_joints[] =
     { // 1 
         EO_INIT(.canLoc)
         {
-            EO_INIT(.belong2board)               FOC_ADDRCAN_4_BID,
+            EO_INIT(.belong2board)               FOC_ADDRCAN_3_BID,
             EO_INIT(.indexinboard)               eo_icubCanProto_jm_index_first,
         }
     },
@@ -147,7 +147,7 @@ static const eOappTheDB_cfg_jointInfo_t s_cfg_appDB_joints[] =
     { // 2 
         EO_INIT(.canLoc)
         {
-            EO_INIT(.belong2board)               FOC_ADDRCAN_1_BID,
+            EO_INIT(.belong2board)               FOC_ADDRCAN_4_BID,
             EO_INIT(.indexinboard)               eo_icubCanProto_jm_index_first,
         }
     }
