@@ -108,7 +108,7 @@ _write_flash_word24() - write a word of FLASH memory with 24-bit data
 #define CONFIG_REG_WRITE        0x4000
 
 //this address can not be change. Depende on micro.
-//in this memory is progma memory, but it contains system infomation: there are startup address, ivt and aivt
+//in this memory is program memory, but it contains system information: there are startup address, ivt and aivt
 #define START_SYSPM                0x0                
 #define END_SYSPM                  0x200              
 
@@ -324,7 +324,7 @@ extern void mm_update_eeprom(uint8_t updateit)
 extern void mm_erase(void)
 {
     mm_erase_programMem();
-    mm_erase_systemMem();
+    //mm_erase_systemMem();
     
     if(s_mm_data.update_ee)
     {
@@ -672,8 +672,9 @@ static eEresult_t s_storePM(uint8_t *data, uint8_t data_size, mm_hex32file_linei
     {
         s_mm_buffer.data.asByte[s_mm_buffer.index++] = data[i];
 
-        if(s_mm_actual_wUnit.StartAddr == 0)
+        if(s_mm_actual_wUnit.StartAddr == START_SYSPM)
         {
+            mm_erase_systemMem();
             s_mm_buffer.data.asWord32[0] = 0x00040000 + (BOOTLDR_ADDR & 0xffff);
             s_mm_buffer.data.asWord32[1] = BOOTLDR_ADDR>>16;
         }
