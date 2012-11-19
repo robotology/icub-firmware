@@ -665,6 +665,7 @@ static eEresult_t s_storePM(uint8_t *data, uint8_t data_size, mm_hex32file_linei
 {
     int16_t i;
     eEresult_t res;
+    static uint8_t erase_sysmem = 0;
 
 
     i=1;
@@ -674,7 +675,7 @@ static eEresult_t s_storePM(uint8_t *data, uint8_t data_size, mm_hex32file_linei
 
         if(s_mm_actual_wUnit.StartAddr == START_SYSPM)
         {
-            mm_erase_systemMem();
+            erase_sysmem = 1;
             s_mm_buffer.data.asWord32[0] = 0x00040000 + (BOOTLDR_ADDR & 0xffff);
             s_mm_buffer.data.asWord32[1] = BOOTLDR_ADDR>>16;
         }
@@ -695,6 +696,12 @@ static eEresult_t s_storePM(uint8_t *data, uint8_t data_size, mm_hex32file_linei
 
         if(s_mm_buffer.index >= PM_ROWSIZE*PM_BYTE_PER_UNIT) 
         {
+            if(1 == erase_sysmem)
+            {
+                erase_sysmem = 0;
+                mm_erase_systemMem();
+            }
+            
             //Write buffer on memory
             mm_write_buffer(); //I don't check error because here the function can be return only ok.
             
