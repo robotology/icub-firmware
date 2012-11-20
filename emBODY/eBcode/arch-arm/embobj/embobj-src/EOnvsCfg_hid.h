@@ -63,7 +63,8 @@ typedef struct
     eOvoid_fp_uint16_voidp_voidp_t  thenvs_ramretrieve; // ep, vol_local, vol_remote
     uint32_t                        thenvs_sizeof;   
     eOuint16_fp_uint16_t            hashfn_id2index; 
-    EOVmutexDerived*                mtx_endpoint;                 
+    EOVmutexDerived*                mtx_endpoint;    
+    EOvector*                       themtxofthenvs;    
 } EOnvsCfg_ep_t;
 
 typedef struct
@@ -79,7 +80,8 @@ typedef struct
     eOnvscfgOwnership_t             ownership;
     uint16_t                        theendpoints_numberof; 
     eOnvsCfgEPhash_t*               ephashtable;  
-    eOuint16_fp_uint16_t            hashfn_ep2index;    
+    eOuint16_fp_uint16_t            hashfn_ep2index;   
+    EOVmutexDerived*                mtx_device;      
 } EOnvsCfg_device_t;
 
 
@@ -97,6 +99,9 @@ struct EOnvsCfg_hid
     eOnvscfgDevicesOwnership_t      devicesowneship;
     EOVstorageDerived*              storage;
     EOmatrix3d*                     allnvs;
+    eOnvscfgMutexProtectionOfNVs_t  mtxnvsmode;
+    eov_mutex_fn_mutexderived_new   mtxderived_new;
+    EOVmutexDerived*                mtx_object;
 };   
  
 

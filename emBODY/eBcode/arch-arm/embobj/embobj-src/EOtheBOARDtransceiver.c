@@ -90,7 +90,9 @@ const eOboardtransceiver_cfg_t eo_boardtransceiver_cfg_default =
     EO_INIT(.vectorof_endpoint_cfg)     NULL,
     EO_INIT(.remotehostipv4addr)        0,
     EO_INIT(.remotehostipv4port)        0,
-    EO_INIT(.sizes)                     {0}
+    EO_INIT(.sizes)                     {0},
+    EO_INIT(.mtx_fn_new)                NULL,
+    EO_INIT(.nvsmtxmode)                eo_nvscfg_mtxprotnvs_none
 };
 
 
@@ -176,16 +178,26 @@ static EOnvsCfg* s_eo_boardtransceiver_nvscfg_get(const eOboardtransceiver_cfg_t
     const EOconstvector* theepcfgs = NULL;
     uint16_t nendpoints = 0;
     uint16_t i;
+    
+    const uint16_t numofdevices = 1;    // one device only
+    const uint16_t ondevindex = 0;      // hence only index 0
+    
 
     if(NULL != nvscfg)
     {
-        return(NULL);
+        // if i call it more than once ... then i return the configuration but allocate and init only once 
+        return(nvscfg);
     }
 
+ 
     theepcfgs = cfg->vectorof_endpoint_cfg;
 
 //    #warning --> so far the BOARDtransceiver does not use any storage. if needed ... change the NULL into a ...
-    nvscfg = eo_nvscfg_New(1, NULL);
+    nvscfg = eo_nvscfg_New(numofdevices, NULL, cfg->nvsmtxmode, cfg->mtx_fn_new);
+    
+    
+    //foreach<device>
+    // begin
 
     nendpoints = eo_constvector_Size(theepcfgs);
     
@@ -195,18 +207,10 @@ static EOnvsCfg* s_eo_boardtransceiver_nvscfg_get(const eOboardtransceiver_cfg_t
     for(i=0; i<nendpoints; i++)
     {
         epcfg = (eOnvscfg_EP_t*) eo_constvector_At(theepcfgs, i);
-
-//         eo_nvscfg_ondevice_PushBackEndpoint(nvscfg, 0, epcfg->endpoint,
-//                                         epcfg->hashfunction_id2index,
-//                                         epcfg->constvector_of_treenodes_EOnv_con,
-//                                         epcfg->constvector_of_EOnv_usr,
-//                                         epcfg->sizeof_endpoint_data, 
-//                                         epcfg->endpoint_data_init,
-//                                         NULL);
-
-        eo_nvscfg_ondevice_PushBackEP(nvscfg, 0, epcfg, NULL);        
-        
+        eo_nvscfg_ondevice_PushBackEP(nvscfg, ondevindex, epcfg);         
     }
+    
+    //end
     
     eo_nvscfg_data_Initialise(nvscfg);
 
