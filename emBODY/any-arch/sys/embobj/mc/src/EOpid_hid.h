@@ -45,14 +45,17 @@ struct EOpid_hid
     float En;
     float KKiIn;
     
-    float Yoff;
     float Imax;
     
+    int32_t Yoff;
     int32_t pwm_max;
     int32_t pwm;
     
     float A;
     float B;
+    
+    int32_t zero_rotation_torque_neg;
+    int32_t zero_rotation_torque_pos;
 
     eObool_t safe_mode;
 }; 
