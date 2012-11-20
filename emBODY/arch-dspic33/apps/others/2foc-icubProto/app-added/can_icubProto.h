@@ -32,22 +32,24 @@
 // outgoing error message (for example unknown command or wrong params)
 #define CAN_PROTO_CMD_ERROR					  0xff
 
+//NOTE: removed because they dont't belong to icub can proto, but are use only for debug porpouse.
+//      if they are used with bootloader, flashing process can not terminate with success.
+////
+////  CAN error codes definition
+////
 //
-//  CAN error codes definition
-//
-
-// the command has a wrong number of parameters
-#define CAN_PROTO_ERROR_INCORRECT_NUMBER_OF_PARAMETERS 0x01
-// the message is unknown by the parser
-#define CAN_PROTO_ERROR_UNKNOWN_COMMAND                0x02
-// trying to write a read only parameter
-#define CAN_PROTO_ERROR_WRITE_READ_ONLY_DATA           0x03
-// command parameter out of range
-#define CAN_PROTO_ERROR_PARAM_OUT_OF_RANGE             0x04
-// command not yet implemented
-#define CAN_PROTO_ERROR_COMMAND_NOT_INPLEMENTED        0x05
-// trying to read a write only parameter
-#define CAN_PROTO_ERROR_READ_WRITE_ONLY_DATA           0x06
+//// the command has a wrong number of parameters
+//#define CAN_PROTO_ERROR_INCORRECT_NUMBER_OF_PARAMETERS 0x01
+//// the message is unknown by the parser
+//#define CAN_PROTO_ERROR_UNKNOWN_COMMAND                0x02
+//// trying to write a read only parameter
+//#define CAN_PROTO_ERROR_WRITE_READ_ONLY_DATA           0x03
+//// command parameter out of range
+//#define CAN_PROTO_ERROR_PARAM_OUT_OF_RANGE             0x04
+//// command not yet implemented
+//#define CAN_PROTO_ERROR_COMMAND_NOT_INPLEMENTED        0x05
+//// trying to read a write only parameter
+//#define CAN_PROTO_ERROR_READ_WRITE_ONLY_DATA           0x06
 
 
 

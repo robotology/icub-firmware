@@ -113,8 +113,9 @@ void CanIcubProtoParserParse(unsigned long rxid, unsigned char rxlen, tCanData *
         
         default:
         {
-            txlen = 0x1;
-	        txpayload.b[0] =CAN_PROTO_ERROR_UNKNOWN_COMMAND; 
+//            txlen = 0x1;
+//	        txpayload.b[0] =CAN_PROTO_ERROR_UNKNOWN_COMMAND; 
+            txlen = 0x0;
             command_ok = 0;
         }
     }
@@ -135,7 +136,7 @@ void CanIcubProtoParserParse(unsigned long rxid, unsigned char rxlen, tCanData *
     }
     else
     {
-      CanIcubProtoTxErrorCode(resp_id, txlen, &txpayload);
+     ; //error. What i do??? // CanIcubProtoTxErrorCode(resp_id, txlen, &txpayload);
     }
 }
 //returns 1 ==> ok, retuns 0 ==> nok
@@ -150,16 +151,18 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
-                *txlen=0x1;
-                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+//                *txlen=0x1;
+//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                *txlen = 0x0;
                 return(0);
             }
          
             // Command can be accepted only if current ststus is SWITCHED ON 
             if(1 != DS402_Statusword.Flags.SwitchedOn )
             {
-                *txlen = 0x1;
-                txpayload->b[0] = CAN_DS402_INVALID_STATUS_CHANGE;
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_DS402_INVALID_STATUS_CHANGE;
+                *txlen = 0x0;
                 return(0);
             }
             
@@ -175,16 +178,18 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
-                *txlen = 0x1;
-                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                  *txlen = 0;
                 return(0);
             }
          
             // Command can be accepted only if current ststus is OPERATION ENABLE
             if ( (1 != DS402_Statusword.Flags.OperationEnabled ) && (1 != DS402_Statusword.Flags.SwitchedOn ) )
             {
-                *txlen = 0x1;
-                txpayload->b[0] = CAN_DS402_INVALID_STATUS_CHANGE;
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_DS402_INVALID_STATUS_CHANGE;
+                  *txlen = 0;
                 return(0);
             }
 			// go to Ready to Switch On state
@@ -198,17 +203,19 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
-                *txlen = 0x1;
-                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                *txlen = 0;
                 return(0);
             }
             
             // Command can be accepted only if current ststus is SWITCH ON DISABLED 
             if(1 != DS402_Statusword.Flags.ReadyToSwitchOn )
             {
-                *txlen = 0x1;
-                txpayload->b[0] = CAN_DS402_INVALID_STATUS_CHANGE;
-                return(0);
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_DS402_INVALID_STATUS_CHANGE;
+                  *txlen = 0;
+                  return(0);
             }
             // go to Switch On state
             DS402_Controlword.Flags.SwitchOn = 1;
@@ -218,15 +225,17 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
-                *txlen = 0x1;
-                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                *txlen = 0x0;
                 return(0);
             }
             // Command can be accepted only if current ststus is OPERATION ENABLE or SWITCHED ON 
             if ( (1 != DS402_Statusword.Flags.OperationEnabled ) && (1 != DS402_Statusword.Flags.SwitchedOn ) )
             {
-                *txlen = 0x1;
-                txpayload->b[0] = CAN_DS402_INVALID_STATUS_CHANGE;
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_DS402_INVALID_STATUS_CHANGE;
+                *txlen = 0x0;
                 return(0);
             }
 
@@ -238,16 +247,18 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
-                *txlen = 0x1;
-                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                *txlen = 0x0;
                 return(0);
             }
             
             txpayload->b[1] = CanIcubProtoGetcontrol_mode();
             if( controlMode_error == txpayload->b[1])
             {
-                *txlen = 0x1;
-                txpayload->b[0] =  CAN_ERROR_INCONSISTENT_STATE;
+//                *txlen = 0x1;
+//                txpayload->b[0] =  CAN_ERROR_INCONSISTENT_STATE;
+                *txlen = 0x0;
                 return(0);
             }
 
@@ -260,16 +271,18 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             if(2 != rxlen)
             {   // incorrect number of parameters
-                *txlen = 0x1;
-                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                *txlen = 0x0;
                 return(0);
             }
 
             //this command has effect only when i'm in enable operation state
             if(1 != DS402_Controlword.Flags.EnableOperation)
             {
-                *txlen = 0x1;
-                txpayload->b[1] = CAN_ERROR_COMMAND_IN_INVALID_STATE;
+//                *txlen = 0x1;
+//                txpayload->b[1] = CAN_ERROR_COMMAND_IN_INVALID_STATE;
+                *txlen = 0x0;
                 return(0);    
             }
 
@@ -312,8 +325,9 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
-                *txlen = 0x1;
-                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                *txlen = 0x0;
                 return(0);
             }
 #ifndef CAN_CMD_ALWAYS_ACCEPT
@@ -357,8 +371,9 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
-                *txlen = 0x1;
-                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                *txlen = 0x0;
                 return(0);
             }
             *txlen = 0x2;
@@ -368,8 +383,9 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 
         case ICUBPROTO_POLLINGCMD_SET_BOARD_ID: 
         {
-            *txlen=0x1;
-             txpayload->b[0] = CAN_PROTO_ERROR_COMMAND_NOT_INPLEMENTED;
+//            *txlen=0x1;
+//             txpayload->b[0] = CAN_PROTO_ERROR_COMMAND_NOT_INPLEMENTED;
+              *txlen=0x0;
              return(0);
             
             /* currently it is NOT possible change board can address, 
@@ -420,8 +436,9 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             SFRAC16 pp, pi, pd;
             if(7 != rxlen)
             {   // incorrect number of parameters
-                *txlen = 0x1;
-                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                *txlen = 0x0;
                 return(0);
             }
 
@@ -437,8 +454,9 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             signed int p, i, d;
             if(1 != rxlen)
             {   // incorrect number of parameters
-                *txlen = 0x1;
-                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                *txlen = 0x0;
                 return(0);
             }
             
@@ -456,8 +474,9 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             
             if(7 != rxlen)
             {   // incorrect number of parameters
-                *txlen = 0x1;
-                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                *txlen = 0x0;
                 return(0);
             }
 
@@ -472,8 +491,9 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             signed int p, i, d;
             if(1 != rxlen)
             {   // incorrect number of parameters
-                *txlen = 0x1;
-                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                *txlen = 0x0;
                 return(0);
             }
             ControllerGetWPIDParm(&p, &i, &d);
@@ -488,16 +508,18 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             if(5 != rxlen)
             {   // incorrect number of parameters
-                *txlen = 0x1;
-                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                *txlen = 0x0;
                 return(0);
             }
             
 #ifndef CAN_CMD_ALWAYS_ACCEPT
             if ( (1 != DS402_Statusword.Flags.OperationEnabled ) && (1 != DS402_Statusword.Flags.SwitchedOn ) )
             {
-              *txlen=0x1;
-              txpayload->b[0] =  CAN_ERROR_COMMAND_IN_INVALID_STATE;
+//              *txlen=0x1;
+//              txpayload->b[0] =  CAN_ERROR_COMMAND_IN_INVALID_STATE;
+              *txlen = 0x0;
               return(0);
             }
 #endif
@@ -516,8 +538,9 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
-                *txlen = 0x1;
-                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                *txlen = 0x0;
                 return(0);
             }
             
@@ -531,8 +554,9 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             if(5 != rxlen)
             {   // incorrect number of parameters
-                *txlen = 0x1;
-                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                *txlen = 0x0;
                 return(0);
             }
             
@@ -551,8 +575,9 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             else
             {
               // parameter out of range
-              *txlen=0x1;
-              txpayload->b[0] = CAN_ERROR_PARAMETER_OUT_OF_RANGE;
+//              *txlen=0x1;
+//              txpayload->b[0] = CAN_ERROR_PARAMETER_OUT_OF_RANGE;
+                *txlen = 0x0;
               return(0);
             }
         }break;
@@ -561,8 +586,9 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             if(5 != rxlen)
             {   // incorrect number of parameters
-                *txlen = 0x1;
-                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                *txlen = 0x0;
                 return(0);
             }
             //extract params from the 1st word
@@ -574,8 +600,9 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
-                *txlen = 0x1;
-                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                *txlen = 0x0;
                 return(0);
             }
             *txlen = 5;
@@ -586,7 +613,8 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         
         default:
         {
-            ICUBPROTO_PAYLOAD_ERROR_SET(txpayload, txlen, CAN_PROTO_ERROR_UNKNOWN_COMMAND);
+            //ICUBPROTO_PAYLOAD_ERROR_SET(txpayload, txlen, CAN_PROTO_ERROR_UNKNOWN_COMMAND);
+            *txlen = 0;
             return(0);
         }
     } //end switch
@@ -596,7 +624,8 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 static int s_canIcubProtoParser_parse_periodicMsg(unsigned char permsg_type, tCanData *rxpayload, unsigned char rxlen, tCanData *txpayload, unsigned char *txlen)
 {
 #ifndef DESIRED_CURR_IN_PER_MSG_BY_EMS
-    ICUBPROTO_PAYLOAD_ERROR_SET(txpayload, txlen, CAN_PROTO_ERROR_UNKNOWN_COMMAND);
+    //ICUBPROTO_PAYLOAD_ERROR_SET(txpayload, txlen, CAN_PROTO_ERROR_UNKNOWN_COMMAND);
+    *txlen = 0;
     return(0);
 #else
     
@@ -606,7 +635,8 @@ static int s_canIcubProtoParser_parse_periodicMsg(unsigned char permsg_type, tCa
         {
             if((canprotoparser_bid*2) > rxlen)
             {
-                ICUBPROTO_PAYLOAD_ERROR_SET(txpayload, txlen, CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS);
+                //ICUBPROTO_PAYLOAD_ERROR_SET(txpayload, txlen, CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS);
+                *txlen = 0;
                 return(0);
             }
              // Torque control references
@@ -620,7 +650,8 @@ static int s_canIcubProtoParser_parse_periodicMsg(unsigned char permsg_type, tCa
        
         default:
         {
-            ICUBPROTO_PAYLOAD_ERROR_SET(txpayload, txlen, CAN_PROTO_ERROR_UNKNOWN_COMMAND);
+            //ICUBPROTO_PAYLOAD_ERROR_SET(txpayload, txlen, CAN_PROTO_ERROR_UNKNOWN_COMMAND);
+            *txlen = 0;
             return(0);
         }
 
@@ -642,17 +673,18 @@ static int s_canIcubProtoParser_parse_canLoaderMsg(tCanData *rxpayload, unsigned
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
-                *txlen = 0x1;
-                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                *txlen = 0x0;
                 return(0);
             }
 
             *txlen = 5;
             txpayload->b[0] = cmd;
             txpayload->b[1] = BOARD_TYPE_2FOC; 
-            txpayload->b[2] = 7;  //TODO  //Firmware version number for BOOTLOADER c
-            txpayload->b[3] = 7;  //TODO   //Firmware build number.
-            txpayload->b[4] = 7;  //TODO   //Firmware build number.
+            txpayload->b[2] = 1;  //TODO  //Firmware version number for BOOTLOADER c
+            txpayload->b[3] = 0;  //TODO   //Firmware build number.
+            txpayload->b[4] = 1;  //TODO   //Firmware build number.
             #warning solita incoerenza tra versioni di fw sensori ed motori            
         } break;
                 
@@ -675,7 +707,8 @@ static int s_canIcubProtoParser_parse_canLoaderMsg(tCanData *rxpayload, unsigned
                 
         default:
         {
-            ICUBPROTO_PAYLOAD_ERROR_SET(txpayload, txlen, CAN_PROTO_ERROR_UNKNOWN_COMMAND);
+            //ICUBPROTO_PAYLOAD_ERROR_SET(txpayload, txlen, CAN_PROTO_ERROR_UNKNOWN_COMMAND);
+            *txlen = 0;
             return(0);
         } break;
         
