@@ -56,11 +56,13 @@ extern "C" {
 
 typedef struct
 {
-    const EOconstvector*        vectorof_endpoint_cfg;
-    eOuint16_fp_uint16_t        hashfunction_ep2index;
-    eOipv4addr_t                remotehostipv4addr;
-    eOipv4port_t                remotehostipv4port;
-    eo_transceiver_sizes_t      sizes; 
+    const EOconstvector*            vectorof_endpoint_cfg;
+    eOuint16_fp_uint16_t            hashfunction_ep2index;
+    eOipv4addr_t                    remotehostipv4addr;
+    eOipv4port_t                    remotehostipv4port;
+    eo_transceiver_sizes_t          sizes; 
+    eov_mutex_fn_mutexderived_new   mtx_fn_new;    
+    eOnvscfgMutexProtectionOfNVs_t  nvsmtxmode;
 } eOboardtransceiver_cfg_t;
 
 
