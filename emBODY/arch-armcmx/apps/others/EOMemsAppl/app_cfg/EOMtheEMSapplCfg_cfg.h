@@ -137,7 +137,7 @@ extern "C" {
 //  <o> ID of the EMS board     <1=> EB1    <2=> EB2    <3=> EB3    <4=> EB4    <5=> EB5    
 //                              <6=> EB6    <7=> EB7    <8=> EB8    <9=> EB9
 
-#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     1
+#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     9
 
 
       
@@ -205,6 +205,8 @@ extern "C" {
 //  <h> error manager
 //  <o> on error   <0=>   redefine __weak eom_emsapplcfg_hid_userdef_OnError() 
 #define sdfefe004       0
+//  <o> printf on debug window enabled   <0=>   false  <1=>   true
+#define EOMTHEEMSAPPLCFG_HALTRACE_ENABLED    0
 //  </h>error manager
 
 
