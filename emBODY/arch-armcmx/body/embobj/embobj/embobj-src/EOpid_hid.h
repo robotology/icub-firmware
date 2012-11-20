@@ -43,18 +43,20 @@ struct EOpid_hid
 
     float Dn;
     float En;
-    float KIn;
+    float KKiIn;
     
-    float Yoff;
-    float Ymax;
     float Imax;
-    float KImax;
+    
+    int32_t Yoff;
+    int32_t pwm_max;
+    int32_t pwm;
     
     float A;
     float B;
     
-    int32_t pwm;
-    
+    int32_t zero_rotation_torque_neg;
+    int32_t zero_rotation_torque_pos;
+
     eObool_t safe_mode;
 }; 
 

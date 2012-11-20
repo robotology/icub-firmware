@@ -88,7 +88,7 @@ struct EOaxisController_hid
 
     int16_t openloop_out;
 
-    uint8_t control_mode;
+    eOmc_controlmode_t control_mode;
 
     uint16_t ready_mask;
 }; 
