@@ -155,7 +155,7 @@
 //   <i> Define max. number of mutexes that will run at the same time.
 //   <i> Default: 0  (Mutexes not enabled)
 #ifndef OSAL_MUTEXNUM
- #define OSAL_MUTEXNUM    8
+ #define OSAL_MUTEXNUM    160
 #endif
 
 
