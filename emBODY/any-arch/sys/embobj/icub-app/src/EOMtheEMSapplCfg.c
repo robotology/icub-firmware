@@ -28,7 +28,7 @@
 #include "eOcfg_sm_EMSappl.h"
 
 #include "EOVtheIPnet.h"
-
+#include "EOMmutex.h"
 
 #include "EOMtheSystem.h"
 #include "EOVtheSystem.h"
@@ -242,7 +242,7 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
         }   
     },
     .getipaddrFROMenvironment   =   EOMTHEEMSAPPLCFG_IPADDR_FROM_ENVIRONMENT,
-    .errmng_haltrace_enabled    =   HALTRACE_ENABLED,
+    .errmng_haltrace_enabled    =   EOMTHEEMSAPPLCFG_HALTRACE_ENABLED,
     .boardid                    =   (eom_emsapplcfg_boardid_t)EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD,
     .hasdevice                  = 
     {
@@ -288,7 +288,9 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
             .capacityofropframeoccasionals  = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEOCCASIONALSCAPACITY, //128,
             .capacityofropframereplies      = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY, //128,
             .maxnumberofregularrops         = EOMTHEEMSAPPLCFG_TRANSCEIVER_MAXNUMOFREGULARROPS //32
-        }    
+        },
+        .mtx_fn_new             = (eov_mutex_fn_mutexderived_new)eom_mutex_New,
+        .nvsmtxmode             = eo_nvscfg_mtxprotnvs_one_per_netvar, //eo_nvscfg_mtxprotnvs_none
     },
     .errobjcfg      =
     {
