@@ -140,7 +140,7 @@ static const eEmoduleInfo_t s_bl_moduleinfo =
             .version    = 
             { 
                 .major = 100, 
-                .minor = 0
+                .minor = 1
             },  
             .builddate  = 
             {
@@ -191,7 +191,7 @@ static const eEmoduleInfo_t s_bl_moduleinfo =
             .version    = 
             { 
                 .major = 2, 
-                .minor = 0
+                .minor = 1
             },  
             .builddate  = 
             {
