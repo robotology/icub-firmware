@@ -299,6 +299,7 @@ static mem_section_info_t s_mm_sectionMem_info[memory_type_max_num]=
 // this variable contains all information necessary to memory manager
 static mem_datastruct_t s_mm_data;
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -324,7 +325,7 @@ extern void mm_update_eeprom(uint8_t updateit)
 extern void mm_erase(void)
 {
     mm_erase_programMem();
-    //mm_erase_systemMem();
+    mm_erase_systemMem();
     
     if(s_mm_data.update_ee)
     {
@@ -414,6 +415,8 @@ extern eEresult_t mm_check_new_fileLineInfo(mm_hex32file_lineinfo_t *fLine_info_
 
 extern eEresult_t mm_write_buffer(void)
 {
+    static uint8_t firsttimewewrite = 1;
+    
     if(DevConf_MemT == s_mm_actual_wUnit.mem_type)
     {
         return(ee_res_NOK_generic); //this function must be invoked on PM and EE memory only.
@@ -422,6 +425,12 @@ extern eEresult_t mm_write_buffer(void)
 
     if(0 != s_mm_buffer.index)
     {
+        if(1 == firsttimewewrite)
+        {
+            firsttimewewrite = 0;
+            mm_erase();
+        }
+        
         _write_flash24(s_mm_actual_wUnit.StartAddr, s_mm_buffer.data.asWord32 );
         
         s_mm_buffer.index = 0;
@@ -665,7 +674,7 @@ static eEresult_t s_storePM(uint8_t *data, uint8_t data_size, mm_hex32file_linei
 {
     int16_t i;
     eEresult_t res;
-    static uint8_t erase_sysmem = 0;
+//    static uint8_t erase_sysmem = 0;
 
 
     i=1;
@@ -675,7 +684,7 @@ static eEresult_t s_storePM(uint8_t *data, uint8_t data_size, mm_hex32file_linei
 
         if(s_mm_actual_wUnit.StartAddr == START_SYSPM)
         {
-            erase_sysmem = 1;
+            //erase_sysmem = 1;
             s_mm_buffer.data.asWord32[0] = 0x00040000 + (BOOTLDR_ADDR & 0xffff);
             s_mm_buffer.data.asWord32[1] = BOOTLDR_ADDR>>16;
         }
@@ -696,11 +705,11 @@ static eEresult_t s_storePM(uint8_t *data, uint8_t data_size, mm_hex32file_linei
 
         if(s_mm_buffer.index >= PM_ROWSIZE*PM_BYTE_PER_UNIT) 
         {
-            if(1 == erase_sysmem)
-            {
-                erase_sysmem = 0;
-                mm_erase_systemMem();
-            }
+//            if(1 == erase_sysmem)
+//            {
+//                erase_sysmem = 0;
+//                mm_erase_systemMem();
+//            }
             
             //Write buffer on memory
             mm_write_buffer(); //I don't check error because here the function can be return only ok.

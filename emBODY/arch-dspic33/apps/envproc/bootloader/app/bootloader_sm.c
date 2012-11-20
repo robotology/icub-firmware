@@ -870,7 +870,8 @@ static void s_blsm_memory_set_address_firstone(const blparser_cmd_any_t* cmdany)
     
     // as it is the first time that an address arrives we erase memory. we erase also the eeprom (application storage)
     // if the board command contained the field updateeeprom equal to one.
-    mm_erase();
+    // acemor-20nov2012: removed from here and moved just before the first writing into flash ....
+    //mm_erase();
     
     // we start the write mode. we dont actually write in flash yet. it returns error if the contained address does not belong to the device
     if(ee_res_OK != mm_start_write(&s_blsm_lineinfo))
