@@ -111,7 +111,7 @@ static const char s_eobj_ownname[] = "EOnvsCfg";
 
 
  
-extern EOnvsCfg* eo_nvscfg_New(uint16_t ndevices, EOVstorageDerived* stg)
+extern EOnvsCfg* eo_nvscfg_New(uint16_t ndevices, EOVstorageDerived* stg, eOnvscfgMutexProtectionOfNVs_t mtxprot, eov_mutex_fn_mutexderived_new mtxnew)
 {
     EOnvsCfg *p = NULL;  
 
@@ -126,6 +126,9 @@ extern EOnvsCfg* eo_nvscfg_New(uint16_t ndevices, EOVstorageDerived* stg)
     p->devicesowneship      = eo_nvscfg_devicesownership_none;
     p->storage              = stg;
     p->allnvs               = NULL;
+    p->mtxderived_new       = mtxnew; 
+    p->mtxnvsmode           = (NULL == mtxnew) ? (eo_nvscfg_mtxprotnvs_none) : (mtxprot); 
+    p->mtx_object           = (eo_nvscfg_mtxprotnvs_one_per_object == p->mtxnvsmode) ? p->mtxderived_new() : NULL;
 
     return(p);
 }
@@ -179,6 +182,7 @@ extern eOresult_t eo_nvscfg_PushBackDevice(EOnvsCfg* p, eOnvscfgOwnership_t owne
     dev->ownership              = ownership;
     dev->theendpoints_numberof  = nendpoints;
     dev->hashfn_ep2index        = hashfn_ep2index;
+    dev->mtx_device             = (eo_nvscfg_mtxprotnvs_one_per_device == p->mtxnvsmode) ? p->mtxderived_new() : NULL;
 #if defined(EO_NVSCFG_USE_HASHTABLE)
     dev->ephashtable            = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(eOnvsCfgEPhash_t), nendpoints);
     // teh entries of teh hastable are all {0xffff, 0xffff} to tell that they are still invalid.
@@ -196,7 +200,7 @@ extern eOresult_t eo_nvscfg_PushBackDevice(EOnvsCfg* p, eOnvscfgOwnership_t owne
 
 //extern eOresult_t eo_nvscfg_ondevice_PushBackEndpoint(EOnvsCfg* p, uint16_t ondevindex, eOnvEP_t endpoint, eOuint16_fp_uint16_t hashfn_id2index, const EOconstvector* treeofnvs_con, const EOconstvector* datanvs_usr, uint32_t datanvs_size, eOvoid_fp_uint16_voidp_voidp_t datanvs_init, EOVmutexDerived* mtx)
 
-extern eOresult_t eo_nvscfg_ondevice_PushBackEP(EOnvsCfg* p, uint16_t ondevindex, eOnvscfg_EP_t *cfgofep, EOVmutexDerived* mtx)
+extern eOresult_t eo_nvscfg_ondevice_PushBackEP(EOnvsCfg* p, uint16_t ondevindex, eOnvscfg_EP_t *cfgofep)
 {
     EOnvsCfg_device_t** thedev = NULL;
     EOnvsCfg_ep_t *theendpoint = NULL;
@@ -261,7 +265,19 @@ extern eOresult_t eo_nvscfg_ondevice_PushBackEP(EOnvsCfg* p, uint16_t ondevindex
     theendpoint->thenvs_ramretrieve = datanvs_retrieve;
     theendpoint->thenvs_sizeof      = datanvs_size;
     theendpoint->hashfn_id2index    = hashfn_id2index;
-    theendpoint->mtx_endpoint       = mtx;
+    theendpoint->mtx_endpoint       = (eo_nvscfg_mtxprotnvs_one_per_endpoint == p->mtxnvsmode) ? p->mtxderived_new() : NULL;
+    
+    // now add the vector of mtx if needed.
+    if(eo_nvscfg_mtxprotnvs_one_per_netvar == p->mtxnvsmode)
+    {
+        uint16_t i;
+        theendpoint->themtxofthenvs = eo_vector_New(sizeof(EOVmutexDerived*), nnvs, NULL, 0, NULL, NULL);
+        for(i=0; i<nnvs; i++)
+        {
+            EOVmutexDerived* mtx = p->mtxderived_new();
+            eo_vector_PushBack(theendpoint->themtxofthenvs, &mtx);           
+        }
+    }
 
 #if defined(EO_NVSCFG_USE_HASHTABLE)
     {   // ok ... i must hash this endpoint with the used index.
@@ -302,6 +318,7 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
     EOnv tmpnv;
     EOnv_con_t* tmpnvcon = NULL;
 
+    EOVmutexDerived* mtx2use = NULL;
 
  	if(NULL == p) 
 	{
@@ -309,6 +326,9 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
 	}
 
     ndev = eo_vector_Size(p->thedevices);
+    
+    
+    mtx2use = (eo_nvscfg_mtxprotnvs_one_per_object == p->mtxnvsmode) ? (p->mtx_object) : (NULL);
 
 
 
@@ -321,6 +341,8 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
     {
         thedev = (EOnvsCfg_device_t**) eo_vector_At(p->thedevices, i);
         nendpoints = eo_vector_Size((*thedev)->theendpoints);
+        
+        mtx2use = (eo_nvscfg_mtxprotnvs_one_per_device == p->mtxnvsmode) ? ((*thedev)->mtx_device) : (mtx2use);
 
 #if defined(EO_NVSCFG_USE_CACHED_NVS)
         eo_matrix3d_Level1_PushBack(p->allnvs, nendpoints);
@@ -329,6 +351,8 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
         for(j=0; j<nendpoints; j++)
         {
             theendpoint = (EOnvsCfg_ep_t**) eo_vector_At((*thedev)->theendpoints, j);
+            
+            mtx2use = (eo_nvscfg_mtxprotnvs_one_per_endpoint == p->mtxnvsmode) ? ((*theendpoint)->mtx_endpoint) : (mtx2use);                   
 
             if(eobool_false == ((*theendpoint)->initted))
             {
@@ -360,6 +384,14 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
                 uint8_t *u8ptrvol = (uint8_t*) (*theendpoint)->thenvs_vol;
                 uint8_t *u8ptrrem = (uint8_t*) (*theendpoint)->thenvs_rem;
 
+                
+                if(eo_nvscfg_mtxprotnvs_one_per_netvar == p->mtxnvsmode)
+                {
+                    uint32_t** addr = eo_vector_At((*theendpoint)->themtxofthenvs, k);
+                    mtx2use = (EOVmutexDerived*) (*addr);
+                }
+                
+
                 eo_nv_hid_Load(     &tmpnv,
                                     (*thedev)->ipaddress,
                                     (*theendpoint)->endpoint,
@@ -368,7 +400,7 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
                                     (void*) (&u8ptrvol[tmpnvcon->offset]),
                                     (eo_nvscfg_ownership_remote == (*thedev)->ownership) ? ( (void*) (&u8ptrrem[tmpnvcon->offset]) ) : (NULL),
                                     //(eo_nvscfg_ownership_remote == (*thedev)->ownership) ? ((void*) ((uint32_t)((*theendpoint)->thenvs_rem) + tmpnvcon->offset)) : (NULL),
-                                    (*theendpoint)->mtx_endpoint,
+                                    mtx2use, // was : (*theendpoint)->mtx_endpoint,
                                     p->storage
                               );
                 
@@ -396,7 +428,7 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
 #endif
                              
             }
-#endif//EO_NVSCFG_INIT_EVERY_NV           
+#endif //EO_NVSCFG_INIT_EVERY_NV  EO_NVSCFG_USE_CACHED_NVS         
               
         }
             
@@ -538,6 +570,7 @@ extern EOnv* eo_nvscfg_GetNV(EOnvsCfg* p, uint16_t ondevindex, uint16_t onendpoi
     EOnvsCfg_ep_t **theendpoint = NULL;
     uint16_t k = 0;
     EOnv_con_t* tmpnvcon = NULL;
+    EOVmutexDerived* mtx2use = NULL;
  
     if((NULL == p) || (NULL == nvtarget)) 
 	{
@@ -569,6 +602,45 @@ extern EOnv* eo_nvscfg_GetNV(EOnvsCfg* p, uint16_t ondevindex, uint16_t onendpoi
     
     tmpnvcon = (EOnv_con_t*) eo_treenode_GetData(treenode);
     
+    if(eo_nvscfg_mtxprotnvs_none == p->mtxnvsmode)
+    {
+        mtx2use = NULL;
+    }
+    else
+    {
+        switch(p->mtxnvsmode)
+        {
+            case eo_nvscfg_mtxprotnvs_one_per_object:
+            {
+                mtx2use = p->mtx_object;
+            } break;
+            
+            case eo_nvscfg_mtxprotnvs_one_per_device:
+            {
+                mtx2use = (*thedev)->mtx_device;
+            } break;            
+       
+            case eo_nvscfg_mtxprotnvs_one_per_endpoint:
+            {
+                mtx2use = (*theendpoint)->mtx_endpoint;
+            } break;  
+            
+            case eo_nvscfg_mtxprotnvs_one_per_netvar:
+            {
+                #warning .... i think of void* as a uint32_t*
+                uint32_t** addr = eo_vector_At((*theendpoint)->themtxofthenvs, k);
+                mtx2use = (EOVmutexDerived*) (*addr);
+            } break;  
+            
+            default:
+            {
+                mtx2use = NULL;
+            } break;
+            
+        }
+    }
+        
+    
     eo_nv_hid_Load(     nv,
                         (*thedev)->ipaddress,
                         (*theendpoint)->endpoint,
@@ -576,7 +648,7 @@ extern EOnv* eo_nvscfg_GetNV(EOnvsCfg* p, uint16_t ondevindex, uint16_t onendpoi
                         (EOnv_usr_t*) eo_constvector_At((*theendpoint)->thenvs_usr, k),
                         (void*) ((uint32_t)((*theendpoint)->thenvs_vol) + tmpnvcon->offset),
                         (eo_nvscfg_ownership_remote == (*thedev)->ownership) ? ((void*) ((uint32_t)((*theendpoint)->thenvs_rem) + tmpnvcon->offset)) : (NULL),
-                        (*theendpoint)->mtx_endpoint,
+                        mtx2use, // was: (*theendpoint)->mtx_endpoint,
                         p->storage
                   );    
 

@@ -53,9 +53,15 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define eov_mutex_Take(a, b)   
+#if defined(EO_TAILOR_CODE_FOR_ARM)
+    #define EONV_DONT_USE_EOV_MUTEX_FUNCTIONS
+#endif
 
-#define eov_mutex_Release(a)
+
+#if defined(EONV_DONT_USE_EOV_MUTEX_FUNCTIONS)
+    #define eov_mutex_Take(a, b)   
+    #define eov_mutex_Release(a)
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 

@@ -100,6 +100,15 @@ typedef struct                      // size is 24 bytes
     eOvoid_fp_uint16_voidp_voidp_t  endpoint_data_retrieve;
 } eOnvscfg_EP_t;
 
+typedef enum
+{
+    eo_nvscfg_mtxprotnvs_none               = 0,    /**< we dont protect vs concurrent access at all */
+    eo_nvscfg_mtxprotnvs_one_per_object     = 1,    /**< all the NVs in the object share the same mutex: reduced use of memory but minimum concurrency */
+    eo_nvscfg_mtxprotnvs_one_per_device     = 2,    /**< all the NVs in a device inside the object share the same mutex */
+    eo_nvscfg_mtxprotnvs_one_per_endpoint   = 3,    /**< all the NVs in an endpoint inside each device inside the object share the same mutex */
+    eo_nvscfg_mtxprotnvs_one_per_netvar     = 4     /**< every NV has its own mutex: heavy use of memory but maximum concurrency */
+} eOnvscfgMutexProtectionOfNVs_t;
+
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
@@ -109,7 +118,7 @@ typedef struct                      // size is 24 bytes
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern EOnvsCfg* eo_nvscfg_New(uint16_t ndevices, EOVstorageDerived* stg);
+extern EOnvsCfg* eo_nvscfg_New(uint16_t ndevices, EOVstorageDerived* stg, eOnvscfgMutexProtectionOfNVs_t mtxprot, eov_mutex_fn_mutexderived_new mtxnew);
 
 extern eOresult_t eo_nvscfg_PushBackDevice(EOnvsCfg* p, eOnvscfgOwnership_t ownership, eOipv4addr_t ipaddress, eOuint16_fp_uint16_t hashfn_ep2index, uint16_t nendpoints);
 
@@ -118,7 +127,7 @@ extern uint16_t eo_nvscfg_GetIndexOfLocalDevice(EOnvsCfg* p);
 
 //extern eOresult_t eo_nvscfg_ondevice_PushBackEndpoint(EOnvsCfg* p, uint16_t ondevindex, eOnvEP_t endpoint, eOuint16_fp_uint16_t hashfn_id2index, const EOconstvector* treeofnvs_con, const EOconstvector* datanvs_usr, uint32_t datanvs_size, eOvoid_fp_uint16_voidp_voidp_t datanvs_init, EOVmutexDerived* mtx);
 
-extern eOresult_t eo_nvscfg_ondevice_PushBackEP(EOnvsCfg* p, uint16_t ondevindex, eOnvscfg_EP_t *cfgofep, EOVmutexDerived* mtx);
+extern eOresult_t eo_nvscfg_ondevice_PushBackEP(EOnvsCfg* p, uint16_t ondevindex, eOnvscfg_EP_t *cfgofep);
 
 
 extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p);
