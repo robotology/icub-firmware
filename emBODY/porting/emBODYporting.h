@@ -86,6 +86,7 @@ extern "C" {
     // or pack(4) ???
     #define snprintf        snprintf  
     #define float32_t       float
+    #define EO_TAILOR_CODE_FOR_ARM
 #elif defined(_DSPIC_) & defined(__GNUC__)
     // for dspic ...
     #define EO_extern_inline        extern inline
@@ -96,6 +97,7 @@ extern "C" {
     // or pack(8) ???
     //#define snprintf        snprintf   
     //#define stdint    dspic_stdint
+    #define EO_TAILOR_CODE_FOR_DSPIC
     #define __weak      __attribute__((__weak__))
 #else
     #error architecture not defined 
