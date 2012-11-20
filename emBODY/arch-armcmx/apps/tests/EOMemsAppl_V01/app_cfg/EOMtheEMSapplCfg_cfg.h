@@ -206,7 +206,7 @@ extern "C" {
 //  <o> on error   <0=>   redefine __weak eom_emsapplcfg_hid_userdef_OnError() 
 #define sdfefe004       0
 //  <o> printf on debug window enabled   <0=>   false  <1=>   true
-#define HALTRACE_ENABLED    0
+#define EOMTHEEMSAPPLCFG_HALTRACE_ENABLED    0
 //  </h>error manager
 
 
