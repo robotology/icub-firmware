@@ -289,8 +289,8 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
             .capacityofropframereplies      = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY, //128,
             .maxnumberofregularrops         = EOMTHEEMSAPPLCFG_TRANSCEIVER_MAXNUMOFREGULARROPS //32
         },
-        .mtx_fn_new             = (eov_mutex_fn_mutexderived_new)eom_mutex_New,
-        .nvsmtxmode             = eo_nvscfg_mtxprotnvs_one_per_netvar, //eo_nvscfg_mtxprotnvs_none
+        .mtx_fn_new             = NULL, //(eov_mutex_fn_mutexderived_new)eom_mutex_New,
+        .nvsmtxmode             = eo_nvscfg_mtxprotnvs_none // eo_nvscfg_mtxprotnvs_one_per_netvar
     },
     .errobjcfg      =
     {
