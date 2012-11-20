@@ -71,7 +71,9 @@ const eOemstransceiver_cfg_t eom_emstransceiver_DefaultCfg =
         EO_INIT(.capacityofropframeoccasionals)     128,
         EO_INIT(.capacityofropframereplies)         128,
         EO_INIT(.maxnumberofregularrops)            32        
-    }
+    },
+    EO_INIT(.mtx_fn_new)                NULL,
+    EO_INIT(.nvsmtxmode)                eo_nvscfg_mtxprotnvs_none
 };
 
 
@@ -126,6 +128,8 @@ extern EOMtheEMStransceiver * eom_emstransceiver_Initialise(const eOemstransceiv
     brdtransceiver_cfg.remotehostipv4addr       = cfg->hostipv4addr;
     brdtransceiver_cfg.remotehostipv4port       = cfg->hostipv4port;
     memcpy(&brdtransceiver_cfg.sizes, &cfg->sizes, sizeof(eo_transceiver_sizes_t));
+    brdtransceiver_cfg.mtx_fn_new               = cfg->mtx_fn_new;
+    brdtransceiver_cfg.nvsmtxmode                = cfg->nvsmtxmode;
 
     
  

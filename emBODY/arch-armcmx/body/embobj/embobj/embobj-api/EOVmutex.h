@@ -71,6 +71,12 @@ typedef struct EOVmutex_hid EOVmutex;
 typedef void EOVmutexDerived;
 
 
+/** @typedef    typedef EOVmutexDerived* (*eov_mutex_fn_mutexderived_new)(void)
+    @brief      eov_mutexderived_fn_new is used to represent a pointer to a function which allocates a derived mutex.
+ **/
+typedef EOVmutexDerived* (*eov_mutex_fn_mutexderived_new)(void);
+
+
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
