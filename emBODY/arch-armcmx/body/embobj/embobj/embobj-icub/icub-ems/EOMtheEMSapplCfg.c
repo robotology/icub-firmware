@@ -348,8 +348,8 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
              .shiftvalues            =
             {
              .jointVelocityShift     =  8,
-             .jointVelocityEstimationShift = 8,
-             .jointAccelerationEstimationShift = 5
+             .jointVelocityEstimationShift = 0,
+             .jointAccelerationEstimationShift = 0
             },
              .bcastpolicy            =
              {
