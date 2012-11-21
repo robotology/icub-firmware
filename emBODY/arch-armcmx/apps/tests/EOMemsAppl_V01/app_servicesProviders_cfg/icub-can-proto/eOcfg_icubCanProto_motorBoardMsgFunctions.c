@@ -41,6 +41,7 @@
 #include "EOMtheEMSapplCfg.h"
 #include "EOtheEMSapplBody.h"
 #include "EOappMeasuresConverter.h"
+#include "EOappMeasuresConverter_hid.h"
 #include "EOemsController.h"
 #include "EOappTheDataBase.h"
 
@@ -1497,11 +1498,11 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* 
     
     if(eo_icubCanProto_jm_index_first == canloc_ptr->indexinboard)
 	{
-        pos_icubCanProtValue = *((eOmeas_position_t*)&(frame->data[0])); 
+        pos_icubCanProtValue = *((eOicubCanProto_position_t*)&(frame->data[0])); 
     }
     else
     {
-        pos_icubCanProtValue = *((eOmeas_position_t*)&(frame->data[4])); 
+        pos_icubCanProtValue = *((eOicubCanProto_position_t*)&(frame->data[4])); 
     }
 
     jstatus_ptr->basic.position = eo_appMeasConv_jntPosition_E2I(appMeasConv_ptr, jId, pos_icubCanProtValue); 
@@ -1621,7 +1622,10 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* 
     }
     
     //convert measure for icub world and set values in jstatus (nv mem)
+    vel_icubCanProtValue = (vel_icubCanProtValue*1000) >> eo_appMeasConv_hid_GetVelEstimShift(appMeasConv_ptr, jId);
 	jstatus_ptr->basic.velocity = eo_appMeasConv_jntVelocity_E2I(appMeasConv_ptr, jId, vel_icubCanProtValue);
+    
+    acc_icubCanProtValue = (acc_icubCanProtValue * 1000000) >> (eo_appMeasConv_hid_GetVelEstimShift(appMeasConv_ptr, jId) + eo_appMeasConv_hid_GetAccEstimShift(appMeasConv_ptr, jId));
     jstatus_ptr->basic.acceleration = eo_appMeasConv_jntAcceleration_E2I(appMeasConv_ptr, jId, acc_icubCanProtValue);
     
     return(eores_OK);
