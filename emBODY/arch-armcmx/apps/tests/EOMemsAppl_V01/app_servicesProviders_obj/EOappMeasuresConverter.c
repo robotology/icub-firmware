@@ -33,9 +33,12 @@
 // --------------------------------------------------------------------------------------------------------------------
 #include "stdlib.h"
 #include "string.h"
+#include "stdio.h"
+//#include "math.h"
 
 #include "EOtheMemoryPool.h"
-#include "EOappTheDataBase.h" 
+#include "EOappTheDataBase.h"
+#include "EOtheErrorManager.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -66,7 +69,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+// typedef int32_t Q17_14_t;
+// #define f_dueAlla14    16384.0
+// //static const float f_dueAlla14 = 16384.0;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -74,7 +79,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 static eOresult_t s_eo_appMeasConv_TableCareateAndInit(EOappMeasConv *p);
 static eOresult_t s_eo_appMeasConv_getShiftValuesFromDB(EOappMeasConv *p);
-
+// static float Q2float(Q17_14_t num);
+// static Q17_14_t float2Q(float num);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -91,7 +97,16 @@ extern EOappMeasConv* eo_appMeasConv_New(eOappMeasConv_cfg_t *cfg)
 {
     eOresult_t res;
     EOappMeasConv *retptr = NULL;
-
+//      static float f1 = -10.889;
+//      static float f2 = -131.327;
+//      float f_res, f_resq, fb1, fb2;
+//      char str[96];
+//     
+//     eOq17_14_t q1, q2, q_res;
+//     int64_t tmp, tmp2;
+//     float fb1, fb2;
+//     int64_t q1_64, q2_64;
+//     
     if(NULL == cfg)
     {
         return(retptr);
@@ -115,6 +130,46 @@ extern EOappMeasConv* eo_appMeasConv_New(eOappMeasConv_cfg_t *cfg)
         return(NULL);
     }
     
+//     q1 = eo_common_float_to_Q17_14(f1);
+//     q2 = eo_common_float_to_Q17_14(f2);
+// //conversione
+//     fb1 = eo_common_Q17_14_to_float(q1);
+//     fb2 = eo_common_Q17_14_to_float(q2);
+//     snprintf(str, sizeof(str)-1, "CONV: fb1=%f, fb2=%f", fb1, fb2);
+//     eo_errman_Info(eo_errman_GetHandle(), "prove Q", str);  
+
+//      //moltiplicazione
+// //     
+// //    snprintf(str, sizeof(str)-1, "q1=%x, q2=%x, tmp=%lld, tmp2=%lld q_res=%ld", q1, q2, tmp, tmp2, q_res);
+//    
+//     eo_common_Q17_14_mult(q1, q2, &q_res);
+//     f_res = f1*f2;
+//     f_resq = eo_common_Q17_14_to_float(q_res);
+//     snprintf(str, sizeof(str)-1, "MOLT: f_res=%f, f_resq=%f", f_res, f_resq);
+//     eo_errman_Info(eo_errman_GetHandle(), "prove Q", str);
+
+//  //divisione
+//     f_res = f1/f2;
+//     eo_common_Q17_14_division(q1, q2, &q_res);
+//     f_resq = eo_common_Q17_14_to_float(q_res);
+//     snprintf(str, sizeof(str)-1, "Divisione: f_res=%f, f_resq=%f", f_res, f_resq );
+//     eo_errman_Info(eo_errman_GetHandle(), "prove Q", str);
+
+// //somma
+//     f_res = f1+f2;
+//     q_res = q1+q2;
+//     f_resq = eo_common_Q17_14_to_float(q_res);
+//     snprintf(str, sizeof(str)-1, "somma: f_res=%f, f_resq=%f", f_res, f_resq);
+//     eo_errman_Info(eo_errman_GetHandle(), "prove Q", str);
+//     
+// //sotraz
+//     f_res = f1-f2;
+//     q_res = q1-q2;
+//     f_resq = eo_common_Q17_14_to_float(q_res);
+//     
+
+//     snprintf(str, sizeof(str)-1, "sotraz: f_res=%f, f_resq=%f", f_res, f_resq);
+//     eo_errman_Info(eo_errman_GetHandle(), "prove Q", str);
     return(retptr);
 }
 
@@ -207,6 +262,22 @@ __weak extern eOmeas_velocity_t eo_appMeasConv_jntVelocity_E2I(EOappMeasConv *p,
     return((eOmeas_velocity_t)e_vel);
 }
 
+__weak extern eOmeas_velocity_t eo_appMeasConv_jntVelocity_E2I_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_velocity_t e_vel)
+{
+#ifdef _APPMEASCONV_SAFE_
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(jId >= p->totalnumofjoint)
+    {
+        return(eores_NOK_nodata);
+    }
+#endif
+    return((eOmeas_velocity_t)e_vel);
+}
+
 
 __weak extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
 {
@@ -225,22 +296,40 @@ __weak extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E(EOappMeas
     return((eOicubCanProto_velocity_t)i_vel);
 }
 
-__weak extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E_forSetVelRefMC4(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
+
+__weak extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
 {
+
 #ifdef _APPMEASCONV_SAFE_
     if(NULL == p)
     {
-        return(0);
+        return(eores_NOK_nullpointer);
     }
     
     if(jId >= p->totalnumofjoint)
     {
-        return(0);
+        return(eores_NOK_nodata);
     }
 #endif
-
-    return((eOicubCanProto_velocity_t)i_vel);
+    
+    return((eOicubCanProto_velocity_t)(i_vel * __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId))));
 }
+// __weak extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E_forSetVelRefMC4(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
+// {
+// #ifdef _APPMEASCONV_SAFE_
+//     if(NULL == p)
+//     {
+//         return(0);
+//     }
+//     
+//     if(jId >= p->totalnumofjoint)
+//     {
+//         return(0);
+//     }
+// #endif
+
+//     return((eOicubCanProto_velocity_t)i_vel);
+// }
 
 
 __weak extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_acceleration_t e_acc)
@@ -260,6 +349,24 @@ __weak extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I(EOappMeas
     return((eOmeas_acceleration_t)e_acc);
 }
 
+
+__weak extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_acceleration_t e_acc)
+{
+#ifdef _APPMEASCONV_SAFE_    
+    if(NULL == p)
+    {
+        return(0);
+    }
+    
+    if(jId >= p->totalnumofjoint)
+    {
+        return(0);
+    }
+#endif
+     
+    return((eOmeas_acceleration_t)e_acc);
+
+}
 __weak extern eOicubCanProto_acceleration_t eo_appMeasConv_jntAcceleration_I2E(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_acceleration_t i_acc)
 {
 #ifdef _APPMEASCONV_SAFE_
@@ -277,7 +384,23 @@ __weak extern eOicubCanProto_acceleration_t eo_appMeasConv_jntAcceleration_I2E(E
     return((eOicubCanProto_acceleration_t)i_acc);
 }
 
+__weak extern eOicubCanProto_acceleration_t eo_appMeasConv_jntAcceleration_I2E_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_acceleration_t i_acc)
+{
+#ifdef _APPMEASCONV_SAFE_
+    if(NULL == p)
+    {
+        return(0);
+    }
+    
+    if(jId >= p->totalnumofjoint)
+    {
+        return(0);
+    }
+#endif
+     
+    return((eOicubCanProto_acceleration_t)i_acc);
 
+}
 __weak extern eOicubCanProto_stiffness_t eo_appMeasConv_impedenceStiffness_I2S(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_stiffness_t i_stiff)
 {
 #ifdef _APPMEASCONV_SAFE_
@@ -432,6 +555,28 @@ static eOresult_t s_eo_appMeasConv_getShiftValuesFromDB(EOappMeasConv *p)
 }
 
 
+
+// static float Q2float(Q17_14_t num)
+// {
+//     int32_t tmp = num;
+//     float result;
+//     
+//     result = tmp/f_dueAlla14;
+//     
+//     return (result);
+//     
+// }
+// static Q17_14_t float2Q(float num)
+// {
+//     Q17_14_t result;
+// //    static float f;
+//     
+// //     f = num*f_dueAlla14;
+// //     result = (Q17_14_t)f;
+//     result = (Q17_14_t)(num*f_dueAlla14);
+//     
+//     return(result);
+// }
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------

@@ -88,7 +88,7 @@ extern eOmeas_position_t eo_appMeasConv_jntPosition_E2I(EOappMeasConv *p, eOmc_j
     }
 #endif
     
-    return((e_pos / eo_appMeasConv_hid_GetEncConv_factor(p, jId)) - eo_appMeasConv_hid_GetEncConv_offset(p, jId));
+    return((eOmeas_position_t)((e_pos / eo_appMeasConv_hid_GetEncConv_factor(p, jId)) - eo_appMeasConv_hid_GetEncConv_offset(p, jId)));
 }
 
 extern eOicubCanProto_position_t eo_appMeasConv_jntPosition_I2E(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_position_t i_pos)
@@ -104,10 +104,26 @@ extern eOicubCanProto_position_t eo_appMeasConv_jntPosition_I2E(EOappMeasConv *p
         return(eores_NOK_nodata);
     }
 #endif
-    return((i_pos + eo_appMeasConv_hid_GetEncConv_offset(p, jId)) * eo_appMeasConv_hid_GetEncConv_factor(p, jId)); 
+    return((eOicubCanProto_position_t)((i_pos + eo_appMeasConv_hid_GetEncConv_offset(p, jId)) * eo_appMeasConv_hid_GetEncConv_factor(p, jId))); 
 }
 
 extern eOmeas_velocity_t eo_appMeasConv_jntVelocity_E2I(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_velocity_t e_vel)
+{
+#ifdef _APPMEASCONV_SAFE_
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(jId >= p->totalnumofjoint)
+    {
+        return(eores_NOK_nodata);
+    }
+#endif
+    return(e_vel/eo_appMeasConv_hid_GetEncConv_factor(p, jId));
+}
+
+extern eOmeas_velocity_t eo_appMeasConv_jntVelocity_E2I_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_velocity_t e_vel)
 {
 //    uint32_t vel_factor;
 #ifdef _APPMEASCONV_SAFE_
@@ -121,14 +137,7 @@ extern eOmeas_velocity_t eo_appMeasConv_jntVelocity_E2I(EOappMeasConv *p, eOmc_j
         return(eores_NOK_nodata);
     }
 #endif
-// see CanBusMotionControl::getEncoderSpeedsRaw(double *v)
-//     vel_factor = (1 << eo_appMeasConv_hid_GetVelEstimShift(p, jId));
-//     
-//     //*1000 : msec-->sec
-//     return(((e_vel*1000)/vel_factor)/eo_appMeasConv_hid_GetEncConv_factor(p, jId));
-    
-    //*1000 : msec-->sec
-    return(((e_vel*1000)>>eo_appMeasConv_hid_GetVelEstimShift(p, jId))/eo_appMeasConv_hid_GetEncConv_factor(p, jId));
+    return((eOmeas_velocity_t)(e_vel/__fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId))));
 }
 
 
@@ -147,25 +156,27 @@ extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E(EOappMeasConv *p
     }
 #endif
     
-    return(((eOicubCanProto_velocity_t)((i_vel * eo_appMeasConv_hid_GetEncConv_factor(p, jId))/1000))<<eo_appMeasConv_hid_GetVelShift(p, jId));
+//    return(((eOicubCanProto_velocity_t)((i_vel * eo_appMeasConv_hid_GetEncConv_factor(p, jId))/1000))<<eo_appMeasConv_hid_GetVelShift(p, jId));
+    return((eOicubCanProto_velocity_t)(i_vel * eo_appMeasConv_hid_GetEncConv_factor(p, jId)));
 }
 
-
-extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E_forSetVelRefMC4(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
+extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
 {
+
 #ifdef _APPMEASCONV_SAFE_
     if(NULL == p)
     {
-        return(0);
+        return(eores_NOK_nullpointer);
     }
     
     if(jId >= p->totalnumofjoint)
     {
-        return(0);
+        return(eores_NOK_nodata);
     }
 #endif
-
-    return((i_vel * eo_appMeasConv_hid_GetEncConv_factor(p, jId))/10);
+    
+//    return(((eOicubCanProto_velocity_t)((i_vel * eo_appMeasConv_hid_GetEncConv_factor(p, jId))/1000))<<eo_appMeasConv_hid_GetVelShift(p, jId));
+    return((eOicubCanProto_velocity_t)(i_vel * __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId))));
 }
 
 extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_acceleration_t e_acc)
@@ -182,8 +193,26 @@ extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I(EOappMeasConv *p
     }
 #endif
     
-    return(((e_acc *1000000)>>(eo_appMeasConv_hid_GetVelEstimShift(p, jId)+eo_appMeasConv_hid_GetAccEstimShift(p, jId)))/eo_appMeasConv_hid_GetEncConv_factor(p, jId));
- 
+    //return(((e_acc *1000000)>>(eo_appMeasConv_hid_GetVelEstimShift(p, jId)+eo_appMeasConv_hid_GetAccEstimShift(p, jId)))/eo_appMeasConv_hid_GetEncConv_factor(p, jId));
+    return((eOmeas_acceleration_t)e_acc /eo_appMeasConv_hid_GetEncConv_factor(p, jId));
+}
+
+extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_acceleration_t e_acc)
+{
+#ifdef _APPMEASCONV_SAFE_    
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(jId >= p->totalnumofjoint)
+    {
+        return(eores_NOK_nodata);
+    }
+#endif
+    
+    //return(((e_acc *1000000)>>(eo_appMeasConv_hid_GetVelEstimShift(p, jId)+eo_appMeasConv_hid_GetAccEstimShift(p, jId)))/eo_appMeasConv_hid_GetEncConv_factor(p, jId));
+    return((eOmeas_acceleration_t)(e_acc / __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId))));
 }
 
 extern eOicubCanProto_acceleration_t eo_appMeasConv_jntAcceleration_I2E(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_acceleration_t i_acc)
@@ -201,9 +230,28 @@ extern eOicubCanProto_acceleration_t eo_appMeasConv_jntAcceleration_I2E(EOappMea
     }
 #endif
    
-    return(((eOicubCanProto_acceleration_t)(i_acc * eo_appMeasConv_hid_GetEncConv_factor(p, jId)))<<eo_appMeasConv_hid_GetVelShift(p, jId));
+//    return(((eOicubCanProto_acceleration_t)(i_acc * eo_appMeasConv_hid_GetEncConv_factor(p, jId)))<<eo_appMeasConv_hid_GetVelShift(p, jId));
+    return((eOicubCanProto_acceleration_t)(i_acc * eo_appMeasConv_hid_GetEncConv_factor(p, jId)));
 }
 
+extern eOicubCanProto_acceleration_t eo_appMeasConv_jntAcceleration_I2E_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_acceleration_t i_acc)
+{
+
+#ifdef _APPMEASCONV_SAFE_
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(jId >= p->totalnumofjoint)
+    {
+        return(eores_NOK_nodata);
+    }
+#endif
+   
+//    return(((eOicubCanProto_acceleration_t)(i_acc * eo_appMeasConv_hid_GetEncConv_factor(p, jId)))<<eo_appMeasConv_hid_GetVelShift(p, jId));
+    return((eOicubCanProto_acceleration_t)(i_acc * __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId))));
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 

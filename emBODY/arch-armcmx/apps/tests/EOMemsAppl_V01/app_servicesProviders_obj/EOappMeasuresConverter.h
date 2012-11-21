@@ -116,6 +116,7 @@ extern eOresult_t eo_appMeasConv_SetJntEncoderConversionOffset(EOappMeasConv *p,
 extern eOmeas_position_t eo_appMeasConv_jntPosition_E2I(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_position_t e_pos);
 
 
+
 /** @fn         extern eOresult_t eo_appMeasConv_position_E2I(EOappMeasConv *p)
     @brief      convert position measure from icub degree (idg) to encoder ticks 
     @param      p        referece to converter
@@ -127,17 +128,33 @@ extern eOmeas_position_t eo_appMeasConv_jntPosition_E2I(EOappMeasConv *p, eOmc_j
 extern eOicubCanProto_position_t eo_appMeasConv_jntPosition_I2E(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_position_t i_pos);
 
 
+/** @fn         extern eOresult_t eo_appMeasConv_position_E2I(EOappMeasConv *p)
+    @brief      convert velocity measure from encoder ticks to icub degree (idg) using absolute value of encoderfactor
+    @param      p        referece to converter
+    @param      jId      joint identifier
+    @return     - eores_NOK_nullpointer if p is NULL
+                - eores_NOK_nodata if joint identified by @e jId is not managed by the given ems
+                - eores_OK on success
+ **/
+extern eOmeas_velocity_t eo_appMeasConv_jntVelocity_E2I_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_velocity_t e_vel);
+
+extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel);
+
+
 extern eOmeas_velocity_t eo_appMeasConv_jntVelocity_E2I(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_velocity_t e_vel);
+
 extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel);
-/* this function is used only to convert the reference velocity(ref_vel) of position set point for a jointr managed by mc4 board.
-   Mc4 board uses ref_vel expressed in (encoder ticks/second)/10.
-   diveded by 10 because in this way in 16 bits is possible rappresents + or - 5 round angles. 
-   see file trajectory.c of firmware */
-extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E_forSetVelRefMC4(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel);
+// /* this function is used only to convert the reference velocity(ref_vel) of position set point for a joint managed by mc4 board.
+//    Mc4 board uses ref_vel expressed in (encoder ticks/second)/10.
+//    diveded by 10 because in this way in 16 bits is possible rappresents + or - 5 round angles. 
+//    see file trajectory.c of firmware */
+// extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E_forSetVelRefMC4(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel);
 
 
 extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_acceleration_t e_acc);
 extern eOicubCanProto_acceleration_t eo_appMeasConv_jntAcceleration_I2E(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_acceleration_t i_acc);
+extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_acceleration_t e_acc);
+extern eOicubCanProto_acceleration_t eo_appMeasConv_jntAcceleration_I2E_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_acceleration_t i_acc);
 
 
 extern eOicubCanProto_stiffness_t eo_appMeasConv_impedenceStiffness_I2S(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_stiffness_t i_stiff);
