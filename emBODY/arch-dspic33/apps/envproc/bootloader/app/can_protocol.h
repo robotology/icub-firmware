@@ -24,7 +24,7 @@
 /*	@file 	    can_protocol.h
 	@brief 	    This file defines can protocol commands and other macros about can protocol.
                 IMPORTANT:  macro's values are defined in CANLOADER  MANUAL. Check it before changing values.  
-                            For more information see http://eris.liralab.it/wiki/CanLoader
+                            For more information see http://wiki.icub.org/wiki/CanLoader
 	@author     valentina.gaggero@iit.it
 	@date	    03/10/2011
 */
