@@ -50,6 +50,7 @@
 #include "EOappTheDataBase.h"
 #include "EOicubCanProto_specifications.h"
 #include "EOappMeasuresConverter.h"
+#include "EOappMeasuresConverter_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -497,10 +498,16 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
     {
         case eomc_setpoint_position:
         {
-            eOicubCanProto_setpoint_position_t setpoint_pos;
+            eOicubCanProto_setpoint_position_t  setpoint_pos;
+            eOicubCanProto_velocity_t           vel_tmp;
             
             setpoint_pos.value = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, setPoint->to.position.value);
-            setpoint_pos.withvelocity = eo_appMeasConv_jntVelocity_I2E_forSetVelRefMC4(appMeasConv_ptr,jxx, setPoint->to.position.withvelocity);           
+            //reference velocity of position set point must be always >0, so here absolute func is used.
+            vel_tmp = eo_appMeasConv_jntVelocity_I2E_abs(appMeasConv_ptr,jxx, setPoint->to.position.withvelocity);
+            //the velocity is dived by 10, because in the fw of mc4 the velocity is sued to get the needed time to reach the setpoint,
+            //so the value is moltyply by 100.
+            setpoint_pos.withvelocity = vel_tmp/10;
+
             msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__POSITION_MOVE; 
             val_ptr =  &setpoint_pos; 
 
@@ -512,10 +519,19 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
 
         case eomc_setpoint_velocity:
         {
-            eOicubCanProto_setpoint_velocity_t setpoint_vel;
+            eOicubCanProto_setpoint_velocity_t  setpoint_vel;
+            eOicubCanProto_velocity_t           vel_tmp;
+            eOicubCanProto_acceleration_t       acc_tmp;
             
-            setpoint_vel.value = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, setPoint->to.velocity.value);
-            setpoint_vel.withacceleration = eo_appMeasConv_jntAcceleration_I2E(appMeasConv_ptr, jxx, setPoint->to.velocity.withacceleration);           
+            vel_tmp = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, setPoint->to.velocity.value);
+            acc_tmp = eo_appMeasConv_jntAcceleration_I2E(appMeasConv_ptr, jxx, setPoint->to.velocity.withacceleration);
+
+            //in order to send velocity to mc4 like setpoint i need to convert it in encoderticks/ms end after shift in order to obtain a small value
+            setpoint_vel.value = ((vel_tmp/1000) << eo_appMeasConv_hid_GetVelEstimShift(appMeasConv_ptr, jxx));
+            setpoint_vel.withacceleration = acc_tmp << eo_appMeasConv_hid_GetVelEstimShift(appMeasConv_ptr, jxx);
+//old
+//            setpoint_vel.value = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, setPoint->to.velocity.value);
+//            setpoint_vel.withacceleration = eo_appMeasConv_jntAcceleration_I2E(appMeasConv_ptr, jxx, setPoint->to.velocity.withacceleration);           
             
             if (setpoint_vel.withacceleration < 1)
             {
@@ -681,7 +697,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
             iCubCanProtCalibrator.params.type4.position = calibrator->params.type4.position;
             iCubCanProtCalibrator.params.type4.velocity = calibrator->params.type4.velocity;
             iCubCanProtCalibrator.params.type4.maxencoder = calibrator->params.type4.maxencoder;
-            enableAMPbeforeCalib = eobool_false;
+            enableAMPbeforeCalib = eobool_true;
         }break;
         
     }
@@ -703,6 +719,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
         msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CALIBRATE_ENCODER;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &iCubCanProtCalibrator);
 
+        #warning VALE-->devo invoiare ena_PWM e RUN?
         msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__ENABLE_PWM_PAD;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
     
