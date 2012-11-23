@@ -373,10 +373,12 @@ extern eOresult_t eo_appCanSP_SetRunMode(EOappCanSP *p, eo_appCanSP_runMode_t ru
     if(eo_appCanSP_runMode__onDemand ==  p->runmode)
     {
         p->waittxdata[hal_can_port1].waitenable = eobool_true;
+        p->waittxdata[hal_can_port2].waitenable = eobool_true;
     }
     else
     {
         p->waittxdata[hal_can_port1].waitenable = eobool_false;
+        p->waittxdata[hal_can_port2].waitenable = eobool_false;
     }
     return(eores_OK);
 }
