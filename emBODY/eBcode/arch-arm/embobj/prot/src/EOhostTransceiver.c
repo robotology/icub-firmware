@@ -179,7 +179,7 @@ static EOnvsCfg* s_eo_hosttransceiver_nvscfg_get(const eOhosttransceiver_cfg_t *
     theepcfgs = cfg->vectorof_endpoint_cfg;
 
     // the HOSTtransceiver does not use any storage.
-    nvscfg = eo_nvscfg_New(1, NULL);
+    nvscfg = eo_nvscfg_New(1, NULL, eo_nvscfg_mtxprotnvs_none, NULL);
 
     nendpoints = eo_constvector_Size(theepcfgs);
     
@@ -198,7 +198,7 @@ static EOnvsCfg* s_eo_hosttransceiver_nvscfg_get(const eOhosttransceiver_cfg_t *
 //                                         epcfg->endpoint_data_init,
 //                                         NULL);
         
-        eo_nvscfg_ondevice_PushBackEP(nvscfg, 0, epcfg, NULL);        
+        eo_nvscfg_ondevice_PushBackEP(nvscfg, 0, epcfg);
     }
     
     eo_nvscfg_data_Initialise(nvscfg);
