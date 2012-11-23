@@ -279,7 +279,7 @@ int CAN1_handleRx (unsigned int board_id)
         // ID 0x700 (100 0000 0000b) message class = bootloader message
        if (((((CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x700) == 0x700) && (((CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x00F) == _board_ID))) || ((CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x00F) == 0x00F)) )
         {
-	        DisableIntT1;
+	    DisableIntT1;
             DisableIntT2;
             IdTx = (CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x0700);         
             IdTx |=  ((_board_ID) << 4);

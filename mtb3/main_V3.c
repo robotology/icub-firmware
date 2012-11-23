@@ -168,23 +168,23 @@ unsigned int AD7147Registers[16][12];  //Element[23] = 0x17 = ID register @ 0x17
 int test=0;
 const	unsigned char AD7147_ADD[4]={0x2C,0x2D,0x2E,0x2F};
 typedef unsigned const int __prog__ * FlashAddress; //flsh address 
-unsigned int __attribute__ ((space(prog), aligned(_FLASH_PAGE*2)))   CapOffset[16][12]={0,0,0,0,0,0,0,0,0,0,0,
-																						 0,0,0,0,0,0,0,0,0,0,0,
-																					     0,0,0,0,0,0,0,0,0,0,0,
-																					     0,0,0,0,0,0,0,0,0,0,0,
-																					     0,0,0,0,0,0,0,0,0,0,0,
-																					     0,0,0,0,0,0,0,0,0,0,0,
-																					     0,0,0,0,0,0,0,0,0,0,0,
-																						 0,0,0,0,0,0,0,0,0,0,0,
-																					     0,0,0,0,0,0,0,0,0,0,0,
-																					     0,0,0,0,0,0,0,0,0,0,0,
-																						 0,0,0,0,0,0,0,0,0,0,0,
-																					     0,0,0,0,0,0,0,0,0,0,0,
-																					     0,0,0,0,0,0,0,0,0,0,0,
-																						 0,0,0,0,0,0,0,0,0,0,0,
-																					     0,0,0,0,0,0,0,0,0,0,0,
-																					     0,0,0,0,0,0,0,0,0,0,0
-																					    };     //Offset of the capacitance 
+unsigned  int __attribute__ ((space(prog), aligned(_FLASH_PAGE*2)))   CapOffset[16][12]={0,0,0,0,0,0,0,0,0,0,0,
+                                                                                        0,0,0,0,0,0,0,0,0,0,0,
+                                                                                        0,0,0,0,0,0,0,0,0,0,0,
+                                                                                        0,0,0,0,0,0,0,0,0,0,0,
+                                                                                        0,0,0,0,0,0,0,0,0,0,0,
+                                                                                        0,0,0,0,0,0,0,0,0,0,0,
+                                                                                        0,0,0,0,0,0,0,0,0,0,0,
+                                                                                        0,0,0,0,0,0,0,0,0,0,0,
+                                                                                        0,0,0,0,0,0,0,0,0,0,0,
+                                                                                        0,0,0,0,0,0,0,0,0,0,0,
+                                                                                        0,0,0,0,0,0,0,0,0,0,0,
+                                                                                        0,0,0,0,0,0,0,0,0,0,0,
+                                                                                        0,0,0,0,0,0,0,0,0,0,0,
+                                                                                        0,0,0,0,0,0,0,0,0,0,0,
+                                                                                        0,0,0,0,0,0,0,0,0,0,0,
+                                                                                        0,0,0,0,0,0,0,0,0,0,0
+                                                                                       };     //Offset of the capacitance
 const FlashAddress _pCapOffset[16]={&CapOffset[0],&CapOffset[1],&CapOffset[2],&CapOffset[3],&CapOffset[4],&CapOffset[5],&CapOffset[6],&CapOffset[7],
 							     &CapOffset[8],&CapOffset[9],&CapOffset[10],&CapOffset[11],&CapOffset[12],&CapOffset[13],&CapOffset[14],&CapOffset[15]
 							      }; 
@@ -222,7 +222,7 @@ unsigned int TIMER_VALUE2=0x132;//0xc00;//0x99;//1ms 0xc00;//0xC00; // Timer dur
 unsigned char SHIFT=2; //shift of the CDC value for removing the noise
 unsigned char SHIFT_THREE=3;// shift of the CDC value for removing the noise
 unsigned char SHIFT_ALL=4; //shift of the CDC value for removing the noise
-unsigned char NOLOAD=235;
+unsigned char NOLOAD=245;
 unsigned char ANALOG_ACC=0; //analog accelerometer, if one 1 messsage is sent every 10ms
 unsigned int ANALOG_ID=0x550; // default value
 unsigned char DIG_GYRO=0; //gyro of the MMSP 
@@ -315,7 +315,7 @@ int main(void)
     char init;
     unsigned char i,l;
     unsigned int counter;
-    unsigned int led_counter;
+    unsigned int led_counter=0;
    	int gx=0;
 	int gy=0;
 	int gz=0;
@@ -457,6 +457,11 @@ if (DIG_GYRO || DIG_ACC)
 //
 	led_counter=0;
 	led0=0;
+        DisableIntT1;
+        DisableIntT2;
+        flag=0;
+        flag2+0;
+
     for (;;)
     {
 	    if ((DIG_GYRO || DIG_ACC) && (flag2))
@@ -502,7 +507,9 @@ if (DIG_GYRO || DIG_ACC)
            	i = 0;
 			if (led_counter==20)
 			{
-				led0=~led0;
+                            if (led0==1) led0=0;
+                            else led0=1;
+				
 				led_counter=0;
 			}	
 			led_counter++;
@@ -986,7 +993,7 @@ static void FillCanMessages8bit_fingertip(unsigned char Channel,unsigned char tr
     unsigned char data[8];
     unsigned int i,j,error;
     int value; //difference of the current measurement and the initial value (_pCapOffset)
-    unsigned int txdata[12];
+    unsigned int txdata[12]={0,0,0,0,0,0,0,0,0,0,0,0};
 	int UP_LIMIT, BOT_LIMIT;	
 		error=0;
 		UP_LIMIT=((MAXVAL-NOLOAD)<<SHIFT);
