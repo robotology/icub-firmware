@@ -14,6 +14,10 @@ void PWM_B_Write_Protect();
  **************************************************************************************/
 void PWM_B_init(void)
 {
+// write protect off 
+   clrRegBits (PWMB_PMCFG, PWMB_PMCFG_WP_MASK);  
+	
+
 	// PWMB_PMCTL: LDFQ=0,HALF=0,IPOL2=0,IPOL1=0,IPOL0=0,PRSC=0,PWMRIE=0,PWMF=0,ISENS=0,LDOK=0,PWMEN=0 
 	setReg (PWMB_PMCTL, 0);
 	          

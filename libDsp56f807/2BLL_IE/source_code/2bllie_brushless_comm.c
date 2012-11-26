@@ -11,8 +11,8 @@
 #include "qd0.h"
 #include "qd1.h"
 // variabili per l'inseguimento del duty cycle
-sDutyControlBL DutyCycle[2];
-sDutyControlBL DutyCycleReq[2];
+volatile sDutyControlBL DutyCycle[2];
+volatile sDutyControlBL DutyCycleReq[2];
 
 extern sPwmControlBL *pTable0;
 extern sPwmControlBL *pTable1;
@@ -138,11 +138,12 @@ void TD0_interrupt(void)
     	hall_error[1] |=HALL_ERROR_TD0;
 	}
    
-	if (DutyCycleReq[0].Duty < MIN_DUTY)
+	if (DutyCycleReq[0].Duty <= MIN_DUTY)
 		DutyCycleReq[0].Duty=MIN_DUTY;
 	if (DutyCycleReq[0].Duty > MAX_DUTY)
 		DutyCycleReq[0].Duty=MAX_DUTY;
-	if (DutyCycleReq[1].Duty < MIN_DUTY)
+	if (DutyCycleReq[1].Duty <=  
+	 MIN_DUTY)
 		DutyCycleReq[1].Duty=MIN_DUTY;
 	if (DutyCycleReq[1].Duty > MAX_DUTY)
 		DutyCycleReq[1].Duty=MAX_DUTY;
@@ -207,6 +208,7 @@ void TD0_interrupt(void)
 					DutyCycle[0].Duty=DutyCycle[0].Duty-STEP;
 				else
 					DutyCycle[0].Duty=DutyCycleReq[0].Duty;
+					
 			}
 		
 	//	else TD0_Disable();

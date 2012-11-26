@@ -21,6 +21,7 @@ void PWM_A_Write_Protect();
  **************************************************************************************/
 void PWM_A_init(void)
 {
+	clrRegBits (PWMA_PMCFG, PWMA_PMCFG_WP_MASK); 
 
 	// PWMA_PMCTL: LDFQ=0,HALF=1,IPOL2=0,IPOL1=0,IPOL0=0,PRSC=0,PWMRIE=0,PWMF=0,ISENS=0,LDOK=0,PWMEN=0 
 	setReg (PWMA_PMCTL, 0x0);
@@ -35,7 +36,7 @@ void PWM_A_init(void)
 	setReg(PWMA_PMCFG, 0x0);           
 
 	// PWMA_PMDEADTM: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,PWMDT=4 
-	setReg (PWMA_PMDEADTM, DEAD_TIME);          		
+	setReg(PWMA_PMDEADTM, DEAD_TIME);          		
            
   	// PWMA_PWMVAL0: PWMVAL=MIN_DUTY 
   	setReg(PWMA_PWMVAL0, MIN_DUTY);           
@@ -67,12 +68,8 @@ else
 {
 	
 } 
-   // do not enable the PWM reload interrupt
-//PWM centered
-
-// PWMA_PMCFG: ??=0,??=0,??=0,EDG=0,??=0,TOPNEG45=0,TOPNEG23=0,TOPNEG01=0,??=0,BOTNEG45=0,BOTNEG23=0,BOTNEG01=0,INDEP45=0,INDEP23=0,INDEP01=0,WP=0 
-	clrRegBits(PWMA_PMCFG, PWMA_PMCFG_EDG_MASK); 
 	// write protect on 
+	
 	setRegBits (PWMA_PMCFG, PWMA_PMCFG_WP_MASK);  
 		
 }

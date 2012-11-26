@@ -114,7 +114,7 @@ void PWM_outputPadEnable(byte axis)
 void PWM_generate_BLL(byte i, Int16 pwm_value)
 {
 	if (pwm_value < MIN_DUTY) pwm_value = MIN_DUTY;
-	if (pwm_value > (MAX_DUTY)) pwm_value = (MAX_DUTY);
+	if (pwm_value > MAX_DUTY) pwm_value = MAX_DUTY;
 	
 	if (i==0)
 	{
@@ -145,7 +145,7 @@ void PWM_generate_BLL(byte i, Int16 pwm_value)
 
 void PWM_generate (byte i, Int16 pwm_value)
 {
-	if (pwm_value>0)
+	if (pwm_value>=0)
 		{
 			DutyCycleReq[i].Dir = 0;
 			DutyCycleReq[i].Duty=pwm_value;	
