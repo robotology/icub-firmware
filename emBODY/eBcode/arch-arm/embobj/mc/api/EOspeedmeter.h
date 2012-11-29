@@ -52,17 +52,19 @@ typedef struct EOspeedmeter_hid EOspeedmeter;
 // - declaration of extern public functions ---------------------------------------------------------------------------
  
  
-extern EOspeedmeter* eo_speedmeter_New(int32_t impulse_per_revolution);
+extern EOspeedmeter* eo_speedmeter_New(void);
 
-extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t pos);
-extern void eo_speedometer_FastEncoderRead(EOspeedmeter* o, int32_t vel);
+extern eObool_t eo_speedometer_IsHardFault(EOspeedmeter* o);
+extern eObool_t eo_speedometer_IsStarted(EOspeedmeter* o);
 
-//extern int32_t eo_speedometer_GetPosition(EOspeedmeter* o);
+extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position);
+
+#ifdef USE_2FOC_FAST_ENCODER
+extern void eo_speedometer_FastEncoderRead(EOspeedmeter* o, int32_t velocity);
+#endif
+
 extern int32_t eo_speedometer_GetDistance(EOspeedmeter* o);
 extern int32_t eo_speedometer_GetVelocity(EOspeedmeter* o);
-
-extern void eo_speedometer_EncoderCalibrate(EOspeedmeter* o, int32_t new_calibration);
-
 
 /** @}            
     end of group eo_pid  

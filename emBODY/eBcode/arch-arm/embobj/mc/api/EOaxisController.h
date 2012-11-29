@@ -65,12 +65,6 @@ typedef struct EOaxisController_hid EOaxisController;
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
 
-extern float decoupler_shoulder_pos[4][4];
-extern float decoupler_shoulder_trq[4][4];
-extern float decoupler_shoulder_pwm[4][4];
-
-extern float decoupler_waist_pwm[4][4];
-
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
  
@@ -79,10 +73,12 @@ extern float decoupler_waist_pwm[4][4];
     @brief      Creates a new motor controller object 
     @return     The pointer to the required object.
  **/
-extern EOaxisController* eo_axisController_New(void);
+extern EOaxisController* eo_axisController_New(int32_t ticks_per_rev);
 
-extern void eo_axisController_ReadEncPos(EOaxisController *o, int32_t pos); 
-extern void eo_axisController_ReadEncVel(EOaxisController *o, int32_t vel);
+extern eObool_t eo_axisController_IsReady(EOaxisController *o);
+
+extern void eo_axisController_SetEncPos(EOaxisController *o, int32_t pos); 
+extern void eo_axisController_SetEncVel(EOaxisController *o, int32_t vel);
 
 //extern int32_t eo_axisController_GetVelocity(EOaxisController *o);
 
@@ -91,7 +87,7 @@ extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_
 extern void eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_t avg_acc);
 extern void eo_axisController_SetTrqRef(EOaxisController *o, int32_t trq);
 
-extern int16_t eo_axisController_PWM(EOaxisController *o);
+extern int16_t eo_axisController_PWM(EOaxisController *o, int32_t *vout);
 
 extern void eo_axisController_Stop(EOaxisController *o);
 
@@ -113,8 +109,8 @@ extern eObool_t eo_axisController_GetMotionDone(EOaxisController *o);
 extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o);
 extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o);
 
-extern void eo_axisController_SetPosPid(EOaxisController *o, float K, float Kd, float Ki, float Ymax, float Imax, float Yoff);
-extern void eo_axisController_SetTrqPid(EOaxisController *o, float K, float Kd, float Ki, float Ymax, float Imax, float Yoff);
+extern void eo_axisController_SetPosPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff);
+extern void eo_axisController_SetTrqPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff);
 
 extern void eo_axisController_StartCalibration(EOaxisController *o, int32_t pos, int32_t vel, int32_t offset);
 

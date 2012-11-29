@@ -16,18 +16,14 @@ extern "C" {
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "EoCommon.h"
-
+#include "EOmotorControl_hid.h"
+    
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
 #include "EOdecoupler.h"
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
-
-#define DEC_MAX_SIZE 4
-
-#define IS_COUPLED_HID(decoupler,joint,motor) (decoupler->M[joint][motor] != 0.0f)
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
@@ -37,10 +33,13 @@ extern "C" {
                 used also by its derived objects.
  **/  
  
-struct EOdecoupler_hid 
+#define MAX_MOTORS 4
+ 
+struct EOmotors_hid 
 {
-    float M[4][4];
-    uint8_t n;
+    uint8_t n_motors;
+    
+    int16_t zero_rotation_torque[MAX_MOTORS];
 }; 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
