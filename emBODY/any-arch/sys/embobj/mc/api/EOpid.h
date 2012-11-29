@@ -65,10 +65,7 @@ extern EOpid* eo_pid_New(void);
     @param      Ymax  The output maximum value.
  **/
 
-extern void eo_pid_SetPid(EOpid *o, float K, float Kd, float Ki, int32_t pwm_max, float Imax, int32_t Yoff);
-extern void eo_pid_SetZRT(EOpid *o, int16_t zrt_neg, int16_t zrt_pos);
-
-extern void eo_pid_SafeMode(EOpid *o, eObool_t on_off);
+extern void eo_pid_SetPid(EOpid *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff);
 
 extern void eo_pid_GetStatus(EOpid *o, int32_t *pwm, int32_t *err);
 
@@ -80,9 +77,9 @@ extern void eo_pid_Reset(EOpid *o);
     @param      En The error between measure and setpoint.
     @return     The actual PWM output value.
  **/
-//extern int16_t eo_pid_PWM(EOpid *o, int32_t En);
-extern int16_t eo_pid_PWM2(EOpid *o, float En, float Vref, float Venc);
-extern int16_t eo_pid_PWM(EOpid *o, float En, float Vref);
+
+extern int32_t eo_pid_PWM2(EOpid *o, float En, float Vref, float Venc);
+extern int32_t eo_pid_PWM(EOpid *o, float En);
 
 /** @}            
     end of group eo_pid  

@@ -62,7 +62,7 @@ extern const float   EMS_PERIOD;
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const char s_eobj_ownname[] = "EOtrajectory";
+//static const char s_eobj_ownname[] = "EOtrajectory";
 
 static float K60byP = 0.0f;
 
@@ -88,7 +88,8 @@ extern EOtrajectory* eo_trajectory_New(int32_t ticks_per_rev)
 
         o->pos_min        = 0;
         o->pos_max        = ticks_per_rev;
-        o->vel_max        = ticks_per_rev/2;
+        o->vel_max        = ticks_per_rev/8;
+        o->acc_max        = ticks_per_rev;
         o->acc_stop_boost = ticks_per_rev;
 
         // boost
@@ -158,20 +159,27 @@ extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, int32_t a
         
         return;
     }
+    
+    LIMIT(-o->vel_max, avg_vel, o->vel_max);
 
     o->PosTimer = (EMS_FREQUENCY_INT32*(p1-(int32_t)o->Pos))/avg_vel;
 
     if (o->PosTimer<0) o->PosTimer = -o->PosTimer;
 }
 
-extern void eo_trajectory_Stop(EOtrajectory *o, int32_t stop_acc)
+//extern void eo_trajectory_Stop(EOtrajectory *o, int32_t stop_acc)
+extern void eo_trajectory_Stop(EOtrajectory *o, int32_t pos, int32_t stop_acc)
 {
     if (o->boost || o->boostTimer) eo_trajectory_BoostStop(o);
 
     o->PosTimer = 0;
     o->VelTimer = 0;
 
-    o->PosF = o->Pos;
+    //o->PosF = o->Pos;
+    o->PosF = o->Pos = pos;
+    
+    LIMIT(o->pos_min, o->PosF, o->pos_max);
+    
     o->VelF = 0.0f;
 
     if (!stop_acc) return;
@@ -198,6 +206,8 @@ extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t v1, int32_t a
         return;
     }
 
+    LIMIT(-o->acc_max, avg_acc, o->acc_max)
+    
     o->VelTimer = (EMS_FREQUENCY_INT32*(v1-(int32_t)o->Vel))/avg_acc;
 
     if (o->VelTimer<0) o->VelTimer = -o->VelTimer;

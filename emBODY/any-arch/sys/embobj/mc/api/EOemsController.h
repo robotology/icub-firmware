@@ -34,16 +34,11 @@ extern "C" {
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 typedef enum {
-    DECOUPLER_POS = 0,
-    DECOUPLER_TRQ = 1,
-    DECOUPLER_PWM = 2
-} emsMotorDecoupler_t;
-
-typedef enum {
     EMS_NULL     = 0,
     EMS_GENERIC  = 1,
     EMS_WAIST    = 2,
-    EMS_SHOULDER = 3
+    EMS_SHOULDER = 3,
+    EMS_ANKLE    = 4
 } emsBoardType_t;
 
 /* @typedef    typedef struct EOtrajectory_hid EOtrajectory
@@ -66,7 +61,6 @@ typedef struct EOemsController_hid EOemsController;
     @return     The pointer to the required object.
  **/
 extern EOemsController* eo_emsController_Init(emsBoardType_t board_type);
-extern eObool_t eo_emsController_AddAxis(uint8_t naxis);
 
 
 /* @fn         extern void eo_trajectory_Set(EOtrajectory *o, float p0, float pf, float v0, float speed)
@@ -81,17 +75,22 @@ extern eObool_t eo_emsController_AddAxis(uint8_t naxis);
 
 // synchronous
 extern void eo_emsController_ReadEncoders(int32_t *pos);
+#ifdef USE_2FOC_FAST_ENCODER
 extern void eo_emsController_ReadSpeed(uint8_t axis, int32_t speed);
-extern void eo_emsController_ReadTorques(int32_t *torque);
+#endif
+extern void eo_emsController_PWM(int16_t* pwm);
 
-//extern float eo_emsController_GetVelocity(uint8_t joint);
+
+
+
+
 
 extern void eo_emsController_SetOutput(uint8_t joint, int16_t out);
 extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_vel);
 extern void eo_emsController_SetVelRef(uint8_t joint, int32_t vel, int32_t avg_acc);
 extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq);
 
-extern /*int16_t*/ void eo_emsController_PWM(int16_t* pwm);
+extern void eo_emsController_ReadTorques(int32_t *torque);
 
 // asynchronous
 extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_t vel, int32_t offset);
@@ -100,14 +99,14 @@ extern eOmc_controlmode_t eo_emsController_GetControlMode(uint8_t joint);
 extern void eo_emsController_ResetPosPid(uint8_t joint);
 extern void eo_emsController_ResetTrqPid(uint8_t joint);
 extern void eo_emsController_Stop(uint8_t joint);
-//extern void eo_emsGetActivePidStatus(uint8_t joint, int16_t *pwm, int32_t *err);
+
 extern void eo_emsController_GetActivePidStatus(uint8_t joint, eOmc_joint_status_ofpid_t* pidStatus);
 extern void eo_emsController_GetJointStatus(uint8_t joint, eOmc_joint_status_basic_t* jointStatus);
 extern eObool_t eo_emsController_GetMotionDone(uint8_t joint);
 
 // configuration
-extern void eo_emsController_SetPosPid(uint8_t joint, float K, float Kd, float Ki, float Ymax, float Imax, float Yoff);
-extern void eo_emsController_SetTrqPid(uint8_t joint, float K, float Kd, float Ki, float Ymax, float Imax, float Yoff);
+extern void eo_emsController_SetPosPid(uint8_t joint, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff);
+extern void eo_emsController_SetTrqPid(uint8_t joint, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff);
 
 
 extern void eo_emsController_SetStiffness(uint8_t joint, int32_t stiffeness);
@@ -118,8 +117,6 @@ extern void eo_emsController_SetPosMax(uint8_t joint, int32_t pos_max);
 extern void eo_emsController_SetVelMax(uint8_t joint, int32_t vel_max);
 
 extern void eo_emsController_SetVelTimeout(uint8_t joint, int32_t vel_timeout);
-
-extern void eo_emsController_SetDecoupler(emsMotorDecoupler_t dec_type, float matrix[4][4]);
 
 /** @}            
     end of group eo_emsController  

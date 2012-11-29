@@ -46,6 +46,7 @@ struct EOtrajectory_hid
     float pos_min;
     float pos_max;
     int32_t vel_max;
+    int32_t acc_max;
 
     int32_t PosTimer;
     int32_t VelTimer;

@@ -24,7 +24,7 @@ extern "C" {
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
-// - empty-section
+
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
@@ -36,21 +36,22 @@ extern "C" {
 
 struct EOspeedmeter_hid 
 {
-    int32_t impulse_per_revolution;
-    int32_t impulse_per_revolution_by_2;
+    int32_t time;
     
-    int32_t time_from_last_change;
-    
-    int32_t calibration;
     int32_t distance;
-    int32_t pos;
+    int32_t position_last;
+    int32_t position_sure;
     
     int32_t odo_x_freq;
     int32_t speed_filt;
     int32_t speed;
     int32_t dir;
-  
-    eObool_t first;
+ 
+    eObool_t is_started;
+    eObool_t hard_fault;
+    
+    uint8_t first_valid_data;
+    uint8_t invalid_data_cnt;
 }; 
 
 

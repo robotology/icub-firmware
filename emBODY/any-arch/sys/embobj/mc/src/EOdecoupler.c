@@ -14,9 +14,6 @@
 #include "EoCommon.h"
 
 #include "EOtheMemoryPool.h"
-#include "EOtheErrorManager.h"
-#include "EOVtheSystem.h"
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -36,7 +33,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+#define ZERO_ROTATION_TORQUE 1200 
+
+#define MOTORS(m) for (uint8_t m=0; m<o->n_motors; ++m)
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -62,70 +62,80 @@
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const char s_eobj_ownname[] = "EOdecoupler";
+//static const char s_eobj_ownname[] = "EOdecoupler";
 
-extern float decoupler_shoulder_pos[4][4] = 
-{
-    {1.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 1.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 1.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 1.0f}
-};
-
-float decoupler_shoulder_trq[4][4];
-float decoupler_shoulder_pwm[4][4];
-float decoupler_waist_pwm[4][4];
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOdecoupler* eo_decoupler_New(uint8_t dim, float matrix[4][4]) 
+extern EOmotors* eo_motors_New(uint8_t n_motors) 
 {
-    if (dim > DEC_MAX_SIZE) return NULL;
-
-    EOdecoupler *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOdecoupler), 1);
+    EOmotors *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOmotors), 1);
 
     if (o)
     {
-        o->n = dim;
-
-        for (int i=0; i<DEC_MAX_SIZE; ++i)
+        if (n_motors > MAX_MOTORS) n_motors = MAX_MOTORS;
+        
+        o->n_motors = n_motors;
+        
+        MOTORS(m)
         {
-            for (int j=0; j<DEC_MAX_SIZE; ++j)
-            {
-                o->M[i][j] = matrix[i][j];
-            }
+            o->zero_rotation_torque[m] = ZERO_ROTATION_TORQUE;
         }
     }
 
     return o;
 }
 
-/*  @fn         extern float eo_trajectory_Step(EOtrajectory *o)
-    @brief      Executes a trajectory step.
-    @param o    The pointer to the trajectory object.
-    @return     The actual trajectory point value.
- **/
-
-extern void eo_decoupler_Mult(EOdecoupler *o, float *src, float *dst)
+extern void eo_motors_PWMs_Shoulder(EOmotors *o, int32_t *pwm_joint, int32_t *vel_joint, int16_t *pwm_motor)
 {
-    uint8_t i,j;
-
-    for (i=0; i<o->n; ++i)
+    if (!o) return;
+     
+    int32_t vel_motor[4];
+    
+    vel_motor[0] =  vel_joint[0];
+    vel_motor[1] = -vel_joint[0]+vel_joint[1];
+    vel_motor[2] = -vel_joint[0]+vel_joint[1]+vel_joint[2];
+    vel_motor[3] =  vel_joint[3];
+    
+    pwm_motor[0] = (int16_t)(      pwm_joint[0]);
+    pwm_motor[1] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]))/40);
+    pwm_motor[2] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]))/40);
+    pwm_motor[3] = (int16_t)(      pwm_joint[3]);
+    
+    MOTORS(m)
     {
-        dst[i] = 0.0f;
-
-        for (j=0; j<o->n; ++j)
+        if (vel_motor[m] > 0)
         {
-            dst[i] += o->M[i][j] * src[j];
-        }    
+            pwm_motor[m] += o->zero_rotation_torque[m];
+        }
+        else if (vel_motor[m] < 0)
+        {
+            pwm_motor[m] -= o->zero_rotation_torque[m];
+        }
+        
+        pwm_motor[m] = -pwm_motor[m];
     }
 }
 
-extern uint8_t eo_decoupler_IsCoupled(EOdecoupler *o, uint8_t joint, uint8_t motor)
+extern void eo_motors_PWMs_UpperLeg(EOmotors *o, int32_t *pwm_joint, int32_t *vel_joint, int16_t *pwm_motor)
 {
-    return o->M[joint][motor] != 0.0f;
+    MOTORS(m)
+    {
+        pwm_motor[m] = (int16_t)pwm_joint[m];
+        
+        if (vel_joint[m] > 0)
+        {
+            pwm_motor[m] += o->zero_rotation_torque[m];
+        }
+        else if (vel_joint[m] < 0)
+        {
+            pwm_motor[m] -= o->zero_rotation_torque[m];
+        }
+    }
+    
+    pwm_motor[2] = -pwm_motor[2];
 }
 
 // --------------------------------------------------------------------------------------------------------------------
