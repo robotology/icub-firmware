@@ -37,7 +37,7 @@
 #include "hal_sensor_gyro.h"
 #include "hal_sensor_accel.h"
 
-#include "utils/hal_utility_fifo.h"
+#include "hal_utility_fifo.h"
 
 #include "hal_brdcfg.h"
 
@@ -58,8 +58,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
+//#define USE_EVENTVIEWER
+#undef USE_EVENTVIEWER
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -369,6 +370,8 @@ void userdef4(void){}
     
 static void s_eventviewer_init(void)
 {
+#ifdef  USE_EVENTVIEWER
+    
     evEntityId_t prev;
 
     eventviewer_init();
@@ -382,6 +385,7 @@ static void s_eventviewer_init(void)
     // the eventviewer shall stay most of time in idle
     // apart from some specific actions: systick, userdef1 and userdef2
     eventviewer_switch_to(ev_ID_idle);
+#endif
 }
 
 static void myledsinit(void)
@@ -394,18 +398,27 @@ static void myledsinit(void)
     
     res = hal_actuator_led_init(hal_actuator_led1, NULL);
     res =  res;
+    
 
+#ifdef  USE_EVENTVIEWER
     prev = eventviewer_switch_to(ev_ID_first_usrdef+1);
+#endif    
     hal_gpio_quickest_setval(hal_brdcfg_actuator_led__theconfig.gpiocfg[0].port, hal_brdcfg_actuator_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
     hal_gpio_quickest_setval(hal_brdcfg_actuator_led__theconfig.gpiocfg[0].port, hal_brdcfg_actuator_led__theconfig.gpiocfg[0].pin, hal_gpio_valHIGH);
     hal_gpio_quickest_setval(hal_brdcfg_actuator_led__theconfig.gpiocfg[0].port, hal_brdcfg_actuator_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
+#ifdef  USE_EVENTVIEWER
     eventviewer_switch_to(prev); 
-    
+#endif
+
+#ifdef  USE_EVENTVIEWER    
     prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
+#endif    
     hal_gpio_setval(hal_brdcfg_actuator_led__theconfig.gpiocfg[0].port, hal_brdcfg_actuator_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
     hal_gpio_setval(hal_brdcfg_actuator_led__theconfig.gpiocfg[0].port, hal_brdcfg_actuator_led__theconfig.gpiocfg[0].pin, hal_gpio_valHIGH);
     hal_gpio_setval(hal_brdcfg_actuator_led__theconfig.gpiocfg[0].port, hal_brdcfg_actuator_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
-    eventviewer_switch_to(prev);     
+#ifdef  USE_EVENTVIEWER
+    eventviewer_switch_to(prev);  
+#endif    
 }
 
 static void myled00toggle(void)
@@ -426,8 +439,10 @@ static void myled01toggle(void* p)
 
 static void myonsystick(void)
 {
+#ifdef  USE_EVENTVIEWER    
     evEntityId_t prev = eventviewer_switch_to(ev_ID_systick);
-
+#endif
+    
     static uint32_t count = 0;
     static const uint32_t max = 500;
     msTicks++;
@@ -448,8 +463,10 @@ static void myonsystick(void)
     {
 //        hal_sys_systemreset();       
     }
-    
-    eventviewer_switch_to(prev);       
+
+#ifdef  USE_EVENTVIEWER    
+    eventviewer_switch_to(prev);    
+#endif    
 }
 
 
