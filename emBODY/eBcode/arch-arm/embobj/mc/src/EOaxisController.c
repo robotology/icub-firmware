@@ -46,8 +46,10 @@ extern const int32_t EMS_FREQUENCY_INT32;
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
+#ifdef MC_CAN_DEBUG
 int32_t encoder_can_pos = 0;
 int32_t encoder_can_vel = 0;
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -429,8 +431,10 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, int32_t *vout)
                 eo_pid_Reset(o->pidP); // position limit reached
             }
 
+            #ifdef MC_CAN_DEBUG
             encoder_can_pos = pos;
             encoder_can_vel = vel;
+            #endif
             
             o->err = pos_ref - pos;
 

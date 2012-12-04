@@ -53,7 +53,9 @@ typedef struct EOmotors_hid EOmotors;
 extern EOmotors* eo_motors_New(uint8_t nmotors);
 
 extern void eo_motors_PWMs_Shoulder(EOmotors *o, int32_t *pwm_joint, int32_t *vel_joint, int16_t *pwm_motor);
-extern void eo_motors_PWMs_UpperLeg(EOmotors *o, int32_t *pwm_joint, int32_t *vel_joint, int16_t *pwm_motor);
+extern void eo_motors_PWMs_UpperLeg(EOmotors *o, int32_t *pwm_joint, int32_t *vel_motor, int16_t *pwm_motor);
+extern void eo_motors_PWMs_Ankle(EOmotors *o, int32_t *pwm_joint, int32_t *vel_motor, int16_t *pwm_motor);
+extern void eo_motors_PWMs_Waist(EOmotors *o, int32_t *pwm_joint, int32_t *vel_joint, int16_t *pwm_motor);
 
 
 /** @}            

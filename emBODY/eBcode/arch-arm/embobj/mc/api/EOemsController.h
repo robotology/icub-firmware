@@ -38,7 +38,8 @@ typedef enum {
     EMS_GENERIC  = 1,
     EMS_WAIST    = 2,
     EMS_SHOULDER = 3,
-    EMS_ANKLE    = 4
+    EMS_ANKLE    = 4,
+    EMS_UPPERLEG = 5
 } emsBoardType_t;
 
 /* @typedef    typedef struct EOtrajectory_hid EOtrajectory

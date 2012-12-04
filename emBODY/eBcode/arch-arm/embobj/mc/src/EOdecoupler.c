@@ -34,7 +34,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define ZERO_ROTATION_TORQUE 1200 
+#define ZERO_ROTATION_TORQUE 1000
 
 #define MOTORS(m) for (uint8_t m=0; m<o->n_motors; ++m)
 
@@ -106,36 +106,105 @@ extern void eo_motors_PWMs_Shoulder(EOmotors *o, int32_t *pwm_joint, int32_t *ve
     
     MOTORS(m)
     {
-        if (vel_motor[m] > 0)
+        if (pwm_motor[m])
         {
-            pwm_motor[m] += o->zero_rotation_torque[m];
+            if (vel_motor[m] > 0)
+            {
+                pwm_motor[m] += o->zero_rotation_torque[m];
+            }
+            else if (vel_motor[m] < 0)
+            {
+                pwm_motor[m] -= o->zero_rotation_torque[m];
+            }
         }
-        else if (vel_motor[m] < 0)
-        {
-            pwm_motor[m] -= o->zero_rotation_torque[m];
-        }
-        
-        pwm_motor[m] = -pwm_motor[m];
     }
+    
+    pwm_motor[0] = -pwm_motor[0];
+    pwm_motor[1] = -pwm_motor[1];
+    pwm_motor[2] = -pwm_motor[2];
+    pwm_motor[3] = -pwm_motor[3];
 }
 
-extern void eo_motors_PWMs_UpperLeg(EOmotors *o, int32_t *pwm_joint, int32_t *vel_joint, int16_t *pwm_motor)
+extern void eo_motors_PWMs_Waist(EOmotors *o, int32_t *pwm_joint, int32_t *vel_joint, int16_t *pwm_motor)
+{
+    if (!o) return;
+     
+    int32_t vel_motor[3];
+    
+    vel_motor[0] =  (vel_joint[0]-vel_joint[1])/2;
+    vel_motor[1] =  (vel_joint[0]+vel_joint[1])/2;
+    vel_motor[2] =   vel_joint[2];
+    
+    pwm_motor[0] = (int16_t)((pwm_joint[0]-pwm_joint[1])/2);
+    pwm_motor[1] = (int16_t)((pwm_joint[0]+pwm_joint[1])/2);
+    pwm_motor[2] = (int16_t  )pwm_joint[2];
+    
+    MOTORS(m)
+    {
+        if (pwm_motor[m])
+        {
+            if (vel_motor[m] > 0)
+            {
+                pwm_motor[m] += o->zero_rotation_torque[m];
+            }
+            else if (vel_motor[m] < 0)
+            {
+                pwm_motor[m] -= o->zero_rotation_torque[m];
+            }
+        }
+    }
+    
+//? pwm_motor[0] = -pwm_motor[0];
+//? pwm_motor[1] = -pwm_motor[1];
+//? pwm_motor[2] = -pwm_motor[2];
+}
+
+extern void eo_motors_PWMs_UpperLeg(EOmotors *o, int32_t *pwm_joint, int32_t *vel_motor, int16_t *pwm_motor)
 {
     MOTORS(m)
     {
         pwm_motor[m] = (int16_t)pwm_joint[m];
         
-        if (vel_joint[m] > 0)
+        if (pwm_motor[m])
         {
-            pwm_motor[m] += o->zero_rotation_torque[m];
-        }
-        else if (vel_joint[m] < 0)
-        {
-            pwm_motor[m] -= o->zero_rotation_torque[m];
+            if (vel_motor[m] > 0)
+            {
+                pwm_motor[m] += o->zero_rotation_torque[m];
+            }
+            else if (vel_motor[m] < 0)
+            {
+                pwm_motor[m] -= o->zero_rotation_torque[m];
+            }
         }
     }
     
+//  pwm_motor[0] = -pwm_motor[0];
+//  pwm_motor[1] = -pwm_motor[1];
     pwm_motor[2] = -pwm_motor[2];
+//  pwm_motor[3] = -pwm_motor[3];
+}
+
+extern void eo_motors_PWMs_Ankle(EOmotors *o, int32_t *pwm_joint, int32_t *vel_motor, int16_t *pwm_motor)
+{
+    MOTORS(m)
+    {
+        pwm_motor[m] = (int16_t)pwm_joint[m];
+        
+        if (pwm_motor[m])
+        {
+            if (vel_motor[m] > 0)
+            {
+                pwm_motor[m] += o->zero_rotation_torque[m];
+            }
+            else if (vel_motor[m] < 0)
+            {
+                pwm_motor[m] -= o->zero_rotation_torque[m];
+            }
+        }
+    }
+    
+//? pwm_motor[0] = -pwm_motor[0];
+//? pwm_motor[1] = -pwm_motor[1];
 }
 
 // --------------------------------------------------------------------------------------------------------------------
