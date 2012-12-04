@@ -248,7 +248,8 @@ static hal_result_t s_hal_switch_init(const hal_switch_cfg_t *cfg)
 
 static hal_result_t s_hal_switch_reg_config(const hal_switch_cfg_t *cfg)
 {
-    uint8_t buff_write = 0x60; //FORCE FULL DUPLEX AND 100T
+    //uint8_t buff_write = 0x60; //FORCE FULL DUPLEX AND 100T
+    uint8_t buff_write = 0x88; //AUTONEGOTATION + ADVERTISE FULLDUPLEX 100
     uint8_t buff_read = 0xFF; 
     volatile uint32_t i = 1;
 
