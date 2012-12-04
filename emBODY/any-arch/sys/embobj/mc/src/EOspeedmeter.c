@@ -97,9 +97,26 @@ extern EOspeedmeter* eo_speedmeter_New(void)
         
         o->hard_fault = eobool_false;
         o->is_started = eobool_false;
+        
+        o->sindex = 0;
+        
+        o->sample[0] = 0;
+        o->sample[1] = 0;
+        o->sample[2] = 0;
+        o->sample[3] = 0;
+        o->sample[4] = 0;
     }
 
     return o;
+}
+
+extern void eo_speedometer_Reset(EOspeedmeter* o)
+{
+    o->hard_fault = eobool_false;
+    o->is_started = eobool_false;
+    
+    o->invalid_data_cnt = 0;
+    o->first_valid_data = 0;
 }
 
 extern eObool_t eo_speedometer_IsHardFault(EOspeedmeter* o)
@@ -130,6 +147,111 @@ extern void eo_speedometer_FastEncoderRead(EOspeedmeter* o, int32_t velocity)
 }
 #endif
 
+extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
+{
+    if (!o || o->hard_fault) return;
+    
+    if (!o->is_started)
+    {
+        encoder_init(o, position);
+        return;
+    }
+    
+    //////////////////////////////
+
+    ++o->time;
+
+    if (o->hard_fault || o->invalid_data_cnt >= 100)
+    {
+        o->hard_fault = eobool_true;
+        o->invalid_data_cnt = 0;
+        return;
+    }
+    
+    if (position == ENC_INVALID)
+    {
+        o->invalid_data_cnt += 10;
+    }
+    else
+    {        
+        if (o->invalid_data_cnt) --o->invalid_data_cnt;
+
+        int32_t check = normalize_angle(position - o->position_last);
+        o->position_last = position;
+
+        if (-48 <= check && check <= 48)
+        {
+            int32_t delta = normalize_angle(position - o->position_sure);
+
+            if (delta<=-32 || delta>=32 || (o->dir==-1 && delta<=-16) || (o->dir==1 && delta>=16))
+            {
+                int32_t delta_x_freq = delta*EMS_FREQUENCY_INT32;
+
+                o->odo_x_freq -= delta_x_freq;
+                o->position_sure = position;
+                o->distance += delta;
+                
+                int32_t speed = delta_x_freq / o->time;
+                LIMIT(-48000, speed, 48000);
+                o->time = 0;
+                
+                o->sample[o->sindex++] = speed;
+                o->sindex %= 5;
+                
+                /*
+                int32_t acc = o->sample[0];
+                int32_t min = acc, max = acc;
+                for (uint8_t i=1; i<5; ++i)
+                {
+                    acc += o->sample[i];
+                  
+                    if (min > o->sample[i]) min = o->sample[i];
+                    if (max < o->sample[i]) max = o->sample[i];
+                }
+                o->speed_filt = (acc-min-max)/3;
+                */
+                
+                o->speed_filt = (o->sample[0]+o->sample[1]+o->sample[2]+o->sample[3]+o->sample[4]) / 5;
+                                
+                o->dir = (delta>0) ? 1 : -1;
+            }
+        }
+        else
+        {
+            o->invalid_data_cnt += 11;
+        }
+    }
+    
+    if (o->time > 500) // is still
+    {
+        o->odo_x_freq = 0;
+        o->speed_filt = 0;
+        o->speed = 0;
+        o->dir = 0;
+        
+        o->sindex = 0;
+        
+        o->sample[0] = 0;
+        o->sample[1] = 0;
+        o->sample[2] = 0;
+        o->sample[3] = 0;
+        o->sample[4] = 0;
+    }
+    else
+    {
+        if (o->time > 1)
+        {
+            int32_t speed_max = 32000 / (o->time-1);
+            LIMIT(-speed_max, o->speed_filt, speed_max);
+        }
+        
+        o->odo_x_freq += o->speed_filt;
+        
+        LIMIT(-16000, o->odo_x_freq, 16000);
+    }
+}
+
+/*
 extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
 {
     if (!o || o->hard_fault) return;
@@ -241,6 +363,7 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
     
     #endif
 }
+*/
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

@@ -52,6 +52,9 @@ struct EOspeedmeter_hid
     
     uint8_t first_valid_data;
     uint8_t invalid_data_cnt;
+    
+    uint8_t sindex;
+    int32_t sample[5];
 }; 
 
 

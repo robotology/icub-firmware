@@ -53,7 +53,7 @@ typedef struct EOspeedmeter_hid EOspeedmeter;
  
  
 extern EOspeedmeter* eo_speedmeter_New(void);
-
+extern void eo_speedometer_Reset(EOspeedmeter* o);
 extern eObool_t eo_speedometer_IsHardFault(EOspeedmeter* o);
 extern eObool_t eo_speedometer_IsStarted(EOspeedmeter* o);
 

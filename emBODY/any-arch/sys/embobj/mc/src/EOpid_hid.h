@@ -43,7 +43,7 @@ struct EOpid_hid
     float Ki;
     float Kd;
 
-    float Xn;
+    //float Xn;
     
     float Dn;
     float En;

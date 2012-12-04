@@ -82,7 +82,7 @@ extern EOpid* eo_pid_New(void)
         o->Ki = 0.0f;
         o->Kd = 0.0f;
         
-        o->Xn = 0.0f;
+        //o->Xn = 0.0f;
 
         o->Dn    = 0.0f;
         o->En    = 0.0f;        
@@ -141,7 +141,7 @@ extern void eo_pid_Reset(EOpid *o)
     o->En   = 0.0f;
     o->KKiIn  = 0.0f;
     
-    o->Xn = 0.0f;
+    //o->Xn = 0.0f;
     
     o->pwm  = 0;
 }
@@ -176,7 +176,7 @@ extern int32_t eo_pid_PWM2(EOpid *o, float En, float Vref, float Venc)
     
     float Xn = (Vref == 0.0f) ? (o->K*o->En) : (o->K*(o->En+o->Kd*(Vref-Venc)));
 
-    //o->Xn = 0.9f*o->Xn + 0.1f*Xn;
+    //float Xn = o->K*(o->En+o->Kd*(Vref-Venc));
     
     o->KKiIn += o->Ki*Xn;
 

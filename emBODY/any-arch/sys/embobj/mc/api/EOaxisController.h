@@ -29,7 +29,7 @@ extern "C" {
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-#define eo_axisController_ReadTorque(axis_controller, torque) eo_axisController_ReadTorque_hid(axis_controller, torque)
+//#define MC_CAN_DEBUG
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 

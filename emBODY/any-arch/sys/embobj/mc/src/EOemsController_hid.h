@@ -50,6 +50,7 @@ struct EOemsController_hid
     uint8_t n_joints;
     
     EMSdefcon_t defcon;
+    eObool_t is_coupled;
     
     EOmotors         *motors;
     EOspeedmeter     *enc_speedometer[MAX_JOINTS];
