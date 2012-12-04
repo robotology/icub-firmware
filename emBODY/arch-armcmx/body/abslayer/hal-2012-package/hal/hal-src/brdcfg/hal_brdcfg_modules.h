@@ -29,13 +29,13 @@
 
 
 #if   defined(HAL_BOARD_MCBSTM32C)
-	#include "brdcfg/hal_brdcfg_mcbstm32c_modules.h"
+	#include "mcbstm32c/hal_brdcfg_mcbstm32c_modules.h"
 #elif defined(HAL_BOARD_EMS001)
-	#include "brdcfg/hal_brdcfg_ems001_modules.h"
+	#include "ems001/hal_brdcfg_ems001_modules.h"
 #elif defined(HAL_BOARD_MCBSTM32F400)
-	#include "brdcfg/hal_brdcfg_mcbstm32f400_modules.h"   
+	#include "mcbstm32f400/hal_brdcfg_mcbstm32f400_modules.h"   
 #elif defined(HAL_BOARD_EMS004)
-	#include "brdcfg/hal_brdcfg_ems004_modules.h"    
+	#include "ems004/hal_brdcfg_ems004_modules.h"    
 #else
 	#error "Please select board XXX w/ HAL_BOARD_XXX"
 #endif                      

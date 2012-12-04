@@ -33,7 +33,7 @@
 
 #include "hal_base.h"
 
-#include "hal_stm32xx_include.h"
+#include "hal_mpu_stm32xx_include.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------

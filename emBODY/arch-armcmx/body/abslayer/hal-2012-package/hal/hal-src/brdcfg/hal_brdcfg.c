@@ -30,13 +30,13 @@
 // - the file ---------------------------------------------------------------------------------------------------------
 
 #if   defined(HAL_BOARD_MCBSTM32C)
-	#include "brdcfg/hal_brdcfg_mcbstm32c.c"
+	#include "mcbstm32c/hal_brdcfg_mcbstm32c.c"
 #elif defined(HAL_BOARD_EMS001)
-	#include "brdcfg/hal_brdcfg_ems001.c"
+	#include "ems001/hal_brdcfg_ems001.c"
 #elif defined(HAL_BOARD_MCBSTM32F400) 
-    #include "brdcfg/hal_brdcfg_mcbstm32f400.c"
+    #include "mcbstm32f400/hal_brdcfg_mcbstm32f400.c"
 #elif defined(HAL_BOARD_EMS004) 
-    #include "brdcfg/hal_brdcfg_ems004.c"    
+    #include "ems004/hal_brdcfg_ems004.c"    
 #else
 	#error "Please select board XXX w/ HAL_BOARD_XXX"
 #endif                        

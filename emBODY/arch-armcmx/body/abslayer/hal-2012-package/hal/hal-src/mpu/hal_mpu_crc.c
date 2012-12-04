@@ -47,7 +47,7 @@
 #include "hal_trace.h"
 #include "stdio.h"
 
-#include "hal_stm32xx_include.h"
+#include "hal_mpu_stm32xx_include.h"
 
 
 

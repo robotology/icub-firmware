@@ -63,11 +63,11 @@
 #endif
 
 #if defined(HAL_HAS_EEPROM)
-#include "hal_eeprom.h"
+#include "hal_device_eeprom.h"
 #endif
 
 #if defined(HAL_HAS_ENCODER)
-#include "hal_encoder.h"
+#include "hal_sensor_encoder.h"
 #endif
 
 #if defined(HAL_HAS_ETH)
@@ -83,7 +83,7 @@
 #endif
 
 #if defined(HAL_HAS_LED)
-#include "hal_led.h"
+#include "hal_actuator_led.h"
 #endif
 
 #if defined(HAL_HAS_SYS)

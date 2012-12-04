@@ -39,7 +39,7 @@
 #include "hal_brdcfg.h"
 #include "hal_utility_bits.h" 
 
-#include "hal_stm32xx_include.h" 
+#include "hal_mpu_stm32xx_include.h" 
 
  
 // --------------------------------------------------------------------------------------------------------------------
