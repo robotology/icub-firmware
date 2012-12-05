@@ -69,6 +69,14 @@ typedef int32_t hal_irqn_t;
  **/
 extern hal_result_t hal_sys_systeminit(void);
 
+/** @fn         extern hal_result_t hal_sys_delay(hal_reltime_t reltime)
+    @brief      When called it returns after the CPU has executed this function for @e reltime microseconds.
+                In this time it is not counted the time the system has spent inside ISRs or in other tasks.
+    @param      reltime     the minumum time spent inside this funtion in microseconds                
+    @return     hal_res_OK, or hal_res_NOK_generic if hal_sys_systeminit() was not already succesfully called.
+ **/
+extern hal_result_t hal_sys_delay(hal_reltime_t reltime);
+
 
 /** @fn         extern hal_result_t hal_sys_systemreset(void)
     @brief      Force a reset of the system.

@@ -52,8 +52,7 @@
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 /** @typedef    typedef enum hal_spi_port_t 
-    @brief      hal_spi_port_t contains the values that a SPI port can have.
-    @warning    On the MCBSTM32C board, the values are mapped into SPI1, SPI2, SPI3.
+    @brief      identifies the SPI to use
  **/
 typedef enum  
 { 
@@ -96,10 +95,10 @@ typedef enum
  **/
 typedef struct
 {
-    hal_spi4encoder_baudrate_t baudrate;/**< spi baudrate */
+    hal_spi4encoder_baudrate_t baudrate;    /**< spi baudrate */
     hal_interrupt_priority_t priority;
-    void (*callback_on_rx)(void *arg);  /**< call back function called after a frame of 3 mux has been read */
-    void *arg;                          /**< argument of the callback */
+    void (*callback_on_rx)(void *arg);      /**< call back function called after a frame of 3 mux has been read */
+    void *arg;                              /**< argument of the callback */
 } hal_spi4encoder_cfg_t;
 
  

@@ -41,7 +41,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 #include "hal_base.h"
-
+#include "hal_eth.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -73,6 +73,8 @@ extern const hal_switch_cfg_t hal_switch_cfg_default;   // = { .dummy = 0};
                 should be avoided as they can corrupt network traffic.
   */
 extern hal_result_t hal_switch_init(const hal_switch_cfg_t *cfg);
+
+extern hal_result_t hal_switch_start(hal_eth_phymode_t *phymode);
 
 
 /** @fn			extern hal_bool_t hal_switch_initted_is(void)
