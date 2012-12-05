@@ -52,9 +52,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#define _TEST_CAN_
+//#define _TEST_CAN_
 //#define _TEST_BASIC_
-//#define _TEST_ETH_
+#define _TEST_ETH_
+//#define _CHECK_SWITCH_STATUS_ //enable check eth link status 
 //#define _TEST_EEPROM_
 //#define _TEST_SPI_
 //#define _TEST_EEPROM_ON_FLASH_
@@ -129,8 +130,14 @@ static void s_test_eeprom_on_flash(void);
 // --------------------------------------------------------------------------------------------------------------------
 
 static volatile uint32_t msTicks; 
-
 void s_tick(void); 
+
+#ifdef _CHECK_SWITCH_STATUS_
+#error pay attention: s_check_switch checks only phy2!!
+void s_check_switch(void);
+static volatile uint32_t count;
+static uint8_t enacheckswitch = 0;
+#endif
 
 //inline uint32_t asasa(uint32_t a)
 //{
@@ -191,19 +198,21 @@ int main(void)
     uniqueid = hal_arch_arm_uniqueid64_get();
     uniqueid = uniqueid;
 
-    hal_memory_getsize(hal_cfgMINE, &size04aligned); 
+    hal_base_memory_getsize(hal_cfgMINE, &size04aligned); 
 
     if(0 != size04aligned)
     {
         data32aligned = (uint32_t*)calloc(size04aligned/4, sizeof(uint32_t));   
     }
 
-    hal_initialise(hal_cfgMINE, data32aligned);
+    hal_base_initialise(hal_cfgMINE, data32aligned);
 
     hal_sys_systeminit();
-
-    hal_sys_systick_sethandler(s_tick, 1000, hal_int_priority00);
-
+#ifdef _CHECK_SWITCH_STATUS_
+    hal_sys_systick_sethandler(s_check_switch, 1000, hal_int_priority00);
+#else
+    hal_sys_systick_sethandler(s_tick, 1000*1000, hal_int_priority00);
+#endif
 
 #ifdef _TEST_I2C_
     s_test_hal_i2c();
@@ -436,7 +445,10 @@ static void s_test_hal_can(void)
     my_can_cfg_default.priorx             = hal_int_priority06;
     my_can_cfg_default.priotx             = hal_int_priority06;
     my_can_cfg_default.callback_on_rx     = s_can_callbkb_onrec;
-    my_can_cfg_default.arg                = NULL;
+    my_can_cfg_default.arg_cb_rx          = NULL;
+    my_can_cfg_default.callback_on_tx     = NULL;
+    my_can_cfg_default.arg_cb_tx          = NULL;
+
 
 
     //it is necessary initilize canframe fileds!!
@@ -646,6 +658,17 @@ static void s_test_hal_eth(void)
     static uint32_t datafr[256] = {255};
     pframe = (hal_eth_frame_t*) &datafr[0];
     const hal_switch_cfg_t switch_cfg = {.dummy = 0};
+    hal_led_cfg_t ledcfg = {.dummy=0};
+
+    hal_led_init(hal_led0, &ledcfg);
+    hal_led_off(hal_led0);
+    hal_led_init(hal_led1, &ledcfg); //led green
+    hal_led_off(hal_led1);
+    hal_led_init(hal_led2, &ledcfg);
+    hal_led_off(hal_led2);
+    hal_led_init(hal_led3, &ledcfg);
+    hal_led_off(hal_led3);
+
 
     frx.frame_new                   = s_getframe;
     frx.frame_movetohigherlayer     = s_giveframeback;
@@ -663,8 +686,11 @@ static void s_test_hal_eth(void)
     hal_switch_init(&switch_cfg);
 
     hal_eth_init(&cfg);
-
-//    hal_eth_enable();
+#ifdef _CHECK_SWITCH_STATUS_
+    enacheckswitch = 1;
+#endif   
+    
+    //    hal_eth_enable();
 //    
 //    hal_eth_sendframe(pframe);
 //    hal_eth_enable(); 
@@ -963,7 +989,85 @@ static void s_tick(void)
 {
     msTicks++;
 }
+#ifdef _CHECK_SWITCH_STATUS_
+static void s_check_switch(void)
+{
+/*
+//these types will be defined in hal_switch.h asap
+typedef struct
+{
+    uint32_t autoNeg_done:1;
+    uint32_t linkisgood:1;
+    uint32_t linkspeed:1; // 1== 100Mb 0==10Mb
+    uint32_t linkduplex:1; //1==full 0==half
+    uint32_t dummy:28;
+} hal_switch_portstatus;
 
+typedef struct
+{
+    hal_switch_portstatus port1;
+    hal_switch_portstatus port2;
+} hal_switch_status;
+*/
+    static hal_switch_status status = {0};
+    count++;
+    
+    if( count < 100)
+    {
+        return;
+    }
+    count = 0;
+    if(enacheckswitch == 0)
+    {
+        return;
+    }        
+
+#define emsappl_ledred          hal_led0
+#define emsappl_ledgreen        hal_led1 
+#define emsappl_ledyellow       hal_led2
+#define emsappl_ledorange       hal_led3
+
+    hal_switch_getStatus(&status);
+
+    if(status.port2.autoNeg_done)
+    {
+        hal_led_on(emsappl_ledgreen);
+    }
+    else
+    {
+        hal_led_off(emsappl_ledgreen);
+    }
+    
+    if(status.port2.linkspeed)
+    {
+        hal_led_on(emsappl_ledred);
+    }
+    else
+    {
+        hal_led_off(emsappl_ledred);
+    }
+    
+    
+    if(status.port2.linkduplex)
+    {
+        hal_led_on(emsappl_ledyellow);
+    }
+    else
+    {
+        hal_led_off(emsappl_ledyellow);
+    }
+
+    if(status.port2.linkisgood)
+    {
+        hal_led_on(emsappl_ledorange);
+    }
+    else
+    {
+        hal_led_off(emsappl_ledorange);
+    }
+
+}
+#endif
 
 static hal_eth_frame_t * s_getframe(uint32_t size)
 {
