@@ -16,7 +16,7 @@ extern "C" {
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "EOmotorControl_hid.h"
+//#include "EOmotorControl_hid.h"
     
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
