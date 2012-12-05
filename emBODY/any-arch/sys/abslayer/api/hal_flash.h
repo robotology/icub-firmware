@@ -115,7 +115,7 @@ extern uint32_t hal_flash_get_baseaddress(void);
 
 /** @fn         extern uint32_t hal_flash_get_totalsize(void)
     @brief      Retrieves the size of the FLASH.
-    @return     256K on STM32F107.
+    @return     the size in bytes.
  **/
 extern uint32_t hal_flash_get_totalsize(void);
 

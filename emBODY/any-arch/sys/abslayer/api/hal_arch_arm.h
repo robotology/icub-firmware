@@ -47,6 +47,8 @@
 #define HAL_USE_ARCH_ARM
 #endif
 
+// -- HAL_HAS_ are macros used to include inside hal.h the proper includ files of the defined modules
+
 #define HAL_HAS_BASE
 #define HAL_HAS_CAN
 #define HAL_HAS_CRC
@@ -61,7 +63,7 @@
 #define HAL_HAS_TIMER
 #define HAL_HAS_TRACE
 #define HAL_HAS_WATCHDOG
-  
+
 
 // - external dependencies --------------------------------------------------------------------------------------------
 

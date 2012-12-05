@@ -164,6 +164,18 @@ typedef uint64_t    hal_abstime_t;
 typedef uint64_t    hal_nanotime_t;
 
 
+/** @typedef    typedef hal_result_t (*hal_res_fp_void_t) (void)
+    @brief      hal_res_fp_void_t is a pointer to a function which returns a hal_result_t and has a void argument.
+ **/
+typedef hal_result_t (*hal_res_fp_void_t) (void);
+
+
+/** @typedef    typedef hal_result_t (*hal_res_fp_voidp_t) (void)
+    @brief      hal_res_fp_voidp_t is a pointer to a function which returns a hal_result_t and has a void pointer argument.
+ **/
+typedef hal_result_t (*hal_res_fp_voidp_t) (void* p);
+
+
 /** @typedef    typedef void (*hal_void_fp_void_t) (void)
     @brief      hal_void_fp_void_t is a pointer to a function which returns void and has a void argument.
  **/
@@ -229,7 +241,7 @@ typedef struct
 {   
     hal_cpufamily_t cpu_family;                 /**< The CPU family: an enum hal_cpufamily_t                */
     hal_cputype_t   cpu_type;                   /**< The CPU type: an enum hal_cputype_t                    */
-    uint32_t        cpu_freq;                   /**< The CPU frequency in Hz                                */
+    uint32_t        cpu_freq;                   /**< The max CPU frequency in Hz                            */
     uint32_t        sys_stacksize;              /**< The size of stack available to the system in bytes     */
     uint32_t        sys_heapsize;               /**< The size of heap available to the system in bytes      */
     hal_boolval_t   display_enable;             /**< Enable of the display: 1 if enabled, 0 not             */
