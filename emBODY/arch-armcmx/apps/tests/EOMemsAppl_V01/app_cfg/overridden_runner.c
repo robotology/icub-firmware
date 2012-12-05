@@ -65,8 +65,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
+#ifdef MC_CAN_DEBUG
 extern int32_t encoder_can_pos;
 extern int32_t encoder_can_vel;
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -226,12 +228,12 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
    
 //following activities are independent on runmode
     
-    /*
+    #ifdef MC_CAN_DEBUG
     uint8_t payload[8];
     ((int32_t*)payload)[0]=encoder_can_pos;
     ((int32_t*)payload)[1]=encoder_can_vel;
     eo_appCanSP_SendMessage_TEST(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), payload);    
-    */
+    #endif
     
     res = eo_appCanSP_StartTransmitCanFrames(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1);
     if(eores_OK != res)
@@ -338,7 +340,7 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, in
 {
     eOresult_t 				err;
     eOresult_t 				res = eores_OK;
-		eOmeas_current_t  value;
+	eOmeas_current_t        value;
     eOicubCanProto_msgCommand_t msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,

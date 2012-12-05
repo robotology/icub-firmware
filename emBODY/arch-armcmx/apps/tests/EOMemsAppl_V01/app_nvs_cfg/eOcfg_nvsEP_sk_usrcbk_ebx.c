@@ -123,7 +123,7 @@ extern void eo_cfg_nvsEP_sk_hid_UPDT_sconfig__sigmode(uint16_t n, const EOnv* nv
             EO_INIT(.cmdId) ICUBCANPROTO_POL_SK_CMD__TACT_SETUP
         };
 
-        hal_led_on(hal_led2);
+//        hal_led_on(hal_led2);
         
         res = eo_appTheDB_GetSkinCanLocation(eo_appTheDB_GetHandle(), skId, &canLoc);
         if(eores_OK != res)

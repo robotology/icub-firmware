@@ -35,7 +35,7 @@
 #include "string.h"
 
 //hal
-//#include "hal.h"
+#include "hal.h"
 
 #include "eOcommon.h"
 #include "EOtheErrorManager.h"
@@ -97,6 +97,7 @@ static void s_eo_emsapplBody_measuresConverter_init(EOtheEMSapplBody *p);
 
 static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p);
 static eOresult_t s_eo_emsapplBody_getRunMode(EOtheEMSapplBody *p);
+static void s_eo_emsapplBody_leds_init(EOtheEMSapplBody *p);
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -128,7 +129,7 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOtheEMSappBody_cfg_t *
     
     retptr->appRunMode = applrunMode__default;
     
-//    s_eo_emsapplBody_leds_init(retptr);
+    s_eo_emsapplBody_leds_init(retptr);
     
     s_eo_emsapplBody_objs_init(retptr); //if a obj init doesn't success, it calls errorManager with fatal error
     eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, "obj-body inited OK");
@@ -219,22 +220,22 @@ extern EOappMeasConv* eo_emsapplBody_GetMeasuresConverterHandle(EOtheEMSapplBody
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-// static void s_eo_emsapplBody_leds_init(EOtheEMSapplBody *p)
-// {
-    // hal_led_cfg_t cfg = {.dummy=0};
+ static void s_eo_emsapplBody_leds_init(EOtheEMSapplBody *p)
+ {
+    hal_led_cfg_t cfg = {.dummy=0};
 
 // //    p->ledtimer = eo_timer_New();
     
     // hal_led_init(hal_led0, &cfg);
     // hal_led_off(hal_led0);
-    // hal_led_init(hal_led1, &cfg); //led green
-    // hal_led_off(hal_led1);
+    hal_led_init(hal_led1, &cfg); //led green
+    hal_led_off(hal_led1);
     // hal_led_init(hal_led2, &cfg);
     // hal_led_off(hal_led2);
     // hal_led_init(hal_led3, &cfg);
     // hal_led_off(hal_led3);
 
-// }
+ }
 
 static void s_eo_emsapplBody_objs_init(EOtheEMSapplBody *p)
 {
@@ -372,18 +373,20 @@ static void s_eo_emsapplBody_encodersReader_init(EOtheEMSapplBody *p)
 
 static void s_eo_emsapplBody_emsController_init(EOtheEMSapplBody *p)
 {
-    uint16_t i, numofjoint = 0;
+    //uint16_t i, numofjoint = 0;
     
     p->bodyobjs.emsController = eo_emsController_Init(p->cfg_ptr->emsControllerCfg.emsboard_type);
 
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != p->bodyobjs.emsController), 
                      s_eobj_ownname, "error in emsController_init");
     
+    /*
     numofjoint =  eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
     for(i=0; i<numofjoint; i++)
     {
         eo_emsController_AddAxis(i);
     }
+    */
 }
 
 
