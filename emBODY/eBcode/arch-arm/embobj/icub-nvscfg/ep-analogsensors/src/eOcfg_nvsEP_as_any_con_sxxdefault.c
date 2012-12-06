@@ -93,7 +93,7 @@ const eOsnsr_strain_t eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue =
             {
                 EO_INIT(.capacity)              12,
                 EO_INIT(.itemsize)              2,
-                EO_INIT(.size)                  12
+                EO_INIT(.size)                  0
             },
             EO_INIT(.data)                      {0}
         },
