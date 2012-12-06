@@ -100,7 +100,7 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOtheEMSappBody_cfg_t *
 
 extern EOtheEMSapplBody* eo_emsapplBody_GetHandle(void);
 
-extern eOtheEMSappBody_cfg_t* eo_emsapplBody_GetConfig(EOtheEMSapplBody *p);
+extern const eOtheEMSappBody_cfg_t* eo_emsapplBody_GetConfig(EOtheEMSapplBody *p);
 
 extern EOappTheDB* eo_emsapplBody_GetDataBaseHandle(EOtheEMSapplBody *p);
 

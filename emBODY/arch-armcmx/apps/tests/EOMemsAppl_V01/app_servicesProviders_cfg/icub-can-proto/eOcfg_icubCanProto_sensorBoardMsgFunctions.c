@@ -32,19 +32,14 @@
 #include "EOicubCanProto.h"
 #include "EOicubCanProto_specifications.h"
 #include "EOicubCanProto_hid.h"
-
-// #include "EoMotionControl.h"
-// #include "EOnv_hid.h"
-// #include "EOarray.h"
-
+#include "EOtheEMSApplBody.h"
 
 
 //icub api
 #include "EoSensors.h"
-#include "EOappTheDataBase.h"
-//nv-cfg
-// #include "eOcfg_nvsEP_as.h"
-// #include "eOcfg_nvsEP_sk.h"
+//to load occasional rop
+#include "eOcfg_nvsEP_as.h" 
+#include "EOMtheEMStransceiver.h"
 
 //#include "hal_debugPin.h"
 // --------------------------------------------------------------------------------------------------------------------
@@ -83,6 +78,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
+static eOresult_t s_loadFullscalelikeoccasionalrop(eOsnsr_strainId_t sId);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -191,11 +187,86 @@ extern eOresult_t eo_icubCanProto_former_pol_sb_cmd__setResolution(EOicubCanProt
 
 extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
+    uint8_t                                     channel;
+    eOresult_t                                  res;
+    eOappTheDB_sensorCanLocation_t              canLoc;
+    eOsnsr_strainId_t                           sId;
+    eOsnsr_strain_config_t                      *sconfig_ptr;
+    eOsnsr_strain_status_t                      *sstatus_ptr;
+    eOicubCanProto_msgDestination_t             msgdest;
+    eOicubCanProto_msgCommand_t                 msgCmd = 
+    {
+        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__GET_FULL_SCALES
+    };
+    
+    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+    
+    /* 1) get can location */
+    canLoc.emscanport = canPort;
+    canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+    
+    
+    res = eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), &canLoc, &sId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    /* 2) get signaloncefullscale, contained in strain config nv. */
+    res = eo_appTheDB_GetSnrStrainConfigPtr(eo_appTheDB_GetHandle(), sId,  &sconfig_ptr);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    if(!sconfig_ptr->signaloncefullscale)
+    {
+        //some error occured
+        return(eores_NOK_nodata);
+    }
+    
+    /* 3) get pointer to nv var where save incoming force values */
+    res = eo_appTheDB_GetSnrStrainStatusPtr(eo_appTheDB_GetHandle(), sId,  &sstatus_ptr);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    channel = (sstatus_ptr->fullscale.head.size/2); //la size e' espressa in byte. ogni canale insirsce un int16.
+    if(channel != frame->data[1])
+    {
+        //somithing wrong: befor i ask full scale for channel "channel" and i received channel for "frame.data[1]" 
+        return(eores_NOK_generic);
+    }
+    
+    memcpy(&(sstatus_ptr->uncalibratedvalues.data[sstatus_ptr->fullscale.head.size]), &(frame->data[2]), 2);
+ 
+    /* 4) if i received last channel's full scale i prepare a occasional rop to send
+          else request full scale of next channel */
+    if(5 == channel)
+    {
+        res = s_loadFullscalelikeoccasionalrop(sId);
+    }
+    else
+    {
+        channel++;
+        sstatus_ptr->fullscale.head.size += 2;
+        msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canLoc.addr); 
+        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &channel);
+    }
     return(eores_OK);
 }
 
+
 extern eOresult_t eo_icubCanProto_former_pol_sb_cmd__getFullScales(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
+    uint8_t *channel = (uint8_t*)val_ptr;
+    canFrame->id = ICUBCANPROTO_POL_SB_CREATE_ID(dest.s.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 2;
+    canFrame->data[0] = ICUBCANPROTO_POL_SB_CMD__GET_FULL_SCALES;
+    canFrame->data[1] = *channel;
+
     return(eores_OK);
 }
 
@@ -325,7 +396,6 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibForceVectorDebugmode
     eOresult_t                                  res;
     eOappTheDB_sensorCanLocation_t              canLoc;
     eOsnsr_strainId_t                           sId;
-    eOsnsr_strain_config_t                      *sconfig_ptr;
     eOsnsr_strain_status_t                      *sstatus_ptr;
 
     /* 1) get can location */
@@ -339,14 +409,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibForceVectorDebugmode
         return(res);
     }
 
-    /* 2) get strain transmission mode, contained in straion config nv.
-          (parsing depends on transmission mode)*/
-    res = eo_appTheDB_GetSnrStrainConfigPtr(eo_appTheDB_GetHandle(), sId,  &sconfig_ptr);
-    if(eores_OK != res)
-    {
-        return(res);
-    }
-    /* 3) get pointer to nv var where save incoming force values */
+    /* 1) get pointer to nv var where save incoming force values */
     res = eo_appTheDB_GetSnrStrainStatusPtr(eo_appTheDB_GetHandle(), sId,  &sstatus_ptr);
     if(eores_OK != res)
     {
@@ -363,7 +426,6 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibTorqueVectorDebugmod
     eOresult_t                                  res;
     eOappTheDB_sensorCanLocation_t              canLoc;
     eOsnsr_strainId_t                           sId;
-    eOsnsr_strain_config_t                      *sconfig_ptr;
     eOsnsr_strain_status_t                      *sstatus_ptr;
 
     /* 1) get can location */
@@ -377,14 +439,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibTorqueVectorDebugmod
         return(res);
     }
 
-    /* 2) get strain transmission mode, contained in straion config nv.
-          (parsing depends on transmission mode)*/
-    res = eo_appTheDB_GetSnrStrainConfigPtr(eo_appTheDB_GetHandle(), sId,  &sconfig_ptr);
-    if(eores_OK != res)
-    {
-        return(res);
-    }
-    /* 3) get pointer to nv var where save incoming force values */
+    /* 1) get pointer to nv var where save incoming force values */
     res = eo_appTheDB_GetSnrStrainStatusPtr(eo_appTheDB_GetHandle(), sId,  &sstatus_ptr);
     if(eores_OK != res)
     {
@@ -537,7 +592,35 @@ extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__tactSetup(EOicubCanProto* p
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+static eOresult_t s_loadFullscalelikeoccasionalrop(eOsnsr_strainId_t sId)
+{
+    eOresult_t res;
+    eo_transceiver_ropinfo_t ropinfo;
+    const eOtheEMSappBody_cfg_t* bodycfg = eo_emsapplBody_GetConfig(eo_emsapplBody_GetHandle());  
+    
+    if(NULL == bodycfg)
+    {
+        return(eores_NOK_generic);
+    }
+
+    //ropinfo.ropcfg contains the configuration for optional fields of a ROP.
+    ropinfo.ropcfg.confrqst = 0;
+    ropinfo.ropcfg.timerqst = 0;
+    ropinfo.ropcfg.plussign = 0;
+    ropinfo.ropcfg.plustime = 0;
+    
+    ropinfo.ropcode = eo_ropcode_sig;
+    
+    ropinfo.nvep = bodycfg->endpoints.as_endpoint;
+    
+    ropinfo.nvid = eo_cfg_nvsEP_as_strain_NVID_Get((eOcfg_nvsEP_as_endpoint_t)bodycfg->endpoints.as_endpoint, 
+                                               (eOcfg_nvsEP_as_strainNumber_t)sId, 
+                                               strainNVindex_sstatus__fullscale);
+    
+    res = eo_transceiver_rop_occasional_Load( eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()), &ropinfo); 
+
+    return(res);
+};
 
 
 // --------------------------------------------------------------------------------------------------------------------

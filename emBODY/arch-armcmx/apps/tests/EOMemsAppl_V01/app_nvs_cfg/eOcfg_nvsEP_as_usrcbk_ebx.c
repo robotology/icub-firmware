@@ -225,9 +225,12 @@ extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig__resolution(uint16_
 
 
 
-extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sstatus(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
+    uint8_t                             channel = 0;
+    eOresult_t                          res;
     eOicubCanProto_msgDestination_t     msgdest;
+    eOsnsr_strain_status_t              *sstatus_ptr;
     eOappTheDB_sensorCanLocation_t      canLoc;
     eOicubCanProto_msgCommand_t         msgCmd = 
     {
@@ -249,7 +252,21 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sstatus(uint16_t xx, cons
     msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__SET_CANDATARATE;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(straincfg->datarate));
     
-    #warning VALE-->fullscale della strain???
+    if(straincfg->signaloncefullscale)
+    {
+        //clear array in strainstatus
+        res = eo_appTheDB_GetSnrStrainStatusPtr(eo_appTheDB_GetHandle(), xx,  &sstatus_ptr);
+        if(eores_OK != res)
+        {
+            return;
+        }
+        
+        sstatus_ptr->fullscale.head.size = 0;
+        memset(&sstatus_ptr->fullscale.data[0], 0, 12);
+        channel = 0;
+        msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__GET_FULL_SCALES;
+        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &channel);
+    }
     
     /* Note: here i don't set head data of arrays in status, because they are init by constant default one strain 
     (see eOcfg_nvsEP_as_any_con_sxxdefault.c) */
@@ -285,6 +302,38 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig__datarate(uint16_
 	EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     
     eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, (eOsnsr_strainId_t)xx, msgCmd, (void*)straindatarate);
+}
+
+
+extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig__signaloncefullscale(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    uint8_t                     channel = 0;
+    eOresult_t                  res;
+    eOsnsr_strain_status_t      *sstatus_ptr;
+    eObool_t                    *signaloncefullscale = (eObool_t*)nv->loc;
+    eOicubCanProto_msgCommand_t msgCmd = 
+    {
+        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__GET_FULL_SCALES
+    };
+
+    if(*signaloncefullscale)
+    {
+        EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+        
+        //clear array in strainstatus
+        res = eo_appTheDB_GetSnrStrainStatusPtr(eo_appTheDB_GetHandle(), xx,  &sstatus_ptr);
+        if(eores_OK != res)
+        {
+            return;
+        }
+        
+        sstatus_ptr->fullscale.head.size = 0;
+        memset(&sstatus_ptr->fullscale.data[0], 0, 12);
+        channel = 0;
+        eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, xx, msgCmd, &channel);
+    }
+
 }
 
 // --------------------------------------------------------------------------------------------------------------------

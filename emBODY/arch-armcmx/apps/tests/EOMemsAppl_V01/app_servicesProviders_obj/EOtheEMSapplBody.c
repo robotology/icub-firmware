@@ -152,7 +152,14 @@ extern EOtheEMSapplBody* eo_emsapplBody_GetHandle(void)
     return((s_applBody.st == eo_emsApplBody_st__inited) ? (&s_applBody) : (NULL));
 }
 
-
+extern const eOtheEMSappBody_cfg_t* eo_emsapplBody_GetConfig(EOtheEMSapplBody *p)
+{
+    if(NULL == p)
+    {
+        return(NULL);
+    }
+    return(p->cfg_ptr);
+}
 extern EOappTheDB* eo_emsapplBody_GetDataBaseHandle(EOtheEMSapplBody *p)
 {
     if(NULL == p)
@@ -226,14 +233,14 @@ extern EOappMeasConv* eo_emsapplBody_GetMeasuresConverterHandle(EOtheEMSapplBody
 
 // //    p->ledtimer = eo_timer_New();
     
-    // hal_led_init(hal_led0, &cfg);
-    // hal_led_off(hal_led0);
+    hal_led_init(hal_led0, &cfg);
+    hal_led_off(hal_led0);
     hal_led_init(hal_led1, &cfg); //led green
     hal_led_off(hal_led1);
-    // hal_led_init(hal_led2, &cfg);
-    // hal_led_off(hal_led2);
-    // hal_led_init(hal_led3, &cfg);
-    // hal_led_off(hal_led3);
+    hal_led_init(hal_led2, &cfg);
+    hal_led_off(hal_led2);
+    hal_led_init(hal_led3, &cfg);
+    hal_led_off(hal_led3);
 
  }
 
