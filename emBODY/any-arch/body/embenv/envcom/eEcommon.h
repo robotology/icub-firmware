@@ -39,7 +39,7 @@
                                                       (((uint32_t)(ip3) << 16)&0x00ff0000) | \
                                                       (((uint32_t)(ip2) << 8)&0x0000ff00)  | \
                                                       (((uint32_t)(ip1) << 0)&0x000000ff) )
-#define EECOMMON_mac_oui_iit                        (0x0000000000332211)
+#define EECOMMON_mac_oui_iit                        (0x0000000000000002)//(0x0000000000332211)
 #define EECOMMON_ipaddr_base_iit                    EECOMMON_ipaddr_from(10, 0, 0, 0)
 #define EECOMMON_ipmask_default_iit                 EECOMMON_ipaddr_from(255, 255, 0, 0)
 
