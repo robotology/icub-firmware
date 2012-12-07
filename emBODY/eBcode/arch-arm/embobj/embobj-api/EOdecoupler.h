@@ -27,8 +27,6 @@ extern "C" {
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-#define IS_COUPLED(decoupler,joint,motor) IS_COUPLED_HID(decoupler,joint,motor)
-
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
  
@@ -38,15 +36,12 @@ extern "C" {
                 object so that the user cannot see its private fields and he/she is forced to manipulate the
                 object only with the proper public functions. 
  **/  
-typedef struct EOdecoupler_hid EOdecoupler;
+typedef struct EOmotors_hid EOmotors;
 
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
 
-extern float decoupler_shoulder_trq[4][4];
-extern float decoupler_shoulder_pwm[4][4];
-extern float decoupler_waist_pwm[4][4];
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
  
@@ -55,16 +50,13 @@ extern float decoupler_waist_pwm[4][4];
     @brief      Creates a new trajectory object 
     @return     The pointer to the required object.
  **/
-extern EOdecoupler* eo_decoupler_New(uint8_t dim, float matrix[4][4]);
+extern EOmotors* eo_motors_New(uint8_t nmotors);
 
-/* @fn         extern float eo_trajectory_Step(EOtrajectory *o)
-    @brief      Executes a trajectory step.
-    @param      o  The pointer to the trajectory object.
-    @return     The actual trajectory point value.
- **/
-extern void eo_decoupler_Mult(EOdecoupler *o, float *src, float *dst);
+extern void eo_motors_PWMs_Shoulder(EOmotors *o, int32_t *pwm_joint, int32_t *vel_joint, int16_t *pwm_motor);
+extern void eo_motors_PWMs_UpperLeg(EOmotors *o, int32_t *pwm_joint, int32_t *vel_motor, int16_t *pwm_motor);
+extern void eo_motors_PWMs_Ankle(EOmotors *o, int32_t *pwm_joint, int32_t *vel_motor, int16_t *pwm_motor);
+extern void eo_motors_PWMs_Waist(EOmotors *o, int32_t *pwm_joint, int32_t *vel_joint, int16_t *pwm_motor);
 
-extern uint8_t eo_decoupler_IsCoupled(EOdecoupler *o, uint8_t joint, uint8_t motor);
 
 /** @}            
     end of group eo_decopler  

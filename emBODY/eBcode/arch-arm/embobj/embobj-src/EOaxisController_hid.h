@@ -58,9 +58,12 @@ struct EOaxisController_hid
     EOpid *pidP;
     EOpid *pidT;
 
-    EOspeedmeter *speedmeter;
     EOtrajectory *trajectory;
 
+    int32_t enc_offset;
+    int32_t position;
+    int32_t velocity;
+    
     int32_t calib_timeout_ms;
     float   calib_max_error;
     float   reach_max_error;
