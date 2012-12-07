@@ -18,17 +18,24 @@ extern "C" {
 
 #include "EoCommon.h"
 
+#include "EOspeedmeter.h"
+#include "EOaxisController.h"
+    
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "EOdecoupler.h"
-#include "EOaxisController.h"
-
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
-#define MAX_MOTORS 4
+#define MAX_JOINTS 4
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
+
+typedef enum 
+{
+    EMS_ALL_OK  = 0,
+    EMS_PRUDENT = 1,
+    EMS_ALARM   = 2
+} EMSdefcon_t;
 
 /*  @struct     EOemsController_hid
     @brief      Hidden definition. Implements private data used only internally by the 
@@ -39,21 +46,17 @@ extern "C" {
 struct EOemsController_hid 
 {
     emsBoardType_t boardType;
-    
-    EOdecoupler *decoupler[3];
 
-    EOaxisController *axis_controller[MAX_MOTORS];
-
-    float torque_meas[MAX_MOTORS];
+    uint8_t n_joints;
     
-    int32_t enc_vel[MAX_MOTORS];
-
-    //float encoder_pos[MAX_MOTORS];
+    EMSdefcon_t defcon;
+    eObool_t is_coupled;
     
-    //float pos_ref[MAX_MOTORS];
-    //float vel_ref[MAX_MOTORS];
-    //float acc_ref[MAX_MOTORS];
-    //float trq_ref[MAX_MOTORS];
+    EOmotors         *motors;
+    EOspeedmeter     *enc_speedometer[MAX_JOINTS];
+    EOaxisController *axis_controller[MAX_JOINTS];
+   
+    //float torque_meas[MAX_MOTORS];
 }; 
 
 
