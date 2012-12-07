@@ -152,7 +152,7 @@ extern void hal_utility_fifo_init(hal_utility_fifo_t *fifo, uint8_t capacity, ui
         } break;
     }
     
-    if(NULL != iteminitval)
+    if((NULL != iteminitval) && (NULL != fifo->data))
     {
         uint8_t i = 0;
         for(i=0; i<fifo->capacity; i++)

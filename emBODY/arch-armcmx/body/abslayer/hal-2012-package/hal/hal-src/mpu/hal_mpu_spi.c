@@ -17,7 +17,7 @@
 */
 
 
-/* @file       hal_mpu_spi.c
+/* @file       hal_spi.c
     @brief      This header file implements internals of a generic hal spi module
     @author     marco.accame@iit.it
     @date       10/29/2012
@@ -38,9 +38,9 @@
 #include "hal_base_hid.h"
 #include "hal_mpu_gpio_hid.h"
 
-#include "utils/hal_tools.h"
 
-#include "hal_sys.h"
+#include "hal_utility_bits.h"
+#include "hal_utility_fifo.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -63,6 +63,10 @@
 #define HAL_spi_port2index(p)           ((uint8_t)(p))
 
 #define HAL_spi_port2stmSPI(p)          (s_hal_spi_stmSPImap[HAL_spi_port2index(p)])
+
+#define RXNE        0x01
+#define TXE         0x02
+#define BSY         0x80
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -98,8 +102,8 @@ typedef struct
     uint8_t             txcount;
     uint8_t*            rxframe;
     uint8_t             rxcount;
-    hal_tools_fifo_t    fifotx;
-    hal_tools_fifo_t    fiforx;
+    hal_utility_fifo_t  fifotx;
+    hal_utility_fifo_t  fiforx;
     uint8_t*            rxbuffer;
 } hal_spi_internals_t;
 
@@ -129,6 +133,7 @@ static void s_hal_spi_isr_disable(hal_spi_port_t port);
 static void s_hal_spi_enable(hal_spi_port_t port);
 static void s_hal_spi_disable(hal_spi_port_t port);
 
+static hal_result_t s_hal_spi_timeoutexpired(void);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -147,13 +152,14 @@ static const SPI_InitTypeDef   s_hal_spi_stm32_cfg =
     .SPI_Mode                       = SPI_Mode_Master,                              // param
     .SPI_DataSize                   = SPI_DataSize_8b,
     .SPI_CPOL                       = SPI_CPOL_High,
-    .SPI_CPHA                       = SPI_CPHA_1Edge,
+    .SPI_CPHA                       = SPI_CPHA_2Edge,
     .SPI_NSS                        = SPI_NSS_Soft,
     .SPI_BaudRatePrescaler          = SPI_BaudRatePrescaler_2,                      // param: depends on speed
     .SPI_FirstBit                   = SPI_FirstBit_MSB,
     .SPI_CRCPolynomial              = 0x0007 // reset value
 };
 
+#warning --> display usa SPI_CPHA_2Edge ma prima avevo messo SPI_CPHA_1Edge
 
 #if     defined(USE_STM32F1)
 static SPI_TypeDef* const s_hal_spi_stmSPImap[] = { SPI1, SPI2, SPI3 };
@@ -163,7 +169,7 @@ static SPI_TypeDef* const s_hal_spi_stmSPImap[] = { SPI1, SPI2, SPI3 };
 
 static const uint32_t s_hal_spi_hw_rcc[] = { RCC_APB2Periph_SPI1, RCC_APB1Periph_SPI2, RCC_APB1Periph_SPI3 };
 
-
+static const uint32_t s_hal_spi_timeout_flag = 0x00010000;
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -174,6 +180,50 @@ extern hal_result_t hal_spi_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg)
     return(s_hal_spi_init(port, cfg));
 }
 
+extern hal_result_t hal_spi_write(hal_spi_port_t port, uint8_t byte, uint8_t* readbyte)
+{
+    volatile uint32_t timeout = 0;
+    SPI_TypeDef* SPIx = NULL;
+    
+    if(hal_false == hal_spi_hid_initted_is(port))
+    {
+        return(hal_res_NOK_generic);
+    }
+    
+    SPIx = HAL_spi_port2stmSPI(port);      
+    
+    SPI_I2S_SendData(SPIx, byte);
+    
+    timeout = s_hal_spi_timeout_flag;
+    // o RESET ?
+    //    while (!(SPI3->SR & RXNE));           /* Wait for send to finish            */ 
+
+    while(RESET == SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_RXNE))
+    {
+        if(0 == (timeout--)) s_hal_spi_timeoutexpired();
+    }  
+    
+    uint8_t rb = SPI_I2S_ReceiveData(SPIx);
+
+    if(NULL != readbyte)   
+    {
+        *readbyte = rb;
+    }        
+   
+    return(hal_res_OK);     
+}
+
+extern hal_result_t hal_spi_read(hal_spi_port_t port, uint8_t* byte)
+{
+    if(hal_false == hal_spi_hid_initted_is(port))
+    {
+        return(hal_res_NOK_generic);
+    }
+
+    *byte = 0;
+    
+    return (hal_res_OK);       
+}
 
 
 
@@ -285,7 +335,7 @@ void SPI1_IRQHandler(void)
             }
             if(hal_false == spi1int->forcestop)
             {
-                spi1int->txframe = hal_tools_fifo_front(&spi1int->fifotx);
+                spi1int->txframe =  hal_utility_fifo_front(&spi1int->fifotx);
                 spi1int->txcount = 0;
             }
         }
@@ -302,7 +352,7 @@ void SPI1_IRQHandler(void)
             if(spi1int->txcount == spi1int->config.sizeoftxframe)
             {   // it is the last byte in the frame ...
                 
-                hal_tools_fifo_pop(&spi1int->fifotx);
+                 hal_utility_fifo_pop(&spi1int->fifotx);
                 lastbyteofframeisintransmission = hal_true;
                 
                 spi1int->txframe = NULL;
@@ -349,7 +399,7 @@ void SPI2_IRQHandler(void)
             
             //if(hal_false == spi2int->forcestoprx)
             //{
-                spi2int->rxframe = (hal_true == hal_tools_fifo_full(&spi2int->fiforx)) ? (NULL) : (spi2int->rxbuffer);
+                spi2int->rxframe = (hal_true ==  hal_utility_fifo_full(&spi2int->fiforx)) ? (NULL) : (spi2int->rxbuffer);
                 spi2int->rxcount = 0;
             //}
         }  
@@ -366,7 +416,7 @@ void SPI2_IRQHandler(void)
             if(spi2int->rxcount == spi2int->config.sizeofrxframe)
             {   // it is the last byte in the frame ...
                 
-                hal_tools_fifo_put(&spi2int->fiforx, spi2int->rxframe);
+                 hal_utility_fifo_put(&spi2int->fiforx, spi2int->rxframe);
                 lastbyteofframeisreceived = hal_true;
                 
                 spi2int->rxframe = NULL;
@@ -404,7 +454,7 @@ void SPI2_IRQHandler(void)
             }
             if(hal_false == spi2int->forcestop)
             {
-                spi2int->txframe = hal_tools_fifo_front(&spi2int->fifotx);
+                spi2int->txframe =  hal_utility_fifo_front(&spi2int->fifotx);
                 spi2int->txcount = 0;
             }
         }
@@ -421,7 +471,7 @@ void SPI2_IRQHandler(void)
             if(spi2int->txcount == spi2int->config.sizeoftxframe)
             {   // it is the last byte in the frame ...
                 
-                hal_tools_fifo_pop(&spi2int->fifotx);
+                 hal_utility_fifo_pop(&spi2int->fifotx);
                 lastbyteofframeisintransmission = hal_true;
                 
                 spi2int->txframe = NULL;
@@ -465,7 +515,7 @@ void SPI3_IRQHandler(void)
             }
             if(hal_false == spi3int->forcestop)
             {
-                spi3int->txframe = hal_tools_fifo_front(&spi3int->fifotx);
+                spi3int->txframe =  hal_utility_fifo_front(&spi3int->fifotx);
                 spi3int->txcount = 0;
             }
         }
@@ -482,7 +532,7 @@ void SPI3_IRQHandler(void)
             if(spi3int->txcount == spi3int->config.sizeoftxframe)
             {   // it is the last byte in the frame ...
                 
-                hal_tools_fifo_pop(&spi3int->fifotx);
+                 hal_utility_fifo_pop(&spi3int->fifotx);
                 lastbyteofframeisintransmission = hal_true;
                 
                 spi3int->txframe = NULL;
@@ -550,7 +600,7 @@ extern hal_boolval_t hal_spi_hid_initted_is(hal_spi_port_t port)
 
 static hal_boolval_t s_hal_spi_supported_is(hal_spi_port_t port)
 {
-    return(hal_base_hid_byte_bitcheck(hal_brdcfg_spi__supported_mask, HAL_spi_port2index(port)) );
+    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_spi__theconfig.supported_mask, HAL_spi_port2index(port)) );
 }
 
 static void s_hal_spi_initted_set(hal_spi_port_t port)
@@ -597,15 +647,20 @@ static hal_result_t s_hal_spi_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg
     s_hal_spi_hw_gpio_init(port);
     s_hal_spi_hw_init(port);
     s_hal_spi_hw_enable(port, cfg);
-    s_hal_spi_isr_enable(port);
+    
+    if(hal_spi_act_singleframe == cfg->activity)
+    {
+        s_hal_spi_isr_enable(port);
+    }
         
     
     s_hal_spi_initted_set(port);
     
     memcpy(&s_hal_spi_internals[HAL_spi_port2index(port)].config, cfg, sizeof(hal_spi_cfg_t));
     
-    hal_tools_fifo_init(&s_hal_spi_internals[HAL_spi_port2index(port)].fifotx, cfg->sizeoftxfifoofframes, cfg->sizeoftxframe, calloc(cfg->sizeoftxfifoofframes*cfg->sizeoftxframe, 1));
-    hal_tools_fifo_init(&s_hal_spi_internals[HAL_spi_port2index(port)].fiforx, cfg->sizeofrxfifoofframes, cfg->sizeofrxframe, calloc(cfg->sizeofrxfifoofframes*cfg->sizeofrxframe, 1));
+    #warning --> remove teh calloc from here 
+    hal_utility_fifo_init(&s_hal_spi_internals[HAL_spi_port2index(port)].fifotx, cfg->sizeoftxfifoofframes, cfg->sizeoftxframe, calloc(cfg->sizeoftxfifoofframes*cfg->sizeoftxframe, 1), NULL);
+    hal_utility_fifo_init(&s_hal_spi_internals[HAL_spi_port2index(port)].fiforx, cfg->sizeofrxfifoofframes, cfg->sizeofrxframe, calloc(cfg->sizeofrxfifoofframes*cfg->sizeofrxframe, 1), NULL);
     
     s_hal_spi_internals[HAL_spi_port2index(port)].rxbuffer =  calloc(cfg->sizeofrxframe, 1);
     s_hal_spi_internals[HAL_spi_port2index(port)].txframe = NULL;
@@ -625,20 +680,46 @@ static void s_hal_spi_hw_init(hal_spi_port_t port)
 
     //uint32_t RCC_APB1Periph_SPIx = (hal_spi_port1 == port) ? (RCC_APB1Periph_SPI1) : (RCC_APB1Periph_SPI2); RCC_APB1Periph_SPI3
     
-    uint32_t RCC_APB1Periph_SPIx = s_hal_spi_hw_rcc[HAL_spi_port2index(port)];
+   
     
-//    // system configuration controller clock
-    #warning --> in stm32f4 removed "RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);" from spi_hw_init() and it still works....
-//    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
     
-    // spi periph clock enable
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPIx, ENABLE);
+    if(hal_spi_port1 == port)
+    {
+        // spi periph clock enable
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
+        
+        // reset spi periph
+        RCC_APB2PeriphResetCmd(RCC_APB2Periph_SPI1, ENABLE);
+        
+        // release reset 
+        RCC_APB2PeriphResetCmd(RCC_APB2Periph_SPI1, DISABLE);        
+    }
+    else
+    {
+         uint32_t RCC_APB1Periph_SPIx = s_hal_spi_hw_rcc[HAL_spi_port2index(port)];
+        
+        // spi periph clock enable
+        RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPIx, ENABLE);
+        
+        // reset spi periph
+        RCC_APB1PeriphResetCmd(RCC_APB1Periph_SPIx, ENABLE);
+        
+        // release reset 
+        RCC_APB1PeriphResetCmd(RCC_APB1Periph_SPIx, DISABLE);        
+    }
     
-    // reset spi periph
-    RCC_APB1PeriphResetCmd(RCC_APB1Periph_SPIx, ENABLE);
-    
-    // release reset 
-    RCC_APB1PeriphResetCmd(RCC_APB1Periph_SPIx, DISABLE);
+// //    // system configuration controller clock
+     #warning --> in stm32f4 removed "RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);" from spi_hw_init() and it still works....
+// //    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+//     
+//     // spi periph clock enable
+//     RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPIx, ENABLE);
+//     
+//     // reset spi periph
+//     RCC_APB1PeriphResetCmd(RCC_APB1Periph_SPIx, ENABLE);
+//     
+//     // release reset 
+//     RCC_APB1PeriphResetCmd(RCC_APB1Periph_SPIx, DISABLE);
 
 #endif
 }
@@ -649,12 +730,20 @@ static void s_hal_spi_hw_gpio_init(hal_spi_port_t port)
     
 #if     defined(USE_STM32F1)
 
-    static const GPIO_InitTypeDef  s_hal_spi_misomosisck_altcfg  =
+    static const GPIO_InitTypeDef  s_hal_spi_sckmosi_altcfg  =
     {
         .GPIO_Pin       = 0,
         .GPIO_Speed     = GPIO_Speed_50MHz,
-        .GPIO_Mode      = GPIO_Mode_AF_OD,
+        .GPIO_Mode      = GPIO_Mode_AF_PP, // il PP serve per spi del display3 .... GPIO_Mode_AF_OD,
     }; 
+
+    static const GPIO_InitTypeDef  s_hal_spi_miso_altcfg  =
+    {
+        .GPIO_Pin       = 0,
+        .GPIO_Speed     = GPIO_Speed_50MHz,
+        .GPIO_Mode      = GPIO_Mode_IPD, // oppure ... GPIO_Mode_IPU?
+    };     
+    
 
     // 1. prepare af.
     // for spi1 (miso, mosi): no-remap if it is (PB6, PB7). GPIO_Remap_SPI1 if it is (PB8, PB9).
@@ -664,28 +753,41 @@ static void s_hal_spi_hw_gpio_init(hal_spi_port_t port)
     hal_bool_t found = hal_false;
 
     
-    hal_gpio_port_t portmiso = hal_brdcfg_spi__miso[HAL_spi_port2index(port)].port;
-    hal_gpio_pin_t  pinmiso  = hal_brdcfg_spi__miso[HAL_spi_port2index(port)].pin;
-    hal_gpio_port_t portmosi = hal_brdcfg_spi__mosi[HAL_spi_port2index(port)].port;
-    hal_gpio_pin_t  pinmosi  = hal_brdcfg_spi__mosi[HAL_spi_port2index(port)].pin;    
+    hal_gpio_port_t portmiso = hal_brdcfg_spi__theconfig.gpio_miso[HAL_spi_port2index(port)].port;
+    hal_gpio_pin_t  pinmiso  = hal_brdcfg_spi__theconfig.gpio_miso[HAL_spi_port2index(port)].pin;
+    hal_gpio_port_t portmosi = hal_brdcfg_spi__theconfig.gpio_mosi[HAL_spi_port2index(port)].port;
+    hal_gpio_pin_t  pinmosi  = hal_brdcfg_spi__theconfig.gpio_mosi[HAL_spi_port2index(port)].pin;    
+    hal_gpio_port_t portsck  = hal_brdcfg_spi__theconfig.gpio_sck[HAL_spi_port2index(port)].port;
+    hal_gpio_pin_t  pinsck   = hal_brdcfg_spi__theconfig.gpio_sck[HAL_spi_port2index(port)].pin;       
     
     if(hal_spi_port1 == port)
     {        
-        if((hal_gpio_portB == portmiso) && (hal_gpio_portB == portmosi) && (hal_gpio_pin6 == pinmiso) && (hal_gpio_pin7 == pinmosi))
+       if((hal_gpio_portA == portmiso) && (hal_gpio_portA == portmosi) && (hal_gpio_portA == portsck) && (hal_gpio_pin6 == pinmiso) && (hal_gpio_pin7 == pinmosi) && (hal_gpio_pin5 == pinsck))
         {
             afname = HAL_GPIO_AFNAME_NONE;  afmode = HAL_GPIO_AFMODE_NONE;      found = hal_true;
         }
-        if((hal_gpio_portB == portmiso) && (hal_gpio_portB == portmosi) && (hal_gpio_pin8 == pinmiso) && (hal_gpio_pin9 == pinmosi))
+        else if((hal_gpio_portB == portmiso) && (hal_gpio_portB == portmosi) && (hal_gpio_portB == portsck) && (hal_gpio_pin4 == pinmiso) && (hal_gpio_pin5 == pinmosi) && (hal_gpio_pin3 == pinsck))
         {
             afname = GPIO_Remap_SPI1;       afmode = ENABLE;                    found = hal_true;
-        }            
+        }               
     }
     else if(hal_spi_port2 == port)
     {
-        if((hal_gpio_portB == portmiso) && (hal_gpio_portB == portmosi) && (hal_gpio_pin10 == pinmiso) && (hal_gpio_pin11 == pinmosi))
+        if((hal_gpio_portB == portmiso) && (hal_gpio_portB == portmosi) && (hal_gpio_portB == portsck) && (hal_gpio_pin14 == pinmiso) && (hal_gpio_pin15 == pinmosi) && (hal_gpio_pin13 == pinsck))
         {
             afname = HAL_GPIO_AFNAME_NONE;  afmode = HAL_GPIO_AFMODE_NONE;      found = hal_true;
-        }  
+        }        
+    }
+    else if(hal_spi_port3 == port)
+    {
+        if((hal_gpio_portB == portmiso) && (hal_gpio_portB == portmosi) && (hal_gpio_portB == portsck) && (hal_gpio_pin4 == pinmiso) && (hal_gpio_pin5 == pinmosi) && (hal_gpio_pin3 == pinsck))
+        {
+            afname = HAL_GPIO_AFNAME_NONE;  afmode = HAL_GPIO_AFMODE_NONE;      found = hal_true;
+        }
+        else if((hal_gpio_portC == portmiso) && (hal_gpio_portC == portmosi) && (hal_gpio_portC == portsck) && (hal_gpio_pin11 == pinmiso) && (hal_gpio_pin12 == pinmosi) && (hal_gpio_pin10 == pinsck))
+        {
+            afname = GPIO_Remap_SPI3;       afmode = ENABLE;                    found = hal_true;
+        }       
     }
     
     if(hal_false == found)
@@ -695,17 +797,19 @@ static void s_hal_spi_hw_gpio_init(hal_spi_port_t port)
 
     hal_gpio_altcfg_t hal_spi_miso_altcfg;
     hal_gpio_altcfg_t hal_spi_mosi_altcfg;
+    hal_gpio_altcfg_t hal_spi_sck_altcfg;
     
-    // prepare the altcfg for miso and mosi pins
-    memcpy(&hal_spi_miso_altcfg, &s_hal_spi_misomosisck_altcfg, sizeof(hal_gpio_altcfg_t));
-    memcpy(&hal_spi_mosi_altcfg, &s_hal_spi_misomosisck_altcfg, sizeof(hal_gpio_altcfg_t));
-    hal_spi_miso_altcfg.afname = hal_spi_mosi_altcfg.afname = afname;
-    hal_spi_miso_altcfg.afmode = hal_spi_mosi_altcfg.afmode = afmode;
+    // prepare the altcfg for miso, mosi, sck pins
+    memcpy(&hal_spi_miso_altcfg, &s_hal_spi_miso_altcfg, sizeof(hal_gpio_altcfg_t));
+    memcpy(&hal_spi_mosi_altcfg, &s_hal_spi_sckmosi_altcfg, sizeof(hal_gpio_altcfg_t));
+    memcpy(&hal_spi_sck_altcfg, &s_hal_spi_sckmosi_altcfg, sizeof(hal_gpio_altcfg_t));
+    hal_spi_miso_altcfg.afname = hal_spi_mosi_altcfg.afname = hal_spi_sck_altcfg.afname = afname;
+    hal_spi_miso_altcfg.afmode = hal_spi_mosi_altcfg.afmode = hal_spi_sck_altcfg.afname = afmode;
     
-    // configure miso and mosi pins
-    hal_gpio_configure(hal_brdcfg_spi__miso[HAL_spi_port2index(port)], &hal_spi_miso_altcfg);    
-    hal_gpio_configure(hal_brdcfg_spi__mosi[HAL_spi_port2index(port)], &hal_spi_mosi_altcfg);
-
+    // configure miso, mosi, sck pins
+    hal_gpio_configure(hal_brdcfg_spi__theconfig.gpio_miso[HAL_spi_port2index(port)], &hal_spi_miso_altcfg);    
+    hal_gpio_configure(hal_brdcfg_spi__theconfig.gpio_mosi[HAL_spi_port2index(port)], &hal_spi_mosi_altcfg);
+    hal_gpio_configure(hal_brdcfg_spi__theconfig.gpio_sck[HAL_spi_port2index(port)], &hal_spi_sck_altcfg);
 
 #elif   defined(USE_STM32F4)    
 
@@ -847,8 +951,9 @@ static void s_hal_spi_hw_enable(hal_spi_port_t port, const hal_spi_cfg_t* cfg)
     // apply the mode
     spi_cfg.SPI_Mode                = (hal_spi_ownership_master == cfg->ownership) ? (SPI_Mode_Master) : (SPI_Mode_Slave);    
     // from SPI_BaudRatePrescaler_2 to SPI_BaudRatePrescaler_128
-    #warning --> SPI_BaudRatePrescaler must be configured. it depends on chosen speed and on the speed of teh bus of spi1, 2, and 3 
-    spi_cfg.SPI_BaudRatePrescaler   = (hal_spi_port1 == port) ? SPI_BaudRatePrescaler_128 : SPI_BaudRatePrescaler_256;
+    #warning --> SPI_BaudRatePrescaler must be configured. it depends on chosen speed and on the speed of the bus of spi1, 2, and 3 
+    #warning --> IT IS OK ONLY FOR SPI3 at 18 MBPS
+    spi_cfg.SPI_BaudRatePrescaler   = SPI_BaudRatePrescaler_2;
  
     SPI_Init(SPIx, &spi_cfg);
     
@@ -925,7 +1030,7 @@ static hal_result_t s_hal_spi_put(hal_spi_port_t port, uint8_t* txframe, uint8_t
  
     // disable so that we can change a data structure which is used by the isr
     s_hal_spi_disable(port);
-    res = hal_tools_fifo_put(&s_hal_spi_internals[HAL_spi_port2index(port)].fifotx, txframe);
+    res =  hal_utility_fifo_put(&s_hal_spi_internals[HAL_spi_port2index(port)].fifotx, txframe);
     
     if(hal_true == sendnow)
     {
@@ -964,6 +1069,7 @@ static void s_hal_spi_isr_disable(hal_spi_port_t port)
     IRQn_Type IRQn = (hal_spi_port1 == port) ? (SPI1_IRQn) : ( (hal_spi_port2 == port) ? (SPI2_IRQn) : (SPI3_IRQn) );
     hal_sys_irqn_disable(IRQn);
 }
+
 
 
 #endif//HAL_USE_SPI

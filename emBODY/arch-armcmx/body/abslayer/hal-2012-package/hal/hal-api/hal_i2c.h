@@ -29,7 +29,7 @@
     @date       10/23/2012
 **/
 
-/** @defgroup arm_hal_i2c HAL I2C
+/** @defgroup doxy_group_hal_i2c HAL I2C
 
     The HAL I2C is a high level module whcih manages i2c communication
  
@@ -225,7 +225,7 @@ extern hal_result_t hal_i2c_standby(hal_i2c_port_t port, hal_i2c_devaddr_t devad
 
 
 /** @}            
-    end of group arm_hal_i2c  
+    end of group doxy_group_hal_i2c  
  **/
 
 #endif  // include-guard

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author: Valentina Gaggero, Marco Accame
  * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
@@ -29,7 +29,7 @@
     @date       09/16/2011
 **/
 
-/** @defgroup hal_arch_cfg_generic HAL ARCH CFG GENERIC
+/** @defgroup doxy_group_hal_arch_cfg HAL ARCH CFG GENERIC
 
     cecece
  
@@ -80,7 +80,7 @@ typedef hal_arch_none_cfg_t     hal_arch_cfg_t;
 
 
 /** @}            
-    end of group hal_arch_cfg_generic  
+    end of group doxy_group_hal_arch_cfg  
  **/
 
 #endif  // include-guard

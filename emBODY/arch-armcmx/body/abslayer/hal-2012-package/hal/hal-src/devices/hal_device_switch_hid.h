@@ -35,7 +35,7 @@
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_device_switch.h"
+#include "hal_switch.h"
 
 
 

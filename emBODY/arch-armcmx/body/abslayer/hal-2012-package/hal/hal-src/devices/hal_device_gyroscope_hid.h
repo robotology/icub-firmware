@@ -17,12 +17,12 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_STM32_SENSOR_GYRO_HID_H_
-#define _HAL_STM32_SENSOR_GYRO_HID_H_
+#ifndef _HAL_DEVICE_GYROSCOPE_HID_H_
+#define _HAL_DEVICE_GYROSCOPE_HID_H_
 
 
-/* @file       hal_stm32_sensor_gyro_hid.h
-    @brief      This header file implements hidden interface to crc
+/* @file       hal_device_gyroscope_hid.h
+    @brief      This header file implements hidden interface to a gyroscope
     @author     marco.accame@iit.it
     @date       10/24/2012
  **/
@@ -36,7 +36,7 @@
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_sensor_gyro.h"
+#include "hal_gyroscope.h"
 
 
 
@@ -46,35 +46,35 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef hal_result_t (*hal_sensor_gyro_hid_fn_read_t) (int32_t*, int32_t*, int32_t*);
+typedef hal_result_t (*hal_device_gyroscope_hid_fn_read_t) (int32_t*, int32_t*, int32_t*);
 
 typedef struct
 {   
-    hal_res_fp_voidp_t                      init;
-    void*                                   initpar;
-    hal_sensor_gyro_hid_fn_read_t           read;
-} hal_sensor_gyro_hid_chip_interface_t;
+    hal_res_fp_voidp_t                          init;
+    void*                                       initpar;
+    hal_device_gyroscope_hid_fn_read_t          read;
+} hal_device_gyroscope_hid_chip_interface_t;
 
 
 typedef struct
 {   
-    hal_sensor_gyro_hid_chip_interface_t    chipif;
-} hal_sensor_gyro_hid_dev_cfg_t;
+    hal_device_gyroscope_hid_chip_interface_t   chipif;
+} hal_device_gyroscope_hid_dev_cfg_t;
 
 typedef struct
 {
-    uint8_t                                 supported_mask;
-    hal_sensor_gyro_hid_dev_cfg_t           devcfg[hal_sensor_gyros_number];
-} hal_sensor_gyro_hid_brdcfg_t;
+    uint8_t                                     supported_mask;
+    hal_device_gyroscope_hid_dev_cfg_t          devcfg[hal_gyroscope_ports_number];
+} hal_device_gyroscope_hid_brdcfg_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 // empty-section
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern uint32_t hal_sensor_gyro_hid_getsize(const hal_cfg_t *cfg);
+extern uint32_t hal_device_gyroscope_hid_getsize(const hal_cfg_t *cfg);
 
-extern hal_result_t hal_sensor_gyro_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory);
+extern hal_result_t hal_device_gyroscope_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory);
 
 
 #endif  // include guard

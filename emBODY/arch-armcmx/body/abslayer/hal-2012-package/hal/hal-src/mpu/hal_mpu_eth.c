@@ -39,7 +39,7 @@
 #include "hal_base_hid.h" 
 #include "hal_mpu_sys_hid.h"
 #include "hal_brdcfg.h"
-//#include "hal_switch.h"
+#include "hal_ethtransceiver.h"
 
 #include "hal_mpu_gpio_hid.h"
 
@@ -465,9 +465,9 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     // in here we allow a specific board to init all what is related to the phy.
     // in case of a phy accessed through the smi, this function must: a. init the smi, b. reset the phy, ... that's it.
     // instead in case of a switch accessed through i2c, this function must: a. init the i2c, reset the switch, that's it.    
-    if(hal_res_NOK_generic == hal_device_ethtransceiver_init(NULL))
+    if(hal_res_NOK_generic == hal_ethtransceiver_init(NULL))
     {
-         hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() called hal_device_ethtransceiver_init() which failed");
+         hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() called hal_ethtransceiver_init() which failed");
     }        
     
   
@@ -482,12 +482,12 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     // in case of a phy accessed through the smi, this function must set the mode and the speed and return the result
     // instead in case of a switch accessed through i2c, this function must configure mode and speed and put the swicth operative. 
 
-    hal_device_ethtransceiver_config(hal_eth_phymode_auto, &usedphymode);
+    hal_ethtransceiver_config(hal_eth_phymode_auto, &usedphymode);
     
     
     if(hal_eth_phymode_none == usedphymode)
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() called hal_device_ethtransceiver_config() which does not support a phy mode");
+        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() called hal_ethtransceiver_config() which does not support a phy mode");
     }
     
     // for rmii we use the same config at the phy ...

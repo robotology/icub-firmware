@@ -349,7 +349,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>VERY_SMALL STM32F10X_CL HAL_MPU_STM32F107 HAL_USE_ARCH_ARM HAL_BOARD_MCBSTM32C</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\hal\hal-api;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc;..\..\hal\hal-src\base;..\..\hal\hal-src\brdcfg;..\..\hal\hal-src\chips;..\..\hal\hal-src\devices;..\..\hal\hal-src\mpu;..\..\hal\hal-src\utilities;..\..\..\..\..\..\arch-armcmx</IncludePath>
+              <IncludePath>..\..\hal\hal-api;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc;..\..\hal\hal-src\base;..\..\hal\hal-src\brdcfg;..\..\hal\hal-src\chips;..\..\hal\hal-src\devices;..\..\hal\hal-src\extbrds;..\..\hal\hal-src\mpu;..\..\hal\hal-src\utilities;..\..\..\..\..\..\arch-armcmx</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -521,9 +521,9 @@
           <GroupName>hal-devices</GroupName>
           <Files>
             <File>
-              <FileName>hal_actuator_led.c</FileName>
+              <FileName>hal_device_accelerometer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_actuator_led.c</FilePath>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_accelerometer.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_cantransceiver.c</FileName>
@@ -546,24 +546,24 @@
               <FilePath>..\..\hal\hal-src\devices\hal_device_ethtransceiver.c</FilePath>
             </File>
             <File>
+              <FileName>hal_device_gyroscope.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_gyroscope.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_led.c</FilePath>
+            </File>
+            <File>
               <FileName>hal_device_switch.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\devices\hal_device_switch.c</FilePath>
             </File>
             <File>
-              <FileName>hal_sensor_accel.c</FileName>
+              <FileName>hal_device_termometer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_sensor_accel.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_sensor_gyro.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_sensor_gyro.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_sensor_temp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_sensor_temp.c</FilePath>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_termometer.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -594,6 +594,16 @@
               <FileName>hal_chip_xx_eeprom.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\chips\hal_chip_xx_eeprom.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-extbrd</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_extbrd_keil_mcbqvga.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\extbrds\hal_extbrd_keil_mcbqvga.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1179,9 +1189,9 @@
           <GroupName>hal-devices</GroupName>
           <Files>
             <File>
-              <FileName>hal_actuator_led.c</FileName>
+              <FileName>hal_device_accelerometer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_actuator_led.c</FilePath>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_accelerometer.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_cantransceiver.c</FileName>
@@ -1204,24 +1214,24 @@
               <FilePath>..\..\hal\hal-src\devices\hal_device_ethtransceiver.c</FilePath>
             </File>
             <File>
+              <FileName>hal_device_gyroscope.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_gyroscope.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_led.c</FilePath>
+            </File>
+            <File>
               <FileName>hal_device_switch.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\devices\hal_device_switch.c</FilePath>
             </File>
             <File>
-              <FileName>hal_sensor_accel.c</FileName>
+              <FileName>hal_device_termometer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_sensor_accel.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_sensor_gyro.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_sensor_gyro.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_sensor_temp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_sensor_temp.c</FilePath>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_termometer.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1252,6 +1262,16 @@
               <FileName>hal_chip_xx_eeprom.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\chips\hal_chip_xx_eeprom.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-extbrd</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_extbrd_keil_mcbqvga.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\extbrds\hal_extbrd_keil_mcbqvga.c</FilePath>
             </File>
           </Files>
         </Group>

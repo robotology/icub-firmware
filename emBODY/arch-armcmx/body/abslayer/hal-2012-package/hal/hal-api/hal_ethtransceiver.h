@@ -18,20 +18,20 @@
            
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _HAL_DEVICE_CANTRANSCEIVER_H_
-#define _HAL_DEVICE_CANTRANSCEIVER_H_
+#ifndef _HAL_ETHTRANSCEIVER_H_
+#define _HAL_ETHTRANSCEIVER_H_
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/** @file       hal_device_cantransceiver.h
-    @brief      This header file implements public interface to the hal cantransceiver module.
+/** @file       hal_ethtransceiver.h
+    @brief      This header file implements public interface to the hal ethtransceiver module.
     @author     valentina.gaggero@iit.it, marco.accame@iit.it
     @date       10/18/2011
 **/
 
-/** @defgroup arm_hal_device_cantransceiver HAL CANTRANSCEIVER
+/** @defgroup arm_hal_ethtransceiver HAL ETHTRANSCEIVER
 
-    The HAL CANTRANSCEIVER ....
+    The HAL ETHTRANSCEIVER ....
  
     @todo acemor-facenda: review documentation.
     
@@ -41,7 +41,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 #include "hal_base.h"
-#include "hal_can.h"
+#include "hal_eth.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -49,43 +49,42 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-/** @typedef    typedef struct hal_device_cantransceiver_cfg_t;
-    @brief      contains configuration data of cantransceiver.
+/** @typedef    typedef struct hal_ethtransceiver_cfg_t;
+    @brief      contains configuration data of ethtransceiver.
  **/
 typedef struct
 {
     uint8_t dummy;          /**< dummy...     */
-} hal_device_cantransceiver_cfg_t;
+} hal_ethtransceiver_cfg_t;
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const hal_device_cantransceiver_cfg_t hal_device_cantransceiver_cfg_default;   // = { .dummy = 0};
+extern const hal_ethtransceiver_cfg_t hal_ethtransceiver_cfg_default;   // = { .dummy = 0};
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn			extern hal_result_t hal_device_cantransceiver_init(hal_can_port_t port, const hal_device_cantransceiver_cfg_t *cfg)
-    @brief  	This function initializes the cantransceiver attached to the MPU
-    @param      port            The port attached to the transceiver
-    @param  	cfg 	        The configuration of the cantransceiver. It can be NULL.
-    @return 	hal_res_NOK_generic in case the cantransceiver cannot be configured, else hal_res_OK
+/** @fn			extern hal_result_t hal_ethtransceiver_init(const hal_ethtransceiver_cfg_t *cfg)
+    @brief  	This function initializes the ethtransceiver attached to the MPU
+    @param  	cfg 	        The configuration of the ethtransceiver. It can be NULL.
+    @return 	hal_res_NOK_generic in case the ethtransceiver cannot be configured, else hal_res_OK
+    @warning    The initialisation may temporarily stop the ethtransceiver, thus multiple calls to this function
+                should be avoided as they can corrupt network traffic.
   */
-extern hal_result_t hal_device_cantransceiver_init(hal_can_port_t port, const hal_device_cantransceiver_cfg_t *cfg);
+extern hal_result_t hal_ethtransceiver_init(const hal_ethtransceiver_cfg_t *cfg);
 
-extern hal_result_t hal_device_cantransceiver_enable(hal_can_port_t port);
-
-extern hal_result_t hal_device_cantransceiver_disable(hal_can_port_t port);
+extern hal_result_t hal_ethtransceiver_config(hal_eth_phymode_t targetphymode, hal_eth_phymode_t *usedphymode);
 
 
-/** @fn			extern hal_bool_t hal_device_cantransceiver_initted_is(void)
-    @brief  	This function tells if the cantransceiver is already initialised.
+/** @fn			extern hal_bool_t hal_ethtransceiver_initted_is(void)
+    @brief  	This function tells if the ethtransceiver is already initialised.
     @return 	hal_true or hal_false.
   */
-extern hal_bool_t hal_device_cantransceiver_initted_is(hal_can_port_t port);
+extern hal_bool_t hal_ethtransceiver_initted_is(void);
 
 /** @}            
-    end of group arm_hal_device_cantransceiver  
+    end of group arm_hal_ethtransceiver  
  **/
 
 #endif  // include-guard

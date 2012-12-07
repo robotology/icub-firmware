@@ -37,12 +37,12 @@
 #include "hal_base.h"
 #include "hal_base_hid.h"
 #include "hal_mpu_eth_hid.h"
-#include "hal_device_eeprom.h"
+#include "hal_eeprom.h"
 #include "hal_timer.h"
 #include "hal_i2c.h"
 #include "hal_watchdog.h"
 
-#include "hal_device_switch.h"
+#include "hal_switch.h"
 #include "hal_device_ethtransceiver_hid.h"
 
 #include "hal_chip_xx_eeprom_hid.h"
@@ -340,26 +340,26 @@
 
 
 
-#ifdef HAL_USE_ACTUATOR_LED
-    extern const hal_actuator_led_hid_brdcfg_t hal_brdcfg_actuator_led__theconfig =
+#ifdef HAL_USE_DEVICE_LED
+    extern const hal_device_led_hid_brdcfg_t hal_brdcfg_device_led__theconfig =
     {
         .supported_mask             = 0x3F, // only 6 leds ...
         .value_on                   = hal_gpio_valLOW,
         .value_off                  = hal_gpio_valHIGH,
         .gpiocfg                    =
         {
-            { .port = hal_gpio_portE,    .pin = hal_gpio_pin8,    .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_actuator_led0 - red
-            { .port = hal_gpio_portE,    .pin = hal_gpio_pin10,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_actuator_led1 - green
-            { .port = hal_gpio_portE,    .pin = hal_gpio_pin12,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_actuator_led2 - yellow
-            { .port = hal_gpio_portE,    .pin = hal_gpio_pin15,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_actuator_led3 - orange
-            { .port = hal_gpio_portD,    .pin = hal_gpio_pin11,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_actuator_led4 - can1
-            { .port = hal_gpio_portB,    .pin = hal_gpio_pin7,    .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_actuator_led5 - can2
-            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirNONE, .speed = hal_gpio_speed_low }, // hal_actuator_led6
-            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirNONE, .speed = hal_gpio_speed_low }  // hal_actuator_led7
+            { .port = hal_gpio_portE,    .pin = hal_gpio_pin8,    .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led0 - red
+            { .port = hal_gpio_portE,    .pin = hal_gpio_pin10,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led1 - green
+            { .port = hal_gpio_portE,    .pin = hal_gpio_pin12,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led2 - yellow
+            { .port = hal_gpio_portE,    .pin = hal_gpio_pin15,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led3 - orange
+            { .port = hal_gpio_portD,    .pin = hal_gpio_pin11,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led4 - can1
+            { .port = hal_gpio_portB,    .pin = hal_gpio_pin7,    .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led5 - can2
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirNONE, .speed = hal_gpio_speed_low }, // hal_led6
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirNONE, .speed = hal_gpio_speed_low }  // hal_led7
           //{ .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirNONE, .speed = hal_gpio_speed_low }
         }
     };
-#endif//HAL_USE_ACTUATOR_LED
+#endif//HAL_USE_DEVICE_LED
 
 
 #ifdef  HAL_USE_DEVICE_CANTRANSCEIVER    
@@ -468,7 +468,7 @@
 
     extern const hal_device_eeprom_hid_brdcfg_t hal_brdcfg_device_eeprom__theconfig =
     {
-        .supported_mask     =  (0 << hal_device_eeprom_emulatedflash) | (1 << hal_device_eeprom_i2c_01) | (0 << hal_device_eeprom_i2c_02),
+        .supported_mask     =  (0 << hal_eeprom_emulatedflash) | (1 << hal_eeprom_i2c_01) | (0 << hal_eeprom_i2c_02),
         .devcfg             =
         {            
             {   // hal_device_eeprom_emulatedflash 
@@ -571,13 +571,13 @@
 
 
  
-#ifdef  HAL_USE_SENSOR_ACCEL   
-    extern const hal_sensor_accel_hid_brdcfg_t hal_brdcfg_sensor_accel__theconfig =
+#ifdef  HAL_USE_DEVICE_ACCELEROMETER   
+    extern const hal_device_accelerometer_hid_brdcfg_t hal_brdcfg_device_accelerometer__theconfig =
     {
         .supported_mask         = 0x1,
         .devcfg         =
         {
-            {   // hal_sensor_accel1
+            {   // hal_accelerometer_port1
                 .chipif             =      
                 {   // use the lis3dh chip by st
                     .init       = (hal_res_fp_voidp_t)hal_chip_st_lis3dh_init,
@@ -587,7 +587,7 @@
             }
          }
     };       
-#endif//HAL_USE_SENSOR_ACCEL
+#endif//HAL_USE_DEVICE_ACCELEROMETER
     
 
 
@@ -600,13 +600,13 @@
 #endif//HAL_USE_SENSOR_ENCODER
   
 
-#ifdef  HAL_USE_SENSOR_GYRO
-    extern const hal_sensor_gyro_hid_brdcfg_t hal_brdcfg_sensor_gyro__theconfig =
+#ifdef  HAL_USE_DEVICE_GYROSCOPE
+    extern const hal_device_gyroscope_hid_brdcfg_t hal_brdcfg_device_gyroscope__theconfig =
     {
         .supported_mask         = 0x1,
         .devcfg         =
         {
-            {   // hal_sensor_gyro1
+            {   // hal_gyroscope_port1
                 .chipif             =      
                 {   // use the l3g4200d chip by st
                     .init       = (hal_res_fp_voidp_t)hal_chip_st_l3g4200d_init,
@@ -616,16 +616,16 @@
             }
          }
     };          
-#endif//HAL_USE_SENSOR_GYRO
+#endif//HAL_USE_DEVICE_GYROSCOPE
     
     
-#ifdef  HAL_USE_SENSOR_TEMP 
-    extern const hal_sensor_temp_hid_brdcfg_t hal_brdcfg_sensor_temp__theconfig =
+#ifdef  HAL_USE_DEVICE_TERMOMETER 
+    extern const hal_device_termometer_hid_brdcfg_t hal_brdcfg_device_termometer__theconfig =
     {
         .supported_mask         = 0x1,
         .devcfg         =
         {
-            {   // hal_sensor_temp1
+            {   // hal_termometer_port1
                 .chipif             =      
                 {   // use the l3g4200d chip by st
                     .init       = (hal_res_fp_voidp_t)hal_chip_st_l3g4200d_init,
@@ -635,7 +635,7 @@
             }
          }
     };           
-#endif//HAL_USE_SENSOR_TEMP
+#endif//HAL_USE_DEVICE_TERMOMETER
     
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -43,7 +43,7 @@
 #include "hal_mpu_sys_hid.h"
 #include "hal_utility_fifo.h"
 #include "hal_utility_bits.h" 
-#include "hal_device_cantransceiver.h"
+#include "hal_cantransceiver.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -285,10 +285,10 @@ extern hal_result_t hal_can_init(hal_can_port_t port, const hal_can_cfg_t *cfg)
     hal_utility_fifo_reset(&cport->canframes_tx_norm);    
     
     // init the phy of can
-    hal_device_cantransceiver_init(port, NULL);
+    hal_cantransceiver_init(port, NULL);
     
     // enable the phy of can
-    hal_device_cantransceiver_enable(port); 
+    hal_cantransceiver_enable(port); 
     
     // init gpios
     s_hal_can_hw_gpio_init(port);

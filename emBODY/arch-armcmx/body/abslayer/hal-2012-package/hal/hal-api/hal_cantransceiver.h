@@ -18,20 +18,20 @@
            
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _HAL_DEVICE_SWITCH_H_
-#define _HAL_DEVICE_SWITCH_H_
+#ifndef _HAL_CANTRANSCEIVER_H_
+#define _HAL_CANTRANSCEIVER_H_
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/** @file       hal_device_switch.h
-    @brief      This header file implements public interface to the hal switch module.
+/** @file       hal_cantransceiver.h
+    @brief      This header file implements public interface to the hal cantransceiver module.
     @author     valentina.gaggero@iit.it, marco.accame@iit.it
     @date       10/18/2011
 **/
 
-/** @defgroup arm_hal_device_switch HAL SWITCH
+/** @defgroup doxy_group_hal_cantransceiver HAL CANTRANSCEIVER
 
-    The HAL SWITCH ....
+    The HAL CANTRANSCEIVER ....
  
     @todo acemor-facenda: review documentation.
     
@@ -41,7 +41,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 #include "hal_base.h"
-#include "hal_eth.h"
+#include "hal_can.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -49,42 +49,43 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-/** @typedef    typedef struct hal_device_switch_cfg_t;
-    @brief      contains configuration data of switch.
+/** @typedef    typedef struct hal_cantransceiver_cfg_t;
+    @brief      contains configuration data of cantransceiver.
  **/
 typedef struct
 {
     uint8_t dummy;          /**< dummy...     */
-} hal_device_switch_cfg_t;
+} hal_cantransceiver_cfg_t;
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const hal_device_switch_cfg_t hal_device_switch_cfg_default;   // = { .dummy = 0};
+extern const hal_cantransceiver_cfg_t hal_cantransceiver_cfg_default;   // = { .dummy = 0};
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn			extern hal_result_t hal_device_switch_init(const hal_device_switch_cfg_t *cfg)
-    @brief  	This function initializes the switch attached to the MPU
-    @param  	cfg 	        The configuration of the switch. It can be NULL.
-    @return 	hal_res_NOK_generic in case the switch cannot be configured, else hal_res_OK
-    @warning    The initialisation may temporarily stop the switch, thus multiple calls to this function
-                should be avoided as they can corrupt network traffic.
+/** @fn			extern hal_result_t hal_cantransceiver_init(hal_can_port_t port, const hal_cantransceiver_cfg_t *cfg)
+    @brief  	This function initializes the cantransceiver attached to the MPU
+    @param      port            The port attached to the transceiver
+    @param  	cfg 	        The configuration of the cantransceiver. It can be NULL.
+    @return 	hal_res_NOK_generic in case the cantransceiver cannot be configured, else hal_res_OK
   */
-extern hal_result_t hal_device_switch_init(const hal_device_switch_cfg_t *cfg);
+extern hal_result_t hal_cantransceiver_init(hal_can_port_t port, const hal_cantransceiver_cfg_t *cfg);
 
-extern hal_result_t hal_device_switch_configure(hal_eth_phymode_t targetphymode, hal_eth_phymode_t *usedphymode);
+extern hal_result_t hal_cantransceiver_enable(hal_can_port_t port);
+
+extern hal_result_t hal_cantransceiver_disable(hal_can_port_t port);
 
 
-/** @fn			extern hal_bool_t hal_device_switch_initted_is(void)
-    @brief  	This function tells if the switch is already initialsied.
+/** @fn			extern hal_bool_t hal_cantransceiver_initted_is(void)
+    @brief  	This function tells if the cantransceiver is already initialised.
     @return 	hal_true or hal_false.
   */
-extern hal_bool_t hal_device_switch_initted_is(void);
+extern hal_bool_t hal_cantransceiver_initted_is(hal_can_port_t port);
 
 /** @}            
-    end of group arm_hal_device_switch  
+    end of group doxy_group_hal_cantransceiver  
  **/
 
 #endif  // include-guard

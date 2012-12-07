@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
- * Author:  Valentina Gaggero, Marco Accame
- * email:   valentina.gaggero@iit.it, marco.accame@iit.it
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
@@ -17,14 +17,14 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_ACTUATOR_LED_HID_H_
-#define _HAL_ACTUATOR_LED_HID_H_
+#ifndef _HAL_DEVICE_ACCELEROMETER_HID_H_
+#define _HAL_DEVICE_ACCELEROMETER_HID_H_
 
 
-/* @file       hal_stm32_led_hid.h
-    @brief      This header file implements hidden interface to a led
-    @author     marco.accame@iit.it, valentina.gaggero@iit.it
-    @date       09/16/2011
+/* @file       hal_device_accelerometer_hid.h
+    @brief      This header file implements hidden interface to accelerometer device
+    @author     marco.accame@iit.it
+    @date       10/26/2012
  **/
 
 
@@ -32,12 +32,11 @@
 
 #include "hal_base.h"
 
-#include "hal_gpio.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_actuator_led.h"
+#include "hal_accelerometer.h"
 
 
 
@@ -47,24 +46,35 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
+
+typedef hal_result_t (*hal_device_accelerometer_hid_fn_read_t) (int32_t*, int32_t*, int32_t*);
+
+typedef struct
+{   
+    hal_res_fp_voidp_t                              init;
+    void*                                           initpar;
+    hal_device_accelerometer_hid_fn_read_t          read;
+} hal_device_accelerometer_hid_chip_interface_t;
+
+typedef struct
+{   
+    hal_device_accelerometer_hid_chip_interface_t   chipif;
+} hal_device_accelerometer_hid_dev_cfg_t;
+
 typedef struct
 {
-    uint8_t                 supported_mask;
-    hal_gpio_val_t          value_on;
-    hal_gpio_val_t          value_off;
-    hal_gpio_cfg_t          gpiocfg[hal_actuator_leds_num];
-} hal_actuator_led_hid_brdcfg_t;
-
+    uint8_t                                         supported_mask;
+    hal_device_accelerometer_hid_dev_cfg_t          devcfg[hal_accelerometer_ports_number];
+} hal_device_accelerometer_hid_brdcfg_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 // empty-section
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern uint32_t hal_actuator_led_hid_getsize(const hal_cfg_t *cfg);
+extern uint32_t hal_device_accelerometer_hid_getsize(const hal_cfg_t *cfg);
 
-extern hal_result_t hal_actuator_led_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory);
-
+extern hal_result_t hal_device_accelerometer_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory);
 
 
 #endif  // include guard

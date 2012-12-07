@@ -45,7 +45,7 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_device_cantransceiver.h"
+#include "hal_cantransceiver.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -66,7 +66,7 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-const hal_device_cantransceiver_cfg_t hal_device_cantransceiver_cfg_default = 
+const hal_cantransceiver_cfg_t hal_cantransceiver_cfg_default = 
 { 
     .dummy = 0 
 };
@@ -87,7 +87,7 @@ static void s_hal_device_cantransceiver_initted_set(hal_can_port_t port);
 static hal_bool_t s_hal_device_cantransceiver_initted_is(hal_can_port_t port);
 
 
-static hal_result_t s_hal_device_cantransceiver_lowlevel_init(hal_can_port_t port, const hal_device_cantransceiver_cfg_t *cfg);
+static hal_result_t s_hal_device_cantransceiver_lowlevel_init(hal_can_port_t port, const hal_cantransceiver_cfg_t *cfg);
 
 
 
@@ -98,7 +98,7 @@ static hal_result_t s_hal_device_cantransceiver_lowlevel_init(hal_can_port_t por
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_device_cantransceiver_cfg_t s_hal_device_cantransceiver_cfg          = {.dummy = 0};
+static hal_cantransceiver_cfg_t s_hal_device_cantransceiver_cfg          = {.dummy = 0};
 static hal_bool_t s_hal_device_cantransceiver_initted[hal_can_ports_num]        =  {hal_false, hal_false};
 
 
@@ -109,7 +109,7 @@ static hal_bool_t s_hal_device_cantransceiver_initted[hal_can_ports_num]        
 
 
 
-extern hal_result_t hal_device_cantransceiver_init(hal_can_port_t port, const hal_device_cantransceiver_cfg_t *cfg)
+extern hal_result_t hal_cantransceiver_init(hal_can_port_t port, const hal_cantransceiver_cfg_t *cfg)
 {
     hal_result_t res = hal_res_NOK_generic;
 
@@ -126,10 +126,10 @@ extern hal_result_t hal_device_cantransceiver_init(hal_can_port_t port, const ha
 
     if(NULL == cfg)
     {
-        cfg = &hal_device_cantransceiver_cfg_default;
+        cfg = &hal_cantransceiver_cfg_default;
     }
 
-    memcpy(&s_hal_device_cantransceiver_cfg, cfg, sizeof(hal_device_cantransceiver_cfg_t));
+    memcpy(&s_hal_device_cantransceiver_cfg, cfg, sizeof(hal_cantransceiver_cfg_t));
 
     res = s_hal_device_cantransceiver_lowlevel_init(port, cfg);
 
@@ -139,7 +139,7 @@ extern hal_result_t hal_device_cantransceiver_init(hal_can_port_t port, const ha
 }
 
 
-extern hal_result_t hal_device_cantransceiver_enable(hal_can_port_t port)
+extern hal_result_t hal_cantransceiver_enable(hal_can_port_t port)
 {
     if(hal_false == s_hal_device_cantransceiver_initted_is(port))
     {
@@ -151,7 +151,7 @@ extern hal_result_t hal_device_cantransceiver_enable(hal_can_port_t port)
     return(hal_res_OK); 
 }
 
-extern hal_result_t hal_device_cantransceiver_disable(hal_can_port_t port)
+extern hal_result_t hal_cantransceiver_disable(hal_can_port_t port)
 {
     if(hal_false == s_hal_device_cantransceiver_initted_is(port))
     {
@@ -163,7 +163,7 @@ extern hal_result_t hal_device_cantransceiver_disable(hal_can_port_t port)
     return(hal_res_OK); 
 }
 
-extern hal_bool_t hal_device_cantransceiver_initted_is(hal_can_port_t port)
+extern hal_bool_t hal_cantransceiver_initted_is(hal_can_port_t port)
 {
     return(s_hal_device_cantransceiver_initted_is(port));
 }
@@ -219,7 +219,7 @@ static void s_hal_device_cantransceiver_initted_set(hal_can_port_t port)
 
 
 
-static hal_result_t s_hal_device_cantransceiver_lowlevel_init(hal_can_port_t port, const hal_device_cantransceiver_cfg_t *cfg)
+static hal_result_t s_hal_device_cantransceiver_lowlevel_init(hal_can_port_t port, const hal_cantransceiver_cfg_t *cfg)
 {
     if((NULL != hal_brdcfg_device_cantransceiver__theconfig.devcfg.chipif.init)   && 
        (NULL != hal_brdcfg_device_cantransceiver__theconfig.devcfg.chipif.enable) &&

@@ -41,27 +41,25 @@
 #define     HAL_USE_FLASH
 #define     HAL_USE_GPIO
 #define     HAL_USE_I2C
-//#define     HAL_USE_SPI
+#define     HAL_USE_SPI
 #define     HAL_USE_SYS
 #define     HAL_USE_TIMER
 #define     HAL_USE_TRACE
 #define     HAL_USE_WATCHDOG
 
-// -- actuators
-#define     HAL_USE_ACTUATOR_LED
-
 // -- devices
+#undef  HAL_USE_DEVICE_ACCELEROMETER
 #define     HAL_USE_DEVICE_CANTRANSCEIVER
-#undef  HAL_USE_DEVICE_DISPLAY  
+#define  HAL_USE_DEVICE_DISPLAY  
 #define     HAL_USE_DEVICE_EEPROM
 #undef  HAL_USE_DEVICE_ENCODER
-#undef  HAL_USE_DEVICE_SWITCH
 #define     HAL_USE_DEVICE_ETHTRANSCEIVER
+#undef  HAL_USE_DEVICE_GYROSCOPE
+#define     HAL_USE_DEVICE_LED
+#undef  HAL_USE_DEVICE_SWITCH
+#undef  HAL_USE_DEVICE_TERMOMETER
 
-// -- sensors
-#undef  HAL_USE_SENSOR_TEMP
-#undef  HAL_USE_SENSOR_GYRO
-#undef  HAL_USE_SENSOR_ACCEL
+
 
 // -- utilities
 #define     HAL_USE_UTILITY_BITS
@@ -76,6 +74,10 @@
 #undef  HAL_USE_CHIP_ST_LIS3DH
 #undef  HAL_USE_CHIP_MICREL_KS8893
 #define     HAL_USE_CHIP_XX_EEPROM
+
+// -- external boards
+#define     HAL_USE_EXTBRD_KEIL_MCBQVGA
+
 
 
 // - exceptions -------------------------------------------------------------------------------------------------------

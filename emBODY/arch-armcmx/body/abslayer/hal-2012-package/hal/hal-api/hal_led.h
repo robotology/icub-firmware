@@ -18,18 +18,18 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _HAL_ACTUATOR_LED_H_
-#define _HAL_ACTUATOR_LED_H_
+#ifndef _HAL_LED_H_
+#define _HAL_LED_H_
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/** @file       hal_actuator_led.h
+/** @file       hal_led.h
     @brief      This header file keeps public interface to the hal led module.
     @author     valentina.gaggero@iit.it, marco.accame@iit.it
     @date       09/16/2011
 **/
 
-/** @defgroup arm_hal_actuator_led HAL LED
+/** @defgroup doxy_group_hal_led HAL LED
 
     The HAL LED ...
  
@@ -52,32 +52,32 @@
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
-/** @typedef    typedef enum hal_actuator_led_t 
-    @brief      hal_actuator_led_t contains every possible led.
+/** @typedef    typedef enum hal_led_t 
+    @brief      hal_led_t contains every possible led.
  **/ 
 typedef enum  
 { 
-    hal_actuator_led0 = 0,         
-    hal_actuator_led1 = 1,
-	hal_actuator_led2 = 2,
-    hal_actuator_led3 = 3,         
-    hal_actuator_led4 = 4,
-	hal_actuator_led5 = 5,
-    hal_actuator_led6 = 6,         
-    hal_actuator_led7 = 7
-} hal_actuator_led_t;
+    hal_led0 = 0,         
+    hal_led1 = 1,
+	hal_led2 = 2,
+    hal_led3 = 3,         
+    hal_led4 = 4,
+	hal_led5 = 5,
+    hal_led6 = 6,         
+    hal_led7 = 7
+} hal_led_t;
 
-enum { hal_actuator_leds_num = 8 };
+enum { hal_leds_num = 8 };
 
 
 
-/** @typedef    typedef struct hal_actuator_led_cfg_t;
+/** @typedef    typedef struct hal_led_cfg_t;
     @brief      contains configuration data of led peripheral.
  **/
 typedef struct
 {
     uint8_t         dummy;              /**< dummy   */         
-} hal_actuator_led_cfg_t;
+} hal_led_cfg_t;
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
@@ -86,46 +86,46 @@ typedef struct
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn			extern hal_result_t hal_actuator_led_init(hal_actuator_led_t led, const hal_actuator_led_cfg_t *cfg);
+/** @fn			extern hal_result_t hal_led_init(hal_led_t led, const hal_led_cfg_t *cfg);
     @brief  	This function inits a led.
     @details    c rfce.
     @param      led             The led to initialise. 
     @param      cfg             The configuration. It can be NULL.
     @return 	hal_res_NOK_unsupported in case the led is not supported, else hal_res_OK
   */
-extern hal_result_t hal_actuator_led_init(hal_actuator_led_t led, const hal_actuator_led_cfg_t *cfg);
+extern hal_result_t hal_led_init(hal_led_t led, const hal_led_cfg_t *cfg);
 
 
 /**
-    @fn         extern hal_result_t hal_actuator_led_on(hal_actuator_led_t led)
+    @fn         extern hal_result_t hal_led_on(hal_led_t led)
     @brief      sets the led on
     @param      led             The led. It must be initted before.
     @return     hal_res_NOK_generic in case the led wasn't initted, else hal_res_OK
  **/
-extern hal_result_t hal_actuator_led_on(hal_actuator_led_t led);
+extern hal_result_t hal_led_on(hal_led_t led);
 
 
 /**
-    @fn         extern hal_result_t hal_actuator_led_on(hal_actuator_led_t led)
+    @fn         extern hal_result_t hal_led_on(hal_led_t led)
     @brief      sets the led off
     @param      led             The led. It must be initted before.
     @return     hal_res_NOK_generic in case the led wasn't initted, else hal_res_OK
  **/
-extern hal_result_t hal_actuator_led_off(hal_actuator_led_t led);
+extern hal_result_t hal_led_off(hal_led_t led);
 
 
 /**
-    @fn         extern hal_result_t hal_actuator_led_on(hal_actuator_led_t led)
+    @fn         extern hal_result_t hal_led_on(hal_led_t led)
     @brief      toggles the led
     @param      led             The led. It must be initted before.
     @return     hal_res_NOK_generic in case the led wasn't initted, else hal_res_OK
  **/
-extern hal_result_t hal_actuator_led_toggle(hal_actuator_led_t led);
+extern hal_result_t hal_led_toggle(hal_led_t led);
 
 
 
 /** @}            
-    end of group arm_hal_actuator_led  
+    end of group doxy_group_hal_led  
  **/
 
 #endif  // include-guard

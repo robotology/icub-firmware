@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author: Valentina Gaggero, Marco Accame
  * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
@@ -29,7 +29,7 @@
     @date       21/10/2011
 **/
 
-/** @defgroup arm_hal_watchdog HAL watchdog
+/** @defgroup hal_watchdog HAL watchdog
 
     The HAL watchdog ...
  
@@ -120,7 +120,7 @@ extern hal_result_t hal_watchdog_refresh(hal_watchdog_t watchdog);
 
 
 /** @}            
-    end of group arm_hal_watchdog  
+    end of group hal_watchdog  
  **/
 
 #endif  // include-guard

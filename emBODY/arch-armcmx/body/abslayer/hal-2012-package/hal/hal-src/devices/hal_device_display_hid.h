@@ -35,7 +35,7 @@
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_device_display.h"
+#include "hal_display.h"
 
 
 
@@ -44,7 +44,36 @@
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
-// empty-section
+
+typedef hal_result_t (*hal_device_display_hid_fn_clear_t) (uint16_t);
+typedef hal_result_t (*hal_device_display_hid_fn_settextproperties_t) (int8_t, uint16_t, uint16_t);
+typedef hal_result_t (*hal_device_display_hid_fn_clearline_t) (uint16_t);
+typedef hal_result_t (*hal_device_display_hid_fn_putchar_t) (uint16_t, uint16_t, char);
+typedef hal_result_t (*hal_device_display_hid_fn_putstring_t) (uint16_t, uint16_t, char*);
+
+typedef struct
+{   
+    hal_res_fp_voidp_t                              init;
+    void*                                           initpar;
+    hal_device_display_hid_fn_clear_t               clear;
+    hal_device_display_hid_fn_settextproperties_t   settextproperties;
+    hal_device_display_hid_fn_clearline_t           clearline;
+    hal_device_display_hid_fn_putchar_t             putchar;
+    hal_device_display_hid_fn_putstring_t           putstring;
+    
+} hal_device_display_hid_chip_interface_t;
+
+
+typedef struct
+{   
+    hal_device_display_hid_chip_interface_t   chipif;
+} hal_device_display_hid_dev_cfg_t;
+
+typedef struct
+{
+    uint8_t                                     supported_mask;
+    hal_device_display_hid_dev_cfg_t            devcfg[hal_display_devs_number];
+} hal_device_display_hid_brdcfg_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------

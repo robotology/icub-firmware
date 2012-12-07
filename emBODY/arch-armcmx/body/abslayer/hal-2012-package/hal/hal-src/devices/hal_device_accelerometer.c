@@ -16,16 +16,16 @@
  * Public License for more details
 */
 
-/* @file       hal_stm32_sensor_temp.c
-	@brief      This file implements internals of the temperature sensor module.
+/* @file       hal_device_accelerometer.c
+	@brief      This file implements internals of the acceleration port module.
 	@author     marco.accame@iit.it
-    @date       10/24/2012
+    @date       10/26/2012
 **/
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_SENSOR_TEMP
+#ifdef HAL_USE_DEVICE_ACCELEROMETER
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -37,24 +37,18 @@
 #include "hal_brdcfg.h"
 
 
-#include "hal_trace.h"
 #include "stdio.h"
 
 //#include "hal_stm32xx_include.h"
 
 #include "hal_utility_bits.h"
 
-//#include "utils/hal_chip_st_l3g4200d.h"
-
-
-
-
  
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_sensor_temp.h"
+#include "hal_accelerometer.h"
 
 
 
@@ -62,14 +56,14 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_sensor_temp_hid.h"
+#include "hal_device_accelerometer_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_sensor_temp_sensor2index(t)              ((uint8_t)((t)))
+#define HAL_device_accelerometer_port2index(t)              ((uint8_t)((t)))
 
 
 
@@ -77,7 +71,7 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern const hal_sensor_temp_cfg_t hal_sensor_temp_cfg_default  = 
+extern const hal_accelerometer_cfg_t hal_device_accelerometer_cfg_default  = 
 { 
     .dummy = 0 
 };
@@ -88,28 +82,28 @@ extern const hal_sensor_temp_cfg_t hal_sensor_temp_cfg_default  =
 
 typedef struct
 {
-    hal_sensor_temp_cfg_t       cfg;
-    uint32_t                    initialvalue;
-} hal_sensor_temp_info_t;
+    hal_accelerometer_cfg_t         cfg;
+    uint32_t                        initialvalue;
+} hal_device_accelerometer_info_t;
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_sensor_temp_supported_is(hal_sensor_temp_t sensor);
-static void s_hal_sensor_temp_initted_set(hal_sensor_temp_t sensor);
-static hal_boolval_t s_hal_sensor_temp_initted_is(hal_sensor_temp_t sensor);
+static hal_boolval_t s_hal_device_accelerometer_supported_is(hal_accelerometer_port_t port);
+static void s_hal_device_accelerometer_initted_set(hal_accelerometer_port_t port);
+static hal_boolval_t s_hal_device_accelerometer_initted_is(hal_accelerometer_port_t port);
 
-static hal_result_t s_hal_sensor_temp_hw_init(hal_sensor_temp_t sensor, const hal_sensor_temp_cfg_t *cfg);
+static hal_result_t s_hal_device_accelerometer_hw_init(hal_accelerometer_port_t port, const hal_accelerometer_cfg_t *cfg);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_sensor_temp_initted[hal_sensor_temps_number] = { hal_false };
+static hal_boolval_t s_hal_device_accelerometer_initted[hal_accelerometer_ports_number] = { hal_false };
 
-static hal_sensor_temp_info_t s_hal_sensor_temp_info[hal_sensor_temps_number] = { 0 };
+static hal_device_accelerometer_info_t s_hal_device_accelerometer_info[hal_accelerometer_ports_number] = { 0 };
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -117,59 +111,93 @@ static hal_sensor_temp_info_t s_hal_sensor_temp_info[hal_sensor_temps_number] = 
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern hal_result_t hal_sensor_temp_init(hal_sensor_temp_t sensor, const hal_sensor_temp_cfg_t *cfg)
+
+extern hal_result_t hal_accelerometer_init(hal_accelerometer_port_t port, const hal_accelerometer_cfg_t *cfg)
 {
 //     hal_result_t res = hal_res_NOK_generic; // dont remove ...
-//     hal_sensor_temp_info_t *info = NULL;
+//     hal_device_accelerometer_info_t *info = NULL;
 
-    if(hal_false == s_hal_sensor_temp_supported_is(sensor))
+    if(hal_false == s_hal_device_accelerometer_supported_is(port))
     {
         return(hal_res_NOK_generic);
     }
      
     if(NULL == cfg)
     {
-        cfg  = &hal_sensor_temp_cfg_default;
+        cfg  = &hal_device_accelerometer_cfg_default;
     }
-    
-    if(hal_true == s_hal_sensor_temp_initted_is(sensor))
+
+    if(hal_true == s_hal_device_accelerometer_initted_is(port))
     {
         return(hal_res_OK);
     } 
- 
-    if(hal_res_OK != s_hal_sensor_temp_hw_init(sensor, cfg))
+    
+    if(hal_res_OK != s_hal_device_accelerometer_hw_init(port, cfg))
     {
         return(hal_res_NOK_generic);
     }
     
-    s_hal_sensor_temp_initted_set(sensor);
+    s_hal_device_accelerometer_initted_set(port);
 
     return(hal_res_OK);
 }
 
-extern hal_result_t hal_sensor_temp_read(hal_sensor_temp_t sensor, hal_sensor_temp_degree_t* degrees)
+// static int32_t s_hal_convert(int32_t v)
+// {
+//     // the range is +-2G. it means that 32k is mapped into 2000 mG -> 32k/2000 = 16.384
+//     // if i have 1 mG i must read  16.384
+//     // to have the measure in milli-G i must multiply the read for F = 1 / 16.384 = 0.06103515625
+//     // F = 125 / (2*1024) = 0.06103515625 .... i multiply 125 and then i shift 11 times
+//     
+//     // if range is +-4G. 32k / 4000 = 8.192 ..... F = 0.1220703125 ....
+//     // F = 125 / 1024 
+//     
+//     // if range is +-8g 
+//     // F = 125 / 512
+//     
+//     // if range is +-16g
+//     // F = 125 / 256
+
+//     uint8_t neg = (v < 0) ? (1) : (0);
+//     int32_t r = (0 == neg) ? (125*v) : (125*(-v));
+//     // now r is positive
+//     r >>= 11;
+//     r = (0 == neg) ? (r) : (-r);
+//     
+//     return(r);  
+// }
+    
+
+
+extern hal_result_t hal_accelerometer_read(hal_accelerometer_port_t port, hal_accelerometer_acceleration_t* acceler)
 {
     hal_result_t res = hal_res_NOK_generic; 
-//    hal_sensor_temp_info_t *info = NULL;
-    int8_t data08 = 0;
-
-    if(NULL == degrees)
+ 
+    if(NULL == acceler)
     {
         return(hal_res_NOK_generic);
     }
     
-    if(hal_false == s_hal_sensor_temp_initted_is(sensor))
-    {
-        *degrees = -128;
-        return(hal_res_NOK_generic);
-    }
+    acceler->xac = 0;
+    acceler->yac = 0;
+    acceler->zac = 0;
+    int32_t xac = 0;
+    int32_t yac = 0;
+    int32_t zac = 0;
 
-
-    res = hal_brdcfg_sensor_temp__theconfig.devcfg[HAL_sensor_temp_sensor2index(sensor)].chipif.read(&data08);
-    *degrees = (int16_t) data08;  
     
-    return(res);    
+    res = hal_brdcfg_device_accelerometer__theconfig.devcfg[HAL_device_accelerometer_port2index(port)].chipif.read(&xac, &yac, &zac);
+    
+    if(hal_res_OK == res)
+    {
+        acceler->xac = xac; 
+        acceler->yac = yac;
+        acceler->zac = zac;        
+    }
+    
+    return(res);
 }
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -181,13 +209,13 @@ extern hal_result_t hal_sensor_temp_read(hal_sensor_temp_t sensor, hal_sensor_te
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_sensor_temp_hid_getsize(const hal_cfg_t *cfg)
+extern uint32_t hal_device_accelerometer_hid_getsize(const hal_cfg_t *cfg)
 {
     // no memory needed
     return(0);
 }
 
-extern hal_result_t hal_sensor_temp_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_device_accelerometer_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
 {
     // no memory needed
 //    if(NULL == memory)
@@ -197,37 +225,37 @@ extern hal_result_t hal_sensor_temp_hid_setmem(const hal_cfg_t *cfg, uint32_t *m
 //    }
 
 
-    memset(s_hal_sensor_temp_info, 0, sizeof(s_hal_sensor_temp_info));
-    memset(s_hal_sensor_temp_initted, hal_false, sizeof(s_hal_sensor_temp_initted));
+    memset(s_hal_device_accelerometer_info, 0, sizeof(s_hal_device_accelerometer_info));
+    memset(s_hal_device_accelerometer_initted, hal_false, sizeof(s_hal_device_accelerometer_initted));
     return(hal_res_OK);  
 }
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-
-static hal_boolval_t s_hal_sensor_temp_supported_is(hal_sensor_temp_t sensor)
+static hal_boolval_t s_hal_device_accelerometer_supported_is(hal_accelerometer_port_t port)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_sensor_temp__theconfig.supported_mask, HAL_sensor_temp_sensor2index(sensor)) );
+    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_accelerometer__theconfig.supported_mask, HAL_device_accelerometer_port2index(port)) );
 }
 
-static void s_hal_sensor_temp_initted_set(hal_sensor_temp_t sensor)
+static void s_hal_device_accelerometer_initted_set(hal_accelerometer_port_t port)
 {
-    s_hal_sensor_temp_initted[HAL_sensor_temp_sensor2index(sensor)] = hal_true;
+    s_hal_device_accelerometer_initted[HAL_device_accelerometer_port2index(port)] = hal_true;
 }
 
-static hal_boolval_t s_hal_sensor_temp_initted_is(hal_sensor_temp_t sensor)
+static hal_boolval_t s_hal_device_accelerometer_initted_is(hal_accelerometer_port_t port)
 {
-    return(s_hal_sensor_temp_initted[HAL_sensor_temp_sensor2index(sensor)]);
+    return(s_hal_device_accelerometer_initted[HAL_device_accelerometer_port2index(port)]);
 }
 
 
-static hal_result_t s_hal_sensor_temp_hw_init(hal_sensor_temp_t sensor, const hal_sensor_temp_cfg_t *cfg)
-{   
-    if((NULL != hal_brdcfg_sensor_temp__theconfig.devcfg[HAL_sensor_temp_sensor2index(sensor)].chipif.init) && (NULL != hal_brdcfg_sensor_temp__theconfig.devcfg[HAL_sensor_temp_sensor2index(sensor)].chipif.read))
+static hal_result_t s_hal_device_accelerometer_hw_init(hal_accelerometer_port_t port, const hal_accelerometer_cfg_t *cfg)
+{
+    if((NULL != hal_brdcfg_device_accelerometer__theconfig.devcfg[HAL_device_accelerometer_port2index(port)].chipif.init) && (NULL != hal_brdcfg_device_accelerometer__theconfig.devcfg[HAL_device_accelerometer_port2index(port)].chipif.read))
     {
-        return(hal_brdcfg_sensor_temp__theconfig.devcfg[HAL_sensor_temp_sensor2index(sensor)].chipif.init(hal_brdcfg_sensor_temp__theconfig.devcfg[HAL_sensor_temp_sensor2index(sensor)].chipif.initpar));
+        return(hal_brdcfg_device_accelerometer__theconfig.devcfg[HAL_device_accelerometer_port2index(port)].chipif.init(hal_brdcfg_device_accelerometer__theconfig.devcfg[HAL_device_accelerometer_port2index(port)].chipif.initpar));
     }
     else
     {
@@ -236,7 +264,7 @@ static hal_result_t s_hal_sensor_temp_hw_init(hal_sensor_temp_t sensor, const ha
 }
 
 
-#endif//HAL_USE_SENSOR_TEMP
+#endif//HAL_USE_SENSOR_ACCEL
 
 
 // --------------------------------------------------------------------------------------------------------------------

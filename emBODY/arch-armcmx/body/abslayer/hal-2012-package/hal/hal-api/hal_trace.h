@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author: Valentina Gaggero, Marco Accame
  * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
@@ -23,13 +23,13 @@
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/** @file       hal_tarce.h
+/** @file       hal_trace.h
     @brief      This header file implements public interface to the hal trace module.
     @author     marco.accame@iit.it, valentina.gaggero@iit.it
     @date       09/09/2011
 **/
 
-/** @defgroup arm_hal_trace HAL TRACE
+/** @defgroup doxy_group_hal_trace HAL TRACE
 
     The HAL TRACE ...
  
@@ -97,7 +97,7 @@ extern int hal_trace_puts(const char * str);
  
  
  /** @}            
-    end of group arm_hal_trace  
+    end of group doxy_group_hal_trace  
  **/
 
 #endif  // include-guard

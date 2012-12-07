@@ -50,7 +50,7 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_device_switch.h"
+#include "hal_switch.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -70,7 +70,7 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-const hal_device_switch_cfg_t hal_device_switch_cfg_default = 
+const hal_switch_cfg_t hal_switch_cfg_default = 
 { 
     .dummy = 0 
 };
@@ -93,7 +93,7 @@ static void s_hal_device_switch_started_set(void);
 static hal_boolval_t s_hal_device_switch_started_is(void);
 
 
-static hal_result_t s_hal_device_switch_lowlevel_init(const hal_device_switch_cfg_t *cfg);
+static hal_result_t s_hal_device_switch_lowlevel_init(const hal_switch_cfg_t *cfg);
 //static hal_result_t s_hal_device_switch_reg_config(void);
 //static hal_result_t s_hal_device_switch_lowlevel_start(void);
 
@@ -105,7 +105,7 @@ static hal_result_t s_hal_device_switch_lowlevel_init(const hal_device_switch_cf
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_device_switch_cfg_t s_hal_device_switch_cfg      = {.dummy = 0};
+static hal_switch_cfg_t s_hal_device_switch_cfg             = {.dummy = 0};
 static hal_boolval_t s_hal_device_switch_initted            =  hal_false;
 static hal_boolval_t s_hal_device_switch_started            =  hal_false;
 
@@ -116,7 +116,7 @@ static hal_boolval_t s_hal_device_switch_started            =  hal_false;
 
 
 
-extern hal_result_t hal_device_switch_init(const hal_device_switch_cfg_t *cfg)
+extern hal_result_t hal_switch_init(const hal_switch_cfg_t *cfg)
 {
     hal_result_t res = hal_res_NOK_generic;
 
@@ -134,10 +134,10 @@ extern hal_result_t hal_device_switch_init(const hal_device_switch_cfg_t *cfg)
 
     if(NULL == cfg)
     {
-        cfg = &hal_device_switch_cfg_default;
+        cfg = &hal_switch_cfg_default;
     }
 
-    memcpy(&s_hal_device_switch_cfg, cfg, sizeof(hal_device_switch_cfg_t));
+    memcpy(&s_hal_device_switch_cfg, cfg, sizeof(hal_switch_cfg_t));
 
     res = s_hal_device_switch_lowlevel_init(cfg);
 
@@ -147,7 +147,7 @@ extern hal_result_t hal_device_switch_init(const hal_device_switch_cfg_t *cfg)
 }
 
 
-extern hal_result_t hal_device_switch_configure(hal_eth_phymode_t targetphymode, hal_eth_phymode_t *usedphymode)
+extern hal_result_t hal_switch_configure(hal_eth_phymode_t targetphymode, hal_eth_phymode_t *usedphymode)
 {
     hal_result_t res = hal_res_NOK_generic;
 
@@ -179,13 +179,13 @@ extern hal_result_t hal_device_switch_configure(hal_eth_phymode_t targetphymode,
 }
 
 
-extern hal_bool_t hal_device_switch_initted_is(void)
+extern hal_bool_t hal_switch_initted_is(void)
 {
     return(s_hal_device_switch_initted_is());
 }
 
 
-extern hal_bool_t hal_device_switch_started_is(void)
+extern hal_bool_t hal_switch_started_is(void)
 {
     return(s_hal_device_switch_started_is());
 }
@@ -251,7 +251,7 @@ static void s_hal_device_switch_started_set(void)
 
 
 
-static hal_result_t s_hal_device_switch_lowlevel_init(const hal_device_switch_cfg_t *cfg)
+static hal_result_t s_hal_device_switch_lowlevel_init(const hal_switch_cfg_t *cfg)
 {
     if((NULL != hal_brdcfg_device_switch__theconfig.devcfg.chipif.init) && (NULL != hal_brdcfg_device_switch__theconfig.devcfg.chipif.config))
     {

@@ -36,6 +36,10 @@
 #include "hal_base.h"
 
 
+#include "hal_base.h"
+
+// - peripherals
+
 #ifdef  HAL_USE_CAN
     #include "hal_mpu_can_hid.h"
 #endif//HAL_USE_CAN
@@ -76,12 +80,11 @@
     #include "hal_mpu_watchdog_hid.h"  
 #endif//HAL_USE_WATCHDOG
 
+// - devices
 
-
-#ifdef  HAL_USE_ACTUATOR_LED
-    #include "hal_actuator_led_hid.h"
-#endif//HAL_USE_ACTUATOR_LED
-
+#ifdef  HAL_USE_DEVICE_ACCELEROMETER
+    #include "hal_device_accelerometer_hid.h"
+#endif//HAL_USE_DEVICE_ACCELEROMETER
 
 #ifdef  HAL_USE_DEVICE_CANTRANSCEIVER
     #include "hal_device_cantransceiver_hid.h" 
@@ -89,28 +92,31 @@
 
 #ifdef  HAL_USE_DEVICE_EEPROM
     #include "hal_device_eeprom_hid.h" 
-//    #include "utils/hal_chip_xx_eeprom.h"
 #endif//HAL_USE_DEVICE_EEPROM
 
 #ifdef  HAL_USE_DEVICE_ETHTRANSCEIVER
     #include "hal_device_ethtransceiver_hid.h" 
 #endif//HAL_USE_DEVICE_ETHTRANSCEIVER
 
+#ifdef  HAL_USE_DEVICE_DISPLAY
+    #include "hal_device_display_hid.h"
+#endif//HAL_USE_DEVICE_DISPLAY
+
+#ifdef  HAL_USE_DEVICE_GYROSCOPE
+    #include "hal_device_gyroscope_hid.h"
+#endif//HAL_USE_DEVICE_GYROSCOPE
+ 
+#ifdef  HAL_USE_DEVICE_LED
+    #include "hal_device_led_hid.h"
+#endif//HAL_USE_DEVICE_LED
+
 #ifdef  HAL_USE_DEVICE_SWITCH
     #include "hal_device_switch_hid.h" 
 #endif//HAL_USE_DEVICE_SWITCH
-
-#ifdef  HAL_USE_SENSOR_ACCEL
-    #include "hal_sensor_accel_hid.h"
-#endif//HAL_USE_SENSOR_ACCEL
-
-#ifdef  HAL_USE_SENSOR_GYRO
-    #include "hal_sensor_gyro_hid.h"
-#endif//HAL_USE_SENSOR_GYRO
-    
-#ifdef  HAL_USE_SENSOR_TEMP
-    #include "hal_sensor_temp_hid.h" 
-#endif//HAL_USE_SENSOR_TEMP
+ 
+#ifdef  HAL_USE_DEVICE_TERMOMETER
+    #include "hal_device_termometer_hid.h" 
+#endif//HAL_USE_DEVICE_TERMOMETER
 
 
 #include "hal_mpu_stm32xx_include.h"
@@ -172,7 +178,6 @@
     extern const hal_gpio_cfg_t hal_brdcfg_spi__sck[];
 #endif//HAL_USE_SPI
 
-
 #ifdef  HAL_USE_SYS
     extern const hal_sys_hid_brdcfg_t hal_brdcfg_sys__theconfig;
 #endif//HAL_USE_SYS            
@@ -185,15 +190,17 @@
     extern const hal_watchdog_hid_brdcfg_t hal_brdcfg_watchdog__theconfig;
 #endif//HAL_USE_WATCHDOG
 
-#ifdef  HAL_USE_ACTUATOR_LED
-    extern const hal_actuator_led_hid_brdcfg_t hal_brdcfg_actuator_led__theconfig;
-#endif//HAL_USE_ACTUATOR_LED 
+
+
+#ifdef  HAL_USE_DEVICE_ACCELEROMETER
+    extern const hal_device_accelerometer_hid_brdcfg_t hal_brdcfg_device_accelerometer__theconfig;
+#endif//HAL_USE_DEVICE_ACCELEROMETER
 
 #ifdef  HAL_USE_DEVICE_CANTRANSCEIVER
     extern const hal_device_cantransceiver_hid_brdcfg_t hal_brdcfg_device_cantransceiver__theconfig;
 #endif//HAL_USE_DEVICE_CANTRANSCEIVER 
 
-#ifdef  HAL_USE_DEVICE_DISPLAY
+#ifdef HAL_USE_DEVICE_DISPLAY
     extern const hal_device_display_hid_brdcfg_t hal_brdcfg_display_encoder__theconfig
 #endif//HAL_USE_DEVICE_DISPLAY
 
@@ -201,32 +208,29 @@
     extern const hal_device_eeprom_hid_brdcfg_t hal_brdcfg_device_eeprom__theconfig;   
 #endif//HAL_USE_DEVICE_EEPROM 
 
-#ifdef  HAL_USE_DEVICE_ETHTRANSCEIVER
-    extern const hal_device_ethtransceiver_hid_brdcfg_t hal_brdcfg_device_ethtransceiver__theconfig;
-#endif//HAL_USE_DEVICE_ETHTRANSCEIVER
-
-#ifdef HAL_USE_DEVICE_SWITCH
-    extern const hal_device_switch_hid_brdcfg_t hal_brdcfg_device_switch__theconfig;
-#endif//HAL_USE_DEVICE_SWITCH
-
-
-#ifdef  HAL_USE_SENSOR_ACCEL
-    extern const hal_sensor_accel_hid_brdcfg_t hal_brdcfg_sensor_accel__theconfig;
-#endif//HAL_USE_SENSOR_ACCEL
-
-
 #ifdef  HAL_USE_SENSOR_ENCODER
     extern const hal_sensor_encoder_hid_brdcfg_t hal_brdcfg_sensor_encoder__theconfig;
 #endif//HAL_USE_SENSOR_ENCODER
 
+#ifdef  HAL_USE_DEVICE_ETHTRANSCEIVER
+    extern const hal_device_ethtransceiver_hid_brdcfg_t hal_brdcfg_device_ethtransceiver__theconfig;
+#endif//HAL_USE_DEVICE_ETHTRANSCEIVER
 
-#ifdef  HAL_USE_SENSOR_GYRO
-    extern const hal_sensor_gyro_hid_brdcfg_t hal_brdcfg_sensor_gyro__theconfig;
-#endif//HAL_USE_SENSOR_GYRO
+#ifdef  HAL_USE_DEVICE_GYROSCOPE
+    extern const hal_device_gyroscope_hid_brdcfg_t hal_brdcfg_device_gyroscope__theconfig;
+#endif//HAL_USE_DEVICE_GYROSCOPE
 
-#ifdef  HAL_USE_SENSOR_TEMP
-    extern const hal_sensor_temp_hid_brdcfg_t hal_brdcfg_sensor_temp__theconfig;
-#endif//HAL_USE_SENSOR_TEMP
+#ifdef  HAL_USE_DEVICE_LED
+    extern const hal_device_led_hid_brdcfg_t hal_brdcfg_device_led__theconfig;
+#endif//HAL_USE_DEVICE_LED 
+
+#ifdef HAL_USE_DEVICE_SWITCH
+    extern const hal_device_switch_hid_brdcfg_t hal_brdcfg_device_switch__theconfig; 
+#endif//HAL_USE_DEVICE_SWITCH
+
+#ifdef  HAL_USE_DEVICE_TERMOMETER
+    extern const hal_device_termometer_hid_brdcfg_t hal_brdcfg_device_termometer__theconfig;
+#endif//HAL_USE_DEVICE_TERMOMETER
 
 
 

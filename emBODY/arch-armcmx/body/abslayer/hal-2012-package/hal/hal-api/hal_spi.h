@@ -29,7 +29,7 @@
     @date       10/29/2012
 **/
 
-/** @defgroup arm_hal_spi HAL SPI
+/** @defgroup doxy_group_hal_spi HAL SPI
 
     The HAL SPI is a high level module whcih manages spi communication
  
@@ -91,6 +91,7 @@ typedef enum
  **/
 typedef enum
 {
+    hal_spi_act_raw08bits       = 2,    /**<  */
     hal_spi_act_singleframe     = 0,    /**< the channel is enabled to manage one frame only and after that it is automatically disabled */
     hal_spi_act_continuous      = 1     /**< NOT SUPPORTED NOW: after the channel is enabled, it exchanges frames, possibly empty, until it is disabled */
 } hal_spi_activity_t;
@@ -101,11 +102,13 @@ typedef enum
  **/
 typedef enum
 {
-    hal_spi_speed_500kbps       = 1,
-    hal_spi_speed_1mbps         = 2,
-    hal_spi_speed_2mbps         = 4,
-    hal_spi_speed_4mbps         = 5,
-    hal_spi_speed_8mbps         = 6
+    hal_spi_speed_500kbps       = 5,
+    hal_spi_speed_1mbps         = 10,
+    hal_spi_speed_2mbps         = 20,
+    hal_spi_speed_4mbps         = 40,
+    hal_spi_speed_8mbps         = 80,
+    hal_spi_speed_9mbps         = 90,
+    hal_spi_speed_18mbps        = 180
 } hal_spi_speed_t;
 
 
@@ -147,6 +150,10 @@ extern hal_result_t hal_spi_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg);
 extern void hal_test_spima_spisl(void);
 
 
+extern hal_result_t hal_spi_write(hal_spi_port_t port, uint8_t byte, uint8_t* readbyte);
+extern hal_result_t hal_spi_read(hal_spi_port_t port, uint8_t* byte);
+
+
 /** @fn			extern hal_result_t hal_spi_send(hal_spi_port_t port, uint8_t* txframe, uint8_t size)
     @brief  	this functionj adds the frame to the transmission buffer. in master ownership if sendnow is hal_true it also starts 
                 transmission. 
@@ -180,7 +187,7 @@ extern hal_result_t hal_spi_get(hal_spi_port_t port, uint8_t* rxframe, uint8_t* 
 
 
 /** @}            
-    end of group arm_hal_spi  
+    end of group doxy_group_hal_spi  
  **/
 
 #endif  // include-guard

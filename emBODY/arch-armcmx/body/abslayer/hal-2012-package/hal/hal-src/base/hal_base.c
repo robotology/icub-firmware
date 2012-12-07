@@ -57,16 +57,16 @@
 #include "hal_mpu_trace_hid.h"
 #include "hal_mpu_watchdog_hid.h"
 
-#include "hal_actuator_led_hid.h" 
+#include "hal_device_led_hid.h" 
 
 #include "hal_device_display_hid.h" 
 #include "hal_device_eeprom_hid.h"
 #include "hal_device_ethtransceiver_hid.h"
 #include "hal_device_switch_hid.h"
 
-#include "hal_sensor_accel_hid.h" 
-#include "hal_sensor_gyro_hid.h"
-#include "hal_sensor_temp_hid.h"
+#include "hal_device_accelerometer_hid.h" 
+#include "hal_device_gyroscope_hid.h"
+#include "hal_device_termometer_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -232,15 +232,15 @@ extern uint32_t hal_base_memory_getsize(const hal_cfg_t *cfg, uint32_t *size04al
 
     // actuators
     
-#ifdef  HAL_USE_ACTUATOR_LED
-    retval += hal_actuator_led_hid_getsize(cfg);
-#endif//HAL_USE_ACTUATOR_LED  
+#ifdef  HAL_USE_DEVICE_LED
+    retval += hal_device_led_hid_getsize(cfg);
+#endif//HAL_USE_DEVICE_LED  
 
 
     // devices
 
 #ifdef  HAL_USE_DEVICE_DISPLAY
-    retval += hal_display_hid_getsize(cfg);
+    retval += hal_device_display_hid_getsize(cfg);
 #endif//HAL_USE_DEVICE_DISPLAY  
 
 #ifdef  HAL_USE_DEVICE_EEPROM
@@ -258,20 +258,20 @@ extern uint32_t hal_base_memory_getsize(const hal_cfg_t *cfg, uint32_t *size04al
 
     // sensors
 
-#ifdef  HAL_USE_SENSOR_ACCEL
-    retval += hal_sensor_accel_hid_getsize(cfg);
-#endif//HAL_USE_SENSOR_ACCEL   
+#ifdef  HAL_USE_DEVICE_ACCELEROMETER
+    retval += hal_device_accelerometer_hid_getsize(cfg);
+#endif//HAL_USE_DEVICE_ACCELEROMETER   
 
 #ifdef HAL_USE_SENSOR_ENCODER
     retval += hal_sensor_encoder_hid_getsize(cfg);
 #endif//HAL_USE_SENSOR_ENCODER   
 
-#ifdef  HAL_USE_SENSOR_GYRO
-    retval += hal_sensor_gyro_hid_getsize(cfg);
-#endif//HAL_USE_SENSOR_GYRO   
+#ifdef  HAL_USE_DEVICE_GYROSCOPE
+    retval += hal_device_gyroscope_hid_getsize(cfg);
+#endif//HAL_USE_DEVICE_GYROSCOPE   
 
 #ifdef  HAL_USE_SENSOR_TEMP
-    retval += hal_sensor_temp_hid_getsize(cfg);
+    retval += hal_device_termometer_hid_getsize(cfg);
 #endif//HAL_USE_SENSOR_TEMP 
 
 
@@ -478,13 +478,13 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
 
     //  actuators
 
-#ifdef  HAL_USE_ACTUATOR_LED
-    if(hal_res_OK != hal_actuator_led_hid_setmem(cfg, data04aligned))
+#ifdef  HAL_USE_DEVICE_LED
+    if(hal_res_OK != hal_device_led_hid_setmem(cfg, data04aligned))
     {
         return(hal_res_NOK_generic);
     }
-    data04aligned += hal_actuator_led_hid_getsize(cfg)/4;
-#endif//HAL_USE_ACTUATOR_LED
+    data04aligned += hal_device_led_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICE_LED
  
     
     // devices
@@ -527,38 +527,38 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
 
     // sensors
     
-#ifdef HAL_USE_SENSOR_ACCEL
-    if(hal_res_OK != hal_sensor_accel_hid_setmem(cfg, data04aligned))
+#ifdef HAL_USE_DEVICE_ACCELEROMETER
+    if(hal_res_OK != hal_device_accelerometer_hid_setmem(cfg, data04aligned))
     {
         return(hal_res_NOK_generic);
     }
-    data04aligned += hal_sensor_accel_hid_getsize(cfg)/4;
-#endif//HAL_USE_SENSOR_ACCEL    
+    data04aligned += hal_device_accelerometer_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICE_ACCELEROMETER    
     
     
-#ifdef HAL_USE_SENSOR_ENCODER
+#ifdef HAL_USE_DEVICE_ENCODER
     if(hal_res_OK != hal_sensor_encoder_hid_setmem(cfg, data04aligned))
     {
         return(hal_res_NOK_generic);
     }
     data04aligned += hal_sensor_encoder_hid_getsize(cfg)/4;
-#endif//HAL_USE_SENSOR_ENCODER    
+#endif//HAL_USE_DEVICE_ENCODER    
     
-#ifdef HAL_USE_SENSOR_GYRO
-    if(hal_res_OK != hal_sensor_gyro_hid_setmem(cfg, data04aligned))
+#ifdef HAL_USE_DEVICE_GYROSCOPE
+    if(hal_res_OK != hal_device_gyroscope_hid_setmem(cfg, data04aligned))
     {
         return(hal_res_NOK_generic);
     }
-    data04aligned += hal_sensor_gyro_hid_getsize(cfg)/4;
-#endif//HAL_USE_SENSOR_GYRO    
+    data04aligned += hal_device_gyroscope_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICE_GYROSCOPE    
  
     
 #ifdef HAL_USE_SENSOR_TEMP
-    if(hal_res_OK != hal_sensor_temp_hid_setmem(cfg, data04aligned))
+    if(hal_res_OK != hal_device_termometer_hid_setmem(cfg, data04aligned))
     {
         return(hal_res_NOK_generic);
     }
-    data04aligned += hal_sensor_temp_hid_getsize(cfg)/4;
+    data04aligned += hal_device_termometer_hid_getsize(cfg)/4;
 #endif//HAL_USE_SENSOR_TEMP    
     
     
@@ -771,51 +771,7 @@ extern void hal_base_hid_on_fatalerror(hal_fatalerror_t errorcode, const char * 
  
 void hal_hid_link_to_all_files(void)
 {
-#ifdef HAL_USE_ARCH
-    hal_arch_arm_hid_getsize(NULL);
-#endif//HAL_USE_ARCH
-#ifdef HAL_USE_CAN
-    hal_can_hid_getsize(NULL);
-#endif
-#ifdef HAL_USE_DISPLAY
-    hal_display_hid_getsize(NULL);
-#endif
-#ifdef HAL_USE_EEPROM
-    hal_eeprom_hid_getsize(NULL);
-#endif
-#ifdef HAL_USE_ENCODER
-    hal_encoder_hid_getsize(NULL);
-#endif
-#ifdef HAL_USE_ETH
-    hal_eth_hid_getsize(NULL); 
-#endif
-#ifdef HAL_USE_FLASH  
-    hal_flash_hid_getsize(NULL);
-#endif
-#ifdef HAL_USE_GPIO
-    hal_gpio_hid_getsize(NULL);
-#endif
-#ifdef HAL_USE_I2C
-    hal_i2c_hid_getsize(NULL);
-#endif
-#ifdef HAL_USE_LED
-    hal_gpio_hid_getsize(NULL);
-#endif
-#ifdef HAL_USE_SPI
-    hal_spi_hid_getsize(NULL);
-#endif
-#ifdef HAL_USE_SYS
-    hal_sys_hid_getsize(NULL);
-#endif
-#ifdef HAL_USE_TIMER
-    hal_timer_hid_getsize(NULL);
-#endif      
-#ifdef HAL_USE_TRACE
-    hal_trace_hid_getsize(NULL);
-#endif 
-#ifdef HAL_USE_WATCHDOG
-    hal_watchdog_hid_getsize(NULL);
-#endif//HAL_USE_WATCHDOG 
+    // removed ...
 }
 
 

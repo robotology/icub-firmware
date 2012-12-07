@@ -47,6 +47,13 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
+typedef struct
+{
+    uint8_t             supported_mask;                     /**< bit in position hal_spi_portx must be 1 if portx is supported */
+    hal_gpio_cfg_t      gpio_miso[hal_spi_ports_number];    /**< in position hal_spi_portx there is configuration of gpio used for miso pin */
+    hal_gpio_cfg_t      gpio_mosi[hal_spi_ports_number];    /**< in position hal_spi_portx there is configuration of gpio used for mosi pin */
+    hal_gpio_cfg_t      gpio_sck[hal_spi_ports_number];     /**< in position hal_spi_portx there is configuration of gpio used for sck pin */
+} hal_spi_hid_brdcfg_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------

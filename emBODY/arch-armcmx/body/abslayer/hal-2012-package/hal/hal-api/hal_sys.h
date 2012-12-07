@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author: Valentina Gaggero, Marco Accame
  * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
@@ -29,7 +29,7 @@
     @date       09/09/2011
 **/
 
-/** @defgroup arm_hal_sys HAL system
+/** @defgroup doxy_group_hal_sys HAL system
 
     The HAL ...
  
@@ -217,7 +217,7 @@ extern void hal_sys_atomic_bitwiseAND(volatile uint32_t *value, uint32_t mask);
  
 
 /** @}            
-    end of group arm_hal_sys  
+    end of group doxy_group_hal_sys  
  **/
 
 #endif  // include-guard

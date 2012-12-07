@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author: Valentina Gaggero, Marco Accame
  * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
@@ -29,7 +29,7 @@
     @date       09/16/2011
 **/
 
-/** @defgroup hal_arch_arm HAL ARCH ARM
+/** @defgroup doxy_group_hal_arch_arm HAL ARCH ARM
 
     cecece
  
@@ -47,22 +47,35 @@
 #define HAL_USE_ARCH_ARM
 #endif
 
-// -- HAL_HAS_ are macros used to include inside hal.h the proper includ files of the defined modules
+// -- HAL_HAS_ are macros used to include inside hal.h the proper include files of the defined modules
 
+// the base of hal
 #define HAL_HAS_BASE
+
+// mpu peripherals supported for arm architecture (stm32fx)
 #define HAL_HAS_CAN
 #define HAL_HAS_CRC
-#define HAL_HAS_DISPLAY
-#define HAL_HAS_EEPROM
-#define HAL_HAS_ENCODER
 #define HAL_HAS_ETH
 #define HAL_HAS_FLASH
 #define HAL_HAS_GPIO
-#define HAL_HAS_LED
+#define HAL_HAS_I2C
+#define HAL_HAS_SPI
 #define HAL_HAS_SYS
 #define HAL_HAS_TIMER
 #define HAL_HAS_TRACE
 #define HAL_HAS_WATCHDOG
+
+// external devices supported for the boards using arm architecture
+#define HAL_HAS_ACCELEROMETER
+#define HAL_HAS_CANTRANSCEIVER
+#define HAL_HAS_DISPLAY
+#define HAL_HAS_EEPROM
+#define HAL_HAS_ENCODER
+#define HAL_HAS_ETHTRANSCEIVER
+#define HAL_HAS_GYROSCOPE
+#define HAL_HAS_LED
+#define HAL_HAS_SWITCH
+#define HAL_HAS_TERMOMETER
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
@@ -144,7 +157,7 @@ extern hal_arch_arm_uniqueid64_t hal_arch_arm_uniqueid64_get(void);
 
 
 /** @}            
-    end of group hal_arch_arm  
+    end of group doxy_group_hal_arch_arm  
  **/
 
 #endif  // include-guard

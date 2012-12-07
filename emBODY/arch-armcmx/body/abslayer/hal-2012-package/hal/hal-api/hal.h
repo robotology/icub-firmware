@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author: Valentina Gaggero, Marco Accame
  * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
@@ -29,7 +29,7 @@
     @date       09/09/2011
 **/
 
-/** @defgroup hal HAL
+/** @defgroup doxy_group_hal HAL
 
     The Hardware Abstraction Layer offers service to the system which are independent from the underlying
     HW platform.
@@ -46,12 +46,22 @@
 // inside hal_arch.h are defined or undefined the HAL_HAS_*
 #include "hal_arch.h"
 
+// the others are in alphabetical order
+
+#if defined(HAL_HAS_ACCELEROMETER)
+#include "hal_accelerometer.h"
+#endif
+
 #if defined(HAL_HAS_BASE)
 #include "hal_base.h"
 #endif
 
 #if defined(HAL_HAS_CAN)
 #include "hal_can.h"
+#endif
+
+#if defined(HAL_HAS_CANTRANSCEIVER)
+#include "hal_cantransceiver.h"
 #endif
 
 #if defined(HAL_HAS_CRC)
@@ -63,15 +73,19 @@
 #endif
 
 #if defined(HAL_HAS_EEPROM)
-#include "hal_device_eeprom.h"
+#include "hal_eeprom.h"
 #endif
 
 #if defined(HAL_HAS_ENCODER)
-#include "hal_sensor_encoder.h"
+#include "hal_encoder.h"
 #endif
 
 #if defined(HAL_HAS_ETH)
 #include "hal_eth.h"
+#endif
+
+#if defined(HAL_HAS_ETHTRANSCEIVER)
+#include "hal_ethtransceiver.h"
 #endif
 
 #if defined(HAL_HAS_FLASH)
@@ -82,12 +96,32 @@
 #include "hal_gpio.h"
 #endif
 
+#if defined(HAL_HAS_GYROSCOPE)
+#include "hal_gyroscope.h"
+#endif
+
+#if defined(HAL_HAS_I2C)
+#include "hal_i2c.h"
+#endif
+
 #if defined(HAL_HAS_LED)
-#include "hal_actuator_led.h"
+#include "hal_led.h"
+#endif
+
+#if defined(HAL_HAS_SPI)
+#include "hal_spi.h"
+#endif
+
+#if defined(HAL_HAS_SWITCH)
+#include "hal_switch.h"
 #endif
 
 #if defined(HAL_HAS_SYS)
 #include "hal_sys.h"
+#endif
+
+#if defined(HAL_HAS_TERMOMETER)
+#include "hal_termometer.h"
 #endif
 
 #if defined(HAL_HAS_TIMER)
@@ -101,6 +135,10 @@
 #if defined(HAL_HAS_WATCHDOG)
 #include "hal_watchdog.h"
 #endif
+
+
+
+
 
 
 
@@ -121,7 +159,7 @@
 
 
 /** @}            
-    end of group hal  
+    end of group doxy_group_hal  
  **/
 
 #endif  // include-guard

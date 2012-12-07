@@ -35,7 +35,7 @@
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_device_eeprom.h"
+#include "hal_eeprom.h"
 
 
 
@@ -79,7 +79,7 @@ typedef union
 typedef struct
 {
     uint8_t                                 supported_mask;
-    hal_device_eeprom_hid_dev_cfg_t         devcfg[hal_device_eeproms_num];
+    hal_device_eeprom_hid_dev_cfg_t         devcfg[hal_eeproms_num];
 } hal_device_eeprom_hid_brdcfg_t;
 
 

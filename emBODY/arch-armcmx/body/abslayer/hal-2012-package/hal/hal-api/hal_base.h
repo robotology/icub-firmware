@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author: Valentina Gaggero, Marco Accame
  * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
@@ -29,7 +29,7 @@
     @date       09/09/2011
 **/
 
-/** @defgroup arm_hal_base HAL base
+/** @defgroup doxy_group_hal_base HAL base
 
     The HAL ...
  
@@ -293,7 +293,7 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
 
 
 /** @}            
-    end of group arm_hal_base  
+    end of group doxy_group_hal_base  
  **/
 
 #endif  // include-guard

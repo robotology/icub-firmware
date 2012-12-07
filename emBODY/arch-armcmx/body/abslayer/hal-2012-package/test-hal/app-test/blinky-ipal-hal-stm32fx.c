@@ -29,13 +29,13 @@
 
 #include "hal_brdcfg_modules.h"
 
-#include "hal_device_switch.h"
-#include "hal_actuator_led.h"
+#include "hal_switch.h"
+#include "hal_led.h"
 #include "hal_spi.h"
 
-#include "hal_sensor_temp.h"
-#include "hal_sensor_gyro.h"
-#include "hal_sensor_accel.h"
+#include "hal_termometer.h"
+#include "hal_gyroscope.h"
+#include "hal_accelerometer.h"
 
 #include "hal_utility_fifo.h"
 
@@ -200,7 +200,37 @@ int main(void)
 
     hal_sys_systeminit();
     
-    s_eventviewer_init();
+#ifdef HAL_USE_DEVICE_DISPLAY    
+    
+    hal_display_init(hal_display_dev1, NULL);
+    
+    hal_display_clearscreen(hal_display_dev1);
+    
+    //hal_display_settextproperties(hal_display_dev1, hal_display_font_24x16, hal_display_color_white, hal_display_color_black);
+    
+    hal_display_putstring(hal_display_dev1, 1, 4, "hello world");
+    hal_display_putstring(hal_display_dev1, 2, 20, "my old friend");
+    hal_display_putstring(hal_display_dev1, 3, 30, "line 3 w/ fonts 6x8");
+    hal_display_putstring(hal_display_dev1, 4, 30, "line 4");
+    hal_display_putstring(hal_display_dev1, 5, 30, "line 5");
+    hal_display_putstring(hal_display_dev1, 6, 30, "line 6");    
+    hal_display_putstring(hal_display_dev1, 7, 30, "line 7");
+    hal_display_putstring(hal_display_dev1, 8, 30, "line 8");
+    hal_display_putstring(hal_display_dev1, 9, 30, "line 9");
+    hal_display_putstring(hal_display_dev1, 10, 30, "line 10"); 
+    
+    hal_display_font_t fnt = 
+    {
+        .textsize   = hal_display_font_size_16x24,
+        .textcolor  = hal_display_color_blue,
+        .backcolor  = hal_display_color_white        
+    };
+    hal_display_setfont(hal_display_dev1, fnt);
+    
+    hal_display_putstring(hal_display_dev1, 5, 0, "line w/ fonts 16x24"); 
+#endif//HAL_USE_DEVICE_DISPLAY
+
+s_eventviewer_init();
     
 //    s_test_fifo();
     
@@ -230,8 +260,8 @@ int main(void)
     for(;;);
 #endif
     
-    
-#ifdef  HAL_USE_SPI  
+#if 0    
+//#ifdef  HAL_USE_SPI  
     hal_spi_cfg_t cfgg;
     memcpy(&cfgg, &hal_spi_cfg_default, sizeof(hal_spi_cfg_t));
     cfgg.onframetransm  = s_myfuntxspima;
@@ -265,8 +295,8 @@ int main(void)
 #ifdef  HAL_USE_DEVICE_SWITCH   
     extern const hal_device_switch_hid_brdcfg_t hal_brdcfg_device_switch__theconfig;
     hal_eth_phymode_t phymode = hal_eth_phymode_none; 
-    hal_device_switch_init(NULL);
-    hal_device_switch_configure(hal_brdcfg_device_switch__theconfig.devcfg.targetphymode, &phymode);
+    hal_switch_init(NULL);
+    hal_switch_configure(hal_brdcfg_device_switch__theconfig.devcfg.targetphymode, &phymode);
 //    for(;;);
 #endif    
  
@@ -274,15 +304,15 @@ int main(void)
     test_eeprom();   
 
 //    test_can();
-#ifdef HAL_USE_SENSOR_ACCEL
-    hal_sensor_accel_init(hal_sensor_accel1, NULL);
-#endif
-#ifdef HAL_USE_SENSOR_GYRO
-    hal_sensor_gyro_init(hal_sensor_gyro1, NULL);
-#endif
-#ifdef HAL_USE_SENSOR_TEMP
-    hal_sensor_temp_init(hal_sensor_temp1, NULL);
-#endif
+#ifdef  HAL_USE_DEVICE_ACCELEROMETER
+    hal_accelerometer_init(hal_accelerometer_port1, NULL);
+#endif//HAL_USE_DEVICE_ACCELEROMETER
+#ifdef  HAL_USE_DEVICE_GYROSCOPE
+    hal_gyroscope_init(hal_gyroscope_port1, NULL);
+#endif//HAL_USE_DEVICE_GYROSCOPE
+#ifdef  HAL_USE_DEVICE_TERMOMETER
+    hal_termometer_init(hal_termometer_port1, NULL);
+#endif//HAL_USE_DEVICE_TERMOMETER
     
     
     ipal_base_memory_getsize(ipal_cfgMINE, &size04aligned);
@@ -305,31 +335,31 @@ int main(void)
     {
         if(0 == read--)
         {
-        #ifdef HAL_USE_SENSOR_TEMP    
-            hal_sensor_temp_degree_t degrees;
-            hal_sensor_temp_read(hal_sensor_temp1, &degrees);
+        #ifdef  HAL_USE_DEVICE_TERMOMETER    
+            hal_termometer_degrees_t degrees;
+            hal_termometer_read(hal_termometer_port1, &degrees);
             degrees = degrees;    
-        #endif
-        #ifdef HAL_USE_SENSOR_GYRO            
-            hal_sensor_gyro_angular_rate_t angrate;
-            hal_sensor_gyro_read(hal_sensor_gyro1, &angrate);
+        #endif//HAL_USE_DEVICE_TERMOMETER
+        #ifdef  HAL_USE_DEVICE_GYROSCOPE            
+            hal_gyroscope_angularrate_t angrate;
+            hal_gyroscope_read(hal_gyroscope_port1, &angrate);
             angrate.xar = angrate.xar;      
-        #endif
-        #ifdef HAL_USE_SENSOR_ACCEL    
-            hal_sensor_accel_acceleration_t accel;
-            hal_sensor_accel_read(hal_sensor_accel1, &accel);
+        #endif//HAL_USE_DEVICE_GYROSCOPE
+        #ifdef  HAL_USE_DEVICE_ACCELEROMETER    
+            hal_accelerometer_acceleration_t accel;
+            hal_accelerometer_read(hal_accelerometer_port1, &accel);
             accel.xac = accel.xac;
-        #endif    
+        #endif//HAL_USE_DEVICE_ACCELEROMETER    
         }
         
         if(1 == button_ispushed())
         {
-            #ifdef HAL_USE_SENSOR_TEMP
-            hal_sensor_temp_degree_t degrees;
+            #ifdef  HAL_USE_DEVICE_TERMOMETER
+            hal_termometer_degrees_t degrees;
             send_msg = 1;
-            hal_sensor_temp_read(hal_sensor_temp1, &degrees);
+            hal_termometer_read(hal_termometer_port1, &degrees);
             degrees = degrees;
-            #endif
+            #endif//HAL_USE_DEVICE_TERMOMETER
         }
 
         timer_poll();
@@ -393,19 +423,19 @@ static void myledsinit(void)
     evEntityId_t prev;
     hal_result_t res;
     
-    res = hal_actuator_led_init(hal_actuator_led0, NULL);
+    res = hal_led_init(hal_led0, NULL);
     res =  res;
     
-    res = hal_actuator_led_init(hal_actuator_led1, NULL);
+    res = hal_led_init(hal_led1, NULL);
     res =  res;
     
 
 #ifdef  USE_EVENTVIEWER
     prev = eventviewer_switch_to(ev_ID_first_usrdef+1);
 #endif    
-    hal_gpio_quickest_setval(hal_brdcfg_actuator_led__theconfig.gpiocfg[0].port, hal_brdcfg_actuator_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
-    hal_gpio_quickest_setval(hal_brdcfg_actuator_led__theconfig.gpiocfg[0].port, hal_brdcfg_actuator_led__theconfig.gpiocfg[0].pin, hal_gpio_valHIGH);
-    hal_gpio_quickest_setval(hal_brdcfg_actuator_led__theconfig.gpiocfg[0].port, hal_brdcfg_actuator_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
+    hal_gpio_quickest_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
+    hal_gpio_quickest_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valHIGH);
+    hal_gpio_quickest_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
 #ifdef  USE_EVENTVIEWER
     eventviewer_switch_to(prev); 
 #endif
@@ -413,9 +443,9 @@ static void myledsinit(void)
 #ifdef  USE_EVENTVIEWER    
     prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
 #endif    
-    hal_gpio_setval(hal_brdcfg_actuator_led__theconfig.gpiocfg[0].port, hal_brdcfg_actuator_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
-    hal_gpio_setval(hal_brdcfg_actuator_led__theconfig.gpiocfg[0].port, hal_brdcfg_actuator_led__theconfig.gpiocfg[0].pin, hal_gpio_valHIGH);
-    hal_gpio_setval(hal_brdcfg_actuator_led__theconfig.gpiocfg[0].port, hal_brdcfg_actuator_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
+    hal_gpio_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
+    hal_gpio_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valHIGH);
+    hal_gpio_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
 #ifdef  USE_EVENTVIEWER
     eventviewer_switch_to(prev);  
 #endif    
@@ -425,7 +455,7 @@ static void myled00toggle(void)
 {
     hal_result_t res;
     
-    res = hal_actuator_led_toggle(hal_actuator_led0);
+    res = hal_led_toggle(hal_led0);
     res =  res;
 }
 
@@ -433,7 +463,7 @@ static void myled01toggle(void* p)
 {
     hal_result_t res;
     
-    res = hal_actuator_led_toggle(hal_actuator_led1);
+    res = hal_led_toggle(hal_led1);
     res =  res;
 }
 
@@ -610,24 +640,24 @@ static void test_eeprom(void)
     
     //hal_i2c4hal_init(hal_i2c_port1, NULL);
 
-    res = hal_device_eeprom_init(hal_device_eeprom_i2c_01, NULL);
+    res = hal_eeprom_init(hal_eeprom_i2c_01, NULL);
     res =  res;
     
-    res = hal_device_eeprom_read(hal_device_eeprom_i2c_01, 258, 12, tmp);
+    res = hal_eeprom_read(hal_eeprom_i2c_01, 258, 12, tmp);
     res =  res;  
     
 //    return;   
     
-    res = hal_device_eeprom_erase(hal_device_eeprom_i2c_01, 0, 512);
+    res = hal_eeprom_erase(hal_eeprom_i2c_01, 0, 512);
     res =  res;
     
-    res = hal_device_eeprom_read(hal_device_eeprom_i2c_01, 258, 12, tmp);
+    res = hal_eeprom_read(hal_eeprom_i2c_01, 258, 12, tmp);
     res =  res;    
     
-    res = hal_device_eeprom_write(hal_device_eeprom_i2c_01, 256, 12, data);
+    res = hal_eeprom_write(hal_eeprom_i2c_01, 256, 12, data);
     res =  res;
     
-    res = hal_device_eeprom_read(hal_device_eeprom_i2c_01, 256, 16, tmp);
+    res = hal_eeprom_read(hal_eeprom_i2c_01, 256, 16, tmp);
     res =  res;
 
 //#endif

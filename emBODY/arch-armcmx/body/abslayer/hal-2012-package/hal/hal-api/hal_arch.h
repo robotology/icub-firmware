@@ -29,7 +29,7 @@
     @date       09/16/2011
 **/
 
-/** @defgroup hal_arch_generic HAL ARCH GENERIC
+/** @defgroup doxy_group_hal_arch HAL ARCH GENERIC
 
     cecece
  
@@ -76,7 +76,7 @@
 
 
 /** @}            
-    end of group hal_arch_generic  
+    end of group doxy_group_hal_arch  
  **/
 
 #endif  // include-guard

@@ -17,14 +17,14 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_STM32_SENSOR_ACCEL_HID_H_
-#define _HAL_STM32_SENSOR_ACCEL_HID_H_
+#ifndef _HAL_EXTBRD_KEIL_MCBQVGA_HID_H_
+#define _HAL_EXTBRD_KEIL_MCBQVGA_HID_H_
 
 
-/* @file       hal_stm32_sensor_accel_hid.h
-    @brief      This header file implements hidden interface to crc
+/* @file       hal_extbrd_keil_mcbqvga_hid.h
+    @brief      This header file implements hidden interface 
     @author     marco.accame@iit.it
-    @date       10/26/2012
+    @date       10/24/2012
  **/
 
 
@@ -36,7 +36,7 @@
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_sensor_accel.h"
+#include "hal_extbrd_keil_mcbqvga.h"
 
 
 
@@ -45,36 +45,17 @@
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
+// empty-section
 
-
-typedef hal_result_t (*hal_sensor_accel_hid_fn_read_t) (int32_t*, int32_t*, int32_t*);
-
-typedef struct
-{   
-    hal_res_fp_voidp_t                      init;
-    void*                                   initpar;
-    hal_sensor_accel_hid_fn_read_t          read;
-} hal_sensor_accel_hid_chip_interface_t;
-
-typedef struct
-{   
-    hal_sensor_accel_hid_chip_interface_t   chipif;
-} hal_sensor_accel_hid_dev_cfg_t;
-
-typedef struct
-{
-    uint8_t                                 supported_mask;
-    hal_sensor_accel_hid_dev_cfg_t          devcfg[hal_sensor_accels_number];
-} hal_sensor_accel_hid_brdcfg_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 // empty-section
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern uint32_t hal_sensor_accel_hid_getsize(const hal_cfg_t *cfg);
+extern uint32_t hal_extbrd_keil_mcbqvga_hid_getsize(const hal_cfg_t *cfg);
 
-extern hal_result_t hal_sensor_accel_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory);
+extern hal_result_t hal_extbrd_keil_mcbqvga_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory);
 
 
 #endif  // include guard

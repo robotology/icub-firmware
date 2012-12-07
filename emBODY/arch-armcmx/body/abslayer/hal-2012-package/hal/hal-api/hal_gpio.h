@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author: Valentina Gaggero, Marco Accame
  * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
@@ -29,7 +29,7 @@
     @date       09/09/2011
 **/
 
-/** @defgroup arm_hal_gpio HAL GPIO
+/** @defgroup doxy_group_hal_gpio HAL GPIO
 
     The HAL GPIO ...
  
@@ -204,7 +204,7 @@ extern void hal_gpio_quickest_setval(hal_gpio_port_t port, hal_gpio_pin_t pin, h
 
 
 /** @}            
-    end of group arm_hal_gpio  
+    end of group doxy_group_hal_gpio  
  **/
 
 #endif  // include-guard

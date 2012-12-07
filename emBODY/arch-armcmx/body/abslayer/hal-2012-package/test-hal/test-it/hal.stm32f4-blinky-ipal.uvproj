@@ -521,9 +521,9 @@
           <GroupName>hal-devices</GroupName>
           <Files>
             <File>
-              <FileName>hal_actuator_led.c</FileName>
+              <FileName>hal_device_accelerometer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_actuator_led.c</FilePath>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_accelerometer.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_cantransceiver.c</FileName>
@@ -546,24 +546,24 @@
               <FilePath>..\..\hal\hal-src\devices\hal_device_ethtransceiver.c</FilePath>
             </File>
             <File>
+              <FileName>hal_device_gyroscope.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_gyroscope.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_led.c</FilePath>
+            </File>
+            <File>
               <FileName>hal_device_switch.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\devices\hal_device_switch.c</FilePath>
             </File>
             <File>
-              <FileName>hal_sensor_accel.c</FileName>
+              <FileName>hal_device_termometer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_sensor_accel.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_sensor_gyro.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_sensor_gyro.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_sensor_temp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_sensor_temp.c</FilePath>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_termometer.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1179,9 +1179,9 @@
           <GroupName>hal-devices</GroupName>
           <Files>
             <File>
-              <FileName>hal_actuator_led.c</FileName>
+              <FileName>hal_device_accelerometer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_actuator_led.c</FilePath>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_accelerometer.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_cantransceiver.c</FileName>
@@ -1204,24 +1204,24 @@
               <FilePath>..\..\hal\hal-src\devices\hal_device_ethtransceiver.c</FilePath>
             </File>
             <File>
+              <FileName>hal_device_gyroscope.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_gyroscope.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_led.c</FilePath>
+            </File>
+            <File>
               <FileName>hal_device_switch.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\devices\hal_device_switch.c</FilePath>
             </File>
             <File>
-              <FileName>hal_sensor_accel.c</FileName>
+              <FileName>hal_device_termometer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_sensor_accel.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_sensor_gyro.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_sensor_gyro.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_sensor_temp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_sensor_temp.c</FilePath>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_termometer.c</FilePath>
             </File>
           </Files>
         </Group>

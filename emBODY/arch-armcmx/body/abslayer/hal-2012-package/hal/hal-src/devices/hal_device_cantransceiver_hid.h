@@ -35,7 +35,7 @@
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_device_cantransceiver.h"
+#include "hal_cantransceiver.h"
 
 
 

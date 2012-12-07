@@ -47,21 +47,18 @@
 #define     HAL_USE_TRACE
 #define     HAL_USE_WATCHDOG
 
-// -- actuators
-#define     HAL_USE_ACTUATOR_LED
-
 // -- devices
+#define     HAL_USE_DEVICE_ACCELEROMETER
 #define     HAL_USE_DEVICE_CANTRANSCEIVER
-#undef   HAL_USE_DEVICE_DISPLAY  
+#undef  HAL_USE_DEVICE_DISPLAY  
 #define     HAL_USE_DEVICE_EEPROM
-#undef   HAL_USE_DEVICE_ENCODER
-#define     HAL_USE_DEVICE_SWITCH
+#undef  HAL_USE_DEVICE_ENCODER
 #define     HAL_USE_DEVICE_ETHTRANSCEIVER
+#define     HAL_USE_DEVICE_GYROSCOPE
+#define     HAL_USE_DEVICE_LED
+#define     HAL_USE_DEVICE_SWITCH
+#define     HAL_USE_DEVICE_TERMOMETER
 
-// -- sensors
-#define     HAL_USE_SENSOR_TEMP
-#define     HAL_USE_SENSOR_GYRO
-#define     HAL_USE_SENSOR_ACCEL
 
 // -- utilities
 #define     HAL_USE_UTILITY_BITS
@@ -81,7 +78,7 @@
 // #undef HAL_USE_CHIP_ST_L3G4200D
 // #undef HAL_USE_CHIP_ST_LIS3DH
 // #undef HAL_USE_CHIP_XX_EEPROM
-// #undef HAL_USE_SENSOR_TEMP
+// #undef HAL_USE_DEVICE_TERMOMETER
 // #undef HAL_USE_SENSOR_GYRO
 // #undef HAL_USE_SENSOR_ACCEL
 // #undef HAL_USE_DEVICE_ETHTRANSCEIVER

@@ -44,7 +44,7 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_device_ethtransceiver.h"
+#include "hal_ethtransceiver.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -64,7 +64,7 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-const hal_device_ethtransceiver_cfg_t hal_device_ethtransceiver_cfg_default = 
+const hal_ethtransceiver_cfg_t hal_ethtransceiver_cfg_default = 
 { 
     .dummy = 0 
 };
@@ -87,7 +87,7 @@ static void s_hal_device_ethtransceiver_started_set(void);
 static hal_bool_t s_hal_device_ethtransceiver_started_is(void);
 
 
-static hal_result_t s_hal_device_ethtransceiver_lowlevel_init(const hal_device_ethtransceiver_cfg_t *cfg);
+static hal_result_t s_hal_device_ethtransceiver_lowlevel_init(const hal_ethtransceiver_cfg_t *cfg);
 
 
 
@@ -98,7 +98,7 @@ static hal_result_t s_hal_device_ethtransceiver_lowlevel_init(const hal_device_e
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_device_ethtransceiver_cfg_t s_hal_device_ethtransceiver_cfg      = {.dummy = 0};
+static hal_ethtransceiver_cfg_t s_hal_device_ethtransceiver_cfg      = {.dummy = 0};
 static hal_bool_t s_hal_device_ethtransceiver_initted                    =  hal_false;
 static hal_bool_t s_hal_device_ethtransceiver_started                    =  hal_false;
 
@@ -109,7 +109,7 @@ static hal_bool_t s_hal_device_ethtransceiver_started                    =  hal_
 
 
 
-extern hal_result_t hal_device_ethtransceiver_init(const hal_device_ethtransceiver_cfg_t *cfg)
+extern hal_result_t hal_ethtransceiver_init(const hal_ethtransceiver_cfg_t *cfg)
 {
     hal_result_t res = hal_res_NOK_generic;
 
@@ -127,10 +127,10 @@ extern hal_result_t hal_device_ethtransceiver_init(const hal_device_ethtransceiv
 
     if(NULL == cfg)
     {
-        cfg = &hal_device_ethtransceiver_cfg_default;
+        cfg = &hal_ethtransceiver_cfg_default;
     }
 
-    memcpy(&s_hal_device_ethtransceiver_cfg, cfg, sizeof(hal_device_ethtransceiver_cfg_t));
+    memcpy(&s_hal_device_ethtransceiver_cfg, cfg, sizeof(hal_ethtransceiver_cfg_t));
 
     res = s_hal_device_ethtransceiver_lowlevel_init(cfg);
 
@@ -140,7 +140,7 @@ extern hal_result_t hal_device_ethtransceiver_init(const hal_device_ethtransceiv
 }
 
 
-extern hal_result_t hal_device_ethtransceiver_config(hal_eth_phymode_t targetphymode, hal_eth_phymode_t *usedphymode)
+extern hal_result_t hal_ethtransceiver_config(hal_eth_phymode_t targetphymode, hal_eth_phymode_t *usedphymode)
 {
 //    hal_result_t res = hal_res_NOK_generic;
 
@@ -245,7 +245,7 @@ static void s_hal_device_ethtransceiver_started_set(void)
 
 
 
-static hal_result_t s_hal_device_ethtransceiver_lowlevel_init(const hal_device_ethtransceiver_cfg_t *cfg)
+static hal_result_t s_hal_device_ethtransceiver_lowlevel_init(const hal_ethtransceiver_cfg_t *cfg)
 {
     if((NULL != hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.init)   && 
        (NULL != hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.config) &&

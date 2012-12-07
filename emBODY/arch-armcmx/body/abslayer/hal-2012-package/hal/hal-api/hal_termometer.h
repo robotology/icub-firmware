@@ -18,20 +18,20 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _HAL_SENSOR_GYRO_H_
-#define _HAL_SENSOR_GYRO_H_
+#ifndef _HAL_TERMOMETER_H_
+#define _HAL_TERMOMETER_H_
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/** @file       hal_sensor_gyro.h
-    @brief      This header file implements interface to a generic hal sensor angular rate module (gyroscope)
+/** @file       hal_termometer.h
+    @brief      This header file implements interface to a generic hal port temperature module
     @author     marco.accame@iit.it
     @date       10/24/2012
 **/
 
-/** @defgroup arm_hal_sensor_gyro HAL SNSR_GYRO
+/** @defgroup doxy_group_hal_termometer HAL TERMOMETER
 
-    The HAL SNSR_TEMP is a high level module whcih manages a angular rate sensor
+    The HAL SNSR_TEMP is a high level module whcih manages a temperature port
  
     @todo acemor-facenda: review documentation.
     
@@ -52,65 +52,60 @@
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
-/** @typedef    typedef enum hal_sensor_gyro_t 
-    @brief      hal_sensor_gyro_t contains the possible sensors
+/** @typedef    typedef enum hal_termometer_port_t 
+    @brief      hal_termometer_port_t contains the possible ports for a temperature sensing
  **/
 typedef enum
 {
-    hal_sensor_gyro1 = 0
-} hal_sensor_gyro_t;
+    hal_termometer_port1 = 0
+} hal_termometer_port_t;
 
-enum { hal_sensor_gyros_number = 1 };
+enum { hal_termometer_ports_number = 1 };
 
 
-/** @typedef    typedef int8_t hal_sensor_gyro_angular_rate_t 
-    @brief      expresses the angular rate in milli degrees per second.
+/** @typedef    typedef int8_t hal_termometer_degrees_t 
+    @brief      expresses temperature in celsius degrees with range [-128, +127] and 1 degree resolution.
  **/
-typedef struct
-{
-    int32_t     xar;
-    int32_t     yar;
-    int32_t     zar;
-} hal_sensor_gyro_angular_rate_t;
+typedef int16_t hal_termometer_degrees_t;
 
 
-/** @typedef    typedef enum hal_sensor_gyro_cfg_t 
-    @brief      hal_sensor_gyro_cfg_t contains the configuration for the sensor.
+/** @typedef    typedef enum hal_termometer_cfg_t 
+    @brief      hal_termometer_cfg_t contains the configuration for the temperature port.
  **/
 typedef struct
 {
     uint8_t         dummy;
-} hal_sensor_gyro_cfg_t;
+} hal_termometer_cfg_t;
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const hal_sensor_gyro_cfg_t hal_sensor_gyro_cfg_default; // = { .dummy = 0 };
+extern const hal_termometer_cfg_t hal_termometer_cfg_default; // = { .dummy = 0 };
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-/** @fn			extern hal_result_t hal_sensor_gyro_init(hal_sensor_gyro_t sensor, const hal_sensor_gyro_cfg_t *cfg)
-    @brief  	this function initializes a given gyro sensor 
-    @param  	sensor	        the sensor
+/** @fn			extern hal_result_t hal_termometer_init(hal_termometer_port_t port, const hal_termometer_cfg_t *cfg)
+    @brief  	this function initializes a temperature port on a given port
+    @param  	port	        the port
     @param  	cfg 	        pointer to configuration data
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_sensor_gyro_init(hal_sensor_gyro_t sensor, const hal_sensor_gyro_cfg_t *cfg);
+extern hal_result_t hal_termometer_init(hal_termometer_port_t port, const hal_termometer_cfg_t *cfg);
 
 
-/** @fn			extern hal_result_t hal_sensor_gyro_read(hal_sensor_gyro_t sensor, hal_sensor_gyro_degree_t* degrees)
-    @brief  	this function reads temperatures on a given sensor.
-    @param  	sensor	        the sensor
+/** @fn			extern hal_result_t hal_termometer_read(hal_termometer_port_t port, hal_termometer_degrees_t* degrees)
+    @brief  	this function reads temperatures on a given port.
+    @param  	port	        the port
     @param  	degrees 	    the read degrees
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_sensor_gyro_read(hal_sensor_gyro_t sensor, hal_sensor_gyro_angular_rate_t* angrate);
+extern hal_result_t hal_termometer_read(hal_termometer_port_t port, hal_termometer_degrees_t* degrees);
 
 
 /** @}            
-    end of group arm_hal_sensor_gyro  
+    end of group doxy_group_hal_termometer  
  **/
 
 #endif  // include-guard
