@@ -15,7 +15,8 @@ set(BASE 				$ENV{ICUB_ROOT}/firmware/emBODY/)
 set(EXTRA_FOLDER  		${CMAKE_CURRENT_SOURCE_DIR}/)
 set(TRANSCEIVER_FOLDER	$ENV{ICUB_ROOT}/main/src/libraries/icubmod/embObjLib/ )
 
-set(CMAKE_MODULE_PATH ../../)
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/../../)
+
 find_package(ACE)
 
 include(embObjLib.conf)
