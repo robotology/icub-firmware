@@ -82,7 +82,7 @@ static const eOappTheDB_cfg_canBoardInfo_t s_cfg_appDB_boards[] =
         EO_INIT(.type)                        eobrd_1foc,
     },
 
-    { // 1 == FOC_ADDRCAN_2_BID
+    { // 1 == FOC_ADDRCAN_2_BID: this board isn't connected to any motor
         EO_INIT(.canLoc)
         {
             EO_INIT(.emscanport)              eOcanport1,
@@ -185,7 +185,7 @@ extern const EOconstvector* const eo_cfg_appDB_constvec_motors__ptr = &s_eo_cfg_
 //};
 
 //No mais boards are coccented to eb5
-const EOconstvector  s_eo_cfg_appDB_constvec_sensors = 
+const EOconstvector  s_eo_cfg_appDB_constvec_snsrMais = 
 {
     EO_INIT(.size)              0, //sizeof(s_cfg_appDB_snrMais)/sizeof(eOappTheDB_cfg_snsrMaisInfo_t), 
     EO_INIT(.item_size)         0, //sizeof(eOappTheDB_cfg_snsrMaisInfo_t),
@@ -207,7 +207,7 @@ extern const EOconstvector* const eo_cfg_appDB_constvec_snsrMais__ptr = &s_eo_cf
 //};
 
 //No strain boards are coccented to eb5
-const EOconstvector  s_eo_cfg_appDB_constvec_sensors = 
+const EOconstvector  s_eo_cfg_appDB_constvec_snsrStrain = 
 {
     EO_INIT(.size)              0, //sizeof(s_cfg_appDB_snrStrain)/sizeof(eOappTheDB_cfg_snsrStrainInfo_t), 
     EO_INIT(.item_size)         0, //sizeof(eOappTheDB_cfg_snsrStrainInfo_t),
