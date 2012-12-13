@@ -351,7 +351,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
     return eobool_true;
 }
 
-extern int16_t eo_axisController_PWM(EOaxisController *o, int32_t *vout)
+extern int16_t eo_axisController_PWM(EOaxisController *o, int32_t *vout, eObool_t *big_error_flag)
 {
     if (!o) return 0;
     
@@ -437,6 +437,8 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, int32_t *vout)
             #endif
             
             o->err = pos_ref - pos;
+
+            if (big_error_flag && (o->err<-400.0 || o->err>400.0)) *big_error_flag = eobool_true;
 
             if (vout) *vout = (int32_t)vel_ref;
             
