@@ -277,9 +277,11 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
     int32_t vel_joint[MAX_JOINTS];
     int32_t pwm_joint[MAX_JOINTS];
 
+    eObool_t big_error_flag = eobool_false;
+    
     JOINTS(j)
     {
-        pwm_joint[j] = eo_axisController_PWM(s_emsc->axis_controller[j], &(vel_joint[j]));
+        pwm_joint[j] = eo_axisController_PWM(s_emsc->axis_controller[j], &(vel_joint[j]), &big_error_flag);
     }
     
     switch (s_emsc->boardType)
@@ -302,7 +304,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
         break;
     }
     
-    if (s_emsc->defcon == EMS_PRUDENT)
+    if (big_error_flag || s_emsc->defcon == EMS_PRUDENT)
     {
         MOTORS(m) LIMIT(pwm_motor[m], SAFE_MAX_CURRENT); 
     }

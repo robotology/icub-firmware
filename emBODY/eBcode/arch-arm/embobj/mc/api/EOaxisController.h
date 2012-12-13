@@ -87,7 +87,7 @@ extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_
 extern void eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_t avg_acc);
 extern void eo_axisController_SetTrqRef(EOaxisController *o, int32_t trq);
 
-extern int16_t eo_axisController_PWM(EOaxisController *o, int32_t *vout);
+extern int16_t eo_axisController_PWM(EOaxisController *o, int32_t *vout, eObool_t *big_error_flag);
 
 extern void eo_axisController_Stop(EOaxisController *o);
 
