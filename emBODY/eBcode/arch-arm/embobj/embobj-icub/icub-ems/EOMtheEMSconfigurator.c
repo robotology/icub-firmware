@@ -165,6 +165,10 @@ __weak extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(EOMt
 
 } 
 
+__weak extern void eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(EOMtheEMSconfigurator* p)
+{
+
+} 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
@@ -197,7 +201,8 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
         // no other event is managed anymore. a possible received packet shall be managed by teh runner
         return;
     }
-    
+     
+     
     if(eobool_true == eo_common_event_check(evt, emssocket_evt_packet_received))
     {   // process the reception of a packet. it must contain a ropframe and nothing else
         
@@ -237,6 +242,11 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
             eom_task_SetEvent(p, emssocket_evt_packet_received); 
         }
      
+    }
+    
+    if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_userdef))
+    {
+        eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(&s_emsconfigurator_singleton);
     }
 
 }
