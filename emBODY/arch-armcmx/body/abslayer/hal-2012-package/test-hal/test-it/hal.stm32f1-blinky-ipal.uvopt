@@ -125,6 +125,7 @@
         <tRmem>1</tRmem>
         <tRfunc>0</tRfunc>
         <tRbox>1</tRbox>
+        <tRtrace>0</tRtrace>
         <sRunDeb>0</sRunDeb>
         <sLrtime>0</sLrtime>
         <nTsel>9</nTsel>
@@ -149,7 +150,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGUARM</Key>
-          <Name>(106=-1,-1,-1,-1,0)(107=-1,-1,-1,-1,0)</Name>
+          <Name>(107=-1,-1,-1,-1,0)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -177,7 +178,24 @@
           <Name>-O14 -S0 -C0 -N00("ARM Cortex-M3") -D00(1BA00477) -L00(4) -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_CL -FS08000000 -FL040000)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>446</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>C:\Users\acemor\sourceforge\emBODY\arch-armcmx\body\abslayer\hal-2012-package\hal\hal-src\extbrds\hal_extbrd_keil_mcbqvga.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -223,8 +241,17 @@
         <newCpu>0</newCpu>
         <uProt>0</uProt>
       </DebugFlag>
+      <Tracepoint>
+        <THDelay>0</THDelay>
+      </Tracepoint>
       <LintExecutable></LintExecutable>
       <LintConfigFile></LintConfigFile>
+      <SystemViewers>
+        <Entry>
+          <Name>System Viewer\SPI3</Name>
+          <WinId>35905</WinId>
+        </Entry>
+      </SystemViewers>
     </TargetOption>
   </Target>
 
@@ -333,6 +360,7 @@
         <tRmem>1</tRmem>
         <tRfunc>0</tRfunc>
         <tRbox>1</tRbox>
+        <tRtrace>0</tRtrace>
         <sRunDeb>0</sRunDeb>
         <sLrtime>0</sLrtime>
         <nTsel>9</nTsel>
@@ -385,7 +413,24 @@
           <Name>-O14 -S0 -C0 -N00("ARM Cortex-M3") -D00(1BA00477) -L00(4) -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_CL -FS08000000 -FL040000)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>446</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>C:\Users\acemor\sourceforge\emBODY\arch-armcmx\body\abslayer\hal-2012-package\hal\hal-src\extbrds\hal_extbrd_keil_mcbqvga.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+      </Breakpoint>
       <MemoryWindow1>
         <Mm>
           <WinNumber>1</WinNumber>
@@ -419,6 +464,9 @@
         <newCpu>0</newCpu>
         <uProt>0</uProt>
       </DebugFlag>
+      <Tracepoint>
+        <THDelay>0</THDelay>
+      </Tracepoint>
       <LintExecutable></LintExecutable>
       <LintConfigFile></LintConfigFile>
     </TargetOption>
@@ -429,19 +477,22 @@
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>1</GroupNumber>
       <FileNumber>1</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>8</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>216</TopLine>
-      <CurrentLine>231</CurrentLine>
+      <TopLine>176</TopLine>
+      <CurrentLine>182</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app-test\blinky-ipal-hal-stm32fx.c</PathWithFileName>
       <FilenameWithoutPath>blinky-ipal-hal-stm32fx.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -450,6 +501,7 @@
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>2</GroupNumber>
       <FileNumber>2</FileNumber>
@@ -463,6 +515,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\sys\mid\lib\stm32f1.lib</PathWithFileName>
       <FilenameWithoutPath>stm32f1.lib</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -471,6 +525,7 @@
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>3</GroupNumber>
       <FileNumber>3</FileNumber>
@@ -484,6 +539,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\hal-cfg\stm32f1\hal_cfg.h</PathWithFileName>
       <FilenameWithoutPath>hal_cfg.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -498,6 +555,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\hal-cfg\stm32f1\hal_cfg.c</PathWithFileName>
       <FilenameWithoutPath>hal_cfg.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -506,6 +565,7 @@
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>4</GroupNumber>
       <FileNumber>5</FileNumber>
@@ -514,11 +574,13 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>185</TopLine>
+      <TopLine>183</TopLine>
       <CurrentLine>190</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-stg\hal_stm32f1_startup.s</PathWithFileName>
       <FilenameWithoutPath>hal_stm32f1_startup.s</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -527,6 +589,7 @@
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>5</GroupNumber>
       <FileNumber>6</FileNumber>
@@ -540,6 +603,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\sys\mid\src\system_stm32f10x.c</PathWithFileName>
       <FilenameWithoutPath>system_stm32f10x.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -548,6 +613,7 @@
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>6</GroupNumber>
       <FileNumber>7</FileNumber>
@@ -561,6 +627,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\base\hal_base.c</PathWithFileName>
       <FilenameWithoutPath>hal_base.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -569,6 +637,7 @@
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>7</GroupNumber>
       <FileNumber>8</FileNumber>
@@ -582,6 +651,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\mpu\hal_mpu_arch.c</PathWithFileName>
       <FilenameWithoutPath>hal_mpu_arch.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
@@ -596,6 +667,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\mpu\hal_mpu_can.c</PathWithFileName>
       <FilenameWithoutPath>hal_mpu_can.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
@@ -610,6 +683,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\mpu\hal_mpu_crc.c</PathWithFileName>
       <FilenameWithoutPath>hal_mpu_crc.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
@@ -624,6 +699,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\mpu\hal_mpu_eth.c</PathWithFileName>
       <FilenameWithoutPath>hal_mpu_eth.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
@@ -638,6 +715,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\mpu\hal_mpu_flash.c</PathWithFileName>
       <FilenameWithoutPath>hal_mpu_flash.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
@@ -647,11 +726,13 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>304</TopLine>
-      <CurrentLine>305</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\mpu\hal_mpu_gpio.c</PathWithFileName>
       <FilenameWithoutPath>hal_mpu_gpio.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
@@ -666,6 +747,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\mpu\hal_mpu_i2c.c</PathWithFileName>
       <FilenameWithoutPath>hal_mpu_i2c.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
@@ -673,13 +756,15 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>1</ColumnNumber>
+      <ColumnNumber>28</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>698</TopLine>
+      <CurrentLine>716</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\mpu\hal_mpu_spi.c</PathWithFileName>
       <FilenameWithoutPath>hal_mpu_spi.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
@@ -694,6 +779,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\mpu\hal_mpu_sys.c</PathWithFileName>
       <FilenameWithoutPath>hal_mpu_sys.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
@@ -708,6 +795,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\mpu\hal_mpu_timer.c</PathWithFileName>
       <FilenameWithoutPath>hal_mpu_timer.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
@@ -722,6 +811,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\mpu\hal_mpu_trace.c</PathWithFileName>
       <FilenameWithoutPath>hal_mpu_trace.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
@@ -736,6 +827,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\mpu\hal_mpu_watchdog.c</PathWithFileName>
       <FilenameWithoutPath>hal_mpu_watchdog.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -744,6 +837,7 @@
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>8</GroupNumber>
       <FileNumber>20</FileNumber>
@@ -757,6 +851,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\devices\hal_device_accelerometer.c</PathWithFileName>
       <FilenameWithoutPath>hal_device_accelerometer.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -771,6 +867,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\devices\hal_device_cantransceiver.c</PathWithFileName>
       <FilenameWithoutPath>hal_device_cantransceiver.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -780,11 +878,13 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>20</TopLine>
-      <CurrentLine>28</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\devices\hal_device_display.c</PathWithFileName>
       <FilenameWithoutPath>hal_device_display.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -799,6 +899,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\devices\hal_device_eeprom.c</PathWithFileName>
       <FilenameWithoutPath>hal_device_eeprom.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -813,6 +915,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\devices\hal_device_ethtransceiver.c</PathWithFileName>
       <FilenameWithoutPath>hal_device_ethtransceiver.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -827,6 +931,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\devices\hal_device_gyroscope.c</PathWithFileName>
       <FilenameWithoutPath>hal_device_gyroscope.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -841,6 +947,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\devices\hal_device_led.c</PathWithFileName>
       <FilenameWithoutPath>hal_device_led.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -855,6 +963,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\devices\hal_device_switch.c</PathWithFileName>
       <FilenameWithoutPath>hal_device_switch.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -869,6 +979,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\devices\hal_device_termometer.c</PathWithFileName>
       <FilenameWithoutPath>hal_device_termometer.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -877,6 +989,7 @@
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>9</GroupNumber>
       <FileNumber>29</FileNumber>
@@ -885,11 +998,13 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>274</TopLine>
-      <CurrentLine>283</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\chips\hal_chip_generic_ethtransceiver.c</PathWithFileName>
       <FilenameWithoutPath>hal_chip_generic_ethtransceiver.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
@@ -904,6 +1019,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\chips\hal_chip_micrel_ks8893.c</PathWithFileName>
       <FilenameWithoutPath>hal_chip_micrel_ks8893.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
@@ -918,6 +1035,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\chips\hal_chip_st_l3g4200d.c</PathWithFileName>
       <FilenameWithoutPath>hal_chip_st_l3g4200d.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
@@ -932,6 +1051,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\chips\hal_chip_st_lis3dh.c</PathWithFileName>
       <FilenameWithoutPath>hal_chip_st_lis3dh.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
@@ -946,6 +1067,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\chips\hal_chip_xx_eeprom.c</PathWithFileName>
       <FilenameWithoutPath>hal_chip_xx_eeprom.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -954,19 +1077,22 @@
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>10</GroupNumber>
       <FileNumber>34</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>49</ColumnNumber>
+      <ColumnNumber>39</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>944</TopLine>
-      <CurrentLine>1181</CurrentLine>
+      <TopLine>433</TopLine>
+      <CurrentLine>446</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\extbrds\hal_extbrd_keil_mcbqvga.c</PathWithFileName>
       <FilenameWithoutPath>hal_extbrd_keil_mcbqvga.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -975,6 +1101,7 @@
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>11</GroupNumber>
       <FileNumber>35</FileNumber>
@@ -988,6 +1115,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\brdcfg\hal_brdcfg.c</PathWithFileName>
       <FilenameWithoutPath>hal_brdcfg.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -996,6 +1125,7 @@
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>12</GroupNumber>
       <FileNumber>36</FileNumber>
@@ -1009,6 +1139,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\utilities\hal_utility_bits.c</PathWithFileName>
       <FilenameWithoutPath>hal_utility_bits.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>12</GroupNumber>
@@ -1023,6 +1155,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\utilities\hal_utility_crc16.c</PathWithFileName>
       <FilenameWithoutPath>hal_utility_crc16.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>12</GroupNumber>
@@ -1037,6 +1171,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\utilities\hal_utility_crc32.c</PathWithFileName>
       <FilenameWithoutPath>hal_utility_crc32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>12</GroupNumber>
@@ -1046,11 +1182,13 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>235</TopLine>
+      <CurrentLine>245</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\utilities\hal_utility_fifo.c</PathWithFileName>
       <FilenameWithoutPath>hal_utility_fifo.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -1059,6 +1197,7 @@
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>13</GroupNumber>
       <FileNumber>40</FileNumber>
@@ -1072,6 +1211,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\sys\abs\lib\ipal.base.medium.lib</PathWithFileName>
       <FilenameWithoutPath>ipal.base.medium.lib</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>13</GroupNumber>
@@ -1086,6 +1227,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\app-test\ipal_cfg.h</PathWithFileName>
       <FilenameWithoutPath>ipal_cfg.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>13</GroupNumber>
@@ -1100,6 +1243,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\app-test\ipal_cfg.c</PathWithFileName>
       <FilenameWithoutPath>ipal_cfg.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -1108,6 +1253,7 @@
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>14</GroupNumber>
       <FileNumber>43</FileNumber>
@@ -1121,6 +1267,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\sys\mid\lib\eventviewer.cm3.lib</PathWithFileName>
       <FilenameWithoutPath>eventviewer.cm3.lib</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
   </Group>
 
