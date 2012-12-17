@@ -36,6 +36,8 @@
 
 #define ZERO_ROTATION_TORQUE 1000
 
+#define CABLE_WARNING_x_100  2000
+
 #define MOTORS(m) for (uint8_t m=0; m<o->n_motors; ++m)
 
 
@@ -97,12 +99,14 @@ extern void eo_motors_PWMs_Shoulder(EOmotors *o, int32_t *pwm_joint, int32_t *ve
     vel_motor[0] =  vel_joint[0];
     vel_motor[1] = -vel_joint[0]+vel_joint[1];
     vel_motor[2] = -vel_joint[0]+vel_joint[1]+vel_joint[2];
+    
     vel_motor[3] =  vel_joint[3];
     
     pwm_motor[0] = (int16_t)(      pwm_joint[0]);
     pwm_motor[1] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]))/40);
     pwm_motor[2] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]))/40);
-    pwm_motor[3] = (int16_t)(      pwm_joint[3]);
+    
+    pwm_motor[3] = (int16_t)pwm_joint[3];
     
     MOTORS(m)
     {
@@ -205,6 +209,40 @@ extern void eo_motors_PWMs_Ankle(EOmotors *o, int32_t *pwm_joint, int32_t *vel_m
     
 //? pwm_motor[0] = -pwm_motor[0];
 //? pwm_motor[1] = -pwm_motor[1];
+}
+
+extern eObool_t eo_motors_CableLimitAlarm(int32_t j0, int32_t j1, int32_t j2)
+{
+    int32_t cond = 171*(j0-j1);
+    
+    if ( cond < -34700 + CABLE_WARNING_x_100) return eobool_true;
+ 
+    cond -= 171*j2;
+    
+    if (cond < -36657 + CABLE_WARNING_x_100) return eobool_true;
+    if (cond >  11242 - CABLE_WARNING_x_100) return eobool_true;
+    
+    cond = 100*j1+j2;
+    
+    if (cond <  -6660 + CABLE_WARNING_x_100) return eobool_true;
+    if (cond >  21330 - CABLE_WARNING_x_100) return eobool_true;
+    
+    cond = 100*j0;
+    
+    if (cond <  -9600 + CABLE_WARNING_x_100) return eobool_true;
+    if (cond >    500 - CABLE_WARNING_x_100) return eobool_true;
+    
+    cond = 100*j1;
+    
+    if (cond <          CABLE_WARNING_x_100) return eobool_true;
+    if (cond >  19500 - CABLE_WARNING_x_100) return eobool_true;
+    
+    cond = 100*j2;
+    
+    if (cond < -9000 + CABLE_WARNING_x_100) return eobool_true;
+    if (cond >  9000 - CABLE_WARNING_x_100) return eobool_true;
+    
+    return eobool_false;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
