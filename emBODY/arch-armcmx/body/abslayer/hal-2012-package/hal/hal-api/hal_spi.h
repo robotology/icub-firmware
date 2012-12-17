@@ -151,7 +151,8 @@ extern void hal_test_spima_spisl(void);
 
 
 extern hal_result_t hal_spi_write(hal_spi_port_t port, uint8_t byte, uint8_t* readbyte);
-extern hal_result_t hal_spi_read(hal_spi_port_t port, uint8_t* byte);
+
+extern hal_result_t hal_spi_isrwrite(hal_spi_port_t port, uint8_t byte, uint8_t* readbyte);
 
 
 /** @fn			extern hal_result_t hal_spi_send(hal_spi_port_t port, uint8_t* txframe, uint8_t size)
@@ -181,7 +182,7 @@ extern hal_result_t hal_spi_stop(hal_spi_port_t port);
     @param  	size 	        the size of the frame
     @return 	hal_res_OK if a valid frame is available or hal_res_NOK_generic on failure
   */
-extern hal_result_t hal_spi_get(hal_spi_port_t port, uint8_t* rxframe, uint8_t* size);
+extern hal_result_t hal_spi_get(hal_spi_port_t port, uint8_t* rxframe, uint8_t* size, uint8_t* remainingrxframes);
 
 
 
