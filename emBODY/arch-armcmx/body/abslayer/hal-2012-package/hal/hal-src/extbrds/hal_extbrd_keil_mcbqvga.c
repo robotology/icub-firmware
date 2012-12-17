@@ -63,6 +63,9 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+//#define HAL_EXTBRD_KEIL_MCBQVGA_SPI_USEACTIVITY_RAW08BIT
+#define HAL_EXTBRD_KEIL_MCBQVGA_SPI_USEACTIVITY_SINGLEFRAME
+
 
 #define HAL_EXTBRD_KEIL_MCBQVGA_SPI_START   (0x70)              
 #define HAL_EXTBRD_KEIL_MCBQVGA_SPI_RD      (0x01)              
@@ -134,6 +137,13 @@ static void s_hal_extbrd_keil_mcbqvga_dat_onlywrite(uint16_t value);
 static void s_hal_extbrd_keil_mcbqvga_dat_stop(void);
 
 static void s_hal_extbrd_keil_mcbqvga_draw_char(uint16_t x, uint16_t y, uint8_t *c);
+
+#if     defined(HAL_EXTBRD_KEIL_MCBQVGA_SPI_USEACTIVITY_RAW08BIT)
+static hal_result_t s_hal_extbrd_keil_mcbqvga_spi_write(hal_spi_port_t port, uint8_t byte, uint8_t* readbyte);
+#elif   defined(HAL_EXTBRD_KEIL_MCBQVGA_SPI_USEACTIVITY_SINGLEFRAME)
+static hal_result_t s_hal_extbrd_keil_mcbqvga_spi_write(hal_spi_port_t port, uint8_t byte, uint8_t* readbyte);
+static void s_hal_extbrd_keil_mcbqvga_spiframe_receiv(void* p);
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -379,7 +389,8 @@ static hal_result_t s_hal_extbrd_keil_mcbqvga_hw_init(const hal_extbrd_keil_mcbq
     hal_result_t res = hal_res_NOK_generic;   
     uint8_t data;
     hal_spi_port_t spiport = cfg->spiport;
-    
+
+#if     defined(HAL_EXTBRD_KEIL_MCBQVGA_SPI_USEACTIVITY_RAW08BIT)    
     static const hal_spi_cfg_t spicfg =
     {
         .ownership              = hal_spi_ownership_master,
@@ -393,7 +404,21 @@ static hal_result_t s_hal_extbrd_keil_mcbqvga_hw_init(const hal_extbrd_keil_mcbq
         .sizeoftxfifoofframes   = 0,
         .sizeofrxfifoofframes   = 0    
     };
-    
+#elif   defined(HAL_EXTBRD_KEIL_MCBQVGA_SPI_USEACTIVITY_SINGLEFRAME)
+    static const hal_spi_cfg_t spicfg =
+    {
+        .ownership              = hal_spi_ownership_master,
+        .dir                    = hal_spi_dir_txonly,
+        .activity               = hal_spi_act_singleframe,
+        .speed                  = hal_spi_speed_18mbps,
+        .sizeoftxframe          = 1,
+        .sizeofrxframe          = 1,
+        .onframetransm          = NULL,
+        .onframereceiv          = s_hal_extbrd_keil_mcbqvga_spiframe_receiv,
+        .sizeoftxfifoofframes   = 4,
+        .sizeofrxfifoofframes   = 4    
+    };
+#endif    
  
     // init spi    
     if(hal_res_OK != (res = hal_spi_init(spiport, &spicfg)))
@@ -547,9 +572,9 @@ static void s_hal_extbrd_keil_mcbqvga_cmd_write(uint8_t cmd)
     hal_gpio_quickest_setval(gpio_cs.port, gpio_cs.pin, hal_gpio_valLOW);
   
   
-    hal_spi_write(spiport, HAL_EXTBRD_KEIL_MCBQVGA_SPI_START | HAL_EXTBRD_KEIL_MCBQVGA_SPI_WR | HAL_EXTBRD_KEIL_MCBQVGA_SPI_INDEX, NULL);
-    hal_spi_write(spiport, 0, NULL);
-    hal_spi_write(spiport, cmd, NULL);
+    s_hal_extbrd_keil_mcbqvga_spi_write(spiport, HAL_EXTBRD_KEIL_MCBQVGA_SPI_START | HAL_EXTBRD_KEIL_MCBQVGA_SPI_WR | HAL_EXTBRD_KEIL_MCBQVGA_SPI_INDEX, NULL);
+    s_hal_extbrd_keil_mcbqvga_spi_write(spiport, 0, NULL);
+    s_hal_extbrd_keil_mcbqvga_spi_write(spiport, cmd, NULL);
     
     
     hal_gpio_quickest_setval(gpio_cs.port, gpio_cs.pin, hal_gpio_valHIGH);
@@ -566,11 +591,11 @@ static uint16_t s_hal_extbrd_keil_mcbqvga_dat_read(void)
     hal_gpio_quickest_setval(gpio_cs.port, gpio_cs.pin, hal_gpio_valLOW);
  
  
-    hal_spi_write(spiport, HAL_EXTBRD_KEIL_MCBQVGA_SPI_START | HAL_EXTBRD_KEIL_MCBQVGA_SPI_RD | HAL_EXTBRD_KEIL_MCBQVGA_SPI_DATA, NULL);
-    hal_spi_write(spiport, 0, NULL);
-    hal_spi_write(spiport, 0, &vv1);
+    s_hal_extbrd_keil_mcbqvga_spi_write(spiport, HAL_EXTBRD_KEIL_MCBQVGA_SPI_START | HAL_EXTBRD_KEIL_MCBQVGA_SPI_RD | HAL_EXTBRD_KEIL_MCBQVGA_SPI_DATA, NULL);
+    s_hal_extbrd_keil_mcbqvga_spi_write(spiport, 0, NULL);
+    s_hal_extbrd_keil_mcbqvga_spi_write(spiport, 0, &vv1);
     value = vv1 << 8;
-    hal_spi_write(spiport, 0, &vv0);
+    s_hal_extbrd_keil_mcbqvga_spi_write(spiport, 0, &vv0);
     value |= vv0;
     
     
@@ -588,9 +613,9 @@ static void s_hal_extbrd_keil_mcbqvga_dat_write(uint16_t value)
     hal_gpio_quickest_setval(gpio_cs.port, gpio_cs.pin, hal_gpio_valLOW);
  
  
-    hal_spi_write(spiport, HAL_EXTBRD_KEIL_MCBQVGA_SPI_START | HAL_EXTBRD_KEIL_MCBQVGA_SPI_WR | HAL_EXTBRD_KEIL_MCBQVGA_SPI_DATA, NULL);
-    hal_spi_write(spiport, value >> 8, NULL);
-    hal_spi_write(spiport, value & 0xff, NULL);
+    s_hal_extbrd_keil_mcbqvga_spi_write(spiport, HAL_EXTBRD_KEIL_MCBQVGA_SPI_START | HAL_EXTBRD_KEIL_MCBQVGA_SPI_WR | HAL_EXTBRD_KEIL_MCBQVGA_SPI_DATA, NULL);
+    s_hal_extbrd_keil_mcbqvga_spi_write(spiport, value >> 8, NULL);
+    s_hal_extbrd_keil_mcbqvga_spi_write(spiport, value & 0xff, NULL);
     
     hal_gpio_quickest_setval(gpio_cs.port, gpio_cs.pin, hal_gpio_valHIGH);
 }
@@ -610,15 +635,15 @@ static void s_hal_extbrd_keil_mcbqvga_dat_start(void)
     
     hal_gpio_quickest_setval(gpio_cs.port, gpio_cs.pin, hal_gpio_valLOW);
     
-    hal_spi_write(spiport, HAL_EXTBRD_KEIL_MCBQVGA_SPI_START | HAL_EXTBRD_KEIL_MCBQVGA_SPI_WR | HAL_EXTBRD_KEIL_MCBQVGA_SPI_DATA, NULL);   
+    s_hal_extbrd_keil_mcbqvga_spi_write(spiport, HAL_EXTBRD_KEIL_MCBQVGA_SPI_START | HAL_EXTBRD_KEIL_MCBQVGA_SPI_WR | HAL_EXTBRD_KEIL_MCBQVGA_SPI_DATA, NULL);   
 }
 
 static void s_hal_extbrd_keil_mcbqvga_dat_onlywrite(uint16_t value)
 {
     hal_spi_port_t spiport = s_hal_extbrd_keil_mcbqvga_info[0].cfg.spiport;
 
-    hal_spi_write(spiport, value >> 8, NULL);
-    hal_spi_write(spiport, value & 0xff, NULL);
+    s_hal_extbrd_keil_mcbqvga_spi_write(spiport, value >> 8, NULL);
+    s_hal_extbrd_keil_mcbqvga_spi_write(spiport, value & 0xff, NULL);
 }
 
 
@@ -693,6 +718,50 @@ static void s_hal_extbrd_keil_mcbqvga_draw_char(uint16_t x, uint16_t y, uint8_t 
     s_hal_extbrd_keil_mcbqvga_dat_stop();
 
 }
+
+
+
+#if     defined(HAL_EXTBRD_KEIL_MCBQVGA_SPI_USEACTIVITY_RAW08BIT)
+static hal_result_t s_hal_extbrd_keil_mcbqvga_spi_write(hal_spi_port_t port, uint8_t byte, uint8_t* readbyte)
+{
+    return(hal_spi_write(port, byte, readbyte)); 
+}
+#elif   defined(HAL_EXTBRD_KEIL_MCBQVGA_SPI_USEACTIVITY_SINGLEFRAME)
+
+static volatile uint8_t anewframehasarrived = 0;
+
+
+static hal_result_t s_hal_extbrd_keil_mcbqvga_spi_write(hal_spi_port_t port, uint8_t byte, uint8_t* readbyte)
+{
+    uint8_t rxbyte = 255;
+    uint8_t sizeofframe = 0;
+    hal_spi_put(port, &byte, 1, hal_true); 
+    
+    for(;;)
+    {
+        if(1 == anewframehasarrived)
+        {
+            anewframehasarrived = 0;
+            break;
+        }
+    }
+
+    hal_spi_get(port, &rxbyte, &sizeofframe, NULL);
+    
+    if(NULL != readbyte)
+    {
+        *readbyte = rxbyte;
+    }
+    
+    return(hal_res_OK);       
+}
+
+
+static void s_hal_extbrd_keil_mcbqvga_spiframe_receiv(void* p)
+{
+    anewframehasarrived = 1;
+}
+#endif
 
 
 // -- static variables

@@ -127,13 +127,17 @@ static void s_hal_spi_hw_enable(hal_spi_port_t port, const hal_spi_cfg_t* cfg);
 
 static hal_result_t s_hal_spi_put(hal_spi_port_t port, uint8_t* txframe, uint8_t size, hal_bool_t sendnow);
 
-static void s_hal_spi_isr_enable(hal_spi_port_t port);
-static void s_hal_spi_isr_disable(hal_spi_port_t port);
+static hal_result_t s_hal_spi_get(hal_spi_port_t port, uint8_t* rxframe, uint8_t* size, uint8_t* remainingrxframes);
+
+static void s_hal_spi_nvic_enable(hal_spi_port_t port);
+static void s_hal_spi_nvic_disable(hal_spi_port_t port);
 
 static void s_hal_spi_enable(hal_spi_port_t port);
 static void s_hal_spi_disable(hal_spi_port_t port);
 
 static hal_result_t s_hal_spi_timeoutexpired(void);
+
+static void s_hal_spi_theisr(SPI_TypeDef* SPIx, hal_spi_internals_t* spixint);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -195,8 +199,6 @@ extern hal_result_t hal_spi_write(hal_spi_port_t port, uint8_t byte, uint8_t* re
     SPI_I2S_SendData(SPIx, byte);
     
     timeout = s_hal_spi_timeout_flag;
-    // o RESET ?
-    //    while (!(SPI3->SR & RXNE));           /* Wait for send to finish            */ 
 
     while(RESET == SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_RXNE))
     {
@@ -213,23 +215,23 @@ extern hal_result_t hal_spi_write(hal_spi_port_t port, uint8_t byte, uint8_t* re
     return(hal_res_OK);     
 }
 
-extern hal_result_t hal_spi_read(hal_spi_port_t port, uint8_t* byte)
-{
-    if(hal_false == hal_spi_hid_initted_is(port))
-    {
-        return(hal_res_NOK_generic);
-    }
 
-    *byte = 0;
-    
-    return (hal_res_OK);       
-}
+// extern hal_result_t hal_spi_read(hal_spi_port_t port, uint8_t* byte)
+// {
+//     if(hal_false == hal_spi_hid_initted_is(port))
+//     {
+//         return(hal_res_NOK_generic);
+//     }
+
+//     *byte = 0;
+//     
+//     return (hal_res_OK);       
+// }
 
 
 
 extern hal_result_t hal_spi_put(hal_spi_port_t port, uint8_t* txframe, uint8_t size, hal_bool_t sendnow)
-{
- 
+{ 
     if(hal_false == hal_spi_hid_initted_is(port))
     {
         return(hal_res_NOK_generic);
@@ -256,6 +258,37 @@ extern hal_result_t hal_spi_put(hal_spi_port_t port, uint8_t* txframe, uint8_t s
     }  
 
     return(s_hal_spi_put(port, txframe, size, sendnow));
+}
+
+extern hal_result_t hal_spi_get(hal_spi_port_t port, uint8_t* rxframe, uint8_t* size, uint8_t* remainingrxframes)
+{
+    if(hal_false == hal_spi_hid_initted_is(port))
+    {
+        return(hal_res_NOK_generic);
+    }
+
+#if 0    
+    s_hal_spi_scheduling_suspend();
+    if(hal_false == s_hal_spi_is_status_locked(port))
+    {
+        s_hal_spi_scheduling_restart();
+        return(hal_res_NOK_generic);
+    }
+    s_hal_spi_status_setlock(); and unlock etc ....
+#endif
+       
+    if(NULL == rxframe)
+    {
+        return(hal_res_NOK_nullpointer);
+    }
+    
+    if(0 == size)
+    {
+        return(hal_res_OK);
+    }  
+
+    return(s_hal_spi_get(port, rxframe, size, remainingrxframes));    
+    
 }
 
    
@@ -352,7 +385,7 @@ void SPI1_IRQHandler(void)
             if(spi1int->txcount == spi1int->config.sizeoftxframe)
             {   // it is the last byte in the frame ...
                 
-                 hal_utility_fifo_pop(&spi1int->fifotx);
+                hal_utility_fifo_pop(&spi1int->fifotx);
                 lastbyteofframeisintransmission = hal_true;
                 
                 spi1int->txframe = NULL;
@@ -498,61 +531,7 @@ void SPI2_IRQHandler(void)
 
 void SPI3_IRQHandler(void)
 {
-    static hal_spi_internals_t* spi3int = &s_hal_spi_internals[HAL_spi_port2index(hal_spi_port3)];
-    static hal_bool_t lastbyteofframeisintransmission = hal_false;
-    
-    if(SET == SPI_I2S_GetITStatus(SPI3, SPI_I2S_IT_TXE))
-    {   // master tx
-        if(NULL == spi3int->txframe)
-        {   // either i have a new frame or i have finished one at the previous call
-            if(hal_true == lastbyteofframeisintransmission)
-            {
-                lastbyteofframeisintransmission = hal_false;
-                if(NULL != spi3int->config.onframetransm)
-                {
-                    spi3int->config.onframetransm(NULL);
-                }                
-            }
-            if(hal_false == spi3int->forcestop)
-            {
-                spi3int->txframe =  hal_utility_fifo_front(&spi3int->fifotx);
-                spi3int->txcount = 0;
-            }
-        }
-        
-        if(NULL != spi3int->txframe)
-        {   // transmit       
-            uint8_t index = spi3int->txcount++;
-        
-            if(index < spi3int->config.sizeoftxframe)
-            {             
-                SPI_I2S_SendData(SPI3, spi3int->txframe[index]);              
-            }
-            
-            if(spi3int->txcount == spi3int->config.sizeoftxframe)
-            {   // it is the last byte in the frame ...
-                
-                 hal_utility_fifo_pop(&spi3int->fifotx);
-                lastbyteofframeisintransmission = hal_true;
-                
-                spi3int->txframe = NULL;
-                spi3int->txcount = 0;                
-            }
-        }
-        else
-        {   // dont have any more frame in fifo-tx
-            if((hal_spi_act_continuous == spi3int->config.activity) && (hal_false == spi3int->forcestop))
-            {   // if tx is continuous we just send a zero byte
-                SPI_I2S_SendData(SPI3, 0);
-            }
-            else
-            {   // else we disable tx
-                spi3int->forcestop = hal_false;
-                SPI_I2S_ITConfig(SPI3, SPI_I2S_IT_TXE, DISABLE);
-            }
-        }
-
-    } 
+    s_hal_spi_theisr(SPI3, &s_hal_spi_internals[HAL_spi_port2index(hal_spi_port3)]);
 }
 
 // ---- isr of the module: end ------
@@ -597,6 +576,272 @@ extern hal_boolval_t hal_spi_hid_initted_is(hal_spi_port_t port)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
+
+#if 0
+static void s_hal_spi_theisr(SPI_TypeDef* SPIx, hal_spi_internals_t* spixint)
+{
+    devo rendere piou' snella la procedura.
+    chiamo uan vola sola la isr per tramettere un byte e se ho finito non chiamo piu'.
+    static hal_bool_t lastbyteofframeisintransmission = hal_false;
+    static hal_bool_t lastbyteofframeisreceived = hal_false;
+    
+    if(SET == SPI_I2S_GetITStatus(SPIx, SPI_I2S_IT_TXE))
+    {   // master tx
+        if(NULL == spixint->txframe)
+        {   // either i have a new frame or i have finished one at the previous call
+            if(hal_true == lastbyteofframeisintransmission)
+            {
+                lastbyteofframeisintransmission = hal_false;
+                if(NULL != spixint->config.onframetransm)
+                {
+                    spixint->config.onframetransm(NULL);
+                }                
+            }
+            if(hal_false == spixint->forcestop)
+            {
+                spixint->txframe =  hal_utility_fifo_front(&spixint->fifotx);
+                spixint->txcount = 0;
+            }
+        }
+        
+        if(NULL != spixint->txframe)
+        {   // transmit       
+            uint8_t index = spixint->txcount++;
+        
+            if(index < spixint->config.sizeoftxframe)
+            {             
+                SPI_I2S_SendData(SPIx, spixint->txframe[index]);              
+            }
+            
+            if(spixint->txcount == spixint->config.sizeoftxframe)
+            {   // it is the last byte in the frame ...
+                
+                hal_utility_fifo_pop(&spixint->fifotx);
+                lastbyteofframeisintransmission = hal_true;
+                
+                spixint->txframe = NULL;
+                spixint->txcount = 0;                
+            }
+        }
+        else
+        {   // dont have any more frames in fifo-tx
+            if((hal_spi_act_continuous == spixint->config.activity) && (hal_false == spixint->forcestop))
+            {   // if tx is continuous we just send a zero byte
+                SPI_I2S_SendData(SPIx, 0);
+            }
+//             else if(hal_false == spixint->forcestop)
+//             {   // else we disable tx   
+// //                spixint->forcestop = hal_false;
+// //                SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, DISABLE);
+//                  SPI_I2S_SendData(SPIx, 0);
+//             }
+            else
+            {
+                spixint->forcestop = hal_false;
+                SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, DISABLE);                
+            }
+        }
+
+    }
+
+
+    if(SET == SPI_I2S_GetITStatus(SPIx, SPI_I2S_IT_RXNE))
+    {
+        //uint8_t rxbyte = (uint8_t)SPI_I2S_ReceiveData(SPIx);
+        
+        if(NULL == spixint->rxframe)
+        {   // either i have a new frame or i have finished one at the previous call
+//             if(hal_true == lastbyteofframeisreceived)
+//             {
+//                 lastbyteofframeisreceived = hal_false;
+//                 if(NULL != spixint->config.onframereceiv)
+//                 {
+//                     spixint->config.onframereceiv(NULL); // address of received byte
+//                 }                
+//             }
+            
+            //if(hal_false == spixint->forcestoprx)
+            {
+                spixint->rxframe = (hal_true ==  hal_utility_fifo_full(&spixint->fiforx)) ? (NULL) : (spixint->rxbuffer);
+                spixint->rxcount = 0;
+            }
+        }  
+
+        if(NULL != spixint->rxframe)
+        {   // can put inside the fifo   
+            uint8_t index = spixint->rxcount++;
+        
+            if(index < spixint->config.sizeofrxframe)
+            {             
+                spixint->rxframe[index] = (uint8_t)SPI_I2S_ReceiveData(SPIx);              
+            }
+            
+            if(spixint->rxcount == spixint->config.sizeofrxframe)
+            {   // it is the last byte in the frame ...
+                
+                hal_utility_fifo_put(&spixint->fiforx, spixint->rxframe);
+                lastbyteofframeisreceived = hal_true;
+                
+                spixint->rxframe = NULL;
+                spixint->rxcount = 0;     
+
+                //spixint->forcestop = hal_true;  
+
+                if(NULL != spixint->config.onframereceiv)
+                {
+                    spixint->config.onframereceiv(NULL); // address of received byte
+                }                  
+            }
+        }
+        else
+        {   // dont have any more space in fifo-rx
+            //if((hal_spi_act_continuous == spixint->config.activity) && (hal_false == spixint->forcestoprx))
+            //{   // if tx is continuous we just retrieve the byte but we dont put inside the frame-rx
+                uint8_t byte = (uint8_t)SPI_I2S_ReceiveData(SPIx); 
+            //}
+            //else
+            //{   // else we disable rx
+            //    spixint->forcestoprx = hal_false;
+            //    SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, DISABLE);
+            //}
+        }        
+       
+    }    
+    
+}
+
+#endif
+
+//static void s_hal_spi_theisr_safe_but_slow(SPI_TypeDef* SPIx, hal_spi_internals_t* spixint)
+static void s_hal_spi_theisr(SPI_TypeDef* SPIx, hal_spi_internals_t* spixint)
+{
+    static hal_bool_t lastbyteofframeisintransmission = hal_false;
+    static hal_bool_t lastbyteofframeisreceived = hal_false;
+    
+    if(SET == SPI_I2S_GetITStatus(SPIx, SPI_I2S_IT_TXE))
+    {   // master tx
+        if(NULL == spixint->txframe)
+        {   // either i have a new frame or i have finished one at the previous call
+            if(hal_true == lastbyteofframeisintransmission)
+            {
+                lastbyteofframeisintransmission = hal_false;
+                if(NULL != spixint->config.onframetransm)
+                {
+                    spixint->config.onframetransm(NULL);
+                }                
+            }
+            if(hal_false == spixint->forcestop)
+            {
+                spixint->txframe =  hal_utility_fifo_front(&spixint->fifotx);
+                spixint->txcount = 0;
+            }
+        }
+        
+        if(NULL != spixint->txframe)
+        {   // transmit       
+            uint8_t index = spixint->txcount++;
+        
+            if(index < spixint->config.sizeoftxframe)
+            {             
+                SPI_I2S_SendData(SPIx, spixint->txframe[index]);              
+            }
+            
+            if(spixint->txcount == spixint->config.sizeoftxframe)
+            {   // it is the last byte in the frame ...
+                
+                hal_utility_fifo_pop(&spixint->fifotx);
+                lastbyteofframeisintransmission = hal_true;
+                
+                spixint->txframe = NULL;
+                spixint->txcount = 0;                
+            }
+        }
+        else
+        {   // dont have any more frames in fifo-tx
+            if((hal_spi_act_continuous == spixint->config.activity) && (hal_false == spixint->forcestop))
+            {   // if tx is continuous we just send a zero byte
+                SPI_I2S_SendData(SPIx, 0);
+            }
+//             else if(hal_false == spixint->forcestop)
+//             {   // else we disable tx   
+// //                spixint->forcestop = hal_false;
+// //                SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, DISABLE);
+//                  SPI_I2S_SendData(SPIx, 0);
+//             }
+            else
+            {
+                spixint->forcestop = hal_false;
+                SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, DISABLE);                
+            }
+        }
+
+    }
+
+
+    if(SET == SPI_I2S_GetITStatus(SPIx, SPI_I2S_IT_RXNE))
+    {
+        //uint8_t rxbyte = (uint8_t)SPI_I2S_ReceiveData(SPIx);
+        
+        if(NULL == spixint->rxframe)
+        {   // either i have a new frame or i have finished one at the previous call
+//             if(hal_true == lastbyteofframeisreceived)
+//             {
+//                 lastbyteofframeisreceived = hal_false;
+//                 if(NULL != spixint->config.onframereceiv)
+//                 {
+//                     spixint->config.onframereceiv(NULL); // address of received byte
+//                 }                
+//             }
+            
+            //if(hal_false == spixint->forcestoprx)
+            {
+                spixint->rxframe = (hal_true ==  hal_utility_fifo_full(&spixint->fiforx)) ? (NULL) : (spixint->rxbuffer);
+                spixint->rxcount = 0;
+            }
+        }  
+
+        if(NULL != spixint->rxframe)
+        {   // can put inside the fifo   
+            uint8_t index = spixint->rxcount++;
+        
+            if(index < spixint->config.sizeofrxframe)
+            {             
+                spixint->rxframe[index] = (uint8_t)SPI_I2S_ReceiveData(SPIx);              
+            }
+            
+            if(spixint->rxcount == spixint->config.sizeofrxframe)
+            {   // it is the last byte in the frame ...
+                
+                hal_utility_fifo_put(&spixint->fiforx, spixint->rxframe);
+                lastbyteofframeisreceived = hal_true;
+                
+                spixint->rxframe = NULL;
+                spixint->rxcount = 0;     
+
+                //spixint->forcestop = hal_true;  
+
+                if(NULL != spixint->config.onframereceiv)
+                {
+                    spixint->config.onframereceiv(NULL); // address of received byte
+                }                  
+            }
+        }
+        else
+        {   // dont have any more space in fifo-rx
+            //if((hal_spi_act_continuous == spixint->config.activity) && (hal_false == spixint->forcestoprx))
+            //{   // if tx is continuous we just retrieve the byte but we dont put inside the frame-rx
+                uint8_t byte = (uint8_t)SPI_I2S_ReceiveData(SPIx); 
+            //}
+            //else
+            //{   // else we disable rx
+            //    spixint->forcestoprx = hal_false;
+            //    SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, DISABLE);
+            //}
+        }        
+       
+    }    
+    
+}
 
 static hal_boolval_t s_hal_spi_supported_is(hal_spi_port_t port)
 {
@@ -650,7 +895,7 @@ static hal_result_t s_hal_spi_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg
     
     if(hal_spi_act_singleframe == cfg->activity)
     {
-        s_hal_spi_isr_enable(port);
+        s_hal_spi_nvic_enable(port);
     }
         
     
@@ -1037,34 +1282,58 @@ static hal_result_t s_hal_spi_put(hal_spi_port_t port, uint8_t* txframe, uint8_t
         s_hal_spi_internals[HAL_spi_port2index(port)].forcestop = hal_false;
         // enable again
         s_hal_spi_enable(port);   
-        SPI_I2S_SendData(SPI2, 0);
     }
     
     return(res);
 }
 
+static hal_result_t s_hal_spi_get(hal_spi_port_t port, uint8_t* rxframe, uint8_t* size, uint8_t* remainingrxframes)
+{
+    hal_result_t res = hal_res_NOK_generic;
+    const hal_spi_cfg_t* cfg = &s_hal_spi_internals[HAL_spi_port2index(port)].config;
+ 
+    // disable so that we can change a data structure which is used by the isr
+    #warning --> devo pensare a come proteggere l'accessso alla fiforx da accessi concorrenti
+//    s_hal_spi_disable(port);
+    res =  hal_utility_fifo_get(&s_hal_spi_internals[HAL_spi_port2index(port)].fiforx, rxframe, size);
+    
+    if(NULL != remainingrxframes)
+    {
+        *remainingrxframes = hal_utility_fifo_size(&s_hal_spi_internals[HAL_spi_port2index(port)].fiforx);
+    }
+        
+//        s_hal_spi_internals[HAL_spi_port2index(port)].forcestop = hal_false;
+        // enable again
+//        s_hal_spi_enable(port);   
+
+    
+    return(res);    
+}
+
 static void s_hal_spi_enable(hal_spi_port_t port)
 {
-    SPI_TypeDef* SPIx = HAL_spi_port2stmSPI(port);    
-    //SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, ENABLE);
+    SPI_TypeDef* SPIx = HAL_spi_port2stmSPI(port); 
+    //SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, ENABLE);    
     SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, ENABLE);
+    SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, ENABLE);
 }
 
 static void s_hal_spi_disable(hal_spi_port_t port)
 {
-    SPI_TypeDef* SPIx = HAL_spi_port2stmSPI(port);   
-    //SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, DISABLE);
+    SPI_TypeDef* SPIx = HAL_spi_port2stmSPI(port); 
+    //SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE | SPI_I2S_IT_RXNE, DISABLE);    
+    SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, DISABLE);
     SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, DISABLE);
 }
 
 
-static void s_hal_spi_isr_enable(hal_spi_port_t port)
+static void s_hal_spi_nvic_enable(hal_spi_port_t port)
 {
     IRQn_Type IRQn = (hal_spi_port1 == port) ? (SPI1_IRQn) : ( (hal_spi_port2 == port) ? (SPI2_IRQn) : (SPI3_IRQn) );
     hal_sys_irqn_enable(IRQn);
 }
 
-static void s_hal_spi_isr_disable(hal_spi_port_t port)
+static void s_hal_spi_nvic_disable(hal_spi_port_t port)
 {
     IRQn_Type IRQn = (hal_spi_port1 == port) ? (SPI1_IRQn) : ( (hal_spi_port2 == port) ? (SPI2_IRQn) : (SPI3_IRQn) );
     hal_sys_irqn_disable(IRQn);
