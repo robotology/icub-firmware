@@ -80,29 +80,34 @@
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSconfigurator *p)
+// extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSconfigurator *p)
+// {
+
+// }
+
+
+extern void eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(EOMtheEMSconfigurator* p)
 {
-//     eOresult_t  res;
-//     uint8_t     numofRXcanframe = 0;
-//     EOappCanSP  *appcanSP = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-#warning VALE --> read or not read can frame in configuration state??    
-//     res = eo_appCanSP_GetNumOfRecCanframe(appcanSP, eOcanport1, &numofRXcanframe);
-//     if(eores_OK != res)
-//     {
-//         return;
-//     }
-//     eo_appCanSP_read(appcanSP, eOcanport1, numofRXcanframe, NULL);
+    eOresult_t  res;
+    uint8_t     numofRXcanframe = 0;
+    EOappCanSP  *appcanSP = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+   
+    res = eo_appCanSP_GetNumOfRecCanframe(appcanSP, eOcanport1, &numofRXcanframe);
+    if(eores_OK != res)
+    {
+        return;
+    }
+    eo_appCanSP_read(appcanSP, eOcanport1, numofRXcanframe, NULL);
 
-//     
-//     res = eo_appCanSP_GetNumOfRecCanframe(appcanSP, eOcanport2, &numofRXcanframe);
-//     if(eores_OK != res)
-//     {
-//         return;
-//     }
-//     eo_appCanSP_read(appcanSP, eOcanport2, numofRXcanframe, NULL);
     
-}
+    res = eo_appCanSP_GetNumOfRecCanframe(appcanSP, eOcanport2, &numofRXcanframe);
+    if(eores_OK != res)
+    {
+        return;
+    }
+    eo_appCanSP_read(appcanSP, eOcanport2, numofRXcanframe, NULL);
 
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 

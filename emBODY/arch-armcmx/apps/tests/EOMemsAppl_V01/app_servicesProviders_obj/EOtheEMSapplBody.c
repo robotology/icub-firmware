@@ -98,6 +98,13 @@ static void s_eo_emsapplBody_measuresConverter_init(EOtheEMSapplBody *p);
 static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p);
 static eOresult_t s_eo_emsapplBody_getRunMode(EOtheEMSapplBody *p);
 static void s_eo_emsapplBody_leds_init(EOtheEMSapplBody *p);
+
+static eOresult_t s_eo_emsapplBody_DisableTxJointOnCan(EOtheEMSapplBody *p, eOmc_jointId_t j);
+static eOresult_t s_eo_emsapplBody_EnableTxMais(EOtheEMSapplBody *p);
+static eOresult_t s_eo_emsapplBody_DisableTxMais(EOtheEMSapplBody *p);
+
+extern void eo_emsapplBody_hid_canSP_cbkonrx(void *arg);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -216,6 +223,73 @@ extern EOappMeasConv* eo_emsapplBody_GetMeasuresConverterHandle(EOtheEMSapplBody
     }
     return(p->bodyobjs.appMeasConv);
 
+}
+
+extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
+{
+    eOresult_t                          res;
+    uint16_t                            numofjoint, i;
+    eOicubCanProto_bcastpolicy_t        *bcastpolicy_ptr;
+    eOicubCanProto_msgCommand_t         msgCmd = 
+    {
+        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__SET_BCAST_POLICY
+    };
+
+    
+    if((applrunMode__skinAndMc4 != p->appRunMode) && (applrunMode__mc4Only != p->appRunMode))
+    {
+        return(eores_OK);
+    }
+    
+    // 2) enable tx on mais
+    res = s_eo_emsapplBody_EnableTxMais(p);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+
+    // 3) config joints
+    numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
+    
+    for(i=0; (i<numofjoint) && (eores_OK == res); i++)
+    {
+        //get bcast policy from db
+        res = eo_appTheDB_GetJointBcastpolicyPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)i, &bcastpolicy_ptr);
+        if(eores_OK != res)
+        {
+            return(res);
+        }
+
+        res = eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, (void*)&(bcastpolicy_ptr->val2bcastList[0]));
+    }
+    #warning disabilita la pelle come si fa?
+    
+
+    return(res);
+}
+
+
+
+extern eOresult_t  eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p)
+{
+    eOresult_t                          res = eores_OK;
+    uint16_t                            numofjoint, i;
+
+    
+    if((applrunMode__skinAndMc4 != p->appRunMode) && (applrunMode__mc4Only != p->appRunMode))
+    {
+        return(eores_OK);
+    }
+    
+    numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
+    
+    for(i=0; (i<numofjoint) && (eores_OK == res); i++)
+    {
+        res = s_eo_emsapplBody_DisableTxJointOnCan(p, (eOmc_jointId_t)i);
+    }
+    
+    return(res);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -351,7 +425,19 @@ static void s_eo_emsapplBody_canServicesProvider_init(EOtheEMSapplBody *p)
 {
     eOappCanSP_cfg_t cfg = 
     {
-        .waitallframesaresent   = eobool_true
+        .cbkonrx   = 
+        {
+            // port1
+            {
+                .fn = eo_emsapplBody_hid_canSP_cbkonrx,
+                .argoffn = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle())
+            },
+            // port2
+            {
+                .fn = eo_emsapplBody_hid_canSP_cbkonrx,
+                .argoffn = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle())
+            },
+        }
     };
     p->bodyobjs.appCanSP = eo_appCanSP_New(&cfg);
 
@@ -359,6 +445,11 @@ static void s_eo_emsapplBody_canServicesProvider_init(EOtheEMSapplBody *p)
                      s_eobj_ownname, "error in appCanSP_New");
 }
 
+extern void eo_emsapplBody_hid_canSP_cbkonrx(void *arg)
+{
+    EOMtask *task = (EOMtask *)arg;
+    eom_task_isrSetEvent(task, emsconfigurator_evt_userdef);
+}
 
 static void s_eo_emsapplBody_encodersReader_init(EOtheEMSapplBody *p)
 {
@@ -413,7 +504,6 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
     uint16_t                                numofjoint, i, numofboard;
     eOmc_controlmode_t                      controlmode = eomc_controlmode_idle;
     eOappTheDB_jointShiftValues_t           *shiftval_ptr;
-    eOicubCanProto_bcastpolicy_t            *bcastpolicy_ptr;
     eOicubCanProto_estimShift_t             estimshift;
     eOicubCanProto_velocityShift_t          shift_icubCanProtValue;
     eOappTheDB_cfg_canBoardInfo_t           *cfg_canbrd_ptr;
@@ -423,7 +513,7 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
         EO_INIT(.cmdId) 0
     };
 
-    // 1) config can board if mc4 boars are connected to this ems 
+    // 1) config can board if mc4 or mais boars are connected to this ems 
     if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
     {
         eOicubCanProto_msgDestination_t     msgdest;
@@ -440,17 +530,23 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
                 continue;
             }
             
-            if(eobrd_mc4 != cfg_canbrd_ptr->type)
+            if(eobrd_mais == cfg_canbrd_ptr->type)
             {
-                continue;
+                res = s_eo_emsapplBody_DisableTxMais(p);
+                if(eores_OK != res)
+                {
+                    return(res);
+                }        
             }
-            
-            msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, cfg_canbrd_ptr->canLoc.addr);
-            res = eo_appCanSP_SendCmd(p->bodyobjs.appCanSP, cfg_canbrd_ptr->canLoc.emscanport, msgdest, msgCmd, (void*)&emsapplCfg_ptr->applbodycfg.icubcanprotoimplementedversion);
-            if(eores_OK != res)
+            else if(eobrd_mc4 == cfg_canbrd_ptr->type)
             {
-                return(res);
-            }        
+                msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, cfg_canbrd_ptr->canLoc.addr);
+                res = eo_appCanSP_SendCmd(p->bodyobjs.appCanSP, cfg_canbrd_ptr->canLoc.emscanport, msgdest, msgCmd, (void*)&emsapplCfg_ptr->applbodycfg.icubcanprotoimplementedversion);
+                if(eores_OK != res)
+                {
+                    return(res);
+                } 
+            }
         }
     }   
 
@@ -482,15 +578,12 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
         
         if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
         {
-            //get bcast policy from db
-            res = eo_appTheDB_GetJointBcastpolicyPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)i, &bcastpolicy_ptr);
+            //disable transmission of data from joint of mc4 board
+            res = s_eo_emsapplBody_DisableTxJointOnCan(p, (eOmc_jointId_t)i);
             if(eores_OK != res)
             {
                 return(res);
             }
-            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_BCAST_POLICY;
-            eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, (void*)&(bcastpolicy_ptr->val2bcastList[0]));
-
             
             //get shift values from DB
             eo_appTheDB_GetShiftValuesOfJointPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)i, &shiftval_ptr);
@@ -580,6 +673,73 @@ static eOresult_t s_eo_emsapplBody_getRunMode(EOtheEMSapplBody *p)
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "applrunmode is not valid");
     return(eores_NOK_generic);
 }
+
+
+static eOresult_t s_eo_emsapplBody_DisableTxJointOnCan(EOtheEMSapplBody *p, eOmc_jointId_t j)
+{
+    eOresult_t                          res = eores_OK;
+    eOicubCanProto_bcastpolicy_t        emptyBcastPolicy = 
+    {   
+        //EO_INIT(.val2bcastList) {ICUBCANPROTO_PER_MB_CMD_STATUS, 0, 0, 0} 
+        EO_INIT(.val2bcastList) {0, 0, 0, 0}
+    };
+    #warning VALE==> e' possibile avere il msg di stato una volta ogni 5 sec???
+    eOicubCanProto_msgCommand_t         msgCmd = 
+    {
+        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__SET_BCAST_POLICY
+    };
+    
+    res = eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, j, msgCmd, (void*)&(emptyBcastPolicy.val2bcastList[0]));
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    
+    
+    return(res);
+}
+
+
+
+static eOresult_t s_eo_emsapplBody_EnableTxMais(EOtheEMSapplBody *p)
+{
+    eOresult_t                  res;
+    eOsnsr_maisId_t             sId = 0; //exist only one mais per ep
+    eOsnsr_mais_config_t        *maiscfg;
+    eOicubCanProto_msgCommand_t msgCmd = 
+    {
+        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__SET_TXMODE
+    };
+
+    
+    res = eo_appTheDB_GetSnrMaisConfigPtr(eo_appTheDB_GetHandle(), sId,  &maiscfg);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    res = eo_appCanSP_SendCmd2SnrMais(p->bodyobjs.appCanSP, sId, msgCmd, (void*)&(maiscfg->mode));
+
+    return(res);
+}
+
+static eOresult_t s_eo_emsapplBody_DisableTxMais(EOtheEMSapplBody *p)
+{
+    eOresult_t                  res;
+    eOsnsr_maisId_t             sId = 0; //exist only one mais per ep
+    eOsnsr_maismode_t           modetx = snsr_maismode_acquirebutdonttx;
+    eOicubCanProto_msgCommand_t msgCmd = 
+    {
+        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__SET_TXMODE
+    };
+
+    res = eo_appCanSP_SendCmd2SnrMais(p->bodyobjs.appCanSP, sId, msgCmd, (void*)&modetx);
+
+    return(res);
+}
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

@@ -53,6 +53,8 @@ typedef struct
     osal_semaphore_t*   semaphore;
 } eOappCanSP_waitTxIsDone_datastruct_t;
 
+
+
 /** @struct     EOconstvector_hid
     @brief      Hidden definition. Implements private data used only internally by the 
                 public or private (static) functions of the object and protected data

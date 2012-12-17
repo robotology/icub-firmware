@@ -40,6 +40,7 @@
 #include "eOcfg_nvsEP_as.h"
 
 //application
+#include "EOMtheEMSappl.h"
 #include "EOtheEMSapplBody.h"
 #include "EOicubCanProto_specifications.h"
 
@@ -112,6 +113,7 @@
 extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eOsnsr_mais_status_t                *sstatus_ptr;
+    eOsmStatesEMSappl_t                 currentstate;
     eOicubCanProto_msgDestination_t     msgdest;
     eOappTheDB_sensorCanLocation_t      canLoc;
     eOicubCanProto_msgCommand_t         msgCmd = 
@@ -125,9 +127,21 @@ extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig(uint16_t n, const E
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     eo_appTheDB_GetSnsrMaisCanLocation(eo_appTheDB_GetHandle(), (eOsnsr_maisId_t)n, &canLoc);
     
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canLoc.addr); 
-    msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__SET_TXMODE;
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(maiscfg->mode));
+    //if pc104 tell me to enable maistx, before to send cmd verify if i'm in RUN state:
+    // if yes ==> ok no problem
+    // if no ==> i'll send cmd when go to RUN state
+    if(snsr_maismode_txdatacontinuously == maiscfg->mode)
+    {
+        //only if the appl is in RUN state enable mais tx
+        eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
+        if(eo_sm_emsappl_STrun == currentstate)
+        {
+            msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canLoc.addr); 
+            msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__SET_TXMODE;
+            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(maiscfg->mode));
+        }
+    }
+    
     
     msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__SET_CANDATARATE;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(maiscfg->datarate));
