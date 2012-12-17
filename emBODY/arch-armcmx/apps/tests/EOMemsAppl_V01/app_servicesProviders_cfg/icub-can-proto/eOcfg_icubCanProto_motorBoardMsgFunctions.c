@@ -979,6 +979,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getFirmwareVersion(EOicubCa
     eOresult_t                              res;
     eOappTheDB_canBoardCanLocation_t        canLoc;
     eObrd_boardId_t                         bid;
+    eObrd_types_t                           brd_type;
 
     canLoc.emscanport = canPort;
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id); 

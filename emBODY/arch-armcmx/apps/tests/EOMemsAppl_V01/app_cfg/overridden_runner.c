@@ -116,17 +116,6 @@ static uint16_t motionDoneJoin2Use = 0;
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p)
 {
-    uint8_t numtx_port1, numtx_port2;
-    char str[128];
-    
-//     hal_can_out_get(eOcanport1, &numtx_port1);
-//     hal_can_out_get(eOcanport1, &numtx_port2);
-//     if((numtx_port1>0) || (numtx_port2>0))
-//     {
-//         sprintf(str, "activity_beforedatagramreceptio: ntx1=%d, ntx2=%d", numtx_port1, numtx_port2);
-//         hal_trace_puts(str);
-//     }
-    
     eOmn_appl_runMode_t runmode =  eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
     if(applrunMode__2foc == runmode)
     {
@@ -139,7 +128,6 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
     EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
     eOmn_appl_runMode_t runmode  =  eo_emsapplBody_GetAppRunMode(emsappbody_ptr);
 
-    
     switch(runmode)
     {
         case applrunMode__skinOnly:

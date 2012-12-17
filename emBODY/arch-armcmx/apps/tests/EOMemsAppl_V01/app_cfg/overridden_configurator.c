@@ -29,6 +29,7 @@
 
 #include "EOMtheEMSappl.h"
 #include "EOtheEMSApplBody.h"
+#include "EOMtheEMSapplCfg.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -80,12 +81,6 @@
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-// extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSconfigurator *p)
-// {
-
-// }
-
-
 extern void eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(EOMtheEMSconfigurator* p)
 {
     eOresult_t  res;
@@ -97,17 +92,22 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(EOMtheEMSconfigu
     {
         return;
     }
-    eo_appCanSP_read(appcanSP, eOcanport1, numofRXcanframe, NULL);
-
+   eo_appCanSP_read(appcanSP, eOcanport1, numofRXcanframe, NULL);
     
-    res = eo_appCanSP_GetNumOfRecCanframe(appcanSP, eOcanport2, &numofRXcanframe);
-    if(eores_OK != res)
-    {
-        return;
-    }
-    eo_appCanSP_read(appcanSP, eOcanport2, numofRXcanframe, NULL);
 
+
+    if(!(eom_emsapplcfg_HasDevice(eom_emsapplcfg_GetHandle(), eom_emsappl_deviceid_skin)))
+    {
+        numofRXcanframe = 0;
+        res = eo_appCanSP_GetNumOfRecCanframe(appcanSP, eOcanport2, &numofRXcanframe);
+        if(eores_OK != res)
+        {
+            return;
+        }
+        eo_appCanSP_read(appcanSP, eOcanport2, numofRXcanframe, NULL);
+    }
 }
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 

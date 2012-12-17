@@ -99,6 +99,7 @@ static void s_eo_appCanSP_callbackOnRx_port1_allertOnReception(void *arg);
 static void s_eo_appCanSP_callbackOnRx_port2_allertOnReception(void *arg);
 static void s_eo_appCanSP_callbackOnRx_portx_allertOnReception(void *arg, hal_can_port_t port);
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -147,7 +148,7 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg)
     icubCanProto_ptr = eo_icubCanProto_New(&icubCanProto_cfg);
     if(NULL == icubCanProto_ptr)
     {
-        return(retptr);
+        return(NULL);
     }
 
 //3) create the obj (i get the memory for the object)
@@ -181,12 +182,13 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg)
     {
         return(NULL);
     }
+        
 
-// 4) initialise peritheral
+// 4) initialise peripheral
     res = (eOresult_t)s_eo_appCanSP_canPeriphInit(retptr);
     if(eores_OK != res)
     {
-        return(retptr);
+        return(NULL);
     }
     
     return(retptr);
@@ -321,6 +323,8 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t n
     
     for(i=0; i<numofcanframe ; i++)
     {
+        memset(&rec_frame, 0, sizeof(hal_can_frame_t));
+        
         res = (eOresult_t)hal_can_get((hal_can_port_t)canport, &rec_frame, NULL);
         if(eores_OK != res) 
         {
@@ -339,7 +343,7 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t n
                                      
         }
 
-        res = eo_icubCanProto_ParseCanFrame(p->icubCanProto_ptr, (eOcanframe_t*)&rec_frame, (eOcanport_t)canport);
+       res = eo_icubCanProto_ParseCanFrame(p->icubCanProto_ptr, (eOcanframe_t*)&rec_frame, (eOcanport_t)canport);
         if(eores_OK != res) 
         {
             return(res);                    
@@ -366,32 +370,25 @@ extern eOresult_t eo_appCanSP_GetNumOfRecCanframe(EOappCanSP *p, eOcanport_t can
     return((eOresult_t)hal_can_received((hal_can_port_t)canport, numofRXcanframe));
 }
 
-extern eOresult_t eo_appCanSP_GetNumOfTxCanframe(EOappCanSP *p, eOcanport_t canport, uint8_t *numofTXcanframe)
-{
-    return((eOresult_t)hal_can_out_get((hal_can_port_t)canport, numofTXcanframe));
-}
-
-
 extern eOresult_t eo_appCanSP_SetRunMode(EOappCanSP *p, eo_appCanSP_runMode_t runmode)
 {
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
     }
-//disable all irq    
-    hal_sys_irqn_disable(hal_arch_arm_CAN1_TX_IRQn);
-    hal_sys_irqn_disable(hal_arch_arm_CAN2_TX_IRQn);
-    hal_sys_irqn_disable(hal_arch_arm_CAN1_RX0_IRQn);
-    hal_sys_irqn_disable(hal_arch_arm_CAN2_RX0_IRQn);
     
     p->runmode = runmode;
- 
-//enable all irq    
-    hal_sys_irqn_enable(hal_arch_arm_CAN1_TX_IRQn);
-    hal_sys_irqn_enable(hal_arch_arm_CAN2_TX_IRQn);
-    hal_sys_irqn_enable(hal_arch_arm_CAN1_RX0_IRQn);
-    hal_sys_irqn_enable(hal_arch_arm_CAN2_RX0_IRQn);
-  
+    
+    if(eo_appCanSP_runMode__onDemand ==  p->runmode)
+    {
+        p->waittxdata[hal_can_port1].waitenable = eobool_true;
+        p->waittxdata[hal_can_port2].waitenable = eobool_true;
+    }
+    else
+    {
+        p->waittxdata[hal_can_port1].waitenable = eobool_false;
+        p->waittxdata[hal_can_port2].waitenable = eobool_false;
+    }
     return(eores_OK);
 }
 
@@ -424,6 +421,7 @@ extern eOresult_t eo_appCanSP_StartTransmitCanFrames(EOappCanSP *p, eOcanport_t 
     
     return((eOresult_t)hal_can_transmit((hal_can_port_t)canport));
 }
+
 
 extern void eo_appCanSP_WaitTransmitCanFrames(EOappCanSP *p, eOcanport_t canport)
 {
@@ -497,7 +495,6 @@ extern eOresult_t eo_appCanSP_EmptyCanOutputQueue(EOappCanSP *p, eOcanport_t can
     return(eores_OK);
 }
 
-
 extern eOresult_t eo_appCanSP_EmptyCanInputQueue(EOappCanSP *p, eOcanport_t canport)
 {
     eOresult_t res;
@@ -511,6 +508,7 @@ extern eOresult_t eo_appCanSP_EmptyCanInputQueue(EOappCanSP *p, eOcanport_t canp
     res = eo_appCanSP_read(p, canport, numofRXcanframe, NULL);
     return(res);
 }
+
 
 extern eOresult_t eo_appCanSP_SendMessage_TEST(EOappCanSP *p, uint8_t *payload_ptr)
 {
@@ -803,9 +801,10 @@ static eOresult_t s_eo_appCanSP_canPeriphInit(EOappCanSP *p)
     can_cfg_port1.priorx             = hal_int_priority11;
     can_cfg_port1.priotx             = hal_int_priority11;
     can_cfg_port1.callback_on_rx     = s_eo_appCanSP_callbackOnRx_port1_allertOnReception;
-    can_cfg_port1.arg_cb_rx          = (void*)p; //p->cfg.cbkonrx[eOcanport1].argoffn;
+    can_cfg_port1.arg_cb_rx          = (void*)p;
     can_cfg_port1.callback_on_tx     = s_eo_appCanSP_callbackOnTx_port1_waittransmission;
     can_cfg_port1.arg_cb_tx          = (void*)p;
+
 
 
     
@@ -813,17 +812,10 @@ static eOresult_t s_eo_appCanSP_canPeriphInit(EOappCanSP *p)
     can_cfg_port2.baudrate           = hal_can_baudrate_1mbps; 
     can_cfg_port2.priorx             = hal_int_priority11;
     can_cfg_port2.priotx             = hal_int_priority11;
-#ifdef _ENA_RXCBK_CANPORT2_
     can_cfg_port2.callback_on_rx     = s_eo_appCanSP_callbackOnRx_port2_allertOnReception;
-    can_cfg_port2.arg_cb_rx          = (void*)p; //p->cfg.cbkonrx[eOcanport2].argoffn;
-#else
-    can_cfg_port2.callback_on_rx     = NULL;
-    can_cfg_port2.arg_cb_rx          = NULL;
-#endif
+    can_cfg_port2.arg_cb_rx          = (void*)p;
     can_cfg_port2.callback_on_tx     = s_eo_appCanSP_callbackOnTx_port2_waittransmission;
     can_cfg_port2.arg_cb_tx          = (void*)p;
-
-
 
     res = (eOresult_t)hal_can_init(hal_can_port1, &can_cfg_port1);
 
@@ -885,7 +877,6 @@ static void s_eo_appCanSP_callbackOnTx_portx_waittransmission(void *arg, hal_can
     }
 }
 
-
 static void s_eo_appCanSP_callbackOnRx_port1_allertOnReception(void *arg)
 {
     s_eo_appCanSP_callbackOnRx_portx_allertOnReception(arg, hal_can_port1);
@@ -913,15 +904,10 @@ static void s_eo_appCanSP_callbackOnRx_portx_allertOnReception(void *arg, hal_ca
     p->cfg.cbkonrx[port].fn(p->cfg.cbkonrx[port].argoffn);
 }
 
-
-
 static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emscanport, eOicubCanProto_msgDestination_t dest, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr)
 {
     eOresult_t          res;
     eOcanframe_t        canFrame;
-    uint8_t             numofTXcanframe=0;
-    char                str[128];
-    osal_result_t       osal_res;
 
     res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, val_ptr, &canFrame);
     if(eores_OK != res)
@@ -935,20 +921,19 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
         {
             if(eores_NOK_busy == res)
             {
-                hal_arch_arm_irqn_t irqn = (eOcanport1 == emscanport)? hal_arch_arm_CAN1_TX_IRQn : hal_arch_arm_CAN2_TX_IRQn;                
+                hal_arch_arm_irqn_t irqn = (eOcanport1 == emscanport)? hal_arch_arm_CAN1_TX_IRQn : hal_arch_arm_CAN2_TX_IRQn;
                 
                 hal_sys_irqn_disable(irqn);
                 p->waittxdata[emscanport].waitenable = eobool_true;
                 p->waittxdata[emscanport].numoftxframe2send = 1;
                 hal_sys_irqn_enable(irqn);
-               
-                osal_res = osal_semaphore_decrement(p->waittxdata[emscanport].semaphore, osal_reltimeINFINITE);
- 
+                
+                osal_semaphore_decrement(p->waittxdata[emscanport].semaphore, osal_reltimeINFINITE);
+                
                 //if i'm here i just wake up
                 hal_sys_irqn_disable(irqn);
                 p->waittxdata[emscanport].waitenable = eobool_false;
                 hal_sys_irqn_enable(irqn);
-                
                 res = (eOresult_t)hal_can_put((hal_can_port_t)emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now );
                 if(eores_OK != res)
                 {
@@ -971,6 +956,7 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
     }
     return(res);
 }
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

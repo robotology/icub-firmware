@@ -70,7 +70,7 @@ struct EOtheEMSapplBody_hid
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
-// empty-section
+extern void eo_emsapplBody_hid_canSP_cbkonrx(void *arg);
 
 
 #endif  // include guard

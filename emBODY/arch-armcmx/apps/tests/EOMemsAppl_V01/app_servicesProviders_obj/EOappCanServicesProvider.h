@@ -50,6 +50,7 @@
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 typedef struct EOappCanSP_hid   EOappCanSP;
 
+
 enum { eo_appCanSP_emscanportnum = 2 };
 
 typedef struct
@@ -58,11 +59,13 @@ typedef struct
 } eOappCanSP_cfg_t;
 
 
+
 typedef enum
 {
     eo_appCanSP_runMode__onEvent    = 0,
     eo_appCanSP_runMode__onDemand   = 1    
 } eo_appCanSP_runMode_t;
+
 
     
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
@@ -168,8 +171,6 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t n
  **/
 extern eOresult_t eo_appCanSP_GetNumOfRecCanframe(EOappCanSP *p, eOcanport_t canport, uint8_t *numofRXcanframe);
 
-extern eOresult_t eo_appCanSP_GetNumOfTxCanframe(EOappCanSP *p, eOcanport_t canport, uint8_t *numofTXcanframe);
-
 
 /** @fn         extern eOresult_t eo_appCanSP_SetRunMode(EOappCanSP *p, eo_appCanSP_runMode_t runmode);
     @brief      set run mode: if on evt the transmission is performed always, on demand canframes to transmit are put in queue, but transmitted on demand.
@@ -179,15 +180,11 @@ extern eOresult_t eo_appCanSP_GetNumOfTxCanframe(EOappCanSP *p, eOcanport_t canp
  **/
 extern eOresult_t eo_appCanSP_SetRunMode(EOappCanSP *p, eo_appCanSP_runMode_t runmode);
 
-
-//if waitflag== true than the user will call eo_appCanSP_WaitTransmitCanFrames
 extern eOresult_t eo_appCanSP_StartTransmitCanFrames(EOappCanSP *p, eOcanport_t canport, eOboolvalues_t waitflag);
 extern void eo_appCanSP_WaitTransmitCanFrames(EOappCanSP *p, eOcanport_t canport);
 
 extern eOresult_t eo_appCanSP_EmptyCanOutputQueue(EOappCanSP *p, eOcanport_t canport);
 extern eOresult_t eo_appCanSP_EmptyCanInputQueue(EOappCanSP *p, eOcanport_t canport);
-
-
 
 extern eOresult_t eo_appCanSP_SendMessage_TEST(EOappCanSP *p, uint8_t *payload_ptr);
 

@@ -185,7 +185,7 @@ EO_static_inline eOicubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_getCmdId_fr
         return(0xFF);
     }
     
-    return((eOicubCanProto_msgCommand_cmdId_t)frame->data[0]);
+    return((eOicubCanProto_msgCommand_cmdId_t)(frame->data[0]&0x7F));
 }
 
 

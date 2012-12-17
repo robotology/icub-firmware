@@ -83,34 +83,12 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 
 extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p)
 {
-//     uint8_t numtx_port1;
-//     uint8_t numtx_port2;
-//    char str[128];
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    
-
     eo_appCanSP_SetRunMode(appCanSP_ptr, eo_appCanSP_runMode__onEvent);
-    
-    
-//     eo_appCanSP_GetNumOfRecCanframe(appCanSP_ptr, eOcanport1, &numtx_port1);
-//     eo_appCanSP_GetNumOfRecCanframe(appCanSP_ptr, eOcanport2, &numtx_port2);
-//     sprintf(str, "userdef_on_exit_RUN: before: ntx1=%d, ntx2=%d", numtx_port1, numtx_port2);
-//     hal_trace_puts(str);
-
-    //since in Evt mode, the appl goes to read can msg only if one msg arrive, now i go to read all rec msg.
-
-    eo_appCanSP_EmptyCanInputQueue(appCanSP_ptr, eOcanport1);
-#ifdef _ENA_RXCBK_CANPORT2_  
-    eo_appCanSP_EmptyCanInputQueue(appCanSP_ptr, eOcanport2);
-#endif    
-    
-//     eo_appCanSP_GetNumOfRecCanframe(appCanSP_ptr, eOcanport1, &numtx_port1);
-//     eo_appCanSP_GetNumOfRecCanframe(appCanSP_ptr, eOcanport2, &numtx_port2);
-//     sprintf(str, "userdef_on_exit_RUN: after: ntx1=%d, ntx2=%d", numtx_port1, numtx_port2);
-//     hal_trace_puts(str);
-
+//#warning VALE ho commnetato EmptyCanInputQueue     
+     eo_appCanSP_EmptyCanInputQueue(appCanSP_ptr, eOcanport1);
+     eo_appCanSP_EmptyCanInputQueue(appCanSP_ptr, eOcanport2);
 }
-
 
 extern void eom_emsappl_hid_userdef_on_exit_CFG(EOMtheEMSappl* p)
 {
@@ -124,57 +102,13 @@ extern void eom_emsappl_hid_userdef_on_exit_CFG(EOMtheEMSappl* p)
 }
 extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
 {
-//     uint8_t numtx_port1;
-//     uint8_t numtx_port2;
-//     char str[128];
-    
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    //Before changing appCanRunMode is important be sure can output queues are empty
-//     hal_can_out_get(eOcanport1, &numtx_port1);
-//     hal_can_out_get(eOcanport1, &numtx_port2);
-//     sprintf(str, "userdef_on_entry_RUN: before: ntx1=%d, ntx2=%d", numtx_port1, numtx_port2);
-//     hal_trace_puts(str);
-   
-    eo_appCanSP_EmptyCanOutputQueue(appCanSP_ptr, eOcanport1);
-#ifdef _ENA_RXCBK_CANPORT2_    
-    eo_appCanSP_EmptyCanOutputQueue(appCanSP_ptr, eOcanport2);
-#endif    
-//     hal_can_out_get(eOcanport1, &numtx_port1);
-//     hal_can_out_get(eOcanport1, &numtx_port2);
-//     sprintf(str, "userdef_on_entry_RUN: after: ntx1=%d, ntx2=%d", numtx_port1, numtx_port2);
-//     hal_trace_puts(str);
-    
-    eo_appCanSP_SetRunMode(appCanSP_ptr, eo_appCanSP_runMode__onDemand);
-}
-
-extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
-{
-    eOresult_t res;
-//     uint8_t numtx_port1;
-//     uint8_t numtx_port2;
-//     char str[128];
-    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    
-    res = eo_emsapplBody_DisableTxAllJointOnCan(eo_emsapplBody_GetHandle());
-    if(eores_OK != res)
-    {
-        ; //gestisci errore
-    }
-    
-//     eo_appCanSP_GetNumOfRecCanframe(appCanSP_ptr, eOcanport1, &numtx_port1);
-//     eo_appCanSP_GetNumOfRecCanframe(appCanSP_ptr, eOcanport2, &numtx_port2);
-//     sprintf(str, "userdef_on_exit_RUN: before: ntx1=%d, ntx2=%d", numtx_port1, numtx_port2);
-//     hal_trace_puts(str);
-//     
-//     eo_appCanSP_EmptyCanInputQueue(appCanSP_ptr, eOcanport1);
-//     eo_appCanSP_EmptyCanInputQueue(appCanSP_ptr, eOcanport2);
-//     
-//     
-//     eo_appCanSP_GetNumOfRecCanframe(appCanSP_ptr, eOcanport1, &numtx_port1);
-//     eo_appCanSP_GetNumOfRecCanframe(appCanSP_ptr, eOcanport2, &numtx_port2);
-//     sprintf(str, "userdef_on_exit_RUN: after: ntx1=%d, ntx2=%d", numtx_port1, numtx_port2);
-//     hal_trace_puts(str);
-
+        //Before changing appCanRunMode is important be sure can output queues are empty
+//#warning VALE --> ho commentato EmptyCanOutputQueue   
+     eo_appCanSP_EmptyCanOutputQueue(appCanSP_ptr, eOcanport1);
+     eo_appCanSP_EmptyCanOutputQueue(appCanSP_ptr, eOcanport2);
+ 
+    eo_appCanSP_SetRunMode(eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle()), eo_appCanSP_runMode__onDemand);
 }
 
 extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
