@@ -74,7 +74,8 @@ typedef struct
 
 typedef enum
 {
-    emsconfigurator_evt_go2runner   =   0x00000002
+    emsconfigurator_evt_go2runner      =   0x00000002,
+    emsconfigurator_evt_userdef          =   0x00000004
 } eOemsconfigurator_event_t;
 
 
