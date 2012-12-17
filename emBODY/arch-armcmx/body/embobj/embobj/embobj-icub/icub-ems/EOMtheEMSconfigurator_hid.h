@@ -65,6 +65,7 @@ struct EOMtheEMSconfigurator_hid
 
 extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSconfigurator* p);
 
+extern void eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(EOMtheEMSconfigurator* p);
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"
