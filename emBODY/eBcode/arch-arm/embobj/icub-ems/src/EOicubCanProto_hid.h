@@ -128,7 +128,7 @@ typedef struct
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 EO_extern_inline eOboolvalues_t eo_icubCanProto_hid_LUTbl_indexIsInTbl(const EOconstLookupTbl *tbl, uint8_t index)
 {
-    return((eOboolvalues_t)((index >= tbl->offset) &&((index - tbl->offset)< tbl->capacity)));
+    return((eOboolvalues_t)((index >= tbl->offset) &&(index < (tbl->offset + tbl->capacity))));
 }
 
 EO_extern_inline eOresult_t eo_icubCanProto_hid_LUTbl_excParse(EOicubCanProto* p,
@@ -194,7 +194,7 @@ EO_extern_inline eOicubCanProto_canBoardAddress_t eo_icubCanProto_hid_getSourceB
 
 EO_extern_inline eOicubCanProto_jm_indexinBoard_t eo_icubCanProto_hid_getjmIndexInBOardFromFrame(eOcanframe_t *frame)
 {
-    return((eOicubCanProto_jm_indexinBoard_t)((frame->data[0] & 0x8) >> 4));
+    return((eOicubCanProto_jm_indexinBoard_t)((frame->data[0] & 0x80) >> 7));
 }
 
 
