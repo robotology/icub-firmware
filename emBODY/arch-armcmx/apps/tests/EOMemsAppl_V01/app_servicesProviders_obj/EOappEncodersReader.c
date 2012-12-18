@@ -179,12 +179,17 @@ extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_en
     res = (eOresult_t)hal_encoder_get_value(encoderMap[enc], &val_raw);
     if(eores_OK != res)
     {
+        *value = 3;
+        
         return(res);
     }
 
+    uint8_t error = s_eo_appEncReader_IsValidValue(&val_raw); 
 
-    if( s_eo_appEncReader_IsValidValue(&val_raw) == eobool_false )
+    if (error)
     {
+        *value = error;
+        
         return(eores_NOK_generic);
     }
 
@@ -320,22 +325,23 @@ static void s_eo_appEncReader_isrCbk_onLastEncRead_SPI3(void *arg)
    }
 }
 
-static eOboolvalues_t s_eo_appEncReader_IsValidValue(uint32_t *valueraw)
+static uint8_t s_eo_appEncReader_IsValidValue(uint32_t *valueraw)
 {
     uint8_t parity_error = 0;
     uint8_t b = 0;
-                
+    
     for (b=0; b<18; ++b)
     {
-        parity_error ^= ((*valueraw)>>b) & 1;
-    }
-
-    if (parity_error || ((0x38 & *valueraw) != 0x20))
-    {
-        return(eobool_false);
+        parity_error ^= (*valueraw)>>b;
     }
     
-    return(eobool_true);
+    if (parity_error & 1) return 1;
+    
+    if ((0x38 & *valueraw) != 0x20) return 2;
+    
+    return 0;
+    
+    //return(eobool_true);
 }
 
 

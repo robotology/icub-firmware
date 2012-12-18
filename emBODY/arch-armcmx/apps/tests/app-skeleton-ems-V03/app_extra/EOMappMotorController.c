@@ -220,7 +220,7 @@ static void s_eom_appMotorController_taskStartup(EOMtask *tsk, uint32_t t)
 
     // ALE
     eo_emsController_Init(1, EMS_GENERIC);
-
+    
     eo_emsController_SetLimits(0, -100000, 100000, 2048);
     eo_emsController_SetPosPid(0, 100.0f, 20.0f, 0.001f);
     eo_emsController_SetPosPidLimits(0, 8000.0f, 750.0f);

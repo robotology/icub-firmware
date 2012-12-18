@@ -159,9 +159,9 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
     
     //////////////////////////////
 
-    ++o->time;
+    if (o->time < 50) ++o->time;
 
-    if (o->hard_fault || o->invalid_data_cnt >= 100)
+    if (o->hard_fault || o->invalid_data_cnt >= 500)
     {
         o->hard_fault = eobool_true;
         o->invalid_data_cnt = 0;
@@ -195,8 +195,34 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
                 LIMIT(-48000, speed, 48000);
                 o->time = 0;
                 
-                o->sample[o->sindex++] = speed;
-                o->sindex %= 5;
+                if (!o->dir || ((o->speed_filt<0) ^ (speed<0)))
+                {
+                    o->sample[0] = speed;
+                    o->sample[1] = speed;
+                    o->sample[2] = speed;
+                    o->sample[3] = speed;
+                    o->sample[4] = speed;
+                    
+                    o->speed_filt = speed;
+                }
+                else
+                {
+                    o->sample[o->sindex++] = speed;
+                    o->sindex %= 5;
+                
+                    //o->speed_filt = (o->sample[0]+o->sample[1]+o->sample[2]+o->sample[3]+o->sample[4]) / 5;
+                    
+                    o->speed_filt = 0;
+                    
+                    // triangular filter
+                    for (uint8_t i=0; i<5; ++i)
+                    {
+                        o->speed_filt += (i+1)*o->sample[(o->sindex+i)%5];
+                    }
+                    
+                    o->speed_filt /= 15;
+                }                
+                
                 
                 /*
                 int32_t acc = o->sample[0];
@@ -211,8 +237,6 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
                 o->speed_filt = (acc-min-max)/3;
                 */
                 
-                o->speed_filt = (o->sample[0]+o->sample[1]+o->sample[2]+o->sample[3]+o->sample[4]) / 5;
-                                
                 o->dir = (delta>0) ? 1 : -1;
             }
         }
@@ -222,22 +246,7 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
         }
     }
     
-    if (o->time > 500) // is still
-    {
-        o->odo_x_freq = 0;
-        o->speed_filt = 0;
-        o->speed = 0;
-        o->dir = 0;
-        
-        o->sindex = 0;
-        
-        o->sample[0] = 0;
-        o->sample[1] = 0;
-        o->sample[2] = 0;
-        o->sample[3] = 0;
-        o->sample[4] = 0;
-    }
-    else
+    if (o->time < 49)
     {
         if (o->time > 1)
         {
@@ -248,6 +257,21 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
         o->odo_x_freq += o->speed_filt;
         
         LIMIT(-16000, o->odo_x_freq, 16000);
+    }
+    else if (o->time == 49) // is still
+    {
+        o->odo_x_freq = 0;
+        o->speed_filt = 0;
+        o->speed = 0;
+        o->dir = 0;
+        
+        //o->sindex = 0;
+        
+        o->sample[0] = 0;
+        o->sample[1] = 0;
+        o->sample[2] = 0;
+        o->sample[3] = 0;
+        o->sample[4] = 0;
     }
 }
 

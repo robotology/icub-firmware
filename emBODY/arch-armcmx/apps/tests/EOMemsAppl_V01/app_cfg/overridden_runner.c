@@ -70,6 +70,8 @@ extern int32_t encoder_can_pos;
 extern int32_t encoder_can_vel;
 #endif
 
+//uint16_t hysto_error[4]={0,0,0,0};
+
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
@@ -235,6 +237,25 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
     eo_appCanSP_SendMessage_TEST(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), payload);    
     #endif
     
+    /*
+    static uint16_t hysto_error_timer = 0;
+    
+    if (++hysto_error_timer >= 1000)
+    {
+        uint8_t payload[8];
+        ((uint16_t*)payload)[0]=hysto_error[1];
+        ((uint16_t*)payload)[1]=hysto_error[2];
+        ((uint16_t*)payload)[2]=hysto_error[3];
+        eo_appCanSP_SendMessage_TEST(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), payload);
+
+        hysto_error_timer = 0;
+        
+        hysto_error[1] = 0;
+        hysto_error[2] = 0;
+        hysto_error[3] = 0;
+    }
+    */
+    
     res = eo_appCanSP_StartTransmitCanFrames(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1, eobool_true);
     if(eores_OK != res)
     {
@@ -373,7 +394,7 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, in
 
 static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
 {
-    //eOresult_t          res;
+    eOresult_t          res;
     EOtheEMSapplBody    *emsappbody_ptr = eo_emsapplBody_GetHandle();
     uint32_t            encvalue[4] = {(uint32_t)ENC_INVALID, (uint32_t)ENC_INVALID, (uint32_t)ENC_INVALID, (uint32_t)ENC_INVALID};
     int16_t             pwm[4];
@@ -384,7 +405,14 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
     {    
         for (uint8_t enc = 0; enc < numofjoint; ++enc)
         {
-            eo_appEncReader_GetValue(eo_emsapplBody_GetEncoderReaderHandle(emsappbody_ptr), (eOappEncReader_encoder_t)enc, &(encvalue[enc]));
+            res = eo_appEncReader_GetValue(eo_emsapplBody_GetEncoderReaderHandle(emsappbody_ptr), (eOappEncReader_encoder_t)enc, &(encvalue[enc]));
+            
+            if (res != eores_OK)
+            {
+                //if (enc == 3) ++hysto_error[encvalue[3]];
+                
+                encvalue[enc] = (uint32_t)ENC_INVALID;
+            }
         }        
     }
 
