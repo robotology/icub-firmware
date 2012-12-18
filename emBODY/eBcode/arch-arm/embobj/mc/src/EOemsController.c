@@ -94,6 +94,8 @@ extern EOemsController* eo_emsController_Init(emsBoardType_t board_type)
         s_emsc->n_joints   = MAX_JOINTS;
         s_emsc->is_coupled = eobool_false;
         
+        s_emsc->cable_length_alarm = eobool_false;
+        
         JOINTS(j)
         {
             s_emsc->axis_controller[j] = NULL;
@@ -158,14 +160,19 @@ extern void eo_emsController_ReadEncoders(int32_t *enc_pos)
     switch (s_emsc->boardType)
     {
     case EMS_SHOULDER:
+    {
         
         // |J0|   |  1     0    0   |   |E0|     
 		// |J1| = |  0     1    0   | * |E1|     with a=40/65
 		// |J2|   |  1    -1    a   |   |E2|
+    
+        int32_t jnt_pos_2_ = enc_pos[0]-enc_pos[1]+(40*enc_pos[2])/65;
+    
+        //s_emsc->cable_length_alarm = eo_motors_CableLimitAlarm(enc_pos[0], enc_pos[1], jnt_pos_2_);
         
         eo_axisController_SetEncPos(s_emsc->axis_controller[0], enc_pos[0]);
         eo_axisController_SetEncPos(s_emsc->axis_controller[1], enc_pos[1]);
-        eo_axisController_SetEncPos(s_emsc->axis_controller[2], enc_pos[0]-enc_pos[1]+(40*enc_pos[2])/65);
+        eo_axisController_SetEncPos(s_emsc->axis_controller[2], jnt_pos_2_);
         eo_axisController_SetEncPos(s_emsc->axis_controller[3], enc_pos[3]);
 
         #ifdef USE_2FOC_FAST_ENCODER
@@ -178,7 +185,7 @@ extern void eo_emsController_ReadEncoders(int32_t *enc_pos)
         #endif
     
         break;
-    
+    }
     case EMS_UPPERLEG:
     case EMS_WAIST:
     case EMS_ANKLE:
@@ -287,7 +294,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
     switch (s_emsc->boardType)
     {
     case EMS_SHOULDER:
-        eo_motors_PWMs_Shoulder(s_emsc->motors, pwm_joint, vel_joint, pwm_motor);  
+        eo_motors_PWMs_Shoulder(s_emsc->motors, pwm_joint, vel_joint, pwm_motor);
         break;
     
     case EMS_ANKLE:
@@ -304,7 +311,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
         break;
     }
     
-    if (big_error_flag || s_emsc->defcon == EMS_PRUDENT)
+    if (big_error_flag || s_emsc->defcon == EMS_PRUDENT || s_emsc->cable_length_alarm)
     {
         MOTORS(m) LIMIT(pwm_motor[m], SAFE_MAX_CURRENT); 
     }

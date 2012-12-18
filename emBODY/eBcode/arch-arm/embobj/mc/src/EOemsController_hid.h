@@ -52,6 +52,8 @@ struct EOemsController_hid
     EMSdefcon_t defcon;
     eObool_t is_coupled;
     
+    eObool_t cable_length_alarm;
+    
     EOmotors         *motors;
     EOspeedmeter     *enc_speedometer[MAX_JOINTS];
     EOaxisController *axis_controller[MAX_JOINTS];
