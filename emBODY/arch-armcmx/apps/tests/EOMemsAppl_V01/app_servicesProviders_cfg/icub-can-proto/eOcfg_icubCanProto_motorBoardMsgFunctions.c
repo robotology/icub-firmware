@@ -1292,10 +1292,11 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
 {
     eOresult_t                              res;
     eOmc_jointId_t   		                jId;
+    eOmc_motorId_t   		                mId;
     eOmc_joint_status_t                     *jstatus_ptr;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOmc_controlmode_t                      eomc_controlmode;
-    
+    eOmn_appl_runMode_t                     runmode; 
 
     
     // set position about the first joint in board
@@ -1304,52 +1305,79 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
     canLoc.indexinboard = eo_icubCanProto_jm_index_first;    
 
     
-    res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), &canLoc, &jId);
-    if(eores_OK != res)
+    runmode = eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
+    
+    if(applrunMode__default == runmode)
     {
-        return(res);
+        return(eores_OK); //ignore error
     }
-
-    res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), jId,  &jstatus_ptr);
-    if(eores_OK != res)
+    
+    if(applrunMode__2foc == runmode)
     {
-        return(res);
+        res = eo_appTheDB_GetMotorId_ByMotorCanLocation(eo_appTheDB_GetHandle(), &canLoc, &mId);
+        if(eores_OK != res)
+        {
+            return(res);
+        }
+        s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((eOicubCanProto_controlmode_t) frame->data[1],
+                                                                            &eomc_controlmode);
+        #warning X ALE: aggiungere qua funzione che prende in input errori 2foc e stato
+        //eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t motorerror, uint8_t canerror, eOmc_controlmode_t controlmode);
+        //eo_emsController_ReadMotorstatus(mId, frame->data[0], frame->data[4], eomc_controlmode);
+        //l'aggiornamento delle nv sara' fatto nel DO.
+        //se l'appl e' in config sicuramente i giunti sono in idle e quindi non c'e' ninete da aggiornare
+        return(eores_OK);
     }
-
-    jstatus_ptr->chamaleon04[0] = frame->data[0]; //fault axis 0
-    jstatus_ptr->chamaleon04[1] = frame->data[4]; //can fault 
-    
-    //set control mode status
-    s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((eOicubCanProto_controlmode_t) frame->data[1],
-                                                                         &eomc_controlmode);
-
-    jstatus_ptr->basic.controlmodestatus = eomc_controlmode;
-    
-    canLoc.indexinboard = eo_icubCanProto_jm_index_second;
-    
-    res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), &canLoc, &jId);
-    if(eores_OK != res)
+    else
     {
-        return(res);
-    }
+        res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), &canLoc, &jId);
+        if(eores_OK != res)
+        {
+            return(res);
+        }
+        
+        res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), jId,  &jstatus_ptr);
+        if(eores_OK != res)
+        {
+            return(res);
+        }
 
-    res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), jId,  &jstatus_ptr);
-    if(eores_OK != res)
-    {
-        return(res);
-    }
+        jstatus_ptr->chamaleon04[0] = frame->data[0]; //fault axis 0
+        jstatus_ptr->chamaleon04[1] = frame->data[4]; //can fault 
+    
+        //set control mode status
+        s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((eOicubCanProto_controlmode_t) frame->data[1],
+                                                                             &eomc_controlmode);
+
+        jstatus_ptr->basic.controlmodestatus = eomc_controlmode;
+    
+        // set position about the first joint in board
+        canLoc.indexinboard = eo_icubCanProto_jm_index_second;
+    
+        res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), &canLoc, &jId);
+        if(eores_OK != res)
+        {
+            return(res);
+        }
+
+        res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), jId,  &jstatus_ptr);
+        if(eores_OK != res)
+        {
+            return(res);
+        }
 
     
-    jstatus_ptr->chamaleon04[0] = frame->data[2]; //fault axis 1
-    jstatus_ptr->chamaleon04[1] = frame->data[4]; //can fault
+        jstatus_ptr->chamaleon04[0] = frame->data[2]; //fault axis 1
+        jstatus_ptr->chamaleon04[1] = frame->data[4]; //can fault
 
-    //set control mode status
-    s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((eOicubCanProto_controlmode_t) frame->data[3],
-                                                                         &eomc_controlmode);
+        //set control mode status
+        s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((eOicubCanProto_controlmode_t) frame->data[3],
+                                                                             &eomc_controlmode);
 
-    jstatus_ptr->basic.controlmodestatus = eomc_controlmode;
+        jstatus_ptr->basic.controlmodestatus = eomc_controlmode;
     
-    return(eores_OK);
+        return(eores_OK);
+    }
 
 }
 
