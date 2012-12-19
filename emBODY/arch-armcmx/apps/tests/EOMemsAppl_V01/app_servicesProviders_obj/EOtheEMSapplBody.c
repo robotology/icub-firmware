@@ -98,6 +98,7 @@ static void s_eo_emsapplBody_measuresConverter_init(EOtheEMSapplBody *p);
 static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p);
 static eOresult_t s_eo_emsapplBody_getRunMode(EOtheEMSapplBody *p);
 static void s_eo_emsapplBody_leds_init(EOtheEMSapplBody *p);
+static void s_eo_emsapplBody_checkConfig(EOtheEMSapplBody *p);
 
 static eOresult_t s_eo_emsapplBody_EnableTxMais(EOtheEMSapplBody *p);
 // --------------------------------------------------------------------------------------------------------------------
@@ -139,6 +140,8 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOtheEMSappBody_cfg_t *
     res = s_eo_emsapplBody_getRunMode(retptr); //the run mode is depending on connected can board (mc4, 2foc, only skin, etc)
     eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in getting run mode");
 
+    s_eo_emsapplBody_checkConfig(retptr); //check config: if somethig is wrong then go to error state.
+    
     res = s_eo_emsapplBody_sendConfig2canboards(retptr);
     eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in sending cfg 2 canboards");
     
@@ -675,6 +678,36 @@ static eOresult_t s_eo_emsapplBody_EnableTxMais(EOtheEMSapplBody *p)
 }
 
 
+static void s_eo_emsapplBody_checkConfig(EOtheEMSapplBody *p)
+{
+    uint16_t                                numofjoint = 0, jid;
+    eOresult_t                              res;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc;    
+    /*Since emscontroller uses 4 joints max, here check the max number of joint for ems connected to 2foc
+    in order to evoid useless chack during controller loop  */
+    if(applrunMode__2foc == p->appRunMode)
+    {
+        numofjoint =  eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
+        if(numofjoint > 4)
+        {
+             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "More then 4 motor for ems connected to 2foc!!");
+        }
+        
+        for(jid = 0; jid <numofjoint; jid++)
+        {
+            res = eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), jid,  &canLoc, NULL);
+            if(eores_OK != res)
+            {
+                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "err in checkConfig");
+            }
+            if(canLoc.addr > 4)
+            {
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "can address bigger than 4!!");
+            }
+        }
+
+    }
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
