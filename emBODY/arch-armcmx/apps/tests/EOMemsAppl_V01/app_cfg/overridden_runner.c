@@ -57,7 +57,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+//if defined SET_DESIRED_CURR_IN_ONLY_ONE_MSG, the appl sends all desered current to 2fon in only one msg
+#define SET_DESIRED_CURR_IN_ONLY_ONE_MSG
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -92,11 +93,19 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
 static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p);
 
 
+
 //utils
 static void s_eom_emsrunner_hid_readSkin(EOtheEMSapplBody *p);
 static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size);
 static void s_eom_emsrunner_hid_readMc4andMais(EOtheEMSapplBody *p);
 static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p);
+
+#ifdef SET_DESIRED_CURR_IN_ONLY_ONE_MSG
+static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_inOneMsgOnly(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size);
+#else
+static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_with4msg(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size);
+#endif
+EO_static_inline  eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size);
 
 
 
@@ -357,22 +366,36 @@ static void s_eom_emsrunner_hid_readMc4andMais(EOtheEMSapplBody *p)
 
 
 
-static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size)
+EO_static_inline  eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size)
+{
+    
+#ifdef SET_DESIRED_CURR_IN_ONLY_ONE_MSG
+    return(s_eom_emsrunner_hid_SetCurrentsetpoint_inOneMsgOnly(p, pwmList, size));
+#else	
+    return(s_eom_emsrunner_hid_SetCurrentsetpoint_with4msg(p, pwmList,size));
+#endif
+}
+
+#ifndef SET_DESIRED_CURR_IN_ONLY_ONE_MSG
+static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_with4msg(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size)
 {
     eOresult_t 				err;
-    eOresult_t 				res = eores_OK;
-	eOmeas_current_t        value;
+	eOmeas_current_t            value;
+    eOresult_t 				    res = eores_OK;
     eOicubCanProto_msgCommand_t msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__SET_DISIRED_CURRENT
-    };
-		
+    };	
 
+#warning VALE --> solo per test
+    pwmList[0] = 0x11AA;
+    pwmList[1] = 0x12AA;
+    pwmList[2] = 0x13AA;
+    pwmList[3] = 0x14AA;
     uint16_t numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
 
-
-    for (uint8_t jid = 0; jid <numofjoint; ++jid)
+    for (uint8_t jid = 0; jid <numofjoint; jid++)
     {
         value = pwmList[jid];
     
@@ -388,8 +411,43 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, in
     }
     
     return(res);
+   
 }
+#endif
 
+#ifdef SET_DESIRED_CURR_IN_ONLY_ONE_MSG
+static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_inOneMsgOnly(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size)
+{
+    eOresult_t 				                res = eores_OK;
+    int16_t                                 pwm_aux[4] = {0, 0, 0, 0};
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOicubCanProto_msgDestination_t         dest;
+    eOicubCanProto_msgCommand_t             msgCmd = 
+    {
+        EO_INIT(.class) eo_icubCanProto_msgCmdClass_periodicMotorBoard,
+        EO_INIT(.cmdId) ICUBCANPROTO_PER_MB_CMD_EMSTO2FOC_DESIRED_CURRENT
+    };
+
+
+    uint16_t numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
+    
+    for (uint8_t jid = 0; jid <numofjoint; ++jid)
+    {
+        res = eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), jid,  &canLoc, NULL);
+        if(eores_OK != res)
+        {
+            return(res); //i think i'll be never here
+        }
+        
+        pwm_aux[canLoc.addr-1] = pwmList[jid];
+    }
+    //since msg is periodic, all 2foc received it so dest is useless.
+    dest.dest = 0;
+    eo_appCanSP_SendCmd(eo_emsapplBody_GetCanServiceHandle(p), canLoc.emscanport, dest, msgCmd, (void*)pwm_aux);
+    
+    return(res);    
+}
+#endif
 
 
 static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
@@ -422,7 +480,8 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
     eo_emsController_PWM(pwm);
 
     /* 3) prepare and punt in rx queue new setpoint */
-    s_eom_emsrunner_hid_SetCurrentsetpoint(emsappbody_ptr, pwm, 0/*unused param*/);
+    s_eom_emsrunner_hid_SetCurrentsetpoint(emsappbody_ptr, pwm, 4); //4: eo_emsController_PWM fills an arry of 4 item 
+                                                                    //because max num of mortor for each ems is 4 
  
     /* 4) update joint status */
     s_eom_emsrunner_hid_UpdateJointstatus(p);
