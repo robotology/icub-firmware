@@ -65,6 +65,9 @@ extern const EOconstLookupTbl icubCanProto_periodicMotorBoardMsg_parser_LUTbl;
 extern const EOconstLookupTbl* const icubCanProto_periodicMotorBoardMsg_parser_LUTbl__ptr;
 
 
+extern const EOconstLookupTbl icubCanProto_periodicMotorBoardMsg_former_LUTbl; 
+extern const EOconstLookupTbl* const icubCanProto_periodicMotorBoardMsg_former_LUTbl__ptr;
+
 // - declaration of extern public functions ---------------------------------------------------------------------------
 // empty-section
 

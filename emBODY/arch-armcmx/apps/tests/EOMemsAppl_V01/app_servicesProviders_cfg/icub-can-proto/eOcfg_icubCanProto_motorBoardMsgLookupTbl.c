@@ -53,11 +53,12 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 /* Since inthe fist 64th messages most of them are obsolete, the table start at msg 64 and manage other such as exception*/
-#define eo_icubCanProto_pollingMotorBoardMsg_inTbl_max        ICUBCANPROTO_POL_MB_CMD_MAXNUM -64 
-#define eo_icubCanProto_pollingMotorBoardMsg_maxNum           ICUBCANPROTO_POL_MB_CMD_MAXNUM
+#define eo_icubCanProto_pollingMotorBoardMsg_inTbl_max          ICUBCANPROTO_POL_MB_CMD_MAXNUM -64 
+#define eo_icubCanProto_pollingMotorBoardMsg_maxNum             ICUBCANPROTO_POL_MB_CMD_MAXNUM
 
-#define eo_icubCanProto_periodicMotorBoardMsg_inTbl_max       ICUBCANPROTO_PER_MB_CMD_MAXNUM 
-#define eo_icubCanProto_periodicMotorBoardMsg_maxNum          ICUBCANPROTO_PER_MB_CMD_MAXNUM
+#define eo_icubCanProto_periodicMotorBoardMsg_inParserTbl_max   12 //until ICUBCANPROTO_PER_MB_CMD_MOTOR_SPEED 
+#define eo_icubCanProto_periodicMotorBoardMsg_inFormerTbl_max   1  //only  ICUBCANPROTO_PER_MB_CMD_EMSTO2FOC_DESIRED_CURRENT
+#define eo_icubCanProto_periodicMotorBoardMsg_maxNum            ICUBCANPROTO_PER_MB_CMD_MAXNUM
 
 
 
@@ -77,13 +78,14 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_former(EOicubC
 static eOresult_t s_eo_icubCanProto_pollingMotorBoardMsg_parser_excFn(void *arg);
 static eOresult_t s_eo_icubCanProto_pollingMotorBoardMsg_former_excFn(void *arg);
 static eOresult_t s_eo_icubCanProto_periodicMotorBoardMsg_parser_excFn(void *arg);
+static eOresult_t s_eo_icubCanProto_periodicMotorBoardMsg_former_excFn(void *arg);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
 /**************************************************************************************************************/
-/*                 POLLING     MOTOR     BOARD     MESSAGES     LOOKUP     TABLE                             */
+/*                 POLLING     MOTOR     BOARD     MESSAGES     LOOKUP     TABLES                            */
 /**************************************************************************************************************/
 
 /* DECLARATION OF POLLING MOTOR BOARD PARSER BODY TBL */
@@ -462,7 +464,7 @@ extern const EOconstLookupTbl* const icubCanProto_pollingMotorBoardMsg_former_LU
 /**************************************************************************************************************/
 
 /* DECLARATION OF PERIODIC MOTOR BOARD PARSER BODY TBL */
-static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_periodicMotorBoardMsg_parserFn_list[eo_icubCanProto_pollingMotorBoardMsg_inTbl_max] = 
+static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_periodicMotorBoardMsg_parserFn_list[eo_icubCanProto_periodicMotorBoardMsg_inParserTbl_max] = 
 {
     {   // 0 ICUBCANPROTO_PER_MB_CMD_2FOC 			
         EO_INIT(.parser)    eo_icubCanProto_parser_per_mb_cmd__2foc
@@ -521,13 +523,40 @@ static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_periodicMotorB
 /* DECLARATION OF PERIODIC MOTOR BOARD LOOKUP TBL */
 extern const EOconstLookupTbl icubCanProto_periodicMotorBoardMsg_parser_LUTbl = 
 {
-    EO_INIT(.capacity)                      eo_icubCanProto_periodicMotorBoardMsg_inTbl_max,
+    EO_INIT(.capacity)                      eo_icubCanProto_periodicMotorBoardMsg_inParserTbl_max,
     EO_INIT(.offset)                        0,
     EO_INIT(.exceptionMngFn)                s_eo_icubCanProto_periodicMotorBoardMsg_parser_excFn,                                        
     EO_INIT(.itemsList)                     &s_periodicMotorBoardMsg_parserFn_list[0]
 };
 
 extern const EOconstLookupTbl* const icubCanProto_periodicMotorBoardMsg_parser_LUTbl__ptr;
+
+
+
+
+
+/* DECLARATION OF PERIODIC MOTOR BOARD FORMER BODY TBL */
+static const eo_icubCanProto_hid_LUTbl_item_formerFnHandling_t  s_periodicMotorBoardMsg_formerFn_list[eo_icubCanProto_periodicMotorBoardMsg_inFormerTbl_max] = 
+{
+    {   // 15 ICUBCANPROTO_PER_MB_CMD_EMSTO2FOC_DESIRED_CURRENT 			
+        EO_INIT(.former)    eo_icubCanProto_former_per_mb_cmd__emsto2foc_desiredcurrent
+    }    
+};        
+
+
+
+
+/* DECLARATION OF PERIODIC MOTOR BOARD LOOKUP TBL */
+extern const EOconstLookupTbl icubCanProto_periodicMotorBoardMsg_former_LUTbl = 
+{
+    EO_INIT(.capacity)                      eo_icubCanProto_periodicMotorBoardMsg_inFormerTbl_max,
+    EO_INIT(.offset)                        15,
+    EO_INIT(.exceptionMngFn)                s_eo_icubCanProto_periodicMotorBoardMsg_former_excFn,                                        
+    EO_INIT(.itemsList)                     &s_periodicMotorBoardMsg_formerFn_list[0]
+};
+
+extern const EOconstLookupTbl* const icubCanProto_periodicMotorBoardMsg_former_LUTbl__ptr;
+
 
 
 
@@ -765,6 +794,10 @@ static eOresult_t s_eo_icubCanProto_periodicMotorBoardMsg_parser_excFn(void *arg
 }
 
 
+static eOresult_t s_eo_icubCanProto_periodicMotorBoardMsg_former_excFn(void *arg)
+{
+    return(eores_OK);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

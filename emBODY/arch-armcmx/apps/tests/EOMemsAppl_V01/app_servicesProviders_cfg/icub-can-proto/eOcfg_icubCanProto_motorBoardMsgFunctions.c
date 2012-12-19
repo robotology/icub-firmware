@@ -64,6 +64,7 @@
 #define EMS_CAN_ADDR                                    0
 #define ICUBCANPROTO_POL_MB_ID_DEFAULT                  ((ICUBCANPROTO_CLASS_POLLING_MOTORBOARD << 8) | (0x0<<4))
 #define ICUBCANPROTO_POL_MB_CREATE_ID(destBoardAddr)    ((ICUBCANPROTO_CLASS_POLLING_MOTORBOARD << 8) | (EMS_CAN_ADDR<<4) | (destBoardAddr&0xF))
+#define ICUBCANPROTO_PER_MB_CREATE_ID(cmdId)            ((ICUBCANPROTO_CLASS_PERIODIC_MOTORBOARD << 8) | (EMS_CAN_ADDR<<4) | (cmdId&0xF))
 
 
 
@@ -1461,6 +1462,21 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__motorSpeed(EOicubCanProto* 
 }
 
 
+extern eOresult_t eo_icubCanProto_former_per_mb_cmd__emsto2foc_desiredcurrent(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
+{
+    int16_t *pwmList = (int16_t*)val_ptr;
+   
+    canFrame->id = ICUBCANPROTO_PER_MB_CREATE_ID(ICUBCANPROTO_PER_MB_CMD_EMSTO2FOC_DESIRED_CURRENT);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 8;
+    *((uint16_t*)(&canFrame->data[0])) = pwmList[0];
+    *((uint16_t*)(&canFrame->data[2])) = pwmList[1];
+    *((uint16_t*)(&canFrame->data[4])) = pwmList[2];
+    *((uint16_t*)(&canFrame->data[6])) = pwmList[3];
+    
+    return(eores_OK);
+}
 
 
 

@@ -91,7 +91,7 @@ static const eo_icubCanProto_hid_LUTbl_item_classMsgTblReference_t s_msgClasses_
 
     {   // 1
         EO_INIT(.parserTbl)                           &icubCanProto_periodicMotorBoardMsg_parser_LUTbl,
-        EO_INIT(.formerTbl)                           NULL,
+        EO_INIT(.formerTbl)                           &icubCanProto_periodicMotorBoardMsg_former_LUTbl,
         EO_INIT(.eo_icubCanProto_getCmdId_fromFrame)  s_eo_icubCanProto_getCmdId_fromFrame_ofPeriodicClass
     },
 
