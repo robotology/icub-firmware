@@ -67,8 +67,9 @@ extern "C" {
 #define ICUBCANPROTO_PER_MB_CMD_DEBUG				        9
 #define ICUBCANPROTO_PER_MB_CMD_MOTOR_POSITION              10
 #define ICUBCANPROTO_PER_MB_CMD_MOTOR_SPEED                 11
+#define ICUBCANPROTO_PER_MB_CMD_EMSTO2FOC_DESIRED_CURRENT   15
 
-#define ICUBCANPROTO_PER_MB_CMD_MAXNUM			            ICUBCANPROTO_PER_MB_CMD_MOTOR_SPEED + 1
+#define ICUBCANPROTO_PER_MB_CMD_MAXNUM			            ICUBCANPROTO_PER_MB_CMD_EMSTO2FOC_DESIRED_CURRENT + 1
 
 
 /***************************************************************************/
