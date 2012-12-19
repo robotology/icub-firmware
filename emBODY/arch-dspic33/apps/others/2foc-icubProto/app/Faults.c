@@ -68,7 +68,8 @@ void FaultConditionsHandler(void)
   EnableIntT3;
 
   // Stop periodic CAN communication
-  DisableIntT4;
+//VALE: even if application is in fault it continues to send status msg
+  //DisableIntT4;
 
   // turn on Red Led
   LED_status.RedBlinkRate=BLINKRATE_FAST;

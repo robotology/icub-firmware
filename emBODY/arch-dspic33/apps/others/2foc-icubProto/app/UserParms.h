@@ -657,16 +657,23 @@
 // Data rate of outgoing messages in 0.1 millisecond units
 #define CAN_OUTPUT_DATARATE (float)2.0
 // every CAN_STATE_PER messages a status message is generated
-#define CAN_STATUS_MSG_PERIOD 500
+#define CAN_STATUS_MSG_PERIOD 5000
 // Enable ack. for CAN set commands
 // #define CAN_ACK_EACH_COMMAND
 //the board send a periodic msg on received set point current, in oreder to synchronize the communication
 #define SYNC_2FOC_TO_EMS
+
+
+//this macro say how many ems can msg the 2foc must have received before sends a status message
+//the ems send a can msg every 1 ms 
+#define CAN_STATUS_MSG_PERIOD_SYNC_WITH_EMS  1000 //every 1 sec 2foc send one status message   
+
+
 //this macro let you to work with 2foc without fault
 //#define NO_FAULT
 //the ems send desired current in periodic message (the ems can send only one message for all 4 2FOC)
 //NOTE: if you use this mode, you must be sure that 2FOC can addres belong to [1, 4].
-//#define DESIRED_CURR_IN_PER_MSG_BY_EMS          
+#define DESIRED_CURR_IN_PER_MSG_BY_EMS          
    
 
 // Enable accept all commands (including setpoints) when in switch off state

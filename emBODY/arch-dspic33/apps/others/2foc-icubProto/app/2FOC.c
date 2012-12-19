@@ -901,7 +901,8 @@ readytoswitchon:
   DS402_Controlword.Flags.SwitchOn = 0;
   DS402_Controlword.Flags.EnableVoltage = 0;
   DS402_Controlword.Flags.EnableOperation = 0;
-
+//VALE: now the application strat to transmit status msg
+EnableIntT4;
   // Stays in READY TO SWITCH ON until the command 
   // SwitchOn received from CAN
   while( 0 == DS402_Controlword.Flags.SwitchOn ){;}
@@ -1023,9 +1024,10 @@ operationenable:
   ADCInterruptAndDMAEnable();
  
   // enable timer3 interrupt for CAN periodic send
-#ifndef SYNC_2FOC_TO_EMS
-  EnableIntT4;
-#endif
+//VALE: commented because we use T4 for transmission only when application is in idle
+//#ifndef SYNC_2FOC_TO_EMS
+//  EnableIntT4;
+//#endif
 
   // if rotor is not aligned perform alignment (only once each turn on)
   if(0 == SysStatus.InitialRotorAlignmentComplete) 
@@ -1058,10 +1060,10 @@ operationenable:
     {
       // Disable drive functions  
       DisableDrive();
-
+//VALE: enable T4 interrupt in order to send staus msg iven if controller is in idle
       // Stop periodic CAN communication
-      DisableIntT4;
-
+//      DisableIntT4;
+//        EnableIntT4;    //this is not necessary becaouse IntT4 is already enabled   
       //goto switchedon;
       goto switchedon;
     }
@@ -1075,9 +1077,9 @@ operationenable:
     {
       // Disable drive functions  
       DisableDrive();
-
+//VALE: comment in order to send staus msg iven if controller is in idle
       // Stop periodic CAN communication
-      DisableIntT4;
+//      DisableIntT4;
 	 
       // change status
 	  // reset the DC link reading to a good value:

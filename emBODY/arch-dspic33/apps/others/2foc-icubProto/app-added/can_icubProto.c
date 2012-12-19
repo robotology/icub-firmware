@@ -72,6 +72,9 @@ void CanIcubProtoSetFilters(unsigned char bid)
     hal_can_receptionfilter_set( 0, 0xfff, 1, CAN_ICUBPROTO_STDID_MAKE_RX(ICUBPROTO_CLASS_POLLING_MOTORBOARD, 0xF/*broadcast*/), 0/*standard_id*/);
     hal_can_receptionfilter_set( 0, 0xfff, 2, CAN_ICUBPROTO_STDID_MAKE_RX(ICUBPROTO_CLASS_CANLOADER, bid), 0/*standard_id*/);
     hal_can_receptionfilter_set( 0, 0xfff, 3, CAN_ICUBPROTO_STDID_MAKE_RX(ICUBPROTO_CLASS_CANLOADER, 0xF/*broadcast*/), 0/*standard_id*/);
+#ifdef DESIRED_CURR_IN_PER_MSG_BY_EMS
+    hal_can_receptionfilter_set( 0, 0xfff, 4, CAN_ICUBPROTO_STDID_MAKE_RX(ICUBPROTO_CLASS_PERIODIC_MOTORBOARD, ICUBPROTO_PERIODICCMD_EMSTO2FOC_DESIRED_CURRENT), 0/*standard_id*/);
+#endif
 }
 
 

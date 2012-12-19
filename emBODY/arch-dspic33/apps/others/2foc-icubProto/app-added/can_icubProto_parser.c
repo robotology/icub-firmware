@@ -642,7 +642,7 @@ static int s_canIcubProtoParser_parse_periodicMsg(unsigned char permsg_type, tCa
              // Torque control references
             CtrlReferences.qIqRef = rxpayload->w[canprotoparser_bid-1];
             // set reference value for toggling torque
-            TorqueTogglingReference = CtrlReferences.qIqRef;            
+            TorqueTogglingReference = CtrlReferences.qIqRef;
 #ifdef SYNC_2FOC_TO_EMS
             CanIcubProtoTrasmitterSendPeriodicData();          
 #endif   
@@ -684,7 +684,7 @@ static int s_canIcubProtoParser_parse_canLoaderMsg(tCanData *rxpayload, unsigned
             txpayload->b[1] = BOARD_TYPE_2FOC; 
             txpayload->b[2] = 1;  //TODO  //Firmware version number for BOOTLOADER c
             txpayload->b[3] = 0;  //TODO   //Firmware build number.
-            txpayload->b[4] = 1;  //TODO   //Firmware build number.
+            txpayload->b[4] = 2;  //TODO   //Firmware build number.
             #warning solita incoerenza tra versioni di fw sensori ed motori            
         } break;
                 
