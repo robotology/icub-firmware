@@ -1184,6 +1184,11 @@
               <FileType>4</FileType>
               <FilePath>..\..\..\..\sys\mid\lib\eventviewer.cm3.lib</FilePath>
             </File>
+            <File>
+              <FileName>eventviewer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\midware\eventviewer-package\eventviewer\eventviewer-src\eventviewer.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1292,7 +1297,7 @@
             <File>
               <FileName>EOicubCanProto.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOicubCanProto.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-ems\src\EOicubCanProto.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2493,6 +2498,11 @@
               <FileType>4</FileType>
               <FilePath>..\..\..\..\sys\mid\lib\eventviewer.cm3.lib</FilePath>
             </File>
+            <File>
+              <FileName>eventviewer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\midware\eventviewer-package\eventviewer\eventviewer-src\eventviewer.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2601,7 +2611,7 @@
             <File>
               <FileName>EOicubCanProto.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOicubCanProto.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-ems\src\EOicubCanProto.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3802,6 +3812,11 @@
               <FileType>4</FileType>
               <FilePath>..\..\..\..\sys\mid\lib\eventviewer.cm3.lib</FilePath>
             </File>
+            <File>
+              <FileName>eventviewer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\midware\eventviewer-package\eventviewer\eventviewer-src\eventviewer.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3990,7 +4005,7 @@
             <File>
               <FileName>EOicubCanProto.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOicubCanProto.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-ems\src\EOicubCanProto.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -5191,6 +5206,51 @@
               <FileType>4</FileType>
               <FilePath>..\..\..\..\sys\mid\lib\eventviewer.cm3.lib</FilePath>
             </File>
+            <File>
+              <FileName>eventviewer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\body\midware\eventviewer-package\eventviewer\eventviewer-src\eventviewer.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5379,7 +5439,7 @@
             <File>
               <FileName>EOicubCanProto.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-src\EOicubCanProto.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-ems\src\EOicubCanProto.c</FilePath>
             </File>
           </Files>
         </Group>
