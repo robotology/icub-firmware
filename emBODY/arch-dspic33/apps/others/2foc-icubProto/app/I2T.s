@@ -9,6 +9,9 @@
 
 /****************************************************
  * implementation 1
+ * This requires CORCON to be set with
+ * - Fractional signed mode
+ * - saturation enabled
  ****************************************************
  *  Formula E= id*id + iq*iq - IMAXNOMINAL*IMAXNOMINAL 
  *
@@ -77,7 +80,7 @@ _I2TIntegral:
 
         ; Save working registers.
 		push    w8;
-        push    CORCON                  ; Prepare CORCON for fractional computation.
+;        push    CORCON                  ; Prepare CORCON for fractional computation.
 ; save DSP accumulator A to the stack
         mov ACCAL,w8				
         push.w w8					
@@ -93,16 +96,16 @@ _I2TIntegral:
         mov ACCBU,w8				
         push.w w8
 
-        fractsetup      w8;
+ ;       fractsetup      w8;
 
-        mov [w0 + #OffsetACCAL], w1; load old val 
-        mov [w0 + #OffsetACCAH], w2; 
-        mov [w0 + #OffsetACCAU], w3;
+        mov.w [w0 + #OffsetACCAL], w1; load old val 
+        mov.w [w0 + #OffsetACCAH], w2; 
+        mov.w [w0 + #OffsetACCAU], w3;
 
-        mov [w0 + #OffsetQMeasured], w4;  load Q
+        mov.w [w0 + #OffsetQMeasured], w4;  load Q
 
        
-        mov [w0 + #OffsetNominal], w5 ; load max I nominal
+        mov.w [w0 + #OffsetNominal], w5 ; load max I nominal
 ;		sub  w4,w8,w4; w4 = w4 - IMAX
 
 ;		mov.w	w4,w5;    copy q for square
@@ -112,7 +115,7 @@ _I2TIntegral:
 
         mpy     w4*w4,b ;b = q*q
 
-		mov [w0 + #OffsetDMeasured], w4 ; load measured D
+		mov.w [w0 + #OffsetDMeasured], w4 ; load measured D
 
  ;      	sub  w4,w8,w4; w4 = w4 - IMAX
 
@@ -143,11 +146,11 @@ _I2TIntegral:
 		mov.w   ACCAH,w2
 		mov.w   ACCAU,w3
  		
-		mov     w1, [w0 + #OffsetACCAL]; store new val 
-        mov     w2, [w0 + #OffsetACCAH]; 
-        mov     w3, [w0 + #OffsetACCAU];
+		mov.w     w1, [w0 + #OffsetACCAL]; store new val 
+        mov.w     w2, [w0 + #OffsetACCAH]; 
+        mov.w     w3, [w0 + #OffsetACCAU];
 		
-		mov     [w0 + #OffsetThreshold], w1 ; load threshold
+		mov.w    [w0 + #OffsetThreshold], w1 ; load threshold
 
 		lac     w1,b;
 		sub     b;                      ; accb = accb - acca
@@ -178,7 +181,7 @@ _I2TIntegral:
         pop.w w8
         mov w8,ACCAL
        
-        pop     CORCON                  ; restore CORCON. 
+;        pop     CORCON                  ; restore CORCON. 
         pop     w8
 
        return
@@ -234,7 +237,7 @@ _I2TFilter:
 
         ; Save working registers.
 		push    w8;
-        push    CORCON                  ; Prepare CORCON for fractional computation.
+      ;  push    CORCON                  ; Prepare CORCON for fractional computation.
 ; save DSP accumulator A to the stack
         mov ACCAL,w8				
         push.w w8					
@@ -250,20 +253,20 @@ _I2TFilter:
         mov ACCBU,w8				
         push.w w8
 
-        fractsetup      w8;
+;        fractsetup      w8;
 
-        mov [w0 + #OffsetACCAL], w1; load old val 
-        mov [w0 + #OffsetACCAH], w2; 
-        mov [w0 + #OffsetACCAU], w3;
+        mov.w [w0 + #OffsetACCAL], w1; load old val 
+        mov.w [w0 + #OffsetACCAH], w2; 
+        mov.w [w0 + #OffsetACCAU], w3;
     	mov.w   w1,ACCAL  ;restore old val
 		mov.w   w2,ACCAH;
 		mov.w   w3,ACCAU;   a is last output
 
-        mov [w0 + #OffsetQMeasured], w4;  load Q
+        mov.w [w0 + #OffsetQMeasured], w4;  load Q
       
         mpy     w4*w4,b ;    b = q*q
 
-		mov [w0 + #OffsetDMeasured], w4 ; load measured D
+		mov.w [w0 + #OffsetDMeasured], w4 ; load measured D
 
         
         mac     w4*w4,b;  b += d*d
@@ -283,7 +286,7 @@ SHIFT_ACC:
 
 		sac.r   b,w5
  
-        mov [w0 + #OffsetK], w4 ; load K (was k*2048)
+        mov.w [w0 + #OffsetK], w4 ; load K (was k*2048)
         
 		mpy     w5*w4,b ; b = b*k 
         sftac   b,#11 ; divide by 2048 for the K 
@@ -298,11 +301,11 @@ SHIFT_ACC:
 		mov.w   ACCAH,w2
 		mov.w   ACCAU,w3
  		
-		mov     w1, [w0 + #OffsetACCAL]; store new val 
-        mov     w2, [w0 + #OffsetACCAH]; 
-        mov     w3, [w0 + #OffsetACCAU];
+		mov.w     w1, [w0 + #OffsetACCAL]; store new val 
+        mov.w     w2, [w0 + #OffsetACCAH]; 
+        mov.w     w3, [w0 + #OffsetACCAU];
 		
-		mov     [w0 + #OffsetThreshold], w4 ; load threshold
+		mov.w     [w0 + #OffsetThreshold], w4 ; load threshold
 
 		mpy     w4*w4,b;
 		sub     b;                      ; accb = accb - acca
@@ -333,7 +336,7 @@ SHIFT_ACC:
         pop.w w8
         mov w8,ACCAL
        
-        pop     CORCON                  ; restore CORCON. 
+ ;       pop     CORCON                  ; restore CORCON. 
         pop     w8
 
        return
@@ -414,11 +417,11 @@ _I2TIntegral2:
 
         fractsetup      w8;
 
-        mov [w0 + #OffsetACCAL], w1; load old val 
-        mov [w0 + #OffsetACCAH], w2; 
-        mov [w0 + #OffsetACCAU], w3;
+        mov.w [w0 + #OffsetACCAL], w1; load old val 
+        mov.w [w0 + #OffsetACCAH], w2; 
+        mov.w [w0 + #OffsetACCAU], w3;
 
-        mov [w0 + #OffsetQMeasured], w4;  load Q
+        mov.w [w0 + #OffsetQMeasured], w4;  load Q
 
 		mov.w   w1,ACCAL  ;restore old val
 		mov.w   w2,ACCAH;
@@ -429,19 +432,29 @@ _I2TIntegral2:
 
 		mov.w	w4,w5;    copy q for square
 
-		btsc    w4,#15;   preserve sign: if it is neg then negate w4
-		neg     w4,w4;
+;		btsc    w4,#15;   preserve sign: if it is neg then negate w4
+;		neg     w4,w4;  DO NOT DO HERE BECAUSE -0x8000 is 0x8000
 
         mpy     w4*w5,b ;b = (q*sign(q))*q
 
-		mov [w0 + #OffsetDMeasured], w4 ; load measured D
+		btsc    w4,#15;   preserve sign: if it was neg then negate result
+		neg     b;
+
+		mov.w [w0 + #OffsetDMeasured], w4 ; load measured D
 
        	sub  w4,w8,w4; w4 = w4 - IMAX
 
 		mov.w	w4,w5;  copy D for square
-		btsc    w4,#15; preserve sign: if it is neg then negate w4
+		btss    w4,#15; preserve sign: if it is neg then negate w4
+		bra     signok
+		mov.w		#0x8000,w1
+		cp		w1,w4;
+		bra		nz,okneg;
+		mov.w		#0x8001,w4
+okneg:
 		neg     w4,w4;
         
+signok:
         mac     w4*w5,b;  b += (d*sign(d))*d
 
 		sftac   b,#16 ; take most significant 16 bits.

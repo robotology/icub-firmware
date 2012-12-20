@@ -15,7 +15,7 @@
 #ifndef UserParms_H
 #define UserParms_H
 
-#define FIRMWARE_REVISION_STRING "2.4"
+#define FIRMWARE_REVISION_STRING "2.7"
 
 // HW revision 3 or previous
 // #define HARDWARE_REVISION_3
@@ -42,8 +42,17 @@
 //
 // Motor Parameters
 //
-#define NPOLEPAIRS  4             // Number of pole pairs
-#define NPOLES      (POLEPAIRS*2) // Number of poles
+// Phase custom motor has 7 pole coupoles
+//#define PHASE_MOTOR 1
+#ifdef PHASE_MOTOR
+  #define NPOLEPAIRS  7
+#else
+  // other motors has 4 pole couples
+  #define NPOLEPAIRS  4
+#endif
+
+// Number of poles
+#define NPOLES      (POLEPAIRS*2) 
 
 //#define NOMINALSPEEDINRPM 3000      // Make sure NOMINALSPEEDINRPM generates a MAXOMEGA < 1.0, Use this formula:
   // MAXOMEGA = NOMINALSPEEDINRPM*SPEEDLOOPTIME*POLEPAIRS*2/60. If MAXOMEGA > 1.0, reduce NOMINALSPEEDINRPM 
@@ -68,8 +77,9 @@
 
 // when this is enabled it is possible to degradate encoder
 // performances via CAN command.
-// comment this if you want to be sure encoder will always run at its 
+// Comment this if you want to be sure encoder will always run at its 
 // best performances (maybe in production releases).
+// Also enabling this has a sligth 2foc loop computational load increase.
 #define ENCODER_DEGRADATION_ENABLED
 
 // check consitency of encoder choose
@@ -115,7 +125,7 @@
   //following defines allows to choose which quadrature encoder to use 
   //
   //uncomment the following to use parameters for Mecapion
-  #define QE_MECAPION_PARAMS
+  //#define QE_MECAPION_PARAMS
   //uncomment the following to use parameters for Avago
   // #define QE_AVAGO_PARAMS
   //uncomment the following to use parameters for AS5306
@@ -241,17 +251,14 @@
   #define QE_RESOLUTION (QE_PPR * (unsigned int)4)
   #define AE_RESOLUTION -1 // avoid GCC complaints
 
-#ifdef ENCODER_USE_ZERO_FOR_ROTOR_ALIGNMENT
-#ifndef QE_ZERO_SYNCPULSEPOSITION
-#error The selected encoder does not support ENCODER_USE_ZERO_FOR_ROTOR_ALIGNMENT because QE_ZERO_SYNCPULSEPOSITION is not defined
-#endif
-#endif
-
-
+  #ifdef ENCODER_USE_ZERO_FOR_ROTOR_ALIGNMENT
+   #ifndef QE_ZERO_SYNCPULSEPOSITION
+   #error The selected encoder does not support ENCODER_USE_ZERO_FOR_ROTOR_ALIGNMENT because QE_ZERO_SYNCPULSEPOSITION is not defined
+  #endif
+ #endif
 #else
   #define QE_RESOLUTION 0 // avoid GCC complaints
  // #define QE_ZERO_SYNCPULSEPOSITION 0 // avoid GCC complaints
-
 #endif
 
 //
@@ -363,12 +370,18 @@
 //#define COMP_POSITION_READ_DELAY
 #define DO_NOT_COMP_POSITION_READ_DELAY
 
+// This is used to detect encoder turns.
+// When the position was close to max and wraps to 0
+// or vice-versa then a "turn" is detected.
+// The poisition is considered "close to" its max or
+// min, when it is no more than 
+// POSITION_TURN_DETECT_THRESHOLD units far from the
+// considered limit
+#define POSITION_TURN_DETECT_THRESHOLD 60000
 
 //
 // PID RELATED THINGS
 //
-
-
 /* Uncomment to enable the OLD, original, Microchip 
  * PI implementation for current loop.
  * This has been proven to be prone to overflows (et least)
@@ -390,7 +403,6 @@
 // #define SPEEDLOOPINC 
 // Use assembler version of the velocity regualtor
 #define SPEEDLOOPINASSEMBLER 
-
 
 /* Uncomment to enable the original Microchip PID
  * implementation.
@@ -424,6 +436,31 @@
 
 
 //
+// PID scaling factor for P I and D factor (current D pid)
+//
+
+#define KSHIFT_D_P -4
+#define KSHIFT_D_I 0
+#define KSHIFT_D_D 0
+
+//
+// PID scaling factor for P I and D factor (current Q pid)
+//
+
+#define KSHIFT_Q_P -4
+#define KSHIFT_Q_I 0
+#define KSHIFT_Q_D 0
+
+//
+// PID scaling factor for P I and D factor (current W pid)
+//
+
+#define KSHIFT_W_P -9
+#define KSHIFT_W_I 0
+#define KSHIFT_W_D 0
+
+
+//
 //  Default PI Coefficients
 //
 
@@ -431,12 +468,12 @@
 
 // Proportional
 //#define KPId        Q15(0.22) // 0.22 Per motori Emoteq
-#define KPId          0xBB8//Q15(0.09) // 3000 per motori Kollmorgen 
+#define KPId          Q15(0.09) // 0.09 per motori Kollmorgen 
 //#define KPId        Q15(0.06) // 0.02 Per motori Mecapion
 
 // Integral
 //#define KIId        Q15(0.05) // 0.05 Per motori emoteq
-#define KIId          0x1388//Q15(0.02) // 5000d per motori Kollmorgen
+#define KIId          Q15(0.02) // 0.02 per motori Kollmorgen 
 //#define KIId        Q15(0.02) // 0.01 per motori Kollmorgen
 
 //Excess (used only in original Microchip PI implementation)
@@ -445,27 +482,33 @@
 //Derivative (used only in original Microhip PID and custom PID2 implementations)
 #define KDId          Q15(0.0) 
 
+// integral anti wind up
+#define KMId          32000
 
-// PID regulator saturation value 
-// 13.5A * 0.75 = 10A
-
-// DO NOT define DOUTMAX Q15, done later.
-#define     DOUTMAX    0.70
+// PID regulator output saturation value (Vd and Vq)
+#ifdef ENCODER_DHES
+  // for HES is needed more headroom
+  #define     DOUTMAX    0.95
+  #define     QOUTMAX    DOUTMAX
+#else
+  // Higer resolution encoders
+  #define     DOUTMAX    0.95
+  #define     QOUTMAX    DOUTMAX
+#endif
 
 // Iq Control Loop Coefficients
 #define     KPIq       KPId
 #define     KIIq       KIId
 #define     KCIq       KCId
 #define     KDIq       KDId
-
-// PID regulator saturation value 
-#define     QOUTMAX    DOUTMAX
+#define     KMIq       KMId
 
 // Velocity (Omega) Control Loop Coefficients
 #define     KPWq        Q15(0.0060)
 #define     KIWq        Q15(0.00001)
 #define     KCWq        Q15(0.0)
 #define     KDWq        Q15(0.0)
+#define     KMWq        32000 //Q15(0.9765)
 
 // PID regulator saturation value 
 #define     WOUTMAX     Q15(0.95)
@@ -490,22 +533,20 @@
 // NOTE: if you change this you probably want also to change
 // W_PID_UNDERSAMPLE (see below)
 #ifdef ENCODER_DHES
-// configuration for low resolution encoders
-#define W_SIMPLE_CALCULATION_UNDERSAMPLE 399  // it reads the velocity each 10ms 
-// As much as we undersample as much as the difference of the two
-// samples is big. We do subtraction in 32bit but the final velocity
-// must fit in 16 bits. For this reason we need to divide the final 
-// calculated velocity.
-#define W_SIMPLE_CALCULATION_DIVISOR W_SIMPLE_CALCULATION_UNDERSAMPLE // 400
-
+ // configuration for low resolution encoders
+ #define W_SIMPLE_CALCULATION_UNDERSAMPLE 199
+ // As much as we undersample as much as the difference of the two
+ // samples is big. We do subtraction in 32bit but the final velocity
+ // must fit in 16 bits. For this reason we need to divide the final 
+ // calculated velocity.
+ #define W_SIMPLE_CALCULATION_DIVISOR W_SIMPLE_CALCULATION_UNDERSAMPLE
 #else
-// configuration for high resolution encoders
-// 39 + 1 = 40 -> 40KHz / 40 = 1KHZ for velocity calculation
-  #define W_SIMPLE_CALCULATION_UNDERSAMPLE 39 
-// TODO: va scritta i  funzione delle altre variabili!
-  #define W_SIMPLE_CALCULATION_DIVISOR 1
+ // configuration for high resolution encoders
+ // 19 + 1 = 20 -> 20KHz / 20 = 1KHZ for velocity calculation
+ #define W_SIMPLE_CALCULATION_UNDERSAMPLE 19 
+ // TODO: va scritta i  funzione delle altre variabili!
+ #define W_SIMPLE_CALCULATION_DIVISOR 1
 #endif
-
 
 // Complex speed calculation Frequency in Hertz. This value must
 // be an integer to avoid pre-compiler error
@@ -515,7 +556,6 @@
 
 // Velocity PID loop undersampling, how many current loops for each W PID loop
 #define W_PID_UNDERSAMPLE W_SIMPLE_CALCULATION_UNDERSAMPLE // 200
-
 
 //
 // Openloop parameters with a ramping speed
@@ -559,7 +599,7 @@
 #endif
 
 //
-// ADC Scaling for current reading.   
+// ADC Scaling for current reading. 
 //
 // Scaling constants: Determined by hardware design. 
 // +-5 Amps sensor on PhaseA and PhaseC(B), current reading inverted in sign, 
@@ -576,7 +616,6 @@
 // e.g the value for 1A reading is 32768:13.5A=x:1A
 //
 // For the ACS714-10 the sensitivity is 100mV/A
-
 #define     DQKA       Q15(1.0)  // Ia 
 #ifdef SAMPLE_IA_IB 
   #define   DQKB       Q15(-1.0) // Ib is sampled . 
@@ -592,8 +631,6 @@
 //
 // DC-Link parameters
 // 
-
-
 // Undervoltage and Overvoltage values in 100mV units.
 // The undervoltage protection will trigger if the VDCLink drops below this value. 
 #define UNDERVOLTAGE_THRESHOLD 100 //12V
@@ -603,7 +640,6 @@
 //
 // I2T protection parameters
 //
-
 #define I2T_FILTER_IMPLEMENTATION
 //#define I2T_INTEGRATOR1_IMPLEMENTATION
 //#define I2T_INTEGRATOR2_IMPLEMENTATION
@@ -627,22 +663,40 @@
 // I2T parameters for FILTER implementation
 //
 // This is the current threshold that will cause protection to fire
-// This value is in I AD units.
-// For example AD reads about 6550 for 5A current,
-#define I2T_CURRENT_THRESHOLD  2620   //2A 
+// This value is in I AD units scaled to 16bit.
+// For example AD reads about 6553 for 5A current, 1310 for 1A
+#define I2T_CURRENT_THRESHOLD   1310
 // This is 2024*K where K is
 // K = 1-(e^(-tc/tau))
 // where TC is 2FOC loop time
-#define I2T_TAU2048 0x64 //Q15(0.0204) chiedete a Merello...
-
+#define I2T_TAU2048 Q15(0.0204)
 
 // I2T warning not implemented yet
-// I2T warning is issued over this value 
+// I2T warning is issued over this value
 //#define I2T_WARNING_THRESHOLD    170
 
+//
 // PWM and Control Timing Parameters
-#define PWMFREQUENCY   40000     // PWM Frequency in Hertz
-#define DEADTIMESEC	   0.00000015 // Deadtime in seconds (0.15 uSec)
+//
+// PWM Frequency in Hertz
+#ifdef ENCODER_DHES
+ // HES can run up to 40KHz
+ #define PWMFREQUENCY   40000     
+#else
+ // Higer resolution encoders
+ #define PWMFREQUENCY   20000     
+#endif
+
+
+// Deadtime in seconds (range 1.6 us to 25 ns)
+#ifdef ENCODER_DHES
+ // HES accept a greater zero cross distortion in order to keep lower temperature
+ #define DEADTIMESEC	   0.00000025 
+#else
+ // hi-res encoders try to minimize zero cross distortion
+ #define DEADTIMESEC	   0.00000020 
+#endif
+
 // this forces the 2foc interrupt to delay PWM registers update when it is 
 // about to do it very close to the PWM hardware register buffering.
 // The number represent the estimated clock cycles taken by SVgen to
@@ -650,6 +704,10 @@
 // algo foresee that the HW will shadows register during SVGen (in the
 // next PWMSAFETIME clock cycles)
 #define PWMSAFETIME 50 // svgen takes 34 cycles. be conservative
+
+// PWMmax and PWMmin are PWMGUARD% and (100% - PWMGUARD%)
+// for example if PWMGUARD is 2 then max PWM is 98% and min is 2%
+#define PWMGUARD 2 
 
 //
 // CAN communication parameters
@@ -685,5 +743,12 @@
 
 // number of elements in the list of possible contents of periodic message
 #define ELEMENTS_IN_PREIODIC_DATA_LIST 0x30
+
+//number of points acquired in gulp circular buffer.
+//used to debug: it will contain last gulp trace before fault
+//NOTE FOR OPTIMIZATION PURPOSE THIS MUST BE A POW OF 2
+#define GULP_HISTORY_BUFFER_SIZE 512
+// this is the bitmask that is used to recirculate the ring buffer
+#define GULP_HISTORY_BUFFER_MASK (GULP_HISTORY_BUFFER_SIZE-1)
 
 #endif

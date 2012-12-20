@@ -70,8 +70,10 @@ extern fractional destinazione[];
 extern IIRCanonicStruct iirc;
 extern unsigned char PeriodicMessageContents[4];
 extern tI2T I2Tdata;
-
-
+extern unsigned int *gulpadr1;
+extern unsigned int *gulpadr2;
+extern unsigned int *gulpadr3;
+extern unsigned int *gulpadr4;
 extern volatile tControlword DS402_Controlword;
 extern volatile tStatusword  DS402_Statusword;
 extern unsigned int EncoderDegradation;

@@ -14,6 +14,10 @@ typedef struct
   fractional controlOutput;  // PID Controller Output
   fractional measuredOutput;  // Measured Output sample
   fractional controlReference;  // Reference Input sample
+  signed short PShift;
+  signed short IShift;
+  signed short DShift;
+  
 } tPID2;
 
 

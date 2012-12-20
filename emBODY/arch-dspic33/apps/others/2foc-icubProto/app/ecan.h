@@ -62,6 +62,7 @@ USE FOR EXTENDED MESSAGES ONLY */
 
 typedef union
 {
+    unsigned long dw[2];
 	unsigned short w[4];
 	unsigned char b[8];
 
@@ -82,7 +83,7 @@ extern volatile int CAN_BusOff;
 
 // function prototypes as defined in can.c
 extern void ECANInit (void (*RxCb)(unsigned long id, unsigned char len, tCanData *payload));
-extern void ECANSend(unsigned long id, unsigned char len,tCanData *payload);
+extern int ECANSend(unsigned long id, unsigned char len,tCanData *payload);
 extern int ECANRxFilterAdd(unsigned long id, unsigned long mask);
 extern void ECANStart();
 extern void ECANCheckState();

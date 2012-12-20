@@ -433,7 +433,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         
         case ICUBPROTO_POLLINGCMD_SET_CURRENT_PID: 
         {
-            SFRAC16 pp, pi, pd;
+            SFRAC16 pp, pi, pd, pm;
             if(7 != rxlen)
             {   // incorrect number of parameters
 //                *txlen = 0x1;
@@ -441,17 +441,18 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 *txlen = 0x0;
                 return(0);
             }
-
+            ControllerGetCurrentDPIDParm(&pp,&pi,&pd,&pm);
             pp = (rxpayload->b[2] << 8 | rxpayload->b[1]);
             pi = (rxpayload->b[4] << 8 | rxpayload->b[3]);
-            pd = (rxpayload->b[6] << 8 | rxpayload->b[5]); 
-            ControllerSetCurrentDPIDParm(pp,pi,pd);
-			ControllerSetCurrentQPIDParm(pp,pi,pd);
+            pd = (rxpayload->b[6] << 8 | rxpayload->b[5]);
+
+            ControllerSetCurrentDPIDParm(pp,pi,pd,pm);
+	    ControllerSetCurrentQPIDParm(pp,pi,pd,pm);
         }break;
         
         case ICUBPROTO_POLLINGCMD_GET_CURRENT_PID: 
         {
-            signed int p, i, d;
+            signed int p, i, d, m;
             if(1 != rxlen)
             {   // incorrect number of parameters
 //                *txlen = 0x1;
@@ -460,7 +461,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 return(0);
             }
             
-            ControllerGetCurrentDPIDParm(&p, &i, &d);
+            ControllerGetCurrentDPIDParm(&p, &i, &d, &m);
             txpayload->b[0] = cmd;
             memcpy(&txpayload->b[1], &p, 2);
             memcpy(&txpayload->b[3], &i, 2);
@@ -470,7 +471,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         
         case ICUBPROTO_POLLINGCMD_SET_VELOCITY_PID: 
         {
-            SFRAC16 pp, pi, pd;
+            SFRAC16 pp, pi, pd, pm;
             
             if(7 != rxlen)
             {   // incorrect number of parameters
@@ -479,16 +480,17 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 *txlen = 0x0;
                 return(0);
             }
-
+            ControllerGetWPIDParm(&pp,&pi,&pd,&pm);
             pp = (rxpayload->b[2] << 8 | rxpayload->b[1]);
             pi = (rxpayload->b[4] << 8 | rxpayload->b[3]);
             pd = (rxpayload->b[6] << 8 | rxpayload->b[5]); 
-            ControllerSetWPIDParm(pp,pi,pd);
+            ControllerSetWPIDParm(pp,pi,pd,pm);
         }break;
         
         case ICUBPROTO_POLLINGCMD_GET_VELOCITY_PID: 
         {
-            signed int p, i, d;
+            signed int p, i, d, m;
+
             if(1 != rxlen)
             {   // incorrect number of parameters
 //                *txlen = 0x1;
@@ -496,7 +498,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 *txlen = 0x0;
                 return(0);
             }
-            ControllerGetWPIDParm(&p, &i, &d);
+            ControllerGetWPIDParm(&p, &i, &d, &m);
             txpayload->b[0] = cmd;
             memcpy(&txpayload->b[1], &p, 2);
             memcpy(&txpayload->b[3], &i, 2);
@@ -571,6 +573,12 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 PeriodicMessageContents[1] = rxpayload->b[2];
                 PeriodicMessageContents[2] = rxpayload->b[3];
                 PeriodicMessageContents[3] = rxpayload->b[4];
+
+                // precalculate this here. This is an optimization
+                gulpadr1 = (unsigned int*)PeriodicData[PeriodicMessageContents[0]];
+                gulpadr2 = (unsigned int*)PeriodicData[PeriodicMessageContents[1]];
+                gulpadr3 = (unsigned int*)PeriodicData[PeriodicMessageContents[2]];
+                gulpadr4 = (unsigned int*)PeriodicData[PeriodicMessageContents[3]];
             }
             else
             {

@@ -19,9 +19,11 @@ void SetupPWM(void)
 {
   // OpenMCPWM1(LOOPINTCY/2, LOOPINTCY/2 -80,0x8002, 0x0077, 0);
   // Motor PWM
-  PDC1 = 0;
-  PDC2 = 0;
-  PDC3 = 0;
+  // IDLE to 50% PWM
+  PDC1 = LOOPINTCY/2;
+  PDC2 = LOOPINTCY/2;
+  PDC3 = LOOPINTCY/2;
+  PWMDisable();
 
   // Center aligned PWM.
   // Note: The PWM period setting register is set to LoopInTcy/2 but since it counts up and 
@@ -29,7 +31,7 @@ void SetupPWM(void)
   // interrupt period is LoopInTcy
   PTPER = LOOPINTCY/2;    // Setup PWM period to Loop Time defined in parms.h 
   PWMCON1 = 0x0077;       // Enable PWM 1,2,3 pairs (L+H) for complementary mode
-  DTCON1 = (0x40 | (DDEADTIME/2)); // Dead time
+  DTCON1 = (0x00 | (DDEADTIME)); // Dead time. Prescaler 0
   DTCON2 = 0;
 
 // TODO: configure FAULTA pin for OverCurrent protection
@@ -39,9 +41,9 @@ void SetupPWM(void)
   PTCON = 0x2;         
 	
   // SEVTCMP: Special Event Compare Count Register 
-  // Phase of ADC capture set relative to PWM cycle: 80 offset and counting down
+  // Phase of ADC capture set relative to PWM cycle: when arrive to PTPER offset and counting down
   // to avoid ripple on the current measurement
-  SEVTCMP = PTPER - 80;
+  SEVTCMP = 0;
   SEVTCMPbits.SEVTDIR = 1;	
 
   // Connect and enable PWM pads to PWM module
@@ -67,9 +69,10 @@ void PWMDisable()
 void PWMEnable()
 // TODO: metti un commento, please
 {
-  PDC1 = 0;
-  PDC2 = 0;
-  PDC3 = 0;
+  // IDLE to 50% PWM
+  PDC1 = LOOPINTCY/2;
+  PDC2 = LOOPINTCY/2;
+  PDC3 = LOOPINTCY/2;
 
   // TODO: vedi sopra
   P1OVDCON = 0x3f00;

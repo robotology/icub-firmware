@@ -38,6 +38,8 @@
         .equ SVGen_qVr1,2        
         .equ SVGen_qVr2,4        
         .equ SVGen_qVr3,6
+        .equ SVGen_pwmmax,8
+        .equ SVGen_pwmmin, 10
 
         .extern _SVGenParm
 

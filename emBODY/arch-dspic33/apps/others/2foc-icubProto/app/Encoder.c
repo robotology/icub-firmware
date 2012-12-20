@@ -23,9 +23,12 @@
 #include "Faults.h"
 #include "controller.h"
 #include "tle5012.h"
+#include "dhes_lut.h"
 
 static unsigned int encoder_buffer;
 unsigned int eb;
+
+
 
 void EncoderInit()
 // setup the appropriate Registers for SPI or QEP encoder
@@ -296,8 +299,11 @@ inline void EncoderPositionDHS()
 //
 {
   extern tSysError SysError;
+  static int round = 0; // ELECTRICAL round conter inside a MECHANICAL round
+  static int encoder_dhes_state = 0;
+  signed char transition;
 
-  // Read HES vaue from the uC pins of choice
+    // Read HES vaue from the uC pins of choice
 #ifdef HES_CONNECTED_TO_P2_P5
   // mask the port where the HES are connected (RP5, RP6, RP7)
   encoder_buffer = (PORTB & 0b011100000) >> 5;
@@ -308,10 +314,69 @@ inline void EncoderPositionDHS()
   encoder_buffer = (PORTBbits.RB3) | (PORTBbits.RB8<<2) | (PORTBbits.RB9<<1);
 #endif
 
+  // NOTE: from the HES you get an Electrical angle! 
+
   // used to gulp the HES value
   eb=encoder_buffer;
 
-  switch(encoder_buffer)
+ // encoder_buffer &= 0b111;
+
+  if((encoder_buffer == 0) || (encoder_buffer == 7)){//if(DHES_VALUE_LUT[encoder_buffer]){ 
+     SysError.HESInvalidValue=1;
+     encoder_dhes_state = 0; // next time do not make assumption
+     FaultConditionsHandler();
+     return;
+  }
+
+  // the HES read the same val of last time. The angle
+  // has not to change. Do nothing.
+  // do not place before check for 0 and 7 : if the first time
+  // encoder_buffer reads 000 it must fault. But the
+  // first time encoder_dhes_state is 000 because it is
+  // init val
+  if(encoder_dhes_state == encoder_buffer)
+    return;
+
+  // if 0 no turn has been done
+  // if 1 or -1 a CW or CCW turn has been done
+  // if -2 error: invalid transition
+  transition = DHES_TRANSITION_LUT[encoder_dhes_state][encoder_buffer];
+
+  if(-2 == transition){
+    SysError.HESInvalidSequence = 1;
+    encoder_dhes_state = 0; // next time do not make assumption
+    FaultConditionsHandler();
+    return;
+  }
+
+  round += transition;
+
+  UnalignedMecchanicalAngle = DHES_UNALIGNEDMECANGLE_LUT[encoder_buffer];
+
+ // round += DHES_TURN_LUT[encoder_dhes_state][encoder_buffer];
+
+  if(round == NPOLEPAIRS){
+   round = 0;
+  }else if(round == -1){
+   round = NPOLEPAIRS -1;
+  }
+
+  encoder_dhes_state = encoder_buffer;
+
+  // combine the electrical angle information with the 
+  // electrical turn count to get mechanical angle
+  UnalignedMecchanicalAngle  += round * (0xFFFFU/NPOLEPAIRS);
+
+}
+
+
+
+//   DHES PROCEDURAL REFERENCE CODE WITHOUT LUTs
+//
+//  Please do not delete it yet at least until
+//  new code with LUTs is well tested!
+
+/*  switch(encoder_buffer)
   {
 // TODO: fare una verifica di quanto sono posizionate bene le sonde di hall:
 //  confrontare encoder_buffer con il dato ricavato da un encoder vero per diversi motori
@@ -320,47 +385,159 @@ inline void EncoderPositionDHS()
 //  del case e vedere di nascosto l'effetto che fa.
 //  vedere anche quale effetto ha la velocità di rotazione sulla lettura 
 
-    // for the HES the  meccanical angle has no meaning for FOC the 
-    // sensor returns directly the electrical angle
     // the HES activation sequence is 1,3,2,6,4,5
     case 1:
-      // the UnalignedMecchanicalAngle variable HAS AN IMPROPER USE!
-      // from the HES you get an Electrical angle! 
-      UnalignedMecchanicalAngle = 0x0000; // 0°
+     
+     
+      if(encoder_dhes_state == 5){
+        // we completed an electrical turn
+        round++;
+
+        if(round == NPOLEPAIRS){ 
+        // we completed the LAST electrical turn in the 
+        // mechanincal turn. So restart from electrical
+        // turn 0
+         round = 0;
+        }
+
+      
+      }else if(encoder_dhes_state != 3){
+        // if we did not 5->1 then the only
+        // other good seq is 5->3. Otherwise trigger an error.
+        // Exception: if prev seq val was -1 then this
+        // this is the first algo iteration and we have not
+        // any prev seq. val
+        if(encoder_dhes_state != -1){
+            SysError.HESInvalidSequence = 1;
+            FaultConditionsHandler();
+        }
+
+      }
+
+      UnalignedMecchanicalAngle = 0x0000U/NPOLEPAIRS; // 0°
+
+      // save new dhes state
+      encoder_dhes_state = 1;
+     
       break;
+
     case 3: 
-      UnalignedMecchanicalAngle = 0x2AAA; // 60°
+
+      // check if we did a valid transition or not
+      if(encoder_dhes_state != 1 && encoder_dhes_state != 2){
+        //if prev seq val was -1 then this
+        // this is the first algo iteration and we have not
+        // any prev seq. val
+        if(encoder_dhes_state != -1){
+            SysError.HESInvalidSequence = 1;
+            FaultConditionsHandler();
+        }
+
+      }
+      // insert in this variable the ELECTRICAL angle. It will
+      // be converted to mechanincal below
+      UnalignedMecchanicalAngle = 0x2AAAU/NPOLEPAIRS; // 60°
+      encoder_dhes_state = 3;
       break;
+
     case 2:
-      UnalignedMecchanicalAngle = 0x5554; // 120°
+      // check if we did a valid transition or not
+      if(encoder_dhes_state != 3 && encoder_dhes_state != 6){
+       //if prev seq val was -1 then this
+       // this is the first algo iteration and we have not
+       // any prev seq. val
+       if(encoder_dhes_state != -1){
+            SysError.HESInvalidSequence = 1;
+            FaultConditionsHandler();
+        }
+
+      }
+
+      UnalignedMecchanicalAngle = 0x5554U/NPOLEPAIRS; // 120°
+      encoder_dhes_state = 2;
       break;
+
     case 6: 
-      UnalignedMecchanicalAngle = 0x7FFF; // 180°
+      // check if we did a valid transition or not
+      if(encoder_dhes_state != 2 && encoder_dhes_state != 4){
+       //if prev seq val was -1 then this
+       // this is the first algo iteration and we have not
+       // any prev seq. val
+       if(encoder_dhes_state != -1){
+            SysError.HESInvalidSequence = 1;
+            FaultConditionsHandler();
+        }
+
+      }
+       // insert in this variable the ELECTRICAL angle. It will
+      // be converted to mechanincal below
+      UnalignedMecchanicalAngle = 0x7FFFU/NPOLEPAIRS; // 180°
+      encoder_dhes_state = 6;
       break;
+
     case 4: 
-      UnalignedMecchanicalAngle = 0xAAA8; // 240°
+      // check if we did a valid transition or not
+      if(encoder_dhes_state != 6 && encoder_dhes_state != 5){
+       //if prev seq val was -1 then this
+       // this is the first algo iteration and we have not
+       // any prev seq. val
+
+       if(encoder_dhes_state != -1){
+            SysError.HESInvalidSequence = 1;
+            FaultConditionsHandler();
+        }
+
+      }
+      // insert in this variable the ELECTRICAL angle. It will
+      // be converted to mechanincal below
+      UnalignedMecchanicalAngle = 0xAAA8U/NPOLEPAIRS; // 240°
+      encoder_dhes_state = 4;
       break;
+
     case 5: 
-      UnalignedMecchanicalAngle = 0xD552; // 300°
+     
+      if(encoder_dhes_state == 1){
+        // we completed an electrical turn
+        round--;
+
+        // we completed the LAST electrical turn in the 
+        // mechanincal turn. So restart from electrical
+        // turn 0
+        if(round == -1) round = NPOLEPAIRS-1;
+
+      }else if(encoder_dhes_state != 4){
+        // if we did not 1->4 then the only
+        // other good seq is 5->3. Otherwise trigger an error.
+        // Exception: if prev seq val was -1 then this
+        // this is the first algo iteration and we have not
+        // any prev seq. val
+       if(encoder_dhes_state != -1){
+            SysError.HESInvalidSequence = 1;
+            FaultConditionsHandler();
+        }
+
+      }
+
+      // insert in this variable the ELECTRICAL angle. It will
+      // be converted to mechanincal below
+      UnalignedMecchanicalAngle = 0xD552U/NPOLEPAIRS; // 300°
+      encoder_dhes_state = 5;
       break;
 
     default:
       // 000 and 111 are invalid values 
       SysError.HESInvalidValue=1;
-
-      // stop the motor
-/*    TorqueTogglingReference = 0;      
-      OmegaTogglingReference = 0;
-      CtrlReferences.qIqRef=0;
-      CtrlReferences.qWRef=0;
-      // TODO: togliere lo stop e fare una acconcia gestione delle eccezioni 
-      // TODO: position can be estimated using last Theta and current velocity
-      UnalignedMecchanicalAngle = 0;
-*/
       FaultConditionsHandler();
+
     break;
   }
+  // combine the electrical angle information with the 
+  // electrical turn count to get mechanical angle
+  UnalignedMecchanicalAngle  += round * (0xFFFFU/NPOLEPAIRS);
 }
+
+*/
+
 
 void EncoderPosition()
 // This function provides an encoder-type independent way to update the 
@@ -383,8 +560,9 @@ void EncoderPosition()
 #error EncoderPositionCannotHandleThisEncoder
 #endif
 
-#ifdef ENCODER_DEGRADATION_ENABLED
   AlignedMecchanicalAngle = UnalignedMecchanicalAngle + Encoder_SyncPulsePosition;
+
+#ifdef ENCODER_DEGRADATION_ENABLED
   AlignedMecchanicalAngle /= EncoderDegradation;
   AlignedMecchanicalAngle *= EncoderDegradation;
 #endif //ENCODER_DEGRADATION_ENABLED

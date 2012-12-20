@@ -75,6 +75,11 @@ typedef enum
     controlMode_error = 0xFF            /* ==> not exist in icub protocol. used for error detection*/
 }icubProtoControlMode_t;
 
+extern unsigned int *gulpadr1;
+extern unsigned int *gulpadr2;
+extern unsigned int *gulpadr3;
+extern unsigned int *gulpadr4;
+
 extern void CanIcubProtoSendResponse(unsigned int stid, unsigned char len, tCanData *errordata);
 extern void CanIcubProtoTxAck(unsigned int stid);
 extern void CanIcubProtoTxErrorCode(unsigned int stid, unsigned char len, tCanData *errordata);

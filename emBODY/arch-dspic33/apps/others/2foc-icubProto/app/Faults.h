@@ -77,7 +77,11 @@ typedef union uSysError
 /*b2*/  unsigned CAN_RTRFlagActive:1;       /* an RTR flag has been seen over the wire. This is not OK for LorCan */
 /*b3*/  unsigned CAN_WasWarn:1;             /* can has been in bus warn at least one time */
 /*b4*/  unsigned CAN_DLCError:1;            /* at least one DLC error has been seen */
-  } ;
+/*b5*/  unsigned SiliconRevisionFault:1;    /* see comments below
+/*b6*/  unsigned PositionLimitUpper:1; 
+/*b7*/  unsigned PositionLimitLower:1; 
+
+ } ;
 
   // Permits to access the whole structure data in byte/word/array fashon 
   unsigned int W[2];
@@ -159,7 +163,12 @@ typedef union uSysError
    unsigned CAN_WasWarn:1;
    // at least one DLC error has been seen
    unsigned CAN_DLCError:1;	
-  
+   // the MCU silicon revision in unsupported
+   unsigned SiliconRevisionFault:1;
+   // the position has run out upper position limit
+   unsigned PositionLimitUpper:1; //27
+   // the position has run out lower position limit
+   unsigned PositionLimitLower:1;
 
 // FOC loop was about to update the PDCs near the PDC shadow copy 
    // (pwm counter approaching 0) and the PDC write has thus been delayed 
@@ -174,7 +183,10 @@ typedef union uSysError
 extern void FaultConditionsHandler(void);
 extern void FaultReset(void);
 extern void FaultExternalTriggered();
+extern int Fault();
+extern void FaultRecheck();
 
 extern volatile tLED_status LED_status;
 extern tSysError SysError;
+
 #endif

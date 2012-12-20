@@ -40,6 +40,6 @@ void VelocityInit();
 
 extern volatile tVelocityParm VelocityParm;
 extern SFRAC16 Encoder_RotorStartingPosition;
-extern volatile  long Current_position;
+extern volatile long Current_position;
 
 #endif

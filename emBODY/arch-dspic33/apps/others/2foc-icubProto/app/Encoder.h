@@ -9,7 +9,7 @@
 #include "UserTypes.h"
 #include "UserParms.h"
 #include "pi.h"
-#include "Velocity.h"
+
 
 // TOTAL delay for AE (SPI + internal DSP)
 // TODO: attenzione sono dei fp, probabilmente troncati dal compilatore
@@ -24,6 +24,7 @@
 // Actual encoder delay for spi encoder 
 #define ENCODER_DELAY AE_DELAY
 #endif
+
 
 extern void EncoderInit();
 extern void EncoderPosition();
@@ -46,8 +47,7 @@ extern tSysStatus SysStatus;
 extern tPIParm PIParmD;
 extern tPIParm PIParmQ;
 extern volatile int Turns;
-extern volatile tVelocityParm VelocityParm;
-extern volatile long Previous_position;
+extern unsigned int Previous_position;
 extern volatile long Previous_position_for_velocity_calc;
 extern volatile short IraqVd;
 extern volatile short IraqVq; 

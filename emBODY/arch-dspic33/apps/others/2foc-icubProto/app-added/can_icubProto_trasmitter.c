@@ -35,6 +35,8 @@ static unsigned char canprototransmitter_bid;
 static unsigned char received_msg_from_ems = 0;
 extern volatile int gulp_update_request ;
 extern tGulp Gulp;
+extern tGulp GulpHistoryBuffer[GULP_HISTORY_BUFFER_SIZE];
+extern int GulpHistoryBufferIdx;
 extern int test_received_data;
 
 static void s_CanIcubProtoTrasmitter_prapareStatusMsg(tCanData *candata_ptr, unsigned char *len_ptr, unsigned long *txid_ptr);

@@ -50,6 +50,12 @@ void CanIcubProtoInit(unsigned char bid)
     {
         bid = 0xA;
     }
+  // init gulp var address with a good address (default GULP var)
+  gulpadr1 = (unsigned int*)PeriodicData[PeriodicMessageContents[0]];
+  gulpadr2 = (unsigned int*)PeriodicData[PeriodicMessageContents[1]];
+  gulpadr3 = (unsigned int*)PeriodicData[PeriodicMessageContents[2]];
+  gulpadr4 = (unsigned int*)PeriodicData[PeriodicMessageContents[3]];
+
   // Initialize the SW transmitter module
   CanIcubProtoTransmitterInit(bid);
   // Initialize the SW parser module

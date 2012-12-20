@@ -41,7 +41,7 @@ void Timer2Config();
 void Timer3Config();
 void Timer4Config();
 void ExternalFaultEnable();
-void OverCurrentFaultEnable();
+void OverCurrentFaultIntEnable();
 void InterruptPriorityConfig( void );
 void SetupHWParameters(void);
 void EepromSave();
@@ -119,24 +119,32 @@ typedef union
 #define BLINKRATE_STILL         0
 #define BLINKRATE_OFF			0xffff
 
+
 // EMUROM Data
 typedef struct eeprom_data {
   //  Do not change the data contained in the Header
   tEepromHeader EepromHeader; 
-
+    
   // User data  
   SFRAC16 I2TParam;
   SFRAC16 I2TThreshold; 
   SFRAC16 CPIDP;
   SFRAC16 CPIDI;
   SFRAC16 CPIDD;
+  SFRAC16 CPIDM;
   SFRAC16 WPIDP;
   SFRAC16 WPIDI;
   SFRAC16 WPIDD;
-
+  SFRAC16 WPIDM;
+    
   // add user data ahead ...
   // .... 
+
+  unsigned short chksum;
+
+
 } __attribute__((__packed__)) tEepromData;
+
 extern DECLARE_EMU_ROM_READVAR(ApplicationData, tEepromData);
 extern PLACE_EMU_ROM_DATA(EMURomSpace, tEepromData);
 #endif

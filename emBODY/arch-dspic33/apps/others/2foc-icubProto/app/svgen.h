@@ -40,6 +40,8 @@ typedef struct {
     short   qVr1;
     short   qVr2;
     short   qVr3;
+    short   pwmmax;
+    short   pwmmin;
 
     } tSVGenParm;
 

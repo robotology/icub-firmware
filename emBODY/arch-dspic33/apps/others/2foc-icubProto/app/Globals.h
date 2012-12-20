@@ -7,6 +7,16 @@
 #endif
 
 #define __GLOBALS_H
+
+//
+// default variable indexes for periodic data 
+// packet (Gulp packet for data plot)
+// 
+#define GULP_DEFAULT1 0x6   //current
+#define GULP_DEFAULT2 0x15  //Motor Position first 16 bit
+#define GULP_DEFAULT3 0x16  //Motor Position last 16 bit 
+#define GULP_DEFAULT4 0x17  //Motor velocity
+
 //
 // PARK-CLARKE related
 //
@@ -168,14 +178,28 @@ unsigned UseHES=0;
 
 // Variables for GULP!ing
 tGulp Gulp;
+tGulp GulpHistoryBuffer[GULP_HISTORY_BUFFER_SIZE];
+int GulpHistoryBufferIdx;
 // define the contents of the periodic message used as an index for PeriodicData
-unsigned char PeriodicMessageContents[4] = {0x6,0x15,0x16,0x17};
+unsigned char PeriodicMessageContents[4] = {GULP_DEFAULT1,GULP_DEFAULT2,GULP_DEFAULT3,GULP_DEFAULT4};
+
 
 // a new set of variables are requested for Gulp!ing
 // if this is 1 we are waiting for FOC to fill new values
 // Note that the main loop does not really wait, it just does not
 // perform operations on the pending variables.
 volatile int gulp_update_request = 1;
+
+// these buffers aux vars make it possible to obtain the best optimization
+// doing all precalculation off the 2foc loop
+unsigned int *gulpadr1;
+unsigned int *gulpadr2;
+unsigned int *gulpadr3;
+unsigned int *gulpadr4;
+
+long position_limit_lower;
+long position_limit_upper;
+int position_limits_enabled = 0;
 
 //
 // IIR Filtering
@@ -246,9 +270,11 @@ PLACE_EMU_ROM_DATA(EMURomSpace, tEepromData) = {
   .CPIDP = KPId,
   .CPIDI = KIId,
   .CPIDD = KDId,
+  .CPIDM = KMId,
   .WPIDP = KPWq,
   .WPIDI = KIWq,
   .WPIDD = KDWq,
+  .WPIDM = KMWq
 };
 
 // declare a variable in local space (ram) that will contain after the call
@@ -304,8 +330,9 @@ volatile short IraqVq = IRA_VQ;
 
 // updated each foc loop
 volatile  long Current_position = 0;
+
 // last foc cycle value
-volatile  long Previous_position = 0;
+unsigned int Previous_position = 0;
 
 // Freezed (undersampled at velocity undersampling rate) vaiable of the 
 // previous position for velocity calculations
@@ -358,6 +385,8 @@ const unsigned int * PeriodicData[ELEMENTS_IN_PREIODIC_DATA_LIST]={
 /* 14 */ (unsigned int*) &ParkParm.qCos,
 /* 15 */ (unsigned int*) (((void*)(&Current_position)) + 2), // position is 32bit wide
 /* 16 */ (unsigned int*) ((void*)(&Current_position)),
+
+
   //
   // Velocity related
   //

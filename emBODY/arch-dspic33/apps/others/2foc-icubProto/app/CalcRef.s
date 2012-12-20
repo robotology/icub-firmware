@@ -111,9 +111,9 @@ CalcRefVec:
           mov.w     #Sq3OV2,ScaleW
 
      ;; AccA = -Vbeta/2
-          neg.w     VbetaW,VbetaW
+     ;  neg.w     VbetaW,VbetaW ; A.M. original algo. do not work with 0x8000
           lac       VbetaW,#1,A
-
+		  neg 		A ; A.M added because I removed neg.w
      ;; Vr2 = -Vbeta/2 + sqrt(3)2 * Valpha)
           mac       ValphaW*ScaleW,A ; add Valpha*sqrt(3)/2 to A
           sac       A,WorkW
@@ -121,7 +121,7 @@ CalcRefVec:
 
      ;; AccA = -Vbeta/2
           lac       VbetaW,#1,A
-
+		  neg 		A ; A.M. added because I removed neg.w
      ;; Vr3 = (-Vbeta/2 - sqrt(3)2 * Valpha)
           msc       ValphaW*ScaleW,A ; sub Valpha*sqrt(3)2 to A
           sac       A,WorkW

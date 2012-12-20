@@ -9,6 +9,10 @@
  *  Based on Microchip PI and PID implementations.
  *  Written by AM for 2FOC board.
  *
+ *  This requires CORCON set with
+ *  - saturation enabled
+ *  - signed fractional mode
+ *
  * **********************************************
  *
  *  Algo pseudocode:
@@ -43,6 +47,9 @@
         .equ    offsetControlOutput, 4
         .equ    offsetMeasuredOutput, 6
         .equ    offsetControlReference, 8
+        .equ    offsetPShift, 10
+        .equ    offsetIShift, 12
+        .equ    offsetDShift, 14
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -63,7 +70,7 @@ _PID2:
         push    w8
 		push    w9
         push    w10
-        push    CORCON                  ; Prepare CORCON for fractional computation.
+   ;     push    CORCON                  ; Prepare CORCON for fractional computation.
 ; save DSP accumulator A to the stack
         mov ACCAL,w8				
         push.w w8					
@@ -79,12 +86,13 @@ _PID2:
         mov ACCBU,w8				
         push.w w8
 
-       fractsetup      w8
+    ;   fractsetup      w8
 
         mov [w0 + #offsetIDPMCoefficients], w8    ; w8 = Base Address of Coefficients array [ I,D,P,MAX_I ]
         mov [w0 + #offsetState], w10    ; w10 = Address of state array (D prev err and I)
         mov [w0 + #offsetMeasuredOutput], w2
         mov [w0 + #offsetControlReference], w3
+      
 
         lac     w3, a                   ; A = tPID.controlReference
         lac     w2, b                   ; B = tPID.MeasuredOutput
@@ -103,13 +111,13 @@ _PID2:
 		sac.r 	b, w6					; w2 = error - preverr
 
 		mpy 	w4*w6, b, [w8]+=4, w4, [w10]+=2, w7 ; b = DERIVATIVE, w4 = ki, w10 pt to tPID.State (I), w8 point to kp
-
+       
 		lac 	[w10], a				; A = tPID.State (I)
 		mac 	w4*w5, a, [w8]+=2, w4   ; A += e*ki, w4 = kp, w8 point to IMAX
 		   
 		sac.r	a,w1					; w1 = integral;
 		mov.w 	[w8],w6					; load IMAX
-		cp 		w6,w1					; integral-max 					
+		cp 		w1,w6					; w1-w6 integral-max 					
 		bra		gt,	notok				; > 0 ?
 		neg.w 	w6,w6					; max = -max
 		cp		w1,w6					; integral - (-max)
@@ -118,10 +126,19 @@ _PID2:
 ok:
 		mov.w	w1,[w10]				; store I
 		lac 	w1,a					; A = I
+
+        mov [w0 + #offsetIShift], w9      
+        sftac   a,w9
+        mov [w0 + #offsetDShift], w9
+        sftac   b,w9
+
 		add		b						; B = A + B
 
 		mpy		w4*w5,a					; A = kp*error
-		sftac	a,#-NKo					; A = A << NKo
+
+        mov [w0 + #offsetPShift], w9
+		sftac	a,w9					; A = A << Pmul
+
 		add		a 						; A = A + B
 		sac.r	a, w1
 
@@ -144,7 +161,7 @@ ok:
         pop.w w8
         mov w8,ACCAL
        
-        pop     CORCON                  ; restore CORCON.
+;        pop     CORCON                  ; restore CORCON.
         pop     w10                     ; Restore working registers.
 		pop     w9
         pop     w8
@@ -153,7 +170,7 @@ ok:
         return
 
 notok:
-		mov.w	w6,w9
+		mov.w	w6,w1
 		bra ok;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

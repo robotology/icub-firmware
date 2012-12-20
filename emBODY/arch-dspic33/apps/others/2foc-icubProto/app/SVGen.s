@@ -249,13 +249,19 @@ jCalcRef10:
           mov.w     TbW,dPWM3
           return
 
-jCalcRef15:
+jCalcRef15: ; CALLED WHEN vr2 and vr3 are neg
 
      ;; Sector 1: (0,0,1)  60-120 degrees
      ;; T1 = -Vr2
      ;; T2 = -Vr3
           neg.w     Vr2W,T2W
+          btsc		T2W,#15
+		  mov.w     #0x7fff,T2W
+          
           neg.w     Vr3W,T1W
+          btsc		T1W,#15
+		  mov.w     #0x7fff, T1W
+          
           rcall     CalcTimes
 
      ;; dPWM1 = Tb
@@ -291,12 +297,18 @@ jCalcRef20:
           mov.w     TaW,dPWM3
           return
 
-jCalcRef25:
+jCalcRef25: ; CALLED WHEN vr3 and vr1 are neg
      ;; Sector 2: (0,1,0)  300-360 degrees
      ;; T1 = -Vr3
      ;; T2 = -Vr1
           neg.w     Vr3W,T2W
+          btsc		T2W,#15
+		  mov.w     #0x7fff,T2W
+          
           neg.w     Vr1W,T1W
+          btsc		T1W,#15
+		  mov.w     #0x7fff,T1W
+          
           rcall     CalcTimes
 
      ;; dPWM1 = Ta
@@ -307,14 +319,20 @@ jCalcRef25:
           mov.w     TbW,dPWM3
           return
 
-jCalcRef30:
+jCalcRef30: ; CALLED WHEN vr1 and vr2 are neg
      ;; Must be Sector 4 since Sector 0 not allowed
      ;; Sector 4: (1,0,0)  180-240 degrees
 
      ;; T1 = -Vr1
      ;; T2 = -Vr2
           neg.w     Vr1W,T2W
+          btsc		T2W,#15
+		  mov.w     #0x7fff,T2W
+          
           neg.w     Vr2W,T1W
+          btsc		T1W,#15
+		  mov.w     #0x7fff,T1W
+          
           rcall     CalcTimes
 
      ;; dPWM1 = Tc
@@ -343,6 +361,8 @@ jCalcRef30:
 ;*******************************************************************
 CalcTimes:
 
+		  mov.w		_SVGenParm+SVGen_pwmmax,w7
+          mov.w    	_SVGenParm+SVGen_pwmmin,w8
      ;; T1 = PWM*T1
 
      ;; Since T1 is in 1.15 and PWM in integer we do multiply by
@@ -363,14 +383,54 @@ CalcTimes:
           sub.w     w0,T1W,WorkW        ;PWM-T1
           sub.w     WorkW,T2W,WorkW     ; -T2
           asr.w     WorkW,WorkW         ; /2
+    
+          cp		WorkW,w8
+		  bra 		LT,clamp1zero;
+		  
+		  cp        WorkW,w7; //w0 is max
+		  bra       LT, ok1;
+          mov.w     w7,WorkW
+		  bra		ok1;
+
+clamp1zero:
+	      mov.w 	w8, WorkW
+
+ok1:
           mov.w     WorkW,TcW           ; store Tc
 
      ;; Tb = Tc + T1
           add.w     WorkW,T1W,WorkW
+
+ 		  cp    	WorkW,w8
+		  bra 		LT,clamp2zero;
+		  
+		  cp        WorkW,w7; //w0 is max
+		  bra       LT, ok2;
+          mov.w     w7,WorkW
+		  bra		ok2;
+
+clamp2zero:
+	      mov.w 	w8, WorkW
+
+ok2:
+
           mov.w     WorkW,TbW
 
 
      ;; Ta = Tb + T2
           add.w     WorkW,T2W,WorkW
+		  cp    	WorkW,w8
+		  bra 		LT,clamp3zero;
+		  
+		  cp        WorkW,w7; //w0 is max
+		  bra       LT, ok3;
+          mov.w     w7,WorkW
+		  bra		ok3;
+
+clamp3zero:
+	      mov.w 	w8, WorkW
+
+ok3:
+
           mov.w     WorkW,TaW
           return

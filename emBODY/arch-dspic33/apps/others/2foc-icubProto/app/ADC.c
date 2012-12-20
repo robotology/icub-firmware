@@ -95,8 +95,8 @@ int ADCCalibrate(void)
   long ADCOffs1 = 0, ADCOffs2 = 0;
   
   // Put an 'accettable' value in case of error in the calibration process
-  MeasCurrParm.Offseta = 0x200;
-  MeasCurrParm.Offsetbc = 0x200;
+  MeasCurrParm.Offseta = 0x0;
+  MeasCurrParm.Offsetbc = 0x0;
 
   // Turn on ADC module
   AD1CON1bits.ADON = 1;
@@ -129,7 +129,7 @@ int ADCCalibrate(void)
       }
     }
     // accumulate values
-    ADCOffs1 += ADC1BUF0;
+    ADCOffs1 += (int)ADC1BUF0;
 
     // Samples AN1
     AD1CHS0bits.CH0SA = 1;
@@ -158,7 +158,7 @@ int ADCCalibrate(void)
       }
     }
     // accumuulate values
-    ADCOffs2 += ADC1BUF0;
+    ADCOffs2 += (int)ADC1BUF0;
 	
     // Samples AN2 (Vdc)
     AD1CHS0bits.CH0SA = 2;
@@ -188,7 +188,7 @@ int ADCCalibrate(void)
       }
     }
     // accumuulate values
-    ADCVdcZero += ADC1BUF0;
+    ADCVdcZero += (int)ADC1BUF0;
 
    /* if the measured VDCLINK is lower than this threshold
     * then we cannot be sure the Allegro are properly powered.
@@ -234,13 +234,14 @@ void ADCConfigPWMandDMAMode()
   // 10 bits
   AD1CON1bits.AD12B = 0;
   
-  // A/D Conversion Clock (TAD). must be >= 75ns.
+  // A/D Conversion Clock (TAD). must be >= 76ns.
   // 40Mhz clk = 25 ns (TCY).
   // TAD = TCY * (ADCS+1)
-  // TAD = 25*3 = 75 ns
-  // Conversion time = TAD*12 = 900ns 
+  // TAD = 25*5 = 125 ns
+  // Conversion time = TAD*12 = 1.5us 
+  // time to conv 4 ch = 1.5*4 = 6 us
 // TODO: il valore di conversione ha influenza sul ritardo con cui parte il calcolo della SVG 
-// 0.9ns + tempo di calcolo deve essere < di TPWM/2  
+// 1.5 us + tempo di calcolo deve essere < di TPWM/2  
   // AM portato a 4. Empiricamente si vede meno rumore su DCLink.
   // Su lettura di corrente sembra migliorare leggermente
   AD1CON3bits.ADCS = 4;   // AD1CON3bits.ADCS = 2;  
@@ -309,8 +310,8 @@ void ADCConfigureRegistersForCalibration()
   AD1CON2 = 0;
   AD1CON3 = 0;
     
-  // A/D Conversion Clock Select bits = 21 * Tcy
-  AD1CON3bits.ADCS = 20;
+  // A/D Conversion Clock Select bits = 5 * Tcy
+  AD1CON3bits.ADCS = 4;
 
   // sample only from ch0 
   AD1CON2bits.CHPS = 0;  
@@ -347,12 +348,22 @@ void ADCDoOffsetCalibration(void)
 // Then setup ADC for for sequential sampling on  CH0=AN0, CH1=AN1, CH2=AN2. 
 // without PWM sync and DMA, value and stored in MeasCurrParm.Offseta,b signed fractional form.
 {
+  int i;
   int ret;
+  int led;
   // Configure ADC registers for calibration without PWM sync and DMA
   ADCConfigureRegistersForCalibration();
 
   // Execute calibration and store values
+  
+  for(i=0;i<10000;i++){// delay  1s
+     __delay32(4000); //delay 100us
+  }
+
+  led = LED_status.RedBlinkRate;
+
   while(1){
+
 	ret = ADCCalibrate() ;
 
     if(-1 == ret){
@@ -374,13 +385,14 @@ void ADCDoOffsetCalibration(void)
          * raise 
          */ 
 		SysError.ADCCalFailure = 1;
-	//	LED_status.RedBlinkRate=BLINKRATE_STILL;
-        break;
+	 	
+        LED_status.RedBlinkRate=BLINKRATE_STILL;
+       // break;
 		
-        //continue;
+        continue;
  	}
 		 
-  //	LED_status.RedBlinkRate=BLINKRATE_OFF;
+     	LED_status.RedBlinkRate = led;
  	 
 
   return;

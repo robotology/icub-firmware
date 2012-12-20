@@ -17,6 +17,7 @@
 #include "qep.h"
 #include "faults.h"
 #include "ecan.h"
+#include "encoder.h"
 
 void ActuateMuxLed()
 // Actuate Multiplexed led ports
@@ -114,10 +115,44 @@ void BlinkLed()
 void __attribute__((__interrupt__, no_auto_psv)) _T3Interrupt(void)
 // Timer 3 IRQ service routine
 // used to run I2T (in order to unwind it) when 2FOC loop is stopped
+// and to perform encoder turn count
 {
   I2Tdata.IQMeasured = 0;
   I2Tdata.IDMeasured = 0;
+
   I2T(&I2Tdata);
+
+  EncoderPosition();
+
+  // Trigger encoder. Start to prepare data for the next reading (if needed..)
+  // this for ABS encoder make SPI to initiate transfer.
+  EncoderTriggerSample();
+
+  
+  if(1 == SysStatus.InitialRotorAlignmentComplete)
+  {
+      
+      // detects and count complete rounds.
+      if((unsigned int)AlignedMecchanicalAngle  > POSITION_TURN_DETECT_THRESHOLD && Previous_position < 65535-POSITION_TURN_DETECT_THRESHOLD)
+      {
+       // the position was close to its min and now it is jumped near to its max value. Decrease turns counter
+
+        Turns--;
+      }
+      else 
+      {
+
+        if((unsigned int)AlignedMecchanicalAngle < 65535-POSITION_TURN_DETECT_THRESHOLD &&  Previous_position > POSITION_TURN_DETECT_THRESHOLD)
+        {
+            
+          // the position was close to its max and now it is jumped near to its min value. Increase turns counter
+          Turns++;
+        }
+      }
+  }
+
+  Previous_position = AlignedMecchanicalAngle;
+
   IFS0bits.T3IF = 0; // clear flag 
 }
 
@@ -279,12 +314,12 @@ void ExternalFaultEnable()
 #endif
 }
 
-void OverCurrentFaultEnable()
+void OverCurrentFaultIntEnable()
 // over current fault interrupt enable
 {
   // clear irq flag
   IFS3bits.FLTA1IF = 0;
-  //enable external fault
+  //enable external fault interrupt
   IEC3bits.FLTA1IE = 1;
 }
 
@@ -293,6 +328,7 @@ void SetupHWParameters(void)
 // Current conversion factor and offset
 // 
 {
+  unsigned long pwmmax,pwmoffs;
   //
   // configure DSP core 
   //
@@ -301,11 +337,11 @@ void SetupHWParameters(void)
   CORCONbits.US  = 0;
   // enable saturation on DSP data write
   CORCONbits.SATDW = 1;
-  // DISABLE saturation on accumulator A. Required by MeasCurr algo
-  CORCONbits.SATA  = 0;
+  // ENABLE saturation on accumulator A.
+  CORCONbits.SATA  = 1;
 
-  // do not do super saturation (probably don't care because SATA = 0
-  CORCONbits.ACCSAT  = 0;
+  //  do super saturation 
+  CORCONbits.ACCSAT  = 1;
   // program space not visible in data space
   CORCONbits.PSV  = 0;
   // conventional rounding mode
@@ -333,6 +369,18 @@ void SetupHWParameters(void)
 
   // Set PWM period to Loop Time
   SVGenParm.iPWMPeriod = LOOPINTCY;
+  
+  // pwm registers range for pwm HW periph is 0 to LOOPINTCY
+  pwmmax = LOOPINTCY;
+  // calculate the given clamp offset for PWM regs given the
+  // PWM guard percentage.
+  pwmoffs = (pwmmax /100) * PWMGUARD;
+
+  // PWM greater value accepted is PWM max minus the guard
+  SVGenParm.pwmmax = pwmmax - pwmoffs;
+  // PWM smaller value accepted is PWM min (zero) plus the guard
+  SVGenParm.pwmmin = pwmoffs;
+
 }
 
 void InterruptPriorityConfig( void )
@@ -654,50 +702,60 @@ void EepromSave()
 // (ed e' pure identata acdc).
 {
   // Update values in EEPROM RAM image 
-  SFRAC16 p,i,d;
+  SFRAC16 p,i,d, max;
+  unsigned short chksum;
+  int j;
 
   // I2T parameters
   ApplicationData.I2TParam = I2Tdata.Param;
-   ApplicationData.I2TThreshold = I2Tdata.IThreshold;
+  ApplicationData.I2TThreshold = I2Tdata.IThreshold;
   
-    // currently D and Q PID have the same parameters
-    ControllerGetCurrentDPIDParm(&p,&i,&d);
-    //  ControllerGetCurrentQPIDParm(&p,&i,&d);
-    // Current PI(D) parameters    
+  // currently D and Q PID have the same parameters
+  ControllerGetCurrentDPIDParm(&p,&i,&d, &max);
+  //  ControllerGetCurrentQPIDParm(&p,&i,&d);
+  // Current PI(D) parameters    
 
 
-   ApplicationData.CPIDP = p;
-   ApplicationData.CPIDI =  i;
-   ApplicationData.CPIDD =  d;
+  ApplicationData.CPIDP =  p;
+  ApplicationData.CPIDI =  i;
+  ApplicationData.CPIDD =  d;
+  ApplicationData.CPIDM =  max;
 
-    ControllerGetWPIDParm(&p,&i,&d);
+  ControllerGetWPIDParm(&p,&i,&d, &max);
 
     // velocity PI(D) parameters
-   ApplicationData.WPIDP = p;
-   ApplicationData.WPIDI =  i;
-   ApplicationData.WPIDD = d;
+  ApplicationData.WPIDP = p;
+  ApplicationData.WPIDI = i;
+  ApplicationData.WPIDD = d;
+  ApplicationData.WPIDM = max;
 
+  chksum = 0;
+
+  for(j=0;j<sizeof(ApplicationData) - sizeof(unsigned short); j++)
+   chksum += ((char*)&ApplicationData)[j];
+
+  ApplicationData.chksum = chksum;
   // Reflash to the EEPROM
-    REFLASH_EMU_ROM(EMURomSpace,ApplicationData);
+  REFLASH_EMU_ROM(EMURomSpace,ApplicationData);
 }
 
 void EepromLoad()
 // TODO: posso anche immaginare dal nome ma preferirei che ci fosse un commentino.
 // (ed e' pure identata acdc).
 {
-  //retrive data from emurom
-    ReadFromEmuROM();
+   //retrive data from emurom
+   ReadFromEmuROM();
 
-  // I2T parameters
-  I2Tdata.Param =  ApplicationData.I2TParam;
+   // I2T parameters
+   I2Tdata.Param =  ApplicationData.I2TParam;
    I2Tdata.IThreshold = ApplicationData.I2TThreshold;
   
-    // currently D and Q PID have the same parameters
-    // Current PI(D) parameters  
-    ControllerSetCurrentDPIDParm(ApplicationData.CPIDP,ApplicationData.CPIDI,ApplicationData.CPIDD);
-    ControllerSetCurrentQPIDParm(ApplicationData.CPIDP,ApplicationData.CPIDI,ApplicationData.CPIDD);
+   // currently D and Q PID have the same parameters
+   // Current PI(D) parameters  
+   ControllerSetCurrentDPIDParm(ApplicationData.CPIDP,ApplicationData.CPIDI,ApplicationData.CPIDD,ApplicationData.CPIDM);
+   ControllerSetCurrentQPIDParm(ApplicationData.CPIDP,ApplicationData.CPIDI,ApplicationData.CPIDD,ApplicationData.CPIDM);
   
 
-    // velocity PI(D) parameters
-    ControllerSetWPIDParm(ApplicationData.WPIDP,ApplicationData.WPIDI,ApplicationData.WPIDD);
+   // velocity PI(D) parameters
+   ControllerSetWPIDParm(ApplicationData.WPIDP,ApplicationData.WPIDI,ApplicationData.WPIDD,ApplicationData.WPIDM);
 }

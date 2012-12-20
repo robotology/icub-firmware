@@ -589,7 +589,7 @@ void ECANPrepareTxBuffer(tCANMessage *CANTxMessage, unsigned long id, unsigned c
 }
 
 
-void ECANSend(unsigned long id, unsigned char len, tCanData *payload)
+int ECANSend(unsigned long id, unsigned char len, tCanData *payload)
 // sends the message on CAN bus  
 // Parameters: 
 {
@@ -600,7 +600,7 @@ void ECANSend(unsigned long id, unsigned char len, tCanData *payload)
   if( C1TR01CONbits.TXREQ0 && C1TR01CONbits.TXREQ1 && C1TR23CONbits.TXREQ2 &&  C1TR23CONbits.TXREQ3)
   {
     // TODO: lanciare un acconccio log di errore
-    return;
+    return -1;
   }
 
   // If Buf0 is free then use Buf0
@@ -721,7 +721,7 @@ void ECANSend(unsigned long id, unsigned char len, tCanData *payload)
 	}
 
 //#endif
-  
+ return 0; 
 }
 
 

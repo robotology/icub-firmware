@@ -6,10 +6,32 @@
 #include <timer.h>
 #include <string.h> // memset
 
+int fault = 0;
+
+int Fault()
+{
+  return fault;
+}
+
+
+void FaultRecheck()
+// retrigger the fault handler if
+// a fault happened.
+// This is used if a fault happened but someone might
+// have enabled PWM or CAN or changed LEDs to restore
+// the fault state
+{
+ if(fault){
+  fault = 0;
+  FaultConditionsHandler();
+ }
+}
+
 void FaultReset(void)
 // called when receiving shutdown cmd and
 // going to readytoswitchon
 {
+	fault = 0;
 	LED_status.RedBlinkRate = BLINKRATE_OFF;
 // clear faults, but do not clear flags that keep track of 
 // past error conditions like can state, SPI communication errors
@@ -33,6 +55,13 @@ void FaultReset(void)
     // External Fault
     SysError.ExternalFaultAsserted = 0;
 
+    SysError.HESInvalidValue=0;
+
+    SysError.HESInvalidSequence = 0;
+
+    SysError.PositionLimitUpper = 0;
+    SysError.PositionLimitLower = 0;
+    
     //unsigned EMUROMFault:1;
     //unsigned EMUROMCRCFault:1;
 
@@ -51,7 +80,7 @@ void FaultReset(void)
 //   unsigned CAN_WasWarn:1;
 //   unsigned CAN_DLCError:1;	
   
-	
+
 }
 
 void FaultConditionsHandler(void)
@@ -60,7 +89,11 @@ void FaultConditionsHandler(void)
 {
   // TODO: To be fully completed
 
-  
+  if(fault)
+    return;
+
+  fault = 1;
+
   // Disable PWM
   PWMDisable();
   
