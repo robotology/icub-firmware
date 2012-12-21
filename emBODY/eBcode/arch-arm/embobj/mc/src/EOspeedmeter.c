@@ -159,7 +159,7 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
     
     //////////////////////////////
 
-    if (o->time < 50) ++o->time;
+    if (o->time < 32000) ++o->time;
 
     if (o->hard_fault || o->invalid_data_cnt >= 500)
     {
@@ -192,6 +192,9 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
                 o->distance += delta;
                 
                 int32_t speed = delta_x_freq / o->time;
+                
+                if (-666 < speed && speed < 666) speed = (speed>0) ? 666 : -666;
+                
                 LIMIT(-48000, speed, 48000);
                 o->time = 0;
                 
@@ -246,7 +249,7 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
         }
     }
     
-    if (o->time < 49)
+    if (o->time < 31999)
     {
         if (o->time > 1)
         {
@@ -258,7 +261,7 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
         
         LIMIT(-16000, o->odo_x_freq, 16000);
     }
-    else if (o->time == 49) // is still
+    else if (o->time == 31999) // is still
     {
         o->odo_x_freq = 0;
         o->speed_filt = 0;
