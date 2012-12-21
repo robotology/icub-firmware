@@ -73,7 +73,7 @@
 #define FOC_ADDRCAN_2_BID       1
 #define FOC_ADDRCAN_3_BID       2
 #define FOC_ADDRCAN_4_BID       3
-#define STRAIN_ADDRCAN_14_BID   4
+#define STRAIN_ADDRCAN_13_BID   4
 
 static const eOappTheDB_cfg_canBoardInfo_t s_cfg_appDB_boards[] = 
 {
@@ -113,11 +113,11 @@ static const eOappTheDB_cfg_canBoardInfo_t s_cfg_appDB_boards[] =
         EO_INIT(.type)                        eobrd_1foc,
      },    
  
-    { // 4  == STRAIN_ADDRCAN_14_BID
+    { // 4  == STRAIN_ADDRCAN_13_BID
         EO_INIT(.canLoc)
         {
             EO_INIT(.emscanport)              eOcanport2,
-            EO_INIT(.addr)                    14,
+            EO_INIT(.addr)                    13,
         },
         EO_INIT(.type)                        eobrd_strain,
     }
@@ -225,7 +225,7 @@ extern const EOconstvector* const eo_cfg_appDB_constvec_snsrMais__ptr = &s_eo_cf
 static const eOappTheDB_cfg_snsrStrainInfo_t  s_cfg_appDB_snsrStrain[] =
 {
     {// 0
-       EO_INIT(.belong2board)                       STRAIN_ADDRCAN_14_BID,
+       EO_INIT(.belong2board)                       STRAIN_ADDRCAN_13_BID,
     }
 };
 
