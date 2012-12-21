@@ -24,7 +24,7 @@
 #define _HAL_MPU_STM32XX_INCLUDE_H_
 
 
-#if   defined(HAL_BOARD_MCBSTM32C) || defined(HAL_BOARD_EMS001)
+#if   defined(HAL_BOARD_MCBSTM32C) || defined(HAL_BOARD_STM3210CEVAL) || defined(HAL_BOARD_EMS001)
 	#include "stm32f1.h"
     #include "cmsis_stm32f1.h"
     //#define cmsis_stm32xx_hid_set_system_core_clock     cmsis_stm32f1_hid_set_system_core_clock
