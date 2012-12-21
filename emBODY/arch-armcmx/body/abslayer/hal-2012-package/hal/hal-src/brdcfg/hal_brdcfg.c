@@ -31,6 +31,8 @@
 
 #if   defined(HAL_BOARD_MCBSTM32C)
 	#include "mcbstm32c/hal_brdcfg_mcbstm32c.c"
+#elif defined(HAL_BOARD_STM3210CEVAL)
+	#include "stm3210ceval/hal_brdcfg_stm3210ceval.c"    
 #elif defined(HAL_BOARD_EMS001)
 	#include "ems001/hal_brdcfg_ems001.c"
 #elif defined(HAL_BOARD_MCBSTM32F400) 
