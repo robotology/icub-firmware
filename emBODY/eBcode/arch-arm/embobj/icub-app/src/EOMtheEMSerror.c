@@ -128,6 +128,8 @@ extern EOMtheEMSerror * eom_emserror_Initialise(const eOemserror_cfg_t *cfg)
                                                     (eOevent_t)0, eok_reltimeINFINITE, NULL, 
                                                     tskEMSerr, "tskEMSerr");
  
+    s_emserror_singleton.mutex = eom_mutex_New();
+    
     eo_errman_SetOnErrorHandler(eo_errman_GetHandle(), s_eom_emserror_OnError);                                               
     
     return(&s_emserror_singleton);
@@ -249,7 +251,8 @@ static void s_eom_emserror_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid,
     
     eom_task_SetEvent(s_emserror_singleton.task, emserror_evt_error); 
     
-    for(;;);    
+    //for(;;);
+    eom_mutex_Take(s_emserror_singleton.mutex, eok_reltimeINFINITE);
 }
 
 
