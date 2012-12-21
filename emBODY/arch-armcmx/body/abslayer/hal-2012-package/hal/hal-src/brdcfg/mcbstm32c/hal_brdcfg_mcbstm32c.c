@@ -226,25 +226,25 @@
 #ifdef  HAL_USE_SPI
     extern const hal_spi_hid_brdcfg_t hal_brdcfg_spi__theconfig =
     {
-        .supported_mask         = (0 << hal_spi_port1) | (0 << hal_spi_port2) | (1 << hal_i2c_port3),
+        .supported_mask         = (1 << hal_spi_port1) | (0 << hal_spi_port2) | (1 << hal_i2c_port3),
+        .gpio_sck               =
+        {
+            { .port = hal_gpio_portA,    .pin = hal_gpio_pin5,    .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portC,    .pin = hal_gpio_pin10,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default } 
+        },
         .gpio_miso              =
         {
-            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portA,    .pin = hal_gpio_pin6,    .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
             { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
             { .port = hal_gpio_portC,    .pin = hal_gpio_pin11,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default } 
         },
         .gpio_mosi              =
         {
-            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portA,    .pin = hal_gpio_pin7,    .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
             { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
             { .port = hal_gpio_portC,    .pin = hal_gpio_pin12,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default } 
-        },  
-        .gpio_sck               =
-        {
-            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
-            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
-            { .port = hal_gpio_portC,    .pin = hal_gpio_pin10,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default } 
-        }          
+        }      
     };
 #endif//HAL_USE_SPI
 
