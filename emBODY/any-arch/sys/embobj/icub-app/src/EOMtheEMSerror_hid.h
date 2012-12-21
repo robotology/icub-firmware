@@ -37,7 +37,7 @@ extern "C" {
 #include "EOMtheEMStransceiver.h"
 #include "EOMtheEMSsocket.h"
 #include "EOMtask.h"
-
+#include "EOMmutex.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
@@ -57,6 +57,7 @@ extern "C" {
 struct EOMtheEMSerror_hid 
 {
     EOMtask*    task;
+    EOMmutex*   mutex; //it is used to suspend the task  that generate transistion to error state   
 };
 
 
