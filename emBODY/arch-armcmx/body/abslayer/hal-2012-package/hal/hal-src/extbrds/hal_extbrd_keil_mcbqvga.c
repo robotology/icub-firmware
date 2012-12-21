@@ -735,21 +735,27 @@ static hal_result_t s_hal_extbrd_keil_mcbqvga_spi_write(hal_spi_port_t port, uin
 {
     uint8_t rxbyte = 255;
     uint8_t sizeofframe = 0;
-    hal_spi_put(port, &byte, 1, hal_true); 
     
-    for(;;)
+    if(NULL == readbyte)
     {
-        if(1 == anewframehasarrived)
-        {
-            anewframehasarrived = 0;
-            break;
-        }
+        hal_spi_direction_set(port, hal_spi_dir_txonly);
+        hal_spi_put(port, &byte, 1, hal_true); 
     }
-
-    hal_spi_get(port, &rxbyte, &sizeofframe, NULL);
-    
-    if(NULL != readbyte)
+    else
     {
+        hal_spi_direction_set(port, hal_spi_dir_txrx);    
+        hal_spi_put(port, &byte, 1, hal_true); 
+        
+        for(;;)
+        {
+            if(1 == anewframehasarrived)
+            {
+                anewframehasarrived = 0;
+                break;
+            }
+        }
+
+        hal_spi_get(port, &rxbyte, &sizeofframe, NULL);        
         *readbyte = rxbyte;
     }
     
