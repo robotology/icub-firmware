@@ -92,6 +92,8 @@ typedef enum
 typedef enum
 {
     hal_spi_act_raw08bits       = 2,    /**<  */
+    hal_spi_act_multiframe      = 4,     // the master transmits as many frames as contained in its tx-fifo and then it disables spi
+    
     hal_spi_act_singleframe     = 0,    /**< the channel is enabled to manage one frame only and after that it is automatically disabled */
     hal_spi_act_continuous      = 1     /**< NOT SUPPORTED NOW: after the channel is enabled, it exchanges frames, possibly empty, until it is disabled */
 } hal_spi_activity_t;
@@ -102,13 +104,12 @@ typedef enum
  **/
 typedef enum
 {
-    hal_spi_speed_500kbps       = 5,
-    hal_spi_speed_1mbps         = 10,
-    hal_spi_speed_2mbps         = 20,
-    hal_spi_speed_4mbps         = 40,
-    hal_spi_speed_8mbps         = 80,
-    hal_spi_speed_9mbps         = 90,
-    hal_spi_speed_18mbps        = 180
+    hal_spi_speed_0562kbps          =   562500,
+    hal_spi_speed_1125kbps          =  1125000,
+    hal_spi_speed_2250kbps          =  2250000,
+    hal_spi_speed_4500kbps          =  4500000,
+    hal_spi_speed_9000kbps          =  9000000,
+    hal_spi_speed_18000kbps         = 18000000
 } hal_spi_speed_t;
 
 
@@ -118,15 +119,17 @@ typedef enum
 typedef struct
 {
     hal_spi_ownership_t     ownership;          /**< the communication ownership: master or slave */
-    hal_spi_direction_t     dir;                /**< the communication direction: tx, rx or both */
-    hal_spi_activity_t      activity;           /**< the activity: single frame or continuous */
+    hal_spi_direction_t     direction;                /**< the communication direction: tx, rx or both */
+    hal_spi_activity_t      activity;           /**< the activity: single frame, multi frame, or continuous */
     hal_spi_speed_t         speed;              /**< the communication speed */
     uint8_t                 sizeoftxframe;      /**< if tx is enables, it tells how many bytes to transmit inside a frame */
     uint8_t                 sizeofrxframe;      /**< if rx is enables, it tells how many bytes to receive inside a frame */
     hal_callback_t          onframetransm;      /**< if not NULL, it is called when a frame is transmitted. its argument is NULL */
     hal_callback_t          onframereceiv;      /**< if not NULL, it is called when a frame is received. its argument points to the received frame */
-    uint8_t                 sizeoftxfifoofframes; //?? si potrebbe bufferizzare le trasmissioni e le ricezioni .....
-    uint8_t                 sizeofrxfifoofframes;
+    uint8_t                 capacityoftxfifoofframes; //?? si potrebbe bufferizzare le trasmissioni e le ricezioni .....
+    uint8_t                 capacityofrxfifoofframes;
+    uint8_t                 dummytxvalue;
+//    hal_uint8_fp_void_t     gettxvalue; si potrebbe mettere una funzione che preleva il valore da trasmettere senza che sia necessario metterlo come frame.
 } hal_spi_cfg_t;
 
  
@@ -167,6 +170,8 @@ extern hal_result_t hal_spi_isrwrite(hal_spi_port_t port, uint8_t byte, uint8_t*
     @return 	hal_res_OK or hal_res_NOK_generic on failure
   */
 extern hal_result_t hal_spi_put(hal_spi_port_t port, uint8_t* txframe, uint8_t size, hal_bool_t sendnow);
+
+extern hal_result_t hal_spi_direction_set(hal_spi_port_t port, hal_spi_direction_t dir);
 
 extern hal_result_t hal_spi_start(hal_spi_port_t port);
 
