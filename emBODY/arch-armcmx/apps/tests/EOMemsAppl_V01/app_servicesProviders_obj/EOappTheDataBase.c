@@ -440,9 +440,12 @@ extern eOresult_t eo_appTheDB_GetSnsrMaisId_BySensorCanLocation(EOappTheDB *p, e
         (canloc_ptr->addr == b_ptr->cfg_ptr->canLoc.addr) )
     {
         *sId_ptr = 0; 
+        return(eores_OK);
     }
-
-    return(eores_OK);
+    else
+    {
+        return(eores_NOK_nodata);
+    }
 
 }
 
@@ -498,10 +501,13 @@ extern eOresult_t eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(EOappTheDB *p,
     if( (canloc_ptr->emscanport == b_ptr->cfg_ptr->canLoc.emscanport) &&
         (canloc_ptr->addr == b_ptr->cfg_ptr->canLoc.addr) )
     {
-        *sId_ptr = 0; 
+        *sId_ptr = 0;
+        return(eores_OK);        
     }
-
-    return(eores_OK);
+    else
+    {
+        return(eores_NOK_nodata);
+    }
 
 }
 
@@ -749,7 +755,7 @@ extern eOresult_t eo_appTheDB_GetSnrStrainConfigPtr(EOappTheDB *p, eOsnsr_strain
     {
         return(eores_NOK_nodata);
     }
-    *sconfig_ptr = NULL; s_eo_appTheDB_GetSnsrStrainNVreference(p, sId, eOappTheDB_hid_snsrStrainNVindex_sconfig);
+    *sconfig_ptr = s_eo_appTheDB_GetSnsrStrainNVreference(p, sId, eOappTheDB_hid_snsrStrainNVindex_sconfig);
     
     return(eores_OK);
 
@@ -767,7 +773,7 @@ extern eOresult_t eo_appTheDB_GetSnrStrainStatusPtr(EOappTheDB *p, eOsnsr_strain
     {
         return(eores_NOK_nodata);
     }
-    *sstatus_ptr = NULL; s_eo_appTheDB_GetSnsrStrainNVreference(p, sId, eOappTheDB_hid_snsrStrainNVindex_sstatus);
+    *sstatus_ptr = s_eo_appTheDB_GetSnsrStrainNVreference(p, sId, eOappTheDB_hid_snsrStrainNVindex_sstatus);
     
     return(eores_OK);
 

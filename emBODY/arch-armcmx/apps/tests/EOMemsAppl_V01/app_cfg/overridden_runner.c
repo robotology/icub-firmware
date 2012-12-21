@@ -301,8 +301,20 @@ static void s_eom_emsrunner_hid_taskRX_act_afterdgramrec_skinOnly_mode(EOtheEMSa
 
 static void s_eom_emsrunner_hid_taskRX_act_afterdgramrec_2foc_mode(EOtheEMSapplBody *p)
 {
-	/* TAG_ALE*/
-    eo_appCanSP_read(eo_emsapplBody_GetCanServiceHandle(p), eOcanport1, 4, NULL); 
+    uint8_t     numofRXcanframe = 0;
+    eOresult_t  res;
+
+    //read can msg from port 1
+    res = eo_appCanSP_GetNumOfRecCanframe(eo_emsapplBody_GetCanServiceHandle(p), eOcanport1, &numofRXcanframe);
+    eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "emsrunner_hid", "err in GetNumOfRecCanframe");
+
+    eo_appCanSP_read(eo_emsapplBody_GetCanServiceHandle(p), eOcanport1, numofRXcanframe, NULL);
+
+    //read msg from port 2
+    res = eo_appCanSP_GetNumOfRecCanframe(eo_emsapplBody_GetCanServiceHandle(p), eOcanport2, &numofRXcanframe);
+    eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "emsrunner_hid", "err in GetNumOfRecCanframe");
+    
+    eo_appCanSP_read(eo_emsapplBody_GetCanServiceHandle(p), eOcanport2, numofRXcanframe, NULL);
 }
 static void s_eom_emsrunner_hid_taskRX_act_afterdgramrec_skinAndMc4_mode(EOtheEMSapplBody *p)
 {

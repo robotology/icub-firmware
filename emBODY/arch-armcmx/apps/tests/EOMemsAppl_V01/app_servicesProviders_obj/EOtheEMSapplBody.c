@@ -56,6 +56,7 @@
 #include "EOMtheEMSapplCfg.h"
 #include "eOcfg_appTheDataBase.h"
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -101,6 +102,12 @@ static void s_eo_emsapplBody_leds_init(EOtheEMSapplBody *p);
 static void s_eo_emsapplBody_checkConfig(EOtheEMSapplBody *p);
 
 static eOresult_t s_eo_emsapplBody_EnableTxMais(EOtheEMSapplBody *p);
+static eOresult_t s_eo_emsapplBody_DisableTxMais(EOtheEMSapplBody *p);
+
+static eOresult_t s_eo_emsapplBody_EnableTxStrain(EOtheEMSapplBody *p);
+static eOresult_t s_eo_emsapplBody_DisableTxStrain(EOtheEMSapplBody *p);
+
+//static eOresult_t test_4_strain(EOtheEMSapplBody *p);
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -236,11 +243,13 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
         EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__SET_BCAST_POLICY
     };
 
-    
-    if((applrunMode__skinAndMc4 != p->appRunMode) && (applrunMode__mc4Only != p->appRunMode))
+    if(applrunMode__2foc == p->appRunMode)
     {
-        return(eores_OK);
+        res = s_eo_emsapplBody_EnableTxStrain(p);
+        return(res);
     }
+    else if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only != p->appRunMode))
+    {
     
     // 2) enable tx on mais
     res = s_eo_emsapplBody_EnableTxMais(p);
@@ -263,10 +272,59 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
 
         res = eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, (void*)&(bcastpolicy_ptr->val2bcastList[0]));
     }
-    #warning disabilita la pelle come si fa?
     
-
+    #warning VALE-->come si fa ad abilitare la pelle???
+    /* per ora non si e' verificato nessun problema se l'applicazione e' in cfg e la pelle spedisce a manetta*/
     return(res);
+    }
+    else
+    {
+        return(eores_OK);
+    }
+}
+
+
+extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p)
+{
+    eOresult_t                          res;
+    uint16_t                            numofjoint, i;
+    eOicubCanProto_bcastpolicy_t        bcastpolicy =
+    {   
+        EO_INIT(.val2bcastList)         {0, 0, 0, 0}
+    };
+    
+    eOicubCanProto_msgCommand_t         msgCmd = 
+    {
+        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__SET_BCAST_POLICY
+    };
+
+    if(applrunMode__2foc == p->appRunMode)
+    {
+        res = s_eo_emsapplBody_DisableTxStrain(p);
+        return(res);
+    }
+    else if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
+    {    
+        // 2) config joints
+        numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
+        
+        for(i=0; (i<numofjoint) && (eores_OK == res); i++)
+        {
+            res = eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, (void*)&(bcastpolicy.val2bcastList[0]));
+        }
+        #warning disabilita la pelle come si fa?
+        
+        // 3) disable tx on mais
+        res = s_eo_emsapplBody_DisableTxMais(p);
+        
+        return(res);
+    }
+    else
+    {
+        return(eores_OK);
+    }
+
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -486,7 +544,7 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
     uint16_t                                numofjoint, i, numofboard;
     eOmc_controlmode_t                      controlmode = eomc_controlmode_idle;
     eOappTheDB_jointShiftValues_t           *shiftval_ptr;
-    eOicubCanProto_bcastpolicy_t            *bcastpolicy_ptr;
+//    eOicubCanProto_bcastpolicy_t            *bcastpolicy_ptr;
     eOicubCanProto_estimShift_t             estimshift;
     eOicubCanProto_velocityShift_t          shift_icubCanProtValue;
     eOappTheDB_cfg_canBoardInfo_t           *cfg_canbrd_ptr;
@@ -678,6 +736,75 @@ static eOresult_t s_eo_emsapplBody_EnableTxMais(EOtheEMSapplBody *p)
 }
 
 
+static eOresult_t s_eo_emsapplBody_DisableTxMais(EOtheEMSapplBody *p)
+{
+    eOresult_t                  res;
+    eOsnsr_maisId_t             sId = 0; //exist only one mais per ep
+    eOsnsr_maismode_t           mode = snsr_maismode_acquirebutdonttx;
+    eOicubCanProto_msgCommand_t msgCmd = 
+    {
+        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__SET_TXMODE
+    };
+
+
+    res = eo_appCanSP_SendCmd2SnrMais(p->bodyobjs.appCanSP, sId, msgCmd, (void*)&mode);
+
+    return(res);
+}
+
+
+
+static eOresult_t s_eo_emsapplBody_EnableTxStrain(EOtheEMSapplBody *p)
+{
+    eOresult_t                  res;
+    eOsnsr_strainId_t           sId = 0; //exist only one mais per ep
+    eOsnsr_strain_config_t      *straincfg;
+    eOicubCanProto_msgCommand_t msgCmd = 
+    {
+        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__SET_TXMODE
+    };
+
+    
+    res = eo_appTheDB_GetSnrStrainConfigPtr(eo_appTheDB_GetHandle(), sId,  &straincfg);
+    if(eores_OK != res)
+    {
+        if(eores_NOK_nodata == res)
+        {
+            //if no strain is connected to ems ==> nothing to do ==>ok
+            res = eores_OK;
+        }
+        return(res);
+    }
+    
+    res = eo_appCanSP_SendCmd2SnrStrain(p->bodyobjs.appCanSP, sId, msgCmd, (void*)&(straincfg->mode));
+
+    return(res);
+}
+
+
+static eOresult_t s_eo_emsapplBody_DisableTxStrain(EOtheEMSapplBody *p)
+{
+    eOresult_t                  res;
+    eOsnsr_strainId_t           sId = 0; //exist only one mais per ep
+    eOsnsr_strainmode_t         mode = snsr_strainmode_acquirebutdonttx;
+    eOicubCanProto_msgCommand_t msgCmd = 
+    {
+        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__SET_TXMODE
+    };
+
+    
+    res = eo_appCanSP_SendCmd2SnrStrain(p->bodyobjs.appCanSP, sId, msgCmd, (void*)&mode);
+    if(eores_NOK_nodata == res)
+    {
+        //if no strain is connected to ems ==> nothing to do ==>ok
+        return(eores_OK);
+    }
+    return(res);
+}
+
 static void s_eo_emsapplBody_checkConfig(EOtheEMSapplBody *p)
 {
     uint16_t                                numofjoint = 0, jid;
@@ -708,6 +835,59 @@ static void s_eo_emsapplBody_checkConfig(EOtheEMSapplBody *p)
 
     }
 }
+
+// static eOresult_t test_4_strain(EOtheEMSapplBody *p)
+// {
+//     uint8_t                             channel = 0;
+//     eOresult_t                          res;
+//     eOicubCanProto_msgDestination_t     msgdest;
+//     eOsnsr_strain_status_t              *sstatus_ptr;
+//     eOappTheDB_sensorCanLocation_t      canLoc;
+//     eOicubCanProto_msgCommand_t         msgCmd = 
+//     {
+//         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
+//         EO_INIT(.cmdId) 0
+//     };
+
+//     eOsnsr_strain_config_t               straincfg = 
+//     {
+//         EO_INIT(.mode)                  snsr_strainmode_txcalibrateddatacontinuously,
+//         EO_INIT(.datarate)              1,
+//         EO_INIT(.signaloncefullscale)   eobool_true,
+//         EO_INIT(.filler01)           {0}                           
+//     };
+
+//     
+//     EOappCanSP *appCanSP_ptr = p->bodyobjs.appCanSP; //eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+//     eo_appTheDB_GetSnsrStrainCanLocation(eo_appTheDB_GetHandle(), (eOsnsr_strainId_t)0, &canLoc);
+//     
+//     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canLoc.addr); 
+//     
+// //     msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__SET_TXMODE;
+// //     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(straincfg.mode));
+//     
+
+//     msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__SET_CANDATARATE;
+//     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(straincfg.datarate));
+//     
+//     if(straincfg.signaloncefullscale)
+//     {
+//         //clear array in strainstatus
+//         res = eo_appTheDB_GetSnrStrainStatusPtr(eo_appTheDB_GetHandle(), 0,  &sstatus_ptr);
+//         if(eores_OK != res)
+//         {
+//             return(res);
+//         }
+//         
+//         sstatus_ptr->fullscale.head.size = 0;
+//         memset(&sstatus_ptr->fullscale.data[0], 0, 12);
+//         channel = 0;
+//         msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__GET_FULL_SCALES;
+//         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &channel);
+//     }
+
+//     return(eores_OK);
+// }
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------

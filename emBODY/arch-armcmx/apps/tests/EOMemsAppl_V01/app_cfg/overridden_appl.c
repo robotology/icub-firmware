@@ -103,12 +103,22 @@ extern void eom_emsappl_hid_userdef_on_exit_CFG(EOMtheEMSappl* p)
 extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
 {
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-        //Before changing appCanRunMode is important be sure can output queues are empty
-//#warning VALE --> ho commentato EmptyCanOutputQueue   
-     eo_appCanSP_EmptyCanOutputQueue(appCanSP_ptr, eOcanport1);
-     eo_appCanSP_EmptyCanOutputQueue(appCanSP_ptr, eOcanport2);
+    //Before changing appCanRunMode is important be sure can output queues are empty
+    eo_appCanSP_EmptyCanOutputQueue(appCanSP_ptr, eOcanport1);
+    eo_appCanSP_EmptyCanOutputQueue(appCanSP_ptr, eOcanport2);
  
     eo_appCanSP_SetRunMode(eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle()), eo_appCanSP_runMode__onDemand);
+}
+
+extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
+{
+    eOresult_t res;
+    
+    res = eo_emsapplBody_DisableTxAllJointOnCan(eo_emsapplBody_GetHandle());
+    if(eores_OK != res)
+    {
+        ; //gestisci errore
+    }
 }
 
 extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)

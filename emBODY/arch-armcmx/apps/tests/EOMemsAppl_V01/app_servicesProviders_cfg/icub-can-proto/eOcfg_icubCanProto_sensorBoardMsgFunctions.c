@@ -238,12 +238,13 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
         return(eores_NOK_generic);
     }
     
-    memcpy(&(sstatus_ptr->uncalibratedvalues.data[sstatus_ptr->fullscale.head.size]), &(frame->data[2]), 2);
+    memcpy(&(sstatus_ptr->fullscale.data[sstatus_ptr->fullscale.head.size]), &(frame->data[2]), 2);
  
     /* 4) if i received last channel's full scale i prepare a occasional rop to send
           else request full scale of next channel */
     if(5 == channel)
     {
+        sstatus_ptr->fullscale.head.size += 2;
         res = s_loadFullscalelikeoccasionalrop(sId);
     }
     else

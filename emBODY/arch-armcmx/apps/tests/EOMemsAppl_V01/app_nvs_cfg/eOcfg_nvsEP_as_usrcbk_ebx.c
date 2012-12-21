@@ -169,6 +169,8 @@ extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig(uint16_t n, const E
 
 extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig__mode(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
+    eOsmStatesEMSappl_t           currentstate;
+    
     eOicubCanProto_msgCommand_t    msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
@@ -179,8 +181,22 @@ extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig__mode(uint16_t n, c
     
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     
-    eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, (eOsnsr_maisId_t)n, msgCmd, (void*)maismode);
-
+    //if pc104 tell me to enable maistx, before to send cmd verify if i'm in RUN state:
+    // if yes ==> ok no problem
+    // if no ==> i'll send cmd when go to RUN state
+    if(snsr_maismode_txdatacontinuously == *maismode)
+    {
+        //only if the appl is in RUN state enable mais tx
+        eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
+        if(eo_sm_emsappl_STrun == currentstate)
+        {
+           eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, (eOsnsr_maisId_t)n, msgCmd, (void*)maismode);
+        }
+    }
+    else
+    {
+        eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, (eOsnsr_maisId_t)n, msgCmd, (void*)maismode);
+    }
 }
 
 
@@ -246,6 +262,7 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig(uint16_t xx, cons
     eOicubCanProto_msgDestination_t     msgdest;
     eOsnsr_strain_status_t              *sstatus_ptr;
     eOappTheDB_sensorCanLocation_t      canLoc;
+    eOsmStatesEMSappl_t                 currentstate;
     eOicubCanProto_msgCommand_t         msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
@@ -258,10 +275,17 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig(uint16_t xx, cons
     eo_appTheDB_GetSnsrStrainCanLocation(eo_appTheDB_GetHandle(), (eOsnsr_strainId_t)xx, &canLoc);
     
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canLoc.addr); 
-    
-    msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__SET_TXMODE;
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(straincfg->mode));
-    
+
+    if(snsr_strainmode_acquirebutdonttx != straincfg->mode) //if pc104 configures strain mode to send data
+    {
+        //only if the appl is in RUN state enable mais tx
+        eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
+        if(eo_sm_emsappl_STrun == currentstate)
+        {
+            msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__SET_TXMODE;
+            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(straincfg->mode));        
+        }
+    }        
 
     msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__SET_CANDATARATE;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(straincfg->datarate));
@@ -288,6 +312,8 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig(uint16_t xx, cons
 
 extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig__mode(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
+    eOsmStatesEMSappl_t            currentstate;
+    
     eOicubCanProto_msgCommand_t    msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
@@ -297,10 +323,20 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig__mode(uint16_t xx
     eOsnsr_strainmode_t               *strainmode = (eOsnsr_strainmode_t*)nv->loc;
     
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    
-    eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, (eOsnsr_strainId_t)xx, msgCmd, (void*)strainmode);
 
-
+    if(snsr_strainmode_acquirebutdonttx == *strainmode) 
+    {
+        eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, (eOsnsr_strainId_t)xx, msgCmd, (void*)strainmode);
+    }
+    else //if pc104 configures strain mode to send data
+    {
+        //only if the appl is in RUN state enable mais tx
+        eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
+        if(eo_sm_emsappl_STrun == currentstate)
+        {
+            eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, (eOsnsr_strainId_t)xx, msgCmd, (void*)strainmode);
+        }
+    }        
 }
 
 extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig__datarate(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
