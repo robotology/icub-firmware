@@ -182,6 +182,12 @@ typedef hal_result_t (*hal_res_fp_voidp_t) (void* p);
 typedef void (*hal_void_fp_void_t) (void);
 
 
+/** @typedef    typedef uint8_t (*hal_uint8_fp_void_t) (void)
+    @brief      hal_uint8_fp_void_t is a pointer to a function which returns uint8_t and has a void argument.
+ **/
+typedef uint8_t (*hal_uint8_fp_void_t) (void);
+
+
 /** @typedef    typedef void (*hal_callback_t) (void* p)
     @brief      hal_callback_t is a pointer to a callback function which returns void and has a void pointer argument.
  **/
