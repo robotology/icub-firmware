@@ -42,6 +42,7 @@ struct EOtrajectory_hid
 
     float PosF;
     float VelF;
+    float VelMin;
 
     float pos_min;
     float pos_max;

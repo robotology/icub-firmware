@@ -291,6 +291,8 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
         pwm_joint[j] = eo_axisController_PWM(s_emsc->axis_controller[j], &(vel_joint[j]), &big_error_flag);
     }
     
+    big_error_flag = eobool_false;
+    
     switch (s_emsc->boardType)
     {
     case EMS_SHOULDER:
@@ -474,6 +476,10 @@ extern void eo_emsController_SetPosMax(uint8_t joint, int32_t pos_max)
 extern void eo_emsController_SetVelMax(uint8_t joint, int32_t vel_max)
 {
     if (s_emsc) eo_axisController_SetVelMax(s_emsc->axis_controller[joint], vel_max);
+}
+
+extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t motorerror, uint8_t canerror, eOmc_controlmode_t controlmode)
+{
 }
 
 // --------------------------------------------------------------------------------------------------------------------

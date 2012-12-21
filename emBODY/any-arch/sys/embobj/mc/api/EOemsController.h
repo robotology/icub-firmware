@@ -119,6 +119,8 @@ extern void eo_emsController_SetVelMax(uint8_t joint, int32_t vel_max);
 
 extern void eo_emsController_SetVelTimeout(uint8_t joint, int32_t vel_timeout);
 
+extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t motorerror, uint8_t canerror, eOmc_controlmode_t controlmode);
+
 /** @}            
     end of group eo_emsController  
  **/

@@ -34,7 +34,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define ZERO_ROTATION_TORQUE 1000
+#define ZERO_ROTATION_TORQUE 0
 
 #define CABLE_WARNING_x_100  2000
 
@@ -141,7 +141,7 @@ extern void eo_motors_PWMs_Waist(EOmotors *o, int32_t *pwm_joint, int32_t *vel_j
     
     pwm_motor[0] = (int16_t)((pwm_joint[0]-pwm_joint[1])/2);
     pwm_motor[1] = (int16_t)((pwm_joint[0]+pwm_joint[1])/2);
-    pwm_motor[2] = (int16_t  )pwm_joint[2];
+    pwm_motor[2] = (int16_t)  pwm_joint[2];
     
     MOTORS(m)
     {

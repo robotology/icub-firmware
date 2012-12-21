@@ -82,7 +82,8 @@ extern EOpid* eo_pid_New(void)
         o->Ki = 0.0f;
         o->Kd = 0.0f;
         
-        //o->Xn = 0.0f;
+        o->Xn = 0.0f;
+        o->pwm_filt = 0.0f;
 
         o->Dn    = 0.0f;
         o->En    = 0.0f;        
@@ -141,7 +142,8 @@ extern void eo_pid_Reset(EOpid *o)
     o->En   = 0.0f;
     o->KKiIn  = 0.0f;
     
-    //o->Xn = 0.0f;
+    o->Xn = 0.0f;
+    o->pwm_filt = 0.0f;
     
     o->pwm  = 0;
 }
@@ -168,26 +170,67 @@ extern int32_t eo_pid_PWM(EOpid *o, float En)
     return o->pwm;
 }
 
+
 extern int32_t eo_pid_PWM2(EOpid *o, float En, float Vref, float Venc)
 {
     if (!o) return 0;
     
     o->En = En;
     
-    float Xn = (Vref == 0.0f) ? (o->K*o->En) : (o->K*(o->En+o->Kd*(Vref-Venc)));
+    if (Vref<0.0f) Vref=-Vref;
+    
+    //float Xn = (Vref == 0.0f) ? (o->K*o->En) : (o->K*(o->En+o->Kd*(Vref-Venc)));
 
-    //float Xn = o->K*(o->En+o->Kd*(Vref-Venc));
+    float Xn = o->K*(o->En+o->Kd*(Vref-Venc));
     
     o->KKiIn += o->Ki*Xn;
 
     LIMIT(o->KKiIn, o->Imax);
-
-    o->pwm = o->Yoff + (int32_t)(Xn + o->KKiIn);
+    
+    if (Vref<2000.0f)
+    {
+        o->Xn += (0.05f+0.000475f*Vref)*(Xn+o->KKiIn-o->Xn);
+    }
+    else
+    {
+        o->Xn = Xn+o->KKiIn;
+    }
+    
+    //o->Xn += 0.1f*(Xn+o->KKiIn-o->Xn);
+    
+    o->pwm = o->Yoff + (int32_t)o->Xn;
         
     LIMIT(o->pwm, o->pwm_max);
     
     return o->pwm;
 }
+
+
+
+/*
+extern int32_t eo_pid_PWM2(EOpid *o, float En, float Vref, float Venc)
+{
+    if (!o) return 0;
+    
+    o->En = En;
+    
+    //float Xn = (Vref == 0.0f) ? (o->K*o->En) : (o->K*(o->En+o->Kd*(Vref-Venc)));
+
+    float Xn = o->K*(o->En+o->Kd*(Vref-Venc));
+    
+    o->KKiIn += o->Ki*Xn;
+
+    LIMIT(o->KKiIn, o->Imax);
+
+    o->pwm = o->Yoff + (int32_t)(Xn+o->KKiIn);
+        
+    LIMIT(o->pwm, o->pwm_max);
+    
+    return o->pwm;
+}
+*/
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
