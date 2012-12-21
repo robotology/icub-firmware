@@ -50,7 +50,7 @@
 // -- devices
 #undef  HAL_USE_DEVICE_ACCELEROMETER
 #define     HAL_USE_DEVICE_CANTRANSCEIVER
-#define  HAL_USE_DEVICE_DISPLAY  
+#undef  HAL_USE_DEVICE_DISPLAY  
 #define     HAL_USE_DEVICE_EEPROM
 #undef  HAL_USE_DEVICE_ENCODER
 #define     HAL_USE_DEVICE_ETHTRANSCEIVER
@@ -76,7 +76,7 @@
 #define     HAL_USE_CHIP_XX_EEPROM
 
 // -- external boards
-#define     HAL_USE_EXTBRD_KEIL_MCBQVGA
+#undef     HAL_USE_EXTBRD_KEIL_MCBQVGA
 
 
 
