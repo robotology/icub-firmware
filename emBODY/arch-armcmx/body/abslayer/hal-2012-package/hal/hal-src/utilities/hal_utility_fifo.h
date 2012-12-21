@@ -87,7 +87,7 @@ extern void hal_utility_fifo_clear(hal_utility_fifo_t *fifo);
 
 extern hal_result_t hal_utility_fifo_put(hal_utility_fifo_t *fifo, uint8_t *data);
 
-extern hal_result_t hal_utility_fifo_get(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *size);
+extern hal_result_t hal_utility_fifo_get(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *remaining);
 
 extern uint8_t * hal_utility_fifo_front(hal_utility_fifo_t *fifo);
 
@@ -99,23 +99,23 @@ extern hal_bool_t hal_utility_fifo_full(hal_utility_fifo_t *fifo);
 
 
 extern uint8_t * hal_utility_fifo_front01(hal_utility_fifo_t *fifo);
-extern hal_result_t hal_utility_fifo_get01(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *size);
+extern hal_result_t hal_utility_fifo_get01(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *remaining);
 extern hal_result_t hal_utility_fifo_put01(hal_utility_fifo_t *fifo, uint8_t *data);
 
 extern uint8_t * hal_utility_fifo_front02(hal_utility_fifo_t *fifo);
-extern hal_result_t hal_utility_fifo_get02(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *size);
+extern hal_result_t hal_utility_fifo_get02(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *remaining);
 extern hal_result_t hal_utility_fifo_put02(hal_utility_fifo_t *fifo, uint8_t *data);
 
 extern uint8_t * hal_utility_fifo_front04(hal_utility_fifo_t *fifo);
-extern hal_result_t hal_utility_fifo_get04(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *size);
+extern hal_result_t hal_utility_fifo_get04(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *remaining);
 extern hal_result_t hal_utility_fifo_put04(hal_utility_fifo_t *fifo, uint8_t *data);
 
 extern uint8_t * hal_utility_fifo_front08(hal_utility_fifo_t *fifo);
-extern hal_result_t hal_utility_fifo_get08(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *size);
+extern hal_result_t hal_utility_fifo_get08(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *remaining);
 extern hal_result_t hal_utility_fifo_put08(hal_utility_fifo_t *fifo, uint8_t *data);
 
 extern uint8_t * hal_utility_fifo_front16(hal_utility_fifo_t *fifo);
-extern hal_result_t hal_utility_fifo_get16(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *size);
+extern hal_result_t hal_utility_fifo_get16(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *remaining);
 extern hal_result_t hal_utility_fifo_put16(hal_utility_fifo_t *fifo, uint8_t *data);
 
 

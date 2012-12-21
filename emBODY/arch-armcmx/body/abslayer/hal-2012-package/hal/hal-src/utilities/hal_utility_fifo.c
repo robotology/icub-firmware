@@ -212,7 +212,7 @@ extern hal_result_t hal_utility_fifo_put(hal_utility_fifo_t *fifo, uint8_t *data
 }
 
 
-extern hal_result_t hal_utility_fifo_get(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *size)
+extern hal_result_t hal_utility_fifo_get(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *remaining)
 {
     // avoid checks .... be careful in calling
     
@@ -239,7 +239,10 @@ extern hal_result_t hal_utility_fifo_get(hal_utility_fifo_t *fifo, uint8_t *data
     }
     
     fifo->size --;
-	*size = fifo->size;
+    if(NULL != remaining)
+    {
+        *remaining = fifo->size;
+    }
     
     return(hal_res_OK);
 }
@@ -326,7 +329,7 @@ extern uint8_t * hal_utility_fifo_front16(hal_utility_fifo_t *fifo)
 }
 
 
-extern hal_result_t hal_utility_fifo_get16(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *size)
+extern hal_result_t hal_utility_fifo_get16(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *remaining)
 {
     // avoid checks .... be careful in calling
     
@@ -348,9 +351,9 @@ extern hal_result_t hal_utility_fifo_get16(hal_utility_fifo_t *fifo, uint8_t *da
 
     
     fifo->size --;
-    if(NULL != size)
+    if(NULL != remaining)
     {
-        *size = fifo->size;
+        *remaining = fifo->size;
     }
     
     return(hal_res_OK);
@@ -402,7 +405,7 @@ extern uint8_t * hal_utility_fifo_front08(hal_utility_fifo_t *fifo)
 }
 
 
-extern hal_result_t hal_utility_fifo_get08(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *size)
+extern hal_result_t hal_utility_fifo_get08(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *remaining)
 {
     // avoid checks .... be careful in calling
     
@@ -424,7 +427,10 @@ extern hal_result_t hal_utility_fifo_get08(hal_utility_fifo_t *fifo, uint8_t *da
 
     
     fifo->size --;
-	*size = fifo->size;
+    if(NULL != remaining)
+    {
+        *remaining = fifo->size;
+    }
     
     return(hal_res_OK);
 }
@@ -474,7 +480,7 @@ extern uint8_t * hal_utility_fifo_front04(hal_utility_fifo_t *fifo)
 }
 
 
-extern hal_result_t hal_utility_fifo_get04(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *size)
+extern hal_result_t hal_utility_fifo_get04(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *remaining)
 {
     // avoid checks .... be careful in calling
     
@@ -496,7 +502,10 @@ extern hal_result_t hal_utility_fifo_get04(hal_utility_fifo_t *fifo, uint8_t *da
 
     
     fifo->size --;
-	*size = fifo->size;
+    if(NULL != remaining)
+    {
+        *remaining = fifo->size;
+    }
     
     return(hal_res_OK);
 }
@@ -548,7 +557,7 @@ extern uint8_t * hal_utility_fifo_front02(hal_utility_fifo_t *fifo)
 }
 
 
-extern hal_result_t hal_utility_fifo_get02(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *size)
+extern hal_result_t hal_utility_fifo_get02(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *remaining)
 {
     // avoid checks .... be careful in calling
     
@@ -570,7 +579,10 @@ extern hal_result_t hal_utility_fifo_get02(hal_utility_fifo_t *fifo, uint8_t *da
 
     
     fifo->size --;
-	*size = fifo->size;
+    if(NULL != remaining)
+    {
+        *remaining = fifo->size;
+    }
     
     return(hal_res_OK);
 }
@@ -621,7 +633,7 @@ extern uint8_t * hal_utility_fifo_front01(hal_utility_fifo_t *fifo)
 }
 
 
-extern hal_result_t hal_utility_fifo_get01(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *size)
+extern hal_result_t hal_utility_fifo_get01(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *remaining)
 {
     // avoid checks .... be careful in calling
     
@@ -643,7 +655,10 @@ extern hal_result_t hal_utility_fifo_get01(hal_utility_fifo_t *fifo, uint8_t *da
 
     
     fifo->size --;
-	*size = fifo->size;
+    if(NULL != remaining)
+    {
+        *remaining = fifo->size;
+    }
     
     return(hal_res_OK);
 }
