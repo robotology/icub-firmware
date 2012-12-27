@@ -202,7 +202,19 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
         return;
     }
      
-     
+    if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_ropframeTx))
+    {
+        // 1. call the former to retrieve a tx packet (even if it is an empty ropframe)        
+        res = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, &numberoftxrops);
+        
+        // 2.  send a packet back. but only if the former gave us a good one.
+        if(eores_OK == res)
+        {
+            res = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
+        }
+    
+    }
+ 
     if(eobool_true == eo_common_event_check(evt, emssocket_evt_packet_received))
     {   // process the reception of a packet. it must contain a ropframe and nothing else
         
@@ -226,14 +238,17 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
         // perform an user-defined function
         eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(&s_emsconfigurator_singleton);
         
-        // 3. call the former to retrieve a tx packet (even if it is an empty ropframe)        
-        res = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, &numberoftxrops);
+        // 3. send ropframe-tx evt to myself in order to send a ropframe
+        eom_task_SetEvent(p, emsconfigurator_evt_ropframeTx); 
         
-        // 4.  send a packet back. but only if the former gave us a good one.
-        if(eores_OK == res)
-        {
-            res = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
-        }
+        // // 3. call the former to retrieve a tx packet (even if it is an empty ropframe)        
+        // res = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, &numberoftxrops);
+        
+        // // 4.  send a packet back. but only if the former gave us a good one.
+        // if(eores_OK == res)
+        // {
+            // res = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
+        // }
         
                
         // 5. if another packet is in the rx fifo, send a new event to process its retrieval again        
@@ -248,6 +263,8 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
     {
         eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(&s_emsconfigurator_singleton);
     }
+    
+
 
 }
 

@@ -75,7 +75,8 @@ typedef struct
 typedef enum
 {
     emsconfigurator_evt_go2runner      =   0x00000002,
-    emsconfigurator_evt_userdef          =   0x00000004
+    emsconfigurator_evt_userdef        =   0x00000004,
+    emsconfigurator_evt_ropframeTx     =   0x00000008           //the configurator sends a ropframe by transceiver
 } eOemsconfigurator_event_t;
 
 
