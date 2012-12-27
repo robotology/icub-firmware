@@ -37,9 +37,15 @@
 
 //icub api
 #include "EoSensors.h"
+
 //to load occasional rop
 #include "eOcfg_nvsEP_as.h" 
 #include "EOMtheEMStransceiver.h"
+
+//to send evt to configurator task
+#include "EOMtask.h"
+#include "EOMtheEMSconfigurator.h"
+#include "EOMtheEMSappl.h"
 
 //#include "hal_debugPin.h"
 // --------------------------------------------------------------------------------------------------------------------
@@ -194,6 +200,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
     eOsnsr_strain_config_t                      *sconfig_ptr;
     eOsnsr_strain_status_t                      *sstatus_ptr;
     eOicubCanProto_msgDestination_t             msgdest;
+    eOsmStatesEMSappl_t                         appl_st;
     eOicubCanProto_msgCommand_t                 msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
@@ -245,7 +252,14 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
     if(5 == channel)
     {
         sstatus_ptr->fullscale.head.size += 2;
+        //prepare occasional rop to send
         res = s_loadFullscalelikeoccasionalrop(sId);
+        eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &appl_st);
+        //if application is in cfg state, then request to configurator to send rop just prepared
+        if(eo_sm_emsappl_STcfg == appl_st)
+        {
+            eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_ropframeTx); 
+        }
     }
     else
     {
