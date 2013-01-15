@@ -192,14 +192,18 @@ extern hal_result_t hal_utility_fifo_put(hal_utility_fifo_t *fifo, uint8_t *data
         return(hal_res_NOK_generic);
     }
     
-    if(NULL != fifo->itemcopy)
-    {
-        fifo->itemcopy(fifo->data, fifo->index, data, 0);
+    if(NULL != data)
+    {   // copy data inside ...
+        if(NULL != fifo->itemcopy)
+        {
+            fifo->itemcopy(fifo->data, fifo->index, data, 0);
+        }
+        else
+        {
+            memcpy(&(fifo->data[fifo->index * fifo->sizeofitem]), data, fifo->sizeofitem);
+        }
     }
-    else
-    {
-        memcpy(&(fifo->data[fifo->index * fifo->sizeofitem]), data, fifo->sizeofitem);
-    }
+    // else just advance the index and size
        
     fifo->size ++;
     fifo->index ++;
@@ -209,6 +213,18 @@ extern hal_result_t hal_utility_fifo_put(hal_utility_fifo_t *fifo, uint8_t *data
     }
     
     return(hal_res_OK);
+}
+
+extern uint8_t * hal_utility_fifo_end(hal_utility_fifo_t *fifo)
+{
+    // avoid checks .... be careful in calling
+    
+    if(fifo->size == fifo->capacity)
+    {
+        return(NULL);
+    }
+        
+    return(&(fifo->data[fifo->index * fifo->sizeofitem]));    
 }
 
 

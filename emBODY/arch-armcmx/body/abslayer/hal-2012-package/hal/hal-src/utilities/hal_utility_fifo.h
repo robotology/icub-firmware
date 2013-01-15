@@ -85,11 +85,16 @@ extern void hal_utility_fifo_reset(hal_utility_fifo_t *fifo);
 
 extern void hal_utility_fifo_clear(hal_utility_fifo_t *fifo);
 
+// if data is NULL, it just increment fifo size without copying anything inside. it can be used after the user ha manipulated
+// directly what returned by hal_utility_fifo_end()
 extern hal_result_t hal_utility_fifo_put(hal_utility_fifo_t *fifo, uint8_t *data);
 
 extern hal_result_t hal_utility_fifo_get(hal_utility_fifo_t *fifo, uint8_t *data, uint8_t *remaining);
 
 extern uint8_t * hal_utility_fifo_front(hal_utility_fifo_t *fifo);
+
+// returns the address of the next position in which data shall be put. if full, then returns NULL
+extern uint8_t * hal_utility_fifo_end(hal_utility_fifo_t *fifo);
 
 extern void hal_utility_fifo_pop(hal_utility_fifo_t *fifo);
 
