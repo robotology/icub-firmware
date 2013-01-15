@@ -1202,6 +1202,8 @@ void compute_desired(byte i)
 #endif	
 			break;
 							
+							
+							
 		case MODE_VELOCITY:
 		case MODE_IMPEDANCE_VEL:
 			_desired[i] += step_trajectory_delta (i);
@@ -1211,6 +1213,7 @@ void compute_desired(byte i)
 			// received  more than _vel_timeout ms ago)
 
 			_vel_counter[i]++;
+#if (VERSION != 0x0258)		  
 		    if(_vel_counter[i] > _vel_timeout[i])
 		    {	
 		    	//disabling velocity control						
@@ -1225,11 +1228,12 @@ void compute_desired(byte i)
 				//resetting the counter
 				_vel_counter[i] = 0;	
 		    }			  	
-
+#endif
 			break;
 		}
-		
+#if (VERSION != 0x0258)		
 		check_desired_within_limits(i, previous_desired);
+#endif
 	}
 }
 

@@ -667,7 +667,7 @@ void can_send_broadcast(void)
 #if (VERSION ==0x0154 || VERSION ==0x0155 || VERSION ==0x0158 || VERSION == 0x0351 || VERSION ==0x0151 || VERSION ==0x0251 || VERSION==0x0254 )
 		if(FAULT_ABS0 == 0)
 			CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
-#elif (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOARD_TYPE == BOARD_TYPE_2BLLDC)
+if ((VERSION !=0x0258) && (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOARD_TYPE == BOARD_TYPE_2BLLDC)) 
 		#ifdef USE_ABS_SSI
 		if(FAULT_ABS0 == 0 && FAULT_ABS1 == 0)
 			CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
@@ -835,7 +835,7 @@ void can_send_broadcast(void)
 		_canmsg.CAN_data[2]= FAULT1;
 
 		//  --- HIGH CURRENT CH 1---
-	#if (VERSION !=0x0154) && (VERSION !=0x0155) && (VERSION !=0x0158) && (VERSION !=0x0254)
+	#if (VERSION !=0x0154) && (VERSION !=0x0155) && (VERSION !=0x0158) && (VERSION !=0x0254) && (VERSION !=0x0258)
 		if (highcurrent[1])
 		{
 			_canmsg.CAN_data[2] |=highcurrent[1]<<3;

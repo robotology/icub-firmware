@@ -125,10 +125,14 @@ void main(void)
 
 	#define winSizeMax 32
 	#define initialWindowSize 4
+#elif (VERSION == 0x0258)
+	#define winSizeMax 4
+	#define initialWindowSize 4
 #else
 	#define winSizeMax 32
 	#define initialWindowSize 30
 #endif
+
 	byte divJntPos[JN]=INIT_ARRAY(initialWindowSize-1);
 	byte divJntVel[JN]=INIT_ARRAY(initialWindowSize-1);
 	byte divMotPos[JN]=INIT_ARRAY(initialWindowSize-1);
@@ -169,7 +173,7 @@ void main(void)
 
 	// enable FAULT
 	__ENIGROUP (61, 3); 
-	#if VERSION == 0x0254
+	#if (VERSION == 0x0254 || VERSION == 0x0258)
 	#else
 	__ENIGROUP (60, 3);
 	#endif	
@@ -195,7 +199,7 @@ void main(void)
 	//enable PWM reload 
 	__ENIGROUP (59, 7); // PMWA
 	
-	#if VERSION == 0x0254
+	#if (VERSION == 0x0254 || VERSION == 0x0258)
 	#else	
 	__ENIGROUP (58, 7); // PWMB
 	#endif
@@ -243,7 +247,7 @@ void main(void)
 
 	init_leds  			  ();
 	
-	#if VERSION == 0x0254
+	#if (VERSION == 0x0254 || VERSION == 0x0258)
 	
 	Init_Brushless_Comm	  (1,HALL); 
   	
@@ -301,7 +305,7 @@ void main(void)
     for (i=0; i<JN; i++)	_position[i]=(Int32) Filter_Bit(get_position_abs_ssi(i));
     for (i=0; i<JN; i++)    _max_real_position[i]=Filter_Bit(4095);
 #else 
-	_position[0]=(Int32)Filter_Bit(get_position_abs_ssi(0));	
+	_position[0]=0;	
    	_position[1]=(Int32) Filter_Bit(get_position_abs_ssi(1));
     _max_real_position[1]=Filter_Bit(4095);
 
@@ -418,7 +422,7 @@ void main(void)
 #endif
 	
 #warning "here we should put a control for 0x0258 and 0x255"	
-#if (VERSION ==0x0254) || (VERSION ==0x0258) || (VERSION ==0x0255)
+#if (VERSION ==0x0254) || (VERSION ==0x0255)
 		   if (get_error_abs_ssi(0)==ERR_ABS_SSI)
 		   {
 					_control_mode[0] = MODE_IDLE;	
@@ -430,6 +434,11 @@ void main(void)
 		   }	
 					 
 #endif	
+
+
+ //DO NOTHING
+
+
 		// decoupling the position	 	
 		decouple_positions();
 		
@@ -442,8 +451,8 @@ void main(void)
 				tailJntPos[i]=headJntPos[i]+(winSizeMax-divJntPos[i]); if(tailJntPos[i]>=winSizeMax) tailJntPos[i]=tailJntPos[i]%winSizeMax;			
 				_speed_old[i] = _speed[i];
 				jntPosWindow[headJntPos[i]][i]=_position[i];
-				_speed[i] = ((jntPosWindow[headJntPos[i]][i] - jntPosWindow[tailJntPos[i]][i] ));
-				_speed[i] <<= _jntVel_est_shift[i];
+				_speed[i] = (Int32) (((jntPosWindow[headJntPos[i]][i] - jntPosWindow[tailJntPos[i]][i] ))<<_jntVel_est_shift[i]);
+			//	_speed[i] <<= _jntVel_est_shift[i];
 				_speed[i] = (Int32)(_speed[i]) / divJntPos[i];
 				headJntPos[i]=headJntPos[i]+1; if(headJntPos[i]>=winSizeMax) headJntPos[i]=0;
 /*
@@ -466,6 +475,8 @@ void main(void)
 				headMotPos[i]=headMotPos[i]+1; if(headMotPos[i]>=winSizeMax) headMotPos[i]=0;				
 			}
 		}
+		
+
 
 					
 		/* in position? */
@@ -480,9 +491,10 @@ void main(void)
 
 	
 //******************************************* POSITION LIMIT CHECK ***************************/
+#if  (VERSION != 0x0258)
 
 		for (i=0; i<JN; i++)  check_range(i, _safeband[i], PWMoutput);
-
+#endif
 //******************************************* COMPUTES CONTROLS *****************************/
 
 		//FT sensor watchdog update 
