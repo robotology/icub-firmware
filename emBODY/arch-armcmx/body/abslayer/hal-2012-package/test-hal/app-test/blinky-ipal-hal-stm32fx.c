@@ -128,8 +128,12 @@ static void s_myfunrxspima(void* p);
 static void s_myfuntxspisl(void* p);
 static void s_myfunrxspisl(void* p);
 
+#define TEST_SPI
+
 #if     defined(HAL_BOARD_MCBSTM32C) || defined(HAL_BOARD_STM3210CEVAL)
+#if defined(TEST_SPI)
 static void s_test_spi_master_slave(void);
+#endif
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -205,7 +209,9 @@ int main(void)
     hal_sys_systeminit();
     
 #if     defined(HAL_BOARD_MCBSTM32C) || defined(HAL_BOARD_STM3210CEVAL)
+    #if defined(TEST_SPI)
      s_test_spi_master_slave();
+    #endif
 #endif
     
 #ifdef HAL_USE_DEVICE_DISPLAY    
@@ -1261,6 +1267,8 @@ static void s_test_fifoultra(void)
 
 #if     defined(HAL_BOARD_MCBSTM32C) || defined(HAL_BOARD_STM3210CEVAL)
 
+#if defined(TEST_SPI)
+
 static volatile uint8_t s_test_slave_recv[4] = {0, 0, 0, 0};
 
 static void s_test_spiframe_slave_receiv(void* p)
@@ -1291,191 +1299,188 @@ static void s_test_spi_master_slave(void)
 }
 
 
-static void s_test_spi_master_txrx_loopback(void)  
-{    
-    static const hal_spi_cfg_t spicfg_master =
-    {
-        .ownership              = hal_spi_ownership_master,
-        .direction              = hal_spi_dir_txrx,
-        .activity               = hal_spi_act_singleframe,
-        .speed                  = hal_spi_speed_18000kbps, //hal_spi_speed_9000kbps, //hal_spi_speed_9000kbps, //hal_spi_speed_0562kbps, hal_spi_speed_1125kbps
-        .sizeoftxframe          = 4,
-        .sizeofrxframe          = 4,
-        .onframetransm          = NULL,
-        .onframereceiv          = s_test_spiframe_master_receiv,
-        .capacityoftxfifoofframes   = 4,
-        .capacityofrxfifoofframes   = 4,
-        .dummytxvalue           = 0xa0        
-    };   
-    
-    
-    static volatile uint8_t frame00[] = {1, 2, 3, 4};
-    static volatile uint8_t frame01[] = {5, 6, 7, 8};
-    static volatile uint8_t frame02[] = {9, 10, 11, 12};
-    
-    static volatile uint8_t rxframe[4] = {0};
+// static void s_test_spi_master_txrx_loopback(void)  
+// {    
+//     static const hal_spi_cfg_t spicfg_master =
+//     {
+//         .ownership              = hal_spi_ownership_master,
+//         .direction              = hal_spi_dir_txrx,
+//         .activity               = hal_spi_act_singleframe,
+//         .speed                  = hal_spi_speed_18000kbps, //hal_spi_speed_9000kbps, //hal_spi_speed_9000kbps, //hal_spi_speed_0562kbps, hal_spi_speed_1125kbps
+//         .sizeofframe            = 4,
+//         .onframetransm          = NULL,
+//         .onframereceiv          = s_test_spiframe_master_receiv,
+//         .capacityoftxfifoofframes   = 4,
+//         .capacityofrxfifoofframes   = 4,
+//         .dummytxvalue           = 0xa0        
+//     };   
+//     
+//     
+//     static volatile uint8_t frame00[] = {1, 2, 3, 4};
+//     static volatile uint8_t frame01[] = {5, 6, 7, 8};
+//     static volatile uint8_t frame02[] = {9, 10, 11, 12};
+//     
+//     static volatile uint8_t rxframe[4] = {0};
 
-    static uint8_t size = 0;
-    static uint8_t remaining = 0;
-    
-    hal_result_t res;
-    
+//     static uint8_t size = 0;
+//     static uint8_t remaining = 0;
+//     
+//     hal_result_t res;
+//     
 
-    hal_spi_init(hal_spi_port2, &spicfg_master);    
+//     hal_spi_init(hal_spi_port2, &spicfg_master);    
 
 
-    hal_spi_put(hal_spi_port2, frame00, 4, hal_false);      
-    hal_spi_put(hal_spi_port2, frame01, 4, hal_false);
-    
-    hal_spi_start(hal_spi_port2);
-    hal_sys_delay(100*1000);
-    
-    hal_spi_start(hal_spi_port2);
-    hal_sys_delay(100*1000);
-    
-    while(0 == s_test_master_recv[0]);
-    s_test_master_recv[0] = 0;  
+//     hal_spi_put(hal_spi_port2, frame00, 4, hal_false);      
+//     hal_spi_put(hal_spi_port2, frame01, 4, hal_false);
+//     
+//     hal_spi_start(hal_spi_port2);
+//     hal_sys_delay(100*1000);
+//     
+//     hal_spi_start(hal_spi_port2);
+//     hal_sys_delay(100*1000);
+//     
+//     while(0 == s_test_master_recv[0]);
+//     s_test_master_recv[0] = 0;  
 
-    
-    res = hal_spi_get(hal_spi_port2, rxframe, &size, &remaining);   
-    if((rxframe[0] != frame00[0]) || (rxframe[1] != frame00[1]) || (rxframe[2] != frame00[2]) || (rxframe[3] != frame00[3]))
-    {
-        for(;;);
-    }
-    hal_sys_delay(100000);
-    while(0 == s_test_master_recv[1]);
-    s_test_master_recv[1] = 0;  
-    res = hal_spi_get(hal_spi_port2, rxframe, &size, &remaining);
-    if((rxframe[0] != frame01[0]) || (rxframe[1] != frame01[1]) || (rxframe[2] != frame01[2]) || (rxframe[3] != frame01[3]))
-    {
-        for(;;);
-    }
-    res = hal_spi_get(hal_spi_port2, rxframe, &size, &remaining);
-    
-    rxframe[0] = rxframe[0];
-    
-        
-    res = res;   
-    for(;;);
-}
+//     
+//     res = hal_spi_get(hal_spi_port2, rxframe, &size, &remaining);   
+//     if((rxframe[0] != frame00[0]) || (rxframe[1] != frame00[1]) || (rxframe[2] != frame00[2]) || (rxframe[3] != frame00[3]))
+//     {
+//         for(;;);
+//     }
+//     hal_sys_delay(100000);
+//     while(0 == s_test_master_recv[1]);
+//     s_test_master_recv[1] = 0;  
+//     res = hal_spi_get(hal_spi_port2, rxframe, &size, &remaining);
+//     if((rxframe[0] != frame01[0]) || (rxframe[1] != frame01[1]) || (rxframe[2] != frame01[2]) || (rxframe[3] != frame01[3]))
+//     {
+//         for(;;);
+//     }
+//     res = hal_spi_get(hal_spi_port2, rxframe, &size, &remaining);
+//     
+//     rxframe[0] = rxframe[0];
+//     
+//         
+//     res = res;   
+//     for(;;);
+// }
 
-static void s_test_spi_master_txonly_slave_rxonly(void)  
-{    
-    static const hal_spi_cfg_t spicfg_master =
-    {
-        .ownership              = hal_spi_ownership_master,
-        .direction              = hal_spi_dir_txonly,
-        .activity               = hal_spi_act_singleframe,
-        .speed                  = hal_spi_speed_9000kbps,
-        .sizeoftxframe          = 4,
-        .sizeofrxframe          = 4,
-        .onframetransm          = NULL,
-        .onframereceiv          = NULL,
-        .capacityoftxfifoofframes   = 4,
-        .capacityofrxfifoofframes   = 4,
-        .dummytxvalue           = 0xa0        
-    };   
-    
-    static const hal_spi_cfg_t spicfg_slave =
-    {
-        .ownership              = hal_spi_ownership_slave,
-        .direction              = hal_spi_dir_rxonly,
-        .activity               = hal_spi_act_singleframe,
-        .speed                  = hal_spi_speed_9000kbps,
-        .sizeoftxframe          = 4,
-        .sizeofrxframe          = 4,
-        .onframetransm          = NULL,
-        .onframereceiv          = s_test_spiframe_slave_receiv,
-        .capacityoftxfifoofframes   = 4,
-        .capacityofrxfifoofframes   = 4,
-        .dummytxvalue           = 0xc0    
-    }; 
-    
-    static volatile uint8_t frame00[] = {1, 2, 3, 4};
-    static volatile uint8_t frame01[] = {5, 6, 7, 8};
-    static volatile uint8_t frame02[] = {9, 10, 11, 12};
-    
-    static volatile uint8_t rxframe[4] = {0};
+// static void s_test_spi_master_txonly_slave_rxonly(void)  
+// {    
+//     static const hal_spi_cfg_t spicfg_master =
+//     {
+//         .ownership              = hal_spi_ownership_master,
+//         .direction              = hal_spi_dir_txonly,
+//         .activity               = hal_spi_act_singleframe,
+//         .speed                  = hal_spi_speed_9000kbps,
+//         .sizeoftxframe          = 4,
+//         .sizeofrxframe          = 4,
+//         .onframetransm          = NULL,
+//         .onframereceiv          = NULL,
+//         .capacityoftxfifoofframes   = 4,
+//         .capacityofrxfifoofframes   = 4,
+//         .dummytxvalue           = 0xa0        
+//     };   
+//     
+//     static const hal_spi_cfg_t spicfg_slave =
+//     {
+//         .ownership              = hal_spi_ownership_slave,
+//         .direction              = hal_spi_dir_rxonly,
+//         .activity               = hal_spi_act_singleframe,
+//         .speed                  = hal_spi_speed_9000kbps,
+//         .sizeoftxframe          = 4,
+//         .sizeofrxframe          = 4,
+//         .onframetransm          = NULL,
+//         .onframereceiv          = s_test_spiframe_slave_receiv,
+//         .capacityoftxfifoofframes   = 4,
+//         .capacityofrxfifoofframes   = 4,
+//         .dummytxvalue           = 0xc0    
+//     }; 
+//     
+//     static volatile uint8_t frame00[] = {1, 2, 3, 4};
+//     static volatile uint8_t frame01[] = {5, 6, 7, 8};
+//     static volatile uint8_t frame02[] = {9, 10, 11, 12};
+//     
+//     static volatile uint8_t rxframe[4] = {0};
 
-    static uint8_t size = 0;
-    static uint8_t remaining = 0;
-    
-    hal_result_t res;
-    
+//     static uint8_t size = 0;
+//     static uint8_t remaining = 0;
+//     
+//     hal_result_t res;
+//     
 
-    hal_spi_init(hal_spi_port2, &spicfg_master);    
-    hal_spi_init(hal_spi_port3, &spicfg_slave);  
+//     hal_spi_init(hal_spi_port2, &spicfg_master);    
+//     hal_spi_init(hal_spi_port3, &spicfg_slave);  
 
-    hal_spi_start(hal_spi_port3);
-    
-    hal_sys_delay(100*1000);
+//     hal_spi_start(hal_spi_port3);
+//     
+//     hal_sys_delay(100*1000);
 
-    hal_spi_put(hal_spi_port2, frame00, 4, hal_false);      
-    hal_spi_put(hal_spi_port2, frame01, 4, hal_false);
-    
-    hal_spi_start(hal_spi_port2);
-    hal_sys_delay(100*1000);
-    
-    hal_spi_start(hal_spi_port2);
-    hal_sys_delay(100*1000);
-    
-    while(0 == s_test_slave_recv[0]);
-    s_test_slave_recv[0] = 0;  
+//     hal_spi_put(hal_spi_port2, frame00, 4, hal_false);      
+//     hal_spi_put(hal_spi_port2, frame01, 4, hal_false);
+//     
+//     hal_spi_start(hal_spi_port2);
+//     hal_sys_delay(100*1000);
+//     
+//     hal_spi_start(hal_spi_port2);
+//     hal_sys_delay(100*1000);
+//     
+//     while(0 == s_test_slave_recv[0]);
+//     s_test_slave_recv[0] = 0;  
 
-    
-    res = hal_spi_get(hal_spi_port3, rxframe, &size, &remaining);   
-    if((rxframe[0] != frame00[0]) || (rxframe[1] != frame00[1]) || (rxframe[2] != frame00[2]) || (rxframe[3] != frame00[3]))
-    {
-        for(;;);
-    }
-    hal_sys_delay(100000);
-    while(0 == s_test_slave_recv[1]);
-    s_test_slave_recv[1] = 0;  
-    res = hal_spi_get(hal_spi_port3, rxframe, &size, &remaining);
-    if((rxframe[0] != frame01[0]) || (rxframe[1] != frame01[1]) || (rxframe[2] != frame01[2]) || (rxframe[3] != frame01[3]))
-    {
-        for(;;);
-    }
-    res = hal_spi_get(hal_spi_port3, rxframe, &size, &remaining);
-    
-    rxframe[0] = rxframe[0];
-    
-        
-    res = res;   
-    for(;;);
-}
+//     
+//     res = hal_spi_get(hal_spi_port3, rxframe, &size, &remaining);   
+//     if((rxframe[0] != frame00[0]) || (rxframe[1] != frame00[1]) || (rxframe[2] != frame00[2]) || (rxframe[3] != frame00[3]))
+//     {
+//         for(;;);
+//     }
+//     hal_sys_delay(100000);
+//     while(0 == s_test_slave_recv[1]);
+//     s_test_slave_recv[1] = 0;  
+//     res = hal_spi_get(hal_spi_port3, rxframe, &size, &remaining);
+//     if((rxframe[0] != frame01[0]) || (rxframe[1] != frame01[1]) || (rxframe[2] != frame01[2]) || (rxframe[3] != frame01[3]))
+//     {
+//         for(;;);
+//     }
+//     res = hal_spi_get(hal_spi_port3, rxframe, &size, &remaining);
+//     
+//     rxframe[0] = rxframe[0];
+//     
+//         
+//     res = res;   
+//     for(;;);
+// }
 
 
 static void s_test_spi_master_txrx_slave_txrx(void)  
 {    
     static const hal_spi_cfg_t spicfg_master =
     {
-        .ownership              = hal_spi_ownership_master,
-        .direction              = hal_spi_dir_txrx,
-        .activity               = hal_spi_act_singleframe,
-        .speed                  = hal_spi_speed_0562kbps, //hal_spi_speed_9000kbps,
-        .sizeoftxframe          = 4,
-        .sizeofrxframe          = 4,
-        .onframetransm          = NULL,
-        .onframereceiv          = s_test_spiframe_master_receiv,
+        .ownership                  = hal_spi_ownership_master,
+        .direction                  = hal_spi_dir_txrx,
+        .activity                   = hal_spi_act_singleframe,
+        .speed                      = hal_spi_speed_0562kbps, //hal_spi_speed_9000kbps,
+        .sizeofframe                = 4,
+        .onframetransm              = NULL,
+        .onframereceiv              = s_test_spiframe_master_receiv,
         .capacityoftxfifoofframes   = 4,
         .capacityofrxfifoofframes   = 4,
-        .dummytxvalue           = 0xfa
+        .dummytxvalue               = 0xc0
     };   
     
     static const hal_spi_cfg_t spicfg_slave =
     {
-        .ownership              = hal_spi_ownership_slave,
-        .direction                    = hal_spi_dir_txrx,
-        .activity               = hal_spi_act_singleframe,
-        .speed                  = hal_spi_speed_0562kbps, //hal_spi_speed_9000kbps,
-        .sizeoftxframe          = 4,
-        .sizeofrxframe          = 4,
-        .onframetransm          = NULL,
-        .onframereceiv          = s_test_spiframe_slave_receiv,
+        .ownership                  = hal_spi_ownership_slave,
+        .direction                  = hal_spi_dir_txrx,
+        .activity                   = hal_spi_act_singleframe,
+        .speed                      = hal_spi_speed_9000kbps, //hal_spi_speed_0562kbps, //hal_spi_speed_9000kbps,
+        .sizeofframe                = 4,
+        .onframetransm              = NULL,
+        .onframereceiv              = s_test_spiframe_slave_receiv,
         .capacityoftxfifoofframes   = 4,
         .capacityofrxfifoofframes   = 4,
-        .dummytxvalue           = 0xfe    
+        .dummytxvalue               = 0xa0    
     }; 
     
     static uint8_t txframemas00[] = {1, 2, 3, 4};
@@ -1494,25 +1499,30 @@ static void s_test_spi_master_txrx_slave_txrx(void)
     hal_result_t res;
     
 
-    hal_spi_init(hal_spi_port2, &spicfg_master);    
-    hal_spi_init(hal_spi_port3, &spicfg_slave);  
+    hal_spi_init(hal_spi_port3, &spicfg_master);    
+    hal_spi_init(hal_spi_port2, &spicfg_slave);  
     
     // load the slave with data to transmit
-    hal_spi_put(hal_spi_port3, txframesla00, 4, hal_false);
-    hal_spi_put(hal_spi_port3, txframesla01, 4, hal_false);
-//    hal_spi_put(hal_spi_port3, txframesla02, 4, hal_false);
-
-    // now start the slave ...  doubt -> shall i activate the txe interrupt as well?
-    hal_spi_start(hal_spi_port3);
+    hal_spi_put(hal_spi_port2, txframesla00, 4, hal_false);
+    hal_spi_put(hal_spi_port2, txframesla01, 4, hal_false);
+//    hal_spi_put(hal_spi_port2, txframesla02, 4, hal_false);
     
     
     // now the master transmits something
-    hal_spi_put(hal_spi_port2, txframemas00, 4, hal_false);      
-    hal_spi_put(hal_spi_port2, txframemas01, 4, hal_false);
-    hal_spi_put(hal_spi_port2, txframemas02, 4, hal_false);
+    hal_spi_put(hal_spi_port3, txframemas00, 4, hal_false);      
+    hal_spi_put(hal_spi_port3, txframemas01, 4, hal_false);
+    hal_spi_put(hal_spi_port3, txframemas02, 4, hal_false);
+
+    // now start the slave ...
+    hal_spi_start(hal_spi_port2, 0);
+    
+    hal_sys_delay(500*1000); // 500 milli
+    
+    
+
     
     // and start the master
-    hal_spi_start(hal_spi_port2);
+    hal_spi_start(hal_spi_port3, 4);
     
     // now we sleep for some time so that the isr does transfer
     hal_sys_delay(500*1000); // 500 milli
@@ -1520,131 +1530,133 @@ static void s_test_spi_master_txrx_slave_txrx(void)
     // now the slave reads
     while(0 == s_test_slave_recv[0]);
     s_test_slave_recv[0] = 0;     
-    res = hal_spi_get(hal_spi_port3, rxframesla, &size, &remaining);   
+    res = hal_spi_get(hal_spi_port2, rxframesla, &size, &remaining);   
 //    while(0 == s_test_slave_recv[1]);
 //    s_test_slave_recv[1] = 0;  
-    res = hal_spi_get(hal_spi_port3, rxframesla, &size, &remaining);
+    res = hal_spi_get(hal_spi_port2, rxframesla, &size, &remaining);
 //    while(0 == s_test_slave_recv[2]);
 //    s_test_slave_recv[2] = 0;     
-    res = hal_spi_get(hal_spi_port3, rxframesla, &size, &remaining);
+    res = hal_spi_get(hal_spi_port2, rxframesla, &size, &remaining);
 
     // now the master reads
     while(0 == s_test_master_recv[0]);
     s_test_master_recv[0] = 0;     
-    res = hal_spi_get(hal_spi_port2, rxframemas, &size, &remaining);   
-    while(0 == s_test_master_recv[1]);
-    s_test_master_recv[1] = 0;  
-    res = hal_spi_get(hal_spi_port2, rxframemas, &size, &remaining);
-    while(0 == s_test_master_recv[2]);
-    s_test_master_recv[2] = 0;     
-    res = hal_spi_get(hal_spi_port2, rxframemas, &size, &remaining);
+    res = hal_spi_get(hal_spi_port3, rxframemas, &size, &remaining);   
+    res = res;
+//    while(0 == s_test_master_recv[1]);
+//    s_test_master_recv[1] = 0;  
+    res = hal_spi_get(hal_spi_port3, rxframemas, &size, &remaining);
+//    while(0 == s_test_master_recv[2]);
+//    s_test_master_recv[2] = 0;     
+    res = hal_spi_get(hal_spi_port3, rxframemas, &size, &remaining);
         
     res = res; 
     for(;;);    
 }
 
-static void s_test_spi_master_rxonly_slave_txonly(void)  
-{    
-    static const hal_spi_cfg_t spicfg_master =
-    {
-        .ownership              = hal_spi_ownership_master,
-        .direction                    = hal_spi_dir_rxonly,
-        .activity               = hal_spi_act_singleframe,
-        .speed                  = hal_spi_speed_1125kbps,
-        .sizeoftxframe          = 4,
-        .sizeofrxframe          = 4,
-        .onframetransm          = NULL,
-        .onframereceiv          = s_test_spiframe_master_receiv,
-        .capacityoftxfifoofframes   = 4,
-        .capacityofrxfifoofframes   = 4,
-        .dummytxvalue           = 0xfa    
-    };   
-    
-    static const hal_spi_cfg_t spicfg_slave =
-    {
-        .ownership              = hal_spi_ownership_slave,
-        .direction                    = hal_spi_dir_txonly,
-        .activity               = hal_spi_act_singleframe,
-        .speed                  = hal_spi_speed_1125kbps,
-        .sizeoftxframe          = 4,
-        .sizeofrxframe          = 4,
-        .onframetransm          = NULL,
-        .onframereceiv          = s_test_spiframe_slave_receiv,
-        .capacityoftxfifoofframes   = 4,
-        .capacityofrxfifoofframes   = 4,
-        .dummytxvalue           = 0xfe    
-    }; 
-    
-    static uint8_t txframemas00[] = {1, 2, 3, 4};
-    static uint8_t txframemas01[] = {5, 6, 7, 8};
-    static uint8_t txframemas02[] = {9, 10, 11, 12};
-    
-    static uint8_t txframesla00[] = {129, 130, 131, 132};
-    static uint8_t txframesla01[] = {133, 134, 135, 136};
-    static uint8_t txframesla02[] = {137, 138, 139, 140};    
-    
-    static uint8_t rxframemas[4] = {0};
-    static uint8_t rxframesla[4] = {0};
-    static uint8_t size = 0;
-    static uint8_t remaining = 0;
-    
-    hal_result_t res;
-    
+// static void s_test_spi_master_rxonly_slave_txonly(void)  
+// {    
+//     static const hal_spi_cfg_t spicfg_master =
+//     {
+//         .ownership              = hal_spi_ownership_master,
+//         .direction                    = hal_spi_dir_rxonly,
+//         .activity               = hal_spi_act_singleframe,
+//         .speed                  = hal_spi_speed_1125kbps,
+//         .sizeoftxframe          = 4,
+//         .sizeofrxframe          = 4,
+//         .onframetransm          = NULL,
+//         .onframereceiv          = s_test_spiframe_master_receiv,
+//         .capacityoftxfifoofframes   = 4,
+//         .capacityofrxfifoofframes   = 4,
+//         .dummytxvalue           = 0xfa    
+//     };   
+//     
+//     static const hal_spi_cfg_t spicfg_slave =
+//     {
+//         .ownership              = hal_spi_ownership_slave,
+//         .direction                    = hal_spi_dir_txonly,
+//         .activity               = hal_spi_act_singleframe,
+//         .speed                  = hal_spi_speed_1125kbps,
+//         .sizeoftxframe          = 4,
+//         .sizeofrxframe          = 4,
+//         .onframetransm          = NULL,
+//         .onframereceiv          = s_test_spiframe_slave_receiv,
+//         .capacityoftxfifoofframes   = 4,
+//         .capacityofrxfifoofframes   = 4,
+//         .dummytxvalue           = 0xfe    
+//     }; 
+//     
+//     static uint8_t txframemas00[] = {1, 2, 3, 4};
+//     static uint8_t txframemas01[] = {5, 6, 7, 8};
+//     static uint8_t txframemas02[] = {9, 10, 11, 12};
+//     
+//     static uint8_t txframesla00[] = {129, 130, 131, 132};
+//     static uint8_t txframesla01[] = {133, 134, 135, 136};
+//     static uint8_t txframesla02[] = {137, 138, 139, 140};    
+//     
+//     static uint8_t rxframemas[4] = {0};
+//     static uint8_t rxframesla[4] = {0};
+//     static uint8_t size = 0;
+//     static uint8_t remaining = 0;
+//     
+//     hal_result_t res;
+//     
 
-    hal_spi_init(hal_spi_port2, &spicfg_master);    
-    hal_spi_init(hal_spi_port3, &spicfg_slave);  
-    
-    // load the slave with data to transmit
-    hal_spi_put(hal_spi_port3, txframesla00, 4, hal_false);
-    hal_spi_put(hal_spi_port3, txframesla01, 4, hal_false);
-//    hal_spi_put(hal_spi_port3, txframesla02, 4, hal_false);
+//     hal_spi_init(hal_spi_port2, &spicfg_master);    
+//     hal_spi_init(hal_spi_port3, &spicfg_slave);  
+//     
+//     // load the slave with data to transmit
+//     hal_spi_put(hal_spi_port3, txframesla00, 4, hal_false);
+//     hal_spi_put(hal_spi_port3, txframesla01, 4, hal_false);
+// //    hal_spi_put(hal_spi_port3, txframesla02, 4, hal_false);
 
-    // now start the slave ...
-    hal_spi_start(hal_spi_port3);
-    
-    
-    // now the master transmits something
-    //hal_spi_put(hal_spi_port2, txframemas00, 4, hal_false);      
-    //hal_spi_put(hal_spi_port2, txframemas01, 4, hal_false);
-    //hal_spi_put(hal_spi_port2, txframemas02, 4, hal_false);
-    
-    // and start the master
-    hal_spi_start(hal_spi_port2);
-    
-    // now we sleep for some time so that the isr does transfer
-    hal_sys_delay(500*1000); // 500 milli
-    
-     // now the master reads
-    while(0 == s_test_master_recv[0]);
-    s_test_master_recv[0] = 0;     
-    res = hal_spi_get(hal_spi_port2, rxframemas, &size, &remaining);   
-    
-    hal_spi_start(hal_spi_port2);
-    while(0 == s_test_master_recv[1]);
-    s_test_master_recv[1] = 0;  
-    res = hal_spi_get(hal_spi_port2, rxframemas, &size, &remaining);
-    
-    hal_spi_start(hal_spi_port2);
-    while(0 == s_test_master_recv[2]);
-    s_test_master_recv[2] = 0;     
-    res = hal_spi_get(hal_spi_port2, rxframemas, &size, &remaining);
-    
-    
-   // now the slave reads
-//     while(0 == s_test_slave_recv[0]);
-//     s_test_slave_recv[0] = 0;     
-    res = hal_spi_get(hal_spi_port3, rxframesla, &size, &remaining);   
-//    while(0 == s_test_slave_recv[1]);
-//    s_test_slave_recv[1] = 0;  
-    res = hal_spi_get(hal_spi_port3, rxframesla, &size, &remaining);
-//    while(0 == s_test_slave_recv[2]);
-//    s_test_slave_recv[2] = 0;     
-    res = hal_spi_get(hal_spi_port3, rxframesla, &size, &remaining);
-    
-        
-    res = res; 
-    for(;;);    
-}
+//     // now start the slave ...
+//     hal_spi_start(hal_spi_port3);
+//     
+//     
+//     // now the master transmits something
+//     //hal_spi_put(hal_spi_port2, txframemas00, 4, hal_false);      
+//     //hal_spi_put(hal_spi_port2, txframemas01, 4, hal_false);
+//     //hal_spi_put(hal_spi_port2, txframemas02, 4, hal_false);
+//     
+//     // and start the master
+//     hal_spi_start(hal_spi_port2);
+//     
+//     // now we sleep for some time so that the isr does transfer
+//     hal_sys_delay(500*1000); // 500 milli
+//     
+//      // now the master reads
+//     while(0 == s_test_master_recv[0]);
+//     s_test_master_recv[0] = 0;     
+//     res = hal_spi_get(hal_spi_port2, rxframemas, &size, &remaining);   
+//     
+//     hal_spi_start(hal_spi_port2);
+//     while(0 == s_test_master_recv[1]);
+//     s_test_master_recv[1] = 0;  
+//     res = hal_spi_get(hal_spi_port2, rxframemas, &size, &remaining);
+//     
+//     hal_spi_start(hal_spi_port2);
+//     while(0 == s_test_master_recv[2]);
+//     s_test_master_recv[2] = 0;     
+//     res = hal_spi_get(hal_spi_port2, rxframemas, &size, &remaining);
+//     
+//     
+//    // now the slave reads
+// //     while(0 == s_test_slave_recv[0]);
+// //     s_test_slave_recv[0] = 0;     
+//     res = hal_spi_get(hal_spi_port3, rxframesla, &size, &remaining);   
+// //    while(0 == s_test_slave_recv[1]);
+// //    s_test_slave_recv[1] = 0;  
+//     res = hal_spi_get(hal_spi_port3, rxframesla, &size, &remaining);
+// //    while(0 == s_test_slave_recv[2]);
+// //    s_test_slave_recv[2] = 0;     
+//     res = hal_spi_get(hal_spi_port3, rxframesla, &size, &remaining);
+//     
+//         
+//     res = res; 
+//     for(;;);    
+// }
+#endif
 
 #endif
 
