@@ -45,6 +45,10 @@
     #include "hal_mpu_crc_hid.h"
 #endif//HAL_USE_CRC
 
+#ifdef  HAL_USE_DMA
+    #include "hal_mpu_dma_hid.h"
+#endif//HAL_USE_DMA
+
 #ifdef HAL_USE_ETH
     #include "hal_mpu_eth_hid.h"
 #endif//HAL_USE_ETH
@@ -145,6 +149,10 @@
 #ifdef  HAL_USE_CRC
     extern const hal_crc_hid_brdcfg_t hal_brdcfg_crc__theconfig;
 #endif//HAL_USE_CRC
+
+#ifdef  HAL_USE_DMA
+    extern const hal_dma_hid_brdcfg_t hal_brdcfg_dma__theconfig;
+#endif//HAL_USE_DMA
 
 #ifdef  HAL_USE_ETH
     extern const hal_eth_hid_brdcfg_t hal_brdcfg_eth__theconfig;

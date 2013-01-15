@@ -37,6 +37,7 @@
 #define     HAL_USE_BASE
 #undef     HAL_USE_CAN
 #undef     HAL_USE_CRC
+#define     HAL_USE_DMA
 #undef     HAL_USE_ETH
 #define     HAL_USE_FLASH
 #define     HAL_USE_GPIO
