@@ -47,6 +47,7 @@
 #include "hal_mpu_arch_hid.h"
 #include "hal_mpu_can_hid.h" 
 #include "hal_mpu_crc_hid.h" 
+#include "hal_mpu_dma_hid.h" 
 #include "hal_mpu_eth_hid.h" 
 #include "hal_mpu_flash_hid.h" 
 #include "hal_mpu_gpio_hid.h" 
@@ -192,6 +193,10 @@ extern uint32_t hal_base_memory_getsize(const hal_cfg_t *cfg, uint32_t *size04al
 #ifdef  HAL_USE_CRC
     retval += hal_crc_hid_getsize(cfg);
 #endif//HAL_USE_CRC
+
+#ifdef  HAL_USE_DMA
+    retval += hal_dma_hid_getsize(cfg);
+#endif//HAL_USE_DMA
 
 #ifdef HAL_USE_ETH
     retval += hal_eth_hid_getsize(cfg);
@@ -402,6 +407,15 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
     data04aligned += hal_crc_hid_getsize(cfg)/4;
 #endif//HAL_USE_CRC
 
+    
+#ifdef  HAL_USE_DMA
+    if(hal_res_OK != hal_dma_hid_setmem(cfg, data04aligned))
+    {
+        return(hal_res_NOK_generic);
+    }
+    data04aligned += hal_dma_hid_getsize(cfg)/4;
+#endif//HAL_USE_DMA    
+    
 
 #ifdef  HAL_USE_ETH
     if(hal_res_OK != hal_eth_hid_setmem(cfg, data04aligned))
