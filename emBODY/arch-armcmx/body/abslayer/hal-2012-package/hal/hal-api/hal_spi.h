@@ -112,6 +112,9 @@ typedef enum
     hal_spi_speed_18000kbps         = 18000000
 } hal_spi_speed_t;
 
+#warning --> nel spi la velocita' non e' precisa, ma dipende dal bus della periferica e dal divisore usato. quindi non va troppo bene dare una speed. meglio dare un divisore del bus ..
+
+
 
 /** @typedef    typedef enum hal_spi_cfg_t 
     @brief      hal_spi_cfg_t contains the configuration for spi
@@ -122,8 +125,9 @@ typedef struct
     hal_spi_direction_t     direction;                /**< the communication direction: tx, rx or both */
     hal_spi_activity_t      activity;           /**< the activity: single frame, multi frame, or continuous */
     hal_spi_speed_t         speed;              /**< the communication speed */
-    uint8_t                 sizeoftxframe;      /**< if tx is enables, it tells how many bytes to transmit inside a frame */
-    uint8_t                 sizeofrxframe;      /**< if rx is enables, it tells how many bytes to receive inside a frame */
+    uint8_t                 sizeofframe;
+//    uint8_t                 sizeoftxframe;      /**< if tx is enabled, it tells how many bytes to transmit inside a frame */
+//    uint8_t                 sizeofrxframe;      /**< if rx is enabled, it tells how many bytes to receive inside a frame */
     hal_callback_t          onframetransm;      /**< if not NULL, it is called when a frame is transmitted. its argument is NULL */
     hal_callback_t          onframereceiv;      /**< if not NULL, it is called when a frame is received. its argument points to the received frame */
     uint8_t                 capacityoftxfifoofframes; //?? si potrebbe bufferizzare le trasmissioni e le ricezioni .....
@@ -173,7 +177,7 @@ extern hal_result_t hal_spi_put(hal_spi_port_t port, uint8_t* txframe, uint8_t s
 
 extern hal_result_t hal_spi_direction_set(hal_spi_port_t port, hal_spi_direction_t dir);
 
-extern hal_result_t hal_spi_start(hal_spi_port_t port);
+extern hal_result_t hal_spi_start(hal_spi_port_t port, uint8_t masternumofframes);
 
 extern hal_result_t hal_spi_stop(hal_spi_port_t port);
 
@@ -190,6 +194,11 @@ extern hal_result_t hal_spi_stop(hal_spi_port_t port);
 extern hal_result_t hal_spi_get(hal_spi_port_t port, uint8_t* rxframe, uint8_t* size, uint8_t* remainingrxframes);
 
 
+
+extern hal_result_t hal_spi_master_start(hal_spi_port_t port, uint8_t numofframes);
+
+
+extern hal_result_t hal_spi_slave_start(hal_spi_port_t port);
 
 
 /** @}            

@@ -146,8 +146,20 @@ extern hal_result_t hal_dma_enable(hal_dma_port_t port);
 extern hal_result_t hal_dma_disable(hal_dma_port_t port);
 
 
+/** @fn         extern hal_result_t hal_dma_retrigger(hal_dma_port_t port)
+    @brief      This function retriggers the dma. it must be called only inside the callback on transfer done when the mode is one shot.
+                If destin is NULL it has the same effect as hal_dma_retrigger().
+    @param      port            identifies DMA port
+    @param      source          the new source pointer
+    @return     hal_res_NOK_generic in case queue is full or wrong port, else hal_res_OK
+  */
+extern hal_result_t hal_dma_retrigger(hal_dma_port_t port);
+
+extern hal_result_t hal_dma_dontdisable(hal_dma_port_t port);
+
 /** @fn         extern hal_result_t hal_dma_source_set(hal_dma_port_t port, void* source)
     @brief      This function changes the dma source. it must be called only inside the callback on transfer done.
+                If source is NULL it has the same effect as hal_dma_retrigger().
     @param      port            identifies DMA port
     @param      source          the new source pointer
     @return     hal_res_NOK_generic in case queue is full or wrong port, else hal_res_OK
@@ -157,6 +169,7 @@ extern hal_result_t hal_dma_source_set(hal_dma_port_t port, void* source);
 
 /** @fn         extern hal_result_t hal_dma_destin_set(hal_dma_port_t port, void* destin)
     @brief      This function changes the dma destination. it must be called only inside the callback on transfer done.
+                If destin is NULL it has the same effect as hal_dma_retrigger().
     @param      port            identifies DMA port
     @param      source          the new source pointer
     @return     hal_res_NOK_generic in case queue is full or wrong port, else hal_res_OK
