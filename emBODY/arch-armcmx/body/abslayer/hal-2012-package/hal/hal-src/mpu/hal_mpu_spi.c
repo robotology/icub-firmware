@@ -79,8 +79,7 @@ const hal_spi_cfg_t hal_spi_cfg_default =
     .direction                  = hal_spi_dir_txrx, 
     .activity                   = hal_spi_act_singleframe,
     .speed                      = hal_spi_speed_1125kbps, 
-    .sizeoftxframe              = 4, 
-    .sizeofrxframe              = 4, 
+    .sizeofframe                = 4,
     .onframetransm              = NULL, 
     .onframereceiv              = NULL,
     .capacityoftxfifoofframes   = 4,
@@ -98,17 +97,19 @@ typedef struct
 {
     hal_bool_t          locked;
     hal_spi_cfg_t       config;
-    uint8_t*            txframe;
+    uint8_t*            dmatxframe;
+    uint8_t*            dmarxframe;
     uint8_t             txcount;
-    uint8_t*            rxframe;
     uint8_t             rxcount;
     hal_utility_fifo_t  fifotx;
     hal_utility_fifo_t  fiforx;
-    uint8_t*            rxbuffer;
+    uint8_t*            dummytxframe;
     hal_bool_t          txisenabled;
     hal_bool_t          rxisenabled;
     hal_spi_direction_t direction;
     hal_bool_t          stopit;
+    hal_spi_port_t      port;
+    uint8_t             masternumofframes;
 } hal_spi_internals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -133,21 +134,17 @@ static hal_result_t s_hal_spi_put(hal_spi_port_t port, uint8_t* txframe, uint8_t
 
 static hal_result_t s_hal_spi_get(hal_spi_port_t port, uint8_t* rxframe, uint8_t* size, uint8_t* remainingrxframes);
 
-static void s_hal_spi_nvic_enable(hal_spi_port_t port);
-static void s_hal_spi_nvic_disable(hal_spi_port_t port);
 
 static void s_hal_spi_periph_enable(hal_spi_port_t port);
 static void s_hal_spi_periph_disable(hal_spi_port_t port);
 
-static void s_hal_spi_isr_enable(hal_spi_port_t port);
-static void s_hal_spi_isr_disable(hal_spi_port_t port);
+static void s_hal_spi_dma_enable(hal_spi_port_t port, const hal_spi_cfg_t *cfg);
 
 static hal_result_t s_hal_spi_timeoutexpired(void);
 
-static void s_hal_spi_theisr(SPI_TypeDef* SPIx, hal_spi_internals_t* spixint);
 
-static hal_result_t s_hal_spi_isr_txbyte_get(hal_spi_internals_t* spixint, uint8_t* txbyte, hal_bool_t* itisthelastoftheframe, hal_bool_t* itisthelastinsidefifo);
-static hal_result_t s_hal_spi_isr_rxbyte_put(hal_spi_internals_t* spixint, uint8_t rxbyte, hal_bool_t* itisthelastoftheframe, hal_bool_t* fifoisfull);
+static void s_hal_spi_dma_on_tranfer_done_tx(void* p);
+static void s_hal_spi_dma_on_tranfer_done_rx(void* p);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -164,11 +161,11 @@ static const SPI_InitTypeDef   s_hal_spi_stm32_cfg =
 {
     .SPI_Direction                  = SPI_Direction_2Lines_FullDuplex,
     .SPI_Mode                       = SPI_Mode_Master,                              // param
-    .SPI_DataSize                   = SPI_DataSize_16b, 
-    .SPI_CPOL                       = SPI_CPOL_High, //SPI_CPOL_Low, //SPI_CPOL_Low, // SPI_CPOL_High high is ok with display and also ok with isr mode
-    .SPI_CPHA                       = SPI_CPHA_1Edge, //SPI_CPHA_2Edge,
+    .SPI_DataSize                   = SPI_DataSize_8b, 
+    .SPI_CPOL                       = SPI_CPOL_Low, //SPI_CPOL_High, //SPI_CPOL_Low, //SPI_CPOL_Low, // SPI_CPOL_High high is ok with display and also ok with isr mode
+    .SPI_CPHA                       = SPI_CPHA_2Edge, //SPI_CPHA_2Edge,
     .SPI_NSS                        = SPI_NSS_Soft,
-    .SPI_BaudRatePrescaler          = SPI_BaudRatePrescaler_2,                      // param: depends on speed
+    .SPI_BaudRatePrescaler          = SPI_BaudRatePrescaler_64,                      // param: depends on speed
     .SPI_FirstBit                   = SPI_FirstBit_LSB, // SPI_FirstBit_MSB is ok with display, su stm3210c e' indifferente
     .SPI_CRCPolynomial              = 0x0007 // reset value
 };
@@ -184,6 +181,16 @@ static SPI_TypeDef* const s_hal_spi_stmSPImap[] = { SPI1, SPI2, SPI3 };
 static const uint32_t s_hal_spi_hw_rcc[] = { RCC_APB2Periph_SPI1, RCC_APB1Periph_SPI2, RCC_APB1Periph_SPI3 };
 
 static const uint32_t s_hal_spi_timeout_flag = 0x00010000;
+
+#if     defined(USE_STM32F1)
+    // on stm32f1 connectivity line: spi1rx/tx is on dma1chn2/chn3,  spi2rx/tx is on dma1chn4/chn5,  spi3rx/tx is on dma2chn1/chn2
+    static const hal_dma_port_t s_hal_spi_dma_port2use_rx[hal_spi_ports_number] = { hal_dma_port2, hal_dma_port4, hal_dma_port8 };
+    static const hal_dma_port_t s_hal_spi_dma_port2use_tx[hal_spi_ports_number] = { hal_dma_port3, hal_dma_port5, hal_dma_port9 };
+#elif   defined(USE_STM32F4)
+
+    #error to be done
+    
+#endif
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -250,28 +257,6 @@ extern hal_result_t hal_spi_write(hal_spi_port_t port, uint8_t byte, uint8_t* re
 
 
 
-// extern hal_result_t hal_spi_direction_set(hal_spi_port_t port, hal_spi_direction_t dir)
-// {
-//     if(hal_false == hal_spi_hid_initted_is(port))
-//     {
-//         return(hal_res_NOK_generic);
-//     }
-
-// #if 0    
-//     s_hal_spi_scheduling_suspend();
-//     if(hal_false == s_hal_spi_is_status_locked(port))
-//     {
-//         s_hal_spi_scheduling_restart();
-//         return(hal_res_NOK_generic);
-//     }
-//     s_hal_spi_status_setlock(); and unlock etc ....
-// #endif
-//     
-//     s_hal_spi_internals[HAL_spi_port2index(port)].direction = dir;
-//        
-//     return(hal_res_OK);    
-// }
-
 extern hal_result_t hal_spi_put(hal_spi_port_t port, uint8_t* txframe, uint8_t size, hal_bool_t sendnow)
 { 
     if(hal_false == hal_spi_hid_initted_is(port))
@@ -334,7 +319,7 @@ extern hal_result_t hal_spi_get(hal_spi_port_t port, uint8_t* rxframe, uint8_t* 
 }
 
    
-extern hal_result_t hal_spi_start(hal_spi_port_t port)
+extern hal_result_t hal_spi_start(hal_spi_port_t port, uint8_t masternumofframes)
 {
     if(hal_false == hal_spi_hid_initted_is(port))
     {
@@ -350,9 +335,26 @@ extern hal_result_t hal_spi_start(hal_spi_port_t port)
     }
     s_hal_spi_status_setlock(); and unlock etc ....
 #endif
-       
+    
+    
+    hal_spi_internals_t* spixint = &s_hal_spi_internals[HAL_spi_port2index(port)];
+    
+    if((0 == masternumofframes) && (hal_spi_ownership_master == spixint->config.ownership))
+    {
+        spixint->masternumofframes = 0;
+        return(hal_res_NOK_generic);
+    }
+    spixint->masternumofframes = masternumofframes;
+    
+    // load tx frame into dma
+    
+    if(hal_res_OK != hal_utility_fifo_get(&(spixint->fifotx), spixint->dmatxframe, NULL))
+    {   // put the dummy one.
+        memcpy(spixint->dmatxframe, spixint->dummytxframe, spixint->config.sizeofframe);
+    } 
+    
+    
     s_hal_spi_periph_enable(port);
-    s_hal_spi_isr_enable(port);
     
     return(hal_res_OK);    
 }
@@ -374,11 +376,10 @@ extern hal_result_t hal_spi_stop(hal_spi_port_t port)
     }
     s_hal_spi_status_setlock(); and unlock etc ....
 #endif
-       
 
-    #warning --> si disabilita cosi' oppure si setta una variabile che poi disabilita dentro la isr
-    s_hal_spi_isr_disable(port);
-    
+
+    s_hal_spi_periph_disable(port);
+           
     return(hal_res_OK);    
 }
 
@@ -390,22 +391,7 @@ extern hal_result_t hal_spi_stop(hal_spi_port_t port)
 
 // ---- isr of the module: begin ----
 
-void SPI1_IRQHandler(void)
-{
-    s_hal_spi_theisr(SPI1, &s_hal_spi_internals[HAL_spi_port2index(hal_spi_port1)]);   
-}
-
-
-void SPI2_IRQHandler(void)
-{
-    s_hal_spi_theisr(SPI2, &s_hal_spi_internals[HAL_spi_port2index(hal_spi_port2)]);   
-}
-
-
-void SPI3_IRQHandler(void)
-{
-    s_hal_spi_theisr(SPI3, &s_hal_spi_internals[HAL_spi_port2index(hal_spi_port3)]);
-}
+// none ...
 
 // ---- isr of the module: end ------
 
@@ -450,326 +436,8 @@ extern hal_boolval_t hal_spi_hid_initted_is(hal_spi_port_t port)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-//    extern uint32_t txe_number = 0;
-//    extern uint32_t rxne_number = 0;
-
-extern uint8_t slatxbytes[80] = {0};
-extern uint8_t slatxindex = 0;
-extern uint8_t masrxbytes[80] = {0};
-extern uint8_t masrxindex = 0;
-
-extern uint8_t mastxbytes[80] = {0};
-extern uint8_t mastxindex = 0;
-extern uint8_t slarxbytes[80] = {0};
-extern uint8_t slarxindex = 0;
-
-static void s_hal_spi_theisr(SPI_TypeDef* SPIx, hal_spi_internals_t* spixint)
-{
-    volatile uint8_t value = 0;
-    
-    if(SET == SPI_I2S_GetITStatus(SPIx, SPI_I2S_IT_OVR))
-    {
-        for(;;); // se SPI_I2S_SendData() e' eseguita all'inizio
-    }
-    
-    if(1 == spixint->stopit)
-    {
-        SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, DISABLE);
-        spixint->txisenabled = 0;
-        spixint->stopit = 0;
-        // if one wants to disable spi ... before that he must wait until the activity flag is reset.
-        
-//         SPI_I2S_SendData(SPIx, 0x66);
-//             
-//         if(hal_spi_ownership_slave == spixint->config.ownership)
-//         {
-//             slatxbytes[slatxindex++] = 0x66;
-//         }
-//         else
-//         {
-//             mastxbytes[mastxindex++] = 0x66;
-//         }       
-        
-    }
-    
-    if(SET == SPI_I2S_GetITStatus(SPIx, SPI_I2S_IT_RXNE))
-    {
-        uint8_t rxbyte = (uint8_t)SPI_I2S_ReceiveData(SPIx);
-        
-        //rxne_number++;
-        
-        hal_bool_t itisthelastbyteoftheframe = hal_false;
-        hal_bool_t fifoisfull = hal_false;
-        
-        value++;
-        
-       
-
-        
-//                 if(hal_spi_ownership_slave == spixint->config.ownership)
-//                 {
-//                     SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, ENABLE);
-//                 }
-        
-
-            if(hal_spi_ownership_slave == spixint->config.ownership)
-            {
-                slarxbytes[slarxindex++] = rxbyte;
-            }  
-            else
-            {
-                masrxbytes[masrxindex++] = rxbyte;
-            }    
-#if 1              
-        if(hal_res_OK == s_hal_spi_isr_rxbyte_put(spixint, rxbyte, &itisthelastbyteoftheframe, &fifoisfull))
-        {            
-            if((hal_true == itisthelastbyteoftheframe))
-            {   
-                if((hal_spi_ownership_master == spixint->config.ownership) && (hal_spi_act_singleframe == spixint->config.activity) && (hal_spi_dir_rxonly == spixint->config.direction))
-                {
-                    //SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, DISABLE);
-                    spixint->stopit = 1;
-                    //SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, DISABLE);
-                }
-                
-                if(NULL != spixint->config.onframereceiv)
-                {
-                    spixint->config.onframereceiv(NULL);
-                }
-            } 
-            
-            if(hal_true == fifoisfull)
-            {
-                // ok ... good to know 
-            }            
-        }
-        else
-        {   // some error occurred ... i disable the transmission
-            if(hal_spi_ownership_master == spixint->config.ownership)
-            {
-                SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, DISABLE);
-                spixint->txisenabled = 0;
-                //SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, DISABLE);
-            }        
-        }
-#endif
-          
-    }    
-   
-    if(SET == SPI_I2S_GetITStatus(SPIx, SPI_I2S_IT_TXE))
-    {   
-        
-        //txe_number++;
-               
-        static volatile uint8_t txbyte = 0;
-        hal_bool_t itisthelastbyteoftheframe = hal_false;
-        hal_bool_t itisthelastbyteinsidefifo = hal_false;
-        
-        value++;
-        
-        
-        // both singleframe and multiframe activity get the byte from here inside
- 
-        if(hal_res_OK == s_hal_spi_isr_txbyte_get(spixint, &txbyte, &itisthelastbyteoftheframe, &itisthelastbyteinsidefifo))
-        {   // if ok, then we can send the tx byte and also we evaluate the modified boolean parameters
-            
-            //hal_sys_delay(100); // con il delay solo qui non funxiona
-//            SPI_I2S_SendData(SPIx, txbyte);
-            //hal_sys_delay(100); // funziona solo se metto questo delay (oppure se sposto la fne al fondo)
-            
-            if(hal_spi_ownership_slave == spixint->config.ownership)
-            {
-                slatxbytes[slatxindex++] = txbyte;
-            }
-            else
-            {
-                mastxbytes[mastxindex++] = txbyte;
-            }               
-            
-            if(hal_true == itisthelastbyteoftheframe)
-            {                
-                if(NULL != spixint->config.onframetransm)                    
-                {
-                    spixint->config.onframetransm(NULL);
-                }
-                
-                if((hal_spi_ownership_master == spixint->config.ownership) && (hal_spi_act_singleframe == spixint->config.activity))
-                {
-                    //SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, DISABLE);
-                    spixint->stopit = 1;
-                    //SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, DISABLE);
-                }
-            }
-            
-            if(hal_true == itisthelastbyteinsidefifo)
-            {
-                if((hal_spi_ownership_master == spixint->config.ownership) && (hal_spi_act_multiframe == spixint->config.activity))
-                {
-                    //SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, DISABLE);
-                    spixint->stopit = 1;
-                    //SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, DISABLE);
-                }     
-            } 
-            
-//             hal_sys_delay(100);
-             SPI_I2S_SendData(SPIx, txbyte);
-//             hal_sys_delay(100);
-//            hal_sys_delay(100);
-        }
-        else
-        {   // damn ... we have an error. we disable 
-            if(hal_spi_ownership_master == spixint->config.ownership)
-            {
-                SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, DISABLE);
-                spixint->txisenabled = 0;
-                //SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, DISABLE);
-            }            
-        }
-       
-    }
-    
-        if(2 == value)
-        {
-        //    for(;;);
-        }
-
-       
-}
 
 
-
-#if 0
-static void s_hal_spi_theisr_safe_but_slow(SPI_TypeDef* SPIx, hal_spi_internals_t* spixint)
-//static void s_hal_spi_theisr(SPI_TypeDef* SPIx, hal_spi_internals_t* spixint)
-{
-    static hal_bool_t lastbyteofframeisintransmission = hal_false;
-    static hal_bool_t lastbyteofframeisreceived = hal_false;
-    
-    if(SET == SPI_I2S_GetITStatus(SPIx, SPI_I2S_IT_TXE))
-    {   // master tx
-        if(NULL == spixint->txframe)
-        {   // either i have a new frame or i have finished one at the previous call
-            if(hal_true == lastbyteofframeisintransmission)
-            {
-                lastbyteofframeisintransmission = hal_false;
-                if(NULL != spixint->config.onframetransm)
-                {
-                    spixint->config.onframetransm(NULL);
-                }                
-            }
-            if(hal_false == spixint->forcestop)
-            {
-                spixint->txframe =  hal_utility_fifo_front(&spixint->fifotx);
-                spixint->txcount = 0;
-            }
-        }
-        
-        if(NULL != spixint->txframe)
-        {   // transmit       
-            uint8_t index = spixint->txcount++;
-        
-            if(index < spixint->config.sizeoftxframe)
-            {             
-                SPI_I2S_SendData(SPIx, spixint->txframe[index]);              
-            }
-            
-            if(spixint->txcount == spixint->config.sizeoftxframe)
-            {   // it is the last byte in the frame ...
-                
-                hal_utility_fifo_pop(&spixint->fifotx);
-                lastbyteofframeisintransmission = hal_true;
-                
-                spixint->txframe = NULL;
-                spixint->txcount = 0;                
-            }
-        }
-        else
-        {   // dont have any more frames in fifo-tx
-            if((hal_spi_act_continuous == spixint->config.activity) && (hal_false == spixint->forcestop))
-            {   // if tx is continuous we just send a zero byte
-                SPI_I2S_SendData(SPIx, 0);
-            }
-//             else if(hal_false == spixint->forcestop)
-//             {   // else we disable tx   
-// //                spixint->forcestop = hal_false;
-// //                SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, DISABLE);
-//                  SPI_I2S_SendData(SPIx, 0);
-//             }
-            else
-            {
-                spixint->forcestop = hal_false;
-                SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, DISABLE);                
-            }
-        }
-
-    }
-
-
-    if(SET == SPI_I2S_GetITStatus(SPIx, SPI_I2S_IT_RXNE))
-    {
-        //uint8_t rxbyte = (uint8_t)SPI_I2S_ReceiveData(SPIx);
-        
-        if(NULL == spixint->rxframe)
-        {   // either i have a new frame or i have finished one at the previous call
-//             if(hal_true == lastbyteofframeisreceived)
-//             {
-//                 lastbyteofframeisreceived = hal_false;
-//                 if(NULL != spixint->config.onframereceiv)
-//                 {
-//                     spixint->config.onframereceiv(NULL); // address of received byte
-//                 }                
-//             }
-            
-            //if(hal_false == spixint->forcestoprx)
-            {
-                spixint->rxframe = (hal_true ==  hal_utility_fifo_full(&spixint->fiforx)) ? (NULL) : (spixint->rxbuffer);
-                spixint->rxcount = 0;
-            }
-        }  
-
-        if(NULL != spixint->rxframe)
-        {   // can put inside the fifo   
-            uint8_t index = spixint->rxcount++;
-        
-            if(index < spixint->config.sizeofrxframe)
-            {             
-                spixint->rxframe[index] = (uint8_t)SPI_I2S_ReceiveData(SPIx);              
-            }
-            
-            if(spixint->rxcount == spixint->config.sizeofrxframe)
-            {   // it is the last byte in the frame ...
-                
-                hal_utility_fifo_put(&spixint->fiforx, spixint->rxframe);
-                lastbyteofframeisreceived = hal_true;
-                
-                spixint->rxframe = NULL;
-                spixint->rxcount = 0;     
-
-                //spixint->forcestop = hal_true;  
-
-                if(NULL != spixint->config.onframereceiv)
-                {
-                    spixint->config.onframereceiv(NULL); // address of received byte
-                }                  
-            }
-        }
-        else
-        {   // dont have any more space in fifo-rx
-            //if((hal_spi_act_continuous == spixint->config.activity) && (hal_false == spixint->forcestoprx))
-            //{   // if tx is continuous we just retrieve the byte but we dont put inside the frame-rx
-                uint8_t byte = (uint8_t)SPI_I2S_ReceiveData(SPIx); 
-            //}
-            //else
-            //{   // else we disable rx
-            //    spixint->forcestoprx = hal_false;
-            //    SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, DISABLE);
-            //}
-        }        
-       
-    }    
-    
-}
-#endif
 static hal_boolval_t s_hal_spi_supported_is(hal_spi_port_t port)
 {
     return(hal_utility_bits_byte_bitcheck(hal_brdcfg_spi__theconfig.supported_mask, HAL_spi_port2index(port)) );
@@ -787,9 +455,10 @@ static hal_bool_t s_hal_spi_is_status_locked(hal_spi_port_t port)
 }
 
 
-
 static hal_result_t s_hal_spi_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg)
 {
+    uint8_t i;
+    
     if(NULL == cfg)
     {
         cfg = &hal_spi_cfg_default;
@@ -820,25 +489,29 @@ static hal_result_t s_hal_spi_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg
     s_hal_spi_hw_init(port);
     s_hal_spi_hw_enable(port, cfg);
     
-    if((hal_spi_act_singleframe == cfg->activity) || (hal_spi_act_multiframe == cfg->activity))
-    {
-        s_hal_spi_nvic_enable(port);
-    }
-        
-    
-    s_hal_spi_initted_set(port);
+
+    // init the spi internals data structure
     
     memcpy(&s_hal_spi_internals[HAL_spi_port2index(port)].config, cfg, sizeof(hal_spi_cfg_t));
     
     #warning --> remove teh calloc from here 
-    hal_utility_fifo_init(&s_hal_spi_internals[HAL_spi_port2index(port)].fifotx, cfg->capacityoftxfifoofframes, cfg->sizeoftxframe, calloc(cfg->capacityoftxfifoofframes*cfg->sizeoftxframe, 1), NULL);
-    hal_utility_fifo_init(&s_hal_spi_internals[HAL_spi_port2index(port)].fiforx, cfg->capacityofrxfifoofframes, cfg->sizeofrxframe, calloc(cfg->capacityofrxfifoofframes*cfg->sizeofrxframe, 1), NULL);
+    hal_utility_fifo_init(&s_hal_spi_internals[HAL_spi_port2index(port)].fifotx, cfg->capacityoftxfifoofframes, cfg->sizeofframe, calloc(cfg->capacityoftxfifoofframes*cfg->sizeofframe, 1), NULL);
+    hal_utility_fifo_init(&s_hal_spi_internals[HAL_spi_port2index(port)].fiforx, cfg->capacityofrxfifoofframes, cfg->sizeofframe, calloc(cfg->capacityofrxfifoofframes*cfg->sizeofframe, 1), NULL);
     
-    s_hal_spi_internals[HAL_spi_port2index(port)].rxbuffer =  calloc(cfg->sizeofrxframe, 1);
-    s_hal_spi_internals[HAL_spi_port2index(port)].txframe = NULL;
+
+    s_hal_spi_internals[HAL_spi_port2index(port)].dummytxframe = calloc(cfg->sizeofframe, 1);
+    for(i=0; i<cfg->sizeofframe; i++)
+    {
+        s_hal_spi_internals[HAL_spi_port2index(port)].dummytxframe[i] = cfg->dummytxvalue + i;
+    }
+    s_hal_spi_internals[HAL_spi_port2index(port)].dmatxframe = calloc(cfg->sizeofframe, 1); //s_hal_spi_internals[HAL_spi_port2index(port)].dummytxframe;
     s_hal_spi_internals[HAL_spi_port2index(port)].txcount = 0;
     
-    s_hal_spi_internals[HAL_spi_port2index(port)].rxframe = NULL;
+    #warning --> debug.
+    memcpy(s_hal_spi_internals[HAL_spi_port2index(port)].dmatxframe, s_hal_spi_internals[HAL_spi_port2index(port)].dummytxframe, cfg->sizeofframe);
+
+    
+    s_hal_spi_internals[HAL_spi_port2index(port)].dmarxframe = calloc(cfg->sizeofframe, 1); //hal_utility_fifo_end(&s_hal_spi_internals[HAL_spi_port2index(port)].fiforx);
     s_hal_spi_internals[HAL_spi_port2index(port)].rxcount = 0;
     
     s_hal_spi_internals[HAL_spi_port2index(port)].direction = cfg->direction;
@@ -846,6 +519,22 @@ static hal_result_t s_hal_spi_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg
     s_hal_spi_internals[HAL_spi_port2index(port)].stopit = 0;
     s_hal_spi_internals[HAL_spi_port2index(port)].txisenabled = 0;
     s_hal_spi_internals[HAL_spi_port2index(port)].rxisenabled = 0;
+    
+    s_hal_spi_internals[HAL_spi_port2index(port)].port = port;
+    s_hal_spi_internals[HAL_spi_port2index(port)].masternumofframes = 0;
+    
+    
+    // now ... go on with the dma
+    
+    if((hal_spi_act_singleframe == cfg->activity) || (hal_spi_act_multiframe == cfg->activity))
+    {
+        s_hal_spi_dma_enable(port, cfg);
+    }
+        
+    
+    // ok, it is initted
+    s_hal_spi_initted_set(port);
+        
   
     return(hal_res_OK);
 }
@@ -1201,6 +890,11 @@ static void s_hal_spi_hw_enable(hal_spi_port_t port, const hal_spi_cfg_t* cfg)
  
     SPI_Init(SPIx, &spi_cfg);
     
+    // enable dma rx request
+    SPI_I2S_DMACmd(SPIx, SPI_I2S_DMAReq_Rx, ENABLE);  
+    // enable dma tx request
+    SPI_I2S_DMACmd(SPIx, SPI_I2S_DMAReq_Tx, ENABLE);        
+    
 #endif
 }
 
@@ -1270,13 +964,14 @@ static hal_result_t s_hal_spi_put(hal_spi_port_t port, uint8_t* txframe, uint8_t
     const hal_spi_cfg_t* cfg = &s_hal_spi_internals[HAL_spi_port2index(port)].config;
  
     // disable so that we can change a data structure which is used by the isr
-    s_hal_spi_isr_disable(port);
+    s_hal_spi_periph_disable(port);
     res =  hal_utility_fifo_put(&s_hal_spi_internals[HAL_spi_port2index(port)].fifotx, txframe);
+       
     
     if(hal_true == sendnow)
     {
         // enable again
-        s_hal_spi_isr_enable(port);   
+        s_hal_spi_periph_enable(port);   
     }
     
     return(res);
@@ -1294,7 +989,7 @@ static hal_result_t s_hal_spi_get(hal_spi_port_t port, uint8_t* rxframe, uint8_t
     
     if(NULL != size)
     {
-        *size = (hal_res_OK == res) ? (s_hal_spi_internals[HAL_spi_port2index(port)].config.sizeofrxframe) : (0);
+        *size = (hal_res_OK == res) ? (s_hal_spi_internals[HAL_spi_port2index(port)].config.sizeofframe) : (0);
     }
         
         // enable again
@@ -1304,219 +999,226 @@ static hal_result_t s_hal_spi_get(hal_spi_port_t port, uint8_t* rxframe, uint8_t
     return(res);    
 }
 
-static void s_hal_spi_isr_enable(hal_spi_port_t port)
-{
-    hal_spi_internals_t* spixint = &s_hal_spi_internals[HAL_spi_port2index(port)];
-    SPI_TypeDef* SPIx = HAL_spi_port2stmSPI(port); 
 
-    SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, ENABLE);
-    spixint->txisenabled = 1;
-    SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, ENABLE);
-    spixint->rxisenabled = 1;
-    
-    SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_ERR, ENABLE);
-    
-    
- 
-    
-//     if(hal_spi_dir_txrx == spixint->direction)
-//     {
-//         SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, ENABLE);
-//         SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, ENABLE);
-//     }
-//     else if(hal_spi_dir_txonly == spixint->direction)
-//     {
-//         SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, ENABLE);
-//     }
-//     else if(hal_spi_dir_rxonly == spixint->direction)
-//     {
-//         SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, ENABLE);
-//     }    
-}
-
-
-static void s_hal_spi_isr_disable(hal_spi_port_t port)
-{
-    hal_spi_internals_t* spixint = &s_hal_spi_internals[HAL_spi_port2index(port)];
-    SPI_TypeDef* SPIx = HAL_spi_port2stmSPI(port); 
-    
-    //SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE | SPI_I2S_IT_RXNE, DISABLE);    
-    SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, DISABLE);
-    spixint->txisenabled = 0;
-    SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, DISABLE);
-    spixint->rxisenabled = 0;
-    
-    SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_ERR, DISABLE);
-}
 
 static void s_hal_spi_periph_enable(hal_spi_port_t port)
 {
     SPI_TypeDef* SPIx = HAL_spi_port2stmSPI(port); 
-    SPI_Cmd(SPIx, ENABLE);
+    SPI_Cmd(SPIx, ENABLE);  
+
+    hal_dma_enable(s_hal_spi_dma_port2use_rx[HAL_spi_port2index(port)]);
+    hal_dma_enable(s_hal_spi_dma_port2use_tx[HAL_spi_port2index(port)]);
 }
 
 static void s_hal_spi_periph_disable(hal_spi_port_t port)
 {
     SPI_TypeDef* SPIx = HAL_spi_port2stmSPI(port); 
     SPI_Cmd(SPIx, DISABLE);
-}
-
-
-static void s_hal_spi_nvic_enable(hal_spi_port_t port)
-{
-    IRQn_Type IRQn = (hal_spi_port1 == port) ? (SPI1_IRQn) : ( (hal_spi_port2 == port) ? (SPI2_IRQn) : (SPI3_IRQn) );
-    hal_sys_irqn_enable(IRQn);
-}
-
-static void s_hal_spi_nvic_disable(hal_spi_port_t port)
-{
-    IRQn_Type IRQn = (hal_spi_port1 == port) ? (SPI1_IRQn) : ( (hal_spi_port2 == port) ? (SPI2_IRQn) : (SPI3_IRQn) );
-    hal_sys_irqn_disable(IRQn);
-}
-
-
-static hal_result_t s_hal_spi_isr_txbyte_get(hal_spi_internals_t* spixint, uint8_t* txbyte, hal_bool_t* itisthelastoftheframe, hal_bool_t* itisthelastinsidefifo)
-{
-    // if the direction is rx-only we just transmit the dummy byte to clock out the spi   
-    static uint8_t incr_mas = 0;
-    static uint8_t incr_sla = 0;
     
-    if(hal_spi_dir_rxonly == spixint->direction)
+    hal_dma_disable(s_hal_spi_dma_port2use_rx[HAL_spi_port2index(port)]);
+}
+
+
+
+
+static void s_hal_spi_dma_enable(hal_spi_port_t port, const hal_spi_cfg_t *cfg)
+{
+    hal_spi_internals_t* spixint = &s_hal_spi_internals[HAL_spi_port2index(port)];
+    
+    hal_dma_cfg_t s_hal_spi_dma_cfg =
     {
-        //*txbyte = spixint->config.dummytxvalue;
-        if(hal_spi_ownership_slave == spixint->config.ownership)
+        .transfer               = hal_dma_transfer_mem2per,
+        .mode                   = hal_dma_mode_oneshot,
+        .intpriority            = hal_int_priority06,
+        .datasize               = cfg->sizeofframe,
+        .source                 = 0,
+        .destin                 = 0,
+        .cbk_on_transfer_done   = NULL,
+        .arg_on_transfer_done   = spixint
+    };
+    
+    
+    s_hal_spi_dma_cfg.transfer                  = hal_dma_transfer_per2mem;
+    s_hal_spi_dma_cfg.source                    = &s_hal_spi_stmSPImap[HAL_spi_port2index(port)]->DR;
+    s_hal_spi_dma_cfg.destin                    = spixint->dmarxframe;
+    s_hal_spi_dma_cfg.cbk_on_transfer_done      = s_hal_spi_dma_on_tranfer_done_rx;
+    s_hal_spi_dma_cfg.arg_on_transfer_done      = spixint;
+    hal_dma_init(s_hal_spi_dma_port2use_rx[HAL_spi_port2index(port)], &s_hal_spi_dma_cfg);
+
+    // init dma for tx
+    s_hal_spi_dma_cfg.transfer                  = hal_dma_transfer_mem2per;
+    s_hal_spi_dma_cfg.cbk_on_transfer_done      = s_hal_spi_dma_on_tranfer_done_tx;
+//    s_hal_spi_dma_cfg.source                    = spixint->dmatxframe;
+//    s_hal_spi_dma_cfg.destin                    = &s_hal_spi_stmSPImap[HAL_spi_port2index(port)]->DR;  
+    s_hal_spi_dma_cfg.source                    = &s_hal_spi_stmSPImap[HAL_spi_port2index(port)]->DR;
+    s_hal_spi_dma_cfg.destin                    = spixint->dmatxframe;    
+    s_hal_spi_dma_cfg.cbk_on_transfer_done      = s_hal_spi_dma_on_tranfer_done_tx;  
+    s_hal_spi_dma_cfg.arg_on_transfer_done      = spixint;    
+    hal_dma_init(s_hal_spi_dma_port2use_tx[HAL_spi_port2index(port)], &s_hal_spi_dma_cfg);    
+}
+
+#if 0
+// cosi' funziona ... ma non so se completamente e poi ... voglio kjigliorare
+static void s_hal_spi_dma_on_tranfer_done_rx(void* p)
+{
+    hal_spi_internals_t* spixint = (hal_spi_internals_t*)p;
+    
+
+    if(hal_true == hal_utility_fifo_full(&(spixint->fiforx)))
+    {
+        hal_utility_fifo_pop(&(spixint->fiforx));
+    }
+    
+    // move spixint->dmarxframe inside &(spixint->fiforx)    
+    hal_utility_fifo_put(&(spixint->fiforx), spixint->dmarxframe);     
+    
+    
+    // and ... dont retrigger things or shall i?
+    
+    hal_dma_retrigger(s_hal_spi_dma_port2use_rx[HAL_spi_port2index(spixint->port)]);
+   
+}
+
+
+static void s_hal_spi_dma_on_tranfer_done_tx(void* p)
+{
+    hal_spi_internals_t* spixint = (hal_spi_internals_t*)p;
+    
+    // copy into dmatxframe another frame.
+    if(hal_res_OK != hal_utility_fifo_get(&(spixint->fifotx), spixint->dmatxframe, NULL))
+    {   // put the dummy one.
+        //memcpy( etc.
+        
+        memcpy(spixint->dmatxframe, spixint->dummytxframe, spixint->config.sizeofframe);
+    }
+    
+    //hal_dma_retrigger
+    
+    //hal_dma_dontdisable(s_hal_spi_dma_port2use_tx[HAL_spi_port2index(spixint->port)]);
+    hal_dma_retrigger(s_hal_spi_dma_port2use_tx[HAL_spi_port2index(spixint->port)]);
+
+    // and ... i retrigger things or shall i not?               
+}
+
+#else
+
+
+static void s_hal_spi_dma_on_tranfer_done_rx(void* p)
+{
+    hal_spi_internals_t* spixint = (hal_spi_internals_t*)p;
+    
+    // 1. copy the rx frame into fifo  
+    
+    if(hal_spi_dir_txonly != spixint->config.direction)
+    {   
+        if(hal_true == hal_utility_fifo_full(&(spixint->fiforx)))
         {
-            *txbyte = spixint->config.dummytxvalue + incr_sla++;
+            hal_utility_fifo_pop(&(spixint->fiforx));
+        }
+        hal_utility_fifo_put(&(spixint->fiforx), spixint->dmarxframe); 
+    }
+
+    // 2. verify if we need to stop
+    hal_bool_t stopit = hal_false;
+//     volatile uint8_t* pmasternumofframes = & (spixint->masternumofframes);
+//     
+//     if(hal_spi_ownership_master == spixint->config.ownership)
+//     {
+//         *pmasternumofframes = (0 == *pmasternumofframes) ? (0) : (*pmasternumofframes - 1);
+//         
+//         if(0 == (*pmasternumofframes))
+//         {
+//             stopit = hal_true;
+//         }
+//         else
+//         {
+//             stopit = hal_false;
+//         }       
+//     }
+//     else
+//     {
+//         stopit = hal_false;
+//     }
+
+    volatile uint8_t* pmasternumofframes = & (spixint->masternumofframes);
+    
+    if(hal_spi_ownership_master == spixint->config.ownership)
+    {
+ 
+        spixint->masternumofframes = (0 == spixint->masternumofframes) ? (0) : (spixint->masternumofframes - 1);
+        
+        if(0 == spixint->masternumofframes)
+        {
+            stopit = hal_true;
         }
         else
         {
-            *txbyte = spixint->config.dummytxvalue + incr_mas++;
-        }
-        *itisthelastoftheframe = hal_false;
-        *itisthelastinsidefifo = hal_false;
-        return(hal_res_OK);        
+            stopit = hal_false;
+        }       
     }
-    
-    // otherwise if we have any kind of tx activity (txonly or txrx), then we get the byte from the fifo of tx frames
-    
-    if(NULL == spixint->txframe)
+    else
     {
-        spixint->txframe =  hal_utility_fifo_front(&spixint->fifotx);
-        spixint->txcount = 0;
-        
-        if(NULL == spixint->txframe)
+        stopit = hal_false;
+    }
+
+    
+    if(hal_true == stopit)
+    {
+        // stop
+    }
+    else
+    {        
+ 
+        if(hal_spi_dir_rxonly != spixint->config.direction)
         {
-            //*txbyte = spixint->config.dummytxvalue;
-                    if(hal_spi_ownership_slave == spixint->config.ownership)
-                    {
-                        *txbyte = spixint->config.dummytxvalue + incr_sla++;
-                    }
-                    else
-                    {
-                        *txbyte = spixint->config.dummytxvalue + incr_mas++;
-                    }
-            *itisthelastoftheframe = hal_false;
-            *itisthelastinsidefifo = hal_false;  
-            if(hal_spi_ownership_master == spixint->config.ownership)
-            {   // error ... the master must have a frame to tx
-                return(hal_res_NOK_generic);
-            }
-            else
-            {
-                return(hal_res_OK);
-            }
-        }        
+            // copy into txbuffer a new frame
+            if(hal_res_OK != hal_utility_fifo_get(&(spixint->fifotx), spixint->dmatxframe, NULL))
+            {   // put the dummy one.
+                memcpy(spixint->dmatxframe, spixint->dummytxframe, spixint->config.sizeofframe);
+            }      
+        }    
+        
+        // retrigger tx
+        hal_dma_retrigger(s_hal_spi_dma_port2use_tx[HAL_spi_port2index(spixint->port)]);
+        
+        // retrigger rx
+        hal_dma_retrigger(s_hal_spi_dma_port2use_rx[HAL_spi_port2index(spixint->port)]);        
+             
+    } 
+
+    if(hal_spi_dir_txonly != spixint->config.direction)
+    {
+        // alert about a reception
+        hal_callback_t onframereceiv = spixint->config.onframereceiv;
+        if(NULL != onframereceiv)
+        {
+            onframereceiv(NULL);
+        }
     }
        
-    *txbyte = spixint->txframe[spixint->txcount++];
-    
-    if(spixint->txcount == spixint->config.sizeoftxframe)
-    {   // it is the last byte in the frame ...
-                
-        *itisthelastoftheframe = hal_true;
-        
-        hal_utility_fifo_pop(&spixint->fifotx);
-        
-        spixint->txframe = hal_utility_fifo_front(&spixint->fifotx);
-        spixint->txcount = 0;    
-
-        if(NULL == spixint->txframe)
-        {
-            *itisthelastinsidefifo = hal_true;
-        }
-        else
-        {
-            *itisthelastinsidefifo = hal_false;
-        }
-    }
-    else
-    {
-        *itisthelastoftheframe = hal_false;
-        *itisthelastinsidefifo = hal_false;
-    }
-    
-    return(hal_res_OK);  
 }
 
-
-static hal_result_t s_hal_spi_isr_rxbyte_put(hal_spi_internals_t* spixint, uint8_t rxbyte, hal_bool_t* itisthelastoftheframe, hal_bool_t* fifoisfull)
+static void s_hal_spi_dma_on_tranfer_done_tx(void* p)
 {
-    // if the direction is tx-only, then we dont store the rxbyte 
+    hal_spi_internals_t* spixint = (hal_spi_internals_t*)p;
     
-    if(hal_spi_dir_txonly == spixint->direction)
+    hal_dma_dontdisable(s_hal_spi_dma_port2use_tx[HAL_spi_port2index(spixint->port)]);
+    
+    
+    // alert about a transmission done
+    if(hal_spi_dir_rxonly != spixint->config.direction)
     {
-        *itisthelastoftheframe = hal_false;
-        *fifoisfull = hal_false;
-        return(hal_res_OK);         
-    }
-    
-    // otherwise if we have reception enabled, then we put the byte into the fifo of rx frames 
-        
-    if(NULL == spixint->rxframe)
-    {
-        spixint->rxframe = (hal_true == hal_utility_fifo_full(&spixint->fiforx)) ? (NULL) : (spixint->rxbuffer);
-        spixint->rxcount = 0;
-        
-        if(NULL == spixint->rxframe)
+        hal_callback_t onframetransm = spixint->config.onframetransm;
+        if(NULL != onframetransm)
         {
-            *itisthelastoftheframe = hal_false;
-            *fifoisfull = hal_true;
-            return(hal_res_OK);  
-        }        
+            onframetransm(NULL);
+        }    
     }
-    
-    
-    // store the byte
-    spixint->rxframe[spixint->rxcount++] = rxbyte;
-    
-
-    if(spixint->rxcount == spixint->config.sizeofrxframe)
-    {   // it is the last byte in the frame ...
-                
-        *itisthelastoftheframe = hal_true;
-        
-        hal_utility_fifo_put(&spixint->fiforx, spixint->rxframe);
-        
-        spixint->rxframe = (hal_true == hal_utility_fifo_full(&spixint->fiforx)) ? (NULL) : (spixint->rxbuffer);
-        spixint->rxcount = 0;    
-
-        if(NULL == spixint->rxframe)
-        {
-            *fifoisfull = hal_true;
-        }
-        else
-        {
-            *fifoisfull = hal_false;
-        }
-    }
-    else
-    {
-        *itisthelastoftheframe = hal_false;
-        *fifoisfull = hal_false;
-    }
-    
-    return(hal_res_OK);  
 }
+
+#endif
+
+
 
 #endif//HAL_USE_SPI
 
