@@ -91,11 +91,8 @@ typedef enum
  **/
 typedef enum
 {
-    hal_spi_act_raw08bits       = 2,    /**<  */
-    hal_spi_act_multiframe      = 4,     // the master transmits as many frames as contained in its tx-fifo and then it disables spi
-    
-    hal_spi_act_singleframe     = 0,    /**< the channel is enabled to manage one frame only and after that it is automatically disabled */
-    hal_spi_act_continuous      = 1     /**< NOT SUPPORTED NOW: after the channel is enabled, it exchanges frames, possibly empty, until it is disabled */
+    hal_spi_act_raw             = 0,    /**< the communication is done using raw bytes. the spi can be slave only */
+    hal_spi_act_framebased      = 1     /**< the communication is done by frames */
 } hal_spi_activity_t;
 
 
@@ -122,25 +119,25 @@ typedef enum
 typedef struct
 {
     hal_spi_ownership_t     ownership;          /**< the communication ownership: master or slave */
-    hal_spi_direction_t     direction;                /**< the communication direction: tx, rx or both */
+    hal_spi_direction_t     direction;          /**< the communication direction: tx, rx or both */
     hal_spi_activity_t      activity;           /**< the activity: single frame, multi frame, or continuous */
     hal_spi_speed_t         speed;              /**< the communication speed */
     uint8_t                 sizeofframe;
-//    uint8_t                 sizeoftxframe;      /**< if tx is enabled, it tells how many bytes to transmit inside a frame */
-//    uint8_t                 sizeofrxframe;      /**< if rx is enabled, it tells how many bytes to receive inside a frame */
-    hal_callback_t          onframetransm;      /**< if not NULL, it is called when a frame is transmitted. its argument is NULL */
-    hal_callback_t          onframereceiv;      /**< if not NULL, it is called when a frame is received. its argument points to the received frame */
-    uint8_t                 capacityoftxfifoofframes; //?? si potrebbe bufferizzare le trasmissioni e le ricezioni .....
-    uint8_t                 capacityofrxfifoofframes;
-    uint8_t                 dummytxvalue;
-//    hal_uint8_fp_void_t     gettxvalue; si potrebbe mettere una funzione che preleva il valore da trasmettere senza che sia necessario metterlo come frame.
+    uint8_t                 capacityoftxfifoofframes; /**< if direction is not hal_spi_dir_rxonly, it specifies the capacity of the fifo of frames to tx */
+    uint8_t                 capacityofrxfifoofframes; /**< if direction is not hal_spi_dir_txonly, it specifies the capacity of the fifo of frames to rx */
+    uint8_t                 dummytxvalue;       /**< it specifies which is the value to transmit in case the fifo is empty or in case direction is hal_spi_dir_rxonly */ 
+    hal_callback_t          onframetransm;      /**< if not NULL and direction is not hal_spi_dir_rxonly it is called when a frame is transmitted */
+    void*                   argonframetransm;
+    hal_callback_t          onframereceiv;      /**< if not NULL and direction is not hal_spi_dir_txonly it is called when a frame is received */
+    void*                   argonframereceiv;
 } hal_spi_cfg_t;
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const hal_spi_cfg_t hal_spi_cfg_default; // = { .ownership = hal_spi_ownership_master, .dir = hal_spi_dir_txrx, .activity = hal_spi_act_singleframe,
-                                                //     .speed = hal_spi_speed_1mbps, .sizeoftxframe = 4, .sizeofrxframe = 4, .onframetransm = NULL, .onframereceiv = NULL };
+extern const hal_spi_cfg_t hal_spi_cfg_default; // = { .ownership = hal_spi_ownership_master, .dir = hal_spi_dir_txrx, .activity = hal_spi_act_multiframe,
+                                                //     .speed = hal_spi_speed_0562kbps, .sizeofframe = 4, .capacityoftxfifoofframes = 4, .capacityofrxfifoofframes = 4,
+                                                //     .dummytxvalue = 0, .onframetransm = NULL, .argonframetransm = NULL, .argonframereceiv = NULL, .onframereceiv = NULL };
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -154,12 +151,8 @@ extern const hal_spi_cfg_t hal_spi_cfg_default; // = { .ownership = hal_spi_owne
   */
 extern hal_result_t hal_spi_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg);
 
-extern void hal_test_spima_spisl(void);
 
-
-extern hal_result_t hal_spi_write(hal_spi_port_t port, uint8_t byte, uint8_t* readbyte);
-
-extern hal_result_t hal_spi_isrwrite(hal_spi_port_t port, uint8_t byte, uint8_t* readbyte);
+extern hal_result_t hal_spi_raw_master_writeread(hal_spi_port_t port, uint8_t byte, uint8_t* readbyte);
 
 
 /** @fn			extern hal_result_t hal_spi_send(hal_spi_port_t port, uint8_t* txframe, uint8_t size)
@@ -170,35 +163,26 @@ extern hal_result_t hal_spi_isrwrite(hal_spi_port_t port, uint8_t byte, uint8_t*
                 txfifoofframes or are just zero data.
     @param  	port	        the port
     @param  	txframe 	    the frame to transmit
-    @param  	size 	        the size of the frame
     @return 	hal_res_OK or hal_res_NOK_generic on failure
   */
-extern hal_result_t hal_spi_put(hal_spi_port_t port, uint8_t* txframe, uint8_t size, hal_bool_t sendnow);
+extern hal_result_t hal_spi_put(hal_spi_port_t port, uint8_t* txframe);
 
-extern hal_result_t hal_spi_direction_set(hal_spi_port_t port, hal_spi_direction_t dir);
-
-extern hal_result_t hal_spi_start(hal_spi_port_t port, uint8_t masternumofframes);
+// 0 -> svuoto il buffer tx.
+// num -> il numeo indicato. si prende prima dal buffer tx se esiste. poi il frame dummy.
+// 255 -> lunghezza infinita. si usa per lo slave o per trasmettere continuamente. si ferma con hal_spi_stop().
+extern hal_result_t hal_spi_start(hal_spi_port_t port, uint8_t lengthofburst);
 
 extern hal_result_t hal_spi_stop(hal_spi_port_t port);
 
-// add a hal_spi_start() and hal_spi_stop() ???
 
-
-/** @fn			extern hal_result_t hal_spi_get(hal_spi_port_t port, uint8_t* rxframe, uint8_t* size)
+/** @fn			extern hal_result_t hal_spi_get(hal_spi_port_t port, uint8_t* size)
     @brief  	this function retrieves a received frame. 
     @param  	port	        the port
     @param  	rxframe 	    the frame to transmit
-    @param  	size 	        the size of the frame
     @return 	hal_res_OK if a valid frame is available or hal_res_NOK_generic on failure
   */
-extern hal_result_t hal_spi_get(hal_spi_port_t port, uint8_t* rxframe, uint8_t* size, uint8_t* remainingrxframes);
+extern hal_result_t hal_spi_get(hal_spi_port_t port, uint8_t* rxframe, uint8_t* remainingrxframes);
 
-
-
-extern hal_result_t hal_spi_master_start(hal_spi_port_t port, uint8_t numofframes);
-
-
-extern hal_result_t hal_spi_slave_start(hal_spi_port_t port);
 
 
 /** @}            

@@ -111,7 +111,6 @@ typedef struct
     void*                       arg_on_transfer_done;
 } hal_dma_cfg_t;
 
-#warning --> what about double buffering ? is it worth implementing it? 
 
 
  
@@ -177,6 +176,9 @@ extern hal_result_t hal_dma_source_set(hal_dma_port_t port, void* source);
 extern hal_result_t hal_dma_destin_set(hal_dma_port_t port, void* destin);
 
 
+extern void hal_dma_isr_enable(hal_dma_port_t port);
+
+extern void hal_dma_isr_disable(hal_dma_port_t port);
 
 /** @}            
     end of group doxy_group_hal_dma  
