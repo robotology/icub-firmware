@@ -65,6 +65,7 @@
 // -- utilities
 #define     HAL_USE_UTILITY_BITS
 #define     HAL_USE_UTILITY_FIFO
+#define     HAL_USE_UTILITY_HEAP
 #undef     HAL_USE_UTILITY_CRC16
 #undef     HAL_USE_UTILITY_CRC32
 
