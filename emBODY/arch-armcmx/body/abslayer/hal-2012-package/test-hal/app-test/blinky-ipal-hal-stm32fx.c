@@ -1452,15 +1452,18 @@ static void s_test_spi_master_slave(void)
 //     for(;;);
 // }
 
-
+// hal_spi_speed_9000kbps
+// hal_spi_speed_4500kbps
+// hal_spi_speed_0562kbps
+#define SPEED2USE hal_spi_speed_4500kbps
 static void s_test_spi_master_txrx_slave_txrx(void)  
 {    
     static const hal_spi_cfg_t spicfg_master =
     {
         .ownership                  = hal_spi_ownership_master,
         .direction                  = hal_spi_dir_txrx,
-        .activity                   = hal_spi_act_singleframe,
-        .speed                      = hal_spi_speed_0562kbps, //hal_spi_speed_9000kbps,
+        .activity                   = hal_spi_act_framebased,
+        .speed                      = SPEED2USE, //hal_spi_speed_9000kbps,
         .sizeofframe                = 4,
         .onframetransm              = NULL,
         .onframereceiv              = s_test_spiframe_master_receiv,
@@ -1473,8 +1476,8 @@ static void s_test_spi_master_txrx_slave_txrx(void)
     {
         .ownership                  = hal_spi_ownership_slave,
         .direction                  = hal_spi_dir_txrx,
-        .activity                   = hal_spi_act_singleframe,
-        .speed                      = hal_spi_speed_9000kbps, //hal_spi_speed_0562kbps, //hal_spi_speed_9000kbps,
+        .activity                   = hal_spi_act_framebased,
+        .speed                      = SPEED2USE, //hal_spi_speed_0562kbps, //hal_spi_speed_9000kbps,
         .sizeofframe                = 4,
         .onframetransm              = NULL,
         .onframereceiv              = s_test_spiframe_slave_receiv,
@@ -1503,18 +1506,18 @@ static void s_test_spi_master_txrx_slave_txrx(void)
     hal_spi_init(hal_spi_port2, &spicfg_slave);  
     
     // load the slave with data to transmit
-    hal_spi_put(hal_spi_port2, txframesla00, 4, hal_false);
-    hal_spi_put(hal_spi_port2, txframesla01, 4, hal_false);
-//    hal_spi_put(hal_spi_port2, txframesla02, 4, hal_false);
+    hal_spi_put(hal_spi_port2, txframesla00);
+    hal_spi_put(hal_spi_port2, txframesla01);
+//    hal_spi_put(hal_spi_port2, txframesla02);
     
     
     // now the master transmits something
-    hal_spi_put(hal_spi_port3, txframemas00, 4, hal_false);      
-    hal_spi_put(hal_spi_port3, txframemas01, 4, hal_false);
-    hal_spi_put(hal_spi_port3, txframemas02, 4, hal_false);
+    hal_spi_put(hal_spi_port3, txframemas00);      
+    hal_spi_put(hal_spi_port3, txframemas01);
+    hal_spi_put(hal_spi_port3, txframemas02);
 
     // now start the slave ...
-    hal_spi_start(hal_spi_port2, 0);
+    hal_spi_start(hal_spi_port2, 255);
     
     hal_sys_delay(500*1000); // 500 milli
     
@@ -1522,7 +1525,7 @@ static void s_test_spi_master_txrx_slave_txrx(void)
 
     
     // and start the master
-    hal_spi_start(hal_spi_port3, 4);
+    hal_spi_start(hal_spi_port3, 0); // or 4
     
     // now we sleep for some time so that the isr does transfer
     hal_sys_delay(500*1000); // 500 milli
@@ -1530,25 +1533,25 @@ static void s_test_spi_master_txrx_slave_txrx(void)
     // now the slave reads
     while(0 == s_test_slave_recv[0]);
     s_test_slave_recv[0] = 0;     
-    res = hal_spi_get(hal_spi_port2, rxframesla, &size, &remaining);   
+    res = hal_spi_get(hal_spi_port2, rxframesla, &remaining);   
 //    while(0 == s_test_slave_recv[1]);
 //    s_test_slave_recv[1] = 0;  
-    res = hal_spi_get(hal_spi_port2, rxframesla, &size, &remaining);
+    res = hal_spi_get(hal_spi_port2, rxframesla, &remaining);
 //    while(0 == s_test_slave_recv[2]);
 //    s_test_slave_recv[2] = 0;     
-    res = hal_spi_get(hal_spi_port2, rxframesla, &size, &remaining);
+    res = hal_spi_get(hal_spi_port2, rxframesla, &remaining);
 
     // now the master reads
     while(0 == s_test_master_recv[0]);
     s_test_master_recv[0] = 0;     
-    res = hal_spi_get(hal_spi_port3, rxframemas, &size, &remaining);   
+    res = hal_spi_get(hal_spi_port3, rxframemas, &remaining);   
     res = res;
 //    while(0 == s_test_master_recv[1]);
 //    s_test_master_recv[1] = 0;  
-    res = hal_spi_get(hal_spi_port3, rxframemas, &size, &remaining);
+    res = hal_spi_get(hal_spi_port3, rxframemas, &remaining);
 //    while(0 == s_test_master_recv[2]);
 //    s_test_master_recv[2] = 0;     
-    res = hal_spi_get(hal_spi_port3, rxframemas, &size, &remaining);
+    res = hal_spi_get(hal_spi_port3, rxframemas, &remaining);
         
     res = res; 
     for(;;);    

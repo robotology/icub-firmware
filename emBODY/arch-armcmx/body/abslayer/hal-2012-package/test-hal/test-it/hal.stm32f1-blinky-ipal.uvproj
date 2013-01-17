@@ -646,6 +646,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\utilities\hal_utility_fifo.c</FilePath>
             </File>
+            <File>
+              <FileName>hal_utility_heap.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\utilities\hal_utility_heap.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1320,6 +1325,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\utilities\hal_utility_fifo.c</FilePath>
             </File>
+            <File>
+              <FileName>hal_utility_heap.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\utilities\hal_utility_heap.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1993,6 +2003,11 @@
               <FileName>hal_utility_fifo.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\utilities\hal_utility_fifo.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_utility_heap.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\utilities\hal_utility_heap.c</FilePath>
             </File>
           </Files>
         </Group>
