@@ -409,13 +409,13 @@ extern hal_result_t hal_can_out_get(hal_can_port_t port, uint8_t *numberof)
 {
     hal_can_portdatastructure_t *cport = s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
 
-    // disable interrupt rx
-    s_hal_can_isr_rx_disable(port);
+    // disable interrupt tx
+    s_hal_can_isr_tx_disable(port);
     
     *numberof = hal_canfifo_hid_size(&cport->canframes_tx_norm);
     
-    // enable interrupt rx
-    s_hal_can_isr_rx_enable(port);
+    // enable interrupt tx
+    s_hal_can_isr_tx_enable(port);
     
     return(hal_res_OK);
 }

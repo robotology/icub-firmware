@@ -528,7 +528,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>1</IsCurrentTarget>
+        <IsCurrentTarget>0</IsCurrentTarget>
       </OPTFL>
       <CpuCode>255</CpuCode>
       <Books>
@@ -780,7 +780,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>0</IsCurrentTarget>
+        <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
       <CpuCode>255</CpuCode>
       <Books>
@@ -1102,10 +1102,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>116</ColumnNumber>
+      <ColumnNumber>17</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>85</TopLine>
-      <CurrentLine>107</CurrentLine>
+      <TopLine>28</TopLine>
+      <CurrentLine>50</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\hal-src\stm32f1\hal_stm32_encoder.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_encoder.c</FilenameWithoutPath>
@@ -1116,10 +1116,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>16</ColumnNumber>
+      <ColumnNumber>35</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>402</TopLine>
-      <CurrentLine>417</CurrentLine>
+      <TopLine>350</TopLine>
+      <CurrentLine>363</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\hal-src\stm32f1\hal_stm32_eth.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_eth.c</FilenameWithoutPath>
@@ -1172,10 +1172,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>13</ColumnNumber>
+      <ColumnNumber>16</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>236</TopLine>
+      <CurrentLine>245</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\hal-src\stm32f1\hal_stm32_switch.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_switch.c</FilenameWithoutPath>
@@ -1242,10 +1242,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>38</ColumnNumber>
+      <ColumnNumber>27</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>10</TopLine>
+      <CurrentLine>14</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\hal-src\stm32f1\hal_stm32_canfifo_hid.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_canfifo_hid.c</FilenameWithoutPath>
@@ -1256,10 +1256,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>1</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>565</TopLine>
-      <CurrentLine>584</CurrentLine>
+      <TopLine>328</TopLine>
+      <CurrentLine>409</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\hal-src\stm32f1\hal_stm32_can.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_can.c</FilenameWithoutPath>
@@ -1277,10 +1277,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>120</ColumnNumber>
+      <ColumnNumber>21</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>192</TopLine>
-      <CurrentLine>210</CurrentLine>
+      <TopLine>22</TopLine>
+      <CurrentLine>48</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\hal-src\stm32f1\hal_stm32_spi4encoder.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_spi4encoder.c</FilenameWithoutPath>
