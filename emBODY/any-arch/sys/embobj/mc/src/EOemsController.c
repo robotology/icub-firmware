@@ -42,7 +42,7 @@
 #define MOTORS(m)   for (uint8_t m=0; m<s_emsc->n_joints; ++m)
 #define ENCODERS(e) for (uint8_t e=0; e<s_emsc->n_joints; ++e)
 
-#define SAFE_MAX_CURRENT 1000
+#define SAFE_MAX_CURRENT 1500
 #define LIMIT(x,L) if (x>(L)) x=(L); else if (x<-(L)) x=-(L)
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -82,7 +82,9 @@ static EOemsController *s_emsc = NULL;
 // --------------------------------------------------------------------------------------------------------------------
 
 extern EOemsController* eo_emsController_Init(emsBoardType_t board_type) 
-{
+{    
+    //board_type = EMS_UPPERLEG;
+    
     if (board_type == EMS_NULL) return NULL;
 
     s_emsc = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOemsController), 1);
@@ -141,6 +143,11 @@ extern EOemsController* eo_emsController_Init(emsBoardType_t board_type)
     }
     
     return s_emsc;
+}
+
+extern void eo_emsController_SetEncSign(uint16_t jxx, int32_t enc_sign)
+{
+    eo_speedometer_SetEncSign(s_emsc->enc_speedometer[jxx], enc_sign);
 }
 
 extern void eo_emsController_ReadEncoders(int32_t *enc_pos)
@@ -248,8 +255,6 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
     
     JOINTS(j)
     {
-        //uint8_t j = 3;
-        
         if (eo_speedometer_IsHardFault(s_emsc->enc_speedometer[j]))
         {
             s_emsc->defcon = EMS_ALARM;
@@ -281,35 +286,34 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
         s_emsc->defcon = EMS_ALL_OK;
     }
     
-    int32_t vel_joint[MAX_JOINTS];
     int32_t pwm_joint[MAX_JOINTS];
 
     eObool_t big_error_flag = eobool_false;
     
     JOINTS(j)
     {
-        pwm_joint[j] = eo_axisController_PWM(s_emsc->axis_controller[j], &(vel_joint[j]), &big_error_flag);
+        pwm_joint[j] = eo_axisController_PWM(s_emsc->axis_controller[j], &big_error_flag);
     }
     
-    big_error_flag = eobool_false;
+    //big_error_flag = eobool_false;
     
     switch (s_emsc->boardType)
     {
     case EMS_SHOULDER:
-        eo_motors_PWMs_Shoulder(s_emsc->motors, pwm_joint, vel_joint, pwm_motor);
+        eo_motors_PWMs_Shoulder(s_emsc->motors, pwm_joint, pwm_motor);
         break;
     
     case EMS_ANKLE:
-        eo_motors_PWMs_Ankle(s_emsc->motors, pwm_joint, vel_joint, pwm_motor);
+        eo_motors_PWMs_Ankle(s_emsc->motors, pwm_joint, pwm_motor);
         break;
         
     case EMS_WAIST:
-        eo_motors_PWMs_Waist(s_emsc->motors, pwm_joint, vel_joint, pwm_motor);
+        eo_motors_PWMs_Waist(s_emsc->motors, pwm_joint, pwm_motor);
         break;
     
     case EMS_UPPERLEG:
     default:
-        eo_motors_PWMs_UpperLeg(s_emsc->motors, pwm_joint, vel_joint, pwm_motor);
+        eo_motors_PWMs_UpperLeg(s_emsc->motors, pwm_joint, pwm_motor);
         break;
     }
     
@@ -344,8 +348,6 @@ extern void eo_emsController_SetOutput(uint8_t joint, int16_t out)
 
 extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_vel)
 {    
-    if (joint == 3) hal_led_toggle(hal_led1);
-    
     if (s_emsc) eo_axisController_SetPosRef(s_emsc->axis_controller[joint], pos, avg_vel);
 }
 
@@ -378,7 +380,12 @@ extern void eo_emsController_ResetPosPid(uint8_t joint)
 
 extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_t vel, int32_t offset)
 {
-    if (s_emsc) eo_axisController_StartCalibration(s_emsc->axis_controller[joint], pos, vel, offset);
+    if (s_emsc)
+    {
+        eo_speedometer_Calibrate(s_emsc->enc_speedometer[joint], offset);
+        
+        eo_axisController_StartCalibration(s_emsc->axis_controller[joint], pos, vel);
+    }
 }
 
 extern void eo_emsController_Stop(uint8_t joint)

@@ -37,7 +37,7 @@ extern const int32_t EMS_FREQUENCY_INT32;
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define GET_AXIS_POSITION() (o->position + o->enc_offset)
+#define GET_AXIS_POSITION() (o->position)
 #define GET_AXIS_VELOCITY() (o->velocity)
 
 
@@ -121,7 +121,7 @@ extern EOaxisController* eo_axisController_New(int32_t ticks_per_rev)
         o->err = 0.0f;
 
         o->ready_mask = 0;
-        o->enc_offset = 0;
+        //o->enc_offset = 0;
         
         o->position = 0;
         o->velocity = 0;
@@ -137,13 +137,13 @@ extern eObool_t eo_axisController_IsReady(EOaxisController *o)
     return CHK_BIT(MASK_POS_INIT_OK);
 }
 
-extern void eo_axisController_StartCalibration(EOaxisController *o, int32_t pos, int32_t vel, int32_t offset)
+extern void eo_axisController_StartCalibration(EOaxisController *o, int32_t pos, int32_t vel)
 {
     if (!o) return;
     
     if (!CHK_BIT(MASK_MIN_POS|MASK_MAX_POS|MASK_POS_PID)) return;
     
-    o->enc_offset = offset;
+    //o->enc_offset = offset;
 	
     eo_trajectory_Init(o->trajectory, GET_AXIS_POSITION(), GET_AXIS_VELOCITY(), 0);
 
@@ -351,7 +351,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
     return eobool_true;
 }
 
-extern int16_t eo_axisController_PWM(EOaxisController *o, int32_t *vout, eObool_t *big_error_flag)
+extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_flag)
 {
     if (!o) return 0;
     
@@ -373,8 +373,6 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, int32_t *vout, eObool_
             }    
         }
     }
-    
-    if (vout) *vout = 0;
     
     switch (o->control_mode)
     {
@@ -417,8 +415,6 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, int32_t *vout, eObool_
                 }
             }
 
-            if (vout) *vout = (int32_t)vel_ref;
-
             return eo_pid_PWM2(o->pidP, o->err, vel_ref, vel);
         }
 
@@ -438,9 +434,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, int32_t *vout, eObool_
             
             o->err = pos_ref - pos;
 
-            if (big_error_flag && (o->err<-400.0 || o->err>400.0)) *big_error_flag = eobool_true;
-
-            if (vout) *vout = (int32_t)vel_ref;
+            if (big_error_flag && (o->err<-800.0 || o->err>800.0)) *big_error_flag = eobool_true;
             
             return eo_pid_PWM2(o->pidP, o->err, vel_ref, vel);
         }

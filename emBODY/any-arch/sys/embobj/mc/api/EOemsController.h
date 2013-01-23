@@ -80,11 +80,7 @@ extern void eo_emsController_ReadEncoders(int32_t *pos);
 extern void eo_emsController_ReadSpeed(uint8_t axis, int32_t speed);
 #endif
 extern void eo_emsController_PWM(int16_t* pwm);
-
-
-
-
-
+extern void eo_emsController_SetEncSign(uint16_t jxx, int32_t enc_sign);
 
 extern void eo_emsController_SetOutput(uint8_t joint, int16_t out);
 extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_vel);

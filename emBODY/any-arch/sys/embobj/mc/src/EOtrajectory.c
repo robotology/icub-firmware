@@ -41,7 +41,7 @@ extern const float   EMS_PERIOD;
 
 #define LIMIT(min, x, max) if (x < (min)) x = (min); else if (x > (max)) x = (max);
 
-#define VELMIN 666.f
+#define VELMIN 0.f
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -164,18 +164,21 @@ extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, int32_t a
         return;
     }
     
-    LIMIT(-o->vel_max, avg_vel, o->vel_max);
-
-    o->PosTimer = (EMS_FREQUENCY_INT32*(p1-(int32_t)o->Pos))/avg_vel;
-
-    if (o->PosTimer < 0)
+    if (avg_vel < 0) avg_vel = -avg_vel;
+    
+    if (avg_vel > o->vel_max) avg_vel = o->vel_max;
+    
+    int32_t delta = EMS_FREQUENCY_INT32*(p1-(int32_t)o->Pos);
+    
+    if (delta >= 0)
     {
-        o->PosTimer = -o->PosTimer;
-        o->VelMin = -VELMIN;
+        o->PosTimer =  delta/avg_vel; 
+        o->VelMin   =  VELMIN;
     }
     else
     {
-        o->VelMin =  VELMIN;
+        o->PosTimer = -delta/avg_vel; 
+        o->VelMin   = -VELMIN;    
     }
 }
 
@@ -284,13 +287,13 @@ extern int8_t eo_trajectory_PosStep(EOtrajectory* o, float *p, float *v)
         
         if (-VELMIN < o->Vel && o->Vel < VELMIN) o->Vel = o->VelMin;
 
-        o->Pos += EMS_PERIOD*(o->Vel += o->PAcc += (((K60byP*(o->PosF-o->Pos)*PbyT-36.0f*o->Vel-24.0f*o->VelMin)*PbyT)-9.0f*o->PAcc)*PbyT);
+        o->Pos += EMS_PERIOD*(o->Vel += o->PAcc += (((K60byP*(o->PosF-o->Pos)*PbyT-36.f*o->Vel-24.f*o->VelMin)*PbyT)-9.f*o->PAcc)*PbyT);
     }
     else if (o->VelTimer)
     {
-        float PbyT = 1.0f/(float)(o->VelTimer--);
+        float PbyT = 1.f/(float)(o->VelTimer--);
 
-        o->PosF = o->Pos += EMS_PERIOD*(o->Vel += o->PAcc += (6.0f*(o->VelF-o->Vel)*PbyT-4.0f*o->PAcc)*PbyT);
+        o->PosF = o->Pos += EMS_PERIOD*(o->Vel += o->PAcc += (6.f*(o->VelF-o->Vel)*PbyT-4.f*o->PAcc)*PbyT);
     }
     else
     {
