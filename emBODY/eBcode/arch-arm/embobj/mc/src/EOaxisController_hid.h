@@ -60,7 +60,7 @@ struct EOaxisController_hid
 
     EOtrajectory *trajectory;
 
-    int32_t enc_offset;
+    //int32_t enc_offset;
     int32_t position;
     int32_t velocity;
     

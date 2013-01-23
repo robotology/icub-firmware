@@ -53,9 +53,11 @@ typedef struct EOspeedmeter_hid EOspeedmeter;
  
  
 extern EOspeedmeter* eo_speedmeter_New(void);
+extern void eo_speedometer_Calibrate(EOspeedmeter* o, int32_t offset);
 extern void eo_speedometer_Reset(EOspeedmeter* o);
 extern eObool_t eo_speedometer_IsHardFault(EOspeedmeter* o);
 extern eObool_t eo_speedometer_IsStarted(EOspeedmeter* o);
+extern void eo_speedometer_SetEncSign(EOspeedmeter* o, int32_t enc_sign);
 
 extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position);
 

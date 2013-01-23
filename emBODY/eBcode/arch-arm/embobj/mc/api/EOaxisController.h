@@ -87,7 +87,7 @@ extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_
 extern void eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_t avg_acc);
 extern void eo_axisController_SetTrqRef(EOaxisController *o, int32_t trq);
 
-extern int16_t eo_axisController_PWM(EOaxisController *o, int32_t *vout, eObool_t *big_error_flag);
+extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_flag);
 
 extern void eo_axisController_Stop(EOaxisController *o);
 
@@ -112,7 +112,7 @@ extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o);
 extern void eo_axisController_SetPosPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff);
 extern void eo_axisController_SetTrqPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff);
 
-extern void eo_axisController_StartCalibration(EOaxisController *o, int32_t pos, int32_t vel, int32_t offset);
+extern void eo_axisController_StartCalibration(EOaxisController *o, int32_t pos, int32_t vel);
 
 /** @}            
     end of group eo_axisController  

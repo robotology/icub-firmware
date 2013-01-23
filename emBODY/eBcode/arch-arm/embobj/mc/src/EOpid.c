@@ -76,25 +76,31 @@ extern EOpid* eo_pid_New(void)
 
     if (o)
     {
-        o->Yoff = 0;
+        o->pwm_offset = 0;
         
-        o->K  = 0.0f;
-        o->Ki = 0.0f;
-        o->Kd = 0.0f;
+        o->K  = 0.f;
+        o->Ki = 0.f;
+        o->Kd = 0.f;
         
-        o->Xn = 0.0f;
-        o->pwm_filt = 0.0f;
-
-        o->Dn    = 0.0f;
-        o->En    = 0.0f;        
-        o->KKiIn = 0.0f;        
-        o->Imax  = 0.0f;
+        o->Xn = 0.f;
+        o->Yn = 0.f;
+        
+        o->Dn    = 0.f;
+        o->En    = 0.f;        
+        o->KKiIn = 0.f;        
+        o->Imax  = 0.f;
+        o->Ymax  = 0.f;
+        
+        o->F = 0.25f;
+        o->a = 2.f*o->F-1.f;
+        o->b = 0.000666f*(1.f-o->F);
 
         o->pwm     = 0;
-        o->pwm_max = 0;
         
-        o->A = 0.0f;
-        o->B = 0.0f;
+        o->moving = eobool_false;
+        
+        //o->A = 0.f;
+        //o->B = 0.f;
     }
 
     return o;
@@ -108,17 +114,21 @@ extern void eo_pid_SetPid(EOpid *o, float K, float Kd, float Ki, float Imax, int
     o->Kd = Kd*EMS_PERIOD;
     o->Ki = Ki;
 	
-    o->Yoff = Yoff;
     o->Imax = Imax;
+    o->Ymax = Ymax;
     
-    o->pwm_max = Ymax;
+    o->F = 0.001f*Ki;
+    o->a = 2.f*o->F-1.f;
+    o->b = 0.000666f*(1.f-o->F);
     
-    float N = 10.0;
-    float T = o->Kd/N;
-    float Q = 2.0f*T*EMS_FREQUENCY_FLOAT; 
+    o->pwm_offset = Yoff;
+    
+    //float N = 10.0;
+    //float T = o->Kd/N;
+    //float Q = 2.0f*T*EMS_FREQUENCY_FLOAT; 
 
-    o->A = (Q-1.0f)/(Q+1.0f);
-    o->B = EMS_FREQUENCY_FLOAT*(1.0f-o->A);
+    //o->A = (Q-1.0f)/(Q+1.0f);
+    //o->B = EMS_FREQUENCY_FLOAT*(1.0f-o->A);
 }
 
 extern void eo_pid_GetStatus(EOpid *o, int32_t *pwm, int32_t *err)
@@ -138,16 +148,18 @@ extern void eo_pid_Reset(EOpid *o)
 {
     if (!o) return;
 	
-    o->Dn   = 0.0f;
-    o->En   = 0.0f;
-    o->KKiIn  = 0.0f;
+    o->Dn   = 0.f;
+    o->En   = 0.f;
+    o->KKiIn  = 0.f;
     
-    o->Xn = 0.0f;
-    o->pwm_filt = 0.0f;
+    o->Xn = 0.f;
+    o->Yn = 0.f;
     
-    o->pwm  = 0;
+    o->pwm = 0;
+    
+    o->moving = eobool_false;
 }
-
+/*
 extern int32_t eo_pid_PWM(EOpid *o, float En)
 {
     if (!o) return 0;
@@ -169,40 +181,50 @@ extern int32_t eo_pid_PWM(EOpid *o, float En)
 
     return o->pwm;
 }
+*/
 
+#define ZRT 500.f
 
 extern int32_t eo_pid_PWM2(EOpid *o, float En, float Vref, float Venc)
 {
     if (!o) return 0;
     
-    o->En = En;
+    float Vmag = Venc < 0.f ? -Venc : Venc;
     
-    if (Vref<0.0f) Vref=-Vref;
+    if (Vref > Vmag) Vmag = Vref; else if (-Vref > Vmag) Vmag = -Vref; 
+     
+    //float Xn = o->K*(En + o->Kd*(Vref-Venc));
     
-    //float Xn = (Vref == 0.0f) ? (o->K*o->En) : (o->K*(o->En+o->Kd*(Vref-Venc)));
-
-    float Xn = o->K*(o->En+o->Kd*(Vref-Venc));
-    
-    o->KKiIn += o->Ki*Xn;
-
-    LIMIT(o->KKiIn, o->Imax);
-    
-    if (Vref<2000.0f)
+    if (Vref != 0.f)
     {
-        o->Xn += (0.05f+0.000475f*Vref)*(Xn+o->KKiIn-o->Xn);
+        //if (!o->moving) o->Yn += (Vref > 0.f) ? ZRT : -ZRT;
+        
+        o->moving = eobool_true;
     }
     else
     {
-        o->Xn = Xn+o->KKiIn;
+        if (Vmag < 666.f) o->moving = eobool_false;
     }
     
-    //o->Xn += 0.1f*(Xn+o->KKiIn-o->Xn);
-    
-    o->pwm = o->Yoff + (int32_t)o->Xn;
+    if (!o->moving)
+    {
+        o->Yn = o->K*En;
+    }
+    else if (Vmag < 2000.f)
+    {
+        o->Yn += o->Ki*(o->K*(En + o->Kd*(Vref-Venc)) - o->Yn);
+    }
+    else
+    {
+        o->Yn = o->K*(En + o->Kd*(Vref-Venc));
+    }
         
-    LIMIT(o->pwm, o->pwm_max);
+    o->En = En;
+    //o->Xn = Xn;
     
-    return o->pwm;
+    LIMIT(o->Yn, o->Ymax);
+    
+    return o->pwm = o->pwm_offset + (int32_t)o->Yn;
 }
 
 

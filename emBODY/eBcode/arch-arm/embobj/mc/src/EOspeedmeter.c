@@ -83,9 +83,12 @@ extern EOspeedmeter* eo_speedmeter_New(void)
     {        
         o->time = 0;
         
-        o->distance = 0;
+        //o->distance = 0;
         o->position_last = 0;
         o->position_sure = 0;
+        
+        o->offset = 0;
+        o->enc_revert = eobool_false;
         
         o->odo_x_freq = 0;
         o->speed_filt = 0;
@@ -110,6 +113,16 @@ extern EOspeedmeter* eo_speedmeter_New(void)
     return o;
 }
 
+extern void eo_speedometer_SetEncSign(EOspeedmeter* o, int32_t enc_sign)
+{
+    o->enc_revert = (enc_sign < 0);
+}
+
+extern void eo_speedometer_Calibrate(EOspeedmeter* o, int32_t offset)
+{
+    o->offset = -offset;
+}
+
 extern void eo_speedometer_Reset(EOspeedmeter* o)
 {
     o->hard_fault = eobool_false;
@@ -130,13 +143,18 @@ extern eObool_t eo_speedometer_IsStarted(EOspeedmeter* o)
 }
 
 extern int32_t eo_speedometer_GetVelocity(EOspeedmeter* o)
-{
-    return o->speed_filt;
+{    
+    return o->enc_revert ? -o->speed_filt : o->speed_filt;
 }
 
 extern int32_t eo_speedometer_GetDistance(EOspeedmeter* o)
 {
-    return o->distance + o->odo_x_freq/EMS_FREQUENCY_INT32;
+    int32_t pos = o->offset + o->position_sure + o->odo_x_freq/EMS_FREQUENCY_INT32;
+    
+    while (pos < 0)                     pos += IMPULSE_x_REVOLUTION;
+    while (pos >= IMPULSE_x_REVOLUTION) pos -= IMPULSE_x_REVOLUTION;
+    
+    return o->enc_revert ? -pos : pos;
 }
 
 #ifdef USE_2FOC_FAST_ENCODER
@@ -189,7 +207,7 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
 
                 o->odo_x_freq -= delta_x_freq;
                 o->position_sure = position;
-                o->distance += delta;
+                //o->distance += delta;
                 
                 int32_t speed = delta_x_freq / o->time;
                 
@@ -428,7 +446,8 @@ static void encoder_init(EOspeedmeter* o, int32_t position)
         o->position_last = position;
         o->position_sure = position;
 
-        o->distance = normalize_angle(position);
+        //o->distance = normalize_angle(position);
+        //o->distance = position;
         
         o->odo_x_freq = 0;
         o->speed_filt = 0;
