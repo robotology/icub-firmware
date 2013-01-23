@@ -237,7 +237,7 @@ file_047=..\app\calculator.c
 file_048=..\app\parser.c
 file_049=..\app\sender_outMsg.c
 file_050=..\app\traps.c
-file_051=..\..\..\libs\libdsp-coff.a
+file_051=C:\Program Files\Microchip\mplabc30\v3.30c\lib\libdsp-coff.a
 file_052=eElinkerscript_applic.gld
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}

@@ -123,6 +123,7 @@ static void s_hal_init(void);  //init hal by allocating memory and by init hw if
 static void s_hal_sys_init(void);// init system
 
 static void s_resetCause_send(void);
+static void s_eeprom_init(void);
 
 #ifdef _DEBUG_
 static void s_send_outgoing_msg_TEST(void);
@@ -202,20 +203,28 @@ static const eOsfoop_cfg_t s_thefoopcfg =
 
 
 
-// struct with configuration data for 6SG application
-// Here are defined only data that must be configured at compile time.
-// other configuration data will be read from eeprom.
-static SIXsg_config_data_t my_6sg_cfg =
+//// struct with configuration data for 6SG application
+//// Here are defined only data that must be configured at compile time.
+//// other configuration data will be read from eeprom.
+//static SIXsg_config_data_t my_6sg_cfg =
+//{
+////    .gen_ee_data = {0}, here don't care (saved in eeprom)
+////    .SIXsg_ee_data = {0}, here don't care (saved in eeprom)
+//    .behaviour_cfg = 
+//    {
+//        .send_ack_each_cmd = 1, //if = 1 send ack for each command (polling msg)
+//        .save_in_ee_immediately = 1, //if = 1 save current values of ee_data in eeprom each time a cmd change a value of data in eeprom.      
+//        .filt_data_mode = filtMode_iir, // filtMode_iir, //TODO: da spostare per adc
+//        .tx_outMsg_mode = tx_outMsg_off  //tx_outMsg_torqueData_on
+//    }
+//};
+
+static config_behaviour_t my_6sg_cfg_behav =
 {
-//    .gen_ee_data = {0}, here don't care (saved in eeprom)
-//    .SIXsg_ee_data = {0}, here don't care (saved in eeprom)
-    .behaviour_cfg = 
-    {
-        .send_ack_each_cmd = 1, //if = 1 send ack for each command (polling msg)
-        .save_in_ee_immediately = 1, //if = 1 save current values of ee_data in eeprom each time a cmd change a value of data in eeprom.      
-        .filt_data_mode = filtMode_iir, // filtMode_iir, //TODO: da spostare per adc
-        .tx_outMsg_mode = tx_outMsg_off  //tx_outMsg_torqueData_on
-    }
+    .send_ack_each_cmd = 1, //if = 1 send ack for each command (polling msg)
+    .save_in_ee_immediately = 1, //if = 1 save current values of ee_data in eeprom each time a cmd change a value of data in eeprom.      
+    .filt_data_mode = filtMode_iir, // filtMode_iir, //TODO: da spostare per adc
+    .tx_outMsg_mode = tx_outMsg_off  //tx_outMsg_torqueData_on
 };
 
 
@@ -224,6 +233,10 @@ static SIXsg_config_data_t my_6sg_cfg =
 static const uint8_t s_start_str[] = "START";
 static const uint8_t s_hello_str[] = "HELLO";
 static const uint8_t s_error_str[] = "ERROR";
+//questa var globale si potrebbe mettere locale in tutti i metodi che la usano chimando la funzione 
+//SIXsg_config_get, ma per ora non voglio alterare troppo il codice
+#warning VALE-->remove global var
+SIXsg_config_data_t *cfg_ptr = NULL;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -275,7 +288,7 @@ static void s_errman_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const
     if( (eo_errortype_weak == errtype) || (eo_errortype_fatal == errtype) )
     {
         //notify error    
-        frame.id = my_6sg_cfg.asfidanken_shared_data.asfidanken_can_address;
+        frame.id = cfg_ptr->gen_ee_data.board_address;
         frame.id_type = hal_can_frameID_std;
         frame.frame_type = hal_can_frame_data;
         frame.size = 5;
@@ -324,34 +337,37 @@ static void s_appl_init(void)
     hal_can_frame_t frame;
     hal_result_t res;
     hal_led_cfg_t l_cfg = { .dummy = 0 };
-    hal_eeprom_cfg_t ee_cfg =
-    { 
-        .flashpagebuffer    = NULL,
-        .flashpagesize      = 0
-    };
 
-    #warning --> asfidanken: la eeprom deve essere inizializzat con la ram ...
-    for(;;);
+    // init eeprom
+    s_eeprom_init();
 
-    hal_eeprom_init(hal_eeprom_emulatedflash, &ee_cfg);
 
-    #warning -> acemor: la cfg data e' presa dalla libreria di eEcommon. vedi bootloader
+
+
     // get config data from eeprom
-    res = SIXsg_config_read_from_eeprom(&my_6sg_cfg); 
+    res = SIXsg_config_init(&my_6sg_cfg_behav); 
     s_check_fault_error(res);
+
+    //set here global var
+    cfg_ptr = SIXsg_config_get();
+    if(NULL == cfg_ptr)
+    {
+        s_check_fault_error(hal_res_NOK_generic);
+        #warning: migliora gestione errore grave!!!!
+    }
 
     // initialise peripherals
     hal_led_init(led_yellow, &l_cfg);
     hal_led_init(led_red, &l_cfg);
-    s_can_init(my_6sg_cfg.asfidanken_shared_data.asfidanken_can_address);
+    s_can_init(cfg_ptr->gen_ee_data.board_address);
 
     // init application modules
-    res = adc_init(&my_6sg_cfg);
+    res = adc_init(cfg_ptr);
     s_check_fault_error(res);
-    ampl_init(&my_6sg_cfg);     // Note: here I don't check result, because I'm sure &my_6sg_cfg now exists.
-    sender_init(&my_6sg_cfg);
-    parser_init(&my_6sg_cfg);
-    calculator_init(&my_6sg_cfg);
+    ampl_init(cfg_ptr);     // Note: here I don't check result, because I'm sure &my_6sg_cfg now exists.
+    sender_init(cfg_ptr);
+    parser_init(cfg_ptr);
+    calculator_init(cfg_ptr);
 
     // start using the application modules
     ampl_set_gain_and_offset();
@@ -362,7 +378,7 @@ static void s_appl_init(void)
     s_resetCause_send();
 
     // notify I'm alive    
-    frame.id = my_6sg_cfg.asfidanken_shared_data.asfidanken_can_address;
+    frame.id = cfg_ptr->gen_ee_data.board_address;
     frame.id_type = hal_can_frameID_std;
     frame.frame_type = hal_can_frame_data;
     frame.size = 5;
@@ -384,7 +400,7 @@ static void s_hal_error_resetCause_send(void)
 
     #warning VALE-> add this function to HAL??
 
-    frame.id = my_6sg_cfg.asfidanken_shared_data.asfidanken_can_address;
+    frame.id = cfg_ptr->gen_ee_data.board_address;
     frame.id_type = hal_can_frameID_std;
     frame.frame_type = hal_can_frame_data;
     frame.size = 8;
@@ -498,6 +514,28 @@ static void s_on_tick(void)
 
 }
 
+static void s_eeprom_init(void)
+{
+   static uint8_t flash[1024];
+#define CRC16_USE_CRC16TABLE_IN_ROM
+#ifndef CRC16_USE_CRC16TABLE_IN_ROM
+    static uint16_t crc16table[256];
+#else
+    static uint16_t* crc16table = NULL;
+#endif
+    hal_eeprom_cfg_t eepromcfg;
+    hal_crc_cfg_t crccfg;
+
+
+    eepromcfg.flashpagebuffer   = flash;
+    eepromcfg.flashpagesize     = sizeof(flash);    
+    hal_eeprom_init(hal_eeprom_emulatedflash, &eepromcfg);
+    
+    crccfg.order                = hal_crc_order_16;
+    crccfg.polynomial           = hal_crc_poly_crc16_ccitt;
+    crccfg.crctblram            = crc16table; // not when hal_crc_poly_crc16_ccitt uses a precalculated const internal table
+    hal_crc_init(hal_crc0, &crccfg);
+}
 
 
 
@@ -511,7 +549,9 @@ static void s_can_init(uint8_t board_address)
         .priorx         = hal_int_priority04,
         .priotx         = hal_int_priority05,
         .callback_on_rx = s_can_callBkp_onRec,
-        .arg_cb_tx      = NULL    
+        .arg_cb_rx      = NULL,   
+        .callback_on_tx = NULL,
+        .arg_cb_tx      = NULL   
     };
 
     hal_can_init(hal_can_port1, &config);
@@ -554,21 +594,21 @@ static void s_send_outgoing_msg(void)
     frame.id_type = hal_can_frameID_std;
     frame.frame_type = hal_can_frame_data;
     frame.size = 6; //o 7 con saturazione!!!
-    if(tx_outMsg_torqueData_on ==  my_6sg_cfg.behaviour_cfg.tx_outMsg_mode)
+    if(tx_outMsg_torqueData_on ==  cfg_ptr->behaviour_cfg.tx_outMsg_mode)
     {
-        frame.id = (CAN_MSG_CLASS_PERIODIC) | (my_6sg_cfg.asfidanken_shared_data.asfidanken_can_address<<4) | (CAN_CMD_TORQUE_VECTOR) ;
+        frame.id = (CAN_MSG_CLASS_PERIODIC) | (cfg_ptr->gen_ee_data.board_address<<4) | (CAN_CMD_TORQUE_VECTOR) ;
         memcpy(frame.data, output.s.torque, sizeof(int16_t) *3);
         hal_can_put(hal_can_port1, &frame, hal_can_send_highprio_now );
     }
-    else if(tx_outMsg_torqueForceData_on ==  my_6sg_cfg.behaviour_cfg.tx_outMsg_mode) 
+    else if(tx_outMsg_torqueForceData_on ==  cfg_ptr->behaviour_cfg.tx_outMsg_mode) 
     {
         //send torque values
-        frame.id = (CAN_MSG_CLASS_PERIODIC) | (my_6sg_cfg.asfidanken_shared_data.asfidanken_can_address<<4) | (CAN_CMD_TORQUE_VECTOR) ;
+        frame.id = (CAN_MSG_CLASS_PERIODIC) | (cfg_ptr->gen_ee_data.board_address<<4) | (CAN_CMD_TORQUE_VECTOR) ;
         memcpy(frame.data, output.s.torque, sizeof(int16_t) *3);
         hal_can_put(hal_can_port1, &frame, hal_can_send_highprio_now );
 
         //send force values
-        frame.id = (CAN_MSG_CLASS_PERIODIC) | (my_6sg_cfg.asfidanken_shared_data.asfidanken_can_address<<4) | (CAN_CMD_FORCE_VECTOR) ;
+        frame.id = (CAN_MSG_CLASS_PERIODIC) | (cfg_ptr->gen_ee_data.board_address<<4) | (CAN_CMD_FORCE_VECTOR) ;
         memcpy(frame.data, output.s.force, sizeof(int16_t) *3);
         hal_can_put(hal_can_port1, &frame, hal_can_send_highprio_now );
     }
@@ -590,27 +630,27 @@ static void s_send_outgoing_msg_TEST(void)
     frame.id_type = hal_can_frameID_std;
     frame.frame_type = hal_can_frame_data;
     frame.size = 6; //o 7 con saturazione!!!
-    if(tx_outMsg_torqueData_on ==  my_6sg_cfg.behaviour_cfg.tx_outMsg_mode)
+    if(tx_outMsg_torqueData_on ==  cfg_ptr->behaviour_cfg.tx_outMsg_mode)
     {
-        frame.id = (CAN_MSG_CLASS_PERIODIC) | (asfidanken_board_address<<4) | (CAN_CMD_TORQUE_VECTOR) ;
+        frame.id = (CAN_MSG_CLASS_PERIODIC) | (cfg_ptr->gen_ee_data.board_address<<4) | (CAN_CMD_TORQUE_VECTOR) ;
         memcpy(frame.data, &adc_values[0], sizeof(int16_t)*3);
         hal_can_put(hal_can_port1, &frame, hal_can_send_highprio_now );
     }
-    else if(tx_outMsg_torqueForceData_on ==  my_6sg_cfg.behaviour_cfg.tx_outMsg_mode) 
+    else if(tx_outMsg_torqueForceData_on ==  cfg_ptr->behaviour_cfg.tx_outMsg_mode) 
     {
         //send torque values
-        frame.id = (CAN_MSG_CLASS_PERIODIC) | (asfidanken_board_address<<4) | (CAN_CMD_TORQUE_VECTOR) ;
+        frame.id = (CAN_MSG_CLASS_PERIODIC) | (cfg_ptr->gen_ee_data.board_address<<4) | (CAN_CMD_TORQUE_VECTOR) ;
         memcpy(frame.data, &adc_values[0], sizeof(int16_t) *3);
         hal_can_put(hal_can_port1, &frame, hal_can_send_highprio_now );
 
         //send force values
-        frame.id = (CAN_MSG_CLASS_PERIODIC) | (asfidanken_board_address<<4) | (CAN_CMD_FORCE_VECTOR) ;
+        frame.id = (CAN_MSG_CLASS_PERIODIC) | (cfg_ptr->gen_ee_data.board_address<<4) | (CAN_CMD_FORCE_VECTOR) ;
         memcpy(frame.data, &adc_values[3], sizeof(int16_t) *3);
         hal_can_put(hal_can_port1, &frame, hal_can_send_highprio_now );
     }
-    else if(tx_outMsg_forceData_on ==  my_6sg_cfg.behaviour_cfg.tx_outMsg_mode) 
+    else if(tx_outMsg_forceData_on ==  cfg_ptr->behaviour_cfg.tx_outMsg_mode) 
     {
-        frame.id = (CAN_MSG_CLASS_PERIODIC) | (asfidanken_board_address<<4) | (CAN_CMD_FORCE_VECTOR) ;
+        frame.id = (CAN_MSG_CLASS_PERIODIC) | (cfg_ptr->gen_ee_data.board_address<<4) | (CAN_CMD_FORCE_VECTOR) ;
         memcpy(frame.data, &adc_values[3], sizeof(int16_t)*3);
         hal_can_put(hal_can_port1, &frame, hal_can_send_highprio_now );
     }

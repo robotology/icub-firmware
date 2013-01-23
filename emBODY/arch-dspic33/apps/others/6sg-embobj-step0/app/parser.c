@@ -327,10 +327,10 @@ static hal_result_t s_cmd_set_board_addr(uint8_t *data_in, uint8_t *data_out, ui
         return(hal_res_NOK_wrongparam);
     }
     
-    CFG_GEN_EEDATA.asfidanken_can_address = data_in[1];
+    CFG_GEN_EEDATA.board_address = data_in[1];
     
-    hal_can_receptionfilter_set(hal_can_port1, 0, 0x70F, 2, (CAN_MSG_CLASS_POLLING|CFG_GEN_EEDATA.asfidanken_can_address ), hal_can_frameID_std);
-    hal_can_receptionfilter_set(hal_can_port1, 0, 0x70F, 0, (CAN_MSG_CLASS_LOADER|CFG_GEN_EEDATA.asfidanken_can_address ), hal_can_frameID_std);
+    hal_can_receptionfilter_set(hal_can_port1, 0, 0x70F, 2, (CAN_MSG_CLASS_POLLING|CFG_GEN_EEDATA.board_address ), hal_can_frameID_std);
+    hal_can_receptionfilter_set(hal_can_port1, 0, 0x70F, 0, (CAN_MSG_CLASS_LOADER|CFG_GEN_EEDATA.board_address ), hal_can_frameID_std);
     //each time can addres is changed it must be saved in eeprom.
     SIXsg_boardAddress_save_to_eeprom(parser_data.SIXsg_config_ptr);
     
@@ -901,10 +901,10 @@ static hal_result_t s_cmd_save2eeprom(uint8_t *data_in, uint8_t *data_out, uint8
 
 static hal_result_t s_cmd_get_fw_version(uint8_t *data_in, uint8_t *data_out, uint8_t *len_data_out) // CAN_CMD_GET_FW_VERSION:
 {
-    srcCode_version_info_t* src_ver_ptr = srcCode_version_get_handler();
+    srcCode_version_info_t* src_ver_ptr = &parser_data.SIXsg_config_ptr->gen_ee_data.verinfo;
 
-    if( (src_ver_ptr->can_protocol.version == data_in[1]) &&
-        (src_ver_ptr->can_protocol.release == data_in[2]) )
+    if( (src_ver_ptr->can_protocol.major == data_in[1]) &&
+        (src_ver_ptr->can_protocol.minor == data_in[2]) )
     {
         parser_data.can_proto_compatibility = 1;
     }
@@ -915,11 +915,13 @@ static hal_result_t s_cmd_get_fw_version(uint8_t *data_in, uint8_t *data_out, ui
 
     data_out[0] = CAN_CMD_GET_FW_VERSION;
     data_out[1] = BOARD_TYPE_6SG; 
-    data_out[2] = src_ver_ptr->exe_file.version;
-    data_out[3] = src_ver_ptr->exe_file.release;
-    data_out[4] = src_ver_ptr->exe_file.build;
-    data_out[5] = src_ver_ptr->can_protocol.version;
-    data_out[6] = src_ver_ptr->can_protocol.release;            
+    data_out[2] = src_ver_ptr->exe_file.major;
+    data_out[3] = src_ver_ptr->exe_file.minor;
+//    data_out[4] = src_ver_ptr->exe_file.build;
+#warning VALE: cosa metta nella versione del build???
+
+    data_out[5] = src_ver_ptr->can_protocol.major;
+    data_out[6] = src_ver_ptr->can_protocol.minor;            
     data_out[7] = parser_data.can_proto_compatibility;
     
     
@@ -995,9 +997,10 @@ static hal_result_t s_parse_can_loaderMsg(uint8_t *data_in, uint8_t *data_out, u
         {
             data_out[0] = CMD_BROADCAST;
             data_out[1] = BOARD_TYPE_6SG; 
-            data_out[2] = src_ver_ptr->exe_file.version;    //Firmware version number for BOOTLOADER
-            data_out[3] = src_ver_ptr->exe_file.release;    //Firmware build number.
-            data_out[4] = src_ver_ptr->exe_file.build;        //Firmware build number.
+            data_out[2] = src_ver_ptr->exe_file.major;    //Firmware version number for BOOTLOADER
+            data_out[3] = src_ver_ptr->exe_file.minor;    //Firmware build number.
+ //           data_out[4] = src_ver_ptr->exe_file.build;        //Firmware build number.
+#warning VALE: --> cosa metto nel ver build???
             *len_data_out = 5; 
             
         } break;
@@ -1011,7 +1014,7 @@ static hal_result_t s_parse_can_loaderMsg(uint8_t *data_in, uint8_t *data_out, u
     
         case CMD_GET_ADDITIONAL_INFO:
         {
-            frame.id = CAN_MSG_CLASS_LOADER | ( CFG_GEN_EEDATA.asfidanken_can_address << 4 ) | (0);;
+            frame.id = CAN_MSG_CLASS_LOADER | ( CFG_GEN_EEDATA.board_address << 4 ) | (0);;
             frame.id_type = hal_can_frameID_std;
             frame.frame_type = hal_can_frame_data;
             frame.size = 6;

@@ -37,37 +37,9 @@
 
 #include <stdint.h>
 
-#warning --> askidanken ho definito srcCode_version_info_t
-
-typedef struct
-{
-    uint8_t     version;
-    uint8_t     release;
-    uint16_t    build;
-} asfidanken_version_t;
-
-typedef struct
-{
-    asfidanken_version_t    exe_file;
-    asfidanken_version_t    can_protocol;
-} srcCode_version_info_t;
-
-typedef struct
-{
-    uint8_t     asfidanken_can_address;
-} asfidanken_shared_data_t;
-
-
 #include "hal_base.h"
+#include "eEcommon.h"
 
-//#warning -> acemor: usare eEshared.h al posto di version_type.h
-//asfidanken: rimosso version_type
-// #include "version_type.h"
-
-//#warning -> acemor: non usare piu' il ee_shared_data.h
-
-//asfidanken: rimosso ee-shared_data
-//#include "ee_shared_data.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
@@ -88,21 +60,28 @@ typedef struct
 
 #define ADDITIONAL_INFO_MAX_LEN     32
 
-#if 0
+typedef struct
+{
+    eEversion_t exe_file;
+    eEversion_t can_protocol;
+} srcCode_version_info_t;
+
+
 /** @typedef    typedef struct general_ee_config_data_t;
-    @brief      contains data shared with bootloader. that must be saved in eeprom.
-                all applications with same bootloader must use this struct 
-                to get general purpose information, like board address.
+    @brief      contains some data shared with bootloader and they must be saved in eeprom.
+                In general, applications and bootloader share some info saved in eeprom.
+                some of them are mirrored in general_ee_config_data_t. 
+    @warning    currently additional info and serial number is not in shared memory, 
+                but in application memory, so I removed them from this struct
+                TODO: move them in shared memory!!
  **/
 typedef struct
 {
-    uint8_t hw_bits; //ee_erased, wd, bor,...
-    uint8_t board_address;
-    uint8_t additional_info[ADDITIONAL_INFO_MAX_LEN];
-    uint8_t serial_number[7]; //TODO: lo lascio qui o lo metto solo tra i dati della 6sg???????
+    uint8_t                 board_address;
+//    uint8_t                 additional_info[ADDITIONAL_INFO_MAX_LEN]; 
+//    uint8_t                 serial_number[7];
+    srcCode_version_info_t  verinfo;
 } general_ee_config_data_t;
-
-#endif
 
 /** @typedef    typedef struct amplifier_gain_t;
     @brief      contains gain values. The amplifier AD8555 applay gain in two steps for each channel. 
@@ -179,9 +158,7 @@ typedef struct
  **/
 typedef struct
 {
-    //general_ee_config_data_t    gen_ee_data;
-    //ee_shared_data_t            gen_ee_data;    /**< contains general information. all boards has this information.*/
-    asfidanken_shared_data_t    asfidanken_shared_data;
+    general_ee_config_data_t    gen_ee_data;
     SIXsg_ee_config_data_t      SIXsg_ee_data;  /**< contains specific information for 6SG application.*/
     config_behaviour_t          behaviour_cfg;
 } SIXsg_config_data_t;
@@ -196,27 +173,45 @@ typedef struct
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn         extern srcCode_version_info_t* srcCode_version_get_handler(void);
-    @brief      returns pointer to memory containg 6SG application and CAN protocol version infomation
+///** @fn         extern srcCode_version_info_t* srcCode_version_get_handler(void);
+//    @brief      returns pointer to memory containg 6SG application and CAN protocol version infomation
+//    @param      -
+//    @return     srcCode_version_info_t pointer
+// **/
+//extern srcCode_version_info_t* srcCode_version_get_handler(void);
+
+
+/** @fn         extern hal_result_t SIXsg_config_init(void)
+    @brief      init 6sg appl config. If eeprom is empty, save in eeprom default config
     @param      -
-    @return     srcCode_version_info_t pointer
+    @return     ok on success, othewise nok
  **/
-extern srcCode_version_info_t* srcCode_version_get_handler(void);
+extern hal_result_t SIXsg_config_init(config_behaviour_t *cfg_behav);
+
+
+/** @fn         hal_result_t SIXsg_config_get(SIXsg_config_data_t *cfg_ptr)
+    @brief      return pointer to 6sg application
+    @param      -
+    @return     NULL if SIXsg_config_init config is not ititalized with SIXsg_config_init func.
+ **/
+extern SIXsg_config_data_t * SIXsg_config_get(void);
+
+
 
 
 extern hal_result_t SIXsg_config_save_to_eeprom(SIXsg_config_data_t *cfg_ptr);
 
 
-/** @fn         extern hal_result_t SIXsg_config_read_from_eeprom(SIXsg_config_data_t *cfg_ptr)
-    @brief      reads from eeprom both general data and 6sg data and sets them in cfg_ptr,
-                i.e., saves the first in "gen_ee_data" field and the second in "SIXsg_ee_data" field of
-                SIXsg_config_data_t struct.
-                if eeprom is empty, set the default vaules in both fields.
-    @param      cfg_ptr         pointer to SIXsg_config_data_t struct.
-    @return     HAL_RES_NOK_ERROR_WRONG_PARAM if cfg_ptr
-                HAL_RES_OK otherwise
- **/
-extern hal_result_t SIXsg_config_read_from_eeprom(SIXsg_config_data_t *cfg_ptr);
+///** @fn         extern hal_result_t SIXsg_config_read_from_eeprom(SIXsg_config_data_t *cfg_ptr)
+//    @brief      reads from eeprom both general data and 6sg data and sets them in cfg_ptr,
+//                i.e., saves the first in "gen_ee_data" field and the second in "SIXsg_ee_data" field of
+//                SIXsg_config_data_t struct.
+//                if eeprom is empty, set the default vaules in both fields.
+//    @param      cfg_ptr         pointer to SIXsg_config_data_t struct.
+//    @return     HAL_RES_NOK_ERROR_WRONG_PARAM if cfg_ptr
+//                HAL_RES_OK otherwise
+// **/
+//extern hal_result_t SIXsg_config_read_from_eeprom(SIXsg_config_data_t *cfg_ptr);
 
 
 extern hal_result_t SIXsg_boardAddress_save_to_eeprom(SIXsg_config_data_t *cfg_ptr);
