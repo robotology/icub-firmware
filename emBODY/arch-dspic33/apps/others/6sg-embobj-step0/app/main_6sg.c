@@ -338,6 +338,10 @@ static void s_appl_init(void)
     hal_result_t res;
     hal_led_cfg_t l_cfg = { .dummy = 0 };
 
+    // initialise peripherals
+    hal_led_init(led_yellow, &l_cfg);
+    hal_led_init(led_red, &l_cfg);
+
     // init eeprom
     s_eeprom_init();
 
@@ -348,6 +352,7 @@ static void s_appl_init(void)
     res = SIXsg_config_init(&my_6sg_cfg_behav); 
     s_check_fault_error(res);
 
+    
     //set here global var
     cfg_ptr = SIXsg_config_get();
     if(NULL == cfg_ptr)
@@ -356,11 +361,10 @@ static void s_appl_init(void)
         #warning: migliora gestione errore grave!!!!
     }
 
-    // initialise peripherals
-    hal_led_init(led_yellow, &l_cfg);
-    hal_led_init(led_red, &l_cfg);
+ //   hal_led_on(led_red);
     s_can_init(cfg_ptr->gen_ee_data.board_address);
 
+   // hal_led_on(led_yellow);
     // init application modules
     res = adc_init(cfg_ptr);
     s_check_fault_error(res);
@@ -394,7 +398,7 @@ static void s_appl_init(void)
 
 
 
-static void s_hal_error_resetCause_send(void)
+static void s_resetCause_send(void)
 {
     hal_can_frame_t frame;
 
@@ -555,12 +559,12 @@ static void s_can_init(uint8_t board_address)
     };
 
     hal_can_init(hal_can_port1, &config);
-
+hal_led_on(led_red);
     hal_can_receptionfilter_set(hal_can_port1, 0, 0x70F, 0, (CAN_MSG_CLASS_POLLING| board_address), hal_can_frameID_std);
     hal_can_receptionfilter_set(hal_can_port1, 0, 0x70F, 1, (CAN_MSG_CLASS_POLLING| 0xF), hal_can_frameID_std);
     hal_can_receptionfilter_set(hal_can_port1, 0, 0x70F, 2, (CAN_MSG_CLASS_LOADER| board_address), hal_can_frameID_std);
     hal_can_receptionfilter_set(hal_can_port1, 0, 0x70F, 3, (CAN_MSG_CLASS_LOADER| 0xF), hal_can_frameID_std);
-
+hal_led_on(led_yellow);
 
     hal_can_enable(hal_can_port1);
 }

@@ -69,7 +69,7 @@
 
 //shortcut to access configuration data
 #define CFG_6SG_BEHAV                   parser_data.SIXsg_config_ptr->behaviour_cfg
-#define CFG_GEN_EEDATA                  parser_data.SIXsg_config_ptr->asfidanken_shared_data
+#define CFG_GEN_EEDATA                  parser_data.SIXsg_config_ptr->gen_ee_data
 #define CFG_6SG_EEDATA                  parser_data.SIXsg_config_ptr->SIXsg_ee_data
 
 
@@ -221,7 +221,7 @@ static const parser_cmd_func_table_t cmd_func_tbl =
 
 extern hal_result_t parser_init(SIXsg_config_data_t *cfg_ptr)
 {
-    parser_data.ee_data_is_saved = 0; //todo: metti enum
+    parser_data.ee_data_is_saved = 1; //todo: metti enum
     if(NULL == cfg_ptr)
     {
         return(hal_res_NOK_nullpointer);
@@ -298,7 +298,7 @@ extern hal_result_t parse_message(void)
     */
     if( ((len_data_out > 0) && (len_data_out <=  hal_can_frame_payload_maxlen)) || ( (CFG_6SG_BEHAV.send_ack_each_cmd) && (len_data_out == 0)) )
     {
-        s_frame_fill(&msg_out,  /*src*/CFG_GEN_EEDATA.asfidanken_can_address, /*dest*/(GET_CMD_SRC(msg_in.id)), data_out, len_data_out);
+        s_frame_fill(&msg_out,  /*src*/CFG_GEN_EEDATA.board_address, /*dest*/(GET_CMD_SRC(msg_in.id)), data_out, len_data_out);
         res = hal_can_put(hal_can_port1, &msg_out, hal_can_send_normprio_now);
         while(hal_res_NOK_busy == res)
         {
@@ -939,9 +939,9 @@ static hal_result_t s_cmd_get_ch_gain(uint8_t *data_in, uint8_t *data_out, uint8
 
     data_out[0] = CAN_CMD_GET_CH_GAIN;
     data_out[1] = data_in[1];
-    data_out[2] = (CFG_6SG_EEDATA.an_channel_gain[data_in[1]].first_step) >> 4;
+    data_out[2] = (CFG_6SG_EEDATA.an_channel_gain[data_in[1]].first_step) >> 8;
     data_out[3] = (CFG_6SG_EEDATA.an_channel_gain[data_in[1]].first_step) &0xFF; 
-    data_out[4] = (CFG_6SG_EEDATA.an_channel_gain[data_in[1]].second_step) >> 4;
+    data_out[4] = (CFG_6SG_EEDATA.an_channel_gain[data_in[1]].second_step) >> 8;
     data_out[5] = (CFG_6SG_EEDATA.an_channel_gain[data_in[1]].second_step) &0xFF; 
  
 
@@ -959,8 +959,8 @@ static hal_result_t s_cmd_set_ch_gain(uint8_t *data_in, uint8_t *data_out, uint8
     
     parser_data.ee_data_is_saved = 0;
 
-    CFG_6SG_EEDATA.an_channel_gain[data_in[1]].first_step = (data_in[2]<<4) | data_in[3];  
-    CFG_6SG_EEDATA.an_channel_gain[data_in[1]].second_step = (data_in[4]<<4) | data_in[5];  
+    CFG_6SG_EEDATA.an_channel_gain[data_in[1]].first_step = (data_in[2]<<8) | data_in[3];  
+    CFG_6SG_EEDATA.an_channel_gain[data_in[1]].second_step = (data_in[4]<<8) | data_in[5];  
 
     //TODO: 
     ampl_set_gain_and_offset();
@@ -988,8 +988,8 @@ static hal_result_t s_parse_can_loaderMsg(uint8_t *data_in, uint8_t *data_out, u
     hal_can_frame_t frame;
     hal_result_t res = hal_res_OK;
     
-    srcCode_version_info_t* src_ver_ptr = srcCode_version_get_handler();
 
+    srcCode_version_info_t* src_ver_ptr = &(parser_data.SIXsg_config_ptr->gen_ee_data.verinfo);
     switch (data_in[0])
     {
 #warning -> acemor: qui al CMD_BROADCAST si risponde con tre bytes: version, release, build mentre nel bootloader con due. ???    
@@ -998,7 +998,8 @@ static hal_result_t s_parse_can_loaderMsg(uint8_t *data_in, uint8_t *data_out, u
             data_out[0] = CMD_BROADCAST;
             data_out[1] = BOARD_TYPE_6SG; 
             data_out[2] = src_ver_ptr->exe_file.major;    //Firmware version number for BOOTLOADER
-            data_out[3] = src_ver_ptr->exe_file.minor;    //Firmware build number.
+            data_out[3] = src_ver_ptr->exe_file.minor; 
+            data_out[4] = 0;
  //           data_out[4] = src_ver_ptr->exe_file.build;        //Firmware build number.
 #warning VALE: --> cosa metto nel ver build???
             *len_data_out = 5; 

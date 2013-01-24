@@ -323,7 +323,7 @@ extern hal_result_t SIXsg_config_init(config_behaviour_t *cfg_behav)
     const eEsharinfoPartable_t *ptab;
     hal_result_t res;
     SIXsg_ee_config_data_t ee_cfg_data;
-    uint32_t s_canaddr = 0x0E;
+    uint32_t s_canaddr = 0x0A;
 
     //1) if i have a cfg behaviour i copy it in appl cfg
     if(NULL != cfg_behav)
