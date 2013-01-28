@@ -35,13 +35,13 @@
 
 
 #ifdef _TIMER_HW_
-     #include "hal_timer.h"   
+     #include "hal_timer.h"  
 #else
-    #include "EOStheFOOP.h"
     #include "EOtimer.h"
     #include "EOaction.h"
 #endif
 
+    #include "EOStheFOOP.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -195,7 +195,7 @@ static void s_sender_tmr_hw_init(void)
     };
 
     hal_timer_init(hal_timer4, &tmr_cfg, NULL);
-    hal_timer_offset_write(hal_timer4, 0, hal_timer_measurement_microsec);
+    hal_timer_offset_write(hal_timer4, 0);
     hal_timer_interrupt_enable(hal_timer4);
 
 }
