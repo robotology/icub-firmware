@@ -532,7 +532,7 @@ extern hal_result_t hal_timer_offset_write(hal_timer_t timer, hal_nanotime_t off
         return(hal_res_NOK_generic);
     }
 
-    if(offset >= s_hal_timer_info[HAL_timer_t2index(timer)]->cfg.countdown)
+    if(offset >= (s_hal_timer_info[HAL_timer_t2index(timer)]->cfg.countdown*1000L))
     {
         return(hal_res_NOK_wrongparam);
     }
