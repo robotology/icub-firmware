@@ -268,9 +268,9 @@ extern void hal_sys_irqn_priority_set(hal_irqn_t irqn, hal_interrupt_priority_t 
         s_hal_sys_irqn_prioset(irqn, 0);    // on dspic 0 disable the isr
     }
     
-    if(dspicprio > 6)
+    if(dspicprio > 7)
     {
-        dspicprio = 6;
+        dspicprio = 7;
     }
     dspicprio = 7 - dspicprio;              // on dspic 1 is less priotity than 2, 3, 4, and 5 whcih is the highest interruptible priority 
     
