@@ -50,8 +50,8 @@ typedef union
     int16_t array[AN_CHANNEL_NUM];
     struct // TODO: add packed attribute???
     {
-        int16_t torque[3];
         int16_t force[3];
+        int16_t torque[3];
     }s; //s stand for semantic data
 } calc_data_output_t;
     

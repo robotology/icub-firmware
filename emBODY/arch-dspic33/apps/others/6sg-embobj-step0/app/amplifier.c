@@ -268,7 +268,7 @@ static void s_ampl_timer_init(void)
     {
         .prescaler = hal_timer_prescaler1,         
         .countdown = 10,            //tmr3_cfg.match_value = 400;
-        .priority = hal_int_priority04,
+        .priority = hal_int_priority03,
         .mode = hal_timer_mode_periodic,
         .callback_on_exp = s_ampl_timer_callback,
         .arg = NULL

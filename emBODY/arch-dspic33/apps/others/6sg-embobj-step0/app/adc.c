@@ -431,12 +431,28 @@ extern void adc_filtering_start(void)
     {
         for( sample = 0, offs = 0; sample < ADC_NUM_SAMPLES; offs += 6, sample++)
         {
-            adc_data.values[0][sample] = adc_spi_dmabuf1[0 + offs] + HEX_VALC;
-            adc_data.values[1][sample] = adc_spi_dmabuf1[1 + offs] + HEX_VALC;
-            adc_data.values[2][sample] = adc_spi_dmabuf1[2 + offs] + HEX_VALC;
-            adc_data.values[3][sample] = adc_spi_dmabuf1[3 + offs] + HEX_VALC;
-            adc_data.values[4][sample] = adc_spi_dmabuf1[4 + offs] + HEX_VALC;
-            adc_data.values[5][sample] = adc_spi_dmabuf1[5 + offs] + HEX_VALC;
+//            adc_data.values[0][sample] = adc_spi_dmabuf1[0 + offs] + HEX_VALC;
+//            adc_data.values[1][sample] = adc_spi_dmabuf1[1 + offs] + HEX_VALC;
+//            adc_data.values[2][sample] = adc_spi_dmabuf1[2 + offs] + HEX_VALC;
+//            adc_data.values[3][sample] = adc_spi_dmabuf1[3 + offs] + HEX_VALC;
+//            adc_data.values[4][sample] = adc_spi_dmabuf1[4 + offs] + HEX_VALC;
+//            adc_data.values[5][sample] = adc_spi_dmabuf1[5 + offs] + HEX_VALC;
+
+//con swap            
+            adc_data.values[1][sample] = adc_spi_dmabuf1[0 + offs] + HEX_VALC;
+            adc_data.values[2][sample] = adc_spi_dmabuf1[1 + offs] + HEX_VALC;
+            adc_data.values[3][sample] = adc_spi_dmabuf1[2 + offs] + HEX_VALC;
+            adc_data.values[4][sample] = adc_spi_dmabuf1[3 + offs] + HEX_VALC;
+            adc_data.values[5][sample] = adc_spi_dmabuf1[4 + offs] + HEX_VALC;
+            adc_data.values[0][sample] = adc_spi_dmabuf1[5 + offs] + HEX_VALC;
+
+
+//            adc_data.values[0][sample] = 0x1 + HEX_VALC;
+//            adc_data.values[1][sample] = 0x2 + HEX_VALC;
+//            adc_data.values[2][sample] = 0x3 + HEX_VALC;
+//            adc_data.values[3][sample] = 0x4 + HEX_VALC;
+//            adc_data.values[4][sample] = 0x5 + HEX_VALC;
+//            adc_data.values[5][sample] = 0x6 + HEX_VALC;
         }
 
         adc_data.flt_wd.actual_flt_buff_infex = 1;
@@ -445,12 +461,27 @@ extern void adc_filtering_start(void)
     {
         for( sample = 0, offs = 0; sample < ADC_NUM_SAMPLES; offs += 6, sample++)
         {
-            adc_data.values[0][sample] = adc_spi_dmabuf2[0 + offs] + HEX_VALC;
-            adc_data.values[1][sample] = adc_spi_dmabuf2[1 + offs] + HEX_VALC;
-            adc_data.values[2][sample] = adc_spi_dmabuf2[2 + offs] + HEX_VALC;
-            adc_data.values[3][sample] = adc_spi_dmabuf2[3 + offs] + HEX_VALC;
-            adc_data.values[4][sample] = adc_spi_dmabuf2[4 + offs] + HEX_VALC;
-            adc_data.values[5][sample] = adc_spi_dmabuf2[5 + offs] + HEX_VALC;
+//            adc_data.values[0][sample] = adc_spi_dmabuf2[0 + offs] + HEX_VALC;
+//            adc_data.values[1][sample] = adc_spi_dmabuf2[1 + offs] + HEX_VALC;
+//            adc_data.values[2][sample] = adc_spi_dmabuf2[2 + offs] + HEX_VALC;
+//            adc_data.values[3][sample] = adc_spi_dmabuf2[3 + offs] + HEX_VALC;
+//            adc_data.values[4][sample] = adc_spi_dmabuf2[4 + offs] + HEX_VALC;
+//            adc_data.values[5][sample] = adc_spi_dmabuf2[5 + offs] + HEX_VALC;
+
+//con swap            
+            adc_data.values[1][sample] = adc_spi_dmabuf2[0 + offs] + HEX_VALC;
+            adc_data.values[2][sample] = adc_spi_dmabuf2[1 + offs] + HEX_VALC;
+            adc_data.values[3][sample] = adc_spi_dmabuf2[2 + offs] + HEX_VALC;
+            adc_data.values[4][sample] = adc_spi_dmabuf2[3 + offs] + HEX_VALC;
+            adc_data.values[5][sample] = adc_spi_dmabuf2[4 + offs] + HEX_VALC;
+            adc_data.values[0][sample] = adc_spi_dmabuf2[5 + offs] + HEX_VALC;
+
+//            adc_data.values[0][sample] = 0x1 + HEX_VALC;
+//            adc_data.values[1][sample] = 0x2 + HEX_VALC;
+//            adc_data.values[2][sample] = 0x3 + HEX_VALC;
+//            adc_data.values[3][sample] = 0x4 + HEX_VALC;
+//            adc_data.values[4][sample] = 0x5 + HEX_VALC;
+//            adc_data.values[5][sample] = 0x6 + HEX_VALC;
         }
 
         adc_data.flt_wd.actual_flt_buff_infex = 2;
@@ -519,6 +550,8 @@ extern void adc_filtering_continue(void)
 
 extern hal_result_t adc_get_data(int16_t *buff)
 {
+    int16_t aux[AN_CHANNEL_NUM];
+    int8_t i;
 
     if(NULL == buff)
     {
@@ -822,7 +855,7 @@ static void s_adc_ad7689_timers_init(void)
     {
         .prescaler          = hal_timer_prescaler1,         
         .countdown          = ADC_SAMPLE_RATE,
-        .priority           = hal_int_priority07,
+        .priority           = hal_int_priority00,
         .mode               = hal_timer_mode_periodic,
         .callback_on_exp    = s_adc_ad7689_timer2_callback,
         .arg                = NULL

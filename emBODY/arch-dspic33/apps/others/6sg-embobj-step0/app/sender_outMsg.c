@@ -188,7 +188,7 @@ static void s_sender_tmr_hw_init(void)
     {
         .prescaler = hal_timer_prescaler64,         
         .countdown = (sender_data.SIXsg_config_ptr->SIXsg_ee_data.can_msg_datarate*1000),
-        .priority = hal_int_priority06,        
+        .priority = hal_int_priority01,        
         .mode = hal_timer_mode_periodic,
         .callback_on_exp = s_sender_tmr_hw_callbkp,
         .arg = NULL 

@@ -161,6 +161,7 @@ static /*const*/ eOssystem_cfg_t s_syscfg =
     .userdef                                =
     {
         .systickperiod                      = 500,
+        .systickpriority                    = hal_int_priority07, 
         .on_systick                         = s_on_tick //NULL //s_my_on_tick 
     }
 };
@@ -223,7 +224,7 @@ static config_behaviour_t my_6sg_cfg_behav =
 {
     .send_ack_each_cmd = 1, //if = 1 send ack for each command (polling msg)
     .save_in_ee_immediately = 1, //if = 1 save current values of ee_data in eeprom each time a cmd change a value of data in eeprom.      
-    .filt_data_mode = filtMode_iir, // filtMode_iir, //TODO: da spostare per adc
+    .filt_data_mode = filtMode_none,// filtMode_iir, //TODO: da spostare per adc
     .tx_outMsg_mode = tx_outMsg_off  //tx_outMsg_torqueData_on
 };
 
@@ -550,8 +551,8 @@ static void s_can_init(uint8_t board_address)
     {
         .runmode        = hal_can_runmode_isr_2txq1rxq,
         .baudrate       = hal_can_baudrate_1mbps,
-        .priorx         = hal_int_priority04,
-        .priotx         = hal_int_priority05,
+        .priorx         = hal_int_priority03,
+        .priotx         = hal_int_priority02,
         .callback_on_rx = s_can_callBkp_onRec,
         .arg_cb_rx      = NULL,   
         .callback_on_tx = NULL,
@@ -559,12 +560,11 @@ static void s_can_init(uint8_t board_address)
     };
 
     hal_can_init(hal_can_port1, &config);
-hal_led_on(led_red);
+
     hal_can_receptionfilter_set(hal_can_port1, 0, 0x70F, 0, (CAN_MSG_CLASS_POLLING| board_address), hal_can_frameID_std);
     hal_can_receptionfilter_set(hal_can_port1, 0, 0x70F, 1, (CAN_MSG_CLASS_POLLING| 0xF), hal_can_frameID_std);
     hal_can_receptionfilter_set(hal_can_port1, 0, 0x70F, 2, (CAN_MSG_CLASS_LOADER| board_address), hal_can_frameID_std);
     hal_can_receptionfilter_set(hal_can_port1, 0, 0x70F, 3, (CAN_MSG_CLASS_LOADER| 0xF), hal_can_frameID_std);
-hal_led_on(led_yellow);
 
     hal_can_enable(hal_can_port1);
 }
@@ -607,19 +607,28 @@ static void s_send_outgoing_msg(void)
     else if(tx_outMsg_torqueForceData_on ==  cfg_ptr->behaviour_cfg.tx_outMsg_mode) 
     {
         //send torque values
-        frame.id = (CAN_MSG_CLASS_PERIODIC) | (cfg_ptr->gen_ee_data.board_address<<4) | (CAN_CMD_TORQUE_VECTOR) ;
-        memcpy(frame.data, output.s.torque, sizeof(int16_t) *3);
+        frame.id = (CAN_MSG_CLASS_PERIODIC) | (cfg_ptr->gen_ee_data.board_address<<4) | (CAN_CMD_TORQUE_VECTOR) ; //0xB
+//since board 6sg does not differcnces torque value from force, but they are all force, here I use arry
+        //memcpy(frame.data, output.s.torque, sizeof(int16_t) *3);
+        memcpy(frame.data, &output.array[3], sizeof(int16_t) *3);
         hal_can_put(hal_can_port1, &frame, hal_can_send_highprio_now );
 
         //send force values
-        frame.id = (CAN_MSG_CLASS_PERIODIC) | (cfg_ptr->gen_ee_data.board_address<<4) | (CAN_CMD_FORCE_VECTOR) ;
-        memcpy(frame.data, output.s.force, sizeof(int16_t) *3);
+        frame.id = (CAN_MSG_CLASS_PERIODIC) | (cfg_ptr->gen_ee_data.board_address<<4) | (CAN_CMD_FORCE_VECTOR) ; //0xA
+        //memcpy(frame.data, output.s.force, sizeof(int16_t) *3);
+//since board 6sg does not differcnces torque value from force, but they are all force, here I use arry
+        memcpy(frame.data, &output.array[0], sizeof(int16_t) *3);
         hal_can_put(hal_can_port1, &frame, hal_can_send_highprio_now );
     }
 #ifdef _DEBUG_
     LATAbits.LATA3 =  ~LATAbits.LATA3;
 #endif
 }
+
+
+
+
+
 
 #ifdef _DEBUG_
 static void s_send_outgoing_msg_TEST(void)
@@ -628,8 +637,15 @@ static void s_send_outgoing_msg_TEST(void)
     hal_can_frame_t frame;
     int16_t adc_values[AN_CHANNEL_NUM] = {1,2,3,4,5,6};
     calc_data_output_t output;
+    hal_result_t res;
 
-    calculate_torque_and_force_data(adc_values, &output);
+    res = adc_get_data(adc_values);
+    if(hal_res_NOK_nodata == res)
+    {
+        return;
+    }
+
+//    calculate_torque_and_force_data(adc_values, &output);
 
     frame.id_type = hal_can_frameID_std;
     frame.frame_type = hal_can_frame_data;
