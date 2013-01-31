@@ -145,7 +145,9 @@ typedef struct
     hal_interrupt_priority_t    priorx;
     hal_interrupt_priority_t    priotx;
     void (*callback_on_rx)(void *arg);
-    void *arg;
+    void *arg_cb_rx;
+    void (*callback_on_tx)(void *arg);
+    void *arg_cb_tx;
 } hal_can_cfg_t;
 
 
