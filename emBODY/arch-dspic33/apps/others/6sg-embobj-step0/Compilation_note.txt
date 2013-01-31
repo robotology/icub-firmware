@@ -1,0 +1,1 @@
+In oreder to compile application to flash in board with bootloader , you should be sure that -o2 option is used.
