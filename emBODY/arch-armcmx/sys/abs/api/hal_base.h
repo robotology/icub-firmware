@@ -190,8 +190,8 @@ typedef void (*hal_callback_t) (void* p);
 
 /** @typedef    typedef enum hal_interrupt_priority_t;
     @brief      rappresents the possible values for interrupt priorities.
-                On ARM:     0 is highest priority. 
-                On DSPIC:   0 is lowest priority
+					0 is highest priority (both ARM and DSPIC)
+					For DSPIC the lowest priority is 7, so if you use prio from 7 to 15 they are the same value(7).
  **/
 typedef enum
 {
