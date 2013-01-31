@@ -1,1 +1,4 @@
 In oreder to compile application to flash in board with bootloader , you should be sure that -o2 option is used.
+
+With -02 option the code has size fit in application flash area.
+If you use -03 or -0s the application does NOT work properly: propably compilator remove some wait condition or nop operation.
