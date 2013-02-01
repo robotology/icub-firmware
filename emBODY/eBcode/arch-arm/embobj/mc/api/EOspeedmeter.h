@@ -27,7 +27,7 @@ extern "C" {
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-#define ENC_INVALID -1
+#define ENC_INVALID 0x7FFFFFFF
 
 //#define USE_2FOC_FAST_ENCODER
 

@@ -77,6 +77,8 @@ extern EOmotors* eo_motors_New(uint8_t n_motors)
 
     if (o)
     {
+        //for (uint8_t m=0; m<MAX_MOTORS; ++m) o->motorON[m] = eobool_true;
+        
         if (n_motors > MAX_MOTORS) n_motors = MAX_MOTORS;
         
         o->n_motors = n_motors;
@@ -90,20 +92,33 @@ extern EOmotors* eo_motors_New(uint8_t n_motors)
     return o;
 }
 
+extern eObool_t eo_motors_is_motorON(EOmotors *o, uint8_t m)
+{
+    if (o && m<MAX_MOTORS) return o->motorON[m];
+    
+    return eobool_false;
+}
+
+extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, eObool_t on_off)
+{
+    if (o && m<MAX_MOTORS) o->motorON[m] = on_off;
+}
+
 extern void eo_motors_PWMs_Shoulder(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor)
 {
-    if (!o) return;
+    //pwm_motor[0] = (int16_t)(      pwm_joint[0]);
+    //pwm_motor[1] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]))/40);
+    //pwm_motor[2] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]))/40);
+
+    pwm_motor[0] = (int16_t)( pwm_joint[0]);
+    pwm_motor[1] = (int16_t)(-pwm_joint[0]+pwm_joint[1]);
+    pwm_motor[2] = (int16_t)(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]);
     
-    pwm_motor[0] = (int16_t)(      pwm_joint[0]);
-    pwm_motor[1] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]))/40);
-    pwm_motor[2] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]))/40);
     pwm_motor[3] = (int16_t)pwm_joint[3];
 }
 
 extern void eo_motors_PWMs_Waist(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor)
 {
-    if (!o) return;
-    
     pwm_motor[0] = (int16_t)((pwm_joint[0]-pwm_joint[1])/2);
     pwm_motor[1] = (int16_t)((pwm_joint[0]+pwm_joint[1])/2);
     pwm_motor[2] = (int16_t)  pwm_joint[2];

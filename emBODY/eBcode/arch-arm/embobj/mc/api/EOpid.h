@@ -78,7 +78,7 @@ extern void eo_pid_Reset(EOpid *o);
     @return     The actual PWM output value.
  **/
 
-extern int32_t eo_pid_PWM2(EOpid *o, float En, float Vref, float Venc);
+extern int32_t eo_pid_PWM2(EOpid *o, float En, float Vref, float Aref, float Venc);
 extern int32_t eo_pid_PWM(EOpid *o, float En);
 
 /** @}            
