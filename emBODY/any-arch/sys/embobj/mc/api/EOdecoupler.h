@@ -59,6 +59,9 @@ extern void eo_motors_PWMs_Waist(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_m
 
 extern eObool_t eo_motors_CableLimitAlarm(int32_t j0, int32_t j1, int32_t j2);
 
+extern eObool_t eo_motors_is_motorON(EOmotors *o, uint8_t m);
+extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, eObool_t on_off);
+
 
 /** @}            
     end of group eo_decopler  

@@ -121,7 +121,6 @@ extern EOaxisController* eo_axisController_New(int32_t ticks_per_rev)
         o->err = 0.0f;
 
         o->ready_mask = 0;
-        //o->enc_offset = 0;
         
         o->position = 0;
         o->velocity = 0;
@@ -319,8 +318,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
     case eomc_controlmode_cmd_position:
         if (!CHK_BIT(MASK_POS_INIT_OK)) return eobool_false;
     //case eomc_controlmode_cmd_position_force:
-        eo_pid_Reset(o->pidP);
-        //eo_trajectory_Stop(o->trajectory, o->acc_stop_cmode);            
+        eo_pid_Reset(o->pidP);            
         eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION(), o->acc_stop_cmode);
         o->control_mode = eomc_controlmode_position;
         break;
@@ -357,6 +355,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
     
     float pos_ref;
     float vel_ref;
+    float acc_ref;
     
     int32_t pos = GET_AXIS_POSITION();
     int32_t vel = GET_AXIS_VELOCITY();
@@ -392,7 +391,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
         
         case eomc_controlmode_calib:
         {
-            eo_trajectory_PosStep(o->trajectory, &pos_ref, &vel_ref);
+            eo_trajectory_PosStep(o->trajectory, &pos_ref, &vel_ref, &acc_ref);
             
             o->err = pos_ref - pos;
 
@@ -415,14 +414,14 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
                 }
             }
 
-            return eo_pid_PWM2(o->pidP, o->err, vel_ref, vel);
+            return eo_pid_PWM2(o->pidP, o->err, vel_ref, acc_ref, vel);
         }
 
         case eomc_controlmode_velocity_pos:
         case eomc_controlmode_position:
         case eomc_controlmode_velocity:
         {            
-            if (eo_trajectory_PosStep(o->trajectory, &pos_ref, &vel_ref))
+            if (eo_trajectory_PosStep(o->trajectory, &pos_ref, &vel_ref, &acc_ref))
             {
                 eo_pid_Reset(o->pidP); // position limit reached
             }
@@ -434,9 +433,21 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
             
             o->err = pos_ref - pos;
 
-            if (big_error_flag && (o->err<-800.0 || o->err>800.0)) *big_error_flag = eobool_true;
+            int32_t pwm = eo_pid_PWM2(o->pidP, o->err, vel_ref, acc_ref, vel);
             
-            return eo_pid_PWM2(o->pidP, o->err, vel_ref, vel);
+            if (big_error_flag)
+            {
+                if (o->err<-2500.f || 2500.f<o->err)
+                {
+                    *big_error_flag = eobool_true;
+                }
+                else if ((pwm<-3000 || 3000<pwm) && (o->err<-800.f || 800.f<o->err) && (-1000.f<vel && vel<1000.f))
+                {
+                    *big_error_flag = eobool_true;
+                }
+            }
+            
+            return pwm;
         }
        
         case eomc_controlmode_torque:

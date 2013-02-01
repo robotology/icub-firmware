@@ -50,17 +50,11 @@ struct EOpid_hid
     float Imax;
     float Ymax;
     
-    float F;    
-    float a;
-    float b;
-    
     //float A;
     //float B;
     
     int32_t pwm_offset;
     int32_t pwm;
-    
-    eObool_t moving;
 }; 
 
 

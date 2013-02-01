@@ -40,6 +40,8 @@ struct EOmotors_hid
     uint8_t n_motors;
     
     int16_t zero_rotation_torque[MAX_MOTORS];
+    
+    eObool_t motorON[MAX_MOTORS];
 }; 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------

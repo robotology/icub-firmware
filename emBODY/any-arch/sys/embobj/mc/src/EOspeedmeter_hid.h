@@ -38,12 +38,12 @@ struct EOspeedmeter_hid
 {
     int32_t time;
     
-    //int32_t distance;
+    int32_t distance;
     int32_t position_last;
     int32_t position_sure;
     
     int32_t offset;
-    eObool_t enc_revert;
+    int32_t enc_sign;
     
     int32_t odo_x_freq;
     int32_t speed_filt;
@@ -56,7 +56,7 @@ struct EOspeedmeter_hid
     uint8_t first_valid_data;
     uint8_t invalid_data_cnt;
     
-    uint8_t sindex;
+    int32_t sindex;
     int32_t sample[5];
 }; 
 

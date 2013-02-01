@@ -83,12 +83,12 @@ extern EOspeedmeter* eo_speedmeter_New(void)
     {        
         o->time = 0;
         
-        //o->distance = 0;
+        o->distance = 0;
         o->position_last = 0;
         o->position_sure = 0;
         
         o->offset = 0;
-        o->enc_revert = eobool_false;
+        o->enc_sign = 0;
         
         o->odo_x_freq = 0;
         o->speed_filt = 0;
@@ -115,12 +115,14 @@ extern EOspeedmeter* eo_speedmeter_New(void)
 
 extern void eo_speedometer_SetEncSign(EOspeedmeter* o, int32_t enc_sign)
 {
-    o->enc_revert = (enc_sign < 0);
+    o->enc_sign = (enc_sign > 0) ? 1 : -1;
 }
 
 extern void eo_speedometer_Calibrate(EOspeedmeter* o, int32_t offset)
 {
-    o->offset = -offset;
+    o->offset = offset;
+    
+    o->is_started = eobool_false;
 }
 
 extern void eo_speedometer_Reset(EOspeedmeter* o)
@@ -144,22 +146,19 @@ extern eObool_t eo_speedometer_IsStarted(EOspeedmeter* o)
 
 extern int32_t eo_speedometer_GetVelocity(EOspeedmeter* o)
 {    
-    return o->enc_revert ? -o->speed_filt : o->speed_filt;
+    return o->speed_filt;
 }
 
 extern int32_t eo_speedometer_GetDistance(EOspeedmeter* o)
 {
-    int32_t pos = o->offset + o->position_sure + o->odo_x_freq/EMS_FREQUENCY_INT32;
-    
-    while (pos < 0)                     pos += IMPULSE_x_REVOLUTION;
-    while (pos >= IMPULSE_x_REVOLUTION) pos -= IMPULSE_x_REVOLUTION;
-    
-    return o->enc_revert ? -pos : pos;
+    return o->distance + o->odo_x_freq/EMS_FREQUENCY_INT32;
 }
 
 #ifdef USE_2FOC_FAST_ENCODER
 extern void eo_speedometer_FastEncoderRead(EOspeedmeter* o, int32_t velocity)
 {
+    if (!o->enc_sign) return;
+    
     o->speed_filt = (o->speed_filt + velocity + 1)/2;
     o->odo_x_freq += o->speed_filt;
 }
@@ -168,6 +167,20 @@ extern void eo_speedometer_FastEncoderRead(EOspeedmeter* o, int32_t velocity)
 extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
 {
     if (!o || o->hard_fault) return;
+    
+    if (!o->enc_sign) return;
+    
+    if (position != ENC_INVALID)
+    {
+        position -= o->offset;
+        
+        if (position < 0) 
+            position += IMPULSE_x_REVOLUTION;
+        else
+            if (position >= IMPULSE_x_REVOLUTION) position -= IMPULSE_x_REVOLUTION;
+        
+        position *= o->enc_sign;
+    }
     
     if (!o->is_started)
     {
@@ -207,11 +220,9 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
 
                 o->odo_x_freq -= delta_x_freq;
                 o->position_sure = position;
-                //o->distance += delta;
+                o->distance += delta;
                 
                 int32_t speed = delta_x_freq / o->time;
-                
-                if (-666 < speed && speed < 666) speed = (speed>0) ? 666 : -666;
                 
                 LIMIT(-48000, speed, 48000);
                 o->time = 0;
@@ -236,7 +247,7 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
                     o->speed_filt = 0;
                     
                     // triangular filter
-                    for (uint8_t i=0; i<5; ++i)
+                    for (int32_t i=0; i<5; ++i)
                     {
                         o->speed_filt += (i+1)*o->sample[(o->sindex+i)%5];
                     }
@@ -446,8 +457,7 @@ static void encoder_init(EOspeedmeter* o, int32_t position)
         o->position_last = position;
         o->position_sure = position;
 
-        //o->distance = normalize_angle(position);
-        //o->distance = position;
+        o->distance = position;
         
         o->odo_x_freq = 0;
         o->speed_filt = 0;
@@ -458,6 +468,14 @@ static void encoder_init(EOspeedmeter* o, int32_t position)
         o->invalid_data_cnt = 0;
         
         o->is_started = eobool_true;
+        
+        o->sindex = 0;
+        
+        o->sample[0] = 0;
+        o->sample[1] = 0;
+        o->sample[2] = 0;
+        o->sample[3] = 0;
+        o->sample[4] = 0;
     }
 }
 

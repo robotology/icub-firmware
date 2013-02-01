@@ -77,7 +77,8 @@ extern void eo_trajectory_BoostTimeout(EOtrajectory *o);
     @param      o  The pointer to the trajectory object.
     @return     The actual trajectory point value.
  **/
-extern int8_t eo_trajectory_PosStep(EOtrajectory *o, float *p, float *v);
+extern int8_t eo_trajectory_PosStep(EOtrajectory *o, float *p, float *v, float *a);
+
 extern void eo_trajectory_Init(EOtrajectory *o, int32_t p0, int32_t v0, int32_t a0);
 
 /** @fn         extern void eo_trajectory_Abort(EOtrajectory *o)
