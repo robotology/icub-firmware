@@ -238,20 +238,21 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
     {
         return(res);
     }
-    channel = (sstatus_ptr->fullscale.head.size/2); //la size e' espressa in byte. ogni canale insirsce un int16.
+    channel = (sstatus_ptr->fullscale.head.size);
     if(channel != frame->data[1])
     {
         //somithing wrong: befor i ask full scale for channel "channel" and i received channel for "frame.data[1]" 
         return(eores_NOK_generic);
     }
-    
-    memcpy(&(sstatus_ptr->fullscale.data[sstatus_ptr->fullscale.head.size]), &(frame->data[2]), 2);
+    /* sstatus_ptr->fullscale.head.size*sstatus_ptr->fullscale.head.itemsize  == (sstatus_ptr->fullscale.head.size<<1) 
+     since itemsize is equal to 2 i used shift insted of moltiplication*/
+    memcpy(&(sstatus_ptr->fullscale.data[(sstatus_ptr->fullscale.head.size<<1)]), &(frame->data[2]), 2);
  
     /* 4) if i received last channel's full scale i prepare a occasional rop to send
           else request full scale of next channel */
     if(5 == channel)
     {
-        sstatus_ptr->fullscale.head.size += 2;
+        sstatus_ptr->fullscale.head.size++;
         //prepare occasional rop to send
         res = s_loadFullscalelikeoccasionalrop(sId);
         eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &appl_st);
@@ -264,7 +265,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
     else
     {
         channel++;
-        sstatus_ptr->fullscale.head.size += 2;
+        sstatus_ptr->fullscale.head.size++;
         msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canLoc.addr); 
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &channel);
     }
