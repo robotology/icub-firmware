@@ -64,6 +64,16 @@ const eOropconfig_t eok_ropconfig_basic =
     EO_INIT(.plustime)      eobool_false
 };
 
+const eOropconfiguration_t eok_ropconfiguration_basic =
+{
+    EO_INIT(.confrqst)      0,
+    EO_INIT(.timerqst)      0,
+    EO_INIT(.plussign)      0,
+    EO_INIT(.plustime)      0,
+    EO_INIT(.confirm)       eo_ropconf_none,
+    EO_INIT(.notused)       0
+};
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -106,11 +116,11 @@ extern EOrop* eo_rop_New(uint16_t capacity)
     // i get the memory for the object
     retptr = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOrop), 1);
 
-    retptr->aboutdata.capacity = capacity;
+    retptr->capacityofstreamdatafield = capacity;
 
     if(0 != capacity)
     {
-        retptr->data = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_08bit, sizeof(uint8_t), capacity);
+        retptr->stream.data = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_08bit, sizeof(uint8_t), capacity);
     }
 
     eo_rop_Reset(retptr);
@@ -128,51 +138,50 @@ extern eOresult_t eo_rop_Reset(EOrop *p)
 
 #define EO_ROP_OPTIMISE_RESET
 
-    p->aboutdata.index              = 0; // but not capacity !!!
+    p->curindexofstreamdatafield    = 0; // but not capacity !!!
 
 
 #ifdef EO_ROP_OPTIMISE_RESET
-    memset(&p->aboutip, 0, sizeof(EOrop_aboutip_hid));
+//    memset(&p->aboutip, 0, sizeof(EOrop_aboutip_hid));
 #else     
-    p->aboutip.ipaddr               = 0;
-    p->aboutip.ipport               = 0;
+//    p->aboutip.ipaddr               = 0;
+//    p->aboutip.ipport               = 0;
 #endif
 
 #ifdef EO_ROP_OPTIMISE_RESET
-    memset(&p->aboutnvs, 0, sizeof(EOrop_aboutnvs_hid));
+    memset(&p->tmpdata, 0, sizeof(EOrop_tmpdata_t));
 #else
 
-    p->aboutnvs.nvscfg              = NULL;
-    p->aboutnvs.nvownership         = eo_nv_ownership_local;
-    p->aboutnvs.ondevindex          = 0; 
-    p->aboutnvs.onendpointindex     = 0;     
-    p->aboutnvs.nvtreenoderoot      = NULL; 
-    eo_nv_Clear(&p->aboutnvs.nvroot);
-    eo_nv_Clear(&p->aboutnvs.nvleaf);
+    p->tmpdata.nvscfg              = NULL;
+    p->tmpdata.nvownership         = eo_nv_ownership_local;
+    p->tmpdata.ondevindex          = 0; 
+    p->tmpdata.onendpointindex     = 0;     
+    p->tmpdata.nvtreenoderoot      = NULL; 
+    eo_nv_Clear(&p->netvar);
 
 #endif
 
 #ifdef EO_ROP_OPTIMISE_RESET
     // acces to un-uligned fields is not ok. but head is 8 bytes ....
-    *((uint64_t*)(&(p->head))) = 0;
+    *((uint64_t*)(&(p->stream.head))) = 0;
 #else
-    p->head.ctrl.confinfo           = eo_ropconf_none;
-    p->head.ctrl.plustime           = 0;
-    p->head.ctrl.plussign           = 0;
-    p->head.ctrl.rqsttime           = 0;
-    p->head.ctrl.rqstconf           = 0;
-    p->head.ctrl.userdefn           = 0;
-    p->head.endp                    = 0;
-    p->head.ropc                    = eo_ropcode_none;
-    p->head.nvid                    = 0;
-    p->head.dsiz                    = 0;
+    p->stream.head.ctrl.confinfo           = eo_ropconf_none;
+    p->stream.head.ctrl.plustime           = 0;
+    p->stream.head.ctrl.plussign           = 0;
+    p->stream.head.ctrl.rqsttime           = 0;
+    p->stream.head.ctrl.rqstconf           = 0;
+    p->stream.head.ctrl.userdefn           = 0;
+    p->stream.head.endp                    = 0;
+    p->stream.head.ropc                    = eo_ropcode_none;
+    p->stream.head.nvid                    = 0;
+    p->stream.head.dsiz                    = 0;
 
-    memset(p->data, 0, p->aboutdata.capacity);
+    memset(p->stream.data, 0, p->aboutdata.capacity);
 
 #endif
 
-    p->sign                         = EOK_uint32dummy;
-    p->time                         = EOK_uint64dummy;
+    p->stream.sign          = EOK_uint32dummy;
+    p->stream.time          = EOK_uint64dummy;
 
     return(eores_OK);
 }
@@ -189,7 +198,7 @@ extern eOresult_t eo_rop_Process(EOrop *p, EOrop *replyrop)
     }
 
     // reset the data progressive index of p. it is used to navigate the data field when it contains tree-nvs
-    p->aboutdata.index = 0;
+    p->curindexofstreamdatafield = 0;
 
     // reset the replyrop
     eo_rop_Reset(replyrop);
@@ -207,7 +216,7 @@ extern eOresult_t eo_rop_Process(EOrop *p, EOrop *replyrop)
     // very well indeed .. we are in here, then we may perform a rop ... lets see.
 
 #if !defined(EO_NV_DONT_USE_ONROPRECEPTION)    
-    eo_nv_hid_OnBefore_ROP(&p->aboutnvs.nvroot, (eOropcode_t)p->head.ropc, p->time, p->sign);
+    eo_nv_hid_OnBefore_ROP(&p->netvar, (eOropcode_t)p->stream.head.ropc, p->stream.time, p->sign);
 #endif
     
     
@@ -218,26 +227,25 @@ extern eOresult_t eo_rop_Process(EOrop *p, EOrop *replyrop)
     // questo ultimo e' l'unuico caso in cui si gestiscono i dati a pezzetti.
     // ATTENZIONE: un nodo non-leaf deve essere FUN_mix a meno che: (a) tutti i nodi sotto siano con stessa FUN_xxx    
 
-
-    if(eobool_true == eo_treenode_isLeaf(p->aboutnvs.nvtreenoderoot))
+    if(eobool_true == p->netvar.isleaf)
     {   // leaf
         s_eo_rop_received_leaf_exec_on_it(p, rop_o);
     }
-    else if(eo_nv_FUN_mix != eo_nv_GetFUN(&p->aboutnvs.nvroot))
+    else if(eo_nv_FUN_mix != eo_nv_GetFUN(&p->netvar))
     {   // non leaf but homeogeneous type, thus we can treat all the subtree in the same mode.
         s_eo_rop_received_nonleaf_exec_on_it(p, rop_o);
     }
-    else if((eo_ropcode_set != p->head.ropc) && (eo_ropcode_rst != p->head.ropc))
+    else if((eo_ropcode_set != p->stream.head.ropc) && (eo_ropcode_rst != p->stream.head.ropc))
     {   // non leaf and non-homogeneous, but we dont risk writing any read-only data, thus we can read all the subtree in teh same mode.
         s_eo_rop_received_nonleaf_exec_on_it(p, rop_o);
     }
     else
     {   // damn ... we need to descend the tree and operate on each leaf 
-        s_eo_rop_received_nonleaf_descend_to_leaves_and_exec(p, p->aboutnvs.nvtreenoderoot, rop_o);
+        s_eo_rop_received_nonleaf_descend_to_leaves_and_exec(p, p->netvar.treenode, rop_o);
     }
 
 #if !defined(EO_NV_DONT_USE_ONROPRECEPTION)
-    eo_nv_hid_OnAfter_ROP(&p->aboutnvs.nvroot, (eOropcode_t)p->head.ropc, p->time, p->sign);
+    eo_nv_hid_OnAfter_ROP(&p->netvar, (eOropcode_t)p->stream.head.ropc, p->stream.time, p->sign);
 #endif
 
     return(eores_OK);
@@ -251,7 +259,7 @@ extern eOropcode_t eo_rop_GetROPcode(EOrop *p)
         return(eo_ropcode_none);
     }
 
-    return((eOropcode_t)p->head.ropc);
+    return((eOropcode_t)p->stream.head.ropc);
 }
 
 extern uint8_t* eo_rop_GetROPdata(EOrop *p)
@@ -261,7 +269,7 @@ extern uint8_t* eo_rop_GetROPdata(EOrop *p)
         return(NULL);
     }
 
-    return(p->data);
+    return(p->stream.data);
 }
 
 
@@ -277,7 +285,7 @@ extern EOnv* eo_rop_hid_NV_Get(EOrop *p)
         return(NULL);
     }
 
-    return(&p->aboutnvs.nvroot);
+    return(&p->netvar);
 }
 
 // used when the rop is already built or when we already have a valid head from a stream
@@ -365,16 +373,16 @@ static EOrop * s_eo_rop_prepare_reply(EOrop *ropin, EOrop *ropout)
     
     EOrop *r = NULL;
 
-    if(NULL == ropin->aboutnvs.nvtreenoderoot)
+    if(NULL == ropin->netvar.treenode)
     {
-        // we did not find a nvtreenoderoot w/ that nvid but we have been asked for a confirmation .... nak then
-        if(1 == ropin->head.ctrl.rqstconf)
+        // we did not find a netvar w/ that nvid but if we have been asked for a confirmation we send a nak
+        if(1 == ropin->stream.head.ctrl.rqstconf)
         {
             r = ropout;
-            r->head.ctrl.confinfo = eo_ropconf_nak;
-            r->head.endp = ropin->head.endp;
-            r->head.ropc = ropin->head.ropc;
-            r->head.dsiz = 0;
+            r->stream.head.ctrl.confinfo = eo_ropconf_nak;
+            r->stream.head.endp = ropin->stream.head.endp;
+            r->stream.head.ropc = ropin->stream.head.ropc;
+            r->stream.head.dsiz = 0;
         }
         else
         {
@@ -382,56 +390,56 @@ static EOrop * s_eo_rop_prepare_reply(EOrop *ropin, EOrop *ropout)
         }
 
     }
-    else if(eo_ropcode_ask == ropin->head.ropc)
+    else if(eo_ropcode_ask == ropin->stream.head.ropc)
     {
         // we surely send a say
         r = ropout;
-        r->head.ropc = eo_ropcode_say;
+        r->stream.head.ropc = eo_ropcode_say;
 
-        if(1 == ropin->head.ctrl.rqstconf)
+        if(1 == ropin->stream.head.ctrl.rqstconf)
         {   // by default we assign a nak, but we SHALL transform it in a none if we process the ask later on
-            r->head.ctrl.confinfo = eo_ropconf_nak;  
+            r->stream.head.ctrl.confinfo = eo_ropconf_nak;  
         }
     }
-    else if(1 == ropin->head.ctrl.rqstconf)
+    else if(1 == ropin->stream.head.ctrl.rqstconf)
     {
         // we may send a ack or a nak, depending on success of operation (insuccess is write on ro netvars). 
         // the matter is made more difficult for pkd variables of mix type (not leaves) which may contain ro and rw netvars.
         // for this reason we assign a nak ropcode, which we SHALL transform in a ack if at least one operation is successful.
         r = ropout;
-        r->head.ctrl.confinfo = eo_ropconf_nak;
-        r->head.ropc = ropin->head.ropc;
+        r->stream.head.ctrl.confinfo = eo_ropconf_nak;
+        r->stream.head.ropc = ropin->stream.head.ropc;
     }
 
     // now complete the reply
     if(NULL != r)
     {
-        r->aboutip.ipaddr               = r->aboutip.ipaddr;
-//        r->aboutip.ipport               = r->aboutip.ipport;
-
-        r->aboutnvs.nvscfg              = ropin->aboutnvs.nvscfg;
-        r->aboutnvs.nvtreenoderoot      = ropin->aboutnvs.nvtreenoderoot;
-        r->aboutnvs.ondevindex          = ropin->aboutnvs.ondevindex;
-        r->aboutnvs.onendpointindex     = ropin->aboutnvs.onendpointindex;
+        // maybe we dont need to fill the tmpdata fields
+        r->tmpdata.nvscfg              = ropin->tmpdata.nvscfg;
+        r->tmpdata.ondevindex          = ropin->tmpdata.ondevindex;
+        r->tmpdata.onendpointindex     = ropin->tmpdata.onendpointindex;
+        
+        // but we surely assign the same netvar, as the reply is about the very same netvar
+        memcpy(&r->netvar, &ropin->netvar, sizeof(EOnv));
 
 
         //r->head.ctrl.userdef = 0;
         //r->head.ctrl.rqstconf = 0;
         //r->head.ctrl.rqsttime= 0;
-        r->head.ctrl.plussign = ropin->head.ctrl.plussign;
-        r->head.ctrl.plustime = ropin->head.ctrl.rqsttime;
+        r->stream.head.ctrl.plussign = ropin->stream.head.ctrl.plussign;
+        r->stream.head.ctrl.plustime = ropin->stream.head.ctrl.rqsttime;
         
-        r->head.endp = ropin->head.endp;
-        r->head.dsiz = 0; // if it must be non-zero then some function shall fill it
-        r->head.nvid = ropin->head.nvid;
+        r->stream.head.endp = ropin->stream.head.endp;
+        r->stream.head.dsiz = 0; // if it must be non-zero then some function shall fill it
+        r->stream.head.nvid = ropin->stream.head.nvid;
 
         // nvid was filled earlier in this function
         // data will be filled by some other function
-        r->sign = (1 == r->head.ctrl.plussign) ? (ropin->sign) : (EOK_uint32dummy);
+        r->stream.sign = (1 == r->stream.head.ctrl.plussign) ? (ropin->stream.sign) : (EOK_uint32dummy);
 #ifndef EODEF_DONT_USE_THE_VSYSTEM
-        r->time = (1 == r->head.ctrl.plustime) ? (eov_sys_LifeTimeGet(eov_sys_GetHandle())) : (EOK_uint64dummy);
+        r->stream.time = (1 == r->stream.head.ctrl.plustime) ? (eov_sys_LifeTimeGet(eov_sys_GetHandle())) : (EOK_uint64dummy);
 #else
-        r->time = (1 == r->head.ctrl.plustime) ? (0xf1f2f3f4f5f6f7f8) : (EOK_uint64dummy);
+        r->stream.time = (1 == r->stream.head.ctrl.plustime) ? (0xf1f2f3f4f5f6f7f8) : (EOK_uint64dummy);
 #endif
     }
 
@@ -452,28 +460,29 @@ static eObool_t s_eo_rop_can_surely_say_cannot_perform_on_device(EOrop *ropin)
     eObool_t ret = eobool_false;
 
     // if the nvtreenoderoot was not found ... we surely cannot operate on that
-    if(NULL == ropin->aboutnvs.nvtreenoderoot)
+    if(NULL == ropin->netvar.treenode)
     {
         return(eobool_true);
     }
 
-    // we on mix functionalities (but more in general on not leaves) we cannot say.
-    if(eobool_false == eo_treenode_isLeaf(ropin->aboutnvs.nvtreenoderoot))
+    // on mix functionalities (but more in general on not leaves) we cannot say.
+    //if(eobool_false == eo_treenode_isLeaf(ropin->tmpdata.nvtreenoderoot))
+    if(eobool_false == ropin->netvar.isleaf)
     {
         return(eobool_false);
     }
 
-    switch(ropin->head.ropc)
+    switch(ropin->stream.head.ropc)
     {
         case eo_ropcode_set:
         case eo_ropcode_rst:
         {
-            ret = (eobool_false == eo_nv_hid_isWritable(&ropin->aboutnvs.nvroot)) ? eobool_true : eobool_false;
+            ret = (eobool_false == eo_nv_hid_isWritable(&ropin->netvar)) ? eobool_true : eobool_false;
         } break;
 
         case eo_ropcode_upd:
         {
-            ret = (eobool_false == eo_nv_hid_isUpdateable(&ropin->aboutnvs.nvroot)) ? eobool_true : eobool_false;
+            ret = (eobool_false == eo_nv_hid_isUpdateable(&ropin->netvar)) ? eobool_true : eobool_false;
         }  break;
 
         default:
@@ -520,20 +529,19 @@ static void s_eo_rop_received_nonleaf_but_reached_leaf_and_exec_on_it(EOrop *rop
     uint16_t capacity = 0;
     EOnv *leaf = NULL;
 
-    if(nvtreeleaf == rop_in->aboutnvs.nvtreenoderoot)
+    if(nvtreeleaf == rop_in->netvar.treenode)
     {
-        // we use the already computed nvroot
+        // we use the already computed netvar
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "illegal path");
-        leaf = &rop_in->aboutnvs.nvroot;
+        leaf = &rop_in->netvar;
     }
     else
     {
         // we need to retrieve the leaf
-        leaf = eo_nvscfg_GetNV(rop_in->aboutnvs.nvscfg, rop_in->aboutnvs.ondevindex, rop_in->aboutnvs.onendpointindex, eo_treenode_GetIndex(nvtreeleaf), nvtreeleaf, NULL);
+        leaf = eo_nvscfg_GetNV(rop_in->tmpdata.nvscfg, rop_in->tmpdata.ondevindex, rop_in->tmpdata.onendpointindex, eo_treenode_GetIndex(nvtreeleaf), nvtreeleaf, NULL);
     }
 
-
-    switch(rop_in->head.ropc)
+    switch(rop_in->stream.head.ropc)
     {
         case eo_ropcode_set:
         case eo_ropcode_rst:
@@ -554,11 +562,11 @@ static void s_eo_rop_received_nonleaf_but_reached_leaf_and_exec_on_it(EOrop *rop
             // stored in the first two bytes of payload and size is 2 + m.
             // dont use rop_in->datasize as it does not work for nested data
 
-            if(eo_ropcode_rst == rop_in->head.ropc)
+            if(eo_ropcode_rst == rop_in->stream.head.ropc)
             {   // rst
 
                 // just reset the leaf without forcing anything.
-                res = eo_nv_ResetTS(leaf, eobool_false, eo_nv_upd_ifneeded, rop_in->time, rop_in->sign); //eObool_t forcerst,           
+                res = eo_nv_ResetTS(leaf, eobool_false, eo_nv_upd_ifneeded, rop_in->stream.time, rop_in->stream.sign); //eObool_t forcerst,           
             
                 // and dont increment the progressive index of rop_in because reset does not have any payload
             }
@@ -566,17 +574,17 @@ static void s_eo_rop_received_nonleaf_but_reached_leaf_and_exec_on_it(EOrop *rop
             {   // set
                 
                 // get the data to be set and its size.
-                source = rop_in->data + rop_in->aboutdata.index;
+                source = rop_in->stream.data + rop_in->curindexofstreamdatafield;
 
                 // set the leaf to the value without forcing anything
-                res = eo_nv_SetTS(leaf, source, eobool_false, eo_nv_upd_ifneeded, rop_in->time, rop_in->sign); //eObool_t forceset,
+                res = eo_nv_SetTS(leaf, source, eobool_false, eo_nv_upd_ifneeded, rop_in->stream.time, rop_in->stream.sign); //eObool_t forceset,
 
                 // and increment the progressive index even if the source was not written to destination
                 // (the reason is that the sender can fill the packet with data that can be read-only)
                 // we use capacity because it is always equal to size except for teh case of arrays.
                 // but if arrays are transmitted inside a MIX, then they are copied entirely in their capacity
                 capacity = eo_nv_Capacity(leaf);
-                rop_in->aboutdata.index += capacity;
+                rop_in->curindexofstreamdatafield += capacity;
             }
 
 
@@ -586,9 +594,9 @@ static void s_eo_rop_received_nonleaf_but_reached_leaf_and_exec_on_it(EOrop *rop
             {                
                 // mark the ropcode of the reply (if any) to be ack
                 // for pkd data of type mix, we send an ack if at least one netvar is writeable.
-                if((1 == rop_in->head.ctrl.rqstconf) && (NULL != rop_o))
+                if((1 == rop_in->stream.head.ctrl.rqstconf) && (NULL != rop_o))
                 {
-                    rop_o->head.ctrl.confinfo = eo_ropconf_ack;
+                    rop_o->stream.head.ctrl.confinfo = eo_ropconf_ack;
                 } 
             }
 
@@ -606,13 +614,13 @@ static void s_eo_rop_received_nonleaf_but_reached_leaf_and_exec_on_it(EOrop *rop
             // these operations are done using the update() function, to which we give every responsibility
             // we have a reply rop only if there is an explicit ack/nak request.
 
-            res = eo_nv_UpdateTS(leaf, rop_in->time, rop_in->sign);
+            res = eo_nv_UpdateTS(leaf, rop_in->stream.time, rop_in->stream.sign);
 
             if(eores_OK == res)
             {
-                if((1 == rop_in->head.ctrl.rqstconf) && (NULL != rop_o))
+                if((1 == rop_in->stream.head.ctrl.rqstconf) && (NULL != rop_o))
                 {
-                    rop_o->head.ctrl.confinfo = eo_ropconf_ack;
+                    rop_o->stream.head.ctrl.confinfo = eo_ropconf_ack;
                 } 
             }
 
@@ -628,17 +636,17 @@ static void s_eo_rop_received_nonleaf_but_reached_leaf_and_exec_on_it(EOrop *rop
 
 
             // we use datasize and not the progressive index because by doing so we update the rop_o as soon as we write
-            destin = rop_o->data + rop_o->head.dsiz;
+            destin = rop_o->stream.data + rop_o->stream.head.dsiz;
 
             eo_nv_Get(leaf, eo_nv_strg_volatile, destin, &size);
 
             // datasize is incremented by capacity. 
-            rop_o->head.dsiz += eo_nv_Capacity(leaf);
+            rop_o->stream.head.dsiz += eo_nv_Capacity(leaf);
 
 
             // never mark it as a nak or ack, even if we received the confirmation request.
             // the confirmation is the reply message itself 
-            rop_o->head.ctrl.confinfo = eo_ropconf_none;
+            rop_o->stream.head.ctrl.confinfo = eo_ropconf_none;
 
         } break; 
                      
@@ -655,19 +663,19 @@ static void s_eo_rop_received_nonleaf_but_reached_leaf_and_exec_on_it(EOrop *rop
 
             // force write also if an input, force update. we never do storage on eeprom just because remote nvs shall not
             // have valid eeprom addresses
-            source = rop_in->data + rop_in->aboutdata.index;
-            eo_nv_remoteSetTS(leaf, source, eo_nv_upd_always, rop_in->time, rop_in->sign);
+            source = rop_in->stream.data + rop_in->curindexofstreamdatafield;
+            eo_nv_remoteSetTS(leaf, source, eo_nv_upd_always, rop_in->stream.time, rop_in->stream.sign);
             //eo_nv_Set(leaf, source, eobool_true, eo_nv_upd_always);
 
             // i increment the progressive index of the rop_in
             //size = eo_nv_Size(leaf, source);
-            rop_in->aboutdata.index += eo_nv_Capacity(leaf);
+            rop_in->curindexofstreamdatafield += eo_nv_Capacity(leaf);
 
 
             // in here we manage the case in which the sig message that we have received required an ack.
-            if((1 == rop_in->head.ctrl.rqstconf) && (NULL != rop_o) && (eo_ropcode_sig == rop_in->head.ropc))
+            if((1 == rop_in->stream.head.ctrl.rqstconf) && (NULL != rop_o) && (eo_ropcode_sig == rop_in->stream.head.ropc))
             {
-                rop_o->head.ctrl.confinfo = eo_ropconf_ack;
+                rop_o->stream.head.ctrl.confinfo = eo_ropconf_ack;
             } 
           
 
@@ -695,10 +703,10 @@ static void s_eo_rop_received_leaf_exec_on_it(EOrop *rop_in, EOrop *rop_o)
     uint16_t size = 0;
     EOnv *thenv = NULL;
 
-    thenv = &rop_in->aboutnvs.nvroot;
+    thenv = &rop_in->netvar;
 
 
-    switch(rop_in->head.ropc)
+    switch(rop_in->stream.head.ropc)
     {
         case eo_ropcode_set:
         case eo_ropcode_rst:
@@ -719,11 +727,11 @@ static void s_eo_rop_received_leaf_exec_on_it(EOrop *rop_in, EOrop *rop_o)
             // stored in the first two bytes of payload and size is 2 + m.
             // dont use rop_in->datasize as it does not work for nested data
 
-            if(eo_ropcode_rst == rop_in->head.ropc)
+            if(eo_ropcode_rst == rop_in->stream.head.ropc)
             {   // rst
 
                 // just reset the thenv without forcing anything.
-                res = eo_nv_ResetTS(thenv, eobool_false, eo_nv_upd_ifneeded, rop_in->time, rop_in->sign); //eObool_t forcerst,           
+                res = eo_nv_ResetTS(thenv, eobool_false, eo_nv_upd_ifneeded, rop_in->stream.time, rop_in->stream.sign); //eObool_t forcerst,           
             
                 // and dont increment the progressive index of rop_in because reset does not have any payload
             }
@@ -731,10 +739,10 @@ static void s_eo_rop_received_leaf_exec_on_it(EOrop *rop_in, EOrop *rop_o)
             {   // set
                 
                 // get the data to be set and its size.
-                source = rop_in->data;
+                source = rop_in->stream.data;
 
                 // set the thenv to the value without forcing anything
-                res = eo_nv_SetTS(thenv, source, eobool_false, eo_nv_upd_ifneeded, rop_in->time, rop_in->sign); //eObool_t forceset,
+                res = eo_nv_SetTS(thenv, source, eobool_false, eo_nv_upd_ifneeded, rop_in->stream.time, rop_in->stream.sign); //eObool_t forceset,
 
                 // and increment the progressive index even if the source was not written to destination
                 // (the reason is that the sender can fill the packet with data that can be read-only)
@@ -749,9 +757,9 @@ static void s_eo_rop_received_leaf_exec_on_it(EOrop *rop_in, EOrop *rop_o)
             {                
                 // mark the ropcode of the reply (if any) to be ack
                 // for pkd data of type mix, we send an ack if at least one netvar is writeable.
-                if((1 == rop_in->head.ctrl.rqstconf) && (NULL != rop_o))
+                if((1 == rop_in->stream.head.ctrl.rqstconf) && (NULL != rop_o))
                 {
-                    rop_o->head.ctrl.confinfo = eo_ropconf_ack;
+                    rop_o->stream.head.ctrl.confinfo = eo_ropconf_ack;
                 } 
             }
 
@@ -773,9 +781,9 @@ static void s_eo_rop_received_leaf_exec_on_it(EOrop *rop_in, EOrop *rop_o)
 
             if(eores_OK == res)
             {
-                if((1 == rop_in->head.ctrl.rqstconf) && (NULL != rop_o))
+                if((1 == rop_in->stream.head.ctrl.rqstconf) && (NULL != rop_o))
                 {
-                    rop_o->head.ctrl.confinfo = eo_ropconf_ack;
+                    rop_o->stream.head.ctrl.confinfo = eo_ropconf_ack;
                 } 
             }
 
@@ -791,19 +799,19 @@ static void s_eo_rop_received_leaf_exec_on_it(EOrop *rop_in, EOrop *rop_o)
 
 
             // we use datasize and not the progressive index because by doing so we update the rop_o as soon as we write
-            destin = rop_o->data;
+            destin = rop_o->stream.data;
 
             eo_nv_Get(thenv, eo_nv_strg_volatile, destin, &size);
 
             // datasize is incremented by size. 
             // size is always equal to the capacity except for netvar of type arr-m,
             // for which m is contained in the first two bytes of the data and size is 2 + m. 
-            rop_o->head.dsiz += size;
+            rop_o->stream.head.dsiz += size;
 
 
             // never mark it as a nak or ack, even if we received the confirmation request.
             // the confirmation is the reply message itself 
-            rop_o->head.ctrl.confinfo = eo_ropconf_none;
+            rop_o->stream.head.ctrl.confinfo = eo_ropconf_none;
 
         } break; 
                      
@@ -820,8 +828,8 @@ static void s_eo_rop_received_leaf_exec_on_it(EOrop *rop_in, EOrop *rop_o)
 
             // force write also if an input, force update. we never do storage on eeprom just because remote nvs shall not
             // have valid eeprom addresses
-            source = rop_in->data;
-            eo_nv_remoteSetTS(thenv, source, eo_nv_upd_always, rop_in->time, rop_in->sign);
+            source = rop_in->stream.data;
+            eo_nv_remoteSetTS(thenv, source, eo_nv_upd_always, rop_in->stream.time, rop_in->stream.sign);
 
             // i increment the progressive index of the rop_in
 //            size = eo_nv_Size(thenv, source);
@@ -829,9 +837,9 @@ static void s_eo_rop_received_leaf_exec_on_it(EOrop *rop_in, EOrop *rop_o)
 
 
             // in here we manage the case in which the sig message that we have received required an ack.
-            if((1 == rop_in->head.ctrl.rqstconf) && (NULL != rop_o) && (eo_ropcode_sig == rop_in->head.ropc))
+            if((1 == rop_in->stream.head.ctrl.rqstconf) && (NULL != rop_o) && (eo_ropcode_sig == rop_in->stream.head.ropc))
             {
-                rop_o->head.ctrl.confinfo = eo_ropconf_ack;
+                rop_o->stream.head.ctrl.confinfo = eo_ropconf_ack;
             } 
           
 

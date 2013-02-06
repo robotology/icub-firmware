@@ -187,6 +187,8 @@ extern eOnvID_t eo_nv_GetID(const EOnv *netvar);
 
 extern eOnvFunc_t eo_nv_GetFUN(const EOnv *netvar);
 
+extern eObool_t eo_nv_isLeaf(const EOnv *netvar);
+
 extern eOnvType_t eo_nv_GetTYP(const EOnv *netvar);
 
 

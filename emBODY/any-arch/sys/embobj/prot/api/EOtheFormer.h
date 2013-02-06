@@ -93,7 +93,7 @@ extern uint16_t eo_former_GetSizeOfStream(EOtheFormer *p, const EOrop *rop);
     @return     Normally eores_OK, eores_NOK_generic upon failure.
  **/
 
-extern eOresult_t eo_former_GetStream(EOtheFormer *p, const EOrop *rop, const uint16_t streamcapacity, uint8_t *streamdata, uint16_t *streamsize, eOipv4addr_t *ipaddr);
+extern eOresult_t eo_former_GetStream(EOtheFormer *p, const EOrop *rop, const uint16_t streamcapacity, uint8_t *streamdata, uint16_t *streamsize);//, eOipv4addr_t *ipaddr);
 
 
 

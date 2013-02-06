@@ -99,7 +99,7 @@ struct EOnvsCfg_hid
     eOnvscfgDevicesOwnership_t      devicesowneship;
     EOVstorageDerived*              storage;
     EOmatrix3d*                     allnvs;
-    eOnvscfgMutexProtectionOfNVs_t  mtxnvsmode;
+    eOnvscfg_protection_t           protection;
     eov_mutex_fn_mutexderived_new   mtxderived_new;
     EOVmutexDerived*                mtx_object;
 };   

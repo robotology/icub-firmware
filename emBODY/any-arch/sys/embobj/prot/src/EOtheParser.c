@@ -108,7 +108,7 @@ extern EOtheParser * eo_parser_GetHandle(void)
 }
 
 
-extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, const uint16_t streamsize, const eOipv4addr_t ipaddr, EOrop *rop, uint16_t *consumedbytes)
+extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, const uint16_t streamsize, EOrop *rop, uint16_t *consumedbytes)
 {
     eOrophead_t *rophead            = NULL;
     uint8_t     *ropdata            = NULL;
@@ -222,35 +222,37 @@ extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, co
     *consumedbytes = sizeof(eOrophead_t) + dataeffectivesize + signeffectivesize + timeeffectivesize;
 
     // copy head
-    memcpy(&rop->head, rophead, sizeof(eOrophead_t));
+    memcpy(&rop->stream.head, rophead, sizeof(eOrophead_t));
 
     // copy data
     if(NULL != ropdata)
     {
-        rop->head.dsiz = rophead->dsiz;
-        memcpy(rop->data, ropdata, rophead->dsiz);
+        rop->stream.head.dsiz = rophead->dsiz;
+        memcpy(rop->stream.data, ropdata, rophead->dsiz);
     }
     
     // copy the signature
     if(0 != signeffectivesize)
     {
-        rop->sign = *( (uint32_t*) &roptail[0] );
+        rop->stream.sign = *( (uint32_t*) &roptail[0] );
     }
 
     // copy the time
     if(0 != timeeffectivesize)
     {
-        rop->time = *( (uint64_t*) &roptail[signeffectivesize] );
+        rop->stream.time = *( (uint64_t*) &roptail[signeffectivesize] );
     }  
     
     // sets the ipaddr
-    rop->aboutip.ipaddr = ipaddr; 
+    #warning --> ho rimosso rop->aboutip.ipaddr = fromipaddr
+    //rop->aboutip.ipaddr = fromipaddr; 
 
+    #warning --> rimuovo rop->aboutnvs.nvownership ..... ??? PENSACI BENE E CERCA DI FARLO
     // sets the ownership
-    rop->aboutnvs.nvownership = eo_rop_hid_GetOwnership(rophead->ropc, (eOropconfinfo_t)rophead->ctrl.confinfo, eo_rop_dir_received);
+    rop->tmpdata.nvownership = eo_rop_hid_GetOwnership(rophead->ropc, (eOropconfinfo_t)rophead->ctrl.confinfo, eo_rop_dir_received);
 
     // do ???
-    rop->aboutdata.index    = 0;
+    rop->curindexofstreamdatafield    = 0;
     
     return(eores_OK);
 }

@@ -91,8 +91,9 @@ const eOboardtransceiver_cfg_t eo_boardtransceiver_cfg_default =
     EO_INIT(.remotehostipv4addr)        0,
     EO_INIT(.remotehostipv4port)        0,
     EO_INIT(.sizes)                     {0},
-    EO_INIT(.mtx_fn_new)                NULL,
-    EO_INIT(.nvsmtxmode)                eo_nvscfg_mtxprotnvs_none
+    EO_INIT(.mutex_fn_new)              NULL,
+    EO_INIT(.transprotection)           eo_trans_protection_none,
+    EO_INIT(.nvscfgprotection)          eo_nvscfg_protection_none
 };
 
 
@@ -142,6 +143,8 @@ extern EOtransceiver * eo_boardtransceiver_Initialise(const eOboardtransceiver_c
     txrxcfg.remipv4addr                    = cfg->remotehostipv4addr;
     txrxcfg.remipv4port                    = cfg->remotehostipv4port;
     txrxcfg.nvscfg                         = s_eo_theboardtrans.nvscfg;
+    txrxcfg.mutex_fn_new                   = cfg->mutex_fn_new;
+    txrxcfg.protection                     = cfg->transprotection;
     
     s_eo_theboardtrans.transceiver = eo_transceiver_New(&txrxcfg);
     
@@ -191,9 +194,10 @@ static EOnvsCfg* s_eo_boardtransceiver_nvscfg_get(const eOboardtransceiver_cfg_t
 
  
     theepcfgs = cfg->vectorof_endpoint_cfg;
+    
 
 //    #warning --> so far the BOARDtransceiver does not use any storage. if needed ... change the NULL into a ...
-    nvscfg = eo_nvscfg_New(numofdevices, NULL, cfg->nvsmtxmode, cfg->mtx_fn_new);
+    nvscfg = eo_nvscfg_New(numofdevices, NULL, cfg->nvscfgprotection, cfg->mutex_fn_new);
     
     
     //foreach<device>

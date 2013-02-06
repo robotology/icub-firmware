@@ -33,6 +33,9 @@
 
 #include "EOtransceiver.h"
 
+
+#include "EOMmutex.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -72,8 +75,8 @@ const eOemstransceiver_cfg_t eom_emstransceiver_DefaultCfg =
         EO_INIT(.capacityofropframereplies)         128,
         EO_INIT(.maxnumberofregularrops)            32        
     },
-    EO_INIT(.mtx_fn_new)                NULL,
-    EO_INIT(.nvsmtxmode)                eo_nvscfg_mtxprotnvs_none
+    EO_INIT(.transprotection)           eo_trans_protection_none,
+    EO_INIT(.nvscfgprotection)          eo_nvscfg_protection_none
 };
 
 
@@ -126,12 +129,12 @@ extern EOMtheEMStransceiver * eom_emstransceiver_Initialise(const eOemstransceiv
     brdtransceiver_cfg.vectorof_endpoint_cfg    = cfg->vectorof_endpoint_cfg;
     brdtransceiver_cfg.hashfunction_ep2index    = cfg->hashfunction_ep2index;   
     brdtransceiver_cfg.remotehostipv4addr       = cfg->hostipv4addr;
-    brdtransceiver_cfg.remotehostipv4port       = cfg->hostipv4port;
+    brdtransceiver_cfg.remotehostipv4port       = cfg->hostipv4port; // it is the remote port where to send packets to
     memcpy(&brdtransceiver_cfg.sizes, &cfg->sizes, sizeof(eo_transceiver_sizes_t));
-    brdtransceiver_cfg.mtx_fn_new               = cfg->mtx_fn_new;
-    brdtransceiver_cfg.nvsmtxmode                = cfg->nvsmtxmode;
-
-    
+    brdtransceiver_cfg.mutex_fn_new             = (eov_mutex_fn_mutexderived_new)eom_mutex_New;
+    brdtransceiver_cfg.transprotection          = cfg->transprotection;
+    brdtransceiver_cfg.nvscfgprotection         = cfg->nvscfgprotection;
+   
  
     //s_emstransceiver_singleton.transceiver = eo_boardtransceiver_Initialise(eom_emstransceiver_hid_userdef_get_cfg(cfg));
     s_emstransceiver_singleton.transceiver = eo_boardtransceiver_Initialise(&brdtransceiver_cfg);

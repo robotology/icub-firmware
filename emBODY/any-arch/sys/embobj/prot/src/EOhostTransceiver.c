@@ -126,6 +126,8 @@ extern EOhostTransceiver * eo_hosttransceiver_New(const eOhosttransceiver_cfg_t 
     txrxcfg.remipv4addr                    = cfg->remoteboardipv4addr;
     txrxcfg.remipv4port                    = cfg->remoteboardipv4port;
     txrxcfg.nvscfg                         = retptr->nvscfg;
+    txrxcfg.mutex_fn_new                   = NULL;
+    txrxcfg.protection                     = eo_trans_protection_none;
     
     retptr->transceiver = eo_transceiver_New(&txrxcfg);
     
@@ -179,7 +181,7 @@ static EOnvsCfg* s_eo_hosttransceiver_nvscfg_get(const eOhosttransceiver_cfg_t *
     theepcfgs = cfg->vectorof_endpoint_cfg;
 
     // the HOSTtransceiver does not use any storage.
-    nvscfg = eo_nvscfg_New(1, NULL, eo_nvscfg_mtxprotnvs_none, NULL);
+    nvscfg = eo_nvscfg_New(1, NULL, eo_nvscfg_protection_none, NULL);
 
     nendpoints = eo_constvector_Size(theepcfgs);
     

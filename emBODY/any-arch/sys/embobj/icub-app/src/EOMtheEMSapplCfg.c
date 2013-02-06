@@ -219,8 +219,7 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
     .applcfg        =
     {
         .emsappinfo             = &eom_emsapplcfg_modinfo, //&eom_emsappl_info_modinfo,
-        .hostipv4addr           = EO_COMMON_IPV4ADDR(EOMTHEEMSAPPLCFG_HOSTIPADDR1, EOMTHEEMSAPPLCFG_HOSTIPADDR2, EOMTHEEMSAPPLCFG_HOSTIPADDR3, EOMTHEEMSAPPLCFG_HOSTIPADDR4)
-//        .hostipv4port           = EOMTHEEMSAPPLCFG_TRANSCEIVER_HOSTIPPORT        
+        .hostipv4addr           = EO_COMMON_IPV4ADDR(EOMTHEEMSAPPLCFG_HOSTIPADDR1, EOMTHEEMSAPPLCFG_HOSTIPADDR2, EOMTHEEMSAPPLCFG_HOSTIPADDR3, EOMTHEEMSAPPLCFG_HOSTIPADDR4)    
     },
     .wipnetcfg      =
     {
@@ -289,8 +288,8 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
             .capacityofropframereplies      = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY, //128,
             .maxnumberofregularrops         = EOMTHEEMSAPPLCFG_TRANSCEIVER_MAXNUMOFREGULARROPS //32
         },
-        .mtx_fn_new             = NULL, //(eov_mutex_fn_mutexderived_new)eom_mutex_New,
-        .nvsmtxmode             = eo_nvscfg_mtxprotnvs_none // eo_nvscfg_mtxprotnvs_one_per_netvar
+        .transprotection        = eo_trans_protection_none, //eo_trans_protection_enabled, //eo_trans_protection_none,
+        .nvscfgprotection       = eo_nvscfg_protection_none //eo_nvscfg_protection_one_per_endpoint //eo_nvscfg_protection_none // eo_nvscfg_protection_one_per_netvar eo_nvscfg_protection_one_per_endpoint
     },
     .errobjcfg      =
     {
@@ -348,8 +347,8 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
              .shiftvalues            =
             {
              .jointVelocityShift     =  8,
-             .jointVelocityEstimationShift = 0,
-             .jointAccelerationEstimationShift = 0
+             .jointVelocityEstimationShift = 8,
+             .jointAccelerationEstimationShift = 5
             },
              .bcastpolicy            =
              {

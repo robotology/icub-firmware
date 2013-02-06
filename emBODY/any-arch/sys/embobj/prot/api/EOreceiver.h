@@ -110,12 +110,10 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvsCfg 
     @brief      returns the frame to be transmitted back and the destination ip address and port.
     @param      p               the object.
     @param      ropframereply   handle of the reply frame. if no rop insde, then it is just teh default empty frame.
-    @param      ipv4addr        the destination IP address.
-    @param      ipv4port        the destination IP port.
     @return     eores_OK only if there is a non-empty ropframe to be transmitted, eores_NOK_generic if teh ropframe is available
                 but it is empty, eores_NOK_nullpointer for NULL pointer errors.
  **/
-extern eOresult_t eo_receiver_GetReply(EOreceiver *p, EOropframe **ropframereply, eOipv4addr_t *ipv4addr, eOipv4port_t *ipv4port);
+extern eOresult_t eo_receiver_GetReply(EOreceiver *p, EOropframe **ropframereply);
 
 
 /** @}            

@@ -94,7 +94,7 @@ extern EOtheParser * eo_parser_GetHandle(void);
     @return     The value eores_NOK_nullpointer if any is a NULL pointer, eores_NOK_generic if pktdata does not have a valid rop, 
                 eores_OK if the function can fill @e rop with meaninful data.
  **/
-extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, const uint16_t streamsize, const eOipv4addr_t ipaddr, EOrop *rop, uint16_t *consumedbytes);
+extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, const uint16_t streamsize, EOrop *rop, uint16_t *consumedbytes);
 
 
 

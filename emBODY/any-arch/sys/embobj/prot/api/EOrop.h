@@ -117,11 +117,44 @@ typedef struct      // 06 bytes
 } eOropSIGcfg_t;    EO_VERIFYsizeof(eOropSIGcfg_t, 6);
 
 
+// typedef struct      // 16 bytes
+// {
+//     eOropconfig_t   ropconfig;      // 4B
+//     eOropconfinfo_t ropconfinfo;    // 1B
+//     eOropcode_t     ropcode;        // 1B
+//     eOnvEP_t        ep;             // 2B
+//     eOnvID_t        id;             // 2B
+//     uint32_t        signature;      // 4B
+// } eOropdescriptor_t;   
+
+
+typedef struct
+{
+    uint8_t         confrqst    :1;
+    uint8_t         timerqst    :1;
+    uint8_t         plussign    :1;
+    uint8_t         plustime    :1;
+    uint8_t         confirm     :2;
+    uint8_t         notused     :2;
+} eOropconfiguration_t;
+
+typedef struct      // 16 bytes
+{
+    eOropconfiguration_t    configuration;      // 1B
+    eOropcode_t             ropcode;            // 1B
+    eOnvEP_t                ep;                 // 2B
+    eOnvID_t                id;                 // 2B
+    uint16_t                size;               // 2B
+    uint8_t*                data;               // 4B
+    uint32_t                signature;          // 4B
+} eOropdescriptor_t;        //EO_VERIFYsizeof(eOropdescriptor_t, 16); 
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
 extern const eOropconfig_t eok_ropconfig_basic; // = {.confrqst=eobool_false, .timerqst=eobool_false, .plussign= eobool_false, .plustime=eobool_false} 
+
+extern const eOropconfiguration_t eok_ropconfiguration_basic;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
  

@@ -36,6 +36,7 @@ extern "C" {
 #include "EoCommon.h"
 #include "EOreceiver.h"
 #include "EOtransmitter.h"
+#include "EOVmutex.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -58,7 +59,10 @@ struct EOtransceiver_hid
 {
     eo_transceiver_cfg_t        cfg;
     EOreceiver*                 receiver;
-    EOtransmitter*              transmitter;    
+    EOtransmitter*              transmitter;   
+    //EOVmutexDerived*            mtx_tx_replies;
+    //EOVmutexDerived*            mtx_tx_regulars;
+    //EOVmutexDerived*            mtx_tx_occasionals;
 }; 
 
 
