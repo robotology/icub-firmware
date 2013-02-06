@@ -65,7 +65,7 @@ extern EOpid* eo_pid_New(void);
     @param      Ymax  The output maximum value.
  **/
 
-extern void eo_pid_SetPid(EOpid *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff);
+extern void eo_pid_SetPid(EOpid *o, float K, float Kd, float Ki, float Imax, int32_t pwm_max, int32_t pwm_offset);
 
 extern void eo_pid_GetStatus(EOpid *o, int32_t *pwm, int32_t *err);
 

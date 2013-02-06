@@ -41,19 +41,18 @@ struct EOpid_hid
     float Ki;
     float Kd;
 
-    float Yn;
     float Xn;
     
     float Dn;
     float En;
     float KKiIn;
     float Imax;
-    float Ymax;
     
-    //float A;
-    //float B;
+    float A;
+    float B;
     
     int32_t pwm_offset;
+    int32_t pwm_max;
     int32_t pwm;
 }; 
 

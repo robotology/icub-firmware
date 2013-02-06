@@ -92,6 +92,8 @@ extern EOtrajectory* eo_trajectory_New(int32_t ticks_per_rev)
         o->acc_max        = ticks_per_rev;
         o->acc_stop_boost = ticks_per_rev;
 
+        o->start_out_of_range = eobool_false;
+        
         // boost
         o->boost          = eobool_false;
         o->boostIsBraking = eobool_false;
@@ -132,6 +134,8 @@ extern void eo_trajectory_Init(EOtrajectory *o, int32_t p0, int32_t v0, int32_t 
     o->Vel  = v0;
     o->PAcc = EMS_PERIOD*a0;
 
+    o->start_out_of_range = (p0 < o->pos_min || o->pos_max < p0);
+    
     o->PosTimer = 0;
     o->VelTimer = 0;
 
@@ -337,24 +341,44 @@ extern int8_t eo_trajectory_PosStep(EOtrajectory* o, float *p, float *v, float *
     {
         if (o->boost || o->boostTimer) eo_trajectory_BoostStop(o);
 
-        *p = o->Pos = o->pos_min;
+        if (o->start_out_of_range)
+        {
+            o->Pos = *p += 4;
+        }
+        else
+        {
+            *p = o->Pos = o->pos_min;
+        }
+          
         if (*v < 0.0f) *v = o->Vel = 0.0f;
         
         *a = 0.0f;
         
         return -1;
     }
-
+    else 
     if (*p > o->pos_max)
     {
         if (o->boost || o->boostTimer) eo_trajectory_BoostStop(o);
 
-        *p = o->Pos = o->pos_max;
+        if (o->start_out_of_range)
+        {
+            o->Pos = *p -= 4;
+        }
+        else
+        {
+            *p = o->Pos = o->pos_max;
+        }
+        
         if (*v > 0.0f) *v = o->Vel = 0.0f;
                 
         *a = 0.0f;
         
         return  1;
+    }
+    else
+    {
+        o->start_out_of_range = eobool_false;
     }
 
     return 0;
