@@ -53,6 +53,8 @@ struct EOtrajectory_hid
     
     // pos-vel boost
    
+    eObool_t start_out_of_range;
+    
     eObool_t boost;
     eObool_t boostIsBraking;
     float    boostPos;

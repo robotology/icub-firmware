@@ -205,6 +205,16 @@ extern void eo_emsController_ReadEncoders(int32_t *enc_pos)
     }
 }
 
+extern void eo_emsController_ReadTorques(int32_t *trq_measures)
+{
+    if (!s_emsc) return;
+    
+    JOINTS(j)
+    {
+        eo_axisController_SetTorque(s_emsc->axis_controller[j], trq_measures[j]);
+    }
+}
+
 #ifdef USE_2FOC_FAST_ENCODER
 extern void eo_emsController_ReadSpeed(uint8_t axis, int32_t speed)
 {
@@ -328,8 +338,8 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
     
     if (big_error_flag || s_emsc->defcon == EMS_PRUDENT || s_emsc->cable_length_alarm)
     {
-        static uint8_t time = 0;
-        if (!++time) hal_led_toggle(hal_led1); // flash green light
+        //static uint8_t time = 0;
+        //if (!++time) hal_led_toggle(hal_led1); // flash green light
         
         JOINTS(j) eo_axisController_Stop(s_emsc->axis_controller[j]);
         
@@ -348,20 +358,15 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
 //////////////////////////////////////////////////////////////////////////////////////////
 
 
-extern void eo_emsController_ReadTorques(int32_t *torque)
-{
-    if (!s_emsc) return;
-
-    #warning eo_emsController_ReadTorques TBI 
-}
-
 extern void eo_emsController_SetOutput(uint8_t joint, int16_t out)
 {
     if (s_emsc) eo_axisController_SetOutput(s_emsc->axis_controller[joint], out);    
 }
 
 extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_vel)
-{    
+{
+    if (joint == 0) hal_led_toggle(hal_led1); // green light
+        
     if (s_emsc) eo_axisController_SetPosRef(s_emsc->axis_controller[joint], pos, avg_vel);
 }
 

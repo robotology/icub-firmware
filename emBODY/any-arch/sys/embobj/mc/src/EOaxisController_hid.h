@@ -63,6 +63,9 @@ struct EOaxisController_hid
     int32_t position;
     int32_t velocity;
     
+    int32_t pos_min;
+    int32_t pos_max;
+    
     int32_t calib_timeout_ms;
     float   calib_max_error;
     float   reach_max_error;
