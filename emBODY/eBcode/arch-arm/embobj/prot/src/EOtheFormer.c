@@ -115,22 +115,22 @@ extern uint16_t eo_former_GetSizeOfStream(EOtheFormer *p, const EOrop *rop)
         return(0);
     }
 
-    if( (eo_ropcode_none == rop->head.ropc) || (eo_ropcode_usr == rop->head.ropc) )
+    if( (eo_ropcode_none == rop->stream.head.ropc) || (eo_ropcode_usr == rop->stream.head.ropc) )
     {
         return(0);      
     }
 
-    if(eobool_true == eo_rop_hid_DataField_is_Present(&rop->head))
+    if(eobool_true == eo_rop_hid_DataField_is_Present(&rop->stream.head))
     {
-         size += eo_rop_hid_DataField_EffectiveSize(rop->head.dsiz);
+         size += eo_rop_hid_DataField_EffectiveSize(rop->stream.head.dsiz);
     }
 
-    if(1 == rop->head.ctrl.plussign)
+    if(1 == rop->stream.head.ctrl.plussign)
     {
         size += 4;
     }
 
-    if(1 == rop->head.ctrl.plustime)
+    if(1 == rop->stream.head.ctrl.plustime)
     {
         size+= 8;
     }
@@ -138,22 +138,22 @@ extern uint16_t eo_former_GetSizeOfStream(EOtheFormer *p, const EOrop *rop)
     return(size);
 }
 
-extern eOresult_t eo_former_GetStream(EOtheFormer *p, const EOrop *rop, const uint16_t streamcapacity, uint8_t *streamdata, uint16_t *streamsize, eOipv4addr_t *ipaddr)
+extern eOresult_t eo_former_GetStream(EOtheFormer *p, const EOrop *rop, const uint16_t streamcapacity, uint8_t *streamdata, uint16_t *streamsize) //, eOipv4addr_t *ipaddr)
 {
     uint16_t dataeffectivesize = 0;
     uint8_t  signsize = 0;
     uint8_t  timesize = 0;
 
-    if((NULL == p) || (NULL == rop) || (NULL == streamdata) || (NULL == streamsize) || (NULL == ipaddr))
+    if((NULL == p) || (NULL == rop) || (NULL == streamdata) || (NULL == streamsize))// || (NULL == ipaddr))
     {    
         return(eores_NOK_nullpointer);
     }
 
     // we assume that the rop is legal as it was formed by the EOtheAgent or extracted from a stream by EOtheParser
     // thus we dont check too much. we just dont process eo_ropcode_none and eo_ropcode_usr
-    if( (eo_ropcode_none == rop->head.ropc) || (eo_ropcode_usr == rop->head.ropc) )
+    if( (eo_ropcode_none == rop->stream.head.ropc) || (eo_ropcode_usr == rop->stream.head.ropc) )
     {
-        if(eo_ropcode_usr == rop->head.ropc)
+        if(eo_ropcode_usr == rop->stream.head.ropc)
         {
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "doesnt support user defined ropc");
         }
@@ -161,17 +161,17 @@ extern eOresult_t eo_former_GetStream(EOtheFormer *p, const EOrop *rop, const ui
     }
 
 
-    if(eobool_true == eo_rop_hid_DataField_is_Present(&rop->head))
+    if(eobool_true == eo_rop_hid_DataField_is_Present(&rop->stream.head))
     {
-        dataeffectivesize = eo_rop_hid_DataField_EffectiveSize(rop->head.dsiz);
+        dataeffectivesize = eo_rop_hid_DataField_EffectiveSize(rop->stream.head.dsiz);
     }
 
-    if(1 == rop->head.ctrl.plussign)
+    if(1 == rop->stream.head.ctrl.plussign)
     {
         signsize = 4;
     }
 
-    if(1 == rop->head.ctrl.plustime)
+    if(1 == rop->stream.head.ctrl.plustime)
     {
         timesize = 8;
     }
@@ -184,13 +184,13 @@ extern eOresult_t eo_former_GetStream(EOtheFormer *p, const EOrop *rop, const ui
     
 
     // copy head into stream
-    memcpy(&streamdata[0], &rop->head, sizeof(eOrophead_t));
+    memcpy(&streamdata[0], &rop->stream.head, sizeof(eOrophead_t));
     (*streamsize) = sizeof(eOrophead_t);
 
     // copy data into stream if any
     if(0 != dataeffectivesize)
     {
-        memcpy(&streamdata[*streamsize], rop->data, dataeffectivesize);
+        memcpy(&streamdata[*streamsize], rop->stream.data, dataeffectivesize);
         (*streamsize) += dataeffectivesize;
     }
     
@@ -198,19 +198,19 @@ extern eOresult_t eo_former_GetStream(EOtheFormer *p, const EOrop *rop, const ui
     // copy sign if any
     if(0 != signsize)
     {
-        *((uint32_t*) (&streamdata[*streamsize]) ) = rop->sign;
+        *((uint32_t*) (&streamdata[*streamsize]) ) = rop->stream.sign;
         (*streamsize) += 4; // or signsize 
     }
  
     // copy time if any
     if(0 != timesize)
     {
-        *((uint64_t*) (&streamdata[*streamsize]) ) = rop->time;
+        *((uint64_t*) (&streamdata[*streamsize]) ) = rop->stream.time;
         (*streamsize) += 8; // or timesize
     }
 
     // ipaddr
-    *ipaddr = rop->aboutip.ipaddr;
+//    *ipaddr = rop->aboutip.ipaddr;
 
     // to be called only once just before transmission
 //    #warning --> i have removed the eo_agent_hid_OutROPonTransmission() from inside the former .... verify it

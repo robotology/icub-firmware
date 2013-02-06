@@ -144,6 +144,10 @@ extern eObool_t eo_treenode_isLeaf(EOtreenode *node)
 {
     if((NULL == node) || (0 != node->nchildren))
     {
+        return(eobool_true);
+    }
+    else if(0 != node->nchildren)
+    {
         return(eobool_false);
     }
     else

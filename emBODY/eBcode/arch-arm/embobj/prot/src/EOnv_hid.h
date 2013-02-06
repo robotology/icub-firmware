@@ -37,6 +37,7 @@ extern "C" {
 #include "EOrop.h"
 #include "EOVmutex.h"
 #include "EOVstorage.h"
+#include "EOtreenode.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
@@ -139,9 +140,11 @@ typedef const struct
  **/
 struct EOnv_hid 
 {
-    eOipv4addr_t                    ip;
-    eOnvEP_t                        ep;
-    uint8_t                         filler[2];
+    EOtreenode*                     treenode;
+    eOipv4addr_t                    ip;             // ip of the device owning the nv
+    eOnvEP_t                        ep;             // ep of the nv. the id is contained inside .con.id
+    eObool_t                        isleaf;         // tells if it is a leaf.
+    uint8_t                         filler[1];
     EOnv_con_t*                     con;        // pointer to the constant part common to every device which uses this nv
     EOnv_usr_t*                     usr;        // pointer to the configurable part specific to each device which uses this nv
     void*                           loc;        // the volatile part which keeps LOCAL value of nv 
@@ -162,8 +165,9 @@ struct EOnv_hid
 //extern EOnv * eo_nv_hid_New(uint8_t fun, uint8_t typ, uint32_t otherthingsmaybe);
 
 
-extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvEP_t ep, EOnv_con_t* con, EOnv_usr_t* usr, void* loc, void* rem, EOVmutexDerived* mtx, EOVstorageDerived* stg);
+extern eOresult_t eo_nv_hid_Load(EOnv *nv,  EOtreenode* treenode, eOipv4addr_t ip, eOnvEP_t ep, EOnv_con_t* con, EOnv_usr_t* usr, void* loc, void* rem, EOVmutexDerived* mtx, EOVstorageDerived* stg);
 
+extern void eo_nv_hid_Fast_LocalMemoryGet(EOnv *nv, void* dest);
 
 #if     !defined(EO_NV_DONT_USE_ONROPRECEPTION)
 extern eObool_t eo_nv_hid_OnBefore_ROP(const EOnv *nv, eOropcode_t ropcode, eOabstime_t roptime, uint32_t ropsign);

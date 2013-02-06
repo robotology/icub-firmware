@@ -349,8 +349,8 @@ extern eOresult_t eo_ropframe_ROP_Get(EOropframe *p, EOrop *rop, uint16_t *unpar
     ropstream = s_eo_ropframe_rops_get(p);
     ropstream += p->index;
    
-    // this function fills the rop only if everything is ok. it returns error if teh packet is not big enough or if keeps non-valid data
-    res = eo_parser_GetROP(eo_parser_GetHandle(), ropstream, unparsed, p->fromipaddr, rop, &consumedbytes);
+    // this function fills the rop only if everything is ok. it returns error if the packet is not big enough or if it keeps non-valid data
+    res = eo_parser_GetROP(eo_parser_GetHandle(), ropstream, unparsed, rop, &consumedbytes);
     
     if(eores_OK != res)
     {
@@ -367,7 +367,7 @@ extern eOresult_t eo_ropframe_ROP_Get(EOropframe *p, EOrop *rop, uint16_t *unpar
     // advance the internal index
     p->index += consumedbytes;
   
-    // returns the unspersedbytes number
+    // returns the number of un-parsed bytes
     if(NULL != unparsedbytes)
     {
         *unparsedbytes = s_eo_ropframe_sizeofrops_get(p) - p->index;
@@ -384,7 +384,6 @@ extern eOresult_t eo_ropframe_ROP_Set(EOropframe *p, const EOrop *rop, uint16_t*
     uint8_t* ropstream = NULL;
     uint16_t streamsize = 0;
     uint16_t streamindex = 0;
-    eOipv4addr_t toipaddr;
     eOresult_t res = eores_NOK_generic;
     
     if((NULL == p) || (NULL == p->headropsfooter) || (NULL == rop)) 
@@ -413,7 +412,7 @@ extern eOresult_t eo_ropframe_ROP_Set(EOropframe *p, const EOrop *rop, uint16_t*
     ropstream += streamindex;
     
     // convert the rop and put it inside the stream;    
-    res = eo_former_GetStream(eo_former_GetHandle(), rop, remaining, ropstream, &streamsize, &toipaddr);
+    res = eo_former_GetStream(eo_former_GetHandle(), rop, remaining, ropstream, &streamsize); 
  
     if(eores_OK != res)
     {

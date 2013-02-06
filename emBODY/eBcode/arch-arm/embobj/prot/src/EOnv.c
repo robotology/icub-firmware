@@ -54,7 +54,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #if defined(EO_TAILOR_CODE_FOR_ARM)
-    #define EONV_DONT_USE_EOV_MUTEX_FUNCTIONS
+//    #define EONV_DONT_USE_EOV_MUTEX_FUNCTIONS
 #endif
 
 
@@ -125,14 +125,16 @@ extern eOresult_t eo_nv_Clear(EOnv *nv)
         return(eores_NOK_nullpointer);
     }
     
-    nv->ip      = 0;
-    nv->ep      = 0;
-    nv->con     = NULL;       
-    nv->usr     = NULL;
-    nv->loc     = NULL;  
-    nv->rem     = NULL; 
-    nv->mtx     = NULL;
-    nv->stg     = NULL;
+    nv->treenode    = NULL;
+    nv->ip          = 0;
+    nv->ep          = 0;
+    nv->isleaf      = eobool_false;
+    nv->con         = NULL;       
+    nv->usr         = NULL;
+    nv->loc         = NULL;  
+    nv->rem         = NULL; 
+    nv->mtx         = NULL;
+    nv->stg         = NULL;
       
     return(eores_OK);
 }
@@ -430,6 +432,16 @@ extern eOnvFunc_t eo_nv_GetFUN(const EOnv *netvar)
     return((eOnvFunc_t)netvar->con->fun);
 }
 
+extern eObool_t eo_nv_isLeaf(const EOnv *netvar)
+{
+    if(NULL == netvar)
+    {
+        return(eobool_true);
+    }
+
+    return(netvar->isleaf);
+}
+
 
 extern eOnvType_t eo_nv_GetTYP(const EOnv *netvar)
 {
@@ -447,18 +459,27 @@ extern eOnvType_t eo_nv_GetTYP(const EOnv *netvar)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvEP_t ep, EOnv_con_t* con, EOnv_usr_t* usr, void* loc, void* rem, EOVmutexDerived* mtx, EOVstorageDerived* stg)
+extern eOresult_t eo_nv_hid_Load(EOnv *nv, EOtreenode* treenode, eOipv4addr_t ip, eOnvEP_t ep, EOnv_con_t* con, EOnv_usr_t* usr, void* loc, void* rem, EOVmutexDerived* mtx, EOVstorageDerived* stg)
 {
-    nv->ip  = ip;
-    nv->ep  = ep;
-    nv->con = con;
-    nv->usr = usr;
-    nv->loc = loc;
-    nv->rem = rem;   
-    nv->mtx = mtx;
-    nv->stg = stg;
+    nv->treenode    = treenode;
+    nv->ip          = ip;
+    nv->ep          = ep;
+    nv->isleaf      = eo_treenode_isLeaf(treenode);
+    nv->con         = con;
+    nv->usr         = usr;
+    nv->loc         = loc;
+    nv->rem         = rem;   
+    nv->mtx         = mtx;
+    nv->stg         = stg;
            
     return(eores_OK);
+}
+
+extern void eo_nv_hid_Fast_LocalMemoryGet(EOnv *nv, void* dest)
+{
+    eov_mutex_Take(nv->mtx, eok_reltimeINFINITE);
+    memcpy(dest, nv->loc, nv->con->capacity);
+    eov_mutex_Release(nv->mtx);    
 }
 
 #if !defined(EO_NV_DONT_USE_ONROPRECEPTION)

@@ -111,7 +111,7 @@ static const char s_eobj_ownname[] = "EOnvsCfg";
 
 
  
-extern EOnvsCfg* eo_nvscfg_New(uint16_t ndevices, EOVstorageDerived* stg, eOnvscfgMutexProtectionOfNVs_t mtxprot, eov_mutex_fn_mutexderived_new mtxnew)
+extern EOnvsCfg* eo_nvscfg_New(uint16_t ndevices, EOVstorageDerived* stg, eOnvscfg_protection_t prot, eov_mutex_fn_mutexderived_new mtxnew)
 {
     EOnvsCfg *p = NULL;  
 
@@ -127,8 +127,8 @@ extern EOnvsCfg* eo_nvscfg_New(uint16_t ndevices, EOVstorageDerived* stg, eOnvsc
     p->storage              = stg;
     p->allnvs               = NULL;
     p->mtxderived_new       = mtxnew; 
-    p->mtxnvsmode           = (NULL == mtxnew) ? (eo_nvscfg_mtxprotnvs_none) : (mtxprot); 
-    p->mtx_object           = (eo_nvscfg_mtxprotnvs_one_per_object == p->mtxnvsmode) ? p->mtxderived_new() : NULL;
+    p->protection           = (NULL == mtxnew) ? (eo_nvscfg_protection_none) : (prot); 
+    p->mtx_object           = (eo_nvscfg_protection_one_per_object == p->protection) ? p->mtxderived_new() : NULL;
 
     return(p);
 }
@@ -182,7 +182,7 @@ extern eOresult_t eo_nvscfg_PushBackDevice(EOnvsCfg* p, eOnvscfgOwnership_t owne
     dev->ownership              = ownership;
     dev->theendpoints_numberof  = nendpoints;
     dev->hashfn_ep2index        = hashfn_ep2index;
-    dev->mtx_device             = (eo_nvscfg_mtxprotnvs_one_per_device == p->mtxnvsmode) ? p->mtxderived_new() : NULL;
+    dev->mtx_device             = (eo_nvscfg_protection_one_per_device == p->protection) ? p->mtxderived_new() : NULL;
 #if defined(EO_NVSCFG_USE_HASHTABLE)
     dev->ephashtable            = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(eOnvsCfgEPhash_t), nendpoints);
     // teh entries of teh hastable are all {0xffff, 0xffff} to tell that they are still invalid.
@@ -265,10 +265,10 @@ extern eOresult_t eo_nvscfg_ondevice_PushBackEP(EOnvsCfg* p, uint16_t ondevindex
     theendpoint->thenvs_ramretrieve = datanvs_retrieve;
     theendpoint->thenvs_sizeof      = datanvs_size;
     theendpoint->hashfn_id2index    = hashfn_id2index;
-    theendpoint->mtx_endpoint       = (eo_nvscfg_mtxprotnvs_one_per_endpoint == p->mtxnvsmode) ? p->mtxderived_new() : NULL;
+    theendpoint->mtx_endpoint       = (eo_nvscfg_protection_one_per_endpoint == p->protection) ? p->mtxderived_new() : NULL;
     
     // now add the vector of mtx if needed.
-    if(eo_nvscfg_mtxprotnvs_one_per_netvar == p->mtxnvsmode)
+    if(eo_nvscfg_protection_one_per_netvar == p->protection)
     {
         uint16_t i;
         theendpoint->themtxofthenvs = eo_vector_New(sizeof(EOVmutexDerived*), nnvs, NULL, 0, NULL, NULL);
@@ -328,7 +328,7 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
     ndev = eo_vector_Size(p->thedevices);
     
     
-    mtx2use = (eo_nvscfg_mtxprotnvs_one_per_object == p->mtxnvsmode) ? (p->mtx_object) : (NULL);
+    mtx2use = (eo_nvscfg_protection_one_per_object == p->protection) ? (p->mtx_object) : (NULL);
 
 
 
@@ -342,7 +342,7 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
         thedev = (EOnvsCfg_device_t**) eo_vector_At(p->thedevices, i);
         nendpoints = eo_vector_Size((*thedev)->theendpoints);
         
-        mtx2use = (eo_nvscfg_mtxprotnvs_one_per_device == p->mtxnvsmode) ? ((*thedev)->mtx_device) : (mtx2use);
+        mtx2use = (eo_nvscfg_protection_one_per_device == p->protection) ? ((*thedev)->mtx_device) : (mtx2use);
 
 #if defined(EO_NVSCFG_USE_CACHED_NVS)
         eo_matrix3d_Level1_PushBack(p->allnvs, nendpoints);
@@ -352,7 +352,7 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
         {
             theendpoint = (EOnvsCfg_ep_t**) eo_vector_At((*thedev)->theendpoints, j);
             
-            mtx2use = (eo_nvscfg_mtxprotnvs_one_per_endpoint == p->mtxnvsmode) ? ((*theendpoint)->mtx_endpoint) : (mtx2use);                   
+            mtx2use = (eo_nvscfg_protection_one_per_endpoint == p->protection) ? ((*theendpoint)->mtx_endpoint) : (mtx2use);                   
 
             if(eobool_false == ((*theendpoint)->initted))
             {
@@ -385,7 +385,7 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
                 uint8_t *u8ptrrem = (uint8_t*) (*theendpoint)->thenvs_rem;
 
                 
-                if(eo_nvscfg_mtxprotnvs_one_per_netvar == p->mtxnvsmode)
+                if(eo_nvscfg_protection_one_per_netvar == p->protection)
                 {
                     uint32_t** addr = eo_vector_At((*theendpoint)->themtxofthenvs, k);
                     mtx2use = (EOVmutexDerived*) (*addr);
@@ -393,6 +393,7 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
                 
 
                 eo_nv_hid_Load(     &tmpnv,
+                                    treenode,
                                     (*thedev)->ipaddress,
                                     (*theendpoint)->endpoint,
                                     tmpnvcon,
@@ -602,30 +603,30 @@ extern EOnv* eo_nvscfg_GetNV(EOnvsCfg* p, uint16_t ondevindex, uint16_t onendpoi
     
     tmpnvcon = (EOnv_con_t*) eo_treenode_GetData(treenode);
     
-    if(eo_nvscfg_mtxprotnvs_none == p->mtxnvsmode)
+    if(eo_nvscfg_protection_none == p->protection)
     {
         mtx2use = NULL;
     }
     else
     {
-        switch(p->mtxnvsmode)
+        switch(p->protection)
         {
-            case eo_nvscfg_mtxprotnvs_one_per_object:
+            case eo_nvscfg_protection_one_per_object:
             {
                 mtx2use = p->mtx_object;
             } break;
             
-            case eo_nvscfg_mtxprotnvs_one_per_device:
+            case eo_nvscfg_protection_one_per_device:
             {
                 mtx2use = (*thedev)->mtx_device;
             } break;            
        
-            case eo_nvscfg_mtxprotnvs_one_per_endpoint:
+            case eo_nvscfg_protection_one_per_endpoint:
             {
                 mtx2use = (*theendpoint)->mtx_endpoint;
             } break;  
             
-            case eo_nvscfg_mtxprotnvs_one_per_netvar:
+            case eo_nvscfg_protection_one_per_netvar:
             {
                 #warning .... i think of void* as a uint32_t*
                 uint32_t** addr = eo_vector_At((*theendpoint)->themtxofthenvs, k);
@@ -642,6 +643,7 @@ extern EOnv* eo_nvscfg_GetNV(EOnvsCfg* p, uint16_t ondevindex, uint16_t onendpoi
         
     
     eo_nv_hid_Load(     nv,
+                        treenode,
                         (*thedev)->ipaddress,
                         (*theendpoint)->endpoint,
                         tmpnvcon,

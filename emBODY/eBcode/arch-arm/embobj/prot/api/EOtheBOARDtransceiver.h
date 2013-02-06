@@ -54,6 +54,7 @@ extern "C" {
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
+
 typedef struct
 {
     const EOconstvector*            vectorof_endpoint_cfg;
@@ -61,8 +62,9 @@ typedef struct
     eOipv4addr_t                    remotehostipv4addr;
     eOipv4port_t                    remotehostipv4port;
     eo_transceiver_sizes_t          sizes; 
-    eov_mutex_fn_mutexderived_new   mtx_fn_new;    
-    eOnvscfgMutexProtectionOfNVs_t  nvsmtxmode;
+    eov_mutex_fn_mutexderived_new   mutex_fn_new;    
+    eOtransceiver_protection_t      transprotection;
+    eOnvscfg_protection_t           nvscfgprotection;
 } eOboardtransceiver_cfg_t;
 
 
@@ -77,7 +79,7 @@ typedef struct EOtheBOARDtransceiver_hid EOtheBOARDtransceiver;
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eOboardtransceiver_cfg_t eo_boardtransceiver_cfg_default; // = {NULL};
+extern const eOboardtransceiver_cfg_t eo_boardtransceiver_cfg_default; 
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------

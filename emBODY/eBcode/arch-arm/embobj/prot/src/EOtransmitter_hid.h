@@ -40,6 +40,7 @@ extern "C" {
 #include "EOnvsCfg.h"
 #include "EOtheAgent.h"
 #include "EOlist.h"
+#include "EOVmutex.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
@@ -51,18 +52,17 @@ extern "C" {
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef struct      // 24 bytes on arm .... 32 on 64 bit arch
+
+typedef struct      // 40 bytes on arm .... 
 {
     eOropcode_t     ropcode;
-    eOnvEP_t        nvep;
-    eOnvID_t        nvid;
-    uint16_t        capacity;       
+    eObool_t        hasdata2update;       
     uint16_t        ropstarthere;   // the index where the rop starts inside teh ropframe. if data is available, then it is placed at ropstarthere+8
     uint16_t        ropsize;
     uint16_t        timeoffsetinsiderop;     // if time is not present its value is 0xffff 
-    void*           nvloc;          // the pointer to the where the real value of the nv is stored. if null, then the rop does not contain data (an ask for example)
-    EOnv*           nv;
-} eo_transm_permrops_info_t; //EO_VERIFYsizeof(eo_transm_permrops_info_t, 24);
+    EOnv            thenv;
+} eo_transm_regrop_info_t; //EO_VERIFYsizeof(eo_transm_regrop_info_t, (10*4));
+
 
 
 /** @struct     EOtransmitter_hid
@@ -75,19 +75,22 @@ struct EOtransmitter_hid
 {
     EOpacket*                   txpacket;
     EOropframe*                 ropframereadytotx;
-    EOropframe*                 ropframepermanent;
-    EOropframe*                 ropframetemporary;    
+    EOropframe*                 ropframeregulars;
+    EOropframe*                 ropframeoccasionals;    
     EOropframe*                 ropframereplies;
     EOrop*                      roptmp;
     EOnvsCfg*                   nvscfg;
     EOtheAgent*                 theagent;
     eOipv4addr_t                ipv4addr;
     eOipv4port_t                ipv4port;
-    uint8_t*                    bufferropframepermanent;
-    uint8_t*                    bufferropframetemporary;
+    uint8_t*                    bufferropframeregulars;
+    uint8_t*                    bufferropframeoccasionals;
     uint8_t*                    bufferropframereplies;
-    EOlist*                     listofpermropsinfo; 
-    eOabstime_t                 currenttime;    
+    EOlist*                     listofregropinfo; 
+    eOabstime_t                 currenttime;   
+    EOVmutexDerived*            mtx_replies;
+    EOVmutexDerived*            mtx_regulars;
+    EOVmutexDerived*            mtx_occasionals;    
 }; 
 
 

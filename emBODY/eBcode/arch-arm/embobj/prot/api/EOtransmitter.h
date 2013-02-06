@@ -44,6 +44,7 @@ extern "C" {
 #include "EOropframe.h"
 #include "EOpacket.h"
 #include "EOnvsCfg.h"
+#include "EOVmutex.h"
 
 
 
@@ -63,25 +64,32 @@ extern "C" {
 typedef struct EOtransmitter_hid EOtransmitter;
 
 
+typedef enum
+{
+    eo_transmitter_protection_none      = 0,
+    eo_transmitter_protection_total     = 1
+} eOtransmitter_protection_t;
 
 typedef struct
 {
-    uint16_t        capacityoftxpacket;  
-    uint16_t        capacityofropframepermanent; 
-    uint16_t        capacityofropframetemporary;
-    uint16_t        capacityofropframereplies;
-    uint16_t        capacityofrop;
-    uint16_t        maxnumberofpermanentrops;
-    EOnvsCfg*       nvscfg;
-    eOipv4addr_t    ipv4addr;
-    eOipv4port_t    ipv4port;
+    uint16_t                        capacityoftxpacket;  
+    uint16_t                        capacityofropframeregulars; 
+    uint16_t                        capacityofropframeoccasionals;
+    uint16_t                        capacityofropframereplies;
+    uint16_t                        capacityofrop;
+    uint16_t                        maxnumberofregularrops;
+    EOnvsCfg*                       nvscfg;
+    eOipv4addr_t                    ipv4addr;
+    eOipv4port_t                    ipv4port;
+    eov_mutex_fn_mutexderived_new   mutex_fn_new;
+    eOtransmitter_protection_t      protection;    
 } eo_transmitter_cfg_t;
 
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eo_transmitter_cfg_t eo_transmitter_cfg_default; //= {256, 128, 128, NULL};
+extern const eo_transmitter_cfg_t eo_transmitter_cfg_default; 
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -101,19 +109,24 @@ extern EOtransmitter* eo_transmitter_New(const eo_transmitter_cfg_t *cfg);
 
 extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outpkt, uint16_t *numberofrops); 
 
-// the rops in permanentrops stay forever unless unloaded one by one or all cleared. at each eo_transmitter_outpacket_Get() they are placed inside the
+// the rops in regular_rops stay forever unless unloaded one by one or all cleared. at each eo_transmitter_outpacket_Get() they are placed inside the
 // packet. they however need an explicit refresh of their values. 
-extern eOresult_t eo_transmitter_permanentrops_Load(EOtransmitter *p, eOropcode_t ropcode, eOnvEP_t nvep, eOnvID_t nvid, eOropconfig_t ropcfg); // oppure un rop gia' pronto??
-extern eOresult_t eo_transmitter_permanentrops_Unload(EOtransmitter *p, eOropcode_t ropcode, eOnvID_t nvid); 
-extern eOresult_t eo_transmitter_permanentrops_Clear(EOtransmitter *p); 
-extern eOresult_t eo_transmitter_permanentrops_Refresh(EOtransmitter *p);
+extern eOresult_t eo_transmitter_regular_rops_Load(EOtransmitter *p, eOropdescriptor_t* ropdesc); 
+extern eOresult_t eo_transmitter_regular_rops_Unload(EOtransmitter *p, eOropdescriptor_t* ropdesc); 
+extern eOresult_t eo_transmitter_regular_rops_Clear(EOtransmitter *p); 
+extern eOresult_t eo_transmitter_regular_rops_Refresh(EOtransmitter *p);
 
-// the rops in temporaryrops are inserted with following functions, put inside the packet by function eo_transmitter_outpacket_Get()
+// the rops in occasional_ropss are inserted with following functions, put inside the packet by function eo_transmitter_outpacket_Get()
 // and after that they are cleared.
 
-extern eOresult_t eo_transmitter_temporaryrop_Load(EOtransmitter *p, eOropcode_t ropcode, eOnvEP_t nvep, eOnvID_t nvid, eOropconfig_t ropcfg); 
+// obsolete ...
+extern eOresult_t eo_transmitter_occasional_rops_Load_without_data(EOtransmitter *p, eOropdescriptor_t* ropdesc, uint8_t itisobsolete); 
 
-extern eOresult_t eo_transmitter_ropframereplies_Append(EOtransmitter *p, EOropframe* ropframe);
+extern eOresult_t eo_transmitter_occasional_rops_Load(EOtransmitter *p, eOropdescriptor_t* ropdesc);
+
+extern eOresult_t eo_transmitter_reply_ropframe_Load(EOtransmitter *p, EOropframe* ropframe);
+
+
 
 
 

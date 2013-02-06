@@ -81,46 +81,43 @@ typedef enum
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef struct
-{
-    uint16_t            capacity;
-    uint16_t            index;
-} EOrop_aboutdata_hid;
+
 
 
 typedef struct
-{
+{   // temporary data used for various purposes, mainly for computing the netvar
     EOnvsCfg*           nvscfg;                 // the used nvscfg
-    eOnvOwnership_t     nvownership;
-    uint16_t            ondevindex;
-    uint16_t            onendpointindex;
-    uint16_t            onidindex;
-    EOtreenode*         nvtreenoderoot;         // points to the relevant nv in the used nvscfg using ondevindx and onendpointindex
-    EOnv                nvroot;
-//    EOnv                nvleaf;               // dont need it
-} EOrop_aboutnvs_hid;
+//    eOipv4addr_t        ipaddress;              // the ip address of the ... is not necessary to be stored
+    eOnvOwnership_t     nvownership;            // the ownership of the netvar with respect to the user of the rop
+    uint16_t            ondevindex;             // the index of the device owning the netvar inside nvscfg 
+    uint16_t            onendpointindex;        // the index of the endpoint owning the netvar on the specified device
+    uint16_t            onidindex;              // the index of the treenode inside the specified endpoint
+} EOrop_tmpdata_t;
 
+
+/* @struct     EOrop_stream_t
+    @brief      contains representation of the binary rop, whichi is formed by: 
+                head (8B) + data (4nB, optional) + sign (4B, optional) + time (8B, optional)
+ **/
 typedef struct
 {
-    eOipv4addr_t        ipaddr;
-//    eOipv4port_t        ipport;               // dont need it
-} EOrop_aboutip_hid;
-
-
-/** @struct     EOrop_hid
-    @brief      Hidden definition. Implements private data used only internally by the 
-                public or private (static) functions of the object and protected data
-                used also by its derived objects.
- **/
-struct EOrop_hid 
-{
-    EOrop_aboutdata_hid aboutdata;
-    EOrop_aboutnvs_hid  aboutnvs;
-    EOrop_aboutip_hid   aboutip;
     eOrophead_t         head;                    
     uint8_t*            data;       
     uint32_t            sign;
-    uint64_t            time;
+    uint64_t            time;    
+} EOrop_stream_t;
+
+
+/* @struct     EOrop_hid
+    @brief      Hidden definition. 
+ **/
+struct EOrop_hid 
+{
+    EOrop_stream_t      stream;                     // contains the representation of the binary rop. it is created by parser or use by rop
+    EOnv                netvar;                     // it is used by the agent in reception phase but also in transmission phase. it
+    uint16_t            capacityofstreamdatafield;  // it is the capacity of the stream.data field 
+    uint16_t            curindexofstreamdatafield;  // contains an index used to navigate the stream.data field in case the set of values are to be done on each leaf of the netvar
+    EOrop_tmpdata_t     tmpdata;                    // temporary data used for various purposes, mainly for computing the netvar    
 };    
 
 

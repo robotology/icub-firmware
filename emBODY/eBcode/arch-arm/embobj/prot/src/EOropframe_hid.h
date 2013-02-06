@@ -75,7 +75,7 @@ typedef struct  // 04 bytes
  
 struct EOropframe_hid 
 {
-    eOipv4addr_t                fromipaddr;
+    //eOipv4addr_t                fromipaddr; // it may be useful, but it is not used ....
     uint16_t                    capacity;
     uint16_t                    size;
     uint16_t                    index;
