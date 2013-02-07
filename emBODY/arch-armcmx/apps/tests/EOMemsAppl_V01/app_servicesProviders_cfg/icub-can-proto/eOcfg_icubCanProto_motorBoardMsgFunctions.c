@@ -1320,9 +1320,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         }
         s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((eOicubCanProto_controlmode_t) frame->data[1],
                                                                             &eomc_controlmode);
-        #warning X ALE: aggiungere qua funzione che prende in input errori 2foc e stato
-        //eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t motorerror, uint8_t canerror, eOmc_controlmode_t controlmode);
-        //eo_emsController_ReadMotorstatus(mId, frame->data[0], frame->data[4], eomc_controlmode);
+        eo_emsController_ReadMotorstatus(mId, frame->data[0], frame->data[4], eomc_controlmode);
         //l'aggiornamento delle nv sara' fatto nel DO.
         //se l'appl e' in config sicuramente i giunti sono in idle e quindi non c'e' ninete da aggiornare
         return(eores_OK);

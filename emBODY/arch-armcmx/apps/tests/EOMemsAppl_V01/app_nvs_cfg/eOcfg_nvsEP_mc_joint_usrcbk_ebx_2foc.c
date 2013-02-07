@@ -148,6 +148,8 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jx
                                     cfg->pidtorque.limitonoutput, 
                                     cfg->pidtorque.offset);
 
+    eo_emsController_SetEncSign((uint16_t)jxx, (int32_t)cfg->encoderconversionfactor);
+
     // 3) set velocity pid:    to be implemented
    
     // 4) set min position    
