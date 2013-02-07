@@ -40,6 +40,8 @@
 
 #define MOTORS(m) for (uint8_t m=0; m<o->n_motors; ++m)
 
+#define SAFE_MAX_CURRENT 2000
+#define LIMIT(x,L) if (x>(L)) x=(L); else if (x<-(L)) x=-(L)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -104,38 +106,66 @@ extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, eObool_t on_off)
     if (o && m<MAX_MOTORS) o->motorON[m] = on_off;
 }
 
-extern void eo_motors_PWMs_Shoulder(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor)
+extern uint8_t eo_motors_PWM(emsBoardType_t board_type, int32_t *pwm_joint, int16_t *pwm_motor, uint8_t alarm_mask)
 {
-    //pwm_motor[0] = (int16_t)(      pwm_joint[0]);
-    //pwm_motor[1] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]))/40);
-    //pwm_motor[2] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]))/40);
-
-    pwm_motor[0] = (int16_t)( pwm_joint[0]);
-    pwm_motor[1] = (int16_t)(-pwm_joint[0]+pwm_joint[1]);
-    pwm_motor[2] = (int16_t)(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]);
+    uint8_t stop_mask = 0;
     
-    pwm_motor[3] = (int16_t)pwm_joint[3];
-}
+    switch (board_type)
+    {
+    case EMS_SHOULDER:
+        pwm_motor[0] = (int16_t)(      pwm_joint[0]);
+        pwm_motor[1] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]))/40);
+        pwm_motor[2] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]))/40);
+    
+        //pwm_motor[0] = (int16_t)( pwm_joint[0]);
+        //pwm_motor[1] = (int16_t)(-pwm_joint[0]+pwm_joint[1]);
+        //pwm_motor[2] = (int16_t)(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]);
+    
+        pwm_motor[3] = (int16_t)pwm_joint[3];
+        
+        break;
 
-extern void eo_motors_PWMs_Waist(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor)
-{
-    pwm_motor[0] = (int16_t)((pwm_joint[0]-pwm_joint[1])/2);
-    pwm_motor[1] = (int16_t)((pwm_joint[0]+pwm_joint[1])/2);
-    pwm_motor[2] = (int16_t)  pwm_joint[2];
-}
+    case EMS_WAIST:
+        pwm_motor[0] = (int16_t)((pwm_joint[0]-pwm_joint[1])/2);
+        pwm_motor[1] = (int16_t)((pwm_joint[0]+pwm_joint[1])/2);
+        pwm_motor[2] = (int16_t)  pwm_joint[2];
+        
+        break;
 
-extern void eo_motors_PWMs_UpperLeg(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor)
-{    
-    pwm_motor[0] =  pwm_joint[0];
-    pwm_motor[1] =  pwm_joint[1];
-    pwm_motor[2] =  pwm_joint[2];
-    pwm_motor[3] =  pwm_joint[3];
-}
+    case EMS_UPPERLEG:
+        pwm_motor[2] =  pwm_joint[2];
+        pwm_motor[3] =  pwm_joint[3];
+    
+    case EMS_ANKLE:
+        pwm_motor[0] =  pwm_joint[0];
+        pwm_motor[1] =  pwm_joint[1];
+    }
+    
+    switch (board_type)
+    {
+    case EMS_SHOULDER:
+        if (alarm_mask & 0x08) LIMIT(pwm_motor[3], SAFE_MAX_CURRENT);
+  
+    case EMS_WAIST:
+        if (alarm_mask & 0x07)
+        {
+            LIMIT(pwm_motor[0], SAFE_MAX_CURRENT);
+            LIMIT(pwm_motor[1], SAFE_MAX_CURRENT);
+            LIMIT(pwm_motor[2], SAFE_MAX_CURRENT);
+        }
+        
+        break;
 
-extern void eo_motors_PWMs_Ankle(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor)
-{    
-    pwm_motor[0] =  pwm_joint[0];
-    pwm_motor[1] =  pwm_joint[1];
+    case EMS_UPPERLEG:
+        if (alarm_mask & 0x04) LIMIT(pwm_motor[2], SAFE_MAX_CURRENT);
+        if (alarm_mask & 0x08) LIMIT(pwm_motor[3], SAFE_MAX_CURRENT);        
+        
+    case EMS_ANKLE:
+        if (alarm_mask & 0x01) LIMIT(pwm_motor[0], SAFE_MAX_CURRENT);
+        if (alarm_mask & 0x02) LIMIT(pwm_motor[1], SAFE_MAX_CURRENT);
+    }
+    
+    return stop_mask;
 }
 
 extern eObool_t eo_motors_CableLimitAlarm(int32_t j0, int32_t j1, int32_t j2)
