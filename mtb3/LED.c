@@ -8,7 +8,6 @@ void LED_Init()
 
 	U2MODE=0;
 	TRISFbits.TRISF5=0;
-	TRISFbits.TRISF5=1;
 	TRISEbits.TRISE5=1;
 	TRISEbits.TRISE4=1;
 	TRISEbits.TRISE3=1;

@@ -302,7 +302,7 @@ void __attribute__((interrupt, no_auto_psv)) _C1Interrupt(void)
     {
         CAN1_interruptRx();   
     }
-	IFS1bits.C1IF =0;
+    IFS1bits.C1IF =0;
 }
 //------------------------------------------------------------------------
 //									MAIN
@@ -332,9 +332,10 @@ int main(void)
     //								Peripheral init
     //------------------------------------------------------------------------
     T1_Init(TIMER_VALUE);
-    CAN_Init();
+    
     I2C_Init(CH0); 
     LED_Init();
+    CAN_Init();
     l3g.i2c_write=WriteByteViaI2C;
 	l3g.i2c_read=ReadByteViaI2C;
 	l3g.i2c_burst=ReadBurstViaI2C;
@@ -457,8 +458,10 @@ if (DIG_GYRO || DIG_ACC)
 //
 	led_counter=0;
 	led0=0;
+        EnableIntCAN1;
         DisableIntT1;
         DisableIntT2;
+
         flag=0;
         flag2+0;
 

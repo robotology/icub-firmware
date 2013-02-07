@@ -1,4 +1,4 @@
-Microchip Technology Inc, vv1_10 (A) L
+Microchip Technology Inc, vv1_10 (A) S
 
 Tool Name:
   c:\program files (x86)\microchip\xc16\v1.10\bin\bin\..\bin/elf-ld.exe
@@ -127,8 +127,8 @@ section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x100               0x340           0x4e0  (1248)
 .const                       0x440                0x9c            0xea  (234)
-.text                        0x4dc              0x30fe          0x497d  (18813)
-.text                       0x35da                0x24            0x36  (54)
+.text                        0x4dc              0x3100          0x4980  (18816)
+.text                       0x35dc                0x22            0x33  (51)
 .prog                       0x3600               0x200           0x300  (768)
 .text                       0x3800               0x1e6           0x2d9  (729)
 .dinit                      0x39e6                0x7a            0xb7  (183)
@@ -143,7 +143,7 @@ Data EEPROM Memory  [Origin = 0x7ffc00, Length = 0x400]
 
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
-_0307DAE050ae02c2         0x7ffc00                0x26            0x26  (38)
+_02FBDAE05113d9c1         0x7ffc00                0x26            0x26  (38)
 
                         Total data EEPROM used (bytes):           0x26  (38) 3%
 
@@ -318,34 +318,34 @@ External Symbols in Program Memory (by address):
                   0x00118e                  _FillCanMessages16bit
                   0x001256                  _FillCanMessages16bit_all
                   0x00129c                  _main
-                  0x001c2c                  _I2C_Init
-                  0x001c58                  _I2C_test
-                  0x001cbc                  _InitialiseI2CMaster
-                  0x001cce                  _StartI2CMaster
-                  0x001d28                  _StopI2CMaster
-                  0x001d70                  _SendByteI2CMaster
-                  0x001ea6                  _WriteViaI2C
-                  0x001f36                  _WriteByteViaI2C
-                  0x001f76                  _ReceiveByteI2CMaster
-                  0x002474                  _ReadBurstViaI2C
-                  0x00254e                  _ReadViaI2C
-                  0x002706                  _ReadByteViaI2C
-                  0x002764                  _SetBoardCanFilter
-                  0x0027ce                  _CAN_Init
-                  0x002860                  _CAN1_send
-                  0x0028e0                  _CAN1_interruptTx
-                  0x002918                  _CAN1_interruptRx
-                  0x002a82                  _CAN1_getRxbufferIndex
-                  0x002a86                  _CAN1_RxbufferIndex_dec
-                  0x002a96                  _can_send_additional_info
-                  0x002ba4                  _CAN1_handleRx
-                  0x002f8c                  _can_receive_additional_info
-                  0x002f9c                  _ConfigAD7147_T
-                  0x0031ca                  _ConfigAD7147
-                  0x0033e0                  _ConfigAD7147_ALL
-                  0x003458                  _ConfigAD7147_THREE
-                  0x00352c                  _ConfigAD7147_FINGERTIP
-                  0x0035da                  _LED_Init
+                  0x001c32                  _I2C_Init
+                  0x001c5e                  _I2C_test
+                  0x001cc2                  _InitialiseI2CMaster
+                  0x001cd4                  _StartI2CMaster
+                  0x001d2e                  _StopI2CMaster
+                  0x001d76                  _SendByteI2CMaster
+                  0x001eac                  _WriteViaI2C
+                  0x001f3c                  _WriteByteViaI2C
+                  0x001f7c                  _ReceiveByteI2CMaster
+                  0x00247a                  _ReadBurstViaI2C
+                  0x002554                  _ReadViaI2C
+                  0x00270c                  _ReadByteViaI2C
+                  0x00276a                  _SetBoardCanFilter
+                  0x0027d4                  _CAN_Init
+                  0x002866                  _CAN1_send
+                  0x0028e6                  _CAN1_interruptTx
+                  0x00291e                  _CAN1_interruptRx
+                  0x002a88                  _CAN1_getRxbufferIndex
+                  0x002a8c                  _CAN1_RxbufferIndex_dec
+                  0x002a9c                  _can_send_additional_info
+                  0x002baa                  _CAN1_handleRx
+                  0x002f8e                  _can_receive_additional_info
+                  0x002f9e                  _ConfigAD7147_T
+                  0x0031cc                  _ConfigAD7147
+                  0x0033e2                  _ConfigAD7147_ALL
+                  0x00345a                  _ConfigAD7147_THREE
+                  0x00352e                  _ConfigAD7147_FINGERTIP
+                  0x0035dc                  _LED_Init
                   0x0035f0                  _LED_test
                   0x003600                  _CapOffset
                   0x003780                  _CapOffset_all
@@ -391,20 +391,20 @@ External Symbols in Program Memory (by name):
                   0x0002b8                  _CAN1SetOperationMode
                   0x0002bc                  _CAN1SetRXMode
                   0x0002cc                  _CAN1SetTXMode
-                  0x002a86                  _CAN1_RxbufferIndex_dec
-                  0x002a82                  _CAN1_getRxbufferIndex
-                  0x002ba4                  _CAN1_handleRx
-                  0x002918                  _CAN1_interruptRx
-                  0x0028e0                  _CAN1_interruptTx
-                  0x002860                  _CAN1_send
-                  0x0027ce                  _CAN_Init
+                  0x002a8c                  _CAN1_RxbufferIndex_dec
+                  0x002a88                  _CAN1_getRxbufferIndex
+                  0x002baa                  _CAN1_handleRx
+                  0x00291e                  _CAN1_interruptRx
+                  0x0028e6                  _CAN1_interruptTx
+                  0x002866                  _CAN1_send
+                  0x0027d4                  _CAN_Init
                   0x003600                  _CapOffset
                   0x003780                  _CapOffset_all
-                  0x0031ca                  _ConfigAD7147
-                  0x0033e0                  _ConfigAD7147_ALL
-                  0x00352c                  _ConfigAD7147_FINGERTIP
-                  0x002f9c                  _ConfigAD7147_T
-                  0x003458                  _ConfigAD7147_THREE
+                  0x0031cc                  _ConfigAD7147
+                  0x0033e2                  _ConfigAD7147_ALL
+                  0x00352e                  _ConfigAD7147_FINGERTIP
+                  0x002f9e                  _ConfigAD7147_T
+                  0x00345a                  _ConfigAD7147_THREE
                   0x0002e2                  _ConfigIntCAN1
                   0x000308                  _ConfigIntTimer1
                   0x000324                  _ConfigIntTimer2
@@ -412,16 +412,16 @@ External Symbols in Program Memory (by name):
                   0x001256                  _FillCanMessages16bit_all
                   0x00100e                  _FillCanMessages8bit_all
                   0x001080                  _FillCanMessages8bit_three
-                  0x001c2c                  _I2C_Init
-                  0x001c58                  _I2C_test
-                  0x001cbc                  _InitialiseI2CMaster
+                  0x001c32                  _I2C_Init
+                  0x001c5e                  _I2C_test
+                  0x001cc2                  _InitialiseI2CMaster
                   0x0038d0                  _L3GAxisBurst
                   0x00387c                  _L3GAxisRead
                   0x003830                  _L3GInit
                   0x00381e                  _L3GRegBurst
                   0x00380c                  _L3GRegRead
                   0x003800                  _L3GRegWrite
-                  0x0035da                  _LED_Init
+                  0x0035dc                  _LED_Init
                   0x0035f0                  _LED_test
                   0x0039be                  _LISAxisBurst
                   0x003968                  _LISAxisRead
@@ -431,27 +431,27 @@ External Symbols in Program Memory (by name):
                   0x0038f8                  _LISRegWrite
                   0x000346                  _OpenTimer1
                   0x00034e                  _OpenTimer2
-                  0x002474                  _ReadBurstViaI2C
-                  0x002706                  _ReadByteViaI2C
-                  0x00254e                  _ReadViaI2C
-                  0x001f76                  _ReceiveByteI2CMaster
+                  0x00247a                  _ReadBurstViaI2C
+                  0x00270c                  _ReadByteViaI2C
+                  0x002554                  _ReadViaI2C
+                  0x001f7c                  _ReceiveByteI2CMaster
                   0x003ab0                  _RecoverConfigurationFromEEprom
                   0x003a60                  _SaveEepromBoardConfig
-                  0x001d70                  _SendByteI2CMaster
+                  0x001d76                  _SendByteI2CMaster
                   0x000660                  _ServiceAD7147Isr_all
                   0x0006d0                  _ServiceAD7147Isr_three
-                  0x002764                  _SetBoardCanFilter
-                  0x001cce                  _StartI2CMaster
-                  0x001d28                  _StopI2CMaster
+                  0x00276a                  _SetBoardCanFilter
+                  0x001cd4                  _StartI2CMaster
+                  0x001d2e                  _StopI2CMaster
                   0x003b0c                  _T1_Init
                   0x003b22                  _T2_Init
                   0x000742                  _TrianglesInit
                   0x000978                  _TrianglesInit_all
                   0x000740                  _Wait
-                  0x001f36                  _WriteByteViaI2C
+                  0x001f3c                  _WriteByteViaI2C
                   0x000358                  _WriteTimer1
                   0x00035c                  _WriteTimer2
-                  0x001ea6                  _WriteViaI2C
+                  0x001eac                  _WriteViaI2C
                   0x003afc                  __ADCInterrupt
                   0x003b3c                  __AddressError
                   0x003b4c                  __AltAddressError
@@ -483,8 +483,8 @@ External Symbols in Program Memory (by name):
                   0x000484                  __pCapOffset_all
                   0x000122                  __psv_init
                   0x000100                  __resetPRI
-                  0x002f8c                  _can_receive_additional_info
-                  0x002a96                  _can_send_additional_info
+                  0x002f8e                  _can_receive_additional_info
+                  0x002a9c                  _can_send_additional_info
                   0x00129c                  _main
 
 Memory Configuration
@@ -666,20 +666,20 @@ userdata
 .comment
  *(.comment)
 
-.debug_info       0x000000       0x61ed
+.debug_info       0x000000       0x6312
  *(.debug_info)
  .debug_info      0x000000       0x19ba build/default/production/_ext/1472/can_interface.o
  .debug_info      0x0019ba         0xaa build/default/production/_ext/1472/can_protocol.o
  .debug_info      0x001a64        0xbed build/default/production/_ext/1472/I2C.o
  .debug_info      0x002651        0x384 build/default/production/_ext/1472/LED.o
- .debug_info      0x0029d5       0x1a96 build/default/production/_ext/1472/main_V3.o
- .debug_info      0x00446b        0x27b build/default/production/_ext/1472/traps.o
- .debug_info      0x0046e6        0x30e build/default/production/_ext/1472/AD7147 - Configuration.o
- .debug_info      0x0049f4        0x454 build/default/production/_ext/1472/eeprom.o
- .debug_info      0x004e48         0xf2 build/default/production/_ext/1472/timers.o
- .debug_info      0x004f3a        0xb53 build/default/production/_ext/1472/ADC.o
- .debug_info      0x005a8d        0x3b6 build/default/production/_ext/1472/lis331dlh.o
- .debug_info      0x005e43        0x3aa build/default/production/_ext/1472/l3g4200d.o
+ .debug_info      0x0029d5       0x1bbb build/default/production/_ext/1472/main_V3.o
+ .debug_info      0x004590        0x27b build/default/production/_ext/1472/traps.o
+ .debug_info      0x00480b        0x30e build/default/production/_ext/1472/AD7147 - Configuration.o
+ .debug_info      0x004b19        0x454 build/default/production/_ext/1472/eeprom.o
+ .debug_info      0x004f6d         0xf2 build/default/production/_ext/1472/timers.o
+ .debug_info      0x00505f        0xb53 build/default/production/_ext/1472/ADC.o
+ .debug_info      0x005bb2        0x3b6 build/default/production/_ext/1472/lis331dlh.o
+ .debug_info      0x005f68        0x3aa build/default/production/_ext/1472/l3g4200d.o
  *(.gnu.linkonce.wi.*)
 
 .debug_abbrev     0x000000        0xd33
@@ -697,20 +697,20 @@ userdata
  .debug_abbrev    0x000b41         0xf9 build/default/production/_ext/1472/lis331dlh.o
  .debug_abbrev    0x000c3a         0xf9 build/default/production/_ext/1472/l3g4200d.o
 
-.debug_line       0x000000       0x4c3f
+.debug_line       0x000000       0x4c4f
  *(.debug_line)
  .debug_line      0x000000        0xa99 build/default/production/_ext/1472/can_interface.o
  .debug_line      0x000a99         0x24 build/default/production/_ext/1472/can_protocol.o
  .debug_line      0x000abd       0x12a5 build/default/production/_ext/1472/I2C.o
- .debug_line      0x001d62        0x12f build/default/production/_ext/1472/LED.o
- .debug_line      0x001e91       0x1a51 build/default/production/_ext/1472/main_V3.o
- .debug_line      0x0038e2        0x15d build/default/production/_ext/1472/traps.o
- .debug_line      0x003a3f        0xb16 build/default/production/_ext/1472/AD7147 - Configuration.o
- .debug_line      0x004555        0x194 build/default/production/_ext/1472/eeprom.o
- .debug_line      0x0046e9         0x97 build/default/production/_ext/1472/timers.o
- .debug_line      0x004780        0x15f build/default/production/_ext/1472/ADC.o
- .debug_line      0x0048df        0x1a9 build/default/production/_ext/1472/lis331dlh.o
- .debug_line      0x004a88        0x1b7 build/default/production/_ext/1472/l3g4200d.o
+ .debug_line      0x001d62        0x127 build/default/production/_ext/1472/LED.o
+ .debug_line      0x001e89       0x1a69 build/default/production/_ext/1472/main_V3.o
+ .debug_line      0x0038f2        0x15d build/default/production/_ext/1472/traps.o
+ .debug_line      0x003a4f        0xb16 build/default/production/_ext/1472/AD7147 - Configuration.o
+ .debug_line      0x004565        0x194 build/default/production/_ext/1472/eeprom.o
+ .debug_line      0x0046f9         0x97 build/default/production/_ext/1472/timers.o
+ .debug_line      0x004790        0x15f build/default/production/_ext/1472/ADC.o
+ .debug_line      0x0048ef        0x1a9 build/default/production/_ext/1472/lis331dlh.o
+ .debug_line      0x004a98        0x1b7 build/default/production/_ext/1472/l3g4200d.o
 
 .debug_frame      0x000000        0x658
  *(.debug_frame)
@@ -726,19 +726,19 @@ userdata
  .debug_frame     0x000570         0x74 build/default/production/_ext/1472/lis331dlh.o
  .debug_frame     0x0005e4         0x74 build/default/production/_ext/1472/l3g4200d.o
 
-.debug_str        0x000000        0x537
+.debug_str        0x000000        0x540
  *(.debug_str)
  .debug_str       0x000000        0x174 build/default/production/_ext/1472/can_interface.o
  .debug_str       0x000174        0x106 build/default/production/_ext/1472/I2C.o
  .debug_str       0x00027a         0x1d build/default/production/_ext/1472/LED.o
- .debug_str       0x000297        0x1e7 build/default/production/_ext/1472/main_V3.o
- .debug_str       0x00047e          0xc build/default/production/_ext/1472/traps.o
- .debug_str       0x00048a         0x38 build/default/production/_ext/1472/AD7147 - Configuration.o
- .debug_str       0x0004c2         0x17 build/default/production/_ext/1472/eeprom.o
- .debug_str       0x0004d9          0xc build/default/production/_ext/1472/timers.o
- .debug_str       0x0004e5         0x3e build/default/production/_ext/1472/ADC.o
- .debug_str       0x000523          0xa build/default/production/_ext/1472/lis331dlh.o
- .debug_str       0x00052d          0xa build/default/production/_ext/1472/l3g4200d.o
+ .debug_str       0x000297        0x1f0 build/default/production/_ext/1472/main_V3.o
+ .debug_str       0x000487          0xc build/default/production/_ext/1472/traps.o
+ .debug_str       0x000493         0x38 build/default/production/_ext/1472/AD7147 - Configuration.o
+ .debug_str       0x0004cb         0x17 build/default/production/_ext/1472/eeprom.o
+ .debug_str       0x0004e2          0xc build/default/production/_ext/1472/timers.o
+ .debug_str       0x0004ee         0x3e build/default/production/_ext/1472/ADC.o
+ .debug_str       0x00052c          0xa build/default/production/_ext/1472/lis331dlh.o
+ .debug_str       0x000536          0xa build/default/production/_ext/1472/l3g4200d.o
 
 .debug_loc
  *(.debug_loc)
@@ -1807,7 +1807,7 @@ LOAD default_isr
 LOAD data_init
 
 .debug_pubtypes
-                  0x000108        0x5c1
+                  0x000108        0x5de
  .debug_pubtypes
                   0x000108        0x1b3 build/default/production/_ext/1472/can_interface.o
  .debug_pubtypes
@@ -1817,88 +1817,88 @@ LOAD data_init
  .debug_pubtypes
                   0x000399         0x6d build/default/production/_ext/1472/LED.o
  .debug_pubtypes
-                  0x000406        0x117 build/default/production/_ext/1472/main_V3.o
+                  0x000406        0x134 build/default/production/_ext/1472/main_V3.o
  .debug_pubtypes
-                  0x00051d         0x35 build/default/production/_ext/1472/traps.o
+                  0x00053a         0x35 build/default/production/_ext/1472/traps.o
  .debug_pubtypes
-                  0x000552         0x53 build/default/production/_ext/1472/eeprom.o
+                  0x00056f         0x53 build/default/production/_ext/1472/eeprom.o
  .debug_pubtypes
-                  0x0005a5         0x12 build/default/production/_ext/1472/timers.o
+                  0x0005c2         0x12 build/default/production/_ext/1472/timers.o
  .debug_pubtypes
-                  0x0005b7         0xd0 build/default/production/_ext/1472/ADC.o
+                  0x0005d4         0xd0 build/default/production/_ext/1472/ADC.o
  .debug_pubtypes
-                  0x000687         0x21 build/default/production/_ext/1472/lis331dlh.o
+                  0x0006a4         0x21 build/default/production/_ext/1472/lis331dlh.o
  .debug_pubtypes
-                  0x0006a8         0x21 build/default/production/_ext/1472/l3g4200d.o
+                  0x0006c5         0x21 build/default/production/_ext/1472/l3g4200d.o
 
 __c30_signature
-                  0x0006ca         0xc6
+                  0x0006e6         0xc6
  __c30_signature
-                  0x0006ca          0x6 build/default/production/_ext/1472/can_interface.o
+                  0x0006e6          0x6 build/default/production/_ext/1472/can_interface.o
  __c30_signature
-                  0x0006d0          0x6 build/default/production/_ext/1472/can_protocol.o
+                  0x0006ec          0x6 build/default/production/_ext/1472/can_protocol.o
  __c30_signature
-                  0x0006d6          0x6 build/default/production/_ext/1472/I2C.o
+                  0x0006f2          0x6 build/default/production/_ext/1472/I2C.o
  __c30_signature
-                  0x0006dc          0x6 build/default/production/_ext/1472/LED.o
+                  0x0006f8          0x6 build/default/production/_ext/1472/LED.o
  __c30_signature
-                  0x0006e2          0x6 build/default/production/_ext/1472/main_V3.o
+                  0x0006fe          0x6 build/default/production/_ext/1472/main_V3.o
  __c30_signature
-                  0x0006e8          0x6 build/default/production/_ext/1472/traps.o
+                  0x000704          0x6 build/default/production/_ext/1472/traps.o
  __c30_signature
-                  0x0006ee          0x6 build/default/production/_ext/1472/AD7147 - Configuration.o
+                  0x00070a          0x6 build/default/production/_ext/1472/AD7147 - Configuration.o
  __c30_signature
-                  0x0006f4          0x6 build/default/production/_ext/1472/eeprom.o
+                  0x000710          0x6 build/default/production/_ext/1472/eeprom.o
  __c30_signature
-                  0x0006fa          0x6 build/default/production/_ext/1472/timers.o
+                  0x000716          0x6 build/default/production/_ext/1472/timers.o
  __c30_signature
-                  0x000700          0x6 build/default/production/_ext/1472/ADC.o
+                  0x00071c          0x6 build/default/production/_ext/1472/ADC.o
  __c30_signature
-                  0x000706          0x6 build/default/production/_ext/1472/lis331dlh.o
+                  0x000722          0x6 build/default/production/_ext/1472/lis331dlh.o
  __c30_signature
-                  0x00070c          0x6 build/default/production/_ext/1472/l3g4200d.o
+                  0x000728          0x6 build/default/production/_ext/1472/l3g4200d.o
  __c30_signature
-                  0x000712          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1AbortAll.o)
+                  0x00072e          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1AbortAll.o)
  __c30_signature
-                  0x000718          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1Initialize.o)
+                  0x000734          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1Initialize.o)
  __c30_signature
-                  0x00071e          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1IsTXReady.o)
+                  0x00073a          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1IsTXReady.o)
  __c30_signature
-                  0x000724          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SendMessage.o)
+                  0x000740          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SendMessage.o)
  __c30_signature
-                  0x00072a          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SetFilter.o)
+                  0x000746          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SetFilter.o)
  __c30_signature
-                  0x000730          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SetMask.o)
+                  0x00074c          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SetMask.o)
  __c30_signature
-                  0x000736          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SetOperationMode.o)
+                  0x000752          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SetOperationMode.o)
  __c30_signature
-                  0x00073c          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SetRXMode.o)
+                  0x000758          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SetRXMode.o)
  __c30_signature
-                  0x000742          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SetTXMode.o)
+                  0x00075e          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SetTXMode.o)
  __c30_signature
-                  0x000748          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(ConfigIntCAN1.o)
+                  0x000764          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(ConfigIntCAN1.o)
  __c30_signature
-                  0x00074e          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(ConfigIntTimer1.o)
+                  0x00076a          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(ConfigIntTimer1.o)
  __c30_signature
-                  0x000754          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(ConfigIntTimer2.o)
+                  0x000770          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(ConfigIntTimer2.o)
  __c30_signature
-                  0x00075a          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(OpenTimer1.o)
+                  0x000776          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(OpenTimer1.o)
  __c30_signature
-                  0x000760          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(OpenTimer2.o)
+                  0x00077c          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(OpenTimer2.o)
  __c30_signature
-                  0x000766          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(WriteTimer1.o)
+                  0x000782          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(WriteTimer1.o)
  __c30_signature
-                  0x00076c          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(WriteTimer2.o)
+                  0x000788          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(WriteTimer2.o)
  __c30_signature
-                  0x000772          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib\libpic30-elf.a(crt0_standard.o)
+                  0x00078e          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib\libpic30-elf.a(crt0_standard.o)
  __c30_signature
-                  0x000778          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib\libpic30-elf.a(data_init_standard.o)
+                  0x000794          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib\libpic30-elf.a(data_init_standard.o)
  __c30_signature
-                  0x00077e          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib\libpic30-elf.a(eedata_helper.eo)
+                  0x00079a          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib\libpic30-elf.a(eedata_helper.eo)
  __c30_signature
-                  0x000784          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib\libpic30-elf.a(flash_helper.eo)
+                  0x0007a0          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib\libpic30-elf.a(flash_helper.eo)
  __c30_signature
-                  0x00078a          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib\libpic30-elf.a(memcpy_helper.eo)
+                  0x0007a6          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib\libpic30-elf.a(memcpy_helper.eo)
 
 .nbss               0x0800        0x302
  .nbss              0x0800        0x19c build/default/production/_ext/1472/main_V3.o
@@ -1961,8 +1961,8 @@ __c30_signature
                     0x8444                  __pCapOffset
                     0x8484                  __pCapOffset_all
 
-.text             0x0004dc       0x30fe
- .text            0x0004dc       0x1750 build/default/production/_ext/1472/main_V3.o
+.text             0x0004dc       0x3100
+ .text            0x0004dc       0x1756 build/default/production/_ext/1472/main_V3.o
                   0x0005bc                  __T1Interrupt
                   0x0005c8                  __T2Interrupt
                   0x000630                  __C1Interrupt
@@ -1976,36 +1976,36 @@ __c30_signature
                   0x00118e                  _FillCanMessages16bit
                   0x001256                  _FillCanMessages16bit_all
                   0x00129c                  _main
- .text            0x001c2c        0xb38 build/default/production/_ext/1472/I2C.o
-                  0x001c2c                  _I2C_Init
-                  0x001c58                  _I2C_test
-                  0x001cbc                  _InitialiseI2CMaster
-                  0x001cce                  _StartI2CMaster
-                  0x001d28                  _StopI2CMaster
-                  0x001d70                  _SendByteI2CMaster
-                  0x001ea6                  _WriteViaI2C
-                  0x001f36                  _WriteByteViaI2C
-                  0x001f76                  _ReceiveByteI2CMaster
-                  0x002474                  _ReadBurstViaI2C
-                  0x00254e                  _ReadViaI2C
-                  0x002706                  _ReadByteViaI2C
- .text            0x002764        0x838 build/default/production/_ext/1472/can_interface.o
-                  0x002764                  _SetBoardCanFilter
-                  0x0027ce                  _CAN_Init
-                  0x002860                  _CAN1_send
-                  0x0028e0                  _CAN1_interruptTx
-                  0x002918                  _CAN1_interruptRx
-                  0x002a82                  _CAN1_getRxbufferIndex
-                  0x002a86                  _CAN1_RxbufferIndex_dec
-                  0x002a96                  _can_send_additional_info
-                  0x002ba4                  _CAN1_handleRx
-                  0x002f8c                  _can_receive_additional_info
- .text            0x002f9c        0x63e build/default/production/_ext/1472/AD7147 - Configuration.o
-                  0x002f9c                  _ConfigAD7147_T
-                  0x0031ca                  _ConfigAD7147
-                  0x0033e0                  _ConfigAD7147_ALL
-                  0x003458                  _ConfigAD7147_THREE
-                  0x00352c                  _ConfigAD7147_FINGERTIP
+ .text            0x001c32        0xb38 build/default/production/_ext/1472/I2C.o
+                  0x001c32                  _I2C_Init
+                  0x001c5e                  _I2C_test
+                  0x001cc2                  _InitialiseI2CMaster
+                  0x001cd4                  _StartI2CMaster
+                  0x001d2e                  _StopI2CMaster
+                  0x001d76                  _SendByteI2CMaster
+                  0x001eac                  _WriteViaI2C
+                  0x001f3c                  _WriteByteViaI2C
+                  0x001f7c                  _ReceiveByteI2CMaster
+                  0x00247a                  _ReadBurstViaI2C
+                  0x002554                  _ReadViaI2C
+                  0x00270c                  _ReadByteViaI2C
+ .text            0x00276a        0x834 build/default/production/_ext/1472/can_interface.o
+                  0x00276a                  _SetBoardCanFilter
+                  0x0027d4                  _CAN_Init
+                  0x002866                  _CAN1_send
+                  0x0028e6                  _CAN1_interruptTx
+                  0x00291e                  _CAN1_interruptRx
+                  0x002a88                  _CAN1_getRxbufferIndex
+                  0x002a8c                  _CAN1_RxbufferIndex_dec
+                  0x002a9c                  _can_send_additional_info
+                  0x002baa                  _CAN1_handleRx
+                  0x002f8e                  _can_receive_additional_info
+ .text            0x002f9e        0x63e build/default/production/_ext/1472/AD7147 - Configuration.o
+                  0x002f9e                  _ConfigAD7147_T
+                  0x0031cc                  _ConfigAD7147
+                  0x0033e2                  _ConfigAD7147_ALL
+                  0x00345a                  _ConfigAD7147_THREE
+                  0x00352e                  _ConfigAD7147_FINGERTIP
 
 .prog             0x003600        0x200
  .prog            0x003600        0x200 build/default/production/_ext/1472/main_V3.o
@@ -2042,9 +2042,9 @@ __c30_signature
                   0x003b0c                  _T1_Init
                   0x003b22                  _T2_Init
 
-.text             0x0035da         0x24
- .text            0x0035da         0x24 build/default/production/_ext/1472/LED.o
-                  0x0035da                  _LED_Init
+.text             0x0035dc         0x22
+ .text            0x0035dc         0x22 build/default/production/_ext/1472/LED.o
+                  0x0035dc                  _LED_Init
                   0x0035f0                  _LED_test
 
 .isr.text         0x003b38         0x20
@@ -2062,8 +2062,8 @@ __c30_signature
  .isr             0x003b58          0x4 default_isr
                   0x003b58                  __DefaultInterrupt
 
-_0307DAE050ae02c2
+_02FBDAE05113d9c1
                     0xfc00         0x26 load address 0x7ffc00  
- _0307DAE050ae02c2
+ _02FBDAE05113d9c1
                     0xfc00         0x26 build/default/production/_ext/1472/main_V3.o
                     0xfc00                  _ee_data
