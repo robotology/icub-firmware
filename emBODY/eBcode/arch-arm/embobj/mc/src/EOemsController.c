@@ -236,32 +236,14 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
         static uint8_t time = 0;
         if (!++time) hal_led_toggle(hal_led0); // flash red light
         
-        MOTORS(m)
-        {
-            pwm_motor[m] = 0;
-        }
-        
-        JOINTS(j)
-        {
-            if (eo_axisController_GetControlMode(s_emsc->axis_controller[j]) != eomc_controlmode_idle)
-            {
-                return;
-            }
-        }
-        
-        // all joints idle
-        
-        ENCODERS(e)
-        {
-            eo_speedometer_Reset(s_emsc->enc_speedometer[e]);
-        }
-        
-        hal_led_off(hal_led0);
+        MOTORS(m) pwm_motor[m] = 0;
         
         return;
     }
     
     EMSdefcon_t defcon = EMS_ALL_OK;
+    
+    uint8_t alarm_mask = s_emsc->cable_length_alarm ?  0x07 : 0x00;
     
     JOINTS(j)
     {
@@ -272,16 +254,10 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
             return;
         }
         
-        if (!eo_speedometer_IsStarted(s_emsc->enc_speedometer[j]))
+        if (!eo_speedometer_IsStarted(s_emsc->enc_speedometer[j]) || !eo_axisController_IsReady(s_emsc->axis_controller[j]))
         {            
+            alarm_mask |= 1<<j;
             s_emsc->defcon = defcon = EMS_PRUDENT;
-            break;
-        }
-        
-        if (!eo_axisController_IsReady(s_emsc->axis_controller[j]))
-        {
-            s_emsc->defcon = defcon = EMS_PRUDENT;
-            break;
         }
     }
     
@@ -291,7 +267,25 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
         
         s_emsc->defcon = EMS_ALL_OK;
     }
+       
+    int32_t pwm_joint[MAX_JOINTS];
+
+    JOINTS(j)
+    {
+        eObool_t big_error_flag = eobool_false;
+        
+        pwm_joint[j] = eo_axisController_PWM(s_emsc->axis_controller[j], &big_error_flag);
+        
+        if (big_error_flag) alarm_mask |= 1<<j;
+    }
     
+    eo_motors_PWM(s_emsc->boardType, pwm_joint, pwm_motor, alarm_mask);
+}
+
+
+
+
+
     /*
     for (uint8_t m=0; m<4; ++m)
     {
@@ -306,47 +300,6 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
         }
     }
     */
-    
-    int32_t pwm_joint[MAX_JOINTS];
-
-    eObool_t big_error_flag = eobool_false;
-    
-    JOINTS(j)
-    {
-        pwm_joint[j] = eo_axisController_PWM(s_emsc->axis_controller[j], &big_error_flag);
-    }
-    
-    switch (s_emsc->boardType)
-    {
-    case EMS_SHOULDER:
-        eo_motors_PWMs_Shoulder(s_emsc->motors, pwm_joint, pwm_motor);
-        break;
-    
-    case EMS_ANKLE:
-        eo_motors_PWMs_Ankle(s_emsc->motors, pwm_joint, pwm_motor);
-        break;
-        
-    case EMS_WAIST:
-        eo_motors_PWMs_Waist(s_emsc->motors, pwm_joint, pwm_motor);
-        break;
-    
-    case EMS_UPPERLEG:
-    default:
-        eo_motors_PWMs_UpperLeg(s_emsc->motors, pwm_joint, pwm_motor);
-        break;
-    }
-    
-    if (big_error_flag || s_emsc->defcon == EMS_PRUDENT || s_emsc->cable_length_alarm)
-    {
-        //static uint8_t time = 0;
-        //if (!++time) hal_led_toggle(hal_led1); // flash green light
-        
-        JOINTS(j) eo_axisController_Stop(s_emsc->axis_controller[j]);
-        
-        MOTORS(m) LIMIT(pwm_motor[m], SAFE_MAX_CURRENT); 
-    }
-}
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////

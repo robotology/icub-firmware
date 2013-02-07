@@ -33,14 +33,6 @@ extern "C" {
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-typedef enum {
-    EMS_NULL     = 0,
-    EMS_GENERIC  = 1,
-    EMS_WAIST    = 2,
-    EMS_SHOULDER = 3,
-    EMS_ANKLE    = 4,
-    EMS_UPPERLEG = 5
-} emsBoardType_t;
 
 /* @typedef    typedef struct EOtrajectory_hid EOtrajectory
     @brief      EOtrajectory is an opaque struct. It is used to implement data abstraction for the 
