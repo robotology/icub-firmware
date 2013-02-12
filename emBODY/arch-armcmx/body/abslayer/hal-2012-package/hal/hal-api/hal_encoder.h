@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
+ * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -19,18 +19,18 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _HAL_SENSOR_ENCODER_H_
-#define _HAL_SENSOR_ENCODER_H_
+#ifndef _HAL_ENCODER_H_
+#define _HAL_ENCODER_H_
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/** @file       hal_sensor_encoder.h
+/** @file       hal_encoder.h
     @brief      This header file implements interface to a generic hal encoder sensor 
     @author     marco.accame@iit.it
-    @date       11/08/2012
+    @date       02/07/2013
 **/
 
-/** @defgroup arm_hal_sensor_encoder HAL SENSOR ENCODER
+/** @defgroup doxy_group_hal_encoder HAL SENSOR ENCODER
 
     The HAL ENCODER ....
  
@@ -52,88 +52,79 @@
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 /** @typedef    typedef enum hal_encoder_t 
-    @brief      hal_encoder_t contains every possible encoder peripheral.
+    @brief      hal_encoder_t contains every possible encoder sensor. the way the encoder is read from the peripherals
+                of the MPU depends on internals of the encoder file. in case of encoders using spi and mux, then the mapping
+                between encoders and peripherals is contained in the brdcfg file.
  **/ 
 typedef enum  
 { 
-    hal_sensor_encoder1 = 0,
-	hal_sensor_encoder2 = 1,
-    hal_sensor_encoder3 = 2,         
-    hal_sensor_encoder4 = 3,
-	hal_sensor_encoder5 = 4,
-    hal_sensor_encoder6 = 5,         
-    hal_sensor_encoder7 = 6,
-	hal_sensor_encoder8 = 7,
-    hal_sensor_encoder9 = 8
-} hal_sensor_encoder_t;
+    hal_encoder1 = 0,
+	hal_encoder2 = 1,
+    hal_encoder3 = 2,         
+    hal_encoder4 = 3,
+	hal_encoder5 = 4,
+    hal_encoder6 = 5
+} hal_encoder_t;
 
-enum { hal_sensor_encoders_num = 9 };
+enum { hal_encoders_num = 6 };
 
 
-/** @typedef    typedef uint32_t hal_sensor_encoder_position_t
-    @brief      contains value of encoder sensor
+/** @typedef    typedef uint32_t hal_encoder_position_t
+    @brief      contains value of encoder
  **/
-typedef uint32_t hal_sensor_encoder_position_t;
+typedef uint32_t hal_encoder_position_t;
 
 
 
-/** @typedef    typedef struct hal_sensor_encoder_cfg_t;
-    @brief      contains configuration data of encoder peripheral.
+/** @typedef    typedef struct hal_encoder_cfg_t;
+    @brief      contains configuration data of encoder.
  **/
 typedef struct
 {
     hal_interrupt_priority_t    priority;       /**< the priority if the ISR underlying the encoder */
     void (*callback_on_rx)(void *arg);          /**< callback called when a new value for the encoder is available   */
     void*                       arg;            /**< argument of the callback: contains pointer to latest encoder value  */
-} hal_sensor_encoder_cfg_t;
+} hal_encoder_cfg_t;
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const hal_sensor_encoder_cfg_t hal_sensor_encoder_cfg_default;   // = { .priority = hal_int_priority15, .callback_on_rx = NULL, .arg = NULL };
+extern const hal_encoder_cfg_t hal_encoder_cfg_default;   // = { .priority = hal_int_priority15, .callback_on_rx = NULL, .arg = NULL };
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn			extern hal_result_t hal_sensor_encoder_init(hal_sensor_encoder_t port, const hal_sensor_encoder_cfg_t *cfg)
-    @brief  	This function initializes spix interface (x=1 or x=2 or x=3).
+/** @fn			extern hal_result_t hal_encoder_init(hal_encoder_t port, const hal_encoder_cfg_t *cfg)
+    @brief  	This function initializes the encoder and whatever is required for its behaviour (mux and spi).
     @param  	encoder 	    the encoder
-    @param  	cfg 	        The configuration of teh encoder. 
-    @return 	hal_res_NOK_generic in case the encoder isn't configured, else hal_res_OK
+    @param  	cfg 	        The configuration of the encoder. 
+    @return 	hal_res_NOK_generic in case the encoder is not supported, else hal_res_OK
   */
-extern hal_result_t hal_sensor_encoder_init(hal_sensor_encoder_t encoder, const hal_sensor_encoder_cfg_t *cfg);
+extern hal_result_t hal_encoder_init(hal_encoder_t encoder, const hal_encoder_cfg_t *cfg);
 
 
-/** @fn			extern hal_result_t hal_sensor_encoder_read_start(hal_sensor_encoder_t encoder)
-    @brief  	This function reads datas from encoder in no-blocked way.
-                In oreder to get those datas, it is necessary to invoke hal_sensor_encoder_get_value.
+/** @fn			extern hal_result_t hal_encoder_start(hal_encoder_t encoder)
+    @brief  	This function starts reading of data from the encoder in a non-blocking way.
+                When reading is finished, then the callback on reception is invoked, which can
+                retrieve the value with hal_encoder_read().
     @param  	encoder 	    the encoder
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_sensor_encoder_read_start(hal_sensor_encoder_t encoder);
+extern hal_result_t hal_encoder_start(hal_encoder_t encoder);
 
 
-/** @fn			extern uint32_t hal_sensor_encoder_read_block(hal_sensor_encoder_t encoder, hal_sensor_encoder_position_t* value);
-    @brief  	This function reads datas from encoder in blocked way and returns read bytes.
+/** @fn			extern uint32_t hal_encoder_read(hal_encoder_t encoder, hal_encoder_position_t* value);
+    @brief  	This function reads data previously acquired by a call of hal_encoder_start().
     @param  	encoder 	    the encoder
     @param  	value 	        keeps the value.
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_sensor_encoder_read_block(hal_sensor_encoder_t encoder, hal_sensor_encoder_position_t* value);
-
-
-/** @fn			extern hal_result_t hal_sensor_encoder_get_value(hal_sensor_encoder_t encoder, hal_sensor_encoder_position_t* value)
-    @brief  	This function reads returns encoder read datas.
-    @param  	encoder 	    the encoder
-    @param  	value 	        keeps the value.
-    @return 	hal_res_NOK_generic on error else hal_res_OK
-  */
-extern hal_result_t hal_sensor_encoder_get_value(hal_sensor_encoder_t encoder, hal_sensor_encoder_position_t* value);
+extern hal_result_t hal_encoder_read(hal_encoder_t encoder, hal_encoder_position_t* value);
 
 
 
 /** @}            
-    end of group arm_hal_encoder  
+    end of group doxy_group_hal_encoder  
  **/
 
 #endif  // include-guard

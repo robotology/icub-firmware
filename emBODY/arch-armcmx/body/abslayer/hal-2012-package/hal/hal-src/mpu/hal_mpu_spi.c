@@ -37,6 +37,7 @@
 #include "hal_brdcfg.h"
 #include "hal_base_hid.h"
 #include "hal_mpu_gpio_hid.h"
+#include "hal_dma.h"
 
 
 #include "hal_utility_bits.h"
@@ -77,6 +78,7 @@ const hal_spi_cfg_t hal_spi_cfg_default =
     .ownership                  = hal_spi_ownership_master, 
     .direction                  = hal_spi_dir_txrx, 
     .activity                   = hal_spi_act_framebased,
+    .prescaler                  = hal_spi_prescaler_dontuse,
     .speed                      = hal_spi_speed_0562kbps, 
     .sizeofframe                = 4,
     .capacityoftxfifoofframes   = 4,
@@ -395,6 +397,36 @@ extern hal_result_t hal_spi_stop(hal_spi_port_t port)
     return(hal_res_OK);    
 }
 
+extern hal_result_t hal_spi_on_framereceiv_set(hal_spi_port_t port, hal_callback_t onframereceiv, void* arg)
+{
+    if(hal_false == hal_spi_hid_initted_is(port))
+    {
+        return(hal_res_NOK_generic);
+    }
+
+    hal_spi_internals_t* spixint = &s_hal_spi_internals[HAL_spi_port2index(port)];    
+    
+    spixint->config.onframereceiv       = onframereceiv;
+    spixint->config.argonframereceiv    = arg;
+    
+    return(hal_res_OK);    
+}
+
+
+extern hal_result_t hal_spi_on_frametransm_set(hal_spi_port_t port, hal_callback_t onframetransm, void* arg)
+{
+    if(hal_false == hal_spi_hid_initted_is(port))
+    {
+        return(hal_res_NOK_generic);
+    }
+
+    hal_spi_internals_t* spixint = &s_hal_spi_internals[HAL_spi_port2index(port)];    
+    
+    spixint->config.onframetransm       = onframetransm;
+    spixint->config.argonframetransm    = arg;
+    
+    return(hal_res_OK);    
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -1243,7 +1275,7 @@ static void s_hal_spi_dma_on_tranfer_done_rx(void* p)
         hal_callback_t onframereceiv = spixint->config.onframereceiv;
         if(NULL != onframereceiv)
         {
-            onframereceiv(NULL);
+            onframereceiv(spixint->config.argonframereceiv);
         }
     }
        
@@ -1261,7 +1293,7 @@ static void s_hal_spi_dma_on_tranfer_done_tx(void* p)
         hal_callback_t onframetransm = spixint->config.onframetransm;
         if(NULL != onframetransm)
         {
-            onframetransm(NULL);
+            onframetransm(spixint->config.argonframetransm);
         }    
     }
 }

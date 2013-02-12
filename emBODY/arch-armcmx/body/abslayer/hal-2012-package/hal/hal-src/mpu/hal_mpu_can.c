@@ -115,9 +115,10 @@ typedef struct
     hal_can_cfg_t               cfg;
     //hal_canfifo_t               canframes_rx_norm;
     //hal_canfifo_t               canframes_tx_norm;
-    hal_utility_fifo_t            canframes_rx_norm;
-    hal_utility_fifo_t            canframes_tx_norm;    
+    hal_utility_fifo_t          canframes_rx_norm;
+    hal_utility_fifo_t          canframes_tx_norm;    
     uint8_t                     enabled;
+    uint8_t                     txisrisenabled;
 } hal_can_portdatastructure_t;
 
 
@@ -300,6 +301,7 @@ extern hal_result_t hal_can_init(hal_can_port_t port, const hal_can_cfg_t *cfg)
     s_hal_can_hw_nvic_init(port); /* NVIC configuration */
 
     cport->enabled = 0;
+    cport->txisrisenabled = 0;
 
     s_hal_can_initted_set(port);
 
@@ -343,6 +345,7 @@ extern hal_result_t hal_can_enable(hal_can_port_t port)
     // dont enable the nvic for the tx
     //s_hal_can_tx_enable(port);
     s_hal_can_isr_tx_disable(port);
+    cport->txisrisenabled = 0;
 
     // enable scheduling 
     hal_base_hid_osal_scheduling_restart();
@@ -377,6 +380,7 @@ extern hal_result_t hal_can_disable(hal_can_port_t port)
     s_hal_can_isr_rx_disable(port);
     // dont disable the nvic for the tx. it was never enabled
     s_hal_can_isr_tx_disable(port);
+    cport->txisrisenabled = 0;
     
     // enable scheduling 
     hal_base_hid_osal_scheduling_restart();
@@ -511,20 +515,28 @@ extern hal_result_t hal_can_receptionfilter_set(hal_can_port_t port, uint8_t mas
 extern hal_result_t hal_can_out_get(hal_can_port_t port, uint8_t *numberof) 
 {
     hal_can_portdatastructure_t *cport = s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
+    uint8_t reenable_isrtx = 0;
     
     if(NULL == numberof)
     {
         return(hal_res_NOK_generic);
     }
 
-    // disable interrupt rx
-    s_hal_can_isr_rx_disable(port);
+    // disable interrupt tx
+    if(1 == cport->txisrisenabled)
+    {
+        s_hal_can_isr_tx_disable(port);
+        reenable_isrtx = 1;
+    }
     
     //*numberof = hal_canfifo_hid_size(&cport->canframes_tx_norm);
     *numberof = hal_utility_fifo_size(&cport->canframes_tx_norm);
     
-    // enable interrupt rx
-    s_hal_can_isr_rx_enable(port);
+    // enable interrupt tx
+    if(1 == reenable_isrtx)
+    {
+        s_hal_can_isr_tx_enable(port);
+    }
     
     return(hal_res_OK);
 }
@@ -701,6 +713,7 @@ static void s_hal_can_isr_sendframes_canx(hal_can_port_t port)
     hal_utility_fifo_t *fifotx = &cport->canframes_tx_norm;
 
     s_hal_can_isr_tx_disable(port);
+    cport->txisrisenabled = 0;
 
     while( (hal_utility_fifo_size(fifotx) > 0) )
     {
@@ -734,6 +747,7 @@ static void s_hal_can_isr_sendframes_canx(hal_can_port_t port)
     if(hal_utility_fifo_size(fifotx) > 0)
 	{   // we still have some frames to send, thus we enable the isr on tx which triggers as soon any of the transmit mailboxes gets empty.
     	s_hal_can_isr_tx_enable(port);
+        cport->txisrisenabled = 1;
 	}
     
     
@@ -1160,6 +1174,7 @@ static hal_result_t s_hal_can_tx_normprio(hal_can_port_t port, hal_can_frame_t *
     
     // disable interrupt in can 1 or 2 for tx depending on value of port: use the nvic
     s_hal_can_isr_tx_disable(port);
+    cport->txisrisenabled = 0;
 
     // put frame in fifo out normal priority
     res = hal_utility_fifo_put16(&cport->canframes_tx_norm, (uint8_t*)frame);

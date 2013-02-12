@@ -37,11 +37,12 @@
 #define     HAL_USE_BASE
 #define     HAL_USE_CAN
 #define     HAL_USE_CRC
+#define     HAL_USE_DMA
 #define     HAL_USE_ETH
 #define     HAL_USE_FLASH
 #define     HAL_USE_GPIO
 #define     HAL_USE_I2C
-//#define     HAL_USE_SPI
+#define     HAL_USE_SPI
 #define     HAL_USE_SYS
 #define     HAL_USE_TIMER
 #define     HAL_USE_TRACE
@@ -52,10 +53,11 @@
 #define     HAL_USE_DEVICE_CANTRANSCEIVER
 #undef  HAL_USE_DEVICE_DISPLAY  
 #define     HAL_USE_DEVICE_EEPROM
-#undef  HAL_USE_DEVICE_ENCODER
+#define     HAL_USE_DEVICE_ENCODER
 #define     HAL_USE_DEVICE_ETHTRANSCEIVER
 #undef  HAL_USE_DEVICE_GYROSCOPE
 #define     HAL_USE_DEVICE_LED
+#define     HAL_USE_DEVICE_MUX
 #define     HAL_USE_DEVICE_SWITCH
 #undef  HAL_USE_DEVICE_TERMOMETER
 

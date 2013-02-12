@@ -147,9 +147,19 @@
 #ifdef  HAL_USE_CRC
     extern const hal_crc_hid_brdcfg_t hal_brdcfg_crc__theconfig =
     {
-        .supported_mask     = (1 << hal_crc0) | (1 << hal_crc1),
+        .supported_mask     = (1 << hal_crc0) | (1 << hal_crc1)
     };
 #endif//HAL_USE_CRC
+    
+#ifdef  HAL_USE_DMA
+    extern const hal_dma_hid_brdcfg_t hal_brdcfg_dma__theconfig =
+    {
+        .supported_mask     = (1 << hal_dma_port1) | (1 << hal_dma_port2) | (1 << hal_dma_port3) | (1 << hal_dma_port4) | (1 << hal_dma_port5) |
+                              (1 << hal_dma_port6) | (1 << hal_dma_port7) | (1 << hal_dma_port8) | (1 << hal_dma_port9) | (1 << hal_dma_port10)|
+                              (1 << hal_dma_port11)| (1 << hal_dma_port12)
+
+    };
+#endif//HAL_USE_DMA       
 
 #ifdef  HAL_USE_ETH
     

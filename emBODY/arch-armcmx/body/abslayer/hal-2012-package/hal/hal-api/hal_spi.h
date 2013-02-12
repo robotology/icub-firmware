@@ -101,16 +101,37 @@ typedef enum
  **/
 typedef enum
 {
-    hal_spi_speed_0562kbps          =   562500,
-    hal_spi_speed_1125kbps          =  1125000,
-    hal_spi_speed_2250kbps          =  2250000,
-    hal_spi_speed_4500kbps          =  4500000,
-    hal_spi_speed_9000kbps          =  9000000,
-    hal_spi_speed_18000kbps         = 18000000
+    hal_spi_speed_0562kbps          =   562500,         /**< valid only for fast sys bus @ 72mhz */
+    hal_spi_speed_1125kbps          =  1125000,         /**< valid only for fast sys bus @ 72mhz */
+    hal_spi_speed_2250kbps          =  2250000,         /**< valid only for fast sys bus @ 72mhz */
+    hal_spi_speed_4500kbps          =  4500000,         /**< valid only for fast sys bus @ 72mhz */
+    hal_spi_speed_9000kbps          =  9000000,         /**< valid only for fast sys bus @ 72mhz */
+    hal_spi_speed_18000kbps         = 18000000,         /**< valid only for fast sys bus @ 72mhz */
+    hal_spi_speed_0652kbps          =   652250,         /**< valid only for fast sys bus @ 84mhz */
+    hal_spi_speed_1312kbps          =  1312500,         /**< valid only for fast sys bus @ 84mhz */
+    hal_spi_speed_2625kbps          =  2625000,         /**< valid only for fast sys bus @ 84mhz */
+    hal_spi_speed_5250kbps          =  5250000,         /**< valid only for fast sys bus @ 84mhz */
+    hal_spi_speed_10500kbps         = 10500000,         /**< valid only for fast sys bus @ 84mhz */
+    hal_spi_speed_21000kbps         = 21000000,         /**< valid only for fast sys bus @ 84mhz */
 } hal_spi_speed_t;
 
-#warning --> nel spi la velocita' non e' precisa, ma dipende dal bus della periferica e dal divisore usato. quindi non va troppo bene dare una speed. meglio dare un divisore del bus ..
 
+
+/** @typedef    typedef enum hal_spi_prescaler_t
+    @brief      contains prescaler to be applied to fast sys bus to achieve the spi speed.
+ **/
+typedef enum
+{
+    hal_spi_prescaler_dontuse   =   0,                  /**< if prescaler is not used, then internals use the hal_spi_speed_t instead */
+//    hal_spi_prescaler_002       =   1,
+    hal_spi_prescaler_004       =   2,
+    hal_spi_prescaler_008       =   3,
+    hal_spi_prescaler_016       =   4,
+    hal_spi_prescaler_032       =   5,
+    hal_spi_prescaler_064       =   6,
+    hal_spi_prescaler_128       =   7,
+    hal_spi_prescaler_256       =   8
+} hal_spi_prescaler_t;
 
 
 /** @typedef    typedef enum hal_spi_cfg_t 
@@ -121,6 +142,7 @@ typedef struct
     hal_spi_ownership_t     ownership;          /**< the communication ownership: master or slave */
     hal_spi_direction_t     direction;          /**< the communication direction: tx, rx or both */
     hal_spi_activity_t      activity;           /**< the activity: single frame, multi frame, or continuous */
+    hal_spi_prescaler_t     prescaler;
     hal_spi_speed_t         speed;              /**< the communication speed */
     uint8_t                 sizeofframe;
     uint8_t                 capacityoftxfifoofframes; /**< if direction is not hal_spi_dir_rxonly, it specifies the capacity of the fifo of frames to tx */
@@ -184,6 +206,10 @@ extern hal_result_t hal_spi_stop(hal_spi_port_t port);
 extern hal_result_t hal_spi_get(hal_spi_port_t port, uint8_t* rxframe, uint8_t* remainingrxframes);
 
 
+
+extern hal_result_t hal_spi_on_framereceiv_set(hal_spi_port_t port, hal_callback_t onframereceiv, void* arg); 
+
+extern hal_result_t hal_spi_on_frametransm_set(hal_spi_port_t port, hal_callback_t onframetransm, void* arg); 
 
 /** @}            
     end of group doxy_group_hal_spi  

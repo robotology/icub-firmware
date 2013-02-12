@@ -62,7 +62,9 @@
 
 #include "hal_device_display_hid.h" 
 #include "hal_device_eeprom_hid.h"
+#include "hal_device_encoder_hid.h"
 #include "hal_device_ethtransceiver_hid.h"
+#include "hal_device_mux_hid.h"
 #include "hal_device_switch_hid.h"
 
 #include "hal_device_accelerometer_hid.h" 
@@ -267,17 +269,21 @@ extern uint32_t hal_base_memory_getsize(const hal_cfg_t *cfg, uint32_t *size04al
     retval += hal_device_accelerometer_hid_getsize(cfg);
 #endif//HAL_USE_DEVICE_ACCELEROMETER   
 
-#ifdef HAL_USE_SENSOR_ENCODER
-    retval += hal_sensor_encoder_hid_getsize(cfg);
-#endif//HAL_USE_SENSOR_ENCODER   
+#ifdef HAL_USE_DEVICE_ENCODER
+    retval += hal_device_encoder_hid_getsize(cfg);
+#endif//HAL_USE_DEVICE_ENCODER   
 
 #ifdef  HAL_USE_DEVICE_GYROSCOPE
     retval += hal_device_gyroscope_hid_getsize(cfg);
 #endif//HAL_USE_DEVICE_GYROSCOPE   
 
-#ifdef  HAL_USE_SENSOR_TEMP
+#ifdef HAL_USE_DEVICE_MUX
+    retval += hal_device_mux_hid_getsize(cfg);
+#endif//HAL_USE_DEVICE_MUX  
+
+#ifdef  HAL_USE_DEVICE_TEMP
     retval += hal_device_termometer_hid_getsize(cfg);
-#endif//HAL_USE_SENSOR_TEMP 
+#endif//HAL_USE_DEVICE_TEMP 
 
 
     // board (hence chips)
@@ -551,11 +557,11 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
     
     
 #ifdef HAL_USE_DEVICE_ENCODER
-    if(hal_res_OK != hal_sensor_encoder_hid_setmem(cfg, data04aligned))
+    if(hal_res_OK != hal_device_encoder_hid_setmem(cfg, data04aligned))
     {
         return(hal_res_NOK_generic);
     }
-    data04aligned += hal_sensor_encoder_hid_getsize(cfg)/4;
+    data04aligned += hal_device_encoder_hid_getsize(cfg)/4;
 #endif//HAL_USE_DEVICE_ENCODER    
     
 #ifdef HAL_USE_DEVICE_GYROSCOPE
@@ -565,15 +571,22 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
     }
     data04aligned += hal_device_gyroscope_hid_getsize(cfg)/4;
 #endif//HAL_USE_DEVICE_GYROSCOPE    
- 
+
+#ifdef HAL_USE_DEVICE_MUX
+    if(hal_res_OK != hal_device_mux_hid_setmem(cfg, data04aligned))
+    {
+        return(hal_res_NOK_generic);
+    }
+    data04aligned += hal_device_mux_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICE_MUX      
     
-#ifdef HAL_USE_SENSOR_TEMP
+#ifdef HAL_USE_DEVICE_TEMP
     if(hal_res_OK != hal_device_termometer_hid_setmem(cfg, data04aligned))
     {
         return(hal_res_NOK_generic);
     }
     data04aligned += hal_device_termometer_hid_getsize(cfg)/4;
-#endif//HAL_USE_SENSOR_TEMP    
+#endif//HAL_USE_DEVICE_TEMP    
     
     
     // board (hence chips)

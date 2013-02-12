@@ -48,6 +48,10 @@
     #include "hal_mpu_crc_hid.h"
 #endif//HAL_USE_CRC
 
+#ifdef  HAL_USE_DMA
+    #include "hal_mpu_dma_hid.h"
+#endif//HAL_USE_DMA
+
 #ifdef HAL_USE_ETH
     #include "hal_mpu_eth_hid.h"
 #endif//HAL_USE_ETH
@@ -65,7 +69,7 @@
 #endif//HAL_USE_I2C
 
 #ifdef HAL_USE_SPI
-    #include "hal_spi.h"
+    #include "hal_mpu_spi_hid.h"
 #endif//HAL_USE_SPI
 
 #ifdef HAL_USE_SYS
@@ -94,6 +98,10 @@
     #include "hal_device_eeprom_hid.h" 
 #endif//HAL_USE_DEVICE_EEPROM
 
+#ifdef HAL_USE_DEVICE_ENCODER
+    #include "hal_device_encoder_hid.h"
+#endif//HAL_USE_DEVICE_ENCODER
+
 #ifdef  HAL_USE_DEVICE_ETHTRANSCEIVER
     #include "hal_device_ethtransceiver_hid.h" 
 #endif//HAL_USE_DEVICE_ETHTRANSCEIVER
@@ -109,6 +117,11 @@
 #ifdef  HAL_USE_DEVICE_LED
     #include "hal_device_led_hid.h"
 #endif//HAL_USE_DEVICE_LED
+
+#ifdef  HAL_USE_DEVICE_MUX
+    #include "hal_device_mux_hid.h"
+#endif//HAL_USE_DEVICE_MUX
+
 
 #ifdef  HAL_USE_DEVICE_SWITCH
     #include "hal_device_switch_hid.h" 
@@ -153,6 +166,10 @@
     extern const hal_crc_hid_brdcfg_t hal_brdcfg_crc__theconfig;
 #endif//HAL_USE_CRC
 
+#ifdef  HAL_USE_DMA
+    extern const hal_dma_hid_brdcfg_t hal_brdcfg_dma__theconfig;
+#endif//HAL_USE_DMA   
+
 #ifdef  HAL_USE_ETH
     extern const hal_eth_hid_brdcfg_t hal_brdcfg_eth__theconfig;
 #endif//HAL_USE_ETH
@@ -171,11 +188,6 @@
 
 #ifdef  HAL_USE_SPI
     extern const hal_spi_hid_brdcfg_t hal_brdcfg_spi__theconfig;
-    tobedone
-    extern const uint8_t hal_brdcfg_spi__supported_mask;
-    extern const hal_gpio_cfg_t hal_brdcfg_spi__miso[];
-    extern const hal_gpio_cfg_t hal_brdcfg_spi__mosi[];
-    extern const hal_gpio_cfg_t hal_brdcfg_spi__sck[];
 #endif//HAL_USE_SPI
 
 #ifdef  HAL_USE_SYS
@@ -208,9 +220,9 @@
     extern const hal_device_eeprom_hid_brdcfg_t hal_brdcfg_device_eeprom__theconfig;   
 #endif//HAL_USE_DEVICE_EEPROM 
 
-#ifdef  HAL_USE_SENSOR_ENCODER
-    extern const hal_sensor_encoder_hid_brdcfg_t hal_brdcfg_sensor_encoder__theconfig;
-#endif//HAL_USE_SENSOR_ENCODER
+#ifdef HAL_USE_DEVICE_ENCODER
+    extern const hal_device_encoder_hid_brdcfg_t hal_brdcfg_device_encoder__theconfig;
+#endif//HAL_USE_DEVICE_ENCODER
 
 #ifdef  HAL_USE_DEVICE_ETHTRANSCEIVER
     extern const hal_device_ethtransceiver_hid_brdcfg_t hal_brdcfg_device_ethtransceiver__theconfig;
@@ -219,10 +231,14 @@
 #ifdef  HAL_USE_DEVICE_GYROSCOPE
     extern const hal_device_gyroscope_hid_brdcfg_t hal_brdcfg_device_gyroscope__theconfig;
 #endif//HAL_USE_DEVICE_GYROSCOPE
-
+ 
 #ifdef  HAL_USE_DEVICE_LED
     extern const hal_device_led_hid_brdcfg_t hal_brdcfg_device_led__theconfig;
 #endif//HAL_USE_DEVICE_LED 
+
+#ifdef HAL_USE_DEVICE_MUX
+    extern const hal_device_mux_hid_brdcfg_t hal_brdcfg_device_mux__theconfig;
+#endif//HAL_USE_DEVICE_MUX  
 
 #ifdef HAL_USE_DEVICE_SWITCH
     extern const hal_device_switch_hid_brdcfg_t hal_brdcfg_device_switch__theconfig; 
