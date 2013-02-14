@@ -37,11 +37,12 @@
 #define     HAL_USE_BASE
 #define     HAL_USE_CAN
 #define     HAL_USE_CRC
+#undef     HAL_USE_DMA
 #define     HAL_USE_ETH
 #define     HAL_USE_FLASH
 #define     HAL_USE_GPIO
 #define     HAL_USE_I2C
-//#define     HAL_USE_SPI
+#undef     HAL_USE_SPI
 #define     HAL_USE_SYS
 #define     HAL_USE_TIMER
 #define     HAL_USE_TRACE
@@ -77,6 +78,9 @@
 #define     HAL_USE_CHIP_XX_EEPROM
 
 
+// -- external boards
+#undef     HAL_USE_EXTBRD_KEIL_MCBQVGA
+
 
 // - exceptions -------------------------------------------------------------------------------------------------------
 
@@ -105,17 +109,6 @@
 
 // - cross dependencies -----------------------------------------------------------------------------------------------
 
-#ifdef  HAL_USE_EEPROM
-    #define HAL_USE_I2C
-#endif//HAL_USE_EEPROM      
-
-#ifdef  HAL_USE_ENCODER
-    #define HAL_USE_SPI4ENCODER
-#endif//HAL_USE_ENCODER
-
-#ifdef  HAL_USE_SWITCH
-    #define HAL_USE_I2C
-#endif//HAL_USE_SWITCH   
 
 
 #endif  // include-guard

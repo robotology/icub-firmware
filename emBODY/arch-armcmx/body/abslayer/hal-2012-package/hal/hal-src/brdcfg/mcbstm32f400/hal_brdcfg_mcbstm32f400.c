@@ -75,27 +75,6 @@
 #endif
 
 
-#ifdef HAL_USE_SPI4ENCODER
-    //- SPI1 chip selecet
-    #define HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_PORT_CS			 	GPIOB
-//    #define HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOB
-    #define HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_ENA_ENCODER_0			GPIO_Pin_10
-    #define HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_ENA_ENCODER_1			GPIO_Pin_1
-    //- SPI2 chip selecet
-    #define HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_PORT_CS			 	GPIOB
-//    #define HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOB
-    #define HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_ENA_ENCODER_0			GPIO_Pin_10
-    #define HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_ENA_ENCODER_1			GPIO_Pin_1
-    //- SPI3 chip selecet
-    #define HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_PORT_CS			 	GPIOB
-//    #define HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOB
-    #define HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_ENA_ENCODER_0			GPIO_Pin_10
-    #define HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_ENA_ENCODER_1			GPIO_Pin_1
-    // SPI commnds for enable/disable chipselect
-    #define HAL_BRDCFG_SPI4ENCODER__SPI_CS_ENA(spix, e)	 	((hal_SPI4ENCODER_ENCDATA_GET(spix)).encoder_gpio_port->BRR |= hal_SPI4ENCODER_ENCDATA_CS_GET(spix, e).BRR_reg);
-    #define HAL_BRDCFG_SPI4ENCODER__SPI_CS_DISA(spix, e)	((hal_SPI4ENCODER_ENCDATA_GET(spix)).encoder_gpio_port->BSRR  |= hal_SPI4ENCODER_ENCDATA_CS_GET(spix, e).BSRR_reg);   
-#endif//HAL_USE_SPI4ENCODER
-
 
 
 
@@ -146,6 +125,17 @@
         .supported_mask     = (1 << hal_crc0) | (1 << hal_crc1),
     };
 #endif//HAL_USE_CRC
+    
+#ifdef  HAL_USE_DMA
+    extern const hal_dma_hid_brdcfg_t hal_brdcfg_dma__theconfig =
+    {
+        .supported_mask     = (1 << hal_dma_port1) | (1 << hal_dma_port2) | (1 << hal_dma_port3) | (1 << hal_dma_port4) | (1 << hal_dma_port5) |
+                              (1 << hal_dma_port6) | (1 << hal_dma_port7) | (1 << hal_dma_port8) | (1 << hal_dma_port9) | (1 << hal_dma_port10)|
+                              (1 << hal_dma_port11)| (1 << hal_dma_port12)| (1 << hal_dma_port13)| (1 << hal_dma_port14)| (1 << hal_dma_port15)|
+                              (1 << hal_dma_port16)
+
+    };
+#endif//HAL_USE_DMA     
 
 
 #ifdef  HAL_USE_ETH
