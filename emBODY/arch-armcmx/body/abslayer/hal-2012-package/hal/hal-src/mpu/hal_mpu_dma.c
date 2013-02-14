@@ -93,7 +93,7 @@ typedef struct
 #if     defined(USE_STM32F1)    
     DMA_Channel_TypeDef*    stm32dmaperiph;
 #elif   defined(USE_STM32F4)   
-    tipodellostream*        stm32dmaperiph;
+    DMA_Stream_TypeDef*     stm32dmaperiph;
 #endif    
 //    void*                   source;
 //    void*                   destin;
@@ -159,7 +159,46 @@ static const IRQn_Type s_hal_dma_irqnumber[hal_dma_ports_num] =
     UsageFault_IRQn, UsageFault_IRQn, UsageFault_IRQn, UsageFault_IRQn // use UsageFault_IRQn when there is no dma port available
 };
 #elif   defined(USE_STM32F4)
-    #error --> define s_hal_dma_memory_mapping_of_ports[] for stm32f4
+           
+static DMA_Stream_TypeDef* const s_hal_dma_memory_mapping_of_ports[hal_dma_ports_num] = 
+{
+    DMA1_Stream0, DMA1_Stream1, DMA1_Stream2, DMA1_Stream3, DMA1_Stream4, DMA1_Stream5, DMA1_Stream6, DMA1_Stream7, 
+    DMA2_Stream0, DMA2_Stream1, DMA2_Stream2, DMA2_Stream3, DMA2_Stream4, DMA2_Stream5, DMA2_Stream6, DMA2_Stream7
+}; 
+
+static const uint32_t s_hal_dma_periphclocks[hal_dma_ports_num] = 
+{
+    RCC_AHB1Periph_DMA1, RCC_AHB1Periph_DMA1, RCC_AHB1Periph_DMA1, RCC_AHB1Periph_DMA1, RCC_AHB1Periph_DMA1, RCC_AHB1Periph_DMA1, RCC_AHB1Periph_DMA1, RCC_AHB1Periph_DMA1,
+    RCC_AHB1Periph_DMA2, RCC_AHB1Periph_DMA2, RCC_AHB1Periph_DMA2, RCC_AHB1Periph_DMA2, RCC_AHB1Periph_DMA2, RCC_AHB1Periph_DMA2, RCC_AHB1Periph_DMA2, RCC_AHB1Periph_DMA2
+};
+
+static const uint32_t s_hal_dma_irqflag_gl[hal_dma_ports_num] =
+{
+    DMA_FLAG_TCIF0|DMA_FLAG_HTIF0|DMA_FLAG_TEIF0|DMA_FLAG_DMEIF0|DMA_FLAG_FEIF0, 
+    DMA_FLAG_TCIF1|DMA_FLAG_HTIF1|DMA_FLAG_TEIF1|DMA_FLAG_DMEIF1|DMA_FLAG_FEIF1,
+    DMA_FLAG_TCIF2|DMA_FLAG_HTIF2|DMA_FLAG_TEIF2|DMA_FLAG_DMEIF2|DMA_FLAG_FEIF2,
+    DMA_FLAG_TCIF3|DMA_FLAG_HTIF3|DMA_FLAG_TEIF3|DMA_FLAG_DMEIF3|DMA_FLAG_FEIF3,
+    DMA_FLAG_TCIF4|DMA_FLAG_HTIF4|DMA_FLAG_TEIF4|DMA_FLAG_DMEIF4|DMA_FLAG_FEIF4,
+    DMA_FLAG_TCIF5|DMA_FLAG_HTIF5|DMA_FLAG_TEIF5|DMA_FLAG_DMEIF5|DMA_FLAG_FEIF5,
+    DMA_FLAG_TCIF6|DMA_FLAG_HTIF6|DMA_FLAG_TEIF6|DMA_FLAG_DMEIF6|DMA_FLAG_FEIF6,
+    
+    DMA_FLAG_TCIF0|DMA_FLAG_HTIF0|DMA_FLAG_TEIF0|DMA_FLAG_DMEIF0|DMA_FLAG_FEIF0, 
+    DMA_FLAG_TCIF1|DMA_FLAG_HTIF1|DMA_FLAG_TEIF1|DMA_FLAG_DMEIF1|DMA_FLAG_FEIF1,
+    DMA_FLAG_TCIF2|DMA_FLAG_HTIF2|DMA_FLAG_TEIF2|DMA_FLAG_DMEIF2|DMA_FLAG_FEIF2,
+    DMA_FLAG_TCIF3|DMA_FLAG_HTIF3|DMA_FLAG_TEIF3|DMA_FLAG_DMEIF3|DMA_FLAG_FEIF3,
+    DMA_FLAG_TCIF4|DMA_FLAG_HTIF4|DMA_FLAG_TEIF4|DMA_FLAG_DMEIF4|DMA_FLAG_FEIF4,
+    DMA_FLAG_TCIF5|DMA_FLAG_HTIF5|DMA_FLAG_TEIF5|DMA_FLAG_DMEIF5|DMA_FLAG_FEIF5,
+    DMA_FLAG_TCIF6|DMA_FLAG_HTIF6|DMA_FLAG_TEIF6|DMA_FLAG_DMEIF6|DMA_FLAG_FEIF6    
+};
+
+static const IRQn_Type s_hal_dma_irqnumber[hal_dma_ports_num] =
+{
+    DMA1_Stream0_IRQn, DMA1_Stream1_IRQn, DMA1_Stream2_IRQn, DMA1_Stream3_IRQn, DMA1_Stream4_IRQn, DMA1_Stream5_IRQn, DMA1_Stream6_IRQn, DMA1_Stream7_IRQn,
+    DMA2_Stream0_IRQn, DMA2_Stream1_IRQn, DMA2_Stream2_IRQn, DMA2_Stream3_IRQn, DMA2_Stream4_IRQn, DMA2_Stream5_IRQn, DMA2_Stream6_IRQn, DMA2_Stream7_IRQn   
+    // use UsageFault_IRQn when there is no dma port available
+};
+
+
 #endif
 
 
@@ -196,10 +235,18 @@ extern hal_result_t hal_dma_init(hal_dma_port_t port, const hal_dma_cfg_t *cfg)
     
     
     // enable the peripheral clock
+    
+#if     defined(USE_STM32F1)
     RCC_AHBPeriphClockCmd(s_hal_dma_periphclocks[HAL_dma_port2index(port)], ENABLE);
-
+#elif    defined(USE_STM32F4)
+    RCC_AHB1PeriphResetCmd(s_hal_dma_periphclocks[HAL_dma_port2index(port)], ENABLE);
+#endif    
+    
+    
+    #error --> verifica nel progetto stm32f4x spi con dam come viene inizializzato il dma. vedi anche i registri poiche' sono diversi dal stm32f1
     
     // set stm32dmainit
+#if     defined(USE_STM32F1)    
     dmaportdata->stm32dmainit.DMA_PeripheralBaseAddr    = (uint32_t)cfg->source;
     dmaportdata->stm32dmainit.DMA_MemoryBaseAddr        = (uint32_t)cfg->destin;
     dmaportdata->stm32dmainit.DMA_DIR                   = (hal_dma_transfer_per2mem == cfg->transfer) ? (DMA_DIR_PeripheralSRC) : (DMA_DIR_PeripheralDST);
@@ -211,6 +258,26 @@ extern hal_result_t hal_dma_init(hal_dma_port_t port, const hal_dma_cfg_t *cfg)
     dmaportdata->stm32dmainit.DMA_Mode                  = DMA_Mode_Normal;
     dmaportdata->stm32dmainit.DMA_Priority              = DMA_Priority_VeryHigh; // or decide which priority is given
     dmaportdata->stm32dmainit.DMA_M2M                   = DMA_M2M_Disable; // or DMA_M2M_Enable in memory2memory
+#elif    defined(USE_STM32F4)
+    dmaportdata->stm32dmainit.DMA_Channel               = DMA_Channel_0;
+    #warning --> VERIFICA SE DMA_Channel_0 va bene oppure cosa ...
+    dmaportdata->stm32dmainit.DMA_PeripheralBaseAddr    = (uint32_t)cfg->source;
+    dmaportdata->stm32dmainit.DMA_Memory0BaseAddr       = (uint32_t)cfg->destin;
+    dmaportdata->stm32dmainit.DMA_DIR                   = (hal_dma_transfer_per2mem == cfg->transfer) ? (DMA_DIR_PeripheralToMemory) : (DMA_DIR_MemoryToPeripheral);
+    dmaportdata->stm32dmainit.DMA_BufferSize            = (uint32_t)cfg->datasize;
+    dmaportdata->stm32dmainit.DMA_PeripheralInc         = (hal_dma_transfer_per2mem == cfg->transfer) ? (DMA_PeripheralInc_Disable) : (DMA_PeripheralInc_Disable);    
+    dmaportdata->stm32dmainit.DMA_MemoryInc             = (hal_dma_transfer_per2mem == cfg->transfer) ? (DMA_MemoryInc_Enable) : (DMA_MemoryInc_Enable);
+    dmaportdata->stm32dmainit.DMA_PeripheralDataSize    = DMA_PeripheralDataSize_Byte; // decide granularity
+    dmaportdata->stm32dmainit.DMA_MemoryDataSize        = DMA_MemoryDataSize_Byte; // decide granularity
+    dmaportdata->stm32dmainit.DMA_Mode                  = DMA_Mode_Normal;    
+    dmaportdata->stm32dmainit.DMA_Priority              = DMA_Priority_VeryHigh; // or decide which priority is given
+    dmaportdata->stm32dmainit.DMA_FIFOMode              = DMA_FIFOMode_Disable;
+    #warning --> VERIFICA DMA_FIFOMode_Disable, DMA_FIFOThreshold_Full, DMA_MemoryBurst_Single, 
+    dmaportdata->stm32dmainit.DMA_FIFOThreshold         = DMA_FIFOThreshold_Full;
+    dmaportdata->stm32dmainit.DMA_MemoryBurst           = DMA_MemoryBurst_Single;
+    dmaportdata->stm32dmainit.DMA_PeripheralBurst       = DMA_PeripheralBurst_Single;       
+    
+#endif  
     
     DMA_DeInit(dmaportdata->stm32dmaperiph);
     DMA_Init(dmaportdata->stm32dmaperiph, &dmaportdata->stm32dmainit);
@@ -359,14 +426,25 @@ extern hal_result_t hal_dma_destin_set(hal_dma_port_t port, void* destin)
     if(NULL != destin)
     {
         dmaportdata->cfg.destin                         = destin;
-        dmaportdata->stm32dmainit.DMA_MemoryBaseAddr    = (uint32_t)dmaportdata->cfg.destin;   
+#if     defined(USE_STM32F1)    
+        dmaportdata->stm32dmainit.DMA_MemoryBaseAddr    = (uint32_t)dmaportdata->cfg.destin;
+#elif   defined(USE_STM32F4)   
+        dmaportdata->stm32dmainit.DMA_Memory0BaseAddr   = (uint32_t)dmaportdata->cfg.destin;
+#endif                           
     }  
 
     dmaportdata->stopit = hal_false;    
     
     DMA_Cmd(dmaportdata->stm32dmaperiph, DISABLE);
+    
+#if     defined(USE_STM32F1)    
     dmaportdata->stm32dmaperiph->CMAR   = dmaportdata->stm32dmainit.DMA_MemoryBaseAddr;
     dmaportdata->stm32dmaperiph->CNDTR  = dmaportdata->stm32dmainit.DMA_BufferSize;
+#elif   defined(USE_STM32F4)   
+    dmaportdata->stm32dmaperiph->CMAR   = dmaportdata->stm32dmainit.DMA_MemoryBaseAddr;
+    dmaportdata->stm32dmaperiph->CNDTR  = dmaportdata->stm32dmainit.DMA_BufferSize;
+#endif           
+
     DMA_Cmd(dmaportdata->stm32dmaperiph, ENABLE);
     
     return(hal_res_OK);
@@ -378,6 +456,8 @@ extern hal_result_t hal_dma_destin_set(hal_dma_port_t port, void* destin)
 
 
 // ---- isr of the module: begin ----
+
+#if     defined(USE_STM32F1)
 
 void DMA1_Channel1_IRQHandler(void)
 {
@@ -438,6 +518,91 @@ void DMA2_Channel5_IRQHandler(void)
 {
     s_hal_dma_isr_portx(hal_dma_port12);
 }
+
+#elif   defined(USE_STM32F4)
+
+void DMA1_Stream0_IRQHandler(void)
+{
+    s_hal_dma_isr_portx(hal_dma_port1);
+}
+
+void DMA1_Stream1_IRQHandler(void)
+{
+    s_hal_dma_isr_portx(hal_dma_port2);  
+}
+
+void DMA1_Stream2_IRQHandler(void)
+{
+    s_hal_dma_isr_portx(hal_dma_port3);
+}
+
+void DMA1_Stream3_IRQHandler(void)
+{
+    s_hal_dma_isr_portx(hal_dma_port4);
+}
+
+void DMA1_Stream4_IRQHandler(void)
+{
+    s_hal_dma_isr_portx(hal_dma_port5);
+}
+
+void DMA1_Stream5_IRQHandler(void)
+{
+    s_hal_dma_isr_portx(hal_dma_port6);
+}
+
+void DMA1_Stream6_IRQHandler(void)
+{
+    s_hal_dma_isr_portx(hal_dma_port7);
+}
+
+void DMA1_Stream7_IRQHandler(void)
+{
+    s_hal_dma_isr_portx(hal_dma_port8);
+}
+
+void DMA2_Stream0_IRQHandler(void)
+{
+    s_hal_dma_isr_portx(hal_dma_port9);
+}
+
+void DMA2_Stream1_IRQHandler(void)
+{
+    s_hal_dma_isr_portx(hal_dma_port10);
+}
+
+void DMA2_Stream2_IRQHandler(void)
+{
+    s_hal_dma_isr_portx(hal_dma_port11);
+}
+
+void DMA2_Stream3_IRQHandler(void)
+{
+    s_hal_dma_isr_portx(hal_dma_port12);
+}
+
+void DMA2_Stream4_IRQHandler(void)
+{
+    s_hal_dma_isr_portx(hal_dma_port13);
+}
+
+void DMA2_Stream5_IRQHandler(void)
+{
+    s_hal_dma_isr_portx(hal_dma_port14);
+}
+
+void DMA2_Stream6_IRQHandler(void)
+{
+    s_hal_dma_isr_portx(hal_dma_port15);
+}
+
+void DMA2_Stream7_IRQHandler(void)
+{
+    s_hal_dma_isr_portx(hal_dma_port16);
+}
+
+
+#endif
 
 // ---- isr of the module: end ------
 
@@ -578,7 +743,11 @@ static void s_hal_dma_hw_nvic_init(hal_dma_port_t port)
 
 static void s_hal_dma_isr_clear_flag(hal_dma_port_t port) 
 {
+#if     defined(USE_STM32F1)
     DMA_ClearFlag(s_hal_dma_irqflag_gl[HAL_dma_port2index(port)]);
+#elif   defined(USE_STM32F4)    
+    DMA_ClearFlag(s_hal_dma_memory_mapping_of_ports[HAL_dma_port2index(port)], s_hal_dma_irqflag_gl[HAL_dma_port2index(port)]);
+#endif
 }
 
 
