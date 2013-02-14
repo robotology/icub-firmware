@@ -571,6 +571,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\devices\hal_device_termometer.c</FilePath>
             </File>
+            <File>
+              <FileName>hal_device_encoder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_encoder.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_mux.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_mux.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1250,6 +1260,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\devices\hal_device_termometer.c</FilePath>
             </File>
+            <File>
+              <FileName>hal_device_encoder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_encoder.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_mux.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_mux.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1928,6 +1948,16 @@
               <FileName>hal_device_termometer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\devices\hal_device_termometer.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_encoder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_encoder.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_mux.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_mux.c</FilePath>
             </File>
           </Files>
         </Group>

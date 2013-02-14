@@ -136,6 +136,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -471,6 +472,11 @@
               <FilePath>..\..\hal\hal-src\mpu\hal_mpu_crc.c</FilePath>
             </File>
             <File>
+              <FileName>hal_mpu_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_dma.c</FilePath>
+            </File>
+            <File>
               <FileName>hal_mpu_eth.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\mpu\hal_mpu_eth.c</FilePath>
@@ -794,6 +800,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -1127,6 +1134,11 @@
               <FileName>hal_mpu_crc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\mpu\hal_mpu_crc.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_mpu_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_dma.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_eth.c</FileName>
