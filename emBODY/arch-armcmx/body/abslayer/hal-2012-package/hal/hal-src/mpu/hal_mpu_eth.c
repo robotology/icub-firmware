@@ -379,8 +379,8 @@ static void s_hal_eth_initted_set(void);
 static hal_boolval_t s_hal_eth_initted_is(void);
 
 // keep the same names of the tcpnet driver, without s_ prefix
-static void rx_descr_init (void);
-static void tx_descr_init (void);
+static void s_hal_eth_rx_descr_init(void);
+static void s_hal_eth_tx_descr_init(void);
 
 
 static void s_hal_eth_rmii_init(void);
@@ -500,23 +500,48 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     return(hal_res_OK);
 }
 
-
+#define EXPERIMENTAL_ETH_ENABLE_DISABLE_BUT_IT_IS_TO_BE_TESTED
 extern hal_result_t hal_eth_enable(void) 
 {
+#if     !defined(EXPERIMENTAL_ETH_ENABLE_DISABLE_BUT_IT_IS_TO_BE_TESTED)
     // acemor on 31 oct 2011: it is the same as NVIC_EnableIRQ(ETH_IRQn) or hal_sys_hid_irqn_enable()
     /* Ethernet Interrupt Enable function. */
+    
     NVIC->ISER[1] = 1 << 29;
-
+#else    
+    // for __DSB() and __ISB, see: http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.faqs/ka13559.html
+    
+    NVIC_ClearPendingIRQ(ETH_IRQn); // shall i clear or shall i not clear?
+    
+    NVIC_EnableIRQ(ETH_IRQn);
+    __DSB();
+    __ISB();
+    
+    // i need to force the isr if since last call of hal_eth_disable() the dma has moved a frame in the descriptor
+    
+    if(INT_RIE == (INT_RIE & ETH->DMASR))
+    {
+        NVIC_SetPendingIRQ(ETH_IRQn);
+    }    
+#endif    
     return(hal_res_OK);
 }
 
 
 extern hal_result_t hal_eth_disable(void) 
 {
+#if     !defined(EXPERIMENTAL_ETH_ENABLE_DISABLE_BUT_IT_IS_TO_BE_TESTED)
     // acemor on 31 oct 2011: it is the same as NVIC_DisableIRQ(ETH_IRQn) or hal_sys_hid_irqn_disable()
     /* Ethernet Interrupt Disable function. */
+    
     NVIC->ICER[1] = 1 << 29;
-
+#else      
+    // for __DSB() and __ISB, see: http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.faqs/ka13559.html
+    
+    NVIC_DisableIRQ(ETH_IRQn);
+    __DSB();
+    __ISB();
+#endif  
     return(hal_res_OK);
 }
 
@@ -727,7 +752,8 @@ static hal_boolval_t s_hal_eth_initted_is(void)
 
 
 // changed NUM_RX_BUF with hal_base_hid_params.eth_dmarxbuffer_num
-static void rx_descr_init (void) {
+static void s_hal_eth_rx_descr_init(void) 
+{
   /* Initialize Receive DMA Descriptor array. */
   U32 i,next;
 
@@ -743,7 +769,8 @@ static void rx_descr_init (void) {
 }
 
 // changed NUM_TX_BUF with hal_base_hid_params.eth_dmatxbuffer_num
-static void tx_descr_init (void) {
+static void s_hal_eth_tx_descr_init(void) 
+{
   /* Initialize Transmit DMA Descriptor array. */
   U32 i,next;
 
@@ -822,8 +849,8 @@ static void s_hal_eth_mac_init(const hal_eth_cfg_t *cfg, hal_eth_phymode_t phymo
    
    
     /* Initialize Tx and Rx DMA Descriptors */
-    rx_descr_init ();
-    tx_descr_init ();
+    s_hal_eth_rx_descr_init();
+    s_hal_eth_tx_descr_init();
     
     /* Flush FIFO, start DMA Tx and Rx */
     ETH->DMAOMR = DOMR_FTF | DOMR_ST | DOMR_SR;
