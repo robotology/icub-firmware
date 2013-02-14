@@ -73,81 +73,7 @@
 #endif
 
 
-#ifdef HAL_USE_SPI4ENCODER
-    //- SPI1 chip selecet
-    #define HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_PORT_CS			 	GPIOD
-//    #define HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOD
-    #define SPI1_GPIO_SEL_ENCODER_PIN_1	  	GPIO_Pin_2
-    #define SPI1_GPIO_SEL_ENCODER_PIN_2	  	GPIO_Pin_3
-    #define SPI1_GPIO_ENA_SLAVE		  		GPIO_Pin_4
-//    #define HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_ENA_ENCODER_0			GPIO_Pin_10
-//    #define HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_ENA_ENCODER_1			GPIO_Pin_1
-#define SPI1_GPIO_SEL_LOW_ENCODER_0  	SPI1_GPIO_SEL_ENCODER_PIN_1 | SPI1_GPIO_SEL_ENCODER_PIN_2
-#define SPI1_GPIO_SEL_HIGH_ENCODER_0 	0
-#define SPI1_GPIO_SEL_LOW_ENCODER_1    	SPI1_GPIO_SEL_ENCODER_PIN_2
-#define SPI1_GPIO_SEL_HIGH_ENCODER_1  	SPI1_GPIO_SEL_ENCODER_PIN_1
-#define SPI1_GPIO_SEL_LOW_ENCODER_2    	SPI1_GPIO_SEL_ENCODER_PIN_1
-#define SPI1_GPIO_SEL_HIGH_ENCODER_2  	SPI1_GPIO_SEL_ENCODER_PIN_2
-    //- SPI2 chip selecet
-    #define HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_PORT_CS			 	GPIOD
-//    #define HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOD
-    #define SPI2_GPIO_SEL_ENCODER_PIN_1	  	GPIO_Pin_2
-    #define SPI2_GPIO_SEL_ENCODER_PIN_2	  	GPIO_Pin_3
-    #define SPI2_GPIO_ENA_SLAVE		  		GPIO_Pin_4 
-//    #define HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_ENA_ENCODER_0			GPIO_Pin_10
-//    #define HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_ENA_ENCODER_1			GPIO_Pin_1
-
-#define SPI2_GPIO_SEL_LOW_ENCODER_0  	GPIO_Pin_2 | GPIO_Pin_3
-#define SPI2_GPIO_SEL_HIGH_ENCODER_0 	0
-
-#define SPI2_GPIO_SEL_LOW_ENCODER_1    	GPIO_Pin_3
-#define SPI2_GPIO_SEL_HIGH_ENCODER_1  	GPIO_Pin_2
-
-#define SPI2_GPIO_SEL_LOW_ENCODER_2    	GPIO_Pin_2
-#define SPI2_GPIO_SEL_HIGH_ENCODER_2  	GPIO_Pin_3
-
-#define SPI2_GPIO_ENA_ENCODER_ALL		GPIO_Pin_4
-#define SPI2_GPIO_DESELECT_ENCODER_ALL	GPIO_Pin_2 | GPIO_Pin_3
-   
-    //- SPI3 chip selecet
-    #define HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_PORT_CS			 	GPIOD
-//    #define HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOD
-
-    #define  SPI3_GPIO_SEL_ENCODER_PIN_1	  	GPIO_Pin_5
-    #define  SPI3_GPIO_SEL_ENCODER_PIN_2	  	GPIO_Pin_6
-    #define  SPI3_GPIO_ENA_SLAVE		  		GPIO_Pin_7
-    
-//    #define HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_ENA_ENCODER_0			GPIO_Pin_10
-//    #define HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_ENA_ENCODER_1			GPIO_Pin_1
-
-#define SPI3_GPIO_SEL_LOW_ENCODER_0  	SPI3_GPIO_SEL_ENCODER_PIN_1 | SPI3_GPIO_SEL_ENCODER_PIN_2
-#define SPI3_GPIO_SEL_HIGH_ENCODER_0 	0
-
-#define SPI3_GPIO_SEL_LOW_ENCODER_1    	SPI3_GPIO_SEL_ENCODER_PIN_2
-#define SPI3_GPIO_SEL_HIGH_ENCODER_1  	SPI3_GPIO_SEL_ENCODER_PIN_1
-
-#define SPI3_GPIO_SEL_LOW_ENCODER_2    	SPI3_GPIO_SEL_ENCODER_PIN_1
-#define SPI3_GPIO_SEL_HIGH_ENCODER_2  	SPI3_GPIO_SEL_ENCODER_PIN_2
-
-//    // SPI commnds for enable/disable chipselect
-//    #define HAL_BRDCFG_SPI4ENCODER__SPI_CS_ENA(spix, e)	 	((hal_SPI4ENCODER_ENCDATA_GET(spix)).encoder_gpio_port->BRR |= hal_SPI4ENCODER_ENCDATA_CS_GET(spix, e).BRR_reg);
-//    #define HAL_BRDCFG_SPI4ENCODER__SPI_CS_DISA(spix, e)	((hal_SPI4ENCODER_ENCDATA_GET(spix)).encoder_gpio_port->BSRR  |= hal_SPI4ENCODER_ENCDATA_CS_GET(spix, e).BSRR_reg);
-
-// SPI commnds for enable/disable chipselect
-						
-#define HAL_BRDCFG_SPI4ENCODER__SPI_CS_ENA(spix)    (hal_SPI4ENCODER_ENCDATA_GET(spix)).encoder_gpio_port->BRR |=  ((hal_SPI4ENCODER_ENCDATA_GET(spix)).cs_pin_ena_slave);	//Livello basso del segnale
-#define HAL_BRDCFG_SPI4ENCODER__SPI_CS_DISA(spix)   (hal_SPI4ENCODER_ENCDATA_GET(spix)).encoder_gpio_port->BSRR |=  ((hal_SPI4ENCODER_ENCDATA_GET(spix)).cs_pin_ena_slave);	//Livello alto
-
-
-//SPI commands for select/deselct encoder "e"  connected on "spix"
-#define HAL_BRDCFG_SPI4ENCODER__SPI_CS_SEL(spix, e)	 ((hal_SPI4ENCODER_ENCDATA_GET(spix)).encoder_gpio_port->BRR |= hal_SPI4ENCODER_ENCDATA_CS_GET(spix, e).BRR_reg);\
-							 ((hal_SPI4ENCODER_ENCDATA_GET(spix)).encoder_gpio_port->BSRR |= hal_SPI4ENCODER_ENCDATA_CS_GET(spix, e).BSRR_reg);
-#define HAL_BRDCFG_SPI4ENCODER__SPI_CS_DESEL(spix)	 ((hal_SPI4ENCODER_ENCDATA_GET(spix)).encoder_gpio_port->BSRR  |= hal_SPI4ENCODER_ENCDATA_CS_GET(spix, 0).BRR_reg);	//Livello alto
-
-    
-#endif//HAL_USE_SPI4ENCODER
-
-
+#warning --> ON EMS001:  PE1 must be configured as output and kept HIGH to feed SPI and CAN with 5VCC
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -806,7 +732,7 @@ extern hal_result_t hal_brdcfg_chips__setmem(const hal_cfg_t *cfg, uint32_t *mem
 
 
 
-
+#if 0
 #ifdef HAL_USE_SPI4ENCODER
 
 /*Note: if there will be some speed problem try to transform  hal_brdcfg_spi4encoder__encoder_enable and  hal_brdcfg_spi4encoder__encoder_disable as inline function,
@@ -886,7 +812,7 @@ void  hal_brdcfg_spi4encoder__chipSelect_init(hal_spi_port_t spix)
 }
 
 #endif//HAL_USE_SPI4ENCODER
-
+#endif
 
                      
 #ifdef  HAL_USE_DEVICE_SWITCH
