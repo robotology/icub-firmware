@@ -105,7 +105,17 @@ static hal_encoder_position_t s_hal_encoder_frame2position(uint8_t* frame);
 
 static hal_boolval_t s_hal_device_encoder_initted[hal_encoders_num] = { hal_false };
 
-static hal_encoder_internals_t s_hal_device_encoder_internals[hal_encoders_num] = {0};
+static hal_encoder_internals_t s_hal_device_encoder_internals[hal_encoders_num] = 
+{
+    {
+        .config     = { .priority = hal_int_priorityNONE, .callback_on_rx = NULL, .arg = NULL }, 
+        .muxport    = hal_mux_port1, 
+        .muxsel     = hal_mux_selNONE, 
+        .spiport    = hal_spi_port1, 
+        .position   = 0, 
+        .rxframe    = {0}
+    }
+};
 
 
 static const hal_spi_cfg_t s_hal_device_encoder_spicfg_master =
@@ -130,7 +140,7 @@ static const hal_spi_cfg_t s_hal_device_encoder_spicfg_master =
 
 extern hal_result_t hal_encoder_init(hal_encoder_t encoder, const hal_encoder_cfg_t *cfg)
 {
-    hal_result_t res = hal_res_NOK_generic;
+    //hal_result_t res = hal_res_NOK_generic;
     hal_encoder_internals_t* eint = &s_hal_device_encoder_internals[HAL_device_encoder_encoder2index(encoder)];
 
     if(hal_false == s_hal_device_encoder_supported_is(encoder))
@@ -155,7 +165,7 @@ extern hal_result_t hal_encoder_init(hal_encoder_t encoder, const hal_encoder_cf
 
     
      
-    #warning --> configure mux and spi. obviously if already initted we dont init the spi and the port anymore.
+    #warning HAL-WIP --> configure mux and spi. obviously if already initted we dont init the spi and the port anymore.
     
     hal_mux_init(eint->muxport, NULL);
     
@@ -268,7 +278,8 @@ static hal_boolval_t s_hal_device_encoder_initted_is(hal_encoder_t encoder)
 
 static void s_hal_encoder_onreceiv(void* p)
 {
-    hal_encoder_t encoder = (hal_encoder_t)p;
+    int32_t tmp = (int32_t)p;                   // tmp is used just to remove a warning about conversione from pointer to smaller integer
+    hal_encoder_t encoder = (hal_encoder_t)tmp;
     hal_encoder_internals_t* eint = &s_hal_device_encoder_internals[HAL_device_encoder_encoder2index(encoder)];
     
     hal_spi_stop(eint->spiport);
