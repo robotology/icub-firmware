@@ -70,13 +70,13 @@ extern const uint32_t hal_utility_crc32_table_0x04c11db7[256];
 extern void hal_utility_crc32_table_get(uint32_t polymomial, uint32_t *hal_utility_crc32table);
 
 
-/** @fn         extern uint32_t hal_utility_crc32_compute(const uint32_t *hal_utility_crc32table, uint32_t initvalue, uint8_t *data, uint32_t len)
+/** @fn         extern uint32_t hal_utility_crc32_compute(const uint32_t polynom, const uint32_t *hal_utility_crc32table, uint32_t initvalue, uint8_t *data, uint32_t len)
     @brief      computes the crc. 
     @param      crctab          the table.
     @param      data            data to be used.
     @param      len             its size, at least four
  **/
-extern uint32_t hal_utility_crc32_compute(const uint32_t *hal_utility_crc32table, uint32_t initvalue, uint8_t *data, uint32_t len);
+extern uint32_t hal_utility_crc32_compute(const uint32_t polynom, const uint32_t *hal_utility_crc32table, uint32_t initvalue, uint8_t *data, uint32_t len);
 
 
 // - doxy end ---------------------------------------------------------------------------------------------------------

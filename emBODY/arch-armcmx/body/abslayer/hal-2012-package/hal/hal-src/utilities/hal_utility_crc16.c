@@ -81,14 +81,14 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_crc_generate_table(const uint16_t polymomial, uint16_t *table);
+static void s_hal_utility_crc16_generate_table(const uint16_t polymomial, uint16_t *table);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
 #ifdef _USE_HAL_UTILITY_CRC16TABLE_IN_ROM_
-// tbl computed by running s_crc_generate_table(0x1021, tbl) on a cm3 micro with a little endian architecture.
+// tbl computed by running s_hal_utility_crc16_generate_table(0x1021, tbl) on a cm3 micro with a little endian architecture.
 const uint16_t hal_utility_crc16_table_0x1021[256] =
 {
     0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7, 
@@ -132,21 +132,23 @@ const uint16_t hal_utility_crc16_table_0x1021[256] =
 
 extern void hal_utility_crc16_table_get(uint16_t polymomial, uint16_t *crctable)
 {
-    s_crc_generate_table(polymomial, crctable);
+    s_hal_utility_crc16_generate_table(polymomial, crctable);
 }
 
 
-extern uint16_t hal_utility_crc16_compute(const uint16_t *hal_utility_crc16table, uint16_t initvalue, uint8_t *data, uint32_t len)
+extern uint16_t hal_utility_crc16_compute(const uint32_t polynom, const uint16_t *hal_utility_crc16table, uint16_t initvalue, uint8_t *data, uint32_t len)
 {
 	// fast lookup table algorithm without augmented zero bytes, e.g. used in pkzip.
 	// only usable with param_polynom orders of 8, 16, 24 or 32.
 
-	uint16_t crc = initvalue;
+	uint32_t crc = initvalue;
 
 	while(len--) 
     {
         crc = (crc << 8) ^ hal_utility_crc16table[ ((crc >> 8) & 0xff) ^ *data++];
     }
+    
+    crc &= 0xffff;
     
 	return(crc);
 }
@@ -181,7 +183,7 @@ extern hal_result_t hal_utility_crc16_hid_setmem(const hal_cfg_t *cfg, uint32_t 
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-static void s_crc_generate_table(const uint16_t polymomial, uint16_t *table) 
+static void s_hal_utility_crc16_generate_table(const uint16_t polymomial, uint16_t *table) 
 {
 	uint32_t i, j;
 	uint32_t bit, crc;
