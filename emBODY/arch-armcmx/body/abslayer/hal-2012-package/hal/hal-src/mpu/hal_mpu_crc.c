@@ -40,6 +40,7 @@
 #include "hal_utility_bits.h" 
 
 
+#include "hal_utility_crc07.h"
 #include "hal_utility_crc16.h"
 #include "hal_utility_crc32.h"
 
@@ -86,8 +87,10 @@ const hal_crc_cfg_t hal_crc_cfg_default =
     .crctblram  = NULL
 }; // the crc-32 polynomial used for eth
 
-const uint32_t hal_crc_poly_crc32 = 0x04C11DB7; 
+const uint32_t hal_crc_poly_crc07 = 0x00000009;
 const uint32_t hal_crc_poly_crc16_ccitt = 0x00001021; 
+const uint32_t hal_crc_poly_crc32 = 0x04C11DB7; 
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -112,7 +115,7 @@ static hal_result_t s_hal_crc_hw_init(hal_crc_info_t *info);
 static uint32_t s_hal_crc32_hw_compute(hal_crc_info_t *info, const void *data, uint32_t size);
 static uint32_t s_hal_crc32_sw_compute(hal_crc_info_t *info, const void *data, uint32_t size);
 static uint32_t s_hal_crc16_sw_compute(hal_crc_info_t *info, const void *data, uint32_t size);
-
+static uint32_t s_hal_crc07_sw_compute(hal_crc_info_t *info, const void *data, uint32_t size);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -150,6 +153,21 @@ extern hal_result_t hal_crc_init(hal_crc_t crc, const hal_crc_cfg_t *cfg)
 
     switch(info->cfg.order)
     {
+        case hal_crc_order_07:
+        {   // on arm always use sw emulation
+
+            if(hal_crc_poly_crc07 == info->cfg.polynomial)
+            {   // for crc07 use rom-ed table
+                info->cfg.crctblram = (void*)hal_utility_crc07_table_0x09;
+                res = hal_res_OK;
+            } 
+            else if(NULL != info->cfg.crctblram)
+            {   // else compute it.
+                hal_utility_crc07_table_get(info->cfg.polynomial, info->cfg.crctblram);
+                res = hal_res_OK;
+            }
+        } break;
+        
         case hal_crc_order_16:
         {   // on arm always use sw emulation
 
@@ -230,14 +248,16 @@ extern hal_result_t hal_crc_compute(hal_crc_t crc, hal_crc_compute_mode_t mode, 
     }
     else if(hal_crc_order_16 == info->cfg.order)
     {
-        //*out = info->initialvalue = hal_utility_crc16_compute(info->cfg.crctblram, (uint16_t)info->initialvalue, (uint8_t*)data, size);
         *out = info->initialvalue = s_hal_crc16_sw_compute(info, data, size);
     }
     else if(hal_crc_order_32 == info->cfg.order)
     {
-        //*out = info->initialvalue = hal_utility_crc32_compute(info->cfg.crctblram, info->initialvalue, (uint8_t*)data, size);
         *out = info->initialvalue = s_hal_crc32_sw_compute(info, data, size);
     }
+    else if(hal_crc_order_07 == info->cfg.order)
+    {
+        *out = info->initialvalue = s_hal_crc07_sw_compute(info, data, size);
+    }    
     else
     {
         *out = 0;
@@ -340,14 +360,14 @@ static uint32_t s_hal_crc32_sw_compute(hal_crc_info_t *info, const void *data, u
 
     uint32_t size4 = size-tailsize;
 
-    info->initialvalue = hal_utility_crc32_compute(info->cfg.crctblram, info->initialvalue, (uint8_t*)data, size4);
+    info->initialvalue = hal_utility_crc32_compute(info->cfg.polynomial, info->cfg.crctblram, info->initialvalue, (uint8_t*)data, size4);
    
     if(0 != (tailsize))
     {
         uint8_t tail[4];
         memset(tail, 0, 4);
         memcpy(tail, ((uint8_t*)data) + size-tailsize, tailsize);
-        info->initialvalue = hal_utility_crc32_compute(info->cfg.crctblram, info->initialvalue, tail, 4); 
+        info->initialvalue = hal_utility_crc32_compute(info->cfg.polynomial, info->cfg.crctblram, info->initialvalue, tail, 4); 
     }
 
     return(info->initialvalue);
@@ -360,14 +380,34 @@ static uint32_t s_hal_crc16_sw_compute(hal_crc_info_t *info, const void *data, u
 
     uint32_t size4 = size-tailsize;
 
-    info->initialvalue = hal_utility_crc16_compute(info->cfg.crctblram, info->initialvalue, (uint8_t*)data, size4);
+    info->initialvalue = hal_utility_crc16_compute(info->cfg.polynomial, info->cfg.crctblram, info->initialvalue, (uint8_t*)data, size4);
    
     if(0 != (tailsize))
     {
         uint8_t tail[4];
         memset(tail, 0, 4);
         memcpy(tail, ((uint8_t*)data) + size-tailsize, tailsize);
-        info->initialvalue = hal_utility_crc16_compute(info->cfg.crctblram, info->initialvalue, tail, 4); 
+        info->initialvalue = hal_utility_crc16_compute(info->cfg.polynomial, info->cfg.crctblram, info->initialvalue, tail, 4); 
+    }
+
+    return(info->initialvalue);
+}
+
+
+static uint32_t s_hal_crc07_sw_compute(hal_crc_info_t *info, const void *data, uint32_t size)
+{
+    uint8_t tailsize = size%4;
+
+    uint32_t size4 = size-tailsize;
+
+    info->initialvalue = hal_utility_crc07_compute(info->cfg.polynomial, info->cfg.crctblram, info->initialvalue, (uint8_t*)data, size4);
+   
+    if(0 != (tailsize))
+    {
+        uint8_t tail[4];
+        memset(tail, 0, 4);
+        memcpy(tail, ((uint8_t*)data) + size-tailsize, tailsize);
+        info->initialvalue = hal_utility_crc07_compute(info->cfg.polynomial, info->cfg.crctblram, info->initialvalue, tail, 4); 
     }
 
     return(info->initialvalue);
