@@ -73,7 +73,9 @@
 #endif
 
 
-#warning --> ON EMS001:  PE1 must be configured as output and kept HIGH to feed SPI and CAN with 5VCC
+#if defined(HAL_USE_SPI) || defined(HAL_USE_CAN)
+#warning HAL-WIP --> ON EMS001: PE1 must be configured as output and kept HIGH to feed SPI and CAN with 5VCC
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -234,24 +236,25 @@
 
 
 
-#warning --> keepinternalclockatstartup must be kept to hal_true otherwise the mco does not initialise ... 
+
 #ifdef  HAL_USE_SYS
+    #warning HAL-INFO --> (not sure it is correct!) keepinternalclockatstartup must be kept to hal_true otherwise the mco does not initialise ... 
     extern const hal_sys_hid_brdcfg_t hal_brdcfg_sys__theconfig  =
     {
-        .keepinternalclockatstartup  = hal_false,      // false is the preferred mode
-        .clock                      =
+        .speeds             =
+        {   
+            .cpu                =  72000000,
+            .fastbus            =  72000000,
+            .slowbus            =  36000000
+        },
+        .clockcfg           =
         {
-            .refclock           = hal_sys_refclock_pll_on_external_xtl,  
-            .intclockspeed      =   8000000,
-            .extclockspeed      =  25000000,
-            .targetspeeds       =
-            {   
-                .cpu                =  72000000,
-                .fastbus            =  72000000,
-                .slowbus            =  36000000
-            },
-            .pllcfg             =
-            {   // pll2clock = pll2mul*(hse/prediv2), speedcpu = pllmul*(pll2clock/prediv1) 
+            .keepinternalclockatstartup     = hal_false,      // false is the preferred mode
+            .refclock                       = hal_sys_refclock_pll_on_external_xtl,  
+            .intclockspeed                  =   8000000,
+            .extclockspeed                  =  25000000,
+            .pllcfg                         =
+            {   // with refclock = hal_sys_refclock_pll_on_external_xtl -> pll2clock = pll2mul*(extclockspeed/prediv2), speeds.cpu = pllmul*(pll2clock/prediv1) 
                 .prediv2            = 5, 
                 .pll2mul            = 8,
                 .prediv1            = 5,

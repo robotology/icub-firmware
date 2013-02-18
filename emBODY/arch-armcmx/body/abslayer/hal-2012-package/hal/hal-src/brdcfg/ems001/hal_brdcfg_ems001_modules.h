@@ -37,42 +37,43 @@
 #define     HAL_USE_BASE
 #define     HAL_USE_CAN
 #define     HAL_USE_CRC
-#undef     HAL_USE_DMA
+#define     HAL_USE_DMA
 #define     HAL_USE_ETH
 #define     HAL_USE_FLASH
 #define     HAL_USE_GPIO
 #define     HAL_USE_I2C
-#undef     HAL_USE_SPI
+#define     HAL_USE_SPI
 #define     HAL_USE_SYS
 #define     HAL_USE_TIMER
 #define     HAL_USE_TRACE
 #define     HAL_USE_WATCHDOG
 
 // -- devices
-#undef  HAL_USE_DEVICE_ACCELEROMETER
+#define     HAL_USE_DEVICE_ACCELEROMETER
 #define     HAL_USE_DEVICE_CANTRANSCEIVER
 #undef  HAL_USE_DEVICE_DISPLAY  
 #define     HAL_USE_DEVICE_EEPROM
-#undef     HAL_USE_DEVICE_ENCODER
+#define     HAL_USE_DEVICE_ENCODER
 #define     HAL_USE_DEVICE_ETHTRANSCEIVER
-#undef  HAL_USE_DEVICE_GYROSCOPE
+#define     HAL_USE_DEVICE_GYROSCOPE
 #define     HAL_USE_DEVICE_LED
-#undef     HAL_USE_DEVICE_MUX
+#define     HAL_USE_DEVICE_MUX
 #define     HAL_USE_DEVICE_SWITCH
-#undef  HAL_USE_DEVICE_TERMOMETER
+#define     HAL_USE_DEVICE_TERMOMETER
 
 
 // -- utilities
 #define     HAL_USE_UTILITY_BITS
 #define     HAL_USE_UTILITY_FIFO
 #define     HAL_USE_UTILITY_HEAP
+#define     HAL_USE_UTILITY_CRC07
 #define     HAL_USE_UTILITY_CRC16
 #define     HAL_USE_UTILITY_CRC32
 
 // -- chips
 #undef   HAL_USE_CHIP_GENERIC_ETHTRANSCEIVER
-#undef   HAL_USE_CHIP_ST_L3G4200D
-#undef   HAL_USE_CHIP_ST_LIS3DH
+#define     HAL_USE_CHIP_ST_L3G4200D
+#define     HAL_USE_CHIP_ST_LIS3DH
 #define     HAL_USE_CHIP_MICREL_KS8893
 #define     HAL_USE_CHIP_XX_EEPROM
 
@@ -93,13 +94,13 @@
 #endif
 
 #ifdef  HAL_SLIM_MODE
-    #undef  HAL_USE_CAN
-    #undef  HAL_USE_DISPLAY
-    #undef  HAL_USE_ENCODER
-    #undef  HAL_USE_ETH
-    #undef  HAL_USE_LED
-    #undef  HAL_USE_TIMER
-    #undef  HAL_USE_WATCHDOG
+//    #undef  HAL_USE_CAN
+//    #undef  HAL_USE_DISPLAY
+//
+//    #undef  HAL_USE_ETH
+//    #undef  HAL_USE_LED
+//    #undef  HAL_USE_TIMER
+//    #undef  HAL_USE_WATCHDOG
 #endif//HAL_SLIM_MODE
 
 // - cross dependencies -----------------------------------------------------------------------------------------------
