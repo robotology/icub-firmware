@@ -66,7 +66,9 @@
 
 #define HAL_spi_port2stmSPI(p)          (s_hal_spi_stmSPImap[HAL_spi_port2index(p)])
 
-#define HAL_MPU_SPI_DEBUG_MODE
+#undef HAL_MPU_SPI_DEBUG_MODE
+
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -75,19 +77,19 @@
 
 const hal_spi_cfg_t hal_spi_cfg_default = 
 { 
-    .ownership                  = hal_spi_ownership_master, 
-    .direction                  = hal_spi_dir_txrx, 
-    .activity                   = hal_spi_act_framebased,
-    .prescaler                  = hal_spi_prescaler_dontuse,
-    .speed                      = hal_spi_speed_0562kbps, 
+    .ownership                  = hal_spi_ownership_master,
+    .direction                  = hal_spi_dir_rxonly,
+    .activity                   = hal_spi_act_framebased,      
+    .prescaler                  = hal_spi_prescaler_128,    // it is 562500 on stm32f1 @ 72mhz fast bus, and 656250 on stm32f4 @ 84mhz fast bus
+    .speed                      = hal_spi_speed_dontuse,           
     .sizeofframe                = 4,
-    .capacityoftxfifoofframes   = 4,
-    .capacityofrxfifoofframes   = 4,
-    .dummytxvalue               = 0,
-    .onframetransm              = NULL, 
+    .capacityoftxfifoofframes   = 0,
+    .capacityofrxfifoofframes   = 2,
+    .dummytxvalue               = 0x00,
+    .onframetransm              = NULL,
     .argonframetransm           = NULL,
     .onframereceiv              = NULL,
-    .argonframereceiv           = NULL
+    .argonframereceiv           = NULL        
 };
 
 
@@ -114,8 +116,10 @@ typedef struct
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+#if 0  
 static void s_hal_spi_scheduling_suspend(void);
 static void s_hal_spi_scheduling_restart(void);
+#endif
 
 static hal_boolval_t s_hal_spi_supported_is(hal_spi_port_t port);
 static void s_hal_spi_initted_set(hal_spi_port_t port);
@@ -157,10 +161,39 @@ static void s_hal_spi_dma_on_tranfer_done_rx(void* p);
 
 static hal_boolval_t s_hal_spi_initted[hal_spi_ports_number] = { hal_false, hal_false, hal_false };
 
-static hal_spi_internals_t s_hal_spi_internals[hal_spi_ports_number] = { 0 };
+static hal_spi_internals_t s_hal_spi_internals[hal_spi_ports_number] = 
+{ 
+    {
+        .config     =
+        {   // same values as in hal_spi_cfg_default
+            .ownership                  = hal_spi_ownership_master,
+            .direction                  = hal_spi_dir_rxonly,
+            .activity                   = hal_spi_act_framebased,      
+            .prescaler                  = hal_spi_prescaler_128,    // it is 562500 on stm32f1 @ 72mhz fast bus, and 656250 on stm32f4 @ 84mhz fast bus
+            .speed                      = hal_spi_speed_dontuse,           
+            .sizeofframe                = 4,
+            .capacityoftxfifoofframes   = 0,
+            .capacityofrxfifoofframes   = 2,
+            .dummytxvalue               = 0x00,
+            .onframetransm              = NULL,
+            .argonframetransm           = NULL,
+            .onframereceiv              = NULL,
+            .argonframereceiv           = NULL        
+        },
+        .dummytxframe           = NULL,
+        .dmatxframe             = NULL,
+        .dmarxframe             = NULL,
+        .fifotx                 = {0},
+        .fiforx                 = {0},
+        .port                   = hal_spi_port1,
+        .frameburstcountdown    = 0,
+        .forcestop              = hal_false,
+        .dmaisenabled           = hal_false     
+    }
+};
 
 
-static const SPI_InitTypeDef   s_hal_spi_stm32_cfg =
+static const SPI_InitTypeDef s_hal_spi_stm32_cfg =
 {
     .SPI_Direction                  = SPI_Direction_2Lines_FullDuplex,
     .SPI_Mode                       = SPI_Mode_Master,                              // param
@@ -174,7 +207,7 @@ static const SPI_InitTypeDef   s_hal_spi_stm32_cfg =
 };
 
 //#warning --> display usa SPI_CPHA_2Edge ma prima avevo messo SPI_CPHA_1Edge
-#warning --> see spi config used for encoders
+#warning HAL-WIP --> verify if the internal s_hal_spi_stm32_cfg used for spi stm32fx config is the same hused in hal1 for encoders
 
 #if     defined(USE_STM32F1)
 static SPI_TypeDef* const s_hal_spi_stmSPImap[] = { SPI1, SPI2, SPI3 };
@@ -195,6 +228,16 @@ static const uint32_t s_hal_spi_timeout_flag = 0x00010000;
     #error to be done
     
 #endif
+    
+    
+// #if     defined(USE_STM32F1)
+//     #warning --> use low speed bus values .. defined in brdcfg
+//     const uint32_t HIGHSPEED = 72000000;
+//     const uint32_t LOWSPEED  = 36000000;
+// #elif   defined(USE_STM32F4)
+//         TODO ...
+// #endif
+    
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -500,7 +543,6 @@ static hal_bool_t s_hal_spi_is_dma_enabled(hal_spi_port_t port)
 
 static hal_result_t s_hal_spi_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg)
 {
-    uint8_t i;
     uint8_t* tmpbuffer = NULL;
     hal_spi_cfg_t *usedcfg = NULL;
     hal_spi_internals_t* spixint = NULL;
@@ -587,6 +629,7 @@ static hal_result_t s_hal_spi_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg
         // - the dummy tx frame
         spixint->dummytxframe = (uint8_t*)hal_utility_heap_new(usedcfg->sizeofframe);
 #if     defined(HAL_MPU_SPI_DEBUG_MODE )
+        uint8_t i;
         for(i=0; i<usedcfg->sizeofframe; i++) { spixint->dummytxframe[i] = usedcfg->dummytxvalue + i; }
 #else   
         memset(spixint->dummytxframe, usedcfg->dummytxvalue, usedcfg->sizeofframe);
@@ -655,11 +698,15 @@ static hal_result_t s_hal_spi_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg
 
 static hal_bool_t s_hal_spi_is_speed_correct(int32_t speed)
 {
+    if(hal_spi_speed_dontuse == speed)
+    {
+        return(hal_true);
+    }
 #if     defined(USE_STM32F1) 
     int32_t v = speed % (int32_t)hal_spi_speed_0562kbps;
     return((0 == v) ? (hal_true) : (hal_false));
 #elif   defined(USE_STM32F4)  
-    int32_t v = speed % (int32_t)hal_spi_speed_0500kbps;
+    int32_t v = speed % (int32_t)hal_spi_speed_0652kbps;
     return((0 == v) ? (hal_true) : (hal_false));
 #endif
     
@@ -965,52 +1012,94 @@ static void s_hal_spi_hw_enable(hal_spi_port_t port, const hal_spi_cfg_t* cfg)
 #if     defined(USE_STM32F1) || defined(USE_STM32F4)
     
     SPI_TypeDef* SPIx = HAL_spi_port2stmSPI(port);
+    uint16_t prescaler_stm32fx = 0;
+    SPI_InitTypeDef spi_cfg;
+    
     
     SPI_I2S_DeInit(SPIx);
  
-    SPI_InitTypeDef spi_cfg;
     memcpy(&spi_cfg, &s_hal_spi_stm32_cfg, sizeof(SPI_InitTypeDef));
     // apply the mode
     spi_cfg.SPI_Mode                = (hal_spi_ownership_master == cfg->ownership) ? (SPI_Mode_Master) : (SPI_Mode_Slave);    
 
-#if     defined(USE_STM32F1)
-    const uint32_t HIGHSPEED = 72000000;
-    const uint32_t LOWSPEED  = 36000000;
-#elif   defined(USE_STM32F4)
-        TODO ...
-#endif
-    
-    uint16_t factor = 0;
-    switch(port)
-    {
-        case hal_spi_port1:
-        {
-            factor = HIGHSPEED / cfg->speed; // spi1 is on the high speed bus 
-        } break;
         
-        case hal_spi_port2:
-        case hal_spi_port3:
-        {
-            factor = LOWSPEED / cfg->speed; // spi2 and spi3 are on the low speed bus 
-        } break;
-    }
+    // configure speed of spi ...
     
-    uint16_t prescaler_stm32fx = 0;
-    switch(factor)
+    if((hal_spi_speed_dontuse == cfg->speed) && (hal_spi_prescaler_dontuse == cfg->prescaler))
     {
-        case 2:     prescaler_stm32fx = SPI_BaudRatePrescaler_2;    break;  
-        case 4:     prescaler_stm32fx = SPI_BaudRatePrescaler_4;    break;
-        case 8:     prescaler_stm32fx = SPI_BaudRatePrescaler_8;    break;
-        case 16:    prescaler_stm32fx = SPI_BaudRatePrescaler_16;   break;
-        case 32:    prescaler_stm32fx = SPI_BaudRatePrescaler_32;   break;
-        case 64:    prescaler_stm32fx = SPI_BaudRatePrescaler_64;   break;
-        case 128:   prescaler_stm32fx = SPI_BaudRatePrescaler_128;  break;
-        case 256:   prescaler_stm32fx = SPI_BaudRatePrescaler_256;  break;
-        default:    prescaler_stm32fx = SPI_BaudRatePrescaler_256;  break;
+         hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_spi_init(): use one of speed or prescaler");
+    }
+    if((hal_spi_speed_dontuse != cfg->speed) && (hal_spi_prescaler_dontuse != cfg->prescaler))
+    {
+         hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_spi_init(): use either speed or prescaler, not both");
     }
     
+    if(hal_spi_prescaler_dontuse != cfg->prescaler)
+    {   // ok, we have the prescaler. need only to convert it in stm32fx format
+        
+        switch(cfg->prescaler)
+        {   // remember that hal_spi_prescaler_xxx is referred to high speed bus, 
+            // and prescaler_stm32fx to high speed bus for spi1 but to low speed for spi2 and spi3
+            case hal_spi_prescaler_004: 
+            { 
+                prescaler_stm32fx = (hal_spi_port1 == port) ? SPI_BaudRatePrescaler_4 : SPI_BaudRatePrescaler_2;    
+            } break;
+            case hal_spi_prescaler_008: 
+            {
+                prescaler_stm32fx = (hal_spi_port1 == port) ? SPI_BaudRatePrescaler_8 : SPI_BaudRatePrescaler_4;
+            } break;
+            case hal_spi_prescaler_016: 
+            {
+                prescaler_stm32fx = (hal_spi_port1 == port) ? SPI_BaudRatePrescaler_16 : SPI_BaudRatePrescaler_8;  
+            } break;
+            case hal_spi_prescaler_032: 
+            { 
+                prescaler_stm32fx = (hal_spi_port1 == port) ? SPI_BaudRatePrescaler_32 : SPI_BaudRatePrescaler_16;   
+            } break;
+            case hal_spi_prescaler_064: 
+            {
+                prescaler_stm32fx = (hal_spi_port1 == port) ? SPI_BaudRatePrescaler_64 : SPI_BaudRatePrescaler_32;   
+            } break;
+            case hal_spi_prescaler_128: 
+            {
+                prescaler_stm32fx = (hal_spi_port1 == port) ? SPI_BaudRatePrescaler_128 : SPI_BaudRatePrescaler_64;  
+            } break;
+            case hal_spi_prescaler_256: 
+            {
+                prescaler_stm32fx = (hal_spi_port1 == port) ? SPI_BaudRatePrescaler_256 : SPI_BaudRatePrescaler_128;  
+            }   break;
+            default:                    
+            {
+                prescaler_stm32fx = SPI_BaudRatePrescaler_256;  
+            } break;
+        }        
+    }    
+    else if(hal_spi_speed_dontuse != cfg->speed)
+    {   // ok, use the speed to compute the prescaler in stm32fx format
+        
+        // remember that hal_spi_prescaler_xxx is referred to high speed bus, 
+        // and prescaler_stm32fx to high speed bus for spi1 but to low speed for spi2 and spi3
+        uint16_t factor = (hal_spi_port1 == port) ? (hal_brdcfg_sys__theconfig.speeds.fastbus / cfg->speed) : (hal_brdcfg_sys__theconfig.speeds.slowbus / cfg->speed);
+        
+        switch(factor)
+        {
+            case 2:     prescaler_stm32fx = SPI_BaudRatePrescaler_2;    break;  
+            case 4:     prescaler_stm32fx = SPI_BaudRatePrescaler_4;    break;
+            case 8:     prescaler_stm32fx = SPI_BaudRatePrescaler_8;    break;
+            case 16:    prescaler_stm32fx = SPI_BaudRatePrescaler_16;   break;
+            case 32:    prescaler_stm32fx = SPI_BaudRatePrescaler_32;   break;
+            case 64:    prescaler_stm32fx = SPI_BaudRatePrescaler_64;   break;
+            case 128:   prescaler_stm32fx = SPI_BaudRatePrescaler_128;  break;
+            case 256:   prescaler_stm32fx = SPI_BaudRatePrescaler_256;  break;
+            default:    prescaler_stm32fx = SPI_BaudRatePrescaler_256;  break;
+        }
+        
+    }
+    
+    // ok ... we have prescaler_stm32fx at last.
     spi_cfg.SPI_BaudRatePrescaler = prescaler_stm32fx;
- 
+    
+    // can init spi 
     SPI_Init(SPIx, &spi_cfg);
     
     if(hal_spi_act_framebased == cfg->activity)
@@ -1033,6 +1122,7 @@ static hal_result_t s_hal_spi_timeoutexpired(void)
     return(hal_res_NOK_generic);
 }
 
+#if 0  
 static void s_hal_spi_scheduling_suspend(void)
 {
     hal_base_hid_osal_scheduling_suspend();
@@ -1042,7 +1132,7 @@ static void s_hal_spi_scheduling_restart(void)
 {
     hal_base_hid_osal_scheduling_restart();
 }
-
+#endif
 
 static hal_result_t s_hal_spi_put(hal_spi_port_t port, uint8_t* txframe)
 {
