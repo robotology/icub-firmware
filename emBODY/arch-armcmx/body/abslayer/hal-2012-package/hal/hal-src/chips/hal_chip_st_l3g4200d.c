@@ -132,7 +132,7 @@ static hal_chip_st_l3g4200d_info_t s_hal_chip_st_l3g4200d_info[1] = { {.cfg = { 
 
 extern hal_result_t hal_chip_st_l3g4200d_init(const hal_chip_st_l3g4200d_cfg_t *cfg)
 {
-    hal_result_t res = hal_res_NOK_generic; // dont remove ...
+    //hal_result_t res = hal_res_NOK_generic; 
      
     if(NULL == cfg)
     {
@@ -176,7 +176,9 @@ extern hal_result_t hal_chip_st_l3g4200d_temp_get(int8_t* temp)
     
     regaddr.bytes.one = TEMP_ADR;
     res = hal_i2c_read(i2cport, I2CADDRESS, regaddr, &data, 1);
-    *temp = (int8_t)data;    
+    *temp = (int8_t)data;   
+
+    res = res;    
    
     return(hal_res_OK);
 }
@@ -223,6 +225,8 @@ extern hal_result_t hal_chip_st_l3g4200d_angrate_get(int32_t* xar, int32_t* yar,
     res = hal_i2c_read(i2cport, I2CADDRESS, regaddr, &datah, 1);
     tmp = (int16_t)((datah << 8) | datal);    
     *zar = s_hal_chip_st_l3g4200d_convert(tmp);
+    
+    res = res;
    
     return(hal_res_OK);
 }
@@ -299,7 +303,6 @@ static hal_result_t s_hal_chip_st_l3g4200d_hw_init(const hal_chip_st_l3g4200d_cf
     hal_i2c_port_t i2cport = cfg->i2cport;
     
  
-    #warning --> put params in board.c such as ... and then call the init of the s_hal_chip_st_l3g4200d_hw_init ...
     // init i2c    
     if(hal_res_OK != (res = hal_i2c_init(i2cport, NULL)))
     {

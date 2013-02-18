@@ -125,7 +125,7 @@ static hal_chip_generic_ethtransceiver_info_t s_hal_chip_generic_ethtransceiver_
 
 extern hal_result_t hal_chip_generic_ethtransceiver_init(const hal_chip_generic_ethtransceiver_cfg_t *cfg)
 {
-    hal_result_t res = hal_res_NOK_generic; // dont remove ...
+    //hal_result_t res = hal_res_NOK_generic; // dont remove ...
      
     if(NULL == cfg)
     {
@@ -151,7 +151,7 @@ extern hal_result_t hal_chip_generic_ethtransceiver_init(const hal_chip_generic_
 
 extern hal_result_t hal_chip_generic_ethtransceiver_configure(hal_eth_phymode_t targetphymode, hal_eth_phymode_t* usedphymode)
 {
-    hal_result_t res = hal_res_NOK_generic;
+    //hal_result_t res = hal_res_NOK_generic;
     
 
 #if 0
@@ -280,7 +280,7 @@ static hal_boolval_t s_hal_chip_generic_ethtransceiver_initted_is(void)
 
 static hal_result_t s_hal_chip_generic_ethtransceiver_hw_init(const hal_chip_generic_ethtransceiver_cfg_t *cfg, hal_chip_generic_ethtransceiver_info_t* info)
 {
-    hal_result_t res = hal_res_NOK_generic;   
+    //hal_result_t res = hal_res_NOK_generic;   
 
     uint16_t regv;
     uint32_t tout;

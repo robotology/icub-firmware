@@ -116,12 +116,12 @@ static hal_chip_micrel_ks8893_info_t s_hal_chip_micrel_ks8893_info[1] = { {.cfg 
 
 extern hal_result_t hal_chip_micrel_ks8893_init(const hal_chip_micrel_ks8893_cfg_t *cfg)
 {
-    hal_result_t res = hal_res_NOK_generic; // dont remove ...
+    //hal_result_t res = hal_res_NOK_generic; 
      
     if(NULL == cfg)
     {
         //cfg  = &hal_chip_micrel_ks8893_cfg_default;
-        for(;;);
+        hal_base_hid_on_fatalerror(hal_fatalerror_missingconfiguration, "in hal_chip_micrel_ks8893_init");
         return(hal_res_NOK_generic);
     }
     
@@ -143,10 +143,10 @@ extern hal_result_t hal_chip_micrel_ks8893_init(const hal_chip_micrel_ks8893_cfg
 
 extern hal_result_t hal_chip_micrel_ks8893_configure(hal_eth_phymode_t targetphymode, hal_eth_phymode_t* usedphymode)
 {
-    hal_result_t res = hal_res_NOK_generic;
+    //hal_result_t res = hal_res_NOK_generic;
     
-    const uint8_t fd100 = 0x60;
-    const uint8_t fd010 = 0x20;
+    //const uint8_t fd100 = 0x60;
+    //const uint8_t fd010 = 0x20;
     uint8_t buff_write = 0x60; // FORCE FULL DUPLEX AND 100T
     uint8_t buff_read = 0xFF; 
     volatile uint32_t i = 1;
@@ -296,7 +296,6 @@ static hal_boolval_t s_hal_chip_micrel_ks8893_initted_is(void)
 static hal_result_t s_hal_chip_micrel_ks8893_hw_init(const hal_chip_micrel_ks8893_cfg_t *cfg, hal_chip_micrel_ks8893_info_t* info)
 {
     hal_result_t res = hal_res_NOK_generic;   
-    uint8_t data;
     hal_i2c_port_t i2cport = cfg->i2cport;
     
     
@@ -329,9 +328,10 @@ static hal_result_t s_hal_chip_micrel_ks8893_hw_init(const hal_chip_micrel_ks889
         return(hal_res_NOK_generic);
     }
     
-#warning --> could add a WHOAMI verification in switch ...    
+//#warning INFO --> could add verification that on ic2 the device at that address is really a micrel switch ...    
 #if 0        
     hal_i2c_regaddr_t regaddr = {.numofbytes = 1, .bytes.one = 0x00 }; 
+    uint8_t data;
 
     // whoami: value must be WHOAMI_VAL
     regaddr.bytes.one = WHOAMI_ADR;
