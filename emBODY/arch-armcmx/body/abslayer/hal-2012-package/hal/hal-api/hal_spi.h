@@ -101,6 +101,7 @@ typedef enum
  **/
 typedef enum
 {
+    hal_spi_speed_dontuse           =   0,              /**< use the prescaler */
     hal_spi_speed_0562kbps          =   562500,         /**< valid only for fast sys bus @ 72mhz */
     hal_spi_speed_1125kbps          =  1125000,         /**< valid only for fast sys bus @ 72mhz */
     hal_spi_speed_2250kbps          =  2250000,         /**< valid only for fast sys bus @ 72mhz */
@@ -157,10 +158,11 @@ typedef struct
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const hal_spi_cfg_t hal_spi_cfg_default; // = { .ownership = hal_spi_ownership_master, .dir = hal_spi_dir_txrx, .activity = hal_spi_act_multiframe,
-                                                //     .speed = hal_spi_speed_0562kbps, .sizeofframe = 4, .capacityoftxfifoofframes = 4, .capacityofrxfifoofframes = 4,
-                                                //     .dummytxvalue = 0, .onframetransm = NULL, .argonframetransm = NULL, .argonframereceiv = NULL, .onframereceiv = NULL };
-
+extern const hal_spi_cfg_t hal_spi_cfg_default; /**< = {.ownership = hal_spi_ownership_master, .dir = hal_spi_dir_rxonly, .activity = hal_spi_act_framebased,
+                                                        .prescaler = hal_spi_prescaler_128, .speed = hal_spi_speed_dontuse, .sizeofframe = 4, 
+                                                        .capacityoftxfifoofframes = 0, .capacityofrxfifoofframes = 2, .dummytxvalue = 0, 
+                                                        .onframetransm = NULL, .argonframetransm = NULL, .argonframereceiv = NULL, .onframereceiv = NULL};
+                                                 */
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
