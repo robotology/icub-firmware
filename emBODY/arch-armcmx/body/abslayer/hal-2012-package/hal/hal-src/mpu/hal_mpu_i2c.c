@@ -629,7 +629,7 @@ static void s_hal_i2c_hw_init(hal_i2c_port_t port)
     uint32_t RCC_APB1Periph_I2Cx = s_hal_i2c_hw_rcc[HAL_i2c_port2index(port)];
     
 //    // system configuration controller clock
-    #warning --> in stm32f4 removed "RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);" from i2c_hw_init() and it still works....
+//    #warning HAL-INFO --> in stm32f4 removed "RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);" from i2c_hw_init() and it still works....
 //    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
     
     // i2c periph clock enable
@@ -929,7 +929,7 @@ static hal_result_t s_hal_i2c_transaction_tx(hal_i2c_port_t port,  hal_i2c_devad
         // send stop condition
         I2C_GenerateSTOP(I2Cx, ENABLE);
         
-        #warning --> ci vuole il clear dei flags ???
+        //#warning HAL-INFO --> ci vuole il clear dei flags ???
         // perform a read on SR1 and SR2 register to clear eventually pending flags 
         (void)(I2Cx)->SR1;
         (void)(I2Cx)->SR2; 
@@ -1089,7 +1089,7 @@ static hal_result_t s_i2c_read(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr, h
     return(hal_res_OK);
 #else    
 
-    hal_result_t res = hal_res_NOK_generic;
+    //hal_result_t res = hal_res_NOK_generic;
     uint8_t reg1byteadr = 0;
     volatile uint32_t timeout = 0;
     
@@ -1303,7 +1303,7 @@ static hal_result_t s_hal_i2c_write(hal_i2c_port_t port, hal_i2c_devaddr_t devad
     
     return(hal_res_OK);
 #else    
-    hal_result_t res = hal_res_NOK_generic;
+    //hal_result_t res = hal_res_NOK_generic;
     uint8_t reg1byteadr = 0;
     volatile uint32_t timeout = 0;
     
