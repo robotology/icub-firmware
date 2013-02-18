@@ -149,7 +149,7 @@ extern hal_result_t hal_switch_init(const hal_switch_cfg_t *cfg)
 
 extern hal_result_t hal_switch_configure(hal_eth_phymode_t targetphymode, hal_eth_phymode_t *usedphymode)
 {
-    hal_result_t res = hal_res_NOK_generic;
+    //hal_result_t res = hal_res_NOK_generic;
 
 
     if(hal_true != s_hal_device_switch_supported_is())
