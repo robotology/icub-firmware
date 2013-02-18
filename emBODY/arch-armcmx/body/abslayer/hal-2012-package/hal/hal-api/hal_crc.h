@@ -68,6 +68,7 @@ enum { hal_crcs_num = 2 };
  **/ 
 typedef enum
 {
+    hal_crc_order_07    = 7,
     hal_crc_order_16    = 16,
     hal_crc_order_32    = 32
 } hal_crc_order_t;
@@ -81,10 +82,10 @@ typedef struct
 {
     hal_crc_order_t order;              /**< the order of the polynomial to use */    
     uint32_t        polynomial;         /**< the polynomial to use specified in direct form. up to order 32.
-                                             crc32 is 0x04C11DB7, crc16-ccitt is 0x00001021 */ 
+                                             crc32 is 0x04C11DB7, crc16-ccitt is 0x00001021, crc07 is 0x09 */ 
     void*           crctblram;          /**< the ram used to compute the crc table when there is no hw support for
-                                             a given polynomial. its size must be 256*2 in case of CRC-16 and 256*4 in
-                                             case of CRC-32. */                                                     
+                                             a given polynomial. its size must be 256*1 in case of CRC-07, 
+                                             256*2 in case of CRC-16, and 256*4 in case of CRC-32. */                                                     
 } hal_crc_cfg_t;
 
 
@@ -93,7 +94,7 @@ typedef struct
  **/ 
 typedef enum
 {
-    hal_crc_mode_clear          = 0,    /**< the initial status is cleared to 0xfff / 0xffffffff */    
+    hal_crc_mode_clear          = 0,    /**< the initial status is cleared to 0xff / 0xfff / 0xffffffff */    
     hal_crc_mode_accumulate     = 1     /**< the initial status is kept from previous computation */  
 } hal_crc_compute_mode_t;
 
@@ -102,8 +103,10 @@ typedef enum
 
 extern const hal_crc_cfg_t hal_crc_cfg_default;     // = { .order =  hal_crc_order_32, .polynomial = 0x04C11DB7. .crctblram = NULL};
 
-extern const uint32_t hal_crc_poly_crc32;           // = 0x04C11DB7; 
+extern const uint32_t hal_crc_poly_crc07;           // = 0x00000009;
 extern const uint32_t hal_crc_poly_crc16_ccitt;     // = 0x00001021; 
+extern const uint32_t hal_crc_poly_crc32;           // = 0x04C11DB7; 
+
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
@@ -113,8 +116,8 @@ extern const uint32_t hal_crc_poly_crc16_ccitt;     // = 0x00001021;
                 of orders 16 and 32, as long as it is passed the ram required by the crc table.
                 The hal_crc_init() function prepares a proper crc table and stores it in the externally passed ram.
                 The crctblram field is not used (and thus can be NULL) in the following cases:
-                - for polynomials 0x04C11DB7 or 0x00001021, as in STM32Fx the former is HW supported and the latter
-                  uses a pre-calculated ROM-ed table, and on DSPIC the other way round (crc16 is HW supported and crc32 uses 
+                - for polynomials 0x04C11DB7 or 0x00001021 or 0x00000009, as in STM32Fx the first is HW supported and the last two
+                  use a pre-calculated ROM-ed table, and on DSPIC the other way round (crc16 is HW supported and crc32 / crc07 uses 
                   a ROM-ed table).
                 - for any CRC-16 in DSPICx where the HW support is used.
     @param      crc             The crc to initialise. 
