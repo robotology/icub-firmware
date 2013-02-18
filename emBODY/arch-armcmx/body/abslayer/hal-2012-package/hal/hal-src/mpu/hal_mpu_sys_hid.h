@@ -83,23 +83,23 @@ typedef struct
     uint32_t                        cpu;
     uint32_t                        fastbus;
     uint32_t                        slowbus;
-} hal_sys_hid_target_speeds_t;
+} hal_sys_hid_speeds_t;
 
 
 typedef struct 
 {
-    hal_sys_hid_refclock_t          refclock;
-    uint32_t                        intclockspeed;    
-    uint32_t                        extclockspeed;
-    hal_sys_hid_target_speeds_t     targetspeeds;
-    hal_sys_hid_pll_cfg_t           pllcfg;
+    hal_bool_t                      keepinternalclockatstartup; // if hal_true: it runs at intclockspeed at startup and changes to refclock inside hal_sys_systeminit()
+    hal_sys_hid_refclock_t          refclock;                   // the clock or mixture of clock and pll to use          
+    uint32_t                        intclockspeed;              // the speed of the internal clock   
+    uint32_t                        extclockspeed;              // teh speed of teh external clock
+    hal_sys_hid_pll_cfg_t           pllcfg;                     // the way the pll, if used, is configured
 } hal_sys_hid_clock_cfg_t;
 
 
 typedef struct
 {
-    hal_bool_t                      keepinternalclockatstartup;  // if hal_true: it runs at intclockspeed at startup and changes to refclock after hal_sys_systeminit()
-    hal_sys_hid_clock_cfg_t         clock;
+    hal_sys_hid_speeds_t            speeds;             // the speeds for cpu, fast bus and slow bus that the system has
+    hal_sys_hid_clock_cfg_t         clockcfg;           // the configuration of clock etc., which are used to achieve the above speeds
 } hal_sys_hid_brdcfg_t;
 
 
