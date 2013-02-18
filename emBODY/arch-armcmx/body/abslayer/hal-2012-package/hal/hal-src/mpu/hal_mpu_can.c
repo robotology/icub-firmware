@@ -68,21 +68,27 @@
 #if     defined(USE_STM32F1)
     // the clock APB1 is 36mhz, half the max frequency of 72 mhz. (see page 49/1096 of stm32f1x reference manual Doc ID 13902 Rev 14) 
     // the clock APB2 operates at full speed of 72 mhz. (see page 49/1096 of stm32f1x reference manual Doc ID 13902 Rev 14)
-    // we give a total of 9 time quanta for the duration of a can bit. we split in 1+5+3
-    #define HAL_MPU_CAN_CLK	  		    36000000
-    #define HAL_MPU_CAN_TQ_TOTAL          9
-    #define HAL_MPU_CAN_TQ_SJW            CAN_SJW_3tq
-    #define HAL_MPU_CAN_TQ_BS1            CAN_BS1_5tq
-    #define HAL_MPU_CAN_TQ_BS2            CAN_BS2_3tq
+    // can is on APB1, aka the slow bus
+    // we give a total of HAL_MPU_CAN_TQ_TOTAL = 9 time quanta for the duration of a can bit. 
+    // we split the 9 time quanta in 5+1+3 = HAL_MPU_CAN_TQ_BS1+1+HAL_MPU_CAN_TQ_BS2
+    // we allow to stretch the bit duration in order to re-synch by maximum HAL_MPU_CAN_TQ_SJW = 3 time quanta 
+    #define HAL_MPU_CAN_CLK	  		        (hal_brdcfg_sys__theconfig.speeds.slowbus)
+    #define HAL_MPU_CAN_TQ_TOTAL            9
+    #define HAL_MPU_CAN_TQ_SJW              CAN_SJW_3tq
+    #define HAL_MPU_CAN_TQ_BS1              CAN_BS1_5tq
+    #define HAL_MPU_CAN_TQ_BS2              CAN_BS2_3tq
 #elif    defined(USE_STM32F4)
     // the clock APB1 is 42mhz, a fourth the max frequency of 168 mhz. (see page 23/180 of stm32f4x datasheet Doc ID 022152 Rev 3)
     // the clock APB2 is 84mhz, a half the max frequency of 168 mhz. (see page 23/180 of stm32f4x datasheet Doc ID 022152 Rev 3)
-    // we give a total of 7 time quanta for the duration of a can bit. we split in 1+4+2
-    #define HAL_MPU_CAN_CLK	  			42000000
-    #define HAL_MPU_CAN_TQ_TOTAL          7
-    #define HAL_MPU_CAN_TQ_SJW            CAN_SJW_3tq
-    #define HAL_MPU_CAN_TQ_BS1            CAN_BS1_4tq
-    #define HAL_MPU_CAN_TQ_BS2            CAN_BS2_2tq    
+    // can is on APB1, aka the slow bus
+    // we give a total of HAL_MPU_CAN_TQ_TOTAL = 7 time quanta for the duration of a can bit. 
+    // we split the 7 time quanta in 4+1+2 = HAL_MPU_CAN_TQ_BS1+1+HAL_MPU_CAN_TQ_BS2
+    // we allow to stretch the bit duration in order to re-synch by maximum HAL_MPU_CAN_TQ_SJW = 3 time quanta     
+    #define HAL_MPU_CAN_CLK	  			    (hal_brdcfg_sys__theconfig.speeds.slowbus)
+    #define HAL_MPU_CAN_TQ_TOTAL            7
+    #define HAL_MPU_CAN_TQ_SJW              CAN_SJW_3tq
+    #define HAL_MPU_CAN_TQ_BS1              CAN_BS1_4tq
+    #define HAL_MPU_CAN_TQ_BS2              CAN_BS2_2tq    
 #endif
 
 #define HAL_can_port2peripheral(p)     ( ( hal_can_port1 == (p) ) ? (CAN1) : (CAN2) )
