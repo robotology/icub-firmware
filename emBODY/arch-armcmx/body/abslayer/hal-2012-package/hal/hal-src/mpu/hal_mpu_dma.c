@@ -241,9 +241,14 @@ extern hal_result_t hal_dma_init(hal_dma_port_t port, const hal_dma_cfg_t *cfg)
 #elif    defined(USE_STM32F4)
     RCC_AHB1PeriphResetCmd(s_hal_dma_periphclocks[HAL_dma_port2index(port)], ENABLE);
 #endif    
+ 
+#if     defined(USE_STM32F1)
+#elif    defined(USE_STM32F4)
+    #error --> verifica nel progetto stm32f4x spi con dam come viene inizializzato il dma. vedi anche i registri poiche' sono diversi dal stm32f1  
+#endif  
     
+  
     
-    #error --> verifica nel progetto stm32f4x spi con dam come viene inizializzato il dma. vedi anche i registri poiche' sono diversi dal stm32f1
     
     // set stm32dmainit
 #if     defined(USE_STM32F1)    
