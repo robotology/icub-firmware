@@ -537,12 +537,13 @@ static hal_timer_status_t s_hal_timer_status_get(hal_timer_t timer)
 
 static void s_hal_timer_prepare(hal_timer_t timer, const hal_timer_cfg_t *cfg)
 {
-
     hal_timer_datastructure_t *info = s_hal_timer_info[HAL_timer_t2index(timer)];
+    // we use SystemCoreClock instead of hal_brdcfg_sys__theconfig.speeds.cpu, which should be the same because ...
+    volatile uint32_t referencespeed = SystemCoreClock;  
 
     memcpy(&info->cfg, cfg, sizeof(hal_timer_cfg_t));
 
-    // use prescaler = ((SystemCoreClock/a/1000) )
+    // use prescaler = ((referencespeed/a/1000) )
 
     if(0 == (info->cfg.countdown % 1000))
     {   // multiple of 1 ms: use 10 khz, thus a = 10. 1 tick is 100us, max countdown is 6400 msec = 6.4 s
@@ -552,7 +553,7 @@ static void s_hal_timer_prepare(hal_timer_t timer, const hal_timer_cfg_t *cfg)
             info->cfg.countdown = 64000*100; // tick is 100
         }
 
-        info->prescaler   = ((SystemCoreClock/10/1000) );  // a is 10. the value is 7200: ok, lower than 65k
+        info->prescaler   = ((referencespeed/10/1000) );  // a is 10. the value is 7200: ok, lower than 65k
         info->period      = info->cfg.countdown / 100; // tick is 100
         info->tick_ns     = 100*1000; // tick is 100
 
@@ -565,7 +566,7 @@ static void s_hal_timer_prepare(hal_timer_t timer, const hal_timer_cfg_t *cfg)
             info->cfg.countdown = 64000*10; // tick is 10
         }
 
-        info->prescaler   = ((SystemCoreClock/100/1000) );  // a is 100. the value is 720: ok, lower than 65k
+        info->prescaler   = ((referencespeed/100/1000) );  // a is 100. the value is 720: ok, lower than 65k
         info->period      = info->cfg.countdown / 10; // tick is 10
         info->tick_ns     = 10*1000; // tick is 10
     }
@@ -577,7 +578,7 @@ static void s_hal_timer_prepare(hal_timer_t timer, const hal_timer_cfg_t *cfg)
             info->cfg.countdown = 64000*1; // tick is 1
         }
 
-        info->prescaler   = ((SystemCoreClock/1000/1000) );  // a is 1000. the value is 72: ok, lower than 65k
+        info->prescaler   = ((referencespeed/1000/1000) );  // a is 1000. the value is 72: ok, lower than 65k
         info->period      = info->cfg.countdown / 1; // tick is 1
         info->tick_ns     = 1*1000; // tick is 1
     }
@@ -589,7 +590,7 @@ static void s_hal_timer_prepare(hal_timer_t timer, const hal_timer_cfg_t *cfg)
             info->cfg.countdown = 8000; // tick is 0.125
         }
 
-        info->prescaler   = ((SystemCoreClock/8000/1000) );  // a is 8000. the value is 9: ok, lower than 65k
+        info->prescaler   = ((referencespeed/8000/1000) );  // a is 8000. the value is 9: ok, lower than 65k
         info->period      = info->cfg.countdown * 8; // tick is 0.125
         info->tick_ns     = 125; // tick is 0.125 micro
     }
