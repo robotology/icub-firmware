@@ -623,9 +623,10 @@ void ETH_IRQHandler(void)
   evEntityId_t prev = eventviewer_switch_to(ev_ID_first_isr+hal_arch_arm_ETH_IRQn);
 #endif
 
-  while (((int_stat = ETH->DMASR) & INT_NISE) != 0) {
-    ETH->DMASR = int_stat;
-    if (int_stat & INT_RIE) {
+  
+  while (((int_stat = ETH->DMASR) & INT_NISE) != 0) {   // -> read dma status register until we have the normal interrupt bit set
+    ETH->DMASR = int_stat;                              // -> reset the dma status register
+    if (int_stat & INT_RIE) {                           // -> in case of received frame ...
       /* Valid frame has been received. */
       i = RxBufIndex;
       if (Rx_Desc[i].Stat & DMA_RX_ERROR_MASK) {
@@ -634,7 +635,7 @@ void ETH_IRQHandler(void)
       if ((Rx_Desc[i].Stat & DMA_RX_SEG_MASK) != DMA_RX_SEG_MASK) {
         goto rel;
       }
-      RxLen = ((Rx_Desc[i].Stat >> 16) & 0x3FFF) - 4;
+      RxLen = ((Rx_Desc[i].Stat >> 16) & 0x3FFF) - 4;   // -> retrieve the length of teh frame
       if (RxLen > ETH_MTU) {
         /* Packet too big, ignore it and free buffer. */
         goto rel;
@@ -670,7 +671,7 @@ rel:  Rx_Desc[i].Stat = DMA_RX_OWN;
       /* Frame transmit completed. */
       //txframes++;
     }
-  }
+  }             // -> we execute a new cycle only if in the execution time of the loop a new interrupt has arrived. 
 
 #if defined(HAL_USE_EVENTVIEWER_ETH)    
   eventviewer_switch_to(prev);
