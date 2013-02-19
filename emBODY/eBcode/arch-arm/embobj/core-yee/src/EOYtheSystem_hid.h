@@ -60,8 +60,8 @@ struct EOYtheSystem_hid
     // base object
     EOVtheSystem                *thevsys;
 
-    const eOvtimerman_cfg_t     *tmrmancfg;
-    const eOvcallbackman_cfg_t  *cbkmancfg;
+//    const eOvtimerman_cfg_t     *tmrmancfg;
+//    const eOvcallbackman_cfg_t  *cbkmancfg;
     eOvoid_fp_void_t            user_init_fn;
 }; 
 

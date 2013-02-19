@@ -19,6 +19,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
+#include <time.h>
+#include <sys/time.h>
 
 #include "stdlib.h"
 #include "EoCommon.h"
@@ -78,6 +80,8 @@ static uint64_t s_eoy_sys_abstime_get(void);
 static void s_eoy_sys_abstime_set(uint64_t time);
 static uint64_t s_eoy_sys_nanotime_get(void);
 static void s_eoy_sys_stop(void);
+static uint64_t s_eoy_sys_ticks_abstime_set(void);
+static int s_timeval_subtract(struct timespec *_result, struct timespec *_x, struct timespec *_y);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -98,6 +102,7 @@ static EOYtheSystem s_eoy_system =
     .user_init_fn   = NULL                // user_init_fn
 };
 
+static struct timespec start_time;
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -141,6 +146,9 @@ extern EOYtheSystem * eoy_sys_Initialise(const eOysystem_cfg_t *syscfg,
     
     #warning --> if needed initialise something related to yarp.
 
+
+    clock_gettime(CLOCK_REALTIME, &start_time);
+
     return(&s_eoy_system);  
 }
 
@@ -161,9 +169,15 @@ extern void eoy_sys_Start(EOYtheSystem *p, eOvoid_fp_void_t userinit_fn)
     s_eoy_sys_start(userinit_fn);
 }
 
+extern uint64_t eoy_sys_abstime_get(EOYtheSystem *p)
+{
+	if(p==NULL)
+	{
+		return(0);
+	}
 
-
-
+	return(s_eoy_sys_abstime_get());
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -201,6 +215,59 @@ static EOVtaskDerived* s_eoy_sys_gettask(void)
 }
 
 static uint64_t s_eoy_sys_abstime_get(void)
+{
+    uint64_t time = 0xEABABABABABABABF;
+    struct timespec curr_time, diff;
+
+    #warning --> retrieve time with YARP
+
+    clock_gettime(CLOCK_REALTIME, &curr_time);
+
+    s_timeval_subtract(&diff, &curr_time, &start_time);
+
+//    //trasformo in microsec
+    time = ((diff.tv_sec * 1000 * 1000) + (diff.tv_nsec/1000));
+//    time = diff.tv_sec;
+    return(time);
+}
+
+
+// risultato= stop - start, cioè _result = _x - _y
+static int s_timeval_subtract(struct timespec *_result, struct timespec *_x, struct timespec *_y)
+{
+	//difftime();
+	/* Perform the carry for the later subtraction by updating y. */
+	static const long int MULTIPLIER = 1000 * 1000 * 1000;
+
+	if(_x->tv_nsec < _y->tv_nsec)
+	{
+		int nsec = (_y->tv_nsec - _x->tv_nsec) / MULTIPLIER + 1;
+
+		_y->tv_nsec -= MULTIPLIER * nsec;
+		_y->tv_sec += nsec;
+	}
+
+	if(_x->tv_nsec - _y->tv_nsec > MULTIPLIER)
+	{
+		int nsec = (_x->tv_nsec - _y->tv_nsec) / MULTIPLIER;
+
+		_y->tv_nsec += MULTIPLIER * nsec;
+		_y->tv_sec -= nsec;
+	}
+
+	/* Compute the time remaining to wait. tv_usec is certainly positive. */
+
+	_result->tv_sec = _x->tv_sec - _y->tv_sec;
+	_result->tv_nsec = _x->tv_nsec - _y->tv_nsec;
+
+	/* Return 1 if result is negative. */
+
+	return _x->tv_sec < _y->tv_sec;
+}
+
+
+
+static uint64_t s_eoy_sys_ticks_abstime_set(void)
 {
     uint64_t time = 0;
     
