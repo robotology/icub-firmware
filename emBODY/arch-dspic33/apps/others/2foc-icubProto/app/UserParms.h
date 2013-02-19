@@ -52,7 +52,7 @@
 #endif
 
 // Number of poles
-#define NPOLES      (POLEPAIRS*2) 
+#define NPOLES      (NPOLEPAIRS*2) 
 
 //#define NOMINALSPEEDINRPM 3000      // Make sure NOMINALSPEEDINRPM generates a MAXOMEGA < 1.0, Use this formula:
   // MAXOMEGA = NOMINALSPEEDINRPM*SPEEDLOOPTIME*POLEPAIRS*2/60. If MAXOMEGA > 1.0, reduce NOMINALSPEEDINRPM 
@@ -80,7 +80,7 @@
 // Comment this if you want to be sure encoder will always run at its 
 // best performances (maybe in production releases).
 // Also enabling this has a sligth 2foc loop computational load increase.
-#define ENCODER_DEGRADATION_ENABLED
+//#define ENCODER_DEGRADATION_ENABLED
 
 // check consitency of encoder choose
 #if !(defined(ENCODER_QE) || defined(ENCODER_ABS) || defined(ENCODER_AIE) || defined(ENCODER_DHES) || defined(ENCODER_TLE))
@@ -665,7 +665,7 @@
 // This is the current threshold that will cause protection to fire
 // This value is in I AD units scaled to 16bit.
 // For example AD reads about 6553 for 5A current, 1310 for 1A
-#define I2T_CURRENT_THRESHOLD   1310
+#define I2T_CURRENT_THRESHOLD   3310
 // This is 2024*K where K is
 // K = 1-(e^(-tc/tau))
 // where TC is 2FOC loop time
@@ -674,6 +674,9 @@
 // I2T warning not implemented yet
 // I2T warning is issued over this value
 //#define I2T_WARNING_THRESHOLD    170
+
+//CURRENT LIMIT. It is the saturation for the reference of the current expressed in AD reads (1310 for 1A)
+#define CURRENT_LIMIT Q15(0.1999)//6553 // for Kolmorgeen  
 
 //
 // PWM and Control Timing Parameters

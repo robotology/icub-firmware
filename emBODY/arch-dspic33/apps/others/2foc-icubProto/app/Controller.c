@@ -28,7 +28,7 @@ tPID2 TorqueSensorPID;
 tPID2 CurrentQPID;
 tPID2 CurrentDPID;
 tPID2 WPID;
-
+volatile unsigned char current_open_loop=0;
 
 void ControllerCurrentDPIDClear()
 {
@@ -121,7 +121,17 @@ void IdIqControl(void)
   SFRAC16 max;
 
   CurrentDPID.controlReference = CtrlReferences.qIdRef;
-  CurrentDPID.measuredOutput = ParkParm.qId;
+
+  if (current_open_loop)
+  {
+  	CurrentDPID.measuredOutput = 0; 
+  	CurrentQPID.measuredOutput = 0; 
+  }
+  else
+  {
+    CurrentDPID.measuredOutput = ParkParm.qId;
+  	CurrentQPID.measuredOutput = ParkParm.qIq;
+  }
 
   PID2(&CurrentDPID);  
   DPIDError = CurrentDPID.controlState[1];
@@ -144,7 +154,7 @@ void IdIqControl(void)
   }
 
   CurrentQPID.controlReference = CtrlReferences.qIqRef;
-  CurrentQPID.measuredOutput = ParkParm.qIq;
+
 
   PID2(&CurrentQPID);
 
@@ -208,7 +218,7 @@ void OmegaControl(void)
 }
 
 void ZeroRegulators(void)
-// Zero PID regulator status
+// Zero PID regulator status 
 {
   // zero integral sums
   PID2Init(&CurrentQPID);

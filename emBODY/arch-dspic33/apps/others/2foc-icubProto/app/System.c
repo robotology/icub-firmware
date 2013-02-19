@@ -729,6 +729,7 @@ void EepromSave()
   ApplicationData.WPIDD = d;
   ApplicationData.WPIDM = max;
 
+
   chksum = 0;
 
   for(j=0;j<sizeof(ApplicationData) - sizeof(unsigned short); j++)

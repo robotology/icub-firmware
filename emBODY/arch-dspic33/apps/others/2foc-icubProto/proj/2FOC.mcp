@@ -93,9 +93,10 @@ file_065=.INC
 file_066=.INC
 file_067=.INC
 file_068=.INC
-file_069=.
+file_069=.H
 file_070=.
 file_071=.
+file_072=.
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -169,6 +170,7 @@ file_068=no
 file_069=no
 file_070=no
 file_071=no
+file_072=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -242,6 +244,7 @@ file_068=no
 file_069=no
 file_070=no
 file_071=no
+file_072=no
 [FILE_INFO]
 file_000=..\app\2FOC.c
 file_001=..\app\ADC.c
@@ -312,9 +315,10 @@ file_065=..\app\PID.inc
 file_066=..\app\pid2.inc
 file_067=..\app\SVGen.inc
 file_068=..\app\park.inc
-file_069=C:\Program Files\Microchip\mplabc30\v3.30c\lib\libq-coff.a
-file_070=C:\Program Files\Microchip\mplabc30\v3.30c\lib\libdsp-coff.a
-file_071=eElinkerscript_appl_2FOC.gld
+file_069=D:\iCub\firmware\emBODY\arch-dspic33\apps\others\2foc-icubProto\app\dhes_lut.h
+file_070=C:\Program Files (x86)\Microchip\MPLAB C30\lib\libq-coff.a
+file_071=C:\Program Files (x86)\Microchip\MPLAB C30\lib\libdsp-coff.a
+file_072=eElinkerscript_appl_2FOC.gld
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=

@@ -86,4 +86,5 @@ extern void CanIcubProtoTxErrorCode(unsigned int stid, unsigned char len, tCanDa
 extern void CanIcubProtoInit(unsigned char bid);
 extern void CanIcubProtoSetFilters(unsigned char bid);
 extern icubProtoControlMode_t CanIcubProtoGetcontrol_mode(void);
+extern const unsigned int * PeriodicData[ELEMENTS_IN_PREIODIC_DATA_LIST];
 #endif

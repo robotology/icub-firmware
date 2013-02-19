@@ -75,6 +75,9 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 static int s_canIcubProtoParser_parse_periodicMsg(unsigned char permsg_type, tCanData *rxpayload, unsigned char rxlen, tCanData *txpayload, unsigned char *txlen);
 static int s_canIcubProtoParser_parse_canLoaderMsg(tCanData *rxpayload, unsigned char rxlen, tCanData *txpayload, unsigned char *txlen);
 
+extern volatile unsigned char received_canloader_msg;
+extern volatile unsigned char current_open_loop;
+
 void CanIcubProtoParserInit(unsigned char bid)
 {
 	canprotoparser_bid = bid;
@@ -209,6 +212,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 return(0);
             }
             
+			
             // Command can be accepted only if current ststus is SWITCH ON DISABLED 
             if(1 != DS402_Statusword.Flags.ReadyToSwitchOn )
             {
@@ -217,6 +221,9 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                   *txlen = 0;
                   return(0);
             }
+		
+		    received_canloader_msg=0; // start to transmit status messages
+
             // go to Switch On state
             DS402_Controlword.Flags.SwitchOn = 1;
         }break;
@@ -294,6 +301,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 case ICUBPROTO_CONTROLMODE_CURRENT:
                 {
                     SysStatus.TorqueControl = 1;
+					current_open_loop=0;
                 }break;
                 case ICUBPROTO_CONTROLMODE_VELOCITY:
                 {
@@ -307,7 +315,13 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 }break;
 
                 case ICUBPROTO_CONTROLMODE_POSITION:
+				{
+				}break;
                 case ICUBPROTO_CONTROLMODE_OPENLOOP:
+				{
+					SysStatus.TorqueControl = 1;
+					current_open_loop=1;
+				}break;	
                 case ICUBPROTO_CONTROLMODE_TORQUE:
                 {
                    s_controlMode_setDefault();
@@ -414,6 +428,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         case ICUBPROTO_POLLINGCMD_SET_MAX_VELOCITY: 
         {
             ; //aspetta maggia
+			//
         }break;
 
         case ICUBPROTO_POLLINGCMD_GET_MAX_VELOCITY: 
@@ -423,7 +438,19 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 
         case ICUBPROTO_POLLINGCMD_SET_CURRENT_LIMIT: 
         {
-            ; //aspetta maggia
+         
+			
+			if(5 != rxlen)
+            {   // incorrect number of parameters
+//                *txlen = 0x1;
+//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                *txlen = 0x0;
+                return(0);
+            }
+		
+		//il dato che arriva è espresso in mA va trasformato in IAD della 2FOC (1A 1310) 
+			ApplicationData.CurLimit=((rxpayload->b[2] << 8 | rxpayload->b[1])*1310)/1000;
+ 
         }break;
         
         case ICUBPROTO_POLLINGCMD_GET_FIRMWARE_VERSION: 
@@ -433,7 +460,8 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         
         case ICUBPROTO_POLLINGCMD_SET_CURRENT_PID: 
         {
-            SFRAC16 pp, pi, pd, pm;
+            SFRAC16 pp, pi, pd, pm; //pm non viene passato dal comando 
+
             if(7 != rxlen)
             {   // incorrect number of parameters
 //                *txlen = 0x1;
@@ -452,7 +480,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         
         case ICUBPROTO_POLLINGCMD_GET_CURRENT_PID: 
         {
-            signed int p, i, d, m;
+            signed int p, i, d, m; 
             if(1 != rxlen)
             {   // incorrect number of parameters
 //                *txlen = 0x1;
@@ -471,7 +499,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         
         case ICUBPROTO_POLLINGCMD_SET_VELOCITY_PID: 
         {
-            SFRAC16 pp, pi, pd, pm;
+            SFRAC16 pp, pi, pd, pm; //pm non viene passato dal comando 
             
             if(7 != rxlen)
             {   // incorrect number of parameters
@@ -508,6 +536,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 
         case ICUBPROTO_POLLINGCMD_SET_DESIRED_CURRENT: 
         {
+			SFRAC16 IqRef;
             if(5 != rxlen)
             {   // incorrect number of parameters
 //                *txlen = 0x1;
@@ -526,11 +555,18 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             }
 #endif
             // Torque control references
-            CtrlReferences.qIqRef = (rxpayload->b[2] << 8 | rxpayload->b[1]);
+			IqRef = (rxpayload->b[2] << 8 | rxpayload->b[1]);
+			if ((IqRef>0) && (IqRef>ApplicationData.CurLimit));
+			IqRef=ApplicationData.CurLimit;
+			if ((IqRef<0) && (IqRef<ApplicationData.CurLimit));
+			IqRef=-ApplicationData.CurLimit;            
+			CtrlReferences.qIqRef=IqRef;
             // set reference value for toggling torque
             TorqueTogglingReference = CtrlReferences.qIqRef;
+
             // Flux control references
             CtrlReferences.qIdRef = (rxpayload->b[4] << 8 | rxpayload->b[3]);  
+
 #ifdef SYNC_2FOC_TO_EMS
             CanIcubProtoTrasmitterSendPeriodicData();          
 #endif    
@@ -674,8 +710,9 @@ static int s_canIcubProtoParser_parse_canLoaderMsg(tCanData *rxpayload, unsigned
 
     cmd = rxpayload->b[0];
     *txlen = 0;
-
-    switch (cmd)
+	
+	
+	switch (cmd)
     {
         case CMD_BROADCAST: 
         {
@@ -686,13 +723,15 @@ static int s_canIcubProtoParser_parse_canLoaderMsg(tCanData *rxpayload, unsigned
                 *txlen = 0x0;
                 return(0);
             }
+			
+			received_canloader_msg=1; // do not transmit status messages
 
             *txlen = 5;
             txpayload->b[0] = cmd;
             txpayload->b[1] = BOARD_TYPE_2FOC; 
             txpayload->b[2] = 1;  //TODO  //Firmware version number for BOOTLOADER c
             txpayload->b[3] = 0;  //TODO   //Firmware build number.
-            txpayload->b[4] = 2;  //TODO   //Firmware build number.
+            txpayload->b[4] = 3;  //TODO   //Firmware build number.
             #warning solita incoerenza tra versioni di fw sensori ed motori            
         } break;
                 

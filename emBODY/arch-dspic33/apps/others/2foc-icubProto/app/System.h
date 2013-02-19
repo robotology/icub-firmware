@@ -139,7 +139,7 @@ typedef struct eeprom_data {
     
   // add user data ahead ...
   // .... 
-
+  SFRAC16 CurLimit;			
   unsigned short chksum;
 
 

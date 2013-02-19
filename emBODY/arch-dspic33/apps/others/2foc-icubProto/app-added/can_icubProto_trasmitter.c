@@ -33,6 +33,7 @@ static unsigned char canprototransmitter_bid;
 //this variable says to know if ems is going on to send msg to 2foc.
 //if ems stops to send msg to 2foc then status message is send by _T4Interrupt and not from CanIcubProtoTrasmitterSendPeriodicData
 static unsigned char received_msg_from_ems = 0;
+volatile unsigned char received_canloader_msg= 0;
 extern volatile int gulp_update_request ;
 extern tGulp Gulp;
 extern tGulp GulpHistoryBuffer[GULP_HISTORY_BUFFER_SIZE];
@@ -156,6 +157,11 @@ void __attribute__((__interrupt__, no_auto_psv)) _T4Interrupt(void)
         received_msg_from_ems = 0;
         return;
     }
+
+	if (received_canloader_msg==1) 
+	{
+		return;
+	}
 
     s_CanIcubProtoTrasmitter_prapareStatusMsg(&candata, &len, &txid);
 	
