@@ -80,7 +80,6 @@ extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_v
 extern void eo_emsController_SetVelRef(uint8_t joint, int32_t vel, int32_t avg_acc);
 extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq);
 
-extern void eo_emsController_ReadTorques(int32_t *torque);
 
 // asynchronous
 extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_t vel, int32_t offset);

@@ -95,6 +95,7 @@ extern EOemsController* eo_emsController_Init(emsBoardType_t board_type)
         s_emsc->defcon     = EMS_PRUDENT;
         s_emsc->n_joints   = MAX_JOINTS;
         s_emsc->is_coupled = eobool_false;
+        s_emsc->motors     = NULL;
         
         s_emsc->cable_length_alarm = eobool_false;
         
@@ -106,7 +107,9 @@ extern EOemsController* eo_emsController_Init(emsBoardType_t board_type)
         
         switch (s_emsc->boardType)
         {
-            case EMS_GENERIC:            
+            case EMS_GENERIC:
+                s_emsc->is_coupled = eobool_false;
+                s_emsc->n_joints   = 0;       
                 break;
             
             case EMS_SHOULDER: 
