@@ -186,11 +186,6 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidposition(eOcfg_nvsEP_mc_joi
 {
     eOmc_PID_t      *pid_ptr = (eOmc_PID_t*)nv->loc;
     float           rescaler = 1.0f/(float)(1<<pid_ptr->scale);
-
-		if (pid_ptr->kp == 0)
-		{
-			pid_ptr->kp = 0;
-		}
 	
     eo_emsController_SetPosPid(jxx, pid_ptr->kp,//*rescaler, 
 	                                pid_ptr->kd,//*rescaler, 
@@ -379,10 +374,12 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
 
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
+    eOmc_controlmode_command_t *controlmode_ptr = (eOmc_controlmode_command_t*)nv->loc;
+    
+    /*
     eOresult_t                              res;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
-    eOmc_controlmode_command_t              *controlmode_ptr = (eOmc_controlmode_command_t*)nv->loc;
-    eOmc_controlmode_command_t              controlmode_2foc = eomc_controlmode_cmd_current;
+    eOmc_controlmode_command_t              controlmode_2foc = eomc_controlmode_cmd_openloop; //eomc_controlmode_cmd_current;
     eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t            msgCmd = 
     {
@@ -419,6 +416,14 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
         {
             if (eo_emsController_GetControlMode(jxx) == eomc_controlmode_idle)
             {
+                eOmc_PID_t pid_open_loop;
+                pid_open_loop.kp = 0x0A00;
+                pid_open_loop.kd = 0;
+                pid_open_loop.ki = 0;
+                
+                msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID;
+                eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &pid_open_loop);
+                
                 msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
                 eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
                 
@@ -431,11 +436,20 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
         }
         
     }
+    */
     
     // 2) set control mode to ems controller
     eo_emsController_SetControlMode(jxx, (eOmc_controlmode_command_t)(*controlmode_ptr));       
-
 }
+
+
+// __ALE__
+extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs__externallymeasuredtorque(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eo_emsController_ReadTorque(jxx, *(eOmeas_torque_t*)nv->loc);
+}
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
