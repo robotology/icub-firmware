@@ -112,6 +112,7 @@ static EOtheARMenvironment s_the_armenv =
 extern EOtheARMenvironment * eo_armenv_Initialise(const eEmoduleInfo_t *modinfo, const eEboardInfo_t *brdinfo)
 {
     
+    
     if(NULL == s_the_armenv.env)
     {
         // allow initialisation with null cfg ..... but not without the moduleinfo
@@ -125,6 +126,32 @@ extern EOtheARMenvironment * eo_armenv_Initialise(const eEmoduleInfo_t *modinfo,
                                                                                s_eo_armenv_shareddata_ipnet_get,
                                                                                s_eo_armenv_shareddata_cannets_get,
                                                                                s_eo_armenv_eproc_get);
+        
+        
+//         #warning --> acemor says: we make sure that the oui is not the infamous 0x112233 but ...
+//         
+//         
+//         shalinfo_deviceinfo_t deviceinfo;
+//         const uint64_t thenewoui = 0x0B9A70; //0xabcdef; 0x332211; 
+//         
+//         if(ee_res_OK != shalinfo_deviceinfo_get(&s_the_armenv.devinfo))
+//         {
+//             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "cannot read deviceinfo");
+//             //return(eores_NOK_generic);
+//         }
+//         
+//         if(thenewoui != (0x0000000000ffffff & s_the_armenv.devinfo->ipnetwork.macaddress))
+//         {        
+//             memcpy(&deviceinfo, s_the_armenv.devinfo, sizeof(shalinfo_deviceinfo_t));
+//             
+//             deviceinfo.ipnetwork.macaddress = 0x0000FFFFFF000000 & s_the_armenv.devinfo->ipnetwork.macaddress;
+//             deviceinfo.ipnetwork.macaddress |= thenewoui;
+//             
+//             shalinfo_deviceinfo_set(&deviceinfo);           
+//         }
+
+        
+        
     }
     
 
