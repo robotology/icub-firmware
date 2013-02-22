@@ -47,8 +47,9 @@ extern const int32_t EMS_FREQUENCY_INT32;
 // empty-section
 
 #ifdef MC_CAN_DEBUG
-int32_t encoder_can_pos = 0;
-int32_t encoder_can_vel = 0;
+//int32_t encoder_can_pos = 0;
+//int32_t encoder_can_vel = 0;
+int16_t torque_debug_can[4];
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -212,7 +213,7 @@ extern void eo_axisController_SetEncVel(EOaxisController *o, int32_t vel)
     if (o) o->velocity = vel;
 } 
 
-extern void eo_axisController_SetTorque(EOaxisController *o, int32_t trq)
+extern void eo_axisController_SetTorque(EOaxisController *o, int16_t trq)
 {
     if (o) o->torque_meas = trq;
 }
@@ -409,8 +410,8 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
             }
             
             #ifdef MC_CAN_DEBUG
-            encoder_can_pos = pos;
-            encoder_can_vel = vel;
+            //encoder_can_pos = pos;
+            //encoder_can_vel = vel;
             #endif
             
             o->err = pos_ref - pos;

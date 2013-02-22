@@ -18,6 +18,12 @@
 
 #include <string.h>
 
+#include "EOtheEMSapplBody.h"
+
+#ifdef MC_CAN_DEBUG
+extern int16_t torque_debug_can[4];
+#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -64,9 +70,10 @@ const float   EMS_FREQUENCY_FLOAT = 1000.0f;
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
-
+void config_2FOC(uint8_t joint);
+void set_2FOC_idle(uint8_t joint);
+void set_2FOC_running(uint8_t joint, eOmc_controlmode_command_t mode);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -208,14 +215,15 @@ extern void eo_emsController_ReadEncoders(int32_t *enc_pos)
     }
 }
 
-extern void eo_emsController_ReadTorques(int32_t *trq_measures)
+extern void eo_emsController_ReadTorque(uint8_t joint, eOmeas_torque_t trq_measure)
 {
     if (!s_emsc) return;
     
-    JOINTS(j)
-    {
-        eo_axisController_SetTorque(s_emsc->axis_controller[j], trq_measures[j]);
-    }
+    eo_axisController_SetTorque(s_emsc->axis_controller[joint], trq_measure);
+    
+    #ifdef MC_CAN_DEBUG
+    torque_debug_can[joint] = trq_measure;
+    #endif
 }
 
 #ifdef USE_2FOC_FAST_ENCODER
@@ -285,10 +293,6 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
     eo_motors_PWM(s_emsc->boardType, pwm_joint, pwm_motor, alarm_mask);
 }
 
-
-
-
-
     /*
     for (uint8_t m=0; m<4; ++m)
     {
@@ -338,7 +342,74 @@ extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq)
 
 extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_command_t mode)
 {
-    if (s_emsc) eo_axisController_SetControlMode(s_emsc->axis_controller[joint], mode);
+    if (s_emsc)
+    {        
+        static eObool_t motors_not_configured = eobool_true;
+        
+        if (motors_not_configured)
+        {
+            motors_not_configured = eobool_false;
+            MOTORS(m) config_2FOC(m);   
+        }
+        
+        eo_axisController_SetControlMode(s_emsc->axis_controller[joint], mode);
+        
+        if (mode == eomc_controlmode_cmd_switch_everything_off)
+        {
+            switch (s_emsc->boardType)
+            {
+            case EMS_GENERIC: return;
+            
+            case EMS_UPPERLEG:
+            case EMS_ANKLE:
+                set_2FOC_idle(joint);
+                break;
+        
+            case EMS_SHOULDER:
+                if (joint == 3)
+                {
+                    set_2FOC_idle(3);
+                    break;
+                }
+            
+            case EMS_WAIST:
+                if (eo_emsController_GetControlMode(0) == eomc_controlmode_idle &&
+                    eo_emsController_GetControlMode(1) == eomc_controlmode_idle &&
+                    eo_emsController_GetControlMode(2) == eomc_controlmode_idle)
+                {
+                    set_2FOC_idle(0);
+                    set_2FOC_idle(1);
+                    set_2FOC_idle(2);
+                }
+                break;
+            }
+        }
+        else
+        {
+            switch (s_emsc->boardType)
+            {
+            case EMS_GENERIC: return;
+            
+            case EMS_UPPERLEG:
+            case EMS_ANKLE:
+                set_2FOC_running(joint, mode);
+                break;
+   
+            case EMS_SHOULDER:
+                if (joint == 3)
+                {
+                    set_2FOC_running(3, mode);
+                    break;
+                }
+        
+            case EMS_WAIST:
+                set_2FOC_running(0, mode);
+                set_2FOC_running(1, mode);
+                set_2FOC_running(2, mode);
+                break;
+            }
+        }
+    }
 }
 
 extern eOmc_controlmode_t eo_emsController_GetControlMode(uint8_t joint)
@@ -476,6 +547,111 @@ extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t motorerror, 
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
+
+void config_2FOC(uint8_t motor)
+{
+    eOmc_PID_t pid;
+    eOmc_i2tParams_t i2t;
+    
+    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+    eOappTheDB_jointOrMotorCanLocation_t canLoc;
+    eOicubCanProto_msgDestination_t msgdest;
+    
+    eOicubCanProto_msgCommand_t msgCmd = 
+    {
+        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.cmdId) 0
+    };
+    
+    eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), motor,  &canLoc, NULL);
+    
+    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+    
+    pid.kp = 0x0A00;
+    pid.kd = 0;
+    pid.ki = 0;
+                
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID;
+    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &pid);
+    
+    i2t.tresh = 0x290C;
+    i2t.time  = 0xCE0E;
+    
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_I2T_PARAMS;
+    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &i2t);
+}
+
+void set_2FOC_idle(uint8_t motor)
+{
+    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+    eOappTheDB_jointOrMotorCanLocation_t canLoc;
+    eOicubCanProto_msgDestination_t msgdest;
+    
+    eOicubCanProto_msgCommand_t msgCmd = 
+    {
+        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.cmdId) 0
+    };
+    
+    eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), motor,  &canLoc, NULL);
+    
+    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+    
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__DISABLE_PWM_PAD;
+    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_IDLE;
+    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+}
+
+void set_2FOC_running(uint8_t motor, eOmc_controlmode_command_t mode)
+{
+    eOmc_PID_t pid;
+    
+    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+    eOmc_controlmode_command_t controlmode_2foc = eomc_controlmode_cmd_openloop;
+    eOappTheDB_jointOrMotorCanLocation_t canLoc;
+    eOicubCanProto_msgDestination_t msgdest;
+    
+    eOicubCanProto_msgCommand_t msgCmd = 
+    {
+        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.cmdId) 0
+    };
+    
+    eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), motor,  &canLoc, NULL);
+    
+    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+    
+    if (mode == eomc_controlmode_cmd_position || mode == eomc_controlmode_cmd_velocity)
+    {
+        controlmode_2foc = eomc_controlmode_cmd_openloop;
+        
+        pid.kp = 0x0A00;
+        pid.kd = 0x0000;
+        pid.ki = 0x0000;
+    }
+    else
+    {
+        controlmode_2foc = eomc_controlmode_cmd_current;
+        
+        pid.kp = 0x0B85;
+        pid.kd = 0x028F;
+        pid.ki = 0x0000;
+    }
+    
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID;
+    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &pid);
+    
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
+    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
+        
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__ENABLE_PWM_PAD;
+    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+            
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;
+    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

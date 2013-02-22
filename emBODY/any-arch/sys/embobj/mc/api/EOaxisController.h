@@ -79,7 +79,7 @@ extern eObool_t eo_axisController_IsReady(EOaxisController *o);
 
 extern void eo_axisController_SetEncPos(EOaxisController *o, int32_t pos); 
 extern void eo_axisController_SetEncVel(EOaxisController *o, int32_t vel);
-extern void eo_axisController_SetTorque(EOaxisController *o, int32_t trq);
+extern void eo_axisController_SetTorque(EOaxisController *o, int16_t trq);
 
 //extern int32_t eo_axisController_GetVelocity(EOaxisController *o);
 
