@@ -484,7 +484,35 @@ extern eOabstime_t eo_ropframe_age_Get(EOropframe *p)
     return(header->ageofframe);
 }
 
+extern eOresult_t eo_ropframe_seqnum_Set(EOropframe *p, uint64_t seqnum)
+{
+    EOropframeHeader_t* header = NULL;
+    
+    if(NULL == p) 
+    {
+        return(eores_NOK_nullpointer);
+    }
 
+    header = s_eo_ropframe_header_get(p);
+
+    header->sequencenumber = seqnum;
+ 
+    return(eores_OK);
+}
+
+extern uint64_t eo_ropframe_seqnum_Get(EOropframe *p)
+{
+    EOropframeHeader_t* header = NULL;
+    
+    if(NULL == p) 
+    {
+        return(eok_uint64dummy);
+    }
+
+    header = s_eo_ropframe_header_get(p);
+
+    return(header->sequencenumber);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

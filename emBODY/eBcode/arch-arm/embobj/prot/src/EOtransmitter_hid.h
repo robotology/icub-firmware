@@ -90,7 +90,8 @@ struct EOtransmitter_hid
     eOabstime_t                 currenttime;   
     EOVmutexDerived*            mtx_replies;
     EOVmutexDerived*            mtx_regulars;
-    EOVmutexDerived*            mtx_occasionals;    
+    EOVmutexDerived*            mtx_occasionals;
+    uint64_t                    tx_seqnum;
 }; 
 
 

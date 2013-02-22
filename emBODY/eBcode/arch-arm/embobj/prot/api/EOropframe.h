@@ -105,6 +105,10 @@ extern eOresult_t eo_ropframe_age_Set(EOropframe *p, eOabstime_t age);
 
 extern eOabstime_t eo_ropframe_age_Get(EOropframe *p);
 
+extern eOresult_t eo_ropframe_seqnum_Set(EOropframe *p, uint64_t seqnum);
+
+extern uint64_t eo_ropframe_seqnum_Get(EOropframe *p);
+
 
 
 /** @}            

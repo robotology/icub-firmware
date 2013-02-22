@@ -54,6 +54,7 @@ typedef struct  // 16 bytes
     uint16_t    ropssizeof;
     uint16_t    ropsnumberof;
     uint64_t    ageofframe;
+    uint64_t    sequencenumber;
 } EOropframeHeader_t;
 
 typedef struct  // 20 bytes
