@@ -142,6 +142,7 @@ extern EOtransmitter* eo_transmitter_New(const eo_transmitter_cfg_t *cfg)
     retptr->bufferropframereplies   = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, cfg->capacityofropframereplies, 1);
     retptr->listofregropinfo        = eo_list_New(sizeof(eo_transm_regrop_info_t), cfg->maxnumberofregularrops, NULL, 0, NULL, NULL);
     retptr->currenttime             = 0;
+    retptr->tx_seqnum               = 0;
 
     eo_ropframe_Load(retptr->ropframeregulars, retptr->bufferropframeregulars, 0, cfg->capacityofropframeregulars);
     eo_ropframe_Clear(retptr->ropframeregulars);
@@ -414,6 +415,12 @@ extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outp
     // now add the age of the frame
     eo_ropframe_age_Set(p->ropframereadytotx, eov_sys_LifeTimeGet(eov_sys_GetHandle()));
     
+    // add sequence number
+    if( eo_ropframe_ROP_NumberOf(p->ropframereadytotx) != 0)
+    {
+    	p->tx_seqnum++;
+    	eo_ropframe_seqnum_Set(p->ropframereadytotx, p->tx_seqnum);
+    }
     // now set the size of the packet according to what is inside the ropframe.
     eo_ropframe_Size_Get(p->ropframereadytotx, &size);
     eo_packet_Size_Set(p->txpacket, size);

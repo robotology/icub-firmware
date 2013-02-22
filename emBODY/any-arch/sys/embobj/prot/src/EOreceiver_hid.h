@@ -69,6 +69,7 @@ struct EOreceiver_hid
     eOipv4addr_t                ipv4addr;
     eOipv4port_t                ipv4port;
     uint8_t*                    bufferropframereply;
+    uint64_t                    rx_seqnum;
 }; 
 
 

@@ -55,7 +55,7 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
-
+extern void eo_receiver_callback_incaseoferror_in_sequencenumberReceived(uint64_t rec_seqnum, uint64_t expected_seqnum);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -112,7 +112,7 @@ extern EOreceiver* eo_receiver_New(const eo_receiver_cfg_t *cfg)
     retptr->ipv4addr            = 0;
     retptr->ipv4port            = 0;
     retptr->bufferropframereply = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, cfg->capacityofropframereply, 1);
- 
+    retptr->rx_seqnum           = eok_uint64dummy;
     // now we need to allocate the buffer for the ropframereply
     
     eo_ropframe_Load(retptr->ropframereply, retptr->bufferropframereply, 0, cfg->capacityofropframereply);
@@ -134,6 +134,7 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvsCfg 
     EOnvsCfg *nvs2use = NULL;
     eOipv4addr_t remipv4addr;
     eOipv4port_t remipv4port;
+    uint64_t rec_seqnum;
 
     
     if((NULL == p) || (NULL == packet)) 
@@ -185,6 +186,22 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvsCfg 
         return(eores_NOK_generic);
     }
     
+    //check sequnece number
+    rec_seqnum = eo_ropframe_seqnum_Get(p->ropframeinput);
+    
+    if(p->rx_seqnum == eok_uint64dummy)
+    {
+        //this is the first received ropframe
+        p->rx_seqnum = rec_seqnum;
+    }
+    else
+    {
+        if(rec_seqnum != (p->rx_seqnum+1))
+        {
+            eo_receiver_callback_incaseoferror_in_sequencenumberReceived(rec_seqnum, p->rx_seqnum+1);
+        }
+        p->rx_seqnum = rec_seqnum;
+    }
     // for every rop inside with eo_ropframe_ROP_NumberOf() :
     //nrops = eo_ropframe_ROP_NumberOf(p->ropframeinput);
     // i have already verified validity of p->ropframeinput, thus i can use the quickversion
@@ -243,6 +260,12 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvsCfg 
     return(eores_OK);   
 }
 
+#if !defined(OVERRIDE_eo_receiver_callback_incaseoferror_in_sequencenumberReceived)
+__weak extern void eo_receiver_callback_incaseoferror_in_sequencenumberReceived(uint64_t rec_seqnum, uint64_t expected_seqnum)
+{
+;
+}
+#endif
 
 extern eOresult_t eo_receiver_GetReply(EOreceiver *p, EOropframe **ropframereply)
 {
