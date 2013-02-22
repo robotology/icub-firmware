@@ -81,16 +81,15 @@ extern EOmotors* eo_motors_New(uint8_t n_motors)
 
     if (o)
     {
-        //for (uint8_t m=0; m<MAX_MOTORS; ++m) o->motorON[m] = eobool_true;
+        for (uint8_t m=0; m<MAX_MOTORS; ++m)
+        {
+            o->motorON[m]              = eobool_false;
+            o->zero_rotation_torque[m] = ZERO_ROTATION_TORQUE;
+        }
         
         if (n_motors > MAX_MOTORS) n_motors = MAX_MOTORS;
         
         o->n_motors = n_motors;
-        
-        MOTORS(m)
-        {
-            o->zero_rotation_torque[m] = ZERO_ROTATION_TORQUE;
-        }
     }
 
     return o;

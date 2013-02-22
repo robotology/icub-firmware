@@ -67,7 +67,7 @@ extern EOemsController* eo_emsController_Init(emsBoardType_t board_type);
  **/
 
 // synchronous
-extern void eo_emsController_ReadTorques(int32_t *trq_measures);
+extern void eo_emsController_ReadTorque(uint8_t joint, eOmeas_torque_t trq_measure);
 extern void eo_emsController_ReadEncoders(int32_t *pos);
 #ifdef USE_2FOC_FAST_ENCODER
 extern void eo_emsController_ReadSpeed(uint8_t axis, int32_t speed);
