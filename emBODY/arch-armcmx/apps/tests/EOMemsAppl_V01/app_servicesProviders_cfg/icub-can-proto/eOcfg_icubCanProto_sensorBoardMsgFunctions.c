@@ -611,7 +611,7 @@ extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__tactSetup(EOicubCanProto* p
 static eOresult_t s_loadFullscalelikeoccasionalrop(eOsnsr_strainId_t sId)
 {
     eOresult_t res;
-    eo_transceiver_ropinfo_t ropinfo;
+    eOropdescriptor_t ropdesc;
     const eOtheEMSappBody_cfg_t* bodycfg = eo_emsapplBody_GetConfig(eo_emsapplBody_GetHandle());  
     
     if(NULL == bodycfg)
@@ -619,21 +619,16 @@ static eOresult_t s_loadFullscalelikeoccasionalrop(eOsnsr_strainId_t sId)
         return(eores_NOK_generic);
     }
 
-    //ropinfo.ropcfg contains the configuration for optional fields of a ROP.
-    ropinfo.ropcfg.confrqst = 0;
-    ropinfo.ropcfg.timerqst = 0;
-    ropinfo.ropcfg.plussign = 0;
-    ropinfo.ropcfg.plustime = 0;
-    
-    ropinfo.ropcode = eo_ropcode_sig;
-    
-    ropinfo.nvep = bodycfg->endpoints.as_endpoint;
-    
-    ropinfo.nvid = eo_cfg_nvsEP_as_strain_NVID_Get((eOcfg_nvsEP_as_endpoint_t)bodycfg->endpoints.as_endpoint, 
+    ropdesc.configuration           = eok_ropconfiguration_basic;
+    ropdesc.configuration.plustime  = 0;
+    ropdesc.ropcode                 = eo_ropcode_sig;
+    ropdesc.ep                      = bodycfg->endpoints.as_endpoint;
+    ropdesc.id                      = eo_cfg_nvsEP_as_strain_NVID_Get((eOcfg_nvsEP_as_endpoint_t)bodycfg->endpoints.as_endpoint, 
                                                (eOcfg_nvsEP_as_strainNumber_t)sId, 
                                                strainNVindex_sstatus__fullscale);
     
-    res = eo_transceiver_rop_occasional_Load( eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()), &ropinfo); 
+   
+    res = eo_transceiver_rop_occasional_Load( eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()), &ropdesc); 
 
     return(res);
 };
