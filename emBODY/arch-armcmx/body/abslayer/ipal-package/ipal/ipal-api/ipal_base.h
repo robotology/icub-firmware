@@ -206,6 +206,14 @@ typedef struct
     ipal_result_t   (*osal_mutex_release)(void *mutex);
     /** The forever value for a timeout in microseconds. */ 
     ipal_reltime_t  osal_param_tout_forever;
+    /** The function which is executed to suspend scheduling. Use the function osal_system_scheduling_suspend() of OSAL.
+        If not redefined (thus this value is NULL) it does nothing.  It is necessary to redefine only if the IPAL is used 
+        in a multitasking execution environment (with an RTOS) */ 
+    void            (*osal_system_scheduling_suspend)(void);
+    /** The function which is executed to restart scheduling. Use the function osal_system_scheduling_restart() of OSAL.
+        If not redefined (thus this value is NULL) it does nothing.  It is necessary to redefine only if the IPAL is used 
+        in a multitasking execution environment (with an RTOS) */ 
+    void            (*osal_system_scheduling_restart)(void);
 
     /** The function is executed to initialise ethernet. Use the HAL version. If NULL a fatal error is issued. */
     ipal_result_t  (*hal_eth_init)(void*);     // arg is: hal_eth_cfg_t *cfg
@@ -254,14 +262,7 @@ typedef struct
     /** The string contains the prompt of telnet. If NULL the default is used */
     const char * usr_tnet_prompt;
     
-    /** The function which is executed to suspend scheduling. Use the function osal_system_scheduling_suspend() of OSAL.
-        If not redefined (thus this value is NULL) it does nothing.  It is necessary to redefine only if the IPAL is used 
-        in a multitasking execution environment (with an RTOS) */ 
-    void            (*osal_system_scheduling_suspend)(void);
-    /** The function which is executed to restart scheduling. Use the function osal_system_scheduling_restart() of OSAL.
-        If not redefined (thus this value is NULL) it does nothing.  It is necessary to redefine only if the IPAL is used 
-        in a multitasking execution environment (with an RTOS) */ 
-    void            (*osal_system_scheduling_restart)(void);
+
 
 } ipal_fn_cfg_t;
 
