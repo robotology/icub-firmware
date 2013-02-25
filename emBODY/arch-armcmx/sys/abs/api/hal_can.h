@@ -251,6 +251,8 @@ extern hal_result_t hal_can_receptionfilter_set(hal_can_port_t port, uint8_t mas
     @param      port            identifies CAN port (CAN1 or CAN2)
     @param      numberof        contains numbers of frames.
     @return     hal_res_NOK_generic in case wrong port or NULL argument, else hal_res_OK.
+    @warning    this function acesses to software output queue WITHOUT pretection from interrupt.
+                So the caaler shoud be take care of this.
   */
 extern hal_result_t hal_can_out_get(hal_can_port_t port, uint8_t *numberof);
 
