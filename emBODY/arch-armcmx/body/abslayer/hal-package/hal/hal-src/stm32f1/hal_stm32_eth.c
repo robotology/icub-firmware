@@ -75,7 +75,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
@@ -162,7 +161,6 @@ static const hal_eth_network_functions_t s_hal_eth_fns =
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
-
 extern void ETH_IRQHandler(void);
 
 
@@ -362,9 +360,26 @@ Ho lasciato comunque il codice per non buttarlo via...
 
 extern hal_result_t hal_eth_enable(void) 
 {
-    // acemor on 31 oct 2011: it is the same as NVIC_EnableIRQ(ETH_IRQn) or hal_sys_hid_irqn_enable()
-    /* Ethernet Interrupt Enable function. */
-    NVIC->ISER[1] = 1 << 29;
+//     // acemor on 31 oct 2011: it is the same as NVIC_EnableIRQ(ETH_IRQn) or hal_sys_hid_irqn_enable()
+//     /* Ethernet Interrupt Enable function. */
+//     NVIC->ISER[1] = 1 << 29;
+//     
+    
+    
+    // for __DSB() and __ISB, see: http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.faqs/ka13559.html
+    
+    //   NVIC_ClearPendingIRQ(ETH_IRQn); // shall i clear or shall i not clear? NOT CLEAR!!!
+    
+    NVIC_EnableIRQ(ETH_IRQn);
+    __DSB();
+    __ISB();
+    
+    // i need to force the isr if since last call of hal_eth_disable() the dma has moved a frame in the descriptor 
+    // or all descriptors are owned by cpu
+    if((INT_RIE == (INT_RIE & ETH->DMASR)) || (INT_RBUIE == (INT_RBUIE & ETH->DMASR)))
+    {
+        NVIC_SetPendingIRQ(ETH_IRQn);
+    }    
 
     return(hal_res_OK);
 }
@@ -372,9 +387,16 @@ extern hal_result_t hal_eth_enable(void)
 
 extern hal_result_t hal_eth_disable(void) 
 {
-    // acemor on 31 oct 2011: it is the same as NVIC_DisableIRQ(ETH_IRQn) or hal_sys_hid_irqn_disable()
-    /* Ethernet Interrupt Disable function. */
-    NVIC->ICER[1] = 1 << 29;
+//     // acemor on 31 oct 2011: it is the same as NVIC_DisableIRQ(ETH_IRQn) or hal_sys_hid_irqn_disable()
+//     /* Ethernet Interrupt Disable function. */
+//     NVIC->ICER[1] = 1 << 29;
+//     
+    
+    // for __DSB() and __ISB, see: http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.faqs/ka13559.html
+    
+    NVIC_DisableIRQ(ETH_IRQn);
+    __DSB();
+    __ISB();
 
     return(hal_res_OK);
 }
@@ -431,51 +453,49 @@ extern const hal_eth_network_functions_t * hal_eth_get_network_functions(void)
 
 // ---- isr of the module: begin ----
 
-
-// changed NUM_RX_BUF with hal_base_hid_params.eth_dmarxbuffer_num
-// changed OS_FRAME with hal_eth_frame_t
-void ETH_IRQHandler(void) 
-{
-  // Ethernet Controller Interrupt function.
-  // questa non va cambiata. pero' .... usa OS_FRAME e chiama alloc_mem() e put_in_queue().
-  // bisogna usare alcuni puntatori a funzione che siano inizializzati / passati in hal_eth_init().
-  // inoltre, se si vuole segnalare l'arrivo di un frame gia' qui dentro, allora bisogna definire
-  // un altro puntatore a funzione hal_on_rx_frame().
-
-
-
+void ETH_IRQHandler (void) {
   /* Ethernet Controller Interrupt function. */
-  hal_eth_frame_t *frame;
+//  OS_FRAME *frame; removed
   U32 i,RxLen;
-  volatile U32 int_stat;
   U32 *sp,*dp;
-
-//  acemor on 18-mar-2011: i removed them two as they were used only for debug purposes
-//  static uint32_t txframes = 0;
-//  static uint32_t rxframes = 0;
+  //added 
+  hal_eth_frame_t *frame;    
+    
 
 #if defined(HAL_USE_EVENTVIEWER_ETH)
   evEntityId_t prev = eventviewer_switch_to(ev_ID_first_isr+hal_arch_arm_ETH_IRQn);
 #endif
+  
 
-  while (((int_stat = ETH->DMASR) & INT_NISE) != 0) {
-    ETH->DMASR = int_stat;
-    if (int_stat & INT_RIE) {
-      /* Valid frame has been received. */
-      i = RxBufIndex;
-      if (Rx_Desc[i].Stat & DMA_RX_ERROR_MASK) {
-        goto rel;
-      }
-      if ((Rx_Desc[i].Stat & DMA_RX_SEG_MASK) != DMA_RX_SEG_MASK) {
-        goto rel;
-      }
-      RxLen = ((Rx_Desc[i].Stat >> 16) & 0x3FFF) - 4;
-      if (RxLen > ETH_MTU) {
-        /* Packet too big, ignore it and free buffer. */
-        goto rel;
-      }
+  i = RxBufIndex;
+  do {
+    /* Valid frame has been received. */
+    if (Rx_Desc[i].Stat & DMA_RX_ERROR_MASK) {
+      goto rel;
+    }
+    if ((Rx_Desc[i].Stat & DMA_RX_SEG_MASK) != DMA_RX_SEG_MASK) {
+      goto rel;
+    }
+    RxLen = ((Rx_Desc[i].Stat >> 16) & 0x3FFF) - 4;
+    if (RxLen > ETH_MTU) {
+      /* Packet too big, ignore it and free buffer. */
+      goto rel;
+    }
+
+//====> following code is sostitute with .....
+//     /* Flag 0x80000000 to skip sys_error() call when out of memory. */
+//     frame = alloc_mem (RxLen | 0x80000000);
+//     /* if 'alloc_mem()' has failed, ignore this packet. */
+//     if (frame != NULL) {
+//       sp = (U32 *)(Rx_Desc[i].Addr & ~3);
+//       dp = (U32 *)&frame->data[0];
+//       for (RxLen = (RxLen + 3) >> 2; RxLen; RxLen--) {
+//         *dp++ = *sp++;
+//       }
+//       put_in_queue (frame);
+//     }
+///====> .... this code
       /* Flag 0x80000000 to skip sys_error() call when out of memory. */
-      //frame = alloc_mem (RxLen | 0x80000000);
       frame = s_onframerx.frame_new(RxLen | 0x80000000);
       /* if 'alloc_mem()' has failed, ignore this packet. */
       if (frame != NULL) {
@@ -484,28 +504,31 @@ void ETH_IRQHandler(void)
         for (RxLen = (RxLen + 3) >> 2; RxLen; RxLen--) {
           *dp++ = *sp++;
         }
+        
+      
         //put_in_queue (frame);
         s_onframerx.frame_movetohigherlayer(frame);
-
         if(NULL != s_onframerx.frame_alerthigherlayer)
         {
             s_onframerx.frame_alerthigherlayer();
         }
-
-        //rxframes ++;
-
-      }
-      /* Release this frame from ETH IO buffer. */
-rel:  Rx_Desc[i].Stat = DMA_RX_OWN;
-
-      if (++i == hal_base_hid_params.eth_dmarxbuffer_num) i = 0;
-      RxBufIndex = i;
     }
-    if (int_stat & INT_TIE) {
-      /* Frame transmit completed. */
-      //txframes++;
-    }
+
+        /* Release this frame from ETH IO buffer. */
+rel:Rx_Desc[i].Stat = DMA_RX_OWN;
+
+    if (++i == hal_base_hid_params.eth_dmarxbuffer_num) i = 0;
+  } while ((Rx_Desc[i].Stat & DMA_RX_OWN) == 0);
+  RxBufIndex = i;
+
+  if (ETH->DMASR & INT_RBUIE) {
+    /* Rx DMA suspended, resume DMA reception. */
+    ETH->DMASR   = INT_RBUIE;
+    ETH->DMARPDR = 0;
   }
+  /* Clear the interrupt pending bits. */
+  ETH->DMASR = INT_NISE | INT_RIE;
+
 
 #if defined(HAL_USE_EVENTVIEWER_ETH)    
   eventviewer_switch_to(prev);
