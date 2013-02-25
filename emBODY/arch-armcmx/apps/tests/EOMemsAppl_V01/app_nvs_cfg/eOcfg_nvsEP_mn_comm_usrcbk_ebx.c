@@ -193,7 +193,8 @@ static void s_eo_cfg_nvsEP_mngmnt_usr_ebx_generic_ropsigcfgcommand(eOmn_ropsigcf
 {
     uint8_t size, i;
     eOropSIGcfg_t *sigcfg;
-    eo_transceiver_ropinfo_t ropinfo;
+    //eo_transceiver_ropinfo_t ropinfo;
+    eOropdescriptor_t ropdesc;
     EOtransceiver* theems00transceiver; 
     EOarray *array = (EOarray*)&ropsigcfgcmd->array;
     eOmn_ropsigcfg_commandtype_t cmmnd = (eOmn_ropsigcfg_commandtype_t)ropsigcfgcmd->cmmnd;
@@ -228,12 +229,12 @@ static void s_eo_cfg_nvsEP_mngmnt_usr_ebx_generic_ropsigcfgcommand(eOmn_ropsigcf
             for(i=0; i<size; i++)
             {
                 sigcfg = (eOropSIGcfg_t*)eo_array_At(array, i);
-                ropinfo.ropcfg              = eok_ropconfig_basic;
-                ropinfo.ropcfg.plustime     = sigcfg->plustime;
-                ropinfo.ropcode             = eo_ropcode_sig;
-                ropinfo.nvep                = sigcfg->ep;    
-                ropinfo.nvid                = sigcfg->id;
-                res = eo_transceiver_rop_regular_Load(theems00transceiver, &ropinfo);
+                ropdesc.configuration           = eok_ropconfiguration_basic;
+                ropdesc.configuration.plustime  = sigcfg->plustime;
+                ropdesc.ropcode                 = eo_ropcode_sig;
+                ropdesc.ep                      = sigcfg->ep;    
+                ropdesc.id                      = sigcfg->id;
+                res = eo_transceiver_rop_regular_Load(theems00transceiver, &ropdesc);
                 res = res;
             }        
         } break;
@@ -243,12 +244,12 @@ static void s_eo_cfg_nvsEP_mngmnt_usr_ebx_generic_ropsigcfgcommand(eOmn_ropsigcf
             for(i=0; i<size; i++)
             {
                 sigcfg = (eOropSIGcfg_t*)eo_array_At(array, i);
-                ropinfo.ropcfg              = eok_ropconfig_basic;
-                ropinfo.ropcfg.plustime     = sigcfg->plustime;
-                ropinfo.ropcode             = eo_ropcode_sig;
-                ropinfo.nvep                = sigcfg->ep;    
-                ropinfo.nvid                = sigcfg->id;
-                res = eo_transceiver_rop_regular_Load(theems00transceiver, &ropinfo);
+                ropdesc.configuration           = eok_ropconfiguration_basic;
+                ropdesc.configuration.plustime  = sigcfg->plustime;
+                ropdesc.ropcode                 = eo_ropcode_sig;
+                ropdesc.ep                      = sigcfg->ep;    
+                ropdesc.id                      = sigcfg->id;
+                res = eo_transceiver_rop_regular_Load(theems00transceiver, &ropdesc);
                 res = res;
             }         
         } break;        
@@ -258,12 +259,12 @@ static void s_eo_cfg_nvsEP_mngmnt_usr_ebx_generic_ropsigcfgcommand(eOmn_ropsigcf
             for(i=0; i<size; i++)
             {
                 sigcfg = (eOropSIGcfg_t*)eo_array_At(array, i);
-                ropinfo.ropcfg              = eok_ropconfig_basic;
-                ropinfo.ropcfg.plustime     = sigcfg->plustime;
-                ropinfo.ropcode             = eo_ropcode_sig;
-                ropinfo.nvep                = sigcfg->ep;    
-                ropinfo.nvid                = sigcfg->id;
-                res = eo_transceiver_rop_regular_Unload(theems00transceiver, &ropinfo);
+                ropdesc.configuration           = eok_ropconfiguration_basic;
+                ropdesc.configuration.plustime  = sigcfg->plustime;
+                ropdesc.ropcode                 = eo_ropcode_sig;
+                ropdesc.ep                      = sigcfg->ep;    
+                ropdesc.id                      = sigcfg->id;
+                res = eo_transceiver_rop_regular_Unload(theems00transceiver, &ropdesc);
                 res = res;
             }         
         } break;                
