@@ -253,6 +253,15 @@ typedef struct
     const char * usr_tnet_welcome_msg;
     /** The string contains the prompt of telnet. If NULL the default is used */
     const char * usr_tnet_prompt;
+    
+    /** The function which is executed to suspend scheduling. Use the function osal_system_scheduling_suspend() of OSAL.
+        If not redefined (thus this value is NULL) it does nothing.  It is necessary to redefine only if the IPAL is used 
+        in a multitasking execution environment (with an RTOS) */ 
+    void            (*osal_system_scheduling_suspend)(void);
+    /** The function which is executed to restart scheduling. Use the function osal_system_scheduling_restart() of OSAL.
+        If not redefined (thus this value is NULL) it does nothing.  It is necessary to redefine only if the IPAL is used 
+        in a multitasking execution environment (with an RTOS) */ 
+    void            (*osal_system_scheduling_restart)(void);
 
 } ipal_fn_cfg_t;
 
