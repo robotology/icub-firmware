@@ -39,10 +39,17 @@
 
 #include "hal_utility_bits.h" 
 
-
+#if defined(HAL_USE_UTILITY_CRC07)
 #include "hal_utility_crc07.h"
+#endif
+
+#if defined(HAL_USE_UTILITY_CRC16)
 #include "hal_utility_crc16.h"
+#endif
+
+#if defined(HAL_USE_UTILITY_CRC32)
 #include "hal_utility_crc32.h"
+#endif
 
 
 #include "hal_trace.h"
@@ -155,7 +162,8 @@ extern hal_result_t hal_crc_init(hal_crc_t crc, const hal_crc_cfg_t *cfg)
     {
         case hal_crc_order_07:
         {   // on arm always use sw emulation
-
+            
+#if defined(HAL_USE_UTILITY_CRC07)
             if(hal_crc_poly_crc07 == info->cfg.polynomial)
             {   // for crc07 use rom-ed table
                 info->cfg.crctblram = (void*)hal_utility_crc07_table_0x09;
@@ -163,14 +171,20 @@ extern hal_result_t hal_crc_init(hal_crc_t crc, const hal_crc_cfg_t *cfg)
             } 
             else if(NULL != info->cfg.crctblram)
             {   // else compute it.
-                hal_utility_crc07_table_get(info->cfg.polynomial, info->cfg.crctblram);
-                res = hal_res_OK;
+                //hal_utility_crc07_table_get(info->cfg.polynomial, info->cfg.crctblram);
+                //res = hal_res_OK;
+                // unfortunately the utility hal_utility_crc07_table_get() is not verified yet
+                #warning WIP --> the function hal_utility_crc07_table_get() seems not to behave correctly, thus i dont use it.
+                res = hal_res_NOK_generic;
             }
+#else
+            res = hal_res_NOK_generic;
+#endif            
         } break;
         
         case hal_crc_order_16:
         {   // on arm always use sw emulation
-
+#if defined(HAL_USE_UTILITY_CRC16)
             if(hal_crc_poly_crc16_ccitt == info->cfg.polynomial)
             {   // for crc16-ccitt use rom-ed table
                 info->cfg.crctblram = (void*)hal_utility_crc16_table_0x1021;
@@ -180,7 +194,10 @@ extern hal_result_t hal_crc_init(hal_crc_t crc, const hal_crc_cfg_t *cfg)
             {   // else compute it.
                 hal_utility_crc16_table_get(info->cfg.polynomial, info->cfg.crctblram);
                 res = hal_res_OK;
-            }
+            } 
+#else
+            res = hal_res_NOK_generic;
+#endif   
         } break;
 
         case hal_crc_order_32:
@@ -191,9 +208,13 @@ extern hal_result_t hal_crc_init(hal_crc_t crc, const hal_crc_cfg_t *cfg)
                 res = s_hal_crc_hw_init(info);
             }
             else if(NULL != info->cfg.crctblram)
-            {
+            {                
+#if defined(HAL_USE_UTILITY_CRC32)
                 hal_utility_crc32_table_get(info->cfg.polynomial, info->cfg.crctblram);
-                res = hal_res_OK;
+                res = hal_res_OK; 
+#else
+            res = hal_res_NOK_generic;
+#endif                   
             }
         } break;
 
@@ -356,6 +377,8 @@ static uint32_t s_hal_crc32_hw_compute(hal_crc_info_t *info, const void *data, u
 
 static uint32_t s_hal_crc32_sw_compute(hal_crc_info_t *info, const void *data, uint32_t size)
 {
+#if defined(HAL_USE_UTILITY_CRC32)
+     
     uint8_t tailsize = size%4;
 
     uint32_t size4 = size-tailsize;
@@ -371,11 +394,17 @@ static uint32_t s_hal_crc32_sw_compute(hal_crc_info_t *info, const void *data, u
     }
 
     return(info->initialvalue);
+
+#else
+    return(0);
+#endif       
 }
 
 
 static uint32_t s_hal_crc16_sw_compute(hal_crc_info_t *info, const void *data, uint32_t size)
 {
+#if defined(HAL_USE_UTILITY_CRC16)
+    
     uint8_t tailsize = size%4;
 
     uint32_t size4 = size-tailsize;
@@ -391,11 +420,17 @@ static uint32_t s_hal_crc16_sw_compute(hal_crc_info_t *info, const void *data, u
     }
 
     return(info->initialvalue);
+    
+#else
+    return(0);
+#endif      
 }
 
 
 static uint32_t s_hal_crc07_sw_compute(hal_crc_info_t *info, const void *data, uint32_t size)
 {
+#if defined(HAL_USE_UTILITY_CRC07)
+    
     uint8_t tailsize = size%4;
 
     uint32_t size4 = size-tailsize;
@@ -411,6 +446,10 @@ static uint32_t s_hal_crc07_sw_compute(hal_crc_info_t *info, const void *data, u
     }
 
     return(info->initialvalue);
+ 
+#else
+    return(0);
+#endif    
 }
 
 #endif//HAL_USE_CRC
