@@ -129,13 +129,6 @@
 
 
 
-//#ifdef HAL_USE_SPI4ENCODER
-//    #define HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOB
-//    #define HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOB
-//    #define HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_PORT_CS_CLOCK			RCC_APB2Periph_GPIOB  
-//#endif//HAL_USE_SPI4ENCODER
-
-
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 // empty-section
@@ -235,13 +228,10 @@
 extern uint32_t hal_brdcfg_chips__getsize(const hal_cfg_t *cfg);
 extern hal_result_t hal_brdcfg_chips__setmem(const hal_cfg_t *cfg, uint32_t *memory);
 
+extern uint32_t hal_brdcfg_extbrds__getsize(const hal_cfg_t *cfg);
+extern hal_result_t hal_brdcfg_extbrds__setmem(const hal_cfg_t *cfg, uint32_t *memory);
 
 
-#ifdef HAL_USE_SPI4ENCODER
-    extern void hal_brdcfg_spi4encoder__chipSelect_init(hal_spi_port_t spix);
-    extern void hal_brdcfg_spi4encoder__encoder_enable(hal_spi_port_t spix, hal_spi_mux_t e);
-    extern void hal_brdcfg_spi4encoder__encoder_disable(hal_spi_port_t spix, hal_spi_mux_t e);  
-#endif//HAL_USE_SPI4ENCODER
 
 
 
