@@ -81,14 +81,14 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_hal_utility_crc07_generate_table(const uint8_t polymomial, uint8_t *table);
+static void s_hal_utility_crc07_generate_table(const uint8_t polynomial, uint8_t *table);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
 #ifdef _USE_HAL_UTILITY_CRC07TABLE_IN_ROM_
-// tbl computed by running s_hal_utility_crc07_generate_table(0x1021, tbl) on a cm3 micro with a little endian architecture.
+// tbl taken from edl manula and NOT by running s_hal_utility_crc07_generate_table(0x1021, tbl) on a cm3 micro with a little endian architecture.
 const uint8_t hal_utility_crc07_table_0x09[256] =
 {
     0x00, 0x09, 0x12, 0x1b, 0x24, 0x2d, 0x36, 0x3f,
@@ -130,13 +130,11 @@ const uint8_t hal_utility_crc07_table_0x09[256] =
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern void hal_utility_crc07_table_get(uint8_t polymomial, uint8_t *crctable)
+extern void hal_utility_crc07_table_get(uint8_t polynomial, uint8_t *crctable)
 {
-    s_hal_utility_crc07_generate_table(polymomial, crctable);
+    s_hal_utility_crc07_generate_table(polynomial, crctable);
 }
 
-
-#warning WIP --> verify that the function hal_utility_crc07_compute() computes the same value as the functions in EMS4 manual
 
 
 #undef USE_CRCTESTER_ALGORITHM
@@ -235,10 +233,12 @@ extern hal_result_t hal_utility_crc07_hid_setmem(const hal_cfg_t *cfg, uint32_t 
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-#warning WIP --> verify the function s_hal_utility_crc07_generate_table(). run with 0x09 and verify vs table in manual of EMS4
-
-static void s_hal_utility_crc07_generate_table(const uint8_t polymomial, uint8_t *table) 
+//#warning WIP --> verify the function s_hal_utility_crc07_generate_table(). run with 0x09 and verify vs table in manual of EMS4
+// it does not generates the correct table ... thus we limit to the precomputed tarble
+static void s_hal_utility_crc07_generate_table(const uint8_t polynomial, uint8_t *table) 
 {
+#if 0
+    
 	uint32_t i, j;
 	uint32_t bit, crc;
 
@@ -246,6 +246,7 @@ static void s_hal_utility_crc07_generate_table(const uint8_t polymomial, uint8_t
     {
 		crc = i;
 		crc >>= 1;
+ 
 
 		for(j=0; j<8; j++) 
         {
@@ -253,12 +254,36 @@ static void s_hal_utility_crc07_generate_table(const uint8_t polymomial, uint8_t
 			crc <<= 1;
 			if(bit)
             {
-                crc ^= polymomial;
+                crc ^= polynomial;
             }
 		}			
 
 		table[i]= crc & 0x7F;
 	}
+    
+#else
+
+    // from: http://www.pololu.com/docs/0J5/5.f
+    // see also http://ghsi.de/CRC/index.php?Polynom=10001001&Message=E100CAFe
+    int i, j;
+    
+    
+    uint8_t pol = 0x80 + polynomial; // not 0x09 nut 0x89
+    
+ 
+    // generate a table value for all 256 possible byte values
+    for (i = 0; i < 256; i++)
+    {
+        table[i] = (i & 0x80) ? i ^ pol : i;
+        for (j = 1; j < 8; j++)
+        {
+            table[i] <<= 1;
+            if (table[i] & 0x80)
+                table[i] ^= pol;
+        }
+    }    
+    
+#endif    
 }
 
 #endif//HAL_USE_UTILITY_CRC07

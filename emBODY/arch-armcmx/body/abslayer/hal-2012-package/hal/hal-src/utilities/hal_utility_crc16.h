@@ -64,12 +64,12 @@ extern const uint16_t hal_utility_crc16_table_0x1021[256];
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
  
-/** @fn         extern void hal_utility_crc16_table_get(uint16_t polymomial, uint16_t *hal_utility_crc16table)
+/** @fn         extern void hal_utility_crc16_table_get(uint16_t polynomial, uint16_t *hal_utility_crc16table)
     @brief      initialise the crctable for a given quotient polynomial. 
     @param      quotient        the poly.
     @param      crctab          the crctab whcih must point to 256 words of 2 bytes each.
  **/
-extern void hal_utility_crc16_table_get(uint16_t polymomial, uint16_t *hal_utility_crc16table);
+extern void hal_utility_crc16_table_get(uint16_t polynomial, uint16_t *hal_utility_crc16table);
 
 
 /** @fn         extern uint16_t hal_utility_crc16_compute(const uint32_t polynom, const uint16_t *hal_utility_crc16table, uint16_t initvalue, uint8_t *data, uint32_t len)

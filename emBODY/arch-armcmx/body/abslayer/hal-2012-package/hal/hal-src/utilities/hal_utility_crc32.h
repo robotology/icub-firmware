@@ -62,12 +62,12 @@ extern const uint32_t hal_utility_crc32_table_0x04c11db7[256];
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
  
-/** @fn         extern void hal_utility_crc32_table_get(uint32_t polymomial, uint32_t *hal_utility_crc32table)
+/** @fn         extern void hal_utility_crc32_table_get(uint32_t polynomial, uint32_t *hal_utility_crc32table)
     @brief      initialise the crctable for a given quotient polynomial. 
     @param      quotient        teh poly.
     @param      crctab          the crctab whcih must point to 256 words of 4 bytes each.
  **/
-extern void hal_utility_crc32_table_get(uint32_t polymomial, uint32_t *hal_utility_crc32table);
+extern void hal_utility_crc32_table_get(uint32_t polynomial, uint32_t *hal_utility_crc32table);
 
 
 /** @fn         extern uint32_t hal_utility_crc32_compute(const uint32_t polynom, const uint32_t *hal_utility_crc32table, uint32_t initvalue, uint8_t *data, uint32_t len)

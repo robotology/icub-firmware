@@ -80,7 +80,7 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_hal_utility_crc32_generate_table(const uint32_t polymomial, uint32_t *table);
+static void s_hal_utility_crc32_generate_table(const uint32_t polynomial, uint32_t *table);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -130,9 +130,9 @@ const uint32_t hal_utility_crc32_table_0x04c11db7[256] =
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern void hal_utility_crc32_table_get(uint32_t polymomial, uint32_t *crctable)
+extern void hal_utility_crc32_table_get(uint32_t polynomial, uint32_t *crctable)
 {
-    s_hal_utility_crc32_generate_table(polymomial, crctable);
+    s_hal_utility_crc32_generate_table(polynomial, crctable);
 }
 
 
@@ -183,7 +183,7 @@ extern hal_result_t hal_utility_crc32_hid_setmem(const hal_cfg_t *cfg, uint32_t 
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-static void s_hal_utility_crc32_generate_table(const uint32_t polymomial, uint32_t *table) 
+static void s_hal_utility_crc32_generate_table(const uint32_t polynomial, uint32_t *table) 
 {
 	uint32_t i, j;
 	uint32_t bit, crc;
@@ -199,7 +199,7 @@ static void s_hal_utility_crc32_generate_table(const uint32_t polymomial, uint32
 			crc <<= 1;
 			if(bit)
             {
-                crc ^= polymomial;
+                crc ^= polynomial;
             }
 		}			
 

@@ -81,11 +81,12 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_hal_utility_crc16_generate_table(const uint16_t polymomial, uint16_t *table);
+static void s_hal_utility_crc16_generate_table(const uint16_t polynomial, uint16_t *table);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
+
 
 #ifdef _USE_HAL_UTILITY_CRC16TABLE_IN_ROM_
 // tbl computed by running s_hal_utility_crc16_generate_table(0x1021, tbl) on a cm3 micro with a little endian architecture.
@@ -126,14 +127,16 @@ const uint16_t hal_utility_crc16_table_0x1021[256] =
 };
 #endif
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern void hal_utility_crc16_table_get(uint16_t polymomial, uint16_t *crctable)
+extern void hal_utility_crc16_table_get(uint16_t polynomial, uint16_t *crctable)
 {
-    s_hal_utility_crc16_generate_table(polymomial, crctable);
+    s_hal_utility_crc16_generate_table(polynomial, crctable);
 }
+
 
 
 extern uint16_t hal_utility_crc16_compute(const uint32_t polynom, const uint16_t *hal_utility_crc16table, uint16_t initvalue, uint8_t *data, uint32_t len)
@@ -183,7 +186,7 @@ extern hal_result_t hal_utility_crc16_hid_setmem(const hal_cfg_t *cfg, uint32_t 
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-static void s_hal_utility_crc16_generate_table(const uint16_t polymomial, uint16_t *table) 
+static void s_hal_utility_crc16_generate_table(const uint16_t polynomial, uint16_t *table) 
 {
 	uint32_t i, j;
 	uint32_t bit, crc;
@@ -199,7 +202,7 @@ static void s_hal_utility_crc16_generate_table(const uint16_t polymomial, uint16
 			crc <<= 1;
 			if(bit)
             {
-                crc ^= polymomial;
+                crc ^= polynomial;
             }
 		}			
 
