@@ -44,8 +44,11 @@
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
-// empty-section
 
+typedef struct
+{
+    uint8_t                 dummy;          /**< not used */
+} hal_trace_hid_brdcfg_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 // empty-section

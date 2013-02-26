@@ -38,6 +38,7 @@
 #include "hal_mpu_can_hid.h"
 #include "hal_mpu_spi_hid.h"
 #include "hal_mpu_eth_hid.h"
+#include "hal_mpu_trace_hid.h"
 #include "hal_eeprom.h"
 #include "hal_timer.h"
 #include "hal_i2c.h"
@@ -86,6 +87,8 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
+
+// --  mpu peripherals
 
 #ifdef  HAL_USE_CAN
     extern const hal_can_hid_brdcfg_t hal_brdcfg_can__theconfig =
@@ -238,6 +241,7 @@
     };
 #endif//HAL_USE_SPI
 
+    
 #ifdef  HAL_USE_SYS
     extern const hal_sys_hid_brdcfg_t hal_brdcfg_sys__theconfig  =
     {
@@ -264,8 +268,7 @@
     };    
 #endif//HAL_USE_SYS    
     
-  
-    
+      
 #ifdef  HAL_USE_TIMER
     extern const hal_timer_hid_brdcfg_t hal_brdcfg_timer__theconfig =
     {
@@ -273,6 +276,14 @@
     };       
 #endif//HAL_USE_TIMER
 
+    
+#ifdef  HAL_USE_TRACE
+    extern const hal_trace_hid_brdcfg_t hal_brdcfg_trace__theconfig =
+    {
+        .dummy              = 0
+    };       
+#endif//HAL_USE_TRACE
+    
 
 #ifdef  HAL_USE_WATCHDOG
     extern const hal_watchdog_hid_brdcfg_t hal_brdcfg_watchdog__theconfig =
@@ -282,32 +293,25 @@
 #endif//HAL_USE_WATCHDOG
 
 
+// -- devices
 
-
-
-
-#ifdef HAL_USE_DEVICE_LED
-    extern const hal_device_led_hid_brdcfg_t hal_brdcfg_device_led__theconfig =
+#ifdef  HAL_USE_DEVICE_ACCELEROMETER   
+    extern const hal_device_accelerometer_hid_brdcfg_t hal_brdcfg_device_accelerometer__theconfig =
     {
-        .supported_mask             = 0xFF, // all the 8 leds ...
-        .value_on                   = hal_gpio_valHIGH,
-        .value_off                  = hal_gpio_valLOW,
-        .gpiocfg                    =
+        .supported_mask         = 0x1,
+        .devcfg         =
         {
-            { .port = hal_gpio_portE,    .pin = hal_gpio_pin8,    .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led0
-            { .port = hal_gpio_portE,    .pin = hal_gpio_pin9,    .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led1
-            { .port = hal_gpio_portE,    .pin = hal_gpio_pin10,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led2
-            { .port = hal_gpio_portE,    .pin = hal_gpio_pin11,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led3
-            { .port = hal_gpio_portE,    .pin = hal_gpio_pin12,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led4
-            { .port = hal_gpio_portE,    .pin = hal_gpio_pin13,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led5
-            { .port = hal_gpio_portE,    .pin = hal_gpio_pin14,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led6
-            { .port = hal_gpio_portE,    .pin = hal_gpio_pin15,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }  // hal_led7
-          //{ .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirNONE, .speed = hal_gpio_speed_low }
-        }
-    };
-#endif//HAL_USE_DEVICE_LED
-    
-    
+            {   // hal_accelerometer_port1
+                .chipif             =      
+                {   // use the lis3dh chip by st
+                    .init       = (hal_res_fp_voidp_t)hal_chip_st_lis3dh_init,
+                    .initpar    = NULL,
+                    .read       = hal_chip_st_lis3dh_accel_get  
+                }                    
+            }
+         }
+    };       
+#endif//HAL_USE_DEVICE_ACCELEROMETER
 
 
 #ifdef  HAL_USE_DEVICE_CANTRANSCEIVER
@@ -318,19 +322,19 @@
     
     static hal_result_t s_hal_device_cantransceiver_simple_init(hal_can_port_t port, void* initpar)
     {
-        //#warning --> in here .... init the gpio
+        //#warning --> in here, if required,.... init the gpio
         return(hal_res_OK);
     }
 
     static hal_result_t s_hal_device_cantransceiver_simple_enable(hal_can_port_t port)
     {   
-        //#warning --> in here .... put gpio low (or high)
+        //#warning --> in here, if required, .... put gpio low (or high)
         return(hal_res_OK);
     }
 
     static hal_result_t s_hal_device_cantransceiver_simple_disable(hal_can_port_t port)
     {   
-        //#warning --> in here .... put gpio high (or low)
+        //#warning --> in here, if required, .... put gpio high (or low)
         return(hal_res_OK);
     }
     
@@ -463,7 +467,26 @@
 #endif//HAL_USE_DEVICE_EEPROM 
 
 
-    
+#ifdef HAL_USE_DEVICE_ENCODER
+    extern const hal_device_encoder_hid_brdcfg_t hal_brdcfg_device_encoder__theconfig =
+    {
+        .supported_mask             = (0 << hal_encoder1) | (0 << hal_encoder2) | (0 << hal_encoder3) | (0 << hal_encoder4) | (0 << hal_encoder5) | (0 << hal_encoder6), 
+        .muxport                    = 
+        {   
+            hal_mux_port1,  hal_mux_port1,  hal_mux_port1,  hal_mux_port1,  hal_mux_port1,  hal_mux_port1           
+        },
+        .muxsel                     = 
+        {   
+            hal_mux_selNONE,hal_mux_selNONE,hal_mux_selNONE,hal_mux_selNONE,hal_mux_selNONE,hal_mux_selNONE           
+        },  
+        .spiport                     = 
+        {   
+            hal_spi_port1,  hal_spi_port1,  hal_spi_port1,  hal_spi_port1,  hal_spi_port1,  hal_spi_port1           
+        }
+    };
+#endif//HAL_USE_DEVICE_ENCODER  
+  
+
 #ifdef HAL_USE_DEVICE_ETHTRANSCEIVER
     extern const hal_device_ethtransceiver_hid_brdcfg_t hal_brdcfg_device_ethtransceiver__theconfig =
     {
@@ -482,6 +505,76 @@
     };   
 #endif//HAL_USE_DEVICE_ETHTRANSCEIVER
 
+    
+#ifdef  HAL_USE_DEVICE_GYROSCOPE
+    extern const hal_device_gyroscope_hid_brdcfg_t hal_brdcfg_device_gyroscope__theconfig =
+    {
+        .supported_mask         = (1 << hal_gyroscope_port1),
+        .devcfg         =
+        {
+            {   // hal_gyroscope_port1
+                .chipif             =      
+                {   // use the l3g4200d chip by st
+                    .init       = (hal_res_fp_voidp_t)hal_chip_st_l3g4200d_init,
+                    .initpar    = NULL,
+                    .read       = hal_chip_st_l3g4200d_angrate_get
+                }                    
+            }
+         }
+    };          
+#endif//HAL_USE_DEVICE_GYROSCOPE
+ 
+
+#ifdef HAL_USE_DEVICE_LED
+    extern const hal_device_led_hid_brdcfg_t hal_brdcfg_device_led__theconfig =
+    {
+        .supported_mask             = 0xFF, // all the 8 leds ...
+        .value_on                   = hal_gpio_valHIGH,
+        .value_off                  = hal_gpio_valLOW,
+        .gpiocfg                    =
+        {
+            { .port = hal_gpio_portE,    .pin = hal_gpio_pin8,    .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led0
+            { .port = hal_gpio_portE,    .pin = hal_gpio_pin9,    .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led1
+            { .port = hal_gpio_portE,    .pin = hal_gpio_pin10,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led2
+            { .port = hal_gpio_portE,    .pin = hal_gpio_pin11,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led3
+            { .port = hal_gpio_portE,    .pin = hal_gpio_pin12,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led4
+            { .port = hal_gpio_portE,    .pin = hal_gpio_pin13,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led5
+            { .port = hal_gpio_portE,    .pin = hal_gpio_pin14,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led6
+            { .port = hal_gpio_portE,    .pin = hal_gpio_pin15,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }  // hal_led7
+          //{ .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirNONE, .speed = hal_gpio_speed_low }
+        }
+    };
+#endif//HAL_USE_DEVICE_LED
+    
+    
+#ifdef HAL_USE_DEVICE_MUX
+    extern const hal_device_mux_hid_brdcfg_t hal_brdcfg_device_mux__theconfig =
+    {
+        .supported_mask             = (0 << hal_mux_port1) | (0 << hal_mux_port2) | (0 << hal_mux_port3) | (0 << hal_mux_port4), 
+        .gpio_sel0                  =
+        {
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default }            
+        },
+        .gpio_sel1                  =
+         {
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default }            
+        }, 
+        .gpio_enable                =
+        {
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default }            
+        },    
+    };
+#endif//HAL_USE_DEVICE_MUX      
+    
 
 #ifdef HAL_USE_DEVICE_SWITCH
     extern const hal_device_switch_hid_brdcfg_t hal_brdcfg_device_switch__theconfig =
@@ -499,55 +592,7 @@
         }
     };
 #endif//HAL_USE_DEVICE_SWITCH
-
-
-#ifdef  HAL_USE_DEVICE_ACCELEROMETER   
-    extern const hal_device_accelerometer_hid_brdcfg_t hal_brdcfg_device_accelerometer__theconfig =
-    {
-        .supported_mask         = 0x1,
-        .devcfg         =
-        {
-            {   // hal_accelerometer_port1
-                .chipif             =      
-                {   // use the lis3dh chip by st
-                    .init       = (hal_res_fp_voidp_t)hal_chip_st_lis3dh_init,
-                    .initpar    = NULL,
-                    .read       = hal_chip_st_lis3dh_accel_get  
-                }                    
-            }
-         }
-    };       
-#endif//HAL_USE_DEVICE_ACCELEROMETER
-
-
-
-#ifdef  HAL_USE_SENSOR_ENCODER
-    extern const hal_sensor_encoder_hid_brdcfg_t hal_brdcfg_sensor_encoder__theconfig =
-    {
-        .supported_mask     = 0,
-        .something          = yet-to-be-done-in-here
-    };
-#endif//HAL_USE_SENSOR_ENCODER
-  
-
-#ifdef  HAL_USE_DEVICE_GYROSCOPE
-    extern const hal_device_gyroscope_hid_brdcfg_t hal_brdcfg_device_gyroscope__theconfig =
-    {
-        .supported_mask         = 0x1,
-        .devcfg         =
-        {
-            {   // hal_gyroscope_port1
-                .chipif             =      
-                {   // use the l3g4200d chip by st
-                    .init       = (hal_res_fp_voidp_t)hal_chip_st_l3g4200d_init,
-                    .initpar    = NULL,
-                    .read       = hal_chip_st_l3g4200d_angrate_get
-                }                    
-            }
-         }
-    };          
-#endif//HAL_USE_DEVICE_GYROSCOPE
-    
+        
     
 #ifdef  HAL_USE_DEVICE_TERMOMETER 
     extern const hal_device_termometer_hid_brdcfg_t hal_brdcfg_device_termometer__theconfig =
@@ -599,6 +644,10 @@ extern uint32_t hal_brdcfg_chips__getsize(const hal_cfg_t *cfg)
     retval += hal_chip_generic_ethtransceiver_hid_getsize(cfg);
 #endif//HAL_USE_CHIP_GENERIC_ETHTRANSCEIVER
     
+#ifdef  HAL_USE_CHIP_MICREL_KS8893
+    retval += hal_chip_micrel_ks8893_hid_getsize(cfg);
+#endif//HAL_USE_CHIP_MICREL_KS8893            
+    
 #ifdef  HAL_USE_CHIP_ST_L3G4200D
     retval += hal_chip_st_l3g4200d_hid_getsize(cfg);
 #endif//HAL_USE_CHIP_ST_L3G4200D    
@@ -606,10 +655,6 @@ extern uint32_t hal_brdcfg_chips__getsize(const hal_cfg_t *cfg)
 #ifdef  HAL_USE_CHIP_ST_LIS3DH
     retval += hal_chip_st_lis3dh_hid_getsize(cfg);
 #endif//HAL_USE_CHIP_ST_LIS3DH        
-
-#ifdef  HAL_USE_CHIP_MICREL_KS8893
-    retval += hal_chip_micrel_ks8893_hid_getsize(cfg);
-#endif//HAL_USE_CHIP_MICREL_KS8893        
 
 #ifdef  HAL_USE_CHIP_XX_EEPROM
     retval += hal_chip_xx_eeprom_hid_getsize(cfg);
@@ -636,6 +681,14 @@ extern hal_result_t hal_brdcfg_chips__setmem(const hal_cfg_t *cfg, uint32_t *mem
     memory += hal_chip_generic_ethtransceiver_hid_getsize(cfg)/4;   
 #endif//HAL_USE_CHIP_GENERIC_ETHTRANSCEIVER
     
+#ifdef  HAL_USE_CHIP_MICREL_KS8893
+    if(hal_res_OK != hal_chip_micrel_ks8893_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_chip_micrel_ks8893_hid_getsize(cfg)/4;       
+#endif//HAL_USE_CHIP_MICREL_KS8893       
+    
 #ifdef  HAL_USE_CHIP_ST_L3G4200D
     if(hal_res_OK != hal_chip_st_l3g4200d_hid_setmem(cfg, memory))
     {
@@ -651,15 +704,7 @@ extern hal_result_t hal_brdcfg_chips__setmem(const hal_cfg_t *cfg, uint32_t *mem
     }
     memory += hal_chip_st_lis3dh_hid_getsize(cfg)/4;       
 #endif//HAL_USE_CHIP_ST_LIS3DH        
-
-#ifdef  HAL_USE_CHIP_MICREL_KS8893
-    if(hal_res_OK != hal_chip_micrel_ks8893_hid_setmem(cfg, memory))
-    {
-        return(hal_res_NOK_generic);
-    }
-    memory += hal_chip_micrel_ks8893_hid_getsize(cfg)/4;       
-#endif//HAL_USE_CHIP_MICREL_KS8893        
-
+     
 #ifdef  HAL_USE_CHIP_XX_EEPROM
     if(hal_res_OK != hal_chip_xx_eeprom_hid_setmem(cfg, memory))
     {
@@ -706,6 +751,27 @@ extern hal_result_t hal_brdcfg_extbrds__setmem(const hal_cfg_t *cfg, uint32_t *m
     return(hal_res_OK);  
 }
 
+
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of extern hidden functions 
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of static functions
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - end-of-file (leave a blank line after)
+// --------------------------------------------------------------------------------------------------------------------
+
+// removed code
 
 // #ifdef HAL_USE_SPI4ENCODER
 
@@ -797,22 +863,4 @@ extern hal_result_t hal_brdcfg_extbrds__setmem(const hal_cfg_t *cfg, uint32_t *m
 // #endif//HAL_USE_SPI4ENCODER
 
 
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of extern hidden functions 
-// --------------------------------------------------------------------------------------------------------------------
-// empty-section
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of static functions
-// --------------------------------------------------------------------------------------------------------------------
-// empty-section
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - end-of-file (leave a blank line after)
-// --------------------------------------------------------------------------------------------------------------------
-
-
+// end of file

@@ -34,7 +34,7 @@
 #include "stdlib.h"
 
 #include "hal_mpu_stm32xx_include.h"
-
+#include "hal_brdcfg.h"
 #include "hal_base_hid.h" 
 
  
@@ -43,7 +43,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "hal_trace.h"
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -80,7 +79,11 @@ extern volatile int32_t ITM_RxBuffer = ITM_RXBUFFER_EMPTY;
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+const hal_trace_cfg_t hal_trace_cfg_default =
+{
+    .dummy  = 0
+};
 
 
 
@@ -89,9 +92,25 @@ extern volatile int32_t ITM_RxBuffer = ITM_RXBUFFER_EMPTY;
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern void hal_trace_init(void)
+extern hal_result_t hal_trace_init(const hal_trace_cfg_t* cfg)
 {
+    uint8_t dummy = 0;
+    if(0 != hal_brdcfg_trace__theconfig.dummy)
+    {
+        dummy = hal_brdcfg_trace__theconfig.dummy;
+    }
+    
+    dummy = dummy;   
+    
+    if(NULL == cfg)
+    {
+        cfg = &hal_trace_cfg_default;
+    }
+
+    
     ITM_RxBuffer = ITM_RXBUFFER_EMPTY;
+    
+    return(hal_res_OK);
 }
 
 
@@ -153,8 +172,8 @@ extern hal_result_t hal_trace_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
 //        return(hal_res_NOK_generic);
 //    }
 
-    // remvoed dependency from nzi data
-    hal_trace_init();
+    // removed dependency from nzi data
+    hal_trace_init(NULL);
     return(hal_res_OK);  
 }
 

@@ -33,12 +33,12 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
+#include "hal_mpu_stm32xx_include.h"
+
 #include "hal_base.h"
 
 
-#include "hal_base.h"
-
-// - peripherals
+// - mpu peripherals
 
 #ifdef  HAL_USE_CAN
     #include "hal_mpu_can_hid.h"
@@ -80,11 +80,16 @@
     #include "hal_mpu_timer_hid.h"  
 #endif//HAL_USE_TIMER
 
+#ifdef  HAL_USE_TRACE
+    #include "hal_mpu_trace_hid.h"  
+#endif//HAL_USE_TRACE
+
 #ifdef  HAL_USE_WATCHDOG
     #include "hal_mpu_watchdog_hid.h"  
 #endif//HAL_USE_WATCHDOG
 
-// - devices
+
+// -- devices
 
 #ifdef  HAL_USE_DEVICE_ACCELEROMETER
     #include "hal_device_accelerometer_hid.h"
@@ -93,6 +98,10 @@
 #ifdef  HAL_USE_DEVICE_CANTRANSCEIVER
     #include "hal_device_cantransceiver_hid.h" 
 #endif//HAL_USE_DEVICE_CANTRANSCEIVER
+
+#ifdef  HAL_USE_DEVICE_DISPLAY
+    #include "hal_device_display_hid.h" 
+#endif//HAL_USE_DEVICE_DISPLAY
 
 #ifdef  HAL_USE_DEVICE_EEPROM
     #include "hal_device_eeprom_hid.h" 
@@ -106,10 +115,6 @@
     #include "hal_device_ethtransceiver_hid.h" 
 #endif//HAL_USE_DEVICE_ETHTRANSCEIVER
 
-#ifdef  HAL_USE_DEVICE_DISPLAY
-    #include "hal_device_display_hid.h"
-#endif//HAL_USE_DEVICE_DISPLAY
-
 #ifdef  HAL_USE_DEVICE_GYROSCOPE
     #include "hal_device_gyroscope_hid.h"
 #endif//HAL_USE_DEVICE_GYROSCOPE
@@ -122,7 +127,6 @@
     #include "hal_device_mux_hid.h"
 #endif//HAL_USE_DEVICE_MUX
 
-
 #ifdef  HAL_USE_DEVICE_SWITCH
     #include "hal_device_switch_hid.h" 
 #endif//HAL_USE_DEVICE_SWITCH
@@ -132,7 +136,6 @@
 #endif//HAL_USE_DEVICE_TERMOMETER
 
 
-#include "hal_mpu_stm32xx_include.h"
 
 
 
@@ -157,6 +160,8 @@
 // empty-section
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
+
+// -- mpu peripherals
 
 #ifdef  HAL_USE_CAN
     extern const hal_can_hid_brdcfg_t hal_brdcfg_can__theconfig;
@@ -198,11 +203,16 @@
     extern const hal_timer_hid_brdcfg_t hal_brdcfg_timer__theconfig;  
 #endif//HAL_USE_TIMER
 
+#ifdef  HAL_USE_TRACE
+    extern const hal_trace_hid_brdcfg_t hal_brdcfg_trace__theconfig;
+#endif//HAL_USE_TRACE
+
 #ifdef  HAL_USE_WATCHDOG
     extern const hal_watchdog_hid_brdcfg_t hal_brdcfg_watchdog__theconfig;
 #endif//HAL_USE_WATCHDOG
 
 
+// -- devices
 
 #ifdef  HAL_USE_DEVICE_ACCELEROMETER
     extern const hal_device_accelerometer_hid_brdcfg_t hal_brdcfg_device_accelerometer__theconfig;
@@ -250,12 +260,13 @@
 
 
 
-
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 extern uint32_t hal_brdcfg_chips__getsize(const hal_cfg_t *cfg);
 extern hal_result_t hal_brdcfg_chips__setmem(const hal_cfg_t *cfg, uint32_t *memory);
 
+extern uint32_t hal_brdcfg_extbrds__getsize(const hal_cfg_t *cfg);
+extern hal_result_t hal_brdcfg_extbrds__setmem(const hal_cfg_t *cfg, uint32_t *memory);
 
 
 #endif  // include-guard

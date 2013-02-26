@@ -243,7 +243,7 @@ static const uint32_t s_hal_spi_timeout_flag = 0x00010000;
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern hal_result_t hal_spi_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg)
+extern hal_result_t hal_spi_init(const hal_spi_port_t port, const hal_spi_cfg_t *cfg)
 {
     return(s_hal_spi_init(port, cfg));
 }

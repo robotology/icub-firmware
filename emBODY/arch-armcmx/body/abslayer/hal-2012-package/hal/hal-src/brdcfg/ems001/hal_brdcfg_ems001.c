@@ -81,6 +81,8 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
+// -- mpu peripherals
+
 #ifdef  HAL_USE_CAN
     extern const hal_can_hid_brdcfg_t hal_brdcfg_can__theconfig =
     {
@@ -118,6 +120,7 @@
     };
 #endif//HAL_USE_CAN
 
+    
 #ifdef  HAL_USE_CRC
     extern const hal_crc_hid_brdcfg_t hal_brdcfg_crc__theconfig =
     {
@@ -207,7 +210,6 @@
     };
 #endif//HAL_USE_I2C
 
-
     
 #ifdef  HAL_USE_SPI
     extern const hal_spi_hid_brdcfg_t hal_brdcfg_spi__theconfig =
@@ -233,8 +235,6 @@
         }      
     };
 #endif//HAL_USE_SPI
-
-
 
 
 #ifdef  HAL_USE_SYS
@@ -264,7 +264,6 @@
     };    
 #endif//HAL_USE_SYS    
   
-
     
 #ifdef  HAL_USE_TIMER
     extern const hal_timer_hid_brdcfg_t hal_brdcfg_timer__theconfig =
@@ -272,6 +271,14 @@
         .supported_mask     = (0 << hal_timer1) | (1 << hal_timer2) | (1 << hal_timer3) | (1 << hal_timer4) | (1 << hal_timer5) | (1 << hal_timer6) | (1 << hal_timer7)
     };       
 #endif//HAL_USE_TIMER
+
+    
+#ifdef  HAL_USE_TRACE
+    extern const hal_trace_hid_brdcfg_t hal_brdcfg_trace__theconfig =
+    {
+        .dummy              = 0
+    };       
+#endif//HAL_USE_TRACE
 
 
 #ifdef  HAL_USE_WATCHDOG
@@ -282,8 +289,26 @@
 #endif//HAL_USE_WATCHDOG
 
 
-
-
+// devices
+    
+#ifdef  HAL_USE_DEVICE_ACCELEROMETER   
+    extern const hal_device_accelerometer_hid_brdcfg_t hal_brdcfg_device_accelerometer__theconfig =
+    {
+        .supported_mask         = 0x1,
+        .devcfg         =
+        {
+            {   // hal_accelerometer_port1
+                .chipif             =      
+                {   // use the lis3dh chip by st
+                    .init       = (hal_res_fp_voidp_t)hal_chip_st_lis3dh_init,
+                    .initpar    = NULL,
+                    .read       = hal_chip_st_lis3dh_accel_get  
+                }                    
+            }
+         }
+    };       
+#endif//HAL_USE_DEVICE_ACCELEROMETER
+        
 
 #ifdef  HAL_USE_DEVICE_CANTRANSCEIVER   
     static hal_result_t s_hal_device_cantransceiver_simple_init(hal_can_port_t port, void* initpar);
@@ -333,12 +358,27 @@
         }   
     };    
 #endif//HAL_USE_DEVICE_CANTRANSCEIVER 
+    
 
-#ifdef HAL_USE_DEVICE_DISPLAY
-    extern const hal_device_display_hid_brdcfg_t hal_brdcfg_device_encoder__theconfig =
+#ifdef HAL_USE_DEVICE_DISPLAY    
+    extern const hal_device_display_hid_brdcfg_t hal_brdcfg_device_display__theconfig =
     {
-        .supported      = hal_false,
-        .somethingelse  = is-yet-to-be-done-in-here;
+        .supported_mask     = (0 << hal_display_dev1),
+        .devcfg             =
+        {  
+            {   // hal_display_dev1
+                .chipif             =
+                {
+                    .init               = NULL,
+                    .initpar            = NULL,
+                    .clear              = NULL,
+                    .settextproperties  = NULL,
+                    .clearline          = NULL,
+                    .putchar            = NULL,
+                    .putstring          = NULL
+                }
+            }
+        }   
     };
 #endif//HAL_USE_DEVICE_DISPLAY
 
@@ -455,13 +495,52 @@
             hal_spi_port1,  hal_spi_port3,  hal_spi_port1,  hal_spi_port3,  hal_spi_port1,  hal_spi_port3           
         }
     };
-#endif//HAL_USE_DEVICE_ENCODER   
+#endif//HAL_USE_DEVICE_ENCODER  
+    
+
+#ifdef HAL_USE_DEVICE_ETHTRANSCEIVER
+    extern const hal_chip_micrel_ks8893_cfg_t s_micrel_ks8893_cfg;
+    extern const hal_device_ethtransceiver_hid_brdcfg_t hal_brdcfg_device_ethtransceiver__theconfig =
+    {
+        .supported      = hal_true,
+        .devcfg         =
+        {
+            .targetphymode      = HAL_ETH_PHYMODE_THEONE2USE,
+            .chipif             =
+            {   // use the micrel 
+                .init           = (hal_res_fp_voidp_t)hal_chip_micrel_ks8893_init,
+                .initpar        = (void*)&s_micrel_ks8893_cfg,
+                .config         = hal_chip_micrel_ks8893_configure, 
+                .getphymode     = hal_chip_micrel_ks8893_mii_getphymode                
+            }
+         }
+    };   
+#endif//HAL_USE_DEVICE_ETHTRANSCEIVER
+
+
+#ifdef  HAL_USE_DEVICE_GYROSCOPE
+    extern const hal_device_gyroscope_hid_brdcfg_t hal_brdcfg_device_gyroscope__theconfig =
+    {
+        .supported_mask         = (1 << hal_gyroscope_port1),
+        .devcfg         =
+        {
+            {   // hal_gyroscope_port1
+                .chipif             =      
+                {   // use the l3g4200d chip by st
+                    .init       = (hal_res_fp_voidp_t)hal_chip_st_l3g4200d_init,
+                    .initpar    = NULL,
+                    .read       = hal_chip_st_l3g4200d_angrate_get
+                }                    
+            }
+         }
+    };          
+#endif//HAL_USE_DEVICE_GYROSCOPE
     
     
 #ifdef HAL_USE_DEVICE_LED
     extern const hal_device_led_hid_brdcfg_t hal_brdcfg_device_led__theconfig =
     {
-        .supported_mask             = 0x3F, // only 6 leds ...
+        .supported_mask             = 0x3F, // only first 6 leds ...
         .value_on                   = hal_gpio_valLOW,
         .value_off                  = hal_gpio_valHIGH,
         .gpiocfg                    =
@@ -478,6 +557,7 @@
         }
     };
 #endif//HAL_USE_DEVICE_LED
+    
     
 #ifdef HAL_USE_DEVICE_MUX
     extern const hal_device_mux_hid_brdcfg_t hal_brdcfg_device_mux__theconfig =
@@ -505,47 +585,11 @@
             { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default }            
         }        
     };
-#endif//HAL_USE_DEVICE_MUX       
-
-#ifdef  HAL_USE_CHIP_MICREL_KS8893     
-    static hal_result_t s_hal_brdcfg_device_switch__extclock_init(void);    
-    static const hal_chip_micrel_ks8893_cfg_t s_micrel_ks8893_cfg =
-    {
-        .i2cport        = hal_i2c_port1,
-        .resetpin       =
-        {
-            .port = hal_gpio_portB, 
-            .pin = hal_gpio_pin2,   
-            .dir = hal_gpio_dirOUT, 
-            .speed = hal_gpio_speed_low 
-        },
-        .extclockinit   = s_hal_brdcfg_device_switch__extclock_init
-    }; 
-#endif//HAL_USE_CHIP_MICREL_KS8893
-    
-    
-#ifdef HAL_USE_DEVICE_ETHTRANSCEIVER
-    extern const hal_device_ethtransceiver_hid_brdcfg_t hal_brdcfg_device_ethtransceiver__theconfig =
-    {
-        .supported      = hal_true,
-        .devcfg         =
-        {
-            .targetphymode      = HAL_ETH_PHYMODE_THEONE2USE,
-            .chipif             =
-            {   // use the micrel 
-                .init           = (hal_res_fp_voidp_t)hal_chip_micrel_ks8893_init,
-                .initpar        = (void*)&s_micrel_ks8893_cfg,
-                .config         = hal_chip_micrel_ks8893_configure, 
-                .getphymode     = hal_chip_micrel_ks8893_mii_getphymode                
-            }
-         }
-    };   
-#endif//HAL_USE_DEVICE_ETHTRANSCEIVER
-
-
+#endif//HAL_USE_DEVICE_MUX  
 
 
 #ifdef HAL_USE_DEVICE_SWITCH
+    extern const hal_chip_micrel_ks8893_cfg_t s_micrel_ks8893_cfg;
     extern const hal_device_switch_hid_brdcfg_t hal_brdcfg_device_switch__theconfig =
     {
         .supported      = hal_true,
@@ -562,60 +606,11 @@
     };
 #endif//HAL_USE_DEVICE_SWITCH
 
-
- 
-#ifdef  HAL_USE_DEVICE_ACCELEROMETER   
-    extern const hal_device_accelerometer_hid_brdcfg_t hal_brdcfg_device_accelerometer__theconfig =
-    {
-        .supported_mask         = 0x1,
-        .devcfg         =
-        {
-            {   // hal_accelerometer_port1
-                .chipif             =      
-                {   // use the lis3dh chip by st
-                    .init       = (hal_res_fp_voidp_t)hal_chip_st_lis3dh_init,
-                    .initpar    = NULL,
-                    .read       = hal_chip_st_lis3dh_accel_get  
-                }                    
-            }
-         }
-    };       
-#endif//HAL_USE_DEVICE_ACCELEROMETER
-    
-
-
-#ifdef  HAL_USE_SENSOR_ENCODER
-    extern const hal_sensor_encoder_hid_brdcfg_t hal_brdcfg_sensor_encoder__theconfig =
-    {
-        .supported_mask     = 0,
-        .something          = yet-to-be-done-in-here
-    };
-#endif//HAL_USE_SENSOR_ENCODER
-  
-
-#ifdef  HAL_USE_DEVICE_GYROSCOPE
-    extern const hal_device_gyroscope_hid_brdcfg_t hal_brdcfg_device_gyroscope__theconfig =
-    {
-        .supported_mask         = 0x1,
-        .devcfg         =
-        {
-            {   // hal_gyroscope_port1
-                .chipif             =      
-                {   // use the l3g4200d chip by st
-                    .init       = (hal_res_fp_voidp_t)hal_chip_st_l3g4200d_init,
-                    .initpar    = NULL,
-                    .read       = hal_chip_st_l3g4200d_angrate_get
-                }                    
-            }
-         }
-    };          
-#endif//HAL_USE_DEVICE_GYROSCOPE
-    
     
 #ifdef  HAL_USE_DEVICE_TERMOMETER 
     extern const hal_device_termometer_hid_brdcfg_t hal_brdcfg_device_termometer__theconfig =
     {
-        .supported_mask         = 0x1,
+        .supported_mask         = (1 << hal_termometer_port1),
         .devcfg         =
         {
             {   // hal_termometer_port1
@@ -629,6 +624,31 @@
          }
     };           
 #endif//HAL_USE_DEVICE_TERMOMETER
+    
+
+// -- chips
+      
+#ifdef  HAL_USE_CHIP_MICREL_KS8893     
+    static hal_result_t s_hal_brdcfg_device_switch__extclock_init(void);    
+    static const hal_chip_micrel_ks8893_cfg_t s_micrel_ks8893_cfg =
+    {
+        .i2cport        = hal_i2c_port1,
+        .resetpin       =
+        {
+            .port   = hal_gpio_portB, 
+            .pin    = hal_gpio_pin2,   
+            .dir    = hal_gpio_dirOUT, 
+            .speed  = hal_gpio_speed_low 
+        },
+        .extclockinit   = s_hal_brdcfg_device_switch__extclock_init
+    }; 
+#endif//HAL_USE_CHIP_MICREL_KS8893
+    
+    
+
+
+    
+    
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -733,6 +753,99 @@ extern hal_result_t hal_brdcfg_chips__setmem(const hal_cfg_t *cfg, uint32_t *mem
 }
 
 
+extern uint32_t hal_brdcfg_extbrds__getsize(const hal_cfg_t *cfg)
+{
+    uint32_t retval = 0;
+    
+#ifdef  HAL_USE_EXTBRD_KEIL_MCBQVGA
+    retval += hal_extbrd_keil_mcbqvga_hid_getsize(cfg);
+#endif//HAL_USE_EXTBRD_KEIL_MCBQVGA
+    
+    return(retval);
+}
+
+
+extern hal_result_t hal_brdcfg_extbrds__setmem(const hal_cfg_t *cfg, uint32_t *memory)
+{
+    // no memory needed
+   if(NULL == memory)
+   {
+       hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
+       return(hal_res_NOK_generic);
+   }
+
+#ifdef  HAL_USE_EXTBRD_KEIL_MCBQVGA
+    if(hal_res_OK != hal_extbrd_keil_mcbqvga_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_extbrd_keil_mcbqvga_hid_getsize(cfg)/4;   
+#endif//HAL_USE_EXTBRD_KEIL_MCBQVGA
+    
+    
+    return(hal_res_OK);  
+}
+
+
+                     
+#ifdef  HAL_USE_DEVICE_SWITCH
+#ifdef  HAL_USE_CHIP_MICREL_KS8893
+
+static void s_hal_brdcfg_device_switch__mco_initialise(void)
+{
+    // this function initialises MCO in order to provide clock ref to switch.
+    // PA8 is MCO. it must be configured = Output mode, max speed 50 MHz + Alternate function output Push-pull (B)
+    // also, we connect pll3 at 50mhz to it
+    
+    // clock gpioa as alternate function
+    RCC->APB2ENR    |= 0x00000005;
+    // init pa8
+    GPIOA->CRH   &= 0xFFFFFFF0;
+    GPIOA->CRH   |= 0x0000000B;	
+
+
+    // set pll3 clock output to 50mhz: (25mhz/5)*10 = 50mhz, thus we use multiplier 10
+    RCC_PLL3Config(RCC_PLL3Mul_10);
+        
+    // enable pll3 
+    RCC_PLL3Cmd(ENABLE);
+    
+    // wait until it is ready
+    while(RCC_GetFlagStatus(RCC_FLAG_PLL3RDY) == RESET);
+    
+    // connect mco on pa8 with pll3
+    RCC_MCOConfig(RCC_MCO_PLL3CLK);
+}
+
+static hal_result_t s_hal_brdcfg_device_switch__extclock_init(void)
+{
+    s_hal_brdcfg_device_switch__mco_initialise();  
+    return(hal_res_OK);    
+}
+
+#endif//HAL_USE_CHIP_MICREL_KS8893
+#endif//HAL_USE_DEVICE_SWITCH
+
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of extern hidden functions 
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of static functions 
+// --------------------------------------------------------------------------------------------------------------------
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - end-of-file (leave a blank line after)
+// --------------------------------------------------------------------------------------------------------------------
+
+
+// removed code
 
 
 #if 0
@@ -816,43 +929,6 @@ void  hal_brdcfg_spi4encoder__chipSelect_init(hal_spi_port_t spix)
 
 #endif//HAL_USE_SPI4ENCODER
 #endif
-
-                     
-#ifdef  HAL_USE_DEVICE_SWITCH
-
-static void s_hal_brdcfg_device_switch__mco_initialise(void)
-{
-    // this function initialises MCO in order to provide clock ref to switch.
-    // PA8 is MCO. it must be configured = Output mode, max speed 50 MHz + Alternate function output Push-pull (B)
-    // also, we connect pll3 at 50mhz to it
-    
-    // clock gpioa as alternate function
-    RCC->APB2ENR    |= 0x00000005;
-    // init pa8
-    GPIOA->CRH   &= 0xFFFFFFF0;
-    GPIOA->CRH   |= 0x0000000B;	
-
-
-    // set pll3 clock output to 50mhz: (25mhz/5)*10 = 50mhz, thus we use multiplier 10
-    RCC_PLL3Config(RCC_PLL3Mul_10);
-        
-    // enable pll3 
-    RCC_PLL3Cmd(ENABLE);
-    
-    // wait until it is ready
-    while(RCC_GetFlagStatus(RCC_FLAG_PLL3RDY) == RESET);
-    
-    // connect mco on pa8 with pll3
-    RCC_MCOConfig(RCC_MCO_PLL3CLK);
-}
-
-static hal_result_t s_hal_brdcfg_device_switch__extclock_init(void)
-{
-    s_hal_brdcfg_device_switch__mco_initialise();  
-    return(hal_res_OK);    
-}
-
-#endif//HAL_USE_DEVICE_SWITCH
 
 
 
@@ -1064,18 +1140,10 @@ extern void hal_brdcfg_sys__gpio_default_init(void)
 #endif
 
 
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of extern hidden functions 
-// --------------------------------------------------------------------------------------------------------------------
-// empty-section
+// end of file
 
 
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of static functions 
-// --------------------------------------------------------------------------------------------------------------------
 
 
-// --------------------------------------------------------------------------------------------------------------------
-// - end-of-file (leave a blank line after)
-// --------------------------------------------------------------------------------------------------------------------
+
 

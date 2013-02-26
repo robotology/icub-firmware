@@ -98,8 +98,8 @@ static hal_result_t s_hal_device_cantransceiver_lowlevel_init(hal_can_port_t por
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_cantransceiver_cfg_t s_hal_device_cantransceiver_cfg          = {.dummy = 0};
-static hal_bool_t s_hal_device_cantransceiver_initted[hal_can_ports_num]        =  {hal_false, hal_false};
+static hal_cantransceiver_cfg_t s_hal_device_cantransceiver_cfg             = {.dummy = 0};
+static hal_bool_t s_hal_device_cantransceiver_initted[hal_can_ports_num]    =  {hal_false, hal_false};
 
 
 
