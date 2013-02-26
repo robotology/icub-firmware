@@ -33,11 +33,14 @@
 #include "hal_led.h"
 #include "hal_spi.h"
 
+#include "hal_crc.h"
+
 #include "hal_termometer.h"
 #include "hal_gyroscope.h"
 #include "hal_accelerometer.h"
 
 #include "hal_utility_fifo.h"
+#include "hal_utility_crc07.h"
 
 #include "hal_brdcfg.h"
 
@@ -208,6 +211,26 @@ int main(void)
 
     hal_sys_systeminit();
     
+    
+//     hal_crc_cfg_t crccfg = 
+//     {
+//         .order          = hal_crc_order_07,
+//         .polynomial     = hal_crc_poly_crc07,
+//         .crctblram      = NULL
+//     };
+//     uint8_t dat[] = {0xFE, 0xCA, 0x00, 0xE1}; //{0xE1,0x00, 0xCA, 0xFe};
+//     uint32_t out = 0;
+//     hal_crc_init(hal_crc0, &crccfg);
+//     
+//     hal_crc_compute(hal_crc0, hal_crc_mode_clear, dat, sizeof(dat), &out);   
+
+//     out = out;    
+    
+//     static uint8_t crc07table[256];
+//     hal_utility_crc07_table_get(0x09, crc07table);
+//     
+//     crc07table[0] = crc07table[0];
+    
 #if     defined(HAL_BOARD_MCBSTM32C) || defined(HAL_BOARD_STM3210CEVAL)
     #if defined(TEST_SPI)
      s_test_spi_master_slave();
@@ -249,6 +272,7 @@ s_eventviewer_init();
 //    s_test_fifo();
     
 //    s_test_fifo();
+    
     
     
     
