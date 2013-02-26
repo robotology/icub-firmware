@@ -83,8 +83,10 @@ typedef struct
     hal_crc_order_t order;              /**< the order of the polynomial to use */    
     uint32_t        polynomial;         /**< the polynomial to use specified in direct form. up to order 32.
                                              crc32 is 0x04C11DB7, crc16-ccitt is 0x00001021, crc07 is 0x09 */ 
-    void*           crctblram;          /**< the ram used to compute the crc table when there is no hw support for
-                                             a given polynomial. its size must be 256*1 in case of CRC-07, 
+    void*           crctblram;          /**< the ram used to compute the crc table when both conditions apply: 
+                                             (1) there is no hw support for a given polynomial, (2) the polynomial
+                                             are NOT: hal_crc_poly_crc07, hal_crc_poly_crc16_ccitt, hal_crc_poly_crc32 for
+                                             which we use a pre-computed crc table. its size must be 256*1 in case of CRC-07, 
                                              256*2 in case of CRC-16, and 256*4 in case of CRC-32. */                                                     
 } hal_crc_cfg_t;
 
