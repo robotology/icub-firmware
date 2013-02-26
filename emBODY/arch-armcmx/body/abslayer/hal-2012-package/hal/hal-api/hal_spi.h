@@ -167,13 +167,13 @@ extern const hal_spi_cfg_t hal_spi_cfg_default; /**< = {.ownership = hal_spi_own
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-/** @fn			extern hal_result_t hal_spi_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg)
+/** @fn			extern hal_result_t hal_spi_init(const hal_spi_port_t port, const hal_spi_cfg_t *cfg)
     @brief  	this function initializes an spi port
     @param  	port	        the port
     @param  	cfg 	        pointer to configuration data
     @return 	hal_res_OK or hal_res_NOK_generic on failure
   */
-extern hal_result_t hal_spi_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg);
+extern hal_result_t hal_spi_init(const hal_spi_port_t port, const hal_spi_cfg_t *cfg);
 
 
 extern hal_result_t hal_spi_raw_master_writeread(hal_spi_port_t port, uint8_t byte, uint8_t* readbyte);

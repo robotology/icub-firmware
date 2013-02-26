@@ -50,11 +50,19 @@
   
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
-// empty-section
+
+/** @typedef    typedef struct hal_trace_cfg_t;
+    @brief      contains configuration for trace peripheral.
+ **/
+typedef struct
+{
+    uint8_t         dummy;      /**< nothing is required for configuration */
+} hal_trace_cfg_t;
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-// empty-section
+
+extern const hal_trace_cfg_t hal_trace_cfg_default;         /**< = {.dummy = 0}; */
 
 
 
@@ -63,11 +71,13 @@
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-/** @fn         extern void hal_trace_init(void)
+/** @fn         extern hal_result_t hal_trace_init(const hal_trace_cfg_t* cfg)
     @brief      Initialises the trace peripheral for STDIO operations.
+    @param      cfg         the configuration for the peripheral. if NULL, it is used hal_trace_cfg_default
+    @return 	hal_res_OK or hal_res_NOK_generic on failure
     @warning    The function may require a proper .ini file for the toolchain.
  **/
-extern void hal_trace_init(void);
+extern hal_result_t hal_trace_init(const hal_trace_cfg_t* cfg);
 
 
 /** @fn         extern int hal_trace_getchar(void)
