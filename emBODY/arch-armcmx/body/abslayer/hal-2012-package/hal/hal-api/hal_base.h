@@ -250,6 +250,14 @@ typedef struct
     uint32_t        cpu_freq;                   /**< The max CPU frequency in Hz                            */
     uint32_t        sys_stacksize;              /**< The size of stack available to the system in bytes     */
     uint32_t        sys_heapsize;               /**< The size of heap available to the system in bytes      */
+    
+    //#warning --> all other options are specified in file memcfg.h which .... ? or maybe i ...
+    //             remove all enables, put sizes of queues in specific config params of the peripheral
+    //             and allocate memory when needed. if dont have memory anymore ... i enter in error mode.
+    //             it is ok with: eth, can1, can2, timers.
+    //             for arch .... if needed i call an init function inside hal_base_something with params
+    //             statically defined inside brdcfg.c
+    
     hal_boolval_t   display_enable;             /**< Enable of the display: 1 if enabled, 0 not             */
     hal_boolval_t   eth_enable;                 /**< Enable of ethernet: 1 enabled, 0 not                   */
     uint8_t         eth_dmatxbuffer_num;        /**< Number of eth frames in the tx buffer (>0)             */
@@ -267,6 +275,9 @@ typedef struct
 	hal_boolval_t   spi3_enable;                /**< Enable of SPI3 peripheral: 1 enabled, 0 not            */
     uint8_t         timers_num;                 /**< Number of timers to use                                */
     hal_arch_cfg_t  arch;                       /**< Configuration of behaviour which are architecture dependant */
+    
+    
+    
     hal_extfn_cfg_t extfn;                      /**< External functionalities offered to the HAL            */
 } hal_cfg_t;
 
