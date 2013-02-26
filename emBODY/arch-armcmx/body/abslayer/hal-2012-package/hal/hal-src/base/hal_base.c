@@ -40,9 +40,11 @@
 
 
 #include "hal_utility_bits_hid.h" 
+#include "hal_utility_crc07_hid.h" 
 #include "hal_utility_crc16_hid.h" 
 #include "hal_utility_crc32_hid.h" 
 #include "hal_utility_fifo_hid.h" 
+#include "hal_utility_heap_hid.h"
 
 #include "hal_mpu_arch_hid.h"
 #include "hal_mpu_can_hid.h" 
@@ -89,7 +91,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+#define HAL_BASE_VERIFY_STACK_HEAP_SIZES
 
 
 
@@ -114,7 +117,7 @@ extern hal_cfg_t hal_base_hid_params =
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-#if 0
+#if defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
     // removed by acemor on 09-mar-2011 to avoid problems of ... 
     // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Heap_Size (referred from hal_stm32.o).
     // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Stack_Size (referred from hal_stm32.o).
@@ -159,11 +162,15 @@ extern uint32_t hal_base_memory_getsize(const hal_cfg_t *cfg, uint32_t *size04al
     }
 
 
-    // utilities
+    // - utilities ----------------------------------------------------------------------------------------------------
     
 #ifdef  HAL_USE_UTILITY_BITS
     retval += hal_utility_bits_hid_getsize(cfg);
 #endif//HAL_USE_UTILITY_BITS
+
+#ifdef  HAL_USE_UTILITY_CRC07
+    retval += hal_utility_crc07_hid_getsize(cfg);
+#endif//HAL_USE_UTILITY_CRC07    
 
 #ifdef  HAL_USE_UTILITY_CRC16
     retval += hal_utility_crc16_hid_getsize(cfg);
@@ -176,18 +183,25 @@ extern uint32_t hal_base_memory_getsize(const hal_cfg_t *cfg, uint32_t *size04al
 #ifdef  HAL_USE_UTILITY_FIFO
     retval += hal_utility_fifo_hid_getsize(cfg);
 #endif//HAL_USE_UTILITY_FIFO    
-    
-    
-    // peripherals
-        
-#ifdef  HAL_USE_ARCH
-    retval += hal_arch_arm_hid_getsize(cfg);
-#endif//HAL_USE_ARCH
 
+#ifdef  HAL_USE_UTILITY_HEAP
+    retval += hal_utility_heap_hid_getsize(cfg);
+#endif//HAL_USE_UTILITY_HEAP    
+ 
+
+    // - base ---------------------------------------------------------------------------------------------------------
+    
 #ifdef  HAL_USE_BASE
     retval += hal_base_hid_getsize(cfg);
 #endif//HAL_USE_BASE
     
+    
+    // - mpu peripherals ----------------------------------------------------------------------------------------------
+        
+#ifdef  HAL_USE_ARCH
+    retval += hal_arch_arm_hid_getsize(cfg);
+#endif//HAL_USE_ARCH
+   
 #ifdef  HAL_USE_CAN
     retval += hal_can_hid_getsize(cfg);
 #endif//HAL_USE_CAN
@@ -237,14 +251,15 @@ extern uint32_t hal_base_memory_getsize(const hal_cfg_t *cfg, uint32_t *size04al
 #endif//HAL_USE_WATCHDOG 
 
 
-    // actuators
-    
-#ifdef  HAL_USE_DEVICE_LED
-    retval += hal_device_led_hid_getsize(cfg);
-#endif//HAL_USE_DEVICE_LED  
+    // - devices ------------------------------------------------------------------------------------------------------
 
+#ifdef  HAL_USE_DEVICE_ACCELEROMETER
+    retval += hal_device_accelerometer_hid_getsize(cfg);
+#endif//HAL_USE_DEVICE_ACCELEROMETER  
 
-    // devices
+#ifdef  HAL_USE_DEVICE_CANTRANSCEIVER
+    retval += hal_device_cantransceiver_hid_getsize(cfg);
+#endif//HAL_USE_DEVICE_CANTRANSCEIVER  
 
 #ifdef  HAL_USE_DEVICE_DISPLAY
     retval += hal_device_display_hid_getsize(cfg);
@@ -254,43 +269,42 @@ extern uint32_t hal_base_memory_getsize(const hal_cfg_t *cfg, uint32_t *size04al
     retval += hal_device_eeprom_hid_getsize(cfg);
 #endif//HAL_USE_DEVICE_EEPROM  
 
+#ifdef HAL_USE_DEVICE_ENCODER
+    retval += hal_device_encoder_hid_getsize(cfg);
+#endif//HAL_USE_DEVICE_ENCODER  
+
 #ifdef  HAL_USE_DEVICE_ETHTRANSCEIVER
     retval += hal_device_ethtransceiver_hid_getsize(cfg);
 #endif//HAL_USE_DEVICE_ETHTRANSCEIVER  
-
-#ifdef  HAL_USE_DEVICE_SWITCH
-    retval += hal_device_switch_hid_getsize(cfg);
-#endif//HAL_USE_DEVICE_SWITCH 
-
-
-    // sensors
-
-#ifdef  HAL_USE_DEVICE_ACCELEROMETER
-    retval += hal_device_accelerometer_hid_getsize(cfg);
-#endif//HAL_USE_DEVICE_ACCELEROMETER   
-
-#ifdef HAL_USE_DEVICE_ENCODER
-    retval += hal_device_encoder_hid_getsize(cfg);
-#endif//HAL_USE_DEVICE_ENCODER   
 
 #ifdef  HAL_USE_DEVICE_GYROSCOPE
     retval += hal_device_gyroscope_hid_getsize(cfg);
 #endif//HAL_USE_DEVICE_GYROSCOPE   
 
+#ifdef  HAL_USE_DEVICE_LED
+    retval += hal_device_led_hid_getsize(cfg);
+#endif//HAL_USE_DEVICE_LED  
+
 #ifdef HAL_USE_DEVICE_MUX
     retval += hal_device_mux_hid_getsize(cfg);
 #endif//HAL_USE_DEVICE_MUX  
 
-#ifdef  HAL_USE_DEVICE_TEMP
+#ifdef  HAL_USE_DEVICE_TERMOMETER
     retval += hal_device_termometer_hid_getsize(cfg);
-#endif//HAL_USE_DEVICE_TEMP 
+#endif//HAL_USE_DEVICE_TERMOMETER 
 
-
-    // board (hence chips)
+#ifdef  HAL_USE_DEVICE_SWITCH
+    retval += hal_device_switch_hid_getsize(cfg);
+#endif//HAL_USE_DEVICE_SWITCH 
+ 
+ 
+    // - board, hence chips -------------------------------------------------------------------------------------------
     
     retval += hal_brdcfg_chips__getsize(cfg);
 
-
+    // - board, hence extborads ---------------------------------------------------------------------------------------
+    
+    retval += hal_brdcfg_extbrds__getsize(cfg);
 
     if(NULL != size04aligned)
     {
@@ -323,7 +337,7 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
 //         return(hal_res_NOK_generic);
 //     }
 
-#if 0 
+#if defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
     // removed by acemor on 09-mar-2011 to avoid problems of ... 
     // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Heap_Size (referred from hal_stm32.o).
     // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Stack_Size (referred from hal_stm32.o).
@@ -342,7 +356,7 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
 
 
     
-    // utilities
+    // - utilities ----------------------------------------------------------------------------------------------------
     
 #ifdef  HAL_USE_UTILITY_BITS
     if(hal_res_OK != hal_utility_bits_hid_setmem(cfg, data04aligned))
@@ -352,6 +366,14 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
     data04aligned += hal_utility_bits_hid_getsize(cfg)/4;
 #endif//HAL_USE_UTILITY_BITS
 
+#ifdef  HAL_USE_UTILITY_CRC07
+    if(hal_res_OK != hal_utility_crc07_hid_setmem(cfg, data04aligned))
+    {
+        return(hal_res_NOK_generic);
+    }
+    data04aligned += hal_utility_crc07_hid_getsize(cfg)/4;
+#endif//HAL_USE_UTILITY_CRC07      
+    
 #ifdef  HAL_USE_UTILITY_CRC16
     if(hal_res_OK != hal_utility_crc16_hid_setmem(cfg, data04aligned))
     {
@@ -375,8 +397,29 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
     }
     data04aligned += hal_utility_fifo_hid_getsize(cfg)/4;
 #endif//HAL_USE_UTILITY_FIFO    
+    
+    
+#ifdef  HAL_USE_UTILITY_HEAP
+    if(hal_res_OK != hal_utility_heap_hid_setmem(cfg, data04aligned))
+    {
+        return(hal_res_NOK_generic);
+    }
+    data04aligned += hal_utility_heap_hid_getsize(cfg)/4;
+#endif//HAL_USE_UTILITY_HEAP       
  
-    // peripherals
+    
+    // - base ---------------------------------------------------------------------------------------------------------
+    
+#ifdef  HAL_USE_BASE
+    if(hal_res_OK != hal_base_hid_setmem(cfg, data04aligned))
+    {
+        return(hal_res_NOK_generic);
+    }
+    data04aligned += hal_base_hid_getsize(cfg)/4;
+#endif//HAL_USE_BASE
+    
+    
+    // - mpu peripherals ----------------------------------------------------------------------------------------------    
     
 #ifdef  HAL_USE_ARCH
     if(hal_res_OK != hal_arch_arm_hid_setmem(cfg, data04aligned))
@@ -385,15 +428,6 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
     }
     data04aligned += hal_arch_arm_hid_getsize(cfg)/4;
 #endif//HAL_USE_ARCH
-
-
-#ifdef  HAL_USE_BASE
-    if(hal_res_OK != hal_base_hid_setmem(cfg, data04aligned))
-    {
-        return(hal_res_NOK_generic);
-    }
-    data04aligned += hal_base_hid_getsize(cfg)/4;
-#endif//HAL_USE_BASE
 
 
 #ifdef  HAL_USE_CAN
@@ -496,18 +530,24 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
 #endif//HAL_USE_WATCHDOG
 
 
-    //  actuators
-
-#ifdef  HAL_USE_DEVICE_LED
-    if(hal_res_OK != hal_device_led_hid_setmem(cfg, data04aligned))
+    // - devices ------------------------------------------------------------------------------------------------------
+    
+    
+#ifdef HAL_USE_DEVICE_ACCELEROMETER
+    if(hal_res_OK != hal_device_accelerometer_hid_setmem(cfg, data04aligned))
     {
         return(hal_res_NOK_generic);
     }
-    data04aligned += hal_device_led_hid_getsize(cfg)/4;
-#endif//HAL_USE_DEVICE_LED
- 
-    
-    // devices
+    data04aligned += hal_device_accelerometer_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICE_ACCELEROMETER   
+
+#ifdef HAL_USE_DEVICE_CANTRANSCEIVER
+    if(hal_res_OK != hal_device_cantransceiver_hid_setmem(cfg, data04aligned))
+    {
+        return(hal_res_NOK_generic);
+    }
+    data04aligned += hal_device_cantransceiver_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICE_CANTRANSCEIVER     
     
 #ifdef HAL_USE_DEVICE_DISPLAY
     if(hal_res_OK != hal_device_display_hid_setmem(cfg, data04aligned))
@@ -517,7 +557,6 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
     data04aligned += hal_device_display_hid_getsize(cfg)/4;
 #endif//HAL_USE_DEVICE_DISPLAY
     
-
 #ifdef HAL_USE_DEVICE_EEPROM
     if(hal_res_OK != hal_device_eeprom_hid_setmem(cfg, data04aligned))
     {
@@ -525,7 +564,14 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
     }
     data04aligned += hal_device_eeprom_hid_getsize(cfg)/4;
 #endif//HAL_USE_DEVICVE_EEPROM
-
+  
+#ifdef HAL_USE_DEVICE_ENCODER
+    if(hal_res_OK != hal_device_encoder_hid_setmem(cfg, data04aligned))
+    {
+        return(hal_res_NOK_generic);
+    }
+    data04aligned += hal_device_encoder_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICE_ENCODER  
     
 #ifdef HAL_USE_DEVICE_ETHTRANSCEIVER
     if(hal_res_OK != hal_device_ethtransceiver_hid_setmem(cfg, data04aligned))
@@ -535,7 +581,38 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
     data04aligned += hal_device_ethtransceiver_hid_getsize(cfg)/4;
 #endif//HAL_USE_DEVICE_ETHTRANSCEIVER    
     
+#ifdef HAL_USE_DEVICE_GYROSCOPE
+    if(hal_res_OK != hal_device_gyroscope_hid_setmem(cfg, data04aligned))
+    {
+        return(hal_res_NOK_generic);
+    }
+    data04aligned += hal_device_gyroscope_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICE_GYROSCOPE  
+    
+#ifdef  HAL_USE_DEVICE_LED
+    if(hal_res_OK != hal_device_led_hid_setmem(cfg, data04aligned))
+    {
+        return(hal_res_NOK_generic);
+    }
+    data04aligned += hal_device_led_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICE_LED
 
+#ifdef HAL_USE_DEVICE_MUX
+    if(hal_res_OK != hal_device_mux_hid_setmem(cfg, data04aligned))
+    {
+        return(hal_res_NOK_generic);
+    }
+    data04aligned += hal_device_mux_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICE_MUX   
+
+#ifdef HAL_USE_DEVICE_TERMOMETER
+    if(hal_res_OK != hal_device_termometer_hid_setmem(cfg, data04aligned))
+    {
+        return(hal_res_NOK_generic);
+    }
+    data04aligned += hal_device_termometer_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICE_TERMOMETER        
+        
 #ifdef HAL_USE_DEVICE_SWITCH
     if(hal_res_OK != hal_device_switch_hid_setmem(cfg, data04aligned))
     {
@@ -544,51 +621,7 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
     data04aligned += hal_device_switch_hid_getsize(cfg)/4;
 #endif//HAL_USE_DEVICE_SWITCH
         
-
-    // sensors
-    
-#ifdef HAL_USE_DEVICE_ACCELEROMETER
-    if(hal_res_OK != hal_device_accelerometer_hid_setmem(cfg, data04aligned))
-    {
-        return(hal_res_NOK_generic);
-    }
-    data04aligned += hal_device_accelerometer_hid_getsize(cfg)/4;
-#endif//HAL_USE_DEVICE_ACCELEROMETER    
-    
-    
-#ifdef HAL_USE_DEVICE_ENCODER
-    if(hal_res_OK != hal_device_encoder_hid_setmem(cfg, data04aligned))
-    {
-        return(hal_res_NOK_generic);
-    }
-    data04aligned += hal_device_encoder_hid_getsize(cfg)/4;
-#endif//HAL_USE_DEVICE_ENCODER    
-    
-#ifdef HAL_USE_DEVICE_GYROSCOPE
-    if(hal_res_OK != hal_device_gyroscope_hid_setmem(cfg, data04aligned))
-    {
-        return(hal_res_NOK_generic);
-    }
-    data04aligned += hal_device_gyroscope_hid_getsize(cfg)/4;
-#endif//HAL_USE_DEVICE_GYROSCOPE    
-
-#ifdef HAL_USE_DEVICE_MUX
-    if(hal_res_OK != hal_device_mux_hid_setmem(cfg, data04aligned))
-    {
-        return(hal_res_NOK_generic);
-    }
-    data04aligned += hal_device_mux_hid_getsize(cfg)/4;
-#endif//HAL_USE_DEVICE_MUX      
-    
-#ifdef HAL_USE_DEVICE_TEMP
-    if(hal_res_OK != hal_device_termometer_hid_setmem(cfg, data04aligned))
-    {
-        return(hal_res_NOK_generic);
-    }
-    data04aligned += hal_device_termometer_hid_getsize(cfg)/4;
-#endif//HAL_USE_DEVICE_TEMP    
-    
-    
+        
     // board (hence chips)
     
     if(hal_res_OK != hal_brdcfg_chips__setmem(cfg, data04aligned))
@@ -597,6 +630,15 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
     }
     data04aligned += hal_brdcfg_chips__getsize(cfg)/4;    
     
+
+    // - board, hence extborads ---------------------------------------------------------------------------------------
+    
+    if(hal_res_OK != hal_brdcfg_extbrds__setmem(cfg, data04aligned))
+    {
+        return(hal_res_NOK_generic);
+    }
+    data04aligned += hal_brdcfg_extbrds__getsize(cfg)/4;       
+
     
     // finally ... sets used config
     memcpy(&hal_base_hid_params, cfg, sizeof(hal_cfg_t));
@@ -632,125 +674,6 @@ extern hal_result_t hal_base_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
     return(hal_res_OK); 
 }
 
-// #if 0
-// // use hal_tools_fifo_ instead
-// void hal_base_hid_genericfifo_init(hal_base_genericfifo_t *gf, uint8_t capacity, uint8_t sizeofitem, uint8_t *data)
-// {
-//     // avoid checks .... be careful in calling
-//     
-//     gf->capacity = capacity;
-//     gf->sizeofitem = sizeofitem;
-//     gf->data = data;
-//     
-//     hal_base_hid_genericfifo_reset(gf);
-// }
-
-
-// void hal_base_hid_genericfifo_reset(hal_base_genericfifo_t *gf)
-// {
-//     // avoid checks .... be careful in calling
-//     
-//     gf->size = 0;
-//     gf->index = 0;
-// }
-
-// void hal_base_hid_genericfifo_clear(hal_base_genericfifo_t *gf)
-// {
-//     // avoid checks .... be careful in calling
-//     
-//     memset(gf->data, 0, gf->capacity * gf->sizeofitem);
-//     
-//     gf->size = 0;
-//     gf->index = 0;
-// }
-
-
-// hal_result_t hal_base_hid_genericfifo_put(hal_base_genericfifo_t *gf, uint8_t *data)
-// {
-//     // avoid checks .... be careful in calling
-//     
-//     if(gf->size == gf->capacity)
-//     {
-//         return(hal_res_NOK_generic);
-//     }
-//     
-//     memcpy(gf->data + (gf->sizeofitem)*(gf->index), data, gf->sizeofitem);
-//     gf->size ++;
-//     gf->index ++;
-//     if(gf->index == gf->capacity)
-//     {
-//         gf->index = 0;
-//     }
-//     
-//     return(hal_res_OK);
-// }
-
-
-// hal_result_t hal_base_hid_genericfifo_get(hal_base_genericfifo_t *gf, uint8_t *data, uint8_t *size)
-// {
-//     // avoid checks .... be careful in calling
-//     
-//     uint8_t start = 0;
-//     
-//     if(0 == gf->size)
-//     {
-//         return(hal_res_NOK_nodata);
-//     }
-//     
-//     start = (gf->capacity + gf->index - gf->size);
-//     if(start >= gf->capacity)
-//     {
-//         start -= gf->capacity;
-//     }
-//     
-//     memcpy(data, gf->data + (gf->sizeofitem)*(start), gf->sizeofitem);
-//     gf->size --;
-// 	
-// 	*size = gf->size;
-//     
-//     return(hal_res_OK);
-// }
-
-
-// uint8_t * hal_base_hid_genericfifo_front(hal_base_genericfifo_t *gf)
-// {
-//     // avoid checks .... be careful in calling
-//     
-//     uint8_t start = 0;
-//     
-//     if(0 == gf->size)
-//     {
-//         return(NULL);
-//     }
-//     
-//     start = (gf->capacity + gf->index - gf->size);
-//     if(start >= gf->capacity)
-//     {
-//         start -= gf->capacity;
-//     }
-//     
-//     return(gf->data + (gf->sizeofitem)*(start));
-// }
-
-
-// void hal_base_hid_genericfifo_pop(hal_base_genericfifo_t *gf)
-// {
-//     // avoid checks .... be careful in calling
-
-//     if(0 != gf->size)
-//     {
-//         gf->size --;
-//     }
-//     
-//     return;
-// }
-
-
-// uint8_t hal_base_hid_genericfifo_size(hal_base_genericfifo_t *gf)
-// {
-//     return(gf->size);
-// }
-// #endif
 
 extern void hal_base_hid_osal_scheduling_suspend(void)
 {
@@ -795,11 +718,6 @@ extern void hal_base_hid_on_fatalerror(hal_fatalerror_t errorcode, const char * 
     }
 }
 
- 
-void hal_hid_link_to_all_files(void)
-{
-    // removed ...
-}
 
 
 extern void hal_base_hid_ram_basic_init(void)
