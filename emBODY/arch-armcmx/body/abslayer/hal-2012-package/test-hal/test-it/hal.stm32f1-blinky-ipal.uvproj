@@ -399,16 +399,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>stm32fx-lib</GroupName>
-          <Files>
-            <File>
-              <FileName>stm32f1.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\mid\lib\stm32f1.lib</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>hal-cfg</GroupName>
           <Files>
             <File>
@@ -434,8 +424,13 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-cmsis</GroupName>
+          <GroupName>midware</GroupName>
           <Files>
+            <File>
+              <FileName>stm32f1.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\sys\mid\lib\stm32f1.lib</FilePath>
+            </File>
             <File>
               <FileName>system_stm32f10x.c</FileName>
               <FileType>1</FileType>
@@ -450,6 +445,116 @@
               <FileName>hal_base.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\base\hal_base.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-board</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_brdcfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\brdcfg\hal_brdcfg.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-chips</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_chip_generic_ethtransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\chips\hal_chip_generic_ethtransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_chip_micrel_ks8893.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\chips\hal_chip_micrel_ks8893.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_chip_st_l3g4200d.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\chips\hal_chip_st_l3g4200d.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_chip_st_lis3dh.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\chips\hal_chip_st_lis3dh.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_chip_xx_eeprom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\chips\hal_chip_xx_eeprom.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-devices</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_device_accelerometer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_accelerometer.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_cantransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_cantransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_display.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_display.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_eeprom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_eeprom.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_encoder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_encoder.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_ethtransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_ethtransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_gyroscope.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_gyroscope.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_led.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_mux.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_mux.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_termometer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_termometer.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_switch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_switch.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-extbrds</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_extbrd_keil_mcbqvga.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\extbrds\hal_extbrd_keil_mcbqvga.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -524,122 +629,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-devices</GroupName>
-          <Files>
-            <File>
-              <FileName>hal_device_accelerometer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_accelerometer.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_cantransceiver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_cantransceiver.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_display.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_display.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_eeprom.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_eeprom.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_ethtransceiver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_ethtransceiver.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_gyroscope.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_gyroscope.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_led.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_led.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_switch.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_switch.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_termometer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_termometer.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_encoder.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_encoder.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_mux.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_mux.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>hal-chips</GroupName>
-          <Files>
-            <File>
-              <FileName>hal_chip_generic_ethtransceiver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_generic_ethtransceiver.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_chip_micrel_ks8893.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_micrel_ks8893.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_chip_st_l3g4200d.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_st_l3g4200d.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_chip_st_lis3dh.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_st_lis3dh.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_chip_xx_eeprom.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_xx_eeprom.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>hal-extbrd</GroupName>
-          <Files>
-            <File>
-              <FileName>hal_extbrd_keil_mcbqvga.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extbrds\hal_extbrd_keil_mcbqvga.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>hal-board</GroupName>
-          <Files>
-            <File>
-              <FileName>hal_brdcfg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\brdcfg\hal_brdcfg.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>hal-utilities</GroupName>
           <Files>
             <File>
               <FileName>hal_utility_bits.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\utilities\hal_utility_bits.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_utility_crc07.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\utilities\hal_utility_crc07.c</FilePath>
             </File>
             <File>
               <FileName>hal_utility_crc16.c</FileName>
@@ -1088,16 +1088,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>stm32fx-lib</GroupName>
-          <Files>
-            <File>
-              <FileName>stm32f1.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\mid\lib\stm32f1.lib</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>hal-cfg</GroupName>
           <Files>
             <File>
@@ -1123,8 +1113,13 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-cmsis</GroupName>
+          <GroupName>midware</GroupName>
           <Files>
+            <File>
+              <FileName>stm32f1.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\sys\mid\lib\stm32f1.lib</FilePath>
+            </File>
             <File>
               <FileName>system_stm32f10x.c</FileName>
               <FileType>1</FileType>
@@ -1139,6 +1134,116 @@
               <FileName>hal_base.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\base\hal_base.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-board</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_brdcfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\brdcfg\hal_brdcfg.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-chips</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_chip_generic_ethtransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\chips\hal_chip_generic_ethtransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_chip_micrel_ks8893.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\chips\hal_chip_micrel_ks8893.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_chip_st_l3g4200d.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\chips\hal_chip_st_l3g4200d.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_chip_st_lis3dh.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\chips\hal_chip_st_lis3dh.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_chip_xx_eeprom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\chips\hal_chip_xx_eeprom.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-devices</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_device_accelerometer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_accelerometer.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_cantransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_cantransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_display.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_display.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_eeprom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_eeprom.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_encoder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_encoder.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_ethtransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_ethtransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_gyroscope.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_gyroscope.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_led.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_mux.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_mux.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_termometer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_termometer.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_switch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_switch.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-extbrds</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_extbrd_keil_mcbqvga.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\extbrds\hal_extbrd_keil_mcbqvga.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1213,122 +1318,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-devices</GroupName>
-          <Files>
-            <File>
-              <FileName>hal_device_accelerometer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_accelerometer.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_cantransceiver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_cantransceiver.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_display.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_display.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_eeprom.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_eeprom.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_ethtransceiver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_ethtransceiver.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_gyroscope.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_gyroscope.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_led.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_led.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_switch.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_switch.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_termometer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_termometer.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_encoder.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_encoder.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_mux.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_mux.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>hal-chips</GroupName>
-          <Files>
-            <File>
-              <FileName>hal_chip_generic_ethtransceiver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_generic_ethtransceiver.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_chip_micrel_ks8893.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_micrel_ks8893.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_chip_st_l3g4200d.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_st_l3g4200d.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_chip_st_lis3dh.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_st_lis3dh.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_chip_xx_eeprom.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_xx_eeprom.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>hal-extbrd</GroupName>
-          <Files>
-            <File>
-              <FileName>hal_extbrd_keil_mcbqvga.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extbrds\hal_extbrd_keil_mcbqvga.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>hal-board</GroupName>
-          <Files>
-            <File>
-              <FileName>hal_brdcfg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\brdcfg\hal_brdcfg.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>hal-utilities</GroupName>
           <Files>
             <File>
               <FileName>hal_utility_bits.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\utilities\hal_utility_bits.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_utility_crc07.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\utilities\hal_utility_crc07.c</FilePath>
             </File>
             <File>
               <FileName>hal_utility_crc16.c</FileName>
@@ -1777,16 +1777,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>stm32fx-lib</GroupName>
-          <Files>
-            <File>
-              <FileName>stm32f1.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\sys\mid\lib\stm32f1.lib</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>hal-cfg</GroupName>
           <Files>
             <File>
@@ -1812,8 +1802,13 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-cmsis</GroupName>
+          <GroupName>midware</GroupName>
           <Files>
+            <File>
+              <FileName>stm32f1.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\sys\mid\lib\stm32f1.lib</FilePath>
+            </File>
             <File>
               <FileName>system_stm32f10x.c</FileName>
               <FileType>1</FileType>
@@ -1828,6 +1823,116 @@
               <FileName>hal_base.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\base\hal_base.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-board</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_brdcfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\brdcfg\hal_brdcfg.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-chips</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_chip_generic_ethtransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\chips\hal_chip_generic_ethtransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_chip_micrel_ks8893.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\chips\hal_chip_micrel_ks8893.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_chip_st_l3g4200d.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\chips\hal_chip_st_l3g4200d.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_chip_st_lis3dh.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\chips\hal_chip_st_lis3dh.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_chip_xx_eeprom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\chips\hal_chip_xx_eeprom.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-devices</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_device_accelerometer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_accelerometer.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_cantransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_cantransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_display.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_display.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_eeprom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_eeprom.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_encoder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_encoder.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_ethtransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_ethtransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_gyroscope.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_gyroscope.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_led.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_mux.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_mux.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_termometer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_termometer.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_switch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\devices\hal_device_switch.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-extbrds</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_extbrd_keil_mcbqvga.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\extbrds\hal_extbrd_keil_mcbqvga.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1902,122 +2007,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-devices</GroupName>
-          <Files>
-            <File>
-              <FileName>hal_device_accelerometer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_accelerometer.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_cantransceiver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_cantransceiver.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_display.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_display.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_eeprom.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_eeprom.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_ethtransceiver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_ethtransceiver.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_gyroscope.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_gyroscope.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_led.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_led.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_switch.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_switch.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_termometer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_termometer.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_encoder.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_encoder.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_mux.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_mux.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>hal-chips</GroupName>
-          <Files>
-            <File>
-              <FileName>hal_chip_generic_ethtransceiver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_generic_ethtransceiver.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_chip_micrel_ks8893.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_micrel_ks8893.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_chip_st_l3g4200d.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_st_l3g4200d.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_chip_st_lis3dh.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_st_lis3dh.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_chip_xx_eeprom.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_xx_eeprom.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>hal-extbrd</GroupName>
-          <Files>
-            <File>
-              <FileName>hal_extbrd_keil_mcbqvga.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extbrds\hal_extbrd_keil_mcbqvga.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>hal-board</GroupName>
-          <Files>
-            <File>
-              <FileName>hal_brdcfg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\brdcfg\hal_brdcfg.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>hal-utilities</GroupName>
           <Files>
             <File>
               <FileName>hal_utility_bits.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\utilities\hal_utility_bits.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_utility_crc07.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\utilities\hal_utility_crc07.c</FilePath>
             </File>
             <File>
               <FileName>hal_utility_crc16.c</FileName>
