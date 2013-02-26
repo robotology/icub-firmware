@@ -28,7 +28,11 @@
 
 #ifdef HAL_USE_WATCHDOG
 
+
+#if     defined(USE_STM32F1)
+#elif   defined(USE_STM32F4)
 #warning WIP --> verify that the watchdog peripheral is the same in stm32f1 and stm32f4
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
