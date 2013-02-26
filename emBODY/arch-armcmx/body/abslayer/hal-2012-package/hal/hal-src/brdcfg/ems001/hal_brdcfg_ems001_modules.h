@@ -64,11 +64,11 @@
 
 // -- utilities
 #define     HAL_USE_UTILITY_BITS
-#define     HAL_USE_UTILITY_FIFO
-#define     HAL_USE_UTILITY_HEAP
 #define     HAL_USE_UTILITY_CRC07
 #define     HAL_USE_UTILITY_CRC16
 #define     HAL_USE_UTILITY_CRC32
+#define     HAL_USE_UTILITY_FIFO
+#define     HAL_USE_UTILITY_HEAP
 
 // -- chips
 #undef   HAL_USE_CHIP_GENERIC_ETHTRANSCEIVER
