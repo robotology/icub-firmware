@@ -207,7 +207,7 @@ static const SPI_InitTypeDef s_hal_spi_stm32_cfg =
 };
 
 //#warning --> display usa SPI_CPHA_2Edge ma prima avevo messo SPI_CPHA_1Edge
-#warning HAL-WIP --> verify if the internal s_hal_spi_stm32_cfg used for spi stm32fx config is the same hused in hal1 for encoders
+#warning HAL-WIP --> verify if the internal s_hal_spi_stm32_cfg used for spi stm32fx config is the same used in hal1 for encoders
 
 #if     defined(USE_STM32F1)
 static SPI_TypeDef* const s_hal_spi_stmSPImap[] = { SPI1, SPI2, SPI3 };
