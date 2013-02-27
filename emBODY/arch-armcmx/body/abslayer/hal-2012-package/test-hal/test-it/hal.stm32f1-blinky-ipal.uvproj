@@ -350,7 +350,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_BOARD_MCBSTM32C</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\hal\hal-api;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc;..\..\hal\hal-src\core;..\..\hal\hal-src\brdcfg;..\..\hal\hal-src\chips;..\..\hal\hal-src\devices;..\..\hal\hal-src\extbrds;..\..\hal\hal-src\mpu;..\..\hal\hal-src\utilities;..\..\..\..\..\..\arch-armcmx</IncludePath>
+              <IncludePath>..\..\hal\hal-api;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc;..\..\hal\hal-src\core;..\..\hal\hal-src\brdcfg;..\..\hal\hal-src\extra\chips;..\..\hal\hal-src\extra\devices;..\..\hal\hal-src\extra\extbrds;..\..\hal\hal-src\extra\mpu;..\..\hal\hal-src\extra\utilities;..\..\..\..\..\..\arch-armcmx</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -514,202 +514,202 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-chips</GroupName>
+          <GroupName>hal-extra-chips</GroupName>
           <Files>
             <File>
               <FileName>hal_chip_generic_ethtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_generic_ethtransceiver.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\chips\hal_chip_generic_ethtransceiver.c</FilePath>
             </File>
             <File>
               <FileName>hal_chip_micrel_ks8893.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_micrel_ks8893.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\chips\hal_chip_micrel_ks8893.c</FilePath>
             </File>
             <File>
               <FileName>hal_chip_st_l3g4200d.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_st_l3g4200d.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\chips\hal_chip_st_l3g4200d.c</FilePath>
             </File>
             <File>
               <FileName>hal_chip_st_lis3dh.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_st_lis3dh.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\chips\hal_chip_st_lis3dh.c</FilePath>
             </File>
             <File>
               <FileName>hal_chip_xx_eeprom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_xx_eeprom.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\chips\hal_chip_xx_eeprom.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-devices</GroupName>
+          <GroupName>hal-extra-devices</GroupName>
           <Files>
             <File>
               <FileName>hal_device_accelerometer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_accelerometer.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_accelerometer.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_cantransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_cantransceiver.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_cantransceiver.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_display.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_display.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_display.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_eeprom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_eeprom.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_eeprom.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_encoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_encoder.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_encoder.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_ethtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_ethtransceiver.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_ethtransceiver.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_gyroscope.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_gyroscope.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_gyroscope.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_led.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_led.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_led.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_mux.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_mux.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_termometer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_termometer.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_mux.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_switch.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_switch.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_switch.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_termometer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_termometer.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-extbrds</GroupName>
+          <GroupName>hal-extra-extbrds</GroupName>
           <Files>
             <File>
               <FileName>hal_extbrd_keil_mcbqvga.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extbrds\hal_extbrd_keil_mcbqvga.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\extbrds\hal_extbrd_keil_mcbqvga.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-mpu</GroupName>
+          <GroupName>hal-extra-mpu</GroupName>
           <Files>
             <File>
               <FileName>hal_mpu_can.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_can.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_can.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_crc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_crc.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_crc.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_dma.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_dma.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_dma.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_eth.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_eth.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_eth.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_flash.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_flash.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_flash.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_gpio.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_gpio.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_i2c.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_i2c.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_i2c.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_spi.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_spi.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_timer.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_timer.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_trace.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_trace.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_trace.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_uniqueid.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_uniqueid.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_uniqueid.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_watchdog.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_watchdog.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_watchdog.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-utilities</GroupName>
+          <GroupName>hal-extra-utilities</GroupName>
           <Files>
             <File>
               <FileName>hal_utility_bits.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utilities\hal_utility_bits.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\utilities\hal_utility_bits.c</FilePath>
             </File>
             <File>
               <FileName>hal_utility_crc07.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utilities\hal_utility_crc07.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\utilities\hal_utility_crc07.c</FilePath>
             </File>
             <File>
               <FileName>hal_utility_crc16.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utilities\hal_utility_crc16.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\utilities\hal_utility_crc16.c</FilePath>
             </File>
             <File>
               <FileName>hal_utility_crc32.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utilities\hal_utility_crc32.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\utilities\hal_utility_crc32.c</FilePath>
             </File>
             <File>
               <FileName>hal_utility_fifo.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utilities\hal_utility_fifo.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\utilities\hal_utility_fifo.c</FilePath>
             </File>
             <File>
               <FileName>hal_utility_heap.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utilities\hal_utility_heap.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\utilities\hal_utility_heap.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1213,202 +1213,202 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-chips</GroupName>
+          <GroupName>hal-extra-chips</GroupName>
           <Files>
             <File>
               <FileName>hal_chip_generic_ethtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_generic_ethtransceiver.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\chips\hal_chip_generic_ethtransceiver.c</FilePath>
             </File>
             <File>
               <FileName>hal_chip_micrel_ks8893.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_micrel_ks8893.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\chips\hal_chip_micrel_ks8893.c</FilePath>
             </File>
             <File>
               <FileName>hal_chip_st_l3g4200d.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_st_l3g4200d.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\chips\hal_chip_st_l3g4200d.c</FilePath>
             </File>
             <File>
               <FileName>hal_chip_st_lis3dh.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_st_lis3dh.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\chips\hal_chip_st_lis3dh.c</FilePath>
             </File>
             <File>
               <FileName>hal_chip_xx_eeprom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_xx_eeprom.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\chips\hal_chip_xx_eeprom.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-devices</GroupName>
+          <GroupName>hal-extra-devices</GroupName>
           <Files>
             <File>
               <FileName>hal_device_accelerometer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_accelerometer.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_accelerometer.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_cantransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_cantransceiver.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_cantransceiver.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_display.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_display.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_display.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_eeprom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_eeprom.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_eeprom.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_encoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_encoder.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_encoder.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_ethtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_ethtransceiver.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_ethtransceiver.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_gyroscope.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_gyroscope.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_gyroscope.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_led.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_led.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_led.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_mux.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_mux.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_termometer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_termometer.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_mux.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_switch.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_switch.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_switch.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_termometer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_termometer.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-extbrds</GroupName>
+          <GroupName>hal-extra-extbrds</GroupName>
           <Files>
             <File>
               <FileName>hal_extbrd_keil_mcbqvga.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extbrds\hal_extbrd_keil_mcbqvga.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\extbrds\hal_extbrd_keil_mcbqvga.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-mpu</GroupName>
+          <GroupName>hal-extra-mpu</GroupName>
           <Files>
             <File>
               <FileName>hal_mpu_can.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_can.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_can.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_crc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_crc.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_crc.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_dma.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_dma.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_dma.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_eth.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_eth.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_eth.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_flash.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_flash.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_flash.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_gpio.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_gpio.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_i2c.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_i2c.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_i2c.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_spi.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_spi.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_timer.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_timer.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_trace.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_trace.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_trace.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_uniqueid.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_uniqueid.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_uniqueid.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_watchdog.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_watchdog.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_watchdog.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-utilities</GroupName>
+          <GroupName>hal-extra-utilities</GroupName>
           <Files>
             <File>
               <FileName>hal_utility_bits.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utilities\hal_utility_bits.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\utilities\hal_utility_bits.c</FilePath>
             </File>
             <File>
               <FileName>hal_utility_crc07.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utilities\hal_utility_crc07.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\utilities\hal_utility_crc07.c</FilePath>
             </File>
             <File>
               <FileName>hal_utility_crc16.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utilities\hal_utility_crc16.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\utilities\hal_utility_crc16.c</FilePath>
             </File>
             <File>
               <FileName>hal_utility_crc32.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utilities\hal_utility_crc32.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\utilities\hal_utility_crc32.c</FilePath>
             </File>
             <File>
               <FileName>hal_utility_fifo.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utilities\hal_utility_fifo.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\utilities\hal_utility_fifo.c</FilePath>
             </File>
             <File>
               <FileName>hal_utility_heap.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utilities\hal_utility_heap.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\utilities\hal_utility_heap.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1912,202 +1912,202 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-chips</GroupName>
+          <GroupName>hal-extra-chips</GroupName>
           <Files>
             <File>
               <FileName>hal_chip_generic_ethtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_generic_ethtransceiver.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\chips\hal_chip_generic_ethtransceiver.c</FilePath>
             </File>
             <File>
               <FileName>hal_chip_micrel_ks8893.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_micrel_ks8893.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\chips\hal_chip_micrel_ks8893.c</FilePath>
             </File>
             <File>
               <FileName>hal_chip_st_l3g4200d.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_st_l3g4200d.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\chips\hal_chip_st_l3g4200d.c</FilePath>
             </File>
             <File>
               <FileName>hal_chip_st_lis3dh.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_st_lis3dh.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\chips\hal_chip_st_lis3dh.c</FilePath>
             </File>
             <File>
               <FileName>hal_chip_xx_eeprom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\chips\hal_chip_xx_eeprom.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\chips\hal_chip_xx_eeprom.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-devices</GroupName>
+          <GroupName>hal-extra-devices</GroupName>
           <Files>
             <File>
               <FileName>hal_device_accelerometer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_accelerometer.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_accelerometer.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_cantransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_cantransceiver.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_cantransceiver.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_display.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_display.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_display.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_eeprom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_eeprom.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_eeprom.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_encoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_encoder.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_encoder.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_ethtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_ethtransceiver.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_ethtransceiver.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_gyroscope.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_gyroscope.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_gyroscope.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_led.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_led.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_led.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_mux.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_mux.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_termometer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_termometer.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_mux.c</FilePath>
             </File>
             <File>
               <FileName>hal_device_switch.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\devices\hal_device_switch.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_switch.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_termometer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\extra\devices\hal_device_termometer.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-extbrds</GroupName>
+          <GroupName>hal-extra-extbrds</GroupName>
           <Files>
             <File>
               <FileName>hal_extbrd_keil_mcbqvga.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extbrds\hal_extbrd_keil_mcbqvga.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\extbrds\hal_extbrd_keil_mcbqvga.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-mpu</GroupName>
+          <GroupName>hal-extra-mpu</GroupName>
           <Files>
             <File>
               <FileName>hal_mpu_can.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_can.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_can.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_crc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_crc.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_crc.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_dma.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_dma.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_dma.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_eth.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_eth.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_eth.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_flash.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_flash.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_flash.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_gpio.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_gpio.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_i2c.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_i2c.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_i2c.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_spi.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_spi.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_timer.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_timer.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_trace.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_trace.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_trace.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_uniqueid.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_uniqueid.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_uniqueid.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_watchdog.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_watchdog.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_watchdog.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-utilities</GroupName>
+          <GroupName>hal-extra-utilities</GroupName>
           <Files>
             <File>
               <FileName>hal_utility_bits.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utilities\hal_utility_bits.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\utilities\hal_utility_bits.c</FilePath>
             </File>
             <File>
               <FileName>hal_utility_crc07.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utilities\hal_utility_crc07.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\utilities\hal_utility_crc07.c</FilePath>
             </File>
             <File>
               <FileName>hal_utility_crc16.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utilities\hal_utility_crc16.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\utilities\hal_utility_crc16.c</FilePath>
             </File>
             <File>
               <FileName>hal_utility_crc32.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utilities\hal_utility_crc32.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\utilities\hal_utility_crc32.c</FilePath>
             </File>
             <File>
               <FileName>hal_utility_fifo.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utilities\hal_utility_fifo.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\utilities\hal_utility_fifo.c</FilePath>
             </File>
             <File>
               <FileName>hal_utility_heap.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\utilities\hal_utility_heap.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\utilities\hal_utility_heap.c</FilePath>
             </File>
           </Files>
         </Group>
