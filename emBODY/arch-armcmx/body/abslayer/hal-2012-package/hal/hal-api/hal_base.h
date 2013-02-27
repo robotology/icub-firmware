@@ -224,36 +224,13 @@ typedef struct
 
 
 /** @typedef    typedef struct hal_cfg_t 
-    @brief      hal_cfg_t contains hal configuration.
+    @brief      hal_cfg_t contains a basic hal configuration able to run the hal-core. other modules shall use proper
+                configuration data structures.
  **/  
 typedef struct
 {   
-//    hal_cpufamily_t cpu_family;                 /**< The CPU family: an enum hal_cpufamily_t                */
-//    hal_cputype_t   cpu_type;                   /**< The CPU type: an enum hal_cputype_t                    */
     uint32_t        stacksize;                  /**< The size of stack available to the system in bytes     */
     uint32_t        heapsize;                   /**< The size of heap available to the system in bytes      */
-    
-    //#warning --> all other options are specified in file memcfg.h which .... ? or maybe i ...
-    //             remove all enables, put sizes of queues in specific config params of the peripheral
-    //             and allocate memory when needed. if dont have memory anymore ... i enter in error mode.
-    //             it is ok with: eth, can1, can2, timers.
-    //             for arch .... if needed i call an init function inside hal_base_something with params
-    //             statically defined inside brdcfg.c
-    
-
-    //uint8_t         eth_dmatxbuffer_num;        /**< Number of eth frames in the tx buffer (>0)             */
-    //uint8_t         eth_dmarxbuffer_num;        /**< Number of eth frames in the rx buffer  (>0)            */
-    //hal_boolval_t   can1_enable;                /**< Enable of CAN1 peripheral: 1 enabled, 0 not            */
-    //uint8_t         can1_rxqnorm_num;           /**< Number of CAN frames in the rx queue of CAN1  (>=0)    */
-    //uint8_t         can1_txqnorm_num;           /**< Number of CAN frames in the tx queue of CAN1  (>=0)    */
-    //uint8_t         can1_txqhigh_num;           /**< Number of CAN frames in the high priority tx queue of CAN1  (>=0)   */
-    //hal_boolval_t   can2_enable;                /**< Enable of CAN2 peripheral: 1 enabled, 0 not            */
-    //uint8_t         can2_rxqnorm_num;           /**< Number of CAN frames in the rx queue of CAN2  (>=0)    */
-    //uint8_t         can2_txqnorm_num;           /**< Number of CAN frames in the tx queue of CAN2  (>=0)    */
-    //uint8_t         can2_txqhigh_num;           /**< Number of CAN frames in the high priority tx queue of CAN2  (>=0)   */
-    //hal_arch_cfg_t  arch;                       /**< Configuration of behaviour which are architecture dependant */
-    
-   
     hal_extfn_cfg_t extfn;                      /**< External functionalities offered to the HAL            */
 } hal_cfg_t;
 
