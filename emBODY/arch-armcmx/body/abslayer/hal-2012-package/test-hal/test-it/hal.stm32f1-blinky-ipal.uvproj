@@ -348,9 +348,9 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>VERY_SMALL STM32F10X_CL HAL_MPU_STM32F107 HAL_USE_ARCH_ARM HAL_BOARD_MCBSTM32C</Define>
+              <Define>HAL_BOARD_MCBSTM32C</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\hal\hal-api;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc;..\..\hal\hal-src\base;..\..\hal\hal-src\brdcfg;..\..\hal\hal-src\chips;..\..\hal\hal-src\devices;..\..\hal\hal-src\extbrds;..\..\hal\hal-src\mpu;..\..\hal\hal-src\utilities;..\..\..\..\..\..\arch-armcmx</IncludePath>
+              <IncludePath>..\..\hal\hal-api;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc;..\..\hal\hal-src\core;..\..\hal\hal-src\brdcfg;..\..\hal\hal-src\chips;..\..\hal\hal-src\devices;..\..\hal\hal-src\extbrds;..\..\hal\hal-src\mpu;..\..\hal\hal-src\utilities;..\..\..\..\..\..\arch-armcmx</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -435,26 +435,81 @@
               <FileName>system_stm32f10x.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\sys\mid\src\system_stm32f10x.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-base</GroupName>
-          <Files>
-            <File>
-              <FileName>hal_base.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\base\hal_base.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>hal-board</GroupName>
+          <GroupName>hal-brdcfg</GroupName>
           <Files>
             <File>
               <FileName>hal_brdcfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\brdcfg\hal_brdcfg.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-core</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_base.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\core\hal_base.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_cpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\core\hal_cpu.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_middleware.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\core\hal_middleware.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_sys.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\core\hal_sys.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -562,11 +617,6 @@
           <GroupName>hal-mpu</GroupName>
           <Files>
             <File>
-              <FileName>hal_mpu_arch.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_arch.c</FilePath>
-            </File>
-            <File>
               <FileName>hal_mpu_can.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\mpu\hal_mpu_can.c</FilePath>
@@ -607,11 +657,6 @@
               <FilePath>..\..\hal\hal-src\mpu\hal_mpu_spi.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_sys.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_sys.c</FilePath>
-            </File>
-            <File>
               <FileName>hal_mpu_timer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\mpu\hal_mpu_timer.c</FilePath>
@@ -620,6 +665,11 @@
               <FileName>hal_mpu_trace.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\mpu\hal_mpu_trace.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_mpu_uniqueid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_uniqueid.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_watchdog.c</FileName>
@@ -1128,22 +1178,37 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-base</GroupName>
-          <Files>
-            <File>
-              <FileName>hal_base.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\base\hal_base.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>hal-board</GroupName>
+          <GroupName>hal-brdcfg</GroupName>
           <Files>
             <File>
               <FileName>hal_brdcfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\brdcfg\hal_brdcfg.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-core</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_base.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\core\hal_base.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_cpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\core\hal_cpu.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_middleware.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\core\hal_middleware.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_sys.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\core\hal_sys.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1251,11 +1316,6 @@
           <GroupName>hal-mpu</GroupName>
           <Files>
             <File>
-              <FileName>hal_mpu_arch.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_arch.c</FilePath>
-            </File>
-            <File>
               <FileName>hal_mpu_can.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\mpu\hal_mpu_can.c</FilePath>
@@ -1296,11 +1356,6 @@
               <FilePath>..\..\hal\hal-src\mpu\hal_mpu_spi.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_sys.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_sys.c</FilePath>
-            </File>
-            <File>
               <FileName>hal_mpu_timer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\mpu\hal_mpu_timer.c</FilePath>
@@ -1309,6 +1364,11 @@
               <FileName>hal_mpu_trace.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\mpu\hal_mpu_trace.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_mpu_uniqueid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_uniqueid.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_watchdog.c</FileName>
@@ -1817,22 +1877,37 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-base</GroupName>
-          <Files>
-            <File>
-              <FileName>hal_base.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\base\hal_base.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>hal-board</GroupName>
+          <GroupName>hal-brdcfg</GroupName>
           <Files>
             <File>
               <FileName>hal_brdcfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\brdcfg\hal_brdcfg.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-core</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_base.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\core\hal_base.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_cpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\core\hal_cpu.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_middleware.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\core\hal_middleware.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_sys.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\core\hal_sys.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1940,11 +2015,6 @@
           <GroupName>hal-mpu</GroupName>
           <Files>
             <File>
-              <FileName>hal_mpu_arch.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_arch.c</FilePath>
-            </File>
-            <File>
               <FileName>hal_mpu_can.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\mpu\hal_mpu_can.c</FilePath>
@@ -1985,11 +2055,6 @@
               <FilePath>..\..\hal\hal-src\mpu\hal_mpu_spi.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_sys.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_sys.c</FilePath>
-            </File>
-            <File>
               <FileName>hal_mpu_timer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\mpu\hal_mpu_timer.c</FilePath>
@@ -1998,6 +2063,11 @@
               <FileName>hal_mpu_trace.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\mpu\hal_mpu_trace.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_mpu_uniqueid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\mpu\hal_mpu_uniqueid.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_watchdog.c</FileName>
