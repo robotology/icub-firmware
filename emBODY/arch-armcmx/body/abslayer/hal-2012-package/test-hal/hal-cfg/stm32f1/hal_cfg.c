@@ -42,28 +42,20 @@
 static void s_hal_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char * errormsg);
 
 
-extern const hal_cfg_t hal_cfg = 
+extern const hal_base_cfg_t hal_base_cfg = 
 {   
-//    .cpu_family             = (hal_cpufamily_t) HAL_CPUFAM,
-//    .cpu_type               = (hal_cputype_t) HAL_CPUTYPE,
     .stacksize              = HAL_STACKSIZE,
     .heapsize               = HAL_HEAPSIZE,
-
-//     .arch                   = 
-//     {
-//         .nothingsofar                       = 0
-//     },
     .extfn                  =
     {
         .usr_on_fatal_error                 = s_hal_cfg_on_fatalerror,
         .osal_system_scheduling_suspend     = NULL,
         .osal_system_scheduling_restart     = NULL
-    }
-    
+    }   
 };
 
 
-extern const hal_cfg_t *hal_cfgMINE = &hal_cfg;
+extern const hal_base_cfg_t *hal_base_cfgMINE = &hal_base_cfg;
 
 
 void SysTick_Handler(void)
