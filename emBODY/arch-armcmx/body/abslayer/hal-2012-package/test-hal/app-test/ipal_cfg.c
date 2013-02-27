@@ -34,6 +34,7 @@
 
 
 #include "hal.h"
+#include "hal_eth.h"
 
 
 #ifdef IPAL_MODE_FULL
