@@ -51,7 +51,6 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-typedef int32_t hal_irqn_t;          
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
@@ -150,21 +149,24 @@ extern void hal_sys_irq_enable(void);
 
 /** @fn         extern void hal_sys_irqn_disable(hal_irqn_t irqn)
     @brief      Disable a selected IRQ in the system.
-    @param      irqn        The irq number to operate on.  Use an enum value in hal_arch_xxx_irqn_t
+    @param      irqn        The irq number to operate on.  Use an enum value in hal_cpu_fam_xxx_irqn_t
+                            or hal_cpu_arc_xxx_irqn_t
  **/
 extern void hal_sys_irqn_disable(hal_irqn_t irqn);
 
 
 /** @fn         extern void hal_sys_irqn_enable(hal_irqn_t irqn)
     @brief      Enable a selected IRQ in the system.
-    @param      irqn        The irq number to operate on.  Use an enum value in hal_arch_xxx_irqn_t
+    @param      irqn        The irq number to operate on.  Use an enum value in hal_cpu_fam_xxx_irqn_t
+                            or hal_cpu_arc_xxx_irqn_t
  **/
 extern void hal_sys_irqn_enable(hal_irqn_t irqn);
 
 
 /** @fn         extern void hal_sys_irqn_priority_set(hal_irqn_t irqn, hal_interrupt_priority_t prio)
     @brief      Sets a priority to the selected IRQ in the system.
-    @param      irqn        The irq number to operate on.  Use an enum value in hal_arch_xxx_irqn_t
+    @param      irqn        The irq number to operate on.  Use an enum value in hal_cpu_fam_xxx_irqn_t
+                            or hal_cpu_arc_xxx_irqn_t
     @param      prio        The target priority
  **/
 extern void hal_sys_irqn_priority_set(hal_irqn_t irqn, hal_interrupt_priority_t prio); 
@@ -172,7 +174,8 @@ extern void hal_sys_irqn_priority_set(hal_irqn_t irqn, hal_interrupt_priority_t 
 
 /** @fn         extern hal_interrupt_priority_t hal_sys_irqn_priority_get(hal_irqn_t irqn)
     @brief      Sets a priority to the selected IRQ in the system.
-    @param      irqn        The irq number to operate on.  Use an enum value in hal_arch_xxx_irqn_t
+    @param      irqn        The irq number to operate on.  Use an enum value in hal_cpu_fam_xxx_irqn_t
+                            or hal_cpu_arc_xxx_irqn_t
     @return     The current priority of the IRQ
  **/
 extern hal_interrupt_priority_t hal_sys_irqn_priority_get(hal_irqn_t irqn);

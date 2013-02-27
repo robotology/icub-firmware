@@ -46,6 +46,7 @@
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
+
 #define hal_can_frame_payload_maxlen        8       /**< max length of can frame's payload 
                                                         (expressed in number of bytes) */
   
@@ -144,6 +145,9 @@ typedef struct
     hal_can_baudrate_t          baudrate; 
     hal_interrupt_priority_t    priorx;
     hal_interrupt_priority_t    priotx;
+    uint8_t                     capacityofrxfifoofframes;
+    uint8_t                     capacityoftxfifoofframes;
+    uint8_t                     capacityoftxfifohighprio;
     void (*callback_on_rx)(void *arg);
     void *arg_cb_rx;
     void (*callback_on_tx)(void *arg);

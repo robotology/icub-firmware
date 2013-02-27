@@ -42,7 +42,7 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "stdint.h"
-#include "hal_arch_cfg.h"
+
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -61,28 +61,6 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-/** @typedef    typedef enum hal_cpufamily_t 
-    @brief      hal_cpufamily_t contains all possible families of CPUs supported by HAL
- **/ 
-typedef enum
-{
-    hal_cpufam_armcm3           = 0,
-    hal_cpufam_armcm4           = 1,
-    hal_cpufam_dspic            = 2
-} hal_cpufamily_t;
-
-
-/** @typedef    typedef enum hal_cputype_t 
-    @brief      hal_cputype_t contains a type of CPU within a given family
- **/ 
-typedef enum
-{
-    hal_cputyp_stm32f1x         = 0,
-    hal_cputyp_stm32f2x         = 1,
-    hal_cputyp_stm32f4x         = 2,
-    hal_cputyp_stellaris        = 3,
-    hal_cputyp_dspic33          = 4
-} hal_cputype_t;
 
 
 /** @typedef    typedef enum hal_result_t 
@@ -122,7 +100,6 @@ typedef enum
     @warning    C99 contains bool, true, and false. To use C99 include "stdbool.h" and -c99 compiler option.
                 At this point please redefine eo_false and eo_true to be equal to false and true.
                 Also, eObool_t must be typedef-ed as bool.
-
  **/ 
 typedef enum
 {
@@ -196,7 +173,7 @@ typedef void (*hal_callback_t) (void* p);
 
 /** @typedef    typedef enum hal_interrupt_priority_t;
     @brief      rappresents the possible values for interrupt priorities.
-                On ARM:     0 is highest priority. 
+                On ARMCM:   0 is highest priority. 
                 On DSPIC:   0 is lowest priority
  **/
 typedef enum
@@ -219,6 +196,12 @@ typedef enum
     hal_int_priority14      = 14,
     hal_int_priority15      = 15
 } hal_interrupt_priority_t;  
+
+
+/** @typedef    typedef int32_t hal_irqn_t
+    @brief      It expresses the IRQ number. Use however the type hal_cpu_arc_xxx_irqn_t or hal_cpu_fam_xxx_irqn_t.
+ **/ 
+typedef int32_t hal_irqn_t;  
 
 
 /** @typedef    typedef struct hal_extfn_cfg_t
@@ -245,11 +228,10 @@ typedef struct
  **/  
 typedef struct
 {   
-    hal_cpufamily_t cpu_family;                 /**< The CPU family: an enum hal_cpufamily_t                */
-    hal_cputype_t   cpu_type;                   /**< The CPU type: an enum hal_cputype_t                    */
-    uint32_t        cpu_freq;                   /**< The max CPU frequency in Hz                            */
-    uint32_t        sys_stacksize;              /**< The size of stack available to the system in bytes     */
-    uint32_t        sys_heapsize;               /**< The size of heap available to the system in bytes      */
+//    hal_cpufamily_t cpu_family;                 /**< The CPU family: an enum hal_cpufamily_t                */
+//    hal_cputype_t   cpu_type;                   /**< The CPU type: an enum hal_cputype_t                    */
+    uint32_t        stacksize;                  /**< The size of stack available to the system in bytes     */
+    uint32_t        heapsize;                   /**< The size of heap available to the system in bytes      */
     
     //#warning --> all other options are specified in file memcfg.h which .... ? or maybe i ...
     //             remove all enables, put sizes of queues in specific config params of the peripheral
@@ -258,26 +240,20 @@ typedef struct
     //             for arch .... if needed i call an init function inside hal_base_something with params
     //             statically defined inside brdcfg.c
     
-    hal_boolval_t   display_enable;             /**< Enable of the display: 1 if enabled, 0 not             */
-    hal_boolval_t   eth_enable;                 /**< Enable of ethernet: 1 enabled, 0 not                   */
-    uint8_t         eth_dmatxbuffer_num;        /**< Number of eth frames in the tx buffer (>0)             */
-    uint8_t         eth_dmarxbuffer_num;        /**< Number of eth frames in the rx buffer  (>0)            */
-    hal_boolval_t   can1_enable;                /**< Enable of CAN1 peripheral: 1 enabled, 0 not            */
-    uint8_t         can1_rxqnorm_num;           /**< Number of CAN frames in the rx queue of CAN1  (>=0)    */
-    uint8_t         can1_txqnorm_num;           /**< Number of CAN frames in the tx queue of CAN1  (>=0)    */
-    uint8_t         can1_txqhigh_num;           /**< Number of CAN frames in the high priority tx queue of CAN1  (>=0)   */
-    hal_boolval_t   can2_enable;                /**< Enable of CAN2 peripheral: 1 enabled, 0 not            */
-    uint8_t         can2_rxqnorm_num;           /**< Number of CAN frames in the rx queue of CAN2  (>=0)    */
-    uint8_t         can2_txqnorm_num;           /**< Number of CAN frames in the tx queue of CAN2  (>=0)    */
-    uint8_t         can2_txqhigh_num;           /**< Number of CAN frames in the high priority tx queue of CAN2  (>=0)   */
-	hal_boolval_t   spi1_enable;                /**< Enable of SPI1 peripheral: 1 enabled, 0 not            */
-	hal_boolval_t   spi2_enable;                /**< Enable of SPI2 peripheral: 1 enabled, 0 not            */
-	hal_boolval_t   spi3_enable;                /**< Enable of SPI3 peripheral: 1 enabled, 0 not            */
-    uint8_t         timers_num;                 /**< Number of timers to use                                */
-    hal_arch_cfg_t  arch;                       /**< Configuration of behaviour which are architecture dependant */
+
+    //uint8_t         eth_dmatxbuffer_num;        /**< Number of eth frames in the tx buffer (>0)             */
+    //uint8_t         eth_dmarxbuffer_num;        /**< Number of eth frames in the rx buffer  (>0)            */
+    //hal_boolval_t   can1_enable;                /**< Enable of CAN1 peripheral: 1 enabled, 0 not            */
+    //uint8_t         can1_rxqnorm_num;           /**< Number of CAN frames in the rx queue of CAN1  (>=0)    */
+    //uint8_t         can1_txqnorm_num;           /**< Number of CAN frames in the tx queue of CAN1  (>=0)    */
+    //uint8_t         can1_txqhigh_num;           /**< Number of CAN frames in the high priority tx queue of CAN1  (>=0)   */
+    //hal_boolval_t   can2_enable;                /**< Enable of CAN2 peripheral: 1 enabled, 0 not            */
+    //uint8_t         can2_rxqnorm_num;           /**< Number of CAN frames in the rx queue of CAN2  (>=0)    */
+    //uint8_t         can2_txqnorm_num;           /**< Number of CAN frames in the tx queue of CAN2  (>=0)    */
+    //uint8_t         can2_txqhigh_num;           /**< Number of CAN frames in the high priority tx queue of CAN2  (>=0)   */
+    //hal_arch_cfg_t  arch;                       /**< Configuration of behaviour which are architecture dependant */
     
-    
-    
+   
     hal_extfn_cfg_t extfn;                      /**< External functionalities offered to the HAL            */
 } hal_cfg_t;
 

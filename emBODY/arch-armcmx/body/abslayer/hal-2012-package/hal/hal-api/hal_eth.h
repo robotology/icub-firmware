@@ -91,10 +91,12 @@ typedef struct
  **/
 typedef struct
 {
-    hal_interrupt_priority_t        priority;
+    hal_interrupt_priority_t        priority;   /**< keeps priority of teh ISR */
     hal_eth_onframereception_t*     onframerx;  /**< The user must customise the behavior in reception using these functions.
                                                      Only the alert function can be NULL. */
     hal_eth_macaddress_t            macaddress; /**< Keeps the mac address */
+    uint8_t                         capacityoftxfifoofframes;   /**< the number of eth frames buffered in transmission */
+    uint8_t                         capacityofrxfifoofframes;   /**< the number of eth frames buffered before the ISR can move to higher layers */
 } hal_eth_cfg_t;
 
 
