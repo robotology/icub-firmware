@@ -29,12 +29,26 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "stdlib.h"
+#include "string.h"
+
 #include "hal_mpu_stm32xx_include.h"
 
-#include "stdlib.h"
+
 #include "hal_base.h"
-#include "string.h"
 #include "hal_base_hid.h"
+
+#include "hal_cpu.h"
+#include "hal_cpu_hid.h"
+
+#include "hal_utility_bits_hid.h" 
+#include "hal_utility_crc07_hid.h" 
+#include "hal_utility_crc16_hid.h" 
+#include "hal_utility_crc32_hid.h" 
+#include "hal_utility_fifo_hid.h" 
+#include "hal_utility_heap_hid.h"
+
+
 #include "hal_mpu_can_hid.h"
 #include "hal_mpu_spi_hid.h"
 #include "hal_mpu_eth_hid.h"
@@ -88,6 +102,51 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
+// -- core
+
+#ifdef  HAL_USE_BASE
+    extern const hal_base_hid_brdcfg_t hal_brdcfg_base__theconfig  =
+    {
+        .dummy  = 0
+    };    
+#endif//HAL_USE_BASE  
+    
+    
+#ifdef  HAL_USE_CPU
+    extern const hal_cpu_hid_brdcfg_t hal_brdcfg_cpu__theconfig  =
+    {
+        .speeds             =
+        {   
+            .cpu                =  72000000,
+            .fastbus            =  72000000,
+            .slowbus            =  36000000
+        },
+        .clockcfg                      =
+        {
+            .keepinternalclockatstartup     = hal_false,      // false is the preferred mode
+            .refclock                       = hal_cpu_refclock_pll_on_external_xtl,  
+            .intclockspeed                  =   8000000,
+            .extclockspeed                  =  25000000,
+            .pllcfg                         =
+            {   // with refclock = hal_cpu_refclock_pll_on_external_xtl -> pll2clock = pll2mul*(extclockspeed/prediv2), speeds.cpu = pllmul*(pll2clock/prediv1) 
+                .prediv2            = 5, 
+                .pll2mul            = 8,
+                .prediv1            = 5,
+                .pllmul             = 9
+            }
+        }   
+    };    
+#endif//HAL_USE_CPU  
+
+
+#ifdef  HAL_USE_SYS
+    extern const hal_sys_hid_brdcfg_t hal_brdcfg_sys__theconfig  =
+    {
+        .dummy             = 0
+    };    
+#endif//HAL_USE_SYS   
+
+
 // --  mpu peripherals
 
 #ifdef  HAL_USE_CAN
@@ -123,7 +182,23 @@
                 .dir      = hal_gpio_dirALT,
                 .speed    = hal_gpio_speed_default        
             }
-        }         
+        } 
+//         ,
+//         .numofframesinrxqnorm   =
+//         {
+//             3,  // hal_can_port1
+//             2   // hal_can_port2            
+//         },
+//         .numofframesintxqnorm   =
+//         {
+//             3,  // hal_can_port1
+//             2   // hal_can_port2            
+//         },
+//         .numofframesintxqprio   =
+//         {
+//             0,  // hal_can_port1
+//             0   // hal_can_port2            
+//         }         
     };
 #endif//HAL_USE_CAN
 
@@ -165,6 +240,9 @@
             .ETH_MDC            = { .port = hal_gpio_portC, .pin = hal_gpio_pin1,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max },
             .ETH_MDIO           = { .port = hal_gpio_portA, .pin = hal_gpio_pin2,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max }       
         }
+//         ,
+//         .numofdmatxbuffers      = 2,
+//         .numofdmarxbuffers      = 2
     };
 
 #endif//HAL_USE_ETH
@@ -240,33 +318,6 @@
         }      
     };
 #endif//HAL_USE_SPI
-
-    
-#ifdef  HAL_USE_SYS
-    extern const hal_sys_hid_brdcfg_t hal_brdcfg_sys__theconfig  =
-    {
-        .speeds             =
-        {   
-            .cpu                =  72000000,
-            .fastbus            =  72000000,
-            .slowbus            =  36000000
-        },
-        .clockcfg                      =
-        {
-            .keepinternalclockatstartup     = hal_false,      // false is the preferred mode
-            .refclock                       = hal_sys_refclock_pll_on_external_xtl,  
-            .intclockspeed                  =   8000000,
-            .extclockspeed                  =  25000000,
-            .pllcfg                         =
-            {   // with refclock = hal_sys_refclock_pll_on_external_xtl -> pll2clock = pll2mul*(extclockspeed/prediv2), speeds.cpu = pllmul*(pll2clock/prediv1) 
-                .prediv2            = 5, 
-                .pll2mul            = 8,
-                .prediv1            = 5,
-                .pllmul             = 9
-            }
-        }   
-    };    
-#endif//HAL_USE_SYS    
     
       
 #ifdef  HAL_USE_TIMER
@@ -283,6 +334,15 @@
         .dummy              = 0
     };       
 #endif//HAL_USE_TRACE
+  
+
+#ifdef  HAL_USE_UNIQUEID
+    extern const hal_uniqueid_hid_brdcfg_t hal_brdcfg_uniqueid__theconfig =
+    {
+        .supported_mask     = (1 << hal_uniqueid_id64bit) | (0 << hal_uniqueid_macaddr),
+        .macoui             = 0
+    };       
+#endif//HAL_USE_UNIQUEID
     
 
 #ifdef  HAL_USE_WATCHDOG
@@ -622,7 +682,12 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+static uint32_t s_hal_brdcfg_chips__getsize(const hal_cfg_t *cfg);
+static hal_result_t s_hal_brdcfg_chips__setmem(const hal_cfg_t *cfg, uint32_t *memory);
+
+static uint32_t s_hal_brdcfg_extbrds__getsize(const hal_cfg_t *cfg);
+static hal_result_t s_hal_brdcfg_extbrds__setmem(const hal_cfg_t *cfg, uint32_t *memory);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -636,7 +701,449 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern uint32_t hal_brdcfg_chips__getsize(const hal_cfg_t *cfg)
+extern uint32_t hal_brdcfg__getsize(const hal_cfg_t *cfg)
+{
+    uint32_t retval = 0;
+ 
+    if(NULL == cfg)
+    {
+        hal_base_hid_on_fatalerror(hal_fatalerror_missingconfiguration, "hal_brdcfg__getsize() needs a cfg");
+        return(0);
+    }  
+
+    // - utilities ----------------------------------------------------------------------------------------------------
+    
+#ifdef  HAL_USE_UTILITY_BITS
+    retval += hal_utility_bits_hid_getsize(cfg);
+#endif//HAL_USE_UTILITY_BITS
+
+#ifdef  HAL_USE_UTILITY_CRC07
+    retval += hal_utility_crc07_hid_getsize(cfg);
+#endif//HAL_USE_UTILITY_CRC07    
+
+#ifdef  HAL_USE_UTILITY_CRC16
+    retval += hal_utility_crc16_hid_getsize(cfg);
+#endif//HAL_USE_UTILITY_CRC16    
+
+#ifdef  HAL_USE_UTILITY_CRC32
+    retval += hal_utility_crc32_hid_getsize(cfg);
+#endif//HAL_USE_UTILITY_CRC32        
+    
+#ifdef  HAL_USE_UTILITY_FIFO
+    retval += hal_utility_fifo_hid_getsize(cfg);
+#endif//HAL_USE_UTILITY_FIFO    
+
+#ifdef  HAL_USE_UTILITY_HEAP
+    retval += hal_utility_heap_hid_getsize(cfg);
+#endif//HAL_USE_UTILITY_HEAP    
+ 
+    
+    
+    // - mpu peripherals ----------------------------------------------------------------------------------------------
+        
+   
+#ifdef  HAL_USE_CAN
+    retval += hal_can_hid_getsize(cfg);
+#endif//HAL_USE_CAN
+
+#ifdef  HAL_USE_CRC
+    retval += hal_crc_hid_getsize(cfg);
+#endif//HAL_USE_CRC
+
+#ifdef  HAL_USE_DMA
+    retval += hal_dma_hid_getsize(cfg);
+#endif//HAL_USE_DMA
+
+#ifdef HAL_USE_ETH
+    retval += hal_eth_hid_getsize(cfg);
+#endif//HAL_USE_ETH
+                      
+#ifdef HAL_USE_FLASH
+    retval += hal_flash_hid_getsize(cfg);
+#endif//HAL_USE_FLASH  
+
+#ifdef  HAL_USE_GPIO
+    retval += hal_gpio_hid_getsize(cfg);
+#endif//HAL_USE_GPIO
+
+#ifdef  HAL_USE_I2C
+    retval += hal_i2c_hid_getsize(cfg);
+#endif//HAL_USE_I2C
+
+#ifdef  HAL_USE_SPI
+    retval += hal_spi_hid_getsize(cfg);
+#endif//HAL_USE_SPI
+
+#ifdef  HAL_USE_TIMER
+    retval += hal_timer_hid_getsize(cfg);
+#endif//HAL_USE_TIMER       
+
+#ifdef  HAL_USE_TRACE
+    retval += hal_trace_hid_getsize(cfg);
+#endif//HAL_USE_TRACE 
+
+#ifdef  HAL_USE_UNIQUEID
+    retval += hal_uniqueid_hid_getsize(cfg);
+#endif//HAL_USE_UNIQUEID 
+
+#ifdef  HAL_USE_WATCHDOG
+    retval += hal_watchdog_hid_getsize(cfg);
+#endif//HAL_USE_WATCHDOG 
+
+
+    // - devices ------------------------------------------------------------------------------------------------------
+
+#ifdef  HAL_USE_DEVICE_ACCELEROMETER
+    retval += hal_device_accelerometer_hid_getsize(cfg);
+#endif//HAL_USE_DEVICE_ACCELEROMETER  
+
+#ifdef  HAL_USE_DEVICE_CANTRANSCEIVER
+    retval += hal_device_cantransceiver_hid_getsize(cfg);
+#endif//HAL_USE_DEVICE_CANTRANSCEIVER  
+
+#ifdef  HAL_USE_DEVICE_DISPLAY
+    retval += hal_device_display_hid_getsize(cfg);
+#endif//HAL_USE_DEVICE_DISPLAY  
+
+#ifdef  HAL_USE_DEVICE_EEPROM
+    retval += hal_device_eeprom_hid_getsize(cfg);
+#endif//HAL_USE_DEVICE_EEPROM  
+
+#ifdef HAL_USE_DEVICE_ENCODER
+    retval += hal_device_encoder_hid_getsize(cfg);
+#endif//HAL_USE_DEVICE_ENCODER  
+
+#ifdef  HAL_USE_DEVICE_ETHTRANSCEIVER
+    retval += hal_device_ethtransceiver_hid_getsize(cfg);
+#endif//HAL_USE_DEVICE_ETHTRANSCEIVER  
+
+#ifdef  HAL_USE_DEVICE_GYROSCOPE
+    retval += hal_device_gyroscope_hid_getsize(cfg);
+#endif//HAL_USE_DEVICE_GYROSCOPE   
+
+#ifdef  HAL_USE_DEVICE_LED
+    retval += hal_device_led_hid_getsize(cfg);
+#endif//HAL_USE_DEVICE_LED  
+
+#ifdef HAL_USE_DEVICE_MUX
+    retval += hal_device_mux_hid_getsize(cfg);
+#endif//HAL_USE_DEVICE_MUX  
+
+#ifdef  HAL_USE_DEVICE_TERMOMETER
+    retval += hal_device_termometer_hid_getsize(cfg);
+#endif//HAL_USE_DEVICE_TERMOMETER 
+
+#ifdef  HAL_USE_DEVICE_SWITCH
+    retval += hal_device_switch_hid_getsize(cfg);
+#endif//HAL_USE_DEVICE_SWITCH 
+ 
+ 
+    // - board, hence chips -------------------------------------------------------------------------------------------
+    
+    retval += s_hal_brdcfg_chips__getsize(cfg);
+
+    // - board, hence extboards ---------------------------------------------------------------------------------------
+    
+    retval += s_hal_brdcfg_extbrds__getsize(cfg);
+
+
+    
+    return(retval);    
+        
+}
+
+
+extern hal_result_t hal_brdcfg__setmem(const hal_cfg_t *cfg, uint32_t *memory)
+{
+    if(NULL == cfg)
+    {   
+        hal_base_hid_on_fatalerror(hal_fatalerror_missingconfiguration, "hal_brdcfg__setmem() needs cfg");
+        return(hal_res_NOK_generic);
+    } 
+
+    // - utilities ----------------------------------------------------------------------------------------------------
+    
+#ifdef  HAL_USE_UTILITY_BITS
+    if(hal_res_OK != hal_utility_bits_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_utility_bits_hid_getsize(cfg)/4;
+#endif//HAL_USE_UTILITY_BITS
+
+#ifdef  HAL_USE_UTILITY_CRC07
+    if(hal_res_OK != hal_utility_crc07_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_utility_crc07_hid_getsize(cfg)/4;
+#endif//HAL_USE_UTILITY_CRC07      
+    
+#ifdef  HAL_USE_UTILITY_CRC16
+    if(hal_res_OK != hal_utility_crc16_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_utility_crc16_hid_getsize(cfg)/4;
+#endif//HAL_USE_UTILITY_CRC16    
+
+#ifdef  HAL_USE_UTILITY_CRC32
+    if(hal_res_OK != hal_utility_crc32_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_utility_crc32_hid_getsize(cfg)/4;
+#endif//HAL_USE_UTILITY_CRC32        
+    
+#ifdef  HAL_USE_UTILITY_FIFO
+    if(hal_res_OK != hal_utility_fifo_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_utility_fifo_hid_getsize(cfg)/4;
+#endif//HAL_USE_UTILITY_FIFO    
+    
+    
+#ifdef  HAL_USE_UTILITY_HEAP
+    if(hal_res_OK != hal_utility_heap_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_utility_heap_hid_getsize(cfg)/4;
+#endif//HAL_USE_UTILITY_HEAP       
+ 
+        
+    
+    // - mpu peripherals ----------------------------------------------------------------------------------------------    
+
+#ifdef  HAL_USE_CAN
+    if(hal_res_OK != hal_can_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_can_hid_getsize(cfg)/4;
+#endif//HAL_USE_CAN
+
+
+#ifdef  HAL_USE_CRC
+    if(hal_res_OK != hal_crc_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_crc_hid_getsize(cfg)/4;
+#endif//HAL_USE_CRC
+
+    
+#ifdef  HAL_USE_DMA
+    if(hal_res_OK != hal_dma_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_dma_hid_getsize(cfg)/4;
+#endif//HAL_USE_DMA    
+    
+
+#ifdef  HAL_USE_ETH
+    if(hal_res_OK != hal_eth_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_eth_hid_getsize(cfg)/4;
+#endif//HAL_USE_ETH 
+
+#ifdef  HAL_USE_FLASH
+    if(hal_res_OK != hal_flash_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_flash_hid_getsize(cfg)/4;
+#endif//HAL_USE_FLASH   
+
+#ifdef  HAL_USE_GPIO
+    if(hal_res_OK != hal_gpio_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_gpio_hid_getsize(cfg)/4;
+#endif//HAL_USE_GPIO
+    
+#ifdef  HAL_USE_I2C
+    if(hal_res_OK != hal_i2c_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_i2c_hid_getsize(cfg)/4;
+#endif//HAL_USE_I2C     
+    
+#ifdef HAL_USE_SPI
+    if(hal_res_OK != hal_spi_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_spi_hid_getsize(cfg)/4;
+#endif//HAL_USE_SPI    
+
+#ifdef HAL_USE_TIMER
+    if(hal_res_OK != hal_timer_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_timer_hid_getsize(cfg)/4;
+#endif//HAL_USE_TIMER
+
+#ifdef HAL_USE_TRACE
+    if(hal_res_OK != hal_trace_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_trace_hid_getsize(cfg)/4;
+#endif//HAL_USE_TRACE
+       
+    
+#ifdef HAL_USE_UNIQUEID
+    if(hal_res_OK != hal_uniqueid_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_uniqueid_hid_getsize(cfg)/4;
+#endif//HAL_USE_UNIQUEID    
+
+#ifdef HAL_USE_WATCHDOG
+    if(hal_res_OK != hal_watchdog_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_watchdog_hid_getsize(cfg)/4;
+#endif//HAL_USE_WATCHDOG
+
+
+    // - devices ------------------------------------------------------------------------------------------------------
+    
+    
+#ifdef HAL_USE_DEVICE_ACCELEROMETER
+    if(hal_res_OK != hal_device_accelerometer_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_device_accelerometer_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICE_ACCELEROMETER   
+
+#ifdef HAL_USE_DEVICE_CANTRANSCEIVER
+    if(hal_res_OK != hal_device_cantransceiver_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_device_cantransceiver_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICE_CANTRANSCEIVER     
+    
+#ifdef HAL_USE_DEVICE_DISPLAY
+    if(hal_res_OK != hal_device_display_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_device_display_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICE_DISPLAY
+    
+#ifdef HAL_USE_DEVICE_EEPROM
+    if(hal_res_OK != hal_device_eeprom_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_device_eeprom_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICVE_EEPROM
+  
+#ifdef HAL_USE_DEVICE_ENCODER
+    if(hal_res_OK != hal_device_encoder_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_device_encoder_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICE_ENCODER  
+    
+#ifdef HAL_USE_DEVICE_ETHTRANSCEIVER
+    if(hal_res_OK != hal_device_ethtransceiver_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_device_ethtransceiver_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICE_ETHTRANSCEIVER    
+    
+#ifdef HAL_USE_DEVICE_GYROSCOPE
+    if(hal_res_OK != hal_device_gyroscope_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_device_gyroscope_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICE_GYROSCOPE  
+    
+#ifdef  HAL_USE_DEVICE_LED
+    if(hal_res_OK != hal_device_led_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_device_led_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICE_LED
+
+#ifdef HAL_USE_DEVICE_MUX
+    if(hal_res_OK != hal_device_mux_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_device_mux_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICE_MUX   
+
+#ifdef HAL_USE_DEVICE_TERMOMETER
+    if(hal_res_OK != hal_device_termometer_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_device_termometer_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICE_TERMOMETER        
+        
+#ifdef HAL_USE_DEVICE_SWITCH
+    if(hal_res_OK != hal_device_switch_hid_setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += hal_device_switch_hid_getsize(cfg)/4;
+#endif//HAL_USE_DEVICE_SWITCH
+        
+        
+    // board (hence chips)
+    
+    if(hal_res_OK != s_hal_brdcfg_chips__setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += s_hal_brdcfg_chips__getsize(cfg)/4;    
+    
+
+    // - board, hence extborads ---------------------------------------------------------------------------------------
+    
+    if(hal_res_OK != s_hal_brdcfg_extbrds__setmem(cfg, memory))
+    {
+        return(hal_res_NOK_generic);
+    }
+    memory += s_hal_brdcfg_extbrds__getsize(cfg)/4;  
+
+    
+
+    return(hal_res_OK);        
+}
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of extern hidden functions 
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of static functions
+// --------------------------------------------------------------------------------------------------------------------
+
+static uint32_t s_hal_brdcfg_chips__getsize(const hal_cfg_t *cfg)
 {
     uint32_t retval = 0;
     
@@ -664,7 +1171,7 @@ extern uint32_t hal_brdcfg_chips__getsize(const hal_cfg_t *cfg)
 }
 
 
-extern hal_result_t hal_brdcfg_chips__setmem(const hal_cfg_t *cfg, uint32_t *memory)
+static hal_result_t s_hal_brdcfg_chips__setmem(const hal_cfg_t *cfg, uint32_t *memory)
 {
     // no memory needed
    if(NULL == memory)
@@ -718,7 +1225,7 @@ extern hal_result_t hal_brdcfg_chips__setmem(const hal_cfg_t *cfg, uint32_t *mem
 }
 
 
-extern uint32_t hal_brdcfg_extbrds__getsize(const hal_cfg_t *cfg)
+static uint32_t s_hal_brdcfg_extbrds__getsize(const hal_cfg_t *cfg)
 {
     uint32_t retval = 0;
     
@@ -730,7 +1237,7 @@ extern uint32_t hal_brdcfg_extbrds__getsize(const hal_cfg_t *cfg)
 }
 
 
-extern hal_result_t hal_brdcfg_extbrds__setmem(const hal_cfg_t *cfg, uint32_t *memory)
+static hal_result_t s_hal_brdcfg_extbrds__setmem(const hal_cfg_t *cfg, uint32_t *memory)
 {
     // no memory needed
    if(NULL == memory)
@@ -750,21 +1257,6 @@ extern hal_result_t hal_brdcfg_extbrds__setmem(const hal_cfg_t *cfg, uint32_t *m
     
     return(hal_res_OK);  
 }
-
-
-
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of extern hidden functions 
-// --------------------------------------------------------------------------------------------------------------------
-// empty-section
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of static functions
-// --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -27,8 +27,38 @@
     @date       16/11/2010
  **/
 
- // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
-#include "hal_brdcfg_modules.h"
+
+// - external dependencies --------------------------------------------------------------------------------------------
+
+#include "hal_base.h"
+
+
+// - public #define  --------------------------------------------------------------------------------------------------
+// empty-section
+  
+
+// - declaration of public user-defined types ------------------------------------------------------------------------- 
+// empty-section
+
+
+// - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
+// empty-section
+
+
+// - declaration of extern public functions ---------------------------------------------------------------------------
+
+extern uint32_t hal_brdcfg__getsize(const hal_cfg_t *cfg);
+extern hal_result_t hal_brdcfg__setmem(const hal_cfg_t *cfg, uint32_t *memory);
+
+// extern uint32_t hal_brdcfg_chips__getsize(const hal_cfg_t *cfg);
+// extern hal_result_t hal_brdcfg_chips__setmem(const hal_cfg_t *cfg, uint32_t *memory);
+
+// extern uint32_t hal_brdcfg_extbrds__getsize(const hal_cfg_t *cfg);
+// extern hal_result_t hal_brdcfg_extbrds__setmem(const hal_cfg_t *cfg, uint32_t *memory);
+
+
+
+// - other declarations which are specific to the chosen board
 
 #if   defined(HAL_BOARD_MCBSTM32C)
 	#include "mcbstm32c/hal_brdcfg_mcbstm32c.h"

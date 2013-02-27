@@ -37,6 +37,16 @@
 
 #include "hal_base.h"
 
+#include "hal_cpu.h"
+#include "hal_cpu_arc_armcm3.h"
+#include "hal_cpu_fam_stm32f1.h"
+#include "hal_cpu_hid.h"
+
+#include "hal_sys.h"
+#include "hal_sys_hid.h"
+
+
+
 
 // -- mpu peripherals
 
@@ -72,10 +82,6 @@
     #include "hal_mpu_spi_hid.h"
 #endif//HAL_USE_SPI
 
-#ifdef HAL_USE_SYS
-    #include "hal_mpu_sys_hid.h"
-#endif//HAL_USE_SYS
-
 #ifdef  HAL_USE_TIMER
     #include "hal_mpu_timer_hid.h"  
 #endif//HAL_USE_TIMER
@@ -83,6 +89,10 @@
 #ifdef  HAL_USE_TRACE
     #include "hal_mpu_trace_hid.h"  
 #endif//HAL_USE_TRACE
+
+#ifdef  HAL_USE_UNIQUEID
+    #include "hal_mpu_uniqueid_hid.h"  
+#endif//HAL_USE_UNIQUEID
 
 #ifdef  HAL_USE_WATCHDOG
     #include "hal_mpu_watchdog_hid.h"  
@@ -139,6 +149,20 @@
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
+// -- core
+
+#ifdef  HAL_USE_BASE
+    extern const hal_base_hid_brdcfg_t hal_brdcfg_base__theconfig;
+#endif//HAL_USE_BASE  
+
+#ifdef  HAL_USE_CPU
+    extern const hal_cpu_hid_brdcfg_t hal_brdcfg_cpu__theconfig;
+#endif//HAL_USE_CPU
+
+#ifdef  HAL_USE_SYS
+    extern const hal_sys_hid_brdcfg_t hal_brdcfg_sys__theconfig;
+#endif//HAL_USE_SYS 
+
 // -- mpu peripherals
 
 #ifdef  HAL_USE_CAN
@@ -172,11 +196,7 @@
 #ifdef  HAL_USE_SPI
     extern const hal_spi_hid_brdcfg_t hal_brdcfg_spi__theconfig;
 #endif//HAL_USE_SPI
-
-#ifdef  HAL_USE_SYS
-    extern const hal_sys_hid_brdcfg_t hal_brdcfg_sys__theconfig;
-#endif//HAL_USE_SYS            
-
+         
 #ifdef  HAL_USE_TIMER
     extern const hal_timer_hid_brdcfg_t hal_brdcfg_timer__theconfig;  
 #endif//HAL_USE_TIMER
@@ -184,6 +204,10 @@
 #ifdef  HAL_USE_TRACE
     extern const hal_trace_hid_brdcfg_t hal_brdcfg_trace__theconfig;  
 #endif//HAL_USE_TRACE
+
+#ifdef  HAL_USE_UNIQUEID
+    extern const hal_uniqueid_hid_brdcfg_t hal_brdcfg_uniqueid__theconfig;
+#endif//HAL_USE_UNIQUEID
 
 #ifdef  HAL_USE_WATCHDOG
     extern const hal_watchdog_hid_brdcfg_t hal_brdcfg_watchdog__theconfig;
@@ -239,12 +263,7 @@
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
-
-extern uint32_t hal_brdcfg_chips__getsize(const hal_cfg_t *cfg);
-extern hal_result_t hal_brdcfg_chips__setmem(const hal_cfg_t *cfg, uint32_t *memory);
-
-extern uint32_t hal_brdcfg_extbrds__getsize(const hal_cfg_t *cfg);
-extern hal_result_t hal_brdcfg_extbrds__setmem(const hal_cfg_t *cfg, uint32_t *memory);
+// empty-section
 
 
 

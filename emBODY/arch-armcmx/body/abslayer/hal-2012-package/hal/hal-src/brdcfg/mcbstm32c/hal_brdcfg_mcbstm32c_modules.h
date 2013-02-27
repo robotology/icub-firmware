@@ -32,9 +32,18 @@
 
 // - modules to be built ----------------------------------------------------------------------------------------------
 
-// -- mpu
-#define     HAL_USE_ARCH
+// -- core: must be always defined
 #define     HAL_USE_BASE
+#define     HAL_USE_CPU
+#define     HAL_USE_SYS
+
+// -- cpu: define one ARC, FAM, and NAM
+#define     HAL_USE_CPU_ARC_ARMCM3
+#define     HAL_USE_CPU_FAM_STM32F1
+#define     HAL_USE_CPU_NAM_STM32F107
+
+
+// -- mpu peripherals: define what you need to use (beware of cross dependencies)
 #define     HAL_USE_CAN
 #define     HAL_USE_CRC
 #define     HAL_USE_DMA
@@ -43,12 +52,12 @@
 #define     HAL_USE_GPIO
 #define     HAL_USE_I2C
 #define     HAL_USE_SPI
-#define     HAL_USE_SYS
 #define     HAL_USE_TIMER
 #define     HAL_USE_TRACE
+#define     HAL_USE_UNIQUEID
 #define     HAL_USE_WATCHDOG
 
-// -- devices
+// -- devices: define what you need to use (beware of cross dependencies from mpu peripherals and amongst devices)
 #undef  HAL_USE_DEVICE_ACCELEROMETER
 #define     HAL_USE_DEVICE_CANTRANSCEIVER
 #undef  HAL_USE_DEVICE_DISPLAY  
@@ -63,7 +72,7 @@
 
 
 
-// -- utilities
+// -- utilities: define what you need to use (beware that most of mpu peripheral modules use BITS and some use FIFO)
 #define     HAL_USE_UTILITY_BITS
 #define     HAL_USE_UTILITY_CRC07
 #define     HAL_USE_UTILITY_CRC16
@@ -72,14 +81,14 @@
 #define     HAL_USE_UTILITY_HEAP
 
 
-// -- chips
+// -- chips: define what you need to use
 #define     HAL_USE_CHIP_GENERIC_ETHTRANSCEIVER
 #undef  HAL_USE_CHIP_ST_L3G4200D
 #undef  HAL_USE_CHIP_ST_LIS3DH
 #undef  HAL_USE_CHIP_MICREL_KS8893
 #define     HAL_USE_CHIP_XX_EEPROM
 
-// -- external boards
+// -- external boards: define what you need to use
 #undef     HAL_USE_EXTBRD_KEIL_MCBQVGA
 
 
@@ -111,7 +120,7 @@
 #endif//HAL_SLIM_MODE
 
 // - cross dependencies -----------------------------------------------------------------------------------------------
-
+// not managed ... 
 
 
 
