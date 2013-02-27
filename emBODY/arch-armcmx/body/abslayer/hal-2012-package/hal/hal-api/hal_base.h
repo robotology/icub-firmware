@@ -223,8 +223,8 @@ typedef struct
 } hal_extfn_cfg_t;
 
 
-/** @typedef    typedef struct hal_cfg_t 
-    @brief      hal_cfg_t contains a basic hal configuration able to run the hal-core. other modules shall use proper
+/** @typedef    typedef struct hal_base_cfg_t 
+    @brief      hal_base_cfg_t contains a basic hal configuration. other modules shall use proper
                 configuration data structures.
  **/  
 typedef struct
@@ -232,7 +232,7 @@ typedef struct
     uint32_t        stacksize;                  /**< The size of stack available to the system in bytes     */
     uint32_t        heapsize;                   /**< The size of heap available to the system in bytes      */
     hal_extfn_cfg_t extfn;                      /**< External functionalities offered to the HAL            */
-} hal_cfg_t;
+} hal_base_cfg_t;
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
@@ -241,7 +241,7 @@ typedef struct
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn         extern uint32_t hal_base_memory_getsize(const hal_cfg_t *cfg, uint32_t *size04aligned)
+/** @fn         extern uint32_t hal_base_memory_getsize(const hal_base_cfg_t *cfg, uint32_t *size04aligned)
     @brief      Gets the size of the 4-aligned memory required by the hal in order to work according to a given
                 configuration. 
     @param      cfg             The target configuration. 
@@ -249,16 +249,16 @@ typedef struct
     @return     The number of bytes of the 4bytes-aligned RAM which is required
 
  **/
-extern uint32_t hal_base_memory_getsize(const hal_cfg_t *cfg, uint32_t *size04aligned);
+extern uint32_t hal_base_memory_getsize(const hal_base_cfg_t *cfg, uint32_t *size04aligned);
 
 
-/** @fn         extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04aligned)
+/** @fn         extern hal_result_t hal_base_initialise(const hal_base_cfg_t *cfg, uint32_t *data04aligned)
     @brief      Initialise the hal to work for a given configuration and with a given external memory.
     @param      cfg             The target configuration. 
     @param      data04aligned   The 4bytes-aligned RAM which is required, or NULL if none is required.
     @return     hal_res_OK or hal_res_NOK_generic 
  **/
-extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04aligned); 
+extern hal_result_t hal_base_initialise(const hal_base_cfg_t *cfg, uint32_t *data04aligned); 
 
 
 
