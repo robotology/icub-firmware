@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
+ * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Valentina Gaggero, Marco Accame
  * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
@@ -16,16 +16,15 @@
  * Public License for more details
 */
 
-
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_MPU_ARCH_HID_H_
-#define _HAL_MPU_ARCH_HID_H_
+#ifndef _HAL_MPU_UNIQUEID_HID_H_
+#define _HAL_MPU_UNIQUEID_HID_H_
 
 
-/* @file       hal_mpu_arch_hid.h
-    @brief      This header file implements hidden interface to parts of hal specifics of architecture
+/* @file       hal_mpu_uniqueid_hid.h
+    @brief      This header file implements hidden interface to a uniqueid
     @author     marco.accame@iit.it
-    @date       09/19/2011
+    @date       02/27/2013
  **/
 
 
@@ -36,26 +35,40 @@
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_arch_arm.h"
+#include "hal_uniqueid.h"
 
 
-// - #define used with hidden structs ---------------------------------------------------------------------------------
+
+// - #define used with hidden struct ----------------------------------------------------------------------------------
 // empty-section
 
-// - definition of hidden structs -------------------------------------------------------------------------------------
-// empty-section
+
+// - definition of the hidden struct implementing the object ----------------------------------------------------------
+
+typedef enum
+{
+    hal_uniqueid_id64bit        = 0,
+    hal_uniqueid_macaddr        = 1
+} hal_uniqueid_hid_id_t;
+
+enum { hal_uniqueid_hid_ids_num = 2 };
+
+typedef struct
+{
+    uint8_t                 supported_mask;
+    uint32_t                macoui;
+} hal_uniqueid_hid_brdcfg_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 // empty-section
 
-
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern uint32_t hal_arch_arm_hid_getsize(const hal_cfg_t *cfg);
-extern hal_result_t hal_arch_arm_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory);
+extern uint32_t hal_uniqueid_hid_getsize(const hal_cfg_t *cfg);
 
-// - definition of extern hidden inline functions ---------------------------------------------------------------------
-// empty-section
+extern hal_result_t hal_uniqueid_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory);
+
+
 
 #endif  // include guard
 

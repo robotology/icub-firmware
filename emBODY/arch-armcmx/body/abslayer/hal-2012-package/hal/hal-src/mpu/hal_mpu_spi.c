@@ -209,9 +209,9 @@ static const SPI_InitTypeDef s_hal_spi_stm32_cfg =
 //#warning --> display usa SPI_CPHA_2Edge ma prima avevo messo SPI_CPHA_1Edge
 #warning HAL-WIP --> verify if the internal s_hal_spi_stm32_cfg used for spi stm32fx config is the same used in hal1 for encoders
 
-#if     defined(USE_STM32F1)
+#if     defined(HAL_USE_CPU_FAM_STM32F1)
 static SPI_TypeDef* const s_hal_spi_stmSPImap[] = { SPI1, SPI2, SPI3 };
-#elif   defined(USE_STM32F4)
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)
 static SPI_TypeDef* const s_hal_spi_stmSPImap[] = { SPI1, SPI2, SPI3 };
 #endif
 
@@ -219,22 +219,22 @@ static const uint32_t s_hal_spi_hw_rcc[] = { RCC_APB2Periph_SPI1, RCC_APB1Periph
 
 static const uint32_t s_hal_spi_timeout_flag = 0x00010000;
 
-#if     defined(USE_STM32F1)
+#if     defined(HAL_USE_CPU_FAM_STM32F1)
     // on stm32f1 connectivity line: spi1rx/tx is on dma1chn2/chn3,  spi2rx/tx is on dma1chn4/chn5,  spi3rx/tx is on dma2chn1/chn2
     static const hal_dma_port_t s_hal_spi_dma_port2use_rx[hal_spi_ports_number] = { hal_dma_port2, hal_dma_port4, hal_dma_port8 };
     static const hal_dma_port_t s_hal_spi_dma_port2use_tx[hal_spi_ports_number] = { hal_dma_port3, hal_dma_port5, hal_dma_port9 };
-#elif   defined(USE_STM32F4)
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)
 
     #error to be done
     
 #endif
     
     
-// #if     defined(USE_STM32F1)
+// #if     defined(HAL_USE_CPU_FAM_STM32F1)
 //     #warning --> use low speed bus values .. defined in brdcfg
 //     const uint32_t HIGHSPEED = 72000000;
 //     const uint32_t LOWSPEED  = 36000000;
-// #elif   defined(USE_STM32F4)
+// #elif   defined(HAL_USE_CPU_FAM_STM32F4)
 //         TODO ...
 // #endif
     
@@ -702,10 +702,10 @@ static hal_bool_t s_hal_spi_is_speed_correct(int32_t speed)
     {
         return(hal_true);
     }
-#if     defined(USE_STM32F1) 
+#if     defined(HAL_USE_CPU_FAM_STM32F1) 
     int32_t v = speed % (int32_t)hal_spi_speed_0562kbps;
     return((0 == v) ? (hal_true) : (hal_false));
-#elif   defined(USE_STM32F4)  
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)  
     int32_t v = speed % (int32_t)hal_spi_speed_0652kbps;
     return((0 == v) ? (hal_true) : (hal_false));
 #endif
@@ -715,7 +715,7 @@ static hal_bool_t s_hal_spi_is_speed_correct(int32_t speed)
 
 static void s_hal_spi_hw_init(hal_spi_port_t port)
 {
-#if     defined(USE_STM32F1) || defined(USE_STM32F4)
+#if     defined(HAL_USE_CPU_FAM_STM32F1) || defined(HAL_USE_CPU_FAM_STM32F4)
 
     //uint32_t RCC_APB1Periph_SPIx = (hal_spi_port1 == port) ? (RCC_APB1Periph_SPI1) : (RCC_APB1Periph_SPI2); RCC_APB1Periph_SPI3
         
@@ -765,7 +765,7 @@ static void s_hal_spi_hw_init(hal_spi_port_t port)
 static void s_hal_spi_hw_gpio_init(hal_spi_port_t port, hal_spi_ownership_t ownership)
 {
     
-#if     defined(USE_STM32F1)
+#if     defined(HAL_USE_CPU_FAM_STM32F1)
 
     static const GPIO_InitTypeDef  s_hal_spi_sckmosi_master_altcfg  =
     {
@@ -874,7 +874,7 @@ static void s_hal_spi_hw_gpio_init(hal_spi_port_t port, hal_spi_ownership_t owne
     hal_gpio_configure(hal_brdcfg_spi__theconfig.gpio_mosi[HAL_spi_port2index(port)], &hal_spi_mosi_altcfg);
 
 
-#elif   defined(USE_STM32F4)    
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)    
 
     static const GPIO_InitTypeDef  s_hal_spi_misomosisck_altcfg  =
     {
@@ -1009,7 +1009,7 @@ static void s_hal_spi_hw_gpio_init(hal_spi_port_t port, hal_spi_ownership_t owne
 
 static void s_hal_spi_hw_enable(hal_spi_port_t port, const hal_spi_cfg_t* cfg)
 {
-#if     defined(USE_STM32F1) || defined(USE_STM32F4)
+#if     defined(HAL_USE_CPU_FAM_STM32F1) || defined(HAL_USE_CPU_FAM_STM32F4)
     
     SPI_TypeDef* SPIx = HAL_spi_port2stmSPI(port);
     uint16_t prescaler_stm32fx = 0;
@@ -1079,7 +1079,7 @@ static void s_hal_spi_hw_enable(hal_spi_port_t port, const hal_spi_cfg_t* cfg)
         
         // remember that hal_spi_prescaler_xxx is referred to high speed bus, 
         // and prescaler_stm32fx to high speed bus for spi1 but to low speed for spi2 and spi3
-        uint16_t factor = (hal_spi_port1 == port) ? (hal_brdcfg_sys__theconfig.speeds.fastbus / cfg->speed) : (hal_brdcfg_sys__theconfig.speeds.slowbus / cfg->speed);
+        uint16_t factor = (hal_spi_port1 == port) ? (hal_brdcfg_cpu__theconfig.speeds.fastbus / cfg->speed) : (hal_brdcfg_cpu__theconfig.speeds.slowbus / cfg->speed);
         
         switch(factor)
         {

@@ -85,6 +85,8 @@ typedef struct
     hal_eth_hid_mif_t           mif;                /**< always rmii  */
     hal_eth_hid_gpio_mif_t      gpio_mif;    
     hal_eth_hid_gpio_smi_t      gpio_smi;
+//    uint8_t                     numofdmatxbuffers;
+//    uint8_t                     numofdmarxbuffers;
 } hal_eth_hid_brdcfg_t;
 
 

@@ -53,6 +53,9 @@ typedef struct
     uint8_t             supported_mask;                 /**< bit in position hal_can_portx must be 1 if portx is supported */
     hal_gpio_cfg_t      gpio_rx[hal_can_ports_num];     /**< in position hal_can_portx there is configuration of gpio used for canx rx pin */
     hal_gpio_cfg_t      gpio_tx[hal_can_ports_num];     /**< in position hal_can_portx there is configuration of gpio used for canx tx pin */
+//    uint8_t             numofframesinrxqnorm[hal_can_ports_num];
+//    uint8_t             numofframesintxqnorm[hal_can_ports_num];
+//    uint8_t             numofframesintxqprio[hal_can_ports_num];
 } hal_can_hid_brdcfg_t;
 
 

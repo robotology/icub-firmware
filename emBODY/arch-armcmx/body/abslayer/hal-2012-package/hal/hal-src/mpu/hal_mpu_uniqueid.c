@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
+ * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Valentina Gaggero, Marco Accame
  * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
@@ -16,33 +16,42 @@
  * Public License for more details
 */
 
-/* @file       hal_mpu_arch.c
-	@brief      This file keeps internal implementation of parts of hal specifics of architecture.
+/* @file       hal_uniqueid.c
+	@brief      This file implements internal implementation of the hal uniqueid module.
 	@author     marco.accame@iit.it
-    @date       09/16/2011
+    @date       02/27/2013
 **/
+
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_ARCH
+#ifdef HAL_USE_UNIQUEID
+
+
+#if     defined(HAL_USE_CPU_FAM_STM32F1)
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)
+#warning WIP --> verify that the uniqueid peripheral is the same in stm32f1 and stm32f4
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "string.h"
 #include "stdlib.h"
 #include "hal_base_hid.h" 
+#include "hal_brdcfg.h"
+#include "hal_utility_bits.h" 
 
-
-
+#include "hal_mpu_stm32xx_include.h" 
 
  
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_arch_arm.h"
+#include "hal_uniqueid.h"
 
 
 
@@ -50,15 +59,23 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_mpu_arch_hid.h"
+#include "hal_mpu_uniqueid_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+#define HAL_uiniqueid2index(t)              ((uint8_t)((t)))
 
 
+#if   defined(HAL_USE_CPU_FAM_STM32F1)
+    #define HAL_MPU_UNIQUEID_UniqueDeviceID96_baseaddress 0x1FFFF7E8
+#elif defined(HAL_USE_CPU_FAM_STM32F4)
+    #define HAL_MPU_UNIQUEID_UniqueDeviceID96_baseaddress 0x1FFF7A10
+#else
+    #error --> u must define an MPU
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -69,26 +86,24 @@
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#if   defined(HAL_MPU_STM32F107)
-    #define HAL_ARCH_ARM_UniqueDeviceID96_baseaddress 0x1FFFF7E8
-#elif defined(HAL_MPU_STM32F407)
-    #define HAL_ARCH_ARM_UniqueDeviceID96_baseaddress 0x1FFF7A10
-#else
-    #error --> u must define an MPU
-#endif
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+static hal_boolval_t s_hal_uniqueid_supported_is(hal_uniqueid_hid_id_t uniqueid);
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+const hal_uniqueid_cfg_t hal_uniqueid_cfg_default =
+{
+    .dummy                  = 0
+};
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -96,20 +111,72 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern hal_arch_arm_uniqueid64_t hal_arch_arm_uniqueid64_get(void)
+extern hal_result_t hal_uniqueid_init(const hal_uniqueid_cfg_t *cfg)
 {
-    uint64_t val = *((const uint64_t *) (HAL_ARCH_ARM_UniqueDeviceID96_baseaddress));
-    val += *((const uint32_t *) (HAL_ARCH_ARM_UniqueDeviceID96_baseaddress+8));
+    hal_result_t res = hal_res_NOK_generic;
+
+//    if(hal_false == s_hal_uniqueid_supported_is(uniqueid))
+//    {
+//        return(hal_res_NOK_unsupported);
+//    }
+
+     
+//    if(NULL == cfg)
+//    {
+//        cfg = &hal_uniqueid_cfg_default;
+//    }
+
+    
+    // nothing to configure
+    
+    res = hal_res_OK;
+   
+//    if(hal_res_OK == res)
+//    {
+//        s_hal_uniqueid_initted_set(uniqueid);
+//    }
+
+    return(res);
+}
+
+
+extern hal_uniqueid_id64bit_t hal_uniqueid_id64bit_get(void)
+{
+     if(hal_false == s_hal_uniqueid_supported_is(hal_uniqueid_id64bit))
+    {
+        return(hal_NA64);
+    } 
+    
+    uint64_t val = *((const uint64_t *) (HAL_MPU_UNIQUEID_UniqueDeviceID96_baseaddress));
+    val += *((const uint32_t *) (HAL_MPU_UNIQUEID_UniqueDeviceID96_baseaddress+8));
     if((0xFFFFFFFFFFFFFFFF+0xFFFFFFFF) == val)
-    {   // 0xFFFFFFFE is the result when all the 96 bits have value 1 (some old versions of stm32f107 have such a hw bug)
+    {   // 0xFFFFFFFE (=0xFFFFFFFFFFFFFFFF+0xFFFFFFFF) is the result when all the 96 bits have value 1 (some old versions of stm32f107 have such a hw bug)
         return(hal_NA64);
     }
     else
     {
         return(val);
-    }
+    }    
+
 }
 
+
+extern hal_uniqueid_id64bit_t hal_uniqueid_macaddr_get(void)
+{
+     if(hal_false == s_hal_uniqueid_supported_is(hal_uniqueid_macaddr))
+    {
+        return(hal_NA64);
+    } 
+    
+
+#if defined(HAL_BOARD_EMS004)
+    #warning WIP --> must define the mac retrieval for ems004
+    return(hal_NA64);
+#else
+    return(hal_NA64);
+#endif    
+
+}
 
 
 
@@ -123,14 +190,13 @@ extern hal_arch_arm_uniqueid64_t hal_arch_arm_uniqueid64_get(void)
 // ---- isr of the module: end ------
 
 
-
-extern uint32_t hal_arch_arm_hid_getsize(const hal_cfg_t *cfg)
-{   
+extern uint32_t hal_uniqueid_hid_getsize(const hal_cfg_t *cfg)
+{
     // no memory needed
     return(0);
 }
 
-extern hal_result_t hal_arch_arm_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_uniqueid_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
 {
     // no memory needed
 //    if(NULL == memory)
@@ -138,19 +204,26 @@ extern hal_result_t hal_arch_arm_hid_setmem(const hal_cfg_t *cfg, uint32_t *memo
 //        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
 //        return(hal_res_NOK_generic);
 //    }
-    return(hal_res_OK); 
-}
 
+    // removed dependancy from NZI ram
+
+    return(hal_res_OK);  
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+static hal_boolval_t s_hal_uniqueid_supported_is(hal_uniqueid_hid_id_t uniqueid)
+{
+    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_uniqueid__theconfig.supported_mask, HAL_uiniqueid2index(uniqueid)));
+}
 
 
 
 
-#endif//HAL_USE_ARCH
+
+#endif//HAL_USE_UNIQUEID
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

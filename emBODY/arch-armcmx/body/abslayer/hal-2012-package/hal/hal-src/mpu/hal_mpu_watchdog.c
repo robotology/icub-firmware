@@ -29,8 +29,8 @@
 #ifdef HAL_USE_WATCHDOG
 
 
-#if     defined(USE_STM32F1)
-#elif   defined(USE_STM32F4)
+#if     defined(HAL_USE_CPU_FAM_STM32F1)
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)
 #warning WIP --> verify that the watchdog peripheral is the same in stm32f1 and stm32f4
 #endif
 
@@ -41,7 +41,6 @@
 #include "string.h"
 #include "stdlib.h"
 #include "hal_base_hid.h" 
-#include "hal_mpu_sys_hid.h"
 #include "hal_brdcfg.h"
 #include "hal_utility_bits.h" 
 

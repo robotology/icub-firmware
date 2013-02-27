@@ -40,7 +40,6 @@
 #include "hal_brdcfg.h"
 #include "hal_base_hid.h" 
 #include "hal_mpu_gpio_hid.h" 
-#include "hal_mpu_sys_hid.h"
 #include "hal_utility_fifo.h"
 #include "hal_utility_bits.h" 
 
@@ -67,9 +66,9 @@
 #define HAL_dma_port2peripheral(p)      (s_hal_dma_memory_mapping_of_ports[HAL_dma_port2index(p)])
 
 
-#if     defined(USE_STM32F1)
+#if     defined(HAL_USE_CPU_FAM_STM32F1)
 
-#elif    defined(USE_STM32F4)
+#elif    defined(HAL_USE_CPU_FAM_STM32F4)
 
 #endif
 
@@ -90,9 +89,9 @@ typedef struct
 {
     hal_dma_cfg_t           cfg;
     DMA_InitTypeDef         stm32dmainit;
-#if     defined(USE_STM32F1)    
+#if     defined(HAL_USE_CPU_FAM_STM32F1)    
     DMA_Channel_TypeDef*    stm32dmaperiph;
-#elif   defined(USE_STM32F4)   
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)   
     DMA_Stream_TypeDef*     stm32dmaperiph;
 #endif    
 //    void*                   source;
@@ -130,7 +129,7 @@ static void s_hal_dma_isr_clear_flag(hal_dma_port_t port);
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#if     defined(USE_STM32F1)
+#if     defined(HAL_USE_CPU_FAM_STM32F1)
 static DMA_Channel_TypeDef* const s_hal_dma_memory_mapping_of_ports[hal_dma_ports_num] = 
 {
     DMA1_Channel1, DMA1_Channel2, DMA1_Channel3, DMA1_Channel4, DMA1_Channel5, DMA1_Channel6, DMA1_Channel7,
@@ -158,7 +157,7 @@ static const IRQn_Type s_hal_dma_irqnumber[hal_dma_ports_num] =
     DMA2_Channel1_IRQn, DMA2_Channel2_IRQn, DMA2_Channel3_IRQn, DMA2_Channel4_IRQn, DMA2_Channel5_IRQn,   
     UsageFault_IRQn, UsageFault_IRQn, UsageFault_IRQn, UsageFault_IRQn // use UsageFault_IRQn when there is no dma port available
 };
-#elif   defined(USE_STM32F4)
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)
            
 static DMA_Stream_TypeDef* const s_hal_dma_memory_mapping_of_ports[hal_dma_ports_num] = 
 {
@@ -236,14 +235,14 @@ extern hal_result_t hal_dma_init(hal_dma_port_t port, const hal_dma_cfg_t *cfg)
     
     // enable the peripheral clock
     
-#if     defined(USE_STM32F1)
+#if     defined(HAL_USE_CPU_FAM_STM32F1)
     RCC_AHBPeriphClockCmd(s_hal_dma_periphclocks[HAL_dma_port2index(port)], ENABLE);
-#elif    defined(USE_STM32F4)
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)
     RCC_AHB1PeriphResetCmd(s_hal_dma_periphclocks[HAL_dma_port2index(port)], ENABLE);
 #endif    
  
-#if     defined(USE_STM32F1)
-#elif    defined(USE_STM32F4)
+#if     defined(HAL_USE_CPU_FAM_STM32F1)
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)
     #error --> verifica nel progetto stm32f4x spi con dam come viene inizializzato il dma. vedi anche i registri poiche' sono diversi dal stm32f1  
 #endif  
     
@@ -251,7 +250,7 @@ extern hal_result_t hal_dma_init(hal_dma_port_t port, const hal_dma_cfg_t *cfg)
     
     
     // set stm32dmainit
-#if     defined(USE_STM32F1)    
+#if     defined(HAL_USE_CPU_FAM_STM32F1)    
     dmaportdata->stm32dmainit.DMA_PeripheralBaseAddr    = (uint32_t)cfg->source;
     dmaportdata->stm32dmainit.DMA_MemoryBaseAddr        = (uint32_t)cfg->destin;
     dmaportdata->stm32dmainit.DMA_DIR                   = (hal_dma_transfer_per2mem == cfg->transfer) ? (DMA_DIR_PeripheralSRC) : (DMA_DIR_PeripheralDST);
@@ -263,7 +262,7 @@ extern hal_result_t hal_dma_init(hal_dma_port_t port, const hal_dma_cfg_t *cfg)
     dmaportdata->stm32dmainit.DMA_Mode                  = DMA_Mode_Normal;
     dmaportdata->stm32dmainit.DMA_Priority              = DMA_Priority_VeryHigh; // or decide which priority is given
     dmaportdata->stm32dmainit.DMA_M2M                   = DMA_M2M_Disable; // or DMA_M2M_Enable in memory2memory
-#elif    defined(USE_STM32F4)
+#elif    defined(HAL_USE_CPU_FAM_STM32F4)
     dmaportdata->stm32dmainit.DMA_Channel               = DMA_Channel_0;
     #warning --> VERIFICA SE DMA_Channel_0 va bene oppure cosa ...
     dmaportdata->stm32dmainit.DMA_PeripheralBaseAddr    = (uint32_t)cfg->source;
@@ -431,9 +430,9 @@ extern hal_result_t hal_dma_destin_set(hal_dma_port_t port, void* destin)
     if(NULL != destin)
     {
         dmaportdata->cfg.destin                         = destin;
-#if     defined(USE_STM32F1)    
+#if     defined(HAL_USE_CPU_FAM_STM32F1)    
         dmaportdata->stm32dmainit.DMA_MemoryBaseAddr    = (uint32_t)dmaportdata->cfg.destin;
-#elif   defined(USE_STM32F4)   
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)   
         dmaportdata->stm32dmainit.DMA_Memory0BaseAddr   = (uint32_t)dmaportdata->cfg.destin;
 #endif                           
     }  
@@ -442,10 +441,10 @@ extern hal_result_t hal_dma_destin_set(hal_dma_port_t port, void* destin)
     
     DMA_Cmd(dmaportdata->stm32dmaperiph, DISABLE);
     
-#if     defined(USE_STM32F1)    
+#if     defined(HAL_USE_CPU_FAM_STM32F1)    
     dmaportdata->stm32dmaperiph->CMAR   = dmaportdata->stm32dmainit.DMA_MemoryBaseAddr;
     dmaportdata->stm32dmaperiph->CNDTR  = dmaportdata->stm32dmainit.DMA_BufferSize;
-#elif   defined(USE_STM32F4)   
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)   
     dmaportdata->stm32dmaperiph->CMAR   = dmaportdata->stm32dmainit.DMA_MemoryBaseAddr;
     dmaportdata->stm32dmaperiph->CNDTR  = dmaportdata->stm32dmainit.DMA_BufferSize;
 #endif           
@@ -462,7 +461,7 @@ extern hal_result_t hal_dma_destin_set(hal_dma_port_t port, void* destin)
 
 // ---- isr of the module: begin ----
 
-#if     defined(USE_STM32F1)
+#if     defined(HAL_USE_CPU_FAM_STM32F1)
 
 void DMA1_Channel1_IRQHandler(void)
 {
@@ -524,7 +523,7 @@ void DMA2_Channel5_IRQHandler(void)
     s_hal_dma_isr_portx(hal_dma_port12);
 }
 
-#elif   defined(USE_STM32F4)
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)
 
 void DMA1_Stream0_IRQHandler(void)
 {
@@ -748,9 +747,9 @@ static void s_hal_dma_hw_nvic_init(hal_dma_port_t port)
 
 static void s_hal_dma_isr_clear_flag(hal_dma_port_t port) 
 {
-#if     defined(USE_STM32F1)
+#if     defined(HAL_USE_CPU_FAM_STM32F1)
     DMA_ClearFlag(s_hal_dma_irqflag_gl[HAL_dma_port2index(port)]);
-#elif   defined(USE_STM32F4)    
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)    
     DMA_ClearFlag(s_hal_dma_memory_mapping_of_ports[HAL_dma_port2index(port)], s_hal_dma_irqflag_gl[HAL_dma_port2index(port)]);
 #endif
 }

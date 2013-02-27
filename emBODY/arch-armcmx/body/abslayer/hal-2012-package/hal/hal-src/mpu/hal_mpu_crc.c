@@ -345,7 +345,7 @@ static hal_result_t s_hal_crc_hw_init(hal_crc_info_t *info)
 {
     info->initialvalue = 0xffffffff;
 
-#if defined(USE_STM32F4)
+#if defined(HAL_USE_CPU_FAM_STM32F4)
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_CRC, ENABLE);
 #endif
     return(hal_res_OK);

@@ -98,7 +98,7 @@ static hal_result_t s_hal_gpio_altfun_configure(hal_gpio_cfg_t cfg, const hal_gp
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-#if     defined(USE_STM32F1)
+#if     defined(HAL_USE_CPU_FAM_STM32F1)
 
 const uint8_t hal_gpio_hid_maxports = 7;
 
@@ -133,7 +133,7 @@ const uint16_t  hal_gpio_hid_pins[]         =         { GPIO_Pin_0,  GPIO_Pin_1,
                                                         GPIO_Pin_8,  GPIO_Pin_9,  GPIO_Pin_10, GPIO_Pin_11,
                                                         GPIO_Pin_12, GPIO_Pin_13, GPIO_Pin_14, GPIO_Pin_15 }; 
 
-#elif   defined(USE_STM32F4)
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)
 
 const uint8_t hal_gpio_hid_maxports = 9;
 
@@ -212,14 +212,14 @@ extern hal_result_t hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_
     
     if(hal_gpio_dirOUT == dir)
     {
-#if     defined(USE_STM32F1)
+#if     defined(HAL_USE_CPU_FAM_STM32F1)
         // enable GPIO clock 
         RCC_APB2PeriphClockCmd(hal_gpio_hid_clocks[port], ENABLE);    
         // Configure the GPIO pin
         GPIO_InitStructure.GPIO_Pin     = (uint16_t)(0x0001 << pin);
         GPIO_InitStructure.GPIO_Speed   = (GPIOSpeed_TypeDef)hal_gpio_hid_speeds[(uint8_t)speed];
         GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_Out_PP;
-#elif   defined(USE_STM32F4)
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)
         // enable GPIO clock 
         RCC_AHB1PeriphClockCmd(hal_gpio_hid_clocks[port], ENABLE);    
         // Configure the GPIO pin
@@ -236,13 +236,13 @@ extern hal_result_t hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_
     } 
     else if(hal_gpio_dirINP == dir)
     {
-#if     defined(USE_STM32F1)
+#if     defined(HAL_USE_CPU_FAM_STM32F1)
         // enable GPIO clock
         RCC_APB2PeriphClockCmd(hal_gpio_hid_clocks[port], ENABLE);
         // configure pin as input floating
         GPIO_InitStructure.GPIO_Pin     = (uint16_t)(0x0001 << pin);
         GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_IN_FLOATING;
-#elif   defined(USE_STM32F4)    
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)    
         // enable GPIO clock                  
         RCC_AHB1PeriphClockCmd(hal_gpio_hid_clocks[port], ENABLE);        
         /// configure pin as input floating
@@ -309,10 +309,10 @@ extern hal_gpio_val_t hal_gpio_getval(hal_gpio_port_t port, hal_gpio_pin_t pin)
 
 extern void hal_gpio_quickest_setval(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_gpio_val_t val)
 {
-#if     defined(USE_STM32F1)
+#if     defined(HAL_USE_CPU_FAM_STM32F1)
     volatile uint32_t* outvalreg = (hal_gpio_valLOW == val) ?  (&hal_gpio_hid_ports[port]->BRR) : (&hal_gpio_hid_ports[port]->BSRR);      
     *outvalreg |= (1<<pin);
-#elif   defined(USE_STM32F4)
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)
    volatile uint16_t* outcmdreg = (hal_gpio_valLOW == val) ?  (&hal_gpio_hid_ports[port]->BSRRH) : (&hal_gpio_hid_ports[port]->BSRRL); 
     *outcmdreg  = (1<<pin);
 #endif    
@@ -437,7 +437,7 @@ static hal_result_t s_hal_gpio_altfun_configure(hal_gpio_cfg_t cfg, const hal_gp
         GPIO_InitStructure.GPIO_Speed = GPIO_InitStructure.GPIO_Speed;
     }
     
-#if     defined(USE_STM32F1)    
+#if     defined(HAL_USE_CPU_FAM_STM32F1)    
     // enable gpio clock and its its afio clock
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO | hal_gpio_hid_clocks[cfg.port], ENABLE);    
     // init the gpio
@@ -447,7 +447,7 @@ static hal_result_t s_hal_gpio_altfun_configure(hal_gpio_cfg_t cfg, const hal_gp
     {
         GPIO_PinRemapConfig(altcfg->afname, (FunctionalState)altcfg->afmode);   
     }        
-#elif   defined(USE_STM32F4)  
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)  
     // enable gpio clock
     RCC_AHB1PeriphClockCmd(hal_gpio_hid_clocks[cfg.port], ENABLE);
     // init the gpio

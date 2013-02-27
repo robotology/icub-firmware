@@ -34,9 +34,9 @@
 #include "string.h"
 #include "stdlib.h"
 #include "hal_base_hid.h" 
-#include "hal_mpu_sys_hid.h"
 #include "hal_brdcfg.h"
 #include "hal_utility_bits.h" 
+#include "hal_utility_heap.h"
 
 
 #include "hal_mpu_stm32xx_include.h" 
@@ -65,17 +65,18 @@
 #define HAL_timer_t2index(t)           ((uint8_t)((t)))
 
 
-#if     defined(USE_STM32F1)
+#if     defined(HAL_USE_CPU_FAM_STM32F1)
     #define TIM1_IRQn           TIM1_UP_IRQn
     #define TIM1_IRQHandler     TIM1_UP_IRQHandler
     #define TIM6_IRQn           TIM6_IRQn
     #define TIM6_IRQHandler     TIM6_DAC_IRQHandler
-#elif   defined(USE_STM32F4)
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)
     #define TIM1_IRQn           TIM1_UP_TIM10_IRQn
     #define TIM1_IRQHandler     TIM1_UP_TIM10_IRQHandler
     #define TIM6_IRQn           TIM6_DAC_IRQn
     #define TIM6_IRQHandler     TIM6_DAC_IRQHandler
 #endif
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -100,7 +101,7 @@ typedef struct
     uint16_t                    period;     // fixed for every architecture
     uint16_t                    prescaler;  // fixed for every architecture
     uint32_t                    tick_ns;    
-} hal_timer_datastructure_t;
+} hal_timer_internals_t;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -174,7 +175,7 @@ static const hal_timer_stm32_regs_t s_hal_timer_stm32regs[hal_timers_num] =
     }
 };
 
-static hal_timer_datastructure_t * s_hal_timer_info[hal_timers_num] = { NULL };
+static hal_timer_internals_t* s_hal_timer_internals[hal_timers_num] = { NULL };
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -184,14 +185,9 @@ static hal_timer_datastructure_t * s_hal_timer_info[hal_timers_num] = { NULL };
 
 extern hal_result_t hal_timer_init(hal_timer_t timer, const hal_timer_cfg_t *cfg, hal_time_t *error)
 {
-    hal_timer_datastructure_t *info = s_hal_timer_info[HAL_timer_t2index(timer)];    
+    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer_t2index(timer)];    
 
     if(hal_false == s_hal_timer_supported_is(timer))
-    {
-        return(hal_res_NOK_generic);
-    }
-
-    if(NULL == info)
     {
         return(hal_res_NOK_generic);
     }
@@ -215,8 +211,14 @@ extern hal_result_t hal_timer_init(hal_timer_t timer, const hal_timer_cfg_t *cfg
     {
         return(hal_res_NOK_wrongparam);
     }
+    
+    // if it does not have ram yet, then attempt to allocate it.
+    if(NULL == tint)
+    {
+        tint = s_hal_timer_internals[HAL_timer_t2index(timer)] = hal_utility_heap_new(sizeof(hal_timer_internals_t));
+    }    
      
-    // if running stop.
+    // if it is running, then stop it.
     if(hal_timer_status_running == hal_timer_status_get(timer))
     {
         hal_timer_stop(timer);
@@ -306,7 +308,7 @@ extern hal_result_t hal_timer_countdown_set(hal_timer_t timer, hal_time_t countd
     }
 
     // computes the values to be put in registers
-    curcfg = &s_hal_timer_info[HAL_timer_t2index(timer)]->cfg;
+    curcfg = &s_hal_timer_internals[HAL_timer_t2index(timer)]->cfg;
     memcpy(&newcfg, curcfg, sizeof(hal_timer_cfg_t));
     newcfg.countdown = countdown;
 
@@ -364,7 +366,7 @@ extern hal_result_t hal_timer_interrupt_disable(hal_timer_t timer)
 
 extern hal_result_t hal_timer_remainingtime_get(hal_timer_t timer, hal_time_t *remaining_time)
 {
-    hal_timer_datastructure_t *info = s_hal_timer_info[HAL_timer_t2index(timer)];
+    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer_t2index(timer)];
     TIM_TypeDef* TIMx               = s_hal_timer_stm32regs[HAL_timer_t2index(timer)].TIMx;
 
     if(hal_false == s_hal_timer_initted_is(timer))
@@ -372,7 +374,7 @@ extern hal_result_t hal_timer_remainingtime_get(hal_timer_t timer, hal_time_t *r
         return(hal_res_NOK_generic);
     }
 
-    *remaining_time = info->tick_ns * TIM_GetCounter(TIMx) / 1000;
+    *remaining_time = tint->tick_ns * TIM_GetCounter(TIMx) / 1000;
 
     return(hal_res_OK);
 }
@@ -470,37 +472,37 @@ extern uint32_t hal_timer_hid_getsize(const hal_cfg_t *cfg)
 {
     uint32_t size = 0;
     
-    size += (cfg->timers_num * sizeof(hal_timer_datastructure_t));
-
+//    size += (MAX_TIMER_INDEX_PLUS_ONE * sizeof(hal_timer_internals_t));
+    
     return(size);
 }
 
 extern hal_result_t hal_timer_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
 {
     uint8_t i = 0;
-    uint8_t *ram08 = (uint8_t*)memory;
+//    uint8_t *ram08 = (uint8_t*)memory;
 
     // removed dependancy from NZI ram
     for(i=0; i<hal_timers_num; i++)
     {
-        s_hal_timer_info[i] = NULL;
+        s_hal_timer_internals[i] = NULL;
     }
 
-    // in case we have any timers
-    if(0 != cfg->timers_num) 
-    {
-        if(NULL == memory)
-        {
-            hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_timer_hid_setmem(): memory missing");
-            return(hal_res_NOK_generic);
-        }
+//     // in case we have any timers
+//     if(0 != MAX_TIMER_INDEX_PLUS_ONE) 
+//     {
+//         if(NULL == memory)
+//         {
+//             hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_timer_hid_setmem(): memory missing");
+//             return(hal_res_NOK_generic);
+//         }
 
-        for(i=0; i<cfg->timers_num; i++)
-        {
-            s_hal_timer_info[i] = (hal_timer_datastructure_t*)ram08;
-            ram08 += sizeof(hal_timer_datastructure_t);
-        }
-    }
+//         for(i=0; i<MAX_TIMER_INDEX_PLUS_ONE; i++)
+//         {
+//             s_hal_timer_internals[i] = (hal_timer_internals_t*)ram08;
+//             ram08 += sizeof(hal_timer_internals_t);
+//         }
+//     }
 
     return(hal_res_OK);  
 }
@@ -526,73 +528,73 @@ static hal_boolval_t s_hal_timer_initted_is(hal_timer_t timer)
 
 static void s_hal_timer_status_set(hal_timer_t timer, hal_timer_status_t status)
 {
-    s_hal_timer_info[HAL_timer_t2index(timer)]->status = status;
+    s_hal_timer_internals[HAL_timer_t2index(timer)]->status = status;
 }
 
 static hal_timer_status_t s_hal_timer_status_get(hal_timer_t timer)
 {
-    hal_timer_datastructure_t *info = s_hal_timer_info[HAL_timer_t2index(timer)];
-    return( (NULL == info) ? (hal_timer_status_none) : (info->status) );
+    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer_t2index(timer)];
+    return( (NULL == tint) ? (hal_timer_status_none) : (tint->status) );
 }
 
 static void s_hal_timer_prepare(hal_timer_t timer, const hal_timer_cfg_t *cfg)
 {
-    hal_timer_datastructure_t *info = s_hal_timer_info[HAL_timer_t2index(timer)];
+    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer_t2index(timer)];
     // we use SystemCoreClock instead of hal_brdcfg_sys__theconfig.speeds.cpu, which should be the same because ...
     volatile uint32_t referencespeed = SystemCoreClock;  
 
-    memcpy(&info->cfg, cfg, sizeof(hal_timer_cfg_t));
+    memcpy(&tint->cfg, cfg, sizeof(hal_timer_cfg_t));
 
     // use prescaler = ((referencespeed/a/1000) )
 
-    if(0 == (info->cfg.countdown % 1000))
+    if(0 == (tint->cfg.countdown % 1000))
     {   // multiple of 1 ms: use 10 khz, thus a = 10. 1 tick is 100us, max countdown is 6400 msec = 6.4 s
 
-        if(info->cfg.countdown > 64000*100) // tick is 100
+        if(tint->cfg.countdown > 64000*100) // tick is 100
         {
-            info->cfg.countdown = 64000*100; // tick is 100
+            tint->cfg.countdown = 64000*100; // tick is 100
         }
 
-        info->prescaler   = ((referencespeed/10/1000) );  // a is 10. the value is 7200: ok, lower than 65k
-        info->period      = info->cfg.countdown / 100; // tick is 100
-        info->tick_ns     = 100*1000; // tick is 100
+        tint->prescaler   = ((referencespeed/10/1000) );  // a is 10. the value is 7200: ok, lower than 65k
+        tint->period      = tint->cfg.countdown / 100; // tick is 100
+        tint->tick_ns     = 100*1000; // tick is 100
 
     }
-    else if(0 == (info->cfg.countdown % 100))
+    else if(0 == (tint->cfg.countdown % 100))
     {   // multiple of 100 us: use 100 khz, thus a = 100. 1 tick is 10us, max countdown is 640 msec
         
-        if(info->cfg.countdown > 64000*10) // tick is 10
+        if(tint->cfg.countdown > 64000*10) // tick is 10
         {
-            info->cfg.countdown = 64000*10; // tick is 10
+            tint->cfg.countdown = 64000*10; // tick is 10
         }
 
-        info->prescaler   = ((referencespeed/100/1000) );  // a is 100. the value is 720: ok, lower than 65k
-        info->period      = info->cfg.countdown / 10; // tick is 10
-        info->tick_ns     = 10*1000; // tick is 10
+        tint->prescaler   = ((referencespeed/100/1000) );  // a is 100. the value is 720: ok, lower than 65k
+        tint->period      = tint->cfg.countdown / 10; // tick is 10
+        tint->tick_ns     = 10*1000; // tick is 10
     }
-    else if(0 == (info->cfg.countdown % 10))
+    else if(0 == (tint->cfg.countdown % 10))
     {   // multiple of 10 us: use 1000 khz, thus a = 1000. 1 tick is 1us, max countdown is 64 msec
         
-        if(info->cfg.countdown > 64000*1) // tick is 1
+        if(tint->cfg.countdown > 64000*1) // tick is 1
         {
-            info->cfg.countdown = 64000*1; // tick is 1
+            tint->cfg.countdown = 64000*1; // tick is 1
         }
 
-        info->prescaler   = ((referencespeed/1000/1000) );  // a is 1000. the value is 72: ok, lower than 65k
-        info->period      = info->cfg.countdown / 1; // tick is 1
-        info->tick_ns     = 1*1000; // tick is 1
+        tint->prescaler   = ((referencespeed/1000/1000) );  // a is 1000. the value is 72: ok, lower than 65k
+        tint->period      = tint->cfg.countdown / 1; // tick is 1
+        tint->tick_ns     = 1*1000; // tick is 1
     }
     else
     {   // multiple of 1 us: use 8000 khz, thus a = 8000. 1 tick is 0.125us, max countdown is 8 msec
         
-        if(info->cfg.countdown > 8000) // tick is 0.125
+        if(tint->cfg.countdown > 8000) // tick is 0.125
         {
-            info->cfg.countdown = 8000; // tick is 0.125
+            tint->cfg.countdown = 8000; // tick is 0.125
         }
 
-        info->prescaler   = ((referencespeed/8000/1000) );  // a is 8000. the value is 9: ok, lower than 65k
-        info->period      = info->cfg.countdown * 8; // tick is 0.125
-        info->tick_ns     = 125; // tick is 0.125 micro
+        tint->prescaler   = ((referencespeed/8000/1000) );  // a is 8000. the value is 9: ok, lower than 65k
+        tint->period      = tint->cfg.countdown * 8; // tick is 0.125
+        tint->tick_ns     = 125; // tick is 0.125 micro
     }
 
 
@@ -600,7 +602,7 @@ static void s_hal_timer_prepare(hal_timer_t timer, const hal_timer_cfg_t *cfg)
 
 static void s_hal_timer_stm32_start(hal_timer_t timer)
 {
-    hal_timer_datastructure_t *info = s_hal_timer_info[HAL_timer_t2index(timer)];
+    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer_t2index(timer)];
     TIM_TypeDef* TIMx               = s_hal_timer_stm32regs[HAL_timer_t2index(timer)].TIMx;
     uint32_t RCC_APB1Periph_TIMx    = s_hal_timer_stm32regs[HAL_timer_t2index(timer)].RCC_APB1Periph_TIMx;
     IRQn_Type TIMx_IRQn             = s_hal_timer_stm32regs[HAL_timer_t2index(timer)].TIMx_IRQn;
@@ -615,8 +617,8 @@ static void s_hal_timer_stm32_start(hal_timer_t timer)
     // registers of TIMx
 
     TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-    TIM_TimeBaseStructure.TIM_Period = info->period - 1;          
-    TIM_TimeBaseStructure.TIM_Prescaler = info->prescaler - 1; 
+    TIM_TimeBaseStructure.TIM_Period = tint->period - 1;          
+    TIM_TimeBaseStructure.TIM_Prescaler = tint->prescaler - 1; 
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;    
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Down;  
     TIM_TimeBaseStructure.TIM_RepetitionCounter = 0x0000;
@@ -627,27 +629,27 @@ static void s_hal_timer_stm32_start(hal_timer_t timer)
     TIM_Cmd(TIMx, ENABLE);
 
     // Immediate load of  Precaler value */
-    TIM_PrescalerConfig(TIMx, info->prescaler - 1, TIM_PSCReloadMode_Immediate);
-    //TIM_PrescalerConfig(TIMx, info->prescaler - 1, TIM_PSCReloadMode_Update);
+    TIM_PrescalerConfig(TIMx, tint->prescaler - 1, TIM_PSCReloadMode_Immediate);
+    //TIM_PrescalerConfig(TIMx, tint->prescaler - 1, TIM_PSCReloadMode_Update);
     
 
     // Clear  update pending flag */
     TIM_ClearFlag(TIMx, TIM_FLAG_Update);
 
-    if(hal_int_priorityNONE != info->cfg.priority)
+    if(hal_int_priorityNONE != tint->cfg.priority)
     {
         // Enable TIM2 Update interrupt */
         TIM_ITConfig(TIMx, TIM_IT_Update, ENABLE);
     
         // enable irqs in nvic
-        hal_sys_irqn_priority_set(TIMx_IRQn, info->cfg.priority);
+        hal_sys_irqn_priority_set(TIMx_IRQn, tint->cfg.priority);
         hal_sys_irqn_enable(TIMx_IRQn);
     }
 }
 
 static void s_hal_timer_stm32_stop(hal_timer_t timer)
 {
-    hal_timer_datastructure_t *info = s_hal_timer_info[HAL_timer_t2index(timer)];
+    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer_t2index(timer)];
 //    NVIC_InitTypeDef NVIC_InitStructure;
     TIM_TypeDef* TIMx               = s_hal_timer_stm32regs[HAL_timer_t2index(timer)].TIMx;
 //    uint32_t RCC_APB1Periph_TIMx    = s_hal_timer_stm32regs[HAL_timer_t2index(timer)].RCC_APB1Periph_TIMx;
@@ -659,7 +661,7 @@ static void s_hal_timer_stm32_stop(hal_timer_t timer)
     TIM_DeInit(TIMx);
     TIM_Cmd(TIMx, DISABLE);
 
-    if(hal_int_priorityNONE != info->cfg.priority)
+    if(hal_int_priorityNONE != tint->cfg.priority)
     {
         TIM_ITConfig(TIMx, TIM_IT_Update, DISABLE);
         hal_sys_irqn_disable(TIMx_IRQn);
@@ -684,7 +686,7 @@ static void s_hal_timer_stm32_stop(hal_timer_t timer)
     TIM_Cmd(TIMx, DISABLE);
 
     // Immediate load of  Precaler value */
-    TIM_PrescalerConfig(TIMx, info->prescaler - 1, TIM_PSCReloadMode_Immediate);
+    TIM_PrescalerConfig(TIMx, tint->prescaler - 1, TIM_PSCReloadMode_Immediate);
 
     // Clear  update pending flag */
     TIM_ClearITPendingBit(TIMx, TIM_IT_Update);
@@ -789,17 +791,17 @@ static void s_hal_timer_stm32_stop(hal_timer_t timer)
 
 static hal_time_t s_hal_timer_get_period(hal_timer_t timer)
 {
-    hal_timer_datastructure_t *info = s_hal_timer_info[HAL_timer_t2index(timer)];
+    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer_t2index(timer)];
 
-    return(info->cfg.countdown);
+    return(tint->cfg.countdown);
 }
 
 
 static void s_hal_timer_callback(hal_timer_t timer)
 {
-    hal_timer_datastructure_t *info = s_hal_timer_info[HAL_timer_t2index(timer)];
+    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer_t2index(timer)];
     
-    if(hal_timer_mode_oneshot == info->cfg.mode)
+    if(hal_timer_mode_oneshot == tint->cfg.mode)
     {
         // stop timer 
         s_hal_timer_stm32_stop(timer);
@@ -807,9 +809,9 @@ static void s_hal_timer_callback(hal_timer_t timer)
         s_hal_timer_status_set(timer, hal_timer_status_expired);
     }
 
-    if(NULL != info->cfg.callback_on_exp)
+    if(NULL != tint->cfg.callback_on_exp)
     {
-        info->cfg.callback_on_exp(info->cfg.arg);
+        tint->cfg.callback_on_exp(tint->cfg.arg);
     }
 }
 

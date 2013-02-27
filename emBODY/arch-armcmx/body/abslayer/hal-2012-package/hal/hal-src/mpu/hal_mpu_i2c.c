@@ -152,10 +152,10 @@ static const I2C_InitTypeDef   s_hal_i2c_stm32_cfg =
     .I2C_ClockSpeed             = 400000                        // PARAMETER
 };
 
-#if     defined(USE_STM32F1)
+#if     defined(HAL_USE_CPU_FAM_STM32F1)
 static I2C_TypeDef* const s_hal_i2c_stmI2Cmap[] = { I2C1, I2C2, NULL };
 static const uint32_t s_hal_i2c_hw_rcc[] = { RCC_APB1Periph_I2C1, RCC_APB1Periph_I2C2, 0 };
-#elif   defined(USE_STM32F4)
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)
 static I2C_TypeDef* const s_hal_i2c_stmI2Cmap[] = { I2C1, I2C2, I2C3 };
 static const uint32_t s_hal_i2c_hw_rcc[] = { RCC_APB1Periph_I2C1, RCC_APB1Periph_I2C2, RCC_APB1Periph_I2C3 };
 #endif
@@ -624,7 +624,7 @@ static hal_result_t s_hal_i2c_init(hal_i2c_port_t port, const hal_i2c_cfg_t *cfg
 
 static void s_hal_i2c_hw_init(hal_i2c_port_t port)
 {
-#if     defined(USE_STM32F1) || defined(USE_STM32F4)
+#if     defined(HAL_USE_CPU_FAM_STM32F1) || defined(HAL_USE_CPU_FAM_STM32F4)
     
     uint32_t RCC_APB1Periph_I2Cx = s_hal_i2c_hw_rcc[HAL_i2c_port2index(port)];
     
@@ -648,7 +648,7 @@ static void s_hal_i2c_hw_init(hal_i2c_port_t port)
 static void s_hal_i2c_hw_gpio_init(hal_i2c_port_t port)
 {
     
-#if     defined(USE_STM32F1)
+#if     defined(HAL_USE_CPU_FAM_STM32F1)
 
     static const GPIO_InitTypeDef  s_hal_i2c_sclsda_altcfg  =
     {
@@ -708,7 +708,7 @@ static void s_hal_i2c_hw_gpio_init(hal_i2c_port_t port)
     hal_gpio_configure(hal_brdcfg_i2c__theconfig.gpio_sda[HAL_i2c_port2index(port)], &hal_i2c_sda_altcfg);
 
 
-#elif   defined(USE_STM32F4)    
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)    
 
     static const GPIO_InitTypeDef  s_hal_i2c_sclsda_altcfg  =
     {
@@ -814,7 +814,7 @@ static void s_hal_i2c_hw_gpio_init(hal_i2c_port_t port)
 
 static void s_hal_i2c_hw_enable(hal_i2c_port_t port, const hal_i2c_cfg_t* cfg)
 {
-#if     defined(USE_STM32F1) || defined(USE_STM32F4)
+#if     defined(HAL_USE_CPU_FAM_STM32F1) || defined(HAL_USE_CPU_FAM_STM32F4)
     
 //    #define HAL_i2c_port2stmI2C(p)          (s_hal_i2c_stmI2Cmap[HAL_i2c_port2index(p)])
 
