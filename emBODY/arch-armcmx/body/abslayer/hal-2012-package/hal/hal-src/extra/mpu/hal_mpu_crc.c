@@ -300,13 +300,13 @@ extern hal_result_t hal_crc_compute(hal_crc_t crc, hal_crc_compute_mode_t mode, 
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_crc_hid_getsize(const hal_cfg_t *cfg)
+extern uint32_t hal_crc_hid_getsize(const hal_base_cfg_t *cfg)
 {
     // no memory needed
     return(0);
 }
 
-extern hal_result_t hal_crc_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_crc_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
 {
     // no memory needed
 //    if(NULL == memory)

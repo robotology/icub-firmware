@@ -249,13 +249,13 @@ extern hal_result_t hal_display_putstring(hal_display_dev_t dev, uint16_t line, 
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_device_display_hid_getsize(const hal_cfg_t *cfg)
+extern uint32_t hal_device_display_hid_getsize(const hal_base_cfg_t *cfg)
 {
     // no memory needed
     return(0);
 }
 
-extern hal_result_t hal_device_display_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_device_display_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
 {
     // no memory needed
 //    if(NULL == memory)

@@ -190,13 +190,13 @@ extern hal_uniqueid_id64bit_t hal_uniqueid_macaddr_get(void)
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_uniqueid_hid_getsize(const hal_cfg_t *cfg)
+extern uint32_t hal_uniqueid_hid_getsize(const hal_base_cfg_t *cfg)
 {
     // no memory needed
     return(0);
 }
 
-extern hal_result_t hal_uniqueid_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_uniqueid_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
 {
     // no memory needed
 //    if(NULL == memory)

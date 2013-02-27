@@ -347,13 +347,13 @@ extern hal_result_t hal_encoder_get_value(hal_encoder_t enc, uint32_t *result )
 // empty-section
 // ---- isr of the module: end ------
 
-extern uint32_t hal_encoder_hid_getsize(const hal_cfg_t *cfg)
+extern uint32_t hal_encoder_hid_getsize(const hal_base_cfg_t *cfg)
 {
     return(hal_spi4encoder_hid_getsize(cfg));
 } 
 
 
-extern hal_result_t hal_encoder_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_encoder_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
 {
     // removed dependancy from NZI ram
     memset(s_hal_encoder_cfgs, 0, sizeof(s_hal_encoder_cfgs));

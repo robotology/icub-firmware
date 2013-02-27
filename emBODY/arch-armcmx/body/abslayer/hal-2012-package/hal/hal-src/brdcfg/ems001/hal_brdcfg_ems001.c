@@ -671,7 +671,7 @@
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern uint32_t hal_brdcfg_chips__getsize(const hal_cfg_t *cfg)
+extern uint32_t hal_brdcfg_chips__getsize(const hal_base_cfg_t *cfg)
 {
     uint32_t retval = 0;
     
@@ -699,7 +699,7 @@ extern uint32_t hal_brdcfg_chips__getsize(const hal_cfg_t *cfg)
 }
 
 
-extern hal_result_t hal_brdcfg_chips__setmem(const hal_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_brdcfg_chips__setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
 {
     // no memory needed
    if(NULL == memory)
@@ -753,7 +753,7 @@ extern hal_result_t hal_brdcfg_chips__setmem(const hal_cfg_t *cfg, uint32_t *mem
 }
 
 
-extern uint32_t hal_brdcfg_extbrds__getsize(const hal_cfg_t *cfg)
+extern uint32_t hal_brdcfg_extbrds__getsize(const hal_base_cfg_t *cfg)
 {
     uint32_t retval = 0;
     
@@ -765,7 +765,7 @@ extern uint32_t hal_brdcfg_extbrds__getsize(const hal_cfg_t *cfg)
 }
 
 
-extern hal_result_t hal_brdcfg_extbrds__setmem(const hal_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_brdcfg_extbrds__setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
 {
     // no memory needed
    if(NULL == memory)

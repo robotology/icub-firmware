@@ -230,8 +230,8 @@
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern uint32_t hal_brdcfg_chips__getsize(const hal_cfg_t *cfg);
-extern hal_result_t hal_brdcfg_chips__setmem(const hal_cfg_t *cfg, uint32_t *memory);
+extern uint32_t hal_brdcfg_chips__getsize(const hal_base_cfg_t *cfg);
+extern hal_result_t hal_brdcfg_chips__setmem(const hal_base_cfg_t *cfg, uint32_t *memory);
 
 
 

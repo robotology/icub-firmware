@@ -357,13 +357,13 @@ extern hal_result_t hal_chip_xx_eeprom_write(uint32_t address, uint32_t size, ui
 //}
 
 
-extern uint32_t hal_chip_xx_eeprom_hid_getsize(const hal_cfg_t *cfg)
+extern uint32_t hal_chip_xx_eeprom_hid_getsize(const hal_base_cfg_t *cfg)
 {   
     // no memory needed
     return(0);
 }
 
-extern hal_result_t hal_chip_xx_eeprom_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_chip_xx_eeprom_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
 {
     // no memory needed
 //    if(NULL == memory)

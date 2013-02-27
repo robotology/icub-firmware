@@ -65,7 +65,7 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern hal_cfg_t hal_base_hid_params = 
+extern hal_base_cfg_t hal_base_hid_params = 
 { 
     .extfn      = NULL              // at least one
 };
@@ -133,7 +133,7 @@ static hal_base_internals_t s_hal_base_internals =
 
 
 
-extern uint32_t hal_base_memory_getsize(const hal_cfg_t *cfg, uint32_t *size04aligned)
+extern uint32_t hal_base_memory_getsize(const hal_base_cfg_t *cfg, uint32_t *size04aligned)
 {
     uint32_t retval = 0;
  
@@ -176,7 +176,7 @@ extern uint32_t hal_base_memory_getsize(const hal_cfg_t *cfg, uint32_t *size04al
 }
 
 
-extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04aligned) 
+extern hal_result_t hal_base_initialise(const hal_base_cfg_t *cfg, uint32_t *data04aligned) 
 {
     if(NULL == cfg)
     {   
@@ -266,7 +266,7 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
     
     
     // finally ... sets used config
-    memcpy(&hal_base_hid_params, cfg, sizeof(hal_cfg_t));
+    memcpy(&hal_base_hid_params, cfg, sizeof(hal_base_cfg_t));
 
     s_hal_base_internals.status = hal_base_status_initialised;
     
@@ -283,13 +283,13 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
 // empty-section
 // ---- isr of the module: end ------
 
-extern uint32_t hal_base_hid_getsize(const hal_cfg_t *cfg)
+extern uint32_t hal_base_hid_getsize(const hal_base_cfg_t *cfg)
 {   
     // no memory needed
     return(0);
 }
 
-extern hal_result_t hal_base_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_base_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
 {
     // no memory needed
 //    if(NULL == memory)

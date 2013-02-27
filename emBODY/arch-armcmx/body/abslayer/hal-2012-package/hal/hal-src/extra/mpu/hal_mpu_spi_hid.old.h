@@ -61,9 +61,9 @@ typedef struct
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern uint32_t hal_spi_hid_getsize(const hal_cfg_t *cfg);
+extern uint32_t hal_spi_hid_getsize(const hal_base_cfg_t *cfg);
 
-extern hal_result_t hal_spi_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory);
+extern hal_result_t hal_spi_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory);
 
 extern hal_boolval_t hal_spi_hid_initted_is(hal_spi_port_t port);
 

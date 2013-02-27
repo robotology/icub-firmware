@@ -157,13 +157,13 @@ extern int hal_trace_puts(const char * str)
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_trace_hid_getsize(const hal_cfg_t *cfg)
+extern uint32_t hal_trace_hid_getsize(const hal_base_cfg_t *cfg)
 {
     // no memory needed
     return(0);
 }
 
-extern hal_result_t hal_trace_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_trace_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
 {
     // no memory needed
 //    if(NULL == memory)

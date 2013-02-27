@@ -162,13 +162,13 @@ extern uint16_t hal_utility_crc16_compute(const uint32_t polynom, const uint16_t
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern uint32_t hal_utility_crc16_hid_getsize(const hal_cfg_t *cfg)
+extern uint32_t hal_utility_crc16_hid_getsize(const hal_base_cfg_t *cfg)
 {   
     // no memory needed
     return(0);
 }
 
-extern hal_result_t hal_utility_crc16_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_utility_crc16_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
 {
     // no memory needed
 //    if(NULL == memory)

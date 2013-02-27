@@ -80,9 +80,9 @@ extern const uint16_t  hal_gpio_hid_pins[];
 
 
 
-extern uint32_t hal_gpio_hid_getsize(const hal_cfg_t *cfg);
+extern uint32_t hal_gpio_hid_getsize(const hal_base_cfg_t *cfg);
 
-extern hal_result_t hal_gpio_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory);
+extern hal_result_t hal_gpio_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory);
 
 
 

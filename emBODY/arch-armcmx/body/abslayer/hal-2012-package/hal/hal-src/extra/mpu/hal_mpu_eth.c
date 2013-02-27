@@ -721,7 +721,7 @@ rel:  Rx_Desc[i].Stat = DMA_RX_OWN;
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_eth_hid_getsize(const hal_cfg_t *cfg)
+extern uint32_t hal_eth_hid_getsize(const hal_base_cfg_t *cfg)
 {
     uint32_t size = 0;
 
@@ -734,7 +734,7 @@ extern uint32_t hal_eth_hid_getsize(const hal_cfg_t *cfg)
     return(size);
 }
 
-extern hal_result_t hal_eth_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_eth_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
 {
 
     // removed dependency from nzi memory

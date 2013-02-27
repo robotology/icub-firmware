@@ -242,13 +242,13 @@ extern hal_result_t hal_chip_st_l3g4200d_angrate_get(int32_t* xar, int32_t* yar,
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_chip_st_l3g4200d_hid_getsize(const hal_cfg_t *cfg)
+extern uint32_t hal_chip_st_l3g4200d_hid_getsize(const hal_base_cfg_t *cfg)
 {
     // no memory needed
     return(0);
 }
 
-extern hal_result_t hal_chip_st_l3g4200d_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_chip_st_l3g4200d_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
 {
     // no memory needed
 //    if(NULL == memory)

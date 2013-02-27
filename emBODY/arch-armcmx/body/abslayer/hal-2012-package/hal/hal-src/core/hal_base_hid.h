@@ -49,13 +49,13 @@ typedef struct
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
-extern hal_cfg_t hal_base_hid_params;
+extern hal_base_cfg_t hal_base_hid_params;
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern uint32_t hal_base_hid_getsize(const hal_cfg_t *cfg);
-extern hal_result_t hal_base_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory);
+extern uint32_t hal_base_hid_getsize(const hal_base_cfg_t *cfg);
+extern hal_result_t hal_base_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory);
 
 extern hal_bool_t hal_base_hid_initted_is(void);
 

@@ -200,13 +200,13 @@ extern hal_bool_t hal_switch_started_is(void)
 // empty-section
 // ---- isr of the module: end ------
 
-extern uint32_t hal_device_switch_hid_getsize(const hal_cfg_t *cfg)
+extern uint32_t hal_device_switch_hid_getsize(const hal_base_cfg_t *cfg)
 {
     return(0);
 } 
 
 
-extern hal_result_t hal_device_switch_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_device_switch_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
 {
 
     // removed dependency from nzi ram

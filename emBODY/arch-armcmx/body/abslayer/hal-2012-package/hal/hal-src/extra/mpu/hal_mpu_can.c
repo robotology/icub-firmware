@@ -617,7 +617,7 @@ void CAN2_RX0_IRQHandler(void)
 // ---- isr of the module: end ------
 
  
-extern uint32_t hal_can_hid_getsize(const hal_cfg_t *cfg)
+extern uint32_t hal_can_hid_getsize(const hal_base_cfg_t *cfg)
 {
     uint32_t size = 0;
     
@@ -639,7 +639,7 @@ extern uint32_t hal_can_hid_getsize(const hal_cfg_t *cfg)
 }
 
 
-extern hal_result_t hal_can_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_can_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
 {
 //    uint8_t *ram08 = (uint8_t*)memory;
     uint8_t i=0;

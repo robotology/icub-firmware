@@ -180,13 +180,13 @@ extern hal_bool_t hal_cantransceiver_initted_is(hal_can_port_t port)
 // empty-section
 // ---- isr of the module: end ------
 
-extern uint32_t hal_device_cantransceiver_hid_getsize(const hal_cfg_t *cfg)
+extern uint32_t hal_device_cantransceiver_hid_getsize(const hal_base_cfg_t *cfg)
 {
     return(0);
 } 
 
 
-extern hal_result_t hal_device_cantransceiver_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_device_cantransceiver_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
 {
 
     // removed dependency from nzi ram

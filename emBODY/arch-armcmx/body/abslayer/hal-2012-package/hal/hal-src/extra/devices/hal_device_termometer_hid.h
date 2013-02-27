@@ -73,9 +73,9 @@ typedef struct
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern uint32_t hal_device_termometer_hid_getsize(const hal_cfg_t *cfg);
+extern uint32_t hal_device_termometer_hid_getsize(const hal_base_cfg_t *cfg);
 
-extern hal_result_t hal_device_termometer_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory);
+extern hal_result_t hal_device_termometer_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory);
 
 
 #endif  // include guard

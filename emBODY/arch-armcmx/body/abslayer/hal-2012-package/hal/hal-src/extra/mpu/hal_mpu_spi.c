@@ -483,13 +483,13 @@ extern hal_result_t hal_spi_on_frametransm_set(hal_spi_port_t port, hal_callback
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_spi_hid_getsize(const hal_cfg_t *cfg)
+extern uint32_t hal_spi_hid_getsize(const hal_base_cfg_t *cfg)
 {
     // no memory needed
     return(0);
 }
 
-extern hal_result_t hal_spi_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_spi_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
 {
     // no memory needed
 //    if(NULL == memory)
