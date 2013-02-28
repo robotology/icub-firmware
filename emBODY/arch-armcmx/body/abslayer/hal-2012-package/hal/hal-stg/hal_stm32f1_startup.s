@@ -59,7 +59,7 @@
     
 
 ;Stack_Size      EQU     0x00000400
-Stack_Size      EQU     HAL_STACKSIZE
+Stack_Size      EQU     HAL_BASE_CFG_STACKSIZE
                 EXPORT  Stack_Size 
 
                 AREA    STACK, NOINIT, READWRITE, ALIGN=3
@@ -72,7 +72,7 @@ __initial_sp
 ; </h>
 
 ;Heap_Size       EQU     0x00002000
-Heap_Size       EQU     HAL_HEAPSIZE
+Heap_Size       EQU     HAL_BASE_CFG_HEAPSIZE
                 EXPORT Heap_Size
 
                 AREA    HEAP, NOINIT, READWRITE, ALIGN=3
