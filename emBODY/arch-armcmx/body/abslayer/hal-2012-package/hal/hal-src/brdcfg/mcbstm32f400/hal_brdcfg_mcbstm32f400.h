@@ -120,7 +120,7 @@
 #endif//HAL_USE_DEVICE_TERMOMETER
 
 
-#include "hal_mpu_stm32xx_include.h"
+#include "hal_middleware_interface.h"
 
 
 

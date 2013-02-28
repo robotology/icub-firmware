@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Valentina Gaggero, Marco Accame
  * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
@@ -23,8 +23,8 @@
 
 /* @file       hal_brdcfg.h
     @brief      This header file includes .h dependent on board
-    @author     valentina.gaggero@iit.it
-    @date       16/11/2010
+    @author     valentina.gaggero@iit.it, marco.accame@iit.it
+    @date       02/28/2013
  **/
 
 
@@ -47,18 +47,12 @@
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern uint32_t hal_brdcfg__getsize(const hal_base_cfg_t *cfg);
-extern hal_result_t hal_brdcfg__setmem(const hal_base_cfg_t *cfg, uint32_t *memory);
-
-// extern uint32_t hal_brdcfg_chips__getsize(const hal_base_cfg_t *cfg);
-// extern hal_result_t hal_brdcfg_chips__setmem(const hal_base_cfg_t *cfg, uint32_t *memory);
-
-// extern uint32_t hal_brdcfg_extbrds__getsize(const hal_base_cfg_t *cfg);
-// extern hal_result_t hal_brdcfg_extbrds__setmem(const hal_base_cfg_t *cfg, uint32_t *memory);
+//extern uint32_t hal_brdcfg__getsize(const hal_base_cfg_t *cfg);
+extern hal_result_t hal_brdcfg__static_memory_init(void);
 
 
 
-// - other declarations which are specific to the chosen board
+// - other declarations which are specific of the chosen board
 
 #if   defined(HAL_BOARD_MCBSTM32C)
 	#include "mcbstm32c/hal_brdcfg_mcbstm32c.h"

@@ -29,7 +29,7 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_mpu_stm32xx_include.h"
+#include "hal_middleware_interface.h"
 
 #include "hal.h"
 #include "stdlib.h"
@@ -693,7 +693,7 @@ extern hal_result_t hal_brdcfg_chips__setmem(const hal_base_cfg_t *cfg, uint32_t
     // no memory needed
    if(NULL == memory)
    {
-       hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
+       hal_base_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
        return(hal_res_NOK_generic);
    }
 
@@ -1138,7 +1138,7 @@ static hal_result_t s_hal_brdcfg_device_switch__extclock_init(void)
 //     hal_i2c_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
 //     if(!(buff_read&0x01))
 //     {
-//         hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "hal_brdcfg_device_switch__configure(): SWITCH not configured");
+//         hal_base_on_fatalerror(hal_fatalerror_runtimefault, "hal_brdcfg_device_switch__configure(): SWITCH not configured");
 //     }
 //     
 //     s_hal_brdcfg_device_switch__mii_phymode_get(phymode);

@@ -33,7 +33,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_mpu_stm32xx_include.h"
+#include "hal_middleware_interface.h"
 
 #include "hal_base.h"
 

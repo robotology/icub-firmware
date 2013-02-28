@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
+ * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Valentina Gaggero, Marco Accame
  * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
@@ -32,16 +32,28 @@
 
 // - modules to be built ----------------------------------------------------------------------------------------------
 
-// -- core: must be always defined
+// -- core: these values must be always defined
 #define     HAL_USE_BASE
+#define     HAL_USE_CORE
 #define     HAL_USE_CPU
+#define     HAL_USE_HEAP
+#define     HAL_USE_MIDDLEWARE_INTERFACE
 #define     HAL_USE_SYS
 
-// -- cpu: define one ARC, FAM, and NAM
+// -- cpu: choose one ARC, FAM, and NAM for the cpu
 #define     HAL_USE_CPU_ARC_ARMCM3
 #define     HAL_USE_CPU_FAM_STM32F1
 #define     HAL_USE_CPU_NAM_STM32F107
 
+// -- the utilities, mpu peripherals, devices, chips, and external boards are used only if the build is not forced to core only 
+#ifndef HAL_BUILD_ONLYCORE 
+
+// -- utilities: define what you need to use (beware that most of mpu peripheral modules use BITS and some use FIFO)
+#define     HAL_USE_UTILITY_BITS
+#define     HAL_USE_UTILITY_CRC07
+#define     HAL_USE_UTILITY_CRC16
+#define     HAL_USE_UTILITY_CRC32
+#define     HAL_USE_UTILITY_FIFO
 
 // -- mpu peripherals: define what you need to use (beware of cross dependencies)
 #define     HAL_USE_CAN
@@ -71,16 +83,6 @@
 #undef  HAL_USE_DEVICE_TERMOMETER
 
 
-
-// -- utilities: define what you need to use (beware that most of mpu peripheral modules use BITS and some use FIFO)
-#define     HAL_USE_UTILITY_BITS
-#define     HAL_USE_UTILITY_CRC07
-#define     HAL_USE_UTILITY_CRC16
-#define     HAL_USE_UTILITY_CRC32
-#define     HAL_USE_UTILITY_FIFO
-#define     HAL_USE_UTILITY_HEAP
-
-
 // -- chips: define what you need to use
 #define     HAL_USE_CHIP_GENERIC_ETHTRANSCEIVER
 #undef  HAL_USE_CHIP_ST_L3G4200D
@@ -91,36 +93,15 @@
 // -- external boards: define what you need to use
 #undef     HAL_USE_EXTBRD_KEIL_MCBQVGA
 
+#endif//HAL_BUILD_ONLYCORE 
 
 
 // - exceptions -------------------------------------------------------------------------------------------------------
+// not managed so far
 
-#if defined(VERY_SMALL )
-//    #undef  HAL_USE_CAN
-    #undef  HAL_USE_DISPLAY
-//    #undef  HAL_USE_ENCODER
-//    #undef  HAL_USE_ETH
-//    #undef  HAL_USE_EEPROM
-//    #undef  HAL_USE_FLASH
-//    #undef  HAL_USE_LED
-    #undef  HAL_USE_SWITCH
-//    #undef  HAL_USE_TIMER
-//    #undef  HAL_USE_WATCHDOG
-#endif
-
-#ifdef  HAL_SLIM_MODE
-    #undef  HAL_USE_CAN
-    #undef  HAL_USE_DISPLAY
-    #undef  HAL_USE_ENCODER
-    #undef  HAL_USE_ETH
-    #undef  HAL_USE_LED
-    #undef  HAL_USE_SWITCH
-    #undef  HAL_USE_TIMER
-    #undef  HAL_USE_WATCHDOG
-#endif//HAL_SLIM_MODE
 
 // - cross dependencies -----------------------------------------------------------------------------------------------
-// not managed ... 
+// not managed so far 
 
 
 

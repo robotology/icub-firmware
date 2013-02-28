@@ -33,7 +33,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_mpu_stm32xx_include.h"
+#include "hal_middleware_interface.h"
 
 #include "hal_base.h"
 
@@ -162,6 +162,7 @@
 #ifdef  HAL_USE_SYS
     extern const hal_sys_hid_brdcfg_t hal_brdcfg_sys__theconfig;
 #endif//HAL_USE_SYS 
+
 
 // -- mpu peripherals
 

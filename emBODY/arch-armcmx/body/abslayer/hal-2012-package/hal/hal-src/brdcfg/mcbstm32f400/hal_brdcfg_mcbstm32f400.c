@@ -29,7 +29,7 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_mpu_stm32xx_include.h"
+#include "hal_middleware_interface.h"
 
 #include "stdlib.h"
 #include "hal_base.h"
@@ -652,7 +652,7 @@ extern hal_result_t hal_brdcfg_chips__setmem(const hal_base_cfg_t *cfg, uint32_t
     // no memory needed
    if(NULL == memory)
    {
-       hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
+       hal_base_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
        return(hal_res_NOK_generic);
    }
 
