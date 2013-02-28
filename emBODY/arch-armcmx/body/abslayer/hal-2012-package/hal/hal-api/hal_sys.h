@@ -51,16 +51,29 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-
+/** @typedef    typedef struct hal_sys_cfg_t 
+    @brief      contains the configuration for the sys module. 
+ **/ 
+typedef struct
+{
+    uint8_t     nothingsofar;    
+} hal_sys_cfg_t;
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-// empty-section
 
-
+extern const hal_sys_cfg_t hal_sys_cfg_default;  // = { .nothingsofar = 0 };
 
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
+
+
+/** @fn         extern hal_result_t hal_sys_init(const hal_sys_cfg_t* cfg)
+    @brief      This function initialises the sys module. It is to be called ONLY by HAL internals
+    @return     hal_res_OK on success, otherwise an error code.
+  */
+extern hal_result_t hal_sys_init(const hal_sys_cfg_t* cfg);
+
 
 /** @fn         extern hal_result_t hal_sys_systeminit(void)
     @brief      Initialise the system.

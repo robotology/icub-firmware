@@ -43,12 +43,10 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 
+// -- the core part of hal: base, cpu, and sys.
+#include "hal_core.h"
 
-#include "hal_base.h"
-#include "hal_cpu.h"
-#include "hal_sys.h"
-
-// the others are included in alphabetical order
+// -- the other modules of hal included in alphabetical order. they may not be available for some boards.
 
 #include "hal_accelerometer.h"
 #include "hal_can.h"

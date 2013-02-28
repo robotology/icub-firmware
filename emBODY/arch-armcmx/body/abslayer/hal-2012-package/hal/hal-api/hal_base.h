@@ -224,7 +224,7 @@ typedef struct
 
 
 /** @typedef    typedef struct hal_base_cfg_t 
-    @brief      hal_base_cfg_t contains a basic hal configuration. other modules shall use proper
+    @brief      hal_base_cfg_t contains the base hal configuration. Other modules shall use proper
                 configuration data structures.
  **/  
 typedef struct
@@ -241,24 +241,40 @@ typedef struct
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn         extern uint32_t hal_base_memory_getsize(const hal_base_cfg_t *cfg, uint32_t *size04aligned)
-    @brief      Gets the size of the 4-aligned memory required by the hal in order to work according to a given
-                configuration. 
-    @param      cfg             The target configuration. 
-    @param      size04aligned   The number of bytes of teh 4-aligned RAM memory which is required. (if not NULL)
-    @return     The number of bytes of the 4bytes-aligned RAM which is required
 
+extern hal_result_t hal_base_init(const hal_base_cfg_t *cfg);
+
+
+/** @fn         extern void hal_base_osal_scheduling_suspend(void)
+    @brief      Suspends the OSAL scheduling. It calls the external funtion passed throught
+                hal_base_cfg_t::extfn.osal_system_scheduling_suspend (if not NULL).
+    @details    Its use is mostly internal to HAL, but it can be called by a HAL user as well. It is
+                useful in multitasking environments running OSAL when a context-switch may delay
+                too much a critical operation, such as a temporary disable of an ISR.                
  **/
-extern uint32_t hal_base_memory_getsize(const hal_base_cfg_t *cfg, uint32_t *size04aligned);
+extern void hal_base_osal_scheduling_suspend(void);
 
 
-/** @fn         extern hal_result_t hal_base_initialise(const hal_base_cfg_t *cfg, uint32_t *data04aligned)
-    @brief      Initialise the hal to work for a given configuration and with a given external memory.
-    @param      cfg             The target configuration. 
-    @param      data04aligned   The 4bytes-aligned RAM which is required, or NULL if none is required.
-    @return     hal_res_OK or hal_res_NOK_generic 
+/** @fn         extern void hal_base_osal_scheduling_restart(void)
+    @brief      Restart the OSAL scheduling after it was suspended by hal_base_hid_osal_scheduling_suspend(). 
+                It calls the external funtion passed throught
+                hal_base_cfg_t::extfn.osal_system_scheduling_restart (if not NULL). 
  **/
-extern hal_result_t hal_base_initialise(const hal_base_cfg_t *cfg, uint32_t *data04aligned); 
+extern void hal_base_osal_scheduling_restart(void);
+
+
+/** @fn         extern void hal_base_on_fatalerror(hal_fatalerror_t errorcode, const char * errormsg)
+    @brief      It is called by HAL when an internal fatal error occurs, but it can be called by a HAL 
+                user as well. The function at first stops OSAL scheduling by calling 
+                hal_base_osal_scheduling_suspend(), then calls an externally defined function passed through 
+                hal_base_cfg_t::extfn.osal_system_scheduling_suspend (if not NULL), and finally enters in an
+                infinite loop.
+    @param      errorcode       The error code. 
+    @param      errormsg        The error message.
+ **/
+extern void hal_base_on_fatalerror(hal_fatalerror_t errorcode, const char * errormsg);
+
+
 
 
 

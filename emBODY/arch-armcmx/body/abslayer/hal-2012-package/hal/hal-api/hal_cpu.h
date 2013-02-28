@@ -95,30 +95,41 @@ typedef enum
  **/ 
 typedef enum
 {
-    hal_cpu_speedtypr_maxcpu        = 0,
-    hal_cpu_speedtype_curcpu        = 1,
+    hal_cpu_speedtype_max           = 0,
+    hal_cpu_speedtype_cpu           = 1,
     hal_cpu_speedtype_fastbus       = 2,
     hal_cpu_speedtype_slowbus       = 3
 } hal_cpu_speedtype_t;
 
 
+/** @typedef    typedef struct hal_cpu_cfg_t 
+    @brief      contains the configuration for the cpu module. 
+ **/  
 typedef struct
 {
-    uint8_t     dummy;    
+    uint8_t     nothingsofar;    
 } hal_cpu_cfg_t;
  
+
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const hal_cpu_cfg_t hal_cpu_cfg_default;
+extern const hal_cpu_cfg_t hal_cpu_cfg_default;  // = { .nothingsofar = 0 };
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 /** @fn         extern hal_result_t hal_cpu_init(const hal_cpu_cfg_t* cfg)
-    @brief      This function initialises (or refresh the cpu internals: speed etc.).
+    @brief      This function initialises the cpu module. It is to be called ONLY by HAL internals.
     @return     hal_res_OK on success, otherwise an error code.
   */
 extern hal_result_t hal_cpu_init(const hal_cpu_cfg_t* cfg);
+
+
+/** @fn         extern hal_result_t hal_cpu_clock_set(void)
+    @brief      This function sets the clocks (cpu, speedbus, slowbus) according to the configuration specified in brdcfg.
+    @return     hal_res_OK on success, otherwise an error code.
+  */
+extern hal_result_t hal_cpu_clocks_set(void);
 
 
 /** @fn         extern hal_cpu_architecture_t hal_cpu_architecture_get(void)
@@ -139,12 +150,6 @@ extern hal_cpu_family_t hal_cpu_family_get(void);
   */
 extern hal_cpu_name_t hal_cpu_name_get(void);
 
-
-/** @fn         extern uint32_t hal_cpu_maxspeed_get(void)
-    @brief      This function retrieves the max speed of the cpu
-    @return     the speed of cpu in hz.
-  */
-extern uint32_t hal_cpu_maxspeed_get(void);
 
 
 /** @fn         extern uint32_t hal_cpu_speed_get(hal_cpu_speedtype_t speedtype)

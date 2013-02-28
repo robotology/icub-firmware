@@ -42,8 +42,6 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-
-
 #include "hal_base.h"
 #include "hal_cpu.h"
 #include "hal_sys.h"
@@ -54,7 +52,24 @@
   
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
-// empty-section
+
+/** @typedef    typedef struct hal_core_cfg_t 
+    @brief      contains the configuration for the core part of hal: base, cpu, and sys. 
+ **/  
+typedef struct
+{
+    hal_base_cfg_t      basecfg;    /**< the configuration of the base module */
+    hal_cpu_cfg_t       cpucfg;     /**< the configuration of the cpu module */
+    hal_sys_cfg_t       syscfg;     /**< the configuration of the sys module */
+} hal_core_cfg_t;
+
+
+typedef enum
+{
+    hal_core_status_zero            = 0,
+    hal_core_status_initialised     = 1,
+    hal_core_status_started         = 2    
+} hal_core_status_t;
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
@@ -62,7 +77,36 @@
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
-// empty-section
+
+/** @fn         extern hal_result_t hal_core_init(const hal_core_cfg_t *cfg)
+    @brief      Initialise the core part of hal to work for a given configuration. The required RAM is internally
+                allocated by using hal_heap_new(). In case of no memory, a hal_fatalerror_missingmemory is triggered.
+    @param      cfg             The target core configuration. 
+    @return     hal_res_OK or hal_res_NOK_generic 
+ **/
+extern hal_result_t hal_core_init(const hal_core_cfg_t *cfg); 
+
+
+/** @fn         extern hal_result_t hal_core_start(void)
+    @brief      It starts the core part of HAL: base, cpu, and sys. The clock specified in brdcfg file will be applied, 
+                and the system will be able to init all the other modules (gpio, can, spi, etc.).
+    @return     hal_res_OK or hal_res_NOK_generic 
+ **/
+extern hal_result_t hal_core_start(void); 
+
+
+/** @fn         extern hal_core_status_t hal_core_status_get(void)
+    @brief      gets the status of the core module.
+    @return     the status
+ **/
+extern hal_core_status_t hal_core_status_get(void);
+
+
+/** @fn         onst hal_core_cfg_t* hal_core_cfg_get(void)
+    @brief      it retrieves the core configuration pointer.
+    @return     pointer to the core configuration
+ **/
+const hal_core_cfg_t* hal_core_cfg_get(void);
 
 
 /** @}            
