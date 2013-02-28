@@ -95,11 +95,16 @@ static hal_result_t s_hal_device_eeprom_eraseflash(uint32_t addr, uint32_t size)
 static hal_result_t s_hal_device_eeprom_writeflash(uint32_t addr, uint32_t size, void * data);
 
 // --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static const variables
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+
+// --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
 static hal_boolval_t s_hal_device_eeprom_initted[hal_eeproms_num] = { hal_false };
-
 static hal_eeprom_cfg_t s_hal_device_eeprom_emulated_flash_cfg = {0};
 
 
@@ -469,21 +474,9 @@ extern hal_bool_t hal_eeprom_address_is_valid(hal_eeprom_t eep, uint32_t addr)
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_device_eeprom_hid_getsize(const hal_base_cfg_t *cfg)
-{
-    // no memory needed
-    return(0);
-}
 
-extern hal_result_t hal_device_eeprom_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_device_eeprom_hid_static_memory_init(void)
 {
-    // no memory needed
-//    if(NULL == memory)
-//    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
-//        return(hal_res_NOK_generic);
-//    }
-
     // removed dependancy from NZI ram
     memset(s_hal_device_eeprom_initted, hal_false, hal_eeproms_num);
     memset(&s_hal_device_eeprom_emulated_flash_cfg, 0, sizeof(s_hal_device_eeprom_emulated_flash_cfg));

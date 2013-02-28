@@ -91,6 +91,10 @@ static hal_result_t s_hal_device_ethtransceiver_lowlevel_init(const hal_ethtrans
 
 
 
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static const variables
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
 
 
 
@@ -194,15 +198,8 @@ extern hal_bool_t hal_device_ethtransceiver_started_is(void)
 // empty-section
 // ---- isr of the module: end ------
 
-extern uint32_t hal_device_ethtransceiver_hid_getsize(const hal_base_cfg_t *cfg)
+extern hal_result_t hal_device_ethtransceiver_hid_static_memory_init(void)
 {
-    return(0);
-} 
-
-
-extern hal_result_t hal_device_ethtransceiver_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
-{
-
     // removed dependency from nzi ram
     memset(&s_hal_device_ethtransceiver_cfg, 0, sizeof(s_hal_device_ethtransceiver_cfg));
     s_hal_device_ethtransceiver_initted                =  hal_false;

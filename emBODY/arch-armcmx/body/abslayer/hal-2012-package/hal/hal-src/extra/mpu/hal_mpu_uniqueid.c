@@ -44,7 +44,7 @@
 #include "hal_brdcfg.h"
 #include "hal_utility_bits.h" 
 
-#include "hal_mpu_stm32xx_include.h" 
+#include "hal_middleware_interface.h" 
 
  
 // --------------------------------------------------------------------------------------------------------------------
@@ -80,13 +80,17 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
-// emty-section
+
+const hal_uniqueid_cfg_t hal_uniqueid_cfg_default =
+{
+    .dummy                  = 0
+};
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-
-
+// empty-section
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -96,14 +100,14 @@ static hal_boolval_t s_hal_uniqueid_supported_is(hal_uniqueid_hid_id_t uniqueid)
 
 
 // --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static const variables
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+// --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-
-const hal_uniqueid_cfg_t hal_uniqueid_cfg_default =
-{
-    .dummy                  = 0
-};
-
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -190,23 +194,8 @@ extern hal_uniqueid_id64bit_t hal_uniqueid_macaddr_get(void)
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_uniqueid_hid_getsize(const hal_base_cfg_t *cfg)
+extern hal_result_t hal_uniqueid_hid_static_memory_init(void)
 {
-    // no memory needed
-    return(0);
-}
-
-extern hal_result_t hal_uniqueid_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
-{
-    // no memory needed
-//    if(NULL == memory)
-//    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
-//        return(hal_res_NOK_generic);
-//    }
-
-    // removed dependancy from NZI ram
-
     return(hal_res_OK);  
 }
 

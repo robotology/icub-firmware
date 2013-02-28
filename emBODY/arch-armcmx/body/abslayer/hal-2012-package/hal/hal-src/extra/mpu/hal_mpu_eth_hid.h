@@ -95,9 +95,7 @@ typedef struct
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern uint32_t hal_eth_hid_getsize(const hal_base_cfg_t *cfg);
-
-extern hal_result_t hal_eth_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory);
+extern hal_result_t hal_eth_hid_static_memory_init(void);
 
 extern void hal_eth_hid_rmii_prepare(void);
 extern void hal_eth_hid_rmii_refclock_init(void);

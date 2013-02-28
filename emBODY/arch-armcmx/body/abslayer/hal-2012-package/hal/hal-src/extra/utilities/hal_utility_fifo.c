@@ -71,7 +71,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -92,6 +92,11 @@ static uint8_t* s_hal_utility_fifo_itemofsize08addr(uint64_t* pool, uint32_t pos
 
 static void s_hal_utility_fifo_itemofsize16copy(uint64_t* dst, uint32_t offsetdst, uint64_t* src, uint32_t offsetsrc);
 static uint8_t* s_hal_utility_fifo_itemofsize16addr(uint64_t* pool, uint32_t pos);
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static const variables
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -710,20 +715,8 @@ extern hal_result_t hal_utility_fifo_put01(hal_utility_fifo_t *fifo, uint8_t *da
 // empty-section
 // ---- isr of the module: end ------
 
-extern uint32_t hal_utility_fifo_hid_getsize(const hal_base_cfg_t *cfg)
-{   
-    // no memory needed
-    return(0);
-}
-
-extern hal_result_t hal_utility_fifo_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_utility_fifo_hid_static_memory_init(void)
 {
-    // no memory needed
-//    if(NULL == memory)
-//    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
-//        return(hal_res_NOK_generic);
-//    }
     return(hal_res_OK); 
 }
 

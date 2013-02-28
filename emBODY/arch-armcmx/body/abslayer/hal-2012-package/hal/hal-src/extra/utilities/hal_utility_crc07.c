@@ -67,25 +67,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
-
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - typedef with internal scope
-// --------------------------------------------------------------------------------------------------------------------
-// empty-section
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - declaration of static functions
-// --------------------------------------------------------------------------------------------------------------------
-
-static void s_hal_utility_crc07_generate_table(const uint8_t polynomial, uint8_t *table);
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition (and initialisation) of static variables
-// --------------------------------------------------------------------------------------------------------------------
 
 #ifdef _USE_HAL_UTILITY_CRC07TABLE_IN_ROM_
 // tbl taken from edl manula and NOT by running s_hal_utility_crc07_generate_table(0x1021, tbl) on a cm3 micro with a little endian architecture.
@@ -125,6 +106,32 @@ const uint8_t hal_utility_crc07_table_0x09[256] =
     0x46, 0x4f, 0x54, 0x5d, 0x62, 0x6b, 0x70, 0x79
 };
 #endif
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - typedef with internal scope
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - declaration of static functions
+// --------------------------------------------------------------------------------------------------------------------
+
+static void s_hal_utility_crc07_generate_table(const uint8_t polynomial, uint8_t *table);
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static const variables
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static variables
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -210,20 +217,8 @@ extern uint8_t hal_utility_crc07_compute(const uint32_t polynom, const uint8_t *
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern uint32_t hal_utility_crc07_hid_getsize(const hal_base_cfg_t *cfg)
-{   
-    // no memory needed
-    return(0);
-}
-
-extern hal_result_t hal_utility_crc07_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_utility_crc07_hid_static_memory_init(void)
 {
-    // no memory needed
-//    if(NULL == memory)
-//    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
-//        return(hal_res_NOK_generic);
-//    }
     return(hal_res_OK); 
 }
 

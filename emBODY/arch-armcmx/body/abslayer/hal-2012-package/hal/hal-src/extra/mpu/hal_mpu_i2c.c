@@ -87,7 +87,7 @@ typedef struct
 {
     hal_bool_t          locked;
     hal_i2c_devaddr_t   devaddr;   
-} hal_i2c_status_t;
+} hal_i2c_internals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -98,6 +98,7 @@ static void s_hal_i2c_scheduling_restart(void);
 
 static hal_boolval_t s_hal_i2c_supported_is(hal_i2c_port_t port);
 static void s_hal_i2c_initted_set(hal_i2c_port_t port);
+static hal_boolval_t s_hal_i2c_initted_is(hal_i2c_port_t port);
 
 static void s_hal_i2c_status_set(hal_i2c_port_t port, hal_bool_t locked, hal_i2c_devaddr_t devaddr);
 
@@ -130,13 +131,10 @@ static hal_result_t s_hal_i2c_standby(hal_i2c_port_t port, hal_i2c_devaddr_t dev
 
 static hal_result_t s_hal_i2c_timeoutexpired(void);
 
-// --------------------------------------------------------------------------------------------------------------------
-// - definition (and initialisation) of static variables
-// --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_i2c_initted[hal_i2c_ports_number] = { hal_false, hal_false, hal_false };
-
-static hal_i2c_status_t s_hal_i2c_status[hal_i2c_ports_number] = { {.locked = hal_false, .devaddr = 0 }, {.locked = hal_false, .devaddr = 0 }, {.locked = hal_false, .devaddr = 0 } };
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static const variables
+// --------------------------------------------------------------------------------------------------------------------
 
 static const uint32_t s_hal_i2c_timeout_flag = 0x00010000;
 static const uint32_t s_hal_i2c_timeout_long = 0x01000000;
@@ -162,6 +160,15 @@ static const uint32_t s_hal_i2c_hw_rcc[] = { RCC_APB1Periph_I2C1, RCC_APB1Periph
 
 
 // --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static variables
+// --------------------------------------------------------------------------------------------------------------------
+
+//static hal_boolval_t s_hal_i2c_initted[hal_i2c_ports_number] = { hal_false, hal_false, hal_false };
+static uint8_t s_hal_i2c_initted = 0;
+static hal_i2c_internals_t s_hal_i2c_internals[hal_i2c_ports_number] = { {.locked = hal_false, .devaddr = 0 }, {.locked = hal_false, .devaddr = 0 }, {.locked = hal_false, .devaddr = 0 } };
+
+    
+// --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -174,36 +181,13 @@ extern hal_result_t hal_i2c_init(hal_i2c_port_t port, const hal_i2c_cfg_t *cfg)
 
 extern hal_bool_t hal_i2c_initted_is(hal_i2c_port_t port)
 {
-
-    if(hal_true == s_hal_i2c_initted[HAL_i2c_port2index(port)]) 
-    {
-        return(hal_true);
-    }
-    
-    return(hal_false);
-
-    
-#if 0    
-    I2C_TypeDef* I2Cx = NULL;
-    // this code allows to understand if the registers are already initted. useful to avoid another init in a jump from bootloader .... but bettere to re-init anyway. 
-    if (hal_i2c_port1 == port)
-    {
-        I2Cx = I2C1;
-    }
-    else if(hal_i2c_port2 == port)
-    {
-        I2Cx = I2C2;
-    }
-
-    if((I2Cx->CR1 & 0x0001) == 0x0001) 
-    {
-        //if i'm here it means the periph. has been initted, but i lost status variable in ram (for example i jumped from loader to appl)
-        return(hal_true); 
-    }
-
-    return(hal_false);
-#endif
-
+    return(s_hal_i2c_initted_is(port));
+//     if(hal_true == s_hal_i2c_initted[HAL_i2c_port2index(port)]) 
+//     {
+//         return(hal_true);
+//     }
+//     
+//     return(hal_false);
 }
 
 extern hal_result_t hal_i2c_transaction_begin(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr)
@@ -521,25 +505,11 @@ extern hal_result_t hal_i2c_standby(hal_i2c_port_t port, hal_i2c_devaddr_t devad
 // empty-section
 // ---- isr of the module: end ------
 
-
-extern uint32_t hal_i2c_hid_getsize(const hal_base_cfg_t *cfg)
+extern hal_result_t hal_i2c_hid_static_memory_init(void)
 {
-    // no memory needed
-    return(0);
-}
-
-extern hal_result_t hal_i2c_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
-{
-    // no memory needed
-//    if(NULL == memory)
-//    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
-//        return(hal_res_NOK_generic);
-//    }
-
-    // removed dependancy from nzi data
-    memset(&s_hal_i2c_initted, hal_false, sizeof(s_hal_i2c_initted));   
-    memset(&s_hal_i2c_status, 0, sizeof(s_hal_i2c_status));
+    //memset(&s_hal_i2c_initted, hal_false, sizeof(s_hal_i2c_initted));   
+    s_hal_i2c_initted = 0;
+    memset(&s_hal_i2c_internals, 0, sizeof(s_hal_i2c_internals));
 
     return(hal_res_OK);
 }
@@ -558,25 +528,30 @@ static hal_boolval_t s_hal_i2c_supported_is(hal_i2c_port_t port)
 
 static void s_hal_i2c_initted_set(hal_i2c_port_t port)
 {
-    s_hal_i2c_initted[HAL_i2c_port2index(port)] = hal_true;
+    hal_utility_bits_byte_bitset(&s_hal_i2c_initted, HAL_i2c_port2index(port));
+}
+
+static hal_boolval_t s_hal_i2c_initted_is(hal_i2c_port_t port)
+{
+    return(hal_utility_bits_byte_bitcheck(s_hal_i2c_initted, HAL_i2c_port2index(port)));
 }
 
 static void s_hal_i2c_status_set(hal_i2c_port_t port, hal_bool_t locked, hal_i2c_devaddr_t devaddr)
 {
 //    s_hal_i2c_scheduling_suspend();
-    s_hal_i2c_status[HAL_i2c_port2index(port)].locked   = locked;
-    s_hal_i2c_status[HAL_i2c_port2index(port)].devaddr  = devaddr;
+    s_hal_i2c_internals[HAL_i2c_port2index(port)].locked   = locked;
+    s_hal_i2c_internals[HAL_i2c_port2index(port)].devaddr  = devaddr;
 //    s_hal_i2c_scheduling_restart();
 }
 
 static hal_bool_t s_hal_i2c_is_status_locked(hal_i2c_port_t port)
 {
-    return(s_hal_i2c_status[HAL_i2c_port2index(port)].locked);
+    return(s_hal_i2c_internals[HAL_i2c_port2index(port)].locked);
 }
 
 static hal_i2c_devaddr_t s_hal_i2c_status_devaddr_get(hal_i2c_port_t port)
 {
-    return(s_hal_i2c_status[HAL_i2c_port2index(port)].devaddr);
+    return(s_hal_i2c_internals[HAL_i2c_port2index(port)].devaddr);
 }
 
 
@@ -691,7 +666,7 @@ static void s_hal_i2c_hw_gpio_init(hal_i2c_port_t port)
     
     if(hal_false == found)
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_i2c_init(): incorrect pin mapping");
+        hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_i2c_init(): incorrect pin mapping");
     }
 
     hal_gpio_altcfg_t hal_i2c_scl_altcfg;
@@ -791,7 +766,7 @@ static void s_hal_i2c_hw_gpio_init(hal_i2c_port_t port)
     
     if((hal_false == foundscl) || (hal_false == foundsda))
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_i2c_init(): incorrect pin mapping");
+        hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_i2c_init(): incorrect pin mapping");
     }
     
    
@@ -1570,18 +1545,18 @@ static hal_result_t s_hal_i2c_standby(hal_i2c_port_t port, hal_i2c_devaddr_t dev
 
 static hal_result_t s_hal_i2c_timeoutexpired(void)
 { 
-    hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "timeout error in i2c operations");
+    hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "timeout error in i2c operations");
     return(hal_res_NOK_generic);
 }
 
 static void s_hal_i2c_scheduling_suspend(void)
 {
-    hal_base_hid_osal_scheduling_suspend();
+    hal_base_osal_scheduling_suspend();
 }
 
 static void s_hal_i2c_scheduling_restart(void)
 {
-    hal_base_hid_osal_scheduling_restart();
+    hal_base_osal_scheduling_restart();
 }
 
 

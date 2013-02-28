@@ -194,7 +194,7 @@ extern hal_result_t hal_can_init(hal_can_port_t port, const hal_can_cfg_t *cfg)
 
     if(hal_can_runmode_isr_1txq1rxq != cfg->runmode)
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "hal_can_init():wrong runmode");
+        hal_base_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "hal_can_init():wrong runmode");
         return(hal_res_NOK_unsupported);  
     }
 
@@ -249,7 +249,7 @@ extern hal_result_t hal_can_enable(hal_can_port_t port)
 
 
     // disable scheduling
-    hal_base_hid_osal_scheduling_suspend();
+    hal_base_osal_scheduling_suspend();
 
     cport->enabled = 1;
 
@@ -264,7 +264,7 @@ extern hal_result_t hal_can_enable(hal_can_port_t port)
     s_hal_can_isr_tx_disable(port);
 
     // enable scheduling 
-    hal_base_hid_osal_scheduling_restart();
+    hal_base_osal_scheduling_restart();
 
 	return(hal_res_OK);
 }
@@ -285,7 +285,7 @@ extern hal_result_t hal_can_disable(hal_can_port_t port)
     }
 
     // disable scheduling
-    hal_base_hid_osal_scheduling_suspend();
+    hal_base_osal_scheduling_suspend();
 
     cport->enabled = 0;
 
@@ -299,7 +299,7 @@ extern hal_result_t hal_can_disable(hal_can_port_t port)
     s_hal_can_isr_tx_disable(port);
     
     // enable scheduling 
-    hal_base_hid_osal_scheduling_restart();
+    hal_base_osal_scheduling_restart();
 
     return(hal_res_OK);
 }
@@ -407,7 +407,7 @@ extern hal_result_t hal_can_transmit(hal_can_port_t port)
     }
     
     // disable scheduling
-    hal_base_hid_osal_scheduling_suspend();
+    hal_base_osal_scheduling_suspend();
 
     //s_hal_can_isr_tx_disable(port); the following func takes care of ena or disa interrupt
     
@@ -418,7 +418,7 @@ extern hal_result_t hal_can_transmit(hal_can_port_t port)
 
    
     // enable scheduling 
-    hal_base_hid_osal_scheduling_restart();
+    hal_base_osal_scheduling_restart();
     
     return(hal_res_OK);
 }
@@ -443,7 +443,7 @@ extern hal_result_t hal_can_received(hal_can_port_t port, uint8_t *numberof)
     }
     
     // disable scheduling 
-    hal_base_hid_osal_scheduling_suspend();
+    hal_base_osal_scheduling_suspend();
     
     // disable interrupt rx
     s_hal_can_isr_rx_disable(port);
@@ -454,7 +454,7 @@ extern hal_result_t hal_can_received(hal_can_port_t port, uint8_t *numberof)
     s_hal_can_isr_rx_enable(port);
     
     // enable scheduling 
-    hal_base_hid_osal_scheduling_restart();
+    hal_base_osal_scheduling_restart();
 
     return(hal_res_OK);
 }
@@ -483,7 +483,7 @@ extern hal_result_t hal_can_get(hal_can_port_t port, hal_can_frame_t *frame, uin
     }
     
     // disable scheduling 
-    hal_base_hid_osal_scheduling_suspend();
+    hal_base_osal_scheduling_suspend();
     
     // disable interrupt rx
     s_hal_can_isr_rx_disable(port);
@@ -494,7 +494,7 @@ extern hal_result_t hal_can_get(hal_can_port_t port, hal_can_frame_t *frame, uin
     s_hal_can_isr_rx_enable(port);
     
     // enable scheduling 
-    hal_base_hid_osal_scheduling_restart();
+    hal_base_osal_scheduling_restart();
 
     if(NULL != remaining)
     {
@@ -547,7 +547,7 @@ extern hal_result_t hal_can_receptionfilter_set(hal_can_port_t port, uint8_t mas
 //    	CAN_FilterInit(&CAN_FilterInitStructure);
 //	}
 
-    //hal_base_hid_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "hal_can_receptionfilter_set(): not supported");
+    //hal_base_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "hal_can_receptionfilter_set(): not supported");
     return(hal_res_NOK_unsupported);
 }
 
@@ -639,7 +639,7 @@ extern hal_result_t hal_can_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memo
     {
         if(NULL == memory)
         {
-            hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_can_hid_setmem(): memory missing");
+            hal_base_on_fatalerror(hal_fatalerror_missingmemory, "hal_can_hid_setmem(): memory missing");
             return(hal_res_NOK_generic);
         }
     }
@@ -1181,7 +1181,7 @@ static hal_result_t s_hal_can_tx_normprio(hal_can_port_t port, hal_can_frame_t *
     hal_result_t res = hal_res_NOK_generic;
    
     // disable scheduling. 
-    hal_base_hid_osal_scheduling_suspend();
+    hal_base_osal_scheduling_suspend();
     
     // disable interrupt in can 1 or 2 for tx depending on value of port
     //CAN_IT_TX_DISA(port);
@@ -1203,7 +1203,7 @@ static hal_result_t s_hal_can_tx_normprio(hal_can_port_t port, hal_can_frame_t *
         }
 
         // and i return error
-        hal_base_hid_osal_scheduling_restart();
+        hal_base_osal_scheduling_restart();
         return(hal_res_NOK_busy);
 
     	/* Non posso abilitare qui interrupt in tx, perche' nel caso in cui la CAN_put sia 
@@ -1230,7 +1230,7 @@ static hal_result_t s_hal_can_tx_normprio(hal_can_port_t port, hal_can_frame_t *
     }
 
     // enable scheduling. 
-    hal_base_hid_osal_scheduling_restart();
+    hal_base_osal_scheduling_restart();
 
     return(res);
 

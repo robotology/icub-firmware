@@ -33,7 +33,7 @@
 
 #include "stdlib.h"
 
-#include "hal_mpu_stm32xx_include.h"
+#include "hal_middleware_interface.h"
 
 #include "string.h"
 
@@ -42,7 +42,7 @@
 #include "hal_mpu_gpio_hid.h" 
 #include "hal_utility_fifo.h"
 #include "hal_utility_bits.h" 
-#include "hal_utility_heap.h"
+#include "hal_heap.h"
 #include "hal_cantransceiver.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -161,13 +161,8 @@ static void s_hal_can_isr_rx_disable(hal_can_port_t port);
 
 
 // --------------------------------------------------------------------------------------------------------------------
-// - definition (and initialisation) of static variables
+// - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
-
-static hal_can_internals_t* s_hal_can_internals[hal_can_ports_num] = { NULL };
-
-static hal_boolval_t s_hal_can_initted[hal_can_ports_num] = { hal_false };
-
 
 #if     defined(HAL_USE_CPU_FAM_STM32F1)
 static const hal_gpio_altcfg_t s_hal_can_canx_rx_altcfg         = 
@@ -265,6 +260,16 @@ static const hal_can_frame_t s_hal_can_defcanframe =
 };
 
 // --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static variables
+// --------------------------------------------------------------------------------------------------------------------
+
+static hal_can_internals_t* s_hal_can_internals[hal_can_ports_num] = { NULL };
+
+static uint8_t s_hal_can_initted = 0;
+//static hal_boolval_t s_hal_can_initted[hal_can_ports_num] = { hal_false };
+
+
+// --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -284,7 +289,7 @@ extern hal_result_t hal_can_init(hal_can_port_t port, const hal_can_cfg_t *cfg)
 
     if(hal_can_runmode_isr_1txq1rxq != cfg->runmode)
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "hal_can_init(): wrong runmode");
+        hal_base_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "hal_can_init(): wrong runmode");
         return(hal_res_NOK_unsupported);  
     }
     
@@ -299,16 +304,16 @@ extern hal_result_t hal_can_init(hal_can_port_t port, const hal_can_cfg_t *cfg)
         
         if((0 == capacityofrxfifoofframes) || (0 == capacityoftxfifoofframes))
         {
-            hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_can_init(): need non-zero tx and rx fifo sizes");
+            hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_can_init(): need non-zero tx and rx fifo sizes");
         }
         
         // the internal entry
-        cint = s_hal_can_internals[HAL_can_port2index(port)] = hal_utility_heap_new(sizeof(hal_can_internals_t));
+        cint = s_hal_can_internals[HAL_can_port2index(port)] = hal_heap_new(sizeof(hal_can_internals_t));
         // the rx buffer
-        tmpram = hal_utility_heap_new( sizeof(hal_can_frame_t) * capacityofrxfifoofframes );
+        tmpram = hal_heap_new( sizeof(hal_can_frame_t) * capacityofrxfifoofframes );
         hal_utility_fifo_init(&cint->canframes_rx_norm, capacityofrxfifoofframes, sizeof(hal_can_frame_t), tmpram, (uint8_t*)&s_hal_can_defcanframe);
         // the tx buffer
-        tmpram = hal_utility_heap_new( sizeof(hal_can_frame_t) * capacityoftxfifoofframes );
+        tmpram = hal_heap_new( sizeof(hal_can_frame_t) * capacityoftxfifoofframes );
         hal_utility_fifo_init(&cint->canframes_tx_norm, capacityoftxfifoofframes, sizeof(hal_can_frame_t), tmpram, (uint8_t*)&s_hal_can_defcanframe);      
     }
     
@@ -371,7 +376,7 @@ extern hal_result_t hal_can_enable(hal_can_port_t port)
 
 
     // disable scheduling
-    hal_base_hid_osal_scheduling_suspend();
+    hal_base_osal_scheduling_suspend();
 
     cint->enabled = 1;
 
@@ -386,7 +391,7 @@ extern hal_result_t hal_can_enable(hal_can_port_t port)
     cint->txisrisenabled = 0;
 
     // enable scheduling 
-    hal_base_hid_osal_scheduling_restart();
+    hal_base_osal_scheduling_restart();
 
 	return(hal_res_OK);
 }
@@ -407,7 +412,7 @@ extern hal_result_t hal_can_disable(hal_can_port_t port)
     }
 
     // disable scheduling
-    hal_base_hid_osal_scheduling_suspend();
+    hal_base_osal_scheduling_suspend();
 
     cint->enabled = 0;
 
@@ -421,7 +426,7 @@ extern hal_result_t hal_can_disable(hal_can_port_t port)
     cint->txisrisenabled = 0;
     
     // enable scheduling 
-    hal_base_hid_osal_scheduling_restart();
+    hal_base_osal_scheduling_restart();
 
     return(hal_res_OK);
 }
@@ -546,7 +551,7 @@ extern hal_result_t hal_can_receptionfilter_set(hal_can_port_t port, uint8_t mas
 //    	CAN_FilterInit(&CAN_FilterInitStructure);
 //	}
 
-    //hal_base_hid_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "hal_can_receptionfilter_set(): not supported");
+    //hal_base_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "hal_can_receptionfilter_set(): not supported");
     return(hal_res_NOK_unsupported);
 }
 
@@ -616,91 +621,19 @@ void CAN2_RX0_IRQHandler(void)
 
 // ---- isr of the module: end ------
 
- 
-extern uint32_t hal_can_hid_getsize(const hal_base_cfg_t *cfg)
+
+extern hal_result_t hal_can_hid_static_memory_init(void)
 {
-    uint32_t size = 0;
+    uint8_t i = 0;
     
-//     if(0 != cfg->can1_enable)
-//     {
-//         size += sizeof(hal_can_internals_t);
-//         size += (cfg->can1_rxqnorm_num * sizeof(hal_can_frame_t));
-//         size += (cfg->can1_txqnorm_num * sizeof(hal_can_frame_t));         
-//     }
-//     
-//     if(0 != cfg->can2_enable)
-//     {
-//         size += sizeof(hal_can_internals_t);
-//         size += (cfg->can2_rxqnorm_num * sizeof(hal_can_frame_t));
-//         size += (cfg->can2_txqnorm_num * sizeof(hal_can_frame_t));         
-//     }
-
-    return(size);
-}
-
-
-extern hal_result_t hal_can_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
-{
-//    uint8_t *ram08 = (uint8_t*)memory;
-    uint8_t i=0;
-    
-//     const hal_can_frame_t defcanframe =
-//     {
-//         .id         = 0,
-//         .id_type    = hal_can_frameID_std,
-//         .frame_type = hal_can_frame_data,
-//         .size       = 0,
-//         .unused     = 0,
-//         .data       = {0}      
-//     };
-
-    // removed dependancy from NZI ram
     for(i=0; i<hal_can_ports_num; i++)
     {
         s_hal_can_internals[i] = NULL;
     }
-    memset(s_hal_can_initted, hal_false, hal_can_ports_num);
-
-
-//     if((0 != cfg->can1_enable) || (0 != cfg->can2_enable))
-//     {
-//         if(NULL == memory)
-//         {
-//             hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_can_hid_setmem(): memory missing");
-//             return(hal_res_NOK_generic);
-//         }
-//     }
-
-//     if(0 != cfg->can1_enable)
-//     {
-//         s_hal_can_internals[0] = (hal_can_internals_t*)ram08;
-//         ram08 += sizeof(hal_can_internals_t);
-//         
-//         //hal_canfifo_hid_init(&s_hal_can_internals[0]->canframes_rx_norm, cfg->can1_rxqnorm_num, ram08);
-//         hal_utility_fifo_init(&s_hal_can_internals[0]->canframes_rx_norm, cfg->can1_rxqnorm_num, sizeof(hal_can_frame_t), ram08, (uint8_t*)&defcanframe);
-//         ram08 += (cfg->can1_rxqnorm_num * sizeof(hal_can_frame_t));
-//         
-//         //hal_canfifo_hid_init(&s_hal_can_internals[0]->canframes_tx_norm, cfg->can1_txqnorm_num, ram08);
-//         hal_utility_fifo_init(&s_hal_can_internals[0]->canframes_tx_norm, cfg->can1_txqnorm_num, sizeof(hal_can_frame_t), ram08, (uint8_t*)&defcanframe);
-//         ram08 += (cfg->can1_txqnorm_num * sizeof(hal_can_frame_t));
-//     }
-    
-//     if(0 != cfg->can2_enable)
-//     {
-//         s_hal_can_internals[1] = (hal_can_internals_t*)ram08;
-//         ram08 += sizeof(hal_can_internals_t);
-//  
-//         //hal_canfifo_hid_init(&s_hal_can_internals[1]->canframes_rx_norm, cfg->can2_rxqnorm_num, ram08);
-//         hal_utility_fifo_init(&s_hal_can_internals[1]->canframes_rx_norm, cfg->can2_rxqnorm_num, sizeof(hal_can_frame_t), ram08, (uint8_t*)&defcanframe);
-//         ram08 += (cfg->can2_rxqnorm_num * sizeof(hal_can_frame_t));
-//         
-//         //hal_canfifo_hid_init(&s_hal_can_internals[1]->canframes_tx_norm, cfg->can2_txqnorm_num, ram08);
-//         hal_utility_fifo_init(&s_hal_can_internals[1]->canframes_tx_norm, cfg->can2_txqnorm_num, sizeof(hal_can_frame_t), ram08, (uint8_t*)&defcanframe);
-//         ram08 += (cfg->can2_txqnorm_num * sizeof(hal_can_frame_t));
-//     }
+    //memset(s_hal_can_initted, hal_false, hal_can_ports_num);
+    s_hal_can_initted = 0;
 
     return(hal_res_OK);
-
 }
 
 
@@ -717,12 +650,14 @@ static hal_boolval_t s_hal_can_supported_is(hal_can_port_t port)
 
 static void s_hal_can_initted_set(hal_can_port_t port)
 {
-    s_hal_can_initted[HAL_can_port2index(port)] = hal_true;
+    //s_hal_can_initted[HAL_can_port2index(port)] = hal_true;
+    hal_utility_bits_byte_bitset(&s_hal_can_initted, HAL_can_port2index(port));
 }
 
 static hal_boolval_t s_hal_can_initted_is(hal_can_port_t port)
 {
-    return(s_hal_can_initted[HAL_can_port2index(port)]);
+    //return(s_hal_can_initted[HAL_can_port2index(port)]);
+    return(hal_utility_bits_byte_bitcheck(s_hal_can_initted, HAL_can_port2index(port)));
 }
 
 
@@ -985,7 +920,7 @@ static void s_hal_can_hw_gpio_init(hal_can_port_t port)
     
     if(hal_false == found)
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_can_init(): incorrect pin mapping");
+        hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_can_init(): incorrect pin mapping");
     }
 
     hal_gpio_altcfg_t hal_can_canx_rx_altcfg;
@@ -1085,7 +1020,7 @@ static void s_hal_can_hw_gpio_init(hal_can_port_t port)
     
     if((hal_false == foundrx) || (hal_false == foundtx))
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_can_init(): incorrect pin mapping");
+        hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_can_init(): incorrect pin mapping");
     }
 
     hal_gpio_altcfg_t hal_can_canx_rx_altcfg;

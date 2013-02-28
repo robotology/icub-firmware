@@ -34,7 +34,7 @@
 
 #include "stdlib.h"
 #include "string.h"
-#include "hal_mpu_stm32xx_include.h"
+#include "hal_middleware_interface.h"
 
 
 #include "hal_base_hid.h" 
@@ -95,7 +95,7 @@ static hal_result_t s_hal_gpio_altfun_configure(hal_gpio_cfg_t cfg, const hal_gp
 
 
 // --------------------------------------------------------------------------------------------------------------------
-// - definition (and initialisation) of static variables
+// - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
 
 #if     defined(HAL_USE_CPU_FAM_STM32F1)
@@ -168,6 +168,11 @@ const uint16_t  hal_gpio_hid_pins[]          =        { GPIO_Pin_0,  GPIO_Pin_1,
                                                         GPIO_Pin_8,  GPIO_Pin_9,  GPIO_Pin_10, GPIO_Pin_11,
                                                         GPIO_Pin_12, GPIO_Pin_13, GPIO_Pin_14, GPIO_Pin_15 }; 
 #endif
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static variables
+// --------------------------------------------------------------------------------------------------------------------
 
 static uint16_t s_hal_gpio_initted_mask[hal_gpio_ports_number] = { 0x0000 };
 static uint16_t s_hal_gpio_output_mask[hal_gpio_ports_number] = { 0x0000 };
@@ -340,21 +345,8 @@ extern hal_result_t hal_gpio_configure(hal_gpio_cfg_t cfg, const hal_gpio_altcfg
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_gpio_hid_getsize(const hal_base_cfg_t *cfg)
+extern hal_result_t hal_gpio_hid_static_memory_init(void)
 {
-    // no memory needed
-    return(0);
-}
-
-extern hal_result_t hal_gpio_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
-{
-    // no memory needed
-//    if(NULL == memory)
-//    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
-//        return(hal_res_NOK_generic);
-//    }
-
     memset(s_hal_gpio_initted_mask, 0, sizeof(s_hal_gpio_initted_mask));
     memset(s_hal_gpio_output_mask, 0, sizeof(s_hal_gpio_output_mask));
     return(hal_res_OK);

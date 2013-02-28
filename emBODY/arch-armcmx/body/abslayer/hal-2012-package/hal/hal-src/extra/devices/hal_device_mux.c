@@ -97,6 +97,12 @@ static hal_boolval_t s_hal_device_mux_initted_is(hal_mux_port_t muxport);
 
 
 // --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static const variables
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+
+// --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -218,22 +224,8 @@ extern hal_result_t hal_mux_disable(hal_mux_port_t muxport)
 // empty-section
 // ---- isr of the module: end ------
 
-
-extern uint32_t hal_device_mux_hid_getsize(const hal_base_cfg_t *cfg)
+extern hal_result_t hal_device_mux_hid_static_memory_init(void)
 {
-    // no memory needed
-    return(0);
-}
-
-extern hal_result_t hal_device_mux_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
-{
-    // no memory needed
-//    if(NULL == memory)
-//    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
-//        return(hal_res_NOK_generic);
-//    }
-
     memset(s_hal_device_mux_initted, hal_false, sizeof(s_hal_device_mux_initted));
     return(hal_res_OK);  
 }

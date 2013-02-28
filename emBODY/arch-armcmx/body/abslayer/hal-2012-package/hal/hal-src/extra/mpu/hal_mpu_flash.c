@@ -35,7 +35,7 @@
 #include "stdlib.h"
 #include "string.h"
 
-#include "hal_mpu_stm32xx_include.h"
+#include "hal_middleware_interface.h"
 
 
 
@@ -77,6 +77,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
+
 #if   defined(HAL_USE_CPU_FAM_STM32F4)  
 static uint32_t s_hal_flash_pageindex_get(uint32_t addr);
 #endif
@@ -91,7 +92,7 @@ static hal_result_t s_hal_flash_writehalfword(uint32_t addr, uint16_t hword);
 
 
 // --------------------------------------------------------------------------------------------------------------------
-// - definition (and initialisation) of static variables
+// - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
 
 static const uint32_t s_hal_flash_BASEADDR          = 0x08000000;
@@ -140,6 +141,11 @@ static const uint32_t s_hal_flash_PAGEADDRS[12]     =
 };
 
 #endif
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static variables
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -432,20 +438,8 @@ extern uint32_t hal_flash_get_unitsize(uint32_t addr)
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_flash_hid_getsize(const hal_base_cfg_t *cfg)
+extern hal_result_t hal_flash_hid_static_memory_init(void)
 {
-    // no memory needed
-    return(0);
-}
-
-extern hal_result_t hal_flash_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
-{
-    // no memory needed
-//    if(NULL == memory)
-//    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
-//        return(hal_res_NOK_generic);
-//    }
     return(hal_res_OK); 
 }
 

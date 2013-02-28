@@ -100,13 +100,10 @@ static hal_boolval_t s_hal_device_display_initted_is(hal_display_dev_t dev);
 
 static hal_result_t s_hal_device_display_hw_init(hal_display_dev_t dev, const hal_display_cfg_t *cfg);
 
-// --------------------------------------------------------------------------------------------------------------------
-// - definition (and initialisation) of static variables
-// --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_device_display_initted[hal_display_devs_number] = { hal_false };
-
-static hal_device_display_info_t s_hal_device_display_info[hal_display_devs_number] = { {.cfg = {.res = hal_display_res_320x240x24, .font = {hal_display_font_size_16x24, hal_display_color_black, hal_display_color_white}}} };
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static const variables
+// --------------------------------------------------------------------------------------------------------------------
 
 static const uint16_t s_hal_device_display_colormap[hal_display_colors_number] = 
 {
@@ -121,6 +118,16 @@ static const uint16_t s_hal_device_display_colormap[hal_display_colors_number] =
     /*hal_display_color_cyan         =*/  0x07FF,
     /*hal_display_color_magenta      =*/  0xF81F 
 };
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static variables
+// --------------------------------------------------------------------------------------------------------------------
+
+static hal_boolval_t s_hal_device_display_initted[hal_display_devs_number] = { hal_false };
+
+static hal_device_display_info_t s_hal_device_display_info[hal_display_devs_number] = { {.cfg = {.res = hal_display_res_320x240x24, .font = {hal_display_font_size_16x24, hal_display_color_black, hal_display_color_white}}} };
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -249,21 +256,9 @@ extern hal_result_t hal_display_putstring(hal_display_dev_t dev, uint16_t line, 
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_device_display_hid_getsize(const hal_base_cfg_t *cfg)
-{
-    // no memory needed
-    return(0);
-}
 
-extern hal_result_t hal_device_display_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_device_display_hid_static_memory_init(void)
 {
-    // no memory needed
-//    if(NULL == memory)
-//    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
-//        return(hal_res_NOK_generic);
-//    }
-
     // removed dependancy from NZI ram
     memset(s_hal_device_display_initted, hal_false, sizeof(s_hal_device_display_initted));
 

@@ -186,7 +186,7 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
 
     if((NULL == cfg) || (hal_int_priorityNONE == cfg->priority) || (NULL == cfg->onframerx) || (NULL == cfg->onframerx->frame_new) || (NULL == cfg->onframerx->frame_movetohigherlayer) || (NULL == cfg->macaddress))
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() needs a cfg w/ functions and mac addr and valid priority");
+        hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() needs a cfg w/ functions and mac addr and valid priority");
     }
     else
     {
@@ -545,7 +545,7 @@ extern hal_result_t hal_eth_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memo
 
     if(NULL == memory)
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_eth_hid_setmem(): memory missing");
+        hal_base_on_fatalerror(hal_fatalerror_missingmemory, "hal_eth_hid_setmem(): memory missing");
         return(hal_res_NOK_generic);
     }
 

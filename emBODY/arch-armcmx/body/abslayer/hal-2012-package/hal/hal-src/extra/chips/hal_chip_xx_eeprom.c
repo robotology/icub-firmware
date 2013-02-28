@@ -34,7 +34,7 @@
 
 #include "stdlib.h"
 #include "string.h"
-#include "hal_mpu_stm32xx_include.h"
+#include "hal_middleware_interface.h"
 
  
 // --------------------------------------------------------------------------------------------------------------------
@@ -54,6 +54,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #define         HAL_CHIP_XX_EEPROM_maxEEPROMsize                   (64*1024)
+
+#define         HAL_CHIP_XX_EEPROM_BASICTIMEOUT                     ((uint32_t)0x00111000)
+#define         HAL_CHIP_XX_EEPROM_MAXTRIALS                        (300)
 
 
 
@@ -121,17 +124,19 @@ static hal_result_t s_hal_chip_xx_eeprom_waiteepromstandbystate(void);
 
 static hal_result_t s_hal_chip_xx_eeprom_wait4operation2complete(void);
 
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static const variables
+// --------------------------------------------------------------------------------------------------------------------
+
+const uint32_t          hal_chip_xx_eeprom_hid_timeout_flag            = HAL_CHIP_XX_EEPROM_BASICTIMEOUT;
+const uint32_t          hal_chip_xx_eeprom_hid_timeout_long            = 10 * HAL_CHIP_XX_EEPROM_BASICTIMEOUT;
+const uint32_t          hal_chip_xx_eeprom_hid_ackaddress_maxtrials    = HAL_CHIP_XX_EEPROM_MAXTRIALS;
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-
-#define hal_chip_xx_eeprom_BASICTIMEOUT                ((uint32_t)0x00111000)
-#define hal_chip_xx_eeprom_MAXTRIALS                   (300)
-
-const uint32_t          hal_chip_xx_eeprom_hid_timeout_flag            = hal_chip_xx_eeprom_BASICTIMEOUT;
-const uint32_t          hal_chip_xx_eeprom_hid_timeout_long            = 10 * hal_chip_xx_eeprom_BASICTIMEOUT;
-const uint32_t          hal_chip_xx_eeprom_hid_ackaddress_maxtrials    = hal_chip_xx_eeprom_MAXTRIALS;
-
 
 
 static hal_chip_xx_eeprom_generic_container_t s_hal_chip_xx_eeprom_generics = 
@@ -357,20 +362,8 @@ extern hal_result_t hal_chip_xx_eeprom_write(uint32_t address, uint32_t size, ui
 //}
 
 
-extern uint32_t hal_chip_xx_eeprom_hid_getsize(const hal_base_cfg_t *cfg)
-{   
-    // no memory needed
-    return(0);
-}
-
-extern hal_result_t hal_chip_xx_eeprom_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_chip_xx_eeprom_hid_static_memory_init(void)
 {
-    // no memory needed
-//    if(NULL == memory)
-//    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
-//        return(hal_res_NOK_generic);
-//    }
     return(hal_res_OK); 
 }
 

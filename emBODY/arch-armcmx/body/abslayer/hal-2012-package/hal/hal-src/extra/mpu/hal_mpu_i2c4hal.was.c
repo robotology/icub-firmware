@@ -219,7 +219,7 @@ extern hal_result_t hal_i2c4hal_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *
     // no memory needed
 //    if(NULL == memory)
 //    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
+//        hal_base_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
 //        return(hal_res_NOK_generic);
 //    }
 
@@ -463,7 +463,7 @@ static void s_hal_i2c4hal_hw_gpio_init(hal_i2c4hal_port_t port)
     
     if(hal_false == found)
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_i2c4hal_init(): incorrect pin mapping");
+        hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_i2c4hal_init(): incorrect pin mapping");
     }
 
     hal_gpio_altcfg_t hal_i2c4hal_scl_altcfg;
@@ -563,7 +563,7 @@ static void s_hal_i2c4hal_hw_gpio_init(hal_i2c4hal_port_t port)
     
     if((hal_false == foundscl) || (hal_false == foundsda))
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_i2c4hal_init(): incorrect pin mapping");
+        hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_i2c4hal_init(): incorrect pin mapping");
     }
     
    
@@ -932,7 +932,7 @@ static hal_result_t s_hal_i2c4hal_timeoutexpired(void)
     // call a user-defined function
     #warning --> add a user-def fun
   
-    hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "timeout error in i2c operations");
+    hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "timeout error in i2c operations");
 
     return(hal_res_NOK_generic);
 }

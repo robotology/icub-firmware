@@ -33,11 +33,12 @@
 
 #include "stdlib.h"
 
-#include "hal_mpu_stm32xx_include.h"
+#include "hal_middleware_interface.h"
 
 #include "string.h"
 
 #include "hal_brdcfg.h"
+#include "hal_heap.h" 
 #include "hal_base_hid.h" 
 #include "hal_mpu_gpio_hid.h" 
 #include "hal_utility_fifo.h"
@@ -98,7 +99,7 @@ typedef struct
 //    void*                   destin;
     hal_bool_t              enabled;
     hal_bool_t              stopit;
-} hal_dma_port_datastructure_t;
+} hal_dma_internals_t;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -125,9 +126,8 @@ static void s_hal_dma_isr_clear_flag(hal_dma_port_t port);
 
 
 // --------------------------------------------------------------------------------------------------------------------
-// - definition (and initialisation) of static variables
+// - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
-
 
 #if     defined(HAL_USE_CPU_FAM_STM32F1)
 static DMA_Channel_TypeDef* const s_hal_dma_memory_mapping_of_ports[hal_dma_ports_num] = 
@@ -201,9 +201,11 @@ static const IRQn_Type s_hal_dma_irqnumber[hal_dma_ports_num] =
 #endif
 
 
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static variables
+// --------------------------------------------------------------------------------------------------------------------
 
-static hal_dma_port_datastructure_t *s_hal_dma_port_datastruct_ptr[hal_dma_ports_num] = {NULL};
-
+static hal_dma_internals_t *s_hal_dma_internals[hal_dma_ports_num] = {NULL};
 static uint16_t s_hal_dma_initted = 0;
 
 
@@ -213,9 +215,9 @@ static uint16_t s_hal_dma_initted = 0;
 
 extern hal_result_t hal_dma_init(hal_dma_port_t port, const hal_dma_cfg_t *cfg)
 {
-	hal_dma_port_datastructure_t *dmaportdata = s_hal_dma_port_datastruct_ptr[HAL_dma_port2index(port)];
+	hal_dma_internals_t *dmaint = s_hal_dma_internals[HAL_dma_port2index(port)];
 
-    if((hal_false == s_hal_dma_supported_is(port)) || (NULL == dmaportdata))
+    if(hal_false == s_hal_dma_supported_is(port))
     {
         return(hal_res_NOK_generic);
     }
@@ -224,13 +226,19 @@ extern hal_result_t hal_dma_init(hal_dma_port_t port, const hal_dma_cfg_t *cfg)
     {
         return(hal_res_NOK_generic);
     }
+    
+    if(NULL == dmaint)
+    {
+        // the internal entry
+        dmaint = s_hal_dma_internals[HAL_dma_port2index(port)] = hal_heap_new(sizeof(hal_dma_internals_t));
+    }
 
    
     // set config
-    memcpy(&dmaportdata->cfg, cfg, sizeof(hal_dma_cfg_t));
+    memcpy(&dmaint->cfg, cfg, sizeof(hal_dma_cfg_t));
     
     // set the stm32dma
-    dmaportdata->stm32dmaperiph = HAL_dma_port2peripheral(port);
+    dmaint->stm32dmaperiph = HAL_dma_port2peripheral(port);
     
     
     // enable the peripheral clock
@@ -246,48 +254,47 @@ extern hal_result_t hal_dma_init(hal_dma_port_t port, const hal_dma_cfg_t *cfg)
     #error --> verifica nel progetto stm32f4x spi con dam come viene inizializzato il dma. vedi anche i registri poiche' sono diversi dal stm32f1  
 #endif  
     
-  
     
     
     // set stm32dmainit
 #if     defined(HAL_USE_CPU_FAM_STM32F1)    
-    dmaportdata->stm32dmainit.DMA_PeripheralBaseAddr    = (uint32_t)cfg->source;
-    dmaportdata->stm32dmainit.DMA_MemoryBaseAddr        = (uint32_t)cfg->destin;
-    dmaportdata->stm32dmainit.DMA_DIR                   = (hal_dma_transfer_per2mem == cfg->transfer) ? (DMA_DIR_PeripheralSRC) : (DMA_DIR_PeripheralDST);
-    dmaportdata->stm32dmainit.DMA_BufferSize            = (uint32_t)cfg->datasize;
-    dmaportdata->stm32dmainit.DMA_PeripheralInc         = (hal_dma_transfer_per2mem == cfg->transfer) ? (DMA_PeripheralInc_Disable) : (DMA_PeripheralInc_Disable);
-    dmaportdata->stm32dmainit.DMA_MemoryInc             = (hal_dma_transfer_per2mem == cfg->transfer) ? (DMA_MemoryInc_Enable) : (DMA_MemoryInc_Enable);
-    dmaportdata->stm32dmainit.DMA_PeripheralDataSize    = DMA_PeripheralDataSize_Byte; // decide granularity
-    dmaportdata->stm32dmainit.DMA_MemoryDataSize        = DMA_MemoryDataSize_Byte; // decide granularity
-    dmaportdata->stm32dmainit.DMA_Mode                  = DMA_Mode_Normal;
-    dmaportdata->stm32dmainit.DMA_Priority              = DMA_Priority_VeryHigh; // or decide which priority is given
-    dmaportdata->stm32dmainit.DMA_M2M                   = DMA_M2M_Disable; // or DMA_M2M_Enable in memory2memory
+    dmaint->stm32dmainit.DMA_PeripheralBaseAddr    = (uint32_t)cfg->source;
+    dmaint->stm32dmainit.DMA_MemoryBaseAddr        = (uint32_t)cfg->destin;
+    dmaint->stm32dmainit.DMA_DIR                   = (hal_dma_transfer_per2mem == cfg->transfer) ? (DMA_DIR_PeripheralSRC) : (DMA_DIR_PeripheralDST);
+    dmaint->stm32dmainit.DMA_BufferSize            = (uint32_t)cfg->datasize;
+    dmaint->stm32dmainit.DMA_PeripheralInc         = (hal_dma_transfer_per2mem == cfg->transfer) ? (DMA_PeripheralInc_Disable) : (DMA_PeripheralInc_Disable);
+    dmaint->stm32dmainit.DMA_MemoryInc             = (hal_dma_transfer_per2mem == cfg->transfer) ? (DMA_MemoryInc_Enable) : (DMA_MemoryInc_Enable);
+    dmaint->stm32dmainit.DMA_PeripheralDataSize    = DMA_PeripheralDataSize_Byte; // decide granularity
+    dmaint->stm32dmainit.DMA_MemoryDataSize        = DMA_MemoryDataSize_Byte; // decide granularity
+    dmaint->stm32dmainit.DMA_Mode                  = DMA_Mode_Normal;
+    dmaint->stm32dmainit.DMA_Priority              = DMA_Priority_VeryHigh; // or decide which priority is given
+    dmaint->stm32dmainit.DMA_M2M                   = DMA_M2M_Disable; // or DMA_M2M_Enable in memory2memory
 #elif    defined(HAL_USE_CPU_FAM_STM32F4)
-    dmaportdata->stm32dmainit.DMA_Channel               = DMA_Channel_0;
+    dmaint->stm32dmainit.DMA_Channel               = DMA_Channel_0;
     #warning --> VERIFICA SE DMA_Channel_0 va bene oppure cosa ...
-    dmaportdata->stm32dmainit.DMA_PeripheralBaseAddr    = (uint32_t)cfg->source;
-    dmaportdata->stm32dmainit.DMA_Memory0BaseAddr       = (uint32_t)cfg->destin;
-    dmaportdata->stm32dmainit.DMA_DIR                   = (hal_dma_transfer_per2mem == cfg->transfer) ? (DMA_DIR_PeripheralToMemory) : (DMA_DIR_MemoryToPeripheral);
-    dmaportdata->stm32dmainit.DMA_BufferSize            = (uint32_t)cfg->datasize;
-    dmaportdata->stm32dmainit.DMA_PeripheralInc         = (hal_dma_transfer_per2mem == cfg->transfer) ? (DMA_PeripheralInc_Disable) : (DMA_PeripheralInc_Disable);    
-    dmaportdata->stm32dmainit.DMA_MemoryInc             = (hal_dma_transfer_per2mem == cfg->transfer) ? (DMA_MemoryInc_Enable) : (DMA_MemoryInc_Enable);
-    dmaportdata->stm32dmainit.DMA_PeripheralDataSize    = DMA_PeripheralDataSize_Byte; // decide granularity
-    dmaportdata->stm32dmainit.DMA_MemoryDataSize        = DMA_MemoryDataSize_Byte; // decide granularity
-    dmaportdata->stm32dmainit.DMA_Mode                  = DMA_Mode_Normal;    
-    dmaportdata->stm32dmainit.DMA_Priority              = DMA_Priority_VeryHigh; // or decide which priority is given
-    dmaportdata->stm32dmainit.DMA_FIFOMode              = DMA_FIFOMode_Disable;
+    dmaint->stm32dmainit.DMA_PeripheralBaseAddr    = (uint32_t)cfg->source;
+    dmaint->stm32dmainit.DMA_Memory0BaseAddr       = (uint32_t)cfg->destin;
+    dmaint->stm32dmainit.DMA_DIR                   = (hal_dma_transfer_per2mem == cfg->transfer) ? (DMA_DIR_PeripheralToMemory) : (DMA_DIR_MemoryToPeripheral);
+    dmaint->stm32dmainit.DMA_BufferSize            = (uint32_t)cfg->datasize;
+    dmaint->stm32dmainit.DMA_PeripheralInc         = (hal_dma_transfer_per2mem == cfg->transfer) ? (DMA_PeripheralInc_Disable) : (DMA_PeripheralInc_Disable);    
+    dmaint->stm32dmainit.DMA_MemoryInc             = (hal_dma_transfer_per2mem == cfg->transfer) ? (DMA_MemoryInc_Enable) : (DMA_MemoryInc_Enable);
+    dmaint->stm32dmainit.DMA_PeripheralDataSize    = DMA_PeripheralDataSize_Byte; // decide granularity
+    dmaint->stm32dmainit.DMA_MemoryDataSize        = DMA_MemoryDataSize_Byte; // decide granularity
+    dmaint->stm32dmainit.DMA_Mode                  = DMA_Mode_Normal;    
+    dmaint->stm32dmainit.DMA_Priority              = DMA_Priority_VeryHigh; // or decide which priority is given
+    dmaint->stm32dmainit.DMA_FIFOMode              = DMA_FIFOMode_Disable;
     #warning --> VERIFICA DMA_FIFOMode_Disable, DMA_FIFOThreshold_Full, DMA_MemoryBurst_Single, 
-    dmaportdata->stm32dmainit.DMA_FIFOThreshold         = DMA_FIFOThreshold_Full;
-    dmaportdata->stm32dmainit.DMA_MemoryBurst           = DMA_MemoryBurst_Single;
-    dmaportdata->stm32dmainit.DMA_PeripheralBurst       = DMA_PeripheralBurst_Single;       
+    dmaint->stm32dmainit.DMA_FIFOThreshold         = DMA_FIFOThreshold_Full;
+    dmaint->stm32dmainit.DMA_MemoryBurst           = DMA_MemoryBurst_Single;
+    dmaint->stm32dmainit.DMA_PeripheralBurst       = DMA_PeripheralBurst_Single;       
     
 #endif  
     
-    DMA_DeInit(dmaportdata->stm32dmaperiph);
-    DMA_Init(dmaportdata->stm32dmaperiph, &dmaportdata->stm32dmainit);
+    DMA_DeInit(dmaint->stm32dmaperiph);
+    DMA_Init(dmaint->stm32dmaperiph, &dmaint->stm32dmainit);
  
-    dmaportdata->enabled = hal_false;
-    dmaportdata->stopit = hal_false;
+    dmaint->enabled = hal_false;
+    dmaint->stopit = hal_false;
 
     s_hal_dma_initted_set(port);
     
@@ -299,19 +306,19 @@ extern hal_result_t hal_dma_init(hal_dma_port_t port, const hal_dma_cfg_t *cfg)
 
 extern hal_result_t hal_dma_enable(hal_dma_port_t port)
 {
-	hal_dma_port_datastructure_t *dmaportdata = s_hal_dma_port_datastruct_ptr[HAL_dma_port2index(port)];
+	hal_dma_internals_t *dmaint = s_hal_dma_internals[HAL_dma_port2index(port)];
 
     if(hal_false == s_hal_dma_initted_is(port))
     {
         return(hal_res_NOK_generic);
     }
 
-    dmaportdata->enabled = hal_true;
+    dmaint->enabled = hal_true;
          
     DMA_ITConfig(HAL_dma_port2peripheral(port), DMA_IT_TC, ENABLE);
     hal_dma_isr_enable(port);
     
-    DMA_Cmd(dmaportdata->stm32dmaperiph, ENABLE);
+    DMA_Cmd(dmaint->stm32dmaperiph, ENABLE);
     
 	return(hal_res_OK);
 }
@@ -319,16 +326,16 @@ extern hal_result_t hal_dma_enable(hal_dma_port_t port)
 
 extern hal_result_t hal_dma_disable(hal_dma_port_t port) 
 {
-	hal_dma_port_datastructure_t *dmaportdata = s_hal_dma_port_datastruct_ptr[HAL_dma_port2index(port)];
+	hal_dma_internals_t *dmaint = s_hal_dma_internals[HAL_dma_port2index(port)];
 
     if(hal_false == s_hal_dma_initted_is(port))
     {
         return(hal_res_NOK_generic);
     }
 
-    dmaportdata->enabled = hal_false;
+    dmaint->enabled = hal_false;
     
-    DMA_Cmd(dmaportdata->stm32dmaperiph, DISABLE);
+    DMA_Cmd(dmaint->stm32dmaperiph, DISABLE);
     
     hal_dma_isr_disable(port);
     DMA_ITConfig(HAL_dma_port2peripheral(port), DMA_IT_TC, DISABLE);
@@ -339,9 +346,9 @@ extern hal_result_t hal_dma_disable(hal_dma_port_t port)
 
 extern void hal_dma_isr_enable(hal_dma_port_t port)
 {
-    hal_dma_port_datastructure_t *dmaportdata = s_hal_dma_port_datastruct_ptr[HAL_dma_port2index(port)];
+    hal_dma_internals_t *dmaint = s_hal_dma_internals[HAL_dma_port2index(port)];
     IRQn_Type IRQn = s_hal_dma_irqnumber[HAL_dma_port2index(port)];
-    if(hal_int_priorityNONE != dmaportdata->cfg.intpriority)
+    if(hal_int_priorityNONE != dmaint->cfg.intpriority)
     {
         hal_sys_irqn_enable(IRQn);
     }
@@ -349,9 +356,9 @@ extern void hal_dma_isr_enable(hal_dma_port_t port)
 
 extern void hal_dma_isr_disable(hal_dma_port_t port)
 {
-    hal_dma_port_datastructure_t *dmaportdata = s_hal_dma_port_datastruct_ptr[HAL_dma_port2index(port)];
+    hal_dma_internals_t *dmaint = s_hal_dma_internals[HAL_dma_port2index(port)];
     IRQn_Type IRQn = s_hal_dma_irqnumber[HAL_dma_port2index(port)];
-    if(hal_int_priorityNONE != dmaportdata->cfg.intpriority)
+    if(hal_int_priorityNONE != dmaint->cfg.intpriority)
     {
         hal_sys_irqn_disable(IRQn);
     }
@@ -359,32 +366,32 @@ extern void hal_dma_isr_disable(hal_dma_port_t port)
 
 extern hal_result_t hal_dma_retrigger(hal_dma_port_t port)
 {
-	hal_dma_port_datastructure_t *dmaportdata = s_hal_dma_port_datastruct_ptr[HAL_dma_port2index(port)];
+	hal_dma_internals_t *dmaint = s_hal_dma_internals[HAL_dma_port2index(port)];
 
     if(hal_false == s_hal_dma_initted_is(port))
     {
         return(hal_res_NOK_generic);
     }
     
-    dmaportdata->stopit = hal_false;
+    dmaint->stopit = hal_false;
     
-    DMA_Cmd(dmaportdata->stm32dmaperiph, DISABLE);
-    dmaportdata->stm32dmaperiph->CNDTR  = dmaportdata->stm32dmainit.DMA_BufferSize;
-    DMA_Cmd(dmaportdata->stm32dmaperiph, ENABLE);
+    DMA_Cmd(dmaint->stm32dmaperiph, DISABLE);
+    dmaint->stm32dmaperiph->CNDTR  = dmaint->stm32dmainit.DMA_BufferSize;
+    DMA_Cmd(dmaint->stm32dmaperiph, ENABLE);
     
     return(hal_res_OK);
 }
 
 extern hal_result_t hal_dma_dontdisable(hal_dma_port_t port)
 {
-	hal_dma_port_datastructure_t *dmaportdata = s_hal_dma_port_datastruct_ptr[HAL_dma_port2index(port)];
+	hal_dma_internals_t *dmaint = s_hal_dma_internals[HAL_dma_port2index(port)];
 
     if(hal_false == s_hal_dma_initted_is(port))
     {
         return(hal_res_NOK_generic);
     }
     
-    dmaportdata->stopit = hal_false;
+    dmaint->stopit = hal_false;
         
     return(hal_res_OK);
 }
@@ -394,7 +401,7 @@ extern hal_result_t hal_dma_dontdisable(hal_dma_port_t port)
 
 extern hal_result_t hal_dma_source_set(hal_dma_port_t port, void* source)
 {
-	hal_dma_port_datastructure_t *dmaportdata = s_hal_dma_port_datastruct_ptr[HAL_dma_port2index(port)];
+	hal_dma_internals_t *dmaint = s_hal_dma_internals[HAL_dma_port2index(port)];
 
     if(hal_false == s_hal_dma_initted_is(port))
     {
@@ -403,16 +410,16 @@ extern hal_result_t hal_dma_source_set(hal_dma_port_t port, void* source)
     
     if(NULL != source)
     {
-        dmaportdata->cfg.source                             = source;
-        dmaportdata->stm32dmainit.DMA_PeripheralBaseAddr    = (uint32_t)dmaportdata->cfg.source;   
+        dmaint->cfg.source                             = source;
+        dmaint->stm32dmainit.DMA_PeripheralBaseAddr    = (uint32_t)dmaint->cfg.source;   
     }
     
-    dmaportdata->stopit = hal_false;
+    dmaint->stopit = hal_false;
     
-    DMA_Cmd(dmaportdata->stm32dmaperiph, DISABLE);
-    dmaportdata->stm32dmaperiph->CPAR   = dmaportdata->stm32dmainit.DMA_PeripheralBaseAddr;
-    dmaportdata->stm32dmaperiph->CNDTR  = dmaportdata->stm32dmainit.DMA_BufferSize;
-    DMA_Cmd(dmaportdata->stm32dmaperiph, ENABLE);
+    DMA_Cmd(dmaint->stm32dmaperiph, DISABLE);
+    dmaint->stm32dmaperiph->CPAR   = dmaint->stm32dmainit.DMA_PeripheralBaseAddr;
+    dmaint->stm32dmaperiph->CNDTR  = dmaint->stm32dmainit.DMA_BufferSize;
+    DMA_Cmd(dmaint->stm32dmaperiph, ENABLE);
     
     return(hal_res_OK);
 }
@@ -420,7 +427,7 @@ extern hal_result_t hal_dma_source_set(hal_dma_port_t port, void* source)
 
 extern hal_result_t hal_dma_destin_set(hal_dma_port_t port, void* destin)
 {
-	hal_dma_port_datastructure_t *dmaportdata = s_hal_dma_port_datastruct_ptr[HAL_dma_port2index(port)];
+	hal_dma_internals_t *dmaint = s_hal_dma_internals[HAL_dma_port2index(port)];
 
     if(hal_false == s_hal_dma_initted_is(port))
     {
@@ -429,27 +436,27 @@ extern hal_result_t hal_dma_destin_set(hal_dma_port_t port, void* destin)
     
     if(NULL != destin)
     {
-        dmaportdata->cfg.destin                         = destin;
+        dmaint->cfg.destin                         = destin;
 #if     defined(HAL_USE_CPU_FAM_STM32F1)    
-        dmaportdata->stm32dmainit.DMA_MemoryBaseAddr    = (uint32_t)dmaportdata->cfg.destin;
+        dmaint->stm32dmainit.DMA_MemoryBaseAddr    = (uint32_t)dmaint->cfg.destin;
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)   
-        dmaportdata->stm32dmainit.DMA_Memory0BaseAddr   = (uint32_t)dmaportdata->cfg.destin;
+        dmaint->stm32dmainit.DMA_Memory0BaseAddr   = (uint32_t)dmaint->cfg.destin;
 #endif                           
     }  
 
-    dmaportdata->stopit = hal_false;    
+    dmaint->stopit = hal_false;    
     
-    DMA_Cmd(dmaportdata->stm32dmaperiph, DISABLE);
+    DMA_Cmd(dmaint->stm32dmaperiph, DISABLE);
     
 #if     defined(HAL_USE_CPU_FAM_STM32F1)    
-    dmaportdata->stm32dmaperiph->CMAR   = dmaportdata->stm32dmainit.DMA_MemoryBaseAddr;
-    dmaportdata->stm32dmaperiph->CNDTR  = dmaportdata->stm32dmainit.DMA_BufferSize;
+    dmaint->stm32dmaperiph->CMAR   = dmaint->stm32dmainit.DMA_MemoryBaseAddr;
+    dmaint->stm32dmaperiph->CNDTR  = dmaint->stm32dmainit.DMA_BufferSize;
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)   
-    dmaportdata->stm32dmaperiph->CMAR   = dmaportdata->stm32dmainit.DMA_MemoryBaseAddr;
-    dmaportdata->stm32dmaperiph->CNDTR  = dmaportdata->stm32dmainit.DMA_BufferSize;
+    dmaint->stm32dmaperiph->CMAR   = dmaint->stm32dmainit.DMA_MemoryBaseAddr;
+    dmaint->stm32dmaperiph->CNDTR  = dmaint->stm32dmainit.DMA_BufferSize;
 #endif           
 
-    DMA_Cmd(dmaportdata->stm32dmaperiph, ENABLE);
+    DMA_Cmd(dmaint->stm32dmaperiph, ENABLE);
     
     return(hal_res_OK);
 }
@@ -610,43 +617,18 @@ void DMA2_Stream7_IRQHandler(void)
 
 // ---- isr of the module: end ------
 
- 
-extern uint32_t hal_dma_hid_getsize(const hal_base_cfg_t *cfg)
+
+extern hal_result_t hal_dma_hid_static_memory_init(void)
 {
-    uint32_t size = 0;
     uint8_t i;
     
     for(i=0; i<hal_dma_ports_num; i++)
-    {
-        if(hal_true == s_hal_dma_supported_is(HAL_dma_index2port(i)))
-        {
-            size += sizeof(hal_dma_port_datastructure_t);
-        }
+    {       
+        s_hal_dma_internals[i] = NULL;
     }
     
-    return(size);
-}
-
-
-extern hal_result_t hal_dma_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
-{
-    uint8_t *ram08 = (uint8_t*)memory;
-    uint8_t i;
-    
-
-    for(i=0; i<hal_dma_ports_num; i++)
-    {
-        if(hal_true == s_hal_dma_supported_is(HAL_dma_index2port(i)))
-        {
-            s_hal_dma_port_datastruct_ptr[i] = (hal_dma_port_datastructure_t*)ram08;
-            ram08 += sizeof(hal_dma_port_datastructure_t);
-        }
-        else
-        {
-            s_hal_dma_port_datastruct_ptr[i] = NULL;
-        }
-    }
-   
+    s_hal_dma_initted = 0;
+       
     return(hal_res_OK);
 }
 
@@ -675,31 +657,31 @@ static hal_boolval_t s_hal_dma_initted_is(hal_dma_port_t port)
 
 static void s_hal_dma_isr_portx(hal_dma_port_t port)
 {   
-    hal_dma_port_datastructure_t *dmaportdata = s_hal_dma_port_datastruct_ptr[HAL_dma_port2index(port)];
+    hal_dma_internals_t *dmaint = s_hal_dma_internals[HAL_dma_port2index(port)];
     
     s_hal_dma_isr_clear_flag(port);
    
     
-    if(hal_dma_mode_oneshot == dmaportdata->cfg.mode)
+    if(hal_dma_mode_oneshot == dmaint->cfg.mode)
     {
-        dmaportdata->stopit = hal_true;
+        dmaint->stopit = hal_true;
     }
     
-    if(NULL != dmaportdata->cfg.cbk_on_transfer_done)
+    if(NULL != dmaint->cfg.cbk_on_transfer_done)
     {
-        dmaportdata->cfg.cbk_on_transfer_done(dmaportdata->cfg.arg_on_transfer_done);
+        dmaint->cfg.cbk_on_transfer_done(dmaint->cfg.arg_on_transfer_done);
     }      
     
 
-    if(hal_dma_mode_oneshot == dmaportdata->cfg.mode)
+    if(hal_dma_mode_oneshot == dmaint->cfg.mode)
     {
-        // if ... inside dmaportdata->cfg.cbk_on_transfer_done() we call any retrigger function, then  we dont disable
-        if(hal_true == dmaportdata->stopit)
+        // if ... inside dmaint->cfg.cbk_on_transfer_done() we call any retrigger function, then  we dont disable
+        if(hal_true == dmaint->stopit)
         {
             hal_dma_disable(port);
         }
         
-        dmaportdata->stopit = hal_false;
+        dmaint->stopit = hal_false;
     }  
        
 }
@@ -711,14 +693,14 @@ static void s_hal_dma_isr_portx(hal_dma_port_t port)
 
 static void s_hal_dma_hw_nvic_init(hal_dma_port_t port)
 {
-    hal_dma_port_datastructure_t *dmaportdata = s_hal_dma_port_datastruct_ptr[HAL_dma_port2index(port)];   
+    hal_dma_internals_t *dmaint = s_hal_dma_internals[HAL_dma_port2index(port)];   
     IRQn_Type IRQn = s_hal_dma_irqnumber[HAL_dma_port2index(port)];
 
 
-    if(hal_int_priorityNONE != dmaportdata->cfg.intpriority)
+    if(hal_int_priorityNONE != dmaint->cfg.intpriority)
     {
         // enable rx irq in nvic
-        hal_sys_irqn_priority_set(IRQn, dmaportdata->cfg.intpriority);
+        hal_sys_irqn_priority_set(IRQn, dmaint->cfg.intpriority);
         hal_sys_irqn_disable(IRQn);
     }
 
@@ -727,9 +709,9 @@ static void s_hal_dma_hw_nvic_init(hal_dma_port_t port)
 
 // static void s_hal_dma_isr_enable(hal_dma_port_t port)
 // {
-//     hal_dma_port_datastructure_t *dmaportdata = s_hal_dma_port_datastruct_ptr[HAL_dma_port2index(port)];
+//     hal_dma_internals_t *dmaint = s_hal_dma_internals[HAL_dma_port2index(port)];
 //     IRQn_Type IRQn = s_hal_dma_irqnumber[HAL_dma_port2index(port)];
-//     if(hal_int_priorityNONE != dmaportdata->cfg.intpriority)
+//     if(hal_int_priorityNONE != dmaint->cfg.intpriority)
 //     {
 //         hal_sys_irqn_enable(IRQn);
 //     }
@@ -737,9 +719,9 @@ static void s_hal_dma_hw_nvic_init(hal_dma_port_t port)
 
 // static void s_hal_dma_isr_disable(hal_dma_port_t port)
 // {
-//     hal_dma_port_datastructure_t *dmaportdata = s_hal_dma_port_datastruct_ptr[HAL_dma_port2index(port)];
+//     hal_dma_internals_t *dmaint = s_hal_dma_internals[HAL_dma_port2index(port)];
 //     IRQn_Type IRQn = s_hal_dma_irqnumber[HAL_dma_port2index(port)];
-//     if(hal_int_priorityNONE != dmaportdata->cfg.intpriority)
+//     if(hal_int_priorityNONE != dmaint->cfg.intpriority)
 //     {
 //         hal_sys_irqn_disable(IRQn);
 //     }

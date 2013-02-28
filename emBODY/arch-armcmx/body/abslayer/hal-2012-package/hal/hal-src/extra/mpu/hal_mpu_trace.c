@@ -33,7 +33,7 @@
 
 #include "stdlib.h"
 
-#include "hal_mpu_stm32xx_include.h"
+#include "hal_middleware_interface.h"
 #include "hal_brdcfg.h"
 #include "hal_base_hid.h" 
 
@@ -64,6 +64,11 @@
 
 extern volatile int32_t ITM_RxBuffer = ITM_RXBUFFER_EMPTY;
 
+const hal_trace_cfg_t hal_trace_cfg_default =
+{
+    .dummy  = 0
+};
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -77,14 +82,16 @@ extern volatile int32_t ITM_RxBuffer = ITM_RXBUFFER_EMPTY;
 
 
 // --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static const variables
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-
-const hal_trace_cfg_t hal_trace_cfg_default =
-{
-    .dummy  = 0
-};
-
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -157,22 +164,8 @@ extern int hal_trace_puts(const char * str)
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_trace_hid_getsize(const hal_base_cfg_t *cfg)
+extern hal_result_t hal_trace_hid_static_memory_init(void)
 {
-    // no memory needed
-    return(0);
-}
-
-extern hal_result_t hal_trace_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
-{
-    // no memory needed
-//    if(NULL == memory)
-//    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
-//        return(hal_res_NOK_generic);
-//    }
-
-    // removed dependency from nzi data
     hal_trace_init(NULL);
     return(hal_res_OK);  
 }

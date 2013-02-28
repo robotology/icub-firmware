@@ -148,11 +148,8 @@ static void s_hal_extbrd_keil_mcbqvga_spiframe_receiv(void* p);
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------
-// - definition (and initialisation) of static variables
+// - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
-
-static hal_boolval_t s_hal_extbrd_keil_mcbqvga_initted[1] = { hal_false };
-static hal_extbrd_keil_mcbqvga_info_t s_hal_extbrd_keil_mcbqvga_info[1] = { {.cfg = { .mode = hal_extbrd_keil_mcbqvga_mode_spi, .spiport = hal_spi_port3}, .font = 0 } };
 
 static const hal_gpio_cfg_t gpio_cs = 
 {
@@ -169,6 +166,14 @@ static const hal_gpio_cfg_t gpio_STLD40D_enable =
     .dir = hal_gpio_dirOUT, 
     .speed = hal_gpio_speed_high
 };
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static variables
+// --------------------------------------------------------------------------------------------------------------------
+
+static hal_boolval_t s_hal_extbrd_keil_mcbqvga_initted[1] = { hal_false };
+static hal_extbrd_keil_mcbqvga_info_t s_hal_extbrd_keil_mcbqvga_info[1] = { {.cfg = { .mode = hal_extbrd_keil_mcbqvga_mode_spi, .spiport = hal_spi_port3}, .font = 0 } };
 
 static volatile uint16_t s_hal_extbrd_keil_mcbqvga_textcolors[2] = {HAL_EXTBRD_KEIL_MCBQVGA_COLWHITE, HAL_EXTBRD_KEIL_MCBQVGA_COLBLACK};
 
@@ -349,22 +354,8 @@ extern hal_result_t hal_extbrd_keil_mcbqvga_putchar(uint16_t line, uint16_t colu
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_extbrd_keil_mcbqvga_hid_getsize(const hal_base_cfg_t *cfg)
+extern hal_result_t hal_extbrd_keil_mcbqvga_hid_static_memory_init(void)
 {
-    // no memory needed
-    return(0);
-}
-
-extern hal_result_t hal_extbrd_keil_mcbqvga_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
-{
-    // no memory needed
-//    if(NULL == memory)
-//    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
-//        return(hal_res_NOK_generic);
-//    }
-
-
     memset(s_hal_extbrd_keil_mcbqvga_initted, hal_false, sizeof(s_hal_extbrd_keil_mcbqvga_initted));
     return(hal_res_OK);  
 }

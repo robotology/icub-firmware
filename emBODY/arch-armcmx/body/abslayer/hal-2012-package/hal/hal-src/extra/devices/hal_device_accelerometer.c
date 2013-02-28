@@ -98,11 +98,15 @@ static hal_boolval_t s_hal_device_accelerometer_initted_is(hal_accelerometer_por
 static hal_result_t s_hal_device_accelerometer_hw_init(hal_accelerometer_port_t port, const hal_accelerometer_cfg_t *cfg);
 
 // --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static const variables
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+// --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
 static hal_boolval_t s_hal_device_accelerometer_initted[hal_accelerometer_ports_number] = { hal_false };
-
 static hal_device_accelerometer_info_t s_hal_device_accelerometer_info[hal_accelerometer_ports_number] = { 0 };
 
 
@@ -209,22 +213,8 @@ extern hal_result_t hal_accelerometer_read(hal_accelerometer_port_t port, hal_ac
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_device_accelerometer_hid_getsize(const hal_base_cfg_t *cfg)
+extern hal_result_t hal_device_accelerometer_hid_static_memory_init(void)
 {
-    // no memory needed
-    return(0);
-}
-
-extern hal_result_t hal_device_accelerometer_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
-{
-    // no memory needed
-//    if(NULL == memory)
-//    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
-//        return(hal_res_NOK_generic);
-//    }
-
-
     memset(s_hal_device_accelerometer_info, 0, sizeof(s_hal_device_accelerometer_info));
     memset(s_hal_device_accelerometer_initted, hal_false, sizeof(s_hal_device_accelerometer_initted));
     return(hal_res_OK);  

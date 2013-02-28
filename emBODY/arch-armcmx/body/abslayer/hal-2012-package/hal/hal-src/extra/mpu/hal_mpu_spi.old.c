@@ -421,7 +421,7 @@ extern hal_result_t hal_spi_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memo
     // no memory needed
 //    if(NULL == memory)
 //    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
+//        hal_base_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
 //        return(hal_res_NOK_generic);
 //    }
 
@@ -982,7 +982,7 @@ static void s_hal_spi_hw_gpio_init(hal_spi_port_t port, hal_spi_ownership_t owne
     
     if(hal_false == found)
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_spi_init(): incorrect pin mapping");
+        hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_spi_init(): incorrect pin mapping");
     }
 
     hal_gpio_altcfg_t hal_spi_sck_altcfg;
@@ -1119,7 +1119,7 @@ static void s_hal_spi_hw_gpio_init(hal_spi_port_t port, hal_spi_ownership_t owne
     
     if((hal_false == foundsck) || (hal_false == foundmiso) || (hal_false == foundmosi))
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_spi_init(): incorrect pin mapping");
+        hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_spi_init(): incorrect pin mapping");
     }
     
     
@@ -1212,19 +1212,19 @@ static hal_result_t s_hal_spi_timeoutexpired(void)
     // call a user-defined function
     #warning --> add a user-def fun
   
-    hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "timeout error in spi operations");
+    hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "timeout error in spi operations");
 
     return(hal_res_NOK_generic);
 }
 
 static void s_hal_spi_scheduling_suspend(void)
 {
-    hal_base_hid_osal_scheduling_suspend();
+    hal_base_osal_scheduling_suspend();
 }
 
 static void s_hal_spi_scheduling_restart(void)
 {
-    hal_base_hid_osal_scheduling_restart();
+    hal_base_osal_scheduling_restart();
 }
 
 extern void hal_test_spima_spisl(void)

@@ -101,6 +101,13 @@ static void s_hal_chip_micrel_ks8893_phymode_get(hal_eth_phymode_t* usedphymode)
 
 
 // --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static const variables
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -121,7 +128,7 @@ extern hal_result_t hal_chip_micrel_ks8893_init(const hal_chip_micrel_ks8893_cfg
     if(NULL == cfg)
     {
         //cfg  = &hal_chip_micrel_ks8893_cfg_default;
-        hal_base_hid_on_fatalerror(hal_fatalerror_missingconfiguration, "in hal_chip_micrel_ks8893_init");
+        hal_base_on_fatalerror(hal_fatalerror_missingconfiguration, "in hal_chip_micrel_ks8893_init");
         return(hal_res_NOK_generic);
     }
     
@@ -226,7 +233,7 @@ extern hal_result_t hal_chip_micrel_ks8893_configure(hal_eth_phymode_t targetphy
     hal_i2c_read(hal_i2c_port1, I2CADDRESS, regadr, &buff_read, 1);
     if(!(buff_read&0x01))
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "hal_chip_micrel_ks8893_configure(): SWITCH not configured");
+        hal_base_on_fatalerror(hal_fatalerror_runtimefault, "hal_chip_micrel_ks8893_configure(): SWITCH not configured");
     }
     
     s_hal_chip_micrel_ks8893_phymode_get(usedphymode);
@@ -257,22 +264,9 @@ extern hal_result_t hal_chip_micrel_ks8893_mii_getphymode(hal_eth_phymode_t* use
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_chip_micrel_ks8893_hid_getsize(const hal_base_cfg_t *cfg)
+
+extern hal_result_t hal_chip_micrel_ks8893_hid_static_memory_init(void)
 {
-    // no memory needed
-    return(0);
-}
-
-extern hal_result_t hal_chip_micrel_ks8893_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
-{
-    // no memory needed
-//    if(NULL == memory)
-//    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
-//        return(hal_res_NOK_generic);
-//    }
-
-
     memset(s_hal_chip_micrel_ks8893_initted, hal_false, sizeof(s_hal_chip_micrel_ks8893_initted));
     return(hal_res_OK);  
 }

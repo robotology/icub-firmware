@@ -105,6 +105,7 @@ typedef struct
     uint8_t                         shift;
 } hal_chip_st_lis3dh_info_t;
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -115,6 +116,13 @@ static hal_boolval_t s_hal_chip_st_lis3dh_initted_is(void);
 static hal_result_t s_hal_chip_st_lis3dh_hw_init(const hal_chip_st_lis3dh_cfg_t *cfg, hal_chip_st_lis3dh_info_t* info);
 
 static int32_t s_hal_chip_st_lis3dh_convert(int32_t v);
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static const variables
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -236,22 +244,8 @@ extern hal_result_t hal_chip_st_lis3dh_accel_get(int32_t* xac, int32_t* yac, int
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_chip_st_lis3dh_hid_getsize(const hal_base_cfg_t *cfg)
+extern hal_result_t hal_chip_st_lis3dh_hid_static_memory_init(void)
 {
-    // no memory needed
-    return(0);
-}
-
-extern hal_result_t hal_chip_st_lis3dh_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
-{
-    // no memory needed
-//    if(NULL == memory)
-//    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
-//        return(hal_res_NOK_generic);
-//    }
-
-
     memset(s_hal_chip_st_lis3dh_initted, hal_false, sizeof(s_hal_chip_st_lis3dh_initted));
     return(hal_res_OK);  
 }

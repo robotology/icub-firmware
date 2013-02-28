@@ -35,7 +35,7 @@
 #include "stdlib.h"
 #include "string.h"
 
-#include "hal_mpu_stm32xx_include.h"
+#include "hal_middleware_interface.h"
 #include "hal_base_hid.h" 
 #include "hal_brdcfg.h"
 #include "hal_ethtransceiver.h"
@@ -44,7 +44,7 @@
 
 
 #include "hal_utility_bits.h" 
-#include "hal_utility_heap.h"
+#include "hal_heap.h"
 
 
 
@@ -398,6 +398,19 @@ static void s_hal_eth_mac_init(const hal_eth_cfg_t *cfg, hal_eth_phymode_t phymo
 
 
 // --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static const variables
+// --------------------------------------------------------------------------------------------------------------------
+
+static const hal_eth_network_functions_t s_hal_eth_fns = 
+{
+    .eth_init           = hal_eth_init, 
+    .eth_enable         = hal_eth_enable, 
+    .eth_disable        = hal_eth_disable, 
+    .eth_sendframe      = hal_eth_sendframe
+};
+
+
+// --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -416,14 +429,6 @@ static uint32_t (*tx_buf)[ETH_BUF_SIZE>>2] = NULL;
 static hal_rx_desc_t *Rx_Desc = NULL;
 static hal_tx_desc_t *Tx_Desc = NULL;
 
-
-static const hal_eth_network_functions_t s_hal_eth_fns = 
-{
-    .eth_init           = hal_eth_init, 
-    .eth_enable         = hal_eth_enable, 
-    .eth_disable        = hal_eth_disable, 
-    .eth_sendframe      = hal_eth_sendframe
-};
 
 static hal_eth_internals_t s_eth_internals =
 {
@@ -464,11 +469,11 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
 
     if((NULL == cfg) || (hal_int_priorityNONE == cfg->priority) || (NULL == cfg->onframerx) || (NULL == cfg->onframerx->frame_new) || (NULL == cfg->onframerx->frame_movetohigherlayer) || (NULL == cfg->macaddress))
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() needs a cfg w/ functions and mac addr and valid priority");
+        hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() needs a cfg w/ functions and mac addr and valid priority");
     }
     else if( (0 == cfg->capacityoftxfifoofframes) || (0 == cfg->capacityofrxfifoofframes))
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() needs a cfg w/ non-zero tx and rx queue");
+        hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() needs a cfg w/ non-zero tx and rx queue");
     }
     else
     {
@@ -487,13 +492,13 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     
     if((0 == capacityoftxfifoofframes) || (0 == capacityofrxfifoofframes))
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() needs a non-zero number of dma tx and rx buffers");
+        hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() needs a non-zero number of dma tx and rx buffers");
     }
     
-    rx_buf = (uint32_t (*)[ETH_BUF_SIZE>>2]) hal_utility_heap_new(ETH_BUF_SIZE * capacityofrxfifoofframes);     
-    tx_buf = (uint32_t (*)[ETH_BUF_SIZE>>2]) hal_utility_heap_new(ETH_BUF_SIZE * capacityoftxfifoofframes);
-    Rx_Desc = (hal_rx_desc_t*) hal_utility_heap_new(sizeof(hal_rx_desc_t) * capacityofrxfifoofframes);
-    Tx_Desc = (hal_tx_desc_t*) hal_utility_heap_new(sizeof(hal_tx_desc_t) * capacityoftxfifoofframes); 
+    rx_buf = (uint32_t (*)[ETH_BUF_SIZE>>2]) hal_heap_new(ETH_BUF_SIZE * capacityofrxfifoofframes);     
+    tx_buf = (uint32_t (*)[ETH_BUF_SIZE>>2]) hal_heap_new(ETH_BUF_SIZE * capacityoftxfifoofframes);
+    Rx_Desc = (hal_rx_desc_t*) hal_heap_new(sizeof(hal_rx_desc_t) * capacityofrxfifoofframes);
+    Tx_Desc = (hal_tx_desc_t*) hal_heap_new(sizeof(hal_tx_desc_t) * capacityoftxfifoofframes); 
 
 
 //    eventviewer_init();
@@ -506,7 +511,7 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     // instead in case of a switch accessed through i2c, this function must: a. init the i2c, reset the switch, that's it.    
     if(hal_res_NOK_generic == hal_ethtransceiver_init(NULL))
     {
-         hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() called hal_ethtransceiver_init() which failed");
+         hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() called hal_ethtransceiver_init() which failed");
     }        
     
   
@@ -526,7 +531,7 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     
     if(hal_eth_phymode_none == usedphymode)
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() called hal_ethtransceiver_config() which does not support a phy mode");
+        hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() called hal_ethtransceiver_config() which does not support a phy mode");
     }
     
     // for rmii we use the same config at the phy ...
@@ -720,24 +725,9 @@ rel:  Rx_Desc[i].Stat = DMA_RX_OWN;
 
 // ---- isr of the module: end ------
 
-
-extern uint32_t hal_eth_hid_getsize(const hal_base_cfg_t *cfg)
-{
-    uint32_t size = 0;
-
-//     size += (ETH_BUF_SIZE * hal_brdcfg_eth__theconfig.numofdmarxbuffers);
-//     size += (ETH_BUF_SIZE * hal_brdcfg_eth__theconfig.numofdmatxbuffers);
-
-//     size += (sizeof(hal_rx_desc_t) * hal_brdcfg_eth__theconfig.numofdmarxbuffers);
-//     size += (sizeof(hal_tx_desc_t) * hal_brdcfg_eth__theconfig.numofdmatxbuffers); 
-
-    return(size);
-}
-
-extern hal_result_t hal_eth_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_eth_hid_static_memory_init(void)
 {
 
-    // removed dependency from nzi memory
     RxBufIndex = 0;
     TxBufIndex = 0;
     rx_buf = NULL;
@@ -745,29 +735,9 @@ extern hal_result_t hal_eth_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memo
     Rx_Desc = NULL;
     Tx_Desc = NULL;
     memset(&s_eth_internals.onframerx, 0, sizeof(hal_eth_onframereception_t));
-    //s_hal_mac = NULL;
 
-
-//     if(NULL == memory)
-//     {
-//         hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_eth_hid_setmem(): memory missing");
-//         return(hal_res_NOK_generic);
-//     }
-//
-//     rx_buf = (uint32_t (*)[ETH_BUF_SIZE>>2]) memory;
-//     memory += ((ETH_BUF_SIZE * hal_brdcfg_eth__theconfig.numofdmarxbuffers)/4);
-//      
-//     tx_buf = (uint32_t (*)[ETH_BUF_SIZE>>2]) memory;
-//     memory += ((ETH_BUF_SIZE * hal_brdcfg_eth__theconfig.numofdmatxbuffers)/4);
-
-//     Rx_Desc = (hal_rx_desc_t*) memory;
-//     memory += ((sizeof(hal_rx_desc_t) * hal_brdcfg_eth__theconfig.numofdmarxbuffers)/4);
-
-//     Tx_Desc = (hal_tx_desc_t*) memory;
-//     memory += ((sizeof(hal_tx_desc_t) * hal_brdcfg_eth__theconfig.numofdmatxbuffers)/4);
 
     return(hal_res_OK);
-
 }
 
 // --------------------------------------------------------------------------------------------------------------------

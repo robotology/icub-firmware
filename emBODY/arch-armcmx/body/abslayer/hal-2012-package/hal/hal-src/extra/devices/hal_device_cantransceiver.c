@@ -91,7 +91,10 @@ static hal_result_t s_hal_device_cantransceiver_lowlevel_init(hal_can_port_t por
 
 
 
-
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static const variables
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -180,15 +183,9 @@ extern hal_bool_t hal_cantransceiver_initted_is(hal_can_port_t port)
 // empty-section
 // ---- isr of the module: end ------
 
-extern uint32_t hal_device_cantransceiver_hid_getsize(const hal_base_cfg_t *cfg)
+
+extern hal_result_t hal_device_cantransceiver_hid_static_memory_init(void)
 {
-    return(0);
-} 
-
-
-extern hal_result_t hal_device_cantransceiver_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
-{
-
     // removed dependency from nzi ram
     memset(&s_hal_device_cantransceiver_cfg, 0, sizeof(s_hal_device_cantransceiver_cfg));
     memset(&s_hal_device_cantransceiver_initted, hal_false, sizeof(s_hal_device_cantransceiver_initted));

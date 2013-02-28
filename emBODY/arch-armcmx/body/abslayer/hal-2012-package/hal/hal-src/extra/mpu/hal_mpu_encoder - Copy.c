@@ -216,17 +216,17 @@ extern hal_result_t hal_encoder_read_block(hal_encoder_t enc, uint32_t *result)
     }
 
 
-	hal_base_hid_osal_scheduling_suspend(); //suspend scheduling
+	hal_base_osal_scheduling_suspend(); //suspend scheduling
 
     if(1 == hal_SPI4ENCODER_ENCODER_IS_BUSY_SET(spix))
     {
-        hal_base_hid_osal_scheduling_restart(); //resume scheduling
+        hal_base_osal_scheduling_restart(); //resume scheduling
         return(hal_res_NOK_generic);
     }
 
     hal_SPI4ENCODER_ENCODER_BUSY_SET(spix);	//saved encoder id in spix interface datas
 
-    hal_base_hid_osal_scheduling_restart(); //resume scheduling
+    hal_base_osal_scheduling_restart(); //resume scheduling
 
 
     
@@ -254,11 +254,11 @@ extern hal_result_t hal_encoder_read_block(hal_encoder_t enc, uint32_t *result)
 
 
 
-	hal_base_hid_osal_scheduling_suspend(); //suspend scheduling
+	hal_base_osal_scheduling_suspend(); //suspend scheduling
 
     hal_SPI4ENCODER_ENCODER_BUSY_RESET(spix);
 
-    hal_base_hid_osal_scheduling_restart(); //resume scheduling
+    hal_base_osal_scheduling_restart(); //resume scheduling
     
     return(hal_res_OK);
 }
@@ -282,17 +282,17 @@ extern hal_result_t hal_encoder_read_start(hal_encoder_t enc)
 
     // verify if we can start reading the encoder on spix or if someone else already has started the reading
 	
-	hal_base_hid_osal_scheduling_suspend(); //suspend scheduling
+	hal_base_osal_scheduling_suspend(); //suspend scheduling
 
     if(1 == hal_SPI4ENCODER_ENCODER_IS_BUSY_SET(spix))
     {
-        hal_base_hid_osal_scheduling_restart(); //resume scheduling
+        hal_base_osal_scheduling_restart(); //resume scheduling
         return(hal_res_NOK_generic);
     }
 
     hal_SPI4ENCODER_ENCODER_BUSY_SET(spix);	//saved encoder id in spix interface datas
 
-    hal_base_hid_osal_scheduling_restart(); //resume scheduling
+    hal_base_osal_scheduling_restart(); //resume scheduling
 
     // ok, we can start the reading process.
 

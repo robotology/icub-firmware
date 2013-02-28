@@ -36,10 +36,10 @@
 #include "hal_base_hid.h" 
 #include "hal_brdcfg.h"
 #include "hal_utility_bits.h" 
-#include "hal_utility_heap.h"
+#include "hal_heap.h"
 
 
-#include "hal_mpu_stm32xx_include.h" 
+#include "hal_middleware_interface.h" 
 
 
  
@@ -62,7 +62,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_timer_t2index(t)           ((uint8_t)((t)))
+#define HAL_timer2index(t)           ((uint8_t)((t)))
 
 
 #if     defined(HAL_USE_CPU_FAM_STM32F1)
@@ -128,7 +128,7 @@ static void s_hal_timer_callback(hal_timer_t timer);
 
 
 // --------------------------------------------------------------------------------------------------------------------
-// - definition (and initialisation) of static variables
+// - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
 
 static const hal_timer_stm32_regs_t s_hal_timer_stm32regs[hal_timers_num] =
@@ -175,6 +175,12 @@ static const hal_timer_stm32_regs_t s_hal_timer_stm32regs[hal_timers_num] =
     }
 };
 
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of variables
+// --------------------------------------------------------------------------------------------------------------------
+
 static hal_timer_internals_t* s_hal_timer_internals[hal_timers_num] = { NULL };
 
 
@@ -185,7 +191,7 @@ static hal_timer_internals_t* s_hal_timer_internals[hal_timers_num] = { NULL };
 
 extern hal_result_t hal_timer_init(hal_timer_t timer, const hal_timer_cfg_t *cfg, hal_time_t *error)
 {
-    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer_t2index(timer)];    
+    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer2index(timer)];    
 
     if(hal_false == s_hal_timer_supported_is(timer))
     {
@@ -215,7 +221,7 @@ extern hal_result_t hal_timer_init(hal_timer_t timer, const hal_timer_cfg_t *cfg
     // if it does not have ram yet, then attempt to allocate it.
     if(NULL == tint)
     {
-        tint = s_hal_timer_internals[HAL_timer_t2index(timer)] = hal_utility_heap_new(sizeof(hal_timer_internals_t));
+        tint = s_hal_timer_internals[HAL_timer2index(timer)] = hal_heap_new(sizeof(hal_timer_internals_t));
     }    
      
     // if it is running, then stop it.
@@ -308,7 +314,7 @@ extern hal_result_t hal_timer_countdown_set(hal_timer_t timer, hal_time_t countd
     }
 
     // computes the values to be put in registers
-    curcfg = &s_hal_timer_internals[HAL_timer_t2index(timer)]->cfg;
+    curcfg = &s_hal_timer_internals[HAL_timer2index(timer)]->cfg;
     memcpy(&newcfg, curcfg, sizeof(hal_timer_cfg_t));
     newcfg.countdown = countdown;
 
@@ -366,8 +372,8 @@ extern hal_result_t hal_timer_interrupt_disable(hal_timer_t timer)
 
 extern hal_result_t hal_timer_remainingtime_get(hal_timer_t timer, hal_time_t *remaining_time)
 {
-    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer_t2index(timer)];
-    TIM_TypeDef* TIMx               = s_hal_timer_stm32regs[HAL_timer_t2index(timer)].TIMx;
+    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer2index(timer)];
+    TIM_TypeDef* TIMx               = s_hal_timer_stm32regs[HAL_timer2index(timer)].TIMx;
 
     if(hal_false == s_hal_timer_initted_is(timer))
     {
@@ -468,41 +474,14 @@ void TIM7_IRQHandler(void)
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_timer_hid_getsize(const hal_base_cfg_t *cfg)
-{
-    uint32_t size = 0;
-    
-//    size += (MAX_TIMER_INDEX_PLUS_ONE * sizeof(hal_timer_internals_t));
-    
-    return(size);
-}
-
-extern hal_result_t hal_timer_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
+extern hal_result_t hal_timer_hid_static_memory_init(void)
 {
     uint8_t i = 0;
-//    uint8_t *ram08 = (uint8_t*)memory;
 
-    // removed dependancy from NZI ram
     for(i=0; i<hal_timers_num; i++)
     {
         s_hal_timer_internals[i] = NULL;
     }
-
-//     // in case we have any timers
-//     if(0 != MAX_TIMER_INDEX_PLUS_ONE) 
-//     {
-//         if(NULL == memory)
-//         {
-//             hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_timer_hid_setmem(): memory missing");
-//             return(hal_res_NOK_generic);
-//         }
-
-//         for(i=0; i<MAX_TIMER_INDEX_PLUS_ONE; i++)
-//         {
-//             s_hal_timer_internals[i] = (hal_timer_internals_t*)ram08;
-//             ram08 += sizeof(hal_timer_internals_t);
-//         }
-//     }
 
     return(hal_res_OK);  
 }
@@ -513,7 +492,7 @@ extern hal_result_t hal_timer_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *me
 
 static hal_boolval_t s_hal_timer_supported_is(hal_timer_t timer)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_timer__theconfig.supported_mask, HAL_timer_t2index(timer)));
+    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_timer__theconfig.supported_mask, HAL_timer2index(timer)));
 }
 
 static void s_hal_timer_initted_set(hal_timer_t timer)
@@ -528,18 +507,18 @@ static hal_boolval_t s_hal_timer_initted_is(hal_timer_t timer)
 
 static void s_hal_timer_status_set(hal_timer_t timer, hal_timer_status_t status)
 {
-    s_hal_timer_internals[HAL_timer_t2index(timer)]->status = status;
+    s_hal_timer_internals[HAL_timer2index(timer)]->status = status;
 }
 
 static hal_timer_status_t s_hal_timer_status_get(hal_timer_t timer)
 {
-    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer_t2index(timer)];
+    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer2index(timer)];
     return( (NULL == tint) ? (hal_timer_status_none) : (tint->status) );
 }
 
 static void s_hal_timer_prepare(hal_timer_t timer, const hal_timer_cfg_t *cfg)
 {
-    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer_t2index(timer)];
+    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer2index(timer)];
     // we use SystemCoreClock instead of hal_brdcfg_sys__theconfig.speeds.cpu, which should be the same because ...
     volatile uint32_t referencespeed = SystemCoreClock;  
 
@@ -602,10 +581,10 @@ static void s_hal_timer_prepare(hal_timer_t timer, const hal_timer_cfg_t *cfg)
 
 static void s_hal_timer_stm32_start(hal_timer_t timer)
 {
-    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer_t2index(timer)];
-    TIM_TypeDef* TIMx               = s_hal_timer_stm32regs[HAL_timer_t2index(timer)].TIMx;
-    uint32_t RCC_APB1Periph_TIMx    = s_hal_timer_stm32regs[HAL_timer_t2index(timer)].RCC_APB1Periph_TIMx;
-    IRQn_Type TIMx_IRQn             = s_hal_timer_stm32regs[HAL_timer_t2index(timer)].TIMx_IRQn;
+    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer2index(timer)];
+    TIM_TypeDef* TIMx               = s_hal_timer_stm32regs[HAL_timer2index(timer)].TIMx;
+    uint32_t RCC_APB1Periph_TIMx    = s_hal_timer_stm32regs[HAL_timer2index(timer)].RCC_APB1Periph_TIMx;
+    IRQn_Type TIMx_IRQn             = s_hal_timer_stm32regs[HAL_timer2index(timer)].TIMx_IRQn;
     TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
    // NVIC_InitTypeDef NVIC_InitStructure;
    
@@ -649,11 +628,11 @@ static void s_hal_timer_stm32_start(hal_timer_t timer)
 
 static void s_hal_timer_stm32_stop(hal_timer_t timer)
 {
-    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer_t2index(timer)];
+    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer2index(timer)];
 //    NVIC_InitTypeDef NVIC_InitStructure;
-    TIM_TypeDef* TIMx               = s_hal_timer_stm32regs[HAL_timer_t2index(timer)].TIMx;
-//    uint32_t RCC_APB1Periph_TIMx    = s_hal_timer_stm32regs[HAL_timer_t2index(timer)].RCC_APB1Periph_TIMx;
-    IRQn_Type TIMx_IRQn             = s_hal_timer_stm32regs[HAL_timer_t2index(timer)].TIMx_IRQn;
+    TIM_TypeDef* TIMx               = s_hal_timer_stm32regs[HAL_timer2index(timer)].TIMx;
+//    uint32_t RCC_APB1Periph_TIMx    = s_hal_timer_stm32regs[HAL_timer2index(timer)].RCC_APB1Periph_TIMx;
+    IRQn_Type TIMx_IRQn             = s_hal_timer_stm32regs[HAL_timer2index(timer)].TIMx_IRQn;
    
 
 #if 1
@@ -791,7 +770,7 @@ static void s_hal_timer_stm32_stop(hal_timer_t timer)
 
 static hal_time_t s_hal_timer_get_period(hal_timer_t timer)
 {
-    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer_t2index(timer)];
+    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer2index(timer)];
 
     return(tint->cfg.countdown);
 }
@@ -799,7 +778,7 @@ static hal_time_t s_hal_timer_get_period(hal_timer_t timer)
 
 static void s_hal_timer_callback(hal_timer_t timer)
 {
-    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer_t2index(timer)];
+    hal_timer_internals_t *tint = s_hal_timer_internals[HAL_timer2index(timer)];
     
     if(hal_timer_mode_oneshot == tint->cfg.mode)
     {

@@ -42,7 +42,7 @@
 
 #include "hal_utility_bits.h"
 #include "hal_utility_fifo.h"
-#include "hal_utility_heap.h"
+#include "hal_heap.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -122,7 +122,9 @@ static void s_hal_spi_scheduling_restart(void);
 #endif
 
 static hal_boolval_t s_hal_spi_supported_is(hal_spi_port_t port);
+
 static void s_hal_spi_initted_set(hal_spi_port_t port);
+static hal_boolval_t s_hal_spi_initted_is(hal_spi_port_t port);
 
 static void s_hal_spi_set_dma_enabled(hal_spi_port_t port, hal_bool_t value);
 static hal_bool_t s_hal_spi_is_dma_enabled(hal_spi_port_t port);
@@ -156,42 +158,8 @@ static void s_hal_spi_dma_on_tranfer_done_tx(void* p);
 static void s_hal_spi_dma_on_tranfer_done_rx(void* p);
 
 // --------------------------------------------------------------------------------------------------------------------
-// - definition (and initialisation) of static variables
+// - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
-
-static hal_boolval_t s_hal_spi_initted[hal_spi_ports_number] = { hal_false, hal_false, hal_false };
-
-static hal_spi_internals_t s_hal_spi_internals[hal_spi_ports_number] = 
-{ 
-    {
-        .config     =
-        {   // same values as in hal_spi_cfg_default
-            .ownership                  = hal_spi_ownership_master,
-            .direction                  = hal_spi_dir_rxonly,
-            .activity                   = hal_spi_act_framebased,      
-            .prescaler                  = hal_spi_prescaler_128,    // it is 562500 on stm32f1 @ 72mhz fast bus, and 656250 on stm32f4 @ 84mhz fast bus
-            .speed                      = hal_spi_speed_dontuse,           
-            .sizeofframe                = 4,
-            .capacityoftxfifoofframes   = 0,
-            .capacityofrxfifoofframes   = 2,
-            .dummytxvalue               = 0x00,
-            .onframetransm              = NULL,
-            .argonframetransm           = NULL,
-            .onframereceiv              = NULL,
-            .argonframereceiv           = NULL        
-        },
-        .dummytxframe           = NULL,
-        .dmatxframe             = NULL,
-        .dmarxframe             = NULL,
-        .fifotx                 = {0},
-        .fiforx                 = {0},
-        .port                   = hal_spi_port1,
-        .frameburstcountdown    = 0,
-        .forcestop              = hal_false,
-        .dmaisenabled           = hal_false     
-    }
-};
-
 
 static const SPI_InitTypeDef s_hal_spi_stm32_cfg =
 {
@@ -238,6 +206,48 @@ static const uint32_t s_hal_spi_timeout_flag = 0x00010000;
 //         TODO ...
 // #endif
     
+    
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static variables
+// --------------------------------------------------------------------------------------------------------------------
+
+// hal_boolval_t s_hal_spi_initted[hal_spi_ports_number] = { hal_false, hal_false, hal_false };
+static uint8_t s_hal_spi_initted = 0;
+
+#warning WIP --> make s_hal_spi_internals an array of pointers
+
+static hal_spi_internals_t s_hal_spi_internals[hal_spi_ports_number] = 
+{ 
+    {
+        .config     =
+        {   // same values as in hal_spi_cfg_default
+            .ownership                  = hal_spi_ownership_master,
+            .direction                  = hal_spi_dir_rxonly,
+            .activity                   = hal_spi_act_framebased,      
+            .prescaler                  = hal_spi_prescaler_128,    // it is 562500 on stm32f1 @ 72mhz fast bus, and 656250 on stm32f4 @ 84mhz fast bus
+            .speed                      = hal_spi_speed_dontuse,           
+            .sizeofframe                = 4,
+            .capacityoftxfifoofframes   = 0,
+            .capacityofrxfifoofframes   = 2,
+            .dummytxvalue               = 0x00,
+            .onframetransm              = NULL,
+            .argonframetransm           = NULL,
+            .onframereceiv              = NULL,
+            .argonframereceiv           = NULL        
+        },
+        .dummytxframe           = NULL,
+        .dmatxframe             = NULL,
+        .dmarxframe             = NULL,
+        .fifotx                 = {0},
+        .fiforx                 = {0},
+        .port                   = hal_spi_port1,
+        .frameburstcountdown    = 0,
+        .forcestop              = hal_false,
+        .dmaisenabled           = hal_false     
+    }
+};
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -482,24 +492,10 @@ extern hal_result_t hal_spi_on_frametransm_set(hal_spi_port_t port, hal_callback
 
 // ---- isr of the module: end ------
 
-
-extern uint32_t hal_spi_hid_getsize(const hal_base_cfg_t *cfg)
+extern hal_result_t hal_spi_hid_static_memory_init(void)
 {
-    // no memory needed
-    return(0);
-}
-
-extern hal_result_t hal_spi_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
-{
-    // no memory needed
-//    if(NULL == memory)
-//    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
-//        return(hal_res_NOK_generic);
-//    }
-
-    // removed dependancy from nzi data
-    memset(&s_hal_spi_initted, hal_false, sizeof(s_hal_spi_initted));   
+    //memset(&s_hal_spi_initted, hal_false, sizeof(s_hal_spi_initted));  
+    s_hal_spi_initted = 0;   
     memset(&s_hal_spi_internals, 0, sizeof(s_hal_spi_internals));
 
     return(hal_res_OK);
@@ -507,7 +503,7 @@ extern hal_result_t hal_spi_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memo
 
 extern hal_boolval_t hal_spi_hid_initted_is(hal_spi_port_t port)
 {   
-    return(s_hal_spi_initted[HAL_spi_port2index(port)]);
+    return(s_hal_spi_initted_is(port));
 }
 
 
@@ -523,9 +519,18 @@ static hal_boolval_t s_hal_spi_supported_is(hal_spi_port_t port)
     return(hal_utility_bits_byte_bitcheck(hal_brdcfg_spi__theconfig.supported_mask, HAL_spi_port2index(port)) );
 }
 
+
 static void s_hal_spi_initted_set(hal_spi_port_t port)
 {
-    s_hal_spi_initted[HAL_spi_port2index(port)] = hal_true;
+    //s_hal_spi_initted[HAL_spi_port2index(port)] = hal_true;
+    hal_utility_bits_byte_bitset(&s_hal_spi_initted, HAL_spi_port2index(port));
+}
+
+
+static hal_boolval_t s_hal_spi_initted_is(hal_spi_port_t port)
+{   
+    //return(s_hal_spi_initted[HAL_spi_port2index(port)]);
+    return(hal_utility_bits_byte_bitcheck(s_hal_spi_initted, HAL_spi_port2index(port)));
 }
 
 
@@ -627,7 +632,7 @@ static hal_result_t s_hal_spi_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg
     {
     
         // - the dummy tx frame
-        spixint->dummytxframe = (uint8_t*)hal_utility_heap_new(usedcfg->sizeofframe);
+        spixint->dummytxframe = (uint8_t*)hal_heap_new(usedcfg->sizeofframe);
 #if     defined(HAL_MPU_SPI_DEBUG_MODE )
         uint8_t i;
         for(i=0; i<usedcfg->sizeofframe; i++) { spixint->dummytxframe[i] = usedcfg->dummytxvalue + i; }
@@ -636,11 +641,11 @@ static hal_result_t s_hal_spi_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg
 #endif  
 
         // - the dma tx frame   
-        spixint->dmatxframe = (uint8_t*)hal_utility_heap_new(usedcfg->sizeofframe);
+        spixint->dmatxframe = (uint8_t*)hal_heap_new(usedcfg->sizeofframe);
         memcpy(spixint->dmatxframe, spixint->dummytxframe, usedcfg->sizeofframe);
 
         // - the dma rx frame  
-        spixint->dmarxframe = (uint8_t*)hal_utility_heap_new(usedcfg->sizeofframe);    
+        spixint->dmarxframe = (uint8_t*)hal_heap_new(usedcfg->sizeofframe);    
         
         
         // - the fifo of tx frames. but only if it needed ... we dont need it if ...
@@ -651,7 +656,7 @@ static hal_result_t s_hal_spi_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg
         }
         else
         {
-            tmpbuffer = (uint8_t*)hal_utility_heap_new(usedcfg->capacityoftxfifoofframes*usedcfg->sizeofframe);
+            tmpbuffer = (uint8_t*)hal_heap_new(usedcfg->capacityoftxfifoofframes*usedcfg->sizeofframe);
             hal_utility_fifo_init(&spixint->fifotx, usedcfg->capacityoftxfifoofframes, usedcfg->sizeofframe, tmpbuffer, NULL);
         }
      
@@ -663,7 +668,7 @@ static hal_result_t s_hal_spi_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg
         }
         else
         {
-            tmpbuffer = (uint8_t*) hal_utility_heap_new(usedcfg->capacityofrxfifoofframes*usedcfg->sizeofframe);
+            tmpbuffer = (uint8_t*) hal_heap_new(usedcfg->capacityofrxfifoofframes*usedcfg->sizeofframe);
             hal_utility_fifo_init(&spixint->fiforx, usedcfg->capacityofrxfifoofframes, usedcfg->sizeofframe, tmpbuffer, NULL);
         }
      
@@ -844,7 +849,7 @@ static void s_hal_spi_hw_gpio_init(hal_spi_port_t port, hal_spi_ownership_t owne
     
     if(hal_false == found)
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_spi_init(): incorrect pin mapping");
+        hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_spi_init(): incorrect pin mapping");
     }
 
     hal_gpio_altcfg_t hal_spi_sck_altcfg;
@@ -981,7 +986,7 @@ static void s_hal_spi_hw_gpio_init(hal_spi_port_t port, hal_spi_ownership_t owne
     
     if((hal_false == foundsck) || (hal_false == foundmiso) || (hal_false == foundmosi))
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_spi_init(): incorrect pin mapping");
+        hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_spi_init(): incorrect pin mapping");
     }
     
     
@@ -1027,11 +1032,11 @@ static void s_hal_spi_hw_enable(hal_spi_port_t port, const hal_spi_cfg_t* cfg)
     
     if((hal_spi_speed_dontuse == cfg->speed) && (hal_spi_prescaler_dontuse == cfg->prescaler))
     {
-         hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_spi_init(): use one of speed or prescaler");
+         hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_spi_init(): use one of speed or prescaler");
     }
     if((hal_spi_speed_dontuse != cfg->speed) && (hal_spi_prescaler_dontuse != cfg->prescaler))
     {
-         hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_spi_init(): use either speed or prescaler, not both");
+         hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_spi_init(): use either speed or prescaler, not both");
     }
     
     if(hal_spi_prescaler_dontuse != cfg->prescaler)
@@ -1118,19 +1123,19 @@ static void s_hal_spi_hw_enable(hal_spi_port_t port, const hal_spi_cfg_t* cfg)
 
 static hal_result_t s_hal_spi_timeoutexpired(void)
 {
-    hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "timeout error in spi raw operations");
+    hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "timeout error in spi raw operations");
     return(hal_res_NOK_generic);
 }
 
 #if 0  
 static void s_hal_spi_scheduling_suspend(void)
 {
-    hal_base_hid_osal_scheduling_suspend();
+    hal_base_osal_scheduling_suspend();
 }
 
 static void s_hal_spi_scheduling_restart(void)
 {
-    hal_base_hid_osal_scheduling_restart();
+    hal_base_osal_scheduling_restart();
 }
 #endif
 

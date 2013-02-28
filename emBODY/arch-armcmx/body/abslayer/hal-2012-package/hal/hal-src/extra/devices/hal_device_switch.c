@@ -99,6 +99,11 @@ static hal_result_t s_hal_device_switch_lowlevel_init(const hal_switch_cfg_t *cf
 
 
 
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static const variables
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -200,16 +205,9 @@ extern hal_bool_t hal_switch_started_is(void)
 // empty-section
 // ---- isr of the module: end ------
 
-extern uint32_t hal_device_switch_hid_getsize(const hal_base_cfg_t *cfg)
+
+extern hal_result_t hal_device_switch_hid_static_memory_init(void)
 {
-    return(0);
-} 
-
-
-extern hal_result_t hal_device_switch_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
-{
-
-    // removed dependency from nzi ram
     memset(&s_hal_device_switch_cfg, 0, sizeof(s_hal_device_switch_cfg));
     s_hal_device_switch_initted                =  hal_false;
     s_hal_device_switch_started                =  hal_false;
@@ -313,7 +311,7 @@ static hal_result_t s_hal_device_switch_reg_config(void)
     hal_i2c_read(hal_i2c_port1, 0xBE, regadr, &buff_read, 1);
     if(!(buff_read&0x01))
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "s_hal_device_switch_reg_config(): SWITCH not configured");
+        hal_base_on_fatalerror(hal_fatalerror_runtimefault, "s_hal_device_switch_reg_config(): SWITCH not configured");
     }
 
     return(hal_res_OK);

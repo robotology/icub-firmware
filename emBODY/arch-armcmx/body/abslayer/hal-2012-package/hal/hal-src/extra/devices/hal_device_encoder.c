@@ -98,6 +98,24 @@ static void s_hal_encoder_onreceiv(void* p);
 
 static hal_encoder_position_t s_hal_encoder_frame2position(uint8_t* frame);
 
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static const variables
+// --------------------------------------------------------------------------------------------------------------------
+
+static const hal_spi_cfg_t s_hal_device_encoder_spicfg_master =
+{
+    .ownership                  = hal_spi_ownership_master,
+    .direction                  = hal_spi_dir_rxonly,
+    .activity                   = hal_spi_act_framebased,
+    .speed                      = hal_spi_speed_0562kbps, 
+    .sizeofframe                = 3,
+    .onframetransm              = NULL,
+    .onframereceiv              = s_hal_encoder_onreceiv,
+    .capacityoftxfifoofframes   = 0,
+    .capacityofrxfifoofframes   = 1,
+    .dummytxvalue               = 0
+};   
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -117,20 +135,6 @@ static hal_encoder_internals_t s_hal_device_encoder_internals[hal_encoders_num] 
     }
 };
 
-
-static const hal_spi_cfg_t s_hal_device_encoder_spicfg_master =
-{
-    .ownership                  = hal_spi_ownership_master,
-    .direction                  = hal_spi_dir_rxonly,
-    .activity                   = hal_spi_act_framebased,
-    .speed                      = hal_spi_speed_0562kbps, 
-    .sizeofframe                = 3,
-    .onframetransm              = NULL,
-    .onframereceiv              = s_hal_encoder_onreceiv,
-    .capacityoftxfifoofframes   = 0,
-    .capacityofrxfifoofframes   = 1,
-    .dummytxvalue               = 0
-};   
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -234,21 +238,8 @@ extern hal_result_t hal_encoder_read(hal_encoder_t encoder, hal_encoder_position
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_device_encoder_hid_getsize(const hal_base_cfg_t *cfg)
+extern hal_result_t hal_device_encoder_hid_static_memory_init(void)
 {
-    // no memory needed
-    return(0);
-}
-
-extern hal_result_t hal_device_encoder_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
-{
-    // no memory needed
-//    if(NULL == memory)
-//    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
-//        return(hal_res_NOK_generic);
-//    }
-
     memset(s_hal_device_encoder_initted, hal_false, sizeof(s_hal_device_encoder_initted));
     return(hal_res_OK);  
 }

@@ -53,9 +53,8 @@
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern uint32_t hal_extbrd_keil_mcbqvga_hid_getsize(const hal_base_cfg_t *cfg);
 
-extern hal_result_t hal_extbrd_keil_mcbqvga_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory);
+extern hal_result_t hal_extbrd_keil_mcbqvga_hid_static_memory_init(void);
 
 
 #endif  // include guard

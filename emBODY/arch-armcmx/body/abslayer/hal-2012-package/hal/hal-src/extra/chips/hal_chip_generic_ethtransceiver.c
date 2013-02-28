@@ -108,6 +108,12 @@ static hal_boolval_t s_hal_chip_generic_ethtransceiver_initted_is(void);
 static hal_result_t s_hal_chip_generic_ethtransceiver_hw_init(const hal_chip_generic_ethtransceiver_cfg_t *cfg, hal_chip_generic_ethtransceiver_info_t* info);
 
 
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static const variables
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -242,22 +248,8 @@ extern hal_result_t hal_chip_generic_ethtransceiver_getphymode(hal_eth_phymode_t
 // ---- isr of the module: end ------
 
 
-extern uint32_t hal_chip_generic_ethtransceiver_hid_getsize(const hal_base_cfg_t *cfg)
+extern hal_result_t hal_chip_generic_ethtransceiver_hid_static_memory_init(void)
 {
-    // no memory needed
-    return(0);
-}
-
-extern hal_result_t hal_chip_generic_ethtransceiver_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
-{
-    // no memory needed
-//    if(NULL == memory)
-//    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
-//        return(hal_res_NOK_generic);
-//    }
-
-
     memset(s_hal_chip_generic_ethtransceiver_initted, hal_false, sizeof(s_hal_chip_generic_ethtransceiver_initted));
     return(hal_res_OK);  
 }
@@ -305,7 +297,7 @@ static hal_result_t s_hal_chip_generic_ethtransceiver_hw_init(const hal_chip_gen
     
     if(HAL_CHIP_GENERIC_ETHTRANSCEIVER__PHYREG_WRITE_TIMEOUT == tout) //ethernet is still in reset state 
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_runtimefault, "hal_brdcfg_eth__phy_start(): PHY is still in reset state");
+        hal_base_on_fatalerror(hal_fatalerror_runtimefault, "hal_brdcfg_eth__phy_start(): PHY is still in reset state");
         return(hal_res_NOK_generic);
     }  
 
