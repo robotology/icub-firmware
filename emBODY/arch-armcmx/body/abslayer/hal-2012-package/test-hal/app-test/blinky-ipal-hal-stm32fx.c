@@ -25,6 +25,7 @@
 #include "stdlib.h"
  
 #include "hal.h"  
+#include "hal_core.h"  
 #include "sys/abs/api/ipal.h"  
 
 #include "hal_brdcfg_modules.h"
@@ -191,7 +192,8 @@ static const hal_gpio_val_t user_notpushed_value =
 
 int main(void) 
 {
-    extern const hal_cfg_t*     hal_cfgMINE;
+    extern const hal_core_cfg_t*     hal_coreCFGptr;
+    extern const hal_base_cfg_t*     hal_base_cfgMINE;
     extern const ipal_cfg_t*    ipal_cfgMINE;
     uint32_t size04aligned;
     uint32_t *data32aligned = NULL;
@@ -199,17 +201,21 @@ int main(void)
     
     
 
-    hal_base_memory_getsize(hal_cfgMINE, &size04aligned); 
+//     hal_base_memory_getsize(hal_base_cfgMINE, &size04aligned); 
 
-    if(0 != size04aligned)
-    {
-        data32aligned = (uint32_t*)calloc(size04aligned/4, sizeof(uint32_t));   
-    }
+//     if(0 != size04aligned)
+//     {
+//         data32aligned = (uint32_t*)calloc(size04aligned/4, sizeof(uint32_t));   
+//     }
 
-    hal_base_initialise(hal_cfgMINE, data32aligned);
+//     hal_base_initialise(hal_base_cfgMINE, data32aligned);
+    
+    hal_core_init(hal_coreCFGptr);
+    
+    hal_core_start();
     
 
-    hal_sys_systeminit();
+    //hal_sys_systeminit();
     
     
 //     hal_crc_cfg_t crccfg = 
@@ -708,7 +714,7 @@ static void test_eeprom(void)
 #endif
 }
 
-#include "hal_mpu_stm32xx_include.h"
+#include "hal_middleware_interface.h"
 #ifdef USE_STM32F4
 static void hal_brdcfg_switch__mco2_init(void)
 {
