@@ -24,48 +24,46 @@
 //-------- <<< Use Configuration Wizard in Context Menu >>> -----------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------------------
 
-// <h> Configuration of HAL
-// <i> It holds configuration for objects used in OSAl
+// <h> Dynamic configuration of core part of HAL
+// <i> It holds configuration for objects used in core part of HAL with limitation on dynamic behaviour (RAM)
 
 
-// <h> Target 
-// <i> Define the target 
 
-//   <o> CPU family         <0=>   Cortex M3  <1=>   Cortex M4
-//   <i> Only Cortex M3 / M4 are now supported.
-#ifndef HAL_CPUFAM
- #define HAL_CPUFAM      0
-#endif
-
-//   <o> CPU type  <0x00=>   STM32F1x   <0x01=>   STM32F4x
-//   <i> Only STM32F1x / STM32F4x are now supported.
-#ifndef HAL_CPUTYPE
- #define HAL_CPUTYPE       0x00
-#endif
-
-
-// </h>Target
-
-
-// <h> System 
-// <i> sssssssss
+// <h> BASE module 
+// <i> It contains stack and heap size and some externally functions
 
 //   <o> stack size         <0x0-0xFFFFFFFF:8>
 //   <i> define how much stack you want.
-#ifndef HAL_STACKSIZE
- #define HAL_STACKSIZE      0x00002000
+#ifndef HAL_BASE_CFG_STACKSIZE
+ #define HAL_BASE_CFG_STACKSIZE      0x00002000
 #endif
 
 //   <o> heap size         <0x0-0xFFFFFFFF:8>
 //   <i> define how much heap you want.
-#ifndef HAL_HEAPSIZE
- #define HAL_HEAPSIZE      0x00008000
+#ifndef HAL_BASE_CFG_HEAPSIZE
+ #define HAL_BASE_CFG_HEAPSIZE      0x00008000
 #endif
 
 
-// </h>System
+// </h>BASE module
+
+// <h> CPU module 
+// <i> It contains ... nothing so far
+
+// <h> nothing so far 
+// </h>nothing so far
+
+// </h>CPU module
 
 
+
+// <h> SYS module 
+// <i> It contains ... nothing so far
+
+// <h> nothing so far 
+// </h>nothing so far
+
+// </h>SYS module
 
 
 
