@@ -96,7 +96,7 @@ extern void* hal_utility_heap_new(uint32_t size)
     void* p = calloc(size, 1);
     if(NULL == p)
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_utility_heap_new(): no heap anymore");
+        hal_base_on_fatalerror(hal_fatalerror_missingmemory, "hal_utility_heap_new(): no heap anymore");
     }
     
     return(p);
@@ -133,7 +133,7 @@ extern hal_result_t hal_utility_heap_hid_setmem(const hal_base_cfg_t *cfg, uint3
     // no memory needed
 //    if(NULL == memory)
 //    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
+//        hal_base_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
 //        return(hal_res_NOK_generic);
 //    }
     return(hal_res_OK); 
