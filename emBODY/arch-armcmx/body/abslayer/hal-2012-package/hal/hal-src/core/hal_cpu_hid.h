@@ -74,6 +74,7 @@ typedef struct
 
 typedef struct 
 {
+    uint32_t                        max;
     uint32_t                        cpu;
     uint32_t                        fastbus;
     uint32_t                        slowbus;
@@ -92,6 +93,9 @@ typedef struct
 
 typedef struct
 {
+    hal_cpu_architecture_t          architecture;
+    hal_cpu_family_t                family;
+    hal_cpu_name_t                  name;
     hal_cpu_hid_speeds_t            speeds;             // the speeds for cpu, fast bus and slow bus that the system has
     hal_cpu_hid_clock_cfg_t         clockcfg;           // the configuration of clock etc., which are used to achieve the above speeds
 } hal_cpu_hid_brdcfg_t;
@@ -101,8 +105,7 @@ typedef struct
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern uint32_t hal_cpu_hid_getsize(const hal_base_cfg_t *cfg);
-extern hal_result_t hal_cpu_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory);
+extern hal_result_t hal_cpu_hid_static_memory_init(void);
 
 
 // - definition of extern hidden inline functions ---------------------------------------------------------------------

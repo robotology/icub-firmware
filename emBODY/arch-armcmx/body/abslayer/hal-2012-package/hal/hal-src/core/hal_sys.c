@@ -36,7 +36,7 @@
 
 #include "hal_cpu.h"
 
-#include "hal_mpu_stm32xx_include.h"
+#include "hal_middleware_interface.h"
 
 #include "hal_base_hid.h" 
 
@@ -64,20 +64,28 @@ extern uint32_t SystemCoreClock;
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+const hal_sys_cfg_t hal_sys_cfg_default = { .nothingsofar = 0 };
 
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
+typedef struct
+{
+    hal_sys_cfg_t       config;
+    volatile uint8_t    cs_takes;   /**<    this variable is used to allows one task or isr to make multiple calls to 
+                                            hal_sys_criticalsection_take() and keep the critical section until the
+                                            same number of calls to hal_sys_criticalsection_release() is done. */ 
+    hal_void_fp_void_t  fn_SYSTICK_handler;  
+} hal_sys_internals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -86,6 +94,13 @@ extern uint32_t SystemCoreClock;
 // static void s_hal_sys_set_sys_clock(uint32_t maxcpufreq);
 // static void s_hal_sys_system_core_clock_update(void);
 
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static const variables
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -93,10 +108,14 @@ extern uint32_t SystemCoreClock;
 // this variable is used to allows one task or isr to make multiple calls to 
 // hal_sys_criticalsection_take() and keep the critical section until the
 // same number of calls to hal_sys_criticalsection_release() is done. 
-static volatile uint8_t s_cs_takes = 0;
-static void (*s_hal_sys_SYSTICK_handler_fn)(void) = NULL;
 
 
+static hal_sys_internals_t s_hal_sys_internals =
+{
+    .config                 = { 0 },
+    .cs_takes               = 0,
+    .fn_SYSTICK_handler     = NULL
+};
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -104,46 +123,26 @@ static void (*s_hal_sys_SYSTICK_handler_fn)(void) = NULL;
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern hal_result_t hal_sys_systeminit(void) 
+extern hal_result_t hal_sys_init(const hal_sys_cfg_t* cfg)
 {
-    if(hal_false == hal_base_hid_initted_is())
+    if(NULL == cfg)
     {
-         return(hal_res_NOK_generic);
-    }
-    
-    // if we use hal, then at startup the system runs a SystemInit() which was re-defined by hal 
-    // the redefined function just configures the internal clock and does not use any prescaling for internal buses.
-    
-    // hence, ... we need to configure a proper clock and update the system core clock 
-    
-    hal_cpu_init(NULL);
-    
-//     if(hal_true == hal_brdcfg_sys__theconfig.clockcfg.keepinternalclockatstartup)
-//     {
-//         s_hal_sys_set_sys_clock(hal_cpu_maxspeed_get());
-//         s_hal_sys_system_core_clock_update();
-//     }
-//     else
-//     {
-//         s_hal_sys_system_core_clock_update();
-//     }
+        cfg  = &hal_sys_cfg_default;
+    } 
 
-
-//     hal_brdcfg_sys__clock_config();
-//     hal_brdcfg_sys__gpio_default_init();
-
-    // configure once and only once the nvic to hold 4 bits for interrupt priorities and 0 for subpriorities
-    // in stm32 lib ... NVIC_PriorityGroup_4 is 0x300, thus cmsis priority group number 3, thus
-    // bits[7:4] for pre-emption priority and bits[3:0} for subpriority. but stm32 only has the 4 msb bits.
-    // see page 114 of joseph yiu's book.
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
-
+    // nothing really to be done
+    
+    
+    memcpy(&s_hal_sys_internals.config, cfg, sizeof(hal_sys_cfg_t));
+    
     // acemor: added to remove dependencies from NZI data
-    s_cs_takes = 0;
-    s_hal_sys_SYSTICK_handler_fn = NULL;
-
-    return(hal_res_OK);
+    s_hal_sys_internals.cs_takes            = 0;
+    s_hal_sys_internals.fn_SYSTICK_handler  = NULL;
+    
+    return(hal_res_OK);   
 }
+
+
 
 uint8_t hal_sys_howmanyARMv7ops(void)
 {
@@ -271,7 +270,7 @@ extern hal_result_t hal_sys_systick_sethandler(void (*systickhandler)(void), hal
         return(hal_res_NOK_generic);
     }
 
-    s_hal_sys_SYSTICK_handler_fn = systickhandler;
+    s_hal_sys_internals.fn_SYSTICK_handler = systickhandler;
 
     // setup the clock for cortex-m3 as in the cmsis example 
     r = SysTick_Config(SystemCoreClock / tickinsec);
@@ -286,7 +285,7 @@ extern hal_result_t hal_sys_systick_sethandler(void (*systickhandler)(void), hal
 
 extern hal_void_fp_void_t hal_sys_systick_gethandler(void)
 {
-    return(s_hal_sys_SYSTICK_handler_fn);
+    return(s_hal_sys_internals.fn_SYSTICK_handler);
 }
 
 
@@ -341,14 +340,14 @@ extern hal_interrupt_priority_t hal_sys_irqn_priority_get(hal_irqn_t irqn)
 extern hal_result_t hal_sys_criticalsection_take(void *p, hal_time_t tout) 
 {
 
-    if(0 == s_cs_takes)
+    if(0 == s_hal_sys_internals.cs_takes)
     {
         hal_sys_irq_disable();
     }
 
-    if(s_cs_takes < 255) 
+    if(s_hal_sys_internals.cs_takes < 255) 
     {
-        s_cs_takes ++;    
+        s_hal_sys_internals.cs_takes ++;    
     }
 
     return(hal_res_OK);
@@ -357,12 +356,12 @@ extern hal_result_t hal_sys_criticalsection_take(void *p, hal_time_t tout)
 
 extern hal_result_t hal_sys_criticalsection_release(void *p) 
 {
-    if(s_cs_takes > 0) 
+    if(s_hal_sys_internals.cs_takes > 0) 
     {
-        s_cs_takes --;
+        s_hal_sys_internals.cs_takes --;
     }
 
-    if(0 == s_cs_takes) 
+    if(0 == s_hal_sys_internals.cs_takes) 
     {
         hal_sys_irq_enable();    
     }
@@ -400,7 +399,72 @@ extern void hal_sys_atomic_bitwiseAND(volatile uint32_t *value, uint32_t mask)
 // ---- isr of the module: end ------
 
 
+extern hal_result_t hal_sys_hid_static_memory_init(void)
+{
+    // removed dependency from nzi data
+    s_hal_sys_internals.cs_takes            = 0;
+    s_hal_sys_internals.fn_SYSTICK_handler  = NULL;
 
+    return(hal_res_OK);  
+}
+
+
+
+extern hal_result_t hal_sys_hid_systeminit(void) 
+{
+    if(hal_false == hal_base_hid_initted_is())
+    {
+         return(hal_res_NOK_generic);
+    }
+    
+    // if we use hal, then at startup the system runs a SystemInit() which was re-defined by hal 
+    // the redefined function just configures the internal clock and does not use any prescaling for internal buses.
+    
+    // hence, ... we need to configure a proper clock and update the system core clock 
+    
+    hal_cpu_clocks_set();
+    
+//     if(hal_true == hal_brdcfg_sys__theconfig.clockcfg.keepinternalclockatstartup)
+//     {
+//         s_hal_sys_set_sys_clock(hal_cpu_maxspeed_get());
+//         s_hal_sys_system_core_clock_update();
+//     }
+//     else
+//     {
+//         s_hal_sys_system_core_clock_update();
+//     }
+
+
+//     hal_brdcfg_sys__clock_config();
+//     hal_brdcfg_sys__gpio_default_init();
+
+    // configure once and only once the nvic to hold 4 bits for interrupt priorities and 0 for subpriorities
+    // in stm32 lib ... NVIC_PriorityGroup_4 is 0x300, thus cmsis priority group number 3, thus
+    // bits[7:4] for pre-emption priority and bits[3:0} for subpriority. but stm32 only has the 4 msb bits.
+    // see page 114 of joseph yiu's book.
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+
+
+    return(hal_res_OK);
+}
+
+
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of static functions 
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+#endif//HAL_USE_SYS
+
+// --------------------------------------------------------------------------------------------------------------------
+// - end-of-file (leave a blank line after)
+// --------------------------------------------------------------------------------------------------------------------
+
+
+// -- removed code
 
 // #if     defined(HAL_USE_CPU_FAM_STM32F1)
 //
@@ -509,7 +573,7 @@ extern void hal_sys_atomic_bitwiseAND(volatile uint32_t *value, uint32_t mask)
 //         {
 //             if(0 == hal_brdcfg_sys__theconfig.clockcfg.extclockspeed)
 //             {
-//                 hal_base_hid_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "SystemCoreClockUpdate() called with HSE mode but HSE clock is not defined");
+//                 hal_base_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "SystemCoreClockUpdate() called with HSE mode but HSE clock is not defined");
 //             }
 //             SystemCoreClock = hal_brdcfg_sys__theconfig.clockcfg.extclockspeed;
 //         } break;
@@ -683,7 +747,7 @@ extern void hal_sys_atomic_bitwiseAND(volatile uint32_t *value, uint32_t mask)
 //         {
 //             if(0 == hal_brdcfg_sys__theconfig.clockcfg.extclockspeed)
 //             {
-//                 hal_base_hid_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "SystemCoreClockUpdate() called with HSE mode but HSE clock is not defined");
+//                 hal_base_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "SystemCoreClockUpdate() called with HSE mode but HSE clock is not defined");
 //             }
 //             SystemCoreClock = hal_brdcfg_sys__theconfig.clockcfg.extclockspeed;
 //         } break;
@@ -701,7 +765,7 @@ extern void hal_sys_atomic_bitwiseAND(volatile uint32_t *value, uint32_t mask)
 //                 /* HSE used as PLL clock source */
 //                 if(0 == hal_brdcfg_sys__theconfig.clockcfg.extclockspeed)
 //                 {
-//                     hal_base_hid_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "SystemCoreClockUpdate() called with PLL w/ HSE ref mode but HSE clock is not defined");
+//                     hal_base_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "SystemCoreClockUpdate() called with PLL w/ HSE ref mode but HSE clock is not defined");
 //                 }
 //                 pllvco = (hal_brdcfg_sys__theconfig.clockcfg.extclockspeed / pllm) * ((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> 6);
 //             }
@@ -746,34 +810,6 @@ extern void hal_sys_atomic_bitwiseAND(volatile uint32_t *value, uint32_t mask)
 //    }
 //}
 
-extern uint32_t hal_sys_hid_getsize(const hal_base_cfg_t *cfg)
-{
-    // no memory needed
-    return(0);
-}
-
-extern hal_result_t hal_sys_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
-{
-    // no memory needed
-//    if(NULL == memory)
-//    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
-//        return(hal_res_NOK_generic);
-//    }
-
-    // removed dependency from nzi data
-    s_cs_takes = 0;
-    s_hal_sys_SYSTICK_handler_fn = NULL;
-
-    return(hal_res_OK);  
-}
-
-
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of static functions 
-// --------------------------------------------------------------------------------------------------------------------
 
 // #if     defined(HAL_USE_CPU_FAM_STM32F1)
 
@@ -787,7 +823,7 @@ extern hal_result_t hal_sys_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memo
 //        (25000000                                != hal_brdcfg_sys__theconfig.clockcfg.extclockspeed) 
 //       )
 //     {
-//             hal_base_hid_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "s_hal_sys_set_sys_clock() supports only 72MHz and external xtl of 25MHz");
+//             hal_base_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "s_hal_sys_set_sys_clock() supports only 72MHz and external xtl of 25MHz");
 //         
 //     }
 
@@ -1100,12 +1136,6 @@ extern hal_result_t hal_sys_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memo
 //     SystemCoreClockUpdate();
 // }
 
-
-#endif//HAL_USE_SYS
-
-// --------------------------------------------------------------------------------------------------------------------
-// - end-of-file (leave a blank line after)
-// --------------------------------------------------------------------------------------------------------------------
 
 
 

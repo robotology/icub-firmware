@@ -34,7 +34,7 @@
 #include "stdlib.h"
 #include "string.h"
 
-#include "hal_mpu_stm32xx_include.h"
+#include "hal_middleware_interface.h"
 
 #include "hal_brdcfg.h"
 
@@ -63,7 +63,7 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-const hal_cpu_cfg_t hal_cpu_cfg_default = { 0 };
+const hal_cpu_cfg_t hal_cpu_cfg_default = { .nothingsofar = 0 };
 
 
 
@@ -83,10 +83,16 @@ extern uint32_t SystemCoreClock = 168000000; //HSI_VALUE;
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_hal_cpu_clock_init(void);
+static void s_hal_cpu_clocks_set(void);
 
-static void s_hal_cpu_set_sys_clock(uint32_t maxcpufreq);
+static void s_hal_cpu_set_sys_clock(void);
 static void s_hal_cpu_system_core_clock_update(void);
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static const variables
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -105,8 +111,14 @@ extern hal_result_t hal_cpu_init(const hal_cpu_cfg_t* cfg)
     {
         cfg  = &hal_cpu_cfg_default;
     } 
+   
+    return(hal_res_OK);   
+}
 
-    s_hal_cpu_clock_init();
+extern hal_result_t hal_cpu_clocks_set(void)
+{
+
+    s_hal_cpu_clocks_set();
     
     return(hal_res_OK);   
 }
@@ -114,47 +126,35 @@ extern hal_result_t hal_cpu_init(const hal_cpu_cfg_t* cfg)
 
 extern hal_cpu_architecture_t hal_cpu_architecture_get(void)
 {
-#if     defined(HAL_USE_CPU_ARC_ARMCM3)
-    return(hal_cpu_arc_armcm3);
-#elif   defined(HAL_USE_CPU_ARC_ARMCM4)
-    return(hal_cpu_arc_armcm4);
-#else
-    #error ERROR --> choose a supported cpu architecture
-#endif
+    return(hal_brdcfg_cpu__theconfig.architecture);
 }
 
 
 extern hal_cpu_family_t hal_cpu_family_get(void)
 {
-#if     defined(HAL_USE_CPU_FAM_STM32F1)
-    return(hal_cpu_fam_stm32f1);
-#elif   defined(HAL_USE_CPU_FAM_STM32F4)
-    return(hal_cpu_fam_stm32f4);
-#else
-    #error ERROR --> choose a supported cpu family
-#endif
+    return(hal_brdcfg_cpu__theconfig.family);
 }
 
 extern hal_cpu_name_t hal_cpu_name_get(void)
 {
-#if     defined(HAL_USE_CPU_NAM_STM32F107)
-    return(hal_cpu_nam_stm32f107);
-#elif   defined(HAL_USE_CPU_NAM_STM32F407)
-    return(hal_cpu_nam_stm32f407);
-#else
-    #error ERROR --> choose a supported cpu name
-#endif
+    return(hal_brdcfg_cpu__theconfig.name);
 }
 
-extern uint32_t hal_cpu_maxspeed_get(void)
+
+extern uint32_t hal_cpu_speed_get(hal_cpu_speedtype_t speedtype)
 {
-#if     defined(HAL_USE_CPU_NAM_STM32F107)
-    return( 72000000);
-#elif   defined(HAL_USE_CPU_NAM_STM32F407)
-    return(168000000);
-#else
-    #error ERROR --> choose a supported cpu name
-#endif    
+    uint32_t res  = 0;
+    
+    switch(speedtype)
+    {
+        case hal_cpu_speedtype_max:         res = hal_brdcfg_cpu__theconfig.speeds.max;         break;
+        case hal_cpu_speedtype_cpu:         res = hal_brdcfg_cpu__theconfig.speeds.cpu;         break;
+        case hal_cpu_speedtype_fastbus:     res = hal_brdcfg_cpu__theconfig.speeds.fastbus;     break;
+        case hal_cpu_speedtype_slowbus:     res = hal_brdcfg_cpu__theconfig.speeds.slowbus;     break;
+        default:                            res = 0;                                            break;        
+    }
+    
+    return(res);   
 }
 
 
@@ -167,22 +167,14 @@ extern uint32_t hal_cpu_maxspeed_get(void)
 // empty-section
 // ---- isr of the module: end ------
 
-extern uint32_t hal_cpu_hid_getsize(const hal_base_cfg_t *cfg)
-{   
-    // no memory needed
-    return(0);
+
+
+extern hal_result_t hal_cpu_hid_static_memory_init(void)
+{
+     return(hal_res_OK); 
 }
 
-extern hal_result_t hal_cpu_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
-{
-    // no memory needed
-//    if(NULL == memory)
-//    {
-//        hal_cpu_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
-//        return(hal_res_NOK_generic);
-//    }
-    return(hal_res_OK); 
-}
+
 
 // -- redefinition of some functions weakly defined in cmsis
 
@@ -254,7 +246,7 @@ void SystemInit(void)
 
     if(hal_false == hal_brdcfg_cpu__theconfig.clockcfg.keepinternalclockatstartup)
     {   // apply the clock straigth away
-        s_hal_cpu_set_sys_clock(hal_cpu_maxspeed_get());
+        s_hal_cpu_set_sys_clock();
         s_hal_cpu_system_core_clock_update();        
     }
     else
@@ -293,7 +285,7 @@ void SystemCoreClockUpdate(void)
         {
             if(0 == hal_brdcfg_cpu__theconfig.clockcfg.extclockspeed)
             {
-                hal_base_hid_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "SystemCoreClockUpdate() called with HSE mode but HSE clock is not defined");
+                hal_base_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "SystemCoreClockUpdate() called with HSE mode but HSE clock is not defined");
             }
             SystemCoreClock = hal_brdcfg_cpu__theconfig.clockcfg.extclockspeed;
         } break;
@@ -436,7 +428,7 @@ void SystemInit(void)
 
     if(hal_false == hal_brdcfg_cpu__theconfig.keepinternalclockatstartup)
     {   // apply the clock straigth away
-        s_hal_cpu_set_sys_clock(168000000);
+        s_hal_cpu_set_sys_clock();
         s_hal_cpu_system_core_clock_update();        
     }
     else
@@ -467,7 +459,7 @@ void SystemCoreClockUpdate(void)
         {
             if(0 == hal_brdcfg_cpu__theconfig.clockcfg.extclockspeed)
             {
-                hal_base_hid_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "SystemCoreClockUpdate() called with HSE mode but HSE clock is not defined");
+                hal_base_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "SystemCoreClockUpdate() called with HSE mode but HSE clock is not defined");
             }
             SystemCoreClock = hal_brdcfg_cpu__theconfig.clockcfg.extclockspeed;
         } break;
@@ -485,7 +477,7 @@ void SystemCoreClockUpdate(void)
                 /* HSE used as PLL clock source */
                 if(0 == hal_brdcfg_cpu__theconfig.clockcfg.extclockspeed)
                 {
-                    hal_base_hid_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "SystemCoreClockUpdate() called with PLL w/ HSE ref mode but HSE clock is not defined");
+                    hal_base_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "SystemCoreClockUpdate() called with PLL w/ HSE ref mode but HSE clock is not defined");
                 }
                 pllvco = (hal_brdcfg_cpu__theconfig.clockcfg.extclockspeed / pllm) * ((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> 6);
             }
@@ -521,7 +513,7 @@ void SystemCoreClockUpdate(void)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static void s_hal_cpu_clock_init(void)
+static void s_hal_cpu_clocks_set(void)
 {
     // if we use hal, then at startup the system runs a SystemInit() which is not the original one, but one re-defined
     // in hal_cpu.c 
@@ -534,7 +526,7 @@ static void s_hal_cpu_clock_init(void)
     
     if(hal_true == hal_brdcfg_cpu__theconfig.clockcfg.keepinternalclockatstartup)
     {
-        s_hal_cpu_set_sys_clock(hal_cpu_maxspeed_get());
+        s_hal_cpu_set_sys_clock();
         s_hal_cpu_system_core_clock_update();
     }
     else
@@ -546,8 +538,8 @@ static void s_hal_cpu_clock_init(void)
 
 #if     defined(HAL_USE_CPU_FAM_STM32F1)
 
-static void s_hal_cpu_set_sys_clock(uint32_t maxcpufreq)
-{   // only valid for 72 mhz
+static void s_hal_cpu_set_sys_clock(void)
+{   // only valid for cpu speed of 72 mhz, and 72/36 fast/slow bus
     
     if((72000000                                != hal_brdcfg_cpu__theconfig.speeds.cpu)       ||
        (72000000                                != hal_brdcfg_cpu__theconfig.speeds.fastbus)   ||
@@ -556,7 +548,7 @@ static void s_hal_cpu_set_sys_clock(uint32_t maxcpufreq)
        (25000000                                != hal_brdcfg_cpu__theconfig.clockcfg.extclockspeed) 
       )
     {
-            hal_base_hid_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "s_hal_cpu_set_sys_clock() supports only 72MHz and external xtl of 25MHz");
+            hal_base_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "s_hal_cpu_set_sys_clock() supports only 72MHz and external xtl of 25MHz");
         
     }
 
@@ -658,7 +650,7 @@ static void s_hal_cpu_set_sys_clock(uint32_t maxcpufreq)
 
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)
 
-static void s_hal_cpu_set_sys_clock(uint32_t maxcpufreq)
+static void s_hal_cpu_set_sys_clock(void)
 {
     
     // in here we can make many verifications ...  but we just dont care and use 

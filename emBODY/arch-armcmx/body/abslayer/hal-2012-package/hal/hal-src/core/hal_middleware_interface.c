@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       hal_middleware.c
+/* @file       hal_middleware_interface.c
     @brief      This file wraps the relevant system source file from middleware
     @author     marco.accame@iit.it
     @date       02/27/2013
@@ -26,6 +26,12 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 
 #include "hal_brdcfg_modules.h"
+
+#ifdef HAL_USE_MIDDLEWARE_INTERFACE
+
+// - the api ----------------------------------------------------------------------------------------------------------
+
+#include "hal_middleware_interface.h"
 
 
 // - the file ---------------------------------------------------------------------------------------------------------
@@ -39,7 +45,13 @@
 	#error --> put file and define macro
 #else
 	#error ERR --> Please select board XXX w/ HAL_BOARD_XXX
-#endif                        
+#endif 
+
+#else
+
+    #warning BEWARE --> you are not using the standard HAL middleware interface. are you sure? 
+
+#endif//HAL_USE_MIDDLEWARE_INTERFACE
 
 
 // --------------------------------------------------------------------------------------------------------------------

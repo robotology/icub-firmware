@@ -16,8 +16,8 @@
  * Public License for more details
 */
 
-/* @file       hal_mpu_base.c
-	@brief      This file keeps implementation of the base hal module for stm32.
+/* @file       hal_base.c
+	@brief      This file keeps implementation of the base hal module for hal.
 	@author     marco.accame@iit.it
     @date       09/12/2011
 **/
@@ -34,7 +34,7 @@
 #include "stdlib.h"
 #include "string.h"
 
-#include "hal_mpu_stm32xx_include.h"
+#include "hal_middleware_interface.h"
 
 #include "hal_brdcfg.h"
 
@@ -64,13 +64,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
-
-extern hal_base_cfg_t hal_base_hid_params = 
-{ 
-    .extfn      = NULL              // at least one
-};
-
-
+// empty-section
 
 
 
@@ -84,189 +78,107 @@ typedef enum
     hal_base_status_initialised     = 1    
 } hal_base_status_t;
 
+
+typedef void (*hal_base_hid_fn_on_error) (hal_fatalerror_t, const char *);
+
 typedef struct
 {
-    hal_base_status_t   status; 
+    hal_base_status_t           status;
+    hal_base_cfg_t              config;
+    hal_void_fp_void_t          fn_osal_system_scheduling_suspend;
+    hal_void_fp_void_t          fn_osal_system_scheduling_restart;
+    hal_base_hid_fn_on_error    fn_on_error;   
 } hal_base_internals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-#if defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
+#if     defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
     // removed by acemor on 09-mar-2011 to avoid problems of ... 
     // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Heap_Size (referred from hal_stm32.o).
     // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Stack_Size (referred from hal_stm32.o).
-__asm int s_hal_getstacksize (void) {
+__asm int s_hal_base_getstacksize (void) {
         IMPORT  Stack_Size
         LDR     R0,=Stack_Size
         BX      LR
 }
 
 
-__asm int s_hal_getheapsize (void) {
+__asm int s_hal_base_getheapsize (void) {
         IMPORT  Heap_Size
         LDR     R0,=Heap_Size
         BX      LR
 }
-#endif
+#endif//defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
 
 
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static const variables
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static void (*s_hal_fn_osal_system_scheduling_suspend)(void) = NULL;
-static void (*s_hal_fn_osal_system_scheduling_restart)(void) = NULL;
-static void (*s_hal_fn_on_error)(hal_fatalerror_t, const char *) = NULL;
-
-
 static hal_base_internals_t s_hal_base_internals =
 {
-    .status     = hal_base_status_zero
+    .status                             = hal_base_status_zero,
+    .config                             = { .extfn = NULL },
+    .fn_osal_system_scheduling_suspend  = NULL,
+    .fn_osal_system_scheduling_restart  = NULL,
+    .fn_on_error                        = NULL   
 };
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
 
-
-extern uint32_t hal_base_memory_getsize(const hal_base_cfg_t *cfg, uint32_t *size04aligned)
-{
-    uint32_t retval = 0;
- 
-    if(NULL == cfg)
-    {
-        hal_base_hid_on_fatalerror(hal_fatalerror_missingconfiguration, "hal_base_memory_getsize() needs a cfg");
-        return(0);
-    }
-    
-    
-    // - base ---------------------------------------------------------------------------------------------------------
-    
-#ifdef  HAL_USE_BASE
-    retval += hal_base_hid_getsize(cfg);
-#endif//HAL_USE_BASE
-    
-    // - sys ----------------------------------------------------------------------------------------------------------
-    
-#ifdef  HAL_USE_SYS
-    retval += hal_sys_hid_getsize(cfg);
-#endif//HAL_USE_SYS     
-    
-
-    // - cpu ---------------------------------------------------------------------------------------------------------
-
-#ifdef  HAL_USE_CPU
-    retval += hal_cpu_hid_getsize(cfg);
-#endif//HAL_USE_CPU 
-    
-    
-    // - brdcfg -------------------------------------------------------------------------------------------------------
-    
-    retval += hal_brdcfg__getsize(cfg);
-    
-    if(NULL != size04aligned)
-    {
-        *size04aligned = retval;
-    }
-    return(retval);
-}
-
-
-extern hal_result_t hal_base_initialise(const hal_base_cfg_t *cfg, uint32_t *data04aligned) 
+extern hal_result_t hal_base_init(const hal_base_cfg_t *cfg) 
 {
     if(NULL == cfg)
     {   
-        hal_base_hid_on_fatalerror(hal_fatalerror_missingconfiguration, "hal_base_initialise() needs cfg");
+        hal_base_on_fatalerror(hal_fatalerror_missingconfiguration, "hal_base_init() needs cfg");
         return(hal_res_NOK_generic);
     }
     
     if(hal_base_status_initialised == s_hal_base_internals.status)
     {
-        hal_base_hid_on_fatalerror(hal_fatalerror_generic, "hal_base_initialise() already called");
+        hal_base_on_fatalerror(hal_fatalerror_generic, "hal_base_init() already called");
         return(hal_res_NOK_generic);    
     }
 
 
     // override functions
-    s_hal_fn_on_error                       = cfg->extfn.usr_on_fatal_error;
-    s_hal_fn_osal_system_scheduling_suspend = cfg->extfn.osal_system_scheduling_suspend;
-    s_hal_fn_osal_system_scheduling_restart = cfg->extfn.osal_system_scheduling_restart;
+    s_hal_base_internals.fn_on_error                       = cfg->extfn.usr_on_fatal_error;
+    s_hal_base_internals.fn_osal_system_scheduling_suspend = cfg->extfn.osal_system_scheduling_suspend;
+    s_hal_base_internals.fn_osal_system_scheduling_restart = cfg->extfn.osal_system_scheduling_restart;
 
 
-
-//     if(cfg->cpu_freq != SystemCoreClock)
-//     {   
-//         hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_base_initialise(): incorrect frequency");
-//         return(hal_res_NOK_generic);
-//     }
-
-#if defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
+#if     defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
     // removed by acemor on 09-mar-2011 to avoid problems of ... 
     // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Heap_Size (referred from hal_stm32.o).
     // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Stack_Size (referred from hal_stm32.o).
-    if(cfg->stacksize != s_hal_getstacksize())
+    // but ... as long as we dont use shalPART.axf (shared library) we dont care.
+    if(cfg->stacksize != s_hal_base_getstacksize())
     {   
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_base_initialise(): incorrect stack size");
+        hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_base_initialise(): incorrect stack size");
         return(hal_res_NOK_generic);
     }
 
-    if(cfg->heapsize != s_hal_getheapsize())
+    if(cfg->heapsize != s_hal_base_getheapsize())
     {   
-        hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_base_initialise(): incorrect heap size");
+        hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_base_initialise(): incorrect heap size");
         return(hal_res_NOK_generic);
     }
-#endif
-
-
-    // - base ---------------------------------------------------------------------------------------------------------
-    
-#ifdef  HAL_USE_BASE
-    if(hal_res_OK != hal_base_hid_setmem(cfg, data04aligned))
-    {
-        return(hal_res_NOK_generic);
-    }
-    data04aligned += hal_base_hid_getsize(cfg)/4;
-#endif//HAL_USE_BASE
-    
-    
-    // - cpu ----------------------------------------------------------------------------------------------------------
-    
-#ifdef  HAL_USE_CPU
-    if(hal_res_OK != hal_cpu_hid_setmem(cfg, data04aligned))
-    {
-        return(hal_res_NOK_generic);
-    }
-    data04aligned += hal_cpu_hid_getsize(cfg)/4;
-#endif//HAL_USE_CPU    
-    
-    // - sys ----------------------------------------------------------------------------------------------------------
-    
-#ifdef HAL_USE_SYS
-    if(hal_res_OK != hal_sys_hid_setmem(cfg, data04aligned))
-    {
-        return(hal_res_NOK_generic);
-    }
-    data04aligned += hal_sys_hid_getsize(cfg)/4;
-#endif//HAL_USE_SYS  
-
-
-    
-    // - brdcfg -------------------------------------------------------------------------------------------------------    
-    
-    if(hal_res_OK != hal_brdcfg__setmem(cfg, data04aligned))
-    {
-        return(hal_res_NOK_generic);
-    }
-    data04aligned += hal_brdcfg__getsize(cfg)/4;
-    
-    
+#endif//defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
+ 
     
     // finally ... sets used config
-    memcpy(&hal_base_hid_params, cfg, sizeof(hal_base_cfg_t));
+    memcpy(&s_hal_base_internals.config, cfg, sizeof(hal_base_cfg_t));
 
     s_hal_base_internals.status = hal_base_status_initialised;
     
@@ -275,70 +187,42 @@ extern hal_result_t hal_base_initialise(const hal_base_cfg_t *cfg, uint32_t *dat
 
 
 
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of extern hidden functions 
-// --------------------------------------------------------------------------------------------------------------------
-
-// ---- isr of the module: begin ----
-// empty-section
-// ---- isr of the module: end ------
-
-extern uint32_t hal_base_hid_getsize(const hal_base_cfg_t *cfg)
-{   
-    // no memory needed
-    return(0);
-}
-
-extern hal_result_t hal_base_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory)
-{
-    // no memory needed
-//    if(NULL == memory)
-//    {
-//        hal_base_hid_on_fatalerror(hal_fatalerror_missingmemory, "hal_xxx_hid_setmem(): memory missing");
-//        return(hal_res_NOK_generic);
-//    }
-    return(hal_res_OK); 
-}
-
-extern hal_bool_t hal_base_hid_initted_is(void)
-{
-    return( (hal_base_status_initialised == s_hal_base_internals.status) ? hal_true : hal_false );    
-}
-
-
-extern void hal_base_hid_osal_scheduling_suspend(void)
+extern void hal_base_osal_scheduling_suspend(void)
 {
 	if(0 != (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk))
 	{	// no need if it is called by an isr
 	 	return;
 	}
 
-    if(NULL != s_hal_fn_osal_system_scheduling_suspend)
+    if(NULL != s_hal_base_internals.fn_osal_system_scheduling_suspend)
     {
-		s_hal_fn_osal_system_scheduling_suspend();
+		s_hal_base_internals.fn_osal_system_scheduling_suspend();
     }
 }
 
 
-extern void hal_base_hid_osal_scheduling_restart(void)
+extern void hal_base_osal_scheduling_restart(void)
 {
 	if(0 != (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk))
 	{	// no need if it is called by an isr
 	 	return;
 	}
 
-    if(NULL != s_hal_fn_osal_system_scheduling_restart)
+    if(NULL != s_hal_base_internals.fn_osal_system_scheduling_restart)
     {
-		s_hal_fn_osal_system_scheduling_restart();
+		s_hal_base_internals.fn_osal_system_scheduling_restart();
     }
 } 
 
 
-extern void hal_base_hid_on_fatalerror(hal_fatalerror_t errorcode, const char * errormsg)
+extern void hal_base_on_fatalerror(hal_fatalerror_t errorcode, const char * errormsg)
 {
-    if(NULL != s_hal_fn_on_error)
+    hal_base_osal_scheduling_suspend();
+    
+    if(NULL != s_hal_base_internals.fn_on_error)
     {
-        s_hal_fn_on_error(errorcode, errormsg);
+        s_hal_base_internals.fn_on_error(errorcode, errormsg);
+        for(;;);
     } 
     else
     {   
@@ -351,19 +235,163 @@ extern void hal_base_hid_on_fatalerror(hal_fatalerror_t errorcode, const char * 
 
 
 
-extern void hal_base_hid_ram_basic_init(void)
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of extern hidden functions 
+// --------------------------------------------------------------------------------------------------------------------
+
+// ---- isr of the module: begin ----
+// empty-section
+// ---- isr of the module: end ------
+
+
+extern hal_result_t hal_base_hid_static_memory_init(void)
 {
-    // in here we set values of memory which is required in hal_base_memory_getsize() and in hal_base_initialise()
-    // before any specific initialisation.
-
-    // for nzi data
-    memset(&hal_base_hid_params, 0, sizeof(hal_base_hid_params));
-
-    s_hal_fn_on_error = NULL;
-    s_hal_fn_osal_system_scheduling_suspend = NULL;
-    s_hal_fn_osal_system_scheduling_restart = NULL;
-
+    return(hal_res_OK); 
 }
+
+extern hal_bool_t hal_base_hid_initted_is(void)
+{
+    return( (hal_base_status_initialised == s_hal_base_internals.status) ? hal_true : hal_false );    
+}
+
+
+
+// extern uint32_t hal_base_hid_memory_getsize(const hal_base_cfg_t *cfg, uint32_t *size04aligned)
+// {
+//     uint32_t retval = 0;
+//  
+//     if(NULL == cfg)
+//     {
+//         hal_base_on_fatalerror(hal_fatalerror_missingconfiguration, "hal_base_memory_getsize() needs a cfg");
+//         return(0);
+//     }
+//     
+//     
+//     // - base ---------------------------------------------------------------------------------------------------------
+//     
+// #ifdef  HAL_USE_BASE
+//     retval += hal_base_hid_getsize(cfg);
+// #endif//HAL_USE_BASE
+//     
+//     // - sys ----------------------------------------------------------------------------------------------------------
+//     
+// #ifdef  HAL_USE_SYS
+//     retval += hal_sys_hid_getsize(cfg);
+// #endif//HAL_USE_SYS     
+//     
+
+//     // - cpu ---------------------------------------------------------------------------------------------------------
+
+// #ifdef  HAL_USE_CPU
+//     retval += hal_cpu_hid_getsize(cfg);
+// #endif//HAL_USE_CPU 
+//     
+//     
+//     // - brdcfg -------------------------------------------------------------------------------------------------------
+//     
+//     retval += hal_brdcfg__getsize(cfg);
+//     
+//     if(NULL != size04aligned)
+//     {
+//         *size04aligned = retval;
+//     }
+//     return(retval);
+// }
+
+
+// extern hal_result_t hal_base_hid_initialise(const hal_base_cfg_t *cfg, uint32_t *data04aligned) 
+// {
+//     if(NULL == cfg)
+//     {   
+//         hal_base_on_fatalerror(hal_fatalerror_missingconfiguration, "hal_base_initialise() needs cfg");
+//         return(hal_res_NOK_generic);
+//     }
+//     
+//     if(hal_base_status_initialised == s_hal_base_internals.status)
+//     {
+//         hal_base_on_fatalerror(hal_fatalerror_generic, "hal_base_initialise() already called");
+//         return(hal_res_NOK_generic);    
+//     }
+
+
+//     // override functions
+//     s_hal_base_internals.fn_on_error                       = cfg->extfn.usr_on_fatal_error;
+//     s_hal_base_internals.fn_osal_system_scheduling_suspend = cfg->extfn.osal_system_scheduling_suspend;
+//     s_hal_base_internals.fn_osal_system_scheduling_restart = cfg->extfn.osal_system_scheduling_restart;
+
+
+
+
+// #if     defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
+//     // removed by acemor on 09-mar-2011 to avoid problems of ... 
+//     // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Heap_Size (referred from hal_stm32.o).
+//     // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Stack_Size (referred from hal_stm32.o).
+//     // but ... as long as we dont use shalPART.axf (shared library) we dont care.
+//     if(cfg->stacksize != s_hal_base_getstacksize())
+//     {   
+//         hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_base_initialise(): incorrect stack size");
+//         return(hal_res_NOK_generic);
+//     }
+
+//     if(cfg->heapsize != s_hal_base_getheapsize())
+//     {   
+//         hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_base_initialise(): incorrect heap size");
+//         return(hal_res_NOK_generic);
+//     }
+// #endif//defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
+
+
+//     // - base ---------------------------------------------------------------------------------------------------------
+//     
+// #ifdef  HAL_USE_BASE
+//     if(hal_res_OK != hal_base_hid_setmem(cfg, data04aligned))
+//     {
+//         return(hal_res_NOK_generic);
+//     }
+//     data04aligned += hal_base_hid_getsize(cfg)/4;
+// #endif//HAL_USE_BASE
+//     
+//     
+//     // - cpu ----------------------------------------------------------------------------------------------------------
+//     
+// #ifdef  HAL_USE_CPU
+//     if(hal_res_OK != hal_cpu_hid_setmem(cfg, data04aligned))
+//     {
+//         return(hal_res_NOK_generic);
+//     }
+//     data04aligned += hal_cpu_hid_getsize(cfg)/4;
+// #endif//HAL_USE_CPU    
+//     
+//     // - sys ----------------------------------------------------------------------------------------------------------
+//     
+// #ifdef HAL_USE_SYS
+//     if(hal_res_OK != hal_sys_hid_setmem(cfg, data04aligned))
+//     {
+//         return(hal_res_NOK_generic);
+//     }
+//     data04aligned += hal_sys_hid_getsize(cfg)/4;
+// #endif//HAL_USE_SYS  
+
+
+//     
+//     // - brdcfg -------------------------------------------------------------------------------------------------------    
+//     
+//     if(hal_res_OK != hal_brdcfg__setmem(cfg, data04aligned))
+//     {
+//         return(hal_res_NOK_generic);
+//     }
+//     data04aligned += hal_brdcfg__getsize(cfg)/4;
+//     
+//     
+//     
+//     // finally ... sets used config
+//     memcpy(&s_hal_base_internals.config, cfg, sizeof(hal_base_cfg_t));
+
+//     s_hal_base_internals.status = hal_base_status_initialised;
+//     
+//     return(hal_res_OK);
+// }
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -378,6 +406,8 @@ extern void hal_base_hid_ram_basic_init(void)
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
+
+
 
 
 

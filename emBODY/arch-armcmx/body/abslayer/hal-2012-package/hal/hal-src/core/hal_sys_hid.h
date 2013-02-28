@@ -33,7 +33,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_mpu_stm32xx_include.h"
+#include "hal_middleware_interface.h"
 #include "hal_base.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -115,9 +115,10 @@ typedef struct
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern uint32_t hal_sys_hid_getsize(const hal_base_cfg_t *cfg);
 
-extern hal_result_t hal_sys_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory);
+extern hal_result_t hal_sys_hid_static_memory_init(void);
+
+extern hal_result_t hal_sys_hid_systeminit(void);
 
 
 
