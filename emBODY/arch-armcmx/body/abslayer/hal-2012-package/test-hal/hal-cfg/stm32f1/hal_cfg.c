@@ -28,9 +28,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "stdlib.h"
-#include "hal_base.h"
-
-
 #include "hal_core.h"
 
 
@@ -44,17 +41,17 @@
 static void s_hal_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char * errormsg);
 
 
-extern const hal_base_cfg_t hal_base_cfg = 
-{   
-    .stacksize              = HAL_BASE_CFG_STACKSIZE,
-    .heapsize               = HAL_BASE_CFG_HEAPSIZE,
-    .extfn                  =
-    {
-        .usr_on_fatal_error                 = s_hal_cfg_on_fatalerror,
-        .osal_system_scheduling_suspend     = NULL,
-        .osal_system_scheduling_restart     = NULL
-    }   
-};
+// extern const hal_base_cfg_t hal_base_cfg = 
+// {   
+//     .stacksize              = HAL_BASE_CFG_STACKSIZE,
+//     .heapsize               = HAL_BASE_CFG_HEAPSIZE,
+//     .extfn                  =
+//     {
+//         .usr_on_fatal_error                 = s_hal_cfg_on_fatalerror,
+//         .osal_system_scheduling_suspend     = NULL,
+//         .osal_system_scheduling_restart     = NULL
+//     }   
+// };
 
 
 extern const hal_core_cfg_t hal_core_cfg = 
@@ -81,7 +78,7 @@ extern const hal_core_cfg_t hal_core_cfg =
 };
 
 
-extern const hal_base_cfg_t *hal_base_cfgMINE = &hal_base_cfg;
+//extern const hal_base_cfg_t *hal_base_cfgMINE = &hal_base_cfg;
 
 extern const hal_core_cfg_t *hal_coreCFGptr = &hal_core_cfg;
 
