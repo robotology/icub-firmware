@@ -64,11 +64,14 @@ typedef struct
 } hal_core_cfg_t;
 
 
+/** @typedef    typedef enum hal_core_status_t 
+    @brief      contains the status of the core part of HAL. 
+ **/  
 typedef enum
 {
-    hal_core_status_zero            = 0,
-    hal_core_status_initialised     = 1,
-    hal_core_status_started         = 2    
+    hal_core_status_zero            = 0,    /**< nothing has been called yet */
+    hal_core_status_initialised     = 1,    /**< hal_core_init() has been succesfully called */
+    hal_core_status_started         = 2     /**< hal_core_start() has been succesfully called */    
 } hal_core_status_t;
 
  
@@ -80,7 +83,8 @@ typedef enum
 
 /** @fn         extern hal_result_t hal_core_init(const hal_core_cfg_t *cfg)
     @brief      Initialise the core part of hal to work for a given configuration. The required RAM is internally
-                allocated by using hal_heap_new(). In case of no memory, a hal_fatalerror_missingmemory is triggered.
+                allocated by using hal_heap_new(). In case of no more memory on the heap, a 
+                hal_fatalerror_missingmemory is triggered.
     @param      cfg             The target core configuration. 
     @return     hal_res_OK or hal_res_NOK_generic 
  **/

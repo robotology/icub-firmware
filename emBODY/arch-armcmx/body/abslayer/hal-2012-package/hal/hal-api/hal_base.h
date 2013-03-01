@@ -241,7 +241,12 @@ typedef struct
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-
+/** @fn         extern hal_result_t hal_base_init(const hal_base_cfg_t *cfg)
+    @brief      Initialises the base module of HAL: stack, heap, funtionalities provided by external
+                functions such as OSAL scheduling management and error handling.
+    @param  	cfg 	        pointer to configuration data
+    @return 	hal_res_OK or hal_res_NOK_generic on failure              
+ **/
 extern hal_result_t hal_base_init(const hal_base_cfg_t *cfg);
 
 
