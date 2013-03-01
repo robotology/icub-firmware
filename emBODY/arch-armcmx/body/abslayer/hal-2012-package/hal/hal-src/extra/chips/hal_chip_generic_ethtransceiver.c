@@ -95,8 +95,8 @@ extern const hal_chip_generic_ethtransceiver_cfg_t hal_chip_generic_ethtransceiv
 
 typedef struct
 {
-    hal_chip_generic_ethtransceiver_cfg_t    cfg;
-} hal_chip_generic_ethtransceiver_info_t;
+    hal_chip_generic_ethtransceiver_cfg_t    config;
+} hal_chip_generic_ethtransceiver_internals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -105,7 +105,7 @@ typedef struct
 static void s_hal_chip_generic_ethtransceiver_initted_set(void);
 static hal_boolval_t s_hal_chip_generic_ethtransceiver_initted_is(void);
 
-static hal_result_t s_hal_chip_generic_ethtransceiver_hw_init(const hal_chip_generic_ethtransceiver_cfg_t *cfg, hal_chip_generic_ethtransceiver_info_t* info);
+static hal_result_t s_hal_chip_generic_ethtransceiver_hw_init(const hal_chip_generic_ethtransceiver_cfg_t *cfg, hal_chip_generic_ethtransceiver_internals_t* intitem);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -120,7 +120,7 @@ static hal_result_t s_hal_chip_generic_ethtransceiver_hw_init(const hal_chip_gen
 // --------------------------------------------------------------------------------------------------------------------
 
 static hal_boolval_t s_hal_chip_generic_ethtransceiver_initted[1] = { hal_false };
-static hal_chip_generic_ethtransceiver_info_t s_hal_chip_generic_ethtransceiver_info[1] = { {.cfg = { .dummy = 0} } };
+static hal_chip_generic_ethtransceiver_internals_t s_hal_chip_generic_ethtransceiver_internals[1] = { {.config = { .dummy = 0} } };
 
 
 
@@ -144,7 +144,7 @@ extern hal_result_t hal_chip_generic_ethtransceiver_init(const hal_chip_generic_
         return(hal_res_OK);
     }    
 
-    if(hal_res_OK != s_hal_chip_generic_ethtransceiver_hw_init(cfg, &s_hal_chip_generic_ethtransceiver_info[0]))
+    if(hal_res_OK != s_hal_chip_generic_ethtransceiver_hw_init(cfg, &s_hal_chip_generic_ethtransceiver_internals[0]))
     {
         return(hal_res_NOK_generic);
     }
@@ -270,7 +270,7 @@ static hal_boolval_t s_hal_chip_generic_ethtransceiver_initted_is(void)
 }
 
 
-static hal_result_t s_hal_chip_generic_ethtransceiver_hw_init(const hal_chip_generic_ethtransceiver_cfg_t *cfg, hal_chip_generic_ethtransceiver_info_t* info)
+static hal_result_t s_hal_chip_generic_ethtransceiver_hw_init(const hal_chip_generic_ethtransceiver_cfg_t *cfg, hal_chip_generic_ethtransceiver_internals_t* intitem)
 {
     //hal_result_t res = hal_res_NOK_generic;   
 
@@ -302,7 +302,7 @@ static hal_result_t s_hal_chip_generic_ethtransceiver_hw_init(const hal_chip_gen
     }  
 
     
-    memcpy(&info->cfg, cfg, sizeof(hal_chip_generic_ethtransceiver_cfg_t));
+    memcpy(&intitem->config, cfg, sizeof(hal_chip_generic_ethtransceiver_cfg_t));
     
     return(hal_res_OK);
 }

@@ -84,7 +84,7 @@ typedef struct
 {
     hal_accelerometer_cfg_t         cfg;
     uint32_t                        initialvalue;
-} hal_device_accelerometer_info_t;
+} hal_device_accelerometer_internals_t;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -106,8 +106,8 @@ static hal_result_t s_hal_device_accelerometer_hw_init(hal_accelerometer_port_t 
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_device_accelerometer_initted[hal_accelerometer_ports_number] = { hal_false };
-static hal_device_accelerometer_info_t s_hal_device_accelerometer_info[hal_accelerometer_ports_number] = { 0 };
+static uint8_t s_hal_device_accelerometer_initted = 0;
+static hal_device_accelerometer_internals_t* s_hal_device_accelerometer_internals[hal_accelerometer_ports_number] = { NULL };
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ static hal_device_accelerometer_info_t s_hal_device_accelerometer_info[hal_accel
 extern hal_result_t hal_accelerometer_init(hal_accelerometer_port_t port, const hal_accelerometer_cfg_t *cfg)
 {
 //     hal_result_t res = hal_res_NOK_generic; // dont remove ...
-//     hal_device_accelerometer_info_t *info = NULL;
+//     hal_device_accelerometer_internals_t *intitem = NULL;
 
     if(hal_false == s_hal_device_accelerometer_supported_is(port))
     {
@@ -215,8 +215,8 @@ extern hal_result_t hal_accelerometer_read(hal_accelerometer_port_t port, hal_ac
 
 extern hal_result_t hal_device_accelerometer_hid_static_memory_init(void)
 {
-    memset(s_hal_device_accelerometer_info, 0, sizeof(s_hal_device_accelerometer_info));
-    memset(s_hal_device_accelerometer_initted, hal_false, sizeof(s_hal_device_accelerometer_initted));
+    memset(s_hal_device_accelerometer_internals, 0, sizeof(s_hal_device_accelerometer_internals));
+    s_hal_device_accelerometer_initted = 0;
     return(hal_res_OK);  
 }
 
@@ -232,12 +232,14 @@ static hal_boolval_t s_hal_device_accelerometer_supported_is(hal_accelerometer_p
 
 static void s_hal_device_accelerometer_initted_set(hal_accelerometer_port_t port)
 {
-    s_hal_device_accelerometer_initted[HAL_device_accelerometer_port2index(port)] = hal_true;
+    //s_hal_device_accelerometer_initted[HAL_device_accelerometer_port2index(port)] = hal_true;
+    hal_utility_bits_byte_bitset(&s_hal_device_accelerometer_initted, HAL_device_accelerometer_port2index(port));
 }
 
 static hal_boolval_t s_hal_device_accelerometer_initted_is(hal_accelerometer_port_t port)
 {
-    return(s_hal_device_accelerometer_initted[HAL_device_accelerometer_port2index(port)]);
+    return(hal_utility_bits_byte_bitcheck(s_hal_device_accelerometer_initted, HAL_device_accelerometer_port2index(port)));
+    //return(s_hal_device_accelerometer_initted[HAL_device_accelerometer_port2index(port)]);
 }
 
 

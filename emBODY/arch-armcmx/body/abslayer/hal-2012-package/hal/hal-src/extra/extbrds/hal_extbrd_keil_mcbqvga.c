@@ -103,9 +103,9 @@ extern const hal_extbrd_keil_mcbqvga_cfg_t hal_extbrd_keil_mcbqvga_cfg_default  
 
 typedef struct
 {
-    hal_extbrd_keil_mcbqvga_cfg_t   cfg;
+    hal_extbrd_keil_mcbqvga_cfg_t   config;
     int8_t                          font;
-} hal_extbrd_keil_mcbqvga_info_t;
+} hal_extbrd_keil_mcbqvga_internals_t;
 
 typedef struct
 {
@@ -122,7 +122,7 @@ typedef struct
 static void s_hal_extbrd_keil_mcbqvga_initted_set(void);
 static hal_boolval_t s_hal_extbrd_keil_mcbqvga_initted_is(void);
 
-static hal_result_t s_hal_extbrd_keil_mcbqvga_hw_init(const hal_extbrd_keil_mcbqvga_cfg_t *cfg, hal_extbrd_keil_mcbqvga_info_t* info);
+static hal_result_t s_hal_extbrd_keil_mcbqvga_hw_init(const hal_extbrd_keil_mcbqvga_cfg_t *cfg, hal_extbrd_keil_mcbqvga_internals_t* intitem);
 
 
 
@@ -173,7 +173,7 @@ static const hal_gpio_cfg_t gpio_STLD40D_enable =
 // --------------------------------------------------------------------------------------------------------------------
 
 static hal_boolval_t s_hal_extbrd_keil_mcbqvga_initted[1] = { hal_false };
-static hal_extbrd_keil_mcbqvga_info_t s_hal_extbrd_keil_mcbqvga_info[1] = { {.cfg = { .mode = hal_extbrd_keil_mcbqvga_mode_spi, .spiport = hal_spi_port3}, .font = 0 } };
+static hal_extbrd_keil_mcbqvga_internals_t s_hal_extbrd_keil_mcbqvga_internals[1] = { {.config = { .mode = hal_extbrd_keil_mcbqvga_mode_spi, .spiport = hal_spi_port3}, .font = 0 } };
 
 static volatile uint16_t s_hal_extbrd_keil_mcbqvga_textcolors[2] = {HAL_EXTBRD_KEIL_MCBQVGA_COLWHITE, HAL_EXTBRD_KEIL_MCBQVGA_COLBLACK};
 
@@ -209,7 +209,7 @@ extern hal_result_t hal_extbrd_keil_mcbqvga_init(const hal_extbrd_keil_mcbqvga_c
         return(hal_res_OK);
     }    
 
-    if(hal_res_OK != s_hal_extbrd_keil_mcbqvga_hw_init(cfg, &s_hal_extbrd_keil_mcbqvga_info[0]))
+    if(hal_res_OK != s_hal_extbrd_keil_mcbqvga_hw_init(cfg, &s_hal_extbrd_keil_mcbqvga_internals[0]))
     {
         return(hal_res_NOK_generic);
     }
@@ -225,7 +225,7 @@ extern hal_result_t hal_extbrd_keil_mcbqvga_init(const hal_extbrd_keil_mcbqvga_c
 extern hal_result_t hal_extbrd_keil_mcbqvga_clear(hal_extbrd_keil_mcbqvga_color_t color)
 {
     hal_result_t res = hal_res_NOK_generic; 
-    hal_spi_port_t spiport = s_hal_extbrd_keil_mcbqvga_info[0].cfg.spiport;
+    hal_spi_port_t spiport = s_hal_extbrd_keil_mcbqvga_internals[0].config.spiport;
 
     
     if(hal_false == s_hal_extbrd_keil_mcbqvga_initted_is())
@@ -256,7 +256,7 @@ extern hal_result_t hal_extbrd_keil_mcbqvga_clear(hal_extbrd_keil_mcbqvga_color_
 extern hal_result_t hal_extbrd_keil_mcbqvga_settextproperties(hal_extbrd_keil_mcbqvga_fontsize_t fontsize, hal_extbrd_keil_mcbqvga_color_t backcolor, hal_extbrd_keil_mcbqvga_color_t textcolor)
 {
     hal_result_t res = hal_res_NOK_generic; 
-    hal_spi_port_t spiport = s_hal_extbrd_keil_mcbqvga_info[0].cfg.spiport;
+    hal_spi_port_t spiport = s_hal_extbrd_keil_mcbqvga_internals[0].config.spiport;
 
     
     if(hal_false == s_hal_extbrd_keil_mcbqvga_initted_is())
@@ -271,7 +271,7 @@ extern hal_result_t hal_extbrd_keil_mcbqvga_settextproperties(hal_extbrd_keil_mc
 
     if(hal_extbrd_keil_mcbqvga_fontsize_16x24 == fontsize)
     {
-        s_hal_extbrd_keil_mcbqvga_info[0].font  = 0;
+        s_hal_extbrd_keil_mcbqvga_internals[0].font  = 0;
         s_hal_extbrd_keil_mcbqvga_thefonts.w    = 16;
         s_hal_extbrd_keil_mcbqvga_thefonts.h    = 24;
         s_hal_extbrd_keil_mcbqvga_thefonts.s    = 2;
@@ -279,7 +279,7 @@ extern hal_result_t hal_extbrd_keil_mcbqvga_settextproperties(hal_extbrd_keil_mc
     }
     else if(hal_extbrd_keil_mcbqvga_fontsize_6x8 == fontsize)
     {
-        s_hal_extbrd_keil_mcbqvga_info[0].font  = 1;
+        s_hal_extbrd_keil_mcbqvga_internals[0].font  = 1;
         s_hal_extbrd_keil_mcbqvga_thefonts.w    = 6;
         s_hal_extbrd_keil_mcbqvga_thefonts.h    = 8;
         s_hal_extbrd_keil_mcbqvga_thefonts.s    = 1;
@@ -377,7 +377,7 @@ static hal_boolval_t s_hal_extbrd_keil_mcbqvga_initted_is(void)
 
  
     
-static hal_result_t s_hal_extbrd_keil_mcbqvga_hw_init(const hal_extbrd_keil_mcbqvga_cfg_t *cfg, hal_extbrd_keil_mcbqvga_info_t* info)
+static hal_result_t s_hal_extbrd_keil_mcbqvga_hw_init(const hal_extbrd_keil_mcbqvga_cfg_t *cfg, hal_extbrd_keil_mcbqvga_internals_t* intitem)
 {
     hal_result_t res = hal_res_NOK_generic;   
     uint8_t data;
@@ -540,7 +540,7 @@ static hal_result_t s_hal_extbrd_keil_mcbqvga_hw_init(const hal_extbrd_keil_mcbq
     
     
     
-    memcpy(&info->cfg, cfg, sizeof(hal_extbrd_keil_mcbqvga_cfg_t));
+    memcpy(&intitem->config, cfg, sizeof(hal_extbrd_keil_mcbqvga_cfg_t));
     
     // store the i2caddress and the register address.
     return(hal_res_OK);
@@ -560,7 +560,7 @@ static void s_hal_extbrd_keil_mcbqvga_reg_write(uint8_t regaddr, uint16_t value)
 
 static void s_hal_extbrd_keil_mcbqvga_cmd_write(uint8_t cmd)
 {
-    hal_spi_port_t spiport = s_hal_extbrd_keil_mcbqvga_info[0].cfg.spiport;
+    hal_spi_port_t spiport = s_hal_extbrd_keil_mcbqvga_internals[0].config.spiport;
     
     hal_gpio_quickest_setval(gpio_cs.port, gpio_cs.pin, hal_gpio_valLOW);
   
@@ -579,7 +579,7 @@ static uint16_t s_hal_extbrd_keil_mcbqvga_dat_read(void)
     uint8_t vv0 = 0;
     uint8_t vv1 = 0;
  
-    hal_spi_port_t spiport = s_hal_extbrd_keil_mcbqvga_info[0].cfg.spiport;
+    hal_spi_port_t spiport = s_hal_extbrd_keil_mcbqvga_internals[0].config.spiport;
     
     hal_gpio_quickest_setval(gpio_cs.port, gpio_cs.pin, hal_gpio_valLOW);
  
@@ -601,7 +601,7 @@ static uint16_t s_hal_extbrd_keil_mcbqvga_dat_read(void)
 
 static void s_hal_extbrd_keil_mcbqvga_dat_write(uint16_t value)
 {
-    hal_spi_port_t spiport = s_hal_extbrd_keil_mcbqvga_info[0].cfg.spiport;
+    hal_spi_port_t spiport = s_hal_extbrd_keil_mcbqvga_internals[0].config.spiport;
     
     hal_gpio_quickest_setval(gpio_cs.port, gpio_cs.pin, hal_gpio_valLOW);
  
@@ -624,7 +624,7 @@ static void s_hal_extbrd_keil_mcbqvga_windowmax(void)
 
 static void s_hal_extbrd_keil_mcbqvga_dat_start(void)
 {
-    hal_spi_port_t spiport = s_hal_extbrd_keil_mcbqvga_info[0].cfg.spiport;
+    hal_spi_port_t spiport = s_hal_extbrd_keil_mcbqvga_internals[0].config.spiport;
     
     hal_gpio_quickest_setval(gpio_cs.port, gpio_cs.pin, hal_gpio_valLOW);
     
@@ -633,7 +633,7 @@ static void s_hal_extbrd_keil_mcbqvga_dat_start(void)
 
 static void s_hal_extbrd_keil_mcbqvga_dat_onlywrite(uint16_t value)
 {
-    hal_spi_port_t spiport = s_hal_extbrd_keil_mcbqvga_info[0].cfg.spiport;
+    hal_spi_port_t spiport = s_hal_extbrd_keil_mcbqvga_internals[0].config.spiport;
 
     s_hal_extbrd_keil_mcbqvga_spi_write(spiport, value >> 8, NULL);
     s_hal_extbrd_keil_mcbqvga_spi_write(spiport, value & 0xff, NULL);

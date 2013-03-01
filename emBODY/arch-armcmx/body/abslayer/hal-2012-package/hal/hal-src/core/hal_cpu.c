@@ -33,10 +33,10 @@
 
 #include "stdlib.h"
 #include "string.h"
+#include "hal_brdcfg.h"
 
 #include "hal_middleware_interface.h"
 
-#include "hal_brdcfg.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -68,9 +68,11 @@ const hal_cpu_cfg_t hal_cpu_cfg_default = { .nothingsofar = 0 };
 
 
 #if     defined(HAL_USE_CPU_NAM_STM32F107)
-extern uint32_t SystemCoreClock =  72000000; //HSI_VALUE;
+extern uint32_t SystemCoreClock     =  72000000; //HSI_VALUE;
 #elif   defined(HAL_USE_CPU_NAM_STM32F407)
-extern uint32_t SystemCoreClock = 168000000; //HSI_VALUE;
+extern uint32_t SystemCoreClock     = 168000000; //HSI_VALUE;
+#else
+    #error ERR --> define systemcoreclock for the mpu
 #endif
 
 
@@ -134,6 +136,7 @@ extern hal_cpu_family_t hal_cpu_family_get(void)
 {
     return(hal_brdcfg_cpu__theconfig.family);
 }
+
 
 extern hal_cpu_name_t hal_cpu_name_get(void)
 {
@@ -505,7 +508,9 @@ void SystemCoreClockUpdate(void)
     SystemCoreClock >>= tmp;
 }
 
-#endif
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -854,6 +859,8 @@ static void s_hal_cpu_set_sys_clock(void)
   
 }
 
+#else
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
 #endif
 
 static void s_hal_cpu_system_core_clock_update(void)

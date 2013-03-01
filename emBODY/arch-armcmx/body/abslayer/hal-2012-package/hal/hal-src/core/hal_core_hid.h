@@ -41,7 +41,7 @@
 // empty-section
 
 // - definition of hidden structs -------------------------------------------------------------------------------------
-
+// empty-section
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
@@ -49,8 +49,7 @@ extern hal_core_cfg_t hal_core_hid_config;
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
-
-const hal_core_cfg_t* hal_core_hid_get_cfg(void);
+// empty-section
 
 
 // - definition of extern hidden inline functions ---------------------------------------------------------------------

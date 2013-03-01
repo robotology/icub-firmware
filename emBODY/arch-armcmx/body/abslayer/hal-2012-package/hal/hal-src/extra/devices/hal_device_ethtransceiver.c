@@ -102,9 +102,9 @@ static hal_result_t s_hal_device_ethtransceiver_lowlevel_init(const hal_ethtrans
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_ethtransceiver_cfg_t s_hal_device_ethtransceiver_cfg      = {.dummy = 0};
-static hal_bool_t s_hal_device_ethtransceiver_initted                    =  hal_false;
-static hal_bool_t s_hal_device_ethtransceiver_started                    =  hal_false;
+static hal_ethtransceiver_cfg_t s_hal_device_ethtransceiver_cfg             = { .dummy = 0 };
+static hal_bool_t s_hal_device_ethtransceiver_initted                       =  hal_false;
+static hal_bool_t s_hal_device_ethtransceiver_started                       =  hal_false;
 
 
 // --------------------------------------------------------------------------------------------------------------------

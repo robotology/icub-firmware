@@ -82,7 +82,7 @@ typedef struct
 {
     hal_gyroscope_cfg_t         cfg;
     uint32_t                    initialvalue;
-} hal_device_gyroscope_info_t;
+} hal_device_gyroscope_internals_t;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -106,9 +106,9 @@ static hal_result_t s_hal_device_gyroscope_hw_init(hal_gyroscope_port_t sensor, 
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_device_gyroscope_initted[hal_gyroscope_ports_number] = { hal_false };
+static uint8_t s_hal_device_gyroscope_initted = 0;
 
-static hal_device_gyroscope_info_t s_hal_device_gyroscope_info[hal_gyroscope_ports_number] = { 0 };
+static hal_device_gyroscope_internals_t* s_hal_device_gyroscope_internals[hal_gyroscope_ports_number] = { NULL };
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ static hal_device_gyroscope_info_t s_hal_device_gyroscope_info[hal_gyroscope_por
 extern hal_result_t hal_gyroscope_init(hal_gyroscope_port_t sensor, const hal_gyroscope_cfg_t *cfg)
 {
 //    hal_result_t res = hal_res_NOK_generic; // dont remove ...
-//    hal_device_gyroscope_info_t *info = NULL;
+//    hal_device_gyroscope_internals_t *info = NULL;
 
     if(hal_false == s_hal_device_gyroscope_supported_is(sensor))
     {
@@ -207,8 +207,8 @@ extern hal_result_t hal_gyroscope_read(hal_gyroscope_port_t sensor, hal_gyroscop
 
 extern hal_result_t hal_device_gyroscope_hid_static_memory_init(void)
 {
-    memset(s_hal_device_gyroscope_info, 0, sizeof(s_hal_device_gyroscope_info));
-    memset(s_hal_device_gyroscope_initted, hal_false, sizeof(s_hal_device_gyroscope_initted));
+    memset(s_hal_device_gyroscope_internals, 0, sizeof(s_hal_device_gyroscope_internals));
+    s_hal_device_gyroscope_initted = 0;
     return(hal_res_OK);  
 }
 
@@ -225,12 +225,12 @@ static hal_boolval_t s_hal_device_gyroscope_supported_is(hal_gyroscope_port_t se
 
 static void s_hal_device_gyroscope_initted_set(hal_gyroscope_port_t sensor)
 {
-    s_hal_device_gyroscope_initted[HAL_device_gyroscope_port2index(sensor)] = hal_true;
+    hal_utility_bits_byte_bitset(&s_hal_device_gyroscope_initted, HAL_device_gyroscope_port2index(sensor));
 }
 
 static hal_boolval_t s_hal_device_gyroscope_initted_is(hal_gyroscope_port_t sensor)
 {
-    return(s_hal_device_gyroscope_initted[HAL_device_gyroscope_port2index(sensor)]);
+    return(hal_utility_bits_byte_bitcheck(s_hal_device_gyroscope_initted, HAL_device_gyroscope_port2index(sensor)));
 }
 
 

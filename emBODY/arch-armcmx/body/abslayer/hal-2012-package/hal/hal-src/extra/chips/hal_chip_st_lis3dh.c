@@ -100,10 +100,10 @@ extern const hal_chip_st_lis3dh_cfg_t hal_chip_st_lis3dh_cfg_default  =
 
 typedef struct
 {
-    hal_chip_st_lis3dh_cfg_t    cfg;
+    hal_chip_st_lis3dh_cfg_t        config;
     uint32_t                        factor;
     uint8_t                         shift;
-} hal_chip_st_lis3dh_info_t;
+} hal_chip_st_lis3dh_internals_t;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -113,7 +113,7 @@ typedef struct
 static void s_hal_chip_st_lis3dh_initted_set(void);
 static hal_boolval_t s_hal_chip_st_lis3dh_initted_is(void);
 
-static hal_result_t s_hal_chip_st_lis3dh_hw_init(const hal_chip_st_lis3dh_cfg_t *cfg, hal_chip_st_lis3dh_info_t* info);
+static hal_result_t s_hal_chip_st_lis3dh_hw_init(const hal_chip_st_lis3dh_cfg_t *cfg, hal_chip_st_lis3dh_internals_t* intitem);
 
 static int32_t s_hal_chip_st_lis3dh_convert(int32_t v);
 
@@ -129,7 +129,7 @@ static int32_t s_hal_chip_st_lis3dh_convert(int32_t v);
 // --------------------------------------------------------------------------------------------------------------------
 
 static hal_boolval_t s_hal_chip_st_lis3dh_initted[1] = { hal_false };
-static hal_chip_st_lis3dh_info_t s_hal_chip_st_lis3dh_info[1] = { {.cfg = { .i2cport = hal_i2c_port1} } };
+static hal_chip_st_lis3dh_internals_t s_hal_chip_st_lis3dh_info[1] = { {.config = { .i2cport = hal_i2c_port1} } };
 
 
 
@@ -166,7 +166,7 @@ extern hal_result_t hal_chip_st_lis3dh_init(const hal_chip_st_lis3dh_cfg_t *cfg)
 extern hal_result_t hal_chip_st_lis3dh_temp_get(int16_t* temp)
 {
     hal_result_t res = hal_res_NOK_generic; 
-    hal_i2c_port_t i2cport = s_hal_chip_st_lis3dh_info[0].cfg.i2cport;
+    hal_i2c_port_t i2cport = s_hal_chip_st_lis3dh_info[0].config.i2cport;
 
     uint8_t datal = 0;
     uint8_t datah = 0;
@@ -194,7 +194,7 @@ extern hal_result_t hal_chip_st_lis3dh_temp_get(int16_t* temp)
 extern hal_result_t hal_chip_st_lis3dh_accel_get(int32_t* xac, int32_t* yac, int32_t* zac)
 {
     hal_result_t res = hal_res_NOK_generic; 
-    hal_i2c_port_t i2cport = s_hal_chip_st_lis3dh_info[0].cfg.i2cport;
+    hal_i2c_port_t i2cport = s_hal_chip_st_lis3dh_info[0].config.i2cport;
 
     uint8_t datal = 0;
     uint8_t datah = 0;
@@ -279,7 +279,7 @@ static hal_boolval_t s_hal_chip_st_lis3dh_initted_is(void)
     // if range is +-16g
     // F = 125 / 256
     
-static hal_result_t s_hal_chip_st_lis3dh_hw_init(const hal_chip_st_lis3dh_cfg_t *cfg, hal_chip_st_lis3dh_info_t* info)
+static hal_result_t s_hal_chip_st_lis3dh_hw_init(const hal_chip_st_lis3dh_cfg_t *cfg, hal_chip_st_lis3dh_internals_t* intitem)
 {
     hal_result_t res = hal_res_NOK_generic;   
     uint8_t data;
@@ -327,26 +327,26 @@ static hal_result_t s_hal_chip_st_lis3dh_hw_init(const hal_chip_st_lis3dh_cfg_t 
     if(hal_chip_st_lis3dh_range_2g == cfg->range)
     {
         data |= 0x00;
-        info->factor = 125;
-        info->shift  = 11; 
+        intitem->factor = 125;
+        intitem->shift  = 11; 
     }
     else if(hal_chip_st_lis3dh_range_4g == cfg->range)
     {
         data |= 0x10;
-        info->factor = 125;
-        info->shift  = 10;         
+        intitem->factor = 125;
+        intitem->shift  = 10;         
     }
     else if(hal_chip_st_lis3dh_range_8g == cfg->range)
     {
         data |= 0x20;
-        info->factor = 125;
-        info->shift  = 9;         
+        intitem->factor = 125;
+        intitem->shift  = 9;         
     }    
     else if(hal_chip_st_lis3dh_range_16g == cfg->range)
     {
         data |= 0x30;
-        info->factor = 125;
-        info->shift  = 8;         
+        intitem->factor = 125;
+        intitem->shift  = 8;         
     }        
     if(hal_res_OK != (res = hal_i2c_write(i2cport, I2CADDRESS, regaddr, &data, 1)))
     {
@@ -372,7 +372,7 @@ static hal_result_t s_hal_chip_st_lis3dh_hw_init(const hal_chip_st_lis3dh_cfg_t 
     }
     hal_i2c_standby(i2cport, I2CADDRESS);    
     
-    memcpy(&info->cfg, cfg, sizeof(hal_chip_st_lis3dh_cfg_t));
+    memcpy(&intitem->config, cfg, sizeof(hal_chip_st_lis3dh_cfg_t));
     
     // store the i2caddress and the register address.
     return(hal_res_OK);

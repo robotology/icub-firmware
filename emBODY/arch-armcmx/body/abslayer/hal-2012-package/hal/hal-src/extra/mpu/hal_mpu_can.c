@@ -89,7 +89,9 @@
     #define HAL_MPU_CAN_TQ_SJW              CAN_SJW_3tq
     #define HAL_MPU_CAN_TQ_BS1              CAN_BS1_4tq
     #define HAL_MPU_CAN_TQ_BS2              CAN_BS2_2tq    
-#endif
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
 
 #define HAL_can_port2peripheral(p)     ( ( hal_can_port1 == (p) ) ? (CAN1) : (CAN2) )
 
@@ -201,6 +203,7 @@ static const hal_gpio_altcfg_t s_hal_can_canx_tx_altcfg =
 //     .GPIO_Mode      = GPIO_Mode_AF_PP,
 //     .GPIO_Speed     = GPIO_Speed_50MHz
 // };
+
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)
 
 static const hal_gpio_altcfg_t s_hal_can_canx_rx_altcfg         = 
@@ -246,7 +249,9 @@ static const hal_gpio_altcfg_t s_hal_can_canx_tx_altcfg =
 //     .GPIO_OType     = GPIO_OType_PP,
 //     .GPIO_PuPd      = GPIO_PuPd_UP
 // };
-#endif
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
 
 
 static const hal_can_frame_t s_hal_can_defcanframe =
@@ -264,9 +269,8 @@ static const hal_can_frame_t s_hal_can_defcanframe =
 // --------------------------------------------------------------------------------------------------------------------
 
 static hal_can_internals_t* s_hal_can_internals[hal_can_ports_num] = { NULL };
-
 static uint8_t s_hal_can_initted = 0;
-//static hal_boolval_t s_hal_can_initted[hal_can_ports_num] = { hal_false };
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -275,7 +279,7 @@ static uint8_t s_hal_can_initted = 0;
 
 extern hal_result_t hal_can_init(hal_can_port_t port, const hal_can_cfg_t *cfg)
 {
-	hal_can_internals_t *cint = s_hal_can_internals[HAL_can_port2index(port)];
+	hal_can_internals_t *intitem = s_hal_can_internals[HAL_can_port2index(port)];
 
     if(hal_false == s_hal_can_supported_is(port))
     {
@@ -296,7 +300,7 @@ extern hal_result_t hal_can_init(hal_can_port_t port, const hal_can_cfg_t *cfg)
     
     // give memory to can internals for this port ...
     
-    if(NULL == cint)
+    if(NULL == intitem)
     {
         void* tmpram = NULL;
         uint8_t capacityofrxfifoofframes = cfg->capacityofrxfifoofframes; 
@@ -307,26 +311,27 @@ extern hal_result_t hal_can_init(hal_can_port_t port, const hal_can_cfg_t *cfg)
             hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_can_init(): need non-zero tx and rx fifo sizes");
         }
         
-        // the internal entry
-        cint = s_hal_can_internals[HAL_can_port2index(port)] = hal_heap_new(sizeof(hal_can_internals_t));
+        // the internal item
+        intitem = s_hal_can_internals[HAL_can_port2index(port)] = hal_heap_new(sizeof(hal_can_internals_t));
+        // minimal configuration of the internal item
         // the rx buffer
         tmpram = hal_heap_new( sizeof(hal_can_frame_t) * capacityofrxfifoofframes );
-        hal_utility_fifo_init(&cint->canframes_rx_norm, capacityofrxfifoofframes, sizeof(hal_can_frame_t), tmpram, (uint8_t*)&s_hal_can_defcanframe);
+        hal_utility_fifo_init(&intitem->canframes_rx_norm, capacityofrxfifoofframes, sizeof(hal_can_frame_t), tmpram, (uint8_t*)&s_hal_can_defcanframe);
         // the tx buffer
         tmpram = hal_heap_new( sizeof(hal_can_frame_t) * capacityoftxfifoofframes );
-        hal_utility_fifo_init(&cint->canframes_tx_norm, capacityoftxfifoofframes, sizeof(hal_can_frame_t), tmpram, (uint8_t*)&s_hal_can_defcanframe);      
+        hal_utility_fifo_init(&intitem->canframes_tx_norm, capacityoftxfifoofframes, sizeof(hal_can_frame_t), tmpram, (uint8_t*)&s_hal_can_defcanframe);      
     }
     
     // set config
-    memcpy(&cint->cfg, cfg, sizeof(hal_can_cfg_t));
+    memcpy(&intitem->cfg, cfg, sizeof(hal_can_cfg_t));
    
     //  reset fifos
-    hal_utility_fifo_reset(&cint->canframes_rx_norm);
-    hal_utility_fifo_reset(&cint->canframes_tx_norm);    
+    hal_utility_fifo_reset(&intitem->canframes_rx_norm);
+    hal_utility_fifo_reset(&intitem->canframes_tx_norm);    
     
     // clear other fields of internals
-    cint->enabled = 0;
-    cint->txisrisenabled = 0;    
+    intitem->enabled = 0;
+    intitem->txisrisenabled = 0;    
     
     
     
@@ -355,14 +360,14 @@ extern hal_result_t hal_can_init(hal_can_port_t port, const hal_can_cfg_t *cfg)
 extern hal_result_t hal_can_enable(hal_can_port_t port)
 {
 	hal_result_t res;
-	hal_can_internals_t *cint = s_hal_can_internals[HAL_can_port2index(port)];
+	hal_can_internals_t *intitem = s_hal_can_internals[HAL_can_port2index(port)];
 
     if(hal_false == s_hal_can_initted_is(port))
     {
         return(hal_res_NOK_generic);
     }
 
-    if(NULL == cint)
+    if(NULL == intitem)
     {
         return(hal_res_NOK_generic);
     }
@@ -378,7 +383,7 @@ extern hal_result_t hal_can_enable(hal_can_port_t port)
     // disable scheduling
     hal_base_osal_scheduling_suspend();
 
-    cint->enabled = 1;
+    intitem->enabled = 1;
 
     // configure interrupts on rx (CAN_IT_FMP0 -> FIFO 0 message pending) and tx (CAN_IT_TME -> transmit mailbox empty)
     CAN_ITConfig(HAL_can_port2peripheral(port), (CAN_IT_FMP0 | CAN_IT_TME), ENABLE);
@@ -388,7 +393,7 @@ extern hal_result_t hal_can_enable(hal_can_port_t port)
     // dont enable the nvic for the tx
     //s_hal_can_tx_enable(port);
     s_hal_can_isr_tx_disable(port);
-    cint->txisrisenabled = 0;
+    intitem->txisrisenabled = 0;
 
     // enable scheduling 
     hal_base_osal_scheduling_restart();
@@ -399,14 +404,14 @@ extern hal_result_t hal_can_enable(hal_can_port_t port)
 
 extern hal_result_t hal_can_disable(hal_can_port_t port) 
 {
-    hal_can_internals_t *cint = s_hal_can_internals[HAL_can_port2index(port)];
+    hal_can_internals_t *intitem = s_hal_can_internals[HAL_can_port2index(port)];
 
     if(hal_false == s_hal_can_initted_is(port))
     {
         return(hal_res_NOK_generic);
     }
 
-    if(NULL == cint)
+    if(NULL == intitem)
     {
         return(hal_res_NOK_generic);
     }
@@ -414,7 +419,7 @@ extern hal_result_t hal_can_disable(hal_can_port_t port)
     // disable scheduling
     hal_base_osal_scheduling_suspend();
 
-    cint->enabled = 0;
+    intitem->enabled = 0;
 
     // deconfigure interrupts on rx (CAN_IT_FMP0 -> FIFO 0 message pending) and tx (CAN_IT_TME -> transmit mailbox empty)
     CAN_ITConfig(HAL_can_port2peripheral(port), (CAN_IT_FMP0 | CAN_IT_TME), DISABLE);
@@ -423,7 +428,7 @@ extern hal_result_t hal_can_disable(hal_can_port_t port)
     s_hal_can_isr_rx_disable(port);
     // dont disable the nvic for the tx. it was never enabled
     s_hal_can_isr_tx_disable(port);
-    cint->txisrisenabled = 0;
+    intitem->txisrisenabled = 0;
     
     // enable scheduling 
     hal_base_osal_scheduling_restart();
@@ -449,12 +454,12 @@ extern hal_result_t hal_can_transmit(hal_can_port_t port)
 
 extern hal_result_t hal_can_received(hal_can_port_t port, uint8_t *numberof) 
 {
-    hal_can_internals_t *cint = s_hal_can_internals[HAL_can_port2index(port)];
+    hal_can_internals_t *intitem = s_hal_can_internals[HAL_can_port2index(port)];
     // disable interrupt rx
     s_hal_can_isr_rx_disable(port);
     
-    //*numberof = hal_canfifo_hid_size(&cint->canframes_rx_norm);
-    *numberof = hal_utility_fifo_size(&cint->canframes_rx_norm);
+    //*numberof = hal_canfifo_hid_size(&intitem->canframes_rx_norm);
+    *numberof = hal_utility_fifo_size(&intitem->canframes_rx_norm);
     
     // enable interrupt rx
     s_hal_can_isr_rx_enable(port);
@@ -465,8 +470,8 @@ extern hal_result_t hal_can_received(hal_can_port_t port, uint8_t *numberof)
 
 extern hal_result_t hal_can_get(hal_can_port_t port, hal_can_frame_t *frame, uint8_t *remaining) 
 {
-    hal_can_internals_t *cint  =   s_hal_can_internals[HAL_can_port2index(port)];
-    hal_utility_fifo_t* fiforx = &cint->canframes_rx_norm;
+    hal_can_internals_t *intitem  =   s_hal_can_internals[HAL_can_port2index(port)];
+    hal_utility_fifo_t* fiforx = &intitem->canframes_rx_norm;
     hal_result_t res = hal_res_NOK_nodata;
   
     // disable interrupt rx
@@ -479,13 +484,13 @@ extern hal_result_t hal_can_get(hal_can_port_t port, hal_can_frame_t *frame, uin
     
     return(res);
     
-//     hal_can_internals_t *cint  =   s_hal_can_internals[HAL_can_port2index(port)];
+//     hal_can_internals_t *intitem  =   s_hal_can_internals[HAL_can_port2index(port)];
 //     hal_canfifo_item_t *fifoframe_ptr   =   NULL;
 //   
 //     // disable interrupt rx
 //     s_hal_can_isr_rx_disable(port);
 
-//     fifoframe_ptr = hal_canfifo_hid_front(&cint->canframes_rx_norm);
+//     fifoframe_ptr = hal_canfifo_hid_front(&intitem->canframes_rx_norm);
 //     if(NULL == fifoframe_ptr)
 //     {
 //         // enable interrupt rx
@@ -495,14 +500,14 @@ extern hal_result_t hal_can_get(hal_can_port_t port, hal_can_frame_t *frame, uin
 //     
 //     memcpy(frame, fifoframe_ptr, sizeof(hal_canfifo_item_t));
 
-//     hal_canfifo_hid_pop(&cint->canframes_rx_norm);
+//     hal_canfifo_hid_pop(&intitem->canframes_rx_norm);
 //     // enable interrupt rx
 //     s_hal_can_isr_rx_enable(port);
 //     
 //     
 //     if(NULL != remaining)
 //     {
-//         *remaining = hal_canfifo_hid_size(&cint->canframes_rx_norm);
+//         *remaining = hal_canfifo_hid_size(&intitem->canframes_rx_norm);
 //     }
 
 //     return(hal_res_OK);    
@@ -557,7 +562,7 @@ extern hal_result_t hal_can_receptionfilter_set(hal_can_port_t port, uint8_t mas
 
 extern hal_result_t hal_can_out_get(hal_can_port_t port, uint8_t *numberof) 
 {
-    hal_can_internals_t *cint = s_hal_can_internals[HAL_can_port2index(port)];
+    hal_can_internals_t *intitem = s_hal_can_internals[HAL_can_port2index(port)];
     uint8_t reenable_isrtx = 0;
     
     if(NULL == numberof)
@@ -566,14 +571,14 @@ extern hal_result_t hal_can_out_get(hal_can_port_t port, uint8_t *numberof)
     }
 
     // disable interrupt tx
-    if(1 == cint->txisrisenabled)
+    if(1 == intitem->txisrisenabled)
     {
         s_hal_can_isr_tx_disable(port);
         reenable_isrtx = 1;
     }
     
-    //*numberof = hal_canfifo_hid_size(&cint->canframes_tx_norm);
-    *numberof = hal_utility_fifo_size(&cint->canframes_tx_norm);
+    //*numberof = hal_canfifo_hid_size(&intitem->canframes_tx_norm);
+    *numberof = hal_utility_fifo_size(&intitem->canframes_tx_norm);
     
     // enable interrupt tx
     if(1 == reenable_isrtx)
@@ -682,11 +687,11 @@ static void s_hal_can_isr_sendframes_canx(hal_can_port_t port)
     uint8_t*  const txmsgsize = &TxMessage.DLC;
     uint64_t* const txmsgdata = (uint64_t*) TxMessage.Data;  
     
-    hal_can_internals_t *cint = s_hal_can_internals[HAL_can_port2index(port)];
-    hal_utility_fifo_t *fifotx = &cint->canframes_tx_norm;
+    hal_can_internals_t *intitem = s_hal_can_internals[HAL_can_port2index(port)];
+    hal_utility_fifo_t *fifotx = &intitem->canframes_tx_norm;
 
     s_hal_can_isr_tx_disable(port);
-    cint->txisrisenabled = 0;
+    intitem->txisrisenabled = 0;
 
     while( (hal_utility_fifo_size(fifotx) > 0) )
     {
@@ -701,9 +706,9 @@ static void s_hal_can_isr_sendframes_canx(hal_can_port_t port)
         if(CAN_TxStatus_NoMailBox != CAN_Transmit(HAL_can_port2peripheral(port), &TxMessage))
         {   // if the CAN_Transmit() was succesful ... remove the sent frame from from fifo-tx and call the user-defined callback
         	hal_utility_fifo_pop(fifotx);
-            if(NULL != cint->cfg.callback_on_tx)
+            if(NULL != intitem->cfg.callback_on_tx)
             {
-                cint->cfg.callback_on_tx(cint->cfg.arg_cb_tx);
+                intitem->cfg.callback_on_tx(intitem->cfg.arg_cb_tx);
             }
         }
         else
@@ -720,7 +725,7 @@ static void s_hal_can_isr_sendframes_canx(hal_can_port_t port)
     if(hal_utility_fifo_size(fifotx) > 0)
 	{   // we still have some frames to send, thus we enable the isr on tx which triggers as soon any of the transmit mailboxes gets empty.
     	s_hal_can_isr_tx_enable(port);
-        cint->txisrisenabled = 1;
+        intitem->txisrisenabled = 1;
 	}
     
     
@@ -732,15 +737,15 @@ static void s_hal_can_isr_sendframes_canx(hal_can_port_t port)
 //         .RTR   = CAN_RTR_DATA       // only data frame are managed    
 //     };
 
-//     hal_can_internals_t *cint = s_hal_can_internals[HAL_can_port2index(port)];
+//     hal_can_internals_t *intitem = s_hal_can_internals[HAL_can_port2index(port)];
 
 //     s_hal_can_isr_tx_disable(port);
 
-//     while( (hal_canfifo_hid_size(&cint->canframes_tx_norm) > 0) )
+//     while( (hal_canfifo_hid_size(&intitem->canframes_tx_norm) > 0) )
 //     {
 //         uint8_t res = 0;
 //         
-//         canframe_ptr = hal_canfifo_hid_front(&cint->canframes_tx_norm);
+//         canframe_ptr = hal_canfifo_hid_front(&intitem->canframes_tx_norm);
 //         TxMessage.StdId = canframe_ptr->id & 0x7FF;
 //         TxMessage.DLC = canframe_ptr->size;
 //         *(uint64_t*)TxMessage.Data = *((uint64_t*)canframe_ptr->data);
@@ -750,10 +755,10 @@ static void s_hal_can_isr_sendframes_canx(hal_can_port_t port)
 
 //         if(res != CAN_TxStatus_NoMailBox)
 //         {   // if the CAN_Transmit() was succesful ... remove the sent from from fifo-tx and call the user-defined callback
-//         	hal_canfifo_hid_pop(&cint->canframes_tx_norm);
-//             if(NULL != cint->cfg.callback_on_tx)
+//         	hal_canfifo_hid_pop(&intitem->canframes_tx_norm);
+//             if(NULL != intitem->cfg.callback_on_tx)
 //             {
-//                 cint->cfg.callback_on_tx(cint->cfg.arg_cb_tx);
+//                 intitem->cfg.callback_on_tx(intitem->cfg.arg_cb_tx);
 //             }
 //         }
 //         else
@@ -763,7 +768,7 @@ static void s_hal_can_isr_sendframes_canx(hal_can_port_t port)
 
 //     }
 
-//     if(hal_canfifo_hid_size(&cint->canframes_tx_norm) > 0)
+//     if(hal_canfifo_hid_size(&intitem->canframes_tx_norm) > 0)
 // 	{   // we still have some frames to send, thus we enable the isr on tx which triggers as soon any of the transmit mailboxes gets empty.
 //     	s_hal_can_isr_tx_enable(port);
 // 	}
@@ -792,8 +797,8 @@ static void s_hal_can_isr_recvframe_canx(hal_can_port_t port)
     
     uint64_t* const data = (uint64_t*) canframe.data;
     
-    hal_can_internals_t *cint = s_hal_can_internals[HAL_can_port2index(port)];
-    hal_utility_fifo_t* fiforx = &cint->canframes_rx_norm;
+    hal_can_internals_t *intitem = s_hal_can_internals[HAL_can_port2index(port)];
+    hal_utility_fifo_t* fiforx = &intitem->canframes_rx_norm;
     
     //hal_can_frame_t* pcanframe =  NULL;
     CanRxMsg RxMessage;    
@@ -820,21 +825,21 @@ static void s_hal_can_isr_recvframe_canx(hal_can_port_t port)
     hal_utility_fifo_put16(fiforx, (uint8_t*)&canframe);
 
     // if a callback is set, invoke it
-    if(NULL != cint->cfg.callback_on_rx )
+    if(NULL != intitem->cfg.callback_on_rx )
     {
-    	cint->cfg.callback_on_rx(cint->cfg.arg_cb_rx);
+    	intitem->cfg.callback_on_rx(intitem->cfg.arg_cb_rx);
     }   
     
     
 //     hal_canfifo_item_t *canframe_ptr;
 //     CanRxMsg RxMessage;
-//     hal_can_internals_t *cint = s_hal_can_internals[HAL_can_port2index(port)];
+//     hal_can_internals_t *intitem = s_hal_can_internals[HAL_can_port2index(port)];
 
-//     canframe_ptr = hal_canfifo_hid_getFirstFree(&cint->canframes_rx_norm);
+//     canframe_ptr = hal_canfifo_hid_getFirstFree(&intitem->canframes_rx_norm);
 //     if(NULL == canframe_ptr)
 //     {   // rx-fifo is full ...  we remove oldest frame
-//         hal_canfifo_hid_pop(&cint->canframes_rx_norm); //remove the oldest frame
-//         canframe_ptr = hal_canfifo_hid_getFirstFree(&cint->canframes_rx_norm);
+//         hal_canfifo_hid_pop(&intitem->canframes_rx_norm); //remove the oldest frame
+//         canframe_ptr = hal_canfifo_hid_getFirstFree(&intitem->canframes_rx_norm);
 //     }
 //     
 //     // get the message from fifo-0 of canx peripheral
@@ -846,9 +851,9 @@ static void s_hal_can_isr_recvframe_canx(hal_can_port_t port)
 //     *((uint64_t*)canframe_ptr->data) = *((uint64_t*)RxMessage.Data);
 
 //     // if a callback is set, invoke it
-//     if(NULL != cint->cfg.callback_on_rx )
+//     if(NULL != intitem->cfg.callback_on_rx )
 //     {
-//     	cint->cfg.callback_on_rx(cint->cfg.arg_cb_rx);
+//     	intitem->cfg.callback_on_rx(intitem->cfg.arg_cb_rx);
 //     }
 
 }
@@ -1038,7 +1043,9 @@ static void s_hal_can_hw_gpio_init(hal_can_port_t port)
 
 #endif
     
-#endif
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
 }
 
 
@@ -1052,21 +1059,21 @@ static void s_hal_can_hw_clock_init(hal_can_port_t port)
 
 static void s_hal_can_hw_nvic_init(hal_can_port_t port)
 {
-    hal_can_internals_t *cint = s_hal_can_internals[HAL_can_port2index(port)];
+    hal_can_internals_t *intitem = s_hal_can_internals[HAL_can_port2index(port)];
     IRQn_Type CANx_RX0_IRQn = (hal_can_port1 == port) ? (CAN1_RX0_IRQn) : (CAN2_RX0_IRQn);
     IRQn_Type CANx_TX_IRQn  = (hal_can_port1 == port) ? (CAN1_TX_IRQn) : (CAN2_TX_IRQn);
 
-    if(hal_int_priorityNONE != cint->cfg.priorx)
+    if(hal_int_priorityNONE != intitem->cfg.priorx)
     {
         // enable rx irq in nvic
-        hal_sys_irqn_priority_set(CANx_RX0_IRQn, cint->cfg.priorx);
+        hal_sys_irqn_priority_set(CANx_RX0_IRQn, intitem->cfg.priorx);
         hal_sys_irqn_disable(CANx_RX0_IRQn);
     }
 
-    if(hal_int_priorityNONE != cint->cfg.priotx)
+    if(hal_int_priorityNONE != intitem->cfg.priotx)
     {
         // enable tx irq in nvic
-        hal_sys_irqn_priority_set(CANx_TX_IRQn, cint->cfg.priotx);
+        hal_sys_irqn_priority_set(CANx_TX_IRQn, intitem->cfg.priotx);
         hal_sys_irqn_disable(CANx_TX_IRQn);
     }
 }
@@ -1074,13 +1081,13 @@ static void s_hal_can_hw_nvic_init(hal_can_port_t port)
 
 static hal_result_t s_hal_can_hw_registers_init(hal_can_port_t port)
 {
-    hal_can_internals_t*    cint  = s_hal_can_internals[HAL_can_port2index(port)];
+    hal_can_internals_t*    intitem  = s_hal_can_internals[HAL_can_port2index(port)];
     CAN_TypeDef*                    CANx   = HAL_can_port2peripheral(port); 
 	CAN_InitTypeDef                 CAN_InitStructure;
 	CAN_FilterInitTypeDef           CAN_FilterInitStructure;
 	uint32_t			            baudrate;   
 
-    switch(cint->cfg.baudrate)
+    switch(intitem->cfg.baudrate)
     {
         case hal_can_baudrate_1mbps:    baudrate = 1000000;     break;
         case hal_can_baudrate_500kbps:  baudrate =  500000;     break;
@@ -1140,17 +1147,17 @@ static hal_result_t s_hal_can_hw_registers_init(hal_can_port_t port)
 
 static hal_result_t s_hal_can_tx_normprio(hal_can_port_t port, hal_can_frame_t *frame, hal_can_send_mode_t sm)
 {
-    hal_can_internals_t *cint = s_hal_can_internals[HAL_can_port2index(port)];
+    hal_can_internals_t *intitem = s_hal_can_internals[HAL_can_port2index(port)];
 
     hal_result_t res = hal_res_NOK_generic;
    
     
     // disable interrupt in can 1 or 2 for tx depending on value of port: use the nvic
     s_hal_can_isr_tx_disable(port);
-    cint->txisrisenabled = 0;
+    intitem->txisrisenabled = 0;
 
     // put frame in fifo out normal priority
-    res = hal_utility_fifo_put16(&cint->canframes_tx_norm, (uint8_t*)frame);
+    res = hal_utility_fifo_put16(&intitem->canframes_tx_norm, (uint8_t*)frame);
 
     // failed to put in fifo
     if(hal_res_OK != res)
@@ -1191,7 +1198,7 @@ static hal_result_t s_hal_can_tx_normprio(hal_can_port_t port, hal_can_frame_t *
 
     return(res);    
     
-//     hal_can_internals_t *cint = s_hal_can_internals[HAL_can_port2index(port)];
+//     hal_can_internals_t *intitem = s_hal_can_internals[HAL_can_port2index(port)];
 //
 //     hal_result_t res = hal_res_NOK_generic;
 //    
@@ -1200,7 +1207,7 @@ static hal_result_t s_hal_can_tx_normprio(hal_can_port_t port, hal_can_frame_t *
 //     s_hal_can_isr_tx_disable(port);
 //
 //     // put frame in fifo out normal priority
-//     res = hal_canfifo_hid_put(&cint->canframes_tx_norm, frame->id, frame->size, frame->data);
+//     res = hal_canfifo_hid_put(&intitem->canframes_tx_norm, frame->id, frame->size, frame->data);
 //
 //     // failed to put in fifo
 //     if(hal_res_OK != res)

@@ -22,7 +22,7 @@
 
 
 /* @file       hal_base_hid.h
-    @brief      This header file implements hidden interface to hal.
+    @brief      This header file implements hidden interface to hal base.
     @author     marco.accame@iit.it
     @date       09/12/2011
  **/
@@ -53,31 +53,10 @@ typedef struct
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-
 extern hal_result_t hal_base_hid_static_memory_init(void);
-
 extern hal_bool_t hal_base_hid_initted_is(void);
 
 
-
-/** @fn         extern uint32_t hal_base_memory_getsize(const hal_base_cfg_t *cfg, uint32_t *size04aligned)
-    @brief      Gets the size of the 4-aligned memory required by the hal in order to work according to a given
-                configuration. 
-    @param      cfg             The target configuration. 
-    @param      size04aligned   The number of bytes of teh 4-aligned RAM memory which is required. (if not NULL)
-    @return     The number of bytes of the 4bytes-aligned RAM which is required
-
- **/
-extern uint32_t hal_base_hid_memory_getsize(const hal_base_cfg_t *cfg, uint32_t *size04aligned);
-
-
-/** @fn         extern hal_result_t hal_base_initialise(const hal_base_cfg_t *cfg, uint32_t *data04aligned)
-    @brief      Initialise the hal to work for a given configuration and with a given external memory.
-    @param      cfg             The target configuration. 
-    @param      data04aligned   The 4bytes-aligned RAM which is required, or NULL if none is required.
-    @return     hal_res_OK or hal_res_NOK_generic 
- **/
-extern hal_result_t hal_base_hid_initialise(const hal_base_cfg_t *cfg, uint32_t *data04aligned); 
 
 
 // - definition of extern hidden inline functions ---------------------------------------------------------------------

@@ -95,10 +95,10 @@ typedef struct
     uint8_t                     hwaddress;                 
     uint16_t                    pagesize;
     uint32_t                    totalsize;
-    hal_chip_xx_eeprom_cfg_t    cfg;
+    hal_chip_xx_eeprom_cfg_t    config;
     volatile uint16_t           numberofbyte2writeinpage;
     volatile uint32_t           timeout;
-} hal_chip_xx_eeprom_generic_container_t;
+} hal_chip_xx_eeprom_internals_t;
 
 
 
@@ -139,13 +139,13 @@ const uint32_t          hal_chip_xx_eeprom_hid_ackaddress_maxtrials    = HAL_CHI
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static hal_chip_xx_eeprom_generic_container_t s_hal_chip_xx_eeprom_generics = 
+static hal_chip_xx_eeprom_internals_t s_hal_chip_xx_eeprom_internals = 
 {
     .initted                    = 0,
     .hwaddress                  = 0xA0,
     .pagesize                   = 4,
     .totalsize                  = 0,
-    .cfg                        =
+    .config                        =
     {
         .chipcfg                 =
         {
@@ -181,7 +181,7 @@ extern hal_result_t hal_chip_xx_eeprom_init(const hal_chip_xx_eeprom_cfg_t *cfg)
         cfg = &hal_chip_xx_eeprom_cfg_default;
     }
     
-    if((hal_chip_xx_eeprom_chip_none == cfg->chipcfg.chip) || (1 == s_hal_chip_xx_eeprom_generics.initted))
+    if((hal_chip_xx_eeprom_chip_none == cfg->chipcfg.chip) || (1 == s_hal_chip_xx_eeprom_internals.initted))
     {
         return(hal_res_NOK_generic);
     }
@@ -192,58 +192,58 @@ extern hal_result_t hal_chip_xx_eeprom_init(const hal_chip_xx_eeprom_cfg_t *cfg)
     
     // ok, cfg is good. i copy it into ...
     
-    memcpy(&s_hal_chip_xx_eeprom_generics.cfg, cfg, sizeof(hal_chip_xx_eeprom_cfg_t));
+    memcpy(&s_hal_chip_xx_eeprom_internals.config, cfg, sizeof(hal_chip_xx_eeprom_cfg_t));
 
  
     // init the generics according to the device
     
-    switch(s_hal_chip_xx_eeprom_generics.cfg.chipcfg.chip)
+    switch(s_hal_chip_xx_eeprom_internals.config.chipcfg.chip)
     {
         case hal_chip_xx_eeprom_chip_st_m24lr64:
         {
-            s_hal_chip_xx_eeprom_generics.hwaddress     = 0xA0;    
-            s_hal_chip_xx_eeprom_generics.pagesize      = 4;   
-            s_hal_chip_xx_eeprom_generics.totalsize     = 8*1024;
+            s_hal_chip_xx_eeprom_internals.hwaddress     = 0xA0;    
+            s_hal_chip_xx_eeprom_internals.pagesize      = 4;   
+            s_hal_chip_xx_eeprom_internals.totalsize     = 8*1024;
         } break;
         
         case hal_chip_xx_eeprom_chip_st_m24c64:
         {
-            s_hal_chip_xx_eeprom_generics.hwaddress     = 0xA0;   
-            s_hal_chip_xx_eeprom_generics.pagesize      = 32; 
-            s_hal_chip_xx_eeprom_generics.totalsize     = 8*1024;
+            s_hal_chip_xx_eeprom_internals.hwaddress     = 0xA0;   
+            s_hal_chip_xx_eeprom_internals.pagesize      = 32; 
+            s_hal_chip_xx_eeprom_internals.totalsize     = 8*1024;
         } break;
         
         case hal_chip_xx_eeprom_chip_st_m24512:
         {
-            s_hal_chip_xx_eeprom_generics.hwaddress     = 0xA0;   
-            s_hal_chip_xx_eeprom_generics.pagesize      = 128;
-            s_hal_chip_xx_eeprom_generics.totalsize     = 64*1024;            
+            s_hal_chip_xx_eeprom_internals.hwaddress     = 0xA0;   
+            s_hal_chip_xx_eeprom_internals.pagesize      = 128;
+            s_hal_chip_xx_eeprom_internals.totalsize     = 64*1024;            
         } break;
         
         case hal_chip_xx_eeprom_chip_atmel_at24c512b:
         {
-            s_hal_chip_xx_eeprom_generics.hwaddress     = 0xA0;    
-            s_hal_chip_xx_eeprom_generics.pagesize      = 128;  
-            s_hal_chip_xx_eeprom_generics.totalsize     = 64*1024;
+            s_hal_chip_xx_eeprom_internals.hwaddress     = 0xA0;    
+            s_hal_chip_xx_eeprom_internals.pagesize      = 128;  
+            s_hal_chip_xx_eeprom_internals.totalsize     = 64*1024;
         } break;
         
         case hal_chip_xx_eeprom_chip_atmel_at24c1024b:
         {
-            s_hal_chip_xx_eeprom_generics.hwaddress     = 0xA0;    
-            s_hal_chip_xx_eeprom_generics.pagesize      = 256;
-            s_hal_chip_xx_eeprom_generics.totalsize     = 128*1024;            
+            s_hal_chip_xx_eeprom_internals.hwaddress     = 0xA0;    
+            s_hal_chip_xx_eeprom_internals.pagesize      = 256;
+            s_hal_chip_xx_eeprom_internals.totalsize     = 128*1024;            
         } break;
         
         default:
         {
-            s_hal_chip_xx_eeprom_generics.hwaddress     = 0xA0;    
-            s_hal_chip_xx_eeprom_generics.pagesize      = 4;  
-            s_hal_chip_xx_eeprom_generics.totalsize     = 8*1024;            
+            s_hal_chip_xx_eeprom_internals.hwaddress     = 0xA0;    
+            s_hal_chip_xx_eeprom_internals.pagesize      = 4;  
+            s_hal_chip_xx_eeprom_internals.totalsize     = 8*1024;            
         } break;
     }
     
     // apply extra bits
-    s_hal_chip_xx_eeprom_generics.hwaddress |= ((s_hal_chip_xx_eeprom_generics.cfg.chipcfg.hwaddra2a1a0 & 0x07) << 1);
+    s_hal_chip_xx_eeprom_internals.hwaddress |= ((s_hal_chip_xx_eeprom_internals.config.chipcfg.hwaddra2a1a0 & 0x07) << 1);
     
 
     // init write protection
@@ -251,9 +251,9 @@ extern hal_result_t hal_chip_xx_eeprom_init(const hal_chip_xx_eeprom_cfg_t *cfg)
     s_hal_chip_xx_eeprom_wrprcfg_enable();
     
     // init i2c: must already be initted ...
-    //hal_i2c_init(s_hal_chip_xx_eeprom_generics.cfg.chipcfg->i2cport, ??);    
+    //hal_i2c_init(s_hal_chip_xx_eeprom_internals.config.chipcfg->i2cport, ??);    
  
-    s_hal_chip_xx_eeprom_generics.initted  = 1;    
+    s_hal_chip_xx_eeprom_internals.initted  = 1;    
         
     return(hal_res_OK);
 }
@@ -274,7 +274,7 @@ extern hal_result_t hal_chip_xx_eeprom_deinit(const hal_chip_xx_eeprom_cfg_t *cf
     s_hal_chip_xx_eeprom_wrprcfg_deinit();
        
 
-    s_hal_chip_xx_eeprom_generics.initted  = 0;     
+    s_hal_chip_xx_eeprom_internals.initted  = 0;     
     
     return(hal_res_OK);
 }
@@ -284,7 +284,7 @@ extern hal_result_t hal_chip_xx_eeprom_read(uint32_t address, uint32_t size, uin
 {   // read and block until done
     hal_result_t res = hal_res_NOK_generic;
     
-    if(0 == s_hal_chip_xx_eeprom_generics.initted)
+    if(0 == s_hal_chip_xx_eeprom_internals.initted)
     {
         return(hal_res_NOK_generic);
     }
@@ -300,7 +300,7 @@ extern hal_result_t hal_chip_xx_eeprom_read(uint32_t address, uint32_t size, uin
     hal_i2c_regaddr_t regaddr;
     regaddr.numofbytes = 2;     // all the managed eeproms use two byte addressing for internal register
     regaddr.bytes.two = (uint16_t) address;
-    res = hal_i2c_read(s_hal_chip_xx_eeprom_generics.cfg.chipcfg.i2cport, s_hal_chip_xx_eeprom_generics.hwaddress, regaddr, buffer, (uint16_t) size);
+    res = hal_i2c_read(s_hal_chip_xx_eeprom_internals.config.chipcfg.i2cport, s_hal_chip_xx_eeprom_internals.hwaddress, regaddr, buffer, (uint16_t) size);
  
  
     if(NULL != readbytes)
@@ -316,7 +316,7 @@ extern hal_result_t hal_chip_xx_eeprom_write(uint32_t address, uint32_t size, ui
 {   // read and block until done
     hal_result_t res = hal_res_NOK_generic;
     
-    if(0 == s_hal_chip_xx_eeprom_generics.initted)
+    if(0 == s_hal_chip_xx_eeprom_internals.initted)
     {
         return(hal_res_NOK_generic);
     }
@@ -383,9 +383,9 @@ extern hal_result_t hal_chip_xx_eeprom_hid_static_memory_init(void)
 static hal_result_t s_hal_chip_xx_eeprom_wrprcfg_init(void)
 {
     hal_result_t res = hal_res_OK;
-    if(NULL != s_hal_chip_xx_eeprom_generics.cfg.wrprcfg.wrpr_init)
+    if(NULL != s_hal_chip_xx_eeprom_internals.config.wrprcfg.wrpr_init)
     {
-        res = (hal_result_t)s_hal_chip_xx_eeprom_generics.cfg.wrprcfg.wrpr_init();
+        res = (hal_result_t)s_hal_chip_xx_eeprom_internals.config.wrprcfg.wrpr_init();
     }
     return(res);
 }
@@ -393,9 +393,9 @@ static hal_result_t s_hal_chip_xx_eeprom_wrprcfg_init(void)
 static hal_result_t s_hal_chip_xx_eeprom_wrprcfg_deinit(void)
 {
     hal_result_t res = hal_res_OK;
-    if(NULL != s_hal_chip_xx_eeprom_generics.cfg.wrprcfg.wrpr_deinit)
+    if(NULL != s_hal_chip_xx_eeprom_internals.config.wrprcfg.wrpr_deinit)
     {
-        res = (hal_result_t)s_hal_chip_xx_eeprom_generics.cfg.wrprcfg.wrpr_deinit();
+        res = (hal_result_t)s_hal_chip_xx_eeprom_internals.config.wrprcfg.wrpr_deinit();
     }
     return(res);
 }
@@ -403,9 +403,9 @@ static hal_result_t s_hal_chip_xx_eeprom_wrprcfg_deinit(void)
 static hal_result_t s_hal_chip_xx_eeprom_wrprcfg_enable(void)
 {
     hal_result_t res = hal_res_OK;
-    if(NULL != s_hal_chip_xx_eeprom_generics.cfg.wrprcfg.wrpr_enable)
+    if(NULL != s_hal_chip_xx_eeprom_internals.config.wrprcfg.wrpr_enable)
     {
-        res = (hal_result_t)s_hal_chip_xx_eeprom_generics.cfg.wrprcfg.wrpr_enable();
+        res = (hal_result_t)s_hal_chip_xx_eeprom_internals.config.wrprcfg.wrpr_enable();
     }
     return(res);
 }
@@ -413,9 +413,9 @@ static hal_result_t s_hal_chip_xx_eeprom_wrprcfg_enable(void)
 static hal_result_t s_hal_chip_xx_eeprom_wrprcfg_disable(void)
 {
     hal_result_t res = hal_res_OK;
-    if(NULL != s_hal_chip_xx_eeprom_generics.cfg.wrprcfg.wrpr_disable)
+    if(NULL != s_hal_chip_xx_eeprom_internals.config.wrprcfg.wrpr_disable)
     {
-        res = (hal_result_t)s_hal_chip_xx_eeprom_generics.cfg.wrprcfg.wrpr_disable();
+        res = (hal_result_t)s_hal_chip_xx_eeprom_internals.config.wrprcfg.wrpr_disable();
     }
     return(res);
 }
@@ -425,15 +425,15 @@ static hal_result_t s_hal_chip_xx_eeprom_wrprcfg_disable(void)
 
 static hal_result_t s_hal_chip_xx_eeprom_verify_rw_bounds(uint32_t address, uint32_t *size, uint8_t* buffer)
 {   
-    if((hal_chip_xx_eeprom_chip_none == s_hal_chip_xx_eeprom_generics.cfg.chipcfg.chip) || (NULL == buffer) || (0 == *size) || (address >= s_hal_chip_xx_eeprom_generics.totalsize))
+    if((hal_chip_xx_eeprom_chip_none == s_hal_chip_xx_eeprom_internals.config.chipcfg.chip) || (NULL == buffer) || (0 == *size) || (address >= s_hal_chip_xx_eeprom_internals.totalsize))
     {
         return(hal_res_NOK_generic);
     }
     
-    // clip address+size to ... s_hal_chip_xx_eeprom_generics.totalsize
-    if((address+(*size)) > s_hal_chip_xx_eeprom_generics.totalsize)
+    // clip address+size to ... s_hal_chip_xx_eeprom_internals.totalsize
+    if((address+(*size)) > s_hal_chip_xx_eeprom_internals.totalsize)
     {
-        uint32_t ss = address+(*size) - s_hal_chip_xx_eeprom_generics.totalsize;
+        uint32_t ss = address+(*size) - s_hal_chip_xx_eeprom_internals.totalsize;
         (*size) -= ss; 
     }    
  
@@ -460,21 +460,21 @@ static hal_result_t s_hal_chip_xx_eeprom_writebuffer(uint8_t* pBuffer, uint16_t 
     uint16_t NumOfPage = 0, NumOfSingle = 0, count = 0;
     uint16_t Addr = 0;
 
-    Addr = WriteAddr % s_hal_chip_xx_eeprom_generics.pagesize;
-    count = s_hal_chip_xx_eeprom_generics.pagesize - Addr;
-    NumOfPage =  NumByteToWrite / s_hal_chip_xx_eeprom_generics.pagesize;
-    NumOfSingle = NumByteToWrite % s_hal_chip_xx_eeprom_generics.pagesize;
+    Addr = WriteAddr % s_hal_chip_xx_eeprom_internals.pagesize;
+    count = s_hal_chip_xx_eeprom_internals.pagesize - Addr;
+    NumOfPage =  NumByteToWrite / s_hal_chip_xx_eeprom_internals.pagesize;
+    NumOfSingle = NumByteToWrite % s_hal_chip_xx_eeprom_internals.pagesize;
  
-    /*!< If WriteAddr is s_hal_chip_xx_eeprom_generics.pagesize aligned  */
+    /*!< If WriteAddr is s_hal_chip_xx_eeprom_internals.pagesize aligned  */
     if(Addr == 0) 
     {
-        /*!< If NumByteToWrite < s_hal_chip_xx_eeprom_generics.pagesize */
+        /*!< If NumByteToWrite < s_hal_chip_xx_eeprom_internals.pagesize */
         if(NumOfPage == 0) 
         {
             /* Store the number of data to be written */
-            s_hal_chip_xx_eeprom_generics.numberofbyte2writeinpage = NumOfSingle;
+            s_hal_chip_xx_eeprom_internals.numberofbyte2writeinpage = NumOfSingle;
             /* Start writing data */
-            s_hal_chip_xx_eeprom_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_hal_chip_xx_eeprom_generics.numberofbyte2writeinpage));
+            s_hal_chip_xx_eeprom_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_hal_chip_xx_eeprom_internals.numberofbyte2writeinpage));
             /* Wait operation to be complete */
             if(hal_res_NOK_generic == s_hal_chip_xx_eeprom_wait4operation2complete())
             {
@@ -482,29 +482,29 @@ static hal_result_t s_hal_chip_xx_eeprom_writebuffer(uint8_t* pBuffer, uint16_t 
             }
             s_hal_chip_xx_eeprom_waiteepromstandbystate();
         }
-        /*!< If NumByteToWrite > s_hal_chip_xx_eeprom_generics.pagesize */
+        /*!< If NumByteToWrite > s_hal_chip_xx_eeprom_internals.pagesize */
         else  
         {
             while(NumOfPage--)
             {
                 /* Store the number of data to be written */
-                s_hal_chip_xx_eeprom_generics.numberofbyte2writeinpage = s_hal_chip_xx_eeprom_generics.pagesize;        
-                s_hal_chip_xx_eeprom_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_hal_chip_xx_eeprom_generics.numberofbyte2writeinpage)); 
+                s_hal_chip_xx_eeprom_internals.numberofbyte2writeinpage = s_hal_chip_xx_eeprom_internals.pagesize;        
+                s_hal_chip_xx_eeprom_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_hal_chip_xx_eeprom_internals.numberofbyte2writeinpage)); 
                 /* Wait operation to be complete */
                 if(hal_res_NOK_generic == s_hal_chip_xx_eeprom_wait4operation2complete())
                 {
                     return(hal_res_NOK_generic);
                 }
                 s_hal_chip_xx_eeprom_waiteepromstandbystate();
-                WriteAddr +=  s_hal_chip_xx_eeprom_generics.pagesize;
-                pBuffer += s_hal_chip_xx_eeprom_generics.pagesize;
+                WriteAddr +=  s_hal_chip_xx_eeprom_internals.pagesize;
+                pBuffer += s_hal_chip_xx_eeprom_internals.pagesize;
             }
 
             if(NumOfSingle!=0)
             {
                 /* Store the number of data to be written */
-                s_hal_chip_xx_eeprom_generics.numberofbyte2writeinpage = NumOfSingle;          
-                s_hal_chip_xx_eeprom_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_hal_chip_xx_eeprom_generics.numberofbyte2writeinpage));
+                s_hal_chip_xx_eeprom_internals.numberofbyte2writeinpage = NumOfSingle;          
+                s_hal_chip_xx_eeprom_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_hal_chip_xx_eeprom_internals.numberofbyte2writeinpage));
                 /* Wait operation to be complete */
                 if(hal_res_NOK_generic == s_hal_chip_xx_eeprom_wait4operation2complete())
                 {
@@ -514,10 +514,10 @@ static hal_result_t s_hal_chip_xx_eeprom_writebuffer(uint8_t* pBuffer, uint16_t 
             }
         }
     }
-    /*!< If WriteAddr is not s_hal_chip_xx_eeprom_generics.pagesize aligned  */
+    /*!< If WriteAddr is not s_hal_chip_xx_eeprom_internals.pagesize aligned  */
     else 
     {
-        /*!< If NumByteToWrite < s_hal_chip_xx_eeprom_generics.pagesize */
+        /*!< If NumByteToWrite < s_hal_chip_xx_eeprom_internals.pagesize */
         if(NumOfPage== 0) 
         {
             /*!< If the number of data to be written is more than the remaining space 
@@ -525,9 +525,9 @@ static hal_result_t s_hal_chip_xx_eeprom_writebuffer(uint8_t* pBuffer, uint16_t 
             if (NumByteToWrite > count)
             {
                 /* Store the number of data to be written */
-                s_hal_chip_xx_eeprom_generics.numberofbyte2writeinpage = count;        
+                s_hal_chip_xx_eeprom_internals.numberofbyte2writeinpage = count;        
                 /*!< Write the data contained in same page */
-                s_hal_chip_xx_eeprom_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_hal_chip_xx_eeprom_generics.numberofbyte2writeinpage));
+                s_hal_chip_xx_eeprom_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_hal_chip_xx_eeprom_internals.numberofbyte2writeinpage));
                 /* Wait operation to be complete */
                 if(hal_res_NOK_generic == s_hal_chip_xx_eeprom_wait4operation2complete())
                 {
@@ -536,9 +536,9 @@ static hal_result_t s_hal_chip_xx_eeprom_writebuffer(uint8_t* pBuffer, uint16_t 
                 s_hal_chip_xx_eeprom_waiteepromstandbystate();  
                 
                 /* Store the number of data to be written */
-                s_hal_chip_xx_eeprom_generics.numberofbyte2writeinpage = (NumByteToWrite - count);          
+                s_hal_chip_xx_eeprom_internals.numberofbyte2writeinpage = (NumByteToWrite - count);          
                 /*!< Write the remaining data in the following page */
-                s_hal_chip_xx_eeprom_writepage((uint8_t*)(pBuffer + count), (WriteAddr + count), (uint16_t*)(&s_hal_chip_xx_eeprom_generics.numberofbyte2writeinpage));
+                s_hal_chip_xx_eeprom_writepage((uint8_t*)(pBuffer + count), (WriteAddr + count), (uint16_t*)(&s_hal_chip_xx_eeprom_internals.numberofbyte2writeinpage));
                 /* Wait operation to be complete */
                 if(hal_res_NOK_generic == s_hal_chip_xx_eeprom_wait4operation2complete())
                 {
@@ -549,8 +549,8 @@ static hal_result_t s_hal_chip_xx_eeprom_writebuffer(uint8_t* pBuffer, uint16_t 
             else      
             {
                 /* Store the number of data to be written */
-                s_hal_chip_xx_eeprom_generics.numberofbyte2writeinpage = NumOfSingle;         
-                s_hal_chip_xx_eeprom_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_hal_chip_xx_eeprom_generics.numberofbyte2writeinpage));
+                s_hal_chip_xx_eeprom_internals.numberofbyte2writeinpage = NumOfSingle;         
+                s_hal_chip_xx_eeprom_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_hal_chip_xx_eeprom_internals.numberofbyte2writeinpage));
                 /* Wait operation to be complete */
                 if(hal_res_NOK_generic == s_hal_chip_xx_eeprom_wait4operation2complete())
                 {
@@ -559,18 +559,18 @@ static hal_result_t s_hal_chip_xx_eeprom_writebuffer(uint8_t* pBuffer, uint16_t 
                 s_hal_chip_xx_eeprom_waiteepromstandbystate();  
             }     
         }
-        /*!< If NumByteToWrite > s_hal_chip_xx_eeprom_generics.pagesize */
+        /*!< If NumByteToWrite > s_hal_chip_xx_eeprom_internals.pagesize */
         else
         {
             NumByteToWrite -= count;
-            NumOfPage =  NumByteToWrite / s_hal_chip_xx_eeprom_generics.pagesize;
-            NumOfSingle = NumByteToWrite % s_hal_chip_xx_eeprom_generics.pagesize;
+            NumOfPage =  NumByteToWrite / s_hal_chip_xx_eeprom_internals.pagesize;
+            NumOfSingle = NumByteToWrite % s_hal_chip_xx_eeprom_internals.pagesize;
 
             if(count != 0)
             {  
                 /* Store the number of data to be written */
-                s_hal_chip_xx_eeprom_generics.numberofbyte2writeinpage = count;         
-                s_hal_chip_xx_eeprom_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_hal_chip_xx_eeprom_generics.numberofbyte2writeinpage));
+                s_hal_chip_xx_eeprom_internals.numberofbyte2writeinpage = count;         
+                s_hal_chip_xx_eeprom_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_hal_chip_xx_eeprom_internals.numberofbyte2writeinpage));
                 /* Wait operation to be complete */
                 if(hal_res_NOK_generic == s_hal_chip_xx_eeprom_wait4operation2complete())
                 {
@@ -584,22 +584,22 @@ static hal_result_t s_hal_chip_xx_eeprom_writebuffer(uint8_t* pBuffer, uint16_t 
             while(NumOfPage--)
             {
                 /* Store the number of data to be written */
-                s_hal_chip_xx_eeprom_generics.numberofbyte2writeinpage = s_hal_chip_xx_eeprom_generics.pagesize;          
-                s_hal_chip_xx_eeprom_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_hal_chip_xx_eeprom_generics.numberofbyte2writeinpage));
+                s_hal_chip_xx_eeprom_internals.numberofbyte2writeinpage = s_hal_chip_xx_eeprom_internals.pagesize;          
+                s_hal_chip_xx_eeprom_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_hal_chip_xx_eeprom_internals.numberofbyte2writeinpage));
                 /* Wait operation to be complete */
                 if(hal_res_NOK_generic == s_hal_chip_xx_eeprom_wait4operation2complete())
                 {
                     return(hal_res_NOK_generic);
                 }
                 s_hal_chip_xx_eeprom_waiteepromstandbystate();
-                WriteAddr +=  s_hal_chip_xx_eeprom_generics.pagesize;
-                pBuffer += s_hal_chip_xx_eeprom_generics.pagesize;  
+                WriteAddr +=  s_hal_chip_xx_eeprom_internals.pagesize;
+                pBuffer += s_hal_chip_xx_eeprom_internals.pagesize;  
             }
             if(NumOfSingle != 0)
             {
                 /* Store the number of data to be written */
-                s_hal_chip_xx_eeprom_generics.numberofbyte2writeinpage = NumOfSingle;           
-                s_hal_chip_xx_eeprom_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_hal_chip_xx_eeprom_generics.numberofbyte2writeinpage)); 
+                s_hal_chip_xx_eeprom_internals.numberofbyte2writeinpage = NumOfSingle;           
+                s_hal_chip_xx_eeprom_writepage(pBuffer, WriteAddr, (uint16_t*)(&s_hal_chip_xx_eeprom_internals.numberofbyte2writeinpage)); 
                 /* Wait operation to be complete */
                 if(hal_res_NOK_generic == s_hal_chip_xx_eeprom_wait4operation2complete())
                 {
@@ -622,7 +622,7 @@ static hal_result_t s_hal_chip_xx_eeprom_writepage(uint8_t* pBuffer, uint16_t Wr
     hal_i2c_regaddr_t regaddr;
     regaddr.numofbytes = 2;
     regaddr.bytes.two = (uint16_t) WriteAddr;
-    res = hal_i2c_write(s_hal_chip_xx_eeprom_generics.cfg.chipcfg.i2cport, s_hal_chip_xx_eeprom_generics.hwaddress, regaddr, pBuffer, *NumByteToWrite);
+    res = hal_i2c_write(s_hal_chip_xx_eeprom_internals.config.chipcfg.i2cport, s_hal_chip_xx_eeprom_internals.hwaddress, regaddr, pBuffer, *NumByteToWrite);
     *NumByteToWrite = 0; 
     
     return(res);
@@ -631,7 +631,7 @@ static hal_result_t s_hal_chip_xx_eeprom_writepage(uint8_t* pBuffer, uint16_t Wr
 
 static hal_result_t s_hal_chip_xx_eeprom_waiteepromstandbystate(void)      
 {
-    return(hal_i2c_standby(s_hal_chip_xx_eeprom_generics.cfg.chipcfg.i2cport, s_hal_chip_xx_eeprom_generics.hwaddress)); 
+    return(hal_i2c_standby(s_hal_chip_xx_eeprom_internals.config.chipcfg.i2cport, s_hal_chip_xx_eeprom_internals.hwaddress)); 
 }
 
 
@@ -639,9 +639,9 @@ static hal_result_t s_hal_chip_xx_eeprom_waiteepromstandbystate(void)
 
 static hal_result_t s_hal_chip_xx_eeprom_chip_timeoutexpired(void) 
 {
-//    if(NULL != s_hal_chip_xx_eeprom_generics.cfg.chipcfg.functionontimeout)
+//    if(NULL != s_hal_chip_xx_eeprom_internals.config.chipcfg.functionontimeout)
 //    {
-//        s_hal_chip_xx_eeprom_generics.cfg.chipcfg.functionontimeout();
+//        s_hal_chip_xx_eeprom_internals.config.chipcfg.functionontimeout();
 //    }
 //    else
 //    {
@@ -654,11 +654,11 @@ static hal_result_t s_hal_chip_xx_eeprom_chip_timeoutexpired(void)
 
 static hal_result_t s_hal_chip_xx_eeprom_wait4operation2complete(void)
 {
-    s_hal_chip_xx_eeprom_generics.timeout = hal_chip_xx_eeprom_hid_timeout_long;
+    s_hal_chip_xx_eeprom_internals.timeout = hal_chip_xx_eeprom_hid_timeout_long;
     
-    while (s_hal_chip_xx_eeprom_generics.numberofbyte2writeinpage > 0)
+    while (s_hal_chip_xx_eeprom_internals.numberofbyte2writeinpage > 0)
     {
-        if((s_hal_chip_xx_eeprom_generics.timeout--) == 0) {return s_hal_chip_xx_eeprom_chip_timeoutexpired();};
+        if((s_hal_chip_xx_eeprom_internals.timeout--) == 0) {return s_hal_chip_xx_eeprom_chip_timeoutexpired();};
     }      
     
     return(hal_res_OK);    

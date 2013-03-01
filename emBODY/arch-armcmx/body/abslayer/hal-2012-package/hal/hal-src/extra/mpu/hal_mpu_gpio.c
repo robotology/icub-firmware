@@ -167,8 +167,9 @@ const uint16_t  hal_gpio_hid_pins[]          =        { GPIO_Pin_0,  GPIO_Pin_1,
                                                         GPIO_Pin_4,  GPIO_Pin_5,  GPIO_Pin_6,  GPIO_Pin_7,
                                                         GPIO_Pin_8,  GPIO_Pin_9,  GPIO_Pin_10, GPIO_Pin_11,
                                                         GPIO_Pin_12, GPIO_Pin_13, GPIO_Pin_14, GPIO_Pin_15 }; 
-#endif
-
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -233,7 +234,9 @@ extern hal_result_t hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_
         GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_OUT;
         GPIO_InitStructure.GPIO_OType   = GPIO_OType_PP;
         GPIO_InitStructure.GPIO_PuPd    = GPIO_PuPd_UP; 
-#endif
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
        
         GPIO_Init(hal_gpio_hid_ports[port], &GPIO_InitStructure);
 
@@ -253,7 +256,9 @@ extern hal_result_t hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_
         /// configure pin as input floating
         GPIO_InitStructure.GPIO_Pin     = (uint16_t)(0x0001 << pin);
         GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_IN;
-#endif
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
         
         GPIO_Init(hal_gpio_hid_ports[port], &GPIO_InitStructure);
 
@@ -320,7 +325,9 @@ extern void hal_gpio_quickest_setval(hal_gpio_port_t port, hal_gpio_pin_t pin, h
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)
    volatile uint16_t* outcmdreg = (hal_gpio_valLOW == val) ?  (&hal_gpio_hid_ports[port]->BSRRH) : (&hal_gpio_hid_ports[port]->BSRRL); 
     *outcmdreg  = (1<<pin);
-#endif    
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif     
 }
 
 
@@ -449,7 +456,9 @@ static hal_result_t s_hal_gpio_altfun_configure(hal_gpio_cfg_t cfg, const hal_gp
     {        
         GPIO_PinAFConfig(hal_gpio_hid_ports[cfg.port], hal_gpio_hid_pinpositions[cfg.pin], altcfg->afname);
     }
-#endif    
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif   
 
     return(hal_res_OK);   
 }

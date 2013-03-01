@@ -38,6 +38,8 @@
 #include "hal_base_hid.h"
 #include "hal_mpu_gpio_hid.h"
 
+#include "hal_heap.h"
+
 
 #include "hal_utility_bits.h" 
 
@@ -156,16 +158,18 @@ static const uint32_t s_hal_i2c_hw_rcc[] = { RCC_APB1Periph_I2C1, RCC_APB1Periph
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)
 static I2C_TypeDef* const s_hal_i2c_stmI2Cmap[] = { I2C1, I2C2, I2C3 };
 static const uint32_t s_hal_i2c_hw_rcc[] = { RCC_APB1Periph_I2C1, RCC_APB1Periph_I2C2, RCC_APB1Periph_I2C3 };
-#endif
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-//static hal_boolval_t s_hal_i2c_initted[hal_i2c_ports_number] = { hal_false, hal_false, hal_false };
 static uint8_t s_hal_i2c_initted = 0;
-static hal_i2c_internals_t s_hal_i2c_internals[hal_i2c_ports_number] = { {.locked = hal_false, .devaddr = 0 }, {.locked = hal_false, .devaddr = 0 }, {.locked = hal_false, .devaddr = 0 } };
+//static hal_i2c_internals_t s_hal_i2c_internals[hal_i2c_ports_number] = { {.locked = hal_false, .devaddr = 0 }, {.locked = hal_false, .devaddr = 0 }, {.locked = hal_false, .devaddr = 0 } };
+static hal_i2c_internals_t* s_hal_i2c_internals[hal_i2c_ports_number] = { NULL };
 
     
 // --------------------------------------------------------------------------------------------------------------------
@@ -182,12 +186,6 @@ extern hal_result_t hal_i2c_init(hal_i2c_port_t port, const hal_i2c_cfg_t *cfg)
 extern hal_bool_t hal_i2c_initted_is(hal_i2c_port_t port)
 {
     return(s_hal_i2c_initted_is(port));
-//     if(hal_true == s_hal_i2c_initted[HAL_i2c_port2index(port)]) 
-//     {
-//         return(hal_true);
-//     }
-//     
-//     return(hal_false);
 }
 
 extern hal_result_t hal_i2c_transaction_begin(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr)
@@ -539,25 +537,27 @@ static hal_boolval_t s_hal_i2c_initted_is(hal_i2c_port_t port)
 static void s_hal_i2c_status_set(hal_i2c_port_t port, hal_bool_t locked, hal_i2c_devaddr_t devaddr)
 {
 //    s_hal_i2c_scheduling_suspend();
-    s_hal_i2c_internals[HAL_i2c_port2index(port)].locked   = locked;
-    s_hal_i2c_internals[HAL_i2c_port2index(port)].devaddr  = devaddr;
+    s_hal_i2c_internals[HAL_i2c_port2index(port)]->locked   = locked;
+    s_hal_i2c_internals[HAL_i2c_port2index(port)]->devaddr  = devaddr;
 //    s_hal_i2c_scheduling_restart();
 }
 
 static hal_bool_t s_hal_i2c_is_status_locked(hal_i2c_port_t port)
 {
-    return(s_hal_i2c_internals[HAL_i2c_port2index(port)].locked);
+    return(s_hal_i2c_internals[HAL_i2c_port2index(port)]->locked);
 }
 
 static hal_i2c_devaddr_t s_hal_i2c_status_devaddr_get(hal_i2c_port_t port)
 {
-    return(s_hal_i2c_internals[HAL_i2c_port2index(port)].devaddr);
+    return(s_hal_i2c_internals[HAL_i2c_port2index(port)]->devaddr);
 }
 
 
 
 static hal_result_t s_hal_i2c_init(hal_i2c_port_t port, const hal_i2c_cfg_t *cfg)
 {
+    hal_i2c_internals_t *intitem = s_hal_i2c_internals[HAL_i2c_port2index(port)];
+    
     if(NULL == cfg)
     {
         cfg = &hal_i2c_cfg_default;
@@ -576,7 +576,15 @@ static hal_result_t s_hal_i2c_init(hal_i2c_port_t port, const hal_i2c_cfg_t *cfg
     if(hal_true == hal_i2c_initted_is(port))
     {
         return(hal_res_OK);
-    }    
+    }  
+
+   // if it does not have ram yet, then attempt to allocate it.
+    if(NULL == intitem)
+    {
+        intitem = s_hal_i2c_internals[HAL_i2c_port2index(port)] = hal_heap_new(sizeof(hal_i2c_internals_t));
+        // minimal initialisation of the internal item
+        s_hal_i2c_status_set(port, hal_false, 0);      
+    }           
     
 
     // acemor: very important info.
@@ -616,7 +624,9 @@ static void s_hal_i2c_hw_init(hal_i2c_port_t port)
     // release reset 
     RCC_APB1PeriphResetCmd(RCC_APB1Periph_I2Cx, DISABLE);
 
-#endif
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
 }
 
 
@@ -784,7 +794,9 @@ static void s_hal_i2c_hw_gpio_init(hal_i2c_port_t port)
     hal_gpio_configure(hal_brdcfg_i2c__theconfig.gpio_sda[HAL_i2c_port2index(port)], &hal_i2c_sda_altcfg);    
 
     
-#endif
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
 }
 
 static void s_hal_i2c_hw_enable(hal_i2c_port_t port, const hal_i2c_cfg_t* cfg)
@@ -804,7 +816,9 @@ static void s_hal_i2c_hw_enable(hal_i2c_port_t port, const hal_i2c_cfg_t* cfg)
     I2C_Cmd(I2Cx, ENABLE);
     // apply configuration
     I2C_Init(I2Cx, &i2c_cfg);
-#endif
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
 }
 
 

@@ -75,7 +75,9 @@
     #define TIM1_IRQHandler     TIM1_UP_TIM10_IRQHandler
     #define TIM6_IRQn           TIM6_DAC_IRQn
     #define TIM6_IRQHandler     TIM6_DAC_IRQHandler
-#endif
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -222,6 +224,9 @@ extern hal_result_t hal_timer_init(hal_timer_t timer, const hal_timer_cfg_t *cfg
     if(NULL == tint)
     {
         tint = s_hal_timer_internals[HAL_timer2index(timer)] = hal_heap_new(sizeof(hal_timer_internals_t));
+        // minimal initialisation of the internal item
+        // initialise at least the status.
+        tint->status = hal_timer_status_none;        
     }    
      
     // if it is running, then stop it.

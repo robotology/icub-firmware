@@ -80,8 +80,7 @@ const hal_eeprom_cfg_t hal_device_eeprom_cfg_default =
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
-
+// 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -104,7 +103,8 @@ static hal_result_t s_hal_device_eeprom_writeflash(uint32_t addr, uint32_t size,
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_device_eeprom_initted[hal_eeproms_num] = { hal_false };
+static uint8_t s_hal_device_eeprom_initted = 0;
+
 static hal_eeprom_cfg_t s_hal_device_eeprom_emulated_flash_cfg = {0};
 
 
@@ -478,7 +478,7 @@ extern hal_bool_t hal_eeprom_address_is_valid(hal_eeprom_t eep, uint32_t addr)
 extern hal_result_t hal_device_eeprom_hid_static_memory_init(void)
 {
     // removed dependancy from NZI ram
-    memset(s_hal_device_eeprom_initted, hal_false, hal_eeproms_num);
+    s_hal_device_eeprom_initted = 0;
     memset(&s_hal_device_eeprom_emulated_flash_cfg, 0, sizeof(s_hal_device_eeprom_emulated_flash_cfg));
 
     return(hal_res_OK); 
@@ -497,12 +497,12 @@ static hal_boolval_t s_hal_device_eeprom_supported_is(hal_eeprom_t eep)
 
 static void s_hal_device_eeprom_initted_set(hal_eeprom_t eep)
 {
-    s_hal_device_eeprom_initted[HAL_device_eeprom_dev2index(eep)] = hal_true;
+     hal_utility_bits_byte_bitset(&s_hal_device_eeprom_initted, HAL_device_eeprom_dev2index(eep));
 }
 
 static hal_boolval_t s_hal_device_eeprom_initted_is(hal_eeprom_t eep)
 {
-    return(s_hal_device_eeprom_initted[HAL_device_eeprom_dev2index(eep)]);
+    return(hal_utility_bits_byte_bitcheck(s_hal_device_eeprom_initted, HAL_device_eeprom_dev2index(eep)));
 }
 
 

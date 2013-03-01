@@ -100,10 +100,10 @@ extern const hal_chip_st_l3g4200d_cfg_t hal_chip_st_l3g4200d_cfg_default  =
 
 typedef struct
 {
-    hal_chip_st_l3g4200d_cfg_t      cfg;
+    hal_chip_st_l3g4200d_cfg_t      config;
     uint32_t                        factor;
     uint8_t                         shift;
-} hal_chip_st_l3g4200d_info_t;
+} hal_chip_st_l3g4200d_internals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -112,7 +112,7 @@ typedef struct
 static void s_hal_chip_st_l3g4200d_initted_set(void);
 static hal_boolval_t s_hal_chip_st_l3g4200d_initted_is(void);
 
-static hal_result_t s_hal_chip_st_l3g4200d_hw_init(const hal_chip_st_l3g4200d_cfg_t *cfg, hal_chip_st_l3g4200d_info_t* info);
+static hal_result_t s_hal_chip_st_l3g4200d_hw_init(const hal_chip_st_l3g4200d_cfg_t *cfg, hal_chip_st_l3g4200d_internals_t* intitem);
 
 static int32_t s_hal_chip_st_l3g4200d_convert(int32_t v);
 
@@ -128,7 +128,7 @@ static int32_t s_hal_chip_st_l3g4200d_convert(int32_t v);
 // --------------------------------------------------------------------------------------------------------------------
 
 static hal_boolval_t s_hal_chip_st_l3g4200d_initted[1] = { hal_false };
-static hal_chip_st_l3g4200d_info_t s_hal_chip_st_l3g4200d_info[1] = { {.cfg = { .i2cport = hal_i2c_port1} } };
+static hal_chip_st_l3g4200d_internals_t s_hal_chip_st_l3g4200d_info[1] = { {.config = { .i2cport = hal_i2c_port1} } };
 
 
 
@@ -166,7 +166,7 @@ extern hal_result_t hal_chip_st_l3g4200d_init(const hal_chip_st_l3g4200d_cfg_t *
 extern hal_result_t hal_chip_st_l3g4200d_temp_get(int8_t* temp)
 {
     hal_result_t res = hal_res_NOK_generic; 
-    hal_i2c_port_t i2cport = s_hal_chip_st_l3g4200d_info[0].cfg.i2cport;
+    hal_i2c_port_t i2cport = s_hal_chip_st_l3g4200d_info[0].config.i2cport;
 
     uint8_t data = 0;
 
@@ -193,7 +193,7 @@ extern hal_result_t hal_chip_st_l3g4200d_temp_get(int8_t* temp)
 extern hal_result_t hal_chip_st_l3g4200d_angrate_get(int32_t* xar, int32_t* yar, int32_t* zar)
 {
     hal_result_t res = hal_res_NOK_generic; 
-    hal_i2c_port_t i2cport = s_hal_chip_st_l3g4200d_info[0].cfg.i2cport;
+    hal_i2c_port_t i2cport = s_hal_chip_st_l3g4200d_info[0].config.i2cport;
 
     uint8_t datal = 0;
     uint8_t datah = 0;
@@ -290,7 +290,7 @@ static hal_boolval_t s_hal_chip_st_l3g4200d_initted_is(void)
 
 
 
-static hal_result_t s_hal_chip_st_l3g4200d_hw_init(const hal_chip_st_l3g4200d_cfg_t *cfg, hal_chip_st_l3g4200d_info_t* info)
+static hal_result_t s_hal_chip_st_l3g4200d_hw_init(const hal_chip_st_l3g4200d_cfg_t *cfg, hal_chip_st_l3g4200d_internals_t* intitem)
 {
     hal_result_t res = hal_res_NOK_generic;   
     uint8_t data;
@@ -337,20 +337,20 @@ static hal_result_t s_hal_chip_st_l3g4200d_hw_init(const hal_chip_st_l3g4200d_cf
     if(hal_chip_st_l3g4200d_range_250dps == cfg->range)
     {
         data |= 0x00;
-        info->factor = 15625;
-        info->shift  = 11; 
+        intitem->factor = 15625;
+        intitem->shift  = 11; 
     }
     else if(hal_chip_st_l3g4200d_range_500dps == cfg->range)
     {
         data |= 0x10;
-        info->factor = 15625;
-        info->shift  = 10;         
+        intitem->factor = 15625;
+        intitem->shift  = 10;         
     }
     else if(hal_chip_st_l3g4200d_range_2000dps == cfg->range)
     {
         data |= 0x20;
-        info->factor = 62500;
-        info->shift  = 10;         
+        intitem->factor = 62500;
+        intitem->shift  = 10;         
     }
     if(hal_res_OK != (res = hal_i2c_write(i2cport, I2CADDRESS, regaddr, &data, 1)))
     {
@@ -367,7 +367,7 @@ static hal_result_t s_hal_chip_st_l3g4200d_hw_init(const hal_chip_st_l3g4200d_cf
     hal_i2c_standby(i2cport, I2CADDRESS);    
     
     
-    memcpy(&info->cfg, cfg, sizeof(hal_chip_st_l3g4200d_cfg_t));
+    memcpy(&intitem->config, cfg, sizeof(hal_chip_st_l3g4200d_cfg_t));
         
     
     // store the i2caddress and the register address.

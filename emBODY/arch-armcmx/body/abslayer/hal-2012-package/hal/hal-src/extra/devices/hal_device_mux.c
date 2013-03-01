@@ -106,9 +106,9 @@ static hal_boolval_t s_hal_device_mux_initted_is(hal_mux_port_t muxport);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_device_mux_initted[hal_mux_ports_num] = { hal_false };
+static uint8_t s_hal_device_mux_initted = 0;
 
-static hal_mux_internals_t s_hal_device_mux_internals[hal_mux_ports_num] = {0};
+static hal_mux_internals_t* s_hal_device_mux_internals[hal_mux_ports_num] = { NULL };
 
 
 
@@ -119,7 +119,7 @@ static hal_mux_internals_t s_hal_device_mux_internals[hal_mux_ports_num] = {0};
 
 extern hal_result_t hal_mux_init(hal_mux_port_t muxport, const hal_mux_cfg_t *cfg)
 {
-    hal_mux_internals_t* mint = &s_hal_device_mux_internals[HAL_device_mux_muxport2index(muxport)];
+    hal_mux_internals_t* intitem = s_hal_device_mux_internals[HAL_device_mux_muxport2index(muxport)];
 
     if(hal_false == s_hal_device_mux_supported_is(muxport))
     {
@@ -134,26 +134,35 @@ extern hal_result_t hal_mux_init(hal_mux_port_t muxport, const hal_mux_cfg_t *cf
         
     // configure the required mux port and put it in selNONE.
     
-    memcpy(&mint->config, cfg, sizeof(hal_mux_cfg_t));   
     
-    mint->enable_port   = hal_brdcfg_device_mux__theconfig.gpio_enable[HAL_device_mux_muxport2index(muxport)].port;
-    mint->enable_pin    = hal_brdcfg_device_mux__theconfig.gpio_enable[HAL_device_mux_muxport2index(muxport)].pin;
-    mint->sel0_port     = hal_brdcfg_device_mux__theconfig.gpio_sel0[HAL_device_mux_muxport2index(muxport)].port;
-    mint->sel0_pin      = hal_brdcfg_device_mux__theconfig.gpio_sel0[HAL_device_mux_muxport2index(muxport)].pin;    
-    mint->sel1_port     = hal_brdcfg_device_mux__theconfig.gpio_sel1[HAL_device_mux_muxport2index(muxport)].port;
-    mint->sel1_pin      = hal_brdcfg_device_mux__theconfig.gpio_sel1[HAL_device_mux_muxport2index(muxport)].pin;   
+    // if it does not have ram yet, then attempt to allocate it.
+    if(NULL == intitem)
+    {
+        intitem = s_hal_device_mux_internals[HAL_device_mux_muxport2index(muxport)] = hal_heap_new(sizeof(hal_mux_internals_t));
+        // minimal initialisation of the internal item
+        // nothing to init.      
+    }       
+    
+    memcpy(&intitem->config, cfg, sizeof(hal_mux_cfg_t));   
+    
+    intitem->enable_port   = hal_brdcfg_device_mux__theconfig.gpio_enable[HAL_device_mux_muxport2index(muxport)].port;
+    intitem->enable_pin    = hal_brdcfg_device_mux__theconfig.gpio_enable[HAL_device_mux_muxport2index(muxport)].pin;
+    intitem->sel0_port     = hal_brdcfg_device_mux__theconfig.gpio_sel0[HAL_device_mux_muxport2index(muxport)].port;
+    intitem->sel0_pin      = hal_brdcfg_device_mux__theconfig.gpio_sel0[HAL_device_mux_muxport2index(muxport)].pin;    
+    intitem->sel1_port     = hal_brdcfg_device_mux__theconfig.gpio_sel1[HAL_device_mux_muxport2index(muxport)].port;
+    intitem->sel1_pin      = hal_brdcfg_device_mux__theconfig.gpio_sel1[HAL_device_mux_muxport2index(muxport)].pin;   
     
     
     hal_gpio_configure(hal_brdcfg_device_mux__theconfig.gpio_enable[HAL_device_mux_muxport2index(muxport)], NULL);
-    hal_gpio_setval(mint->enable_port, mint->enable_pin, hal_gpio_valHIGH);
+    hal_gpio_setval(intitem->enable_port, intitem->enable_pin, hal_gpio_valHIGH);
     
     hal_sys_delay(1);   // we use 1 microsec, but it is actually 50 ns
     
     hal_gpio_configure(hal_brdcfg_device_mux__theconfig.gpio_sel0[HAL_device_mux_muxport2index(muxport)], NULL);
-    hal_gpio_setval(mint->sel0_port, mint->sel0_pin, hal_gpio_valHIGH);    
+    hal_gpio_setval(intitem->sel0_port, intitem->sel0_pin, hal_gpio_valHIGH);    
     
     hal_gpio_configure(hal_brdcfg_device_mux__theconfig.gpio_sel1[HAL_device_mux_muxport2index(muxport)], NULL);
-    hal_gpio_setval(mint->sel1_port, mint->sel1_pin, hal_gpio_valHIGH);    
+    hal_gpio_setval(intitem->sel1_port, intitem->sel1_pin, hal_gpio_valHIGH);    
     
         
 
@@ -164,6 +173,8 @@ extern hal_result_t hal_mux_init(hal_mux_port_t muxport, const hal_mux_cfg_t *cf
 
 extern hal_result_t hal_mux_enable(hal_mux_port_t muxport, hal_mux_sel_t muxsel)
 {    
+    hal_mux_internals_t* intitem = s_hal_device_mux_internals[HAL_device_mux_muxport2index(muxport)];
+    
     static const hal_gpio_val_t s_values_sel0[hal_mux_sels_num] = {hal_gpio_valLOW,   hal_gpio_valHIGH,   hal_gpio_valLOW};
     static const hal_gpio_val_t s_values_sel1[hal_mux_sels_num] = {hal_gpio_valLOW,   hal_gpio_valLOW,    hal_gpio_valHIGH};
     
@@ -174,21 +185,20 @@ extern hal_result_t hal_mux_enable(hal_mux_port_t muxport, hal_mux_sel_t muxsel)
 
     // do something 
     
-    hal_mux_internals_t* mint = &s_hal_device_mux_internals[HAL_device_mux_muxport2index(muxport)];
     
     if(hal_mux_selNONE == muxsel)
     {
         return(hal_mux_disable(muxport));
     }
     
-    hal_gpio_setval(mint->enable_port, mint->enable_pin, hal_gpio_valHIGH);
+    hal_gpio_setval(intitem->enable_port, intitem->enable_pin, hal_gpio_valHIGH);
     hal_sys_delay(1);   // we use 1 microsec, but it is actually 50 ns
-    hal_gpio_setval(mint->sel0_port, mint->sel0_pin, s_values_sel0[(uint8_t)muxsel]);    
-    hal_gpio_setval(mint->sel1_port, mint->sel1_pin, s_values_sel1[(uint8_t)muxsel]);   
+    hal_gpio_setval(intitem->sel0_port, intitem->sel0_pin, s_values_sel0[(uint8_t)muxsel]);    
+    hal_gpio_setval(intitem->sel1_port, intitem->sel1_pin, s_values_sel1[(uint8_t)muxsel]);   
     
     hal_sys_delay(1);   // we use 1 microsec, but it is actually 50 ns
     
-    hal_gpio_setval(mint->enable_port, mint->enable_pin, hal_gpio_valLOW);
+    hal_gpio_setval(intitem->enable_port, intitem->enable_pin, hal_gpio_valLOW);
     
     return(hal_res_OK);
 }
@@ -197,6 +207,8 @@ extern hal_result_t hal_mux_enable(hal_mux_port_t muxport, hal_mux_sel_t muxsel)
 
 extern hal_result_t hal_mux_disable(hal_mux_port_t muxport)
 {
+    hal_mux_internals_t* intitem = s_hal_device_mux_internals[HAL_device_mux_muxport2index(muxport)];
+    
     if(hal_false == s_hal_device_mux_initted_is(muxport))
     {
         return(hal_res_NOK_generic);
@@ -204,12 +216,11 @@ extern hal_result_t hal_mux_disable(hal_mux_port_t muxport)
 
     // do something 
     
-    hal_mux_internals_t* mint = &s_hal_device_mux_internals[HAL_device_mux_muxport2index(muxport)];
 
-    hal_gpio_setval(mint->enable_port, mint->enable_pin, hal_gpio_valHIGH);
+    hal_gpio_setval(intitem->enable_port, intitem->enable_pin, hal_gpio_valHIGH);
     hal_sys_delay(1);   // we use 1 microsec, but it is actually 50 ns
-    hal_gpio_setval(mint->sel0_port, mint->sel0_pin, hal_gpio_valHIGH);    
-    hal_gpio_setval(mint->sel1_port, mint->sel1_pin, hal_gpio_valHIGH);   
+    hal_gpio_setval(intitem->sel0_port, intitem->sel0_pin, hal_gpio_valHIGH);    
+    hal_gpio_setval(intitem->sel1_port, intitem->sel1_pin, hal_gpio_valHIGH);   
     
     return(hal_res_OK);
 }
@@ -226,7 +237,7 @@ extern hal_result_t hal_mux_disable(hal_mux_port_t muxport)
 
 extern hal_result_t hal_device_mux_hid_static_memory_init(void)
 {
-    memset(s_hal_device_mux_initted, hal_false, sizeof(s_hal_device_mux_initted));
+    s_hal_device_mux_initted = 0;
     return(hal_res_OK);  
 }
 
@@ -236,19 +247,19 @@ extern hal_result_t hal_device_mux_hid_static_memory_init(void)
 
 static hal_boolval_t s_hal_device_mux_supported_is(hal_mux_port_t muxport)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_mux__theconfig.supported_mask, HAL_device_mux_muxport2index(muxport)) );
+    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_mux__theconfig.supported_mask, HAL_device_mux_muxport2index(muxport)));
 }
 
 
 static void s_hal_device_mux_initted_set(hal_mux_port_t muxport)
 {
-    s_hal_device_mux_initted[HAL_device_mux_muxport2index(muxport)] = hal_true;
+    hal_utility_bits_byte_bitset(&s_hal_device_mux_initted, HAL_device_mux_muxport2index(muxport));
 }
 
 
 static hal_boolval_t s_hal_device_mux_initted_is(hal_mux_port_t muxport)
 {
-    return(s_hal_device_mux_initted[HAL_device_mux_muxport2index(muxport)]);
+    return(hal_utility_bits_byte_bitcheck(s_hal_device_mux_initted, HAL_device_mux_muxport2index(muxport)));
 }
 
 

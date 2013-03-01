@@ -85,8 +85,8 @@ extern const hal_chip_micrel_ks8893_cfg_t hal_chip_micrel_ks8893_cfg_default  =
 
 typedef struct
 {
-    hal_chip_micrel_ks8893_cfg_t    cfg;
-} hal_chip_micrel_ks8893_info_t;
+    hal_chip_micrel_ks8893_cfg_t    config;
+} hal_chip_micrel_ks8893_internals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -95,7 +95,7 @@ typedef struct
 static void s_hal_chip_micrel_ks8893_initted_set(void);
 static hal_boolval_t s_hal_chip_micrel_ks8893_initted_is(void);
 
-static hal_result_t s_hal_chip_micrel_ks8893_hw_init(const hal_chip_micrel_ks8893_cfg_t *cfg, hal_chip_micrel_ks8893_info_t* info);
+static hal_result_t s_hal_chip_micrel_ks8893_hw_init(const hal_chip_micrel_ks8893_cfg_t *cfg, hal_chip_micrel_ks8893_internals_t* intitem);
 
 static void s_hal_chip_micrel_ks8893_phymode_get(hal_eth_phymode_t* usedphymode);
 
@@ -112,7 +112,7 @@ static void s_hal_chip_micrel_ks8893_phymode_get(hal_eth_phymode_t* usedphymode)
 // --------------------------------------------------------------------------------------------------------------------
 
 static hal_boolval_t s_hal_chip_micrel_ks8893_initted[1] = { hal_false };
-static hal_chip_micrel_ks8893_info_t s_hal_chip_micrel_ks8893_info[1] = { {.cfg = { .i2cport = hal_i2c_port1} } };
+static hal_chip_micrel_ks8893_internals_t s_hal_chip_micrel_ks8893_info[1] = { {.config = { .i2cport = hal_i2c_port1} } };
 
 
 
@@ -287,7 +287,7 @@ static hal_boolval_t s_hal_chip_micrel_ks8893_initted_is(void)
 }
 
 
-static hal_result_t s_hal_chip_micrel_ks8893_hw_init(const hal_chip_micrel_ks8893_cfg_t *cfg, hal_chip_micrel_ks8893_info_t* info)
+static hal_result_t s_hal_chip_micrel_ks8893_hw_init(const hal_chip_micrel_ks8893_cfg_t *cfg, hal_chip_micrel_ks8893_internals_t* intitem)
 {
     hal_result_t res = hal_res_NOK_generic;   
     hal_i2c_port_t i2cport = cfg->i2cport;
@@ -340,7 +340,7 @@ static hal_result_t s_hal_chip_micrel_ks8893_hw_init(const hal_chip_micrel_ks889
 #endif        
     
     
-    memcpy(&info->cfg, cfg, sizeof(hal_chip_micrel_ks8893_cfg_t));
+    memcpy(&intitem->config, cfg, sizeof(hal_chip_micrel_ks8893_cfg_t));
     
     // store the i2caddress and the register address.
     return(hal_res_OK);

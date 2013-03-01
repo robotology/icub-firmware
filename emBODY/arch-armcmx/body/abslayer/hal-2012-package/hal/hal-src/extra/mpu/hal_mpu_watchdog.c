@@ -32,7 +32,9 @@
 #if     defined(HAL_USE_CPU_FAM_STM32F1)
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)
 #warning WIP --> verify that the watchdog peripheral is the same in stm32f1 and stm32f4
-#endif
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -43,6 +45,8 @@
 #include "hal_base_hid.h" 
 #include "hal_brdcfg.h"
 #include "hal_utility_bits.h" 
+
+#include "hal_heap.h"
 
 #include "hal_middleware_interface.h" 
 
@@ -102,8 +106,8 @@ static hal_boolval_t s_hal_watchdog_supported_is(hal_watchdog_t watchdog);
 static void s_hal_watchdog_initted_set(hal_watchdog_t watchdog);
 static hal_boolval_t s_hal_watchdog_initted_is(hal_watchdog_t watchdog);
 
-static void s_hal_watchdog_normal_start(hal_watchdog_internals_t *winfo);
-static void s_hal_watchdog_window_start(hal_watchdog_internals_t *winfo);
+static void s_hal_watchdog_normal_start(hal_watchdog_internals_t *intitem);
+static void s_hal_watchdog_window_start(hal_watchdog_internals_t *intitem);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -116,9 +120,8 @@ static void s_hal_watchdog_window_start(hal_watchdog_internals_t *winfo);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_watchdog_internals_t s_hal_watchdog_info[hal_watchdogs_num] = {0};
+static hal_watchdog_internals_t* s_hal_watchdog_internals[hal_watchdogs_num] = { NULL };
 
-//static hal_boolval_t s_hal_watchdog_initted[hal_watchdogs_num] = { hal_false };
 static uint8_t s_hal_watchdog_initted = 0;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -128,53 +131,60 @@ static uint8_t s_hal_watchdog_initted = 0;
 
 extern hal_result_t hal_watchdog_init(hal_watchdog_t watchdog, const hal_watchdog_cfg_t *cfg)
 {
+    hal_watchdog_internals_t* intitem = s_hal_watchdog_internals[HAL_watchdog2index(watchdog)];
     hal_result_t res = hal_res_NOK_generic;
-    hal_watchdog_internals_t *winfo;
 
     if(hal_false == s_hal_watchdog_supported_is(watchdog))
     {
         return(hal_res_NOK_unsupported);
     }
 
-    winfo = &s_hal_watchdog_info[HAL_watchdog2index(watchdog)];
      
     if(NULL == cfg)
     {
         cfg = &hal_watchdog_cfg_default;
     }
+    
+    // if it does not have ram yet, then attempt to allocate it.
+    if(NULL == intitem)
+    {
+        intitem = s_hal_watchdog_internals[HAL_watchdog2index(watchdog)] = hal_heap_new(sizeof(hal_watchdog_internals_t));
+        // minimal initialisation of the internal item
+        // nothing to init.      
+    }      
 
     switch(watchdog)
     {
         case hal_watchdog_normal:
         {
-            memcpy(&winfo->cfg, cfg, sizeof(hal_watchdog_cfg_t));
-            if(winfo->cfg.countdown > 10000000)
+            memcpy(&intitem->cfg, cfg, sizeof(hal_watchdog_cfg_t));
+            if(intitem->cfg.countdown > 10000000)
             {
-                winfo->cfg.countdown = 10000000;
+                intitem->cfg.countdown = 10000000;
             }
-            else if(winfo->cfg.countdown < 10000)
+            else if(intitem->cfg.countdown < 10000)
             {
-                winfo->cfg.countdown = 10000;
+                intitem->cfg.countdown = 10000;
             }
         
-            winfo->reload = (winfo->cfg.countdown / 3200);        
+            intitem->reload = (intitem->cfg.countdown / 3200);        
             
             res = hal_res_OK;
         } break;
 
         case hal_watchdog_window:
         {
-            memcpy(&winfo->cfg, cfg, sizeof(hal_watchdog_cfg_t));
-            if(winfo->cfg.countdown > 50000)
+            memcpy(&intitem->cfg, cfg, sizeof(hal_watchdog_cfg_t));
+            if(intitem->cfg.countdown > 50000)
             {
-                winfo->cfg.countdown = 50000;
+                intitem->cfg.countdown = 50000;
             }
-            else if(winfo->cfg.countdown < 5000)
+            else if(intitem->cfg.countdown < 5000)
             {
-                winfo->cfg.countdown = 5000;
+                intitem->cfg.countdown = 5000;
             }
         
-            winfo->reload = 64 + ((winfo->cfg.countdown+910) / 910);        
+            intitem->reload = 64 + ((intitem->cfg.countdown+910) / 910);        
             
             res = hal_res_OK;
         } break;
@@ -197,28 +207,27 @@ extern hal_result_t hal_watchdog_init(hal_watchdog_t watchdog, const hal_watchdo
 
 extern hal_result_t hal_watchdog_start(hal_watchdog_t watchdog)
 {
+    hal_watchdog_internals_t* intitem = s_hal_watchdog_internals[HAL_watchdog2index(watchdog)];
     hal_result_t res = hal_res_NOK_generic;
-    hal_watchdog_internals_t *winfo;
 
     if(hal_false == s_hal_watchdog_initted_is(watchdog))
     {
         return(hal_res_NOK_generic);
     }
 
-    winfo = &s_hal_watchdog_info[HAL_watchdog2index(watchdog)];
 
 
     switch(watchdog)
     {
         case hal_watchdog_normal:
         {
-            s_hal_watchdog_normal_start(winfo);
+            s_hal_watchdog_normal_start(intitem);
             res = hal_res_OK;
         } break;
 
         case hal_watchdog_window:
         {
-            s_hal_watchdog_window_start(winfo);
+            s_hal_watchdog_window_start(intitem);
             res = hal_res_OK;
         } break;
 
@@ -235,15 +244,13 @@ extern hal_result_t hal_watchdog_start(hal_watchdog_t watchdog)
 
 extern hal_result_t hal_watchdog_refresh(hal_watchdog_t watchdog)
 {
+    hal_watchdog_internals_t* intitem = s_hal_watchdog_internals[HAL_watchdog2index(watchdog)];
     hal_result_t res = hal_res_NOK_generic;
-    hal_watchdog_internals_t *winfo;
 
     if(hal_false == s_hal_watchdog_initted_is(watchdog))
     {
         return(hal_res_NOK_generic);
     }
-
-    winfo = &s_hal_watchdog_info[HAL_watchdog2index(watchdog)];
 
 
     switch(watchdog)
@@ -256,7 +263,7 @@ extern hal_result_t hal_watchdog_refresh(hal_watchdog_t watchdog)
 
         case hal_watchdog_window:
         {
-            WWDG_SetCounter(winfo->reload);
+            WWDG_SetCounter(intitem->reload);
             res = hal_res_OK;
         } break;
 
@@ -281,14 +288,14 @@ extern hal_result_t hal_watchdog_refresh(hal_watchdog_t watchdog)
 
 void WWDG_IRQHandler(void)
 {
-    hal_watchdog_internals_t *winfo = &s_hal_watchdog_info[HAL_watchdog2index(hal_watchdog_window)];
+    hal_watchdog_internals_t* intitem = s_hal_watchdog_internals[HAL_watchdog2index(hal_watchdog_window)];
 
     // Clear EWI flag 
     WWDG_ClearFlag();
 
-    if(NULL !=winfo->cfg.onwindowexpiry_cbk)
+    if(NULL !=intitem->cfg.onwindowexpiry_cbk)
     {
-        winfo->cfg.onwindowexpiry_cbk(winfo->cfg.onwindowexpiry_arg);
+        intitem->cfg.onwindowexpiry_cbk(intitem->cfg.onwindowexpiry_arg);
     }
 }
 
@@ -297,8 +304,7 @@ void WWDG_IRQHandler(void)
 
 extern hal_result_t hal_watchdog_hid_static_memory_init(void)
 {
-    memset(s_hal_watchdog_info, 0, sizeof(s_hal_watchdog_info));
-    //memset(s_hal_watchdog_initted, hal_false, sizeof(s_hal_watchdog_initted));
+    memset(s_hal_watchdog_internals, 0, sizeof(s_hal_watchdog_internals));
     s_hal_watchdog_initted = 0;
     return(hal_res_OK);  
 }
@@ -314,19 +320,17 @@ static hal_boolval_t s_hal_watchdog_supported_is(hal_watchdog_t watchdog)
 
 static void s_hal_watchdog_initted_set(hal_watchdog_t watchdog)
 {
-    //s_hal_watchdog_initted[HAL_watchdog2index(watchdog)] = hal_true;
     hal_utility_bits_byte_bitset(&s_hal_watchdog_initted, HAL_watchdog2index(watchdog));
 }
 
 static hal_boolval_t s_hal_watchdog_initted_is(hal_watchdog_t watchdog)
 {
-    //return(s_hal_watchdog_initted[HAL_watchdog2index(watchdog)]);
     return(hal_utility_bits_byte_bitcheck(s_hal_watchdog_initted, HAL_watchdog2index(watchdog)));
 }
 
 
 
-static void s_hal_watchdog_normal_start(hal_watchdog_internals_t *winfo)
+static void s_hal_watchdog_normal_start(hal_watchdog_internals_t *intitem)
 {
   /* IWDG timeout equal to xxx ms (the timeout may varies due to LSI frequency
      dispersion) */
@@ -337,7 +341,7 @@ static void s_hal_watchdog_normal_start(hal_watchdog_internals_t *winfo)
   IWDG_SetPrescaler(IWDG_Prescaler_128);
 
   /* Set counter reload value to 349 */
-  IWDG_SetReload(winfo->reload);
+  IWDG_SetReload(intitem->reload);
 
   /* Reload IWDG counter */
   IWDG_ReloadCounter();
@@ -348,10 +352,10 @@ static void s_hal_watchdog_normal_start(hal_watchdog_internals_t *winfo)
 }
 
 
-static void s_hal_watchdog_window_start(hal_watchdog_internals_t *winfo)
+static void s_hal_watchdog_window_start(hal_watchdog_internals_t *intitem)
 {
 //    NVIC_InitTypeDef NVIC_InitStructure;
-    // do something using s_hal_watchdog_info[0].countdown etc.
+    // do something using s_hal_watchdog_internals[0].countdown etc.
 
     // acemor on 21oct11: taken from STM32F10x_StdPeriph_Lib_V3.2.0\Project\STM32F10x_StdPeriph_Examples\WWDG
 
@@ -379,23 +383,23 @@ static void s_hal_watchdog_window_start(hal_watchdog_internals_t *winfo)
 
     // 3. set window
     /* Set Window value to 65 */
-    WWDG_SetWindowValue(winfo->reload);
+    WWDG_SetWindowValue(intitem->reload);
     //WWDG_SetWindowValue(65);
 
 
     // 4. set counter value and clear
     /* On Value line devices, Enable WWDG and set counter value to 127, WWDG timeout = ~1366 æs * 64 = 87.42 ms */
     /* On other devices, Enable WWDG and set counter value to 127, WWDG timeout = ~910 æs * 64 = 58.25 ms */
-    WWDG_Enable(winfo->reload);
+    WWDG_Enable(intitem->reload);
     
     /* Clear EWI flag */
     WWDG_ClearFlag();
     
     // 5. enable interrupt
-    if(hal_int_priorityNONE != winfo->cfg.priority)
+    if(hal_int_priorityNONE != intitem->cfg.priority)
     {
         // enable irqs in nvic
-        hal_sys_irqn_priority_set(WWDG_IRQn, winfo->cfg.priority);
+        hal_sys_irqn_priority_set(WWDG_IRQn, intitem->cfg.priority);
         hal_sys_irqn_enable(WWDG_IRQn);
 
         /* Enable EW interrupt */

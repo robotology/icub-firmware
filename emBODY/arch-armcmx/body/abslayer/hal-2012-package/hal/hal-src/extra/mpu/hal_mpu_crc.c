@@ -36,6 +36,8 @@
 #include "hal_base_hid.h" 
 #include "hal_brdcfg.h"
 
+#include "hal_heap.h"
+
 
 #include "hal_utility_bits.h" 
 
@@ -105,7 +107,7 @@ const uint32_t hal_crc_poly_crc32 = 0x04C11DB7;
 
 typedef struct
 {
-    hal_crc_cfg_t       cfg;
+    hal_crc_cfg_t       config;
     uint32_t            initialvalue;
 } hal_crc_internals_t;
 
@@ -118,11 +120,11 @@ static hal_boolval_t s_hal_crc_supported_is(hal_crc_t crc);
 static void s_hal_crc_initted_set(hal_crc_t crc);
 static hal_boolval_t s_hal_crc_initted_is(hal_crc_t crc);
 
-static hal_result_t s_hal_crc_hw_init(hal_crc_internals_t *crcint);
-static uint32_t s_hal_crc32_hw_compute(hal_crc_internals_t *crcint, const void *data, uint32_t size);
-static uint32_t s_hal_crc32_sw_compute(hal_crc_internals_t *crcint, const void *data, uint32_t size);
-static uint32_t s_hal_crc16_sw_compute(hal_crc_internals_t *crcint, const void *data, uint32_t size);
-static uint32_t s_hal_crc07_sw_compute(hal_crc_internals_t *crcint, const void *data, uint32_t size);
+static hal_result_t s_hal_crc_hw_init(hal_crc_internals_t *intitem);
+static uint32_t s_hal_crc32_hw_compute(hal_crc_internals_t *intitem, const void *data, uint32_t size);
+static uint32_t s_hal_crc32_sw_compute(hal_crc_internals_t *intitem, const void *data, uint32_t size);
+static uint32_t s_hal_crc16_sw_compute(hal_crc_internals_t *intitem, const void *data, uint32_t size);
+static uint32_t s_hal_crc07_sw_compute(hal_crc_internals_t *intitem, const void *data, uint32_t size);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -134,10 +136,9 @@ static uint32_t s_hal_crc07_sw_compute(hal_crc_internals_t *crcint, const void *
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-//static hal_boolval_t s_hal_crc_initted[hal_crcs_num] = { hal_false };
 static uint8_t s_hal_crc_initted = 0;
 
-static hal_crc_internals_t s_hal_crc_internals[hal_crcs_num] = {{{hal_crc_order_32, 0, NULL}, 0xffffffff}, {{hal_crc_order_32, 0, NULL}, 0xffffffff}};
+static hal_crc_internals_t* s_hal_crc_internals[hal_crcs_num] = { NULL };
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -148,7 +149,7 @@ static hal_crc_internals_t s_hal_crc_internals[hal_crcs_num] = {{{hal_crc_order_
 extern hal_result_t hal_crc_init(hal_crc_t crc, const hal_crc_cfg_t *cfg)
 {
     hal_result_t res = hal_res_NOK_generic; // dont remove ...
-    hal_crc_internals_t *crcint = NULL;
+    hal_crc_internals_t *intitem = s_hal_crc_internals[HAL_crc2index(crc)];
 
     if(hal_false == s_hal_crc_supported_is(crc))
     {
@@ -159,26 +160,34 @@ extern hal_result_t hal_crc_init(hal_crc_t crc, const hal_crc_cfg_t *cfg)
     {
         cfg  = &hal_crc_cfg_default;
     }
+    
+    
+    // if it does not have ram yet, then attempt to allocate it.
+    if(NULL == intitem)
+    {
+        intitem = s_hal_crc_internals[HAL_crc2index(crc)] = hal_heap_new(sizeof(hal_crc_internals_t));
+        // minimal initialisation of the internal item
+        // nothing to init.      
+    }        
 
-    crcint = &s_hal_crc_internals[HAL_crc2index(crc)];
 
-    memcpy(&crcint->cfg, cfg, sizeof(hal_crc_cfg_t));
-    crcint->initialvalue = 0xffffffff;
+    memcpy(&intitem->config, cfg, sizeof(hal_crc_cfg_t));
+    intitem->initialvalue = 0xffffffff;
 
-    switch(crcint->cfg.order)
+    switch(intitem->config.order)
     {
         case hal_crc_order_07:
         {   // on arm always use sw emulation
             
 #if defined(HAL_USE_UTILITY_CRC07)
-            if(hal_crc_poly_crc07 == crcint->cfg.polynomial)
+            if(hal_crc_poly_crc07 == intitem->config.polynomial)
             {   // for crc07 use rom-ed table
-                crcint->cfg.crctblram = (void*)hal_utility_crc07_table_0x09;
+                intitem->config.crctblram = (void*)hal_utility_crc07_table_0x09;
                 res = hal_res_OK;
             } 
-            else if(NULL != crcint->cfg.crctblram)
+            else if(NULL != intitem->config.crctblram)
             {   // else compute it.
-                //hal_utility_crc07_table_get(crcint->cfg.polynomial, crcint->cfg.crctblram);
+                //hal_utility_crc07_table_get(intitem->config.polynomial, intitem->config.crctblram);
                 //res = hal_res_OK;
                 // unfortunately the utility hal_utility_crc07_table_get() is not verified yet
                 #warning WIP --> the function hal_utility_crc07_table_get() seems not to behave correctly, thus i dont use it.
@@ -192,14 +201,14 @@ extern hal_result_t hal_crc_init(hal_crc_t crc, const hal_crc_cfg_t *cfg)
         case hal_crc_order_16:
         {   // on arm always use sw emulation
 #if defined(HAL_USE_UTILITY_CRC16)
-            if(hal_crc_poly_crc16_ccitt == crcint->cfg.polynomial)
+            if(hal_crc_poly_crc16_ccitt == intitem->config.polynomial)
             {   // for crc16-ccitt use rom-ed table
-                crcint->cfg.crctblram = (void*)hal_utility_crc16_table_0x1021;
+                intitem->config.crctblram = (void*)hal_utility_crc16_table_0x1021;
                 res = hal_res_OK;
             } 
-            else if(NULL != crcint->cfg.crctblram)
+            else if(NULL != intitem->config.crctblram)
             {   // else compute it.
-                hal_utility_crc16_table_get(crcint->cfg.polynomial, crcint->cfg.crctblram);
+                hal_utility_crc16_table_get(intitem->config.polynomial, intitem->config.crctblram);
                 res = hal_res_OK;
             } 
 #else
@@ -210,14 +219,14 @@ extern hal_result_t hal_crc_init(hal_crc_t crc, const hal_crc_cfg_t *cfg)
         case hal_crc_order_32:
         {   // on arm use sw emulation except for crc-32 
 
-            if(hal_crc_poly_crc32 == crcint->cfg.polynomial)
+            if(hal_crc_poly_crc32 == intitem->config.polynomial)
             {   // use hw emulation
-                res = s_hal_crc_hw_init(crcint);
+                res = s_hal_crc_hw_init(intitem);
             }
-            else if(NULL != crcint->cfg.crctblram)
+            else if(NULL != intitem->config.crctblram)
             {                
 #if defined(HAL_USE_UTILITY_CRC32)
-                hal_utility_crc32_table_get(crcint->cfg.polynomial, crcint->cfg.crctblram);
+                hal_utility_crc32_table_get(intitem->config.polynomial, intitem->config.crctblram);
                 res = hal_res_OK; 
 #else
             res = hal_res_NOK_generic;
@@ -244,9 +253,7 @@ extern hal_result_t hal_crc_init(hal_crc_t crc, const hal_crc_cfg_t *cfg)
 
 extern hal_result_t hal_crc_compute(hal_crc_t crc, hal_crc_compute_mode_t mode, const void *data, uint32_t size, uint32_t *out)
 {
-    //hal_crc_cfg_t* cfg = NULL;
-    hal_crc_internals_t *crcint = NULL;
-
+    hal_crc_internals_t *intitem = s_hal_crc_internals[HAL_crc2index(crc)];
  
     if((NULL == data) || (NULL == out) || (0 == size))
     {
@@ -260,31 +267,28 @@ extern hal_result_t hal_crc_compute(hal_crc_t crc, hal_crc_compute_mode_t mode, 
     }
 
     // do something 
-
-    crcint = &s_hal_crc_internals[HAL_crc2index(crc)];
-    //cfg = &s_hal_crc_internals[HAL_crc2index(crc)].cfg;
-
+    
     if(hal_crc_mode_clear == mode)
     {
-        crcint->initialvalue = 0xffffffff;
+        intitem->initialvalue = 0xffffffff;
     }
 
     // first the case of hw support
-    if(hal_crc_poly_crc32 == crcint->cfg.polynomial)
+    if(hal_crc_poly_crc32 == intitem->config.polynomial)
     {
-        *out = crcint->initialvalue = s_hal_crc32_hw_compute(crcint, data, size);
+        *out = intitem->initialvalue = s_hal_crc32_hw_compute(intitem, data, size);
     }
-    else if(hal_crc_order_16 == crcint->cfg.order)
+    else if(hal_crc_order_16 == intitem->config.order)
     {
-        *out = crcint->initialvalue = s_hal_crc16_sw_compute(crcint, data, size);
+        *out = intitem->initialvalue = s_hal_crc16_sw_compute(intitem, data, size);
     }
-    else if(hal_crc_order_32 == crcint->cfg.order)
+    else if(hal_crc_order_32 == intitem->config.order)
     {
-        *out = crcint->initialvalue = s_hal_crc32_sw_compute(crcint, data, size);
+        *out = intitem->initialvalue = s_hal_crc32_sw_compute(intitem, data, size);
     }
-    else if(hal_crc_order_07 == crcint->cfg.order)
+    else if(hal_crc_order_07 == intitem->config.order)
     {
-        *out = crcint->initialvalue = s_hal_crc07_sw_compute(crcint, data, size);
+        *out = intitem->initialvalue = s_hal_crc07_sw_compute(intitem, data, size);
     }    
     else
     {
@@ -310,7 +314,6 @@ extern hal_result_t hal_crc_compute(hal_crc_t crc, hal_crc_compute_mode_t mode, 
 extern hal_result_t hal_crc_hid_static_memory_init(void)
 {
     memset(s_hal_crc_internals, 0, sizeof(s_hal_crc_internals));
-    //memset(s_hal_crc_initted, hal_false, sizeof(s_hal_crc_initted));
     s_hal_crc_initted = 0;
     return(hal_res_OK);  
 }
@@ -326,37 +329,41 @@ static hal_boolval_t s_hal_crc_supported_is(hal_crc_t crc)
 
 static void s_hal_crc_initted_set(hal_crc_t crc)
 {
-    //s_hal_crc_initted[HAL_crc2index(crc)] = hal_true;
     hal_utility_bits_byte_bitset(&s_hal_crc_initted, HAL_crc2index(crc));
 }
 
 static hal_boolval_t s_hal_crc_initted_is(hal_crc_t crc)
 {
-    //return(s_hal_crc_initted[HAL_crc2index(crc)]);
     return(hal_utility_bits_byte_bitcheck(s_hal_crc_initted, HAL_crc2index(crc)));
 }
 
 
-static hal_result_t s_hal_crc_hw_init(hal_crc_internals_t *crcint)
+static hal_result_t s_hal_crc_hw_init(hal_crc_internals_t *intitem)
 {
-    crcint->initialvalue = 0xffffffff;
+    intitem->initialvalue = 0xffffffff;
 
-#if defined(HAL_USE_CPU_FAM_STM32F4)
+#if     defined(HAL_USE_CPU_FAM_STM32F1)
+    // nothing
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_CRC, ENABLE);
-#endif
-    return(hal_res_OK);
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif    
+    
+    return(hal_res_OK);   
 }
 
-static uint32_t s_hal_crc32_hw_compute(hal_crc_internals_t *crcint, const void *data, uint32_t size)
+
+static uint32_t s_hal_crc32_hw_compute(hal_crc_internals_t *intitem, const void *data, uint32_t size)
 {
     uint8_t tailsize = 0;
 
-    if(0xffffffff == crcint->initialvalue)
+    if(0xffffffff == intitem->initialvalue)
     {
         CRC_ResetDR();
     }
 
-    crcint->initialvalue = CRC_CalcBlockCRC_networkorder((uint32_t*)data, size/4);
+    intitem->initialvalue = CRC_CalcBlockCRC_networkorder((uint32_t*)data, size/4);
    
     tailsize = size%4; 
 
@@ -365,13 +372,13 @@ static uint32_t s_hal_crc32_hw_compute(hal_crc_internals_t *crcint, const void *
         uint8_t tail[4];
         memset(tail, 0, 4);
         memcpy(tail, ((uint8_t*)data) + size-tailsize, tailsize);
-        crcint->initialvalue = CRC_CalcBlockCRC((uint32_t*)tail, 1); 
+        intitem->initialvalue = CRC_CalcBlockCRC((uint32_t*)tail, 1); 
     }
 
-    return(crcint->initialvalue);
+    return(intitem->initialvalue);
 }
 
-static uint32_t s_hal_crc32_sw_compute(hal_crc_internals_t *crcint, const void *data, uint32_t size)
+static uint32_t s_hal_crc32_sw_compute(hal_crc_internals_t *intitem, const void *data, uint32_t size)
 {
 #if defined(HAL_USE_UTILITY_CRC32)
      
@@ -379,17 +386,17 @@ static uint32_t s_hal_crc32_sw_compute(hal_crc_internals_t *crcint, const void *
 
     uint32_t size4 = size-tailsize;
 
-    crcint->initialvalue = hal_utility_crc32_compute(crcint->cfg.polynomial, crcint->cfg.crctblram, crcint->initialvalue, (uint8_t*)data, size4);
+    intitem->initialvalue = hal_utility_crc32_compute(intitem->config.polynomial, intitem->config.crctblram, intitem->initialvalue, (uint8_t*)data, size4);
    
     if(0 != (tailsize))
     {
         uint8_t tail[4];
         memset(tail, 0, 4);
         memcpy(tail, ((uint8_t*)data) + size-tailsize, tailsize);
-        crcint->initialvalue = hal_utility_crc32_compute(crcint->cfg.polynomial, crcint->cfg.crctblram, crcint->initialvalue, tail, 4); 
+        intitem->initialvalue = hal_utility_crc32_compute(intitem->config.polynomial, intitem->config.crctblram, intitem->initialvalue, tail, 4); 
     }
 
-    return(crcint->initialvalue);
+    return(intitem->initialvalue);
 
 #else
     return(0);
@@ -397,7 +404,7 @@ static uint32_t s_hal_crc32_sw_compute(hal_crc_internals_t *crcint, const void *
 }
 
 
-static uint32_t s_hal_crc16_sw_compute(hal_crc_internals_t *crcint, const void *data, uint32_t size)
+static uint32_t s_hal_crc16_sw_compute(hal_crc_internals_t *intitem, const void *data, uint32_t size)
 {
 #if defined(HAL_USE_UTILITY_CRC16)
     
@@ -405,17 +412,17 @@ static uint32_t s_hal_crc16_sw_compute(hal_crc_internals_t *crcint, const void *
 
     uint32_t size4 = size-tailsize;
 
-    crcint->initialvalue = hal_utility_crc16_compute(crcint->cfg.polynomial, crcint->cfg.crctblram, crcint->initialvalue, (uint8_t*)data, size4);
+    intitem->initialvalue = hal_utility_crc16_compute(intitem->config.polynomial, intitem->config.crctblram, intitem->initialvalue, (uint8_t*)data, size4);
    
     if(0 != (tailsize))
     {
         uint8_t tail[4];
         memset(tail, 0, 4);
         memcpy(tail, ((uint8_t*)data) + size-tailsize, tailsize);
-        crcint->initialvalue = hal_utility_crc16_compute(crcint->cfg.polynomial, crcint->cfg.crctblram, crcint->initialvalue, tail, 4); 
+        intitem->initialvalue = hal_utility_crc16_compute(intitem->config.polynomial, intitem->config.crctblram, intitem->initialvalue, tail, 4); 
     }
 
-    return(crcint->initialvalue);
+    return(intitem->initialvalue);
     
 #else
     return(0);
@@ -423,7 +430,7 @@ static uint32_t s_hal_crc16_sw_compute(hal_crc_internals_t *crcint, const void *
 }
 
 
-static uint32_t s_hal_crc07_sw_compute(hal_crc_internals_t *crcint, const void *data, uint32_t size)
+static uint32_t s_hal_crc07_sw_compute(hal_crc_internals_t *intitem, const void *data, uint32_t size)
 {
 #if defined(HAL_USE_UTILITY_CRC07)
     
@@ -431,17 +438,17 @@ static uint32_t s_hal_crc07_sw_compute(hal_crc_internals_t *crcint, const void *
 
     uint32_t size4 = size-tailsize;
 
-    crcint->initialvalue = hal_utility_crc07_compute(crcint->cfg.polynomial, crcint->cfg.crctblram, crcint->initialvalue, (uint8_t*)data, size4);
+    intitem->initialvalue = hal_utility_crc07_compute(intitem->config.polynomial, intitem->config.crctblram, intitem->initialvalue, (uint8_t*)data, size4);
    
     if(0 != (tailsize))
     {
         uint8_t tail[4];
         memset(tail, 0, 4);
         memcpy(tail, ((uint8_t*)data) + size-tailsize, tailsize);
-        crcint->initialvalue = hal_utility_crc07_compute(crcint->cfg.polynomial, crcint->cfg.crctblram, crcint->initialvalue, tail, 4); 
+        intitem->initialvalue = hal_utility_crc07_compute(intitem->config.polynomial, intitem->config.crctblram, intitem->initialvalue, tail, 4); 
     }
 
-    return(crcint->initialvalue);
+    return(intitem->initialvalue);
  
 #else
     return(0);

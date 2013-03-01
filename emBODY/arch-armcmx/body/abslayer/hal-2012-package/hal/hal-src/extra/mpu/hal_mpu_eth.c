@@ -909,6 +909,8 @@ extern void hal_eth_hid_rmii_rx_init(void)
         .afname     = GPIO_AF_ETH,
         .afmode     = ENABLE
     };
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
 #endif    
     hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_CRS_DV, &rmii_rx_altcfg);    
     hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_RXD0, &rmii_rx_altcfg);   
@@ -944,7 +946,9 @@ extern void hal_eth_hid_rmii_tx_init(void)
         .afname     = GPIO_AF_ETH,
         .afmode     = ENABLE
     };
-#endif
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
     
     hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TX_EN, &rmii_tx_altcfg);    
     hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TXD0, &rmii_tx_altcfg);   
@@ -983,6 +987,8 @@ extern void hal_eth_hid_smi_init(void)
         .afmode     = ENABLE
     };
     const uint32_t mdcclockrange = 0x00000004; // MDC clock range:  bits 4:2 CR: clock range. value 1 -> HCLK = 100-168 MHz, MDC Clock = HCLK/62
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
 #endif    
         
     hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_smi.ETH_MDC, &smi_altcfg);    
@@ -1057,7 +1063,9 @@ extern void hal_eth_hid_rmii_refclock_init(void)
         .afname     = GPIO_AF_ETH,
         .afmode     = ENABLE
     };        
-#endif
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
     
     hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_REF_CLK, &rmii_clk_altcfg);      
 }
@@ -1092,6 +1100,8 @@ extern void hal_eth_hid_rmii_prepare(void)
     // step 3. enable clocks for ethernet (RX, TX, MAC) 
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_ETH_MAC | RCC_AHB1Periph_ETH_MAC_Tx | RCC_AHB1Periph_ETH_MAC_Rx, ENABLE); // RCC->AHB1ENR |= 0x0E000000;
 
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
 #endif    
 }
 
@@ -1132,7 +1142,6 @@ static int8_t s_hal_eth_gpioeth_init(stm32gpio_gpio_t gpio, uint8_t mode)
     return(0);    
 
 #elif   defined(HAL_USE_CPU_FAM_STM32F4) 
-
   
      static const GPIO_InitTypeDef ethgpioinit = 
      {   // safe one
@@ -1161,6 +1170,8 @@ static int8_t s_hal_eth_gpioeth_init(stm32gpio_gpio_t gpio, uint8_t mode)
     GPIO_PinAFConfig(stm32gpio_hid_thegpioports[(uint8_t)gpio.port], stm32gpio_hid_thepinnums[(uint8_t)gpio.pin], GPIO_AF_ETH);
 
     return(0);
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
 #endif    
 }
 #endif

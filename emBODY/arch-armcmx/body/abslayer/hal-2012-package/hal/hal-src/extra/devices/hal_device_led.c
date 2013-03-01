@@ -94,7 +94,7 @@ static hal_boolval_t s_hal_device_led_initted_is(hal_led_t led);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_device_led_initted[hal_leds_num] = { hal_false };
+static uint16_t s_hal_device_led_initted = 0;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -202,7 +202,7 @@ extern hal_result_t hal_led_toggle(hal_led_t led)
 
 extern hal_result_t hal_device_led_hid_static_memory_init(void)
 {
-    memset(s_hal_device_led_initted, hal_false, sizeof(s_hal_device_led_initted));
+    s_hal_device_led_initted = 0;
     return(hal_res_OK);  
 }
 
@@ -217,12 +217,12 @@ static hal_boolval_t s_hal_device_led_supported_is(hal_led_t led)
 
 static void s_hal_device_led_initted_set(hal_led_t led)
 {
-    s_hal_device_led_initted[HAL_device_led_led2index(led)] = hal_true;
+    hal_utility_bits_halfword_bitset(&s_hal_device_led_initted, HAL_device_led_led2index(led));
 }
 
 static hal_boolval_t s_hal_device_led_initted_is(hal_led_t led)
 {
-    return(s_hal_device_led_initted[HAL_device_led_led2index(led)]);
+    return(hal_utility_bits_halfword_bitcheck(s_hal_device_led_initted, HAL_device_led_led2index(led)));
 }
 
 

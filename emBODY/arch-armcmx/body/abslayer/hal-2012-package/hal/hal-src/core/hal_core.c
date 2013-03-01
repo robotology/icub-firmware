@@ -116,9 +116,7 @@ static hal_core_internals_t s_hal_core_internals =
 
 extern hal_result_t hal_core_init(const hal_core_cfg_t *cfg) 
 {
-//    uint32_t size04aligned;
-//    uint32_t *data32aligned = NULL;
-    
+   
     if(NULL == cfg)
     {   
         hal_base_on_fatalerror(hal_fatalerror_missingconfiguration, "hal_core_init() needs cfg");
@@ -136,23 +134,11 @@ extern hal_result_t hal_core_init(const hal_core_cfg_t *cfg)
     
     memcpy(&s_hal_core_internals.config, cfg, sizeof(hal_core_cfg_t));    
     
-    
-//     // -- call initialisation of base
-//    
-//     hal_base_memory_getsize(&cfg->basecfg, &size04aligned); 
-//
-//     if(0 != size04aligned)
-//     {
-//         data32aligned = (uint32_t*)hal_heap_new(size04aligned);   
-//     }
-//
-//     hal_base_initialise(&cfg->basecfg, data32aligned);
-
-    
-    // call something which prepare memory in core
+     
+    // call something which prepares memory in core modules
     s_hal_core_modules_in_core_static_memory_init();
     
-    // call something which prepare memory of other modules specified in brdcfg
+    // call something which prepares memory of other modules specified in brdcfg
     s_hal_core_modules_in_brdcfg_static_memory_init();
     
     
@@ -171,6 +157,7 @@ extern hal_result_t hal_core_init(const hal_core_cfg_t *cfg)
     
     return(hal_res_OK);
 }
+
 
 extern hal_result_t hal_core_start(void)
 {
@@ -195,10 +182,12 @@ extern hal_core_status_t hal_core_status_get(void)
     return(s_hal_core_internals.status); 
 }
 
+
 const hal_core_cfg_t* hal_core_cfg_get(void)
 {
     return(&s_hal_core_internals.config);
 }
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -214,8 +203,10 @@ const hal_core_cfg_t* hal_core_cfg_get(void)
 
 // extern hal_result_t hal_core_hid_static_memory_init(void)
 // {
+//     #warning --> IT MUST NOT BE USED OTHERWISE IT CLEARS the static variables of core ...
 //     return(hal_res_OK); 
 // }
+
 //
 // extern hal_bool_t hal_core_hid_initted_is(void)
 // {
@@ -240,6 +231,7 @@ static void s_hal_core_modules_in_core_static_memory_init(void)
     // sys
     hal_sys_hid_static_memory_init();   
 }
+
 
 static void s_hal_core_modules_in_brdcfg_static_memory_init(void)
 {

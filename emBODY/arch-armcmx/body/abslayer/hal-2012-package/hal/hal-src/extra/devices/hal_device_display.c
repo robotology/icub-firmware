@@ -88,7 +88,7 @@ extern const hal_display_cfg_t hal_display_cfg_default =
 typedef struct
 {
     hal_display_cfg_t           cfg;
-} hal_device_display_info_t;
+} hal_device_display_internals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -124,9 +124,12 @@ static const uint16_t s_hal_device_display_colormap[hal_display_colors_number] =
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_device_display_initted[hal_display_devs_number] = { hal_false };
+//static hal_boolval_t s_hal_device_display_initted[hal_display_devs_number] = { hal_false };
 
-static hal_device_display_info_t s_hal_device_display_info[hal_display_devs_number] = { {.cfg = {.res = hal_display_res_320x240x24, .font = {hal_display_font_size_16x24, hal_display_color_black, hal_display_color_white}}} };
+static uint8_t s_hal_device_display_initted = 0;
+static hal_device_display_internals_t* s_hal_device_display_internals[hal_display_devs_number] = { NULL };
+
+//static hal_device_display_internals_t s_hal_device_display_internals[hal_display_devs_number] = { {.cfg = {.res = hal_display_res_320x240x24, .font = {hal_display_font_size_16x24, hal_display_color_black, hal_display_color_white}}} };
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -136,6 +139,7 @@ static hal_device_display_info_t s_hal_device_display_info[hal_display_devs_numb
 
 extern hal_result_t hal_display_init(hal_display_dev_t dev, const hal_display_cfg_t *cfg)
 {
+    hal_display_internals_t *intitem = s_hal_device_display_internals[HAL_device_display_dev2index(dev)];
     if(hal_true != s_hal_device_display_supported_is(dev))
     {
         return(hal_res_NOK_unsupported);
@@ -145,6 +149,14 @@ extern hal_result_t hal_display_init(hal_display_dev_t dev, const hal_display_cf
     {
         cfg = &hal_display_cfg_default;
     }
+    
+    // if it does not have ram yet, then attempt to allocate it.
+    if(NULL == intitem)
+    {
+        intitem = s_hal_device_display_internals[HAL_device_display_dev2index(dev)] = hal_heap_new(sizeof(hal_display_internals_t));
+        // minimal initialisation of the internal item
+        // nothing to init.      
+    } 
 
     // in here we should add a brdcfg_  function which takes care of initting the device used and the required periphs.
     // e.g., in mcbstm32c a given 320x240 display is used together with spi. the init function and pointers to 
@@ -155,7 +167,7 @@ extern hal_result_t hal_display_init(hal_display_dev_t dev, const hal_display_cf
         return(hal_res_NOK_generic);
     }
     
-    memcpy(&s_hal_device_display_info[HAL_device_display_dev2index(dev)].cfg, cfg, sizeof(hal_display_cfg_t));
+    memcpy(&intitem->cfg, cfg, sizeof(hal_display_cfg_t));
     
     s_hal_device_display_initted_set(dev);
     
@@ -167,6 +179,8 @@ extern hal_result_t hal_display_init(hal_display_dev_t dev, const hal_display_cf
 
 extern hal_result_t hal_display_clearscreen(hal_display_dev_t dev)
 {
+    hal_display_internals_t *intitem = s_hal_device_display_internals[HAL_device_display_dev2index(dev)];
+    
     if(hal_true != s_hal_device_display_initted_is(dev))
     {
         return(hal_res_NOK_generic);
@@ -176,13 +190,16 @@ extern hal_result_t hal_display_clearscreen(hal_display_dev_t dev)
     {
         return(hal_res_NOK_generic);
     }
-    hal_display_cfg_t *cfg = &s_hal_device_display_info[HAL_device_display_dev2index(dev)].cfg;
+    
+    hal_display_cfg_t *cfg = &intitem->cfg;
     
     return(hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_dev2index(dev)].chipif.clear(s_hal_device_display_colormap[cfg->screencolor]));    
 }
 
 extern hal_result_t hal_display_setfont(hal_display_dev_t dev, hal_display_font_t font)
 {
+    hal_display_internals_t *intitem = s_hal_device_display_internals[HAL_device_display_dev2index(dev)];
+    
     if(hal_true != s_hal_device_display_initted_is(dev))
     {
         return(hal_res_NOK_generic);
@@ -194,7 +211,7 @@ extern hal_result_t hal_display_setfont(hal_display_dev_t dev, hal_display_font_
         return(hal_res_NOK_generic);
     }
     
-    memcpy(&s_hal_device_display_info[HAL_device_display_dev2index(dev)].cfg.font, &font, sizeof(hal_display_font_t));
+    memcpy(&intitem->cfg.font, &font, sizeof(hal_display_font_t));
     
     return(hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_dev2index(dev)].chipif.settextproperties(font.textsize, s_hal_device_display_colormap[font.backcolor], s_hal_device_display_colormap[font.textcolor]));        
 }
@@ -260,7 +277,8 @@ extern hal_result_t hal_display_putstring(hal_display_dev_t dev, uint16_t line, 
 extern hal_result_t hal_device_display_hid_static_memory_init(void)
 {
     // removed dependancy from NZI ram
-    memset(s_hal_device_display_initted, hal_false, sizeof(s_hal_device_display_initted));
+    s_hal_device_display_initted = 0;
+    memset(s_hal_device_display_internals, 0, sizeof(s_hal_device_display_internals));
 
     return(hal_res_OK);  
 }
@@ -277,12 +295,14 @@ static hal_boolval_t s_hal_device_display_supported_is(hal_display_dev_t dev)
 
 static void s_hal_device_display_initted_set(hal_display_dev_t dev)
 {
-    s_hal_device_display_initted[HAL_device_display_dev2index(dev)] = hal_true;
+    //s_hal_device_display_initted[HAL_device_display_dev2index(dev)] = hal_true;
+    hal_utility_bits_byte_bitset(&s_hal_device_display_initted, HAL_device_display_dev2index(dev));
 }
 
 static hal_boolval_t s_hal_device_display_initted_is(hal_display_dev_t dev)
 {
-    return(s_hal_device_display_initted[HAL_device_display_dev2index(dev)]);
+    return(hal_utility_bits_byte_bitcheck(s_hal_device_display_initted, HAL_device_display_dev2index(dev)));
+    //return(s_hal_device_display_initted[HAL_device_display_dev2index(dev)]);
 }
 
 static hal_result_t s_hal_device_display_hw_init(hal_display_dev_t dev, const hal_display_cfg_t *cfg)

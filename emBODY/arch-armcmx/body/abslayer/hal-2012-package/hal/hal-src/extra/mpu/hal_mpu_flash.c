@@ -140,7 +140,9 @@ static const uint32_t s_hal_flash_PAGEADDRS[12]     =
     0x080E0000          // s_hal_flash_BASEADDR + 896k
 };
 
-#endif
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -398,6 +400,8 @@ extern uint32_t hal_flash_get_pageaddr(uint32_t addr)
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)    
     uint32_t pageindex = s_hal_flash_pageindex_get(addr);   
     return(s_hal_flash_PAGEADDRS[pageindex]);
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
 #endif    
 }
 
@@ -472,6 +476,8 @@ static hal_result_t s_hal_flash_erasepage(uint32_t addr)
     FLASH_ClearFlag(FLASH_FLAG_BSY | FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR | FLASH_FLAG_PGAERR | FLASH_FLAG_PGPERR | FLASH_FLAG_PGSERR);
     // important: FLASH_EraseSector() DOES NOT use the pageindex, but its own values. 
     status = FLASH_EraseSector(s_hal_flash_stm32f4_sector_get(addr), VoltageRange_3);
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
 #endif  
 
     return((FLASH_COMPLETE==status)?(hal_res_OK):(hal_res_NOK_generic));
@@ -609,6 +615,8 @@ static uint32_t s_hal_flash_pageindex_get(uint32_t addr)
     }
 
     return(s_hal_flash_PAGESNUM-1);  
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
 #endif    
 }
 #endif
@@ -640,6 +648,8 @@ static uint32_t s_hal_flash_quickget_pagesize(uint32_t addr)
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)    
     uint32_t pageindex = s_hal_flash_pageindex_get(addr);   
     return(s_hal_flash_PAGESIZES[pageindex]);
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
 #endif    
 }
 

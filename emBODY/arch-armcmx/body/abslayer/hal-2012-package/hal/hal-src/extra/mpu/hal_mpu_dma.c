@@ -67,11 +67,11 @@
 #define HAL_dma_port2peripheral(p)      (s_hal_dma_memory_mapping_of_ports[HAL_dma_port2index(p)])
 
 
-#if     defined(HAL_USE_CPU_FAM_STM32F1)
-
-#elif    defined(HAL_USE_CPU_FAM_STM32F4)
-
-#endif
+// #if     defined(HAL_USE_CPU_FAM_STM32F1)
+// #elif    defined(HAL_USE_CPU_FAM_STM32F4)
+// #else   //defined(HAL_USE_CPU_FAM_*)
+//     #error ERR --> choose a HAL_USE_CPU_FAM_*
+// #endif   
 
 
 
@@ -94,6 +94,8 @@ typedef struct
     DMA_Channel_TypeDef*    stm32dmaperiph;
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)   
     DMA_Stream_TypeDef*     stm32dmaperiph;
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
 #endif    
 //    void*                   source;
 //    void*                   destin;
@@ -130,6 +132,7 @@ static void s_hal_dma_isr_clear_flag(hal_dma_port_t port);
 // --------------------------------------------------------------------------------------------------------------------
 
 #if     defined(HAL_USE_CPU_FAM_STM32F1)
+
 static DMA_Channel_TypeDef* const s_hal_dma_memory_mapping_of_ports[hal_dma_ports_num] = 
 {
     DMA1_Channel1, DMA1_Channel2, DMA1_Channel3, DMA1_Channel4, DMA1_Channel5, DMA1_Channel6, DMA1_Channel7,
@@ -157,6 +160,7 @@ static const IRQn_Type s_hal_dma_irqnumber[hal_dma_ports_num] =
     DMA2_Channel1_IRQn, DMA2_Channel2_IRQn, DMA2_Channel3_IRQn, DMA2_Channel4_IRQn, DMA2_Channel5_IRQn,   
     UsageFault_IRQn, UsageFault_IRQn, UsageFault_IRQn, UsageFault_IRQn // use UsageFault_IRQn when there is no dma port available
 };
+
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)
            
 static DMA_Stream_TypeDef* const s_hal_dma_memory_mapping_of_ports[hal_dma_ports_num] = 
@@ -198,7 +202,9 @@ static const IRQn_Type s_hal_dma_irqnumber[hal_dma_ports_num] =
 };
 
 
-#endif
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -247,12 +253,16 @@ extern hal_result_t hal_dma_init(hal_dma_port_t port, const hal_dma_cfg_t *cfg)
     RCC_AHBPeriphClockCmd(s_hal_dma_periphclocks[HAL_dma_port2index(port)], ENABLE);
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)
     RCC_AHB1PeriphResetCmd(s_hal_dma_periphclocks[HAL_dma_port2index(port)], ENABLE);
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
 #endif    
  
 #if     defined(HAL_USE_CPU_FAM_STM32F1)
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)
     #error --> verifica nel progetto stm32f4x spi con dam come viene inizializzato il dma. vedi anche i registri poiche' sono diversi dal stm32f1  
-#endif  
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
     
     
     
@@ -288,7 +298,9 @@ extern hal_result_t hal_dma_init(hal_dma_port_t port, const hal_dma_cfg_t *cfg)
     dmaint->stm32dmainit.DMA_MemoryBurst           = DMA_MemoryBurst_Single;
     dmaint->stm32dmainit.DMA_PeripheralBurst       = DMA_PeripheralBurst_Single;       
     
-#endif  
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif   
     
     DMA_DeInit(dmaint->stm32dmaperiph);
     DMA_Init(dmaint->stm32dmaperiph, &dmaint->stm32dmainit);
@@ -441,7 +453,9 @@ extern hal_result_t hal_dma_destin_set(hal_dma_port_t port, void* destin)
         dmaint->stm32dmainit.DMA_MemoryBaseAddr    = (uint32_t)dmaint->cfg.destin;
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)   
         dmaint->stm32dmainit.DMA_Memory0BaseAddr   = (uint32_t)dmaint->cfg.destin;
-#endif                           
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif                         
     }  
 
     dmaint->stopit = hal_false;    
@@ -454,7 +468,9 @@ extern hal_result_t hal_dma_destin_set(hal_dma_port_t port, void* destin)
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)   
     dmaint->stm32dmaperiph->CMAR   = dmaint->stm32dmainit.DMA_MemoryBaseAddr;
     dmaint->stm32dmaperiph->CNDTR  = dmaint->stm32dmainit.DMA_BufferSize;
-#endif           
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif          
 
     DMA_Cmd(dmaint->stm32dmaperiph, ENABLE);
     
@@ -612,8 +628,9 @@ void DMA2_Stream7_IRQHandler(void)
     s_hal_dma_isr_portx(hal_dma_port16);
 }
 
-
-#endif
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
 
 // ---- isr of the module: end ------
 
@@ -733,7 +750,9 @@ static void s_hal_dma_isr_clear_flag(hal_dma_port_t port)
     DMA_ClearFlag(s_hal_dma_irqflag_gl[HAL_dma_port2index(port)]);
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)    
     DMA_ClearFlag(s_hal_dma_memory_mapping_of_ports[HAL_dma_port2index(port)], s_hal_dma_irqflag_gl[HAL_dma_port2index(port)]);
-#endif
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
 }
 
 

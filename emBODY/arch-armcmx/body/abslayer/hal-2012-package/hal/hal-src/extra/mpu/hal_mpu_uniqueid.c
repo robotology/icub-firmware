@@ -32,7 +32,9 @@
 #if     defined(HAL_USE_CPU_FAM_STM32F1)
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)
 #warning WIP --> verify that the uniqueid peripheral is the same in stm32f1 and stm32f4
-#endif
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -69,13 +71,13 @@
 #define HAL_uiniqueid2index(t)              ((uint8_t)((t)))
 
 
-#if   defined(HAL_USE_CPU_FAM_STM32F1)
+#if     defined(HAL_USE_CPU_FAM_STM32F1)
     #define HAL_MPU_UNIQUEID_UniqueDeviceID96_baseaddress 0x1FFFF7E8
-#elif defined(HAL_USE_CPU_FAM_STM32F4)
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)
     #define HAL_MPU_UNIQUEID_UniqueDeviceID96_baseaddress 0x1FFF7A10
-#else
-    #error --> u must define an MPU
-#endif
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 

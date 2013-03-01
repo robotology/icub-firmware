@@ -102,7 +102,7 @@ static hal_result_t s_hal_device_cantransceiver_lowlevel_init(hal_can_port_t por
 // --------------------------------------------------------------------------------------------------------------------
 
 static hal_cantransceiver_cfg_t s_hal_device_cantransceiver_cfg             = {.dummy = 0};
-static hal_bool_t s_hal_device_cantransceiver_initted[hal_can_ports_num]    =  {hal_false, hal_false};
+static uint8_t s_hal_device_cantransceiver_initted = 0;
 
 
 
@@ -188,7 +188,7 @@ extern hal_result_t hal_device_cantransceiver_hid_static_memory_init(void)
 {
     // removed dependency from nzi ram
     memset(&s_hal_device_cantransceiver_cfg, 0, sizeof(s_hal_device_cantransceiver_cfg));
-    memset(&s_hal_device_cantransceiver_initted, hal_false, sizeof(s_hal_device_cantransceiver_initted));
+    s_hal_device_cantransceiver_initted = 0;
 
     return(hal_res_OK);
 }
@@ -206,12 +206,14 @@ static hal_bool_t s_hal_device_cantransceiver_supported_is(hal_can_port_t port)
 
 static hal_bool_t s_hal_device_cantransceiver_initted_is(hal_can_port_t port)
 {
-    return(s_hal_device_cantransceiver_initted[HAL_device_cantransceiver_canport2index(port)]);
+    //return(s_hal_device_cantransceiver_initted[HAL_device_cantransceiver_canport2index(port)]);
+    return(hal_utility_bits_byte_bitcheck(s_hal_device_cantransceiver_initted, HAL_device_cantransceiver_canport2index(port)));
 }
 
 static void s_hal_device_cantransceiver_initted_set(hal_can_port_t port)
 {
-    s_hal_device_cantransceiver_initted[HAL_device_cantransceiver_canport2index(port)] = hal_true;
+    //s_hal_device_cantransceiver_initted[HAL_device_cantransceiver_canport2index(port)] = hal_true;
+    hal_utility_bits_byte_bitset(&s_hal_device_cantransceiver_initted, HAL_device_cantransceiver_canport2index(port));
 }
 
 
