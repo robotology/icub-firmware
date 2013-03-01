@@ -193,10 +193,10 @@ static const hal_gpio_val_t user_notpushed_value =
 int main(void) 
 {
     extern const hal_core_cfg_t*     hal_coreCFGptr;
-    extern const hal_base_cfg_t*     hal_base_cfgMINE;
+//    extern const hal_base_cfg_t*     hal_base_cfgMINE;
     extern const ipal_cfg_t*    ipal_cfgMINE;
-    uint32_t size04aligned;
-    uint32_t *data32aligned = NULL;
+   uint32_t size04aligned;
+   uint32_t *data32aligned = NULL;
     hal_result_t res = hal_res_OK;
     
     
@@ -213,6 +213,18 @@ int main(void)
     hal_core_init(hal_coreCFGptr);
     
     hal_core_start();
+    
+    
+    
+    myledsinit();
+    
+    button_init();
+    
+     // 1 millisec.
+    res = hal_sys_systick_sethandler(myonsystick, 1000, hal_int_priority00);
+    res =  res;    
+    
+    for(;;);
     
 
     //hal_sys_systeminit();
