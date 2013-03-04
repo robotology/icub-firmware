@@ -23,7 +23,7 @@
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /* @file       hal_brdcfg_mcbstm32c.h
-    @brief      This header file defines Interface Pins, eval-board depend macro and low level function prototypes.
+    @brief      This header file defines support for board mcbstm32c.
     @author     valentina.gaggero@iit.it, marco.accame@iit.it
     @date       10/09/2010
  **/

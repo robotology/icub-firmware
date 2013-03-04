@@ -17,7 +17,7 @@
 */
 
 /* @file       hal_brdcfg_mcbstm32c.c
-	@brief      This file implements low level functions which depend on board.
+	@brief      This file implements support for board mcbstm32c.
 	@author     valentina.gaggero@iit.it, marco.accame@iit.it
     @date       11/16/2010
 **/
@@ -186,22 +186,6 @@
                 .speed    = hal_gpio_speed_default        
             }
         } 
-//         ,
-//         .numofframesinrxqnorm   =
-//         {
-//             3,  // hal_can_port1
-//             2   // hal_can_port2            
-//         },
-//         .numofframesintxqnorm   =
-//         {
-//             3,  // hal_can_port1
-//             2   // hal_can_port2            
-//         },
-//         .numofframesintxqprio   =
-//         {
-//             0,  // hal_can_port1
-//             0   // hal_can_port2            
-//         }         
     };
 #endif//HAL_USE_CAN
 
@@ -243,9 +227,6 @@
             .ETH_MDC            = { .port = hal_gpio_portC, .pin = hal_gpio_pin1,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max },
             .ETH_MDIO           = { .port = hal_gpio_portA, .pin = hal_gpio_pin2,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max }       
         }
-//         ,
-//         .numofdmatxbuffers      = 2,
-//         .numofdmarxbuffers      = 2
     };
 
 #endif//HAL_USE_ETH
@@ -702,153 +683,6 @@ static hal_result_t s_hal_brdcfg_extbrds__static_memory_init(void);
 // --------------------------------------------------------------------------------------------------------------------
 
 
-// extern uint32_t hal_brdcfg__getsize(const hal_base_cfg_t *cfg)
-// {
-//     uint32_t retval = 0;
-//  
-//     if(NULL == cfg)
-//     {
-//         hal_base_on_fatalerror(hal_fatalerror_missingconfiguration, "hal_brdcfg__getsize() needs a cfg");
-//         return(0);
-//     }  
-
-//     // - utilities ----------------------------------------------------------------------------------------------------
-//     
-// #ifdef  HAL_USE_UTILITY_BITS
-//     retval += hal_utility_bits_hid_getsize(cfg);
-// #endif//HAL_USE_UTILITY_BITS
-
-// #ifdef  HAL_USE_UTILITY_CRC07
-//     retval += hal_utility_crc07_hid_getsize(cfg);
-// #endif//HAL_USE_UTILITY_CRC07    
-
-// #ifdef  HAL_USE_UTILITY_CRC16
-//     retval += hal_utility_crc16_hid_getsize(cfg);
-// #endif//HAL_USE_UTILITY_CRC16    
-
-// #ifdef  HAL_USE_UTILITY_CRC32
-//     retval += hal_utility_crc32_hid_getsize(cfg);
-// #endif//HAL_USE_UTILITY_CRC32        
-//     
-// #ifdef  HAL_USE_UTILITY_FIFO
-//     retval += hal_utility_fifo_hid_getsize(cfg);
-// #endif//HAL_USE_UTILITY_FIFO    
-
-//  
-//     
-//     
-//     // - mpu peripherals ----------------------------------------------------------------------------------------------
-//         
-//    
-// #ifdef  HAL_USE_CAN
-//     retval += hal_can_hid_getsize(cfg);
-// #endif//HAL_USE_CAN
-
-// #ifdef  HAL_USE_CRC
-//     retval += hal_crc_hid_getsize(cfg);
-// #endif//HAL_USE_CRC
-
-// #ifdef  HAL_USE_DMA
-//     retval += hal_dma_hid_getsize(cfg);
-// #endif//HAL_USE_DMA
-
-// #ifdef HAL_USE_ETH
-//     retval += hal_eth_hid_getsize(cfg);
-// #endif//HAL_USE_ETH
-//                       
-// #ifdef HAL_USE_FLASH
-//     retval += hal_flash_hid_getsize(cfg);
-// #endif//HAL_USE_FLASH  
-
-// #ifdef  HAL_USE_GPIO
-//     retval += hal_gpio_hid_getsize(cfg);
-// #endif//HAL_USE_GPIO
-
-// #ifdef  HAL_USE_I2C
-//     retval += hal_i2c_hid_getsize(cfg);
-// #endif//HAL_USE_I2C
-
-// #ifdef  HAL_USE_SPI
-//     retval += hal_spi_hid_getsize(cfg);
-// #endif//HAL_USE_SPI
-
-// #ifdef  HAL_USE_TIMER
-//     retval += hal_timer_hid_getsize(cfg);
-// #endif//HAL_USE_TIMER       
-
-// #ifdef  HAL_USE_TRACE
-//     retval += hal_trace_hid_getsize(cfg);
-// #endif//HAL_USE_TRACE 
-
-// #ifdef  HAL_USE_UNIQUEID
-//     retval += hal_uniqueid_hid_getsize(cfg);
-// #endif//HAL_USE_UNIQUEID 
-
-// #ifdef  HAL_USE_WATCHDOG
-//     retval += hal_watchdog_hid_getsize(cfg);
-// #endif//HAL_USE_WATCHDOG 
-
-
-//     // - devices ------------------------------------------------------------------------------------------------------
-
-// #ifdef  HAL_USE_DEVICE_ACCELEROMETER
-//     retval += hal_device_accelerometer_hid_getsize(cfg);
-// #endif//HAL_USE_DEVICE_ACCELEROMETER  
-
-// #ifdef  HAL_USE_DEVICE_CANTRANSCEIVER
-//     retval += hal_device_cantransceiver_hid_getsize(cfg);
-// #endif//HAL_USE_DEVICE_CANTRANSCEIVER  
-
-// #ifdef  HAL_USE_DEVICE_DISPLAY
-//     retval += hal_device_display_hid_getsize(cfg);
-// #endif//HAL_USE_DEVICE_DISPLAY  
-
-// #ifdef  HAL_USE_DEVICE_EEPROM
-//     retval += hal_device_eeprom_hid_getsize(cfg);
-// #endif//HAL_USE_DEVICE_EEPROM  
-
-// #ifdef HAL_USE_DEVICE_ENCODER
-//     retval += hal_device_encoder_hid_getsize(cfg);
-// #endif//HAL_USE_DEVICE_ENCODER  
-//
-// #ifdef  HAL_USE_DEVICE_ETHTRANSCEIVER
-//     retval += hal_device_ethtransceiver_hid_getsize(cfg);
-// #endif//HAL_USE_DEVICE_ETHTRANSCEIVER  
-//
-// #ifdef  HAL_USE_DEVICE_GYROSCOPE
-//     retval += hal_device_gyroscope_hid_getsize(cfg);
-// #endif//HAL_USE_DEVICE_GYROSCOPE   
-//
-// #ifdef  HAL_USE_DEVICE_LED
-//     retval += hal_device_led_hid_getsize(cfg);
-// #endif//HAL_USE_DEVICE_LED  
-//
-// #ifdef HAL_USE_DEVICE_MUX
-//     retval += hal_device_mux_hid_getsize(cfg);
-// #endif//HAL_USE_DEVICE_MUX  
-//
-// #ifdef  HAL_USE_DEVICE_TERMOMETER
-//     retval += hal_device_termometer_hid_getsize(cfg);
-// #endif//HAL_USE_DEVICE_TERMOMETER 
-//
-// #ifdef  HAL_USE_DEVICE_SWITCH
-//     retval += hal_device_switch_hid_getsize(cfg);
-// #endif//HAL_USE_DEVICE_SWITCH 
-//  
-//  
-//     // - board, hence chips -------------------------------------------------------------------------------------------
-//     
-//     retval += s_hal_brdcfg_chips__getsize(cfg);
-//
-//     // - board, hence extboards ---------------------------------------------------------------------------------------
-//     
-//     retval += s_hal_brdcfg_extbrds__getsize(cfg);
-//
-//
-//     
-//     return(retval);    
-//         
-// }
 
 
 extern hal_result_t hal_brdcfg__static_memory_init(void)
@@ -1162,96 +996,4 @@ static hal_result_t s_hal_brdcfg_extbrds__static_memory_init(void)
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
 
-// removed code
 
-// #ifdef HAL_USE_SPI4ENCODER
-
-// /*Note: if there will be some speed problems, you can try to transform  hal_brdcfg_spi4encoder__encoder_enable and  hal_brdcfg_spi4encoder__encoder_disable as inline function,
-// but pay attention with the project with scatter file.probably it will give you trouble*/
-
-// extern void hal_brdcfg_spi4encoder__encoder_enable(hal_spi_port_t spix, hal_spi_mux_t e)
-// {
-// 	HAL_BRDCFG_SPI4ENCODER__SPI_CS_ENA(spix, e)
-// }
-
-// extern void hal_brdcfg_spi4encoder__encoder_disable(hal_spi_port_t spix, hal_spi_mux_t e)
-// {
-// 	HAL_BRDCFG_SPI4ENCODER__SPI_CS_DISA(spix, e)
-// }
-
-// extern void hal_brdcfg_spi4encoder__chipSelect_init(hal_spi_port_t spix )
-// {
-//     GPIO_InitTypeDef  GPIO_InitStructure;
-
-// 	
-// 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;	 //Output push-pull mode
-// 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-
-
-// //1) init data struct and GPIO regiter
-// 	switch(spix)
-// 	{
-// 		case hal_spi_port1:
-// 		{
-// 			hal_SPI4ENCODER_ENCDATA_GET(spix).cs_encoder[0].BRR_reg = HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_ENA_ENCODER_0; //pin che devono valere zero
-// 			hal_SPI4ENCODER_ENCDATA_GET(spix).cs_encoder[0].BSRR_reg = HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_ENA_ENCODER_0;	//pin che devono valere 1
-// 			
-// 			hal_SPI4ENCODER_ENCDATA_GET(spix).cs_encoder[1].BRR_reg = HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_ENA_ENCODER_1;
-// 			hal_SPI4ENCODER_ENCDATA_GET(spix).cs_encoder[1].BSRR_reg = HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_ENA_ENCODER_1;
-// 			hal_SPI4ENCODER_ENCDATA_GET(spix).encoder_gpio_port = HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_PORT_CS;
-// 			
-// 		
-// 			GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_ENA_ENCODER_0 | HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_ENA_ENCODER_1;
-// 			GPIO_Init(HAL_BRDCFG_SPI4ENCODER__SPI1_GPIO_PORT_CS, &GPIO_InitStructure);
-// 		
-// 		} break;
-
-// 		case hal_spi_port2:
-// 		{
-// 			hal_SPI4ENCODER_ENCDATA_GET(spix).cs_encoder[0].BRR_reg = HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_ENA_ENCODER_0; //pin che devono valere zero
-// 			hal_SPI4ENCODER_ENCDATA_GET(spix).cs_encoder[0].BSRR_reg = HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_ENA_ENCODER_0;	//pin che devono valere 1
-// 			
-// 			hal_SPI4ENCODER_ENCDATA_GET(spix).cs_encoder[1].BRR_reg = HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_ENA_ENCODER_1;
-// 			hal_SPI4ENCODER_ENCDATA_GET(spix).cs_encoder[1].BSRR_reg = HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_ENA_ENCODER_1;
-// 			hal_SPI4ENCODER_ENCDATA_GET(spix).encoder_gpio_port = HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_PORT_CS;
-// 			
-// 		
-// 			GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_ENA_ENCODER_0 | HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_ENA_ENCODER_1;
-// 			GPIO_Init(HAL_BRDCFG_SPI4ENCODER__SPI2_GPIO_PORT_CS, &GPIO_InitStructure);
-// 		
-// 		} break;
-//         
-// 		case hal_spi_port3:
-// 		{
-// 			
-// 			hal_SPI4ENCODER_ENCDATA_GET(spix).cs_encoder[0].BRR_reg = HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_ENA_ENCODER_0; //pin che devono valere zero
-// 			hal_SPI4ENCODER_ENCDATA_GET(spix).cs_encoder[0].BSRR_reg = HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_ENA_ENCODER_0;	//pin che devono valere 1
-// 			
-// 			hal_SPI4ENCODER_ENCDATA_GET(spix).cs_encoder[1].BRR_reg = HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_ENA_ENCODER_1;
-// 			hal_SPI4ENCODER_ENCDATA_GET(spix).cs_encoder[1].BSRR_reg = HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_ENA_ENCODER_1;
-// 			hal_SPI4ENCODER_ENCDATA_GET(spix).encoder_gpio_port = HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_PORT_CS;
-// 			
-// 		
-// 			GPIO_InitStructure.GPIO_Pin = HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_ENA_ENCODER_0 | HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_ENA_ENCODER_1;
-// 			GPIO_Init(HAL_BRDCFG_SPI4ENCODER__SPI3_GPIO_PORT_CS, &GPIO_InitStructure);
-// 		
-// 		} break;
-// 	}	
-
-// //2) init unused data struct fields
-// 	hal_SPI4ENCODER_ENCDATA_GET(spix).cs_encoder[2].BRR_reg = 0;
-// 	hal_SPI4ENCODER_ENCDATA_GET(spix).cs_encoder[2].BSRR_reg = 0;
-// 	
-// 	hal_SPI4ENCODER_ENCDATA_GET(spix).cs_pin_ena_slave = 0;	//non usato	 per questa scheda
-
-
-// //3) set pin high value
-// 	hal_brdcfg_spi4encoder__encoder_disable(spix, (hal_spi_mux_t)0);
-// 	hal_brdcfg_spi4encoder__encoder_disable(spix, (hal_spi_mux_t)1);
-
-// }
-
-// #endif//HAL_USE_SPI4ENCODER
-
-
-// end of file
