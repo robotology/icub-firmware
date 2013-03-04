@@ -84,7 +84,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-static eOresult_t s_loadFullscalelikeoccasionalrop(eOsnsr_strainId_t sId);
+static eOresult_t s_loadFullscalelikeoccasionalrop(eOsnsr_strainId_t sId, eOsnsr_arrayofupto12bytes_t  *myfullscale);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -226,11 +226,11 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
     {
         return(res);
     }
-    if(!sconfig_ptr->signaloncefullscale)
-    {
-        //some error occured
-        return(eores_NOK_nodata);
-    }
+//     if(!sconfig_ptr->signaloncefullscale)
+//     {
+//         //some error occured
+//         return(eores_NOK_nodata);
+//     }
     
     /* 3) get pointer to nv var where save incoming force values */
     res = eo_appTheDB_GetSnrStrainStatusPtr(eo_appTheDB_GetHandle(), sId,  &sstatus_ptr);
@@ -252,9 +252,13 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
           else request full scale of next channel */
     if(5 == channel)
     {
+        eOsnsr_arrayofupto12bytes_t     myfullscale;
+        
+        memcpy(&myfullscale , &sstatus_ptr->fullscale, sizeof(eOsnsr_arrayofupto12bytes_t));
+        
         sstatus_ptr->fullscale.head.size++;
         //prepare occasional rop to send
-        res = s_loadFullscalelikeoccasionalrop(sId);
+        res = s_loadFullscalelikeoccasionalrop(sId, &myfullscale);
         eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &appl_st);
         //if application is in cfg state, then request to configurator to send rop just prepared
         if(eo_sm_emsappl_STcfg == appl_st)
@@ -608,16 +612,19 @@ extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__tactSetup(EOicubCanProto* p
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-static eOresult_t s_loadFullscalelikeoccasionalrop(eOsnsr_strainId_t sId)
+static eOresult_t s_loadFullscalelikeoccasionalrop(eOsnsr_strainId_t sId, eOsnsr_arrayofupto12bytes_t  *myfullscale)
 {
     eOresult_t res;
     eOropdescriptor_t ropdesc;
     const eOtheEMSappBody_cfg_t* bodycfg = eo_emsapplBody_GetConfig(eo_emsapplBody_GetHandle());  
     
+    
+    
     if(NULL == bodycfg)
     {
         return(eores_NOK_generic);
     }
+
 
     ropdesc.configuration           = eok_ropconfiguration_basic;
     ropdesc.configuration.plustime  = 0;
@@ -626,7 +633,8 @@ static eOresult_t s_loadFullscalelikeoccasionalrop(eOsnsr_strainId_t sId)
     ropdesc.id                      = eo_cfg_nvsEP_as_strain_NVID_Get((eOcfg_nvsEP_as_endpoint_t)bodycfg->endpoints.as_endpoint, 
                                                (eOcfg_nvsEP_as_strainNumber_t)sId, 
                                                strainNVindex_sstatus__fullscale);
-    
+    ropdesc.data                    = (void*)myfullscale;
+    ropdesc.size                    = sizeof(eOsnsr_arrayofupto12bytes_t);
    
     res = eo_transceiver_rop_occasional_Load( eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()), &ropdesc); 
 
