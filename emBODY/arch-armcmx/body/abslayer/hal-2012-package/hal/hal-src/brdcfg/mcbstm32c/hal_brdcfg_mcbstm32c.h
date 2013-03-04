@@ -36,6 +36,7 @@
 #include "hal_middleware_interface.h"
 
 #include "hal_base.h"
+#include "hal_base_hid.h"
 
 #include "hal_cpu.h"
 #include "hal_cpu_arc_armcm3.h"
