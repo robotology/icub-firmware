@@ -88,7 +88,7 @@ typedef struct
     hal_void_fp_void_t          fn_osal_system_scheduling_suspend;
     hal_void_fp_void_t          fn_osal_system_scheduling_restart;
     hal_base_hid_fn_on_error    fn_on_error;   
-} hal_base_internals_t;
+} hal_base_theinternals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -122,7 +122,7 @@ __asm int s_hal_base_getheapsize (void) {
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_base_internals_t s_hal_base_internals =
+static hal_base_theinternals_t s_hal_base_theinternals =
 {
     .status                             = hal_base_status_zero,
     .config                             = { .extfn = NULL },
@@ -145,7 +145,7 @@ extern hal_result_t hal_base_init(const hal_base_cfg_t *cfg)
         return(hal_res_NOK_generic);
     }
     
-    if(hal_base_status_initialised == s_hal_base_internals.status)
+    if(hal_base_status_initialised == s_hal_base_theinternals.status)
     {
         hal_base_on_fatalerror(hal_fatalerror_generic, "hal_base_init() already called");
         return(hal_res_NOK_generic);    
@@ -153,9 +153,9 @@ extern hal_result_t hal_base_init(const hal_base_cfg_t *cfg)
 
 
     // override functions
-    s_hal_base_internals.fn_on_error                       = cfg->extfn.usr_on_fatal_error;
-    s_hal_base_internals.fn_osal_system_scheduling_suspend = cfg->extfn.osal_system_scheduling_suspend;
-    s_hal_base_internals.fn_osal_system_scheduling_restart = cfg->extfn.osal_system_scheduling_restart;
+    s_hal_base_theinternals.fn_on_error                       = cfg->extfn.usr_on_fatal_error;
+    s_hal_base_theinternals.fn_osal_system_scheduling_suspend = cfg->extfn.osal_system_scheduling_suspend;
+    s_hal_base_theinternals.fn_osal_system_scheduling_restart = cfg->extfn.osal_system_scheduling_restart;
 
 
 #if     defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
@@ -178,9 +178,9 @@ extern hal_result_t hal_base_init(const hal_base_cfg_t *cfg)
  
     
     // finally ... sets used config
-    memcpy(&s_hal_base_internals.config, cfg, sizeof(hal_base_cfg_t));
+    memcpy(&s_hal_base_theinternals.config, cfg, sizeof(hal_base_cfg_t));
 
-    s_hal_base_internals.status = hal_base_status_initialised;
+    s_hal_base_theinternals.status = hal_base_status_initialised;
     
     return(hal_res_OK);
 }
@@ -193,9 +193,9 @@ extern void hal_base_osal_scheduling_suspend(void)
 	 	return;
 	}
 
-    if(NULL != s_hal_base_internals.fn_osal_system_scheduling_suspend)
+    if(NULL != s_hal_base_theinternals.fn_osal_system_scheduling_suspend)
     {
-		s_hal_base_internals.fn_osal_system_scheduling_suspend();
+		s_hal_base_theinternals.fn_osal_system_scheduling_suspend();
     }
 }
 
@@ -207,9 +207,9 @@ extern void hal_base_osal_scheduling_restart(void)
 	 	return;
 	}
 
-    if(NULL != s_hal_base_internals.fn_osal_system_scheduling_restart)
+    if(NULL != s_hal_base_theinternals.fn_osal_system_scheduling_restart)
     {
-		s_hal_base_internals.fn_osal_system_scheduling_restart();
+		s_hal_base_theinternals.fn_osal_system_scheduling_restart();
     }
 } 
 
@@ -218,9 +218,9 @@ extern void hal_base_on_fatalerror(hal_fatalerror_t errorcode, const char * erro
 {
     hal_base_osal_scheduling_suspend();
     
-    if(NULL != s_hal_base_internals.fn_on_error)
+    if(NULL != s_hal_base_theinternals.fn_on_error)
     {
-        s_hal_base_internals.fn_on_error(errorcode, errormsg);
+        s_hal_base_theinternals.fn_on_error(errorcode, errormsg);
         for(;;);
     } 
     else
@@ -245,12 +245,13 @@ extern void hal_base_on_fatalerror(hal_fatalerror_t errorcode, const char * erro
 
 extern hal_result_t hal_base_hid_static_memory_init(void)
 {
+    memset(&s_hal_base_theinternals, 0, sizeof(hal_base_theinternals_t));
     return(hal_res_OK); 
 }
 
 extern hal_bool_t hal_base_hid_initted_is(void)
 {
-    return( (hal_base_status_initialised == s_hal_base_internals.status) ? hal_true : hal_false );    
+    return( (hal_base_status_initialised == s_hal_base_theinternals.status) ? hal_true : hal_false );    
 }
 
 

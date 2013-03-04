@@ -73,6 +73,12 @@
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+typedef struct
+{
+    uint16_t    initted_mask[hal_gpio_ports_number];
+    uint16_t    output_mask[hal_gpio_ports_number];
+} hal_gpio_theinternals_t;
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -175,8 +181,14 @@ const uint16_t  hal_gpio_hid_pins[]          =        { GPIO_Pin_0,  GPIO_Pin_1,
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static uint16_t s_hal_gpio_initted_mask[hal_gpio_ports_number] = { 0x0000 };
-static uint16_t s_hal_gpio_output_mask[hal_gpio_ports_number] = { 0x0000 };
+static hal_gpio_theinternals_t s_hal_gpio_theinternals =
+{
+    .initted_mask       = { 0 },
+    .output_mask        = { 0 }   
+};
+
+// static uint16_t s_hal_gpio_initted_mask[hal_gpio_ports_number] = { 0x0000 };
+// static uint16_t s_hal_gpio_output_mask[hal_gpio_ports_number] = { 0x0000 };
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -354,8 +366,7 @@ extern hal_result_t hal_gpio_configure(hal_gpio_cfg_t cfg, const hal_gpio_altcfg
 
 extern hal_result_t hal_gpio_hid_static_memory_init(void)
 {
-    memset(s_hal_gpio_initted_mask, 0, sizeof(s_hal_gpio_initted_mask));
-    memset(s_hal_gpio_output_mask, 0, sizeof(s_hal_gpio_output_mask));
+    memset(&s_hal_gpio_theinternals, 0, sizeof(s_hal_gpio_theinternals));
     return(hal_res_OK);
 }
 
@@ -375,31 +386,31 @@ static hal_boolval_t s_hal_gpio_supported_is(hal_gpio_port_t port, hal_gpio_pin_
 
 static void s_hal_gpio_initted_set(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {   // cannot be called with port and pin of value NONE
-    uint16_t *pp = &s_hal_gpio_initted_mask[HAL_gpio_port2index(port)];
+    uint16_t *pp = &s_hal_gpio_theinternals.initted_mask[HAL_gpio_port2index(port)];
     hal_utility_bits_halfword_bitset(pp, HAL_gpio_pin2index(pin));
 }
 
 static hal_boolval_t s_hal_gpio_initted_is(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {   // cannot be called with port and pin of value NONE
-    uint16_t p = s_hal_gpio_initted_mask[HAL_gpio_port2index(port)];
+    uint16_t p = s_hal_gpio_theinternals.initted_mask[HAL_gpio_port2index(port)];
     return(hal_utility_bits_halfword_bitcheck(p, HAL_gpio_pin2index(pin)) );
 }
 
 static void s_hal_gpio_output_set(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {
-    uint16_t *pp = &s_hal_gpio_output_mask[HAL_gpio_port2index(port)];
+    uint16_t *pp = &s_hal_gpio_theinternals.output_mask[HAL_gpio_port2index(port)];
     hal_utility_bits_halfword_bitset(pp, HAL_gpio_pin2index(pin));
 }
 
 static void s_hal_gpio_output_clear(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {
-    uint16_t *pp = &s_hal_gpio_output_mask[HAL_gpio_port2index(port)];
+    uint16_t *pp = &s_hal_gpio_theinternals.output_mask[HAL_gpio_port2index(port)];
     hal_utility_bits_halfword_bitclear(pp, HAL_gpio_pin2index(pin));
 }
 
 static hal_boolval_t s_hal_gpio_output_is(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {
-    uint16_t p = s_hal_gpio_output_mask[HAL_gpio_port2index(port)];
+    uint16_t p = s_hal_gpio_theinternals.output_mask[HAL_gpio_port2index(port)];
     return(hal_utility_bits_halfword_bitcheck(p, HAL_gpio_pin2index(pin)) );
 }
 

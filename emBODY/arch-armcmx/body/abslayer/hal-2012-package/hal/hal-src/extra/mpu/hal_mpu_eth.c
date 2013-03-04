@@ -375,7 +375,7 @@ typedef struct
 {
     hal_eth_cfg_t               config;  
     hal_eth_onframereception_t  onframerx;   
-} hal_eth_internals_t;
+} hal_eth_theinternals_t;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -429,8 +429,9 @@ static uint32_t (*tx_buf)[ETH_BUF_SIZE>>2] = NULL;
 static hal_rx_desc_t *Rx_Desc = NULL;
 static hal_tx_desc_t *Tx_Desc = NULL;
 
+#warning WIP --> put all static variables inside s_hal_eth_theinternals
 
-static hal_eth_internals_t s_eth_internals =
+static hal_eth_theinternals_t s_hal_eth_theinternals =
 {
     .config     =
     {
@@ -477,8 +478,8 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     }
     else
     {
-        memcpy(&s_eth_internals.config, cfg, sizeof(hal_eth_cfg_t));
-        memcpy(&s_eth_internals.onframerx, cfg->onframerx, sizeof(hal_eth_onframereception_t));
+        memcpy(&s_hal_eth_theinternals.config, cfg, sizeof(hal_eth_cfg_t));
+        memcpy(&s_hal_eth_theinternals.onframerx, cfg->onframerx, sizeof(hal_eth_onframereception_t));
     }
     
     // give ram to the dma descriptors
@@ -486,8 +487,8 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
 //     uint8_t capacityoftxfifoofframes = hal_brdcfg_eth__theconfig.numofdmatxbuffers;
 //     uint8_t capacityofrxfifoofframes = hal_brdcfg_eth__theconfig.numofdmarxbuffers;
 
-        uint8_t capacityoftxfifoofframes = s_eth_internals.config.capacityoftxfifoofframes;
-        uint8_t capacityofrxfifoofframes = s_eth_internals.config.capacityofrxfifoofframes;
+        uint8_t capacityoftxfifoofframes = s_hal_eth_theinternals.config.capacityoftxfifoofframes;
+        uint8_t capacityofrxfifoofframes = s_hal_eth_theinternals.config.capacityofrxfifoofframes;
     
     
     if((0 == capacityoftxfifoofframes) || (0 == capacityofrxfifoofframes))
@@ -590,7 +591,7 @@ extern hal_result_t hal_eth_disable(void)
 }
 
 
-// changed NUM_TX_BUF with s_eth_internals.config.capacityoftxfifoofframes (former hal_base_hid_params.eth_dmatxbuffer_num)
+// changed NUM_TX_BUF with s_hal_eth_theinternals.config.capacityoftxfifoofframes (former hal_base_hid_params.eth_dmatxbuffer_num)
 extern hal_result_t hal_eth_sendframe(hal_eth_frame_t *frame) 
 {
     // called by tcpnet's send_frame(OS_FRAME *frame)
@@ -621,7 +622,7 @@ extern hal_result_t hal_eth_sendframe(hal_eth_frame_t *frame)
     }
     Tx_Desc[j].Size      = frame->length;
     Tx_Desc[j].CtrlStat |= DMA_TX_OWN;
-    if (++j == s_eth_internals.config.capacityoftxfifoofframes) j = 0;
+    if (++j == s_hal_eth_theinternals.config.capacityoftxfifoofframes) j = 0;
     TxBufIndex = j;
     /* Start frame transmission. */
     ETH->DMASR   = DSR_TPSS;
@@ -642,7 +643,7 @@ extern const hal_eth_network_functions_t * hal_eth_get_network_functions(void)
 
 // ---- isr of the module: begin ----
 
-// changed NUM_RX_BUF with s_eth_internals.config.capacityofrxfifoofframes (former hal_base_hid_params.eth_dmarxbuffer_num)
+// changed NUM_RX_BUF with s_hal_eth_theinternals.config.capacityofrxfifoofframes (former hal_base_hid_params.eth_dmarxbuffer_num)
 // changed OS_FRAME with hal_eth_frame_t
 void ETH_IRQHandler(void) 
 {
@@ -686,7 +687,7 @@ void ETH_IRQHandler(void)
       }
       /* Flag 0x80000000 to skip sys_error() call when out of memory. */
       //frame = alloc_mem (RxLen | 0x80000000);
-      frame = s_eth_internals.onframerx.frame_new(RxLen | 0x80000000);
+      frame = s_hal_eth_theinternals.onframerx.frame_new(RxLen | 0x80000000);
       /* if 'alloc_mem()' has failed, ignore this packet. */
       if (frame != NULL) {
         sp = (U32 *)(Rx_Desc[i].Addr & ~3);
@@ -695,11 +696,11 @@ void ETH_IRQHandler(void)
           *dp++ = *sp++;
         }
         //put_in_queue (frame);
-        s_eth_internals.onframerx.frame_movetohigherlayer(frame);
+        s_hal_eth_theinternals.onframerx.frame_movetohigherlayer(frame);
 
-        if(NULL != s_eth_internals.onframerx.frame_alerthigherlayer)
+        if(NULL != s_hal_eth_theinternals.onframerx.frame_alerthigherlayer)
         {
-            s_eth_internals.onframerx.frame_alerthigherlayer();
+            s_hal_eth_theinternals.onframerx.frame_alerthigherlayer();
         }
 
         //rxframes ++;
@@ -708,7 +709,7 @@ void ETH_IRQHandler(void)
       /* Release this frame from ETH IO buffer. */
 rel:  Rx_Desc[i].Stat = DMA_RX_OWN;
 
-      if (++i == s_eth_internals.config.capacityofrxfifoofframes) i = 0;
+      if (++i == s_hal_eth_theinternals.config.capacityofrxfifoofframes) i = 0;
       RxBufIndex = i;
     }
     if (int_stat & INT_TIE) {
@@ -734,7 +735,7 @@ extern hal_result_t hal_eth_hid_static_memory_init(void)
     tx_buf = NULL;
     Rx_Desc = NULL;
     Tx_Desc = NULL;
-    memset(&s_eth_internals.onframerx, 0, sizeof(hal_eth_onframereception_t));
+    memset(&s_hal_eth_theinternals.onframerx, 0, sizeof(hal_eth_onframereception_t));
 
 
     return(hal_res_OK);
@@ -756,20 +757,20 @@ static void s_hal_eth_initted_set(void)
 
 static hal_boolval_t s_hal_eth_initted_is(void)
 {
-    return((0 == s_eth_internals.config.macaddress) ? (hal_false) : (hal_true));
+    return((0 == s_hal_eth_theinternals.config.macaddress) ? (hal_false) : (hal_true));
 }
 
 
 
-// changed NUM_RX_BUF with s_eth_internals.config.capacityofrxfifoofframes (former hal_base_hid_params.eth_dmarxbuffer_num)
+// changed NUM_RX_BUF with s_hal_eth_theinternals.config.capacityofrxfifoofframes (former hal_base_hid_params.eth_dmarxbuffer_num)
 static void s_hal_eth_rx_descr_init(void) 
 {
   /* Initialize Receive DMA Descriptor array. */
   U32 i,next;
 
   RxBufIndex = 0;
-  for (i = 0, next = 0; i < s_eth_internals.config.capacityofrxfifoofframes; i++) {
-    if (++next == s_eth_internals.config.capacityofrxfifoofframes) next = 0;
+  for (i = 0, next = 0; i < s_hal_eth_theinternals.config.capacityofrxfifoofframes; i++) {
+    if (++next == s_hal_eth_theinternals.config.capacityofrxfifoofframes) next = 0;
     Rx_Desc[i].Stat = DMA_RX_OWN;
     Rx_Desc[i].Ctrl = DMA_RX_RCH | ETH_BUF_SIZE;
     Rx_Desc[i].Addr = (U32)&rx_buf[i];
@@ -778,15 +779,15 @@ static void s_hal_eth_rx_descr_init(void)
   ETH->DMARDLAR = (U32)&Rx_Desc[0];
 }
 
-// changed NUM_TX_BUF with s_eth_internals.config.capacityoftxfifoofframes
+// changed NUM_TX_BUF with s_hal_eth_theinternals.config.capacityoftxfifoofframes
 static void s_hal_eth_tx_descr_init(void) 
 {
   /* Initialize Transmit DMA Descriptor array. */
   U32 i,next;
 
   TxBufIndex = 0;
-  for (i = 0, next = 0; i < s_eth_internals.config.capacityoftxfifoofframes; i++) {
-    if (++next == s_eth_internals.config.capacityoftxfifoofframes) next = 0;
+  for (i = 0, next = 0; i < s_hal_eth_theinternals.config.capacityoftxfifoofframes; i++) {
+    if (++next == s_hal_eth_theinternals.config.capacityoftxfifoofframes) next = 0;
     Tx_Desc[i].CtrlStat = DMA_TX_TCH | DMA_TX_LS | DMA_TX_FS;
     Tx_Desc[i].Addr     = (U32)&tx_buf[i];
     Tx_Desc[i].Next     = (U32)&Tx_Desc[next];

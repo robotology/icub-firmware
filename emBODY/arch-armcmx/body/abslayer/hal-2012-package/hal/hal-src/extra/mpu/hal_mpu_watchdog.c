@@ -94,7 +94,13 @@ typedef struct
 {
     hal_watchdog_cfg_t  cfg;
     uint32_t            reload;    
-} hal_watchdog_internals_t;
+} hal_watchdog_internal_item_t;
+
+typedef struct
+{
+    uint8_t                         initted;
+    hal_watchdog_internal_item_t*   items[hal_watchdogs_number];   
+} hal_watchdog_theinternals_t;
 
 
 
@@ -106,8 +112,8 @@ static hal_boolval_t s_hal_watchdog_supported_is(hal_watchdog_t watchdog);
 static void s_hal_watchdog_initted_set(hal_watchdog_t watchdog);
 static hal_boolval_t s_hal_watchdog_initted_is(hal_watchdog_t watchdog);
 
-static void s_hal_watchdog_normal_start(hal_watchdog_internals_t *intitem);
-static void s_hal_watchdog_window_start(hal_watchdog_internals_t *intitem);
+static void s_hal_watchdog_normal_start(hal_watchdog_internal_item_t *intitem);
+static void s_hal_watchdog_window_start(hal_watchdog_internal_item_t *intitem);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -120,9 +126,12 @@ static void s_hal_watchdog_window_start(hal_watchdog_internals_t *intitem);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_watchdog_internals_t* s_hal_watchdog_internals[hal_watchdogs_num] = { NULL };
+static hal_watchdog_theinternals_t s_hal_watchdog_theinternals =
+{
+    .initted            = 0,
+    .items              = { NULL }   
+};
 
-static uint8_t s_hal_watchdog_initted = 0;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -131,7 +140,7 @@ static uint8_t s_hal_watchdog_initted = 0;
 
 extern hal_result_t hal_watchdog_init(hal_watchdog_t watchdog, const hal_watchdog_cfg_t *cfg)
 {
-    hal_watchdog_internals_t* intitem = s_hal_watchdog_internals[HAL_watchdog2index(watchdog)];
+    hal_watchdog_internal_item_t* intitem = s_hal_watchdog_theinternals.items[HAL_watchdog2index(watchdog)];
     hal_result_t res = hal_res_NOK_generic;
 
     if(hal_false == s_hal_watchdog_supported_is(watchdog))
@@ -148,7 +157,7 @@ extern hal_result_t hal_watchdog_init(hal_watchdog_t watchdog, const hal_watchdo
     // if it does not have ram yet, then attempt to allocate it.
     if(NULL == intitem)
     {
-        intitem = s_hal_watchdog_internals[HAL_watchdog2index(watchdog)] = hal_heap_new(sizeof(hal_watchdog_internals_t));
+        intitem = s_hal_watchdog_theinternals.items[HAL_watchdog2index(watchdog)] = hal_heap_new(sizeof(hal_watchdog_internal_item_t));
         // minimal initialisation of the internal item
         // nothing to init.      
     }      
@@ -207,7 +216,7 @@ extern hal_result_t hal_watchdog_init(hal_watchdog_t watchdog, const hal_watchdo
 
 extern hal_result_t hal_watchdog_start(hal_watchdog_t watchdog)
 {
-    hal_watchdog_internals_t* intitem = s_hal_watchdog_internals[HAL_watchdog2index(watchdog)];
+    hal_watchdog_internal_item_t* intitem = s_hal_watchdog_theinternals.items[HAL_watchdog2index(watchdog)];
     hal_result_t res = hal_res_NOK_generic;
 
     if(hal_false == s_hal_watchdog_initted_is(watchdog))
@@ -244,7 +253,7 @@ extern hal_result_t hal_watchdog_start(hal_watchdog_t watchdog)
 
 extern hal_result_t hal_watchdog_refresh(hal_watchdog_t watchdog)
 {
-    hal_watchdog_internals_t* intitem = s_hal_watchdog_internals[HAL_watchdog2index(watchdog)];
+    hal_watchdog_internal_item_t* intitem = s_hal_watchdog_theinternals.items[HAL_watchdog2index(watchdog)];
     hal_result_t res = hal_res_NOK_generic;
 
     if(hal_false == s_hal_watchdog_initted_is(watchdog))
@@ -288,7 +297,7 @@ extern hal_result_t hal_watchdog_refresh(hal_watchdog_t watchdog)
 
 void WWDG_IRQHandler(void)
 {
-    hal_watchdog_internals_t* intitem = s_hal_watchdog_internals[HAL_watchdog2index(hal_watchdog_window)];
+    hal_watchdog_internal_item_t* intitem = s_hal_watchdog_theinternals.items[HAL_watchdog2index(hal_watchdog_window)];
 
     // Clear EWI flag 
     WWDG_ClearFlag();
@@ -304,8 +313,7 @@ void WWDG_IRQHandler(void)
 
 extern hal_result_t hal_watchdog_hid_static_memory_init(void)
 {
-    memset(s_hal_watchdog_internals, 0, sizeof(s_hal_watchdog_internals));
-    s_hal_watchdog_initted = 0;
+    memset(&s_hal_watchdog_theinternals, 0, sizeof(s_hal_watchdog_theinternals));
     return(hal_res_OK);  
 }
 
@@ -320,17 +328,17 @@ static hal_boolval_t s_hal_watchdog_supported_is(hal_watchdog_t watchdog)
 
 static void s_hal_watchdog_initted_set(hal_watchdog_t watchdog)
 {
-    hal_utility_bits_byte_bitset(&s_hal_watchdog_initted, HAL_watchdog2index(watchdog));
+    hal_utility_bits_byte_bitset(&s_hal_watchdog_theinternals.initted, HAL_watchdog2index(watchdog));
 }
 
 static hal_boolval_t s_hal_watchdog_initted_is(hal_watchdog_t watchdog)
 {
-    return(hal_utility_bits_byte_bitcheck(s_hal_watchdog_initted, HAL_watchdog2index(watchdog)));
+    return(hal_utility_bits_byte_bitcheck(s_hal_watchdog_theinternals.initted, HAL_watchdog2index(watchdog)));
 }
 
 
 
-static void s_hal_watchdog_normal_start(hal_watchdog_internals_t *intitem)
+static void s_hal_watchdog_normal_start(hal_watchdog_internal_item_t *intitem)
 {
   /* IWDG timeout equal to xxx ms (the timeout may varies due to LSI frequency
      dispersion) */
@@ -352,10 +360,10 @@ static void s_hal_watchdog_normal_start(hal_watchdog_internals_t *intitem)
 }
 
 
-static void s_hal_watchdog_window_start(hal_watchdog_internals_t *intitem)
+static void s_hal_watchdog_window_start(hal_watchdog_internal_item_t *intitem)
 {
 //    NVIC_InitTypeDef NVIC_InitStructure;
-    // do something using s_hal_watchdog_internals[0].countdown etc.
+    // do something using s_hal_watchdog_theinternals.items[0].countdown etc.
 
     // acemor on 21oct11: taken from STM32F10x_StdPeriph_Lib_V3.2.0\Project\STM32F10x_StdPeriph_Examples\WWDG
 

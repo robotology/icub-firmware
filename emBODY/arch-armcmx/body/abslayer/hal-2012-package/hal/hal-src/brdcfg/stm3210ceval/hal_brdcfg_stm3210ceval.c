@@ -261,16 +261,16 @@
 #ifdef  HAL_USE_I2C
     extern const hal_i2c_hid_brdcfg_t hal_brdcfg_i2c__theconfig =
     {
-        .supported_mask         = (0 << hal_i2c_port1),
+        .supported_mask         = (1 << hal_i2c_port1),
         .gpio_scl               =
         {
-            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portB,    .pin = hal_gpio_pin6,    .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
             { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
             { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default } 
         },
         .gpio_sda               =
         {
-            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portB,    .pin = hal_gpio_pin7,    .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
             { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
             { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default }         
         }
@@ -651,6 +651,13 @@
          }
     };           
 #endif//HAL_USE_DEVICE_TERMOMETER
+
+
+// -- chips
+// none
+
+// -- extbrds
+// none
     
 
 

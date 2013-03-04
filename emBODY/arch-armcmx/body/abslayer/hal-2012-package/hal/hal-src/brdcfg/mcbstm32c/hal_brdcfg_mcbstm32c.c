@@ -655,6 +655,12 @@
          }
     };           
 #endif//HAL_USE_DEVICE_TERMOMETER
+
+// -- chips
+// none
+
+// -- extbrds
+// none
     
 
 

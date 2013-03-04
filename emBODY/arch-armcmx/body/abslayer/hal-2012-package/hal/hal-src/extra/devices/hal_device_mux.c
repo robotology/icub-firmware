@@ -37,7 +37,7 @@
 #include "hal_gpio.h"
 #include "hal_brdcfg.h"
 #include "hal_utility_bits.h" 
-
+#include "hal_heap.h" 
 
 
  

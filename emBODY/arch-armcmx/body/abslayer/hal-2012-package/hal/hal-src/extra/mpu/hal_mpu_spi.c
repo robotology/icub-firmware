@@ -110,7 +110,14 @@ typedef struct
     uint8_t             frameburstcountdown;
     hal_bool_t          forcestop;
     hal_bool_t          dmaisenabled;
-} hal_spi_internals_t;
+} hal_spi_internal_item_t;
+
+
+typedef struct
+{
+    uint8_t                     initted;
+    hal_spi_internal_item_t*    items[hal_spi_ports_number];   
+} hal_spi_theinternals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -215,41 +222,12 @@ static const uint32_t s_hal_spi_timeout_flag = 0x00010000;
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-// hal_boolval_t s_hal_spi_initted[hal_spi_ports_number] = { hal_false, hal_false, hal_false };
-static uint8_t s_hal_spi_initted = 0;
+static hal_spi_theinternals_t s_hal_spi_theinternals =
+{
+    .initted            = 0,
+    .items              = { NULL }   
+};
 
-static hal_spi_internals_t* s_hal_spi_internals[hal_spi_ports_number] = { NULL };
-
-// static hal_spi_internals_t s_hal_spi_internals[hal_spi_ports_number] = 
-// { 
-//     {
-//         .config     =
-//         {   // same values as in hal_spi_cfg_default
-//             .ownership                  = hal_spi_ownership_master,
-//             .direction                  = hal_spi_dir_rxonly,
-//             .activity                   = hal_spi_act_framebased,      
-//             .prescaler                  = hal_spi_prescaler_128,    // it is 562500 on stm32f1 @ 72mhz fast bus, and 656250 on stm32f4 @ 84mhz fast bus
-//             .speed                      = hal_spi_speed_dontuse,           
-//             .sizeofframe                = 4,
-//             .capacityoftxfifoofframes   = 0,
-//             .capacityofrxfifoofframes   = 2,
-//             .dummytxvalue               = 0x00,
-//             .onframetransm              = NULL,
-//             .argonframetransm           = NULL,
-//             .onframereceiv              = NULL,
-//             .argonframereceiv           = NULL        
-//         },
-//         .dummytxframe           = NULL,
-//         .dmatxframe             = NULL,
-//         .dmarxframe             = NULL,
-//         .fifotx                 = {0},
-//         .fiforx                 = {0},
-//         .port                   = hal_spi_port1,
-//         .frameburstcountdown    = 0,
-//         .forcestop              = hal_false,
-//         .dmaisenabled           = hal_false     
-//     }
-// };
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -264,7 +242,7 @@ extern hal_result_t hal_spi_init(const hal_spi_port_t port, const hal_spi_cfg_t 
 
 extern hal_result_t hal_spi_raw_master_writeread(hal_spi_port_t port, uint8_t byte, uint8_t* readbyte)
 {
-    hal_spi_internals_t* intitem = s_hal_spi_internals[HAL_spi_port2index(port)];
+    hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_port2index(port)];
     hal_spi_cfg_t* cfg = NULL;
     volatile uint32_t timeout = 0;
     SPI_TypeDef* SPIx = HAL_spi_port2stmSPI(port);
@@ -368,7 +346,7 @@ extern hal_result_t hal_spi_get(hal_spi_port_t port, uint8_t* rxframe, uint8_t* 
    
 extern hal_result_t hal_spi_start(hal_spi_port_t port, uint8_t lengthofburst)
 {
-    hal_spi_internals_t* intitem = s_hal_spi_internals[HAL_spi_port2index(port)];
+    hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_port2index(port)];
     
     if(hal_false == hal_spi_hid_initted_is(port))
     {
@@ -457,7 +435,7 @@ extern hal_result_t hal_spi_stop(hal_spi_port_t port)
 
 extern hal_result_t hal_spi_on_framereceiv_set(hal_spi_port_t port, hal_callback_t onframereceiv, void* arg)
 {
-    hal_spi_internals_t* intitem = s_hal_spi_internals[HAL_spi_port2index(port)]; 
+    hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_port2index(port)]; 
     
     if(hal_false == hal_spi_hid_initted_is(port))
     {
@@ -475,7 +453,7 @@ extern hal_result_t hal_spi_on_framereceiv_set(hal_spi_port_t port, hal_callback
 
 extern hal_result_t hal_spi_on_frametransm_set(hal_spi_port_t port, hal_callback_t onframetransm, void* arg)
 {
-    hal_spi_internals_t* intitem = s_hal_spi_internals[HAL_spi_port2index(port)]; 
+    hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_port2index(port)]; 
     
     if(hal_false == hal_spi_hid_initted_is(port))
     {
@@ -501,10 +479,8 @@ extern hal_result_t hal_spi_on_frametransm_set(hal_spi_port_t port, hal_callback
 // ---- isr of the module: end ------
 
 extern hal_result_t hal_spi_hid_static_memory_init(void)
-{
-    //memset(&s_hal_spi_initted, hal_false, sizeof(s_hal_spi_initted));  
-    s_hal_spi_initted = 0;   
-    memset(&s_hal_spi_internals, 0, sizeof(s_hal_spi_internals));
+{ 
+    memset(&s_hal_spi_theinternals, 0, sizeof(s_hal_spi_theinternals));
 
     return(hal_res_OK);
 }
@@ -530,33 +506,31 @@ static hal_boolval_t s_hal_spi_supported_is(hal_spi_port_t port)
 
 static void s_hal_spi_initted_set(hal_spi_port_t port)
 {
-    //s_hal_spi_initted[HAL_spi_port2index(port)] = hal_true;
-    hal_utility_bits_byte_bitset(&s_hal_spi_initted, HAL_spi_port2index(port));
+    hal_utility_bits_byte_bitset(&s_hal_spi_theinternals.initted, HAL_spi_port2index(port));
 }
 
 
 static hal_boolval_t s_hal_spi_initted_is(hal_spi_port_t port)
 {   
-    //return(s_hal_spi_initted[HAL_spi_port2index(port)]);
-    return(hal_utility_bits_byte_bitcheck(s_hal_spi_initted, HAL_spi_port2index(port)));
+    return(hal_utility_bits_byte_bitcheck(s_hal_spi_theinternals.initted, HAL_spi_port2index(port)));
 }
 
 
 static void s_hal_spi_set_dma_enabled(hal_spi_port_t port, hal_bool_t value)
 {
-    s_hal_spi_internals[HAL_spi_port2index(port)]->dmaisenabled = value;
+    s_hal_spi_theinternals.items[HAL_spi_port2index(port)]->dmaisenabled = value;
 }
 
 
 static hal_bool_t s_hal_spi_is_dma_enabled(hal_spi_port_t port)
 {
-    return(s_hal_spi_internals[HAL_spi_port2index(port)]->dmaisenabled);
+    return(s_hal_spi_theinternals.items[HAL_spi_port2index(port)]->dmaisenabled);
 }
 
 
 static hal_result_t s_hal_spi_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg)
 {
-    hal_spi_internals_t* intitem = s_hal_spi_internals[HAL_spi_port2index(port)];
+    hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_port2index(port)];
     hal_spi_cfg_t *usedcfg = NULL;
     uint8_t* tmpbuffer = NULL;
     
@@ -618,7 +592,7 @@ static hal_result_t s_hal_spi_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg
     // if it does not have ram yet, then attempt to allocate it.
     if(NULL == intitem)
     {
-        intitem = s_hal_spi_internals[HAL_spi_port2index(port)] = hal_heap_new(sizeof(hal_spi_internals_t));
+        intitem = s_hal_spi_theinternals.items[HAL_spi_port2index(port)] = hal_heap_new(sizeof(hal_spi_internal_item_t));
         // minimal initialisation of the internal item
         // nothing to init.      
     }      
@@ -1163,7 +1137,7 @@ static void s_hal_spi_scheduling_restart(void)
 static hal_result_t s_hal_spi_put(hal_spi_port_t port, uint8_t* txframe)
 {
     hal_result_t res = hal_res_NOK_generic;
-    hal_spi_internals_t* intitem = s_hal_spi_internals[HAL_spi_port2index(port)];
+    hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_port2index(port)];
     hal_spi_cfg_t* cfg = &intitem->config;
     
     
@@ -1202,7 +1176,7 @@ static hal_result_t s_hal_spi_put(hal_spi_port_t port, uint8_t* txframe)
 static hal_result_t s_hal_spi_get(hal_spi_port_t port, uint8_t* rxframe, uint8_t* remainingrxframes)
 {
     hal_result_t res = hal_res_NOK_generic;
-    hal_spi_internals_t* intitem = s_hal_spi_internals[HAL_spi_port2index(port)];
+    hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_port2index(port)];
     hal_spi_cfg_t* cfg = &intitem->config;
     
     
@@ -1280,7 +1254,7 @@ static void s_hal_spi_periph_dma_disable(hal_spi_port_t port)
 
 static void s_hal_spi_dma_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg)
 {
-    hal_spi_internals_t* intitem = s_hal_spi_internals[HAL_spi_port2index(port)];
+    hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_port2index(port)];
     
     hal_dma_cfg_t s_hal_spi_dma_cfg =
     {
@@ -1317,7 +1291,7 @@ static void s_hal_spi_dma_init(hal_spi_port_t port, const hal_spi_cfg_t *cfg)
 
 static void s_hal_spi_dma_on_tranfer_done_rx(void* p)
 {
-    hal_spi_internals_t* intitem = (hal_spi_internals_t*)p;
+    hal_spi_internal_item_t* intitem = (hal_spi_internal_item_t*)p;
     
     // 1. copy the rx frame into fifo  
     
@@ -1399,7 +1373,7 @@ static void s_hal_spi_dma_on_tranfer_done_rx(void* p)
 
 static void s_hal_spi_dma_on_tranfer_done_tx(void* p)
 {
-    hal_spi_internals_t* intitem = (hal_spi_internals_t*)p;
+    hal_spi_internal_item_t* intitem = (hal_spi_internal_item_t*)p;
     
     hal_dma_dontdisable(s_hal_spi_dma_port2use_tx[HAL_spi_port2index(intitem->port)]);
        

@@ -109,17 +109,21 @@
     #include "hal_device_cantransceiver_hid.h" 
 #endif//HAL_USE_DEVICE_CANTRANSCEIVER
 
+#ifdef  HAL_USE_DEVICE_DISPLAY
+    #include "hal_device_display_hid.h" 
+#endif//HAL_USE_DEVICE_DISPLAY
+
 #ifdef  HAL_USE_DEVICE_EEPROM
     #include "hal_device_eeprom_hid.h" 
 #endif//HAL_USE_DEVICE_EEPROM
 
+#ifdef HAL_USE_DEVICE_ENCODER
+    #include "hal_device_encoder_hid.h"
+#endif//HAL_USE_DEVICE_ENCODER
+
 #ifdef  HAL_USE_DEVICE_ETHTRANSCEIVER
     #include "hal_device_ethtransceiver_hid.h" 
 #endif//HAL_USE_DEVICE_ETHTRANSCEIVER
-
-#ifdef  HAL_USE_DEVICE_DISPLAY
-    #include "hal_device_display_hid.h"
-#endif//HAL_USE_DEVICE_DISPLAY
 
 #ifdef  HAL_USE_DEVICE_GYROSCOPE
     #include "hal_device_gyroscope_hid.h"

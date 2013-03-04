@@ -37,6 +37,7 @@
 #include "hal_gpio.h"
 #include "hal_brdcfg.h"
 #include "hal_utility_bits.h" 
+#include "hal_heap.h"
 
 
 
@@ -252,7 +253,7 @@ extern hal_result_t hal_encoder_read(hal_encoder_t encoder, hal_encoder_position
 extern hal_result_t hal_device_encoder_hid_static_memory_init(void)
 {
     s_hal_device_encoder_initted = 0;
-    memset(&hal_encoder_internals_t, 0, sizeof(hal_encoder_internals_t));
+    memset(&s_hal_device_encoder_internals, 0, sizeof(hal_encoder_internals_t));
     return(hal_res_OK);  
 }
 

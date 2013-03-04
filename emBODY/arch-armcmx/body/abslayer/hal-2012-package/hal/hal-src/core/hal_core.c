@@ -79,7 +79,7 @@ typedef struct
 {
     hal_core_status_t   status; 
     hal_core_cfg_t      config;
-} hal_core_internals_t;
+} hal_core_theinternals_t;
 
 
 
@@ -102,7 +102,7 @@ static void s_hal_core_modules_in_brdcfg_static_memory_init(void);
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static hal_core_internals_t s_hal_core_internals =
+static hal_core_theinternals_t s_hal_core_theinternals =
 {
     .status     = hal_core_status_zero,
     .config     = { 0 }
@@ -123,7 +123,7 @@ extern hal_result_t hal_core_init(const hal_core_cfg_t *cfg)
         return(hal_res_NOK_generic);
     }
     
-    if(hal_core_status_zero != s_hal_core_internals.status)
+    if(hal_core_status_zero != s_hal_core_theinternals.status)
     {
         hal_base_on_fatalerror(hal_fatalerror_generic, "hal_core_init() already called");
         return(hal_res_NOK_generic);    
@@ -132,7 +132,7 @@ extern hal_result_t hal_core_init(const hal_core_cfg_t *cfg)
     
     // sets used config. it may be used to retrieve params for hal_cpu_init() and hal_sys_init()
     
-    memcpy(&s_hal_core_internals.config, cfg, sizeof(hal_core_cfg_t));    
+    memcpy(&s_hal_core_theinternals.config, cfg, sizeof(hal_core_cfg_t));    
     
      
     // call something which prepares memory in core modules
@@ -153,7 +153,7 @@ extern hal_result_t hal_core_init(const hal_core_cfg_t *cfg)
     
    
     // sets initialisation done
-    s_hal_core_internals.status = hal_core_status_initialised;
+    s_hal_core_theinternals.status = hal_core_status_initialised;
     
     return(hal_res_OK);
 }
@@ -162,7 +162,7 @@ extern hal_result_t hal_core_init(const hal_core_cfg_t *cfg)
 extern hal_result_t hal_core_start(void)
 {
 
-    if(hal_core_status_initialised != s_hal_core_internals.status)
+    if(hal_core_status_initialised != s_hal_core_theinternals.status)
     {
         hal_base_on_fatalerror(hal_fatalerror_generic, "hal_core_init() not called yet or hal_core_start() already called");
         return(hal_res_NOK_generic);    
@@ -171,7 +171,7 @@ extern hal_result_t hal_core_start(void)
     // call system init
     hal_sys_hid_systeminit();
             
-    s_hal_core_internals.status = hal_core_status_started;
+    s_hal_core_theinternals.status = hal_core_status_started;
     
     return(hal_res_OK);
 }
@@ -179,13 +179,13 @@ extern hal_result_t hal_core_start(void)
 
 extern hal_core_status_t hal_core_status_get(void)
 {
-    return(s_hal_core_internals.status); 
+    return(s_hal_core_theinternals.status); 
 }
 
 
 const hal_core_cfg_t* hal_core_cfg_get(void)
 {
-    return(&s_hal_core_internals.config);
+    return(&s_hal_core_theinternals.config);
 }
 
 
@@ -210,7 +210,7 @@ const hal_core_cfg_t* hal_core_cfg_get(void)
 //
 // extern hal_bool_t hal_core_hid_initted_is(void)
 // {
-//     return( (hal_core_status_initialised == s_hal_core_internals.status) ? hal_true : hal_false );    
+//     return( (hal_core_status_initialised == s_hal_core_theinternals.status) ? hal_true : hal_false );    
 // }
 
 

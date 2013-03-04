@@ -109,17 +109,21 @@
     #include "hal_device_cantransceiver_hid.h" 
 #endif//HAL_USE_DEVICE_CANTRANSCEIVER
 
+#ifdef  HAL_USE_DEVICE_DISPLAY
+    #include "hal_device_display_hid.h" 
+#endif//HAL_USE_DEVICE_DISPLAY
+
 #ifdef  HAL_USE_DEVICE_EEPROM
     #include "hal_device_eeprom_hid.h" 
 #endif//HAL_USE_DEVICE_EEPROM
 
+#ifdef HAL_USE_DEVICE_ENCODER
+    #include "hal_device_encoder_hid.h"
+#endif//HAL_USE_DEVICE_ENCODER
+
 #ifdef  HAL_USE_DEVICE_ETHTRANSCEIVER
     #include "hal_device_ethtransceiver_hid.h" 
 #endif//HAL_USE_DEVICE_ETHTRANSCEIVER
-
-#ifdef  HAL_USE_DEVICE_DISPLAY
-    #include "hal_device_display_hid.h"
-#endif//HAL_USE_DEVICE_DISPLAY
 
 #ifdef  HAL_USE_DEVICE_GYROSCOPE
     #include "hal_device_gyroscope_hid.h"
@@ -234,9 +238,9 @@
     extern const hal_device_eeprom_hid_brdcfg_t hal_brdcfg_device_eeprom__theconfig;   
 #endif//HAL_USE_DEVICE_EEPROM 
 
-#ifdef  HAL_USE_SENSOR_ENCODER
+#ifdef  HAL_USE_DEVICE_ENCODER
     extern const hal_sensor_encoder_hid_brdcfg_t hal_brdcfg_sensor_encoder__theconfig;
-#endif//HAL_USE_SENSOR_ENCODER
+#endif//HAL_USE_DEVICE_ENCODER
 
 #ifdef  HAL_USE_DEVICE_ETHTRANSCEIVER
     extern const hal_device_ethtransceiver_hid_brdcfg_t hal_brdcfg_device_ethtransceiver__theconfig;

@@ -210,7 +210,7 @@ static void s_hal_device_termometer_initted_set(hal_termometer_port_t port)
 
 static hal_boolval_t s_hal_device_termometer_initted_is(hal_termometer_port_t port)
 {
-    return(hal_utility_bits_byte_bitcheck(s_hal_device_termometer_initted, [HAL_device_termometer_port2index(port)));
+    return(hal_utility_bits_byte_bitcheck(s_hal_device_termometer_initted, HAL_device_termometer_port2index(port)));
     //return(s_hal_device_termometer_initted[HAL_device_termometer_port2index(port)]);
 }
 

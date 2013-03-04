@@ -105,12 +105,18 @@ const uint32_t hal_crc_poly_crc32 = 0x04C11DB7;
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+
 typedef struct
 {
     hal_crc_cfg_t       config;
     uint32_t            initialvalue;
-} hal_crc_internals_t;
+} hal_crc_internal_item_t;
 
+typedef struct
+{
+    uint8_t                     initted;
+    hal_crc_internal_item_t*    items[hal_crcs_number];   
+} hal_crc_theinternals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -120,11 +126,11 @@ static hal_boolval_t s_hal_crc_supported_is(hal_crc_t crc);
 static void s_hal_crc_initted_set(hal_crc_t crc);
 static hal_boolval_t s_hal_crc_initted_is(hal_crc_t crc);
 
-static hal_result_t s_hal_crc_hw_init(hal_crc_internals_t *intitem);
-static uint32_t s_hal_crc32_hw_compute(hal_crc_internals_t *intitem, const void *data, uint32_t size);
-static uint32_t s_hal_crc32_sw_compute(hal_crc_internals_t *intitem, const void *data, uint32_t size);
-static uint32_t s_hal_crc16_sw_compute(hal_crc_internals_t *intitem, const void *data, uint32_t size);
-static uint32_t s_hal_crc07_sw_compute(hal_crc_internals_t *intitem, const void *data, uint32_t size);
+static hal_result_t s_hal_crc_hw_init(hal_crc_internal_item_t *intitem);
+static uint32_t s_hal_crc32_hw_compute(hal_crc_internal_item_t *intitem, const void *data, uint32_t size);
+static uint32_t s_hal_crc32_sw_compute(hal_crc_internal_item_t *intitem, const void *data, uint32_t size);
+static uint32_t s_hal_crc16_sw_compute(hal_crc_internal_item_t *intitem, const void *data, uint32_t size);
+static uint32_t s_hal_crc07_sw_compute(hal_crc_internal_item_t *intitem, const void *data, uint32_t size);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -136,9 +142,11 @@ static uint32_t s_hal_crc07_sw_compute(hal_crc_internals_t *intitem, const void 
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static uint8_t s_hal_crc_initted = 0;
-
-static hal_crc_internals_t* s_hal_crc_internals[hal_crcs_num] = { NULL };
+static hal_crc_theinternals_t s_hal_crc_theinternals =
+{
+    .initted            = 0,
+    .items              = { NULL }   
+};
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -149,7 +157,8 @@ static hal_crc_internals_t* s_hal_crc_internals[hal_crcs_num] = { NULL };
 extern hal_result_t hal_crc_init(hal_crc_t crc, const hal_crc_cfg_t *cfg)
 {
     hal_result_t res = hal_res_NOK_generic; // dont remove ...
-    hal_crc_internals_t *intitem = s_hal_crc_internals[HAL_crc2index(crc)];
+    //hal_crc_internals_t *intitem = s_hal_crc_internals[HAL_crc2index(crc)];
+    hal_crc_internal_item_t* intitem = s_hal_crc_theinternals.items[HAL_crc2index(crc)];
 
     if(hal_false == s_hal_crc_supported_is(crc))
     {
@@ -165,7 +174,7 @@ extern hal_result_t hal_crc_init(hal_crc_t crc, const hal_crc_cfg_t *cfg)
     // if it does not have ram yet, then attempt to allocate it.
     if(NULL == intitem)
     {
-        intitem = s_hal_crc_internals[HAL_crc2index(crc)] = hal_heap_new(sizeof(hal_crc_internals_t));
+        intitem = s_hal_crc_theinternals.items[HAL_crc2index(crc)] = hal_heap_new(sizeof(hal_crc_internal_item_t));
         // minimal initialisation of the internal item
         // nothing to init.      
     }        
@@ -253,7 +262,8 @@ extern hal_result_t hal_crc_init(hal_crc_t crc, const hal_crc_cfg_t *cfg)
 
 extern hal_result_t hal_crc_compute(hal_crc_t crc, hal_crc_compute_mode_t mode, const void *data, uint32_t size, uint32_t *out)
 {
-    hal_crc_internals_t *intitem = s_hal_crc_internals[HAL_crc2index(crc)];
+    //hal_crc_internals_t *intitem = s_hal_crc_internals[HAL_crc2index(crc)];
+    hal_crc_internal_item_t* intitem = s_hal_crc_theinternals.items[HAL_crc2index(crc)];
  
     if((NULL == data) || (NULL == out) || (0 == size))
     {
@@ -313,8 +323,7 @@ extern hal_result_t hal_crc_compute(hal_crc_t crc, hal_crc_compute_mode_t mode, 
 
 extern hal_result_t hal_crc_hid_static_memory_init(void)
 {
-    memset(s_hal_crc_internals, 0, sizeof(s_hal_crc_internals));
-    s_hal_crc_initted = 0;
+    memset(&s_hal_crc_theinternals, 0, sizeof(s_hal_crc_theinternals));
     return(hal_res_OK);  
 }
 
@@ -329,16 +338,16 @@ static hal_boolval_t s_hal_crc_supported_is(hal_crc_t crc)
 
 static void s_hal_crc_initted_set(hal_crc_t crc)
 {
-    hal_utility_bits_byte_bitset(&s_hal_crc_initted, HAL_crc2index(crc));
+    hal_utility_bits_byte_bitset(&s_hal_crc_theinternals.initted, HAL_crc2index(crc));
 }
 
 static hal_boolval_t s_hal_crc_initted_is(hal_crc_t crc)
 {
-    return(hal_utility_bits_byte_bitcheck(s_hal_crc_initted, HAL_crc2index(crc)));
+    return(hal_utility_bits_byte_bitcheck(s_hal_crc_theinternals.initted, HAL_crc2index(crc)));
 }
 
 
-static hal_result_t s_hal_crc_hw_init(hal_crc_internals_t *intitem)
+static hal_result_t s_hal_crc_hw_init(hal_crc_internal_item_t *intitem)
 {
     intitem->initialvalue = 0xffffffff;
 
@@ -354,7 +363,7 @@ static hal_result_t s_hal_crc_hw_init(hal_crc_internals_t *intitem)
 }
 
 
-static uint32_t s_hal_crc32_hw_compute(hal_crc_internals_t *intitem, const void *data, uint32_t size)
+static uint32_t s_hal_crc32_hw_compute(hal_crc_internal_item_t *intitem, const void *data, uint32_t size)
 {
     uint8_t tailsize = 0;
 
@@ -378,7 +387,7 @@ static uint32_t s_hal_crc32_hw_compute(hal_crc_internals_t *intitem, const void 
     return(intitem->initialvalue);
 }
 
-static uint32_t s_hal_crc32_sw_compute(hal_crc_internals_t *intitem, const void *data, uint32_t size)
+static uint32_t s_hal_crc32_sw_compute(hal_crc_internal_item_t *intitem, const void *data, uint32_t size)
 {
 #if defined(HAL_USE_UTILITY_CRC32)
      
@@ -404,7 +413,7 @@ static uint32_t s_hal_crc32_sw_compute(hal_crc_internals_t *intitem, const void 
 }
 
 
-static uint32_t s_hal_crc16_sw_compute(hal_crc_internals_t *intitem, const void *data, uint32_t size)
+static uint32_t s_hal_crc16_sw_compute(hal_crc_internal_item_t *intitem, const void *data, uint32_t size)
 {
 #if defined(HAL_USE_UTILITY_CRC16)
     
@@ -430,7 +439,7 @@ static uint32_t s_hal_crc16_sw_compute(hal_crc_internals_t *intitem, const void 
 }
 
 
-static uint32_t s_hal_crc07_sw_compute(hal_crc_internals_t *intitem, const void *data, uint32_t size)
+static uint32_t s_hal_crc07_sw_compute(hal_crc_internal_item_t *intitem, const void *data, uint32_t size)
 {
 #if defined(HAL_USE_UTILITY_CRC07)
     

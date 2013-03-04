@@ -83,13 +83,19 @@ const hal_i2c_cfg_t hal_i2c_cfg_default =
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
 
 typedef struct
 {
     hal_bool_t          locked;
     hal_i2c_devaddr_t   devaddr;   
-} hal_i2c_internals_t;
+} hal_i2c_internal_item_t;
+
+typedef struct
+{
+    uint8_t                     initted;
+    hal_i2c_internal_item_t*    items[hal_i2c_ports_number];   
+} hal_i2c_theinternals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -167,9 +173,14 @@ static const uint32_t s_hal_i2c_hw_rcc[] = { RCC_APB1Periph_I2C1, RCC_APB1Periph
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static uint8_t s_hal_i2c_initted = 0;
-//static hal_i2c_internals_t s_hal_i2c_internals[hal_i2c_ports_number] = { {.locked = hal_false, .devaddr = 0 }, {.locked = hal_false, .devaddr = 0 }, {.locked = hal_false, .devaddr = 0 } };
-static hal_i2c_internals_t* s_hal_i2c_internals[hal_i2c_ports_number] = { NULL };
+static hal_i2c_theinternals_t s_hal_i2c_theinternals =
+{
+    .initted            = 0,
+    .items              = { NULL }   
+};
+
+// static uint8_t s_hal_i2c_initted = 0;
+// static hal_i2c_internal_item_t* s_hal_i2c_internals[hal_i2c_ports_number] = { NULL };
 
     
 // --------------------------------------------------------------------------------------------------------------------
@@ -505,10 +516,7 @@ extern hal_result_t hal_i2c_standby(hal_i2c_port_t port, hal_i2c_devaddr_t devad
 
 extern hal_result_t hal_i2c_hid_static_memory_init(void)
 {
-    //memset(&s_hal_i2c_initted, hal_false, sizeof(s_hal_i2c_initted));   
-    s_hal_i2c_initted = 0;
-    memset(&s_hal_i2c_internals, 0, sizeof(s_hal_i2c_internals));
-
+    memset(&s_hal_i2c_theinternals, 0, sizeof(s_hal_i2c_theinternals));
     return(hal_res_OK);
 }
 
@@ -526,37 +534,38 @@ static hal_boolval_t s_hal_i2c_supported_is(hal_i2c_port_t port)
 
 static void s_hal_i2c_initted_set(hal_i2c_port_t port)
 {
-    hal_utility_bits_byte_bitset(&s_hal_i2c_initted, HAL_i2c_port2index(port));
+    hal_utility_bits_byte_bitset(&s_hal_i2c_theinternals.initted, HAL_i2c_port2index(port));
 }
 
 static hal_boolval_t s_hal_i2c_initted_is(hal_i2c_port_t port)
 {
-    return(hal_utility_bits_byte_bitcheck(s_hal_i2c_initted, HAL_i2c_port2index(port)));
+    return(hal_utility_bits_byte_bitcheck(s_hal_i2c_theinternals.initted, HAL_i2c_port2index(port)));
 }
 
 static void s_hal_i2c_status_set(hal_i2c_port_t port, hal_bool_t locked, hal_i2c_devaddr_t devaddr)
 {
 //    s_hal_i2c_scheduling_suspend();
-    s_hal_i2c_internals[HAL_i2c_port2index(port)]->locked   = locked;
-    s_hal_i2c_internals[HAL_i2c_port2index(port)]->devaddr  = devaddr;
+    s_hal_i2c_theinternals.items[HAL_i2c_port2index(port)]->locked   = locked;
+    s_hal_i2c_theinternals.items[HAL_i2c_port2index(port)]->devaddr  = devaddr;
 //    s_hal_i2c_scheduling_restart();
 }
 
 static hal_bool_t s_hal_i2c_is_status_locked(hal_i2c_port_t port)
 {
-    return(s_hal_i2c_internals[HAL_i2c_port2index(port)]->locked);
+    return(s_hal_i2c_theinternals.items[HAL_i2c_port2index(port)]->locked);
 }
 
 static hal_i2c_devaddr_t s_hal_i2c_status_devaddr_get(hal_i2c_port_t port)
 {
-    return(s_hal_i2c_internals[HAL_i2c_port2index(port)]->devaddr);
+    return(s_hal_i2c_theinternals.items[HAL_i2c_port2index(port)]->devaddr);
 }
 
 
 
 static hal_result_t s_hal_i2c_init(hal_i2c_port_t port, const hal_i2c_cfg_t *cfg)
 {
-    hal_i2c_internals_t *intitem = s_hal_i2c_internals[HAL_i2c_port2index(port)];
+    //hal_i2c_internal_item_t *intitem = s_hal_i2c_internals[HAL_i2c_port2index(port)];
+    hal_i2c_internal_item_t* intitem = s_hal_i2c_theinternals.items[HAL_i2c_port2index(port)];
     
     if(NULL == cfg)
     {
@@ -581,7 +590,7 @@ static hal_result_t s_hal_i2c_init(hal_i2c_port_t port, const hal_i2c_cfg_t *cfg
    // if it does not have ram yet, then attempt to allocate it.
     if(NULL == intitem)
     {
-        intitem = s_hal_i2c_internals[HAL_i2c_port2index(port)] = hal_heap_new(sizeof(hal_i2c_internals_t));
+        intitem = s_hal_i2c_theinternals.items[HAL_i2c_port2index(port)] = hal_heap_new(sizeof(hal_i2c_internal_item_t));
         // minimal initialisation of the internal item
         s_hal_i2c_status_set(port, hal_false, 0);      
     }           

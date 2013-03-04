@@ -147,7 +147,7 @@ typedef struct
 typedef struct
 {
     uint8_t                     initted;
-    hal_can_internal_item_t*    items[hal_can_ports_num];   
+    hal_can_internal_item_t*    items[hal_can_ports_number];   
 } hal_can_theinternals_t;
 
 

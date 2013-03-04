@@ -62,7 +62,7 @@
 #undef     HAL_USE_ETH
 #define     HAL_USE_FLASH
 #define     HAL_USE_GPIO
-#undef     HAL_USE_I2C
+#define     HAL_USE_I2C
 #define     HAL_USE_SPI
 #define     HAL_USE_TIMER
 #define     HAL_USE_TRACE
@@ -73,7 +73,7 @@
 #undef  HAL_USE_DEVICE_ACCELEROMETER
 #undef     HAL_USE_DEVICE_CANTRANSCEIVER
 #undef  HAL_USE_DEVICE_DISPLAY  
-#undef     HAL_USE_DEVICE_EEPROM
+#define     HAL_USE_DEVICE_EEPROM
 #undef  HAL_USE_DEVICE_ENCODER
 #undef     HAL_USE_DEVICE_ETHTRANSCEIVER
 #undef  HAL_USE_DEVICE_GYROSCOPE
@@ -88,7 +88,7 @@
 #undef  HAL_USE_CHIP_ST_L3G4200D
 #undef  HAL_USE_CHIP_ST_LIS3DH
 #undef  HAL_USE_CHIP_MICREL_KS8893
-#undef     HAL_USE_CHIP_XX_EEPROM
+#define    HAL_USE_CHIP_XX_EEPROM
 
 // -- external boards: define what you need to use
 #undef     HAL_USE_EXTBRD_KEIL_MCBQVGA

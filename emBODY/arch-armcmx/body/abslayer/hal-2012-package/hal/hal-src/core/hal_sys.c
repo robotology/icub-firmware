@@ -85,7 +85,7 @@ typedef struct
                                             hal_sys_criticalsection_take() and keep the critical section until the
                                             same number of calls to hal_sys_criticalsection_release() is done. */ 
     hal_void_fp_void_t  fn_SYSTICK_handler;  
-} hal_sys_internals_t;
+} hal_sys_theinternals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -110,7 +110,7 @@ typedef struct
 // same number of calls to hal_sys_criticalsection_release() is done. 
 
 
-static hal_sys_internals_t s_hal_sys_internals =
+static hal_sys_theinternals_t s_hal_sys_theinternals =
 {
     .config                 = { 0 },
     .cs_takes               = 0,
@@ -133,11 +133,11 @@ extern hal_result_t hal_sys_init(const hal_sys_cfg_t* cfg)
     // nothing really to be done
     
     
-    memcpy(&s_hal_sys_internals.config, cfg, sizeof(hal_sys_cfg_t));
+    memcpy(&s_hal_sys_theinternals.config, cfg, sizeof(hal_sys_cfg_t));
     
     // acemor: added to remove dependencies from NZI data
-    s_hal_sys_internals.cs_takes            = 0;
-    s_hal_sys_internals.fn_SYSTICK_handler  = NULL;
+    s_hal_sys_theinternals.cs_takes            = 0;
+    s_hal_sys_theinternals.fn_SYSTICK_handler  = NULL;
     
     return(hal_res_OK);   
 }
@@ -270,7 +270,7 @@ extern hal_result_t hal_sys_systick_sethandler(void (*systickhandler)(void), hal
         return(hal_res_NOK_generic);
     }
 
-    s_hal_sys_internals.fn_SYSTICK_handler = systickhandler;
+    s_hal_sys_theinternals.fn_SYSTICK_handler = systickhandler;
 
     // setup the clock for cortex-m3 as in the cmsis example 
     r = SysTick_Config(SystemCoreClock / tickinsec);
@@ -285,7 +285,7 @@ extern hal_result_t hal_sys_systick_sethandler(void (*systickhandler)(void), hal
 
 extern hal_void_fp_void_t hal_sys_systick_gethandler(void)
 {
-    return(s_hal_sys_internals.fn_SYSTICK_handler);
+    return(s_hal_sys_theinternals.fn_SYSTICK_handler);
 }
 
 
@@ -340,14 +340,14 @@ extern hal_interrupt_priority_t hal_sys_irqn_priority_get(hal_irqn_t irqn)
 extern hal_result_t hal_sys_criticalsection_take(void *p, hal_time_t tout) 
 {
 
-    if(0 == s_hal_sys_internals.cs_takes)
+    if(0 == s_hal_sys_theinternals.cs_takes)
     {
         hal_sys_irq_disable();
     }
 
-    if(s_hal_sys_internals.cs_takes < 255) 
+    if(s_hal_sys_theinternals.cs_takes < 255) 
     {
-        s_hal_sys_internals.cs_takes ++;    
+        s_hal_sys_theinternals.cs_takes ++;    
     }
 
     return(hal_res_OK);
@@ -356,12 +356,12 @@ extern hal_result_t hal_sys_criticalsection_take(void *p, hal_time_t tout)
 
 extern hal_result_t hal_sys_criticalsection_release(void *p) 
 {
-    if(s_hal_sys_internals.cs_takes > 0) 
+    if(s_hal_sys_theinternals.cs_takes > 0) 
     {
-        s_hal_sys_internals.cs_takes --;
+        s_hal_sys_theinternals.cs_takes --;
     }
 
-    if(0 == s_hal_sys_internals.cs_takes) 
+    if(0 == s_hal_sys_theinternals.cs_takes) 
     {
         hal_sys_irq_enable();    
     }
@@ -402,8 +402,8 @@ extern void hal_sys_atomic_bitwiseAND(volatile uint32_t *value, uint32_t mask)
 extern hal_result_t hal_sys_hid_static_memory_init(void)
 {
     // removed dependency from nzi data
-    s_hal_sys_internals.cs_takes            = 0;
-    s_hal_sys_internals.fn_SYSTICK_handler  = NULL;
+    s_hal_sys_theinternals.cs_takes            = 0;
+    s_hal_sys_theinternals.fn_SYSTICK_handler  = NULL;
 
     return(hal_res_OK);  
 }

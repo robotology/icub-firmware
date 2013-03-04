@@ -92,7 +92,11 @@ const hal_uniqueid_cfg_t hal_uniqueid_cfg_default =
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+typedef struct
+{
+    uint8_t         nothing;     
+} hal_uiniqueid_theinternals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -109,8 +113,11 @@ static hal_boolval_t s_hal_uniqueid_supported_is(hal_uniqueid_hid_id_t uniqueid)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
+// static hal_uiniqueid_theinternals_t s_hal_uniqueid_theinternals =
+// {
+//     .nothing = 0
+// };
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions

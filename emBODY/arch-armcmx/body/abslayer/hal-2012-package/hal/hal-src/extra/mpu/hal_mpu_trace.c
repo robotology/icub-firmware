@@ -74,6 +74,10 @@ const hal_trace_cfg_t hal_trace_cfg_default =
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+typedef struct
+{
+    uint8_t         nothing;     
+} hal_trace_theinternals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -91,8 +95,11 @@ const hal_trace_cfg_t hal_trace_cfg_default =
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
+// static hal_trace_theinternals_t s_hal_trace_theinternals =
+// {
+//     .nothing = 0
+// };
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
