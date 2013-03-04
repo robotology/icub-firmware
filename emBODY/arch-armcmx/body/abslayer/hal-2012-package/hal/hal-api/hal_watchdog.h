@@ -62,7 +62,7 @@ typedef enum
                                      it forces a reset of the system */
 } hal_watchdog_t;
 
-enum { hal_watchdogs_num = 2 };
+enum { hal_watchdogs_number = 2 };
 
 
 

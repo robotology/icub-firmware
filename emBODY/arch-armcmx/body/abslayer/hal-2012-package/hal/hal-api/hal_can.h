@@ -96,7 +96,7 @@ typedef enum
     hal_can_port2 = 1           /**< CAN2        */
 } hal_can_port_t; 
 
-enum { hal_can_ports_num = 2 };
+enum { hal_can_ports_number = 2 };
 
 
 /** @typedef    typedef enum hal_can_send_mode_t;

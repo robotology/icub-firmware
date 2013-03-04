@@ -60,7 +60,7 @@ typedef enum
     hal_crc1 = 1
 } hal_crc_t;
 
-enum { hal_crcs_num = 2 };
+enum { hal_crcs_number = 2 };
 
 
 /** @typedef    typedef enum hal_crc_order_t 
