@@ -39,7 +39,7 @@
 byte	_board_ID = 16;	
 char    _additional_info [32];
 UInt8    mainLoopOVF=0;
-byte    _build_number = 61;
+byte    _build_number = 62;
 byte    _my_can_protocol_major = 1;
 byte    _my_can_protocol_minor = 1;
 bool    _can_protocol_ack = false;
@@ -691,6 +691,37 @@ led0_off
 			}
 		}	
 #endif		
+
+/***********************************************************************
+// Check Current is made here
+/***********************************************************************/
+
+		for (i=0; i<JN; i++) 
+		{
+			if ((get_current(i)>=25000) || (get_current(i)<=-25000))
+			{
+				_control_mode[i] = MODE_IDLE;	
+				_pad_enabled[i] = false;
+				highcurrent[i]=true;
+				PWM_outputPadDisable(i);
+#ifdef DEBUG_CAN_MSG
+				can_printf("j%d curr %f",i,get_current(i));
+#endif
+			}
+			check_current(i, (_pid[i] > 0));		
+			compute_i2t(i);
+			if (_filt_current[i] > MAX_I2T_CURRENT)
+			{
+				_control_mode[i] = MODE_IDLE;	
+				_pad_enabled[i] = false;
+				highcurrent[i]=true;
+				PWM_outputPadDisable(i);
+#ifdef DEBUG_CAN_MSG
+				can_printf("j%d filtcurr %f",i,_filt_current[i]);
+#endif	
+			}			
+		}
+
 //	Check for the MAIN LOOP duration
  
 			
