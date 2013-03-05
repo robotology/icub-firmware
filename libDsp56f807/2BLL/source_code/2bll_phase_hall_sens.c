@@ -108,7 +108,7 @@ void Init_Hall_Effect_1(void)
 
 
 //*********************************************************
-#pragma interrupt saveall
+#pragma interrupt 
 void Interrupt_Phase_X0(void)
 {	
 	UInt8 tmp,val,deb;
@@ -147,7 +147,7 @@ void Interrupt_Phase_X0(void)
 	clrRegBits(TMRA0_SCR, TMRA0_SCR_IEF_MASK);
 
 }
-#pragma interrupt saveall
+#pragma interrupt 
 void Interrupt_Phase_Y0(void)
 {
 	UInt8 tmp,val,deb;
@@ -189,7 +189,7 @@ void Interrupt_Phase_Y0(void)
 	clrRegBits(TMRA1_SCR, TMRA1_SCR_IEF_MASK);
 
 }
-#pragma interrupt saveall
+#pragma interrupt 
 void Interrupt_Phase_Z0(void)
 {
 	UInt8 tmp,val,deb;
@@ -232,7 +232,7 @@ void Interrupt_Phase_Z0(void)
 }
 
 //*********************************************************
-#pragma interrupt saveall
+#pragma interrupt 
 void Interrupt_Phase_X1(void)
 {
 	UInt8 tmp,val,deb;
@@ -271,7 +271,7 @@ void Interrupt_Phase_X1(void)
 #endif	
 	clrRegBits(TMRB0_SCR, TMRB0_SCR_IEF_MASK);
 }
-#pragma interrupt saveall
+#pragma interrupt 
 void Interrupt_Phase_Y1(void)
 {
 	UInt8 tmp,val,deb;
@@ -311,7 +311,7 @@ void Interrupt_Phase_Y1(void)
 	clrRegBits(TMRB1_SCR, TMRB1_SCR_IEF_MASK);
 
 }
-#pragma interrupt saveall
+#pragma interrupt 
 void Interrupt_Phase_Z1(void)
 {
 	UInt8 tmp,val,deb;

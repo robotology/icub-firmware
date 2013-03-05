@@ -90,6 +90,7 @@ static inline dword Idr2Id (dword idr)
  * gets the IDR from the CAN registers.
  * @return the IDR in a dword.
  */
+#pragma interrupt called 
 static inline dword GetRxBufferIdr (void)
 {
 	dword Idr;
@@ -585,13 +586,11 @@ void CAN1_interruptTx (void)
 /**
  * the RX isr routine.
  */
-#pragma interrupt saveall
+#pragma interrupt 
 void CAN1_interruptRx (void)
 {
 	canmsg_t *p;
-	byte i;
-
-//	setReg (CAN_RFLG, CAN_RFLG_RXF_MASK);   // Reset the reception complete flag 
+	byte i; 
 	
 	CAN_DI;
 	
@@ -613,23 +612,26 @@ void CAN1_interruptRx (void)
 */	
 
 	//WARNING: extended frame ID has been removed for speed optimization
-	p->CAN_frameType   = DATA_FRAME;
-	p->CAN_frameFormat = STANDARD_FORMAT;
+
 	p->CAN_messID      = GetRxBufferIdr()>>21; 
 	p->CAN_length      = ((getReg(CAN_RB_DLR) & 0xF)<=8 ? (getReg(CAN_RB_DLR) & 0xF) : 8);
 	for (i = 0; i < p->CAN_length; i++) p->CAN_data[i] = *((byte *)CAN_RB_DSR0 + i);
 	
+	setRegBits(CAN_RFLG, CAN_RFLG_RXF_MASK);   // Reset the reception complete flag 
+	
+	p->CAN_frameType   = DATA_FRAME;
+	p->CAN_frameFormat = STANDARD_FORMAT;
+	
 	if (read_p == -1) read_p = write_p;
 
-	setReg (CAN_RFLG, CAN_RFLG_RXF_MASK);   // Reset the reception complete flag 
 	CAN_EI;
 
-}
+} 
 
 /**
  * the error ISR.
  */
-#pragma interrupt saveall
+#pragma interrupt 
 void CAN1_interruptError (void)
 {
 	CAN_DI;
@@ -662,7 +664,7 @@ void CAN1_interruptError (void)
 /**
  * the wakeup ISR.
  */
-#pragma interrupt saveall
+#pragma interrupt 
 void CAN1_interruptWakeup (void)
 {
 	CAN_DI;
