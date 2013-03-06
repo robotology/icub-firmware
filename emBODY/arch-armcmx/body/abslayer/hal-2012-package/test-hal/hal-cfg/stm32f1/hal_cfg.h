@@ -30,20 +30,10 @@
 
 
 // <h> BASE module 
-// <i> It contains stack and heap size and some externally functions
+// <i> It contains ... nothing so far
 
-//   <o> stack size         <0x0-0xFFFFFFFF:8>
-//   <i> define how much stack you want.
-#ifndef HAL_BASE_CFG_STACKSIZE
- #define HAL_BASE_CFG_STACKSIZE      0x00002000
-#endif
-
-//   <o> heap size         <0x0-0xFFFFFFFF:8>
-//   <i> define how much heap you want.
-#ifndef HAL_BASE_CFG_HEAPSIZE
- #define HAL_BASE_CFG_HEAPSIZE      0x00008000
-#endif
-
+// <h> nothing so far 
+// </h>nothing so far
 
 // </h>BASE module
 
@@ -56,12 +46,28 @@
 // </h>CPU module
 
 
-
-// <h> SYS module 
+// <h> FLASH module 
 // <i> It contains ... nothing so far
 
 // <h> nothing so far 
 // </h>nothing so far
+
+// </h>FLASH module
+
+// <h> SYS module 
+// <i> It contains stack and heap size and some externally functions
+
+//   <o> stack size         <0x0-0xFFFFFFFF:8>
+//   <i> define how much stack you want.
+#ifndef HAL_SYS_CFG_STACKSIZE
+ #define HAL_SYS_CFG_STACKSIZE      0x00002000
+#endif
+
+//   <o> heap size         <0x0-0xFFFFFFFF:8>
+//   <i> define how much heap you want.
+#ifndef HAL_SYS_CFG_HEAPSIZE
+ #define HAL_SYS_CFG_HEAPSIZE      0x00008000
+#endif
 
 // </h>SYS module
 

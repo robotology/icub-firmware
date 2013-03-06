@@ -45,8 +45,6 @@ extern const hal_core_cfg_t hal_core_cfg =
 {   
     .basecfg    =
     {
-        .stacksize              = HAL_BASE_CFG_STACKSIZE,
-        .heapsize               = HAL_BASE_CFG_HEAPSIZE,
         .extfn                  =
         {
             .usr_on_fatal_error                 = s_hal_cfg_on_fatalerror,
@@ -56,11 +54,16 @@ extern const hal_core_cfg_t hal_core_cfg =
     },
     .cpucfg     =
     {
-        .nothingsofar           = 0
+        .dummy                  = 0
+    },
+    .flashcfg   =
+    {
+        .dummy                  = 0
     },
     .syscfg     =
     {
-        .nothingsofar           = 0
+        .stacksize              = HAL_SYS_CFG_STACKSIZE,
+        .heapsize               = HAL_SYS_CFG_HEAPSIZE,
     }        
 };
 
