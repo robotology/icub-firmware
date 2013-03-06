@@ -59,7 +59,7 @@
  **/
 typedef struct
 {
-    hal_i2c_port_t      i2cport;
+    hal_i2c_t           i2cport;
     hal_gpio_cfg_t      resetpin;
     hal_res_fp_void_t   extclockinit;
 } hal_chip_micrel_ks8893_cfg_t;
