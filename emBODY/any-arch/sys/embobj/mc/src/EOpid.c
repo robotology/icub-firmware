@@ -145,6 +145,7 @@ extern void eo_pid_Reset(EOpid *o)
     o->pwm = 0;
 }
 
+/*
 extern int32_t eo_pid_PWM(EOpid *o, float En)
 {
     if (!o) return 0;
@@ -161,6 +162,22 @@ extern int32_t eo_pid_PWM(EOpid *o, float En)
     LIMIT(o->KKiIn, o->Imax);
     
     o->pwm = o->pwm_offset + (int32_t)(Xn + o->K*Dn + o->KKiIn);
+    
+    LIMIT(o->pwm, o->pwm_max);
+
+    return o->pwm;
+}
+*/
+
+extern int32_t eo_pid_PWM(EOpid *o, float En)
+{
+    if (!o) return 0;
+    
+    o->En = En;
+
+    float Xn = o->K*o->En;
+    
+    o->pwm = o->pwm_offset + (int32_t)Xn;
     
     LIMIT(o->pwm, o->pwm_max);
 

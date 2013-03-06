@@ -86,7 +86,7 @@ extern EOaxisController* eo_axisController_New(int32_t ticks_per_rev)
     if (o)
     {
         o->pidP = eo_pid_New();    
-        o->pidT = NULL;
+        o->pidT = eo_pid_New();
         
         o->trajectory = eo_trajectory_New(ticks_per_rev);
         
@@ -198,9 +198,14 @@ extern void eo_axisController_SetVelTimeout(EOaxisController *o, int32_t vel_tim
     o->vel_timeout = vel_timeout;
 }
 
-extern void eo_axisController_SetStiffness(EOaxisController *o, int32_t stiffness)
+extern void eo_axisController_SetImpedance(EOaxisController *o, int32_t stiffness, int32_t damping, int32_t offset)
 {
-    if (o) o->stiffness = stiffness;
+    if (o)
+    {
+        o->stiffness  = stiffness;
+        o->damping    = damping;
+        o->torque_off = offset;
+    }
 }                 
 
 extern void eo_axisController_SetEncPos(EOaxisController *o, int32_t pos)
@@ -240,7 +245,6 @@ extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_
     case eomc_controlmode_velocity:
         o->control_mode = eomc_controlmode_position;
     case eomc_controlmode_position:
-    //case eomc_controlmode_calib:
         eo_trajectory_SetPosReference(o->trajectory, pos, avg_vel);
         break;
         
@@ -263,7 +267,6 @@ extern void eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_
     case eomc_controlmode_idle: 
     case eomc_controlmode_torque: 
     case eomc_controlmode_openloop:
-    //case eomc_controlmode_calib:
         return;
          
     case eomc_controlmode_position:
@@ -440,7 +443,14 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
                 eo_pid_Reset(o->pidT); // position limit reached
             }
        
-            o->err = pos_ref - pos;
+            if (o->control_mode == eomc_controlmode_impedance_pos)
+            {
+                o->err = pos_ref - pos;
+            }
+            else
+            {
+                o->err = vel_ref - vel;
+            }
             
             o->torque_ref = o->stiffness * o->err; 
             
@@ -513,20 +523,16 @@ extern eObool_t eo_axisController_GetMotionDone(EOaxisController *o)
     switch (o->control_mode)
     {
         case eomc_controlmode_idle:
+        case eomc_controlmode_torque:
         case eomc_controlmode_openloop:
             return eobool_false;
-
-        case eomc_controlmode_velocity_pos:
+        
         case eomc_controlmode_position:
         case eomc_controlmode_velocity:
-        //case eomc_controlmode_calib:
-            return eo_trajectory_IsDone(o->trajectory);
-       
-        case eomc_controlmode_torque:
+        case eomc_controlmode_velocity_pos:
         case eomc_controlmode_impedance_pos:
         case eomc_controlmode_impedance_vel:
-        #warning (ALE) to be implemented
-            return eobool_false;
+            return eo_trajectory_IsDone(o->trajectory);
     }
     
     return eobool_false;
@@ -548,32 +554,49 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint
     {
         case eomc_controlmode_idle:
             pidStatus->reference = 0;
+            break;
+
+        case eomc_controlmode_openloop:
+            pidStatus->reference = o->openloop_out;
+            break;
+
+        case eomc_controlmode_velocity:
+        case eomc_controlmode_impedance_vel:
+            pidStatus->reference = eo_trajectory_GetVel(o->trajectory);
+            break;
+
+        case eomc_controlmode_position:
+        case eomc_controlmode_velocity_pos:
+        case eomc_controlmode_impedance_pos:
+            pidStatus->reference = eo_trajectory_GetPos(o->trajectory);
+            break;
+
+        case eomc_controlmode_torque:
+            pidStatus->reference = o->torque_ref;
+            break;
+    }
+    
+    switch (o->control_mode)
+    {
+        case eomc_controlmode_idle:
             pidStatus->output    = 0;
             pidStatus->error     = 0;
             break;
 
         case eomc_controlmode_openloop:
-            pidStatus->reference = o->openloop_out;
             pidStatus->output    = o->openloop_out;
             pidStatus->error     = 0;
             break;
 
         case eomc_controlmode_velocity:
-            pidStatus->reference = eo_trajectory_GetVel(o->trajectory);
-            eo_pid_GetStatus(o->pidP, &(pidStatus->output), &(pidStatus->error));
-            break;
-
-        case eomc_controlmode_velocity_pos:
         case eomc_controlmode_position:
-        //case eomc_controlmode_calib:
-            pidStatus->reference = eo_trajectory_GetPos(o->trajectory);
+        case eomc_controlmode_velocity_pos:
             eo_pid_GetStatus(o->pidP, &(pidStatus->output), &(pidStatus->error));
             break;
 
         case eomc_controlmode_torque:
-            #warning (ALE) to be implemented
-            pidStatus->reference = 0;
-
+        case eomc_controlmode_impedance_pos:
+        case eomc_controlmode_impedance_vel:
             eo_pid_GetStatus(o->pidT, &(pidStatus->output), &(pidStatus->error));
             break;
     }
