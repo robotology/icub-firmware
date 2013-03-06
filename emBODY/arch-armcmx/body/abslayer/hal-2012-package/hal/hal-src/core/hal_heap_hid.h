@@ -41,7 +41,11 @@
 // empty-section
 
 // - definition of hidden structs -------------------------------------------------------------------------------------
-// empty-section
+
+typedef struct
+{
+    uint8_t         nothingsofar;
+} hal_heap_hid_brdcfg_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 // empty-section
@@ -49,9 +53,7 @@
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-//extern uint32_t hal_heap_hid_getsize(const hal_base_cfg_t *cfg);
-
-extern hal_result_t hal_heap_hid_setmem(const hal_base_cfg_t *cfg, uint32_t *memory);
+extern hal_result_t hal_heap_hid_static_memory_init(void);
 
 
 // - definition of extern hidden inline functions ---------------------------------------------------------------------

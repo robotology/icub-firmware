@@ -66,8 +66,8 @@ typedef enum
  **/
 typedef struct
 {
-    hal_i2c_port_t                  i2cport;
-    hal_chip_st_lis3dh_range_t    range;
+    hal_i2c_t                       i2cport;
+    hal_chip_st_lis3dh_range_t      range;
 } hal_chip_st_lis3dh_cfg_t;
 
  

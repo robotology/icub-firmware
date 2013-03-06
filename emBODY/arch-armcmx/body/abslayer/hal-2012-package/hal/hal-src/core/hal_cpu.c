@@ -63,7 +63,7 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-const hal_cpu_cfg_t hal_cpu_cfg_default = { .nothingsofar = 0 };
+const hal_cpu_cfg_t hal_cpu_cfg_default = { .dummy = 0 };
 
 
 

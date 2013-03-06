@@ -52,7 +52,7 @@ typedef struct
     uint8_t                 supported_mask;
     hal_gpio_val_t          value_on;
     hal_gpio_val_t          value_off;
-    hal_gpio_cfg_t          gpiocfg[hal_leds_num];
+    hal_gpio_map_t          gpiomaps[hal_leds_number];
 } hal_device_led_hid_brdcfg_t;
 
 

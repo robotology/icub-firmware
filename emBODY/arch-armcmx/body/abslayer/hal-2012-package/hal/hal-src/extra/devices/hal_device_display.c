@@ -40,6 +40,8 @@
 #include "hal_base_hid.h" 
 
 #include "hal_brdcfg.h"
+
+#include "hal_heap.h"
  
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -59,7 +61,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_device_display_dev2index(t)              ((uint8_t)((t)))
+#define HAL_device_display_id2index(t)              ((uint8_t)((t)))
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -87,18 +89,24 @@ extern const hal_display_cfg_t hal_display_cfg_default =
 
 typedef struct
 {
-    hal_display_cfg_t           cfg;
-} hal_device_display_internals_t;
+    hal_display_cfg_t           config;
+} hal_device_display_internal_item_t;
+
+typedef struct
+{
+    uint8_t                                 initted;
+    hal_device_display_internal_item_t*     items[hal_displays_number];   
+} hal_device_display_theinternals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_device_display_supported_is(hal_display_dev_t dev);
-static void s_hal_device_display_initted_set(hal_display_dev_t dev);
-static hal_boolval_t s_hal_device_display_initted_is(hal_display_dev_t dev);
+static hal_boolval_t s_hal_device_display_supported_is(hal_display_t id);
+static void s_hal_device_display_initted_set(hal_display_t id);
+static hal_boolval_t s_hal_device_display_initted_is(hal_display_t id);
 
-static hal_result_t s_hal_device_display_hw_init(hal_display_dev_t dev, const hal_display_cfg_t *cfg);
+static hal_result_t s_hal_device_display_hw_init(hal_display_t id, const hal_display_cfg_t *cfg);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -124,12 +132,15 @@ static const uint16_t s_hal_device_display_colormap[hal_display_colors_number] =
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-//static hal_boolval_t s_hal_device_display_initted[hal_display_devs_number] = { hal_false };
 
-static uint8_t s_hal_device_display_initted = 0;
-static hal_device_display_internals_t* s_hal_device_display_internals[hal_display_devs_number] = { NULL };
+static hal_device_display_theinternals_t s_hal_device_display_theinternals =
+{
+    .initted            = 0,
+    .items              = { NULL }   
+};
 
-//static hal_device_display_internals_t s_hal_device_display_internals[hal_display_devs_number] = { {.cfg = {.res = hal_display_res_320x240x24, .font = {hal_display_font_size_16x24, hal_display_color_black, hal_display_color_white}}} };
+//static uint8_t s_hal_device_display_initted = 0;
+//static hal_device_display_internal_item_t* s_hal_device_display_internals[hal_displays_number] = { NULL };
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -137,10 +148,10 @@ static hal_device_display_internals_t* s_hal_device_display_internals[hal_displa
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern hal_result_t hal_display_init(hal_display_dev_t dev, const hal_display_cfg_t *cfg)
+extern hal_result_t hal_display_init(hal_display_t id, const hal_display_cfg_t *cfg)
 {
-    hal_display_internals_t *intitem = s_hal_device_display_internals[HAL_device_display_dev2index(dev)];
-    if(hal_true != s_hal_device_display_supported_is(dev))
+    hal_device_display_internal_item_t *intitem = s_hal_device_display_theinternals.items[HAL_device_display_id2index(id)];
+    if(hal_true != s_hal_device_display_supported_is(id))
     {
         return(hal_res_NOK_unsupported);
     }
@@ -153,7 +164,7 @@ extern hal_result_t hal_display_init(hal_display_dev_t dev, const hal_display_cf
     // if it does not have ram yet, then attempt to allocate it.
     if(NULL == intitem)
     {
-        intitem = s_hal_device_display_internals[HAL_device_display_dev2index(dev)] = hal_heap_new(sizeof(hal_display_internals_t));
+        intitem = s_hal_device_display_theinternals.items[HAL_device_display_id2index(id)] = hal_heap_new(sizeof(hal_device_display_internal_item_t));
         // minimal initialisation of the internal item
         // nothing to init.      
     } 
@@ -162,103 +173,103 @@ extern hal_result_t hal_display_init(hal_display_dev_t dev, const hal_display_cf
     // e.g., in mcbstm32c a given 320x240 display is used together with spi. the init function and pointers to 
     // other functions must be taken from hal_brdcfg_mcbstm32c.[c, h]
 
-    if(hal_res_OK != s_hal_device_display_hw_init(dev, cfg)) // contains GLCD_Init()
+    if(hal_res_OK != s_hal_device_display_hw_init(id, cfg)) // contains GLCD_Init()
     {
         return(hal_res_NOK_generic);
     }
     
-    memcpy(&intitem->cfg, cfg, sizeof(hal_display_cfg_t));
+    memcpy(&intitem->config, cfg, sizeof(hal_display_cfg_t));
     
-    s_hal_device_display_initted_set(dev);
+    s_hal_device_display_initted_set(id);
     
-    hal_display_clearscreen(dev);    
-    hal_display_setfont(dev, cfg->font);
+    hal_display_clearscreen(id);    
+    hal_display_setfont(id, cfg->font);
     
     return(hal_res_OK);
 }
 
-extern hal_result_t hal_display_clearscreen(hal_display_dev_t dev)
+extern hal_result_t hal_display_clearscreen(hal_display_t id)
 {
-    hal_display_internals_t *intitem = s_hal_device_display_internals[HAL_device_display_dev2index(dev)];
+    hal_device_display_internal_item_t *intitem = s_hal_device_display_theinternals.items[HAL_device_display_id2index(id)];
     
-    if(hal_true != s_hal_device_display_initted_is(dev))
+    if(hal_true != s_hal_device_display_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
    
-    if(NULL == hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_dev2index(dev)].chipif.clear)
+    if(NULL == hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_id2index(id)].chipif.clear)
     {
         return(hal_res_NOK_generic);
     }
     
-    hal_display_cfg_t *cfg = &intitem->cfg;
+    hal_display_cfg_t *cfg = &intitem->config;
     
-    return(hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_dev2index(dev)].chipif.clear(s_hal_device_display_colormap[cfg->screencolor]));    
+    return(hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_id2index(id)].chipif.clear(s_hal_device_display_colormap[cfg->screencolor]));    
 }
 
-extern hal_result_t hal_display_setfont(hal_display_dev_t dev, hal_display_font_t font)
+extern hal_result_t hal_display_setfont(hal_display_t id, hal_display_font_t font)
 {
-    hal_display_internals_t *intitem = s_hal_device_display_internals[HAL_device_display_dev2index(dev)];
+    hal_device_display_internal_item_t *intitem = s_hal_device_display_theinternals.items[HAL_device_display_id2index(id)];
     
-    if(hal_true != s_hal_device_display_initted_is(dev))
+    if(hal_true != s_hal_device_display_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
     
     
-    if(NULL == hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_dev2index(dev)].chipif.settextproperties)
+    if(NULL == hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_id2index(id)].chipif.settextproperties)
     {
         return(hal_res_NOK_generic);
     }
     
-    memcpy(&intitem->cfg.font, &font, sizeof(hal_display_font_t));
+    memcpy(&intitem->config.font, &font, sizeof(hal_display_font_t));
     
-    return(hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_dev2index(dev)].chipif.settextproperties(font.textsize, s_hal_device_display_colormap[font.backcolor], s_hal_device_display_colormap[font.textcolor]));        
+    return(hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_id2index(id)].chipif.settextproperties(font.textsize, s_hal_device_display_colormap[font.backcolor], s_hal_device_display_colormap[font.textcolor]));        
 }
 
 
-extern hal_result_t hal_display_clearline(hal_display_dev_t dev, uint16_t line)
+extern hal_result_t hal_display_clearline(hal_display_t id, uint16_t line)
 {
-    if(hal_true != s_hal_device_display_initted_is(dev))
+    if(hal_true != s_hal_device_display_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
 
-    if(NULL == hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_dev2index(dev)].chipif.clearline)
+    if(NULL == hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_id2index(id)].chipif.clearline)
     {
         return(hal_res_NOK_generic);
     }
-    return(hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_dev2index(dev)].chipif.clearline(line));
+    return(hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_id2index(id)].chipif.clearline(line));
 }
 
-extern hal_result_t hal_display_putchar(hal_display_dev_t dev, uint16_t line, uint16_t column, char chr)
+extern hal_result_t hal_display_putchar(hal_display_t id, uint16_t line, uint16_t column, char chr)
 {
-    if(hal_true != s_hal_device_display_initted_is(dev))
+    if(hal_true != s_hal_device_display_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
 
     
-    if(NULL == hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_dev2index(dev)].chipif.putchar)
+    if(NULL == hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_id2index(id)].chipif.putchar)
     {
         return(hal_res_NOK_generic);
     }
-    return(hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_dev2index(dev)].chipif.putchar(line, column, chr));
+    return(hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_id2index(id)].chipif.putchar(line, column, chr));
 }
 
-extern hal_result_t hal_display_putstring(hal_display_dev_t dev, uint16_t line, uint16_t column, char* str)
+extern hal_result_t hal_display_putstring(hal_display_t id, uint16_t line, uint16_t column, char* str)
 {
-    if(hal_true != s_hal_device_display_initted_is(dev))
+    if(hal_true != s_hal_device_display_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
 
 
-    if(NULL == hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_dev2index(dev)].chipif.putstring)
+    if(NULL == hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_id2index(id)].chipif.putstring)
     {
         return(hal_res_NOK_generic);
     }
-    return(hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_dev2index(dev)].chipif.putstring(line, column, str));
+    return(hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_id2index(id)].chipif.putstring(line, column, str));
 }
 
 
@@ -276,10 +287,7 @@ extern hal_result_t hal_display_putstring(hal_display_dev_t dev, uint16_t line, 
 
 extern hal_result_t hal_device_display_hid_static_memory_init(void)
 {
-    // removed dependancy from NZI ram
-    s_hal_device_display_initted = 0;
-    memset(s_hal_device_display_internals, 0, sizeof(s_hal_device_display_internals));
-
+    memset(&s_hal_device_display_theinternals, 0, sizeof(s_hal_device_display_theinternals));
     return(hal_res_OK);  
 }
 
@@ -288,28 +296,26 @@ extern hal_result_t hal_device_display_hid_static_memory_init(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_device_display_supported_is(hal_display_dev_t dev)
+static hal_boolval_t s_hal_device_display_supported_is(hal_display_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_display__theconfig.supported_mask, HAL_device_display_dev2index(dev)) );
+    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_display__theconfig.supported_mask, HAL_device_display_id2index(id)) );
 }
 
-static void s_hal_device_display_initted_set(hal_display_dev_t dev)
+static void s_hal_device_display_initted_set(hal_display_t id)
 {
-    //s_hal_device_display_initted[HAL_device_display_dev2index(dev)] = hal_true;
-    hal_utility_bits_byte_bitset(&s_hal_device_display_initted, HAL_device_display_dev2index(dev));
+    hal_utility_bits_byte_bitset(&s_hal_device_display_theinternals.initted, HAL_device_display_id2index(id));
 }
 
-static hal_boolval_t s_hal_device_display_initted_is(hal_display_dev_t dev)
+static hal_boolval_t s_hal_device_display_initted_is(hal_display_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(s_hal_device_display_initted, HAL_device_display_dev2index(dev)));
-    //return(s_hal_device_display_initted[HAL_device_display_dev2index(dev)]);
+    return(hal_utility_bits_byte_bitcheck(s_hal_device_display_theinternals.initted, HAL_device_display_id2index(id)));
 }
 
-static hal_result_t s_hal_device_display_hw_init(hal_display_dev_t dev, const hal_display_cfg_t *cfg)
+static hal_result_t s_hal_device_display_hw_init(hal_display_t id, const hal_display_cfg_t *cfg)
 {
-    if((NULL != hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_dev2index(dev)].chipif.init))
+    if((NULL != hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_id2index(id)].chipif.init))
     {
-        return(hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_dev2index(dev)].chipif.init(hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_dev2index(dev)].chipif.initpar));
+        return(hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_id2index(id)].chipif.init(hal_brdcfg_device_display__theconfig.devcfg[HAL_device_display_id2index(id)].chipif.initpar));
     }
     else
     {

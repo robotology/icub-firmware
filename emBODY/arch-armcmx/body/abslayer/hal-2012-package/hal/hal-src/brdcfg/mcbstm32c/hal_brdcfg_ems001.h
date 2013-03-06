@@ -46,8 +46,7 @@
 #include "hal_sys.h"
 #include "hal_sys_hid.h"
 
-#include "hal_flash_hid.h"
-#include "hal_heap_hid.h"
+
 
 
 // -- mpu peripherals
@@ -67,6 +66,10 @@
 #ifdef HAL_USE_ETH
     #include "hal_mpu_eth_hid.h"
 #endif//HAL_USE_ETH
+
+#ifdef HAL_USE_FLASH
+    #include "hal_mpu_flash_hid.h"
+#endif//HAL_USE_FLASH
 
 #ifdef HAL_USE_GPIO
     #include "hal_mpu_gpio_hid.h"
@@ -106,21 +109,17 @@
     #include "hal_device_cantransceiver_hid.h" 
 #endif//HAL_USE_DEVICE_CANTRANSCEIVER
 
-#ifdef  HAL_USE_DEVICE_DISPLAY
-    #include "hal_device_display_hid.h" 
-#endif//HAL_USE_DEVICE_DISPLAY
-
 #ifdef  HAL_USE_DEVICE_EEPROM
     #include "hal_device_eeprom_hid.h" 
 #endif//HAL_USE_DEVICE_EEPROM
 
-#ifdef HAL_USE_DEVICE_ENCODER
-    #include "hal_device_encoder_hid.h"
-#endif//HAL_USE_DEVICE_ENCODER
-
 #ifdef  HAL_USE_DEVICE_ETHTRANSCEIVER
     #include "hal_device_ethtransceiver_hid.h" 
 #endif//HAL_USE_DEVICE_ETHTRANSCEIVER
+
+#ifdef  HAL_USE_DEVICE_DISPLAY
+    #include "hal_device_display_hid.h"
+#endif//HAL_USE_DEVICE_DISPLAY
 
 #ifdef  HAL_USE_DEVICE_GYROSCOPE
     #include "hal_device_gyroscope_hid.h"
@@ -161,14 +160,6 @@
     extern const hal_cpu_hid_brdcfg_t hal_brdcfg_cpu__theconfig;
 #endif//HAL_USE_CPU
 
-#ifdef  HAL_USE_FLASH
-    extern const hal_flash_hid_brdcfg_t hal_brdcfg_flash__theconfig;
-#endif//HAL_USE_FLASH
- 
-#ifdef  HAL_USE_HEAP
-    extern const hal_heap_hid_brdcfg_t hal_brdcfg_heap__theconfig;
-#endif//HAL_USE_HEAP      
-
 #ifdef  HAL_USE_SYS
     extern const hal_sys_hid_brdcfg_t hal_brdcfg_sys__theconfig;
 #endif//HAL_USE_SYS 
@@ -192,6 +183,9 @@
     extern const hal_eth_hid_brdcfg_t hal_brdcfg_eth__theconfig;
 #endif//HAL_USE_ETH
 
+#ifdef  HAL_USE_FLASH
+    extern const hal_flash_hid_brdcfg_t hal_brdcfg_flash__theconfig;
+#endif//HAL_USE_FLASH
 
 #ifdef  HAL_USE_GPIO
     extern const hal_gpio_hid_brdcfg_t hal_brdcfg_gpio__theconfig;
@@ -240,9 +234,9 @@
     extern const hal_device_eeprom_hid_brdcfg_t hal_brdcfg_device_eeprom__theconfig;   
 #endif//HAL_USE_DEVICE_EEPROM 
 
-#ifdef  HAL_USE_DEVICE_ENCODER
+#ifdef  HAL_USE_SENSOR_ENCODER
     extern const hal_sensor_encoder_hid_brdcfg_t hal_brdcfg_sensor_encoder__theconfig;
-#endif//HAL_USE_DEVICE_ENCODER
+#endif//HAL_USE_SENSOR_ENCODER
 
 #ifdef  HAL_USE_DEVICE_ETHTRANSCEIVER
     extern const hal_device_ethtransceiver_hid_brdcfg_t hal_brdcfg_device_ethtransceiver__theconfig;

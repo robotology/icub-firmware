@@ -64,7 +64,7 @@ typedef struct
 typedef struct
 {
     uint8_t                                     supported_mask;
-    hal_device_gyroscope_hid_dev_cfg_t          devcfg[hal_gyroscope_ports_number];
+    hal_device_gyroscope_hid_dev_cfg_t          devcfg[hal_gyroscopes_number];
 } hal_device_gyroscope_hid_brdcfg_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------

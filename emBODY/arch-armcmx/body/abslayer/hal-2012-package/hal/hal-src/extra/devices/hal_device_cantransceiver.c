@@ -60,7 +60,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_device_cantransceiver_canport2index(p)           ((uint8_t)((p)))
+#define HAL_device_cantransceiver_id2index(p)           ((uint8_t)((p)))
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -76,18 +76,29 @@ const hal_cantransceiver_cfg_t hal_cantransceiver_cfg_default =
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+
+typedef struct
+{
+    hal_cantransceiver_cfg_t                        config;
+} hal_device_cantransceiver_internal_item_t;
+
+typedef struct
+{
+    uint8_t                                         initted;
+    hal_device_cantransceiver_internal_item_t*      items[hal_cantransceivers_number];   
+} hal_device_cantransceiver_theinternals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_bool_t s_hal_device_cantransceiver_supported_is(hal_can_port_t port);
-static void s_hal_device_cantransceiver_initted_set(hal_can_port_t port);
-static hal_bool_t s_hal_device_cantransceiver_initted_is(hal_can_port_t port);
+static hal_bool_t s_hal_device_cantransceiver_supported_is(hal_cantransceiver_t id);
+static void s_hal_device_cantransceiver_initted_set(hal_cantransceiver_t id);
+static hal_bool_t s_hal_device_cantransceiver_initted_is(hal_cantransceiver_t id);
 
 
-static hal_result_t s_hal_device_cantransceiver_lowlevel_init(hal_can_port_t port, const hal_cantransceiver_cfg_t *cfg);
+static hal_result_t s_hal_device_cantransceiver_lowlevel_init(hal_cantransceiver_t id, const hal_cantransceiver_cfg_t *cfg);
 
 
 
@@ -101,8 +112,12 @@ static hal_result_t s_hal_device_cantransceiver_lowlevel_init(hal_can_port_t por
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_cantransceiver_cfg_t s_hal_device_cantransceiver_cfg             = {.dummy = 0};
-static uint8_t s_hal_device_cantransceiver_initted = 0;
+
+static hal_device_cantransceiver_theinternals_t s_hal_device_cantransceiver_theinternals =
+{
+    .initted            = 0,
+    .items              = { NULL }   
+};
 
 
 
@@ -112,17 +127,17 @@ static uint8_t s_hal_device_cantransceiver_initted = 0;
 
 
 
-extern hal_result_t hal_cantransceiver_init(hal_can_port_t port, const hal_cantransceiver_cfg_t *cfg)
+extern hal_result_t hal_cantransceiver_init(hal_cantransceiver_t id, const hal_cantransceiver_cfg_t *cfg)
 {
     hal_result_t res = hal_res_NOK_generic;
 
-    if(hal_true != s_hal_device_cantransceiver_supported_is(port))
+    if(hal_true != s_hal_device_cantransceiver_supported_is(id))
     {
         return(hal_res_NOK_unsupported);
     }
 
 
-    if(hal_true == s_hal_device_cantransceiver_initted_is(port))
+    if(hal_true == s_hal_device_cantransceiver_initted_is(id))
     {
         return(hal_res_OK);
     }
@@ -132,43 +147,42 @@ extern hal_result_t hal_cantransceiver_init(hal_can_port_t port, const hal_cantr
         cfg = &hal_cantransceiver_cfg_default;
     }
 
-    memcpy(&s_hal_device_cantransceiver_cfg, cfg, sizeof(hal_cantransceiver_cfg_t));
 
-    res = s_hal_device_cantransceiver_lowlevel_init(port, cfg);
+    res = s_hal_device_cantransceiver_lowlevel_init(id, cfg);
 
-    s_hal_device_cantransceiver_initted_set(port);
+    s_hal_device_cantransceiver_initted_set(id);
 
     return(res);
 }
 
 
-extern hal_result_t hal_cantransceiver_enable(hal_can_port_t port)
+extern hal_result_t hal_cantransceiver_enable(hal_cantransceiver_t id)
 {
-    if(hal_false == s_hal_device_cantransceiver_initted_is(port))
+    if(hal_false == s_hal_device_cantransceiver_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
     
-    hal_brdcfg_device_cantransceiver__theconfig.devcfg.chipif.enable(port);
+    hal_brdcfg_device_cantransceiver__theconfig.devcfg.chipif.enable(id);
 
     return(hal_res_OK); 
 }
 
-extern hal_result_t hal_cantransceiver_disable(hal_can_port_t port)
+extern hal_result_t hal_cantransceiver_disable(hal_cantransceiver_t id)
 {
-    if(hal_false == s_hal_device_cantransceiver_initted_is(port))
+    if(hal_false == s_hal_device_cantransceiver_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
     
-    hal_brdcfg_device_cantransceiver__theconfig.devcfg.chipif.disable(port);
+    hal_brdcfg_device_cantransceiver__theconfig.devcfg.chipif.disable(id);
 
     return(hal_res_OK); 
 }
 
-extern hal_bool_t hal_cantransceiver_initted_is(hal_can_port_t port)
+extern hal_bool_t hal_cantransceiver_initted_is(hal_cantransceiver_t id)
 {
-    return(s_hal_device_cantransceiver_initted_is(port));
+    return(s_hal_device_cantransceiver_initted_is(id));
 }
 
 
@@ -187,8 +201,7 @@ extern hal_bool_t hal_cantransceiver_initted_is(hal_can_port_t port)
 extern hal_result_t hal_device_cantransceiver_hid_static_memory_init(void)
 {
     // removed dependency from nzi ram
-    memset(&s_hal_device_cantransceiver_cfg, 0, sizeof(s_hal_device_cantransceiver_cfg));
-    s_hal_device_cantransceiver_initted = 0;
+    memset(&s_hal_device_cantransceiver_theinternals, 0, sizeof(s_hal_device_cantransceiver_theinternals));
 
     return(hal_res_OK);
 }
@@ -198,33 +211,31 @@ extern hal_result_t hal_device_cantransceiver_hid_static_memory_init(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_bool_t s_hal_device_cantransceiver_supported_is(hal_can_port_t port)
+static hal_bool_t s_hal_device_cantransceiver_supported_is(hal_cantransceiver_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_cantransceiver__theconfig.supported_mask, HAL_device_cantransceiver_canport2index(port)));
+    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_cantransceiver__theconfig.supported_mask, HAL_device_cantransceiver_id2index(id)));
 }
 
 
-static hal_bool_t s_hal_device_cantransceiver_initted_is(hal_can_port_t port)
+static hal_bool_t s_hal_device_cantransceiver_initted_is(hal_cantransceiver_t id)
 {
-    //return(s_hal_device_cantransceiver_initted[HAL_device_cantransceiver_canport2index(port)]);
-    return(hal_utility_bits_byte_bitcheck(s_hal_device_cantransceiver_initted, HAL_device_cantransceiver_canport2index(port)));
+    return(hal_utility_bits_byte_bitcheck(s_hal_device_cantransceiver_theinternals.initted, HAL_device_cantransceiver_id2index(id)));
 }
 
-static void s_hal_device_cantransceiver_initted_set(hal_can_port_t port)
+static void s_hal_device_cantransceiver_initted_set(hal_cantransceiver_t id)
 {
-    //s_hal_device_cantransceiver_initted[HAL_device_cantransceiver_canport2index(port)] = hal_true;
-    hal_utility_bits_byte_bitset(&s_hal_device_cantransceiver_initted, HAL_device_cantransceiver_canport2index(port));
+    hal_utility_bits_byte_bitset(&s_hal_device_cantransceiver_theinternals.initted, HAL_device_cantransceiver_id2index(id));
 }
 
 
 
-static hal_result_t s_hal_device_cantransceiver_lowlevel_init(hal_can_port_t port, const hal_cantransceiver_cfg_t *cfg)
+static hal_result_t s_hal_device_cantransceiver_lowlevel_init(hal_cantransceiver_t id, const hal_cantransceiver_cfg_t *cfg)
 {
     if((NULL != hal_brdcfg_device_cantransceiver__theconfig.devcfg.chipif.init)   && 
        (NULL != hal_brdcfg_device_cantransceiver__theconfig.devcfg.chipif.enable) &&
        (NULL != hal_brdcfg_device_cantransceiver__theconfig.devcfg.chipif.disable) )
     {
-        return(hal_brdcfg_device_cantransceiver__theconfig.devcfg.chipif.init(port, hal_brdcfg_device_cantransceiver__theconfig.devcfg.chipif.initpar));
+        return(hal_brdcfg_device_cantransceiver__theconfig.devcfg.chipif.init(id, hal_brdcfg_device_cantransceiver__theconfig.devcfg.chipif.initpar));
     }
 
     return(hal_res_NOK_generic);    

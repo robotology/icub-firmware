@@ -90,7 +90,7 @@
 
 extern const hal_chip_st_lis3dh_cfg_t hal_chip_st_lis3dh_cfg_default  = 
 { 
-    .i2cport    = hal_i2c_port1,
+    .i2cport    = hal_i2c1,
     .range      = hal_chip_st_lis3dh_range_2g      
 };
 
@@ -129,7 +129,7 @@ static int32_t s_hal_chip_st_lis3dh_convert(int32_t v);
 // --------------------------------------------------------------------------------------------------------------------
 
 static hal_boolval_t s_hal_chip_st_lis3dh_initted[1] = { hal_false };
-static hal_chip_st_lis3dh_internals_t s_hal_chip_st_lis3dh_info[1] = { {.config = { .i2cport = hal_i2c_port1} } };
+static hal_chip_st_lis3dh_internals_t s_hal_chip_st_lis3dh_info[1] = { {.config = { .i2cport = hal_i2c1} } };
 
 
 
@@ -166,7 +166,7 @@ extern hal_result_t hal_chip_st_lis3dh_init(const hal_chip_st_lis3dh_cfg_t *cfg)
 extern hal_result_t hal_chip_st_lis3dh_temp_get(int16_t* temp)
 {
     hal_result_t res = hal_res_NOK_generic; 
-    hal_i2c_port_t i2cport = s_hal_chip_st_lis3dh_info[0].config.i2cport;
+    hal_i2c_t i2cport = s_hal_chip_st_lis3dh_info[0].config.i2cport;
 
     uint8_t datal = 0;
     uint8_t datah = 0;
@@ -194,7 +194,7 @@ extern hal_result_t hal_chip_st_lis3dh_temp_get(int16_t* temp)
 extern hal_result_t hal_chip_st_lis3dh_accel_get(int32_t* xac, int32_t* yac, int32_t* zac)
 {
     hal_result_t res = hal_res_NOK_generic; 
-    hal_i2c_port_t i2cport = s_hal_chip_st_lis3dh_info[0].config.i2cport;
+    hal_i2c_t i2cport = s_hal_chip_st_lis3dh_info[0].config.i2cport;
 
     uint8_t datal = 0;
     uint8_t datah = 0;
@@ -283,7 +283,7 @@ static hal_result_t s_hal_chip_st_lis3dh_hw_init(const hal_chip_st_lis3dh_cfg_t 
 {
     hal_result_t res = hal_res_NOK_generic;   
     uint8_t data;
-    hal_i2c_port_t i2cport = cfg->i2cport;
+    hal_i2c_t i2cport = cfg->i2cport;
     
  
     // init i2c    

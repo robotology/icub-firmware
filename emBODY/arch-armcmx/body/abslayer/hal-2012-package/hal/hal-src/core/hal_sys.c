@@ -64,13 +64,14 @@ extern uint32_t SystemCoreClock;
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+#define HAL_SYS_VERIFY_STACK_HEAP_SIZES
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-const hal_sys_cfg_t hal_sys_cfg_default = { .nothingsofar = 0 };
+const hal_sys_cfg_t hal_sys_cfg_default = { .stacksize = 0, .heapsize = 0 };
 
 
 
@@ -119,6 +120,30 @@ static hal_sys_theinternals_t s_hal_sys_theinternals =
 
 
 // --------------------------------------------------------------------------------------------------------------------
+// - definition of __asm functions
+// --------------------------------------------------------------------------------------------------------------------
+
+#if     defined(HAL_SYS_VERIFY_STACK_HEAP_SIZES)
+    // removed by acemor on 09-mar-2011 to avoid problems of ... 
+    // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Heap_Size (referred from hal_stm32.o).
+    // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Stack_Size (referred from hal_stm32.o).
+__asm static int hal_sys_getstacksize (void) {
+        IMPORT  Stack_Size
+        LDR     R0,=Stack_Size
+        BX      LR
+}
+
+
+__asm static int hal_sys_getheapsize (void) {
+        IMPORT  Heap_Size
+        LDR     R0,=Heap_Size
+        BX      LR
+}
+#endif//defined(HAL_SYS_VERIFY_STACK_HEAP_SIZES)
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -130,7 +155,25 @@ extern hal_result_t hal_sys_init(const hal_sys_cfg_t* cfg)
         cfg  = &hal_sys_cfg_default;
     } 
 
-    // nothing really to be done
+    // verify stack and heap
+#if     defined(HAL_SYS_VERIFY_STACK_HEAP_SIZES)
+    // removed by acemor on 09-mar-2011 to avoid problems of ... 
+    // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Heap_Size (referred from hal_stm32.o).
+    // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Stack_Size (referred from hal_stm32.o).
+    // but ... as long as we dont use shalPART.axf (shared library) we dont care.
+    if(cfg->stacksize != hal_sys_getstacksize())
+    {   
+        hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_base_initialise(): incorrect stack size");
+        return(hal_res_NOK_generic);
+    }
+
+    if(cfg->heapsize != hal_sys_getheapsize())
+    {   
+        hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_base_initialise(): incorrect heap size");
+        return(hal_res_NOK_generic);
+    }
+#endif//defined(HAL_SYS_VERIFY_STACK_HEAP_SIZES)
+     
     
     
     memcpy(&s_hal_sys_theinternals.config, cfg, sizeof(hal_sys_cfg_t));

@@ -83,6 +83,7 @@ typedef struct
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static hal_bool_t s_hal_trace_supported_is(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -108,14 +109,13 @@ typedef struct
 
 extern hal_result_t hal_trace_init(const hal_trace_cfg_t* cfg)
 {
-    uint8_t dummy = 0;
-    if(0 != hal_brdcfg_trace__theconfig.dummy)
+    
+    if(hal_true != s_hal_trace_supported_is())
     {
-        dummy = hal_brdcfg_trace__theconfig.dummy;
+        return(hal_res_NOK_unsupported);
     }
     
-    dummy = dummy;   
-    
+       
     if(NULL == cfg)
     {
         cfg = &hal_trace_cfg_default;
@@ -130,7 +130,11 @@ extern hal_result_t hal_trace_init(const hal_trace_cfg_t* cfg)
 
 extern int hal_trace_getchar(void) 
 {
-//    return(-1);
+    if(hal_true != s_hal_trace_supported_is())
+    {
+        return(-1);
+    }
+
     while(ITM_CheckChar() != 1);
     return(ITM_ReceiveChar());
 }    
@@ -138,13 +142,20 @@ extern int hal_trace_getchar(void)
 
 extern int hal_trace_putchar(int ch) 
 {
-//    return(-1);
+    if(hal_true != s_hal_trace_supported_is())
+    {
+        return(-1);
+    }
     return(ITM_SendChar(ch));    
 }
 
 extern int hal_trace_puts(const char * str) 
 {
-//    return(0);
+    if(hal_true != s_hal_trace_supported_is())
+    {
+        return(0);
+    }
+    
     uint32_t ch;
     int16_t num = 0;
     while('\0' != (ch = *str))
@@ -180,7 +191,11 @@ extern hal_result_t hal_trace_hid_static_memory_init(void)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+static hal_bool_t s_hal_trace_supported_is(void)
+{
+    return(hal_brdcfg_trace__theconfig.supported); 
+}
 
 
 

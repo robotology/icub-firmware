@@ -37,11 +37,13 @@
 #include "hal_base.h"
 #include "hal_sys.h"
 #include "hal_cpu.h"
+#include "hal_flash.h"
 #include "hal_heap.h"
 
 #include "hal_base_hid.h"
 #include "hal_sys_hid.h"
 #include "hal_cpu_hid.h"
+#include "hal_flash_hid.h"
 #include "hal_heap_hid.h"
 
 #include "hal_brdcfg.h"
@@ -148,6 +150,9 @@ extern hal_result_t hal_core_init(const hal_core_cfg_t *cfg)
     // -- call initialisation of cpu
     hal_cpu_init(&cfg->cpucfg);
     
+    // -- call initialisation of flash   
+    hal_flash_init(&cfg->flashcfg);    
+    
     // -- call initialisation of sys   
     hal_sys_init(&cfg->syscfg);
     
@@ -228,6 +233,12 @@ static void s_hal_core_modules_in_core_static_memory_init(void)
     // cpu
     hal_cpu_hid_static_memory_init();
     
+    // flash
+    hal_flash_hid_static_memory_init();
+
+    // heap
+    hal_heap_hid_static_memory_init();
+        
     // sys
     hal_sys_hid_static_memory_init();   
 }

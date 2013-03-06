@@ -72,7 +72,7 @@ typedef struct
 typedef struct
 {
     uint8_t                                     supported_mask;
-    hal_device_display_hid_dev_cfg_t            devcfg[hal_display_devs_number];
+    hal_device_display_hid_dev_cfg_t            devcfg[hal_displays_number];
 } hal_device_display_hid_brdcfg_t;
 
 

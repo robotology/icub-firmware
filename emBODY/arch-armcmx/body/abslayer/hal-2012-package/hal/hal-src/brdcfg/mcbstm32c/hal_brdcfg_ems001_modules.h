@@ -36,7 +36,6 @@
 #define     HAL_USE_BASE
 #define     HAL_USE_CORE
 #define     HAL_USE_CPU
-#define     HAL_USE_FLASH
 #define     HAL_USE_HEAP
 #define     HAL_USE_MIDDLEWARE_INTERFACE
 #define     HAL_USE_SYS
@@ -61,6 +60,7 @@
 #define     HAL_USE_CRC
 #define     HAL_USE_DMA
 #define     HAL_USE_ETH
+#define     HAL_USE_FLASH
 #define     HAL_USE_GPIO
 #define     HAL_USE_I2C
 #define     HAL_USE_SPI
@@ -70,23 +70,23 @@
 #define     HAL_USE_WATCHDOG
 
 // -- devices: define what you need to use (beware of cross dependencies from mpu peripherals and amongst devices)
-#define  HAL_USE_DEVICE_ACCELEROMETER
+#undef  HAL_USE_DEVICE_ACCELEROMETER
 #define     HAL_USE_DEVICE_CANTRANSCEIVER
 #undef  HAL_USE_DEVICE_DISPLAY  
 #define     HAL_USE_DEVICE_EEPROM
 #undef  HAL_USE_DEVICE_ENCODER
 #define     HAL_USE_DEVICE_ETHTRANSCEIVER
-#define  HAL_USE_DEVICE_GYROSCOPE
+#undef  HAL_USE_DEVICE_GYROSCOPE
 #define     HAL_USE_DEVICE_LED
 #undef     HAL_USE_DEVICE_MUX
 #undef  HAL_USE_DEVICE_SWITCH
-#define  HAL_USE_DEVICE_TERMOMETER
+#undef  HAL_USE_DEVICE_TERMOMETER
 
 
 // -- chips: define what you need to use
 #define     HAL_USE_CHIP_GENERIC_ETHTRANSCEIVER
-#define     HAL_USE_CHIP_ST_L3G4200D
-#define     HAL_USE_CHIP_ST_LIS3DH
+#undef  HAL_USE_CHIP_ST_L3G4200D
+#undef  HAL_USE_CHIP_ST_LIS3DH
 #undef  HAL_USE_CHIP_MICREL_KS8893
 #define     HAL_USE_CHIP_XX_EEPROM
 

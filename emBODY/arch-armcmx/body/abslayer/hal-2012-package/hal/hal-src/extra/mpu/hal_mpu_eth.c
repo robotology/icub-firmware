@@ -72,6 +72,9 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+#define HAL_eth_id2index(p)           ((uint8_t)((p)))
+
+
 #define ETH_BUF_SIZE        1536        /* ETH Receive/Transmit buffer size  */
 #define ETH_MTU             1514        /* Eth Maximum Transmission Unit */
 
@@ -375,6 +378,13 @@ typedef struct
 {
     hal_eth_cfg_t               config;  
     hal_eth_onframereception_t  onframerx;   
+} hal_eth_internal_item_t;
+
+
+typedef struct
+{
+    uint8_t                     initted;
+    hal_eth_internal_item_t*    items[hal_eths_number];
 } hal_eth_theinternals_t;
 
 
@@ -383,8 +393,8 @@ typedef struct
 // --------------------------------------------------------------------------------------------------------------------
 
 static hal_bool_t s_hal_eth_supported_is(void);
-static void s_hal_eth_initted_set(void);
-static hal_boolval_t s_hal_eth_initted_is(void);
+static void s_hal_eth_initted_set(hal_eth_t id);
+static hal_boolval_t s_hal_eth_initted_is(hal_eth_t id);
 
 // keep the same names of the tcpnet driver, without s_ prefix
 static void s_hal_eth_rx_descr_init(void);
@@ -431,7 +441,15 @@ static hal_tx_desc_t *Tx_Desc = NULL;
 
 #warning WIP --> put all static variables inside s_hal_eth_theinternals
 
+
 static hal_eth_theinternals_t s_hal_eth_theinternals =
+{
+    .initted            = 0,
+    .items              = { NULL }   
+};
+
+#if 0
+static hal_eth_internal_item_t s_hal_eth_theinternals =
 {
     .config     =
     {
@@ -449,7 +467,7 @@ static hal_eth_theinternals_t s_hal_eth_theinternals =
     }
     
 };
-
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -460,11 +478,18 @@ extern void ETH_IRQHandler(void);
 
 extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
 {
+    const hal_eth_t id = hal_eth1;
     hal_eth_phymode_t usedphymode;
+    hal_eth_internal_item_t* intitem = s_hal_eth_theinternals.items[HAL_eth_id2index(id)];
 
     if(hal_true != s_hal_eth_supported_is())
     {
         return(hal_res_NOK_unsupported);
+    }
+    
+    if(hal_true == s_hal_eth_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
     }
 
 
@@ -476,19 +501,21 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     {
         hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() needs a cfg w/ non-zero tx and rx queue");
     }
-    else
+
+    if(NULL == intitem)
     {
-        memcpy(&s_hal_eth_theinternals.config, cfg, sizeof(hal_eth_cfg_t));
-        memcpy(&s_hal_eth_theinternals.onframerx, cfg->onframerx, sizeof(hal_eth_onframereception_t));
+        intitem = s_hal_eth_theinternals.items[HAL_eth_id2index(id)] = hal_heap_new(sizeof(hal_eth_internal_item_t));
+    
     }
+    
+    memcpy(&intitem->config, cfg, sizeof(hal_eth_cfg_t));
+    memcpy(&intitem->onframerx, cfg->onframerx, sizeof(hal_eth_onframereception_t));
+    
     
     // give ram to the dma descriptors
     
-//     uint8_t capacityoftxfifoofframes = hal_brdcfg_eth__theconfig.numofdmatxbuffers;
-//     uint8_t capacityofrxfifoofframes = hal_brdcfg_eth__theconfig.numofdmarxbuffers;
-
-        uint8_t capacityoftxfifoofframes = s_hal_eth_theinternals.config.capacityoftxfifoofframes;
-        uint8_t capacityofrxfifoofframes = s_hal_eth_theinternals.config.capacityofrxfifoofframes;
+    uint8_t capacityoftxfifoofframes = intitem->config.capacityoftxfifoofframes;
+    uint8_t capacityofrxfifoofframes = intitem->config.capacityofrxfifoofframes;
     
     
     if((0 == capacityoftxfifoofframes) || (0 == capacityofrxfifoofframes))
@@ -540,7 +567,7 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     s_hal_eth_mac_init(cfg, rmiiphymode);
     
 
-    s_hal_eth_initted_set();
+    s_hal_eth_initted_set(id);
     
     return(hal_res_OK);
 }
@@ -603,7 +630,7 @@ extern hal_result_t hal_eth_sendframe(hal_eth_frame_t *frame)
     U32 i,j;
 
 
-    if(hal_true != s_hal_eth_initted_is())
+    if(hal_true != s_hal_eth_initted_is(hal_eth1))
     {
         return(hal_res_NOK_generic);
     }
@@ -622,7 +649,7 @@ extern hal_result_t hal_eth_sendframe(hal_eth_frame_t *frame)
     }
     Tx_Desc[j].Size      = frame->length;
     Tx_Desc[j].CtrlStat |= DMA_TX_OWN;
-    if (++j == s_hal_eth_theinternals.config.capacityoftxfifoofframes) j = 0;
+    if (++j == s_hal_eth_theinternals.items[0]->config.capacityoftxfifoofframes) j = 0;
     TxBufIndex = j;
     /* Start frame transmission. */
     ETH->DMASR   = DSR_TPSS;
@@ -643,7 +670,7 @@ extern const hal_eth_network_functions_t * hal_eth_get_network_functions(void)
 
 // ---- isr of the module: begin ----
 
-// changed NUM_RX_BUF with s_hal_eth_theinternals.config.capacityofrxfifoofframes (former hal_base_hid_params.eth_dmarxbuffer_num)
+// changed NUM_RX_BUF with s_hal_eth_theinternals.items[0]->config.capacityofrxfifoofframes (former hal_base_hid_params.eth_dmarxbuffer_num)
 // changed OS_FRAME with hal_eth_frame_t
 void ETH_IRQHandler(void) 
 {
@@ -687,7 +714,7 @@ void ETH_IRQHandler(void)
       }
       /* Flag 0x80000000 to skip sys_error() call when out of memory. */
       //frame = alloc_mem (RxLen | 0x80000000);
-      frame = s_hal_eth_theinternals.onframerx.frame_new(RxLen | 0x80000000);
+      frame = s_hal_eth_theinternals.items[0]->onframerx.frame_new(RxLen | 0x80000000);
       /* if 'alloc_mem()' has failed, ignore this packet. */
       if (frame != NULL) {
         sp = (U32 *)(Rx_Desc[i].Addr & ~3);
@@ -696,11 +723,11 @@ void ETH_IRQHandler(void)
           *dp++ = *sp++;
         }
         //put_in_queue (frame);
-        s_hal_eth_theinternals.onframerx.frame_movetohigherlayer(frame);
+        s_hal_eth_theinternals.items[0]->onframerx.frame_movetohigherlayer(frame);
 
-        if(NULL != s_hal_eth_theinternals.onframerx.frame_alerthigherlayer)
+        if(NULL != s_hal_eth_theinternals.items[0]->onframerx.frame_alerthigherlayer)
         {
-            s_hal_eth_theinternals.onframerx.frame_alerthigherlayer();
+            s_hal_eth_theinternals.items[0]->onframerx.frame_alerthigherlayer();
         }
 
         //rxframes ++;
@@ -709,7 +736,7 @@ void ETH_IRQHandler(void)
       /* Release this frame from ETH IO buffer. */
 rel:  Rx_Desc[i].Stat = DMA_RX_OWN;
 
-      if (++i == s_hal_eth_theinternals.config.capacityofrxfifoofframes) i = 0;
+      if (++i == s_hal_eth_theinternals.items[0]->config.capacityofrxfifoofframes) i = 0;
       RxBufIndex = i;
     }
     if (int_stat & INT_TIE) {
@@ -735,8 +762,7 @@ extern hal_result_t hal_eth_hid_static_memory_init(void)
     tx_buf = NULL;
     Rx_Desc = NULL;
     Tx_Desc = NULL;
-    memset(&s_hal_eth_theinternals.onframerx, 0, sizeof(hal_eth_onframereception_t));
-
+    memset(&s_hal_eth_theinternals, 0, sizeof(s_hal_eth_theinternals));
 
     return(hal_res_OK);
 }
@@ -750,14 +776,14 @@ static hal_bool_t s_hal_eth_supported_is(void)
     return(hal_brdcfg_eth__theconfig.supported);
 }
 
-static void s_hal_eth_initted_set(void)
+static void s_hal_eth_initted_set(hal_eth_t id)
 {
-    //s_hal_mac = s_hal_mac;
+    hal_utility_bits_byte_bitset(&s_hal_eth_theinternals.initted, HAL_eth_id2index(id));
 }
 
-static hal_boolval_t s_hal_eth_initted_is(void)
+static hal_boolval_t s_hal_eth_initted_is(hal_eth_t id)
 {
-    return((0 == s_hal_eth_theinternals.config.macaddress) ? (hal_false) : (hal_true));
+    return(hal_utility_bits_byte_bitcheck(s_hal_eth_theinternals.initted, HAL_eth_id2index(id)));
 }
 
 
@@ -769,8 +795,8 @@ static void s_hal_eth_rx_descr_init(void)
   U32 i,next;
 
   RxBufIndex = 0;
-  for (i = 0, next = 0; i < s_hal_eth_theinternals.config.capacityofrxfifoofframes; i++) {
-    if (++next == s_hal_eth_theinternals.config.capacityofrxfifoofframes) next = 0;
+  for (i = 0, next = 0; i < s_hal_eth_theinternals.items[0]->config.capacityofrxfifoofframes; i++) {
+    if (++next == s_hal_eth_theinternals.items[0]->config.capacityofrxfifoofframes) next = 0;
     Rx_Desc[i].Stat = DMA_RX_OWN;
     Rx_Desc[i].Ctrl = DMA_RX_RCH | ETH_BUF_SIZE;
     Rx_Desc[i].Addr = (U32)&rx_buf[i];
@@ -786,8 +812,8 @@ static void s_hal_eth_tx_descr_init(void)
   U32 i,next;
 
   TxBufIndex = 0;
-  for (i = 0, next = 0; i < s_hal_eth_theinternals.config.capacityoftxfifoofframes; i++) {
-    if (++next == s_hal_eth_theinternals.config.capacityoftxfifoofframes) next = 0;
+  for (i = 0, next = 0; i < s_hal_eth_theinternals.items[0]->config.capacityoftxfifoofframes; i++) {
+    if (++next == s_hal_eth_theinternals.items[0]->config.capacityoftxfifoofframes) next = 0;
     Tx_Desc[i].CtrlStat = DMA_TX_TCH | DMA_TX_LS | DMA_TX_FS;
     Tx_Desc[i].Addr     = (U32)&tx_buf[i];
     Tx_Desc[i].Next     = (U32)&Tx_Desc[next];
@@ -882,6 +908,7 @@ static void s_hal_eth_mac_init(const hal_eth_cfg_t *cfg, hal_eth_phymode_t phymo
 
 extern void hal_eth_hid_rmii_rx_init(void)
 {
+    hal_gpio_cfg_t config;
 #if     defined(HAL_USE_CPU_FAM_STM32F1) 
     static hal_gpio_altcfg_t rmii_rx_altcfg = 
     {
@@ -895,7 +922,7 @@ extern void hal_eth_hid_rmii_rx_init(void)
         .afmode     = HAL_GPIO_AFMODE_NONE
     };
     rmii_rx_altcfg.afname = GPIO_Remap_ETH;
-    rmii_rx_altcfg.afmode = (hal_gpio_portD == hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_CRS_DV.port) ? (ENABLE) : (DISABLE);    
+    rmii_rx_altcfg.afmode = (hal_gpio_portD == hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_CRS_DV.gpio.port) ? (ENABLE) : (DISABLE);    
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)
     static const hal_gpio_altcfg_t rmii_rx_altcfg = 
     {
@@ -912,15 +939,30 @@ extern void hal_eth_hid_rmii_rx_init(void)
     };
 #else //defined(HAL_USE_CPU_FAM_*)
     #error ERR --> choose a HAL_USE_CPU_FAM_*
-#endif    
-    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_CRS_DV, &rmii_rx_altcfg);    
-    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_RXD0, &rmii_rx_altcfg);   
-    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_RXD1, &rmii_rx_altcfg);    
+#endif 
+
+    memcpy(&config, &hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_CRS_DV.config, sizeof(hal_gpio_cfg_t));
+    config.altcfg = (hal_gpio_altcfg_t*) &rmii_rx_altcfg;
+    hal_gpio_init(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_CRS_DV.gpio, &config);
+    
+    memcpy(&config, &hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_RXD0.config, sizeof(hal_gpio_cfg_t));
+    config.altcfg = (hal_gpio_altcfg_t*) &rmii_rx_altcfg;
+    hal_gpio_init(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_RXD0.gpio, &config);    
+    
+    memcpy(&config, &hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_RXD1.config, sizeof(hal_gpio_cfg_t));
+    config.altcfg = (hal_gpio_altcfg_t*) &rmii_rx_altcfg;
+    hal_gpio_init(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_RXD1.gpio, &config);    
+    
+    
+//    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_CRS_DV, &rmii_rx_altcfg);    
+//    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_RXD0, &rmii_rx_altcfg);   
+//    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_RXD1, &rmii_rx_altcfg);    
 }
 
 // cambiata
 extern void hal_eth_hid_rmii_tx_init(void)
 {
+    hal_gpio_cfg_t config;
 #if     defined(HAL_USE_CPU_FAM_STM32F1) 
     static const hal_gpio_altcfg_t rmii_tx_altcfg = 
     {
@@ -951,15 +993,28 @@ extern void hal_eth_hid_rmii_tx_init(void)
     #error ERR --> choose a HAL_USE_CPU_FAM_*
 #endif 
     
-    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TX_EN, &rmii_tx_altcfg);    
-    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TXD0, &rmii_tx_altcfg);   
-    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TXD1, &rmii_tx_altcfg);        
+    memcpy(&config, &hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TX_EN.config, sizeof(hal_gpio_cfg_t));
+    config.altcfg = (hal_gpio_altcfg_t*) &rmii_tx_altcfg;
+    hal_gpio_init(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TX_EN.gpio, &config);    
+    
+    memcpy(&config, &hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TXD0.config, sizeof(hal_gpio_cfg_t));
+    config.altcfg = (hal_gpio_altcfg_t*) &rmii_tx_altcfg;
+    hal_gpio_init(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TXD0.gpio, &config);     
+
+    memcpy(&config, &hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TXD1.config, sizeof(hal_gpio_cfg_t));
+    config.altcfg = (hal_gpio_altcfg_t*) &rmii_tx_altcfg;
+    hal_gpio_init(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TXD1.gpio, &config);      
+    
+//    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TX_EN, &rmii_tx_altcfg);    
+//    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TXD0, &rmii_tx_altcfg);   
+//    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_TXD1, &rmii_tx_altcfg);        
 }
  
 
 
 extern void hal_eth_hid_smi_init(void)
 {
+    hal_gpio_cfg_t config;
 #if     defined(HAL_USE_CPU_FAM_STM32F1)    
     static const hal_gpio_altcfg_t smi_altcfg = 
     {
@@ -990,10 +1045,18 @@ extern void hal_eth_hid_smi_init(void)
     const uint32_t mdcclockrange = 0x00000004; // MDC clock range:  bits 4:2 CR: clock range. value 1 -> HCLK = 100-168 MHz, MDC Clock = HCLK/62
 #else //defined(HAL_USE_CPU_FAM_*)
     #error ERR --> choose a HAL_USE_CPU_FAM_*
-#endif    
-        
-    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_smi.ETH_MDC, &smi_altcfg);    
-    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_smi.ETH_MDIO, &smi_altcfg);  
+#endif   
+
+    memcpy(&config, &hal_brdcfg_eth__theconfig.gpio_smi.ETH_MDC.config, sizeof(hal_gpio_cfg_t));
+    config.altcfg = (hal_gpio_altcfg_t*) &smi_altcfg;
+    hal_gpio_init(hal_brdcfg_eth__theconfig.gpio_smi.ETH_MDC.gpio, &config);         
+
+    memcpy(&config, &hal_brdcfg_eth__theconfig.gpio_smi.ETH_MDIO.config, sizeof(hal_gpio_cfg_t));
+    config.altcfg = (hal_gpio_altcfg_t*) &smi_altcfg;
+    hal_gpio_init(hal_brdcfg_eth__theconfig.gpio_smi.ETH_MDIO.gpio, &config);     
+    
+//     hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_smi.ETH_MDC, &smi_altcfg);    
+//     hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_smi.ETH_MDIO, &smi_altcfg);  
      
     // MDC Clock range
     ETH->MACMIIAR   = mdcclockrange;   
@@ -1038,6 +1101,9 @@ extern void hal_eth_hid_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t val
 
 extern void hal_eth_hid_rmii_refclock_init(void)
 {   // used by mac but also by external phy or switch
+    
+    hal_gpio_cfg_t config;
+    
 #if     defined(HAL_USE_CPU_FAM_STM32F1)     
     static const hal_gpio_altcfg_t rmii_clk_altcfg = 
     {
@@ -1068,7 +1134,11 @@ extern void hal_eth_hid_rmii_refclock_init(void)
     #error ERR --> choose a HAL_USE_CPU_FAM_*
 #endif 
     
-    hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_REF_CLK, &rmii_clk_altcfg);      
+    memcpy(&config, &hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_REF_CLK.config, sizeof(hal_gpio_cfg_t));
+    config.altcfg = (hal_gpio_altcfg_t*) &rmii_clk_altcfg;
+    hal_gpio_init(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_REF_CLK.gpio, &config);     
+    
+    //hal_gpio_configure(hal_brdcfg_eth__theconfig.gpio_mif.rmii.ETH_RMII_REF_CLK, &rmii_clk_altcfg);      
 }
 
 

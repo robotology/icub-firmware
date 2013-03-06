@@ -60,7 +60,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_device_led_led2index(t)              ((uint8_t)((t)))
+#define HAL_device_led_id2index(t)              ((uint8_t)((t)))
 
 
 
@@ -85,9 +85,9 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_device_led_supported_is(hal_led_t led);
-static void s_hal_device_led_initted_set(hal_led_t led);
-static hal_boolval_t s_hal_device_led_initted_is(hal_led_t led);
+static hal_boolval_t s_hal_device_led_supported_is(hal_led_t id);
+static void s_hal_device_led_initted_set(hal_led_t id);
+static hal_boolval_t s_hal_device_led_initted_is(hal_led_t id);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -102,80 +102,80 @@ static uint16_t s_hal_device_led_initted = 0;
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern hal_result_t hal_led_init(hal_led_t led, const hal_led_cfg_t *cfg)
+extern hal_result_t hal_led_init(hal_led_t id, const hal_led_cfg_t *cfg)
 {
-    const hal_gpio_cfg_t *gc = NULL;
+    const hal_gpio_map_t *gm = NULL;
     hal_result_t res = hal_res_NOK_generic;
 
-    if(hal_false == s_hal_device_led_supported_is(led))
+    if(hal_false == s_hal_device_led_supported_is(id))
     {
         return(hal_res_NOK_generic);
     }
      
-    gc = &hal_brdcfg_device_led__theconfig.gpiocfg[HAL_device_led_led2index(led)];
+    gm = &hal_brdcfg_device_led__theconfig.gpiomaps[HAL_device_led_id2index(id)];
     
-    res = hal_gpio_init(gc->port, gc->pin, gc->dir, gc->speed);
+    res = hal_gpio_init(gm->gpio, &gm->config);
     
     if(hal_res_OK != res)
     {
         return(res);
     }
     
-    hal_gpio_setval(gc->port, gc->pin, hal_brdcfg_device_led__theconfig.value_off);
+    hal_gpio_setval(gm->gpio, hal_brdcfg_device_led__theconfig.value_off);
  
-    s_hal_device_led_initted_set(led);
+    s_hal_device_led_initted_set(id);
     return(hal_res_OK);
 }
 
 
-extern hal_result_t hal_led_on(hal_led_t led)
+extern hal_result_t hal_led_on(hal_led_t id)
 {
-    const hal_gpio_cfg_t *gc = NULL;
+    const hal_gpio_map_t *gm = NULL;
     
-    if(hal_false == s_hal_device_led_initted_is(led))
+    if(hal_false == s_hal_device_led_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
 
     // do something 
-    gc = &hal_brdcfg_device_led__theconfig.gpiocfg[HAL_device_led_led2index(led)];
+    gm = &hal_brdcfg_device_led__theconfig.gpiomaps[HAL_device_led_id2index(id)];
     
-    return(hal_gpio_setval(gc->port, gc->pin, hal_brdcfg_device_led__theconfig.value_on));
+    return(hal_gpio_setval(gm->gpio, hal_brdcfg_device_led__theconfig.value_on));
 }
 
 
 
-extern hal_result_t hal_led_off(hal_led_t led)
+extern hal_result_t hal_led_off(hal_led_t id)
 {
-    const hal_gpio_cfg_t *gc = NULL;
+    const hal_gpio_map_t *gm = NULL;
     
-    if(hal_false == s_hal_device_led_initted_is(led))
+    if(hal_false == s_hal_device_led_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
 
     // do something 
-    gc = &hal_brdcfg_device_led__theconfig.gpiocfg[HAL_device_led_led2index(led)];
+    gm = &hal_brdcfg_device_led__theconfig.gpiomaps[HAL_device_led_id2index(id)];
     
-    return(hal_gpio_setval(gc->port, gc->pin, hal_brdcfg_device_led__theconfig.value_off));
+    return(hal_gpio_setval(gm->gpio, hal_brdcfg_device_led__theconfig.value_off));
 }
 
 
 
-extern hal_result_t hal_led_toggle(hal_led_t led)
+extern hal_result_t hal_led_toggle(hal_led_t id)
 {
-    const hal_gpio_cfg_t *gc = NULL;
+    const hal_gpio_map_t *gm = NULL;
     hal_gpio_val_t val = hal_gpio_valNONE;
     
-    if(hal_false == s_hal_device_led_initted_is(led))
+    if(hal_false == s_hal_device_led_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
 
     // do something 
-    gc = &hal_brdcfg_device_led__theconfig.gpiocfg[HAL_device_led_led2index(led)];
+    gm = &hal_brdcfg_device_led__theconfig.gpiomaps[HAL_device_led_id2index(id)];
     
-    val = hal_gpio_getval(gc->port, gc->pin);
+    val = hal_gpio_getval(gm->gpio);
     
     if(hal_brdcfg_device_led__theconfig.value_off == val)
     {
@@ -186,7 +186,7 @@ extern hal_result_t hal_led_toggle(hal_led_t led)
         val = hal_brdcfg_device_led__theconfig.value_off;
     }
 
-    return(hal_gpio_setval(gc->port, gc->pin, val));
+    return(hal_gpio_setval(gm->gpio, val));
 }
 
 
@@ -210,25 +210,25 @@ extern hal_result_t hal_device_led_hid_static_memory_init(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_device_led_supported_is(hal_led_t led)
+static hal_boolval_t s_hal_device_led_supported_is(hal_led_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_led__theconfig.supported_mask, HAL_device_led_led2index(led)) );
+    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_led__theconfig.supported_mask, HAL_device_led_id2index(id)) );
 }
 
-static void s_hal_device_led_initted_set(hal_led_t led)
+static void s_hal_device_led_initted_set(hal_led_t id)
 {
-    hal_utility_bits_halfword_bitset(&s_hal_device_led_initted, HAL_device_led_led2index(led));
+    hal_utility_bits_halfword_bitset(&s_hal_device_led_initted, HAL_device_led_id2index(id));
 }
 
-static hal_boolval_t s_hal_device_led_initted_is(hal_led_t led)
+static hal_boolval_t s_hal_device_led_initted_is(hal_led_t id)
 {
-    return(hal_utility_bits_halfword_bitcheck(s_hal_device_led_initted, HAL_device_led_led2index(led)));
+    return(hal_utility_bits_halfword_bitcheck(s_hal_device_led_initted, HAL_device_led_id2index(id)));
 }
 
 
 
 
-#endif//HAL_USE_ACTUATOR_LED
+#endif//HAL_USE_DEVICE_LED
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

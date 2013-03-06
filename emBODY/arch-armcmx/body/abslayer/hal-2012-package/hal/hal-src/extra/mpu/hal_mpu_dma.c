@@ -62,9 +62,9 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_dma_port2index(p)           ((uint8_t)((p)))
-#define HAL_dma_index2port(i)           ((hal_dma_port_t)((i)))
-#define HAL_dma_port2peripheral(p)      (s_hal_dma_memory_mapping_of_ports[HAL_dma_port2index(p)])
+#define HAL_dma_id2index(p)             ((uint8_t)((p)))
+#define HAL_dma_index2id(i)             ((hal_dma_t)((i)))
+#define HAL_dma_id2peripheral(p)        (s_hal_dma_memory_mapping_of_ports[HAL_dma_id2index(p)])
 
 
 // #if     defined(HAL_USE_CPU_FAM_STM32F1)
@@ -107,7 +107,7 @@ typedef struct
 typedef struct
 {
     uint16_t                    initted;
-    hal_dma_internal_item_t*    items[hal_dma_ports_number];   
+    hal_dma_internal_item_t*    items[hal_dmas_number];   
 } hal_dma_theinternals_t;
 
 
@@ -115,20 +115,20 @@ typedef struct
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_dma_supported_is(hal_dma_port_t port);
-static void s_hal_dma_initted_set(hal_dma_port_t port);
-static hal_boolval_t s_hal_dma_initted_is(hal_dma_port_t port);
+static hal_boolval_t s_hal_dma_supported_is(hal_dma_t id);
+static void s_hal_dma_initted_set(hal_dma_t id);
+static hal_boolval_t s_hal_dma_initted_is(hal_dma_t id);
 
 
 // hw related initialisation whcih may change with different versions of stm32fx mpus
-static void s_hal_dma_hw_nvic_init(hal_dma_port_t port);
-// static void s_hal_dma_isr_enable(hal_dma_port_t port);
-// static void s_hal_dma_isr_disable(hal_dma_port_t port);
+static void s_hal_dma_hw_nvic_init(hal_dma_t id);
+// static void s_hal_dma_isr_enable(hal_dma_t id);
+// static void s_hal_dma_isr_disable(hal_dma_t id);
 
 
-static void s_hal_dma_isr_portx(hal_dma_port_t port);
+static void s_hal_dma_isr_portx(hal_dma_t id);
 
-static void s_hal_dma_isr_clear_flag(hal_dma_port_t port);
+static void s_hal_dma_isr_clear_flag(hal_dma_t id);
 
 
 // enable or disab
@@ -140,28 +140,28 @@ static void s_hal_dma_isr_clear_flag(hal_dma_port_t port);
 
 #if     defined(HAL_USE_CPU_FAM_STM32F1)
 
-static DMA_Channel_TypeDef* const s_hal_dma_memory_mapping_of_ports[hal_dma_ports_number] = 
+static DMA_Channel_TypeDef* const s_hal_dma_memory_mapping_of_ports[hal_dmas_number] = 
 {
     DMA1_Channel1, DMA1_Channel2, DMA1_Channel3, DMA1_Channel4, DMA1_Channel5, DMA1_Channel6, DMA1_Channel7,
     DMA2_Channel1, DMA2_Channel2, DMA2_Channel3, DMA2_Channel4, DMA2_Channel5,
     NULL, NULL, NULL, NULL
 }; 
 
-static const uint32_t s_hal_dma_periphclocks[hal_dma_ports_number] = 
+static const uint32_t s_hal_dma_periphclocks[hal_dmas_number] = 
 {
     RCC_AHBPeriph_DMA1, RCC_AHBPeriph_DMA1, RCC_AHBPeriph_DMA1, RCC_AHBPeriph_DMA1, RCC_AHBPeriph_DMA1, RCC_AHBPeriph_DMA1, RCC_AHBPeriph_DMA1,
     RCC_AHBPeriph_DMA2, RCC_AHBPeriph_DMA2, RCC_AHBPeriph_DMA2, RCC_AHBPeriph_DMA2, RCC_AHBPeriph_DMA2,
     0, 0, 0, 0    
 };
 
-static const uint32_t s_hal_dma_irqflag_gl[hal_dma_ports_number] =
+static const uint32_t s_hal_dma_irqflag_gl[hal_dmas_number] =
 {
     DMA1_FLAG_GL1, DMA1_FLAG_GL2, DMA1_FLAG_GL3, DMA1_FLAG_GL4, DMA1_FLAG_GL5, DMA1_FLAG_GL6, DMA1_FLAG_GL7,
     DMA2_FLAG_GL1, DMA2_FLAG_GL2, DMA2_FLAG_GL3, DMA2_FLAG_GL4, DMA2_FLAG_GL5,   
     0, 0, 0, 0
 };
 
-static const IRQn_Type s_hal_dma_irqnumber[hal_dma_ports_number] =
+static const IRQn_Type s_hal_dma_irqnumber[hal_dmas_number] =
 {
     DMA1_Channel1_IRQn, DMA1_Channel2_IRQn, DMA1_Channel3_IRQn, DMA1_Channel4_IRQn, DMA1_Channel5_IRQn, DMA1_Channel6_IRQn, DMA1_Channel7_IRQn,
     DMA2_Channel1_IRQn, DMA2_Channel2_IRQn, DMA2_Channel3_IRQn, DMA2_Channel4_IRQn, DMA2_Channel5_IRQn,   
@@ -170,19 +170,19 @@ static const IRQn_Type s_hal_dma_irqnumber[hal_dma_ports_number] =
 
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)
            
-static DMA_Stream_TypeDef* const s_hal_dma_memory_mapping_of_ports[hal_dma_ports_num] = 
+static DMA_Stream_TypeDef* const s_hal_dma_memory_mapping_of_ports[hal_dmas_num] = 
 {
     DMA1_Stream0, DMA1_Stream1, DMA1_Stream2, DMA1_Stream3, DMA1_Stream4, DMA1_Stream5, DMA1_Stream6, DMA1_Stream7, 
     DMA2_Stream0, DMA2_Stream1, DMA2_Stream2, DMA2_Stream3, DMA2_Stream4, DMA2_Stream5, DMA2_Stream6, DMA2_Stream7
 }; 
 
-static const uint32_t s_hal_dma_periphclocks[hal_dma_ports_num] = 
+static const uint32_t s_hal_dma_periphclocks[hal_dmas_num] = 
 {
     RCC_AHB1Periph_DMA1, RCC_AHB1Periph_DMA1, RCC_AHB1Periph_DMA1, RCC_AHB1Periph_DMA1, RCC_AHB1Periph_DMA1, RCC_AHB1Periph_DMA1, RCC_AHB1Periph_DMA1, RCC_AHB1Periph_DMA1,
     RCC_AHB1Periph_DMA2, RCC_AHB1Periph_DMA2, RCC_AHB1Periph_DMA2, RCC_AHB1Periph_DMA2, RCC_AHB1Periph_DMA2, RCC_AHB1Periph_DMA2, RCC_AHB1Periph_DMA2, RCC_AHB1Periph_DMA2
 };
 
-static const uint32_t s_hal_dma_irqflag_gl[hal_dma_ports_num] =
+static const uint32_t s_hal_dma_irqflag_gl[hal_dmas_num] =
 {
     DMA_FLAG_TCIF0|DMA_FLAG_HTIF0|DMA_FLAG_TEIF0|DMA_FLAG_DMEIF0|DMA_FLAG_FEIF0, 
     DMA_FLAG_TCIF1|DMA_FLAG_HTIF1|DMA_FLAG_TEIF1|DMA_FLAG_DMEIF1|DMA_FLAG_FEIF1,
@@ -201,7 +201,7 @@ static const uint32_t s_hal_dma_irqflag_gl[hal_dma_ports_num] =
     DMA_FLAG_TCIF6|DMA_FLAG_HTIF6|DMA_FLAG_TEIF6|DMA_FLAG_DMEIF6|DMA_FLAG_FEIF6    
 };
 
-static const IRQn_Type s_hal_dma_irqnumber[hal_dma_ports_num] =
+static const IRQn_Type s_hal_dma_irqnumber[hal_dmas_num] =
 {
     DMA1_Stream0_IRQn, DMA1_Stream1_IRQn, DMA1_Stream2_IRQn, DMA1_Stream3_IRQn, DMA1_Stream4_IRQn, DMA1_Stream5_IRQn, DMA1_Stream6_IRQn, DMA1_Stream7_IRQn,
     DMA2_Stream0_IRQn, DMA2_Stream1_IRQn, DMA2_Stream2_IRQn, DMA2_Stream3_IRQn, DMA2_Stream4_IRQn, DMA2_Stream5_IRQn, DMA2_Stream6_IRQn, DMA2_Stream7_IRQn   
@@ -224,19 +224,16 @@ static hal_dma_theinternals_t s_hal_dma_theinternals =
     .items              = { NULL }   
 };
 
-// static hal_dma_internal_item_t *s_hal_dma_internals[hal_dma_ports_num] = {NULL};
-// static uint16_t s_hal_dma_initted = 0;
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern hal_result_t hal_dma_init(hal_dma_port_t port, const hal_dma_cfg_t *cfg)
+extern hal_result_t hal_dma_init(hal_dma_t id, const hal_dma_cfg_t *cfg)
 {
-    hal_dma_internal_item_t* intitem = s_hal_dma_theinternals.items[HAL_dma_port2index(port)];
+    hal_dma_internal_item_t* intitem = s_hal_dma_theinternals.items[HAL_dma_id2index(id)];
 
-    if(hal_false == s_hal_dma_supported_is(port))
+    if(hal_false == s_hal_dma_supported_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -249,7 +246,7 @@ extern hal_result_t hal_dma_init(hal_dma_port_t port, const hal_dma_cfg_t *cfg)
     if(NULL == intitem)
     {
         // the internal entry
-        intitem = s_hal_dma_theinternals.items[HAL_dma_port2index(port)] = hal_heap_new(sizeof(hal_dma_internal_item_t));
+        intitem = s_hal_dma_theinternals.items[HAL_dma_id2index(id)] = hal_heap_new(sizeof(hal_dma_internal_item_t));
     }
 
    
@@ -257,15 +254,15 @@ extern hal_result_t hal_dma_init(hal_dma_port_t port, const hal_dma_cfg_t *cfg)
     memcpy(&intitem->cfg, cfg, sizeof(hal_dma_cfg_t));
     
     // set the stm32dma
-    intitem->stm32dmaperiph = HAL_dma_port2peripheral(port);
+    intitem->stm32dmaperiph = HAL_dma_id2peripheral(id);
     
     
     // enable the peripheral clock
     
 #if     defined(HAL_USE_CPU_FAM_STM32F1)
-    RCC_AHBPeriphClockCmd(s_hal_dma_periphclocks[HAL_dma_port2index(port)], ENABLE);
+    RCC_AHBPeriphClockCmd(s_hal_dma_periphclocks[HAL_dma_id2index(id)], ENABLE);
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)
-    RCC_AHB1PeriphResetCmd(s_hal_dma_periphclocks[HAL_dma_port2index(port)], ENABLE);
+    RCC_AHB1PeriphResetCmd(s_hal_dma_periphclocks[HAL_dma_id2index(id)], ENABLE);
 #else //defined(HAL_USE_CPU_FAM_*)
     #error ERR --> choose a HAL_USE_CPU_FAM_*
 #endif    
@@ -321,27 +318,27 @@ extern hal_result_t hal_dma_init(hal_dma_port_t port, const hal_dma_cfg_t *cfg)
     intitem->enabled = hal_false;
     intitem->stopit = hal_false;
 
-    s_hal_dma_initted_set(port);
+    s_hal_dma_initted_set(id);
     
-    s_hal_dma_hw_nvic_init(port);
+    s_hal_dma_hw_nvic_init(id);
 
     return(hal_res_OK);
 }
 
 
-extern hal_result_t hal_dma_enable(hal_dma_port_t port)
+extern hal_result_t hal_dma_enable(hal_dma_t id)
 {
-	hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_port2index(port)];
+	hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_id2index(id)];
 
-    if(hal_false == s_hal_dma_initted_is(port))
+    if(hal_false == s_hal_dma_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
 
     intitem->enabled = hal_true;
          
-    DMA_ITConfig(HAL_dma_port2peripheral(port), DMA_IT_TC, ENABLE);
-    hal_dma_isr_enable(port);
+    DMA_ITConfig(HAL_dma_id2peripheral(id), DMA_IT_TC, ENABLE);
+    hal_dma_isr_enable(id);
     
     DMA_Cmd(intitem->stm32dmaperiph, ENABLE);
     
@@ -349,11 +346,11 @@ extern hal_result_t hal_dma_enable(hal_dma_port_t port)
 }
 
 
-extern hal_result_t hal_dma_disable(hal_dma_port_t port) 
+extern hal_result_t hal_dma_disable(hal_dma_t id) 
 {
-	hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_port2index(port)];
+	hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_id2index(id)];
 
-    if(hal_false == s_hal_dma_initted_is(port))
+    if(hal_false == s_hal_dma_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -362,38 +359,38 @@ extern hal_result_t hal_dma_disable(hal_dma_port_t port)
     
     DMA_Cmd(intitem->stm32dmaperiph, DISABLE);
     
-    hal_dma_isr_disable(port);
-    DMA_ITConfig(HAL_dma_port2peripheral(port), DMA_IT_TC, DISABLE);
+    hal_dma_isr_disable(id);
+    DMA_ITConfig(HAL_dma_id2peripheral(id), DMA_IT_TC, DISABLE);
         
 	return(hal_res_OK);
 }
 
 
-extern void hal_dma_isr_enable(hal_dma_port_t port)
+extern void hal_dma_isr_enable(hal_dma_t id)
 {
-    hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_port2index(port)];
-    IRQn_Type IRQn = s_hal_dma_irqnumber[HAL_dma_port2index(port)];
+    hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_id2index(id)];
+    IRQn_Type IRQn = s_hal_dma_irqnumber[HAL_dma_id2index(id)];
     if(hal_int_priorityNONE != intitem->cfg.intpriority)
     {
         hal_sys_irqn_enable(IRQn);
     }
 }
 
-extern void hal_dma_isr_disable(hal_dma_port_t port)
+extern void hal_dma_isr_disable(hal_dma_t id)
 {
-    hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_port2index(port)];
-    IRQn_Type IRQn = s_hal_dma_irqnumber[HAL_dma_port2index(port)];
+    hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_id2index(id)];
+    IRQn_Type IRQn = s_hal_dma_irqnumber[HAL_dma_id2index(id)];
     if(hal_int_priorityNONE != intitem->cfg.intpriority)
     {
         hal_sys_irqn_disable(IRQn);
     }
 }
 
-extern hal_result_t hal_dma_retrigger(hal_dma_port_t port)
+extern hal_result_t hal_dma_retrigger(hal_dma_t id)
 {
-	hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_port2index(port)];
+	hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_id2index(id)];
 
-    if(hal_false == s_hal_dma_initted_is(port))
+    if(hal_false == s_hal_dma_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -407,11 +404,11 @@ extern hal_result_t hal_dma_retrigger(hal_dma_port_t port)
     return(hal_res_OK);
 }
 
-extern hal_result_t hal_dma_dontdisable(hal_dma_port_t port)
+extern hal_result_t hal_dma_dontdisable(hal_dma_t id)
 {
-	hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_port2index(port)];
+	hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_id2index(id)];
 
-    if(hal_false == s_hal_dma_initted_is(port))
+    if(hal_false == s_hal_dma_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -424,11 +421,11 @@ extern hal_result_t hal_dma_dontdisable(hal_dma_port_t port)
 
 
 
-extern hal_result_t hal_dma_source_set(hal_dma_port_t port, void* source)
+extern hal_result_t hal_dma_source_set(hal_dma_t id, void* source)
 {
-	hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_port2index(port)];
+	hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_id2index(id)];
 
-    if(hal_false == s_hal_dma_initted_is(port))
+    if(hal_false == s_hal_dma_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -450,11 +447,11 @@ extern hal_result_t hal_dma_source_set(hal_dma_port_t port, void* source)
 }
 
 
-extern hal_result_t hal_dma_destin_set(hal_dma_port_t port, void* destin)
+extern hal_result_t hal_dma_destin_set(hal_dma_t id, void* destin)
 {
-	hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_port2index(port)];
+	hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_id2index(id)];
 
-    if(hal_false == s_hal_dma_initted_is(port))
+    if(hal_false == s_hal_dma_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -501,144 +498,144 @@ extern hal_result_t hal_dma_destin_set(hal_dma_port_t port, void* destin)
 
 void DMA1_Channel1_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port1);
+    s_hal_dma_isr_portx(hal_dma1);
 }
 
 void DMA1_Channel2_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port2);  
+    s_hal_dma_isr_portx(hal_dma2);  
 }
 
 void DMA1_Channel3_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port3);
+    s_hal_dma_isr_portx(hal_dma3);
 }
 
 void DMA1_Channel4_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port4);
+    s_hal_dma_isr_portx(hal_dma4);
 }
 
 void DMA1_Channel5_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port5);
+    s_hal_dma_isr_portx(hal_dma5);
 }
 
 void DMA1_Channel6_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port6);
+    s_hal_dma_isr_portx(hal_dma6);
 }
 
 void DMA1_Channel7_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port7);
+    s_hal_dma_isr_portx(hal_dma7);
 }
 
 void DMA2_Channel1_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port8);
+    s_hal_dma_isr_portx(hal_dma8);
 }
 
 void DMA2_Channel2_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port9);
+    s_hal_dma_isr_portx(hal_dma9);
 }
 
 void DMA2_Channel3_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port10);
+    s_hal_dma_isr_portx(hal_dma10);
 }
 
 void DMA2_Channel4_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port11);
+    s_hal_dma_isr_portx(hal_dma11);
 }
 
 void DMA2_Channel5_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port12);
+    s_hal_dma_isr_portx(hal_dma12);
 }
 
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)
 
 void DMA1_Stream0_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port1);
+    s_hal_dma_isr_portx(hal_dma1);
 }
 
 void DMA1_Stream1_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port2);  
+    s_hal_dma_isr_portx(hal_dma2);  
 }
 
 void DMA1_Stream2_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port3);
+    s_hal_dma_isr_portx(hal_dma3);
 }
 
 void DMA1_Stream3_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port4);
+    s_hal_dma_isr_portx(hal_dma4);
 }
 
 void DMA1_Stream4_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port5);
+    s_hal_dma_isr_portx(hal_dma5);
 }
 
 void DMA1_Stream5_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port6);
+    s_hal_dma_isr_portx(hal_dma6);
 }
 
 void DMA1_Stream6_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port7);
+    s_hal_dma_isr_portx(hal_dma7);
 }
 
 void DMA1_Stream7_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port8);
+    s_hal_dma_isr_portx(hal_dma8);
 }
 
 void DMA2_Stream0_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port9);
+    s_hal_dma_isr_portx(hal_dma9);
 }
 
 void DMA2_Stream1_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port10);
+    s_hal_dma_isr_portx(hal_dma10);
 }
 
 void DMA2_Stream2_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port11);
+    s_hal_dma_isr_portx(hal_dma11);
 }
 
 void DMA2_Stream3_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port12);
+    s_hal_dma_isr_portx(hal_dma12);
 }
 
 void DMA2_Stream4_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port13);
+    s_hal_dma_isr_portx(hal_dma13);
 }
 
 void DMA2_Stream5_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port14);
+    s_hal_dma_isr_portx(hal_dma14);
 }
 
 void DMA2_Stream6_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port15);
+    s_hal_dma_isr_portx(hal_dma15);
 }
 
 void DMA2_Stream7_IRQHandler(void)
 {
-    s_hal_dma_isr_portx(hal_dma_port16);
+    s_hal_dma_isr_portx(hal_dma16);
 }
 
 #else //defined(HAL_USE_CPU_FAM_*)
@@ -662,27 +659,27 @@ extern hal_result_t hal_dma_hid_static_memory_init(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_dma_supported_is(hal_dma_port_t port)
+static hal_boolval_t s_hal_dma_supported_is(hal_dma_t id)
 {
-    return(hal_utility_bits_halfword_bitcheck(hal_brdcfg_dma__theconfig.supported_mask, HAL_dma_port2index(port)));
+    return(hal_utility_bits_halfword_bitcheck(hal_brdcfg_dma__theconfig.supported_mask, HAL_dma_id2index(id)));
 }
 
-static void s_hal_dma_initted_set(hal_dma_port_t port)
+static void s_hal_dma_initted_set(hal_dma_t id)
 {
-    hal_utility_bits_halfword_bitset(&s_hal_dma_theinternals.initted, HAL_dma_port2index(port));
+    hal_utility_bits_halfword_bitset(&s_hal_dma_theinternals.initted, HAL_dma_id2index(id));
 }
 
-static hal_boolval_t s_hal_dma_initted_is(hal_dma_port_t port)
+static hal_boolval_t s_hal_dma_initted_is(hal_dma_t id)
 {
-    return(hal_utility_bits_halfword_bitcheck(s_hal_dma_theinternals.initted, HAL_dma_port2index(port)));
+    return(hal_utility_bits_halfword_bitcheck(s_hal_dma_theinternals.initted, HAL_dma_id2index(id)));
 }
 
 
-static void s_hal_dma_isr_portx(hal_dma_port_t port)
+static void s_hal_dma_isr_portx(hal_dma_t id)
 {   
-    hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_port2index(port)];
+    hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_id2index(id)];
     
-    s_hal_dma_isr_clear_flag(port);
+    s_hal_dma_isr_clear_flag(id);
    
     
     if(hal_dma_mode_oneshot == intitem->cfg.mode)
@@ -701,7 +698,7 @@ static void s_hal_dma_isr_portx(hal_dma_port_t port)
         // if ... inside intitem->cfg.cbk_on_transfer_done() we call any retrigger function, then  we dont disable
         if(hal_true == intitem->stopit)
         {
-            hal_dma_disable(port);
+            hal_dma_disable(id);
         }
         
         intitem->stopit = hal_false;
@@ -714,10 +711,10 @@ static void s_hal_dma_isr_portx(hal_dma_port_t port)
 
 
 
-static void s_hal_dma_hw_nvic_init(hal_dma_port_t port)
+static void s_hal_dma_hw_nvic_init(hal_dma_t id)
 {
-    hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_port2index(port)];   
-    IRQn_Type IRQn = s_hal_dma_irqnumber[HAL_dma_port2index(port)];
+    hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_id2index(id)];   
+    IRQn_Type IRQn = s_hal_dma_irqnumber[HAL_dma_id2index(id)];
 
 
     if(hal_int_priorityNONE != intitem->cfg.intpriority)
@@ -730,32 +727,32 @@ static void s_hal_dma_hw_nvic_init(hal_dma_port_t port)
 }
 
 
-// static void s_hal_dma_isr_enable(hal_dma_port_t port)
+// static void s_hal_dma_isr_enable(hal_dma_t id)
 // {
-//     hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_port2index(port)];
-//     IRQn_Type IRQn = s_hal_dma_irqnumber[HAL_dma_port2index(port)];
+//     hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_id2index(id)];
+//     IRQn_Type IRQn = s_hal_dma_irqnumber[HAL_dma_id2index(id)];
 //     if(hal_int_priorityNONE != intitem->cfg.intpriority)
 //     {
 //         hal_sys_irqn_enable(IRQn);
 //     }
 // }
 
-// static void s_hal_dma_isr_disable(hal_dma_port_t port)
+// static void s_hal_dma_isr_disable(hal_dma_t id)
 // {
-//     hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_port2index(port)];
-//     IRQn_Type IRQn = s_hal_dma_irqnumber[HAL_dma_port2index(port)];
+//     hal_dma_internal_item_t *intitem = s_hal_dma_theinternals.items[HAL_dma_id2index(id)];
+//     IRQn_Type IRQn = s_hal_dma_irqnumber[HAL_dma_id2index(id)];
 //     if(hal_int_priorityNONE != intitem->cfg.intpriority)
 //     {
 //         hal_sys_irqn_disable(IRQn);
 //     }
 // }
 
-static void s_hal_dma_isr_clear_flag(hal_dma_port_t port) 
+static void s_hal_dma_isr_clear_flag(hal_dma_t id) 
 {
 #if     defined(HAL_USE_CPU_FAM_STM32F1)
-    DMA_ClearFlag(s_hal_dma_irqflag_gl[HAL_dma_port2index(port)]);
+    DMA_ClearFlag(s_hal_dma_irqflag_gl[HAL_dma_id2index(id)]);
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)    
-    DMA_ClearFlag(s_hal_dma_memory_mapping_of_ports[HAL_dma_port2index(port)], s_hal_dma_irqflag_gl[HAL_dma_port2index(port)]);
+    DMA_ClearFlag(s_hal_dma_memory_mapping_of_ports[HAL_dma_id2index(id)], s_hal_dma_irqflag_gl[HAL_dma_id2index(id)]);
 #else //defined(HAL_USE_CPU_FAM_*)
     #error ERR --> choose a HAL_USE_CPU_FAM_*
 #endif 

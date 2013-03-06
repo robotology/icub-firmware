@@ -141,28 +141,7 @@
     };    
 #endif//HAL_USE_CPU  
 
-#ifdef  HAL_USE_FLASH
-    extern const hal_flash_hid_brdcfg_t hal_brdcfg_flash__theconfig =
-    {
-        .baseaddress    =   0x08000000,                 // on every stm
-        .totalsize      =
-        #if     defined(HAL_USE_CPU_NAM_STM32F107)
-                            256*1024
-        #elif   defined(HAL_USE_CPU_NAM_STM32F407)
-                            1024*1024
-        #endif
-    };
-#endif//HAL_USE_FLASH
- 
 
-#ifdef  HAL_USE_HEAP
-    extern const hal_heap_hid_brdcfg_t hal_brdcfg_heap__theconfig =
-    {
-        .nothingsofar   = 0
-    };
-#endif//HAL_USE_HEAP    
-   
-    
 #ifdef  HAL_USE_SYS
     extern const hal_sys_hid_brdcfg_t hal_brdcfg_sys__theconfig  =
     {
@@ -176,28 +155,35 @@
 #ifdef  HAL_USE_CAN
     extern const hal_can_hid_brdcfg_t hal_brdcfg_can__theconfig =
     {
-        .supported_mask     = (1 << hal_can1) | (1 << hal_can2),
+        .supported_mask     = (1 << hal_can_port1) | (1 << hal_can_port2),
         .gpio_rx            =
         {
-            {   // hal_can1 
-                .gpio   = { .port = hal_gpio_portD,     .pin = hal_gpio_pin0 }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            },            
-            {   // hal_can2 
-                .gpio   = { .port = hal_gpio_portB,     .pin = hal_gpio_pin5 }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            }
+            {   // hal_can_port1
+                .port     = hal_gpio_portD, 
+                .pin      = hal_gpio_pin0,        
+                .dir      = hal_gpio_dirALT,
+                .speed    = hal_gpio_speed_default
+            },
+            {   // hal_can_port2
+                .port     = hal_gpio_portB, 
+                .pin      = hal_gpio_pin5,        
+                .dir      = hal_gpio_dirALT,
+                .speed    = hal_gpio_speed_default        
+            } 
         },
         .gpio_tx            =
-        {
-
-            {   // hal_can1 
-                .gpio   = { .port = hal_gpio_portD,     .pin = hal_gpio_pin1 }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            },            
-            {   // hal_can2 
-                .gpio   = { .port = hal_gpio_portB,     .pin = hal_gpio_pin6 }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_default,    .altcfg = NULL }
+        {   
+            {   // hal_can_port1
+                .port     = hal_gpio_portD,
+                .pin      = hal_gpio_pin1,        
+                .dir      = hal_gpio_dirALT,
+                .speed    = hal_gpio_speed_default
+            },           
+            {   // hal_can_port2
+                .port     = hal_gpio_portB,
+                .pin      = hal_gpio_pin6,        
+                .dir      = hal_gpio_dirALT,
+                .speed    = hal_gpio_speed_default        
             }
         } 
     };
@@ -206,16 +192,16 @@
 #ifdef  HAL_USE_CRC
     extern const hal_crc_hid_brdcfg_t hal_brdcfg_crc__theconfig =
     {
-        .supported_mask     = (1 << hal_crc1) | (1 << hal_crc2)
+        .supported_mask     = (1 << hal_crc0) | (1 << hal_crc1)
     };
 #endif//HAL_USE_CRC
     
 #ifdef  HAL_USE_DMA
     extern const hal_dma_hid_brdcfg_t hal_brdcfg_dma__theconfig =
     {
-        .supported_mask     = (1 << hal_dma1) | (1 << hal_dma2) | (1 << hal_dma3) | (1 << hal_dma4) | (1 << hal_dma5) |
-                              (1 << hal_dma6) | (1 << hal_dma7) | (1 << hal_dma8) | (1 << hal_dma9) | (1 << hal_dma10)|
-                              (1 << hal_dma11)| (1 << hal_dma12)
+        .supported_mask     = (1 << hal_dma_port1) | (1 << hal_dma_port2) | (1 << hal_dma_port3) | (1 << hal_dma_port4) | (1 << hal_dma_port5) |
+                              (1 << hal_dma_port6) | (1 << hal_dma_port7) | (1 << hal_dma_port8) | (1 << hal_dma_port9) | (1 << hal_dma_port10)|
+                              (1 << hal_dma_port11)| (1 << hal_dma_port12)
 
     };
 #endif//HAL_USE_DMA       
@@ -228,59 +214,29 @@
         .mif                = hal_eth_mif_rmii,
         .gpio_mif.rmii      =
         {
-            .ETH_RMII_REF_CLK   =            
-            {   
-                .gpio   = { .port = hal_gpio_portA,     .pin = hal_gpio_pin1 }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_max,        .altcfg = NULL }
-            },  
-            .ETH_RMII_TX_EN     =            
-            {   
-                .gpio   = { .port = hal_gpio_portB,     .pin = hal_gpio_pin11 }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_max,        .altcfg = NULL }
-            },
-            .ETH_RMII_TXD0      =            
-            {   
-                .gpio   = { .port = hal_gpio_portB,     .pin = hal_gpio_pin12 }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_max,        .altcfg = NULL }
-            },
-            .ETH_RMII_TXD1      =            
-            {   
-                .gpio   = { .port = hal_gpio_portB,     .pin = hal_gpio_pin13 }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_max,        .altcfg = NULL }
-            },
-            .ETH_RMII_CRS_DV    =            
-            {   
-                .gpio   = { .port = hal_gpio_portD,     .pin = hal_gpio_pin8 }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_max,        .altcfg = NULL }
-            },
-            .ETH_RMII_RXD0      =            
-            {   
-                .gpio   = { .port = hal_gpio_portD,     .pin = hal_gpio_pin9 }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_max,        .altcfg = NULL }
-            },
-            .ETH_RMII_RXD1      =            
-            {   
-                .gpio   = { .port = hal_gpio_portD,     .pin = hal_gpio_pin10 }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_max,        .altcfg = NULL }
-            }     
+            .ETH_RMII_REF_CLK   = { .port = hal_gpio_portA, .pin = hal_gpio_pin1,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max },
+            .ETH_RMII_TX_EN     = { .port = hal_gpio_portB, .pin = hal_gpio_pin11,  .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max },
+            .ETH_RMII_TXD0      = { .port = hal_gpio_portB, .pin = hal_gpio_pin12,  .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max },
+            .ETH_RMII_TXD1      = { .port = hal_gpio_portB, .pin = hal_gpio_pin13,  .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max },
+            .ETH_RMII_CRS_DV    = { .port = hal_gpio_portD, .pin = hal_gpio_pin8,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max },
+            .ETH_RMII_RXD0      = { .port = hal_gpio_portD, .pin = hal_gpio_pin9,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max },
+            .ETH_RMII_RXD1      = { .port = hal_gpio_portD, .pin = hal_gpio_pin10,  .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max }       
         },
-        .gpio_smi       =
+        .gpio_smi           =
         {
-            .ETH_MDC        =            
-            {   
-                .gpio   = { .port = hal_gpio_portC,     .pin = hal_gpio_pin1 }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_max,        .altcfg = NULL }
-            },     
-            .ETH_MDIO       =            
-            {   
-                .gpio   = { .port = hal_gpio_portA,     .pin = hal_gpio_pin2 }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_max,        .altcfg = NULL }
-            }     
+            .ETH_MDC            = { .port = hal_gpio_portC, .pin = hal_gpio_pin1,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max },
+            .ETH_MDIO           = { .port = hal_gpio_portA, .pin = hal_gpio_pin2,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_max }       
         }
     };
 
 #endif//HAL_USE_ETH
 
+#ifdef  HAL_USE_FLASH
+    extern const hal_flash_hid_brdcfg_t hal_brdcfg_flash__theconfig =
+    {
+        .nonesofar  = 0
+    };
+#endif//HAL_USE_FLASH
 
 
 #ifdef HAL_USE_GPIO
@@ -305,36 +261,18 @@
 #ifdef  HAL_USE_I2C
     extern const hal_i2c_hid_brdcfg_t hal_brdcfg_i2c__theconfig =
     {
-        .supported_mask         = (1 << hal_i2c1),
+        .supported_mask         = (1 << hal_i2c_port1),
         .gpio_scl               =
         {
-            {   // hal_i2c1 
-                .gpio   = { .port = hal_gpio_portB,     .pin = hal_gpio_pin8 }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            },              
-            {   // hal_i2c2 
-                .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            },             
-            {   // hal_i2c3 
-                .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            }            
+            { .port = hal_gpio_portB,    .pin = hal_gpio_pin8,    .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default } 
         },
         .gpio_sda               =
         {
-            {   // hal_i2c1 
-                .gpio   = { .port = hal_gpio_portB,     .pin = hal_gpio_pin9 }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            },              
-            {   // hal_i2c2 
-                .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            },             
-            {   // hal_i2c3 
-                .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            }                  
+            { .port = hal_gpio_portB,    .pin = hal_gpio_pin9,    .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default }         
         }
     };
 #endif//HAL_USE_I2C
@@ -343,51 +281,24 @@
 #ifdef  HAL_USE_SPI
     extern const hal_spi_hid_brdcfg_t hal_brdcfg_spi__theconfig =
     {
-        .supported_mask         = (1 << hal_spi1) | (0 << hal_spi2) | (1 << hal_spi3),
+        .supported_mask         = (1 << hal_spi_port1) | (0 << hal_spi_port2) | (1 << hal_i2c_port3),
         .gpio_sck               =
         {
-            {   // hal_spi1 
-                .gpio   = { .port = hal_gpio_portA,     .pin = hal_gpio_pin5 }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            },              
-            {   // hal_spi2 
-                .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            }, 
-            {   // hal_spi3 
-                .gpio   = { .port = hal_gpio_portC,     .pin = hal_gpio_pin10}, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            }
+            { .port = hal_gpio_portA,    .pin = hal_gpio_pin5,    .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portC,    .pin = hal_gpio_pin10,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default } 
         },
         .gpio_miso              =
         {
-            {   // hal_spi1 
-                .gpio   = { .port = hal_gpio_portA,     .pin = hal_gpio_pin6 }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            },              
-            {   // hal_spi2 
-                .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            }, 
-            {   // hal_spi3 
-                .gpio   = { .port = hal_gpio_portC,     .pin = hal_gpio_pin11}, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            }            
+            { .port = hal_gpio_portA,    .pin = hal_gpio_pin6,    .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portC,    .pin = hal_gpio_pin11,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default } 
         },
         .gpio_mosi              =
         {
-            {   // hal_spi1 
-                .gpio   = { .port = hal_gpio_portA,     .pin = hal_gpio_pin7 }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            },              
-            {   // hal_spi2 
-                .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            }, 
-            {   // hal_spi3 
-                .gpio   = { .port = hal_gpio_portC,     .pin = hal_gpio_pin12}, 
-                .config = { .dir = hal_gpio_dirALT,     .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            }            
+            { .port = hal_gpio_portA,    .pin = hal_gpio_pin7,    .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portC,    .pin = hal_gpio_pin12,   .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default } 
         }      
     };
 #endif//HAL_USE_SPI
@@ -404,7 +315,7 @@
 #ifdef  HAL_USE_TRACE
     extern const hal_trace_hid_brdcfg_t hal_brdcfg_trace__theconfig =
     {
-        .supported          = hal_true
+        .dummy              = 0
     };       
 #endif//HAL_USE_TRACE
   
@@ -421,7 +332,7 @@
 #ifdef  HAL_USE_WATCHDOG
     extern const hal_watchdog_hid_brdcfg_t hal_brdcfg_watchdog__theconfig =
     {
-        .supported_mask     = (1 << hal_watchdog1_normal) | (1 << hal_watchdog2_window)
+        .supported_mask     = (1 << hal_watchdog_normal) | (1 << hal_watchdog_window)
     };       
 #endif//HAL_USE_WATCHDOG
 
@@ -449,23 +360,23 @@
 
 #ifdef  HAL_USE_DEVICE_CANTRANSCEIVER
 
-    static hal_result_t s_hal_device_cantransceiver_simple_init(hal_cantransceiver_t id, void* initpar);
-    static hal_result_t s_hal_device_cantransceiver_simple_enable(hal_cantransceiver_t id);
-    static hal_result_t s_hal_device_cantransceiver_simple_disable(hal_cantransceiver_t id);
+    static hal_result_t s_hal_device_cantransceiver_simple_init(hal_can_port_t port, void* initpar);
+    static hal_result_t s_hal_device_cantransceiver_simple_enable(hal_can_port_t port);
+    static hal_result_t s_hal_device_cantransceiver_simple_disable(hal_can_port_t port);
     
-    static hal_result_t s_hal_device_cantransceiver_simple_init(hal_cantransceiver_t id, void* initpar)
+    static hal_result_t s_hal_device_cantransceiver_simple_init(hal_can_port_t port, void* initpar)
     {
         //#warning --> in here, if required,.... init the gpio
         return(hal_res_OK);
     }
 
-    static hal_result_t s_hal_device_cantransceiver_simple_enable(hal_cantransceiver_t id)
+    static hal_result_t s_hal_device_cantransceiver_simple_enable(hal_can_port_t port)
     {   
         //#warning --> in here, if required, .... put gpio low (or high)
         return(hal_res_OK);
     }
 
-    static hal_result_t s_hal_device_cantransceiver_simple_disable(hal_cantransceiver_t id)
+    static hal_result_t s_hal_device_cantransceiver_simple_disable(hal_can_port_t port)
     {   
         //#warning --> in here, if required, .... put gpio high (or low)
         return(hal_res_OK);
@@ -473,7 +384,7 @@
     
     extern const hal_device_cantransceiver_hid_brdcfg_t hal_brdcfg_device_cantransceiver__theconfig =
     {
-        .supported_mask     =  (1 << hal_can1) | (1 << hal_can2),
+        .supported_mask     =  (1 << hal_can_port1) | (1 << hal_can_port2),
         .devcfg             =
         {            
             .chipif             =
@@ -493,12 +404,12 @@
     static const hal_extbrd_keil_mcbqvga_cfg_t s_hal_brdcfg_device_display__theconfig_initpar =
     {
         .mode       = hal_extbrd_keil_mcbqvga_mode_spi,
-        .spiport    = hal_spi3
+        .spiport    = hal_spi_port3
     };
     
     extern const hal_device_display_hid_brdcfg_t hal_brdcfg_device_display__theconfig =
     {
-        .supported_mask     = (1 << hal_display1),
+        .supported_mask     = (1 << hal_display_dev1),
         .devcfg             =
         {  
             {   // hal_display_dev1
@@ -540,7 +451,7 @@
         .chipcfg    =
         {
             .chip           = hal_chip_xx_eeprom_chip_st_m24c64,
-            .i2cport        = hal_i2c1,
+            .i2cport        = hal_i2c_port1,
             .hwaddra2a1a0   = 0 // a0 = a1 = a2 = 0
         },
         .wrprcfg    =
@@ -554,7 +465,7 @@
 
     extern const hal_device_eeprom_hid_brdcfg_t hal_brdcfg_device_eeprom__theconfig =
     {
-        .supported_mask     =  (1 << hal_eeprom1_emulatedflash) | (1 << hal_eeprom2_i2c_01) | (0 << hal_eeprom3_i2c_02),
+        .supported_mask     =  (1 << hal_eeprom_emulatedflash) | (1 << hal_eeprom_i2c_01) | (0 << hal_eeprom_i2c_02),
         .devcfg             =
         {            
             {   // hal_device_eeprom_emulatedflash 
@@ -569,7 +480,7 @@
                 {
                     .baseaddress    = 0,
                     .totalsize      = 8*1024,
-                    .i2cport        = hal_i2c1,
+                    .i2cport        = hal_i2c_port1,
                     .chipif         =
                     {   // use the chip xx_eeprom
                         .init           = (hal_res_fp_voidp_t)hal_chip_xx_eeprom_init,
@@ -584,7 +495,7 @@
                 {
                     .baseaddress    = 0,
                     .totalsize      = 0,
-                    .i2cport        = hal_i2c1,
+                    .i2cport        = hal_i2c_port1,
                     .chipif         =
                     {   // dont use any chip
                         .init           = NULL,
@@ -642,7 +553,7 @@
 #ifdef  HAL_USE_DEVICE_GYROSCOPE
     extern const hal_device_gyroscope_hid_brdcfg_t hal_brdcfg_device_gyroscope__theconfig =
     {
-        .supported_mask         = (1 << hal_gyroscope1),
+        .supported_mask         = (1 << hal_gyroscope_port1),
         .devcfg         =
         {
             {   // hal_gyroscope_port1
@@ -664,45 +575,17 @@
         .supported_mask             = 0xFF, // all the 8 leds ...
         .value_on                   = hal_gpio_valHIGH,
         .value_off                  = hal_gpio_valLOW,
-        .gpiomaps                    =
+        .gpiocfg                    =
         {
-            {   // hal_led1 
-                .gpio   = { .port = hal_gpio_portE,     .pin = hal_gpio_pin8 }, 
-                .config = { .dir = hal_gpio_dirOUT,     .speed = hal_gpio_speed_low,    .altcfg = NULL }
-            },
-            {   // hal_led2 
-                .gpio   = { .port = hal_gpio_portE,     .pin = hal_gpio_pin9 }, 
-                .config = { .dir = hal_gpio_dirOUT,     .speed = hal_gpio_speed_low,    .altcfg = NULL }
-            },            
-            {   // hal_led3 
-                .gpio   = { .port = hal_gpio_portE,     .pin = hal_gpio_pin10}, 
-                .config = { .dir = hal_gpio_dirOUT,     .speed = hal_gpio_speed_low,    .altcfg = NULL }
-            },            
-            {   // hal_led4 
-                .gpio   = { .port = hal_gpio_portE,     .pin = hal_gpio_pin11}, 
-                .config = { .dir = hal_gpio_dirOUT,     .speed = hal_gpio_speed_low,    .altcfg = NULL }
-            },            
-            {   // hal_led5 
-                .gpio   = { .port = hal_gpio_portE,     .pin = hal_gpio_pin12}, 
-                .config = { .dir = hal_gpio_dirOUT,     .speed = hal_gpio_speed_low,    .altcfg = NULL }
-            },   
-            {   // hal_led6 
-                .gpio   = { .port = hal_gpio_portE,     .pin = hal_gpio_pin13}, 
-                .config = { .dir = hal_gpio_dirOUT,     .speed = hal_gpio_speed_low,    .altcfg = NULL }
-            },   
-            {   // hal_led7 
-                .gpio   = { .port = hal_gpio_portE,     .pin = hal_gpio_pin14}, 
-                .config = { .dir = hal_gpio_dirOUT,     .speed = hal_gpio_speed_low,    .altcfg = NULL }
-            },               
-            {   // hal_led8 
-                .gpio   = { .port = hal_gpio_portE,     .pin = hal_gpio_pin15}, 
-                .config = { .dir = hal_gpio_dirOUT,     .speed = hal_gpio_speed_low,    .altcfg = NULL }
-            }
-//             {   // hal_lednone 
-//                 .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE}, 
-//                 .config = { .dir = hal_gpio_dirNONE,    .speed = hal_gpio_speed_low,    .altcfg = NULL }
-//             }
-
+            { .port = hal_gpio_portE,    .pin = hal_gpio_pin8,    .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led0
+            { .port = hal_gpio_portE,    .pin = hal_gpio_pin9,    .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led1
+            { .port = hal_gpio_portE,    .pin = hal_gpio_pin10,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led2
+            { .port = hal_gpio_portE,    .pin = hal_gpio_pin11,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led3
+            { .port = hal_gpio_portE,    .pin = hal_gpio_pin12,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led4
+            { .port = hal_gpio_portE,    .pin = hal_gpio_pin13,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led5
+            { .port = hal_gpio_portE,    .pin = hal_gpio_pin14,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }, // hal_led6
+            { .port = hal_gpio_portE,    .pin = hal_gpio_pin15,   .dir = hal_gpio_dirOUT,  .speed = hal_gpio_speed_low }  // hal_led7
+          //{ .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirNONE, .speed = hal_gpio_speed_low }
         }
     };
 #endif//HAL_USE_DEVICE_LED
@@ -714,60 +597,24 @@
         .supported_mask             = (0 << hal_mux_port1) | (0 << hal_mux_port2) | (0 << hal_mux_port3) | (0 << hal_mux_port4), 
         .gpio_sel0                  =
         {
-            {    
-                .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                .config = { .dir = hal_gpio_dirNONE,    .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            },             
-            {    
-                .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                .config = { .dir = hal_gpio_dirNONE,    .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            }, 
-            {    
-                .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                .config = { .dir = hal_gpio_dirNONE,    .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            }, 
-            {    
-                .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                .config = { .dir = hal_gpio_dirNONE,    .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            }            
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default }            
         },
         .gpio_sel1                  =
          {
-           {    
-                .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                .config = { .dir = hal_gpio_dirNONE,    .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            },             
-            {    
-                .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                .config = { .dir = hal_gpio_dirNONE,    .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            }, 
-            {    
-                .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                .config = { .dir = hal_gpio_dirNONE,    .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            }, 
-            {    
-                .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                .config = { .dir = hal_gpio_dirNONE,    .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            }                 
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default }            
         }, 
         .gpio_enable                =
         {
-           {    
-                .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                .config = { .dir = hal_gpio_dirNONE,    .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            },             
-            {    
-                .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                .config = { .dir = hal_gpio_dirNONE,    .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            }, 
-            {    
-                .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                .config = { .dir = hal_gpio_dirNONE,    .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            }, 
-            {    
-                .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                .config = { .dir = hal_gpio_dirNONE,    .speed = hal_gpio_speed_default,    .altcfg = NULL }
-            }                 
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default },
+            { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE, .dir = hal_gpio_dirALT, .speed = hal_gpio_speed_default }            
         },    
     };
 #endif//HAL_USE_DEVICE_MUX      
@@ -808,12 +655,6 @@
          }
     };           
 #endif//HAL_USE_DEVICE_TERMOMETER
-
-// -- chips
-// none
-
-// -- extbrds
-// none
     
 
 
@@ -920,7 +761,13 @@ extern hal_result_t hal_brdcfg__static_memory_init(void)
         return(hal_res_NOK_generic);
     }
 #endif//HAL_USE_ETH 
- 
+
+#ifdef  HAL_USE_FLASH
+    if(hal_res_OK != hal_flash_hid_static_memory_init())
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif//HAL_USE_FLASH   
 
 #ifdef  HAL_USE_GPIO
     if(hal_res_OK != hal_gpio_hid_static_memory_init())

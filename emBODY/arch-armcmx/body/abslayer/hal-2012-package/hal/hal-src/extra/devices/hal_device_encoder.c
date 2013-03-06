@@ -61,7 +61,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_device_encoder_encoder2index(t)              ((uint8_t)((t)))
+#define HAL_device_encoder_id2index(t)              ((uint8_t)((t)))
 
 
 
@@ -83,16 +83,23 @@ typedef struct
     hal_spi_port_t          spiport;
     hal_encoder_position_t  position;
     uint8_t                 rxframe[4];
-} hal_encoder_internals_t;
+} hal_device_encoder_internal_item_t;
+
+
+typedef struct
+{
+    uint8_t                                     initted;
+    hal_device_encoder_internal_item_t*         items[hal_encoders_number];   
+} hal_device_encoder_theinternals_t;
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_device_encoder_supported_is(hal_encoder_t encoder);
-static void s_hal_device_encoder_initted_set(hal_encoder_t encoder);
-static hal_boolval_t s_hal_device_encoder_initted_is(hal_encoder_t encoder);
+static hal_boolval_t s_hal_device_encoder_supported_is(hal_encoder_t id);
+static void s_hal_device_encoder_initted_set(hal_encoder_t id);
+static hal_boolval_t s_hal_device_encoder_initted_is(hal_encoder_t id);
 
 
 static void s_hal_encoder_onreceiv(void* p);
@@ -122,11 +129,14 @@ static const hal_spi_cfg_t s_hal_device_encoder_spicfg_master =
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static uint16_t s_hal_device_encoder_initted = 0;
+static hal_device_encoder_theinternals_t s_hal_device_encoder_theinternals =
+{
+    .initted            = 0,
+    .items              = { NULL }   
+};
 
-static hal_encoder_internals_t* s_hal_device_encoder_internals[hal_encoders_num] = { NULL };
 
-// static hal_encoder_internals_t s_hal_device_encoder_internals[hal_encoders_num] = 
+// static hal_device_encoder_internal_item_t s_hal_device_encoder_internals[hal_encoders_number] = 
 // {
 //     {
 //         .config     = { .priority = hal_int_priorityNONE, .callback_on_rx = NULL, .arg = NULL }, 
@@ -145,12 +155,12 @@ static hal_encoder_internals_t* s_hal_device_encoder_internals[hal_encoders_num]
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern hal_result_t hal_encoder_init(hal_encoder_t encoder, const hal_encoder_cfg_t *cfg)
+extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *cfg)
 {
     //hal_result_t res = hal_res_NOK_generic;
-    hal_encoder_internals_t* intitem = s_hal_device_encoder_internals[HAL_device_encoder_encoder2index(encoder)];
+    hal_device_encoder_internal_item_t* intitem = s_hal_device_encoder_theinternals.items[HAL_device_encoder_id2index(id)];
 
-    if(hal_false == s_hal_device_encoder_supported_is(encoder))
+    if(hal_false == s_hal_device_encoder_supported_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -166,15 +176,15 @@ extern hal_result_t hal_encoder_init(hal_encoder_t encoder, const hal_encoder_cf
     // if it does not have ram yet, then attempt to allocate it.
     if(NULL == intitem)
     {
-        intitem = s_hal_device_encoder_internals[HAL_device_encoder_encoder2index(encoder)] = hal_heap_new(sizeof(hal_encoder_internals_t));
+        intitem = s_hal_device_encoder_theinternals.items[HAL_device_encoder_id2index(id)] = hal_heap_new(sizeof(hal_device_encoder_internal_item_t));
         // minimal initialisation of the internal item
         // nothing to init.      
     }       
     
     memcpy(&intitem->config, cfg, sizeof(hal_encoder_cfg_t));   
-    intitem->muxport   = hal_brdcfg_device_encoder__theconfig.muxport[HAL_device_encoder_encoder2index(encoder)];
-    intitem->muxsel    = hal_brdcfg_device_encoder__theconfig.muxsel[HAL_device_encoder_encoder2index(encoder)];
-    intitem->spiport   = hal_brdcfg_device_encoder__theconfig.spiport[HAL_device_encoder_encoder2index(encoder)];
+    intitem->muxport   = hal_brdcfg_device_encoder__theconfig.muxport[HAL_device_encoder_id2index(id)];
+    intitem->muxsel    = hal_brdcfg_device_encoder__theconfig.muxsel[HAL_device_encoder_id2index(id)];
+    intitem->spiport   = hal_brdcfg_device_encoder__theconfig.spiport[HAL_device_encoder_id2index(id)];
     intitem->position  = 0;
     
 
@@ -187,16 +197,16 @@ extern hal_result_t hal_encoder_init(hal_encoder_t encoder, const hal_encoder_cf
     hal_spi_init(intitem->spiport, &s_hal_device_encoder_spicfg_master);
     
  
-    s_hal_device_encoder_initted_set(encoder);
+    s_hal_device_encoder_initted_set(id);
     return(hal_res_OK);
 }
 
 
-extern hal_result_t hal_encoder_start(hal_encoder_t encoder)
+extern hal_result_t hal_encoder_start(hal_encoder_t id)
 {  
-    hal_encoder_internals_t* intitem = s_hal_device_encoder_internals[HAL_device_encoder_encoder2index(encoder)];   
+    hal_device_encoder_internal_item_t* intitem = s_hal_device_encoder_theinternals.items[HAL_device_encoder_id2index(id)];   
     
-    if(hal_false == s_hal_device_encoder_initted_is(encoder))
+    if(hal_false == s_hal_device_encoder_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -206,7 +216,7 @@ extern hal_result_t hal_encoder_start(hal_encoder_t encoder)
        
     hal_mux_enable(intitem->muxport, intitem->muxsel);
     
-    hal_spi_on_framereceiv_set(intitem->spiport, s_hal_encoder_onreceiv, (void*)encoder);
+    hal_spi_on_framereceiv_set(intitem->spiport, s_hal_encoder_onreceiv, (void*)id);
     
     hal_spi_start(intitem->spiport, 1); // 1 solo frame ...
     
@@ -217,11 +227,11 @@ extern hal_result_t hal_encoder_start(hal_encoder_t encoder)
 
 
 
-extern hal_result_t hal_encoder_read(hal_encoder_t encoder, hal_encoder_position_t* value)
+extern hal_result_t hal_encoder_read(hal_encoder_t id, hal_encoder_position_t* value)
 {
-    hal_encoder_internals_t* intitem = s_hal_device_encoder_internals[HAL_device_encoder_encoder2index(encoder)];
+    hal_device_encoder_internal_item_t* intitem = s_hal_device_encoder_theinternals.items[HAL_device_encoder_id2index(id)];
     
-    if(hal_false == s_hal_device_encoder_initted_is(encoder))
+    if(hal_false == s_hal_device_encoder_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -252,8 +262,7 @@ extern hal_result_t hal_encoder_read(hal_encoder_t encoder, hal_encoder_position
 
 extern hal_result_t hal_device_encoder_hid_static_memory_init(void)
 {
-    s_hal_device_encoder_initted = 0;
-    memset(&s_hal_device_encoder_internals, 0, sizeof(hal_encoder_internals_t));
+    memset(&s_hal_device_encoder_theinternals, 0, sizeof(s_hal_device_encoder_theinternals));
     return(hal_res_OK);  
 }
 
@@ -261,21 +270,21 @@ extern hal_result_t hal_device_encoder_hid_static_memory_init(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_device_encoder_supported_is(hal_encoder_t encoder)
+static hal_boolval_t s_hal_device_encoder_supported_is(hal_encoder_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_encoder__theconfig.supported_mask, HAL_device_encoder_encoder2index(encoder)) );
+    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_encoder__theconfig.supported_mask, HAL_device_encoder_id2index(id)) );
 }
 
 
-static void s_hal_device_encoder_initted_set(hal_encoder_t encoder)
+static void s_hal_device_encoder_initted_set(hal_encoder_t id)
 {
-    hal_utility_bits_halfword_bitset(&s_hal_device_encoder_initted, HAL_device_encoder_encoder2index(encoder));
+    hal_utility_bits_halfword_bitset(&s_hal_device_encoder_theinternals.initted, HAL_device_encoder_id2index(id));
 }
 
 
-static hal_boolval_t s_hal_device_encoder_initted_is(hal_encoder_t encoder)
+static hal_boolval_t s_hal_device_encoder_initted_is(hal_encoder_t id)
 {
-    return(hal_utility_bits_halfword_bitcheck(s_hal_device_encoder_initted, HAL_device_encoder_encoder2index(encoder)));
+    return(hal_utility_bits_halfword_bitcheck(s_hal_device_encoder_theinternals.initted, HAL_device_encoder_id2index(id)));
 }
 
 
@@ -283,8 +292,8 @@ static hal_boolval_t s_hal_device_encoder_initted_is(hal_encoder_t encoder)
 static void s_hal_encoder_onreceiv(void* p)
 {
     int32_t tmp = (int32_t)p;                   // tmp is used just to remove a warning about conversione from pointer to smaller integer
-    hal_encoder_t encoder = (hal_encoder_t)tmp;
-    hal_encoder_internals_t* intitem = s_hal_device_encoder_internals[HAL_device_encoder_encoder2index(encoder)];
+    hal_encoder_t id = (hal_encoder_t)tmp;
+    hal_device_encoder_internal_item_t* intitem = s_hal_device_encoder_theinternals.items[HAL_device_encoder_id2index(id)];
     
     hal_spi_stop(intitem->spiport);
     hal_mux_disable(intitem->muxport);

@@ -44,8 +44,8 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef hal_result_t (*hal_device_cantransceiver_hid_fn_init_t) (hal_can_port_t port, void* initpar);
-typedef hal_result_t (*hal_device_cantransceiver_hid_fn_enabledisable_t) (hal_can_port_t port);
+typedef hal_result_t (*hal_device_cantransceiver_hid_fn_init_t) (hal_cantransceiver_t id, void* initpar);
+typedef hal_result_t (*hal_device_cantransceiver_hid_fn_enabledisable_t) (hal_cantransceiver_t id);
 typedef struct
 {   // used inside the public functions of hal_device_cantransceiver to communicate to the chip, but defined inside brdcfg
     hal_device_cantransceiver_hid_fn_init_t             init;
@@ -57,13 +57,13 @@ typedef struct
 
 typedef struct
 {   
-    hal_device_cantransceiver_hid_chip_interface_t  chipif;
+    hal_device_cantransceiver_hid_chip_interface_t      chipif;
 } hal_device_cantransceiver_hid_dev_cfg_t;
 
 typedef struct
 {
-    uint8_t                                         supported_mask;
-    hal_device_cantransceiver_hid_dev_cfg_t         devcfg;
+    uint8_t                                             supported_mask;
+    hal_device_cantransceiver_hid_dev_cfg_t             devcfg;
 } hal_device_cantransceiver_hid_brdcfg_t;
 
 

@@ -22,7 +22,7 @@
 
 
 /* @file       hal_device_mux_hid.h
-    @brief      This header file implements hidden interface to a muxport
+    @brief      This header file implements hidden interface to a id
     @author     marco.accame@iit.it, valentina.gaggero@iit.it
     @date       02/07/2013
  **/
@@ -50,9 +50,9 @@
 typedef struct
 {
     uint8_t                 supported_mask;
-    hal_gpio_cfg_t          gpio_sel0[hal_mux_ports_num];    /**<  */
-    hal_gpio_cfg_t          gpio_sel1[hal_mux_ports_num];    /**<  */
-    hal_gpio_cfg_t          gpio_enable[hal_mux_ports_num];    /**<  */
+    hal_gpio_map_t          gpio_sel0[hal_muxs_number];    /**<  */
+    hal_gpio_map_t          gpio_sel1[hal_muxs_number];    /**<  */
+    hal_gpio_map_t          gpio_enable[hal_muxs_number];    /**<  */
 } hal_device_mux_hid_brdcfg_t;
 
 

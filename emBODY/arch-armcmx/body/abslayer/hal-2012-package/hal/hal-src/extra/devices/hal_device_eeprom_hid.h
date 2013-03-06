@@ -66,7 +66,7 @@ typedef struct
 {   
     uint32_t                                baseaddress;
     uint32_t                                totalsize;
-    hal_i2c_port_t                          i2cport;
+    hal_i2c_t                               i2cport;
     hal_device_eeprom_hid_chip_interface_t  chipif;
 } hal_device_eeprom_hid_i2cbased_cfg_t;
 
@@ -79,7 +79,7 @@ typedef union
 typedef struct
 {
     uint8_t                                 supported_mask;
-    hal_device_eeprom_hid_dev_cfg_t         devcfg[hal_eeproms_num];
+    hal_device_eeprom_hid_dev_cfg_t         devcfg[hal_eeproms_number];
 } hal_device_eeprom_hid_brdcfg_t;
 
 

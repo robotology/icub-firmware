@@ -53,13 +53,13 @@ typedef enum
 
 typedef struct
 {   // RMII: Reduced Media Independent Interface   
-    hal_gpio_cfg_t      ETH_RMII_REF_CLK;           /**< configuration of gpio used for ETH_RMII_REF_CLK pin */
-    hal_gpio_cfg_t      ETH_RMII_TX_EN;             /**< configuration of gpio used for ETH_RMII_TX_EN pin */
-    hal_gpio_cfg_t      ETH_RMII_TXD0;              /**< configuration of gpio used for ETH_RMII_TXD0 pin */
-    hal_gpio_cfg_t      ETH_RMII_TXD1;              /**< configuration of gpio used for ETH_RMII_TXD1 pin */
-    hal_gpio_cfg_t      ETH_RMII_CRS_DV;            /**< configuration of gpio used for ETH_RMII_CRS_DV pin */
-    hal_gpio_cfg_t      ETH_RMII_RXD0;              /**< configuration of gpio used for ETH_RMII_RXD0 pin */
-    hal_gpio_cfg_t      ETH_RMII_RXD1;              /**< configuration of gpio used for ETH_RMII_RXD1 pin */
+    hal_gpio_map_t      ETH_RMII_REF_CLK;           /**< mapping of gpio used for ETH_RMII_REF_CLK pin */
+    hal_gpio_map_t      ETH_RMII_TX_EN;             /**< mapping of gpio used for ETH_RMII_TX_EN pin */
+    hal_gpio_map_t      ETH_RMII_TXD0;              /**< mapping of gpio used for ETH_RMII_TXD0 pin */
+    hal_gpio_map_t      ETH_RMII_TXD1;              /**< mapping of gpio used for ETH_RMII_TXD1 pin */
+    hal_gpio_map_t      ETH_RMII_CRS_DV;            /**< mapping of gpio used for ETH_RMII_CRS_DV pin */
+    hal_gpio_map_t      ETH_RMII_RXD0;              /**< mapping of gpio used for ETH_RMII_RXD0 pin */
+    hal_gpio_map_t      ETH_RMII_RXD1;              /**< mapping of gpio used for ETH_RMII_RXD1 pin */
 } hal_eth_hid_gpio_rmii_t;
 
 typedef struct
@@ -75,8 +75,8 @@ typedef union
 
 typedef struct
 {   // SMI: Serial Management Interface
-    hal_gpio_cfg_t      ETH_MDC;                    /**< configuration of gpio used for ETH_MDC pin */
-    hal_gpio_cfg_t      ETH_MDIO;                   /**< configuration of gpio used for ETH_MDIO pin */
+    hal_gpio_map_t      ETH_MDC;                    /**< mapping of gpio used for ETH_MDC pin */
+    hal_gpio_map_t      ETH_MDIO;                   /**< mapping of gpio used for ETH_MDIO pin */
 } hal_eth_hid_gpio_smi_t;
 
 typedef struct
@@ -85,8 +85,6 @@ typedef struct
     hal_eth_hid_mif_t           mif;                /**< always rmii  */
     hal_eth_hid_gpio_mif_t      gpio_mif;    
     hal_eth_hid_gpio_smi_t      gpio_smi;
-//    uint8_t                     numofdmatxbuffers;
-//    uint8_t                     numofdmarxbuffers;
 } hal_eth_hid_brdcfg_t;
 
 

@@ -35,6 +35,9 @@
 
 #include "hal_middleware_interface.h"
 
+// to see HAL_USE_CPU_FAM_xxxx 
+#include "hal_brdcfg_modules.h"
+
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
@@ -51,12 +54,16 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
+#if     defined(HAL_USE_CPU_FAM_STM32F1) || defined(HAL_USE_CPU_FAM_STM32F4)
 struct hal_gpio_hid_altcfg_t 
 {
     GPIO_InitTypeDef        gpioext;
     uint32_t                afname;     // HAL_GPIO_AFNAME_NONE, and other specific such as GPIO_Remap_ETH (stm32f1) or others
     uint32_t                afmode;     // HAL_GPIO_AFMODE_NONE, ENABLE, DISABLE (latter two are enum FunctionalState type)
 };
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif  
 
 
 typedef struct

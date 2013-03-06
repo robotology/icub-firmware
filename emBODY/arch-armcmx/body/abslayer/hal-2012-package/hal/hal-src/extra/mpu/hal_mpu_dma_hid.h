@@ -50,7 +50,7 @@
 
 typedef struct
 {
-    uint16_t            supported_mask;                 /**< bit in position hal_dma_portx must be 1 if portx is supported */
+    uint16_t            supported_mask;                 /**< bit in position hal_dmax must be 1 if portx is supported */
 } hal_dma_hid_brdcfg_t;
 
 

@@ -64,7 +64,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+#define HAL_device_switch_id2index(t)              ((uint8_t)((t)))
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -80,7 +81,21 @@ const hal_switch_cfg_t hal_switch_cfg_default =
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+
+typedef struct
+{
+    hal_switch_cfg_t        config;
+} hal_switch_internal_item_t;
+
+
+typedef struct
+{
+    uint8_t                         initted;
+    uint8_t                         started;
+    hal_switch_internal_item_t*     items[hal_switches_number];   
+} hal_switch_theinternals_t;
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -110,9 +125,13 @@ static hal_result_t s_hal_device_switch_lowlevel_init(const hal_switch_cfg_t *cf
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_switch_cfg_t s_hal_device_switch_cfg             = {.dummy = 0};
-static hal_boolval_t s_hal_device_switch_initted            =  hal_false;
-static hal_boolval_t s_hal_device_switch_started            =  hal_false;
+static hal_switch_theinternals_t s_hal_device_switch_theinternals =
+{
+    .initted            = 0,
+    .started            = 0,
+    .items              = { NULL }   
+};
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -123,12 +142,20 @@ static hal_boolval_t s_hal_device_switch_started            =  hal_false;
 
 extern hal_result_t hal_switch_init(const hal_switch_cfg_t *cfg)
 {
+    const hal_switch_t id = hal_switch1;
     hal_result_t res = hal_res_NOK_generic;
+    hal_switch_internal_item_t* intitem = s_hal_device_switch_theinternals.items[HAL_device_switch_id2index(id)];
 
 
     if(hal_true != s_hal_device_switch_supported_is())
     {
         return(hal_res_NOK_unsupported);
+    }
+    
+    if(NULL == intitem)
+    {
+        intitem = s_hal_device_switch_theinternals.items[HAL_device_switch_id2index(id)] = hal_heap_new(sizeof(hal_switch_internal_item_t));
+        // no initialisation is needed
     }
 
 
@@ -222,29 +249,34 @@ extern hal_result_t hal_device_switch_hid_static_memory_init(void)
 
 static hal_bool_t s_hal_device_switch_supported_is(void)
 {
+    const hal_switch_t id = hal_switch1;
     return(hal_brdcfg_device_switch__theconfig.supported); 
 }
 
 static hal_boolval_t s_hal_device_switch_initted_is(void)
 {
-    return(s_hal_device_switch_initted);
+    const hal_switch_t id = hal_switch1;
+    return(hal_utility_bits_byte_bitcheck(s_hal_device_switch_theinternals.initted, HAL_device_switch_id2index(id)));
 }
 
 static void s_hal_device_switch_initted_set(void)
 {
-    s_hal_device_switch_initted = hal_true;
+    const hal_switch_t id = hal_switch1;
+    hal_utility_bits_byte_bitset(&s_hal_device_switch_theinternals.initted, HAL_device_switch_id2index(id));
 }
 
 
 static hal_boolval_t s_hal_device_switch_started_is(void)
 {
-    return(s_hal_device_switch_started);
+    const hal_switch_t id = hal_switch1;
+    return(hal_utility_bits_byte_bitcheck(s_hal_device_switch_theinternals.started, HAL_device_switch_id2index(id)));
 }
 
 
 static void s_hal_device_switch_started_set(void)
 {
-    s_hal_device_switch_started = hal_true;
+    const hal_switch_t id = hal_switch1;
+    hal_utility_bits_byte_bitset(&s_hal_device_switch_theinternals.started, HAL_device_switch_id2index(id));
 }
 
 

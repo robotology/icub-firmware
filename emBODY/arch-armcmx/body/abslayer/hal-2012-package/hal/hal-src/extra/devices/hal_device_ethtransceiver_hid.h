@@ -17,8 +17,8 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_STM32_ETHTRANSCEIVER_HID_H_
-#define _HAL_STM32_ETHTRANSCEIVER_HID_H_
+#ifndef _HAL_DEVICE_ETHTRANSCEIVER_HID_H_
+#define _HAL_DEVICE_ETHTRANSCEIVER_HID_H_
 
 
 /* @file       hal_device_ethtransceiver_hid.h

@@ -52,8 +52,8 @@
 typedef struct
 {
     uint8_t             supported_mask;                     /**< bit in position hal_can_portx must be 1 if portx is supported */
-    hal_gpio_cfg_t      gpio_scl[hal_i2c_ports_number];     /**< in position hal_i2c_portx there is configuration of gpio used for scl pin */
-    hal_gpio_cfg_t      gpio_sda[hal_i2c_ports_number];     /**< in position hal_i2c_portx there is configuration of gpio used for sda pin */
+    hal_gpio_map_t      gpio_scl[hal_i2cs_number];          /**< in position hal_i2cx there is mapping of gpio used for its scl pin */
+    hal_gpio_map_t      gpio_sda[hal_i2cs_number];          /**< in position hal_i2cx there is mapping of gpio used for its sda pin */
 } hal_i2c_hid_brdcfg_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------

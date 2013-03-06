@@ -81,7 +81,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_crc2index(t)              ((uint8_t)((t)))
+#define HAL_crc_id2index(t)              ((uint8_t)((t)))
 
 
 
@@ -122,9 +122,9 @@ typedef struct
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_crc_supported_is(hal_crc_t crc);
-static void s_hal_crc_initted_set(hal_crc_t crc);
-static hal_boolval_t s_hal_crc_initted_is(hal_crc_t crc);
+static hal_boolval_t s_hal_crc_supported_is(hal_crc_t id);
+static void s_hal_crc_initted_set(hal_crc_t id);
+static hal_boolval_t s_hal_crc_initted_is(hal_crc_t id);
 
 static hal_result_t s_hal_crc_hw_init(hal_crc_internal_item_t *intitem);
 static uint32_t s_hal_crc32_hw_compute(hal_crc_internal_item_t *intitem, const void *data, uint32_t size);
@@ -154,13 +154,13 @@ static hal_crc_theinternals_t s_hal_crc_theinternals =
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern hal_result_t hal_crc_init(hal_crc_t crc, const hal_crc_cfg_t *cfg)
+extern hal_result_t hal_crc_init(hal_crc_t id, const hal_crc_cfg_t *cfg)
 {
     hal_result_t res = hal_res_NOK_generic; // dont remove ...
-    //hal_crc_internals_t *intitem = s_hal_crc_internals[HAL_crc2index(crc)];
-    hal_crc_internal_item_t* intitem = s_hal_crc_theinternals.items[HAL_crc2index(crc)];
+    //hal_crc_internals_t *intitem = s_hal_crc_internals[HAL_crc_id2index(id)];
+    hal_crc_internal_item_t* intitem = s_hal_crc_theinternals.items[HAL_crc_id2index(id)];
 
-    if(hal_false == s_hal_crc_supported_is(crc))
+    if(hal_false == s_hal_crc_supported_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -174,7 +174,7 @@ extern hal_result_t hal_crc_init(hal_crc_t crc, const hal_crc_cfg_t *cfg)
     // if it does not have ram yet, then attempt to allocate it.
     if(NULL == intitem)
     {
-        intitem = s_hal_crc_theinternals.items[HAL_crc2index(crc)] = hal_heap_new(sizeof(hal_crc_internal_item_t));
+        intitem = s_hal_crc_theinternals.items[HAL_crc_id2index(id)] = hal_heap_new(sizeof(hal_crc_internal_item_t));
         // minimal initialisation of the internal item
         // nothing to init.      
     }        
@@ -255,22 +255,22 @@ extern hal_result_t hal_crc_init(hal_crc_t crc, const hal_crc_cfg_t *cfg)
     }
 
 
-    s_hal_crc_initted_set(crc);
+    s_hal_crc_initted_set(id);
 
     return(hal_res_OK);
 }
 
-extern hal_result_t hal_crc_compute(hal_crc_t crc, hal_crc_compute_mode_t mode, const void *data, uint32_t size, uint32_t *out)
+extern hal_result_t hal_crc_compute(hal_crc_t id, hal_crc_compute_mode_t mode, const void *data, uint32_t size, uint32_t *out)
 {
-    //hal_crc_internals_t *intitem = s_hal_crc_internals[HAL_crc2index(crc)];
-    hal_crc_internal_item_t* intitem = s_hal_crc_theinternals.items[HAL_crc2index(crc)];
+    //hal_crc_internals_t *intitem = s_hal_crc_internals[HAL_crc_id2index(id)];
+    hal_crc_internal_item_t* intitem = s_hal_crc_theinternals.items[HAL_crc_id2index(id)];
  
     if((NULL == data) || (NULL == out) || (0 == size))
     {
         return(hal_res_NOK_generic);
     }
     
-    if(hal_false == s_hal_crc_initted_is(crc))
+    if(hal_false == s_hal_crc_initted_is(id))
     {
         *out = 0;
         return(hal_res_NOK_generic);
@@ -331,19 +331,19 @@ extern hal_result_t hal_crc_hid_static_memory_init(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_crc_supported_is(hal_crc_t crc)
+static hal_boolval_t s_hal_crc_supported_is(hal_crc_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_crc__theconfig.supported_mask, HAL_crc2index(crc)) );
+    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_crc__theconfig.supported_mask, HAL_crc_id2index(id)) );
 }
 
-static void s_hal_crc_initted_set(hal_crc_t crc)
+static void s_hal_crc_initted_set(hal_crc_t id)
 {
-    hal_utility_bits_byte_bitset(&s_hal_crc_theinternals.initted, HAL_crc2index(crc));
+    hal_utility_bits_byte_bitset(&s_hal_crc_theinternals.initted, HAL_crc_id2index(id));
 }
 
-static hal_boolval_t s_hal_crc_initted_is(hal_crc_t crc)
+static hal_boolval_t s_hal_crc_initted_is(hal_crc_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(s_hal_crc_theinternals.initted, HAL_crc2index(crc)));
+    return(hal_utility_bits_byte_bitcheck(s_hal_crc_theinternals.initted, HAL_crc_id2index(id)));
 }
 
 

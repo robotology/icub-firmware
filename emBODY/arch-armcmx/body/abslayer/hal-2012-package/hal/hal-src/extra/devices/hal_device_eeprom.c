@@ -62,7 +62,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_device_eeprom_dev2index(t)               ((uint8_t)(t))
+#define HAL_device_eeprom_id2index(t)               ((uint8_t)(t))
 
 
 
@@ -80,15 +80,26 @@ const hal_eeprom_cfg_t hal_device_eeprom_cfg_default =
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// 
+
+typedef struct
+{
+    uint8_t                                 dummy;
+} hal_device_eeprom_internal_item_t;
+
+typedef struct
+{
+    uint8_t                                 initted;
+    hal_eeprom_cfg_t                        config_of_emulated_flash;
+    //hal_device_eeprom_internal_item_t*      items[hal_eeproms_number];   
+} hal_device_eeprom_theinternals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_device_eeprom_supported_is(hal_eeprom_t eep);
-static void s_hal_device_eeprom_initted_set(hal_eeprom_t eep);
-static hal_boolval_t s_hal_device_eeprom_initted_is(hal_eeprom_t eep);
+static hal_boolval_t s_hal_device_eeprom_supported_is(hal_eeprom_t id);
+static void s_hal_device_eeprom_initted_set(hal_eeprom_t id);
+static hal_boolval_t s_hal_device_eeprom_initted_is(hal_eeprom_t id);
 
 static hal_result_t s_hal_device_eeprom_eraseflash(uint32_t addr, uint32_t size);
 static hal_result_t s_hal_device_eeprom_writeflash(uint32_t addr, uint32_t size, void * data);
@@ -103,9 +114,13 @@ static hal_result_t s_hal_device_eeprom_writeflash(uint32_t addr, uint32_t size,
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static uint8_t s_hal_device_eeprom_initted = 0;
+static hal_device_eeprom_theinternals_t s_hal_device_eeprom_theinternals =
+{
+    .initted                    = 0,
+    .config_of_emulated_flash   = { .flashpagebuffer = NULL, .flashpagesize = 0 }
+    //.items                      = { NULL }   
+};
 
-static hal_eeprom_cfg_t s_hal_device_eeprom_emulated_flash_cfg = {0};
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -113,10 +128,10 @@ static hal_eeprom_cfg_t s_hal_device_eeprom_emulated_flash_cfg = {0};
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern hal_result_t hal_eeprom_init(hal_eeprom_t eep, const hal_eeprom_cfg_t *cfg)
+extern hal_result_t hal_eeprom_init(hal_eeprom_t id, const hal_eeprom_cfg_t *cfg)
 {
     hal_result_t res = hal_res_NOK_unsupported;
-    if(hal_true != s_hal_device_eeprom_supported_is(eep))
+    if(hal_true != s_hal_device_eeprom_supported_is(id))
     {
         return(hal_res_NOK_unsupported);
     }
@@ -128,24 +143,24 @@ extern hal_result_t hal_eeprom_init(hal_eeprom_t eep, const hal_eeprom_cfg_t *cf
 
     // marker: evaluate the kind of eeprom
     
-    const hal_device_eeprom_hid_dev_cfg_t* devcfg = &hal_brdcfg_device_eeprom__theconfig.devcfg[HAL_device_eeprom_dev2index(eep)];
+    const hal_device_eeprom_hid_dev_cfg_t* devcfg = &hal_brdcfg_device_eeprom__theconfig.devcfg[HAL_device_eeprom_id2index(id)];
 
-    switch(eep)
+    switch(id)
     {
-        case hal_eeprom_emulatedflash:
+        case hal_eeprom1_emulatedflash:
         {
             if((0 == cfg->flashpagesize) || (NULL == cfg->flashpagebuffer))
             {
                 return(hal_res_NOK_generic);
             }
             
-            memcpy(&s_hal_device_eeprom_emulated_flash_cfg, cfg, sizeof(hal_eeprom_cfg_t)); 
+            memcpy(&s_hal_device_eeprom_theinternals.config_of_emulated_flash, cfg, sizeof(hal_eeprom_cfg_t)); 
 
             hal_flash_unlock();
             res = hal_res_OK;
         } break;
 
-        case hal_eeprom_i2c_01:
+        case hal_eeprom2_i2c_01:
         {
             res = hal_i2c_init(devcfg->i2cbased.i2cport, NULL);   // i use default configuration
             if(hal_res_OK != res)
@@ -177,14 +192,14 @@ extern hal_result_t hal_eeprom_init(hal_eeprom_t eep, const hal_eeprom_cfg_t *cf
     
     if(hal_res_OK == res)
     {
-        s_hal_device_eeprom_initted_set(eep);
+        s_hal_device_eeprom_initted_set(id);
     }
 
     return(hal_res_OK);
 }
 
 
-extern hal_result_t hal_eeprom_erase(hal_eeprom_t eep, uint32_t addr, uint32_t size)
+extern hal_result_t hal_eeprom_erase(hal_eeprom_t id, uint32_t addr, uint32_t size)
 {   
     hal_result_t res = hal_res_NOK_generic;
     // must be static const to be used within any shared library
@@ -195,7 +210,7 @@ extern hal_result_t hal_eeprom_erase(hal_eeprom_t eep, uint32_t addr, uint32_t s
     uint32_t i = 0;
 
     
-    if(hal_true != s_hal_device_eeprom_initted_is(eep))
+    if(hal_true != s_hal_device_eeprom_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -205,28 +220,28 @@ extern hal_result_t hal_eeprom_erase(hal_eeprom_t eep, uint32_t addr, uint32_t s
          return(hal_res_NOK_generic);
     }
     
-    if(hal_false == hal_eeprom_address_is_valid(eep, addr))
+    if(hal_false == hal_eeprom_address_is_valid(id, addr))
     {   // cannot write at the address the first bytes
         return(hal_res_NOK_generic);
     }
 
-    if(hal_false == hal_eeprom_address_is_valid(eep, addr+size-1))
+    if(hal_false == hal_eeprom_address_is_valid(id, addr+size-1))
     {   // cannot write at the address the last bytes
         return(hal_res_NOK_generic);
     }    
 
     // marker: evaluate the kind of eeprom
     
-    const hal_device_eeprom_hid_dev_cfg_t* devcfg = &hal_brdcfg_device_eeprom__theconfig.devcfg[HAL_device_eeprom_dev2index(eep)];
+    const hal_device_eeprom_hid_dev_cfg_t* devcfg = &hal_brdcfg_device_eeprom__theconfig.devcfg[HAL_device_eeprom_id2index(id)];
     
-    switch(eep)
+    switch(id)
     {
-        case hal_eeprom_emulatedflash:
+        case hal_eeprom1_emulatedflash:
         {
             res = s_hal_device_eeprom_eraseflash(addr, size);
         } break;
 
-        case hal_eeprom_i2c_01:
+        case hal_eeprom2_i2c_01:
         {
             num8 = size / factor;
             rem8 = size % factor;
@@ -260,11 +275,11 @@ extern hal_result_t hal_eeprom_erase(hal_eeprom_t eep, uint32_t addr, uint32_t s
 
 
 
-extern hal_result_t hal_eeprom_write(hal_eeprom_t eep, uint32_t addr, uint32_t size, void *data)
+extern hal_result_t hal_eeprom_write(hal_eeprom_t id, uint32_t addr, uint32_t size, void *data)
 {
     hal_result_t res = hal_res_NOK_generic;
 
-    if(hal_true != s_hal_device_eeprom_initted_is(eep))
+    if(hal_true != s_hal_device_eeprom_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -274,27 +289,27 @@ extern hal_result_t hal_eeprom_write(hal_eeprom_t eep, uint32_t addr, uint32_t s
          return(hal_res_NOK_generic);
     }
 
-    if(hal_false == hal_eeprom_address_is_valid(eep, addr))
+    if(hal_false == hal_eeprom_address_is_valid(id, addr))
     {   // cannot write at the address the first bytes
         return(hal_res_NOK_generic);
     }
 
-    if(hal_false == hal_eeprom_address_is_valid(eep, addr+size-1))
+    if(hal_false == hal_eeprom_address_is_valid(id, addr+size-1))
     {   // cannot write at the address the last bytes
         return(hal_res_NOK_generic);
     }    
 
     
-    const hal_device_eeprom_hid_dev_cfg_t* devcfg = &hal_brdcfg_device_eeprom__theconfig.devcfg[HAL_device_eeprom_dev2index(eep)];
+    const hal_device_eeprom_hid_dev_cfg_t* devcfg = &hal_brdcfg_device_eeprom__theconfig.devcfg[HAL_device_eeprom_id2index(id)];
     
-    switch(eep)
+    switch(id)
     {
-        case hal_eeprom_emulatedflash:
+        case hal_eeprom1_emulatedflash:
         {
             res = s_hal_device_eeprom_writeflash(addr, size, data);
         } break;
 
-        case hal_eeprom_i2c_01:
+        case hal_eeprom2_i2c_01:
         {
             res = devcfg->i2cbased.chipif.write(addr, size, (uint8_t*)data, NULL);
         } break;
@@ -311,11 +326,11 @@ extern hal_result_t hal_eeprom_write(hal_eeprom_t eep, uint32_t addr, uint32_t s
 }
 
 
-extern hal_result_t hal_eeprom_read(hal_eeprom_t eep, uint32_t addr, uint32_t size, void *data)
+extern hal_result_t hal_eeprom_read(hal_eeprom_t id, uint32_t addr, uint32_t size, void *data)
 {
     hal_result_t res = hal_res_NOK_generic;
 
-    if(hal_true != s_hal_device_eeprom_initted_is(eep))
+    if(hal_true != s_hal_device_eeprom_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -325,27 +340,27 @@ extern hal_result_t hal_eeprom_read(hal_eeprom_t eep, uint32_t addr, uint32_t si
 	     return(hal_res_NOK_generic);
 	}
 
-    if(hal_false == hal_eeprom_address_is_valid(eep, addr))
+    if(hal_false == hal_eeprom_address_is_valid(id, addr))
     {   // cannot write at the address the first bytes
         return(hal_res_NOK_generic);
     }
 
-    if(hal_false == hal_eeprom_address_is_valid(eep, addr+size-1))
+    if(hal_false == hal_eeprom_address_is_valid(id, addr+size-1))
     {   // cannot write at the address the last bytes
         return(hal_res_NOK_generic);
     }  
 
 
-    const hal_device_eeprom_hid_dev_cfg_t* devcfg = &hal_brdcfg_device_eeprom__theconfig.devcfg[HAL_device_eeprom_dev2index(eep)];
+    const hal_device_eeprom_hid_dev_cfg_t* devcfg = &hal_brdcfg_device_eeprom__theconfig.devcfg[HAL_device_eeprom_id2index(id)];
     
-    switch(eep)
+    switch(id)
     {
-        case hal_eeprom_emulatedflash:
+        case hal_eeprom1_emulatedflash:
         {
             res = hal_flash_read(addr, size, data);
         } break;
 
-        case hal_eeprom_i2c_01:
+        case hal_eeprom2_i2c_01:
         {
             res = devcfg->i2cbased.chipif.read(addr, size, (uint8_t*)data, NULL);
         } break;
@@ -363,20 +378,20 @@ extern hal_result_t hal_eeprom_read(hal_eeprom_t eep, uint32_t addr, uint32_t si
 
 
 
-extern uint32_t hal_eeprom_get_baseaddress(hal_eeprom_t eep)
+extern uint32_t hal_eeprom_get_baseaddress(hal_eeprom_t id)
 {
     uint32_t val = hal_NA32;
     
-    const hal_device_eeprom_hid_dev_cfg_t* devcfg = &hal_brdcfg_device_eeprom__theconfig.devcfg[HAL_device_eeprom_dev2index(eep)];
+    const hal_device_eeprom_hid_dev_cfg_t* devcfg = &hal_brdcfg_device_eeprom__theconfig.devcfg[HAL_device_eeprom_id2index(id)];
 
-    switch(eep)
+    switch(id)
     {
-        case hal_eeprom_emulatedflash:
+        case hal_eeprom1_emulatedflash:
         {
             val = devcfg->flashemul.baseaddress;;
         } break;
 
-        case hal_eeprom_i2c_01:
+        case hal_eeprom2_i2c_01:
         {
             val = devcfg->i2cbased.baseaddress;
         } break;
@@ -391,20 +406,20 @@ extern uint32_t hal_eeprom_get_baseaddress(hal_eeprom_t eep)
 }
 
 
-extern uint32_t hal_eeprom_get_totalsize(hal_eeprom_t eep)
+extern uint32_t hal_eeprom_get_totalsize(hal_eeprom_t id)
 {
     uint32_t val = hal_NA32;
     
-    const hal_device_eeprom_hid_dev_cfg_t* devcfg = &hal_brdcfg_device_eeprom__theconfig.devcfg[HAL_device_eeprom_dev2index(eep)];
+    const hal_device_eeprom_hid_dev_cfg_t* devcfg = &hal_brdcfg_device_eeprom__theconfig.devcfg[HAL_device_eeprom_id2index(id)];
 
-    switch(eep)
+    switch(id)
     {
-        case hal_eeprom_emulatedflash:
+        case hal_eeprom1_emulatedflash:
         {
             val = devcfg->flashemul.totalsize;
         } break;
 
-        case hal_eeprom_i2c_01:
+        case hal_eeprom2_i2c_01:
         {
             val = devcfg->i2cbased.totalsize;
         } break;
@@ -419,22 +434,22 @@ extern uint32_t hal_eeprom_get_totalsize(hal_eeprom_t eep)
 }
 
 
-extern hal_bool_t hal_eeprom_address_is_valid(hal_eeprom_t eep, uint32_t addr)
+extern hal_bool_t hal_eeprom_address_is_valid(hal_eeprom_t id, uint32_t addr)
 {
     uint32_t base;
     uint32_t size;
     
-    const hal_device_eeprom_hid_dev_cfg_t* devcfg = &hal_brdcfg_device_eeprom__theconfig.devcfg[HAL_device_eeprom_dev2index(eep)];
+    const hal_device_eeprom_hid_dev_cfg_t* devcfg = &hal_brdcfg_device_eeprom__theconfig.devcfg[HAL_device_eeprom_id2index(id)];
 
-    switch(eep)
+    switch(id)
     {
-        case hal_eeprom_emulatedflash:
+        case hal_eeprom1_emulatedflash:
         {
             base = devcfg->flashemul.baseaddress;
             size = devcfg->flashemul.totalsize;
         } break;
 
-        case hal_eeprom_i2c_01:
+        case hal_eeprom2_i2c_01:
         {
             base = devcfg->i2cbased.baseaddress;
             size = devcfg->i2cbased.totalsize;
@@ -477,10 +492,7 @@ extern hal_bool_t hal_eeprom_address_is_valid(hal_eeprom_t eep, uint32_t addr)
 
 extern hal_result_t hal_device_eeprom_hid_static_memory_init(void)
 {
-    // removed dependancy from NZI ram
-    s_hal_device_eeprom_initted = 0;
-    memset(&s_hal_device_eeprom_emulated_flash_cfg, 0, sizeof(s_hal_device_eeprom_emulated_flash_cfg));
-
+    memset(&s_hal_device_eeprom_theinternals, 0, sizeof(s_hal_device_eeprom_theinternals));
     return(hal_res_OK); 
 }
 
@@ -490,19 +502,19 @@ extern hal_result_t hal_device_eeprom_hid_static_memory_init(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_device_eeprom_supported_is(hal_eeprom_t eep)
+static hal_boolval_t s_hal_device_eeprom_supported_is(hal_eeprom_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_eeprom__theconfig.supported_mask, HAL_device_eeprom_dev2index(eep)));
+    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_eeprom__theconfig.supported_mask, HAL_device_eeprom_id2index(id)));
 }
 
-static void s_hal_device_eeprom_initted_set(hal_eeprom_t eep)
+static void s_hal_device_eeprom_initted_set(hal_eeprom_t id)
 {
-     hal_utility_bits_byte_bitset(&s_hal_device_eeprom_initted, HAL_device_eeprom_dev2index(eep));
+     hal_utility_bits_byte_bitset(&s_hal_device_eeprom_theinternals.initted, HAL_device_eeprom_id2index(id));
 }
 
-static hal_boolval_t s_hal_device_eeprom_initted_is(hal_eeprom_t eep)
+static hal_boolval_t s_hal_device_eeprom_initted_is(hal_eeprom_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(s_hal_device_eeprom_initted, HAL_device_eeprom_dev2index(eep)));
+    return(hal_utility_bits_byte_bitcheck(s_hal_device_eeprom_theinternals.initted, HAL_device_eeprom_id2index(id)));
 }
 
 
@@ -523,7 +535,7 @@ static hal_result_t s_hal_device_eeprom_eraseflash(uint32_t addr, uint32_t size)
         return(hal_res_NOK_generic);
     }
 
-    if(NULL == s_hal_device_eeprom_emulated_flash_cfg.flashpagebuffer)
+    if(NULL == s_hal_device_eeprom_theinternals.config_of_emulated_flash.flashpagebuffer)
     {   // dont have a pagebuffer
         return(hal_res_NOK_generic);
     }
@@ -536,7 +548,7 @@ static hal_result_t s_hal_device_eeprom_eraseflash(uint32_t addr, uint32_t size)
         offset     = addr - pageaddr;
         numbytes   = (size<(pagesize-offset)) ? (size) : (pagesize-offset);
 
-        if(s_hal_device_eeprom_emulated_flash_cfg.flashpagesize < pagesize)
+        if(s_hal_device_eeprom_theinternals.config_of_emulated_flash.flashpagesize < pagesize)
         {   // cannot erase a page with size bigger than the buffer capacity
             return(hal_res_NOK_generic);
         }
@@ -548,13 +560,13 @@ static hal_result_t s_hal_device_eeprom_eraseflash(uint32_t addr, uint32_t size)
         else
         {   // need to save some data in the page...
             // read a page and place content in buffer
-            hal_flash_read(pageaddr, pagesize, s_hal_device_eeprom_emulated_flash_cfg.flashpagebuffer);
+            hal_flash_read(pageaddr, pagesize, s_hal_device_eeprom_theinternals.config_of_emulated_flash.flashpagebuffer);
             // set to 0xff a part of the buffer
-            memset(&((uint8_t*)s_hal_device_eeprom_emulated_flash_cfg.flashpagebuffer)[offset], 0xFF, numbytes);
+            memset(&((uint8_t*)s_hal_device_eeprom_theinternals.config_of_emulated_flash.flashpagebuffer)[offset], 0xFF, numbytes);
             // erase the full page
             hal_flash_erase(pageaddr, pagesize);
             // write the buffer
-            hal_flash_write(pageaddr, pagesize, s_hal_device_eeprom_emulated_flash_cfg.flashpagebuffer);
+            hal_flash_write(pageaddr, pagesize, s_hal_device_eeprom_theinternals.config_of_emulated_flash.flashpagebuffer);
         }
 
         size -= numbytes;
@@ -591,7 +603,7 @@ static hal_result_t s_hal_device_eeprom_writeflash(uint32_t addr, uint32_t size,
         return(hal_res_NOK_generic);
     }
 
-    if(NULL == s_hal_device_eeprom_emulated_flash_cfg.flashpagebuffer)
+    if(NULL == s_hal_device_eeprom_theinternals.config_of_emulated_flash.flashpagebuffer)
     {   // dont have a pagebuffer
         return(hal_res_NOK_generic);
     }
@@ -605,19 +617,19 @@ static hal_result_t s_hal_device_eeprom_writeflash(uint32_t addr, uint32_t size,
         numbytes   = (size<(pagesize-offset)) ? (size) : (pagesize-offset);
         data2write = (uint8_t*)data + count;;
 
-        if(s_hal_device_eeprom_emulated_flash_cfg.flashpagesize < pagesize)
+        if(s_hal_device_eeprom_theinternals.config_of_emulated_flash.flashpagesize < pagesize)
         {   // cannot write in a page with size bigger than the buffer capacity
             return(hal_res_NOK_generic);
         }
         
         // read a page and place content in buffer
-        hal_flash_read(pageaddr, pagesize, s_hal_device_eeprom_emulated_flash_cfg.flashpagebuffer);
+        hal_flash_read(pageaddr, pagesize, s_hal_device_eeprom_theinternals.config_of_emulated_flash.flashpagebuffer);
         // change the buffer
-        memcpy(&((uint8_t*)s_hal_device_eeprom_emulated_flash_cfg.flashpagebuffer)[offset], data2write, numbytes);
+        memcpy(&((uint8_t*)s_hal_device_eeprom_theinternals.config_of_emulated_flash.flashpagebuffer)[offset], data2write, numbytes);
         // erase the page
         hal_flash_erase(pageaddr, pagesize);
         // write the buffer
-        hal_flash_write(pageaddr, pagesize, s_hal_device_eeprom_emulated_flash_cfg.flashpagebuffer);
+        hal_flash_write(pageaddr, pagesize, s_hal_device_eeprom_theinternals.config_of_emulated_flash.flashpagebuffer);
 
         count += numbytes;
         size -= numbytes;

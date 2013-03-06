@@ -39,6 +39,8 @@
 
 #include "hal_brdcfg.h"
 
+#include "hal_utility_bits.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -58,7 +60,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+#define HAL_device_ethtransceiver_id2index(p)           ((uint8_t)((p)))
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -74,17 +77,28 @@ const hal_ethtransceiver_cfg_t hal_ethtransceiver_cfg_default =
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+typedef struct
+{
+    hal_ethtransceiver_cfg_t                        config;
+} hal_device_ethtransceiver_internal_item_t;
+
+typedef struct
+{
+    uint8_t                                         initted;
+    uint8_t                                         started;
+    hal_device_ethtransceiver_internal_item_t*      items[hal_ethtransceivers_number];   
+} hal_device_ethtransceiver_theinternals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
 static hal_bool_t s_hal_device_ethtransceiver_supported_is(void);
-static void s_hal_device_ethtransceiver_initted_set(void);
-static hal_bool_t s_hal_device_ethtransceiver_initted_is(void);
-static void s_hal_device_ethtransceiver_started_set(void);
-static hal_bool_t s_hal_device_ethtransceiver_started_is(void);
+static void s_hal_device_ethtransceiver_initted_set(hal_ethtransceiver_t id);
+static hal_bool_t s_hal_device_ethtransceiver_initted_is(hal_ethtransceiver_t id);
+static void s_hal_device_ethtransceiver_started_set(hal_ethtransceiver_t id);
+static hal_bool_t s_hal_device_ethtransceiver_started_is(hal_ethtransceiver_t id);
 
 
 static hal_result_t s_hal_device_ethtransceiver_lowlevel_init(const hal_ethtransceiver_cfg_t *cfg);
@@ -102,9 +116,12 @@ static hal_result_t s_hal_device_ethtransceiver_lowlevel_init(const hal_ethtrans
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_ethtransceiver_cfg_t s_hal_device_ethtransceiver_cfg             = { .dummy = 0 };
-static hal_bool_t s_hal_device_ethtransceiver_initted                       =  hal_false;
-static hal_bool_t s_hal_device_ethtransceiver_started                       =  hal_false;
+static hal_device_ethtransceiver_theinternals_t s_hal_device_ethtransceiver_theinternals =
+{
+    .initted            = 0,
+    .started            = 0,
+    .items              = { NULL }   
+};
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -124,7 +141,7 @@ extern hal_result_t hal_ethtransceiver_init(const hal_ethtransceiver_cfg_t *cfg)
     }
 
 
-    if(hal_true == s_hal_device_ethtransceiver_initted_is())
+    if(hal_true == s_hal_device_ethtransceiver_initted_is(hal_ethtransceiver1))
     {
         return(hal_res_OK);
     }
@@ -134,11 +151,10 @@ extern hal_result_t hal_ethtransceiver_init(const hal_ethtransceiver_cfg_t *cfg)
         cfg = &hal_ethtransceiver_cfg_default;
     }
 
-    memcpy(&s_hal_device_ethtransceiver_cfg, cfg, sizeof(hal_ethtransceiver_cfg_t));
-
+    
     res = s_hal_device_ethtransceiver_lowlevel_init(cfg);
 
-    s_hal_device_ethtransceiver_initted_set();
+    s_hal_device_ethtransceiver_initted_set(hal_ethtransceiver1);
 
     return(res);
 }
@@ -155,13 +171,13 @@ extern hal_result_t hal_ethtransceiver_config(hal_eth_phymode_t targetphymode, h
     }
 
 
-    if(hal_false == s_hal_device_ethtransceiver_initted_is())
+    if(hal_false == s_hal_device_ethtransceiver_initted_is(hal_ethtransceiver1))
     {
         return(hal_res_NOK_generic);
     }
     
 
-    if(hal_true == s_hal_device_ethtransceiver_started_is())
+    if(hal_true == s_hal_device_ethtransceiver_started_is(hal_ethtransceiver1))
     {
         hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.getphymode(usedphymode);
         return(hal_res_OK);
@@ -171,7 +187,7 @@ extern hal_result_t hal_ethtransceiver_config(hal_eth_phymode_t targetphymode, h
  
     hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.config(targetphymode, usedphymode);
 
-    s_hal_device_ethtransceiver_started_set();
+    s_hal_device_ethtransceiver_started_set(hal_ethtransceiver1);
 
     return(hal_res_OK); 
 }
@@ -179,13 +195,13 @@ extern hal_result_t hal_ethtransceiver_config(hal_eth_phymode_t targetphymode, h
 
 extern hal_bool_t hal_device_ethtransceiver_initted_is(void)
 {
-    return(s_hal_device_ethtransceiver_initted_is());
+    return(s_hal_device_ethtransceiver_initted_is(hal_ethtransceiver1));
 }
 
 
 extern hal_bool_t hal_device_ethtransceiver_started_is(void)
 {
-    return(s_hal_device_ethtransceiver_started_is());
+    return(s_hal_device_ethtransceiver_started_is(hal_ethtransceiver1));
 }
 
 
@@ -200,11 +216,7 @@ extern hal_bool_t hal_device_ethtransceiver_started_is(void)
 
 extern hal_result_t hal_device_ethtransceiver_hid_static_memory_init(void)
 {
-    // removed dependency from nzi ram
-    memset(&s_hal_device_ethtransceiver_cfg, 0, sizeof(s_hal_device_ethtransceiver_cfg));
-    s_hal_device_ethtransceiver_initted                =  hal_false;
-    s_hal_device_ethtransceiver_started                =  hal_false;
-
+    memset(&s_hal_device_ethtransceiver_theinternals, 0, sizeof(s_hal_device_ethtransceiver_theinternals));
     return(hal_res_OK);
 }
 
@@ -218,26 +230,26 @@ static hal_bool_t s_hal_device_ethtransceiver_supported_is(void)
     return(hal_brdcfg_device_ethtransceiver__theconfig.supported); 
 }
 
-static hal_bool_t s_hal_device_ethtransceiver_initted_is(void)
+static hal_bool_t s_hal_device_ethtransceiver_initted_is(hal_ethtransceiver_t id)
 {
-    return(s_hal_device_ethtransceiver_initted);
+    return(hal_utility_bits_byte_bitcheck(s_hal_device_ethtransceiver_theinternals.initted, HAL_device_ethtransceiver_id2index(id)));
 }
 
-static void s_hal_device_ethtransceiver_initted_set(void)
+static void s_hal_device_ethtransceiver_initted_set(hal_ethtransceiver_t id)
 {
-    s_hal_device_ethtransceiver_initted = hal_true;
-}
-
-
-static hal_bool_t s_hal_device_ethtransceiver_started_is(void)
-{
-    return(s_hal_device_ethtransceiver_started);
+    hal_utility_bits_byte_bitset(&s_hal_device_ethtransceiver_theinternals.initted, HAL_device_ethtransceiver_id2index(id));
 }
 
 
-static void s_hal_device_ethtransceiver_started_set(void)
+static hal_bool_t s_hal_device_ethtransceiver_started_is(hal_ethtransceiver_t id)
 {
-    s_hal_device_ethtransceiver_started = hal_true;
+    return(hal_utility_bits_byte_bitcheck(s_hal_device_ethtransceiver_theinternals.started, HAL_device_ethtransceiver_id2index(id)));
+}
+
+
+static void s_hal_device_ethtransceiver_started_set(hal_ethtransceiver_t id)
+{
+     hal_utility_bits_byte_bitset(&s_hal_device_ethtransceiver_theinternals.started, HAL_device_ethtransceiver_id2index(id));
 }
 
 

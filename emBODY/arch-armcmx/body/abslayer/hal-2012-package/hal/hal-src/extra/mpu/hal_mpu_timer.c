@@ -62,7 +62,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_timer2index(t)           ((uint8_t)((t)))
+#define HAL_timer_id2index(t)       ((uint8_t)((t)))
 
 
 #if     defined(HAL_USE_CPU_FAM_STM32F1)
@@ -98,7 +98,7 @@ typedef struct
 
 typedef struct
 {
-    hal_timer_cfg_t             cfg;        // fixed for every architecture
+    hal_timer_cfg_t             config;     // fixed for every architecture
     hal_timer_status_t          status;     // fixed for every architecture
     uint16_t                    period;     // fixed for every architecture
     uint16_t                    prescaler;  // fixed for every architecture
@@ -116,23 +116,23 @@ typedef struct
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_timer_supported_is(hal_timer_t timer);
-static void s_hal_timer_initted_set(hal_timer_t timer);
-static hal_boolval_t s_hal_timer_initted_is(hal_timer_t timer);
+static hal_boolval_t s_hal_timer_supported_is(hal_timer_t id);
+static void s_hal_timer_initted_set(hal_timer_t id);
+static hal_boolval_t s_hal_timer_initted_is(hal_timer_t id);
 
-static void s_hal_timer_status_set(hal_timer_t timer, hal_timer_status_t status);
-static hal_timer_status_t s_hal_timer_status_get(hal_timer_t timer);
+static void s_hal_timer_status_set(hal_timer_t id, hal_timer_status_t status);
+static hal_timer_status_t s_hal_timer_status_get(hal_timer_t id);
 
-static void s_hal_timer_prepare(hal_timer_t timer, const hal_timer_cfg_t *cfg);
+static void s_hal_timer_prepare(hal_timer_t id, const hal_timer_cfg_t *cfg);
 
-static void s_hal_timer_stm32_start(hal_timer_t timer);
-static void s_hal_timer_stm32_stop(hal_timer_t timer);
+static void s_hal_timer_stm32_start(hal_timer_t id);
+static void s_hal_timer_stm32_stop(hal_timer_t id);
 
 
 
-static hal_time_t s_hal_timer_get_period(hal_timer_t timer);
+static hal_time_t s_hal_timer_get_period(hal_timer_t id);
 
-static void s_hal_timer_callback(hal_timer_t timer);
+static void s_hal_timer_callback(hal_timer_t id);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -195,19 +195,17 @@ static hal_timer_theinternals_t s_hal_timer_theinternals =
     .items              = { NULL }   
 };
 
-//static hal_timer_internal_item_t* s_hal_timer_internals[hal_timers_num] = { NULL };
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern hal_result_t hal_timer_init(hal_timer_t timer, const hal_timer_cfg_t *cfg, hal_time_t *error)
+extern hal_result_t hal_timer_init(hal_timer_t id, const hal_timer_cfg_t *cfg, hal_time_t *error)
 {
-    hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer2index(timer)];    
+    hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer_id2index(id)];    
 
-    if(hal_false == s_hal_timer_supported_is(timer))
+    if(hal_false == s_hal_timer_supported_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -235,27 +233,27 @@ extern hal_result_t hal_timer_init(hal_timer_t timer, const hal_timer_cfg_t *cfg
     // if it does not have ram yet, then attempt to allocate it.
     if(NULL == intitem)
     {
-        intitem = s_hal_timer_theinternals.items[HAL_timer2index(timer)] = hal_heap_new(sizeof(hal_timer_internal_item_t));
+        intitem = s_hal_timer_theinternals.items[HAL_timer_id2index(id)] = hal_heap_new(sizeof(hal_timer_internal_item_t));
         // minimal initialisation of the internal item
         // initialise at least the status.
         intitem->status = hal_timer_status_none;        
     }    
      
     // if it is running, then stop it.
-    if(hal_timer_status_running == hal_timer_status_get(timer))
+    if(hal_timer_status_running == hal_timer_status_get(id))
     {
-        hal_timer_stop(timer);
+        hal_timer_stop(id);
     }
 
     // marker: save the cfg and init registers
 
     // computes the values to be put in registers and compute the error in microsec
-    s_hal_timer_prepare(timer, cfg);
+    s_hal_timer_prepare(id, cfg);
 
     // marker: calculate error
     if(NULL != error)
     {
-        hal_time_t period = s_hal_timer_get_period(timer);
+        hal_time_t period = s_hal_timer_get_period(id);
         if(period > cfg->countdown)
         {
             *error = period - cfg->countdown; 
@@ -266,89 +264,89 @@ extern hal_result_t hal_timer_init(hal_timer_t timer, const hal_timer_cfg_t *cfg
         }
     }
     
-    s_hal_timer_initted_set(timer);
+    s_hal_timer_initted_set(id);
 
     return(hal_res_OK);
 }
 
 
-extern hal_result_t hal_timer_start(hal_timer_t timer)
+extern hal_result_t hal_timer_start(hal_timer_t id)
 {
-    if(hal_false == s_hal_timer_initted_is(timer))
+    if(hal_false == s_hal_timer_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
 
-    if(hal_timer_status_running == s_hal_timer_status_get(timer))
+    if(hal_timer_status_running == s_hal_timer_status_get(id))
     {
-        hal_timer_stop(timer);
+        hal_timer_stop(id);
     }
 
-    s_hal_timer_status_set(timer, hal_timer_status_running);
-    s_hal_timer_stm32_start(timer); 
+    s_hal_timer_status_set(id, hal_timer_status_running);
+    s_hal_timer_stm32_start(id); 
 
     return(hal_res_OK);
 }
 
 
 
-extern hal_result_t hal_timer_stop(hal_timer_t timer)
+extern hal_result_t hal_timer_stop(hal_timer_t id)
 {
-    if(hal_false == s_hal_timer_initted_is(timer))
+    if(hal_false == s_hal_timer_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
 
-    if(hal_timer_status_idle == s_hal_timer_status_get(timer))
+    if(hal_timer_status_idle == s_hal_timer_status_get(id))
     {
         return(hal_res_OK);
     }
     // marker: stop and set status
 
-    s_hal_timer_stm32_stop(timer);
-    s_hal_timer_status_set(timer, hal_timer_status_idle);
+    s_hal_timer_stm32_stop(id);
+    s_hal_timer_status_set(id, hal_timer_status_idle);
 
     return(hal_res_OK);
 }
 
 
 
-extern hal_result_t hal_timer_countdown_set(hal_timer_t timer, hal_time_t countdown, hal_time_t *error)
+extern hal_result_t hal_timer_countdown_set(hal_timer_t id, hal_time_t countdown, hal_time_t *error)
 {                                                                            
     hal_timer_cfg_t *curcfg = NULL;
     hal_timer_cfg_t newcfg;
     uint8_t wasrunning = 0;
 
-    if(hal_false == s_hal_timer_initted_is(timer))
+    if(hal_false == s_hal_timer_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
 
     // if running stop.
-    if(hal_timer_status_running == hal_timer_status_get(timer))
+    if(hal_timer_status_running == hal_timer_status_get(id))
     {
         wasrunning = 1;
     }
 
     // computes the values to be put in registers
-    curcfg = &s_hal_timer_theinternals.items[HAL_timer2index(timer)]->cfg;
+    curcfg = &s_hal_timer_theinternals.items[HAL_timer_id2index(id)]->config;
     memcpy(&newcfg, curcfg, sizeof(hal_timer_cfg_t));
     newcfg.countdown = countdown;
 
-    hal_timer_init(timer, &newcfg, error);
+    hal_timer_init(id, &newcfg, error);
 
     if(1 == wasrunning)
     {
-        hal_timer_start(timer);
+        hal_timer_start(id);
     }
 
     return(hal_res_OK);
 }
 
 
-extern hal_result_t hal_timer_priority_set(hal_timer_t timer, hal_interrupt_priority_t prio)
+extern hal_result_t hal_timer_priority_set(hal_timer_t id, hal_interrupt_priority_t prio)
 {
-    if(hal_false == s_hal_timer_initted_is(timer))
+    if(hal_false == s_hal_timer_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -359,23 +357,9 @@ extern hal_result_t hal_timer_priority_set(hal_timer_t timer, hal_interrupt_prio
 }
 
 
-extern hal_result_t hal_timer_interrupt_enable(hal_timer_t timer)
+extern hal_result_t hal_timer_interrupt_enable(hal_timer_t id)
 {
-    if(hal_false == s_hal_timer_initted_is(timer))
-    {
-        return(hal_res_NOK_generic);
-    }
-
-    // do something 
-
-    return(hal_res_NOK_unsupported);
-}
-
-
-
-extern hal_result_t hal_timer_interrupt_disable(hal_timer_t timer)
-{
-    if(hal_false == s_hal_timer_initted_is(timer))
+    if(hal_false == s_hal_timer_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -387,12 +371,26 @@ extern hal_result_t hal_timer_interrupt_disable(hal_timer_t timer)
 
 
 
-extern hal_result_t hal_timer_remainingtime_get(hal_timer_t timer, hal_time_t *remaining_time)
+extern hal_result_t hal_timer_interrupt_disable(hal_timer_t id)
 {
-    hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer2index(timer)];
-    TIM_TypeDef* TIMx               = s_hal_timer_stm32regs[HAL_timer2index(timer)].TIMx;
+    if(hal_false == s_hal_timer_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
 
-    if(hal_false == s_hal_timer_initted_is(timer))
+    // do something 
+
+    return(hal_res_NOK_unsupported);
+}
+
+
+
+extern hal_result_t hal_timer_remainingtime_get(hal_timer_t id, hal_time_t *remaining_time)
+{
+    hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer_id2index(id)];
+    TIM_TypeDef* TIMx               = s_hal_timer_stm32regs[HAL_timer_id2index(id)].TIMx;
+
+    if(hal_false == s_hal_timer_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -403,9 +401,9 @@ extern hal_result_t hal_timer_remainingtime_get(hal_timer_t timer, hal_time_t *r
 }
 
 
-extern hal_result_t hal_timer_offset_write(hal_timer_t timer, hal_nanotime_t offset)
+extern hal_result_t hal_timer_offset_write(hal_timer_t id, hal_nanotime_t offset)
 {
-    if(hal_false == s_hal_timer_initted_is(timer))
+    if(hal_false == s_hal_timer_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -417,15 +415,15 @@ extern hal_result_t hal_timer_offset_write(hal_timer_t timer, hal_nanotime_t off
 }
 
 
-extern hal_timer_status_t hal_timer_status_get(hal_timer_t timer)
+extern hal_timer_status_t hal_timer_status_get(hal_timer_t id)
 {
 
-    if(hal_false == s_hal_timer_initted_is(timer))
+    if(hal_false == s_hal_timer_initted_is(id))
     {
         return(hal_timer_status_none);
     }
 
-    return(s_hal_timer_status_get(timer));
+    return(s_hal_timer_status_get(id));
 }
 
 
@@ -493,12 +491,7 @@ void TIM7_IRQHandler(void)
 
 extern hal_result_t hal_timer_hid_static_memory_init(void)
 {
-    uint8_t i = 0;
-
-    for(i=0; i<hal_timers_num; i++)
-    {
-        s_hal_timer_theinternals.items[i] = NULL;
-    }
+    memset(&s_hal_timer_theinternals, 0, sizeof(s_hal_timer_theinternals));
 
     return(hal_res_OK);  
 }
@@ -507,101 +500,101 @@ extern hal_result_t hal_timer_hid_static_memory_init(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_timer_supported_is(hal_timer_t timer)
+static hal_boolval_t s_hal_timer_supported_is(hal_timer_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_timer__theconfig.supported_mask, HAL_timer2index(timer)));
+    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_timer__theconfig.supported_mask, HAL_timer_id2index(id)));
 }
 
-static void s_hal_timer_initted_set(hal_timer_t timer)
+static void s_hal_timer_initted_set(hal_timer_t id)
 {
-    s_hal_timer_status_set(timer, hal_timer_status_idle);
+    s_hal_timer_status_set(id, hal_timer_status_idle);
 }
 
-static hal_boolval_t s_hal_timer_initted_is(hal_timer_t timer)
+static hal_boolval_t s_hal_timer_initted_is(hal_timer_t id)
 {
-    return((hal_timer_status_none != s_hal_timer_status_get(timer)) ? (hal_true) : (hal_false));
+    return((hal_timer_status_none != s_hal_timer_status_get(id)) ? (hal_true) : (hal_false));
 }
 
-static void s_hal_timer_status_set(hal_timer_t timer, hal_timer_status_t status)
+static void s_hal_timer_status_set(hal_timer_t id, hal_timer_status_t status)
 {
-    s_hal_timer_theinternals.items[HAL_timer2index(timer)]->status = status;
+    s_hal_timer_theinternals.items[HAL_timer_id2index(id)]->status = status;
 }
 
-static hal_timer_status_t s_hal_timer_status_get(hal_timer_t timer)
+static hal_timer_status_t s_hal_timer_status_get(hal_timer_t id)
 {
-    hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer2index(timer)];
+    hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer_id2index(id)];
     return( (NULL == intitem) ? (hal_timer_status_none) : (intitem->status) );
 }
 
-static void s_hal_timer_prepare(hal_timer_t timer, const hal_timer_cfg_t *cfg)
+static void s_hal_timer_prepare(hal_timer_t id, const hal_timer_cfg_t *cfg)
 {
-    hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer2index(timer)];
+    hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer_id2index(id)];
     // we use SystemCoreClock instead of hal_brdcfg_sys__theconfig.speeds.cpu, which should be the same because ...
     volatile uint32_t referencespeed = SystemCoreClock;  
 
-    memcpy(&intitem->cfg, cfg, sizeof(hal_timer_cfg_t));
+    memcpy(&intitem->config, cfg, sizeof(hal_timer_cfg_t));
 
     // use prescaler = ((referencespeed/a/1000) )
 
-    if(0 == (intitem->cfg.countdown % 1000))
+    if(0 == (intitem->config.countdown % 1000))
     {   // multiple of 1 ms: use 10 khz, thus a = 10. 1 tick is 100us, max countdown is 6400 msec = 6.4 s
 
-        if(intitem->cfg.countdown > 64000*100) // tick is 100
+        if(intitem->config.countdown > 64000*100) // tick is 100
         {
-            intitem->cfg.countdown = 64000*100; // tick is 100
+            intitem->config.countdown = 64000*100; // tick is 100
         }
 
         intitem->prescaler   = ((referencespeed/10/1000) );  // a is 10. the value is 7200: ok, lower than 65k
-        intitem->period      = intitem->cfg.countdown / 100; // tick is 100
+        intitem->period      = intitem->config.countdown / 100; // tick is 100
         intitem->tick_ns     = 100*1000; // tick is 100
 
     }
-    else if(0 == (intitem->cfg.countdown % 100))
+    else if(0 == (intitem->config.countdown % 100))
     {   // multiple of 100 us: use 100 khz, thus a = 100. 1 tick is 10us, max countdown is 640 msec
         
-        if(intitem->cfg.countdown > 64000*10) // tick is 10
+        if(intitem->config.countdown > 64000*10) // tick is 10
         {
-            intitem->cfg.countdown = 64000*10; // tick is 10
+            intitem->config.countdown = 64000*10; // tick is 10
         }
 
         intitem->prescaler   = ((referencespeed/100/1000) );  // a is 100. the value is 720: ok, lower than 65k
-        intitem->period      = intitem->cfg.countdown / 10; // tick is 10
+        intitem->period      = intitem->config.countdown / 10; // tick is 10
         intitem->tick_ns     = 10*1000; // tick is 10
     }
-    else if(0 == (intitem->cfg.countdown % 10))
+    else if(0 == (intitem->config.countdown % 10))
     {   // multiple of 10 us: use 1000 khz, thus a = 1000. 1 tick is 1us, max countdown is 64 msec
         
-        if(intitem->cfg.countdown > 64000*1) // tick is 1
+        if(intitem->config.countdown > 64000*1) // tick is 1
         {
-            intitem->cfg.countdown = 64000*1; // tick is 1
+            intitem->config.countdown = 64000*1; // tick is 1
         }
 
         intitem->prescaler   = ((referencespeed/1000/1000) );  // a is 1000. the value is 72: ok, lower than 65k
-        intitem->period      = intitem->cfg.countdown / 1; // tick is 1
+        intitem->period      = intitem->config.countdown / 1; // tick is 1
         intitem->tick_ns     = 1*1000; // tick is 1
     }
     else
     {   // multiple of 1 us: use 8000 khz, thus a = 8000. 1 tick is 0.125us, max countdown is 8 msec
         
-        if(intitem->cfg.countdown > 8000) // tick is 0.125
+        if(intitem->config.countdown > 8000) // tick is 0.125
         {
-            intitem->cfg.countdown = 8000; // tick is 0.125
+            intitem->config.countdown = 8000; // tick is 0.125
         }
 
         intitem->prescaler   = ((referencespeed/8000/1000) );  // a is 8000. the value is 9: ok, lower than 65k
-        intitem->period      = intitem->cfg.countdown * 8; // tick is 0.125
+        intitem->period      = intitem->config.countdown * 8; // tick is 0.125
         intitem->tick_ns     = 125; // tick is 0.125 micro
     }
 
 
 }
 
-static void s_hal_timer_stm32_start(hal_timer_t timer)
+static void s_hal_timer_stm32_start(hal_timer_t id)
 {
-    hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer2index(timer)];
-    TIM_TypeDef* TIMx               = s_hal_timer_stm32regs[HAL_timer2index(timer)].TIMx;
-    uint32_t RCC_APB1Periph_TIMx    = s_hal_timer_stm32regs[HAL_timer2index(timer)].RCC_APB1Periph_TIMx;
-    IRQn_Type TIMx_IRQn             = s_hal_timer_stm32regs[HAL_timer2index(timer)].TIMx_IRQn;
+    hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer_id2index(id)];
+    TIM_TypeDef* TIMx               = s_hal_timer_stm32regs[HAL_timer_id2index(id)].TIMx;
+    uint32_t RCC_APB1Periph_TIMx    = s_hal_timer_stm32regs[HAL_timer_id2index(id)].RCC_APB1Periph_TIMx;
+    IRQn_Type TIMx_IRQn             = s_hal_timer_stm32regs[HAL_timer_id2index(id)].TIMx_IRQn;
     TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
    // NVIC_InitTypeDef NVIC_InitStructure;
    
@@ -632,24 +625,24 @@ static void s_hal_timer_stm32_start(hal_timer_t timer)
     // Clear  update pending flag */
     TIM_ClearFlag(TIMx, TIM_FLAG_Update);
 
-    if(hal_int_priorityNONE != intitem->cfg.priority)
+    if(hal_int_priorityNONE != intitem->config.priority)
     {
         // Enable TIM2 Update interrupt */
         TIM_ITConfig(TIMx, TIM_IT_Update, ENABLE);
     
         // enable irqs in nvic
-        hal_sys_irqn_priority_set(TIMx_IRQn, intitem->cfg.priority);
+        hal_sys_irqn_priority_set(TIMx_IRQn, intitem->config.priority);
         hal_sys_irqn_enable(TIMx_IRQn);
     }
 }
 
-static void s_hal_timer_stm32_stop(hal_timer_t timer)
+static void s_hal_timer_stm32_stop(hal_timer_t id)
 {
-    hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer2index(timer)];
+    hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer_id2index(id)];
 //    NVIC_InitTypeDef NVIC_InitStructure;
-    TIM_TypeDef* TIMx               = s_hal_timer_stm32regs[HAL_timer2index(timer)].TIMx;
-//    uint32_t RCC_APB1Periph_TIMx    = s_hal_timer_stm32regs[HAL_timer2index(timer)].RCC_APB1Periph_TIMx;
-    IRQn_Type TIMx_IRQn             = s_hal_timer_stm32regs[HAL_timer2index(timer)].TIMx_IRQn;
+    TIM_TypeDef* TIMx               = s_hal_timer_stm32regs[HAL_timer_id2index(id)].TIMx;
+//    uint32_t RCC_APB1Periph_TIMx    = s_hal_timer_stm32regs[HAL_timer_id2index(id)].RCC_APB1Periph_TIMx;
+    IRQn_Type TIMx_IRQn             = s_hal_timer_stm32regs[HAL_timer_id2index(id)].TIMx_IRQn;
    
 
 #if 1
@@ -657,7 +650,7 @@ static void s_hal_timer_stm32_stop(hal_timer_t timer)
     TIM_DeInit(TIMx);
     TIM_Cmd(TIMx, DISABLE);
 
-    if(hal_int_priorityNONE != intitem->cfg.priority)
+    if(hal_int_priorityNONE != intitem->config.priority)
     {
         TIM_ITConfig(TIMx, TIM_IT_Update, DISABLE);
         hal_sys_irqn_disable(TIMx_IRQn);
@@ -785,29 +778,29 @@ static void s_hal_timer_stm32_stop(hal_timer_t timer)
 ////  TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE);
 //}
 
-static hal_time_t s_hal_timer_get_period(hal_timer_t timer)
+static hal_time_t s_hal_timer_get_period(hal_timer_t id)
 {
-    hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer2index(timer)];
+    hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer_id2index(id)];
 
-    return(intitem->cfg.countdown);
+    return(intitem->config.countdown);
 }
 
 
-static void s_hal_timer_callback(hal_timer_t timer)
+static void s_hal_timer_callback(hal_timer_t id)
 {
-    hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer2index(timer)];
+    hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer_id2index(id)];
     
-    if(hal_timer_mode_oneshot == intitem->cfg.mode)
+    if(hal_timer_mode_oneshot == intitem->config.mode)
     {
         // stop timer 
-        s_hal_timer_stm32_stop(timer);
+        s_hal_timer_stm32_stop(id);
               
-        s_hal_timer_status_set(timer, hal_timer_status_expired);
+        s_hal_timer_status_set(id, hal_timer_status_expired);
     }
 
-    if(NULL != intitem->cfg.callback_on_exp)
+    if(NULL != intitem->config.callback_on_exp)
     {
-        intitem->cfg.callback_on_exp(intitem->cfg.arg);
+        intitem->config.callback_on_exp(intitem->config.arg);
     }
 }
 

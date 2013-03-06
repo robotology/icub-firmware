@@ -69,7 +69,7 @@ extern const hal_chip_xx_eeprom_cfg_t hal_chip_xx_eeprom_cfg_default =
     .chipcfg                 =
     {
         .chip                   = hal_chip_xx_eeprom_chip_st_m24lr64, 
-        .i2cport                = hal_i2c_port1,  
+        .i2cport                = hal_i2c1,  
         .hwaddra2a1a0           = (0 << 2) | (0 << 1) | (0 << 0)       
     },
 
@@ -150,7 +150,7 @@ static hal_chip_xx_eeprom_internals_t s_hal_chip_xx_eeprom_internals =
         .chipcfg                 =
         {
             .chip                   = hal_chip_xx_eeprom_chip_none, 
-            .i2cport                = hal_i2c_port1, 
+            .i2cport                = hal_i2c1, 
             .hwaddra2a1a0           = (0 << 2) | (0 << 1) | (0 << 0)        
         },
         .wrprcfg                          =

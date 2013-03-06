@@ -94,23 +94,23 @@ typedef struct
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-#if     defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
-    // removed by acemor on 09-mar-2011 to avoid problems of ... 
-    // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Heap_Size (referred from hal_stm32.o).
-    // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Stack_Size (referred from hal_stm32.o).
-__asm int s_hal_base_getstacksize (void) {
-        IMPORT  Stack_Size
-        LDR     R0,=Stack_Size
-        BX      LR
-}
+// #if     defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
+//     // removed by acemor on 09-mar-2011 to avoid problems of ... 
+//     // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Heap_Size (referred from hal_stm32.o).
+//     // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Stack_Size (referred from hal_stm32.o).
+// __asm int s_hal_base_getstacksize (void) {
+//         IMPORT  Stack_Size
+//         LDR     R0,=Stack_Size
+//         BX      LR
+// }
 
 
-__asm int s_hal_base_getheapsize (void) {
-        IMPORT  Heap_Size
-        LDR     R0,=Heap_Size
-        BX      LR
-}
-#endif//defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
+// __asm int s_hal_base_getheapsize (void) {
+//         IMPORT  Heap_Size
+//         LDR     R0,=Heap_Size
+//         BX      LR
+// }
+// #endif//defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -158,24 +158,24 @@ extern hal_result_t hal_base_init(const hal_base_cfg_t *cfg)
     s_hal_base_theinternals.fn_osal_system_scheduling_restart = cfg->extfn.osal_system_scheduling_restart;
 
 
-#if     defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
-    // removed by acemor on 09-mar-2011 to avoid problems of ... 
-    // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Heap_Size (referred from hal_stm32.o).
-    // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Stack_Size (referred from hal_stm32.o).
-    // but ... as long as we dont use shalPART.axf (shared library) we dont care.
-    if(cfg->stacksize != s_hal_base_getstacksize())
-    {   
-        hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_base_initialise(): incorrect stack size");
-        return(hal_res_NOK_generic);
-    }
+// #if     defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
+//     // removed by acemor on 09-mar-2011 to avoid problems of ... 
+//     // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Heap_Size (referred from hal_stm32.o).
+//     // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Stack_Size (referred from hal_stm32.o).
+//     // but ... as long as we dont use shalPART.axf (shared library) we dont care.
+//     if(cfg->stacksize != s_hal_base_getstacksize())
+//     {   
+//         hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_base_initialise(): incorrect stack size");
+//         return(hal_res_NOK_generic);
+//     }
 
-    if(cfg->heapsize != s_hal_base_getheapsize())
-    {   
-        hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_base_initialise(): incorrect heap size");
-        return(hal_res_NOK_generic);
-    }
-#endif//defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
- 
+//     if(cfg->heapsize != s_hal_base_getheapsize())
+//     {   
+//         hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_base_initialise(): incorrect heap size");
+//         return(hal_res_NOK_generic);
+//     }
+// #endif//defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
+//  
     
     // finally ... sets used config
     memcpy(&s_hal_base_theinternals.config, cfg, sizeof(hal_base_cfg_t));

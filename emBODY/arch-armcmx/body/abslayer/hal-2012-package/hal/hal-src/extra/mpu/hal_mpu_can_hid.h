@@ -50,9 +50,9 @@
 
 typedef struct
 {
-    uint8_t             supported_mask;                 /**< bit in position hal_can_portx must be 1 if portx is supported */
-    hal_gpio_cfg_t      gpio_rx[hal_can_ports_number];     /**< in position hal_can_portx there is configuration of gpio used for canx rx pin */
-    hal_gpio_cfg_t      gpio_tx[hal_can_ports_number];     /**< in position hal_can_portx there is configuration of gpio used for canx tx pin */
+    uint8_t             supported_mask;             /**< bit in position hal_can_portx must be 1 if portx is supported */
+    hal_gpio_map_t      gpio_rx[hal_cans_number];   /**< in position hal_can_portx there is mapping of gpio used for canx rx pin */
+    hal_gpio_map_t      gpio_tx[hal_cans_number];   /**< in position hal_can_portx there is mapping of gpio used for canx tx pin */
 } hal_can_hid_brdcfg_t;
 
 

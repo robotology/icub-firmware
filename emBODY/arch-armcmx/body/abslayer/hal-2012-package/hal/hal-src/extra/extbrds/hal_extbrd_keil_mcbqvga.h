@@ -72,7 +72,7 @@ typedef enum
 typedef struct
 {
     hal_extbrd_keil_mcbqvga_mode_t      mode;
-    hal_spi_port_t                      spiport;
+    hal_spi_t                           spiport;
 } hal_extbrd_keil_mcbqvga_cfg_t;
 
 typedef enum

@@ -66,7 +66,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_device_termometer_port2index(t)              ((uint8_t)((t)))
+#define HAL_device_termometer_id2index(t)              ((uint8_t)((t)))
 
 
 
@@ -85,20 +85,25 @@ extern const hal_termometer_cfg_t hal_termometer_cfg_default  =
 
 typedef struct
 {
-    hal_termometer_cfg_t       cfg;
-    uint32_t                    initialvalue;
-} hal_device_termometer_internals_t;
+    hal_termometer_cfg_t        config;
+} hal_device_termometer_internal_item_t;
+
+typedef struct
+{
+    uint8_t                                 initted;
+    hal_device_termometer_internal_item_t   items[hal_termometers_number];
+} hal_device_termometer_theinternals_t;
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_device_termometer_supported_is(hal_termometer_port_t port);
-static void s_hal_device_termometer_initted_set(hal_termometer_port_t port);
-static hal_boolval_t s_hal_device_termometer_initted_is(hal_termometer_port_t port);
+static hal_boolval_t s_hal_device_termometer_supported_is(hal_termometer_t id);
+static void s_hal_device_termometer_initted_set(hal_termometer_t id);
+static hal_boolval_t s_hal_device_termometer_initted_is(hal_termometer_t id);
 
-static hal_result_t s_hal_device_termometer_hw_init(hal_termometer_port_t port, const hal_termometer_cfg_t *cfg);
+static hal_result_t s_hal_device_termometer_hw_init(hal_termometer_t id, const hal_termometer_cfg_t *cfg);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -111,9 +116,12 @@ static hal_result_t s_hal_device_termometer_hw_init(hal_termometer_port_t port, 
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static uint8_t s_hal_device_termometer_initted = 0;
+static hal_device_termometer_theinternals_t s_hal_device_termometer_theinternals =
+{
+    .initted            = 0,
+    .items              = { NULL }   
+};
 
-static hal_device_termometer_internals_t* s_hal_device_termometer_internals[hal_termometer_ports_number] = { NULL };
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -121,12 +129,11 @@ static hal_device_termometer_internals_t* s_hal_device_termometer_internals[hal_
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern hal_result_t hal_termometer_init(hal_termometer_port_t port, const hal_termometer_cfg_t *cfg)
+extern hal_result_t hal_termometer_init(hal_termometer_t id, const hal_termometer_cfg_t *cfg)
 {
-//     hal_result_t res = hal_res_NOK_generic; // dont remove ...
-//     hal_device_termometer_internals_t *info = NULL;
+//     hal_device_termometer_internal_item_t *info = s_hal_device_termometer_theinternals.items[0];
 
-    if(hal_false == s_hal_device_termometer_supported_is(port))
+    if(hal_false == s_hal_device_termometer_supported_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -136,25 +143,25 @@ extern hal_result_t hal_termometer_init(hal_termometer_port_t port, const hal_te
         cfg  = &hal_termometer_cfg_default;
     }
     
-    if(hal_true == s_hal_device_termometer_initted_is(port))
+    if(hal_true == s_hal_device_termometer_initted_is(id))
     {
         return(hal_res_OK);
     } 
  
-    if(hal_res_OK != s_hal_device_termometer_hw_init(port, cfg))
+    if(hal_res_OK != s_hal_device_termometer_hw_init(id, cfg))
     {
         return(hal_res_NOK_generic);
     }
     
-    s_hal_device_termometer_initted_set(port);
+    s_hal_device_termometer_initted_set(id);
 
     return(hal_res_OK);
 }
 
-extern hal_result_t hal_termometer_read(hal_termometer_port_t port, hal_termometer_degrees_t* degrees)
+extern hal_result_t hal_termometer_read(hal_termometer_t id, hal_termometer_degrees_t* degrees)
 {
     hal_result_t res = hal_res_NOK_generic; 
-//    hal_device_termometer_internals_t *info = NULL;
+//    hal_device_termometer_internal_item_t *info = s_hal_device_termometer_theinternals.items[0];
     int8_t data08 = 0;
 
     if(NULL == degrees)
@@ -162,14 +169,14 @@ extern hal_result_t hal_termometer_read(hal_termometer_port_t port, hal_termomet
         return(hal_res_NOK_generic);
     }
     
-    if(hal_false == s_hal_device_termometer_initted_is(port))
+    if(hal_false == s_hal_device_termometer_initted_is(id))
     {
         *degrees = -128;
         return(hal_res_NOK_generic);
     }
 
 
-    res = hal_brdcfg_device_termometer__theconfig.devcfg[HAL_device_termometer_port2index(port)].chipif.read(&data08);
+    res = hal_brdcfg_device_termometer__theconfig.devcfg[HAL_device_termometer_id2index(id)].chipif.read(&data08);
     *degrees = (int16_t) data08;  
     
     return(res);    
@@ -187,8 +194,7 @@ extern hal_result_t hal_termometer_read(hal_termometer_port_t port, hal_termomet
 
 extern hal_result_t hal_device_termometer_hid_static_memory_init(void)
 {
-    memset(s_hal_device_termometer_internals, 0, sizeof(s_hal_device_termometer_internals));
-    s_hal_device_termometer_initted = 0;
+    memset(&s_hal_device_termometer_theinternals, 0, sizeof(s_hal_device_termometer_theinternals));
     return(hal_res_OK);  
 }
 
@@ -197,29 +203,27 @@ extern hal_result_t hal_device_termometer_hid_static_memory_init(void)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static hal_boolval_t s_hal_device_termometer_supported_is(hal_termometer_port_t port)
+static hal_boolval_t s_hal_device_termometer_supported_is(hal_termometer_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_termometer__theconfig.supported_mask, HAL_device_termometer_port2index(port)) );
+    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_termometer__theconfig.supported_mask, HAL_device_termometer_id2index(id)) );
 }
 
-static void s_hal_device_termometer_initted_set(hal_termometer_port_t port)
+static void s_hal_device_termometer_initted_set(hal_termometer_t id)
 {
-    hal_utility_bits_byte_bitset(&s_hal_device_termometer_initted, HAL_device_termometer_port2index(port));
-    //s_hal_device_termometer_initted[HAL_device_termometer_port2index(port)] = hal_true;
+    hal_utility_bits_byte_bitset(&s_hal_device_termometer_theinternals.initted, HAL_device_termometer_id2index(id));
 }
 
-static hal_boolval_t s_hal_device_termometer_initted_is(hal_termometer_port_t port)
+static hal_boolval_t s_hal_device_termometer_initted_is(hal_termometer_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(s_hal_device_termometer_initted, HAL_device_termometer_port2index(port)));
-    //return(s_hal_device_termometer_initted[HAL_device_termometer_port2index(port)]);
+    return(hal_utility_bits_byte_bitcheck(s_hal_device_termometer_theinternals.initted, HAL_device_termometer_id2index(id)));
 }
 
 
-static hal_result_t s_hal_device_termometer_hw_init(hal_termometer_port_t port, const hal_termometer_cfg_t *cfg)
+static hal_result_t s_hal_device_termometer_hw_init(hal_termometer_t id, const hal_termometer_cfg_t *cfg)
 {   
-    if((NULL != hal_brdcfg_device_termometer__theconfig.devcfg[HAL_device_termometer_port2index(port)].chipif.init) && (NULL != hal_brdcfg_device_termometer__theconfig.devcfg[HAL_device_termometer_port2index(port)].chipif.read))
+    if((NULL != hal_brdcfg_device_termometer__theconfig.devcfg[HAL_device_termometer_id2index(id)].chipif.init) && (NULL != hal_brdcfg_device_termometer__theconfig.devcfg[HAL_device_termometer_id2index(id)].chipif.read))
     {
-        return(hal_brdcfg_device_termometer__theconfig.devcfg[HAL_device_termometer_port2index(port)].chipif.init(hal_brdcfg_device_termometer__theconfig.devcfg[HAL_device_termometer_port2index(port)].chipif.initpar));
+        return(hal_brdcfg_device_termometer__theconfig.devcfg[HAL_device_termometer_id2index(id)].chipif.init(hal_brdcfg_device_termometer__theconfig.devcfg[HAL_device_termometer_id2index(id)].chipif.initpar));
     }
     else
     {

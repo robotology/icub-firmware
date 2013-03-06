@@ -64,7 +64,7 @@ typedef struct
 typedef struct
 {
     uint8_t                                         supported_mask;
-    hal_device_termometer_hid_dev_cfg_t             devcfg[hal_termometer_ports_number];
+    hal_device_termometer_hid_dev_cfg_t             devcfg[hal_termometers_number];
 } hal_device_termometer_hid_brdcfg_t;
 
 

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
- * Author:  Marco Accame
- * email:   marco.accame@iit.it
+ * Author:  Valentina Gaggero, Marco Accame
+ * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
@@ -18,26 +18,25 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_MPU_SPI_HID_H_
-#define _HAL_MPU_SPI_HID_H_
+#ifndef _HAL_FLASH_HID_H_
+#define _HAL_FLASH_HID_H_
 
 
-/* @file       hal_mpu_spi_hid.h
-    @brief      This header file implements hidden interface to a generic hal spi module
+/* @file       hal_mpu_hid.h
+    @brief      This header file implements hidden interface to flash.
     @author     marco.accame@iit.it
-    @date       10/29/2012
+    @date       09/12/2011
  **/
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "hal_base.h"
-#include "hal_gpio.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_spi.h"
+#include "hal_flash.h"
 
 
 
@@ -49,11 +48,9 @@
 
 typedef struct
 {
-    uint8_t             supported_mask;                     /**< bit in position hal_spix must be 1 if portx is supported */
-    hal_gpio_map_t      gpio_sck[hal_spis_number];          /**< in position hal_spix there is mapping of gpio used for sck pin */
-    hal_gpio_map_t      gpio_miso[hal_spis_number];         /**< in position hal_spix there is mapping of gpio used for miso pin */
-    hal_gpio_map_t      gpio_mosi[hal_spis_number];         /**< in position hal_spix there is mapping of gpio used for mosi pin */
-} hal_spi_hid_brdcfg_t;
+    uint32_t            baseaddress;            /**< 0x08000000 on stm   */
+    uint32_t            totalsize;              /**< 1m for stm32f4x, etc ...  */
+} hal_flash_hid_brdcfg_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
@@ -61,9 +58,10 @@ typedef struct
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern hal_result_t hal_spi_hid_static_memory_init(void);
 
-extern hal_boolval_t hal_spi_hid_initted_is(hal_spi_t id);
+extern hal_result_t hal_flash_hid_static_memory_init(void);
+
+
 
 
 

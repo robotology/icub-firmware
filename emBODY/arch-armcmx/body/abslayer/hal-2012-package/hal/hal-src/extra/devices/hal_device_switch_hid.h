@@ -17,8 +17,8 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_STM32_SWITCH_HID_H_
-#define _HAL_STM32_SWITCH_HID_H_
+#ifndef _HAL_DEVICE_SWITCH_HID_H_
+#define _HAL_DEVICE_SWITCH_HID_H_
 
 
 /* @file       hal_device_switch_hid.h
@@ -56,7 +56,6 @@ typedef struct
 
 typedef struct
 {   
-//    hal_i2c_port_t                          i2cport;
     hal_eth_phymode_t                       targetphymode;
     hal_device_switch_hid_chip_interface_t  chipif;
 } hal_device_switch_hid_dev_cfg_t;

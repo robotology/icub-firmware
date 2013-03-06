@@ -65,13 +65,27 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+const hal_gpio_cfg_t hal_gpio_cfg_default =
+{
+    .dir                    = hal_gpio_dirOUT,
+    .speed                  = hal_gpio_speed_low
+};
 
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
+
+
+typedef struct 
+{
+    hal_gpio_port_t     port;
+    hal_gpio_pin_t      pin;
+    hal_gpio_dir_t      dir;
+    hal_gpio_speed_t    speed;
+} hal_gpio_xxx_t;
 
 typedef struct
 {
@@ -97,7 +111,19 @@ static void s_hal_gpio_output_clear(hal_gpio_port_t port, hal_gpio_pin_t pin);
 
 static hal_boolval_t s_hal_gpio_output_is(hal_gpio_port_t port, hal_gpio_pin_t pin);
 
-static hal_result_t s_hal_gpio_altfun_configure(hal_gpio_cfg_t cfg, const hal_gpio_altcfg_t* altcfg);
+static hal_result_t s_hal_gpio_altfun_configure(hal_gpio_xxx_t xxx, const hal_gpio_altcfg_t* altcfg);
+
+/* @fn         extern hal_result_t s_hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_gpio_dir_t dir)
+//     @brief      Inits the given pin in the given port with the given direction and a given speed 
+//     @param      pin             The pin. 
+//     @param      port            The port. 
+//     @param      dir             The direction.
+//     @param      dir             The speed.
+//     @return     If successful hal_res_OK
+//  **/
+static hal_result_t s_hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_gpio_dir_t dir, hal_gpio_speed_t speed);
+
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -195,23 +221,166 @@ static hal_gpio_theinternals_t s_hal_gpio_theinternals =
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-// __attribute__ ((weak)) extern void pippo(void)
-// //__weak extern void pippo(void)
+
+extern hal_result_t hal_gpio_init(hal_gpio_t gpio, const hal_gpio_cfg_t* cfg)
+{
+    if(NULL == cfg)
+    {
+        cfg = &hal_gpio_cfg_default;
+    }
+    
+    if(hal_gpio_dirALT != cfg->dir)
+    {
+        return(s_hal_gpio_init(gpio.port, gpio.pin, cfg->dir, cfg->speed));
+    }
+    
+    hal_gpio_xxx_t xxx;
+    xxx.port    = gpio.port;
+    xxx.pin     = gpio.pin;
+    xxx.dir     = cfg->dir;
+    xxx.speed   = cfg->speed;
+    
+    return(s_hal_gpio_altfun_configure(xxx, cfg->altcfg));    
+}
+
+extern hal_result_t hal_gpio_setval(hal_gpio_t gpio, hal_gpio_val_t val)
+{
+    if((hal_gpio_portNONE == gpio.port) || (hal_gpio_pinNONE == gpio.pin) || (hal_gpio_valNONE == val))
+    {
+        return(hal_res_NOK_generic);
+    }
+
+    // can write only initted port-pin
+    if(hal_true != s_hal_gpio_initted_is(gpio.port, gpio.pin))
+    {
+        return(hal_res_NOK_generic);
+    }
+
+    // can write only output port-pin
+    if(hal_true != s_hal_gpio_output_is(gpio.port, gpio.pin))
+    {
+        return(hal_res_NOK_generic);
+    }
+
+        
+    GPIO_WriteBit(hal_gpio_hid_ports[gpio.port], (uint16_t)(0x0001 << gpio.pin), (hal_gpio_valLOW == val) ? (Bit_RESET) : (Bit_SET)); 
+    
+    return(hal_res_OK);
+}
+
+extern hal_gpio_val_t hal_gpio_getval(hal_gpio_t gpio) 
+{
+    if((hal_gpio_portNONE == gpio.port) || (hal_gpio_pinNONE == gpio.pin))
+    {
+        return(hal_gpio_valNONE);
+    }
+
+    // can write only initted port-pin
+    if(hal_true != s_hal_gpio_initted_is(gpio.port, gpio.pin))
+    {
+        return(hal_gpio_valNONE);
+    }
+
+    return((hal_gpio_val_t)GPIO_ReadInputDataBit(hal_gpio_hid_ports[gpio.port], (uint16_t)(0x0001 << (uint8_t)gpio.pin)));
+
+} 
+
+
+extern void hal_gpio_quickest_setval(hal_gpio_t gpio, hal_gpio_val_t val)
+{
+#if     defined(HAL_USE_CPU_FAM_STM32F1)
+    volatile uint32_t* outvalreg = (hal_gpio_valLOW == val) ?  (&hal_gpio_hid_ports[gpio.port]->BRR) : (&hal_gpio_hid_ports[gpio.port]->BSRR);      
+    *outvalreg |= (1<<gpio.pin);
+#elif   defined(HAL_USE_CPU_FAM_STM32F4)
+   volatile uint16_t* outcmdreg = (hal_gpio_valLOW == val) ?  (&hal_gpio_hid_ports[gpio.port]->BSRRH) : (&hal_gpio_hid_ports[gpio.port]->BSRRL); 
+    *outcmdreg  = (1<<gpio.pin);
+#else //defined(HAL_USE_CPU_FAM_*)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif     
+}
+
+/* @fn         extern hal_result_t hal_gpio_configure(hal_gpio_cfg_t map, const hal_gpio_altcfg_t* altcfg)
+    @brief      It is a method to initialise the gpio which is more complete than hal_gpio_init(). If altcfg is NULL
+                it behaves as hal_gpio_init(). Otherwise it uses altcfg as a pointer to configurations which are specific of
+                the CPU family in use (see for instance hal_cpu_fam_stm32f1_gpio_altcfg_t).
+    @param      map             The gpio mapping. 
+    @param      altcfg          The alternate config specific of the chosen MPU family. 
+    @return     If successful hal_res_OK
+ **/
+//extern hal_result_t hal_gpio_configure(hal_gpio_xxx_t map, const hal_gpio_altcfg_t* altcfg);
+
+// extern hal_result_t hal_gpio_configure(hal_gpio_xxx_t xxx, const hal_gpio_altcfg_t* altcfg) 
 // {
-//     volatile uint8_t aaa = 10;
-//     uint8_t i;
-//     for(i=0; i<10; i++)
+//     if(hal_gpio_dirALT != xxx.dir)
 //     {
-//         aaa --;
+//         return(s_hal_gpio_init(xxx.port, xxx.pin, xxx.dir, xxx.speed));
 //     }
-// }
-// extern void pippo(void)
-// {
-//    hal_gpio_init(hal_gpio_portA, hal_gpio_pin1, hal_gpio_dirNONE, hal_gpio_speed_default);
+//     
+//     return(s_hal_gpio_altfun_configure(xxx, altcfg));
 // }
 
 
-extern hal_result_t hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_gpio_dir_t dir, hal_gpio_speed_t speed) 
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of extern hidden functions 
+// --------------------------------------------------------------------------------------------------------------------
+
+
+// ---- isr of the module: begin ----
+// empty-section
+// ---- isr of the module: end ------
+
+
+extern hal_result_t hal_gpio_hid_static_memory_init(void)
+{
+    memset(&s_hal_gpio_theinternals, 0, sizeof(s_hal_gpio_theinternals));
+    return(hal_res_OK);
+}
+
+  
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of static functions 
+// --------------------------------------------------------------------------------------------------------------------
+
+static hal_boolval_t s_hal_gpio_supported_is(hal_gpio_port_t port, hal_gpio_pin_t pin)
+{
+    uint16_t p = hal_brdcfg_gpio__theconfig.supported_mask_byport[HAL_gpio_port2index(port)];
+    return(hal_utility_bits_halfword_bitcheck(p, HAL_gpio_pin2index(pin)) );
+}
+
+
+static void s_hal_gpio_initted_set(hal_gpio_port_t port, hal_gpio_pin_t pin)
+{   // cannot be called with port and pin of value NONE
+    uint16_t *pp = &s_hal_gpio_theinternals.initted_mask[HAL_gpio_port2index(port)];
+    hal_utility_bits_halfword_bitset(pp, HAL_gpio_pin2index(pin));
+}
+
+static hal_boolval_t s_hal_gpio_initted_is(hal_gpio_port_t port, hal_gpio_pin_t pin)
+{   // cannot be called with port and pin of value NONE
+    uint16_t p = s_hal_gpio_theinternals.initted_mask[HAL_gpio_port2index(port)];
+    return(hal_utility_bits_halfword_bitcheck(p, HAL_gpio_pin2index(pin)) );
+}
+
+static void s_hal_gpio_output_set(hal_gpio_port_t port, hal_gpio_pin_t pin)
+{
+    uint16_t *pp = &s_hal_gpio_theinternals.output_mask[HAL_gpio_port2index(port)];
+    hal_utility_bits_halfword_bitset(pp, HAL_gpio_pin2index(pin));
+}
+
+static void s_hal_gpio_output_clear(hal_gpio_port_t port, hal_gpio_pin_t pin)
+{
+    uint16_t *pp = &s_hal_gpio_theinternals.output_mask[HAL_gpio_port2index(port)];
+    hal_utility_bits_halfword_bitclear(pp, HAL_gpio_pin2index(pin));
+}
+
+static hal_boolval_t s_hal_gpio_output_is(hal_gpio_port_t port, hal_gpio_pin_t pin)
+{
+    uint16_t p = s_hal_gpio_theinternals.output_mask[HAL_gpio_port2index(port)];
+    return(hal_utility_bits_halfword_bitcheck(p, HAL_gpio_pin2index(pin)) );
+}
+
+static hal_result_t s_hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_gpio_dir_t dir, hal_gpio_speed_t speed) 
 {
 
     GPIO_InitTypeDef  GPIO_InitStructure;
@@ -286,135 +455,8 @@ extern hal_result_t hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_
     return(hal_res_OK);
 }
 
-extern hal_result_t hal_gpio_setval(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_gpio_val_t val)
-{
-    if((hal_gpio_portNONE == port) || (hal_gpio_pinNONE == pin) || (hal_gpio_valNONE == val))
-    {
-        return(hal_res_NOK_generic);
-    }
 
-    // can write only initted port-pin
-    if(hal_true != s_hal_gpio_initted_is(port, pin))
-    {
-        return(hal_res_NOK_generic);
-    }
-
-    // can write only output port-pin
-    if(hal_true != s_hal_gpio_output_is(port, pin))
-    {
-        return(hal_res_NOK_generic);
-    }
-
-        
-    GPIO_WriteBit(hal_gpio_hid_ports[port], (uint16_t)(0x0001 << pin), (hal_gpio_valLOW == val) ? (Bit_RESET) : (Bit_SET)); 
-    
-    return(hal_res_OK);
-}
-
-extern hal_gpio_val_t hal_gpio_getval(hal_gpio_port_t port, hal_gpio_pin_t pin) 
-{
-    if((hal_gpio_portNONE == port) || (hal_gpio_pinNONE == pin))
-    {
-        return(hal_gpio_valNONE);
-    }
-
-    // can write only initted port-pin
-    if(hal_true != s_hal_gpio_initted_is(port, pin))
-    {
-        return(hal_gpio_valNONE);
-    }
-
-    return((hal_gpio_val_t)GPIO_ReadInputDataBit(hal_gpio_hid_ports[port], (uint16_t)(0x0001 << (uint8_t)pin)));
-
-} 
-
-
-extern void hal_gpio_quickest_setval(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_gpio_val_t val)
-{
-#if     defined(HAL_USE_CPU_FAM_STM32F1)
-    volatile uint32_t* outvalreg = (hal_gpio_valLOW == val) ?  (&hal_gpio_hid_ports[port]->BRR) : (&hal_gpio_hid_ports[port]->BSRR);      
-    *outvalreg |= (1<<pin);
-#elif   defined(HAL_USE_CPU_FAM_STM32F4)
-   volatile uint16_t* outcmdreg = (hal_gpio_valLOW == val) ?  (&hal_gpio_hid_ports[port]->BSRRH) : (&hal_gpio_hid_ports[port]->BSRRL); 
-    *outcmdreg  = (1<<pin);
-#else //defined(HAL_USE_CPU_FAM_*)
-    #error ERR --> choose a HAL_USE_CPU_FAM_*
-#endif     
-}
-
-
-extern hal_result_t hal_gpio_configure(hal_gpio_cfg_t cfg, const hal_gpio_altcfg_t* altcfg) 
-{
-    if(hal_gpio_dirALT != cfg.dir)
-    {
-        return(hal_gpio_init(cfg.port, cfg.pin, cfg.dir, cfg.speed));
-    }
-    
-    return(s_hal_gpio_altfun_configure(cfg, altcfg));
- 
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of extern hidden functions 
-// --------------------------------------------------------------------------------------------------------------------
-
-
-// ---- isr of the module: begin ----
-// empty-section
-// ---- isr of the module: end ------
-
-
-extern hal_result_t hal_gpio_hid_static_memory_init(void)
-{
-    memset(&s_hal_gpio_theinternals, 0, sizeof(s_hal_gpio_theinternals));
-    return(hal_res_OK);
-}
-
-  
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of static functions 
-// --------------------------------------------------------------------------------------------------------------------
-
-static hal_boolval_t s_hal_gpio_supported_is(hal_gpio_port_t port, hal_gpio_pin_t pin)
-{
-    uint16_t p = hal_brdcfg_gpio__theconfig.supported_mask_byport[HAL_gpio_port2index(port)];
-    return(hal_utility_bits_halfword_bitcheck(p, HAL_gpio_pin2index(pin)) );
-}
-
-
-static void s_hal_gpio_initted_set(hal_gpio_port_t port, hal_gpio_pin_t pin)
-{   // cannot be called with port and pin of value NONE
-    uint16_t *pp = &s_hal_gpio_theinternals.initted_mask[HAL_gpio_port2index(port)];
-    hal_utility_bits_halfword_bitset(pp, HAL_gpio_pin2index(pin));
-}
-
-static hal_boolval_t s_hal_gpio_initted_is(hal_gpio_port_t port, hal_gpio_pin_t pin)
-{   // cannot be called with port and pin of value NONE
-    uint16_t p = s_hal_gpio_theinternals.initted_mask[HAL_gpio_port2index(port)];
-    return(hal_utility_bits_halfword_bitcheck(p, HAL_gpio_pin2index(pin)) );
-}
-
-static void s_hal_gpio_output_set(hal_gpio_port_t port, hal_gpio_pin_t pin)
-{
-    uint16_t *pp = &s_hal_gpio_theinternals.output_mask[HAL_gpio_port2index(port)];
-    hal_utility_bits_halfword_bitset(pp, HAL_gpio_pin2index(pin));
-}
-
-static void s_hal_gpio_output_clear(hal_gpio_port_t port, hal_gpio_pin_t pin)
-{
-    uint16_t *pp = &s_hal_gpio_theinternals.output_mask[HAL_gpio_port2index(port)];
-    hal_utility_bits_halfword_bitclear(pp, HAL_gpio_pin2index(pin));
-}
-
-static hal_boolval_t s_hal_gpio_output_is(hal_gpio_port_t port, hal_gpio_pin_t pin)
-{
-    uint16_t p = s_hal_gpio_theinternals.output_mask[HAL_gpio_port2index(port)];
-    return(hal_utility_bits_halfword_bitcheck(p, HAL_gpio_pin2index(pin)) );
-}
-
-static hal_result_t s_hal_gpio_altfun_configure(hal_gpio_cfg_t cfg, const hal_gpio_altcfg_t* altcfg)
+static hal_result_t s_hal_gpio_altfun_configure(hal_gpio_xxx_t xxx, const hal_gpio_altcfg_t* altcfg)
 {
     GPIO_InitTypeDef  GPIO_InitStructure;
     
@@ -425,22 +467,22 @@ static hal_result_t s_hal_gpio_altfun_configure(hal_gpio_cfg_t cfg, const hal_gp
     }
     
     // we dont have this port in the mpu
-    if(0 == hal_gpio_hid_clocks[cfg.port])
+    if(0 == hal_gpio_hid_clocks[xxx.port])
     {
         return(hal_res_NOK_unsupported);
     }
     
-    // we use cfg.port and cfg.pin from the hal_gpio_cfg_t, we understand that we are in alt mode from cfg.dir
+    // we use xxx.port and xxx.pin from the hal_gpio_xxx_t, we understand that we are in alt mode from xxx.dir
     // and for the rest we use altcfg
     GPIO_StructInit(&GPIO_InitStructure);
     
     // configure gpio
     memcpy(&GPIO_InitStructure, &altcfg->gpioext, sizeof(GPIO_InitTypeDef));
     // any changes to GPIO_InitStructure ?? only the pin !
-    GPIO_InitStructure.GPIO_Pin = hal_gpio_hid_pins[cfg.pin]; 
-    if(hal_gpio_speed_default != cfg.speed)
+    GPIO_InitStructure.GPIO_Pin = hal_gpio_hid_pins[xxx.pin]; 
+    if(hal_gpio_speed_default != xxx.speed)
     {   // if the gpiocfg specifies something different from default, then we use it.
-        GPIO_InitStructure.GPIO_Speed = (GPIOSpeed_TypeDef)hal_gpio_hid_speeds[cfg.speed];
+        GPIO_InitStructure.GPIO_Speed = (GPIOSpeed_TypeDef)hal_gpio_hid_speeds[xxx.speed];
     }
     else
     {   // else we use the speed in gpioext
@@ -449,9 +491,9 @@ static hal_result_t s_hal_gpio_altfun_configure(hal_gpio_cfg_t cfg, const hal_gp
     
 #if     defined(HAL_USE_CPU_FAM_STM32F1)    
     // enable gpio clock and its its afio clock
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO | hal_gpio_hid_clocks[cfg.port], ENABLE);    
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO | hal_gpio_hid_clocks[xxx.port], ENABLE);    
     // init the gpio
-    GPIO_Init(hal_gpio_hid_ports[cfg.port], &GPIO_InitStructure);    
+    GPIO_Init(hal_gpio_hid_ports[xxx.port], &GPIO_InitStructure);    
     // remap gpio ... but only if it is not 0
     if(HAL_GPIO_AFMODE_NONE != altcfg->afmode)
     {
@@ -459,13 +501,13 @@ static hal_result_t s_hal_gpio_altfun_configure(hal_gpio_cfg_t cfg, const hal_gp
     }        
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)  
     // enable gpio clock
-    RCC_AHB1PeriphClockCmd(hal_gpio_hid_clocks[cfg.port], ENABLE);
+    RCC_AHB1PeriphClockCmd(hal_gpio_hid_clocks[xxx.port], ENABLE);
     // init the gpio
-    GPIO_Init(hal_gpio_hid_ports[cfg.port], &GPIO_InitStructure);    
+    GPIO_Init(hal_gpio_hid_ports[xxx.port], &GPIO_InitStructure);    
     // remap gpio 
     if(HAL_GPIO_AFMODE_NONE != altcfg->afmode)   
     {        
-        GPIO_PinAFConfig(hal_gpio_hid_ports[cfg.port], hal_gpio_hid_pinpositions[cfg.pin], altcfg->afname);
+        GPIO_PinAFConfig(hal_gpio_hid_ports[xxx.port], hal_gpio_hid_pinpositions[xxx.pin], altcfg->afname);
     }
 #else //defined(HAL_USE_CPU_FAM_*)
     #error ERR --> choose a HAL_USE_CPU_FAM_*
