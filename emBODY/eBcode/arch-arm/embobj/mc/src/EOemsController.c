@@ -500,10 +500,9 @@ extern void eo_emsController_SetTrqPid(uint8_t joint, float K, float Kd, float K
 // PID configurations
 ///////////////////////
 
-
-extern void eo_emsController_SetStiffness(uint8_t joint, int32_t stiffness)
+extern void eo_emsController_SetImpedance(uint8_t joint, int32_t stiffness, int32_t damping, int32_t offset)
 {
-    if (s_emsc) eo_axisController_SetStiffness(s_emsc->axis_controller[joint], stiffness);
+    if (s_emsc) eo_axisController_SetImpedance(s_emsc->axis_controller[joint], stiffness, damping, offset);
 }
 
 extern void eo_emsController_SetVelTimeout(uint8_t joint, int32_t vel_timeout)

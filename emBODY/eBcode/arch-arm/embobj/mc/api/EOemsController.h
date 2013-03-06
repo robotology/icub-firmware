@@ -97,8 +97,7 @@ extern eObool_t eo_emsController_GetMotionDone(uint8_t joint);
 extern void eo_emsController_SetPosPid(uint8_t joint, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff);
 extern void eo_emsController_SetTrqPid(uint8_t joint, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff);
 
-
-extern void eo_emsController_SetStiffness(uint8_t joint, int32_t stiffeness);
+extern void eo_emsController_SetImpedance(uint8_t joint, int32_t stiffness, int32_t damping, int32_t offset);
 
 extern void eo_emsController_SetLimits(uint8_t joint, int32_t pos_min, int32_t pos_max, int32_t vel_max);
 extern void eo_emsController_SetPosMin(uint8_t joint, int32_t pos_min);
