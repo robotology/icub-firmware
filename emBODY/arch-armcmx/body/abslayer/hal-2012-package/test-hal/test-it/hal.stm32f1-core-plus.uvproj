@@ -350,7 +350,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_BOARD_MCBSTM32C</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\hal\hal-api;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc;..\..\hal\hal-src\core;..\..\hal\hal-src\brdcfg;..\..\hal\hal-src\extra\chips;..\..\hal\hal-src\extra\devices;..\..\hal\hal-src\extra\extbrds;..\..\hal\hal-src\extra\mpu;..\..\hal\hal-src\extra\utilities;..\..\..\..\..\..\arch-armcmx</IncludePath>
+              <IncludePath>..\..\hal\hal-api;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc;..\..\hal\hal-src\core;..\..\hal\hal-src\brdcfg;..\..\hal\hal-src\extra\chips;..\..\hal\hal-src\extra\devices;..\..\hal\hal-src\extra\extbrds;..\..\hal\hal-src\extra\periphs;..\..\hal\hal-src\extra\utilities;..\..\..\..\..\..\arch-armcmx</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -587,59 +587,59 @@
           <GroupName>hal-extra-periphs</GroupName>
           <Files>
             <File>
-              <FileName>hal_mpu_can.c</FileName>
+              <FileName>hal_periph_can.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_can.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_can.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_crc.c</FileName>
+              <FileName>hal_periph_crc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_crc.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_crc.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_dma.c</FileName>
+              <FileName>hal_periph_dma.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_dma.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_dma.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_eth.c</FileName>
+              <FileName>hal_periph_eth.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_eth.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_eth.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_gpio.c</FileName>
+              <FileName>hal_periph_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_gpio.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_gpio.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_i2c.c</FileName>
+              <FileName>hal_periph_i2c.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_i2c.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_i2c.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_spi.c</FileName>
+              <FileName>hal_periph_spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_spi.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_spi.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_timer.c</FileName>
+              <FileName>hal_periph_timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_timer.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_timer.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_trace.c</FileName>
+              <FileName>hal_periph_trace.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_trace.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_trace.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_uniqueid.c</FileName>
+              <FileName>hal_periph_uniqueid.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_uniqueid.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_uniqueid.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_watchdog.c</FileName>
+              <FileName>hal_periph_watchdog.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_watchdog.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_watchdog.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1344,59 +1344,59 @@
           <GroupName>hal-extra-periphs</GroupName>
           <Files>
             <File>
-              <FileName>hal_mpu_can.c</FileName>
+              <FileName>hal_periph_can.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_can.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_can.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_crc.c</FileName>
+              <FileName>hal_periph_crc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_crc.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_crc.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_dma.c</FileName>
+              <FileName>hal_periph_dma.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_dma.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_dma.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_eth.c</FileName>
+              <FileName>hal_periph_eth.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_eth.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_eth.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_gpio.c</FileName>
+              <FileName>hal_periph_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_gpio.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_gpio.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_i2c.c</FileName>
+              <FileName>hal_periph_i2c.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_i2c.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_i2c.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_spi.c</FileName>
+              <FileName>hal_periph_spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_spi.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_spi.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_timer.c</FileName>
+              <FileName>hal_periph_timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_timer.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_timer.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_trace.c</FileName>
+              <FileName>hal_periph_trace.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_trace.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_trace.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_uniqueid.c</FileName>
+              <FileName>hal_periph_uniqueid.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_uniqueid.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_uniqueid.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_watchdog.c</FileName>
+              <FileName>hal_periph_watchdog.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_watchdog.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_watchdog.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2083,59 +2083,59 @@
           <GroupName>hal-extra-periphs</GroupName>
           <Files>
             <File>
-              <FileName>hal_mpu_can.c</FileName>
+              <FileName>hal_periph_can.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_can.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_can.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_crc.c</FileName>
+              <FileName>hal_periph_crc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_crc.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_crc.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_dma.c</FileName>
+              <FileName>hal_periph_dma.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_dma.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_dma.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_eth.c</FileName>
+              <FileName>hal_periph_eth.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_eth.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_eth.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_gpio.c</FileName>
+              <FileName>hal_periph_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_gpio.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_gpio.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_i2c.c</FileName>
+              <FileName>hal_periph_i2c.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_i2c.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_i2c.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_spi.c</FileName>
+              <FileName>hal_periph_spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_spi.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_spi.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_timer.c</FileName>
+              <FileName>hal_periph_timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_timer.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_timer.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_trace.c</FileName>
+              <FileName>hal_periph_trace.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_trace.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_trace.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_uniqueid.c</FileName>
+              <FileName>hal_periph_uniqueid.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_uniqueid.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_uniqueid.c</FilePath>
             </File>
             <File>
-              <FileName>hal_mpu_watchdog.c</FileName>
+              <FileName>hal_periph_watchdog.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_watchdog.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_watchdog.c</FilePath>
             </File>
           </Files>
         </Group>
