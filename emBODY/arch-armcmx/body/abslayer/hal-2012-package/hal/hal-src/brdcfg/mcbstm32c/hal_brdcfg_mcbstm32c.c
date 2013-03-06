@@ -48,10 +48,10 @@
 #include "hal_utility_fifo_hid.h" 
 
 
-#include "hal_mpu_can_hid.h"
-#include "hal_mpu_spi_hid.h"
-#include "hal_mpu_eth_hid.h"
-#include "hal_mpu_trace_hid.h"
+#include "hal_periph_can_hid.h"
+#include "hal_periph_spi_hid.h"
+#include "hal_periph_eth_hid.h"
+#include "hal_periph_trace_hid.h"
 #include "hal_eeprom.h"
 #include "hal_timer.h"
 #include "hal_i2c.h"
@@ -88,7 +88,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#if defined(HAL_USE_ETH) || defined(HAL_USE_DEVICE_ETHTRANSCEIVER) || defined(HAL_USE_DEVICE_SWITCH)
+#if defined(HAL_USE_PERIPH_ETH) || defined(HAL_USE_DEVICE_ETHTRANSCEIVER) || defined(HAL_USE_DEVICE_SWITCH)
     #define HAL_ETH_PHYMODE_THEONE2USE     hal_eth_phymode_fullduplex100mbps
 #endif
 
@@ -173,7 +173,7 @@
 
 // --  extra: mpu peripherals
 
-#ifdef  HAL_USE_CAN
+#ifdef  HAL_USE_PERIPH_CAN
     extern const hal_can_hid_brdcfg_t hal_brdcfg_can__theconfig =
     {
         .supported_mask     = (1 << hal_can1) | (1 << hal_can2),
@@ -201,16 +201,16 @@
             }
         } 
     };
-#endif//HAL_USE_CAN
+#endif//HAL_USE_PERIPH_CAN
 
-#ifdef  HAL_USE_CRC
+#ifdef  HAL_USE_PERIPH_CRC
     extern const hal_crc_hid_brdcfg_t hal_brdcfg_crc__theconfig =
     {
         .supported_mask     = (1 << hal_crc1) | (1 << hal_crc2)
     };
-#endif//HAL_USE_CRC
+#endif//HAL_USE_PERIPH_CRC
     
-#ifdef  HAL_USE_DMA
+#ifdef  HAL_USE_PERIPH_DMA
     extern const hal_dma_hid_brdcfg_t hal_brdcfg_dma__theconfig =
     {
         .supported_mask     = (1 << hal_dma1) | (1 << hal_dma2) | (1 << hal_dma3) | (1 << hal_dma4) | (1 << hal_dma5) |
@@ -218,9 +218,9 @@
                               (1 << hal_dma11)| (1 << hal_dma12)
 
     };
-#endif//HAL_USE_DMA       
+#endif//HAL_USE_PERIPH_DMA       
 
-#ifdef  HAL_USE_ETH
+#ifdef  HAL_USE_PERIPH_ETH
     
     extern const hal_eth_hid_brdcfg_t hal_brdcfg_eth__theconfig     =
     {
@@ -279,11 +279,11 @@
         }
     };
 
-#endif//HAL_USE_ETH
+#endif//HAL_USE_PERIPH_ETH
 
 
 
-#ifdef HAL_USE_GPIO
+#ifdef HAL_USE_PERIPH_GPIO
     extern const hal_gpio_hid_brdcfg_t hal_brdcfg_gpio__theconfig =
     {
         .supported_mask_byport    =
@@ -299,10 +299,10 @@
             0x0000      // port i
         }
     };
-#endif//HAL_USE_GPIO
+#endif//HAL_USE_PERIPH_GPIO
 
 
-#ifdef  HAL_USE_I2C
+#ifdef  HAL_USE_PERIPH_I2C
     extern const hal_i2c_hid_brdcfg_t hal_brdcfg_i2c__theconfig =
     {
         .supported_mask         = (1 << hal_i2c1),
@@ -337,10 +337,10 @@
             }                  
         }
     };
-#endif//HAL_USE_I2C
+#endif//HAL_USE_PERIPH_I2C
 
 
-#ifdef  HAL_USE_SPI
+#ifdef  HAL_USE_PERIPH_SPI
     extern const hal_spi_hid_brdcfg_t hal_brdcfg_spi__theconfig =
     {
         .supported_mask         = (1 << hal_spi1) | (0 << hal_spi2) | (1 << hal_spi3),
@@ -390,40 +390,40 @@
             }            
         }      
     };
-#endif//HAL_USE_SPI
+#endif//HAL_USE_PERIPH_SPI
     
       
-#ifdef  HAL_USE_TIMER
+#ifdef  HAL_USE_PERIPH_TIMER
     extern const hal_timer_hid_brdcfg_t hal_brdcfg_timer__theconfig =
     {
         .supported_mask     = (0 << hal_timer1) | (1 << hal_timer2) | (1 << hal_timer3) | (1 << hal_timer4) | (1 << hal_timer5) | (1 << hal_timer6) | (1 << hal_timer7)
     };       
-#endif//HAL_USE_TIMER
+#endif//HAL_USE_PERIPH_TIMER
 
     
-#ifdef  HAL_USE_TRACE
+#ifdef  HAL_USE_PERIPH_TRACE
     extern const hal_trace_hid_brdcfg_t hal_brdcfg_trace__theconfig =
     {
         .supported          = hal_true
     };       
-#endif//HAL_USE_TRACE
+#endif//HAL_USE_PERIPH_TRACE
   
 
-#ifdef  HAL_USE_UNIQUEID
+#ifdef  HAL_USE_PERIPH_UNIQUEID
     extern const hal_uniqueid_hid_brdcfg_t hal_brdcfg_uniqueid__theconfig =
     {
         .supported_mask     = (1 << hal_uniqueid_id64bit) | (0 << hal_uniqueid_macaddr),
         .macoui             = 0
     };       
-#endif//HAL_USE_UNIQUEID
+#endif//HAL_USE_PERIPH_UNIQUEID
     
 
-#ifdef  HAL_USE_WATCHDOG
+#ifdef  HAL_USE_PERIPH_WATCHDOG
     extern const hal_watchdog_hid_brdcfg_t hal_brdcfg_watchdog__theconfig =
     {
         .supported_mask     = (1 << hal_watchdog1_normal) | (1 << hal_watchdog2_window)
     };       
-#endif//HAL_USE_WATCHDOG
+#endif//HAL_USE_PERIPH_WATCHDOG
 
 
 // -- devices
@@ -890,87 +890,87 @@ extern hal_result_t hal_brdcfg__static_memory_init(void)
     
     // - mpu peripherals ----------------------------------------------------------------------------------------------    
 
-#ifdef  HAL_USE_CAN
+#ifdef  HAL_USE_PERIPH_CAN
     if(hal_res_OK != hal_can_hid_static_memory_init())
     {
         return(hal_res_NOK_generic);
     }
-#endif//HAL_USE_CAN
+#endif//HAL_USE_PERIPH_CAN
 
 
-#ifdef  HAL_USE_CRC
+#ifdef  HAL_USE_PERIPH_CRC
     if(hal_res_OK != hal_crc_hid_static_memory_init())
     {
         return(hal_res_NOK_generic);
     }
-#endif//HAL_USE_CRC
+#endif//HAL_USE_PERIPH_CRC
 
     
-#ifdef  HAL_USE_DMA
+#ifdef  HAL_USE_PERIPH_DMA
     if(hal_res_OK != hal_dma_hid_static_memory_init())
     {
         return(hal_res_NOK_generic);
     }
-#endif//HAL_USE_DMA    
+#endif//HAL_USE_PERIPH_DMA    
     
 
-#ifdef  HAL_USE_ETH
+#ifdef  HAL_USE_PERIPH_ETH
     if(hal_res_OK != hal_eth_hid_static_memory_init())
     {
         return(hal_res_NOK_generic);
     }
-#endif//HAL_USE_ETH 
+#endif//HAL_USE_PERIPH_ETH 
  
 
-#ifdef  HAL_USE_GPIO
+#ifdef  HAL_USE_PERIPH_GPIO
     if(hal_res_OK != hal_gpio_hid_static_memory_init())
     {
         return(hal_res_NOK_generic);
     }
-#endif//HAL_USE_GPIO
+#endif//HAL_USE_PERIPH_GPIO
     
-#ifdef  HAL_USE_I2C
+#ifdef  HAL_USE_PERIPH_I2C
     if(hal_res_OK != hal_i2c_hid_static_memory_init())
     {
         return(hal_res_NOK_generic);
     }
-#endif//HAL_USE_I2C     
+#endif//HAL_USE_PERIPH_I2C     
     
-#ifdef HAL_USE_SPI
+#ifdef HAL_USE_PERIPH_SPI
     if(hal_res_OK != hal_spi_hid_static_memory_init())
     {
         return(hal_res_NOK_generic);
     }
-#endif//HAL_USE_SPI    
+#endif//HAL_USE_PERIPH_SPI    
 
-#ifdef HAL_USE_TIMER
+#ifdef HAL_USE_PERIPH_TIMER
     if(hal_res_OK != hal_timer_hid_static_memory_init())
     {
         return(hal_res_NOK_generic);
     }
-#endif//HAL_USE_TIMER
+#endif//HAL_USE_PERIPH_TIMER
 
-#ifdef HAL_USE_TRACE
+#ifdef HAL_USE_PERIPH_TRACE
     if(hal_res_OK != hal_trace_hid_static_memory_init())
     {
         return(hal_res_NOK_generic);
     }
-#endif//HAL_USE_TRACE
+#endif//HAL_USE_PERIPH_TRACE
        
     
-#ifdef HAL_USE_UNIQUEID
+#ifdef HAL_USE_PERIPH_UNIQUEID
     if(hal_res_OK != hal_uniqueid_hid_static_memory_init())
     {
         return(hal_res_NOK_generic);
     }
-#endif//HAL_USE_UNIQUEID    
+#endif//HAL_USE_PERIPH_UNIQUEID    
 
-#ifdef HAL_USE_WATCHDOG
+#ifdef HAL_USE_PERIPH_WATCHDOG
     if(hal_res_OK != hal_watchdog_hid_static_memory_init())
     {
         return(hal_res_NOK_generic);
     }
-#endif//HAL_USE_WATCHDOG
+#endif//HAL_USE_PERIPH_WATCHDOG
 
 
     // - devices ------------------------------------------------------------------------------------------------------

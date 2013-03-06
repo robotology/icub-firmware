@@ -34,7 +34,7 @@
 #include "stdlib.h"
 #include "string.h"
 #include "hal_base_hid.h" 
-#include "hal_mpu_eth_hid.h" 
+//#include "hal_periph_eth_hid.h" 
 #include "hal_brdcfg.h"
 
 

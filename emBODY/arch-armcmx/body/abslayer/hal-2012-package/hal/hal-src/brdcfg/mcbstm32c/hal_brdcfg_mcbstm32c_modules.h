@@ -57,17 +57,17 @@
 #define     HAL_USE_UTILITY_FIFO
 
 // -- mpu peripherals: define what you need to use (beware of cross dependencies)
-#define     HAL_USE_CAN
-#define     HAL_USE_CRC
-#define     HAL_USE_DMA
-#define     HAL_USE_ETH
-#define     HAL_USE_GPIO
-#define     HAL_USE_I2C
-#define     HAL_USE_SPI
-#define     HAL_USE_TIMER
-#define     HAL_USE_TRACE
-#define     HAL_USE_UNIQUEID
-#define     HAL_USE_WATCHDOG
+#define     HAL_USE_PERIPH_CAN
+#define     HAL_USE_PERIPH_CRC
+#define     HAL_USE_PERIPH_DMA
+#define     HAL_USE_PERIPH_ETH
+#define     HAL_USE_PERIPH_GPIO
+#define     HAL_USE_PERIPH_I2C
+#define     HAL_USE_PERIPH_SPI
+#define     HAL_USE_PERIPH_TIMER
+#define     HAL_USE_PERIPH_TRACE
+#define     HAL_USE_PERIPH_UNIQUEID
+#define     HAL_USE_PERIPH_WATCHDOG
 
 // -- devices: define what you need to use (beware of cross dependencies from mpu peripherals and amongst devices)
 #define  HAL_USE_DEVICE_ACCELEROMETER
