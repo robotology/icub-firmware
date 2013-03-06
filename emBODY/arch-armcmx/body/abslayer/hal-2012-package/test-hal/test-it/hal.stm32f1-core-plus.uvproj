@@ -462,6 +462,11 @@
               <FilePath>..\..\hal\hal-src\core\hal_cpu.c</FilePath>
             </File>
             <File>
+              <FileName>hal_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\core\hal_flash.c</FilePath>
+            </File>
+            <File>
               <FileName>hal_heap.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\core\hal_heap.c</FilePath>
@@ -579,7 +584,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-extra-mpu</GroupName>
+          <GroupName>hal-extra-periphs</GroupName>
           <Files>
             <File>
               <FileName>hal_mpu_can.c</FileName>
@@ -600,11 +605,6 @@
               <FileName>hal_mpu_eth.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_eth.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_mpu_flash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_flash.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_gpio.c</FileName>
@@ -1219,6 +1219,11 @@
               <FilePath>..\..\hal\hal-src\core\hal_cpu.c</FilePath>
             </File>
             <File>
+              <FileName>hal_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\core\hal_flash.c</FilePath>
+            </File>
+            <File>
               <FileName>hal_heap.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\core\hal_heap.c</FilePath>
@@ -1336,7 +1341,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-extra-mpu</GroupName>
+          <GroupName>hal-extra-periphs</GroupName>
           <Files>
             <File>
               <FileName>hal_mpu_can.c</FileName>
@@ -1357,11 +1362,6 @@
               <FileName>hal_mpu_eth.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_eth.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_mpu_flash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_flash.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_gpio.c</FileName>
@@ -1958,6 +1958,11 @@
               <FilePath>..\..\hal\hal-src\core\hal_cpu.c</FilePath>
             </File>
             <File>
+              <FileName>hal_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\core\hal_flash.c</FilePath>
+            </File>
+            <File>
               <FileName>hal_heap.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\core\hal_heap.c</FilePath>
@@ -2075,7 +2080,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hal-extra-mpu</GroupName>
+          <GroupName>hal-extra-periphs</GroupName>
           <Files>
             <File>
               <FileName>hal_mpu_can.c</FileName>
@@ -2096,11 +2101,6 @@
               <FileName>hal_mpu_eth.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_eth.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_mpu_flash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\mpu\hal_mpu_flash.c</FilePath>
             </File>
             <File>
               <FileName>hal_mpu_gpio.c</FileName>
