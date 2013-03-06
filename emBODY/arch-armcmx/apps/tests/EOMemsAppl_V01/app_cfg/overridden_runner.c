@@ -67,8 +67,9 @@
 // empty-section
 
 #ifdef MC_CAN_DEBUG
-extern int32_t encoder_can_pos;
-extern int32_t encoder_can_vel;
+//extern int32_t encoder_can_pos;
+//extern int32_t encoder_can_vel;
+extern int16_t torque_debug_can[4];
 #endif
 
 //uint16_t hysto_error[4]={0,0,0,0};
@@ -240,10 +241,18 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
 //following activities are independent on runmode
     
     #ifdef MC_CAN_DEBUG
-    uint8_t payload[8];
-    ((int32_t*)payload)[0]=encoder_can_pos;
-    ((int32_t*)payload)[1]=encoder_can_vel;
-    eo_appCanSP_SendMessage_TEST(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), payload);    
+    //uint8_t payload[8];
+    //((int32_t*)payload)[0]=encoder_can_pos;
+    //((int32_t*)payload)[1]=encoder_can_vel;
+    //eo_appCanSP_SendMessage_TEST(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), payload);
+    static uint16_t cnt = 0;
+    
+    if (++cnt >= 1000)
+    {
+        cnt = 0;
+        
+        eo_appCanSP_SendMessage_TEST(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), (uint8_t*)torque_debug_can);
+    }
     #endif
     
     /*
