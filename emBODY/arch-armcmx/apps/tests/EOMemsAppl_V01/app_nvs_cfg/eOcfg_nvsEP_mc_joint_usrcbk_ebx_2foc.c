@@ -161,7 +161,8 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jx
     // 6) set vel timeout        
     eo_emsController_SetVelTimeout(jxx, cfg->velocitysetpointtimeout);
         
-    // 7) set impedance : to be implemented  
+    // 7) set impedance 
+    eo_emsController_SetImpedance(jxx, cfg->impedance.stiffness, cfg->impedance.damping, cfg->impedance.offset);
     
     // 8) set monitormode status
     res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx,  &jstatus_ptr);
@@ -206,15 +207,13 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidtorque(eOcfg_nvsEP_mc_joint
                                     pid_ptr->limitonintegral,
                                     pid_ptr->limitonoutput, 
 	                                pid_ptr->offset);
-
 }
-
-
-
 
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__impedance(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-    // to be implemented 
+    eOmc_impedance_t *cfg = (eOmc_impedance_t*)nv->loc;
+    
+    eo_emsController_SetImpedance(jxx, cfg->stiffness, cfg->damping, cfg->offset);
 }
 
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__minpositionofjoint(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
