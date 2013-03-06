@@ -97,8 +97,8 @@ static void brd_eventviewer_init(void);
 
 
 static void leds_init(void);
-static void led00_toggle(void);
-static void led01_toggle(void* p);
+static void led01_toggle(void);
+static void led02_toggle(void* p);
 extern void onsystick(void); // use extern to be used w/ eventviewer
 
 static void button_init(void);
@@ -128,19 +128,47 @@ static volatile uint32_t led0_blink_rate = 500;
 
 #if     defined(HAL_USE_GPIO)
 
-static const hal_gpio_cfg_t user_button = 
+static const hal_gpio_map_t user_button = 
 {
-#if     defined(HAL_BOARD_MCBSTM32F400)    
-    .port   = hal_gpio_portG,
-    .pin    = hal_gpio_pin15,
-    .speed  = hal_gpio_speed_low,
-    .dir    = hal_gpio_dirINP
+#if     defined(HAL_BOARD_MCBSTM32F400)       
+    .gpio       =
+    {
+ 
+        .port   = hal_gpio_portG,
+        .pin    = hal_gpio_pin15
+    },
+    .config     =
+    {
+        .speed  = hal_gpio_speed_low,
+        .dir    = hal_gpio_dirINP,
+        .altcfg = NULL
+    }
 #elif   defined(HAL_BOARD_MCBSTM32C)
-    .port   = hal_gpio_portB,
-    .pin    = hal_gpio_pin7,
-    .speed  = hal_gpio_speed_low,
-    .dir    = hal_gpio_dirINP
+    .gpio       =
+    {
+ 
+        .port   = hal_gpio_portB,
+        .pin    = hal_gpio_pin7
+    },
+    .config     =
+    {
+        .speed  = hal_gpio_speed_low,
+        .dir    = hal_gpio_dirINP,
+        .altcfg = NULL
+    }    
 #else
+    .gpio       =
+    {
+ 
+        .port   = hal_gpio_portNONE,
+        .pin    = hal_gpio_pinNONE
+    },
+    .config     =
+    {
+        .speed  = hal_gpio_speedNONE,
+        .dir    = hal_gpio_dirNONE,
+        .altcfg = NULL
+    }     
     .dir    = hal_gpio_dirNONE 
 #endif    
 };
@@ -249,29 +277,31 @@ static void leds_init(void)
     
     hal_result_t res;
     
-    res = hal_led_init(hal_led0, NULL);
+    res = hal_led_init(hal_led1, NULL);
     res =  res;
     
-    res = hal_led_init(hal_led1, NULL);
+    res = hal_led_init(hal_led2, NULL);
     res =  res;
     
 
 #ifdef  USE_EVENTVIEWER
     evEntityId_t prev = eventviewer_switch_to(ev_ID_first_usrdef+1);
-#endif    
-    hal_gpio_quickest_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
-    hal_gpio_quickest_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valHIGH);
-    hal_gpio_quickest_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
+#endif  
+#warning --> to adjust !!!!!!!!!!!    
+//     hal_gpio_quickest_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
+//     hal_gpio_quickest_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valHIGH);
+//     hal_gpio_quickest_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
 #ifdef  USE_EVENTVIEWER
     eventviewer_switch_to(prev); 
 #endif
 
 #ifdef  USE_EVENTVIEWER    
     prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
-#endif    
-    hal_gpio_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
-    hal_gpio_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valHIGH);
-    hal_gpio_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
+#endif   
+#warning --> to adjust !!!!!!!!!!!   
+//     hal_gpio_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
+//     hal_gpio_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valHIGH);
+//     hal_gpio_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
 #ifdef  USE_EVENTVIEWER
     eventviewer_switch_to(prev);  
 #endif  
@@ -279,25 +309,25 @@ static void leds_init(void)
 #endif//defined(HAL_USE_DEVICE_LED)
 }
 
-static void led00_toggle(void)
+static void led01_toggle(void)
 {
 #if     defined(HAL_USE_DEVICE_LED)
         
     hal_result_t res;
     
-    res = hal_led_toggle(hal_led0);
+    res = hal_led_toggle(hal_led1);
     res =  res;
 
 #endif//defined(HAL_USE_DEVICE_LED)    
 }
 
-static void led01_toggle(void* p)
+static void led02_toggle(void* p)
 {
 #if     defined(HAL_USE_DEVICE_LED)
     
     hal_result_t res;
     
-    res = hal_led_toggle(hal_led1);
+    res = hal_led_toggle(hal_led2);
     res =  res;
 
 #endif//defined(HAL_USE_DEVICE_LED)    
@@ -317,7 +347,7 @@ extern void onsystick(void)
     if(led0_blink_rate == count)
     {
         count = 0;
-        led00_toggle();
+        led01_toggle();
     }
     
     if(0 == (msTicks%100))
@@ -340,10 +370,9 @@ static void button_init(void)
 {
 #if     defined(HAL_USE_GPIO)
     
-    if(hal_gpio_dirINP == user_button.dir)
+    if(hal_gpio_dirINP == user_button.config.dir)
     {
-        hal_gpio_configure(user_button, NULL);
-        //hal_gpio_init(user_button.port, user_button.pin, user_button.dir, user_button.speed);
+        hal_gpio_init(user_button.gpio, &user_button.config);
     }
     
 #endif//defined(HAL_USE_GPIO)    
@@ -355,9 +384,10 @@ static uint8_t button_ispushed(void)
     
     hal_gpio_val_t v = user_notpushed_value;
     
-    if(hal_gpio_dirINP == user_button.dir)
+    if(hal_gpio_dirINP == user_button.config.dir)
     {
-        v = hal_gpio_getval(user_button.port, user_button.pin);
+        #warning --> to adjust !!!!!!!!!!!   
+        v = hal_gpio_getval(user_button.gpio);
         return((user_notpushed_value == v) ? 0 : 1);        
     }
     else
@@ -415,26 +445,26 @@ static void test_device_eeprom(void)
     
     //hal_i2c4hal_init(hal_i2c_port1, NULL);
 
-    res = hal_eeprom_init(hal_eeprom_i2c_01, NULL);
+    res = hal_eeprom_init(hal_eeprom2_i2c_01, NULL);
     res =  res;
     
-    res = hal_eeprom_read(hal_eeprom_i2c_01, 258, BYTES_TO_VERIFY, tmp);
+    res = hal_eeprom_read(hal_eeprom2_i2c_01, 258, BYTES_TO_VERIFY, tmp);
     res =  res;  
     
 //    return;   
     
-    res = hal_eeprom_erase(hal_eeprom_i2c_01, 0, 512);
+    res = hal_eeprom_erase(hal_eeprom2_i2c_01, 0, 512);
     res =  res;
     
-    res = hal_eeprom_read(hal_eeprom_i2c_01, 258, BYTES_TO_VERIFY, tmp);
+    res = hal_eeprom_read(hal_eeprom2_i2c_01, 258, BYTES_TO_VERIFY, tmp);
     res =  res;    
     
-    res = hal_eeprom_write(hal_eeprom_i2c_01, 256, BYTES_TO_VERIFY, data);
+    res = hal_eeprom_write(hal_eeprom2_i2c_01, 256, BYTES_TO_VERIFY, data);
     res =  res;
     
     memset(tmp, 0, sizeof(tmp));
     
-    res = hal_eeprom_read(hal_eeprom_i2c_01, 256, BYTES_TO_VERIFY+4, tmp);
+    res = hal_eeprom_read(hal_eeprom2_i2c_01, 256, BYTES_TO_VERIFY+4, tmp);
     res =  res;
     
     if(0 != memcmp(tmp, data, BYTES_TO_VERIFY))
