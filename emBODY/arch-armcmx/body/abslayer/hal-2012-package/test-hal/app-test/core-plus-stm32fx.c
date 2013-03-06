@@ -64,6 +64,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
+#if defined(HAL_BUILD_ONLYCORE)
+#define DONT_USE_TRACE
+#endif
 
 #define USE_EVENTVIEWER
 //#undef  USE_EVENTVIEWER
@@ -207,9 +210,10 @@ int main(void)
      
     leds_init();    
     button_init();
-    
-    hal_trace_init(NULL);
 
+#if !defined(DONT_USE_TRACE)    
+    hal_trace_init(NULL);
+#endif
 
     brd_eventviewer_init();
     
@@ -394,6 +398,8 @@ static uint8_t button_ispushed(void)
     {
         return(0);
     }
+#else //defined(HAL_USE_GPIO) 
+    return(0);
 #endif//defined(HAL_USE_GPIO)    
 }
 
@@ -405,7 +411,9 @@ static void test_has_failed(const char* msg)
     led0_blink_rate = 100;
     
     snprintf(errormsg, sizeof(errormsg)-1, "test has failed: %s", msg);
+#if !defined(DONT_USE_TRACE) 
     hal_trace_puts(errormsg);
+#endif
     for(;;);   
 }
 
@@ -414,7 +422,9 @@ static void test_is_beginning(const char* msg)
     char okmsg[64] =  {0};    
    
     snprintf(okmsg, sizeof(okmsg)-1, "test is beginning: %s", msg);
+#if !defined(DONT_USE_TRACE) 
     hal_trace_puts(okmsg); 
+#endif
 }
 
 static void test_was_successful(const char* msg)
@@ -422,7 +432,9 @@ static void test_was_successful(const char* msg)
     char okmsg[64] =  {0};    
    
     snprintf(okmsg, sizeof(okmsg)-1, "test was succesful: %s", msg);
+#if !defined(DONT_USE_TRACE) 
     hal_trace_puts(okmsg); 
+#endif
 }
 
 
