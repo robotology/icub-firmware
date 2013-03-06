@@ -52,15 +52,15 @@
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
-/** @typedef    typedef enum hal_display_dev_t 
-    @brief      hal_display_dev_t contains every possible display.
+/** @typedef    typedef enum hal_display_t 
+    @brief      hal_display_t contains every possible display.
  **/ 
 typedef enum  
 { 
-    hal_display_dev1 = 0
-} hal_display_dev_t;
+    hal_display1 = 0
+} hal_display_t;
 
-enum { hal_display_devs_number = 1 };
+enum { hal_displays_number = 1 };
 
 /** @typedef    typedef enum hal_display_resolution_t 
     @brief      hal_display_resolution_t expresses resolution of the display in term of pixel width, height and bits
@@ -128,51 +128,51 @@ extern const hal_display_cfg_t hal_display_cfg_default;   // = { .res = hal_disp
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn         extern hal_result_t hal_display_init(hal_display_dev_t display, const hal_display_cfg_t *cfg)
+/** @fn         extern hal_result_t hal_display_init(hal_display_t id, const hal_display_cfg_t *cfg)
     @brief      Initialise an external display. 
     @param      cfg         The configuration
     @return     hal_res_OK or hal_res_NOK_generic on failure or if the display is disabled by the base config.
  **/
-extern hal_result_t hal_display_init(hal_display_dev_t dev, const hal_display_cfg_t *cfg);
+extern hal_result_t hal_display_init(hal_display_t id, const hal_display_cfg_t *cfg);
 
 
-/** @fn         extern hal_result_t hal_display_clear(hal_display_dev_t dev, hal_display_color_t color)
+/** @fn         extern hal_result_t hal_display_clear(hal_display_t id, hal_display_color_t color)
     @brief      Clear the whole display with color @e color.  
     @param      color       The color which teh display will be.
  **/
-extern hal_result_t hal_display_clearscreen(hal_display_dev_t dev);
+extern hal_result_t hal_display_clearscreen(hal_display_t id);
 
 
-/** @fn         extern hal_result_t hal_display_settext(hal_display_dev_t dev, hal_display_font_t fnt, hal_display_color_t backcolor, hal_display_color_t textcolor)
+/** @fn         extern hal_result_t hal_display_settext(hal_display_t id, hal_display_font_t fnt, hal_display_color_t backcolor, hal_display_color_t textcolor)
     @brief      Sets the display so that text uses a given font, a given background color and a given color.  
     @param      fnt         The font to be used.
     @param      backcolor   The background color of the text
     @param      textcolor   The color used for text.
  **/
-extern hal_result_t hal_display_setfont(hal_display_dev_t dev, hal_display_font_t font);
+extern hal_result_t hal_display_setfont(hal_display_t id, hal_display_font_t font);
 
 
-/** @fn         extern hal_result_t hal_display_clearline(hal_display_dev_t dev, uint16_t line)
+/** @fn         extern hal_result_t hal_display_clearline(hal_display_t id, uint16_t line)
     @brief      Clear a complete line in teh dispalay.  
     @param      line        The target line.
  **/
-extern hal_result_t hal_display_clearline(hal_display_dev_t dev, uint16_t line);
+extern hal_result_t hal_display_clearline(hal_display_t id, uint16_t line);
 
 
-/** @fn         extern hal_result_t hal_display_putchar(hal_display_dev_t dev, uint16_t line, char chr)
+/** @fn         extern hal_result_t hal_display_putchar(hal_display_t id, uint16_t line, char chr)
     @brief      Display a character on a given line 
     @param      line        The target line.
     @param      chr         The target character.
  **/
-extern hal_result_t hal_display_putchar(hal_display_dev_t dev, uint16_t line, uint16_t column, char chr);
+extern hal_result_t hal_display_putchar(hal_display_t id, uint16_t line, uint16_t column, char chr);
 
 
-/** @fn         extern hal_result_t hal_display_putstring(hal_display_dev_t dev, uint16_t line, char* str)
+/** @fn         extern hal_result_t hal_display_putstring(hal_display_t id, uint16_t line, char* str)
     @brief      Display a null-terminated string on a given line 
     @param      line        The target line.
     @param      str         The null-terminated string.
  **/
-extern hal_result_t hal_display_putstring(hal_display_dev_t dev, uint16_t line, uint16_t column, char* str);
+extern hal_result_t hal_display_putstring(hal_display_t id, uint16_t line, uint16_t column, char* str);
 
 
 /** @}            

@@ -102,6 +102,32 @@ typedef enum
  
 } hal_cpu_fam_stm32f1_irqn_t;
 
+
+#if 0
+typedef enum
+{   // values from stm32f10x_gpio.h
+    hal_cpu_fam_stm32f1_gpio_speed_10mhz    = 1,
+    hal_cpu_fam_stm32f1_gpio_speed_2mhz,
+    hal_cpu_fam_stm32f1_gpio_speed_50mhz
+} hal_cpu_fam_stm32f1_gpio_speed_t;
+typedef enum
+{   // values from stm32f10x_gpio.h
+    hal_cpu_fam_stm32f1_gpio_mode_AIN           = 0x0,
+    hal_cpu_fam_stm32f1_gpio_mode_IN_FLOATING   = 0x04,
+    hal_cpu_fam_stm32f1_gpio_mode_IPD           = 0x28,
+    hal_cpu_fam_stm32f1_gpio_mode_IPU           = 0x48,
+    hal_cpu_fam_stm32f1_gpio_mode_Out_OD        = 0x14,
+    hal_cpu_fam_stm32f1_gpio_mode_Out_PP        = 0x10,
+    hal_cpu_fam_stm32f1_gpio_mode_AF_OD         = 0x1C,
+    hal_cpu_fam_stm32f1_gpio_mode_AF_PP         = 0x18   
+} hal_cpu_fam_stm32f1_gpio_mode_t;
+typedef struct
+{   // from stm32f10x_gpio.h
+    uint16_t                                gpiopin;
+    hal_cpu_fam_stm32f1_gpio_speed_t        gpiospeed;
+    hal_cpu_fam_stm32f1_gpio_mode_t         gpiomode;
+} hal_cpu_fam_stm32f1_gpio_altcfg_t;
+#endif
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section

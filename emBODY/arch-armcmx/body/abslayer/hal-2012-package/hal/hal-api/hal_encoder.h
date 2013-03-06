@@ -66,7 +66,7 @@ typedef enum
     hal_encoder6 = 5
 } hal_encoder_t;
 
-enum { hal_encoders_num = 6 };
+enum { hal_encoders_number = 6 };
 
 
 /** @typedef    typedef uint32_t hal_encoder_position_t
@@ -94,32 +94,32 @@ extern const hal_encoder_cfg_t hal_encoder_cfg_default;   // = { .priority = hal
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn			extern hal_result_t hal_encoder_init(hal_encoder_t port, const hal_encoder_cfg_t *cfg)
+/** @fn			extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *cfg)
     @brief  	This function initializes the encoder and whatever is required for its behaviour (mux and spi).
     @param  	encoder 	    the encoder
     @param  	cfg 	        The configuration of the encoder. 
     @return 	hal_res_NOK_generic in case the encoder is not supported, else hal_res_OK
   */
-extern hal_result_t hal_encoder_init(hal_encoder_t encoder, const hal_encoder_cfg_t *cfg);
+extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *cfg);
 
 
-/** @fn			extern hal_result_t hal_encoder_start(hal_encoder_t encoder)
+/** @fn			extern hal_result_t hal_encoder_start(hal_encoder_t id)
     @brief  	This function starts reading of data from the encoder in a non-blocking way.
                 When reading is finished, then the callback on reception is invoked, which can
                 retrieve the value with hal_encoder_read().
     @param  	encoder 	    the encoder
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_encoder_start(hal_encoder_t encoder);
+extern hal_result_t hal_encoder_start(hal_encoder_t id);
 
 
-/** @fn			extern uint32_t hal_encoder_read(hal_encoder_t encoder, hal_encoder_position_t* value);
+/** @fn			extern uint32_t hal_encoder_read(hal_encoder_t id, hal_encoder_position_t* value);
     @brief  	This function reads data previously acquired by a call of hal_encoder_start().
     @param  	encoder 	    the encoder
     @param  	value 	        keeps the value.
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_encoder_read(hal_encoder_t encoder, hal_encoder_position_t* value);
+extern hal_result_t hal_encoder_read(hal_encoder_t id, hal_encoder_position_t* value);
 
 
 

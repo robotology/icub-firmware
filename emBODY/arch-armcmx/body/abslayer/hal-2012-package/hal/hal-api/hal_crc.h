@@ -56,8 +56,8 @@
  **/ 
 typedef enum  
 { 
-    hal_crc0 = 0,         
-    hal_crc1 = 1
+    hal_crc1 = 0,         
+    hal_crc2 = 1
 } hal_crc_t;
 
 enum { hal_crcs_number = 2 };
@@ -112,7 +112,7 @@ extern const uint32_t hal_crc_poly_crc32;           // = 0x04C11DB7;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn			extern hal_result_t hal_crc_init(hal_crc_t crc, const hal_crc_cfg_t *cfg)
+/** @fn			extern hal_result_t hal_crc_init(hal_crc_t id, const hal_crc_cfg_t *cfg)
     @brief  	This function inits a crc peripheral.
     @details    The type of CRC to use is specified by the order and polymomial. It is possible to specify any polymomial
                 of orders 16 and 32, as long as it is passed the ram required by the crc table.
@@ -126,11 +126,11 @@ extern const uint32_t hal_crc_poly_crc32;           // = 0x04C11DB7;
     @param      cfg             The configuration. In case is NULL, the default is used.
     @return 	hal_res_NOK_unsupported in case the led is not supported, else hal_res_OK
   */
-extern hal_result_t hal_crc_init(hal_crc_t crc, const hal_crc_cfg_t *cfg);
+extern hal_result_t hal_crc_init(hal_crc_t id, const hal_crc_cfg_t *cfg);
 
 
 /**
-    @fn         extern hal_result_t hal_crc_compute(hal_crc_t crc, hal_crc_compute_mode_t mode, const void *data, uint32_t size, uint32_t *out)
+    @fn         extern hal_result_t hal_crc_compute(hal_crc_t id, hal_crc_compute_mode_t mode, const void *data, uint32_t size, uint32_t *out)
     @brief      computes the crc on len bytes pointed by buf and places the result in out.
     @details    the crc is computed using the following conventions: initial value is 0xffff / 0xffffffff, final
                 xor is not performed (the user can do it externally), 
@@ -141,7 +141,7 @@ extern hal_result_t hal_crc_init(hal_crc_t crc, const hal_crc_cfg_t *cfg);
     @param      out         Pointer to the resulting crc. For hal_crc_order_16 only the 16 LSB are used
     @return     hal_res_NOK_generic in case the crc peripheral wasn't initted or parameters are incorrect, else hal_res_OK
  **/
-extern hal_result_t hal_crc_compute(hal_crc_t crc, hal_crc_compute_mode_t mode, const void *data, uint32_t size, uint32_t *out);
+extern hal_result_t hal_crc_compute(hal_crc_t id, hal_crc_compute_mode_t mode, const void *data, uint32_t size, uint32_t *out);
 
 
 

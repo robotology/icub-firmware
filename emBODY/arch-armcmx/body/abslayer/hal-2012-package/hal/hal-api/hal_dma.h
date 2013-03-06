@@ -60,6 +60,7 @@ typedef enum
     hal_dma_transfer_per2mem    = 2     /**< from peripheral to memory */
 } hal_dma_transfer_t; 
 
+
 /** @typedef    typedef enum hal_dma_mode_t 
     @brief      hal_dma_mode_t is used to specify the mode of the transfer
  **/                
@@ -69,30 +70,31 @@ typedef enum
     hal_dma_mode_forever        = 1     /**< once the transfer is completed ...................... not supported yet */
 } hal_dma_mode_t; 
 
-/** @typedef    typedef enum hal_dma_port_t 
-    @brief      hal_dma_port_t contains the possible dma ports.
+
+/** @typedef    typedef enum hal_dma_t 
+    @brief      hal_dma_t contains the possible dma ports.
  **/
 typedef enum  
 { 
-    hal_dma_port1  = 0,         /**< DMA port1  */
-    hal_dma_port2  = 1,         /**< DMA port2  */
-    hal_dma_port3  = 2,         /**< DMA port3  */
-    hal_dma_port4  = 3,         /**< DMA port4  */
-    hal_dma_port5  = 4,         /**< DMA port5  */
-    hal_dma_port6  = 5,         /**< DMA port6  */
-    hal_dma_port7  = 6,         /**< DMA port7  */
-    hal_dma_port8  = 7,         /**< DMA port8  */
-    hal_dma_port9  = 8,         /**< DMA port9  */
-    hal_dma_port10 = 9,         /**< DMA port10 */
-    hal_dma_port11 = 10,        /**< DMA port11 */
-    hal_dma_port12 = 11,        /**< DMA port12 */
-    hal_dma_port13 = 12,        /**< DMA port13 */
-    hal_dma_port14 = 13,        /**< DMA port14 */
-    hal_dma_port15 = 14,        /**< DMA port15 */
-    hal_dma_port16 = 15         /**< DMA port16 */
-} hal_dma_port_t; 
+    hal_dma1  = 0,         /**< DMA port1  */
+    hal_dma2  = 1,         /**< DMA port2  */
+    hal_dma3  = 2,         /**< DMA port3  */
+    hal_dma4  = 3,         /**< DMA port4  */
+    hal_dma5  = 4,         /**< DMA port5  */
+    hal_dma6  = 5,         /**< DMA port6  */
+    hal_dma7  = 6,         /**< DMA port7  */
+    hal_dma8  = 7,         /**< DMA port8  */
+    hal_dma9  = 8,         /**< DMA port9  */
+    hal_dma10 = 9,         /**< DMA port10 */
+    hal_dma11 = 10,        /**< DMA port11 */
+    hal_dma12 = 11,        /**< DMA port12 */
+    hal_dma13 = 12,        /**< DMA port13 */
+    hal_dma14 = 13,        /**< DMA port14 */
+    hal_dma15 = 14,        /**< DMA port15 */
+    hal_dma16 = 15         /**< DMA port16 */
+} hal_dma_t; 
 
-enum { hal_dma_ports_number = 16 };
+enum { hal_dmas_number = 16 };
 
 
 
@@ -112,7 +114,6 @@ typedef struct
 } hal_dma_cfg_t;
 
 
-
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
@@ -120,65 +121,65 @@ typedef struct
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn         extern hal_result_t hal_dma_init(hal_dma_port_t port, const hal_dma_cfg_t *cfg)
+/** @fn         extern hal_result_t hal_dma_init(hal_dma_t id, const hal_dma_cfg_t *cfg)
     @brief      This function configures a dma port.
     @param      port            identifies the DMA port
     @param      cfg             the configuration of DMA port
     @return     hal_res_NOK_generic in case of error, else hal_res_OK
   */
-extern hal_result_t hal_dma_init(hal_dma_port_t port, const hal_dma_cfg_t *cfg);
+extern hal_result_t hal_dma_init(hal_dma_t id, const hal_dma_cfg_t *cfg);
 
 
-/** @fn         extern hal_result_t hal_dma_enable(hal_dma_port_t port)
+/** @fn         extern hal_result_t hal_dma_enable(hal_dma_t id)
     @brief      This function starts DMA. It must be invoked after hal_dma_init.
     @param      port            identifies port
     @return     hal_res_NOK_generic in case of error, else hal_res_OK
   */
-extern hal_result_t hal_dma_enable(hal_dma_port_t port);
+extern hal_result_t hal_dma_enable(hal_dma_t id);
 
 
-/** @fn         extern hal_result_t hal_dma_disable(hal_dma_port_t port)
+/** @fn         extern hal_result_t hal_dma_disable(hal_dma_t id)
     @brief      This function disable DMA.
     @param      port            identifies DMA port
     @return     hal_res_NOK_generic in case of error, else hal_res_OK
   */
-extern hal_result_t hal_dma_disable(hal_dma_port_t port);
+extern hal_result_t hal_dma_disable(hal_dma_t id);
 
 
-/** @fn         extern hal_result_t hal_dma_retrigger(hal_dma_port_t port)
+/** @fn         extern hal_result_t hal_dma_retrigger(hal_dma_t id)
     @brief      This function retriggers the dma. it must be called only inside the callback on transfer done when the mode is one shot.
                 If destin is NULL it has the same effect as hal_dma_retrigger().
     @param      port            identifies DMA port
     @param      source          the new source pointer
     @return     hal_res_NOK_generic in case queue is full or wrong port, else hal_res_OK
   */
-extern hal_result_t hal_dma_retrigger(hal_dma_port_t port);
+extern hal_result_t hal_dma_retrigger(hal_dma_t id);
 
-extern hal_result_t hal_dma_dontdisable(hal_dma_port_t port);
+extern hal_result_t hal_dma_dontdisable(hal_dma_t id);
 
-/** @fn         extern hal_result_t hal_dma_source_set(hal_dma_port_t port, void* source)
+/** @fn         extern hal_result_t hal_dma_source_set(hal_dma_t id, void* source)
     @brief      This function changes the dma source. it must be called only inside the callback on transfer done.
                 If source is NULL it has the same effect as hal_dma_retrigger().
     @param      port            identifies DMA port
     @param      source          the new source pointer
     @return     hal_res_NOK_generic in case queue is full or wrong port, else hal_res_OK
   */
-extern hal_result_t hal_dma_source_set(hal_dma_port_t port, void* source);
+extern hal_result_t hal_dma_source_set(hal_dma_t id, void* source);
 
 
-/** @fn         extern hal_result_t hal_dma_destin_set(hal_dma_port_t port, void* destin)
+/** @fn         extern hal_result_t hal_dma_destin_set(hal_dma_t id, void* destin)
     @brief      This function changes the dma destination. it must be called only inside the callback on transfer done.
                 If destin is NULL it has the same effect as hal_dma_retrigger().
     @param      port            identifies DMA port
     @param      source          the new source pointer
     @return     hal_res_NOK_generic in case queue is full or wrong port, else hal_res_OK
   */
-extern hal_result_t hal_dma_destin_set(hal_dma_port_t port, void* destin);
+extern hal_result_t hal_dma_destin_set(hal_dma_t id, void* destin);
 
 
-extern void hal_dma_isr_enable(hal_dma_port_t port);
+extern void hal_dma_isr_enable(hal_dma_t id);
 
-extern void hal_dma_isr_disable(hal_dma_port_t port);
+extern void hal_dma_isr_disable(hal_dma_t id);
 
 /** @}            
     end of group doxy_group_hal_dma  

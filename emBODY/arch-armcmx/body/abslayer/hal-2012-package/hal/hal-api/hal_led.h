@@ -57,17 +57,17 @@
  **/ 
 typedef enum  
 { 
-    hal_led0 = 0,         
-    hal_led1 = 1,
-	hal_led2 = 2,
-    hal_led3 = 3,         
-    hal_led4 = 4,
-	hal_led5 = 5,
-    hal_led6 = 6,         
-    hal_led7 = 7
+    hal_led1 = 0,         
+    hal_led2 = 1,
+	hal_led3 = 2,
+    hal_led4 = 3,         
+    hal_led5 = 4,
+	hal_led6 = 5,
+    hal_led7 = 6,         
+    hal_led8 = 7
 } hal_led_t;
 
-enum { hal_leds_num = 8 };
+enum { hal_leds_number = 8 };
 
 
 
@@ -86,41 +86,41 @@ typedef struct
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn			extern hal_result_t hal_led_init(hal_led_t led, const hal_led_cfg_t *cfg);
+/** @fn			extern hal_result_t hal_led_init(hal_led_t id, const hal_led_cfg_t *cfg);
     @brief  	This function inits a led.
     @details    c rfce.
     @param      led             The led to initialise. 
     @param      cfg             The configuration. It can be NULL.
     @return 	hal_res_NOK_unsupported in case the led is not supported, else hal_res_OK
   */
-extern hal_result_t hal_led_init(hal_led_t led, const hal_led_cfg_t *cfg);
+extern hal_result_t hal_led_init(hal_led_t id, const hal_led_cfg_t *cfg);
 
 
 /**
-    @fn         extern hal_result_t hal_led_on(hal_led_t led)
+    @fn         extern hal_result_t hal_led_on(hal_led_t id)
     @brief      sets the led on
     @param      led             The led. It must be initted before.
     @return     hal_res_NOK_generic in case the led wasn't initted, else hal_res_OK
  **/
-extern hal_result_t hal_led_on(hal_led_t led);
+extern hal_result_t hal_led_on(hal_led_t id);
 
 
 /**
-    @fn         extern hal_result_t hal_led_on(hal_led_t led)
+    @fn         extern hal_result_t hal_led_on(hal_led_t id)
     @brief      sets the led off
     @param      led             The led. It must be initted before.
     @return     hal_res_NOK_generic in case the led wasn't initted, else hal_res_OK
  **/
-extern hal_result_t hal_led_off(hal_led_t led);
+extern hal_result_t hal_led_off(hal_led_t id);
 
 
 /**
-    @fn         extern hal_result_t hal_led_on(hal_led_t led)
+    @fn         extern hal_result_t hal_led_on(hal_led_t id)
     @brief      toggles the led
     @param      led             The led. It must be initted before.
     @return     hal_res_NOK_generic in case the led wasn't initted, else hal_res_OK
  **/
-extern hal_result_t hal_led_toggle(hal_led_t led);
+extern hal_result_t hal_led_toggle(hal_led_t id);
 
 
 

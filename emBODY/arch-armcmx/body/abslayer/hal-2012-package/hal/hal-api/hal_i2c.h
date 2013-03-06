@@ -52,17 +52,17 @@
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
-/** @typedef    typedef enum hal_i2c_port_t 
-    @brief      hal_i2c_port_t contains the possible I2C ports 
+/** @typedef    typedef enum hal_i2c_t 
+    @brief      hal_i2c_t contains the possible I2C ports 
  **/
 typedef enum
 {
-    hal_i2c_port1 = 0,
-    hal_i2c_port2 = 1,
-    hal_i2c_port3 = 2
-} hal_i2c_port_t;
+    hal_i2c1 = 0,
+    hal_i2c2 = 1,
+    hal_i2c3 = 2
+} hal_i2c_t;
 
-enum { hal_i2c_ports_number = 3 };
+enum { hal_i2cs_number = 3 };
 
 
 typedef enum
@@ -104,7 +104,6 @@ typedef struct
     hal_i2c_mode_t          mode;
     hal_i2c_speed_t         speed;  
     hal_i2c_devaddr_t       ownaddress; // used only if slave mode
-    hal_bool_t              usedma;     // not supported yet 
 } hal_i2c_cfg_t;
 
  
@@ -116,46 +115,46 @@ extern const hal_i2c_cfg_t hal_i2c_cfg_default; // = { .mode = hal_i2c_mode_mast
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-/** @fn			extern hal_result_t hal_i2c_init(hal_i2c_port_t port, const hal_i2c_cfg_t *cfg)
+/** @fn			extern hal_result_t hal_i2c_init(hal_i2c_t id, const hal_i2c_cfg_t *cfg)
     @brief  	this function initializes an i2c port
-    @param  	port	        the port
+    @param  	id              the id of i2c
     @param  	cfg 	        pointer to configuration data
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_i2c_init(hal_i2c_port_t port, const hal_i2c_cfg_t *cfg);
+extern hal_result_t hal_i2c_init(hal_i2c_t id, const hal_i2c_cfg_t *cfg);
 
-/** @fn			extern hal_bool_t hal_i2c_initted_is(hal_i2c_port_t port)
+/** @fn			extern hal_bool_t hal_i2c_initted_is(hal_i2c_t id)
     @brief  	this function tells if an i2c port has already been initted
-    @param  	port	        the port
+    @param  	id              the id of i2c
     @return 	hal_true or hal_false
   */
-extern hal_bool_t hal_i2c_initted_is(hal_i2c_port_t port);
+extern hal_bool_t hal_i2c_initted_is(hal_i2c_t id);
 
-/** @fn			extern hal_result_t hal_i2c_transaction_begin(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr)
+/** @fn			extern hal_result_t hal_i2c_transaction_begin(hal_i2c_t id, hal_i2c_devaddr_t devaddr)
     @brief  	this function begins a transaction: locks the bus for other attempts of hal_i2c_transaction_begin(), sends a START, write 
                 the address of the device to talk to.
-    @param  	port	        the port
+    @param  	id              the id of i2c
     @param  	devaddr 	    the address of the device used for this transaction
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_i2c_transaction_begin(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr);
+extern hal_result_t hal_i2c_transaction_begin(hal_i2c_t id, hal_i2c_devaddr_t devaddr);
 
-/** @fn			extern hal_result_t hal_i2c_transaction_transmit(hal_i2c_port_t port, uint8_t* data, uint16_t size, hal_bool_t sendstart, hal_bool_t sendstop)
+/** @fn			extern hal_result_t hal_i2c_transaction_transmit(hal_i2c_t id, uint8_t* data, uint16_t size, hal_bool_t sendstart, hal_bool_t sendstop)
     @brief  	this function transmits data inside a transaction: if sendstart is hal_true it sends a START and the address of the device with write flag, 
                 sends to the device size bytes, and if sendstop is hal_true it sends a STOP condition. 
-    @param  	port	        the port
+    @param  	id              the id of i2c
     @param  	data	        the data to write
     @param      size            the size of data to write
     @param      sendstart       if hal_true a START is sent before sending data
     @param      sendstop        if hal_true a STOP is sent after having sent the data
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_i2c_transaction_transmit(hal_i2c_port_t port, uint8_t* data, uint16_t size, hal_bool_t sendstart, hal_bool_t sendstop);
+extern hal_result_t hal_i2c_transaction_transmit(hal_i2c_t id, uint8_t* data, uint16_t size, hal_bool_t sendstart, hal_bool_t sendstop);
 
-/** @fn			extern hal_result_t hal_i2c_transaction_receive(hal_i2c_port_t port, uint8_t* data, uint16_t size, hal_bool_t sendstart, hal_bool_t sendnack, hal_bool_t sendstop)
+/** @fn			extern hal_result_t hal_i2c_transaction_receive(hal_i2c_t id, uint8_t* data, uint16_t size, hal_bool_t sendstart, hal_bool_t sendnack, hal_bool_t sendstop)
     @brief  	this function receives data inside a transaction: if sendstart is hal_true it sends a START and the address of the device with read flag, 
                 receives from the device size bytes, if sendnack is hal_true it does not ack last received byte, and finally if sendstop is hal_true it sends a STOP condition. 
-    @param  	port	        the port
+    @param  	id              the id of i2c
     @param  	data	        the data to write
     @param      size            the size of data to write
     @param      sendstart       if hal_true a START is sent before receiving data
@@ -163,64 +162,64 @@ extern hal_result_t hal_i2c_transaction_transmit(hal_i2c_port_t port, uint8_t* d
     @param      sendstop        if hal_true a STOP is sent after having received the data
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_i2c_transaction_receive(hal_i2c_port_t port, uint8_t* data, uint16_t size, hal_bool_t sendstart, hal_bool_t sendnack, hal_bool_t sendstop);
+extern hal_result_t hal_i2c_transaction_receive(hal_i2c_t id, uint8_t* data, uint16_t size, hal_bool_t sendstart, hal_bool_t sendnack, hal_bool_t sendstop);
 
-//extern hal_result_t hal_i2c_transaction_stop(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr);
+//extern hal_result_t hal_i2c_transaction_stop(hal_i2c_t id, hal_i2c_devaddr_t devaddr);
 
-/** @fn			extern hal_result_t hal_i2c_transaction_ends(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr)
+/** @fn			extern hal_result_t hal_i2c_transaction_ends(hal_i2c_t id, hal_i2c_devaddr_t devaddr)
     @brief  	this function ends a transaction: unlocks the bus to allow others to use it
-    @param  	port	        the port
+    @param  	id              the id of i2c
     @param  	devaddr 	    the address of the device used for the transaction
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_i2c_transaction_end(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr);
+extern hal_result_t hal_i2c_transaction_end(hal_i2c_t id, hal_i2c_devaddr_t devaddr);
 
 
-/** @fn			extern hal_result_t hal_i2c_ping(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr)
+/** @fn			extern hal_result_t hal_i2c_ping(hal_i2c_t id, hal_i2c_devaddr_t devaddr)
     @brief  	this function is used to verify if a device with a given address is present on the bus.
-    @param  	port	        the port
+    @param  	id              the id of i2c
     @param  	devaddr 	    the address of the device
     @return 	hal_res_NOK_generic on error or if the device does not respond, else hal_res_OK
   */
-extern hal_result_t hal_i2c_ping(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr);
+extern hal_result_t hal_i2c_ping(hal_i2c_t id, hal_i2c_devaddr_t devaddr);
 
 
-/** @fn			extern hal_result_t hal_i2c_read(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
+/** @fn			extern hal_result_t hal_i2c_read(hal_i2c_t id, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
     @brief  	this function is a typical reading transaction, where the master wants to read @e size bytes from the register @e regaddr of the device with
                 address @e devaddr.
     @details    this function can be sustituted with some transaction calls. See internals for details.    
-    @param  	port	        the port
+    @param  	id              the id of i2c
     @param  	devaddr 	    the address of the device
     @param  	regaddr 	    the address of register
     @param  	data            pointer holding the data to read
     @param  	size            teh size of data to read.
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_i2c_read(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size);
+extern hal_result_t hal_i2c_read(hal_i2c_t id, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size);
 
 
-/** @fn			extern hal_result_t hal_i2c_write(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
+/** @fn			extern hal_result_t hal_i2c_write(hal_i2c_t id, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
     @brief  	this function is a typical writing transaction, where the master wants to write @e size bytes inside the register @e regaddr of the device with
                 address @e devaddr.
     @details    this function can be sustituted with some transaction calls. See internals for details.    
-    @param  	port	        the port
+    @param  	id              the id of i2c
     @param  	devaddr 	    the address of the device
     @param  	regaddr 	    the address of register
     @param  	data            pointer holding the data to write
     @param  	size            teh size of data to write.
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_i2c_write(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size);
+extern hal_result_t hal_i2c_write(hal_i2c_t id, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size);
 
 
-/** @fn			extern hal_result_t hal_i2c_standby(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr)
+/** @fn			extern hal_result_t hal_i2c_standby(hal_i2c_t id, hal_i2c_devaddr_t devaddr)
     @brief  	this function is used to put in standby a device after it has sent data to teh master. Basically, it sends a START followed by the address of the
                 device. Then it waits an ACK or NACK from it. It repeats this cycle until an ACK is received. This function is specific for EEPROM use.
-    @param  	port	        the port
+    @param  	id              the id of i2c
     @param  	devaddr 	    the address of the device
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_i2c_standby(hal_i2c_port_t port, hal_i2c_devaddr_t devaddr);
+extern hal_result_t hal_i2c_standby(hal_i2c_t id, hal_i2c_devaddr_t devaddr);
 
 
 

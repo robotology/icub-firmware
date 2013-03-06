@@ -229,8 +229,6 @@ typedef struct
  **/  
 typedef struct
 {   
-    uint32_t        stacksize;                  /**< The size of stack available to the system in bytes     */
-    uint32_t        heapsize;                   /**< The size of heap available to the system in bytes      */
     hal_extfn_cfg_t extfn;                      /**< External functionalities offered to the HAL            */
 } hal_base_cfg_t;
 

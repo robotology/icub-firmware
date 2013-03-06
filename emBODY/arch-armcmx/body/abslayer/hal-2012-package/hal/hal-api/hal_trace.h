@@ -51,6 +51,17 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
+/** @typedef    typedef enum hal_trace_t 
+    @brief      contains ids of every possible trace unit.
+ **/ 
+typedef enum  
+{ 
+    hal_trace1         = 0             /**< the only one */
+} hal_trace_t;
+
+enum { hal_traces_number = 1 };
+
+
 /** @typedef    typedef struct hal_trace_cfg_t;
     @brief      contains configuration for trace peripheral.
  **/
@@ -63,8 +74,6 @@ typedef struct
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
 extern const hal_trace_cfg_t hal_trace_cfg_default;         /**< = {.dummy = 0}; */
-
-
 
 
 

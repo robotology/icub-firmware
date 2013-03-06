@@ -29,7 +29,7 @@
     @date       10/18/2011
 **/
 
-/** @defgroup arm_hal_switch HAL SWITCH
+/** @defgroup doxy_group_hal_switch HAL SWITCH
 
     The HAL SWITCH ....
  
@@ -48,6 +48,18 @@
   
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
+
+
+/** @typedef    typedef enum hal_switch_t 
+    @brief      contains ids of every possible eth switch.
+ **/ 
+typedef enum  
+{ 
+    hal_switch1         = 0             /**< the only one */
+} hal_switch_t;
+
+enum { hal_switches_number = 1 };
+
 
 /** @typedef    typedef struct hal_switch_cfg_t;
     @brief      contains configuration data of switch.
@@ -74,6 +86,7 @@ extern const hal_switch_cfg_t hal_switch_cfg_default;   // = { .dummy = 0};
   */
 extern hal_result_t hal_switch_init(const hal_switch_cfg_t *cfg);
 
+
 extern hal_result_t hal_switch_configure(hal_eth_phymode_t targetphymode, hal_eth_phymode_t *usedphymode);
 
 
@@ -83,8 +96,9 @@ extern hal_result_t hal_switch_configure(hal_eth_phymode_t targetphymode, hal_et
   */
 extern hal_bool_t hal_switch_initted_is(void);
 
+
 /** @}            
-    end of group arm_hal_switch  
+    end of group doxy_group_hal_switch  
  **/
 
 #endif  // include-guard

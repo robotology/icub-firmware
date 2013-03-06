@@ -97,6 +97,14 @@ typedef enum
 
 enum { hal_gpio_pins_number = 16 };
 
+/** @typedef    typedef struct hal_gpio_t 
+    @brief      hal_gpio_t specifies a pair port-pin whcih identifies a gpio.
+ **/    
+typedef struct 
+{
+    hal_gpio_port_t     port;
+    hal_gpio_pin_t      pin;    
+} hal_gpio_t;   
 
 /** @typedef    typedef enum hal_gpio_speed_t 
     @brief      hal_gpio_val_t contains speed values that an output pin can have. The values used inside HAL
@@ -136,70 +144,89 @@ typedef enum
 } hal_gpio_val_t; 
  
 
+/** @typedef    typedef struct hal_gpio_hid_altcfg_t hal_gpio_altcfg_t 
+    @brief      hal_gpio_altcfg_t is an opaque struct, which is defined in the hal_gpio_hid.h file. it depends on a 
+                specific HAL_USE_CPU_FAM_xxx family of CPUs, and for such a reason it is not made visible in the public API.
+    @details    It contains the configuration needs for a gpio which are specific of the chosen MPU. It is mainly used by 
+                internal modules of hal. An example of its use is when we need to configure the ETH_RMII_TX_EN pin of 
+                hal_eth in alternate function push-pull at 50MHz.
+ **/
+typedef struct hal_gpio_hid_altcfg_t hal_gpio_altcfg_t;
+
+
 /** @typedef    typedef enum hal_gpio_cfg_t 
-    @brief      hal_gpio_cfg_t contains the configuration for a gpio
+    @brief      hal_gpio_cfg_t contains the configuration for a gpio. it can be a normal input or output or even an alternate
+                function. in this latter case, we use altcfg if .dir has value hal_gpio_dirALT.
  **/
 typedef struct 
 {
-    hal_gpio_port_t     port;
-    hal_gpio_pin_t      pin;
     hal_gpio_dir_t      dir;
     hal_gpio_speed_t    speed;
+    hal_gpio_altcfg_t*  altcfg;
 } hal_gpio_cfg_t;
 
-typedef struct hal_gpio_hid_altcfg_t hal_gpio_altcfg_t;
+
+
+/** @typedef    typedef enum hal_gpio_map_t 
+    @brief      hal_gpio_map_t contains the mapping of gpio with dir and speed and it config.
+                It is used in mapping a peripheral into a given gpio
+ **/
+typedef struct 
+{
+    hal_gpio_t          gpio;
+    hal_gpio_cfg_t      config;
+} hal_gpio_map_t;
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-// empty-section
+
+extern const hal_gpio_cfg_t hal_gpio_cfg_default; // = {.dir = hal_gpio_dirOUT, .speed = hal_gpio_speed_low};
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn         extern hal_result_t hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_gpio_dir_t dir)
-    @brief      Inits the given pin in the given port with the given direction and a given speed 
-    @param      pin             The pin. 
-    @param      port            The port. 
-    @param      dir             The direction.
-    @param      dir             The speed.
-    @return     Always hal_res_OK
+
+
+/** @fn         extern hal_result_t hal_gpio_init(hal_gpio_t gpio, const hal_gpio_cfg_t* cfg)
+    @brief      It initialises the gpio. If cfg->dir is hal_gpio_dirINP or hal_gpio_dirINP then the gpio is
+                configured using the cfg->dir and cfg->speed only. Else if cfg->dir is hal_gpio_dirALT, then
+                it is used also the field cfg->altcfg.
+    @param      gpio            The gpio. 
+    @param      cfg             The cfg. 
+    @return     If successful hal_res_OK
  **/
-extern hal_result_t hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_gpio_dir_t dir, hal_gpio_speed_t speed);
-
-extern hal_result_t hal_gpio_configure(hal_gpio_cfg_t cfg, const hal_gpio_altcfg_t* altcfg);
+extern hal_result_t hal_gpio_init(hal_gpio_t gpio, const hal_gpio_cfg_t* cfg);
 
 
-/** @fn         extern hal_result_t hal_gpio_setval(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_gpio_val_t val)
-    @brief      Sets the value of the given pin in the given port 
-    @param      pin             The pin. 
-    @param      port            The port. 
+
+/** @fn         extern hal_result_t hal_gpio_setval(hal_gpio_t gpio, hal_gpio_val_t val)
+    @brief      Sets the value of the given gpiot 
+    @param      gpio            The gpio. 
     @param      value           The target value.
-    @return     Always hal_res_OK
+    @return     If successful hal_res_OK
  **/
-extern hal_result_t hal_gpio_setval(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_gpio_val_t val);
+extern hal_result_t hal_gpio_setval(hal_gpio_t gpio, hal_gpio_val_t val);
 
 
-/** @fn         extern hal_gpio_val_t hal_gpio_getval(hal_gpio_port_t port, hal_gpio_pin_t pin)
-    @brief      Gets the value of the given pin in the given port 
-    @param      pin             The pin. 
-    @param      port            The port. 
+/** @fn         extern hal_gpio_val_t hal_gpio_getval(hal_gpio_t gpio)
+    @brief      Gets the value of the given gpio 
+    @param      gpio            The gpio.  
     @return     The value.
  **/
-extern hal_gpio_val_t hal_gpio_getval(hal_gpio_port_t port, hal_gpio_pin_t pin);
+extern hal_gpio_val_t hal_gpio_getval(hal_gpio_t gpio);
 
 
-/** @fn         extern void hal_gpio_quickest_setval(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_gpio_val_t val)
+/** @fn         extern void hal_gpio_quickest_setval(hal_gpio_t gpio hal_gpio_val_t val)
     @brief      Sets the value of the given pin in the given port in the quickest possible mode. To pursue speed,
                 all safety checks which are available in hal_gpio_setval are here removed. Thus, pay particular
                 attention to manipulate gpios already initted as output. And never and never use hal_gpio_portNONE
                 or hal_gpio_pinNONE otherwise a SW crash is inevitable. needless to say don't ever use hal_gpio_valNONE. 
                 On STM32F107 @ 72MHz, the execution time is around 1 usec vs. about 1.7 usec of hal_gpio_setval().
                 On STM32F407 @ 168MHz, the execution time is around 0.2 usec vs. about 0.4 usec of hal_gpio_setval().
-    @param      pin             The pin. 
-    @param      port            The port. 
+    @param      gpio            The gpio. 
     @param      value           The target value.
  **/
-extern void hal_gpio_quickest_setval(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_gpio_val_t val);
+extern void hal_gpio_quickest_setval(hal_gpio_t gpio, hal_gpio_val_t val);
 
 
 

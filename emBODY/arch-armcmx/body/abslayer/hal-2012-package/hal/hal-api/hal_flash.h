@@ -50,13 +50,44 @@
   
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
-// empty-section
+
+/** @typedef    typedef enum hal_flash_t 
+    @brief      contains ids of every possible flash bank.
+ **/ 
+typedef enum  
+{ 
+    hal_flash1_internal = 0             /**< the only flash bank */
+} hal_flash_t;
+
+enum { hal_flashes_number = 1 };
+
+
+
+/** @typedef    typedef struct hal_flash_cfg_t 
+    @brief      contains the configuration for the flash module. 
+ **/  
+typedef struct
+{
+    uint8_t     dummy;    
+} hal_flash_cfg_t;
+ 
+
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-// empty-section
+
+extern const hal_flash_cfg_t hal_flash_cfg_default;  // = { .dummy = 0 };
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
+
+
+/** @fn         extern hal_result_t hal_flash_init(const hal_flash_cfg_t *cfg)
+    @brief      Initialise the flash bank. If anything goes wrong, 
+                the function calls hal_base_on_fatalerror() with proper error code.
+    @param      cfg         Contains the eth configuration.
+    @return     If succesful, always hal_res_OK.
+ **/
+extern hal_result_t hal_flash_init(const hal_flash_cfg_t *cfg);
 
 
 /** @fn         extern hal_result_t hal_flash_lock(void)

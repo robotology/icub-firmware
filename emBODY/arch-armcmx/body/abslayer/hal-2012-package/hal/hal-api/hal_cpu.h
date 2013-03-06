@@ -107,13 +107,13 @@ typedef enum
  **/  
 typedef struct
 {
-    uint8_t     nothingsofar;    
+    uint8_t     dummy;    
 } hal_cpu_cfg_t;
  
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const hal_cpu_cfg_t hal_cpu_cfg_default;  // = { .nothingsofar = 0 };
+extern const hal_cpu_cfg_t hal_cpu_cfg_default;  // = { .dummy = 0 };
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------

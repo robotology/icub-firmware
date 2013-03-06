@@ -49,6 +49,18 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
+/** @typedef    typedef enum hal_cantransceiver_t 
+    @brief      hal_cantransceiver_t contains the usable can trasceiver: one per can.
+ **/
+typedef enum  
+{ 
+    hal_cantransceiver1 = 0,           /**< for hal_can1        */
+    hal_cantransceiver2 = 1            /**< fro hal_can2        */
+} hal_cantransceiver_t; 
+
+enum { hal_cantransceivers_number = 2 };
+
+
 /** @typedef    typedef struct hal_cantransceiver_cfg_t;
     @brief      contains configuration data of cantransceiver.
  **/
@@ -65,24 +77,24 @@ extern const hal_cantransceiver_cfg_t hal_cantransceiver_cfg_default;   // = { .
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn			extern hal_result_t hal_cantransceiver_init(hal_can_port_t port, const hal_cantransceiver_cfg_t *cfg)
+/** @fn			extern hal_result_t hal_cantransceiver_init(hal_cantransceiver_t id, const hal_cantransceiver_cfg_t *cfg)
     @brief  	This function initializes the cantransceiver attached to the MPU
     @param      port            The port attached to the transceiver
     @param  	cfg 	        The configuration of the cantransceiver. It can be NULL.
     @return 	hal_res_NOK_generic in case the cantransceiver cannot be configured, else hal_res_OK
   */
-extern hal_result_t hal_cantransceiver_init(hal_can_port_t port, const hal_cantransceiver_cfg_t *cfg);
+extern hal_result_t hal_cantransceiver_init(hal_cantransceiver_t id, const hal_cantransceiver_cfg_t *cfg);
 
-extern hal_result_t hal_cantransceiver_enable(hal_can_port_t port);
+extern hal_result_t hal_cantransceiver_enable(hal_cantransceiver_t id);
 
-extern hal_result_t hal_cantransceiver_disable(hal_can_port_t port);
+extern hal_result_t hal_cantransceiver_disable(hal_cantransceiver_t id);
 
 
 /** @fn			extern hal_bool_t hal_cantransceiver_initted_is(void)
     @brief  	This function tells if the cantransceiver is already initialised.
     @return 	hal_true or hal_false.
   */
-extern hal_bool_t hal_cantransceiver_initted_is(hal_can_port_t port);
+extern hal_bool_t hal_cantransceiver_initted_is(hal_cantransceiver_t id);
 
 /** @}            
     end of group doxy_group_hal_cantransceiver  

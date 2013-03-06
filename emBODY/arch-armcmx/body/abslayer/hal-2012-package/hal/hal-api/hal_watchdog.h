@@ -57,9 +57,9 @@
  **/ 
 typedef enum  
 { 
-    hal_watchdog_normal = 0,    /**< if not refreshed within its countdown, then it forces a reset of the system */
-    hal_watchdog_window = 1     /**< if not refreshed within its countdown, then it executes a callback function and if not refreshed
-                                     it forces a reset of the system */
+    hal_watchdog1_normal = 0,       /**< if not refreshed within its countdown, then it forces a reset of the system */
+    hal_watchdog2_window = 1        /**< if not refreshed within its countdown, then it executes a callback function and if not refreshed
+                                         it forces a reset of the system */
 } hal_watchdog_t;
 
 enum { hal_watchdogs_number = 2 };
@@ -86,10 +86,10 @@ extern const hal_watchdog_cfg_t hal_watchdog_cfg_default; //= { .countdown = 200
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn			extern hal_result_t hal_watchdog_init(hal_watchdog_t watchdog, const hal_watchdog_cfg_t *cfg)
+/** @fn			extern hal_result_t hal_watchdog_init(hal_watchdog_t id, const hal_watchdog_cfg_t *cfg)
     @brief  	This function initializes a watchdog. 
     @details    c rfce.
-    @param      watchdog        The watchdog to initialise. 
+    @param      id              The watchdog to initialise. 
     @param      cfg             The configuration. If NULL it uses its default.
                                 The normal watchdog has a countdown range from 10 msec upto 10 seconds.
                                 The window watchdog has a countdown range from 5 ms upto 50 ms. The callback function has 
@@ -97,25 +97,25 @@ extern const hal_watchdog_cfg_t hal_watchdog_cfg_default; //= { .countdown = 200
     @return 	hal_res_NOK_generic in case the watchdog cannot be configured, hal_res_NOK_unsupported if it is not
                 supported, hal_res_OK if successful
   */
-extern hal_result_t hal_watchdog_init(hal_watchdog_t watchdog, const hal_watchdog_cfg_t *cfg);
+extern hal_result_t hal_watchdog_init(hal_watchdog_t id, const hal_watchdog_cfg_t *cfg);
 
 
 /**
-    @fn         extern hal_result_t hal_watchdog_start(hal_watchdog_t watchdog)
+    @fn         extern hal_result_t hal_watchdog_start(hal_watchdog_t id)
     @brief      starts the watchdog @e watchdog
-    @param      watchdog        The watchdog to start. It must be initted before.
+    @param      id        The watchdog to start. It must be initted before.
     @return     hal_res_NOK_generic in case the watchdog wasn't configured, else hal_res_OK
  **/
-extern hal_result_t hal_watchdog_start(hal_watchdog_t watchdog);
+extern hal_result_t hal_watchdog_start(hal_watchdog_t id);
 
 
 /**
-    @fn         extern hal_result_t hal_watchdog_refresh(hal_watchdog_t watchdog)
+    @fn         extern hal_result_t hal_watchdog_refresh(hal_watchdog_t id)
     @brief      refreshes the watchdog @e watchdog
-    @param      watchdog        The watchdog to start. It must be initted before.
+    @param      id        The watchdog to start. It must be initted before.
     @return     hal_res_NOK_generic in case the watchdog wasn't configured, else hal_res_OK
  **/
-extern hal_result_t hal_watchdog_refresh(hal_watchdog_t watchdog);
+extern hal_result_t hal_watchdog_refresh(hal_watchdog_t id);
 
 
 

@@ -52,15 +52,15 @@
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
-/** @typedef    typedef enum hal_accelerometer_port_t 
-    @brief      hal_accelerometer_port_t contains the possible ports
+/** @typedef    typedef enum hal_accelerometer_t 
+    @brief      hal_accelerometer_t contains the possible accelerometers
  **/
 typedef enum
 {
-    hal_accelerometer_port1 = 0
-} hal_accelerometer_port_t;
+    hal_accelerometer1 = 0
+} hal_accelerometer_t;
 
-enum { hal_accelerometer_ports_number = 1 };
+enum { hal_accelerometers_number = 1 };
 
 
 /** @typedef    typedef int8_t hal_accelerometer_acceleration_t 
@@ -91,22 +91,22 @@ extern const hal_accelerometer_cfg_t hal_accelerometer_cfg_default; // = { .dumm
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-/** @fn			extern hal_result_t hal_accelerometer_init(hal_accelerometer_port_t port, const hal_accelerometer_cfg_t *cfg)
+/** @fn			extern hal_result_t hal_accelerometer_init(hal_accelerometer_t id, const hal_accelerometer_cfg_t *cfg)
     @brief  	this function initializes a given accel port 
     @param  	port	        the port
     @param  	cfg 	        pointer to configuration data
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_accelerometer_init(hal_accelerometer_port_t port, const hal_accelerometer_cfg_t *cfg);
+extern hal_result_t hal_accelerometer_init(hal_accelerometer_t id, const hal_accelerometer_cfg_t *cfg);
 
 
-/** @fn			extern hal_result_t hal_accelerometer_read(hal_accelerometer_port_t port, hal_accelerometer_acceleration_t* acceler)
+/** @fn			extern hal_result_t hal_accelerometer_read(hal_accelerometer_t id, hal_accelerometer_acceleration_t* acceler)
     @brief  	this function reads temperatures on a given port.
     @param  	port	        the port
-    @param  	acceler 	    the read accelration
+    @param  	acceler 	    the read acceleration
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_accelerometer_read(hal_accelerometer_port_t port, hal_accelerometer_acceleration_t* acceler);
+extern hal_result_t hal_accelerometer_read(hal_accelerometer_t id, hal_accelerometer_acceleration_t* acceler);
 
 
 /** @}            

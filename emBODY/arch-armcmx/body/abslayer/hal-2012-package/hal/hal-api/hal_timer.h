@@ -140,7 +140,7 @@ typedef struct
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn			extern hal_result_t hal_timer_init(hal_timer_t timer, const hal_timer_cfg_t *cfg, hal_time_t *error)
+/** @fn			extern hal_result_t hal_timer_init(hal_timer_t id, const hal_timer_cfg_t *cfg, hal_time_t *error)
     @brief  	This function initializes a timer. It can be called more times. If called on a running timer, it
                 stops it first. If priority field of @e cfg has value different from hal_int_priorityNONE,
                 the function enable timer's ISR which is responsible of calling the associated callback function.
@@ -161,94 +161,94 @@ typedef struct
                 hal_res_NOK_nullpointer if @e cfg is NULL
                 hal_res_OK otherwise
   */
-extern hal_result_t hal_timer_init(hal_timer_t timer, const hal_timer_cfg_t *cfg, hal_time_t *error);
+extern hal_result_t hal_timer_init(hal_timer_t id, const hal_timer_cfg_t *cfg, hal_time_t *error);
 
 
-/** @fn         extern hal_result_t timer_start(timer_t timer);
-    @brief      starts timer @e timer
+/** @fn         extern hal_result_t timer_start(hal_timer_t id);
+    @brief      starts timer @e id
     @param      timer           The timer to start. It must be initted before.
     @return     hal_res_NOK_generic in case the timer wasn't configured, else hal_res_OK
  **/
-extern hal_result_t hal_timer_start(hal_timer_t timer);
+extern hal_result_t hal_timer_start(hal_timer_t id);
 
 
-/** @fn         extern hal_result_t timer_stop(timer_t timer);
-    @brief      stops timer @e timer
-    @param      timer           The timer to start. It must be initted and started before.
+/** @fn         extern hal_result_t timer_stop(hal_timer_t id);
+    @brief      stops timer @e id
+    @param      id           The timer to start. It must be initted and started before.
     @return     hal_res_NOK_generic in case the timer wasn't configured or started, else hal_res_OK
  **/
-extern hal_result_t hal_timer_stop(hal_timer_t timer);
+extern hal_result_t hal_timer_stop(hal_timer_t id);
 
 
-/** @fn         extern hal_result_t hal_timer_remainingtime_get(hal_timer_t timer, hal_time_t *remaining_time)
+/** @fn         extern hal_result_t hal_timer_remainingtime_get(hal_timer_t id, hal_time_t *remaining_time)
     @brief      reads timer's actual value
-    @param      timer
+    @param      id                  the timer
     @param      remaining_time      Gives back the timer's value expressed microseconds
     @return     hal_res_NOK_generic if timer is not initialized or configured in hal_cfg,
                 hal_res_OK otherwise.
  **/
-extern hal_result_t hal_timer_remainingtime_get(hal_timer_t timer, hal_time_t *remaining_time);
+extern hal_result_t hal_timer_remainingtime_get(hal_timer_t id, hal_time_t *remaining_time);
 
 
-/** @fn         extern hal_timer_status_t hal_timer_status_get(hal_timer_t timer, hal_timer_status_t *status)
+/** @fn         extern hal_timer_status_t hal_timer_status_get(hal_timer_t id)
     @brief      gets the status of the timer
-    @param      timer
+    @param      id                  the timer
     @return     timer's status
  **/
-extern hal_timer_status_t hal_timer_status_get(hal_timer_t timer);
+extern hal_timer_status_t hal_timer_status_get(hal_timer_t id);
 
 
-/** @fn         extern hal_result_t hal_timer_countdown_set(hal_timer_t timer, hal_time_t countdown, hal_time_t *error);
+/** @fn         extern hal_result_t hal_timer_countdown_set(hal_timer_t id, hal_time_t countdown, hal_time_t *error);
     @brief      sets timer countdown. A running timer is stopped before setting the value and restarted afterwards. 
-    @param      timer
+    @param      id              the timer
     @param      countdown       Timer's countdown expressed in microseconds.
     @param      error           The error in microseconds. This param can be NULL: in this case error is not calculated.
     @return     hal_res_NOK_generic / hal_res_OK
     @warning    This function is a wrapper of other functions. It does some controls and then calls hal_timer_init() with 
                 proper parameters. This call is contained within hal_timer_stop() and hal_timer_start() if the timer was running
  **/
-extern hal_result_t hal_timer_countdown_set(hal_timer_t timer, hal_time_t countdown, hal_time_t *error);
+extern hal_result_t hal_timer_countdown_set(hal_timer_t id, hal_time_t countdown, hal_time_t *error);
 
 
-/** @fn         extern hal_result_t hal_timer_priority_set(hal_timer_t timer, hal_interrupt_priority_t prio);
+/** @fn         extern hal_result_t hal_timer_priority_set(hal_timer_t id, hal_interrupt_priority_t prio);
     @brief      configures priority interrupt of timer @e timer. It stops and restart a running timer.
-    @param      timer       timer to configure
-    @param      prio        value of timer's interrupt priority
+    @param      id              timer to configure
+    @param      prio            value of timer's interrupt priority
     @return     hal_res_NOK_wrongparam if timer is in hal_timer_mode_oneshot mode and @e prio has value hal_int_priorityNONE
                 hal_res_NOK_generic if timer is not initialized.
                 hal_res_ok otherwise
  **/
-extern hal_result_t hal_timer_priority_set(hal_timer_t timer, hal_interrupt_priority_t prio);
+extern hal_result_t hal_timer_priority_set(hal_timer_t id, hal_interrupt_priority_t prio);
 
 
-/** @fn         extern hal_result_t hal_timer_interrupt_enable(hal_timer_t timer);
+/** @fn         extern hal_result_t hal_timer_interrupt_enable(hal_timer_t id);
     @brief      enables timer interrupt
-    @param      timer
+    @param      id              teh timer
     @return     hal_res_NOK_generic if timer is not initialized.
                 hal_res_ok otherwise
  **/
-extern hal_result_t hal_timer_interrupt_enable(hal_timer_t timer);
+extern hal_result_t hal_timer_interrupt_enable(hal_timer_t id);
 
 
-/** @fn         extern hal_result_t hal_timer_interrupt_disable(hal_timer_t timer);
+/** @fn         extern hal_result_t hal_timer_interrupt_disable(hal_timer_t id);
     @brief      disables timer interrupt
-    @param      timer
+    @param      id              teh timer
     @return     hal_res_NOK_generic if timer is not initialized.
                 hal_res_ok otherwise
  
  **/
-extern hal_result_t hal_timer_interrupt_disable(hal_timer_t timer);
+extern hal_result_t hal_timer_interrupt_disable(hal_timer_t id);
 
 
-/** @fn         extern hal_result_t hal_timer_offset_write(hal_timer_t timer, hal_nanotime_t offset)
+/** @fn         extern hal_result_t hal_timer_offset_write(hal_timer_t id, hal_nanotime_t offset)
     @brief      writes timer's offset. When the timer starts, it counts from offset value. 
-    @param      timer
+    @param      id  
     @param      offset              number of nanosecconds to start from.
     @return     hal_res_NOK_generic if timer is not initialized
                 hal_res_NOK_wrongparam if offset is bigger than countdown configured with init function.
                 hal_res_OK otherwise
  **/
-extern hal_result_t hal_timer_offset_write(hal_timer_t timer, hal_nanotime_t offset);
+extern hal_result_t hal_timer_offset_write(hal_timer_t id, hal_nanotime_t offset);
 
 
 /** @}            

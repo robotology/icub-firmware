@@ -52,15 +52,15 @@
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
-/** @typedef    typedef enum hal_gyroscope_port_t 
-    @brief      hal_gyroscope_port_t contains the possible sensors
+/** @typedef    typedef enum hal_gyroscope_t 
+    @brief      hal_gyroscope_t contains the possible sensors
  **/
 typedef enum
 {
-    hal_gyroscope_port1     = 0
-} hal_gyroscope_port_t;
+    hal_gyroscope1     = 0
+} hal_gyroscope_t;
 
-enum { hal_gyroscope_ports_number = 1 };
+enum { hal_gyroscopes_number = 1 };
 
 
 /** @typedef    typedef int8_t hal_gyroscope_angularrate_t 
@@ -91,22 +91,22 @@ extern const hal_gyroscope_cfg_t hal_gyroscope_cfg_default; // = { .dummy = 0 };
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-/** @fn			extern hal_result_t hal_gyroscope_init(hal_gyroscope_port_t sensor, const hal_gyroscope_cfg_t *cfg)
+/** @fn			extern hal_result_t hal_gyroscope_init(hal_gyroscope_t id, const hal_gyroscope_cfg_t *cfg)
     @brief  	this function initializes a given gyro sensor 
     @param  	sensor	        the sensor
     @param  	cfg 	        pointer to configuration data
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_gyroscope_init(hal_gyroscope_port_t sensor, const hal_gyroscope_cfg_t *cfg);
+extern hal_result_t hal_gyroscope_init(hal_gyroscope_t id, const hal_gyroscope_cfg_t *cfg);
 
 
-/** @fn			extern hal_result_t hal_gyroscope_read(hal_gyroscope_port_t sensor, hal_device_gyroscope_degree_t* degrees)
+/** @fn			extern hal_result_t hal_gyroscope_read(hal_gyroscope_t id, hal_device_gyroscope_degree_t* degrees)
     @brief  	this function reads temperatures on a given sensor.
     @param  	sensor	        the sensor
     @param  	degrees 	    the read degrees
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_gyroscope_read(hal_gyroscope_port_t sensor, hal_gyroscope_angularrate_t* angrate);
+extern hal_result_t hal_gyroscope_read(hal_gyroscope_t id, hal_gyroscope_angularrate_t* angrate);
 
 
 /** @}            

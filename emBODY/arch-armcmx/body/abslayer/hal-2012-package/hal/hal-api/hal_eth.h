@@ -113,29 +113,6 @@ typedef struct
 } hal_eth_network_functions_t;
 
 
-// typedef enum
-// {
-//     hal_eth_speed_auto      = 0,
-//     hal_eth_speed_10        = 1,
-//     hal_eth_speed_100       = 2,
-//     hal_eth_speed_none      = 255
-// } hal_eth_speed_t;
-
-// typedef enum
-// {
-//     hal_eth_mux_auto        = 0,
-//     hal_eth_mux_halfduplex  = 1,
-//     hal_eth_mux_fullduplex  = 2,
-//     hal_eth_mux_none       = 255
-// } hal_eth_mux_t;
-
-
-// typedef struct 
-// {
-//     hal_eth_mux_t       mux;
-//     hal_eth_speed_t     speed;
-// } hal_eth_phycfg_t;
-
 
 typedef enum
 {
@@ -147,6 +124,16 @@ typedef enum
     hal_eth_phymode_none                = 255
 } hal_eth_phymode_t;
 
+
+/** @typedef    typedef enum hal_eth_t 
+    @brief      contains ids of every possible eth peripheral.
+ **/ 
+typedef enum  
+{ 
+    hal_eth1        = 0             /**< the only eth */
+} hal_eth_t;
+
+enum { hal_eths_number = 1 };
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section

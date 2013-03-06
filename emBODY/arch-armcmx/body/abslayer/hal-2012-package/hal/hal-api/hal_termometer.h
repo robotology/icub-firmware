@@ -24,14 +24,14 @@
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_termometer.h
-    @brief      This header file implements interface to a generic hal port temperature module
+    @brief      This header file implements interface to a generic hal termometer
     @author     marco.accame@iit.it
     @date       10/24/2012
 **/
 
 /** @defgroup doxy_group_hal_termometer HAL TERMOMETER
 
-    The HAL SNSR_TEMP is a high level module whcih manages a temperature port
+    The HAL SNSR_TEMP is a high level module whcih manages a temperature sensor
  
     @todo acemor-facenda: review documentation.
     
@@ -52,15 +52,15 @@
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
-/** @typedef    typedef enum hal_termometer_port_t 
-    @brief      hal_termometer_port_t contains the possible ports for a temperature sensing
+/** @typedef    typedef enum hal_termometer_t 
+    @brief      hal_termometer_t contains the possible ids for a temperature sensor
  **/
 typedef enum
 {
-    hal_termometer_port1 = 0
-} hal_termometer_port_t;
+    hal_termometer1 = 0
+} hal_termometer_t;
 
-enum { hal_termometer_ports_number = 1 };
+enum { hal_termometers_number = 1 };
 
 
 /** @typedef    typedef int8_t hal_termometer_degrees_t 
@@ -86,22 +86,22 @@ extern const hal_termometer_cfg_t hal_termometer_cfg_default; // = { .dummy = 0 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-/** @fn			extern hal_result_t hal_termometer_init(hal_termometer_port_t port, const hal_termometer_cfg_t *cfg)
+/** @fn			extern hal_result_t hal_termometer_init(hal_termometer_t id, const hal_termometer_cfg_t *cfg)
     @brief  	this function initializes a temperature port on a given port
     @param  	port	        the port
     @param  	cfg 	        pointer to configuration data
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_termometer_init(hal_termometer_port_t port, const hal_termometer_cfg_t *cfg);
+extern hal_result_t hal_termometer_init(hal_termometer_t id, const hal_termometer_cfg_t *cfg);
 
 
-/** @fn			extern hal_result_t hal_termometer_read(hal_termometer_port_t port, hal_termometer_degrees_t* degrees)
+/** @fn			extern hal_result_t hal_termometer_read(hal_termometer_t id, hal_termometer_degrees_t* degrees)
     @brief  	this function reads temperatures on a given port.
-    @param  	port	        the port
+    @param  	id	            the id
     @param  	degrees 	    the read degrees
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_termometer_read(hal_termometer_port_t port, hal_termometer_degrees_t* degrees);
+extern hal_result_t hal_termometer_read(hal_termometer_t id, hal_termometer_degrees_t* degrees);
 
 
 /** @}            

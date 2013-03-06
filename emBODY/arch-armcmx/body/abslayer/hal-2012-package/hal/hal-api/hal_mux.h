@@ -51,20 +51,18 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-/** @typedef    typedef enum hal_muxport_t 
-    @brief      hal_muxport_t contains every possible mux sensor. the way the muxport is read from the peripherals
-                of the MPU depends on internals of the muxport file. in case of muxports using spi and mux, then the mapping
-                between muxports and peripherals is contained in the brdcfg file.
+/** @typedef    typedef enum hal_mux_t 
+    @brief      hal_mux_t contains every possible mux identifier.
  **/ 
 typedef enum  
 { 
-    hal_mux_port1   = 0,
-	hal_mux_port2   = 1,
-    hal_mux_port3   = 2,         
-    hal_mux_port4   = 3
-} hal_mux_port_t;
+    hal_mux1   = 0,
+	hal_mux2   = 1,
+    hal_mux3   = 2,         
+    hal_mux4   = 3
+} hal_mux_t;
 
-enum { hal_mux_ports_num = 4 };
+enum { hal_muxs_number = 4 };
 
 
 typedef enum
@@ -75,13 +73,7 @@ typedef enum
     hal_mux_selNONE = 255
 } hal_mux_sel_t;
 
-enum { hal_mux_sels_num = 3 };
-
-
-/** @typedef    typedef uint32_t hal_mux_position_t
-    @brief      contains value of muxport
- **/
-typedef uint32_t hal_mux_position_t;
+enum { hal_mux_sels_number = 3 };
 
 
 
@@ -90,41 +82,41 @@ typedef uint32_t hal_mux_position_t;
  **/
 typedef struct
 {
-    uint8_t     nothing;        /**< nothing  */
+    uint8_t     dummy;        /**< nothing  */
 } hal_mux_cfg_t;
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const hal_mux_cfg_t hal_mux_cfg_default;   // = { .nothing = 0 };
+extern const hal_mux_cfg_t hal_mux_cfg_default;   // = { .dummy = 0 };
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn			extern hal_result_t hal_mux_init(hal_mux_port_t muxport, const hal_mux_cfg_t *cfg)
+/** @fn			extern hal_result_t hal_mux_init(hal_mux_t id, const hal_mux_cfg_t *cfg)
     @brief  	This function initializes the mux.
-    @param  	muxport 	    the mux port
+    @param  	id 	            the mux id
     @param  	cfg 	        The configuration of the mux. 
     @return 	hal_res_NOK_generic in case the mux is not supported, else hal_res_OK
   */
-extern hal_result_t hal_mux_init(hal_mux_port_t muxport, const hal_mux_cfg_t *cfg);
+extern hal_result_t hal_mux_init(hal_mux_t id, const hal_mux_cfg_t *cfg);
 
 
-/** @fn			extern hal_result_t hal_mux_enable(hal_mux_port_t muxport, hal_mux_sel_t muxsel)
-    @brief  	This function enables the mux port with a given selection.
-    @param  	muxport         the mux port
+/** @fn			extern hal_result_t hal_mux_enable(hal_mux_t id, hal_mux_sel_t muxsel)
+    @brief  	This function enables the mux id with a given selection.
+    @param  	id              the mux id
     @param  	muxsel          the mux selection 
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_mux_enable(hal_mux_port_t muxport, hal_mux_sel_t muxsel);
+extern hal_result_t hal_mux_enable(hal_mux_t id, hal_mux_sel_t muxsel);
 
 
-/** @fn			extern hal_result_t hal_mux_disable(hal_mux_port_t muxport)
+/** @fn			extern hal_result_t hal_mux_disable(hal_mux_t id)
     @brief  	This function disables the mux. no selection is active.
-    @param  	muxport         the mux port
+    @param  	id              the mux id
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_mux_disable(hal_mux_port_t muxport);
+extern hal_result_t hal_mux_disable(hal_mux_t id);
 
 
 

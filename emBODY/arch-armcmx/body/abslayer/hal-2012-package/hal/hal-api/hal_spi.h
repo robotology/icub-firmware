@@ -52,17 +52,17 @@
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
-/** @typedef    typedef enum hal_spi_port_t 
-    @brief      hal_spi_port_t contains the possible SPI ports 
+/** @typedef    typedef enum hal_spi_t 
+    @brief      hal_spi_t contains the possible SPI ports 
  **/
 typedef enum
 {
-    hal_spi_port1 = 0,
-    hal_spi_port2 = 1,
-    hal_spi_port3 = 2
-} hal_spi_port_t;
+    hal_spi1 = 0,
+    hal_spi2 = 1,
+    hal_spi3 = 2
+} hal_spi_t;
 
-enum { hal_spi_ports_number = 3 };
+enum { hal_spis_number = 3 };
 
 
 /** @typedef    typedef enum hal_spi_mode_t
@@ -167,19 +167,19 @@ extern const hal_spi_cfg_t hal_spi_cfg_default; /**< = {.ownership = hal_spi_own
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-/** @fn			extern hal_result_t hal_spi_init(const hal_spi_port_t port, const hal_spi_cfg_t *cfg)
+/** @fn			extern hal_result_t hal_spi_init(const hal_spi_t id, const hal_spi_cfg_t *cfg)
     @brief  	this function initializes an spi port
     @param  	port	        the port
     @param  	cfg 	        pointer to configuration data
     @return 	hal_res_OK or hal_res_NOK_generic on failure
   */
-extern hal_result_t hal_spi_init(const hal_spi_port_t port, const hal_spi_cfg_t *cfg);
+extern hal_result_t hal_spi_init(const hal_spi_t id, const hal_spi_cfg_t *cfg);
 
 
-extern hal_result_t hal_spi_raw_master_writeread(hal_spi_port_t port, uint8_t byte, uint8_t* readbyte);
+extern hal_result_t hal_spi_raw_master_writeread(hal_spi_t id, uint8_t byte, uint8_t* readbyte);
 
 
-/** @fn			extern hal_result_t hal_spi_send(hal_spi_port_t port, uint8_t* txframe, uint8_t size)
+/** @fn			extern hal_result_t hal_spi_send(hal_spi_t id, uint8_t* txframe, uint8_t size)
     @brief  	this functionj adds the frame to the transmission buffer. in master ownership if sendnow is hal_true it also starts 
                 transmission. 
                 if the port is configured having activity hal_spi_act_continuous, then the sendnow enables or disables the activity.
@@ -189,29 +189,29 @@ extern hal_result_t hal_spi_raw_master_writeread(hal_spi_port_t port, uint8_t by
     @param  	txframe 	    the frame to transmit
     @return 	hal_res_OK or hal_res_NOK_generic on failure
   */
-extern hal_result_t hal_spi_put(hal_spi_port_t port, uint8_t* txframe);
+extern hal_result_t hal_spi_put(hal_spi_t id, uint8_t* txframe);
 
 // 0 -> svuoto il buffer tx.
 // num -> il numeo indicato. si prende prima dal buffer tx se esiste. poi il frame dummy.
 // 255 -> lunghezza infinita. si usa per lo slave o per trasmettere continuamente. si ferma con hal_spi_stop().
-extern hal_result_t hal_spi_start(hal_spi_port_t port, uint8_t lengthofburst);
+extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t lengthofburst);
 
-extern hal_result_t hal_spi_stop(hal_spi_port_t port);
+extern hal_result_t hal_spi_stop(hal_spi_t id);
 
 
-/** @fn			extern hal_result_t hal_spi_get(hal_spi_port_t port, uint8_t* size)
+/** @fn			extern hal_result_t hal_spi_get(hal_spi_t id, uint8_t* size)
     @brief  	this function retrieves a received frame. 
     @param  	port	        the port
     @param  	rxframe 	    the frame to transmit
     @return 	hal_res_OK if a valid frame is available or hal_res_NOK_generic on failure
   */
-extern hal_result_t hal_spi_get(hal_spi_port_t port, uint8_t* rxframe, uint8_t* remainingrxframes);
+extern hal_result_t hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remainingrxframes);
 
 
 
-extern hal_result_t hal_spi_on_framereceiv_set(hal_spi_port_t port, hal_callback_t onframereceiv, void* arg); 
+extern hal_result_t hal_spi_on_framereceiv_set(hal_spi_t id, hal_callback_t onframereceiv, void* arg); 
 
-extern hal_result_t hal_spi_on_frametransm_set(hal_spi_port_t port, hal_callback_t onframetransm, void* arg); 
+extern hal_result_t hal_spi_on_frametransm_set(hal_spi_t id, hal_callback_t onframetransm, void* arg); 
 
 /** @}            
     end of group doxy_group_hal_spi  

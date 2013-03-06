@@ -49,6 +49,17 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
+/** @typedef    typedef enum hal_ethtransceiver_t 
+    @brief      contains the id of the can transceiver
+ **/
+typedef enum  
+{ 
+    hal_ethtransceiver1 = 0            /**< for hal_eth1        */
+} hal_ethtransceiver_t; 
+
+enum { hal_ethtransceivers_number = 1 };
+
+
 /** @typedef    typedef struct hal_ethtransceiver_cfg_t;
     @brief      contains configuration data of ethtransceiver.
  **/
@@ -73,6 +84,7 @@ extern const hal_ethtransceiver_cfg_t hal_ethtransceiver_cfg_default;   // = { .
                 should be avoided as they can corrupt network traffic.
   */
 extern hal_result_t hal_ethtransceiver_init(const hal_ethtransceiver_cfg_t *cfg);
+
 
 extern hal_result_t hal_ethtransceiver_config(hal_eth_phymode_t targetphymode, hal_eth_phymode_t *usedphymode);
 

@@ -56,12 +56,13 @@
  **/ 
 typedef struct
 {
-    uint8_t     nothingsofar;    
+    uint32_t        stacksize;                  /**< The size of stack available to the system in bytes     */
+    uint32_t        heapsize;                   /**< The size of heap available to the system in bytes      */
 } hal_sys_cfg_t;
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const hal_sys_cfg_t hal_sys_cfg_default;  // = { .nothingsofar = 0 };
+extern const hal_sys_cfg_t hal_sys_cfg_default;  // = { .stacksize = 0, .heapsize = 0 };
 
 
 
@@ -80,6 +81,7 @@ extern hal_result_t hal_sys_init(const hal_sys_cfg_t* cfg);
     @return     hal_res_OK, or hal_res_NOK_generic if hal_initialise() was not already succesfully called.
  **/
 extern hal_result_t hal_sys_systeminit(void);
+
 
 /** @fn         extern hal_result_t hal_sys_delay(hal_reltime_t reltime)
     @brief      When called it returns after the CPU has executed this function for @e reltime microseconds.
