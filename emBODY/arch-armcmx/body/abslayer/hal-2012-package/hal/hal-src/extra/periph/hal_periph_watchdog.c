@@ -26,7 +26,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_WATCHDOG
+#ifdef HAL_USE_PERIPH_WATCHDOG
 
 
 #if     defined(HAL_USE_CPU_FAM_STM32F1)
@@ -63,7 +63,7 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_mpu_watchdog_hid.h"
+#include "hal_periph_watchdog_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -419,7 +419,7 @@ static void s_hal_watchdog_window_start(hal_watchdog_internal_item_t *intitem)
 
 
 
-#endif//HAL_USE_WATCHDOG
+#endif//HAL_USE_PERIPH_WATCHDOG
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

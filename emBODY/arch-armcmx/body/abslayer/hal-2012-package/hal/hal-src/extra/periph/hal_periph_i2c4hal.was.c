@@ -17,7 +17,7 @@
 */
 
 
-/* @file       hal_mpu_i2c.c
+/* @file       hal_periph_i2c.c
 	@brief      This file implements internal implementation of the hal i2c module.
 	@author     valentina.gaggero@iit.it
     @date       28/02/2011
@@ -26,7 +26,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_I2C4HAL
+#ifdef HAL_USE_PERIPH_I2C4HAL
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -36,7 +36,7 @@
 #include "string.h"
 #include "hal_brdcfg.h"
 #include "hal_base_hid.h"
-#include "hal_mpu_gpio_hid.h"
+#include "hal_periph_gpio_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -50,7 +50,7 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_mpu_i2c4hal_hid.h"
+#include "hal_periph_i2c4hal_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -112,7 +112,7 @@ static const uint32_t s_hal_i2c4hal_timeout_flag = 0x00100;
 static const uint32_t s_hal_i2c4hal_timeout_long = 0x10000;
 static const uint32_t s_hal_i2c4hal_ackaddress_maxtrials = 100000;
 
-static const I2C_InitTypeDef   s_hal_i2c4hal_mpu_cfg =
+static const I2C_InitTypeDef   s_hal_i2c4hal_periph_cfg =
 {
     .I2C_Mode                   = I2C_Mode_I2C,
     .I2C_DutyCycle              = I2C_DutyCycle_2,
@@ -591,7 +591,7 @@ static void s_hal_i2c4hal_hw_enable(hal_i2c4hal_port_t port, hal_i2c4hal_speed_t
     I2C_TypeDef* I2Cx = (hal_i2c4hal_port1 == port) ? (I2C1) : (I2C2);
     
     I2C_InitTypeDef i2c4hal_cfg;
-    memcpy(&i2c4hal_cfg, &s_hal_i2c4hal_mpu_cfg, sizeof(I2C_InitTypeDef));
+    memcpy(&i2c4hal_cfg, &s_hal_i2c4hal_periph_cfg, sizeof(I2C_InitTypeDef));
     // apply the clockspeed 
     i2c4hal_cfg.I2C_ClockSpeed = (uint32_t)speed * 100000;
     // i2c peripheral enable
@@ -938,7 +938,7 @@ static hal_result_t s_hal_i2c4hal_timeoutexpired(void)
 }
 
 
-#endif//HAL_USE_I2C4HAL
+#endif//HAL_USE_PERIPH_I2C4HAL
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

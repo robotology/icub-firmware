@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       hal_mpu_dma.c
+/* @file       hal_periph_dma.c
 	@brief      This file implements the hal dma module.
 	@author     marco.accame@iit.it
     @date       12/21/2012
@@ -25,7 +25,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_DMA
+#ifdef HAL_USE_PERIPH_DMA
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -40,7 +40,7 @@
 #include "hal_brdcfg.h"
 #include "hal_heap.h" 
 #include "hal_base_hid.h" 
-#include "hal_mpu_gpio_hid.h" 
+#include "hal_periph_gpio_hid.h" 
 #include "hal_utility_fifo.h"
 #include "hal_utility_bits.h" 
 
@@ -55,7 +55,7 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_mpu_dma_hid.h" 
+#include "hal_periph_dma_hid.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -759,7 +759,7 @@ static void s_hal_dma_isr_clear_flag(hal_dma_t id)
 }
 
 
-#endif//HAL_USE_DMA
+#endif//HAL_USE_PERIPH_DMA
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

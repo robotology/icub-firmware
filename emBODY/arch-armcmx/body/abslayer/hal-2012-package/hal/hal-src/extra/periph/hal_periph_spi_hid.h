@@ -18,11 +18,11 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_MPU_SPI_HID_H_
-#define _HAL_MPU_SPI_HID_H_
+#ifndef _HAL_PERIPH_SPI_HID_H_
+#define _HAL_PERIPH_SPI_HID_H_
 
 
-/* @file       hal_mpu_spi_hid.h
+/* @file       hal_periph_spi_hid.h
     @brief      This header file implements hidden interface to a generic hal spi module
     @author     marco.accame@iit.it
     @date       10/29/2012

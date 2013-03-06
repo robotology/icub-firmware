@@ -26,7 +26,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_ETH
+#ifdef HAL_USE_PERIPH_ETH
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -40,7 +40,7 @@
 #include "hal_brdcfg.h"
 #include "hal_ethtransceiver.h"
 
-#include "hal_mpu_gpio_hid.h"
+#include "hal_periph_gpio_hid.h"
 
 
 #include "hal_utility_bits.h" 
@@ -65,7 +65,7 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_mpu_eth_hid.h" 
+#include "hal_periph_eth_hid.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1178,7 +1178,7 @@ extern void hal_eth_hid_rmii_prepare(void)
 
 
 
-#endif//HAL_USE_ETH
+#endif//HAL_USE_PERIPH_ETH
 
 
 // ---- removed or old functions

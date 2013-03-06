@@ -17,11 +17,11 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_MPU_UNIQUEID_HID_H_
-#define _HAL_MPU_UNIQUEID_HID_H_
+#ifndef _HAL_PERIPH_UNIQUEID_HID_H_
+#define _HAL_PERIPH_UNIQUEID_HID_H_
 
 
-/* @file       hal_mpu_uniqueid_hid.h
+/* @file       hal_periph_uniqueid_hid.h
     @brief      This header file implements hidden interface to a uniqueid
     @author     marco.accame@iit.it
     @date       02/27/2013

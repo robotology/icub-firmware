@@ -22,7 +22,7 @@
 #define _HAL_MPU_I2C4HAL_HID_H_
 
 
-/* @file       hal_mpu_i2c4hal_hid.h
+/* @file       hal_periph_i2c4hal_hid.h
     @brief      This header file implements hidden interface to i2c4hal.
     @author     marco.accame@iit.it
     @date       09/12/2011

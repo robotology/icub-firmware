@@ -26,7 +26,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_GPIO
+#ifdef HAL_USE_PERIPH_GPIO
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -53,7 +53,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 
-#include "hal_mpu_gpio_hid.h"
+#include "hal_periph_gpio_hid.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
@@ -518,7 +518,7 @@ static hal_result_t s_hal_gpio_altfun_configure(hal_gpio_xxx_t xxx, const hal_gp
 
 
 
-#endif//HAL_USE_GPIO
+#endif//HAL_USE_PERIPH_GPIO
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------

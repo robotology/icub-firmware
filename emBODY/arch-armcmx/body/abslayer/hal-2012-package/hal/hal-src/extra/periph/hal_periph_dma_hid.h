@@ -17,11 +17,11 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_MPU_DMA_HID_H_
-#define _HAL_MPU_DMA_HID_H_
+#ifndef _HAL_PERIPH_DMA_HID_H_
+#define _HAL_PERIPH_DMA_HID_H_
 
 
-/* @file       hal_mpu_dma_hid.h
+/* @file       hal_periph_dma_hid.h
 	@brief      This file contains hidden api of the hal dma module.
 	@author     marco.accame@iit.it
     @date       12/21/2012

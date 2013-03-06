@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       hal_mpu_can.c
+/* @file       hal_periph_can.c
 	@brief      This file implements internal implementation of the hal can module.
 	@author     marco.accame@iit.it
     @date       05/27/2010
@@ -25,7 +25,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_CAN
+#ifdef HAL_USE_PERIPH_CAN
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -39,7 +39,7 @@
 
 #include "hal_brdcfg.h"
 #include "hal_base_hid.h" 
-#include "hal_mpu_sys_hid.h"
+#include "hal_periph_sys_hid.h"
 
  
 // --------------------------------------------------------------------------------------------------------------------
@@ -53,7 +53,7 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_mpu_can_hid.h" 
+#include "hal_periph_can_hid.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1269,7 +1269,7 @@ static void s_hal_can_isr_rx_disable(hal_can_port_t port)
 }
 
 
-#endif//HAL_USE_CAN
+#endif//HAL_USE_PERIPH_CAN
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

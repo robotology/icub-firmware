@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       hal_mpu_crc.c
+/* @file       hal_periph_crc.c
 	@brief      This file implements internal implementation of the hal crc module.
 	@author     marco.accame@iit.it
     @date       09/16/2011
@@ -25,7 +25,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_CRC
+#ifdef HAL_USE_PERIPH_CRC
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -74,7 +74,7 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_mpu_crc_hid.h"
+#include "hal_periph_crc_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -464,7 +464,7 @@ static uint32_t s_hal_crc07_sw_compute(hal_crc_internal_item_t *intitem, const v
 #endif    
 }
 
-#endif//HAL_USE_CRC
+#endif//HAL_USE_PERIPH_CRC
 
 
 // --------------------------------------------------------------------------------------------------------------------

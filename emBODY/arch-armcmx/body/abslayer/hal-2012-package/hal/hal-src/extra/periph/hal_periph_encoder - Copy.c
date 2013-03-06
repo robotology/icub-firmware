@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file     hal_mpu_encoder.c
+/* @file     hal_periph_encoder.c
 	@brief      This file implements communication between spi peripherals and encoders.
 	@author     marco.accame@iit.it
     @date       09/09/2011
@@ -36,11 +36,11 @@
 #include "stm32f1.h"
 
 #include "hal_spi4encoder.h"
-#include "hal_mpu_spi4encoder_hid.h"
+#include "hal_periph_spi4encoder_hid.h"
 
 #include "hal_brdcfg.h"
 #include "hal_base_hid.h" 
-#include "hal_mpu_sys_hid.h"
+#include "hal_periph_sys_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -54,7 +54,7 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_mpu_encoder_hid.h" 
+#include "hal_periph_encoder_hid.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------

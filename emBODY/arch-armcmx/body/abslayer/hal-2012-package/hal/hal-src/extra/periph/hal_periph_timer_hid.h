@@ -17,11 +17,11 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_MPU_TIMER_HID_H_
-#define _HAL_MPU_TIMER_HID_H_
+#ifndef _HAL_PERIPH_TIMER_HID_H_
+#define _HAL_PERIPH_TIMER_HID_H_
 
 
-/* @file       hal_mpu_timer_hid.h
+/* @file       hal_periph_timer_hid.h
     @brief      This header file implements hidden interface to a timer
     @author     marco.accame@iit.it
     @date       09/12/2011

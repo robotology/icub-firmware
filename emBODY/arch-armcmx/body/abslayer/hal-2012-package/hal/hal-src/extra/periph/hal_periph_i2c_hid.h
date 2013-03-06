@@ -18,11 +18,11 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_MPU_I2C_HID_H_
-#define _HAL_MPU_I2C_HID_H_
+#ifndef _HAL_PERIPH_I2C_HID_H_
+#define _HAL_PERIPH_I2C_HID_H_
 
 
-/* @file       hal_mpu_i2c_hid.h
+/* @file       hal_periph_i2c_hid.h
     @brief      This header file implements hidden interface to i2c.
     @author     marco.accame@iit.it
     @date       09/12/2011

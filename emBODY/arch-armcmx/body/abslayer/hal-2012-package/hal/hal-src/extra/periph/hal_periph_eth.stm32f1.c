@@ -26,7 +26,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_ETH
+#ifdef HAL_USE_PERIPH_ETH
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -36,7 +36,7 @@
 #include "hal_stm32xx_include.h"
 #include "string.h"
 #include "hal_base_hid.h" 
-#include "hal_mpu_sys_hid.h"
+#include "hal_periph_sys_hid.h"
 #include "hal_brdcfg.h"
 #include "hal_switch.h"
 
@@ -57,14 +57,14 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_mpu_eth_hid.h" 
+#include "hal_periph_eth_hid.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_mpu_eth_def.h" 
+#include "hal_periph_eth_def.h" 
 
 // from NET_CONFIG.H       
 //#define ETH_MTU         1514      /* Ethernet Frame Max Transfer Unit        */
@@ -768,7 +768,7 @@ static void s_hal_eth_rmii_init(void)
 
 }
 
-#endif//HAL_USE_ETH
+#endif//HAL_USE_PERIPH_ETH
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

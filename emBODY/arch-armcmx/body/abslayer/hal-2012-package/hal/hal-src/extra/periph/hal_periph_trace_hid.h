@@ -17,11 +17,11 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_MPU_TRACE_HID_H_
-#define _HAL_MPU_TRACE_HID_H_
+#ifndef _HAL_PERIPH_TRACE_HID_H_
+#define _HAL_PERIPH_TRACE_HID_H_
 
 
-/* @file       hal_mpu_trace_hid.h
+/* @file       hal_periph_trace_hid.h
     @brief      This header file implements hidden interface to a trace
     @author     marco.accame@iit.it
     @date       09/12/2011

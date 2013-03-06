@@ -26,7 +26,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_SPI
+#ifdef HAL_USE_PERIPH_SPI
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -36,7 +36,7 @@
 #include "string.h"
 #include "hal_brdcfg.h"
 #include "hal_base_hid.h"
-#include "hal_mpu_gpio_hid.h"
+#include "hal_periph_gpio_hid.h"
 
 
 #include "hal_utility_bits.h"
@@ -53,7 +53,7 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_mpu_spi_hid.h"
+#include "hal_periph_spi_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1518,7 +1518,7 @@ static hal_result_t s_hal_spi_isr_rxbyte_put(hal_spi_internals_t* spixint, uint8
     return(hal_res_OK);  
 }
 
-#endif//HAL_USE_SPI
+#endif//HAL_USE_PERIPH_SPI
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

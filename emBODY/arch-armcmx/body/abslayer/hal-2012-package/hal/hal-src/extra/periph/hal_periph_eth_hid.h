@@ -18,11 +18,11 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_MPU_ETH_HID_H_
-#define _HAL_MPU_ETH_HID_H_
+#ifndef _HAL_PERIPH_ETH_HID_H_
+#define _HAL_PERIPH_ETH_HID_H_
 
 
-/* @file       hal_mpu_eth_hid.h
+/* @file       hal_periph_eth_hid.h
     @brief      This header file implements hidden interface to hal eth.
     @author     marco.accame@iit.it
     @date       06/08/2010

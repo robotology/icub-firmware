@@ -25,7 +25,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_TRACE
+#ifdef HAL_USE_PERIPH_TRACE
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -49,7 +49,7 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_mpu_trace_hid.h"
+#include "hal_periph_trace_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -199,7 +199,7 @@ static hal_bool_t s_hal_trace_supported_is(void)
 
 
 
-#endif//HAL_USE_TRACE
+#endif//HAL_USE_PERIPH_TRACE
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

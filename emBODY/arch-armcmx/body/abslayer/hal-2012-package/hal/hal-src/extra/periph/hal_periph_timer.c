@@ -25,7 +25,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_TIMER
+#ifdef HAL_USE_PERIPH_TIMER
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -55,7 +55,7 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_mpu_timer_hid.h"
+#include "hal_periph_timer_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -805,7 +805,7 @@ static void s_hal_timer_callback(hal_timer_t id)
 }
 
 
-#endif//HAL_USE_TIMER
+#endif//HAL_USE_PERIPH_TIMER
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

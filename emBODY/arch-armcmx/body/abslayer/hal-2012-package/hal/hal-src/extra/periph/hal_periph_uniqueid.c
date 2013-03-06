@@ -26,7 +26,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_UNIQUEID
+#ifdef HAL_USE_PERIPH_UNIQUEID
 
 
 #if     defined(HAL_USE_CPU_FAM_STM32F1)
@@ -61,7 +61,7 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_mpu_uniqueid_hid.h"
+#include "hal_periph_uniqueid_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -221,7 +221,7 @@ static hal_boolval_t s_hal_uniqueid_supported_is(hal_uniqueid_hid_id_t uniqueid)
 
 
 
-#endif//HAL_USE_UNIQUEID
+#endif//HAL_USE_PERIPH_UNIQUEID
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
