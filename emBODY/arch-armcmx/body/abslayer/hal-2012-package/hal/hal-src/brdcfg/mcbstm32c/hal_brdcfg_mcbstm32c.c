@@ -473,7 +473,7 @@
     
     extern const hal_device_cantransceiver_hid_brdcfg_t hal_brdcfg_device_cantransceiver__theconfig =
     {
-        .supported_mask     =  (1 << hal_can1) | (1 << hal_can2),
+        .supported_mask     =  (1 << hal_cantransceiver1) | (1 << hal_cantransceiver2),
         .devcfg             =
         {            
             .chipif             =

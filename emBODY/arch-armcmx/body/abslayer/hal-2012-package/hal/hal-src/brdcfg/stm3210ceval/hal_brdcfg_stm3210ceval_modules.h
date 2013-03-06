@@ -32,10 +32,12 @@
 
 // - modules to be built ----------------------------------------------------------------------------------------------
 
+
 // -- core: these values must be always defined
 #define     HAL_USE_BASE
 #define     HAL_USE_CORE
 #define     HAL_USE_CPU
+#define     HAL_USE_FLASH
 #define     HAL_USE_HEAP
 #define     HAL_USE_MIDDLEWARE_INTERFACE
 #define     HAL_USE_SYS
@@ -56,18 +58,18 @@
 #define     HAL_USE_UTILITY_FIFO
 
 // -- mpu peripherals: define what you need to use (beware of cross dependencies)
-#undef     HAL_USE_CAN
-#define     HAL_USE_CRC
-#define     HAL_USE_DMA
-#undef     HAL_USE_ETH
-#define     HAL_USE_FLASH
-#define     HAL_USE_GPIO
-#define     HAL_USE_I2C
-#define     HAL_USE_SPI
-#define     HAL_USE_TIMER
-#define     HAL_USE_TRACE
-#define     HAL_USE_UNIQUEID
-#define     HAL_USE_WATCHDOG
+#undef     HAL_USE_PERIPH_CAN
+#define     HAL_USE_PERIPH_CRC
+#define     HAL_USE_PERIPH_DMA
+#undef     HAL_USE_PERIPH_ETH
+#define     HAL_USE_PERIPH_FLASH
+#define     HAL_USE_PERIPH_GPIO
+#define     HAL_USE_PERIPH_I2C
+#define     HAL_USE_PERIPH_SPI
+#define     HAL_USE_PERIPH_TIMER
+#define     HAL_USE_PERIPH_TRACE
+#define     HAL_USE_PERIPH_UNIQUEID
+#define     HAL_USE_PERIPH_WATCHDOG
 
 // -- devices: define what you need to use (beware of cross dependencies from mpu peripherals and amongst devices)
 #undef  HAL_USE_DEVICE_ACCELEROMETER

@@ -241,7 +241,7 @@
 #endif//HAL_USE_DEVICE_EEPROM 
 
 #ifdef  HAL_USE_DEVICE_ENCODER
-    extern const hal_sensor_encoder_hid_brdcfg_t hal_brdcfg_sensor_encoder__theconfig;
+    extern const hal_device_encoder_hid_brdcfg_t hal_brdcfg_device_encoder__theconfig;
 #endif//HAL_USE_DEVICE_ENCODER
 
 #ifdef  HAL_USE_DEVICE_ETHTRANSCEIVER

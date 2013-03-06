@@ -46,58 +46,55 @@
 #include "hal_sys.h"
 #include "hal_sys_hid.h"
 
-
+#include "hal_flash_hid.h"
+#include "hal_heap_hid.h"
 
 
 // -- mpu peripherals
 
-#ifdef  HAL_USE_CAN
-    #include "hal_mpu_can_hid.h"
-#endif//HAL_USE_CAN
+#ifdef  HAL_USE_PERIPH_CAN
+    #include "hal_periph_can_hid.h"
+#endif//HAL_USE_PERIPH_CAN
 
-#ifdef  HAL_USE_CRC
-    #include "hal_mpu_crc_hid.h"
-#endif//HAL_USE_CRC
+#ifdef  HAL_USE_PERIPH_CRC
+    #include "hal_periph_crc_hid.h"
+#endif//HAL_USE_PERIPH_CRC
 
-#ifdef  HAL_USE_DMA
-    #include "hal_mpu_dma_hid.h"
-#endif//HAL_USE_DMA
+#ifdef  HAL_USE_PERIPH_DMA
+    #include "hal_periph_dma_hid.h"
+#endif//HAL_USE_PERIPH_DMA
 
-#ifdef HAL_USE_ETH
-    #include "hal_mpu_eth_hid.h"
-#endif//HAL_USE_ETH
+#ifdef HAL_USE_PERIPH_ETH
+    #include "hal_periph_eth_hid.h"
+#endif//HAL_USE_PERIPH_ETH
 
-#ifdef HAL_USE_FLASH
-    #include "hal_mpu_flash_hid.h"
-#endif//HAL_USE_FLASH
+#ifdef HAL_USE_PERIPH_GPIO
+    #include "hal_periph_gpio_hid.h"
+#endif//HAL_USE_PERIPH_GPIO
 
-#ifdef HAL_USE_GPIO
-    #include "hal_mpu_gpio_hid.h"
-#endif//HAL_USE_GPIO
+#ifdef HAL_USE_PERIPH_I2C
+    #include "hal_periph_i2c_hid.h"
+#endif//HAL_USE_PERIPH_I2C
 
-#ifdef HAL_USE_I2C
-    #include "hal_mpu_i2c_hid.h"
-#endif//HAL_USE_I2C
+#ifdef HAL_USE_PERIPH_SPI
+    #include "hal_periph_spi_hid.h"
+#endif//HAL_USE_PERIPH_SPI
 
-#ifdef HAL_USE_SPI
-    #include "hal_mpu_spi_hid.h"
-#endif//HAL_USE_SPI
+#ifdef  HAL_USE_PERIPH_TIMER
+    #include "hal_periph_timer_hid.h"  
+#endif//HAL_USE_PERIPH_TIMER
 
-#ifdef  HAL_USE_TIMER
-    #include "hal_mpu_timer_hid.h"  
-#endif//HAL_USE_TIMER
+#ifdef  HAL_USE_PERIPH_TRACE
+    #include "hal_periph_trace_hid.h"  
+#endif//HAL_USE_PERIPH_TRACE
 
-#ifdef  HAL_USE_TRACE
-    #include "hal_mpu_trace_hid.h"  
-#endif//HAL_USE_TRACE
+#ifdef  HAL_USE_PERIPH_UNIQUEID
+    #include "hal_periph_uniqueid_hid.h"  
+#endif//HAL_USE_PERIPH_UNIQUEID
 
-#ifdef  HAL_USE_UNIQUEID
-    #include "hal_mpu_uniqueid_hid.h"  
-#endif//HAL_USE_UNIQUEID
-
-#ifdef  HAL_USE_WATCHDOG
-    #include "hal_mpu_watchdog_hid.h"  
-#endif//HAL_USE_WATCHDOG
+#ifdef  HAL_USE_PERIPH_WATCHDOG
+    #include "hal_periph_watchdog_hid.h"  
+#endif//HAL_USE_PERIPH_WATCHDOG
 
 // -- devices
 
@@ -148,12 +145,10 @@
 
 
 
-
-
 // - public #define  --------------------------------------------------------------------------------------------------
 
 
-#if defined(HAL_USE_ETH) || defined(HAL_USE_DEVICE_ETHTRANSCEIVER) || defined(HAL_USE_DEVICE_SWITCH)
+#if defined(HAL_USE_PERIPH_ETH) || defined(HAL_USE_DEVICE_ETHTRANSCEIVER) || defined(HAL_USE_DEVICE_SWITCH)
     #define HAL_ETH_PHYMODE_THEONE2USE     hal_eth_phymode_fullduplex100mbps
 #endif
 
@@ -181,6 +176,14 @@
     extern const hal_cpu_hid_brdcfg_t hal_brdcfg_cpu__theconfig;
 #endif//HAL_USE_CPU
 
+#ifdef  HAL_USE_FLASH
+    extern const hal_flash_hid_brdcfg_t hal_brdcfg_flash__theconfig;
+#endif//HAL_USE_FLASH
+ 
+#ifdef  HAL_USE_HEAP
+    extern const hal_heap_hid_brdcfg_t hal_brdcfg_heap__theconfig;
+#endif//HAL_USE_HEAP      
+
 #ifdef  HAL_USE_SYS
     extern const hal_sys_hid_brdcfg_t hal_brdcfg_sys__theconfig;
 #endif//HAL_USE_SYS 
@@ -188,53 +191,50 @@
 
 // -- mpu peripherals
 
-#ifdef  HAL_USE_CAN
+#ifdef  HAL_USE_PERIPH_CAN
     extern const hal_can_hid_brdcfg_t hal_brdcfg_can__theconfig;
-#endif//HAL_USE_CAN
+#endif//HAL_USE_PERIPH_CAN
 
-#ifdef  HAL_USE_CRC
+#ifdef  HAL_USE_PERIPH_CRC
     extern const hal_crc_hid_brdcfg_t hal_brdcfg_crc__theconfig;
-#endif//HAL_USE_CRC
+#endif//HAL_USE_PERIPH_CRC
 
-#ifdef  HAL_USE_DMA
+#ifdef  HAL_USE_PERIPH_DMA
     extern const hal_dma_hid_brdcfg_t hal_brdcfg_dma__theconfig;
-#endif//HAL_USE_DMA    
+#endif//HAL_USE_PERIPH_DMA    
 
-#ifdef  HAL_USE_ETH
+#ifdef  HAL_USE_PERIPH_ETH
     extern const hal_eth_hid_brdcfg_t hal_brdcfg_eth__theconfig;
-#endif//HAL_USE_ETH
+#endif//HAL_USE_PERIPH_ETH
 
-#ifdef  HAL_USE_FLASH
-    extern const hal_flash_hid_brdcfg_t hal_brdcfg_flash__theconfig;
-#endif//HAL_USE_FLASH
 
-#ifdef  HAL_USE_GPIO
+#ifdef  HAL_USE_PERIPH_GPIO
     extern const hal_gpio_hid_brdcfg_t hal_brdcfg_gpio__theconfig;
-#endif//HAL_USE_GPIO
+#endif//HAL_USE_PERIPH_GPIO
 
-#ifdef  HAL_USE_I2C
+#ifdef  HAL_USE_PERIPH_I2C
     extern const hal_i2c_hid_brdcfg_t hal_brdcfg_i2c__theconfig;
-#endif//HAL_USE_I2C
+#endif//HAL_USE_PERIPH_I2C
 
-#ifdef  HAL_USE_SPI
+#ifdef  HAL_USE_PERIPH_SPI
     extern const hal_spi_hid_brdcfg_t hal_brdcfg_spi__theconfig;
-#endif//HAL_USE_SPI
+#endif//HAL_USE_PERIPH_SPI
          
-#ifdef  HAL_USE_TIMER
+#ifdef  HAL_USE_PERIPH_TIMER
     extern const hal_timer_hid_brdcfg_t hal_brdcfg_timer__theconfig;  
-#endif//HAL_USE_TIMER
+#endif//HAL_USE_PERIPH_TIMER
 
-#ifdef  HAL_USE_TRACE
+#ifdef  HAL_USE_PERIPH_TRACE
     extern const hal_trace_hid_brdcfg_t hal_brdcfg_trace__theconfig;  
-#endif//HAL_USE_TRACE
+#endif//HAL_USE_PERIPH_TRACE
 
-#ifdef  HAL_USE_UNIQUEID
+#ifdef  HAL_USE_PERIPH_UNIQUEID
     extern const hal_uniqueid_hid_brdcfg_t hal_brdcfg_uniqueid__theconfig;
-#endif//HAL_USE_UNIQUEID
+#endif//HAL_USE_PERIPH_UNIQUEID
 
-#ifdef  HAL_USE_WATCHDOG
+#ifdef  HAL_USE_PERIPH_WATCHDOG
     extern const hal_watchdog_hid_brdcfg_t hal_brdcfg_watchdog__theconfig;
-#endif//HAL_USE_WATCHDOG
+#endif//HAL_USE_PERIPH_WATCHDOG
 
 
 // -- devices
@@ -282,6 +282,7 @@
 #ifdef  HAL_USE_DEVICE_TERMOMETER
     extern const hal_device_termometer_hid_brdcfg_t hal_brdcfg_device_termometer__theconfig;
 #endif//HAL_USE_DEVICE_TERMOMETER
+
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
