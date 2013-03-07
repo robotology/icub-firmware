@@ -190,7 +190,8 @@ extern hal_result_t hal_sys_init(const hal_sys_cfg_t* cfg)
 uint8_t hal_sys_howmanyARMv7ops(void)
 {
 #if     defined(HAL_USE_CPU_FAM_STM32F1)
-    return(3+3);
+    //return(3+3);
+    return(3+3+3);      // number seems to be rather empirical. can anybody help me finding a rule?
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)
     return(3+1);
 #else //defined(HAL_USE_CPU_FAM_*)
