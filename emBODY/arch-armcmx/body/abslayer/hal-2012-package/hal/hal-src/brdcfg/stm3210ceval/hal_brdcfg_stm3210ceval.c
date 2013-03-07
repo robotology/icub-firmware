@@ -534,7 +534,7 @@
         .chipcfg    =
         {
             .chip           = hal_chip_xx_eeprom_chip_st_m24c64,
-            .i2cport        = hal_i2c1,
+            .i2cid          = hal_i2c1,
             .hwaddra2a1a0   = 0 // a0 = a1 = a2 = 0
         },
         .wrprcfg    =
@@ -563,7 +563,7 @@
                 {
                     .baseaddress    = 0,
                     .totalsize      = 8*1024,
-                    .i2cport        = hal_i2c1,
+                    .i2cid          = hal_i2c1,
                     .chipif         =
                     {   // use the chip xx_eeprom
                         .init           = (hal_res_fp_voidp_t)hal_chip_xx_eeprom_init,
@@ -578,7 +578,7 @@
                 {
                     .baseaddress    = 0,
                     .totalsize      = 0,
-                    .i2cport        = hal_i2c1,
+                    .i2cid          = hal_i2c1,
                     .chipif         =
                     {   // dont use any chip
                         .init           = NULL,

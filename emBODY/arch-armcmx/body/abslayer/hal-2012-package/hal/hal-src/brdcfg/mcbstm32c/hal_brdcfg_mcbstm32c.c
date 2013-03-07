@@ -540,7 +540,7 @@
         .chipcfg    =
         {
             .chip           = hal_chip_xx_eeprom_chip_st_m24c64,
-            .i2cport        = hal_i2c1,
+            .i2cid          = hal_i2c1,
             .hwaddra2a1a0   = 0 // a0 = a1 = a2 = 0
         },
         .wrprcfg    =
@@ -569,7 +569,7 @@
                 {
                     .baseaddress    = 0,
                     .totalsize      = 8*1024,
-                    .i2cport        = hal_i2c1,
+                    .i2cid          = hal_i2c1,
                     .chipif         =
                     {   // use the chip xx_eeprom
                         .init           = (hal_res_fp_voidp_t)hal_chip_xx_eeprom_init,
@@ -584,7 +584,7 @@
                 {
                     .baseaddress    = 0,
                     .totalsize      = 0,
-                    .i2cport        = hal_i2c1,
+                    .i2cid          = hal_i2c1,
                     .chipif         =
                     {   // dont use any chip
                         .init           = NULL,
@@ -604,15 +604,15 @@
     extern const hal_device_encoder_hid_brdcfg_t hal_brdcfg_device_encoder__theconfig =
     {
         .supported_mask             = (0 << hal_encoder1) | (0 << hal_encoder2) | (0 << hal_encoder3) | (0 << hal_encoder4) | (0 << hal_encoder5) | (0 << hal_encoder6), 
-        .muxport                    = 
+        .muxid                      = 
         {   
-            hal_mux_port1,  hal_mux_port1,  hal_mux_port1,  hal_mux_port1,  hal_mux_port1,  hal_mux_port1           
+            hal_mux1,   hal_mux1,  hal_mux1,  hal_mux1,  hal_mux1,  hal_mux1           
         },
         .muxsel                     = 
         {   
             hal_mux_selNONE,hal_mux_selNONE,hal_mux_selNONE,hal_mux_selNONE,hal_mux_selNONE,hal_mux_selNONE           
         },  
-        .spiport                     = 
+        .spiid                      = 
         {   
             hal_spi_port1,  hal_spi_port1,  hal_spi_port1,  hal_spi_port1,  hal_spi_port1,  hal_spi_port1           
         }
@@ -711,7 +711,7 @@
 #ifdef HAL_USE_DEVICE_MUX
     extern const hal_device_mux_hid_brdcfg_t hal_brdcfg_device_mux__theconfig =
     {
-        .supported_mask             = (0 << hal_mux_port1) | (0 << hal_mux_port2) | (0 << hal_mux_port3) | (0 << hal_mux_port4), 
+        .supported_mask             = (0 << hal_mux1) | (0 << hal_mux2) | (0 << hal_mux3) | (0 << hal_mux4), 
         .gpio_sel0                  =
         {
             {    

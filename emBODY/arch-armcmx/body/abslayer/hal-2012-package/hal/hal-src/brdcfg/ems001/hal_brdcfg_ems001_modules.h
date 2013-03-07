@@ -32,7 +32,7 @@
 
 // - modules to be built ----------------------------------------------------------------------------------------------
 
-#define HAL_BUILD_ONLYCORE
+//#define HAL_BUILD_ONLYCORE
 
 // -- core: these values must be always defined
 #define     HAL_USE_BASE
