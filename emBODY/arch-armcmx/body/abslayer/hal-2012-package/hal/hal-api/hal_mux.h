@@ -62,7 +62,7 @@ typedef enum
     hal_mux4   = 3
 } hal_mux_t;
 
-enum { hal_muxs_number = 4 };
+enum { hal_muxes_number = 4 };
 
 
 typedef enum

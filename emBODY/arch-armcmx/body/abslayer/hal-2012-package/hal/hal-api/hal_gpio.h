@@ -65,14 +65,15 @@ typedef enum
     hal_gpio_portG,
     hal_gpio_portH,
     hal_gpio_portI,
-    hal_gpio_portNONE = hal_NA08
+    hal_gpio_portNONE = hal_NA08    /**< use when no port can be specified. it does not count in hal_gpio_ports_number */
 } hal_gpio_port_t;
 
 enum { hal_gpio_ports_number = 9 };
 
     
 /** @typedef    typedef enum hal_gpio_pin_t 
-    @brief      hal_gpio_pin_t contains all possible pins that a silicon GPIO can have.
+    @brief      hal_gpio_pin_t contains all possible pins that a silicon GPIO can have. It it correct make the id start
+                from 0 rather than 1, as usual in HAL, because silicon vendors make it start from 0.
  **/    
 typedef enum 
 {
@@ -92,7 +93,7 @@ typedef enum
     hal_gpio_pin13,
     hal_gpio_pin14,
     hal_gpio_pin15,
-    hal_gpio_pinNONE = hal_NA08    
+    hal_gpio_pinNONE = hal_NA08     /**< use when no pin can be specified. it does not count in hal_gpio_pinss_number */   
 } hal_gpio_pin_t;   
 
 enum { hal_gpio_pins_number = 16 };
@@ -116,7 +117,8 @@ typedef enum
     hal_gpio_speed_low      = 1,        /**< use a driving clock with low speed */
     hal_gpio_speed_medium   = 2,        /**< use a driving clock with medium speed */
     hal_gpio_speed_high     = 3,        /**< use a driving clock with fast speed */
-    hal_gpio_speed_max      = 4         /**< use a driving clock with maximum speed */
+    hal_gpio_speed_max      = 4,        /**< use a driving clock with maximum speed */
+    hal_gpio_speed_NONE     = hal_NA08  /**< use when no speed can be specified. it does not count in hal_gpio_speeds_number */
 } hal_gpio_speed_t;
 
 enum { hal_gpio_speeds_number = 5 };
@@ -126,12 +128,13 @@ enum { hal_gpio_speeds_number = 5 };
  **/
 typedef enum  
 {
-    hal_gpio_dirNONE = 0,      /**< Not defined direction. It must be used very carefully */
-    hal_gpio_dirINP  = 1,      /**< Input direction            */
-    hal_gpio_dirOUT  = 2,      /**< Output direction           */
-    hal_gpio_dirALT  = 3
+    hal_gpio_dirINP  = 0,       /**< Input direction                */
+    hal_gpio_dirOUT  = 1,       /**< Output direction               */
+    hal_gpio_dirALT  = 2,       /**< Alternate mode configuration   */
+    hal_gpio_dirNONE = 255,     /**< use when no direction can be specified. it does not count in hal_gpio_speeds_number */
 } hal_gpio_dir_t;
 
+enum { hal_gpio_dirs_number = 3 };
  
 /** @typedef    typedef enum hal_gpio_val_t 
     @brief      hal_gpio_val_t contains the values that a silicon pin can have.
