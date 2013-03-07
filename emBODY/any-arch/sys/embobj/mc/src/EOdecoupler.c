@@ -117,15 +117,15 @@ extern uint8_t eo_motors_PWM(emsBoardType_t board_type, int32_t *pwm_joint, int1
         break;
     
     case EMS_SHOULDER:
-        pwm_motor[0] = (int16_t)(      pwm_joint[0]);
-        pwm_motor[1] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]))/40);
-        pwm_motor[2] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]))/40);
+        //pwm_motor[0] = (int16_t)(      pwm_joint[0]);
+        //pwm_motor[1] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]))/40);
+        //pwm_motor[2] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]))/40);
     
-        //pwm_motor[0] = (int16_t)( pwm_joint[0]);
-        //pwm_motor[1] = (int16_t)(-pwm_joint[0]+pwm_joint[1]);
-        //pwm_motor[2] = (int16_t)(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]);
+        pwm_motor[0] = (int16_t)  pwm_joint[0];
+        pwm_motor[1] = (int16_t)(-pwm_joint[0]+pwm_joint[1]);
+        pwm_motor[2] = (int16_t)(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]);
     
-        pwm_motor[3] = (int16_t)pwm_joint[3];
+        pwm_motor[3] = (int16_t)  pwm_joint[3];
         
         break;
 

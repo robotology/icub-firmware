@@ -111,8 +111,8 @@ extern EOaxisController* eo_axisController_New(int32_t ticks_per_rev)
         o->torque_last_pos_err = 0;
         o->torque_damp_lp_filt = 0;
 
-        o->stiffness = 0;
-        o->damping   = 0;
+        o->stiffness = 0.0f;
+        o->damping   = 0.0f;
         ///////////////////////////
         
         o->openloop_out = 0;

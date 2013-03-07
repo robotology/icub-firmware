@@ -622,7 +622,7 @@ void set_2FOC_running(uint8_t motor, eOmc_controlmode_command_t mode)
     
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
     
-    if (mode == eomc_controlmode_cmd_position || mode == eomc_controlmode_cmd_velocity)
+    //if (mode == eomc_controlmode_cmd_position || mode == eomc_controlmode_cmd_velocity)
     {
         controlmode_2foc = eomc_controlmode_cmd_openloop;
         
@@ -630,6 +630,7 @@ void set_2FOC_running(uint8_t motor, eOmc_controlmode_command_t mode)
         pid.kd = 0x0000;
         pid.ki = 0x0000;
     }
+    /*
     else
     {
         controlmode_2foc = eomc_controlmode_cmd_current;
@@ -638,6 +639,7 @@ void set_2FOC_running(uint8_t motor, eOmc_controlmode_command_t mode)
         pid.kd = 0x028F;
         pid.ki = 0x0000;
     }
+    */
     
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &pid);
