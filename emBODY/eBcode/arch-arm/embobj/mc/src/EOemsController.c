@@ -245,7 +245,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
     if (s_emsc->defcon == EMS_ALARM)
     {
         static uint8_t time = 0;
-        if (!++time) hal_led_toggle(hal_led0); // flash red light
+//        if (!++time) hal_led_toggle(hal_led0); // flash red light
         
         MOTORS(m) pwm_motor[m] = 0;
         
@@ -325,7 +325,7 @@ extern void eo_emsController_SetOutput(uint8_t joint, int16_t out)
 
 extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_vel)
 {
-    if (joint == 0) hal_led_toggle(hal_led1); // green light
+//    if (joint == 0) hal_led_toggle(hal_led1); // green light
         
     if (s_emsc) eo_axisController_SetPosRef(s_emsc->axis_controller[joint], pos, avg_vel);
 }
