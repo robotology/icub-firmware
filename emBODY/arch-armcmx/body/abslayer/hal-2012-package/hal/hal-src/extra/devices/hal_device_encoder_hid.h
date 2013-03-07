@@ -51,9 +51,9 @@
 typedef struct
 {
     uint8_t                 supported_mask;
-    hal_mux_t               muxport[hal_encoders_number];              /**< which mux port is used for each encoder */
-    hal_mux_sel_t           muxsel[hal_encoders_number];               /**< which mux selection is used of the mux port */
-    hal_spi_t               spiport[hal_encoders_number];              /**< which spi port is used for each encoder */
+    hal_mux_t               muxid[hal_encoders_number];         /**< which mux id is used for each encoder */
+    hal_mux_sel_t           muxsel[hal_encoders_number];        /**< which mux selection is used of the mux port */
+    hal_spi_t               spiid[hal_encoders_number];         /**< which spi port is used for each encoder */
 } hal_device_encoder_hid_brdcfg_t;
 
 

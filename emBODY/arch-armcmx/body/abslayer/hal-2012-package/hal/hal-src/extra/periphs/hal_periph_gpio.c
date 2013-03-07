@@ -62,6 +62,8 @@
 #define HAL_gpio_port2index(po)             ((uint8_t)(po))
 #define HAL_gpio_pin2index(pi)              ((uint8_t)(pi))
 
+#define HAL_gpio_speed2index(sp)            ((uint8_t)(sp))
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
@@ -69,7 +71,8 @@
 const hal_gpio_cfg_t hal_gpio_cfg_default =
 {
     .dir                    = hal_gpio_dirOUT,
-    .speed                  = hal_gpio_speed_low
+    .speed                  = hal_gpio_speed_low,
+    .altcfg                 = NULL
 };
 
 
@@ -385,7 +388,7 @@ static hal_result_t s_hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, ha
 
     GPIO_InitTypeDef  GPIO_InitStructure;
     
-    if((hal_gpio_portNONE == port) || (hal_gpio_pinNONE == pin) || (hal_gpio_dirNONE == dir))
+    if((hal_gpio_portNONE == port) || (hal_gpio_pinNONE == pin) || (hal_gpio_dirNONE == dir) || (hal_gpio_speed_NONE == speed))
     {
         return(hal_res_NOK_generic);
     }
@@ -404,14 +407,14 @@ static hal_result_t s_hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, ha
         RCC_APB2PeriphClockCmd(hal_gpio_hid_clocks[port], ENABLE);    
         // Configure the GPIO pin
         GPIO_InitStructure.GPIO_Pin     = (uint16_t)(0x0001 << pin);
-        GPIO_InitStructure.GPIO_Speed   = (GPIOSpeed_TypeDef)hal_gpio_hid_speeds[(uint8_t)speed];
+        GPIO_InitStructure.GPIO_Speed   = (GPIOSpeed_TypeDef)hal_gpio_hid_speeds[HAL_gpio_speed2index(speed)];
         GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_Out_PP;
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)
         // enable GPIO clock 
         RCC_AHB1PeriphClockCmd(hal_gpio_hid_clocks[port], ENABLE);    
         // Configure the GPIO pin
         GPIO_InitStructure.GPIO_Pin     = (uint16_t)(0x0001 << pin);
-        GPIO_InitStructure.GPIO_Speed   = (GPIOSpeed_TypeDef)hal_gpio_hid_speeds[(uint8_t)speed];
+        GPIO_InitStructure.GPIO_Speed   = (GPIOSpeed_TypeDef)hal_gpio_hid_speeds[HAL_gpio_speed2index(speed)];
         GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_OUT;
         GPIO_InitStructure.GPIO_OType   = GPIO_OType_PP;
         GPIO_InitStructure.GPIO_PuPd    = GPIO_PuPd_UP; 
@@ -480,6 +483,7 @@ static hal_result_t s_hal_gpio_altfun_configure(hal_gpio_xxx_t xxx, const hal_gp
     memcpy(&GPIO_InitStructure, &altcfg->gpioext, sizeof(GPIO_InitTypeDef));
     // any changes to GPIO_InitStructure ?? only the pin !
     GPIO_InitStructure.GPIO_Pin = hal_gpio_hid_pins[xxx.pin]; 
+    #warning --> verifica speed default etc....
     if(hal_gpio_speed_default != xxx.speed)
     {   // if the gpiocfg specifies something different from default, then we use it.
         GPIO_InitStructure.GPIO_Speed = (GPIOSpeed_TypeDef)hal_gpio_hid_speeds[xxx.speed];

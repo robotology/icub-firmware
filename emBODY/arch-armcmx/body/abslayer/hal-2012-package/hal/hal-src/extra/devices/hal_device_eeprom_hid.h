@@ -66,7 +66,7 @@ typedef struct
 {   
     uint32_t                                baseaddress;
     uint32_t                                totalsize;
-    hal_i2c_t                               i2cport;
+    hal_i2c_t                               i2cid;
     hal_device_eeprom_hid_chip_interface_t  chipif;
 } hal_device_eeprom_hid_i2cbased_cfg_t;
 

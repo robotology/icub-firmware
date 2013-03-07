@@ -74,8 +74,12 @@
 
 extern const hal_chip_micrel_ks8893_cfg_t hal_chip_micrel_ks8893_cfg_default  = 
 { 
-    .i2cport        = hal_i2c_port1,
-    .resetpin       = { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE,  .dir = hal_gpio_dirNONE, .speed = hal_gpio_speed_default },
+    .i2cid          = hal_i2c1,
+    .resetpin       = 
+    {   
+        .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+        .config = { .dir = hal_gpio_dirNONE,    .speed = hal_gpio_speed_NONE,   .altcfg = NULL }
+    },
     .extclockinit   = NULL
 };
 
@@ -83,19 +87,27 @@ extern const hal_chip_micrel_ks8893_cfg_t hal_chip_micrel_ks8893_cfg_default  =
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+
 typedef struct
 {
-    hal_chip_micrel_ks8893_cfg_t    config;
-} hal_chip_micrel_ks8893_internals_t;
+    hal_chip_micrel_ks8893_cfg_t        config;
+} hal_chip_micrel_ks8893_internal_item_t;
+
+typedef struct
+{
+    hal_bool_t                                  initted;
+    hal_chip_micrel_ks8893_internal_item_t*     items[1];   
+} hal_chip_micrel_ks8893_theinternals_t;
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
 static void s_hal_chip_micrel_ks8893_initted_set(void);
-static hal_boolval_t s_hal_chip_micrel_ks8893_initted_is(void);
+static hal_bool_t s_hal_chip_micrel_ks8893_initted_is(void);
 
-static hal_result_t s_hal_chip_micrel_ks8893_hw_init(const hal_chip_micrel_ks8893_cfg_t *cfg, hal_chip_micrel_ks8893_internals_t* intitem);
+static hal_result_t s_hal_chip_micrel_ks8893_hw_init(const hal_chip_micrel_ks8893_cfg_t *cfg, hal_chip_micrel_ks8893_internal_item_t *intitem);
 
 static void s_hal_chip_micrel_ks8893_phymode_get(hal_eth_phymode_t* usedphymode);
 
@@ -111,8 +123,15 @@ static void s_hal_chip_micrel_ks8893_phymode_get(hal_eth_phymode_t* usedphymode)
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_chip_micrel_ks8893_initted[1] = { hal_false };
-static hal_chip_micrel_ks8893_internals_t s_hal_chip_micrel_ks8893_info[1] = { {.config = { .i2cport = hal_i2c_port1} } };
+static hal_chip_micrel_ks8893_theinternals_t s_hal_chip_micrel_ks8893_theinternals =
+{
+    .initted            = hal_false,
+    .items              = { NULL }   
+};
+
+//#warning --> fix the internals
+//static hal_boolval_t s_hal_chip_micrel_ks8893_initted[1] = { hal_false };
+//static hal_chip_micrel_ks8893_internals_t s_hal_chip_micrel_ks8893_info[1] = { {.config = { .i2cid = hal_i2c1} } };
 
 
 
@@ -122,12 +141,10 @@ static hal_chip_micrel_ks8893_internals_t s_hal_chip_micrel_ks8893_info[1] = { {
 
 
 extern hal_result_t hal_chip_micrel_ks8893_init(const hal_chip_micrel_ks8893_cfg_t *cfg)
-{
-    //hal_result_t res = hal_res_NOK_generic; 
-     
+{   
+    hal_chip_micrel_ks8893_internal_item_t *intitem = s_hal_chip_micrel_ks8893_theinternals.items[0];
     if(NULL == cfg)
     {
-        //cfg  = &hal_chip_micrel_ks8893_cfg_default;
         hal_base_on_fatalerror(hal_fatalerror_missingconfiguration, "in hal_chip_micrel_ks8893_init");
         return(hal_res_NOK_generic);
     }
@@ -135,9 +152,19 @@ extern hal_result_t hal_chip_micrel_ks8893_init(const hal_chip_micrel_ks8893_cfg
     if(hal_true == s_hal_chip_micrel_ks8893_initted_is())
     {
         return(hal_res_OK);
-    }    
+    }  
+    
+    // if it does not have ram yet, then attempt to allocate it.
+    if(NULL == intitem)
+    {
+        intitem = s_hal_chip_micrel_ks8893_theinternals.items[0] = hal_heap_new(sizeof(hal_chip_micrel_ks8893_internal_item_t));
+        // minimal initialisation of the internal item
+        // nothing to init.      
+    } 
 
-    if(hal_res_OK != s_hal_chip_micrel_ks8893_hw_init(cfg, &s_hal_chip_micrel_ks8893_info[0]))
+    
+
+    if(hal_res_OK != s_hal_chip_micrel_ks8893_hw_init(cfg, intitem))
     {
         return(hal_res_NOK_generic);
     }
@@ -150,7 +177,7 @@ extern hal_result_t hal_chip_micrel_ks8893_init(const hal_chip_micrel_ks8893_cfg
 
 extern hal_result_t hal_chip_micrel_ks8893_configure(hal_eth_phymode_t targetphymode, hal_eth_phymode_t* usedphymode)
 {
-    //hal_result_t res = hal_res_NOK_generic;
+    hal_chip_micrel_ks8893_internal_item_t *intitem = s_hal_chip_micrel_ks8893_theinternals.items[0];
     
     //const uint8_t fd100 = 0x60;
     //const uint8_t fd010 = 0x20;
@@ -162,10 +189,12 @@ extern hal_result_t hal_chip_micrel_ks8893_configure(hal_eth_phymode_t targetphy
     if(hal_false == s_hal_chip_micrel_ks8893_initted_is())
     {
         return(hal_res_NOK_generic);
-    }    
+    }  
+
+    hal_i2c_t i2cid = intitem->config.i2cid;
 
     regadr.bytes.one = REG0x01;
-    hal_i2c_read(hal_i2c_port1, I2CADDRESS, regadr, &buff_read, 1);
+    hal_i2c_read(i2cid, I2CADDRESS, regadr, &buff_read, 1);
     if((buff_read&0x01))
     {   // already initted. to be initted again must pass through a reset
         if(NULL != usedphymode)
@@ -191,11 +220,11 @@ extern hal_result_t hal_chip_micrel_ks8893_configure(hal_eth_phymode_t targetphy
 #if 0    
     // configure mii
     regadr.bytes.one = 0x06;
-    hal_i2c_read(hal_i2c_port1, I2CADDRESS, regadr, &buff_read, 1);
+    hal_i2c_read(i2cid, I2CADDRESS, regadr, &buff_read, 1);
     buff_write  = buff_read;
     buff_write |= 0x10; 
-    hal_i2c_write(hal_i2c_port1, I2CADDRESS, regadr, &buff_write, 1);
-    hal_i2c_read(hal_i2c_port1, I2CADDRESS, regadr, &buff_read, 1);
+    hal_i2c_write(i2cid, I2CADDRESS, regadr, &buff_write, 1);
+    hal_i2c_read(i2cid, I2CADDRESS, regadr, &buff_read, 1);
 #endif
 
     // 1. configure  switch's ports 1 and 2
@@ -212,25 +241,25 @@ extern hal_result_t hal_chip_micrel_ks8893_configure(hal_eth_phymode_t targetphy
     
     // port 1
     regadr.bytes.one = REG0x1C;
-    hal_i2c_read(hal_i2c_port1, I2CADDRESS, regadr, &buff_read, 1);
-    hal_i2c_write(hal_i2c_port1, I2CADDRESS, regadr, &buff_write, 1);
-    hal_i2c_read(hal_i2c_port1, I2CADDRESS, regadr, &buff_read, 1);
+    hal_i2c_read(i2cid, I2CADDRESS, regadr, &buff_read, 1);
+    hal_i2c_write(i2cid, I2CADDRESS, regadr, &buff_write, 1);
+    hal_i2c_read(i2cid, I2CADDRESS, regadr, &buff_read, 1);
      
     // port 2 
     regadr.bytes.one = REG0x2C;
-    hal_i2c_read(hal_i2c_port1, I2CADDRESS, regadr, &buff_read, 1);
-    hal_i2c_write(hal_i2c_port1, I2CADDRESS, regadr, &buff_write, 1);   
-    hal_i2c_read(hal_i2c_port1, I2CADDRESS, regadr, &buff_read, 1);
+    hal_i2c_read(i2cid, I2CADDRESS, regadr, &buff_read, 1);
+    hal_i2c_write(i2cid, I2CADDRESS, regadr, &buff_write, 1);   
+    hal_i2c_read(i2cid, I2CADDRESS, regadr, &buff_read, 1);
 
     // 2. start the switch
     buff_write = 0x1;  
     regadr.bytes.one = REG0x01;    
-    hal_i2c_write(hal_i2c_port1, I2CADDRESS, regadr, &buff_write, 1);
+    hal_i2c_write(i2cid, I2CADDRESS, regadr, &buff_write, 1);
     
 
     // 3. read back to verify
     regadr.bytes.one = REG0x01;
-    hal_i2c_read(hal_i2c_port1, I2CADDRESS, regadr, &buff_read, 1);
+    hal_i2c_read(i2cid, I2CADDRESS, regadr, &buff_read, 1);
     if(!(buff_read&0x01))
     {
         hal_base_on_fatalerror(hal_fatalerror_runtimefault, "hal_chip_micrel_ks8893_configure(): SWITCH not configured");
@@ -267,7 +296,7 @@ extern hal_result_t hal_chip_micrel_ks8893_mii_getphymode(hal_eth_phymode_t* use
 
 extern hal_result_t hal_chip_micrel_ks8893_hid_static_memory_init(void)
 {
-    memset(s_hal_chip_micrel_ks8893_initted, hal_false, sizeof(s_hal_chip_micrel_ks8893_initted));
+    memset(&s_hal_chip_micrel_ks8893_theinternals, 0, sizeof(s_hal_chip_micrel_ks8893_theinternals));
     return(hal_res_OK);  
 }
 
@@ -278,19 +307,20 @@ extern hal_result_t hal_chip_micrel_ks8893_hid_static_memory_init(void)
 
 static void s_hal_chip_micrel_ks8893_initted_set(void)
 {
-    s_hal_chip_micrel_ks8893_initted[0] = hal_true;
+    s_hal_chip_micrel_ks8893_theinternals.initted = hal_true;
 }
 
-static hal_boolval_t s_hal_chip_micrel_ks8893_initted_is(void)
+static hal_bool_t s_hal_chip_micrel_ks8893_initted_is(void)
 {
-    return(s_hal_chip_micrel_ks8893_initted[0]);
+    return(s_hal_chip_micrel_ks8893_theinternals.initted);
 }
 
 
-static hal_result_t s_hal_chip_micrel_ks8893_hw_init(const hal_chip_micrel_ks8893_cfg_t *cfg, hal_chip_micrel_ks8893_internals_t* intitem)
+static hal_result_t s_hal_chip_micrel_ks8893_hw_init(const hal_chip_micrel_ks8893_cfg_t *cfg, hal_chip_micrel_ks8893_internal_item_t *intitem)
 {
     hal_result_t res = hal_res_NOK_generic;   
-    hal_i2c_port_t i2cport = cfg->i2cport;
+    
+    hal_i2c_t i2cid = cfg->i2cid;
     
     
     // 1. init external clock.
@@ -301,15 +331,15 @@ static hal_result_t s_hal_chip_micrel_ks8893_hw_init(const hal_chip_micrel_ks889
     }
  
     // 2. reset the micrel
-    
-    hal_gpio_configure(cfg->resetpin, NULL);
-    hal_gpio_setval(cfg->resetpin.port, cfg->resetpin.pin, hal_gpio_valLOW);
+    const hal_gpio_map_t *resetpinmap = &cfg->resetpin;
+    hal_gpio_init(resetpinmap->gpio, &resetpinmap->config);
+    hal_gpio_setval(resetpinmap->gpio, hal_gpio_valLOW);
     hal_sys_delay(10*1000);
-    hal_gpio_setval(cfg->resetpin.port, cfg->resetpin.pin, hal_gpio_valHIGH);
+    hal_gpio_setval(resetpinmap->gpio, hal_gpio_valHIGH);
     hal_sys_delay(100);    
  
     // 3. init i2c    
-    if(hal_res_OK != (res = hal_i2c_init(i2cport, NULL)))
+    if(hal_res_OK != (res = hal_i2c_init(i2cid, NULL)))
     {
         return(res);
     }
@@ -317,7 +347,7 @@ static hal_result_t s_hal_chip_micrel_ks8893_hw_init(const hal_chip_micrel_ks889
     
     // 4. verify that the micrel is responding
     
-    if(hal_res_OK != hal_i2c_ping(i2cport, I2CADDRESS))
+    if(hal_res_OK != hal_i2c_ping(i2cid, I2CADDRESS))
     {
         return(hal_res_NOK_generic);
     }
@@ -329,7 +359,7 @@ static hal_result_t s_hal_chip_micrel_ks8893_hw_init(const hal_chip_micrel_ks889
 
     // whoami: value must be WHOAMI_VAL
     regaddr.bytes.one = WHOAMI_ADR;
-    if(hal_res_OK != (res = hal_i2c_read(i2cport, I2CADDRESS, regaddr, &data, 1)))
+    if(hal_res_OK != (res = hal_i2c_read(i2cid, I2CADDRESS, regaddr, &data, 1)))
     {
         return(res);
     }
@@ -350,6 +380,9 @@ static hal_result_t s_hal_chip_micrel_ks8893_hw_init(const hal_chip_micrel_ks889
 
 static void s_hal_chip_micrel_ks8893_phymode_get(hal_eth_phymode_t* usedphymode)
 {
+    hal_chip_micrel_ks8893_internal_item_t *intitem = s_hal_chip_micrel_ks8893_theinternals.items[0];
+    hal_i2c_t i2cid = intitem->config.i2cid;
+    
     #define MIIHALFD    (1 << 6)
     #define MII10MBS    (1 << 4)
     uint8_t mux = 0;
@@ -357,7 +390,7 @@ static void s_hal_chip_micrel_ks8893_phymode_get(hal_eth_phymode_t* usedphymode)
     uint8_t read = 0xFF; 
     hal_i2c_regaddr_t regadr = {.numofbytes = 1, .bytes.one = 0};
     regadr.bytes.one = 0x06;
-    hal_i2c_read(hal_i2c_port1, I2CADDRESS, regadr, &read, 1);
+    hal_i2c_read(i2cid, I2CADDRESS, regadr, &read, 1);
     if( (MIIHALFD & read) == MIIHALFD)
     {
         mux = 0;

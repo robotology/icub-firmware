@@ -66,14 +66,14 @@ typedef enum
  **/
 typedef struct
 {
-    hal_i2c_t                       i2cport;
+    hal_i2c_t                       i2cid;
     hal_chip_st_lis3dh_range_t      range;
 } hal_chip_st_lis3dh_cfg_t;
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const hal_chip_st_lis3dh_cfg_t hal_chip_st_lis3dh_cfg_default; // = { .i2cport = hal_i2c_port1, .range = hal_chip_st_lis3dh_range_2g };
+extern const hal_chip_st_lis3dh_cfg_t hal_chip_st_lis3dh_cfg_default; // = { .i2cid = hal_i2c1, .range = hal_chip_st_lis3dh_range_2g };
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------

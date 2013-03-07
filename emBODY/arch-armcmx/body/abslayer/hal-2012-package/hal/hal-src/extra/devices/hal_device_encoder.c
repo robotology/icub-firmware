@@ -78,9 +78,9 @@ extern const hal_encoder_cfg_t hal_encoder_cfg_default = { .priority = hal_int_p
 typedef struct
 {
     hal_encoder_cfg_t       config;
-    hal_mux_port_t          muxport;
+    hal_mux_t               muxid;
     hal_mux_sel_t           muxsel;
-    hal_spi_port_t          spiport;
+    hal_spi_t               spiid;
     hal_encoder_position_t  position;
     uint8_t                 rxframe[4];
 } hal_device_encoder_internal_item_t;
@@ -88,7 +88,7 @@ typedef struct
 
 typedef struct
 {
-    uint8_t                                     initted;
+    uint16_t                                    initted;
     hal_device_encoder_internal_item_t*         items[hal_encoders_number];   
 } hal_device_encoder_theinternals_t;
 
@@ -140,9 +140,9 @@ static hal_device_encoder_theinternals_t s_hal_device_encoder_theinternals =
 // {
 //     {
 //         .config     = { .priority = hal_int_priorityNONE, .callback_on_rx = NULL, .arg = NULL }, 
-//         .muxport    = hal_mux_port1, 
+//         .muxid    = hal_mux_port1, 
 //         .muxsel     = hal_mux_selNONE, 
-//         .spiport    = hal_spi_port1, 
+//         .spiid    = hal_spi_port1, 
 //         .position   = 0, 
 //         .rxframe    = {0}
 //     }
@@ -182,9 +182,9 @@ extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *
     }       
     
     memcpy(&intitem->config, cfg, sizeof(hal_encoder_cfg_t));   
-    intitem->muxport   = hal_brdcfg_device_encoder__theconfig.muxport[HAL_device_encoder_id2index(id)];
+    intitem->muxid   = hal_brdcfg_device_encoder__theconfig.muxid[HAL_device_encoder_id2index(id)];
     intitem->muxsel    = hal_brdcfg_device_encoder__theconfig.muxsel[HAL_device_encoder_id2index(id)];
-    intitem->spiport   = hal_brdcfg_device_encoder__theconfig.spiport[HAL_device_encoder_id2index(id)];
+    intitem->spiid   = hal_brdcfg_device_encoder__theconfig.spiid[HAL_device_encoder_id2index(id)];
     intitem->position  = 0;
     
 
@@ -192,9 +192,9 @@ extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *
      
     #warning HAL-WIP --> configure mux and spi. obviously if already initted we dont init the spi and the port anymore.
     
-    hal_mux_init(intitem->muxport, NULL);
+    hal_mux_init(intitem->muxid, NULL);
     
-    hal_spi_init(intitem->spiport, &s_hal_device_encoder_spicfg_master);
+    hal_spi_init(intitem->spiid, &s_hal_device_encoder_spicfg_master);
     
  
     s_hal_device_encoder_initted_set(id);
@@ -214,11 +214,11 @@ extern hal_result_t hal_encoder_start(hal_encoder_t id)
     // do something 
     
        
-    hal_mux_enable(intitem->muxport, intitem->muxsel);
+    hal_mux_enable(intitem->muxid, intitem->muxsel);
     
-    hal_spi_on_framereceiv_set(intitem->spiport, s_hal_encoder_onreceiv, (void*)id);
+    hal_spi_on_framereceiv_set(intitem->spiid, s_hal_encoder_onreceiv, (void*)id);
     
-    hal_spi_start(intitem->spiport, 1); // 1 solo frame ...
+    hal_spi_start(intitem->spiid, 1); // 1 solo frame ...
     
     // quando il frame sara' stato ricevuto allora si chiamera' la callback che prima scrive in ram. poi ...
     
@@ -295,12 +295,12 @@ static void s_hal_encoder_onreceiv(void* p)
     hal_encoder_t id = (hal_encoder_t)tmp;
     hal_device_encoder_internal_item_t* intitem = s_hal_device_encoder_theinternals.items[HAL_device_encoder_id2index(id)];
     
-    hal_spi_stop(intitem->spiport);
-    hal_mux_disable(intitem->muxport);
+    hal_spi_stop(intitem->spiid);
+    hal_mux_disable(intitem->muxid);
     
     // ok ... now i get the frame of three bytes.
     
-    hal_spi_get(intitem->spiport, intitem->rxframe, NULL);
+    hal_spi_get(intitem->spiid, intitem->rxframe, NULL);
     
     intitem->position = s_hal_encoder_frame2position(intitem->rxframe);
     

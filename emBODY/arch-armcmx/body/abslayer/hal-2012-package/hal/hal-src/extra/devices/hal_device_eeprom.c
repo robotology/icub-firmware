@@ -162,7 +162,7 @@ extern hal_result_t hal_eeprom_init(hal_eeprom_t id, const hal_eeprom_cfg_t *cfg
 
         case hal_eeprom2_i2c_01:
         {
-            res = hal_i2c_init(devcfg->i2cbased.i2cport, NULL);   // i use default configuration
+            res = hal_i2c_init(devcfg->i2cbased.i2cid, NULL);   // i use default configuration
             if(hal_res_OK != res)
             {
                 return(res);

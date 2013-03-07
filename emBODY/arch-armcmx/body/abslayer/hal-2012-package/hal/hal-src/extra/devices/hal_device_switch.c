@@ -39,11 +39,13 @@
 #include "hal_i2c.h" 
 
 #include "hal_sys.h"
-#include "hal_mpu_eth_hid.h"
+#include "hal_periph_eth_hid.h"
 
-#include "hal_mpu_i2c_hid.h"
+#include "hal_periph_i2c_hid.h"
 
 #include "hal_brdcfg.h"
+
+#include "hal_utility_bits.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -169,7 +171,7 @@ extern hal_result_t hal_switch_init(const hal_switch_cfg_t *cfg)
         cfg = &hal_switch_cfg_default;
     }
 
-    memcpy(&s_hal_device_switch_cfg, cfg, sizeof(hal_switch_cfg_t));
+    memcpy(&intitem->config, cfg, sizeof(hal_switch_cfg_t));
 
     res = s_hal_device_switch_lowlevel_init(cfg);
 
@@ -235,10 +237,7 @@ extern hal_bool_t hal_switch_started_is(void)
 
 extern hal_result_t hal_device_switch_hid_static_memory_init(void)
 {
-    memset(&s_hal_device_switch_cfg, 0, sizeof(s_hal_device_switch_cfg));
-    s_hal_device_switch_initted                =  hal_false;
-    s_hal_device_switch_started                =  hal_false;
-
+    memset(&s_hal_device_switch_theinternals, 0, sizeof(s_hal_device_switch_theinternals));
     return(hal_res_OK);
 }
 

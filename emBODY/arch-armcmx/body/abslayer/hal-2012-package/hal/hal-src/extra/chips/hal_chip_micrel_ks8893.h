@@ -59,15 +59,15 @@
  **/
 typedef struct
 {
-    hal_i2c_t           i2cport;
-    hal_gpio_cfg_t      resetpin;
+    hal_i2c_t           i2cid;
+    hal_gpio_map_t      resetpin;
     hal_res_fp_void_t   extclockinit;
 } hal_chip_micrel_ks8893_cfg_t;
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const hal_chip_micrel_ks8893_cfg_t hal_chip_micrel_ks8893_cfg_default; // = {.i2cport = hal_i2c_port1, etc.};
+extern const hal_chip_micrel_ks8893_cfg_t hal_chip_micrel_ks8893_cfg_default; // = {.i2cid = hal_i2c1, etc.};
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------

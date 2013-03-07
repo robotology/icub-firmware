@@ -87,7 +87,7 @@ typedef struct
 typedef struct
 {
     uint8_t                     initted;
-    hal_mux_internal_item_t*    items[hal_muxs_numberber];   
+    hal_mux_internal_item_t*    items[hal_muxes_number];   
 } hal_mux_theinternals_t;
 
 
@@ -243,7 +243,7 @@ extern hal_result_t hal_mux_disable(hal_mux_t id)
 
 extern hal_result_t hal_device_mux_hid_static_memory_init(void)
 {
-    memset(&s_hal_mux_theinternals, o, sizeof(s_hal_mux_theinternals));
+    memset(&s_hal_mux_theinternals, 0, sizeof(s_hal_mux_theinternals));
     
     return(hal_res_OK);  
 }

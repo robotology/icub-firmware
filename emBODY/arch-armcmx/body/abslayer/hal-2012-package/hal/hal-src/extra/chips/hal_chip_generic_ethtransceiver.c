@@ -93,19 +93,26 @@ extern const hal_chip_generic_ethtransceiver_cfg_t hal_chip_generic_ethtransceiv
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+
 typedef struct
 {
-    hal_chip_generic_ethtransceiver_cfg_t    config;
-} hal_chip_generic_ethtransceiver_internals_t;
+    hal_chip_generic_ethtransceiver_cfg_t               config;
+} hal_chip_generic_ethtransceiver_internal_item_t;
+
+typedef struct
+{
+    hal_bool_t                                          initted;
+    hal_chip_generic_ethtransceiver_internal_item_t*    items[1];   
+} hal_chip_generic_ethtransceiver_theinternals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
 static void s_hal_chip_generic_ethtransceiver_initted_set(void);
-static hal_boolval_t s_hal_chip_generic_ethtransceiver_initted_is(void);
+static hal_bool_t s_hal_chip_generic_ethtransceiver_initted_is(void);
 
-static hal_result_t s_hal_chip_generic_ethtransceiver_hw_init(const hal_chip_generic_ethtransceiver_cfg_t *cfg, hal_chip_generic_ethtransceiver_internals_t* intitem);
+static hal_result_t s_hal_chip_generic_ethtransceiver_hw_init(const hal_chip_generic_ethtransceiver_cfg_t *cfg, hal_chip_generic_ethtransceiver_internal_item_t* intitem);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -119,8 +126,12 @@ static hal_result_t s_hal_chip_generic_ethtransceiver_hw_init(const hal_chip_gen
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_chip_generic_ethtransceiver_initted[1] = { hal_false };
-static hal_chip_generic_ethtransceiver_internals_t s_hal_chip_generic_ethtransceiver_internals[1] = { {.config = { .dummy = 0} } };
+
+static hal_chip_generic_ethtransceiver_theinternals_t s_hal_chip_generic_ethtransceiver_theinternals =
+{
+    .initted            = hal_false,
+    .items              = { NULL }   
+};
 
 
 
@@ -131,7 +142,7 @@ static hal_chip_generic_ethtransceiver_internals_t s_hal_chip_generic_ethtransce
 
 extern hal_result_t hal_chip_generic_ethtransceiver_init(const hal_chip_generic_ethtransceiver_cfg_t *cfg)
 {
-    //hal_result_t res = hal_res_NOK_generic; // dont remove ...
+    hal_chip_generic_ethtransceiver_internal_item_t *intitem = s_hal_chip_generic_ethtransceiver_theinternals.items[0];
      
     if(NULL == cfg)
     {
@@ -142,9 +153,17 @@ extern hal_result_t hal_chip_generic_ethtransceiver_init(const hal_chip_generic_
     if(hal_true == s_hal_chip_generic_ethtransceiver_initted_is())
     {
         return(hal_res_OK);
+    }  
+
+    // if it does not have ram yet, then attempt to allocate it.
+    if(NULL == intitem)
+    {
+        intitem = s_hal_chip_generic_ethtransceiver_theinternals.items[0] = hal_heap_new(sizeof(hal_chip_generic_ethtransceiver_internal_item_t));
+        // minimal initialisation of the internal item
+        // nothing to init.      
     }    
 
-    if(hal_res_OK != s_hal_chip_generic_ethtransceiver_hw_init(cfg, &s_hal_chip_generic_ethtransceiver_internals[0]))
+    if(hal_res_OK != s_hal_chip_generic_ethtransceiver_hw_init(cfg, intitem))
     {
         return(hal_res_NOK_generic);
     }
@@ -158,6 +177,11 @@ extern hal_result_t hal_chip_generic_ethtransceiver_init(const hal_chip_generic_
 extern hal_result_t hal_chip_generic_ethtransceiver_configure(hal_eth_phymode_t targetphymode, hal_eth_phymode_t* usedphymode)
 {
     //hal_result_t res = hal_res_NOK_generic;
+    
+    if(hal_false == s_hal_chip_generic_ethtransceiver_initted_is())
+    {
+        return(hal_res_NOK_generic);
+    }     
     
 
 #if 0
@@ -250,7 +274,7 @@ extern hal_result_t hal_chip_generic_ethtransceiver_getphymode(hal_eth_phymode_t
 
 extern hal_result_t hal_chip_generic_ethtransceiver_hid_static_memory_init(void)
 {
-    memset(s_hal_chip_generic_ethtransceiver_initted, hal_false, sizeof(s_hal_chip_generic_ethtransceiver_initted));
+    memset(&s_hal_chip_generic_ethtransceiver_theinternals, 0, sizeof(s_hal_chip_generic_ethtransceiver_theinternals));
     return(hal_res_OK);  
 }
 
@@ -261,16 +285,16 @@ extern hal_result_t hal_chip_generic_ethtransceiver_hid_static_memory_init(void)
 
 static void s_hal_chip_generic_ethtransceiver_initted_set(void)
 {
-    s_hal_chip_generic_ethtransceiver_initted[0] = hal_true;
+    s_hal_chip_generic_ethtransceiver_theinternals.initted = hal_true;
 }
 
-static hal_boolval_t s_hal_chip_generic_ethtransceiver_initted_is(void)
+static hal_bool_t s_hal_chip_generic_ethtransceiver_initted_is(void)
 {
-    return(s_hal_chip_generic_ethtransceiver_initted[0]);
+    return(s_hal_chip_generic_ethtransceiver_theinternals.initted);
 }
 
 
-static hal_result_t s_hal_chip_generic_ethtransceiver_hw_init(const hal_chip_generic_ethtransceiver_cfg_t *cfg, hal_chip_generic_ethtransceiver_internals_t* intitem)
+static hal_result_t s_hal_chip_generic_ethtransceiver_hw_init(const hal_chip_generic_ethtransceiver_cfg_t *cfg, hal_chip_generic_ethtransceiver_internal_item_t* intitem)
 {
     //hal_result_t res = hal_res_NOK_generic;   
 

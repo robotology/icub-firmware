@@ -39,7 +39,6 @@
 
 #include "stdio.h"
 
-//#include "hal_stm32xx_include.h"
 
 
 
@@ -90,7 +89,7 @@
 
 extern const hal_chip_st_l3g4200d_cfg_t hal_chip_st_l3g4200d_cfg_default  = 
 { 
-    .i2cport    = hal_i2c1,
+    .i2cid      = hal_i2c1,
     .range      = hal_chip_st_l3g4200d_range_250dps    
 };
 
@@ -98,12 +97,19 @@ extern const hal_chip_st_l3g4200d_cfg_t hal_chip_st_l3g4200d_cfg_default  =
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+
 typedef struct
 {
     hal_chip_st_l3g4200d_cfg_t      config;
     uint32_t                        factor;
     uint8_t                         shift;
-} hal_chip_st_l3g4200d_internals_t;
+} hal_chip_st_l3g4200d_internal_item_t;
+
+typedef struct
+{
+    hal_bool_t                                  initted;
+    hal_chip_st_l3g4200d_internal_item_t*       items[1];   
+} hal_chip_st_l3g4200d_theinternals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -112,7 +118,7 @@ typedef struct
 static void s_hal_chip_st_l3g4200d_initted_set(void);
 static hal_boolval_t s_hal_chip_st_l3g4200d_initted_is(void);
 
-static hal_result_t s_hal_chip_st_l3g4200d_hw_init(const hal_chip_st_l3g4200d_cfg_t *cfg, hal_chip_st_l3g4200d_internals_t* intitem);
+static hal_result_t s_hal_chip_st_l3g4200d_hw_init(const hal_chip_st_l3g4200d_cfg_t *cfg, hal_chip_st_l3g4200d_internal_item_t* intitem);
 
 static int32_t s_hal_chip_st_l3g4200d_convert(int32_t v);
 
@@ -127,8 +133,13 @@ static int32_t s_hal_chip_st_l3g4200d_convert(int32_t v);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_chip_st_l3g4200d_initted[1] = { hal_false };
-static hal_chip_st_l3g4200d_internals_t s_hal_chip_st_l3g4200d_info[1] = { {.config = { .i2cport = hal_i2c1} } };
+static hal_chip_st_l3g4200d_theinternals_t s_hal_chip_st_l3g4200d_theinternals =
+{
+    .initted            = hal_false,
+    .items              = { NULL }   
+};
+
+
 
 
 
@@ -139,7 +150,7 @@ static hal_chip_st_l3g4200d_internals_t s_hal_chip_st_l3g4200d_info[1] = { {.con
 
 extern hal_result_t hal_chip_st_l3g4200d_init(const hal_chip_st_l3g4200d_cfg_t *cfg)
 {
-    //hal_result_t res = hal_res_NOK_generic; 
+    hal_chip_st_l3g4200d_internal_item_t *intitem = s_hal_chip_st_l3g4200d_theinternals.items[0];
      
     if(NULL == cfg)
     {
@@ -149,9 +160,18 @@ extern hal_result_t hal_chip_st_l3g4200d_init(const hal_chip_st_l3g4200d_cfg_t *
     if(hal_true == s_hal_chip_st_l3g4200d_initted_is())
     {
         return(hal_res_OK);
-    }    
+    }  
 
-    if(hal_res_OK != s_hal_chip_st_l3g4200d_hw_init(cfg, &s_hal_chip_st_l3g4200d_info[0]))
+    // if it does not have ram yet, then attempt to allocate it.
+    if(NULL == intitem)
+    {
+        intitem = s_hal_chip_st_l3g4200d_theinternals.items[0] = hal_heap_new(sizeof(hal_chip_st_l3g4200d_internal_item_t));
+        // minimal initialisation of the internal item
+        // nothing to init.      
+    }  
+    
+
+    if(hal_res_OK != s_hal_chip_st_l3g4200d_hw_init(cfg, intitem))
     {
         return(hal_res_NOK_generic);
     }
@@ -166,7 +186,8 @@ extern hal_result_t hal_chip_st_l3g4200d_init(const hal_chip_st_l3g4200d_cfg_t *
 extern hal_result_t hal_chip_st_l3g4200d_temp_get(int8_t* temp)
 {
     hal_result_t res = hal_res_NOK_generic; 
-    hal_i2c_t i2cport = s_hal_chip_st_l3g4200d_info[0].config.i2cport;
+    hal_chip_st_l3g4200d_internal_item_t *intitem = s_hal_chip_st_l3g4200d_theinternals.items[0];
+    hal_i2c_t i2cid = intitem->config.i2cid;
 
     uint8_t data = 0;
 
@@ -182,7 +203,7 @@ extern hal_result_t hal_chip_st_l3g4200d_temp_get(int8_t* temp)
     hal_i2c_regaddr_t regaddr = {.numofbytes = 1, .bytes.one = 0x00 }; 
     
     regaddr.bytes.one = TEMP_ADR;
-    res = hal_i2c_read(i2cport, I2CADDRESS, regaddr, &data, 1);
+    res = hal_i2c_read(i2cid, I2CADDRESS, regaddr, &data, 1);
     *temp = (int8_t)data;   
 
     res = res;    
@@ -193,7 +214,8 @@ extern hal_result_t hal_chip_st_l3g4200d_temp_get(int8_t* temp)
 extern hal_result_t hal_chip_st_l3g4200d_angrate_get(int32_t* xar, int32_t* yar, int32_t* zar)
 {
     hal_result_t res = hal_res_NOK_generic; 
-    hal_i2c_t i2cport = s_hal_chip_st_l3g4200d_info[0].config.i2cport;
+    hal_chip_st_l3g4200d_internal_item_t *intitem = s_hal_chip_st_l3g4200d_theinternals.items[0];
+    hal_i2c_t i2cid = intitem->config.i2cid;
 
     uint8_t datal = 0;
     uint8_t datah = 0;
@@ -213,23 +235,23 @@ extern hal_result_t hal_chip_st_l3g4200d_angrate_get(int32_t* xar, int32_t* yar,
     hal_i2c_regaddr_t regaddr = {.numofbytes = 1, .bytes.one = 0x00 }; 
     
     regaddr.bytes.one = ARXL_ADR;
-    res = hal_i2c_read(i2cport, I2CADDRESS, regaddr, &datal, 1);
+    res = hal_i2c_read(i2cid, I2CADDRESS, regaddr, &datal, 1);
     regaddr.bytes.one = ARXH_ADR;
-    res = hal_i2c_read(i2cport, I2CADDRESS, regaddr, &datah, 1);
+    res = hal_i2c_read(i2cid, I2CADDRESS, regaddr, &datah, 1);
     tmp = (int16_t)((datah << 8) | datal);    
     *xar = s_hal_chip_st_l3g4200d_convert(tmp);
     
     regaddr.bytes.one = ARYL_ADR;
-    res = hal_i2c_read(i2cport, I2CADDRESS, regaddr, &datal, 1);
+    res = hal_i2c_read(i2cid, I2CADDRESS, regaddr, &datal, 1);
     regaddr.bytes.one = ARYH_ADR;
-    res = hal_i2c_read(i2cport, I2CADDRESS, regaddr, &datah, 1);
+    res = hal_i2c_read(i2cid, I2CADDRESS, regaddr, &datah, 1);
     tmp = (int16_t)((datah << 8) | datal);    
     *yar = s_hal_chip_st_l3g4200d_convert(tmp);    
 
     regaddr.bytes.one = ARZL_ADR;
-    res = hal_i2c_read(i2cport, I2CADDRESS, regaddr, &datal, 1);
+    res = hal_i2c_read(i2cid, I2CADDRESS, regaddr, &datal, 1);
     regaddr.bytes.one = ARZH_ADR;
-    res = hal_i2c_read(i2cport, I2CADDRESS, regaddr, &datah, 1);
+    res = hal_i2c_read(i2cid, I2CADDRESS, regaddr, &datah, 1);
     tmp = (int16_t)((datah << 8) | datal);    
     *zar = s_hal_chip_st_l3g4200d_convert(tmp);
     
@@ -252,7 +274,7 @@ extern hal_result_t hal_chip_st_l3g4200d_angrate_get(int32_t* xar, int32_t* yar,
 
 extern hal_result_t hal_chip_st_l3g4200d_hid_static_memory_init(void)
 {
-    memset(s_hal_chip_st_l3g4200d_initted, hal_false, sizeof(s_hal_chip_st_l3g4200d_initted));
+    memset(&s_hal_chip_st_l3g4200d_theinternals, 0, sizeof(s_hal_chip_st_l3g4200d_theinternals));
     return(hal_res_OK);  
 }
 
@@ -263,12 +285,12 @@ extern hal_result_t hal_chip_st_l3g4200d_hid_static_memory_init(void)
 
 static void s_hal_chip_st_l3g4200d_initted_set(void)
 {
-    s_hal_chip_st_l3g4200d_initted[0] = hal_true;
+    s_hal_chip_st_l3g4200d_theinternals.initted = hal_true;
 }
 
-static hal_boolval_t s_hal_chip_st_l3g4200d_initted_is(void)
+static hal_bool_t s_hal_chip_st_l3g4200d_initted_is(void)
 {
-    return(s_hal_chip_st_l3g4200d_initted[0]);
+    return(s_hal_chip_st_l3g4200d_theinternals.initted);
 }
 
 
@@ -290,20 +312,20 @@ static hal_boolval_t s_hal_chip_st_l3g4200d_initted_is(void)
 
 
 
-static hal_result_t s_hal_chip_st_l3g4200d_hw_init(const hal_chip_st_l3g4200d_cfg_t *cfg, hal_chip_st_l3g4200d_internals_t* intitem)
+static hal_result_t s_hal_chip_st_l3g4200d_hw_init(const hal_chip_st_l3g4200d_cfg_t *cfg, hal_chip_st_l3g4200d_internal_item_t *intitem)
 {
     hal_result_t res = hal_res_NOK_generic;   
     uint8_t data;
-    hal_i2c_t i2cport = cfg->i2cport;
+    hal_i2c_t i2cid = cfg->i2cid;
     
  
     // init i2c    
-    if(hal_res_OK != (res = hal_i2c_init(i2cport, NULL)))
+    if(hal_res_OK != (res = hal_i2c_init(i2cid, NULL)))
     {
         return(res);
     }
     
-    if(hal_res_OK != hal_i2c_ping(i2cport, I2CADDRESS))
+    if(hal_res_OK != hal_i2c_ping(i2cid, I2CADDRESS))
     {
         return(hal_res_NOK_generic);
     }
@@ -313,7 +335,7 @@ static hal_result_t s_hal_chip_st_l3g4200d_hw_init(const hal_chip_st_l3g4200d_cf
     
     // whoami: value must be WHOAMI_VAL
     regaddr.bytes.one = WHOAMI_ADR;
-    if(hal_res_OK != (res = hal_i2c_read(i2cport, I2CADDRESS, regaddr, &data, 1)))
+    if(hal_res_OK != (res = hal_i2c_read(i2cid, I2CADDRESS, regaddr, &data, 1)))
     {
         return(res);
     }
@@ -326,11 +348,11 @@ static hal_result_t s_hal_chip_st_l3g4200d_hw_init(const hal_chip_st_l3g4200d_cf
     
     regaddr.bytes.one = CTR1_ADR;       
     data = 0x0F; // enable x, y, z and power down normal mode (so that i have temperature readings). bandwidth is 100 hx w/ 12.5 cutoff
-    if(hal_res_OK != (res = hal_i2c_write(i2cport, I2CADDRESS, regaddr, &data, 1)))
+    if(hal_res_OK != (res = hal_i2c_write(i2cid, I2CADDRESS, regaddr, &data, 1)))
     {
         return(res);
     }
-    hal_i2c_standby(i2cport, I2CADDRESS);
+    hal_i2c_standby(i2cid, I2CADDRESS);
 
     regaddr.bytes.one = CTR4_ADR;       
     data = 0x00;        // continuos update of data + lbs @lower address + full scalse is 250 dps + self test disable + spi disabled
@@ -352,19 +374,19 @@ static hal_result_t s_hal_chip_st_l3g4200d_hw_init(const hal_chip_st_l3g4200d_cf
         intitem->factor = 62500;
         intitem->shift  = 10;         
     }
-    if(hal_res_OK != (res = hal_i2c_write(i2cport, I2CADDRESS, regaddr, &data, 1)))
+    if(hal_res_OK != (res = hal_i2c_write(i2cid, I2CADDRESS, regaddr, &data, 1)))
     {
         return(res);
     }  
-    hal_i2c_standby(i2cport, I2CADDRESS);  
+    hal_i2c_standby(i2cid, I2CADDRESS);  
  
     regaddr.bytes.one = CTR5_ADR;       
     data = 0x40;        // enable fifo
-    if(hal_res_OK != (res = hal_i2c_write(i2cport, I2CADDRESS, regaddr, &data, 1)))
+    if(hal_res_OK != (res = hal_i2c_write(i2cid, I2CADDRESS, regaddr, &data, 1)))
     {
         return(res);
     }
-    hal_i2c_standby(i2cport, I2CADDRESS);    
+    hal_i2c_standby(i2cid, I2CADDRESS);    
     
     
     memcpy(&intitem->config, cfg, sizeof(hal_chip_st_l3g4200d_cfg_t));
@@ -377,9 +399,10 @@ static hal_result_t s_hal_chip_st_l3g4200d_hw_init(const hal_chip_st_l3g4200d_cf
 
 static int32_t s_hal_chip_st_l3g4200d_convert(int32_t v)
 {
+    hal_chip_st_l3g4200d_internal_item_t *intitem = s_hal_chip_st_l3g4200d_theinternals.items[0];
 
-    int32_t factor =   (int32_t)s_hal_chip_st_l3g4200d_info[0].factor; // 
-    uint8_t  shift =            s_hal_chip_st_l3g4200d_info[0].shift; //  
+    int32_t factor =   (int32_t)intitem->factor; // 
+    uint8_t  shift =            intitem->shift; //  
 
     uint8_t neg = (v < 0) ? (1) : (0);
     int32_t r = (0 == neg) ? (factor*v) : (factor*(-v));

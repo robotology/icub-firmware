@@ -74,7 +74,7 @@ typedef enum
 typedef struct
 {
     hal_chip_xx_eeprom_chip_t       chip;
-    hal_i2c_t                       i2cport;      
+    hal_i2c_t                       i2cid;      
     uint8_t                         hwaddra2a1a0;       /**< put a 1 in pos 2, 1, 0 if the a2, a1, a0 is high. */
 } hal_chip_xx_eeprom_chip_cfg_t;
 
