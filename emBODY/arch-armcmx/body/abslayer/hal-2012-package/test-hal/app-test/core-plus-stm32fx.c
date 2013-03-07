@@ -71,8 +71,16 @@
 #define USE_EVENTVIEWER
 //#undef  USE_EVENTVIEWER
 
+
+//#undef  EXECUTE_TEST_SYS_DELAY
+#define EXECUTE_TEST_SYS_DELAY
+
 //#undef  EXECUTE_TEST_DEVICE_EEPROM
 #define EXECUTE_TEST_DEVICE_EEPROM
+
+
+//#undef  EXECUTE_TEST_PERIPH_TIMER
+#define EXECUTE_TEST_PERIPH_TIMER
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -111,12 +119,18 @@ static void test_is_beginning(const char* msg);
 static void test_was_successful(const char* msg);
 static void test_has_failed(const char* msg);
 
+#if     defined(EXECUTE_TEST_SYS_DELAY)    
+static void test_sys_delay(void);
+#endif//defined(EXECUTE_TEST_SYS_DELAY)    
+
 #if     defined(EXECUTE_TEST_DEVICE_EEPROM)
 static void test_device_eeprom(void);
 #endif//defined(EXECUTE_TEST_DEVICE_EEPROM)
 
 
-
+#if     defined(EXECUTE_TEST_PERIPH_TIMER)    
+static void test_periph_timer(void);
+#endif//defined(EXECUTE_TEST_PERIPH_TIMER)    
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -225,12 +239,20 @@ int main(void)
     
 
     // now after the systick i execute some more tests.
+    
+#if     defined(EXECUTE_TEST_SYS_DELAY)    
+    test_sys_delay();
+#endif//defined(EXECUTE_TEST_SYS_DELAY)       
 
 #if     defined(EXECUTE_TEST_DEVICE_EEPROM)    
     test_device_eeprom();
 #endif//defined(EXECUTE_TEST_DEVICE_EEPROM)    
     
-    
+#if     defined(EXECUTE_TEST_PERIPH_TIMER)    
+    test_periph_timer();
+#endif//defined(EXECUTE_TEST_PERIPH_TIMER)    
+     
+ 
     for(;;);
     
 }
@@ -419,7 +441,7 @@ static void test_has_failed(const char* msg)
 
 static void test_is_beginning(const char* msg)
 {  
-    char okmsg[64] =  {0};    
+    char okmsg[128] =  {0};    
    
     snprintf(okmsg, sizeof(okmsg)-1, "test is beginning: %s", msg);
 #if !defined(DONT_USE_TRACE) 
@@ -429,7 +451,7 @@ static void test_is_beginning(const char* msg)
 
 static void test_was_successful(const char* msg)
 {  
-    char okmsg[64] =  {0};    
+    char okmsg[128] =  {0};    
    
     snprintf(okmsg, sizeof(okmsg)-1, "test was succesful: %s", msg);
 #if !defined(DONT_USE_TRACE) 
@@ -439,6 +461,65 @@ static void test_was_successful(const char* msg)
 
 
 // -- the tests ----
+
+#if     defined(EXECUTE_TEST_SYS_DELAY)   
+
+static void test_sys_delay(void)
+{
+    evEntityId_t prev;
+    
+    test_is_beginning("sys-delay: 10, 200, 500, 1000 usec ");
+    
+    
+    // delay for some times and them measure it.
+    
+    hal_sys_irq_disable();
+
+#ifdef  USE_EVENTVIEWER
+     prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
+#endif  
+    hal_sys_delay(10);
+#ifdef  USE_EVENTVIEWER
+    eventviewer_switch_to(prev); 
+#endif    
+    
+    
+#ifdef  USE_EVENTVIEWER
+    prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
+#endif  
+    hal_sys_delay(200);
+#ifdef  USE_EVENTVIEWER
+    eventviewer_switch_to(prev); 
+#endif      
+
+
+#ifdef  USE_EVENTVIEWER
+    prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
+#endif  
+    hal_sys_delay(500);
+#ifdef  USE_EVENTVIEWER
+    eventviewer_switch_to(prev); 
+#endif   
+
+
+#ifdef  USE_EVENTVIEWER
+    prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
+#endif  
+    hal_sys_delay(1000);
+#ifdef  USE_EVENTVIEWER
+    eventviewer_switch_to(prev); 
+#endif  
+
+    hal_sys_irq_enable();
+
+    test_was_successful("sys-delay: ONLY IF the measures with eventviewer is OK");
+
+}    
+    
+#endif//defined(EXECUTE_TEST_SYS_DELAY)  
+
+
+
 
 #if     defined(EXECUTE_TEST_DEVICE_EEPROM)
 
@@ -495,6 +576,75 @@ static void test_device_eeprom(void)
 #endif//defined(EXECUTE_TEST_DEVICE_EEPROM)
 
 
+
+#if     defined(EXECUTE_TEST_PERIPH_TIMER)
+
+static volatile uint8_t test_timer_count = 0;
+
+static void test_timer_callback(void* p)
+{
+#ifdef  USE_EVENTVIEWER
+    evEntityId_t prev = eventviewer_switch_to(ev_ID_first_usrdef+1);
+#endif  
+
+    test_timer_count++;
+    if(0 == (test_timer_count%5))
+    {
+        hal_led_toggle(hal_led2);
+    }
+
+#ifdef  USE_EVENTVIEWER
+    eventviewer_switch_to(prev); 
+#endif
+}
+
+static const hal_timer_cfg_t test_timer_config =
+{
+    .prescaler          = hal_timer_prescalerAUTO,
+    .countdown          = 200*1000,
+    .priority           = hal_int_priority10,
+    .mode               = hal_timer_mode_periodic,
+    .callback_on_exp    = test_timer_callback,
+    .arg                = NULL    
+};
+
+static void test_periph_timer(void)
+{
+#if     defined(HAL_USE_PERIPH_TIMER)
+    
+    test_is_beginning("timer");
+    
+    
+    // init a timer to tick every 200 ms.
+    // every time it ticks it increments a variable
+    // i sleep 1050 ms and i count the variable: it must be 5.
+
+    hal_result_t res = hal_timer_init(hal_timer2, &test_timer_config, NULL);
+    
+    res = hal_timer_start(hal_timer2);
+    res = res;
+    
+#ifdef  USE_EVENTVIEWER
+    evEntityId_t prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
+#endif  
+    hal_sys_delay(1000*1000);
+#ifdef  USE_EVENTVIEWER
+    eventviewer_switch_to(prev); 
+#endif  
+    
+    test_was_successful("timer: ONLY IF the measure with eventviewer is OK");
+
+    if(5 == test_timer_count)
+    {
+        test_was_successful("timer: however seems ok as there were 5 ticks of 200 ms within a hal_sys_delay(1000*1000)");
+    }
+
+    
+
+#endif//defined(HAL_USE_PERIPH_TIMER)
+}
+
+#endif//defined(EXECUTE_TEST_PERIPH_TIMER)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
