@@ -43,6 +43,7 @@
 #include "EoSensors.h"
 #include "EoBoards.h"
 #include "EOicubCanProto_specifications.h"
+#include "osal.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -67,7 +68,12 @@ typedef enum
 } eo_appCanSP_runMode_t;
 
 
-    
+typedef struct
+{
+    uint8_t isrunning;
+    uint8_t numoftxframe[2];
+    osal_semaphore_t*   semafori[2];
+}runnning_data_t;
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
 
@@ -181,14 +187,20 @@ extern eOresult_t eo_appCanSP_GetNumOfRecCanframe(EOappCanSP *p, eOcanport_t can
 extern eOresult_t eo_appCanSP_SetRunMode(EOappCanSP *p, eo_appCanSP_runMode_t runmode);
 
 extern eOresult_t eo_appCanSP_StartTransmitCanFrames(EOappCanSP *p, eOcanport_t canport, eOboolvalues_t waitflag);
-extern void eo_appCanSP_WaitTransmitCanFrames(EOappCanSP *p, eOcanport_t canport);
+extern eOresult_t eo_appCanSP_WaitTransmitCanFrames(EOappCanSP *p, eOcanport_t canport);
 
 extern eOresult_t eo_appCanSP_EmptyCanOutputQueue(EOappCanSP *p, eOcanport_t canport);
 extern eOresult_t eo_appCanSP_EmptyCanInputQueue(EOappCanSP *p, eOcanport_t canport);
 
 extern eOresult_t eo_appCanSP_SendMessage_TEST(EOappCanSP *p, uint8_t *payload_ptr);
 
+extern eOresult_t eo_appCanSP_GetNumOfTxCanframe(EOappCanSP *p, eOcanport_t canport, uint8_t *numofTXcanframe);
 
+extern eOresult_t eo_appCanSP_StartTransmitAndWait(EOappCanSP *p, eOcanport_t canport);
+
+extern eOresult_t eo_appCanSP_starttransmit_XXX(EOappCanSP *p, eOcanport_t port);
+
+extern eOresult_t eo_appCanSP_wait_XXX(EOappCanSP *p, eOcanport_t port);
 
 #ifdef _USE_PROTO_TEST_
 /** @fn         extern eOresult_t eo_appCanSP_SendSetPoint(EOappCanSP *p, eOmc_jointId_t jId, eOmc_setpoint_t *setPoint)

@@ -77,6 +77,19 @@
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
+extern uint8_t numofframe_2sendRead[2];
+extern uint8_t numofput;
+extern uint8_t countput_ena;
+extern uint8_t ena_checktx_nexttime;
+extern uint8_t countput_netxtime[2];
+
+
+
+extern volatile int8_t RUN_semaphore_count[2];
+extern volatile int8_t MY_semaphore_count[2];
+extern uint8_t counput4cycle[2];
+
+extern uint8_t can_out_queue_full;  
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -122,6 +135,13 @@ static eOappCanSP_cfg_t defaultcfg =
 
 static const char s_eobj_ownname[] = "EOappCanSP";
 
+
+
+
+
+
+volatile uint8_t numtx[2] = {0,0};
+runnning_data_t run_data;
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -169,19 +189,22 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg)
     extern const hal_cfg_t *hal_cfgMINE;
     //can port 1
     //the max num of token in semaphore is equal to the max num of frame in can out queue.
-    retptr->waittxdata[hal_can_port1].semaphore = osal_semaphore_new(hal_cfgMINE->can1_txqnorm_num/*maxtokens*/, 0/*current num of token*/);
+    retptr->waittxdata[hal_can_port1].semaphore = osal_semaphore_new(255/*maxtokens*/, 0/*current num of token*/);
     if(NULL == retptr->waittxdata[hal_can_port1].semaphore)
     {
         return(NULL);
     }
+     osal_semaphore_set(retptr->waittxdata[hal_can_port1].semaphore, 0);
     
     //can port 2
     //the max num of token in semaphore is equal to the max num of frame in can out queue.
-    retptr->waittxdata[hal_can_port2].semaphore = osal_semaphore_new(hal_cfgMINE->can1_txqnorm_num/*maxtokens*/, 0/*current num of token*/);
+    retptr->waittxdata[hal_can_port2].semaphore = osal_semaphore_new(255/*maxtokens*/, 0/*current num of token*/);
     if(NULL == retptr->waittxdata[hal_can_port2].semaphore)
     {
         return(NULL);
     }
+    
+    osal_semaphore_set(retptr->waittxdata[hal_can_port2].semaphore, 0);
         
 
 // 4) initialise peripheral
@@ -191,8 +214,74 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg)
         return(NULL);
     }
     
+    
+    run_data.isrunning = 0;
+    
+    
+    run_data.numoftxframe[0] = 0;
+    run_data.semafori[0] = osal_semaphore_new(255/*maxtokens*/, 0/*current num of token*/);
+    if(run_data.semafori[0] == NULL)
+    {
+        return(NULL);
+    }
+    run_data.semafori[1] = osal_semaphore_new(255/*maxtokens*/, 0/*current num of token*/);
+    run_data.numoftxframe[1] = 0;
+    if(run_data.semafori[1] == NULL)
+    {
+        return(NULL);
+    }
+
     return(retptr);
 }
+
+extern eOresult_t eo_appCanSP_starttransmit_XXX(EOappCanSP *p, eOcanport_t port)
+{
+    uint8_t                 numofoutframe = 0;
+    hal_arch_arm_irqn_t     irqn;
+
+    irqn = (eOcanport1 == port)? hal_arch_arm_CAN1_TX_IRQn : hal_arch_arm_CAN2_TX_IRQn;
+   
+    //disa tx
+    hal_sys_irqn_disable(irqn);
+    
+    
+    //set num of can frame in out queue
+    hal_can_out_get((hal_can_port_t)port, &numofoutframe);
+    numtx[port] = numofoutframe;
+    run_data.numoftxframe[port] = numofoutframe;
+    
+    hal_sys_irqn_enable(irqn);
+    
+    if(numofoutframe != 0)
+    {
+        hal_can_transmit((hal_can_port_t)port);
+    }
+
+    return(eores_OK);
+}
+
+
+
+extern eOresult_t eo_appCanSP_wait_XXX(EOappCanSP *p, eOcanport_t port)
+{
+    uint8_t                 numofoutframe = 0;
+    hal_arch_arm_irqn_t     irqn;
+    osal_result_t           osal_res;
+
+    if(run_data.numoftxframe[port] != 0)
+    {
+        osal_res = osal_semaphore_decrement(run_data.semafori[port], osal_reltimeINFINITE);
+        RUN_semaphore_count[port]--;
+//         if(osal_res != osal_res_OK)
+//         {
+//             char str[100];
+//             snprintf(str, sizeof(str)-1, "Err osal decr = %d", osal_res );        
+//             hal_trace_puts(str); 
+//         }
+    }
+    return((eOresult_t)osal_res);
+}
+
 
 
 extern eOresult_t eo_appCanSP_SendCmd2Joint(EOappCanSP *p, eOmc_jointId_t jId, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr)
@@ -370,6 +459,19 @@ extern eOresult_t eo_appCanSP_GetNumOfRecCanframe(EOappCanSP *p, eOcanport_t can
     return((eOresult_t)hal_can_received((hal_can_port_t)canport, numofRXcanframe));
 }
 
+
+extern eOresult_t eo_appCanSP_GetNumOfTxCanframe(EOappCanSP *p, eOcanport_t canport, uint8_t *numofTXcanframe)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    // here not check if numofRXcanframe is null because hal function already do it.   
+    return((eOresult_t)hal_can_out_get((hal_can_port_t)canport, numofTXcanframe));
+}
+
+
 extern eOresult_t eo_appCanSP_SetRunMode(EOappCanSP *p, eo_appCanSP_runMode_t runmode)
 {
     if(NULL == p)
@@ -379,16 +481,16 @@ extern eOresult_t eo_appCanSP_SetRunMode(EOappCanSP *p, eo_appCanSP_runMode_t ru
     
     p->runmode = runmode;
     
-    if(eo_appCanSP_runMode__onDemand ==  p->runmode)
-    {
-        p->waittxdata[hal_can_port1].waitenable = eobool_true;
-        p->waittxdata[hal_can_port2].waitenable = eobool_true;
-    }
-    else
-    {
+//     if(eo_appCanSP_runMode__onDemand ==  p->runmode)
+//     {
+//         p->waittxdata[hal_can_port1].waitenable = eobool_true;
+//         p->waittxdata[hal_can_port2].waitenable = eobool_true;
+//     }
+//     else
+//     {
         p->waittxdata[hal_can_port1].waitenable = eobool_false;
         p->waittxdata[hal_can_port2].waitenable = eobool_false;
-    }
+//     }
     return(eores_OK);
 }
 
@@ -396,48 +498,68 @@ extern eOresult_t eo_appCanSP_StartTransmitCanFrames(EOappCanSP *p, eOcanport_t 
 {
     uint8_t                 numofoutframe = 0;
     hal_arch_arm_irqn_t     irqn;
+    eOresult_t              res = eores_OK;
+
 
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
     }
 
-    if(waitflag)//prepare data for wait sending can frame
+  
+    irqn = (eOcanport1 == canport)? hal_arch_arm_CAN1_TX_IRQn : hal_arch_arm_CAN2_TX_IRQn;
+
+    //disa tx
+    hal_sys_irqn_disable(irqn);
+    
+    //set num of can frame in out queue
+    hal_can_out_get((hal_can_port_t)canport, &numofoutframe);
+
+    if((waitflag) && (numofoutframe >0))     //prepare data for wait sending can frame
     {
-        irqn = (eOcanport1 == canport)? hal_arch_arm_CAN1_TX_IRQn : hal_arch_arm_CAN2_TX_IRQn;
-   
-        //disa tx
-        hal_sys_irqn_disable(irqn);
-        
         p->waittxdata[canport].waitenable = eobool_true;
-        
-        //set num of can frame in out queue
-        hal_can_out_get((hal_can_port_t)canport, &numofoutframe);
-        p->waittxdata[canport].numoftxframe2send = numofoutframe;
-        
-        //ena tx
-        hal_sys_irqn_enable(irqn);
+    }
+    p->waittxdata[canport].numoftxframe2send = numofoutframe;
+
+    //ena tx
+    hal_sys_irqn_enable(irqn);
+
+    
+    if(numofoutframe != 0)
+    {
+        res = hal_can_transmit((hal_can_port_t)canport);
     }
     
-    return((eOresult_t)hal_can_transmit((hal_can_port_t)canport));
+    return(res);
 }
 
 
-extern void eo_appCanSP_WaitTransmitCanFrames(EOappCanSP *p, eOcanport_t canport)
+extern eOresult_t eo_appCanSP_WaitTransmitCanFrames(EOappCanSP *p, eOcanport_t canport)
 {
     hal_arch_arm_irqn_t irqn;
+    osal_result_t osal_res;
     
     if(NULL == p)
     {
-        return;
+        return(eores_NOK_nullpointer);
     }
 
-    
-    if(p->waittxdata[canport].numoftxframe2send > 0) //if some frames wait to be sent, then suspend me
+    if(p->waittxdata[canport].waitenable == eobool_false)
     {
-        osal_semaphore_decrement(p->waittxdata[canport].semaphore, osal_reltimeINFINITE);
+        return(eores_NOK_nodata);
     }
     
+    MY_semaphore_count[canport]--;
+    osal_res = osal_semaphore_decrement(run_data.semafori[canport], osal_reltimeINFINITE);
+    
+    if(osal_res != osal_res_OK)
+    {
+        char str[100];
+        snprintf(str, sizeof(str)-1, "Err osal decr = %d", osal_res );        
+        hal_trace_puts(str); 
+    }
+    
+    //if i'm here i wake up
     irqn = (eOcanport1 == canport)? hal_arch_arm_CAN1_TX_IRQn : hal_arch_arm_CAN2_TX_IRQn;
    
     //disa tx
@@ -448,14 +570,58 @@ extern void eo_appCanSP_WaitTransmitCanFrames(EOappCanSP *p, eOcanport_t canport
     
     //ena tx
     hal_sys_irqn_enable(irqn);
+    
+    return((eOresult_t)osal_res);
 
 }
 
+extern eOresult_t eo_appCanSP_StartTransmitAndWait(EOappCanSP *p, eOcanport_t canport)
+{
+    uint8_t                 numofoutframe = 0, after = 0;
+    hal_arch_arm_irqn_t     irqn;
+    char                    str[100];
 
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+
+    irqn = (eOcanport1 == canport)? hal_arch_arm_CAN1_TX_IRQn : hal_arch_arm_CAN2_TX_IRQn;
+
+    //disa tx
+    hal_sys_irqn_disable(irqn);
+    
+    p->waittxdata[canport].waitenable = eobool_true;
+    
+    //set num of can frame in out queue
+    hal_can_out_get((hal_can_port_t)canport, &numofoutframe);
+    p->waittxdata[canport].numoftxframe2send = numofoutframe;
+    //ena tx
+    hal_sys_irqn_enable(irqn);
+
+    
+    hal_can_transmit((hal_can_port_t)canport);
+
+    osal_semaphore_decrement(p->waittxdata[canport].semaphore, osal_reltimeINFINITE);
+    
+    //if i'm here i just wake up
+    hal_sys_irqn_disable(irqn);
+    p->waittxdata[canport].waitenable = eobool_false;
+    
+    hal_can_out_get((hal_can_port_t)canport, &after);
+  
+    
+    hal_sys_irqn_enable(irqn);
+
+    return(eores_OK);
+    
+}
 
 extern eOresult_t eo_appCanSP_EmptyCanOutputQueue(EOappCanSP *p, eOcanport_t canport)
 {
-    uint8_t numberofoutcanframe;
+    uint8_t numberofoutcanframe, after;
+    char str[100];
     
     if(NULL == p)
     {
@@ -485,11 +651,13 @@ extern eOresult_t eo_appCanSP_EmptyCanOutputQueue(EOappCanSP *p, eOcanport_t can
     hal_sys_irqn_enable(irqn);
     
     //wait until all can frame are sent
+    MY_semaphore_count[canport]--;
     osal_semaphore_decrement(p->waittxdata[canport].semaphore, osal_reltimeINFINITE);
-    
+ 
     //if i'm here i just wake up
     hal_sys_irqn_disable(irqn);
-    p->waittxdata[canport].waitenable = eobool_false;
+    p->waittxdata[canport].waitenable = eobool_false;    
+    
     hal_sys_irqn_enable(irqn);
     
     return(eores_OK);
@@ -861,19 +1029,55 @@ static void s_eo_appCanSP_callbackOnTx_port2_waittransmission(void *arg)
 }
 
 
+extern uint8_t numofsentframe;
 static void s_eo_appCanSP_callbackOnTx_portx_waittransmission(void *arg, hal_can_port_t port)
 {
     EOappCanSP *p = (EOappCanSP *)arg;
-    if(eobool_false == p->waittxdata[port].waitenable)
+    
+    
+
+    if(eobool_true == p->waittxdata[port].waitenable)
     {
-        return;
+        p->waittxdata[port].numoftxframe2send --;
+        
+        if(0 == p->waittxdata[port].numoftxframe2send)
+        {
+            osal_result_t osal_res;
+            
+            MY_semaphore_count[port]++;
+            osal_res = osal_semaphore_increment(p->waittxdata[port].semaphore, osal_callerISR);
+            if(osal_res != osal_res_OK)
+            {
+                char str[100];
+                snprintf(str, sizeof(str)-1, "Err osal incr = %d", osal_res );        
+                hal_trace_puts(str); 
+            }
+        }
     }
+
     
-    p->waittxdata[port].numoftxframe2send --;
-    
-    if(0 == p->waittxdata[port].numoftxframe2send)
+    if(run_data.isrunning)
     {
-        osal_semaphore_increment(p->waittxdata[port].semaphore, osal_callerISR);
+        if(run_data.numoftxframe[port] == 0)
+        {
+            char str[100];
+            snprintf(str, sizeof(str)-1, "Err isr numoftxframe[%d]=0 and numtx[port]=%d", port, numtx[port]);        
+            hal_trace_puts(str); 
+        }    
+        numtx[port]--;
+        if(numtx[port] == 0)
+        {
+            osal_result_t osal_res;
+            RUN_semaphore_count[port]++;
+            osal_res  = osal_semaphore_increment(run_data.semafori[port], osal_callerISR);
+//             if(osal_res != osal_res_OK)
+//             {
+//                 char str[100];
+//                 snprintf(str, sizeof(str)-1, "Err osal incr = %d", osal_res );        
+//                 hal_trace_puts(str); 
+//             }
+
+        }
     }
 }
 
@@ -903,7 +1107,7 @@ static void s_eo_appCanSP_callbackOnRx_portx_allertOnReception(void *arg, hal_ca
     }
     p->cfg.cbkonrx[port].fn(p->cfg.cbkonrx[port].argoffn);
 }
-
+extern uint8_t numoftxfrme_failed;
 static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emscanport, eOicubCanProto_msgDestination_t dest, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr)
 {
     eOresult_t          res;
@@ -927,7 +1131,8 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
                 p->waittxdata[emscanport].waitenable = eobool_true;
                 p->waittxdata[emscanport].numoftxframe2send = 1;
                 hal_sys_irqn_enable(irqn);
-                
+
+                MY_semaphore_count[emscanport]--;
                 osal_semaphore_decrement(p->waittxdata[emscanport].semaphore, osal_reltimeINFINITE);
                 
                 //if i'm here i just wake up
@@ -948,10 +1153,17 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
     }
     else // eo_appCanSP_runMode__onDemand
     {
+        counput4cycle[emscanport]++;
+        if(ena_checktx_nexttime)
+        {
+            countput_netxtime[emscanport]++;
+        }
         res = (eOresult_t)hal_can_put((hal_can_port_t)emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_later);
         if(eores_NOK_busy == res)
         {
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "lost can frame (out-queue full)");
+            numoftxfrme_failed++;
+            can_out_queue_full = 1;
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "lost can frame (out-queue full)");
         }
     }
     return(res);

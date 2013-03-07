@@ -163,7 +163,7 @@
 //   <i> Define max. number of semaphores that will run at the same time.
 //   <i> Default: 0  (Semaphores not enabled)
 #ifndef OSAL_SEMAPHORENUM
- #define OSAL_SEMAPHORENUM    6
+ #define OSAL_SEMAPHORENUM    8
 #endif
 
 

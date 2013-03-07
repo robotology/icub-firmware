@@ -554,6 +554,16 @@
               <FileType>4</FileType>
               <FilePath>..\..\..\..\sys\abs\lib\ipal.base.medium.lib</FilePath>
             </File>
+            <File>
+              <FileName>ipal-lwip.base.small.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\sys\abs\lib\ipal-lwip.base.small.lib</FilePath>
+            </File>
+            <File>
+              <FileName>ipal.base.small.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\sys\abs\lib\ipal.base.small.lib</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1333,6 +1343,16 @@
               <FileName>EOpid.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOpid.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ethLowLevelPraser</GroupName>
+          <Files>
+            <File>
+              <FileName>EthLowLevParser.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ethlowlevelparser\EthLowLevParser.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1868,6 +1888,16 @@
               <FileType>4</FileType>
               <FilePath>..\..\..\..\sys\abs\lib\ipal.base.medium.lib</FilePath>
             </File>
+            <File>
+              <FileName>ipal-lwip.base.small.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\sys\abs\lib\ipal-lwip.base.small.lib</FilePath>
+            </File>
+            <File>
+              <FileName>ipal.base.small.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\sys\abs\lib\ipal.base.small.lib</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2647,6 +2677,16 @@
               <FileName>EOpid.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOpid.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ethLowLevelPraser</GroupName>
+          <Files>
+            <File>
+              <FileName>EthLowLevParser.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ethlowlevelparser\EthLowLevParser.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2980,7 +3020,7 @@
           <Cads>
             <interw>1</interw>
             <Optim>4</Optim>
-            <oTime>1</oTime>
+            <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
             <Strict>0</Strict>
@@ -2993,7 +3033,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC</Define>
+              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC _TEST_SEQNUM_</Define>
               <Undefine></Undefine>
               <IncludePath>..\app_main;..\app_cfg;..\app_servicesProviders_obj;..\app_servicesProviders_cfg\icub-can-net;..\app_servicesProviders_cfg\icub-can-proto;..\abslayer-cfg;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\sys\embobj\icub-app\api;..\..\..\..\..\any-arch\sys\embobj\icub-app\cfg;..\..\..\..\..\any-arch\sys\embobj\icub-app\src;..\..\..\..\..\any-arch\sys\embobj\icub-ems\api;..\..\..\..\..\any-arch\sys\embobj\icub-ems\src;..\..\..\..\..\any-arch\sys\embobj\mc\src;..\..\..\..\..\any-arch\sys\embobj\mc\api</IncludePath>
             </VariousControls>
@@ -3181,6 +3221,52 @@
               <FileName>ipal.base.medium.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\sys\abs\lib\ipal.base.medium.lib</FilePath>
+            </File>
+            <File>
+              <FileName>ipal-lwip.base.small.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\sys\abs\lib\ipal-lwip.base.small.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>ipal.base.small.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\sys\abs\lib\ipal.base.small.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
             </File>
           </Files>
         </Group>
@@ -4041,6 +4127,16 @@
               <FileName>EOpid.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOpid.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ethLowLevelPraser</GroupName>
+          <Files>
+            <File>
+              <FileName>EthLowLevParser.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ethlowlevelparser\EthLowLevParser.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4387,7 +4483,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO _FORCE_NETWORK_FROM_IPAL_CFG</Define>
+              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO _FORCE_NETWORK_FROM_IPAL_CFG _TEST_SEQNUM_</Define>
               <Undefine></Undefine>
               <IncludePath>..\app_main;..\app_cfg;..\app_servicesProviders_obj;..\app_servicesProviders_cfg\icub-can-net;..\app_servicesProviders_cfg\icub-can-proto;..\abslayer-cfg;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\sys\embobj\icub-app\api;..\..\..\..\..\any-arch\sys\embobj\icub-app\cfg;..\..\..\..\..\any-arch\sys\embobj\icub-app\src;..\..\..\..\..\any-arch\sys\embobj\mc\src;..\..\..\..\..\any-arch\sys\embobj\mc\api;..\..\..\..\..\any-arch\sys\embobj\icub-ems\api;..\..\..\..\..\any-arch\sys\embobj\icub-ems\src</IncludePath>
             </VariousControls>
@@ -4575,6 +4671,52 @@
               <FileName>ipal.base.medium.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\sys\abs\lib\ipal.base.medium.lib</FilePath>
+            </File>
+            <File>
+              <FileName>ipal-lwip.base.small.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\sys\abs\lib\ipal-lwip.base.small.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>ipal.base.small.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\sys\abs\lib\ipal.base.small.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
             </File>
           </Files>
         </Group>
@@ -5475,6 +5617,16 @@
               <FileName>EOpid.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOpid.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ethLowLevelPraser</GroupName>
+          <Files>
+            <File>
+              <FileName>EthLowLevParser.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ethlowlevelparser\EthLowLevParser.c</FilePath>
             </File>
           </Files>
         </Group>
