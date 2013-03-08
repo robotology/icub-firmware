@@ -48,8 +48,7 @@ extern int16_t torque_debug_can[4];
 #define MOTORS(m)   for (uint8_t m=0; m<s_emsc->n_joints; ++m)
 #define ENCODERS(e) for (uint8_t e=0; e<s_emsc->n_joints; ++e)
 
-#define SAFE_MAX_CURRENT 1500
-#define LIMIT(x,L) if (x>(L)) x=(L); else if (x<-(L)) x=-(L)
+//#define LIMIT(x,L) if (x>(L)) x=(L); else if (x<-(L)) x=-(L)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -90,8 +89,6 @@ static EOemsController *s_emsc = NULL;
 
 extern EOemsController* eo_emsController_Init(emsBoardType_t board_type) 
 {    
-    //board_type = EMS_UPPERLEG;
-    
     if (board_type == EMS_NULL) return NULL;
 
     s_emsc = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOemsController), 1);
@@ -184,6 +181,8 @@ extern void eo_emsController_ReadEncoders(int32_t *enc_pos)
 		// |J2|   |  1    -1    a   |   |E2|
     
         int32_t jnt_posI2I = enc_pos[0]-enc_pos[1]+(40*enc_pos[2])/65;
+        
+        //eo_axisController_EncRangeAdj(s_emsc->axis_controller[2], &jnt_posI2I);
     
         //s_emsc->cable_length_alarm = eo_motors_CableLimitAlarm(enc_pos[0], enc_pos[1], jnt_posI2I);
         
@@ -244,7 +243,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
     
     if (s_emsc->defcon == EMS_ALARM)
     {
-        static uint8_t time = 0;
+//        static uint8_t time = 0;
 //        if (!++time) hal_led_toggle(hal_led0); // flash red light
         
         MOTORS(m) pwm_motor[m] = 0;
@@ -551,6 +550,7 @@ void config_2FOC(uint8_t motor)
 {
     eOmc_PID_t pid;
     eOmc_i2tParams_t i2t;
+    //eOicubCanProto_current_t max_current;
     
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     eOappTheDB_jointOrMotorCanLocation_t canLoc;
@@ -568,16 +568,18 @@ void config_2FOC(uint8_t motor)
     
     pid.kp = 0x0A00;
     pid.kd = 0;
-    pid.ki = 0;
-                
+    pid.ki = 0; 
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &pid);
     
-    i2t.tresh = 0x290C;
-    i2t.time  = 0xCE0E;
-    
+    i2t.time  = 0x290C;
+    i2t.tresh = 0xCE0E;
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_I2T_PARAMS;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &i2t);
+    
+    //max_current = 0x3333;
+    //msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_LIMIT;
+    //eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &max_current);
 }
 
 void set_2FOC_idle(uint8_t motor)
@@ -586,7 +588,7 @@ void set_2FOC_idle(uint8_t motor)
     eOappTheDB_jointOrMotorCanLocation_t canLoc;
     eOicubCanProto_msgDestination_t msgdest;
     
-    eOicubCanProto_msgCommand_t msgCmd = 
+    eOicubCanProto_msgCommand_t msgCmd =
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
         EO_INIT(.cmdId) 0

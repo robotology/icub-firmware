@@ -114,6 +114,7 @@ extern void eo_axisController_SetPosPid(EOaxisController *o, float K, float Kd, 
 extern void eo_axisController_SetTrqPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff);
 
 extern void eo_axisController_StartCalibration(EOaxisController *o, int32_t pos, int32_t vel);
+extern eObool_t eo_axisController_EncRangeAdj(EOaxisController *o, int32_t *pos);
 
 /** @}            
     end of group eo_axisController  

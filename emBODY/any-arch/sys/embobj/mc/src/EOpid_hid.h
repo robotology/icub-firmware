@@ -51,6 +51,8 @@ struct EOpid_hid
     float A;
     float B;
     
+    float pwm_3Hz_LPF;
+    
     int32_t pwm_offset;
     int32_t pwm_max;
     int32_t pwm;

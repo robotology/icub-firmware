@@ -90,6 +90,7 @@ extern EOpid* eo_pid_New(void)
         o->pwm_offset = 0;
         o->pwm_max = 0;
         o->pwm = 0;
+        o->pwm_3Hz_LPF = 0.f;
         
         o->A = 0.f;
         o->B = 0.f;
@@ -143,17 +144,16 @@ extern void eo_pid_Reset(EOpid *o)
     o->Xn = 0.f;
     
     o->pwm = 0;
+    o->pwm_3Hz_LPF = 0.f;
 }
 
-/*
-extern int32_t eo_pid_PWM(EOpid *o, float En)
+extern int32_t eo_pid_PWM_pid(EOpid *o, float En)
 {
     if (!o) return 0;
                 
-    float Dn = o->A*o->Dn + o->B*(En - o->En);
+    o->Dn = o->A*o->Dn + o->B*(En - o->En);
     
     o->En = En;
-    o->Dn = Dn;
 
     float Xn = o->K*o->En;
     
@@ -161,15 +161,14 @@ extern int32_t eo_pid_PWM(EOpid *o, float En)
 
     LIMIT(o->KKiIn, o->Imax);
     
-    o->pwm = o->pwm_offset + (int32_t)(Xn + o->K*Dn + o->KKiIn);
+    o->pwm = o->pwm_offset + (int32_t)(Xn + o->K*o->Dn + o->KKiIn);
     
     LIMIT(o->pwm, o->pwm_max);
 
     return o->pwm;
 }
-*/
 
-extern int32_t eo_pid_PWM(EOpid *o, float En)
+extern int32_t eo_pid_PWM_p(EOpid *o, float En)
 {
     if (!o) return 0;
     
@@ -184,7 +183,24 @@ extern int32_t eo_pid_PWM(EOpid *o, float En)
     return o->pwm;
 }
 
-extern int32_t eo_pid_PWM2(EOpid *o, float En, float Vref, float Aref, float Venc)
+extern int32_t eo_pid_PWM_p_3Hz_LPF(EOpid *o, float En)
+{
+    if (!o) return 0;
+    
+    o->En = En;
+
+    float Xn = o->K*o->En;
+    
+    o->pwm_3Hz_LPF += 0.0185f*(Xn - o->pwm_3Hz_LPF);
+    
+    o->pwm = o->pwm_offset + (int32_t)o->pwm_3Hz_LPF;
+    
+    LIMIT(o->pwm, o->pwm_max);
+
+    return o->pwm;
+}
+
+extern int32_t eo_pid_PWM_piv(EOpid *o, float En, float Venc, float Vref, float Aref)
 {
     if (!o) return 0;
     
