@@ -70,6 +70,7 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+#define USE_VALUES_BOARD8
 
 extern uint8_t callback_of_setpoint_all_joints(verify_pair_t pair, uint8_t joint)
 {
@@ -107,8 +108,14 @@ extern uint8_t callback_of_setpoint_all_joints(verify_pair_t pair, uint8_t joint
             {0xffff8000, 0x00000e38}, {0xffff8000, 0x00000e38}, {0xffff8000, 0x00000e38}, {0xffff8000, 0x00000e38}, {0xffff4000, 0x00000e38}
         }        
     }; 
-    
-    const verify_pair_t (*reference)[NSAMPLES] = thej0123board8_reference; // OPPURE: thej0123board6_reference
+
+#if     defined(USE_VALUES_BOARD6)    
+    const verify_pair_t (*reference)[NSAMPLES] = thej0123board6_reference; 
+#elif   defined(USE_VALUES_BOARD8)
+    const verify_pair_t (*reference)[NSAMPLES] = thej0123board8_reference;
+#else
+    #error --> must define either USE_VALUES_BOARD6 OR USE_VALUES_BOARD8
+#endif  
     
     static uint8_t initted[NJOINTS] = {0};
     static verify_t verify[NJOINTS] = {0};
