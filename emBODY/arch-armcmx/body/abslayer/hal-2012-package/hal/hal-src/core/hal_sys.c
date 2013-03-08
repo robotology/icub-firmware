@@ -299,7 +299,7 @@ extern hal_result_t hal_sys_vectortable_relocate(uint32_t offset)
 }
 
 
-extern hal_result_t hal_sys_systick_sethandler(void (*systickhandler)(void), hal_time_t period, hal_interrupt_priority_t priority)
+extern hal_result_t hal_sys_systick_sethandler(void (*systickhandler)(void), hal_reltime_t period, hal_interrupt_priority_t priority)
 {
     uint32_t tickinsec = 1000*1000 / period;
     uint8_t r = 0;
@@ -381,7 +381,7 @@ extern hal_interrupt_priority_t hal_sys_irqn_priority_get(hal_irqn_t irqn)
 // and http://www.keil.com/support/man/docs/rlarm/rlarm_ar_svc_func.htm
 
 
-extern hal_result_t hal_sys_criticalsection_take(void *p, hal_time_t tout) 
+extern hal_result_t hal_sys_criticalsection_take(void *p, hal_reltime_t tout) 
 {
 
     if(0 == s_hal_sys_theinternals.cs_takes)

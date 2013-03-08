@@ -130,7 +130,7 @@ static void s_hal_timer_stm32_stop(hal_timer_t id);
 
 
 
-static hal_time_t s_hal_timer_get_period(hal_timer_t id);
+static hal_reltime_t s_hal_timer_get_period(hal_timer_t id);
 
 static void s_hal_timer_callback(hal_timer_t id);
 
@@ -201,7 +201,7 @@ static hal_timer_theinternals_t s_hal_timer_theinternals =
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern hal_result_t hal_timer_init(hal_timer_t id, const hal_timer_cfg_t *cfg, hal_time_t *error)
+extern hal_result_t hal_timer_init(hal_timer_t id, const hal_timer_cfg_t *cfg, hal_reltime_t *error)
 {
     hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer_id2index(id)];    
 
@@ -253,7 +253,7 @@ extern hal_result_t hal_timer_init(hal_timer_t id, const hal_timer_cfg_t *cfg, h
     // marker: calculate error
     if(NULL != error)
     {
-        hal_time_t period = s_hal_timer_get_period(id);
+        hal_reltime_t period = s_hal_timer_get_period(id);
         if(period > cfg->countdown)
         {
             *error = period - cfg->countdown; 
@@ -311,7 +311,7 @@ extern hal_result_t hal_timer_stop(hal_timer_t id)
 
 
 
-extern hal_result_t hal_timer_countdown_set(hal_timer_t id, hal_time_t countdown, hal_time_t *error)
+extern hal_result_t hal_timer_countdown_set(hal_timer_t id, hal_reltime_t countdown, hal_reltime_t *error)
 {                                                                            
     hal_timer_cfg_t *curcfg = NULL;
     hal_timer_cfg_t newcfg;
@@ -385,7 +385,7 @@ extern hal_result_t hal_timer_interrupt_disable(hal_timer_t id)
 
 
 
-extern hal_result_t hal_timer_remainingtime_get(hal_timer_t id, hal_time_t *remaining_time)
+extern hal_result_t hal_timer_remainingtime_get(hal_timer_t id, hal_reltime_t *remaining_time)
 {
     hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer_id2index(id)];
     TIM_TypeDef* TIMx               = s_hal_timer_stm32regs[HAL_timer_id2index(id)].TIMx;
@@ -778,7 +778,7 @@ static void s_hal_timer_stm32_stop(hal_timer_t id)
 ////  TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE);
 //}
 
-static hal_time_t s_hal_timer_get_period(hal_timer_t id)
+static hal_reltime_t s_hal_timer_get_period(hal_timer_t id)
 {
     hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer_id2index(id)];
 
