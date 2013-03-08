@@ -439,7 +439,7 @@ void SystemInit(void)
     
     // now the HSI is selected as system clock, and no prescaler is used     
 
-    if(hal_false == hal_brdcfg_cpu__theconfig.keepinternalclockatstartup)
+    if(hal_false == hal_brdcfg_cpu__theconfig.clockcfg.keepinternalclockatstartup)
     {   // apply the clock straigth away
         s_hal_cpu_set_sys_clock();
         s_hal_cpu_system_core_clock_update();        

@@ -40,14 +40,17 @@
     #define STM32F10X_CL
 	#include "stm32f1.h"
     #include "cmsis_stm32f1.h"
-    //#define USE_STM32F1        
+    
 #elif defined(HAL_USE_CPU_NAM_STM32F407)
+    // we need to adapt the stm32f4.h and cmsis_stm32f4.h for a stm32f407 by defining the macro STM32F4XX
+    // we also need: __CORTEX_M4  __FPU_PRESENT
+    #define STM32F4XX 
+    #define __CORTEX_M4  
+//    #define __FPU_PRESENT
 
 	#include "stm32f4.h"
     #include "cmsis_stm32f4.h"   
-    //#define USE_STM32F4
-    
-	#error --> put file and define macro
+
 #else
 	#error ERR --> Please select board XXX w/ HAL_BOARD_XXX
 #endif                        

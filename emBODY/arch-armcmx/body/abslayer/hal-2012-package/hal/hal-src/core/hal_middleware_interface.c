@@ -40,9 +40,11 @@
     // we need to adapt the filesystem_stm32f10x.c for a stm32f107 by defining the macro STM32F10X_CL
     #define STM32F10X_CL
 	#include "..\..\..\..\..\sys\mid\src\system_stm32f10x.c"
-    //#include "system_stm32f10x.c"
 #elif defined(HAL_USE_CPU_NAM_STM32F407)
-	#error --> put file and define macro
+    // we need to adapt the filesystem_stm32f10x.c for a stm32f107 by defining the macro STM32F10X_CL
+    #define STM32F4XX 
+    #define __CORTEX_M4
+	#include "..\..\..\..\..\sys\mid\src\system_stm32f4xx.c"
 #else
 	#error ERR --> Please select board XXX w/ HAL_BOARD_XXX
 #endif 
