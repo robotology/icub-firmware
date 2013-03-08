@@ -43,6 +43,8 @@
 
 #include "stdint.h"
 
+#include "verify.h"
+
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
@@ -57,7 +59,9 @@
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern uint8_t callback_of_setpoint(int32_t data, uint8_t joint);
+extern uint8_t callback_of_setpoint(verify_pair_t data, uint8_t joint);
+
+extern uint8_t callback_of_setpoint_all_joints(verify_pair_t pair, uint8_t joint);
 
 
 /** @}            

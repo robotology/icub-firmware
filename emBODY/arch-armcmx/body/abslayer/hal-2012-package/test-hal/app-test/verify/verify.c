@@ -77,32 +77,32 @@ static uint8_t s_verify_search_for_synch(verify_t *verif)
     uint8_t res = 0;    
     uint8_t i;
     int j;
-    int32_t* valuesrec = verif->tmp;
-    const int32_t* reference = verif->reference;
+    verify_pair_t* valuesrec = verif->tmp;
+    const verify_pair_t* reference = verif->reference;
     
-    memset(valuesrec, 0, verif->capacity*sizeof(int32_t));
+    memset(valuesrec, 0, verif->capacity*sizeof(verify_pair_t));
     
     circular_get_from_latest_minus(&verif->received, 0, (uint8_t*)valuesrec);
 
     // try to find the latest received value in reference 
     for(i=0; i<verif->capacity; i++)
     {
-        if(valuesrec[0] == reference[i])
+        if(0 == memcmp(&valuesrec[0], &reference[i], sizeof(verify_pair_t)))
         {   // ok ... found the first. now i verify if all the others are ok.
             uint8_t allmatched = 1;
             for(j=1; j<verif->capacity; j++)
             {
-                int32_t ref = 0;
-                int32_t rec = 0;
+                verify_pair_t ref = {0,0};
+                verify_pair_t rec = {0,0};
                 int32_t indexrec = i-j;
                 if(indexrec < 0)
                 {
                     indexrec += verif->capacity;
                 }
-                ref = reference[indexrec];
+                memcpy(&ref, &reference[indexrec], sizeof(verify_pair_t));
                 circular_get_from_latest_minus(&verif->received, j, (uint8_t*)&rec);
                 
-                if(ref != rec)
+                if(0 != memcmp(&ref, &rec, sizeof(verify_pair_t))) //(ref != rec)
                 {
                     allmatched = 0;
                     break;
@@ -136,24 +136,24 @@ static uint8_t s_verify_search_for_synch(verify_t *verif)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern void verify_init(verify_t *verif, uint8_t capacity, const int32_t *reference)
+extern void verify_init(verify_t *verif, uint8_t capacity, const verify_pair_t *reference)
 {
     verif->synched = 0;
     verif->capacity = capacity;
     verif->reference = reference;
     
-    circular_init(&verif->received, capacity, sizeof(int32_t));
-    circular_init(&verif->synchref, capacity, sizeof(int32_t));
+    circular_init(&verif->received, capacity, sizeof(verify_pair_t));
+    circular_init(&verif->synchref, capacity, sizeof(verify_pair_t));
     
-    verif->tmp = calloc(verif->capacity, sizeof(int32_t));
+    verif->tmp = calloc(verif->capacity, sizeof(verify_pair_t));
 }
 
-extern uint8_t verify_add(verify_t *verif, int32_t position)
+extern uint8_t verify_add(verify_t *verif, verify_pair_t pair)
 {
     uint8_t res = 1;
     uint8_t need2synch = (0 == verif->synched) ? 1 : 0;
     
-    circular_put(&verif->received, (uint8_t*)&position);
+    circular_put(&verif->received, (uint8_t*)&pair);
     
     if(1 == need2synch)
     {
@@ -171,7 +171,7 @@ extern uint8_t verify_add(verify_t *verif, int32_t position)
             uint8_t i;
             for(i=0; i<verif->capacity; i++)
             {
-                int32_t val = 0;
+                verify_pair_t val = {0,0};
                 circular_get_from_earliest(&verif->received, i, (uint8_t*)&val);
                 circular_put(&verif->synchref, (uint8_t*)&val);               
             }
@@ -197,11 +197,11 @@ extern uint8_t verify_add(verify_t *verif, int32_t position)
             uint8_t i;
             for(i=0; i<verif->capacity; i++)
             {
-                int32_t valrec = 0;
-                int32_t valref = 0;
+                verify_pair_t valrec = {0,0};
+                verify_pair_t valref = {0,0};
                 circular_get_from_latest_minus(&verif->received, i, (uint8_t*)&valrec);
                 circular_get_from_latest_minus(&verif->synchref, i, (uint8_t*)&valref);  
-                if(valrec != valref)
+                if(0 != memcmp(&valrec, &valref, sizeof(verify_pair_t))) //valrec != valref)
                 {
                     res = 0;
                     break;

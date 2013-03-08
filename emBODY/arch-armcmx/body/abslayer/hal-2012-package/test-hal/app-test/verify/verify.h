@@ -50,16 +50,22 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
+typedef struct
+{
+    int32_t     pos;
+    int32_t     vel;   
+} verify_pair_t;
+
 typedef struct verify_hid_t verify_t;
 
 struct verify_hid_t
 {
     uint8_t synched;                            // equal to 1 only if we have the latest input positions equal to teh reference    
     uint8_t capacity;                           /**< the max possible number of items which can be store inside the circular buffer */
-    const int32_t *reference;                         /**< the data of the buffer: capacity * sizeofitem bytes which must be passed at construction */
+    const verify_pair_t *reference;             /**< the data of the buffer: capacity * sizeofitem bytes which must be passed at construction */
     circular_t received;
     circular_t synchref;
-    int32_t *tmp;
+    verify_pair_t *tmp;
 };  
 
  
@@ -69,10 +75,10 @@ struct verify_hid_t
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern void verify_init(verify_t *verif, uint8_t capacity, const int32_t *reference);
+extern void verify_init(verify_t *verif, uint8_t capacity, const verify_pair_t *reference);
 
 // returns 0 if latest capacity positions are not equal to the reference, return 1 if they are, return 255 if still synch
-extern uint8_t verify_add(verify_t *verif, int32_t position);
+extern uint8_t verify_add(verify_t *verif, verify_pair_t pair);
 
 
 
