@@ -129,7 +129,7 @@ extern hal_result_t hal_sys_executenowataddress(uint32_t addr);
 extern hal_result_t hal_sys_vectortable_relocate(uint32_t offset);
 
 
-/** @fn         extern hal_result_t hal_sys_systick_sethandler(void (*systickhandler)(void), hal_time_t period, hal_interrupt_priority_t priority)
+/** @fn         extern hal_result_t hal_sys_systick_sethandler(void (*systickhandler)(void), hal_reltime_t period, hal_interrupt_priority_t priority)
     @brief      Starts a periodic call every @e period usec to the passed @e systickhandler function. On ARM Cortex
                 MPUs the caller is the SysTick ISR. The SysTick_Handler() function is internally defined as __weak, 
                 so that it can be overriden by any other definition (e.g., by the one inside osal).
@@ -139,7 +139,7 @@ extern hal_result_t hal_sys_vectortable_relocate(uint32_t offset);
     @return     hal_res_OK, or hal_res_NOK_generic if hal_initialise() was not already succesfully called or id parameters
                 are invalid.
  **/
-extern hal_result_t hal_sys_systick_sethandler(void (*systickhandler)(void), hal_time_t period, hal_interrupt_priority_t priority);
+extern hal_result_t hal_sys_systick_sethandler(void (*systickhandler)(void), hal_reltime_t period, hal_interrupt_priority_t priority);
 
 
 /** @fn         extern hal_void_fp_void_t hal_sys_systick_gethandler(void)
@@ -196,7 +196,7 @@ extern void hal_sys_irqn_priority_set(hal_irqn_t irqn, hal_interrupt_priority_t 
 extern hal_interrupt_priority_t hal_sys_irqn_priority_get(hal_irqn_t irqn);
  
  
-/** @fn         extern hal_result_t hal_sys_criticalsection_take(void *p, hal_time_t tout)
+/** @fn         extern hal_result_t hal_sys_criticalsection_take(void *p, hal_reltime_t tout)
     @brief      Takes exclusive control of the system so that no ISR will interrupt the thread of execution contained
                 between a _take() and a _release(). This function can be called multiple times with no harm, so that the
                 protection vs. ISR can be nested in several layers of function calls.
@@ -204,7 +204,7 @@ extern hal_interrupt_priority_t hal_sys_irqn_priority_get(hal_irqn_t irqn);
     @param      t               A dummy timeout required by some EmbObj object.
     @return     Always hal_res_OK.
  **/
-extern hal_result_t hal_sys_criticalsection_take(void *p, hal_time_t tout);
+extern hal_result_t hal_sys_criticalsection_take(void *p, hal_reltime_t tout);
 
 
 /** @fn         extern hal_result_t hal_sys_criticalsection_release(void *p)

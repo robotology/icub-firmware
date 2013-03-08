@@ -71,7 +71,7 @@ enum { hal_watchdogs_number = 2 };
  **/
 typedef struct
 {
-    hal_time_t                  countdown;                  /**< the countdown of the watchdog in microseconds      */
+    hal_reltime_t               countdown;                  /**< the countdown of the watchdog in microseconds      */
     hal_interrupt_priority_t    priority;                   /**< priority of the ISR for teh window watchdog */
     hal_callback_t              onwindowexpiry_cbk;         /**< callback called by the ISR when the window watchdog expires   */
     void*                       onwindowexpiry_arg;         /**< argument of the callback                           */    

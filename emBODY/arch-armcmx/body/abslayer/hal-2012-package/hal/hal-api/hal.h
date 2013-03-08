@@ -62,11 +62,13 @@
 #include "hal_gyroscope.h"
 #include "hal_i2c.h"
 #include "hal_led.h"
+#include "hal_mux.h"
 #include "hal_spi.h"
 #include "hal_switch.h"
 #include "hal_termometer.h"
 #include "hal_timer.h"
 #include "hal_trace.h"
+#include "hal_uniqueid.h"
 #include "hal_watchdog.h"
 
 

@@ -126,7 +126,7 @@ typedef enum
 typedef struct
 {
     hal_timer_prescaler_t           prescaler;          /**< the prescaler one wants to use */
-    hal_time_t                      countdown;          /**< the countdown before the ISR executes the callback */
+    hal_reltime_t                   countdown;          /**< the countdown before the ISR executes the callback */
     hal_interrupt_priority_t        priority;           /**< if hal_int_priorityNONE then there is no ISR and mode cannot be hal_timer_mode_oneshot */
     hal_timer_mode_t                mode;               /**< the mode of the timer: hal_timer_mode_oneshot or hal_timer_mode_periodic */
     void (*callback_on_exp)(void *arg);                 /**< callback called by the ISR executed at the expiry of the timer    */
@@ -140,7 +140,7 @@ typedef struct
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn			extern hal_result_t hal_timer_init(hal_timer_t id, const hal_timer_cfg_t *cfg, hal_time_t *error)
+/** @fn			extern hal_result_t hal_timer_init(hal_timer_t id, const hal_timer_cfg_t *cfg, hal_reltime_t *error)
     @brief  	This function initializes a timer. It can be called more times. If called on a running timer, it
                 stops it first. If priority field of @e cfg has value different from hal_int_priorityNONE,
                 the function enable timer's ISR which is responsible of calling the associated callback function.
@@ -161,7 +161,7 @@ typedef struct
                 hal_res_NOK_nullpointer if @e cfg is NULL
                 hal_res_OK otherwise
   */
-extern hal_result_t hal_timer_init(hal_timer_t id, const hal_timer_cfg_t *cfg, hal_time_t *error);
+extern hal_result_t hal_timer_init(hal_timer_t id, const hal_timer_cfg_t *cfg, hal_reltime_t *error);
 
 
 /** @fn         extern hal_result_t timer_start(hal_timer_t id);
@@ -180,14 +180,14 @@ extern hal_result_t hal_timer_start(hal_timer_t id);
 extern hal_result_t hal_timer_stop(hal_timer_t id);
 
 
-/** @fn         extern hal_result_t hal_timer_remainingtime_get(hal_timer_t id, hal_time_t *remaining_time)
+/** @fn         extern hal_result_t hal_timer_remainingtime_get(hal_timer_t id, hal_reltime_t *remaining_time)
     @brief      reads timer's actual value
     @param      id                  the timer
     @param      remaining_time      Gives back the timer's value expressed microseconds
     @return     hal_res_NOK_generic if timer is not initialized or configured in hal_cfg,
                 hal_res_OK otherwise.
  **/
-extern hal_result_t hal_timer_remainingtime_get(hal_timer_t id, hal_time_t *remaining_time);
+extern hal_result_t hal_timer_remainingtime_get(hal_timer_t id, hal_reltime_t *remaining_time);
 
 
 /** @fn         extern hal_timer_status_t hal_timer_status_get(hal_timer_t id)
@@ -198,7 +198,7 @@ extern hal_result_t hal_timer_remainingtime_get(hal_timer_t id, hal_time_t *rema
 extern hal_timer_status_t hal_timer_status_get(hal_timer_t id);
 
 
-/** @fn         extern hal_result_t hal_timer_countdown_set(hal_timer_t id, hal_time_t countdown, hal_time_t *error);
+/** @fn         extern hal_result_t hal_timer_countdown_set(hal_timer_t id, hal_reltime_t countdown, hal_reltime_t *error);
     @brief      sets timer countdown. A running timer is stopped before setting the value and restarted afterwards. 
     @param      id              the timer
     @param      countdown       Timer's countdown expressed in microseconds.
@@ -207,7 +207,7 @@ extern hal_timer_status_t hal_timer_status_get(hal_timer_t id);
     @warning    This function is a wrapper of other functions. It does some controls and then calls hal_timer_init() with 
                 proper parameters. This call is contained within hal_timer_stop() and hal_timer_start() if the timer was running
  **/
-extern hal_result_t hal_timer_countdown_set(hal_timer_t id, hal_time_t countdown, hal_time_t *error);
+extern hal_result_t hal_timer_countdown_set(hal_timer_t id, hal_reltime_t countdown, hal_reltime_t *error);
 
 
 /** @fn         extern hal_result_t hal_timer_priority_set(hal_timer_t id, hal_interrupt_priority_t prio);

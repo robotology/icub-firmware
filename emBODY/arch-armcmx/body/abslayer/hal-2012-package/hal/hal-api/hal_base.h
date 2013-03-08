@@ -47,16 +47,35 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-#define hal_NA08    ((uint8_t)(0xFF))
-#define hal_NA16    ((uint16_t)(0xFFFF))
-#define hal_NA32    ((uint32_t)(0xFFFFFFFF)) 
-#define hal_NA64    ((uint64_t)(0xFFFFFFFFFFFFFFFF))
+#define hal_NA08                                    ((uint8_t)(0xFF))
+#define hal_NA16                                    ((uint16_t)(0xFFFF))
+#define hal_NA32                                    ((uint32_t)(0xFFFFFFFF)) 
+#define hal_NA64                                    ((uint64_t)(0xFFFFFFFFFFFFFFFF))
 
-#define hal_BASE_U8toU32(a)                       ((uint32_t)(a)&0xff)
-#define hal_BASE_U16toU32(a)                      ((uint32_t)(a)&0xffff)
-#define hal_BASE_U8toU64(a)                       ((uint64_t)(a)&0xff)
-#define hal_BASE_4BtoU32(a, b, c, d)              ((hal_BASE_U8toU32(a))|(hal_BASE_U8toU32(b)<<8)|(hal_BASE_U8toU32(c)<<16)|(hal_BASE_U8toU32(d)<<24)) 
-#define hal_BASE_8BtoU64(a, b, c, d, e, f, g, h)  (((uint64_t)hal_BASE_4BtoU32(a, b, c, d))|((uint64_t)hal_BASE_4BtoU32(e, f, g, h)<<32)) 
+#define hal_BASE_U8toU32(a)                         ((uint32_t)(a)&0xff)
+#define hal_BASE_U16toU32(a)                        ((uint32_t)(a)&0xffff)
+#define hal_BASE_U8toU64(a)                         ((uint64_t)(a)&0xff)
+#define hal_BASE_4BtoU32(a, b, c, d)                ((hal_BASE_U8toU32(a))|(hal_BASE_U8toU32(b)<<8)|(hal_BASE_U8toU32(c)<<16)|(hal_BASE_U8toU32(d)<<24)) 
+#define hal_BASE_8BtoU64(a, b, c, d, e, f, g, h)    (((uint64_t)hal_BASE_4BtoU32(a, b, c, d))|((uint64_t)hal_BASE_4BtoU32(e, f, g, h)<<32)) 
+
+
+#define hal_RELTIME_1microsec                       (1L)
+#define hal_RELTIME_1millisec                       (1000L)                           
+#define hal_RELTIME_1second                         (1000000L)
+#define hal_RELTIME_1minute                         (60000000L)
+#define hal_RELTIME_1hour                           (3600000000L)
+
+#define hal_ABSTIME_1microsec                       (1LL)
+#define hal_ABSTIME_1millisec                       (1000LL)                           
+#define hal_ABSTIME_1second                         (1000000LL)
+#define hal_ABSTIME_1minute                         (60000000LL)
+#define hal_ABSTIME_1hour                           (3600000000LL)
+#define hal_ABSTIME_1day                            (24*hal_ABSTIME_1hour)
+
+#define hal_NANOTIME_1nanosec                       (1LL)
+#define hal_NANOTIME_1microsec                      (1000LL)
+#define hal_NANOTIME_1millisec                      (1000000LL)                           
+#define hal_NANOTIME_1second                        (1000000000LL)
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
@@ -116,27 +135,30 @@ typedef uint8_t     hal_bool_t;
 
 /** @typedef    typedef uint32_t hal_reltime_t 
     @brief      hal_reltime_t express time in hal in form of usec (micro-seconds). It is used for relative timing
-                operations because its maximum value is about 4294 seconds, which is more than enough for most needs.
+                operations because its maximum value is about 4294 seconds (1 hour, 11 min, and 34 sec), which is 
+                more than enough for most needs. As such it is used in systick, HW timers, watchdog.
  **/  
 typedef uint32_t    hal_reltime_t;
 
 
-/** @typedef    typedef hal_reltime_t  hal_time_t
-    @brief      hal_time_t is an alias for hal_reltime_t
- **/ 
-typedef hal_reltime_t  hal_time_t;
+///** @typedef    typedef hal_reltime_t  hal_time_t
+//    @brief      hal_time_t is an alias for hal_reltime_t.
+// **/ 
+//typedef hal_reltime_t  hal_time_t;
 
 
 /** @typedef    typedef uint64_t hal_abstime_t 
     @brief      hal_abstime_t express absolute time in hal in form of usec (micro-seconds) on a very long range.
-                A hal_absttime_t variable keeps time up to 584 thousand years.
+                A hal_absttime_t variable keeps time up to 584 thousand years. It can be used to count time of 
+                a system synce its bootstrap.
  **/  
 typedef uint64_t    hal_abstime_t;
 
 
 /** @typedef    typedef uint64_t hal_nanotime_t 
     @brief      hal_nanotime_t express very precise relative time in hal in form of nsec (nano-seconds).
-                A hal_nanoime_t variable keeps time up to 584 years.
+                A hal_nanotime_t variable keeps time up to 584 years. It can be used in such peripherals where
+                a precision sub-microsecond is required.
  **/  
 typedef uint64_t    hal_nanotime_t;
 
