@@ -99,17 +99,20 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+
+#ifdef  USE_EVENTVIEWER
+// keep the following idle and userdefx as extern to make them visible in eventviewer
 void idle(void);
 void userdef1(void);
 void userdef2(void);
 void userdef3(void);
 void userdef4(void);
 static void brd_eventviewer_init(void);
-
+#endif//USE_EVENTVIEWER
 
 static void leds_init(void);
-static void led01_toggle(void);
-static void led02_toggle(void* p);
+static void leds_led1_toggle(void);
+static void leds_led2_toggle(void);
 extern void onsystick(void); // use extern to be used w/ eventviewer
 
 static void button_init(void);
@@ -139,11 +142,11 @@ static void test_periph_timer(void);
 static volatile uint32_t msTicks = 0;
 static volatile uint8_t s_tick = 0;
 
-static volatile uint32_t led0_blink_rate = 500;
+static volatile uint32_t led0_blink_rate_ms = 500;
 
 
 
-#if     defined(HAL_USE_GPIO)
+#if     defined(HAL_USE_PERIPH_GPIO)
 
 static const hal_gpio_map_t user_button = 
 {
@@ -200,7 +203,7 @@ static const hal_gpio_val_t user_notpushed_value =
     hal_gpio_valNONE; 
 #endif    
 
-#endif//defined(HAL_USE_GPIO)
+#endif//defined(HAL_USE_PERIPH_GPIO)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of externally defined functions or variable which dont have a .h file
@@ -229,13 +232,17 @@ int main(void)
     hal_trace_init(NULL);
 #endif
 
+    
+#if defined(USE_EVENTVIEWER)
     brd_eventviewer_init();
+#endif
     
     // 1 millisec.
-    res = hal_sys_systick_sethandler(onsystick, 1000, hal_int_priority00);
+    res = hal_sys_systick_sethandler(onsystick, hal_RELTIME_1millisec, hal_int_priority00);
     res =  res;   
     
     // now, if the led0 blinks at 1Hz, then  we have tested the hal-core plus gpio plus leds. ... ok, not exaustively
+    
     
 
     // now after the systick i execute some more tests.
@@ -270,6 +277,9 @@ int main(void)
 // - definition of static functions 
 // -------------------------------------------------------------------------------------------------------------------- 
 
+#ifdef  USE_EVENTVIEWER
+
+// keep tem extern to make them visible in eventviewer
 void idle(void){}
 void userdef1(void){}
 void userdef2(void){}
@@ -278,9 +288,8 @@ void userdef4(void){}
     
 static void brd_eventviewer_init(void)
 {
-#ifdef  USE_EVENTVIEWER
     
-    evEntityId_t prev;
+    //evEntityId_t prev;
 
     eventviewer_init();
     eventviewer_load(ev_ID_idle, idle);  
@@ -294,8 +303,11 @@ static void brd_eventviewer_init(void)
     // apart from some specific actions: systick, userdef1 and userdef2
     eventviewer_switch_to(ev_ID_idle);
     
-#endif//USE_EVENTVIEWER
+
 }
+
+#endif//USE_EVENTVIEWER
+
 
 static void leds_init(void)
 {
@@ -306,36 +318,42 @@ static void leds_init(void)
     res = hal_led_init(hal_led1, NULL);
     res =  res;
     
+    leds_led1_toggle();
+    leds_led1_toggle();
+    
     res = hal_led_init(hal_led2, NULL);
     res =  res;
     
+    leds_led2_toggle();
+    leds_led2_toggle();
+    
 
-#ifdef  USE_EVENTVIEWER
-    evEntityId_t prev = eventviewer_switch_to(ev_ID_first_usrdef+1);
-#endif  
-#warning --> to adjust !!!!!!!!!!!    
-//     hal_gpio_quickest_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
-//     hal_gpio_quickest_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valHIGH);
-//     hal_gpio_quickest_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
-#ifdef  USE_EVENTVIEWER
-    eventviewer_switch_to(prev); 
-#endif
+// #ifdef  USE_EVENTVIEWER
+//     evEntityId_t prev = eventviewer_switch_to(ev_ID_first_usrdef+1);
+// #endif  
+// //#warning --> to adjust !!!!!!!!!!!    
+// //     hal_gpio_quickest_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
+// //     hal_gpio_quickest_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valHIGH);
+// //     hal_gpio_quickest_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
+// #ifdef  USE_EVENTVIEWER
+//     eventviewer_switch_to(prev); 
+// #endif
 
-#ifdef  USE_EVENTVIEWER    
-    prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
-#endif   
-#warning --> to adjust !!!!!!!!!!!   
-//     hal_gpio_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
-//     hal_gpio_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valHIGH);
-//     hal_gpio_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
-#ifdef  USE_EVENTVIEWER
-    eventviewer_switch_to(prev);  
-#endif  
+// #ifdef  USE_EVENTVIEWER    
+//     prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
+// #endif   
+// //#warning --> to adjust !!!!!!!!!!!   
+// //     hal_gpio_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
+// //     hal_gpio_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valHIGH);
+// //     hal_gpio_setval(hal_brdcfg_device_led__theconfig.gpiocfg[0].port, hal_brdcfg_device_led__theconfig.gpiocfg[0].pin, hal_gpio_valLOW);
+// #ifdef  USE_EVENTVIEWER
+//     eventviewer_switch_to(prev);  
+// #endif  
 
 #endif//defined(HAL_USE_DEVICE_LED)
 }
 
-static void led01_toggle(void)
+static void leds_led1_toggle(void)
 {
 #if     defined(HAL_USE_DEVICE_LED)
         
@@ -347,7 +365,7 @@ static void led01_toggle(void)
 #endif//defined(HAL_USE_DEVICE_LED)    
 }
 
-static void led02_toggle(void* p)
+static void leds_led2_toggle(void)
 {
 #if     defined(HAL_USE_DEVICE_LED)
     
@@ -370,10 +388,10 @@ extern void onsystick(void)
     msTicks++;
     
     count++;
-    if(led0_blink_rate == count)
+    if(led0_blink_rate_ms == count)
     {
         count = 0;
-        led01_toggle();
+        leds_led1_toggle();
     }
     
     if(0 == (msTicks%100))
@@ -394,25 +412,25 @@ extern void onsystick(void)
 
 static void button_init(void)
 {
-#if     defined(HAL_USE_GPIO)
+#if     defined(HAL_USE_PERIPH_GPIO)
     
     if(hal_gpio_dirINP == user_button.config.dir)
     {
         hal_gpio_init(user_button.gpio, &user_button.config);
+        button_ispushed();
     }
     
-#endif//defined(HAL_USE_GPIO)    
+#endif//defined(HAL_USE_PERIPH_GPIO)    
 }
 
 static uint8_t button_ispushed(void)
 {
-#if     defined(HAL_USE_GPIO)
+#if     defined(HAL_USE_PERIPH_GPIO)
     
     hal_gpio_val_t v = user_notpushed_value;
     
     if(hal_gpio_dirINP == user_button.config.dir)
     {
-        #warning --> to adjust !!!!!!!!!!!   
         v = hal_gpio_getval(user_button.gpio);
         return((user_notpushed_value == v) ? 0 : 1);        
     }
@@ -420,9 +438,9 @@ static uint8_t button_ispushed(void)
     {
         return(0);
     }
-#else //defined(HAL_USE_GPIO) 
+#else //defined(HAL_USE_PERIPH_GPIO) 
     return(0);
-#endif//defined(HAL_USE_GPIO)    
+#endif//defined(HAL_USE_PERIPH_GPIO)    
 }
 
 
@@ -430,7 +448,7 @@ static uint8_t button_ispushed(void)
 static void test_has_failed(const char* msg)
 {  
     char errormsg[64] =  {0};    
-    led0_blink_rate = 100;
+    led0_blink_rate_ms = 100;
     
     snprintf(errormsg, sizeof(errormsg)-1, "test has failed: %s", msg);
 #if !defined(DONT_USE_TRACE) 
@@ -645,6 +663,7 @@ static void test_periph_timer(void)
 }
 
 #endif//defined(EXECUTE_TEST_PERIPH_TIMER)
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
