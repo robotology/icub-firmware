@@ -170,7 +170,7 @@ static const IRQn_Type s_hal_dma_irqnumber[hal_dmas_number] =
 
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)
            
-static DMA_Stream_TypeDef* const s_hal_dma_memory_mapping_of_ports[hal_dmas_num] = 
+static DMA_Stream_TypeDef* const s_hal_dma_memory_mapping_of_ports[hal_dmas_number] = 
 {
     DMA1_Stream0, DMA1_Stream1, DMA1_Stream2, DMA1_Stream3, DMA1_Stream4, DMA1_Stream5, DMA1_Stream6, DMA1_Stream7, 
     DMA2_Stream0, DMA2_Stream1, DMA2_Stream2, DMA2_Stream3, DMA2_Stream4, DMA2_Stream5, DMA2_Stream6, DMA2_Stream7

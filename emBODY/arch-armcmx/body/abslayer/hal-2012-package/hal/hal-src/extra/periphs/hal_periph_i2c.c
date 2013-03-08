@@ -735,7 +735,7 @@ static void s_hal_i2c_hw_gpio_init(hal_i2c_t id)
     hal_gpio_port_t portsda = hal_brdcfg_i2c__theconfig.gpio_sda[HAL_i2c_id2index(id)].gpio.port;
     hal_gpio_pin_t  pinsda  = hal_brdcfg_i2c__theconfig.gpio_sda[HAL_i2c_id2index(id)].gpio.pin;       
     
-    if(hal_i2c1 == i2c)
+    if(hal_i2c1 == id)
     { 
         afname = GPIO_AF_I2C1;  afmode = ENABLE;
         
@@ -751,7 +751,7 @@ static void s_hal_i2c_hw_gpio_init(hal_i2c_t id)
             foundsda = hal_true;
         }
     }
-    else if(hal_i2c2 == i2c)
+    else if(hal_i2c2 == id)
     {   
         afname = GPIO_AF_I2C2;  afmode = ENABLE;
         
@@ -769,7 +769,7 @@ static void s_hal_i2c_hw_gpio_init(hal_i2c_t id)
             foundsda = hal_true;
         }
     }
-    else if(hal_i2c3 == i2c)
+    else if(hal_i2c3 == id)
     {
         afname = GPIO_AF_I2C3;  afmode = ENABLE;
         
