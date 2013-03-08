@@ -66,7 +66,7 @@ struct EOaxisController_hid
     int32_t pos_min;
     int32_t pos_max;
     
-    float   err;
+    int32_t err;
 
     int32_t acc_stop_cmode;
     int32_t acc_stop_alarm;
