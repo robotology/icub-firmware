@@ -76,12 +76,25 @@ extern const hal_sys_cfg_t hal_sys_cfg_default;  // = { .stacksize = 0, .heapsiz
 extern hal_result_t hal_sys_init(const hal_sys_cfg_t* cfg);
 
 
-/** @fn         extern hal_result_t hal_sys_systeminit(void)
-    @brief      Initialise the system.
-    @return     hal_res_OK, or hal_res_NOK_generic if hal_initialise() was not already succesfully called.
- **/
-extern hal_result_t hal_sys_systeminit(void);
+///** @fn         extern hal_result_t hal_sys_systeminit(void)
+//    @brief      Initialise the system. OBSOLETE
+//    @return     hal_res_OK, or hal_res_NOK_generic if hal_initialise() was not already succesfully called.
+// **/
+//extern hal_result_t hal_sys_systeminit(void);
 
+
+/** @fn         extern uint32_t hal_sys_stack_get_totalsize(void);
+    @brief      It returns size of configured stack.
+    @return     The size of configured stack in bytes.
+ **/
+extern uint32_t hal_sys_stack_get_totalsize(void);
+
+
+/** @fn         extern uint32_t hal_sys_heap_get_totalsize(void);
+    @brief      It returns size of configured heap.
+    @return     The size of configured heap in bytes.
+ **/
+extern uint32_t hal_sys_heap_get_totalsize(void);
 
 /** @fn         extern hal_result_t hal_sys_delay(hal_reltime_t reltime)
     @brief      When called it returns after the CPU has executed this function for @e reltime microseconds.

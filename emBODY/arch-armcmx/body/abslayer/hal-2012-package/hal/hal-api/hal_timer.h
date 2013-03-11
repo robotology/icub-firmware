@@ -67,17 +67,21 @@
  **/ 
 typedef enum  
 { 
-    hal_timer1 = 0,
-	hal_timer2 = 1,
-    hal_timer3 = 2,
-    hal_timer4 = 3,
-	hal_timer5 = 4,
-    hal_timer6 = 5,
-    hal_timer7 = 6,
-    hal_timer8 = 7
+    hal_timer1  = 0,
+	hal_timer2  = 1,
+    hal_timer3  = 2,
+    hal_timer4  = 3,
+	hal_timer5  = 4,
+    hal_timer6  = 5,
+    hal_timer7  = 6,
+    hal_timer8  = 7,
+    hal_timer9  = 8,
+    hal_timer10 = 9,
+    hal_timer11 = 10,
+    hal_timer12 = 11
 } hal_timer_t;
 
-enum { hal_timers_num = 8 };
+enum { hal_timers_number = 12 };
 
 
 /** @typedef    typedef enum hal_timer_status_t 

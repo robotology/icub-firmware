@@ -62,28 +62,38 @@
 
 #if 1
 typedef enum
-{   // values from stm32f10x_gpio.h
-    hal_cpu_fam_stm32f1_gpio_speed_10mhz    = 1,
-    hal_cpu_fam_stm32f1_gpio_speed_2mhz,
-    hal_cpu_fam_stm32f1_gpio_speed_50mhz
-} hal_cpu_fam_stm32f1_gpio_speed_t;
+{   // values from stm32f40x_gpio.h
+    hal_cpu_fam_stm32f4_gpio_speed_2mhz     = 0x00,
+    hal_cpu_fam_stm32f4_gpio_speed_25mhz    = 0x01,    
+    hal_cpu_fam_stm32f4_gpio_speed_50mhz    = 0x02,  
+    hal_cpu_fam_stm32f4_gpio_speed_100mhz   = 0x03       
+} hal_cpu_fam_stm32f4_gpio_speed_t;
 typedef enum
-{   // values from stm32f10x_gpio.h
-    hal_cpu_fam_stm32f1_gpio_mode_AIN           = 0x0,
-    hal_cpu_fam_stm32f1_gpio_mode_IN_FLOATING   = 0x04,
-    hal_cpu_fam_stm32f1_gpio_mode_IPD           = 0x28,
-    hal_cpu_fam_stm32f1_gpio_mode_IPU           = 0x48,
-    hal_cpu_fam_stm32f1_gpio_mode_Out_OD        = 0x14,
-    hal_cpu_fam_stm32f1_gpio_mode_Out_PP        = 0x10,
-    hal_cpu_fam_stm32f1_gpio_mode_AF_OD         = 0x1C,
-    hal_cpu_fam_stm32f1_gpio_mode_AF_PP         = 0x18   
-} hal_cpu_fam_stm32f1_gpio_mode_t;
+{   // values from stm32f40x_gpio.h
+    hal_cpu_fam_stm32f4_gpio_mode_IN        = 0x00,
+    hal_cpu_fam_stm32f4_gpio_mode_OUT       = 0x01,
+    hal_cpu_fam_stm32f4_gpio_mode_AF        = 0x02,
+    hal_cpu_fam_stm32f4_gpio_mode_AN        = 0x03
+} hal_cpu_fam_stm32f4_gpio_mode_t;
+typedef enum
+{
+    hal_cpu_fam_stm32f4_gpio_otype_PP       = 0x00,
+    hal_cpu_fam_stm32f4_gpio_otype_OD       = 0x01
+} hal_cpu_fam_stm32f4_gpio_otype_t;
+typedef enum
+{
+    hal_cpu_fam_stm32f4_gpio_pupd_nopull    = 0x00,
+    hal_cpu_fam_stm32f4_gpio_pupd_up        = 0x01,
+    hal_cpu_fam_stm32f4_gpio_pupd_down      = 0x02
+} hal_cpu_fam_stm32f4_gpio_pupd_t;
 typedef struct
-{   // from stm32f10x_gpio.h
-    uint16_t                                gpiopin;
-    hal_cpu_fam_stm32f1_gpio_speed_t        gpiospeed;
-    hal_cpu_fam_stm32f1_gpio_mode_t         gpiomode;
-} hal_cpu_fam_stm32f1_gpio_altcfg_t;
+{   // from stm32f40x_gpio.h
+    uint32_t                                gpiopin;
+    hal_cpu_fam_stm32f4_gpio_mode_t         gpiomode;
+    hal_cpu_fam_stm32f4_gpio_speed_t        gpiospeed;
+    hal_cpu_fam_stm32f4_gpio_otype_t        gpiootype;
+    hal_cpu_fam_stm32f4_gpio_pupd_t         gpiopupd;
+} hal_cpu_fam_stm32f4_gpio_altcfg_t;
 #endif
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
@@ -97,7 +107,7 @@ typedef struct
 
 
 /** @}            
-    end of group doxy_group_hal_cpu_fam_stm32f1  
+    end of group doxy_group_hal_cpu_fam_stm32f4  
  **/
 
 #endif  // include-guard

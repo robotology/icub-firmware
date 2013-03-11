@@ -61,6 +61,8 @@ typedef enum
     hal_cpu_arc_none                = hal_NA08
 } hal_cpu_architecture_t;
 
+enum { hal_cpu_architectures_number = 3 };
+
 
 /** @typedef    typedef enum hal_cpu_family_t 
     @brief      hal_cpu_family_t contains the family of the CPU within a given architecture
@@ -75,6 +77,7 @@ typedef enum
     hal_cpu_fam_none                = hal_NA08
 } hal_cpu_family_t;
 
+enum { hal_cpu_families_number = 5 };
 
 /** @typedef    typedef enum hal_cpu_name_t 
     @brief      hal_cpu_name_t contains the name of the CPU within a given family
@@ -88,6 +91,8 @@ typedef enum
     hal_cpu_nam_dspic33             = 4,
     hal_cpu_nam_none                = hal_NA08
 } hal_cpu_name_t;
+
+enum { hal_cpu_names_number = 5 };
 
 
 /** @typedef    typedef enum hal_cpu_speed_t 
