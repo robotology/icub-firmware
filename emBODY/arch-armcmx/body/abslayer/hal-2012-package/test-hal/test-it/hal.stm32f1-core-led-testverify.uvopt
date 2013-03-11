@@ -182,7 +182,7 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>225</LineNumber>
+          <LineNumber>324</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>0</Address>
           <ByteObject>0</ByteObject>
@@ -204,6 +204,11 @@
         </Ww>
         <Ww>
           <count>1</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>j,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>2</count>
           <WinNumber>1</WinNumber>
           <ItemText>res</ItemText>
         </Ww>
@@ -450,7 +455,7 @@
         <Bp>
           <Number>2</Number>
           <Type>0</Type>
-          <LineNumber>225</LineNumber>
+          <LineNumber>324</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>0</Address>
           <ByteObject>0</ByteObject>
@@ -786,7 +791,7 @@
         <Bp>
           <Number>2</Number>
           <Type>0</Type>
-          <LineNumber>225</LineNumber>
+          <LineNumber>324</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>0</Address>
           <ByteObject>0</ByteObject>
@@ -861,8 +866,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>206</TopLine>
-      <CurrentLine>222</CurrentLine>
+      <TopLine>302</TopLine>
+      <CurrentLine>320</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app-test\core-led-testverify.c</PathWithFileName>
       <FilenameWithoutPath>core-led-testverify.c</FilenameWithoutPath>
@@ -875,10 +880,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>46</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>68</TopLine>
+      <CurrentLine>75</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app-test\verify\callback_file.c</PathWithFileName>
       <FilenameWithoutPath>callback_file.c</FilenameWithoutPath>
@@ -907,7 +912,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>25</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -973,8 +978,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>184</TopLine>
-      <CurrentLine>190</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-stg\hal_startup_cpu_nam_stm32f107.s</PathWithFileName>
       <FilenameWithoutPath>hal_startup_cpu_nam_stm32f107.s</FilenameWithoutPath>
@@ -1141,8 +1146,8 @@
       <Focus>0</Focus>
       <ColumnNumber>99</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>193</TopLine>
-      <CurrentLine>194</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\core\hal_sys.c</PathWithFileName>
       <FilenameWithoutPath>hal_sys.c</FilenameWithoutPath>
@@ -1449,7 +1454,7 @@
 
   <Group>
     <GroupName>hal-extra-periphs</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1573,8 +1578,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>449</TopLine>
-      <CurrentLine>450</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\extra\periphs\hal_periph_timer.c</PathWithFileName>
       <FilenameWithoutPath>hal_periph_timer.c</FilenameWithoutPath>
@@ -1645,8 +1650,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\extra\utilities\hal_utility_bits.c</PathWithFileName>
       <FilenameWithoutPath>hal_utility_bits.c</FilenameWithoutPath>
@@ -1709,8 +1714,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\extra\utilities\hal_utility_fifo.c</PathWithFileName>
       <FilenameWithoutPath>hal_utility_fifo.c</FilenameWithoutPath>
