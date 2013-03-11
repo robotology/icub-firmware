@@ -180,7 +180,6 @@ static const hal_gpio_map_t user_button =
 #if     defined(HAL_BOARD_MCBSTM32F400)       
     .gpio       =
     {
- 
         .port   = hal_gpio_portG,
         .pin    = hal_gpio_pin15
     },
@@ -192,8 +191,7 @@ static const hal_gpio_map_t user_button =
     }
 #elif   defined(HAL_BOARD_MCBSTM32C)
     .gpio       =
-    {
- 
+    { 
         .port   = hal_gpio_portB,
         .pin    = hal_gpio_pin7
     },
@@ -206,17 +204,15 @@ static const hal_gpio_map_t user_button =
 #else
     .gpio       =
     {
- 
         .port   = hal_gpio_portNONE,
         .pin    = hal_gpio_pinNONE
     },
     .config     =
     {
-        .speed  = hal_gpio_speedNONE,
+        .speed  = hal_gpio_speed_NONE,
         .dir    = hal_gpio_dirNONE,
         .altcfg = NULL
-    }     
-    .dir    = hal_gpio_dirNONE 
+    }
 #endif    
 };
 
@@ -920,7 +916,11 @@ static void test_periph_watchdog(void)
 #if     defined(EXECUTE_TEST_PERIPH_UNIQUEID)    
 static void test_periph_uniqueid(void)
 {
+#ifdef HAL_USE_PERIPH_UNIQUEID
+    
     test_is_beginning("unique id");
+    
+
     
     hal_uniqueid_init(NULL);
     
@@ -930,6 +930,8 @@ static void test_periph_uniqueid(void)
 
     snprintf(msg, sizeof(msg)-1, "hal_uniqueid_macaddr_t: its value is 0x%llx", hal_uniqueid_macaddr_get());
     test_message(msg);
+
+#endif//HAL_USE_PERIPH_UNIQUEID
     
 }
 #endif//defined(EXECUTE_TEST_PERIPH_UNIQUEID)   
