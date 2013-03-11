@@ -32,108 +32,81 @@
 
 // - modules to be built ----------------------------------------------------------------------------------------------
 
-// -- mpu
-#define     HAL_USE_ARCH
-#define     HAL_USE_BASE
-#define     HAL_USE_CAN
-#define     HAL_USE_CRC
-#define     HAL_USE_ETH
-#define     HAL_USE_FLASH
-#define     HAL_USE_GPIO
-#define     HAL_USE_I2C
-//#define     HAL_USE_SPI
-#define     HAL_USE_SYS
-#define     HAL_USE_TIMER
-#define     HAL_USE_TRACE
-#define     HAL_USE_WATCHDOG
+#define     HAL_BUILD_ONLYCORE
+//#define     HAL_BUILD_ONLYBLINKY
 
-// -- devices
-#define     HAL_USE_DEVICE_ACCELEROMETER
-#define     HAL_USE_DEVICE_CANTRANSCEIVER
+
+// -- core: these values must be always defined
+#define     HAL_USE_BASE
+#define     HAL_USE_CORE
+#define     HAL_USE_CPU
+#define     HAL_USE_FLASH
+#define     HAL_USE_HEAP
+#define     HAL_USE_MIDDLEWARE_INTERFACE
+#define     HAL_USE_SYS
+
+// -- cpu: choose one ARC, FAM, and NAM for the cpu
+#define     HAL_USE_CPU_ARC_ARMCM4
+#define     HAL_USE_CPU_FAM_STM32F4
+#define     HAL_USE_CPU_NAM_STM32F407
+
+// -- the utilities, mpu peripherals, devices, chips, and external boards are used only if the build is not forced to core only 
+#ifndef HAL_BUILD_ONLYCORE 
+
+// -- utilities: define what you need to use (beware that most of mpu peripheral modules use BITS and some use FIFO)
+#define     HAL_USE_UTILITY_BITS
+#define     HAL_USE_UTILITY_CRC07
+#define     HAL_USE_UTILITY_CRC16
+#define     HAL_USE_UTILITY_CRC32
+#define     HAL_USE_UTILITY_FIFO
+
+// -- mpu peripherals: define what you need to use (beware of cross dependencies)
+#undef     HAL_USE_PERIPH_CAN
+#undef     HAL_USE_PERIPH_CRC
+#undef     HAL_USE_PERIPH_DMA
+#undef     HAL_USE_PERIPH_ETH
+#define     HAL_USE_PERIPH_GPIO
+#define     HAL_USE_PERIPH_I2C
+#undef     HAL_USE_PERIPH_SPI
+#define     HAL_USE_PERIPH_TIMER
+#define     HAL_USE_PERIPH_TRACE
+#define     HAL_USE_PERIPH_UNIQUEID
+#define     HAL_USE_PERIPH_WATCHDOG
+
+// -- devices: define what you need to use (beware of cross dependencies from mpu peripherals and amongst devices)
+#undef  HAL_USE_DEVICE_ACCELEROMETER
+#undef     HAL_USE_DEVICE_CANTRANSCEIVER
 #undef  HAL_USE_DEVICE_DISPLAY  
 #define     HAL_USE_DEVICE_EEPROM
 #undef  HAL_USE_DEVICE_ENCODER
-#define     HAL_USE_DEVICE_ETHTRANSCEIVER
-#define     HAL_USE_DEVICE_GYROSCOPE
+#undef     HAL_USE_DEVICE_ETHTRANSCEIVER
+#undef  HAL_USE_DEVICE_GYROSCOPE
 #define     HAL_USE_DEVICE_LED
-#define     HAL_USE_DEVICE_SWITCH
-#define     HAL_USE_DEVICE_TERMOMETER
+#undef     HAL_USE_DEVICE_MUX
+#undef  HAL_USE_DEVICE_SWITCH
+#undef  HAL_USE_DEVICE_TERMOMETER
 
 
-// -- utilities
-#define     HAL_USE_UTILITY_BITS
-#define     HAL_USE_UTILITY_FIFO
-#define     HAL_USE_UTILITY_HEAP
-#define     HAL_USE_UTILITY_CRC16
-#define     HAL_USE_UTILITY_CRC32
-
-// -- chips
-#undef   HAL_USE_CHIP_GENERIC_ETHTRANSCEIVER
-#define     HAL_USE_CHIP_ST_L3G4200D
-#define     HAL_USE_CHIP_ST_LIS3DH
-#define     HAL_USE_CHIP_MICREL_KS8893
+// -- chips: define what you need to use
+#undef     HAL_USE_CHIP_GENERIC_ETHTRANSCEIVER
+#undef     HAL_USE_CHIP_ST_L3G4200D
+#undef     HAL_USE_CHIP_ST_LIS3DH
+#undef  HAL_USE_CHIP_MICREL_KS8893
 #define     HAL_USE_CHIP_XX_EEPROM
 
+// -- external boards: define what you need to use
+#undef     HAL_USE_EXTBRD_KEIL_MCBQVGA
 
-
-// #undef HAL_USE_CHIP_ST_L3G4200D
-// #undef HAL_USE_CHIP_ST_LIS3DH
-// #undef HAL_USE_CHIP_XX_EEPROM
-// #undef HAL_USE_DEVICE_TERMOMETER
-// #undef HAL_USE_SENSOR_GYRO
-// #undef HAL_USE_SENSOR_ACCEL
-// #undef HAL_USE_DEVICE_ETHTRANSCEIVER
-// #undef HAL_USE_DEVICE_EEPROM
-// #undef HAL_USE_ETH
-// #undef HAL_USE_CRC
-// #undef HAL_USE_CAN
-// #undef HAL_USE_TIMER
-// #undef HAL_USE_WATCHDOG
-// #undef HAL_USE_FLASH
+#endif//HAL_BUILD_ONLYCORE 
 
 
 // - exceptions -------------------------------------------------------------------------------------------------------
+// not managed so far
 
-#if defined(VERY_SMALL )
-//    #undef  HAL_USE_CAN
-    #undef  HAL_USE_DISPLAY
-    #undef  HAL_USE_ENCODER
-//    #undef  HAL_USE_ETH
-//    #undef  HAL_USE_EEPROM
-//    #undef  HAL_USE_FLASH
-//    #undef  HAL_USE_LED
-//    #undef  HAL_USE_SWITCH
-//    #undef  HAL_USE_TIMER
-//    #undef  HAL_USE_WATCHDOG
-#endif
-    
-#ifdef  HAL_SLIM_MODE
-    #undef  HAL_USE_CAN
-    #undef  HAL_USE_DISPLAY
-    #undef  HAL_USE_ENCODER
-    #undef  HAL_USE_ETH
-    #undef  HAL_USE_LED
-    #undef  HAL_USE_TIMER
-    #undef  HAL_USE_WATCHDOG
-#endif//HAL_SLIM_MODE
 
 // - cross dependencies -----------------------------------------------------------------------------------------------
+// not managed so far 
 
-#ifdef  HAL_USE_EEPROM
-    #define HAL_USE_I2C
-#endif//HAL_USE_EEPROM      
-
-#ifdef  HAL_USE_ENCODER
-    #define HAL_USE_SPI4ENCODER
-#endif//HAL_USE_ENCODER
-
-#ifdef  HAL_USE_LED
-    #define HAL_USE_GPIO
-#endif//HAL_USE_LED 
-
-#ifdef  HAL_USE_SWITCH
-    #define HAL_USE_I2C
-#endif//HAL_USE_SWITCH   
 
 
 #endif  // include-guard
