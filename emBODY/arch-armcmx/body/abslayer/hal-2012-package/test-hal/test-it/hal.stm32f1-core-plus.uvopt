@@ -750,10 +750,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>5</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>253</TopLine>
-      <CurrentLine>262</CurrentLine>
+      <TopLine>189</TopLine>
+      <CurrentLine>190</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app-test\core-plus-stm32fx.c</PathWithFileName>
       <FilenameWithoutPath>core-plus-stm32fx.c</FilenameWithoutPath>
@@ -764,7 +764,7 @@
 
   <Group>
     <GroupName>hal-cfg</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -779,8 +779,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\hal-cfg\stm32f1\hal_cfg.h</PathWithFileName>
-      <FilenameWithoutPath>hal_cfg.h</FilenameWithoutPath>
+      <PathWithFileName>..\hal-cfg\hal_core_cfg.h</PathWithFileName>
+      <FilenameWithoutPath>hal_core_cfg.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -790,13 +790,13 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>41</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\hal-cfg\stm32f1\hal_cfg.c</PathWithFileName>
-      <FilenameWithoutPath>hal_cfg.c</FilenameWithoutPath>
+      <PathWithFileName>..\hal-cfg\hal_core_cfg.c</PathWithFileName>
+      <FilenameWithoutPath>hal_core_cfg.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -804,7 +804,7 @@
 
   <Group>
     <GroupName>hal-startup</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -814,10 +814,10 @@
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>19</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>185</TopLine>
-      <CurrentLine>190</CurrentLine>
+      <TopLine>52</TopLine>
+      <CurrentLine>58</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-stg\hal_startup_cpu_nam_stm32f107.s</PathWithFileName>
       <FilenameWithoutPath>hal_startup_cpu_nam_stm32f107.s</FilenameWithoutPath>
@@ -852,7 +852,7 @@
 
   <Group>
     <GroupName>hal-brdcfg</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -860,7 +860,7 @@
       <GroupNumber>5</GroupNumber>
       <FileNumber>6</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -968,7 +968,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>26</TopLine>
+      <TopLine>27</TopLine>
       <CurrentLine>35</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\core\hal_middleware_interface.c</PathWithFileName>
@@ -984,8 +984,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>313</TopLine>
+      <CurrentLine>333</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\core\hal_sys.c</PathWithFileName>
       <FilenameWithoutPath>hal_sys.c</FilenameWithoutPath>
@@ -1416,7 +1416,7 @@
       <Focus>0</Focus>
       <ColumnNumber>57</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>2</TopLine>
+      <TopLine>3</TopLine>
       <CurrentLine>4</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\hal\hal-src\extra\periphs\hal_periph_timer.c</PathWithFileName>

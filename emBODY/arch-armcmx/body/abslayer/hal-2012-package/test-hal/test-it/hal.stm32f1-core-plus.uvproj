@@ -366,7 +366,7 @@
               <MiscControls>--cpreproc</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\hal-cfg\stm32f1</IncludePath>
+              <IncludePath>..\hal-cfg</IncludePath>
             </VariousControls>
           </Aads>
           <LDads>
@@ -402,14 +402,14 @@
           <GroupName>hal-cfg</GroupName>
           <Files>
             <File>
-              <FileName>hal_cfg.h</FileName>
+              <FileName>hal_core_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\hal-cfg\stm32f1\hal_cfg.h</FilePath>
+              <FilePath>..\hal-cfg\hal_core_cfg.h</FilePath>
             </File>
             <File>
-              <FileName>hal_cfg.c</FileName>
+              <FileName>hal_core_cfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\hal-cfg\stm32f1\hal_cfg.c</FilePath>
+              <FilePath>..\hal-cfg\hal_core_cfg.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1123,7 +1123,7 @@
               <MiscControls>--cpreproc</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\hal-cfg\stm32f1</IncludePath>
+              <IncludePath>..\hal-cfg</IncludePath>
             </VariousControls>
           </Aads>
           <LDads>
@@ -1159,14 +1159,14 @@
           <GroupName>hal-cfg</GroupName>
           <Files>
             <File>
-              <FileName>hal_cfg.h</FileName>
+              <FileName>hal_core_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\hal-cfg\stm32f1\hal_cfg.h</FilePath>
+              <FilePath>..\hal-cfg\hal_core_cfg.h</FilePath>
             </File>
             <File>
-              <FileName>hal_cfg.c</FileName>
+              <FileName>hal_core_cfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\hal-cfg\stm32f1\hal_cfg.c</FilePath>
+              <FilePath>..\hal-cfg\hal_core_cfg.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1862,7 +1862,7 @@
               <MiscControls>--cpreproc</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\hal-cfg\stm32f1</IncludePath>
+              <IncludePath>..\hal-cfg</IncludePath>
             </VariousControls>
           </Aads>
           <LDads>
@@ -1898,14 +1898,14 @@
           <GroupName>hal-cfg</GroupName>
           <Files>
             <File>
-              <FileName>hal_cfg.h</FileName>
+              <FileName>hal_core_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\hal-cfg\stm32f1\hal_cfg.h</FilePath>
+              <FilePath>..\hal-cfg\hal_core_cfg.h</FilePath>
             </File>
             <File>
-              <FileName>hal_cfg.c</FileName>
+              <FileName>hal_core_cfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\hal-cfg\stm32f1\hal_cfg.c</FilePath>
+              <FilePath>..\hal-cfg\hal_core_cfg.c</FilePath>
             </File>
           </Files>
         </Group>
