@@ -75,12 +75,21 @@
 //#undef  EXECUTE_TEST_SYS_DELAY
 #define EXECUTE_TEST_SYS_DELAY
 
+// #undef EXECUTE_TEST_PERIPH_I2C
+#define EXECUTE_TEST_PERIPH_I2C
+
 //#undef  EXECUTE_TEST_DEVICE_EEPROM
 #define EXECUTE_TEST_DEVICE_EEPROM
 
 
 //#undef  EXECUTE_TEST_PERIPH_TIMER
 #define EXECUTE_TEST_PERIPH_TIMER
+
+#undef  EXECUTE_TEST_PERIPH_WATCHDOG
+//#define EXECUTE_TEST_PERIPH_WATCHDOG
+
+//#undef EXECUTE_TEST_PERIPH_UNIQUEID
+#define EXECUTE_TEST_PERIPH_UNIQUEID
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -121,10 +130,17 @@ static uint8_t button_ispushed(void);
 static void test_is_beginning(const char* msg);
 static void test_was_successful(const char* msg);
 static void test_has_failed(const char* msg);
+static void test_message(const char* msg);
+
+static void info_about_core_plus_led(void);
 
 #if     defined(EXECUTE_TEST_SYS_DELAY)    
 static void test_sys_delay(void);
 #endif//defined(EXECUTE_TEST_SYS_DELAY)    
+
+#if     defined(EXECUTE_TEST_PERIPH_I2C)    
+static void test_periph_i2c(void);
+#endif//defined(EXECUTE_TEST_PERIPH_I2C)  
 
 #if     defined(EXECUTE_TEST_DEVICE_EEPROM)
 static void test_device_eeprom(void);
@@ -135,10 +151,21 @@ static void test_device_eeprom(void);
 static void test_periph_timer(void);
 #endif//defined(EXECUTE_TEST_PERIPH_TIMER)    
 
+
+#if     defined(EXECUTE_TEST_PERIPH_WATCHDOG)    
+static void test_periph_watchdog(void);
+#endif//defined(EXECUTE_TEST_PERIPH_WATCHDOG)    
+
+#if     defined(EXECUTE_TEST_PERIPH_UNIQUEID)    
+static void test_periph_uniqueid(void);
+#endif//defined(EXECUTE_TEST_PERIPH_UNIQUEID)   
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
+static const hal_reltime_t systickperiod = hal_RELTIME_1millisec;
 static volatile uint32_t msTicks = 0;
 static volatile uint8_t s_tick = 0;
 
@@ -231,6 +258,11 @@ int main(void)
 #if !defined(DONT_USE_TRACE)    
     hal_trace_init(NULL);
 #endif
+    
+    test_message("");
+    test_message("");
+    test_message(" # THE SYSTEM HAS JUST STARTED AND HAL INITTED ");
+    test_message("");
 
     
 #if defined(USE_EVENTVIEWER)
@@ -238,28 +270,54 @@ int main(void)
 #endif
     
     // 1 millisec.
-    res = hal_sys_systick_sethandler(onsystick, hal_RELTIME_1millisec, hal_int_priority00);
+    res = hal_sys_systick_sethandler(onsystick, systickperiod, hal_int_priority00);
     res =  res;   
     
     // now, if the led0 blinks at 1Hz, then  we have tested the hal-core plus gpio plus leds. ... ok, not exaustively
-    
+       
+    info_about_core_plus_led();
     
 
     // now after the systick i execute some more tests.
     
+
+    test_message("");
+    test_message(" ------------------------------------------ ");
+    test_message(" ----------- BEGINNING OF TESTS ----------- ");
+    test_message(" ------------------------------------------ ");
+    test_message("");
+
 #if     defined(EXECUTE_TEST_SYS_DELAY)    
     test_sys_delay();
-#endif//defined(EXECUTE_TEST_SYS_DELAY)       
+#endif//defined(EXECUTE_TEST_SYS_DELAY)      
+ 
+#if     defined(EXECUTE_TEST_PERIPH_I2C)    
+    test_periph_i2c();
+#endif//defined(EXECUTE_TEST_PERIPH_I2C)  
 
 #if     defined(EXECUTE_TEST_DEVICE_EEPROM)    
     test_device_eeprom();
-#endif//defined(EXECUTE_TEST_DEVICE_EEPROM)    
+#endif//defined(EXECUTE_TEST_DEVICE_EEPROM)  
+
     
 #if     defined(EXECUTE_TEST_PERIPH_TIMER)    
     test_periph_timer();
 #endif//defined(EXECUTE_TEST_PERIPH_TIMER)    
+
+#if     defined(EXECUTE_TEST_PERIPH_WATCHDOG)    
+    test_periph_watchdog();
+#endif//defined(EXECUTE_TEST_PERIPH_WATCHDOG)   
+
+#if     defined(EXECUTE_TEST_PERIPH_UNIQUEID)    
+    test_periph_uniqueid();
+#endif//defined(EXECUTE_TEST_PERIPH_UNIQUEID)   
      
  
+    test_message("");
+    test_message(" ------------------------------------------ ");
+    test_message(" ----------- ALL TESTS ARE OVER ----------- ");
+    test_message(" ------------------------------------------ ");
+    
     for(;;);
     
 }
@@ -447,7 +505,7 @@ static uint8_t button_ispushed(void)
 
 static void test_has_failed(const char* msg)
 {  
-    char errormsg[64] =  {0};    
+    char errormsg[128] =  {0};    
     led0_blink_rate_ms = 100;
     
     snprintf(errormsg, sizeof(errormsg)-1, "test has failed: %s", msg);
@@ -463,6 +521,7 @@ static void test_is_beginning(const char* msg)
    
     snprintf(okmsg, sizeof(okmsg)-1, "test is beginning: %s", msg);
 #if !defined(DONT_USE_TRACE) 
+    hal_trace_puts(""); 
     hal_trace_puts(okmsg); 
 #endif
 }
@@ -477,6 +536,71 @@ static void test_was_successful(const char* msg)
 #endif
 }
 
+static void test_message(const char* msg)
+{
+#if !defined(DONT_USE_TRACE) 
+    hal_trace_puts(msg); 
+#endif
+}
+
+
+static void info_about_core_plus_led(void)
+{
+    char msg[256] =  {0};  
+    const char arcstrs[][32]= {"ARM CM3", "ARM CM4", "DSPIC", "NONE"};
+    const char famstrs[][32] = {"STM32F1", "STM32F2", "STM32F4", "STELLARIS", "DSPIC", "NONE"};
+    const char namstrs[][32] = {"STM32F103", "STM32F107", "STM32F207", "STM32F407", "DSPIC33", "NONE"};
+
+    hal_cpu_architecture_t  arc     = hal_cpu_architecture_get();
+    hal_cpu_family_t        fam     = hal_cpu_family_get();
+    hal_cpu_name_t          nam     = hal_cpu_name_get();
+    uint32_t cpuspeed               = hal_cpu_speed_get(hal_cpu_speedtype_cpu);
+    uint32_t fasspeed              = hal_cpu_speed_get(hal_cpu_speedtype_fastbus);
+    uint32_t slospeed               = hal_cpu_speed_get(hal_cpu_speedtype_slowbus);
+
+#if !defined(DONT_USE_TRACE)    
+    hal_trace_puts(" # HAL CORE is formed by modules BASE, CPU, FLASH, SYS");  
+
+
+
+    snprintf(msg, sizeof(msg)-1, " BASE: contains user defined functions for error handling and osal scheduling suspend / resume");
+    hal_trace_puts(msg); 
+
+    snprintf(msg, sizeof(msg)-1, " CPU: arch = %s, family = %s, name = %s, speed = %d mhz, fastbus = %d mhz, slowbus = %d mhz", 
+                                 arcstrs[arc], famstrs[fam], namstrs[nam], cpuspeed/1000000, fasspeed/1000000, slospeed/1000000);
+    hal_trace_puts(msg); 
+
+    
+    snprintf(msg, sizeof(msg)-1, " FLASH: baseaddress = 0x%x, size = %d kbytes used for both code and direct read/write operations", 
+                                 hal_flash_get_baseaddress(), hal_flash_get_totalsize()/1024);
+    hal_trace_puts(msg);     
+
+
+#ifdef HAL_USE_DEVICE_LED
+    char extra[64] = {"and blinks hal_led0 at 1 hz"};
+#else
+    char extra[64] = {"");    
+#endif 
+    snprintf(msg, sizeof(msg)-1, " SYS: stack size = %d kbytes, heap size = %d kbytes, systick callback was set at %d usec, can be seen on eventviewer %s", 
+                                 hal_sys_stack_get_totalsize()/1024, hal_sys_heap_get_totalsize()/1024, systickperiod, extra);
+    hal_trace_puts(msg);   
+
+    hal_trace_puts(""); 
+    hal_trace_puts(" # OTHER modules are:");  
+        
+    hal_trace_puts(" TRACE:             enabled and used (otherwise you would not read this print)");         
+        
+#ifdef HAL_USE_DEVICE_LED
+    hal_trace_puts(" DEVICE LED:        enabled and used");  
+#endif
+        
+    hal_trace_puts(" PLUS OTHERS");
+        
+#endif    
+    
+    
+    
+}
 
 // -- the tests ----
 
@@ -496,7 +620,7 @@ static void test_sys_delay(void)
 #ifdef  USE_EVENTVIEWER
      prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
 #endif  
-    hal_sys_delay(10);
+    hal_sys_delay(10*hal_RELTIME_1microsec);
 #ifdef  USE_EVENTVIEWER
     eventviewer_switch_to(prev); 
 #endif    
@@ -505,7 +629,7 @@ static void test_sys_delay(void)
 #ifdef  USE_EVENTVIEWER
     prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
 #endif  
-    hal_sys_delay(200);
+    hal_sys_delay(200*hal_RELTIME_1microsec);
 #ifdef  USE_EVENTVIEWER
     eventviewer_switch_to(prev); 
 #endif      
@@ -514,7 +638,7 @@ static void test_sys_delay(void)
 #ifdef  USE_EVENTVIEWER
     prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
 #endif  
-    hal_sys_delay(500);
+    hal_sys_delay(500*hal_RELTIME_1microsec);
 #ifdef  USE_EVENTVIEWER
     eventviewer_switch_to(prev); 
 #endif   
@@ -523,13 +647,42 @@ static void test_sys_delay(void)
 #ifdef  USE_EVENTVIEWER
     prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
 #endif  
-    hal_sys_delay(1000);
+    hal_sys_delay(hal_RELTIME_1millisec);
 #ifdef  USE_EVENTVIEWER
     eventviewer_switch_to(prev); 
 #endif  
 
-    hal_sys_irq_enable();
+#ifdef  USE_EVENTVIEWER
+    prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
+#endif  
+    hal_sys_delay(10*hal_RELTIME_1millisec);
+#ifdef  USE_EVENTVIEWER
+    eventviewer_switch_to(prev); 
+#endif 
 
+#ifdef  USE_EVENTVIEWER
+    prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
+#endif  
+    hal_sys_delay(100*hal_RELTIME_1millisec);
+#ifdef  USE_EVENTVIEWER
+    eventviewer_switch_to(prev); 
+#endif 
+
+#ifdef  USE_EVENTVIEWER
+    prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
+#endif  
+    hal_sys_delay(hal_RELTIME_1second);
+#ifdef  USE_EVENTVIEWER
+    eventviewer_switch_to(prev); 
+#endif 
+
+    hal_sys_irq_enable();
+    
+//     for(;;)
+//     {
+//                 leds_led2_toggle();
+//                 hal_sys_delay(500*1000);
+//     }        
     test_was_successful("sys-delay: ONLY IF the measures with eventviewer is OK");
 
 }    
@@ -537,6 +690,14 @@ static void test_sys_delay(void)
 #endif//defined(EXECUTE_TEST_SYS_DELAY)  
 
 
+#if     defined(EXECUTE_TEST_PERIPH_I2C)    
+static void test_periph_i2c(void)
+{
+    
+    test_is_beginning("i2c: if test eeprom is OK then i2c works fine. if test eeprom fails ... i2c may work or not");
+    
+}
+#endif//defined(EXECUTE_TEST_PERIPH_I2C)  
 
 
 #if     defined(EXECUTE_TEST_DEVICE_EEPROM)
@@ -606,15 +767,20 @@ static void test_timer_callback(void* p)
 #endif  
 
     test_timer_count++;
+    
+#if     defined(HAL_USE_DEVICE_LED)    
     if(0 == (test_timer_count%5))
     {
         hal_led_toggle(hal_led2);
     }
-
+#endif//defined(HAL_USE_DEVICE_LED)
+    
 #ifdef  USE_EVENTVIEWER
     eventviewer_switch_to(prev); 
 #endif
 }
+
+static const hal_timer_t haltimer_ontest = hal_timer6;
 
 static const hal_timer_cfg_t test_timer_config =
 {
@@ -637,15 +803,19 @@ static void test_periph_timer(void)
     // every time it ticks it increments a variable
     // i sleep 1050 ms and i count the variable: it must be 5.
 
-    hal_result_t res = hal_timer_init(hal_timer2, &test_timer_config, NULL);
+    hal_result_t res = hal_timer_init(haltimer_ontest, &test_timer_config, NULL);
     
-    res = hal_timer_start(hal_timer2);
+    res = hal_timer_start(haltimer_ontest);
     res = res;
+    if(hal_res_OK != res)
+    {
+        test_has_failed("timer: hal_timer_init() or hal_timer_start() failed");
+    }
     
 #ifdef  USE_EVENTVIEWER
     evEntityId_t prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
 #endif  
-    hal_sys_delay(1000*1000);
+    hal_sys_delay(hal_RELTIME_1second+50*hal_RELTIME_1millisec);
 #ifdef  USE_EVENTVIEWER
     eventviewer_switch_to(prev); 
 #endif  
@@ -654,7 +824,7 @@ static void test_periph_timer(void)
 
     if(5 == test_timer_count)
     {
-        test_was_successful("timer: however seems ok as there were 5 ticks of 200 ms within a hal_sys_delay(1000*1000)");
+        test_was_successful("timer: BUT IT IS SURELY OK because there were 5 ticks of 200 ms within a hal_sys_delay(1050*1000)");
     }
 
     
@@ -664,6 +834,105 @@ static void test_periph_timer(void)
 
 #endif//defined(EXECUTE_TEST_PERIPH_TIMER)
 
+
+#if     defined(EXECUTE_TEST_PERIPH_WATCHDOG)   
+
+#define WDT_NORMAL
+//#define WDT_WINDOW
+
+#ifdef WDT_NORMAL
+static const hal_watchdog_t wdtid = hal_watchdog1_normal; // hal_watchdog2_window 
+#define COUNTDOWN hal_RELTIME_1second //(40*hal_RELTIME_1millisec)
+#else
+static const hal_watchdog_t wdtid = hal_watchdog2_window; // hal_watchdog1_normal 
+#define COUNTDOWN (40*hal_RELTIME_1millisec)
+#endif
+
+
+
+
+static void wdtcallback(void* p)
+{
+    #define MAXREFRESHES_CALLBACK  10
+    static uint8_t num = 0;
+    num++;
+    if(num < MAXREFRESHES_CALLBACK)
+    {
+        hal_watchdog_refresh(wdtid);  
+        test_message("hal_watchdog2_window: refresh occurred inside the callback");        
+    }
+    else
+    {
+        test_message("hal_watchdog2_window: last callback did nort refresh and the system is about to restart");
+    }
+}
+
+static const hal_watchdog_cfg_t wdtconfig = 
+{
+    .countdown              = COUNTDOWN,
+    .priority               = hal_int_priority11,
+    .onwindowexpiry_cbk     = wdtcallback,
+    .onwindowexpiry_arg     = NULL   
+};
+
+static void test_periph_watchdog(void)
+{
+
+    test_is_beginning("watchdog: 1 sec wdt refreshed 10 times every 0.5 sec");
+    
+    
+    // init a watchdog timer of 1 second before reset. i refresh it 10 times only
+
+
+    hal_result_t res = hal_watchdog_init(wdtid, &wdtconfig);
+    
+    res = hal_watchdog_start(wdtid);
+    res = res;
+    if(hal_res_OK != res)
+    {
+        test_has_failed("watchdog: hal_watchdog_init() or hal_watchdog_start() failed");
+    }
+    
+    uint32_t i;
+    for(i=0; i<10; i++)
+    {
+        hal_sys_delay(500*hal_RELTIME_1millisec);
+        hal_watchdog_refresh(wdtid);
+    }
+    
+    test_message("hal_watchdog1_normal: last hal_watchdog_refresh() was called.");
+    
+    for(i=0;;i++)
+    {
+        char msg[128] =  {0};       
+        snprintf(msg, sizeof(msg)-1, "hal_watchdog1_normal: restart in .... %d millisec", COUNTDOWN/1000 - i*100);
+        hal_sys_delay(100*hal_RELTIME_1millisec);
+        test_message(msg);
+    }
+    
+    for(;;);
+        
+}
+#endif//defined(EXECUTE_TEST_PERIPH_WATCHDOG)   
+
+
+
+#if     defined(EXECUTE_TEST_PERIPH_UNIQUEID)    
+static void test_periph_uniqueid(void)
+{
+    test_is_beginning("unique id");
+    
+    hal_uniqueid_init(NULL);
+    
+    char msg[128] =  {0};       
+    snprintf(msg, sizeof(msg)-1, "hal_uniqueid_id64bit_t: its value is 0x%llx", hal_uniqueid_id64bit_get());
+    test_message(msg);
+
+    snprintf(msg, sizeof(msg)-1, "hal_uniqueid_macaddr_t: its value is 0x%llx", hal_uniqueid_macaddr_get());
+    test_message(msg);
+    
+}
+#endif//defined(EXECUTE_TEST_PERIPH_UNIQUEID)   
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
