@@ -69,12 +69,13 @@
     #define TIM1_IRQn           TIM1_UP_IRQn
     #define TIM1_IRQHandler     TIM1_UP_IRQHandler
     #define TIM6_IRQn           TIM6_IRQn
-    #define TIM6_IRQHandler     TIM6_DAC_IRQHandler
+    #define TIM6_IRQHandler     TIM6_IRQHandler
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)
     #define TIM1_IRQn           TIM1_UP_TIM10_IRQn
     #define TIM1_IRQHandler     TIM1_UP_TIM10_IRQHandler
     #define TIM6_IRQn           TIM6_DAC_IRQn
     #define TIM6_IRQHandler     TIM6_DAC_IRQHandler
+    #define TIM8_IRQHandler     TIM8_UP_TIM13_IRQHandler
 #else //defined(HAL_USE_CPU_FAM_*)
     #error ERR --> choose a HAL_USE_CPU_FAM_*
 #endif 
@@ -89,12 +90,40 @@
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+typedef enum 
+{
+    hal_timer_refspeed_cpu          = 0,
+    hal_timer_refspeed_fastbus      = 1,
+    hal_timer_refspeed_slowbus      = 2,
+    hal_timer_refspeed_none         = 255,
+} hal_timer_reference_speed_bus_t;
+
+
+#if     defined(HAL_USE_CPU_FAM_STM32F1) || defined(HAL_USE_CPU_FAM_STM32F4)    
+typedef enum
+{
+    hal_timer_stm32_periphclock_apb1    = 1,
+    hal_timer_stm32_periphclock_apb2    = 2,
+    hal_timer_stm32_periphclock_none    = 255
+} hal_timer_stm32_periphclock_t;
+#else //defined(HAL_USE_CPU_FAM_STM32F1) || defined(HAL_USE_CPU_FAM_STM32F4)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif 
+
 typedef struct
 {
-    TIM_TypeDef*        TIMx;
-    uint32_t            RCC_APB1Periph_TIMx;
-    IRQn_Type           TIMx_IRQn;
-} hal_timer_stm32_regs_t;
+    hal_timer_reference_speed_bus_t referencespeedbus;
+#if     defined(HAL_USE_CPU_FAM_STM32F1) || defined(HAL_USE_CPU_FAM_STM32F4)    
+    hal_timer_stm32_periphclock_t   periphclock;
+    TIM_TypeDef*                    TIMx;
+    uint32_t                        RCC_APBxPeriph_TIMx;
+    IRQn_Type                       TIMx_IRQn;
+#else //defined(HAL_USE_CPU_FAM_STM32F1) || defined(HAL_USE_CPU_FAM_STM32F4)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif    
+} hal_timer_cpufamily_regs_t;
+
+
 
 typedef struct
 {
@@ -108,7 +137,7 @@ typedef struct
 
 typedef struct
 {
-    hal_timer_internal_item_t*    items[hal_timers_num];   
+    hal_timer_internal_item_t*    items[hal_timers_number];   
 } hal_timer_theinternals_t;
 
 
@@ -116,17 +145,17 @@ typedef struct
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_timer_supported_is(hal_timer_t id);
+static hal_bool_t s_hal_timer_supported_is(hal_timer_t id);
 static void s_hal_timer_initted_set(hal_timer_t id);
-static hal_boolval_t s_hal_timer_initted_is(hal_timer_t id);
+static hal_bool_t s_hal_timer_initted_is(hal_timer_t id);
 
 static void s_hal_timer_status_set(hal_timer_t id, hal_timer_status_t status);
 static hal_timer_status_t s_hal_timer_status_get(hal_timer_t id);
 
-static void s_hal_timer_prepare(hal_timer_t id, const hal_timer_cfg_t *cfg);
+static hal_result_t s_hal_timer_prepare(hal_timer_t id, const hal_timer_cfg_t *cfg);
 
-static void s_hal_timer_stm32_start(hal_timer_t id);
-static void s_hal_timer_stm32_stop(hal_timer_t id);
+static void s_hal_timer_cpufamily_start(hal_timer_t id);
+static void s_hal_timer_cpufamily_stop(hal_timer_t id);
 
 
 
@@ -139,50 +168,107 @@ static void s_hal_timer_callback(hal_timer_t id);
 // - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const hal_timer_stm32_regs_t s_hal_timer_stm32regs[hal_timers_num] =
+#if     defined(HAL_USE_CPU_FAM_STM32F1) || defined(HAL_USE_CPU_FAM_STM32F4)
+static const hal_timer_cpufamily_regs_t s_hal_timer_cpufamily_regs[hal_timers_number] =
 {
-    {   // timer1   
+    {   // timer1         
+        .referencespeedbus      = hal_timer_refspeed_cpu, 
+        .periphclock            = hal_timer_stm32_periphclock_apb2,        
         .TIMx                   = TIM1,
-        .RCC_APB1Periph_TIMx    = RCC_APB2Periph_TIM1, 
-        .TIMx_IRQn              = TIM1_IRQn 
+        .RCC_APBxPeriph_TIMx    = RCC_APB2Periph_TIM1, 
+        .TIMx_IRQn              = TIM1_IRQn      
     },
-    {   // timer2   
+    {   // timer2  
+        .referencespeedbus      = hal_timer_refspeed_fastbus,
+        .periphclock            = hal_timer_stm32_periphclock_apb1,
         .TIMx                   = TIM2,
-        .RCC_APB1Periph_TIMx    = RCC_APB1Periph_TIM2, 
-        .TIMx_IRQn              = TIM2_IRQn 
+        .RCC_APBxPeriph_TIMx    = RCC_APB1Periph_TIM2, 
+        .TIMx_IRQn              = TIM2_IRQn     
     },
-    {   // timer3   
+    {   // timer3 
+        .referencespeedbus      = hal_timer_refspeed_fastbus, 
+        .periphclock            = hal_timer_stm32_periphclock_apb1,        
         .TIMx                   = TIM3,
-        .RCC_APB1Periph_TIMx    = RCC_APB1Periph_TIM3, 
+        .RCC_APBxPeriph_TIMx    = RCC_APB1Periph_TIM3, 
         .TIMx_IRQn              = TIM3_IRQn 
     },
     {   // timer4   
+        .referencespeedbus      = hal_timer_refspeed_fastbus,
+        .periphclock            = hal_timer_stm32_periphclock_apb1,  
         .TIMx                   = TIM4,
-        .RCC_APB1Periph_TIMx    = RCC_APB1Periph_TIM4, 
-        .TIMx_IRQn              = TIM4_IRQn 
+        .RCC_APBxPeriph_TIMx    = RCC_APB1Periph_TIM4, 
+        .TIMx_IRQn              = TIM4_IRQn
     },
     {   // timer5   
+        .referencespeedbus      = hal_timer_refspeed_fastbus,
+        .periphclock            = hal_timer_stm32_periphclock_apb1,
         .TIMx                   = TIM5,
-        .RCC_APB1Periph_TIMx    = RCC_APB1Periph_TIM5, 
+        .RCC_APBxPeriph_TIMx    = RCC_APB1Periph_TIM5, 
         .TIMx_IRQn              = TIM5_IRQn 
     },
-    {   // timer6   
+    {   // timer6          
+        .referencespeedbus      = hal_timer_refspeed_fastbus,
+        .periphclock            = hal_timer_stm32_periphclock_apb1,
         .TIMx                   = TIM6,
-        .RCC_APB1Periph_TIMx    = RCC_APB1Periph_TIM6, 
-        .TIMx_IRQn              = TIM6_IRQn 
+        .RCC_APBxPeriph_TIMx    = RCC_APB1Periph_TIM6, 
+        .TIMx_IRQn              = TIM6_IRQn         
     },
     {   // timer7   
+        .referencespeedbus      = hal_timer_refspeed_fastbus,
+        .periphclock            = hal_timer_stm32_periphclock_apb1,
         .TIMx                   = TIM7,
-        .RCC_APB1Periph_TIMx    = RCC_APB1Periph_TIM7, 
+        .RCC_APBxPeriph_TIMx    = RCC_APB1Periph_TIM7, 
         .TIMx_IRQn              = TIM7_IRQn 
     },
-    {   // timer8   
+    {   // timer8  
+#if     defined(HAL_USE_CPU_NAM_STM32F107)        
+        .referencespeedbus      = hal_timer_refspeed_none,
+        .periphclock            = hal_timer_stm32_periphclock_none,
         .TIMx                   = NULL,
-        .RCC_APB1Periph_TIMx    = 0, 
-        .TIMx_IRQn              = TIM7_IRQn // we use this value just to remove a warning raised by the compiler 
-    }
+        .RCC_APBxPeriph_TIMx    = 0, 
+        .TIMx_IRQn              = TIM7_IRQn  // we use this value just to remove a warning raised by the compiler
+#elif   defined(HAL_USE_CPU_NAM_STM32F407)
+        .referencespeedbus      = hal_timer_refspeed_cpu,
+        .periphclock            = hal_timer_stm32_periphclock_apb2,
+        .TIMx                   = TIM8,
+        .RCC_APBxPeriph_TIMx    = RCC_APB2Periph_TIM8, 
+        .TIMx_IRQn              = TIM8_UP_TIM13_IRQn 
+#else //defined(HAL_USE_CPU_NAM_STM32F407)
+    #error ERR --> choose a HAL_USE_CPU_NAM_*
+#endif
+    },
+    {   // timer9    
+        .referencespeedbus      = hal_timer_refspeed_none,
+        .periphclock            = hal_timer_stm32_periphclock_none,
+        .TIMx                   = NULL,
+        .RCC_APBxPeriph_TIMx    = 0, 
+        .TIMx_IRQn              = TIM7_IRQn  // we use this value just to remove a warning raised by the compiler
+    }, 
+    {   // timer10    
+        .referencespeedbus      = hal_timer_refspeed_none,
+        .periphclock            = hal_timer_stm32_periphclock_none,
+        .TIMx                   = NULL,
+        .RCC_APBxPeriph_TIMx    = 0, 
+        .TIMx_IRQn              = TIM7_IRQn  // we use this value just to remove a warning raised by the compiler
+    },  
+    {   // timer11    
+        .referencespeedbus      = hal_timer_refspeed_none,
+        .periphclock            = hal_timer_stm32_periphclock_none,
+        .TIMx                   = NULL,
+        .RCC_APBxPeriph_TIMx    = 0, 
+        .TIMx_IRQn              = TIM7_IRQn  // we use this value just to remove a warning raised by the compiler
+    },
+    {   // timer12    
+        .referencespeedbus      = hal_timer_refspeed_none,
+        .periphclock            = hal_timer_stm32_periphclock_none,
+        .TIMx                   = NULL,
+        .RCC_APBxPeriph_TIMx    = 0, 
+        .TIMx_IRQn              = TIM7_IRQn  // we use this value just to remove a warning raised by the compiler
+    }     
 };
-
+#else //defined(HAL_USE_CPU_FAM_STM32F1) || defined(HAL_USE_CPU_FAM_STM32F4)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -249,6 +335,7 @@ extern hal_result_t hal_timer_init(hal_timer_t id, const hal_timer_cfg_t *cfg, h
 
     // computes the values to be put in registers and compute the error in microsec
     s_hal_timer_prepare(id, cfg);
+    
 
     // marker: calculate error
     if(NULL != error)
@@ -283,7 +370,7 @@ extern hal_result_t hal_timer_start(hal_timer_t id)
     }
 
     s_hal_timer_status_set(id, hal_timer_status_running);
-    s_hal_timer_stm32_start(id); 
+    s_hal_timer_cpufamily_start(id); 
 
     return(hal_res_OK);
 }
@@ -303,7 +390,7 @@ extern hal_result_t hal_timer_stop(hal_timer_t id)
     }
     // marker: stop and set status
 
-    s_hal_timer_stm32_stop(id);
+    s_hal_timer_cpufamily_stop(id);
     s_hal_timer_status_set(id, hal_timer_status_idle);
 
     return(hal_res_OK);
@@ -388,7 +475,7 @@ extern hal_result_t hal_timer_interrupt_disable(hal_timer_t id)
 extern hal_result_t hal_timer_remainingtime_get(hal_timer_t id, hal_reltime_t *remaining_time)
 {
     hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer_id2index(id)];
-    TIM_TypeDef* TIMx               = s_hal_timer_stm32regs[HAL_timer_id2index(id)].TIMx;
+    TIM_TypeDef* TIMx               = s_hal_timer_cpufamily_regs[HAL_timer_id2index(id)].TIMx;
 
     if(hal_false == s_hal_timer_initted_is(id))
     {
@@ -434,6 +521,8 @@ extern hal_timer_status_t hal_timer_status_get(hal_timer_t id)
 // --------------------------------------------------------------------------------------------------------------------
 
 // ---- isr of the module: begin ----
+
+#if     defined(HAL_USE_CPU_FAM_STM32F1) || defined(HAL_USE_CPU_FAM_STM32F4)
 
 void TIM1_IRQHandler(void)
 {
@@ -486,6 +575,17 @@ void TIM7_IRQHandler(void)
     s_hal_timer_callback(hal_timer7);
 }
 
+void TIM8_IRQHandler(void)
+{
+    // Clear TIMx update interrupt 
+    TIM_ClearITPendingBit(TIM8, TIM_IT_Update);
+    s_hal_timer_callback(hal_timer8);
+}
+
+#else //defined(HAL_USE_CPU_FAM_STM32F1) || defined(HAL_USE_CPU_FAM_STM32F4)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif
+
 // ---- isr of the module: end ------
 
 
@@ -500,9 +600,14 @@ extern hal_result_t hal_timer_hid_static_memory_init(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_timer_supported_is(hal_timer_t id)
+static hal_bool_t s_hal_timer_supported_is(hal_timer_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_timer__theconfig.supported_mask, HAL_timer_id2index(id)));
+    if(hal_timer_refspeed_none == s_hal_timer_cpufamily_regs[HAL_timer_id2index(id)].referencespeedbus)
+    {
+            return(hal_false);
+    }
+    
+    return(hal_utility_bits_halfword_bitcheck(hal_brdcfg_timer__theconfig.supported_mask, HAL_timer_id2index(id)));
 }
 
 static void s_hal_timer_initted_set(hal_timer_t id)
@@ -510,7 +615,7 @@ static void s_hal_timer_initted_set(hal_timer_t id)
     s_hal_timer_status_set(id, hal_timer_status_idle);
 }
 
-static hal_boolval_t s_hal_timer_initted_is(hal_timer_t id)
+static hal_bool_t s_hal_timer_initted_is(hal_timer_t id)
 {
     return((hal_timer_status_none != s_hal_timer_status_get(id)) ? (hal_true) : (hal_false));
 }
@@ -526,12 +631,29 @@ static hal_timer_status_t s_hal_timer_status_get(hal_timer_t id)
     return( (NULL == intitem) ? (hal_timer_status_none) : (intitem->status) );
 }
 
-static void s_hal_timer_prepare(hal_timer_t id, const hal_timer_cfg_t *cfg)
+
+static hal_result_t s_hal_timer_prepare(hal_timer_t id, const hal_timer_cfg_t *cfg)
 {
     hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer_id2index(id)];
-    // we use SystemCoreClock instead of hal_brdcfg_sys__theconfig.speeds.cpu, which should be the same because ...
-    volatile uint32_t referencespeed = SystemCoreClock;  
+    // we use SystemCoreClock instead of hal_brdcfg_cpu__theconfig.speeds.fastbus, which should be the same because ...
+    //volatile uint32_t referencespeed = hal_brdcfg_cpu__theconfig.speeds.fastbus;  
+    hal_timer_reference_speed_bus_t referencespeedbus = s_hal_timer_cpufamily_regs[HAL_timer_id2index(id)].referencespeedbus;   
+    volatile uint32_t referencespeed = 0; 
 
+    switch(referencespeedbus)
+    {
+        case hal_timer_refspeed_slowbus:    { referencespeed = hal_brdcfg_cpu__theconfig.speeds.slowbus;    } break;
+        case hal_timer_refspeed_fastbus:    { referencespeed = hal_brdcfg_cpu__theconfig.speeds.fastbus;    } break;
+        case hal_timer_refspeed_cpu:        { referencespeed = hal_brdcfg_cpu__theconfig.speeds.cpu;        } break;
+        default:                            { referencespeed = 0;                                           } break;
+    } 
+    
+    if(0 == referencespeed)
+    {
+        return(hal_res_NOK_unsupported);
+    }
+
+    
     memcpy(&intitem->config, cfg, sizeof(hal_timer_cfg_t));
 
     // use prescaler = ((referencespeed/a/1000) )
@@ -544,7 +666,7 @@ static void s_hal_timer_prepare(hal_timer_t id, const hal_timer_cfg_t *cfg)
             intitem->config.countdown = 64000*100; // tick is 100
         }
 
-        intitem->prescaler   = ((referencespeed/10/1000) );  // a is 10. the value is 7200: ok, lower than 65k
+        intitem->prescaler   = ((referencespeed/10/1000) );  // a is 10. the value is 7200 (for stm332f1): ok, lower than 65k
         intitem->period      = intitem->config.countdown / 100; // tick is 100
         intitem->tick_ns     = 100*1000; // tick is 100
 
@@ -585,23 +707,36 @@ static void s_hal_timer_prepare(hal_timer_t id, const hal_timer_cfg_t *cfg)
         intitem->period      = intitem->config.countdown * 8; // tick is 0.125
         intitem->tick_ns     = 125; // tick is 0.125 micro
     }
-
+    
+    return(hal_res_OK);
 
 }
 
-static void s_hal_timer_stm32_start(hal_timer_t id)
+
+
+static void s_hal_timer_cpufamily_start(hal_timer_t id)
 {
+#if     defined(HAL_USE_CPU_FAM_STM32F1) || defined(HAL_USE_CPU_FAM_STM32F4)
+    
     hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer_id2index(id)];
-    TIM_TypeDef* TIMx               = s_hal_timer_stm32regs[HAL_timer_id2index(id)].TIMx;
-    uint32_t RCC_APB1Periph_TIMx    = s_hal_timer_stm32regs[HAL_timer_id2index(id)].RCC_APB1Periph_TIMx;
-    IRQn_Type TIMx_IRQn             = s_hal_timer_stm32regs[HAL_timer_id2index(id)].TIMx_IRQn;
+    TIM_TypeDef* TIMx               = s_hal_timer_cpufamily_regs[HAL_timer_id2index(id)].TIMx;
+    uint32_t RCC_APBxPeriph_TIMx    = s_hal_timer_cpufamily_regs[HAL_timer_id2index(id)].RCC_APBxPeriph_TIMx;
+    IRQn_Type TIMx_IRQn             = s_hal_timer_cpufamily_regs[HAL_timer_id2index(id)].TIMx_IRQn;
+    hal_timer_stm32_periphclock_t periphclock = s_hal_timer_cpufamily_regs[HAL_timer_id2index(id)].periphclock;
     TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
    // NVIC_InitTypeDef NVIC_InitStructure;
    
 
 
     // Enable TIMx clock 
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIMx, ENABLE);
+    if(hal_timer_stm32_periphclock_apb1 == periphclock)
+    {
+        RCC_APB1PeriphClockCmd(RCC_APBxPeriph_TIMx, ENABLE);
+    }
+    else if(hal_timer_stm32_periphclock_apb2 == periphclock)
+    {
+        RCC_APB2PeriphClockCmd(RCC_APBxPeriph_TIMx, ENABLE);
+    }
 
     // registers of TIMx
 
@@ -617,7 +752,7 @@ static void s_hal_timer_stm32_start(hal_timer_t id)
     //* enable counter 
     TIM_Cmd(TIMx, ENABLE);
 
-    // Immediate load of  Precaler value */
+    // Immediate load of  Prescaler value */
     TIM_PrescalerConfig(TIMx, intitem->prescaler - 1, TIM_PSCReloadMode_Immediate);
     //TIM_PrescalerConfig(TIMx, intitem->prescaler - 1, TIM_PSCReloadMode_Update);
     
@@ -634,18 +769,26 @@ static void s_hal_timer_stm32_start(hal_timer_t id)
         hal_sys_irqn_priority_set(TIMx_IRQn, intitem->config.priority);
         hal_sys_irqn_enable(TIMx_IRQn);
     }
+    
+#else //defined(HAL_USE_CPU_FAM_STM32F1) || defined(HAL_USE_CPU_FAM_STM32F4)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#endif    
 }
 
-static void s_hal_timer_stm32_stop(hal_timer_t id)
+static void s_hal_timer_cpufamily_stop(hal_timer_t id)
 {
+#if     defined(HAL_USE_CPU_FAM_STM32F1) || defined(HAL_USE_CPU_FAM_STM32F4)
+    
     hal_timer_internal_item_t *intitem = s_hal_timer_theinternals.items[HAL_timer_id2index(id)];
 //    NVIC_InitTypeDef NVIC_InitStructure;
-    TIM_TypeDef* TIMx               = s_hal_timer_stm32regs[HAL_timer_id2index(id)].TIMx;
-//    uint32_t RCC_APB1Periph_TIMx    = s_hal_timer_stm32regs[HAL_timer_id2index(id)].RCC_APB1Periph_TIMx;
-    IRQn_Type TIMx_IRQn             = s_hal_timer_stm32regs[HAL_timer_id2index(id)].TIMx_IRQn;
-   
-
-#if 1
+    TIM_TypeDef* TIMx               = s_hal_timer_cpufamily_regs[HAL_timer_id2index(id)].TIMx;
+//    uint32_t RCC_APBxPeriph_TIMx    = s_hal_timer_cpufamily_regs[HAL_timer_id2index(id)].RCC_APBxPeriph_TIMx;
+    IRQn_Type TIMx_IRQn             = s_hal_timer_cpufamily_regs[HAL_timer_id2index(id)].TIMx_IRQn;
+//    hal_timer_reference_speed_bus_t referencespeedbus = s_hal_timer_cpufamily_regs[HAL_timer_id2index(id)].referencespeedbus;
+  
+    
+#define TIMER_USE_IT
+#if     defined(TIMER_USE_IT)
 
     TIM_DeInit(TIMx);
     TIM_Cmd(TIMx, DISABLE);
@@ -658,8 +801,15 @@ static void s_hal_timer_stm32_stop(hal_timer_t id)
 
 #else
 
-    // Enable TIMx clock 
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIMx, DISABLE);
+    // disable TIMx clock 
+    if(hal_timer_stm32_periphclock_apb1 == periphclock)
+    {
+        RCC_APB1PeriphClockCmd(RCC_APBxPeriph_TIMx, DISABLE);
+    }
+    else if(hal_timer_stm32_periphclock_apb2 == periphclock)
+    {
+        RCC_APB2PeriphClockCmd(RCC_APBxPeriph_TIMx, DISABLE);
+    }
 
     // register of TIMx
  
@@ -696,8 +846,15 @@ static void s_hal_timer_stm32_stop(hal_timer_t id)
     NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
     NVIC_Init(&NVIC_InitStructure);
 
+#endif//defined(TIMER_USE_IT)
+
+
+#else //defined(HAL_USE_CPU_FAM_STM32F1) || defined(HAL_USE_CPU_FAM_STM32F4)
+    #error ERR --> choose a HAL_USE_CPU_FAM_*
 #endif
 }
+
+
 
 //
 //
@@ -793,7 +950,7 @@ static void s_hal_timer_callback(hal_timer_t id)
     if(hal_timer_mode_oneshot == intitem->config.mode)
     {
         // stop timer 
-        s_hal_timer_stm32_stop(id);
+        s_hal_timer_cpufamily_stop(id);
               
         s_hal_timer_status_set(id, hal_timer_status_expired);
     }

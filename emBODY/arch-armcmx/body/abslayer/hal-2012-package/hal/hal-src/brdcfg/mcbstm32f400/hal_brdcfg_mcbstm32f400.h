@@ -37,8 +37,10 @@
 #include "hal_base_hid.h"
 
 #include "hal_cpu.h"
-#include "hal_cpu_arc_armcm3.h"
-#include "hal_cpu_fam_stm32f1.h"
+#include "hal_cpu_arc_armcmx.h"
+#include "hal_cpu_arc_armcm4.h"
+#include "hal_cpu_fam_stm32f4.h"
+#include "hal_cpu_nam_stm32f407.h"
 #include "hal_cpu_hid.h"
 
 #include "hal_sys.h"

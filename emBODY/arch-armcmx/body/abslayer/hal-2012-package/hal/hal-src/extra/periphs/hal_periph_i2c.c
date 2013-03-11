@@ -796,6 +796,7 @@ static void s_hal_i2c_hw_gpio_init(hal_i2c_t id)
    
     hal_gpio_altcfg_t hal_i2c_scl_altcfg;
     hal_gpio_altcfg_t hal_i2c_sda_altcfg;
+    hal_gpio_cfg_t config;
     
     // prepare the altcfg for scl and sda pins
     memcpy(&hal_i2c_scl_altcfg, &s_hal_i2c_sclsda_altcfg, sizeof(hal_gpio_altcfg_t));
@@ -804,8 +805,13 @@ static void s_hal_i2c_hw_gpio_init(hal_i2c_t id)
     hal_i2c_scl_altcfg.afmode = hal_i2c_sda_altcfg.afmode = afmode;
     
     // configure scl and sda pins
-    hal_gpio_configure(hal_brdcfg_i2c__theconfig.gpio_scl[HAL_i2c_id2index(id)], &hal_i2c_scl_altcfg);    
-    hal_gpio_configure(hal_brdcfg_i2c__theconfig.gpio_sda[HAL_i2c_id2index(id)], &hal_i2c_sda_altcfg);    
+    memcpy(&config, &hal_brdcfg_i2c__theconfig.gpio_scl[HAL_i2c_id2index(id)].config, sizeof(hal_gpio_cfg_t));
+    config.altcfg = &hal_i2c_scl_altcfg;
+    hal_gpio_init(hal_brdcfg_i2c__theconfig.gpio_scl[HAL_i2c_id2index(id)].gpio, &config);  
+
+    memcpy(&config, &hal_brdcfg_i2c__theconfig.gpio_sda[HAL_i2c_id2index(id)].config, sizeof(hal_gpio_cfg_t));
+    config.altcfg = &hal_i2c_sda_altcfg;    
+    hal_gpio_init(hal_brdcfg_i2c__theconfig.gpio_sda[HAL_i2c_id2index(id)].gpio, &config);    
 
     
 #else //defined(HAL_USE_CPU_FAM_*)

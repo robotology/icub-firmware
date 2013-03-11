@@ -167,13 +167,13 @@ extern hal_result_t hal_watchdog_init(hal_watchdog_t id, const hal_watchdog_cfg_
         case hal_watchdog1_normal:
         {
             memcpy(&intitem->cfg, cfg, sizeof(hal_watchdog_cfg_t));
-            if(intitem->cfg.countdown > 10000000)
+            if(intitem->cfg.countdown > 10*hal_RELTIME_1second)
             {
-                intitem->cfg.countdown = 10000000;
+                intitem->cfg.countdown = 10*hal_RELTIME_1second;
             }
-            else if(intitem->cfg.countdown < 10000)
+            else if(intitem->cfg.countdown < 10*hal_RELTIME_1millisec)
             {
-                intitem->cfg.countdown = 10000;
+                intitem->cfg.countdown = 10*hal_RELTIME_1millisec;
             }
         
             intitem->reload = (intitem->cfg.countdown / 3200);        
@@ -184,13 +184,13 @@ extern hal_result_t hal_watchdog_init(hal_watchdog_t id, const hal_watchdog_cfg_
         case hal_watchdog2_window:
         {
             memcpy(&intitem->cfg, cfg, sizeof(hal_watchdog_cfg_t));
-            if(intitem->cfg.countdown > 50000)
+            if(intitem->cfg.countdown > 50*hal_RELTIME_1millisec)
             {
-                intitem->cfg.countdown = 50000;
+                intitem->cfg.countdown = 50*hal_RELTIME_1millisec;
             }
-            else if(intitem->cfg.countdown < 5000)
+            else if(intitem->cfg.countdown < 5*hal_RELTIME_1millisec)
             {
-                intitem->cfg.countdown = 5000;
+                intitem->cfg.countdown = 5*hal_RELTIME_1millisec;
             }
         
             intitem->reload = 64 + ((intitem->cfg.countdown+910) / 910);        

@@ -185,6 +185,16 @@ extern hal_result_t hal_sys_init(const hal_sys_cfg_t* cfg)
     return(hal_res_OK);   
 }
 
+extern uint32_t hal_sys_stack_get_totalsize(void)
+{
+    return(hal_sys_getstacksize());   
+}
+
+
+extern uint32_t hal_sys_heap_get_totalsize(void)
+{
+    return(hal_sys_getheapsize());   
+}
 
 
 uint8_t hal_sys_howmanyARMv7ops(void)
@@ -320,7 +330,7 @@ extern hal_result_t hal_sys_systick_sethandler(void (*systickhandler)(void), hal
     r = SysTick_Config(SystemCoreClock / tickinsec);
 
 
-    hal_sys_irqn_priority_set(hal_cpu_arc_armcm3_SysTick_IRQn, priority);
+    hal_sys_irqn_priority_set(hal_cpu_arc_armcmx_SysTick_IRQn, priority);
 
 
     return((0==r) ? (hal_res_OK) : (hal_res_NOK_generic));

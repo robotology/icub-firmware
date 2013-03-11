@@ -294,8 +294,8 @@
             0xffff,     // port e
             0xffff,     // port f
             0xffff,     // port g
-            0x0000,     // port h
-            0x0000      // port i
+            0xffff,     // port h
+            0xffff      // port i
         }
     };
 #endif//HAL_USE_PERIPH_GPIO
@@ -395,7 +395,7 @@
 #ifdef  HAL_USE_PERIPH_TIMER
     extern const hal_timer_hid_brdcfg_t hal_brdcfg_timer__theconfig =
     {
-        .supported_mask     = (0 << hal_timer1) | (1 << hal_timer2) | (1 << hal_timer3) | (1 << hal_timer4) | (1 << hal_timer5) | (1 << hal_timer6) | (1 << hal_timer7)
+        .supported_mask     = (1 << hal_timer1) | (1 << hal_timer2) | (1 << hal_timer3) | (1 << hal_timer4) | (1 << hal_timer5) | (1 << hal_timer6) | (1 << hal_timer7) | (1 << hal_timer8)
     };       
 #endif//HAL_USE_PERIPH_TIMER
 
