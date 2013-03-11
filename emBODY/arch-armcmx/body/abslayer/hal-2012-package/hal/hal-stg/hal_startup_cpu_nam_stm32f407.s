@@ -52,7 +52,7 @@
 
 ; in case of error from assembler, you surely forgot --cpreproc in menu asm-options/misc-controls
 ; or may also to include it into asm path in menu asm-options/include-paths
-#include "hal_cfg.h"
+#include "hal_core_cfg.h"
     
 
 ;Stack_Size      EQU     0x00000400
