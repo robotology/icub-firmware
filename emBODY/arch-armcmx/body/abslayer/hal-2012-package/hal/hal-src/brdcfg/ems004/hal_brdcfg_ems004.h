@@ -130,9 +130,9 @@
     #include "hal_device_led_hid.h"
 #endif//HAL_USE_DEVICE_LED
 
-//#ifdef  HAL_USE_DEVICE_SWITCH
-//    #include "hal_device_switch_hid.h" 
-//#endif//HAL_USE_DEVICE_SWITCH
+#ifdef  HAL_USE_DEVICE_SWITCH
+    #include "hal_device_switch_hid.h"
+#endif//HAL_USE_DEVICE_SWITCH
  
 #ifdef  HAL_USE_DEVICE_TERMOMETER
     #include "hal_device_termometer_hid.h" 
@@ -261,7 +261,7 @@
 #endif//HAL_USE_DEVICE_MUX 
 
 #ifdef HAL_USE_DEVICE_SWITCH
-   extern const hal_device_switch_hid_brdcfg_t hal_brdcfg_device_switch__theconfig 
+   extern const hal_device_switch_hid_brdcfg_t hal_brdcfg_device_switch__theconfig; 
 #endif//HAL_USE_DEVICE_SWITCH
 
 #ifdef  HAL_USE_DEVICE_TERMOMETER

@@ -29,7 +29,7 @@
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
-#include "hal_middleware_interface.h"
+//#include "hal_middleware_interface.h"
 #include "hal_base.h"
 
 

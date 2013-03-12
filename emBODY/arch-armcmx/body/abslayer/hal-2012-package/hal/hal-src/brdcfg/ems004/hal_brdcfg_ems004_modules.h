@@ -32,7 +32,7 @@
 
 // - modules to be built ----------------------------------------------------------------------------------------------
 
-#define     HAL_BUILD_ONLYCORE
+//#define     HAL_BUILD_ONLYCORE
 //#define     HAL_BUILD_ONLYBLINKY
 
 
@@ -64,7 +64,7 @@
 #undef     HAL_USE_PERIPH_CAN
 #undef     HAL_USE_PERIPH_CRC
 #undef     HAL_USE_PERIPH_DMA
-#undef     HAL_USE_PERIPH_ETH
+#define     HAL_USE_PERIPH_ETH
 #define     HAL_USE_PERIPH_GPIO
 #define     HAL_USE_PERIPH_I2C
 #undef     HAL_USE_PERIPH_SPI
@@ -79,19 +79,19 @@
 #undef  HAL_USE_DEVICE_DISPLAY  
 #define     HAL_USE_DEVICE_EEPROM
 #undef  HAL_USE_DEVICE_ENCODER
-#undef     HAL_USE_DEVICE_ETHTRANSCEIVER
+#define     HAL_USE_DEVICE_ETHTRANSCEIVER
 #undef  HAL_USE_DEVICE_GYROSCOPE
 #define     HAL_USE_DEVICE_LED
 #undef     HAL_USE_DEVICE_MUX
-#undef  HAL_USE_DEVICE_SWITCH
+#define HAL_USE_DEVICE_SWITCH
 #undef  HAL_USE_DEVICE_TERMOMETER
 
 
 // -- chips: define what you need to use
-#undef     HAL_USE_CHIP_GENERIC_ETHTRANSCEIVER
+#define     HAL_USE_CHIP_GENERIC_ETHTRANSCEIVER
 #undef     HAL_USE_CHIP_ST_L3G4200D
 #undef     HAL_USE_CHIP_ST_LIS3DH
-#undef  HAL_USE_CHIP_MICREL_KS8893
+#define  HAL_USE_CHIP_MICREL_KS8893
 #define     HAL_USE_CHIP_XX_EEPROM
 
 // -- external boards: define what you need to use

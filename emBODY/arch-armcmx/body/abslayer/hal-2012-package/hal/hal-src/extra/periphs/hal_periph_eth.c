@@ -491,13 +491,17 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     {
         return(hal_res_NOK_generic);
     }
+    
+    #warning WIP --> make ipal use a cfg w/ capacityoftxfifoofframes and capacityofrxfifoofframes
+    uint8_t capacityoftxfifoofframes = 1;   // cfg->capacityoftxfifoofframes
+    uint8_t capacityofrxfifoofframes = 2;   // cfg->capacityofrxfifoofframes
 
 
     if((NULL == cfg) || (hal_int_priorityNONE == cfg->priority) || (NULL == cfg->onframerx) || (NULL == cfg->onframerx->frame_new) || (NULL == cfg->onframerx->frame_movetohigherlayer) || (NULL == cfg->macaddress))
     {
         hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() needs a cfg w/ functions and mac addr and valid priority");
     }
-    else if( (0 == cfg->capacityoftxfifoofframes) || (0 == cfg->capacityofrxfifoofframes))
+    else if( (0 == capacityoftxfifoofframes) || (0 == capacityofrxfifoofframes))
     {
         hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() needs a cfg w/ non-zero tx and rx queue");
     }
@@ -509,13 +513,14 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     }
     
     memcpy(&intitem->config, cfg, sizeof(hal_eth_cfg_t));
+    intitem->config.capacityoftxfifoofframes = capacityoftxfifoofframes;
+    intitem->config.capacityofrxfifoofframes = capacityofrxfifoofframes;
+    
     memcpy(&intitem->onframerx, cfg->onframerx, sizeof(hal_eth_onframereception_t));
     
     
     // give ram to the dma descriptors
     
-    uint8_t capacityoftxfifoofframes = intitem->config.capacityoftxfifoofframes;
-    uint8_t capacityofrxfifoofframes = intitem->config.capacityofrxfifoofframes;
     
     
     if((0 == capacityoftxfifoofframes) || (0 == capacityofrxfifoofframes))

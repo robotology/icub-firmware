@@ -61,6 +61,7 @@
 #include "hal_device_ethtransceiver_hid.h"
 
 #include "hal_chip_xx_eeprom_hid.h"
+#include "hal_chip_micrel_ks8893_hid.h"
 #include "hal_chip_st_l3g4200d_hid.h"
 #include "hal_chip_st_lis3dh_hid.h"
 #include "hal_chip_generic_ethtransceiver_hid.h"
@@ -647,6 +648,7 @@
   
 
 #ifdef HAL_USE_DEVICE_ETHTRANSCEIVER
+    extern const hal_chip_micrel_ks8893_cfg_t s_micrel_ks8893_cfg;
     extern const hal_device_ethtransceiver_hid_brdcfg_t hal_brdcfg_device_ethtransceiver__theconfig =
     {
         .supported      = hal_true,
