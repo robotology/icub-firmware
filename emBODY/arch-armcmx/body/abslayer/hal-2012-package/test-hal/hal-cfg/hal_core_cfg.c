@@ -81,13 +81,14 @@ void SysTick_Handler(void)
     }
 }
 
-
+#include "hal_trace.h"
 static void s_hal_core_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char * errormsg)
 {
     errorcode = errorcode;
     if(NULL != errormsg)
     {
 //        hal_display_putstring(4, (uint8_t*)errormsg);
+        hal_trace_puts(errormsg);
     }
 
     for(;;);
