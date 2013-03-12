@@ -32,18 +32,18 @@
 #include "hal_brdcfg_modules.h"
 #include "hal_brdcfg.h"
 
-#include "hal_switch.h"
-#include "hal_led.h"
-#include "hal_spi.h"
+//#include "hal_switch.h"
+//#include "hal_led.h"
+//#include "hal_spi.h"
 
-#include "hal_crc.h"
+//#include "hal_crc.h"
 
-#include "hal_termometer.h"
-#include "hal_gyroscope.h"
-#include "hal_accelerometer.h"
+// #include "hal_termometer.h"
+// #include "hal_gyroscope.h"
+// #include "hal_accelerometer.h"
 
-#include "hal_utility_fifo.h"
-#include "hal_utility_crc07.h"
+// #include "hal_utility_fifo.h"
+// #include "hal_utility_crc07.h"
 
 
 
@@ -90,6 +90,17 @@
 
 //#undef EXECUTE_TEST_PERIPH_UNIQUEID
 #define EXECUTE_TEST_PERIPH_UNIQUEID
+
+
+//#undef EXECUTE_TEST_PERIPH_ETH
+#define EXECUTE_TEST_PERIPH_ETH
+
+
+#ifdef EXECUTE_TEST_PERIPH_ETH
+#define EXECUTE_TEST_PERIPH_ETH_PING
+#define EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY
+//#define EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -161,15 +172,20 @@ static void test_periph_uniqueid(void);
 #endif//defined(EXECUTE_TEST_PERIPH_UNIQUEID)   
 
 
+#if     defined(EXECUTE_TEST_PERIPH_ETH)    
+static void test_periph_eth(void);
+#endif//defined(EXECUTE_TEST_PERIPH_ETH)   
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
 static const hal_reltime_t systickperiod = hal_RELTIME_1millisec;
 static volatile uint32_t msTicks = 0;
-static volatile uint8_t s_tick = 0;
+static volatile uint8_t s_tick_ipal = 0;
 
 static volatile uint32_t led0_blink_rate_ms = 500;
+static const uint32_t ipal_tick_rate_ms = 100;
 
 
 
@@ -306,7 +322,16 @@ int main(void)
 
 #if     defined(EXECUTE_TEST_PERIPH_UNIQUEID)    
     test_periph_uniqueid();
-#endif//defined(EXECUTE_TEST_PERIPH_UNIQUEID)   
+#endif//defined(EXECUTE_TEST_PERIPH_UNIQUEID)  
+
+
+
+
+// keep it last, as it contains a forever loop
+
+#if     defined(EXECUTE_TEST_PERIPH_ETH)    
+    test_periph_eth();
+#endif//defined(EXECUTE_TEST_PERIPH_ETH)
      
  
     test_message("");
@@ -381,6 +406,12 @@ static void leds_init(void)
     leds_led2_toggle();
     leds_led2_toggle();
     
+    res = hal_led_init(hal_led3, NULL);
+    res =  res;
+    
+    res = hal_led_init(hal_led4, NULL);
+    res =  res;
+    
 
 // #ifdef  USE_EVENTVIEWER
 //     evEntityId_t prev = eventviewer_switch_to(ev_ID_first_usrdef+1);
@@ -448,9 +479,9 @@ extern void onsystick(void)
         leds_led1_toggle();
     }
     
-    if(0 == (msTicks%100))
+    if(0 == (msTicks % ipal_tick_rate_ms))
     {
-        s_tick = 1;
+        s_tick_ipal = 1;
     }
     
     if(10000 == msTicks)
@@ -935,6 +966,219 @@ static void test_periph_uniqueid(void)
     
 }
 #endif//defined(EXECUTE_TEST_PERIPH_UNIQUEID)   
+
+
+#if     defined(EXECUTE_TEST_PERIPH_ETH)    
+#include "../../../../../sys/abs/api/ipal.h"
+static uint8_t s_blink_ipal_led3 = 0;
+static uint8_t s_blink_ipal_led4 = 0;
+static uint8_t s_reply_udp_msg = 0;
+static uint16_t udpport = 12345;
+static uint8_t udpmsgback[4] = {0};
+static ipal_udpsocket_t* s_udpskt = NULL;
+static ipal_ipv4addr_t ipaddr_remote_host = 0;
+static void test_periph_eth_tick_ipal(void) 
+{
+    static uint32_t tt = 0;
+    if(1 == s_tick_ipal) 
+    {
+        s_tick_ipal = 0;
+        ipal_sys_timetick_increment();
+        if(++tt == 5)
+        {
+            s_blink_ipal_led3 = 1;
+            tt = 0;
+        }
+    }
+}
+
+#if     defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY)   
+static void s_udp_onreception(void *arg, ipal_udpsocket_t *skt, ipal_packet_t *pkt, ipal_ipv4addr_t adr, ipal_port_t por)
+{
+    char msg[128] =  {0};
+    uint8_t *remip = (uint8_t*)&ipaddr_remote_host;
+    
+    s_reply_udp_msg = 1;
+    s_blink_ipal_led4 = 1;
+    
+    memcpy(udpmsgback, pkt->data, sizeof(udpmsgback));
+    ipaddr_remote_host = adr;
+
+    skt = skt;
+    pkt = pkt;
+    adr = adr;
+    por = por;
+    
+    snprintf(msg, sizeof(msg)-1, "eth: received a pkt of size %d from remote host %d.%d.%d.%d:%d", 
+                                  pkt->size, remip[0], remip[1], remip[2], remip[3], por);
+    hal_trace_puts(msg);    
+
+}
+static void test_periph_eth_udp_init(void)
+{
+    char msg[128] =  {0};
+    ipal_result_t res;
+    
+    ipal_tos_t tos = 
+    {
+        .precedence         = ipal_prec_immediate,
+        .lowdelay           = 1,
+        .highthroughput     = 1,
+        .highreliability    = 1,
+        .unused             = 0
+    };
+
+    s_udpskt = ipal_udpsocket_new(tos);
+    res = ipal_udpsocket_bind(s_udpskt, IPAL_ipv4addr_INADDR_ANY, udpport);
+    res = res;
+
+    res = ipal_udpsocket_recv(s_udpskt, s_udp_onreception, NULL);
+    res = res;
+    
+    if(ipal_res_OK == res)
+    {
+        snprintf(msg, sizeof(msg)-1, "eth: succesfully opened a listening udp socket on port %d", udpport);
+    }
+    else
+    {
+        snprintf(msg, sizeof(msg)-1, "eth: failed to open a listening udp socket on port %d", udpport);
+    }
+    hal_trace_puts(msg);    
+}
+#endif//defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY) 
+
+#if     defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY)    
+static void test_periph_eth_udp_reply(void)
+{
+    char msg[128] =  {0};
+    static ipal_result_t res;
+    //static uint8_t data[8] = {8};
+    static uint8_t arped = 0;
+    static ipal_packet_t pkt;
+    static uint8_t num = 0;
+    uint8_t *remip = (uint8_t*)&ipaddr_remote_host;
+
+    pkt.data = (uint8_t*)&udpmsgback;
+    pkt.size = 4;
+
+    static ipal_ipv4addr_t arped_ipv4addr = 1;
+
+    if(ipaddr_remote_host != arped_ipv4addr)
+    {
+        arped = 0;
+    }
+
+    if(0 == arped)
+    {
+        snprintf(msg, sizeof(msg)-1, "eth: arp requested to remote host %d.%d.%d.%d", 
+                                      remip[0], remip[1], remip[2], remip[3]);
+        hal_trace_puts(msg);
+        if(ipal_res_OK == ipal_arp_request(ipaddr_remote_host, ipal_arp_cache_permanently))
+        {
+            arped = 1;
+            arped_ipv4addr = ipaddr_remote_host;
+            snprintf(msg, sizeof(msg)-1, "eth: remote host %d.%d.%d.%d is arped", 
+                              remip[0], remip[1], remip[2], remip[3]);
+            hal_trace_puts(msg);
+        }        
+    }
+    
+    if(1 == arped)
+    {
+        num++;
+        snprintf(msg, sizeof(msg)-1, "eth: transmitted a packet with data = {0x%x, 0x%x, 0x%x, 0x%x} to remote host %d.%d.%d.%d:%d", 
+                                        pkt.data[0], pkt.data[1], pkt.data[2], pkt.data[3], 
+                                        remip[0], remip[1], remip[2], remip[3], udpport);
+                                        
+        hal_trace_puts(msg);
+        res = ipal_udpsocket_sendto(s_udpskt, &pkt, ipaddr_remote_host, udpport);
+        res = res;
+    }
+    
+    
+    
+}
+#endif//defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY) 
+
+static void test_periph_eth(void)
+{    
+    
+#if defined(EXECUTE_TEST_PERIPH_ETH_PING)||defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY)    
+    
+    test_is_beginning("eth");   
+    char msg[128] =  {0};
+
+    // 1. init and start ipal    
+    extern const ipal_cfg_t*    ipal_cfgMINE;
+    const uint8_t *ipaddr = (const uint8_t*)&ipal_cfgMINE->eth_ip;
+    uint32_t size04aligned;
+    uint32_t *data32aligned = NULL;    
+    ipal_base_memory_getsize(ipal_cfgMINE, &size04aligned);
+    if(0 != size04aligned)
+    {
+        data32aligned = (uint32_t*)calloc(size04aligned/4, sizeof(uint32_t));   
+    }    
+    ipal_base_initialise(ipal_cfgMINE, data32aligned);
+    ipal_sys_start(); 
+    
+       
+    
+#if     defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY)    
+    test_periph_eth_udp_init();
+#endif//defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY) 
+    
+    
+#if     !defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY)    
+    snprintf(msg, sizeof(msg)-1, "eth: successful if led3 blinks at 1Hz and the board responds to ping to %d.%d.%d.%d", 
+                                 ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]);
+    
+    test_message(msg);
+#else
+    snprintf(msg, sizeof(msg)-1, "eth: successful if led3 blinks at 1Hz, the board responds to ping to %d.%d.%d.%d,", 
+                                 ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]);
+    
+    test_message(msg);
+    snprintf(msg, sizeof(msg)-1, "     and if a small udp packet to port %d is replied w/ its first 4 bytes", udpport);
+    
+    test_message(msg);
+#endif//!defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY) 
+    
+    // 2. run ipal
+    for(;;)
+    {
+
+        test_periph_eth_tick_ipal();
+        ipal_sys_process_communication();
+        
+#if     defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY)    
+        if(1 == s_reply_udp_msg)
+        {
+            s_reply_udp_msg = 0;
+            test_periph_eth_udp_reply();
+        }
+#endif//defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY)            
+        
+        if(1 == s_blink_ipal_led3)
+        {        
+            hal_led_toggle(hal_led3);
+            s_blink_ipal_led3 = 0;
+        }
+        
+        if(1 == s_blink_ipal_led4)
+        {        
+            hal_led_toggle(hal_led4);
+            s_blink_ipal_led4 = 0;
+            hal_trace_puts("eth: toggled led4");
+        }
+        
+            
+    
+    } 
+    
+#endif//defined(EXECUTE_TEST_PERIPH_ETH_PING)||defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY)    
+    
+}
+#endif//defined(EXECUTE_TEST_PERIPH_ETH)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
