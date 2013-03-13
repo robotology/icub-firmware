@@ -113,8 +113,8 @@ extern EOaxisController* eo_axisController_New(int32_t ticks_per_rev)
         o->torque_last_pos_err = 0;
         o->torque_damp_lp_filt = 0;
 
-        o->stiffness = 0.0f;
-        o->damping   = 0.0f;
+        o->stiffness = 0;
+        o->damping   = 0;
         ///////////////////////////
         
         o->openloop_out = 0;
@@ -484,13 +484,15 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
                 err = vel_ref - vel;
             }
             
-            o->torque_ref = o->stiffness*err + o->damping*(err - o->err);
+            o->torque_ref = (o->stiffness*err + o->damping*(err - o->err))/1000; 
 
             o->err = err;
         }    
         case eomc_controlmode_torque:
         {
-            int32_t pwm = eo_pid_PWM_p_3Hz_LPF(o->pidT, o->torque_ref - o->torque_meas);
+            //int32_t pwm = eo_pid_PWM_pi_3Hz_LPF(o->pidT, o->torque_ref - o->torque_meas);
+            
+            int32_t pwm = eo_pid_PWM_pi(o->pidT, o->torque_ref - o->torque_meas);
             
             if (pos <= o->pos_min || o->pos_max <= pos)
             {
