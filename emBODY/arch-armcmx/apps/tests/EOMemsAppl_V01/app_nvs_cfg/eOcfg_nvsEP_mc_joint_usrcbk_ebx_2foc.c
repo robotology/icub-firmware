@@ -141,8 +141,8 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jx
 
     // 2) set torque pid    
     rescaler_trq = 1.0f/(float)(1<<cfg->pidtorque.scale);
-    eo_emsController_SetTrqPid(jxx, cfg->pidtorque.kp,//*rescaler_trq, 
-		                            cfg->pidtorque.kd,//*rescaler_trq, 
+    eo_emsController_SetTrqPid(jxx, cfg->pidtorque.kp*rescaler_trq, 
+		                            cfg->pidtorque.kd*rescaler_trq, 
                                     cfg->pidtorque.ki*rescaler_trq,
                                     cfg->pidtorque.limitonintegral,
                                     cfg->pidtorque.limitonoutput, 
@@ -201,8 +201,8 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidtorque(eOcfg_nvsEP_mc_joint
     eOmc_PID_t      *pid_ptr = (eOmc_PID_t*)nv->loc;
     float           rescaler = 1.0f/(float)(1<<pid_ptr->scale);
 
-    eo_emsController_SetTrqPid(jxx, pid_ptr->kp,//*rescaler, 
-	                                pid_ptr->kd,//*rescaler, 
+    eo_emsController_SetTrqPid(jxx, pid_ptr->kp*rescaler, 
+	                                pid_ptr->kd*rescaler, 
 	                                pid_ptr->ki*rescaler, 
                                     pid_ptr->limitonintegral,
                                     pid_ptr->limitonoutput, 
