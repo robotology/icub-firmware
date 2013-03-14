@@ -53,7 +53,6 @@
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern void cmsis_stm32f4_hid_set_system_core_clock(void);
 
 
 
