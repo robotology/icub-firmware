@@ -27,7 +27,7 @@
 
 #include "stdint.h"
 #include "stdlib.h"
-
+#include "string.h"
 
 #include "stm32f4.h"
 
@@ -70,6 +70,10 @@ static void myonsystick(void);
 
 static void test_timer(uint16_t microsecs);
 
+static void test_flash(void);
+
+static void test_eeprom(void);
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -92,6 +96,12 @@ int main(void)
 {
  
     brd_mcbstm32x_led_init();
+    
+    test_eeprom();
+    
+    //for(;;);
+    
+    test_flash();
     
     
     systickserv_start_systick(1000, myonsystick);
@@ -200,6 +210,97 @@ void TIM7_IRQHandler(void)
             val = 0;
         }
     }
+
+}
+
+
+static void test_flash(void)
+{
+    // erase first sector of 64k at address 0x08010000
+    // write some data on it. read it back
+    
+    uint32_t address = 0x08010000; //+64*1024;
+    uint8_t dataread[64] = {0};
+    uint8_t datawrite[64] = {0x1};
+    
+    int8_t result = -1;
+
+    // unlock
+    FLASH_Unlock();
+
+
+    // read first
+    {
+        const void *flashaddr = (const void*)address;
+        memcpy(dataread, flashaddr, sizeof(dataread));
+    }
+    
+    // delete
+    {
+        FLASH_Status status = FLASH_COMPLETE;
+        uint32_t pageindex = FLASH_Sector_4;
+        
+        
+        FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR | 
+                  FLASH_FLAG_PGAERR | FLASH_FLAG_PGPERR|FLASH_FLAG_PGSERR); 
+        
+        //FLASH_ClearFlag(FLASH_FLAG_BSY | FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR | FLASH_FLAG_PGAERR | FLASH_FLAG_PGPERR | FLASH_FLAG_PGSERR);
+
+        status = FLASH_EraseSector(pageindex, VoltageRange_3);
+
+        result = ((FLASH_COMPLETE==status)?(0):(-1));     
+        result = result;
+    }
+    
+    // write
+    {
+        uint32_t addr = address;
+        uint32_t size = sizeof(datawrite);
+        uint32_t *data = (uint32_t*)datawrite;
+        
+        volatile FLASH_Status status = FLASH_COMPLETE;
+        uint32_t EndAddr = 0;
+
+       
+
+        EndAddr = addr + size; 
+
+        while((addr < EndAddr) && (status == FLASH_COMPLETE))
+        {
+            // cannot write on non-0xffffffff flash
+            if(0xFFFFFFFF != *((volatile uint32_t*)addr))
+            {
+                status = FLASH_ERROR_OPERATION;
+                break;
+            }
+
+            // no need to write if already 0xffffffff
+            if(0xFFFFFFFF == *data)
+            {
+                status = FLASH_COMPLETE;
+            }
+            else
+            {
+                status = FLASH_ProgramWord(addr, *data);
+            }
+
+            addr = addr + 4;
+            data++;
+        }
+        
+        result = ((FLASH_COMPLETE == status) ? (0) :(-1));
+        result = result;
+    }
+
+
+}
+
+
+
+
+static void test_eeprom(void)
+{
+
 
 }
 
