@@ -172,14 +172,13 @@
 /** @addtogroup STM32F4xx_System_Private_Variables
   * @{
   */
+// IIT-changed: ...
+__weak uint32_t SystemCoreClock = 168000000;
 
-  uint32_t SystemCoreClock = 168000000;
 
-
-//IIT-changed
-//IIT-comment: made constant to place it in flash
+//IIT-changed: made it constant to place it in flash
 // __I uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
-const volatile uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
+const uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
 
 
 /**
@@ -189,10 +188,6 @@ const volatile uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 
 /** @addtogroup STM32F4xx_System_Private_FunctionPrototypes
   * @{
   */
-
-  //IIT-added
-//IIT-comment: added to force initialisation of variable SystemCoreClock which is not a ZI variable and cannot be const. 
-extern void cmsis_stm32f4_hid_set_system_core_clock(void);      
 
 static void SetSysClock(void);
 #ifdef DATA_IN_ExtSRAM
@@ -208,12 +203,6 @@ static void SetSysClock(void);
   */
 
 
-extern void cmsis_stm32f4_hid_set_system_core_clock(void)
-{
-    SystemCoreClock = 168000000;
-}
-
-
 /**
   * @brief  Setup the microcontroller system
   *         Initialize the Embedded Flash Interface, the PLL and update the 
@@ -221,12 +210,9 @@ extern void cmsis_stm32f4_hid_set_system_core_clock(void)
   * @param  None
   * @retval None
   */
-void SystemInit(void)
+// IIT-changed: made it weak so that we can redefined if we want
+__weak void SystemInit(void)
 {
-
-    //IIT-added
-    //IIT-comment: added to force initialisation of variable SystemCoreClock which is not a ZI variable and cannot be const. 
-    cmsis_stm32f4_hid_set_system_core_clock();
 
   /* FPU settings ------------------------------------------------------------*/
   #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
@@ -266,6 +252,9 @@ void SystemInit(void)
 #else
   SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal FLASH */
 #endif
+
+    // IIT-changed: added to refresh the value of SystemCoreClock
+    SystemCoreClockUpdate();
 }
 
 /**
@@ -304,7 +293,8 @@ void SystemInit(void)
   * @param  None
   * @retval None
   */
-void SystemCoreClockUpdate(void)
+// IIT-changed: __weak (so that we can redefine if we want)
+__weak void SystemCoreClockUpdate(void)
 {
   uint32_t tmp = 0, pllvco = 0, pllp = 2, pllsource = 0, pllm = 2;
   
