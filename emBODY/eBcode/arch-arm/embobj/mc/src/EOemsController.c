@@ -42,8 +42,6 @@ extern int16_t torque_debug_can[4];
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define TICKS_PER_REVOLUTION 0x10000
-
 #define JOINTS(j)   for (uint8_t j=0; j<s_emsc->n_joints; ++j)
 #define MOTORS(m)   for (uint8_t m=0; m<s_emsc->n_joints; ++m)
 #define ENCODERS(e) for (uint8_t e=0; e<s_emsc->n_joints; ++e)
@@ -55,9 +53,10 @@ extern int16_t torque_debug_can[4];
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-const float   EMS_PERIOD          = 0.001f;
-const int32_t EMS_FREQUENCY_INT32 = 1000;
-const float   EMS_FREQUENCY_FLOAT = 1000.0f;
+const float   EMS_PERIOD           = 0.001f;
+const int32_t EMS_FREQUENCY_INT32  = 1000;
+const float   EMS_FREQUENCY_FLOAT  = 1000.0f;
+const int32_t TICKS_PER_REVOLUTION = 65536;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -144,7 +143,7 @@ extern EOemsController* eo_emsController_Init(emsBoardType_t board_type)
         
         JOINTS(j)
         {
-            s_emsc->axis_controller[j] = eo_axisController_New(TICKS_PER_REVOLUTION);
+            s_emsc->axis_controller[j] = eo_axisController_New();
             s_emsc->enc_speedometer[j] = eo_speedmeter_New();
         }
     }

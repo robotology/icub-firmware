@@ -191,15 +191,18 @@ extern int32_t eo_pid_PWM_pi_3Hz_LPF(EOpid *o, float En)
 {
     if (!o) return 0;
     
-    o->En = En;
-
-    float Xn = o->K*o->En;
+    float Xn = o->K*En;
     
     o->KKiIn += o->Ki*Xn;
 
     LIMIT(o->KKiIn, o->Imax);
     
-    o->pwm_3Hz_LPF += 0.0185f*(Xn + o->KKiIn - o->pwm_3Hz_LPF);
+    Xn += o->KKiIn;
+
+    o->pwm_3Hz_LPF = 0.981325f*o->pwm_3Hz_LPF + 0.0093375f*(Xn + o->Xn);
+    
+    o->Xn = Xn;
+    o->En = En;
     
     o->pwm = o->pwm_offset + (int32_t)o->pwm_3Hz_LPF;
     
