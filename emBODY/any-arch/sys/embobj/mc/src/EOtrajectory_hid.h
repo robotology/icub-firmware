@@ -36,33 +36,35 @@ extern "C" {
  
 struct EOtrajectory_hid 
 {
-    float Pos;
-    float Vel;
-    float PAcc;
-
-    float PosF;
-    float VelF;
-
     float pos_min;
     float pos_max;
+    
     int32_t vel_max;
     int32_t acc_max;
 
+    //////////////////
+    // position
+    float xPos;
+    float xVel;
+    float xPAcc;
+
+    float xPosF;
+    float xVelF;
+    
     int32_t PosTimer;
-    int32_t VelTimer;
     
-    // pos-vel boost
-   
-    eObool_t start_out_of_range;
+    //////////////////
+    // velocity
+    eObool_t bVelocityMove;
+    eObool_t bIsBraking;
     
-    eObool_t boost;
-    eObool_t boostIsBraking;
-    float    boostPos;
-    float    boostVel;
-    float    boostVelF;
-    float    boostPAcc;
-    int32_t  boostTimer;
-    int32_t  acc_stop_boost;
+    float    vPos;
+    float    vVel;
+    float    vPAcc;
+    
+    float    vVelF;
+    
+    int32_t  VelTimer;
 }; 
 
 

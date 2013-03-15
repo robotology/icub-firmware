@@ -17,9 +17,10 @@
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem.h"
 
+extern const float   EMS_PERIOD;
 extern const float   EMS_FREQUENCY_FLOAT;
 extern const int32_t EMS_FREQUENCY_INT32;
-extern const float   EMS_PERIOD;
+extern const int32_t TICKS_PER_REVOLUTION;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -39,7 +40,7 @@ extern const float   EMS_PERIOD;
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define LIMIT(min, x, max) if (x < (min)) x = (min); else if (x > (max)) x = (max);
+#define LIMIT(min, x, max) { if (x < (min)) x = (min); else if (x > (max)) x = (max); }
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -70,39 +71,38 @@ static float K60byP = 0.0f;
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOtrajectory* eo_trajectory_New(int32_t ticks_per_rev) 
+extern EOtrajectory* eo_trajectory_New() 
 {
     EOtrajectory *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOtrajectory), 1);
 
     if (o)
     {
-        o->Pos  = 0.0f;
-        o->Vel  = 0.0f;
-        o->PAcc = 0.0f;
+        o->pos_min = 0;
+        o->pos_max = TICKS_PER_REVOLUTION;
+        o->vel_max = TICKS_PER_REVOLUTION/3;
+        o->acc_max = TICKS_PER_REVOLUTION;
+        
+        // position
+        o->xPos  = 0.0f;
+        o->xVel  = 0.0f;
+        o->xPAcc = 0.0f;
 
-        o->PosF = 0.0f;
-        o->VelF = 0.0f;
+        o->xPosF = 0.0f;
+        o->xVelF = 0.0f;
 
         o->PosTimer = 0;
-        o->VelTimer = 0;
-
-        o->pos_min        = 0;
-        o->pos_max        = ticks_per_rev;
-        o->vel_max        = ticks_per_rev/8;
-        o->acc_max        = ticks_per_rev;
-        o->acc_stop_boost = ticks_per_rev;
-
-        o->start_out_of_range = eobool_false;
         
-        // boost
-        o->boost          = eobool_false;
-        o->boostIsBraking = eobool_false;
+        // velocity
+        o->bVelocityMove     = eobool_false;
+        o->bIsBraking = eobool_false;
          
-        o->boostPos  = 0.0f;
-        o->boostVel  = 0.0f;
-        o->boostVelF = 0.0f;
-        o->boostPAcc = 0.0f;
-        o->boostTimer = 0;
+        o->vPos  = 0.0f;
+        o->vVel  = 0.0f;
+        o->vPAcc = 0.0f;
+        
+        o->vVelF = 0.0f;
+        
+        o->VelTimer = 0;
     }
 
     if (K60byP == 0.0f)
@@ -130,129 +130,107 @@ extern void eo_trajectory_SetVelMax(EOtrajectory *o, int32_t vel_max)
 
 extern void eo_trajectory_Init(EOtrajectory *o, int32_t p0, int32_t v0, int32_t a0)
 {
-    o->Pos  = p0;
-    o->Vel  = v0;
-    o->PAcc = EMS_PERIOD*a0;
-
-    o->start_out_of_range = (p0 < o->pos_min || o->pos_max < p0);
+    o->xPosF = o->xPos  = p0;
+    o->xVel  = v0;
+    o->xPAcc = EMS_PERIOD*a0;
+    o->xVelF = 0.0f;
     
     o->PosTimer = 0;
     o->VelTimer = 0;
-
-    o->boostTimer = 0;
-    o->boost          = eobool_false;
-    o->boostIsBraking = eobool_false;
-    o->boostPos  = 0.0f;
-    o->boostVel  = 0.0f;
-    o->boostVelF = 0.0f;
-    o->boostPAcc = 0.0f;
+    
+    o->bVelocityMove     = eobool_false;
+    o->bIsBraking = eobool_false;
+    
+    o->vPos  = 0.0f;
+    o->vVel  = 0.0f;
+    o->vPAcc = 0.0f;
+    o->vVelF = 0.0f;
 }
 
 extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, int32_t avg_vel)
 {
-    if (o->boost || o->boostTimer) eo_trajectory_BoostStop(o);
+    if (o->bVelocityMove || o->VelTimer) eo_trajectory_VelocityStop(o);
 
-    LIMIT(o->pos_min, p1, o->pos_max);
+    LIMIT(o->pos_min, p1, o->pos_max)
 
-    o->PosF = (float)p1;
-    o->VelF = 0.0f;
-    
-    o->VelTimer = 0;
+    o->xPosF = (float)p1;
+    o->xVelF = 0.0f;
 
     if (!avg_vel) avg_vel = o->vel_max;
     
     LIMIT(-o->vel_max, avg_vel, o->vel_max)
     
-    o->PosTimer = (EMS_FREQUENCY_INT32*(p1-(int32_t)o->Pos))/avg_vel;
+    o->PosTimer = (EMS_FREQUENCY_INT32*(p1-(int32_t)o->xPos))/avg_vel;
     
-    if (o->PosTimer<0) o->PosTimer = -o->PosTimer;
-}
-
-extern void eo_trajectory_Stop(EOtrajectory *o, int32_t pos, int32_t stop_acc)
-{
-    if (o->boost || o->boostTimer) eo_trajectory_BoostStop(o);
-
-    o->VelTimer = 0;
-
-    o->PosF = o->Pos = pos;
-    
-    //LIMIT(o->pos_min, o->PosF, o->pos_max);
-    
-    o->VelF = 0.0f;
-
-    if (!stop_acc) stop_acc = o->acc_max;
-
-    o->PosTimer = (EMS_FREQUENCY_INT32*(int32_t)o->Vel)/stop_acc;
-
     if (o->PosTimer<0) o->PosTimer = -o->PosTimer;
 }
 
 extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t v1, int32_t avg_acc)
 {
-    if (o->boost || o->boostTimer) eo_trajectory_BoostStop(o);
+    o->bVelocityMove     = eobool_true;
+    o->bIsBraking = eobool_false;
 
     LIMIT(-o->vel_max, v1, o->vel_max)
 
-    o->VelF = (float)v1;
-
-    o->PosTimer = 0;
+    o->vVelF = (float)v1;
 
     if (!avg_acc) avg_acc = o->acc_max;
-
-    LIMIT(-o->acc_max, avg_acc, o->acc_max);
     
-    o->VelTimer = (EMS_FREQUENCY_INT32*(v1-(int32_t)o->Vel))/avg_acc;
+    LIMIT(-o->acc_max, avg_acc, o->acc_max)
+    
+    o->VelTimer = (EMS_FREQUENCY_INT32*(v1-(int32_t)o->vVel))/avg_acc;
 
     if (o->VelTimer<0) o->VelTimer = -o->VelTimer;
 }
 
-extern void eo_trajectory_BoostStart(EOtrajectory *o, int32_t v1, int32_t avg_acc)
+extern void eo_trajectory_Stop(EOtrajectory *o, int32_t pos, int32_t stop_acc)
 {
-    o->boost = eobool_true;
-    o->boostIsBraking = eobool_false;
+    if (o->bVelocityMove || o->VelTimer) eo_trajectory_VelocityStop(o);
 
-    LIMIT(-o->vel_max, v1, o->vel_max)
-
-    o->boostVelF = (float)v1;
-
-    if (!avg_acc) avg_acc = o->acc_max;
+    o->xPosF = o->xPos = pos;
     
-    LIMIT(-o->acc_max, avg_acc, o->acc_max);
+    //LIMIT(o->pos_min, o->PosF, o->pos_max)
     
-    o->boostTimer = (EMS_FREQUENCY_INT32*(v1-(int32_t)o->boostVel))/avg_acc;
+    o->xVelF = 0.0f;
 
-    if (o->boostTimer<0) o->boostTimer = -o->boostTimer;
+    if (!stop_acc) stop_acc = o->acc_max;
+
+    o->PosTimer = (EMS_FREQUENCY_INT32*(int32_t)o->xVel)/stop_acc;
+
+    if (o->PosTimer<0) o->PosTimer = -o->PosTimer;
 }
 
-extern void eo_trajectory_BoostStop(EOtrajectory *o)
+extern void eo_trajectory_VelocityStop(EOtrajectory *o)
 {
-    o->boostIsBraking = eobool_false;
-    o->boost = eobool_false;
-    o->boostTimer = 0;
+    o->bIsBraking    = eobool_false;
+    o->bVelocityMove = eobool_false;
+    
+    o->VelTimer = 0;
 
-    o->Pos  += o->boostPos;
-    o->PosF += o->boostPos;
-    o->Vel  += o->boostVel;
-    o->PAcc += o->boostPAcc;
+    o->xPos  += o->vPos;
+    o->xPosF += o->vPos;
+    o->xVel  += o->vVel;
+    o->xPAcc += o->vPAcc;
 
-    o->boostPos  = 0.0f;
-    o->boostVel  = 0.0f;
-    o->boostVelF = 0.0f;
-    o->boostPAcc = 0.0f;    
+    o->vPos  = 0.0f;
+    o->vVel  = 0.0f;
+    o->vVelF = 0.0f;
+    o->vPAcc = 0.0f;    
 }
 
-extern void eo_trajectory_BoostTimeout(EOtrajectory *o)
+extern void eo_trajectory_VelocityTimeout(EOtrajectory *o)
 {
-    if (o->boost)
+    if (o->bVelocityMove)
     {
-        o->boost = eobool_false;
-        o->boostIsBraking = eobool_true;
+        o->bVelocityMove = eobool_false;
+        o->bIsBraking    = eobool_true;
 
-        eo_trajectory_BoostStart(o, 0, o->acc_stop_boost);
+        eo_trajectory_SetVelReference(o, 0, o->acc_max);
     }
 }
 
-extern int8_t eo_trajectory_PosStep(EOtrajectory* o, float *p, float *v, float *a)
+#if 0
+extern int8_t eo_trajectory_Step(EOtrajectory* o, float *p, float *v, float *a)
 {
     if (o->PosTimer)
     {
@@ -340,27 +318,111 @@ extern int8_t eo_trajectory_PosStep(EOtrajectory* o, float *p, float *v, float *
     
     return 0;
 }
+#endif
+
+//////////////////////////////////////////////////////////////////////////////////
+
+extern int8_t eo_trajectory_Step(EOtrajectory* o, float *p, float *v, float *a)
+{
+    if (o->PosTimer)
+    {
+        float PbyT = 1.0f/(float)(o->PosTimer--);
+
+        o->xPos += EMS_PERIOD*(o->xVel += o->xPAcc += (((K60byP*(o->xPosF-o->xPos)*PbyT-36.f*o->xVel /*-24.f*o->xVelF*/)*PbyT)-9.f*o->xPAcc)*PbyT);
+    }
+    else
+    {        
+        if (o->xVelF != 0.f) o->xPosF += EMS_PERIOD*o->xVelF;
+
+        o->xVel = o->xVelF;        
+        o->xPos = o->xPosF;
+        o->xPAcc = 0.f;
+    }
+    
+    if (o->VelTimer)
+    {
+        float PbyT = 1.0f/(float)(o->VelTimer--);
+
+        o->vPos += EMS_PERIOD*(o->vVel += o->vPAcc += (6.0f*(o->vVelF-o->vVel)*PbyT-4.0f*o->vPAcc)*PbyT);
+
+        *p = o->xPos  + o->vPos;
+        *v = o->xVel  + o->vVel;
+        *a = o->xPAcc + o->vPAcc;
+    }
+    else if (o->bVelocityMove)
+    {
+        o->vPAcc = 0.0f;
+        
+        o->vPos += EMS_PERIOD*(o->vVel = o->vVelF);
+
+        *p = o->xPos + o->vPos;
+        *v = o->xVel + o->vVel;
+        
+        *a = o->xPAcc;
+    }
+    else
+    {
+        if (o->bIsBraking) eo_trajectory_VelocityStop(o);
+
+        *p = o->xPos;
+        *v = o->xVel;
+        
+        *a = o->xPAcc;
+    }
+    
+    if (*p < o->pos_min)
+    {
+        if (o->bVelocityMove || o->VelTimer) eo_trajectory_VelocityStop(o);
+          
+        if (*v < 0.f)
+        {
+            o->PosTimer = 0;
+            *v = o->xVel = o->xVelF = 0.f;
+        }
+        
+        *a = 0.0f;
+        
+        return -1;
+    }
+    else if (*p > o->pos_max)
+    {
+        if (o->bVelocityMove || o->VelTimer) eo_trajectory_VelocityStop(o);
+        
+        if (*v > 0.f)
+        {
+            o->PosTimer = 0;
+            *v = o->xVel = o->xVelF = 0.f;
+        }
+                
+        *a = 0.0f;
+        
+        return  1;
+    }
+    
+    return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////////////
 
 extern eObool_t eo_trajectory_IsDone(EOtrajectory* o)
 {
-    return !o->PosTimer && !o->VelTimer;
+    return !o->PosTimer;
 }
 
 extern int32_t eo_trajectory_GetPos(EOtrajectory* o)
 {
-    return (int32_t)o->Pos;
+    return (int32_t)o->xPos;
 }
 
 extern int32_t eo_trajectory_GetVel(EOtrajectory* o)
 {
-    return (int32_t)o->Vel;
+    return (int32_t)o->xVel;
 }
 
 extern int32_t eo_trajectory_GetAcc(EOtrajectory* o)
 {
-    return (int32_t)(EMS_FREQUENCY_FLOAT*o->PAcc);
+    return (int32_t)(EMS_FREQUENCY_FLOAT*o->xPAcc);
 }
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

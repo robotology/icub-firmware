@@ -67,22 +67,17 @@ struct EOaxisController_hid
     int32_t pos_max;
     
     int32_t err;
-
-    int32_t acc_stop_cmode;
-    int32_t acc_stop_alarm;
     
     // measures (read only)
     int32_t torque_meas;
+    uint8_t torque_wdog;
 
-    int32_t vel_timer;
-    int32_t vel_timeout;    
+    int32_t velocity_timer;
 
     // torque control
     int32_t torque_ref;
     int32_t torque_out;
     int32_t torque_off;
-    int32_t torque_last_pos_err;
-    int32_t torque_damp_lp_filt;
 
     // parameters
     int32_t stiffness;

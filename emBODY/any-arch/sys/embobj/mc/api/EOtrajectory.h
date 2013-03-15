@@ -52,7 +52,7 @@ typedef struct EOtrajectory_hid EOtrajectory;
     @brief      Creates a new trajectory object 
     @return     The pointer to the required object.
  **/
-extern EOtrajectory* eo_trajectory_New(int32_t ticks_per_rev);
+extern EOtrajectory* eo_trajectory_New(void);
 
 extern void eo_trajectory_SetPosMin(EOtrajectory *o, int32_t pos_min);
 extern void eo_trajectory_SetPosMax(EOtrajectory *o, int32_t pos_max);
@@ -69,15 +69,14 @@ extern void eo_trajectory_SetVelMax(EOtrajectory *o, int32_t vel_max);
  **/
 extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, int32_t avg_vel);
 extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t v1, int32_t avg_acc);
-extern void eo_trajectory_BoostStart(EOtrajectory *o, int32_t v1, int32_t avg_acc);
-extern void eo_trajectory_BoostTimeout(EOtrajectory *o);
+extern void eo_trajectory_VelocityTimeout(EOtrajectory *o);
 
 /** @fn         extern float eo_trajectory_Step(EOtrajectory *o)
     @brief      Executes a trajectory step.
     @param      o  The pointer to the trajectory object.
     @return     The actual trajectory point value.
  **/
-extern int8_t eo_trajectory_PosStep(EOtrajectory *o, float *p, float *v, float *a);
+extern int8_t eo_trajectory_Step(EOtrajectory *o, float *p, float *v, float *a);
 
 extern void eo_trajectory_Init(EOtrajectory *o, int32_t p0, int32_t v0, int32_t a0);
 
@@ -87,7 +86,7 @@ extern void eo_trajectory_Init(EOtrajectory *o, int32_t p0, int32_t v0, int32_t 
  **/
 //extern void eo_trajectory_Stop(EOtrajectory *o, int32_t stop_acc);
 extern void eo_trajectory_Stop(EOtrajectory *o, int32_t pos, int32_t stop_acc);
-extern void eo_trajectory_BoostStop(EOtrajectory *o);
+extern void eo_trajectory_VelocityStop(EOtrajectory *o);
 
 //extern void eo_trajectory_Stop(EOtrajectory *o, float pos);
 
