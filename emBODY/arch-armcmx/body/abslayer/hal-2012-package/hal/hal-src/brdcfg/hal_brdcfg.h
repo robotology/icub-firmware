@@ -65,7 +65,7 @@ extern hal_result_t hal_brdcfg__static_memory_init(void);
 #elif defined(HAL_BOARD_EMS004) 
     #include "ems004/hal_brdcfg_ems004.h"    
 #elif defined(HAL_BOARD_MC4PLUS) 
-    #include "ems004/hal_brdcfg_mc4plus.h"    
+    #include "mc4plus/hal_brdcfg_mc4plus.h"    
 #else 
 	#error "Please select board XXX w/ HAL_BOARD_XXX"
 #endif                      
