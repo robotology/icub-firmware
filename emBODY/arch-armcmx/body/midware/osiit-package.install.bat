@@ -10,7 +10,7 @@ echo. -- Setting the variables...
 :: https://svn.cognitivehumanoids.eu/sdl/embedded/arm/embody/body/midware/osiit-package version 960
 set SOURCE=./osiit-package
 set SVN=C:\Program Files\TortoiseSVN\bin
-set URL=https://svn.icub.iit.local/repos/sdl/embedded/arm/embody/body/midware/osiit-package
+set URL=https://svn.icub.iit.local/repos/soft/embed/embedded/arm/embody/body/midware/osiit-package
 
 :: Unless you want to modify the script, this is enough.
 
