@@ -57,19 +57,16 @@ extern "C" {
  **/  
  
 struct EOMtheLEDpulser_hid 
-{
-    // base object
-    EOtimer                     *timer;
-    eOmledpulser_cfg_t          config;
+{    
+    eOmledpulser_cfg_t          config;    
     EOaction                    *action;
-    uint16_t                    ticks;
+    EOtimer                     *timer[eom_ledpulser_leds_number];
+    uint16_t                    ticks[eom_ledpulser_leds_number];
 }; 
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-// name used by u-vision
-void eom_gpioman(void *p);
 
 
 #ifdef __cplusplus
