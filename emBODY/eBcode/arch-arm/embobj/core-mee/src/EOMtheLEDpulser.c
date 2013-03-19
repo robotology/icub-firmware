@@ -55,7 +55,8 @@
 
 const eOmledpulser_cfg_t eom_ledpulser_DefaultCfg = 
 { 
-    .led        = hal_led0
+    .numberofleds   = 1, 
+    .leds           = { hal_led0 }
 };
 
 
@@ -80,12 +81,14 @@ static const char s_eobj_ownname[] = "EOMtheLEDpulser";
 
 static EOMtheLEDpulser s_mledpulser = 
 {
-    .timer          = NULL,                   
     .config         = 
     {
-        .led        = hal_led0
+        .numberofleds   = 1, 
+        .leds           = { hal_led0 }
     },
-    .ticks          = 0     
+    .action         = NULL,
+    .timer          = {NULL},
+    .ticks          = {0}     
 }; 
 
 
@@ -110,21 +113,35 @@ extern EOMtheLEDpulser * eom_ledpulser_Initialise(const eOmledpulser_cfg_t *ledp
         ledpulsercfg = &eom_ledpulser_DefaultCfg;
     }
     
+    if(ledpulsercfg->numberofleds > eom_ledpulser_leds_number)
+    {
+        return(NULL);
+    }
+    
+    // dont do any control over coherency of leds is ...
+    
     memcpy(&s_mledpulser.config, ledpulsercfg, sizeof(eOmledpulser_cfg_t));
     
-    s_mledpulser.ticks = 0;
+    memset(&s_mledpulser.ticks[0], 0, eom_ledpulser_leds_number);
  
-    // i get the timer
-    s_mledpulser.timer = eo_timer_New(); 
+    // i get the timers
+    uint8_t i = 0;
+    for(i=0; i<s_mledpulser.config.numberofleds; i++)
+    {
+        s_mledpulser.timer[i] = eo_timer_New(); 
+    }
     
     // i get the action
     s_mledpulser.action = eo_action_New();
     
-    eo_action_SetCallback(s_mledpulser.action, s_eom_ledpulser_callback, &s_mledpulser, eom_callbackman_GetTask(eom_callbackman_GetHandle()));
+    eo_action_SetCallback(s_mledpulser.action, s_eom_ledpulser_callback, (void*)0, eom_callbackman_GetTask(eom_callbackman_GetHandle()));
 
-    // i init the led
-    hal_led_init(s_mledpulser.config.led, NULL);
-    hal_led_off(s_mledpulser.config.led);
+    // i init the leds
+    for(i=0; i<s_mledpulser.config.numberofleds; i++)
+    {
+        hal_led_init(s_mledpulser.config.leds[i], NULL);
+        hal_led_off(s_mledpulser.config.leds[i]);
+    }
 
     
     // return the singleton handler
@@ -138,38 +155,89 @@ extern EOMtheLEDpulser * eom_ledpulser_GetHandle(void)
     return( (NULL != s_mledpulser.timer) ? (&s_mledpulser) : (NULL) );   
 }
 
-extern void eom_ledpulser_Start(EOMtheLEDpulser* p, eOreltime_t pulseperiod, uint8_t pulsesnumberof)
+extern void eom_ledpulser_On(EOMtheLEDpulser* p, eOmledpulser_led_t id)
 {
     if(NULL == p)
     {
         return;
     }
     
-    if(eo_tmrstat_Running == eo_timer_GetStatus(s_mledpulser.timer))
+    if(eo_tmrstat_Running == eo_timer_GetStatus(s_mledpulser.timer[id]))
     {
-        eo_timer_Stop(s_mledpulser.timer);
+        eo_timer_Stop(s_mledpulser.timer[id]);
     }
     
-    s_mledpulser.ticks = 2*pulsesnumberof;
+    s_mledpulser.ticks[id] = 0;
     
-    hal_led_on(s_mledpulser.config.led);
+    hal_led_on(s_mledpulser.config.leds[id]);      
+}
+
+extern void eom_ledpulser_Off(EOMtheLEDpulser* p, eOmledpulser_led_t id)
+{
+    if(NULL == p)
+    {
+        return;
+    }
     
-    eo_timer_Start(s_mledpulser.timer, eok_abstimeNOW, pulseperiod/2, eo_tmrmode_FOREVER, s_mledpulser.action);
-       
+    if(eo_tmrstat_Running == eo_timer_GetStatus(s_mledpulser.timer[id]))
+    {
+        eo_timer_Stop(s_mledpulser.timer[id]);
+    }
+    
+    s_mledpulser.ticks[id] = 0;
+    
+    hal_led_off(s_mledpulser.config.leds[id]);      
+}
+
+extern void eom_ledpulser_Toggle(EOMtheLEDpulser* p, eOmledpulser_led_t id)
+{
+    if(NULL == p)
+    {
+        return;
+    }
+    
+    if(eo_tmrstat_Running == eo_timer_GetStatus(s_mledpulser.timer[id]))
+    {
+        eo_timer_Stop(s_mledpulser.timer[id]);
+    }
+    
+    s_mledpulser.ticks[id] = 0;
+    
+    hal_led_toggle(s_mledpulser.config.leds[id]);      
+}
+
+extern void eom_ledpulser_Start(EOMtheLEDpulser* p, eOmledpulser_led_t id, eOreltime_t pulseperiod, uint8_t pulsesnumberof)
+{
+    if(NULL == p)
+    {
+        return;
+    }
+    
+    if(eo_tmrstat_Running == eo_timer_GetStatus(s_mledpulser.timer[id]))
+    {
+        eo_timer_Stop(s_mledpulser.timer[id]);
+    }
+    
+    s_mledpulser.ticks[id] = 2*pulsesnumberof;
+    
+    hal_led_on(s_mledpulser.config.leds[id]);
+    
+    eo_action_SetCallback(s_mledpulser.action, s_eom_ledpulser_callback, (void*)id, eom_callbackman_GetTask(eom_callbackman_GetHandle()));
+    
+    eo_timer_Start(s_mledpulser.timer[id], eok_abstimeNOW, pulseperiod/2, eo_tmrmode_FOREVER, s_mledpulser.action);       
 }
 
 
-extern void eom_ledpulser_Stop(EOMtheLEDpulser* p)
+extern void eom_ledpulser_Stop(EOMtheLEDpulser* p, eOmledpulser_led_t id)
 {
     if(NULL == p)
     {
         return;
     }
     
-    eo_timer_Stop(s_mledpulser.timer);
+    eo_timer_Stop(s_mledpulser.timer[id]);
  
-    hal_led_off(s_mledpulser.config.led);
-      
+    hal_led_off(s_mledpulser.config.leds[id]);      
 }
 
 
@@ -188,18 +256,20 @@ extern void eom_ledpulser_Stop(EOMtheLEDpulser* p)
  
 static void s_eom_ledpulser_callback(void* p)
 {
-    EOMtheLEDpulser* pulser = (EOMtheLEDpulser*)p;
+    EOMtheLEDpulser* pulser = &s_mledpulser;
+    uint32_t dummy = (uint32_t) p; // to remove compiler warning 
+    eOmledpulser_led_t id = (eOmledpulser_led_t) dummy;
     
-    pulser->ticks --;
+    pulser->ticks[id] --;
     
-    if(0 == pulser->ticks)
+    if(0 == pulser->ticks[id])
     {
-        hal_led_off(pulser->config.led);
-        eo_timer_Stop(pulser->timer);
+        hal_led_off(pulser->config.leds[id]);
+        eo_timer_Stop(pulser->timer[id]);
     }
     else
     {
-        hal_led_toggle(pulser->config.led);
+        hal_led_toggle(pulser->config.leds[id]);
     }
     
 }
