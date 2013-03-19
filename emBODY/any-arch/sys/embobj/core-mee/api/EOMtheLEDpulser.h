@@ -57,20 +57,31 @@ extern "C" {
  **/  
 typedef struct EOMtheLEDpulser_hid EOMtheLEDpulser;
 
+typedef enum
+{
+    eom_ledpulser_led_zero  = 0,
+    eom_ledpulser_led_one   = 1,
+    eom_ledpulser_led_two   = 2,
+    eom_ledpulser_led_three = 3,
+    eom_ledpulser_led_four  = 4,
+    eom_ledpulser_led_five  = 5
+} eOmledpulser_led_t;
 
+enum { eom_ledpulser_leds_number = 6 };
 
 /**	@typedef    typedef struct eOmledpulser_cfg_t 
  	@brief      Contains the configuration for the eOmledpulser_cfg_t. 
  **/ 
 typedef struct
 {
-    hal_led_t           led; 
+    uint8_t             numberofleds;
+    hal_led_t           leds[eom_ledpulser_leds_number];
 } eOmledpulser_cfg_t;
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eOmledpulser_cfg_t eom_ledpulser_DefaultCfg; // = { .led = hal_led0 };
+extern const eOmledpulser_cfg_t eom_ledpulser_DefaultCfg; // = { .numberofleds = 1, .leds = {hal_led0} };
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -91,10 +102,15 @@ extern EOMtheLEDpulser * eom_ledpulser_Initialise(const eOmledpulser_cfg_t *ledp
  **/
 extern EOMtheLEDpulser * eom_ledpulser_GetHandle(void); 
 
+extern void eom_ledpulser_On(EOMtheLEDpulser* p, eOmledpulser_led_t id);
 
-extern void eom_ledpulser_Start(EOMtheLEDpulser* p, eOreltime_t pulseperiod, uint8_t pulsesnumberof); 
+extern void eom_ledpulser_Off(EOMtheLEDpulser* p, eOmledpulser_led_t id);
 
-extern void eom_ledpulser_Stop(EOMtheLEDpulser* p); 
+extern void eom_ledpulser_Toggle(EOMtheLEDpulser* p, eOmledpulser_led_t id);
+
+extern void eom_ledpulser_Start(EOMtheLEDpulser* p, eOmledpulser_led_t id, eOreltime_t pulseperiod, uint8_t pulsesnumberof); 
+
+extern void eom_ledpulser_Stop(EOMtheLEDpulser* p, eOmledpulser_led_t id); 
  
 
 /** @}            
