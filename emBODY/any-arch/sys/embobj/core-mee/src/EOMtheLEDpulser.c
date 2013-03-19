@@ -101,7 +101,7 @@ static EOMtheLEDpulser s_mledpulser =
 extern EOMtheLEDpulser * eom_ledpulser_Initialise(const eOmledpulser_cfg_t *ledpulsercfg) 
 {
     // already initialised ?
-    if(NULL != s_mledpulser.timer) 
+    if(NULL != s_mledpulser.timer[0]) 
     {
         // already initialised !
         return(&s_mledpulser);
@@ -113,7 +113,7 @@ extern EOMtheLEDpulser * eom_ledpulser_Initialise(const eOmledpulser_cfg_t *ledp
         ledpulsercfg = &eom_ledpulser_DefaultCfg;
     }
     
-    if(ledpulsercfg->numberofleds > eom_ledpulser_leds_number)
+    if((ledpulsercfg->numberofleds > eom_ledpulser_leds_number) || (0 == ledpulsercfg->numberofleds))
     {
         return(NULL);
     }
