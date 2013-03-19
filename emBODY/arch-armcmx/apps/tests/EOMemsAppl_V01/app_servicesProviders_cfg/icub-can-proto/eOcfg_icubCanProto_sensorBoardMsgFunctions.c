@@ -254,9 +254,10 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
     {
         eOsnsr_arrayofupto12bytes_t     myfullscale;
         
-        memcpy(&myfullscale , &sstatus_ptr->fullscale, sizeof(eOsnsr_arrayofupto12bytes_t));
         
         sstatus_ptr->fullscale.head.size++;
+        memcpy(&myfullscale , &sstatus_ptr->fullscale, sizeof(eOsnsr_arrayofupto12bytes_t));
+
         //prepare occasional rop to send
         res = s_loadFullscalelikeoccasionalrop(sId, &myfullscale);
         eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &appl_st);
