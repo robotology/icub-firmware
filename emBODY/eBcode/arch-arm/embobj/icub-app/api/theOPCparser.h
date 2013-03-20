@@ -51,6 +51,8 @@ extern "C" {
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
+enum { opcparser_signature = 0xDE };
+
 /** @typedef    typedef struct theOPCparser_hid theOPCparser
     @brief      theOPCparser is an opaque struct. It is used to implement data abstraction for the 
                 object so that the user cannot see its private fields so that he/she is forced to manipulate the
@@ -71,18 +73,21 @@ typedef enum
     opcparser_opc_ask   = 0,
     opcparser_opc_say   = 1,
     opcparser_opc_set   = 2,
+    opcparser_opc_sig   = 3,
     opcparser_opc_none  = 127,
 } opcparser_opc_t;
 
-typedef uint8_t opcparser_dbv_t;
-typedef uint8_t opcparser_var_t;
+typedef uint16_t opcparser_dbv_t;
+typedef uint16_t opcparser_var_t;
+
 
 typedef struct
 {
-    uint8_t             opc;    /**< use opcparser_opc_t values */
-    uint8_t             dbv;    /**< version of the used database */
-    uint8_t             var;    /**< identifier of the variable to be manipulated */
-    uint8_t             len;    /**< length of the data field */
+    uint8_t             sgn;        /**< contains a signature for the opc. it is teh first byte of the packet and must be opcparser_signature  */
+    uint8_t             opc;        /**< use opcparser_opc_t values */
+    uint16_t            dbv;        /**< version of the used database */
+    uint16_t            var;        /**< identifier of the variable to be manipulated */
+    uint16_t            len;        /**< length of the data field */
 } opcparser_header_t; 
 
 
@@ -94,16 +99,20 @@ typedef struct
 } opcparser_message_t; 
 
 
+typedef struct opcparser_var_map_T opcparser_var_map_t;
 
-typedef void (*opcparser_fp_voidp_t)(void*);
+typedef void (*opcparser_fp_onset_t)(opcparser_var_map_t* map, void* recdata);
+typedef void (*opcparser_fp_onsig_t)(opcparser_var_map_t* map, void* recdata);
 
-typedef struct
+struct opcparser_var_map_T
 {
-    uint8_t                 var;
-    uint8_t                 size;
+    uint16_t                var;
+    uint16_t                size;
     void*                   ptr;
-    opcparser_fp_voidp_t    onset;  // but calls a opcparser_var_map_t*
-} opcparser_var_map_t;
+    opcparser_fp_onset_t    onset;  // calls a opcparser_var_map_t* and rx data
+    opcparser_fp_onsig_t    onsig;  // calls a opcparser_var_map_t* and rx data
+};
+
 
 
 /**	@typedef    typedef struct opcparser_cfg_t 
@@ -111,8 +120,8 @@ typedef struct
  **/
 typedef struct
 {
-    uint8_t                 databaseversion;    /**< it shall match the head.dbv field in the message */
-    uint8_t                 numberofvariables;  /**< it tells how many variables are inside the database */
+    uint16_t                databaseversion;    /**< it shall match the head.dbv field in the message */
+    uint16_t                numberofvariables;  /**< it tells how many variables are inside the database */
     opcparser_var_map_t*    arrayofvariablemap; /**< contains a C array of numberofvariables items */
 } opcparser_cfg_t;
 
@@ -141,10 +150,14 @@ extern theOPCparser * opcparser_Initialise(const opcparser_cfg_t *cfg);
 extern theOPCparser * opcparser_GetHandle(void);
 
 
+// opcparser_OK if it has signature, opcparser_NOK_generic otherwise
+extern opcparser_res_t opcparser_Has_Signature(theOPCparser* p, opcparser_message_t* msg);
 
 // opcparser_OK_withreplyif there is a reply message, 0 in case of no reply but correct message, -1 in case of error
-extern opcparser_res_t opcparser_Parse(theOPCparser* p, opcparser_message_t* msg, opcparser_message_t* reply, uint8_t* replysize);
+extern opcparser_res_t opcparser_Parse(theOPCparser* p, opcparser_message_t* msg, opcparser_message_t* reply, uint16_t* replysize);
 
+
+extern opcparser_res_t opcparser_Form(theOPCparser* p, opcparser_opc_t opc, opcparser_var_t var, opcparser_message_t* msg, uint16_t* size);
 
 /** @}            
     end of group doxy_opcparser  
