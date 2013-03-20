@@ -64,8 +64,8 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static opcparser_var_map_t* s_opcparser_find(opcparser_message_t* msg);
-static opcparser_res_t s_opcparser_process_operation(opcparser_message_t* msg, opcparser_var_map_t* map, opcparser_message_t* reply, uint8_t* replysize);
+static opcparser_var_map_t* s_opcparser_find(opcparser_header_t* head);
+static opcparser_res_t s_opcparser_process_operation(opcparser_message_t* msg, opcparser_var_map_t* map, opcparser_message_t* reply, uint16_t* replysize);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -118,22 +118,34 @@ extern theOPCparser* opcparser_GetHandle(void)
 }
 
 
+extern opcparser_res_t opcparser_Has_Signature(theOPCparser* p, opcparser_message_t* msg)
+{   
+    if((NULL == p) || (NULL == msg))
+    {
+        return(opcparser_NOK_generic);
+    }
 
+    return((opcparser_signature == msg->head.sgn) ? (opcparser_OK) : (opcparser_NOK_generic));
+    
+}
 
-extern opcparser_res_t opcparser_Parse(theOPCparser* p, opcparser_message_t* msg, opcparser_message_t* reply, uint8_t* replysize)
+extern opcparser_res_t opcparser_Parse(theOPCparser* p, opcparser_message_t* msg, opcparser_message_t* reply, uint16_t* replysize)
 {
     opcparser_res_t res = opcparser_NOK_generic;
-    
-
-    
+       
     if((NULL == p) || (NULL == msg) || (NULL == replysize))
     {
         return(opcparser_NOK_generic);
     }
     
-    *replysize = 0;
+    if(opcparser_signature != msg->head.sgn)
+    {
+        *replysize = 0;
+        return(opcparser_NOK_generic);
+    }
     
-    opcparser_var_map_t* map = s_opcparser_find(msg);
+    
+    opcparser_var_map_t* map = s_opcparser_find(&msg->head);
     
     if(NULL == map)
     {
@@ -144,6 +156,42 @@ extern opcparser_res_t opcparser_Parse(theOPCparser* p, opcparser_message_t* msg
     
            
     return(res);
+}
+
+extern opcparser_res_t opcparser_Form(theOPCparser* p, opcparser_opc_t opc, opcparser_var_t var, opcparser_message_t* msg, uint16_t* size)
+{       
+    if((NULL == p) || (NULL == msg) || (NULL == size))
+    {
+        return(opcparser_NOK_generic);
+    }
+    
+    if((opc != opcparser_opc_ask) && (opc != opcparser_opc_sig))
+    {
+        return(opcparser_NOK_generic);
+    }
+
+    msg->head.sgn   = opcparser_signature;
+    msg->head.opc   = opc;
+    msg->head.dbv   = s_opcparser_singleton.cfg->databaseversion;
+    msg->head.var   = var;
+    msg->head.len   = 0; // but it shall be updated
+    
+    opcparser_var_map_t* map = s_opcparser_find(&msg->head);
+    
+    if(NULL == map)
+    {
+        memset(&msg->head, 0, sizeof(opcparser_header_t));
+        return(opcparser_NOK_generic);
+    }
+    
+    msg->head.len = map->size;
+    if(0 != map->size)
+    {
+        memcpy(msg->data, map->ptr, map->size);
+    }
+    
+    return(opcparser_OK);
+     
 }
 
 
@@ -161,9 +209,9 @@ extern opcparser_res_t opcparser_Parse(theOPCparser* p, opcparser_message_t* msg
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static opcparser_var_map_t* s_opcparser_find(opcparser_message_t* msg)
+static opcparser_var_map_t* s_opcparser_find(opcparser_header_t* head)
 {
-    if(s_opcparser_singleton.cfg->databaseversion != msg->head.dbv)
+    if(s_opcparser_singleton.cfg->databaseversion != head->dbv)
     {
         return(NULL);
     }
@@ -173,7 +221,7 @@ static opcparser_var_map_t* s_opcparser_find(opcparser_message_t* msg)
     
     for(i=0; i<s_opcparser_singleton.cfg->numberofvariables; i++)
     {
-        if(msg->head.var == s_opcparser_singleton.cfg->arrayofvariablemap[i].var)
+        if(head->var == s_opcparser_singleton.cfg->arrayofvariablemap[i].var)
         {
             map = &s_opcparser_singleton.cfg->arrayofvariablemap[i];
             break;
@@ -184,7 +232,7 @@ static opcparser_var_map_t* s_opcparser_find(opcparser_message_t* msg)
 }
 
 
-static opcparser_res_t s_opcparser_process_operation(opcparser_message_t* msg, opcparser_var_map_t* map, opcparser_message_t* reply, uint8_t* replysize)
+static opcparser_res_t s_opcparser_process_operation(opcparser_message_t* msg, opcparser_var_map_t* map, opcparser_message_t* reply, uint16_t* replysize)
 {
     opcparser_res_t res = opcparser_OK;
     
@@ -196,12 +244,17 @@ static opcparser_res_t s_opcparser_process_operation(opcparser_message_t* msg, o
     {
         case opcparser_opc_ask:
         {
+            reply->head.sgn     = opcparser_signature;
             reply->head.opc     = opcparser_opc_say;
             reply->head.dbv     = msg->head.dbv;
             reply->head.var     = map->var;
             reply->head.len     = map->size;
-            memcpy(reply->data, map->ptr, map->size);
-            *replysize = 4+map->size;
+            if(0 != map->size)
+            {
+                memcpy(reply->data, map->ptr, map->size);
+            }
+            *replysize = sizeof(opcparser_header_t) + map->size;
+            // ok... now i make it multiple of 4
             *replysize += 3;
             *replysize /= 4;
             *replysize *= 4;
@@ -212,32 +265,52 @@ static opcparser_res_t s_opcparser_process_operation(opcparser_message_t* msg, o
 
         case opcparser_opc_set:
         {
+            reply->head.sgn     = opcparser_signature;
             reply->head.opc     = opcparser_opc_none;
             reply->head.dbv     = 0;
             reply->head.var     = 0;
             reply->head.len     = 0;
-            if((NULL != map->ptr) && (0 != map->size))
-            {
-                memcpy(map->ptr, msg->data, map->size);
-            }           
+//             if((NULL != map->ptr) && (0 != map->size))
+//             {
+//                 memcpy(map->ptr, msg->data, map->size);
+//             }           
             if(NULL != map->onset)
             {
-                map->onset(map);
+                map->onset(map, msg->data);
             }
             
             res = opcparser_OK;
         
         } break;
-
-        case opcparser_opc_say:
-        default:
+        
+        case opcparser_opc_sig:
         {
+            reply->head.sgn     = opcparser_signature;
             reply->head.opc     = opcparser_opc_none;
             reply->head.dbv     = 0;
             reply->head.var     = 0;
             reply->head.len     = 0;  
             
-            res = opcparser_NOK_generic;            
+            if(NULL != map->onsig)
+            {
+                map->onsig(map, msg->data);
+            }
+            
+            res = opcparser_OK;    
+            
+        } break;
+
+        case opcparser_opc_say:
+        default:
+        {
+            reply->head.sgn     = opcparser_signature;
+            reply->head.opc     = opcparser_opc_none;
+            reply->head.dbv     = 0;
+            reply->head.var     = 0;
+            reply->head.len     = 0;  
+            
+            res = opcparser_NOK_generic;    
+            
         } break;
      
     }
