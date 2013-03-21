@@ -26,8 +26,8 @@
 #include "stdlib.h" 
 #include "string.h" 
 
-extern uint32_t lamiavariabileU32;
-extern uint16_t lamiavariabileU16;
+extern uint32_t lamiavariabileU32 = 0x12345678;
+extern uint16_t lamiavariabileU16 = 0xabcd;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
