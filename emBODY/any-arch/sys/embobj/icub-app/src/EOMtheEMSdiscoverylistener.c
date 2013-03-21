@@ -73,7 +73,8 @@ const eOemsdiscoverylistener_cfg_t eom_emsdiscoverylistener_DefaultCfg =
     EO_INIT(.localport)                 3333, 
     EO_INIT(.remoteport)                3333,
     EO_INIT(.remoteipaddr)              EO_COMMON_IPV4ADDR_LOCALHOST,
-    EO_INIT(.usemutex)                  eobool_true    
+    EO_INIT(.usemutex)                  eobool_true,
+    EO_INIT(.discoveryprotocol)         eodiscovery_protocol_ethloader_reduced    
 };
 
 
@@ -82,8 +83,9 @@ const eOemsdiscoverylistener_cfg_t eom_emsdiscoverylistener_DefaultCfg =
 // --------------------------------------------------------------------------------------------------------------------
 
 typedef enum
-{
-    emsdiscoverylistener_evt_packet_received = 1
+{   // must be single bits: 1, 2, 4, 8, 16, 32, 64 etc.
+    emsdiscoverylistener_evt_packet_received = 1,
+    emsdiscoverylistener_evt_packet_2transmit = 2
 } emsdiscoverylistener_event_t;
 
 
@@ -161,6 +163,7 @@ extern EOMtheEMSdiscoverylistener * eom_emsdiscoverylistener_Initialise(const eO
     dtrcfg.hostipv4addr  = cfg->remoteipaddr;
     dtrcfg.hostipv4port  = cfg->remoteport;
     dtrcfg.txpktcapacity = cfg->outdatagramsizeof;
+    dtrcfg.discoveryprotocol = cfg->discoveryprotocol;
     eom_emsdiscoverytransceiver_Initialise(&dtrcfg);
     
     
@@ -256,10 +259,10 @@ static void s_eom_emsdiscoverylistener_task_run(EOMtask *p, uint32_t t)
             if(eores_OK == eom_emsdiscoverytransceiver_Parse(eom_emsdiscoverytransceiver_GetHandle(), rxpkt))
             {
              
-                // 3. call the former to retrieve a tx packet                
-                if(eores_OK == eom_emsdiscoverytransceiver_Form(eom_emsdiscoverytransceiver_GetHandle(), &txpkt))
+                // 3. retrieve the reply                
+                if(eores_OK == eom_emsdiscoverytransceiver_GetReply(eom_emsdiscoverytransceiver_GetHandle(), &txpkt))
                 {
-                    // 4.  send a packet back. but only if the former gave us a good one.
+                    // 4.  send a packet back. but only if the get_reply gave us a good one.
                     s_eom_emsdiscoverylistener_Transmit(&s_emsdiscoverylistener_singleton, txpkt);
                 }
                 
