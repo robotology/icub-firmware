@@ -57,6 +57,8 @@
 
 #include "EOMtheEMSdiscoverylistener.h"
 
+#include "EOMtheLEDpulser.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -559,7 +561,17 @@ static void s_eom_emsappl_InitLeds(void)
     hal_led_init(emsappl_ledyellow, &cfg);
     hal_led_off(emsappl_ledyellow);
     hal_led_init(emsappl_ledorange, &cfg);
-    hal_led_off(emsappl_ledorange);    
+    hal_led_off(emsappl_ledorange); 
+
+    eOmledpulser_cfg_t ledpulsercfg = 
+    {
+        .numberofleds   = 3,
+        .leds           = { eom_ledpulser_led_zero, eom_ledpulser_led_one, eom_ledpulser_led_two }
+    };
+
+    eom_ledpulser_Initialise(&ledpulsercfg);
+
+    //eom_ledpulser_Start(eom_ledpulser_GetHandle(), eom_ledpulser_led_zero, 400*1000, 10);
 }
 
 static void s_eom_emsappl_startBlinkLed(uint32_t counttick)
