@@ -56,7 +56,7 @@
 const eOmledpulser_cfg_t eom_ledpulser_DefaultCfg = 
 { 
     .numberofleds   = 1, 
-    .leds           = { hal_led0 }
+    .leds           = { eom_ledpulser_led_zero }
 };
 
 
@@ -77,14 +77,14 @@ static void s_eom_ledpulser_callback(void* p);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const char s_eobj_ownname[] = "EOMtheLEDpulser";
+//static const char s_eobj_ownname[] = "EOMtheLEDpulser";
 
 static EOMtheLEDpulser s_mledpulser = 
 {
     .config         = 
     {
         .numberofleds   = 1, 
-        .leds           = { hal_led0 }
+        .leds           = { eom_ledpulser_led_zero }
     },
     .action         = NULL,
     .timer          = {NULL},
@@ -139,8 +139,8 @@ extern EOMtheLEDpulser * eom_ledpulser_Initialise(const eOmledpulser_cfg_t *ledp
     // i init the leds
     for(i=0; i<s_mledpulser.config.numberofleds; i++)
     {
-        hal_led_init(s_mledpulser.config.leds[i], NULL);
-        hal_led_off(s_mledpulser.config.leds[i]);
+        hal_led_init((hal_led_t)s_mledpulser.config.leds[i], NULL);
+        hal_led_off((hal_led_t)s_mledpulser.config.leds[i]);
     }
 
     
@@ -169,7 +169,7 @@ extern void eom_ledpulser_On(EOMtheLEDpulser* p, eOmledpulser_led_t id)
     
     s_mledpulser.ticks[id] = 0;
     
-    hal_led_on(s_mledpulser.config.leds[id]);      
+    hal_led_on((hal_led_t)s_mledpulser.config.leds[id]);      
 }
 
 extern void eom_ledpulser_Off(EOMtheLEDpulser* p, eOmledpulser_led_t id)
@@ -186,7 +186,7 @@ extern void eom_ledpulser_Off(EOMtheLEDpulser* p, eOmledpulser_led_t id)
     
     s_mledpulser.ticks[id] = 0;
     
-    hal_led_off(s_mledpulser.config.leds[id]);      
+    hal_led_off((hal_led_t)s_mledpulser.config.leds[id]);      
 }
 
 extern void eom_ledpulser_Toggle(EOMtheLEDpulser* p, eOmledpulser_led_t id)
@@ -203,7 +203,7 @@ extern void eom_ledpulser_Toggle(EOMtheLEDpulser* p, eOmledpulser_led_t id)
     
     s_mledpulser.ticks[id] = 0;
     
-    hal_led_toggle(s_mledpulser.config.leds[id]);      
+    hal_led_toggle((hal_led_t)s_mledpulser.config.leds[id]);      
 }
 
 extern void eom_ledpulser_Start(EOMtheLEDpulser* p, eOmledpulser_led_t id, eOreltime_t pulseperiod, uint8_t pulsesnumberof)
@@ -220,7 +220,7 @@ extern void eom_ledpulser_Start(EOMtheLEDpulser* p, eOmledpulser_led_t id, eOrel
     
     s_mledpulser.ticks[id] = 2*pulsesnumberof;
     
-    hal_led_on(s_mledpulser.config.leds[id]);
+    hal_led_on((hal_led_t)s_mledpulser.config.leds[id]);
     
     eo_action_SetCallback(s_mledpulser.action, s_eom_ledpulser_callback, (void*)id, eom_callbackman_GetTask(eom_callbackman_GetHandle()));
     
@@ -237,7 +237,7 @@ extern void eom_ledpulser_Stop(EOMtheLEDpulser* p, eOmledpulser_led_t id)
     
     eo_timer_Stop(s_mledpulser.timer[id]);
  
-    hal_led_off(s_mledpulser.config.leds[id]);      
+    hal_led_off((hal_led_t)s_mledpulser.config.leds[id]);      
 }
 
 
@@ -264,12 +264,12 @@ static void s_eom_ledpulser_callback(void* p)
     
     if(0 == pulser->ticks[id])
     {
-        hal_led_off(pulser->config.leds[id]);
+        hal_led_off((hal_led_t)pulser->config.leds[id]);
         eo_timer_Stop(pulser->timer[id]);
     }
     else
     {
-        hal_led_toggle(pulser->config.leds[id]);
+        hal_led_toggle((hal_led_t)pulser->config.leds[id]);
     }
     
 }
