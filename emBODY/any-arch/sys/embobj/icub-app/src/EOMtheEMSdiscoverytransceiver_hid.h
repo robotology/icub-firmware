@@ -37,6 +37,8 @@ extern "C" {
 #include "EOpacket.h"
 #include "EOtimer.h"
 
+#include "OPCprotocolManager.h"
+
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
 #include "EOMtheEMSdiscoverytransceiver.h"
@@ -54,10 +56,11 @@ extern "C" {
  **/  
 struct EOMtheEMSdiscoverytransceiver_hid 
 {
-    EOpacket*   txpkt;
+    EOpacket*   replypkt;
     eObool_t    transmit;
     EOtimer*    shutdowntmr;
     eOemsdiscoverytransceiver_cfg_t cfg;
+    OPCprotocolManager* opcprotman;
 };
 
 
@@ -65,7 +68,7 @@ struct EOMtheEMSdiscoverytransceiver_hid
 
 //extern eOboarddiscoverytransceiver_cfg_t* eom_emsdiscoverytransceiver_hid_userdef_get_cfg(const eOemsdiscoverytransceiver_cfg_t *cfg);
 
-//extern void eom_emsdiscoverytransceiver_hid_userdef_add_endpoints(eOboarddiscoverytransceiver_cfg_t *brdcfg);
+extern opcprotman_cfg_t* eom_emsdiscoverytransceiver_hid_userdef_get_OPCprotocolManager_cfg(void);
 
 
 #ifdef __cplusplus
