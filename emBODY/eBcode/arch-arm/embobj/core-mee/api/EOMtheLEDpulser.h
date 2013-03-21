@@ -75,13 +75,13 @@ enum { eom_ledpulser_leds_number = 6 };
 typedef struct
 {
     uint8_t             numberofleds;
-    hal_led_t           leds[eom_ledpulser_leds_number];
+    eOmledpulser_led_t  leds[eom_ledpulser_leds_number];
 } eOmledpulser_cfg_t;
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eOmledpulser_cfg_t eom_ledpulser_DefaultCfg; // = { .numberofleds = 1, .leds = {hal_led0} };
+extern const eOmledpulser_cfg_t eom_ledpulser_DefaultCfg; // = { .numberofleds = 1, .leds = {eom_ledpulser_led_zero} };
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
