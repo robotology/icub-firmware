@@ -247,6 +247,9 @@ extern eOresult_t eo_appTheDB_GetJointInputsPtr(EOappTheDB *p, eOmc_jointId_t jI
 extern eOresult_t eo_appTheDB_GetJointCmdControlmodePtr(EOappTheDB *p, eOmc_jointId_t jId,  eOmc_controlmode_t **jcmdcontrolmode_ptr);
 extern eOresult_t eo_appTheDB_GetShiftValuesOfJointPtr(EOappTheDB *p, eOmc_jointId_t jId, eOappTheDB_jointShiftValues_t **shiftval_ptr);
 extern eOresult_t eo_appTheDB_GetJointBcastpolicyPtr(EOappTheDB *p, eOmc_jointId_t jId,  eOicubCanProto_bcastpolicy_t **bcast_ptr);
+extern eOresult_t eo_appTheDB_SetJointCurrentControlmode(EOappTheDB *p, eOmc_jointId_t jId, eOmc_controlmode_t curr_mode);
+extern eOresult_t eo_appTheDB_GetJointCurrentControlmode(EOappTheDB *p, eOmc_jointId_t jId, eOmc_controlmode_t *curr_mode_ptr);
+
 
 
 extern eOresult_t eo_appTheDB_GetMotorConfigPtr(EOappTheDB *p, eOmc_motorId_t mId,  eOmc_motor_config_t **mconfig_ptr);

@@ -671,9 +671,49 @@ extern eOresult_t eo_appTheDB_GetJointBcastpolicyPtr(EOappTheDB *p, eOmc_jointId
     return(eores_OK);
 }
 
+extern eOresult_t eo_appTheDB_SetJointCurrentControlmode(EOappTheDB *p, eOmc_jointId_t jId, eOmc_controlmode_t curr_mode)
+{
+    eOappTheDB_hid_jointInfo_t 		*j_ptr;
+    
+    if(NULL == p)
+	{
+        return(eores_NOK_nullpointer);
+	}
+    
+    if(jId >= eo_array_Capacity(p->jointsList))
+    {
+        return(eores_NOK_nodata);
+    }
+
+    j_ptr = (eOappTheDB_hid_jointInfo_t *)eo_array_At(p->jointsList, jId);
+    j_ptr->curr_mode = curr_mode;
+    
+    return(eores_OK);
+}
 
 
-extern eOresult_t eo_appTheDB_GetMotorConfigPtr(EOappTheDB *p, eOmc_jointId_t mId,  eOmc_motor_config_t **mconfig_ptr)
+
+extern eOresult_t eo_appTheDB_GetJointCurrentControlmode(EOappTheDB *p, eOmc_jointId_t jId, eOmc_controlmode_t *curr_mode_ptr)
+{
+    eOappTheDB_hid_jointInfo_t 		*j_ptr;
+    
+    if((NULL == p) || (NULL == curr_mode_ptr))
+	{
+        return(eores_NOK_nullpointer);
+	}
+    
+    if(jId >= eo_array_Capacity(p->jointsList))
+    {
+        return(eores_NOK_nodata);
+    }
+
+    j_ptr = (eOappTheDB_hid_jointInfo_t *)eo_array_At(p->jointsList, jId);
+    *curr_mode_ptr = j_ptr->curr_mode;
+
+    return(eores_OK);
+}
+
+extern eOresult_t eo_appTheDB_GetMotorConfigPtr(EOappTheDB *p, eOmc_motorId_t mId,  eOmc_motor_config_t **mconfig_ptr)
 {
 	if((NULL == p) || (NULL == mconfig_ptr))
 	{
@@ -1008,6 +1048,8 @@ static eOresult_t s_appTheDB_jointslist_init(EOappTheDB *p)
         j_ptr->ref2motor = (eOmc_motorId_t)i;			  //currently the ith joint has connected to ith motor
         j_ptr->shiftvalues_ptr = shiftvalues_ptr;
         j_ptr->bcastpolicy_ptr = bcastpolicy_ptr;
+        /*the curr mode will be initialized when nv jstatus will be initilized. */
+        //j_ptr->curr_mode = eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.jstatus.basic.controlmodestatus;
         
         //2.1)make a connection beetween board to joint also ==> fill "connected joints list" of baord
         b_ptr = (eOappTheDB_hid_canBoardInfo_t*)eo_array_At(p->canboardsList, j_ptr->cfg_ptr->canLoc.belong2board);
@@ -1207,6 +1249,7 @@ static eOresult_t s_appTheDB_nvsrefmaps_init(EOappTheDB *p)
 {
     eOresult_t res;
     uint16_t size, i;
+    eOmc_joint_status_t *jstatus_ptr;
 
 //joint
     size = eo_array_Capacity(p->jointsList);
@@ -1222,6 +1265,9 @@ static eOresult_t s_appTheDB_nvsrefmaps_init(EOappTheDB *p)
         {
             return(res);
         }
+        eo_appTheDB_GetJointStatusPtr(p, i,  &jstatus_ptr);
+        eo_appTheDB_SetJointCurrentControlmode(p, i, jstatus_ptr->basic.controlmodestatus);
+        
     }
     
 //motor
