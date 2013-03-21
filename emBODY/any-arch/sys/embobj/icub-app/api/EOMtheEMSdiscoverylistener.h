@@ -43,6 +43,7 @@ extern "C" {
 
 #include "EoCommon.h"
 #include "EOMtask.h"
+#include "EOMtheEMSdiscoverytransceiver.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -74,7 +75,8 @@ typedef struct
     eOipv4port_t                localport;
     eOipv4port_t                remoteport;
     eOipv4addr_t                remoteipaddr;   // if EO_COMMON_IPV4ADDR_LOCALHOST, then the reply is sent to the ip of the caller
-    eObool_t                    usemutex;     
+    eObool_t                    usemutex;   
+    eOemsdiscovery_protocol_t   discoveryprotocol;       
 } eOemsdiscoverylistener_cfg_t;
 
 

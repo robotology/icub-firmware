@@ -60,15 +60,22 @@ extern "C" {
 typedef struct EOMtheEMSdiscoverytransceiver_hid EOMtheEMSdiscoverytransceiver;
 
 
+typedef enum
+{
+    eodiscovery_protocol_ethloader_reduced          = 0,
+    eodiscovery_protocol_ethloader_reduced_plus_opc = 1  
+} eOemsdiscovery_protocol_t;
+
 
 /**	@typedef    typedef struct eOemsdiscoverytransceiver_cfg_t 
  	@brief      Contains the configuration for the EOMtheEMSdiscoverytransceiver. 
  **/
 typedef struct
 {
-    eOipv4addr_t            hostipv4addr;           /**< if localhost, the ip address of reply is the one of the caller */
-    eOipv4port_t            hostipv4port; 
-    uint16_t                txpktcapacity;
+    eOipv4addr_t                hostipv4addr;           /**< if EO_COMMON_IPV4ADDR_LOCALHOST, then we process packets from every ip address and reply to it */
+    eOipv4port_t                hostipv4port; 
+    uint16_t                    txpktcapacity;
+    eOemsdiscovery_protocol_t   discoveryprotocol;
 } eOemsdiscoverytransceiver_cfg_t;
 
 
@@ -76,7 +83,10 @@ typedef struct
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
 // in here we shall place configuration of rop dimensione etc. now in defines such as EOK_BOARDDISCOVERYTRANSCEIVER_capacityofpacket etc.
-extern const eOemsdiscoverytransceiver_cfg_t eom_emsdiscoverytransceiver_DefaultCfg; // = {.dummy = 0};
+extern const eOemsdiscoverytransceiver_cfg_t eom_emsdiscoverytransceiver_DefaultCfg; // = { .hostipv4addr  = EO_COMMON_IPV4ADDR_LOCALHOST,
+                                                                                     //     .hostipv4port  = 3333,
+                                                                                     //     .txpktcapacity = 64
+                                                                                     //   };
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -101,7 +111,7 @@ extern EOMtheEMSdiscoverytransceiver * eom_emsdiscoverytransceiver_GetHandle(voi
 
 extern eOresult_t eom_emsdiscoverytransceiver_Parse(EOMtheEMSdiscoverytransceiver* p, EOpacket* rxpkt);
 
-extern eOresult_t eom_emsdiscoverytransceiver_Form(EOMtheEMSdiscoverytransceiver* p, EOpacket** txpkt);
+extern eOresult_t eom_emsdiscoverytransceiver_GetReply(EOMtheEMSdiscoverytransceiver* p, EOpacket** txpkt);
 
 
 /** @}            
