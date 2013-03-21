@@ -81,6 +81,8 @@ void set_2FOC_running(uint8_t joint, eOmc_controlmode_command_t mode);
 
 static EOemsController *s_emsc = NULL;
 
+static uint16_t sOpenLoopGain  = 0x0800;
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -179,15 +181,15 @@ extern void eo_emsController_ReadEncoders(int32_t *enc_pos)
 		// |J1| = |  0     1    0   | * |E1|     with a=40/65
 		// |J2|   |  1    -1    a   |   |E2|
     
-        int32_t jnt_posI2I = enc_pos[0]-enc_pos[1]+(40*enc_pos[2])/65;
+        int32_t jnt_pos_2_ = enc_pos[0]-enc_pos[1]+(40*enc_pos[2])/65;
         
-        //eo_axisController_EncRangeAdj(s_emsc->axis_controller[2], &jnt_posI2I);
+        eo_axisController_EncRangeAdj(s_emsc->axis_controller[2], &jnt_pos_2_);
     
-        //s_emsc->cable_length_alarm = eo_motors_CableLimitAlarm(enc_pos[0], enc_pos[1], jnt_posI2I);
+        //s_emsc->cable_length_alarm = eo_motors_CableLimitAlarm(enc_pos[0], enc_pos[1], jnt_pos_2_);
         
         eo_axisController_SetEncPos(s_emsc->axis_controller[0], enc_pos[0]);
         eo_axisController_SetEncPos(s_emsc->axis_controller[1], enc_pos[1]);
-        eo_axisController_SetEncPos(s_emsc->axis_controller[2], jnt_posI2I);
+        eo_axisController_SetEncPos(s_emsc->axis_controller[2], jnt_pos_2_);
         eo_axisController_SetEncPos(s_emsc->axis_controller[3], enc_pos[3]);
 
         #ifdef USE_2FOC_FAST_ENCODER
@@ -288,23 +290,16 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
         if (big_error_flag) alarm_mask |= 1<<j;
     }
     
-    eo_motors_PWM(s_emsc->boardType, pwm_joint, pwm_motor, alarm_mask);
-}
-
-    /*
-    for (uint8_t m=0; m<4; ++m)
+    uint8_t stop_mask = eo_motors_PWM(s_emsc->motors, s_emsc->boardType, pwm_joint, pwm_motor, alarm_mask);
+    
+    JOINTS(j)
     {
-        if (!eo_motors_is_motorON(s_emsc->motors, m))
+        if (stop_mask & (1<<j))
         {
-            JOINTS(j)
-            {
-                eo_axisController_SetControlMode(s_emsc->axis_controller[j], eomc_controlmode_cmd_switch_everything_off);
-            }
-            
-            break;
+            eo_emsController_SetControlMode(j, eomc_controlmode_cmd_switch_everything_off);
         }
     }
-    */
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -493,7 +488,11 @@ extern void eo_emsController_SetPosPid(uint8_t joint, float K, float Kd, float K
 }   
 extern void eo_emsController_SetTrqPid(uint8_t joint, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff)
 {
-    if (s_emsc) eo_axisController_SetTrqPid(s_emsc->axis_controller[joint], K, Kd, Ki, Imax, Ymax, Yoff);    
+    //if (s_emsc) eo_axisController_SetTrqPid(s_emsc->axis_controller[joint], K, Kd, Ki, Imax, Ymax, Yoff);
+    
+    if (s_emsc) eo_axisController_SetTrqPid(s_emsc->axis_controller[joint], K, 0.0f, 0.0f, 0.0f, Ymax, Yoff);
+    
+    //sOpenLoopGain=(uint16_t)Yoff;
 }   
 // PID configurations
 ///////////////////////
@@ -530,7 +529,7 @@ extern void eo_emsController_SetVelMax(uint8_t joint, int32_t vel_max)
 
 extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t motorerror, uint8_t canerror, eOmc_controlmode_t controlmode)
 {
-    //if (s_emsc) eo_motor_set_motor_status(s_emsc->motors, motor, !motorerror && !canerror && controlmode!=eomc_controlmode_idle);
+    if (s_emsc) eo_motor_set_motor_error_status(s_emsc->motors, motor, motorerror || canerror);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -549,7 +548,7 @@ void config_2FOC(uint8_t motor)
 {
     eOmc_PID_t pid;
     eOmc_i2tParams_t i2t;
-    //eOicubCanProto_current_t max_current;
+    eOicubCanProto_current_t max_current;
     
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     eOappTheDB_jointOrMotorCanLocation_t canLoc;
@@ -576,9 +575,9 @@ void config_2FOC(uint8_t motor)
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_I2T_PARAMS;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &i2t);
     
-    //max_current = 0x3333;
-    //msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_LIMIT;
-    //eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &max_current);
+    max_current = 0x1999;
+    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_LIMIT;
+    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &max_current);
 }
 
 void set_2FOC_idle(uint8_t motor)
@@ -623,15 +622,15 @@ void set_2FOC_running(uint8_t motor, eOmc_controlmode_command_t mode)
     
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
     
-    //if (mode == eomc_controlmode_cmd_position || mode == eomc_controlmode_cmd_velocity)
+    if (mode == eomc_controlmode_cmd_position || mode == eomc_controlmode_cmd_velocity)
     {
         controlmode_2foc = eomc_controlmode_cmd_openloop;
         
         pid.kp = 0x0A00;
+        //pid.kp = sOpenLoopGain;
         pid.kd = 0x0000;
         pid.ki = 0x0000;
     }
-    /*
     else
     {
         controlmode_2foc = eomc_controlmode_cmd_current;
@@ -640,8 +639,7 @@ void set_2FOC_running(uint8_t motor, eOmc_controlmode_command_t mode)
         pid.kd = 0x028F;
         pid.ki = 0x0000;
     }
-    */
-    
+   
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &pid);
     

@@ -39,7 +39,7 @@ struct EOmotors_hid
 {
     uint8_t n_motors;
     
-    eObool_t motorON[MAX_MOTORS];
+    uint8_t motor_error_mask;
     int16_t zero_rotation_torque[MAX_MOTORS];
 }; 
 

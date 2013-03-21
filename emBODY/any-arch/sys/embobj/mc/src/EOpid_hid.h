@@ -40,18 +40,19 @@ struct EOpid_hid
     float K;
     float Ki;
     float Kd;
-
-    float Xn;
+    
+    float Kff;
     
     float Dn;
     float En;
     float KKiIn;
     float Imax;
     
+    float xv0,xv1,xv2;
+    float yv0,yv1,yv2;
+    
     float A;
     float B;
-    
-    float pwm_3Hz_LPF;
     
     int32_t pwm_offset;
     int32_t pwm_max;
