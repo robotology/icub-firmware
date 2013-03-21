@@ -125,7 +125,7 @@ extern "C" {
 
 //  <o> host IP4 address <1-255>
 //  <i> default: 205
-#define EOMTHEEMSAPPLCFG_HOSTIPADDR4                            205
+#define EOMTHEEMSAPPLCFG_HOSTIPADDR4                            101
 
 
 //  </h>Remote Host
@@ -204,7 +204,7 @@ extern "C" {
 
 //  <h> error manager
 //  <o> on error   <0=>   redefine __weak eom_emsapplcfg_hid_userdef_OnError() 
-#define sdfefe004       0
+//#define sdfefe004       0
 //  <o> printf on debug window enabled   <0=>   false  <1=>   true
 #define EOMTHEEMSAPPLCFG_HALTRACE_ENABLED    0
 //  </h>error manager
@@ -405,15 +405,15 @@ extern "C" {
 
 //  <o> max size of input datagrams <16-64>
 //  <i> default: 16
-#define EOMTHEEMSAPPLCFG_DISCOVERY_INPDGRAMSIZEOF                  16
+#define EOMTHEEMSAPPLCFG_DISCOVERY_INPDGRAMSIZEOF                  32
 
 //  <o> max number of output datagrams <1-8>
 //  <i> default: 1 
 #define EOMTHEEMSAPPLCFG_DISCOVERY_OUTDGRAMNUMBER                  1
 
-//  <o> max size of output datagrams <16-128>
+//  <o> max size of output datagrams <16-1024>
 //  <i> default: 32
-#define EOMTHEEMSAPPLCFG_DISCOVERY_OUTDGRAMSIZEOF                  32
+#define EOMTHEEMSAPPLCFG_DISCOVERY_OUTDGRAMSIZEOF                  256
 
 //  </h>datagrams in socket
 
@@ -444,8 +444,8 @@ extern "C" {
 
 //  <h> protocol
 
-//  <o> type of protocol    <0=> ETHloader reduced set: only CMD_SCAN, CMD_RESET, and CMD_UPD_ONCE
-#define EOMTHEEMSAPPLCFG_DISCOVERY_PROTOCOL                0
+//  <o> type of protocol    <0=> ETHloader reduced set: only CMD_SCAN, CMD_RESET, and CMD_UPD_ONCE  <1=> ETHloader reduced set plus user-def OPC
+#define EOMTHEEMSAPPLCFG_DISCOVERY_PROTOCOL                1
 
 //  </h>protocol
 
@@ -485,8 +485,8 @@ extern "C" {
 #define EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMNUMBER                  2
 
 //  <o> max size of output datagrams <64-1500>
-//  <i> default: 1024
-#define EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF                  1024
+//  <i> default: 1316
+#define EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF                  1316
 
 //  </h>datagrams in socket
 
@@ -495,6 +495,17 @@ extern "C" {
 
 
 //  <h> Transceiver configuration
+
+
+//  <h> filter on incoming packets
+
+//  <o> source IP address       <0=> are accepted only packets coming from the Remote Host 
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_filter_ipaddr 0
+
+//  <o> source port             <0=> any source port is valid
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_filter_ipport             0
+
+//  </h>filter on incoming packets
 
 //  <h> destination address
 
@@ -541,11 +552,11 @@ extern "C" {
 
 //  <o> capacity of the ropframe of occasional rops    <16-1440:8>
 //  <i> default: 128
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEOCCASIONALSCAPACITY  128  
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEOCCASIONALSCAPACITY  256  
 
 //  <o> capacity of the ropframe of reply rops    <16-1440:8>
 //  <i> default: 128
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY  128  
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY  64  
 
 
 
@@ -769,6 +780,15 @@ extern "C" {
 #define assfe66999999906743fcrec4 0  
 
 // </h>EOMtheEMSrunner   
+
+
+//  <h> EOMtheEMSdiscoverytransceiver    
+ 
+//  <o> eom_emsdiscoverytransceiver_hid_userdef_get_OPCprotocolManager_cfg()      <0=> used to allow the discoverytransceiver to manage a given OPC protocol
+#define assfef443f43wdws56743fcrsd43d234 0
+    
+// </h>EOMtheEMSdiscoverytransceiver   
+
 
 //  </h>Overridable functions    
     
