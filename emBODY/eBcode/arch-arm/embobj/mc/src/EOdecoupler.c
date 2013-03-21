@@ -81,9 +81,10 @@ extern EOmotors* eo_motors_New(uint8_t n_motors)
 
     if (o)
     {
+        o->motor_error_mask = 0x00;
+        
         for (uint8_t m=0; m<MAX_MOTORS; ++m)
         {
-            o->motorON[m]              = eobool_false;
             o->zero_rotation_torque[m] = ZERO_ROTATION_TORQUE;
         }
         
@@ -95,20 +96,33 @@ extern EOmotors* eo_motors_New(uint8_t n_motors)
     return o;
 }
 
+/*
 extern eObool_t eo_motors_is_motorON(EOmotors *o, uint8_t m)
 {
-    if (o && m<MAX_MOTORS) return o->motorON[m];
+    if (o) return 0 != (o->active_motors_mask & (1<<m));
     
     return eobool_false;
 }
+*/
 
-extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, eObool_t on_off)
+extern void eo_motor_set_motor_error_status(EOmotors *o, uint8_t m, eObool_t bError)
 {
-    if (o && m<MAX_MOTORS) o->motorON[m] = on_off;
+    if (!o) return;
+    
+    if (bError)
+    {
+        o->motor_error_mask |=  (1<<m);
+    }
+    else
+    {
+        o->motor_error_mask &= ~(1<<m);
+    }
 }
 
-extern uint8_t eo_motors_PWM(emsBoardType_t board_type, int32_t *pwm_joint, int16_t *pwm_motor, uint8_t alarm_mask)
+extern uint8_t eo_motors_PWM(EOmotors *o, emsBoardType_t board_type, int32_t *pwm_joint, int16_t *pwm_motor, uint8_t alarm_mask)
 {
+    if (!o) return 0xFF;
+    
     uint8_t stop_mask = 0;
     
     switch (board_type)
@@ -117,32 +131,90 @@ extern uint8_t eo_motors_PWM(emsBoardType_t board_type, int32_t *pwm_joint, int1
         break;
     
     case EMS_SHOULDER:
-        pwm_motor[0] = (int16_t)(      pwm_joint[0]);
-        pwm_motor[1] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]))/40);
-        pwm_motor[2] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]))/40);
+        if (o->motor_error_mask & 0x07)
+        {
+            stop_mask |= 0x07;
+            pwm_motor[0] = pwm_motor[1] = pwm_motor[2] = 0;
+        }
+        else
+        {
+            pwm_motor[0] = (int16_t)(      pwm_joint[0]);
+            pwm_motor[1] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]))/40);
+            pwm_motor[2] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]))/40);
     
-        //pwm_motor[0] = (int16_t)  pwm_joint[0];
-        //pwm_motor[1] = (int16_t)(-pwm_joint[0]+pwm_joint[1]);
-        //pwm_motor[2] = (int16_t)(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]);
-    
-        pwm_motor[3] = (int16_t)  pwm_joint[3];
+            //pwm_motor[0] = (int16_t)  pwm_joint[0];
+            //pwm_motor[1] = (int16_t)(-pwm_joint[0]+pwm_joint[1]);
+            //pwm_motor[2] = (int16_t)(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]);
+        }
+        
+        if (o->motor_error_mask & 0x08)
+        {            
+            stop_mask |= 0x08;
+            pwm_motor[3] = 0;
+        }
+        else
+        {   
+            pwm_motor[3] = (int16_t)  pwm_joint[3];
+        }
         
         break;
 
     case EMS_WAIST:
-        pwm_motor[0] = (int16_t)((pwm_joint[0]-pwm_joint[1])/2);
-        pwm_motor[1] = (int16_t)((pwm_joint[0]+pwm_joint[1])/2);
-        pwm_motor[2] = (int16_t)  pwm_joint[2];
+        if (o->motor_error_mask & 0x07)
+        {
+            stop_mask |= 0x07;
+            pwm_motor[0] = pwm_motor[1] = pwm_motor[2] = 0;
+        }
+        else
+        {
+            pwm_motor[0] = (int16_t)((pwm_joint[0]-pwm_joint[1])/2);
+            pwm_motor[1] = (int16_t)((pwm_joint[0]+pwm_joint[1])/2);
+            pwm_motor[2] = (int16_t)  pwm_joint[2];
+        }
         
         break;
 
     case EMS_UPPERLEG:
-        pwm_motor[2] =  pwm_joint[2];
-        pwm_motor[3] =  pwm_joint[3];
+        if (o->motor_error_mask & 0x04)
+        {
+            stop_mask |= 0x04;
+            pwm_motor[2] = 0;
+        }
+        else
+        {
+            pwm_motor[2] = pwm_joint[2];
+        }
+        
+        if (o->motor_error_mask & 0x08)
+        {
+            stop_mask |= 0x08;
+            pwm_motor[3] = 0;
+        }
+        else
+        {
+            pwm_motor[3] = pwm_joint[3];
+        }
     
     case EMS_ANKLE:
-        pwm_motor[0] =  pwm_joint[0];
-        pwm_motor[1] =  pwm_joint[1];
+        if (o->motor_error_mask & 0x01)
+        {
+            stop_mask |= 0x01;
+            pwm_motor[0] = 0;
+        }
+        else
+        {
+            pwm_motor[0] = pwm_joint[0];
+        }
+        
+        if (o->motor_error_mask & 0x02)
+        {
+            stop_mask |= 0x02;
+            pwm_motor[1] = 0;
+        }
+        else
+        {
+            pwm_motor[1] = pwm_joint[1];
+        }
     }
     
     switch (board_type)

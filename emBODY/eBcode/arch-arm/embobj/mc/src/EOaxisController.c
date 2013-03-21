@@ -191,6 +191,8 @@ extern void eo_axisController_SetPosMin(EOaxisController *o, int32_t pos_min)
     if (!o) return;
     
     SET_BIT(MASK_MIN_POS);
+    
+    o->pos_min = pos_min;
 
     eo_trajectory_SetPosMin(o->trajectory, pos_min);
 }
@@ -199,6 +201,8 @@ extern void eo_axisController_SetPosMax(EOaxisController *o, int32_t pos_max)
     if (!o) return;
     
     SET_BIT(MASK_MAX_POS);
+    
+    o->pos_max = pos_max;
 
     eo_trajectory_SetPosMax(o->trajectory, pos_max);
 }
@@ -493,16 +497,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
                 eo_pid_Reset(o->pidT); // position limit reached
             }
        
-            int32_t err;
-            
-            if (o->control_mode == eomc_controlmode_impedance_pos)
-            {
-                err = pos_ref - pos;
-            }
-            else
-            {
-                err = vel_ref - vel;
-            }
+            int32_t err = pos_ref - pos;
             
             o->torque_ref = (o->stiffness*err + o->damping*(err - o->err))/1000; 
 
@@ -521,9 +516,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
                 return 0;
             }
             
-            int32_t pwm = eo_pid_PWM_pi_3Hz_LPF(o->pidT, o->torque_ref - o->torque_meas);
-            
-            //int32_t pwm = eo_pid_PWM_pi(o->pidT, o->torque_ref - o->torque_meas);
+            int32_t pwm = eo_pid_PWM_pi_1_1Hz_2ndLPF(o->pidT, o->torque_ref, o->torque_meas);
             
             if (pos <= o->pos_min || o->pos_max <= pos)
             {
@@ -566,7 +559,9 @@ extern void eo_axisController_SetTrqPid(EOaxisController *o, float K, float Kd, 
     
     SET_BIT(MASK_TRQ_PID);
 
-    eo_pid_SetPid(o->pidT, K, Kd, Ki, Imax, Ymax, Yoff);
+    eo_pid_SetPid(o->pidT, K, Kd, Ki, Imax, Ymax, 0);
+    
+    o->torque_ref = Yoff;
 }
 
 extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_status_basic_t* jointStatus)
