@@ -37,6 +37,7 @@ extern "C" {
 #include "EOVtheIPnet.h"
 #include "EOMtask.h"
 #include "EOaction.h"
+#include "EOtimer.h"    
 
 #include "osal.h"
 #include "ipal.h"
@@ -51,6 +52,14 @@ extern "C" {
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
+
+typedef struct
+{
+    uint32_t    datagrams_failed_to_go_in_rxfifo;
+    uint32_t    datagrams_failed_to_go_in_txosalqueue;
+    uint32_t    datagrams_failed_to_be_retrieved_from_txfifo;
+    uint32_t    datagrams_failed_to_be_sent_by_ipal;    
+} EOMtheIPnetDEBUG_t;
 
 typedef enum
 {   // contains all possible command types that can be sent to the EOMtask tskproc
@@ -99,6 +108,8 @@ struct EOMtheIPnet_hid
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
+
+extern EOMtheIPnetDEBUG_t eom_ipnet_hid_DEBUG;
 
 // name of the tasks as it is shown in uvision
 
