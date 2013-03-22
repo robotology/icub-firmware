@@ -60,6 +60,18 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
+//  DEBUG
+extern EOMtheEMStransceiverDEBUG_t eom_emstransceiver_hid_DEBUG =
+{
+    .rxinvalidropframes                     = 0,
+    .errorsinsequencenumber                 = 0,
+    .lostreplies                            = 0,
+    .failuresinloadofreplyropframe          = 0,
+    .txropframeistoobigforthepacket         = 0,
+    .cannotloadropinregulars                = 0,
+    .cannotloadropinoccasionals             = 0    
+};
+
 const eOemstransceiver_cfg_t eom_emstransceiver_DefaultCfg = 
 {
     EO_INIT(.vectorof_endpoint_cfg)     NULL,
