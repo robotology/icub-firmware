@@ -87,8 +87,9 @@ extern EOspeedmeter* eo_speedmeter_New(void)
         o->position_last = 0;
         o->position_sure = 0;
         
-        o->offset = 0;
-        o->enc_sign = 0;
+        o->calibrated = eobool_false;
+        o->offset     = 0;
+        o->enc_sign   = 0;
         
         o->odo_x_freq = 0;
         o->speed_filt = 0;
@@ -123,6 +124,7 @@ extern void eo_speedometer_Calibrate(EOspeedmeter* o, int32_t offset)
     o->offset = offset;
     
     o->is_started = eobool_false;
+    o->calibrated = eobool_true;
 }
 
 extern void eo_speedometer_Reset(EOspeedmeter* o)
@@ -142,6 +144,11 @@ extern eObool_t eo_speedometer_IsHardFault(EOspeedmeter* o)
 extern eObool_t eo_speedometer_IsStarted(EOspeedmeter* o)
 {
     return o->is_started;
+}
+
+extern eObool_t eo_speedometer_IsCalibrated(EOspeedmeter* o)
+{
+    return o->calibrated;
 }
 
 extern int32_t eo_speedometer_GetVelocity(EOspeedmeter* o)
@@ -174,10 +181,14 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
     {
         position -= o->offset;
         
-        if (position < 0) 
+        if (position < 0)
+        {
             position += IMPULSE_x_REVOLUTION;
-        else
-            if (position >= IMPULSE_x_REVOLUTION) position -= IMPULSE_x_REVOLUTION;
+        }
+        else if (position >= IMPULSE_x_REVOLUTION)
+        {
+            position -= IMPULSE_x_REVOLUTION;
+        }
         
         position *= o->enc_sign;
     }
@@ -192,7 +203,7 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
 
     if (o->time < 32000) ++o->time;
 
-    if (o->hard_fault || o->invalid_data_cnt >= 500)
+    if (/* o->hard_fault || */ o->invalid_data_cnt >= 500)
     {
         o->hard_fault = eobool_true;
         o->invalid_data_cnt = 0;
@@ -305,6 +316,72 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
         o->sample[3] = 0;
         o->sample[4] = 0;
     }
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of extern hidden functions 
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of static functions 
+// --------------------------------------------------------------------------------------------------------------------
+
+static void encoder_init(EOspeedmeter* o, int32_t position)
+{
+    if (position == ENC_INVALID)
+    {
+        o->first_valid_data = 0;
+        return;
+    }
+    
+    if (!o->first_valid_data)
+    {
+        o->position_last = position;
+    }
+    
+    if (o->position_last != position)
+    {
+        o->first_valid_data = 0;
+        return;
+    }
+    
+    if (++o->first_valid_data >= 3)
+    {
+        o->time = 0;
+        
+        o->position_last = position;
+        o->position_sure = position;
+
+        o->distance = position;
+        
+        o->odo_x_freq = 0;
+        o->speed_filt = 0;
+        o->speed = 0;
+        o->dir = 0;
+
+        o->first_valid_data = 0;
+        o->invalid_data_cnt = 0;
+        
+        o->is_started = eobool_true;
+        
+        o->sindex = 0;
+        
+        o->sample[0] = 0;
+        o->sample[1] = 0;
+        o->sample[2] = 0;
+        o->sample[3] = 0;
+        o->sample[4] = 0;
+    }
+}
+
+static int32_t normalize_angle(int32_t a)
+{
+    while (a < -IMPULSE_x_REVOLUTION_by_2) a += IMPULSE_x_REVOLUTION;
+    while (a >  IMPULSE_x_REVOLUTION_by_2) a -= IMPULSE_x_REVOLUTION;
+
+    return a;
 }
 
 /*
@@ -420,72 +497,6 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
     #endif
 }
 */
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of extern hidden functions 
-// --------------------------------------------------------------------------------------------------------------------
-// empty-section
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of static functions 
-// --------------------------------------------------------------------------------------------------------------------
-
-static void encoder_init(EOspeedmeter* o, int32_t position)
-{
-    if (position == ENC_INVALID)
-    {
-        o->first_valid_data = 0;
-        return;
-    }
-    
-    if (!o->first_valid_data)
-    {
-        o->position_last = position;
-    }
-    
-    if (o->position_last != position)
-    {
-        o->first_valid_data = 0;
-        return;
-    }
-    
-    if (++o->first_valid_data >= 3)
-    {
-        o->time = 0;
-        
-        o->position_last = position;
-        o->position_sure = position;
-
-        o->distance = position;
-        
-        o->odo_x_freq = 0;
-        o->speed_filt = 0;
-        o->speed = 0;
-        o->dir = 0;
-
-        o->first_valid_data = 0;
-        o->invalid_data_cnt = 0;
-        
-        o->is_started = eobool_true;
-        
-        o->sindex = 0;
-        
-        o->sample[0] = 0;
-        o->sample[1] = 0;
-        o->sample[2] = 0;
-        o->sample[3] = 0;
-        o->sample[4] = 0;
-    }
-}
-
-static int32_t normalize_angle(int32_t a)
-{
-    while (a < -IMPULSE_x_REVOLUTION_by_2) a += IMPULSE_x_REVOLUTION;
-    while (a >  IMPULSE_x_REVOLUTION_by_2) a -= IMPULSE_x_REVOLUTION;
-
-    return a;
-}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
