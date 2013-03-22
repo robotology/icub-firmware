@@ -101,9 +101,10 @@ extern eODeb_eoProtoParser * eODeb_eoProtoParser_Initialise(const eODeb_eoProtoP
         return(NULL);
     }
     
-    memcpy(&s_debParser_singleton.cfg, cfg, sizeof(eOethLowLevParser_cfg_t));
+    memcpy(&s_debParser_singleton.cfg, cfg, sizeof(eODeb_eoProtoParser_cfg_t));
     s_debParser_singleton.initted = 1;
     
+    s_eodeb_eoProtoParser_NVisrequired(&s_debParser_singleton, 0x14, 0x9c00);
     return(&s_debParser_singleton);
 }
 
@@ -237,7 +238,8 @@ static eOresult_t s_eodeb_eoProtoParser_CheckNV(eODeb_eoProtoParser *p, eOethLow
                 }
                 howmuch = (ropheader->dsiz) + fill;
                 enddata_ptr = &rop_ptr[howmuch];
-                ropAddInfo.time = *((uint64_t*)enddata_ptr);  
+                memcpy((uint8_t*)&ropAddInfo.time, enddata_ptr, sizeof(uint64_t));
+//                ropAddInfo.time = *((uint64_t*)enddata_ptr);  
             }
             
             p->cfg.checks.nv.cbk_onNVfound(pktInfo_ptr, &ropAddInfo);
