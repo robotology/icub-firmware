@@ -88,6 +88,8 @@ struct EOaxisController_hid
     eOmc_controlmode_t control_mode;
 
     uint16_t ready_mask;
+    
+    filter_cut_freq_t filter_cut_freq;
 }; 
 
 

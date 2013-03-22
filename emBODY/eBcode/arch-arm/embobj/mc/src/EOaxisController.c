@@ -86,12 +86,14 @@ int16_t torque_debug_can[4];
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOaxisController* eo_axisController_New(void) 
+extern EOaxisController* eo_axisController_New(filter_cut_freq_t cf) 
 {
     EOaxisController *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOaxisController), 1);
 
     if (o)
     {
+        o->filter_cut_freq = cf;
+        
         o->pidP = eo_pid_New();    
         o->pidT = eo_pid_New();
         
@@ -514,7 +516,18 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
                 return 0;
             }
             
-            int32_t pwm = eo_pid_PWM_pi_1_1Hz_2ndLPF(o->pidT, o->torque_ref, o->torque_meas);
+            int32_t pwm = 0;
+            
+            switch (o->filter_cut_freq)
+            {
+            case CUT_FREQ_1_1_Hz: 
+                pwm = eo_pid_PWM_pi_1_1Hz_2ndLPF(o->pidT, o->torque_ref, o->torque_meas); 
+                break;
+                
+            case CUT_FREQ_3_0_Hz: 
+                pwm = eo_pid_PWM_pi_3_0Hz_2ndLPF(o->pidT, o->torque_ref, o->torque_meas); 
+                break;
+            }
             
             if (pos <= o->pos_min || o->pos_max <= pos)
             {
