@@ -81,6 +81,22 @@ struct EOMtheEMSrunner_hid
 };
 
 
+typedef struct
+{
+    uint64_t    numberofperiods;
+    uint64_t    cumulativeabsoluteerrorinperiod;  
+    uint32_t    meanofabsoluteerrorinperiod;
+    uint32_t    movingmeanofabsoluteerrorinperiod;
+    uint32_t    maxabsoluteerrorinperiod;
+    uint32_t    minabsoluteerrorinperiod;  
+    uint32_t    executionoverflows[eo_emsrunner_task_numberof];
+    uint32_t    datagrams_failed_to_go_in_txsocket;    
+} EOMtheEMSrunnerDEBUG_t;
+
+
+extern EOMtheEMSrunnerDEBUG_t eom_emsrunner_hid_DEBUG;
+
+
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
 extern void tskEMSrunRX(void *p);

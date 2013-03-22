@@ -250,11 +250,13 @@ extern eOresult_t eom_emssocket_Receive(EOMtheEMSsocket *p, EOpacket** rxpkt, eO
         return(eores_NOK_generic);
     }  
 
+    // eok_reltimeZERO is on read blocking mode ... it waits until a packet is received.
     res = eo_socketdtg_Get(p->socket, p->rxpkt, eok_reltimeZERO);
     
     if(eores_OK != res)
     {
         eo_packet_Size_Set(p->rxpkt, 0);
+        eo_socketdtg_Received_NumberOf(p->socket, remaining);
     }
     else
     {

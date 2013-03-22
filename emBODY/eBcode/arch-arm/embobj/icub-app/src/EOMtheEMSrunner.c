@@ -110,6 +110,8 @@ const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg =
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static void s_eom_emsrunner_compute_timing_statistics(void);
+
 static eObool_t s_eom_emsrunner_timing_is_compatible(const eOemsrunner_cfg_t *cfg);
 
 static void s_eom_emsrunner_taskRX_startup(EOMtask *p, uint32_t t);
@@ -161,6 +163,17 @@ static EOMtheEMSrunner s_theemsrunner =
 };
 
 
+extern EOMtheEMSrunnerDEBUG_t eom_emsrunner_hid_DEBUG =
+{
+    .numberofperiods                            = 0,
+    .cumulativeabsoluteerrorinperiod            = 0,
+    .meanofabsoluteerrorinperiod                = 0,
+    .movingmeanofabsoluteerrorinperiod          = 0,
+    .maxabsoluteerrorinperiod                   = 0,
+    .minabsoluteerrorinperiod                   = 1000000000,
+    .executionoverflows                         = {0, 0, 0},
+    .datagrams_failed_to_go_in_txsocket         = 0  
+};
 
 //static const hal_timer_t s_eom_runner_timers_task[3] = {hal_timer2, hal_timer3, hal_timer4};
 //static const hal_timer_t s_eom_runner_timers_warn[3] = {hal_timer5, hal_timer6, hal_timer7};
@@ -387,6 +400,8 @@ extern void tskEMSrunTX(void *p)
 
 /*__weak*/ extern void eom_emsrunner_hid_userdef_taskRX_activity(EOMtheEMSrunner *p)
 {   
+    s_eom_emsrunner_compute_timing_statistics();
+    
     p->numofrxrops = 0;
     p->numofrxpackets = 0;
     
@@ -609,6 +624,7 @@ __weak extern void eom_emsrunner_hid_userdef_onexecutionoverflow(EOMtheEMSrunner
     eOerrmanErrorType_t errortype = (eo_emsrunner_mode_hardrealtime == p->mode) ? (eo_errortype_fatal) : (eo_errortype_warning);
     snprintf(str, sizeof(str)-1, "exec overflow of %s", tskname[taskid]); 
     eo_errman_Error(eo_errman_GetHandle(), errortype, s_eobj_ownname, str); 
+    eom_emsrunner_hid_DEBUG.executionoverflows[taskid] ++;
 }
 
 
@@ -618,11 +634,68 @@ __weak extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunne
     eOerrmanErrorType_t errortype = (eo_emsrunner_mode_hardrealtime == p->mode) ? (eo_errortype_fatal) : (eo_errortype_warning);
     snprintf(str, sizeof(str)-1, "failed to tx a packet, possibly because socket is full"); 
     eo_errman_Error(eo_errman_GetHandle(), errortype, s_eobj_ownname, str); 
+    eom_emsrunner_hid_DEBUG.datagrams_failed_to_go_in_txsocket ++;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
+
+static void s_eom_emsrunner_compute_timing_statistics(void)
+{
+    static uint64_t prevtime = 0;
+    uint64_t currtime = osal_system_abstime_get();
+    int64_t error = 0;
+    
+    if(0 == prevtime)
+    {
+        prevtime = currtime;
+        return;
+    }
+    
+    error = (currtime - prevtime - s_theemsrunner.cfg.period); // period is 1000 microseconds
+    if(error < 0) { error = -error; }
+    
+    
+    
+    eom_emsrunner_hid_DEBUG.numberofperiods ++;
+    eom_emsrunner_hid_DEBUG.cumulativeabsoluteerrorinperiod += error;
+    
+    eom_emsrunner_hid_DEBUG.meanofabsoluteerrorinperiod = eom_emsrunner_hid_DEBUG.cumulativeabsoluteerrorinperiod / eom_emsrunner_hid_DEBUG.numberofperiods;
+    
+    
+    if(error > eom_emsrunner_hid_DEBUG.maxabsoluteerrorinperiod)
+    {
+        eom_emsrunner_hid_DEBUG.maxabsoluteerrorinperiod = error;       
+    }
+    
+    if(error < eom_emsrunner_hid_DEBUG.minabsoluteerrorinperiod)
+    {
+        eom_emsrunner_hid_DEBUG.minabsoluteerrorinperiod = error;       
+    }    
+    
+    {   // compute moving mean using 1024 samples
+        static uint32_t mean_1k_n = 0;
+        static uint32_t mean_n = 0;
+        
+        uint32_t mean_1k_nplus1 = 0;
+        uint32_t mean_nplus1 = 0;
+        
+        mean_1k_nplus1 = mean_1k_n - mean_n + error;
+        
+        mean_nplus1 = mean_1k_nplus1 >> 10;
+        
+        // save for next time
+        mean_1k_n = mean_1k_nplus1;
+        mean_n = mean_nplus1;
+        
+        eom_emsrunner_hid_DEBUG.movingmeanofabsoluteerrorinperiod =  mean_nplus1;      
+    }
+    
+    
+    // finally save the curr time 
+    prevtime = currtime;   
+}
 
 static eObool_t s_eom_emsrunner_timing_is_compatible(const eOemsrunner_cfg_t *cfg)
 {

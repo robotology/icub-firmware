@@ -115,6 +115,7 @@ uint8_t can_out_queue_full  = 0;
 static void s_eom_emsappl_environment_init(void);
 static void s_eom_emsappl_ipnetwork_init(void);
 
+static void s_eom_emsappl_backdoor_init(void);
 static void s_eom_emsappl_thelistener_init(void);
 static void s_eom_emsappl_theemssocket_init(void);
 
@@ -205,12 +206,16 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
     s_eom_emsappl_environment_init();
     s_eom_emsappl_ipnetwork_init();
 
-    // 4. initialise the listener
-    s_eom_emsappl_thelistener_init();
     
     // 5. initialise the EOMtheEMSsocket and the EOMtheEMStransceiver   
     s_eom_emsappl_theemssocket_init();    
     s_eom_emsappl_theemstransceiver_init();
+    
+    // 4. initialise the listener
+    s_eom_emsappl_thelistener_init();
+    
+    // 4b. initialise the backdoor
+    s_eom_emsappl_backdoor_init();    
     
     // 6. initialise the EOMtheEMSerror
     s_eom_emsappl_theemserror_init();    
@@ -506,6 +511,14 @@ static void s_eom_emsappl_thelistener_init(void)
     
     eom_emsdiscoverylistener_Initialise(&emscfg->disclistcfg);
 }
+
+static void s_eom_emsappl_backdoor_init(void)
+{
+    EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
+    
+    eom_emsbackdoor_Initialise(&emscfg->backdoorcfg);
+}
+
 
 static void s_eom_emsappl_theemssocket_init(void)
 {

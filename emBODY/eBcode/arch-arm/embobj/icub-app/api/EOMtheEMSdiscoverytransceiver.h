@@ -62,8 +62,7 @@ typedef struct EOMtheEMSdiscoverytransceiver_hid EOMtheEMSdiscoverytransceiver;
 
 typedef enum
 {
-    eodiscovery_protocol_ethloader_reduced          = 0,
-    eodiscovery_protocol_ethloader_reduced_plus_opc = 1  
+    eodiscovery_protocol_ethloader_reduced          = 0  
 } eOemsdiscovery_protocol_t;
 
 

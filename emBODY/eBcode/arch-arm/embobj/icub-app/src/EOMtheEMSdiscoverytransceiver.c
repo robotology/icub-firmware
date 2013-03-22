@@ -36,7 +36,6 @@
 #include "shalPART.h"
 #include "shalINFO.h"
 
-#include "OPCprotocolManager.h"
 
 //#include "appl-core.h"
 
@@ -137,9 +136,7 @@ extern EOMtheEMSdiscoverytransceiver * eom_emsdiscoverytransceiver_Initialise(co
     s_emsdiscoverytransceiver_singleton.transmit = eobool_false;
     
     s_emsdiscoverytransceiver_singleton.shutdowntmr = eo_timer_New();
-    
-    s_emsdiscoverytransceiver_singleton.opcprotman = opcprotman_New(eom_emsdiscoverytransceiver_hid_userdef_get_OPCprotocolManager_cfg());
-    
+       
 
     return(&s_emsdiscoverytransceiver_singleton);
 }
@@ -217,10 +214,6 @@ extern eOresult_t eom_emsdiscoverytransceiver_GetReply(EOMtheEMSdiscoverytransce
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-__weak extern opcprotman_cfg_t* eom_emsdiscoverytransceiver_hid_userdef_get_OPCprotocolManager_cfg(void)
-{
-    return(NULL);
-}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -246,32 +239,7 @@ static eObool_t s_parse_and_form(uint8_t *data, uint8_t size, eOipv4addr_t remad
     eo_packet_Payload_Get(s_emsdiscoverytransceiver_singleton.replypkt, &txdata, &txsize);  
 
     
-    if((eodiscovery_protocol_ethloader_reduced_plus_opc == s_emsdiscoverytransceiver_singleton.cfg.discoveryprotocol) &&
-        (opcprotman_OK == opcprotman_Has_Signature(s_emsdiscoverytransceiver_singleton.opcprotman, (opcprotman_message_t*)data)) )
-    {
-         // call the opc parser
-        uint16_t opctxsize = 0;
-        opcprotman_res_t rr = opcprotman_Parse(s_emsdiscoverytransceiver_singleton.opcprotman, (opcprotman_message_t*)data, (opcprotman_message_t*)txdata, &opctxsize);    
-
-        if(opcprotman_OK_withreply == rr)
-        {               
-            transmit = eobool_true;
-            
-            // ok ... a msg to be sent back.
-            // set the size
-            eo_packet_Size_Set(s_emsdiscoverytransceiver_singleton.replypkt, opctxsize); 
-            
-            eOipv4addr_t address = s_emsdiscoverytransceiver_singleton.cfg.hostipv4addr;
-            if(EO_COMMON_IPV4ADDR_LOCALHOST == address)
-            {
-                address = remaddr;
-            }
-            eo_packet_Addressing_Set(s_emsdiscoverytransceiver_singleton.replypkt, 
-                                 address, s_emsdiscoverytransceiver_singleton.cfg.hostipv4port);
-        }            
-  
-    }
-    else
+    if(1)
     {   // it can be a eth-loader protocol
        
         uint8_t r = s_app_core_manage_cmd(data, txdata, s_emsdiscoverytransceiver_singleton.cfg.txpktcapacity, &txsize);
