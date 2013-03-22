@@ -28,7 +28,8 @@
 #include "EOtheFormer.h"
 
 
-
+// DEBUG
+#include "EOMtheEMStransceiver_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -179,6 +180,10 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvsCfg 
     // verify if the ropframeinput is valid w/ eo_ropframe_IsValid()
     if(eobool_false == eo_ropframe_IsValid(p->ropframeinput))
     {
+        {   // DEBUG
+            eom_emstransceiver_hid_DEBUG.rxinvalidropframes ++;
+        }
+        
         if(NULL != thereisareply)
         {
             *thereisareply = eobool_false;
@@ -198,6 +203,9 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvsCfg 
     {
         if(rec_seqnum != (p->rx_seqnum+1))
         {
+            {   // DEBUG
+                eom_emstransceiver_hid_DEBUG.errorsinsequencenumber ++;
+            }
             eo_receiver_callback_incaseoferror_in_sequencenumberReceived(rec_seqnum, p->rx_seqnum+1);
         }
         p->rx_seqnum = rec_seqnum;
@@ -228,6 +236,13 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvsCfg 
         if(eo_ropcode_none != eo_rop_GetROPcode(p->ropreply))
         {
             res = eo_ropframe_ROP_Set(p->ropframereply, p->ropreply, NULL, NULL, &txremainingbytes);
+            
+            {   // DEBUG
+                if(eores_OK != res)
+                {
+                    eom_emstransceiver_hid_DEBUG.lostreplies ++;
+                }
+            }
         }
         
         // we keep on decoding eve if we cannot put a reply into the ropframe 

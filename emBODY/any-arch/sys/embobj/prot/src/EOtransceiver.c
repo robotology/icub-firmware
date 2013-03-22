@@ -32,6 +32,9 @@
 
 #include "EOVmutex.h"
 
+// DEBUG
+#include "EOMtheEMStransceiver_hid.h"
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -195,7 +198,14 @@ extern eOresult_t eo_transceiver_Receive(EOtransceiver *p, EOpacket *pkt, uint16
         
         //eov_mutex_Take(p->mtx_tx_replies, eok_reltimeINFINITE);
         res = eo_transmitter_reply_ropframe_Load(p->transmitter, ropframereply);      
-        //eov_mutex_Release(p->mtx_tx_replies);            
+        //eov_mutex_Release(p->mtx_tx_replies);  
+
+        {   // DEBUG
+            if(eores_OK != res)
+            {
+                eom_emstransceiver_hid_DEBUG.failuresinloadofreplyropframe ++;            
+            }
+        }
 
     }    
     
@@ -262,6 +272,13 @@ extern eOresult_t eo_transceiver_rop_regular_Load(EOtransceiver *p, eOropdescrip
     res = eo_transmitter_regular_rops_Load(p->transmitter, ropdesc);
     //eov_mutex_Release(p->mtx_tx_regulars); 
     
+    {   // DEBUG    
+        if(eores_OK != res)
+        {
+            eom_emstransceiver_hid_DEBUG.cannotloadropinregulars ++;
+        }
+    }    
+    
     return(res);
 }
 
@@ -294,13 +311,20 @@ extern eOresult_t eo_transceiver_rop_occasional_Load_without_data(EOtransceiver 
     res = eo_transmitter_occasional_rops_Load_without_data(p->transmitter, ropdesc, itisobsolete);
     //eov_mutex_Release(p->mtx_tx_occasionals);
     
+    {   // DEBUG    
+        if(eores_OK != res)
+        {
+            eom_emstransceiver_hid_DEBUG.cannotloadropinoccasionals ++;
+        }
+    }     
+    
     return(res);
 }  
 
 
 extern eOresult_t eo_transceiver_rop_occasional_Load(EOtransceiver *p, eOropdescriptor_t *ropdesc)
 {
-//    eOresult_t res;
+    eOresult_t res;
     
     if((NULL == p) || (NULL == ropdesc))
     {
@@ -328,7 +352,16 @@ extern eOresult_t eo_transceiver_rop_occasional_Load(EOtransceiver *p, eOropdesc
 //         
 //     }   
 
-    return(eo_transmitter_occasional_rops_Load(p->transmitter, ropdesc));
+    res = eo_transmitter_occasional_rops_Load(p->transmitter, ropdesc);
+    
+    {   // DEBUG    
+        if(eores_OK != res)
+        {
+            eom_emstransceiver_hid_DEBUG.cannotloadropinoccasionals ++;
+        }
+    }   
+
+    return(res);
 
 //  #if 0  
 //
