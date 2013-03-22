@@ -32,7 +32,8 @@
 #include "EOVtheSystem.h"
 
 
-
+// DEBUG
+#include "EOMtheEMStransceiver_hid.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -416,6 +417,7 @@ extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outp
     eo_ropframe_age_Set(p->ropframereadytotx, eov_sys_LifeTimeGet(eov_sys_GetHandle()));
     
     // add sequence number
+    #warning --> the sequence number in tx ropframe is incremneted only if the number of rops is non-zero ... (?)
     if( eo_ropframe_ROP_NumberOf(p->ropframereadytotx) != 0)
     {
     	p->tx_seqnum++;
@@ -424,6 +426,15 @@ extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outp
     // now set the size of the packet according to what is inside the ropframe.
     eo_ropframe_Size_Get(p->ropframereadytotx, &size);
     eo_packet_Size_Set(p->txpacket, size);
+
+    {   // DEBUG    
+        uint16_t capacity = 0;
+        eo_packet_Capacity_Get(p->txpacket, &capacity);   
+        if(size > capacity)
+        {
+            eom_emstransceiver_hid_DEBUG.txropframeistoobigforthepacket ++;
+        }
+    }
     
     // finally gives back the packet
     *outpkt = p->txpacket;
