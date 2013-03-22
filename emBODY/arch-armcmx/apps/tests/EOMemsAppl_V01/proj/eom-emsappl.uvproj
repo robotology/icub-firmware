@@ -136,6 +136,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -1264,6 +1265,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\OPCprotocolManager.c</FilePath>
             </File>
+            <File>
+              <FileName>EOMtheEMSbackdoor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSbackdoor.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSbackdoortransceiver.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1308,6 +1319,11 @@
               <FileName>overridden_configurator.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\overridden_configurator.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_backdoortransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\overridden_backdoortransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1508,6 +1524,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -2618,6 +2635,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\OPCprotocolManager.c</FilePath>
             </File>
+            <File>
+              <FileName>EOMtheEMSbackdoor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSbackdoor.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSbackdoortransceiver.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2662,6 +2689,11 @@
               <FileName>overridden_configurator.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\overridden_configurator.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_backdoortransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\overridden_backdoortransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2862,6 +2894,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -4008,6 +4041,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\OPCprotocolManager.c</FilePath>
             </File>
+            <File>
+              <FileName>EOMtheEMSbackdoor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSbackdoor.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSbackdoortransceiver.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4132,6 +4175,11 @@
               <FileName>overridden_configurator.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\overridden_configurator.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_backdoortransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\overridden_backdoortransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4332,6 +4380,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -5518,6 +5567,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\OPCprotocolManager.c</FilePath>
             </File>
+            <File>
+              <FileName>EOMtheEMSbackdoor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSbackdoor.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSbackdoortransceiver.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5642,6 +5701,11 @@
               <FileName>overridden_configurator.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\overridden_configurator.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_backdoortransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\overridden_backdoortransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
