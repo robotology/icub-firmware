@@ -264,6 +264,19 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
         .remoteipaddr           = EO_COMMON_IPV4ADDR(EOMTHEEMSAPPLCFG_DISCOVERY_REMOTEIPADDR1, EOMTHEEMSAPPLCFG_DISCOVERY_REMOTEIPADDR2, EOMTHEEMSAPPLCFG_DISCOVERY_REMOTEIPADDR3, EOMTHEEMSAPPLCFG_DISCOVERY_REMOTEIPADDR4),
         .usemutex               = eobool_true                   
     },
+    .backdoorcfg    =
+    {
+        .taskpriority           = 41,
+        .taskstacksize          = 512,
+        .inpdatagramnumber      = 2,
+        .outdatagramnumber      = 1,
+        .inpdatagramsizeof      = 64,
+        .outdatagramsizeof      = 64,
+        .localport              = 4444, 
+        .remoteport             = 4444,
+        .remoteipaddr           = EO_COMMON_IPV4ADDR(EOMTHEEMSAPPLCFG_HOSTIPADDR1, EOMTHEEMSAPPLCFG_HOSTIPADDR2, EOMTHEEMSAPPLCFG_HOSTIPADDR3, EOMTHEEMSAPPLCFG_HOSTIPADDR4),
+        .usemutex               = eobool_true     
+    },
     .socketcfg      =
     {
         .inpdatagramnumber          = EOMTHEEMSAPPLCFG_SOCKET_INPDGRAMNUMBER, 

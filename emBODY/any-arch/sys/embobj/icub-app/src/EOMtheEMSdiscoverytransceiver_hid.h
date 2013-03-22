@@ -60,7 +60,6 @@ struct EOMtheEMSdiscoverytransceiver_hid
     eObool_t    transmit;
     EOtimer*    shutdowntmr;
     eOemsdiscoverytransceiver_cfg_t cfg;
-    OPCprotocolManager* opcprotman;
 };
 
 
@@ -68,7 +67,7 @@ struct EOMtheEMSdiscoverytransceiver_hid
 
 //extern eOboarddiscoverytransceiver_cfg_t* eom_emsdiscoverytransceiver_hid_userdef_get_cfg(const eOemsdiscoverytransceiver_cfg_t *cfg);
 
-extern opcprotman_cfg_t* eom_emsdiscoverytransceiver_hid_userdef_get_OPCprotocolManager_cfg(void);
+
 
 
 #ifdef __cplusplus

@@ -59,7 +59,7 @@ struct EOMtheEMSdiscoverylistener_hid
     EOMtask*                            task;
     EOsocketDatagram*                   socket;
     EOpacket                            *rxpkt;
-    EOpacket                            *txpkt;
+    EOpacket                            *replypkt;
     eOipv4addr_t                        hostaddress;
     eObool_t                            connected2host;   
     eOemsdiscoverylistener_cfg_t        cfg;

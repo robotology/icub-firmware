@@ -114,7 +114,7 @@ static EOMtheEMSdiscoverylistener s_emsdiscoverylistener_singleton =
     EO_INIT(.task)                          NULL,
     EO_INIT(.socket)                        NULL,
     EO_INIT(.rxpkt)                         NULL,
-    EO_INIT(.txpkt)                         NULL,
+    EO_INIT(.replypkt)                         NULL,
     EO_INIT(.hostaddress)                   EO_COMMON_IPV4ADDR_LOCALHOST,
     EO_INIT(.connected2host)                eobool_false,
     EO_INIT(.cfg)       
@@ -243,7 +243,7 @@ static void s_eom_emsdiscoverylistener_task_run(EOMtask *p, uint32_t t)
     // the event that we have received
     eOevent_t evt = (eOevent_t)t;
     EOpacket* rxpkt = s_emsdiscoverylistener_singleton.rxpkt;
-    EOpacket* txpkt = NULL;
+    EOpacket* replypkt = NULL;
     eOsizecntnr_t remainingrxpkts = 0;    
 
     
@@ -260,10 +260,10 @@ static void s_eom_emsdiscoverylistener_task_run(EOMtask *p, uint32_t t)
             {
              
                 // 3. retrieve the reply                
-                if(eores_OK == eom_emsdiscoverytransceiver_GetReply(eom_emsdiscoverytransceiver_GetHandle(), &txpkt))
+                if(eores_OK == eom_emsdiscoverytransceiver_GetReply(eom_emsdiscoverytransceiver_GetHandle(), &replypkt))
                 {
                     // 4.  send a packet back. but only if the get_reply gave us a good one.
-                    s_eom_emsdiscoverylistener_Transmit(&s_emsdiscoverylistener_singleton, txpkt);
+                    s_eom_emsdiscoverylistener_Transmit(&s_emsdiscoverylistener_singleton, replypkt);
                 }
                 
             }

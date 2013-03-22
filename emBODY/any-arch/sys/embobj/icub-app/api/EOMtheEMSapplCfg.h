@@ -50,6 +50,7 @@ extern "C" {
 
 #include "EOMtheEMSdiscoverylistener.h"
 #include "EOMtheEMSdiscoverytransceiver.h"
+#include "EOMtheEMSbackdoor.h"
 #include "EOMtheEMSsocket.h"
 
 #include "EOMtheIPnet.h"
@@ -119,6 +120,7 @@ typedef const struct
     eObool_t                        hasdevice[eom_emsappl_deviceid_numberof];
     eOnvEP_t                        eps[eom_emsappl_eptype_numberof];
     eOemsdiscoverylistener_cfg_t    disclistcfg;
+    eOemsbackdoor_cfg_t             backdoorcfg;
     eOemssocket_cfg_t               socketcfg;      /**< the cfg used by the object EOMtheEMSsocket launched by the EOMtheEMSappl */
     eOemstransceiver_cfg_t          transcfg;       /**< the cfg used by the object EOMtheEMStransceiver launched by the EOMtheEMSappl */
     eOemserror_cfg_t                errobjcfg;      /**<   */
