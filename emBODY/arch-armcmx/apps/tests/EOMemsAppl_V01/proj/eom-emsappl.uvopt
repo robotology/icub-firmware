@@ -750,7 +750,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>1</IsCurrentTarget>
+        <IsCurrentTarget>0</IsCurrentTarget>
       </OPTFL>
       <CpuCode>255</CpuCode>
       <Books>
@@ -1054,7 +1054,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>0</IsCurrentTarget>
+        <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
       <CpuCode>255</CpuCode>
       <Books>
@@ -3235,10 +3235,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>43</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>99</TopLine>
+      <CurrentLine>105</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_nvsEP_mc_usrcbk_ebx.c</FilenameWithoutPath>
@@ -3464,7 +3464,7 @@
 
   <Group>
     <GroupName>icub-ems-cfg</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -3694,13 +3694,13 @@
   </Group>
 
   <Group>
-    <GroupName>ethLowLevelPraser</GroupName>
-    <tvExp>1</tvExp>
+    <GroupName>ethLowLevelPraserDebug</GroupName>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
       <GroupNumber>28</GroupNumber>
-      <FileNumber>157</FileNumber>
+      <FileNumber>0</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -3709,8 +3709,36 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\ethlowlevelparser\EthLowLevParser.c</PathWithFileName>
-      <FilenameWithoutPath>EthLowLevParser.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\utils\src\eODeb_eoProtoParser.c</PathWithFileName>
+      <FilenameWithoutPath>eODeb_eoProtoParser.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>28</GroupNumber>
+      <FileNumber>0</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\utils\src\eOtheEthLowLevelParser.c</PathWithFileName>
+      <FilenameWithoutPath>eOtheEthLowLevelParser.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>28</GroupNumber>
+      <FileNumber>0</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\ethlowlevelparser\usrCbk_ethLowLevParser.c</PathWithFileName>
+      <FilenameWithoutPath>usrCbk_ethLowLevParser.c</FilenameWithoutPath>
     </File>
   </Group>
 
