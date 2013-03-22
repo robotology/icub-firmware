@@ -21,6 +21,8 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "stdio.h"
+
 //general
 #include "stdlib.h"
 #include "string.h"
