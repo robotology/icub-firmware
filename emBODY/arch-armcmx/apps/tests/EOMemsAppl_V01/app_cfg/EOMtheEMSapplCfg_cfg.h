@@ -1,20 +1,4 @@
-/*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
- * Author:  Marco Accame
- * email:   marco.accame@iit.it
- * website: www.robotcub.org
- * Permission is granted to copy, distribute, and/or modify this program
- * under the terms of the GNU General Public License, version 2 or any
- * later version published by the Free Software Foundation.
- *
- * A copy of the license can be found at
- * http://www.robotcub.org/icub/license/gpl.txt
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details
-*/
+// see copyright at end of file
 
 // - include guard ----------------------------------------------------------------------------------------------------
 #ifndef _EOMTHEEMSAPPLCFG_CFG_H_
@@ -32,75 +16,6 @@ extern "C" {
 
 
 // -  default constants ----------------------------------------------------------------------------------------------- 
-
-
-
-
-//#define EOMTHEEMSAPPLCFG_HOSTIPADDR1                            10
-//#define EOMTHEEMSAPPLCFG_HOSTIPADDR2                            255
-//#define EOMTHEEMSAPPLCFG_HOSTIPADDR3                            72
-//#define EOMTHEEMSAPPLCFG_HOSTIPADDR4                            205
-
-//#define EOMTHEEMSAPPLCFG_HOSTIPPORT                             33333
-
-
-//#define EOMTHEEMSAPPLCFG_TMRMAN_TASK_PRIORITYof                 240
-//#define EOMTHEEMSAPPLCFG_TMRMAN_TASK_STACKSIZEof                512
-//#define EOMTHEEMSAPPLCFG_TMRMAN_TASK_QUEUESIZEof                8
-
-//#define EOMTHEEMSAPPLCFG_CBKMAN_TASK_PRIORITYof                 202
-//#define EOMTHEEMSAPPLCFG_CBKMAN_TASK_STACKSIZEof                512
-//#define EOMTHEEMSAPPLCFG_CBKMAN_TASK_QUEUESIZEof                8
-
-
-//#define EOMTHEEMSAPPLCFG_IPNETPROC_TASK_PRIORITYof              220
-//#define EOMTHEEMSAPPLCFG_IPNETPROC_TASK_STACKSIZEof             1024
-//#define EOMTHEEMSAPPLCFG_IPNETPROC_TASK_MAXIDLETIMEof           20000
-//#define EOMTHEEMSAPPLCFG_IPNETPROC_WAKEUPONRXFRAME              1
-//#define EOMTHEEMSAPPLCFG_IPNETTICK_TASK_PRIORITYof              219
-//#define EOMTHEEMSAPPLCFG_IPNETTICK_TASK_STACKSIZEof             128
-
-
-//#define EOMTHEEMSAPPLCFG_IPNET_MAXNUMOFSOCKETS                  1
-//#define EOMTHEEMSAPPLCFG_IPNET_MAXNUMOFDATAGRAMSENQUEUEDINTX    4
-
-
-//#define EOMTHEEMSAPPLCFG_IPADDR_FROM_ENVIRONMENT                0
-
-//#define EOMTHEEMSAPPLCFG_SOCKET_INPDGRAMNUMBER                  3
-//#define EOMTHEEMSAPPLCFG_SOCKET_INPDGRAMSIZEOF                  768
-//#define EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMNUMBER                  2
-//#define EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF                  1024
-//#define EOMTHEEMSAPPLCFG_SOCKET_LOCALPORT                       12345
-
-//#define EOMTHEEMSAPPLCFG_ERROBJ_TASK_PRIORITYof                 40
-//#define EOMTHEEMSAPPLCFG_ERROBJ_TASK_STACKSIZEof                512
-
-
-//#define EOMTHEEMSAPPLCFG_CFGOBJ_TASK_PRIORITYof                 50
-//#define EOMTHEEMSAPPLCFG_CFGOBJ_TASK_STACKSIZEof                512
-
-//#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_RX_PRIORITYof              250
-//#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_DO_PRIORITYof              251
-//#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_TX_PRIORITYof              252
-
-//#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_RX_STACKSIZEof             1024
-//#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_DO_STACKSIZEof             1024
-//#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_TX_STACKSIZEof             1024
-
-
-//#define EOMTHEEMSAPPLCFG_RUNOBJ_PERIOD                          1000
-//#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_AFTER                        0
-//#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_SAFETIME                     300
-//#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_AFTER                        400
-//#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_SAFETIME                     250
-//#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_AFTER                        700
-//#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_SAFETIME                     250
-
-//#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_MAXPACKETS                   3
-//#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_MAXPACKETS                   1
-
-//#define EOMTHEEMSAPPLCFG_RUNOBJ_MODE_AT_STARTUP                 0
 
  
 // - configuration wizard ---------------------------------------------------------------------------------------------
@@ -153,7 +68,7 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          1
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          2
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          3
 //  </h>version
 
 //  <h> build date
@@ -162,11 +77,11 @@ extern "C" {
 //  <o> month           <1-12> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        3
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          11
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          22
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         11
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         14
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          18
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          30
 //  </h>build date
 
 // </h>Info 
@@ -378,11 +293,11 @@ extern "C" {
 
 //  <o> number of UDP sockets <1-4>
 //  <i> default: 1
-#define EOMTHEEMSAPPLCFG_IPNET_MAXNUMOFSOCKETS   2
+#define EOMTHEEMSAPPLCFG_IPNET_MAXNUMOFSOCKETS   3
 
 //  <o>  max number of packets in wait for transmission <1-16>
 //  <i> default: 4
-#define EOMTHEEMSAPPLCFG_IPNET_MAXNUMOFDATAGRAMSENQUEUEDINTX   4
+#define EOMTHEEMSAPPLCFG_IPNET_MAXNUMOFDATAGRAMSENQUEUEDINTX   8
 
 //  </h>UDP sockets 
 
@@ -529,7 +444,7 @@ extern "C" {
 //     #endif  
  
 
-        #define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY   EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF
+    #define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY   (EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF)
 
 #else
     #error specify capacity of ropframe
@@ -770,6 +685,15 @@ extern "C" {
 
 // </h>EOMtheEMSrunner   
 
+
+//  <h> EOMtheEMSbackdoortransceiver    
+ 
+//  <o> eom_emsbackdoortransceiver_hid_userdef_get_OPCprotocolManager_cfg()      <0=> used to allow the backdoortransceiver to manage a given OPC protocol
+#define assfef443f43wdws56743fcrsd43d234 0
+    
+// </h>EOMtheEMSbackdoortransceiver   
+
+
 //  </h>Overridable functions    
     
 
@@ -779,6 +703,25 @@ extern "C" {
 #endif 
  
 #endif  // include-guard
+
+// keep at the end because the configuration wizard can parse not many lines of code ...
+/*
+ * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
+ * website: www.robotcub.org
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * A copy of the license can be found at
+ * http://www.robotcub.org/icub/license/gpl.txt
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
+*/
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
