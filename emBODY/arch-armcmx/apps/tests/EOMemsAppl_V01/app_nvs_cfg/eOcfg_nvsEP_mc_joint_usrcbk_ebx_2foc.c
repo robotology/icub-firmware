@@ -263,7 +263,10 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__motionmonitormode(eOcfg_nvsEP_
     }
 }
 
-
+// #include "../checksetpoint/callback_file.h"
+// //extern uint8_t callback_of_setpoint(int32_t data, uint8_t joint);
+// extern uint8_t callback_of_setpointV2(int32_t data, uint8_t joint);
+// extern uint8_t callback_of_setpoint_all_joints(verify_pair_t pair, uint8_t joint);
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eOresult_t                              res;
@@ -300,6 +303,15 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
     {
         case eomc_setpoint_position:
         {
+//             #if defined(EOMTHEEMSAPPLCFG_USE_EB8)  || defined(EOMTHEEMSAPPLCFG_USE_EB6)
+//             verify_pair_t pair;
+//             pair.pos = setPoint->to.position.value;
+//             pair.vel = setPoint->to.position.withvelocity;
+//             callback_of_setpoint_all_joints(pair, jxx);
+//             
+//             //callback_of_setpoint(setPoint->to.position.value, jxx);
+//             //callback_of_setpointV2(setPoint->to.position.value, jxx);
+//             #endif
             eo_emsController_SetPosRef(jxx, setPoint->to.position.value, setPoint->to.position.withvelocity);
         }break;
         
