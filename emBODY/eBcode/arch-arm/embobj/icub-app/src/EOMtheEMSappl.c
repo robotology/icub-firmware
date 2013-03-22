@@ -59,6 +59,11 @@
 
 #include "EOMtheLEDpulser.h"
 
+#ifdef _TEST_SEQNUM_
+    #include "eOtheEthLowLevelParser.h"
+    #include "eODeb_eoProtoParser.h"
+#endif
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -604,6 +609,88 @@ EO_static_inline eOsmStatesEMSappl_t s_eom_emsappl_GetCurrentState(EOMtheEMSappl
     return((eOsmStatesEMSappl_t)eo_sm_GetActiveState(p->sm));
 }
 
+
+#ifdef _TEST_SEQNUM_
+extern void my_cbk_onErrorSeqNum(eOethLowLevParser_packetInfo_t *pktInfo_ptr, uint32_t rec_seqNum, uint32_t expected_seqNum);
+extern void my_cbk_onNVfound(eOethLowLevParser_packetInfo_t *pktInfo_ptr, eODeb_eoProtoParser_ropAdditionalInfo_t *ropAddInfo_ptr);
+static void s_eom_emsappl_ethLowLevelParser_configure(void)
+{
+//     //4.1) init application parser: embObjParser
+//     const eODeb_eoProtoParser_cfg_t  deb_eoParserCfg = 
+//     {
+//         EO_INIT(.checks)
+//         {
+//             EO_INIT(.seqNum)
+//             {
+//                 EO_INIT(.cbk_onErrSeqNum)           my_cbk_onErrorSeqNum,
+//             },
+//             
+//             EO_INIT(.nv)                            {0},
+//             
+//             EO_INIT(.invalidRopFrame)               {0}
+//         }
+//     };
+    
+    
+        //4.1) init application parser: embObjParser 
+    const eODeb_eoProtoParser_cfg_t  deb_eoParserCfg =  
+    { 
+        EO_INIT(.checks) 
+        { 
+            EO_INIT(.seqNum) 
+            { 
+                EO_INIT(.cbk_onErrSeqNum)           my_cbk_onErrorSeqNum, 
+            }, 
+             
+            EO_INIT(.nv) 
+            { 
+                EO_INIT(.NVs2searchArray) 
+                { 
+                    EO_INIT(.head) 
+                    { 
+                        EO_INIT(.capacity)       eODeb_eoProtoParser_maxNV2find, 
+                        EO_INIT(.itemsize)       sizeof(eODeb_eoProtoParser_nvidEp_couple_t), 
+                        EO_INIT(.size)           1, 
+                    }, 
+                    EO_INIT(.data) 
+                    { 
+                        {0x14, 0x9c00} 
+                    } 
+                 
+                }, 
+                EO_INIT(.cbk_onNVfound)            my_cbk_onNVfound 
+            }, 
+             
+            EO_INIT(.invalidRopFrame)               {0} 
+        } 
+    };
+
+    
+    eODeb_eoProtoParser_Initialise(&deb_eoParserCfg);
+    
+    
+    //4.2) init low level parser: eOethLowLevParser
+/*    const eOethLowLevParser_cfg_t  ethLowLevParserCfg = 
+    {
+        EO_INIT(.conFiltersData) 
+        {
+            EO_INIT(.filtersEnable)     0,
+            EO_INIT(.filters)           {0}, //use pcap filter
+        },
+        
+        EO_INIT(.appParserData)
+        {
+            EO_INIT(.func)             eODeb_eoProtoParser_RopFrameDissect
+            EO_INIT(.arg)              eODeb_eoProtoParser_GetHandle(),
+        }
+    };
+*/
+    //currently use thelow level parser and appl paser separately
+    const eOethLowLevParser_cfg_t  ethLowLevParserCfg = {0}; 
+    eo_ethLowLevParser_Initialise(&ethLowLevParserCfg);
+
+}
+#endif
 // --------------------------------------------------------------------------------------------------------------------
 // redefinition of functions of state machine
 
@@ -614,6 +701,9 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_CFG(EOsm *s)
 #ifdef _TEST_SEQNUM_
     osal_timer_stop(s_emsappl_singleton.timer4led, osal_callerTSK);
     s_eom_emsappl_startBlinkLed(1000); 
+    
+    s_eom_emsappl_ethLowLevelParser_configure();
+    
 #else    
     hal_led_on(emsappl_ledgreen);
 #endif    
