@@ -81,7 +81,7 @@ void set_2FOC_running(uint8_t joint, eOmc_controlmode_command_t mode);
 
 static EOemsController *s_emsc = NULL;
 
-static uint16_t sOpenLoopGain  = 0x0800;
+//static uint16_t sOpenLoopGain  = 0x0800;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -115,19 +115,32 @@ extern EOemsController* eo_emsController_Init(emsBoardType_t board_type)
                 s_emsc->n_joints   = 0;       
                 break;
             
-            case EMS_SHOULDER: 
+            case EMS_SHOULDER:
+                s_emsc->axis_controller[0] = eo_axisController_New(CUT_FREQ_3_0_Hz);
+                s_emsc->axis_controller[1] = eo_axisController_New(CUT_FREQ_3_0_Hz);
+                s_emsc->axis_controller[2] = eo_axisController_New(CUT_FREQ_3_0_Hz);
+                s_emsc->axis_controller[3] = eo_axisController_New(CUT_FREQ_3_0_Hz);
                 s_emsc->n_joints   = 4;
                 break;
             
             case EMS_WAIST:    
+                s_emsc->axis_controller[0] = eo_axisController_New(CUT_FREQ_3_0_Hz);
+                s_emsc->axis_controller[1] = eo_axisController_New(CUT_FREQ_3_0_Hz);
+                s_emsc->axis_controller[2] = eo_axisController_New(CUT_FREQ_3_0_Hz);
                 s_emsc->n_joints   = 3;          
                 break;
 
             case EMS_UPPERLEG:
+                s_emsc->axis_controller[0] = eo_axisController_New(CUT_FREQ_3_0_Hz);
+                s_emsc->axis_controller[1] = eo_axisController_New(CUT_FREQ_3_0_Hz);
+                s_emsc->axis_controller[2] = eo_axisController_New(CUT_FREQ_3_0_Hz);
+                s_emsc->axis_controller[3] = eo_axisController_New(CUT_FREQ_3_0_Hz);
                 s_emsc->n_joints   = 4;          
                 break;
             
             case EMS_ANKLE:
+                s_emsc->axis_controller[0] = eo_axisController_New(CUT_FREQ_3_0_Hz);
+                s_emsc->axis_controller[1] = eo_axisController_New(CUT_FREQ_3_0_Hz);
                 s_emsc->n_joints   = 2;          
                 break;
             
@@ -139,7 +152,6 @@ extern EOemsController* eo_emsController_Init(emsBoardType_t board_type)
         
         JOINTS(j)
         {
-            s_emsc->axis_controller[j] = eo_axisController_New();
             s_emsc->enc_speedometer[j] = eo_speedmeter_New();
         }
     }

@@ -191,68 +191,6 @@ extern int32_t eo_pid_PWM_pi(EOpid *o, float En)
     return o->pwm;
 }
 
-/*
-#define NZEROS 1
-#define NPOLES 1
-#define GAIN   1.071001538e+02
-
-static float xv[NZEROS+1], yv[NPOLES+1];
-
-static void filterloop()
-  { for (;;)
-      { xv[0] = xv[1]; 
-        xv[1] = next input value / GAIN;
-        yv[0] = yv[1]; 
-        yv[1] =   (xv[0] + xv[1])
-                     + (  0.9813258905 * yv[0]);
-        next output value = yv[1];
-      }
-  }
-*/
-
-extern int32_t eo_pid_PWM_pi_3Hz_1stLPF(EOpid *o, float En)
-{
-    if (!o) return 0;
-    
-    o->En = En;
-    
-    En *= o->K;
-    
-    //o->KKiIn += o->Ki*En;
-    //LIMIT(o->KKiIn, o->Imax);
-    //En += o->KKiIn;
-    
-    o->xv0 = o->xv1; o->xv1 = 0.0093370547f*En;
-    
-    o->yv0 = o->yv1; 
-    
-    o->yv1 = o->xv0 + o->xv1 + 0.9813258905f*o->yv0;
-
-    o->pwm = o->pwm_offset + (int32_t)o->yv1;
-    
-    LIMIT(o->pwm, o->pwm_max);
-
-    return o->pwm;
-}
-
-/*
-#define NZEROS 2
-#define NPOLES 2
-#define GAIN   1.140829091e+04
-
-static float xv[NZEROS+1], yv[NPOLES+1];
-
-static void filterloop()
-  { for (;;)
-      { xv[0] = xv[1]; xv[1] = xv[2]; 
-        xv[2] = next input value / GAIN;
-        yv[0] = yv[1]; yv[1] = yv[2]; 
-        yv[2] =   (xv[0] + xv[2]) + 2 * xv[1]
-                     + ( -0.9736948720 * yv[0]) + (  1.9733442498 * yv[1]);
-        next output value = yv[2];
-      }
-  }
-*/
 
 extern int32_t eo_pid_PWM_pi_1_1Hz_2ndLPF(EOpid *o, float Tr, float Tm)
 {
@@ -277,6 +215,33 @@ extern int32_t eo_pid_PWM_pi_1_1Hz_2ndLPF(EOpid *o, float Tr, float Tm)
     //o->yv2 = o->xv0 +2.0f*o->xv1 +o->xv2 -0.9911535959f*o->yv0 +1.9911142922f*o->yv1; // 1 Hz
     //o->yv2 = o->xv0 +2.0f*o->xv1 +o->xv2 -0.9893937283f*o->yv0 +1.9893371812f*o->yv1; // 1.2 Hz
     o->yv2 = o->xv0 +2.0f*o->xv1 +o->xv2 -0.9902732712f*o->yv0 +1.9902257348f*o->yv1; // 1.1 Hz
+    
+    o->pwm = o->pwm_offset + (int32_t)(o->yv2 + o->Kff*Tr);
+    
+    LIMIT(o->pwm, o->pwm_max);
+
+    return o->pwm;
+}
+
+extern int32_t eo_pid_PWM_pi_3_0Hz_2ndLPF(EOpid *o, float Tr, float Tm)
+{
+    if (!o) return 0;
+    
+    float En = Tr - Tm;
+    
+    o->En = En;
+   
+    En *= o->K;
+    
+    //o->KKiIn += o->Ki*En;
+    //LIMIT(o->KKiIn, o->Imax);
+    //En += o->KKiIn;
+    
+    o->xv0 = o->xv1; o->xv1 = o->xv2; 
+    o->xv2 = 8.7655548748e-5f*En; // 3.0 Hz
+    
+    o->yv0 = o->yv1; o->yv1 = o->yv2;
+    o->yv2 = o->xv0 +2.0f*o->xv1 +o->xv2 -0.9736948720f*o->yv0 +1.9733442498f*o->yv1; // 3.0 Hz
     
     o->pwm = o->pwm_offset + (int32_t)(o->yv2 + o->Kff*Tr);
     
