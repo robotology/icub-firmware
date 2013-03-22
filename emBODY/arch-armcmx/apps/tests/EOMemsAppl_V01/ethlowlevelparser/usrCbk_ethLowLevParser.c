@@ -29,6 +29,7 @@
 #include "stdlib.h"
 #include "EoCommon.h"
 #include "string.h"
+#include "stdio.h"
 
 #include "hal.h"
 
