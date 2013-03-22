@@ -99,7 +99,6 @@ extern EOemsController* eo_emsController_Init(emsBoardType_t board_type)
         s_emsc->boardType  = board_type;
         s_emsc->defcon     = EMS_PRUDENT;
         s_emsc->n_joints   = MAX_JOINTS;
-        s_emsc->is_coupled = eobool_false;
         s_emsc->motors     = NULL;
         
         s_emsc->cable_length_alarm = eobool_false;
@@ -113,27 +112,22 @@ extern EOemsController* eo_emsController_Init(emsBoardType_t board_type)
         switch (s_emsc->boardType)
         {
             case EMS_GENERIC:
-                s_emsc->is_coupled = eobool_false;
                 s_emsc->n_joints   = 0;       
                 break;
             
             case EMS_SHOULDER: 
                 s_emsc->n_joints   = 4;
-                s_emsc->is_coupled = eobool_true;
                 break;
             
             case EMS_WAIST:    
                 s_emsc->n_joints   = 3;          
-                s_emsc->is_coupled = eobool_true;
                 break;
 
             case EMS_UPPERLEG:
-                s_emsc->is_coupled = eobool_false;
                 s_emsc->n_joints   = 4;          
                 break;
             
             case EMS_ANKLE:
-                s_emsc->is_coupled = eobool_false;
                 s_emsc->n_joints   = 2;          
                 break;
             
@@ -419,11 +413,35 @@ extern void eo_emsController_ResetPosPid(uint8_t joint)
 
 extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_t vel, int32_t offset)
 {
-    if (s_emsc)
-    {
-        eo_speedometer_Calibrate(s_emsc->enc_speedometer[joint], offset);
+    if (!s_emsc) return;
         
-        eo_axisController_StartCalibration(s_emsc->axis_controller[joint], pos, vel);
+    switch (s_emsc->boardType)
+    {    
+    case EMS_UPPERLEG:
+    case EMS_ANKLE:
+        eo_speedometer_Calibrate(s_emsc->enc_speedometer[joint], offset);
+        eo_axisController_Calibrate(s_emsc->axis_controller[joint]);
+        break;
+   
+    case EMS_SHOULDER:
+        if (joint == 3)
+        {
+            eo_speedometer_Calibrate(s_emsc->enc_speedometer[joint], offset);
+            eo_axisController_Calibrate(s_emsc->axis_controller[joint]);
+            break;
+        }
+        
+    case EMS_WAIST:
+        eo_speedometer_Calibrate(s_emsc->enc_speedometer[joint], offset);
+    
+        if (eo_speedometer_IsCalibrated(s_emsc->enc_speedometer[0]) && 
+            eo_speedometer_IsCalibrated(s_emsc->enc_speedometer[1]) &&
+            eo_speedometer_IsCalibrated(s_emsc->enc_speedometer[2]))
+        {
+            eo_axisController_Calibrate(s_emsc->axis_controller[0]);
+            eo_axisController_Calibrate(s_emsc->axis_controller[1]);
+            eo_axisController_Calibrate(s_emsc->axis_controller[2]);
+        }
     }
 }
 

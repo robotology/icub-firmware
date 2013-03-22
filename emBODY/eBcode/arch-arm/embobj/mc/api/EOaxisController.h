@@ -113,8 +113,8 @@ extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o);
 extern void eo_axisController_SetPosPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff);
 extern void eo_axisController_SetTrqPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff);
 
-extern void eo_axisController_StartCalibration(EOaxisController *o, int32_t pos, int32_t vel);
-extern eObool_t eo_axisController_EncRangeAdj(EOaxisController *o, int32_t *pos);
+extern void eo_axisController_Calibrate(EOaxisController *o);
+extern eObool_t eo_axisController_EncRangeAdj(EOaxisController *o, int32_t *pos); // shoulder joint 2 only
 
 /** @}            
     end of group eo_axisController  

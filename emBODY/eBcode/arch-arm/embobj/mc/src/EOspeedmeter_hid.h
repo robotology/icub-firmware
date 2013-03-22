@@ -42,6 +42,7 @@ struct EOspeedmeter_hid
     int32_t position_last;
     int32_t position_sure;
     
+    eObool_t calibrated;
     int32_t offset;
     int32_t enc_sign;
     

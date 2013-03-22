@@ -50,7 +50,6 @@ struct EOemsController_hid
     uint8_t n_joints;
     
     EMSdefcon_t defcon;
-    eObool_t is_coupled;
     
     eObool_t cable_length_alarm;
     

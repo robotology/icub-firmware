@@ -136,17 +136,15 @@ extern eObool_t eo_axisController_IsReady(EOaxisController *o)
     return CHK_BIT(MASK_POS_INIT_OK);
 }
 
-extern void eo_axisController_StartCalibration(EOaxisController *o, int32_t pos, int32_t vel)
+extern void eo_axisController_Calibrate(EOaxisController *o)
 {
     if (!o) return;
     
-    //if (!CHK_BIT(MASK_MIN_POS|MASK_MAX_POS|MASK_POS_PID)) return;
-	
-    eo_trajectory_Init(o->trajectory, GET_AXIS_POSITION(), GET_AXIS_VELOCITY(), 0);
-
     SET_BIT(MASK_CALIB_OK);
     
-    //eo_trajectory_SetPosReference(o->trajectory, pos, vel);
+    eo_trajectory_Init(o->trajectory, GET_AXIS_POSITION(), GET_AXIS_VELOCITY(), 0);
+
+    eo_axisController_SetControlMode(o, eomc_controlmode_cmd_position);
 }
 
 extern eObool_t eo_axisController_EncRangeAdj(EOaxisController *o, int32_t *pos)
