@@ -71,6 +71,15 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
+extern EOMtheIPnetDEBUG_t eom_ipnet_hid_DEBUG =
+{
+    .datagrams_failed_to_go_in_rxfifo               = 0,
+    .datagrams_failed_to_go_in_txosalqueue          = 0,
+    .datagrams_failed_to_be_retrieved_from_txfifo   = 0,
+    .datagrams_failed_to_be_sent_by_ipal            = 0    
+};
+
+
 const eOmipnet_cfg_t eom_ipnet_DefaultCfg = 
 { 
     .procpriority               = 220, 
@@ -613,6 +622,11 @@ static eOresult_t s_eom_ipnet_Alert(EOVtheIPnet* ip, void *eobjcaller, eOevent_t
                 // send event
                 eom_task_SetEvent(s_eom_theipnet.tskproc, eov_ipnet_evt_TXdatagram);
             }
+            else
+            {
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "cannot put a datagram in tx fifo");  
+                eom_ipnet_hid_DEBUG.datagrams_failed_to_go_in_txosalqueue ++;
+            }
 
         } break;
 
@@ -865,7 +879,6 @@ static void s_eom_ipnet_OnReceptionDatagram(void *arg, ipal_udpsocket_t *skt, ip
 {
     EOsocketDatagram *dtgskt = NULL;
     volatile eOresult_t res = eores_NOK_timeout;
-    static uint32_t fails = 0;
    
 
 #ifdef SLOWERMODEONRXDATAGRAM
@@ -908,7 +921,7 @@ static void s_eom_ipnet_OnReceptionDatagram(void *arg, ipal_udpsocket_t *skt, ip
 
     if(eores_OK != res)
     {
-        fails ++;
+        eom_ipnet_hid_DEBUG.datagrams_failed_to_go_in_rxfifo ++;
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "cannot put a datagram in rx fifo");
         // return because ... we did not put the message in teh queue and thus ... we dont want do any action on reception
         return;
@@ -1127,39 +1140,50 @@ static void s_eom_ipnet_process_transmission_datagram(void)
         case STATUS_SOCK_OPENED:
         {
             // get dgram from output queue. 
-            // VERY IMPORTANT: i use eok_reltimeZERO because it may be that we have a periodic
-            // transmission of teh socket and the user does not have a packet to transmit, thus that fifooutput is empty.
-            // well: we dont want to block in there
+            // VERY IMPORTANT: it may be that we have a periodic
+            // transmission of the socket and the user does not have a packet to transmit, thus fifooutput is empty.
+            // well: we dont want to block in there. we can:
+            // 1. retriev the size, 2. if seize is not zero the we retrieve the packet with infinite wait (so that we are sure to get it)
 
-
-            res = eo_fifo_Get(s->dgramfifooutput, &vitem, eok_reltimeZERO);
-            ditem = ((EOpacket *)vitem);
-            // if i use a quicker get-rem ... uncomments the following two line and comment the eo_fifo_Rem()
-            //res = eo_fifo_GetRem(s->dgramfifooutput, txpkt, eok_reltimeZERO);
-            //ditem = ((EOpacket *)txpkt);
-            if(eores_OK == res) 
-            {   // transmit the datagram
-                ipalpkt.data = ditem->data;
-                ipalpkt.size = ditem->size;
-                if(ipal_res_OK == ipal_udpsocket_sendto(s->socket->skthandle, &ipalpkt, ditem->remoteaddr, ditem->remoteport))
-                {
-                    // remove the datagram being transmitted
-                    eo_fifo_Rem(s->dgramfifooutput, s_eom_theipnet.maxwaittime);
-
-                    // do action on tx-done
-                    if((NULL != s->socket->ontransmission) && (eo_actypeNONE != eo_action_GetType(s->socket->ontransmission)))
+            uint16_t sizefifoout = 0;
+            res = eo_fifo_Size(s->dgramfifooutput, &sizefifoout, eok_reltimeINFINITE);
+            
+            if(0 != sizefifoout)
+            {
+                res = eo_fifo_Get(s->dgramfifooutput, &vitem, eok_reltimeINFINITE);
+                ditem = ((EOpacket *)vitem);
+                // if i use a quicker get-rem ... uncomments the following two line and comment the eo_fifo_Rem()
+                //res = eo_fifo_GetRem(s->dgramfifooutput, txpkt, eok_reltimeZERO);
+                //ditem = ((EOpacket *)txpkt);
+                if(eores_OK == res) 
+                {   // transmit the datagram
+                    ipalpkt.data = ditem->data;
+                    ipalpkt.size = ditem->size;
+                    if(ipal_res_OK == ipal_udpsocket_sendto(s->socket->skthandle, &ipalpkt, ditem->remoteaddr, ditem->remoteport))
                     {
-                        eo_action_Execute(s->socket->ontransmission, eok_reltimeZERO);
+                        // remove the datagram being transmitted
+                        eo_fifo_Rem(s->dgramfifooutput, s_eom_theipnet.maxwaittime);
+
+                        // do action on tx-done
+                        if((NULL != s->socket->ontransmission) && (eo_actypeNONE != eo_action_GetType(s->socket->ontransmission)))
+                        {
+                            eo_action_Execute(s->socket->ontransmission, eok_reltimeZERO);
+                        }
+                    }
+                    else
+                    {
+                         // remove the datagram being transmitted also if you fail to tx it.
+                        eo_fifo_Rem(s->dgramfifooutput, s_eom_theipnet.maxwaittime);
+                        // but put a warning on it.
+                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "ipal cannot send a datagram");
+                        eom_ipnet_hid_DEBUG.datagrams_failed_to_be_sent_by_ipal ++;
                     }
                 }
                 else
                 {
-                     // remove the datagram being transmitted also if you fail to tx it.
-                    eo_fifo_Rem(s->dgramfifooutput, s_eom_theipnet.maxwaittime);
-                    // but put a warning on it.
-                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "ipal cannot send a datagram");
-
+                    eom_ipnet_hid_DEBUG.datagrams_failed_to_be_retrieved_from_txfifo ++;               
                 }
+            
             }
 
             // if message queue is not empty, then sends another tx event because there is another socket which needs transmission
