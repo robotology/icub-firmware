@@ -40,7 +40,7 @@ extern "C" {
  **/  
 typedef struct EOpid_hid EOpid;
 
-typedef enum { CUT_FREQ_1_1_Hz = 11, CUT_FREQ_3_0_Hz = 30 } filter_cut_freq_t;
+typedef enum { NO_FILTER = 0, CUT_FREQ_1_1_Hz = 11, CUT_FREQ_3_0_Hz = 30 } filter_cut_freq_t;
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
@@ -79,7 +79,7 @@ extern void eo_pid_Reset(EOpid *o);
     @return     The actual PWM output value.
  **/
 
-extern int32_t eo_pid_PWM_pi(EOpid *o, float En);
+extern int32_t eo_pid_PWM_pi(EOpid *o, float Tr, float Tm);
 extern int32_t eo_pid_PWM_pi_1_1Hz_2ndLPF(EOpid *o, float Tr, float Tm);
 extern int32_t eo_pid_PWM_pi_3_0Hz_2ndLPF(EOpid *o, float Tr, float Tm);
 extern int32_t eo_pid_PWM_piv(EOpid *o, float En, float Venc, float Vref, float Aref);

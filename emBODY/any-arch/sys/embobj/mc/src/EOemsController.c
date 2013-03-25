@@ -116,10 +116,10 @@ extern EOemsController* eo_emsController_Init(emsBoardType_t board_type)
                 break;
             
             case EMS_SHOULDER:
-                s_emsc->axis_controller[0] = eo_axisController_New(CUT_FREQ_3_0_Hz);
-                s_emsc->axis_controller[1] = eo_axisController_New(CUT_FREQ_3_0_Hz);
-                s_emsc->axis_controller[2] = eo_axisController_New(CUT_FREQ_3_0_Hz);
-                s_emsc->axis_controller[3] = eo_axisController_New(CUT_FREQ_3_0_Hz);
+                s_emsc->axis_controller[0] = eo_axisController_New(NO_FILTER);
+                s_emsc->axis_controller[1] = eo_axisController_New(NO_FILTER);
+                s_emsc->axis_controller[2] = eo_axisController_New(NO_FILTER);
+                s_emsc->axis_controller[3] = eo_axisController_New(NO_FILTER);
                 s_emsc->n_joints   = 4;
                 break;
             
@@ -131,7 +131,7 @@ extern EOemsController* eo_emsController_Init(emsBoardType_t board_type)
                 break;
 
             case EMS_UPPERLEG:
-                s_emsc->axis_controller[0] = eo_axisController_New(CUT_FREQ_3_0_Hz);
+                s_emsc->axis_controller[0] = eo_axisController_New(NO_FILTER);
                 s_emsc->axis_controller[1] = eo_axisController_New(CUT_FREQ_3_0_Hz);
                 s_emsc->axis_controller[2] = eo_axisController_New(CUT_FREQ_3_0_Hz);
                 s_emsc->axis_controller[3] = eo_axisController_New(CUT_FREQ_3_0_Hz);
