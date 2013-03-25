@@ -252,6 +252,34 @@ extern int32_t eo_pid_PWM_pi_3_0Hz_2ndLPF(EOpid *o, float Tr, float Tm)
     return o->pwm;
 }
 
+/*
+extern int32_t eo_pid_PWM_pi_3_0Hz_1stLPF(EOpid *o, float Tr, float Tm)
+{
+    if (!o) return 0;
+    
+    float En = Tr - Tm;
+    
+    o->En = En;
+   
+    En *= o->K;
+    
+    //o->KKiIn += o->Ki*En;
+    //LIMIT(o->KKiIn, o->Imax);
+    //En += o->KKiIn;
+    
+    o->xv0 = o->xv1; o->xv1 = o->xv2; 
+    o->xv2 = 8.7655548748e-5f*En; // 3.0 Hz
+    
+    o->yv0 = o->yv1; o->yv1 = o->yv2;
+    o->yv2 = o->xv0 +2.0f*o->xv1 +o->xv2 -0.9736948720f*o->yv0 +1.9733442498f*o->yv1; // 3.0 Hz
+    
+    o->pwm = o->pwm_offset + (int32_t)(o->yv2 + o->Kff*Tr);
+    
+    LIMIT(o->pwm, o->pwm_max);
+
+    return o->pwm;
+}
+*/
 
 extern int32_t eo_pid_PWM_piv(EOpid *o, float En, float Venc, float Vref, float Aref)
 {

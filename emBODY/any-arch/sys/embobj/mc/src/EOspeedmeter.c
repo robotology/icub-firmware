@@ -330,6 +330,8 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
 
 static void encoder_init(EOspeedmeter* o, int32_t position)
 {
+    if (!o) return;
+    
     if (position == ENC_INVALID)
     {
         o->first_valid_data = 0;
