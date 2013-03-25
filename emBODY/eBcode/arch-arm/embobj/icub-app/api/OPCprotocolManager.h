@@ -32,7 +32,26 @@ extern "C" {
 
 /** @defgroup doxy_opcprotman OPCprotocolManager singleton 
     
-    The .....  
+    The OPC protocol is formed by the following fields: header [+ data].
+    
+    header: 8 bytes 
+    
+    B0      B1      B2      B3      B4      B5      B6      B7       
+    [SGN   ][OPC   ][DBV           ][VAR           ][LEN           ]
+        |                               |               |
+                                        |               |--> size of the data field
+                                        |
+                                        |--> identifier of the variable
+                        
+                        |--> identifier of the database containing the variable
+                |
+                |--> the opcode to apply to the variable
+        |
+        |--> the signature (it is always 0xDE)
+ 
+
+    data: LEN bytes + 0 padding to reach multiple of four 
+    
   
     @{		
  **/
