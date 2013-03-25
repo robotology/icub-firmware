@@ -520,6 +520,10 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
             
             switch (o->filter_cut_freq)
             {
+            case NO_FILTER:
+                pwm = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas); 
+                break;
+            
             case CUT_FREQ_1_1_Hz: 
                 pwm = eo_pid_PWM_pi_1_1Hz_2ndLPF(o->pidT, o->torque_ref, o->torque_meas); 
                 break;
