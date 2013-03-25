@@ -184,6 +184,8 @@ extern opcprotman_res_t opcprotman_Form(OPCprotocolManager* p, opcprotman_opc_t 
         return(opcprotman_NOK_generic);
     }
     
+    *size = 0;
+    
     if((opc == opcprotman_opc_say) || (opc == opcprotman_opc_none))
     {
         return(opcprotman_NOK_generic);
@@ -208,9 +210,15 @@ extern opcprotman_res_t opcprotman_Form(OPCprotocolManager* p, opcprotman_opc_t 
     switch(opc)
     {
         case opcprotman_opc_ask:
+        {
+            *size = sizeof(opcprotman_header_t);
+            res = opcprotman_OK;            
+        } break;
+        
         case opcprotman_opc_sig:
         {   // copy into message the data which is inside the variable
             memcpy(msg->data, map->ptr, map->size);
+            *size = map->size + sizeof(opcprotman_header_t);
             res = opcprotman_OK;
         } break;
  
@@ -220,6 +228,7 @@ extern opcprotman_res_t opcprotman_Form(OPCprotocolManager* p, opcprotman_opc_t 
             if(NULL != setdata)
             {
                 memcpy(msg->data, setdata, map->size);  
+                *size = map->size + sizeof(opcprotman_header_t);
                 res = opcprotman_OK;
             }
             else     
