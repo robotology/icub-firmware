@@ -151,6 +151,8 @@ extern void eo_axisController_Calibrate(EOaxisController *o)
 
 extern eObool_t eo_axisController_EncRangeAdj(EOaxisController *o, int32_t *pos)
 {
+    if (!o) return eobool_false;
+    
     if (o->pos_min <= *pos && *pos <= o->pos_max) return eobool_false;
     
     int32_t new_pos = *pos + 65536;
