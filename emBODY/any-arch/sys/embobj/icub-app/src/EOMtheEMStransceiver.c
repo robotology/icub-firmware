@@ -61,6 +61,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 //  DEBUG
+
 extern EOMtheEMStransceiverDEBUG_t eom_emstransceiver_hid_DEBUG =
 {
     .rxinvalidropframes                     = 0,
