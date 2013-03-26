@@ -377,7 +377,81 @@ extern "C" {
 //  </h>listener task
 
 
-// </h>Discovery Listener configuration
+// </h>Backdoor configuration
+
+//  <h> Backdoor configuration (for EOMtheEMSbackdoor)
+
+//  <o> IP listening port <4444=> 4444
+//  <i> default: 4444
+#define EOMTHEEMSAPPLCFG_BACKDOOR_LOCALPORT                       4444
+
+
+//  <h> datagrams in socket
+
+//  <o> max number of input datagrams <1-8>
+//  <i> default: 2
+#define EOMTHEEMSAPPLCFG_BACKDOOR_INPDGRAMNUMBER                  2
+
+//  <o> max size of input datagrams <16-64>
+//  <i> default: 16
+#define EOMTHEEMSAPPLCFG_BACKDOOR_INPDGRAMSIZEOF                  64
+
+//  <o> max number of output datagrams <1-8>
+//  <i> default: 2 
+#define EOMTHEEMSAPPLCFG_BACKDOOR_OUTDGRAMNUMBER                  1
+
+//  <o> max size of output datagrams <16-128>
+//  <i> default: 32
+#define EOMTHEEMSAPPLCFG_BACKDOOR_OUTDGRAMSIZEOF                  64
+
+//  </h>datagrams in socket
+
+//  <h> destination address
+
+//  <o> IP address <0=> The same as Remote Host then the one from incoming request
+//  <i> default: 1
+#define EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR_MODE                   0
+
+#if   (0 == EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR_MODE)
+    #define EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR1    EOMTHEEMSAPPLCFG_HOSTIPADDR1
+    #define EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR2    EOMTHEEMSAPPLCFG_HOSTIPADDR2
+    #define EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR3    EOMTHEEMSAPPLCFG_HOSTIPADDR3
+    #define EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR4    EOMTHEEMSAPPLCFG_HOSTIPADDR4
+#elif (1 == EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR_MODE)
+    #define EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR1    127
+    #define EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR2    0
+    #define EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR3    0
+    #define EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR4    1    
+#endif
+
+//  <o> IP port <4444=> 4444
+//  <i> default: 4444
+#define EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEPORT                4444
+
+//  </h>destination address
+
+
+//  <h> protocol
+
+//  <o> type of protocol    <0=> OPC protocol
+#define EOMTHEEMSAPPLCFG_BACKDOOR_PROTOCOL                0
+
+//  </h>protocol
+
+//  <h> backdoor task
+
+//  <o> task priority <2-251>
+//  <i> default: 41
+#define EOMTHEEMSAPPLCFG_BACKDOOR_TASK_PRIORITYof   251
+
+//  <o> task stack size <256-1024:128>
+//  <i> default: 512
+#define EOMTHEEMSAPPLCFG_BACKDOOR_TASK_STACKSIZEof   512
+
+//  </h>backdoor task
+
+
+// </h>Backdoor configuration
 
 //  <h> Socket configuration (for EOMtheEMSsocket)
 
@@ -529,16 +603,16 @@ extern "C" {
 //  <i> it is important put the priorities of the three tasks higher than any other task in the system
 
 //  <o> RX task priority <2-251>
-//  <i> default: 249
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_RX_PRIORITYof   249
+//  <i> default: 247
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_RX_PRIORITYof   247
 
 //  <o> DO task priority <2-251>
-//  <i> default: 250
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_DO_PRIORITYof   250
+//  <i> default: 248
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_DO_PRIORITYof   248
 
 //  <o> TX task priority <2-251>
-//  <i> default: 251
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_TX_PRIORITYof   251
+//  <i> default: 249
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_TX_PRIORITYof   249
 
 //  </h>priorities 
 

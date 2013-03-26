@@ -31,6 +31,8 @@
 #include "EOMtheEMSrunner_hid.h"        // to see eom_emsrunner_hid_DEBUG (40 bytes)
 #include "EOMtheEMStransceiver_hid.h"   // to see EOMtheEMStransceiverDEBUG_t (28 bytes)
 
+#include "EOemsController_hid.h" 
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -50,6 +52,8 @@ static void on_rec_runner_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map,
 
 static void on_rec_transceiver_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata);
 
+static void on_rec_emscontroller_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
@@ -63,30 +67,36 @@ static void on_rec_transceiver_debug(opcprotman_opc_t opc, opcprotman_var_map_t*
 static opcprotman_var_map_t s_myarray[] = 
 {
     {
-        .var        = 1,
+        .var        = eom_ipnet_hid_DEBUG_id,
         .size       = sizeof(eom_ipnet_hid_DEBUG),
         .ptr        = &eom_ipnet_hid_DEBUG,
         .onrec      = on_rec_ipnet_debug
     },
     {
-        .var        = 2,
+        .var        = eom_emsrunner_hid_DEBUG_id,
         .size       = sizeof(eom_emsrunner_hid_DEBUG),
         .ptr        = &eom_emsrunner_hid_DEBUG,
         .onrec      = on_rec_runner_debug
     },
     {
-        .var        = 3,
+        .var        = eom_emstransceiver_hid_DEBUG_id,
         .size       = sizeof(eom_emstransceiver_hid_DEBUG),
         .ptr        = &eom_emstransceiver_hid_DEBUG,
         .onrec      = on_rec_transceiver_debug
     },
+    {
+        .var        = eo_emsController_hid_DEBUG_id,
+        .size       = sizeof(eo_emsController_hid_DEBUG),
+        .ptr        = &eo_emsController_hid_DEBUG,
+        .onrec      = on_rec_emscontroller_debug
+    }    
     
 };
 
 extern opcprotman_cfg_t opcprotmanCFGv0x1234 =
 {
     .databaseversion        = 0x1234,
-    .numberofvariables      = 3,
+    .numberofvariables      = 4,
     .arrayofvariablemap     = s_myarray
 };
 
@@ -166,6 +176,29 @@ static void on_rec_transceiver_debug(opcprotman_opc_t opc, opcprotman_var_map_t*
     }       
     
 }
+
+static void on_rec_emscontroller_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata)
+{   // for the ems
+    
+    switch(opc)
+    {
+        
+        case opcprotman_opc_set:
+        {   // someboby has sent us the order of copying recdata into map->ptr 
+            
+            // we just dont do it ...         
+        } break;
+        
+        case opcprotman_opc_say:    // someboby has replied to a ask we sent
+        case opcprotman_opc_sig:    // someboby has spontaneously sent some data
+        default:
+        {   // other are not managed
+        
+        } break;
+    }       
+    
+}
+
 
 // static void generic_on_rec(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata)
 // {   // the copy in map->ptr is not yet done ...

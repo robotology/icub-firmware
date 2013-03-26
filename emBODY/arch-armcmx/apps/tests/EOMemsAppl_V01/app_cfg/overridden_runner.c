@@ -39,6 +39,8 @@
 #include "EoSensors.h"
 #include "EoManagement.h"
 
+#include "EOemsController_hid.h" 
+
 
 
 
@@ -164,7 +166,9 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EO
          eo_appEncReader_StartRead(eo_emsapplBody_GetEncoderReaderHandle(eo_emsapplBody_GetHandle()));
     }
     ciclecount++;
-
+    
+    // DEBUG
+    eo_emsController_hid_DEBUG_reset();
 }
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
@@ -181,6 +185,7 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
         
         case applrunMode__2foc:
         {
+            eo_emsController_hid_DEBUG_evaltransmission();
             s_eom_emsrunner_hid_taskRX_act_afterdgramrec_2foc_mode(emsappbody_ptr);
         }break;
         
