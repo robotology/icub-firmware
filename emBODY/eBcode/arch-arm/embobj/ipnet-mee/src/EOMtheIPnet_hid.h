@@ -109,6 +109,7 @@ struct EOMtheIPnet_hid
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
+#define eom_ipnet_hid_DEBUG_id 1
 extern EOMtheIPnetDEBUG_t eom_ipnet_hid_DEBUG;
 
 // name of the tasks as it is shown in uvision
