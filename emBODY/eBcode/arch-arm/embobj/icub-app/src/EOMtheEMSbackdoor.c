@@ -237,6 +237,49 @@ extern eOresult_t eom_emsbackdoor_Transmit(EOMtheEMSbackdoor *p, uint8_t* data, 
     return(eores_OK);
 }
 
+
+extern eOresult_t eom_emsbackdoor_Signal(EOMtheEMSbackdoor *p, uint16_t var , eOreltime_t timeout)
+{
+
+    if((NULL == p))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+   
+    // metti data nel txpkt ... ma solo se il semaforo lo consente e poi manda un evento
+    
+    osal_result_t osalres = osal_semaphore_decrement(s_emsbackdoor_singleton.txsemaphore, timeout);
+    
+    if(osal_res_OK != osalres)
+    {
+        return(eores_NOK_generic);
+    }
+    
+    // form the packet ... by taking as data the payload of the tx packet
+    uint8_t* data = NULL;
+    uint16_t size;
+    eo_packet_Payload_Get(s_emsbackdoor_singleton.txpkt, &data, &size);
+    
+    eOresult_t res = eom_emsbackdoortransceiver_FormSignal(eom_emsbackdoortransceiver_GetHandle(), var, data, &size);
+            
+    // if it fails ... release the semaphore and return
+    if(eores_OK != res)
+    {
+        osal_semaphore_increment(s_emsbackdoor_singleton.txsemaphore, osal_callerTSK);
+        return(eores_NOK_generic);
+    }
+          
+    eo_packet_Size_Set(s_emsbackdoor_singleton.txpkt, size);
+    
+    eo_packet_Addressing_Set(s_emsbackdoor_singleton.txpkt, s_emsbackdoor_singleton.hostaddress, s_emsbackdoor_singleton.cfg.remoteport);
+          
+    eom_task_SetEvent(p->task, emsbackdoor_evt_packet_2transmit); 
+        
+    return(eores_OK);
+}
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------

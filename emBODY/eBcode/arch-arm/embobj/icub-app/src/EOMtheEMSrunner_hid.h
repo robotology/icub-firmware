@@ -94,6 +94,7 @@ typedef struct
 } EOMtheEMSrunnerDEBUG_t;
 
 
+#define eom_emsrunner_hid_DEBUG_id 2
 extern EOMtheEMSrunnerDEBUG_t eom_emsrunner_hid_DEBUG;
 
 

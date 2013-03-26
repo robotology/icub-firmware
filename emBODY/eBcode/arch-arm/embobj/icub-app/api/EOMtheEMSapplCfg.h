@@ -81,7 +81,8 @@ typedef enum
     eom_emsappl_boardid_eb6         = 6,
     eom_emsappl_boardid_eb7         = 7,
     eom_emsappl_boardid_eb8         = 8,
-    eom_emsappl_boardid_eb9         = 9
+    eom_emsappl_boardid_eb9         = 9,
+    eom_emsappl_boardid_ebnone      = 255
 } eom_emsapplcfg_boardid_t;
 
 typedef enum

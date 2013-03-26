@@ -266,15 +266,15 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
     },
     .backdoorcfg    =
     {
-        .taskpriority           = 41,
-        .taskstacksize          = 512,
-        .inpdatagramnumber      = 2,
-        .outdatagramnumber      = 1,
-        .inpdatagramsizeof      = 64,
-        .outdatagramsizeof      = 64,
-        .localport              = 4444, 
-        .remoteport             = 4444,
-        .remoteipaddr           = EO_COMMON_IPV4ADDR(EOMTHEEMSAPPLCFG_HOSTIPADDR1, EOMTHEEMSAPPLCFG_HOSTIPADDR2, EOMTHEEMSAPPLCFG_HOSTIPADDR3, EOMTHEEMSAPPLCFG_HOSTIPADDR4),
+        .taskpriority           = EOMTHEEMSAPPLCFG_BACKDOOR_TASK_PRIORITYof,
+        .taskstacksize          = EOMTHEEMSAPPLCFG_BACKDOOR_TASK_STACKSIZEof,
+        .inpdatagramnumber      = EOMTHEEMSAPPLCFG_BACKDOOR_INPDGRAMNUMBER,
+        .outdatagramnumber      = EOMTHEEMSAPPLCFG_BACKDOOR_OUTDGRAMNUMBER,
+        .inpdatagramsizeof      = EOMTHEEMSAPPLCFG_BACKDOOR_INPDGRAMSIZEOF,
+        .outdatagramsizeof      = EOMTHEEMSAPPLCFG_BACKDOOR_OUTDGRAMSIZEOF,
+        .localport              = EOMTHEEMSAPPLCFG_BACKDOOR_LOCALPORT, 
+        .remoteport             = EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEPORT,
+        .remoteipaddr           = EO_COMMON_IPV4ADDR(EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR1, EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR2, EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR3, EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR4),
         .usemutex               = eobool_true     
     },
     .socketcfg      =

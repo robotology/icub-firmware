@@ -183,6 +183,21 @@ extern eOresult_t eom_emsbackdoortransceiver_GetReply(EOMtheEMSbackdoortransceiv
     return(res);
 }
 
+extern eOresult_t eom_emsbackdoortransceiver_FormSignal(EOMtheEMSbackdoortransceiver* p, uint16_t var, uint8_t* data, uint16_t* size)
+{
+    
+    if((NULL == p) || (NULL == data) || (NULL == size))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    opcprotman_res_t res = opcprotman_Form(s_emsbackdoortransceiver_singleton.opcprotman, opcprotman_opc_sig, var, NULL, (opcprotman_message_t*)data, size);
+        
+        
+     
+    return((opcprotman_OK == res) ? (eores_OK) : (eores_NOK_generic));
+}
+
 
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -72,6 +72,7 @@ typedef struct
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
+#define eom_emstransceiver_hid_DEBUG_id 3
 extern EOMtheEMStransceiverDEBUG_t eom_emstransceiver_hid_DEBUG;
 
 //extern eOboardtransceiver_cfg_t* eom_emstransceiver_hid_userdef_get_cfg(const eOemstransceiver_cfg_t *cfg);

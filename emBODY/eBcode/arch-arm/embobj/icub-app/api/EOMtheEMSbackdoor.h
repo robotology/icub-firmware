@@ -111,7 +111,7 @@ extern EOMtask * eom_emsbackdoor_GetTask(EOMtheEMSbackdoor *p);
 
 extern eOresult_t eom_emsbackdoor_Transmit(EOMtheEMSbackdoor *p, uint8_t* data, uint16_t size, eOreltime_t timeout);
 
-
+extern eOresult_t eom_emsbackdoor_Signal(EOMtheEMSbackdoor *p, uint16_t var , eOreltime_t timeout);
 
 /** @}            
     end of group eom_EOMtheEMSbackdoor  
