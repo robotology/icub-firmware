@@ -80,6 +80,8 @@ extern void eo_pid_Reset(EOpid *o);
  **/
 
 extern int32_t eo_pid_PWM_pi(EOpid *o, float Tr, float Tm);
+extern int32_t eo_pid_PWM_pi_1_1Hz_1stLPF(EOpid *o, float Tr, float Tm);
+extern int32_t eo_pid_PWM_pi_3_0Hz_1stLPF(EOpid *o, float Tr, float Tm);
 extern int32_t eo_pid_PWM_pi_1_1Hz_2ndLPF(EOpid *o, float Tr, float Tm);
 extern int32_t eo_pid_PWM_pi_3_0Hz_2ndLPF(EOpid *o, float Tr, float Tm);
 extern int32_t eo_pid_PWM_piv(EOpid *o, float En, float Venc, float Vref, float Aref);

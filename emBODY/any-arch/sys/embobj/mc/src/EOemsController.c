@@ -111,24 +111,19 @@ extern EOemsController* eo_emsController_Init(emsBoardType_t board_type)
         
         switch (s_emsc->boardType)
         {
-            case EMS_GENERIC:
-                s_emsc->n_joints   = 0;       
-                break;
-            
             case EMS_SHOULDER:
                 s_emsc->axis_controller[0] = eo_axisController_New(CUT_FREQ_3_0_Hz);
                 s_emsc->axis_controller[1] = eo_axisController_New(CUT_FREQ_3_0_Hz);
                 s_emsc->axis_controller[2] = eo_axisController_New(CUT_FREQ_3_0_Hz);
                 s_emsc->axis_controller[3] = eo_axisController_New(CUT_FREQ_3_0_Hz);
-                s_emsc->n_joints   = 4;
+                s_emsc->n_joints = 4;
                 break;
             
             case EMS_WAIST:    
                 s_emsc->axis_controller[0] = eo_axisController_New(CUT_FREQ_3_0_Hz);
                 s_emsc->axis_controller[1] = eo_axisController_New(CUT_FREQ_3_0_Hz);
                 s_emsc->axis_controller[2] = eo_axisController_New(CUT_FREQ_3_0_Hz);
-                s_emsc->axis_controller[3] = eo_axisController_New(CUT_FREQ_3_0_Hz);
-                s_emsc->n_joints   = 3;          
+                s_emsc->n_joints = 3;          
                 break;
 
             case EMS_UPPERLEG:
@@ -136,13 +131,13 @@ extern EOemsController* eo_emsController_Init(emsBoardType_t board_type)
                 s_emsc->axis_controller[1] = eo_axisController_New(CUT_FREQ_1_1_Hz);
                 s_emsc->axis_controller[2] = eo_axisController_New(CUT_FREQ_1_1_Hz);
                 s_emsc->axis_controller[3] = eo_axisController_New(CUT_FREQ_1_1_Hz);
-                s_emsc->n_joints   = 4;          
+                s_emsc->n_joints = 4;          
                 break;
             
             case EMS_ANKLE:
                 s_emsc->axis_controller[0] = eo_axisController_New(CUT_FREQ_3_0_Hz);
                 s_emsc->axis_controller[1] = eo_axisController_New(CUT_FREQ_3_0_Hz);
-                s_emsc->n_joints   = 2;          
+                s_emsc->n_joints = 2;          
                 break;
             
             default:           
@@ -162,6 +157,8 @@ extern EOemsController* eo_emsController_Init(emsBoardType_t board_type)
 
 extern void eo_emsController_SetEncSign(uint16_t jxx, int32_t enc_sign)
 {
+    if (!s_emsc) return;
+    
     eo_speedometer_SetEncSign(s_emsc->enc_speedometer[jxx], enc_sign);
 }
 
@@ -244,7 +241,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
 {
     if (!s_emsc)
     {
-        for (uint8_t m=0; m<4; ++m) pwm_motor[m] = 0;
+        for (uint8_t m=0; m<MAX_JOINTS; ++m) pwm_motor[m] = 0;
         
         return;
     }
@@ -342,72 +339,71 @@ extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq)
 
 extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_command_t mode)
 {
-    if (s_emsc)
-    {        
-        static eObool_t motors_not_configured = eobool_true;
-        
-        if (motors_not_configured)
+    if (!s_emsc) return;
+    
+    static eObool_t motors_not_configured = eobool_true;
+    
+    if (motors_not_configured)
+    {
+        motors_not_configured = eobool_false;
+        MOTORS(m) config_2FOC(m);   
+    }
+    
+    eo_axisController_SetControlMode(s_emsc->axis_controller[joint], mode);
+    
+    if (mode == eomc_controlmode_cmd_switch_everything_off)
+    {
+        switch (s_emsc->boardType)
         {
-            motors_not_configured = eobool_false;
-            MOTORS(m) config_2FOC(m);   
-        }
+        case EMS_GENERIC: return;
         
-        eo_axisController_SetControlMode(s_emsc->axis_controller[joint], mode);
-        
-        if (mode == eomc_controlmode_cmd_switch_everything_off)
-        {
-            switch (s_emsc->boardType)
+        case EMS_UPPERLEG:
+        case EMS_ANKLE:
+            set_2FOC_idle(joint);
+            break;
+    
+        case EMS_SHOULDER:
+            if (joint == 3)
             {
-            case EMS_GENERIC: return;
-            
-            case EMS_UPPERLEG:
-            case EMS_ANKLE:
-                set_2FOC_idle(joint);
-                break;
-        
-            case EMS_SHOULDER:
-                if (joint == 3)
-                {
-                    set_2FOC_idle(3);
-                    break;
-                }
-            
-            case EMS_WAIST:
-                if (eo_emsController_GetControlMode(0) == eomc_controlmode_idle &&
-                    eo_emsController_GetControlMode(1) == eomc_controlmode_idle &&
-                    eo_emsController_GetControlMode(2) == eomc_controlmode_idle)
-                {
-                    set_2FOC_idle(0);
-                    set_2FOC_idle(1);
-                    set_2FOC_idle(2);
-                }
+                set_2FOC_idle(3);
                 break;
             }
-        }
-        else
-        {
-            switch (s_emsc->boardType)
-            {
-            case EMS_GENERIC: return;
-            
-            case EMS_UPPERLEG:
-            case EMS_ANKLE:
-                set_2FOC_running(joint, mode);
-                break;
-   
-            case EMS_SHOULDER:
-                if (joint == 3)
-                {
-                    set_2FOC_running(3, mode);
-                    break;
-                }
         
-            case EMS_WAIST:
-                set_2FOC_running(0, mode);
-                set_2FOC_running(1, mode);
-                set_2FOC_running(2, mode);
+        case EMS_WAIST:
+            if (eo_emsController_GetControlMode(0) == eomc_controlmode_idle &&
+                eo_emsController_GetControlMode(1) == eomc_controlmode_idle &&
+                eo_emsController_GetControlMode(2) == eomc_controlmode_idle)
+            {
+                set_2FOC_idle(0);
+                set_2FOC_idle(1);
+                set_2FOC_idle(2);
+            }
+            break;
+        }
+    }
+    else
+    {
+        switch (s_emsc->boardType)
+        {
+        case EMS_GENERIC: return;
+        
+        case EMS_UPPERLEG:
+        case EMS_ANKLE:
+            set_2FOC_running(joint, mode);
+            break;
+
+        case EMS_SHOULDER:
+            if (joint == 3)
+            {
+                set_2FOC_running(3, mode);
                 break;
             }
+    
+        case EMS_WAIST:
+            set_2FOC_running(0, mode);
+            set_2FOC_running(1, mode);
+            set_2FOC_running(2, mode);
+            break;
         }
     }
 }

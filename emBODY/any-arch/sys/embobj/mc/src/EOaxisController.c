@@ -518,7 +518,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
                 return 0;
             }
             
-            int32_t pwm = 0;
+            int32_t pwm = 0; // = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
             
             switch (o->filter_cut_freq)
             {
@@ -527,11 +527,11 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
                 break;
             
             case CUT_FREQ_1_1_Hz: 
-                pwm = eo_pid_PWM_pi_1_1Hz_2ndLPF(o->pidT, o->torque_ref, o->torque_meas); 
+                pwm = eo_pid_PWM_pi_1_1Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas); 
                 break;
                 
             case CUT_FREQ_3_0_Hz: 
-                pwm = eo_pid_PWM_pi_3_0Hz_2ndLPF(o->pidT, o->torque_ref, o->torque_meas); 
+                pwm = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas); 
                 break;
             }
             
