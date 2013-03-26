@@ -434,7 +434,7 @@
         .supported_mask         = 0x1,
         .devcfg         =
         {
-            {   // hal_accelerometer_port1
+            {   // hal_accelerometer1
                 .chipif             =      
                 {   // use the lis3dh chip by st
                     .init       = (hal_res_fp_voidp_t)hal_chip_st_lis3dh_init,
