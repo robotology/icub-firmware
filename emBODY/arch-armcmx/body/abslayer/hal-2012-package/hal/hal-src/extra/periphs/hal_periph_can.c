@@ -99,7 +99,7 @@
 #endif 
 
 
-
+#warning WIP --> CAN2 does not trigger the rx handler... WE MUST FIX IT ...
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -183,7 +183,7 @@ static const hal_gpio_altcfg_t s_hal_can_canx_rx_altcfg         =
     .gpioext    =
     {
         .GPIO_Pin       = 0,
-        .GPIO_Speed     = GPIO_Speed_2MHz,
+        .GPIO_Speed     = GPIO_Speed_50MHz, // both GPIO_Speed_2MHz and GPIO_Speed_50MHz are the same as it is configured in input mode
         .GPIO_Mode      = GPIO_Mode_IPU,  
     },
     .afname     = HAL_GPIO_AFNAME_NONE,
@@ -385,6 +385,7 @@ extern hal_result_t hal_can_enable(hal_can_t id)
 	hal_result_t res;
 	//hal_can_internals_t *intitem = s_hal_can_internals[HAL_can_id2index(id)];
     hal_can_internal_item_t* intitem = s_hal_can_theinternals.items[HAL_can_id2index(id)];
+    CAN_TypeDef* CANx = HAL_can_port2peripheral(id);
 
     if(hal_false == s_hal_can_initted_is(id))
     {
@@ -410,7 +411,10 @@ extern hal_result_t hal_can_enable(hal_can_t id)
     intitem->enabled = 1;
 
     // configure interrupts on rx (CAN_IT_FMP0 -> FIFO 0 message pending) and tx (CAN_IT_TME -> transmit mailbox empty)
+    // it is the same using only one call of CAN_ITConfig() or two ...
     CAN_ITConfig(HAL_can_port2peripheral(id), (CAN_IT_FMP0 | CAN_IT_TME), ENABLE);
+    //CAN_ITConfig(HAL_can_port2peripheral(id), CAN_IT_FMP0, ENABLE);
+    //CAN_ITConfig(HAL_can_port2peripheral(id), CAN_IT_TME, ENABLE);
 
     // nvic 
     s_hal_can_isr_rx_enable(id);
@@ -418,6 +422,11 @@ extern hal_result_t hal_can_enable(hal_can_t id)
     //s_hal_can_tx_enable(id);
     s_hal_can_isr_tx_disable(id);
     intitem->txisrisenabled = 0;
+    
+    // it is in can driver by K&%L. it was not in hal-1. it seems not be important. it does not make can2 work ..
+    CANx->MCR &= ~(1 << 0);             /* normal operating mode, reset INRQ   */
+    while (CANx->MSR & (1 << 0));
+
 
     // enable scheduling 
     hal_base_osal_scheduling_restart();
@@ -447,7 +456,10 @@ extern hal_result_t hal_can_disable(hal_can_t id)
     intitem->enabled = 0;
 
     // deconfigure interrupts on rx (CAN_IT_FMP0 -> FIFO 0 message pending) and tx (CAN_IT_TME -> transmit mailbox empty)
+    // it is the same using only one call of CAN_ITConfig() or two ...
     CAN_ITConfig(HAL_can_port2peripheral(id), (CAN_IT_FMP0 | CAN_IT_TME), DISABLE);
+    CAN_ITConfig(HAL_can_port2peripheral(id), CAN_IT_TME, DISABLE);
+    CAN_ITConfig(HAL_can_port2peripheral(id), CAN_IT_FMP0, DISABLE);
 
     // nvic 
     s_hal_can_isr_rx_disable(id);
@@ -696,7 +708,7 @@ static hal_boolval_t s_hal_can_initted_is(hal_can_t id)
   */
 static void s_hal_can_isr_sendframes_canx(hal_can_t id)
 {
-    static CanTxMsg TxMessage =
+    CanTxMsg TxMessage =            // not static because if can1 interrupts can2 then the variable can be dirty
     {
         .StdId  = 0,                // can be changed. it is a uint32_t
         .ExtId  = 0,                // fixed: not used as frame-id is always std
@@ -708,7 +720,7 @@ static void s_hal_can_isr_sendframes_canx(hal_can_t id)
     
     uint32_t* const txmsgiden = &TxMessage.StdId;
     uint8_t*  const txmsgsize = &TxMessage.DLC;
-    uint64_t* const txmsgdata = (uint64_t*) TxMessage.Data;  
+    // uint64_t*  txmsgdata = (uint64_t*) TxMessage.Data;  // cannot use such a cast because .Data[] is not 8-aligned
     
     //hal_can_internals_t *intitem = s_hal_can_internals[HAL_can_id2index(id)];
     hal_can_internal_item_t* intitem = s_hal_can_theinternals.items[HAL_can_id2index(id)];
@@ -724,7 +736,8 @@ static void s_hal_can_isr_sendframes_canx(hal_can_t id)
         // 
         *txmsgiden      = pcanframe->id & 0x7FF; // acemor: we could remove 0x7ff because CAN_Transmit() shifts it 21 positions up.
         *txmsgsize      = pcanframe->size;
-        *txmsgdata      = *((uint64_t*)pcanframe->data);
+        //*txmsgdata      = *((uint64_t*)pcanframe->data); // cannot use because destination is not 8-aligned
+        memcpy(TxMessage.Data, pcanframe->data, 8);
 
         // CAN_Transmit() returns the number of the mailbox used in transmission or CAN_TxStatus_NoMailBox if there is no empty mailbox
         if(CAN_TxStatus_NoMailBox != CAN_Transmit(HAL_can_port2peripheral(id), &TxMessage))
@@ -850,7 +863,7 @@ static void s_hal_can_isr_recvframe_canx(hal_can_t id)
     hal_utility_fifo_put16(fiforx, (uint8_t*)&canframe);
 
     // if a callback is set, invoke it
-    if(NULL != intitem->config.callback_on_rx )
+    if(NULL != intitem->config.callback_on_rx)
     {
     	intitem->config.callback_on_rx(intitem->config.arg_cb_rx);
     }   
@@ -983,7 +996,7 @@ static void s_hal_can_hw_gpio_init(hal_can_t id)
  
     GPIO_InitTypeDef  GPIO_InitStructure;
     
-    // enable gpio clock for can1 tx and rx
+    // enable gpio clock for canx tx and rx
     RCC_AHB1PeriphClockCmd(hal_brdcfg_can__gpio_clock_canx_rx[HAL_can_id2index(id)] | hal_brdcfg_can__gpio_clock_canx_tx[HAL_can_id2index(id)], ENABLE);
 
     // what about ?
