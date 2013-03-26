@@ -20,6 +20,9 @@
 
 #include "EOtheEMSapplBody.h"
 
+
+#include "EOMtheEMSbackdoor.h"
+
 #ifdef MC_CAN_DEBUG
 extern int16_t torque_debug_can[4];
 #endif
@@ -57,6 +60,16 @@ const float   EMS_PERIOD           = 0.001f;
 const int32_t EMS_FREQUENCY_INT32  = 1000;
 const float   EMS_FREQUENCY_FLOAT  = 1000.0f;
 const int32_t TICKS_PER_REVOLUTION = 65536;
+
+
+//extern const uint16_t eo_emsController_hid_DEBUG_id = 4;
+extern EOemsControllerDEBUG_t eo_emsController_hid_DEBUG =
+{
+    .boardid        = eom_emsappl_boardid_ebnone,
+    .count          = {0, 0, 0, 0},
+    .position       = {0, 0, 0, 0},
+    .velocity       = {0, 0, 0, 0}    
+}; 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -343,7 +356,18 @@ extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_v
 {
 //    if (joint == 0) hal_led_toggle(hal_led1); // green light
         
-    if (s_emsc) eo_axisController_SetPosRef(s_emsc->axis_controller[joint], pos, avg_vel);
+    if (s_emsc) 
+    {
+        // DEBUG
+        if(joint < 4)
+        {
+            eo_emsController_hid_DEBUG.count[joint] ++;
+            eo_emsController_hid_DEBUG.position[joint] = pos;
+            eo_emsController_hid_DEBUG.velocity[joint] = avg_vel;
+        }
+        
+        eo_axisController_SetPosRef(s_emsc->axis_controller[joint], pos, avg_vel);       
+    }
 }
 
 extern void eo_emsController_SetVelRef(uint8_t joint, int32_t vel, int32_t avg_acc)
@@ -581,7 +605,27 @@ extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t motorerror, 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+extern void eo_emsController_hid_DEBUG_reset(void)
+{
+    // DEBUG
+    memset(&eo_emsController_hid_DEBUG, 0, sizeof(EOemsControllerDEBUG_t));    
+}
+
+extern void eo_emsController_hid_DEBUG_evaltransmission(void)
+{
+    const uint8_t zero[4] = {0, 0, 0, 0};
+    
+    if((eom_emsappl_boardid_eb6 == eom_emsapplcfg_GetHandle()->boardid) || (eom_emsappl_boardid_eb8 == eom_emsapplcfg_GetHandle()->boardid))
+    {
+        if(0 != memcmp(&eo_emsController_hid_DEBUG.count, zero, 4))
+        {
+            eo_emsController_hid_DEBUG.boardid = eom_emsapplcfg_GetHandle()->boardid;
+            // form and send the packet.
+            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eo_emsController_hid_DEBUG_id, eok_reltimeINFINITE);        
+        }
+    }    
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
