@@ -685,8 +685,8 @@
     extern const hal_device_led_hid_brdcfg_t hal_brdcfg_device_led__theconfig =
     {
         .supported_mask             = (1 << hal_led1) | (1 << hal_led2) | (1 << hal_led3) | (1 << hal_led4) | (1 << hal_led5) | (1 << hal_led6), // = 0x3F: only first 6 leds ...
-        .value_on                   = hal_gpio_valHIGH,
-        .value_off                  = hal_gpio_valLOW,
+        .value_on                   = hal_gpio_valLOW,
+        .value_off                  = hal_gpio_valHIGH,
         .gpiomaps                    =
         {
             {   // hal_led1 
