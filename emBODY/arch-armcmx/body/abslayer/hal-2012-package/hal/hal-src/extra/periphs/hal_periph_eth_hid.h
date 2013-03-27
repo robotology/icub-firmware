@@ -88,8 +88,14 @@ typedef struct
 } hal_eth_hid_brdcfg_t;
 
 
+typedef struct
+{
+    void (*fn_inside_eth_isr)(uint8_t*, uint16_t);          /**< accepts the pointer to the received payload and its size */    
+} hal_eth_hid_debug_support_t;
+
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
+extern hal_eth_hid_debug_support_t hal_eth_hid_DEBUG_support; 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

@@ -349,13 +349,19 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-
+extern hal_eth_hid_debug_support_t hal_eth_hid_DEBUG_support =
+{
+    .fn_inside_eth_isr  = NULL
+};
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
 typedef uint32_t    U32;
+
+
+typedef uint32_t (*hal_eth_array_of_buffers_t)[ETH_BUF_SIZE>>2];
 
 
 typedef struct {
@@ -377,7 +383,13 @@ typedef struct {
 typedef struct
 {
     hal_eth_cfg_t               config;  
-    hal_eth_onframereception_t  onframerx;   
+    hal_eth_onframereception_t  onframerx;  
+    uint8_t                     rxbufindex;     
+    uint8_t                     txbufindex;   
+    hal_rx_desc_t*              rx_desc;
+    hal_tx_desc_t*              tx_desc;
+    hal_eth_array_of_buffers_t  rx_buffers;
+    hal_eth_array_of_buffers_t  tx_buffers;
 } hal_eth_internal_item_t;
 
 
@@ -426,20 +438,20 @@ static const hal_eth_network_functions_t s_hal_eth_fns =
 
 
 // keep teh same names of the tcpnet driver, without s_ prefix
-static uint8_t RxBufIndex = 0;
-static uint8_t TxBufIndex = 0;
+//static uint8_t RxBufIndex = 0;
+//static uint8_t TxBufIndex = 0;
 
 // keep the same names of the tcpnet driver, without s_ prefix. however, make them pointers
 /* ENET local DMA buffers. */
-static uint32_t (*rx_buf)[ETH_BUF_SIZE>>2] = NULL;
-static uint32_t (*tx_buf)[ETH_BUF_SIZE>>2] = NULL;
+//static uint32_t (*rx_buf)[ETH_BUF_SIZE>>2] = NULL;
+//static uint32_t (*tx_buf)[ETH_BUF_SIZE>>2] = NULL;
 
 // keep the same names of the tcpnet driver, without s_ prefix. however, make them pointers
 /* ENET local DMA Descriptors. */
-static hal_rx_desc_t *Rx_Desc = NULL;
-static hal_tx_desc_t *Tx_Desc = NULL;
+//static hal_rx_desc_t *Rx_Desc = NULL;
+//static hal_tx_desc_t *Tx_Desc = NULL;
 
-#warning WIP --> put all static variables inside s_hal_eth_theinternals
+//#warning WIP --> put all static variables inside s_hal_eth_theinternals
 
 
 static hal_eth_theinternals_t s_hal_eth_theinternals =
@@ -528,10 +540,12 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
         hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_eth_init() needs a non-zero number of dma tx and rx buffers");
     }
     
-    rx_buf = (uint32_t (*)[ETH_BUF_SIZE>>2]) hal_heap_new(ETH_BUF_SIZE * capacityofrxfifoofframes);     
-    tx_buf = (uint32_t (*)[ETH_BUF_SIZE>>2]) hal_heap_new(ETH_BUF_SIZE * capacityoftxfifoofframes);
-    Rx_Desc = (hal_rx_desc_t*) hal_heap_new(sizeof(hal_rx_desc_t) * capacityofrxfifoofframes);
-    Tx_Desc = (hal_tx_desc_t*) hal_heap_new(sizeof(hal_tx_desc_t) * capacityoftxfifoofframes); 
+    intitem->rx_buffers = (hal_eth_array_of_buffers_t) hal_heap_new(ETH_BUF_SIZE * capacityofrxfifoofframes);     
+    intitem->tx_buffers = (hal_eth_array_of_buffers_t) hal_heap_new(ETH_BUF_SIZE * capacityoftxfifoofframes);
+    intitem->rx_desc = (hal_rx_desc_t*) hal_heap_new(sizeof(hal_rx_desc_t) * capacityofrxfifoofframes);
+    intitem->tx_desc = (hal_tx_desc_t*) hal_heap_new(sizeof(hal_tx_desc_t) * capacityoftxfifoofframes);
+    //Rx_Desc = (hal_rx_desc_t*) hal_heap_new(sizeof(hal_rx_desc_t) * capacityofrxfifoofframes);
+    //Tx_Desc = (hal_tx_desc_t*) hal_heap_new(sizeof(hal_tx_desc_t) * capacityoftxfifoofframes); 
 
 
 //    eventviewer_init();
@@ -633,6 +647,9 @@ extern hal_result_t hal_eth_sendframe(hal_eth_frame_t *frame)
     /* Send frame to ETH ethernet controller */
     U32 *sp,*dp;
     U32 i,j;
+    
+    const hal_eth_t id = hal_eth1;
+    hal_eth_internal_item_t* intitem = s_hal_eth_theinternals.items[HAL_eth_id2index(id)];
 
 
     if(hal_true != s_hal_eth_initted_is(hal_eth1))
@@ -641,21 +658,25 @@ extern hal_result_t hal_eth_sendframe(hal_eth_frame_t *frame)
     }
 
 
-    j = TxBufIndex;
+    j = intitem->txbufindex; //TxBufIndex;
     /* Wait until previous packet transmitted. */
-    while (Tx_Desc[j].CtrlStat & DMA_TX_OWN);
+    //while (Tx_Desc[j].CtrlStat & DMA_TX_OWN);
+    while (intitem->tx_desc[j].CtrlStat & DMA_TX_OWN);
 
     sp = (U32 *)&frame->datafirstbyte[0];
-    dp = (U32 *)(Tx_Desc[j].Addr & ~3);
+    dp = (U32 *)(intitem->tx_desc[j].Addr & ~3);
+    //dp = (U32 *)(Tx_Desc[j].Addr & ~3);
 
     /* Copy frame data to ETH IO buffer. */
     for (i = (frame->length + 3) >> 2; i; i--) {
         *dp++ = *sp++;
     }
-    Tx_Desc[j].Size      = frame->length;
-    Tx_Desc[j].CtrlStat |= DMA_TX_OWN;
-    if (++j == s_hal_eth_theinternals.items[0]->config.capacityoftxfifoofframes) j = 0;
-    TxBufIndex = j;
+    //Tx_Desc[j].Size      = frame->length;
+    //Tx_Desc[j].CtrlStat |= DMA_TX_OWN;
+    intitem->tx_desc[j].Size      = frame->length;
+    intitem->tx_desc[j].CtrlStat |= DMA_TX_OWN;    
+    if (++j == intitem->config.capacityoftxfifoofframes) j = 0;
+    intitem->txbufindex = j; //TxBufIndex = j;
     /* Start frame transmission. */
     ETH->DMASR   = DSR_TPSS;
     ETH->DMATPDR = 0;
@@ -679,12 +700,16 @@ extern const hal_eth_network_functions_t * hal_eth_get_network_functions(void)
 // changed OS_FRAME with hal_eth_frame_t
 void ETH_IRQHandler(void) 
 {
+    const hal_eth_t id = hal_eth1;
+    hal_eth_internal_item_t* intitem = s_hal_eth_theinternals.items[HAL_eth_id2index(id)];
+    
   // questa non va cambiata. pero' .... usa OS_FRAME e chiama alloc_mem() e put_in_queue().
   // bisogna usare alcuni puntatori a funzione che siano inizializzati / passati in hal_eth_init().
   // inoltre, se si vuole segnalare l'arrivo di un frame gia' qui dentro, allora bisogna definire
   // un altro puntatore a funzione hal_on_rx_frame().
 
-
+    uint8_t* rxframedata = NULL;
+    uint16_t rxframesize = 0;
 
   /* Ethernet Controller Interrupt function. */
   hal_eth_frame_t *frame;
@@ -705,44 +730,63 @@ void ETH_IRQHandler(void)
     ETH->DMASR = int_stat;                              // -> reset the dma status register
     if (int_stat & INT_RIE) {                           // -> in case of received frame ...
       /* Valid frame has been received. */
-      i = RxBufIndex;
-      if (Rx_Desc[i].Stat & DMA_RX_ERROR_MASK) {
+      i = intitem->rxbufindex; //RxBufIndex;
+      if (intitem->rx_desc[i].Stat & DMA_RX_ERROR_MASK) {  
+      //if (Rx_Desc[i].Stat & DMA_RX_ERROR_MASK) {
         goto rel;
       }
-      if ((Rx_Desc[i].Stat & DMA_RX_SEG_MASK) != DMA_RX_SEG_MASK) {
+      //if ((Rx_Desc[i].Stat & DMA_RX_SEG_MASK) != DMA_RX_SEG_MASK) {
+      if ((intitem->rx_desc[i].Stat & DMA_RX_SEG_MASK) != DMA_RX_SEG_MASK) {
         goto rel;
       }
-      RxLen = ((Rx_Desc[i].Stat >> 16) & 0x3FFF) - 4;   // -> retrieve the length of teh frame
+      
+      //RxLen = ((Rx_Desc[i].Stat >> 16) & 0x3FFF) - 4;   // -> retrieve the length of teh frame
+      RxLen = ((intitem->rx_desc[i].Stat >> 16) & 0x3FFF) - 4;   // -> retrieve the length of teh frame
+      rxframesize = RxLen;
       if (RxLen > ETH_MTU) {
         /* Packet too big, ignore it and free buffer. */
         goto rel;
       }
       /* Flag 0x80000000 to skip sys_error() call when out of memory. */
       //frame = alloc_mem (RxLen | 0x80000000);
-      frame = s_hal_eth_theinternals.items[0]->onframerx.frame_new(RxLen | 0x80000000);
+      frame = intitem->onframerx.frame_new(RxLen | 0x80000000);
       /* if 'alloc_mem()' has failed, ignore this packet. */
       if (frame != NULL) {
-        sp = (U32 *)(Rx_Desc[i].Addr & ~3);
+        //sp = (U32 *)(Rx_Desc[i].Addr & ~3);
+        sp = (U32 *)(intitem->rx_desc[i].Addr & ~3);
         dp = (U32 *)&frame->datafirstbyte[0];
+        rxframedata = (uint8_t*)sp;
         for (RxLen = (RxLen + 3) >> 2; RxLen; RxLen--) {
           *dp++ = *sp++;
         }
         //put_in_queue (frame);
-        s_hal_eth_theinternals.items[0]->onframerx.frame_movetohigherlayer(frame);
+        intitem->onframerx.frame_movetohigherlayer(frame);
 
-        if(NULL != s_hal_eth_theinternals.items[0]->onframerx.frame_alerthigherlayer)
+        if(NULL != intitem->onframerx.frame_alerthigherlayer)
         {
-            s_hal_eth_theinternals.items[0]->onframerx.frame_alerthigherlayer();
+            intitem->onframerx.frame_alerthigherlayer();
         }
 
         //rxframes ++;
-
+        
       }
+      else
+      {
+          rxframedata = 0;          
+      }
+      
+    if(NULL != hal_eth_hid_DEBUG_support.fn_inside_eth_isr)
+    {            
+        hal_eth_hid_DEBUG_support.fn_inside_eth_isr(rxframedata, rxframesize);
+    }
+        
       /* Release this frame from ETH IO buffer. */
-rel:  Rx_Desc[i].Stat = DMA_RX_OWN;
-
-      if (++i == s_hal_eth_theinternals.items[0]->config.capacityofrxfifoofframes) i = 0;
-      RxBufIndex = i;
+//rel:  Rx_Desc[i].Stat = DMA_RX_OWN;
+rel:  intitem->rx_desc[i].Stat = DMA_RX_OWN;
+    
+      
+    if (++i == intitem->config.capacityofrxfifoofframes) i = 0;
+      intitem->rxbufindex = i; //RxBufIndex = i;
     }
     if (int_stat & INT_TIE) {
       /* Frame transmit completed. */
@@ -761,12 +805,12 @@ rel:  Rx_Desc[i].Stat = DMA_RX_OWN;
 extern hal_result_t hal_eth_hid_static_memory_init(void)
 {
 
-    RxBufIndex = 0;
-    TxBufIndex = 0;
-    rx_buf = NULL;
-    tx_buf = NULL;
-    Rx_Desc = NULL;
-    Tx_Desc = NULL;
+    //RxBufIndex = 0;
+    //TxBufIndex = 0;
+    //rx_buf = NULL;
+    //tx_buf = NULL;
+    //Rx_Desc = NULL;
+    //Tx_Desc = NULL;
     memset(&s_hal_eth_theinternals, 0, sizeof(s_hal_eth_theinternals));
 
     return(hal_res_OK);
@@ -798,16 +842,18 @@ static void s_hal_eth_rx_descr_init(void)
 {
   /* Initialize Receive DMA Descriptor array. */
   U32 i,next;
+    const hal_eth_t id = hal_eth1;
+    hal_eth_internal_item_t* intitem = s_hal_eth_theinternals.items[HAL_eth_id2index(id)];
 
-  RxBufIndex = 0;
-  for (i = 0, next = 0; i < s_hal_eth_theinternals.items[0]->config.capacityofrxfifoofframes; i++) {
-    if (++next == s_hal_eth_theinternals.items[0]->config.capacityofrxfifoofframes) next = 0;
-    Rx_Desc[i].Stat = DMA_RX_OWN;
-    Rx_Desc[i].Ctrl = DMA_RX_RCH | ETH_BUF_SIZE;
-    Rx_Desc[i].Addr = (U32)&rx_buf[i];
-    Rx_Desc[i].Next = (U32)&Rx_Desc[next];
+  intitem->rxbufindex = 0; //RxBufIndex = 0;
+  for (i = 0, next = 0; i < intitem->config.capacityofrxfifoofframes; i++) {
+    if (++next == intitem->config.capacityofrxfifoofframes) next = 0;
+    intitem->rx_desc[i].Stat = DMA_RX_OWN;
+    intitem->rx_desc[i].Ctrl = DMA_RX_RCH | ETH_BUF_SIZE;
+    intitem->rx_desc[i].Addr = (U32)&intitem->rx_buffers[i];
+    intitem->rx_desc[i].Next = (U32)&intitem->rx_desc[next];
   }
-  ETH->DMARDLAR = (U32)&Rx_Desc[0];
+  ETH->DMARDLAR = (U32)&intitem->rx_desc[0];
 }
 
 // changed NUM_TX_BUF with s_hal_eth_theinternals.config.capacityoftxfifoofframes
@@ -815,15 +861,17 @@ static void s_hal_eth_tx_descr_init(void)
 {
   /* Initialize Transmit DMA Descriptor array. */
   U32 i,next;
+    const hal_eth_t id = hal_eth1;
+    hal_eth_internal_item_t* intitem = s_hal_eth_theinternals.items[HAL_eth_id2index(id)];
 
-  TxBufIndex = 0;
-  for (i = 0, next = 0; i < s_hal_eth_theinternals.items[0]->config.capacityoftxfifoofframes; i++) {
-    if (++next == s_hal_eth_theinternals.items[0]->config.capacityoftxfifoofframes) next = 0;
-    Tx_Desc[i].CtrlStat = DMA_TX_TCH | DMA_TX_LS | DMA_TX_FS;
-    Tx_Desc[i].Addr     = (U32)&tx_buf[i];
-    Tx_Desc[i].Next     = (U32)&Tx_Desc[next];
+  intitem->txbufindex = 0; //TxBufIndex = 0;
+  for (i = 0, next = 0; i < intitem->config.capacityoftxfifoofframes; i++) {
+    if (++next == intitem->config.capacityoftxfifoofframes) next = 0;
+    intitem->tx_desc[i].CtrlStat = DMA_TX_TCH | DMA_TX_LS | DMA_TX_FS;
+    intitem->tx_desc[i].Addr     = (U32)&intitem->tx_buffers[i];
+    intitem->tx_desc[i].Next     = (U32)&intitem->tx_desc[next];
   }
-  ETH->DMATDLAR = (U32)&Tx_Desc[0];
+  ETH->DMATDLAR = (U32)&intitem->tx_desc[0];
 }
 
 
