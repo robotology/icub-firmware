@@ -160,6 +160,9 @@ extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, int32_t a
     o->xPosF = (float)p1;
     o->xVelF = 0.0f;
 
+    o->xVel = 0.0f;
+    o->xPAcc = 0.f;
+    
     if (!avg_vel) avg_vel = o->vel_max;
     
     LIMIT(-o->vel_max, avg_vel, o->vel_max)
