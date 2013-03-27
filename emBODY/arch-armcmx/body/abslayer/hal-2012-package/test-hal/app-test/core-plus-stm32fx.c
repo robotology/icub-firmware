@@ -30,7 +30,7 @@
 
 
 #include "hal_brdcfg_modules.h"
-#include "hal_brdcfg.h"
+//#include "hal_brdcfg.h"
 
 //#include "hal_switch.h"
 //#include "hal_led.h"
@@ -91,6 +91,24 @@
 //#undef EXECUTE_TEST_PERIPH_UNIQUEID
 #define EXECUTE_TEST_PERIPH_UNIQUEID
 
+
+#undef EXECUTE_TEST_PERIPH_CAN
+//#define EXECUTE_TEST_PERIPH_CAN
+
+#define haLcAn1    hal_can1
+#define haLcAn2    hal_can2
+
+#ifdef EXECUTE_TEST_PERIPH_CAN
+#define BURSTLEN 5
+//#define EXECUTE_TEST_PERIPH_CAN_TX1_REGULAR
+ #define EXECUTE_TEST_PERIPH_CAN_TX1_BURST
+// #define EXECUTE_TEST_PERIPH_CAN_TX1_MIXED
+
+#define EXECUTE_TEST_PERIPH_CAN_TX1
+
+#define EXECUTE_TEST_PERIPH_CAN_TX1_RX2
+//#define EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY
+#endif
 
 //#undef EXECUTE_TEST_PERIPH_ETH
 #define EXECUTE_TEST_PERIPH_ETH
@@ -172,6 +190,10 @@ static void test_periph_uniqueid(void);
 #endif//defined(EXECUTE_TEST_PERIPH_UNIQUEID)   
 
 
+#if     defined(EXECUTE_TEST_PERIPH_CAN)    
+static void test_periph_can(void);
+#endif//defined(EXECUTE_TEST_PERIPH_CAN)  
+
 #if     defined(EXECUTE_TEST_PERIPH_ETH)    
 static void test_periph_eth(void);
 #endif//defined(EXECUTE_TEST_PERIPH_ETH)   
@@ -182,10 +204,12 @@ static void test_periph_eth(void);
 
 static const hal_reltime_t systickperiod = hal_RELTIME_1millisec;
 static volatile uint32_t msTicks = 0;
-static volatile uint8_t s_tick_ipal = 0;
 
-static volatile uint32_t led0_blink_rate_ms = 500;
-static const uint32_t ipal_tick_rate_ms = 100;
+
+static volatile uint32_t led1_blink_rate_ms = 500;
+
+static volatile uint8_t s_tick_slower = 0; //s_tick_slower
+static const uint32_t s_tick_slower_rate_ms = 100;
 
 
 
@@ -325,6 +349,12 @@ int main(void)
 #endif//defined(EXECUTE_TEST_PERIPH_UNIQUEID)  
 
 
+// keep it last, as it contains a forever loop
+
+#if     defined(EXECUTE_TEST_PERIPH_CAN)    
+    test_periph_can();
+#endif//defined(EXECUTE_TEST_PERIPH_CAN)
+     
 
 
 // keep it last, as it contains a forever loop
@@ -411,7 +441,14 @@ static void leds_init(void)
     
     res = hal_led_init(hal_led4, NULL);
     res =  res;
+  
+    res = hal_led_init(hal_led5, NULL);
+    res =  res;
     
+    res = hal_led_init(hal_led6, NULL);
+    res =  res;    
+
+
 
 // #ifdef  USE_EVENTVIEWER
 //     evEntityId_t prev = eventviewer_switch_to(ev_ID_first_usrdef+1);
@@ -473,15 +510,15 @@ extern void onsystick(void)
     msTicks++;
     
     count++;
-    if(led0_blink_rate_ms == count)
+    if(led1_blink_rate_ms == count)
     {
         count = 0;
         leds_led1_toggle();
     }
     
-    if(0 == (msTicks % ipal_tick_rate_ms))
+    if(0 == (msTicks % s_tick_slower_rate_ms))
     {
-        s_tick_ipal = 1;
+        s_tick_slower = 1;
     }
     
     if(10000 == msTicks)
@@ -533,7 +570,7 @@ static uint8_t button_ispushed(void)
 static void test_has_failed(const char* msg)
 {  
     char errormsg[128] =  {0};    
-    led0_blink_rate_ms = 100;
+    led1_blink_rate_ms = 100;
     
     snprintf(errormsg, sizeof(errormsg)-1, "test has failed: %s", msg);
 #if !defined(DONT_USE_TRACE) 
@@ -606,7 +643,7 @@ static void info_about_core_plus_led(void)
 #ifdef HAL_USE_DEVICE_LED
     char extra[64] = {"and blinks hal_led0 at 1 hz"};
 #else
-    char extra[64] = {"");    
+    char extra[64] = {" "};    
 #endif 
     snprintf(msg, sizeof(msg)-1, " SYS: stack size = %d kbytes, heap size = %d kbytes, systick callback was set at %d usec, can be seen on eventviewer %s", 
                                  hal_sys_stack_get_totalsize()/1024, hal_sys_heap_get_totalsize()/1024, systickperiod, extra);
@@ -637,12 +674,20 @@ static void test_sys_delay(void)
 {
     evEntityId_t prev;
     
-    test_is_beginning("sys-delay: 10, 200, 500, 1000 usec ");
+    test_is_beginning("sys-delay: 1, 10, 100, 500 usec + 1, 10, 100, 500 msec + 1 sec");
     
     
     // delay for some times and them measure it.
     
     hal_sys_irq_disable();
+    
+#ifdef  USE_EVENTVIEWER
+     prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
+#endif  
+    hal_sys_delay(1*hal_RELTIME_1microsec);
+#ifdef  USE_EVENTVIEWER
+    eventviewer_switch_to(prev); 
+#endif       
 
 #ifdef  USE_EVENTVIEWER
      prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
@@ -656,7 +701,7 @@ static void test_sys_delay(void)
 #ifdef  USE_EVENTVIEWER
     prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
 #endif  
-    hal_sys_delay(200*hal_RELTIME_1microsec);
+    hal_sys_delay(100*hal_RELTIME_1microsec);
 #ifdef  USE_EVENTVIEWER
     eventviewer_switch_to(prev); 
 #endif      
@@ -691,6 +736,14 @@ static void test_sys_delay(void)
     prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
 #endif  
     hal_sys_delay(100*hal_RELTIME_1millisec);
+#ifdef  USE_EVENTVIEWER
+    eventviewer_switch_to(prev); 
+#endif 
+
+#ifdef  USE_EVENTVIEWER
+    prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
+#endif  
+    hal_sys_delay(500*hal_RELTIME_1millisec);
 #ifdef  USE_EVENTVIEWER
     eventviewer_switch_to(prev); 
 #endif 
@@ -813,7 +866,7 @@ static const hal_timer_cfg_t test_timer_config =
 {
     .prescaler          = hal_timer_prescalerAUTO,
     .countdown          = 200*1000,
-    .priority           = hal_int_priority10,
+    .priority           = hal_int_priority15,
     .mode               = hal_timer_mode_periodic,
     .callback_on_exp    = test_timer_callback,
     .arg                = NULL    
@@ -897,7 +950,7 @@ static void wdtcallback(void* p)
 static const hal_watchdog_cfg_t wdtconfig = 
 {
     .countdown              = COUNTDOWN,
-    .priority               = hal_int_priority11,
+    .priority               = hal_int_priority14,
     .onwindowexpiry_cbk     = wdtcallback,
     .onwindowexpiry_arg     = NULL   
 };
@@ -968,6 +1021,242 @@ static void test_periph_uniqueid(void)
 #endif//defined(EXECUTE_TEST_PERIPH_UNIQUEID)   
 
 
+#if     defined(EXECUTE_TEST_PERIPH_CAN)    
+
+static const hal_can_cfg_t canconfigbase =
+{
+    .runmode                    = hal_can_runmode_isr_1txq1rxq,
+    .baudrate                   = hal_can_baudrate_1mbps,
+    .priorx                     = hal_int_priority10,
+    .priotx                     = hal_int_priority11,
+    .capacityofrxfifoofframes   = 8,
+    .capacityoftxfifoofframes   = 8,
+    .capacityoftxfifohighprio   = 0,
+    .callback_on_rx             = NULL,
+    .arg_cb_rx                  = NULL,
+    .callback_on_tx             = NULL,
+    .arg_cb_tx                  = NULL
+};
+
+static hal_can_cfg_t canxconfig;
+
+typedef struct
+{
+    uint8_t     pos0;
+    uint8_t     pos1;
+    uint16_t    filler;
+    uint32_t    sequencenumber;  
+} can_message_format_t;
+
+#if     defined(EXECUTE_TEST_PERIPH_CAN_TX1_REGULAR)
+static void can_transmit_regular(hal_can_frame_t* frametx, uint32_t cnt)
+{   
+    ((can_message_format_t*)frametx->data)->sequencenumber = cnt;
+    
+    frametx->data[0] = cnt & 0xff;    
+
+    
+    hal_can_put(haLcAn1, frametx, hal_can_send_normprio_now);
+    
+}
+#elif   defined(EXECUTE_TEST_PERIPH_CAN_TX1_BURST)
+static void can_transmit_burst(hal_can_frame_t* frametx, uint8_t burstlen, uint32_t cnt)
+{           
+    static uint8_t accumulate = 0;
+    
+    ((can_message_format_t*)frametx->data)->sequencenumber = cnt;
+                
+    frametx->data[0] = cnt & 0xff;    
+    frametx->data[1] = accumulate;
+    
+    hal_can_put(haLcAn1, frametx, hal_can_send_normprio_later); //hal_can_send_normprio_now);  
+
+    
+    if(burstlen == ++accumulate)
+    {
+        accumulate = 0;
+        hal_can_transmit(haLcAn1);
+    }
+}
+#elif   defined(EXECUTE_TEST_PERIPH_CAN_TX1_MIXED)
+static void can_transmit_mixed(hal_can_frame_t* frametx, uint8_t burstlen, uint32_t cnt)
+{           
+    static uint8_t accumulate = 0;
+    
+    ((can_message_format_t*)frametx->data)->sequencenumber = cnt;
+                
+    frametx->data[0] = cnt;    
+
+    if(0 == accumulate)
+    {
+        frametx->data[1] = 0;  
+        hal_can_put(haLcAn1, frametx, hal_can_send_normprio_now); //hal_can_send_normprio_now); 
+    }
+    else 
+    {
+        frametx->data[1] = accumulate;
+        hal_can_put(haLcAn1, frametx, hal_can_send_normprio_later); //hal_can_send_normprio_now);  
+    } 
+    
+    if((burstlen+1) == ++accumulate)
+    {
+        accumulate = 0;
+        hal_can_transmit(haLcAn1);
+    }
+}
+#endif
+
+static volatile uint8_t can1_received = 0;
+static void test_periph_can1_on_rx(void* p)
+{
+    can1_received = 1;
+}
+
+#if     defined(EXECUTE_TEST_PERIPH_CAN_TX1_RX2) 
+
+static volatile uint8_t can2_received = 0;
+static void test_periph_can2_on_rx(void* p)
+{
+    can2_received = 1;
+}
+
+
+static void can_process_reception(hal_can_t canid, uint32_t count)
+{
+    hal_can_frame_t rxframe;
+    can_message_format_t* msgformat = (can_message_format_t*)rxframe.data;
+    char msg[128] =  {0};
+    
+    uint32_t rxnumber = 0;
+    uint8_t remaining = 0;
+    hal_result_t res = hal_res_OK;
+
+    do
+    {    
+        res = hal_can_get(canid, &rxframe, &remaining);
+        
+        rxnumber = msgformat->sequencenumber;
+        
+        if(haLcAn1 == canid)
+        {
+                snprintf(msg, sizeof(msg)-1, "can: received a can pkt from haLcAn1 of size %d and w/ sequencenumber = %d", 
+                                              rxframe.size, rxnumber);
+                hal_trace_puts(msg);          
+        }
+        else if(haLcAn2 == canid)
+        {
+            if(0 == (rxnumber % 100))
+            {
+                snprintf(msg, sizeof(msg)-1, "can: received a can pkt from haLcAn2 of size %d and w/ sequencenumber = %d", 
+                                              rxframe.size, rxnumber);
+                hal_trace_puts(msg);           
+            }
+        }
+    } while((remaining > 0) && (hal_res_OK == res));
+    
+}
+#endif//defined(EXECUTE_TEST_PERIPH_CAN_TX1_RX2) 
+
+static void test_periph_can(void)
+{    
+    
+//#if defined(EXECUTE_TEST_PERIPH_CAN_TX1)||defined(EXECUTE_TEST_PERIPH_CAN_TX1_RX2)    
+    
+    test_is_beginning("can");   
+    char msg[128] =  {0};
+    hal_can_frame_t canframetx =
+    {
+        .id                 = 7,
+        .id_type            = hal_can_frameID_std,
+        .frame_type         = hal_can_frame_data,
+        .size               = 8,
+        .unused             = 0,
+        .data               = {0, 1, 2, 3, 4, 5, 6, 7}       
+    };
+    
+
+
+
+    
+       
+    
+#if     defined(EXECUTE_TEST_PERIPH_CAN_TX1_RX2)  
+    // init can 2
+    memcpy(&canxconfig, &canconfigbase, sizeof(hal_can_cfg_t));
+    canxconfig.priorx = hal_int_priority10;
+    canxconfig.priotx = hal_int_priority11;
+    canxconfig.callback_on_rx   = test_periph_can2_on_rx;
+    canxconfig.arg_cb_rx        = (void*)haLcAn2;
+    hal_can_init(haLcAn2, &canxconfig);
+    hal_can_enable(haLcAn2);
+    //hal_can_put(haLcAn2, &canframetx, hal_can_send_normprio_now);
+#endif//defined(EXECUTE_TEST_PERIPH_CAN_TX1_RX2) 
+    
+    // init can 1 
+    memcpy(&canxconfig, &canconfigbase, sizeof(hal_can_cfg_t));
+    canxconfig.priorx = hal_int_priority12;
+    canxconfig.priotx = hal_int_priority13;
+    canxconfig.callback_on_rx   = test_periph_can1_on_rx;
+    canxconfig.arg_cb_rx        = (void*)haLcAn1;
+    hal_can_init(haLcAn1, &canxconfig);
+    hal_can_enable(haLcAn1);    
+    
+    
+// #if     !defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY)    
+//     snprintf(msg, sizeof(msg)-1, "eth: successful if led3 blinks at 1Hz and the board responds to ping to %d.%d.%d.%d", 
+//                                  ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]);
+//     
+//     test_message(msg);
+// #else
+//     snprintf(msg, sizeof(msg)-1, "eth: successful if led3 blinks at 1Hz, the board responds to ping to %d.%d.%d.%d,", 
+//                                  ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]);
+//     
+//     test_message(msg);
+//     snprintf(msg, sizeof(msg)-1, "     and if a small udp packet to port %d is replied w/ its first 4 bytes", udpport);
+//     
+//     test_message(msg);
+// #endif//!defined(EXECUTE_TEST_PERIPH_CAN) 
+    
+    // 2. run forever loop
+    for(;;)
+    {
+        static uint32_t count = 0;
+        if(1 == s_tick_slower)
+        {
+            s_tick_slower = 0;
+            count++;
+            
+#if     defined(EXECUTE_TEST_PERIPH_CAN_TX1_REGULAR)
+            can_transmit_regular(&canframetx, count); 
+#elif   defined(EXECUTE_TEST_PERIPH_CAN_TX1_BURST)
+            can_transmit_burst(&canframetx, BURSTLEN, count); 
+#elif   defined(EXECUTE_TEST_PERIPH_CAN_TX1_MIXED)
+            can_transmit_mixed(&canframetx, BURSTLEN, count); 
+#endif
+            
+        }
+        
+        if(1 == can1_received)
+        {
+            can1_received = 0;
+            can_process_reception(haLcAn1, count);           
+        }
+        
+#if     defined(EXECUTE_TEST_PERIPH_CAN_TX1_RX2)         
+        if(1 == can2_received)
+        {
+            can2_received = 0;
+            can_process_reception(haLcAn2, count);           
+        }
+#endif//defined(EXECUTE_TEST_PERIPH_CAN_TX1_RX2)           
+    } 
+      
+    
+}
+
+#endif//defined(EXECUTE_TEST_PERIPH_CAN)
+
+
 #if     defined(EXECUTE_TEST_PERIPH_ETH)    
 #include "../../../../../sys/abs/api/ipal.h"
 static uint8_t s_blink_ipal_led3 = 0;
@@ -980,9 +1269,9 @@ static ipal_ipv4addr_t ipaddr_remote_host = 0;
 static void test_periph_eth_tick_ipal(void) 
 {
     static uint32_t tt = 0;
-    if(1 == s_tick_ipal) 
+    if(1 == s_tick_slower) 
     {
-        s_tick_ipal = 0;
+        s_tick_slower = 0;
         ipal_sys_timetick_increment();
         if(++tt == 5)
         {
