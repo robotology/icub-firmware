@@ -204,24 +204,24 @@ extern void eo_emsController_ReadEncoders(int32_t *enc_pos)
     
         //s_emsc->cable_length_alarm = eo_motors_CableLimitAlarm(enc_pos[0], enc_pos[1], jnt_pos_2_);
         
-        static uint8_t led = 0;
-        
-        if (eo_motors_CableLimitAlarm(enc_pos[0], enc_pos[1], jnt_pos_2_))
-        {
-            if (!led)
-            {
-                led = 1;
-                hal_led_on(hal_led0);
-            }
-        }
-        else
-        {
-            if (led)
-            {
-                led = 0;
-                hal_led_off(hal_led0);
-            }
-        }
+//         static uint8_t led = 0;
+//         
+//         if (eo_motors_CableLimitAlarm(enc_pos[0], enc_pos[1], jnt_pos_2_))
+//         {
+//             if (!led)
+//             {
+//                 led = 1;
+//                 hal_led_on(hal_led0);
+//             }
+//         }
+//         else
+//         {
+//             if (led)
+//             {
+//                 led = 0;
+//                 hal_led_off(hal_led0);
+//             }
+//         }
         
         eo_axisController_SetEncPos(s_emsc->axis_controller[0], enc_pos[0]);
         eo_axisController_SetEncPos(s_emsc->axis_controller[1], enc_pos[1]);
