@@ -203,7 +203,7 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
 
     if (o->time < 32000) ++o->time;
 
-    if (/* o->hard_fault || */ o->invalid_data_cnt >= 500)
+    if (o->invalid_data_cnt >= 500)
     {
         o->hard_fault = eobool_true;
         o->invalid_data_cnt = 0;
@@ -386,7 +386,147 @@ static int32_t normalize_angle(int32_t a)
     return a;
 }
 
-/*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#if 0
+extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
+{
+    if (!o || o->hard_fault) return;
+    
+    if (!o->enc_sign) return;
+    
+    if (position != ENC_INVALID)
+    {
+        position -= o->offset;
+        
+        if (position < 0)
+        {
+            position += IMPULSE_x_REVOLUTION;
+        }
+        else if (position >= IMPULSE_x_REVOLUTION)
+        {
+            position -= IMPULSE_x_REVOLUTION;
+        }
+        
+        position *= o->enc_sign;
+    }
+    
+    if (!o->is_started)
+    {
+        encoder_init(o, position);
+        return;
+    }
+    
+    //////////////////////////////
+
+    if (o->time < 1000) ++o->time;
+
+    if (o->invalid_data_cnt >= 500)
+    {
+        o->hard_fault = eobool_true;
+        o->invalid_data_cnt = 0;
+        return;
+    }
+    
+    if (position == ENC_INVALID)
+    {
+        o->invalid_data_cnt += 10;
+    }
+    else
+    {        
+        if (o->invalid_data_cnt) --o->invalid_data_cnt;
+
+        int32_t check = normalize_angle(position - o->position_last);
+        o->position_last = position;
+
+        if (-48 <= check && check <= 48)
+        {
+            int32_t delta = normalize_angle(position - o->position_sure);
+
+            if (delta<=-32 || delta>=32 || (o->dir==-1 && delta<=-16) || (o->dir==1 && delta>=16))
+            {
+                int32_t delta_x_freq = delta*EMS_FREQUENCY_INT32;
+
+                o->odo_x_freq -= delta_x_freq;
+                o->position_sure = position;
+                o->distance += delta;
+                
+                int32_t slowiness = ((o->time)<<10) / delta;
+                
+                if (!o->dir || ((o->slowiness<0) ^ (slowiness<0)))
+                {
+                    o->slowiness = slowiness;
+                }
+                else
+                {
+                    o->slowiness = (4*o->slowiness + slowiness + 2) / 5;
+                }
+                
+                o->speed_filt = 1024000 / (o->slowiness = slowiness);
+
+                LIMIT(-48000, o->speed_filt, 48000);
+                
+                o->time = 0;
+                
+                o->dir = (delta>0) ? 1 : -1;
+            }
+        }
+        else
+        {
+            o->invalid_data_cnt += 11;
+        }
+    }
+    
+    if (o->time < 999)
+    {
+        if (o->time > 1)
+        {
+            int32_t speed_max = 32000 / (o->time-1);
+            LIMIT(-speed_max, o->speed_filt, speed_max);
+        }
+        
+        o->odo_x_freq += o->speed_filt;
+        
+        LIMIT(-16000, o->odo_x_freq, 16000);
+    }
+    else if (o->time == 999) // is still
+    {
+        o->odo_x_freq = 0;
+        o->speed_filt = 0;
+        o->speed = 0;
+        o->dir = 0;
+        
+        //o->sindex = 0;
+        
+        o->sample[0] = 0;
+        o->sample[1] = 0;
+        o->sample[2] = 0;
+        o->sample[3] = 0;
+        o->sample[4] = 0;
+    }
+}
+
 extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
 {
     if (!o || o->hard_fault) return;
@@ -498,7 +638,7 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
     
     #endif
 }
-*/
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

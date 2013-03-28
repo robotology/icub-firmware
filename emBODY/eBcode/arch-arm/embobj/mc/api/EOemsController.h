@@ -83,7 +83,7 @@ extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq);
 
 // asynchronous
 extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_t vel, int32_t offset);
-extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_command_t mode);
+extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_command_t mode, eObool_t twoFOC_off);
 extern eOmc_controlmode_t eo_emsController_GetControlMode(uint8_t joint);
 extern void eo_emsController_ResetPosPid(uint8_t joint);
 extern void eo_emsController_ResetTrqPid(uint8_t joint);
