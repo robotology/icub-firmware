@@ -450,7 +450,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
     */
     
     // 2) set control mode to ems controller
-    eo_emsController_SetControlMode(jxx, (eOmc_controlmode_command_t)(*controlmode_ptr));       
+    eo_emsController_SetControlMode(jxx, (eOmc_controlmode_command_t)(*controlmode_ptr), eobool_true);       
 }
 
 

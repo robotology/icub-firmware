@@ -116,12 +116,30 @@ extern void eo_pid_SetPid(EOpid *o, float K, float Kd, float Ki, float Imax, int
     o->pwm_max = pwm_max;
     o->pwm_offset = pwm_offset;
     
-    float N = 10.0;
-    float T = o->Kd/N;
-    float Q = 2.0f*T*EMS_FREQUENCY_FLOAT; 
-
-    o->A = (Q-1.0f)/(Q+1.0f);
+    float Q = 2.0f*o->Kd*EMS_FREQUENCY_FLOAT; 
+    o->A = (Q-10.0f)/(Q+10.0f);
     o->B = EMS_FREQUENCY_FLOAT*(1.0f-o->A);
+}
+
+extern int32_t eo_pid_PWM_pid(EOpid *o, float En)
+{
+    if (!o) return 0;
+                
+    o->Dn = o->A*o->Dn + o->B*(En - o->En);
+    
+    o->En = En;
+
+    //En *= o->K;
+    
+    //o->KKiIn += o->Ki*En;
+
+    //LIMIT(o->KKiIn, o->Imax);
+    
+    o->pwm = o->pwm_offset + (int32_t)(o->K*(En+o->Kd*o->Dn));
+    
+    LIMIT(o->pwm, o->pwm_max);
+
+    return o->pwm;
 }
 
 extern void eo_pid_GetStatus(EOpid *o, int32_t *pwm, int32_t *err)
@@ -149,27 +167,6 @@ extern void eo_pid_Reset(EOpid *o)
     o->yv0 = o->yv1 = o->yv2 = 0.0f;
     
     o->pwm = 0;
-}
-
-extern int32_t eo_pid_PWM_pid(EOpid *o, float En)
-{
-    if (!o) return 0;
-                
-    o->Dn = o->A*o->Dn + o->B*(En - o->En);
-    
-    o->En = En;
-
-    En *= o->K;
-    
-    o->KKiIn += o->Ki*En;
-
-    LIMIT(o->KKiIn, o->Imax);
-    
-    o->pwm = o->pwm_offset + (int32_t)(En + o->K*o->Dn + o->KKiIn);
-    
-    LIMIT(o->pwm, o->pwm_max);
-
-    return o->pwm;
 }
 
 extern int32_t eo_pid_PWM_pi(EOpid *o, float Tr, float Tm)

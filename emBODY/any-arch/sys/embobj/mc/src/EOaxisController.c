@@ -472,10 +472,12 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
                 {
                     *big_error_flag = eobool_true;
                 }
-                else if (OUT_OF_RANGE(pwm,3000) && OUT_OF_RANGE(o->err,728/*4 deg*/) && IN_RANGE(vel,1000))
-                {
-                    *big_error_flag = eobool_true;
-                }
+                
+                //else if (OUT_OF_RANGE(pwm,3000) && OUT_OF_RANGE(o->err,728/*4 deg*/) && IN_RANGE(vel,1000))
+                //{
+                //    *big_error_flag = eobool_true;
+                //}
+                
             }
             
             return pwm;

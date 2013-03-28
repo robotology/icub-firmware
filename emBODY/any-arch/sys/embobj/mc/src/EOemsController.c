@@ -125,10 +125,10 @@ extern EOemsController* eo_emsController_Init(emsBoardType_t board_type)
         switch (s_emsc->boardType)
         {
             case EMS_SHOULDER:
-                s_emsc->axis_controller[0] = eo_axisController_New(CUT_FREQ_3_0_Hz);
-                s_emsc->axis_controller[1] = eo_axisController_New(CUT_FREQ_3_0_Hz);
-                s_emsc->axis_controller[2] = eo_axisController_New(CUT_FREQ_3_0_Hz);
-                s_emsc->axis_controller[3] = eo_axisController_New(CUT_FREQ_3_0_Hz);
+                s_emsc->axis_controller[0] = eo_axisController_New(CUT_FREQ_1_1_Hz);
+                s_emsc->axis_controller[1] = eo_axisController_New(CUT_FREQ_1_1_Hz);
+                s_emsc->axis_controller[2] = eo_axisController_New(CUT_FREQ_1_1_Hz);
+                s_emsc->axis_controller[3] = eo_axisController_New(CUT_FREQ_1_1_Hz);
                 s_emsc->n_joints = 4;
                 break;
             
@@ -332,7 +332,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
     {
         if (stop_mask & (1<<j))
         {
-            eo_emsController_SetControlMode(j, eomc_controlmode_cmd_switch_everything_off);
+            eo_emsController_SetControlMode(j, eomc_controlmode_cmd_switch_everything_off, eobool_false);
         }
     }
 }
@@ -380,7 +380,7 @@ extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq)
     if (s_emsc) eo_axisController_SetTrqRef(s_emsc->axis_controller[joint], trq);
 }
 
-extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_command_t mode)
+extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_command_t mode, eObool_t twoFOC_off)
 {
     if (!s_emsc) return;
     
@@ -396,32 +396,35 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
     
     if (mode == eomc_controlmode_cmd_switch_everything_off)
     {
-        switch (s_emsc->boardType)
+        if (twoFOC_off)
         {
-        case EMS_GENERIC: return;
-        
-        case EMS_UPPERLEG:
-        case EMS_ANKLE:
-            set_2FOC_idle(joint);
-            break;
-    
-        case EMS_SHOULDER:
-            if (joint == 3)
+            switch (s_emsc->boardType)
             {
-                set_2FOC_idle(3);
+            case EMS_GENERIC: return;
+        
+            case EMS_UPPERLEG:
+            case EMS_ANKLE:
+                set_2FOC_idle(joint);
+                break;
+    
+            case EMS_SHOULDER:
+                if (joint == 3)
+                {
+                    set_2FOC_idle(3);
+                    break;
+                }
+        
+            case EMS_WAIST:
+                if (eo_emsController_GetControlMode(0) == eomc_controlmode_idle &&
+                    eo_emsController_GetControlMode(1) == eomc_controlmode_idle &&
+                    eo_emsController_GetControlMode(2) == eomc_controlmode_idle)
+                {
+                    set_2FOC_idle(0);
+                    set_2FOC_idle(1);
+                    set_2FOC_idle(2);
+                }
                 break;
             }
-        
-        case EMS_WAIST:
-            if (eo_emsController_GetControlMode(0) == eomc_controlmode_idle &&
-                eo_emsController_GetControlMode(1) == eomc_controlmode_idle &&
-                eo_emsController_GetControlMode(2) == eomc_controlmode_idle)
-            {
-                set_2FOC_idle(0);
-                set_2FOC_idle(1);
-                set_2FOC_idle(2);
-            }
-            break;
         }
     }
     else
@@ -660,8 +663,8 @@ void config_2FOC(uint8_t motor)
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &pid);
     
-    i2t.time  = 0x290C;
-    i2t.tresh = 0xCE0E;
+    i2t.time  = 668;
+    i2t.tresh = 12000;
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_I2T_PARAMS;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &i2t);
     
