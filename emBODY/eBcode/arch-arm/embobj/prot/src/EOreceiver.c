@@ -47,7 +47,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -113,8 +113,10 @@ extern EOreceiver* eo_receiver_New(const eo_receiver_cfg_t *cfg)
     retptr->bufferropframereply = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, cfg->capacityofropframereply, 1);
     retptr->rx_seqnum           = eok_uint64dummy;
     // now we need to allocate the buffer for the ropframereply
-    
+
+#if defined(USE_DEBUG_EORECEIVER)    
     memset(&retptr->DEBUG, 0, sizeof(EOreceiverDEBUG_t));
+#endif  
     
     eo_ropframe_Load(retptr->ropframereply, retptr->bufferropframereply, 0, cfg->capacityofropframereply);
     
@@ -180,10 +182,11 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvsCfg 
     // verify if the ropframeinput is valid w/ eo_ropframe_IsValid()
     if(eobool_false == eo_ropframe_IsValid(p->ropframeinput))
     {
+#if defined(USE_DEBUG_EORECEIVER)         
         {   // DEBUG
             p->DEBUG.rxinvalidropframes ++;
         }
-        
+#endif       
         if(NULL != thereisareply)
         {
             *thereisareply = eobool_false;
@@ -203,9 +206,11 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvsCfg 
     {
         if(rec_seqnum != (p->rx_seqnum+1))
         {
+#if defined(USE_DEBUG_EORECEIVER)             
             {   // DEBUG
                 p->DEBUG.errorsinsequencenumber ++;
             }
+#endif            
             eo_receiver_callback_incaseoferror_in_sequencenumberReceived(rec_seqnum, p->rx_seqnum+1);
         }
         p->rx_seqnum = rec_seqnum;
@@ -237,12 +242,14 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvsCfg 
         {
             res = eo_ropframe_ROP_Set(p->ropframereply, p->ropreply, NULL, NULL, &txremainingbytes);
             
+#if defined(USE_DEBUG_EORECEIVER)             
             {   // DEBUG
                 if(eores_OK != res)
                 {
                     p->DEBUG.lostreplies ++;
                 }
             }
+#endif            
         }
         
         // we keep on decoding eve if we cannot put a reply into the ropframe 

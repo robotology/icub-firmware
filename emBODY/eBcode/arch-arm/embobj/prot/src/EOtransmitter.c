@@ -62,6 +62,7 @@
 #endif
 
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
@@ -180,8 +181,10 @@ extern EOtransmitter* eo_transmitter_New(const eo_transmitter_cfg_t *cfg)
         retptr->mtx_occasionals = NULL;
     }
     
+#if defined(USE_DEBUG_EOTRANSMITTER)
     // DEBUG
     retptr->DEBUG.txropframeistoobigforthepacket = 0;
+#endif
     
     return(retptr);
 }
@@ -428,6 +431,7 @@ extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outp
     eo_ropframe_Size_Get(p->ropframereadytotx, &size);
     eo_packet_Size_Set(p->txpacket, size);
 
+#if defined(USE_DEBUG_EOTRANSMITTER)    
     {   // DEBUG    
         uint16_t capacity = 0;
         eo_packet_Capacity_Get(p->txpacket, &capacity);   
@@ -436,6 +440,7 @@ extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outp
             p->DEBUG.txropframeistoobigforthepacket ++;
         }
     }
+#endif
     
     // finally gives back the packet
     *outpkt = p->txpacket;
