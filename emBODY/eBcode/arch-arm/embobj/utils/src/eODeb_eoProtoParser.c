@@ -263,7 +263,7 @@ static uint8_t s_eodeb_eoProtoParser_NVisrequired(eODeb_eoProtoParser *p, eOnvEP
     for(i=0; i<max; i++)
     {
         couple  = (eODeb_eoProtoParser_nvidEp_couple_t *)eo_array_At((EOarray*)&p->cfg.checks.nv.NVs2searchArray, i);
-        if(ep == ALL_EP)
+        if(couple->ep == ALL_EP)
         {
         	if(couple->id == nvid)
 			{
