@@ -33,6 +33,9 @@
 
 #include "EOtransceiver.h"
 
+#include "EOtransceiver_hid.h" // used only for debug
+#include "EOtransmitter_hid.h" // used only for debug
+#include "EOreceiver_hid.h"    // used only for debug
 
 #include "EOMmutex.h"
 
@@ -104,6 +107,7 @@ const eOemstransceiver_cfg_t eom_emstransceiver_DefaultCfg =
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static void s_eom_emstransceiver_synch_DEBUG(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -151,6 +155,8 @@ extern EOMtheEMStransceiver * eom_emstransceiver_Initialise(const eOemstransceiv
  
     //s_emstransceiver_singleton.transceiver = eo_boardtransceiver_Initialise(eom_emstransceiver_hid_userdef_get_cfg(cfg));
     s_emstransceiver_singleton.transceiver = eo_boardtransceiver_Initialise(&brdtransceiver_cfg);
+    
+    s_eom_emstransceiver_synch_DEBUG();
     
     char str[96];
     uint8_t *ipaddr = (uint8_t*) &cfg->hostipv4addr;
@@ -206,6 +212,8 @@ extern eOresult_t eom_emstransceiver_Parse(EOMtheEMStransceiver* p, EOpacket* rx
     
     res = eo_transceiver_Receive(s_emstransceiver_singleton.transceiver, rxpkt, numberofrops, txtime);
     
+    s_eom_emstransceiver_synch_DEBUG();
+    
     return(res);
 }
 
@@ -221,6 +229,8 @@ extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** tx
     
     res = eo_transceiver_Transmit(s_emstransceiver_singleton.transceiver, txpkt, numberofrops);
     
+    s_eom_emstransceiver_synch_DEBUG();
+    
     return(res);
 }
 
@@ -234,6 +244,23 @@ extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** tx
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+static void s_eom_emstransceiver_synch_DEBUG(void)
+{
+    // retrieve the DEBUG variables of transceiver, transmitter, receiver and put them inside here.
+    EOtransceiverDEBUG_t* transceiverDBG = &s_emstransceiver_singleton.transceiver->DEBUG;
+    EOtransmitterDEBUG_t* transmitterDBG = &s_emstransceiver_singleton.transceiver->transmitter->DEBUG;
+    EOreceiverDEBUG_t*    receiverDBG    = &s_emstransceiver_singleton.transceiver->receiver->DEBUG;
+    
+    // update the extern variable used for debug ...
+    eom_emstransceiver_hid_DEBUG.rxinvalidropframes             = receiverDBG->rxinvalidropframes;
+    eom_emstransceiver_hid_DEBUG.errorsinsequencenumber         = receiverDBG->errorsinsequencenumber;
+    eom_emstransceiver_hid_DEBUG.lostreplies                    = receiverDBG->lostreplies;
+    eom_emstransceiver_hid_DEBUG.failuresinloadofreplyropframe  = transceiverDBG->failuresinloadofreplyropframe;
+    eom_emstransceiver_hid_DEBUG.txropframeistoobigforthepacket = transmitterDBG->txropframeistoobigforthepacket;   
+    eom_emstransceiver_hid_DEBUG.cannotloadropinregulars        = transceiverDBG->cannotloadropinregulars;
+    eom_emstransceiver_hid_DEBUG.cannotloadropinoccasionals     = transceiverDBG->cannotloadropinoccasionals;
+    
+}
 
 
 
