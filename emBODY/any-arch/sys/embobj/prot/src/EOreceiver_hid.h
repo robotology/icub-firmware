@@ -47,6 +47,7 @@ extern "C" {
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
+#undef USE_DEBUG_EORECEIVER
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
@@ -77,7 +78,9 @@ struct EOreceiver_hid
     eOipv4port_t                ipv4port;
     uint8_t*                    bufferropframereply;
     uint64_t                    rx_seqnum;
+#if defined(USE_DEBUG_EORECEIVER)      
     EOreceiverDEBUG_t           DEBUG;
+#endif    
 }; 
 
 

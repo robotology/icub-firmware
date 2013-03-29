@@ -56,7 +56,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -155,6 +155,7 @@ extern EOMtheEMStransceiver * eom_emstransceiver_Initialise(const eOemstransceiv
  
     //s_emstransceiver_singleton.transceiver = eo_boardtransceiver_Initialise(eom_emstransceiver_hid_userdef_get_cfg(cfg));
     s_emstransceiver_singleton.transceiver = eo_boardtransceiver_Initialise(&brdtransceiver_cfg);
+
     
     s_eom_emstransceiver_synch_DEBUG();
     
@@ -246,6 +247,7 @@ extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** tx
 
 static void s_eom_emstransceiver_synch_DEBUG(void)
 {
+#if defined(USE_DEBUG_THEEMSTRANSCEIVER)    
     // retrieve the DEBUG variables of transceiver, transmitter, receiver and put them inside here.
     EOtransceiverDEBUG_t* transceiverDBG = &s_emstransceiver_singleton.transceiver->DEBUG;
     EOtransmitterDEBUG_t* transmitterDBG = &s_emstransceiver_singleton.transceiver->transmitter->DEBUG;
@@ -259,7 +261,7 @@ static void s_eom_emstransceiver_synch_DEBUG(void)
     eom_emstransceiver_hid_DEBUG.txropframeistoobigforthepacket = transmitterDBG->txropframeistoobigforthepacket;   
     eom_emstransceiver_hid_DEBUG.cannotloadropinregulars        = transceiverDBG->cannotloadropinregulars;
     eom_emstransceiver_hid_DEBUG.cannotloadropinoccasionals     = transceiverDBG->cannotloadropinoccasionals;
-    
+#endif    
 }
 
 

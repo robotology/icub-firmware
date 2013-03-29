@@ -50,6 +50,7 @@ extern "C" {
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
+#undef USE_DEBUG_EOTRANSMITTER
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
@@ -98,7 +99,9 @@ struct EOtransmitter_hid
     EOVmutexDerived*            mtx_regulars;
     EOVmutexDerived*            mtx_occasionals;
     uint64_t                    tx_seqnum;
+#if defined(USE_DEBUG_EOTRANSMITTER)    
     EOtransmitterDEBUG_t        DEBUG;
+#endif    
 }; 
 
 

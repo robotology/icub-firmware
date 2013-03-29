@@ -44,7 +44,8 @@ extern "C" {
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
-// empty-section
+
+#undef USE_DEBUG_THEEMSTRANSCEIVER
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 

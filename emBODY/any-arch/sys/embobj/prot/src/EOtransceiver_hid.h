@@ -46,6 +46,7 @@ extern "C" {
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
+#undef USE_DEBUG_EOTRANSCEIVER
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
@@ -67,7 +68,9 @@ struct EOtransceiver_hid
     eo_transceiver_cfg_t        cfg;
     EOreceiver*                 receiver;
     EOtransmitter*              transmitter;   
+#if defined(USE_DEBUG_EOTRANSCEIVER)    
     EOtransceiverDEBUG_t        DEBUG;
+#endif    
     //EOVmutexDerived*            mtx_tx_replies;
     //EOVmutexDerived*            mtx_tx_regulars;
     //EOVmutexDerived*            mtx_tx_occasionals;

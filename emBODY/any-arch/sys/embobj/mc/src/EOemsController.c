@@ -75,7 +75,7 @@ extern EOemsControllerDEBUG_t eo_emsController_hid_DEBUG =
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -358,6 +358,7 @@ extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_v
         
     if (s_emsc) 
     {
+#if defined(USE_DEBUG_THEEMSCONTROLLER)         
         // DEBUG
         if(joint < 4)
         {
@@ -365,6 +366,7 @@ extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_v
             eo_emsController_hid_DEBUG.position[joint] = pos;
             eo_emsController_hid_DEBUG.velocity[joint] = avg_vel;
         }
+#endif        
         
         eo_axisController_SetPosRef(s_emsc->axis_controller[joint], pos, avg_vel);       
     }
@@ -611,12 +613,15 @@ extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t motorerror, 
 
 extern void eo_emsController_hid_DEBUG_reset(void)
 {
+#if defined(USE_DEBUG_THEEMSCONTROLLER)    
     // DEBUG
-    memset(&eo_emsController_hid_DEBUG, 0, sizeof(EOemsControllerDEBUG_t));    
+    memset(&eo_emsController_hid_DEBUG, 0, sizeof(EOemsControllerDEBUG_t));  
+#endif    
 }
 
 extern void eo_emsController_hid_DEBUG_evaltransmission(void)
 {
+#if defined(USE_DEBUG_THEEMSCONTROLLER)     
     const uint8_t zero[4] = {0, 0, 0, 0};
     
     if((eom_emsappl_boardid_eb6 == eom_emsapplcfg_GetHandle()->boardid) || (eom_emsappl_boardid_eb8 == eom_emsapplcfg_GetHandle()->boardid))
@@ -627,7 +632,8 @@ extern void eo_emsController_hid_DEBUG_evaltransmission(void)
             // form and send the packet.
             eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eo_emsController_hid_DEBUG_id, eok_reltimeINFINITE);        
         }
-    }    
+    }  
+#endif    
 }
 
 
