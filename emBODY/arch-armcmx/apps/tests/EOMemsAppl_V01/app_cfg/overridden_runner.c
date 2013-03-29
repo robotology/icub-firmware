@@ -159,7 +159,7 @@ static uint16_t motionDoneJoin2Use = 0;
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p)
 {
-    char str[100];
+    //char str[100];
     eOmn_appl_runMode_t runmode =  eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
     if(applrunMode__2foc == runmode)
     {
@@ -258,7 +258,7 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
 {
 
     EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
-    eOresult_t res;
+    //eOresult_t res;
     static uint8_t first = 1;
     char str[130];
     
