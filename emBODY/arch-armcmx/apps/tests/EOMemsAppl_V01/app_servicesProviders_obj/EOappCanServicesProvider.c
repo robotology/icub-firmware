@@ -265,8 +265,8 @@ extern eOresult_t eo_appCanSP_starttransmit_XXX(EOappCanSP *p, eOcanport_t port)
 
 extern eOresult_t eo_appCanSP_wait_XXX(EOappCanSP *p, eOcanport_t port)
 {
-    uint8_t                 numofoutframe = 0;
-    hal_arch_arm_irqn_t     irqn;
+//    uint8_t                 numofoutframe = 0;
+//    hal_arch_arm_irqn_t     irqn;
     osal_result_t           osal_res;
 
     if(run_data.numoftxframe[port] != 0)
@@ -500,6 +500,7 @@ extern eOresult_t eo_appCanSP_StartTransmitCanFrames(EOappCanSP *p, eOcanport_t 
     uint8_t                 numofoutframe = 0;
     hal_arch_arm_irqn_t     irqn;
     eOresult_t              res = eores_OK;
+    hal_result_t            halres;
 
 
     if(NULL == p)
@@ -528,8 +529,10 @@ extern eOresult_t eo_appCanSP_StartTransmitCanFrames(EOappCanSP *p, eOcanport_t 
     
     if(numofoutframe != 0)
     {
-        res = hal_can_transmit((hal_can_port_t)canport);
+        halres = hal_can_transmit((hal_can_port_t)canport);
+        res = (hal_res_OK == halres) ? (eores_OK):(eores_NOK_generic);
     }
+
     
     return(res);
 }
@@ -580,7 +583,7 @@ extern eOresult_t eo_appCanSP_StartTransmitAndWait(EOappCanSP *p, eOcanport_t ca
 {
     uint8_t                 numofoutframe = 0, after = 0;
     hal_arch_arm_irqn_t     irqn;
-    char                    str[100];
+//    char                    str[100];
 
     if(NULL == p)
     {
@@ -621,8 +624,9 @@ extern eOresult_t eo_appCanSP_StartTransmitAndWait(EOappCanSP *p, eOcanport_t ca
 
 extern eOresult_t eo_appCanSP_EmptyCanOutputQueue(EOappCanSP *p, eOcanport_t canport)
 {
-    uint8_t numberofoutcanframe, after;
-    char str[100];
+    uint8_t numberofoutcanframe;
+    //uint8_t after;
+    //char str[100];
     
     if(NULL == p)
     {
@@ -1071,6 +1075,7 @@ static void s_eo_appCanSP_callbackOnTx_portx_waittransmission(void *arg, hal_can
             osal_result_t osal_res;
             RUN_semaphore_count[port]++;
             osal_res  = osal_semaphore_increment(run_data.semafori[port], osal_callerISR);
+            osal_res = osal_res;
 //             if(osal_res != osal_res_OK)
 //             {
 //                 char str[100];
