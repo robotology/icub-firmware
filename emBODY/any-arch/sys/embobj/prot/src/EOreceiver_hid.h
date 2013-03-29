@@ -51,6 +51,13 @@ extern "C" {
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
 
+typedef struct
+{
+    uint32_t    rxinvalidropframes; 
+    uint32_t    errorsinsequencenumber; 
+    uint32_t    lostreplies;
+} EOreceiverDEBUG_t;
+
 /** @struct     EOreceiver_hid
     @brief      Hidden definition. Implements private data used only internally by the 
                 public or private (static) functions of the object and protected data
@@ -70,11 +77,15 @@ struct EOreceiver_hid
     eOipv4port_t                ipv4port;
     uint8_t*                    bufferropframereply;
     uint64_t                    rx_seqnum;
+    EOreceiverDEBUG_t           DEBUG;
 }; 
 
 
+
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
-// empty-section
+
+
+extern void eo_receiver_callback_incaseoferror_in_sequencenumberReceived(uint64_t rec_seqnum, uint64_t expected_seqnum);
 
 
 #ifdef __cplusplus

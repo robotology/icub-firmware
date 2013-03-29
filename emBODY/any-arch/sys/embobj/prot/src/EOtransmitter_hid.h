@@ -41,6 +41,7 @@ extern "C" {
 #include "EOtheAgent.h"
 #include "EOlist.h"
 #include "EOVmutex.h"
+#include "EOnv_hid.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
@@ -63,6 +64,11 @@ typedef struct      // 40 bytes on arm ....
     EOnv            thenv;
 } eo_transm_regrop_info_t; //EO_VERIFYsizeof(eo_transm_regrop_info_t, (10*4));
 
+
+typedef struct
+{
+    uint32_t    txropframeistoobigforthepacket;
+} EOtransmitterDEBUG_t;
 
 
 /** @struct     EOtransmitter_hid
@@ -92,12 +98,12 @@ struct EOtransmitter_hid
     EOVmutexDerived*            mtx_regulars;
     EOVmutexDerived*            mtx_occasionals;
     uint64_t                    tx_seqnum;
+    EOtransmitterDEBUG_t        DEBUG;
 }; 
 
 
+
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
-
-
 
 
 #ifdef __cplusplus

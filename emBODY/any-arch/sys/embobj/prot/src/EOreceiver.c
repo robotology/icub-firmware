@@ -28,8 +28,6 @@
 #include "EOtheFormer.h"
 
 
-// DEBUG
-#include "EOMtheEMStransceiver_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -56,7 +54,7 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
-extern void eo_receiver_callback_incaseoferror_in_sequencenumberReceived(uint64_t rec_seqnum, uint64_t expected_seqnum);
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -115,6 +113,8 @@ extern EOreceiver* eo_receiver_New(const eo_receiver_cfg_t *cfg)
     retptr->bufferropframereply = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, cfg->capacityofropframereply, 1);
     retptr->rx_seqnum           = eok_uint64dummy;
     // now we need to allocate the buffer for the ropframereply
+    
+    memset(&retptr->DEBUG, 0, sizeof(EOreceiverDEBUG_t));
     
     eo_ropframe_Load(retptr->ropframereply, retptr->bufferropframereply, 0, cfg->capacityofropframereply);
     
@@ -181,7 +181,7 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvsCfg 
     if(eobool_false == eo_ropframe_IsValid(p->ropframeinput))
     {
         {   // DEBUG
-            eom_emstransceiver_hid_DEBUG.rxinvalidropframes ++;
+            p->DEBUG.rxinvalidropframes ++;
         }
         
         if(NULL != thereisareply)
@@ -204,7 +204,7 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvsCfg 
         if(rec_seqnum != (p->rx_seqnum+1))
         {
             {   // DEBUG
-                eom_emstransceiver_hid_DEBUG.errorsinsequencenumber ++;
+                p->DEBUG.errorsinsequencenumber ++;
             }
             eo_receiver_callback_incaseoferror_in_sequencenumberReceived(rec_seqnum, p->rx_seqnum+1);
         }
@@ -240,7 +240,7 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvsCfg 
             {   // DEBUG
                 if(eores_OK != res)
                 {
-                    eom_emstransceiver_hid_DEBUG.lostreplies ++;
+                    p->DEBUG.lostreplies ++;
                 }
             }
         }

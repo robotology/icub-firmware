@@ -32,9 +32,6 @@
 
 #include "EOVmutex.h"
 
-// DEBUG
-#include "EOMtheEMStransceiver_hid.h"
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -60,7 +57,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
 
 
@@ -96,6 +92,8 @@ const eo_transceiver_cfg_t eo_transceiver_cfg_default =
     EO_INIT(.mutex_fn_new)                  NULL,
     EO_INIT(.protection)                    eo_trans_protection_none
 };
+
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -148,6 +146,8 @@ extern EOtransceiver* eo_transceiver_New(const eo_transceiver_cfg_t *cfg)
     
     retptr->transmitter = eo_transmitter_New(&tra_cfg);
     
+    memset(&retptr->DEBUG, 0, sizeof(EOtransceiverDEBUG_t)); 
+    
 //     if((eo_trans_protection_enabled == cfg->protection) && (NULL != cfg->mutex_fn_new))
 //     {
 //         retptr->mtx_tx_replies      = cfg->mutex_fn_new();
@@ -187,8 +187,8 @@ extern eOresult_t eo_transceiver_Receive(EOtransceiver *p, EOpacket *pkt, uint16
     {
         // must put the reply inside the transmitter
         EOropframe* ropframereply = NULL;
-        eOipv4addr_t toipv4addr;
-        eOipv4port_t toipv4port;
+//        eOipv4addr_t toipv4addr;
+//        eOipv4port_t toipv4port;
         
         // if in here, i am sure that there is a reply and that return value will be eores_OK
         res = eo_receiver_GetReply(p->receiver, &ropframereply);
@@ -203,7 +203,7 @@ extern eOresult_t eo_transceiver_Receive(EOtransceiver *p, EOpacket *pkt, uint16
         {   // DEBUG
             if(eores_OK != res)
             {
-                eom_emstransceiver_hid_DEBUG.failuresinloadofreplyropframe ++;            
+                p->DEBUG.failuresinloadofreplyropframe ++;            
             }
         }
 
@@ -275,7 +275,7 @@ extern eOresult_t eo_transceiver_rop_regular_Load(EOtransceiver *p, eOropdescrip
     {   // DEBUG    
         if(eores_OK != res)
         {
-            eom_emstransceiver_hid_DEBUG.cannotloadropinregulars ++;
+            p->DEBUG.cannotloadropinregulars ++;
         }
     }    
     
@@ -314,7 +314,7 @@ extern eOresult_t eo_transceiver_rop_occasional_Load_without_data(EOtransceiver 
     {   // DEBUG    
         if(eores_OK != res)
         {
-            eom_emstransceiver_hid_DEBUG.cannotloadropinoccasionals ++;
+            p->DEBUG.cannotloadropinoccasionals ++;
         }
     }     
     
@@ -357,7 +357,7 @@ extern eOresult_t eo_transceiver_rop_occasional_Load(EOtransceiver *p, eOropdesc
     {   // DEBUG    
         if(eores_OK != res)
         {
-            eom_emstransceiver_hid_DEBUG.cannotloadropinoccasionals ++;
+            p->DEBUG.cannotloadropinoccasionals ++;
         }
     }   
 
