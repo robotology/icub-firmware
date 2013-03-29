@@ -209,11 +209,11 @@ static eOresult_t s_eo_EthLowLewParser_GetUDPpayload(eOTheEthLowLevParser *p, ui
     const eo_lowLevParser_ethernetHeader         *ethernet;  /* The ethernet header [1] */
     const eo_lowLevParser_IPHeader               *ip;              /* The IP header */
     const eo_lowLevParser_UDPHeader              *udp_h;         /* The UDP header */
-    /*const*/ uint8_t                            *payload = NULL;                    /* Packet payload */
+//    /*const*/ uint8_t                            *payload = NULL;                    /* Packet payload */
 
     int32_t size_ip;
     int32_t size_udp = sizeof(eo_lowLevParser_UDPHeader);
-    int32_t size_payload;
+//    int32_t size_payload;
 
 
     if((NULL == p) || (packet == NULL) || (pktInfo_ptr == NULL))
@@ -229,6 +229,7 @@ static eOresult_t s_eo_EthLowLewParser_GetUDPpayload(eOTheEthLowLevParser *p, ui
     
     /* define ethernet header */
     ethernet = (eo_lowLevParser_ethernetHeader*)(packet);
+    ethernet = ethernet;
 
     /* define/compute ip header offset */
     ip = (eo_lowLevParser_IPHeader*)(packet + ETHERNET_HEADER_SIZE);
