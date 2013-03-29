@@ -54,6 +54,7 @@
 #define ROPFRAME_HEADER_SIZE        sizeof(EOropframeHeader_t)
 #define ROP_HEADER_SIZE             sizeof(eOrophead_t)
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
@@ -104,7 +105,6 @@ extern eODeb_eoProtoParser * eODeb_eoProtoParser_Initialise(const eODeb_eoProtoP
     memcpy(&s_debParser_singleton.cfg, cfg, sizeof(eODeb_eoProtoParser_cfg_t));
     s_debParser_singleton.initted = 1;
     
-    s_eodeb_eoProtoParser_NVisrequired(&s_debParser_singleton, 0x14, 0x9c00);
     return(&s_debParser_singleton);
 }
 
@@ -122,7 +122,7 @@ extern eOresult_t eODeb_eoProtoParser_RopFrameDissect(eODeb_eoProtoParser *p, eO
     {
         return(eores_NOK_nullpointer);
     }
-
+//printf("_RopFrameDissect : 1\n");
     //1) verify if i received a valid ropframe
     if(!(s_eodeb_eoProtoParser_isvalidropframe(pktInfo_ptr->payload_ptr)))
     {
@@ -263,10 +263,21 @@ static uint8_t s_eodeb_eoProtoParser_NVisrequired(eODeb_eoProtoParser *p, eOnvEP
     for(i=0; i<max; i++)
     {
         couple  = (eODeb_eoProtoParser_nvidEp_couple_t *)eo_array_At((EOarray*)&p->cfg.checks.nv.NVs2searchArray, i);
-        if((couple->id == nvid)&&(couple->ep == ep))
+        if(ep == ALL_EP)
         {
-            return(1);
+        	if(couple->id == nvid)
+			{
+				return(1);
+			}
         }
+        else
+        {
+            if((couple->id == nvid)&&(couple->ep == ep))
+            {
+                return(1);
+            }
+        }
+
     }
     return(0);
 }

@@ -47,7 +47,9 @@ extern "C" {
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
-#define eODeb_eoProtoParser_maxNV2find     20
+#define eODeb_eoProtoParser_maxNV2find     40
+
+#define ALL_EP 							   0xFFFF
   
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
