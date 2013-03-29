@@ -1266,7 +1266,7 @@ static eOresult_t s_appTheDB_nvsrefmaps_init(EOappTheDB *p)
             return(res);
         }
         eo_appTheDB_GetJointStatusPtr(p, i,  &jstatus_ptr);
-        eo_appTheDB_SetJointCurrentControlmode(p, i, jstatus_ptr->basic.controlmodestatus);
+        eo_appTheDB_SetJointCurrentControlmode(p, i, (eOmc_controlmode_t)jstatus_ptr->basic.controlmodestatus);
         
     }
     
