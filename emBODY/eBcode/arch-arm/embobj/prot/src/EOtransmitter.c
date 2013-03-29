@@ -32,8 +32,6 @@
 #include "EOVtheSystem.h"
 
 
-// DEBUG
-#include "EOMtheEMStransceiver_hid.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -67,7 +65,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
 
 
 
@@ -181,6 +179,9 @@ extern EOtransmitter* eo_transmitter_New(const eo_transmitter_cfg_t *cfg)
         retptr->mtx_regulars    = NULL;
         retptr->mtx_occasionals = NULL;
     }
+    
+    // DEBUG
+    retptr->DEBUG.txropframeistoobigforthepacket = 0;
     
     return(retptr);
 }
@@ -432,7 +433,7 @@ extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outp
         eo_packet_Capacity_Get(p->txpacket, &capacity);   
         if(size > capacity)
         {
-            eom_emstransceiver_hid_DEBUG.txropframeistoobigforthepacket ++;
+            p->DEBUG.txropframeistoobigforthepacket ++;
         }
     }
     

@@ -49,6 +49,13 @@ extern "C" {
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
+typedef struct
+{
+    uint32_t    failuresinloadofreplyropframe;
+    uint32_t    cannotloadropinregulars;
+    uint32_t    cannotloadropinoccasionals;
+} EOtransceiverDEBUG_t;
+
 /** @struct     EOtransceiver_hid
     @brief      Hidden definition. Implements private data used only internally by the 
                 public or private (static) functions of the object and protected data
@@ -60,15 +67,15 @@ struct EOtransceiver_hid
     eo_transceiver_cfg_t        cfg;
     EOreceiver*                 receiver;
     EOtransmitter*              transmitter;   
+    EOtransceiverDEBUG_t        DEBUG;
     //EOVmutexDerived*            mtx_tx_replies;
     //EOVmutexDerived*            mtx_tx_regulars;
     //EOVmutexDerived*            mtx_tx_occasionals;
 }; 
 
 
+
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
-
-
 
 
 #ifdef __cplusplus
