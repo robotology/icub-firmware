@@ -48,25 +48,36 @@ extern "C" {
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef struct  // 16 bytes
+typedef struct  // 24 bytes
 {
-    uint32_t    startofframe;
-    uint16_t    ropssizeof;
-    uint16_t    ropsnumberof;
-    uint64_t    ageofframe;
-    uint64_t    sequencenumber;
-} EOropframeHeader_t;
+    uint32_t            startofframe;
+    uint16_t            ropssizeof;
+    uint16_t            ropsnumberof;
+    uint64_t            ageofframe;
+    uint64_t            sequencenumber;
+} EOropframeHeader_t;   EO_VERIFYsizeof(EOropframeHeader_t, 24);
 
-typedef struct  // 20 bytes
-{
-    EOropframeHeader_t header;
-    uint8_t         ropsfooter[4];
-} EOropframeHeaderRopsFooter_t;
 
 typedef struct  // 04 bytes
 {
-    uint32_t    endoframe;
-} EOropframeFooter_t;
+    uint32_t            endoframe;
+} EOropframeFooter_t;   EO_VERIFYsizeof(EOropframeFooter_t, 4);
+
+
+typedef struct  // 28 bytes ... 
+{
+    uint8_t             headerfooter[28];
+} EOropframeEmpty_t;    EO_VERIFYsizeof(EOropframeEmpty_t, sizeof(EOropframeHeader_t)+sizeof(EOropframeFooter_t));
+
+
+typedef struct  // 32 bytes
+{
+    EOropframeHeader_t          header;
+    uint8_t                     ropsfooter[8];
+} EOropframeHeaderRopsFooter_t; EO_VERIFYsizeof(EOropframeHeaderRopsFooter_t, 32);
+
+
+
 
 /** @struct     EOropframe_hid
     @brief      Hidden definition. Implements private data used only internally by the 
