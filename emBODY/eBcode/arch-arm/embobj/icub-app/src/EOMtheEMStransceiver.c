@@ -27,7 +27,7 @@
 #include "EoCommon.h"
 
 #include "EOtheMemoryPool.h"
-#include "EOtheErrormanager.h"
+#include "EOtheErrorManager.h"
 
 #include "EOtheBOARDtransceiver_hid.h"
 
