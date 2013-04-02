@@ -162,7 +162,7 @@ extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E(EOappMeasConv *p
 
 extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
 {
-
+    int32_t temp;
 #ifdef _APPMEASCONV_SAFE_
     if(NULL == p)
     {
@@ -175,8 +175,19 @@ extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E_abs(EOappMeasCon
     }
 #endif
     
-//    return(((eOicubCanProto_velocity_t)((i_vel * eo_appMeasConv_hid_GetEncConv_factor(p, jId))/1000))<<eo_appMeasConv_hid_GetVelShift(p, jId));
-    return((eOicubCanProto_velocity_t)(i_vel * __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId))));
+
+    //return((eOicubCanProto_velocity_t)(i_vel * __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId))));
+            
+    //NEW VERSION:
+    /*the velocity is dived by 10, because the seuslt of followiong moltiplication
+    (i_vel * __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId)))
+    can be bigger then 32767 (max value of int16)
+    so thet result is divieded by 10.
+    Note thet velocity is used to get the needed time to reach the setpoint, so in mc4 fw it is enogth to moltiply by 100 ensted of 1000 (1ms)
+    */
+
+    temp = (i_vel * __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId)));
+    return((eOicubCanProto_velocity_t)(temp/10));
 }
 
 extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_acceleration_t e_acc)

@@ -503,11 +503,11 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
             
             setpoint_pos.value = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, setPoint->to.position.value);
             //reference velocity of position set point must be always >0, so here absolute func is used.
-            vel_tmp = eo_appMeasConv_jntVelocity_I2E_abs(appMeasConv_ptr,jxx, setPoint->to.position.withvelocity);
-            //the velocity is dived by 10, because in the fw of mc4 the velocity is sued to get the needed time to reach the setpoint,
-            //so the value is moltyply by 100.
-            setpoint_pos.withvelocity = vel_tmp/10;
-
+//            vel_tmp = eo_appMeasConv_jntVelocity_I2E_abs(appMeasConv_ptr,jxx, setPoint->to.position.withvelocity);
+//             //the velocity is dived by 10, because in the fw of mc4 the velocity is sued to get the needed time to reach the setpoint,
+//             //so the value is moltyply by 100.
+//             setpoint_pos.withvelocity = vel_tmp/10;
+            setpoint_pos.withvelocity = eo_appMeasConv_jntVelocity_I2E_abs(appMeasConv_ptr,jxx, setPoint->to.position.withvelocity);
             msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__POSITION_MOVE; 
             val_ptr =  &setpoint_pos; 
 
