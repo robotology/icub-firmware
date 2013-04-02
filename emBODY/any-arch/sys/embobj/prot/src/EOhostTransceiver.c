@@ -117,7 +117,7 @@ extern EOhostTransceiver * eo_hosttransceiver_New(const eOhosttransceiver_cfg_t 
     retptr->nvscfg = s_eo_hosttransceiver_nvscfg_get(cfg);
     
 
-    txrxcfg.capacityofpacket               = EOK_HOSTTRANSCEIVER_capacityofpacket;
+    txrxcfg.capacityofpacket               = EOK_HOSTTRANSCEIVER_capacityoftxpacket;
     txrxcfg.capacityofrop                  = EOK_HOSTTRANSCEIVER_capacityofrop;
     txrxcfg.capacityofropframeregulars     = EOK_HOSTTRANSCEIVER_capacityofropframeregulars;
     txrxcfg.capacityofropframeoccasionals  = EOK_HOSTTRANSCEIVER_capacityofropframeoccasionals;
