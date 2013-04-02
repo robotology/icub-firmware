@@ -46,12 +46,16 @@ extern "C" {
 // - public #define  --------------------------------------------------------------------------------------------------
 
 //#warning --> instead of 20 ... can i put 0? answer: seems yes  .. but be carefule w/ eo_ropframe_ROP_NumberOf_quickversion()
-
-#define EOK_HOSTTRANSCEIVER_capacityofpacket                   1408
+/*  Dimensions hereafter are related to the biggest packet the pc104 can send to the EMSs. It has to be equal to the biggest packet the EMS
+    can receive and process ( which is different from the max packet the EMS can send to the pc104, because the protocol is asimmetryc)
+*/
+#define EOK_HOSTTRANSCEIVER_emptyropframe_dimension            28     // header + footer + 8 byte for progressive number
+#define X                                                      ( EOK_HOSTTRANSCEIVER_capacityofropframeregulars + EOK_HOSTTRANSCEIVER_capacityofropframereplies + EOK_HOSTTRANSCEIVER_emptyropframe_dimension)
+#define EOK_HOSTTRANSCEIVER_capacityofpacket                   768
 #define EOK_HOSTTRANSCEIVER_capacityofrop                      256
 #define EOK_HOSTTRANSCEIVER_capacityofropframeregulars         20
-#define EOK_HOSTTRANSCEIVER_capacityofropframeoccasionals      1408
 #define EOK_HOSTTRANSCEIVER_capacityofropframereplies          20
+#define EOK_HOSTTRANSCEIVER_capacityofropframeoccasionals      (EOK_HOSTTRANSCEIVER_capacityofpacket - X)
 #define EOK_HOSTTRANSCEIVER_maxnumberofregularrops             1
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
