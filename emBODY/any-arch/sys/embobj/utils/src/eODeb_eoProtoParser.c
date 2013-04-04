@@ -76,6 +76,7 @@ static uint8_t s_eodeb_eoProtoParser_NVisrequired(eODeb_eoProtoParser *p, eOnvEP
 static uint8_t s_eodeb_eoProtoParser_CheckSeqnum(eODeb_eoProtoParser *p, eOethLowLevParser_packetInfo_t *pktInfo_ptr, 
                                                 uint32_t *rec_seqnum, uint32_t *expeted_seqnum);
 static uint8_t s_eodeb_eoProtoParser_isvalidropframe(uint8_t *payload);
+static eOresult_t s_eodeb_eoProtoParser_DumpNV(eODeb_eoProtoParser *p, eOethLowLevParser_packetInfo_t *pktInfo_ptr);
 
 
 
@@ -147,6 +148,8 @@ extern eOresult_t eODeb_eoProtoParser_RopFrameDissect(eODeb_eoProtoParser *p, eO
     {
         s_eodeb_eoProtoParser_CheckNV(p, pktInfo_ptr);
     }
+
+    //s_eodeb_eoProtoParser_DumpNV(p, pktInfo_ptr);
     
     return(eores_OK);
 }
@@ -193,10 +196,10 @@ static eOresult_t s_eodeb_eoProtoParser_CheckNV(eODeb_eoProtoParser *p, eOethLow
     //get rop to first rop
 	rop_ptr = &pktInfo_ptr->payload_ptr[ROPFRAME_HEADER_SIZE];
 	ropheader = (eOrophead_t*)rop_ptr;
-
+	//#include "stdio.h"
+	//            printf("src addr 0x%x dest addr 0x%x\n ",  pktInfo_ptr->src_addr, pktInfo_ptr->dst_addr);
 	for(i=0; i<ropframeheader->ropsnumberof; i++)
 	{		
-        //if((cfg.checks.nv.reqnv.ep == ropheader->endp) && (cfg.checks.nv.reqnv.nvid == ropheader->nvid))
         if(s_eodeb_eoProtoParser_NVisrequired(p, ropheader->endp, ropheader->nvid))
 		{
 			uint8_t *enddata_ptr;
@@ -245,9 +248,18 @@ static eOresult_t s_eodeb_eoProtoParser_CheckNV(eODeb_eoProtoParser *p, eOethLow
             p->cfg.checks.nv.cbk_onNVfound(pktInfo_ptr, &ropAddInfo);
  		}
 		
-        //go to next rop
-		rop_ptr = &rop_ptr[8+ropheader->dsiz + 8];
-		ropheader = (eOrophead_t*)rop_ptr;
+    	//go to next rop
+    		int32_t fill= ropheader->dsiz%4;
+    		int32_t howmuch = 0;
+    		if(fill!=0)
+    		{
+    			fill=4-fill;
+    		}
+    		howmuch = (ropheader->dsiz) + fill;
+
+
+    		//rop_ptr = &rop_ptr[8+ropheader->dsiz + 8];
+    		rop_ptr = &rop_ptr[8+howmuch + 8];
 	}
 
     return(eores_OK);
@@ -274,7 +286,7 @@ static uint8_t s_eodeb_eoProtoParser_NVisrequired(eODeb_eoProtoParser *p, eOnvEP
         {
             if((couple->id == nvid)&&(couple->ep == ep))
             {
-                return(1);
+            	return(1);
             }
         }
 
@@ -325,6 +337,90 @@ static uint8_t s_eodeb_eoProtoParser_CheckSeqnum(eODeb_eoProtoParser *p, eOethLo
     return(0);
 }
 
+
+static eOresult_t s_eodeb_eoProtoParser_DumpNV(eODeb_eoProtoParser *p, eOethLowLevParser_packetInfo_t *pktInfo_ptr)
+{
+    EOropframeHeader_t *ropframeheader;
+	eOrophead_t *ropheader;
+	uint8_t *rop_ptr;
+    uint16_t i;
+
+
+	//get ropframe header
+	ropframeheader = (EOropframeHeader_t *)pktInfo_ptr->payload_ptr;
+
+    //get rop to first rop
+	rop_ptr = &pktInfo_ptr->payload_ptr[ROPFRAME_HEADER_SIZE];
+	ropheader = (eOrophead_t*)rop_ptr;
+//	#include "stdio.h"
+//	printf("\n\nsrc addr 0x%x dest addr 0x%x \t numofrop%d \n ",  pktInfo_ptr->src_addr, pktInfo_ptr->dst_addr, ropframeheader->ropsnumberof);
+	for(i=0; i<ropframeheader->ropsnumberof; i++)
+	{
+
+		uint8_t *enddata_ptr;
+		eODeb_eoProtoParser_ropAdditionalInfo_t ropAddInfo = {0};
+
+		//prepare rop additional info
+		ropAddInfo.desc.configuration.plussign = ropheader->ctrl.plussign;
+		ropAddInfo.desc.configuration.plustime = ropheader->ctrl.plustime;
+		ropAddInfo.desc.ropcode = ropheader->ropc;
+		ropAddInfo.desc.ep = ropheader->endp;
+		ropAddInfo.desc.id = ropheader->nvid;
+		ropAddInfo.desc.data = &rop_ptr[ROP_HEADER_SIZE];
+		ropAddInfo.desc.size = ropheader->dsiz;
+		ropAddInfo.desc.signature = EOK_uint32dummy;
+		ropAddInfo.time = EOK_uint64dummy;
+
+
+		if(ropheader->ctrl.plussign == 1)
+		{
+			int32_t fill= ropheader->dsiz%4;
+			int32_t howmuch = 0;
+			if(fill!=0)
+			{
+				fill=4-fill;
+			}
+			howmuch = (ropheader->dsiz) + fill;
+			enddata_ptr = &rop_ptr[howmuch];
+			ropAddInfo.desc.signature = *((uint32_t*)enddata_ptr);
+			enddata_ptr = &rop_ptr[howmuch+4/*signature size*/];
+			ropAddInfo.time = *((uint64_t*)enddata_ptr);
+		}
+		else if(ropheader->ctrl.plustime == 1)
+		{
+			int32_t fill= ropheader->dsiz%4;
+			int32_t howmuch = 0;
+			if(fill!=0)
+			{
+				fill=4-fill;
+			}
+			howmuch = (ropheader->dsiz) + fill;
+			enddata_ptr = &rop_ptr[howmuch];
+			memcpy((uint8_t*)&ropAddInfo.time, enddata_ptr, sizeof(uint64_t));
+//                ropAddInfo.time = *((uint64_t*)enddata_ptr);
+		}
+
+//		printf("ep=0x%x id=0x%x size=%hd\n", ropAddInfo.desc.ep, ropAddInfo.desc.id, ropAddInfo.desc.size);
+
+
+	//go to next rop
+		int32_t fill= ropheader->dsiz%4;
+		int32_t howmuch = 0;
+		if(fill!=0)
+		{
+			fill=4-fill;
+		}
+		howmuch = (ropheader->dsiz) + fill;
+
+
+		//rop_ptr = &rop_ptr[8+ropheader->dsiz + 8];
+		rop_ptr = &rop_ptr[8+howmuch + 8];
+		ropheader = (eOrophead_t*)rop_ptr;
+	}
+//	fflush(stdout);
+
+    return(eores_OK);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
