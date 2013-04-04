@@ -149,7 +149,7 @@ extern eOresult_t eODeb_eoProtoParser_RopFrameDissect(eODeb_eoProtoParser *p, eO
         s_eodeb_eoProtoParser_CheckNV(p, pktInfo_ptr);
     }
 
-    //s_eodeb_eoProtoParser_DumpNV(p, pktInfo_ptr);
+//    s_eodeb_eoProtoParser_DumpNV(p, pktInfo_ptr);
     
     return(eores_OK);
 }
@@ -199,68 +199,61 @@ static eOresult_t s_eodeb_eoProtoParser_CheckNV(eODeb_eoProtoParser *p, eOethLow
 	//#include "stdio.h"
 	//            printf("src addr 0x%x dest addr 0x%x\n ",  pktInfo_ptr->src_addr, pktInfo_ptr->dst_addr);
 	for(i=0; i<ropframeheader->ropsnumberof; i++)
-	{		
-        if(s_eodeb_eoProtoParser_NVisrequired(p, ropheader->endp, ropheader->nvid))
+	{
+		uint8_t *enddata_ptr;
+		eODeb_eoProtoParser_ropAdditionalInfo_t ropAddInfo = {0};
+		int32_t filldata = 0, totdatasize = 0, signaturesize = 0, timesize = 0;
+
+		//calulate fill data size
+		filldata = ropheader->dsiz%4;
+		if(filldata!=0)
 		{
-			uint8_t *enddata_ptr;
-            eODeb_eoProtoParser_ropAdditionalInfo_t ropAddInfo = {0};
-           
-            //prepare rop additional info
-            ropAddInfo.desc.configuration.plussign = ropheader->ctrl.plussign;
-            ropAddInfo.desc.configuration.plustime = ropheader->ctrl.plustime;
-            ropAddInfo.desc.ropcode = ropheader->ropc;
-            ropAddInfo.desc.ep = ropheader->endp;
-            ropAddInfo.desc.id = ropheader->nvid;
-            ropAddInfo.desc.data = &rop_ptr[ROP_HEADER_SIZE];
-            ropAddInfo.desc.size = ropheader->dsiz;
-            ropAddInfo.desc.signature = EOK_uint32dummy;
-            ropAddInfo.time = EOK_uint64dummy;
-            
-            
-			if(ropheader->ctrl.plussign == 1)
-            {
-                int32_t fill= ropheader->dsiz%4;
-                int32_t howmuch = 0;
-                if(fill!=0)
-                {
-                    fill=4-fill;
-                }
-                howmuch = (ropheader->dsiz) + fill;
-                enddata_ptr = &rop_ptr[howmuch];
-                ropAddInfo.desc.signature = *((uint32_t*)enddata_ptr);
-                enddata_ptr = &rop_ptr[howmuch+4/*signature size*/];
-                ropAddInfo.time = *((uint64_t*)enddata_ptr);
-            }
-            else if(ropheader->ctrl.plustime == 1)
-            {
-                int32_t fill= ropheader->dsiz%4;
-                int32_t howmuch = 0;
-                if(fill!=0)
-                {
-                    fill=4-fill;
-                }
-                howmuch = (ropheader->dsiz) + fill;
-                enddata_ptr = &rop_ptr[howmuch];
-                memcpy((uint8_t*)&ropAddInfo.time, enddata_ptr, sizeof(uint64_t));
-//                ropAddInfo.time = *((uint64_t*)enddata_ptr);  
-            }
-            
-            p->cfg.checks.nv.cbk_onNVfound(pktInfo_ptr, &ropAddInfo);
- 		}
-		
-    	//go to next rop
-    		int32_t fill= ropheader->dsiz%4;
-    		int32_t howmuch = 0;
-    		if(fill!=0)
-    		{
-    			fill=4-fill;
-    		}
-    		howmuch = (ropheader->dsiz) + fill;
+			filldata=4-filldata;
+		}
+
+		//calculate total data size
+		totdatasize = (ropheader->dsiz) + filldata;
+
+		//save ptr to enddata
+		enddata_ptr = &rop_ptr[(ropheader->dsiz) + filldata];
+
+		if(ropheader->ctrl.plussign == 1)
+		{
+			uint8_t *data_ptr = &rop_ptr[totdatasize];
+			ropAddInfo.desc.signature = *((uint32_t*)data_ptr);
+			signaturesize = 4;
+
+		}
+		if(ropheader->ctrl.plustime == 1)
+		{
+			uint8_t *data_ptr = &rop_ptr[totdatasize + signaturesize];
+			memcpy((uint8_t*)&ropAddInfo.time, data_ptr, sizeof(uint64_t));
+			timesize = 8;
+		}
+
+		if(s_eodeb_eoProtoParser_NVisrequired(p, ropheader->endp, ropheader->nvid))
+		{
+
+			//prepare rop additional info
+			ropAddInfo.desc.configuration.plussign = ropheader->ctrl.plussign;
+			ropAddInfo.desc.configuration.plustime = ropheader->ctrl.plustime;
+			ropAddInfo.desc.ropcode = ropheader->ropc;
+			ropAddInfo.desc.ep = ropheader->endp;
+			ropAddInfo.desc.id = ropheader->nvid;
+			ropAddInfo.desc.data = &rop_ptr[ROP_HEADER_SIZE];
+			ropAddInfo.desc.size = ropheader->dsiz;
+			ropAddInfo.desc.signature = EOK_uint32dummy;
+			ropAddInfo.time = EOK_uint64dummy;
+
+			p->cfg.checks.nv.cbk_onNVfound(pktInfo_ptr, &ropAddInfo);
+		}
 
 
-    		//rop_ptr = &rop_ptr[8+ropheader->dsiz + 8];
-    		rop_ptr = &rop_ptr[8+howmuch + 8];
-	}
+		//go to next rop
+		rop_ptr = &rop_ptr[ROP_HEADER_SIZE + totdatasize + signaturesize + timesize];
+		ropheader = (eOrophead_t*)rop_ptr;
+
+	} //end for
 
     return(eores_OK);
 }
@@ -352,13 +345,14 @@ static eOresult_t s_eodeb_eoProtoParser_DumpNV(eODeb_eoProtoParser *p, eOethLowL
     //get rop to first rop
 	rop_ptr = &pktInfo_ptr->payload_ptr[ROPFRAME_HEADER_SIZE];
 	ropheader = (eOrophead_t*)rop_ptr;
-//	#include "stdio.h"
-//	printf("\n\nsrc addr 0x%x dest addr 0x%x \t numofrop%d \n ",  pktInfo_ptr->src_addr, pktInfo_ptr->dst_addr, ropframeheader->ropsnumberof);
+	#include "stdio.h"
+	printf("\n\nsrc addr 0x%x dest addr 0x%x \t numofrop%d \n ",  pktInfo_ptr->src_addr, pktInfo_ptr->dst_addr, ropframeheader->ropsnumberof);
 	for(i=0; i<ropframeheader->ropsnumberof; i++)
 	{
 
 		uint8_t *enddata_ptr;
 		eODeb_eoProtoParser_ropAdditionalInfo_t ropAddInfo = {0};
+		int32_t filldata = 0, totdatasize = 0, signaturesize = 0, timesize = 0;
 
 		//prepare rop additional info
 		ropAddInfo.desc.configuration.plussign = ropheader->ctrl.plussign;
@@ -371,53 +365,42 @@ static eOresult_t s_eodeb_eoProtoParser_DumpNV(eODeb_eoProtoParser *p, eOethLowL
 		ropAddInfo.desc.signature = EOK_uint32dummy;
 		ropAddInfo.time = EOK_uint64dummy;
 
+		//calulate fill data size
+		filldata = ropheader->dsiz%4;
+		if(filldata!=0)
+		{
+			filldata=4-filldata;
+		}
+
+		//calculate total data size
+		totdatasize = (ropheader->dsiz) + filldata;
+
+		//save ptr to enddata
+		enddata_ptr = &rop_ptr[(ropheader->dsiz) + filldata];
 
 		if(ropheader->ctrl.plussign == 1)
 		{
-			int32_t fill= ropheader->dsiz%4;
-			int32_t howmuch = 0;
-			if(fill!=0)
-			{
-				fill=4-fill;
-			}
-			howmuch = (ropheader->dsiz) + fill;
-			enddata_ptr = &rop_ptr[howmuch];
-			ropAddInfo.desc.signature = *((uint32_t*)enddata_ptr);
-			enddata_ptr = &rop_ptr[howmuch+4/*signature size*/];
-			ropAddInfo.time = *((uint64_t*)enddata_ptr);
+			uint8_t *data_ptr = &rop_ptr[totdatasize];
+			ropAddInfo.desc.signature = *((uint32_t*)data_ptr);
+			signaturesize = 4;
+
 		}
-		else if(ropheader->ctrl.plustime == 1)
+		if(ropheader->ctrl.plustime == 1)
 		{
-			int32_t fill= ropheader->dsiz%4;
-			int32_t howmuch = 0;
-			if(fill!=0)
-			{
-				fill=4-fill;
-			}
-			howmuch = (ropheader->dsiz) + fill;
-			enddata_ptr = &rop_ptr[howmuch];
-			memcpy((uint8_t*)&ropAddInfo.time, enddata_ptr, sizeof(uint64_t));
-//                ropAddInfo.time = *((uint64_t*)enddata_ptr);
+			uint8_t *data_ptr = &rop_ptr[totdatasize + signaturesize];
+			memcpy((uint8_t*)&ropAddInfo.time, data_ptr, sizeof(uint64_t));
+			timesize = 8;
 		}
 
-//		printf("ep=0x%x id=0x%x size=%hd\n", ropAddInfo.desc.ep, ropAddInfo.desc.id, ropAddInfo.desc.size);
+
+		printf("ep=0x%x id=0x%x size=%hd\n", ropAddInfo.desc.ep, ropAddInfo.desc.id, ropAddInfo.desc.size);
 
 
-	//go to next rop
-		int32_t fill= ropheader->dsiz%4;
-		int32_t howmuch = 0;
-		if(fill!=0)
-		{
-			fill=4-fill;
-		}
-		howmuch = (ropheader->dsiz) + fill;
-
-
-		//rop_ptr = &rop_ptr[8+ropheader->dsiz + 8];
-		rop_ptr = &rop_ptr[8+howmuch + 8];
+		//go to next rop
+		rop_ptr = &rop_ptr[ROP_HEADER_SIZE + totdatasize + signaturesize + timesize];
 		ropheader = (eOrophead_t*)rop_ptr;
 	}
-//	fflush(stdout);
+	fflush(stdout);
 
     return(eores_OK);
 }
