@@ -57,6 +57,14 @@ extern "C" {
 // -- all the possible enum
 
 
+
+enum {  eomc_ctrlmval_idle          = 0x00, eomc_ctrlmval_position      = 0x01, eomc_ctrlmval_velocity      = 0x02, 
+        eomc_ctrlmval_torque        = 0x03, eomc_ctrlmval_impedance_pos = 0x04, eomc_ctrlmval_impedance_vel = 0x05, 
+        eomc_ctrlmval_current       = 0x06, eomc_ctrlmval_velocity_pos  = 0x07,
+        eomc_ctrlmval_openloop      = 0x50, eomc_ctrlmval_everything_off= 0xf0, eomc_ctrlmval_calib         = 0xfe
+     };
+
+
 /** @typedef    typedef enum eOmc_controlmode_command_t
     @brief      eOmc_controlmode_command_t contains command to set the control mode.
     @warning    On an EMS only modes eomc_controlmode_cmd_idle, eomc_controlmode_cmd_position, eomc_controlmode_cmd_velocity, eomc_controlmode_cmd_torque,
@@ -66,14 +74,14 @@ extern "C" {
  **/
 typedef enum
 {
-    eomc_controlmode_cmd_position                   = 0x01,
-    eomc_controlmode_cmd_velocity                   = 0x02,      /**< velocity control loop */ 
-    eomc_controlmode_cmd_torque                     = 0x03,
-    eomc_controlmode_cmd_impedance_pos              = 0x04,
-    eomc_controlmode_cmd_impedance_vel              = 0x05,
-    eomc_controlmode_cmd_current                    = 0x06,
-    eomc_controlmode_cmd_openloop                   = 0x50,
-    eomc_controlmode_cmd_switch_everything_off      = 0xf0      /**< it imposes a zero current on the motor and also turns the pwm off */    
+    eomc_controlmode_cmd_position                   = eomc_ctrlmval_position,
+    eomc_controlmode_cmd_velocity                   = eomc_ctrlmval_velocity,      /**< velocity control loop */ 
+    eomc_controlmode_cmd_torque                     = eomc_ctrlmval_torque,
+    eomc_controlmode_cmd_impedance_pos              = eomc_ctrlmval_impedance_pos,
+    eomc_controlmode_cmd_impedance_vel              = eomc_ctrlmval_impedance_vel,
+    eomc_controlmode_cmd_current                    = eomc_ctrlmval_current,
+    eomc_controlmode_cmd_openloop                   = eomc_ctrlmval_openloop,
+    eomc_controlmode_cmd_switch_everything_off      = eomc_ctrlmval_everything_off      /**< it imposes a zero current on the motor and also turns the pwm off */    
 } eOmc_controlmode_command_t;
 
 
@@ -88,29 +96,20 @@ typedef enum
  **/
 typedef enum
 {
-    eomc_controlmode_idle                       = 0x00,     /**< pid and pwm off*/
-    eomc_controlmode_position                   = 0x01,
-    eomc_controlmode_velocity                   = 0x02,      /**< velocity control loop */    
-    eomc_controlmode_torque                     = 0x03,
-    eomc_controlmode_impedance_pos              = 0x04,
-    eomc_controlmode_impedance_vel              = 0x05,
-    eomc_controlmode_current                    = 0x06, 
-    eomc_controlmode_velocity_pos               = 0x07,     /**< The controller is in position, but the controller switches to eomc_controlmode_velocity_pos
+    eomc_controlmode_idle                       = eomc_ctrlmval_idle,     /**< pid and pwm off*/
+    eomc_controlmode_position                   = eomc_ctrlmval_position,
+    eomc_controlmode_velocity                   = eomc_ctrlmval_velocity,      /**< velocity control loop */    
+    eomc_controlmode_torque                     = eomc_ctrlmval_torque,
+    eomc_controlmode_impedance_pos              = eomc_ctrlmval_impedance_pos,
+    eomc_controlmode_impedance_vel              = eomc_ctrlmval_impedance_vel,
+    eomc_controlmode_current                    = eomc_ctrlmval_current, 
+    eomc_controlmode_velocity_pos               = eomc_ctrlmval_velocity_pos,     /**< The controller is in position, but the controller switches to eomc_controlmode_velocity_pos
                                                                  automatically when it receives a velocity set setpoint. 
-                                                                 In icub can proto there is not differences between velocity and velocity_pos */ 
- 
-    eomc_controlmode_openloop                   = 0x50,
-    eomc_controlmode_calib                      = 0xfe      /**< it means joint is in calibration, without specifing wich type of calibartion joint is using. this value doesn't belong to icub can proto. */ 
+                                                                 In icub can proto there is not differences between velocity and velocity_pos */  
+    eomc_controlmode_openloop                   = eomc_ctrlmval_openloop,
+    eomc_controlmode_calib                      = eomc_ctrlmval_calib      /**< it means joint is in calibration, without specifing wich type of calibartion joint is using. this value doesn't belong to icub can proto. */ 
 } eOmc_controlmode_t;
 
-
-EO_VERIFYproposition(check, (eomc_controlmode_cmd_position == eomc_controlmode_position));
-EO_VERIFYproposition(check, (eomc_controlmode_cmd_torque == eomc_controlmode_torque));
-EO_VERIFYproposition(check, (eomc_controlmode_cmd_impedance_pos == eomc_controlmode_impedance_pos));
-EO_VERIFYproposition(check, (eomc_controlmode_cmd_impedance_vel == eomc_controlmode_impedance_vel));
-EO_VERIFYproposition(check, (eomc_controlmode_cmd_current == eomc_controlmode_current));
-EO_VERIFYproposition(check, (eomc_controlmode_cmd_velocity == eomc_controlmode_velocity));
-EO_VERIFYproposition(check, (eomc_controlmode_cmd_openloop == eomc_controlmode_openloop));
 
 
 
@@ -164,22 +163,18 @@ typedef enum
 
 
 /** @typedef    typedef enum eOmc_calibration_types_t
-    @brief      contains the possible types of calibration.
+    @brief      contains the possible types of calibration. 
+                the values cannot be changed because they are given by icub can protocol
  **/
 typedef enum
 {
-    eomc_calibration_type0_hard_stops               = 0,
-    eomc_calibration_type1_abs_sens_analog          = 1,
-    eomc_calibration_type2_hard_stops_diff          = 2,
-    eomc_calibration_type3_abs_sens_digital         = 3,
-    eomc_calibration_type4_abs_and_incremental      = 4
+    eomc_calibration_type0_hard_stops               = 0,    // cannot change
+    eomc_calibration_type1_abs_sens_analog          = 1,    // cannot change
+    eomc_calibration_type2_hard_stops_diff          = 2,    // cannot change
+    eomc_calibration_type3_abs_sens_digital         = 3,    // cannot change
+    eomc_calibration_type4_abs_and_incremental      = 4     // cannot change
 } eOmc_calibration_type_t;
 
-EO_VERIFYproposition(isCalibrationTypeCompatiblewithicubcanproto, (eomc_calibration_type0_hard_stops == 0));
-EO_VERIFYproposition(isCalibrationTypeCompatiblewithicubcanproto, (eomc_calibration_type1_abs_sens_analog == 1));
-EO_VERIFYproposition(isCalibrationTypeCompatiblewithicubcanproto, (eomc_calibration_type2_hard_stops_diff == 2));
-EO_VERIFYproposition(isCalibrationTypeCompatiblewithicubcanproto, (eomc_calibration_type3_abs_sens_digital == 3));
-EO_VERIFYproposition(isCalibrationTypeCompatiblewithicubcanproto, (eomc_calibration_type4_abs_and_incremental == 4));
 
 
 // -- all the possible data service structures
