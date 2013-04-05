@@ -62,6 +62,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 #define db_emscanportconnected2motorboard     eOcanport1 
+#define DB_NULL_VALUE_U16                     0xFFFF
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -385,6 +386,10 @@ extern eOresult_t eo_appTheDB_GetMotorId_ByMotorCanLocation(EOappTheDB *p, eOapp
 
 	b_ptr = (eOappTheDB_hid_canBoardInfo_t *)eo_array_At(p->canboardsList, eo_appTheDB_hid_GetBoardIdWithAddress(p, canloc_ptr->addr));
     *mId_ptr = b_ptr->s.jm.connectedmotors[canloc_ptr->indexinboard];
+    if(*mId_ptr == DB_NULL_VALUE_U16)
+    {
+        return(eores_NOK_nodata);
+    }
 
     return(eores_OK);
 }
@@ -981,7 +986,7 @@ static eObool_t s_appTheDB_checkConfiguaration(eOappTheDB_cfg_t *cfg)
 
 static eOresult_t s_appTheDB_canboardslist_init(EOappTheDB *p)
 {
-    eOsizecntnr_t 					i;
+    eOsizecntnr_t 					i,k;
     eOappTheDB_cfg_canBoardInfo_t 	*b_cfg_ptr = NULL;	//pointer to configuration 
 	eOappTheDB_hid_canBoardInfo_t 	*b_ptr = NULL;		//ponter to db memory
         
@@ -1008,6 +1013,11 @@ static eOresult_t s_appTheDB_canboardslist_init(EOappTheDB *p)
                                                     sizeof(eOmc_jointId_t), eOicubCanProto_jm_indexInBoard_max);
 			b_ptr->s.jm.connectedmotors =  eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
                                                     sizeof(eOmc_motorId_t), eOicubCanProto_jm_indexInBoard_max);
+            for(k=0; k<eOicubCanProto_jm_indexInBoard_max; k++)
+            {
+                b_ptr->s.jm.connectedjoints[k] = DB_NULL_VALUE_U16;
+                b_ptr->s.jm.connectedmotors[k] = DB_NULL_VALUE_U16;
+            }
         }
 //         else if((eobrd_mais == b_ptr->cfg_ptr->type) || (eobrd_skin == b_ptr->cfg_ptr->type) || (eobrd_strain == b_ptr->cfg_ptr->type))
 //         {
