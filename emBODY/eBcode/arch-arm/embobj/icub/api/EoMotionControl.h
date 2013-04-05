@@ -57,7 +57,8 @@ extern "C" {
 // -- all the possible enum
 
 
-
+/** @warning    DO NOT CHANGE these values, as they are given by iCub protocol.
+ **/
 enum {  eomc_ctrlmval_idle          = 0x00, eomc_ctrlmval_position      = 0x01, eomc_ctrlmval_velocity      = 0x02, 
         eomc_ctrlmval_torque        = 0x03, eomc_ctrlmval_impedance_pos = 0x04, eomc_ctrlmval_impedance_vel = 0x05, 
         eomc_ctrlmval_current       = 0x06, eomc_ctrlmval_velocity_pos  = 0x07,
