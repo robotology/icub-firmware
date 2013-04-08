@@ -1214,6 +1214,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__2foc(EOicubCanProto* p, eOc
         return(res);
     }
 
+    #warning VALE--> before use current, vel and pos of 2foc be sure to had configured 2foc periodic msg content!!!
     mstatus_ptr->basic.current = *((int16_t*)&(frame->data[0]));
     mstatus_ptr->basic.velocity = *((int16_t*)&(frame->data[2]));
     mstatus_ptr->basic.position = *((int32_t*)&(frame->data[4]));
