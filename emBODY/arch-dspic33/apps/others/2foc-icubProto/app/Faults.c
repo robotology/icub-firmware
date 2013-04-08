@@ -4,6 +4,7 @@
 
 #include "Faults.h"
 #include <timer.h>
+#include "can_icubProto_trasmitter.h"
 #include <string.h> // memset
 
 int fault = 0;
@@ -100,9 +101,9 @@ void FaultConditionsHandler(void)
   //I2T will run in behalf of timer 3 when PWM is disabled
   EnableIntT3;
 
-  // Stop periodic CAN communication
-//VALE: even if application is in fault it continues to send status msg
-  //DisableIntT4;
+  // Send Periodic Status Message with fault inf  
+  
+  CanIcubProtoTrasmitter_SendStatusMsg();	
 
   // turn on Red Led
   LED_status.RedBlinkRate=BLINKRATE_FAST;
@@ -121,7 +122,7 @@ void __attribute__((__interrupt__,no_auto_psv)) _FLTA1Interrupt(void)
 
   // call fault handler
   FaultConditionsHandler();
-
+	
   // clear irq flag
   IFS3bits.FLTA1IF = 0;
 }

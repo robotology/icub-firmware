@@ -690,6 +690,8 @@ static int s_canIcubProtoParser_parse_periodicMsg(unsigned char permsg_type, tCa
 #ifdef SYNC_2FOC_TO_EMS
             CanIcubProtoTrasmitterSendPeriodicData();          
 #endif   
+			*txlen = 0;
+			return(1);
         }break;
        
         default:
@@ -731,7 +733,7 @@ static int s_canIcubProtoParser_parse_canLoaderMsg(tCanData *rxpayload, unsigned
             txpayload->b[1] = BOARD_TYPE_2FOC; 
             txpayload->b[2] = 1;  //TODO  //Firmware version number for BOOTLOADER c
             txpayload->b[3] = 0;  //TODO   //Firmware build number.
-            txpayload->b[4] = 3;  //TODO   //Firmware build number.
+            txpayload->b[4] = 4;  //TODO   //Firmware build number.
             #warning solita incoerenza tra versioni di fw sensori ed motori            
         } break;
                 

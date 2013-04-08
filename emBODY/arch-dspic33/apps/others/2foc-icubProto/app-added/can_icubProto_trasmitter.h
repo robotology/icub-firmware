@@ -23,6 +23,7 @@ extern void CanIcubProtoTransmitterInit(unsigned char bid);
 extern void CanIcubProtoTrasmitterSendPeriodicData(void);
 extern void CanIcubProtoTransmitterUpdateBoardId(unsigned char bid);
 extern void __attribute__((__interrupt__, no_auto_psv)) _T4Interrupt(void);
+extern void CanIcubProtoTrasmitter_SendStatusMsg();
 
 
 #endif

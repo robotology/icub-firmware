@@ -40,7 +40,6 @@ extern tGulp GulpHistoryBuffer[GULP_HISTORY_BUFFER_SIZE];
 extern int GulpHistoryBufferIdx;
 extern int test_received_data;
 
-static void s_CanIcubProtoTrasmitter_prapareStatusMsg(tCanData *candata_ptr, unsigned char *len_ptr, unsigned long *txid_ptr);
 
 static void s_CanIcubProtoTrasmitter_praparePeriodicMsg(tCanData *candata_ptr, unsigned char *len_ptr, unsigned long *txid_ptr);
 
@@ -117,9 +116,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _T4Interrupt(void)
 // The periodic CAN transmission buffer is filled and the trasmission is started
 {
   static unsigned int state_cnt = 0;
-  unsigned long txid;
-  unsigned char len;
-  static tCanData candata = {{0}};
+
   // CAN TX buffer for period gulp messages (not status)
   // This needs to be static because it might be not initialized 
   // in this function when gulp vars are not updated
@@ -163,9 +160,8 @@ void __attribute__((__interrupt__, no_auto_psv)) _T4Interrupt(void)
 		return;
 	}
 
-    s_CanIcubProtoTrasmitter_prapareStatusMsg(&candata, &len, &txid);
-	
-	ECANSend(txid, len, &candata);
+    CanIcubProtoTrasmitter_SendStatusMsg();
+
   }
 }
 
@@ -225,7 +221,7 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     unsigned char txlen = 0;
     unsigned long txid;
     tCanData perMsg_payload; // = {{0}};
-    tCanData statusMsg_payload; // = {{0}};
+  
     
     static unsigned int state_cnt = 0;
 
@@ -248,9 +244,9 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     {
         // reset counter for next status message
         state_cnt = 0;
-        s_CanIcubProtoTrasmitter_prapareStatusMsg(&statusMsg_payload, &txlen, &txid);
-    	
-    	ECANSend(txid, txlen, &statusMsg_payload);
+        
+		CanIcubProtoTrasmitter_SendStatusMsg();
+
     }
 }
 
@@ -265,19 +261,26 @@ static void s_CanIcubProtoTrasmitter_praparePeriodicMsg(tCanData *candata_ptr, u
     *txid_ptr = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBPROTO_CLASS_PERIODIC_MOTORBOARD, canprototransmitter_bid, ICUBPROTO_PERIODICCMD_2FOC);
 }
 
-static void s_CanIcubProtoTrasmitter_prapareStatusMsg(tCanData *candata_ptr, unsigned char *len_ptr, unsigned long *txid_ptr)
+extern void CanIcubProtoTrasmitter_SendStatusMsg()
 {
+	tCanData candata;
+	unsigned char len;
+	unsigned long txid;
     //reset the payload
-     memset(&candata_ptr->b[0], 0, 8);
+     memset(&candata.b[0], 0, 8);
        
     //prapare the payload
-    candata_ptr->b[0] = SysError.b[0];    
-    candata_ptr->b[0] |= (( SysError.I2TFailure << 3) | (SysError.AS5045CalcError << 5)); //adjust some values;
-    candata_ptr->b[1] = CanIcubProtoGetcontrol_mode(); //in case of error??
-    candata_ptr->b[4] = SysError.b[1];
-    candata_ptr->b[6] = SysStatus.b[3];
+    candata.b[0] = SysError.b[0];    
+    candata.b[0] |= (( SysError.I2TFailure << 3) | (SysError.AS5045CalcError << 5)); //adjust some values;
+    candata.b[1] = CanIcubProtoGetcontrol_mode(); //in case of error??
+    candata.b[4] = SysError.b[1];
+    candata.b[5] = (SysError.I2TFailure << 5);
+    candata.b[6] = SysStatus.b[3];
     
-    *txid_ptr = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBPROTO_CLASS_PERIODIC_MOTORBOARD, canprototransmitter_bid, ICUBPROTO_PERIODICCMD_STATUS);
-    *len_ptr = 7;
+    txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBPROTO_CLASS_PERIODIC_MOTORBOARD, canprototransmitter_bid, ICUBPROTO_PERIODICCMD_STATUS);
+    len = 7;
+	
+	ECANSend(txid, len, &candata);
+
 }
 

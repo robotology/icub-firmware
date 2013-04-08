@@ -12,10 +12,11 @@
 // default variable indexes for periodic data 
 // packet (Gulp packet for data plot)
 // 
-#define GULP_DEFAULT1 0x6   //current
-#define GULP_DEFAULT2 0x15  //Motor Position first 16 bit
-#define GULP_DEFAULT3 0x16  //Motor Position last 16 bit 
-#define GULP_DEFAULT4 0x17  //Motor velocity
+#define GULP_DEFAULT1 0x6   //Current
+#define GULP_DEFAULT2 0x17  //Motor velocity
+#define GULP_DEFAULT3 0x15  //Motor Position first 16 bit
+#define GULP_DEFAULT4 0x16  //Motor Position last 16 bit 
+
 
 //
 // PARK-CLARKE related
