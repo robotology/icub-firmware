@@ -523,13 +523,26 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
             eOicubCanProto_velocity_t           vel_tmp;
             eOicubCanProto_acceleration_t       acc_tmp;
             
-            vel_tmp = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, setPoint->to.velocity.value);
-            acc_tmp = eo_appMeasConv_jntAcceleration_I2E(appMeasConv_ptr, jxx, setPoint->to.velocity.withacceleration);
+//             vel_tmp = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, setPoint->to.velocity.value);
+//             acc_tmp = eo_appMeasConv_jntAcceleration_I2E(appMeasConv_ptr, jxx, setPoint->to.velocity.withacceleration);
 
-            //in order to send velocity to mc4 like setpoint i need to convert it in encoderticks/ms end after shift in order to obtain a small value
-            setpoint_vel.value = ((vel_tmp/1000) << eo_appMeasConv_hid_GetVelEstimShift(appMeasConv_ptr, jxx));
-            setpoint_vel.withacceleration = acc_tmp << eo_appMeasConv_hid_GetVelEstimShift(appMeasConv_ptr, jxx);
-//old
+//             //in order to send velocity to mc4 like setpoint i need to convert it in encoderticks/ms end after shift in order to obtain a small value
+//             setpoint_vel.value = ((vel_tmp/1000) << eo_appMeasConv_hid_GetVelEstimShift(appMeasConv_ptr, jxx));
+//             setpoint_vel.withacceleration = acc_tmp << eo_appMeasConv_hid_GetVelEstimShift(appMeasConv_ptr, jxx);
+
+ 
+            setpoint_vel.withacceleration = eo_appMeasConv_jntAcceleration_I2E_abs(appMeasConv_ptr, jxx, setPoint->to.velocity.withacceleration);           
+            setpoint_vel.value = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, setPoint->to.velocity.value);
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            //old
 //            setpoint_vel.value = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, setPoint->to.velocity.value);
 //            setpoint_vel.withacceleration = eo_appMeasConv_jntAcceleration_I2E(appMeasConv_ptr, jxx, setPoint->to.velocity.withacceleration);           
             
