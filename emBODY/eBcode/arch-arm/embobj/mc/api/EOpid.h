@@ -85,7 +85,8 @@ extern int32_t eo_pid_PWM_pi_3_0Hz_1stLPF(EOpid *o, float Tr, float Tm);
 extern int32_t eo_pid_PWM_pi_1_1Hz_2ndLPF(EOpid *o, float Tr, float Tm);
 extern int32_t eo_pid_PWM_pi_3_0Hz_2ndLPF(EOpid *o, float Tr, float Tm);
 extern int32_t eo_pid_PWM_piv(EOpid *o, float En, float Venc, float Vref, float Aref);
-extern int32_t eo_pid_PWM_pid(EOpid *o, float En);
+//extern int32_t eo_pid_PWM_pid(EOpid *o, float En);
+extern int32_t eo_pid_PWM_pid(EOpid *o, float En, float Vref);
 
 /** @}            
     end of group eo_pid  

@@ -73,9 +73,9 @@ typedef struct EOaxisController_hid EOaxisController;
     @brief      Creates a new motor controller object 
     @return     The pointer to the required object.
  **/
-extern EOaxisController* eo_axisController_New(filter_cut_freq_t);
+extern EOaxisController* eo_axisController_New(filter_cut_freq_t, uint8_t);
 
-extern eObool_t eo_axisController_IsReady(EOaxisController *o);
+extern eObool_t eo_axisController_HasLimits(EOaxisController *o);
 
 extern void eo_axisController_SetEncPos(EOaxisController *o, int32_t pos); 
 extern void eo_axisController_SetEncVel(EOaxisController *o, int32_t vel);
@@ -113,8 +113,11 @@ extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o);
 extern void eo_axisController_SetPosPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff);
 extern void eo_axisController_SetTrqPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff);
 
-extern void eo_axisController_Calibrate(EOaxisController *o);
-extern eObool_t eo_axisController_EncRangeAdj(EOaxisController *o, int32_t *pos); // shoulder joint 2 only
+extern void eo_axisController_StartCalibration(EOaxisController *o);
+extern void eo_axisController_SetCalibrated(EOaxisController *o);
+extern eObool_t eo_axisController_IsCalibrated(EOaxisController *o);
+
+extern int32_t eo_axisController_EncRangeAdj(EOaxisController *o, int32_t *enc_pos); // shoulder joint 2 only
 
 /** @}            
     end of group eo_axisController  

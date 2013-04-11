@@ -19,7 +19,7 @@ extern "C" {
 #include "EoCommon.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
- 
+
 #include "EOspeedmeter.h"
 
 
@@ -29,37 +29,40 @@ extern "C" {
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
 /** @struct     EOspeedmeter_hid
-    @brief      Hidden definition. Implements private data used only internally by the 
+    @brief      Hidden definition. Implements private data used only internally by the
                 public or private (static) functions of the object and protected data
                 used also by its derived objects.
- **/  
+ **/
 
-struct EOspeedmeter_hid 
+struct EOspeedmeter_hid
 {
     int32_t time;
-    
+
     int32_t distance;
     int32_t position_last;
     int32_t position_sure;
-    
+
     eObool_t calibrated;
-    int32_t offset;
     int32_t enc_sign;
-    
-    int32_t odo_x_freq;
+    int32_t offset;
+
     int32_t speed_filt;
     int32_t speed;
     int32_t dir;
- 
+
     eObool_t is_started;
     eObool_t hard_fault;
-    
-    uint8_t first_valid_data;
-    uint8_t invalid_data_cnt;
-    
-    int32_t sindex;
-    int32_t sample[5];
-}; 
+
+    uint8_t  first_valid_data;
+    uint16_t invalid_data_cnt;
+
+    int32_t window;
+    int32_t distance_filt;
+    int32_t distance_pred;
+
+    int32_t delta;
+    int32_t delta_filt;
+};
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
@@ -67,12 +70,8 @@ struct EOspeedmeter_hid
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"
-#endif 
- 
+#endif
+
 #endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
-
-
-
-
