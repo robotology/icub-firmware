@@ -44,27 +44,34 @@ struct EOtrajectory_hid
 
     //////////////////
     // position
-    float xPos;
-    float xVel;
-    float xPAcc;
-
-    float xPosF;
-    float xVelF;
+    float xX;
+    float xV;
+    float xA;
     
-    int32_t PosTimer;
+    //float xXf;
+    
+    float xT;
+    float xTimer;
     
     //////////////////
     // velocity
     eObool_t bVelocityMove;
     eObool_t bIsBraking;
     
-    float    vPos;
-    float    vVel;
-    float    vPAcc;
+    float vX;
+    float vV;
+    float vA;
     
-    float    vVelF;
+    //float vVf;
+   
+    float vT;
+    float vTimer;
     
-    int32_t  VelTimer;
+    float xInvT;
+    float vInvT;
+    
+    float xK0,xK1,xK2,xK3;
+    float vK0,vK1,vK2;
 }; 
 
 

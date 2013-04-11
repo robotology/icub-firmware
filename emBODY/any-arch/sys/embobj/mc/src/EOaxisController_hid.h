@@ -30,18 +30,18 @@ extern "C" {
 
 // required
 
-#define MASK_MIN_POS           0x0001
-#define MASK_MAX_POS           0x0002
-#define MASK_VEL_TOUT          0x0004
-#define MASK_MAX_VEL           0x0008
+#define MASK_MIN_POS           0x01
+#define MASK_MAX_POS           0x02
+#define MASK_VEL_TOUT          0x04
+#define MASK_MAX_VEL           0x08
 
-#define MASK_POS_PID           0x0010
-#define MASK_TRQ_PID           0x0020
+#define MASK_POS_PID           0x10
+#define MASK_TRQ_PID           0x20
 
-#define MASK_CALIB_OK          0x0100
+#define MASK_HAS_LIMITS        0x03
 
-#define MASK_POS_INIT_OK       0x0113
-#define MASK_TRQ_INIT_OK       0x0123
+#define MASK_POS_READY         0x13
+#define MASK_TRQ_READY         0x23
  
 #define eo_axisController_ReadTorque_hid(axis_controller, torque) axis_controller->torque_meas = torque
 
@@ -60,6 +60,8 @@ struct EOaxisController_hid
 
     EOtrajectory *trajectory;
 
+    uint8_t axisID;
+    
     int32_t position;
     int32_t velocity;
     
@@ -87,7 +89,9 @@ struct EOaxisController_hid
 
     eOmc_controlmode_t control_mode;
 
-    uint16_t ready_mask;
+    uint8_t limits_mask;
+    
+    eObool_t calibrated;
     
     filter_cut_freq_t filter_cut_freq;
 }; 
