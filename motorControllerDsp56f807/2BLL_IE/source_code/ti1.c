@@ -39,38 +39,14 @@ void TI1_init (void)
 /**
  * isr timer. 
  */
-#pragma interrupt saveall
+#pragma interrupt 
 void TI1_interrupt (void)
 {
 	byte i;
 	_count++;
 
 	_wait = false;
-		for (i=0; i<JN; i++) 
-		{
-			if ((get_current(i)>=25000) || (get_current(i)<=-25000))
-			{
-				_control_mode[i] = MODE_IDLE;	
-				_pad_enabled[i] = false;
-				highcurrent[i]=true;
-				PWM_outputPadDisable(i);
 
-				can_printf("j%d curr %f",i,get_current(i));
-
-			}
-			check_current(i, (_pid[i] > 0));		
-			compute_i2t(i);
-			if (_filt_current[i] > MAX_I2T_CURRENT)
-			{
-				_control_mode[i] = MODE_IDLE;	
-				_pad_enabled[i] = false;
-				highcurrent[i]=true;
-				PWM_outputPadDisable(i);
-
-				can_printf("j%d filtcurr %f",i,_filt_current[i]);
-	
-			}			
-		}
 		
 clrRegBit (TMRA3_SCR, TCF);            /* Reset interrupt request flag */
 
