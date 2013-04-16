@@ -51,13 +51,13 @@ extern "C" {
     can receive and process ( which is different from the max packet the EMS can send to the pc104, because the protocol is asimmetryc)
 */
 #define EOK_HOSTTRANSCEIVER_emptyropframe_dimension            sizeof(EOropframeEmpty_t)     // header + footer + 8 byte for progressive number
-#define X                                                      ( EOK_HOSTTRANSCEIVER_capacityofropframeregulars + EOK_HOSTTRANSCEIVER_capacityofropframereplies + EOK_HOSTTRANSCEIVER_emptyropframe_dimension)
+#define EOK_HOSTTRANSCEIVER_TMP                                ( EOK_HOSTTRANSCEIVER_capacityofropframeregulars + EOK_HOSTTRANSCEIVER_capacityofropframereplies + EOK_HOSTTRANSCEIVER_emptyropframe_dimension)
 #define EOK_HOSTTRANSCEIVER_capacityoftxpacket                 768
 #define EOK_HOSTTRANSCEIVER_capacityofrxpacket                 1408
 #define EOK_HOSTTRANSCEIVER_capacityofrop                      256
 #define EOK_HOSTTRANSCEIVER_capacityofropframeregulars         20
 #define EOK_HOSTTRANSCEIVER_capacityofropframereplies          20
-#define EOK_HOSTTRANSCEIVER_capacityofropframeoccasionals      (EOK_HOSTTRANSCEIVER_capacityoftxpacket - X)
+#define EOK_HOSTTRANSCEIVER_capacityofropframeoccasionals      (EOK_HOSTTRANSCEIVER_capacityoftxpacket - EOK_HOSTTRANSCEIVER_TMP)
 #define EOK_HOSTTRANSCEIVER_maxnumberofregularrops             1
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
