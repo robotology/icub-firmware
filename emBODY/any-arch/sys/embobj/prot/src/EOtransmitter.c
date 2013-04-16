@@ -421,7 +421,7 @@ extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outp
     eo_ropframe_age_Set(p->ropframereadytotx, eov_sys_LifeTimeGet(eov_sys_GetHandle()));
     
     // add sequence number
-    #warning --> the sequence number in tx ropframe is incremneted only if the number of rops is non-zero ... (?)
+    //#warning --> the sequence number in tx ropframe is incremneted only if the number of rops is non-zero ... (?)
     if( eo_ropframe_ROP_NumberOf(p->ropframereadytotx) != 0)
     {
     	p->tx_seqnum++;
@@ -454,7 +454,7 @@ extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outp
     return(eores_OK);   
 }
 
-#warning --> make eo_transmitter_occasional_rops_Load obsolete ............. DO IT
+//#warning --> make eo_transmitter_occasional_rops_Load obsolete ............. DO IT
 extern eOresult_t eo_transmitter_occasional_rops_Load_without_data(EOtransmitter *p, eOropdescriptor_t* ropdesc, uint8_t itisobsolete)//eOropcode_t ropcode, eOnvEP_t nvep, eOnvID_t nvid, eOropconfig_t ropcfg)
 {
 //    eo_transm_regrop_info_t regropinfo;
@@ -499,7 +499,7 @@ extern eOresult_t eo_transmitter_occasional_rops_Load(EOtransmitter *p, eOropdes
     uint16_t ropsize;
     uint16_t remainingbytes;
     
-  #warning --> it is on test  ... 
+//  #warning --> it is on test  ... 
     
     uint16_t ondevindex;
     uint16_t onendpointindex;
@@ -507,6 +507,7 @@ extern eOresult_t eo_transmitter_occasional_rops_Load(EOtransmitter *p, eOropdes
     
     EOtreenode* treenode;
     EOnv nv;
+    eOnvOwnership_t nvownership;
     
     eObool_t hasdata2send = eobool_false;    
 
@@ -527,7 +528,7 @@ extern eOresult_t eo_transmitter_occasional_rops_Load(EOtransmitter *p, eOropdes
     
     
     
-    eOnvOwnership_t nvownership = eo_rop_hid_GetOwnership(ropdesc->ropcode, eo_ropconf_none, eo_rop_dir_outgoing);
+    nvownership = eo_rop_hid_GetOwnership(ropdesc->ropcode, eo_ropconf_none, eo_rop_dir_outgoing);
       
     
     // retrieve the indices inside the nvscfg given the triple (ip, ep, id)
