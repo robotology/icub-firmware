@@ -379,10 +379,11 @@ extern eOresult_t eo_nvscfg_data_Initialise(EOnvsCfg* p)
 #endif
             for(k=0; k<nvars; k++)
             {
-                treenode = (EOtreenode*) eo_constvector_At((*theendpoint)->thetreeofnvs_con, k);
-                tmpnvcon = (EOnv_con_t*) eo_treenode_GetData(treenode);
                 uint8_t *u8ptrvol = (uint8_t*) (*theendpoint)->thenvs_vol;
                 uint8_t *u8ptrrem = (uint8_t*) (*theendpoint)->thenvs_rem;
+
+                treenode = (EOtreenode*) eo_constvector_At((*theendpoint)->thetreeofnvs_con, k);
+                tmpnvcon = (EOnv_con_t*) eo_treenode_GetData(treenode);
 
                 
                 if(eo_nvscfg_protection_one_per_netvar == p->protection)
@@ -628,7 +629,7 @@ extern EOnv* eo_nvscfg_GetNV(EOnvsCfg* p, uint16_t ondevindex, uint16_t onendpoi
             
             case eo_nvscfg_protection_one_per_netvar:
             {
-                #warning .... i think of void* as a uint32_t*
+                //#warning .... i think of void* as a uint32_t*
                 uint32_t** addr = eo_vector_At((*theendpoint)->themtxofthenvs, k);
                 mtx2use = (EOVmutexDerived*) (*addr);
             } break;  
