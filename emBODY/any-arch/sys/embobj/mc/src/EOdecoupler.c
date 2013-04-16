@@ -41,6 +41,7 @@
 #define MOTORS(m) for (uint8_t m=0; m<o->n_motors; ++m)
 
 #define SAFE_MAX_CURRENT 2500
+#define NOMINAL_CURRENT  6500
 #define LIMIT(x,L) if (x>(L)) x=(L); else if (x<-(L)) x=-(L)
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -216,36 +217,41 @@ extern uint8_t eo_motors_PWM(EOmotors *o, emsBoardType_t board_type, int32_t *pw
             pwm_motor[1] = pwm_joint[1];
         }
     }
-       
-    switch (board_type)
+    
+    if (alarm_mask)
     {
-    case EMS_SHOULDER:
-        if (alarm_mask & 0x08) LIMIT(pwm_motor[3], SAFE_MAX_CURRENT);
-        if (alarm_mask & 0x07)
+        switch (board_type)
         {
-            LIMIT(pwm_motor[0], SAFE_MAX_CURRENT);
-            LIMIT(pwm_motor[1], SAFE_MAX_CURRENT);
-            LIMIT(pwm_motor[2], SAFE_MAX_CURRENT);
-        }
-        break;
-  
-    case EMS_WAIST:
-        if (alarm_mask & 0x07)
-        {
-            LIMIT(pwm_motor[0], SAFE_MAX_CURRENT);
-            LIMIT(pwm_motor[1], SAFE_MAX_CURRENT);
-            LIMIT(pwm_motor[2], SAFE_MAX_CURRENT);
-        }
-        break;
+        case EMS_SHOULDER:
+            if (alarm_mask & 0x08) LIMIT(pwm_motor[3], SAFE_MAX_CURRENT);
+            if (alarm_mask & 0x07)
+            {
+                LIMIT(pwm_motor[0], SAFE_MAX_CURRENT);
+                LIMIT(pwm_motor[1], SAFE_MAX_CURRENT);
+                LIMIT(pwm_motor[2], SAFE_MAX_CURRENT);
+            }
+            break;
+      
+        case EMS_WAIST:
+            if (alarm_mask & 0x07)
+            {
+                LIMIT(pwm_motor[0], SAFE_MAX_CURRENT);
+                LIMIT(pwm_motor[1], SAFE_MAX_CURRENT);
+                LIMIT(pwm_motor[2], SAFE_MAX_CURRENT);
+            }
+            break;
 
-    case EMS_UPPERLEG:
-        if (alarm_mask & 0x04) LIMIT(pwm_motor[2], SAFE_MAX_CURRENT);
-        if (alarm_mask & 0x08) LIMIT(pwm_motor[3], SAFE_MAX_CURRENT);        
-        
-    case EMS_ANKLE:
-        if (alarm_mask & 0x01) LIMIT(pwm_motor[0], SAFE_MAX_CURRENT);
-        if (alarm_mask & 0x02) LIMIT(pwm_motor[1], SAFE_MAX_CURRENT);
+        case EMS_UPPERLEG:
+            if (alarm_mask & 0x04) LIMIT(pwm_motor[2], SAFE_MAX_CURRENT);
+            if (alarm_mask & 0x08) LIMIT(pwm_motor[3], SAFE_MAX_CURRENT);        
+            
+        case EMS_ANKLE:
+            if (alarm_mask & 0x01) LIMIT(pwm_motor[0], SAFE_MAX_CURRENT);
+            if (alarm_mask & 0x02) LIMIT(pwm_motor[1], SAFE_MAX_CURRENT);
+        }
     }
+    
+    MOTORS(m) LIMIT(pwm_motor[m], NOMINAL_CURRENT);
     
     return stop_mask;
 }
