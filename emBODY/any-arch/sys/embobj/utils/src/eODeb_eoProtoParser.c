@@ -30,6 +30,10 @@
 #include "EoCommon.h"
 #include "string.h"
 
+// acemor: cannot use printf in embOBJ. use error manager instead
+#pragma message("WARNING-> acemor: cannot use printf in embOBJ. use error manager instead")
+#include "stdio.h"
+
 #include "EOropframe_hid.h"
 #include "EOrop_hid.h"
 
@@ -196,7 +200,7 @@ static eOresult_t s_eodeb_eoProtoParser_CheckNV(eODeb_eoProtoParser *p, eOethLow
     //get rop to first rop
 	rop_ptr = &pktInfo_ptr->payload_ptr[ROPFRAME_HEADER_SIZE];
 	ropheader = (eOrophead_t*)rop_ptr;
-	//#include "stdio.h"
+
 	//            printf("src addr 0x%x dest addr 0x%x\n ",  pktInfo_ptr->src_addr, pktInfo_ptr->dst_addr);
 	for(i=0; i<ropframeheader->ropsnumberof; i++)
 	{
@@ -345,7 +349,7 @@ static eOresult_t s_eodeb_eoProtoParser_DumpNV(eODeb_eoProtoParser *p, eOethLowL
     //get rop to first rop
 	rop_ptr = &pktInfo_ptr->payload_ptr[ROPFRAME_HEADER_SIZE];
 	ropheader = (eOrophead_t*)rop_ptr;
-	#include "stdio.h"
+
 	printf("\n\nsrc addr 0x%x dest addr 0x%x \t numofrop%d \n ",  pktInfo_ptr->src_addr, pktInfo_ptr->dst_addr, ropframeheader->ropsnumberof);
 	for(i=0; i<ropframeheader->ropsnumberof; i++)
 	{
