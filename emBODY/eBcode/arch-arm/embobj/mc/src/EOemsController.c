@@ -57,7 +57,7 @@ const int32_t EMS_FREQUENCY_INT32  = 1000;
 const float   EMS_FREQUENCY_FLOAT  = 1000.0f;
 const int32_t TICKS_PER_REVOLUTION = 65536;
 
-#ifdef _MC_BACKDOOR__
+
 //extern const uint16_t eo_emsController_hid_DEBUG_id = 4;
 extern EOemsControllerDEBUG_t eo_emsController_hid_DEBUG =
 {
@@ -66,7 +66,7 @@ extern EOemsControllerDEBUG_t eo_emsController_hid_DEBUG =
     .position       = {0, 0, 0, 0},
     .velocity       = {0, 0, 0, 0}    
 }; 
-#endif
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
