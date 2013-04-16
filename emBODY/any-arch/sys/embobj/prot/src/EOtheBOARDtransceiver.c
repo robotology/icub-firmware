@@ -88,7 +88,7 @@ static EOtheBOARDtransceiver s_eo_theboardtrans =
 const eOboardtransceiver_cfg_t eo_boardtransceiver_cfg_default = 
 {
     EO_INIT(.vectorof_endpoint_cfg)     NULL,
-    EO_INIT(hashfunction_ep2index)      NULL,
+    EO_INIT(.hashfunction_ep2index)     NULL,
     EO_INIT(.remotehostipv4addr)        0,
     EO_INIT(.remotehostipv4port)        0,
     EO_INIT(.sizes)                     {0},
