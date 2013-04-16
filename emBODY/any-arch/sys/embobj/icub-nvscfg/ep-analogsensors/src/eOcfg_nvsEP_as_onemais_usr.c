@@ -110,7 +110,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static const EOnv_usr_t s_eo_cfg_nvsEP_as_onemais_usr_array_of_EOnv_usr[] =
+static EOnv_usr_t s_eo_cfg_nvsEP_as_onemais_usr_array_of_EOnv_usr[] =
 {
 #if 0
     {   // s00 
