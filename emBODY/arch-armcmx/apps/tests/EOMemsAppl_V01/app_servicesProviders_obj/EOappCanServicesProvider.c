@@ -267,7 +267,7 @@ extern eOresult_t eo_appCanSP_wait_XXX(EOappCanSP *p, eOcanport_t port)
 {
 //    uint8_t                 numofoutframe = 0;
 //    hal_arch_arm_irqn_t     irqn;
-    osal_result_t           osal_res;
+    osal_result_t           osal_res = osal_res_OK ;
 
     if(run_data.numoftxframe[port] != 0)
     {
