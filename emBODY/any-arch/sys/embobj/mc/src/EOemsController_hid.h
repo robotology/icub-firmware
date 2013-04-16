@@ -65,7 +65,7 @@ struct EOemsController_hid
     //float torque_meas[MAX_MOTORS];
 }; 
 
-#ifdef __MC_BACKDOOR__
+
 typedef struct
 {   // 4 is MAX_JOINTS but i use 4 to avoid ... problems with the host
     eom_emsapplcfg_boardid_t    boardid;
@@ -79,7 +79,7 @@ typedef struct
 
 #define eo_emsController_hid_DEBUG_id 4
 extern EOemsControllerDEBUG_t eo_emsController_hid_DEBUG;
-
+#ifdef __MC_BACKDOOR__
 extern void eo_emsController_hid_DEBUG_reset(void);
 
 extern void eo_emsController_hid_DEBUG_evaltransmission(void);
