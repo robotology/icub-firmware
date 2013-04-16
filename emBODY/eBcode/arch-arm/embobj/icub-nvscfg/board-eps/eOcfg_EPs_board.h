@@ -47,7 +47,7 @@ extern "C" {
 #include "EOconstvector.h"
 #include "EOnvsCfg.h"
 
-#warning "This include (eOcfg_EPs_allboards) will generate chaos on EMS code!"
+//#warning "This include (eOcfg_EPs_allboards) will generate chaos on EMS code!"
 #include "eOcfg_EPs_allboards.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ extern "C" {
 // eOnvEP_t nvindex	= index of ith NV inside that particular EP
 
 // return constvectorof_nvscfgep for a given board
-extern EOconstvector* eo_cfg_nvsEP_board_EPs_nvscfgep_get(uint8_t boardNum);
+extern const EOconstvector* eo_cfg_nvsEP_board_EPs_nvscfgep_get(uint8_t boardNum);
 
 // return number of EP handled by this board
 extern uint16_t eo_cfg_nvsEP_board_EPs_numberof_get(const EOconstvector* constvectorof_nvscfgep);
