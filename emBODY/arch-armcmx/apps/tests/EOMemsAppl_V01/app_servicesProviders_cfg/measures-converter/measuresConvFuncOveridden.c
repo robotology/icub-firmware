@@ -162,8 +162,9 @@ extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E(EOappMeasConv *p
     
       //in order to send velocity to mc4 like setpoint i need to convert it in encoderticks/ms end after shift in order to obtain a small value
       tmp = i_vel * eo_appMeasConv_hid_GetEncConv_factor(p, jId);
-      tmp = tmp *(1 << eo_appMeasConv_hid_GetVelEstimShift(p, jId));
-      tmp = tmp/1000;
+      tmp = tmp *(1 << eo_appMeasConv_hid_GetVelEstimShift(p, jId)); //here i can't use shift because i_vel can be negative.
+      tmp = tmp + 500;  //round to nearest integer
+      tmp = tmp/1000; //convert from sec to ms
     //  tmp = (tmp/1000) << eo_appMeasConv_hid_GetVelEstimShift(p, jId);
       return((eOicubCanProto_velocity_t)tmp);
 
@@ -272,10 +273,11 @@ int32_t tmp;
 #endif
    
 //    return(((eOicubCanProto_acceleration_t)(i_acc * eo_appMeasConv_hid_GetEncConv_factor(p, jId)))<<eo_appMeasConv_hid_GetVelShift(p, jId));
-    tmp = i_acc * __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId));
-    tmp = tmp << eo_appMeasConv_hid_GetVelEstimShift(p, jId);
+    tmp = i_acc << eo_appMeasConv_hid_GetVelEstimShift(p, jId);
+    tmp = tmp * __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId));
+    tmp = tmp + 500000; //round to nearest integer
     //tmp = tmp/1000;
-    tmp = tmp/1000000;
+    tmp = tmp/1000000; // conver from sec^2 to millsec^2 
     return((eOicubCanProto_acceleration_t)tmp);
 //    return((eOicubCanProto_acceleration_t)(i_acc * __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId))));
 }
