@@ -47,9 +47,9 @@ extern "C" {
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-//#define EOUTIL_CHAMELEON_DESCRIPTOR_NONE    0xFF
-#define EOUTIL_CHAMELEON_DESCRIPTOR_SIZE_NONE    3
-#define EOUTIL_CHAMELEON_DESCRIPTOR_IDEN_NONE    0
+//#define EOUTIL_CHAMELEON_DESCRIPTOR_NONE        0xFF
+#define EOUTIL_CHAMELEON_DESCRIPTOR_SIZE_NONE   3
+#define EOUTIL_CHAMELEON_DESCRIPTOR_IDEN_NONE   0
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
