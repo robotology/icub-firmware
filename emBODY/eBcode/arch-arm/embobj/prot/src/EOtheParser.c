@@ -244,10 +244,10 @@ extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, co
     }  
     
     // sets the ipaddr
-    #warning --> ho rimosso rop->aboutip.ipaddr = fromipaddr
+    //#warning --> ho rimosso rop->aboutip.ipaddr = fromipaddr
     //rop->aboutip.ipaddr = fromipaddr; 
 
-    #warning --> rimuovo rop->aboutnvs.nvownership ..... ??? PENSACI BENE E CERCA DI FARLO
+    //#warning --> rimuovo rop->aboutnvs.nvownership ..... ??? PENSACI BENE E CERCA DI FARLO
     // sets the ownership
     rop->tmpdata.nvownership = eo_rop_hid_GetOwnership(rophead->ropc, (eOropconfinfo_t)rophead->ctrl.confinfo, eo_rop_dir_received);
 
