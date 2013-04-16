@@ -64,7 +64,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-//#define EOCFG_NVSEP_AS_OVERRIDE
+#define EOCFG_NVSEP_AS_OVERRIDE
 
 #if defined(EOCFG_NVSEP_AS_OVERRIDE)
 #include "eOcfg_nvsEP_as_overridden.h"
@@ -131,6 +131,9 @@ const eOsnsr_mais_t* eo_cfg_nvsEP_as_mais_defaultvalue = &eo_cfg_nvsEP_as_any_co
 
 extern uint16_t eo_cfg_nvsEP_as_strain_numbermax_Get(eOcfg_nvsEP_as_endpoint_t ep)
 {
+    uint16_t max;
+    uint16_t i;
+
     static const uint8_t smax[9] =
     {
         strainOneStrain_TOTALnumber, 0,                                 // left arm
@@ -140,8 +143,8 @@ extern uint16_t eo_cfg_nvsEP_as_strain_numbermax_Get(eOcfg_nvsEP_as_endpoint_t e
         strainOneStrain_TOTALnumber, 0                                  // right leg       
     };  EO_VERIFYsizeof(smax, 9*sizeof(uint8_t));   
     
-    uint16_t max = 0; 
-    uint16_t i = (uint16_t)ep - (uint16_t)endpoint_as_leftupperarm;
+    max = 0; 
+    i = (uint16_t)ep - (uint16_t)endpoint_as_leftupperarm;
     if(i < 9)
     {
         max = smax[i];
@@ -153,6 +156,9 @@ extern uint16_t eo_cfg_nvsEP_as_strain_numbermax_Get(eOcfg_nvsEP_as_endpoint_t e
 
 extern uint16_t eo_cfg_nvsEP_as_mais_numbermax_Get(eOcfg_nvsEP_as_endpoint_t ep)
 {
+    uint16_t max;
+    uint16_t i;
+
     static const uint8_t mmax[9] =
     {
         0, maisOneMais_TOTALnumber,                                 // left arm
@@ -162,8 +168,8 @@ extern uint16_t eo_cfg_nvsEP_as_mais_numbermax_Get(eOcfg_nvsEP_as_endpoint_t ep)
         0, 0                                                        // right leg       
     };  EO_VERIFYsizeof(mmax, 9*sizeof(uint8_t));   
     
-    uint16_t max = 0; 
-    uint16_t i = (uint16_t)ep - (uint16_t)endpoint_as_leftupperarm;
+    max = 0; 
+    i = (uint16_t)ep - (uint16_t)endpoint_as_leftupperarm;
     if(i < 9)
     {
         max = mmax[i];

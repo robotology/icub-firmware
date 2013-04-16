@@ -59,7 +59,7 @@
 
 
 
-//#define EOCFG_NVSEP_SK_OVERRIDE
+#define EOCFG_NVSEP_SK_OVERRIDE
 
 #if defined(EOCFG_NVSEP_SK_OVERRIDE)
 #include "eOcfg_nvsEP_sk_overridden.h"
@@ -125,14 +125,16 @@ extern eOnvID_t eo_cfg_nvsEP_sk_NVID_Get(eOcfg_nvsEP_sk_endpoint_t ep, eOcfg_nvs
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-
+#if !defined(OVERRIDE_eo_cfg_nvsEP_sk_hid_INITIALISE)
 __weak extern void eo_cfg_nvsEP_sk_hid_INITIALISE(eOnvEP_t ep, void *loc, void *rem)
 {
     eObool_t theOwnershipIsLocal = (NULL == rem) ? eobool_true : eobool_false;
     theOwnershipIsLocal = theOwnershipIsLocal;
 }
+#endif
 
 // init:
+#if !defined(OVERRIDE_eo_cfg_nvsEP_sk_hid_INIT_sconfig__sigmode)
 __weak extern void eo_cfg_nvsEP_sk_hid_INIT_sconfig__sigmode(uint16_t n, const EOnv* nv)
 {   // n is always 0
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
@@ -141,7 +143,10 @@ __weak extern void eo_cfg_nvsEP_sk_hid_INIT_sconfig__sigmode(uint16_t n, const E
     theOwnershipIsLocal = theOwnershipIsLocal;
     ep = ep;
 }
+#endif
 
+
+#if !defined(OVERRIDE_eo_cfg_nvsEP_sk_hid_INIT_sstatus__arrayof10canframe)
 __weak extern void eo_cfg_nvsEP_sk_hid_INIT_sstatus__arrayof10canframe(uint16_t n, const EOnv* nv)
 {   // n is always 0
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
@@ -150,9 +155,10 @@ __weak extern void eo_cfg_nvsEP_sk_hid_INIT_sstatus__arrayof10canframe(uint16_t 
     theOwnershipIsLocal = theOwnershipIsLocal;
     ep = ep;
 }
-
+#endif
 
 // updt:
+#if !defined(OVERRIDE_eo_cfg_nvsEP_sk_hid_UPDT_sconfig__sigmode)
 __weak extern void eo_cfg_nvsEP_sk_hid_UPDT_sconfig__sigmode(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {   // n is always 0
     eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
@@ -161,6 +167,7 @@ __weak extern void eo_cfg_nvsEP_sk_hid_UPDT_sconfig__sigmode(uint16_t n, const E
     theOwnershipIsLocal = theOwnershipIsLocal;
     ep = ep;
 }
+#endif
 
 #if !defined(OVERRIDE_eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe)
 __weak extern void eo_cfg_nvsEP_sk_hid_UPDT_sstatus__arrayof10canframe(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
