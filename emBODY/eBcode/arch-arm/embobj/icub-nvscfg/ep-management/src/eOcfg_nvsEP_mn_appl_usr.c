@@ -104,7 +104,7 @@ static const eOnv_fn_peripheral_t s_eo_cfg_nvsEP_mn_appl_ebx_cmmnds__go2state =
 };
 
 
-static const EOnv_usr_t s_eo_cfg_nvsEP_mn_appl_array_of_EOnv_usr[] =
+static EOnv_usr_t s_eo_cfg_nvsEP_mn_appl_array_of_EOnv_usr[] =
 {
     {   // 00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mn_appl_ebx_config,
