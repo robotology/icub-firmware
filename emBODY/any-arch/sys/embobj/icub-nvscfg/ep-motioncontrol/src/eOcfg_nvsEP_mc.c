@@ -63,7 +63,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-//#define EOCFG_NVSEP_MC_OVERRIDE
+#define EOCFG_NVSEP_MC_OVERRIDE
 
 #if defined(EOCFG_NVSEP_MC_OVERRIDE)
 #include "eOcfg_nvsEP_mc_overridden.h"
@@ -158,6 +158,9 @@ EO_VERIFYproposition(xxx, motorNVindex_TOTALnumber                          == E
 
 extern uint16_t eo_cfg_nvsEP_mc_joint_numbermax_Get(eOcfg_nvsEP_mc_endpoint_t ep)
 {
+    uint16_t max;
+    uint16_t i;
+
     static const uint8_t jmax[9] =
     {
         jointUpperArm_TOTALnumber, jointLowerArm_TOTALnumber,           // left arm
@@ -167,8 +170,8 @@ extern uint16_t eo_cfg_nvsEP_mc_joint_numbermax_Get(eOcfg_nvsEP_mc_endpoint_t ep
         jointUpperLeg_TOTALnumber, jointLowerLeg_TOTALnumber            // right leg       
     };  EO_VERIFYsizeof(jmax, 9*sizeof(uint8_t));
     
-    uint16_t max = 0; 
-    uint16_t i = (uint16_t)ep - (uint16_t)endpoint_mc_leftupperarm;
+    max = 0; 
+    i = (uint16_t)ep - (uint16_t)endpoint_mc_leftupperarm;
     if(i < 9)
     {
         max = jmax[i];
