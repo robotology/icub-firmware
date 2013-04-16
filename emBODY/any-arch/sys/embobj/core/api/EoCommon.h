@@ -578,12 +578,15 @@ EO_extern_inline eOresult_t eo_common_Q17_14_mult(eOq17_14_t q_num1, eOq17_14_t 
     int64_t tmp;
     
     tmp = ((int64_t)q_num1) * ((int64_t)q_num2);
+
     if(tmp >= 0x200000000000LL)
     {
         return(eores_NOK_generic);
     }
-    
-    *q_res = (tmp + (1<<13))>>14;
+
+    tmp = (tmp + (1<<13))>>14;  // acemor: split the following two to remove a warning on visual studio    
+    *q_res = (eOq17_14_t)tmp; 
+
     return(eores_OK);
 }
 
