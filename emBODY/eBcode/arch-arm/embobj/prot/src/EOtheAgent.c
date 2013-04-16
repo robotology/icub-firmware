@@ -334,7 +334,7 @@ extern eOresult_t eo_agent_OutROPrefresh(EOtheAgent *p, EOrop *rop)
 //     {
 //         return(eores_NOK_generic);
 //     }
-    #warning --> i remove a check ... think of how to put it back again. maybe vs. ropcode. 
+    //#warning --> i remove a check ... think of how to put it back again. maybe vs. ropcode. 
 
     
     // ok, now we are ready to update the rop
@@ -615,7 +615,7 @@ extern eOresult_t eo_agent_hid_OutROPonTransmission(EOtheAgent *p, EOrop *rop)
     {
         if(NULL !=  eo_theagent.cfg->on_rop_conf_requested)
         {
-            #warning --> in eo_agent_hid_OutROPonTransmission() ho rimosso il ip di destinazione
+//            #warning --> in eo_agent_hid_OutROPonTransmission() ho rimosso il ip di destinazione
             eo_theagent.cfg->on_rop_conf_requested(/*rop->aboutip.ipaddr*/0, rop->stream.head.ropc, rop->stream.head.endp, rop->stream.head.nvid, rop->stream.sign, rop->stream.time);
         }
         return(eores_OK);
