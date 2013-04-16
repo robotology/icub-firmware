@@ -73,6 +73,14 @@
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
+static const uint8_t s_dd[1] = {0};
+
+static const EOconstvector s_eo_cfg_nvsEP_board_empty = 
+{
+    EO_INIT(.size)                  0,
+    EO_INIT(.item_size)             1,
+    EO_INIT(.item_array_data)       s_dd
+};
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables
@@ -86,40 +94,58 @@
 
 
 
-extern EOconstvector* eo_cfg_nvsEP_board_EPs_nvscfgep_get(uint8_t boardNum)
+extern const EOconstvector* eo_cfg_nvsEP_board_EPs_nvscfgep_get(uint8_t boardNum)
 {
-	const EOconstvector* 	EPvector;
+	const EOconstvector* EPvector = &s_eo_cfg_nvsEP_board_empty;
 	switch(boardNum)
 	{
 		case 1:
+        {
 			EPvector = eo_cfg_EPs_vectorof_eb1;
-			break;
+        } break;
+
 		case 2:
-			EPvector = eo_cfg_EPs_vectorof_eb2;
-			break;
+		{
+            EPvector = eo_cfg_EPs_vectorof_eb2;
+        } break;
+
 		case 3:
-			EPvector = eo_cfg_EPs_vectorof_eb3;
-			break;
+		{
+            EPvector = eo_cfg_EPs_vectorof_eb3;
+        } break;
+
 		case 4:
-			EPvector = eo_cfg_EPs_vectorof_eb4;
-			break;
+		{
+            EPvector = eo_cfg_EPs_vectorof_eb4;
+        } break;
+
 		case 5:
-			EPvector = eo_cfg_EPs_vectorof_eb5;
-			break;
+		{ 
+            EPvector = eo_cfg_EPs_vectorof_eb5;
+        } break;
+
 		case 6:
-			EPvector = eo_cfg_EPs_vectorof_eb6;
-			break;
+        {
+            EPvector = eo_cfg_EPs_vectorof_eb6;
+        } break;
+
 		case 7:
+        {
 			EPvector = eo_cfg_EPs_vectorof_eb7;
-			break;
+        } break;
+
 		case 8:
-			EPvector = eo_cfg_EPs_vectorof_eb8;
-			break;
+		{
+            EPvector = eo_cfg_EPs_vectorof_eb8;
+        } break;
+
 		case 9:
-			EPvector = eo_cfg_EPs_vectorof_eb9;
-			break;
+		{ 
+            EPvector = eo_cfg_EPs_vectorof_eb9;
+        } break;
+
 	}
-	return EPvector;
+	return(EPvector);
 }
 
 extern uint16_t eo_cfg_nvsEP_board_EPs_numberof_get(const EOconstvector* constvectorof_nvscfgep)
@@ -205,7 +231,6 @@ extern uint16_t eo_cfg_nvsEP_board_NVs_total_numberof_get(const EOconstvector* c
 extern uint16_t eo_cfg_nvsEP_board_NVs_endpoint_numberof_get(const EOconstvector* constvectorof_nvscfgep, uint16_t epindex)
 {  
 	uint16_t number = 0;
-	eOsizecntnr_t i;
 	eOnvscfg_EP_t *epscfg = NULL;
 
 	if(EOK_uint16dummy == epindex)
@@ -230,7 +255,6 @@ extern eOnvID_t eo_cfg_nvsEP_board_NVs_endpoint_NVID_get(const EOconstvector* co
 	//   const EOconstvector* constvectorof_nvscfgep = eo_cfg_EPs_vectorof_eb1;
 
 	eOnvID_t nvid = EOK_uint16dummy;
-	eOsizecntnr_t i;
 	eOsizecntnr_t number;
 	eOnvscfg_EP_t *epscfg = NULL;
 	EOtreenode *treenode = NULL;
@@ -269,6 +293,11 @@ extern eOnvID_t eo_cfg_nvsEP_board_NVs_endpoint_NVID_get(const EOconstvector* co
 extern uint16_t eo_cfg_nvsEP_board_NVs_endpoint_Nvindex_get(const eOnvscfg_EP_t* EPcfg, eOnvID_t nvid)
 {
 	uint16_t nvindex = EOK_uint16dummy;
+
+    if(NULL == EPcfg)
+    {
+        return(nvindex);
+    }
 
 	nvindex = EPcfg->hashfunction_id2index(nvid);
 	return nvindex;
