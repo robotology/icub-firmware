@@ -25,10 +25,14 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
+#include "EoCommon.h"
 
 #include "stdlib.h"
-#include "EoCommon.h"
 #include "string.h"
+
+#if defined(EO_TAILOR_CODE_FOR_ARM)
+    #error ERROR -> cannot use this file in ARM environment as printf does not work
+#endif
 
 // acemor: cannot use printf in embOBJ. use error manager instead
 #pragma message("WARNING-> acemor: cannot use printf in embOBJ. use error manager instead")
