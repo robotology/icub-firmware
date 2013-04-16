@@ -171,7 +171,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static const EOnv_usr_t s_eo_cfg_nvsEP_mc_upperarm_usr_array_of_EOnv_usr[] =
+static EOnv_usr_t s_eo_cfg_nvsEP_mc_upperarm_usr_array_of_EOnv_usr[] =
 {
     {   // j00 
         EO_INIT(.peripheralinterface)   &s_eo_cfg_nvsEP_mc_upperarm_j00_ebx_jconfig,
