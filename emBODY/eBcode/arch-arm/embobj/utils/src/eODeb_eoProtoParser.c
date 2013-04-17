@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       eOlowLevelParser_embObjProto.c
+/* @file       eODeb_eoProtoParser.c
     @brief      
     @author     valentina.gaggero@iit.it
     @date       03/18/2013
@@ -29,14 +29,6 @@
 
 #include "stdlib.h"
 #include "string.h"
-
-#if defined(EO_TAILOR_CODE_FOR_ARM)
-    #error ERROR -> cannot use this file in ARM environment as printf does not work
-#endif
-
-// acemor: cannot use printf in embOBJ. use error manager instead
-#pragma message("WARNING-> acemor: cannot use printf in embOBJ. use error manager instead")
-#include "stdio.h"
 
 #include "EOropframe_hid.h"
 #include "EOrop_hid.h"
@@ -131,7 +123,7 @@ extern eOresult_t eODeb_eoProtoParser_RopFrameDissect(eODeb_eoProtoParser *p, eO
     {
         return(eores_NOK_nullpointer);
     }
-//printf("_RopFrameDissect : 1\n");
+
     //1) verify if i received a valid ropframe
     if(!(s_eodeb_eoProtoParser_isvalidropframe(pktInfo_ptr->payload_ptr)))
     {
@@ -205,10 +197,9 @@ static eOresult_t s_eodeb_eoProtoParser_CheckNV(eODeb_eoProtoParser *p, eOethLow
 	rop_ptr = &pktInfo_ptr->payload_ptr[ROPFRAME_HEADER_SIZE];
 	ropheader = (eOrophead_t*)rop_ptr;
 
-	//            printf("src addr 0x%x dest addr 0x%x\n ",  pktInfo_ptr->src_addr, pktInfo_ptr->dst_addr);
 	for(i=0; i<ropframeheader->ropsnumberof; i++)
 	{
-		uint8_t *enddata_ptr;
+		//uint8_t *enddata_ptr;
 		eODeb_eoProtoParser_ropAdditionalInfo_t ropAddInfo = {0};
 		int32_t filldata = 0, totdatasize = 0, signaturesize = 0, timesize = 0;
 
@@ -222,8 +213,8 @@ static eOresult_t s_eodeb_eoProtoParser_CheckNV(eODeb_eoProtoParser *p, eOethLow
 		//calculate total data size
 		totdatasize = (ropheader->dsiz) + filldata;
 
-		//save ptr to enddata
-		enddata_ptr = &rop_ptr[(ropheader->dsiz) + filldata];
+// 		//save ptr to enddata
+// 		enddata_ptr = &rop_ptr[(ropheader->dsiz) + filldata];
 
 		if(ropheader->ctrl.plussign == 1)
 		{
@@ -354,11 +345,10 @@ static eOresult_t s_eodeb_eoProtoParser_DumpNV(eODeb_eoProtoParser *p, eOethLowL
 	rop_ptr = &pktInfo_ptr->payload_ptr[ROPFRAME_HEADER_SIZE];
 	ropheader = (eOrophead_t*)rop_ptr;
 
-	printf("\n\nsrc addr 0x%x dest addr 0x%x \t numofrop%d \n ",  pktInfo_ptr->src_addr, pktInfo_ptr->dst_addr, ropframeheader->ropsnumberof);
 	for(i=0; i<ropframeheader->ropsnumberof; i++)
 	{
 
-		uint8_t *enddata_ptr;
+//		uint8_t *enddata_ptr;
 		eODeb_eoProtoParser_ropAdditionalInfo_t ropAddInfo = {0};
 		int32_t filldata = 0, totdatasize = 0, signaturesize = 0, timesize = 0;
 
@@ -383,8 +373,8 @@ static eOresult_t s_eodeb_eoProtoParser_DumpNV(eODeb_eoProtoParser *p, eOethLowL
 		//calculate total data size
 		totdatasize = (ropheader->dsiz) + filldata;
 
-		//save ptr to enddata
-		enddata_ptr = &rop_ptr[(ropheader->dsiz) + filldata];
+// 		//save ptr to enddata
+// 		enddata_ptr = &rop_ptr[(ropheader->dsiz) + filldata];
 
 		if(ropheader->ctrl.plussign == 1)
 		{
@@ -401,14 +391,10 @@ static eOresult_t s_eodeb_eoProtoParser_DumpNV(eODeb_eoProtoParser *p, eOethLowL
 		}
 
 
-		printf("ep=0x%x id=0x%x size=%hd\n", ropAddInfo.desc.ep, ropAddInfo.desc.id, ropAddInfo.desc.size);
-
-
 		//go to next rop
 		rop_ptr = &rop_ptr[ROP_HEADER_SIZE + totdatasize + signaturesize + timesize];
 		ropheader = (eOrophead_t*)rop_ptr;
 	}
-	fflush(stdout);
 
     return(eores_OK);
 }
