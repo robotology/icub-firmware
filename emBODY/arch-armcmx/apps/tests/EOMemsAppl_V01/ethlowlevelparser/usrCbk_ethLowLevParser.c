@@ -82,6 +82,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
+#ifdef _TEST_SEQNUM_
 extern void EthLowLevParser_callbackInHAL(uint8_t *packet)
 {
     eOresult_t res;
@@ -111,7 +112,13 @@ extern void my_cbk_onNVfound(eOethLowLevParser_packetInfo_t *pktInfo_ptr, eODeb_
     hal_trace_puts(str);
 }
 
+#else
+extern void EthLowLevParser_callbackInHAL(uint8_t *packet)
+{
+;
+}
 
+#endif
 
 
 
