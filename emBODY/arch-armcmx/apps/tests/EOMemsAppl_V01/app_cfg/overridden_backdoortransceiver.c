@@ -33,11 +33,15 @@
 
 #include "EOemsController_hid.h" 
 
+#include "EOtheEMSApplBody.h"    //to see EOcanFaultLogDEBUG_t
+
+#include "EOappEncodersReader_hid.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
-
+extern EOcanFaultLogDEBUG_t EOcanFaultLogDEBUG;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -53,6 +57,11 @@ static void on_rec_runner_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map,
 static void on_rec_transceiver_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata);
 
 static void on_rec_emscontroller_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata);
+
+static void on_rec_canFaultLog_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata);
+
+static void on_rec_encoderError_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata);
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
@@ -89,14 +98,27 @@ static opcprotman_var_map_t s_myarray[] =
         .size       = sizeof(eo_emsController_hid_DEBUG),
         .ptr        = &eo_emsController_hid_DEBUG,
         .onrec      = on_rec_emscontroller_debug
-    }    
+    },    
+    {
+        .var        = eo_canFaultLogDEBUG_id,
+        .size       = sizeof(EOcanFaultLogDEBUG_t),
+        .ptr        = &EOcanFaultLogDEBUG,
+        .onrec      = on_rec_canFaultLog_debug
+    },
+
+     {
+        .var        = eo_EncoderErrorDEBUG_id,
+        .size       = sizeof(EOencoderErrorDEBUG_t),
+        .ptr        = &EOencoderErrorDEBUG,
+        .onrec      = on_rec_encoderError_debug
+    } 
     
 };
 
 extern opcprotman_cfg_t opcprotmanCFGv0x1234 =
 {
     .databaseversion        = 0x1234,
-    .numberofvariables      = 4,
+    .numberofvariables      = 6,
     .arrayofvariablemap     = s_myarray
 };
 
@@ -199,6 +221,51 @@ static void on_rec_emscontroller_debug(opcprotman_opc_t opc, opcprotman_var_map_
     
 }
 
+static void on_rec_canFaultLog_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata)
+{   // for the ems
+    
+    //NOTE: never rec in ems
+    switch(opc)
+    {
+        
+        case opcprotman_opc_set:
+        {   // someboby has sent us the order of copying recdata into map->ptr 
+            
+            // we just dont do it ...         
+        } break;
+        
+        case opcprotman_opc_say:    // someboby has replied to a ask we sent
+        case opcprotman_opc_sig:    // someboby has spontaneously sent some data
+        default:
+        {   // other are not managed
+        
+        } break;
+    }       
+    
+}
+
+static void on_rec_encoderError_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata)
+{   // for the ems
+    
+    //NOTE: never rec in ems
+    switch(opc)
+    {
+        
+        case opcprotman_opc_set:
+        {   // someboby has sent us the order of copying recdata into map->ptr 
+            
+            // we just dont do it ...         
+        } break;
+        
+        case opcprotman_opc_say:    // someboby has replied to a ask we sent
+        case opcprotman_opc_sig:    // someboby has spontaneously sent some data
+        default:
+        {   // other are not managed
+        
+        } break;
+    }       
+    
+}
 
 // static void generic_on_rec(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata)
 // {   // the copy in map->ptr is not yet done ...

@@ -109,7 +109,11 @@ extern volatile uint8_t numtx[2];
 
 //contatore cicli RX-DO-TX 
 uint32_t ciclecount = 0;
-    
+
+
+#ifdef _BDOOR_DEB_CANMSG_LOG_
+extern EOcanFaultLogDEBUG_t EOcanFaultLogDEBUG;
+#endif
     
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -168,7 +172,9 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EO
     ciclecount++;
     
     // DEBUG
+    #ifdef __MC_BACKDOOR__
     eo_emsController_hid_DEBUG_reset();
+    #endif
 }
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
@@ -185,7 +191,9 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
         
         case applrunMode__2foc:
         {
+            #ifdef __MC_BACKDOOR__
             eo_emsController_hid_DEBUG_evaltransmission();
+            #endif
             s_eom_emsrunner_hid_taskRX_act_afterdgramrec_2foc_mode(emsappbody_ptr);
         }break;
         
@@ -572,7 +580,9 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_inOneMsgOnly(EOtheEMSap
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_periodicMotorBoard,
         EO_INIT(.cmdId) ICUBCANPROTO_PER_MB_CMD_EMSTO2FOC_DESIRED_CURRENT
     };
-
+#ifdef _BDOOR_DEB_CANMSG_LOG_
+    extern int8_t canLogFaultDeb_count;
+#endif
 
     uint16_t numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
     
@@ -585,6 +595,13 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_inOneMsgOnly(EOtheEMSap
         }
         
         pwm_aux[canLoc.addr-1] = pwmList[jid];
+#ifdef _BDOOR_DEB_CANMSG_LOG_
+        if(canLogFaultDeb_count == -1)
+        {
+            EOcanFaultLogDEBUG.currSetPointList[jid] = pwmList[jid];
+        }
+#endif
+    
     }
     //since msg is periodic, all 2foc received it so dest is useless.
     dest.dest = 0;

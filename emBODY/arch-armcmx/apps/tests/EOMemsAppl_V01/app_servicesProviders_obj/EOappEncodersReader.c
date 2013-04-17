@@ -98,6 +98,10 @@ static const hal_encoder_t encoderMap[eOeOappEncReader_encoderMaxNum] =
     /* 5 */     hal_encoder9
 };
 
+
+EOencoderErrorDEBUG_t EOencoderErrorDEBUG = {0};
+uint16_t count_enc_read = 0;
+#define MAX_COUNT_ENC_READ      4000
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -183,13 +187,31 @@ extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_en
         
         return(res);
     }
-
+#ifdef _BDOOR_ENCERROR_
+    count_enc_read++;
+    if(count_enc_read == MAX_COUNT_ENC_READ)
+    {
+        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eo_EncoderErrorDEBUG_id, eok_reltimeINFINITE);  
+        count_enc_read = 0;
+        memset(&EOencoderErrorDEBUG, 0, sizeof(EOencoderErrorDEBUG_t));
+    }
+#endif    
     uint8_t error = s_eo_appEncReader_IsValidValue(&val_raw); 
 
     if (error)
     {
         *value = error;
         
+#ifdef _BDOOR_ENCERROR_
+        if(error == 1)
+        {
+             EOencoderErrorDEBUG.parityCheck[enc]++;
+        }
+        if(error ==2)
+        {
+            EOencoderErrorDEBUG.status[enc]++;
+        }
+#endif     
         return(eores_NOK_generic);
     }
 
@@ -335,9 +357,15 @@ static uint8_t s_eo_appEncReader_IsValidValue(uint32_t *valueraw)
         parity_error ^= (*valueraw)>>b;
     }
     
-    if (parity_error & 1) return 1;
+    if (parity_error & 1) 
+    { 
+        return 1;
+    }
     
-    if ((0x38 & *valueraw) != 0x20) return 2;
+    if ((0x38 & *valueraw) != 0x20)
+    {
+        return 2;
+    }
     
     return 0;
     

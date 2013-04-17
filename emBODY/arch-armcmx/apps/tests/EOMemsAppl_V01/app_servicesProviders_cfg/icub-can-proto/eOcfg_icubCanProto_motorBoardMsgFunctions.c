@@ -92,7 +92,11 @@ static eOresult_t s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcContro
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+EOcanFaultLogDEBUG_t EOcanFaultLogDEBUG = {0};
+#ifdef _BDOOR_DEB_CANMSG_LOG_
+    int8_t canLogFaultDeb_count = -1;                 
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1297,6 +1301,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOmc_controlmode_t                      eomc_controlmode;
     eOmn_appl_runMode_t                     runmode; 
+    
 
     
     // set position about the first joint in board
@@ -1324,6 +1329,28 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         eo_emsController_ReadMotorstatus(mId, frame->data[0], frame->data[4], eomc_controlmode);
         //l'aggiornamento delle nv sara' fatto nel DO.
         //se l'appl e' in config sicuramente i giunti sono in idle e quindi non c'e' ninete da aggiornare
+        
+        #ifdef _BDOOR_DEB_CANMSG_LOG_
+        if(canLogFaultDeb_count != -1)
+        {
+            memcpy(&EOcanFaultLogDEBUG.nextCanMsgs[canLogFaultDeb_count], frame, sizeof(eOcanframe_t));
+            canLogFaultDeb_count++;
+            if(canLogFaultDeb_count == 6)
+            {
+                eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eo_canFaultLogDEBUG_id, eok_reltimeINFINITE);        
+                canLogFaultDeb_count = -1;
+                memset(&EOcanFaultLogDEBUG, 0, sizeof(EOcanFaultLogDEBUG_t));
+            }
+            return(eores_OK);
+        }
+        if(((frame->data[0] & 0x08) == 0x8) || ((frame->data[0] & 0x04) == 0x4)) //over curr fault or ext fault
+        {
+            memcpy(&EOcanFaultLogDEBUG.overCurrentMsg, frame, sizeof(eOcanframe_t));
+            canLogFaultDeb_count = 0;
+            return(eores_OK);
+        }
+        #endif
+        
         return(eores_OK);
     }
     else
