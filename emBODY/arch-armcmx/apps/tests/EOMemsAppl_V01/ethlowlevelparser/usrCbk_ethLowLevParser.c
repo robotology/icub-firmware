@@ -112,13 +112,17 @@ extern void my_cbk_onNVfound(eOethLowLevParser_packetInfo_t *pktInfo_ptr, eODeb_
     hal_trace_puts(str);
 }
 
-#else
-extern void EthLowLevParser_callbackInHAL(uint8_t *packet)
-{
-;
-}
+// #else
+// extern int pippo;
+// extern void EthLowLevParser_callbackInHAL(uint8_t *packet, uint32_t size)
+// {
+//     char str[80];
+//     sprintf(str, "HO RICEVUTO UN PKT");
+//     hal_trace_puts(str);
+//     pippo = 5;
+// }
 
-#endif
+ #endif
 
 
 

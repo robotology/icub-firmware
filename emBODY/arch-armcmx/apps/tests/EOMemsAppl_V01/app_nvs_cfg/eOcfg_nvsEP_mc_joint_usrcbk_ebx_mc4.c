@@ -499,52 +499,20 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
         case eomc_setpoint_position:
         {
             eOicubCanProto_setpoint_position_t  setpoint_pos;
-            eOicubCanProto_velocity_t           vel_tmp;
             
             setpoint_pos.value = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, setPoint->to.position.value);
             //reference velocity of position set point must be always >0, so here absolute func is used.
-//            vel_tmp = eo_appMeasConv_jntVelocity_I2E_abs(appMeasConv_ptr,jxx, setPoint->to.position.withvelocity);
-//             //the velocity is dived by 10, because in the fw of mc4 the velocity is sued to get the needed time to reach the setpoint,
-//             //so the value is moltyply by 100.
-//             setpoint_pos.withvelocity = vel_tmp/10;
             setpoint_pos.withvelocity = eo_appMeasConv_jntVelocity_I2E_abs(appMeasConv_ptr,jxx, setPoint->to.position.withvelocity);
             msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__POSITION_MOVE; 
             val_ptr =  &setpoint_pos; 
-
-//             snprintf(str, sizeof(str)-1, "POSIZIONE: rec_pos=%x rec_vel=%x pos=%d, vel=%d", 
-//                      setPoint->to.position.value, setPoint->to.position.withvelocity,
-//                      setpoint_pos.value, setpoint_pos.withvelocity);  
-//             eo_errman_Info(eo_errman_GetHandle(), "SET POINT", str);            
         }break;
 
         case eomc_setpoint_velocity:
         {
             eOicubCanProto_setpoint_velocity_t  setpoint_vel;
-            eOicubCanProto_velocity_t           vel_tmp;
-            eOicubCanProto_acceleration_t       acc_tmp;
             
-//             vel_tmp = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, setPoint->to.velocity.value);
-//             acc_tmp = eo_appMeasConv_jntAcceleration_I2E(appMeasConv_ptr, jxx, setPoint->to.velocity.withacceleration);
-
-//             //in order to send velocity to mc4 like setpoint i need to convert it in encoderticks/ms end after shift in order to obtain a small value
-//             setpoint_vel.value = ((vel_tmp/1000) << eo_appMeasConv_hid_GetVelEstimShift(appMeasConv_ptr, jxx));
-//             setpoint_vel.withacceleration = acc_tmp << eo_appMeasConv_hid_GetVelEstimShift(appMeasConv_ptr, jxx);
-
- 
             setpoint_vel.withacceleration = eo_appMeasConv_jntAcceleration_I2E_abs(appMeasConv_ptr, jxx, setPoint->to.velocity.withacceleration);           
             setpoint_vel.value = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, setPoint->to.velocity.value);
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            //old
-//            setpoint_vel.value = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, setPoint->to.velocity.value);
-//            setpoint_vel.withacceleration = eo_appMeasConv_jntAcceleration_I2E(appMeasConv_ptr, jxx, setPoint->to.velocity.withacceleration);           
             
             if (setpoint_vel.withacceleration < 1)
             {
@@ -553,8 +521,6 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
             
             msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__VELOCITY_MOVE;                 
             val_ptr =  &setpoint_vel;   
-//             snprintf(str, sizeof(str)-1, "VELOCITA: vel=%d, acc=%d", setpoint_vel.value, setpoint_vel.withacceleration);  
-//             eo_errman_Info(eo_errman_GetHandle(), "SET POINT", str);            
             
         }break;
 

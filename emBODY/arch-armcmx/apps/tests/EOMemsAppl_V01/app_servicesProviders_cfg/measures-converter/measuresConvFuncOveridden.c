@@ -157,18 +157,13 @@ extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E(EOappMeasConv *p
     }
 #endif
     
-//    return(((eOicubCanProto_velocity_t)((i_vel * eo_appMeasConv_hid_GetEncConv_factor(p, jId))/1000))<<eo_appMeasConv_hid_GetVelShift(p, jId));
-    
-    
-      //in order to send velocity to mc4 like setpoint i need to convert it in encoderticks/ms end after shift in order to obtain a small value
+ 
+      //in order to send velocity to mc4 like setpoint i need to convert it in encoderticks/ms and after shift in order to obtain a small value
       tmp = i_vel * eo_appMeasConv_hid_GetEncConv_factor(p, jId);
       tmp = tmp *(1 << eo_appMeasConv_hid_GetVelEstimShift(p, jId)); //here i can't use shift because i_vel can be negative.
       tmp = tmp + 500;  //round to nearest integer
       tmp = tmp/1000; //convert from sec to ms
-    //  tmp = (tmp/1000) << eo_appMeasConv_hid_GetVelEstimShift(p, jId);
       return((eOicubCanProto_velocity_t)tmp);
-
-      //return((eOicubCanProto_velocity_t)(i_vel * eo_appMeasConv_hid_GetEncConv_factor(p, jId)));
 }
 
 extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
@@ -186,15 +181,14 @@ extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E_abs(EOappMeasCon
     }
 #endif
     
-
-    //return((eOicubCanProto_velocity_t)(i_vel * __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId))));
-            
+      
     //NEW VERSION:
-    /*the velocity is dived by 10, because the seuslt of followiong moltiplication
+    /*the velocity is dived by 10, because the reuslt of followiong moltiplication
     (i_vel * __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId)))
     can be bigger then 32767 (max value of int16)
     so thet result is divieded by 10.
     Note thet velocity is used to get the needed time to reach the setpoint, so in mc4 fw it is enogth to moltiply by 100 ensted of 1000 (1ms)
+    This operation was already done by CanBusMotionControl
     */
 
     temp = (i_vel * __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId)));
@@ -215,7 +209,6 @@ extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I(EOappMeasConv *p
     }
 #endif
     
-    //return(((e_acc *1000000)>>(eo_appMeasConv_hid_GetVelEstimShift(p, jId)+eo_appMeasConv_hid_GetAccEstimShift(p, jId)))/eo_appMeasConv_hid_GetEncConv_factor(p, jId));
     return((eOmeas_acceleration_t)e_acc /eo_appMeasConv_hid_GetEncConv_factor(p, jId));
 }
 
@@ -233,7 +226,6 @@ extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I_abs(EOappMeasCon
     }
 #endif
     
-    //return(((e_acc *1000000)>>(eo_appMeasConv_hid_GetVelEstimShift(p, jId)+eo_appMeasConv_hid_GetAccEstimShift(p, jId)))/eo_appMeasConv_hid_GetEncConv_factor(p, jId));
     return((eOmeas_acceleration_t)(e_acc / __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId))));
 }
 
@@ -252,7 +244,6 @@ extern eOicubCanProto_acceleration_t eo_appMeasConv_jntAcceleration_I2E(EOappMea
     }
 #endif
    
-//    return(((eOicubCanProto_acceleration_t)(i_acc * eo_appMeasConv_hid_GetEncConv_factor(p, jId)))<<eo_appMeasConv_hid_GetVelShift(p, jId));
     return((eOicubCanProto_acceleration_t)(i_acc * eo_appMeasConv_hid_GetEncConv_factor(p, jId)));
 }
 
@@ -272,14 +263,11 @@ int32_t tmp;
     }
 #endif
    
-//    return(((eOicubCanProto_acceleration_t)(i_acc * eo_appMeasConv_hid_GetEncConv_factor(p, jId)))<<eo_appMeasConv_hid_GetVelShift(p, jId));
     tmp = i_acc << eo_appMeasConv_hid_GetVelEstimShift(p, jId);
     tmp = tmp * __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId));
     tmp = tmp + 500000; //round to nearest integer
-    //tmp = tmp/1000;
     tmp = tmp/1000000; // conver from sec^2 to millsec^2 
     return((eOicubCanProto_acceleration_t)tmp);
-//    return((eOicubCanProto_acceleration_t)(i_acc * __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId))));
 }
 
 // --------------------------------------------------------------------------------------------------------------------
