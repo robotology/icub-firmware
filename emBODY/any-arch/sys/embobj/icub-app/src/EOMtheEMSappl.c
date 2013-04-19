@@ -626,8 +626,13 @@ EO_static_inline eOsmStatesEMSappl_t s_eom_emsappl_GetCurrentState(EOMtheEMSappl
 #ifdef _TEST_SEQNUM_
 extern void my_cbk_onErrorSeqNum(eOethLowLevParser_packetInfo_t *pktInfo_ptr, uint32_t rec_seqNum, uint32_t expected_seqNum);
 extern void my_cbk_onNVfound(eOethLowLevParser_packetInfo_t *pktInfo_ptr, eODeb_eoProtoParser_ropAdditionalInfo_t *ropAddInfo_ptr);
+//this variable is a function ptr.if is is not null, the isr invoked on rx pkt, will call the function ponted by this variable
+extern void (*hal_eth_lowLevelUsePacket_ptr)(uint8_t* pkt_ptr, uint32_t size);
+extern void EthLowLevParser_callbackInHAL(uint8_t *packet, uint32_t size);
 static void s_eom_emsappl_ethLowLevelParser_configure(void)
 {
+    
+    hal_eth_lowLevelUsePacket_ptr = EthLowLevParser_callbackInHAL;
 //     //4.1) init application parser: embObjParser
 //     const eODeb_eoProtoParser_cfg_t  deb_eoParserCfg = 
 //     {
