@@ -247,12 +247,9 @@ extern hal_result_t hal_encoder_read_block(hal_encoder_t enc, uint32_t *result)
     hal_brdcfg_spi4encoder__encoder_disable(spix, encoder);
     
     //formatting result
-//    *result = ( (value[0] & 0x7F)  << 16 ) | (value[1] << 8) | (value[2] & 0xE0);
-//    *result = (*result) >> 5;
-    *result = ( value[0]  << 16 ) | (value[1] << 8) | (value[2] & 0xC0);
-    *result = (*result) >> 6;
-
-
+   *result = ( (value[0] & 0x7F)  << 16 ) | (value[1] << 8) | (value[2] & 0xE0);
+   *result = (*result) >> 5;
+    
 
 	hal_base_hid_osal_scheduling_suspend(); //suspend scheduling
 

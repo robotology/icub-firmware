@@ -628,6 +628,9 @@ void hal_hid_link_to_all_files(void)
 #endif//HAL_USE_WATCHDOG 
 }
 
+//added to force initialisation of variable SystemCoreClock which is not a ZI variable and cannot be const.
+//defined in system_stm32f10x.c
+extern void cmsis_stm32f1_hid_set_system_core_clock(void);  
 
 extern void hal_base_hid_ram_basic_init(void)
 {

@@ -73,7 +73,12 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
-
+/* This variable can contain a ptr to a function that want to use a eth raw pkt (with ethernet and udp/tcp headers, etc)
+   For example this function can be a parser to check a particular info in a pkt, like sequence number
+   In oreder to use this variable, an external program have to declare hal_eth_lowLevelUsePacket_ptr like external and set
+   to the ptr of application's function.
+*/
+void (*hal_eth_lowLevelUsePacket_ptr)(uint8_t* pkt_ptr, uint32_t size) = NULL;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -459,7 +464,8 @@ void ETH_IRQHandler (void) {
   U32 i,RxLen;
   U32 *sp,*dp;
   //added 
-  hal_eth_frame_t *frame;    
+  hal_eth_frame_t *frame; 
+  uint32_t size = 0;    
     
 
 #if defined(HAL_USE_EVENTVIEWER_ETH)
@@ -497,6 +503,7 @@ void ETH_IRQHandler (void) {
 ///====> .... this code
       /* Flag 0x80000000 to skip sys_error() call when out of memory. */
       frame = s_onframerx.frame_new(RxLen | 0x80000000);
+      size = (RxLen | 0x80000000);
       /* if 'alloc_mem()' has failed, ignore this packet. */
       if (frame != NULL) {
         sp = (U32 *)(Rx_Desc[i].Addr & ~3);
@@ -504,8 +511,13 @@ void ETH_IRQHandler (void) {
         for (RxLen = (RxLen + 3) >> 2; RxLen; RxLen--) {
           *dp++ = *sp++;
         }
+                
         
-      
+        if(hal_eth_lowLevelUsePacket_ptr != NULL)
+        {
+            hal_eth_lowLevelUsePacket_ptr(&frame->datafirstbyte[0], size);
+        }
+        
         //put_in_queue (frame);
         s_onframerx.frame_movetohigherlayer(frame);
         if(NULL != s_onframerx.frame_alerthigherlayer)
@@ -513,6 +525,10 @@ void ETH_IRQHandler (void) {
             s_onframerx.frame_alerthigherlayer();
         }
     }
+//     else
+//     {
+//         //error: memory is missing!!
+//     }
 
         /* Release this frame from ETH IO buffer. */
 rel:Rx_Desc[i].Stat = DMA_RX_OWN;
