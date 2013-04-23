@@ -333,7 +333,7 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
         snprintf(str, sizeof(str)-1, "FIRST in TX: sem count = %d", MY_semaphore_count[0] );        
         hal_trace_puts(str); 
         first = 0;
-        run_data.isrunning = 1;
+       // run_data.isrunning = 1;
     }
     
 

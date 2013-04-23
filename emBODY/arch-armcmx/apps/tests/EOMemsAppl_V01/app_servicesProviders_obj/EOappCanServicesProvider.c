@@ -142,7 +142,7 @@ static const char s_eobj_ownname[] = "EOappCanSP";
 
 
 volatile uint8_t numtx[2] = {0,0};
-runnning_data_t run_data;
+//runnning_data_t run_data;
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -216,18 +216,18 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg)
     }
     
     
-    run_data.isrunning = 0;
+    retptr->run_data.isrunning = 0;
     
     
-    run_data.numoftxframe[0] = 0;
-    run_data.semafori[0] = osal_semaphore_new(255/*maxtokens*/, 0/*current num of token*/);
-    if(run_data.semafori[0] == NULL)
+    retptr->run_data.numoftxframe[0] = 0;
+    retptr->run_data.semafori[0] = osal_semaphore_new(255/*maxtokens*/, 0/*current num of token*/);
+    if(retptr->run_data.semafori[0] == NULL)
     {
         return(NULL);
     }
-    run_data.semafori[1] = osal_semaphore_new(255/*maxtokens*/, 0/*current num of token*/);
-    run_data.numoftxframe[1] = 0;
-    if(run_data.semafori[1] == NULL)
+    retptr->run_data.semafori[1] = osal_semaphore_new(255/*maxtokens*/, 0/*current num of token*/);
+    retptr->run_data.numoftxframe[1] = 0;
+    if(retptr->run_data.semafori[1] == NULL)
     {
         return(NULL);
     }
@@ -242,6 +242,11 @@ extern eOresult_t eo_appCanSP_starttransmit_XXX(EOappCanSP *p, eOcanport_t port)
 
     irqn = (eOcanport1 == port)? hal_arch_arm_CAN1_TX_IRQn : hal_arch_arm_CAN2_TX_IRQn;
    
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
     //disa tx
     hal_sys_irqn_disable(irqn);
     
@@ -249,7 +254,7 @@ extern eOresult_t eo_appCanSP_starttransmit_XXX(EOappCanSP *p, eOcanport_t port)
     //set num of can frame in out queue
     hal_can_out_get((hal_can_port_t)port, &numofoutframe);
     numtx[port] = numofoutframe;
-    run_data.numoftxframe[port] = numofoutframe;
+    p->run_data.numoftxframe[port] = numofoutframe;
     
     hal_sys_irqn_enable(irqn);
     
@@ -269,9 +274,14 @@ extern eOresult_t eo_appCanSP_wait_XXX(EOappCanSP *p, eOcanport_t port)
 //    hal_arch_arm_irqn_t     irqn;
     osal_result_t           osal_res = osal_res_OK ;
 
-    if(run_data.numoftxframe[port] != 0)
+    if(NULL == p)
     {
-        osal_res = osal_semaphore_decrement(run_data.semafori[port], osal_reltimeINFINITE);
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(p->run_data.numoftxframe[port] != 0)
+    {
+        osal_res = osal_semaphore_decrement(p->run_data.semafori[port], osal_reltimeINFINITE);
         RUN_semaphore_count[port]--;
 //         if(osal_res != osal_res_OK)
 //         {
@@ -492,6 +502,16 @@ extern eOresult_t eo_appCanSP_SetRunMode(EOappCanSP *p, eo_appCanSP_runMode_t ru
         p->waittxdata[hal_can_port1].waitenable = eobool_false;
         p->waittxdata[hal_can_port2].waitenable = eobool_false;
 //     }
+    
+    if(eo_appCanSP_runMode__onDemand ==  p->runmode)
+    {
+        p->run_data.isrunning = 1;
+    }
+    else
+    {
+        p->run_data.isrunning = 0;
+    }
+    
     return(eores_OK);
 }
 
@@ -554,7 +574,7 @@ extern eOresult_t eo_appCanSP_WaitTransmitCanFrames(EOappCanSP *p, eOcanport_t c
     }
     
     MY_semaphore_count[canport]--;
-    osal_res = osal_semaphore_decrement(run_data.semafori[canport], osal_reltimeINFINITE);
+    osal_res = osal_semaphore_decrement(p->run_data.semafori[canport], osal_reltimeINFINITE);
     
     if(osal_res != osal_res_OK)
     {
@@ -1061,9 +1081,9 @@ static void s_eo_appCanSP_callbackOnTx_portx_waittransmission(void *arg, hal_can
     }
 
     
-    if(run_data.isrunning)
+    if(p->run_data.isrunning)
     {
-        if(run_data.numoftxframe[port] == 0)
+        if(p->run_data.numoftxframe[port] == 0)
         {
             char str[100];
             snprintf(str, sizeof(str)-1, "Err isr numoftxframe[%d]=0 and numtx[port]=%d", port, numtx[port]);        
@@ -1074,7 +1094,7 @@ static void s_eo_appCanSP_callbackOnTx_portx_waittransmission(void *arg, hal_can
         {
             osal_result_t osal_res;
             RUN_semaphore_count[port]++;
-            osal_res  = osal_semaphore_increment(run_data.semafori[port], osal_callerISR);
+            osal_res  = osal_semaphore_increment(p->run_data.semafori[port], osal_callerISR);
             osal_res = osal_res;
 //             if(osal_res != osal_res_OK)
 //             {
@@ -1113,7 +1133,7 @@ static void s_eo_appCanSP_callbackOnRx_portx_allertOnReception(void *arg, hal_ca
     }
     p->cfg.cbkonrx[port].fn(p->cfg.cbkonrx[port].argoffn);
 }
-extern uint8_t numoftxfrme_failed;
+extern uint8_t numoftxfrme_failed[2];
 static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emscanport, eOicubCanProto_msgDestination_t dest, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr)
 {
     eOresult_t          res;
@@ -1167,7 +1187,7 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
         res = (eOresult_t)hal_can_put((hal_can_port_t)emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_later);
         if(eores_NOK_busy == res)
         {
-            numoftxfrme_failed++;
+            numoftxfrme_failed[emscanport]++;
             can_out_queue_full = 1;
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "lost can frame (out-queue full)");
         }

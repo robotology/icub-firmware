@@ -55,6 +55,13 @@ typedef struct
 
 
 
+typedef struct
+{
+    uint8_t isrunning;
+    uint8_t numoftxframe[2];
+    osal_semaphore_t*   semafori[2];
+} eOappCanSP_runnning_data_t;
+
 /** @struct     EOconstvector_hid
     @brief      Hidden definition. Implements private data used only internally by the 
                 public or private (static) functions of the object and protected data
@@ -67,6 +74,7 @@ struct EOappCanSP_hid
     EOicubCanProto                          *icubCanProto_ptr;
     eo_appCanSP_runMode_t                   runmode;
     eOappCanSP_waitTxIsDone_datastruct_t    waittxdata[hal_can_ports_num];
+    eOappCanSP_runnning_data_t              run_data;
 };
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
