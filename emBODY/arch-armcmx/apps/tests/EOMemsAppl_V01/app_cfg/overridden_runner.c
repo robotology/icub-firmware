@@ -103,7 +103,7 @@ volatile int8_t MY_semaphore_count[2] = {0, 0};
 volatile int8_t RUN_semaphore_count[2] = {0, 0};
 
 //dati di canservicepropvider
-extern runnning_data_t run_data;
+//extern runnning_data_t run_data;
 extern volatile uint8_t numtx[2];
 
 
