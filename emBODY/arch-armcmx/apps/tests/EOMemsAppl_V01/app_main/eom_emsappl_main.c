@@ -110,11 +110,11 @@ int main(void)
 
 }
 #ifdef _TEST_SEQNUM_
-extern uint32_t ciclecount;
+
 extern void eo_receiver_callback_incaseoferror_in_sequencenumberReceived(uint64_t rec_seqnum, uint64_t expected_seqnum)
 {
     char str[80];
-    sprintf(str, "SEQ_NUM: rec=%llu expeted=%llu in cyclenum %d", rec_seqnum, expected_seqnum, ciclecount);
+    sprintf(str, "SEQ_NUM: rec=%llu expeted=%llu ", rec_seqnum, expected_seqnum);
     hal_trace_puts(str);
 
     hal_led_on(hal_led0); //led rosso
