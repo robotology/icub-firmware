@@ -22,6 +22,7 @@
 
 
 #include "EOMtheEMSbackdoor.h"
+#include "OPCprotocolManager_Cfg.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -58,7 +59,6 @@ const float   EMS_FREQUENCY_FLOAT  = 1000.0f;
 const int32_t TICKS_PER_REVOLUTION = 65536;
 
 
-//extern const uint16_t eo_emsController_hid_DEBUG_id = 4;
 extern EOemsControllerDEBUG_t eo_emsController_hid_DEBUG =
 {
     .boardid        = eom_emsappl_boardid_ebnone,

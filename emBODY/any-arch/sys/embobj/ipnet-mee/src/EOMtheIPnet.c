@@ -55,6 +55,7 @@
 
 #include "EOMtheIPnet_hid.h" 
 #include "EOMmutex_hid.h" 
+#include "OPCprotocolManager_Cfg.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -71,7 +72,6 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-//extern const uint16_t eom_ipnet_hid_DEBUG_id    = 1;
 extern EOMtheIPnetDEBUG_t eom_ipnet_hid_DEBUG   =
 {
     .datagrams_failed_to_go_in_rxfifo               = 0,

@@ -50,6 +50,8 @@
 
 #include "eventviewer.h"
 
+#include "OPCprotocolManager_Cfg.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -162,7 +164,7 @@ static EOMtheEMSrunner s_theemsrunner =
     EO_INIT(.osaltaskipnetexec)     NULL
 };
 
-//extern const uint16_t eom_emsrunner_hid_DEBUG_id        = 2;
+
 extern EOMtheEMSrunnerDEBUG_t eom_emsrunner_hid_DEBUG   =
 {
     .numberofperiods                            = 0,

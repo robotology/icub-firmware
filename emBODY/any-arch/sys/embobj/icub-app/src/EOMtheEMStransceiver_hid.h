@@ -59,22 +59,9 @@ struct EOMtheEMStransceiver_hid
     EOtransceiver*  transceiver;
 };
 
-typedef struct
-{
-    uint32_t    rxinvalidropframes;
-    uint32_t    errorsinsequencenumber;
-    uint32_t    lostreplies;
-    uint32_t    failuresinloadofreplyropframe;
-    uint32_t    txropframeistoobigforthepacket;
-    uint32_t    cannotloadropinregulars;
-    uint32_t    cannotloadropinoccasionals;
-} EOMtheEMStransceiverDEBUG_t;
-
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-#define eom_emstransceiver_hid_DEBUG_id 3
-extern EOMtheEMStransceiverDEBUG_t eom_emstransceiver_hid_DEBUG;
 
 //extern eOboardtransceiver_cfg_t* eom_emstransceiver_hid_userdef_get_cfg(const eOemstransceiver_cfg_t *cfg);
 
