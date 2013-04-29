@@ -82,33 +82,7 @@ extern int16_t torque_debug_can[4];
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
-uint8_t numoftxfrme_failed[2] = {0, 0}; // indica quante volte durante la fase di rx e do ho provato a mettere in coda un farme
-                                        //e ritorna coda piena.
-                                        //questo numero e' resettato a fine ciclo
-                                
-uint8_t numofframe_2send[2] = {0, 0}; // contiene il numero di messaggi da inviare appena entrati nella fase di tx
-uint8_t numofframe_2sendRemain[2] = {0, 0};  // contiene il numero di messaggi ancora presenti in coda alla fine della fase di tx.
 
-// nel caso in cui ho ancora dei frame in coda all'uscita dalla fase di tx questi contatori mi dicono cosa succede 
-//durante le sucessive fasi rx e DO. 
-uint8_t ena_checktx_nexttime = 0; //abilita il controllo
-uint8_t countput_netxtime[2] = {0, 0};
-
-uint8_t counput4cycle[2] = {0, 0};
-
-
-volatile int8_t MY_semaphore_count[2] = {0, 0};
-
-//da usare con funzioni XXX
-volatile int8_t RUN_semaphore_count[2] = {0, 0};
-
-//dati di canservicepropvider
-//extern runnning_data_t run_data;
-extern volatile uint8_t numtx[2];
-
-
-//contatore cicli RX-DO-TX 
-uint32_t ciclecount = 0;
 
 
 #ifdef _BDOOR_DEB_CANMSG_LOG_
@@ -169,7 +143,6 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EO
     {
          eo_appEncReader_StartRead(eo_emsapplBody_GetEncoderReaderHandle(eo_emsapplBody_GetHandle()));
     }
-    ciclecount++;
     
     // DEBUG
     #ifdef __MC_BACKDOOR__
@@ -267,8 +240,6 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
 
     EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
     //eOresult_t res;
-    static uint8_t first = 1;
-    char str[130];
     
 #ifdef _USE_PROTO_TEST_
     eOmc_setpoint_t     mySetPoint_current = 
@@ -321,35 +292,10 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
     */
     
     
-    if((numoftxfrme_failed[0] != 0) || (numoftxfrme_failed[0] != 0))
-    {
-        snprintf(str, sizeof(str)-1, "num tx FAILED frame: numfailure[0]=%d numfailure[1]=%d", numoftxfrme_failed[0], numoftxfrme_failed[1]);        
-        hal_trace_puts(str);
-    }
-    
-    
-    if(first)
-    {
-        snprintf(str, sizeof(str)-1, "FIRST in TX: sem count = %d", MY_semaphore_count[0] );        
-        hal_trace_puts(str); 
-        first = 0;
-       // run_data.isrunning = 1;
-    }
-    
+ 
 
-    eo_appCanSP_GetNumOfTxCanframe(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1, &numofframe_2send[0]);
-    eo_appCanSP_GetNumOfTxCanframe(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport2, &numofframe_2send[1]);
+ 
     
-    
-    if(ena_checktx_nexttime)
-    {
-        for(int i=0; i<2; i++)
-        {
-            snprintf(str, sizeof(str)-1, "NEXT_TIME: cyclecount=%d port=%d numofput=%d, isrcount=%d, semcount=%d", ciclecount, i, countput_netxtime[i], numtx[i], MY_semaphore_count[i]);      
-            hal_trace_puts(str); 
-        }
-        ena_checktx_nexttime = 0;
-    }
 //     res = eo_appCanSP_StartTransmitCanFrames(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1, eobool_true);
 //     if(eores_OK != res)
 //     {
@@ -372,7 +318,7 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
 extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p)
 {
     uint8_t a =1;
-    char str[250];
+
     EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
     eOresult_t res[2];
     
@@ -401,33 +347,6 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
     res[0] = eo_appCanSP_wait_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1);
     res[1] = eo_appCanSP_wait_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport2);
     
-    eo_appCanSP_GetNumOfTxCanframe(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1, &numofframe_2sendRemain[0]);
-    eo_appCanSP_GetNumOfTxCanframe(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport2, &numofframe_2sendRemain[1]);
-    if((numofframe_2sendRemain[0]!= 0) || (numofframe_2sendRemain[1]!= 0))
-    {
-        for(int i=0; i<2; i++)
-        {
-            snprintf(str, sizeof(str)-1, "TX PHASE: cyclenum=%d port=%d before=%d, after=%d isrcount=%d, semcount=%d res=%d",ciclecount, i, numofframe_2send[i], numofframe_2sendRemain[i], numtx[i], MY_semaphore_count[i], res[i]);        
-            hal_trace_puts(str);
-        }
-        //abilito trace per il ciclo sucessivo e resetto il count
-        ena_checktx_nexttime = 1;
-        countput_netxtime[0] = 0;
-        countput_netxtime[1] = 0;
-    }
-
-    
-    if(counput4cycle[0]>10)
-    {
-            snprintf(str, sizeof(str)-1, "TX PHASE: cyclenum=%d numof pun in this cylce=%d", ciclecount, counput4cycle[0]);        
-            hal_trace_puts(str);
-    }
-    
-    //reset dei contatori
-    numoftxfrme_failed[0] = 0;
-    numoftxfrme_failed[1] = 0;
-    counput4cycle[0] = 0;
-    counput4cycle[1] = 0;
 }
 
 
