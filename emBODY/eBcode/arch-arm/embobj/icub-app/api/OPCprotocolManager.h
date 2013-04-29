@@ -182,6 +182,10 @@ extern opcprotman_res_t opcprotman_Parse(OPCprotocolManager* p, opcprotman_messa
 
 extern opcprotman_res_t opcprotman_Form(OPCprotocolManager* p, opcprotman_opc_t opc, opcprotman_var_t var, const void* setdata, opcprotman_message_t* msg, uint16_t* size);
 
+extern opcprotman_var_map_t* opcprotman_find(OPCprotocolManager* p, uint16_t var);
+
+extern opcprotman_res_t opcprotman_personalize_var(OPCprotocolManager* p, uint16_t var, uint8_t* var_ram, opcprotman_fp_onrec_t fn);
+
 /** @}            
     end of group doxy_opcprotman  
  **/

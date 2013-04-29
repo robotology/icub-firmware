@@ -66,6 +66,7 @@
 
 static opcprotman_var_map_t* s_opcprotman_find(OPCprotocolManager* p, opcprotman_header_t* head);
 static opcprotman_res_t s_opcprotman_process_operation(opcprotman_message_t* msg, opcprotman_var_map_t* map, opcprotman_message_t* reply, uint16_t* replysize);
+static opcprotman_var_map_t* s_opcprotman_find_var(OPCprotocolManager* p, uint16_t var);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -83,6 +84,7 @@ static opcprotman_res_t s_opcprotman_process_operation(opcprotman_message_t* msg
 
 extern OPCprotocolManager * opcprotman_New(const opcprotman_cfg_t *cfg)
 {
+    opcprotman_res_t res;
     OPCprotocolManager* p = NULL;
     
     if(NULL == cfg)
@@ -96,12 +98,40 @@ extern OPCprotocolManager * opcprotman_New(const opcprotman_cfg_t *cfg)
     }
     
     p->cfg = cfg;
-      
+    
+    
+    res = opcprotman_personalize_database();  
+    if(opcprotman_OK != res)
+    {
+        return(NULL);
+    }
+    
     return(p);
 
 }
 
+extern opcprotman_res_t opcprotman_personalize_var(OPCprotocolManager* p, uint16_t var, uint8_t* var_ram, opcprotman_fp_onrec_t fn)
+{
+    opcprotman_var_map_t* map_ptr;
+    
+    if((NULL == p) || (NULL == var_ram))
+    {
+        return(opcprotman_NOK_generic);
+    }
+    
+    map_ptr = opcprotman_find(p, var);
+    
+    if(NULL == map_ptr)
+    {
+        return(opcprotman_NOK_generic);
+    }
+    
+    map_ptr->ptr = var_ram;
+    map_ptr->onrec = fn;
+    
+    return(opcprotman_OK);
 
+}
 
 extern opcprotman_res_t opcprotman_Has_Signature(OPCprotocolManager* p, opcprotman_message_t* msg)
 {   
@@ -199,7 +229,7 @@ extern opcprotman_res_t opcprotman_Form(OPCprotocolManager* p, opcprotman_opc_t 
     
     opcprotman_var_map_t* map = s_opcprotman_find(p, &msg->head);
     
-    if((NULL == map) || (0 == map->size))
+    if((NULL == map) || (0 == map->size) || (NULL == map->ptr))
     {
         memset(&msg->head, 0, sizeof(opcprotman_header_t));
         return(opcprotman_NOK_generic);
@@ -256,9 +286,21 @@ extern opcprotman_res_t opcprotman_Form(OPCprotocolManager* p, opcprotman_opc_t 
 }
 
 
+extern opcprotman_var_map_t* opcprotman_find(OPCprotocolManager* p, uint16_t var)
+{
+    if(NULL == p)
+    {
+        return(NULL);
+    }
+    return(s_opcprotman_find_var(p, var));
+}
 
-
-
+// #ifndef __USE_MY _OPCPROTMAN_PERSONALIZE_DATABASE__
+// extern opcprotman_res_t opcprotman_personalize_database(void)
+// {
+//     return(opcprotman_OK);
+// }
+// #endif
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -276,13 +318,33 @@ static opcprotman_var_map_t* s_opcprotman_find(OPCprotocolManager* p, opcprotman
     {
         return(NULL);
     }
+
+    return(s_opcprotman_find_var(p, head->var));
     
+//     uint16_t i;
+//     opcprotman_var_map_t* map = NULL;
+//     
+//     for(i=0; i<p->cfg->numberofvariables; i++)
+//     {
+//         if(head->var == p->cfg->arrayofvariablemap[i].var)
+//         {
+//             map = &p->cfg->arrayofvariablemap[i];
+//             break;
+//         }
+//     }
+//     
+//     return(map);
+}
+
+
+static opcprotman_var_map_t* s_opcprotman_find_var(OPCprotocolManager* p, uint16_t var)
+{
     uint16_t i;
     opcprotman_var_map_t* map = NULL;
     
     for(i=0; i<p->cfg->numberofvariables; i++)
     {
-        if(head->var == p->cfg->arrayofvariablemap[i].var)
+        if(var == p->cfg->arrayofvariablemap[i].var)
         {
             map = &p->cfg->arrayofvariablemap[i];
             break;

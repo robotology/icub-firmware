@@ -66,19 +66,9 @@ struct EOemsController_hid
 }; 
 
 
-typedef struct
-{   // 4 is MAX_JOINTS but i use 4 to avoid ... problems with the host
-    eom_emsapplcfg_boardid_t    boardid;
-    uint8_t                     count[4];
-    eOmeas_position_t           position[4];
-    eOmeas_velocity_t           velocity[4];    
-} EOemsControllerDEBUG_t;
-
-
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-#define eo_emsController_hid_DEBUG_id 4
-extern EOemsControllerDEBUG_t eo_emsController_hid_DEBUG;
+
 #ifdef __MC_BACKDOOR__
 extern void eo_emsController_hid_DEBUG_reset(void);
 

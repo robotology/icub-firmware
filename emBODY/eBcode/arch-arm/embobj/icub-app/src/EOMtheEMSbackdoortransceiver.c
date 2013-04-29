@@ -138,7 +138,16 @@ extern EOMtheEMSbackdoortransceiver* eom_emsbackdoortransceiver_GetHandle(void)
     }
 }
 
-
+extern OPCprotocolManager* eom_emsbackdoortransceiver_GetOPCprotocolManagerHandle(EOMtheEMSbackdoortransceiver* p)
+{
+    if(NULL == p)
+    {
+        return(NULL);
+    }
+    
+    return(s_emsbackdoortransceiver_singleton.opcprotman);
+    
+}
 
 extern eOresult_t eom_emsbackdoortransceiver_Parse(EOMtheEMSbackdoortransceiver* p, EOpacket* rxpkt)
 {
