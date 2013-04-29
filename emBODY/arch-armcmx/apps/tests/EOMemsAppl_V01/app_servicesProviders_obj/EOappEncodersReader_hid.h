@@ -84,13 +84,7 @@ struct EOappEncReader_hid
     EOappEncReader_confEncDataPerSPI_hid_t configuredEnc_SPI3;
 }; 
 
-#define eo_EncoderErrorDEBUG_id 6
-typedef struct
-{
-    uint16_t parityCheck[6];
-    uint16_t status[6];
-} EOencoderErrorDEBUG_t;
-extern EOencoderErrorDEBUG_t EOencoderErrorDEBUG;
+
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------

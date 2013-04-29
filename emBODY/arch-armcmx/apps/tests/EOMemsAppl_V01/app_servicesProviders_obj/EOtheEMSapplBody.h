@@ -91,17 +91,7 @@ typedef struct
 } eOtheEMSappBody_cfg_t;
 
 
-
-#define eo_canFaultLogDEBUG_id 5
-typedef struct
-{
-    int16_t currSetPointList[4];
-    eOcanframe_t overCurrentMsg;
-    eOcanframe_t nextCanMsgs[6];
-}EOcanFaultLogDEBUG_t; //size 2*4 + 16 +16*6 = 120
-
-
-    
+   
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
 

@@ -38,6 +38,8 @@
 
 #include "EOtheMemoryPool.h"
 
+#include "OPCprotocolManager_Cfg.h" 
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface

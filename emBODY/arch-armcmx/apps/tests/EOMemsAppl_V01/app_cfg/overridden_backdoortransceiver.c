@@ -21,27 +21,15 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOMtheEMSbackdoortransceiver_hid.h" 
-#include "stdio.h" 
-#include "stdlib.h" 
-#include "string.h" 
-
-
-#include "EOMtheIPnet_hid.h"            // to see eom_ipnet_hid_DEBUG (16 bytes)
-#include "EOMtheEMSrunner_hid.h"        // to see eom_emsrunner_hid_DEBUG (40 bytes)
-#include "EOMtheEMStransceiver_hid.h"   // to see EOMtheEMStransceiverDEBUG_t (28 bytes)
-
-#include "EOemsController_hid.h" 
-
-#include "EOtheEMSApplBody.h"    //to see EOcanFaultLogDEBUG_t
-
-#include "EOappEncodersReader_hid.h"
+#include "OPCprotocolManager_Cfg.h" 
+#include "EOMtheEMSbackdoortransceiver_hid.h"
+#include "OPCprotocolManager.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
-extern EOcanFaultLogDEBUG_t EOcanFaultLogDEBUG;
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -73,54 +61,16 @@ static void on_rec_encoderError_debug(opcprotman_opc_t opc, opcprotman_var_map_t
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-static opcprotman_var_map_t s_myarray[] = 
-{
-    {
-        .var        = eom_ipnet_hid_DEBUG_id,
-        .size       = sizeof(eom_ipnet_hid_DEBUG),
-        .ptr        = &eom_ipnet_hid_DEBUG,
-        .onrec      = on_rec_ipnet_debug
-    },
-    {
-        .var        = eom_emsrunner_hid_DEBUG_id,
-        .size       = sizeof(eom_emsrunner_hid_DEBUG),
-        .ptr        = &eom_emsrunner_hid_DEBUG,
-        .onrec      = on_rec_runner_debug
-    },
-    {
-        .var        = eom_emstransceiver_hid_DEBUG_id,
-        .size       = sizeof(eom_emstransceiver_hid_DEBUG),
-        .ptr        = &eom_emstransceiver_hid_DEBUG,
-        .onrec      = on_rec_transceiver_debug
-    },
-    {
-        .var        = eo_emsController_hid_DEBUG_id,
-        .size       = sizeof(eo_emsController_hid_DEBUG),
-        .ptr        = &eo_emsController_hid_DEBUG,
-        .onrec      = on_rec_emscontroller_debug
-    },    
-    {
-        .var        = eo_canFaultLogDEBUG_id,
-        .size       = sizeof(EOcanFaultLogDEBUG_t),
-        .ptr        = &EOcanFaultLogDEBUG,
-        .onrec      = on_rec_canFaultLog_debug
-    },
+//the following vars are declare in somewhere in the code and they contain value to send or the received value.
+extern EOMtheIPnetDEBUG_t eom_ipnet_hid_DEBUG;
+extern EOMtheEMSrunnerDEBUG_t eom_emsrunner_hid_DEBUG;
+extern EOMtheEMStransceiverDEBUG_t eom_emstransceiver_hid_DEBUG;
+extern EOemsControllerDEBUG_t eo_emsController_hid_DEBUG;
+extern EOcanFaultLogDEBUG_t EOcanFaultLogDEBUG;
+extern EOencoderErrorDEBUG_t EOencoderErrorDEBUG;
 
-     {
-        .var        = eo_EncoderErrorDEBUG_id,
-        .size       = sizeof(EOencoderErrorDEBUG_t),
-        .ptr        = &EOencoderErrorDEBUG,
-        .onrec      = on_rec_encoderError_debug
-    } 
-    
-};
 
-extern opcprotman_cfg_t opcprotmanCFGv0x1234 =
-{
-    .databaseversion        = 0x1234,
-    .numberofvariables      = 6,
-    .arrayofvariablemap     = s_myarray
-};
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -308,9 +258,81 @@ static void on_rec_encoderError_debug(opcprotman_opc_t opc, opcprotman_var_map_t
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern opcprotman_cfg_t* eom_emsbackdoortransceiver_hid_userdef_get_OPCprotocolManager_cfg(void)
+
+extern opcprotman_res_t opcprotman_personalize_database(void)
 {
-    return(&opcprotmanCFGv0x1234);
+    opcprotman_res_t res = opcprotman_OK;
+    
+    OPCprotocolManager* p = eom_emsbackdoortransceiver_GetOPCprotocolManagerHandle(eom_emsbackdoortransceiver_GetHandle());
+     
+/* personalize eom_ipnet_hid_DEBUG_id var*/
+	res = opcprotman_personalize_var(   p, 
+                                        eom_ipnet_hid_DEBUG_id,
+                                        (uint8_t*) &eom_ipnet_hid_DEBUG, 
+                                        on_rec_ipnet_debug);
+
+    if(opcprotman_OK != res)
+    {
+        return(res);
+    }
+/* personalize eom_emsrunner_hid_DEBUG_id var*/
+	res = opcprotman_personalize_var(   p, 
+                                        eom_emsrunner_hid_DEBUG_id,
+                                        (uint8_t*)&eom_emsrunner_hid_DEBUG, 
+                                        on_rec_runner_debug);
+
+    if(opcprotman_OK != res)
+    {
+        return(res);
+    }
+    
+/* personalize eom_emstransceiver_hid_DEBUG_id var*/
+	res = opcprotman_personalize_var(   p, 
+                                        eom_emstransceiver_hid_DEBUG_id,
+                                        (uint8_t*)&eom_emstransceiver_hid_DEBUG, 
+                                        on_rec_transceiver_debug);
+
+    if(opcprotman_OK != res)
+    {
+        return(res);
+    }
+
+
+/* personalize eo_emsController_hid_DEBUG_id var*/
+	res = opcprotman_personalize_var(   p, 
+                                        eo_emsController_hid_DEBUG_id,
+                                        (uint8_t*)&eo_emsController_hid_DEBUG, 
+                                        on_rec_emscontroller_debug);
+
+    if(opcprotman_OK != res)
+    {
+        return(res);
+    }
+
+
+/* personalize eo_emsController_hid_DEBUG_id var*/
+	res = opcprotman_personalize_var(   p, 
+                                        eo_canFaultLogDEBUG_id,
+                                        (uint8_t*)&EOcanFaultLogDEBUG, 
+                                        on_rec_canFaultLog_debug);
+
+    if(opcprotman_OK != res)
+    {
+        return(res);
+    }
+  
+    /* personalize eo_emsController_hid_DEBUG_id var*/
+	res = opcprotman_personalize_var(   p, 
+                                         eo_EncoderErrorDEBUG_id ,
+                                        (uint8_t*)&EOencoderErrorDEBUG, 
+                                        on_rec_encoderError_debug);
+
+    if(opcprotman_OK != res)
+    {
+        return(res);
+    }
+
+    return(res);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
