@@ -100,7 +100,7 @@ extern OPCprotocolManager * opcprotman_New(const opcprotman_cfg_t *cfg)
     p->cfg = cfg;
     
     
-    res = opcprotman_personalize_database();  
+    res = opcprotman_personalize_database(p);  
     if(opcprotman_OK != res)
     {
         return(NULL);
