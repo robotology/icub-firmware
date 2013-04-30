@@ -87,7 +87,7 @@ static opcprotman_var_map_t s_myarray[] =
     
 };
 
-extern opcprotman_cfg_t opcprotmanCFGv0x1234 =
+opcprotman_cfg_t opcprotmanCFGv0x1234 =
 {
     .databaseversion        = 0x1234,
     .numberofvariables      = opcProt_numofvar_max,
@@ -116,7 +116,7 @@ extern opcprotman_cfg_t opcprotmanCFGv0x1234 =
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern opcprotman_cfg_t* eom_emsbackdoortransceiver_hid_userdef_get_OPCprotocolManager_cfg(void)
+extern opcprotman_cfg_t* OPCprotocolManager_Cfg_getconfig(void)
 {
     return(&opcprotmanCFGv0x1234);
 }
