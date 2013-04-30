@@ -259,12 +259,11 @@ static void on_rec_encoderError_debug(opcprotman_opc_t opc, opcprotman_var_map_t
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern opcprotman_res_t opcprotman_personalize_database(void)
+extern opcprotman_res_t opcprotman_personalize_database(OPCprotocolManager *p)
 {
     opcprotman_res_t res = opcprotman_OK;
     
-    OPCprotocolManager* p = eom_emsbackdoortransceiver_GetOPCprotocolManagerHandle(eom_emsbackdoortransceiver_GetHandle());
-     
+
 /* personalize eom_ipnet_hid_DEBUG_id var*/
 	res = opcprotman_personalize_var(   p, 
                                         eom_ipnet_hid_DEBUG_id,
