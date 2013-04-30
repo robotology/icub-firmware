@@ -136,6 +136,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -1324,6 +1325,11 @@
               <FileType>1</FileType>
               <FilePath>..\app_cfg\overridden_backdoortransceiver.c</FilePath>
             </File>
+            <File>
+              <FileName>OPCprotocolManager_Cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\cfg\OPCprotocolManager_Cfg.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1523,6 +1529,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -2693,6 +2700,11 @@
               <FileType>1</FileType>
               <FilePath>..\app_cfg\overridden_backdoortransceiver.c</FilePath>
             </File>
+            <File>
+              <FileName>OPCprotocolManager_Cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\cfg\OPCprotocolManager_Cfg.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2892,6 +2904,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -3103,7 +3116,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC _TEST_SEQNUM_</Define>
+              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC _TEST_SEQNUM_ _BDOOR_DEB_CANMSG_LOG_</Define>
               <Undefine></Undefine>
               <IncludePath>..\app_main;..\app_cfg;..\app_nvs_cfg;..\app_servicesProviders_obj;..\app_servicesProviders_cfg\icub-can-net;..\app_servicesProviders_cfg\icub-can-proto;..\abslayer-cfg;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\sys\embobj\icub-app\api;..\..\..\..\..\any-arch\sys\embobj\icub-app\cfg;..\..\..\..\..\any-arch\sys\embobj\icub-app\src;..\..\..\..\..\any-arch\sys\embobj\icub-ems\api;..\..\..\..\..\any-arch\sys\embobj\icub-ems\src;..\..\..\..\..\any-arch\sys\embobj\mc\src;..\..\..\..\..\any-arch\sys\embobj\mc\api</IncludePath>
             </VariousControls>
@@ -4178,6 +4191,11 @@
               <FileType>1</FileType>
               <FilePath>..\app_cfg\overridden_backdoortransceiver.c</FilePath>
             </File>
+            <File>
+              <FileName>OPCprotocolManager_Cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\cfg\OPCprotocolManager_Cfg.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4377,6 +4395,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -5702,6 +5721,11 @@
               <FileName>overridden_backdoortransceiver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\overridden_backdoortransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>OPCprotocolManager_Cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\cfg\OPCprotocolManager_Cfg.c</FilePath>
             </File>
           </Files>
         </Group>

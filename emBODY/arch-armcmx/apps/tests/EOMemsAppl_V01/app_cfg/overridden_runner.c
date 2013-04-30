@@ -40,6 +40,7 @@
 #include "EoManagement.h"
 
 #include "EOemsController_hid.h" 
+#include "OPCprotocolManager_Cfg.h" 
 
 
 
