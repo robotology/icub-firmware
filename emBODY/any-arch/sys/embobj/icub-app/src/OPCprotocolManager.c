@@ -114,7 +114,7 @@ extern opcprotman_res_t opcprotman_personalize_var(OPCprotocolManager* p, uint16
 {
     opcprotman_var_map_t* map_ptr;
     
-    if((NULL == p) || (NULL == var_ram))
+    if(NULL == p)
     {
         return(opcprotman_NOK_generic);
     }
@@ -367,6 +367,11 @@ static opcprotman_res_t s_opcprotman_process_operation(opcprotman_message_t* msg
     {
         case opcprotman_opc_ask:
         {
+        	if(NULL == map->ptr)
+        	{
+        		return(opcprotman_NOK_generic);
+        	}
+
             reply->head.sgn     = opcprotman_signature;
             reply->head.opc     = opcprotman_opc_say;
             reply->head.dbv     = msg->head.dbv;
