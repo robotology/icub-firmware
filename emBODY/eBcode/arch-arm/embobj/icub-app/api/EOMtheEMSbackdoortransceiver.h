@@ -44,9 +44,6 @@ extern "C" {
 #include "EoCommon.h"
 #include "EOpacket.h"
 
-#include "OPCprotocolManager.h"
-
-
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -114,8 +111,6 @@ extern eOresult_t eom_emsbackdoortransceiver_Parse(EOMtheEMSbackdoortransceiver*
 extern eOresult_t eom_emsbackdoortransceiver_GetReply(EOMtheEMSbackdoortransceiver* p, EOpacket** txpkt);
 
 extern eOresult_t eom_emsbackdoortransceiver_FormSignal(EOMtheEMSbackdoortransceiver* p, uint16_t var, uint8_t* data, uint16_t* size);
-
-extern OPCprotocolManager* eom_emsbackdoortransceiver_GetOPCprotocolManagerHandle(EOMtheEMSbackdoortransceiver* p);
 
 /** @}            
     end of group eom_theemsbackdoortransceiver  
