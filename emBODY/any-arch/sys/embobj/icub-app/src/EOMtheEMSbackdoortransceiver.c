@@ -31,7 +31,7 @@
 
 
 #include "OPCprotocolManager.h"
-
+#include "OPCprotocolManager_Cfg.h"
 //#include "appl-core.h"
 
 
@@ -120,7 +120,7 @@ extern EOMtheEMSbackdoortransceiver * eom_emsbackdoortransceiver_Initialise(cons
     s_emsbackdoortransceiver_singleton.replypkt = eo_packet_New(s_emsbackdoortransceiver_singleton.cfg.replypktcapacity);
     s_emsbackdoortransceiver_singleton.transmit = eobool_false;
     
-    s_emsbackdoortransceiver_singleton.opcprotman = opcprotman_New(eom_emsbackdoortransceiver_hid_userdef_get_OPCprotocolManager_cfg());
+    s_emsbackdoortransceiver_singleton.opcprotman = opcprotman_New(OPCprotocolManager_Cfg_getconfig());
     
     return(&s_emsbackdoortransceiver_singleton);
 }
