@@ -27,14 +27,13 @@ extern "C" {
 #endif
 
 
-/** @file       EOtheEMSbackdoorCfg.h
-    @brief      This file provides interface to ems application body: it let acess to all obj 
-                that form application body.
+/** @file       OPCprotocolManager_Cfg.h
+    @brief      This file provides interface to the configuration of OPCprotoclManager shared between pc104 and ems board.
     @author     valentina.gaggero@iit.it
     @date       04/29/2013
 **/
 
-/** @defgroup EOtheEMSbackdoorCfg 
+/** @defgroup OPCprotocolManager_Cfg
     ...... 
     @{        
  **/
@@ -42,6 +41,7 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 #include "EoCommon.h"
 #include "EoMeasures.h"
+#include "OPCprotocolManager.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -117,13 +117,11 @@ typedef struct
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
-// empty-section
+extern opcprotman_cfg_t* OPCprotocolManager_Cfg_getconfig(void);
   
 
-
-
 /** @}            
-    end of group EOtheEMSbackdoorCfg
+    end of group OPCprotocolManager_Cfg
  **/
 
 #ifdef __cplusplus
