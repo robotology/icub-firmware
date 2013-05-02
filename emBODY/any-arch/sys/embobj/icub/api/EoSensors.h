@@ -139,6 +139,13 @@ typedef struct
     uint8_t                         filler04[4];                               
 } eOsnsr_strain_inputs_t;           EO_VERIFYsizeof(eOsnsr_strain_inputs_t, 4);
 
+typedef enum
+{
+    snsr_strain_formatofvalues_fullscale            = 0,
+    snsr_strain_formatofvalues_calibrated           = 1,
+    snsr_strain_formatofvalues_uncalibrated         = 2
+} eOsnsr_strain_formatofvalues_t;
+
 typedef struct                      // size is: 16+16+16+0 = 48                     
 {
     eOsnsr_arrayofupto12bytes_t     fullscale;                              /**< the full scale as an array of three forces and three torques each of 2 bytes */
