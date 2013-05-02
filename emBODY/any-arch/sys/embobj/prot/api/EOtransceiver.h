@@ -73,7 +73,7 @@ typedef enum
 
 typedef struct   
 {
-    uint16_t        capacityofpacket; 
+    uint16_t        capacityoftxpacket; 
     uint16_t        capacityofrop;    
     uint16_t        capacityofropframeregulars; 
     uint16_t        capacityofropframeoccasionals;
@@ -84,7 +84,7 @@ typedef struct
 
 typedef struct
 {
-    uint16_t                        capacityofpacket; 
+    uint16_t                        capacityoftxpacket; 
     uint16_t                        capacityofrop;    
     uint16_t                        capacityofropframeregulars; 
     uint16_t                        capacityofropframeoccasionals;
