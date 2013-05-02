@@ -85,7 +85,7 @@ const eOemstransceiver_cfg_t eom_emstransceiver_DefaultCfg =
     EO_INIT(.hostipv4port)              12345,
     EO_INIT(.sizes)
     {
-        EO_INIT(.capacityofpacket)                  1024,
+        EO_INIT(.capacityoftxpacket)                1024,
         EO_INIT(.capacityofrop)                     256,
         EO_INIT(.capacityofropframeregulars)        768,
         EO_INIT(.capacityofropframeoccasionals)     128,
