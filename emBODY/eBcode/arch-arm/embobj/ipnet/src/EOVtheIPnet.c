@@ -86,11 +86,11 @@ static const char s_eobj_ownname[] = "EOVtheIPnet";
 
 static EOVtheIPnet s_ipnet = 
 {
-    .vtable                     = {NULL},         // vtable: attach, detach, alert, arp, waitpacket
-    .tsk                        = NULL,           // tsk
-    .activedgramsocksptrlist    = NULL,           // activedgramsocksptrlist
-    .mutexactivedgram           = NULL,            // mutexactivedgram
-    .active                     = eobool_true
+    EO_INIT(.vtable)                    {NULL},         // vtable: attach, detach, alert, arp, waitpacket
+    EO_INIT(.tsk)                       NULL,           // tsk
+    EO_INIT(.activedgramsocksptrlist)   NULL,           // activedgramsocksptrlist
+    EO_INIT(.mutexactivedgram)          NULL,           // mutexactivedgram
+    EO_INIT(.active)                    eobool_true
 }; 
 
 
