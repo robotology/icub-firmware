@@ -294,7 +294,7 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
         .hostipv4port           = EOMTHEEMSAPPLCFG_TRANSCEIVER_HOSTIPPORT,
         .sizes                  =
         {
-            .capacityofpacket               = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY, //1024,
+            .capacityoftxpacket             = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY, //1024,
             .capacityofrop                  = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPCAPACITY, //256,
             .capacityofropframeregulars     = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY, //768,
             .capacityofropframeoccasionals  = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEOCCASIONALSCAPACITY, //128,
