@@ -41,6 +41,7 @@ extern "C" {
 
 #include "EoCommon.h"
 #include "EOtransceiver.h"
+#include "EOVmutex.h"
 #include "EOropframe_hid.h"
 
 
@@ -48,7 +49,7 @@ extern "C" {
 
 //#warning --> instead of 20 ... can i put 0? answer: seems yes  .. but be carefule w/ eo_ropframe_ROP_NumberOf_quickversion()
 /*  Dimensions hereafter are related to the biggest packet the pc104 can send to the EMSs. It has to be equal to the biggest packet the EMS
-    can receive and process ( which is different from the max packet the EMS can send to the pc104, because the protocol is asimmetryc)
+    can receive and process ( which is different from the max packet the EMS can send to the pc104, because the protocol is asymmetric)
 */
 #define EOK_HOSTTRANSCEIVER_emptyropframe_dimension            sizeof(EOropframeEmpty_t)     // header + footer + 8 byte for progressive number
 #define EOK_HOSTTRANSCEIVER_TMP                                ( EOK_HOSTTRANSCEIVER_capacityofropframeregulars + EOK_HOSTTRANSCEIVER_capacityofropframereplies + EOK_HOSTTRANSCEIVER_emptyropframe_dimension)
@@ -64,13 +65,14 @@ extern "C" {
 
 typedef struct
 {
-    const EOconstvector*        vectorof_endpoint_cfg;
-    eOuint16_fp_uint16_t        hashfunction_ep2index;
-    eOipv4addr_t                remoteboardipv4addr;
-    eOipv4port_t                remoteboardipv4port;
-    uint8_t                     tobedefined; // ip, port, numendpoints ... or simply: local ip is retrieved by eeprom, remote ip from
-                             // first reception, port is fixed, numendpoints and an constvector of endpoint config
-                             // is store in a file containing a variable pointer to const data. 
+    const EOconstvector*            vectorof_endpoint_cfg;
+    eOuint16_fp_uint16_t            hashfunction_ep2index;
+    eOipv4addr_t                    remoteboardipv4addr;
+    eOipv4port_t                    remoteboardipv4port;
+    eo_transceiver_sizes_t          sizes;       
+    eov_mutex_fn_mutexderived_new   mutex_fn_new;    
+    eOtransceiver_protection_t      transprotection;
+    eOnvscfg_protection_t           nvscfgprotection; 
 } eOhosttransceiver_cfg_t;
 
 
@@ -85,7 +87,7 @@ typedef struct EOhostTransceiver_hid EOhostTransceiver;
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eOhosttransceiver_cfg_t eo_hosttransceiver_cfg_default; // = {NULL, 0, 0, 0};
+extern const eOhosttransceiver_cfg_t eo_hosttransceiver_cfg_default; // = { ... };
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
