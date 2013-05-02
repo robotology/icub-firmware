@@ -70,7 +70,12 @@ http://technet.microsoft.com/en-us/library/bb463220.aspx
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-const eOsktdtgTXmode_t eo_sktdtg_TXnow = { .startat = EOK_abstimeNOW, .after = 0, .periodic = eobool_false};
+const eOsktdtgTXmode_t eo_sktdtg_TXnow = 
+{ 
+    EO_INIT(.startat)   EOK_abstimeNOW, 
+    EO_INIT(.after)     0, 
+    EO_INIT(.periodic)  eobool_false
+};
 
 
 
