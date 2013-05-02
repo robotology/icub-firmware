@@ -79,7 +79,7 @@
 
 const eo_transceiver_cfg_t eo_transceiver_cfg_default = 
 {
-    EO_INIT(.capacityofpacket)              512, 
+    EO_INIT(.capacityoftxpacket)            512, 
     EO_INIT(.capacityofrop)                 128, 
     EO_INIT(.capacityofropframeregulars)    256,
     EO_INIT(.capacityofropframeoccasionals) 128,
@@ -121,7 +121,7 @@ extern EOtransceiver* eo_transceiver_New(const eo_transceiver_cfg_t *cfg)
 
     
     memcpy(&tra_cfg, &eo_transmitter_cfg_default, sizeof(eo_transmitter_cfg_t));
-    tra_cfg.capacityoftxpacket              = cfg->capacityofpacket;
+    tra_cfg.capacityoftxpacket              = cfg->capacityoftxpacket;
     tra_cfg.capacityofropframeregulars      = cfg->capacityofropframeregulars;
     tra_cfg.capacityofropframeoccasionals   = cfg->capacityofropframeoccasionals;
     tra_cfg.capacityofropframereplies       = cfg->capacityofropframereplies;

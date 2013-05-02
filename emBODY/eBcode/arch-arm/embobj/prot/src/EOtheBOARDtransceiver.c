@@ -125,7 +125,7 @@ extern EOtransceiver * eo_boardtransceiver_Initialise(const eOboardtransceiver_c
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "need a vector of endpoints");
     }
 
-    if((0 == cfg->sizes.capacityofpacket) || (0 == cfg->sizes.capacityofrop) || (0 == cfg->sizes.capacityofropframeregulars) ||
+    if((0 == cfg->sizes.capacityoftxpacket) || (0 == cfg->sizes.capacityofrop) || (0 == cfg->sizes.capacityofropframeregulars) ||
        (0 == cfg->sizes.capacityofropframeoccasionals) || (0 == cfg->sizes.capacityofropframereplies) || (0 == cfg->sizes.maxnumberofregularrops))
     {
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "a cfg->sizes field is 0");
@@ -136,7 +136,7 @@ extern EOtransceiver * eo_boardtransceiver_Initialise(const eOboardtransceiver_c
     s_eo_theboardtrans.nvscfg = s_eo_boardtransceiver_nvscfg_get(cfg);
     
 
-    txrxcfg.capacityofpacket               = cfg->sizes.capacityofpacket;
+    txrxcfg.capacityoftxpacket             = cfg->sizes.capacityoftxpacket;
     txrxcfg.capacityofrop                  = cfg->sizes.capacityofrop;
     txrxcfg.capacityofropframeregulars     = cfg->sizes.capacityofropframeregulars;
     txrxcfg.capacityofropframeoccasionals  = cfg->sizes.capacityofropframeoccasionals;

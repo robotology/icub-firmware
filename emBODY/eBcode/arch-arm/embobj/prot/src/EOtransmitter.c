@@ -140,7 +140,7 @@ extern EOtransmitter* eo_transmitter_New(const eo_transmitter_cfg_t *cfg)
     retptr->bufferropframeregulars  = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, cfg->capacityofropframeregulars, 1);
     retptr->bufferropframeoccasionals = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, cfg->capacityofropframeoccasionals, 1);
     retptr->bufferropframereplies   = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, cfg->capacityofropframereplies, 1);
-    retptr->listofregropinfo        = eo_list_New(sizeof(eo_transm_regrop_info_t), cfg->maxnumberofregularrops, NULL, 0, NULL, NULL);
+    retptr->listofregropinfo        = (0 == cfg->maxnumberofregularrops) ? (NULL) : (eo_list_New(sizeof(eo_transm_regrop_info_t), cfg->maxnumberofregularrops, NULL, 0, NULL, NULL));
     retptr->currenttime             = 0;
     retptr->tx_seqnum               = 0;
 
@@ -253,7 +253,7 @@ extern eOresult_t eo_transmitter_regular_rops_Load(EOtransmitter *p, eOropdescri
     
 
     // 2. put the rop inside the ropframe
-    res = eo_ropframe_ROP_Set(p->ropframeregulars, p->roptmp, &ropstarthere, &ropsize, &remainingbytes);
+    res = eo_ropframe_ROP_Add(p->ropframeregulars, p->roptmp, &ropstarthere, &ropsize, &remainingbytes);
     // if we cannot add the rop we quit
     if(eores_OK != res)
     {
@@ -328,7 +328,7 @@ extern eOresult_t eo_transmitter_regular_rops_Unload(EOtransmitter *p, eOropdesc
     //                                  you must: decrement the nrops by 1, decrement the size by regropinfo.ropsize, ... else in header and private variable ...
     //                                            and finally make a memmove down by regropinfo.ropsize.
     
-    eo_ropframe_hid_rop_rem(p->ropframeregulars, regropinfo.ropstarthere, regropinfo.ropsize);
+    eo_ropframe_ROP_Rem(p->ropframeregulars, regropinfo.ropstarthere, regropinfo.ropsize);
   
 
     eov_mutex_Release(p->mtx_regulars);
@@ -483,7 +483,7 @@ extern eOresult_t eo_transmitter_occasional_rops_Load_without_data(EOtransmitter
     }
 
     // put the rop inside the ropframe
-    res = eo_ropframe_ROP_Set(p->ropframeoccasionals, p->roptmp, NULL, &ropsize, &remainingbytes);
+    res = eo_ropframe_ROP_Add(p->ropframeoccasionals, p->roptmp, NULL, &ropsize, &remainingbytes);
     
     
     eov_mutex_Release(p->mtx_occasionals);
@@ -494,12 +494,12 @@ extern eOresult_t eo_transmitter_occasional_rops_Load_without_data(EOtransmitter
 extern eOresult_t eo_transmitter_occasional_rops_Load(EOtransmitter *p, eOropdescriptor_t* ropdesc) //eOropcode_t ropcode, eOnvEP_t nvep, eOnvID_t nvid, eOropconfig_t ropcfg, uint8_t* data)
 {
 //    eo_transm_regrop_info_t regropinfo;
+    eOnvOwnership_t nvownership;
     eOresult_t res;
     uint16_t usedbytes;
     uint16_t ropsize;
     uint16_t remainingbytes;
     
-//  #warning --> it is on test  ... 
     
     uint16_t ondevindex;
     uint16_t onendpointindex;
@@ -507,7 +507,6 @@ extern eOresult_t eo_transmitter_occasional_rops_Load(EOtransmitter *p, eOropdes
     
     EOtreenode* treenode;
     EOnv nv;
-    eOnvOwnership_t nvownership;
     
     eObool_t hasdata2send = eobool_false;    
 
@@ -577,7 +576,7 @@ extern eOresult_t eo_transmitter_occasional_rops_Load(EOtransmitter *p, eOropdes
     }
 
     // put the rop inside the ropframe
-    res = eo_ropframe_ROP_Set(p->ropframeoccasionals, p->roptmp, NULL, &ropsize, &remainingbytes);
+    res = eo_ropframe_ROP_Add(p->ropframeoccasionals, p->roptmp, NULL, &ropsize, &remainingbytes);
     
     
     eov_mutex_Release(p->mtx_occasionals);

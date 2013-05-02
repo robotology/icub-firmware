@@ -272,6 +272,55 @@ extern uint8_t* eo_rop_GetROPdata(EOrop *p)
     return(p->stream.data);
 }
 
+extern uint16_t eo_rop_ComputeSize(eOropconfig_t ropcfg, eOropcode_t ropc, uint16_t sizeofdata)
+{
+    uint16_t size = sizeof(eOrophead_t);
+    eOrophead_t rophead = 
+    {
+        EO_INIT(.ctrl)  0,
+        EO_INIT(.ropc)  ropc,
+        EO_INIT(.endp)  0,
+        EO_INIT(.nvid)  0,
+        EO_INIT(.dsiz)  sizeofdata        
+    };
+
+    if( (eo_ropcode_none == ropc) || (eo_ropcode_usr == ropc) )
+    {
+        return(0);      
+    }
+    
+
+    
+    rophead.ctrl.ffu        = 0;
+    rophead.ctrl.confinfo   = eo_ropconf_none;
+    rophead.ctrl.plustime   = (eobool_true == ropcfg.plustime) ? (1) : (0);
+    rophead.ctrl.plussign   = (eobool_true == ropcfg.plussign) ? (1) : (0);
+    rophead.ctrl.rqsttime   = (eobool_true == ropcfg.timerqst) ? (1) : (0);
+    rophead.ctrl.rqstconf   = (eobool_true == ropcfg.confrqst) ? (1) : (0);
+    rophead.ctrl.userdefn   = 0;
+    
+    
+    if(eobool_true == eo_rop_hid_DataField_is_Required(&rophead))
+    {
+        size += eo_rop_hid_DataField_EffectiveSize(rophead.dsiz);
+    }
+
+    if(1 == rophead.ctrl.plussign)
+    {
+        size += 4;
+    }
+
+    if(1 == rophead.ctrl.plustime)
+    {
+        size+= 8;
+    }
+
+    return(size);    
+    
+}
+
+
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
