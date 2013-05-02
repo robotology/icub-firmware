@@ -192,11 +192,7 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
     
     // 1. init timer 4 blinking led 
     s_eom_emsappl_InitLeds();
-#ifdef _TEST_SEQNUM_
     s_eom_emsappl_startBlinkLed(10);
-#else
-    s_eom_emsappl_startBlinkLed(500);
-#endif    
 
     // 2. create the sm.
     s_emsappl_singleton.sm = eo_sm_New(eo_cfg_sm_EMSappl_Get());
@@ -716,15 +712,13 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_CFG(EOsm *s)
 {
     
     EOaction onrx;
-#ifdef _TEST_SEQNUM_
     osal_timer_stop(s_emsappl_singleton.timer4led, osal_callerTSK);
     s_eom_emsappl_startBlinkLed(1000); 
     
+#ifdef _TEST_SEQNUM_    
     s_eom_emsappl_ethLowLevelParser_configure();
-    
-#else    
-    hal_led_on(emsappl_ledgreen);
 #endif    
+
     eo_action_SetEvent(&onrx, emssocket_evt_packet_received, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
     // the socket alerts the cfg task
     eom_emssocket_Open(eom_emssocket_GetHandle(), &onrx, NULL);
@@ -734,11 +728,10 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_CFG(EOsm *s)
 
 
 extern void eo_cfg_sm_EMSappl_hid_on_exit_CFG(EOsm *s)
-{
-    hal_led_off(emsappl_ledgreen);
-    
+{ 
     eom_emsappl_hid_userdef_on_exit_CFG(&s_emsappl_singleton);
 }
+
 #ifdef _TEST_SEQNUM_
 static void s_eom_emsrunner_emsappl_toogleallled(osal_timer_t* tmr, void* par)
 {
@@ -752,6 +745,7 @@ static void s_eom_emsrunner_emsappl_toogleallled(osal_timer_t* tmr, void* par)
     }
 }
 #endif
+
 
 extern void eo_cfg_sm_EMSappl_hid_on_entry_ERR(EOsm *s)
 {
@@ -790,7 +784,7 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_ERR(EOsm *s)
 
 extern void eo_cfg_sm_EMSappl_hid_on_exit_ERR(EOsm *s)
 {
-    hal_led_off(emsappl_ledyellow);
+    hal_led_off(emsappl_ledred);
     
     eom_emsappl_hid_userdef_on_exit_ERR(&s_emsappl_singleton);
 
@@ -801,12 +795,9 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_RUN(EOsm *s)
     EOaction ontxdone;
     //eo_action_Clear(&ontxdone);
 
-#ifdef _TEST_SEQNUM_
     osal_timer_stop(s_emsappl_singleton.timer4led, osal_callerTSK);
     s_eom_emsappl_startBlinkLed(100); 
-#else    
-        hal_led_on(emsappl_ledyellow);
-#endif     
+    
 
     eo_action_SetCallback(&ontxdone, (eOcallback_t)eom_emsrunner_OnUDPpacketTransmitted, eom_emsrunner_GetHandle(), NULL);
     // the socket does not alert anybody when it receives a pkt, but can alert the sending task
