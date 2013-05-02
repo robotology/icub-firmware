@@ -69,6 +69,7 @@ typedef struct  // 28 bytes ...
     uint8_t             headerfooter[28];
 } EOropframeEmpty_t;    EO_VERIFYsizeof(EOropframeEmpty_t, sizeof(EOropframeHeader_t)+sizeof(EOropframeFooter_t));
 
+EO_VERIFYsizeof(EOropframeEmpty_t, eo_ropframe_capacityforZEROrops);
 
 typedef struct  // 32 bytes
 {
@@ -87,14 +88,14 @@ typedef struct  // 32 bytes
  
 struct EOropframe_hid 
 {
-    //eOipv4addr_t                fromipaddr; // it may be useful, but it is not used ....
-    uint16_t                    capacity;
-    uint16_t                    size;
-    uint16_t                    index;
-    uint16_t                    currop;
-    uint16_t                    remainingbytes;
-    uint8_t                     externaldatastorage;
-    EOropframeHeaderRopsFooter_t*  headropsfooter;
+    uint16_t                        capacity;               // contains the maximum size of headropsfooter
+    uint16_t                        size;                   // contains the number of bytes effectively used by headropsfooter. has values from eo_ropframe_capacityforZEROrops to .capacity
+    uint16_t                        index2nextrop2beparsed; // it is an index to next rop to be parser. it starts from zero and is used from &rops[0]
+    uint16_t                        dummy;
+//    uint16_t                        currop;                 // ...
+//    uint16_t                        remainingbytes;
+//    uint8_t                         externaldatastorage;
+    EOropframeHeaderRopsFooter_t*   headropsfooter;         // contains the header, the rops, the footer. in case of a ropframe unable to store rops its size must be eo_ropframe_capacityforZEROrops
 }; 
 
 
@@ -102,7 +103,6 @@ struct EOropframe_hid
 
 uint8_t* eo_ropframe_hid_get_pointer_offset(EOropframe *p, uint16_t offset);
 
-extern eOresult_t eo_ropframe_hid_rop_rem(EOropframe *p, uint16_t startat, uint16_t size);
 
 
 #ifdef __cplusplus

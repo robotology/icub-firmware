@@ -194,12 +194,12 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvsCfg 
         return(eores_NOK_generic);
     }
     
-    //check sequnece number
+    //check sequence number
     rec_seqnum = eo_ropframe_seqnum_Get(p->ropframeinput);
     
     if(p->rx_seqnum == eok_uint64dummy)
     {
-        //this is the first received ropframe
+        //this is the first received ropframe or ... the sender uses dummy seqnum
         p->rx_seqnum = rec_seqnum;
     }
     else
@@ -222,9 +222,9 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvsCfg 
     
     for(i=0; i<nrops; i++)
     {
-        // - get teh rop w/ eo_ropframe_ROP_Get()
+        // - get teh rop w/ eo_ropframe_ROP_Parse()
         
-        res = eo_ropframe_ROP_Get(p->ropframeinput, p->ropinput, &rxremainingbytes);
+        res = eo_ropframe_ROP_Parse(p->ropframeinput, p->ropinput, &rxremainingbytes);
         
         if(eores_OK != res)
         {
@@ -236,11 +236,11 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvsCfg 
         
         eo_agent_InpROPprocess(p->theagent, p->ropinput, nvs2use, remipv4addr, p->ropreply);
         
-        // - if ropreply is ok w/ eo_rop_GetROPcode() then add it to ropframereply w/ eo_ropframe_ROP_Set()
+        // - if ropreply is ok w/ eo_rop_GetROPcode() then add it to ropframereply w/ eo_ropframe_ROP_Add()
         
         if(eo_ropcode_none != eo_rop_GetROPcode(p->ropreply))
         {
-            res = eo_ropframe_ROP_Set(p->ropframereply, p->ropreply, NULL, NULL, &txremainingbytes);
+            res = eo_ropframe_ROP_Add(p->ropframereply, p->ropreply, NULL, NULL, &txremainingbytes);
             
 #if defined(USE_DEBUG_EORECEIVER)             
             {   // DEBUG

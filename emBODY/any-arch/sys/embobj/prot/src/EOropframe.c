@@ -109,7 +109,8 @@ static void s_eo_ropframe_footer_adjust(EOropframe *p);
 
 //static const char s_eobj_ownname[] = "EOropframe";
 
-static const uint16_t s_eo_ropframe_minimum_framesize = (sizeof(EOropframeHeader_t)+sizeof(EOropframeFooter_t));
+static const uint16_t s_eo_ropframe_minimum_framesize = eo_ropframe_capacityforZEROrops;
+//(sizeof(EOropframeHeader_t)+sizeof(EOropframeFooter_t));
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -125,10 +126,10 @@ extern EOropframe* eo_ropframe_New(void)
     // i get the memory for the object
     retptr = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOropframe), 1);
     
-    retptr->capacity            = 0;
-    retptr->size                = 0;
-    retptr->index               = 0;
-    retptr->headropsfooter      = NULL;
+    retptr->capacity                = 0;
+    retptr->size                    = 0;
+    retptr->index2nextrop2beparsed  = 0;
+    retptr->headropsfooter          = NULL;
 
     return(retptr);
 }
@@ -141,15 +142,15 @@ extern eOresult_t eo_ropframe_Load(EOropframe *p, uint8_t *framedata, uint16_t f
         return(eores_NOK_nullpointer);
     }
     
-    if((framecapacity < s_eo_ropframe_minimum_framesize) || (framesize > framecapacity))
+    if((framecapacity < s_eo_ropframe_minimum_framesize) || (framesize > framecapacity) || (framesize < s_eo_ropframe_minimum_framesize))
     {
         return(eores_NOK_generic);
     }
 
-    p->capacity     = framecapacity;
-    p->size         = framesize;
-    p->index        = 0;
-    p->headropsfooter      = (EOropframeHeaderRopsFooter_t*)framedata;
+    p->capacity                 = framecapacity;
+    p->size                     = framesize;
+    p->index2nextrop2beparsed   = 0;
+    p->headropsfooter           = (EOropframeHeaderRopsFooter_t*)framedata;
     
     return(eores_OK);
 }
@@ -161,10 +162,10 @@ extern eOresult_t eo_ropframe_Unload(EOropframe *p)
         return(eores_NOK_nullpointer);
     }
 
-    p->capacity            = 0;
-    p->size                = 0;
-    p->index               = 0;
-    p->headropsfooter      = NULL;
+    p->capacity                 = 0;
+    p->size                     = 0;
+    p->index2nextrop2beparsed   = 0;
+    p->headropsfooter           = NULL;
 
     return(eores_OK);
 }
@@ -202,11 +203,9 @@ extern eOresult_t eo_ropframe_Clear(EOropframe *p)
     {
         return(eores_NOK_nullpointer);
     }
-
-    
-    p->size         = (0 == p->capacity) ? (0) : (s_eo_ropframe_minimum_framesize);
-    p->index        = 0;
-//    p->currop       = 0;
+   
+    p->size                     = (0 == p->capacity) ? (0) : (s_eo_ropframe_minimum_framesize); // if capacity is zero then we dont have buffer ... else we have and size must be s_eo_ropframe_minimum_framesize
+    p->index2nextrop2beparsed   = 0;
     
     if(NULL != p->headropsfooter)
     {
@@ -257,11 +256,12 @@ extern eOresult_t eo_ropframe_Append(EOropframe *p, EOropframe *rfr, uint16_t *r
     // copy
     memcpy(s_eo_ropframe_rops_get(p)+p_sizeofrops, s_eo_ropframe_rops_get(rfr), rfr_sizeofrops);
 
-    // advance the internal index
-    p->index += rfr_sizeofrops;
+    // advance the internal index2nextrop2beparsed ... are w sure we need it in here? i dont think so
+    //#warning -> remove ??
+    //p->index2nextrop2beparsed += rfr_sizeofrops;
 
     // advance the size
-    p->size  += rfr_sizeofrops;
+    p->size  += rfr_sizeofrops;     // if we append a ropframe the size of the resulting frame will be the sum of the old size (head+rops+foot) plus the size of the appended rops.
     
     // adjust the header
     s_eo_ropframe_header_addrops(p, s_eo_ropframe_numberofrops_get(rfr), rfr_sizeofrops);
@@ -322,7 +322,7 @@ extern uint16_t eo_ropframe_ROP_NumberOf_quickversion(EOropframe *p)
     return( p->headropsfooter->header.ropsnumberof );
 }
 
-extern eOresult_t eo_ropframe_ROP_Get(EOropframe *p, EOrop *rop, uint16_t *unparsedbytes)
+extern eOresult_t eo_ropframe_ROP_Parse(EOropframe *p, EOrop *rop, uint16_t *unparsedbytes)
 {
     uint16_t consumedbytes = 0;
     eOresult_t res = eores_NOK_generic;
@@ -335,7 +335,7 @@ extern eOresult_t eo_ropframe_ROP_Get(EOropframe *p, EOrop *rop, uint16_t *unpar
     }
     
     // dont go on if the rops are all retrieved.
-    unparsed = s_eo_ropframe_sizeofrops_get(p) - p->index;
+    unparsed = s_eo_ropframe_sizeofrops_get(p) - p->index2nextrop2beparsed;
     
     if(0 == unparsed)
     {
@@ -344,10 +344,10 @@ extern eOresult_t eo_ropframe_ROP_Get(EOropframe *p, EOrop *rop, uint16_t *unpar
         return(eores_NOK_generic);
     }
     
-    // get the ropstream starting from p->index. call the parser
+    // get the ropstream starting from p->index2nextrop2beparsed. call the parser
     
     ropstream = s_eo_ropframe_rops_get(p);
-    ropstream += p->index;
+    ropstream += p->index2nextrop2beparsed;
    
     // this function fills the rop only if everything is ok. it returns error if the packet is not big enough or if it keeps non-valid data
     res = eo_parser_GetROP(eo_parser_GetHandle(), ropstream, unparsed, rop, &consumedbytes);
@@ -355,7 +355,7 @@ extern eOresult_t eo_ropframe_ROP_Get(EOropframe *p, EOrop *rop, uint16_t *unpar
     if(eores_OK != res)
     {
         eo_rop_Reset(rop);
-        p->index = s_eo_ropframe_sizeofrops_get(p);
+        p->index2nextrop2beparsed = s_eo_ropframe_sizeofrops_get(p);
         if(NULL != unparsedbytes)
         {
             *unparsedbytes = 0;
@@ -364,13 +364,13 @@ extern eOresult_t eo_ropframe_ROP_Get(EOropframe *p, EOrop *rop, uint16_t *unpar
         return(eores_NOK_generic);
     }
     
-    // advance the internal index
-    p->index += consumedbytes;
+    // advance the internal index2nextrop2beparsed
+    p->index2nextrop2beparsed += consumedbytes;
   
     // returns the number of un-parsed bytes
     if(NULL != unparsedbytes)
     {
-        *unparsedbytes = s_eo_ropframe_sizeofrops_get(p) - p->index;
+        *unparsedbytes = s_eo_ropframe_sizeofrops_get(p) - p->index2nextrop2beparsed;
     }
 
     // then ... returns ok.
@@ -378,10 +378,10 @@ extern eOresult_t eo_ropframe_ROP_Get(EOropframe *p, EOrop *rop, uint16_t *unpar
     return(eores_OK);
 }
 
-extern eOresult_t eo_ropframe_ROP_Set(EOropframe *p, const EOrop *rop, uint16_t* addedinpos, uint16_t* consumedbytes, uint16_t *remainingbytes)
-{
-    uint16_t remaining = 0;
+extern eOresult_t eo_ropframe_ROP_Add(EOropframe *p, const EOrop *rop, uint16_t* addedinpos, uint16_t* consumedbytes, uint16_t *remainingbytes)
+{    
     uint8_t* ropstream = NULL;
+    int32_t remaining = 0;
     uint16_t streamsize = 0;
     uint16_t streamindex = 0;
     eOresult_t res = eores_NOK_generic;
@@ -398,10 +398,12 @@ extern eOresult_t eo_ropframe_ROP_Set(EOropframe *p, const EOrop *rop, uint16_t*
     }
     
     // verify that we have bytes enough to convert the rop to stream 
-  
+    
     streamsize = eo_former_GetSizeOfStream(eo_former_GetHandle(), rop);
+    // remaining can be also negative. for example when capacity is eo_ropframe_capacityforZEROrops+1 (thus only one byte for rops) and the target rop requires 8 bytes.
+    // we have eo_ropframe_capacityforZEROrops+1 - eo_ropframe_capacityforZEROrops - 8 = -7 ...
     remaining = p->capacity - s_eo_ropframe_minimum_framesize - s_eo_ropframe_sizeofrops_get(p);
-    if(remaining < streamsize)
+    if(remaining < ((int32_t)streamsize))
     {   // not enough space in ...
         return(eores_NOK_generic);
     }
@@ -420,10 +422,11 @@ extern eOresult_t eo_ropframe_ROP_Set(EOropframe *p, const EOrop *rop, uint16_t*
         return(eores_NOK_generic);
     }
     
-    // advance the internal index
-    p->index += streamsize;
+//    // advance the internal index2nextrop2beparsed: are we sure that we must advance it?
+//#warning --> remove it
+//    p->index2nextrop2beparsed += streamsize;
 
-    // advance the size
+    // advance the size with what is sued by the added stream
     p->size  += streamsize;
     
     // adjust the header
@@ -449,6 +452,44 @@ extern eOresult_t eo_ropframe_ROP_Set(EOropframe *p, const EOrop *rop, uint16_t*
     }
     
     // ... returns ok
+
+    return(eores_OK);
+}
+
+
+extern eOresult_t eo_ropframe_ROP_Rem(EOropframe *p, uint16_t wasaddedinpos, uint16_t itsizewas)
+{
+    int16_t tmp = 0;
+
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+
+    // move memory
+    tmp = s_eo_ropframe_sizeofrops_get(p)-wasaddedinpos-itsizewas; // howmanymove
+    if(tmp > 0)
+    {
+        memmove(s_eo_ropframe_rops_get(p)+wasaddedinpos, s_eo_ropframe_rops_get(p)+wasaddedinpos+itsizewas, tmp);
+    }
+
+//    // decrement the internal index2nextrop2beparsed: are we sure we must update it?
+//#warning -> remove it
+//    p->index2nextrop2beparsed -= itsizewas;
+
+    // decrement the size by the byte used by the removed stream
+    p->size  -= itsizewas;
+    
+    // adjust the header
+    s_eo_ropframe_header_remrop(p, itsizewas);
+
+    // adjust the footer
+    s_eo_ropframe_footer_adjust(p);
+
+    // clear what stays beyond footer: instead or remaining i clear only what was non-zero (itsizewas)
+    //tmp = p->capacity - s_eo_ropframe_minimum_framesize - s_eo_ropframe_sizeofrops_get(p);  // remaining
+    memset(((uint8_t*)s_eo_ropframe_footer_get(p))+sizeof(EOropframeFooter_t), 0, itsizewas);
 
     return(eores_OK);
 }
@@ -529,41 +570,7 @@ uint8_t* eo_ropframe_hid_get_pointer_offset(EOropframe *p, uint16_t offset)
 }
 
 
-extern eOresult_t eo_ropframe_hid_rop_rem(EOropframe *p, uint16_t startat, uint16_t size)
-{
-    int16_t tmp = 0;
 
-    if(NULL == p)
-    {
-        return(eores_NOK_nullpointer);
-    }
-
-
-    // move memory
-    tmp = s_eo_ropframe_sizeofrops_get(p)-startat-size; // howmanymove
-    if(tmp > 0)
-    {
-        memmove(s_eo_ropframe_rops_get(p)+startat, s_eo_ropframe_rops_get(p)+startat+size, tmp);
-    }
-
-    // decrement the internal index
-    p->index -= size;
-
-    // decrement the size
-    p->size  -= size;
-    
-    // adjust the header
-    s_eo_ropframe_header_remrop(p, size);
-
-    // adjust the footer
-    s_eo_ropframe_footer_adjust(p);
-
-    // clear what stays beyond footer: instead or remaining i clear only what was non-zero (size)
-    //tmp = p->capacity - s_eo_ropframe_minimum_framesize - s_eo_ropframe_sizeofrops_get(p);  // remaining
-    memset(((uint8_t*)s_eo_ropframe_footer_get(p))+sizeof(EOropframeFooter_t), 0, size);
-
-    return(eores_OK);
-}
 
 
 // --------------------------------------------------------------------------------------------------------------------
