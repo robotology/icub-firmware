@@ -63,6 +63,7 @@ extern "C" {
 	#define float32_t       float
 	#define __weak	
     #define EO_TAILOR_CODE_FOR_WINDOWS
+    #define EO_WARNING(a)   __pragma(message("EOWARNING-> "##a))
 //	#define EOCFG_NVSEP_MC_OVERRIDE
 //	#define EOCFG_NVSEP_SK_OVERRIDE
 //	#define EOCFG_NVSEP_AS_OVERRIDE
@@ -78,6 +79,7 @@ extern "C" {
     #define float32_t       float    
 	#define __weak __attribute__((weak))
     #define EO_TAILOR_CODE_FOR_LINUX
+    #define EO_WARNING(a)   _Pragma(message("EOWARNING-> "##a))
 //	#define EOCFG_NVSEP_MC_OVERRIDE
 //	#define EOCFG_NVSEP_SK_OVERRIDE
 //	#define EOCFG_NVSEP_AS_OVERRIDE
