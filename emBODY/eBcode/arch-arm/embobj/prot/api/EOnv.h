@@ -82,6 +82,8 @@ typedef uint16_t eOnvEP_t;
 
 typedef uint16_t eOnvID_t;
 
+enum { eo_nv_EPdummy = EOK_uint16dummy, eo_nv_IDdummy = EOK_uint16dummy }; 
+
 typedef uint8_t eOnvIDfuntyp_t;
 typedef uint16_t eOnvIDoffset_t;
 

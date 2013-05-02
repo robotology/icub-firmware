@@ -193,6 +193,8 @@ extern eOropcode_t eo_rop_GetROPcode(EOrop *p);
 
 extern uint8_t* eo_rop_GetROPdata(EOrop *p);
 
+extern uint16_t eo_rop_ComputeSize(eOropconfig_t ropcfg, eOropcode_t ropc, uint16_t sizeofdata);
+
 
 
 /** @}            

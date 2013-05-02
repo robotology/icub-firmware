@@ -52,6 +52,9 @@ extern "C" {
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
+// the ropframe with zero rops does not have zero capacity as it is made of an header and a footer. thus requires some bytes 
+enum { eo_ropframe_capacityforZEROrops = 28 };
+
 
 /** @typedef    typedef struct EOropframe_hid EOropframe
     @brief      EOropframe is an opaque struct. It is used to implement data abstraction for the datagram 
@@ -96,9 +99,11 @@ extern uint16_t eo_ropframe_ROP_NumberOf(EOropframe *p);
 // does not check anything about p safety
 extern uint16_t eo_ropframe_ROP_NumberOf_quickversion(EOropframe *p);
 
-extern eOresult_t eo_ropframe_ROP_Get(EOropframe *p, EOrop *rop, uint16_t *unparsedbytes);
+extern eOresult_t eo_ropframe_ROP_Parse(EOropframe *p, EOrop *rop, uint16_t *unparsedbytes);
 
-extern eOresult_t eo_ropframe_ROP_Set(EOropframe *p, const EOrop *rop, uint16_t* addedinpos, uint16_t* consumedbytes, uint16_t *remainingbytes);
+extern eOresult_t eo_ropframe_ROP_Add(EOropframe *p, const EOrop *rop, uint16_t* addedinpos, uint16_t* consumedbytes, uint16_t *remainingbytes);
+
+extern eOresult_t eo_ropframe_ROP_Rem(EOropframe *p, uint16_t wasaddedinpos, uint16_t itssizeis);
 
 
 extern eOresult_t eo_ropframe_age_Set(EOropframe *p, eOabstime_t age);
