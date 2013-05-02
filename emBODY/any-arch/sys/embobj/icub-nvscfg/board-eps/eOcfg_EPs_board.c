@@ -144,6 +144,11 @@ extern const EOconstvector* eo_cfg_nvsEP_board_EPs_nvscfgep_get(uint8_t boardNum
             EPvector = eo_cfg_EPs_vectorof_eb9;
         } break;
 
+        default:
+        {
+            EPvector = &s_eo_cfg_nvsEP_board_empty;
+        } break;
+
 	}
 	return(EPvector);
 }
