@@ -118,7 +118,8 @@ extern EOreceiver* eo_receiver_New(const eo_receiver_cfg_t *cfg)
     memset(&retptr->DEBUG, 0, sizeof(EOreceiverDEBUG_t));
 #endif  
     
-    eo_ropframe_Load(retptr->ropframereply, retptr->bufferropframereply, 0, cfg->capacityofropframereply);
+    eo_ropframe_Load(retptr->ropframereply, retptr->bufferropframereply, eo_ropframe_sizeforZEROrops, cfg->capacityofropframereply);
+    eo_ropframe_Clear(retptr->ropframereply);
     
     return(retptr);
 }

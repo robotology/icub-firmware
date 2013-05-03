@@ -144,11 +144,11 @@ extern EOtransmitter* eo_transmitter_New(const eo_transmitter_cfg_t *cfg)
     retptr->currenttime             = 0;
     retptr->tx_seqnum               = 0;
 
-    eo_ropframe_Load(retptr->ropframeregulars, retptr->bufferropframeregulars, 0, cfg->capacityofropframeregulars);
+    eo_ropframe_Load(retptr->ropframeregulars, retptr->bufferropframeregulars, eo_ropframe_sizeforZEROrops, cfg->capacityofropframeregulars);
     eo_ropframe_Clear(retptr->ropframeregulars);
-    eo_ropframe_Load(retptr->ropframeoccasionals, retptr->bufferropframeoccasionals, 0, cfg->capacityofropframeoccasionals);
+    eo_ropframe_Load(retptr->ropframeoccasionals, retptr->bufferropframeoccasionals, eo_ropframe_sizeforZEROrops, cfg->capacityofropframeoccasionals);
     eo_ropframe_Clear(retptr->ropframeoccasionals);
-    eo_ropframe_Load(retptr->ropframereplies, retptr->bufferropframereplies, 0, cfg->capacityofropframereplies);
+    eo_ropframe_Load(retptr->ropframereplies, retptr->bufferropframereplies, eo_ropframe_sizeforZEROrops, cfg->capacityofropframereplies);
     eo_ropframe_Clear(retptr->ropframereplies);
 
 

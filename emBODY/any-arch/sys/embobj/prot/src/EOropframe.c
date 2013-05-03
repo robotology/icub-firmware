@@ -109,7 +109,7 @@ static void s_eo_ropframe_footer_adjust(EOropframe *p);
 
 //static const char s_eobj_ownname[] = "EOropframe";
 
-static const uint16_t s_eo_ropframe_minimum_framesize = eo_ropframe_capacityforZEROrops;
+//static const uint16_t s_eo_ropframe_minimum_framesize = eo_ropframe_sizeforZEROrops;
 //(sizeof(EOropframeHeader_t)+sizeof(EOropframeFooter_t));
 
 
@@ -142,7 +142,7 @@ extern eOresult_t eo_ropframe_Load(EOropframe *p, uint8_t *framedata, uint16_t f
         return(eores_NOK_nullpointer);
     }
     
-    if((framecapacity < s_eo_ropframe_minimum_framesize) || (framesize > framecapacity) || (framesize < s_eo_ropframe_minimum_framesize))
+    if((framecapacity < eo_ropframe_sizeforZEROrops) || (framesize > framecapacity) || (framesize < eo_ropframe_sizeforZEROrops))
     {
         return(eores_NOK_generic);
     }
@@ -204,7 +204,7 @@ extern eOresult_t eo_ropframe_Clear(EOropframe *p)
         return(eores_NOK_nullpointer);
     }
    
-    p->size                     = (0 == p->capacity) ? (0) : (s_eo_ropframe_minimum_framesize); // if capacity is zero then we dont have buffer ... else we have and size must be s_eo_ropframe_minimum_framesize
+    p->size                     = (0 == p->capacity) ? (0) : (eo_ropframe_sizeforZEROrops); // if capacity is zero then we dont have buffer ... else we have and size must be eo_ropframe_sizeforZEROrops
     p->index2nextrop2beparsed   = 0;
     
     if(NULL != p->headropsfooter)
@@ -246,7 +246,7 @@ extern eOresult_t eo_ropframe_Append(EOropframe *p, EOropframe *rfr, uint16_t *r
     p_sizeofrops = s_eo_ropframe_sizeofrops_get(p);
 
     // first must be able to accept the rops contained in teh second
-    if(p->capacity < (s_eo_ropframe_minimum_framesize+p_sizeofrops+rfr_sizeofrops))
+    if(p->capacity < (eo_ropframe_sizeforZEROrops+p_sizeofrops+rfr_sizeofrops))
     {
         return(eores_NOK_generic);
     }
@@ -272,7 +272,7 @@ extern eOresult_t eo_ropframe_Append(EOropframe *p, EOropframe *rfr, uint16_t *r
     // fill the retrun value
     if(NULL != remainingbytes)
     {
-        *remainingbytes = p->capacity - s_eo_ropframe_minimum_framesize - s_eo_ropframe_sizeofrops_get(p);
+        *remainingbytes = p->capacity - eo_ropframe_sizeforZEROrops - s_eo_ropframe_sizeofrops_get(p);
     }
 
 
@@ -400,9 +400,9 @@ extern eOresult_t eo_ropframe_ROP_Add(EOropframe *p, const EOrop *rop, uint16_t*
     // verify that we have bytes enough to convert the rop to stream 
     
     streamsize = eo_former_GetSizeOfStream(eo_former_GetHandle(), rop);
-    // remaining can be also negative. for example when capacity is eo_ropframe_capacityforZEROrops+1 (thus only one byte for rops) and the target rop requires 8 bytes.
-    // we have eo_ropframe_capacityforZEROrops+1 - eo_ropframe_capacityforZEROrops - 8 = -7 ...
-    remaining = p->capacity - s_eo_ropframe_minimum_framesize - s_eo_ropframe_sizeofrops_get(p);
+    // remaining can be also negative. for example when capacity is eo_ropframe_sizeforZEROrops+1 (thus only one byte for rops) and the target rop requires 8 bytes.
+    // we have eo_ropframe_sizeforZEROrops+1 - eo_ropframe_sizeforZEROrops - 8 = -7 ...
+    remaining = p->capacity - eo_ropframe_sizeforZEROrops - s_eo_ropframe_sizeofrops_get(p);
     if(remaining < ((int32_t)streamsize))
     {   // not enough space in ...
         return(eores_NOK_generic);
@@ -448,7 +448,7 @@ extern eOresult_t eo_ropframe_ROP_Add(EOropframe *p, const EOrop *rop, uint16_t*
         
     if(NULL != remainingbytes)
     {
-        *remainingbytes = p->capacity - s_eo_ropframe_minimum_framesize - s_eo_ropframe_sizeofrops_get(p);
+        *remainingbytes = p->capacity - eo_ropframe_sizeforZEROrops - s_eo_ropframe_sizeofrops_get(p);
     }
     
     // ... returns ok
@@ -488,7 +488,7 @@ extern eOresult_t eo_ropframe_ROP_Rem(EOropframe *p, uint16_t wasaddedinpos, uin
     s_eo_ropframe_footer_adjust(p);
 
     // clear what stays beyond footer: instead or remaining i clear only what was non-zero (itsizewas)
-    //tmp = p->capacity - s_eo_ropframe_minimum_framesize - s_eo_ropframe_sizeofrops_get(p);  // remaining
+    //tmp = p->capacity - eo_ropframe_sizeforZEROrops - s_eo_ropframe_sizeofrops_get(p);  // remaining
     memset(((uint8_t*)s_eo_ropframe_footer_get(p))+sizeof(EOropframeFooter_t), 0, itsizewas);
 
     return(eores_OK);
