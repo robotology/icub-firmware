@@ -209,6 +209,12 @@ extern eOresult_t eo_transmitter_regular_rops_Load(EOtransmitter *p, eOropdescri
     {
         return(eores_NOK_nullpointer);
     }  
+
+    if(NULL == p->listofregropinfo)
+    {
+        // in such a case there is room for regular rops (for instance because the cfg->maxnumberofregularrops is zero)
+        return(eores_NOK_generic);
+    }
     
     
     eov_mutex_Take(p->mtx_regulars, eok_reltimeINFINITE);
@@ -291,6 +297,12 @@ extern eOresult_t eo_transmitter_regular_rops_Unload(EOtransmitter *p, eOropdesc
         return(eores_NOK_nullpointer);
     }  
 
+    if(NULL == p->listofregropinfo)
+    {
+        // in such a case there is room for regular rops (for instance because the cfg->maxnumberofregularrops is zero)
+        return(eores_NOK_generic);
+    }
+
     // work on the list ... 
     
     eov_mutex_Take(p->mtx_regulars, eok_reltimeINFINITE);
@@ -343,6 +355,12 @@ extern eOresult_t eo_transmitter_regular_rops_Clear(EOtransmitter *p)
     {
         return(eores_NOK_nullpointer);
     }  
+
+    if(NULL == p->listofregropinfo)
+    {
+        // in such a case there is room for regular rops (for instance because the cfg->maxnumberofregularrops is zero)
+        return(eores_OK);
+    }
     
     eov_mutex_Take(p->mtx_regulars, eok_reltimeINFINITE);
     
@@ -367,6 +385,12 @@ extern eOresult_t eo_transmitter_regular_rops_Refresh(EOtransmitter *p)
     {
         return(eores_NOK_nullpointer);
     }  
+
+    if(NULL == p->listofregropinfo)
+    {
+        // in such a case there is room for regular rops (for instance because the cfg->maxnumberofregularrops is zero)
+        return(eores_OK);
+    }
     
     eov_mutex_Take(p->mtx_regulars, eok_reltimeINFINITE);
     
