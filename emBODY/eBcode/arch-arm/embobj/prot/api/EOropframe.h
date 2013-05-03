@@ -52,8 +52,8 @@ extern "C" {
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-// the ropframe with zero rops does not have zero capacity as it is made of an header and a footer. thus requires some bytes 
-enum { eo_ropframe_capacityforZEROrops = 28 };
+// the ropframe with zero rops does not have zero szie as it is made of an header and a footer. thus requires some bytes 
+enum { eo_ropframe_sizeforZEROrops = 28 };
 
 
 /** @typedef    typedef struct EOropframe_hid EOropframe
@@ -72,10 +72,8 @@ typedef struct EOropframe_hid EOropframe;
 // - declaration of extern public functions ---------------------------------------------------------------------------
  
  
-/** @fn         extern EOropframe* eo_ropframe_New(uint16_t capacity)
-    @brief      Creates a new frame object and allocates memory able to store @e capacity bytes. If @e capacity is
-                zero, then the object shall have external storage mode.
-    @param      capacity   The max size of the packet.
+/** @fn         extern EOropframe* eo_ropframe_New(void)
+    @brief      Creates a new frame object.
     @return     The pointer to the required object.
  **/
 extern EOropframe* eo_ropframe_New(void);
