@@ -42,7 +42,7 @@ extern "C" {
 #include "EoCommon.h"
 #include "EOtransceiver.h"
 #include "EOVmutex.h"
-#include "EOropframe_hid.h"
+#include "EOropframe.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -51,15 +51,15 @@ extern "C" {
 /*  Dimensions hereafter are related to the biggest packet the pc104 can send to the EMSs. It has to be equal to the biggest packet the EMS
     can receive and process ( which is different from the max packet the EMS can send to the pc104, because the protocol is asymmetric)
 */
-#define EOK_HOSTTRANSCEIVER_emptyropframe_dimension            sizeof(EOropframeEmpty_t)     // header + footer + 8 byte for progressive number
-#define EOK_HOSTTRANSCEIVER_TMP                                ( EOK_HOSTTRANSCEIVER_capacityofropframeregulars + EOK_HOSTTRANSCEIVER_capacityofropframereplies + EOK_HOSTTRANSCEIVER_emptyropframe_dimension)
+#define EOK_HOSTTRANSCEIVER_emptyropframe_dimension            eo_ropframe_sizeforZEROrops     // header + footer + 8 byte for progressive number = 28
 #define EOK_HOSTTRANSCEIVER_capacityoftxpacket                 768
 #define EOK_HOSTTRANSCEIVER_capacityofrxpacket                 1408
 #define EOK_HOSTTRANSCEIVER_capacityofrop                      256
-#define EOK_HOSTTRANSCEIVER_capacityofropframeregulars         20
-#define EOK_HOSTTRANSCEIVER_capacityofropframereplies          20
+#define EOK_HOSTTRANSCEIVER_capacityofropframeregulars         eo_ropframe_sizeforZEROrops
+#define EOK_HOSTTRANSCEIVER_capacityofropframereplies          eo_ropframe_sizeforZEROrops
+#define EOK_HOSTTRANSCEIVER_TMP                                ( EOK_HOSTTRANSCEIVER_capacityofropframeregulars + EOK_HOSTTRANSCEIVER_capacityofropframereplies + EOK_HOSTTRANSCEIVER_emptyropframe_dimension)
 #define EOK_HOSTTRANSCEIVER_capacityofropframeoccasionals      (EOK_HOSTTRANSCEIVER_capacityoftxpacket - EOK_HOSTTRANSCEIVER_TMP)
-#define EOK_HOSTTRANSCEIVER_maxnumberofregularrops             1
+#define EOK_HOSTTRANSCEIVER_maxnumberofregularrops             0
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
