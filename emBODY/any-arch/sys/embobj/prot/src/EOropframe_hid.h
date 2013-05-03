@@ -69,7 +69,8 @@ typedef struct  // 28 bytes ...
     uint8_t             headerfooter[28];
 } EOropframeEmpty_t;    EO_VERIFYsizeof(EOropframeEmpty_t, sizeof(EOropframeHeader_t)+sizeof(EOropframeFooter_t));
 
-EO_VERIFYsizeof(EOropframeEmpty_t, eo_ropframe_capacityforZEROrops);
+// the following is used to guarantee that eo_ropframe_capacityforZEROrops is equal to size of EOropframeEmpty_t.
+EO_VERIFYproposition(EOropframe_hid_verifyzerorops, sizeof(EOropframeEmpty_t) == eo_ropframe_capacityforZEROrops);
 
 typedef struct  // 32 bytes
 {
