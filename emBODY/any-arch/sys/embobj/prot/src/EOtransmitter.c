@@ -30,6 +30,7 @@
 #include "EOnv_hid.h"
 #include "EOrop_hid.h"
 #include "EOVtheSystem.h"
+#include "EOtheErrorManager.h"
 
 
 
@@ -93,7 +94,7 @@ static void s_eo_transmitter_list_shiftdownropinfo(void *item, void *param);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-//static const char s_eobj_ownname[] = "EOtransmitter";
+static const char s_eobj_ownname[] = "EOtransmitter";
 
 const eo_transmitter_cfg_t eo_transmitter_cfg_default = 
 {
@@ -161,8 +162,13 @@ extern EOtransmitter* eo_transmitter_New(const eo_transmitter_cfg_t *cfg)
         eo_packet_Payload_Get(retptr->txpacket, &data, &size);
         eo_packet_Capacity_Get(retptr->txpacket, &capacity);
     
-        eo_ropframe_Load(retptr->ropframereadytotx, data, size, capacity);
+        eo_ropframe_Load(retptr->ropframereadytotx, data, eo_ropframe_sizeforZEROrops, capacity); // dont use size because size is now zero.
         eo_ropframe_Clear(retptr->ropframereadytotx);
+        
+        if(eobool_true != eo_ropframe_IsValid(retptr->ropframereadytotx))
+        {
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "the ropframeready2tx is not valid... cannot continue");
+        }
 
         // the destination ipv4addr and ipv4port are constant and are the ones passed through configuration
         eo_packet_Addressing_Set(retptr->txpacket, retptr->ipv4addr, retptr->ipv4port);
