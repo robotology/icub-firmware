@@ -44,12 +44,6 @@ static void on_rec_runner_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map,
 
 static void on_rec_transceiver_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata);
 
-static void on_rec_emscontroller_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata);
-
-static void on_rec_canFaultLog_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata);
-
-static void on_rec_encoderError_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata);
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
@@ -65,12 +59,6 @@ static void on_rec_encoderError_debug(opcprotman_opc_t opc, opcprotman_var_map_t
 extern EOMtheIPnetDEBUG_t eom_ipnet_hid_DEBUG;
 extern EOMtheEMSrunnerDEBUG_t eom_emsrunner_hid_DEBUG;
 extern EOMtheEMStransceiverDEBUG_t eom_emstransceiver_hid_DEBUG;
-extern EOemsControllerDEBUG_t eo_emsController_hid_DEBUG;
-extern EOcanFaultLogDEBUG_t EOcanFaultLogDEBUG;
-extern EOencoderErrorDEBUG_t EOencoderErrorDEBUG;
-
-
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -149,73 +137,8 @@ static void on_rec_transceiver_debug(opcprotman_opc_t opc, opcprotman_var_map_t*
     
 }
 
-static void on_rec_emscontroller_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata)
-{   // for the ems
-    
-    switch(opc)
-    {
-        
-        case opcprotman_opc_set:
-        {   // someboby has sent us the order of copying recdata into map->ptr 
-            
-            // we just dont do it ...         
-        } break;
-        
-        case opcprotman_opc_say:    // someboby has replied to a ask we sent
-        case opcprotman_opc_sig:    // someboby has spontaneously sent some data
-        default:
-        {   // other are not managed
-        
-        } break;
-    }       
-    
-}
 
-static void on_rec_canFaultLog_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata)
-{   // for the ems
-    
-    //NOTE: never rec in ems
-    switch(opc)
-    {
-        
-        case opcprotman_opc_set:
-        {   // someboby has sent us the order of copying recdata into map->ptr 
-            
-            // we just dont do it ...         
-        } break;
-        
-        case opcprotman_opc_say:    // someboby has replied to a ask we sent
-        case opcprotman_opc_sig:    // someboby has spontaneously sent some data
-        default:
-        {   // other are not managed
-        
-        } break;
-    }       
-    
-}
 
-static void on_rec_encoderError_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata)
-{   // for the ems
-    
-    //NOTE: never rec in ems
-    switch(opc)
-    {
-        
-        case opcprotman_opc_set:
-        {   // someboby has sent us the order of copying recdata into map->ptr 
-            
-            // we just dont do it ...         
-        } break;
-        
-        case opcprotman_opc_say:    // someboby has replied to a ask we sent
-        case opcprotman_opc_sig:    // someboby has spontaneously sent some data
-        default:
-        {   // other are not managed
-        
-        } break;
-    }       
-    
-}
 
 // static void generic_on_rec(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata)
 // {   // the copy in map->ptr is not yet done ...
@@ -295,42 +218,7 @@ extern opcprotman_res_t opcprotman_personalize_database(OPCprotocolManager *p)
     {
         return(res);
     }
-
-
-/* personalize eo_emsController_hid_DEBUG_id var*/
-	res = opcprotman_personalize_var(   p, 
-                                        eo_emsController_hid_DEBUG_id,
-                                        (uint8_t*)&eo_emsController_hid_DEBUG, 
-                                        on_rec_emscontroller_debug);
-
-    if(opcprotman_OK != res)
-    {
-        return(res);
-    }
-
-
-/* personalize eo_emsController_hid_DEBUG_id var*/
-	res = opcprotman_personalize_var(   p, 
-                                        eo_canFaultLogDEBUG_id,
-                                        (uint8_t*)&EOcanFaultLogDEBUG, 
-                                        on_rec_canFaultLog_debug);
-
-    if(opcprotman_OK != res)
-    {
-        return(res);
-    }
   
-    /* personalize eo_emsController_hid_DEBUG_id var*/
-	res = opcprotman_personalize_var(   p, 
-                                         eo_EncoderErrorDEBUG_id ,
-                                        (uint8_t*)&EOencoderErrorDEBUG, 
-                                        on_rec_encoderError_debug);
-
-    if(opcprotman_OK != res)
-    {
-        return(res);
-    }
-
     return(res);
 }
 

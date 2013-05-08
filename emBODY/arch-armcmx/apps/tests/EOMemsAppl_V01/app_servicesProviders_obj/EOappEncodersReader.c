@@ -101,9 +101,7 @@ static const hal_encoder_t encoderMap[eOeOappEncReader_encoderMaxNum] =
 };
 
 
-EOencoderErrorDEBUG_t EOencoderErrorDEBUG = {0};
-uint16_t count_enc_read = 0;
-#define MAX_COUNT_ENC_READ      4000
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -189,31 +187,11 @@ extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_en
         
         return(res);
     }
-#ifdef _BDOOR_ENCERROR_
-    count_enc_read++;
-    if(count_enc_read == MAX_COUNT_ENC_READ)
-    {
-        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eo_EncoderErrorDEBUG_id, eok_reltimeINFINITE);  
-        count_enc_read = 0;
-        memset(&EOencoderErrorDEBUG, 0, sizeof(EOencoderErrorDEBUG_t));
-    }
-#endif    
     uint8_t error = s_eo_appEncReader_IsValidValue(&val_raw); 
 
     if (error)
     {
-        *value = error;
-        
-#ifdef _BDOOR_ENCERROR_
-        if(error == 1)
-        {
-             EOencoderErrorDEBUG.parityCheck[enc]++;
-        }
-        if(error ==2)
-        {
-            EOencoderErrorDEBUG.status[enc]++;
-        }
-#endif     
+        *value = error;  
         return(eores_NOK_generic);
     }
 
