@@ -577,13 +577,13 @@ static void s_eom_emsappl_InitLeds(void)
     hal_led_init(emsappl_ledorange, &cfg);
     hal_led_off(emsappl_ledorange); 
 
-    eOmledpulser_cfg_t ledpulsercfg = 
-    {
-        .numberofleds   = 3,
-        .leds           = { eom_ledpulser_led_zero, eom_ledpulser_led_one, eom_ledpulser_led_two }
-    };
+//     eOmledpulser_cfg_t ledpulsercfg = 
+//     {
+//         .numberofleds   = 3,
+//         .leds           = { eom_ledpulser_led_zero, eom_ledpulser_led_one, eom_ledpulser_led_two }
+//     };
 
-    eom_ledpulser_Initialise(&ledpulsercfg);
+//     eom_ledpulser_Initialise(&ledpulsercfg);
 
     //eom_ledpulser_Start(eom_ledpulser_GetHandle(), eom_ledpulser_led_zero, 400*1000, 10);
 }
