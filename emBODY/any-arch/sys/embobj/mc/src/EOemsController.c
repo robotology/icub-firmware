@@ -59,13 +59,6 @@ const float   EMS_FREQUENCY_FLOAT  = 1000.0f;
 const int32_t TICKS_PER_REVOLUTION = 65536;
 
 
-extern EOemsControllerDEBUG_t eo_emsController_hid_DEBUG =
-{
-    .boardid        = eom_emsappl_boardid_ebnone,
-    .count          = {0, 0, 0, 0},
-    .position       = {0, 0, 0, 0},
-    .velocity       = {0, 0, 0, 0}    
-}; 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -354,17 +347,7 @@ extern void eo_emsController_SetOutput(uint8_t joint, int16_t out)
 extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_vel)
 {
     if (s_emsc) 
-    {
-#if defined(USE_DEBUG_THEEMSCONTROLLER)         
-        // DEBUG
-        if(joint < 4)
-        {
-            eo_emsController_hid_DEBUG.count[joint] ++;
-            eo_emsController_hid_DEBUG.position[joint] = pos;
-            eo_emsController_hid_DEBUG.velocity[joint] = avg_vel;
-        }
-#endif        
-        
+    {        
         eo_axisController_SetPosRef(s_emsc->axis_controller[joint], pos, avg_vel);       
     }
 }
@@ -638,32 +621,7 @@ extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t motorerror, 
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-#ifdef __MC_BACKDOOR__
-extern void eo_emsController_hid_DEBUG_reset(void)
-{
-#if defined(USE_DEBUG_THEEMSCONTROLLER)    
-    // DEBUG
-    memset(&eo_emsController_hid_DEBUG, 0, sizeof(EOemsControllerDEBUG_t));  
-#endif    
-}
 
-extern void eo_emsController_hid_DEBUG_evaltransmission(void)
-{
-#if defined(USE_DEBUG_THEEMSCONTROLLER)     
-    const uint8_t zero[4] = {0, 0, 0, 0};
-    
-    if((eom_emsappl_boardid_eb6 == eom_emsapplcfg_GetHandle()->boardid) || (eom_emsappl_boardid_eb8 == eom_emsapplcfg_GetHandle()->boardid))
-    {
-        if(0 != memcmp(&eo_emsController_hid_DEBUG.count, zero, 4))
-        {
-            eo_emsController_hid_DEBUG.boardid = eom_emsapplcfg_GetHandle()->boardid;
-            // form and send the packet.
-            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eo_emsController_hid_DEBUG_id, eok_reltimeINFINITE);        
-        }
-    }  
-#endif    
-}
-#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------

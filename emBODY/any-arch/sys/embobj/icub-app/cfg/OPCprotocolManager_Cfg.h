@@ -48,11 +48,8 @@ extern "C" {
 #define 	eom_ipnet_hid_DEBUG_id 				1
 #define 	eom_emsrunner_hid_DEBUG_id  		2
 #define		eom_emstransceiver_hid_DEBUG_id 	3
-#define 	eo_emsController_hid_DEBUG_id 		4
-#define 	eo_canFaultLogDEBUG_id 				5
-#define 	eo_EncoderErrorDEBUG_id 			6
 
-#define 	opcProt_numofvar_max				6
+#define 	opcProt_numofvar_max				3
   
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
@@ -89,27 +86,6 @@ typedef struct
     uint32_t    cannotloadropinoccasionals;
 } EOMtheEMStransceiverDEBUG_t;  
 
-
-typedef struct
-{   // 4 is MAX_JOINTS but i use 4 to avoid ... problems with the host
-    uint32_t                    boardid;    //eom_emsapplcfg_boardid_t
-    uint8_t                     count[4];
-    eOmeas_position_t           position[4];
-    eOmeas_velocity_t           velocity[4];    
-} EOemsControllerDEBUG_t;
-
-typedef struct
-{
-    int16_t currSetPointList[4];
-    eOcanframe_t overCurrentMsg;
-    eOcanframe_t nextCanMsgs[6];
-}EOcanFaultLogDEBUG_t; //size 2*4 + 16 +16*6 = 120
-
-typedef struct
-{
-    uint16_t parityCheck[6];
-    uint16_t status[6];
-} EOencoderErrorDEBUG_t;
 
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------

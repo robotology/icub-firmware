@@ -64,27 +64,7 @@ static opcprotman_var_map_t s_myarray[] =
         .size       = sizeof(EOMtheEMStransceiverDEBUG_t),
         .ptr        = NULL,
         .onrec      = NULL
-    },
-    {
-        .var        = eo_emsController_hid_DEBUG_id,
-        .size       = sizeof(EOemsControllerDEBUG_t),
-        .ptr        = NULL,
-        .onrec      = NULL
-    },    
-    {
-        .var        = eo_canFaultLogDEBUG_id,
-        .size       = sizeof(EOcanFaultLogDEBUG_t),
-        .ptr        = NULL,
-        .onrec      = NULL
-    },
-
-     {
-        .var        = eo_EncoderErrorDEBUG_id,
-        .size       = sizeof(EOencoderErrorDEBUG_t),
-        .ptr        = NULL,
-        .onrec      = NULL
-    } 
-    
+    }
 };
 
 opcprotman_cfg_t opcprotmanCFGv0x1234 =

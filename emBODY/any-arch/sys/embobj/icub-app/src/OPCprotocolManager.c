@@ -80,7 +80,8 @@ static opcprotman_var_map_t* s_opcprotman_find_var(OPCprotocolManager* p, uint16
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
-
+//this function will be declare in a configuration file, in oreder to personalize memory and callback functions of the database 
+extern opcprotman_res_t opcprotman_personalize_database(OPCprotocolManager *p);
 
 extern OPCprotocolManager * opcprotman_New(const opcprotman_cfg_t *cfg)
 {
