@@ -1345,7 +1345,8 @@ extern void* svc_oosiit_mbx_create(uint16_t numofmessages)
     ret = rt_iit_memory_getmbx(numofmessages);
     if(NULL != ret)
     {
-        rt_mbx_init(ret, 16+(4*numofmessages));  
+        // rt_mbx_init(ret, 16+(4*numofmessages));  // 16 is: ((sizeof(struct OS_MCB)-4). then rt_mbx_init() operates to retrieve numofmessages, thus ...
+        iitchanged_rt_mbx_init(ret, numofmessages);
     }
     
     rt_iit_dbg_svc_exit();

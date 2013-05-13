@@ -856,6 +856,20 @@ rdy:  p_CB->events &= ~event_flags;
 
 // - mailbox management routines: rt_Mailbox.c ------------------------------------------------------------------------
 
+void iitchanged_rt_mbx_init (OS_ID mailbox, U16 numofmessages) {
+  /* Initialize a mailbox */
+  P_MCB p_MCB = mailbox;
+
+  p_MCB->cb_type = MCB;
+  p_MCB->state   = 0;
+  p_MCB->isr_st  = 0;
+  p_MCB->p_lnk   = NULL;
+  p_MCB->first   = 0;
+  p_MCB->last    = 0;
+  p_MCB->count   = 0;
+  p_MCB->size    = numofmessages;
+}
+
 OS_RESULT iitchanged_rt_mbx_send (OS_ID mailbox, void *p_msg, TIME_t timeout) {
    /* Send message to a mailbox */
    P_MCB p_MCB = mailbox;
