@@ -23,7 +23,7 @@
 #include "OPCprotocolManager_Cfg.h" 
 #include "OPCprotocolManager.h"
 
-#include "EOtheEMSapplDiagnostics.h"
+#include "EoDiagnostics.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
