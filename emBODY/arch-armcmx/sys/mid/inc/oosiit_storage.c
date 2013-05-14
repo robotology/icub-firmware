@@ -108,6 +108,7 @@ extern OS_TID    rt_tsk_self(void);
 extern void      rt_mut_init(OS_ID mutex);
 extern OS_RESULT iitchanged_rt_mut_wait(OS_ID mutex, TIME_t timeout);
 extern OS_RESULT rt_mut_release(OS_ID mutex);
+extern void* rt_iit_tsk_perthread_libspace_get(OS_TID task_id);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
@@ -224,12 +225,16 @@ void *__user_perthread_libspace (void) {
     return (&__libspace_start);
   }
 
+#if 0  
     if(NULL == std_libspace)
     {
         oosiit_sys_error(oosiit_error_internal_stdlibspace);    
     }
 
   return ((void *)&std_libspace[idx-1]);
+#else
+    return(rt_iit_tsk_perthread_libspace_get(idx));
+#endif    
 }
 
 
