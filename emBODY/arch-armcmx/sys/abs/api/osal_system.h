@@ -57,8 +57,10 @@
 /** @fn         extern void osal_system_start(void (*launcher_fn)(void))
     @brief      Start the scheduler which executes the function launcher_fn() inside the launcher task with priority 
                 osal_prio_systsk_launcher (254). 
-                The launcher_fn() function is responsible to start any other task and either returns or adjust its priority
-                to a value between osal_prio_usrtsk_min and osal_prio_usrtsk_max and runs as a normal task. 
+                The launcher_fn() function is responsible to start any other task and at the end it must either: 
+                (a) call return which causes the system to stop the launcher task and releasing the launcher stack;
+                or (b) adjust its priority to a value between osal_prio_usrtsk_min and osal_prio_usrtsk_max and run
+                as a normal task. 
                 At the end of the launcher_fn(), the system shall have the following tasks:
                 (a) the scheduler with priority osal_prio_systsk_scheduler (255), (b) the idle task with priority
                 osal_prio_systsk_idle (0), (c) the user-defined tasks with user priorities, and possibly (d) the launcher 
@@ -72,17 +74,6 @@
                 scheduler.
  **/
 extern void osal_system_start(void (*launcher_fn)(void));
-
-
-// /** @fn         extern void * osal_system_launcherbuffer_get(uint16_t *size)
-//     @brief      Retrieves the memory area which was used by the launcher task as its stack.  This function
-//                 can be called only by an ordinary running task. It has a protection which returns NULL if the
-//                 launcher tasks has not been launched yet or if it is still running.
-//                 after .
-//     @param      size        Points to the size of the returned memory.
-//     @return     The required memory or NULL.
-//  **/
-//extern void * osal_system_launcherbuffer_get(uint16_t *size);
 
 
 /** @fn         extern void osal_system_ticks_abstime_set(osal_abstime_t tot)
