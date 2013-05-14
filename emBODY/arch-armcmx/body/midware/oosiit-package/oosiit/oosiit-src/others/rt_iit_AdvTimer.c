@@ -65,6 +65,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "string.h"
+#include "stdlib.h"
 #include "oosiit.h"
 #include "rt_TypeDef.h"
 #include "rt_task.h"
@@ -137,6 +138,10 @@ static void s_rt_iit_advtmr_insert(PIIT_ADVTMR p_tmr, WIDETIME_t itcnt);
 
 static void s_rt_iit_advtmr_clear(PIIT_ADVTMR p_tmr);
 
+static void s_rt_iit_advtmr_synchronise_staticversion(U64 oldtime);
+
+static void s_rt_iit_advtmr_synchronise_dynamicversion(U64 oldtime); 
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -158,15 +163,17 @@ OS_ID rt_iit_advtmr_new (void)  {
    PIIT_ADVTMR p_tmr;
 
    
-
-   // return null if we dont have the timers
-   if (oosiit_cfg_advtmr == NULL)  {
-      
-      return (NULL);
+   // if we dont have the static memory for the timers ... call malloc
+   if(NULL != oosiit_cfg_advtmr)  
+   {  
+        p_tmr = rt_alloc_box ((U32 *)oosiit_cfg_advtmr);       
    }
-
-   // get ram
-   p_tmr = rt_alloc_box ((U32 *)oosiit_cfg_advtmr);
+   else
+   {
+        //p_tmr = calloc(sizeof(struct OSIIT_ADVTMR), 1);
+       p_tmr = oosiit_memory_new(sizeof(struct OSIIT_ADVTMR));
+   }
+   
    if (!p_tmr)  {
       
       return (NULL);
@@ -334,96 +341,16 @@ void rt_iit_advtmr_tick (void) {
 
 void rt_iit_advtmr_synchronise(U64 oldtime) 
 {
-    // remove the absolute timers and put them in a temporary array.
-    // then reinsert them again in the list.
-    U8 i;
-    PIIT_ADVTMR prev, p_tmr;
-    oosiit_advtmr_timing_t timing;
-    oosiit_advtmr_action_t action;
-
-
-    memset(&((oosiit_arrayhead_t*)oosiit_cfg_advtmr_ptrs)->data[0], 0, 4*((oosiit_arrayhead_t*)oosiit_cfg_advtmr_ptrs)->capacity);
-    ((oosiit_arrayhead_t*)oosiit_cfg_advtmr_ptrs)->size = 0;
-
-    prev = (PIIT_ADVTMR)&os_iit_advtmr;
-
-#ifdef _DEBUG_THE_TIME_SHIFT_
-    s_rt_iit_advtmr_debug_read_list_of_active_timers();
-#endif
-
-    // stage 1: remove from the list every absolute timer
-    while(NULL != prev->next)  
-    {
-        // work on its next.
-        p_tmr = prev->next;
-#ifdef _DEBUG_THE_TIME_SHIFT_
-        s_rt_iit_advtmr_debug_read_list_of_active_timers();
-#endif
-        if(OOSIIT_ASAPTIME == p_tmr->abstime_iit) 
-        {   // the timer is an incremental one
-            prev = p_tmr;
-            continue;        
-        }
-        else
-        {   // found an absolute timer
-
-            // remove the timer but dont destroy it.
-            prev->next = p_tmr->next;
-            prev->tcnt += p_tmr->tcnt;
-#ifdef _DEBUG_THE_TIME_SHIFT_
-            s_rt_iit_advtmr_debug_read_list_of_active_timers();
-#endif
-            // put the timer inside the array
-            ((oosiit_arrayhead_t*)oosiit_cfg_advtmr_ptrs)->data[((oosiit_arrayhead_t*)oosiit_cfg_advtmr_ptrs)->size++] = (U32)p_tmr;
-
-        }
-
+    if(NULL != oosiit_cfg_advtmr_ptrs)
+    {        
+        s_rt_iit_advtmr_synchronise_staticversion(oldtime);
     }
-
-    // stage 2: insert them back in the list
-#ifdef _DEBUG_THE_TIME_SHIFT_
-    s_rt_iit_advtmr_debug_read_list_of_active_timers();
-#endif
-    for(i=0; i<((oosiit_arrayhead_t*)oosiit_cfg_advtmr_ptrs)->size; i++)
+    else
     {
-        p_tmr = (PIIT_ADVTMR) ((oosiit_arrayhead_t*)oosiit_cfg_advtmr_ptrs)->data[i];
-
-        // fill action
-        action.cbk          = p_tmr->cbk;
-        action.par          = p_tmr->par;
-
-        // fill timing. 
-        // if periodic it is easy: we leave the same values. if singleshot in the future ok. if in the past we set curtime+1.
-
-        if(0 != p_tmr->period_iit)
-        {   // periodic: easy as we leave the same values
-            timing.startat      = p_tmr->startat_iit - p_tmr->period_iit;
-            timing.firstshot    = p_tmr->period_iit;
-            timing.othershots   = p_tmr->period_iit;
-        }
-        else if(p_tmr->abstime_iit > oosiit_time)
-        {   // singleshot in the future: we set startat with the desired expiry time
-            timing.startat      = p_tmr->abstime_iit;
-            timing.firstshot    = 0;
-            timing.othershots   = 0;
-        }
-        else
-        {   // singleshot in the past: we execute it at next tick
-            timing.startat      = oosiit_time + 1;
-            timing.firstshot    = 0;
-            timing.othershots   = 0;
-        }
-
-
-        // now clear the timer and start it
-        s_rt_iit_advtmr_clear(p_tmr);
-        s_rt_iit_advtmr_start(p_tmr, &timing, &action);
-#ifdef _DEBUG_THE_TIME_SHIFT_
-        s_rt_iit_advtmr_debug_read_list_of_active_timers();
-#endif
+        s_rt_iit_advtmr_synchronise_dynamicversion(oldtime);
     }
-
 }
+
 
 #if 0
 void rt_iit_advtmr_synchronise_buggy_version(U64 oldtime) 
@@ -883,7 +810,15 @@ static OS_ID s_rt_iit_advtmr_delete (OS_ID timer)  {
       s_rt_iit_advtmr_stop(timer);
    }
    
-   rt_free_box ((U32 *)oosiit_cfg_advtmr, p_tmr);
+   if(NULL != oosiit_cfg_advtmr)
+   {
+       rt_free_box ((U32 *)oosiit_cfg_advtmr, p_tmr);
+   }
+   else
+   {
+        //free(p_tmr);
+       oosiit_memory_del(p_tmr);
+   }
 
    /* Timer killed */
    return (NULL);
@@ -925,6 +860,216 @@ static void s_rt_iit_advtmr_clear(PIIT_ADVTMR p_tmr)
     p_tmr->par              = NULL;
 }
 
+static void s_rt_iit_advtmr_synchronise_staticversion(U64 oldtime) 
+{
+    // remove the absolute timers and put them in a temporary array.
+    // then reinsert them again in the list.
+    U8 i;
+    PIIT_ADVTMR prev, p_tmr;
+    oosiit_advtmr_timing_t timing;
+    oosiit_advtmr_action_t action;
+    
+
+    memset(&((oosiit_arrayhead_t*)oosiit_cfg_advtmr_ptrs)->data[0], 0, 4*((oosiit_arrayhead_t*)oosiit_cfg_advtmr_ptrs)->capacity);
+    ((oosiit_arrayhead_t*)oosiit_cfg_advtmr_ptrs)->size = 0;
+
+
+#ifdef _DEBUG_THE_TIME_SHIFT_
+    s_rt_iit_advtmr_debug_read_list_of_active_timers();
+#endif
+
+    // stage 1: remove from the list every absolute timer
+    prev = (PIIT_ADVTMR)&os_iit_advtmr;
+    while(NULL != prev->next)  
+    {
+        // work on its next.
+        p_tmr = prev->next;
+#ifdef _DEBUG_THE_TIME_SHIFT_
+        s_rt_iit_advtmr_debug_read_list_of_active_timers();
+#endif
+        if(OOSIIT_ASAPTIME == p_tmr->abstime_iit) 
+        {   // the timer is an incremental one
+            prev = p_tmr;
+            continue;        
+        }
+        else
+        {   // found an absolute timer
+
+            // remove the timer but dont destroy it.
+            prev->next = p_tmr->next;
+            prev->tcnt += p_tmr->tcnt;
+#ifdef _DEBUG_THE_TIME_SHIFT_
+            s_rt_iit_advtmr_debug_read_list_of_active_timers();
+#endif
+            // put the timer inside the array
+            ((oosiit_arrayhead_t*)oosiit_cfg_advtmr_ptrs)->data[((oosiit_arrayhead_t*)oosiit_cfg_advtmr_ptrs)->size++] = (U32)p_tmr;
+
+        }
+
+    }
+
+    // stage 2: insert them back in the list
+#ifdef _DEBUG_THE_TIME_SHIFT_
+    s_rt_iit_advtmr_debug_read_list_of_active_timers();
+#endif
+    for(i=0; i<((oosiit_arrayhead_t*)oosiit_cfg_advtmr_ptrs)->size; i++)
+    {
+        p_tmr = (PIIT_ADVTMR) ((oosiit_arrayhead_t*)oosiit_cfg_advtmr_ptrs)->data[i];
+
+        // fill action
+        action.cbk          = p_tmr->cbk;
+        action.par          = p_tmr->par;
+
+        // fill timing. 
+        // if periodic it is easy: we leave the same values. if singleshot in the future ok. if in the past we set curtime+1.
+
+        if(0 != p_tmr->period_iit)
+        {   // periodic: easy as we leave the same values
+            timing.startat      = p_tmr->startat_iit - p_tmr->period_iit;
+            timing.firstshot    = p_tmr->period_iit;
+            timing.othershots   = p_tmr->period_iit;
+        }
+        else if(p_tmr->abstime_iit > oosiit_time)
+        {   // singleshot in the future: we set startat with the desired expiry time
+            timing.startat      = p_tmr->abstime_iit;
+            timing.firstshot    = 0;
+            timing.othershots   = 0;
+        }
+        else
+        {   // singleshot in the past: we execute it at next tick
+            timing.startat      = oosiit_time + 1;
+            timing.firstshot    = 0;
+            timing.othershots   = 0;
+        }
+
+
+        // now clear the timer and start it
+        s_rt_iit_advtmr_clear(p_tmr);
+        s_rt_iit_advtmr_start(p_tmr, &timing, &action);
+#ifdef _DEBUG_THE_TIME_SHIFT_
+        s_rt_iit_advtmr_debug_read_list_of_active_timers();
+#endif
+    }
+
+}
+
+static void s_rt_iit_advtmr_synchronise_dynamicversion(U64 oldtime) 
+{
+    // remove the absolute timers and put them in a temporary array.
+    // then reinsert them again in the list.
+    PIIT_ADVTMR prev, p_tmr;
+    oosiit_advtmr_timing_t timing;
+    oosiit_advtmr_action_t action;
+    
+    PIIT_ADVTMR* storedabsolutetimers = NULL;
+    uint16_t numberofstoredabsolutetimers = 0;
+    uint16_t i=0;
+    
+    
+
+#ifdef _DEBUG_THE_TIME_SHIFT_
+    s_rt_iit_advtmr_debug_read_list_of_active_timers();
+#endif
+    
+    // stage 0: count int the list every absolute timer
+    prev = (PIIT_ADVTMR)&os_iit_advtmr;
+    while(NULL != prev->next)  
+    {
+        // work on its next.
+        p_tmr = prev->next;
+
+        if(OOSIIT_ASAPTIME == p_tmr->abstime_iit) 
+        {   // the timer is an incremental one
+            prev = p_tmr;
+            continue;        
+        }
+        else
+        {   // found an absolute timer
+            numberofstoredabsolutetimers++;
+        }
+    }  
+
+    if(numberofstoredabsolutetimers > 0)
+    {
+        storedabsolutetimers = calloc(sizeof(PIIT_ADVTMR), numberofstoredabsolutetimers);
+    }
+
+    // stage 1: remove from the list every absolute timer
+    prev = (PIIT_ADVTMR)&os_iit_advtmr;
+    while(NULL != prev->next)  
+    {
+        // work on its next.
+        p_tmr = prev->next;
+#ifdef _DEBUG_THE_TIME_SHIFT_
+        s_rt_iit_advtmr_debug_read_list_of_active_timers();
+#endif
+        if(OOSIIT_ASAPTIME == p_tmr->abstime_iit) 
+        {   // the timer is an incremental one
+            prev = p_tmr;
+            continue;        
+        }
+        else
+        {   // found an absolute timer
+
+            // remove the timer but dont destroy it.
+            prev->next = p_tmr->next;
+            prev->tcnt += p_tmr->tcnt;
+#ifdef _DEBUG_THE_TIME_SHIFT_
+            s_rt_iit_advtmr_debug_read_list_of_active_timers();
+#endif
+            // put the timer inside the array
+            storedabsolutetimers[i++] = p_tmr;
+        }
+
+    }
+
+    // stage 2: insert them back in the list
+#ifdef _DEBUG_THE_TIME_SHIFT_
+    s_rt_iit_advtmr_debug_read_list_of_active_timers();
+#endif
+    for(i=0; i<numberofstoredabsolutetimers; i++)
+    {
+        p_tmr = storedabsolutetimers[i];
+
+        // fill action
+        action.cbk          = p_tmr->cbk;
+        action.par          = p_tmr->par;
+
+        // fill timing. 
+        // if periodic it is easy: we leave the same values. if singleshot in the future ok. if in the past we set curtime+1.
+
+        if(0 != p_tmr->period_iit)
+        {   // periodic: easy as we leave the same values
+            timing.startat      = p_tmr->startat_iit - p_tmr->period_iit;
+            timing.firstshot    = p_tmr->period_iit;
+            timing.othershots   = p_tmr->period_iit;
+        }
+        else if(p_tmr->abstime_iit > oosiit_time)
+        {   // singleshot in the future: we set startat with the desired expiry time
+            timing.startat      = p_tmr->abstime_iit;
+            timing.firstshot    = 0;
+            timing.othershots   = 0;
+        }
+        else
+        {   // singleshot in the past: we execute it at next tick
+            timing.startat      = oosiit_time + 1;
+            timing.firstshot    = 0;
+            timing.othershots   = 0;
+        }
+
+
+        // now clear the timer and start it
+        s_rt_iit_advtmr_clear(p_tmr);
+        s_rt_iit_advtmr_start(p_tmr, &timing, &action);
+#ifdef _DEBUG_THE_TIME_SHIFT_
+        s_rt_iit_advtmr_debug_read_list_of_active_timers();
+#endif
+    }
+    
+    
+    // finally delete the temporary memory
+    free(storedabsolutetimers);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

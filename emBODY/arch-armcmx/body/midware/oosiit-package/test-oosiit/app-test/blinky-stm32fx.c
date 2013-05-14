@@ -142,15 +142,9 @@ int main(void)
 //     ram32data = (uint32_t*)calloc(ram32num/4, sizeof(uint32_t));
 //     ram64data = (uint64_t*)calloc(ram64num/8, sizeof(uint64_t));
 
-    ram32data = (uint32_t*)oosiit_memory_new(ram32num);
-    ram64data = (uint64_t*)oosiit_memory_new(ram64num);
+    ram32data = (0 == ram32num) ? (NULL) : ((uint32_t*)oosiit_memory_new(ram32num));
+    ram64data = (0 == ram64num) ? (NULL) : ((uint64_t*)oosiit_memory_new(ram64num));
     
-    if((NULL == ram32data) || (NULL == ram64data))
-    {
-        // enter in error mode
-        for(;;);
-    }
-
     oosiit_memory_load(oosiit_cfg_USERptr, ram32data, ram64data);
 
     inittskstacksize = 256;

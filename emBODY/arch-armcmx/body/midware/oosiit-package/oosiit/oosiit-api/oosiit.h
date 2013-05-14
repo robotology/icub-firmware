@@ -81,21 +81,31 @@ typedef uint32_t oosiit_taskid_t;
 typedef void* oosiit_objptr_t;
 
 
+/** @typedef    typedef enum oosiit_memorymode_t 
+    @brief      contains modes for memory allocation.
+ **/ 
+typedef enum
+{
+    oosiit_memmode_static       = 0,
+    oosiit_memmode_dynamic      = 1  
+} oosiit_memorymode_t;
+
+
 /** @typedef    typedef struct oosiit_cfg_t
     @brief      keeps configuration of oosiit which can be loaded in runtime.
  **/
 typedef struct
 {  
-    // from cmsis-rtx
+    uint32_t        cpufreq;                        /**< the clock speed of the MPU in Hz. */                                
+    uint32_t        ticktime;                       /**< the tick period in micro-seconds. */   
+    uint8_t         capacityofpostpendcommandfifo;  /**< the capacity of FIFO which contains events to be processed in the postPEND following a call of a oosiit function from inside an ISR */     
+    uint8_t         checkstackoverflow;             /**< if 1 at every context switch its is verified if there is a stack overflow. if 0 no check is done. */  
+    uint8_t         memorymode;                     /**< use oosiit_memorymode_t */
+    uint8_t         roundrobinenabled;              /**< if 1 it allows round-robin between the task of same priority. if 0 rr is disabled. */                                                 
+    uint32_t        roundrobinnumberofticks;        /**< the timeslice assigned to each task. in number of ticks*/          
     uint8_t         maxnumofusertasks;              /**< max number of user tasks (init and idle task are not counted as they are system tasks) */                   
-    uint8_t         checkStack;                     /**< if 1 at every context switch its is verified if there is a stack overflow. if 0 no check is done. */                
-    uint8_t         sizeISRFIFO;                    /**< the size of FIFO which contains events to be processed in the postPEND following a call of a oosiit function from inside an ISR */ 
-    uint8_t         roundRobin;                     /**< if 1 it allows round-robin between the task of same priority. if 0 rr is disabled. */ 
-    uint32_t        osClock;                        /**< the clock speed of teh MPU in hz. */                                
-    uint32_t        osTick;                         /**< the tick period in micro-seconds. */                                                     
-    uint32_t        roundRobinTimeout;              /**< the timeslice assigned to each task. in ticks. */                                                     
-                               
-    // from iit extension
+
+    // the following are not relevant if memoryallocation is oosiit_memalloc_atruntime
     uint8_t         numAdvTimer;                    /**< max number of advanced timers */                            
     uint8_t         numMutex;                       /**< max number of mutexes */                                              
     uint8_t         numSemaphore;                   /**< max number of semaphores */                           
@@ -145,7 +155,7 @@ typedef struct
 {
     oosiit_task_fn_t    function;       /**< the function executed by the task. typically is a forever loop. */
     void*               param;          /**< the param of the function executed by the task.  */
-    uint8_t             priority;       /**< the priority of teh task. */
+    uint8_t             priority;       /**< the priority of the task. */
     uint16_t            stacksize;      /**< the stack size */
     uint64_t*           stackdata;      /**< the stack used by the task */   
 } oosiit_task_properties_t;
@@ -161,14 +171,15 @@ typedef enum
     oosiit_error_isrfifooverflow        = 2,        /**< too many calls from an ISR */
     oosiit_error_mbxoverflow            = 3,        /**< to be undestood */
     oosiit_error_internal_stdlibspace   = 10,       /**< there is no stdlib space available */
-    oosiit_error_internal_sysmutex      = 11        /**< too many calls to system mutex */
+    oosiit_error_internal_sysmutex      = 11,       /**< too many calls to system mutex */
+    oosiit_error_memory_allocation      = 12
 } oosiit_error_code_t;
 
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const uint32_t oosiit_maxwait;
+extern const uint32_t oosiit_maxwait;   // = OOSIIT_MAXWAIT
 extern const uint32_t oosiit_notimeout; // = OOSIIT_NOTIMEOUT
 extern const uint64_t oosiit_asaptime;  // = OOSIIT_ASAPTIME
 
@@ -240,8 +251,8 @@ extern uint64_t* oosiit_memory_getstack(uint16_t bytes);
 
 
 /** @fn         extern oosiit_result_t oosiit_sys_start(oosiit_task_properties_t* tskinit, oosiit_task_properties_t* tskidle)
-    @brief      starts the system and executes the init and teh idle tasks as defined by the function parameters. 
-                the init task is responsible to start any other task and then, either (a) delete itself and return control to teh scheduler,
+    @brief      starts the system and executes the init and the idle tasks as defined by the function parameters. 
+                the init task is responsible to start any other task and then, either (a) delete itself and return control to the scheduler,
                 or (b) enter a forever loop possibly adjusting its priority and / or blocking itself by waiting a message / event / timeout / trigger of
                 a period. 
                 the idle task shall always have zero priority and executes when no other task is scheduled. 
@@ -325,7 +336,12 @@ extern oosiit_result_t oosiit_tsk_setprio(oosiit_taskid_t tskid, uint8_t tskprio
  **/
 extern oosiit_result_t oosiit_tsk_pass(void);
 
-
+/** @fn         extern void* oosiit_tsk_get_perthread_libspace(oosiit_taskid_t tskid)
+    @brief      returns a pointer to 96 bytes used to store data that is local to this thread.
+    @param      tskid           the ID of the task
+    @return     if successful the pointer, otherwise it returns NULL. 
+ **/
+extern void* oosiit_tsk_get_perthread_libspace(oosiit_taskid_t tskid);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // time functions

@@ -174,7 +174,128 @@ static uint8_t s_dbg_previous_id = ev_ID_idle;
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+extern void rt_iit_dynamic_mode_init(const oosiit_cfg_t *cfg)
+{   
+ 
+    // cannot initialise if i dont know a configuration
+    if(NULL == cfg)
+    {
+        os_error(0x60000001);
+    }
 
+
+//    oosiit_hid_params_get_ram32(oosiit_cfg_in_use, ram32size);
+
+//    oosiit_hid_params_get_ram64(oosiit_cfg_in_use, ram64size);
+
+
+    os_maxtaskrun = oosiit_cfg_in_use->maxnumofusertasks+2; // adds two: idle and init
+//     os_stackinfo  = (oosiit_cfg_in_use->checkStack << 24) |
+//                     (oosiit_cfg_in_use->numTaskWithUserProvidedStack << 16) |
+//                     (oosiit_cfg_in_use->sizeStack*4);
+    
+    os_stackinfo  = (oosiit_cfg_in_use->checkstackoverflow << 24) |
+                    (os_maxtaskrun << 16) |
+                    (0*4);    
+    os_rrobin_use  = (0 == oosiit_cfg_in_use->roundrobinenabled) ? (0) : (1);
+    os_rrobin_tout = oosiit_cfg_in_use->roundrobinnumberofticks;
+
+    os_trv        = ((uint32_t)(((double)oosiit_cfg_in_use->cpufreq*(double)oosiit_cfg_in_use->ticktime)/1E6)-1);
+    oosiit_num_units_of_systick = (os_trv+1);
+    oosiit_ns_per_unit_of_systick = ((uint32_t)oosiit_cfg_in_use->ticktime*1000)/(uint32_t)(oosiit_num_units_of_systick);
+    os_flags      = 1; //oosiit_cfg_in_use->priviledgeMode; 
+
+    os_clockrate  =  oosiit_cfg_in_use->ticktime;
+    //os_timernum   = (0 << 16) | oosiit_cfg_in_use->numTimer;    // in cm3, OS_TIMER is 0
+    os_timernum   = (0 << 16) | 0;    // in cm3, OS_TIMER is 0
+ 
+    // dyn: advanced timers
+    oosiit_cfg_advtmr_ptrs   = NULL;
+    oosiit_cfg_advtmr_size   = 0;
+    oosiit_cfg_advtmr        = NULL;
+    
+    
+
+#if 1   
+    // dyn: mutexes
+    oosiit_cfg_mutex_size       = 0;
+    oosiit_cfg_mutex            = NULL;
+
+
+    // dyn: semaphores
+    oosiit_cfg_semaphore_size   = 0;
+    oosiit_cfg_semaphore        = NULL;
+
+    
+    // dyn: mboxex
+    oosiit_cfg_mbox_size        = 0;
+    oosiit_cfg_mbox             = NULL;
+
+    // dyn: mutex_memory
+    oosiit_cfg_mutex_memory     = NULL;
+//    oosiit_cfg_mutex_memory     = ALLOC_MUTEX();
+//    // init the mutex
+//    if(NULL != oosiit_cfg_mutex_memory)
+//    {
+//        s_mutex_memory = (U32 *)oosiit_cfg_mutex_memory;
+//        rt_mut_init(s_mutex_memory);            
+//    }
+
+
+    // dyn: mp tcb 
+    mp_tcb_size    = 0;
+    mp_tcb         = NULL;
+    
+    // dyn: os-fifo  
+    os_fifo_size = oosiit_cfg_in_use->capacityofpostpendcommandfifo;
+    //os_fifo = calloc((sizeof(struct OS_PSQ)-sizeof(struct OS_PSFE))+oosiit_cfg_in_use->capacityofpostpendcommandfifo*sizeof(struct OS_PSFE), 1);
+    os_fifo = oosiit_memory_new((sizeof(struct OS_PSQ)-sizeof(struct OS_PSFE))+oosiit_cfg_in_use->capacityofpostpendcommandfifo*sizeof(struct OS_PSFE));
+
+    // dyn: active task-control-block table
+    //os_active_TCB = (void**) calloc(sizeof(void*), os_maxtaskrun);
+    os_active_TCB = oosiit_memory_new(sizeof(void*)*os_maxtaskrun);
+
+
+    // dyn: tmr
+    mp_tmr_size    = 0;
+    m_tmr           = NULL;
+
+    // dyn: globalstack
+    oosiit_cfg_globstack_size    = 0;
+    oosiit_cfg_globstack         = NULL;
+
+
+    // dyn: mp_stk
+    mp_stk_size    = 0;
+    mp_stk         = NULL;
+
+
+    std_libspace = NULL;
+//    std_libspace = (U32 (*)[24])rt_iit_libspace_init();
+//    if(NULL == std_libspace)
+//    {
+//        os_error(0x60000002);    
+//    }
+
+
+    // initialisation to zero of os variables
+    {
+        extern BIT os_lock;             //IIT-EXT
+        extern BIT os_psh_flag;         //IIT-EXT
+        extern U8  pend_flags;          //IIT-EXT
+
+        os_lock = 0;
+        os_psh_flag = 0;
+        pend_flags = 0;    
+
+    }
+    
+           
+#endif    
+    
+    
+    
+}
 
 extern void rt_iit_params_init(void)
 {
@@ -189,7 +310,8 @@ extern void rt_iit_params_init(void)
     }
 
     // cannot initialise if i dont have ram
-    if((NULL == oosiit_params_ram32data) || (NULL == oosiit_params_ram64data) || (NULL == oosiit_params_stdlib32data))
+    //if((NULL == oosiit_params_ram32data) || (NULL == oosiit_params_ram64data) || (NULL == oosiit_params_stdlib32data))
+    if((NULL == oosiit_params_ram32data) || (NULL == oosiit_params_ram64data))
     {
         os_error(0x60000002);
     }
@@ -198,22 +320,22 @@ extern void rt_iit_params_init(void)
 
     oosiit_hid_params_get_ram64(oosiit_cfg_in_use, ram64size);
 
-    os_maxtaskrun = oosiit_cfg_in_use->maxnumofusertasks;
+    os_maxtaskrun = oosiit_cfg_in_use->maxnumofusertasks + 2; // adds idle and init
 //     os_stackinfo  = (oosiit_cfg_in_use->checkStack << 24) |
 //                     (oosiit_cfg_in_use->numTaskWithUserProvidedStack << 16) |
 //                     (oosiit_cfg_in_use->sizeStack*4);
-    os_stackinfo  = (oosiit_cfg_in_use->checkStack << 24) |
-                    (oosiit_cfg_in_use->maxnumofusertasks << 16) |
+    os_stackinfo  = (oosiit_cfg_in_use->checkstackoverflow << 24) |
+                    ((os_maxtaskrun) << 16) |
                     (0*4);    
-    os_rrobin_use  = (0 == oosiit_cfg_in_use->roundRobin) ? (0) : (1);
-    os_rrobin_tout = oosiit_cfg_in_use->roundRobinTimeout;
+    os_rrobin_use  = (0 == oosiit_cfg_in_use->roundrobinenabled) ? (0) : (1);
+    os_rrobin_tout = oosiit_cfg_in_use->roundrobinnumberofticks;
 
-    os_trv        = ((uint32_t)(((double)oosiit_cfg_in_use->osClock*(double)oosiit_cfg_in_use->osTick)/1E6)-1);
+    os_trv        = ((uint32_t)(((double)oosiit_cfg_in_use->cpufreq*(double)oosiit_cfg_in_use->ticktime)/1E6)-1);
     oosiit_num_units_of_systick = (os_trv+1);
-    oosiit_ns_per_unit_of_systick = ((uint32_t)oosiit_cfg_in_use->osTick*1000)/(uint32_t)(oosiit_num_units_of_systick);
+    oosiit_ns_per_unit_of_systick = ((uint32_t)oosiit_cfg_in_use->ticktime*1000)/(uint32_t)(oosiit_num_units_of_systick);
     os_flags      = 1; //oosiit_cfg_in_use->priviledgeMode; 
 
-    os_clockrate  =  oosiit_cfg_in_use->osTick;
+    os_clockrate  =  oosiit_cfg_in_use->ticktime;
     //os_timernum   = (0 << 16) | oosiit_cfg_in_use->numTimer;    // in cm3, OS_TIMER is 0
     os_timernum   = (0 << 16) | 0;    // in cm3, OS_TIMER is 0
  
@@ -296,7 +418,7 @@ extern void rt_iit_params_init(void)
     {   
         // error: os_fifo_size = sizeof(uint32_t)*ram32size[6];
         // os_fifo_size contains the number of items, not the size in bytes of teh memory
-        os_fifo_size = oosiit_cfg_in_use->sizeISRFIFO;
+        os_fifo_size = oosiit_cfg_in_use->capacityofpostpendcommandfifo;
         os_fifo = &oosiit_params_ram32data[offset32];
         offset32 += ram32size[6];
     }
@@ -356,11 +478,12 @@ extern void rt_iit_params_init(void)
     }
 
 
-    std_libspace = (U32 (*)[24])rt_iit_libspace_init();
-    if(NULL == std_libspace)
-    {
-        os_error(0x60000002);    
-    }
+    std_libspace = NULL;
+//    std_libspace = (U32 (*)[24])rt_iit_libspace_init();
+//    if(NULL == std_libspace)
+//    {
+//        os_error(0x60000002);    
+//    }
 
 
     // initialisation to zero of os variables
@@ -379,29 +502,39 @@ extern void rt_iit_params_init(void)
 }
 
 
-extern U32* rt_iit_libspace_init(void)
-{
-    uint16_t sizes[2];
+// extern U32* rt_iit_libspace_init(void)
+// {
+//     uint16_t sizes[2];
+//     U32* ret = NULL;
 
-    if(NULL == oosiit_cfg_in_use)
-    {
-        return(NULL);
-    }
+//     if(NULL == oosiit_cfg_in_use)
+//     {
+//         return(NULL);
+//     }
 
 
 
-    oosiit_hid_params_get_stdlib32(oosiit_cfg_in_use, sizes);
+//     oosiit_hid_params_get_stdlib32(oosiit_cfg_in_use, sizes);
 
-    if(0 != sizes[0])
-    {   
-        return(&oosiit_params_stdlib32data[0]);
-    }
-    else
-    {
-        return(NULL);
-    }     
+//     if(0 != sizes[0])
+//     {   
+//         if(NULL == oosiit_params_stdlib32data)
+//         {
+//             ret = calloc(sizes[0], 4);
+//         }
+//         else
+//         {
+//             ret = &oosiit_params_stdlib32data[0];
+//         }
+//     }
+//     else
+//     {
+//         ret = NULL;
+//     } 
 
-}
+//     return(ret);
+
+// }
 
 
 extern void rt_iit_time_set(U32 low, U32 high) 
@@ -1555,9 +1688,18 @@ void rt_iit_sys_start(oosiit_task_properties_t* inittsk, oosiit_task_properties_
     {
         os_active_TCB[i] = NULL;
     }
-    rt_init_box(mp_tcb, mp_tcb_size, sizeof(struct OS_TCB));                //IIT-EXT: removed the & because it did not make external memory work
-    rt_init_box(mp_stk, mp_stk_size, BOX_ALIGN_8 | (U16)(os_stackinfo));    //IIT-EXT: removed the & because it did not make external memory work
-    rt_init_box((U32 *)m_tmr, mp_tmr_size, sizeof(struct OS_TMR));
+    if(NULL != mp_tcb)
+    {
+        rt_init_box(mp_tcb, mp_tcb_size, sizeof(struct OS_TCB));                //IIT-EXT: removed the & because it did not make external memory work
+    }
+    if(NULL != mp_stk)
+    {
+        rt_init_box(mp_stk, mp_stk_size, BOX_ALIGN_8 | (U16)(os_stackinfo));    //IIT-EXT: removed the & because it did not make external memory work
+    }
+    if(NULL != m_tmr)
+    {
+        rt_init_box((U32 *)m_tmr, mp_tmr_size, sizeof(struct OS_TMR));
+    }
 
  
 
@@ -1614,11 +1756,108 @@ void rt_iit_sys_start(oosiit_task_properties_t* inittsk, oosiit_task_properties_
     /* Start up first user task before entering the endless loop */
     //rt_tsk_create(first_task, prio_stksz, stk, NULL);
     uint32_t stacksize24priority08 = ((((uint32_t)(inittsk->stacksize)) << 8)&0xffffff00) | (inittsk->priority&0xff);
-    rt_tsk_create((FUNCP)inittsk->function, stacksize24priority08, (uint32_t*)inittsk->stackdata, inittsk->param);  
+    rt_iit_tsk_create((FUNCP)inittsk->function, stacksize24priority08, (uint32_t*)inittsk->stackdata, inittsk->param);  
 //#endif    
 }
 
 
+OS_TID rt_iit_tsk_create (FUNCP task, U32 prio_stksz, void *stk, void *argv) {
+  /* Start a new task declared with "task". */
+  P_TCB task_context;
+  U32 i;
+    
+  if(0 == (i = rt_get_TID ())) 
+  { // i move it earliear because ... if i use dynamic memory mode the oosiit_memory_new() is succesful even if we dont have a valid TID anymore
+    return(0);
+  }      
+
+  /* Priority 0 is reserved for idle task! */
+  if ((prio_stksz & 0xFF) == 0) {
+    prio_stksz += 1;
+  }
+  if(NULL != mp_tcb)
+    task_context = rt_alloc_box (mp_tcb);
+  else
+    //task_context = calloc(sizeof(struct OS_TCB), 1);
+    task_context = oosiit_memory_new(sizeof(struct OS_TCB));
+  
+  if (task_context == NULL) {
+    return (0);
+  }
+  /* If "size != 0" use a private user provided stack. */
+  task_context->stack      = stk;
+  task_context->priv_stack = prio_stksz >> 8;
+  /* Pass parameter 'argv' to 'rt_init_context' */
+  task_context->msg = argv;
+  /* For 'size == 0' system allocates the user stack from the memory pool. */
+  rt_init_context (task_context, prio_stksz & 0xFF, task);
+
+  /* Find a free entry in 'os_active_TCB' table. */
+  //i = rt_get_TID ();
+  os_active_TCB[i-1] = task_context;
+  task_context->task_id = i;
+  DBG_TASK_NOTIFY(task_context, __TRUE);
+  rt_dispatch (task_context);
+  return ((OS_TID)i);
+}
+
+OS_RESULT rt_iit_tsk_delete (OS_TID task_id) {
+  /* Terminate the task identified with "task_id". */
+  P_TCB task_context;
+
+  if (task_id == 0 || task_id == os_tsk.run->task_id) {
+    /* Terminate itself. */
+    os_tsk.run->state     = INACTIVE;
+    os_tsk.run->tsk_stack = rt_get_PSP ();
+    rt_stk_check ();
+    os_active_TCB[os_tsk.run->task_id-1] = NULL;
+    if(NULL != mp_stk)
+        rt_free_box (mp_stk, os_tsk.run->stack);
+    else
+        free(os_tsk.run->stack);
+    os_tsk.run->stack = NULL;
+    DBG_TASK_NOTIFY(os_tsk.run, __FALSE);
+    if(NULL != mp_tcb)
+        rt_free_box (mp_tcb, os_tsk.run);
+    else
+        free(os_tsk.run);
+    os_tsk.run = NULL;
+    rt_dispatch (NULL);
+    /* The program should never come to this point. */
+  }
+  else {
+    /* Find the task in the "os_active_TCB" array. */
+    if (task_id > os_maxtaskrun || os_active_TCB[task_id-1] == NULL) {
+      /* Task with "task_id" not found or not started. */
+      return (OS_R_NOK);
+    }
+    task_context = os_active_TCB[task_id-1];
+    rt_rmv_list (task_context);
+    rt_rmv_dly (task_context);
+    os_active_TCB[task_id-1] = NULL;
+    if(NULL != mp_stk)
+        rt_free_box (mp_stk, task_context->stack);
+    else
+        free(task_context->stack);
+    task_context->stack = NULL;
+    DBG_TASK_NOTIFY(task_context, __FALSE);
+    if(NULL != mp_tcb)
+        rt_free_box (mp_tcb, task_context);
+    else
+        free(task_context);
+  }
+  return (OS_R_OK);
+}
+
+void* rt_iit_tsk_perthread_libspace_get(OS_TID task_id)
+{
+    P_TCB tc = os_active_TCB[task_id-1];
+    if(NULL == tc)
+    {
+        return(NULL);
+    }
+    return(tc->perthread_libspace);  
+}
 
 
 // - from rt_list: rt_List.c ------------------------------------------------------------------------------------------

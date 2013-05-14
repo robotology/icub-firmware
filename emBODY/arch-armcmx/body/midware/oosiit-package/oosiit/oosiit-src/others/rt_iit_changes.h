@@ -151,7 +151,7 @@ typedef struct OS_TCB *P_TCB_Opaque;
     #define MSB_TIME_t      0x80000000
     #define NOTIMEOUT       0xffffffff
     // EXTRAOFFSET is 4 if TIME_t is U32 and EVENT_t is U16. if both are U32, then it becomes 8.
-    #define EXTRAOFFSET     8
+    #define EXTRAOFFSET     (8+96)
 // if there is experimental support for send2front in message box ... use 12
 // AS I HAVE ADDED: msgsendmode + dummy1 + dummy2 there are 4 more bytes
 //    #define EXTRAOFFSET     12
@@ -170,10 +170,14 @@ typedef struct OS_TCB *P_TCB_Opaque;
 
 // - sys routines -
 extern void rt_iit_sys_start(oosiit_task_properties_t* inittsk, oosiit_task_properties_t* idletsk);
+extern OS_TID rt_iit_tsk_create (FUNCP task, U32 prio_stksz, void *stk, void *argv);
+extern OS_RESULT rt_iit_tsk_delete (OS_TID task_id);
+extern void* rt_iit_tsk_perthread_libspace_get(OS_TID task_id);
 
 // - init routines -
+extern void rt_iit_dynamic_mode_init(const oosiit_cfg_t *cfg);
 extern void rt_iit_params_init(void);
-extern U32* rt_iit_libspace_init(void);
+//extern U32* rt_iit_libspace_init(void);
 extern U32* rt_iit_libmutex_init(U8 *nrmutex);
 
 // - time routines -

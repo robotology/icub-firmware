@@ -134,6 +134,14 @@
 // <h> IIT extension
 // <i> It holds IIT extension
 
+//   <o>memory mode <0=>   static    <1=>   dynamic    
+//   <i> if dynamic the following numbers are not relevant anymore as they are allocated on demand
+//   <i> moreover, the task control block is allocated on task creation
+#ifndef OOSIIT_MEMMODE
+ #define OOSIIT_MEMMODE    1
+#endif
+
+
 //   <o> number of advanced timers <0-250>
 //   <i> define max. number of timers that will run at the same time.
 //   <i> default: 0  (timers disabled)

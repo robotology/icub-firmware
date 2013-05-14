@@ -29,6 +29,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "stdlib.h"
+#include "string.h"
 
 #if defined(OOSIIT_DBG_ENABLE)
 #include "api/eventviewer.h"
@@ -119,6 +120,8 @@ extern volatile uint64_t oosiit_time = 0;
 extern uint32_t oosiit_ns_per_unit_of_systick = 0;
 extern uint32_t oosiit_num_units_of_systick = 0;
 
+extern uint32_t oosiit_memory_sizeofallocated = 0;
+
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
@@ -173,10 +176,11 @@ SVC_0_1(svc_oosiit_sys_resume,          oosiit_result_t,                        
 
 // - task
 SVC_4_1(svc_oosiit_tsk_create,          oosiit_taskid_t,    FAKE_VOID_FP_VOIDP, void*,                  void*,          uint32_t,       RET_uint32_t);
-SVC_1_1(svc_oosiit_tsk_delete,          oosiit_result_t,    oosiit_taskid_t,                                                            RET_pointer);
+SVC_1_1(svc_oosiit_tsk_delete,          oosiit_result_t,    oosiit_taskid_t,                                                            RET_int32_t);
 SVC_0_1(svc_oosiit_tsk_self,            uint32_t,                                                                                       RET_uint32_t);
 SVC_2_1(svc_oosiit_tsk_setprio,         oosiit_result_t,    oosiit_taskid_t,    uint8_t,                                                RET_int32_t);
 SVC_0_1(svc_oosiit_tsk_pass,            oosiit_result_t,                                                                                RET_int32_t);
+SVC_1_1(svc_oosiit_tsk_get_perthread_libspace, void*,       oosiit_taskid_t,                                                            RET_pointer);
 
 
 // - time
@@ -225,6 +229,7 @@ SVC_1_1(svc_oosiit_advtmr_delete,       oosiit_result_t,    void*,              
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
+static oosiit_cfg_t s_oosiit_cfg_in_use = {0};
 static volatile uint8_t s_oosiit_started = 0;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -238,24 +243,37 @@ extern void os_set_env(void);
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+
 extern void* oosiit_memory_new(uint32_t size)
 {
+    void* ret = NULL;
+    
     if(0 == size)
     {
         return(NULL);
     }    
     else if(0 != __get_IPSR()) 
     {   // inside isr
-        return(NULL);
+        //ret = NULL;
+        ret = calloc(size, 1);
     }     
     else if(1 == s_oosiit_started)
-    {    
-        return(__svc_oosiit_memory_new(size));
+    {   // not within an isr. os started     
+        ret = __svc_oosiit_memory_new(size);
     }
     else
-    {
-        return(calloc(size, 1));
+    {   // not within an isr. os not started   
+        ret = calloc(size, 1);
     }
+    
+    if(NULL == ret)
+    {
+        oosiit_sys_error(oosiit_error_memory_allocation);
+    }
+    
+    oosiit_memory_sizeofallocated += size;
+    
+    return(ret);
 }
 
 extern oosiit_result_t oosiit_memory_del(void* mem)
@@ -266,14 +284,16 @@ extern oosiit_result_t oosiit_memory_del(void* mem)
     }    
     else if(0 != __get_IPSR()) 
     {   // inside isr
-        return(oosiit_res_NOK);
+        //return(oosiit_res_NOK);
+        free(mem);
+        return(oosiit_res_OK);
     }
     else if(1 == s_oosiit_started) 
-    {        
+    {   // not within an isr. os started        
         return(__svc_oosiit_memory_del(mem));
     }
     else
-    {
+    {   // not within an isr. os not started  
         free(mem);
         return(oosiit_res_OK);
     }
@@ -291,7 +311,13 @@ extern oosiit_result_t oosiit_memory_getsize(const oosiit_cfg_t *cfg, uint16_t *
     if(0 != __get_IPSR()) 
     {   // inside isr
         return(oosiit_res_NOK);
-    }     
+    }  
+
+    if(oosiit_memmode_dynamic == cfg->memorymode)
+    {
+        *size04aligned = *size08aligned = 0;
+        return(oosiit_res_OK);
+    }        
     
     *size04aligned = 4*s_oosiit_params_get_ram32size(cfg);
     *size08aligned = 8*s_oosiit_params_get_ram64size(cfg);
@@ -301,10 +327,16 @@ extern oosiit_result_t oosiit_memory_getsize(const oosiit_cfg_t *cfg, uint16_t *
 
 extern oosiit_result_t oosiit_memory_load(const oosiit_cfg_t *cfg, uint32_t *data04aligned, uint64_t *data08aligned)
 {
-    if((NULL == cfg) || (NULL == data04aligned) || (NULL == data08aligned) )
+    if(NULL == cfg)
     {
         return(oosiit_res_NOK);
-    }
+    }   
+
+    if((oosiit_memmode_static == cfg->memorymode) && ((NULL == data04aligned) || (NULL == data08aligned)))
+    {
+        return(oosiit_res_NOK);
+    }    
+
     
     if(0 != __get_IPSR()) 
     {   // inside isr
@@ -316,11 +348,10 @@ extern oosiit_result_t oosiit_memory_load(const oosiit_cfg_t *cfg, uint32_t *dat
         return(oosiit_res_NOK);
     }
     
-    oosiit_cfg_in_use            = cfg;
-    oosiit_params_stdlib32data   = data04aligned;
-    oosiit_params_ram32data      = data04aligned + ((SIZEOF_STDLIB32_ELEM/4)*cfg->maxnumofusertasks);   
-    oosiit_params_ram64data      = data08aligned;
-
+    memcpy(&s_oosiit_cfg_in_use, cfg, sizeof(oosiit_cfg_t));
+    oosiit_cfg_in_use            = &s_oosiit_cfg_in_use;
+    
+ 
     // need to initialise os_flags now because os_sys_init* calls os_set_env() which use it before rt_sys_init() is called
     os_flags      = 1; //oosiit_cfg_in_use->priviledgeMode;
     
@@ -328,8 +359,28 @@ extern oosiit_result_t oosiit_memory_load(const oosiit_cfg_t *cfg, uint32_t *dat
     os_set_env();
     
     // initialise the parameters and the memory straigth away.
-    rt_iit_params_init();             
-    rt_iit_memory_init();             
+    if(oosiit_memmode_static == cfg->memorymode)
+    {
+//        oosiit_params_stdlib32data   = data04aligned;
+//        oosiit_params_ram32data      = data04aligned + ((SIZEOF_STDLIB32_ELEM/4)*cfg->maxnumofusertasks);   
+//        oosiit_params_ram64data      = data08aligned;    
+        oosiit_params_stdlib32data   = NULL;
+        oosiit_params_ram32data      = data04aligned;   
+        oosiit_params_ram64data      = data08aligned;                
+        rt_iit_params_init();             
+        rt_iit_memory_init();  
+    }    
+    else if(oosiit_memmode_dynamic == cfg->memorymode)
+    {
+        oosiit_params_stdlib32data   = NULL;
+        oosiit_params_ram32data      = NULL;   
+        oosiit_params_ram64data      = NULL;        
+        rt_iit_dynamic_mode_init(cfg);                  
+    }
+    else
+    {   // error
+        
+    }
 
     return(oosiit_res_OK);
 }
@@ -555,6 +606,18 @@ extern oosiit_result_t oosiit_tsk_pass(void)
     }   
 }
 
+extern void* oosiit_tsk_get_perthread_libspace(oosiit_taskid_t tskid)
+{
+    if(0 != __get_IPSR()) 
+    {   // inside isr
+        return(rt_iit_tsk_perthread_libspace_get(tskid));
+    } 
+    else
+    {   // call svc
+        return(__svc_oosiit_tsk_get_perthread_libspace(tskid));
+    }     
+}
+
 // - time management functions ----------------------------------------------------------------------------------------
 
 extern uint64_t oosiit_time_get(void)
@@ -585,25 +648,25 @@ extern uint64_t oosiit_microtime_get(void)
     
     // add to microsecs the content of register systick_current_value_reg properly scaled.
     // if it is equal to systick_reload_value_reg, then extranano = 0;
-    // if it is equal to 1, then extranano = ... (osTick*1000)/(systick_reload_value_reg+1)
+    // if it is equal to 1, then extranano = ... (ticktime*1000)/(systick_reload_value_reg+1)
 
     nanosecs = oosiit_ns_per_unit_of_systick * (oosiit_num_units_of_systick - reg0xE000E018);
-    microsecs = (oosiit_time * oosiit_cfg_in_use->osTick) + nanosecs/1000LL;
+    microsecs = (oosiit_time * oosiit_cfg_in_use->ticktime) + nanosecs/1000LL;
 
     return(microsecs);    
 }
 
 extern uint64_t oosiit_nanotime_get(void)
 {
-    uint64_t nanosecs;// = osiit_time * osiit_params_cfg->osTick * 1000;
+    uint64_t nanosecs;// = osiit_time * osiit_params_cfg->ticktime * 1000;
     volatile uint32_t reg0xE000E018 = *((volatile uint32_t *)0xE000E018);
 
     // add to nanosecs the content of register systick_current_value_reg properly scaled.
     // if it is equal to systick_reload_value_reg, then extranano = 0;
-    // if it is equal to 1, then extranano = ... (osTick*1000)/(systick_reload_value_reg+1)
+    // if it is equal to 1, then extranano = ... (ticktime*1000)/(systick_reload_value_reg+1)
 
     nanosecs = oosiit_ns_per_unit_of_systick * (oosiit_num_units_of_systick - reg0xE000E018);
-    nanosecs += (oosiit_time * oosiit_cfg_in_use->osTick * 1000LL);
+    nanosecs += (oosiit_time * oosiit_cfg_in_use->ticktime * 1000LL);
 
     return(nanosecs);
 }
@@ -611,14 +674,14 @@ extern uint64_t oosiit_nanotime_get(void)
 #if 0
 extern oosiit_result_t oosiit_secsnano_get(uint32_t *secs, uint32_t *nano)
 {
-    U64 nanosecs;// = osiit_time * osiit_params_cfg->osTick * 1000;
+    U64 nanosecs;// = osiit_time * osiit_params_cfg->ticktime * 1000;
 
     // add to nanosecs the content of register systick_current_value_reg properly scaled.
     // if it is equal to systick_reload_value_reg, then extranano = 0;
-    // if it is equal to 1, then extranano = ... (osTick*1000)/(systick_reload_value_reg+1)
+    // if it is equal to 1, then extranano = ... (ticktime*1000)/(systick_reload_value_reg+1)
 
     nanosecs = (os_iit_ns_per_unit_of_systick*(os_iit_num_units_of_systick-(*((volatile U32 *)0xE000E018))));
-    nanosecs += (osiit_time * osiit_params_cfg->osTick * 1000);
+    nanosecs += (osiit_time * osiit_params_cfg->ticktime * 1000);
 
     if(NULL != secs)
     {
@@ -1025,21 +1088,21 @@ extern oosiit_result_t oosiit_advtmr_delete(oosiit_objptr_t timer)
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern uint16_t oosiit_hid_params_get_stdlib32(const oosiit_cfg_t *cfg, uint16_t *stdlib32size)
-{
-    uint16_t stdlib32datasizetot = 0;
+// extern uint16_t oosiit_hid_params_get_stdlib32(const oosiit_cfg_t *cfg, uint16_t *stdlib32size)
+// {
+//     uint16_t stdlib32datasizetot = 0;
 
-    if(NULL == cfg)
-    {
-        return(0);
-    }
+//     if(NULL == cfg)
+//     {
+//         return(0);
+//     }
 
-    stdlib32size[0] = (SIZEOF_STDLIB32_ELEM/4)*cfg->maxnumofusertasks;
-    stdlib32datasizetot += stdlib32size[0];
+//     stdlib32size[0] = (SIZEOF_STDLIB32_ELEM/4)*cfg->maxnumofusertasks;
+//     stdlib32datasizetot += stdlib32size[0];
 
-    return(stdlib32datasizetot);
+//     return(stdlib32datasizetot);
 
-}
+// }
 
 extern uint16_t oosiit_hid_params_get_ram32(const oosiit_cfg_t *cfg, uint16_t *ram32size)
 {
@@ -1060,11 +1123,11 @@ extern uint16_t oosiit_hid_params_get_ram32(const oosiit_cfg_t *cfg, uint16_t *r
     ram32datasizetot += ram32size[3];
     ram32size[4] = IFN0(cfg->numMutex+cfg->numSemaphore+cfg->numMessageBox+cfg->sizeof64alignedStack, (SIZEOF_MUTEX_ELEM/4));    
     ram32datasizetot += ram32size[4];
-    ram32size[5] = IFN0(cfg->maxnumofusertasks, SIZEINU32ofBOX4AL(SIZEOF_TCB_ELEM, cfg->maxnumofusertasks)); 
+    ram32size[5] = IFN0(cfg->maxnumofusertasks+1, SIZEINU32ofBOX4AL(SIZEOF_TCB_ELEM, cfg->maxnumofusertasks+1)); 
     ram32datasizetot += ram32size[5];
-    ram32size[6] = cfg->sizeISRFIFO*(SIZEOF_POSTSERV_ELEM/4) + (SIZEOF_POSTSERV_HEAD/4);      
+    ram32size[6] = cfg->capacityofpostpendcommandfifo*(SIZEOF_POSTSERV_ELEM/4) + (SIZEOF_POSTSERV_HEAD/4);      
     ram32datasizetot += ram32size[6];
-    ram32size[7] = (SIZEOF_TCBPOINTER/4)*cfg->maxnumofusertasks;
+    ram32size[7] = (SIZEOF_TCBPOINTER/4)*(cfg->maxnumofusertasks+2);
     ram32datasizetot += ram32size[7];
     //ram32size[8] = IFN0(cfg->numTimer, SIZEINU32ofBOX4AL(SIZEOF_TMR_ELEM, cfg->numTimer));
     ram32size[8] = IFN0(0, SIZEINU32ofBOX4AL(SIZEOF_TMR_ELEM, 0));
@@ -1107,8 +1170,8 @@ static uint16_t s_oosiit_params_get_ram32size(const oosiit_cfg_t *cfg)
     }
 
     // for oosiit_params_stdlib32data
-    ram32datasizetot += ((SIZEOF_STDLIB32_ELEM/4)*cfg->maxnumofusertasks);    
-
+//    ram32datasizetot += ((SIZEOF_STDLIB32_ELEM/4)*cfg->maxnumofusertasks);   
+    
     // the following use membox 4-aligned: adv-timers [0], task-control-block [5], timers [8]
     // for oosiit_params_ram32data
     // 0. advanced timers
@@ -1121,17 +1184,18 @@ static uint16_t s_oosiit_params_get_ram32size(const oosiit_cfg_t *cfg)
     ram32datasizetot += IFN0(cfg->numMessageBox*cfg->numMessageBoxElements, (SIZEOF_BASEMBOX_ELEM/4)*cfg->numMessageBox+cfg->numMessageBoxElements); 
     // 4. mutex for ram
     ram32datasizetot += IFN0(cfg->numMutex+cfg->numSemaphore+cfg->numMessageBox+cfg->sizeof64alignedStack, (SIZEOF_MUTEX_ELEM/4));  
-    // 5. acemor-fix-it
-    ram32datasizetot += IFN0(cfg->maxnumofusertasks, SIZEINU32ofBOX4AL(SIZEOF_TCB_ELEM, cfg->maxnumofusertasks));
+    // 5. memory for tcb: we need one for each user task plus one for the init (the idle use a dedicated one)
+    ram32datasizetot += IFN0(cfg->maxnumofusertasks+1, SIZEINU32ofBOX4AL(SIZEOF_TCB_ELEM, cfg->maxnumofusertasks+1));
     // 6. isr post service
-    ram32datasizetot += cfg->sizeISRFIFO*(SIZEOF_POSTSERV_ELEM/4) + (SIZEOF_POSTSERV_HEAD/4);  
-    // 7. pointers to task control blocks      
-    ram32datasizetot += (SIZEOF_TCBPOINTER/4)*cfg->maxnumofusertasks; 
+    ram32datasizetot += cfg->capacityofpostpendcommandfifo*(SIZEOF_POSTSERV_ELEM/4) + (SIZEOF_POSTSERV_HEAD/4);  
+    // 7. pointers to task control blocks: one for each user task plus one per idle task plus one per init task
+    ram32datasizetot += (SIZEOF_TCBPOINTER/4)*(cfg->maxnumofusertasks+2); 
     // 8. timers  
     //ram32datasizetot += IFN0(cfg->numTimer, SIZEINU32ofBOX4AL(SIZEOF_TMR_ELEM, cfg->numTimer));
     ram32datasizetot += IFN0(0, SIZEINU32ofBOX4AL(SIZEOF_TMR_ELEM, 0));
 
-    
+
+
     return(ram32datasizetot);
 }
 
@@ -1239,7 +1303,7 @@ extern oosiit_taskid_t svc_oosiit_tsk_create(FAKE_VOID_FP_VOIDP tskfn, void *tsk
     oosiit_taskid_t tid;
     rt_iit_dbg_svc_enter();
        
-    tid = rt_tsk_create((FUNCP)tskfn, tskstacksize24tskpriority08, tskstackdata, tskfnarg);
+    tid = rt_iit_tsk_create((FUNCP)tskfn, tskstacksize24tskpriority08, tskstackdata, tskfnarg);
        
     rt_iit_dbg_svc_exit();
     return(tid);
@@ -1250,7 +1314,7 @@ extern oosiit_result_t svc_oosiit_tsk_delete(oosiit_taskid_t tskid)
     OS_RESULT res;
     rt_iit_dbg_svc_enter();
     
-    res = rt_tsk_delete(tskid);
+    res = rt_iit_tsk_delete(tskid);
     
     rt_iit_dbg_svc_exit();
     return((oosiit_result_t)res);
@@ -1286,6 +1350,11 @@ extern oosiit_result_t svc_oosiit_tsk_pass(void)
     
     rt_iit_dbg_svc_exit();
     return(oosiit_res_OK);
+}
+
+extern void* svc_oosiit_tsk_get_perthread_libspace(uint32_t tid)
+{
+    return(rt_iit_tsk_perthread_libspace_get(tid));
 }
 
 
