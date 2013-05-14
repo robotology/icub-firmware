@@ -55,6 +55,9 @@
 //appl 
 #include "EOappTheDataBase.h"
 
+//diagnostics
+#include "EOtheEMSapplDiagnostics.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -71,7 +74,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+#define eoappCanSP_timeoutsenddiagnostics       1000
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -103,6 +106,13 @@ static void s_eo_appCanSP_callbackOnTx_portx_waittransmission(void *arg, hal_can
 static void s_eo_appCanSP_callbackOnRx_port1_allertOnReception(void *arg);
 static void s_eo_appCanSP_callbackOnRx_port2_allertOnReception(void *arg);
 static void s_eo_appCanSP_callbackOnRx_portx_allertOnReception(void *arg, hal_can_port_t port);
+
+static void s_eo_appCanSP_callbackOnErr_port1(void *arg);
+static void s_eo_appCanSP_callbackOnErr_port2(void *arg);
+static void s_eo_appCanSP_callbackOnErr_portx(void *arg, eOcanport_t port);
+
+static void s_eo_appCanSP_updateDiagnosticValues(EOappCanSP *p, eOcanport_t port);
+static void s_eo_appCanSP_clearDiagnosticValues(EOappCanSP *p, eOcanport_t port);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -252,6 +262,13 @@ extern eOresult_t eo_appCanSP_starttransmit_XXX(EOappCanSP *p, eOcanport_t port)
     if(numofoutframe != 0)
     {
         hal_can_transmit((hal_can_port_t)port);
+    }
+    
+    if(p->periphstatus[port].isnewvalue)
+    {
+        s_eo_appCanSP_updateDiagnosticValues(p, port);
+        eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsperiph , eoappCanSP_timeoutsenddiagnostics);
+        s_eo_appCanSP_clearDiagnosticValues(p, port);
     }
 
     return(eores_OK);
@@ -410,6 +427,12 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t n
         return(eores_NOK_nullpointer);
     }
 
+    if(p->periphstatus[canport].isnewvalue)
+    {
+        s_eo_appCanSP_updateDiagnosticValues(p, canport);
+        eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsperiph , eoappCanSP_timeoutsenddiagnostics);
+        s_eo_appCanSP_clearDiagnosticValues(p, canport);
+    }
     
     for(i=0; i<numofcanframe ; i++)
     {
@@ -987,7 +1010,8 @@ static eOresult_t s_eo_appCanSP_canPeriphInit(EOappCanSP *p)
     can_cfg_port1.arg_cb_rx          = (void*)p;
     can_cfg_port1.callback_on_tx     = s_eo_appCanSP_callbackOnTx_port1_waittransmission;
     can_cfg_port1.arg_cb_tx          = (void*)p;
-
+    can_cfg_port1.callback_on_err    = s_eo_appCanSP_callbackOnErr_port1;
+    can_cfg_port1.arg_cb_err         = (void*)p;
 
 
     
@@ -999,6 +1023,8 @@ static eOresult_t s_eo_appCanSP_canPeriphInit(EOappCanSP *p)
     can_cfg_port2.arg_cb_rx          = (void*)p;
     can_cfg_port2.callback_on_tx     = s_eo_appCanSP_callbackOnTx_port2_waittransmission;
     can_cfg_port2.arg_cb_tx          = (void*)p;
+    can_cfg_port2.callback_on_err    = s_eo_appCanSP_callbackOnErr_port2;
+    can_cfg_port2.arg_cb_err         = (void*)p;
 
     res = (eOresult_t)hal_can_init(hal_can_port1, &can_cfg_port1);
 
@@ -1172,11 +1198,52 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
         if(eores_NOK_busy == res)
         {
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "lost can frame (out-queue full)");
+            //here don't update diagnostics because hal_can_put already done it.
         }
+    }
+    
+    if(p->periphstatus[emscanport].isnewvalue)
+    {
+        s_eo_appCanSP_updateDiagnosticValues(p, emscanport);
+        eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsperiph , eoappCanSP_timeoutsenddiagnostics);
+        s_eo_appCanSP_clearDiagnosticValues(p, emscanport);
     }
     return(res);
 }
 
+
+static void s_eo_appCanSP_callbackOnErr_port1(void *arg)
+{
+    s_eo_appCanSP_callbackOnErr_portx(arg, eOcanport1);
+}
+
+static void s_eo_appCanSP_callbackOnErr_port2(void *arg)
+{
+    s_eo_appCanSP_callbackOnErr_portx(arg, eOcanport2);
+}
+
+static void s_eo_appCanSP_callbackOnErr_portx(void *arg, eOcanport_t port)
+{
+    EOappCanSP *p = (EOappCanSP *)arg;
+    
+    hal_can_getstatus((hal_can_port_t)port, &p->periphstatus[port].st);
+    p->periphstatus[port].isnewvalue = 1;
+}
+
+static void s_eo_appCanSP_updateDiagnosticValues(EOappCanSP *p, eOcanport_t port)
+{
+    eo_dgn_emsperiph.can_dev[port].hw.warning = p->periphstatus[port].st.u.s.hw_status.warning;
+    eo_dgn_emsperiph.can_dev[port].hw.passive = p->periphstatus[port].st.u.s.hw_status.passive;
+    eo_dgn_emsperiph.can_dev[port].hw.busoff = p->periphstatus[port].st.u.s.hw_status.busoff;
+    eo_dgn_emsperiph.can_dev[port].sw.txqueueisfull = p->periphstatus[port].st.u.s.sw_status.txqueueisfull;
+    eo_dgn_emsperiph.can_dev[port].sw.rxqueueisfull = p->periphstatus[port].st.u.s.sw_status.rxqueueisfull;
+}
+
+static void s_eo_appCanSP_clearDiagnosticValues(EOappCanSP *p, eOcanport_t port)
+{
+    memset(&p->periphstatus[port].st, 0, sizeof(eOappCanSP_periphstatus_t));
+    p->periphstatus[port].isnewvalue = 0;
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

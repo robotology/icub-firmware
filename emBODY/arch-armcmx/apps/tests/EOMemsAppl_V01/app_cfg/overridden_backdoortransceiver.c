@@ -20,10 +20,14 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
-
+#include "string.h"
 #include "OPCprotocolManager_Cfg.h" 
 #include "EOMtheEMSbackdoortransceiver_hid.h"
 #include "OPCprotocolManager.h"
+
+#include "EOtheEMSapplDiagnostics.h"
+#include "hal_trace.h"
+#include "stdio.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -38,12 +42,7 @@
 
 //static void generic_on_rec(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata);
 
-static void on_rec_ipnet_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata);
-
-static void on_rec_runner_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata);
-
-static void on_rec_transceiver_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata);
-
+static void on_rec_dgn_cmds(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
@@ -55,10 +54,6 @@ static void on_rec_transceiver_debug(opcprotman_opc_t opc, opcprotman_var_map_t*
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-//the following vars are declare in somewhere in the code and they contain value to send or the received value.
-extern EOMtheIPnetDEBUG_t eom_ipnet_hid_DEBUG;
-extern EOMtheEMSrunnerDEBUG_t eom_emsrunner_hid_DEBUG;
-extern EOMtheEMStransceiverDEBUG_t eom_emstransceiver_hid_DEBUG;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -71,67 +66,28 @@ extern EOMtheEMStransceiverDEBUG_t eom_emstransceiver_hid_DEBUG;
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static void on_rec_ipnet_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata)
-{   // for the ems
-    
-    switch(opc)
-    {
-        
-        case opcprotman_opc_set:
-        {   // someboby has sent us the order of copying recdata into map->ptr 
-            
-            // we just dont do it ...         
-        } break;
-        
-        case opcprotman_opc_say:    // someboby has replied to a ask we sent
-        case opcprotman_opc_sig:    // someboby has spontaneously sent some data
-        default:
-        {   // other are not managed
-        
-        } break;
-    }       
-    
-}
 
-static void on_rec_runner_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata)
-{   // for the ems
-    
-    switch(opc)
-    {
-        
-        case opcprotman_opc_set:
-        {   // someboby has sent us the order of copying recdata into map->ptr 
-            
-            // we just dont do it ...         
-        } break;
-        
-        case opcprotman_opc_say:    // someboby has replied to a ask we sent
-        case opcprotman_opc_sig:    // someboby has spontaneously sent some data
-        default:
-        {   // other are not managed
-        
-        } break;
-    }       
-    
-}
 
-static void on_rec_transceiver_debug(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata)
+static void on_rec_dgn_cmds(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata)
 {   // for the ems
+    
+    eOdgn_commands_t* cmd_ptr = (eOdgn_commands_t*)recdata;
     
     switch(opc)
     {
-        
-        case opcprotman_opc_set:
-        {   // someboby has sent us the order of copying recdata into map->ptr 
-            
-            // we just dont do it ...         
-        } break;
-        
+
         case opcprotman_opc_say:    // someboby has replied to a ask we sent
         case opcprotman_opc_sig:    // someboby has spontaneously sent some data
+        {
+             
+        }
+        case opcprotman_opc_set:
         default:
-        {   // other are not managed
-        
+        {   
+            char str[50];
+            sprintf(str, "diagnostics cmd=%d", cmd_ptr->enable);
+            hal_trace_puts(str);
+            memcpy(&eo_dgn_cmds, (eOdgn_commands_t*)recdata, sizeof(eOdgn_commands_t));
         } break;
     }       
     
@@ -139,37 +95,6 @@ static void on_rec_transceiver_debug(opcprotman_opc_t opc, opcprotman_var_map_t*
 
 
 
-
-// static void generic_on_rec(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata)
-// {   // the copy in map->ptr is not yet done ...
-
-//     switch(opc)
-//     {
-//         case opcprotman_opc_say:
-//         {   // someboby has replied to a ask we sent: get the recdata and use it as you like
-//             recdata = recdata;
-//         } break;
-//         
-//        case opcprotman_opc_sig:
-//         {   // someboby has spontaneously sent some data: use it as you like
-//             recdata = recdata;
-//         } break;        
-//         
-//         case opcprotman_opc_set:
-//         {   // someboby has sent us the order of copying recdata into map->ptr ... do it
-//             if((NULL != map->ptr) && (0 != map->size))
-//             {
-//                 memcpy(map->ptr, recdata, map->size); 
-//             }                
-//         } break;
-//         
-//         default:
-//         {   // other are not managed
-//         
-//         } break;
-//     }
-//  
-// }
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -187,32 +112,43 @@ extern opcprotman_res_t opcprotman_personalize_database(OPCprotocolManager *p)
     opcprotman_res_t res = opcprotman_OK;
     
 
-/* personalize eom_ipnet_hid_DEBUG_id var*/
+/* personalize eodgn_nvidbdoor_cmds var*/
 	res = opcprotman_personalize_var(   p, 
-                                        eom_ipnet_hid_DEBUG_id,
-                                        (uint8_t*) &eom_ipnet_hid_DEBUG, 
-                                        on_rec_ipnet_debug);
+                                        eodgn_nvidbdoor_cmds,
+                                        (uint8_t*) &eo_dgn_cmds, 
+                                        on_rec_dgn_cmds);
 
     if(opcprotman_OK != res)
     {
         return(res);
     }
-/* personalize eom_emsrunner_hid_DEBUG_id var*/
+/* personalize eodgn_nvidbdoor_emsperiph var*/
 	res = opcprotman_personalize_var(   p, 
-                                        eom_emsrunner_hid_DEBUG_id,
-                                        (uint8_t*)&eom_emsrunner_hid_DEBUG, 
-                                        on_rec_runner_debug);
+                                        eodgn_nvidbdoor_emsperiph,
+                                        (uint8_t*)&eo_dgn_emsperiph, 
+                                        NULL); //on ems i don't receive this data
 
     if(opcprotman_OK != res)
     {
         return(res);
     }
     
-/* personalize eom_emstransceiver_hid_DEBUG_id var*/
+/* personalize eodgn_nvidbdoor_emsapplcore var*/
 	res = opcprotman_personalize_var(   p, 
-                                        eom_emstransceiver_hid_DEBUG_id,
-                                        (uint8_t*)&eom_emstransceiver_hid_DEBUG, 
-                                        on_rec_transceiver_debug);
+                                        eodgn_nvidbdoor_emsapplcommon,
+                                        (uint8_t*)&eo_dgn_emsapplcore, 
+                                        NULL); //on ems i don't receive this data
+
+    if(opcprotman_OK != res)
+    {
+        return(res);
+    }
+    
+/* personalize eodgn_nvidbdoor_emsapplmc var*/
+	res = opcprotman_personalize_var(   p, 
+                                        eodgn_nvidbdoor_emsapplmc,
+                                        (uint8_t*)&eo_dgn_emsappmc, 
+                                        NULL); //on ems i don't receive this data
 
     if(opcprotman_OK != res)
     {

@@ -41,6 +41,7 @@
 
 #include "EOemsController_hid.h" 
 #include "OPCprotocolManager_Cfg.h" 
+#include "EOtheEMSapplDiagnostics.h"
 
 
 
@@ -64,7 +65,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 //if defined SET_DESIRED_CURR_IN_ONLY_ONE_MSG, the appl sends all desered current to 2fon in only one msg
 #define SET_DESIRED_CURR_IN_ONLY_ONE_MSG
-
+#define runner_timeout_send_diagnostics         1000
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -340,7 +341,30 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
 }
 
 
+extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunner *p)
+{
+    eOemsrunner_diagnosticsinfo_t *dgn_ptr = eom_emsrunner_GetDiagnosticsInfoHandle(p);
+    if(NULL == dgn_ptr)
+    {
+        return;
+    }
+    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
+    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , runner_timeout_send_diagnostics);
 
+}
+
+extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver *p)
+{
+    eOemstransceiver_diagnosticsinfo_t* dgn_ptr = eom_emstransceiver_GetDiagnosticsInfoHandle(p);
+    
+    if(NULL == dgn_ptr)
+    {
+        return;
+    }
+    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
+    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , runner_timeout_send_diagnostics);
+    
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------

@@ -45,6 +45,8 @@
 #include "EOMtheEMSappl.h"
 #include "EOtheEMSapplBody.h"
 
+#include "EOtheEMSapplDiagnostics.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -236,6 +238,11 @@ static void s_eo_cfg_nvsEP_mngmnt_usr_ebx_generic_ropsigcfgcommand(eOmn_ropsigcf
                 ropdesc.id                      = sigcfg->id;
                 res = eo_transceiver_rop_regular_Load(theems00transceiver, &ropdesc);
                 res = res;
+                if(eores_OK != res)
+                {
+                    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
+                    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , 1000);
+                }
             }        
         } break;
         

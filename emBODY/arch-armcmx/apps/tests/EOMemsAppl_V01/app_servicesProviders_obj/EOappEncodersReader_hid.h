@@ -74,6 +74,8 @@ typedef struct
 } EOappEncReader_confEncDataPerSPI_hid_t;
 
 
+
+
 struct EOappEncReader_hid
 {
     eOappEncReader_cfg_t    cfg;
@@ -82,6 +84,7 @@ struct EOappEncReader_hid
 //    struct configEncSPIX    configuredEnc_SPI3;     /**< contains the sequence of reading of encoders connected to SPI3 */ 
     EOappEncReader_confEncDataPerSPI_hid_t configuredEnc_SPI1;
     EOappEncReader_confEncDataPerSPI_hid_t configuredEnc_SPI3;
+    eOappEncReader_diagnosticsinfo_t dgninfo;
 }; 
 
 

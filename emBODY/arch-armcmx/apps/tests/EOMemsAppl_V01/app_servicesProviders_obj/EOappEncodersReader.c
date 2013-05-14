@@ -39,6 +39,7 @@
 #include "EOtheMemoryPool.h"
 
 #include "OPCprotocolManager_Cfg.h" 
+#include "EOtheEMSapplDiagnostics.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -61,6 +62,8 @@
 #define CHECK_ENC_IS_CONNECTED(p, enc)      ((1<<enc) == ((1<<enc)&(p->halConfigEncMask)))
 #define ENCODER_NULL                        255
 #define INTPRIO_SPI_ENCODERS                hal_int_priority05
+#define DGN_COUNT_MAX                       10000 //1 sec
+#define DGN_THRESHOLD                       80
 
 
 
@@ -84,8 +87,10 @@ static void s_eo_appEncReader_isrCbk_onLastEncRead_SPI3(void *arg);
 
 static void s_eo_appEncReader_readConnectedEncConfg(EOappEncReader *p, EOappEncReader_configEncSPIXReadSequence_hid_t *cfgEncSPIX, hal_encoder_t startEnc, hal_encoder_t endEnc);
 static void s_eo_appEncReader_configureConnectedEncoders(EOappEncReader *p, hal_encoder_t startEnc, hal_encoder_t endEnc, EOappEncReader_configEncSPIXReadSequence_hid_t *cfgEncSPIX);
-static eOboolvalues_t s_eo_appEncReader_IsValidValue(uint32_t *valueraw);
+static eOboolvalues_t s_eo_appEncReader_IsValidValue(uint32_t *valueraw, eOappEncReader_errortype_t *error);
 static void s_eo_appEncReader_mapAppNumbering2HalNumbering(EOappEncReader *p);
+
+static void s_eo_appEncReader_check(EOappEncReader *p);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -129,6 +134,9 @@ extern EOappEncReader* eo_appEncReader_New(eOappEncReader_cfg_t *cfg)
     s_eo_appEncReader_configureConnectedEncoders(retptr, hal_encoder1, hal_encoder3, &(retptr->configuredEnc_SPI1.readSeq));
     s_eo_appEncReader_configureConnectedEncoders(retptr, hal_encoder7, hal_encoder9, &(retptr->configuredEnc_SPI3.readSeq));
     
+    //reset diagnostics info
+    memset(&retptr->dgninfo, 0, sizeof(eOappEncReader_diagnosticsinfo_t));
+    
     return(retptr);
 }
 
@@ -140,6 +148,7 @@ extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p)
         return(eores_NOK_nullpointer);
     }
 
+    s_eo_appEncReader_check(p);
 
     if(ENCODER_NULL != p->configuredEnc_SPI1.readSeq.first)
     {   
@@ -179,19 +188,21 @@ extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_en
 {
     uint32_t val_raw;
     eOresult_t res;
+    eOappEncReader_errortype_t errortype;
     
     res = (eOresult_t)hal_encoder_get_value(encoderMap[enc], &val_raw);
     if(eores_OK != res)
     {
-        *value = 3;
-        
+        *value = (uint32_t)err_onReadFromSpi;
+        p->dgninfo.enclist[enc][err_onReadFromSpi]++;
         return(res);
     }
-    uint8_t error = s_eo_appEncReader_IsValidValue(&val_raw); 
+   // eOboolvalues_t res = s_eo_appEncReader_IsValidValue(&val_raw, &errortype); 
 
-    if (error)
+    if (eobool_false == s_eo_appEncReader_IsValidValue(&val_raw, &errortype))
     {
-        *value = error;  
+        *value = (eOappEncReader_errortype_t)errortype;  
+        p->dgninfo.enclist[enc][errortype]++;
         return(eores_NOK_generic);
     }
 
@@ -215,6 +226,16 @@ __inline extern eOboolvalues_t eo_appEncReader_isReady(EOappEncReader *p)
     return(eobool_false);
 }
 
+
+extern eOappEncReader_diagnosticsinfo_t* eo_appEncReader_GetDiagnosticsHandle(EOappEncReader *p)
+{
+    if(NULL == p)
+    {
+        return(NULL);
+    }
+
+    return(&p->dgninfo);
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -327,7 +348,8 @@ static void s_eo_appEncReader_isrCbk_onLastEncRead_SPI3(void *arg)
    }
 }
 
-static uint8_t s_eo_appEncReader_IsValidValue(uint32_t *valueraw)
+//return 0 in case of error else 1
+static eOboolvalues_t s_eo_appEncReader_IsValidValue(uint32_t *valueraw, eOappEncReader_errortype_t *error)
 {
     uint8_t parity_error = 0;
     uint8_t b = 0;
@@ -339,15 +361,18 @@ static uint8_t s_eo_appEncReader_IsValidValue(uint32_t *valueraw)
     
     if (parity_error & 1) 
     { 
-        return 1;
+        *error = err_onParityError;
+        return(eobool_false);
     }
     
     if ((0x38 & *valueraw) != 0x20)
     {
-        return 2;
+        *error = err_onInvalidValue;
+        return(eobool_false);
+
     }
     
-    return 0;
+    return(eobool_true);
     
     //return(eobool_true);
 }
@@ -365,6 +390,38 @@ static void s_eo_appEncReader_mapAppNumbering2HalNumbering(EOappEncReader *p)
         }           
     }
 
+}
+
+static void s_eo_appEncReader_check(EOappEncReader *p)
+{
+   uint32_t index, errtype;
+   eOresult_t res;
+    if(p->dgninfo.count < DGN_COUNT_MAX)
+    {
+        p->dgninfo.count++;
+        return;
+    }
+        
+    for(index=0; index<eOeOappEncReader_encoderMaxNum; index++)
+    {
+        for(errtype=1; errtype<=eOappEncReader_errtype_MaxNum; errtype++)
+        {
+            if(p->dgninfo.enclist[index][errtype] > DGN_THRESHOLD)
+            {
+                res = eo_theEMSdgn_UpdateApplWithMc(eo_theEMSdgn_GetHandle(), p);
+                if(eores_OK != res)
+                {
+                    return;//if some error occured while updating var to send, signaling error comes to naught.
+                }
+                
+                eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplmc , 0);
+                return;
+            }
+        }
+    }
+    
+    //reset all statistics 
+    memset(&p->dgninfo, 0, sizeof(eOappEncReader_diagnosticsinfo_t));        
 }
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -730,11 +730,6 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMtheTimerManager.c</FilePath>
             </File>
-            <File>
-              <FileName>EOMtheLEDpulser.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMtheLEDpulser.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1394,6 +1389,16 @@
               <FileName>usrCbk_ethLowLevParser.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\ethlowlevelparser\usrCbk_ethLowLevParser.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>diagnostics</GroupName>
+          <Files>
+            <File>
+              <FileName>EOtheEMSapplDiagnostics.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOtheEMSapplDiagnostics.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2105,11 +2110,6 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMtheTimerManager.c</FilePath>
             </File>
-            <File>
-              <FileName>EOMtheLEDpulser.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMtheLEDpulser.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -2772,6 +2772,16 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>diagnostics</GroupName>
+          <Files>
+            <File>
+              <FileName>EOtheEMSapplDiagnostics.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOtheEMSapplDiagnostics.c</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -3116,7 +3126,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC _BDOOR_DEB_CANMSG_LOG_</Define>
+              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC</Define>
               <Undefine></Undefine>
               <IncludePath>..\app_main;..\app_cfg;..\app_nvs_cfg;..\app_servicesProviders_obj;..\app_servicesProviders_cfg\icub-can-net;..\app_servicesProviders_cfg\icub-can-proto;..\abslayer-cfg;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\sys\embobj\icub-app\api;..\..\..\..\..\any-arch\sys\embobj\icub-app\cfg;..\..\..\..\..\any-arch\sys\embobj\icub-app\src;..\..\..\..\..\any-arch\sys\embobj\icub-ems\api;..\..\..\..\..\any-arch\sys\embobj\icub-ems\src;..\..\..\..\..\any-arch\sys\embobj\mc\src;..\..\..\..\..\any-arch\sys\embobj\mc\api</IncludePath>
             </VariousControls>
@@ -3516,51 +3526,6 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMtheTimerManager.c</FilePath>
             </File>
-            <File>
-              <FileName>EOMtheLEDpulser.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMtheLEDpulser.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -4383,6 +4348,16 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>diagnostics</GroupName>
+          <Files>
+            <File>
+              <FileName>EOtheEMSapplDiagnostics.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOtheEMSapplDiagnostics.c</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -4727,7 +4702,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO _FORCE_NETWORK_FROM_IPAL_CFG _BDOOR_DEB_CANMSG_LOG_</Define>
+              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO _FORCE_NETWORK_FROM_IPAL_CFG</Define>
               <Undefine></Undefine>
               <IncludePath>..\app_main;..\app_cfg;..\app_nvs_cfg;..\app_servicesProviders_obj;..\app_servicesProviders_cfg\icub-can-net;..\app_servicesProviders_cfg\icub-can-proto;..\abslayer-cfg;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\sys\embobj\icub-app\api;..\..\..\..\..\any-arch\sys\embobj\icub-app\cfg;..\..\..\..\..\any-arch\sys\embobj\icub-app\src;..\..\..\..\..\any-arch\sys\embobj\mc\src;..\..\..\..\..\any-arch\sys\embobj\mc\api;..\..\..\..\..\any-arch\sys\embobj\icub-ems\api;..\..\..\..\..\any-arch\sys\embobj\icub-ems\src</IncludePath>
             </VariousControls>
@@ -5127,11 +5102,6 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMtheTimerManager.c</FilePath>
             </File>
-            <File>
-              <FileName>EOMtheLEDpulser.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMtheLEDpulser.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -5911,6 +5881,16 @@
               <FileName>usrCbk_ethLowLevParser.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\ethlowlevelparser\usrCbk_ethLowLevParser.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>diagnostics</GroupName>
+          <Files>
+            <File>
+              <FileName>EOtheEMSapplDiagnostics.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOtheEMSapplDiagnostics.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -47,6 +47,8 @@
 #include "EOMtheEMSconfigurator.h"
 #include "EOMtheEMSappl.h"
 
+#include "EOtheEMSapplDiagnostics.h"
+
 //#include "hal_debugPin.h"
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -639,6 +641,12 @@ static eOresult_t s_loadFullscalelikeoccasionalrop(eOsnsr_strainId_t sId, eOsnsr
    
     res = eo_transceiver_rop_occasional_Load( eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()), &ropdesc); 
 
+    if(eores_OK != res)
+    {
+        eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
+        eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , 1000);
+
+    }
     return(res);
 };
 

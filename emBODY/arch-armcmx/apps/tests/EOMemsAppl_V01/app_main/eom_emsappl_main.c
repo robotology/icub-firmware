@@ -40,6 +40,9 @@
 #include "EOMtheEMSapplCfg.h"
 #include "EOMtheEMSappl.h"
 
+#include "OPCprotocolManager_Cfg.h" 
+#include "EOtheEMSapplDiagnostics.h"
+
 
 
 
@@ -116,10 +119,15 @@ extern void eo_receiver_callback_incaseoferror_in_sequencenumberReceived(uint64_
     char str[80];
     sprintf(str, "SEQ_NUM: rec=%llu expeted=%llu ", rec_seqnum, expected_seqnum);
     hal_trace_puts(str);
-
-    hal_led_on(hal_led0); //led rosso
+  
 }
 #endif
+
+extern void eo_receiver_callback_incaseoferror_in_sequencenumberReceived(uint64_t rec_seqnum, uint64_t expected_seqnum)
+{
+    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());    
+    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon  , 0);
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------

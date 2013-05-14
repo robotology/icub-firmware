@@ -65,6 +65,20 @@ typedef enum
 
 enum {eOeOappEncReader_encoderMaxNum = 6};
 
+typedef enum
+{
+    err_onParityError   = 0,
+    err_onInvalidValue  = 1,
+    err_onReadFromSpi   = 2
+} eOappEncReader_errortype_t;
+
+enum {eOappEncReader_errtype_MaxNum = 3};
+typedef struct
+{
+    uint16_t enclist[eOeOappEncReader_encoderMaxNum][eOappEncReader_errtype_MaxNum];
+    uint16_t count;
+} eOappEncReader_diagnosticsinfo_t;
+
 
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
@@ -77,6 +91,8 @@ extern eOresult_t eo_appEncReader_getValues(EOappEncReader *p, uint32_t *data_pt
 EO_extern_inline eOboolvalues_t eo_appEncReader_isReady(EOappEncReader *p);  //p is not checked
 
 extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_encoder_t enc, uint32_t *value);
+
+extern eOappEncReader_diagnosticsinfo_t* eo_appEncReader_GetDiagnosticsHandle(EOappEncReader *p);
 /** @}            
     end of group eo_app_encodersReader
  **/

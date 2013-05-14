@@ -31,6 +31,8 @@
 #include "EOtheEMSApplBody.h"
 #include "EOMtheEMSapplCfg.h"
 
+#include "EOtheEMSapplDiagnostics.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -48,7 +50,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+#define configurator_timeout_send_diagnostics 1000
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -108,7 +110,12 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(EOMtheEMSconfigu
     }
 }
 
-
+extern void eom_emsconfigurator_hid_userdef_onemstransceivererror(EOMtheEMStransceiver* p)
+{
+    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
+    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , configurator_timeout_send_diagnostics);
+    
+ }
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
