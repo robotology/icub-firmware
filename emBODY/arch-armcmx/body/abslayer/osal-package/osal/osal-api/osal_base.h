@@ -264,21 +264,25 @@ typedef struct
 {
     osal_rtostype_t     rtostype;               /**< The underlying RTOS   */   
     osal_memorymodel_t  memorymodel;            /**< The used memory model */
+    uint8_t             prio;                   /**< the HW priority of the OSAL (aka the priority of the handler of osal_ calls)    */                  
     osal_cpufamily_t    cpufam;                 /**< The CPU type                     */                                 
     uint32_t            cpufreq;                /**< The CPU frequency in Hz                                    */ 
-    uint8_t             prio;                   /**< the HW priority of the OSAL (aka the priority of the handler of osal_ calls)    */                  
     osal_reltime_t      tick;                   /**< The tick of the OSAL expressed in micro-sec  */ 
     uint16_t            launcherstacksize;      /**< The stack size (in bytes) of the launcher task             */               
     uint16_t            idlestacksize;          /**< The stack size (in bytes) of the idle task                 */
-    uint16_t            globalstacksize;        /**< The global stack size (in bytes) reserved for all other tasks        */
     osal_bool_t         roundrobin;             /**< If osal_true the OSAL uses round robin on tasks of equal priority, else it does not  */
     osal_reltime_t      roundrobintick;         /**< The maximum timeslot used for round robin expressed in micro-sec */
-    uint8_t             tasknum;                /**< The maximum number of user tasks managed by OSAl (apart launcher and idle tasks)*/
-    uint8_t             timernum;               /**< The maximum number of timers managed by OSAl */
-    uint8_t             mutexnum;               /**< The maximum number of mutexes managed by OSAl */    
-    uint8_t             semaphorenum;           /**< The maximum number of semaphores managed by OSAl */
-    uint8_t             mqueuenum;              /**< The maximum number of messagequeues managed by OSAl */
+    uint8_t             tasknum;                /**< The maximum number of user tasks managed by OSAL (apart launcher and idle tasks) */
+    
+    // sizes relevant only for memorymodel osal_memmode_static
+    uint16_t            globalstacksize;        /**< The global stack size (in bytes) reserved for user tasks        */
+    uint8_t             timernum;               /**< The maximum number of timers managed by OSAL */
+    uint8_t             mutexnum;               /**< The maximum number of mutexes managed by OSAL */    
+    uint8_t             semaphorenum;           /**< The maximum number of semaphores managed by OSAL */
+    uint8_t             mqueuenum;              /**< The maximum number of messagequeues managed by OSAL */
     uint16_t            mqueueelemnum;          /**< The maximum total number of messages contained in all the possible message queues */
+    
+    // additional configuration
     osal_arch_cfg_t     arch;                   /**< the configuration part relative to the architecture specified in cpufam */
     osal_extfn_cfg_t    extfn;                  /**< User-defined behaviour defined with external function pointers */
 } osal_cfg_t;
