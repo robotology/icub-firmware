@@ -23,6 +23,8 @@
 #include "OPCprotocolManager_Cfg.h" 
 #include "OPCprotocolManager.h"
 
+#include "EOtheEMSapplDiagnostics.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -48,20 +50,26 @@
 static opcprotman_var_map_t s_myarray[] = 
 {
     {
-        .var        = eom_ipnet_hid_DEBUG_id,
-        .size       = sizeof(EOMtheIPnetDEBUG_t),
+        .var        = eodgn_nvidbdoor_cmds,
+        .size       = sizeof(eOdgn_commands_t),
         .ptr        = NULL,
         .onrec      = NULL
     },
     {
-        .var        = eom_emsrunner_hid_DEBUG_id,
-        .size       = sizeof(EOMtheEMSrunnerDEBUG_t),
+        .var        = eodgn_nvidbdoor_emsperiph,
+        .size       = sizeof(eOdgn_emsperipheralstatus_t),
         .ptr        = NULL,
         .onrec      = NULL
     },
     {
-        .var        = eom_emstransceiver_hid_DEBUG_id,
-        .size       = sizeof(EOMtheEMStransceiverDEBUG_t),
+        .var        = eodgn_nvidbdoor_emsapplcommon,
+        .size       = sizeof(eOdgn_emsapplication_common_t),
+        .ptr        = NULL,
+        .onrec      = NULL
+    },
+    {
+        .var        = eodgn_nvidbdoor_emsapplmc,
+        .size       = sizeof(eOdgn_emsapplication_emswithmc_t),
         .ptr        = NULL,
         .onrec      = NULL
     }
@@ -70,7 +78,7 @@ static opcprotman_var_map_t s_myarray[] =
 opcprotman_cfg_t opcprotmanCFGv0x1234 =
 {
     .databaseversion        = 0x1234,
-    .numberofvariables      = opcProt_numofvar_max,
+    .numberofvariables      = opcCfg_nvid_bdoor_user_num + eodgn_nvidbdoor_max,
     .arrayofvariablemap     = s_myarray
 };
 

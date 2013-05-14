@@ -72,12 +72,12 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOMtheIPnetDEBUG_t eom_ipnet_hid_DEBUG   =
+extern eOmipnet_diagnosticsinfo_t eom_ipnet_diagnosticsInfo  =
 {
-    .datagrams_failed_to_go_in_rxfifo               = 0,
-    .datagrams_failed_to_go_in_txosalqueue          = 0,
-    .datagrams_failed_to_be_retrieved_from_txfifo   = 0,
-    .datagrams_failed_to_be_sent_by_ipal            = 0    
+    .datagrams_failed_to_go_in_rxfifo                       = 0,
+    .datagrams_failed_to_go_in_txosalqueue                  = 0,
+    .datagrams_failed_to_be_retrieved_from_txfifo           = 0,
+    .datagrams_failed_to_be_sent_by_ipal                    = 0    
 };
 
 
@@ -412,6 +412,28 @@ extern EOMtask* eom_ipnet_GetTask(EOMtheIPnet *ip, eOmipnet_taskid_t tskid)
     return((eomipnet_task_proc == tskid) ? (ip->tskproc) : (ip->tsktick));
 }
 
+extern eOresult_t eom_ipnet_GetDiagnosticsInfo(EOMtheIPnet *ip, eOmipnet_diagnosticsinfo_t *dgn_ptr)
+{
+    if((NULL == ip) || (NULL == dgn_ptr))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    memcpy(dgn_ptr, &eom_ipnet_diagnosticsInfo, sizeof(eOmipnet_diagnosticsinfo_t));
+    
+    return(eores_OK);
+}
+
+
+extern  eOmipnet_diagnosticsinfo_t * eom_ipnet_GetDiagnosticsInfoHandle(EOMtheIPnet *ip)
+{
+    if(NULL == ip)
+    {
+        return(NULL);
+    }
+    return(&eom_ipnet_diagnosticsInfo);
+
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -626,7 +648,7 @@ static eOresult_t s_eom_ipnet_Alert(EOVtheIPnet* ip, void *eobjcaller, eOevent_t
             else
             {
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "cannot put a datagram in tx fifo");  
-                eom_ipnet_hid_DEBUG.datagrams_failed_to_go_in_txosalqueue ++;
+                eom_ipnet_diagnosticsInfo.datagrams_failed_to_go_in_txosalqueue ++;
             }
 
         } break;
@@ -922,7 +944,7 @@ static void s_eom_ipnet_OnReceptionDatagram(void *arg, ipal_udpsocket_t *skt, ip
 
     if(eores_OK != res)
     {
-        eom_ipnet_hid_DEBUG.datagrams_failed_to_go_in_rxfifo ++;
+        eom_ipnet_diagnosticsInfo.datagrams_failed_to_go_in_rxfifo ++;
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "cannot put a datagram in rx fifo");
         // return because ... we did not put the message in teh queue and thus ... we dont want do any action on reception
         return;
@@ -1177,12 +1199,12 @@ static void s_eom_ipnet_process_transmission_datagram(void)
                         eo_fifo_Rem(s->dgramfifooutput, s_eom_theipnet.maxwaittime);
                         // but put a warning on it.
                         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "ipal cannot send a datagram");
-                        eom_ipnet_hid_DEBUG.datagrams_failed_to_be_sent_by_ipal ++;
+                        eom_ipnet_diagnosticsInfo.datagrams_failed_to_be_sent_by_ipal ++;
                     }
                 }
                 else
                 {
-                    eom_ipnet_hid_DEBUG.datagrams_failed_to_be_retrieved_from_txfifo ++;               
+                    eom_ipnet_diagnosticsInfo.datagrams_failed_to_be_retrieved_from_txfifo ++;               
                 }
             
             }

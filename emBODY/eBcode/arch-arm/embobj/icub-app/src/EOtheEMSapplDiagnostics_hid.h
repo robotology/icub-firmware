@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
- * Author:  Marco Accame
- * email:   marco.accame@iit.it
+ * Author:  Valentina Gaggero
+ * email:   valentina.gaggero@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
@@ -17,68 +17,44 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOTRANSCEIVER_HID_H_
-#define _EOTRANSCEIVER_HID_H_
+#ifndef _EOTHEEMSAPPLDIAGNOTICS_HID_H_
+#define _EOTHEEMSAPPLDIAGNOTICS_HID_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* @file       EOtransceiver_hid.h
-    @brief      This header file implements hidden interface to a packet object.
-    @author     marco.accame@iit.it
-    @date       0111/2010
+/* @file       EOMtheEMSsocket_hid.h
+    @brief      This header file implements hidden interface to the error manager
+ 	@author     valentina.gaggero@iit.it
+	@date       05/10/2013
  **/
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-#include "EOreceiver.h"
-#include "EOtransmitter.h"
-#include "EOVmutex.h"
+
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "EOtransceiver.h"
+#include "EOtheEMSapplDiagnostics.h"
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
-
-#define USE_DEBUG_EOTRANSCEIVER
+// empty-section
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef struct
+struct EOTheEMSdiagnostics_hid_t
 {
-    uint32_t    failuresinloadofreplyropframe;
-    uint32_t    cannotloadropinregulars;
-    uint32_t    cannotloadropinoccasionals;
-} EOtransceiverDEBUG_t;
-
-/** @struct     EOtransceiver_hid
-    @brief      Hidden definition. Implements private data used only internally by the 
-                public or private (static) functions of the object and protected data
-                used also by its derived objects.
- **/  
- 
-struct EOtransceiver_hid 
-{
-    eo_transceiver_cfg_t        cfg;
-    EOreceiver*                 receiver;
-    EOtransmitter*              transmitter;   
-#if defined(USE_DEBUG_EOTRANSCEIVER)    
-    EOtransceiverDEBUG_t        DEBUG;
-#endif    
-    //EOVmutexDerived*            mtx_tx_replies;
-    //EOVmutexDerived*            mtx_tx_regulars;
-    //EOVmutexDerived*            mtx_tx_occasionals;
-}; 
-
+    uint8_t dummy;
+};
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
+// empty-section
 
 
 #ifdef __cplusplus
@@ -88,7 +64,4 @@ struct EOtransceiver_hid
 #endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
-
-
-
 

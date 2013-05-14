@@ -170,6 +170,11 @@ __weak extern void eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(EOMtheEMS
 
 } 
 
+__weak extern void eom_emsconfigurator_hid_userdef_onemstransceivererror(EOMtheEMStransceiver* p)
+{
+
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -212,6 +217,10 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
         {
             res = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
         }
+        else
+        {
+            eom_emsconfigurator_hid_userdef_onemstransceivererror(eom_emstransceiver_GetHandle());
+        }
     
     }
  
@@ -230,7 +239,12 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
             if(eores_OK == res)
             {
                 s_emsconfigurator_singleton.numofrxrops = numberofrxrops;
-            }         
+            }
+            else
+            {
+               eom_emsconfigurator_hid_userdef_onemstransceivererror(eom_emstransceiver_GetHandle());
+            }
+            
         }
         
 
@@ -267,7 +281,6 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
 
 
 }
-
 
 
 
