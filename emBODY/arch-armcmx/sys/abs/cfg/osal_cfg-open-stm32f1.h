@@ -34,14 +34,14 @@
 //   <o> RTOS type         <0=>   IITmodified-RTXARM    <1=>    OOSIIT
 //   <i> Only IITmodified-RTXARM and OOSIIT are so far supported.
 #ifndef OSAL_RTOSTYPE
- #define OSAL_RTOSTYPE      0
+ #define OSAL_RTOSTYPE      1
 #endif
 
 
-//   <o> Memory model         <0=>   static allocation
+//   <o> Memory model         <0=>   static allocation      <1=>   dynamic allocation    
 //   <i> Only static allocation is now supported.
 #ifndef OSAL_MEMMODEL
- #define OSAL_MEMMODEL      0
+ #define OSAL_MEMMODEL      1
 #endif
 
 
@@ -49,6 +49,7 @@
 
 // <h> Embedded System 
 // <i> sssssssss
+
 
 //   <o> CPU family         <0=>   Cortex M3 <1=>   Cortex M4
 //   <i> Only Cortex M3 and M4 are now supported.
@@ -58,7 +59,7 @@
 
 //   <o> CPU Frequency [Hz] <1-1000000000>
 //   <i> Specify CPU frequency.
-//   <i> Default: 72000000  (72MHz on STM32F107, 168Mhz on STM32F407)
+//   <i> Default: 72000000  (72MHz on STM32F107)
 #ifndef OSAL_CPUFREQ
  #define OSAL_CPUFREQ       72000000
 #endif
@@ -147,7 +148,7 @@
 //   <i> Define max number of timers.
 //   <i> Default: 0  (User timers disabled)
 #ifndef OSAL_TIMERNUM
- #define OSAL_TIMERNUM    6
+ #define OSAL_TIMERNUM    1
 #endif
 
 
@@ -155,7 +156,7 @@
 //   <i> Define max. number of mutexes that will run at the same time.
 //   <i> Default: 0  (Mutexes not enabled)
 #ifndef OSAL_MUTEXNUM
- #define OSAL_MUTEXNUM    5
+ #define OSAL_MUTEXNUM    1
 #endif
 
 
@@ -163,7 +164,7 @@
 //   <i> Define max. number of semaphores that will run at the same time.
 //   <i> Default: 0  (Semaphores not enabled)
 #ifndef OSAL_SEMAPHORENUM
- #define OSAL_SEMAPHORENUM    5
+ #define OSAL_SEMAPHORENUM    1
 #endif
 
 
@@ -171,14 +172,14 @@
 //   <i> Define max. number of message queues that that will run at the same time.
 //   <i> Default: 0  (Message queues not enabled)
 #ifndef OSAL_MQUEUENUM
- #define OSAL_MQUEUENUM    5
+ #define OSAL_MQUEUENUM    1
 #endif
 
 //   <o> Total number of messages in message queues <0-1000>
 //   <i> Define max. number of messages that can be contained in all the message queues.
 //   <i> Default: 0  (Message queues not enabled)
 #ifndef OSAL_MQUEUEELEMNUM
- #define OSAL_MQUEUEELEMNUM    20
+ #define OSAL_MQUEUEELEMNUM    1
 #endif
 
 
@@ -197,8 +198,8 @@
 
 // - some controls ----------------------------------------------------------------------------------------------------
 
-#if(0 != OSAL_RTOSTYPE)
-    #error only arm-rtx modified by iit is supported so far
+#if(OSAL_RTOSTYPE > 1)
+    #error only arm-rtx modified by iit and oosiit are supported so far
 #endif
 
 
