@@ -64,19 +64,6 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-//  DEBUG
-
-extern EOMtheEMStransceiverDEBUG_t eom_emstransceiver_hid_DEBUG =
-{
-    .rxinvalidropframes                     = 0,
-    .errorsinsequencenumber                 = 0,
-    .lostreplies                            = 0,
-    .failuresinloadofreplyropframe          = 0,
-    .txropframeistoobigforthepacket         = 0,
-    .cannotloadropinregulars                = 0,
-    .cannotloadropinoccasionals             = 0    
-};
-
 const eOemstransceiver_cfg_t eom_emstransceiver_DefaultCfg = 
 {
     EO_INIT(.vectorof_endpoint_cfg)     NULL,
@@ -108,7 +95,7 @@ const eOemstransceiver_cfg_t eom_emstransceiver_DefaultCfg =
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_eom_emstransceiver_synch_DEBUG(void);
+static void s_eom_emstransceiver_update_diagnosticsinfo(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -124,6 +111,16 @@ static EOMtheEMStransceiver s_emstransceiver_singleton =
 };
 
 
+static eOemstransceiver_diagnosticsinfo_t s_eom_emstransceiver_diagnosticsinfo =
+{
+    .rxinvalidropframes                     = 0,
+    .rxseqnumwrong                          = 0,
+    .lostreplies                            = 0,
+    .failuresinloadofreplyropframe          = 0,
+    .txropframeistoobigforthepacket         = 0,
+    .cannotloadropinregulars                = 0,
+    .cannotloadropinoccasionals             = 0    
+};
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -158,7 +155,7 @@ extern EOMtheEMStransceiver * eom_emstransceiver_Initialise(const eOemstransceiv
     s_emstransceiver_singleton.transceiver = eo_boardtransceiver_Initialise(&brdtransceiver_cfg);
 
     
-    s_eom_emstransceiver_synch_DEBUG();
+    s_eom_emstransceiver_update_diagnosticsinfo();
     
     char str[96];
     uint8_t *ipaddr = (uint8_t*) &cfg->hostipv4addr;
@@ -214,7 +211,7 @@ extern eOresult_t eom_emstransceiver_Parse(EOMtheEMStransceiver* p, EOpacket* rx
     
     res = eo_transceiver_Receive(s_emstransceiver_singleton.transceiver, rxpkt, numberofrops, txtime);
     
-    s_eom_emstransceiver_synch_DEBUG();
+    s_eom_emstransceiver_update_diagnosticsinfo();
     
     return(res);
 }
@@ -231,11 +228,34 @@ extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** tx
     
     res = eo_transceiver_Transmit(s_emstransceiver_singleton.transceiver, txpkt, numberofrops);
     
-    s_eom_emstransceiver_synch_DEBUG();
+    s_eom_emstransceiver_update_diagnosticsinfo();
     
     return(res);
 }
 
+
+extern eOresult_t eom_emstransceiver_GetDiagnosticsInfo(EOMtheEMStransceiver* p, eOemstransceiver_diagnosticsinfo_t *dgn_ptr)
+{
+    if((NULL == p) || (NULL == dgn_ptr))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    memcpy(dgn_ptr, &s_eom_emstransceiver_diagnosticsinfo, sizeof(eOemstransceiver_diagnosticsinfo_t));
+    
+    return(eores_OK);
+}
+
+extern eOemstransceiver_diagnosticsinfo_t* eom_emstransceiver_GetDiagnosticsInfoHandle(EOMtheEMStransceiver* p)
+{
+    if(NULL == p)
+    {
+        return(NULL);
+    }
+    s_eom_emstransceiver_update_diagnosticsinfo();
+    return(&s_eom_emstransceiver_diagnosticsinfo);
+    
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -246,23 +266,22 @@ extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** tx
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_eom_emstransceiver_synch_DEBUG(void)
+static void s_eom_emstransceiver_update_diagnosticsinfo(void)
 {
-#if defined(USE_DEBUG_THEEMSTRANSCEIVER)    
     // retrieve the DEBUG variables of transceiver, transmitter, receiver and put them inside here.
     EOtransceiverDEBUG_t* transceiverDBG = &s_emstransceiver_singleton.transceiver->DEBUG;
     EOtransmitterDEBUG_t* transmitterDBG = &s_emstransceiver_singleton.transceiver->transmitter->DEBUG;
     EOreceiverDEBUG_t*    receiverDBG    = &s_emstransceiver_singleton.transceiver->receiver->DEBUG;
     
     // update the extern variable used for debug ...
-    eom_emstransceiver_hid_DEBUG.rxinvalidropframes             = receiverDBG->rxinvalidropframes;
-    eom_emstransceiver_hid_DEBUG.errorsinsequencenumber         = receiverDBG->errorsinsequencenumber;
-    eom_emstransceiver_hid_DEBUG.lostreplies                    = receiverDBG->lostreplies;
-    eom_emstransceiver_hid_DEBUG.failuresinloadofreplyropframe  = transceiverDBG->failuresinloadofreplyropframe;
-    eom_emstransceiver_hid_DEBUG.txropframeistoobigforthepacket = transmitterDBG->txropframeistoobigforthepacket;   
-    eom_emstransceiver_hid_DEBUG.cannotloadropinregulars        = transceiverDBG->cannotloadropinregulars;
-    eom_emstransceiver_hid_DEBUG.cannotloadropinoccasionals     = transceiverDBG->cannotloadropinoccasionals;
-#endif    
+    s_eom_emstransceiver_diagnosticsinfo.rxinvalidropframes             = receiverDBG->rxinvalidropframes;
+    s_eom_emstransceiver_diagnosticsinfo.rxseqnumwrong                  = receiverDBG->errorsinsequencenumber;
+    s_eom_emstransceiver_diagnosticsinfo.lostreplies                    = receiverDBG->lostreplies;
+    s_eom_emstransceiver_diagnosticsinfo.failuresinloadofreplyropframe  = transceiverDBG->failuresinloadofreplyropframe;
+    s_eom_emstransceiver_diagnosticsinfo.txropframeistoobigforthepacket = transmitterDBG->txropframeistoobigforthepacket;   
+    s_eom_emstransceiver_diagnosticsinfo.cannotloadropinregulars        = transceiverDBG->cannotloadropinregulars;
+    s_eom_emstransceiver_diagnosticsinfo.cannotloadropinoccasionals     = transceiverDBG->cannotloadropinoccasionals;
+  
 }
 
 

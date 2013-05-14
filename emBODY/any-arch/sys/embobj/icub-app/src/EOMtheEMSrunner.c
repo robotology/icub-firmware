@@ -112,7 +112,9 @@ const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg =
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_eom_emsrunner_compute_timing_statistics(void);
+static void s_eom_emsrunner_update_dignosticsinfo_timing(void);
+static void s_eom_emsrunner_update_dignosticsinfo_exeoverflows(eOemsrunner_taskid_t taskid);
+static void s_eom_emsrunner_update_dignosticsinfo_txfailure(void);
 
 static eObool_t s_eom_emsrunner_timing_is_compatible(const eOemsrunner_cfg_t *cfg);
 
@@ -165,7 +167,7 @@ static EOMtheEMSrunner s_theemsrunner =
 };
 
 
-extern EOMtheEMSrunnerDEBUG_t eom_emsrunner_hid_DEBUG   =
+static eOemsrunner_diagnosticsinfo_t s_eom_emsrunner_diagnosticsinfo   =
 {
     .numberofperiods                            = 0,
     .cumulativeabsoluteerrorinperiod            = 0,
@@ -176,7 +178,6 @@ extern EOMtheEMSrunnerDEBUG_t eom_emsrunner_hid_DEBUG   =
     .executionoverflows                         = {0, 0, 0},
     .datagrams_failed_to_go_in_txsocket         = 0  
 };
-
 //static const hal_timer_t s_eom_runner_timers_task[3] = {hal_timer2, hal_timer3, hal_timer4};
 //static const hal_timer_t s_eom_runner_timers_warn[3] = {hal_timer5, hal_timer6, hal_timer7};
 
@@ -377,6 +378,27 @@ extern void eom_emsrunner_OnUDPpacketTransmitted(EOMtheEMSrunner *p)
 }
 
 
+extern eOresult_t eom_emsrunner_GetDiagnosticsInfo(EOMtheEMSrunner *p, eOemsrunner_diagnosticsinfo_t *dgn_ptr)
+{
+    if((NULL == p)|| (NULL == dgn_ptr))
+    {
+        return(eores_NOK_nullpointer);
+    } 
+    
+    memcpy(dgn_ptr, &s_eom_emsrunner_diagnosticsinfo, sizeof(eOemsrunner_diagnosticsinfo_t));
+    return(eores_OK);
+}
+
+extern eOemsrunner_diagnosticsinfo_t * eom_emsrunner_GetDiagnosticsInfoHandle(EOMtheEMSrunner *p)
+{
+    if(NULL == p)
+    {
+        return(NULL);
+    } 
+    
+    return(&s_eom_emsrunner_diagnosticsinfo);
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -400,9 +422,15 @@ extern void tskEMSrunTX(void *p)
 } 
 
 
+__weak extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver *p)
+{
+;
+}
+
+
 /*__weak*/ extern void eom_emsrunner_hid_userdef_taskRX_activity(EOMtheEMSrunner *p)
 {   
-    s_eom_emsrunner_compute_timing_statistics();
+    s_eom_emsrunner_update_dignosticsinfo_timing();
     
     p->numofrxrops = 0;
     p->numofrxpackets = 0;
@@ -444,6 +472,7 @@ __weak extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramrecep
     eOsizecntnr_t remainingrxpkts = 1;    
     uint16_t processedpkts = 0;
     eObool_t processreception = eobool_true;
+    eOresult_t res;
     
     // evaluate if we can enter in the reception loop
     if((0 == p->cfg.maxnumofRXpackets) || (eobool_false == eom_runner_hid_cansafelyexecute(p, eo_emsrunner_taskid_runRX)))
@@ -466,7 +495,11 @@ __weak extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramrecep
         if(eores_OK == resrx)
         {
             uint16_t tmp = 0;
-            eom_emstransceiver_Parse(eom_emstransceiver_GetHandle(), rxpkt, &tmp, NULL);
+            res = eom_emstransceiver_Parse(eom_emstransceiver_GetHandle(), rxpkt, &tmp, NULL);
+            if(eores_OK != res)
+            {
+                eom_emsrunner_hid_userdef_onemstransceivererror(eom_emstransceiver_GetHandle());
+            }
             p->numofrxrops += tmp;
             p->numofrxpackets++;
         }
@@ -589,8 +622,13 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtrans
             }
             else
             {
+                s_eom_emsrunner_update_dignosticsinfo_txfailure();
                 eom_emsrunner_hid_userdef_onfailedtransmission(p);
             }
+        }
+        else
+        {
+            eom_emsrunner_hid_userdef_onemstransceivererror(eom_emstransceiver_GetHandle());
         }
 
         // 2. evaluate quit from the loop
@@ -626,7 +664,6 @@ __weak extern void eom_emsrunner_hid_userdef_onexecutionoverflow(EOMtheEMSrunner
     eOerrmanErrorType_t errortype = (eo_emsrunner_mode_hardrealtime == p->mode) ? (eo_errortype_fatal) : (eo_errortype_warning);
     snprintf(str, sizeof(str)-1, "exec overflow of %s", tskname[taskid]); 
     eo_errman_Error(eo_errman_GetHandle(), errortype, s_eobj_ownname, str); 
-    eom_emsrunner_hid_DEBUG.executionoverflows[taskid] ++;
 }
 
 
@@ -636,14 +673,15 @@ __weak extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunne
     eOerrmanErrorType_t errortype = (eo_emsrunner_mode_hardrealtime == p->mode) ? (eo_errortype_fatal) : (eo_errortype_warning);
     snprintf(str, sizeof(str)-1, "failed to tx a packet, possibly because socket is full"); 
     eo_errman_Error(eo_errman_GetHandle(), errortype, s_eobj_ownname, str); 
-    eom_emsrunner_hid_DEBUG.datagrams_failed_to_go_in_txsocket ++;
 }
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_eom_emsrunner_compute_timing_statistics(void)
+static void s_eom_emsrunner_update_dignosticsinfo_timing(void) 
 {
     static uint64_t prevtime = 0;
     uint64_t currtime = osal_system_abstime_get();
@@ -660,20 +698,20 @@ static void s_eom_emsrunner_compute_timing_statistics(void)
     
     
     
-    eom_emsrunner_hid_DEBUG.numberofperiods ++;
-    eom_emsrunner_hid_DEBUG.cumulativeabsoluteerrorinperiod += error;
+    s_eom_emsrunner_diagnosticsinfo.numberofperiods ++;
+    s_eom_emsrunner_diagnosticsinfo.cumulativeabsoluteerrorinperiod += error;
     
-    eom_emsrunner_hid_DEBUG.meanofabsoluteerrorinperiod = eom_emsrunner_hid_DEBUG.cumulativeabsoluteerrorinperiod / eom_emsrunner_hid_DEBUG.numberofperiods;
+    s_eom_emsrunner_diagnosticsinfo.meanofabsoluteerrorinperiod = s_eom_emsrunner_diagnosticsinfo.cumulativeabsoluteerrorinperiod / s_eom_emsrunner_diagnosticsinfo.numberofperiods;
     
     
-    if(error > eom_emsrunner_hid_DEBUG.maxabsoluteerrorinperiod)
+    if(error > s_eom_emsrunner_diagnosticsinfo.maxabsoluteerrorinperiod)
     {
-        eom_emsrunner_hid_DEBUG.maxabsoluteerrorinperiod = error;       
+        s_eom_emsrunner_diagnosticsinfo.maxabsoluteerrorinperiod = error;       
     }
     
-    if(error < eom_emsrunner_hid_DEBUG.minabsoluteerrorinperiod)
+    if(error < s_eom_emsrunner_diagnosticsinfo.minabsoluteerrorinperiod)
     {
-        eom_emsrunner_hid_DEBUG.minabsoluteerrorinperiod = error;       
+        s_eom_emsrunner_diagnosticsinfo.minabsoluteerrorinperiod = error;       
     }    
     
     {   // compute moving mean using 1024 samples
@@ -691,7 +729,7 @@ static void s_eom_emsrunner_compute_timing_statistics(void)
         mean_1k_n = mean_1k_nplus1;
         mean_n = mean_nplus1;
         
-        eom_emsrunner_hid_DEBUG.movingmeanofabsoluteerrorinperiod =  mean_nplus1;      
+        s_eom_emsrunner_diagnosticsinfo.movingmeanofabsoluteerrorinperiod =  mean_nplus1;      
     }
     
     
@@ -752,6 +790,7 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
     
     if(eobool_true == eom_runner_hid_signaloverflow(&s_theemsrunner, eo_emsrunner_taskid_runRX))
     {
+       s_eom_emsrunner_update_dignosticsinfo_exeoverflows(eo_emsrunner_taskid_runRX);
        eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runRX); 
     }
     
@@ -787,6 +826,7 @@ static void s_eom_emsrunner_taskDO_run(EOMtask *p, uint32_t t)
 
     if(eobool_true == eom_runner_hid_signaloverflow(&s_theemsrunner, eo_emsrunner_taskid_runDO))
     {
+       s_eom_emsrunner_update_dignosticsinfo_exeoverflows(eo_emsrunner_taskid_runDO);
        eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runDO);     
     }
     
@@ -850,6 +890,7 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
     
     if(eobool_true == eom_runner_hid_signaloverflow(&s_theemsrunner, eo_emsrunner_taskid_runTX))
     {   // it is in this position so that ... it is still possible to send the EMS appl in ERROR state.
+        s_eom_emsrunner_update_dignosticsinfo_exeoverflows(eo_emsrunner_taskid_runTX);
         eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runTX);
     } 
 
@@ -1141,6 +1182,16 @@ static void s_eom_emsrunner_6HALTIMERS_activate_taskrx_ultrabasic(void *arg)
     s_eom_emsrunner_6HALTIMERS_start_task_ultrabasic(arg);
     
     s_eom_emsrunner_6HALTIMERS_activate_task_ultrabasic(arg);    
+}
+
+static void s_eom_emsrunner_update_dignosticsinfo_exeoverflows(eOemsrunner_taskid_t taskid)
+{
+     s_eom_emsrunner_diagnosticsinfo.executionoverflows[taskid] ++;
+}
+
+static void s_eom_emsrunner_update_dignosticsinfo_txfailure(void)
+{
+     s_eom_emsrunner_diagnosticsinfo.datagrams_failed_to_go_in_txsocket ++;
 }
 
 

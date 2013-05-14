@@ -75,6 +75,17 @@ typedef struct
 } eOemstransceiver_cfg_t;
 
 
+typedef struct
+{
+    uint32_t    rxinvalidropframes;             /**< received invalid ropframe */
+    uint32_t    rxseqnumwrong;                  /**< received ropframe with wrong sequence num*/  //errorsinsequencenumber;
+    uint32_t    lostreplies;                    /**< error in appending a reply in reply-ropframe */
+    uint32_t    failuresinloadofreplyropframe;  /**< error oin append reply-ropframe in the ropframe to tx*/
+    uint32_t    txropframeistoobigforthepacket; /*the tx ropframe's size is bigger than pky payload's size*/
+    uint32_t    cannotloadropinregulars;
+    uint32_t    cannotloadropinoccasionals;
+} eOemstransceiver_diagnosticsinfo_t;  
+
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
@@ -116,6 +127,10 @@ extern eOresult_t eom_emstransceiver_Parse(EOMtheEMStransceiver* p, EOpacket* rx
 
 extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** txpkt, uint16_t *numberofrops);
 
+//this function copy internal data to dgn_ptr
+extern eOresult_t eom_emstransceiver_GetDiagnosticsInfo(EOMtheEMStransceiver* p, eOemstransceiver_diagnosticsinfo_t *dgn_ptr);
+
+extern eOemstransceiver_diagnosticsinfo_t* eom_emstransceiver_GetDiagnosticsInfoHandle(EOMtheEMStransceiver* p);
 
 /** @}            
     end of group eom_theemstransceiver  

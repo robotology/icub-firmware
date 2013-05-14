@@ -40,51 +40,33 @@ extern "C" {
 
 // - external dependencies --------------------------------------------------------------------------------------------
 #include "EoCommon.h"
-#include "EoMeasures.h"
 #include "OPCprotocolManager.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
-#define 	eom_ipnet_hid_DEBUG_id 				1
-#define 	eom_emsrunner_hid_DEBUG_id  		2
-#define		eom_emstransceiver_hid_DEBUG_id 	3
+#define eodgn_nvidbdoor_cmds            1
+#define eodgn_nvidbdoor_emsperiph       2
+#define eodgn_nvidbdoor_emsapplcommon   3
+#define eodgn_nvidbdoor_emsapplmc       4
 
-#define 	opcProt_numofvar_max				3
-  
+#define eodgn_nvidbdoor_max              5
+
+
+
+//use nv id of backdoor from 11 because values from 1 to 10 are used for diagnostics porpouse.
+#define opcCfg_nvid_bdoor_dgn_offset                       10
+
+//pay attention: update nvid_bdoor_user_num value. it is the numeber of nvid you use.
+#define  opcCfg_nvid_bdoor_user_num                         0
+
+
+/*example: 
+#define 	eom_ipnet_hid_DEBUG_id 		nvid_bdoor_offset +	1
+#define  nvid_bdoor_user_num            1
+*/
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
-typedef struct
-{
-    uint32_t    datagrams_failed_to_go_in_rxfifo;
-    uint32_t    datagrams_failed_to_go_in_txosalqueue;
-    uint32_t    datagrams_failed_to_be_retrieved_from_txfifo;
-    uint32_t    datagrams_failed_to_be_sent_by_ipal;    
-} EOMtheIPnetDEBUG_t;
 
-
-typedef struct
-{
-    uint64_t    numberofperiods;
-    uint64_t    cumulativeabsoluteerrorinperiod;  
-    uint32_t    meanofabsoluteerrorinperiod;
-    uint32_t    movingmeanofabsoluteerrorinperiod;
-    uint32_t    maxabsoluteerrorinperiod;
-    uint32_t    minabsoluteerrorinperiod;  
-    uint32_t    executionoverflows[3]; //enum { eo_emsrunner_task_numberof   = 3 };
-    uint32_t    datagrams_failed_to_go_in_txsocket;    
-} EOMtheEMSrunnerDEBUG_t;
-
-
-typedef struct
-{
-    uint32_t    rxinvalidropframes;
-    uint32_t    errorsinsequencenumber;
-    uint32_t    lostreplies;
-    uint32_t    failuresinloadofreplyropframe;
-    uint32_t    txropframeistoobigforthepacket;
-    uint32_t    cannotloadropinregulars;
-    uint32_t    cannotloadropinoccasionals;
-} EOMtheEMStransceiverDEBUG_t;  
 
 
 

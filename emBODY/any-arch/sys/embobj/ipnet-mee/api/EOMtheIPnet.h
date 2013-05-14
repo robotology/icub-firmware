@@ -114,6 +114,15 @@ typedef struct
     eOmipnet_cfg_addr_t*    addrcfg;
     eOmipnet_cfg_dtgskt_t   dtgskcfg;
 } eOmipnet_whole_cfg_t;
+
+
+typedef struct
+{
+    uint32_t    datagrams_failed_to_go_in_rxfifo;
+    uint32_t    datagrams_failed_to_go_in_txosalqueue;
+    uint32_t    datagrams_failed_to_be_retrieved_from_txfifo;
+    uint32_t    datagrams_failed_to_be_sent_by_ipal;    
+} eOmipnet_diagnosticsinfo_t;
    
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
@@ -215,6 +224,11 @@ extern eOresult_t eom_ipnet_IGMPgroupLeave(EOMtheIPnet *ip, eOipv4addr_t igmp);
 
 extern EOMtask* eom_ipnet_GetTask(EOMtheIPnet *ip, eOmipnet_taskid_t tskid);
 
+//this funcion copi internal data to memory pointed by dgn_ptr
+extern eOresult_t eom_ipnet_GetDiagnosticsInfo(EOMtheIPnet *ip, eOmipnet_diagnosticsinfo_t *dgn_ptr);
+
+//return pointer to diagnostics internal data
+extern  eOmipnet_diagnosticsinfo_t * eom_ipnet_GetDiagnosticsInfoHandle(EOMtheIPnet *ip);
 
 /** @}            
     end of group eom_theipnet  

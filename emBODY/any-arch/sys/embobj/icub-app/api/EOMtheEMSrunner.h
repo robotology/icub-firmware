@@ -105,7 +105,17 @@ typedef struct
     eOemsrunner_mode_t  modeatstartup;
 } eOemsrunner_cfg_t;
 
-
+typedef struct
+{
+    uint64_t    numberofperiods;
+    uint64_t    cumulativeabsoluteerrorinperiod;  
+    uint32_t    meanofabsoluteerrorinperiod;
+    uint32_t    movingmeanofabsoluteerrorinperiod;
+    uint32_t    maxabsoluteerrorinperiod;
+    uint32_t    minabsoluteerrorinperiod;  
+    uint32_t    executionoverflows[eo_emsrunner_task_numberof];
+    uint32_t    datagrams_failed_to_go_in_txsocket;    
+} eOemsrunner_diagnosticsinfo_t;
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
@@ -147,7 +157,11 @@ extern eOresult_t eom_emsrunner_SetMode(EOMtheEMSrunner *p, eOemsrunner_mode_t m
 
 extern void eom_emsrunner_OnUDPpacketTransmitted(EOMtheEMSrunner *p);
 
+//this func copies internal diagnostic values in memory pointed by dgn_ptr
+extern eOresult_t eom_emsrunner_GetDiagnosticsInfo(EOMtheEMSrunner *p, eOemsrunner_diagnosticsinfo_t *dgn_ptr);
 
+//this function returns pointer to internal memory containing diagnostics info
+extern eOemsrunner_diagnosticsinfo_t* eom_emsrunner_GetDiagnosticsInfoHandle(EOMtheEMSrunner *p);
 /** @}            
     end of group eom_EOMtheEMSrunner  
  **/
