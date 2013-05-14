@@ -38,10 +38,10 @@
 #endif
 
 
-//   <o> Memory model         <0=>   static allocation
+//   <o> Memory model         <0=>   static allocation      <1=>   dynamic allocation    
 //   <i> Only static allocation is now supported.
 #ifndef OSAL_MEMMODEL
- #define OSAL_MEMMODEL      0
+ #define OSAL_MEMMODEL      1
 #endif
 
 

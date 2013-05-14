@@ -193,8 +193,8 @@ static uint8_t s_osal_arch_arm_armc99_sysmutex_number = 0;
 
 extern uint32_t osal_base_memory_getsize(const osal_cfg_t *cfg, uint32_t *size08aligned)
 {
-    uint16_t size08;
-    uint16_t size04;
+    uint16_t size08 = 0;
+    uint16_t size04 = 0;
     uint32_t retval = 0;
 
     if(NULL == cfg)
@@ -206,23 +206,28 @@ extern uint32_t osal_base_memory_getsize(const osal_cfg_t *cfg, uint32_t *size08
         return(0);
     }
 
-    if(osal_memmode_static != cfg->memorymodel)
-    {
-        if(NULL != size08aligned)
-        {
-            *size08aligned = 0;
-        }
-        return(0);
+//     if(osal_memmode_static != cfg->memorymodel)
+//     {
+//         if(NULL != size08aligned)
+//         {
+//             *size08aligned = 0;
+//         }
+//         return(0);
+//     }
+
+    s_osal_fill_cfg(&s_osal_oosiit_cfg, cfg);   
+    oosiit_memory_getsize(&s_osal_oosiit_cfg, &size04, &size08);
+    
+    retval = (size04+7)/8 + (size08+7)/8;
+    
+    // if memory mode is dynamic ... oossit will return 0 memory
+    
+    if(osal_memmode_static == cfg->memorymodel)
+    {   // add the memory required for the osal
+        retval += (cfg->launcherstacksize+7)/8 + (cfg->idlestacksize+7)/8 + ((cfg->tasknum+2)*sizeof(osal_task_t)+7)/8;
+        retval *= 8;                
     }
 
-    s_osal_fill_cfg(&s_osal_oosiit_cfg, cfg);
-    
-    
-    oosiit_memory_getsize(&s_osal_oosiit_cfg, &size04, &size08);
-
-
-    retval = (size04+7)/8 + (size08+7)/8 + (cfg->launcherstacksize+7)/8 + (cfg->idlestacksize+7)/8 + ((cfg->tasknum+2)*sizeof(osal_task_t)+7)/8;
-    retval *= 8;
 
     if(NULL != size08aligned)
     {
@@ -246,8 +251,8 @@ extern osal_result_t osal_base_memory_del(void* mem)
 
 extern osal_result_t osal_base_initialise(const osal_cfg_t *cfg, uint64_t *data08aligned)
 {
-    uint16_t size08;
-    uint16_t size04;
+    uint16_t size08 = 0;
+    uint16_t size04 = 0;
     uint32_t *oosiitdata04al;
     uint64_t *oosiitdata08al;
 
@@ -257,15 +262,15 @@ extern osal_result_t osal_base_initialise(const osal_cfg_t *cfg, uint64_t *data0
         //return(osal_res_NOK_nullpointer);    
     }    
     
-    if(osal_memmode_static != cfg->memorymodel)
-    {
-        s_osal_error(osal_error_unsupportedbehaviour, "osal: unsupported memory model");
-        //return(osal_res_NOK_nullpointer);
-    }
+//    if(osal_memmode_static != cfg->memorymodel)
+//    {
+//        s_osal_error(osal_error_unsupportedbehaviour, "osal: unsupported memory model");
+//        //return(osal_res_NOK_nullpointer);
+//    }
 
-    if(NULL == data08aligned)
+    if((osal_memmode_static == cfg->memorymodel) && (NULL == data08aligned))
     {
-        s_osal_error(osal_error_incorrectparameter, "osal: NULL memory in osal_initialise()");
+        s_osal_error(osal_error_incorrectparameter, "osal: NULL memory in osal_initialise() for static memory model");
         //return(osal_res_NOK_nullpointer);
     }
 
@@ -306,18 +311,39 @@ extern osal_result_t osal_base_initialise(const osal_cfg_t *cfg, uint64_t *data0
     oosiit_memory_load(&s_osal_oosiit_cfg, oosiitdata04al, oosiitdata08al);
     
     // memory for launcher stack.
-    s_osal_stacklauncher_data = (uint64_t*)(data08aligned + (size04+7)/8 + (size08+7)/8);
+    if(osal_memmode_static == cfg->memorymodel)
+    {
+        s_osal_stacklauncher_data = (uint64_t*)(data08aligned + (size04+7)/8 + (size08+7)/8);
+    }
+    else
+    {
+        s_osal_stacklauncher_data = osal_base_memory_new(cfg->launcherstacksize);
+    }
     s_osal_stacklauncher_size = cfg->launcherstacksize;
     memset(s_osal_stacklauncher_data, 0xEE, s_osal_stacklauncher_size); 
    
     // memory for idle stack.
-    s_osal_stackidle_data = (uint64_t*)(data08aligned + (size04+7)/8 + (size08+7)/8 + (cfg->launcherstacksize+7)/8);
+    if(osal_memmode_static == cfg->memorymodel)
+    {
+        s_osal_stackidle_data = (uint64_t*)(data08aligned + (size04+7)/8 + (size08+7)/8 + (cfg->launcherstacksize+7)/8);
+    }
+    else
+    {
+        s_osal_stackidle_data = osal_base_memory_new(cfg->idlestacksize);
+    }
     s_osal_stackidle_size = cfg->idlestacksize;
     memset(s_osal_stackidle_data, 0xEE, s_osal_stackidle_size);    
     
     // memory for task ids
-    s_osal_task_data = (osal_task_t*)(data08aligned + (size04+7)/8 + (size08+7)/8 + (cfg->launcherstacksize+7)/8 + (cfg->idlestacksize+7)/8);
-    //s_osal_task_num = cfg->tasknum + 2;
+    if(osal_memmode_static == cfg->memorymodel)
+    {
+        s_osal_task_data = (osal_task_t*)(data08aligned + (size04+7)/8 + (size08+7)/8 + (cfg->launcherstacksize+7)/8 + (cfg->idlestacksize+7)/8);
+    } 
+    else
+    {
+        s_osal_task_data = osal_base_memory_new(sizeof(osal_task_t)*(cfg->tasknum + 2));
+    }
+        //s_osal_task_num = cfg->tasknum + 2;
 
     // config entry for idle task (pos 0) and launcher task (pos 1)
 
@@ -551,7 +577,7 @@ extern osal_task_t * osal_task_new(void (*run_fn)(void*), void *run_arg, uint8_t
         //return(NULL);
     }
 
-    // decrement stacksize
+    // increment used stacksize
     s_resources_used[osal_info_entity_globalstack] += stksize;
 
     // use priority osal_prio_systsk_usrwhencreated = 1 to avoid that the run_fn starts straigth away 
@@ -628,7 +654,35 @@ extern osal_result_t osal_task_period_wait(void)
 
 extern osal_result_t osal_task_delete(osal_task_t *tsk)
 {
-    return(osal_res_NOK_generic);
+    osal_task_id_t taskid;
+    //oosiit_result_t res;
+    
+    if(NULL == tsk)
+    {
+        return(osal_res_NOK_nullpointer);
+    }
+    
+    // some tasks could call it at the same time ... better to protect
+    osal_mutex_take(s_osal_mutex_api_protection, OSAL_reltimeINFINITE);   
+    
+    taskid = tsk->rtosid;   
+    oosiit_tsk_delete(taskid);
+    
+    s_resources_used[osal_info_entity_task] --;
+    if(osal_memmode_dynamic == s_osal_osal_cfg.memorymodel)
+    {
+        s_resources_used[osal_info_entity_globalstack] -= s_osal_task_data[taskid].stksize;
+    }
+
+    s_osal_task_data[taskid].rtosid     = 0;
+    s_osal_task_data[taskid].prio       = 0;
+    s_osal_task_data[taskid].stksize    = 0;
+    s_osal_task_data[taskid].stkdata    = NULL;
+    s_osal_task_data[taskid].ext        = NULL;        
+ 
+    osal_mutex_release(s_osal_mutex_api_protection);
+
+    return(osal_res_OK);    
 }
 
 extern osal_result_t osal_task_priority_get(osal_task_t *tsk, uint8_t *prio)
@@ -877,6 +931,7 @@ extern osal_result_t osal_messagequeue_put(osal_messagequeue_t *mq, osal_message
 
 extern osal_result_t osal_messagequeue_delete(osal_messagequeue_t *mq)
 {
+    s_osal_error(osal_error_unsupportedbehaviour, "osal_messagequeue_delete():");
     return(osal_res_NOK_generic);
 }
 
@@ -987,6 +1042,7 @@ extern osal_result_t osal_mutex_release(osal_mutex_t *mutex)
 
 extern osal_result_t osal_mutex_delete(osal_mutex_t *mutex)
 {
+    s_osal_error(osal_error_unsupportedbehaviour, "osal_mutex_delete():");
     return(osal_res_NOK_generic);
 }
 
@@ -1069,6 +1125,7 @@ extern osal_result_t osal_semaphore_increment(osal_semaphore_t *sem, osal_caller
 
 extern osal_result_t osal_semaphore_delete(osal_semaphore_t *sem)
 {
+    s_osal_error(osal_error_unsupportedbehaviour, "osal_semaphore_delete():");
     return(osal_res_NOK_generic); 
 }
 
@@ -1191,12 +1248,16 @@ extern void * osal_arch_arm_armc99stdlib_getlibspace(uint8_t firstcall)
     // we have osal running, thus also oosiit. we get the osiit task id and we give it its memory
     idx = oosiit_tsk_self();
 
+#if 0  
     if(NULL == std_libspace)
     {
         s_osal_error(osal_error_internal2, "armc99stdlib: not enough libspace");
     }
 
     return ((void *)&std_libspace[idx-1]);
+#else
+    return(oosiit_tsk_get_perthread_libspace(idx));
+#endif      
 }
 
 extern void rt_mut_init(void* mutex);
@@ -1412,6 +1473,7 @@ static void s_osal_error(osal_fatalerror_t err_code, const char *err_msg)
 
 static void s_osal_fill_cfg(oosiit_cfg_t *oosiit_c, const osal_cfg_t *osal_c)
 {
+#if 0    
     oosiit_c->maxnumofusertasks                 = osal_c->tasknum;
     oosiit_c->checkStack                        = 1;   // always check stack overflow w/ osiit
     oosiit_c->sizeISRFIFO                       = 16; // ???? the enqueable requests done to rtos within an ISR
@@ -1426,7 +1488,41 @@ static void s_osal_fill_cfg(oosiit_cfg_t *oosiit_c, const osal_cfg_t *osal_c)
     oosiit_c->numMessageBox                     = osal_c->mqueuenum;
     oosiit_c->numMessageBoxElements             = osal_c->mqueueelemnum;
     oosiit_c->sizeof64alignedStack              = osal_c->globalstacksize; 
+#else
+    oosiit_c->cpufreq                           = osal_c->cpufreq;
+    oosiit_c->ticktime                          = osal_c->tick;
+    oosiit_c->capacityofpostpendcommandfifo     = 16; // ???? the enqueable requests done to rtos within an ISR
+    oosiit_c->checkstackoverflow                = 1;   // always check stack overflow w/ osiit
+    oosiit_c->memorymode                        = (osal_memmode_static == osal_c->memorymodel) ? oosiit_memmode_static : oosiit_memmode_dynamic; //oosiit_memmode_dynamic;
+    oosiit_c->roundrobinenabled                 = osal_c->roundrobin;    
+    oosiit_c->roundrobinnumberofticks           = osal_c->roundrobintick;    
+    oosiit_c->maxnumofusertasks                 = osal_c->tasknum;
+       
+    oosiit_c->numAdvTimer                       = osal_c->timernum;
+    oosiit_c->numMutex                          = osal_c->mutexnum + 1;  // +1 for internal sys mutex s_osal_mutex_api_protection
+    oosiit_c->numSemaphore                      = osal_c->semaphorenum;
+    oosiit_c->numMessageBox                     = osal_c->mqueuenum;
+    oosiit_c->numMessageBoxElements             = osal_c->mqueueelemnum;
+    oosiit_c->sizeof64alignedStack              = osal_c->globalstacksize; 
+#endif    
 }
+
+//     oosiit_c->cpufreq                           = osal_c->cpufreq;
+//     oosiit_c->ticktime                          = osal_c->tick;
+//     oosiit_c->capacityofpostpendcommandfifo     = 16; // ???? the enqueable requests done to rtos within an ISR
+//     oosiit_c->checkstackoverflow                = 1;   // always check stack overflow w/ osiit
+//     oosiit_c->memoryallocation                  = oosiit_memalloc_atstartup;
+//     oosiit_c->roundrobinenabled                 = osal_c->roundrobin;    
+//     oosiit_c->roundrobinticktime                = osal_c->roundrobintick;
+//     
+//     oosiit_c->maxnumofusertasks                 = osal_c->tasknum;
+//        
+//     oosiit_c->numAdvTimer                       = osal_c->timernum;
+//     oosiit_c->numMutex                          = osal_c->mutexnum + 1;  // +1 for internal sys mutex s_osal_mutex_api_protection
+//     oosiit_c->numSemaphore                      = osal_c->semaphorenum;
+//     oosiit_c->numMessageBox                     = osal_c->mqueuenum;
+//     oosiit_c->numMessageBoxElements             = osal_c->mqueueelemnum;
+//     oosiit_c->sizeof64alignedStack              = osal_c->globalstacksize; 
 
 void osal_launcher(void* p)
 {

@@ -129,15 +129,12 @@ int main(void)
     
     osal_base_memory_getsize(osal_cfg_USERptr, &ram64size);
 
-
-    ram64data = (uint64_t*)osal_base_memory_new(ram64size);
-    
-    if(NULL == ram64data)
+    if(NULL != ram64data)
     {
-        // enter in error mode
-        for(;;);
+        ram64data = (uint64_t*)osal_base_memory_new(ram64size);
     }
-
+    
+ 
     osal_base_initialise(osal_cfg_USERptr, ram64data);
 
  
