@@ -42,16 +42,15 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-// #include "EOMtheIPnet.h"
-// #include "EOMtheEMSrunner.h"
-
+#include "EoMotionControl.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
-
-
-
-
+#define DGN_MOTOR_FAULT_UNDERVOLTAGE    0x00000001
+#define DGN_MOTOR_FAULT_OVERVOLTAGE     0x00000002
+#define DGN_MOTOR_FAULT_EXTERNAL        0x00000004
+#define DGN_MOTOR_FAULT_OVERCURRENT     0x00000008
+#define DGN_MOTOR_FAULT_I2TFAILURE      0x00000010
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
@@ -235,6 +234,11 @@ typedef struct
 {
     uint8_t enable; //if true than all errrors are signaled else none!
 }eOdgn_commands_t;
+
+typedef struct
+{
+    uint8_t motorlist[12]; //on ems there are 12 motor max.Each element of array contains falg about the motor with id = index of array
+} eOdgn_motorstatusflag_t;
 
 /** @}            
     end of group eo_cevcwervcrev5555  
