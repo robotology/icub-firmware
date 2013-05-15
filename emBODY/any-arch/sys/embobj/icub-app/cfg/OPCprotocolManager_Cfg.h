@@ -48,8 +48,9 @@ extern "C" {
 #define eodgn_nvidbdoor_emsperiph       2
 #define eodgn_nvidbdoor_emsapplcommon   3
 #define eodgn_nvidbdoor_emsapplmc       4
+#define eodgn_nvidbdoor_motorstatus     5
 
-#define eodgn_nvidbdoor_max              5
+#define eodgn_nvidbdoor_max             6
 
 
 
