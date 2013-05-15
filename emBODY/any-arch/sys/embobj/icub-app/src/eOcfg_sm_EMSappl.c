@@ -436,7 +436,10 @@ __weak extern void eo_cfg_sm_EMSappl_hid_on_exit_CFG(EOsm *s)
 {
     //eOsmDynamicDataEMSappl_t *ram = eo_sm_GetDynamicData(s);
 }  
-__weak extern void eo_cfg_sm_EMSappl_hid_on_exit_RUN(EOsm *s);
+__weak extern void eo_cfg_sm_EMSappl_hid_on_exit_RUN(EOsm *s)
+{
+;
+}
 __weak extern void eo_cfg_sm_EMSappl_hid_on_exit_ERR(EOsm *s)
 {
     //eOsmDynamicDataEMSappl_t *ram = eo_sm_GetDynamicData(s);
