@@ -71,16 +71,17 @@ extern void oosiit_sys_error(oosiit_error_code_t errorcode)
 
 extern const oosiit_cfg_t oosiit_cfg_USER =
 {
-    // from cmsis-rtx
+    .cpufreq                        = OOSIIT_CLOCK,               
+    .ticktime                       = OOSIIT_TICK,     
+    .capacityofpostpendcommandfifo  = OOSIIT_FIFOSZ,  
+    .checkstackoverflow             = OOSIIT_STKCHECK,  
+    .memorymode                     = OOSIIT_MEMMODE, //oosiit_memmode_static, //oosiit_memmode_dynamic,  
+    .roundrobinenabled              = OOSIIT_ROBIN,         
+    .roundrobinnumberofticks        = OOSIIT_ROBINTOUT,         
+
+
     .maxnumofusertasks              = OOSIIT_TASKCNT,             
-    .checkStack                     = OOSIIT_STKCHECK,       
-    .sizeISRFIFO                    = OOSIIT_FIFOSZ,       
-    .roundRobin                     = OOSIIT_ROBIN,         
-    .osClock                        = OOSIIT_CLOCK,               
-    .osTick                         = OOSIIT_TICK,      
-    .roundRobinTimeout              = OOSIIT_ROBINTOUT,           
-           
-    // iit extension
+        
     .numAdvTimer                    = OOSIIT_ADVTIMERCNT,      
     .numMutex                       = OOSIIT_MUTEXCNT,         
     .numSemaphore                   = OOSIIT_SEMAPHORECNT,     
