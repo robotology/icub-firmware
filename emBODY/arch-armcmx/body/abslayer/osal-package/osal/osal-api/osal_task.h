@@ -120,6 +120,14 @@ extern osal_task_t * osal_task_get(osal_caller_t caller);
 extern void * osal_task_stack_get(uint16_t *size);
 
 
+/** @fn         extern void * osal_task_stack_get1(osal_task_t *tsk, uint16_t *size)
+    @brief      Gets the stack of the task
+    @param      tsk             The handle to the task.
+    @param      size        pointer to stack size
+    @return     pointer to the stack.
+**/
+extern void * osal_task_stack_get1(osal_task_t *tsk, uint16_t *size);
+
 /** @fn         extern osal_result_t osal_task_priority_get(osal_task_t *tsk, uint8_t *prio)
     @brief      Retrieves the priority of a task.
     @param      tsk             The handle to the task.
@@ -203,10 +211,13 @@ extern osal_result_t osal_task_period_wait(void);
 
 
 /** @fn         extern osal_result_t osal_task_delete(osal_task_t *tsk)
-    @brief      Deletes a task and free some resources. If memory model is static, it does not free the stack of the
-                function.
+    @brief      Deletes a task and free its resources. If tsk is taken with osal_task_get(), then the task can
+                delete itself. In such a case the function does not return and the scheduler internally executes 
+                next task.  
     @param      tsk             The handle to the task.
-    @return     On success: osal_res_OK, otherwise: osal_res_NOK_nullpointer.
+    @return     On success osal_res_OK, osal_res_NOK_nullpointer if tsk is NULL, osal_res_NOK_generic if
+                tsk is related to a task already deleted. It does not return if the task calling the function
+                wants to delete itself.
  **/
 extern osal_result_t osal_task_delete(osal_task_t *tsk);
 

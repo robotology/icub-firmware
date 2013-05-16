@@ -83,9 +83,13 @@ extern const osal_abstime_t osal_abstimeNONE        = OSAL_abstimeNONE;
 // we keep 12 bytes for a mutex
 typedef uint32_t OOSIIT_MUT[3];
 
+
+enum {osal_task_signature = 0x66};
+
 struct osal_task_opaque_t 
-{   // 1+1+2+4+4 = 12 bytes
-    osal_task_id_t  rtosid;
+{   // 4+1+1+2+4+4 = 16 bytes
+    void*           rtostsk;
+    uint8_t         signature;
     uint8_t         prio;
     uint16_t        stksize;
     uint64_t        *stkdata;
@@ -94,7 +98,8 @@ struct osal_task_opaque_t
 
 struct osal_timer_opaque_t 
 {
-    uint32_t rtosdata;
+    void*           rtostmr;
+    uint32_t        signature;
 };
 
 struct osal_messagequeue_opaque_t
@@ -164,9 +169,20 @@ static uint64_t *s_osal_stackidle_data = NULL;
 static uint16_t  s_osal_stackidle_size = 0;
 
 
-// memory use to store osal_task data.
+// memory used to store osal_task data.
 static osal_task_t *s_osal_task_data = NULL; // its size is number of tasks+2 (idle, launcher, tasks)
-//static uint8_t s_osal_task_num = 0;
+static uint8_t s_osal_task_maxnum = 0;
+static uint8_t s_osal_task_next = 0;
+
+// special system tasks ...
+static osal_task_t* s_osal_task_launcher;
+static osal_task_t* s_osal_task_idle;
+
+
+// memory used to store osal_timer data.
+static osal_timer_t *s_osal_timer_data = NULL;
+static uint8_t s_osal_timer_maxnum = 0;
+static uint8_t s_osal_timer_next = 0;
 
 // indicates how many usec in a tick. used for time conversion
 static uint32_t s_osal_usec_in_tick = 0;
@@ -206,21 +222,12 @@ extern uint32_t osal_base_memory_getsize(const osal_cfg_t *cfg, uint32_t *size08
         return(0);
     }
 
-//     if(osal_memmode_static != cfg->memorymodel)
-//     {
-//         if(NULL != size08aligned)
-//         {
-//             *size08aligned = 0;
-//         }
-//         return(0);
-//     }
-
     s_osal_fill_cfg(&s_osal_oosiit_cfg, cfg);   
     oosiit_memory_getsize(&s_osal_oosiit_cfg, &size04, &size08);
     
     retval = (size04+7)/8 + (size08+7)/8;
     
-    // if memory mode is dynamic ... oossit will return 0 memory
+    // if memory mode is dynamic ... oosiit_memory_getsize will require 0 memory
     
     if(osal_memmode_static == cfg->memorymodel)
     {   // add the memory required for the osal
@@ -262,11 +269,6 @@ extern osal_result_t osal_base_initialise(const osal_cfg_t *cfg, uint64_t *data0
         //return(osal_res_NOK_nullpointer);    
     }    
     
-//    if(osal_memmode_static != cfg->memorymodel)
-//    {
-//        s_osal_error(osal_error_unsupportedbehaviour, "osal: unsupported memory model");
-//        //return(osal_res_NOK_nullpointer);
-//    }
 
     if((osal_memmode_static == cfg->memorymodel) && (NULL == data08aligned))
     {
@@ -305,9 +307,17 @@ extern osal_result_t osal_base_initialise(const osal_cfg_t *cfg, uint64_t *data0
     
     oosiit_memory_getsize(&s_osal_oosiit_cfg, &size04, &size08);
 
-    // memory for oosiit
-    oosiitdata04al = (uint32_t*)(data08aligned);
-    oosiitdata08al = (uint64_t*)(data08aligned + (size04+7)/8);
+    // memory for oosiit. 
+    if((0 != size04) || (0 != size08))
+    {
+        oosiitdata04al = (uint32_t*)(data08aligned);
+        oosiitdata08al = (uint64_t*)(data08aligned + (size04+7)/8);
+    }
+    else
+    {
+        oosiitdata04al = NULL;
+        oosiitdata08al = NULL;
+    }
     oosiit_memory_load(&s_osal_oosiit_cfg, oosiitdata04al, oosiitdata08al);
     
     // memory for launcher stack.
@@ -334,31 +344,23 @@ extern osal_result_t osal_base_initialise(const osal_cfg_t *cfg, uint64_t *data0
     s_osal_stackidle_size = cfg->idlestacksize;
     memset(s_osal_stackidle_data, 0xEE, s_osal_stackidle_size);    
     
-    // memory for task ids
+    // memory for task pointers
     if(osal_memmode_static == cfg->memorymodel)
     {
         s_osal_task_data = (osal_task_t*)(data08aligned + (size04+7)/8 + (size08+7)/8 + (cfg->launcherstacksize+7)/8 + (cfg->idlestacksize+7)/8);
+        s_osal_task_idle = &s_osal_task_data[0];
+        s_osal_task_launcher = &s_osal_task_data[1];
+        s_osal_task_maxnum = cfg->tasknum + 2;
+        s_osal_task_next = 2;
     } 
     else
-    {
-        s_osal_task_data = osal_base_memory_new(sizeof(osal_task_t)*(cfg->tasknum + 2));
+    {   // only the launcher and the init
+        s_osal_task_data = NULL;
+        s_osal_task_idle = osal_base_memory_new(sizeof(osal_task_t));
+        s_osal_task_launcher = osal_base_memory_new(sizeof(osal_task_t));
+        //osal_base_memory_new(sizeof(osal_task_t)*(0 + 2)); // NULL; //osal_base_memory_new(sizeof(osal_task_t)*(cfg->tasknum + 2));
     }
-        //s_osal_task_num = cfg->tasknum + 2;
-
-    // config entry for idle task (pos 0) and launcher task (pos 1)
-
-    s_osal_task_data[0].rtosid     = 0;
-    s_osal_task_data[0].prio       = osal_prio_systsk_idle;
-    s_osal_task_data[0].stksize    = s_osal_stackidle_size;
-    s_osal_task_data[0].stkdata    = s_osal_stackidle_data;
-    s_osal_task_data[0].ext        = NULL;
-
-    s_osal_task_data[1].rtosid     = 1;
-    s_osal_task_data[1].prio       = osal_prio_systsk_launcher;
-    s_osal_task_data[1].stksize    = s_osal_stacklauncher_size-8;
-    s_osal_task_data[1].stkdata    = &s_osal_stacklauncher_data[1];
-    s_osal_task_data[1].ext        = NULL;
-
+    
 
     s_osal_usec_in_tick = cfg->tick;
 
@@ -389,8 +391,7 @@ extern const osal_cfg_t* osal_info_get_config(void)
     else
     {
         return(&s_osal_osal_cfg);
-    }
-    
+    }    
 }
 
 
@@ -421,19 +422,41 @@ extern void osal_system_start(void (*launcher_fn)(void))
         s_osal_error(osal_error_incorrectparameter, "osal: incorrect param in osal_start()");
     }
     
-    tskpinit.function   = osal_launcher;
-    tskpinit.param      = NULL;
-    tskpinit.priority   = osal_prio_systsk_launcher;
-    tskpinit.stacksize  = s_osal_stacklauncher_size-8;
-    tskpinit.stackdata  = &s_osal_stacklauncher_data[1];
+    // as we dont call an explicit oosiit_tsk_create() which gives a oosiit_tskptr_t, 
+    // the task idle itself inside s_osal_on_idle() must call: s_osal_task_idle->rtostsk = oosiit_tsk_self()  
+    s_osal_task_idle->rtostsk       = NULL;
+    s_osal_task_idle->signature     = osal_task_signature;
+    s_osal_task_idle->prio          = osal_prio_systsk_idle;
+    s_osal_task_idle->stksize       = s_osal_stackidle_size;
+    s_osal_task_idle->stkdata       = s_osal_stackidle_data;
+    s_osal_task_idle->ext           = NULL;
     
     tskpidle.function   = s_osal_on_idle;
     tskpidle.param      = NULL;
     tskpidle.priority   = osal_prio_systsk_idle;
     tskpidle.stacksize  = s_osal_stackidle_size;
-    tskpidle.stackdata  = s_osal_stackidle_data;    
-       
+    tskpidle.stackdata  = s_osal_stackidle_data; 
+    tskpidle.extdata    = s_osal_task_idle;    
     
+
+    // as we dont call an explicit oosiit_tsk_create() which gives a oosiit_tskptr_t, 
+    // the task launcher itself inside osal_launcher() must call: s_osal_task_launcher->rtostsk = oosiit_tsk_self()
+    s_osal_task_launcher->rtostsk   = NULL;
+    s_osal_task_launcher->signature = osal_task_signature;
+    s_osal_task_launcher->prio      = osal_prio_systsk_launcher;
+    s_osal_task_launcher->stksize   = s_osal_stacklauncher_size; 
+    s_osal_task_launcher->stkdata   = &s_osal_stacklauncher_data[0]; 
+    s_osal_task_launcher->ext       = NULL;    
+    
+    tskpinit.function   = osal_launcher;
+    tskpinit.param      = NULL;
+    tskpinit.priority   = osal_prio_systsk_launcher;
+    tskpinit.stacksize  = s_osal_stacklauncher_size-8;
+    tskpinit.stackdata  = &s_osal_stacklauncher_data[1];
+    tskpinit.extdata    = s_osal_task_launcher;
+    
+
+           
     // start the system
     oosiit_sys_start(&tskpinit, &tskpidle);
 }
@@ -553,8 +576,8 @@ extern osal_task_t * osal_task_new1(osal_task_properties_t *tskprop)
 extern osal_task_t * osal_task_new(void (*run_fn)(void*), void *run_arg, uint8_t prio, uint16_t stksize)
 {
     uint64_t *stack = NULL;
-    
-    uint8_t taskid = 0;
+    osal_task_t* retval = NULL;    
+    void *rtostsk = NULL;
     oosiit_task_properties_t tskprop;
 
 
@@ -567,8 +590,26 @@ extern osal_task_t * osal_task_new(void (*run_fn)(void*), void *run_arg, uint8_t
     // protect vs concurrent call
     osal_mutex_take(s_osal_mutex_api_protection, OSAL_reltimeINFINITE);
     
+    // can we proceed in getting the task? if dynamic mode yes. if static mode ... lets see
+    if(NULL != s_osal_task_data)
+    {
+        if(s_osal_task_next >= s_osal_task_maxnum)
+        {
+            // cannot get a task
+            s_osal_error(osal_error_missingmemory, "osal: missing mem for osal_task_t (static mode) in osal_task_new()");
+            osal_mutex_release(s_osal_mutex_api_protection);
+            return(NULL);        
+        }
+        retval = &s_osal_task_data[s_osal_task_next++];
+    }
+    else
+    {
+        retval = osal_base_memory_new(sizeof(osal_task_t)); 
+    }
+       
+    
+    // get the stack    
     stack = oosiit_memory_getstack(stksize);
-
     if(NULL == stack)
     {
         // cannot get a stack
@@ -576,45 +617,51 @@ extern osal_task_t * osal_task_new(void (*run_fn)(void*), void *run_arg, uint8_t
         osal_mutex_release(s_osal_mutex_api_protection);
         //return(NULL);
     }
-
     // increment used stacksize
     s_resources_used[osal_info_entity_globalstack] += stksize;
+        
 
-    // use priority osal_prio_systsk_usrwhencreated = 1 to avoid that the run_fn starts straigth away 
-
+     
+    // get a oosiit task
     tskprop.function        = run_fn;
     tskprop.param           = run_arg;
-    tskprop.priority        = osal_prio_systsk_usrwhencreated;
+    tskprop.priority        = osal_prio_systsk_usrwhencreated; // use priority osal_prio_systsk_usrwhencreated = 1 to avoid that the run_fn starts straigth away
     tskprop.stacksize       = stksize;
     tskprop.stackdata       = stack;
+    tskprop.extdata         = retval; // by crating teh task w/ this argument i avoid calling oosiit_tsk_set_extdata(rtostsk, retval) after
     
-    //taskid = oosiit_tsk_create_oldversion(run_fn, run_arg, osal_prio_systsk_usrwhencreated, stack, stksize);
-    taskid = oosiit_tsk_create(&tskprop);
+    rtostsk = oosiit_tsk_create(&tskprop);
 
-    if(0 == taskid)
+    if(NULL == rtostsk)
     {
         // cannot get a task
         s_osal_error(osal_error_missingmemory, "osal: missing mem for rtos task in osal_task_new()");
         osal_mutex_release(s_osal_mutex_api_protection);
         //return(NULL);
     }
-
+    
+    // ok. i can increment the tasks.
     s_resources_used[osal_info_entity_task] ++;
-
-
-    s_osal_task_data[taskid].rtosid     = taskid;
-    s_osal_task_data[taskid].prio       = prio;
-    s_osal_task_data[taskid].stksize    = stksize;
-    s_osal_task_data[taskid].stkdata    = stack;
-    s_osal_task_data[taskid].ext        = NULL;
+    
+    
+    // init the returning osal task
+    retval->rtostsk    = rtostsk;
+    retval->signature  = osal_task_signature;
+    retval->prio       = prio;
+    retval->stksize    = stksize;
+    retval->stkdata    = stack;
+    retval->ext        = NULL;
+    
+    // store inside the rtostsk the pointer to the osal task
+    //oosiit_tsk_set_extdata(rtostsk, retval);
 
     // can release now
     osal_mutex_release(s_osal_mutex_api_protection);
 
     // the destiny of the task is now given to the scheduler. it can start now if prio is higher than the priority of the caller  
-    oosiit_tsk_setprio(taskid, prio);
+    oosiit_tsk_setprio(rtostsk, prio);
 
-    return(&s_osal_task_data[taskid]);
+    return(retval);
 }
 
 
@@ -654,8 +701,7 @@ extern osal_result_t osal_task_period_wait(void)
 
 extern osal_result_t osal_task_delete(osal_task_t *tsk)
 {
-    osal_task_id_t taskid;
-    //oosiit_result_t res;
+    void* rtostsk = NULL;
     
     if(NULL == tsk)
     {
@@ -664,24 +710,44 @@ extern osal_result_t osal_task_delete(osal_task_t *tsk)
     
     // some tasks could call it at the same time ... better to protect
     osal_mutex_take(s_osal_mutex_api_protection, OSAL_reltimeINFINITE);   
+        
+    if((NULL == tsk->rtostsk) || (osal_task_signature != tsk->signature))
+    {   // if the caller has used a proper tsk. it may be that another task has already or just deleted the task.
+        osal_mutex_release(s_osal_mutex_api_protection);
+        return(osal_res_NOK_generic);
+    }
     
-    taskid = tsk->rtosid;   
-    oosiit_tsk_delete(taskid);
+    rtostsk = tsk->rtostsk;
     
     s_resources_used[osal_info_entity_task] --;
     if(osal_memmode_dynamic == s_osal_osal_cfg.memorymodel)
     {
-        s_resources_used[osal_info_entity_globalstack] -= s_osal_task_data[taskid].stksize;
+        s_resources_used[osal_info_entity_globalstack] -= tsk->stksize;
     }
-
-    s_osal_task_data[taskid].rtosid     = 0;
-    s_osal_task_data[taskid].prio       = 0;
-    s_osal_task_data[taskid].stksize    = 0;
-    s_osal_task_data[taskid].stkdata    = NULL;
-    s_osal_task_data[taskid].ext        = NULL;        
+    
+    // reset the data pointed by tsk so that another task calling osal_tsk_* functions with the same tsk
+    // exits gracefully ... until the same memory is used for something else....    
+    tsk->rtostsk        = NULL;
+    tsk->signature      = 0;
+    tsk->prio           = 0;
+    tsk->stksize        = 0;
+    tsk->stkdata        = NULL;
+    tsk->ext            = NULL;       
+    
+    if(NULL == s_osal_task_data)
+    {   
+        osal_base_memory_del(tsk);
+    }        
  
     osal_mutex_release(s_osal_mutex_api_protection);
+    
+    // MUST be the last operation because ... in case of auto-delete the function
+    // oosiit_tsk_delete() internally forces a contex switch and current task is not executed anymore
+    // thus isntructions after oosiit_tsk_delete() are not executed 
+    oosiit_tsk_delete(rtostsk);     
+    // in case of auto-delete any instruction after this comment is not executed .....  
 
+    
     return(osal_res_OK);    
 }
 
@@ -693,6 +759,11 @@ extern osal_result_t osal_task_priority_get(osal_task_t *tsk, uint8_t *prio)
         return(osal_res_NOK_nullpointer);
     }
     
+    if((NULL == tsk->rtostsk) || (osal_task_signature != tsk->signature))
+    {
+        return(osal_res_NOK_generic);
+    }
+    
     *prio = tsk->prio;
 
     return(osal_res_OK);
@@ -700,7 +771,6 @@ extern osal_result_t osal_task_priority_get(osal_task_t *tsk, uint8_t *prio)
 
 extern osal_result_t osal_task_priority_set(osal_task_t *tsk, uint8_t prio)
 {
-
     if(NULL == tsk)
     {
         return(osal_res_NOK_nullpointer);
@@ -710,30 +780,37 @@ extern osal_result_t osal_task_priority_set(osal_task_t *tsk, uint8_t prio)
     {
         return(osal_res_NOK_generic);
     }
+      
    
     // some tasks could call it at the same time ... better to protect
     osal_mutex_take(s_osal_mutex_api_protection, OSAL_reltimeINFINITE);
+        
+    if((NULL == tsk->rtostsk) || (osal_task_signature != tsk->signature))
+    {
+        osal_mutex_release(s_osal_mutex_api_protection);
+        return(osal_res_NOK_generic);
+    }      
 
     tsk->prio = prio;
 
-    oosiit_tsk_setprio(tsk->rtosid, prio);
+    oosiit_tsk_setprio(tsk->rtostsk, prio);
 
     osal_mutex_release(s_osal_mutex_api_protection);
 
     return(osal_res_OK);
 }
 
-extern osal_result_t osal_task_id_get(osal_task_t *tsk, osal_task_id_t *id)
-{
-    if((NULL == tsk) || (NULL == id))
-    {
-        return(osal_res_NOK_nullpointer);
-    }
-    
-    *id = tsk->rtosid;
+// extern osal_result_t osal_task_id_get(osal_task_t *tsk, osal_task_id_t *id)
+// {
+//     if((NULL == tsk) || (NULL == id))
+//     {
+//         return(osal_res_NOK_nullpointer);
+//     }
+//     
+//     *id = 0;
 
-    return(osal_res_OK);
-}
+//     return(osal_res_OK);
+// }
 
 extern osal_result_t osal_task_extdata_set(osal_task_t *tsk, void *ext)
 {
@@ -744,6 +821,12 @@ extern osal_result_t osal_task_extdata_set(osal_task_t *tsk, void *ext)
 
     // some tasks could call it at the same time ... better to protect
     osal_mutex_take(s_osal_mutex_api_protection, OSAL_reltimeINFINITE);
+    
+    if((NULL == tsk->rtostsk) || (osal_task_signature != tsk->signature))
+    {
+        osal_mutex_release(s_osal_mutex_api_protection);
+        return(osal_res_NOK_generic);
+    }     
 
     tsk->ext = ext;
 
@@ -759,51 +842,43 @@ extern void* osal_task_extdata_get(osal_task_t *tsk)
         return(NULL);
     }
     
+    if((NULL == tsk->rtostsk) || (osal_task_signature != tsk->signature))
+    {
+        return(NULL);
+    }
+    
     return(tsk->ext);
 }
 
 
 extern osal_task_t * osal_task_get(osal_caller_t caller)
-{
-    // in rtx it is the same function 
-    uint8_t taskid = 0;
-
-#if 0    
-    if(osal_callerTSK == caller)
-    {
-        taskid = oosiit_tsk_self();    
-    }
-    else
-    {
-        taskid = oosiit_tsk_self();
-    }
-#endif
-    
-    taskid = oosiit_tsk_self();    
-
-    if(255 == taskid)
-    {
-        taskid = 0;
-    }
-
-    return(&s_osal_task_data[taskid]);
+{    
+//     osal_task_t* retval = NULL;
+//     void* rtostsk = oosiit_tsk_self();       
+//     // i had associated the osal task to the rtos task
+//     retval = oosiit_tsk_get_extdata(rtostsk);
+//     return(retval);
+    return(oosiit_tsk_get_extdata(oosiit_tsk_self()));
 }
 
-extern void * osal_task_stack_get(uint16_t *size)
+extern void * osal_task_stack_get1(osal_task_t *tsk, uint16_t *size)
 {
-    uint8_t taskid = oosiit_tsk_self();    
-
-    if(255 == taskid)
+    if(NULL == tsk)
     {
-        taskid = 0;
+        return(NULL);
     }
     
+    if((NULL == tsk->rtostsk) || (osal_task_signature != tsk->signature))
+    {
+        return(NULL);
+    }
+        
     if(NULL != size)
     {
-        *size = s_osal_task_data[taskid].stksize;
+        *size = tsk->stksize;
     }
 
-    return(s_osal_task_data[taskid].stkdata);
+    return(tsk->stkdata);
 }
 
 extern osal_messagequeue_t * osal_messagequeue_new(uint16_t maxmsg)
@@ -942,7 +1017,7 @@ extern osal_result_t osal_eventflag_set(osal_eventflag_t flag, osal_task_t * tot
         return(osal_res_NOK_nullpointer);
     }
     
-    oosiit_evt_set(flag, totask->rtosid);
+    oosiit_evt_set(flag, totask->rtostsk);
 
     return(osal_res_OK);
 }
@@ -1231,7 +1306,7 @@ extern uint32_t (*std_libspace)[96/4];
 extern void * osal_arch_arm_armc99stdlib_getlibspace(uint8_t firstcall) 
 {
     // provide a separate libspace for each task
-    oosiit_taskid_t idx;
+    oosiit_tskptr_t tp = NULL;
 
     if(1 == firstcall)
     {
@@ -1246,18 +1321,10 @@ extern void * osal_arch_arm_armc99stdlib_getlibspace(uint8_t firstcall)
     }
 
     // we have osal running, thus also oosiit. we get the osiit task id and we give it its memory
-    idx = oosiit_tsk_self();
+    tp = oosiit_tsk_self();
 
-#if 0  
-    if(NULL == std_libspace)
-    {
-        s_osal_error(osal_error_internal2, "armc99stdlib: not enough libspace");
-    }
-
-    return ((void *)&std_libspace[idx-1]);
-#else
-    return(oosiit_tsk_get_perthread_libspace(idx));
-#endif      
+    return(oosiit_tsk_get_perthread_libspace(tp));
+    
 }
 
 extern void rt_mut_init(void* mutex);
@@ -1379,7 +1446,8 @@ extern void osal_hid_reset_static_ram(void)
     s_osal_stacklauncher_size       = 0;
 
     s_osal_task_data                = NULL; // its size is number of tasks+2 (idle, launcher, tasks)
-    //s_osal_task_num               = 0;
+    s_osal_task_maxnum              = 0;
+    s_osal_task_next                = 0;
 
     s_osal_usec_in_tick             = 0;
     s_osal_launcher_fn              = NULL;
@@ -1425,6 +1493,8 @@ static void s_osal_on_idle(void* p)
 {
     p = p;
     
+    s_osal_task_idle->rtostsk = oosiit_tsk_self();
+    
     if(NULL != s_osal_osal_cfg.extfn.usr_on_idle)
     {
         s_osal_osal_cfg.extfn.usr_on_idle();
@@ -1439,19 +1509,13 @@ static void s_osal_on_idle(void* p)
 
 static void s_osal_error(osal_fatalerror_t err_code, const char *err_msg) 
 {
-    uint32_t tid = 0;
     osal_task_t *task = NULL;
 
     osal_system_scheduling_suspend();
     
     if((osal_info_status_running == s_osal_info_status) || (osal_info_status_suspended == s_osal_info_status))
     { 
-        tid = oosiit_tsk_self(); //isr_tsk_get(); // the os-version crashes if osiit calls os_error().... os_tsk_self();
-        if(255 == tid)  // idle-task... use zero-th position in s_osal_task_data[]
-        {
-            tid = 0;
-        }
-        task = &s_osal_task_data[tid];
+        task = osal_task_get(osal_callerAUTOdetect);
     }
     else
     {
@@ -1538,6 +1602,9 @@ void osal_launcher(void* p)
     {
         s_osal_error(osal_error_missingmemory, "osal: cannot create the s_osal_mutex_api_protection");
     }
+    
+    // must retrieve the rtostsk in here because we did not call a oosiit_tsk_create(). the system did
+    s_osal_task_launcher->rtostsk = oosiit_tsk_self();
 
     // change the priority of the svc only. the pendsv and systick have fixed value. 
 	// the default in osiit for svc, pendsv and systick is 14, 15, 15. 
@@ -1555,10 +1622,14 @@ void osal_launcher(void* p)
 
     // but if we are in here it means that the user wants to terminate the launcher task ...
     // thus i mark its stack as available by resetting its signature.
-    s_osal_stacklauncher_data[0] = (uint64_t)0;
+    //s_osal_stacklauncher_data[0] = (uint64_t)0;
+    
+    
+    // delete the task ...
 
     // delete the launcher task
     oosiit_tsk_delete(oosiit_tsk_self());
+    
 }
 
 static uint32_t s_osal_period2tick(osal_reltime_t period)
