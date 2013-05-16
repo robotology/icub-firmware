@@ -1220,8 +1220,26 @@ extern osal_result_t osal_mutex_release(osal_mutex_t *mutex)
 
 extern osal_result_t osal_mutex_delete(osal_mutex_t *mutex)
 {
-    s_osal_error(osal_error_unsupportedbehaviour, "osal_mutex_delete():");
-    return(osal_res_NOK_generic);
+    if(NULL == mutex)
+    {
+        return(osal_res_NOK_nullpointer);
+    }
+    
+    void* rtosobj = NULL;
+    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)mutex, osal_mutex_signature)))
+    { 
+        return(osal_res_NOK_generic);
+    }  
+    
+    oosiit_mut_delete(rtosobj);
+    
+    s_osal_rtosobj_clr((osal_obj_t*)mutex);
+        
+    osal_mutex_take(s_osal_mutex_api_protection, OSAL_reltimeINFINITE);
+    s_resources_used[osal_info_entity_mutex] --;
+    osal_mutex_release(s_osal_mutex_api_protection);
+
+    return(osal_res_OK);
 }
 
 
@@ -1340,8 +1358,27 @@ extern osal_result_t osal_semaphore_increment(osal_semaphore_t *sem, osal_caller
 
 extern osal_result_t osal_semaphore_delete(osal_semaphore_t *sem)
 {
-    s_osal_error(osal_error_unsupportedbehaviour, "osal_semaphore_delete():");
-    return(osal_res_NOK_generic); 
+    if(NULL == sem)
+    {
+        return(osal_res_NOK_nullpointer); 
+    }
+
+    void* rtosobj = NULL;
+    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)sem, osal_semaphore_signature)))
+    { 
+        return(osal_res_NOK_generic);
+    }       
+    
+    oosiit_sem_delete(rtosobj);
+    
+    s_osal_rtosobj_clr((osal_obj_t*)sem);
+        
+    osal_mutex_take(s_osal_mutex_api_protection, OSAL_reltimeINFINITE);
+    s_resources_used[osal_info_entity_semaphore] --;
+    osal_mutex_release(s_osal_mutex_api_protection);
+
+    return(osal_res_OK);
+
 }
 
 
