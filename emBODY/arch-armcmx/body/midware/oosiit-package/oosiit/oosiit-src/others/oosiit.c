@@ -136,13 +136,16 @@ extern uint32_t oosiit_memory_sizeofallocated = 0;
 static uint16_t s_oosiit_params_get_ram32size(const oosiit_cfg_t *cfg);
 static uint16_t s_oosiit_params_get_ram64size(const oosiit_cfg_t *cfg);
 
-
-static __INLINE oosiit_taskid_t isr_oosiit_tsk_self(void);
+static __INLINE void* isr_oosiit_memory_new(uint32_t size);
+static __INLINE oosiit_result_t isr_oosiit_memory_del(void* mem);
+static __INLINE oosiit_tskptr_t isr_oosiit_tsk_self(void);
+static __INLINE oosiit_result_t isr_oosiit_tsk_set_extdata(oosiit_tskptr_t tp, void* extdata);
+static __INLINE void* isr_oosiit_tsk_get_extdata(oosiit_tskptr_t tp);
 static __INLINE oosiit_result_t isr_oosiit_mbx_retrieve(oosiit_objptr_t mailbox, void** message);
 static __INLINE void isr_oosiit_mbx_send(oosiit_objptr_t mailbox, void* message);
 static __INLINE uint16_t isr_oosiit_mbx_available(oosiit_objptr_t mailbox);
 static __INLINE uint16_t isr_oosiit_mbx_used(oosiit_objptr_t mailbox);
-static __INLINE oosiit_result_t isr_oosiit_evt_set(uint32_t flags, oosiit_taskid_t tskid);
+static __INLINE oosiit_result_t isr_oosiit_evt_set(uint32_t flags, oosiit_tskptr_t tskid);
 static __INLINE oosiit_result_t isr_oosiit_sem_send(oosiit_objptr_t sem);
 static __INLINE oosiit_result_t isr_oosiit_advtmr_start(oosiit_objptr_t timer, oosiit_advtmr_timing_t *timing, oosiit_advtmr_action_t *action);
 static __INLINE oosiit_result_t isr_oosiit_advtmr_stop(oosiit_objptr_t timer);
@@ -175,13 +178,15 @@ SVC_0_1(svc_oosiit_sys_resume,          oosiit_result_t,                        
 
 
 // - task
-SVC_4_1(svc_oosiit_tsk_create,          oosiit_taskid_t,    FAKE_VOID_FP_VOIDP, void*,                  void*,          uint32_t,       RET_uint32_t);
-SVC_1_1(svc_oosiit_tsk_delete,          oosiit_result_t,    oosiit_taskid_t,                                                            RET_int32_t);
-SVC_0_1(svc_oosiit_tsk_self,            uint32_t,                                                                                       RET_uint32_t);
-SVC_2_1(svc_oosiit_tsk_setprio,         oosiit_result_t,    oosiit_taskid_t,    uint8_t,                                                RET_int32_t);
+//SVC_4_1(svc_oosiit_tsk_create,          oosiit_tskptr_t,    FAKE_VOID_FP_VOIDP, void*,                  void*,          uint32_t,       RET_pointer);
+SVC_4_1(svc_oosiit_tsk_create,          oosiit_tskptr_t,    FAKE_VOID_FP_VOIDP, void*,                  void*,          void*,          RET_pointer);
+SVC_1_1(svc_oosiit_tsk_delete,          oosiit_result_t,    oosiit_tskptr_t,                                                            RET_int32_t);
+SVC_0_1(svc_oosiit_tsk_self,            oosiit_tskptr_t,                                                                                RET_pointer);
+SVC_2_1(svc_oosiit_tsk_setprio,         oosiit_result_t,    oosiit_tskptr_t,    uint8_t,                                                RET_int32_t);
 SVC_0_1(svc_oosiit_tsk_pass,            oosiit_result_t,                                                                                RET_int32_t);
-SVC_1_1(svc_oosiit_tsk_get_perthread_libspace, void*,       oosiit_taskid_t,                                                            RET_pointer);
-
+SVC_1_1(svc_oosiit_tsk_get_perthread_libspace, void*,       oosiit_tskptr_t,                                                            RET_pointer);
+SVC_2_1(svc_oosiit_tsk_set_extdata,     oosiit_result_t,    oosiit_tskptr_t,    void*,                                                  RET_int32_t);
+SVC_1_1(svc_oosiit_tsk_get_extdata,     void*,              oosiit_tskptr_t,                                                            RET_pointer);
 
 // - time
 SVC_2_1(svc_oosiit_time_set,            oosiit_result_t,    uint32_t,           uint32_t,                                               RET_int32_t);
@@ -201,7 +206,7 @@ SVC_1_1(svc_oosiit_mbx_used,            uint16_t,           void*,              
 
 
 // event flags 
-SVC_2_1(svc_oosiit_evt_set,             oosiit_result_t,    uint32_t,           oosiit_taskid_t,                                        RET_int32_t);
+SVC_2_1(svc_oosiit_evt_set,             oosiit_result_t,    uint32_t,           oosiit_tskptr_t,                                        RET_int32_t);
 SVC_3_1(svc_oosiit_evt_wait,            oosiit_result_t,    uint32_t,           uint32_t,               oosiit_evt_wait_mode_t,         RET_int32_t);
 SVC_0_1(svc_oosiit_evt_get,             uint32_t,                                                                                       RET_uint32_t);
 SVC_1_1(svc_oosiit_evt_clr,             oosiit_result_t,    uint32_t,                                                                   RET_int32_t);
@@ -254,8 +259,7 @@ extern void* oosiit_memory_new(uint32_t size)
     }    
     else if(0 != __get_IPSR()) 
     {   // inside isr
-        //ret = NULL;
-        ret = calloc(size, 1);
+        ret = isr_oosiit_memory_new(size);
     }     
     else if(1 == s_oosiit_started)
     {   // not within an isr. os started     
@@ -263,7 +267,7 @@ extern void* oosiit_memory_new(uint32_t size)
     }
     else
     {   // not within an isr. os not started   
-        ret = calloc(size, 1);
+        ret = rt_iit_memory_new(size);
     }
     
     if(NULL == ret)
@@ -271,7 +275,6 @@ extern void* oosiit_memory_new(uint32_t size)
         oosiit_sys_error(oosiit_error_memory_allocation);
     }
     
-    oosiit_memory_sizeofallocated += size;
     
     return(ret);
 }
@@ -284,9 +287,7 @@ extern oosiit_result_t oosiit_memory_del(void* mem)
     }    
     else if(0 != __get_IPSR()) 
     {   // inside isr
-        //return(oosiit_res_NOK);
-        free(mem);
-        return(oosiit_res_OK);
+        return(isr_oosiit_memory_del(mem));
     }
     else if(1 == s_oosiit_started) 
     {   // not within an isr. os started        
@@ -294,10 +295,9 @@ extern oosiit_result_t oosiit_memory_del(void* mem)
     }
     else
     {   // not within an isr. os not started  
-        free(mem);
+        rt_iit_memory_del(mem);
         return(oosiit_res_OK);
     }
-
 }
 
 extern oosiit_result_t oosiit_memory_getsize(const oosiit_cfg_t *cfg, uint16_t *size04aligned, uint16_t *size08aligned)
@@ -361,12 +361,12 @@ extern oosiit_result_t oosiit_memory_load(const oosiit_cfg_t *cfg, uint32_t *dat
     // initialise the parameters and the memory straigth away.
     if(oosiit_memmode_static == cfg->memorymode)
     {
-//        oosiit_params_stdlib32data   = data04aligned;
-//        oosiit_params_ram32data      = data04aligned + ((SIZEOF_STDLIB32_ELEM/4)*cfg->maxnumofusertasks);   
-//        oosiit_params_ram64data      = data08aligned;    
-        oosiit_params_stdlib32data   = NULL;
-        oosiit_params_ram32data      = data04aligned;   
-        oosiit_params_ram64data      = data08aligned;                
+       oosiit_params_stdlib32data   = data04aligned;
+       oosiit_params_ram32data      = data04aligned + ((SIZEOF_STDLIB32_ELEM/4)*cfg->maxnumofusertasks);   
+       oosiit_params_ram64data      = data08aligned;    
+//         oosiit_params_stdlib32data   = NULL;
+//         oosiit_params_ram32data      = data04aligned;   
+//         oosiit_params_ram64data      = data08aligned;                
         rt_iit_params_init();             
         rt_iit_memory_init();  
     }    
@@ -511,44 +511,51 @@ extern uint64_t* oosiit_memory_getstack(uint16_t bytes)
 
 // - task functions ---------------------------------------------------------------------------------------------------
 
-extern oosiit_taskid_t oosiit_tsk_create_oldversion(void (*tskfn)(void *), void *tskfnarg, uint8_t tskpriority, void *tskstackdata, uint16_t tskstacksize)
-{
-    if(0 != __get_IPSR()) 
-    {   // inside isr
-        return((oosiit_taskid_t)0);
-    } 
-    else if((NULL == tskfn) || (NULL == tskstackdata) || (0 == tskstacksize) )
-    {
-        return((oosiit_taskid_t)0);
-    }
-    else
-    {   // call svc
-        uint32_t tskstacksize24tskpriority08 = ((((uint32_t)(tskstacksize)) << 8)&0xffffff00) | (tskpriority&0xff);
-        return(__svc_oosiit_tsk_create(tskfn, tskfnarg, tskstackdata, tskstacksize24tskpriority08));
-    }   
-}
+//extern oosiit_tskptr_t oosiit_tsk_create_oldversion(void (*tskfn)(void *), void *tskfnarg, uint8_t tskpriority, void *tskstackdata, uint16_t tskstacksize);
 
-extern oosiit_taskid_t oosiit_tsk_create(oosiit_task_properties_t* tskprop)
+// extern oosiit_tskptr_t oosiit_tsk_create_oldversion(void (*tskfn)(void *), void *tskfnarg, uint8_t tskpriority, void *tskstackdata, uint16_t tskstacksize)
+// {
+//     if(0 != __get_IPSR()) 
+//     {   // inside isr
+//         return(NULL);
+//     } 
+//     else if((NULL == tskfn) || (NULL == tskstackdata) || (0 == tskstacksize) )
+//     {
+//         return(NULL);
+//     }
+//     else
+//     {   // call svc
+//         uint32_t tskstacksize24tskpriority08 = ((((uint32_t)(tskstacksize)) << 8)&0xffffff00) | (tskpriority&0xff);
+//         return(__svc_oosiit_tsk_create(tskfn, tskfnarg, tskstackdata, tskstacksize24tskpriority08));
+//     }   
+// }
+
+extern oosiit_tskptr_t oosiit_tsk_create(oosiit_task_properties_t* tskprop)
 {
     if(0 != __get_IPSR()) 
     {   // inside isr
-        return((oosiit_taskid_t)0);
+        return(NULL);
     } 
     else if((NULL == tskprop) || (NULL == tskprop->function) || (NULL == tskprop->stackdata) || (0 == tskprop->stacksize) )
     {
-        return((oosiit_taskid_t)0);
+        return(NULL);
     }
     else
     {   // call svc
-        uint32_t tskstacksize24tskpriority08 = ((((uint32_t)(tskprop->stacksize)) << 8)&0xffffff00) | (tskprop->priority&0xff);
-        return(__svc_oosiit_tsk_create(tskprop->function, tskprop->param, tskprop->stackdata, tskstacksize24tskpriority08));
+//        uint32_t tskstacksize24tskpriority08 = ((((uint32_t)(tskprop->stacksize)) << 8)&0xffffff00) | (tskprop->priority&0xff);
+//        return(__svc_oosiit_tsk_create(tskprop->function, tskprop->param, tskprop->stackdata, tskstacksize24tskpriority08));
+        osiit_hid_tsk_create_other_args_t others;
+        others.stacksize = tskprop->stacksize;
+        others.priority = tskprop->priority;
+        others.extdata = tskprop->extdata;
+        return(__svc_oosiit_tsk_create(tskprop->function, tskprop->param, tskprop->stackdata, &others));
     }   
 }
 
 
-extern oosiit_result_t oosiit_tsk_delete(oosiit_taskid_t tskid)
+extern oosiit_result_t oosiit_tsk_delete(oosiit_tskptr_t tp)
 {
-    if(0 == tskid)
+    if(NULL == tp)
     {
         return(oosiit_res_NOK);
     }
@@ -559,11 +566,11 @@ extern oosiit_result_t oosiit_tsk_delete(oosiit_taskid_t tskid)
     } 
     else
     {   // call svc
-        return(__svc_oosiit_tsk_delete(tskid));
+        return(__svc_oosiit_tsk_delete(tp));
     } 
 }
 
-extern oosiit_taskid_t oosiit_tsk_self(void)
+extern oosiit_tskptr_t oosiit_tsk_self(void)
 {
     if(0 != __get_IPSR()) 
     {   // inside isr
@@ -575,21 +582,21 @@ extern oosiit_taskid_t oosiit_tsk_self(void)
     } 
 }
 
-extern oosiit_result_t oosiit_tsk_setprio(oosiit_taskid_t tskid, uint8_t tskpriority)
+extern oosiit_result_t oosiit_tsk_setprio(oosiit_tskptr_t tp, uint8_t tskpriority)
 {
-    if(0 == tskid)
+    if(NULL == tp)
     {
         return(oosiit_res_NOK);
     }
     
     if(0 != __get_IPSR()) 
     {   // inside isr
-        //return(isr_oosiit_tsk_prio(tskid, tskpriority));
+        //return(isr_oosiit_tsk_prio(tp, tskpriority));
         return(oosiit_res_NOK);
     } 
     else
     {   // call svc
-        return(__svc_oosiit_tsk_setprio(tskid, tskpriority));
+        return(__svc_oosiit_tsk_setprio(tp, tskpriority));
     }   
 }
 
@@ -606,17 +613,59 @@ extern oosiit_result_t oosiit_tsk_pass(void)
     }   
 }
 
-extern void* oosiit_tsk_get_perthread_libspace(oosiit_taskid_t tskid)
+extern void* oosiit_tsk_get_perthread_libspace(oosiit_tskptr_t tp)
 {
+    if(NULL == tp)
+    {
+        return(NULL);
+    }
+    
     if(0 != __get_IPSR()) 
     {   // inside isr
-        return(rt_iit_tsk_perthread_libspace_get(tskid));
+        return(rt_iit_tsk_perthread_libspace_get(tp));
     } 
     else
     {   // call svc
-        return(__svc_oosiit_tsk_get_perthread_libspace(tskid));
+        return(__svc_oosiit_tsk_get_perthread_libspace(tp));
     }     
 }
+
+extern oosiit_result_t oosiit_tsk_set_extdata(oosiit_tskptr_t tp, void* extdata)
+{
+    if(NULL == tp)
+    {
+        return(oosiit_res_NOK);
+    }
+    
+    if(0 != __get_IPSR()) 
+    {   // inside isr
+        return(isr_oosiit_tsk_set_extdata(tp, extdata));
+    } 
+    else
+    {   // call svc
+        return(__svc_oosiit_tsk_set_extdata(tp, extdata));
+    }       
+}
+
+
+extern void* oosiit_tsk_get_extdata(oosiit_tskptr_t tp)
+{
+    if(NULL == tp)
+    {
+        return(NULL);
+    }
+    
+    if(0 != __get_IPSR()) 
+    {   // inside isr
+        return(isr_oosiit_tsk_get_extdata(tp));
+    } 
+    else
+    {   // call svc
+        return(__svc_oosiit_tsk_get_extdata(tp));
+    }        
+}
+
+
 
 // - time management functions ----------------------------------------------------------------------------------------
 
@@ -827,20 +876,20 @@ extern uint16_t oosiit_mbx_used(oosiit_objptr_t mailbox)
 // - event flag functions ---------------------------------------------------------------------------------------------
 
 
-extern oosiit_result_t oosiit_evt_set(uint32_t flags, oosiit_taskid_t tskid)
+extern oosiit_result_t oosiit_evt_set(uint32_t flags, oosiit_tskptr_t tp)
 {
-    if(0 == tskid)
+    if(NULL == tp)
     {
         return(oosiit_res_NOK);
     }
     
     if(0 != __get_IPSR()) 
     {   // inside isr
-        return(isr_oosiit_evt_set(flags, tskid));
+        return(isr_oosiit_evt_set(flags, tp));
     } 
     else
     {   // call svc
-        return(__svc_oosiit_evt_set(flags, tskid));
+        return(__svc_oosiit_evt_set(flags, tp));
     }
 }
 
@@ -1088,21 +1137,21 @@ extern oosiit_result_t oosiit_advtmr_delete(oosiit_objptr_t timer)
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-// extern uint16_t oosiit_hid_params_get_stdlib32(const oosiit_cfg_t *cfg, uint16_t *stdlib32size)
-// {
-//     uint16_t stdlib32datasizetot = 0;
+extern uint16_t oosiit_hid_params_get_stdlib32(const oosiit_cfg_t *cfg, uint16_t *stdlib32size)
+{
+    uint16_t stdlib32datasizetot = 0;
 
-//     if(NULL == cfg)
-//     {
-//         return(0);
-//     }
+    if(NULL == cfg)
+    {
+        return(0);
+    }
 
-//     stdlib32size[0] = (SIZEOF_STDLIB32_ELEM/4)*cfg->maxnumofusertasks;
-//     stdlib32datasizetot += stdlib32size[0];
+    stdlib32size[0] = (SIZEOF_STDLIB32_ELEM/4)*cfg->maxnumofusertasks;
+    stdlib32datasizetot += stdlib32size[0];
 
-//     return(stdlib32datasizetot);
+    return(stdlib32datasizetot);
 
-// }
+}
 
 extern uint16_t oosiit_hid_params_get_ram32(const oosiit_cfg_t *cfg, uint16_t *ram32size)
 {
@@ -1170,7 +1219,7 @@ static uint16_t s_oosiit_params_get_ram32size(const oosiit_cfg_t *cfg)
     }
 
     // for oosiit_params_stdlib32data
-//    ram32datasizetot += ((SIZEOF_STDLIB32_ELEM/4)*cfg->maxnumofusertasks);   
+    ram32datasizetot += ((SIZEOF_STDLIB32_ELEM/4)*cfg->maxnumofusertasks);   
     
     // the following use membox 4-aligned: adv-timers [0], task-control-block [5], timers [8]
     // for oosiit_params_ram32data
@@ -1215,6 +1264,21 @@ static uint16_t s_oosiit_params_get_ram64size(const oosiit_cfg_t *cfg)
     return(ram64datasizetot);
 }
 
+// ------------------------------------------- ovverridden functions ---------------------------------------------------
+
+void rt_stk_check(void) 
+{  
+    if(0 == s_oosiit_cfg_in_use.checkstackoverflow)
+    {
+        return;
+    }
+    
+    /* Check for stack overflow. */
+    if((os_tsk.run->tsk_stack < (U32)os_tsk.run->stack) || (os_tsk.run->stack[0] != MAGIC_WORD)) 
+    {
+        os_error (OS_ERR_STK_OVF);
+    }
+}    
 
 // ------------------------------------------- svc functions -----------------------------------------------------------
 
@@ -1297,46 +1361,63 @@ extern oosiit_result_t svc_oosiit_sys_resume(void)
 
 // - task
 
-extern oosiit_taskid_t svc_oosiit_tsk_create(FAKE_VOID_FP_VOIDP tskfn, void *tskfnarg, void *tskstackdata, uint32_t tskstacksize24tskpriority08)
+// extern oosiit_tskptr_t svc_oosiit_tsk_create(FAKE_VOID_FP_VOIDP tskfn, void *tskfnarg, void *tskstackdata, uint32_t tskstacksize24tskpriority08)
+// {   // rt_tsk_create_user_ex has tskfnarg as last argument
+//     // void (*tskfn)(void *)
+//     oosiit_tskptr_t tp;
+//     rt_iit_dbg_svc_enter();
+//        
+//     tp = rt_iit_tsk_create((FUNCP)tskfn, tskstacksize24tskpriority08, tskstackdata, tskfnarg);
+//        
+//     rt_iit_dbg_svc_exit();
+//     return(tp);
+// }
+
+extern oosiit_tskptr_t svc_oosiit_tsk_create(FAKE_VOID_FP_VOIDP tskfn, void *tskfnarg, void *tskstackdata, void* others)
 {   // rt_tsk_create_user_ex has tskfnarg as last argument
     // void (*tskfn)(void *)
-    oosiit_taskid_t tid;
+    oosiit_tskptr_t tp;
+    osiit_hid_tsk_create_other_args_t *otherparams;
     rt_iit_dbg_svc_enter();
+    
+    otherparams = (osiit_hid_tsk_create_other_args_t*) others;
        
-    tid = rt_iit_tsk_create((FUNCP)tskfn, tskstacksize24tskpriority08, tskstackdata, tskfnarg);
+//    tp = rt_iit_tsk_create((FUNCP)tskfn, tskstacksize24tskpriority08, tskstackdata, tskfnarg);
+    
+    tp = rt_iit_tsk_create((FUNCP)tskfn, tskfnarg, tskstackdata, others);
        
     rt_iit_dbg_svc_exit();
-    return(tid);
+    return(tp);
 }
 
-extern oosiit_result_t svc_oosiit_tsk_delete(oosiit_taskid_t tskid)
+extern oosiit_result_t svc_oosiit_tsk_delete(oosiit_tskptr_t tp)
 {
     OS_RESULT res;
     rt_iit_dbg_svc_enter();
     
-    res = rt_iit_tsk_delete(tskid);
+    res = rt_iit_tsk_delete(tp);
     
     rt_iit_dbg_svc_exit();
     return((oosiit_result_t)res);
 }
 
-extern oosiit_taskid_t svc_oosiit_tsk_self(void)
+extern oosiit_tskptr_t svc_oosiit_tsk_self(void)
 {
-    oosiit_taskid_t tid;
+    oosiit_tskptr_t tp;
     rt_iit_dbg_svc_enter();
     
-    tid = rt_tsk_self();
+    tp = rt_iit_tsk_self();
     
     rt_iit_dbg_svc_exit();
-    return(tid);
+    return(tp);
 }
 
-extern oosiit_result_t svc_oosiit_tsk_setprio(oosiit_taskid_t tskid, uint8_t tskpriority)
+extern oosiit_result_t svc_oosiit_tsk_setprio(oosiit_tskptr_t tp, uint8_t tskpriority)
 {
     OS_RESULT res;
     rt_iit_dbg_svc_enter();
     
-    res = rt_tsk_prio(tskid, tskpriority);
+    res = rt_iit_tsk_prio(tp, tskpriority);
     
     rt_iit_dbg_svc_exit();
     return((oosiit_result_t)res);
@@ -1352,9 +1433,31 @@ extern oosiit_result_t svc_oosiit_tsk_pass(void)
     return(oosiit_res_OK);
 }
 
-extern void* svc_oosiit_tsk_get_perthread_libspace(uint32_t tid)
+extern void* svc_oosiit_tsk_get_perthread_libspace(oosiit_tskptr_t tp)
 {
-    return(rt_iit_tsk_perthread_libspace_get(tid));
+    return(rt_iit_tsk_perthread_libspace_get(tp));
+}
+
+
+extern oosiit_result_t svc_oosiit_tsk_set_extdata(oosiit_tskptr_t tp, void* extdata)
+{
+    rt_iit_dbg_svc_enter();
+    
+    isr_oosiit_tsk_set_extdata(tp, extdata);
+    
+    rt_iit_dbg_svc_exit();
+    return(oosiit_res_OK);
+}
+
+extern void* svc_oosiit_tsk_get_extdata(oosiit_tskptr_t tp)
+{
+    void* ret = NULL;
+    rt_iit_dbg_svc_enter();
+    
+    ret = isr_oosiit_tsk_get_extdata(tp);
+    
+    rt_iit_dbg_svc_exit();
+    return(ret);
 }
 
 
@@ -1469,11 +1572,11 @@ extern uint16_t svc_oosiit_mbx_used(oosiit_objptr_t mailbox)
 
 // events
 
-extern oosiit_result_t svc_oosiit_evt_set(uint32_t flags, oosiit_taskid_t tskid)
+extern oosiit_result_t svc_oosiit_evt_set(uint32_t flags, oosiit_tskptr_t tp)
 {
     rt_iit_dbg_svc_enter();
     
-    iitchanged_rt_evt_set(flags, tskid);
+    iitchanged_rt_evt_set(flags, tp);
     
     rt_iit_dbg_svc_exit();
     return(oosiit_res_OK);
@@ -1665,11 +1768,33 @@ extern oosiit_result_t svc_oosiit_advtmr_delete(oosiit_objptr_t timer)
 // - definition of static inline functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-
-
-static __INLINE oosiit_taskid_t isr_oosiit_tsk_self(void)
+static __INLINE void* isr_oosiit_memory_new(uint32_t size)
 {
-    return(rt_tsk_self());
+    return(rt_iit_memory_new(size));
+}
+
+static __INLINE oosiit_result_t isr_oosiit_memory_del(void* mem)
+{
+    rt_iit_memory_del(mem);
+    return(oosiit_res_OK);
+}
+
+static __INLINE oosiit_tskptr_t isr_oosiit_tsk_self(void)
+{
+    return(rt_iit_tsk_self());
+}
+
+static __INLINE oosiit_result_t isr_oosiit_tsk_set_extdata(oosiit_tskptr_t tp, void* extdata)
+{
+    P_TCB tcb = (P_TCB)tp;
+    tcb->extdata = extdata;
+    return(oosiit_res_OK);  
+}
+
+static __INLINE void* isr_oosiit_tsk_get_extdata(oosiit_tskptr_t tp)
+{
+    P_TCB tcb = (P_TCB)tp;
+    return(tcb->extdata);    
 }
 
 static __INLINE oosiit_result_t isr_oosiit_mbx_retrieve(oosiit_objptr_t mailbox, void** message)
@@ -1704,9 +1829,9 @@ static __INLINE uint16_t isr_oosiit_mbx_used(oosiit_objptr_t mailbox)
     return((uint16_t)rt_iit_mbx_count(mailbox));    
 }
 
-static __INLINE oosiit_result_t isr_oosiit_evt_set(uint32_t flags, oosiit_taskid_t tskid)
+static __INLINE oosiit_result_t isr_oosiit_evt_set(uint32_t flags, oosiit_tskptr_t tp)
 {
-    iitchanged_isr_evt_set(flags, tskid);
+    iitchanged_isr_evt_set(flags, tp);
     return(oosiit_res_OK);
 }
 

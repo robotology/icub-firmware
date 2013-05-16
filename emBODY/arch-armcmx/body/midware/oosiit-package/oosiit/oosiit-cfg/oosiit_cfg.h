@@ -30,8 +30,8 @@
 // <i> It holds params both for CMSIS-RTOS RTX and for IIT extension
 
 
-// <h> CMSIS-RTOS RTX
-// <i> The same as the CMSIS-RTOS RTX configuration
+// <h> basics
+// <i> The basic configuration
 
 // #IIT comment#
 // the following code is adapted from file RTX_Conf_CM.C, V4.20 or successive, in the section between:
@@ -43,52 +43,49 @@
 // we have removed the user-timer section of CMSIS-RTOS RTX as the timers are implemented as an IIT extension
 // #/IIT comment#
 
-// <h> task configuration
-// =====================
-//
-//   <o> max number of user tasks <0-250>
-//   <i> Default: 6
-#ifndef OOSIIT_TASKCNT
- #define OOSIIT_TASKCNT     14
-#endif
 
-
-// <q> check stack overflow
-// ===============================
-// <i> Include the stack checking code for a stack overflow.
-// <i> Note that additional code reduces the kernel performance.
-#ifndef OOSIIT_STKCHECK
- #define OOSIIT_STKCHECK    1
-#endif
-
-// // q> run in cmx privileded mode
-// // =========================
-// // i> run all tasks in privileged mode.
-// // i> default: privileged
-// #ifndef OOSIIT_RUNPRIV
-//  #define OOSIIT_RUNPRIV     0
-// #endif
-
-// </h>
-// <h> systick timer configuration
+// <h>timing configuration
 // =============================
-//   <o> timer clock value [Hz] <1-1000000000>
-//   <i> set the timer clock value for selected timer.
+//   <o> cpu speed [Hz] <1-1000000000>
+//   <i> set the cpu speed.
 //   <i> Default: 72000000  (72MHz)
 #ifndef OOSIIT_CLOCK
  #define OOSIIT_CLOCK       72000000
 #endif
 
-//   <o> timer tick value [us] <1-1000000>
-//   <i> set the timer tick value for selected timer.
-//   <i> Default: 1000  (1ms)
+//   <o> oosiit tick value [us] <1-1000000>
+//   <i> set the tick value for the oosiit.
+//   <i> Default: 1000  (1000 usec)
 #ifndef OOSIIT_TICK
  #define OOSIIT_TICK        1000
 #endif
 
+
 // </h>
 
-// <h>system configuration
+
+// <h> system configuration
+
+//   <o>capacity of fifo queue used for oosiit calls inside ISRs <4=>   4 entries  <8=>   8 entries
+//                         <12=> 12 entries  <16=> 16 entries
+//                         <24=> 24 entries  <32=> 32 entries
+//                         <48=> 48 entries  <64=> 64 entries
+//                         <96=> 96 entries
+//   <i> ISR functions store requests to this buffer,
+//   <i> when they are called from the interrupt handler.
+//   <i> Default: 16 entries
+#ifndef OOSIIT_FIFOSZ
+ #define OOSIIT_FIFOSZ      16
+#endif
+
+
+// <q> check stack overflow
+// ===============================
+// <i> includes the stack checking code for a stack overflow.
+#ifndef OOSIIT_STKCHECK
+ #define OOSIIT_STKCHECK    1
+#endif
+
 // =======================
 // <e>round-robin task switching
 // =============================
@@ -107,32 +104,15 @@
 // </e>
 
 
-//   o>Number of user timers 0-250>
-//   i> Define max. number of user timers that will run at the same time.
-//   i> Default: 0  (User timers disabled)
-//#ifndef OOSIIT_TIMERCNT
-// #define OOSIIT_TIMERCNT    0
-//#endif
-
-//   <o>ISR FIFO Queue size<4=>   4 entries  <8=>   8 entries
-//                         <12=> 12 entries  <16=> 16 entries
-//                         <24=> 24 entries  <32=> 32 entries
-//                         <48=> 48 entries  <64=> 64 entries
-//                         <96=> 96 entries
-//   <i> ISR functions store requests to this buffer,
-//   <i> when they are called from the interrupt handler.
-//   <i> Default: 16 entries
-#ifndef OOSIIT_FIFOSZ
- #define OOSIIT_FIFOSZ      16
-#endif
-
-// </h>
 
 // </h>
 
 
-// <h> IIT extension
-// <i> It holds IIT extension
+
+// </h>
+
+
+// <h>memory mode
 
 //   <o>memory mode <0=>   static    <1=>   dynamic    
 //   <i> if dynamic the following numbers are not relevant anymore as they are allocated on demand
@@ -141,43 +121,65 @@
  #define OOSIIT_MEMMODE    1
 #endif
 
+// </h>
 
-//   <o> number of advanced timers <0-250>
+
+
+
+
+
+
+
+
+// <h> static mode configuration
+// <i> It holds the maximum number of items that the static memory mode can support
+
+
+
+//   <o> max number of user tasks <0-250>
+//   <i> Default: 6
+#ifndef OOSIIT_TASKCNT
+ #define OOSIIT_TASKCNT     1
+#endif
+
+
+
+//   <o> max number of advanced timers <0-250>
 //   <i> define max. number of timers that will run at the same time.
 //   <i> default: 0  (timers disabled)
 #ifndef OOSIIT_ADVTIMERCNT
- #define OOSIIT_ADVTIMERCNT    6
+ #define OOSIIT_ADVTIMERCNT    1
 #endif
 
 
-//   <o> number of mutexes <0-250>
+//   <o> max number of mutexes <0-250>
 //   <i> Define max. number of mutexes that will run at the same time.
 //   <i> Default: 0  (Mutexes not enabled)
 #ifndef OOSIIT_MUTEXCNT
- #define OOSIIT_MUTEXCNT    5
+ #define OOSIIT_MUTEXCNT    1
 #endif
 
 
-//   <o> number of semaphores <0-250>
+//   <o> max number of semaphores <0-250>
 //   <i> Define max. number of semaphores that will run at the same time.
 //   <i> Default: 0  (Semaphores not enabled)
 #ifndef OOSIIT_SEMAPHORECNT
- #define OOSIIT_SEMAPHORECNT    5
+ #define OOSIIT_SEMAPHORECNT    1
 #endif
 
 
-//   <o> number of message boxes <0-250>
+//   <o> max number of message boxes <0-250>
 //   <i> Define max. number of message boxes that that will run at the same time.
 //   <i> Default: 0  (Message boxes not enabled)
 #ifndef OOSIIT_MBOXCNT
- #define OOSIIT_MBOXCNT    5
+ #define OOSIIT_MBOXCNT    1
 #endif
 
-//   <o> total max number of elements in message boxes <0-1000>
+//   <o> max number of elements in message boxes <0-1000>
 //   <i> Define max. number of elements that can be contained in every message box.
 //   <i> Default: 0  (Message boxes not enabled)
 #ifndef OOSIIT_MBOXELEMENTCNT
- #define OOSIIT_MBOXELEMENTCNT    40
+ #define OOSIIT_MBOXELEMENTCNT    1
 #endif
 
 
@@ -185,7 +187,7 @@
 //   <i> Define max. size in bytes of the global stack.
 //   <i> Default: 0  
 #ifndef OOSIIT_GLOBALSTACK
- #define OOSIIT_GLOBALSTACK    4096
+ #define OOSIIT_GLOBALSTACK    1
 #endif
 
 

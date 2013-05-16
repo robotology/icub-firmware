@@ -137,6 +137,37 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
+struct OS_TSK os_tsk =
+{
+    .run = NULL,
+    .new = NULL
+};
+
+struct OS_TCB os_idle_TCB = 
+{
+    .cb_type                = 0,
+    .state                  = 0,
+    .prio                   = 0,
+    .task_id                = 0,
+    .p_lnk                  = NULL,
+    .p_rlnk                 = NULL,
+    .p_dlnk                 = NULL,
+    .p_blnk                 = NULL,
+    .delta_time             = 0,
+    .interval_time          = 0,
+    .events                 = 0,
+    .waits                  = 0,
+    .msg                    = NULL,
+    .ptr_perthread_libspace = NULL,
+    .extdata                = NULL,
+
+    .stack_frame            = 0,
+    .reserved               = 0,
+    .priv_stack             = 0,
+    .tsk_stack              = 0,
+    .stack                  = NULL,
+    .ptask                  = NULL
+};
 
 
 
@@ -174,6 +205,17 @@ static uint8_t s_dbg_previous_id = ev_ID_idle;
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+
+extern void* rt_iit_memory_new(uint32_t size)
+{
+    return(calloc(size, 1));
+}
+
+extern void rt_iit_memory_del(void* mem)
+{
+    free(mem);
+}
+
 extern void rt_iit_dynamic_mode_init(const oosiit_cfg_t *cfg)
 {   
  
@@ -189,7 +231,7 @@ extern void rt_iit_dynamic_mode_init(const oosiit_cfg_t *cfg)
 //    oosiit_hid_params_get_ram64(oosiit_cfg_in_use, ram64size);
 
 
-    os_maxtaskrun = oosiit_cfg_in_use->maxnumofusertasks+2; // adds two: idle and init
+    os_maxtaskrun = 0; //oosiit_cfg_in_use->maxnumofusertasks+2; // adds two: idle and init
 //     os_stackinfo  = (oosiit_cfg_in_use->checkStack << 24) |
 //                     (oosiit_cfg_in_use->numTaskWithUserProvidedStack << 16) |
 //                     (oosiit_cfg_in_use->sizeStack*4);
@@ -249,11 +291,11 @@ extern void rt_iit_dynamic_mode_init(const oosiit_cfg_t *cfg)
     // dyn: os-fifo  
     os_fifo_size = oosiit_cfg_in_use->capacityofpostpendcommandfifo;
     //os_fifo = calloc((sizeof(struct OS_PSQ)-sizeof(struct OS_PSFE))+oosiit_cfg_in_use->capacityofpostpendcommandfifo*sizeof(struct OS_PSFE), 1);
-    os_fifo = oosiit_memory_new((sizeof(struct OS_PSQ)-sizeof(struct OS_PSFE))+oosiit_cfg_in_use->capacityofpostpendcommandfifo*sizeof(struct OS_PSFE));
+    os_fifo = rt_iit_memory_new((sizeof(struct OS_PSQ)-sizeof(struct OS_PSFE))+oosiit_cfg_in_use->capacityofpostpendcommandfifo*sizeof(struct OS_PSFE));
 
     // dyn: active task-control-block table
     //os_active_TCB = (void**) calloc(sizeof(void*), os_maxtaskrun);
-    os_active_TCB = oosiit_memory_new(sizeof(void*)*os_maxtaskrun);
+    os_active_TCB = NULL; //rt_iit_memory_new(sizeof(void*)*os_maxtaskrun);
 
 
     // dyn: tmr
@@ -271,11 +313,7 @@ extern void rt_iit_dynamic_mode_init(const oosiit_cfg_t *cfg)
 
 
     std_libspace = NULL;
-//    std_libspace = (U32 (*)[24])rt_iit_libspace_init();
-//    if(NULL == std_libspace)
-//    {
-//        os_error(0x60000002);    
-//    }
+
 
 
     // initialisation to zero of os variables
@@ -310,8 +348,8 @@ extern void rt_iit_params_init(void)
     }
 
     // cannot initialise if i dont have ram
-    //if((NULL == oosiit_params_ram32data) || (NULL == oosiit_params_ram64data) || (NULL == oosiit_params_stdlib32data))
-    if((NULL == oosiit_params_ram32data) || (NULL == oosiit_params_ram64data))
+    if((NULL == oosiit_params_ram32data) || (NULL == oosiit_params_ram64data) || (NULL == oosiit_params_stdlib32data))
+    //if((NULL == oosiit_params_ram32data) || (NULL == oosiit_params_ram64data))
     {
         os_error(0x60000002);
     }
@@ -436,7 +474,7 @@ extern void rt_iit_params_init(void)
     }
     else
     {
-        os_active_TCB    = 0;
+        os_active_TCB    = NULL;
     }
 
 
@@ -478,12 +516,12 @@ extern void rt_iit_params_init(void)
     }
 
 
-    std_libspace = NULL;
-//    std_libspace = (U32 (*)[24])rt_iit_libspace_init();
-//    if(NULL == std_libspace)
-//    {
-//        os_error(0x60000002);    
-//    }
+//    std_libspace = NULL;
+   std_libspace = (U32 (*)[24])rt_iit_libspace_init();
+   if(NULL == std_libspace)
+   {
+       os_error(0x60000002);    
+   }
 
 
     // initialisation to zero of os variables
@@ -502,39 +540,39 @@ extern void rt_iit_params_init(void)
 }
 
 
-// extern U32* rt_iit_libspace_init(void)
-// {
-//     uint16_t sizes[2];
-//     U32* ret = NULL;
+extern U32* rt_iit_libspace_init(void)
+{
+    uint16_t sizes[2];
+    U32* ret = NULL;
 
-//     if(NULL == oosiit_cfg_in_use)
-//     {
-//         return(NULL);
-//     }
+    if(NULL == oosiit_cfg_in_use)
+    {
+        return(NULL);
+    }
 
 
 
-//     oosiit_hid_params_get_stdlib32(oosiit_cfg_in_use, sizes);
+    oosiit_hid_params_get_stdlib32(oosiit_cfg_in_use, sizes);
 
-//     if(0 != sizes[0])
-//     {   
-//         if(NULL == oosiit_params_stdlib32data)
-//         {
-//             ret = calloc(sizes[0], 4);
-//         }
-//         else
-//         {
-//             ret = &oosiit_params_stdlib32data[0];
-//         }
-//     }
-//     else
-//     {
-//         ret = NULL;
-//     } 
+    if(0 != sizes[0])
+    {   
+        if(NULL == oosiit_params_stdlib32data)
+        {
+            ret = calloc(sizes[0], 4);
+        }
+        else
+        {
+            ret = &oosiit_params_stdlib32data[0];
+        }
+    }
+    else
+    {
+        ret = NULL;
+    } 
 
-//     return(ret);
+    return(ret);
 
-// }
+}
 
 
 extern void rt_iit_time_set(U32 low, U32 high) 
@@ -880,11 +918,11 @@ OS_RESULT iitchanged_rt_evt_wait (EVENT_t wait_flags, TIME_t timeout, BOOL and_w
 } 
 
 
-void iitchanged_rt_evt_set (EVENT_t event_flags, OS_TID task_id) {
+void iitchanged_rt_evt_set (EVENT_t event_flags, OS_TPTR taskp) {
   /* Set one or more event flags of a selectable task. */
-  P_TCB p_tcb;
+  P_TCB p_tcb = (P_TCB) taskp;
 
-  p_tcb = os_active_TCB[task_id-1];
+//  p_tcb = os_active_TCB[task_id-1];
   if (p_tcb == NULL) {
     
     return;
@@ -918,10 +956,11 @@ wkup: p_tcb->events &= ~event_flags;
   
 }
 
-void iitchanged_rt_evt_clr (EVENT_t clear_flags, OS_TID task_id) {
+void iitchanged_rt_evt_clr (EVENT_t clear_flags, OS_TPTR taskp) {
   /* Clear one or more event flags (identified by "clear_flags") of a */
   /* selectable task (identified by "task"). */
-  P_TCB task = os_active_TCB[task_id-1];
+  //P_TCB task = os_active_TCB[task_id-1];
+    P_TCB task = (P_TCB)taskp;
 
   
 
@@ -940,9 +979,10 @@ void iitchanged_rt_evt_clr_runningtask(EVENT_t flags)
 }
 
 
-void iitchanged_isr_evt_set (EVENT_t event_flags, OS_TID task_id) {
+void iitchanged_isr_evt_set (EVENT_t event_flags, OS_TPTR taskp) {
   /* Same function as "os_evt_set", but to be called by ISRs. */
-  P_TCB p_tcb = os_active_TCB[task_id-1];
+  //P_TCB p_tcb = os_active_TCB[task_id-1];
+    P_TCB p_tcb = (P_TCB)taskp;
 
   if (p_tcb == NULL) {
     return;
@@ -1649,6 +1689,7 @@ extern struct OS_XTMR os_tmr; //IIT-EXT
 
 static U8 osiit_init_task_started = 0; // IIT-EXT: allows to give tid 1 only to init_task
 
+#if 0
 OS_TID rt_get_TID (void) {
   U32 tid;
 //  for (tid = 1; tid <= os_maxtaskrun; tid++) {                               // IIT-EXT: removed
@@ -1659,9 +1700,23 @@ OS_TID rt_get_TID (void) {
   }
   return (0);
 }
-
-
-        
+#else
+OS_TID rt_get_TID (void) {
+  U32 tid;
+    static U32 last = 1;
+    
+    if(NULL == os_active_TCB)
+        return(last++);
+    
+  for (tid = (1+osiit_init_task_started); tid <= os_maxtaskrun; tid++) {       // IIT-EXT: added
+    if (os_active_TCB[tid-1] == NULL) {
+      return ((OS_TID)tid);
+    }
+  }
+  return (0);    
+}
+#endif
+    
 
 void rt_iit_sys_start(oosiit_task_properties_t* inittsk, oosiit_task_properties_t* idletsk) 
 { 
@@ -1684,9 +1739,12 @@ void rt_iit_sys_start(oosiit_task_properties_t* inittsk, oosiit_task_properties_
 
 
     // Initialize dynamic memory and task TCB pointers to NULL. 
-    for(i=0; i<os_maxtaskrun; i++) 
+    if(NULL != os_active_TCB)
     {
-        os_active_TCB[i] = NULL;
+        for(i=0; i<os_maxtaskrun; i++) 
+        {
+            os_active_TCB[i] = NULL;
+        }
     }
     if(NULL != mp_tcb)
     {
@@ -1708,6 +1766,7 @@ void rt_iit_sys_start(oosiit_task_properties_t* inittsk, oosiit_task_properties_
     os_idle_TCB.stack           = (uint32_t*)idletsk->stackdata;        //IIT-EXT: now it is passed externally 
     os_idle_TCB.priv_stack      = idletsk->stacksize;                   //IIT-EXT: now it is passed externally 
     os_idle_TCB.msg             = idletsk->param;                       //IIT-EXT: and has a parameter !! 
+    os_idle_TCB.extdata         = idletsk->extdata;
     rt_init_context (&os_idle_TCB, 0, (FUNCP)idletsk->function);        //IIT-EXT: as well as an externally passed function
  
     
@@ -1755,108 +1814,230 @@ void rt_iit_sys_start(oosiit_task_properties_t* inittsk, oosiit_task_properties_
     
     /* Start up first user task before entering the endless loop */
     //rt_tsk_create(first_task, prio_stksz, stk, NULL);
-    uint32_t stacksize24priority08 = ((((uint32_t)(inittsk->stacksize)) << 8)&0xffffff00) | (inittsk->priority&0xff);
-    rt_iit_tsk_create((FUNCP)inittsk->function, stacksize24priority08, (uint32_t*)inittsk->stackdata, inittsk->param);  
+    //uint32_t stacksize24priority08 = ((((uint32_t)(inittsk->stacksize)) << 8)&0xffffff00) | (inittsk->priority&0xff);
+    //rt_iit_tsk_create((FUNCP)inittsk->function, stacksize24priority08, (uint32_t*)inittsk->stackdata, &others); 
+    osiit_hid_tsk_create_other_args_t others;
+    others.priority = inittsk->priority;
+    others.stacksize = inittsk->stacksize;
+    others.extdata = inittsk->extdata;    
+    rt_iit_tsk_create((FUNCP)inittsk->function, inittsk->param, inittsk->stackdata, &others); 
 //#endif    
 }
 
 
-OS_TID rt_iit_tsk_create (FUNCP task, U32 prio_stksz, void *stk, void *argv) {
+
+
+OS_TPTR rt_iit_tsk_create (FUNCP task, void *taskfnarg, void *taskstackdata, osiit_hid_tsk_create_other_args_t* others) {
   /* Start a new task declared with "task". */
   P_TCB task_context;
   U32 i;
+  U8 prio = others->priority;
+  U16 stacksize = others->stacksize;
+  
     
+    // in case of static teh tid is 1.... max-numof-tasks+1.
+    // in case of dynamic teh tid is 1 .... inf
   if(0 == (i = rt_get_TID ())) 
-  { // i move it earliear because ... if i use dynamic memory mode the oosiit_memory_new() is succesful even if we dont have a valid TID anymore
+  { // i move it earliear because ... if i use dynamic memory mode the rt_iit_memory_new() is succesful even if we dont have a valid TID anymore
     return(0);
   }      
 
-  /* Priority 0 is reserved for idle task! */
-  if ((prio_stksz & 0xFF) == 0) {
-    prio_stksz += 1;
+
+//   /* Priority 0 is reserved for idle task! */
+//   if ((prio_stksz & 0xFF) == 0) {
+//     prio_stksz += 1;
+//   }
+  
+  if(0 == prio)
+  {
+      prio = 1;
   }
+  
   if(NULL != mp_tcb)
+  {
     task_context = rt_alloc_box (mp_tcb);
+    if(NULL == task_context)
+    {
+       oosiit_sys_error(oosiit_error_memory_preallocated);
+    }
+  }
   else
+  {
     //task_context = calloc(sizeof(struct OS_TCB), 1);
-    task_context = oosiit_memory_new(sizeof(struct OS_TCB));
+    task_context = rt_iit_memory_new(sizeof(struct OS_TCB));    
+  }
   
   if (task_context == NULL) {
     return (0);
   }
+  
+  task_context->ptr_perthread_libspace = NULL;      // it will be set on demand inside rt_iit_tsk_perthread_libspace_get()
+  task_context->extdata = others->extdata;
+  
   /* If "size != 0" use a private user provided stack. */
-  task_context->stack      = stk;
-  task_context->priv_stack = prio_stksz >> 8;
+  task_context->stack      = taskstackdata;
+  //task_context->priv_stack = prio_stksz >> 8;
+  task_context->priv_stack = stacksize;
   /* Pass parameter 'argv' to 'rt_init_context' */
-  task_context->msg = argv;
+  task_context->msg = taskfnarg;
   /* For 'size == 0' system allocates the user stack from the memory pool. */
-  rt_init_context (task_context, prio_stksz & 0xFF, task);
+  //rt_init_context (task_context, prio_stksz & 0xFF, task);
+  rt_init_context (task_context, prio, task);
 
   /* Find a free entry in 'os_active_TCB' table. */
   //i = rt_get_TID ();
-  os_active_TCB[i-1] = task_context;
+  if(NULL != os_active_TCB)
+    os_active_TCB[i-1] = task_context;
+  else
+    task_context = task_context;
+  
   task_context->task_id = i;
   DBG_TASK_NOTIFY(task_context, __TRUE);
   rt_dispatch (task_context);
-  return ((OS_TID)i);
+  return ((OS_TPTR)task_context);
 }
 
-OS_RESULT rt_iit_tsk_delete (OS_TID task_id) {
-  /* Terminate the task identified with "task_id". */
-  P_TCB task_context;
+OS_TPTR rt_iit_tsk_self (void) {
+  /* Return own task identifier value. */
+  if (os_tsk.run == NULL) {
+    return (NULL);
+  }
+  return (os_tsk.run);
+}
 
-  if (task_id == 0 || task_id == os_tsk.run->task_id) {
+OS_RESULT rt_iit_tsk_prio (OS_TPTR taskp, U8 new_prio) {
+  /* Change execution priority of a task to "new_prio". */
+  P_TCB p_task = (P_TCB)taskp;
+    
+    if(NULL == p_task)
+    {
+        return (OS_R_NOK);    
+    }
+
+  if (p_task == os_tsk.run) {
+    /* Change execution priority of calling task. */
+    os_tsk.run->prio = new_prio;
+run:if (rt_rdy_prio() > new_prio) {
+      rt_put_prio (&os_rdy, os_tsk.run);
+      os_tsk.run->state   = READY;
+      rt_dispatch (NULL);
+    }
+    return (OS_R_OK);
+  }
+
+//   /* Find the task in the "os_active_TCB" array. */
+//   if (task_id > os_maxtaskrun || os_active_TCB[task_id-1] == NULL) {
+//     /* Task with "task_id" not found or not started. */
+//     return (OS_R_NOK);
+//   }
+//  p_task = os_active_TCB[task_id-1];
+  p_task->prio = new_prio;
+  if (p_task == os_tsk.run) {
+    goto run;
+  }
+  rt_resort_prio (p_task);
+  if (p_task->state == READY) {
+    /* Task enqueued in a ready list. */
+    p_task = rt_get_first (&os_rdy);
+    rt_dispatch (p_task);
+  }
+  return (OS_R_OK);
+}
+
+OS_RESULT rt_iit_tsk_delete (OS_TPTR taskp) {
+  /* Terminate the task identified with "task_id". */
+  P_TCB task_context = (P_TCB)taskp; 
+  OS_TID task_id = 0;
+    
+  if(NULL == task_context)
+      return(OS_R_NOK);
+  
+  task_id = task_context->task_id;
+
+  if (task_context == os_tsk.run) {
     /* Terminate itself. */
     os_tsk.run->state     = INACTIVE;
     os_tsk.run->tsk_stack = rt_get_PSP ();
     rt_stk_check ();
-    os_active_TCB[os_tsk.run->task_id-1] = NULL;
+    if(NULL != os_active_TCB)
+        os_active_TCB[os_tsk.run->task_id-1] = NULL;
     if(NULL != mp_stk)
         rt_free_box (mp_stk, os_tsk.run->stack);
     else
-        free(os_tsk.run->stack);
+        rt_iit_memory_del(os_tsk.run->stack);
     os_tsk.run->stack = NULL;
     DBG_TASK_NOTIFY(os_tsk.run, __FALSE);
     if(NULL != mp_tcb)
+    {
+        task_context->ptr_perthread_libspace = NULL;   
         rt_free_box (mp_tcb, os_tsk.run);
+    }
     else
-        free(os_tsk.run);
+    {
+        if(NULL == task_context->ptr_perthread_libspace)
+        {
+            rt_iit_memory_del(task_context->ptr_perthread_libspace);
+        }
+        rt_iit_memory_del(os_tsk.run);
+    }
     os_tsk.run = NULL;
     rt_dispatch (NULL);
     /* The program should never come to this point. */
   }
   else {
     /* Find the task in the "os_active_TCB" array. */
-    if (task_id > os_maxtaskrun || os_active_TCB[task_id-1] == NULL) {
-      /* Task with "task_id" not found or not started. */
-      return (OS_R_NOK);
-    }
-    task_context = os_active_TCB[task_id-1];
+//    if (task_id > os_maxtaskrun || os_active_TCB[task_id-1] == NULL) {
+//      /* Task with "task_id" not found or not started. */
+//      return (OS_R_NOK);
+//    }
+//    task_context = os_active_TCB[task_id-1];
     rt_rmv_list (task_context);
     rt_rmv_dly (task_context);
-    os_active_TCB[task_id-1] = NULL;
+    if(NULL != os_active_TCB)
+        os_active_TCB[task_id-1] = NULL;
     if(NULL != mp_stk)
         rt_free_box (mp_stk, task_context->stack);
     else
-        free(task_context->stack);
+        rt_iit_memory_del(task_context->stack);
     task_context->stack = NULL;
     DBG_TASK_NOTIFY(task_context, __FALSE);
     if(NULL != mp_tcb)
+    {
+        task_context->ptr_perthread_libspace = NULL;
         rt_free_box (mp_tcb, task_context);
+    }
     else
-        free(task_context);
+    {
+        if(NULL == task_context->ptr_perthread_libspace)
+        {
+            rt_iit_memory_del(task_context->ptr_perthread_libspace);
+        }
+        rt_iit_memory_del(task_context);
+    }
   }
   return (OS_R_OK);
 }
 
-void* rt_iit_tsk_perthread_libspace_get(OS_TID task_id)
+void* rt_iit_tsk_perthread_libspace_get(OS_TPTR taskp)
 {
-    P_TCB tc = os_active_TCB[task_id-1];
+    //P_TCB tc = os_active_TCB[task_id-1];
+    P_TCB tc = (P_TCB)taskp;
     if(NULL == tc)
     {
         return(NULL);
     }
-    return(tc->perthread_libspace);  
+    if(NULL == tc->ptr_perthread_libspace)
+    {   // if we dont have ever initted the pointer ....
+        if(NULL == std_libspace)
+        {   // use heap
+            tc->ptr_perthread_libspace = rt_iit_memory_new(96); // 96 because ... see arm documentation
+        }
+        else
+        {   // use preallocated std_libspace
+            tc->ptr_perthread_libspace = (void *)&std_libspace[tc->task_id-1];
+        }
+    }
+    return(tc->ptr_perthread_libspace);  
 }
 
 

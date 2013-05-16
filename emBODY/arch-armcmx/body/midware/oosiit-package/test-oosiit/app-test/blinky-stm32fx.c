@@ -96,8 +96,8 @@ static oosiit_objptr_t s_tmr1sec  = NULL;
 
 static oosiit_objptr_t s_mailbox1 = NULL;
 
-static oosiit_taskid_t s_tskid_evtbased = 0;                        
-static oosiit_taskid_t s_tskid_msgbased = 0;                        
+static oosiit_tskptr_t s_tskid_evtbased = 0;                        
+static oosiit_tskptr_t s_tskid_msgbased = 0;                        
 
 
 static const uint32_t s_event_trigger = 0x00000010;
@@ -146,6 +146,7 @@ int main(void)
     ram64data = (0 == ram64num) ? (NULL) : ((uint64_t*)oosiit_memory_new(ram64num));
     
     oosiit_memory_load(oosiit_cfg_USERptr, ram32data, ram64data);
+    
 
     inittskstacksize = 256;
     inittskstackdata = oosiit_memory_getstack(inittskstacksize);
@@ -215,12 +216,34 @@ extern void oosiit_init(void* p)
 
 
 
-
+extern void *__user_perthread_libspace (void);
 extern void tsk_evtbased(void* p) 
 {
     volatile uint32_t sig = 0;
     uint32_t avail = 0;
     uint8_t i = 0;
+    
+    
+    static volatile void* pp = NULL;
+    
+    pp = __user_perthread_libspace();
+    
+    pp = pp;
+    
+    pp = __user_perthread_libspace();
+    
+    pp = pp;    
+    
+    pp = oosiit_tsk_get_extdata(oosiit_tsk_self());
+    
+    oosiit_tsk_set_extdata(oosiit_tsk_self(), (void*)0x12345678);
+    
+    pp = oosiit_tsk_get_extdata(oosiit_tsk_self());
+    
+    oosiit_tsk_set_extdata(oosiit_tsk_self(), (void*)0x11111111);
+    
+    pp = oosiit_tsk_get_extdata(oosiit_tsk_self());
+    
     for(;;) 
     {
         oosiit_evt_wait(s_event_trigger, OOSIIT_NOTIMEOUT, oosiit_evt_wait_mode_all); 
@@ -320,6 +343,7 @@ static void s_init(void* p)
     tskprop.priority    = 50;
     tskprop.stacksize   = tskstacksize;
     tskprop.stackdata   = tskstackdata;
+    tskprop.extdata     = (void*)0x66667777;
     s_tskid_evtbased    = oosiit_tsk_create(&tskprop);    
     
     
@@ -355,13 +379,26 @@ static void s_init(void* p)
    
 }
 
+
+extern void *__user_perthread_libspace (void);
 static void s_stay(void* p)
 {
-    uint32_t count  = 0;  
+    uint32_t count  = 0; 
+    static volatile void *pp = NULL;    
     
     oosiit_tsk_setprio(oosiit_tsk_self(), 10);
 
     oosiit_itv_set(5000);
+    
+    pp = __user_perthread_libspace();
+    
+    pp = pp;
+    
+    pp = __user_perthread_libspace();
+    
+    pp = pp;
+    
+    
 
     for(;;)
     {

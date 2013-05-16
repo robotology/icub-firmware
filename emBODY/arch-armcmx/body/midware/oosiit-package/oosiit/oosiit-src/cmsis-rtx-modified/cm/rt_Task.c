@@ -46,10 +46,12 @@
  *---------------------------------------------------------------------------*/
 
 /* Running and next task info. */
-struct OS_TSK os_tsk;
+//struct OS_TSK os_tsk;
+
 
 /* Task Control Blocks of idle demon */
-struct OS_TCB os_idle_TCB;
+//struct OS_TCB os_idle_TCB;
+
 
 
 /*----------------------------------------------------------------------------

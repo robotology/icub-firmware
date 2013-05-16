@@ -171,7 +171,7 @@ OS_ID rt_iit_advtmr_new (void)  {
    else
    {
         //p_tmr = calloc(sizeof(struct OSIIT_ADVTMR), 1);
-       p_tmr = oosiit_memory_new(sizeof(struct OSIIT_ADVTMR));
+       p_tmr = rt_iit_memory_new(sizeof(struct OSIIT_ADVTMR));
    }
    
    if (!p_tmr)  {
@@ -816,8 +816,7 @@ static OS_ID s_rt_iit_advtmr_delete (OS_ID timer)  {
    }
    else
    {
-        //free(p_tmr);
-       oosiit_memory_del(p_tmr);
+       rt_iit_memory_del(p_tmr);
    }
 
    /* Timer killed */

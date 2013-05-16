@@ -86,6 +86,7 @@
 #include "stdint.h"
 
 #include "oosiit.h"
+#include "oosiit_hid.h"
 
 #if defined(OOSIIT_DBG_ENABLE_ALL)
 #define OOSIIT_DBG_ENABLE
@@ -136,7 +137,16 @@ typedef unsigned int       BOOL;
 typedef void               (*FUNCP)(void);
 typedef U32     OS_TID;
 typedef void    *OS_ID;
+typedef void*   OS_TPTR;      // points to a struct OS_TCB
 typedef U32     OS_RESULT;
+
+typedef struct
+{
+    void* param;
+    void* extdata;
+} iit_tsk_create_others_t;
+
+
 
 // 
 typedef struct OS_TCB *P_TCB_Opaque; 
@@ -151,7 +161,7 @@ typedef struct OS_TCB *P_TCB_Opaque;
     #define MSB_TIME_t      0x80000000
     #define NOTIMEOUT       0xffffffff
     // EXTRAOFFSET is 4 if TIME_t is U32 and EVENT_t is U16. if both are U32, then it becomes 8.
-    #define EXTRAOFFSET     (8+96)
+    #define EXTRAOFFSET     (8+8)
 // if there is experimental support for send2front in message box ... use 12
 // AS I HAVE ADDED: msgsendmode + dummy1 + dummy2 there are 4 more bytes
 //    #define EXTRAOFFSET     12
@@ -168,16 +178,23 @@ typedef struct OS_TCB *P_TCB_Opaque;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
+extern void* rt_iit_memory_new(uint32_t size);
+
+extern void rt_iit_memory_del(void* mem);
+
 // - sys routines -
 extern void rt_iit_sys_start(oosiit_task_properties_t* inittsk, oosiit_task_properties_t* idletsk);
-extern OS_TID rt_iit_tsk_create (FUNCP task, U32 prio_stksz, void *stk, void *argv);
-extern OS_RESULT rt_iit_tsk_delete (OS_TID task_id);
-extern void* rt_iit_tsk_perthread_libspace_get(OS_TID task_id);
+//extern OS_TPTR rt_iit_tsk_create (FUNCP task, U32 prio_stksz, void *stk, iit_tsk_create_others_t* others);
+OS_TPTR rt_iit_tsk_create (FUNCP task, void *taskfnarg, void *taskstackdata, osiit_hid_tsk_create_other_args_t* others);
+extern OS_TPTR rt_iit_tsk_self (void);
+extern OS_RESULT rt_iit_tsk_prio (OS_TPTR taskp, U8 new_prio);
+extern OS_RESULT rt_iit_tsk_delete (OS_TPTR taskp);
+extern void* rt_iit_tsk_perthread_libspace_get(OS_TPTR taskp);
 
 // - init routines -
 extern void rt_iit_dynamic_mode_init(const oosiit_cfg_t *cfg);
 extern void rt_iit_params_init(void);
-//extern U32* rt_iit_libspace_init(void);
+extern U32* rt_iit_libspace_init(void);
 extern U32* rt_iit_libmutex_init(U8 *nrmutex);
 
 // - time routines -
@@ -193,10 +210,10 @@ extern OS_RESULT iitchanged_rt_mut_wait(OS_ID mutex, TIME_t timeout);
 
 // - event flag management routines -
 extern OS_RESULT iitchanged_rt_evt_wait(EVENT_t wait_flags,  TIME_t timeout, BOOL and_wait); 
-extern void iitchanged_rt_evt_set (EVENT_t event_flags, OS_TID task_id);
-extern void iitchanged_rt_evt_clr (EVENT_t clear_flags, OS_TID task_id);
+extern void iitchanged_rt_evt_set (EVENT_t event_flags, OS_TPTR taskp);
+extern void iitchanged_rt_evt_clr (EVENT_t clear_flags, OS_TPTR taskp);
 extern void iitchanged_rt_evt_clr_runningtask(EVENT_t flags);
-extern void iitchanged_isr_evt_set (EVENT_t event_flags, OS_TID task_id);
+extern void iitchanged_isr_evt_set (EVENT_t event_flags, OS_TPTR taskp);
 extern EVENT_t iitchanged_rt_evt_get (void);
 extern void iitchanged_rt_evt_psh (U32 arg_u32, U32 set_flags);
 

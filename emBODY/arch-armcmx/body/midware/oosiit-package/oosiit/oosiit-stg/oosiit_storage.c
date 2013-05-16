@@ -96,25 +96,27 @@
 // - declarations of extern functions defined in other modules
 // --------------------------------------------------------------------------------------------------------------------
 
-// - the types needed by the funtions 
+// - the types needed by some funtions 
 typedef uint32_t OS_TID;
 typedef uint32_t OS_MUT[3];
 typedef void*    OS_ID;
+typedef void*   OS_TPTR;      // points to a struct OS_TCB
 typedef uint32_t OS_RESULT;
 typedef uint32_t TIME_t;
 
 // - some dependency for functions used in here. these functions are defined inside oosiit.lib
-extern OS_TID    rt_tsk_self(void);
+//extern OS_TID    rt_tsk_self(void);
+extern OS_TPTR rt_iit_tsk_self (void);
 extern void      rt_mut_init(OS_ID mutex);
 extern OS_RESULT iitchanged_rt_mut_wait(OS_ID mutex, TIME_t timeout);
 extern OS_RESULT rt_mut_release(OS_ID mutex);
-extern void* rt_iit_tsk_perthread_libspace_get(OS_TID task_id);
+extern void* rt_iit_tsk_perthread_libspace_get(OS_TPTR taskp);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define runtask_id()    rt_tsk_self()
+//#define runtask_id()    rt_tsk_self()
 #define mutex_init(m)   rt_mut_init(m)
 #define mutex_wait(m)   iitchanged_rt_mut_wait(m, OOSIIT_NOTIMEOUT)
 #define mutex_rel(m)    rt_mut_release(m)
@@ -124,7 +126,7 @@ extern void* rt_iit_tsk_perthread_libspace_get(OS_TID task_id);
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-// holders for memory
+// holders for static memory
 
 // - advanced timers
 uint32_t* oosiit_cfg_advtmr_ptrs                = NULL;
@@ -174,7 +176,7 @@ uint32_t  mp_stk_size                           = 0;
 uint32_t (*std_libspace)[96/4]                  = NULL;
 OS_MUT*   std_libmutex                          = NULL;
 uint8_t   max_nr_mutex                          = 0; 
-extern void  *__libspace_start;             // just declaration, as it is defined elsewhere
+extern void  *__libspace_start;                 // just a declaration, as it is defined elsewhere
 #endif
 
 
@@ -208,15 +210,17 @@ __USED uint32_t os_timernum                     = 0;
 
 // - standard library multithreading interface: begin
 
-#if defined (__CC_ARM) && !defined (__MICROLIB)
+#if     defined (__CC_ARM) && !defined (__MICROLIB)
 
-#ifndef OOSIIT_USE_EXTERNAL_TREADSAFETY
-
+#if     defined(OOSIIT_USE_EXTERNAL_TREADSAFETY)
+    // if defined we dont re-define in here.
+#else
 
 /*--------------------------- __user_perthread_libspace ---------------------*/
 
 void *__user_perthread_libspace (void) {
   /* Provide a separate libspace for each task. */
+#if 0    
   uint32_t idx;
 
   idx = runtask_id ();
@@ -225,7 +229,6 @@ void *__user_perthread_libspace (void) {
     return (&__libspace_start);
   }
 
-#if 0  
     if(NULL == std_libspace)
     {
         oosiit_sys_error(oosiit_error_internal_stdlibspace);    
@@ -233,7 +236,16 @@ void *__user_perthread_libspace (void) {
 
   return ((void *)&std_libspace[idx-1]);
 #else
-    return(rt_iit_tsk_perthread_libspace_get(idx));
+    oosiit_tskptr_t tp = NULL;
+
+    tp = rt_iit_tsk_self();
+    if(NULL == tp)
+    {
+        // oosiit not running yet
+        return (&__libspace_start);
+    }
+
+    return(rt_iit_tsk_perthread_libspace_get(tp));      
 #endif    
 }
 
@@ -271,7 +283,8 @@ int _mutex_initialize(OS_ID *mutex)
 
 __attribute__((used)) void _mutex_acquire (OS_ID *mutex) {
   /* Acquire a system mutex, lock stdlib resources. */
-  if (runtask_id ()) {
+//  if (runtask_id ()) {
+  if(NULL != rt_iit_tsk_self()) {
     /* RTX running, acquire a mutex. */
     mutex_wait (*mutex);
   }
@@ -282,13 +295,14 @@ __attribute__((used)) void _mutex_acquire (OS_ID *mutex) {
 
 __attribute__((used)) void _mutex_release (OS_ID *mutex) {
   /* Release a system mutex, unlock stdlib resources. */
-  if (runtask_id ()) {
+//  if (runtask_id ()) {
+  if(NULL != rt_iit_tsk_self()) {
     /* RTX runnning, release a mutex. */
     mutex_rel (*mutex);
   }
 }
 
-#endif//OOSIIT_USE_EXTERNAL_TREADSAFETY
+#endif//!defined(OOSIIT_USE_EXTERNAL_TREADSAFETY)
 
 
 #endif //defined (__CC_ARM) && !defined (__MICROLIB)

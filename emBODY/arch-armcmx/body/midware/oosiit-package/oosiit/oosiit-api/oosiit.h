@@ -34,7 +34,9 @@ extern "C" {
 
 /* @defgroup oosiit IIT extension to open source CMSIS-RTOS RTX kernel
     The IIT extension to the open source CMSIS-RTOS RTX kernel allows the support to time with 32 bits range, event flags 
-    extended to 32 bits, plus advanced timers with individual callback execution and reload capabilities. 
+    extended to 32 bits, plus advanced timers with individual callback execution and reload capabilities. It also allows
+    using two memory modes: static and dynamic. In the former, the memory of every resource that will be used by the oosiit 
+    is allocated at startup. In dynamic mode, the memory is allocated only when it is effectively required.    
    
     @{		
  **/
@@ -72,7 +74,9 @@ typedef enum
 /** @typedef    typedef uint32_t oosiit_taskid_t 
     @brief      contains the identifier of a oosiit task.
  **/ 
-typedef uint32_t oosiit_taskid_t; 
+//typedef uint32_t oosiit_taskid_t; 
+
+typedef void* oosiit_tskptr_t;
 
 
 /** @typedef    typedef void* oosiit_objptr_t 
@@ -96,22 +100,22 @@ typedef enum
  **/
 typedef struct
 {  
-    uint32_t        cpufreq;                        /**< the clock speed of the MPU in Hz. */                                
-    uint32_t        ticktime;                       /**< the tick period in micro-seconds. */   
+    uint32_t        cpufreq;                        /**< the clock speed of the CPU in Hz. */                                
+    uint32_t        ticktime;                       /**< the tick time of the oosiit in micro-seconds. */   
     uint8_t         capacityofpostpendcommandfifo;  /**< the capacity of FIFO which contains events to be processed in the postPEND following a call of a oosiit function from inside an ISR */     
-    uint8_t         checkstackoverflow;             /**< if 1 at every context switch its is verified if there is a stack overflow. if 0 no check is done. */  
-    uint8_t         memorymode;                     /**< use oosiit_memorymode_t */
-    uint8_t         roundrobinenabled;              /**< if 1 it allows round-robin between the task of same priority. if 0 rr is disabled. */                                                 
-    uint32_t        roundrobinnumberofticks;        /**< the timeslice assigned to each task. in number of ticks*/          
-    uint8_t         maxnumofusertasks;              /**< max number of user tasks (init and idle task are not counted as they are system tasks) */                   
+    uint8_t         checkstackoverflow;             /**< if 1 stack overflow is verified at every context switch. */  
+    uint8_t         memorymode;                     /**< use oosiit_memorymode_t. if oosiit_memmode_static the ram used by oosiit object is preallocated. else, it is allcated in runtime */
+    uint8_t         roundrobinenabled;              /**< if 1 it allows round-robin between the tasks of same priority. */                                                 
+    uint32_t        roundrobinnumberofticks;        /**< the timeslice assigned to each round-robin task expressed in number of ticks */                             
 
     // the following are not relevant if memoryallocation is oosiit_memalloc_atruntime
-    uint8_t         numAdvTimer;                    /**< max number of advanced timers */                            
-    uint8_t         numMutex;                       /**< max number of mutexes */                                              
-    uint8_t         numSemaphore;                   /**< max number of semaphores */                           
-    uint8_t         numMessageBox;                  /**< max number of message boxes */                      
-    uint16_t        numMessageBoxElements;          /**< max number of messages in all the message boxes */                  
-    uint32_t        sizeof64alignedStack;           /**< size of internally allocated memory for the stack of tasks. If 0 all the stacks must be externally generated */                    
+    uint8_t         maxnumofusertasks;              /**< for oosiit_memmode_static case only: max number of user tasks (init and idle task are not counted as they are system tasks) */
+    uint8_t         numAdvTimer;                    /**< for oosiit_memmode_static case only: max number of advanced timers */                            
+    uint8_t         numMutex;                       /**< for oosiit_memmode_static case only: max number of mutexes */                                              
+    uint8_t         numSemaphore;                   /**< for oosiit_memmode_static case only: max number of semaphores */                           
+    uint8_t         numMessageBox;                  /**< for oosiit_memmode_static case only: max number of message boxes */                      
+    uint16_t        numMessageBoxElements;          /**< for oosiit_memmode_static case only: max number of messages in all the message boxes */                  
+    uint32_t        sizeof64alignedStack;           /**< for oosiit_memmode_static case only: size of internally allocated memory for the stack of tasks */                    
 } oosiit_cfg_t;
 
 
@@ -157,7 +161,8 @@ typedef struct
     void*               param;          /**< the param of the function executed by the task.  */
     uint8_t             priority;       /**< the priority of the task. */
     uint16_t            stacksize;      /**< the stack size */
-    uint64_t*           stackdata;      /**< the stack used by the task */   
+    uint64_t*           stackdata;      /**< the stack used by the task */  
+    void*               extdata;        /**< external data which may be useful link to the task */
 } oosiit_task_properties_t;
 
 
@@ -171,8 +176,9 @@ typedef enum
     oosiit_error_isrfifooverflow        = 2,        /**< too many calls from an ISR */
     oosiit_error_mbxoverflow            = 3,        /**< to be undestood */
     oosiit_error_internal_stdlibspace   = 10,       /**< there is no stdlib space available */
-    oosiit_error_internal_sysmutex      = 11,       /**< too many calls to system mutex */
-    oosiit_error_memory_allocation      = 12
+    oosiit_error_internal_sysmutex      = 11,       /**< system mutexes are not enough */
+    oosiit_error_memory_allocation      = 12,       /**< there is not heap anymore */
+    oosiit_error_memory_preallocated    = 13        /**< there is not preallocated memory anymore */
 } oosiit_error_code_t;
 
 
@@ -191,7 +197,7 @@ extern const uint64_t oosiit_asaptime;  // = OOSIIT_ASAPTIME
 // memory functions
 
 /** @fn         extern void* oosiit_memory_new(uint32_t size)
-    @brief      Thread safe memory allocator. It cannot be called from within an ISR. 
+    @brief      Thread safe memory allocator. 
     @param      size            the size of the requested memory in bytes.
     @return     if successful a proper 8-aligned memory pointer, otherwise it returns NULL.
  **/ 
@@ -199,7 +205,7 @@ extern void* oosiit_memory_new(uint32_t size);
 
 
 /** @fn         extern oosiit_result_t oosiit_memory_del(void* mem)
-    @brief      Thread-safe memory free. It cannot be called from within an ISR. 
+    @brief      Thread-safe memory free. 
     @param      mem             the pointer to the memory to be de-allocated.
     @return     if successful oosiit_res_OK, otherwise it returns oosiit_res_NOK (for instance if called with NULL pointer)
  **/ 
@@ -237,17 +243,6 @@ extern uint64_t* oosiit_memory_getstack(uint16_t bytes);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // system functions
-
-// /** @fn         extern oosiit_result_t oosiit_sys_init(void (*inittskfn)(void), uint8_t inittskpriority, void* inittskstackdata, uint16_t inittskstacksize)
-//     @brief      starts the os and executes the init task as defined by the function parameters. from inside this task, usually terminated at 
-//                 the end, the user can launch other tasks. 
-//     @param      inittskfn           the function executed by the init task.
-//     @param      inittskpriority     the priority of teh init task
-//     @param      inittskstackdata    the stack used by teh init task.
-//     @param      inittskstacksize    the size of teh stack used by the init task
-//     @return     if succesuful it never returns, otherwise it returns oosiit_res_NOK (for instance if called from within an ISR or if parameters are incorrect)
-//  **/ 
-// extern oosiit_result_t oosiit_sys_init(void (*inittskfn)(void), uint8_t inittskpriority, void* inittskstackdata, uint16_t inittskstacksize);
 
 
 /** @fn         extern oosiit_result_t oosiit_sys_start(oosiit_task_properties_t* tskinit, oosiit_task_properties_t* tskidle)
@@ -287,64 +282,84 @@ extern void oosiit_sys_error(oosiit_error_code_t errorcode);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // task functions
 
-extern oosiit_taskid_t oosiit_tsk_create_oldversion(void (*tskfn)(void *), void *tskfnarg, uint8_t tskpriority, void *tskstackdata, uint16_t tskstacksize);
-
  
-/** @fn         extern oosiit_taskid_t oosiit_tsk_create(oosiit_task_properties_t* tskprop)
+/** @fn         extern oosiit_tskptr_t oosiit_tsk_create(oosiit_task_properties_t* tskprop)
     @brief      Creates and starts a task.
     @param      tskprop     the properties that a task must have
-    @return     The ID of the ID of the task or 0 upon failure. 
-    @warning    The function cannot be called from within an ISR. This operation consumes one task control block and thus
-                reduces the total amount of still available user tasks specified in configuration loaded with oosiit_memory_load()
+    @return     The descriptor of the task or NULL upon failure. 
+    @warning    The function cannot be called from within an ISR. In oosiit_memmode_static memory mode this operation consumes one task 
+                control block and thus  reduces the total amount of still available user tasks specified in configuration loaded with 
+                oosiit_memory_load()
  **/ 
-extern oosiit_taskid_t oosiit_tsk_create(oosiit_task_properties_t* tskprop);
+extern oosiit_tskptr_t oosiit_tsk_create(oosiit_task_properties_t* tskprop);
 
 
-/** @fn         extern oosiit_result_t oosiit_tsk_delete(oosiit_taskid_t tskid)
+/** @fn         extern oosiit_result_t oosiit_tsk_delete(oosiit_tskptr_t tp)
     @brief      deletes a task and free one task control block.
-    @param      tskid       the ID of the task
+    @param      tp       the descriptor of the task
     @return     if succesuful oosiit_res_OK, otherwise it returns oosiit_res_NOK. 
     @warning    The function cannot be called from within an ISR. The stack of the function is NOT automatically released
                 and if needed must be managed by the user. After this operation, instead, the number of available user tasks
                 is incread by one.
  **/
-extern oosiit_result_t oosiit_tsk_delete(oosiit_taskid_t tskid);
+extern oosiit_result_t oosiit_tsk_delete(oosiit_tskptr_t tp);
 
 
-/** @fn         extern oosiit_taskid_t oosiit_tsk_self(void)
-    @brief      retrieves teh ID of the calling task.
-    @return     The ID of the ID of the task or 0 upon failure. 
+/** @fn         extern oosiit_tskptr_t oosiit_tsk_self(void)
+    @brief      retrieves the descriptor of the calling task.
+    @return     The descriptor of the task or NULL upon failure. 
     @warning    The function CAN be called from within an ISR.
  **/ 
-extern oosiit_taskid_t oosiit_tsk_self(void);
+extern oosiit_tskptr_t oosiit_tsk_self(void);
 
 
-/** @fn         extern oosiit_result_t oosiit_tsk_setprio(oosiit_taskid_t tskid, uint8_t tskpriority)
+/** @fn         extern oosiit_result_t oosiit_tsk_setprio(oosiit_tskptr_t tp, uint8_t tskpriority)
     @brief      changes the priority of the task specified.
-    @param      tskid           the ID of the task
+    @param      tp       the descriptor of the task
     @param      tskpriority     the new priority
     @return     if succesuful oosiit_res_OK, otherwise it returns oosiit_res_NOK. 
     @warning    The function cannot be called from within an ISR.
  **/
-extern oosiit_result_t oosiit_tsk_setprio(oosiit_taskid_t tskid, uint8_t tskpriority);
+extern oosiit_result_t oosiit_tsk_setprio(oosiit_tskptr_t tp, uint8_t tskpriority);
 
 
 /** @fn         extern oosiit_result_t oosiit_tsk_pass(void)
     @brief      used in round-robin to force a context switch and thus passing execution to the next task of same priority
-    @return     if succesuful oosiit_res_OK, otherwise it returns oosiit_res_NOK. 
+    @return     if successful oosiit_res_OK, otherwise it returns oosiit_res_NOK. 
     @warning    The function cannot be called from within an ISR.
  **/
 extern oosiit_result_t oosiit_tsk_pass(void);
 
-/** @fn         extern void* oosiit_tsk_get_perthread_libspace(oosiit_taskid_t tskid)
+
+/** @fn         extern void* oosiit_tsk_get_perthread_libspace(oosiit_tskptr_t tp)
     @brief      returns a pointer to 96 bytes used to store data that is local to this thread.
-    @param      tskid           the ID of the task
+    @param      tp       the descriptor of the task
     @return     if successful the pointer, otherwise it returns NULL. 
  **/
-extern void* oosiit_tsk_get_perthread_libspace(oosiit_taskid_t tskid);
+extern void* oosiit_tsk_get_perthread_libspace(oosiit_tskptr_t tp);
+
+
+/** @fn         extern oosiit_result_t oosiit_tsk_set_extdata(oosiit_tskptr_t tp, void* extdata)
+    @brief      allows associating some external data to the task.
+    @param      tp       the descriptor of the task
+    @param      extdata  the pointer to the data to be associated to the task
+    @return     if successful oosiit_res_OK, otherwise it returns oosiit_res_NOK 
+ **/
+extern oosiit_result_t oosiit_tsk_set_extdata(oosiit_tskptr_t tp, void* extdata);
+
+
+/** @fn         extern void* oosiit_tsk_get_extdata(oosiit_tskptr_t tp)
+    @brief      allows retrieving the external data associated to the task.
+    @param      tp       the descriptor of the task
+    @param      extdata  the pointer to the data to be associated to the task
+    @return     if successful the pointer, otherwise it returns NULL. 
+ **/
+extern void* oosiit_tsk_get_extdata(oosiit_tskptr_t tp);
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // time functions
+
 
 /** @fn         extern uint64_t oosiit_time_get(void)
     @brief      Returns the time since last bootstrap in system ticks.
@@ -455,13 +470,13 @@ extern uint16_t oosiit_mbx_used(oosiit_objptr_t mailbox);
 // event flag functions
 
 
-/** @fn         extern oosiit_result_t oosiit_evt_set(uint32_t flags, oosiit_taskid_t tskid)
+/** @fn         extern oosiit_result_t oosiit_evt_set(uint32_t flags, oosiit_tskptr_t tp)
     @brief      It sends the event flags specified by @e flags to the task @e taskid. The function can be called also by an ISR.
     @param      flags           the mask of the event flags to be sent to the task.
     @param      tskid           the task.
     @return     oosiit_res_NOK if the specified task is invalid, oosiit_res_OK in all other cases.
  **/ 
-extern oosiit_result_t oosiit_evt_set(uint32_t flags, oosiit_taskid_t tskid);
+extern oosiit_result_t oosiit_evt_set(uint32_t flags, oosiit_tskptr_t tp);
 
 
 /** @fn         extern oosiit_result_t oosiit_evt_wait(uint32_t waitflags,  uint32_t timeout, oosiit_evt_wait_mode_t waitmode)
@@ -639,7 +654,6 @@ extern oosiit_result_t oosiit_advtmr_isactive(oosiit_objptr_t timer);
 extern oosiit_result_t oosiit_advtmr_delete(oosiit_objptr_t timer);
 
 
-//#error --> vedere DBG_TASK_NOTIFY, etc.
 
 /* @}            
     end of group oosiit  

@@ -65,7 +65,7 @@
     #define TAKE_MUTEX(m, t) 
     #define RELEASE_MUTEX(m)    
 #else
-    #define ALLOC_MUTEX()       oosiit_memory_new(sizeof(struct OS_MUCB))
+    #define ALLOC_MUTEX()       rt_iit_memory_new(sizeof(struct OS_MUCB))
     #define TAKE_MUTEX(m, t)    (NULL == m) ? (;) : (iitchanged_rt_mut_wait(m, t))
     #define RELEASE_MUTEX(m)    (NULL == m) ? (;) : (rt_mut_release(m))
 #endif  
@@ -162,14 +162,14 @@ extern OS_ID rt_iit_memory_getmut(void)
     
     if(NULL == oosiit_cfg_mutex)
     {
-        //ret = calloc(sizeof(struct OS_MUCB), 1);
-        ret = oosiit_memory_new(sizeof(struct OS_MUCB));
+        ret = rt_iit_memory_new(sizeof(struct OS_MUCB));
     }
     else
     {    
         if(((U32)s_index_mutex + sizeof(struct OS_MUCB) - (U32)oosiit_cfg_mutex) > oosiit_cfg_mutex_size)
         {
             RELEASE_MUTEX(s_mutex_memory);
+            oosiit_sys_error(oosiit_error_memory_preallocated);
             return(NULL);   // dont have any memory anymore or it was empty (every var above is NULL or zero)
         }
         
@@ -200,8 +200,7 @@ extern OS_ID rt_iit_memory_getsem(void)
     
     if(NULL == oosiit_cfg_semaphore)
     {
-        //ret = calloc(sizeof(struct OS_SCB), 1);
-        ret = oosiit_memory_new(sizeof(struct OS_SCB));
+        ret = rt_iit_memory_new(sizeof(struct OS_SCB));
     }
     else
     {
@@ -209,6 +208,7 @@ extern OS_ID rt_iit_memory_getsem(void)
         if(((U32)s_index_semaphore + sizeof(struct OS_SCB) - (U32)oosiit_cfg_semaphore) > oosiit_cfg_semaphore_size)
         {
             RELEASE_MUTEX(s_mutex_memory);   
+            oosiit_sys_error(oosiit_error_memory_preallocated);
             return(NULL);   // dont have any memory anymore or it was empty (every var above is NULL or zero)
         }
         
@@ -240,8 +240,7 @@ extern OS_ID rt_iit_memory_getmbx(U16 nitems)
     
     if(NULL == oosiit_cfg_mbox)
     {
-        //ret = calloc((sizeof(struct OS_MCB)-sizeof(void*))+nitems*sizeof(void*), 1);
-        ret = oosiit_memory_new((sizeof(struct OS_MCB)-sizeof(void*))+nitems*sizeof(void*));
+        ret = rt_iit_memory_new((sizeof(struct OS_MCB)-sizeof(void*))+nitems*sizeof(void*));
     }
     else
     {
@@ -249,6 +248,7 @@ extern OS_ID rt_iit_memory_getmbx(U16 nitems)
         if(((U32)s_index_mbox + ((sizeof(struct OS_MCB)-4)+4*nitems) - (U32)oosiit_cfg_mbox) > oosiit_cfg_mbox_size)
         {
             RELEASE_MUTEX(s_mutex_memory);
+            oosiit_sys_error(oosiit_error_memory_preallocated);
             return(NULL);   // dont have any memory anymore or it was empty (every var above is NULL or zero)
         }
         
@@ -284,8 +284,7 @@ extern U64* rt_iit_memory_getstack(U16 nbytes)
     
     if(NULL == oosiit_cfg_globstack)
     {
-        //ret = calloc(items, 8);
-        ret = oosiit_memory_new(8*items);
+        ret = rt_iit_memory_new(8*items);
         memset(ret, 0x11, 8*items);
     }
     else
@@ -294,6 +293,7 @@ extern U64* rt_iit_memory_getstack(U16 nbytes)
         if(((U32)s_index_stack + (items)*8 - (U32)oosiit_cfg_globstack) > oosiit_cfg_globstack_size)
         {
             RELEASE_MUTEX(s_mutex_memory); 
+            oosiit_sys_error(oosiit_error_memory_preallocated);
             return(NULL);   // dont have any memory anymore or it was empty (every var above is NULL or zero)
         }
         

@@ -73,7 +73,9 @@ typedef struct OS_TCB {
 //  U8     dummy1;                    //IIT-EXT: for sent2front
 //  U16    dummy2;                    //IIT-EXT: for sent2front
   void   **msg;                   /* Direct message passing when task waits  */
-  U8    perthread_libspace[96];
+  //U8    perthread_libspace[96];
+  void   *ptr_perthread_libspace;
+  void   *extdata;
 
   /* Hardware dependant part: specific for CM processor                      */
   U8     stack_frame;             /* Stack frame: 0=Basic, 1=Extended        */
