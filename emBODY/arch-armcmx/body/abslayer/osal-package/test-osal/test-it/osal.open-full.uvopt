@@ -200,7 +200,7 @@
         <Mm>
           <WinNumber>1</WinNumber>
           <SubType>0</SubType>
-          <ItemText>countfive</ItemText>
+          <ItemText>0x200008f8</ItemText>
         </Mm>
       </MemoryWindow1>
       <DebugFlag>
@@ -924,7 +924,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>111</TopLine>
+      <TopLine>112</TopLine>
       <CurrentLine>116</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app-test\blinky-osal-stm32fx.c</PathWithFileName>
@@ -940,8 +940,8 @@
       <Focus>0</Focus>
       <ColumnNumber>29</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>7</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app-test\brd_mcbstm32x.c</PathWithFileName>
       <FilenameWithoutPath>brd_mcbstm32x.c</FilenameWithoutPath>
@@ -964,8 +964,8 @@
       <Focus>0</Focus>
       <ColumnNumber>6</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>122</TopLine>
-      <CurrentLine>124</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\sys\mid\src\system_stm32f10x.c</PathWithFileName>
       <FilenameWithoutPath>system_stm32f10x.c</FilenameWithoutPath>
@@ -1084,8 +1084,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>50</TopLine>
-      <CurrentLine>57</CurrentLine>
+      <TopLine>195</TopLine>
+      <CurrentLine>225</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\osal-cfg\osal_cfg-open-stm32f1.h</PathWithFileName>
       <FilenameWithoutPath>osal_cfg-open-stm32f1.h</FilenameWithoutPath>
@@ -1128,7 +1128,7 @@
 
   <Group>
     <GroupName>osal</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1138,10 +1138,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>5</ColumnNumber>
+      <ColumnNumber>34</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>658</TopLine>
-      <CurrentLine>673</CurrentLine>
+      <TopLine>852</TopLine>
+      <CurrentLine>864</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\osal\osal-src\osal-oosiit.c</PathWithFileName>
       <FilenameWithoutPath>osal-oosiit.c</FilenameWithoutPath>
@@ -1196,8 +1196,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\sys\mid\inc\oosiit_storage.c</PathWithFileName>
       <FilenameWithoutPath>oosiit_storage.c</FilenameWithoutPath>

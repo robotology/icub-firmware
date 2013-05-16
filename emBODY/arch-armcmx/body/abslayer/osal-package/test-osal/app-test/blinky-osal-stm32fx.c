@@ -129,7 +129,7 @@ int main(void)
     
     osal_base_memory_getsize(osal_cfg_USERptr, &ram64size);
 
-    if(NULL != ram64data)
+    if(0 != ram64size)
     {
         ram64data = (uint64_t*)osal_base_memory_new(ram64size);
     }
@@ -152,9 +152,23 @@ int main(void)
 
 static void s_launcher(void) 
 {
+    static volatile int ciao = 0;
+    osal_task_t *myself = osal_task_get(osal_callerAUTOdetect);
     s_init();
- 
     s_stay();
+//     
+//     ciao ++;
+//     
+//     myself = osal_task_get(osal_callerAUTOdetect);
+//     osal_task_delete(myself);
+//     
+//     ciao ++;
+//     if(33 == ciao)
+//     {
+//         ciao = 44;
+//     }
+//  
+
 }
 
 
