@@ -595,6 +595,36 @@ extern osal_result_t osal_task_period_wait(void)
     return(osal_res_OK);
 }
 
+extern osal_result_t osal_task_delete(osal_task_t *tsk)
+{
+    osal_task_id_t rtosid = 0;
+    
+    if(NULL == tsk)
+    {
+        return(osal_res_NOK_nullpointer);
+    }
+    
+    // some tasks could call it at the same time ... better to protect
+    osal_mutex_take(s_osal_mutex_api_protection, OSAL_reltimeINFINITE);   
+        
+     
+    rtosid = tsk->rtosid;
+    
+    s_resources_used[osal_info_entity_task] --;
+
+
+    osal_mutex_release(s_osal_mutex_api_protection);
+    
+    // MUST be the last operation because ... in case of auto-delete the function
+    // oosiit_tsk_delete() internally forces a contex switch and current task is not executed anymore
+    // thus isntructions after oosiit_tsk_delete() are not executed 
+    os_tsk_delete(rtosid);     
+    // in case of auto-delete any instruction after this comment is not executed .....  
+
+    
+    return(osal_res_OK);    
+}
+
 extern osal_result_t osal_task_priority_get(osal_task_t *tsk, uint8_t *prio)
 {
 

@@ -825,7 +825,7 @@
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
             <VariousControls>
-              <MiscControls></MiscControls>
+              <MiscControls>--c99</MiscControls>
               <Define>OOSIIT_USE_EXTERNAL_TREADSAFETY OSAL_CPUFAM_CM3</Define>
               <Undefine></Undefine>
               <IncludePath>..\osal\osal-api;..\..\..\..\sys\mid\api;..\..\..\..\sys\mid\inc</IncludePath>
@@ -1303,7 +1303,7 @@
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
             <VariousControls>
-              <MiscControls></MiscControls>
+              <MiscControls>--c99</MiscControls>
               <Define>OOSIIT_USE_EXTERNAL_TREADSAFETY OSAL_CPUFAM_CM4</Define>
               <Undefine></Undefine>
               <IncludePath>..\osal\osal-api;..\..\..\..\sys\mid\api;..\..\..\..\sys\mid\inc</IncludePath>
@@ -1781,7 +1781,7 @@
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
             <VariousControls>
-              <MiscControls></MiscControls>
+              <MiscControls>--c99</MiscControls>
               <Define>OOSIIT_USE_EXTERNAL_TREADSAFETY OSAL_CPUFAM_CM4</Define>
               <Undefine></Undefine>
               <IncludePath>..\osal\osal-api;..\..\..\..\sys\mid\api;..\..\..\..\sys\mid\inc</IncludePath>

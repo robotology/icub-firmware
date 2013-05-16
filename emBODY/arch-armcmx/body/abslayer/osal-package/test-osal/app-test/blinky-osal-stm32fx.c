@@ -153,21 +153,21 @@ int main(void)
 static void s_launcher(void) 
 {
     static volatile int ciao = 0;
-    osal_task_t *myself = osal_task_get(osal_callerAUTOdetect);
+    osal_task_t *myself = osal_task_get(osal_callerTSK);
     s_init();
-    s_stay();
-//     
-//     ciao ++;
-//     
-//     myself = osal_task_get(osal_callerAUTOdetect);
-//     osal_task_delete(myself);
-//     
-//     ciao ++;
-//     if(33 == ciao)
-//     {
-//         ciao = 44;
-//     }
-//  
+//    s_stay();
+    
+    ciao ++;
+    
+    myself = osal_task_get(osal_callerTSK);
+    osal_task_delete(myself);
+    
+    ciao ++;
+    if(33 == ciao)
+    {
+        ciao = 44;
+    }
+ 
 
 }
 

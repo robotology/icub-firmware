@@ -84,38 +84,37 @@ extern const osal_abstime_t osal_abstimeNONE        = OSAL_abstimeNONE;
 typedef uint32_t OOSIIT_MUT[3];
 
 
-enum {osal_task_signature = 0x66};
+enum {osal_task_signature = 0x33};
 
 struct osal_task_opaque_t 
 {   // 4+1+1+2+4+4 = 16 bytes
     void*           rtostsk;
-    uint8_t         signature;
+    uint8_t         signtsk;
     uint8_t         prio;
     uint16_t        stksize;
     uint64_t        *stkdata;
     void            *ext;
 };
 
-struct osal_timer_opaque_t 
-{
-    void*           rtostmr;
-    uint32_t        signature;
-};
 
-struct osal_messagequeue_opaque_t
-{
-    uint32_t rtosdata;
-};
+typedef struct
+{   // 16 bytes
+    void*           rtosobj;
+    uint32_t        signature;   
+} osal_obj_t;
 
-struct osal_mutex_opaque_t
-{   
-    uint32_t rtosdata;
-};
+enum {osal_timer_signature = 0x01234544};
+typedef osal_obj_t osal_timer_opaque_t;
 
-struct osal_semaphore_opaque_t
-{
-    uint32_t rtosdata;
-};
+enum {osal_messagequeue_signature = 0x01234555};
+typedef osal_obj_t osal_messagequeue_opaque_t;
+
+enum {osal_mutex_signature = 0x01234566};
+typedef osal_obj_t osal_mutex_opaque_t;
+
+enum {osal_semaphore_signature = 0x01234577};
+typedef osal_obj_t osal_semaphore_opaque_t;
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -136,12 +135,20 @@ static uint32_t s_osal_delay2tick(osal_reltime_t delay);
 static uint64_t s_osal_abstime2tick(osal_abstime_t time);
 static uint32_t s_osal_period2tick(osal_reltime_t period);
 
+static osal_obj_t* s_osal_osalobj_new(void *rtosobj, uint32_t signature);
+static void* s_osal_rtosobj_get(osal_obj_t *osalobj, uint32_t signature);
+static void s_osal_rtosobj_clr(osal_obj_t *osalobj);
+
+static void s_osal_taskobj_init(void* memory);
+static osal_task_t* s_osal_taskobj_new(void);
+static void s_osal_taskobj_del(osal_task_t* taskobj);
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static osal_cpufamily_t s_osal_cpufam = 
+static const osal_cpufamily_t s_osal_cpufam = 
 #if defined(OSAL_CPUFAM_CM3)
     osal_cpufam_armcm3;
 #elif defined(OSAL_CPUFAM_CM4)
@@ -175,14 +182,8 @@ static uint8_t s_osal_task_maxnum = 0;
 static uint8_t s_osal_task_next = 0;
 
 // special system tasks ...
-static osal_task_t* s_osal_task_launcher;
-static osal_task_t* s_osal_task_idle;
-
-
-// memory used to store osal_timer data.
-static osal_timer_t *s_osal_timer_data = NULL;
-static uint8_t s_osal_timer_maxnum = 0;
-static uint8_t s_osal_timer_next = 0;
+static osal_task_t* s_osal_task_launcher = NULL;
+static osal_task_t* s_osal_task_idle = NULL;
 
 // indicates how many usec in a tick. used for time conversion
 static uint32_t s_osal_usec_in_tick = 0;
@@ -345,21 +346,26 @@ extern osal_result_t osal_base_initialise(const osal_cfg_t *cfg, uint64_t *data0
     memset(s_osal_stackidle_data, 0xEE, s_osal_stackidle_size);    
     
     // memory for task pointers
-    if(osal_memmode_static == cfg->memorymodel)
-    {
-        s_osal_task_data = (osal_task_t*)(data08aligned + (size04+7)/8 + (size08+7)/8 + (cfg->launcherstacksize+7)/8 + (cfg->idlestacksize+7)/8);
-        s_osal_task_idle = &s_osal_task_data[0];
-        s_osal_task_launcher = &s_osal_task_data[1];
-        s_osal_task_maxnum = cfg->tasknum + 2;
-        s_osal_task_next = 2;
-    } 
-    else
-    {   // only the launcher and the init
-        s_osal_task_data = NULL;
-        s_osal_task_idle = osal_base_memory_new(sizeof(osal_task_t));
-        s_osal_task_launcher = osal_base_memory_new(sizeof(osal_task_t));
-        //osal_base_memory_new(sizeof(osal_task_t)*(0 + 2)); // NULL; //osal_base_memory_new(sizeof(osal_task_t)*(cfg->tasknum + 2));
-    }
+//     if(osal_memmode_static == cfg->memorymodel)
+//     {
+//         s_osal_task_data = (osal_task_t*)(data08aligned + (size04+7)/8 + (size08+7)/8 + (cfg->launcherstacksize+7)/8 + (cfg->idlestacksize+7)/8);
+//         s_osal_task_idle = &s_osal_task_data[0];
+//         s_osal_task_launcher = &s_osal_task_data[1];
+//         s_osal_task_maxnum = cfg->tasknum + 2;
+//         s_osal_task_next = 2;
+//     } 
+//     else
+//     {   // only the launcher and the init
+//         s_osal_task_data = NULL;
+//         s_osal_task_idle = osal_base_memory_new(sizeof(osal_task_t));
+//         s_osal_task_launcher = osal_base_memory_new(sizeof(osal_task_t));
+//         //osal_base_memory_new(sizeof(osal_task_t)*(0 + 2)); // NULL; //osal_base_memory_new(sizeof(osal_task_t)*(cfg->tasknum + 2));
+//     }
+
+    s_osal_taskobj_init((data08aligned + (size04+7)/8 + (size08+7)/8 + (cfg->launcherstacksize+7)/8 + (cfg->idlestacksize+7)/8));
+    
+    s_osal_task_idle        = s_osal_taskobj_new();
+    s_osal_task_launcher    = s_osal_taskobj_new();
     
 
     s_osal_usec_in_tick = cfg->tick;
@@ -425,7 +431,7 @@ extern void osal_system_start(void (*launcher_fn)(void))
     // as we dont call an explicit oosiit_tsk_create() which gives a oosiit_tskptr_t, 
     // the task idle itself inside s_osal_on_idle() must call: s_osal_task_idle->rtostsk = oosiit_tsk_self()  
     s_osal_task_idle->rtostsk       = NULL;
-    s_osal_task_idle->signature     = osal_task_signature;
+    s_osal_task_idle->signtsk       = osal_task_signature;
     s_osal_task_idle->prio          = osal_prio_systsk_idle;
     s_osal_task_idle->stksize       = s_osal_stackidle_size;
     s_osal_task_idle->stkdata       = s_osal_stackidle_data;
@@ -442,7 +448,7 @@ extern void osal_system_start(void (*launcher_fn)(void))
     // as we dont call an explicit oosiit_tsk_create() which gives a oosiit_tskptr_t, 
     // the task launcher itself inside osal_launcher() must call: s_osal_task_launcher->rtostsk = oosiit_tsk_self()
     s_osal_task_launcher->rtostsk   = NULL;
-    s_osal_task_launcher->signature = osal_task_signature;
+    s_osal_task_launcher->signtsk   = osal_task_signature;
     s_osal_task_launcher->prio      = osal_prio_systsk_launcher;
     s_osal_task_launcher->stksize   = s_osal_stacklauncher_size; 
     s_osal_task_launcher->stkdata   = &s_osal_stacklauncher_data[0]; 
@@ -590,21 +596,29 @@ extern osal_task_t * osal_task_new(void (*run_fn)(void*), void *run_arg, uint8_t
     // protect vs concurrent call
     osal_mutex_take(s_osal_mutex_api_protection, OSAL_reltimeINFINITE);
     
-    // can we proceed in getting the task? if dynamic mode yes. if static mode ... lets see
-    if(NULL != s_osal_task_data)
+//     // can we proceed in getting the task? if dynamic mode yes. if static mode ... lets see
+//     if(NULL != s_osal_task_data)
+//     {
+//         if(s_osal_task_next >= s_osal_task_maxnum)
+//         {
+//             // cannot get a task
+//             s_osal_error(osal_error_missingmemory, "osal: missing mem for osal_task_t (static mode) in osal_task_new()");
+//             osal_mutex_release(s_osal_mutex_api_protection);
+//             return(NULL);        
+//         }
+//         retval = &s_osal_task_data[s_osal_task_next++];
+//     }
+//     else
+//     {
+//         retval = osal_base_memory_new(sizeof(osal_task_t)); 
+//     }
+//     
+    retval = s_osal_taskobj_new();    
+    if(NULL == retval)
     {
-        if(s_osal_task_next >= s_osal_task_maxnum)
-        {
-            // cannot get a task
-            s_osal_error(osal_error_missingmemory, "osal: missing mem for osal_task_t (static mode) in osal_task_new()");
-            osal_mutex_release(s_osal_mutex_api_protection);
-            return(NULL);        
-        }
-        retval = &s_osal_task_data[s_osal_task_next++];
-    }
-    else
-    {
-        retval = osal_base_memory_new(sizeof(osal_task_t)); 
+        s_osal_error(osal_error_missingmemory, "osal: missing mem for osal_task_t in osal_task_new()");
+        osal_mutex_release(s_osal_mutex_api_protection);
+        return(NULL);        
     }
        
     
@@ -646,7 +660,7 @@ extern osal_task_t * osal_task_new(void (*run_fn)(void*), void *run_arg, uint8_t
     
     // init the returning osal task
     retval->rtostsk    = rtostsk;
-    retval->signature  = osal_task_signature;
+    retval->signtsk    = osal_task_signature;
     retval->prio       = prio;
     retval->stksize    = stksize;
     retval->stkdata    = stack;
@@ -711,7 +725,7 @@ extern osal_result_t osal_task_delete(osal_task_t *tsk)
     // some tasks could call it at the same time ... better to protect
     osal_mutex_take(s_osal_mutex_api_protection, OSAL_reltimeINFINITE);   
         
-    if((NULL == tsk->rtostsk) || (osal_task_signature != tsk->signature))
+    if((NULL == tsk->rtostsk) || (osal_task_signature != tsk->signtsk))
     {   // if the caller has used a proper tsk. it may be that another task has already or just deleted the task.
         osal_mutex_release(s_osal_mutex_api_protection);
         return(osal_res_NOK_generic);
@@ -728,16 +742,13 @@ extern osal_result_t osal_task_delete(osal_task_t *tsk)
     // reset the data pointed by tsk so that another task calling osal_tsk_* functions with the same tsk
     // exits gracefully ... until the same memory is used for something else....    
     tsk->rtostsk        = NULL;
-    tsk->signature      = 0;
+    tsk->signtsk        = 0;
     tsk->prio           = 0;
     tsk->stksize        = 0;
     tsk->stkdata        = NULL;
     tsk->ext            = NULL;       
     
-    if(NULL == s_osal_task_data)
-    {   
-        osal_base_memory_del(tsk);
-    }        
+    s_osal_taskobj_del(tsk);      
  
     osal_mutex_release(s_osal_mutex_api_protection);
     
@@ -759,7 +770,7 @@ extern osal_result_t osal_task_priority_get(osal_task_t *tsk, uint8_t *prio)
         return(osal_res_NOK_nullpointer);
     }
     
-    if((NULL == tsk->rtostsk) || (osal_task_signature != tsk->signature))
+    if((NULL == tsk->rtostsk) || (osal_task_signature != tsk->signtsk))
     {
         return(osal_res_NOK_generic);
     }
@@ -785,7 +796,7 @@ extern osal_result_t osal_task_priority_set(osal_task_t *tsk, uint8_t prio)
     // some tasks could call it at the same time ... better to protect
     osal_mutex_take(s_osal_mutex_api_protection, OSAL_reltimeINFINITE);
         
-    if((NULL == tsk->rtostsk) || (osal_task_signature != tsk->signature))
+    if((NULL == tsk->rtostsk) || (osal_task_signature != tsk->signtsk))
     {
         osal_mutex_release(s_osal_mutex_api_protection);
         return(osal_res_NOK_generic);
@@ -800,17 +811,22 @@ extern osal_result_t osal_task_priority_set(osal_task_t *tsk, uint8_t prio)
     return(osal_res_OK);
 }
 
-// extern osal_result_t osal_task_id_get(osal_task_t *tsk, osal_task_id_t *id)
-// {
-//     if((NULL == tsk) || (NULL == id))
-//     {
-//         return(osal_res_NOK_nullpointer);
-//     }
-//     
-//     *id = 0;
+extern osal_result_t osal_task_id_get(osal_task_t *tsk, osal_task_id_t *id)
+{
+    if((NULL == tsk) || (NULL == id))
+    {
+        return(osal_res_NOK_nullpointer);
+    }
+ 
+    if((NULL == tsk->rtostsk) || (osal_task_signature != tsk->signtsk))
+    {
+        return(osal_res_NOK_generic);
+    } 
+    
+    *id = 0;
 
-//     return(osal_res_OK);
-// }
+    return(osal_res_OK);
+}
 
 extern osal_result_t osal_task_extdata_set(osal_task_t *tsk, void *ext)
 {
@@ -822,7 +838,7 @@ extern osal_result_t osal_task_extdata_set(osal_task_t *tsk, void *ext)
     // some tasks could call it at the same time ... better to protect
     osal_mutex_take(s_osal_mutex_api_protection, OSAL_reltimeINFINITE);
     
-    if((NULL == tsk->rtostsk) || (osal_task_signature != tsk->signature))
+    if((NULL == tsk->rtostsk) || (osal_task_signature != tsk->signtsk))
     {
         osal_mutex_release(s_osal_mutex_api_protection);
         return(osal_res_NOK_generic);
@@ -842,7 +858,7 @@ extern void* osal_task_extdata_get(osal_task_t *tsk)
         return(NULL);
     }
     
-    if((NULL == tsk->rtostsk) || (osal_task_signature != tsk->signature))
+    if((NULL == tsk->rtostsk) || (osal_task_signature != tsk->signtsk))
     {
         return(NULL);
     }
@@ -868,7 +884,7 @@ extern void * osal_task_stack_get1(osal_task_t *tsk, uint16_t *size)
         return(NULL);
     }
     
-    if((NULL == tsk->rtostsk) || (osal_task_signature != tsk->signature))
+    if((NULL == tsk->rtostsk) || (osal_task_signature != tsk->signtsk))
     {
         return(NULL);
     }
@@ -891,14 +907,35 @@ extern osal_messagequeue_t * osal_messagequeue_new(uint16_t maxmsg)
         //return(NULL);
     }
     
-  
-    retptr = oosiit_mbx_create(maxmsg);
+    
+//     retptr = osal_base_memory_new(sizeof(osal_messagequeue_t));
+//     
+//     if(NULL == retptr)
+//     {
+//         s_osal_error(osal_error_missingmemory, "osal: missing mem for osal_messagequeue_t in osal_messagequeue_new()");
+//         //return(NULL);
+//     }
+//     
+//   
+//     retptr->rtosmbx = oosiit_mbx_create(maxmsg);
+//     retptr->signmbx = osal_messagequeue_signature;
 
-    if(NULL == retptr)
+//     if(NULL == retptr->rtosmbx)
+//     {
+//         s_osal_error(osal_error_missingmemory, "osal: missing mem for rtos msg queue in osal_messagequeue_new()");
+//         //return(NULL);
+//     }
+    
+    
+    
+    void* rtosobj = oosiit_mbx_create(maxmsg);
+    if(NULL == rtosobj)
     {
-        s_osal_error(osal_error_missingmemory, "osal: missing mem for rtos msg queue in osal_messagequeue_new()");
+        s_osal_error(osal_error_missingmemory, "osal: missing mem for rtos obj in osal_messagequeue_new()");
         //return(NULL);
-    }
+    }        
+    retptr = (osal_messagequeue_t*)s_osal_osalobj_new(rtosobj, osal_messagequeue_signature);
+    
 
     // protect he because the osiit_* calls are already protected as they are executes by svc
     osal_mutex_take(s_osal_mutex_api_protection, OSAL_reltimeINFINITE);
@@ -922,11 +959,19 @@ extern osal_result_t osal_messagequeue_get(osal_messagequeue_t *mq, osal_message
     {
         return(osal_res_NOK_nullpointer);
     }
+    
+   
+    void* rtosobj = NULL;
+    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)mq, osal_messagequeue_signature)))
+    {
+        return(osal_res_NOK_generic);
+    }
+    
 
     *pmsg = (osal_message_t)0;
     
     // any caller ...
-    rr = oosiit_mbx_retrieve(mq, &p, s_osal_timeout2tick(tout));
+    rr = oosiit_mbx_retrieve(rtosobj, &p, s_osal_timeout2tick(tout));
     
     *pmsg = (osal_message_t)p;
     
@@ -953,8 +998,14 @@ extern osal_message_t osal_messagequeue_getquick(osal_messagequeue_t *mq, osal_r
         return((osal_message_t)0);
     }
     
+    void* rtosobj = NULL;
+    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)mq, osal_messagequeue_signature)))
+    {
+        return((osal_message_t)0);
+    }    
+    
     // any caller
-    oosiit_mbx_retrieve(mq, &p, s_osal_timeout2tick(tout));
+    oosiit_mbx_retrieve(rtosobj, &p, s_osal_timeout2tick(tout));
 
     
     return((osal_message_t)p);
@@ -966,8 +1017,14 @@ extern uint16_t osal_messagequeue_available(osal_messagequeue_t *mq, osal_caller
     {
         return(0);
     }
+    
+    void* rtosobj = NULL;
+    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)mq, osal_messagequeue_signature)))
+    {
+        return(0);
+    }      
 
-    return( oosiit_mbx_available(mq) );    
+    return( oosiit_mbx_available(rtosobj) );    
 }
 
 
@@ -977,8 +1034,14 @@ extern uint16_t osal_messagequeue_size(osal_messagequeue_t *mq, osal_caller_t ca
     {
         return(0);
     }
+    
+    void* rtosobj = NULL;
+    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)mq, osal_messagequeue_signature)))
+    {
+        return(0);
+    }      
 
-    return( oosiit_mbx_used(mq) );    
+    return( oosiit_mbx_used(rtosobj) );    
 }
 
 
@@ -991,7 +1054,13 @@ extern osal_result_t osal_messagequeue_put(osal_messagequeue_t *mq, osal_message
         return(osal_res_NOK_nullpointer);
     }
     
-    rr = oosiit_mbx_send(mq, (void*)msg, s_osal_timeout2tick(tout));
+    void* rtosobj = NULL;
+    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)mq, osal_messagequeue_signature)))
+    { 
+        return(osal_res_NOK_generic);
+    }    
+    
+    rr = oosiit_mbx_send(rtosobj, (void*)msg, s_osal_timeout2tick(tout));
 
     if(rr == oosiit_res_OK)
     {
@@ -1001,7 +1070,6 @@ extern osal_result_t osal_messagequeue_put(osal_messagequeue_t *mq, osal_message
     {
         return(osal_res_NOK_timeout);
     }
-
 }
 
 extern osal_result_t osal_messagequeue_delete(osal_messagequeue_t *mq)
@@ -1067,13 +1135,31 @@ extern osal_mutex_t * osal_mutex_new(void)
 {
     osal_mutex_t *retptr = NULL;
     
-    retptr = oosiit_mut_create();
+//     retptr = osal_base_memory_new(sizeof(osal_mutex_t));
+//     
+//     if(NULL == retptr)
+//     {
+//         s_osal_error(osal_error_missingmemory, "osal: missing mem for osal_mutex_t in osal_mutex_new()");
+//         //return(NULL);
+//     }    
+//     
+//     retptr->rtosmtx = oosiit_mut_create();
+//     retptr->signmtx = osal_mutex_signature;
+//     
+//     if(NULL == retptr)
+//     {
+//         s_osal_error(osal_error_missingmemory, "osal: missing mem for rtos mutex in osal_mutex_new()");
+//         //return(NULL);
+//     }
     
-    if(NULL == retptr)
+    void* rtosobj = oosiit_mut_create();
+    if(NULL == rtosobj)
     {
-        s_osal_error(osal_error_missingmemory, "osal: missing mem for rtos mutex in osal_mutex_new()");
+        s_osal_error(osal_error_missingmemory, "osal: missing mem for rtos obj in osal_mutex_new()");
         //return(NULL);
-    }
+    }        
+    retptr = (osal_mutex_t*)s_osal_osalobj_new(rtosobj, osal_mutex_signature);
+    
 
     if(NULL != s_osal_mutex_api_protection)
     {
@@ -1096,7 +1182,13 @@ extern osal_result_t osal_mutex_take(osal_mutex_t *mutex, osal_reltime_t tout)
         return(osal_res_NOK_nullpointer);
     }
     
-    rr = oosiit_mut_wait(mutex, s_osal_timeout2tick(tout));
+    void* rtosobj = NULL;
+    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)mutex, osal_mutex_signature)))
+    { 
+        return(osal_res_NOK_generic);
+    }       
+    
+    rr = oosiit_mut_wait(rtosobj, s_osal_timeout2tick(tout));
     
     if((oosiit_res_OK == rr) || (oosiit_res_MUT == rr))
     {
@@ -1112,7 +1204,18 @@ extern osal_result_t osal_mutex_take(osal_mutex_t *mutex, osal_reltime_t tout)
 
 extern osal_result_t osal_mutex_release(osal_mutex_t *mutex) 
 {
-    return((oosiit_res_NOK == oosiit_mut_release(mutex)) ? (osal_res_NOK_generic) : (osal_res_OK));
+    if(NULL == mutex)
+    {
+        return(osal_res_NOK_nullpointer);
+    }
+    
+    void* rtosobj = NULL;
+    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)mutex, osal_mutex_signature)))
+    { 
+        return(osal_res_NOK_generic);
+    }  
+    
+    return((oosiit_res_NOK == oosiit_mut_release(rtosobj)) ? (osal_res_NOK_generic) : (osal_res_OK));
 }
 
 extern osal_result_t osal_mutex_delete(osal_mutex_t *mutex)
@@ -1132,16 +1235,34 @@ extern osal_semaphore_t * osal_semaphore_new(uint8_t maxtokens, uint8_t tokens)
         //return(NULL);
     }
     
-    retptr = oosiit_sem_create(maxtokens, tokens);
+//     retptr = osal_base_memory_new(sizeof(osal_semaphore_t));
+//     
+//     if(NULL == retptr)
+//     {
+//         s_osal_error(osal_error_missingmemory, "osal: missing mem for osal_semaphore_t in osal_semaphore_new()");
+//         //return(NULL);
+//     }
+//     
+//     retptr->rtossem = oosiit_sem_create(maxtokens, tokens);
+//     retptr->signsem = osal_semaphore_signature;
 
 
-    if(NULL == retptr)
+//     if(NULL == retptr)
+//     {
+//         s_osal_error(osal_error_missingmemory, "osal: missing mem for rtos sem in osal_semaphore_new()");
+//         //return(NULL);
+//     }
+
+
+    void* rtosobj = oosiit_sem_create(maxtokens, tokens);
+    if(NULL == rtosobj)
     {
-        s_osal_error(osal_error_missingmemory, "osal: missing mem for rtos sem in osal_semaphore_new()");
+        s_osal_error(osal_error_missingmemory, "osal: missing mem for rtos obj in osal_semaphore_new()");
         //return(NULL);
-    }
-
-
+    }        
+    retptr = (osal_semaphore_t*)s_osal_osalobj_new(rtosobj, osal_semaphore_signature);    
+    
+    
     osal_mutex_take(s_osal_mutex_api_protection, OSAL_reltimeINFINITE);
     s_resources_used[osal_info_entity_semaphore] ++;
     osal_mutex_release(s_osal_mutex_api_protection);
@@ -1150,6 +1271,7 @@ extern osal_semaphore_t * osal_semaphore_new(uint8_t maxtokens, uint8_t tokens)
     return(retptr);
 }
 
+  
 extern osal_result_t osal_semaphore_set(osal_semaphore_t *sem, uint8_t tokens)
 {
     if(NULL == sem)
@@ -1157,7 +1279,13 @@ extern osal_result_t osal_semaphore_set(osal_semaphore_t *sem, uint8_t tokens)
         return(osal_res_NOK_nullpointer); 
     }
     
-    oosiit_sem_set(sem, tokens);
+    void* rtosobj = NULL;
+    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)sem, osal_semaphore_signature)))
+    { 
+        return(osal_res_NOK_generic);
+    }       
+    
+    oosiit_sem_set(rtosobj, tokens);
 
     // ok, all done
     return(osal_res_OK);
@@ -1173,7 +1301,13 @@ extern osal_result_t osal_semaphore_decrement(osal_semaphore_t *sem, osal_reltim
         return(osal_res_NOK_nullpointer); 
     }
     
-    rr = oosiit_sem_wait(sem, s_osal_timeout2tick(tout));
+    void* rtosobj = NULL;
+    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)sem, osal_semaphore_signature)))
+    { 
+        return(osal_res_NOK_generic);
+    }     
+    
+    rr = oosiit_sem_wait(rtosobj, s_osal_timeout2tick(tout));
     
     if((oosiit_res_OK == rr) || (oosiit_res_SEM == rr))
     {
@@ -1193,8 +1327,14 @@ extern osal_result_t osal_semaphore_increment(osal_semaphore_t *sem, osal_caller
     {
         return(osal_res_NOK_nullpointer); 
     }
-  
-    return((oosiit_res_OK == oosiit_sem_send(sem)) ? (osal_res_OK) : (osal_res_NOK_generic));
+
+    void* rtosobj = NULL;
+    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)sem, osal_semaphore_signature)))
+    { 
+        return(osal_res_NOK_generic);
+    }       
+    
+    return((oosiit_res_OK == oosiit_sem_send(rtosobj)) ? (osal_res_OK) : (osal_res_NOK_generic));
 }
 
 
@@ -1207,22 +1347,38 @@ extern osal_result_t osal_semaphore_delete(osal_semaphore_t *sem)
 
 extern osal_timer_t * osal_timer_new(void)
 {
-    // oosiit_advtmr_start returns a oosiit_objptr_t, which is a void*.
-    // as the osal_timer_t type contains only a ptr to the rtos timer then we can use the following:
-
-    void *ret = oosiit_advtmr_new();
-    
-    if(NULL == ret)
+    osal_timer_t *retptr = NULL;
+ 
+    void* rtosobj = oosiit_advtmr_new();    
+    if(NULL == rtosobj)
     { 
-        s_osal_error(osal_error_missingmemory, "osal: missing mem for rtos timer in osal_timer_new()");
+        s_osal_error(osal_error_missingmemory, "osal: missing mem for rtos obj in osal_timer_new()");
         //return(NULL);
-    }
+    }    
+    retptr = (osal_timer_t*)s_osal_osalobj_new(rtosobj, osal_timer_signature);
+    
+       
+//     if(osal_memmode_dynamic == s_osal_osal_cfg.memorymodel)
+//     {
+//         retval = osal_base_memory_new(sizeof(osal_timer_t));   
+//         if(NULL == retval)
+//         { 
+//             s_osal_error(osal_error_missingmemory, "osal: missing mem for osal_timer_t in osal_timer_new()");
+//             //return(NULL);
+//         }  
+//         retval->rtostmr = rtostmr;
+//         retval->signtmr = osal_timer_signature;
+//     }
+//     else
+//     {
+//         retval = rtostmr;
+//     }
 
     osal_mutex_take(s_osal_mutex_api_protection, OSAL_reltimeINFINITE);
     s_resources_used[osal_info_entity_timer] ++;
     osal_mutex_release(s_osal_mutex_api_protection);
 
-    return((osal_timer_t*)ret);
+    return(retptr);
 }
 
 
@@ -1237,6 +1393,30 @@ extern osal_result_t osal_timer_start(osal_timer_t *timer, osal_timer_timing_t *
     { 
         return(osal_res_NOK_nullpointer);
     }
+    #warning -> protect it w/ mutex?
+    
+
+    void* rtosobj = NULL;
+    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)timer, osal_timer_signature)))
+    {
+        return(osal_res_NOK_generic);
+    }
+    
+    
+//     if(osal_memmode_dynamic == s_osal_osal_cfg.memorymodel)
+//     {
+//         if((NULL == timer->rtostmr) || (osal_timer_signature != timer->signtmr))
+//         { 
+//             return(osal_res_NOK_generic);
+//         } 
+//
+//         rtostmr = timer->rtostmr;       
+//     } 
+//     else
+//     {
+//         rtostmr = timer; 
+//     }
+ 
 
     tim.startat     = s_osal_abstime2tick(timing->startat);
     tim.firstshot   = s_osal_delay2tick(timing->count);
@@ -1246,7 +1426,7 @@ extern osal_result_t osal_timer_start(osal_timer_t *timer, osal_timer_timing_t *
     act.par         = onexpiry->par;
     
     
-    rr = oosiit_advtmr_start(timer, &tim, &act);
+    rr = oosiit_advtmr_start(rtosobj, &tim, &act);
 
 
     return((oosiit_res_NOK == rr) ? (osal_res_NOK_generic) : (osal_res_OK));
@@ -1255,35 +1435,57 @@ extern osal_result_t osal_timer_start(osal_timer_t *timer, osal_timer_timing_t *
 
 extern osal_result_t osal_timer_stop(osal_timer_t *timer, osal_caller_t caller)
 {   
+    void* rtosobj = NULL;
+    
     if(NULL == timer)
     { 
         return(osal_res_NOK_nullpointer);
     }
-
-    return((oosiit_res_NOK == oosiit_advtmr_stop(timer)) ? (osal_res_NOK_generic) : (osal_res_OK));
+    
+    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)timer, osal_timer_signature)))
+    {
+        return(osal_res_NOK_generic);
+    }
+    
+    return((oosiit_res_NOK == oosiit_advtmr_stop(rtosobj)) ? (osal_res_NOK_generic) : (osal_res_OK));
 }
 
 
 extern osal_result_t osal_timer_isactive(osal_timer_t *timer, osal_caller_t caller)
 {
+    void* rtosobj = NULL;
+    
     if(NULL == timer)
     { 
         return(osal_res_NOK_nullpointer);
     }
+    
+    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)timer, osal_timer_signature)))
+    {
+        return(osal_res_NOK_generic);
+    }     
 
-    return((oosiit_res_NOK == oosiit_advtmr_isactive(timer)) ? (osal_res_NOK_generic) : (osal_res_OK));
+    return((oosiit_res_NOK == oosiit_advtmr_isactive(rtosobj)) ? (osal_res_NOK_generic) : (osal_res_OK));
 }
 
 extern osal_result_t osal_timer_delete(osal_timer_t *timer)
 {
+    void* rtosobj = NULL;
+    
     if(NULL == timer)
     { 
         return(osal_res_NOK_nullpointer);
     }
-
-    oosiit_advtmr_delete(timer);
-
     
+    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)timer, osal_timer_signature)))
+    {
+        return(osal_res_NOK_generic);
+    }      
+
+    oosiit_advtmr_delete(rtosobj);
+    
+    s_osal_rtosobj_clr((osal_obj_t*)timer);
+        
     osal_mutex_take(s_osal_mutex_api_protection, OSAL_reltimeINFINITE);
     s_resources_used[osal_info_entity_timer] --;
     osal_mutex_release(s_osal_mutex_api_protection);
@@ -1685,8 +1887,104 @@ static uint32_t s_osal_timeout2tick(osal_reltime_t tout)
 
 }
 
+static osal_obj_t* s_osal_osalobj_new(void *rtosobj, uint32_t signature)
+{
+    osal_obj_t* retval = NULL;
+    
+    if(osal_memmode_dynamic == s_osal_osal_cfg.memorymodel)
+    {
+        retval = osal_base_memory_new(sizeof(osal_obj_t));   
+        if(NULL == retval)
+        { 
+            s_osal_error(osal_error_missingmemory, "osal: missing mem for osal object in osal_xxx_new()");
+            //return(NULL);
+        }  
+        retval->rtosobj     = rtosobj;
+        retval->signature   = signature;
+    }
+    else
+    {
+        retval = rtosobj;
+    }
+    
+    return(retval);
+}
 
+static void* s_osal_rtosobj_get(osal_obj_t *osalobj, uint32_t signature)
+{
+    void* rtosobj = NULL;
+        
+    if(osal_memmode_dynamic == s_osal_osal_cfg.memorymodel)
+    {
+        if((NULL == osalobj->rtosobj) || (signature != osalobj->signature))
+        { 
+            return(NULL);
+        } 
 
+        rtosobj = osalobj->rtosobj;       
+    } 
+    else
+    {
+        rtosobj = osalobj; 
+    }
+    
+    return(rtosobj);
+}
+
+static void s_osal_rtosobj_clr(osal_obj_t *osalobj)
+{
+    if(osal_memmode_dynamic == s_osal_osal_cfg.memorymodel)
+    {
+        osalobj->rtosobj    = NULL;
+        osalobj->signature  = 0;
+        osal_base_memory_del(osalobj);
+    } 
+}
+
+static void s_osal_taskobj_init(void* memory)
+{
+    if(osal_memmode_static == s_osal_osal_cfg.memorymodel)
+    {
+        s_osal_task_data    = memory;
+        s_osal_task_maxnum  = s_osal_osal_cfg.tasknum + 2;
+        s_osal_task_next    = 0; 
+    }
+    else
+    {
+        s_osal_task_data    = NULL;
+        s_osal_task_maxnum  = 0;
+        s_osal_task_next    = 0; 
+    }    
+}
+
+static osal_task_t* s_osal_taskobj_new(void)
+{
+    osal_task_t* taskobj = NULL;
+
+    if(osal_memmode_static == s_osal_osal_cfg.memorymodel)
+    {
+        if(s_osal_task_next >= s_osal_task_maxnum)
+        {
+            // cannot get a task
+            return(NULL);        
+        }
+        taskobj = &s_osal_task_data[s_osal_task_next++];
+    }
+    else if(osal_memmode_dynamic == s_osal_osal_cfg.memorymodel)
+    {
+        taskobj = osal_base_memory_new(sizeof(osal_task_t));   
+    }        
+    
+    return(taskobj);   
+}
+
+static void s_osal_taskobj_del(osal_task_t* taskobj)
+{
+    if(osal_memmode_dynamic == s_osal_osal_cfg.memorymodel)
+    {  
+        osal_base_memory_del(taskobj);
+    }      
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
