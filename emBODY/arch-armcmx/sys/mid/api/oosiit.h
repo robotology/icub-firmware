@@ -554,6 +554,15 @@ extern oosiit_result_t oosiit_sem_send(oosiit_objptr_t sem);
 extern oosiit_result_t oosiit_sem_wait(oosiit_objptr_t sem, uint32_t timeout);
 
 
+
+/** @fn         extern oosiit_result_t oosiit_sem_delete(oosiit_objptr_t sem)
+    @brief      It deletes a semaphore. 
+    @param      sem             The handler to the semaphore
+    @return     oosiit_res_OK upon success, oosiit_res_NOK upon failure (e.g., if called from an ISR)
+
+ **/ 
+extern oosiit_result_t oosiit_sem_delete(oosiit_objptr_t sem);
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // mutex functions
 
@@ -563,7 +572,6 @@ extern oosiit_result_t oosiit_sem_wait(oosiit_objptr_t sem, uint32_t timeout);
     @return     the mutex or NULL if no memory is available.
  **/ 
 extern oosiit_objptr_t oosiit_mut_create(void);
-
 
 
 /** @fn         extern oosiit_result_t oosiit_mut_wait(oosiit_objptr_t mutex, uint32_t timeout)
@@ -585,6 +593,13 @@ extern oosiit_result_t oosiit_mut_wait(oosiit_objptr_t mutex, uint32_t timeout);
 extern oosiit_result_t oosiit_mut_release(oosiit_objptr_t mutex);
 
 
+/** @fn         extern oosiit_result_t oosiit_mut_delete(oosiit_objptr_t mutex)
+    @brief      It deletes a mutex. 
+    @param      sem             The handler to the mutex
+    @return     oosiit_res_OK upon success, oosiit_res_NOK upon failure (e.g., if called from an ISR)
+
+ **/
+extern oosiit_result_t oosiit_mut_delete(oosiit_objptr_t mutex);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // advanced timer functions
