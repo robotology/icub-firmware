@@ -139,7 +139,7 @@
 //   <o> max number of user tasks <0-250>
 //   <i> Default: 6
 #ifndef OOSIIT_TASKCNT
- #define OOSIIT_TASKCNT     1
+ #define OOSIIT_TASKCNT     8
 #endif
 
 
@@ -148,7 +148,7 @@
 //   <i> define max. number of timers that will run at the same time.
 //   <i> default: 0  (timers disabled)
 #ifndef OOSIIT_ADVTIMERCNT
- #define OOSIIT_ADVTIMERCNT    1
+ #define OOSIIT_ADVTIMERCNT    8
 #endif
 
 
@@ -156,7 +156,7 @@
 //   <i> Define max. number of mutexes that will run at the same time.
 //   <i> Default: 0  (Mutexes not enabled)
 #ifndef OOSIIT_MUTEXCNT
- #define OOSIIT_MUTEXCNT    1
+ #define OOSIIT_MUTEXCNT    8
 #endif
 
 
@@ -164,7 +164,7 @@
 //   <i> Define max. number of semaphores that will run at the same time.
 //   <i> Default: 0  (Semaphores not enabled)
 #ifndef OOSIIT_SEMAPHORECNT
- #define OOSIIT_SEMAPHORECNT    1
+ #define OOSIIT_SEMAPHORECNT    8
 #endif
 
 
@@ -172,14 +172,14 @@
 //   <i> Define max. number of message boxes that that will run at the same time.
 //   <i> Default: 0  (Message boxes not enabled)
 #ifndef OOSIIT_MBOXCNT
- #define OOSIIT_MBOXCNT    1
+ #define OOSIIT_MBOXCNT    8
 #endif
 
 //   <o> max number of elements in message boxes <0-1000>
 //   <i> Define max. number of elements that can be contained in every message box.
 //   <i> Default: 0  (Message boxes not enabled)
 #ifndef OOSIIT_MBOXELEMENTCNT
- #define OOSIIT_MBOXELEMENTCNT    1
+ #define OOSIIT_MBOXELEMENTCNT    80
 #endif
 
 
@@ -187,7 +187,7 @@
 //   <i> Define max. size in bytes of the global stack.
 //   <i> Default: 0  
 #ifndef OOSIIT_GLOBALSTACK
- #define OOSIIT_GLOBALSTACK    1
+ #define OOSIIT_GLOBALSTACK    8000
 #endif
 
 

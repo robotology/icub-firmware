@@ -207,6 +207,7 @@ extern void      iitchanged_rt_itv_wait(void);
 
 // - mutex management routines -
 extern OS_RESULT iitchanged_rt_mut_wait(OS_ID mutex, TIME_t timeout);
+extern OS_RESULT rt_iit_mut_delete (OS_ID mutex);
 
 // - event flag management routines -
 extern OS_RESULT iitchanged_rt_evt_wait(EVENT_t wait_flags,  TIME_t timeout, BOOL and_wait); 
@@ -231,6 +232,7 @@ extern OS_RESULT iitchanged_rt_sem_send (OS_ID semaphore);
 extern OS_RESULT iitchanged_rt_sem_wait(OS_ID semaphore, TIME_t timeout);
 extern void iitchanged_isr_sem_send (OS_ID semaphore);
 extern void iitchanged_rt_sem_psh (void* p);
+extern OS_RESULT rt_iit_sem_delete (OS_ID semaphore);
 
 
 // - task delays management routines -

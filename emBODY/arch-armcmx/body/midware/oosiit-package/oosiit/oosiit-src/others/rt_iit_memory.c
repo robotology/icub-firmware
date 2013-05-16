@@ -185,6 +185,23 @@ extern OS_ID rt_iit_memory_getmut(void)
     return(ret);
 }
 
+extern void rt_iit_memory_relmut(OS_ID mut) 
+{
+     // take mutex
+    TAKE_MUTEX(s_mutex_memory, 0xFFFFFFFF);
+    
+    if(NULL == oosiit_cfg_semaphore)
+    {
+        rt_iit_memory_del(mut);
+    }
+    else
+    {
+        // unfortunately in static mode we cannot give memory back 
+    }    
+ 
+    // release mutex
+    RELEASE_MUTEX(s_mutex_memory);
+}
 
 extern OS_ID rt_iit_memory_getsem(void) 
 {
@@ -223,6 +240,24 @@ extern OS_ID rt_iit_memory_getsem(void)
     
     // return value
     return(ret);
+}
+
+extern void rt_iit_memory_relsem(OS_ID sem) 
+{
+     // take mutex
+    TAKE_MUTEX(s_mutex_memory, 0xFFFFFFFF);
+    
+    if(NULL == oosiit_cfg_semaphore)
+    {
+        rt_iit_memory_del(sem);
+    }
+    else
+    {
+        // unfortunately in static mode we cannot give memory back 
+    }    
+ 
+    // release mutex
+    RELEASE_MUTEX(s_mutex_memory);
 }
 
 extern OS_ID rt_iit_memory_getmbx(U16 nitems) 

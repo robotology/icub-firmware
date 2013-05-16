@@ -384,11 +384,12 @@ extern void *__user_perthread_libspace (void);
 static void s_stay(void* p)
 {
     uint32_t count  = 0; 
+    uint32_t xxx = 0;
     static volatile void *pp = NULL;    
     
     oosiit_tsk_setprio(oosiit_tsk_self(), 10);
 
-    oosiit_itv_set(5000);
+    oosiit_itv_set(2000);
     
     pp = __user_perthread_libspace();
     
@@ -398,11 +399,25 @@ static void s_stay(void* p)
     
     pp = pp;
     
-    
+    oosiit_objptr_t mut = oosiit_mut_create();
+    oosiit_mut_wait(mut, 0);
 
     for(;;)
     {
         oosiit_itv_wait();
+        
+        if(NULL != mut)
+        {
+            oosiit_mut_delete(mut);
+            mut = NULL;
+            mut = oosiit_mut_create();
+            if(NULL != mut)
+                oosiit_mut_wait(mut, 0);
+        }
+        else
+        {
+            xxx++;
+        }
  
         if(0 == (++count % 2)) 
         {

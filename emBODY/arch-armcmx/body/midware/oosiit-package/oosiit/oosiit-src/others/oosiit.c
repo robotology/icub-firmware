@@ -216,11 +216,13 @@ SVC_2_1(svc_oosiit_sem_create,          void*,              uint8_t,            
 SVC_2_1(svc_oosiit_sem_set,             oosiit_result_t,    void*,              uint8_t,                                                RET_int32_t);
 SVC_1_1(svc_oosiit_sem_send,            oosiit_result_t,    void*,                                                                      RET_int32_t);
 SVC_2_1(svc_oosiit_sem_wait,            oosiit_result_t,    void*,              uint32_t,                                               RET_int32_t);
+SVC_1_1(svc_oosiit_sem_delete,          oosiit_result_t,    void*,                                                                      RET_int32_t);
 
 // mutex
 SVC_0_1(svc_oosiit_mut_create,          void*,                                                                                          RET_pointer);
 SVC_2_1(svc_oosiit_mut_wait,            oosiit_result_t,    void*,              uint32_t,                                               RET_int32_t);
 SVC_1_1(svc_oosiit_mut_release,         oosiit_result_t,    void*,                                                                      RET_int32_t);
+SVC_1_1(svc_oosiit_mut_delete,          oosiit_result_t,    void*,                                                                      RET_int32_t);
 
 // advanced timer
 SVC_0_1(svc_oosiit_advtmr_new,          void*,                                                                                          RET_pointer);
@@ -1006,6 +1008,23 @@ extern oosiit_result_t oosiit_sem_wait(oosiit_objptr_t sem, uint32_t timeout)
     }
 }
 
+extern oosiit_result_t oosiit_sem_delete(oosiit_objptr_t sem)
+{
+    if(NULL == sem)
+    {
+        return(oosiit_res_NOK);
+    }
+    
+    if(0 != __get_IPSR()) 
+    {   // inside isr
+        return(oosiit_res_NOK);
+    } 
+    else
+    {   // call svc
+         return(__svc_oosiit_sem_delete(sem));
+    }    
+}
+
 
 // - mutex functions --------------------------------------------------------------------------------------------------
 
@@ -1047,6 +1066,22 @@ extern oosiit_result_t oosiit_mut_release(oosiit_objptr_t mutex)
     }
 }
 
+extern oosiit_result_t oosiit_mut_delete(oosiit_objptr_t mutex)
+{
+    if(NULL == mutex)
+    {
+        return(oosiit_res_NOK);
+    }
+    
+    if(0 != __get_IPSR()) 
+    {   // inside isr
+        return(oosiit_res_NOK);
+    } 
+    else
+    {   // call svc
+         return(__svc_oosiit_mut_delete(mutex));
+    }    
+}
 
 // - advanced timer functions -----------------------------------------------------------------------------------------
 
@@ -1674,6 +1709,19 @@ extern oosiit_result_t svc_oosiit_sem_wait(oosiit_objptr_t sem, uint32_t timeout
     return((oosiit_result_t)res);   
 }
 
+extern oosiit_result_t svc_oosiit_sem_delete(oosiit_objptr_t sem)
+{
+    OS_RESULT res;
+    rt_iit_dbg_svc_enter();
+ 
+    res = rt_iit_sem_delete(sem);
+    
+    rt_iit_memory_relsem(sem);
+    
+    rt_iit_dbg_svc_exit();
+    return((oosiit_result_t)res);   
+}
+
 // mutex
 
 extern void* svc_oosiit_mut_create(void)
@@ -1708,6 +1756,19 @@ extern oosiit_result_t svc_oosiit_mut_release(oosiit_objptr_t mutex)
     rt_iit_dbg_svc_enter();
  
     res = rt_mut_release(mutex);
+    
+    rt_iit_dbg_svc_exit();
+    return((oosiit_result_t)res);   
+}
+
+extern oosiit_result_t svc_oosiit_mut_delete(oosiit_objptr_t mutex)
+{
+    OS_RESULT res;
+    rt_iit_dbg_svc_enter();
+ 
+    res = rt_iit_mut_delete(mutex);
+    
+    rt_iit_memory_relmut(mutex);
     
     rt_iit_dbg_svc_exit();
     return((oosiit_result_t)res);   

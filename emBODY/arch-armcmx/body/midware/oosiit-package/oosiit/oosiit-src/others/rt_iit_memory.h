@@ -67,8 +67,10 @@ typedef U32     OS_RESULT;
 extern void rt_iit_memory_init(void);
 
 extern OS_ID rt_iit_memory_getmut(void);
+extern void rt_iit_memory_relmut(OS_ID mut);
 
 extern OS_ID rt_iit_memory_getsem(void);
+extern void rt_iit_memory_relsem(OS_ID sem);
 
 extern OS_ID rt_iit_memory_getmbx(U16 nitems);
 

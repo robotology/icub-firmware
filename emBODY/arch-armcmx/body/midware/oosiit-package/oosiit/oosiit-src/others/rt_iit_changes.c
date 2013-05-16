@@ -881,6 +881,41 @@ inc: p_MCB->level++;
 } 
 
 
+OS_RESULT rt_iit_mut_delete (OS_ID mutex) {
+  /* Delete a mutex object */
+  P_MUCB p_MCB = mutex;
+  P_TCB  p_TCB;
+
+  /* Restore owner task's priority. */
+  if (p_MCB->level != 0) {
+    p_MCB->owner->prio = p_MCB->prio;
+    if (p_MCB->owner != os_tsk.run) {
+      rt_resort_prio (p_MCB->owner);
+    }
+  }
+
+  while (p_MCB->p_lnk != NULL) {
+    /* A task is waiting for mutex. */
+    p_TCB = rt_get_first ((P_XCB)p_MCB);
+    rt_ret_val(p_TCB, 0/*osOK*/);
+    rt_rmv_dly(p_TCB);
+    p_TCB->state = READY;
+    rt_put_prio (&os_rdy, p_TCB);
+  }
+
+  if (os_rdy.p_lnk && (os_rdy.p_lnk->prio > os_tsk.run->prio)) {
+    /* preempt running task */
+    rt_put_prio (&os_rdy, os_tsk.run);
+    os_tsk.run->state = READY;
+    rt_dispatch (NULL);
+  }
+
+  p_MCB->cb_type = 0;
+
+  return (OS_R_OK);
+}
+
+
 // - event flag management routines: rt_Event.c -----------------------------------------------------------------------
 
 OS_RESULT iitchanged_rt_evt_wait (EVENT_t wait_flags, TIME_t timeout, BOOL and_wait) {
@@ -1640,6 +1675,32 @@ void iitchanged_rt_sem_psh (void *p) {
   }
 }
 
+
+OS_RESULT rt_iit_sem_delete (OS_ID semaphore) {
+  /* Delete semaphore */
+  P_SCB p_SCB = semaphore;
+  P_TCB p_TCB;
+
+  while (p_SCB->p_lnk != NULL) {
+    /* A task is waiting for token */
+    p_TCB = rt_get_first ((P_XCB)p_SCB);
+    rt_ret_val(p_TCB, 0);
+    rt_rmv_dly(p_TCB);
+    p_TCB->state = READY;
+    rt_put_prio (&os_rdy, p_TCB);
+  }
+
+  if (os_rdy.p_lnk && (os_rdy.p_lnk->prio > os_tsk.run->prio)) {
+    /* preempt running task */
+    rt_put_prio (&os_rdy, os_tsk.run);
+    os_tsk.run->state = READY;
+    rt_dispatch (NULL);
+  }
+
+  p_SCB->cb_type = 0;
+
+  return (OS_R_OK);
+}
 
 
 // - from rt_task: rt_Task.c ------------------------------------------------------------------------------------------
