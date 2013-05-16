@@ -83,42 +83,55 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 
 extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p)
 {
+    char str[30];
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     eo_appCanSP_SetRunMode(appCanSP_ptr, eo_appCanSP_runMode__onEvent);
-//#warning VALE ho commnetato EmptyCanInputQueue     
-     eo_appCanSP_EmptyCanInputQueue(appCanSP_ptr, eOcanport1);
-     eo_appCanSP_EmptyCanInputQueue(appCanSP_ptr, eOcanport2);
+  
+    eo_appCanSP_EmptyCanInputQueue(appCanSP_ptr, eOcanport1);
+    eo_appCanSP_EmptyCanInputQueue(appCanSP_ptr, eOcanport2);
+    snprintf(str, sizeof(str)-1, "userdef_on_entry_CFG"); 
+    hal_trace_puts(str);
 }
 
 extern void eom_emsappl_hid_userdef_on_exit_CFG(EOMtheEMSappl* p)
 {
     eOresult_t res;
-    
+    char str[30];
     res = eo_emsapplBody_EnableTxAllJointOnCan(eo_emsapplBody_GetHandle());
     if(eores_OK != res)
     {
         ; //gestisci errore
     }
+    snprintf(str, sizeof(str)-1, "userdef_on_exit_CFG"); 
+    hal_trace_puts(str);
 }
 extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
 {
+    char str[30];
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     //Before changing appCanRunMode is important be sure can output queues are empty
     eo_appCanSP_EmptyCanOutputQueue(appCanSP_ptr, eOcanport1);
     eo_appCanSP_EmptyCanOutputQueue(appCanSP_ptr, eOcanport2);
  
     eo_appCanSP_SetRunMode(eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle()), eo_appCanSP_runMode__onDemand);
+    snprintf(str, sizeof(str)-1, "userdef_on_entry_RUN"); 
+    hal_trace_puts(str);
 }
 
 extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
 {
     eOresult_t res;
-    
+    char str[30];
+    //set run mode on demand in order to send message to disable all joints on can
+    eo_appCanSP_SetRunMode(eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle()), eo_appCanSP_runMode__onEvent);
+
     res = eo_emsapplBody_DisableTxAllJointOnCan(eo_emsapplBody_GetHandle());
     if(eores_OK != res)
     {
         ; //gestisci errore
     }
+    snprintf(str, sizeof(str)-1, "userdef_on_exit_RUN"); 
+    hal_trace_puts(str);
 }
 
 extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
