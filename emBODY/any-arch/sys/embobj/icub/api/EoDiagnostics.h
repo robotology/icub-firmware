@@ -238,7 +238,7 @@ typedef struct
 typedef struct
 {
     uint8_t motorlist[12]; //on ems there are 12 motor max.Each element of array contains falg about the motor with id = index of array
-} eOdgn_motorstatusflag_t;
+} eOdgn_motorstatusflags_t;
 
 /** @}            
     end of group eo_cevcwervcrev5555  
