@@ -72,6 +72,12 @@ static opcprotman_var_map_t s_myarray[] =
         .size       = sizeof(eOdgn_emsapplication_emswithmc_t),
         .ptr        = NULL,
         .onrec      = NULL
+    },
+    {
+        .var        = eodgn_nvidbdoor_motorstatus,
+        .size       = sizeof(eOdgn_motorstatusflags_t),
+        .ptr        = NULL,
+        .onrec      = NULL
     }
 };
 
