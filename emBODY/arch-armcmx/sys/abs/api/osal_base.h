@@ -272,9 +272,9 @@ typedef struct
     uint16_t            idlestacksize;          /**< The stack size (in bytes) of the idle task                 */
     osal_bool_t         roundrobin;             /**< If osal_true the OSAL uses round robin on tasks of equal priority, else it does not  */
     osal_reltime_t      roundrobintick;         /**< The maximum timeslot used for round robin expressed in micro-sec */
+
+    // sizes relevant only for memorymodel osal_memmode_static    
     uint8_t             tasknum;                /**< The maximum number of user tasks managed by OSAL (apart launcher and idle tasks) */
-    
-    // sizes relevant only for memorymodel osal_memmode_static
     uint16_t            globalstacksize;        /**< The global stack size (in bytes) reserved for user tasks        */
     uint8_t             timernum;               /**< The maximum number of timers managed by OSAL */
     uint8_t             mutexnum;               /**< The maximum number of mutexes managed by OSAL */    

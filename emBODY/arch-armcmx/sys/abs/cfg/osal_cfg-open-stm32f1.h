@@ -38,19 +38,6 @@
 #endif
 
 
-//   <o> Memory model         <0=>   static allocation      <1=>   dynamic allocation    
-//   <i> Only static allocation is now supported.
-#ifndef OSAL_MEMMODEL
- #define OSAL_MEMMODEL      1
-#endif
-
-
-// </h>Porting specifics
-
-// <h> Embedded System 
-// <i> sssssssss
-
-
 //   <o> CPU family         <0=>   Cortex M3 <1=>   Cortex M4
 //   <i> Only Cortex M3 and M4 are now supported.
 #ifndef OSAL_CPUFAM
@@ -65,7 +52,8 @@
 #endif
 
 
-// </h>Embedded System
+
+// </h>Porting specifics
 
 
 // <h> Scheduler 
@@ -85,30 +73,6 @@
 #ifndef OSAL_TICK
  #define OSAL_TICK        1000
 #endif
-
-
-
-//   <o> Stack size for launcher task [bytes] <200-4096:8>
-//   <i> Set the stack size for launcher task.
-//   <i> Default: 128
-#ifndef OSAL_LAUNSTKSIZE
- #define OSAL_LAUNSTKSIZE     1024
-#endif
-
-//   <o> Stack size for idle task [bytes] <200-4096:8>
-//   <i> Set the stack size for idle task.
-//   <i> Default: 128
-#ifndef OSAL_IDLESTKSIZE
- #define OSAL_IDLESTKSIZE     256
-#endif
-
-//   <o> Total stack size for all the other tasks [bytes] <256-16384:8>
-//   <i> Define max. size in bytes of the global stack.
-//   <i> Default: 256  (only one task for instance)
-#ifndef OSAL_GLOBSTKSIZE
- #define OSAL_GLOBSTKSIZE    8192
-#endif
-
 
 
 // <e>Round-Robin Task switching
@@ -132,10 +96,47 @@
 // </h>Scheduler
 
 
+// <h> System resources 
+// <i> sssssssss
+
+
+//   <o> Stack size for launcher task [bytes] <200-4096:8>
+//   <i> Set the stack size for launcher task.
+//   <i> Default: 128
+#ifndef OSAL_LAUNSTKSIZE
+ #define OSAL_LAUNSTKSIZE     1024
+#endif
+
+//   <o> Stack size for idle task [bytes] <200-4096:8>
+//   <i> Set the stack size for idle task.
+//   <i> Default: 128
+#ifndef OSAL_IDLESTKSIZE
+ #define OSAL_IDLESTKSIZE     256
+#endif
+
+
+// </h>System resources
+
+
+// <h> Memory model 
+// <i> sssssssss
+
+
+//   <o> Memory model         <0=>   static allocation      <1=>   dynamic allocation    
+//   <i> with static allocation all the memory needed by OSAL objects is allocate at startup and retrieved when required.
+//   <i> with dynamic allocation the memry is retrieved just when it is needed
+#ifndef OSAL_MEMMODEL
+ #define OSAL_MEMMODEL      1
+#endif
 
 
 
-// <h> OSAL objects
+// </h>Memory model
+
+
+
+// <h> Max number of OSAL resources for static allocation mode
+// <i> This section is relevant only if the memory model is static.
 
 //   <o> Number of user tasks <0-250>
 //   <i> Maximum number of tasks that will run at the same time.
@@ -144,11 +145,19 @@
  #define OSAL_TASKNUM     8
 #endif
 
+//   <o> Total stack size for all the user tasks [bytes] <256-16384:8>
+//   <i> Define max. size in bytes of the global stack.
+//   <i> Default: 256  (only one task for instance)
+#ifndef OSAL_GLOBSTKSIZE
+ #define OSAL_GLOBSTKSIZE    8192
+#endif
+
+
 //   <o> Number of timers <0-250>
 //   <i> Define max number of timers.
 //   <i> Default: 0  (User timers disabled)
 #ifndef OSAL_TIMERNUM
- #define OSAL_TIMERNUM    1
+ #define OSAL_TIMERNUM    8
 #endif
 
 
@@ -156,7 +165,7 @@
 //   <i> Define max. number of mutexes that will run at the same time.
 //   <i> Default: 0  (Mutexes not enabled)
 #ifndef OSAL_MUTEXNUM
- #define OSAL_MUTEXNUM    1
+ #define OSAL_MUTEXNUM    8
 #endif
 
 
@@ -164,7 +173,7 @@
 //   <i> Define max. number of semaphores that will run at the same time.
 //   <i> Default: 0  (Semaphores not enabled)
 #ifndef OSAL_SEMAPHORENUM
- #define OSAL_SEMAPHORENUM    1
+ #define OSAL_SEMAPHORENUM    8
 #endif
 
 
@@ -172,14 +181,14 @@
 //   <i> Define max. number of message queues that that will run at the same time.
 //   <i> Default: 0  (Message queues not enabled)
 #ifndef OSAL_MQUEUENUM
- #define OSAL_MQUEUENUM    1
+ #define OSAL_MQUEUENUM    8
 #endif
 
 //   <o> Total number of messages in message queues <0-1000>
 //   <i> Define max. number of messages that can be contained in all the message queues.
 //   <i> Default: 0  (Message queues not enabled)
 #ifndef OSAL_MQUEUEELEMNUM
- #define OSAL_MQUEUEELEMNUM    1
+ #define OSAL_MQUEUEELEMNUM    64
 #endif
 
 
@@ -202,10 +211,18 @@
     #error only arm-rtx modified by iit and oosiit are supported so far
 #endif
 
+#if(OSAL_RTOSTYPE == 0)
+    #if(OSAL_MEMMODEL == 1)
+        #error only oosiit supports dynamic memory model
+    #endif
 
-#if(OSAL_MQUEUEELEMNUM < OSAL_MQUEUENUM)
-    #warning more messagequeues than messages ...
+    #if(OSAL_MQUEUEELEMNUM < OSAL_MQUEUENUM)
+        #error more messagequeues than messages ...
+    #endif
+
 #endif
+
+
 
 // - end of controls --------------------------------------------------------------------------------------------------
 
