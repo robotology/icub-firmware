@@ -1377,10 +1377,10 @@ extern oosiit_tskptr_t svc_oosiit_tsk_create(FAKE_VOID_FP_VOIDP tskfn, void *tsk
 {   // rt_tsk_create_user_ex has tskfnarg as last argument
     // void (*tskfn)(void *)
     oosiit_tskptr_t tp;
-    osiit_hid_tsk_create_other_args_t *otherparams;
+    //osiit_hid_tsk_create_other_args_t *otherparams;
     rt_iit_dbg_svc_enter();
     
-    otherparams = (osiit_hid_tsk_create_other_args_t*) others;
+    //otherparams = (osiit_hid_tsk_create_other_args_t*) others;
        
 //    tp = rt_iit_tsk_create((FUNCP)tskfn, tskstacksize24tskpriority08, tskstackdata, tskfnarg);
     
