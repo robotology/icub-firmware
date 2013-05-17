@@ -247,6 +247,15 @@ ICUBCANPROTO_PER_SB_CMD_
 #define ICUBCANPROTO_POL_SK_CMD__TACT_SETUP         76
 
 
+
+/*****************************************************************************/
+// error flags in motor board status message (ICUBCANPROTO_PER_MB_CMD_STATUS)
+/*****************************************************************************/
+#define ICUBCANPROTO_PER_MB_STATUS_FLAG_UNDERVOLTAGE    0x01
+#define ICUBCANPROTO_PER_MB_STATUS_FLAG_OVERVOLTAGE     0x02
+#define ICUBCANPROTO_PER_MB_STATUS_FLAG_EXTERNAL        0x04
+#define ICUBCANPROTO_PER_MB_STATUS_FLAG_OVERCURRENT     0x08
+#define ICUBCANPROTO_PER_MB_STATUS_FLAG_I2TFAILURE      0x20//in data[5]
  
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
