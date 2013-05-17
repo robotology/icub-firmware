@@ -3,10 +3,10 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_HAL_CM.H
  *      Purpose: Hardware Abstraction Layer for Cortex-M definitions
- *      Rev.:    V4.50
+ *      Rev.:    V4.70
  *----------------------------------------------------------------------------
  *
- * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
+ * Copyright (c) 1999-2009 KEIL, 2009-2013 ARM Germany GmbH
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -143,7 +143,11 @@ static inline U8 __clz(U32 value)
 #define NVIC_ST_CURRENT (*((volatile U32 *)0xE000E018))
 #define NVIC_ISER         ((volatile U32 *)0xE000E100)
 #define NVIC_ICER         ((volatile U32 *)0xE000E180)
+#if (__TARGET_ARCH_6S_M)
+#define NVIC_IP           ((volatile U32 *)0xE000E400)
+#else
 #define NVIC_IP           ((volatile U8  *)0xE000E400)
+#endif
 #define NVIC_INT_CTRL   (*((volatile U32 *)0xE000ED04))
 #define NVIC_AIR_CTRL   (*((volatile U32 *)0xE000ED0C))
 #define NVIC_SYS_PRI2   (*((volatile U32 *)0xE000ED1C))
@@ -159,8 +163,13 @@ static inline U8 __clz(U32 value)
 #define OS_X_PENDING    ((NVIC_INT_CTRL >> 28) & 1)
 #define OS_X_UNPEND(fl) NVIC_INT_CTRL  = (*fl = OS_X_PENDING) << 27
 #define OS_X_PEND(fl,p) NVIC_INT_CTRL  = (fl | p) << 28
+#if (__TARGET_ARCH_6S_M)
+#define OS_X_INIT(n)    NVIC_IP[n>>2] |= 0xFF << (8*(n & 0x03)); \
+                        NVIC_ISER[n>>5] = 1 << (n & 0x1F)
+#else
 #define OS_X_INIT(n)    NVIC_IP[n] = 0xFF; \
                         NVIC_ISER[n>>5] = 1 << (n & 0x1F)
+#endif
 #define OS_X_LOCK(n)    NVIC_ICER[n>>5] = 1 << (n & 0x1F)
 #define OS_X_UNLOCK(n)  NVIC_ISER[n>>5] = 1 << (n & 0x1F)
 
@@ -217,6 +226,14 @@ __inline static void rt_systick_init (void) {
   NVIC_ST_CURRENT = 0;
   NVIC_ST_CTRL    = 0x0007;
   NVIC_SYS_PRI3  |= 0xFF000000;
+}
+
+__inline static U32 rt_systick_val (void) {
+  return (os_trv - NVIC_ST_CURRENT);
+}
+
+__inline static U32 rt_systick_ovf (void) {
+  return ((NVIC_INT_CTRL >> 26) & 1);
 }
 
 __inline static void rt_svc_init (void) {

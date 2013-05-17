@@ -1083,14 +1083,9 @@ OS_RESULT iitchanged_rt_mbx_send (OS_ID mailbox, void *p_msg, TIME_t timeout) {
    P_MCB p_MCB = mailbox;
    P_TCB p_TCB;
 
-   
-
-  if (p_MCB->state == 1) {
+  if ((p_MCB->p_lnk != NULL) && (p_MCB->state == 1)) {
     /* A task is waiting for message */
     p_TCB = rt_get_first ((P_XCB)p_MCB);
-    if (p_MCB->p_lnk == NULL) {
-      p_MCB->state = 0;
-    }
 #ifdef __CMSIS_RTOS
     rt_ret_val2(p_TCB, 0x10/*osEventMessage*/, (U32)p_msg);
 #else
@@ -1142,7 +1137,6 @@ OS_RESULT iitchanged_rt_mbx_wait (OS_ID mailbox, void **message, TIME_t timeout)
    /* Receive a message; possibly wait for it */
    P_MCB p_MCB = mailbox;
    P_TCB p_TCB;
-   
 
    /* If a message is available in the fifo buffer */
    /* remove it from the fifo buffer and return. */
@@ -1151,12 +1145,9 @@ OS_RESULT iitchanged_rt_mbx_wait (OS_ID mailbox, void **message, TIME_t timeout)
       if (++p_MCB->last == p_MCB->size) {
          p_MCB->last = 0;
       }
-    if (p_MCB->state == 2) {
+    if ((p_MCB->p_lnk != NULL) && (p_MCB->state == 2)) {
       /* A task is waiting to send message */
       p_TCB = rt_get_first ((P_XCB)p_MCB);
-      if (p_MCB->p_lnk == NULL) {
-        p_MCB->state = 0;
-      }
 #ifdef __CMSIS_RTOS
       rt_ret_val(p_TCB, 0/*osOK*/);
 #else

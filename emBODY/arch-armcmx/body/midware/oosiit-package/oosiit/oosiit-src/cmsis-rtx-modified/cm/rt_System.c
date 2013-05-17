@@ -3,10 +3,10 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_SYSTEM.C
  *      Purpose: System Task Manager
- *      Rev.:    V4.50
+ *      Rev.:    V4.70
  *----------------------------------------------------------------------------
  *
- * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
+ * Copyright (c) 1999-2009 KEIL, 2009-2013 ARM Germany GmbH
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -241,10 +241,23 @@ __weak void rt_pop_req (void) {
 
 __weak int os_tick_init (void) {
   /* Initialize SysTick timer as system tick timer. */
-  rt_systick_init ();
+  rt_systick_init();
   return (-1);  /* Return IRQ number of SysTick timer */
 }
 
+/*--------------------------- os_tick_val -----------------------------------*/
+
+__weak U32 os_tick_val (void) {
+  /* Get SysTick timer current value (0 .. OS_TRV). */
+  return rt_systick_val();
+}
+
+/*--------------------------- os_tick_ovf -----------------------------------*/
+
+__weak U32 os_tick_ovf (void) {
+  /* Get SysTick timer overflow flag */
+  return rt_systick_ovf();
+}
 
 /*--------------------------- os_tick_irqack --------------------------------*/
 

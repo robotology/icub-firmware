@@ -3,10 +3,10 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_TYPEDEF.H
  *      Purpose: Type Definitions
- *      Rev.:    V4.50
+ *      Rev.:    V4.70
  *----------------------------------------------------------------------------
  *
- * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
+ * Copyright (c) 1999-2009 KEIL, 2009-2013 ARM Germany GmbH
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -73,9 +73,9 @@ typedef struct OS_TCB {
 //  U8     dummy1;                    //IIT-EXT: for sent2front
 //  U16    dummy2;                    //IIT-EXT: for sent2front
   void   **msg;                   /* Direct message passing when task waits  */
-  //U8    perthread_libspace[96];
-  void   *ptr_perthread_libspace;
-  void   *extdata;
+  //U8    perthread_libspace[96];   //IIT-EXT: added
+  void   *ptr_perthread_libspace;   //IIT-EXT: added 
+  void   *extdata;                  //IIT-EXT: added
 
   /* Hardware dependant part: specific for CM processor                      */
   U8     stack_frame;             /* Stack frame: 0=Basic, 1=Extended        */
@@ -93,7 +93,6 @@ typedef struct OS_TCB {
 typedef struct OS_PSFE {          /* Post Service Fifo Entry                 */
   void  *id;                      /* Object Identification                   */
   U32    arg;                     /* Object Argument                         */
-//  U32    flags;                 //IIT-EXT: for send2front. but not used                                                  //IIT-EXT: we could implement the add in front of mbx w/ this field
 } *P_PSFE;
 
 typedef struct OS_PSQ {           /* Post Service Queue                      */

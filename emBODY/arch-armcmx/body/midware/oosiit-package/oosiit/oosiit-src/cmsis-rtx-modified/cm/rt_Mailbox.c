@@ -3,10 +3,10 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_MAILBOX.C
  *      Purpose: Implements waits and wake-ups for mailbox messages
- *      Rev.:    V4.50
+ *      Rev.:    V4.70
  *----------------------------------------------------------------------------
  *
- * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
+ * Copyright (c) 1999-2009 KEIL, 2009-2013 ARM Germany GmbH
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -72,12 +72,9 @@ OS_RESULT rt_mbx_send (OS_ID mailbox, void *p_msg, U16 timeout) {
   P_MCB p_MCB = mailbox;
   P_TCB p_TCB;
 
-  if (p_MCB->state == 1) {
+  if ((p_MCB->p_lnk != NULL) && (p_MCB->state == 1)) {
     /* A task is waiting for message */
     p_TCB = rt_get_first ((P_XCB)p_MCB);
-    if (p_MCB->p_lnk == NULL) {
-      p_MCB->state = 0;
-    }
 #ifdef __CMSIS_RTOS
     rt_ret_val2(p_TCB, 0x10/*osEventMessage*/, (U32)p_msg);
 #else
@@ -135,12 +132,9 @@ OS_RESULT rt_mbx_wait (OS_ID mailbox, void **message, U16 timeout) {
     if (++p_MCB->last == p_MCB->size) {
       p_MCB->last = 0;
     }
-    if (p_MCB->state == 2) {
+    if ((p_MCB->p_lnk != NULL) && (p_MCB->state == 2)) {
       /* A task is waiting to send message */
       p_TCB = rt_get_first ((P_XCB)p_MCB);
-      if (p_MCB->p_lnk == NULL) {
-        p_MCB->state = 0;
-      }
 #ifdef __CMSIS_RTOS
       rt_ret_val(p_TCB, 0/*osOK*/);
 #else
@@ -235,17 +229,14 @@ void rt_mbx_psh (P_MCB p_CB, void *p_msg) {
 #ifdef __CMSIS_RTOS //IIT-EXT: to remove compiler warning about non referenced variable
   void *mem;
 #endif
-    
-  switch (p_CB->state) {
+
+  if (p_CB->p_lnk != NULL) switch (p_CB->state) {
 #ifdef __CMSIS_RTOS
     case 3:
       /* Task is waiting to allocate memory, remove it from the waiting list */
       mem = rt_alloc_box(p_msg);
       if (mem == NULL) break;
       p_TCB = rt_get_first ((P_XCB)p_CB);
-      if (p_CB->p_lnk == NULL) {
-        p_CB->state = 0;
-      }
       rt_ret_val(p_TCB, (U32)mem);
       p_TCB->state = READY;
       rt_rmv_dly (p_TCB);
@@ -255,9 +246,6 @@ void rt_mbx_psh (P_MCB p_CB, void *p_msg) {
     case 2:
       /* Task is waiting to send a message, remove it from the waiting list */
       p_TCB = rt_get_first ((P_XCB)p_CB);
-      if (p_CB->p_lnk == NULL) {
-        p_CB->state = 0;
-      }
 #ifdef __CMSIS_RTOS
       rt_ret_val(p_TCB, 0/*osOK*/);
 #else
@@ -275,9 +263,6 @@ void rt_mbx_psh (P_MCB p_CB, void *p_msg) {
     case 1:
       /* Task is waiting for a message, pass the message to the task directly */
       p_TCB = rt_get_first ((P_XCB)p_CB);
-      if (p_CB->p_lnk == NULL) {
-        p_CB->state = 0;
-      }
 #ifdef __CMSIS_RTOS
       rt_ret_val2(p_TCB, 0x10/*osEventMessage*/, (U32)p_msg);
 #else
@@ -288,19 +273,18 @@ void rt_mbx_psh (P_MCB p_CB, void *p_msg) {
       rt_rmv_dly (p_TCB);
       rt_put_prio (&os_rdy, p_TCB);
       break;
-    default:
-      /* No task is waiting for a message, store it to the mailbox queue */
-      if (p_CB->count < p_CB->size) {
-        p_CB->msg[p_CB->first] = p_msg;
-        rt_inc (&p_CB->count);
-        if (++p_CB->first == p_CB->size) {
-          p_CB->first = 0;
-        }
+  } else {
+    /* No task is waiting for a message, store it to the mailbox queue */
+    if (p_CB->count < p_CB->size) {
+      p_CB->msg[p_CB->first] = p_msg;
+      rt_inc (&p_CB->count);
+      if (++p_CB->first == p_CB->size) {
+        p_CB->first = 0;
       }
-      else {
-        os_error (OS_ERR_MBX_OVF);
-      }
-      break;
+    }
+    else {
+      os_error (OS_ERR_MBX_OVF);
+    }
   }
 }
 

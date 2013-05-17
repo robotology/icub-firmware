@@ -3,10 +3,10 @@
  *----------------------------------------------------------------------------
  *      Name:    HAL_CM4.C
  *      Purpose: Hardware Abstraction Layer for Cortex-M4
- *      Rev.:    V4.50
+ *      Rev.:    V4.70
  *----------------------------------------------------------------------------
  *
- * Copyright (c) 1999-2009 KEIL, 2009-2012 ARM Germany GmbH
+ * Copyright (c) 1999-2009 KEIL, 2009-2013 ARM Germany GmbH
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -124,6 +124,11 @@ __asm void SVC_Handler (void) {
         IMPORT  SVC_Table
         IMPORT  rt_stk_check
 
+#ifdef  IFX_XMC4XXX
+        EXPORT  SVC_Handler_Veneer
+SVC_Handler_Veneer        
+#endif
+
         MRS     R0,PSP                  ; Read PSP
         LDR     R1,[R0,#24]             ; Read Saved PC from Stack
         LDRB    R1,[R1,#-2]             ; Load SVC Number
@@ -140,7 +145,12 @@ __asm void SVC_Handler (void) {
         LDR     R3,=__cpp(&os_tsk)
         LDM     R3,{R1,R2}              ; os_tsk.run, os_tsk.new
         CMP     R1,R2
+#ifdef  IFX_XMC4XXX
+        PUSHEQ  {LR}
+        POPEQ   {PC}
+#else
         BXEQ    LR                      ; RETI, no task switch
+#endif
 
         CBZ     R1,SVC_Next             ; Runtask deleted?
         TST     LR,#0x10                ; is it extended frame?
@@ -168,7 +178,12 @@ SVC_Next
         MSR     PSP,R12                 ; Write PSP
 
 SVC_Exit
+#ifdef  IFX_XMC4XXX
+        PUSH    {LR}
+        POP     {PC}
+#else
         BX      LR
+#endif
 
         /*------------------- User SVC ------------------------------*/
 
@@ -199,6 +214,11 @@ SVC_Done
 __asm void PendSV_Handler (void) {
         PRESERVE8
 
+#ifdef  IFX_XMC4XXX
+        EXPORT  PendSV_Handler_Veneer
+PendSV_Handler_Veneer        
+#endif
+
         PUSH    {R4,LR}                 ; Save EXC_RETURN
         BL      __cpp(rt_pop_req)
 
@@ -208,7 +228,12 @@ Sys_Switch
         LDR     R3,=__cpp(&os_tsk)
         LDM     R3,{R1,R2}              ; os_tsk.run, os_tsk.new
         CMP     R1,R2
+#ifdef  IFX_XMC4XXX
+        PUSHEQ  {LR}
+        POPEQ   {PC}
+#else
         BXEQ    LR                      ; RETI, no task switch
+#endif
 
         MRS     R12,PSP                 ; Read PSP
         TST     LR,#0x10                ; is it extended frame?
@@ -235,7 +260,12 @@ Sys_Switch
         MSR     PSP,R12                 ; Write PSP
 
 Sys_Exit
+#ifdef  IFX_XMC4XXX
+        PUSH    {LR}
+        POP     {PC}
+#else
         BX      LR                      ; Return to Thread Mode
+#endif
 
         ALIGN
 }
@@ -245,6 +275,11 @@ Sys_Exit
 
 __asm void SysTick_Handler (void) {
         PRESERVE8
+
+#ifdef  IFX_XMC4XXX
+        EXPORT  SysTick_Handler_Veneer
+SysTick_Handler_Veneer        
+#endif
 
         PUSH    {R4,LR}                 ; Save EXC_RETURN
         BL      __cpp(rt_systick)
