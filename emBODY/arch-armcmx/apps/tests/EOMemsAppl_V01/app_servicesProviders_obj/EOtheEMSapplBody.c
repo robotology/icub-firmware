@@ -104,7 +104,7 @@ static void s_eo_emsapplBody_checkConfig(EOtheEMSapplBody *p);
 static eOresult_t s_eo_emsapplBody_EnableTxMais(EOtheEMSapplBody *p);
 static eOresult_t s_eo_emsapplBody_DisableTxMais(EOtheEMSapplBody *p);
 
-static eOresult_t s_eo_emsapplBody_EnableTxStrain(EOtheEMSapplBody *p);
+static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p);
 static eOresult_t s_eo_emsapplBody_DisableTxStrain(EOtheEMSapplBody *p);
 
 //static eOresult_t test_4_strain(EOtheEMSapplBody *p);
@@ -245,7 +245,7 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
 
     if(applrunMode__2foc == p->appRunMode)
     {
-        res = s_eo_emsapplBody_EnableTxStrain(p);
+        res = s_eo_emsapplBody_SendTxMode2Strain(p);
         return(res);
     }
     else if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only != p->appRunMode))
@@ -755,7 +755,7 @@ static eOresult_t s_eo_emsapplBody_DisableTxMais(EOtheEMSapplBody *p)
 
 
 
-static eOresult_t s_eo_emsapplBody_EnableTxStrain(EOtheEMSapplBody *p)
+static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p)
 {
     eOresult_t                  res;
     eOsnsr_strainId_t           sId = 0; //exist only one mais per ep

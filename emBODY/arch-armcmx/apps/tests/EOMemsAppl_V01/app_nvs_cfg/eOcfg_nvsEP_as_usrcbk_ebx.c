@@ -276,16 +276,13 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig(uint16_t xx, cons
     
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canLoc.addr); 
 
-    if(snsr_strainmode_acquirebutdonttx != straincfg->mode) //if pc104 configures strain mode to send data
+    //only if the appl is in RUN state enable strain tx
+    eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
+    if(eo_sm_emsappl_STrun == currentstate)
     {
-        //only if the appl is in RUN state enable mais tx
-        eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
-        if(eo_sm_emsappl_STrun == currentstate)
-        {
-            msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__SET_TXMODE;
-            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(straincfg->mode));        
-        }
-    }        
+        msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__SET_TXMODE;
+        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(straincfg->mode));        
+    }
 
     msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__SET_CANDATARATE;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(straincfg->datarate));

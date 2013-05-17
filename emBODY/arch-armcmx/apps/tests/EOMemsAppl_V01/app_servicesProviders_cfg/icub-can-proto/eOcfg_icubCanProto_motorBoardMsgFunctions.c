@@ -48,6 +48,8 @@
 //#include "hal_debugPin.h"
 
 #include "OPCprotocolManager_Cfg.h"
+#include "EoDiagnostics.h"
+#include "EOtheEMSapplDiagnostics.h"
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -85,6 +87,7 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p
 static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr);
 static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidError(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr);
 static eOresult_t s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode(eOicubCanProto_controlmode_t icubcanProto_controlmode, eOmc_controlmode_t *eomc_controlmode);
+static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanframe_t *frame, eOmn_appl_runMode_t runmode);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -1298,6 +1301,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOmc_controlmode_t                      eomc_controlmode;
     eOmn_appl_runMode_t                     runmode; 
+    uint8_t                                 st_flag = 0;
     
 
     
@@ -1314,23 +1318,28 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         return(eores_OK); //ignore error
     }
     
+    //get mId
+    res = eo_appTheDB_GetMotorId_ByMotorCanLocation(eo_appTheDB_GetHandle(), &canLoc, &mId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+   
     if(applrunMode__2foc == runmode)
     {
-        res = eo_appTheDB_GetMotorId_ByMotorCanLocation(eo_appTheDB_GetHandle(), &canLoc, &mId);
-        if(eores_OK != res)
-        {
-            return(res);
-        }
+        //in this case one can addr =>one motor!!
         s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((eOicubCanProto_controlmode_t) frame->data[1],
                                                                             &eomc_controlmode);
         eo_emsController_ReadMotorstatus(mId, frame->data[0], frame->data[4], eomc_controlmode);
-        //l'aggiornamento delle nv sara' fatto nel DO.
+        //l'aggiornamento delle nv del giunto sara' fatto nel DO.
         //se l'appl e' in config sicuramente i giunti sono in idle e quindi non c'e' ninete da aggiornare
+        s_eo_appTheDB_UpdateMototStatusPtr(mId, frame, runmode);
         
         return(eores_OK);
     }
     else
     {
+        //forst joint
         res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), &canLoc, &jId);
         if(eores_OK != res)
         {
@@ -1343,16 +1352,22 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
             return(res);
         }
 
-        jstatus_ptr->chamaleon04[0] = frame->data[0]; //fault axis 0
-        jstatus_ptr->chamaleon04[1] = frame->data[4]; //can fault 
     
         //set control mode status
         s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((eOicubCanProto_controlmode_t) frame->data[1],
                                                                              &eomc_controlmode);
 
         jstatus_ptr->basic.controlmodestatus = eomc_controlmode;
+        
+        //update motor status flag
+        st_flag = frame->data[0];
+        s_eo_appTheDB_UpdateMototStatusPtr(mId, frame, runmode);
+        
+        
+
+        
     
-        // set position about the first joint in board
+        // second joint
         canLoc.indexinboard = eo_icubCanProto_jm_index_second;
     
         res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), &canLoc, &jId);
@@ -1360,6 +1375,14 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         {
             return(res);
         }
+        
+        //get mId
+        res = eo_appTheDB_GetMotorId_ByMotorCanLocation(eo_appTheDB_GetHandle(), &canLoc, &mId);
+        if(eores_OK != res)
+        {
+            return(res);
+        }
+
 
         res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), jId,  &jstatus_ptr);
         if(eores_OK != res)
@@ -1368,14 +1391,16 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         }
 
     
-        jstatus_ptr->chamaleon04[0] = frame->data[2]; //fault axis 1
-        jstatus_ptr->chamaleon04[1] = frame->data[4]; //can fault
-
         //set control mode status
         s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((eOicubCanProto_controlmode_t) frame->data[3],
                                                                              &eomc_controlmode);
 
         jstatus_ptr->basic.controlmodestatus = eomc_controlmode;
+        
+        
+        //update motor status flag
+        st_flag = frame->data[2];
+        s_eo_appTheDB_UpdateMototStatusPtr(mId, frame, runmode);
     
         return(eores_OK);
     }
@@ -1773,6 +1798,60 @@ static eOresult_t s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcContro
         }break;
     }
     return(eores_OK);
+}
+
+
+static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanframe_t *frame, eOmn_appl_runMode_t runmode)
+{
+    eOmc_motor_status_t     *mstatus_ptr;
+    eOresult_t              res;
+    uint8_t                 flag0 = frame->data[0];
+    uint8_t                 flag5 = frame->data[5];
+    
+    
+    res = eo_appTheDB_GetMotorStatusPtr(eo_appTheDB_GetHandle(), mId,  &mstatus_ptr);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    
+    mstatus_ptr->chamaleon04[0] = 0;
+    
+    if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MB_STATUS_FLAG_UNDERVOLTAGE)) //undervoltage
+    {
+        mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_UNDERVOLTAGE;
+    }
+    
+    if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MB_STATUS_FLAG_OVERVOLTAGE)) //overvoltage    
+    {
+        mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_OVERVOLTAGE;
+    }
+    
+    if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MB_STATUS_FLAG_EXTERNAL))//external
+    {
+        mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_EXTERNAL;
+    }
+ 
+    if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MB_STATUS_FLAG_OVERCURRENT)) //over current
+    {
+        if((applrunMode__2foc == runmode) && (EO_COMMON_CHECK_FLAG(flag5, ICUBCANPROTO_PER_MB_STATUS_FLAG_I2TFAILURE)))
+        {
+            mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_I2TFAILURE;
+        }
+        else
+        {
+            mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_OVERCURRENT;
+        }
+    }
+
+    if(0 != mstatus_ptr->chamaleon04[0])
+    {
+        eo_theEMSdgn_UpdateMotorStFlags(eo_theEMSdgn_GetHandle(), mId, mstatus_ptr->chamaleon04[0]);
+        eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_motorstatus , 0);
+        eo_theEMSdgn_ClearMotorStFlags(eo_theEMSdgn_GetHandle());
+    }
+    return(eores_OK);
+    
 }
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

@@ -155,6 +155,19 @@ extern opcprotman_res_t opcprotman_personalize_database(OPCprotocolManager *p)
         return(res);
     }
   
+
+/* personalize eodgn_nvidbdoor_motorstatus var*/
+	res = opcprotman_personalize_var(   p, 
+                                        eodgn_nvidbdoor_motorstatus,
+                                        (uint8_t*)&eo_dgn_motorstflag, 
+                                        NULL); //on ems i don't receive this data
+
+    if(opcprotman_OK != res)
+    {
+        return(res);
+    }
+
+
     return(res);
 }
 
