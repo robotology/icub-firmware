@@ -814,10 +814,7 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_RUN(EOsm *s)
 
 extern void eo_cfg_sm_EMSappl_hid_on_exit_RUN(EOsm *s)
 {
-#ifndef _TEST_SEQNUM_    
-    hal_led_off(emsappl_ledyellow);
-    //eov_ipnet_Activate(eov_ipnet_GetHandle());
-#endif    
+ 
     eom_emsappl_hid_userdef_on_exit_RUN(&s_emsappl_singleton);
 }
 
