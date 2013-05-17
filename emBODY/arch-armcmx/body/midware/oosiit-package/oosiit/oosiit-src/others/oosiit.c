@@ -151,6 +151,11 @@ static __INLINE oosiit_result_t isr_oosiit_advtmr_start(oosiit_objptr_t timer, o
 static __INLINE oosiit_result_t isr_oosiit_advtmr_stop(oosiit_objptr_t timer);
 static __INLINE oosiit_result_t isr_oosiit_advtmr_delete(oosiit_objptr_t timer);
 
+static __INLINE oosiit_result_t s_oosiit_tsk_valid(oosiit_tskptr_t tp);
+static __INLINE oosiit_result_t s_oosiit_mut_valid(oosiit_objptr_t op);
+static __INLINE oosiit_result_t s_oosiit_sem_valid(oosiit_objptr_t op);
+static __INLINE oosiit_result_t s_oosiit_mbx_valid(oosiit_objptr_t op);
+static __INLINE oosiit_result_t s_oosiit_advtmr_valid(oosiit_objptr_t op);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of svc functions
@@ -203,7 +208,7 @@ SVC_3_1(svc_oosiit_mbx_retrieve,        oosiit_result_t,    void*,              
 SVC_3_1(svc_oosiit_mbx_send,            oosiit_result_t,    void*,              void*,                  uint32_t,                       RET_int32_t);
 SVC_1_1(svc_oosiit_mbx_available,       uint16_t,           void*,                                                                      RET_uint32_t);
 SVC_1_1(svc_oosiit_mbx_used,            uint16_t,           void*,                                                                      RET_uint32_t);
-
+SVC_1_1(svc_oosiit_mbx_delete,          oosiit_result_t,    void*,                                                                      RET_int32_t);
 
 // event flags 
 SVC_2_1(svc_oosiit_evt_set,             oosiit_result_t,    uint32_t,           oosiit_tskptr_t,                                        RET_int32_t);
@@ -557,7 +562,7 @@ extern oosiit_tskptr_t oosiit_tsk_create(oosiit_task_properties_t* tskprop)
 
 extern oosiit_result_t oosiit_tsk_delete(oosiit_tskptr_t tp)
 {
-    if(NULL == tp)
+    if(oosiit_res_NOK == s_oosiit_tsk_valid(tp))
     {
         return(oosiit_res_NOK);
     }
@@ -586,7 +591,7 @@ extern oosiit_tskptr_t oosiit_tsk_self(void)
 
 extern oosiit_result_t oosiit_tsk_setprio(oosiit_tskptr_t tp, uint8_t tskpriority)
 {
-    if(NULL == tp)
+    if(oosiit_res_NOK == s_oosiit_tsk_valid(tp))
     {
         return(oosiit_res_NOK);
     }
@@ -617,7 +622,7 @@ extern oosiit_result_t oosiit_tsk_pass(void)
 
 extern void* oosiit_tsk_get_perthread_libspace(oosiit_tskptr_t tp)
 {
-    if(NULL == tp)
+    if(oosiit_res_NOK == s_oosiit_tsk_valid(tp))
     {
         return(NULL);
     }
@@ -634,7 +639,7 @@ extern void* oosiit_tsk_get_perthread_libspace(oosiit_tskptr_t tp)
 
 extern oosiit_result_t oosiit_tsk_set_extdata(oosiit_tskptr_t tp, void* extdata)
 {
-    if(NULL == tp)
+    if(oosiit_res_NOK == s_oosiit_tsk_valid(tp))
     {
         return(oosiit_res_NOK);
     }
@@ -652,7 +657,7 @@ extern oosiit_result_t oosiit_tsk_set_extdata(oosiit_tskptr_t tp, void* extdata)
 
 extern void* oosiit_tsk_get_extdata(oosiit_tskptr_t tp)
 {
-    if(NULL == tp)
+    if(oosiit_res_NOK == s_oosiit_tsk_valid(tp))
     {
         return(NULL);
     }
@@ -805,9 +810,31 @@ extern oosiit_objptr_t oosiit_mbx_create(uint16_t numofmessages)
     }
 }
 
+extern oosiit_result_t oosiit_mbx_delete(oosiit_objptr_t mailbox)
+{
+    if(oosiit_res_NOK == s_oosiit_mbx_valid(mailbox))
+    {
+        return(oosiit_res_NOK);
+    } 
+    
+    if(0 != __get_IPSR()) 
+    {   // inside isr
+        return(oosiit_res_NOK);
+    } 
+    else
+    {   // call svc
+         return(__svc_oosiit_mbx_delete(mailbox));
+    }         
+}
+
 extern oosiit_result_t oosiit_mbx_retrieve(oosiit_objptr_t mailbox, void** message, uint32_t timeout)
 {
-    if((NULL == mailbox) || (NULL == message))
+    if(oosiit_res_NOK == s_oosiit_mbx_valid(mailbox))
+    {
+        return(oosiit_res_NOK);
+    } 
+    
+    if(NULL == message)
     {
         return(oosiit_res_NOK);
     }
@@ -824,7 +851,12 @@ extern oosiit_result_t oosiit_mbx_retrieve(oosiit_objptr_t mailbox, void** messa
 
 extern oosiit_result_t oosiit_mbx_send(oosiit_objptr_t mailbox, void* message, uint32_t timeout)
 {
-    if((NULL == mailbox) || (NULL == message))
+    if(oosiit_res_NOK == s_oosiit_mbx_valid(mailbox))
+    {
+        return(oosiit_res_NOK);
+    } 
+    
+    if(NULL == message)
     {
         return(oosiit_res_NOK);
     }
@@ -842,10 +874,10 @@ extern oosiit_result_t oosiit_mbx_send(oosiit_objptr_t mailbox, void* message, u
 
 extern uint16_t oosiit_mbx_available(oosiit_objptr_t mailbox)
 {
-    if(NULL == mailbox)
+    if(oosiit_res_NOK == s_oosiit_mbx_valid(mailbox))
     {
         return(0);
-    }
+    } 
     
     if(0 != __get_IPSR()) 
     {   // inside isr
@@ -859,10 +891,10 @@ extern uint16_t oosiit_mbx_available(oosiit_objptr_t mailbox)
 
 extern uint16_t oosiit_mbx_used(oosiit_objptr_t mailbox)
 {
-    if(NULL == mailbox)
+    if(oosiit_res_NOK == s_oosiit_mbx_valid(mailbox))
     {
         return(0);
-    }
+    } 
     
     if(0 != __get_IPSR()) 
     {   // inside isr
@@ -880,7 +912,7 @@ extern uint16_t oosiit_mbx_used(oosiit_objptr_t mailbox)
 
 extern oosiit_result_t oosiit_evt_set(uint32_t flags, oosiit_tskptr_t tp)
 {
-    if(NULL == tp)
+    if(oosiit_res_NOK == s_oosiit_tsk_valid(tp))
     {
         return(oosiit_res_NOK);
     }
@@ -959,10 +991,10 @@ extern oosiit_objptr_t oosiit_sem_create(uint8_t maxtokens, uint8_t ntokens)
 
 extern oosiit_result_t oosiit_sem_set(oosiit_objptr_t sem, uint8_t ntokens)
 {
-    if(NULL == sem)
+    if(oosiit_res_NOK == s_oosiit_sem_valid(sem))
     {
         return(oosiit_res_NOK);
-    }
+    } 
     
     if(0 != __get_IPSR()) 
     {   // inside isr
@@ -976,10 +1008,10 @@ extern oosiit_result_t oosiit_sem_set(oosiit_objptr_t sem, uint8_t ntokens)
 
 extern oosiit_result_t oosiit_sem_send(oosiit_objptr_t sem)
 {
-    if(NULL == sem)
+    if(oosiit_res_NOK == s_oosiit_sem_valid(sem))
     {
         return(oosiit_res_NOK);
-    }
+    } 
     
     if(0 != __get_IPSR()) 
     {   // inside isr
@@ -993,10 +1025,10 @@ extern oosiit_result_t oosiit_sem_send(oosiit_objptr_t sem)
 
 extern oosiit_result_t oosiit_sem_wait(oosiit_objptr_t sem, uint32_t timeout)
 {
-    if(NULL == sem)
+    if(oosiit_res_NOK == s_oosiit_sem_valid(sem))
     {
         return(oosiit_res_NOK);
-    }
+    } 
     
     if(0 != __get_IPSR()) 
     {   // inside isr
@@ -1010,10 +1042,10 @@ extern oosiit_result_t oosiit_sem_wait(oosiit_objptr_t sem, uint32_t timeout)
 
 extern oosiit_result_t oosiit_sem_delete(oosiit_objptr_t sem)
 {
-    if(NULL == sem)
+    if(oosiit_res_NOK == s_oosiit_sem_valid(sem))
     {
         return(oosiit_res_NOK);
-    }
+    } 
     
     if(0 != __get_IPSR()) 
     {   // inside isr
@@ -1043,6 +1075,11 @@ extern oosiit_objptr_t oosiit_mut_create(void)
 
 extern oosiit_result_t oosiit_mut_wait(oosiit_objptr_t mutex, uint32_t timeout)
 {
+    if(oosiit_res_NOK == s_oosiit_mut_valid(mutex))
+    {
+        return(oosiit_res_NOK);
+    }
+    
     if(0 != __get_IPSR()) 
     {   // inside isr
         return(oosiit_res_NOK);
@@ -1056,6 +1093,11 @@ extern oosiit_result_t oosiit_mut_wait(oosiit_objptr_t mutex, uint32_t timeout)
 
 extern oosiit_result_t oosiit_mut_release(oosiit_objptr_t mutex)
 {
+    if(oosiit_res_NOK == s_oosiit_mut_valid(mutex))
+    {
+        return(oosiit_res_NOK);
+    }
+    
     if(0 != __get_IPSR()) 
     {   // inside isr
         return(oosiit_res_NOK);
@@ -1068,7 +1110,7 @@ extern oosiit_result_t oosiit_mut_release(oosiit_objptr_t mutex)
 
 extern oosiit_result_t oosiit_mut_delete(oosiit_objptr_t mutex)
 {
-    if(NULL == mutex)
+    if(oosiit_res_NOK == s_oosiit_mut_valid(mutex))
     {
         return(oosiit_res_NOK);
     }
@@ -1100,7 +1142,12 @@ extern oosiit_objptr_t oosiit_advtmr_new(void)
 
 extern oosiit_result_t oosiit_advtmr_start(oosiit_objptr_t timer, oosiit_advtmr_timing_t *timing, oosiit_advtmr_action_t *action)
 {
-    if((NULL == timer) || (NULL == timing) || (NULL == action))
+    if(oosiit_res_NOK == s_oosiit_advtmr_valid(timer))
+    {
+        return(oosiit_res_NOK);
+    }    
+    
+    if((NULL == timing) || (NULL == action))
     {
         return(oosiit_res_NOK);
     }
@@ -1117,10 +1164,10 @@ extern oosiit_result_t oosiit_advtmr_start(oosiit_objptr_t timer, oosiit_advtmr_
 
 extern oosiit_result_t oosiit_advtmr_stop(oosiit_objptr_t timer)
 {
-    if(NULL == timer) 
+    if(oosiit_res_NOK == s_oosiit_advtmr_valid(timer))
     {
         return(oosiit_res_NOK);
-    }
+    }  
     
     if(0 != __get_IPSR()) 
     {   // inside isr
@@ -1134,10 +1181,10 @@ extern oosiit_result_t oosiit_advtmr_stop(oosiit_objptr_t timer)
 
 extern oosiit_result_t oosiit_advtmr_isactive(oosiit_objptr_t timer)
 {
-    if(NULL == timer) 
+    if(oosiit_res_NOK == s_oosiit_advtmr_valid(timer))
     {
         return(oosiit_res_NOK);
-    }
+    }  
     
     return((OS_R_OK == rt_iit_advtmr_isactive(timer)) ? (oosiit_res_OK) : (oosiit_res_NOK));
     
@@ -1153,10 +1200,10 @@ extern oosiit_result_t oosiit_advtmr_isactive(oosiit_objptr_t timer)
 
 extern oosiit_result_t oosiit_advtmr_delete(oosiit_objptr_t timer)
 {
-    if(NULL == timer) 
+    if(oosiit_res_NOK == s_oosiit_advtmr_valid(timer))
     {
         return(oosiit_res_NOK);
-    }
+    }  
     
     if(0 != __get_IPSR()) 
     {   // inside isr
@@ -1561,6 +1608,19 @@ extern void* svc_oosiit_mbx_create(uint16_t numofmessages)
 }
 
 
+extern oosiit_result_t svc_oosiit_mbx_delete(oosiit_objptr_t mailbox)
+{
+    OS_RESULT res;
+    rt_iit_dbg_svc_enter();
+ 
+    res = iitdeveloped_rt_mbx_delete(mailbox);
+    
+    rt_iit_memory_relsem(mailbox);
+    
+    rt_iit_dbg_svc_exit();
+    return((oosiit_result_t)res);   
+}
+
 extern oosiit_result_t svc_oosiit_mbx_retrieve(oosiit_objptr_t mailbox, void** message, uint32_t timeout)
 {
     OS_RESULT res;
@@ -1915,6 +1975,58 @@ static __INLINE oosiit_result_t isr_oosiit_advtmr_stop(oosiit_objptr_t timer)
 static __INLINE oosiit_result_t isr_oosiit_advtmr_delete(oosiit_objptr_t timer)
 {
     return((oosiit_result_t)isr_iit_advtmr_delete(timer));
+}
+
+
+static __INLINE oosiit_result_t s_oosiit_tsk_valid(oosiit_tskptr_t tp)
+{
+    if((NULL == tp) || (TCB != *((uint8_t*)tp)))
+    {
+        oosiit_sys_error(oosiit_error_invalid_tskptr);
+        return(oosiit_res_NOK);
+    }
+    return(oosiit_res_OK);    
+}
+
+static __INLINE oosiit_result_t s_oosiit_mut_valid(oosiit_objptr_t op)
+{
+    if((NULL == op) || (MUCB != *((uint8_t*)op)))
+    {
+        oosiit_sys_error(oosiit_error_invalid_objptr);
+        return(oosiit_res_NOK);
+    }
+    return(oosiit_res_OK);    
+}
+
+
+static __INLINE oosiit_result_t s_oosiit_sem_valid(oosiit_objptr_t op)
+{
+    if((NULL == op) || (SCB != *((uint8_t*)op)))
+    {
+        oosiit_sys_error(oosiit_error_invalid_objptr);
+        return(oosiit_res_NOK);
+    }
+    return(oosiit_res_OK);    
+}
+
+static __INLINE oosiit_result_t s_oosiit_mbx_valid(oosiit_objptr_t op)
+{
+    if((NULL == op) || (MCB != *((uint8_t*)op)))
+    {
+        oosiit_sys_error(oosiit_error_invalid_objptr);
+        return(oosiit_res_NOK);
+    }
+    return(oosiit_res_OK);    
+}
+
+static __INLINE oosiit_result_t s_oosiit_advtmr_valid(oosiit_objptr_t op)
+{
+    if((NULL == op) || (ATCB != *((uint8_t*)op)))
+    {
+        oosiit_sys_error(oosiit_error_invalid_objptr);
+        return(oosiit_res_NOK);
+    }
+    return(oosiit_res_OK);    
 }
 
 // --------------------------------------------------------------------------------------------------------------------

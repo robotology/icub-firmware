@@ -118,7 +118,7 @@
 //   <i> if dynamic the following numbers are not relevant anymore as they are allocated on demand
 //   <i> moreover, the task control block is allocated on task creation
 #ifndef OOSIIT_MEMMODE
- #define OOSIIT_MEMMODE    1
+ #define OOSIIT_MEMMODE    0
 #endif
 
 // </h>

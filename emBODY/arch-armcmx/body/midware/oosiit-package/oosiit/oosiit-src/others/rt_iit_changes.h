@@ -102,6 +102,18 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
+#define NOCB            0x00
+#define TCB             0x60
+#define MCB             0x61
+#define SCB             0x62
+#define MUCB            0x63
+#define HCB             0x64
+#define ATCB            0x65 //IIT-EXT: for AdvancedTimers
+
+#define OS_R_OBJDELETED 0x10
+
+
+
 #if defined(OOSIIT_DBG_ENABLE)
 #define	RT_IIT_SYSCALL_ID_SYSTICK   ev_ID_systick	
 #define	RT_IIT_SYSCALL_ID_PENDSV    ev_ID_pendsv
@@ -219,7 +231,8 @@ extern EVENT_t iitchanged_rt_evt_get (void);
 extern void iitchanged_rt_evt_psh (U32 arg_u32, U32 set_flags);
 
 // - mailbox management routines -
-void iitchanged_rt_mbx_init (OS_ID mailbox, U16 numofmessages);
+extern void iitchanged_rt_mbx_init (OS_ID mailbox, U16 numofmessages);
+extern OS_RESULT iitdeveloped_rt_mbx_delete (OS_ID mailbox);
 extern OS_RESULT iitchanged_rt_mbx_send(OS_ID mailbox, void *p_msg,    TIME_t timeout);
 extern OS_RESULT iitchanged_rt_mbx_wait(OS_ID mailbox, void **message, TIME_t timeout);
 extern OS_RESULT rt_iit_mbx_count(OS_ID mailbox);

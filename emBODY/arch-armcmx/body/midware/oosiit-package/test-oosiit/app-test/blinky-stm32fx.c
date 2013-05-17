@@ -84,6 +84,7 @@ static void s_gotoerrormode(void);
 
 static void s_init(void* p);
 static void s_stay(void* p);
+static void s_away(void* p);
 
 
 
@@ -208,9 +209,13 @@ extern void oosiit_idle(void *p)
 
 extern void oosiit_init(void* p) 
 {
+    static volatile int i = 0;
     s_init(p);
+    
+    i++;
  
     s_stay(p);
+    s_away(p);
 }
 
 
@@ -409,6 +414,7 @@ static void s_stay(void* p)
         if(NULL != mut)
         {
             oosiit_mut_delete(mut);
+            //oosiit_mut_wait(mut, 0);
             mut = NULL;
             mut = oosiit_mut_create();
             if(NULL != mut)
@@ -430,6 +436,15 @@ static void s_stay(void* p)
         
     }
 
+}
+
+static void s_away(void* p)
+{
+    static volatile int i=0;
+    
+    oosiit_tsk_delete(oosiit_tsk_self());
+    i++;
+    
 }
 
 

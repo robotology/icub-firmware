@@ -145,7 +145,7 @@ struct OS_TSK os_tsk =
 
 struct OS_TCB os_idle_TCB = 
 {
-    .cb_type                = 0,
+    .cb_type                = NOCB,
     .state                  = 0,
     .prio                   = 0,
     .task_id                = 0,
@@ -672,7 +672,7 @@ void rt_iit_pop_req_base (void) {
       /* Must be of SCB type */
       //rt_sem_psh ((P_SCB)p_CB); //IIT-EXT
       iitchanged_rt_sem_psh((P_SCB)p_CB);
-    }
+    } // else ... it may be NOCB or an error
     if (++idx == os_psq->size) idx = 0;
     rt_dec (&os_psq->count);
   }
@@ -739,11 +739,11 @@ void rt_pop_req (void) {
     else if (p_CB->cb_type == ATCB) { //IIT-EXT
       rt_advtmr_psh ((OS_ID)p_CB, (U32)os_psq->q[idx].arg); //IIT-EXT
     } //IIT-EXT
-    else {
+    else if (p_CB->cb_type == SCB) { //IIT-EXT
       /* Must be of SCB type */
       //rt_sem_psh ((P_SCB)p_CB); //IIT-EXT
       rt_iit_sem_psh((P_SCB)p_CB);
-    }
+    } // else ... error
     if (++idx == os_psq->size) idx = 0;
     rt_dec (&os_psq->count);
   }
@@ -897,7 +897,7 @@ OS_RESULT rt_iit_mut_delete (OS_ID mutex) {
   while (p_MCB->p_lnk != NULL) {
     /* A task is waiting for mutex. */
     p_TCB = rt_get_first ((P_XCB)p_MCB);
-    rt_ret_val(p_TCB, 0/*osOK*/);
+    rt_ret_val(p_TCB, OS_R_OBJDELETED);
     rt_rmv_dly(p_TCB);
     p_TCB->state = READY;
     rt_put_prio (&os_rdy, p_TCB);
@@ -910,7 +910,7 @@ OS_RESULT rt_iit_mut_delete (OS_ID mutex) {
     rt_dispatch (NULL);
   }
 
-  p_MCB->cb_type = 0;
+  p_MCB->cb_type = NOCB;
 
   return (OS_R_OK);
 }
@@ -1077,6 +1077,59 @@ void iitchanged_rt_mbx_init (OS_ID mailbox, U16 numofmessages) {
   p_MCB->count   = 0;
   p_MCB->size    = numofmessages;
 }
+
+OS_RESULT iitdeveloped_rt_mbx_delete (OS_ID mailbox) 
+{
+    // delete mailbox
+    P_MCB p_MCB = mailbox;
+    P_TCB p_TCB;
+ 
+    while (p_MCB->p_lnk != NULL) 
+    {
+        if ((p_MCB->p_lnk != NULL) && (p_MCB->state == 1)) 
+        {   // a task is waiting for a message:  we wake it up and give error if the mbx is empty. otherwise we give it the message
+            p_TCB = rt_get_first ((P_XCB)p_MCB);
+            if (p_MCB->count) 
+            {
+                *p_TCB->msg = p_MCB->msg[p_MCB->last];
+                if (++p_MCB->last == p_MCB->size) {
+                    p_MCB->last = 0;
+                }
+                rt_dec (&p_MCB->count); 
+                //rt_ret_val (p_TCB, OS_R_MBX);  
+                rt_ret_val(p_TCB, OS_R_OBJDELETED);
+            }
+            else
+            {
+                *p_TCB->msg = NULL;
+                rt_ret_val (p_TCB, OS_R_OBJDELETED);
+            }
+            rt_rmv_dly (p_TCB);
+            rt_dispatch (p_TCB);               
+        }
+        else if ((p_MCB->p_lnk != NULL) && (p_MCB->state == 2)) 
+        {
+            // a task is waiting to send a message: the mbx cannot accept it, thus we return an error 
+            p_TCB = rt_get_first ((P_XCB)p_MCB);
+            rt_ret_val(p_TCB, OS_R_OBJDELETED);
+            rt_rmv_dly (p_TCB);
+            rt_dispatch (p_TCB);
+        }
+    }
+
+    if (os_rdy.p_lnk && (os_rdy.p_lnk->prio > os_tsk.run->prio)) 
+    {
+        /* preempt running task */
+        rt_put_prio (&os_rdy, os_tsk.run);
+        os_tsk.run->state = READY;
+        rt_dispatch (NULL);
+    }
+
+  p_MCB->cb_type = NOCB;
+
+  return (OS_R_OK);
+}
+
 
 OS_RESULT iitchanged_rt_mbx_send (OS_ID mailbox, void *p_msg, TIME_t timeout) {
    /* Send message to a mailbox */
@@ -1675,7 +1728,7 @@ OS_RESULT rt_iit_sem_delete (OS_ID semaphore) {
   while (p_SCB->p_lnk != NULL) {
     /* A task is waiting for token */
     p_TCB = rt_get_first ((P_XCB)p_SCB);
-    rt_ret_val(p_TCB, 0);
+    rt_ret_val(p_TCB, OS_R_OBJDELETED);
     rt_rmv_dly(p_TCB);
     p_TCB->state = READY;
     rt_put_prio (&os_rdy, p_TCB);
@@ -1688,7 +1741,7 @@ OS_RESULT rt_iit_sem_delete (OS_ID semaphore) {
     rt_dispatch (NULL);
   }
 
-  p_SCB->cb_type = 0;
+  p_SCB->cb_type = NOCB;
 
   return (OS_R_OK);
 }
@@ -2019,6 +2072,7 @@ OS_RESULT rt_iit_tsk_delete (OS_TPTR taskp) {
         rt_iit_memory_del(os_tsk.run->stack);
     os_tsk.run->stack = NULL;
     DBG_TASK_NOTIFY(os_tsk.run, __FALSE);
+    os_tsk.run->cb_type = NOCB; // useful only in case of static mode, where the memory stay unchanged. the free changes content of pointer memory
     if(NULL != mp_tcb)
     {
         task_context->ptr_perthread_libspace = NULL;   
@@ -2053,6 +2107,7 @@ OS_RESULT rt_iit_tsk_delete (OS_TPTR taskp) {
         rt_iit_memory_del(task_context->stack);
     task_context->stack = NULL;
     DBG_TASK_NOTIFY(task_context, __FALSE);
+    task_context->cb_type = NOCB; // useful only in case of static mode, where the memory stay unchanged. the free changes content of pointer memory
     if(NULL != mp_tcb)
     {
         task_context->ptr_perthread_libspace = NULL;

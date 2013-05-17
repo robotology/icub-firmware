@@ -34,12 +34,13 @@
 
 /* Definitions */
 
-/* Values for 'cb_type' */
-#define TCB             0
-#define MCB             1
-#define SCB             2
-#define MUCB            3
-#define HCB             4
+//IIT-EXT: moved them from here to ... rt_iit_changes.h
+// /* Values for 'cb_type' */
+// #define TCB             0
+// #define MCB             1
+// #define SCB             2
+// #define MUCB            3
+// #define HCB             4
 
 /* Variables */
 extern struct OS_XCB os_rdy;

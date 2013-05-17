@@ -77,7 +77,7 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-#define ATCB            5 //IIT-EXT: for AdvancedTimers
+//#define ATCB            5 //IIT-EXT: for AdvancedTimers
   
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
