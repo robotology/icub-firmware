@@ -64,6 +64,7 @@ eOdgn_commands_t                    eo_dgn_cmds;
 eOdgn_emsperipheralstatus_t         eo_dgn_emsperiph;
 eOdgn_emsapplication_common_t       eo_dgn_emsapplcore;
 eOdgn_emsapplication_emswithmc_t    eo_dgn_emsappmc;
+eOdgn_motorstatusflags_t            eo_dgn_motorstflag;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -95,6 +96,7 @@ extern EOTheEMSdiagnostics_t* eo_theEMSdgn_Initialize(void)
     memset(&eo_dgn_emsperiph, 0, sizeof(eOdgn_emsperipheralstatus_t));
     memset(&eo_dgn_emsapplcore, 0, sizeof(eOdgn_emsapplication_common_t));
     memset(&eo_dgn_emsappmc, 0, sizeof(eOdgn_emsapplication_emswithmc_t));
+    memset(&eo_dgn_motorstflag, 0, sizeof(eOdgn_motorstatusflags_t));
     
     return(&s_thedgn);
 }
@@ -181,6 +183,25 @@ extern eOresult_t eo_theEMSdgn_UpdateApplWithMc(EOTheEMSdiagnostics_t* p, EOappE
     }
     return(eores_OK);
 }
+
+extern eOresult_t eo_theEMSdgn_UpdateMotorStFlags(EOTheEMSdiagnostics_t* p, eOmc_motorId_t mId, uint8_t flags)
+{
+    if(mId >= 12)
+    {
+        return(eores_NOK_generic);
+    }
+
+    eo_dgn_motorstflag.motorlist[mId] = flags;
+
+    return(eores_OK);
+}
+
+extern eOresult_t eo_theEMSdgn_ClearMotorStFlags(EOTheEMSdiagnostics_t* p)
+{
+     memset(&eo_dgn_motorstflag, 0, sizeof(eOdgn_motorstatusflags_t));
+    return(eores_OK);
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
