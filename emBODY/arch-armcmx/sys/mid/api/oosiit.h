@@ -67,7 +67,8 @@ typedef enum
     oosiit_res_EVT      = 0x02,
     oosiit_res_SEM      = 0x03,
     oosiit_res_MBX      = 0x04,
-    oosiit_res_MUT      = 0x05
+    oosiit_res_MUT      = 0x05,
+    oosiit_res_OBJDEL   = 0x10
 } oosiit_result_t;
 
 
@@ -174,11 +175,13 @@ typedef enum
     oosiit_error_unknown                = 0,        /**< nasty one */
     oosiit_error_stackoverflow          = 1,        /**< a task has used all its stack */
     oosiit_error_isrfifooverflow        = 2,        /**< too many calls from an ISR */
-    oosiit_error_mbxoverflow            = 3,        /**< to be undestood */
+    oosiit_error_mbxoverflow            = 3,        /**< .... */
     oosiit_error_internal_stdlibspace   = 10,       /**< there is no stdlib space available */
     oosiit_error_internal_sysmutex      = 11,       /**< system mutexes are not enough */
     oosiit_error_memory_allocation      = 12,       /**< there is not heap anymore */
-    oosiit_error_memory_preallocated    = 13        /**< there is not preallocated memory anymore */
+    oosiit_error_memory_preallocated    = 13,       /**< there is not preallocated memory anymore */
+    oosiit_error_invalid_tskptr         = 14,       /**< the API have detected the use of an incorrect oosiit_tskptr_t */
+    oosiit_error_invalid_objptr         = 15        /**< the API have detected the use of an incorrect oosiit_objptr_t */
 } oosiit_error_code_t;
 
 
@@ -426,6 +429,15 @@ extern void oosiit_itv_wait(void);
 extern oosiit_objptr_t oosiit_mbx_create(uint16_t numofmessages); 
 
 
+/** @fn         extern oosiit_result_t oosiit_mbx_delete(oosiit_objptr_t mailbox)
+    @brief      It deletes a mailbox. 
+    @param      mailbox         The handler to the mailbox
+    @return     oosiit_res_OK upon success, oosiit_res_NOK upon failure (e.g., if called from an ISR)
+
+ **/ 
+extern oosiit_result_t oosiit_mbx_delete(oosiit_objptr_t mailbox);
+
+
 /** @fn         extern oosiit_result_t oosiit_mbx_retrieve(oosiit_objptr_t mailbox, void **message, uint32_t timeout)
     @brief      Gets a pointer to a message from the mailbox. The function can be called from inside an ISR. In such a case it is used as if timeout were zero.
     @param      mailbox         the mailbox.
@@ -522,6 +534,14 @@ extern oosiit_result_t oosiit_evt_clr(uint32_t flags);
 extern oosiit_objptr_t oosiit_sem_create(uint8_t maxtokens, uint8_t ntokens);
 
 
+/** @fn         extern oosiit_result_t oosiit_sem_delete(oosiit_objptr_t sem)
+    @brief      It deletes a semaphore. 
+    @param      sem             The handler to the semaphore
+    @return     oosiit_res_OK upon success, oosiit_res_NOK upon failure (e.g., if called from an ISR)
+
+ **/ 
+extern oosiit_result_t oosiit_sem_delete(oosiit_objptr_t sem);
+
 
 /** @fn         extern oosiit_result_t oosiit_sem_set(oosiit_objptr_t sem, uint8_t ntokens)
     @brief      It sets the number of tokens to @e ntokens. The function wakes up a task that may wait if the
@@ -555,14 +575,6 @@ extern oosiit_result_t oosiit_sem_wait(oosiit_objptr_t sem, uint32_t timeout);
 
 
 
-/** @fn         extern oosiit_result_t oosiit_sem_delete(oosiit_objptr_t sem)
-    @brief      It deletes a semaphore. 
-    @param      sem             The handler to the semaphore
-    @return     oosiit_res_OK upon success, oosiit_res_NOK upon failure (e.g., if called from an ISR)
-
- **/ 
-extern oosiit_result_t oosiit_sem_delete(oosiit_objptr_t sem);
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // mutex functions
 
@@ -572,6 +584,15 @@ extern oosiit_result_t oosiit_sem_delete(oosiit_objptr_t sem);
     @return     the mutex or NULL if no memory is available.
  **/ 
 extern oosiit_objptr_t oosiit_mut_create(void);
+
+
+/** @fn         extern oosiit_result_t oosiit_mut_delete(oosiit_objptr_t mutex)
+    @brief      It deletes a mutex. 
+    @param      sem             The handler to the mutex
+    @return     oosiit_res_OK upon success, oosiit_res_NOK upon failure (e.g., if called from an ISR)
+
+ **/
+extern oosiit_result_t oosiit_mut_delete(oosiit_objptr_t mutex);
 
 
 /** @fn         extern oosiit_result_t oosiit_mut_wait(oosiit_objptr_t mutex, uint32_t timeout)
@@ -592,14 +613,6 @@ extern oosiit_result_t oosiit_mut_wait(oosiit_objptr_t mutex, uint32_t timeout);
  **/
 extern oosiit_result_t oosiit_mut_release(oosiit_objptr_t mutex);
 
-
-/** @fn         extern oosiit_result_t oosiit_mut_delete(oosiit_objptr_t mutex)
-    @brief      It deletes a mutex. 
-    @param      sem             The handler to the mutex
-    @return     oosiit_res_OK upon success, oosiit_res_NOK upon failure (e.g., if called from an ISR)
-
- **/
-extern oosiit_result_t oosiit_mut_delete(oosiit_objptr_t mutex);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // advanced timer functions

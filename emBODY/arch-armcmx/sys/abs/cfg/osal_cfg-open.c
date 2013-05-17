@@ -60,10 +60,11 @@ extern const osal_cfg_t osal_cfg =
     .tick                   = (osal_reltime_t)OSAL_TICK,              // uint32_t        tick;                                   
     .launcherstacksize      = OSAL_LAUNSTKSIZE,       // uint16_t        launcherstacksize;                     
     .idlestacksize          = OSAL_IDLESTKSIZE,       // uint16_t        idlestacksize;
-    .globalstacksize        = OSAL_GLOBSTKSIZE,       // uint16_t        globalstacksize;
     .roundrobin             = (osal_bool_t)OSAL_RROBIN,            // uint8_t         roundrobin;
     .roundrobintick         = OSAL_RROBINTICK,        // uint32_t        roundrobintick;
+    
     .tasknum                = OSAL_TASKNUM,           // uint8_t         tasknum;
+    .globalstacksize        = OSAL_GLOBSTKSIZE,       // uint16_t        globalstacksize;
     .timernum               = OSAL_TIMERNUM,          // uint8_t         timernum;
     .mutexnum               = OSAL_MUTEXNUM,          // uint8_t         mutexnum;
     .semaphorenum           = OSAL_SEMAPHORENUM,      // uint8_t         semaphorenum;
