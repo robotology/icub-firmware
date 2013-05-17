@@ -546,6 +546,7 @@ extern eOresult_t eo_common_verifysafebaseobject(eOsafelyderived_t *derived, con
 
 #define EO_COMMON_IPV4ADDR_LOCALHOST                EO_COMMON_IPV4ADDR(127, 0, 0, 1)
 
+#define EO_COMMON_CHECK_FLAG(var, flagmask)         ((flagmask) == ((var)& (flagmask)))
 // - definition of extern public inlined functions --------------------------------------------------------------------
 
 EO_extern_inline eOipv4addr_t eo_common_ipv4addr(uint8_t ip1, uint8_t ip2, uint8_t ip3, uint8_t ip4)
