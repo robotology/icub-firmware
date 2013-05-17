@@ -148,10 +148,70 @@ typedef struct
     void *arg_cb_rx;
     void (*callback_on_tx)(void *arg);
     void *arg_cb_tx;
+    void (*callback_on_err)(void *arg);
+    void *arg_cb_err;
 } hal_can_cfg_t;
 
 
- 
+
+// typedef struct 
+// {
+//     union
+//     {
+//         uint32_t status;
+//         struct
+//         {
+//             uint8_t  REC;           /**< Receive Error Counter */ 
+//             uint8_t  TEC;           /**< Trasmit Error Counter */ 
+//             uint8_t  warning:1;     /**< This bit is set by hardware when the warning limit has been reached
+//                                         (Receive Error Counter or Transmit Error Counter >= 96).See standard for more information*/
+//             uint8_t  passive:1;     /**<  This bit is set by hardware when the Error Passive limit has been reached (Receive Error
+//                                          Counter or Transmit Error Counter>127). */
+//             uint8_t  busoff:1;      /**< This bit is set by hardware when it enters the bus-off state. The bus-off state is entered on
+//                                          TEC overflow, greater than 255*/
+//             uint8_t  txqueueisfull:1; /**< if its value is 1 then the tx sw buffer is full */
+//             uint8_t  rxqueueisfull:1; /**< if its value is 1 then the rx sw buffer is full */
+//             uint8_t  dummy3b:3;
+//             uint8_t  dummyu8;
+//         }s;
+//     }u;
+// } hal_can_status_t;
+
+
+
+typedef struct 
+{
+    union
+    {
+        uint32_t status;
+        struct
+        {
+            struct
+            {
+                uint8_t  REC;           /**< Receive Error Counter */ 
+                uint8_t  TEC;           /**< Trasmit Error Counter */ 
+                uint8_t  warning:1;     /**< This bit is set by hardware when the warning limit has been reached
+                                            (Receive Error Counter or Transmit Error Counter >= 96).See standard for more information*/
+                uint8_t  passive:1;     /**<  This bit is set by hardware when the Error Passive limit has been reached (Receive Error
+                                             Counter or Transmit Error Counter>127). */
+                uint8_t  busoff:1;      /**< This bit is set by hardware when it enters the bus-off state. The bus-off state is entered on
+                                             TEC overflow, greater than 255*/
+                uint8_t  txqueueisfull:1; /**< if its value is 1 then the tx hw buffer is full. Currently it is not managed!!*/
+                uint8_t  rxqueueisfull:1; /**< if its value is 1 then the rx hw buffer is full. */
+                uint8_t  dummy3b:3;
+                
+            }hw_status; //3 bytes NOTE: this information are set by hardware and propagate to application layer by an interrupt
+            
+            struct
+            {
+                uint8_t txqueueisfull:1; 
+                uint8_t rxqueueisfull:1;
+            }sw_status; //1 bytes NOTE: this information are set by software when try to put a new frame in sw output queue and it is full (txqueueisfull =1)
+                        // or when the can receive a new frame and sw input queue is full (rxqueueisfull = 1).  en sw interrupt is generated.??!! 
+        }s;
+    }u;
+} hal_can_status_t;
+
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
 extern const hal_can_cfg_t hal_can_cfg_default;
@@ -256,6 +316,8 @@ extern hal_result_t hal_can_receptionfilter_set(hal_can_port_t port, uint8_t mas
   */
 extern hal_result_t hal_can_out_get(hal_can_port_t port, uint8_t *numberof);
 
+
+extern hal_result_t hal_can_getstatus(hal_can_port_t port, hal_can_status_t *status_ptr);
 
 /** @}            
     end of group arm_hal_can  
