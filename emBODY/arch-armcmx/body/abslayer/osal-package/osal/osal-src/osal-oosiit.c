@@ -982,6 +982,7 @@ extern osal_result_t osal_messagequeue_get(osal_messagequeue_t *mq, osal_message
 //        case oosiit_res_TMO:        res = (osal_callerTSK == caller) ? (osal_res_NOK_timeout) : (osal_res_NOK_isrnowait);             break;
         case oosiit_res_TMO:        res = osal_res_NOK_timeout;     break;
         case oosiit_res_NOK: 
+        case oosiit_res_OBJDEL:
         default:                    res = osal_res_NOK_nullpointer; break; 
     }
     
@@ -1074,8 +1075,26 @@ extern osal_result_t osal_messagequeue_put(osal_messagequeue_t *mq, osal_message
 
 extern osal_result_t osal_messagequeue_delete(osal_messagequeue_t *mq)
 {
-    s_osal_error(osal_error_unsupportedbehaviour, "osal_messagequeue_delete():");
-    return(osal_res_NOK_generic);
+    if(NULL == mq)
+    {
+        return(osal_res_NOK_nullpointer); 
+    }
+
+    void* rtosobj = NULL;
+    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)mq, osal_messagequeue_signature)))
+    { 
+        return(osal_res_NOK_generic);
+    }       
+    
+    oosiit_mbx_delete(rtosobj);
+    
+    s_osal_rtosobj_clr((osal_obj_t*)mq);
+        
+    osal_mutex_take(s_osal_mutex_api_protection, OSAL_reltimeINFINITE);
+    s_resources_used[osal_info_entity_messagequeue] --;
+    osal_mutex_release(s_osal_mutex_api_protection);
+
+    return(osal_res_OK);
 }
 
 extern osal_result_t osal_eventflag_set(osal_eventflag_t flag, osal_task_t * totask, osal_caller_t caller)
