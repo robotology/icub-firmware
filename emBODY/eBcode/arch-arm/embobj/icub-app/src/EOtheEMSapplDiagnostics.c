@@ -138,8 +138,6 @@ extern eOresult_t eo_theEMSdgn_UpdateApplCore(EOTheEMSdiagnostics_t* p)
         eo_dgn_emsapplcore.core.runst.executionoverflows[2] = dgn_run_ptr->executionoverflows[2];
         eo_dgn_emsapplcore.core.runst.datagrams_failed_to_go_in_txsocket = dgn_run_ptr->datagrams_failed_to_go_in_txsocket;
     }
-    #warning sistema eo_dgn_emsapplcore.core.runst.cantxfailuretimeoutsemaphore;
-    
     
 //ipnet
     eOmipnet_diagnosticsinfo_t *dgn_ipnet_ptr = eom_ipnet_GetDiagnosticsInfoHandle(eom_ipnet_GetHandle());
