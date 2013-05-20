@@ -43,6 +43,8 @@
 #include "OPCprotocolManager_Cfg.h" 
 #include "EOtheEMSapplDiagnostics.h"
 
+#include "EOtheEMSapplDiagnostics.h"
+
 
 
 
@@ -308,15 +310,13 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p)
 {
-    uint8_t a =1;
-
     EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
     eOresult_t res[2];
     
 /* METODO 1 */
 //     res[0] = eo_appCanSP_WaitTransmitCanFrames(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1);
 //     res[1] = eo_appCanSP_WaitTransmitCanFrames(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport2);
-    a =a;
+
  /* METODO 2 */   
 //     eo_appCanSP_GetNumOfTxCanframe(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1, &numofframe_tx);
 //     while(1)
@@ -337,6 +337,12 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
 
     res[0] = eo_appCanSP_wait_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1);
     res[1] = eo_appCanSP_wait_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport2);
+    if((eores_NOK_timeout ==  res[0]) || (eores_NOK_timeout ==  res[1]))
+    {
+        eo_dgn_emsapplcore.core.runst.cantxfailuretimeoutsemaphore++;
+        eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , runner_timeout_send_diagnostics);
+
+    }
     
 }
 
