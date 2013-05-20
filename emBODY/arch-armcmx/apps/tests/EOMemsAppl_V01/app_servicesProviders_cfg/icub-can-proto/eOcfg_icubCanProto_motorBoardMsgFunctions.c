@@ -1301,8 +1301,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOmc_controlmode_t                      eomc_controlmode;
     eOmn_appl_runMode_t                     runmode; 
-    uint8_t                                 st_flag = 0;
-    
+   
 
     
     // set position about the first joint in board
@@ -1360,7 +1359,6 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         jstatus_ptr->basic.controlmodestatus = eomc_controlmode;
         
         //update motor status flag
-        st_flag = frame->data[0];
         s_eo_appTheDB_UpdateMototStatusPtr(mId, frame, runmode);
         
         
@@ -1399,7 +1397,6 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         
         
         //update motor status flag
-        st_flag = frame->data[2];
         s_eo_appTheDB_UpdateMototStatusPtr(mId, frame, runmode);
     
         return(eores_OK);
