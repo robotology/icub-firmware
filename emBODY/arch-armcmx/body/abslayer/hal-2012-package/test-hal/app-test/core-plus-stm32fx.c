@@ -110,8 +110,8 @@
 //#define EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY
 #endif
 
-//#undef EXECUTE_TEST_PERIPH_ETH
-#define EXECUTE_TEST_PERIPH_ETH
+#undef EXECUTE_TEST_PERIPH_ETH
+//#define EXECUTE_TEST_PERIPH_ETH
 
 
 #ifdef EXECUTE_TEST_PERIPH_ETH
@@ -784,7 +784,7 @@ static void test_periph_i2c(void)
 
 static void test_device_eeprom(void)
 {
-#if     defined(HAL_USE_DEVICE_EEPROM)
+#if     defined(HAL_USE_DEVICE_EEPROM) || defined(HAL_USE_DEVICE_EEPROM_dummy)
     
     test_is_beginning("eeprom");
     
