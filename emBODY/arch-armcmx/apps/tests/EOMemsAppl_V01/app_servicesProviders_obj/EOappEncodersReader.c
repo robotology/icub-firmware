@@ -396,32 +396,41 @@ static void s_eo_appEncReader_check(EOappEncReader *p)
 {
    uint32_t index, errtype;
    eOresult_t res;
+   uint8_t signal_error = 0;
+    
     if(p->dgninfo.count < DGN_COUNT_MAX)
     {
         p->dgninfo.count++;
         return;
     }
         
-    for(index=0; index<eOeOappEncReader_encoderMaxNum; index++)
+    for(index=0; (index<eOeOappEncReader_encoderMaxNum) && (0 == signal_error); index++)
     {
-        for(errtype=1; errtype<=eOappEncReader_errtype_MaxNum; errtype++)
+        for(errtype=0; (errtype<eOappEncReader_errtype_MaxNum)  && (0 == signal_error); errtype++)
         {
             if(p->dgninfo.enclist[index][errtype] > DGN_THRESHOLD)
             {
-                res = eo_theEMSdgn_UpdateApplWithMc(eo_theEMSdgn_GetHandle(), p);
-                if(eores_OK != res)
-                {
-                    return;//if some error occured while updating var to send, signaling error comes to naught.
-                }
-                
-                eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplmc , 0);
-                return;
+                signal_error = 1;
             }
         }
     }
     
+    if(1 == signal_error)
+    {
+        res = eo_theEMSdgn_UpdateApplWithMc(eo_theEMSdgn_GetHandle(), p);
+        if(eores_OK == res)
+        {
+           eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplmc , 0);
+        }
+        else
+        {
+            ;//if some error occured while updating var to send, signaling error comes to naught.
+        }
+    }
+
     //reset all statistics 
-    memset(&p->dgninfo, 0, sizeof(eOappEncReader_diagnosticsinfo_t));        
+    memset(&p->dgninfo, 0, sizeof(eOappEncReader_diagnosticsinfo_t));
+    p->dgninfo.count = 0;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
