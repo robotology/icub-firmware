@@ -179,13 +179,13 @@
 #elif defined SYSCLK_FREQ_56MHz
   uint32_t SystemCoreClock         = SYSCLK_FREQ_56MHz;        /*!< System Clock Frequency (Core Clock) */
 #elif defined SYSCLK_FREQ_72MHz
-// IIT-changed: ...
-  __weak uint32_t SystemCoreClock  = SYSCLK_FREQ_72MHz;        /*!< System Clock Frequency (Core Clock) */
+  uint32_t SystemCoreClock         = SYSCLK_FREQ_72MHz;        /*!< System Clock Frequency (Core Clock) */
 #else /*!< HSI Selected as System Clock source */
   uint32_t SystemCoreClock         = HSI_VALUE;        /*!< System Clock Frequency (Core Clock) */
 #endif
 
-//IIT-changed: made constant to place it in flash
+//IIT-changed
+//IIT-comment: made constant to palce it in flash
 // __I uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
 const uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
 /**
@@ -196,6 +196,9 @@ const uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 
   * @{
   */
  
+//IIT-added
+//IIT-comment: added to force initialisation of variable SystemCoreClock which is not a ZI variable and cannot be const. 
+extern void cmsis_stm32f1_hid_set_system_core_clock(void);  
 
 static void SetSysClock(void);
 
@@ -233,9 +236,12 @@ static void SetSysClock(void);
   * @param  None
   * @retval None
   */
-// IIT-changed: made it weak so that we can redefined if we want  
-__weak void SystemInit (void)
+void SystemInit (void)
 {
+
+    //IIT-added
+    //IIT-comment: added to force initialisation of variable SystemCoreClock which is not a ZI variable and cannot be const. 
+    cmsis_stm32f1_hid_set_system_core_clock();
 
   /* Reset the RCC clock configuration to the default reset state(for debug purpose) */
   /* Set HSION bit */
@@ -292,9 +298,6 @@ __weak void SystemInit (void)
 #else
   SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal FLASH. */
 #endif 
-
-    // IIT-changed: added to refresh the value of SystemCoreClock
-    SystemCoreClockUpdate();
 }
 
 /**
@@ -332,8 +335,7 @@ __weak void SystemInit (void)
   * @param  None
   * @retval None
   */
-// IIT-changed: __weak (so that we can redefine if we want)
-__weak void SystemCoreClockUpdate (void)
+void SystemCoreClockUpdate (void)
 {
   uint32_t tmp = 0, pllmull = 0, pllsource = 0;
 
@@ -443,26 +445,26 @@ __weak void SystemCoreClockUpdate (void)
 
 
 
-// //IIT-added
-// //IIT-comment: added to force initialisation of variable SystemCoreClock which is not a ZI variable and cannot be const. 
-// extern void cmsis_stm32f1_hid_set_system_core_clock(void)
-// {
-// #ifdef SYSCLK_FREQ_HSE
-//   SystemCoreClock         = SYSCLK_FREQ_HSE;        /*!< System Clock Frequency (Core Clock) */
-// #elif defined SYSCLK_FREQ_24MHz
-//   SystemCoreClock         = SYSCLK_FREQ_24MHz;        /*!< System Clock Frequency (Core Clock) */
-// #elif defined SYSCLK_FREQ_36MHz
-//   SystemCoreClock         = SYSCLK_FREQ_36MHz;        /*!< System Clock Frequency (Core Clock) */
-// #elif defined SYSCLK_FREQ_48MHz
-//   SystemCoreClock         = SYSCLK_FREQ_48MHz;        /*!< System Clock Frequency (Core Clock) */
-// #elif defined SYSCLK_FREQ_56MHz
-//   SystemCoreClock         = SYSCLK_FREQ_56MHz;        /*!< System Clock Frequency (Core Clock) */
-// #elif defined SYSCLK_FREQ_72MHz
-//   SystemCoreClock         = SYSCLK_FREQ_72MHz;        /*!< System Clock Frequency (Core Clock) */
-// #else /*!< HSI Selected as System Clock source */
-//   SystemCoreClock         = HSI_VALUE;        /*!< System Clock Frequency (Core Clock) */
-// #endif
-// }
+//IIT-added
+//IIT-comment: added to force initialisation of variable SystemCoreClock which is not a ZI variable and cannot be const. 
+extern void cmsis_stm32f1_hid_set_system_core_clock(void)
+{
+#ifdef SYSCLK_FREQ_HSE
+  SystemCoreClock         = SYSCLK_FREQ_HSE;        /*!< System Clock Frequency (Core Clock) */
+#elif defined SYSCLK_FREQ_24MHz
+  SystemCoreClock         = SYSCLK_FREQ_24MHz;        /*!< System Clock Frequency (Core Clock) */
+#elif defined SYSCLK_FREQ_36MHz
+  SystemCoreClock         = SYSCLK_FREQ_36MHz;        /*!< System Clock Frequency (Core Clock) */
+#elif defined SYSCLK_FREQ_48MHz
+  SystemCoreClock         = SYSCLK_FREQ_48MHz;        /*!< System Clock Frequency (Core Clock) */
+#elif defined SYSCLK_FREQ_56MHz
+  SystemCoreClock         = SYSCLK_FREQ_56MHz;        /*!< System Clock Frequency (Core Clock) */
+#elif defined SYSCLK_FREQ_72MHz
+  SystemCoreClock         = SYSCLK_FREQ_72MHz;        /*!< System Clock Frequency (Core Clock) */
+#else /*!< HSI Selected as System Clock source */
+  SystemCoreClock         = HSI_VALUE;        /*!< System Clock Frequency (Core Clock) */
+#endif
+}
 
 /**
   * @brief  Configures the System clock frequency, HCLK, PCLK2 and PCLK1 prescalers.
