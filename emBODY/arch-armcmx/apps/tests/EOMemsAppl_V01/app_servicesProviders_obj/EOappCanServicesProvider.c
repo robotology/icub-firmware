@@ -74,7 +74,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-#define eoappCanSP_timeoutsenddiagnostics       1000
+#define eoappCanSP_timeoutsenddiagnostics           1000
+#define eoappCanSP_onEvtMode_timeoutSendFrame       2000
+#define eoappCanSP_onDemandMode_timeoutSendFrame    10000
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -289,7 +291,7 @@ extern eOresult_t eo_appCanSP_wait_XXX(EOappCanSP *p, eOcanport_t port)
     
     if(p->run_data.numoftxframe[port] != 0)
     {
-        osal_res = osal_semaphore_decrement(p->run_data.semafori[port], osal_reltimeINFINITE);
+        osal_res = osal_semaphore_decrement(p->run_data.semafori[port], /*osal_reltimeINFINITE*/ eoappCanSP_onDemandMode_timeoutSendFrame);
 //         if(osal_res != osal_res_OK)
 //         {
 //             char str[100];
@@ -1172,7 +1174,7 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
                 p->waittxdata[emscanport].numoftxframe2send = 1;
                 hal_sys_irqn_enable(irqn);
 
-                osal_semaphore_decrement(p->waittxdata[emscanport].semaphore, osal_reltimeINFINITE);
+                osal_semaphore_decrement(p->waittxdata[emscanport].semaphore, /*osal_reltimeINFINITE*/eoappCanSP_onEvtMode_timeoutSendFrame);
                 
                 //if i'm here i just wake up
                 hal_sys_irqn_disable(irqn);
@@ -1197,7 +1199,9 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
         res = (eOresult_t)hal_can_put((hal_can_port_t)emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_later);
         if(eores_NOK_busy == res)
         {
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "lost can frame (out-queue full)");
+            //Note: removed fatal error because in some case it ca be usefull disconnect can and going on with appl.
+            //using emsbackdoor it is possible know if errors occur.
+            //eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "lost can frame (out-queue full)");
             //here don't update diagnostics because hal_can_put already done it.
         }
     }
