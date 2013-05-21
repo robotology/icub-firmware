@@ -35,6 +35,8 @@
 #include "stdlib.h"
 #include "string.h"
 
+//#include "hal_middleware_interface.h" // to see middleware (if needed)
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -95,6 +97,8 @@ static uint8_t myeepromdummy[MYEEPROMDUMMYSIZE] = {0};
 
 extern hal_result_t hal_eeprom_init(hal_eeprom_t id, const hal_eeprom_cfg_t *cfg)
 {
+//    GPIO_InitTypeDef gpioinit;
+//    GPIO_StructInit(&gpioinit);
     return(hal_res_OK);
 }
 
