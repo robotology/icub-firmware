@@ -9,8 +9,9 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 #include "string.h"
-
+#include "stdio.h"
 #include "hal.h"
+#include "hal_trace.h"
 #include "hal_arch.h"
 
 #include "stdlib.h"
@@ -54,12 +55,13 @@
 
 //#define _TEST_CAN_
 //#define _TEST_BASIC_
-#define _TEST_ETH_
+//#define _TEST_ETH_
 //#define _CHECK_SWITCH_STATUS_ //enable check eth link status 
 //#define _TEST_EEPROM_
 //#define _TEST_SPI_
 //#define _TEST_EEPROM_ON_FLASH_
 //#define _TEST_I2C_ 
+#define _TEST_SW_INTERRUPT_
 
 //#ifdef _TEST_I2C_ 
 //    #define _TEST_EEPROM_
@@ -124,6 +126,11 @@ static void s_test_eeprom(void);
 
 
 static void s_test_eeprom_on_flash(void);
+
+#ifdef _TEST_SW_INTERRUPT_
+#include "stm32f1.h"
+static void s_test_sw_interrupt(void);
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -208,6 +215,8 @@ int main(void)
     hal_base_initialise(hal_cfgMINE, data32aligned);
 
     hal_sys_systeminit();
+    
+    hal_trace_init();
 #ifdef _CHECK_SWITCH_STATUS_
     hal_sys_systick_sethandler(s_check_switch, 1000, hal_int_priority00);
 #else
@@ -248,7 +257,9 @@ int main(void)
     s_test_hal_spi();
 #endif
 
-
+#ifdef _TEST_SW_INTERRUPT_
+s_test_sw_interrupt();
+#endif
 
 //    Delay(5000);
 
@@ -429,13 +440,42 @@ static void s_can_onrec(hal_can_port_t port)
 }
 
 
+
+
+static void s_can_printstatus(hal_can_port_t port, hal_can_status_t *status_ptr)
+{
+    char str[200];
+    snprintf(str, sizeof(str)-1, "ERROR port%d: REC=%d TEC=%d w=%d p=%d boff=%d txfull=%d rxfull=%d", port, status_ptr->u.s.hw_status.REC,
+                                                                                        status_ptr->u.s.hw_status.warning,
+                                                                                        status_ptr->u.s.hw_status.passive,
+                                                                                        status_ptr->u.s.hw_status.busoff,
+                                                                                        status_ptr->u.s.hw_status.txqueueisfull,
+                                                                                        status_ptr->u.s.hw_status.rxqueueisfull   
+                                                                                        );
+    hal_trace_puts(str);
+}
+volatile hal_can_status_t status1, status2;
+static void s_can_callbkp_can1_onerr(void *arg)
+{
+    hal_can_getstatus(hal_can_port1, &status1);
+//    s_can_printstatus(hal_can_port1, &status1);
+}
+
+static void s_can_callbkp_can2_onerr(void *arg)
+{
+    hal_can_getstatus(hal_can_port2, &status2);
+//    s_can_printstatus(hal_can_port2, &status2);
+}
+
+volatile uint32_t a;
 static void s_test_hal_can(void)
 {
     hal_can_frame_t canframe;
     hal_result_t res;
-    uint8_t count, i;
+    uint32_t count, i;
     uint32_t id1 = 0x1E;
     uint32_t id2 = 0x2E;
+    
 
 
     hal_can_cfg_t my_can_cfg_default;
@@ -448,6 +488,8 @@ static void s_test_hal_can(void)
     my_can_cfg_default.arg_cb_rx          = NULL;
     my_can_cfg_default.callback_on_tx     = NULL;
     my_can_cfg_default.arg_cb_tx          = NULL;
+    my_can_cfg_default.callback_on_err    = s_can_callbkp_can1_onerr;
+    my_can_cfg_default.arg_cb_err         = NULL;
 
 
 
@@ -477,6 +519,7 @@ static void s_test_hal_can(void)
 
 
     my_can_cfg_default.callback_on_rx     = s_can_callbkb_onrec2;
+    my_can_cfg_default.callback_on_err    = s_can_callbkp_can2_onerr;
 
     res = hal_can_init(hal_can_port2, &my_can_cfg_default);
 
@@ -552,34 +595,34 @@ static void s_test_hal_can(void)
 //    canframe.data[0] = 9;
 //    hal_can_put(hal_can_port1, &canframe, hal_can_send_normprio_later);
 
-    while(1)
-    {
+//     while(1)
+//     {
 
-        if(rec_msg2)
-        {
-            rec_msg2 = 0;
-    
-            res = hal_can_get(hal_can_port2, &canframe, NULL);
-        
-            if(hal_res_OK == res)
-            {
-                canframe.data[0] = 0xa1;
-                hal_can_put(hal_can_port1, &canframe, hal_can_send_normprio_later);
-                canframe.data[0] = 0xa2;
-                hal_can_put(hal_can_port1, &canframe, hal_can_send_normprio_later);
-                canframe.data[0] = 0xa3;
-                hal_can_put(hal_can_port1, &canframe, hal_can_send_normprio_later);
-                canframe.data[0] = 0xa4;
-                hal_can_put(hal_can_port1, &canframe, hal_can_send_normprio_later);
-                canframe.data[0] = 0xa5;
-                hal_can_put(hal_can_port1, &canframe, hal_can_send_normprio_now);
+//         if(rec_msg2)
+//         {
+//             rec_msg2 = 0;
+//     
+//             res = hal_can_get(hal_can_port2, &canframe, NULL);
+//         
+//             if(hal_res_OK == res)
+//             {
+//                 canframe.data[0] = 0xa1;
+//                 hal_can_put(hal_can_port1, &canframe, hal_can_send_normprio_later);
+//                 canframe.data[0] = 0xa2;
+//                 hal_can_put(hal_can_port1, &canframe, hal_can_send_normprio_later);
+//                 canframe.data[0] = 0xa3;
+//                 hal_can_put(hal_can_port1, &canframe, hal_can_send_normprio_later);
+//                 canframe.data[0] = 0xa4;
+//                 hal_can_put(hal_can_port1, &canframe, hal_can_send_normprio_later);
+//                 canframe.data[0] = 0xa5;
+//                 hal_can_put(hal_can_port1, &canframe, hal_can_send_normprio_now);
 
 
-            }
-        }
-//        count = 0;
-    
-    }
+//             }
+//         }
+// //        count = 0;
+//     
+//     }
 
 /*    while(1)
     {
@@ -603,6 +646,42 @@ static void s_test_hal_can(void)
     
     }
     */
+    
+    while(1)
+    {
+//         for(count = 0; count <700; count ++)
+//         {
+//            canframe.data[0] = count;
+//            while(hal_res_NOK_busy == hal_can_put(hal_can_port1, &canframe, hal_can_send_normprio_now))
+//            {a = a;}
+//             
+//           hal_can_put(hal_can_port2, &canframe, hal_can_send_normprio_now);
+//         }
+     #include "stm32f10x_can.h"   
+    CanTxMsg TxMessage =
+    {
+        .IDE   = CAN_ID_STD,     //only stdid are managed
+        .ExtId = 0,              // since frame-id is std it is not used by stm32lib
+        .RTR   = CAN_RTR_DATA   //only data frame are managed    
+    };
+
+        for(count = 0; count <1000; count ++)
+        {
+        TxMessage.StdId = canframe.id & 0x7FF;
+        TxMessage.DLC = canframe.size;
+        *(uint64_t*)TxMessage.Data = *((uint64_t*)&canframe.data);
+
+       	while(CAN_NO_MB == CAN_Transmit( CAN1, &TxMessage))
+        {
+            a=a;
+        }
+        //CAN_Transmit( CAN1, &TxMessage);
+        }
+        hal_can_getstatus(hal_can_port1, &status1);
+        hal_can_getstatus(hal_can_port1, &status2);
+        //s_can_printstatus(hal_can_port1, &status);
+         while(1);
+    }
 
 }
 #endif
@@ -1194,3 +1273,74 @@ static void s_test_eeprom(void)
 }
 #endif //_TEST_EEPROM_
 
+
+#ifdef _TEST_SW_INTERRUPT_
+//configure extenal line 0 su PA0 pin in order to generate an sw interrurpt
+void EXTI0_Config(void)
+{
+  EXTI_InitTypeDef   EXTI_InitStructure;
+  GPIO_InitTypeDef   GPIO_InitStructure;
+  NVIC_InitTypeDef   NVIC_InitStructure;
+  
+  /* Enable GPIOA clock */
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+
+  /* Configure PA0 pin as input floating */
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+ 
+  /* Connect EXTI0 Line to PA0 pin */
+    GPIO_EXTILineConfig(GPIO_PortSourceGPIOA, GPIO_PinSource0);
+    
+    
+
+  /* Configure EXTI0 line */
+  EXTI_InitStructure.EXTI_Line = EXTI_Line0;
+  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
+  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  EXTI_Init(&EXTI_InitStructure);
+
+  /* Enable and set EXTI0 Interrupt */
+  NVIC_InitStructure.NVIC_IRQChannel = EXTI0_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x00;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  
+  NVIC_Init(&NVIC_InitStructure);
+}
+
+
+
+
+
+static uint32_t sw_interrupt = 0;
+static void s_test_sw_interrupt(void)
+{
+    
+     uint32_t i;
+     EXTI0_Config();
+    while(1)
+    {
+        for(i = 0; i< 2000; i++)
+        {
+            __nop();
+        }
+        EXTI_GenerateSWInterrupt(EXTI_Line0);
+    }
+}
+
+void EXTI0_IRQHandler(void)
+{
+
+    sw_interrupt++;
+    EXTI_ClearITPendingBit(EXTI_Line0);
+
+    
+    
+}  
+    
+    
+
+#endif
