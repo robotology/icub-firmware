@@ -459,6 +459,34 @@ extern eOresult_t eo_packet_hid_DefClear(void *p)
 }
 
 
+extern EOpacket* eo_packet_hid_Initialise(EOpacket *p, void *data, uint16_t capacity)
+{
+    EOpacket *retptr = NULL;  
+
+    if((NULL ==p) || (NULL == data) || (0 == capacity))
+    {
+        return(NULL);
+    }
+ 
+
+    // i get the memory for the object
+    retptr = p;
+    
+    retptr->remoteaddr          = 0;
+    retptr->remoteport          = 0;
+    retptr->incomplete_flag     = 0;
+    retptr->size                = 0;
+    retptr->capacity            = capacity; 
+    retptr->write_index         = 0;
+    retptr->read_index          = 0;
+    retptr->data                = data;
+
+    retptr->externaldatastorage = (0 == capacity) ? (1) : (0);
+
+    return(retptr);
+}
+
+
 
 
 // --------------------------------------------------------------------------------------------------------------------

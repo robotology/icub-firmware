@@ -75,6 +75,8 @@ extern eOresult_t eo_packet_hid_DefCopy(void *d, void *s);
 
 extern eOresult_t eo_packet_hid_DefClear(void *p);
 
+extern EOpacket* eo_packet_hid_Initialise(EOpacket *p, void *data, uint16_t capacity);
+
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"
