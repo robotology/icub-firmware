@@ -180,7 +180,7 @@ static void* s_eocfg_eps_ebx_ram[][3] =
     {NULL, NULL, NULL}
 };
 
-extern const EOconstvector eo_cfg_EPs_vectorof_eb4_object = 
+const EOconstvector eo_cfg_EPs_vectorof_eb4_object = 
 {
     EO_INIT(.size)                  sizeof(s_eo_cfg_EPs_vectorof_eb4_data)/sizeof(const eOnvscfg_EP_t),
     EO_INIT(.item_size)             sizeof(eOnvscfg_EP_t),
