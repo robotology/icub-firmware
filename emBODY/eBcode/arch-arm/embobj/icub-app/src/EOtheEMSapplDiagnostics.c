@@ -61,6 +61,7 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 eOdgn_commands_t                    eo_dgn_cmds;
+eOdgn_errorlog_t                    eo_dgn_errorlog;
 eOdgn_emsperipheralstatus_t         eo_dgn_emsperiph;
 eOdgn_emsapplication_common_t       eo_dgn_emsapplcore;
 eOdgn_emsapplication_emswithmc_t    eo_dgn_emsappmc;
@@ -93,6 +94,7 @@ static EOTheEMSdiagnostics_t s_thedgn = {0};
 extern EOTheEMSdiagnostics_t* eo_theEMSdgn_Initialize(void)
 {
     memset(&eo_dgn_cmds, 0, sizeof(eOdgn_commands_t));
+    memset(&eo_dgn_errorlog, 0, sizeof(eOdgn_errorlog_t));
     memset(&eo_dgn_emsperiph, 0, sizeof(eOdgn_emsperipheralstatus_t));
     memset(&eo_dgn_emsapplcore, 0, sizeof(eOdgn_emsapplication_common_t));
     memset(&eo_dgn_emsappmc, 0, sizeof(eOdgn_emsapplication_emswithmc_t));
@@ -110,7 +112,7 @@ extern EOTheEMSdiagnostics_t* eo_theEMSdgn_GetHandle(void)
 
 extern eOresult_t eo_theEMSdgn_Signalerror(EOTheEMSdiagnostics_t* p, uint16_t var , eOreltime_t timeout)
 {
-    if(eo_dgn_cmds.enable)
+    if((eo_dgn_cmds.enable) || (eodgn_nvidbdoor_errorlog == var))
     {    
         return (eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), var , timeout));
     }
@@ -197,6 +199,14 @@ extern eOresult_t eo_theEMSdgn_UpdateMotorStFlags(EOTheEMSdiagnostics_t* p, eOmc
 extern eOresult_t eo_theEMSdgn_ClearMotorStFlags(EOTheEMSdiagnostics_t* p)
 {
      memset(&eo_dgn_motorstflag, 0, sizeof(eOdgn_motorstatusflags_t));
+    return(eores_OK);
+}
+
+extern eOresult_t eo_theEMSdgn_UpdateErrorLog(EOTheEMSdiagnostics_t* p, char *str_error, uint16_t size)
+{
+    uint16_t minsize = ((size < eOdgn_errorlog_str_size) ? size: eOdgn_errorlog_str_size);
+    
+    memcpy(&eo_dgn_errorlog.errorstate_str[0], str_error, minsize);
     return(eores_OK);
 }
 

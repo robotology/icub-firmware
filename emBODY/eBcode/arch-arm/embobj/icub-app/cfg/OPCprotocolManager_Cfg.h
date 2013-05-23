@@ -45,12 +45,13 @@ extern "C" {
 
 // - public #define  --------------------------------------------------------------------------------------------------
 #define eodgn_nvidbdoor_cmds            1
-#define eodgn_nvidbdoor_emsperiph       2
-#define eodgn_nvidbdoor_emsapplcommon   3
-#define eodgn_nvidbdoor_emsapplmc       4
-#define eodgn_nvidbdoor_motorstatus     5
+#define eodgn_nvidbdoor_errorlog        2
+#define eodgn_nvidbdoor_emsperiph       3
+#define eodgn_nvidbdoor_emsapplcommon   4
+#define eodgn_nvidbdoor_emsapplmc       5
+#define eodgn_nvidbdoor_motorstatus     6
 
-#define eodgn_nvidbdoor_max             6
+#define eodgn_nvidbdoor_max             7
 
 
 
