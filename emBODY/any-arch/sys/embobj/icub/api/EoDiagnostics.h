@@ -240,6 +240,13 @@ typedef struct
     uint8_t motorlist[12]; //on ems there are 12 motor max.Each element of array contains falg about the motor with id = index of array
 } eOdgn_motorstatusflags_t;
 
+
+    enum{eOdgn_errorlog_str_size = 250};
+typedef struct
+{
+    char errorstate_str[eOdgn_errorlog_str_size]; //in string contains the reason of switch to error state.
+} eOdgn_errorlog_t;
+
 /** @}            
     end of group eo_cevcwervcrev5555  
  **/

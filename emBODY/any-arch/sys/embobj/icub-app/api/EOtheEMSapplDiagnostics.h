@@ -67,10 +67,11 @@ typedef struct EOTheEMSdiagnostics_hid_t EOTheEMSdiagnostics_t;
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
 extern eOdgn_commands_t                    eo_dgn_cmds;
+extern eOdgn_errorlog_t                    eo_dgn_errorlog;
 extern eOdgn_emsperipheralstatus_t         eo_dgn_emsperiph;
 extern eOdgn_emsapplication_common_t       eo_dgn_emsapplcore;
 extern eOdgn_emsapplication_emswithmc_t    eo_dgn_emsappmc;
-extern eOdgn_motorstatusflags_t             eo_dgn_motorstflag;
+extern eOdgn_motorstatusflags_t            eo_dgn_motorstflag;
 
 
 
@@ -89,6 +90,8 @@ extern eOresult_t eo_theEMSdgn_UpdateApplWithMc(EOTheEMSdiagnostics_t* p, EOappE
 extern eOresult_t eo_theEMSdgn_UpdateMotorStFlags(EOTheEMSdiagnostics_t* p, eOmc_motorId_t mId, uint8_t flags);
 
 extern eOresult_t eo_theEMSdgn_ClearMotorStFlags(EOTheEMSdiagnostics_t* p);
+
+extern eOresult_t eo_theEMSdgn_UpdateErrorLog(EOTheEMSdiagnostics_t* p, char *str_error, uint16_t size);
 
 /** @}            
     end of group 

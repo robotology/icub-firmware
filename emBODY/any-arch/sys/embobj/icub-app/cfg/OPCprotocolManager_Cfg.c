@@ -56,6 +56,12 @@ static opcprotman_var_map_t s_myarray[] =
         .onrec      = NULL
     },
     {
+        .var        = eodgn_nvidbdoor_errorlog,
+        .size       = sizeof(eOdgn_errorlog_t),
+        .ptr        = NULL,
+        .onrec      = NULL
+    },
+    {
         .var        = eodgn_nvidbdoor_emsperiph,
         .size       = sizeof(eOdgn_emsperipheralstatus_t),
         .ptr        = NULL,
