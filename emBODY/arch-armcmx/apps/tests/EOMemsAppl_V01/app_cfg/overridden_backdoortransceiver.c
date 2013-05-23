@@ -122,6 +122,18 @@ extern opcprotman_res_t opcprotman_personalize_database(OPCprotocolManager *p)
     {
         return(res);
     }
+    
+/* personalize eodgn_nvidbdoor_errorlog var*/
+	res = opcprotman_personalize_var(   p, 
+                                        eodgn_nvidbdoor_errorlog,
+                                        (uint8_t*) &eo_dgn_errorlog, 
+                                        NULL);
+
+    if(opcprotman_OK != res)
+    {
+        return(res);
+    }
+    
 /* personalize eodgn_nvidbdoor_emsperiph var*/
 	res = opcprotman_personalize_var(   p, 
                                         eodgn_nvidbdoor_emsperiph,
