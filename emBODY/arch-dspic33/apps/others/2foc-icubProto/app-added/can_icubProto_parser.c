@@ -377,7 +377,9 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 
         case ICUBPROTO_POLLINGCMD_SET_ENCODER_POSITION: 
         {
-            ;  //todo aspetta maggia
+            
+		// setta l'offset di fasatura 
+		Encoder_SyncPulsePosition=(rxpayload->b[2] << 8 | rxpayload->b[1]);  //todo aspetta maggia
         }break;
         
         

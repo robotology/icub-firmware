@@ -710,7 +710,7 @@ void EncoderRotorAlign()
   // in order to simplify the reading from the port when connected to P2,P5
   // the phase in the two cases results different 
 #ifdef HES_CONNECTED_TO_P1_P6
-  Encoder_SyncPulsePosition = 0xB000; // for kollmorgen
+  Encoder_SyncPulsePosition = 0x0AAA; // for kollmorgen
 #endif
 #ifdef HES_CONNECTED_TO_P2_P5
   Encoder_SyncPulsePosition = 0x0;
