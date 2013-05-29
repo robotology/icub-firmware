@@ -441,8 +441,10 @@ void main(void)
 		_position[3]= get_position_encoder(3);					
 #endif
 #if VERSION == 0x0214
-	    _position[0]= get_position_abs_ssi(AEA4);	
+	    _position[0]= get_position_encoder(0);	
 		_position[1]= get_position_encoder(1);
+		_position[2]= get_position_encoder(2);
+		_position[3]= get_position_abs_ssi(AEA3);	
 					
 #endif
 //-------------------------------------------------------------------------------------------

@@ -266,7 +266,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
  ********/	
 #elif VERSION ==0x0214
 
-	if ((type==CALIB_HARD_STOPS) && (channel>=1))
+	if ((type==CALIB_HARD_STOPS) && (channel<=2))
 	{
 		if (_control_mode[channel] != MODE_IDLE && IS_DONE(channel))
 		{
@@ -294,7 +294,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		#endif
 	}
 
-	if ((type==CALIB_ABS_DIGITAL ) && (channel==0))
+	if ((type==CALIB_ABS_DIGITAL ) && (channel==3))
 	{
 		#ifdef DEBUG_CALIBRATION	
 		can_printf ("Calibration started  %d \r\n",channel);
@@ -314,7 +314,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		if (param2>0)
 		{
 		
-		    _position[channel] = get_position_abs_ssi(AEA4);
+		    _position[channel] = get_position_abs_ssi(AEA3);
 			_set_point[channel] = param1;
 			init_trajectory (channel, _position[channel], _set_point[channel], param2);
 			_in_position[channel] = false;

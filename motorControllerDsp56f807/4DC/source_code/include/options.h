@@ -19,7 +19,7 @@
 //#define VERSION 0x0219                /* AEA encoders in the wrist  
 //#define VERSION 0x0228                /* HAND V2 Analog encoder in M0 MAISEncoder in M1 (HES0), M2 (HES1+HES2), M3 (HES3)  
 //#define VERSION 0x0230                /* HAND V2 MAISEncoder in M0 (HES4+HES5), M1 (HES6), M2 (HES7+HES8), M3 (HES11+HES12+HES13) 
-//#define VERSION 0x0214                /* TALKING HEAD, M0 IE in the JAW, M1 AEA encoder in the eyebrows, M2 and M3 lips.    
+//#define VERSION 0x0214                /* TALKING HEAD, M3 AEA encoder LIPS LOW, M0 M1 and M2 incremental encoder.    
 //#define SERIAL_MENU_OPTION    1       /* if on, enables serial menu interface */
 
 //#define DEBUG_CAN_MSG 	    1		/* conditional compile for printing can info */
