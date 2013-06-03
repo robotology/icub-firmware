@@ -28,7 +28,7 @@ extern "C" {
 
 
 /** @file       OPCprotocolManager_Cfg.h
-    @brief      This file provides interface to the configuration of OPCprotoclManager shared between pc104 and ems board.
+    @brief      This file provides interface to the configuration of OPCprotoclManager shared between pc104 and ems boards.
     @author     valentina.gaggero@iit.it
     @date       04/29/2013
 **/
