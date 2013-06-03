@@ -115,7 +115,16 @@ extern void eo_trajectory_Init(EOtrajectory *o, int32_t p0, int32_t v0, int32_t 
     
     o->vTimer = o->vT = 0.0f;
     
+    o->Xdebug = 0;
+    o->Vdebug = 0;
+    
     o->bVelocityMove = o->bIsBraking = eobool_false;
+}
+
+extern void eo_trajectory_GetPosReference(EOtrajectory *o, int32_t *xStar, int32_t *velAvg)
+{
+    *xStar  = o->Xdebug;
+    *velAvg = o->Vdebug;
 }
 
 extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t xStar, int32_t velAvg)
@@ -138,6 +147,9 @@ extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t xStar, int32_
 
     o->xT = D/V;
     
+    o->Xdebug = xStar;
+    o->Vdebug = velAvg;
+    
     if (o->xT < EMS_PERIOD)
     {
         o->xTimer = o->xT = 0.0f;
@@ -145,6 +157,8 @@ extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t xStar, int32_
         o->xX = (float)xStar;
 		
 		o->xV = o->xA = 0.0f;
+        
+        o->Vdebug = 0;
         
         return;
     }
