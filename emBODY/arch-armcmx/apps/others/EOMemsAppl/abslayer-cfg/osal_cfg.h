@@ -105,7 +105,7 @@
 //   <i> Define max. size in bytes of the global stack.
 //   <i> Default: 256  (only one task for instance)
 #ifndef OSAL_GLOBSTKSIZE
- #define OSAL_GLOBSTKSIZE    8196
+ #define OSAL_GLOBSTKSIZE    9216
 #endif
 
 
@@ -140,14 +140,14 @@
 //   <i> Maximum number of tasks that will run at the same time.
 //   <i> Default: 6
 #ifndef OSAL_TASKNUM
- #define OSAL_TASKNUM     12
+ #define OSAL_TASKNUM     14
 #endif
 
 //   <o> Number of timers <0-250>
 //   <i> Define max number of timers.
 //   <i> Default: 0  (User timers disabled)
 #ifndef OSAL_TIMERNUM
- #define OSAL_TIMERNUM    6
+ #define OSAL_TIMERNUM    14
 #endif
 
 
@@ -163,7 +163,7 @@
 //   <i> Define max. number of semaphores that will run at the same time.
 //   <i> Default: 0  (Semaphores not enabled)
 #ifndef OSAL_SEMAPHORENUM
- #define OSAL_SEMAPHORENUM    6
+ #define OSAL_SEMAPHORENUM    10
 #endif
 
 

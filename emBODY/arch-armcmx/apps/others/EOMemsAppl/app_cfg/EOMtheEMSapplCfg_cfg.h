@@ -32,15 +32,15 @@ extern "C" {
 
 //  <o> host IP2 address <0-255>
 //  <i> default: 255
-#define EOMTHEEMSAPPLCFG_HOSTIPADDR2                            0
+#define EOMTHEEMSAPPLCFG_HOSTIPADDR2                            255
 
 //  <o> host IP3 address <0-255>
 //  <i> default: 72
-#define EOMTHEEMSAPPLCFG_HOSTIPADDR3                            1
+#define EOMTHEEMSAPPLCFG_HOSTIPADDR3                            72
 
 //  <o> host IP4 address <1-255>
 //  <i> default: 205
-#define EOMTHEEMSAPPLCFG_HOSTIPADDR4                            104
+#define EOMTHEEMSAPPLCFG_HOSTIPADDR4                            101
 
 
 //  </h>Remote Host
@@ -218,7 +218,7 @@ extern "C" {
 
 //  <o> addresses       <0=> from eeprom 
 //                      <1=> from ipal_cfg.h                               
-#define ADDR_USEIPAL   0
+#define ADDR_USEIPAL   1
 
 #if (1 == ADDR_USEIPAL)
     #define EOMTHEEMSAPPLCFG_IPADDR_FROM_ENVIRONMENT        0
@@ -492,7 +492,7 @@ extern "C" {
 
 //  <o> IP port <1-65000>
 //  <i> default: 33333
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_HOSTIPPORT                12345
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_HOSTIPPORT                33333
 
 //  </h>destination address
 
