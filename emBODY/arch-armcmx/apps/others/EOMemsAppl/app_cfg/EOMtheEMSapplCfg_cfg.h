@@ -1,3 +1,4 @@
+// see copyright at end of file
 
 // - include guard ----------------------------------------------------------------------------------------------------
 #ifndef _EOMTHEEMSAPPLCFG_CFG_H_
@@ -15,7 +16,6 @@ extern "C" {
 
 
 // -  default constants ----------------------------------------------------------------------------------------------- 
-// empty-section
 
  
 // - configuration wizard ---------------------------------------------------------------------------------------------
@@ -30,17 +30,17 @@ extern "C" {
 //  <i> default: 10
 #define EOMTHEEMSAPPLCFG_HOSTIPADDR1                            10
 
-//  <o> host IP2 address <1-255>
+//  <o> host IP2 address <0-255>
 //  <i> default: 255
-#define EOMTHEEMSAPPLCFG_HOSTIPADDR2                            255
+#define EOMTHEEMSAPPLCFG_HOSTIPADDR2                            0
 
-//  <o> host IP3 address <1-255>
+//  <o> host IP3 address <0-255>
 //  <i> default: 72
-#define EOMTHEEMSAPPLCFG_HOSTIPADDR3                            72
+#define EOMTHEEMSAPPLCFG_HOSTIPADDR3                            1
 
 //  <o> host IP4 address <1-255>
 //  <i> default: 205
-#define EOMTHEEMSAPPLCFG_HOSTIPADDR4                            101
+#define EOMTHEEMSAPPLCFG_HOSTIPADDR4                            104
 
 
 //  </h>Remote Host
@@ -52,7 +52,7 @@ extern "C" {
 //  <o> ID of the EMS board     <1=> EB1    <2=> EB2    <3=> EB3    <4=> EB4    <5=> EB5    
 //                              <6=> EB6    <7=> EB7    <8=> EB8    <9=> EB9
 
-#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     9
+#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     1
 
 
       
@@ -68,20 +68,20 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          1
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          0
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          14
 //  </h>version
 
 //  <h> build date
 //  <o> year            <2010-2020> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2012
+#define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2013
 //  <o> month           <1-12> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        5
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          21
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          16
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         14
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         18
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          30
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          10
 //  </h>build date
 
 // </h>Info 
@@ -119,9 +119,9 @@ extern "C" {
 
 //  <h> error manager
 //  <o> on error   <0=>   redefine __weak eom_emsapplcfg_hid_userdef_OnError() 
-//#define sdfefe004       0
+#define sdfefe004       0
 //  <o> printf on debug window enabled   <0=>   false  <1=>   true
-#define EOMTHEEMSAPPLCFG_HALTRACE_ENABLED    0
+#define EOMTHEEMSAPPLCFG_HALTRACE_ENABLED    1
 //  </h>error manager
 
 
@@ -218,7 +218,7 @@ extern "C" {
 
 //  <o> addresses       <0=> from eeprom 
 //                      <1=> from ipal_cfg.h                               
-#define ADDR_USEIPAL   1
+#define ADDR_USEIPAL   0
 
 #if (1 == ADDR_USEIPAL)
     #define EOMTHEEMSAPPLCFG_IPADDR_FROM_ENVIRONMENT        0
@@ -320,15 +320,15 @@ extern "C" {
 
 //  <o> max size of input datagrams <16-64>
 //  <i> default: 16
-#define EOMTHEEMSAPPLCFG_DISCOVERY_INPDGRAMSIZEOF                  32
+#define EOMTHEEMSAPPLCFG_DISCOVERY_INPDGRAMSIZEOF                  16
 
 //  <o> max number of output datagrams <1-8>
 //  <i> default: 1 
 #define EOMTHEEMSAPPLCFG_DISCOVERY_OUTDGRAMNUMBER                  1
 
-//  <o> max size of output datagrams <16-1024>
+//  <o> max size of output datagrams <16-128>
 //  <i> default: 32
-#define EOMTHEEMSAPPLCFG_DISCOVERY_OUTDGRAMSIZEOF                  256
+#define EOMTHEEMSAPPLCFG_DISCOVERY_OUTDGRAMSIZEOF                  32
 
 //  </h>datagrams in socket
 
@@ -359,8 +359,8 @@ extern "C" {
 
 //  <h> protocol
 
-//  <o> type of protocol    <0=> ETHloader reduced set: only CMD_SCAN, CMD_RESET, and CMD_UPD_ONCE  <1=> ETHloader reduced set plus user-def OPC
-#define EOMTHEEMSAPPLCFG_DISCOVERY_PROTOCOL                1
+//  <o> type of protocol    <0=> ETHloader reduced set: only CMD_SCAN, CMD_RESET, and CMD_UPD_ONCE
+#define EOMTHEEMSAPPLCFG_DISCOVERY_PROTOCOL                0
 
 //  </h>protocol
 
@@ -377,7 +377,81 @@ extern "C" {
 //  </h>listener task
 
 
-// </h>Discovery Listener configuration
+// </h>Backdoor configuration
+
+//  <h> Backdoor configuration (for EOMtheEMSbackdoor)
+
+//  <o> IP listening port <4444=> 4444
+//  <i> default: 4444
+#define EOMTHEEMSAPPLCFG_BACKDOOR_LOCALPORT                       4444
+
+
+//  <h> datagrams in socket
+
+//  <o> max number of input datagrams <1-8>
+//  <i> default: 2
+#define EOMTHEEMSAPPLCFG_BACKDOOR_INPDGRAMNUMBER                  2
+
+//  <o> max size of input datagrams <16-64>
+//  <i> default: 16
+#define EOMTHEEMSAPPLCFG_BACKDOOR_INPDGRAMSIZEOF                  32
+
+//  <o> max number of output datagrams <1-8>
+//  <i> default: 2 
+#define EOMTHEEMSAPPLCFG_BACKDOOR_OUTDGRAMNUMBER                  1
+
+//  <o> max size of output datagrams <16-128>
+//  <i> default: 32
+#define EOMTHEEMSAPPLCFG_BACKDOOR_OUTDGRAMSIZEOF                  128
+
+//  </h>datagrams in socket
+
+//  <h> destination address
+
+//  <o> IP address <0=> The same as Remote Host then the one from incoming request
+//  <i> default: 1
+#define EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR_MODE                   0
+
+#if   (0 == EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR_MODE)
+    #define EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR1    EOMTHEEMSAPPLCFG_HOSTIPADDR1
+    #define EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR2    EOMTHEEMSAPPLCFG_HOSTIPADDR2
+    #define EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR3    EOMTHEEMSAPPLCFG_HOSTIPADDR3
+    #define EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR4    EOMTHEEMSAPPLCFG_HOSTIPADDR4
+#elif (1 == EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR_MODE)
+    #define EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR1    127
+    #define EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR2    0
+    #define EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR3    0
+    #define EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEIPADDR4    1    
+#endif
+
+//  <o> IP port <4444=> 4444
+//  <i> default: 4444
+#define EOMTHEEMSAPPLCFG_BACKDOOR_REMOTEPORT                4444
+
+//  </h>destination address
+
+
+//  <h> protocol
+
+//  <o> type of protocol    <0=> OPC protocol
+#define EOMTHEEMSAPPLCFG_BACKDOOR_PROTOCOL                0
+
+//  </h>protocol
+
+//  <h> backdoor task
+
+//  <o> task priority <2-251>
+//  <i> default: 41
+#define EOMTHEEMSAPPLCFG_BACKDOOR_TASK_PRIORITYof   251
+
+//  <o> task stack size <256-1024:128>
+//  <i> default: 512
+#define EOMTHEEMSAPPLCFG_BACKDOOR_TASK_STACKSIZEof   512
+
+//  </h>backdoor task
+
+
+// </h>Backdoor configuration
 
 //  <h> Socket configuration (for EOMtheEMSsocket)
 
@@ -400,8 +474,8 @@ extern "C" {
 #define EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMNUMBER                  2
 
 //  <o> max size of output datagrams <64-1500>
-//  <i> default: 1316
-#define EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF                  1316
+//  <i> default: 1024
+#define EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF                  1408
 
 //  </h>datagrams in socket
 
@@ -411,17 +485,6 @@ extern "C" {
 
 //  <h> Transceiver configuration
 
-
-//  <h> filter on incoming packets
-
-//  <o> source IP address       <0=> are accepted only packets coming from the Remote Host 
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_filter_ipaddr 0
-
-//  <o> source port             <0=> any source port is valid
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_filter_ipport             0
-
-//  </h>filter on incoming packets
-
 //  <h> destination address
 
 //  <o> IP address <0=>    The same as Remote Host
@@ -429,7 +492,7 @@ extern "C" {
 
 //  <o> IP port <1-65000>
 //  <i> default: 33333
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_HOSTIPPORT                33333
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_HOSTIPPORT                12345
 
 //  </h>destination address
 
@@ -455,7 +518,7 @@ extern "C" {
 //     #endif  
  
 
-    #define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY   EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF
+    #define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY   (EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF)
 
 #else
     #error specify capacity of ropframe
@@ -463,15 +526,15 @@ extern "C" {
 
 //  <o> capacity of the ropframe of regular rops    <16-1440:8>
 //  <i> default: 768
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY  768  
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY  1024  
 
 //  <o> capacity of the ropframe of occasional rops    <16-1440:8>
 //  <i> default: 128
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEOCCASIONALSCAPACITY  256  
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEOCCASIONALSCAPACITY  128  
 
 //  <o> capacity of the ropframe of reply rops    <16-1440:8>
 //  <i> default: 128
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY  64  
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY  256  
 
 
 
@@ -516,7 +579,7 @@ extern "C" {
 
 //  <o> task stack size <256-1024:128>
 //  <i> default: 512
-#define EOMTHEEMSAPPLCFG_CFGOBJ_TASK_STACKSIZEof   512
+#define EOMTHEEMSAPPLCFG_CFGOBJ_TASK_STACKSIZEof   1024
 
 //  </h>Configurator object configuration
 
@@ -529,7 +592,7 @@ extern "C" {
 
 //  <o> task stack size <256-1024:128>
 //  <i> default: 512
-#define EOMTHEEMSAPPLCFG_ERROBJ_TASK_STACKSIZEof   512
+#define EOMTHEEMSAPPLCFG_ERROBJ_TASK_STACKSIZEof   1024
 
 //  </h>Error object configuration
 
@@ -540,16 +603,16 @@ extern "C" {
 //  <i> it is important put the priorities of the three tasks higher than any other task in the system
 
 //  <o> RX task priority <2-251>
-//  <i> default: 249
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_RX_PRIORITYof   249
+//  <i> default: 247
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_RX_PRIORITYof   247
 
 //  <o> DO task priority <2-251>
-//  <i> default: 250
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_DO_PRIORITYof   250
+//  <i> default: 248
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_DO_PRIORITYof   248
 
 //  <o> TX task priority <2-251>
-//  <i> default: 251
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_TX_PRIORITYof   251
+//  <i> default: 249
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_TX_PRIORITYof   249
 
 //  </h>priorities 
 
@@ -697,12 +760,12 @@ extern "C" {
 // </h>EOMtheEMSrunner   
 
 
-//  <h> EOMtheEMSdiscoverytransceiver    
+//  <h> EOMtheEMSbackdoortransceiver    
  
-//  <o> eom_emsdiscoverytransceiver_hid_userdef_get_OPCprotocolManager_cfg()      <0=> used to allow the discoverytransceiver to manage a given OPC protocol
+//  <o> eom_emsbackdoortransceiver_hid_userdef_get_OPCprotocolManager_cfg()      <0=> used to allow the backdoortransceiver to manage a given OPC protocol
 #define assfef443f43wdws56743fcrsd43d234 0
     
-// </h>EOMtheEMSdiscoverytransceiver   
+// </h>EOMtheEMSbackdoortransceiver   
 
 
 //  </h>Overridable functions    
@@ -715,6 +778,7 @@ extern "C" {
  
 #endif  // include-guard
 
+// keep at the end because the configuration wizard can parse not many lines of code ...
 /*
  * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame

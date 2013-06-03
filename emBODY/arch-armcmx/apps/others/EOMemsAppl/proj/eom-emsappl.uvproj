@@ -136,6 +136,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -1077,7 +1078,7 @@
             <File>
               <FileName>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-management\usrcbk\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
+              <FilePath>..\app_cfg\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1144,6 +1145,21 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSdiscoverytransceiver.c</FilePath>
             </File>
+            <File>
+              <FileName>OPCprotocolManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\OPCprotocolManager.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSbackdoor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSbackdoor.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSbackdoortransceiver.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1183,6 +1199,16 @@
               <FileName>example_overridden_runner.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\example_overridden_runner.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_backdoortransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\overridden_backdoortransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>OPCprotocolManager_Cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\OPCprotocolManager_Cfg.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1318,6 +1344,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -2241,7 +2268,7 @@
             <File>
               <FileName>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-management\usrcbk\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
+              <FilePath>..\app_cfg\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2308,6 +2335,21 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSdiscoverytransceiver.c</FilePath>
             </File>
+            <File>
+              <FileName>OPCprotocolManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\OPCprotocolManager.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSbackdoor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSbackdoor.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSbackdoortransceiver.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2347,6 +2389,16 @@
               <FileName>example_overridden_runner.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\example_overridden_runner.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_backdoortransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\overridden_backdoortransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>OPCprotocolManager_Cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\OPCprotocolManager_Cfg.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2482,6 +2534,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -3405,7 +3458,7 @@
             <File>
               <FileName>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-management\usrcbk\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
+              <FilePath>..\app_cfg\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3472,6 +3525,21 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSdiscoverytransceiver.c</FilePath>
             </File>
+            <File>
+              <FileName>OPCprotocolManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\OPCprotocolManager.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSbackdoor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSbackdoor.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSbackdoortransceiver.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3511,6 +3579,16 @@
               <FileName>example_overridden_runner.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\example_overridden_runner.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_backdoortransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\overridden_backdoortransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>OPCprotocolManager_Cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\OPCprotocolManager_Cfg.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3646,6 +3724,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -4569,7 +4648,7 @@
             <File>
               <FileName>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\body\embobj\embobj\embobj-icub\icub-nvscfg\ep-management\usrcbk\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
+              <FilePath>..\app_cfg\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4636,6 +4715,21 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSdiscoverytransceiver.c</FilePath>
             </File>
+            <File>
+              <FileName>OPCprotocolManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\OPCprotocolManager.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSbackdoor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSbackdoor.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSbackdoortransceiver.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4675,6 +4769,16 @@
               <FileName>example_overridden_runner.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\example_overridden_runner.c</FilePath>
+            </File>
+            <File>
+              <FileName>overridden_backdoortransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\overridden_backdoortransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>OPCprotocolManager_Cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\OPCprotocolManager_Cfg.c</FilePath>
             </File>
           </Files>
         </Group>
