@@ -309,16 +309,25 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
        
     int32_t pwm_joint[MAX_JOINTS];
 
+    eObool_t control_mode_trq = eobool_false;
+    
     JOINTS(j)
     {
         eObool_t big_error_flag = eobool_false;
         
         pwm_joint[j] = eo_axisController_PWM(s_emsc->axis_controller[j], &big_error_flag);
         
+        if (!control_mode_trq)
+        {
+            eOmc_controlmode_t control_mode = eo_axisController_GetControlMode(s_emsc->axis_controller[j]);
+        
+            control_mode_trq |= ((control_mode == eomc_controlmode_torque) || (control_mode == eomc_controlmode_impedance_pos) || (control_mode == eomc_controlmode_impedance_vel));
+        }
+        
         if (big_error_flag) alarm_mask |= 1<<j;
     }
     
-    uint8_t stop_mask = eo_motors_PWM(s_emsc->motors, s_emsc->boardType, pwm_joint, pwm_motor, alarm_mask);
+    uint8_t stop_mask = eo_motors_PWM(s_emsc->motors, s_emsc->boardType, pwm_joint, pwm_motor, alarm_mask, control_mode_trq);
     
     JOINTS(j)
     {
@@ -708,15 +717,15 @@ void set_2FOC_running(uint8_t motor, eOmc_controlmode_command_t mode)
     
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
     
-    if (mode == eomc_controlmode_cmd_position || mode == eomc_controlmode_cmd_velocity)
+    //if (mode == eomc_controlmode_cmd_position || mode == eomc_controlmode_cmd_velocity)
     {
         controlmode_2foc = eomc_controlmode_cmd_openloop;
         
         pid.kp = 0x0A00;
-        //pid.kp = sOpenLoopGain;
         pid.kd = 0x0000;
         pid.ki = 0x0000;
     }
+    /*
     else
     {
         controlmode_2foc = eomc_controlmode_cmd_current;
@@ -725,6 +734,7 @@ void set_2FOC_running(uint8_t motor, eOmc_controlmode_command_t mode)
         pid.kd = 0x028F;
         pid.ki = 0x0000;
     }
+    */
    
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &pid);

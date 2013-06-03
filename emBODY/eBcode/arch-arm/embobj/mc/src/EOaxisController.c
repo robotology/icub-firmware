@@ -582,7 +582,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
        
             int32_t err = pos_ref - pos;
             
-            o->torque_ref = (o->stiffness*err + o->damping*(err - o->err))/1000; 
+            o->torque_ref = o->torque_off + (o->stiffness*err + o->damping*(err - o->err))/1000; 
 
             o->err = err;
         }    
