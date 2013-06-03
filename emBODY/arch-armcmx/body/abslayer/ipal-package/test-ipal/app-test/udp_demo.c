@@ -144,7 +144,7 @@ int main(void)
     uint32_t *data32aligned = NULL;
 
     
-    uint32_t ram32sizeip;
+    uint32_t ram32sizeip = 0;
     uint32_t *ram32dataip = NULL;
 
 
@@ -168,8 +168,16 @@ int main(void)
 
     hal_trace_puts("initialisation done\n");
 
+		ram32sizeip = 0;
     ipal_base_memory_getsize(ipal_cfgMINE, &ram32sizeip);
-    ram32dataip = (uint32_t*)calloc(ram32sizeip/4, sizeof(uint32_t));
+		if(0 != ram32sizeip)
+		{
+				ram32dataip = (uint32_t*)calloc(ram32sizeip/4, sizeof(uint32_t));
+		}
+		else
+		{
+				ram32dataip = NULL;
+		}
     ipal_base_initialise(ipal_cfgMINE, ram32dataip);
     ipal_sys_start();
 
