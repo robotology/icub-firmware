@@ -120,7 +120,7 @@ extern void eo_motor_set_motor_error_status(EOmotors *o, uint8_t m, eObool_t bEr
     }
 }
 
-extern uint8_t eo_motors_PWM(EOmotors *o, emsBoardType_t board_type, int32_t *pwm_joint, int16_t *pwm_motor, uint8_t alarm_mask)
+extern uint8_t eo_motors_PWM(EOmotors *o, emsBoardType_t board_type, int32_t *pwm_joint, int16_t *pwm_motor, uint8_t alarm_mask, eObool_t control_mode_trq)
 {
     if (!o) return 0xFF;
     
@@ -139,13 +139,20 @@ extern uint8_t eo_motors_PWM(EOmotors *o, emsBoardType_t board_type, int32_t *pw
         }
         else
         {
-            pwm_motor[0] = (int16_t)(      pwm_joint[0]);
-            pwm_motor[1] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]))/40);
-            pwm_motor[2] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]))/40);
-    
-            //pwm_motor[0] = (int16_t)  pwm_joint[0];
-            //pwm_motor[1] = (int16_t)(-pwm_joint[0]+pwm_joint[1]);
-            //pwm_motor[2] = (int16_t)(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]);
+            /*
+            if (control_mode_trq)
+            {
+                pwm_motor[0] = (int16_t)  pwm_joint[0];
+                pwm_motor[1] = (int16_t)(-pwm_joint[0]+pwm_joint[1]);
+                pwm_motor[2] = (int16_t)(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]);
+            }
+            else
+            */
+            {
+                pwm_motor[0] = (int16_t)(      pwm_joint[0]);
+                pwm_motor[1] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]))/40);
+                pwm_motor[2] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]))/40);
+            }
         }
         
         if (o->motor_error_mask & 0x08)
