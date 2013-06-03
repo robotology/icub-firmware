@@ -307,6 +307,11 @@ extern void eo_axisController_SetOutput(EOaxisController *o, int16_t out)
     if (o) o->openloop_out = out;
 }
 
+extern void eo_axisController_GetPosRef(EOaxisController *o, int32_t *pos, int32_t *avg_vel)
+{
+     eo_trajectory_GetPosReference(o->trajectory, pos, avg_vel);
+}
+
 extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_t avg_vel)
 {
     if (!o) return;

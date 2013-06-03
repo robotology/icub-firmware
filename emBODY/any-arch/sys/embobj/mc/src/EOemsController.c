@@ -353,6 +353,13 @@ extern void eo_emsController_SetOutput(uint8_t joint, int16_t out)
     if (s_emsc) eo_axisController_SetOutput(s_emsc->axis_controller[joint], out);    
 }
 
+extern void eo_emsController_GetPosRef(int32_t* pos, int32_t* avg_vel)
+{
+    if (!s_emsc) return;
+    
+    JOINTS(j) eo_axisController_GetPosRef(s_emsc->axis_controller[j], &(pos[j]), &(avg_vel[j])); 
+}
+
 extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_vel)
 {
     if (s_emsc) 

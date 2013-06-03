@@ -42,6 +42,9 @@ struct EOtrajectory_hid
     int32_t vel_max;
     int32_t acc_max;
 
+    int32_t Xdebug;
+    int32_t Vdebug;
+    
     //////////////////
     // position
     float xX;
