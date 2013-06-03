@@ -42,8 +42,10 @@
 #include "EOMtheEMSappl.h"
 #include "EOMtheEMSapplCfg.h"
 
+#if	!defined(EMSAPPL_USE_CORE)
 #include "EOtheEMSapplDiagnostics.h"
-
+#warning -> TODO: EOtheEMSapplDiagnosticsshould be separated from EOMtheEMSerror
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -247,9 +249,11 @@ static void s_eom_emserror_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid,
     }
     
     //eov_sys_Stop(eov_sys_GetHandle());
-    
+
+#if	!defined(EMSAPPL_USE_CORE)    
     eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
     eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+#endif
      
     eom_task_PrioritySet(s_emserror_singleton.task, eom_mtask_prio_max);
     
