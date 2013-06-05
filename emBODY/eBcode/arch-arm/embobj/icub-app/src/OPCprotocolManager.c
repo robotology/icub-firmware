@@ -74,6 +74,7 @@ static opcprotman_var_map_t* s_opcprotman_find_var(OPCprotocolManager* p, uint16
 // --------------------------------------------------------------------------------------------------------------------
 
 //static const char s_eobj_ownname[] = "OPCprotocolManager";
+static uint32_t seqencenumber = 0;
 
 
 
@@ -192,7 +193,6 @@ extern opcprotman_res_t opcprotman_Parse(OPCprotocolManager* p, opcprotman_messa
         return(opcprotman_NOK_generic);
     }
     
-    
     opcprotman_var_map_t* map = s_opcprotman_find(p, &msg->head);
     
     if(NULL == map)
@@ -227,6 +227,8 @@ extern opcprotman_res_t opcprotman_Form(OPCprotocolManager* p, opcprotman_opc_t 
     msg->head.dbv   = p->cfg->databaseversion;
     msg->head.var   = var;
     msg->head.len   = 0; // but it shall be updated
+    seqencenumber++;
+    msg->head.seqnum = seqencenumber;
     
     opcprotman_var_map_t* map = s_opcprotman_find(p, &msg->head);
     
@@ -296,6 +298,15 @@ extern opcprotman_var_map_t* opcprotman_find(OPCprotocolManager* p, uint16_t var
     return(s_opcprotman_find_var(p, var));
 }
 
+
+extern uint32_t opcprotman_getSeqNum(OPCprotocolManager* p, opcprotman_message_t* msg)
+{
+    if((NULL == p) || (NULL == msg) )
+    {
+        return(INT32_MAX);
+    }
+    return(msg->head.seqnum);
+}
 // #ifndef __USE_MY _OPCPROTMAN_PERSONALIZE_DATABASE__
 // extern opcprotman_res_t opcprotman_personalize_database(void)
 // {
