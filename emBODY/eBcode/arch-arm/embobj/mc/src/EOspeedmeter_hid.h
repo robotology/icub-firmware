@@ -54,7 +54,7 @@ struct EOspeedmeter_hid
     eObool_t hard_fault;
 
     uint8_t  first_valid_data;
-    uint16_t invalid_data_cnt;
+    //uint16_t invalid_data_cnt;
 
     int32_t window;
     int32_t distance_filt;
