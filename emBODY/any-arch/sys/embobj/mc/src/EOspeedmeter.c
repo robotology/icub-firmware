@@ -102,7 +102,7 @@ extern EOspeedmeter* eo_speedmeter_New(void)
         o->delta = 0;
         o->delta_filt = 0;
         
-        o->invalid_data_cnt = 0;
+        //o->invalid_data_cnt = 0;
         o->first_valid_data = 0;
         
         o->hard_fault = eobool_false;
@@ -212,7 +212,7 @@ static void encoder_init(EOspeedmeter* o, int32_t position)
         o->dir = 0;
 
         o->first_valid_data = 0;
-        o->invalid_data_cnt = 0;
+        //o->invalid_data_cnt = 0;
         
         o->is_started = eobool_true;
     }
@@ -260,20 +260,22 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
 
     if (o->time < 1000) ++o->time;
 
+    /*
     if (o->invalid_data_cnt >= 10000)
     {
         o->hard_fault = eobool_true;
         o->invalid_data_cnt = 0;
         return;
     }
+    */
     
     if (position == ENC_INVALID)
     {
-        o->invalid_data_cnt += 10;
+        //o->invalid_data_cnt += 10;
     }
     else
     {        
-        if (o->invalid_data_cnt) --o->invalid_data_cnt;
+        //if (o->invalid_data_cnt) --o->invalid_data_cnt;
 
         int32_t check = normalize_angle(position - o->position_last);
         o->position_last = position;
@@ -303,10 +305,12 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
                 o->dir = 0;
             }
         }
+        /*
         else
         {
             o->invalid_data_cnt += 11;
         }
+        */
     }
     
     if (o->time < 999)
