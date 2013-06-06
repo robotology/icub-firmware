@@ -80,6 +80,7 @@ void can_receive_additional_info();
 
 #define CAN_SET_BOARD_ID			50
 #define CAN_GET_BOARD_ID			51
+#define CAN_SET_TORQUE_SOURCE		52
 
 #define CAN_GET_PID_ERROR			55
 
@@ -131,7 +132,10 @@ void can_receive_additional_info();
 #define CAN_SET_TORQUE_STICTION_PARAMS  95
 #define CAN_GET_TORQUE_STICTION_PARAMS  96
 
-#define NUM_OF_MESSAGES				97
+#define CAN_SET_BACKEMF_PARAMS      97
+#define CAN_GET_BACKEMF_PARAMS      98
+
+#define NUM_OF_MESSAGES				99
 
 // class 1 messages, broadcast 
 // when in bcast mode, messages are sent periodically by the controller

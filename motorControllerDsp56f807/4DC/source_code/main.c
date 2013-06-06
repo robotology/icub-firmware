@@ -32,7 +32,7 @@
 	
 byte	_board_ID = 15;	
 char    _additional_info [32];
-byte    _build_number = 51;
+byte    _build_number = 70;
 byte    _my_can_protocol_major = 1;
 byte    _my_can_protocol_minor = 1;
 bool    _can_protocol_ack = false;
@@ -211,6 +211,7 @@ void main(void)
 				
 	serial_interface_init (JN);
 	can_interface_init    (JN);
+	init_strain           ();
 	init_currents         ();
     init_pwm			  ();	 
     init_faults           (true,true,true);	 

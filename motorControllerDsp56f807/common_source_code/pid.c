@@ -61,7 +61,7 @@ byte  _t1c =0;
 
 // BACK-EMF COMPENSATION
 Int16 _backemf_gain[JN]  = INIT_ARRAY (0);
-Int16 _backemf_shift[JN] = INIT_ARRAY (0);
+byte  _backemf_shift[JN] = INIT_ARRAY (0);
 
 // DECOUPLING PARAMETERS
 float _param_a10_coeff = -1.6455F;
@@ -247,102 +247,17 @@ Int32 compute_pwm(byte j)
 	byte  i=0;
 	Int32 speed_damping =0;
 
-		/*watchdog check for strain messages in torque control mode + input selection*/
-		//the function turns off pwm of joint <jnt> if <strain_num> watchdog is triggered
-		//the first number is joint, the second number is the watchdog identifier
-#if   (VERSION == 0x150 || VERSION == 0x140 || VERSION == 0x250 )
-	  	//arm
-	  	read_force_data (0, WDT_JNT_STRAIN_12,0);
-	  	read_force_data (1, WDT_JNT_STRAIN_12,1);
-#elif (VERSION == 0x151 || VERSION == 0x251 ) 
-	  	//legs
-	  	if (_board_ID==5)     //left leg
-	  	{
-		//	read_force_data (0, WDT_6AX_STRAIN_13, 5);
-			read_force_data (0, WDT_JNT_STRAIN_12, 2);
-	  		read_force_data (1, WDT_JNT_STRAIN_12, 3);   		
-	  	}
-	  	else if (_board_ID==6) //left leg
-	  	{
-			read_force_data (0, WDT_JNT_STRAIN_12, 0); 
-	  		read_force_data (1, WDT_JNT_STRAIN_12, 1); 	  		
-	  	}
-	  	else if (_board_ID==7) //left leg
-	  	{
-			read_force_data (0, WDT_JNT_STRAIN_12, 4); 
-	  		read_force_data (1, WDT_JNT_STRAIN_12, 5); 	  		
-	  	}
-	  	else if (_board_ID==8) //right leg
-	  	{
-		//	read_force_data (0, WDT_6AX_STRAIN_14, 5);
-			read_force_data (0, WDT_JNT_STRAIN_11, 2);
-		  	read_force_data (1, WDT_JNT_STRAIN_11, 3);   		
-	  	}  
-	  	else if (_board_ID==9) //right leg
-	  	{
-			read_force_data (0, WDT_JNT_STRAIN_11, 0); 
-	 	 	read_force_data (1, WDT_JNT_STRAIN_11, 1); 	  		
-	  	}
-	  	else if (_board_ID==10) //right leg
-	  	{
-			read_force_data (0, WDT_JNT_STRAIN_11, 4); 
-		  	read_force_data (1, WDT_JNT_STRAIN_11, 5); 	  		
-	  	}  	  	
-	  	else
-	  	{
-		//you should never execute this code
-		if (_control_mode[j] == MODE_TORQUE ||
-			_control_mode[j] == MODE_IMPEDANCE_POS ||
-			_control_mode[j] == MODE_IMPEDANCE_VEL)
-			{	
-				_control_mode[j] = MODE_IDLE;	
-				_pad_enabled[j] = false;
-				PWM_outputPadDisable(j);			
-				can_printf("ERR:unknown fc2");
-				_strain_val[j]=0;
-			}
-	  	}
-#elif (VERSION == 0x152 || VERSION == 0x252) 
-	  	//torso
-	  	read_force_data (0, WDT_JNT_STRAIN_12,1); 
-	  	read_force_data (1, WDT_JNT_STRAIN_12,2); 
-#elif (VERSION == 0x154 || VERSION == 0x254)
-	  	//torso
-	  	read_force_data (0, WDT_JNT_STRAIN_12,0); 
-	  	  
-#elif VERSION == 0x157 || VERSION == 0x147 || VERSION == 0x257
-      	//coupled joint of the arm
-     // read_force_data (0, WDT_6AX_STRAIN_13,5);
-	 	read_force_data (0, WDT_JNT_STRAIN_12,2);
-	  	read_force_data (1, WDT_JNT_STRAIN_12,3); 
-#elif   VERSION == 0x0119
-		//arm
-		read_force_data (0, WDT_JNT_STRAIN_12,4); //wrist pronosupination
-		read_force_data (1, WDT_JNT_STRAIN_11,0); //wrist pitch disabled
-		read_force_data (2, WDT_JNT_STRAIN_11,1); //wrist yaw   disabled
-		read_force_data (3, -1               ,0); //fingers disabled
-#elif   VERSION == 0x0219
-    	//armV2
-    	read_force_data (0, WDT_JNT_STRAIN_12,4); //wrist pronosupination
-		read_force_data (1, WDT_JNT_STRAIN_11,0); //@@@TODO differential 1 for icubV2
-		read_force_data (2, WDT_JNT_STRAIN_11,1); //@@@TODO differential wrist 2 for icubV2
-		read_force_data (3, -1				 ,0); //fingers disabled
-#elif	VERSION == 0x0351
+	/*watchdog check for strain messages in torque control mode + input selection*/
+	//the function turns off pwm of joint <jnt> if <strain_num> watchdog is triggered
+	//the first number is joint, the second number is the watchdog identifier
+	for (i=0;i<JN; i++)
+	{
+	    //can_printf("%d %d %d %d",i,_selected_strain_id[i], _selected_strain_chan[i], _strain_wtd[_selected_strain_id[i]]);
+		read_force_data (i, _selected_strain_id[i], _selected_strain_chan[i]);		
+	}
+#if	VERSION == 0x0351
 		//iKart has a fake torque mode that just compensates for back-emf
 		_strain_val[j]=0;
-#else
-	  	//other firmwares
-		//you should never execute this code
-		if (_control_mode[j] == MODE_TORQUE ||
-			_control_mode[j] == MODE_IMPEDANCE_POS ||
-			_control_mode[j] == MODE_IMPEDANCE_VEL)
-			{	
-				_control_mode[j] = MODE_IDLE;	
-				_pad_enabled[j] = false;
-				PWM_outputPadDisable(j);			
-				can_printf("ERR:unknown fc2");
-				_strain_val[j]=0;
-			}
 #endif	  
 	
 	switch (_control_mode[j]) 

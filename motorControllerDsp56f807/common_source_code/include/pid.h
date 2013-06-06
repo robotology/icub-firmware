@@ -102,7 +102,7 @@ extern Int16 _sacc2[JN] ;
 
 // BACK-EMF COMPENSATION
 extern Int16 _backemf_gain[JN];
-extern Int16 _backemf_shift[JN];
+extern byte  _backemf_shift[JN];
 
 // POSITION VARIABLES											
 extern Int32 _abs_pos_calibration[JN] ;	// absolute position to be reached during calibration

@@ -3,8 +3,6 @@
 
 #include "controller.h"
 
-#define STRAIN_MAX 4
-
 #define CAN_ID_JNT_STRAIN_11		11
 #define CAN_ID_JNT_STRAIN_12		12
 #define CAN_ID_6AX_STRAIN_13		13
@@ -14,7 +12,11 @@
 #define WDT_JNT_STRAIN_12		1
 #define WDT_6AX_STRAIN_13		2
 #define WDT_6AX_STRAIN_14 		3
+#define WDT_6AX_STRAIN_01 		4
+#define STRAIN_MAX              5
 
+extern byte  _selected_strain_id[JN];
+extern byte  _selected_strain_chan[JN];
 
 extern Int16 _strain[STRAIN_MAX][6];
 extern Int16 _strain_init[STRAIN_MAX][6];

@@ -34,7 +34,7 @@
 byte	_board_ID = 16;	
 char    _additional_info [32];
 UInt8    mainLoopOVF=0;
-word    _build_number = 68;
+word    _build_number = 70;
 int     _countBoardStatus[2] ={0,0};
 Int16   _flash_version=0; 
 UInt8   BUS_OFF=false;
@@ -256,11 +256,9 @@ void main(void)
 	Init_Brushless_Comm	  (JN,HALL); 
   	
   	#endif
-	can_interface_init    (JN);
-	 
-#ifdef TORQUE_CNTRL
+	can_interface_init    (JN);	 
     init_strain ();
-#endif 	
+
 
     init_position_abs_ssi ();
 #if VERSION ==0x0257 

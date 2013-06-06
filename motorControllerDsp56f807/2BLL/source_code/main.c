@@ -39,7 +39,7 @@
 byte	_board_ID = 16;	
 char    _additional_info [32];
 UInt8    mainLoopOVF=0;
-byte    _build_number = 62;
+byte    _build_number = 70;
 byte    _my_can_protocol_major = 1;
 byte    _my_can_protocol_minor = 1;
 bool    _can_protocol_ack = false;
@@ -254,10 +254,7 @@ void main(void)
 
 	serial_interface_init (JN);
 	can_interface_init    (JN);
-	
-#ifdef TORQUE_CNTRL
     init_strain ();
-#endif 	
 
     init_position_abs_ssi ();
 #if VERSION == 0x0153 || VERSION ==0x0157 || VERSION == 0x0172 || VERSION ==0x0351

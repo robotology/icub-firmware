@@ -1153,8 +1153,8 @@
 	if      (CAN_DATA[1]==0) _debug_in0[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
 	else if (CAN_DATA[1]==1) _debug_in1[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
 	else if (CAN_DATA[1]==2) _debug_in2[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
-	else if (CAN_DATA[1]==3) _backemf_shift[axis] = _debug_in3[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
-	else if (CAN_DATA[1]==4) _backemf_gain[axis]  = _debug_in4[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
+	else if (CAN_DATA[1]==3) _debug_in3[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
+	else if (CAN_DATA[1]==4) _debug_in4[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
 	else if (CAN_DATA[1]==5) _debug_in5[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
 	else if (CAN_DATA[1]==6) _debug_in6[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
 	else if (CAN_DATA[1]==7) _debug_in7[axis] = BYTE_W(CAN_DATA[2], CAN_DATA[3]); \
@@ -1313,6 +1313,35 @@ else \
 		CAN_DATA[4] = BYTE_L(_kd_imp[axis]); \
 		CAN_DATA[5] = BYTE_H(_ko_imp[axis]); \
 		CAN_DATA[6] = BYTE_L(_ko_imp[axis]); \
+		CAN_DATA[7] = 0; \
+		CAN1_send(CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
+		_general_board_error = ERROR_NONE; \
+}
+
+//-------------------------------------------------------------------
+#define CAN_SET_BACKEMF_PARAMS_HANDLER(x) \
+{ \
+	if (CAN_LEN == 8) \
+	{ \
+		_backemf_gain[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
+		_backemf_shift[axis] = CAN_DATA[3]; \
+		_general_board_error = ERROR_NONE; \
+	} \
+	else \
+		_general_board_error = ERROR_FMT; \
+}
+
+//-------------------------------------------------------------------
+#define CAN_GET_BACKEMF_PARAMS_HANDLER(x) \
+{ \
+	PREPARE_HEADER; \
+		CAN_LEN = 8; \
+		CAN_DATA[1] = BYTE_H(_backemf_gain[axis]); \
+		CAN_DATA[2] = BYTE_L(_backemf_gain[axis]); \
+		CAN_DATA[3] = _backemf_shift[axis]; \
+		CAN_DATA[4] = 0; \
+		CAN_DATA[5] = 0; \
+		CAN_DATA[6] = 0; \
 		CAN_DATA[7] = 0; \
 		CAN1_send(CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
 		_general_board_error = ERROR_NONE; \
@@ -1678,6 +1707,19 @@ else \
 		CAN_DATA[2] = _general_board_error; \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
 		_general_board_error = ERROR_NONE; \
+}
+
+//-------------------------------------------------------------------
+#define CAN_SET_TORQUE_SOURCE_HANDLER(x) \
+{ \
+	if (CAN_LEN == 8) \
+	{ \
+		_selected_strain_id[axis]=CAN_DATA[1]; \
+		_selected_strain_chan[axis]=CAN_DATA[2]; \
+		_general_board_error = ERROR_NONE; \
+	} \
+	else \
+		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
