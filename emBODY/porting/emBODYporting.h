@@ -80,7 +80,8 @@ extern "C" {
 	#define __weak __attribute__((weak))
     #define EO_TAILOR_CODE_FOR_LINUX
     #define EO_WARNING(a)   _Pragma(message("EOWARNING-> "##a))
-//	#define EOCFG_NVSEP_MC_OVERRIDE
+    #define OVERRIDE_eo_receiver_callback_incaseoferror_in_sequencenumberReceived
+    //	#define EOCFG_NVSEP_MC_OVERRIDE
 //	#define EOCFG_NVSEP_SK_OVERRIDE
 //	#define EOCFG_NVSEP_AS_OVERRIDE
 #elif defined(__arm__)
