@@ -457,7 +457,10 @@ typedef     eOresult_t  (*eOres_fp_voidfpvoid_t)                    (void (*)(vo
 typedef     eOresult_t  (*eOres_fp_voidp_uint32_uint32_cvoidp_t)    (void *, uint32_t, uint32_t, const void *);
 typedef     eOresult_t  (*eOres_fp_voidp_uint32_uint32_voidp_t)     (void *, uint32_t, uint32_t, void *);
 typedef     void        (*eOvoid_fp_voidfpvoiduint32_t)             (void (*)(void), uint32_t);
-typedef     void        (*eOvoid_fp_voidfpvoiduint32uint8_t)       (void (*)(void), uint32_t, uint8_t);
+typedef     void        (*eOvoid_fp_voidfpvoiduint32uint8_t)       	(void (*)(void), uint32_t, uint8_t);
+typedef     uint16_t    (*eOuint16_fp_uint16_uint16_t)              (uint16_t, uint16_t);
+typedef     void*       (*eOvoidp_fp_uint16_uint16_t)               (uint16_t, uint16_t);
+typedef     void*       (*eOvoidp_fp_voidp_uint16_uint16_t)         (void*, uint16_t, uint16_t);
 
 
 /** @typedef    typedef struct eOcallbackData_t
