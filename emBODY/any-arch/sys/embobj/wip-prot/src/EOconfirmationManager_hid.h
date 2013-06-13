@@ -37,7 +37,7 @@ extern "C" {
 #include "EOpacket.h"
 #include "EOropframe.h"
 #include "EOrop.h"
-#include "EOnvsCfg.h"
+#include "EOnvSet.h"
 #include "EOtheAgent.h"
 #include "EOlist.h"
 #include "EOVmutex.h"
