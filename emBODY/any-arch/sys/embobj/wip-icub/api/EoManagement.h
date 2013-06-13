@@ -73,6 +73,7 @@ typedef enum
     eomn_entity_appl                        = 1,
 } eOmn_entity_t; 
 
+enum { eomn_entities_numberof = 2 };
 
 // -- all the possible enum
 

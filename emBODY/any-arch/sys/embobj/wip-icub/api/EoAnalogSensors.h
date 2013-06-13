@@ -66,6 +66,7 @@ typedef enum
     eoas_entity_mais                        = 1,
 } eOas_entity_t; 
 
+enum { eoas_entities_numberof = 2 };
 
 // -- all the possible enum
 

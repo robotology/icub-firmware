@@ -67,6 +67,8 @@ typedef enum
     eomc_entity_controller                      = 2
 } eOmc_entity_t; 
 
+enum { eomc_entities_numberof = 3 };
+
 
 // -- all the possible enum
 

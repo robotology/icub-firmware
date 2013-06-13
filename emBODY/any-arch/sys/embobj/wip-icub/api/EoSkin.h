@@ -64,13 +64,15 @@ typedef enum
     eosk_entity_skin                    = 0
 } eOsk_entity_t; 
 
+enum { eosk_entities_numberof = 1 };
+
 
 // -- all the possible enum
 
 typedef enum
 {
-    skin_sigmode_dontsignal                         = 0,
-    snsr_sigmode_signal                             = 1  
+    eosk_sigmode_dontsignal                         = 0,
+    eosk_sigmode_signal                             = 1  
 } eOsk_sigmode_t;
 
 
@@ -124,9 +126,9 @@ typedef struct                  // size is: 164+4+0 = 168
 
 typedef struct                  // size is: 4+4+168+0 = 176
 {
-    eOsk_config_t               sconfig;
-    eOsk_inputs_t               sinputs;    
-    eOsk_status_t               sstatus;
+    eOsk_config_t               config;
+    eOsk_inputs_t               inputs;    
+    eOsk_status_t               status;
 } eOsk_skin_t;                  EO_VERIFYsizeof(eOsk_skin_t, 176);
 
 
