@@ -34,53 +34,7 @@
 #include "EoProtocolEPmc.h"
 #include "EoProtocolEPmn.h"
 #include "EoProtocolEPas.h"
-#warning --> later on u must add teh proper functions
-
-
-
-
-
-extern uint16_t eoprot_ep_sk_variables_numberof_Get(eOprotEP_t ep)
-{
-    return(0);
-}
-
-
-
-
-
-extern uint16_t eoprot_ep_sk_variable_progressivenumber_Get(eOprotEP_t ep, eOprotID_t id)
-{
-    return(0);
-}
-
-
-
-extern uint16_t eoprot_ep_sk_ram_sizeof_Get(eOprotEP_t ep)
-{
-    return(0);
-}
-
-
-
-extern uint16_t eoprot_ep_sk_variable_ram_sizeof_Get(eOprotEP_t ep, eOprotID_t id)
-{
-    return(0);
-}
-
-
-extern void* eoprot_ep_sk_variable_ram_extract(void* epram, eOprotEP_t ep, eOprotID_t id)
-{
-    return(NULL);
-}
-
-
-
-
-extern void* eoprot_ep_sk_variable_romdescriptor_Get(eOprotEP_t ep, eOprotID_t id)
-{
-    return(NULL);
-}
+#include "EoProtocolEPsk.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -347,7 +301,7 @@ extern void* eoprot_ep_variable_ram_Extract(void* epram, eOprotEP_t ep, eOprotID
         
         case eoprot_ep_category_skin:
         {
-            ram = eoprot_ep_sk_variable_ram_extract(epram, ep, id);
+            ram = eoprot_ep_sk_variable_ram_Extract(epram, ep, id);
         } break;  
 
         default:
@@ -384,7 +338,7 @@ extern const void* eoprot_ep_variable_rom_get(eOprotEP_t ep, eOprotID_t id)
         
         case eoprot_ep_category_skin:
         {
-            rom = eoprot_ep_sk_variable_romdescriptor_Get(ep, id);
+            rom = eoprot_ep_sk_variable_rom_Get(ep, id);
         } break;  
 
         default:
