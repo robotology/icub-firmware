@@ -62,7 +62,8 @@ extern "C" {
  **/
 typedef enum
 {
-    eoprot_ep_mc_leftlowerarm       = eoprot_endpoint_mc_leftlowerarm,   
+    eoprot_ep_mc_leftupperarm       = eoprot_endpoint_mc_leftupperarm,   
+    eoprot_ep_mc_leftlowerarm       = eoprot_endpoint_mc_leftlowerarm,
     
     eoprot_ep_mc_rightupperarm      = eoprot_endpoint_mc_rightupperarm,   
     eoprot_ep_mc_rightlowerarm      = eoprot_endpoint_mc_rightlowerarm,   
@@ -87,6 +88,8 @@ enum { eoprot_endpoints_motioncontrol_numberof = 9 };
  **/
 typedef eOmc_entity_t eOprotEntityEPmc_t;
 
+enum { eoprot_ep_mc_entities_numberof = eomc_entities_numberof };
+
 // - definition of the joint: number of them in each endpoint, tag and funtyp values
 
 enum
@@ -102,6 +105,7 @@ typedef enum
 {   
     eoprot_ep_mc_joints_numberof_leftupperarm   = eoprot_ep_mc_joints_numberof_upperarm,
     eoprot_ep_mc_joints_numberof_leftlowerarm   = eoprot_ep_mc_joints_numberof_lowerarm,
+    
     eoprot_ep_mc_joints_numberof_rightupperarm  = eoprot_ep_mc_joints_numberof_upperarm,   
     eoprot_ep_mc_joints_numberof_rightlowerarm  = eoprot_ep_mc_joints_numberof_lowerarm,   
 
@@ -149,7 +153,7 @@ typedef enum
     eoprot_ep_mc_joint_tag_jcmmnds__controlmode                         = 20
 } eOprot_ep_mc_joint_tag_t;
 
-enum { eoprot_ep_mc_joint_tags_numberof = 21};  // it MUST be equal to the number of tags in a joint.      
+enum { eoprot_ep_mc_joint_tags_numberof = 21 };  // it MUST be equal to the number of tags in a joint.      
 
 
 /** @typedef    typedef enum eOprot_ep_mc_joint_funtyp_t
@@ -185,7 +189,7 @@ typedef enum
     eoprot_ep_mc_joint_funtyp_jcmmnds__controlmode                      = EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_u08)
 } eOprot_ep_mc_joint_funtyp_t;    
 
-enum { eoprot_ep_mc_joint_funtyps_numberof = 21};  // it MUST be equal to the number of tags in a joint.  
+enum { eoprot_ep_mc_joint_funtyps_numberof = 21 };  // it MUST be equal to the number of tags in a joint.  
 
 
 // - definition of the motor: number of them in each endpoint, tag and funtyp values
@@ -234,7 +238,7 @@ typedef enum
     eoprot_ep_mc_motor_tag_mstatus__chamaleon04                       = 6
 } eOprot_ep_mc_motor_tag_t;
 
-enum { eoprot_ep_mc_motor_tags_numberof = 7};   // it MUST be equal to the number of tags in a motor.   
+enum { eoprot_ep_mc_motor_tags_numberof = 7 };   // it MUST be equal to the number of tags in a motor.   
 
 
 /** @typedef    typedef enum eOprot_ep_mc_motor_funtyp_t
@@ -254,7 +258,7 @@ typedef enum
     eoprot_ep_mc_motor_funtyp_mstatus__chamaleon04                      = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_u32) 
 } eOprot_ep_mc_motor_funtyp_t;  
 
-enum { eoprot_ep_mc_motor_funtyps_numberof = 7};   // it MUST be equal to the number of tags in a motor. 
+enum { eoprot_ep_mc_motor_funtyps_numberof = 7 };   // it MUST be equal to the number of tags in a motor. 
 
 // - definition of the controller: number of them in each endpoint, tag and funtyp values
 
@@ -295,7 +299,7 @@ typedef enum
      eoprot_ep_mc_controller_tag_ccmmnds__go2stateofcontroller         = 4
 } eOprot_ep_mc_controller_tag_t;
 
-enum { eoprot_ep_mc_controller_tags_numberof = 5};  // it MUST be equal to the number of tags in a controller. 
+enum { eoprot_ep_mc_controller_tags_numberof = 5 };  // it MUST be equal to the number of tags in a controller. 
 
 /** @typedef    typedef enum eOprot_ep_mc_controller_funtyp_t
     @brief      It contains the function and type for all the network variables in a controller. There must be a one-to-one
@@ -312,7 +316,7 @@ typedef enum
     eoprot_ep_mc_controller_funtyp_ccmmnds__go2stateofcontroller        = EO_nv_FUNTYP(eo_nv_FUN_out, eo_nv_TYP_u08)
 } eOprot_ep_mc_controller_funtyp_t; 
 
-enum { eoprot_ep_mc_controller_funtyps_numberof = 5};  // it MUST be equal to the number of tags in a controller. 
+enum { eoprot_ep_mc_controller_funtyps_numberof = 5 };  // it MUST be equal to the number of tags in a controller. 
 
 
 // - structures implementing the endpoints
@@ -373,6 +377,18 @@ typedef struct                  // 152*2+40*2+24 = 408
 } eOprot_ep_mc_lowerleg_t;      EO_VERIFYsizeof(eOprot_ep_mc_lowerleg_t, 408);
 
 
+typedef eOprot_ep_mc_upperarm_t eOprot_ep_mc_leftupperarm_t;
+typedef eOprot_ep_mc_upperarm_t eOprot_ep_mc_rightupperarm_t;
+
+typedef eOprot_ep_mc_lowerarm_t eOprot_ep_mc_leftlowerarm_t;
+typedef eOprot_ep_mc_lowerarm_t eOprot_ep_mc_rightlowerarm_t;
+
+
+typedef eOprot_ep_mc_upperleg_t eOprot_ep_mc_leftupperleg_t;
+typedef eOprot_ep_mc_upperleg_t eOprot_ep_mc_rightupperleg_t;
+
+typedef eOprot_ep_mc_lowerleg_t eOprot_ep_mc_leftlowerleg_t;
+typedef eOprot_ep_mc_lowerleg_t eOprot_ep_mc_rightlowerleg_t;
   
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section

@@ -75,6 +75,8 @@ enum { eoprot_endpoints_skin_numberof = 2 };
  **/
 typedef eOsk_entity_t eOprotEntityEPsk_t;
 
+enum { eoprot_ep_sk_entities_numberof = eosk_entities_numberof };
+
 
 // - definition of the skin: number of them in each endpoint, tag and funtyp values
 

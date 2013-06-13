@@ -71,13 +71,15 @@ typedef enum
 } eOprot_endpoint_analogsensor_t;
 
 
-enum { eoprot_endpoints_analosensor_numberof = 6 };
+enum { eoprot_endpoints_analogsensor_numberof = 6 };
 
 
 /** @typedef    typedef eOas_entity_t eOprotEntityEPas_t
     @brief      It contains the entities in endpoint analosensor: strain and mais
  **/
 typedef eOas_entity_t eOprotEntityEPas_t;
+
+enum { eoprot_ep_as_entities_numberof = eoas_entities_numberof };
 
 
 // - definition of the strain: number of them in each endpoint, tag and funtyp values

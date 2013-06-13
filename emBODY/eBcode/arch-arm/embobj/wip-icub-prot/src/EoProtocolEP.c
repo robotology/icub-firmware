@@ -174,31 +174,36 @@ extern eOprotProgNumber_t eoprot_ep_variable_ID2prognumber(eOprotEP_t ep, eOprot
     return(prognum);
 }
 
+// current implementation depends on the fatct taht we have the 16 bits of the id assigned to entity-index-tag
+// with 4-4-8 bits. thus we put a guard which fails compilation in case those values change.
+EO_VERIFYproposition(eoprot_ep_1234, 16 == eoprot_entities_numberof);
+EO_VERIFYproposition(eoprot_ep_1234, 16 == eoprot_indices_numberof);
+EO_VERIFYproposition(eoprot_ep_1234, 256 == eoprot_tags_numberof);
 
 extern eOprotID_t eoprot_ep_variable_ID_get(eOprotEP_t ep, eOprotEntity_t entity, eOprotIndex_t index, eOprotTag_t tag)
 {
-    uint32_t id = tag & 0xff;
-    id |= ((index&0x1f)<<8);
-    id |= ((entity&0x03)<<13);
+    uint32_t id = (uint32_t)tag & 0xff;
+    id |= (((uint32_t)index & 0x0f)<<8);
+    id |= (((uint32_t)entity & 0x0f)<<16);
     return((eOprotID_t)id);    
 }
 
 extern eOprotEntity_t eoprot_ep_variable_ID2entity(eOprotEP_t ep, eOprotID_t id)
 {
-    uint32_t ent = ((id>>13)&0x03);
+    uint32_t ent = (((uint32_t)id>>16) & 0x0f);
     return((eOprotEntity_t)ent);    
 }
 
 extern eOprotIndex_t eoprot_ep_variable_ID2index(eOprotEP_t ep, eOprotID_t id)
 {
-    uint32_t index = ((id>>8)&0x1f);
+    uint32_t index = (((uint32_t)id>>8) & 0x0f);
     return((eOprotIndex_t)index);    
 }
 
 
 extern eOprotTag_t eoprot_ep_variable_ID2tag(eOprotEP_t ep, eOprotID_t id)
 {
-    uint32_t tag = (id&0xff);
+    uint32_t tag = ((uint32_t)id & 0xff);
     return((eOprotTag_t)tag);  
 }
 

@@ -56,8 +56,12 @@
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-// - guard on motion control tags ...
+// - guard on max number of entities
+EO_VERIFYproposition(eoprot_ep_sk_ded34, eoprot_ep_sk_entities_numberof <= eoprot_entities_numberof);
+
+// - guard on tags ...
 EO_VERIFYproposition(eoprot_ep_sk_tagsnum_sk, eoprot_ep_sk_skin_tags_numberof == eoprot_ep_sk_skin_funtyps_numberof);
+EO_VERIFYproposition(eoprot_ep_sk_tagsmax_sk, eoprot_ep_sk_skin_tags_numberof <= eoprot_tags_numberof);
 
 
 // - some more constants
@@ -163,7 +167,7 @@ extern const eOsk_skin_t* eoprot_ep_sk_skin_default_Get(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-#warning --> the function s_eoprot_ep_sk_ep2arrayindex() does not make a control upon validity of its argument ...
+//#warning --> the function s_eoprot_ep_sk_ep2arrayindex() does not make a control upon validity of its argument ...
 static uint8_t s_eoprot_ep_sk_ep2arrayindex(eOprotEP_t ep)
 { 
     uint8_t arrayindex = ep&0xf;

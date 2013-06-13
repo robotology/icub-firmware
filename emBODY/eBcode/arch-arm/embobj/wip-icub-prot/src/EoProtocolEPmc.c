@@ -56,11 +56,18 @@
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-// - guard on motion control tags ...
-EO_VERIFYproposition(eoprot_ep_mc_tagsnum_jo, eoprot_ep_mc_joint_tags_numberof == eoprot_ep_mc_joint_funtyps_numberof);
-EO_VERIFYproposition(eoprot_ep_mc_tagsnum_mo, eoprot_ep_mc_motor_tags_numberof == eoprot_ep_mc_motor_funtyps_numberof);
-EO_VERIFYproposition(eoprot_ep_mc_tagsnum_co, eoprot_ep_mc_controller_tags_numberof == eoprot_ep_mc_controller_funtyps_numberof);
+// - guard on max number of entities
+EO_VERIFYproposition(eoprot_ep_mc_dew4, eoprot_ep_mc_entities_numberof <= eoprot_entities_numberof);
 
+// - guard on tags ...
+EO_VERIFYproposition(eoprot_ep_mc_tagsnum_jo, eoprot_ep_mc_joint_tags_numberof == eoprot_ep_mc_joint_funtyps_numberof);
+EO_VERIFYproposition(eoprot_ep_mc_tagsmax_jo, eoprot_ep_mc_joint_tags_numberof <= eoprot_tags_numberof);
+
+EO_VERIFYproposition(eoprot_ep_mc_tagsnum_mo, eoprot_ep_mc_motor_tags_numberof == eoprot_ep_mc_motor_funtyps_numberof);
+EO_VERIFYproposition(eoprot_ep_mc_tagsmax_mo, eoprot_ep_mc_motor_tags_numberof <= eoprot_tags_numberof);
+
+EO_VERIFYproposition(eoprot_ep_mc_tagsnum_co, eoprot_ep_mc_controller_tags_numberof == eoprot_ep_mc_controller_funtyps_numberof);
+EO_VERIFYproposition(eoprot_ep_mc_tagsmax_co, eoprot_ep_mc_controller_tags_numberof <= eoprot_tags_numberof);
 
 // - some more constants
 

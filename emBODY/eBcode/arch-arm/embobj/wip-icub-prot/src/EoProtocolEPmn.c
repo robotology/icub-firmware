@@ -56,10 +56,15 @@
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-// - guard on motion control tags ...
-EO_VERIFYproposition(eoprot_ep_mn_tagsnum_co, eoprot_ep_mn_comm_tags_numberof == eoprot_ep_mn_comm_funtyps_numberof);
-EO_VERIFYproposition(eoprot_ep_mn_tagsnum_ap, eoprot_ep_mn_appl_tags_numberof == eoprot_ep_mn_appl_funtyps_numberof);
+// - guard on max number of entities
+EO_VERIFYproposition(eoprot_ep_mn_ded34, eoprot_ep_mn_entities_numberof <= eoprot_entities_numberof);
 
+// - guard on tags ...
+EO_VERIFYproposition(eoprot_ep_mn_tagsnum_co, eoprot_ep_mn_comm_tags_numberof == eoprot_ep_mn_comm_funtyps_numberof);
+EO_VERIFYproposition(eoprot_ep_mn_tagsmax_co, eoprot_ep_mn_comm_tags_numberof <= eoprot_tags_numberof);
+
+EO_VERIFYproposition(eoprot_ep_mn_tagsnum_ap, eoprot_ep_mn_appl_tags_numberof == eoprot_ep_mn_appl_funtyps_numberof);
+EO_VERIFYproposition(eoprot_ep_mn_tagsmax_ap, eoprot_ep_mn_appl_tags_numberof <= eoprot_tags_numberof);
 
 
 // - some more constants
@@ -176,7 +181,7 @@ extern const eOmn_appl_t* eoprot_ep_mn_appl_default_Get(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-#warning --> the function s_eoprot_ep_mn_ep2arrayindex() does not make a control upon validity of its argument ...
+
 static uint8_t s_eoprot_ep_mn_ep2arrayindex(eOprotEP_t ep)
 {   // we have only one endpoint thus only one index equal to 0.
     uint8_t arrayindex = 0;
