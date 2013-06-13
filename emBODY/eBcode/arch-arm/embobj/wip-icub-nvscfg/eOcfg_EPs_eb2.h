@@ -17,21 +17,21 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOCFG_EPS_EB1_H_
-#define _EOCFG_EPS_EB1_H_
+#ifndef _EOCFG_EPS_EB2_H_
+#define _EOCFG_EPS_EB2_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-/** @file       eOcfg_EPs_eb1.h          
-	@brief      This header file contains a const configuration for the endpoints of board EB1 (left arm, upper)
+/** @file       eOcfg_EPs_eb2.h          
+	@brief      This header file contains a const configuration for the endpoints of board EB2 (left arm, lower)
 	@author     marco.accame@iit.it
 	@date       06/06/2013
 **/
 
-/** @defgroup eo_eOcfg_EPs_eb1 Configuration of the NVs for management of the ems board eb1
+/** @defgroup eo_eOcfg_EPs_eb2 Configuration of the NVs for management of the ems board eb2
     Tcecece 
     
     @{		
@@ -57,39 +57,39 @@ extern "C" {
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
 
-extern const eOnvset_DEVcfg_t* eo_cfg_EPs_eb1;
-extern const eOnvset_DEVcfg_t eo_cfg_EPs_eb1_object;
+extern const eOnvset_DEVcfg_t* eo_cfg_EPs_eb2;
+extern const eOnvset_DEVcfg_t eo_cfg_EPs_eb2_object;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-/** @fn         extern void* eo_cfg_nvsEP_eb1_Get_RAM(eOnvEP_t ep, eOnvsetOwnership_t ownership)
+/** @fn         extern void* eo_cfg_nvsEP_eb2_Get_RAM(eOnvEP_t ep, eOnvsetOwnership_t ownership)
     @brief      retrieves all the the RAM of the endpoint specified by @e ep. This functions returns the locally or
                 remotely owned RAM. 
                 This ram can be used with a proper cast to the struct representing the endpoint (e.g., for the endpoint 
-                eoprot_endpoint_mc_leftupperarm, the cast is to be done with eOprot_ep_mc_leftupperarm_t).
+                eoprot_endpoint_mc_leftlowerarm, the cast is to be done with eOprot_ep_mc_leftlowerarm_t).
     @param      ep              The endpoint.
     @param      ownership       the ownership
     @return     The pointer to the memory or NULL if the memory is not initialised yet or if the @e ep is not recognised
  **/
-extern void* eo_cfg_nvsEP_eb1_Get_RAM(eOnvEP_t ep, eOnvsetOwnership_t ownership);
+extern void* eo_cfg_nvsEP_eb2_Get_RAM(eOnvEP_t ep, eOnvsetOwnership_t ownership);
 
 
-/** @fn         extern void* eo_cfg_nvsEP_eb1_Get_locallyownedRAM(eOnvEP_t ep)
+/** @fn         extern void* eo_cfg_nvsEP_eb2_Get_locallyownedRAM(eOnvEP_t ep)
     @brief      retrieves all the the RAM of the endpoint specified by @e ep. This functions returns the locally owned RAM.
                 This ram can be used with a proper cast to the struct representing the endpoint (e.g., for the endpoint 
-                eoprot_endpoint_mc_leftupperarm, the cast is to be done with eOprot_ep_mc_leftupperarm_t).
+                eoprot_endpoint_mc_leftlowerarm, the cast is to be done with eOprot_ep_mc_leftlowerarm_t).
     @param      ep              The endpoint.
     @return     The pointer to the memory or NULL if the memory is not initialised yet or if the @e ep is not recognised
  **/
-extern void* eo_cfg_nvsEP_eb1_Get_locallyownedRAM(eOnvEP_t ep);
+extern void* eo_cfg_nvsEP_eb2_Get_locallyownedRAM(eOnvEP_t ep);
 
 
 
 
 /** @}            
-    end of group eo_eOcfg_EPs_eb1  
+    end of group eo_eOcfg_EPs_eb2  
  **/
 
 #ifdef __cplusplus
