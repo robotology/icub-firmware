@@ -348,7 +348,7 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
          {
              .emsboard_type          = EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE
          },
-				.endpoints                  =
+         .endpoints                  =
          {
              .mc_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_mc,   
              .as_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_as,

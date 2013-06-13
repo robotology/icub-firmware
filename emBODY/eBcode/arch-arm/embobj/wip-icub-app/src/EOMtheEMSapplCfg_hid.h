@@ -63,50 +63,42 @@ extern "C" {
         #define     EOMTHEEMSAPPLCFG_USE_EB2
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB2"
         #include    "eOcfg_EPs_eb2.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb2_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb2_hashfunction_ep2index        
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eo_cfg_EPs_eb2_object        
 #elif   (3 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB3
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB3"
         #include    "eOcfg_EPs_eb3.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb3_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb3_hashfunction_ep2index        
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eo_cfg_EPs_eb3_object         
 #elif   (4 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB4
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB4"
         #include    "eOcfg_EPs_eb4.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb4_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb4_hashfunction_ep2index  
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eo_cfg_EPs_eb4_object  
 #elif   (5 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB5
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB5"
         #include    "eOcfg_EPs_eb5.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb5_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb5_hashfunction_ep2index  
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eo_cfg_EPs_eb5_object   
 #elif   (6 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB6
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB6"
         #include    "eOcfg_EPs_eb6.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb6_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb6_hashfunction_ep2index  
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eo_cfg_EPs_eb6_object   
 #elif   (7 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB7
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB7"
         #include    "eOcfg_EPs_eb7.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb7_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb7_hashfunction_ep2index  
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eo_cfg_EPs_eb7_object   
 #elif   (8 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB8
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB8"
         #include    "eOcfg_EPs_eb8.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb8_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb8_hashfunction_ep2index  
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eo_cfg_EPs_eb8_object   
 #elif   (9 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB9
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB9"
         #include    "eOcfg_EPs_eb9.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb9_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb9_hashfunction_ep2index  
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eo_cfg_EPs_eb9_object   
 #endif
 
 
@@ -194,10 +186,9 @@ extern "C" {
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
         
 #elif     defined(EOMTHEEMSAPPLCFG_USE_EB2)
-        #include "eOcfg_nvsEP_sk.h"
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    eoprot_endpoint_mc_leftlowerarm       
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    eoprot_endpoint_as_leftlowerarm 
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    eoprot_endpoint_sk_emsboard_leftlowerarm 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    eoprot_endpoint_sk_leftlowerarm 
         
 #elif     defined(EOMTHEEMSAPPLCFG_USE_EB3)
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    eoprot_endpoint_mc_rightupperarm       
@@ -205,7 +196,6 @@ extern "C" {
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
 
 #elif     defined(EOMTHEEMSAPPLCFG_USE_EB4)
-        #include "eOcfg_nvsEP_sk.h"
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    eoprot_endpoint_mc_rightlowerarm       
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    eoprot_endpoint_as_rightlowerarm 
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    eoprot_endpoint_sk_emsboard_rightlowerarm 
