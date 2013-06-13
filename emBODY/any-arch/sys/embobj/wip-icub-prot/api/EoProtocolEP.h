@@ -34,7 +34,7 @@ extern "C" {
     @date       06/05/2013
 **/
 
-/** @defgroup eo_protocolendpoint protocol of ... 
+/** @defgroup eo_EoProtocolEP protocol of ... 
     In here there are constants for the max number of joints and motors in an endpoint 
     
     @{        
@@ -68,7 +68,9 @@ typedef enum
 
 enum { eoprot_endpoint_categories_numberof = 4 }; // it does not count the eoprot_ep_category_none.
 
-enum { eoprot_endpoint_maxnum_in_category = 16 }; 
+
+enum { eoprot_endpoint_maxnum_in_category = 16 }; // used to quickly retrieve index given the endpoint.
+
 
 /** @typedef    typedef enum eOprot_endpoint_base_t;
     @brief      It contains the base address for all categories of endpoint. this type is used to assign the values to the endpoints.
@@ -88,9 +90,9 @@ typedef enum
 typedef enum
 {
     eoprot_ep_offset_emsboard           = 1,
-    eoprot_ep_offset_comm               = 2,
-    eoprot_ep_offset_appl               = 3,
-    eoprot_ep_offset_errors             = 4,
+//    eoprot_ep_offset_comm               = 2, // not used so far.
+//    eoprot_ep_offset_appl               = 3, // not used so far.
+//    eoprot_ep_offset_errors             = 4, // not used so far.
     
     eoprot_ep_offset_leftupperarm       = 1,
     eoprot_ep_offset_leftlowerarm       = 2,
@@ -115,9 +117,9 @@ enum { eoprot_endpoint_offset_highestvalue = 9 };
 typedef enum
 {
     eoprot_endpoint_mn_emsboard         = eoprot_ep_base_mn+eoprot_ep_offset_emsboard,      /**< = 0x0001, management of the ems board: comm+appl */   
-    eoprot_endpoint_mn_comm             = eoprot_ep_base_mn+eoprot_ep_offset_comm,          /**< = 0x0002, management of communication */   
-    eoprot_endpoint_mn_appl             = eoprot_ep_base_mn+eoprot_ep_offset_appl,          /**< = 0x0003, management of application */ 
-    eoprot_endpoint_mn_errors           = eoprot_ep_base_mn+eoprot_ep_offset_errors,        /**< = 0x0004, management of errors */       
+//    eoprot_endpoint_mn_comm             = eoprot_ep_base_mn+eoprot_ep_offset_comm,          /**< = 0x0002, management of communication */   
+//    eoprot_endpoint_mn_appl             = eoprot_ep_base_mn+eoprot_ep_offset_appl,          /**< = 0x0003, management of application */ 
+//    eoprot_endpoint_mn_errors           = eoprot_ep_base_mn+eoprot_ep_offset_errors,        /**< = 0x0004, management of errors */       
     
     eoprot_endpoint_mc_leftupperarm     = eoprot_ep_base_mc+eoprot_ep_offset_leftupperarm,  /**< = 0x0011, management of motion control in left upper arm */    
     eoprot_endpoint_mc_leftlowerarm     = eoprot_ep_base_mc+eoprot_ep_offset_leftlowerarm,  /**< = 0x0012, management of motion control in left lower arm */ 
@@ -148,7 +150,7 @@ typedef enum
     eoprot_endpoint_none                = EOK_uint16dummy
 } eOprot_endpoint_t;
 
-enum { eoprot_endpoints_numberof = 21 }; // it does not count the eoprot_endpoint_none.
+enum { eoprot_endpoints_numberof = 1 }; // it does not count the eoprot_endpoint_none.
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
@@ -161,7 +163,7 @@ enum { eoprot_endpoints_numberof = 21 }; // it does not count the eoprot_endpoin
 /** @fn         extern eOprot_endpoint_category_t eoprot_ep_category_get(eOprotEP_t ep)
     @brief      it tells which category the endpoint belongs to.
     @param      ep              The endpoint.
-    @return     the category.
+    @return     the category (or eoprot_ep_category_none in case of invalid endpoint)
  **/
 extern eOprot_endpoint_category_t eoprot_ep_category_get(eOprotEP_t ep);
 
@@ -177,9 +179,10 @@ extern uint16_t eoprot_ep_variables_numberof_get(eOprotEP_t ep);
 /** @fn         extern eOprotID_t eoprot_ep_variable_ID_get(eOprotEP_t ep, eOprotEntity_t entity, eOprotIndex_t index, eOprotTag_t tag)
     @brief      it retrieves the endpoint of a variable in the endpoint given a triple (entity, index, tag).
     @param      ep              the endpoint.
-    @param      entity          the entity. Use relevant definition in the specific endpoint.
-    @param      index           the index of the entity.  
-    @param      tag             the tag of the variable of the index-th entity. 
+    @param      entity          the entity. Use relevant values for the enum of the specific endpoint: eOprotEntityEPas_t, 
+                                eOprotEntityEPmc_t, eOprotEntityEPmn_t, or eOprotEntityEPsk_t
+    @param      index           the index of the entity (from 0 to eoprot_indices_numberof-1).  
+    @param      tag             the tag of the variable of the index-th entity (from 0 to eoprot_tags_numberof-1).
     @return     the variable ID or EOK_uint16dummy if there is no variable defined by the triple (entity, index, tag) in that endpoint.
  **/
 extern eOprotID_t eoprot_ep_variable_ID_get(eOprotEP_t ep, eOprotEntity_t entity, eOprotIndex_t index, eOprotTag_t tag); 
@@ -251,13 +254,13 @@ extern void* eoprot_ep_variable_ram_extract(void* epram, eOprotEP_t ep, eOprotID
     @brief      it returns the rom pointer used as descriptor by a given variables of a given endpoint 
     @param      ep              the endpoint.
     @param      id              the identifier of the variable.
-    @return     pointer to the rom descriptor of the variable or NULL upon failure.
+    @return     pointer to the rom descriptor (EOnv_rom_t*) of the variable or NULL upon failure.
  **/
 extern const void* eoprot_ep_variable_rom_get(eOprotEP_t ep, eOprotID_t id);
 
 
 /** @}            
-    end of group eo_protocolendpoint  
+    end of group eo_EoProtocolEP  
  **/
 
 #ifdef __cplusplus

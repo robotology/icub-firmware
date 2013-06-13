@@ -85,10 +85,12 @@ typedef uint16_t eOprotID_t;
 
 /** @typedef    uint8_t eOprotEntity_t
     @brief      used to chose the value of the eOprotID_t. it can be a joint or a motor in a motion control endpoint.
+                It is used as a generic type for function arguments. You should use the relevant type of the endpoint
+                in use: eOprotEntityEPas_t, eOprotEntityEPmc_t, eOprotEntityEPmn_t, or eOprotEntityEPsk_t
  **/
 typedef uint8_t eOprotEntity_t;
 
-enum { eoprot_entities_numberof = 8 };
+enum { eoprot_entities_numberof = 16 };  // the current implementation uses at most 16 possible types of entities per endpoint.
 
 
 /** @typedef    uint8_t eOprotIndex_t
@@ -97,7 +99,7 @@ enum { eoprot_entities_numberof = 8 };
  **/
 typedef uint8_t eOprotIndex_t;
 
-enum { eoprot_indices_numberof = 32 };
+enum { eoprot_indices_numberof = 16 };  // the current implementation uses at most 16 possible entities of a given type per endpoint.
 
 
 /** @typedef    uint16_t eOprotTag_t
@@ -106,7 +108,7 @@ enum { eoprot_indices_numberof = 32 };
  **/
 typedef uint16_t eOprotTag_t;
 
-enum { eoprot_tags_numberof = 256 };
+enum { eoprot_tags_numberof = 256 };    // the current implementation uses at most 256 possible tags per entity of a given type per endpoint.
 
 
 /** @typedef    uint16_t eOprotProgNumber_t

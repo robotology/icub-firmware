@@ -74,6 +74,8 @@ enum { eoprot_endpoints_management_numberof = 1 };
  **/
 typedef eOmn_entity_t eOprotEntityEPmn_t;
 
+enum { eoprot_ep_mn_entities_numberof = eomn_entities_numberof };
+
 
 // - definition of the comm: number of them in each endpoint, tag and funtyp values
 
@@ -93,7 +95,7 @@ typedef enum
      eoprot_ep_mn_comm_tag_cmmnds__ropsigcfg    = 0
 } eOprot_ep_mn_comm_tag_t;
 
-enum { eoprot_ep_mn_comm_tags_numberof = 1};  // it MUST be equal to the number of tags. 
+enum { eoprot_ep_mn_comm_tags_numberof = 1 };  // it MUST be equal to the number of tags. 
 
 
 /** @typedef    typedef enum eOprot_ep_mn_comm_funtyp_t
@@ -105,7 +107,7 @@ typedef enum
     eoprot_ep_mn_comm_funtyp_cmmnds__ropsigcfg  = EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_pkd)
 } eOprot_ep_mn_comm_funtyp_t; 
 
-enum { eoprot_ep_mn_comm_funtyps_numberof = 1};  // it MUST be equal to the number of tags. 
+enum { eoprot_ep_mn_comm_funtyps_numberof = 1 };  // it MUST be equal to the number of tags. 
 
 
 // - definition of the appl: number of them, tag and funtyp values
@@ -128,7 +130,7 @@ typedef enum
      eoprot_ep_mn_appl_tag_cmmnds__go2state     = 2
 } eOprot_ep_mn_appl_tag_t;
 
-enum { eoprot_ep_mn_appl_tags_numberof = 3};  // it MUST be equal to the number of tags. 
+enum { eoprot_ep_mn_appl_tags_numberof = 3 };  // it MUST be equal to the number of tags. 
 
 
 /** @typedef    typedef enum eOprot_ep_mn_appl_funtyp_t
@@ -142,7 +144,7 @@ typedef enum
     eoprot_ep_mn_appl_funtyp_cmmnds__go2state   = EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_u08)
 } eOprot_ep_mn_appl_funtyp_t; 
 
-enum { eoprot_ep_mn_appl_funtyps_numberof = 3};  // it MUST be equal to the number of tags. 
+enum { eoprot_ep_mn_appl_funtyps_numberof = 3 };  // it MUST be equal to the number of tags. 
 
 
 // - structures implementing the endpoints
