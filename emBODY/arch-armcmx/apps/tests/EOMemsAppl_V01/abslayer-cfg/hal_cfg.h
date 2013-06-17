@@ -137,7 +137,7 @@
 #endif
 
 
-//   <o> Max can frames in input buffer <1-16>
+//   <o> Max can frames in input buffer <1-32>
 //   <i> Default: 4
 #define HAL_CAN1_INPBUFFCAPACITY     16
 
@@ -158,11 +158,11 @@
 #endif
 
 
-//   <o> Max can frames in input buffer <1-16>
+//   <o> Max can frames in input buffer <1-32>
 //   <i> Default: 4
-#define HAL_CAN2_INPBUFFCAPACITY     16
+#define HAL_CAN2_INPBUFFCAPACITY     32
 
-//   <o> Max can frames in output buffer <1-16>
+//   <o> Max can frames in output buffer <1-32>
 //   <i> Default: 4
 #define HAL_CAN2_OUTBUFFCAPACITY     16
 
