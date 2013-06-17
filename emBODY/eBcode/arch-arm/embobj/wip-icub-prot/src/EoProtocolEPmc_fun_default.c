@@ -92,314 +92,314 @@ __weak extern void eoprot_ep_mc_fun_INITIALISE(eOnvEP_t ep, void *loc, void *rem
 #endif
 
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jconfig)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jconfig(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_config)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_config(const EOnv* nv, uint16_t index) {}
 #endif
 
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jconfig)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jconfig(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_config)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_config(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jconfig__pidposition)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jconfig__pidposition(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_config__pidposition)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_config__pidposition(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jconfig__pidposition)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__pidposition(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
-#endif
-
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jconfig__pidvelocity)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jconfig__pidvelocity(const EOnv* nv, uint16_t index) {}
-#endif
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jconfig__pidvelocity)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__pidvelocity(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
-#endif
-   
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jconfig__pidtorque)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jconfig__pidtorque(const EOnv* nv, uint16_t index) {}
-#endif
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jconfig__pidtorque)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__pidtorque(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_config__pidposition)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_config__pidposition(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jconfig__impedance)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jconfig__impedance(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_config__pidvelocity)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_config__pidvelocity(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jconfig__impedance)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__impedance(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
-#endif
-
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jconfig__minpositionofjoint)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jconfig__minpositionofjoint(const EOnv* nv, uint16_t index) {}
-#endif
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jconfig__minpositionofjoint)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__minpositionofjoint(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_config__pidvelocity)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_config__pidvelocity(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
    
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jconfig__maxpositionofjoint)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jconfig__maxpositionofjoint(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_config__pidtorque)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_config__pidtorque(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jconfig__maxpositionofjoint)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__maxpositionofjoint(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_config__pidtorque)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_config__pidtorque(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jconfig__velocitysetpointtimeout)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jconfig__velocitysetpointtimeout(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_config__impedance)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_config__impedance(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jconfig__velocitysetpointtimeout)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__velocitysetpointtimeout(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_config__impedance)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_config__impedance(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#endif
+
+
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_config__minpositionofjoint)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_config__minpositionofjoint(const EOnv* nv, uint16_t index) {}
+#endif
+
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_config__minpositionofjoint)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_config__minpositionofjoint(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#endif
+   
+
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_config__maxpositionofjoint)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_config__maxpositionofjoint(const EOnv* nv, uint16_t index) {}
+#endif
+
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_config__maxpositionofjoint)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_config__maxpositionofjoint(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#endif
+
+
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_config__velocitysetpointtimeout)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_config__velocitysetpointtimeout(const EOnv* nv, uint16_t index) {}
+#endif
+
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_config__velocitysetpointtimeout)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_config__velocitysetpointtimeout(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
   
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jconfig__motionmonitormode)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jconfig__motionmonitormode(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_config__motionmonitormode)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_config__motionmonitormode(const EOnv* nv, uint16_t index) {}
 #endif
 
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jconfig__motionmonitormode)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__motionmonitormode(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_config__motionmonitormode)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_config__motionmonitormode(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jconfig__encoderconversionfactor)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jconfig__encoderconversionfactor(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_config__encoderconversionfactor)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_config__encoderconversionfactor(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jconfig__encoderconversionfactor)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__encoderconversionfactor(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
-#endif
-
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jconfig__encoderconversionoffset)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jconfig__encoderconversionoffset(const EOnv* nv, uint16_t index) {}
-#endif
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jconfig__encoderconversionoffset)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__encoderconversionoffset(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_config__encoderconversionfactor)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_config__encoderconversionfactor(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jconfig__des02FORjstatuschamaleon04)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jconfig__des02FORjstatuschamaleon04(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_config__encoderconversionoffset)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_config__encoderconversionoffset(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jconfig__des02FORjstatuschamaleon04)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__des02FORjstatuschamaleon04(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_config__encoderconversionoffset)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_config__encoderconversionoffset(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#endif
+
+
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_config__des02FORstatuschamaleon04)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_config__des02FORstatuschamaleon04(const EOnv* nv, uint16_t index) {}
+#endif
+
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_config__des02FORstatuschamaleon04)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_config__des02FORstatuschamaleon04(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
   
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jstatus)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jstatus(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_status)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_status(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jstatus)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jstatus(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
-#endif
-
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jstatus__basic)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jstatus__basic(const EOnv* nv, uint16_t index) {}
-#endif
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jstatus__basic)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jstatus__basic(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_status)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_status(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jstatus__ofpid)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jstatus__ofpid(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_status__basic)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_status__basic(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jstatus__ofpid)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jstatus__ofpid(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
-#endif
-
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jstatus__chamaleon04)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jstatus__chamaleon04(const EOnv* nv, uint16_t index) {}
-#endif
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jstatus__chamaleon04_updt)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jstatus__chamaleon04(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_status__basic)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_status__basic(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
 
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jinputs)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jinputs(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_status__ofpid)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_status__ofpid(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jinputs)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jinputs(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_status__ofpid)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_status__ofpid(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jinputs__externallymeasuredtorque)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jinputs__externallymeasuredtorque(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_status__chamaleon04)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_status__chamaleon04(const EOnv* nv, uint16_t index) {}
+#endif
+
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_status__chamaleon04_updt)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_status__chamaleon04(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#endif
+
+
+
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_inputs)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_inputs(const EOnv* nv, uint16_t index) {}
+#endif
+
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_inputs)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_inputs(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#endif
+
+
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_inputs__externallymeasuredtorque)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_inputs__externallymeasuredtorque(const EOnv* nv, uint16_t index) {}
 #endif   
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jinputs__externallymeasuredtorque)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jinputs__externallymeasuredtorque(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_inputs__externallymeasuredtorque)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_inputs__externallymeasuredtorque(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
 
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jcmmnds__calibration)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jcmmnds__calibration(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_cmmnds__calibration)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_cmmnds__calibration(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jcmmnds__calibration_UDPT)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jcmmnds__calibration(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
-#endif
-
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jcmmnds__setpoint)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jcmmnds__setpoint(const EOnv* nv, uint16_t index) {}
-#endif
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jcmmnds__setpoint)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jcmmnds__setpoint(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_cmmnds__calibration_UDPT)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_cmmnds__calibration(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jcmmnds__stoptrajectory)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jcmmnds__stoptrajectory(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_cmmnds__setpoint)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_cmmnds__setpoint(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jcmmnds__stoptrajectory)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jcmmnds__stoptrajectory(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_cmmnds__setpoint)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_cmmnds__setpoint(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_jcmmnds__controlmode)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_jcmmnds__controlmode(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_cmmnds__stoptrajectory)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_cmmnds__stoptrajectory(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_jcmmnds__controlmode)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_jcmmnds__controlmode(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_cmmnds__stoptrajectory)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_cmmnds__stoptrajectory(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#endif
+
+
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_cmmnds__controlmode)
+__weak extern void eoprot_ep_mc_fun_INIT_joint_cmmnds__controlmode(const EOnv* nv, uint16_t index) {}
+#endif
+
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_cmmnds__controlmode)
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_cmmnds__controlmode(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
   
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_motor_mconfig)
-__weak extern void eoprot_ep_mc_fun_INIT_motor_mconfig(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_motor_config)
+__weak extern void eoprot_ep_mc_fun_INIT_motor_config(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_motor_mconfig)
-__weak extern void eoprot_ep_mc_fun_UPDT_motor_mconfig(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
-#endif
-
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_motor_mconfig__pidcurrent)
-__weak extern void eoprot_ep_mc_fun_INIT_motor_mconfig__pidcurrent(const EOnv* nv, uint16_t index) {}
-#endif
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_motor_mconfig__pidcurrent)
-__weak extern void eoprot_ep_mc_fun_UPDT_motor_mconfig__pidcurrent(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
-#endif
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_motor_mconfig__maxvelocityofmotor)
-__weak extern void eoprot_ep_mc_fun_INIT_motor_mconfig__maxvelocityofmotor(const EOnv* nv, uint16_t index) {}
-#endif
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_motor_mconfig__maxvelocityofmotor)
-__weak extern void eoprot_ep_mc_fun_UPDT_motor_mconfig__maxvelocityofmotor(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_motor_config)
+__weak extern void eoprot_ep_mc_fun_UPDT_motor_config(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_motor_mconfig__maxcurrentofmotor)
-__weak extern void eoprot_ep_mc_fun_INIT_motor_mconfig__maxcurrentofmotor(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_motor_config__pidcurrent)
+__weak extern void eoprot_ep_mc_fun_INIT_motor_config__pidcurrent(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_motor_mconfig__maxcurrentofmotor)
-__weak extern void eoprot_ep_mc_fun_UPDT_motor_mconfig__maxcurrentofmotor(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_motor_config__pidcurrent)
+__weak extern void eoprot_ep_mc_fun_UPDT_motor_config__pidcurrent(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_motor_mconfig__des02FORmstatuschamaleon04)
-__weak extern void eoprot_ep_mc_fun_INIT_motor_mconfig__des02FORmstatuschamaleon04(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_motor_config__maxvelocityofmotor)
+__weak extern void eoprot_ep_mc_fun_INIT_motor_config__maxvelocityofmotor(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_motor_mconfig__des02FORmstatuschamaleon04)
-__weak extern void eoprot_ep_mc_fun_UPDT_motor_mconfig__des02FORmstatuschamaleon04(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_motor_config__maxvelocityofmotor)
+__weak extern void eoprot_ep_mc_fun_UPDT_motor_config__maxvelocityofmotor(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_motor_mstatus)
-__weak extern void eoprot_ep_mc_fun_INIT_motor_mstatus(const EOnv* nv, uint16_t index) {}
+
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_motor_config__maxcurrentofmotor)
+__weak extern void eoprot_ep_mc_fun_INIT_motor_config__maxcurrentofmotor(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_motor_mstatus)
-__weak extern void eoprot_ep_mc_fun_UPDT_motor_mstatus(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_motor_config__maxcurrentofmotor)
+__weak extern void eoprot_ep_mc_fun_UPDT_motor_config__maxcurrentofmotor(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_motor_mstatus__basic)
-__weak extern void eoprot_ep_mc_fun_INIT_motor_mstatus__basic(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_motor_config__des02FORstatuschamaleon04)
+__weak extern void eoprot_ep_mc_fun_INIT_motor_config__des02FORstatuschamaleon04(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_motor_mstatus__basic)
-__weak extern void eoprot_ep_mc_fun_UPDT_motor_mstatus__basic(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_motor_config__des02FORstatuschamaleon04)
+__weak extern void eoprot_ep_mc_fun_UPDT_motor_config__des02FORstatuschamaleon04(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_motor_mstatus__chamaleon04)
-__weak extern void eoprot_ep_mc_fun_INIT_motor_mstatus__chamaleon04(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_motor_status)
+__weak extern void eoprot_ep_mc_fun_INIT_motor_status(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_motor_mstatus__chamaleon04)
-__weak extern void eoprot_ep_mc_fun_UPDT_motor_mstatus__chamaleon04(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_motor_status)
+__weak extern void eoprot_ep_mc_fun_UPDT_motor_status(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#endif
+
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_motor_status__basic)
+__weak extern void eoprot_ep_mc_fun_INIT_motor_status__basic(const EOnv* nv, uint16_t index) {}
+#endif
+
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_motor_status__basic)
+__weak extern void eoprot_ep_mc_fun_UPDT_motor_status__basic(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#endif
+
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_motor_status__chamaleon04)
+__weak extern void eoprot_ep_mc_fun_INIT_motor_status__chamaleon04(const EOnv* nv, uint16_t index) {}
+#endif
+
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_motor_status__chamaleon04)
+__weak extern void eoprot_ep_mc_fun_UPDT_motor_status__chamaleon04(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif   
 
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_controller_cconfig)
-__weak extern void eoprot_ep_mc_fun_INIT_controller_cconfig(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_controller_config)
+__weak extern void eoprot_ep_mc_fun_INIT_controller_config(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_controller_cconfig)
-__weak extern void eoprot_ep_mc_fun_UPDT_controller_cconfig(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_controller_config)
+__weak extern void eoprot_ep_mc_fun_UPDT_controller_config(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_controller_cconfig__durationofctrlloop)
-__weak extern void eoprot_ep_mc_fun_INIT_controller_cconfig__durationofctrlloop(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_controller_config__durationofctrlloop)
+__weak extern void eoprot_ep_mc_fun_INIT_controller_config__durationofctrlloop(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_controller_cconfig__durationofctrlloop)
-__weak extern void eoprot_ep_mc_fun_UPDT_controller_cconfig__durationofctrlloop(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_controller_config__durationofctrlloop)
+__weak extern void eoprot_ep_mc_fun_UPDT_controller_config__durationofctrlloop(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_controller_cstatus)
-__weak extern void eoprot_ep_mc_fun_INIT_controller_cstatus(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_controller_status)
+__weak extern void eoprot_ep_mc_fun_INIT_controller_status(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_controller_cstatus)
-__weak extern void eoprot_ep_mc_fun_UPDT_controller_cstatus(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_controller_status)
+__weak extern void eoprot_ep_mc_fun_UPDT_controller_status(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_controller_cstatus__alljomoinitted)
-__weak extern void eoprot_ep_mc_fun_INIT_controller_cstatus__alljomoinitted(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_controller_status__alljomoinitted)
+__weak extern void eoprot_ep_mc_fun_INIT_controller_status__alljomoinitted(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_controller_cstatus__alljomoinitted)
-__weak extern void eoprot_ep_mc_fun_UPDT_controller_cstatus__alljomoinitted(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_controller_status__alljomoinitted)
+__weak extern void eoprot_ep_mc_fun_UPDT_controller_status__alljomoinitted(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_controller_ccmmnds__go2stateofcontroller)
-__weak extern void eoprot_ep_mc_fun_INIT_controller_ccmmnds__go2stateofcontroller(const EOnv* nv, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_controller_cmmnds__go2stateofcontroller)
+__weak extern void eoprot_ep_mc_fun_INIT_controller_cmmnds__go2stateofcontroller(const EOnv* nv, uint16_t index) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_controller_ccmmnds__go2stateofcontroller)
-__weak extern void eoprot_ep_mc_fun_UPDT_controller_ccmmnds__go2stateofcontroller(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_controller_cmmnds__go2stateofcontroller)
+__weak extern void eoprot_ep_mc_fun_UPDT_controller_cmmnds__go2stateofcontroller(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -64,114 +64,114 @@
 extern void eoprot_ep_mc_fun_INITIALISE(eOnvEP_t ep, void *loc, void *rem);
 
 
-extern void eoprot_ep_mc_fun_INIT_joint_jconfig(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_joint_jconfig(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_joint_config(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_joint_config(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_joint_jconfig__pidposition(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__pidposition(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_joint_config__pidposition(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_joint_config__pidposition(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_joint_jconfig__pidvelocity(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__pidvelocity(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_joint_config__pidvelocity(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_joint_config__pidvelocity(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
    
-extern void eoprot_ep_mc_fun_INIT_joint_jconfig__pidtorque(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__pidtorque(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_joint_config__pidtorque(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_joint_config__pidtorque(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_joint_jconfig__impedance(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__impedance(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_joint_config__impedance(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_joint_config__impedance(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_joint_jconfig__minpositionofjoint(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__minpositionofjoint(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_joint_config__minpositionofjoint(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_joint_config__minpositionofjoint(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
    
-extern void eoprot_ep_mc_fun_INIT_joint_jconfig__maxpositionofjoint(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__maxpositionofjoint(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_joint_config__maxpositionofjoint(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_joint_config__maxpositionofjoint(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_joint_jconfig__velocitysetpointtimeout(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__velocitysetpointtimeout(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_joint_config__velocitysetpointtimeout(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_joint_config__velocitysetpointtimeout(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_joint_jconfig__motionmonitormode(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__motionmonitormode(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_joint_config__motionmonitormode(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_joint_config__motionmonitormode(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_joint_jconfig__encoderconversionfactor(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__encoderconversionfactor(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_joint_config__encoderconversionfactor(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_joint_config__encoderconversionfactor(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_joint_jconfig__encoderconversionoffset(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__encoderconversionoffset(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_joint_config__encoderconversionoffset(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_joint_config__encoderconversionoffset(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_joint_jconfig__des02FORjstatuschamaleon04(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_joint_jconfig__des02FORjstatuschamaleon04(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
-
-
-extern void eoprot_ep_mc_fun_INIT_joint_jstatus(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_joint_jstatus(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
-
-extern void eoprot_ep_mc_fun_INIT_joint_jstatus__basic(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_joint_jstatus__basic(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
-
-extern void eoprot_ep_mc_fun_INIT_joint_jstatus__ofpid(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_joint_jstatus__ofpid(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
-
-extern void eoprot_ep_mc_fun_INIT_joint_jstatus__chamaleon04(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_joint_jstatus__chamaleon04(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_joint_config__des02FORstatuschamaleon04(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_joint_config__des02FORstatuschamaleon04(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
 
-extern void eoprot_ep_mc_fun_INIT_joint_jinputs(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_joint_jinputs(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_joint_status(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_joint_status(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_joint_jinputs__externallymeasuredtorque(const EOnv* nv, uint16_t index);   
-extern void eoprot_ep_mc_fun_UPDT_joint_jinputs__externallymeasuredtorque(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_joint_status__basic(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_joint_status__basic(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
+extern void eoprot_ep_mc_fun_INIT_joint_status__ofpid(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_joint_status__ofpid(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_joint_jcmmnds__calibration(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_joint_jcmmnds__calibration(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
-
-extern void eoprot_ep_mc_fun_INIT_joint_jcmmnds__setpoint(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_joint_jcmmnds__setpoint(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
-
-extern void eoprot_ep_mc_fun_INIT_joint_jcmmnds__stoptrajectory(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_joint_jcmmnds__stoptrajectory(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
-
-extern void eoprot_ep_mc_fun_INIT_joint_jcmmnds__controlmode(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_joint_jcmmnds__controlmode(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_joint_status__chamaleon04(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_joint_status__chamaleon04(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
 
-extern void eoprot_ep_mc_fun_INIT_motor_mconfig(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_motor_mconfig(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_joint_inputs(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_joint_inputs(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_motor_mconfig__pidcurrent(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_motor_mconfig__pidcurrent(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_joint_inputs__externallymeasuredtorque(const EOnv* nv, uint16_t index);   
+extern void eoprot_ep_mc_fun_UPDT_joint_inputs__externallymeasuredtorque(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_motor_mconfig__maxvelocityofmotor(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_motor_mconfig__maxvelocityofmotor(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_motor_mconfig__maxcurrentofmotor(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_motor_mconfig__maxcurrentofmotor(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_joint_cmmnds__calibration(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_joint_cmmnds__calibration(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_motor_mconfig__des02FORmstatuschamaleon04(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_motor_mconfig__des02FORmstatuschamaleon04(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_joint_cmmnds__setpoint(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_joint_cmmnds__setpoint(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_motor_mstatus(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_motor_mstatus(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_joint_cmmnds__stoptrajectory(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_joint_cmmnds__stoptrajectory(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_motor_mstatus__basic(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_motor_mstatus__basic(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_joint_cmmnds__controlmode(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_joint_cmmnds__controlmode(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_motor_mstatus__chamaleon04(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_motor_mstatus__chamaleon04(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+
+extern void eoprot_ep_mc_fun_INIT_motor_config(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_motor_config(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+
+extern void eoprot_ep_mc_fun_INIT_motor_config__pidcurrent(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_motor_config__pidcurrent(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+
+extern void eoprot_ep_mc_fun_INIT_motor_config__maxvelocityofmotor(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_motor_config__maxvelocityofmotor(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+
+extern void eoprot_ep_mc_fun_INIT_motor_config__maxcurrentofmotor(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_motor_config__maxcurrentofmotor(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+
+extern void eoprot_ep_mc_fun_INIT_motor_config__des02FORstatuschamaleon04(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_motor_config__des02FORstatuschamaleon04(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+
+extern void eoprot_ep_mc_fun_INIT_motor_status(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_motor_status(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+
+extern void eoprot_ep_mc_fun_INIT_motor_status__basic(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_motor_status__basic(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+
+extern void eoprot_ep_mc_fun_INIT_motor_status__chamaleon04(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_motor_status__chamaleon04(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
    
-extern void eoprot_ep_mc_fun_INIT_controller_cconfig(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_controller_cconfig(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_controller_config(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_controller_config(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_controller_cconfig__durationofctrlloop(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_controller_cconfig__durationofctrlloop(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_controller_config__durationofctrlloop(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_controller_config__durationofctrlloop(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_controller_cstatus(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_controller_cstatus(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_controller_status(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_controller_status(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_controller_cstatus__alljomoinitted(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_controller_cstatus__alljomoinitted(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_controller_status__alljomoinitted(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_controller_status__alljomoinitted(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
-extern void eoprot_ep_mc_fun_INIT_controller_ccmmnds__go2stateofcontroller(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mc_fun_UPDT_controller_ccmmnds__go2stateofcontroller(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mc_fun_INIT_controller_cmmnds__go2stateofcontroller(const EOnv* nv, uint16_t index);
+extern void eoprot_ep_mc_fun_UPDT_controller_cmmnds__go2stateofcontroller(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
 
 
 
