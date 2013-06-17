@@ -68,6 +68,7 @@
 //if defined SET_DESIRED_CURR_IN_ONLY_ONE_MSG, the appl sends all desered current to 2fon in only one msg
 #define SET_DESIRED_CURR_IN_ONLY_ONE_MSG
 #define runner_timeout_send_diagnostics         1000
+#define runner_countmax_check_ethlink_status    1000 //every one second
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -124,6 +125,7 @@ EO_static_inline  eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSappl
 // --------------------------------------------------------------------------------------------------------------------
 
 static uint16_t motionDoneJoin2Use = 0;
+static uint16_t count_ethlink_status = 0;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -333,6 +335,18 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
 //     eo_appCanSP_StartTransmitAndWait(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport2);
     
  
+ 
+ //before wait can, check link status!!
+    count_ethlink_status ++;
+    if(runner_countmax_check_ethlink_status == count_ethlink_status)
+    {
+        uint8_t link1_isup;
+        uint8_t link2_isup;
+		//this func chacks if one of link change state and notify it.
+		//the pkt arrived on pc104 backdoor when one link change down->up.
+        eo_theEMSdgn_checkEthLinkStatus(eo_theEMSdgn_GetHandle(), &link1_isup, &link2_isup);
+        count_ethlink_status = 0;
+    }
 /* METODO 4*/
 
     res[0] = eo_appCanSP_wait_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1);
