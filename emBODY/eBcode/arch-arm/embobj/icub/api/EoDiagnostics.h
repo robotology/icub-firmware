@@ -93,7 +93,7 @@ typedef struct
 
 typedef struct 
 {
-    uint8_t dummy;
+    uint8_t linksmask;
 } eOdgn_ethstatus_t;
 
 typedef struct 
@@ -105,7 +105,8 @@ typedef struct
 {
     eOdgn_canstatus_t   can_dev[2];
     eOdgn_ethstatus_t   eth_dev;
-} eOdgn_emsperipheralstatus_t; //3 B
+    uint8_t             dummy[5];
+} eOdgn_emsperipheralstatus_t; //8 B
 
 typedef struct
 {
@@ -139,20 +140,22 @@ typedef struct
     uint32_t    executionoverflows[3]; //enum { eo_emsrunner_task_numberof   = 3 };
     uint32_t    datagrams_failed_to_go_in_txsocket;
     uint32_t    cantxfailuretimeoutsemaphore;
-} eOdgn_coreappl_runningst_t; //44 bytes
+    uint32_t    dummy;
+} eOdgn_coreappl_runningst_t; //48 bytes
 
 
 typedef struct
 {
     uint32_t cantxfailuretimeoutsemaphore;
-} eOdgn_coreappl_configst_t; //4 B
+    uint32_t dummy;
+} eOdgn_coreappl_configst_t; //8 B
 
 
 typedef struct
 {
     eOdgn_coreappl_runningst_t    runst;
     eOdgn_coreappl_configst_t     cfgst;
-} eOdgn_coreapplication_t; //48 bytes
+} eOdgn_coreapplication_t; //56 bytes
 
 typedef struct
 {
@@ -171,7 +174,8 @@ typedef struct
     uint32_t    txropframeistoobigforthepacket;
     uint32_t    cannotloadropinregulars;
     uint32_t    cannotloadropinoccasionals;
-} eOdgn_embObjtransceiver_t;  // 28 B
+    uint32_t    dummy;
+} eOdgn_embObjtransceiver_t;  // 32 B
 
 typedef struct
 {
@@ -198,7 +202,7 @@ typedef struct
     eOdgn_coreapplication_t         core;
     eOdgn_ipnet_t                   ipnet;
     eOdgn_embObjtransceiver_t       transceiver;
-} eOdgn_emsapplication_common_t; // 48 + 16 + 28 = 92
+} eOdgn_emsapplication_common_t; // 56 + 16 + 32 = 104
 
 typedef struct
 {
@@ -211,7 +215,7 @@ typedef struct
     eOdgn_emsperipheralstatus_t     periph;
     //eOdgn_connecteddevices_t     devices;
     eOdgn_emsapplication_common_t   appl;
-} eOdgn_emsdiagnostic_common_t;
+} eOdgn_emsdiagnostic_common_t; //104 + 8
 
 
 typedef struct 
@@ -246,6 +250,7 @@ typedef struct
 {
     char errorstate_str[eOdgn_errorlog_str_size]; //in string contains the reason of switch to error state.
 } eOdgn_errorlog_t;
+
 
 /** @}            
     end of group eo_cevcwervcrev5555  
