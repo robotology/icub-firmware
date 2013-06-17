@@ -141,7 +141,7 @@ typedef enum
 {
     eoprot_ep_mn_appl_funtyp_config             = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd),
     eoprot_ep_mn_appl_funtyp_status             = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd),
-    eoprot_ep_mn_appl_funtyp_cmmnds__go2state   = EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_u08)
+    eoprot_ep_mn_appl_funtyp_cmmnds__go2state   = EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_b08)
 } eOprot_ep_mn_appl_funtyp_t; 
 
 enum { eoprot_ep_mn_appl_funtyps_numberof = 3 };  // it MUST be equal to the number of tags. 

@@ -107,7 +107,7 @@ enum { eoprot_ep_sk_skin_tags_numberof = 2 };  // it MUST be equal to the number
  **/
 typedef enum
 {
-    eoprot_ep_sk_skin_funtyp_config__sigmode                = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08),
+    eoprot_ep_sk_skin_funtyp_config__sigmode                = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b08),
     eoprot_ep_sk_skin_funtyp_status__arrayof10canframes     = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_arr)
 } eOprot_ep_sk_skin_funtyp_t; 
 
