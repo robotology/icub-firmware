@@ -114,10 +114,10 @@ enum {eonv_fun_bits_numberof = 3 };
 
 typedef enum
 {
-    eo_nv_TYP_u08                = 0,
-    eo_nv_TYP_u16                = 1,
-    eo_nv_TYP_u32                = 2,
-    eo_nv_TYP_u64                = 3,
+    eo_nv_TYP_b08                = 0,
+    eo_nv_TYP_b16                = 1,
+    eo_nv_TYP_b32                = 2,
+    eo_nv_TYP_b64                = 3,
     eo_nv_TYP_NO4                = 4,
     eo_nv_TYP_NO5                = 5,
     eo_nv_TYP_arr                = 6,   // packed as a EOarray object: 2B+1B+1B+[data]
