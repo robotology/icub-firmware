@@ -168,25 +168,25 @@ typedef enum
     eoprot_ep_mc_joint_funtyp_jconfig__pidvelocity                      = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd),
     eoprot_ep_mc_joint_funtyp_jconfig__pidtorque                        = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd),
     eoprot_ep_mc_joint_funtyp_jconfig__impedance                        = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd),
-    eoprot_ep_mc_joint_funtyp_jconfig__minpositionofjoint               = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u32),
-    eoprot_ep_mc_joint_funtyp_jconfig__maxpositionofjoint               = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u32),
-    eoprot_ep_mc_joint_funtyp_jconfig__velocitysetpointtimeout          = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u16),
-    eoprot_ep_mc_joint_funtyp_jconfig__motionmonitormode                = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08),
-    eoprot_ep_mc_joint_funtyp_jconfig__encoderconversionfactor          = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u32),
-    eoprot_ep_mc_joint_funtyp_jconfig__encoderconversionoffset          = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u32),
+    eoprot_ep_mc_joint_funtyp_jconfig__minpositionofjoint               = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b32),
+    eoprot_ep_mc_joint_funtyp_jconfig__maxpositionofjoint               = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b32),
+    eoprot_ep_mc_joint_funtyp_jconfig__velocitysetpointtimeout          = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b16),
+    eoprot_ep_mc_joint_funtyp_jconfig__motionmonitormode                = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b08),
+    eoprot_ep_mc_joint_funtyp_jconfig__encoderconversionfactor          = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b32),
+    eoprot_ep_mc_joint_funtyp_jconfig__encoderconversionoffset          = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b32),
 
     eoprot_ep_mc_joint_funtyp_jstatus                                   = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd),
     eoprot_ep_mc_joint_funtyp_jstatus__basic                            = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd),
     eoprot_ep_mc_joint_funtyp_jstatus__ofpid                            = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd),
-    eoprot_ep_mc_joint_funtyp_jstatus__chamaleon04                      = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_u32),
+    eoprot_ep_mc_joint_funtyp_jstatus__chamaleon04                      = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_b32),
 
     eoprot_ep_mc_joint_funtyp_jinputs                                   = EO_nv_FUNTYP(eo_nv_FUN_out, eo_nv_TYP_pkd),
-    eoprot_ep_mc_joint_funtyp_jinputs__externallymeasuredtorque         = EO_nv_FUNTYP(eo_nv_FUN_out, eo_nv_TYP_u16),
+    eoprot_ep_mc_joint_funtyp_jinputs__externallymeasuredtorque         = EO_nv_FUNTYP(eo_nv_FUN_out, eo_nv_TYP_b16),
 
     eoprot_ep_mc_joint_funtyp_jcmmnds__calibration                      = EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_pkd),
     eoprot_ep_mc_joint_funtyp_jcmmnds__setpoint                         = EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_pkd),
-    eoprot_ep_mc_joint_funtyp_jcmmnds__stoptrajectory                   = EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_u08),
-    eoprot_ep_mc_joint_funtyp_jcmmnds__controlmode                      = EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_u08)
+    eoprot_ep_mc_joint_funtyp_jcmmnds__stoptrajectory                   = EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_b08),
+    eoprot_ep_mc_joint_funtyp_jcmmnds__controlmode                      = EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_b08)
 } eOprot_ep_mc_joint_funtyp_t;    
 
 enum { eoprot_ep_mc_joint_funtyps_numberof = 21 };  // it MUST be equal to the number of tags in a joint.  
@@ -250,12 +250,12 @@ typedef enum
 {
     eoprot_ep_mc_motor_funtyp_mconfig                                   = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd),
     eoprot_ep_mc_motor_funtyp_mconfig__pidcurrent                       = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd),
-    eoprot_ep_mc_motor_funtyp_mconfig__maxvelocityofmotor               = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u32),
-    eoprot_ep_mc_motor_funtyp_mconfig__maxcurrentofmotor                = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u16),
+    eoprot_ep_mc_motor_funtyp_mconfig__maxvelocityofmotor               = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b32),
+    eoprot_ep_mc_motor_funtyp_mconfig__maxcurrentofmotor                = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b16),
 
     eoprot_ep_mc_motor_funtyp_mstatus                                   = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd),
     eoprot_ep_mc_motor_funtyp_mstatus__basic                            = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd),
-    eoprot_ep_mc_motor_funtyp_mstatus__chamaleon04                      = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_u32) 
+    eoprot_ep_mc_motor_funtyp_mstatus__chamaleon04                      = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_b32) 
 } eOprot_ep_mc_motor_funtyp_t;  
 
 enum { eoprot_ep_mc_motor_funtyps_numberof = 7 };   // it MUST be equal to the number of tags in a motor. 
@@ -309,11 +309,11 @@ enum { eoprot_ep_mc_controller_tags_numberof = 5 };  // it MUST be equal to the 
 typedef enum
 {
     eoprot_ep_mc_controller_funtyp_cconfig                              = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd),
-    eoprot_ep_mc_controller_funtyp_cconfig__durationofctrlloop          = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u32),
+    eoprot_ep_mc_controller_funtyp_cconfig__durationofctrlloop          = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b32),
 
     eoprot_ep_mc_controller_funtyp_cstatus                              = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd),
-    eoprot_ep_mc_controller_funtyp_cstatus__alljomoinitted              = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_u08),
-    eoprot_ep_mc_controller_funtyp_ccmmnds__go2stateofcontroller        = EO_nv_FUNTYP(eo_nv_FUN_out, eo_nv_TYP_u08)
+    eoprot_ep_mc_controller_funtyp_cstatus__alljomoinitted              = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_b08),
+    eoprot_ep_mc_controller_funtyp_ccmmnds__go2stateofcontroller        = EO_nv_FUNTYP(eo_nv_FUN_out, eo_nv_TYP_b08)
 } eOprot_ep_mc_controller_funtyp_t; 
 
 enum { eoprot_ep_mc_controller_funtyps_numberof = 5 };  // it MUST be equal to the number of tags in a controller. 

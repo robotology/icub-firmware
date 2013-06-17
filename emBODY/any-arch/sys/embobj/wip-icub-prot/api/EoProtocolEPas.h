@@ -58,7 +58,7 @@ extern "C" {
 
 
 /** @typedef    typedef enum eOprot_endpoint_analogsensor_t;
-    @brief      It contains all the endpoints used for analosensor. 
+    @brief      It contains all the endpoints used for analogsensor. 
  **/
 typedef enum
 {
@@ -122,9 +122,9 @@ enum { eoprot_ep_as_strain_tags_numberof = 8 };  // it MUST be equal to the numb
 typedef enum
 {
     eoprot_ep_as_strain_funtyp_config                         = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd),
-    eoprot_ep_as_strain_funtyp_config__mode                   = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08),
-    eoprot_ep_as_strain_funtyp_config__datarate               = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08),
-    eoprot_ep_as_strain_funtyp_config__signaloncefullscale    = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08),
+    eoprot_ep_as_strain_funtyp_config__mode                   = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b08),
+    eoprot_ep_as_strain_funtyp_config__datarate               = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b08),
+    eoprot_ep_as_strain_funtyp_config__signaloncefullscale    = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b08),
     eoprot_ep_as_strain_funtyp_status                         = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd),
     eoprot_ep_as_strain_funtyp_status__fullscale              = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_arr),
     eoprot_ep_as_strain_funtyp_status__calibratedvalues       = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_arr),
@@ -172,9 +172,9 @@ enum { eoprot_ep_as_mais_tags_numberof = 6 };  // it MUST be equal to the number
 typedef enum
 {
     eoprot_ep_as_mais_funtyp_config                         = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd),
-    eoprot_ep_as_mais_funtyp_config__mode                   = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08),
-    eoprot_ep_as_mais_funtyp_config__datarate               = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08),
-    eoprot_ep_as_mais_funtyp_config__resolution             = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_u08),
+    eoprot_ep_as_mais_funtyp_config__mode                   = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b08),
+    eoprot_ep_as_mais_funtyp_config__datarate               = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b08),
+    eoprot_ep_as_mais_funtyp_config__resolution             = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b08),
     eoprot_ep_as_mais_funtyp_status                         = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd),
     eoprot_ep_as_mais_funtyp_status__the15values            = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_arr)
 } eOprot_ep_as_mais_funtyp_t; 
