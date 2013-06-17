@@ -52,7 +52,7 @@ extern "C" {
 //  <o> ID of the EMS board     <1=> EB1    <2=> EB2    <3=> EB3    <4=> EB4    <5=> EB5    
 //                              <6=> EB6    <7=> EB7    <8=> EB8    <9=> EB9
 
-#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     2
+#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     1
 
 
       
@@ -68,20 +68,20 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          1
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          14
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          18
 //  </h>version
 
 //  <h> build date
 //  <o> year            <2010-2020> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2013
 //  <o> month           <1-12> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        5
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        6
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          16
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          17
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         18
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         15
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          10
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          53
 //  </h>build date
 
 // </h>Info 
@@ -390,7 +390,7 @@ extern "C" {
 
 //  <o> max number of input datagrams <1-8>
 //  <i> default: 2
-#define EOMTHEEMSAPPLCFG_BACKDOOR_INPDGRAMNUMBER                  2
+#define EOMTHEEMSAPPLCFG_BACKDOOR_INPDGRAMNUMBER                  1
 
 //  <o> max size of input datagrams <16-64>
 //  <i> default: 16
@@ -398,11 +398,11 @@ extern "C" {
 
 //  <o> max number of output datagrams <1-8>
 //  <i> default: 2 
-#define EOMTHEEMSAPPLCFG_BACKDOOR_OUTDGRAMNUMBER                  1
+#define EOMTHEEMSAPPLCFG_BACKDOOR_OUTDGRAMNUMBER                  4
 
-//  <o> max size of output datagrams <16-128>
+//  <o> max size of output datagrams <16-200>
 //  <i> default: 32
-#define EOMTHEEMSAPPLCFG_BACKDOOR_OUTDGRAMSIZEOF                  128
+#define EOMTHEEMSAPPLCFG_BACKDOOR_OUTDGRAMSIZEOF                  150
 
 //  </h>datagrams in socket
 
@@ -577,9 +577,9 @@ extern "C" {
 //  <i> default: 50
 #define EOMTHEEMSAPPLCFG_CFGOBJ_TASK_PRIORITYof   50
 
-//  <o> task stack size <256-1024:128>
+//  <o> task stack size <256-2048:128>
 //  <i> default: 512
-#define EOMTHEEMSAPPLCFG_CFGOBJ_TASK_STACKSIZEof   1024
+#define EOMTHEEMSAPPLCFG_CFGOBJ_TASK_STACKSIZEof   1200
 
 //  </h>Configurator object configuration
 
@@ -592,7 +592,7 @@ extern "C" {
 
 //  <o> task stack size <256-1024:128>
 //  <i> default: 512
-#define EOMTHEEMSAPPLCFG_ERROBJ_TASK_STACKSIZEof   1024
+#define EOMTHEEMSAPPLCFG_ERROBJ_TASK_STACKSIZEof   1600
 
 //  </h>Error object configuration
 
