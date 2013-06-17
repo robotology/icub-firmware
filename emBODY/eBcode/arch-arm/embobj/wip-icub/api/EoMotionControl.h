@@ -539,10 +539,10 @@ typedef struct                  // size is 16+12+1+1+2+0 = 32
 
 typedef struct                  // size is 80+32+8+32+0 = 152
 {
-    eOmc_joint_config_t         jconfig;                    /**< the configuration of the joint */
-    eOmc_joint_status_t         jstatus;                    /**< the status of the joint */
-    eOmc_joint_inputs_t         jinputs;                    /**< it contains all the values that a host can send to a joint as inputs */
-    eOmc_joint_commands_t       jcmmnds;                    /**< it contains all the commands that a host can send to a joint */
+    eOmc_joint_config_t         config;                     /**< the configuration of the joint */
+    eOmc_joint_status_t         status;                     /**< the status of the joint */
+    eOmc_joint_inputs_t         inputs;                     /**< it contains all the values that a host can send to a joint as inputs */
+    eOmc_joint_commands_t       cmmnds;                     /**< it contains all the commands that a host can send to a joint */
 } eOmc_joint_t;                 EO_VERIFYsizeof(eOmc_joint_t, 152);
 
 
@@ -598,8 +598,8 @@ typedef struct                  // size is: 12+4+0 = 16
 
 typedef struct                  // size is 24+16+0 = 40
 {
-    eOmc_motor_config_t         mconfig;                    /**< the configuration of the motor */
-    eOmc_motor_status_t         mstatus;                    /**< the status of the motor */   
+    eOmc_motor_config_t         config;                     /**< the configuration of the motor */
+    eOmc_motor_status_t         status;                     /**< the status of the motor */   
 } eOmc_motor_t;                 EO_VERIFYsizeof(eOmc_motor_t, 40); 
  
 
@@ -643,9 +643,9 @@ typedef struct                  // size is 1+7+0 = 8
 
 typedef struct                  // size is 8+8+8+0 = 24
 {
-    eOmc_controller_config_t    cconfig;                    /**< controller configuration */
-    eOmc_controller_status_t    cstatus;                    /**< controller status  */
-    eOmc_controller_commands_t  ccmmnds;                    /**< controller commands  */
+    eOmc_controller_config_t    config;                     /**< controller configuration */
+    eOmc_controller_status_t    status;                     /**< controller status  */
+    eOmc_controller_commands_t  cmmnds;                     /**< controller commands  */
 } eOmc_controller_t;            EO_VERIFYsizeof(eOmc_controller_t, 24); 
 
 
