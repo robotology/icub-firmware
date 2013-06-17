@@ -93,6 +93,7 @@ extern eOresult_t eo_theEMSdgn_ClearMotorStFlags(EOTheEMSdiagnostics_t* p);
 
 extern eOresult_t eo_theEMSdgn_UpdateErrorLog(EOTheEMSdiagnostics_t* p, char *str_error, uint16_t size);
 
+extern eOresult_t eo_theEMSdgn_checkEthLinkStatus(EOTheEMSdiagnostics_t* p, uint8_t *link1_isup, uint8_t *link2_isup);
 /** @}            
     end of group 
     
