@@ -76,7 +76,9 @@
 #define EVIEWER_IDbase                  (ev_ID_first_isr+80)
 #define EVIEWER_IDofTSKstart(tskid)     (EVIEWER_IDbase+2*(tskid))
 #define EVIEWER_IDofTSKalert(tskid)     (EVIEWER_IDbase+2*(tskid)+1)
-
+#define EVIEWER_userDef_IDbase          (ev_ID_first_usrdef+1)
+#define EVIEWER_userDef_RUNRecRopframe     (EVIEWER_userDef_IDbase +1)
+//#define EVIEWER_userDef_CFGRecRopframe     (EVIEWER_userDef_IDbase +2) see definition in EOMtheEMSconfigurator.c
 #endif
 
 
@@ -254,6 +256,7 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
     eventviewer_load(EVIEWER_IDofTSKalert(eo_emsrunner_taskid_runDO), evDOalert);    
     eventviewer_load(EVIEWER_IDofTSKstart(eo_emsrunner_taskid_runTX), evTXstart);    
     eventviewer_load(EVIEWER_IDofTSKalert(eo_emsrunner_taskid_runTX), evTXalert);
+    eventviewer_load(EVIEWER_userDef_RUNRecRopframe, usrDef_RUNRecRopframe);
 #endif    
         
     return(&s_theemsrunner);
@@ -495,7 +498,13 @@ __weak extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramrecep
         if(eores_OK == resrx)
         {
             uint16_t tmp = 0;
+            #if defined(EVIEWER_ENABLED)    
+            evEntityId_t prev = eventviewer_switch_to(EVIEWER_userDef_RUNRecRopframe);
+            #endif   
             res = eom_emstransceiver_Parse(eom_emstransceiver_GetHandle(), rxpkt, &tmp, NULL);
+            #if defined(EVIEWER_ENABLED)    
+            eventviewer_switch_to(prev);
+            #endif   
             if(eores_OK != res)
             {
                 eom_emsrunner_hid_userdef_onemstransceivererror(eom_emstransceiver_GetHandle());
@@ -1202,6 +1211,7 @@ void evDOstart(void){}
 void evDOalert(void){}
 void evTXstart(void){}
 void evTXalert(void){}
+void usrDef_RUNRecRopframe(void){}
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -96,6 +96,7 @@ void evDOstart(void);
 void evDOalert(void);
 void evTXstart(void);
 void evTXalert(void);
+void usrDef_RUNRecRopframe(void);
 #endif
 
 // default function for RX: it calls _beforedatagramreception(), _datagramreception(), _afterdatagramreception()
