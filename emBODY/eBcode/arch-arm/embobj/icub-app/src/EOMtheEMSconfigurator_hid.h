@@ -67,6 +67,11 @@ extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSco
 
 extern void eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(EOMtheEMSconfigurator* p);
 
+
+#if defined(EVIEWER_ENABLED)
+void usrDef_CFGRecRopframe(void);
+#endif
+
 #ifdef __cplusplus
 }       // closing brace for extern "C"
 #endif 
