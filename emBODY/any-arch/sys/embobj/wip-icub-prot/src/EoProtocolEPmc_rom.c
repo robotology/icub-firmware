@@ -73,105 +73,105 @@ static uint16_t s_eoprot_ep_mc_rom_motor_ramoffset(uint16_t tag);
 static uint16_t s_eoprot_ep_mc_rom_controller_ramoffset(uint16_t tag);
 
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_joint_INIT_config(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_joint_UPDT_config(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig__pidposition(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig__pidposition(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_joint_INIT_config__pidposition(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_joint_UPDT_config__pidposition(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig__pidvelocity(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig__pidvelocity(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_joint_INIT_config__pidvelocity(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_joint_UPDT_config__pidvelocity(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig__pidtorque(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig__pidtorque(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_joint_INIT_config__pidtorque(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_joint_UPDT_config__pidtorque(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig__impedance(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig__impedance(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_joint_INIT_config__impedance(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_joint_UPDT_config__impedance(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig__minpositionofjoint(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig__minpositionofjoint(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_joint_INIT_config__minpositionofjoint(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_joint_UPDT_config__minpositionofjoint(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig__maxpositionofjoint(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig__maxpositionofjoint(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_joint_INIT_config__maxpositionofjoint(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_joint_UPDT_config__maxpositionofjoint(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig__velocitysetpointtimeout(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig__velocitysetpointtimeout(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_joint_INIT_config__velocitysetpointtimeout(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_joint_UPDT_config__velocitysetpointtimeout(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig__motionmonitormode(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig__motionmonitormode(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_joint_INIT_config__motionmonitormode(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_joint_UPDT_config__motionmonitormode(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig__encoderconversionfactor(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig__encoderconversionfactor(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_joint_INIT_config__encoderconversionfactor(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_joint_UPDT_config__encoderconversionfactor(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig__encoderconversionoffset(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig__encoderconversionoffset(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_joint_INIT_config__encoderconversionoffset(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_joint_UPDT_config__encoderconversionoffset(const EOnv* nv, const eOropdescriptor_t* rd);
 
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jstatus(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_joint_UPDT_jstatus(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_joint_INIT_status(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_joint_UPDT_status(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jstatus__basic(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_joint_UPDT_jstatus__basic(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_joint_INIT_status__basic(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_joint_UPDT_status__basic(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jstatus__ofpid(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_joint_UPDT_jstatus__ofpid(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_joint_INIT_status__ofpid(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_joint_UPDT_status__ofpid(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jstatus__chamaleon04(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_joint_UPDT_jstatus__chamaleon04(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_joint_INIT_status__chamaleon04(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_joint_UPDT_status__chamaleon04(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jinputs(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_joint_UPDT_jinputs(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_joint_INIT_inputs(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_joint_UPDT_inputs(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jinputs__externallymeasuredtorque(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_joint_UPDT_jinputs__externallymeasuredtorque(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_joint_INIT_inputs__externallymeasuredtorque(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_joint_UPDT_inputs__externallymeasuredtorque(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jcmmnds__calibration(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_joint_UPDT_jcmmnds__calibration(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_joint_INIT_cmmnds__calibration(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_joint_UPDT_cmmnds__calibration(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jcmmnds__setpoint(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_joint_UPDT_jcmmnds__setpoint(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_joint_INIT_cmmnds__setpoint(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_joint_UPDT_cmmnds__setpoint(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jcmmnds__stoptrajectory(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_joint_UPDT_jcmmnds__stoptrajectory(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_joint_INIT_cmmnds__stoptrajectory(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_joint_UPDT_cmmnds__stoptrajectory(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jcmmnds__controlmode(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_joint_UPDT_jcmmnds__controlmode(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_joint_INIT_cmmnds__controlmode(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_joint_UPDT_cmmnds__controlmode(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_motor_INIT_mconfig(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_motor_UPDT_mconfig(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_motor_INIT_config(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_motor_UPDT_config(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_motor_INIT_mconfig__pidcurrent(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_motor_UPDT_mconfig__pidcurrent(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_motor_INIT_config__pidcurrent(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_motor_UPDT_config__pidcurrent(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_motor_INIT_mconfig__maxvelocityofmotor(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_motor_UPDT_mconfig__maxvelocityofmotor(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_motor_INIT_config__maxvelocityofmotor(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_motor_UPDT_config__maxvelocityofmotor(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_motor_INIT_mconfig__maxcurrentofmotor(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_motor_UPDT_mconfig__maxcurrentofmotor(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_motor_INIT_config__maxcurrentofmotor(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_motor_UPDT_config__maxcurrentofmotor(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_motor_INIT_mstatus(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_motor_UPDT_mstatus(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_motor_INIT_status(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_motor_UPDT_status(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_motor_INIT_mstatus__basic(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_motor_UPDT_mstatus__basic(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_motor_INIT_status__basic(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_motor_UPDT_status__basic(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_motor_INIT_mstatus__chamaleon04(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_motor_UPDT_mstatus__chamaleon04(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_motor_INIT_status__chamaleon04(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_motor_UPDT_status__chamaleon04(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_controller_INIT_cconfig(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_controller_UPDT_cconfig(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_controller_INIT_config(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_controller_UPDT_config(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_controller_INIT_cconfig__durationofctrlloop(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_controller_UPDT_cconfig__durationofctrlloop(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_controller_INIT_config__durationofctrlloop(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_controller_UPDT_config__durationofctrlloop(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_controller_INIT_cstatus(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_controller_UPDT_cstatus(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_controller_INIT_status(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_controller_UPDT_status(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_controller_INIT_cstatus__alljomoinitted(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_controller_UPDT_cstatus__alljomoinitted(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_controller_INIT_status__alljomoinitted(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_controller_UPDT_status__alljomoinitted(const EOnv* nv, const eOropdescriptor_t* rd);
 
-static void s_eoprot_ep_mc_rom_controller_INIT_ccmmnds__go2stateofcontroller(const EOnv* nv);
-static void s_eoprot_ep_mc_rom_controller_UPDT_ccmmnds__go2stateofcontroller(const EOnv* nv, const eOropdescriptor_t* rd);
+static void s_eoprot_ep_mc_rom_controller_INIT_cmmnds__go2stateofcontroller(const EOnv* nv);
+static void s_eoprot_ep_mc_rom_controller_UPDT_cmmnds__go2stateofcontroller(const EOnv* nv, const eOropdescriptor_t* rd);
 
 
 
@@ -183,7 +183,7 @@ static void s_eoprot_ep_mc_rom_controller_UPDT_ccmmnds__go2stateofcontroller(con
 
 const eOmc_joint_t eoprot_ep_mc_rom_joint_defaultvalue =
 {
-    EO_INIT(.jconfig)             
+    EO_INIT(.config)             
     {
         EO_INIT(.pidposition)
         {
@@ -233,7 +233,7 @@ const eOmc_joint_t eoprot_ep_mc_rom_joint_defaultvalue =
         EO_INIT(.encoderconversionfactor)   EOUTIL_EMULFLOAT32_ONE,
         EO_INIT(.encoderconversionoffset)   EOUTIL_EMULFLOAT32_ZERO
     },
-    EO_INIT(.jstatus)                       
+    EO_INIT(.status)                       
     {
         EO_INIT(.basic)
         {
@@ -252,12 +252,12 @@ const eOmc_joint_t eoprot_ep_mc_rom_joint_defaultvalue =
         },
         EO_INIT(.chamaleon04)               {0, 0, 0, 0} 
     },
-    EO_INIT(.jinputs)                       
+    EO_INIT(.inputs)                       
     {
         EO_INIT(.externallymeasuredtorque)  0,
         EO_INIT(.filler06)                  {0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6} 
     },
-    EO_INIT(.jcmmnds)                       
+    EO_INIT(.cmmnds)                       
     {
         EO_INIT(.calibration)               {0},
         EO_INIT(.setpoint)                  {0},
@@ -271,7 +271,7 @@ const eOmc_joint_t eoprot_ep_mc_rom_joint_defaultvalue =
 
 const eOmc_motor_t eoprot_ep_mc_rom_motor_defaultvalue =
 {
-    EO_INIT(.mconfig)             
+    EO_INIT(.config)             
     {
         EO_INIT(.pidcurrent)
         {
@@ -288,7 +288,7 @@ const eOmc_motor_t eoprot_ep_mc_rom_motor_defaultvalue =
         EO_INIT(.maxcurrentofmotor)         0,
         EO_INIT(.filler02)                  {0xf1, 0xf2}
     },
-    EO_INIT(.mstatus)                       
+    EO_INIT(.status)                       
     {
         EO_INIT(.basic) 
         {
@@ -304,12 +304,12 @@ const eOmc_motor_t eoprot_ep_mc_rom_motor_defaultvalue =
 
 const eOmc_controller_t eoprot_ep_mc_rom_controller_defaultvalue =
 {
-    EO_INIT(.cconfig)             
+    EO_INIT(.config)             
     {
         EO_INIT(.durationofctrlloop)        EOK_reltime1ms,
         EO_INIT(.filler04)                  {0xf1, 0xf2, 0xf3, 0xf4}
     },
-    EO_INIT(.cstatus)                      
+    EO_INIT(.status)                      
     {
         EO_INIT(.alljomoinitted)            eobool_false,
         EO_INIT(.numofjoints)               EOK_uint08dummy,
@@ -318,7 +318,7 @@ const eOmc_controller_t eoprot_ep_mc_rom_controller_defaultvalue =
         EO_INIT(.flagsinittedjoints)        0x0000,
         EO_INIT(.flagsinittedmotors)        0x0000   
     },
-    EO_INIT(.ccmmnds)                      
+    EO_INIT(.cmmnds)                      
     {
         EO_INIT(.go2stateofcontroller)      eomc_stateofcontroller_config,
         EO_INIT(.filler07)                  {0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7}   
@@ -328,372 +328,372 @@ const eOmc_controller_t eoprot_ep_mc_rom_controller_defaultvalue =
 
 // - descriptors for the variables of a joint
 
-EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_jconfig =
+EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_config =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.jconfig),
-    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_jconfig,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.config),
+    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_config,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.jconfig,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_jconfig,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_jconfig
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.config,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_config,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_config
 };
 
 
-EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_jconfig__pidposition =
+EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_config__pidposition =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.jconfig.pidposition),
-    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_jconfig__pidposition,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.config.pidposition),
+    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_config__pidposition,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.jconfig.pidposition,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_jconfig__pidposition,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_jconfig__pidposition
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.config.pidposition,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_config__pidposition,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_config__pidposition
 };
 
 
-EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_jconfig__pidvelocity =
+EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_config__pidvelocity =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.jconfig.pidvelocity),
-    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_jconfig__pidvelocity,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.config.pidvelocity),
+    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_config__pidvelocity,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.jconfig.pidvelocity,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_jconfig__pidvelocity,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_jconfig__pidvelocity
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.config.pidvelocity,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_config__pidvelocity,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_config__pidvelocity
 };
 
 
-EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_jconfig__pidtorque =
+EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_config__pidtorque =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.jconfig.pidtorque),
-    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_jconfig__pidtorque,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.config.pidtorque),
+    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_config__pidtorque,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.jconfig.pidtorque,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_jconfig__pidtorque,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_jconfig__pidtorque
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.config.pidtorque,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_config__pidtorque,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_config__pidtorque
 };
 
 
-EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_jconfig__impedance =
+EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_config__impedance =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.jconfig.impedance),
-    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_jconfig__impedance,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.config.impedance),
+    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_config__impedance,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.jconfig.impedance,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_jconfig__impedance,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_jconfig__impedance
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.config.impedance,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_config__impedance,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_config__impedance
 }; 
 
 
-EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_jconfig__minpositionofjoint =
+EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_config__minpositionofjoint =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.jconfig.minpositionofjoint),
-    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_jconfig__minpositionofjoint,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.config.minpositionofjoint),
+    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_config__minpositionofjoint,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.jconfig.minpositionofjoint,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_jconfig__minpositionofjoint,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_jconfig__minpositionofjoint
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.config.minpositionofjoint,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_config__minpositionofjoint,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_config__minpositionofjoint
 }; 
 
 
-EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_jconfig__maxpositionofjoint =
+EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_config__maxpositionofjoint =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.jconfig.maxpositionofjoint),
-    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_jconfig__maxpositionofjoint,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.config.maxpositionofjoint),
+    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_config__maxpositionofjoint,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.jconfig.maxpositionofjoint,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_jconfig__maxpositionofjoint,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_jconfig__maxpositionofjoint
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.config.maxpositionofjoint,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_config__maxpositionofjoint,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_config__maxpositionofjoint
 }; 
 
 
-EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_jconfig__velocitysetpointtimeout =
+EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_config__velocitysetpointtimeout =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.jconfig.velocitysetpointtimeout),
-    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_jconfig__velocitysetpointtimeout,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.config.velocitysetpointtimeout),
+    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_config__velocitysetpointtimeout,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.jconfig.velocitysetpointtimeout,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_jconfig__velocitysetpointtimeout,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_jconfig__velocitysetpointtimeout
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.config.velocitysetpointtimeout,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_config__velocitysetpointtimeout,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_config__velocitysetpointtimeout
 }; 
 
 
-EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_jconfig__motionmonitormode =
+EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_config__motionmonitormode =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.jconfig.motionmonitormode),
-    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_jconfig__motionmonitormode,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.config.motionmonitormode),
+    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_config__motionmonitormode,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.jconfig.motionmonitormode,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_jconfig__motionmonitormode,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_jconfig__motionmonitormode
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.config.motionmonitormode,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_config__motionmonitormode,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_config__motionmonitormode
 }; 
 
 
-EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_jconfig__encoderconversionfactor =
+EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_config__encoderconversionfactor =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.jconfig.encoderconversionfactor),
-    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_jconfig__encoderconversionfactor,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.config.encoderconversionfactor),
+    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_config__encoderconversionfactor,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.jconfig.encoderconversionfactor,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_jconfig__encoderconversionfactor,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_jconfig__encoderconversionfactor
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.config.encoderconversionfactor,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_config__encoderconversionfactor,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_config__encoderconversionfactor
 }; 
 
 
-EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_jconfig__encoderconversionoffset =
+EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_config__encoderconversionoffset =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.jconfig.encoderconversionoffset),
-    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_jconfig__encoderconversionoffset,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.config.encoderconversionoffset),
+    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_config__encoderconversionoffset,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.jconfig.encoderconversionoffset,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_jconfig__encoderconversionoffset,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_jconfig__encoderconversionoffset
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.config.encoderconversionoffset,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_config__encoderconversionoffset,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_config__encoderconversionoffset
 }; 
 
 
-EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_jstatus =
+EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_status =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.jstatus),
-    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_jstatus,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.status),
+    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_status,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.jstatus,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_jstatus,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_jstatus
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.status,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_status,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_status
 }; 
 
 
-EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_jstatus__basic =
+EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_status__basic =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.jstatus.basic),
-    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_jstatus__basic,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.status.basic),
+    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_status__basic,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.jstatus.basic,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_jstatus__basic,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_jstatus__basic
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.status.basic,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_status__basic,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_status__basic
 };
 
 
-EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_jstatus__ofpid =
+EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_status__ofpid =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.jstatus.ofpid),
-    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_jstatus__ofpid,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.status.ofpid),
+    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_status__ofpid,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.jstatus.ofpid,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_jstatus__ofpid,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_jstatus__ofpid
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.status.ofpid,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_status__ofpid,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_status__ofpid
 };
 
 
-EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_jstatus__chamaleon04 =
+EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_status__chamaleon04 =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.jstatus.chamaleon04),
-    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_jstatus__chamaleon04,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.status.chamaleon04),
+    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_status__chamaleon04,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.jstatus.chamaleon04,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_jstatus__chamaleon04,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_jstatus__chamaleon04
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.status.chamaleon04,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_status__chamaleon04,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_status__chamaleon04
 };
 
 
-EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_jinputs =
+EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_inputs =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.jinputs),
-    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_jinputs,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.inputs),
+    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_inputs,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.jinputs,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_jinputs,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_jinputs
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.inputs,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_inputs,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_inputs
 };
 
 
-EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_jinputs__externallymeasuredtorque =
+EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_inputs__externallymeasuredtorque =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.jinputs.externallymeasuredtorque),
-    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_jinputs__externallymeasuredtorque,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.inputs.externallymeasuredtorque),
+    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_inputs__externallymeasuredtorque,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.jinputs.externallymeasuredtorque,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_jinputs__externallymeasuredtorque,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_jinputs__externallymeasuredtorque
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.inputs.externallymeasuredtorque,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_inputs__externallymeasuredtorque,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_inputs__externallymeasuredtorque
 }; 
 
 
-EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_jcmmnds__calibration =
+EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_cmmnds__calibration =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.jcmmnds.calibration),
-    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_jcmmnds__calibration,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.cmmnds.calibration),
+    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_cmmnds__calibration,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.jcmmnds.calibration,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_jcmmnds__calibration,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_jcmmnds__calibration
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.cmmnds.calibration,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_cmmnds__calibration,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_cmmnds__calibration
 }; 
 
 
-EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_jcmmnds__setpoint =
+EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_cmmnds__setpoint =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.jcmmnds.setpoint),
-    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_jcmmnds__setpoint,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.cmmnds.setpoint),
+    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_cmmnds__setpoint,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.jcmmnds.setpoint,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_jcmmnds__setpoint,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_jcmmnds__setpoint
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.cmmnds.setpoint,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_cmmnds__setpoint,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_cmmnds__setpoint
 }; 
 
 
-EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_jcmmnds__stoptrajectory =
+EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_cmmnds__stoptrajectory =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.jcmmnds.stoptrajectory),
-    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_jcmmnds__stoptrajectory,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.cmmnds.stoptrajectory),
+    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_cmmnds__stoptrajectory,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.jcmmnds.stoptrajectory,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_jcmmnds__stoptrajectory,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_jcmmnds__stoptrajectory
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.cmmnds.stoptrajectory,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_cmmnds__stoptrajectory,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_cmmnds__stoptrajectory
 }; 
 
 
-EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_jcmmnds__controlmode =
+EOnv_rom_t eoprot_ep_mc_rom_joint_descriptor_cmmnds__controlmode =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.jcmmnds.controlmode),
-    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_jcmmnds__controlmode,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_joint_defaultvalue.cmmnds.controlmode),
+    EO_INIT(.funtyp)    eoprot_ep_mc_joint_funtyp_cmmnds__controlmode,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.jcmmnds.controlmode,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_jcmmnds__controlmode,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_jcmmnds__controlmode
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_joint_defaultvalue.cmmnds.controlmode,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_joint_INIT_cmmnds__controlmode,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_joint_UPDT_cmmnds__controlmode
 }; 
 
 
 
 // - descriptors for the variables of a motor 
 
-EOnv_rom_t eoprot_ep_mc_rom_motor_descriptor_mconfig =
+EOnv_rom_t eoprot_ep_mc_rom_motor_descriptor_config =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_motor_defaultvalue.mconfig),
-    EO_INIT(.funtyp)    eoprot_ep_mc_motor_funtyp_mconfig,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_motor_defaultvalue.config),
+    EO_INIT(.funtyp)    eoprot_ep_mc_motor_funtyp_config,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_motor_defaultvalue.mconfig,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_motor_INIT_mconfig,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_motor_UPDT_mconfig
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_motor_defaultvalue.config,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_motor_INIT_config,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_motor_UPDT_config
 };
 
 
-EOnv_rom_t eoprot_ep_mc_rom_motor_descriptor_mconfig__pidcurrent =
+EOnv_rom_t eoprot_ep_mc_rom_motor_descriptor_config__pidcurrent =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_motor_defaultvalue.mconfig.pidcurrent),
-    EO_INIT(.funtyp)    eoprot_ep_mc_motor_funtyp_mconfig__pidcurrent,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_motor_defaultvalue.config.pidcurrent),
+    EO_INIT(.funtyp)    eoprot_ep_mc_motor_funtyp_config__pidcurrent,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_motor_defaultvalue.mconfig.pidcurrent,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_motor_INIT_mconfig__pidcurrent,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_motor_UPDT_mconfig__pidcurrent
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_motor_defaultvalue.config.pidcurrent,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_motor_INIT_config__pidcurrent,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_motor_UPDT_config__pidcurrent
 };
 
 
-EOnv_rom_t eoprot_ep_mc_rom_motor_descriptor_mconfig__maxvelocityofmotor =
+EOnv_rom_t eoprot_ep_mc_rom_motor_descriptor_config__maxvelocityofmotor =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_motor_defaultvalue.mconfig.maxvelocityofmotor),
-    EO_INIT(.funtyp)    eoprot_ep_mc_motor_funtyp_mconfig__maxvelocityofmotor,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_motor_defaultvalue.config.maxvelocityofmotor),
+    EO_INIT(.funtyp)    eoprot_ep_mc_motor_funtyp_config__maxvelocityofmotor,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_motor_defaultvalue.mconfig.maxvelocityofmotor,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_motor_INIT_mconfig__maxvelocityofmotor,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_motor_UPDT_mconfig__maxvelocityofmotor
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_motor_defaultvalue.config.maxvelocityofmotor,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_motor_INIT_config__maxvelocityofmotor,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_motor_UPDT_config__maxvelocityofmotor
 };
 
 
-EOnv_rom_t eoprot_ep_mc_rom_motor_descriptor_mconfig__maxcurrentofmotor =
+EOnv_rom_t eoprot_ep_mc_rom_motor_descriptor_config__maxcurrentofmotor =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_motor_defaultvalue.mconfig.maxcurrentofmotor),
-    EO_INIT(.funtyp)    eoprot_ep_mc_motor_funtyp_mconfig__maxcurrentofmotor,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_motor_defaultvalue.config.maxcurrentofmotor),
+    EO_INIT(.funtyp)    eoprot_ep_mc_motor_funtyp_config__maxcurrentofmotor,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_motor_defaultvalue.mconfig.maxcurrentofmotor,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_motor_INIT_mconfig__maxcurrentofmotor,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_motor_UPDT_mconfig__maxcurrentofmotor
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_motor_defaultvalue.config.maxcurrentofmotor,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_motor_INIT_config__maxcurrentofmotor,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_motor_UPDT_config__maxcurrentofmotor
 };
 
 
 
-EOnv_rom_t eoprot_ep_mc_rom_motor_descriptor_mstatus =
+EOnv_rom_t eoprot_ep_mc_rom_motor_descriptor_status =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_motor_defaultvalue.mstatus),
-    EO_INIT(.funtyp)    eoprot_ep_mc_motor_funtyp_mstatus,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_motor_defaultvalue.status),
+    EO_INIT(.funtyp)    eoprot_ep_mc_motor_funtyp_status,
     EO_INIT(.dummy)     0,   
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_motor_defaultvalue.mstatus,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_motor_INIT_mstatus,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_motor_UPDT_mstatus
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_motor_defaultvalue.status,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_motor_INIT_status,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_motor_UPDT_status
 };
 
 
-EOnv_rom_t eoprot_ep_mc_rom_motor_descriptor_mstatus__basic =
+EOnv_rom_t eoprot_ep_mc_rom_motor_descriptor_status__basic =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_motor_defaultvalue.mstatus.basic),
-    EO_INIT(.funtyp)    eoprot_ep_mc_motor_funtyp_mstatus__basic,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_motor_defaultvalue.status.basic),
+    EO_INIT(.funtyp)    eoprot_ep_mc_motor_funtyp_status__basic,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_motor_defaultvalue.mstatus.basic,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_motor_INIT_mstatus__basic,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_motor_UPDT_mstatus__basic
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_motor_defaultvalue.status.basic,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_motor_INIT_status__basic,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_motor_UPDT_status__basic
 };
 
-EOnv_rom_t eoprot_ep_mc_rom_motor_descriptor_mstatus__chamaleon04 =
+EOnv_rom_t eoprot_ep_mc_rom_motor_descriptor_status__chamaleon04 =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_motor_defaultvalue.mstatus.chamaleon04),
-    EO_INIT(.funtyp)    eoprot_ep_mc_motor_funtyp_mstatus__chamaleon04,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_motor_defaultvalue.status.chamaleon04),
+    EO_INIT(.funtyp)    eoprot_ep_mc_motor_funtyp_status__chamaleon04,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_motor_defaultvalue.mstatus.chamaleon04,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_motor_INIT_mstatus__chamaleon04,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_motor_UPDT_mstatus__chamaleon04
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_motor_defaultvalue.status.chamaleon04,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_motor_INIT_status__chamaleon04,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_motor_UPDT_status__chamaleon04
 };
 
 
 // - descriptors for the variables of a controller
 
 
-EOnv_rom_t eoprot_ep_mc_rom_controller_descriptor_cconfig =
+EOnv_rom_t eoprot_ep_mc_rom_controller_descriptor_config =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_controller_defaultvalue.cconfig),
-    EO_INIT(.funtyp)    eoprot_ep_mc_controller_funtyp_cconfig,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_controller_defaultvalue.config),
+    EO_INIT(.funtyp)    eoprot_ep_mc_controller_funtyp_config,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_controller_defaultvalue.cconfig,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_controller_INIT_cconfig,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_controller_UPDT_cconfig
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_controller_defaultvalue.config,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_controller_INIT_config,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_controller_UPDT_config
 };
 
 
-EOnv_rom_t eoprot_ep_mc_rom_controller_descriptor_cconfig__durationofctrlloop =
+EOnv_rom_t eoprot_ep_mc_rom_controller_descriptor_config__durationofctrlloop =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_controller_defaultvalue.cconfig.durationofctrlloop),
-    EO_INIT(.funtyp)    eoprot_ep_mc_controller_funtyp_cconfig__durationofctrlloop,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_controller_defaultvalue.config.durationofctrlloop),
+    EO_INIT(.funtyp)    eoprot_ep_mc_controller_funtyp_config__durationofctrlloop,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_controller_defaultvalue.cconfig.durationofctrlloop,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_controller_INIT_cconfig__durationofctrlloop,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_controller_UPDT_cconfig__durationofctrlloop
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_controller_defaultvalue.config.durationofctrlloop,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_controller_INIT_config__durationofctrlloop,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_controller_UPDT_config__durationofctrlloop
 };
 
 
-EOnv_rom_t eoprot_ep_mc_rom_controller_descriptor_cstatus =
+EOnv_rom_t eoprot_ep_mc_rom_controller_descriptor_status =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_controller_defaultvalue.cstatus),
-    EO_INIT(.funtyp)    eoprot_ep_mc_controller_funtyp_cstatus,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_controller_defaultvalue.status),
+    EO_INIT(.funtyp)    eoprot_ep_mc_controller_funtyp_status,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_controller_defaultvalue.cstatus,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_controller_INIT_cstatus,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_controller_UPDT_cstatus
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_controller_defaultvalue.status,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_controller_INIT_status,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_controller_UPDT_status
 };
 
 
-EOnv_rom_t eoprot_ep_mc_rom_controller_descriptor_cstatus__alljomoinitted =
+EOnv_rom_t eoprot_ep_mc_rom_controller_descriptor_status__alljomoinitted =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_controller_defaultvalue.cstatus.alljomoinitted),
-    EO_INIT(.funtyp)    eoprot_ep_mc_controller_funtyp_cstatus__alljomoinitted,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_controller_defaultvalue.status.alljomoinitted),
+    EO_INIT(.funtyp)    eoprot_ep_mc_controller_funtyp_status__alljomoinitted,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_controller_defaultvalue.cstatus.alljomoinitted,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_controller_INIT_cstatus__alljomoinitted,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_controller_UPDT_cstatus__alljomoinitted
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_controller_defaultvalue.status.alljomoinitted,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_controller_INIT_status__alljomoinitted,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_controller_UPDT_status__alljomoinitted
 };
 
 
-EOnv_rom_t eoprot_ep_mc_rom_controller_descriptor_ccmmnds__go2stateofcontroller =
+EOnv_rom_t eoprot_ep_mc_rom_controller_descriptor_cmmnds__go2stateofcontroller =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_controller_defaultvalue.ccmmnds.go2stateofcontroller),
-    EO_INIT(.funtyp)    eoprot_ep_mc_controller_funtyp_ccmmnds__go2stateofcontroller,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mc_rom_controller_defaultvalue.cmmnds.go2stateofcontroller),
+    EO_INIT(.funtyp)    eoprot_ep_mc_controller_funtyp_cmmnds__go2stateofcontroller,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_controller_defaultvalue.ccmmnds.go2stateofcontroller,
-    EO_INIT(.init)      s_eoprot_ep_mc_rom_controller_INIT_ccmmnds__go2stateofcontroller,
-    EO_INIT(.update)    s_eoprot_ep_mc_rom_controller_UPDT_ccmmnds__go2stateofcontroller
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mc_rom_controller_defaultvalue.cmmnds.go2stateofcontroller,
+    EO_INIT(.init)      s_eoprot_ep_mc_rom_controller_INIT_cmmnds__go2stateofcontroller,
+    EO_INIT(.update)    s_eoprot_ep_mc_rom_controller_UPDT_cmmnds__go2stateofcontroller
 };
 
 
@@ -707,43 +707,43 @@ EOnv_rom_t eoprot_ep_mc_rom_controller_descriptor_ccmmnds__go2stateofcontroller 
 const EOnv_rom_t * const eoprot_ep_mc_rom_folded_descriptors[] =
 {
     // here are eoprot_ep_mc_joint_tags_numberof descriptors for the joints (equal for every joint)
-    &eoprot_ep_mc_rom_joint_descriptor_jconfig,
-    &eoprot_ep_mc_rom_joint_descriptor_jconfig__pidposition,
-    &eoprot_ep_mc_rom_joint_descriptor_jconfig__pidvelocity,
-    &eoprot_ep_mc_rom_joint_descriptor_jconfig__pidtorque,
-    &eoprot_ep_mc_rom_joint_descriptor_jconfig__impedance,
-    &eoprot_ep_mc_rom_joint_descriptor_jconfig__minpositionofjoint,
-    &eoprot_ep_mc_rom_joint_descriptor_jconfig__maxpositionofjoint,
-    &eoprot_ep_mc_rom_joint_descriptor_jconfig__velocitysetpointtimeout,
-    &eoprot_ep_mc_rom_joint_descriptor_jconfig__motionmonitormode,
-    &eoprot_ep_mc_rom_joint_descriptor_jconfig__encoderconversionfactor,
-    &eoprot_ep_mc_rom_joint_descriptor_jconfig__encoderconversionoffset,
-    &eoprot_ep_mc_rom_joint_descriptor_jstatus,
-    &eoprot_ep_mc_rom_joint_descriptor_jstatus__basic,
-    &eoprot_ep_mc_rom_joint_descriptor_jstatus__ofpid,
-    &eoprot_ep_mc_rom_joint_descriptor_jstatus__chamaleon04,
-    &eoprot_ep_mc_rom_joint_descriptor_jinputs,
-    &eoprot_ep_mc_rom_joint_descriptor_jinputs__externallymeasuredtorque,
-    &eoprot_ep_mc_rom_joint_descriptor_jcmmnds__calibration,
-    &eoprot_ep_mc_rom_joint_descriptor_jcmmnds__setpoint,
-    &eoprot_ep_mc_rom_joint_descriptor_jcmmnds__stoptrajectory,
-    &eoprot_ep_mc_rom_joint_descriptor_jcmmnds__controlmode,
+    &eoprot_ep_mc_rom_joint_descriptor_config,
+    &eoprot_ep_mc_rom_joint_descriptor_config__pidposition,
+    &eoprot_ep_mc_rom_joint_descriptor_config__pidvelocity,
+    &eoprot_ep_mc_rom_joint_descriptor_config__pidtorque,
+    &eoprot_ep_mc_rom_joint_descriptor_config__impedance,
+    &eoprot_ep_mc_rom_joint_descriptor_config__minpositionofjoint,
+    &eoprot_ep_mc_rom_joint_descriptor_config__maxpositionofjoint,
+    &eoprot_ep_mc_rom_joint_descriptor_config__velocitysetpointtimeout,
+    &eoprot_ep_mc_rom_joint_descriptor_config__motionmonitormode,
+    &eoprot_ep_mc_rom_joint_descriptor_config__encoderconversionfactor,
+    &eoprot_ep_mc_rom_joint_descriptor_config__encoderconversionoffset,
+    &eoprot_ep_mc_rom_joint_descriptor_status,
+    &eoprot_ep_mc_rom_joint_descriptor_status__basic,
+    &eoprot_ep_mc_rom_joint_descriptor_status__ofpid,
+    &eoprot_ep_mc_rom_joint_descriptor_status__chamaleon04,
+    &eoprot_ep_mc_rom_joint_descriptor_inputs,
+    &eoprot_ep_mc_rom_joint_descriptor_inputs__externallymeasuredtorque,
+    &eoprot_ep_mc_rom_joint_descriptor_cmmnds__calibration,
+    &eoprot_ep_mc_rom_joint_descriptor_cmmnds__setpoint,
+    &eoprot_ep_mc_rom_joint_descriptor_cmmnds__stoptrajectory,
+    &eoprot_ep_mc_rom_joint_descriptor_cmmnds__controlmode,
     
     // here are eoprot_ep_mc_motor_tags_numberof descriptors for the motors (equal for every motor)
-    &eoprot_ep_mc_rom_motor_descriptor_mconfig,
-    &eoprot_ep_mc_rom_motor_descriptor_mconfig__pidcurrent,
-    &eoprot_ep_mc_rom_motor_descriptor_mconfig__maxvelocityofmotor,
-    &eoprot_ep_mc_rom_motor_descriptor_mconfig__maxcurrentofmotor,
-    &eoprot_ep_mc_rom_motor_descriptor_mstatus,
-    &eoprot_ep_mc_rom_motor_descriptor_mstatus__basic,
-    &eoprot_ep_mc_rom_motor_descriptor_mstatus__chamaleon04,
+    &eoprot_ep_mc_rom_motor_descriptor_config,
+    &eoprot_ep_mc_rom_motor_descriptor_config__pidcurrent,
+    &eoprot_ep_mc_rom_motor_descriptor_config__maxvelocityofmotor,
+    &eoprot_ep_mc_rom_motor_descriptor_config__maxcurrentofmotor,
+    &eoprot_ep_mc_rom_motor_descriptor_status,
+    &eoprot_ep_mc_rom_motor_descriptor_status__basic,
+    &eoprot_ep_mc_rom_motor_descriptor_status__chamaleon04,
 
     // here are eoprot_ep_mc_controller_tags_numberof descriptors for the single controller
-    &eoprot_ep_mc_rom_controller_descriptor_cconfig,
-    &eoprot_ep_mc_rom_controller_descriptor_cconfig__durationofctrlloop,
-    &eoprot_ep_mc_rom_controller_descriptor_cstatus,
-    &eoprot_ep_mc_rom_controller_descriptor_cstatus__alljomoinitted,
-    &eoprot_ep_mc_rom_controller_descriptor_ccmmnds__go2stateofcontroller
+    &eoprot_ep_mc_rom_controller_descriptor_config,
+    &eoprot_ep_mc_rom_controller_descriptor_config__durationofctrlloop,
+    &eoprot_ep_mc_rom_controller_descriptor_status,
+    &eoprot_ep_mc_rom_controller_descriptor_status__alljomoinitted,
+    &eoprot_ep_mc_rom_controller_descriptor_cmmnds__go2stateofcontroller
          
 };  EO_VERIFYsizeof(eoprot_ep_mc_rom_folded_descriptors, sizeof(EOnv_rom_t*)*(eoprot_ep_mc_joint_tags_numberof+eoprot_ep_mc_motor_tags_numberof+eoprot_ep_mc_controller_tags_numberof));
 
@@ -991,370 +991,370 @@ static uint16_t s_eoprot_ep_mc_rom_controller_ramoffset(uint16_t tag)
 
 // - the functions called by the descriptors
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig(const EOnv* nv)
+static void s_eoprot_ep_mc_rom_joint_INIT_config(const EOnv* nv)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_joint_jconfig(nv, index);
+    eoprot_ep_mc_fun_INIT_joint_config(nv, index);
 }
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig(const EOnv* nv, const eOropdescriptor_t* rd)
+static void s_eoprot_ep_mc_rom_joint_UPDT_config(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_joint_jconfig(nv, rd, index);
-}
-
-
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig__pidposition(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_joint_jconfig__pidposition(nv, index);
-}
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig__pidposition(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_joint_jconfig__pidposition(nv, rd, index);
-}
-
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig__pidvelocity(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_joint_jconfig__pidvelocity(nv, index);
-}
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig__pidvelocity(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_joint_jconfig__pidvelocity(nv, rd, index);
-}
-
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig__pidtorque(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_joint_jconfig__pidtorque(nv, index);
-}
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig__pidtorque(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_joint_jconfig__pidtorque(nv, rd, index);
-}
-
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig__impedance(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_joint_jconfig__impedance(nv, index);
-}
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig__impedance(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_joint_jconfig__impedance(nv, rd, index);
-}
-
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig__minpositionofjoint(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_joint_jconfig__minpositionofjoint(nv, index);
-}
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig__minpositionofjoint(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_joint_jconfig__minpositionofjoint(nv, rd, index);
-}
-
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig__maxpositionofjoint(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_joint_jconfig__maxpositionofjoint(nv, index);
-}
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig__maxpositionofjoint(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_joint_jconfig__maxpositionofjoint(nv, rd, index);
-}
-
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig__velocitysetpointtimeout(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_joint_jconfig__velocitysetpointtimeout(nv, index);
-}
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig__velocitysetpointtimeout(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_joint_jconfig__velocitysetpointtimeout(nv, rd, index);
+    eoprot_ep_mc_fun_UPDT_joint_config(nv, rd, index);
 }
 
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig__motionmonitormode(const EOnv* nv)
+static void s_eoprot_ep_mc_rom_joint_INIT_config__pidposition(const EOnv* nv)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_joint_jconfig__motionmonitormode(nv, index);
+    eoprot_ep_mc_fun_INIT_joint_config__pidposition(nv, index);
 }
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig__motionmonitormode(const EOnv* nv, const eOropdescriptor_t* rd)
+static void s_eoprot_ep_mc_rom_joint_UPDT_config__pidposition(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_joint_jconfig__motionmonitormode(nv, rd, index);
-}
-
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig__encoderconversionfactor(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_joint_jconfig__encoderconversionfactor(nv, index);
-}
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig__encoderconversionfactor(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_joint_jconfig__encoderconversionfactor(nv, rd, index);
+    eoprot_ep_mc_fun_UPDT_joint_config__pidposition(nv, rd, index);
 }
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jconfig__encoderconversionoffset(const EOnv* nv)
+static void s_eoprot_ep_mc_rom_joint_INIT_config__pidvelocity(const EOnv* nv)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_joint_jconfig__encoderconversionoffset(nv, index);
+    eoprot_ep_mc_fun_INIT_joint_config__pidvelocity(nv, index);
 }
-static void s_eoprot_ep_mc_rom_joint_UPDT_jconfig__encoderconversionoffset(const EOnv* nv, const eOropdescriptor_t* rd)
+static void s_eoprot_ep_mc_rom_joint_UPDT_config__pidvelocity(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_joint_jconfig__encoderconversionoffset(nv, rd, index);
-}
-
-static void s_eoprot_ep_mc_rom_joint_INIT_jstatus(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_joint_jstatus(nv, index);
-}
-static void s_eoprot_ep_mc_rom_joint_UPDT_jstatus(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_joint_jstatus(nv, rd, index);
+    eoprot_ep_mc_fun_UPDT_joint_config__pidvelocity(nv, rd, index);
 }
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jstatus__basic(const EOnv* nv)
+static void s_eoprot_ep_mc_rom_joint_INIT_config__pidtorque(const EOnv* nv)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_joint_jstatus__basic(nv, index);
+    eoprot_ep_mc_fun_INIT_joint_config__pidtorque(nv, index);
 }
-static void s_eoprot_ep_mc_rom_joint_UPDT_jstatus__basic(const EOnv* nv, const eOropdescriptor_t* rd)
+static void s_eoprot_ep_mc_rom_joint_UPDT_config__pidtorque(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_joint_jstatus__basic(nv, rd, index);
-}
-
-static void s_eoprot_ep_mc_rom_joint_INIT_jstatus__ofpid(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_joint_jstatus__ofpid(nv, index);
-}
-static void s_eoprot_ep_mc_rom_joint_UPDT_jstatus__ofpid(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_joint_jstatus__ofpid(nv, rd, index);
+    eoprot_ep_mc_fun_UPDT_joint_config__pidtorque(nv, rd, index);
 }
 
-
-static void s_eoprot_ep_mc_rom_joint_INIT_jstatus__chamaleon04(const EOnv* nv)
+static void s_eoprot_ep_mc_rom_joint_INIT_config__impedance(const EOnv* nv)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_joint_jstatus__chamaleon04(nv, index);
+    eoprot_ep_mc_fun_INIT_joint_config__impedance(nv, index);
 }
-static void s_eoprot_ep_mc_rom_joint_UPDT_jstatus__chamaleon04(const EOnv* nv, const eOropdescriptor_t* rd)
+static void s_eoprot_ep_mc_rom_joint_UPDT_config__impedance(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_joint_jstatus__chamaleon04(nv, rd, index);
-}
-
-static void s_eoprot_ep_mc_rom_joint_INIT_jinputs(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_joint_jinputs(nv, index);
-}
-static void s_eoprot_ep_mc_rom_joint_UPDT_jinputs(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_joint_jinputs(nv, rd, index);
+    eoprot_ep_mc_fun_UPDT_joint_config__impedance(nv, rd, index);
 }
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jinputs__externallymeasuredtorque(const EOnv* nv)
+static void s_eoprot_ep_mc_rom_joint_INIT_config__minpositionofjoint(const EOnv* nv)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_joint_jinputs__externallymeasuredtorque(nv, index);
+    eoprot_ep_mc_fun_INIT_joint_config__minpositionofjoint(nv, index);
 }
-static void s_eoprot_ep_mc_rom_joint_UPDT_jinputs__externallymeasuredtorque(const EOnv* nv, const eOropdescriptor_t* rd)
+static void s_eoprot_ep_mc_rom_joint_UPDT_config__minpositionofjoint(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_joint_jinputs__externallymeasuredtorque(nv, rd, index);
-}
-
-static void s_eoprot_ep_mc_rom_joint_INIT_jcmmnds__calibration(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_joint_jcmmnds__calibration(nv, index);
-}
-static void s_eoprot_ep_mc_rom_joint_UPDT_jcmmnds__calibration(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_joint_jcmmnds__calibration(nv, rd, index);
+    eoprot_ep_mc_fun_UPDT_joint_config__minpositionofjoint(nv, rd, index);
 }
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jcmmnds__setpoint(const EOnv* nv)
+static void s_eoprot_ep_mc_rom_joint_INIT_config__maxpositionofjoint(const EOnv* nv)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_joint_jcmmnds__setpoint(nv, index);
+    eoprot_ep_mc_fun_INIT_joint_config__maxpositionofjoint(nv, index);
 }
-static void s_eoprot_ep_mc_rom_joint_UPDT_jcmmnds__setpoint(const EOnv* nv, const eOropdescriptor_t* rd)
+static void s_eoprot_ep_mc_rom_joint_UPDT_config__maxpositionofjoint(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_joint_jcmmnds__setpoint(nv, rd, index);
-}
-
-static void s_eoprot_ep_mc_rom_joint_INIT_jcmmnds__stoptrajectory(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_joint_jcmmnds__stoptrajectory(nv, index);
-}
-static void s_eoprot_ep_mc_rom_joint_UPDT_jcmmnds__stoptrajectory(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_joint_jcmmnds__stoptrajectory(nv, rd, index);
+    eoprot_ep_mc_fun_UPDT_joint_config__maxpositionofjoint(nv, rd, index);
 }
 
-static void s_eoprot_ep_mc_rom_joint_INIT_jcmmnds__controlmode(const EOnv* nv)
+static void s_eoprot_ep_mc_rom_joint_INIT_config__velocitysetpointtimeout(const EOnv* nv)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_joint_jcmmnds__controlmode(nv, index);
+    eoprot_ep_mc_fun_INIT_joint_config__velocitysetpointtimeout(nv, index);
 }
-static void s_eoprot_ep_mc_rom_joint_UPDT_jcmmnds__controlmode(const EOnv* nv, const eOropdescriptor_t* rd)
+static void s_eoprot_ep_mc_rom_joint_UPDT_config__velocitysetpointtimeout(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_joint_jcmmnds__controlmode(nv, rd, index);
-}
-
-static void s_eoprot_ep_mc_rom_motor_INIT_mconfig(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_motor_mconfig(nv, index);
-}
-static void s_eoprot_ep_mc_rom_motor_UPDT_mconfig(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_motor_mconfig(nv, rd, index);
+    eoprot_ep_mc_fun_UPDT_joint_config__velocitysetpointtimeout(nv, rd, index);
 }
 
-static void s_eoprot_ep_mc_rom_motor_INIT_mconfig__pidcurrent(const EOnv* nv)
+
+static void s_eoprot_ep_mc_rom_joint_INIT_config__motionmonitormode(const EOnv* nv)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_motor_mconfig__pidcurrent(nv, index);
+    eoprot_ep_mc_fun_INIT_joint_config__motionmonitormode(nv, index);
 }
-static void s_eoprot_ep_mc_rom_motor_UPDT_mconfig__pidcurrent(const EOnv* nv, const eOropdescriptor_t* rd)
+static void s_eoprot_ep_mc_rom_joint_UPDT_config__motionmonitormode(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_motor_mconfig__pidcurrent(nv, rd, index);
+    eoprot_ep_mc_fun_UPDT_joint_config__motionmonitormode(nv, rd, index);
 }
 
-static void s_eoprot_ep_mc_rom_motor_INIT_mconfig__maxvelocityofmotor(const EOnv* nv)
+static void s_eoprot_ep_mc_rom_joint_INIT_config__encoderconversionfactor(const EOnv* nv)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_motor_mconfig__maxvelocityofmotor(nv, index);
+    eoprot_ep_mc_fun_INIT_joint_config__encoderconversionfactor(nv, index);
 }
-static void s_eoprot_ep_mc_rom_motor_UPDT_mconfig__maxvelocityofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
+static void s_eoprot_ep_mc_rom_joint_UPDT_config__encoderconversionfactor(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_motor_mconfig__maxvelocityofmotor(nv, rd, index);
-}
-
-static void s_eoprot_ep_mc_rom_motor_INIT_mconfig__maxcurrentofmotor(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_motor_mconfig__maxcurrentofmotor(nv, index);
-}
-static void s_eoprot_ep_mc_rom_motor_UPDT_mconfig__maxcurrentofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_motor_mconfig__maxcurrentofmotor(nv, rd, index);
+    eoprot_ep_mc_fun_UPDT_joint_config__encoderconversionfactor(nv, rd, index);
 }
 
-static void s_eoprot_ep_mc_rom_motor_INIT_mstatus(const EOnv* nv)
+static void s_eoprot_ep_mc_rom_joint_INIT_config__encoderconversionoffset(const EOnv* nv)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_motor_mstatus(nv, index);
+    eoprot_ep_mc_fun_INIT_joint_config__encoderconversionoffset(nv, index);
 }
-static void s_eoprot_ep_mc_rom_motor_UPDT_mstatus(const EOnv* nv, const eOropdescriptor_t* rd)
+static void s_eoprot_ep_mc_rom_joint_UPDT_config__encoderconversionoffset(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_motor_mstatus(nv, rd, index);
-}
-
-static void s_eoprot_ep_mc_rom_motor_INIT_mstatus__basic(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_motor_mstatus__basic(nv, index);
-}
-static void s_eoprot_ep_mc_rom_motor_UPDT_mstatus__basic(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_motor_mstatus__basic(nv, rd, index);
+    eoprot_ep_mc_fun_UPDT_joint_config__encoderconversionoffset(nv, rd, index);
 }
 
-static void s_eoprot_ep_mc_rom_motor_INIT_mstatus__chamaleon04(const EOnv* nv)
+static void s_eoprot_ep_mc_rom_joint_INIT_status(const EOnv* nv)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_motor_mstatus__chamaleon04(nv, index);
+    eoprot_ep_mc_fun_INIT_joint_status(nv, index);
 }
-static void s_eoprot_ep_mc_rom_motor_UPDT_mstatus__chamaleon04(const EOnv* nv, const eOropdescriptor_t* rd)
+static void s_eoprot_ep_mc_rom_joint_UPDT_status(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_motor_mstatus__chamaleon04(nv, rd, index);
-}
-
-static void s_eoprot_ep_mc_rom_controller_INIT_cconfig(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_controller_cconfig(nv, index);
-}
-static void s_eoprot_ep_mc_rom_controller_UPDT_cconfig(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_controller_cconfig(nv, rd, index);
+    eoprot_ep_mc_fun_UPDT_joint_status(nv, rd, index);
 }
 
-static void s_eoprot_ep_mc_rom_controller_INIT_cconfig__durationofctrlloop(const EOnv* nv)
+static void s_eoprot_ep_mc_rom_joint_INIT_status__basic(const EOnv* nv)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_controller_cconfig__durationofctrlloop(nv, index);
+    eoprot_ep_mc_fun_INIT_joint_status__basic(nv, index);
 }
-static void s_eoprot_ep_mc_rom_controller_UPDT_cconfig__durationofctrlloop(const EOnv* nv, const eOropdescriptor_t* rd)
+static void s_eoprot_ep_mc_rom_joint_UPDT_status__basic(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_controller_cconfig__durationofctrlloop(nv, rd, index);
-}
-
-static void s_eoprot_ep_mc_rom_controller_INIT_cstatus(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_controller_cstatus(nv, index);
-}
-static void s_eoprot_ep_mc_rom_controller_UPDT_cstatus(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_controller_cstatus(nv, rd, index);
+    eoprot_ep_mc_fun_UPDT_joint_status__basic(nv, rd, index);
 }
 
-static void s_eoprot_ep_mc_rom_controller_INIT_cstatus__alljomoinitted(const EOnv* nv)
+static void s_eoprot_ep_mc_rom_joint_INIT_status__ofpid(const EOnv* nv)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_controller_cstatus__alljomoinitted(nv, index);
+    eoprot_ep_mc_fun_INIT_joint_status__ofpid(nv, index);
 }
-static void s_eoprot_ep_mc_rom_controller_UPDT_cstatus__alljomoinitted(const EOnv* nv, const eOropdescriptor_t* rd)
+static void s_eoprot_ep_mc_rom_joint_UPDT_status__ofpid(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_controller_cstatus__alljomoinitted(nv, rd, index);
+    eoprot_ep_mc_fun_UPDT_joint_status__ofpid(nv, rd, index);
 }
 
-static void s_eoprot_ep_mc_rom_controller_INIT_ccmmnds__go2stateofcontroller(const EOnv* nv)
+
+static void s_eoprot_ep_mc_rom_joint_INIT_status__chamaleon04(const EOnv* nv)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_INIT_controller_ccmmnds__go2stateofcontroller(nv, index);
+    eoprot_ep_mc_fun_INIT_joint_status__chamaleon04(nv, index);
 }
-static void s_eoprot_ep_mc_rom_controller_UPDT_ccmmnds__go2stateofcontroller(const EOnv* nv, const eOropdescriptor_t* rd)
+static void s_eoprot_ep_mc_rom_joint_UPDT_status__chamaleon04(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mc_fun_UPDT_controller_ccmmnds__go2stateofcontroller(nv, rd, index);
+    eoprot_ep_mc_fun_UPDT_joint_status__chamaleon04(nv, rd, index);
+}
+
+static void s_eoprot_ep_mc_rom_joint_INIT_inputs(const EOnv* nv)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_INIT_joint_inputs(nv, index);
+}
+static void s_eoprot_ep_mc_rom_joint_UPDT_inputs(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_UPDT_joint_inputs(nv, rd, index);
+}
+
+static void s_eoprot_ep_mc_rom_joint_INIT_inputs__externallymeasuredtorque(const EOnv* nv)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_INIT_joint_inputs__externallymeasuredtorque(nv, index);
+}
+static void s_eoprot_ep_mc_rom_joint_UPDT_inputs__externallymeasuredtorque(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_UPDT_joint_inputs__externallymeasuredtorque(nv, rd, index);
+}
+
+static void s_eoprot_ep_mc_rom_joint_INIT_cmmnds__calibration(const EOnv* nv)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_INIT_joint_cmmnds__calibration(nv, index);
+}
+static void s_eoprot_ep_mc_rom_joint_UPDT_cmmnds__calibration(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_UPDT_joint_cmmnds__calibration(nv, rd, index);
+}
+
+static void s_eoprot_ep_mc_rom_joint_INIT_cmmnds__setpoint(const EOnv* nv)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_INIT_joint_cmmnds__setpoint(nv, index);
+}
+static void s_eoprot_ep_mc_rom_joint_UPDT_cmmnds__setpoint(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_UPDT_joint_cmmnds__setpoint(nv, rd, index);
+}
+
+static void s_eoprot_ep_mc_rom_joint_INIT_cmmnds__stoptrajectory(const EOnv* nv)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_INIT_joint_cmmnds__stoptrajectory(nv, index);
+}
+static void s_eoprot_ep_mc_rom_joint_UPDT_cmmnds__stoptrajectory(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_UPDT_joint_cmmnds__stoptrajectory(nv, rd, index);
+}
+
+static void s_eoprot_ep_mc_rom_joint_INIT_cmmnds__controlmode(const EOnv* nv)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_INIT_joint_cmmnds__controlmode(nv, index);
+}
+static void s_eoprot_ep_mc_rom_joint_UPDT_cmmnds__controlmode(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_UPDT_joint_cmmnds__controlmode(nv, rd, index);
+}
+
+static void s_eoprot_ep_mc_rom_motor_INIT_config(const EOnv* nv)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_INIT_motor_config(nv, index);
+}
+static void s_eoprot_ep_mc_rom_motor_UPDT_config(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_UPDT_motor_config(nv, rd, index);
+}
+
+static void s_eoprot_ep_mc_rom_motor_INIT_config__pidcurrent(const EOnv* nv)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_INIT_motor_config__pidcurrent(nv, index);
+}
+static void s_eoprot_ep_mc_rom_motor_UPDT_config__pidcurrent(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_UPDT_motor_config__pidcurrent(nv, rd, index);
+}
+
+static void s_eoprot_ep_mc_rom_motor_INIT_config__maxvelocityofmotor(const EOnv* nv)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_INIT_motor_config__maxvelocityofmotor(nv, index);
+}
+static void s_eoprot_ep_mc_rom_motor_UPDT_config__maxvelocityofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_UPDT_motor_config__maxvelocityofmotor(nv, rd, index);
+}
+
+static void s_eoprot_ep_mc_rom_motor_INIT_config__maxcurrentofmotor(const EOnv* nv)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_INIT_motor_config__maxcurrentofmotor(nv, index);
+}
+static void s_eoprot_ep_mc_rom_motor_UPDT_config__maxcurrentofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_UPDT_motor_config__maxcurrentofmotor(nv, rd, index);
+}
+
+static void s_eoprot_ep_mc_rom_motor_INIT_status(const EOnv* nv)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_INIT_motor_status(nv, index);
+}
+static void s_eoprot_ep_mc_rom_motor_UPDT_status(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_UPDT_motor_status(nv, rd, index);
+}
+
+static void s_eoprot_ep_mc_rom_motor_INIT_status__basic(const EOnv* nv)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_INIT_motor_status__basic(nv, index);
+}
+static void s_eoprot_ep_mc_rom_motor_UPDT_status__basic(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_UPDT_motor_status__basic(nv, rd, index);
+}
+
+static void s_eoprot_ep_mc_rom_motor_INIT_status__chamaleon04(const EOnv* nv)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_INIT_motor_status__chamaleon04(nv, index);
+}
+static void s_eoprot_ep_mc_rom_motor_UPDT_status__chamaleon04(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_UPDT_motor_status__chamaleon04(nv, rd, index);
+}
+
+static void s_eoprot_ep_mc_rom_controller_INIT_config(const EOnv* nv)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_INIT_controller_config(nv, index);
+}
+static void s_eoprot_ep_mc_rom_controller_UPDT_config(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_UPDT_controller_config(nv, rd, index);
+}
+
+static void s_eoprot_ep_mc_rom_controller_INIT_config__durationofctrlloop(const EOnv* nv)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_INIT_controller_config__durationofctrlloop(nv, index);
+}
+static void s_eoprot_ep_mc_rom_controller_UPDT_config__durationofctrlloop(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_UPDT_controller_config__durationofctrlloop(nv, rd, index);
+}
+
+static void s_eoprot_ep_mc_rom_controller_INIT_status(const EOnv* nv)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_INIT_controller_status(nv, index);
+}
+static void s_eoprot_ep_mc_rom_controller_UPDT_status(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_UPDT_controller_status(nv, rd, index);
+}
+
+static void s_eoprot_ep_mc_rom_controller_INIT_status__alljomoinitted(const EOnv* nv)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_INIT_controller_status__alljomoinitted(nv, index);
+}
+static void s_eoprot_ep_mc_rom_controller_UPDT_status__alljomoinitted(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_UPDT_controller_status__alljomoinitted(nv, rd, index);
+}
+
+static void s_eoprot_ep_mc_rom_controller_INIT_cmmnds__go2stateofcontroller(const EOnv* nv)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_INIT_controller_cmmnds__go2stateofcontroller(nv, index);
+}
+static void s_eoprot_ep_mc_rom_controller_UPDT_cmmnds__go2stateofcontroller(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    eoprot_ep_mc_fun_UPDT_controller_cmmnds__go2stateofcontroller(nv, rd, index);
 }
 
 
