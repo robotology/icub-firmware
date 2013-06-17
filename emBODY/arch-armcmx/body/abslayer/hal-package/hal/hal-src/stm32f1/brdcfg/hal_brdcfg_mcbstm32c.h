@@ -51,6 +51,10 @@
     #include "hal_spi4encoder.h" 
 #endif//HAL_USE_SPI4ENCODER
 
+#ifdef HAL_USE_ETH
+     #include "hal_eth.h" 
+#endif //HAL_USE_ETH
+
 
 #include "stm32f10x_i2c.h"
 
@@ -190,6 +194,8 @@
 
 #ifdef HAL_USE_ETH  
     extern void hal_brdcfg_eth__phy_start(void);
+    extern hal_result_t hal_brdcfg_eth__check_links(uint8_t *linkst_mask, uint8_t *links_num);
+    extern hal_result_t hal_brdcfg_eth__get_links_status(hal_eth_phy_status_t** link_list, uint8_t *links_num);
 #endif//HAL_USE_ETH
 
 

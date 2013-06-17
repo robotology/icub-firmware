@@ -68,6 +68,16 @@ extern  void write_PHY (uint16_t PHYAddr, uint16_t PhyReg, uint16_t value);
 extern uint16_t read_PHY (uint16_t PHYAddr, uint16_t PhyReg);
 
 
+extern void hal_eth_hid_smi_write(uint16_t PHYAddr, uint16_t PhyReg, uint16_t value);
+
+/** @fn         extern uint16_t hal_eth_smi_read(uint16_t PHYAddr, uint16_t PhyReg)
+    @brief      reads values of PHY's register
+    @return     value of register
+    @warning    It is generally used to initialise a TCP-IP stack
+ **/
+extern uint16_t hal_eth_hid_smi_read(uint16_t PHYAddr, uint16_t PhyReg);
+
+
 
 #endif  // include guard
 

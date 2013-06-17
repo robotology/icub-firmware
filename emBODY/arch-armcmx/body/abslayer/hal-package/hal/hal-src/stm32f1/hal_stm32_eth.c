@@ -447,9 +447,16 @@ extern hal_result_t hal_eth_sendframe(hal_eth_frame_t *frame)
 }
 
 
-extern const hal_eth_network_functions_t * hal_eth_get_network_functions(void)
+
+extern hal_result_t hal_eth_check_links(uint8_t *linkst_mask, uint8_t *links_num)
 {
-    return(&s_hal_eth_fns);
+    return(hal_brdcfg_eth__check_links(linkst_mask, links_num));
+}
+
+
+extern hal_result_t hal_eth_get_links_status(hal_eth_phy_status_t** link_list, uint8_t *links_num)
+{
+    return(hal_brdcfg_eth__get_links_status(link_list, links_num));
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -602,6 +609,21 @@ extern hal_result_t hal_eth_hid_setmem(const hal_cfg_t *cfg, uint32_t *memory)
 
     return(hal_res_OK);
 
+}
+
+extern const hal_eth_network_functions_t * hal_eth_get_network_functions(void)
+{
+    return(&s_hal_eth_fns);
+}
+
+extern void hal_eth_hid_smi_write(uint16_t PHYAddr, uint16_t PhyReg, uint16_t value)
+{
+    write_PHY (PHYAddr, PhyReg, value);
+}
+
+extern uint16_t hal_eth_hid_smi_read(uint16_t PHYAddr, uint16_t PhyReg)
+{
+    return(read_PHY (PHYAddr, PhyReg));
 }
 
 // --------------------------------------------------------------------------------------------------------------------

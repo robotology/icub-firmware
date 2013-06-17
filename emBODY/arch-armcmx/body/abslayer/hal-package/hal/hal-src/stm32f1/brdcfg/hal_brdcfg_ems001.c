@@ -33,6 +33,7 @@
 #include "cmsis_stm32f1.h"
 
 #include "stdlib.h"
+#include "string.h"
 #include "hal_base.h"
 #include "hal_stm32_base_hid.h"
 #include "hal_stm32_spi4encoder_hid.h"
@@ -324,6 +325,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 static void s_hal_ems001_i2c_wait2micro(void);
+#ifdef HAL_USE_ETH
+static void s_hal_brdcfg_eth__get_links_status(hal_eth_phy_status_t* status, uint8_t phy_num);
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -867,6 +871,62 @@ extern void hal_brdcfg_eth__phy_start(void)
 
 #endif//HAL_USE_ETH
 
+#ifdef HAL_USE_ETH
+extern hal_result_t hal_brdcfg_eth__check_links(uint8_t *linkst_mask, uint8_t *links_num)
+{
+    uint16_t status_link;
+    uint8_t  PHYaddr = 0x1;
+    uint8_t  REGaddr = 0x1;
+    #define  LINK_IS_UP 0x00000004
+    
+    if((NULL == linkst_mask) || (NULL == links_num))
+    {
+        return(hal_res_NOK_nullpointer);
+    }
+    *linkst_mask = 0;
+    *links_num = 2;
+    
+    
+    status_link = hal_eth_hid_smi_read(PHYaddr, REGaddr);
+    if((status_link &LINK_IS_UP) == LINK_IS_UP)
+    {
+       *linkst_mask |= 0x01;
+    }
+    
+    PHYaddr = 0x2;
+    status_link = hal_eth_hid_smi_read(PHYaddr, REGaddr);
+    if((status_link &LINK_IS_UP) == LINK_IS_UP)
+    {
+        *linkst_mask |= 0x02;
+    }
+    return(hal_res_OK);
+}
+
+
+#endif
+
+
+#ifdef HAL_USE_ETH
+static hal_eth_phy_status_t phy_list[2] = {0};
+
+extern hal_result_t hal_brdcfg_eth__get_links_status(hal_eth_phy_status_t** link_list, uint8_t *links_num)
+{
+    
+    if((NULL == link_list) || (NULL == links_num))
+    {
+        return(hal_res_NOK_nullpointer);
+    }
+
+    s_hal_brdcfg_eth__get_links_status(&phy_list[0], 1);//first phy
+    
+    s_hal_brdcfg_eth__get_links_status(&phy_list[1], 2);//second phy
+
+    *link_list = &phy_list[0];
+    *links_num = 2;   
+    return(hal_res_OK);
+}
+
+#endif
 
 #ifdef HAL_USE_SYS
 extern void hal_brdcfg_sys__clock_config(void)
@@ -1119,6 +1179,52 @@ static void s_hal_ems001_i2c_wait2micro(void)
 }
 #endif//HAL_USE_I2C4HAL
 
+
+
+#ifdef HAL_USE_ETH
+static void s_hal_brdcfg_eth__get_links_status(hal_eth_phy_status_t* status, uint8_t phy_num)
+{
+    uint16_t regaddr_status0, regaddr_status1;
+    uint8_t  buff_read = 0xFF;
+    
+    if(1 == phy_num)
+    {
+        regaddr_status0 = 0x1E;
+        regaddr_status1 = 0x1F;
+    }
+    else // (2 == phy_num)
+    {
+        regaddr_status0 = 0x2E;
+        regaddr_status1 = 0x2F;
+    }
+    
+    memset(status, 0, sizeof(hal_eth_phy_status_t));
+    
+    hal_brdcfg_switch__reg_read_byI2C(&buff_read, regaddr_status0); //port1
+    if(buff_read&0x0040)// autoneg completed
+    {
+        status->autoNeg_done = 1;
+    }
+    if(buff_read&0x0020)// link is good
+    {
+        status->linkisgood = 1;
+    }
+    
+    buff_read = 0;
+    hal_brdcfg_switch__reg_read_byI2C(&buff_read, regaddr_status1); //port1
+    if(buff_read&0x0004)// link speed 1==>100
+    {
+        status->linkspeed = 1;
+    }
+    if(buff_read&0x0002)// duplex 1==>full
+    {
+        status->linkduplex = 1;
+    }
+
+
+}
+
+#endif
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------

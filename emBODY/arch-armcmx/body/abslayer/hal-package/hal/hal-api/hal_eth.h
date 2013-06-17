@@ -146,6 +146,15 @@ typedef enum
 } hal_eth_phymode_t;
 
  
+typedef struct
+{
+    uint32_t linkisup:1;
+    uint32_t autoNeg_done:1;
+    uint32_t linkisgood:1;
+    uint32_t linkspeed:1; // 1== 100Mb 0==10Mb
+    uint32_t linkduplex:1; //1==full 0==half
+    uint32_t dummy:27;
+} hal_eth_phy_status_t;
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
 
@@ -192,7 +201,22 @@ extern hal_result_t hal_eth_sendframe(hal_eth_frame_t *frame);
  **/
 extern const hal_eth_network_functions_t * hal_eth_get_network_functions(void);
 
+/** @fn         extern hal_boolval_t hal_eth_check_links(void)
+    @brief      checks all physical links.In output linkst_mask indicate each phy status: 
+                if bit in pos x values 1 then phy num x is up, else is down. phy num starts to count from 0.
+                links_num in output contains num of used phy.
+    @return     if linkst_mask or links_num is null returns hal_res_NOK_nullpointer else hal_res_OK
+    @warning    It is board dependent. curr
+ **/
+extern hal_result_t hal_eth_check_links(uint8_t *linkst_mask, uint8_t *links_num);
 
+
+/** @fn         extern hal_result_t hal_eth_check_links(void)
+    @brief      check all physical links.
+    @return     in output link list contains pointer to an array of hal_eth_phy_status with links_num element
+    @warning    It is board dependent
+ **/
+extern hal_result_t hal_eth_get_links_status(hal_eth_phy_status_t** link_list, uint8_t *links_num);
 
 /** @}            
     end of group arm_hal_eth  
