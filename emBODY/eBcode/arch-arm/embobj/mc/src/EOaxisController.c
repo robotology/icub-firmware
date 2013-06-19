@@ -275,7 +275,7 @@ extern void eo_axisController_SetImpedance(EOaxisController *o, int32_t stiffnes
     if (o)
     {
         o->stiffness  = stiffness;
-        o->damping    = damping;
+        o->damping    = (damping*EMS_FREQUENCY_INT32)/1000;
         o->torque_off = offset;
     }
 }                 
@@ -285,7 +285,7 @@ extern void eo_axisController_GetImpedance(EOaxisController *o, int32_t *stiffne
     if (o)
     {
         *stiffness = o->stiffness;
-        *damping   = o->damping;
+        *damping   = (o->damping*1000)/EMS_FREQUENCY_INT32;
         *offset    = o->torque_off;
     }
 }
@@ -597,7 +597,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
        
             int32_t err = pos_ref - pos;
             
-            o->torque_ref = o->torque_off + (o->stiffness*err + o->damping*(err - o->err))/1000; 
+            o->torque_ref = o->torque_off + (o->stiffness*err)/1000 + o->damping*(err - o->err);
 
             o->err = err;
         }    
