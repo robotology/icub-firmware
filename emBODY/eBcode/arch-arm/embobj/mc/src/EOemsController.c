@@ -603,6 +603,11 @@ extern void eo_emsController_SetImpedance(uint8_t joint, int32_t stiffness, int3
     if (s_emsc) eo_axisController_SetImpedance(s_emsc->axis_controller[joint], stiffness, damping, offset);
 }
 
+extern void eo_emsController_GetImpedance(uint8_t joint, int32_t *stiffness, int32_t *damping, int32_t *offset)
+{
+    if (s_emsc) eo_axisController_GetImpedance(s_emsc->axis_controller[joint], stiffness, damping, offset);
+}
+
 extern void eo_emsController_SetVelTimeout(uint8_t joint, int32_t vel_timeout)
 {
     if (s_emsc) eo_axisController_SetVelTimeout(s_emsc->axis_controller[joint], vel_timeout);
