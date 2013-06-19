@@ -280,6 +280,16 @@ extern void eo_axisController_SetImpedance(EOaxisController *o, int32_t stiffnes
     }
 }                 
 
+extern void eo_axisController_GetImpedance(EOaxisController *o, int32_t *stiffness, int32_t *damping, int32_t *offset)
+{
+    if (o)
+    {
+        *stiffness = o->stiffness;
+        *damping   = o->damping;
+        *offset    = o->torque_off;
+    }
+}
+
 extern void eo_axisController_SetEncPos(EOaxisController *o, int32_t pos)
 {
     if (o) o->position = pos;
