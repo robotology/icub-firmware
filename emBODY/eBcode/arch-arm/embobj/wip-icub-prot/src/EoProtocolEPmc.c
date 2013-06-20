@@ -247,7 +247,7 @@ extern const eOmc_controller_t* eoprot_ep_mc_controller_default_Get(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-#warning --> the function s_eoprot_ep_mc_ep2arrayindex() does not make a control upon validity of its argument ...
+//#warning --> the function s_eoprot_ep_mc_ep2arrayindex() does not make a control upon validity of its argument ...
 static uint8_t s_eoprot_ep_mc_ep2arrayindex(eOprotEP_t ep)
 {   // we have at most 16 endpoints thus we use 0xf.
     uint8_t arrayindex = ep&0xf;
