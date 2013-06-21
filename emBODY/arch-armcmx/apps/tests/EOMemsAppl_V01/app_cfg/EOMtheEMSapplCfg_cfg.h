@@ -52,7 +52,7 @@ extern "C" {
 //  <o> ID of the EMS board     <1=> EB1    <2=> EB2    <3=> EB3    <4=> EB4    <5=> EB5    
 //                              <6=> EB6    <7=> EB7    <8=> EB8    <9=> EB9
 
-#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     1
+#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     4
 
 
       
@@ -68,7 +68,7 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          1
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          18
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          20
 //  </h>version
 
 //  <h> build date
@@ -77,11 +77,11 @@ extern "C" {
 //  <o> month           <1-12> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        6
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          17
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          21
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         15
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         18
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          53
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          0
 //  </h>build date
 
 // </h>Info 
