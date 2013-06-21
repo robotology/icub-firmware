@@ -64,29 +64,15 @@ typedef struct
 typedef struct
 {
     eOappTheDB_cfg_jointInfo_t   		*cfg_ptr;
-    eOappEncReader_encoder_t            connectedEnc;       /**< currently i assumed: the encoder connected to joint with jointId=x, has encoderid=x */
-    eOmc_motorId_t                      ref2motor;          /**< currently i assumed: the motor connected to joint with jointId=x, has motorid=x */
-    //in teoria i seguenti valori dovrebbero dipendere dal giunto
-    //ma visto che per ora si usano brasati nel codice 
-    //qui inserisco il puntatore alla struttura data allocata dinamicamente
-    //una volta sola per tutti a cui tutti puntano.
     eOappTheDB_jointShiftValues_t       *shiftvalues_ptr;   
     eOicubCanProto_bcastpolicy_t        *bcastpolicy_ptr;
-    eOmc_controlmode_t                   curr_mode;     /**< ATTENTION: currently not used!!
-															 Here current control mode is saved.
-                                                             When an update of control mode arrive, in callback I'dont know last currmode, 
-                                                             so i can use this filed to compere new mode wthi curr.
-                                                             Obviously this file have to be updated at the end of nv callback. */
 } eOappTheDB_hid_jointInfo_t;
 
 
 typedef struct
 {
     eOappTheDB_cfg_motorInfo_t   		*cfg_ptr;
-    eOmc_jointId_t                      ref2joint;
 } eOappTheDB_hid_motorInfo_t;
-
-
 
 
 typedef struct

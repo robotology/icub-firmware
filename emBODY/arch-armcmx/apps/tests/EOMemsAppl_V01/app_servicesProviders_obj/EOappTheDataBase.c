@@ -237,66 +237,8 @@ extern eObool_t	eo_appTheDB_isSkinConnected(EOappTheDB *p)
 }
 
 
-extern eOresult_t eo_appTheDB_SetjointsShiftValues(EOappTheDB *p, eOappTheDB_jointShiftValues_t *shiftval_ptr)
-{
-    if((NULL == p) || (NULL == shiftval_ptr))
-    {
-        return(eores_NOK_nullpointer);
-    }
-    
-    return(eores_OK);
-}
-
-extern eOresult_t eo_appTheDB_SetJointsBcastpolicyPtr(EOappTheDB *p, eOicubCanProto_bcastpolicy_t *bcast_ptr)
-{
-    if((NULL == p) || (NULL == bcast_ptr))
-    {
-        return(eores_NOK_nullpointer);
-    }
-    
-    return(eores_OK);
-}
 
 
-
-extern eOresult_t eo_appTheDB_GetShiftValuesOfJoint(EOappTheDB *p, eOmc_jointId_t jId, eOappTheDB_jointShiftValues_t *shiftval_ptr)
-{
-    eOappTheDB_hid_jointInfo_t   *j_ptr;
-	
-    if((NULL == p) || (NULL == shiftval_ptr))
-    {
-        return(eores_NOK_nullpointer);
-    }
-	
-    j_ptr = (eOappTheDB_hid_jointInfo_t *)eo_array_At(p->jointsList, jId);
-    if(NULL == j_ptr)
-    {
-        return(eores_NOK_nodata);
-    }
-
-    memcpy(shiftval_ptr, j_ptr->shiftvalues_ptr, sizeof(eOappTheDB_jointShiftValues_t));
-    
-    return(eores_OK);
-}
-
-
-extern eOappEncReader_encoder_t eo_appTheDB_GetEncoderConnected2Joint(EOappTheDB *p, eOmc_jointId_t jId)
-{
-	eOappTheDB_hid_jointInfo_t *j_ptr;
-    if(NULL == p)
-    {
-        return(eOeOappEncReader_encoderUnused);
-    }
-	
-	j_ptr = (eOappTheDB_hid_jointInfo_t *)eo_array_At(p->jointsList, jId);
-	
-	if(NULL == j_ptr)
-	{
-		return(eOeOappEncReader_encoderUnused);
-	}
-	
-    return(j_ptr->connectedEnc);
-}
 
 extern eOresult_t eo_appTheDB_GetJointCanLocation(EOappTheDB *p, eOmc_jointId_t jId,  eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr, eObrd_types_t *type_ptr)
 {
@@ -674,47 +616,7 @@ extern eOresult_t eo_appTheDB_GetJointBcastpolicyPtr(EOappTheDB *p, eOmc_jointId
     return(eores_OK);
 }
 
-extern eOresult_t eo_appTheDB_SetJointCurrentControlmode(EOappTheDB *p, eOmc_jointId_t jId, eOmc_controlmode_t curr_mode)
-{
-    eOappTheDB_hid_jointInfo_t 		*j_ptr;
-    
-    if(NULL == p)
-	{
-        return(eores_NOK_nullpointer);
-	}
-    
-    if(jId >= eo_array_Capacity(p->jointsList))
-    {
-        return(eores_NOK_nodata);
-    }
 
-    j_ptr = (eOappTheDB_hid_jointInfo_t *)eo_array_At(p->jointsList, jId);
-    j_ptr->curr_mode = curr_mode;
-    
-    return(eores_OK);
-}
-
-
-
-extern eOresult_t eo_appTheDB_GetJointCurrentControlmode(EOappTheDB *p, eOmc_jointId_t jId, eOmc_controlmode_t *curr_mode_ptr)
-{
-    eOappTheDB_hid_jointInfo_t 		*j_ptr;
-    
-    if((NULL == p) || (NULL == curr_mode_ptr))
-	{
-        return(eores_NOK_nullpointer);
-	}
-    
-    if(jId >= eo_array_Capacity(p->jointsList))
-    {
-        return(eores_NOK_nodata);
-    }
-
-    j_ptr = (eOappTheDB_hid_jointInfo_t *)eo_array_At(p->jointsList, jId);
-    *curr_mode_ptr = j_ptr->curr_mode;
-
-    return(eores_OK);
-}
 
 extern eOresult_t eo_appTheDB_GetMotorConfigPtr(EOappTheDB *p, eOmc_motorId_t mId,  eOmc_motor_config_t **mconfig_ptr)
 {
@@ -901,38 +803,7 @@ extern eOresult_t eo_appTheDB_GetCanBoardId_ByCanLocation(EOappTheDB *p, eOappTh
     
     return(eores_NOK_nodata);
 }
-// extern eOresult_t eo_appTheDB_GetSkinConfigPtr(EOappTheDB *p,eOsk_skinId_t sId,  eOskin_config_t **skconfig_ptr)
-// {
-// 	if((NULL == p) || (NULL == skconfig_ptr))
-// 	{
-//         return(eores_NOK_nullpointer);
-// 	}
-//     
-//     if(sId >= eo_array_Capacity(p->skinList))
-//     {
-//         return(eores_NOK_nodata);
-//     }
-//     *skconfig_ptr = NULL; //s_eo_appTheDB_GetSkinNVreference(p, mId, eOappTheDB_hid_skinNVindex_sconfig);
-//     
-//     return(eores_OK);
 
-// }
-// extern eOresult_t eo_appTheDB_GetSkinStatusPtr(EOappTheDB *p,eOsk_skinId_t sId,  eOskin_status_t **skstatus_ptr)
-// {
-// 	if((NULL == p) || (NULL == skstatus_ptr))
-// 	{
-//         return(eores_NOK_nullpointer);
-// 	}
-//     
-//     if(sId >= eo_array_Capacity(p->skinList))
-//     {
-//         return(eores_NOK_nodata);
-//     }
-//     *skstatus_ptr = NULL; //s_eo_appTheDB_GetSkinNVreference(p, mId, eOappTheDB_hid_skinNVindex_sstatus);
-//     
-//     return(eores_OK);
-
-// }
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1055,13 +926,11 @@ static eOresult_t s_appTheDB_jointslist_init(EOappTheDB *p)
     for(i = 0; i< p->cfg.jointsList->size; i++)
     {
 		j_ptr = (eOappTheDB_hid_jointInfo_t*)eo_array_At(p->jointsList, i);
+        
         j_ptr->cfg_ptr = &j_cfg_ptr[i];
-        j_ptr->connectedEnc = (eOappEncReader_encoder_t)i; //currently the ith joint has connected to ith encoder
-        j_ptr->ref2motor = (eOmc_motorId_t)i;			  //currently the ith joint has connected to ith motor
         j_ptr->shiftvalues_ptr = shiftvalues_ptr;
         j_ptr->bcastpolicy_ptr = bcastpolicy_ptr;
-        /*the curr mode will be initialized when nv jstatus will be initilized. */
-        //j_ptr->curr_mode = eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.jstatus.basic.controlmodestatus;
+        
         
         //2.1)make a connection beetween board to joint also ==> fill "connected joints list" of baord
         b_ptr = (eOappTheDB_hid_canBoardInfo_t*)eo_array_At(p->canboardsList, j_ptr->cfg_ptr->canLoc.belong2board);
@@ -1094,7 +963,6 @@ static eOresult_t s_appTheDB_motorslist_init(EOappTheDB *p)
     {
 		m_ptr = (eOappTheDB_hid_motorInfo_t*)eo_array_At(p->motorsList, i);
         m_ptr->cfg_ptr = &m_cfg_ptr[i];
-        m_ptr->ref2joint = (eOmc_jointId_t)i;
         
         //2.1)make a connection beetween board to joint also ==> fill "connected joints list" of board
 		b_ptr = (eOappTheDB_hid_canBoardInfo_t*)eo_array_At(p->canboardsList, m_ptr->cfg_ptr->canLoc.belong2board);
