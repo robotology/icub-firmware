@@ -166,7 +166,7 @@ extern eOresult_t eo_theEMSdgn_UpdateApplCore(EOTheEMSdiagnostics_t* p)
     return(eores_OK);
 }
 
-extern eOresult_t eo_theEMSdgn_UpdateApplWithMc(EOTheEMSdiagnostics_t* p, EOappEncReader* encreader_ptr)
+extern eOresult_t eo_theEMSdgn_UpdateApplWithMc(EOTheEMSdiagnostics_t* p, EOappEncReader* encreader_ptr, uint16_t count)
 {
     uint8_t i;
     eOappEncReader_diagnosticsinfo_t* dgn_ptr = eo_appEncReader_GetDiagnosticsHandle(encreader_ptr);
@@ -181,6 +181,7 @@ extern eOresult_t eo_theEMSdgn_UpdateApplWithMc(EOTheEMSdiagnostics_t* p, EOappE
         eo_dgn_emsappmc.encreads.encList[i].err_onInvalidValue = dgn_ptr->enclist[i][err_onInvalidValue];
         eo_dgn_emsappmc.encreads.encList[i].err_onParityError = dgn_ptr->enclist[i][err_onParityError];
     }
+    eo_dgn_emsappmc.encreads.count = count;
     return(eores_OK);
 }
 
