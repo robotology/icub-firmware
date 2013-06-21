@@ -188,14 +188,17 @@ typedef struct
     uint16_t err_onReadFromSpi;
     uint16_t err_onParityError;
     uint16_t err_onInvalidValue;
-} eOappEncReader_error_t;
+    uint16_t dummy;
+} eOappEncReader_error_t; //8B
 
 enum{eOdgn_emsmaxnumofencoders = 6};
 
 typedef struct
 {
    eOappEncReader_error_t encList[eOdgn_emsmaxnumofencoders]; //6 = eOeOappEncReader_encoderMaxNum
-} eOdgn_encoderreads_t;
+   uint32_t count;
+   uint32_t dummy;
+} eOdgn_encoderreads_t; //56B
 
 typedef struct
 {
