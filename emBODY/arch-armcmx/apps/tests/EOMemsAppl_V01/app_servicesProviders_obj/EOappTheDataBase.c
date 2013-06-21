@@ -45,6 +45,8 @@
 #include "eOcfg_nvsEP_as.h"
 #include "eOcfg_nvsEP_sk.h"
 
+#include "EOMtheEMSapplCfg_hid.h" //here is define type of ems used
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -88,17 +90,8 @@ static eOresult_t s_appTheDB_snsrStrainlist_init(EOappTheDB *p);
 static eOresult_t s_appTheDB_skinlist_init(EOappTheDB *p);
 static eOresult_t s_appTheDB_canaddressLookuptbl_init(EOappTheDB *p);
 
-static eOresult_t s_appTheDB_nvsrefmaps_init(EOappTheDB *p);
-static eOresult_t s_appTheDB_nvsrefmaps_jmap_fill(EOappTheDB *p, eOmc_jointId_t jId);
-static eOresult_t s_appTheDB_nvsrefmaps_mmap_fill(EOappTheDB *p, eOmc_motorId_t mId);
-static eOresult_t s_appTheDB_nvsrefmaps_snsrMaismap_fill(EOappTheDB *p, eOsnsr_maisId_t sId);
-static eOresult_t s_appTheDB_nvsrefmaps_snsrStrainmap_fill(EOappTheDB *p, eOsnsr_strainId_t sId);
-static eOresult_t s_appTheDB_nvsrefmaps_skinmap_fill(EOappTheDB *p, eOsk_skinId_t skId);
-static void* s_eo_appTheDB_GetJointNVreference(EOappTheDB *p, eOmc_jointId_t jId, eOappTheDB_hid_jointNVindex_t nvindex);
-static void* s_eo_appTheDB_GetMotorNVreference(EOappTheDB *p, eOmc_motorId_t mId, eOappTheDB_hid_motorNVindex_t nvindex);
-static void* s_eo_appTheDB_GetSnsrMaisNVreference(EOappTheDB *p, eOsnsr_maisId_t sId, eOappTheDB_hid_snsrMaisNVindex_t nvindex);
-static void* s_eo_appTheDB_GetSnsrStrainNVreference(EOappTheDB *p, eOsnsr_strainId_t sId, eOappTheDB_hid_snsrStrainNVindex_t nvindex);
-static void* s_eo_appTheDB_GetSkinNVreference(EOappTheDB *p, eOsk_skinId_t skId, eOappTheDB_hid_skinNVindex_t nvindex);
+
+static eOresult_t s_appTheDB_nvsramref_init(EOappTheDB *p);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -176,7 +169,8 @@ extern EOappTheDB* eo_appTheDB_Initialise(eOappTheDB_cfg_t *cfg)
         return(NULL);
     }
 
-    res = s_appTheDB_nvsrefmaps_init(retptr);
+    //res = s_appTheDB_nvsrefmaps_init(retptr);
+    res = s_appTheDB_nvsramref_init(retptr);
     if(eores_OK != res)
     {
         return(NULL);
@@ -571,12 +565,12 @@ extern eOresult_t eo_appTheDB_GetJointConfigPtr(EOappTheDB *p, eOmc_jointId_t jI
         return(eores_NOK_nullpointer);
 	}
     
-    if(jId >= eo_array_Capacity(p->jointsList))
+    if(jId >= p->cfg.jointsList->size)
     {
         return(eores_NOK_nodata);
     }
-    *jconfig_ptr = s_eo_appTheDB_GetJointNVreference(p, jId, eOappTheDB_hid_jointNVindex_jconfig);
-    
+
+    *jconfig_ptr = &(p->nvsram.jointsList_ptr[jId].jconfig);
     return(eores_OK);
 }
 
@@ -588,12 +582,13 @@ extern eOresult_t eo_appTheDB_GetJointStatusPtr(EOappTheDB *p, eOmc_jointId_t jI
         return(eores_NOK_nullpointer);
 	}
     
-    if(jId >= eo_array_Capacity(p->jointsList))
+    if(jId >= p->cfg.jointsList->size)
     {
         return(eores_NOK_nodata);
     }
-    *jstatus_ptr = s_eo_appTheDB_GetJointNVreference(p, jId, eOappTheDB_hid_jointNVindex_jstatus);
+
     
+    *jstatus_ptr = &(p->nvsram.jointsList_ptr[jId].jstatus);
     return(eores_OK);
 }
 
@@ -605,11 +600,12 @@ extern eOresult_t eo_appTheDB_GetJointInputsPtr(EOappTheDB *p, eOmc_jointId_t jI
         return(eores_NOK_nullpointer);
 	}
     
-    if(jId >= eo_array_Capacity(p->jointsList))
+    if(jId >= p->cfg.jointsList->size)
     {
         return(eores_NOK_nodata);
     }
-    *jinputs_ptr = s_eo_appTheDB_GetJointNVreference(p, jId, eOappTheDB_hid_jointNVindex_jinputs);
+    
+    *jinputs_ptr = &(p->nvsram.jointsList_ptr[jId].jinputs);
     
     return(eores_OK);
 }
@@ -622,11 +618,13 @@ extern eOresult_t eo_appTheDB_GetJointCmdControlmodePtr(EOappTheDB *p, eOmc_join
         return(eores_NOK_nullpointer);
 	}
     
-    if(jId >= eo_array_Capacity(p->jointsList))
+    if(jId >= p->cfg.jointsList->size)
     {
         return(eores_NOK_nodata);
     }
-    *jcmdcontrolmode_ptr = s_eo_appTheDB_GetJointNVreference(p, jId, eOappTheDB_hid_jointNVindex_jcmmnds__controlmode);
+    
+    
+    *jcmdcontrolmode_ptr = (eOmc_controlmode_t*)&(p->nvsram.jointsList_ptr[jId].jcmmnds.controlmode);
     
     return(eores_OK);
 }
@@ -725,13 +723,12 @@ extern eOresult_t eo_appTheDB_GetMotorConfigPtr(EOappTheDB *p, eOmc_motorId_t mI
         return(eores_NOK_nullpointer);
 	}
 
-    if(mId >= eo_array_Capacity(p->motorsList))
+    if(mId >= p->cfg.motorsList->size)
     {
-        *mconfig_ptr = NULL;
         return(eores_NOK_nodata);
     }
     
-    *mconfig_ptr = s_eo_appTheDB_GetMotorNVreference(p, mId, eOappTheDB_hid_motorNVindex_mconfig);
+    *mconfig_ptr =  &(p->nvsram.motorsList_ptr[mId].mconfig);
     
     return(eores_OK);
 }
@@ -744,11 +741,12 @@ extern eOresult_t eo_appTheDB_GetMotorStatusPtr(EOappTheDB *p, eOmc_motorId_t mI
         return(eores_NOK_nullpointer);
 	}
     
-    if(mId >= eo_array_Capacity(p->motorsList))
+    if(mId >= p->cfg.motorsList->size)
     {
         return(eores_NOK_nodata);
     }
-    *mstatus_ptr = s_eo_appTheDB_GetMotorNVreference(p, mId, eOappTheDB_hid_motorNVindex_mstaus);
+    
+    *mstatus_ptr = &(p->nvsram.motorsList_ptr[mId].mstatus);
     
     return(eores_OK);
 }
@@ -761,11 +759,12 @@ extern eOresult_t eo_appTheDB_GetSnrMaisConfigPtr(EOappTheDB *p, eOsnsr_maisId_t
         return(eores_NOK_nullpointer);
 	}
     
-    if(sId >= eo_array_Capacity(p->snsrMaisList))
+    if(sId >= p->cfg.snsrMaisList->size)
     {
         return(eores_NOK_nodata);
     }
-    *sconfig_ptr = s_eo_appTheDB_GetSnsrMaisNVreference(p, sId, eOappTheDB_hid_snsrMaisNVindex_mconfig);
+
+    *sconfig_ptr = &(p->nvsram.maisList_ptr[sId].mconfig);
     
     return(eores_OK);
 
@@ -778,11 +777,12 @@ extern eOresult_t eo_appTheDB_GetSnrMaisStatusPtr(EOappTheDB *p, eOsnsr_maisId_t
         return(eores_NOK_nullpointer);
 	}
     
-    if(sId >= eo_array_Capacity(p->snsrMaisList))
+    if(sId >= p->cfg.snsrMaisList->size)
     {
         return(eores_NOK_nodata);
     }
-    *sstatus_ptr = s_eo_appTheDB_GetSnsrMaisNVreference(p, sId, eOappTheDB_hid_snsrMaisNVindex_mstatus);
+    
+    *sstatus_ptr = &(p->nvsram.maisList_ptr[sId].mstatus);
     
     return(eores_OK);
 
@@ -796,11 +796,12 @@ extern eOresult_t eo_appTheDB_GetSnrStrainConfigPtr(EOappTheDB *p, eOsnsr_strain
         return(eores_NOK_nullpointer);
 	}
     
-    if(sId >= eo_array_Capacity(p->snsrStrainList))
+    if(sId >= p->cfg.snsrStrainList->size)
     {
         return(eores_NOK_nodata);
     }
-    *sconfig_ptr = s_eo_appTheDB_GetSnsrStrainNVreference(p, sId, eOappTheDB_hid_snsrStrainNVindex_sconfig);
+    
+    *sconfig_ptr = &(p->nvsram.strainList_ptr[sId].sconfig);
     
     return(eores_OK);
 
@@ -814,11 +815,12 @@ extern eOresult_t eo_appTheDB_GetSnrStrainStatusPtr(EOappTheDB *p, eOsnsr_strain
         return(eores_NOK_nullpointer);
 	}
     
-    if(sId >= eo_array_Capacity(p->snsrStrainList))
+    if(sId >= p->cfg.snsrStrainList->size)
     {
         return(eores_NOK_nodata);
     }
-    *sstatus_ptr = s_eo_appTheDB_GetSnsrStrainNVreference(p, sId, eOappTheDB_hid_snsrStrainNVindex_sstatus);
+    
+    *sstatus_ptr = &(p->nvsram.strainList_ptr[sId].sstatus);
     
     return(eores_OK);
 
@@ -831,11 +833,11 @@ extern eOresult_t eo_appTheDB_GetSkinCfgSigModePtr(EOappTheDB *p,eOsk_skinId_t s
         return(eores_NOK_nullpointer);
 	}
     
-    if(skId >= eo_array_Capacity(p->skinList))
+    if(skId >= p->cfg.skinList->size)
     {
         return(eores_NOK_nodata);
     }
-    *sigmode_ptr = s_eo_appTheDB_GetSkinNVreference(p, skId, eOappTheDB_hid_skinNVindex_sconfig__sigmode);
+    *sigmode_ptr = (eOskin_sigmode_t*)&(p->nvsram.someskin_ptr->sconfig.sigmode);
     
     return(eores_OK);
 
@@ -847,11 +849,11 @@ extern eOresult_t eo_appTheDB_GetSkinStArray10CanFramesPtr(EOappTheDB *p,eOsk_sk
         return(eores_NOK_nullpointer);
 	}
     
-    if(skId >= eo_array_Capacity(p->skinList))
+    if(skId >= p->cfg.skinList->size)
     {
         return(eores_NOK_nodata);
     }
-    *arrayof10canframes_ptr = s_eo_appTheDB_GetSkinNVreference(p, skId, eOappTheDB_hid_skinNVindex_sstaus__arrayof10canframe);
+    *arrayof10canframes_ptr = &(p->nvsram.someskin_ptr->sstatus.arrayof10canframes);
     
     return(eores_OK);
 
@@ -1255,296 +1257,133 @@ static eOresult_t s_appTheDB_canaddressLookuptbl_init(EOappTheDB *p)
 }
 
 
-static eOresult_t s_appTheDB_nvsrefmaps_init(EOappTheDB *p)
+
+static eOresult_t s_appTheDB_nvsramref_init(EOappTheDB *p)
 {
-    eOresult_t res;
-    uint16_t size, i;
-    eOmc_joint_status_t *jstatus_ptr;
-
-//joint
-    size = eo_array_Capacity(p->jointsList);
-    p->nvsrefMaps.jnvMap = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(void**), size);
-      
-    for(i=0; i<size; i++)
-    {
-        p->nvsrefMaps.jnvMap[i] = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
-                                                sizeof(void*), eOappTheDB_hid_jointNVindex_TOTALnumber); 
-        
-        res = s_appTheDB_nvsrefmaps_jmap_fill(p, (eOmc_jointId_t)i);
-        if(eores_OK  != res)
-        {
-            return(res);
-        }
-        eo_appTheDB_GetJointStatusPtr(p, i,  &jstatus_ptr);
-        eo_appTheDB_SetJointCurrentControlmode(p, i, (eOmc_controlmode_t)jstatus_ptr->basic.controlmodestatus);
-        
-    }
     
-//motor
-    size = eo_array_Capacity(p->motorsList);
-    p->nvsrefMaps.mnvMap = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(void**), size);
-      
-    for(i=0; i<size; i++)
-    {
-        p->nvsrefMaps.mnvMap[i] = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
-                                                sizeof(void*), eOappTheDB_hid_motorNVindex_TOTALnumber);
+    eOmc_joint_t            *jointsList_ptr  = NULL;
+    eOmc_motor_t            *motorsList_ptr  = NULL;
+    eOmc_controller_t       *thecontroller   = NULL;
+    eOsnsr_mais_t           *maisList_ptr    = NULL;
+    eOsnsr_strain_t         *strainList_ptr  = NULL;
+    eOskin_someskin_t       *someskin_ptr    = NULL;
 
-        res = s_appTheDB_nvsrefmaps_mmap_fill(p, (eOmc_motorId_t)i);
-        if(eores_OK  != res)
-        {
-            return(res);
-        }
-
-    }
     
+#if  defined(EOMTHEEMSAPPLCFG_USE_EB1)
+    //mc
+    eo_cfg_nvsEP_mc_upperarm_t *mc_ptr = (eo_cfg_nvsEP_mc_upperarm_t*)eo_cfg_nvsEP_eb1_Get_locallyownedRAM(p->cfg.mc_endpoint);
+    jointsList_ptr = &mc_ptr->joints[0];
+    motorsList_ptr = &mc_ptr->motors[0];
+    thecontroller = &mc_ptr->thecontroller;
     
-//mais
-    size = eo_array_Capacity(p->snsrMaisList);
-    p->nvsrefMaps.snsrMaisnvMap = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(void**), size);
-      
-    for(i=0; i<size; i++)
-    {
-        p->nvsrefMaps.snsrMaisnvMap[i] = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
-                                                sizeof(void*), eOappTheDB_hid_snsrMaisNVindex_TOTALnumber);
-
-        res = s_appTheDB_nvsrefmaps_snsrMaismap_fill(p, (eOsnsr_maisId_t)i);
-        if(eores_OK  != res)
-        {
-            return(res);
-        }
-
-    }
-
-
-//strain
-    size = eo_array_Capacity(p->snsrStrainList);
-    p->nvsrefMaps.snsrStrainnvMap = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(void**), size);
-      
-    for(i=0; i<size; i++)
-    {
-        p->nvsrefMaps.snsrStrainnvMap[i] = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
-                                                sizeof(void*), eOappTheDB_hid_snsrStrainNVindex_TOTALnumber);
-
-        res = s_appTheDB_nvsrefmaps_snsrStrainmap_fill(p, (eOsnsr_strainId_t)i);
-        if(eores_OK  != res)
-        {
-            return(res);
-        }
-
-    }
-    
-//skin
-    size = eo_array_Capacity(p->skinList);
-    p->nvsrefMaps.skinnvMap = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(void**), size);
-      
-    for(i=0; i<size; i++)
-    {
-        p->nvsrefMaps.skinnvMap[i] = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
-                                                sizeof(void*), eOappTheDB_hid_skinNVindex_TOTALnumber);
-
-        res = s_appTheDB_nvsrefmaps_skinmap_fill(p, (eOsk_skinId_t)i);
-        if(eores_OK  != res)
-        {
-            return(res);
-        }
-
-    }
-
-    return(eores_OK);
-}
-
-
-static eOresult_t s_appTheDB_nvsrefmaps_jmap_fill(EOappTheDB *p, eOmc_jointId_t jId)
-{
-    uint16_t                        ipindex, epindex, idindex;
-    EOnv                            nv;
-    EOnv                            *nv_res_ptr;
-    eOnvID_t                        nv_id;
-    eOresult_t                      res;
-    eOappTheDB_hid_jointNVindex_t   jnvindex;
-
-    for(jnvindex=eOappTheDB_hid_jointNVindex_jconfig /*=0*/; jnvindex<eOappTheDB_hid_jointNVindex_TOTALnumber; jnvindex++)
-    {
-        nv_id = eo_cfg_nvsEP_mc_joint_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)p->cfg.mc_endpoint, 
-                                               (eOcfg_nvsEP_mc_jointNumber_t)jId, 
-                                               eo_appTheDB_hid_GetMCjointNVindex(jnvindex));
-            
-        res = eo_nvscfg_GetIndices(p->cfg.nvsCfg, eok_ipv4addr_localhost, p->cfg.mc_endpoint, nv_id, 
-                                   &ipindex, &epindex, &idindex); 
-        if(eores_OK != res)
-        {
-            return(res);
-        }
-        nv_res_ptr = eo_nvscfg_GetNV(p->cfg.nvsCfg, ipindex, epindex, idindex, NULL, &nv);
-        if(NULL == nv_res_ptr)
-        {
-            return(eores_NOK_nullpointer);    
-        }
-        p->nvsrefMaps.jnvMap[jId][jnvindex] = nv.loc;  
-
-    }
-    return(eores_OK);
-}
-
-
-
-static eOresult_t s_appTheDB_nvsrefmaps_mmap_fill(EOappTheDB *p, eOmc_motorId_t mId)
-{
-    uint16_t                        ipindex, epindex, idindex;
-    EOnv                            nv;
-    EOnv                            *nv_res_ptr;
-    eOnvID_t                        nv_id;
-    eOresult_t                      res;
-    eOappTheDB_hid_motorNVindex_t   mnvindex;
-
-    for(mnvindex=eOappTheDB_hid_motorNVindex_mconfig /*=0*/; mnvindex<eOappTheDB_hid_motorNVindex_TOTALnumber; mnvindex++)
-    {
-        nv_id = eo_cfg_nvsEP_mc_motor_NVID_Get((eOcfg_nvsEP_mc_endpoint_t)p->cfg.mc_endpoint, 
-                                               (eOcfg_nvsEP_mc_motorNumber_t)mId, 
-                                               eo_appTheDB_hid_GetMCmotorNVindex(mnvindex));
-            
-        res = eo_nvscfg_GetIndices(p->cfg.nvsCfg, eok_ipv4addr_localhost, p->cfg.mc_endpoint, nv_id, 
-                                   &ipindex, &epindex, &idindex); 
-        if(eores_OK != res)
-        {
-            return(res);
-        }
-        nv_res_ptr = eo_nvscfg_GetNV(p->cfg.nvsCfg, ipindex, epindex, idindex, NULL, &nv);
-        if(NULL == nv_res_ptr)
-        {
-            return(eores_NOK_nullpointer);    
-        }
-        p->nvsrefMaps.mnvMap[mId][mnvindex] = nv.loc;  
-
-    }
-    return(eores_OK);
-}
-
-
-
-static eOresult_t s_appTheDB_nvsrefmaps_snsrMaismap_fill(EOappTheDB *p, eOsnsr_maisId_t sId)
-{
-    uint16_t                            ipindex, epindex, idindex;
-    EOnv                                nv;
-    EOnv                                *nv_res_ptr;
-    eOnvID_t                            nv_id;
-    eOresult_t                          res;
-    eOappTheDB_hid_snsrMaisNVindex_t   snvindex;
+    //strain 
+    eo_cfg_nvsEP_as_onestrain_t *as_ptr = (eo_cfg_nvsEP_as_onestrain_t *)eo_cfg_nvsEP_eb1_Get_locallyownedRAM(p->cfg.as_endpoint);
+    strainList_ptr = &as_ptr->strains[0];
     
 
-    for(snvindex=eOappTheDB_hid_snsrMaisNVindex_mconfig /*=0*/; snvindex<eOappTheDB_hid_snsrMaisNVindex_TOTALnumber; snvindex++)
-    {
-        nv_id = eo_cfg_nvsEP_as_mais_NVID_Get((eOcfg_nvsEP_as_endpoint_t)p->cfg.as_endpoint, 
-                                               (eOcfg_nvsEP_as_maisNumber_t)sId, 
-                                               eo_appTheDB_hid_GetASmaisNVindex(snvindex));
-            
-        res = eo_nvscfg_GetIndices(p->cfg.nvsCfg, eok_ipv4addr_localhost, p->cfg.as_endpoint, nv_id, 
-                                   &ipindex, &epindex, &idindex); 
-        if(eores_OK != res)
-        {
-            return(res);
-        }
-        nv_res_ptr = eo_nvscfg_GetNV(p->cfg.nvsCfg, ipindex, epindex, idindex, NULL, &nv);
-        if(NULL == nv_res_ptr)
-        {
-            return(eores_NOK_nullpointer);    
-        }
-        p->nvsrefMaps.snsrMaisnvMap[sId][snvindex] = nv.loc;  
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB2)
+    //mc
+    eo_cfg_nvsEP_mc_lowerarm_t *mc_ptr = (eo_cfg_nvsEP_mc_lowerarm_t*)eo_cfg_nvsEP_eb2_Get_locallyownedRAM(p->cfg.mc_endpoint);
+    jointsList_ptr = &mc_ptr->joints[0];
+    motorsList_ptr = &mc_ptr->motors[0];
+    thecontroller = &mc_ptr->thecontroller;
+    
+    //mais
+    eo_cfg_nvsEP_as_onemais_t *as_ptr = (eo_cfg_nvsEP_as_onemais_t *)eo_cfg_nvsEP_eb2_Get_locallyownedRAM(p->cfg.as_endpoint);
+    maisList_ptr = &as_ptr->maises[0];
+    
+    //skin
+    eo_cfg_nvsEP_sk_emsboard_t * sk_ptr = (eo_cfg_nvsEP_sk_emsboard_t *)eo_cfg_nvsEP_eb2_Get_locallyownedRAM(p->cfg.sk_endpoint);
+    someskin_ptr  = &sk_ptr->someskin;
+  
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB3)
+    //mc
+    eo_cfg_nvsEP_mc_upperarm_t *mc_ptr = (eo_cfg_nvsEP_mc_upperarm_t*)eo_cfg_nvsEP_eb3_Get_locallyownedRAM(p->cfg.mc_endpoint);
+    jointsList_ptr = &mc_ptr->joints[0];
+    motorsList_ptr = &mc_ptr->motors[0];
+    thecontroller = &mc_ptr->thecontroller;
+    
+    //strain 
+    eo_cfg_nvsEP_as_onestrain_t *as_ptr = (eo_cfg_nvsEP_as_onestrain_t *)eo_cfg_nvsEP_eb3_Get_locallyownedRAM(p->cfg.as_endpoint);
+    strainList_ptr = &as_ptr->strains[0];
+    
+    
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB4)
+    //mc
+    eo_cfg_nvsEP_mc_lowerarm_t *mc_ptr = (eo_cfg_nvsEP_mc_lowerarm_t*)eo_cfg_nvsEP_eb4_Get_locallyownedRAM(p->cfg.mc_endpoint);
+    jointsList_ptr = &mc_ptr->joints[0];
+    motorsList_ptr = &mc_ptr->motors[0];
+    thecontroller = &mc_ptr->thecontroller;
+    
+    //mais
+    eo_cfg_nvsEP_as_onemais_t *as_ptr = (eo_cfg_nvsEP_as_onemais_t *)eo_cfg_nvsEP_eb4_Get_locallyownedRAM(p->cfg.as_endpoint);
+    maisList_ptr = &as_ptr->maises[0];
+    
+    //skin
+    eo_cfg_nvsEP_sk_emsboard_t * sk_ptr = (eo_cfg_nvsEP_sk_emsboard_t *)eo_cfg_nvsEP_eb4_Get_locallyownedRAM(p->cfg.sk_endpoint);
+    someskin_ptr  = &sk_ptr->someskin;
+    
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
+    //mc
+    eo_cfg_nvsEP_mc_torso_t *mc_ptr = (eo_cfg_nvsEP_mc_torso_t*)eo_cfg_nvsEP_eb5_Get_locallyownedRAM(p->cfg.mc_endpoint);
+    jointsList_ptr = &mc_ptr->joints[0];
+    motorsList_ptr = &mc_ptr->motors[0];
+    thecontroller = &mc_ptr->thecontroller;
+    
+    
+#elif  defined(EOMTHEEMSAPPLCFG_USE_EB6)
+    //mc
+    eo_cfg_nvsEP_mc_upperleg_t *mc_ptr = (eo_cfg_nvsEP_mc_upperleg_t*)eo_cfg_nvsEP_eb6_Get_locallyownedRAM(p->cfg.mc_endpoint);
+    jointsList_ptr = &mc_ptr->joints[0];
+    motorsList_ptr = &mc_ptr->motors[0];
+    thecontroller = &mc_ptr->thecontroller;
+    
+    //strain 
+    eo_cfg_nvsEP_as_onestrain_t *as_ptr = (eo_cfg_nvsEP_as_onestrain_t *)eo_cfg_nvsEP_eb6_Get_locallyownedRAM(p->cfg.as_endpoint);
+    strainList_ptr = &as_ptr->strains[0];
 
-    }
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB7)
+    //mc
+    eo_cfg_nvsEP_mc_lowerleg_t *mc_ptr = (eo_cfg_nvsEP_mc_lowerleg_t*)eo_cfg_nvsEP_eb7_Get_locallyownedRAM(p->cfg.mc_endpoint);
+    jointsList_ptr = &mc_ptr->joints[0];
+    motorsList_ptr = &mc_ptr->motors[0];
+    thecontroller = &mc_ptr->thecontroller;
+    
+    
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB8)
+    //mc
+    eo_cfg_nvsEP_mc_upperleg_t *mc_ptr = (eo_cfg_nvsEP_mc_upperleg_t*)eo_cfg_nvsEP_eb8_Get_locallyownedRAM(p->cfg.mc_endpoint);
+    jointsList_ptr = &mc_ptr->joints[0];
+    motorsList_ptr = &mc_ptr->motors[0];
+    thecontroller = &mc_ptr->thecontroller;
+    
+    //strain 
+    eo_cfg_nvsEP_as_onestrain_t *as_ptr = (eo_cfg_nvsEP_as_onestrain_t *)eo_cfg_nvsEP_eb8_Get_locallyownedRAM(p->cfg.as_endpoint);
+    strainList_ptr = &as_ptr->strains[0];
+
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB9)
+    //mc
+    eo_cfg_nvsEP_mc_lowerleg_t *mc_ptr = (eo_cfg_nvsEP_mc_lowerleg_t*)eo_cfg_nvsEP_eb9_Get_locallyownedRAM(p->cfg.mc_endpoint);
+    jointsList_ptr = &mc_ptr->joints[0];
+    motorsList_ptr = &mc_ptr->motors[0];
+    thecontroller = &mc_ptr->thecontroller;
+#else
+    #error --> you must define an EBx
+#endif
+    
+    
+    p->nvsram.jointsList_ptr = jointsList_ptr;
+    p->nvsram.motorsList_ptr = motorsList_ptr;
+    p->nvsram.thecontroller = thecontroller;
+    p->nvsram.maisList_ptr = maisList_ptr;
+    p->nvsram.strainList_ptr = strainList_ptr;
+    p->nvsram.someskin_ptr = someskin_ptr;
+
+
     return(eores_OK);
 }
 
-static eOresult_t s_appTheDB_nvsrefmaps_snsrStrainmap_fill(EOappTheDB *p, eOsnsr_strainId_t sId)
-{
-    uint16_t                            ipindex, epindex, idindex;
-    EOnv                                nv;
-    EOnv                                *nv_res_ptr;
-    eOnvID_t                            nv_id;
-    eOresult_t                          res;
-    eOappTheDB_hid_snsrStrainNVindex_t   snvindex;
 
-    for(snvindex=eOappTheDB_hid_snsrStrainNVindex_sconfig /*=0*/; snvindex<eOappTheDB_hid_snsrStrainNVindex_TOTALnumber; snvindex++)
-    {
-        nv_id = eo_cfg_nvsEP_as_strain_NVID_Get((eOcfg_nvsEP_as_endpoint_t)p->cfg.as_endpoint, 
-                                               (eOcfg_nvsEP_as_strainNumber_t)sId, 
-                                               eo_appTheDB_hid_GetASstrainNVindex(snvindex));
-            
-        res = eo_nvscfg_GetIndices(p->cfg.nvsCfg, eok_ipv4addr_localhost, p->cfg.as_endpoint, nv_id, 
-                                   &ipindex, &epindex, &idindex); 
-        if(eores_OK != res)
-        {
-            return(res);
-        }
-        nv_res_ptr = eo_nvscfg_GetNV(p->cfg.nvsCfg, ipindex, epindex, idindex, NULL, &nv);
-        if(NULL == nv_res_ptr)
-        {
-            return(eores_NOK_nullpointer);    
-        }
-        p->nvsrefMaps.snsrStrainnvMap[sId][snvindex] = nv.loc;  
-
-    }
-    return(eores_OK);
-}
-
-
-static eOresult_t s_appTheDB_nvsrefmaps_skinmap_fill(EOappTheDB *p, eOsk_skinId_t skId)
-{
-    uint16_t                            ipindex, epindex, idindex;
-    EOnv                                nv;
-    EOnv                                *nv_res_ptr;
-    eOnvID_t                            nv_id;
-    eOresult_t                          res;
-    eOappTheDB_hid_skinNVindex_t        sknvindex;
-
-    for(sknvindex=eOappTheDB_hid_skinNVindex_sconfig__sigmode /*=0*/; sknvindex<eOappTheDB_hid_skinNVindex_TOTALnumber; sknvindex++)
-    {
-        nv_id = eo_cfg_nvsEP_sk_NVID_Get((eOcfg_nvsEP_sk_endpoint_t)p->cfg.sk_endpoint, 
-                                         (eOcfg_nvsEP_sk_skinNumber_t)skId, 
-                                          eo_appTheDB_hid_GetSKskinNVindex(sknvindex));
-            
-        res = eo_nvscfg_GetIndices(p->cfg.nvsCfg, eok_ipv4addr_localhost, p->cfg.sk_endpoint, nv_id, 
-                                   &ipindex, &epindex, &idindex); 
-        if(eores_OK != res)
-        {
-            return(res);
-        }
-        nv_res_ptr = eo_nvscfg_GetNV(p->cfg.nvsCfg, ipindex, epindex, idindex, NULL, &nv);
-        if(NULL == nv_res_ptr)
-        {
-            return(eores_NOK_nullpointer);    
-        }
-        p->nvsrefMaps.skinnvMap[skId][sknvindex] = nv.loc;  
-
-    }
-    return(eores_OK);
-}
-
-static void* s_eo_appTheDB_GetJointNVreference(EOappTheDB *p, eOmc_jointId_t jId, eOappTheDB_hid_jointNVindex_t nvindex)
-{
-	return(p->nvsrefMaps.jnvMap[jId][nvindex]);
-}
-
-static void* s_eo_appTheDB_GetMotorNVreference(EOappTheDB *p, eOmc_motorId_t mId, eOappTheDB_hid_motorNVindex_t nvindex)
-{
-	return(p->nvsrefMaps.mnvMap[mId][nvindex]);
-}
-
-static void* s_eo_appTheDB_GetSnsrMaisNVreference(EOappTheDB *p, eOsnsr_maisId_t sId, eOappTheDB_hid_snsrMaisNVindex_t nvindex)
-{
-	return(p->nvsrefMaps.snsrMaisnvMap[sId][nvindex]);
-}
-
-static void* s_eo_appTheDB_GetSnsrStrainNVreference(EOappTheDB *p, eOsnsr_strainId_t sId, eOappTheDB_hid_snsrStrainNVindex_t nvindex)
-{
-	return(p->nvsrefMaps.snsrStrainnvMap[sId][nvindex]);
-}
-
-
-static void* s_eo_appTheDB_GetSkinNVreference(EOappTheDB *p, eOsk_skinId_t skId, eOappTheDB_hid_skinNVindex_t nvindex)
-{
-	return(p->nvsrefMaps.skinnvMap[skId][nvindex]);
-}
 
 
 // --------------------------------------------------------------------------------------------------------------------

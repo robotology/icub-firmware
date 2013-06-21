@@ -115,6 +115,15 @@ typedef struct
 //     eOicubCanProto_canBoardAddress_t    maxusedcanaddr4motorboard;
 // } eOappTheDB_hid_generaldata_t;
 
+typedef struct
+{
+    eOmc_joint_t            *jointsList_ptr;    
+    eOmc_motor_t            *motorsList_ptr;
+    eOmc_controller_t       *thecontroller;
+    eOsnsr_mais_t           *maisList_ptr;
+    eOsnsr_strain_t         *strainList_ptr;
+    eOskin_someskin_t       *someskin_ptr;
+} eOappTheDB_hid_nvsRamRef_t;
 
 
 struct EOappTheDB_hid
@@ -132,111 +141,15 @@ struct EOappTheDB_hid
 		eOsizecntnr_t 		capacity;
 		eObrd_boardId_t		*tbl; /* gli indici partono da zero,a nche se l'inidirizzo zero sar'a' sempre usato dalla ems.*/
 	}canaddressLookuptbl;
-	
-	struct
-	{
-		void ***jnvMap;
-		void ***mnvMap;
-		void ***snsrMaisnvMap;
-		void ***snsrStrainnvMap;
-		void ***skinnvMap;
-	}nvsrefMaps;
 
+    eOappTheDB_hid_nvsRamRef_t nvsram;
 
 };
 
 
 
-typedef enum
-{
-    eOappTheDB_hid_jointNVindex_jconfig                               = 0,
-    eOappTheDB_hid_jointNVindex_jstatus                                = 1,
-    eOappTheDB_hid_jointNVindex_jinputs                               = 2,
-    eOappTheDB_hid_jointNVindex_jcmmnds__calibration                  = 3,
-    eOappTheDB_hid_jointNVindex_jcmmnds__setpoint                     = 4,
-    eOappTheDB_hid_jointNVindex_jcmmnds__stoptrajectory               = 5,
-    eOappTheDB_hid_jointNVindex_jcmmnds__controlmode                  = 6,
-} eOappTheDB_hid_jointNVindex_t;
-enum{ eOappTheDB_hid_jointNVindex_TOTALnumber = eOappTheDB_hid_jointNVindex_jcmmnds__controlmode +1 };
-
-
-typedef enum
-{
-    eOappTheDB_hid_motorNVindex_mconfig                               = 0,
-    eOappTheDB_hid_motorNVindex_mstaus                                = 1
-} eOappTheDB_hid_motorNVindex_t;
-
-enum{ eOappTheDB_hid_motorNVindex_TOTALnumber = eOappTheDB_hid_motorNVindex_mstaus +1 };
-
-
-
-
-
-typedef enum
-{
-    eOappTheDB_hid_snsrMaisNVindex_mconfig                               = 0,
-    eOappTheDB_hid_snsrMaisNVindex_mstatus                               = 1
-} eOappTheDB_hid_snsrMaisNVindex_t;
-
-enum{ eOappTheDB_hid_snsrMaisNVindex_TOTALnumber = eOappTheDB_hid_snsrMaisNVindex_mstatus +1 };
-
-
-typedef enum
-{
-    eOappTheDB_hid_snsrStrainNVindex_sconfig                               = 0,
-    eOappTheDB_hid_snsrStrainNVindex_sstatus                               = 1
-} eOappTheDB_hid_snsrStrainNVindex_t;
-
-enum{ eOappTheDB_hid_snsrStrainNVindex_TOTALnumber = eOappTheDB_hid_snsrStrainNVindex_sstatus +1 };
-
-
-typedef enum
-{
-    eOappTheDB_hid_skinNVindex_sconfig__sigmode                            = 0,
-    eOappTheDB_hid_skinNVindex_sstaus__arrayof10canframe                   = 1
-} eOappTheDB_hid_skinNVindex_t;
-
-enum{ eOappTheDB_hid_skinNVindex_TOTALnumber = eOappTheDB_hid_skinNVindex_sstaus__arrayof10canframe +1 };
 
 // - declaration of const ---------------------------------------------------------------------------
-
-static const eOcfg_nvsEP_mc_jointNVindex_t s_eoappTheDB_jointIndexMap[eOappTheDB_hid_jointNVindex_TOTALnumber] = 
-{
-    jointNVindex_jconfig,
-    jointNVindex_jstatus,
-    jointNVindex_jinputs,
-    jointNVindex_jcmmnds__calibration,
-    jointNVindex_jcmmnds__setpoint,
-    jointNVindex_jcmmnds__stoptrajectory,
-    jointNVindex_jcmmnds__controlmode
-};
-
-
-static const eOcfg_nvsEP_mc_motorNVindex_t s_eoappTheDB_motorIndexMap[eOappTheDB_hid_motorNVindex_TOTALnumber] = 
-{
-    motorNVindex_mconfig,
-    motorNVindex_mstatus
-};
-
-static const eOcfg_nvsEP_as_maisNVindex_t s_eoappTheDB_snsrMaisIndexMap[eOappTheDB_hid_snsrMaisNVindex_TOTALnumber] = 
-{
-    maisNVindex_mconfig,
-    maisNVindex_mstatus
-};
-
-static const eOcfg_nvsEP_as_strainNVindex_t s_eoappTheDB_snsrStrainIndexMap[eOappTheDB_hid_snsrStrainNVindex_TOTALnumber] = 
-{
-    strainNVindex_sconfig,
-    strainNVindex_sstatus
-};
-
-
-static const eOcfg_nvsEP_sk_skinNVindex_t s_eoappTheDB_skinIndexMap[eOappTheDB_hid_skinNVindex_TOTALnumber] = 
-{
-    skinNVindex_sconfig__sigmode,
-    skinNVindex_sstatus__arrayof10canframe
-};
-
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
@@ -245,35 +158,6 @@ EO_extern_inline eObrd_boardId_t eo_appTheDB_hid_GetBoardIdWithAddress(EOappTheD
 {
     return(p->canaddressLookuptbl.tbl[addr]);
 }
-
-EO_extern_inline eOcfg_nvsEP_mc_jointNVindex_t eo_appTheDB_hid_GetMCjointNVindex(eOappTheDB_hid_jointNVindex_t index)
-{
-    return(s_eoappTheDB_jointIndexMap[index]);
-}
-
-
-EO_extern_inline eOcfg_nvsEP_mc_motorNVindex_t eo_appTheDB_hid_GetMCmotorNVindex(eOappTheDB_hid_motorNVindex_t index)
-{
-    return(s_eoappTheDB_motorIndexMap[index]);
-}
-
-EO_extern_inline eOcfg_nvsEP_as_maisNVindex_t eo_appTheDB_hid_GetASmaisNVindex(eOappTheDB_hid_snsrMaisNVindex_t index)
-{
-    return(s_eoappTheDB_snsrMaisIndexMap[index]);
-}
-
-
-EO_extern_inline eOcfg_nvsEP_as_strainNVindex_t eo_appTheDB_hid_GetASstrainNVindex(eOappTheDB_hid_snsrStrainNVindex_t index)
-{
-    return(s_eoappTheDB_snsrStrainIndexMap[index]);
-}
-
-
-EO_extern_inline eOcfg_nvsEP_sk_skinNVindex_t eo_appTheDB_hid_GetSKskinNVindex(eOappTheDB_hid_skinNVindex_t index)
-{
-    return(s_eoappTheDB_skinIndexMap[index]);
-}
-
 
 
 #ifdef __cplusplus
