@@ -88,109 +88,109 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #if !defined(OVERRIDE_eoprot_ep_as_fun_INITIALISE)
-__weak extern void eoprot_ep_as_fun_INITIALISE(eOnvEP_t ep, void *loc, void *rem) {}
+__weak extern void eoprot_ep_as_fun_INITIALISE(eOnvEP_t ep, void *ram) {}
 #endif
 
 
 
 #if !defined(OVERRIDE_eoprot_ep_as_fun_INIT_strain_config)
-__weak extern void eoprot_ep_as_fun_INIT_strain_config(const EOnv* nv, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_INIT_strain_config(const EOnv* nv) {}
 #endif
 #if !defined(OVERRIDE_eoprot_ep_as_fun_UPDT_strain_config)
-__weak extern void eoprot_ep_as_fun_UPDT_strain_config(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_UPDT_strain_config(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
 
 #if !defined(OVERRIDE_eoprot_ep_as_fun_INIT_strain_config__mode)
-__weak extern void eoprot_ep_as_fun_INIT_strain_config__mode(const EOnv* nv, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_INIT_strain_config__mode(const EOnv* nv) {}
 #endif
 #if !defined(OVERRIDE_eoprot_ep_as_fun_UPDT_strain_config__mode)
-__weak extern void eoprot_ep_as_fun_UPDT_strain_config__mode(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_UPDT_strain_config__mode(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
 
 #if !defined(OVERRIDE_eoprot_ep_as_fun_INIT_strain_config__datarate)
-__weak extern void eoprot_ep_as_fun_INIT_strain_config__datarate(const EOnv* nv, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_INIT_strain_config__datarate(const EOnv* nv) {}
 #endif
 #if !defined(OVERRIDE_eoprot_ep_as_fun_UPDT_strain_config__datarate)
-__weak extern void eoprot_ep_as_fun_UPDT_strain_config__datarate(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_UPDT_strain_config__datarate(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
 #if !defined(OVERRIDE_eoprot_ep_as_fun_INIT_strain_config__signaloncefullscale)
-__weak extern void eoprot_ep_as_fun_INIT_strain_config__signaloncefullscale(const EOnv* nv, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_INIT_strain_config__signaloncefullscale(const EOnv* nv) {}
 #endif
 #if !defined(OVERRIDE_eoprot_ep_as_fun_UPDT_strain_config__signaloncefullscale)
-__weak extern void eoprot_ep_as_fun_UPDT_strain_config__signaloncefullscale(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_UPDT_strain_config__signaloncefullscale(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
 #if !defined(OVERRIDE_eoprot_ep_as_fun_INIT_strain_status)
-__weak extern void eoprot_ep_as_fun_INIT_strain_status(const EOnv* nv, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_INIT_strain_status(const EOnv* nv) {}
 #endif
 #if !defined(OVERRIDE_eoprot_ep_as_fun_UPDT_strain_status)
-__weak extern void eoprot_ep_as_fun_UPDT_strain_status(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_UPDT_strain_status(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
 #if !defined(OVERRIDE_eoprot_ep_as_fun_INIT_strain_status__fullscale)
-__weak extern void eoprot_ep_as_fun_INIT_strain_status__fullscale(const EOnv* nv, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_INIT_strain_status__fullscale(const EOnv* nv) {}
 #endif
 #if !defined(OVERRIDE_eoprot_ep_as_fun_UPDT_strain_status__fullscale)
-__weak extern void eoprot_ep_as_fun_UPDT_strain_status__fullscale(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_UPDT_strain_status__fullscale(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
 #if !defined(OVERRIDE_eoprot_ep_as_fun_INIT_strain_status__calibratedvalues)
-__weak extern void eoprot_ep_as_fun_INIT_strain_status__calibratedvalues(const EOnv* nv, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_INIT_strain_status__calibratedvalues(const EOnv* nv) {}
 #endif
 #if !defined(OVERRIDE_eoprot_ep_as_fun_UPDT_strain_status__calibratedvalues)
-__weak extern void eoprot_ep_as_fun_UPDT_strain_status__calibratedvalues(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_UPDT_strain_status__calibratedvalues(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
 #if !defined(OVERRIDE_eoprot_ep_as_fun_INIT_strain_status__uncalibratedvalues)
-__weak extern void eoprot_ep_as_fun_INIT_strain_status__uncalibratedvalues(const EOnv* nv, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_INIT_strain_status__uncalibratedvalues(const EOnv* nv) {}
 #endif
 #if !defined(OVERRIDE_eoprot_ep_as_fun_UPDT_strain_status__uncalibratedvalues)
-__weak extern void eoprot_ep_as_fun_UPDT_strain_status__uncalibratedvalues(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_UPDT_strain_status__uncalibratedvalues(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
 #if !defined(OVERRIDE_eoprot_ep_as_fun_INIT_mais_config)
-__weak extern void eoprot_ep_as_fun_INIT_mais_config(const EOnv* nv, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_INIT_mais_config(const EOnv* nv) {}
 #endif
 #if !defined(OVERRIDE_eoprot_ep_as_fun_UPDT_mais_config)
-__weak extern void eoprot_ep_as_fun_UPDT_mais_config(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_UPDT_mais_config(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
 #if !defined(OVERRIDE_eoprot_ep_as_fun_INIT_mais_config__mode)
-__weak extern void eoprot_ep_as_fun_INIT_mais_config__mode(const EOnv* nv, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_INIT_mais_config__mode(const EOnv* nv) {}
 #endif
 #if !defined(OVERRIDE_eoprot_ep_as_fun_UPDT_mais_config__mode)
-__weak extern void eoprot_ep_as_fun_UPDT_mais_config__mode(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_UPDT_mais_config__mode(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
 #if !defined(OVERRIDE_eoprot_ep_as_fun_INIT_mais_config__datarate)
-__weak extern void eoprot_ep_as_fun_INIT_mais_config__datarate(const EOnv* nv, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_INIT_mais_config__datarate(const EOnv* nv) {}
 #endif
 #if !defined(OVERRIDE_eoprot_ep_as_fun_UPDT_mais_config__datarate)
-__weak extern void eoprot_ep_as_fun_UPDT_mais_config__datarate(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_UPDT_mais_config__datarate(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
 #if !defined(OVERRIDE_eoprot_ep_as_fun_INIT_mais_config__resolution)
-__weak extern void eoprot_ep_as_fun_INIT_mais_config__resolution(const EOnv* nv, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_INIT_mais_config__resolution(const EOnv* nv) {}
 #endif
 #if !defined(OVERRIDE_eoprot_ep_as_fun_UPDT_mais_config__resolution)
-__weak extern void eoprot_ep_as_fun_UPDT_mais_config__resolution(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_UPDT_mais_config__resolution(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
 #if !defined(OVERRIDE_eoprot_ep_as_fun_INIT_mais_status)
-__weak extern void eoprot_ep_as_fun_INIT_mais_status(const EOnv* nv, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_INIT_mais_status(const EOnv* nv) {}
 #endif
 #if !defined(OVERRIDE_eoprot_ep_as_fun_UPDT_mais_status)
-__weak extern void eoprot_ep_as_fun_UPDT_mais_status(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_UPDT_mais_status(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
 #if !defined(OVERRIDE_eoprot_ep_as_fun_INIT_mais_status__the15values)
-__weak extern void eoprot_ep_as_fun_INIT_mais_status__the15values(const EOnv* nv, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_INIT_mais_status__the15values(const EOnv* nv) {}
 #endif
 #if !defined(OVERRIDE_eoprot_ep_as_fun_UPDT_mais_status__the15values)
-__weak extern void eoprot_ep_as_fun_UPDT_mais_status__the15values(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+__weak extern void eoprot_ep_as_fun_UPDT_mais_status__the15values(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
 

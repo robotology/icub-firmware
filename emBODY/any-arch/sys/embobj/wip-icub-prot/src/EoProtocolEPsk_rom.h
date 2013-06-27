@@ -62,10 +62,12 @@ extern const eOsk_skin_t eoprot_ep_sk_rom_skin_defaultvalue;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern uint16_t eoprot_ep_sk_rom_epid2progressivenumber(eOprotEP_t ep, eOprotID_t id);
-extern uint16_t eoprot_ep_sk_rom_epid2sizeofvar(eOprotEP_t ep, eOprotID_t id);
-extern void* eoprot_ep_sk_rom_dataepid2nvram(void* data, eOprotEP_t ep, eOprotID_t id);
-extern void* eoprot_ep_sk_rom_epid2nvrom(eOprotEP_t ep, eOprotID_t id);
+extern uint16_t eoprot_ep_sk_rom_skin_get_offset(eOprotTag_t tag);
+
+extern void* eoprot_ep_sk_rom_get_nvrom(eOprotID_t id);
+extern uint16_t eoprot_ep_sk_rom_get_sizeofvar(eOprotID_t id);
+extern uint16_t eoprot_ep_sk_rom_get_prognum(eOprotID_t id);
+
 
 
 /** @}            

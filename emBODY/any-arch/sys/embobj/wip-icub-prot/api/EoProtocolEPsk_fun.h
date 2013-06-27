@@ -61,14 +61,14 @@
 
 // all of them are weakly-defined or/and overridable by means of a specific include file
 
-extern void eoprot_ep_sk_fun_INITIALISE(eOnvEP_t ep, void *loc, void *rem);
+extern void eoprot_ep_sk_fun_INITIALISE(eOnvEP_t ep, void *ram);
 
 
-extern void eoprot_ep_sk_fun_INIT_skin_config__sigmode(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_sk_fun_UPDT_skin_config__sigmode(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_sk_fun_INIT_skin_config__sigmode(const EOnv* nv);
+extern void eoprot_ep_sk_fun_UPDT_skin_config__sigmode(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_sk_fun_INIT_skin_status__arrayof10canframes(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_sk_fun_UPDT_skin_status__arrayof10canframes(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_sk_fun_INIT_skin_status__arrayof10canframes(const EOnv* nv);
+extern void eoprot_ep_sk_fun_UPDT_skin_status__arrayof10canframes(const EOnv* nv, const eOropdescriptor_t* rd);
 
 
 

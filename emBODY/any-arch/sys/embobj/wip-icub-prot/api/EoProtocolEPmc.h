@@ -31,7 +31,7 @@ extern "C" {
     @date       06/05/2013
 **/
 
-/** @defgroup eo_protocol_ep_mc Protocol for motion control endpoint 
+/** @defgroup eo_EoProtocolEPmc Protocol for motion control endpoint 
     Ivreververv e
     
     @{        
@@ -57,31 +57,6 @@ extern "C" {
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
-/** @typedef    typedef enum eOprot_endpoint_motioncontrol_t;
-    @brief      It contains all the endpoints used for motion control. 
- **/
-typedef enum
-{
-    eoprot_ep_mc_leftupperarm       = eoprot_endpoint_mc_leftupperarm,   
-    eoprot_ep_mc_leftlowerarm       = eoprot_endpoint_mc_leftlowerarm,
-    
-    eoprot_ep_mc_rightupperarm      = eoprot_endpoint_mc_rightupperarm,   
-    eoprot_ep_mc_rightlowerarm      = eoprot_endpoint_mc_rightlowerarm,   
-
-    eoprot_ep_mc_torso              = eoprot_endpoint_mc_torso,  
-
-    eoprot_ep_mc_leftupperleg       = eoprot_endpoint_mc_leftupperleg,   
-    eoprot_ep_mc_leftlowerleg       = eoprot_endpoint_mc_leftlowerleg,   
-    
-    eoprot_ep_mc_rightupperleg      = eoprot_endpoint_mc_rightupperleg,   
-    eoprot_ep_mc_rightlowerleg      = eoprot_endpoint_mc_rightlowerleg   
-    
-} eOprot_endpoint_motioncontrol_t;
-
-
-enum { eoprot_endpoints_motioncontrol_numberof = 9 };
-
-
 /** @typedef    typedef eOmc_entity_t eOprotEntityEPmc_t
     @brief      It contains the entities in endpoint motion control. They are eomc_entity_joint, eomc_entity_motor, 
                 and eomc_entity_controller.
@@ -90,36 +65,8 @@ typedef eOmc_entity_t eOprotEntityEPmc_t;
 
 enum { eoprot_ep_mc_entities_numberof = eomc_entities_numberof };
 
-// - definition of the joint: number of them in each endpoint, tag and funtyp values
 
-enum
-{
-    eoprot_ep_mc_joints_numberof_upperarm   = 4,
-    eoprot_ep_mc_joints_numberof_lowerarm   = 12,
-    eoprot_ep_mc_joints_numberof_thetorso   = 3,
-    eoprot_ep_mc_joints_numberof_upperleg   = 4,
-    eoprot_ep_mc_joints_numberof_lowerleg   = 2
-}; 
-
-typedef enum
-{   
-    eoprot_ep_mc_joints_numberof_leftupperarm   = eoprot_ep_mc_joints_numberof_upperarm,
-    eoprot_ep_mc_joints_numberof_leftlowerarm   = eoprot_ep_mc_joints_numberof_lowerarm,
-    
-    eoprot_ep_mc_joints_numberof_rightupperarm  = eoprot_ep_mc_joints_numberof_upperarm,   
-    eoprot_ep_mc_joints_numberof_rightlowerarm  = eoprot_ep_mc_joints_numberof_lowerarm,   
-
-    eoprot_ep_mc_joints_numberof_torso          = eoprot_ep_mc_joints_numberof_thetorso,   
-
-    eoprot_ep_mc_joints_numberof_leftupperleg   = eoprot_ep_mc_joints_numberof_upperleg,  
-    eoprot_ep_mc_joints_numberof_leftlowerleg   = eoprot_ep_mc_joints_numberof_lowerleg,   
-    
-    eoprot_ep_mc_joints_numberof_rightupperleg  = eoprot_ep_mc_joints_numberof_upperleg,   
-    eoprot_ep_mc_joints_numberof_rightlowerleg  = eoprot_ep_mc_joints_numberof_lowerleg   
-} eOprot_ep_mc_joints_numberof_t;
-
-
-
+// - definition of the joint
 
 /** @typedef    typedef enum eOprot_ep_mc_joint_tag_t
     @brief      It contains the tags for all variables in a joint.
@@ -156,70 +103,43 @@ typedef enum
 enum { eoprot_ep_mc_joint_tags_numberof = 21 };  // it MUST be equal to the number of tags in a joint.      
 
 
-/** @typedef    typedef enum eOprot_ep_mc_joint_funtyp_t
-    @brief      It contains the function and type for all the network variables in a joint. There must be a one-to-one
+/** @typedef    typedef enum eOprot_ep_mc_joint_rwmode_t
+    @brief      It contains the rw mode for all the network variables in a joint. There must be a one-to-one
                 correspondence to the values in eOprot_ep_mc_joint_tag_t.
                 See definition of eOmc_joint_t (and its fields) in file EoMotionControl.h for explanation of the variables.
  **/
 typedef enum
 {
-    eoprot_ep_mc_joint_funtyp_config                                   = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd),
-    eoprot_ep_mc_joint_funtyp_config__pidposition                      = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd),
-    eoprot_ep_mc_joint_funtyp_config__pidvelocity                      = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd),
-    eoprot_ep_mc_joint_funtyp_config__pidtorque                        = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd),
-    eoprot_ep_mc_joint_funtyp_config__impedance                        = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd),
-    eoprot_ep_mc_joint_funtyp_config__minpositionofjoint               = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b32),
-    eoprot_ep_mc_joint_funtyp_config__maxpositionofjoint               = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b32),
-    eoprot_ep_mc_joint_funtyp_config__velocitysetpointtimeout          = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b16),
-    eoprot_ep_mc_joint_funtyp_config__motionmonitormode                = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b08),
-    eoprot_ep_mc_joint_funtyp_config__encoderconversionfactor          = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b32),
-    eoprot_ep_mc_joint_funtyp_config__encoderconversionoffset          = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b32),
+    eoprot_ep_mc_joint_rwmode_config                                   = eo_nv_rwmode_RW,
+    eoprot_ep_mc_joint_rwmode_config__pidposition                      = eo_nv_rwmode_RW,
+    eoprot_ep_mc_joint_rwmode_config__pidvelocity                      = eo_nv_rwmode_RW,
+    eoprot_ep_mc_joint_rwmode_config__pidtorque                        = eo_nv_rwmode_RW,
+    eoprot_ep_mc_joint_rwmode_config__impedance                        = eo_nv_rwmode_RW,
+    eoprot_ep_mc_joint_rwmode_config__minpositionofjoint               = eo_nv_rwmode_RW,
+    eoprot_ep_mc_joint_rwmode_config__maxpositionofjoint               = eo_nv_rwmode_RW,
+    eoprot_ep_mc_joint_rwmode_config__velocitysetpointtimeout          = eo_nv_rwmode_RW,
+    eoprot_ep_mc_joint_rwmode_config__motionmonitormode                = eo_nv_rwmode_RW,
+    eoprot_ep_mc_joint_rwmode_config__encoderconversionfactor          = eo_nv_rwmode_RW,
+    eoprot_ep_mc_joint_rwmode_config__encoderconversionoffset          = eo_nv_rwmode_RW,
 
-    eoprot_ep_mc_joint_funtyp_status                                   = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd),
-    eoprot_ep_mc_joint_funtyp_status__basic                            = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd),
-    eoprot_ep_mc_joint_funtyp_status__ofpid                            = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd),
-    eoprot_ep_mc_joint_funtyp_status__chamaleon04                      = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_b32),
+    eoprot_ep_mc_joint_rwmode_status                                   = eo_nv_rwmode_RO,
+    eoprot_ep_mc_joint_rwmode_status__basic                            = eo_nv_rwmode_RO,
+    eoprot_ep_mc_joint_rwmode_status__ofpid                            = eo_nv_rwmode_RO,
+    eoprot_ep_mc_joint_rwmode_status__chamaleon04                      = eo_nv_rwmode_RO,
 
-    eoprot_ep_mc_joint_funtyp_inputs                                   = EO_nv_FUNTYP(eo_nv_FUN_out, eo_nv_TYP_pkd),
-    eoprot_ep_mc_joint_funtyp_inputs__externallymeasuredtorque         = EO_nv_FUNTYP(eo_nv_FUN_out, eo_nv_TYP_b16),
+    eoprot_ep_mc_joint_rwmode_inputs                                   = eo_nv_rwmode_RW,
+    eoprot_ep_mc_joint_rwmode_inputs__externallymeasuredtorque         = eo_nv_rwmode_RW,
 
-    eoprot_ep_mc_joint_funtyp_cmmnds__calibration                      = EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_pkd),
-    eoprot_ep_mc_joint_funtyp_cmmnds__setpoint                         = EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_pkd),
-    eoprot_ep_mc_joint_funtyp_cmmnds__stoptrajectory                   = EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_b08),
-    eoprot_ep_mc_joint_funtyp_cmmnds__controlmode                      = EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_b08)
-} eOprot_ep_mc_joint_funtyp_t;    
+    eoprot_ep_mc_joint_rwmode_cmmnds__calibration                      = eo_nv_rwmode_RW,
+    eoprot_ep_mc_joint_rwmode_cmmnds__setpoint                         = eo_nv_rwmode_RW,
+    eoprot_ep_mc_joint_rwmode_cmmnds__stoptrajectory                   = eo_nv_rwmode_RW,
+    eoprot_ep_mc_joint_rwmode_cmmnds__controlmode                      = eo_nv_rwmode_RW
+} eOprot_ep_mc_joint_rwmode_t;    
 
-enum { eoprot_ep_mc_joint_funtyps_numberof = 21 };  // it MUST be equal to the number of tags in a joint.  
-
-
-// - definition of the motor: number of them in each endpoint, tag and funtyp values
-
-enum
-{
-    eoprot_ep_mc_motors_numberof_upperarm   = 4,
-    eoprot_ep_mc_motors_numberof_lowerarm   = 12,
-    eoprot_ep_mc_motors_numberof_thetorso   = 3,
-    eoprot_ep_mc_motors_numberof_upperleg   = 4,
-    eoprot_ep_mc_motors_numberof_lowerleg   = 2
-}; 
-
-typedef enum
-{   
-    eoprot_ep_mc_motors_numberof_leftupperarm   = eoprot_ep_mc_motors_numberof_upperarm,
-    eoprot_ep_mc_motors_numberof_leftlowerarm   = eoprot_ep_mc_motors_numberof_lowerarm,
-    eoprot_ep_mc_motors_numberof_rightupperarm  = eoprot_ep_mc_motors_numberof_upperarm,   
-    eoprot_ep_mc_motors_numberof_rightlowerarm  = eoprot_ep_mc_motors_numberof_lowerarm,   
-
-    eoprot_ep_mc_motors_numberof_torso          = eoprot_ep_mc_motors_numberof_thetorso,   
-
-    eoprot_ep_mc_motors_numberof_leftupperleg   = eoprot_ep_mc_motors_numberof_upperleg,  
-    eoprot_ep_mc_motors_numberof_leftlowerleg   = eoprot_ep_mc_motors_numberof_lowerleg,   
-    
-    eoprot_ep_mc_motors_numberof_rightupperleg  = eoprot_ep_mc_motors_numberof_upperleg,   
-    eoprot_ep_mc_motors_numberof_rightlowerleg  = eoprot_ep_mc_motors_numberof_lowerleg   
-} eOprot_ep_mc_motors_numberof_t;
+enum { eoprot_ep_mc_joint_rwmodes_numberof = 21 };  // it MUST be equal to the number of tags in a joint.  
 
 
+// - definition of the motor
 
 
 /** @typedef    typedef enum eOprot_ep_mc_motor_tag_t
@@ -241,49 +161,29 @@ typedef enum
 enum { eoprot_ep_mc_motor_tags_numberof = 7 };   // it MUST be equal to the number of tags in a motor.   
 
 
-/** @typedef    typedef enum eOprot_ep_mc_motor_funtyp_t
-    @brief      It contains the function and type for all the network variables in a motor. There must be a one-to-one
+/** @typedef    typedef enum eOprot_ep_mc_motor_rwmode_t
+    @brief      It contains the rw mode for all the network variables in a motor. There must be a one-to-one
                 correspondence to the values in eOprot_ep_mc_motor_tag_t.
                 See definition of eOmc_motor_t (and its fields) in file EoMotionControl.h for explanation of the variables.
  **/
 typedef enum
 {
-    eoprot_ep_mc_motor_funtyp_config                                   = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd),
-    eoprot_ep_mc_motor_funtyp_config__pidcurrent                       = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd),
-    eoprot_ep_mc_motor_funtyp_config__maxvelocityofmotor               = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b32),
-    eoprot_ep_mc_motor_funtyp_config__maxcurrentofmotor                = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b16),
+    eoprot_ep_mc_motor_rwmode_config                                   = eo_nv_rwmode_RW,
+    eoprot_ep_mc_motor_rwmode_config__pidcurrent                       = eo_nv_rwmode_RW,
+    eoprot_ep_mc_motor_rwmode_config__maxvelocityofmotor               = eo_nv_rwmode_RW,
+    eoprot_ep_mc_motor_rwmode_config__maxcurrentofmotor                = eo_nv_rwmode_RW,
 
-    eoprot_ep_mc_motor_funtyp_status                                   = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd),
-    eoprot_ep_mc_motor_funtyp_status__basic                            = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd),
-    eoprot_ep_mc_motor_funtyp_status__chamaleon04                      = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_b32) 
-} eOprot_ep_mc_motor_funtyp_t;  
+    eoprot_ep_mc_motor_rwmode_status                                   = eo_nv_rwmode_RO,
+    eoprot_ep_mc_motor_rwmode_status__basic                            = eo_nv_rwmode_RO,
+    eoprot_ep_mc_motor_rwmode_status__chamaleon04                      = eo_nv_rwmode_RO 
+} eOprot_ep_mc_motor_rwmode_t;  
 
-enum { eoprot_ep_mc_motor_funtyps_numberof = 7 };   // it MUST be equal to the number of tags in a motor. 
+enum { eoprot_ep_mc_motor_rwmodes_numberof = 7 };   // it MUST be equal to the number of tags in a motor. 
 
-// - definition of the controller: number of them in each endpoint, tag and funtyp values
 
-enum
-{
-    eoprot_ep_mc_controllers_numberof       = 1
-}; 
 
-typedef enum
-{   
-    eoprot_ep_mc_controllers_numberof_leftupperarm   = eoprot_ep_mc_controllers_numberof,
-    eoprot_ep_mc_controllers_numberof_leftlowerarm   = eoprot_ep_mc_controllers_numberof,
-    eoprot_ep_mc_controllers_numberof_rightupperarm  = eoprot_ep_mc_controllers_numberof,   
-    eoprot_ep_mc_controllers_numberof_rightlowerarm  = eoprot_ep_mc_controllers_numberof,   
+// - definition of the controller
 
-    eoprot_ep_mc_controllers_numberof_torso          = eoprot_ep_mc_controllers_numberof,   
-
-    eoprot_ep_mc_controllers_numberof_leftupperleg   = eoprot_ep_mc_controllers_numberof,  
-    eoprot_ep_mc_controllers_numberof_leftlowerleg   = eoprot_ep_mc_controllers_numberof,   
-    
-    eoprot_ep_mc_controllers_numberof_rightupperleg  = eoprot_ep_mc_controllers_numberof,   
-    eoprot_ep_mc_controllers_numberof_rightlowerleg  = eoprot_ep_mc_controllers_numberof   
-} eOprot_ep_mc_controllers_numberof_t;
-
-  
 
 
 /** @typedef    typedef enum eOprot_ep_mc_controller_tag_t
@@ -301,94 +201,62 @@ typedef enum
 
 enum { eoprot_ep_mc_controller_tags_numberof = 5 };  // it MUST be equal to the number of tags in a controller. 
 
-/** @typedef    typedef enum eOprot_ep_mc_controller_funtyp_t
+
+/** @typedef    typedef enum eOprot_ep_mc_controller_rwmode_t
     @brief      It contains the function and type for all the network variables in a controller. There must be a one-to-one
                 correspondence to the values in eOprot_ep_mc_controller_tag_t.
                 See definition of eOmc_controller_t (and its fields) in file EoMotionControl.h for explanation of the variables.
  **/
 typedef enum
 {
-    eoprot_ep_mc_controller_funtyp_config                              = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd),
-    eoprot_ep_mc_controller_funtyp_config__durationofctrlloop          = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b32),
+    eoprot_ep_mc_controller_rwmode_config                              = eo_nv_rwmode_RW,
+    eoprot_ep_mc_controller_rwmode_config__durationofctrlloop          = eo_nv_rwmode_RW,
 
-    eoprot_ep_mc_controller_funtyp_status                              = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd),
-    eoprot_ep_mc_controller_funtyp_status__alljomoinitted              = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_b08),
-    eoprot_ep_mc_controller_funtyp_cmmnds__go2stateofcontroller        = EO_nv_FUNTYP(eo_nv_FUN_out, eo_nv_TYP_b08)
-} eOprot_ep_mc_controller_funtyp_t; 
+    eoprot_ep_mc_controller_rwmode_status                              = eo_nv_rwmode_RO,
+    eoprot_ep_mc_controller_rwmode_status__alljomoinitted              = eo_nv_rwmode_RO,
+    eoprot_ep_mc_controller_rwmode_cmmnds__go2stateofcontroller        = eo_nv_rwmode_RW
+} eOprot_ep_mc_controller_rwmode_t; 
 
-enum { eoprot_ep_mc_controller_funtyps_numberof = 5 };  // it MUST be equal to the number of tags in a controller. 
+enum { eoprot_ep_mc_controller_rwmodes_numberof = 5 };  // it MUST be equal to the number of tags in a controller. 
 
 
 // - structures implementing the endpoints
 
 
-/** @typedef    typedef struct eOprot_ep_mc_upperarm_t;
-    @brief      contains all the variables in the upperarm.
+/** @typedef    typedef struct eOprot_ep_mc_template_t;
+    @brief      is a template for the organisation of joints, motors, controllers in the motion control endpoint.
  **/
-typedef struct                  // 152*4+40*4+24 = 792              
+typedef struct                  // 152*1+40*1+24 = 216              
 {
-    eOmc_joint_t                joints[eoprot_ep_mc_joints_numberof_upperarm]; 
-    eOmc_motor_t                motors[eoprot_ep_mc_motors_numberof_upperarm];
+    eOmc_joint_t                joints[1]; 
+    eOmc_motor_t                motors[1];
     eOmc_controller_t           thecontroller;
-} eOprot_ep_mc_upperarm_t;      EO_VERIFYsizeof(eOprot_ep_mc_upperarm_t, 792);
+} eOprot_ep_mc_template_t;      EO_VERIFYsizeof(eOprot_ep_mc_template_t, 216);
 
-
-/** @typedef    typedef struct eOprot_ep_mc_lowerarm_t;
-    @brief      contains all the variables in the lowerarm.
+#if 0
+/** @typedef    typedef struct eOprot_ep_mc_variables_t;
+    @brief      it contains all variables in the motion control endpoint.
  **/
-typedef struct                  // 152*12+40*12+24 = 2328              
+typedef struct                  // 4+4+4+4 = 16              
 {
-    eOmc_joint_t                joints[eoprot_ep_mc_joints_numberof_lowerarm]; 
-    eOmc_motor_t                motors[eoprot_ep_mc_motors_numberof_lowerarm];
-    eOmc_controller_t           thecontroller;
-} eOprot_ep_mc_lowerarm_t;      EO_VERIFYsizeof(eOprot_ep_mc_lowerarm_t, 2328);
+    eOmc_joint_t*               joints;             // pointer to all joints organised in an array
+    eOmc_motor_t*               motors;             // pointer to all motors organised in an array
+    eOmc_controller_t*          controllers;        // pointer to all controllers (even if it is typically only one) organised in an array
+    uint8_t                     pool[4];            // the memory pool for the entities. 
+} eOprot_ep_mc_variables_t;     EO_VERIFYsizeof(eOprot_ep_mc_variables_t, 16);
+#endif
 
-
-/** @typedef    typedef struct eOprot_ep_mc_torso_t;
-    @brief      contains all the variables in the torso.
+#if 0
+/** @typedef    typedef struct eOprot_ep_mc_variables1_t;
+    @brief      it contains all variables in the motion control endpoint.
  **/
-typedef struct                  // 152*3+40*3+24 = 600             
+typedef struct                  // 3*4+4 = 16              
 {
-    eOmc_joint_t                joints[eoprot_ep_mc_joints_numberof_torso]; 
-    eOmc_motor_t                motors[eoprot_ep_mc_motors_numberof_torso];
-    eOmc_controller_t           thecontroller;
-} eOprot_ep_mc_torso_t;         EO_VERIFYsizeof(eOprot_ep_mc_torso_t, 600);
+    void*                       entities[eoprot_ep_mc_entities_numberof];   // pointer to the arrays of the entities (joint, motor, controller)
+    uint8_t                     pool[4];            // the memory pool for the entities. 
+} eOprot_ep_mc_variables1_t;    EO_VERIFYsizeof(eOprot_ep_mc_variables1_t, 16);
+#endif
 
-
-/** @typedef    typedef struct eOprot_ep_mc_upperleg_t;
-    @brief      contains all the variables in the upperleg.
- **/
-typedef struct                  // 152*4+40*4+24 = 792              
-{
-    eOmc_joint_t                joints[eoprot_ep_mc_joints_numberof_upperleg]; 
-    eOmc_motor_t                motors[eoprot_ep_mc_motors_numberof_upperleg];
-    eOmc_controller_t           thecontroller;
-} eOprot_ep_mc_upperleg_t;      EO_VERIFYsizeof(eOprot_ep_mc_upperleg_t, 792);
-
-
-/** @typedef    typedef struct eOprot_ep_mc_lowerleg_t;
-    @brief      contains all the variables in the lowerleg.
- **/
-typedef struct                  // 152*2+40*2+24 = 408              
-{
-    eOmc_joint_t                joints[eoprot_ep_mc_joints_numberof_lowerleg]; 
-    eOmc_motor_t                motors[eoprot_ep_mc_motors_numberof_lowerleg];
-    eOmc_controller_t           thecontroller;
-} eOprot_ep_mc_lowerleg_t;      EO_VERIFYsizeof(eOprot_ep_mc_lowerleg_t, 408);
-
-
-typedef eOprot_ep_mc_upperarm_t eOprot_ep_mc_leftupperarm_t;
-typedef eOprot_ep_mc_upperarm_t eOprot_ep_mc_rightupperarm_t;
-
-typedef eOprot_ep_mc_lowerarm_t eOprot_ep_mc_leftlowerarm_t;
-typedef eOprot_ep_mc_lowerarm_t eOprot_ep_mc_rightlowerarm_t;
-
-
-typedef eOprot_ep_mc_upperleg_t eOprot_ep_mc_leftupperleg_t;
-typedef eOprot_ep_mc_upperleg_t eOprot_ep_mc_rightupperleg_t;
-
-typedef eOprot_ep_mc_lowerleg_t eOprot_ep_mc_leftlowerleg_t;
-typedef eOprot_ep_mc_lowerleg_t eOprot_ep_mc_rightlowerleg_t;
   
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
@@ -399,53 +267,76 @@ typedef eOprot_ep_mc_lowerleg_t eOprot_ep_mc_rightlowerleg_t;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
+#if 0   // dynamic mode
+extern eOresult_t eoprot_ep_mc_number_of_boards_Load(uint16_t numofboards);
+#endif
 
-/** @fn         extern uint16_t eoprot_ep_mc_variable_numberof_Get(eOprotEP_t ep)
-    @brief      This function retrieves the number of variables given the endpoint @e ep
+
+/** @fn         extern eOresult_t eoprot_ep_mc_number_of_entities_Load(eOprotBRD_t brd, const uint8_t* numberofeachentity)
+    @brief      This function loads the maximum number of entities managed by the endpoint ...
+    @param      brd                     the board
+    @param      numberofeachentity      array of the values.
+    @return     the number of variables.
+  */
+extern eOresult_t eoprot_ep_mc_number_of_entities_Load(eOprotBRD_t brd, const uint8_t* numberofeachentity);
+
+
+/** @fn         extern uint16_t eoprot_ep_mc_variable_numberof_Get(eOprotBRD_t brd)
+    @brief      This function retrieves the number of variables given the board
     @param      ep              the endpoint
     @return     the number of variables.
   */
-extern uint16_t eoprot_ep_mc_variables_numberof_Get(eOprotEP_t ep);
+extern uint16_t eoprot_ep_mc_variables_numberof_Get(eOprotBRD_t brd);
 
 
-/** @fn         extern uint16_t eoprot_ep_mc_variable_progressivenumber_Get(eOprotEP_t ep)
-    @brief      This function retrieves the progressive number of a variable given the endpoint @e ep and the @e id
+/** @fn         extern eOprotID_t eoprot_ep_mc_variable_idfromprognumber_Get(eOprotBRD_t brd, uint16_t prog)
+    @brief      This function retrieves the id of a variable from the progressive number given the board
+    @param      brd                     the board
+    @param      prog                    the progressive number
+    @return     the ID or EOK_uint16dummy if invalid .
+  */
+extern eOprotID_t eoprot_ep_mc_variable_idfromprognumber_Get(eOprotBRD_t brd, uint16_t prog);
+
+
+/** @fn         extern uint16_t eoprot_ep_mc_variable_progressivenumber_Get(eOprotBRD_t brd)
+    @brief      This function retrieves the progressive number of a variable given the board and the @e id
     @param      ep              the endpoint
     @return     the progressive number or EOK_uint16dummy if invalid .
   */
-extern uint16_t eoprot_ep_mc_variable_progressivenumber_Get(eOprotEP_t ep, eOprotID_t id);
+extern uint16_t eoprot_ep_mc_variable_progressivenumber_Get(eOprotBRD_t brd, eOprotID_t id);
 
-/** @fn         extern uint16_t eoprot_ep_mc_joints_numberof_Get(eOprotEP_t ep)
-    @brief      This function retrieves the number of joints given the endpoint @e ep
+
+/** @fn         extern uint16_t eoprot_ep_mc_joints_numberof_Get(eOprotBRD_t brd)
+    @brief      This function retrieves the number of joints given the board
     @param      ep              the endpoint
     @return     the number of joints.
   */
-extern uint16_t eoprot_ep_mc_joints_numberof_Get(eOprotEP_t ep);
+extern uint16_t eoprot_ep_mc_joints_numberof_Get(eOprotBRD_t brd);
 
 
-/** @fn         extern uint16_t eoprot_ep_mc_motors_numberof_Get(eOprotEP_t ep)
-    @brief      This function retrieves the number of motors given the endpoint @e ep
+/** @fn         extern uint16_t eoprot_ep_mc_motors_numberof_Get(eOprotBRD_t brd)
+    @brief      This function retrieves the number of motors given the board
     @param      ep              the endpoint
     @return     the number of motors.
   */
-extern uint16_t eoprot_ep_mc_motors_numberof_Get(eOprotEP_t ep);
+extern uint16_t eoprot_ep_mc_motors_numberof_Get(eOprotBRD_t brd);
 
 
-/** @fn         extern uint16_t eoprot_ep_mc_controllers_numberof_Get(eOprotEP_t ep)
-    @brief      This function retrieves the number of controllers given the endpoint @e ep
+/** @fn         extern uint16_t eoprot_ep_mc_controllers_numberof_Get(eOprotBRD_t brd)
+    @brief      This function retrieves the number of controllers given the board
     @param      ep              the endpoint
     @return     the number of controllers.
   */
-extern uint16_t eoprot_ep_mc_controllers_numberof_Get(eOprotEP_t ep);
+extern uint16_t eoprot_ep_mc_controllers_numberof_Get(eOprotBRD_t brd);
 
 
-extern uint16_t eoprot_ep_mc_ram_sizeof_Get(eOprotEP_t ep);
+extern uint16_t eoprot_ep_mc_ram_sizeof_Get(eOprotBRD_t brd);
 
-extern uint16_t eoprot_ep_mc_variable_ram_sizeof_Get(eOprotEP_t ep, eOprotID_t id);
+extern uint16_t eoprot_ep_mc_variable_ram_sizeof_Get(eOprotID_t id);
 
-extern void* eoprot_ep_mc_variable_ram_Extract(void* epram, eOprotEP_t ep, eOprotID_t id);
+extern void* eoprot_ep_mc_variable_ram_Extract(void* epram, eOprotBRD_t brd, eOprotID_t id);
 
-extern void* eoprot_ep_mc_variable_rom_Get(eOprotEP_t ep, eOprotID_t id);
+extern void* eoprot_ep_mc_variable_rom_Get(eOprotID_t id);
 
 extern const eOmc_joint_t* eoprot_ep_mc_joint_default_Get(void);
 
@@ -455,7 +346,7 @@ extern const eOmc_controller_t* eoprot_ep_mc_controller_default_Get(void);
 
 
 /** @}            
-    end of group eo_protocol_ep_mc  
+    end of group eo_EoProtocolEPmc  
  **/
 
 #ifdef __cplusplus

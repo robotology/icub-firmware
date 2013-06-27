@@ -64,10 +64,18 @@ typedef struct
 } eOprotVAR_t;
 
 
+// si potrebbe cambiare il protocollo per avere un eOprotID32_t a 32 bit che abbia come sottocampi ognuno a 8 bit: ep, entity, index, tag
+
+
 /** @typedef    typedef uint32_t eOprotIP_t
     @brief      used to identify a variable in a network, as the eOprotIP_t resembles the IP address of a device..
  **/
 typedef uint32_t eOprotIP_t;
+
+/** @typedef    typedef uint8_t eOprotBRD_t
+    @brief      used as a short identifier of an IP address with values starting from 0 upto the max number of boards in the network
+ **/
+typedef uint8_t eOprotBRD_t;
 
 
 /** @typedef    typedef uint16_t eOprotEP_t

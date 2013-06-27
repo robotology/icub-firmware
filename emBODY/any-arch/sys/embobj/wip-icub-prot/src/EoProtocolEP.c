@@ -34,7 +34,7 @@
 #include "EoProtocolEPmc.h"
 #include "EoProtocolEPmn.h"
 #include "EoProtocolEPas.h"
-#include "EoProtocolEPsk.h"
+//#include "EoProtocolEPsk.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -53,7 +53,6 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-EO_VERIFYproposition(eoprot_ep_aaa, eoprot_endpoint_maxnum_in_category > eoprot_endpoint_offset_highestvalue);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -86,48 +85,34 @@ EO_VERIFYproposition(eoprot_ep_aaa, eoprot_endpoint_maxnum_in_category > eoprot_
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern eOprot_endpoint_category_t eoprot_ep_category_get(eOprotEP_t ep)
-{
-    eOprot_endpoint_category_t cat = eoprot_ep_category_none;
-    uint16_t base = ep & 0x00F0;
-    switch(base)
-    {
-        case eoprot_ep_base_mn:         cat = eoprot_ep_category_management;        break;
-        case eoprot_ep_base_mc:         cat = eoprot_ep_category_motioncontrol;     break;
-        case eoprot_ep_base_as:         cat = eoprot_ep_category_analogsensor;      break;
-        case eoprot_ep_base_sk:         cat = eoprot_ep_category_skin;              break;
-        default:                        cat = eoprot_ep_category_none;              break;
-    }
-    return(cat);
-}
 
-extern uint16_t eoprot_ep_variables_numberof_get(eOprotEP_t ep)
+
+extern uint16_t eoprot_ep_variables_numberof_get(eOprotBRD_t brd, eOprotEP_t ep)
 {
     uint16_t total = 0;
-    eOprot_endpoint_category_t cat = eoprot_ep_category_get(ep);
-    
-    switch(cat)
-    {
-        case eoprot_ep_category_management:
-        {
-            total = eoprot_ep_mn_variables_numberof_Get(ep);
-        } break;
-        
-        case eoprot_ep_category_motioncontrol:
-        {
-            total = eoprot_ep_mc_variables_numberof_Get(ep);
-        } break;  
-        
-        case eoprot_ep_category_analogsensor:
-        {
-            total = eoprot_ep_as_variables_numberof_Get(ep);
-        } break;     
-        
-        case eoprot_ep_category_skin:
-        {
-            total = eoprot_ep_sk_variables_numberof_Get(ep);
-        } break;  
 
+    switch(ep)
+    { 
+        case eoprot_endpoint_management:
+        {
+            total = eoprot_ep_mn_variables_numberof_Get(brd);
+        } break;
+     
+        case eoprot_endpoint_motioncontrol:
+        {
+            total = eoprot_ep_mc_variables_numberof_Get(brd);
+        } break;  
+     
+        case eoprot_endpoint_analogsensors:
+        {
+            total = eoprot_ep_as_variables_numberof_Get(brd);
+        } break;     
+#if 0        
+        case eoprot_endpoint_skin:
+        {
+            total = eoprot_ep_sk_variables_numberof_Get(brd);
+        } break;  
+#endif
         default:
         {
             total = 0;
@@ -137,42 +122,6 @@ extern uint16_t eoprot_ep_variables_numberof_get(eOprotEP_t ep)
     return(total);
 }
 
-
-extern eOprotProgNumber_t eoprot_ep_variable_ID2prognumber(eOprotEP_t ep, eOprotID_t id)
-{
-    uint16_t prognum = EOK_uint16dummy;
-    eOprot_endpoint_category_t cat = eoprot_ep_category_get(ep);
-    
-    switch(cat)
-    {
-        case eoprot_ep_category_management:
-        {
-            prognum = eoprot_ep_mn_variable_progressivenumber_Get(ep, id);
-        } break;
-        
-        case eoprot_ep_category_motioncontrol:
-        {
-            prognum = eoprot_ep_mc_variable_progressivenumber_Get(ep, id);
-        } break;  
-        
-        case eoprot_ep_category_analogsensor:
-        {
-            prognum = eoprot_ep_as_variable_progressivenumber_Get(ep, id);
-        } break;     
-        
-        case eoprot_ep_category_skin:
-        {
-            prognum = eoprot_ep_sk_variable_progressivenumber_Get(ep, id);
-        } break;  
-
-        default:
-        {
-            prognum = EOK_uint16dummy;
-        } break;    
-    }
-    
-    return(prognum);
-}
 
 // current implementation depends on the fatct taht we have the 16 bits of the id assigned to entity-index-tag
 // with 4-4-8 bits. thus we put a guard which fails compilation in case those values change.
@@ -184,13 +133,13 @@ extern eOprotID_t eoprot_ep_variable_ID_get(eOprotEP_t ep, eOprotEntity_t entity
 {
     uint32_t id = (uint32_t)tag & 0xff;
     id |= (((uint32_t)index & 0x0f)<<8);
-    id |= (((uint32_t)entity & 0x0f)<<16);
+    id |= (((uint32_t)entity & 0x0f)<<12);
     return((eOprotID_t)id);    
 }
 
 extern eOprotEntity_t eoprot_ep_variable_ID2entity(eOprotEP_t ep, eOprotID_t id)
 {
-    uint32_t ent = (((uint32_t)id>>16) & 0x0f);
+    uint32_t ent = (((uint32_t)id>>12) & 0x0f);
     return((eOprotEntity_t)ent);    
 }
 
@@ -208,31 +157,67 @@ extern eOprotTag_t eoprot_ep_variable_ID2tag(eOprotEP_t ep, eOprotID_t id)
 }
 
 
-extern uint16_t eoprot_ep_ram_sizeof_get(eOprotEP_t ep)
+extern eOprotProgNumber_t eoprot_ep_variable_ID2prognumber(eOprotBRD_t brd, eOprotEP_t ep, eOprotID_t id)
 {
-    uint16_t size = 0;
-    eOprot_endpoint_category_t cat = eoprot_ep_category_get(ep);
+    uint16_t prognum = EOK_uint16dummy;
     
-    switch(cat)
+    switch(ep)
     {
-        case eoprot_ep_category_management:
+        case eoprot_endpoint_management:
         {
-            size = eoprot_ep_mn_ram_sizeof_Get(ep);
+            prognum = eoprot_ep_mn_variable_progressivenumber_Get(brd, id);
         } break;
         
-        case eoprot_ep_category_motioncontrol:
+        case eoprot_endpoint_motioncontrol:
         {
-            size = eoprot_ep_mc_ram_sizeof_Get(ep);
+            prognum = eoprot_ep_mc_variable_progressivenumber_Get(brd, id);
         } break;  
         
-        case eoprot_ep_category_analogsensor:
+        case eoprot_endpoint_analogsensors:
         {
-            size = eoprot_ep_as_ram_sizeof_Get(ep);
+            prognum = eoprot_ep_as_variable_progressivenumber_Get(brd, id);
         } break;     
         
-        case eoprot_ep_category_skin:
+        case eoprot_endpoint_skin:
         {
-            size = eoprot_ep_sk_ram_sizeof_Get(ep);
+ //           prognum = eoprot_ep_sk_variable_progressivenumber_Get(brd, id);
+        } break;  
+
+        default:
+        {
+            prognum = EOK_uint16dummy;
+        } break;    
+    }
+
+    return(prognum);
+}
+
+
+
+extern uint16_t eoprot_ep_ram_sizeof_get(eOprotBRD_t brd, eOprotEP_t ep)
+{
+    uint16_t size = 0;
+
+    switch(ep)
+    {
+        case eoprot_endpoint_management:
+        {
+            size = eoprot_ep_mn_ram_sizeof_Get(brd);
+        } break;
+        
+        case eoprot_endpoint_motioncontrol:
+        {
+            size = eoprot_ep_mc_ram_sizeof_Get(brd);
+        } break;  
+        
+        case eoprot_endpoint_analogsensors:
+        {
+            size = eoprot_ep_as_ram_sizeof_Get(brd);
+        } break;     
+        
+        case eoprot_endpoint_skin:
+        {
+//            size = eoprot_ep_sk_ram_sizeof_Get(brd);
         } break;  
 
         default:
@@ -245,31 +230,30 @@ extern uint16_t eoprot_ep_ram_sizeof_get(eOprotEP_t ep)
 }
 
 
-extern uint16_t eoprot_ep_variable_ram_sizeof_get(eOprotEP_t ep, eOprotID_t id)
+extern uint16_t eoprot_ep_variable_ram_sizeof_get(eOprotBRD_t brd, eOprotEP_t ep, eOprotID_t id)
 {
     uint16_t size = 0;
-    eOprot_endpoint_category_t cat = eoprot_ep_category_get(ep);
-    
-    switch(cat)
+
+    switch(ep)
     {
-        case eoprot_ep_category_management:
+        case eoprot_endpoint_management:
         {
-            size = eoprot_ep_mn_variable_ram_sizeof_Get(ep, id);
+            size = eoprot_ep_mn_variable_ram_sizeof_Get(id);
         } break;
         
-        case eoprot_ep_category_motioncontrol:
+        case eoprot_endpoint_motioncontrol:
         {
-            size = eoprot_ep_mc_variable_ram_sizeof_Get(ep, id);
+            size = eoprot_ep_mc_variable_ram_sizeof_Get(id);
         } break;  
         
-        case eoprot_ep_category_analogsensor:
+        case eoprot_endpoint_analogsensors:
         {
-            size = eoprot_ep_as_variable_ram_sizeof_Get(ep, id);
+            size = eoprot_ep_as_variable_ram_sizeof_Get(id);
         } break;     
         
-        case eoprot_ep_category_skin:
+        case eoprot_endpoint_skin:
         {
-            size = eoprot_ep_sk_variable_ram_sizeof_Get(ep, id);
+//            size = eoprot_ep_sk_variable_ram_sizeof_Get(id);
         } break;  
 
         default:
@@ -281,32 +265,31 @@ extern uint16_t eoprot_ep_variable_ram_sizeof_get(eOprotEP_t ep, eOprotID_t id)
     return(size);
 }
 
-extern void* eoprot_ep_variable_ram_Extract(void* epram, eOprotEP_t ep, eOprotID_t id)
+
+extern void* eoprot_ep_variable_ram_extract(void* epram, eOprotBRD_t brd, eOprotEP_t ep, eOprotID_t id)
 {
     void* ram = NULL;
      
-    eOprot_endpoint_category_t cat = eoprot_ep_category_get(ep);
-    
-    switch(cat)
+    switch(ep)
     {
-        case eoprot_ep_category_management:
+        case eoprot_endpoint_management:
         {
-            ram = eoprot_ep_mn_variable_ram_Extract(epram, ep, id);
+            ram = eoprot_ep_mn_variable_ram_Extract(epram, brd, id);
         } break;
         
-        case eoprot_ep_category_motioncontrol:
+        case eoprot_endpoint_motioncontrol:
         {
-            ram = eoprot_ep_mc_variable_ram_Extract(epram, ep, id);
+            ram = eoprot_ep_mc_variable_ram_Extract(epram, brd, id);
         } break;  
         
-        case eoprot_ep_category_analogsensor:
+        case eoprot_endpoint_analogsensors:
         {
-            ram = eoprot_ep_as_variable_ram_Extract(epram, ep, id);
+            ram = eoprot_ep_as_variable_ram_Extract(epram, brd, id);
         } break;     
         
-        case eoprot_ep_category_skin:
+        case eoprot_endpoint_skin:
         {
-            ram = eoprot_ep_sk_variable_ram_Extract(epram, ep, id);
+//            ram = eoprot_ep_sk_variable_ram_Extract(epram, brd, id);
         } break;  
 
         default:
@@ -314,47 +297,44 @@ extern void* eoprot_ep_variable_ram_Extract(void* epram, eOprotEP_t ep, eOprotID
             ram = NULL;
         } break;    
     }
-    
+
     return(ram);      
 }
+
 
 extern const void* eoprot_ep_variable_rom_get(eOprotEP_t ep, eOprotID_t id)
 {
     void* rom = NULL;
-     
-    eOprot_endpoint_category_t cat = eoprot_ep_category_get(ep);
-    
-    switch(cat)
+        
+    switch(ep)
     {
-        case eoprot_ep_category_management:
+        case eoprot_endpoint_management:
         {
-            rom = eoprot_ep_mn_variable_rom_Get(ep, id);
+            rom = eoprot_ep_mn_variable_rom_Get(id);
         } break;
         
-        case eoprot_ep_category_motioncontrol:
+        case eoprot_endpoint_motioncontrol:
         {
-            rom = eoprot_ep_mc_variable_rom_Get(ep, id);
+            rom = eoprot_ep_mc_variable_rom_Get(id);
         } break;  
         
-        case eoprot_ep_category_analogsensor:
+        case eoprot_endpoint_analogsensors:
         {
-            rom = eoprot_ep_as_variable_rom_Get(ep, id);
+            rom = eoprot_ep_as_variable_rom_Get(id);
         } break;     
         
-        case eoprot_ep_category_skin:
+        case eoprot_endpoint_skin:
         {
-            rom = eoprot_ep_sk_variable_rom_Get(ep, id);
+  //          rom = eoprot_ep_sk_variable_rom_Get(id);
         } break;  
 
         default:
         {
             rom = NULL;
         } break;    
-    }
+    }    
     
-    return(rom);    
-    
-    
+    return(rom);       
 }
 
 

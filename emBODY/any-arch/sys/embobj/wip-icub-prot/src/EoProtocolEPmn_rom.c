@@ -68,22 +68,10 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static uint16_t s_eoprot_ep_mn_rom_epid2index_of_folded_descriptors(eOprotID_t id);
+
 static uint16_t s_eoprot_ep_mn_rom_comm_ramoffset(uint16_t tag);
 static uint16_t s_eoprot_ep_mn_rom_appl_ramoffset(uint16_t tag);
-
-
-static void s_eoprot_ep_mn_rom_comm_INIT_cmmnds__ropsigcfg(const EOnv* nv);
-static void s_eoprot_ep_mn_rom_comm_UPDT_cmmnds__ropsigcfg(const EOnv* nv, const eOropdescriptor_t* rd);
-
-
-static void s_eoprot_ep_mn_rom_appl_INIT_config(const EOnv* nv);
-static void s_eoprot_ep_mn_rom_appl_UPDT_config(const EOnv* nv, const eOropdescriptor_t* rd);
-
-static void s_eoprot_ep_mn_rom_appl_INIT_status(const EOnv* nv);
-static void s_eoprot_ep_mn_rom_appl_UPDT_status(const EOnv* nv, const eOropdescriptor_t* rd);
-
-static void s_eoprot_ep_mn_rom_appl_INIT_cmmnds__go2state(const EOnv* nv);
-static void s_eoprot_ep_mn_rom_appl_UPDT_cmmnds__go2state(const EOnv* nv, const eOropdescriptor_t* rd);
 
 
 
@@ -93,6 +81,9 @@ static void s_eoprot_ep_mn_rom_appl_UPDT_cmmnds__go2state(const EOnv* nv, const 
 
 // - default value of a comm
 
+#if 1
+const eOmn_comm_t eoprot_ep_mn_rom_comm_defaultvalue = { 0 };
+#else
 const eOmn_comm_t eoprot_ep_mn_rom_comm_defaultvalue =
 {
     EO_INIT(.config)             
@@ -122,9 +113,13 @@ const eOmn_comm_t eoprot_ep_mn_rom_comm_defaultvalue =
         }
     }
 }; 
+#endif
 
 // - default value of a appl
 
+#if 1
+const eOmn_appl_t eoprot_ep_mn_rom_appl_defaultvalue = { 0 };
+#else
 const eOmn_appl_t eoprot_ep_mn_rom_appl_defaultvalue =
 {
     EO_INIT(.config)
@@ -144,18 +139,18 @@ const eOmn_appl_t eoprot_ep_mn_rom_appl_defaultvalue =
         EO_INIT(.filler07)          {0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7}    
     }       
 };  
-
+#endif
 
 // - descriptors for the variables of a comm
 
 EOnv_rom_t eoprot_ep_mn_rom_comm_descriptor_cmmnds__ropsigcfg =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_mn_rom_comm_defaultvalue.cmmnds.ropsigcfg),
-    EO_INIT(.funtyp)    eoprot_ep_mn_comm_funtyp_cmmnds__ropsigcfg,
+    EO_INIT(.rwmode)    eoprot_ep_mn_comm_rwmode_cmmnds__ropsigcfg,
     EO_INIT(.dummy)     0,    
     EO_INIT(.resetval)  (const void*)&eoprot_ep_mn_rom_comm_defaultvalue.cmmnds.ropsigcfg,
-    EO_INIT(.init)      s_eoprot_ep_mn_rom_comm_INIT_cmmnds__ropsigcfg,
-    EO_INIT(.update)    s_eoprot_ep_mn_rom_comm_UPDT_cmmnds__ropsigcfg
+    EO_INIT(.init)      eoprot_ep_mn_fun_INIT_comm_cmmnds__ropsigcfg,
+    EO_INIT(.update)    eoprot_ep_mn_fun_UPDT_comm_cmmnds__ropsigcfg
 };
 
 
@@ -164,31 +159,31 @@ EOnv_rom_t eoprot_ep_mn_rom_comm_descriptor_cmmnds__ropsigcfg =
 EOnv_rom_t eoprot_ep_mn_rom_comm_descriptor_config =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_mn_rom_appl_defaultvalue.config),
-    EO_INIT(.funtyp)    eoprot_ep_mn_appl_funtyp_config,
+    EO_INIT(.rwmode)    eoprot_ep_mn_appl_rwmode_config,
     EO_INIT(.dummy)     0,    
     EO_INIT(.resetval)  (const void*)&eoprot_ep_mn_rom_appl_defaultvalue.config,
-    EO_INIT(.init)      s_eoprot_ep_mn_rom_appl_INIT_config,
-    EO_INIT(.update)    s_eoprot_ep_mn_rom_appl_UPDT_config
+    EO_INIT(.init)      eoprot_ep_mn_fun_INIT_appl_config,
+    EO_INIT(.update)    eoprot_ep_mn_fun_UPDT_appl_config
 };
 
 EOnv_rom_t eoprot_ep_mn_rom_comm_descriptor_status =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_mn_rom_appl_defaultvalue.status),
-    EO_INIT(.funtyp)    eoprot_ep_mn_appl_funtyp_status,
+    EO_INIT(.rwmode)    eoprot_ep_mn_appl_rwmode_status,
     EO_INIT(.dummy)     0,    
     EO_INIT(.resetval)  (const void*)&eoprot_ep_mn_rom_appl_defaultvalue.status,
-    EO_INIT(.init)      s_eoprot_ep_mn_rom_appl_INIT_status,
-    EO_INIT(.update)    s_eoprot_ep_mn_rom_appl_UPDT_status
+    EO_INIT(.init)      eoprot_ep_mn_fun_INIT_appl_status,
+    EO_INIT(.update)    eoprot_ep_mn_fun_UPDT_appl_status
 };
 
 EOnv_rom_t eoprot_ep_mn_rom_comm_descriptor_cmmnds__go2state =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_mn_rom_appl_defaultvalue.cmmnds.go2state),
-    EO_INIT(.funtyp)    eoprot_ep_mn_appl_funtyp_cmmnds__go2state,
+    EO_INIT(.rwmode)    eoprot_ep_mn_appl_rwmode_cmmnds__go2state,
     EO_INIT(.dummy)     0,    
     EO_INIT(.resetval)  (const void*)&eoprot_ep_mn_rom_appl_defaultvalue.cmmnds.go2state,
-    EO_INIT(.init)      s_eoprot_ep_mn_rom_appl_INIT_cmmnds__go2state,
-    EO_INIT(.update)    s_eoprot_ep_mn_rom_appl_UPDT_cmmnds__go2state
+    EO_INIT(.init)      eoprot_ep_mn_fun_INIT_appl_cmmnds__go2state,
+    EO_INIT(.update)    eoprot_ep_mn_fun_UPDT_appl_cmmnds__go2state
 };
 
 
@@ -228,71 +223,67 @@ const EOconstvector  eoprot_ep_mn_rom_constvector_of_folded_descriptors_dat =
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern uint16_t eoprot_ep_mn_rom_epid2ramoffset(eOprotEP_t ep, eOprotID_t id)
+
+
+extern uint16_t eoprot_ep_mn_rom_comm_get_offset(eOprotTag_t tag)
 {
-    uint16_t offset = 0;
-    uint16_t tag = eoprot_ep_variable_ID2tag(ep, id);
-    
-    if(EOK_uint16dummy == tag)
-    {
-        return(EOK_uint16dummy);
-    }
-    
-    eOprotEntity_t entity = eoprot_ep_variable_ID2entity(ep, id);
-    uint16_t index = eoprot_ep_variable_ID2index(ep, id);
-    
-//    if(eoprot_ep_mn_emsboard != ep)
-//    {
-//        return(EOK_uint16dummy);
-//    }
-    
-    switch(entity)
-    {
-        case eomn_entity_comm:
-        {   // the comms are all displaced at the beginning of the data
-            offset = index*sizeof(eOmn_comm_t) + s_eoprot_ep_mn_rom_comm_ramoffset(tag); 
-        } break;
-        
-        case eomn_entity_appl:
-        {   // the appls are placed after all the comms in the mn endpoint emsboard (the only one so far).
-            uint16_t numberofcomms = 1; // eoprot_ep_mn_comms_numberof_Get(ep);
-            offset = numberofcomms*sizeof(eOmn_comm_t) + index*sizeof(eOmn_appl_t) + s_eoprot_ep_mn_rom_appl_ramoffset(tag);  
-        } break;      
-        
-        default:
-        {   // error
-            offset = EOK_uint16dummy;
-        } break;
-    
-    }
-    
-    return(offset);  
+    return(s_eoprot_ep_mn_rom_comm_ramoffset(tag));
 }
 
-extern void* eoprot_ep_mn_rom_dataepid2nvram(void* data, eOprotEP_t ep, eOprotID_t id)
+extern uint16_t eoprot_ep_mn_rom_appl_get_offset(eOprotTag_t tag)
 {
-    uint8_t* startofdata = data;
-    uint16_t offset = eoprot_ep_mn_rom_epid2ramoffset(ep, id);
+    return(s_eoprot_ep_mn_rom_appl_ramoffset(tag));
+}
+
+extern void* eoprot_ep_mn_rom_get_nvrom(eOprotID_t id)
+{
+    uint16_t indexoffoldeddescriptors = s_eoprot_ep_mn_rom_epid2index_of_folded_descriptors(id);
     
-    if(EOK_uint16dummy == offset)
+    if(EOK_uint16dummy == indexoffoldeddescriptors)
     {
         return(NULL);
-    }   
+    }
+    
+    return((void*)eoprot_ep_mn_rom_folded_descriptors[indexoffoldeddescriptors]);   
+}
 
-    return(&startofdata[offset]);
+extern uint16_t eoprot_ep_mn_rom_get_sizeofvar(eOprotID_t id)
+{     
+    EOnv_rom_t* rom = eoprot_ep_mn_rom_get_nvrom(id);  
+    if(NULL == rom)
+    {
+        return(0);
+    }    
+    return(rom->capacity); 
+}
+
+extern uint16_t eoprot_ep_mn_rom_get_prognum(eOprotID_t id)
+{   // we assume that the variables are inserted in a progressive way without holes. and even if there are a few holes never mind.
+    return(eoprot_ep_variable_ID2tag(eoprot_endpoint_management, id));
 }
 
 
-extern uint16_t eoprot_ep_mn_rom_epid2index_of_folded_descriptors(eOprotEP_t ep, eOprotID_t id)
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of extern hidden functions 
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of static functions 
+// --------------------------------------------------------------------------------------------------------------------
+
+static uint16_t s_eoprot_ep_mn_rom_epid2index_of_folded_descriptors(eOprotID_t id)
 {      
-    uint16_t tag = eoprot_ep_variable_ID2tag(ep, id);
+    uint16_t tag = eoprot_ep_variable_ID2tag(eoprot_endpoint_management, id);
     
     if(EOK_uint16dummy == tag)
     {
         return(EOK_uint16dummy);
     }
     
-    eOprotEntity_t entity = eoprot_ep_variable_ID2entity(ep, id);
+    eOprotEntity_t entity = eoprot_ep_variable_ID2entity(eoprot_endpoint_management, id);
     
     switch(entity)
     {
@@ -316,85 +307,8 @@ extern uint16_t eoprot_ep_mn_rom_epid2index_of_folded_descriptors(eOprotEP_t ep,
     return(tag);   
 }
 
-extern void* eoprot_ep_mn_rom_epid2nvrom(eOprotEP_t ep, eOprotID_t id)
-{
-    uint16_t indexoffoldeddescriptors = eoprot_ep_mn_rom_epid2index_of_folded_descriptors(ep, id);
-    
-    if(EOK_uint16dummy == indexoffoldeddescriptors)
-    {
-        return(NULL);
-    }
-    
-    return((void*)&eoprot_ep_mn_rom_folded_descriptors[indexoffoldeddescriptors]);   
-}
 
-extern uint16_t eoprot_ep_mn_rom_epid2progressivenumber(eOprotEP_t ep, eOprotID_t id)
-{     
-    uint16_t tag = eoprot_ep_variable_ID2tag(ep, id);
-    uint16_t index = eoprot_ep_variable_ID2index(ep, id);               // ok, even if index shall always be 1
-    eOprotEntity_t entity = eoprot_ep_variable_ID2entity(ep, id);
-    uint16_t prognum = 0;
-    
-    if((EOK_uint16dummy == tag) || (EOK_uint16dummy == index) || (EOK_uint16dummy == entity))
-    {
-        return(EOK_uint16dummy);
-    }
-    
-      
-    switch(entity)
-    {
-        case eomn_entity_comm:
-        {   // the comms are the first ones   
-            prognum = index*eoprot_ep_mn_comm_tags_numberof + tag;
-        } break;
-        
-        case eomn_entity_appl:
-        {   // the appls are after all comms
-            prognum = eoprot_ep_mn_comms_numberof_Get(ep)*eoprot_ep_mn_comm_tags_numberof + 
-                      index*eoprot_ep_mn_appl_tags_numberof + tag; 
-        } break;      
-        
-        default:
-        {   // error
-            prognum = EOK_uint16dummy;
-        } break;
-    
-    }
-    
-    return(prognum); 
-}
-
-extern uint16_t eoprot_ep_mn_rom_ep2variablesnumberof(eOprotEP_t ep)
-{     
-    uint16_t total = eoprot_ep_mn_comms_numberof_Get(ep)*eoprot_ep_mn_comm_tags_numberof + 
-                     eoprot_ep_mn_appls_numberof_Get(ep)*eoprot_ep_mn_appl_tags_numberof;;
-    
-    return(total); 
-}
-
-extern uint16_t eoprot_ep_mn_rom_epid2sizeofvar(eOprotEP_t ep, eOprotID_t id)
-{     
-    EOnv_rom_t* rom = eoprot_ep_mn_rom_epid2nvrom(ep, id);  
-    if(NULL == rom)
-    {
-        return(0);
-    }    
-    return(rom->capacity); 
-}
-
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of extern hidden functions 
-// --------------------------------------------------------------------------------------------------------------------
-// empty-section
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of static functions 
-// --------------------------------------------------------------------------------------------------------------------
-
-// returns the offset form the start of the struct eOmc_comm_t of the variable with a given tag 
+// returns the offset form the start of the struct eOmn_comm_t of the variable with a given tag 
 static uint16_t s_eoprot_ep_mn_rom_comm_ramoffset(uint16_t tag)
 {   
     //return(eoprot_ep_mn_rom_comm_offsets[tag]);
@@ -402,61 +316,12 @@ static uint16_t s_eoprot_ep_mn_rom_comm_ramoffset(uint16_t tag)
     return((uint16_t)tmp); 
 }
 
-// returns the offset form the start of the struct eOmc_appl_t of the variable with a given tag 
+// returns the offset form the start of the struct eOmn_appl_t of the variable with a given tag 
 static uint16_t s_eoprot_ep_mn_rom_appl_ramoffset(uint16_t tag)
 {
     //return(eoprot_ep_mn_rom_appl_offsets[tag]);
     uint32_t tmp = ((uint32_t) eoprot_ep_mn_rom_folded_descriptors[tag]->resetval) - ((uint32_t) &eoprot_ep_mn_rom_appl_defaultvalue);
     return((uint16_t)tmp); 
-}
-
-
-// - the functions called by the descriptors
-
-
-static void s_eoprot_ep_mn_rom_comm_INIT_cmmnds__ropsigcfg(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mn_fun_INIT_comm_cmmnds__ropsigcfg(nv, index);
-}
-static void s_eoprot_ep_mn_rom_comm_UPDT_cmmnds__ropsigcfg(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mn_fun_UPDT_comm_cmmnds__ropsigcfg(nv, rd, index);
-}
-
-
-static void s_eoprot_ep_mn_rom_appl_INIT_config(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mn_fun_INIT_appl_config(nv, index);
-}
-static void s_eoprot_ep_mn_rom_appl_UPDT_config(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mn_fun_UPDT_appl_config(nv, rd, index);
-}
-
-static void s_eoprot_ep_mn_rom_appl_INIT_status(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mn_fun_INIT_appl_status(nv, index);
-}
-static void s_eoprot_ep_mn_rom_appl_UPDT_status(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mn_fun_UPDT_appl_status(nv, rd, index);
-}
-
-static void s_eoprot_ep_mn_rom_appl_INIT_cmmnds__go2state(const EOnv* nv)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mn_fun_INIT_appl_cmmnds__go2state(nv, index);
-}
-static void s_eoprot_ep_mn_rom_appl_UPDT_cmmnds__go2state(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint16_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
-    eoprot_ep_mn_fun_UPDT_appl_cmmnds__go2state(nv, rd, index);
 }
 
 
