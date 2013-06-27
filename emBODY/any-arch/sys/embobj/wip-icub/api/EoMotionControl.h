@@ -454,6 +454,8 @@ typedef struct
  **/
 typedef uint16_t  eOmc_jointId_t;
 
+//#warning --> eval using uint8_t ...
+
 
 
 /** @typedef    typedef struct eOmc_joint_config_t
@@ -532,7 +534,7 @@ typedef struct                  // size is 16+12+1+1+2+0 = 32
     eOmc_setpoint_t             setpoint;                   /**< the setpoint of the joint */
     eObool_t                    stoptrajectory;             /**< it is an order to stop the current trajectory on the joint */
     eOenum08_t                  controlmode;                /**< use values from eOmc_controlmode_command_t */
-    uint8_t                     filler02[2];                
+    uint8_t                     filler02[2];     
 } eOmc_joint_commands_t;        EO_VERIFYsizeof(eOmc_joint_commands_t, 32);
 
 
@@ -546,8 +548,6 @@ typedef struct                  // size is 80+32+8+32+0 = 152
 } eOmc_joint_t;                 EO_VERIFYsizeof(eOmc_joint_t, 152);
 
 
-
-
 // -- the definition of a motor
 
 
@@ -556,6 +556,8 @@ typedef struct                  // size is 80+32+8+32+0 = 152
     @brief      eOmc_motorId_t contains the values required to identify a motor
  **/
 typedef uint16_t  eOmc_motorId_t;
+
+//#warning --> eval using uint8_t ...
 
 
 /** @typedef    typedef struct eOmc_motor_config_t
