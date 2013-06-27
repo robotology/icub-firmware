@@ -30,8 +30,8 @@
 	@date       05/29/2013
 **/
 
-/** @defgroup eo_asfdgrwet Functions used in analosensor endpoint
-    Here are the functions used in analosensor endpoint. They can be overridden as they are weakly defined in the .c file.
+/** @defgroup eo_EoProtocolEPas_fun Functions used in analog sensors endpoint
+    Here are the functions used in analog sensors endpoint. They can be overridden as they are weakly defined in the .c file.
     
     @{		
  **/
@@ -61,56 +61,56 @@
 
 // all of them are weakly-defined or/and overridable by means of a specific include file
 
-extern void eoprot_ep_as_fun_INITIALISE(eOnvEP_t ep, void *loc, void *rem);
+extern void eoprot_ep_as_fun_INITIALISE(eOnvEP_t ep, void *ram);
 
 
-extern void eoprot_ep_as_fun_INIT_strain_config(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_as_fun_UPDT_strain_config(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_as_fun_INIT_strain_config(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_strain_config(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_strain_config__mode(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_as_fun_UPDT_strain_config__mode(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_as_fun_INIT_strain_config__mode(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_strain_config__mode(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_strain_config__datarate(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_as_fun_UPDT_strain_config__datarate(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_as_fun_INIT_strain_config__datarate(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_strain_config__datarate(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_strain_config__signaloncefullscale(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_as_fun_UPDT_strain_config__signaloncefullscale(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_as_fun_INIT_strain_config__signaloncefullscale(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_strain_config__signaloncefullscale(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_strain_status(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_as_fun_UPDT_strain_status(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_as_fun_INIT_strain_status(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_strain_status(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_strain_status__fullscale(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_as_fun_UPDT_strain_status__fullscale(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_as_fun_INIT_strain_status__fullscale(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_strain_status__fullscale(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_strain_status__calibratedvalues(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_as_fun_UPDT_strain_status__calibratedvalues(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_as_fun_INIT_strain_status__calibratedvalues(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_strain_status__calibratedvalues(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_strain_status__uncalibratedvalues(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_as_fun_UPDT_strain_status__uncalibratedvalues(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_as_fun_INIT_strain_status__uncalibratedvalues(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_strain_status__uncalibratedvalues(const EOnv* nv, const eOropdescriptor_t* rd);
 
 
-extern void eoprot_ep_as_fun_INIT_mais_config(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_as_fun_UPDT_mais_config(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_as_fun_INIT_mais_config(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_mais_config(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_mais_config__mode(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_as_fun_UPDT_mais_config__mode(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_as_fun_INIT_mais_config__mode(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_mais_config__mode(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_mais_config__datarate(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_as_fun_UPDT_mais_config__datarate(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_as_fun_INIT_mais_config__datarate(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_mais_config__datarate(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_mais_config__resolution(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_as_fun_UPDT_mais_config__resolution(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_as_fun_INIT_mais_config__resolution(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_mais_config__resolution(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_mais_status(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_as_fun_UPDT_mais_status(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_as_fun_INIT_mais_status(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_mais_status(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_mais_status__the15values(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_as_fun_UPDT_mais_status__the15values(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_as_fun_INIT_mais_status__the15values(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_mais_status__the15values(const EOnv* nv, const eOropdescriptor_t* rd);
 
 
 
 /** @}            
-    end of group eo_asfdgrwet  
+    end of group eo_EoProtocolEPas_fun  
  **/
 
 #endif  // include-guard

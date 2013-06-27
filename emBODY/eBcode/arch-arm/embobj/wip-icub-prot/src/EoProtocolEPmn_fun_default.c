@@ -88,46 +88,46 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #if !defined(OVERRIDE_eoprot_ep_mn_fun_INITIALISE)
-__weak extern void eoprot_ep_mn_fun_INITIALISE(eOnvEP_t ep, void *loc, void *rem) {}
+__weak extern void eoprot_ep_mn_fun_INITIALISE(eOnvEP_t ep, void *ram) {}
 #endif
 
 
 
 #if !defined(OVERRIDE_eoprot_ep_mn_fun_INIT_comm_cmmnds__ropsigcfg)
-__weak extern void eoprot_ep_mn_fun_INIT_comm_cmmnds__ropsigcfg(const EOnv* nv, uint16_t index) {}
+__weak extern void eoprot_ep_mn_fun_INIT_comm_cmmnds__ropsigcfg(const EOnv* nv) {}
 #endif
 
 
 #if !defined(OVERRIDE_eoprot_ep_mn_fun_UPDT_comm_cmmnds__ropsigcfg)
-__weak extern void eoprot_ep_mn_fun_UPDT_comm_cmmnds__ropsigcfg(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+__weak extern void eoprot_ep_mn_fun_UPDT_comm_cmmnds__ropsigcfg(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
   
 
 #if !defined(OVERRIDE_eoprot_ep_mn_fun_INIT_appl_config)
-__weak extern void eoprot_ep_mn_fun_INIT_appl_config(const EOnv* nv, uint16_t index) {}
+__weak extern void eoprot_ep_mn_fun_INIT_appl_config(const EOnv* nv) {}
 #endif
 
 #if !defined(OVERRIDE_eoprot_ep_mn_fun_UPDT_appl_config)
-__weak extern void eoprot_ep_mn_fun_UPDT_appl_config(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+__weak extern void eoprot_ep_mn_fun_UPDT_appl_config(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
 
 #if !defined(OVERRIDE_eoprot_ep_mn_fun_INIT_appl_status)
-__weak extern void eoprot_ep_mn_fun_INIT_appl_status(const EOnv* nv, uint16_t index) {}
+__weak extern void eoprot_ep_mn_fun_INIT_appl_status(const EOnv* nv) {}
 #endif
 
 #if !defined(OVERRIDE_eoprot_ep_mn_fun_UPDT_appl_mstatus)
-__weak extern void eoprot_ep_mn_fun_UPDT_appl_status(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+__weak extern void eoprot_ep_mn_fun_UPDT_appl_status(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
 
 #if !defined(OVERRIDE_eoprot_ep_mn_fun_INIT_appl_ccmmnds__go2state)
-__weak extern void eoprot_ep_mn_fun_INIT_appl_cmmnds__go2state(const EOnv* nv, uint16_t index) {}
+__weak extern void eoprot_ep_mn_fun_INIT_appl_cmmnds__go2state(const EOnv* nv) {}
 #endif
 
 #if !defined(OVERRIDE_eoprot_ep_mn_fun_UPDT_appl_ccmmnds__go2state)
-__weak extern void eoprot_ep_mn_fun_UPDT_appl_cmmnds__go2state(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) {}
+__weak extern void eoprot_ep_mn_fun_UPDT_appl_cmmnds__go2state(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
 

@@ -30,7 +30,7 @@
 	@date       05/29/2013
 **/
 
-/** @defgroup eo_asfdgrwet Functions used in management endpoint
+/** @defgroup eo_EoProtocolEPmn_fun Functions used in management endpoint
     Here are the functions used in management endpoint. They can be overridden as they are weakly defined in the .c file.
     
     @{		
@@ -61,25 +61,25 @@
 
 // all of them are weakly-defined or/and overridable by means of a specific include file
 
-extern void eoprot_ep_mn_fun_INITIALISE(eOnvEP_t ep, void *loc, void *rem);
+extern void eoprot_ep_mn_fun_INITIALISE(eOnvEP_t ep, void *ram);
 
 
-extern void eoprot_ep_mn_fun_INIT_comm_cmmnds__ropsigcfg(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mn_fun_UPDT_comm_cmmnds__ropsigcfg(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mn_fun_INIT_comm_cmmnds__ropsigcfg(const EOnv* nv);
+extern void eoprot_ep_mn_fun_UPDT_comm_cmmnds__ropsigcfg(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_mn_fun_INIT_appl_config(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mn_fun_UPDT_appl_config(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mn_fun_INIT_appl_config(const EOnv* nv);
+extern void eoprot_ep_mn_fun_UPDT_appl_config(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_mn_fun_INIT_appl_status(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mn_fun_UPDT_appl_status(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mn_fun_INIT_appl_status(const EOnv* nv);
+extern void eoprot_ep_mn_fun_UPDT_appl_status(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_mn_fun_INIT_appl_cmmnds__go2state(const EOnv* nv, uint16_t index);
-extern void eoprot_ep_mn_fun_UPDT_appl_cmmnds__go2state(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index);
+extern void eoprot_ep_mn_fun_INIT_appl_cmmnds__go2state(const EOnv* nv);
+extern void eoprot_ep_mn_fun_UPDT_appl_cmmnds__go2state(const EOnv* nv, const eOropdescriptor_t* rd);
 
 
 
 /** @}            
-    end of group eo_asfdgrwet  
+    end of group eo_EoProtocolEPmn_fun  
  **/
 
 #endif  // include-guard

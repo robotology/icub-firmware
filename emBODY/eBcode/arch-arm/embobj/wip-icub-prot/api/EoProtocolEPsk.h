@@ -31,7 +31,7 @@ extern "C" {
     @date       06/05/2013
 **/
 
-/** @defgroup eo_protocol_ep_sk Protocol for skin endpoint 
+/** @defgroup eo_EoProtocolEPsk Protocol for skin endpoint 
     Ivreververv e
     
     @{        
@@ -57,19 +57,6 @@ extern "C" {
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
-/** @typedef    typedef enum eOprot_endpoint_skin_t;
-    @brief      It contains all the endpoints used for skin. 
- **/
-typedef enum
-{
-    eoprot_ep_sk_leftlowerarm       = eoprot_endpoint_sk_leftlowerarm,
-    eoprot_ep_sk_rightlowerarm      = eoprot_endpoint_sk_rightlowerarm
-} eOprot_endpoint_skin_t;
-
-
-enum { eoprot_endpoints_skin_numberof = 2 };
-
-
 /** @typedef    typedef eOsk_entity_t eOprotEntityEPsk_t
     @brief      It contains the entities in endpoint skin: skin and mais
  **/
@@ -78,15 +65,8 @@ typedef eOsk_entity_t eOprotEntityEPsk_t;
 enum { eoprot_ep_sk_entities_numberof = eosk_entities_numberof };
 
 
-// - definition of the skin: number of them in each endpoint, tag and funtyp values
+// - definition of the skin
 
-typedef enum
-{   
-    eoprot_ep_sk_skins_numberof_leftlowerarm          = 1,
-    eoprot_ep_sk_skins_numberof_rightlowerarm         = 1
-} eOprot_ep_sk_skins_numberof_t;
-
-  
 
 /** @typedef    typedef enum eOprot_ep_sk_skin_tag_t
     @brief      It contains the tags for all variables in the skin endpoints.
@@ -101,33 +81,30 @@ typedef enum
 enum { eoprot_ep_sk_skin_tags_numberof = 2 };  // it MUST be equal to the number of tags. 
 
 
-/** @typedef    typedef enum eOprot_ep_sk_skin_funtyp_t
+/** @typedef    typedef enum eOprot_ep_sk_skin_rwmode_t
     @brief      It contains the function and type for all the network variables. There must be a one-to-one
                 correspondence to the values in eOprot_ep_sk_skin_tag_t.
  **/
 typedef enum
 {
-    eoprot_ep_sk_skin_funtyp_config__sigmode                = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b08),
-    eoprot_ep_sk_skin_funtyp_status__arrayof10canframes     = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_arr)
-} eOprot_ep_sk_skin_funtyp_t; 
+    eoprot_ep_sk_skin_rwmode_config__sigmode                = eo_nv_rwmode_RW,
+    eoprot_ep_sk_skin_rwmode_status__arrayof10canframes     = eo_nv_rwmode_RO
+} eOprot_ep_sk_skin_rwmode_t; 
 
-enum { eoprot_ep_sk_skin_funtyps_numberof = 2 };  // it MUST be equal to the number of tags. 
+enum { eoprot_ep_sk_skin_rwmodes_numberof = 2 };  // it MUST be equal to the number of tags. 
 
 
 // - structures implementing the endpoints
   
 
-/** @typedef    typedef struct eOprot_ep_sk_lowerarm_t;
-    @brief      contains all the variables in the endpoint skin
+/** @typedef    typedef struct eOprot_ep_sk_template_t;
+    @brief      it is a template for the organisation of the entities in the endpoint skin
  **/
 typedef struct                  // 176+0 = 176              
 {
     eOsk_skin_t                 skin;
-} eOprot_ep_sk_lowerarm_t;      EO_VERIFYsizeof(eOprot_ep_sk_lowerarm_t, 176);
+} eOprot_ep_sk_template_t;      EO_VERIFYsizeof(eOprot_ep_sk_template_t, 176);
 
-
-typedef eOprot_ep_sk_lowerarm_t eOprot_ep_sk_leftlowerarm_t;
-typedef eOprot_ep_sk_lowerarm_t eOprot_ep_sk_rightlowerarm_t;
 
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
@@ -140,45 +117,57 @@ typedef eOprot_ep_sk_lowerarm_t eOprot_ep_sk_rightlowerarm_t;
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-/** @fn         extern uint16_t eoprot_ep_sk_variable_numberof_Get(eOprotEP_t ep)
-    @brief      This function retrieves the number of variables given the endpoint @e ep
-    @param      ep              the endpoint
+#if 0   // dynamic mode
+extern eOresult_t eoprot_ep_sk_number_of_boards_Load(uint16_t numofboards);
+#endif
+
+/** @fn         extern eOresult_t eoprot_ep_sk_number_of_entities_Load(eOprotBRD_t brd, const uint8_t* numberofeachentity)
+    @brief      This function loads the maximum number of entities managed by the endpoint ...
+    @param      brd                     the board
+    @param      numberofeachentity      array of the values.
     @return     the number of variables.
   */
-extern uint16_t eoprot_ep_sk_variables_numberof_Get(eOprotEP_t ep);
+extern eOresult_t eoprot_ep_sk_number_of_entities_Load(eOprotBRD_t brd, const uint8_t* numberofeachentity);
 
 
-/** @fn         extern uint16_t eoprot_ep_sk_variable_progressivenumber_Get(eOprotEP_t ep)
-    @brief      This function retrieves the progressive number of a variable given the endpoint @e ep and the @e id
-    @param      ep              the endpoint
+/** @fn         extern uint16_t eoprot_ep_sk_variable_numberof_Get(eOprotBRD_t brd)
+    @brief      This function retrieves the number of variables given the board
+    @param      brd                     the board
+    @return     the number of variables.
+  */
+extern uint16_t eoprot_ep_sk_variables_numberof_Get(eOprotBRD_t brd);
+
+
+/** @fn         extern uint16_t eoprot_ep_sk_variable_progressivenumber_Get(eOprotBRD_t brd, eOprotID_t id)
+    @brief      This function retrieves the progressive number of a variable given the board and the @e id
+    @param      brd                     the board
+    @param      id                      the ID
     @return     the progressive number or EOK_uint16dummy if invalid .
   */
-extern uint16_t eoprot_ep_sk_variable_progressivenumber_Get(eOprotEP_t ep, eOprotID_t id);
+extern uint16_t eoprot_ep_sk_variable_progressivenumber_Get(eOprotBRD_t brd, eOprotID_t id);
 
 
-/** @fn         extern uint16_t eoprot_ep_sk_skins_numberof_Get(eOprotEP_t ep)
-    @brief      This function retrieves the number of comms entities given the endpoint @e ep
-    @param      ep              the endpoint
-    @return     the number of comms.
+/** @fn         extern uint16_t eoprot_ep_sk_skins_numberof_Get(eOprotBRD_t brd)
+    @brief      This function retrieves the number of skins entities given the board
+    @param      brd                     the board
+    @return     the number of skins.
   */
-extern uint16_t eoprot_ep_sk_skins_numberof_Get(eOprotEP_t ep);
+extern uint16_t eoprot_ep_sk_skins_numberof_Get(eOprotBRD_t brd);
 
+extern uint16_t eoprot_ep_sk_ram_sizeof_Get(eOprotBRD_t brd);
 
-extern uint16_t eoprot_ep_sk_ram_sizeof_Get(eOprotEP_t ep);
+extern uint16_t eoprot_ep_sk_variable_ram_sizeof_Get(eOprotID_t id);
 
-extern uint16_t eoprot_ep_sk_variable_ram_sizeof_Get(eOprotEP_t ep, eOprotID_t id);
+extern void* eoprot_ep_sk_variable_ram_Extract(void* epram, eOprotBRD_t brd, eOprotID_t id);
 
-extern void* eoprot_ep_sk_variable_ram_Extract(void* epram, eOprotEP_t ep, eOprotID_t id);
-
-extern void* eoprot_ep_sk_variable_rom_Get(eOprotEP_t ep, eOprotID_t id);
+extern void* eoprot_ep_sk_variable_rom_Get(eOprotID_t id);
 
 extern const eOsk_skin_t* eoprot_ep_sk_skin_default_Get(void);
 
 
 
-
 /** @}            
-    end of group eo_protocol_ep_sk  
+    end of group eo_EoProtocolEPsk  
  **/
 
 #ifdef __cplusplus

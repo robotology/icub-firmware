@@ -31,7 +31,7 @@ extern "C" {
     @date       06/05/2013
 **/
 
-/** @defgroup eo_protocol_ep_as Protocol for analog sensors endpoint 
+/** @defgroup eo_EoProtocolEPas Protocol for analog sensors endpoint 
     Ivreververv e
     
     @{        
@@ -57,23 +57,6 @@ extern "C" {
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
-/** @typedef    typedef enum eOprot_endpoint_analogsensor_t;
-    @brief      It contains all the endpoints used for analogsensor. 
- **/
-typedef enum
-{
-    eoprot_ep_as_leftupperarm       = eoprot_endpoint_as_leftupperarm,
-    eoprot_ep_as_leftlowerarm       = eoprot_endpoint_as_leftlowerarm,
-    eoprot_ep_as_rightupperarm      = eoprot_endpoint_as_rightupperarm,
-    eoprot_ep_as_rightlowerarm      = eoprot_endpoint_as_rightlowerarm,
-    eoprot_ep_as_leftupperleg       = eoprot_endpoint_as_leftupperleg,
-    eoprot_ep_as_rightupperleg      = eoprot_endpoint_as_rightupperleg
-} eOprot_endpoint_analogsensor_t;
-
-
-enum { eoprot_endpoints_analogsensor_numberof = 6 };
-
-
 /** @typedef    typedef eOas_entity_t eOprotEntityEPas_t
     @brief      It contains the entities in endpoint analosensor: strain and mais
  **/
@@ -82,19 +65,8 @@ typedef eOas_entity_t eOprotEntityEPas_t;
 enum { eoprot_ep_as_entities_numberof = eoas_entities_numberof };
 
 
-// - definition of the strain: number of them in each endpoint, tag and funtyp values
+// - definition of the strain
 
-typedef enum
-{   
-    eoprot_ep_as_strains_numberof_leftupperarm          = 1,
-    eoprot_ep_as_strains_numberof_leftlowerarm          = 0,
-    eoprot_ep_as_strains_numberof_rightupperarm         = 1,
-    eoprot_ep_as_strains_numberof_rightlowerarm         = 0,
-    eoprot_ep_as_strains_numberof_leftupperleg          = 1,
-    eoprot_ep_as_strains_numberof_rightupperleg         = 1
-} eOprot_ep_as_strains_numberof_t;
-
-  
 
 /** @typedef    typedef enum eOprot_ep_as_strain_tag_t
     @brief      It contains the tags for all variables in the analosensor endpoints.
@@ -115,38 +87,28 @@ typedef enum
 enum { eoprot_ep_as_strain_tags_numberof = 8 };  // it MUST be equal to the number of tags. 
 
 
-/** @typedef    typedef enum eOprot_ep_as_strain_funtyp_t
+/** @typedef    typedef enum eOprot_ep_as_strain_rwmode_t
     @brief      It contains the function and type for all the network variables. There must be a one-to-one
                 correspondence to the values in eOprot_ep_as_strain_tag_t.
  **/
 typedef enum
 {
-    eoprot_ep_as_strain_funtyp_config                         = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd),
-    eoprot_ep_as_strain_funtyp_config__mode                   = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b08),
-    eoprot_ep_as_strain_funtyp_config__datarate               = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b08),
-    eoprot_ep_as_strain_funtyp_config__signaloncefullscale    = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b08),
-    eoprot_ep_as_strain_funtyp_status                         = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd),
-    eoprot_ep_as_strain_funtyp_status__fullscale              = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_arr),
-    eoprot_ep_as_strain_funtyp_status__calibratedvalues       = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_arr),
-    eoprot_ep_as_strain_funtyp_status__uncalibratedvalues     = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_arr)    
-} eOprot_ep_as_strain_funtyp_t; 
+    eoprot_ep_as_strain_rwmode_config                         = eo_nv_rwmode_RW,
+    eoprot_ep_as_strain_rwmode_config__mode                   = eo_nv_rwmode_RW,
+    eoprot_ep_as_strain_rwmode_config__datarate               = eo_nv_rwmode_RW,
+    eoprot_ep_as_strain_rwmode_config__signaloncefullscale    = eo_nv_rwmode_RW,
+    eoprot_ep_as_strain_rwmode_status                         = eo_nv_rwmode_RO,
+    eoprot_ep_as_strain_rwmode_status__fullscale              = eo_nv_rwmode_RO,
+    eoprot_ep_as_strain_rwmode_status__calibratedvalues       = eo_nv_rwmode_RO,
+    eoprot_ep_as_strain_rwmode_status__uncalibratedvalues     = eo_nv_rwmode_RO    
+} eOprot_ep_as_strain_rwmode_t; 
 
-enum { eoprot_ep_as_strain_funtyps_numberof = 8 };  // it MUST be equal to the number of tags. 
+enum { eoprot_ep_as_strain_rwmodes_numberof = 8 };  // it MUST be equal to the number of tags. 
 
 
-// - definition of the mais: number of them, tag and funtyp values
 
-typedef enum
-{   
-    eoprot_ep_as_maises_numberof_leftupperarm          = 0,
-    eoprot_ep_as_maises_numberof_leftlowerarm          = 1,
-    eoprot_ep_as_maises_numberof_rightupperarm         = 0,
-    eoprot_ep_as_maises_numberof_rightlowerarm         = 1,
-    eoprot_ep_as_maises_numberof_leftupperleg          = 0,
-    eoprot_ep_as_maises_numberof_rightupperleg         = 0
-} eOprot_ep_as_maises_numberof_t;
-
-  
+// - definition of the mais
+ 
 
 /** @typedef    typedef enum eOprot_ep_as_mais_tag_t
     @brief      It contains the tags for all variables in the analosensor .
@@ -165,110 +127,35 @@ typedef enum
 enum { eoprot_ep_as_mais_tags_numberof = 6 };  // it MUST be equal to the number of tags. 
 
 
-/** @typedef    typedef enum eOprot_ep_as_mais_funtyp_t
+/** @typedef    typedef enum eOprot_ep_as_mais_rwmode_t
     @brief      It contains the function and type for all the network variables. There must be a one-to-one
                 correspondence to the values in eOprot_ep_as_mais_tag_t.
  **/
 typedef enum
 {
-    eoprot_ep_as_mais_funtyp_config                         = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd),
-    eoprot_ep_as_mais_funtyp_config__mode                   = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b08),
-    eoprot_ep_as_mais_funtyp_config__datarate               = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b08),
-    eoprot_ep_as_mais_funtyp_config__resolution             = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_b08),
-    eoprot_ep_as_mais_funtyp_status                         = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd),
-    eoprot_ep_as_mais_funtyp_status__the15values            = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_arr)
-} eOprot_ep_as_mais_funtyp_t; 
+    eoprot_ep_as_mais_rwmode_config                         = eo_nv_rwmode_RW,
+    eoprot_ep_as_mais_rwmode_config__mode                   = eo_nv_rwmode_RW,
+    eoprot_ep_as_mais_rwmode_config__datarate               = eo_nv_rwmode_RW,
+    eoprot_ep_as_mais_rwmode_config__resolution             = eo_nv_rwmode_RW,
+    eoprot_ep_as_mais_rwmode_status                         = eo_nv_rwmode_RO,
+    eoprot_ep_as_mais_rwmode_status__the15values            = eo_nv_rwmode_RO
+} eOprot_ep_as_mais_rwmode_t; 
 
-enum { eoprot_ep_as_mais_funtyps_numberof = 6 };  // it MUST be equal to the number of tags. 
+enum { eoprot_ep_as_mais_rwmodes_numberof = 6 };  // it MUST be equal to the number of tags. 
 
 
 // - structures implementing the endpoints
+
+/** @typedef    typedef struct eOprot_ep_as_template_t;
+    @brief      is a template for the organisation of strains and maises in the analog sensors endpoint.
+ **/
+typedef struct                  // 56*1+48*1 = 104              
+{
+    eOas_strain_t               strains[1]; 
+    eOas_mais_t                 maises[1];
+} eOprot_ep_as_template_t;      EO_VERIFYsizeof(eOprot_ep_as_template_t, 104);
   
   
-// /** @typedef    typedef struct eOprot_ep_as_leftupperarm_t;
-//     @brief      contains all the variables in the endpoint analosensor for the ems board.
-//  **/
-// typedef struct                  // 56+0 = 160              
-// {
-//     eOas_strain_t               strain;
-// } eOprot_ep_as_leftupperarm_t;  EO_VERIFYsizeof(eOprot_ep_as_leftupperarm_t, 56);  
-
-/** @typedef    typedef struct eOprot_ep_as_upperarm_t;
-    @brief      contains all the variables in the endpoint analosensor for the ems board.
- **/
-typedef struct                  // 56+0 = 160              
-{
-    eOas_strain_t               strain;
-} eOprot_ep_as_upperarm_t;      EO_VERIFYsizeof(eOprot_ep_as_upperarm_t, 56);  
-
-// /** @typedef    typedef struct eOprot_ep_as_leftlowerarm_t;
-//     @brief      contains all the variables in the endpoint analosensor for the ems board.
-//  **/
-// typedef struct                  // 48+0 = 160              
-// {
-//     eOas_mais_t                 mais;
-// } eOprot_ep_as_leftlowerarm_t;  EO_VERIFYsizeof(eOprot_ep_as_leftlowerarm_t, 48);  
-
-/** @typedef    typedef struct eOprot_ep_as_lowerarm_t;
-    @brief      contains all the variables in the endpoint analosensor for the ems board.
- **/
-typedef struct                  // 48+0 = 160              
-{
-    eOas_mais_t                 mais;
-} eOprot_ep_as_lowerarm_t;  EO_VERIFYsizeof(eOprot_ep_as_lowerarm_t, 48);
-
-
-
-// /** @typedef    typedef struct eOprot_ep_as_rightupperarm_t;
-//     @brief      contains all the variables in the endpoint analosensor for the ems board.
-//  **/
-// typedef struct                  // 56+0 = 160              
-// {
-//     eOas_strain_t               strain;
-// } eOprot_ep_as_rightupperarm_t; EO_VERIFYsizeof(eOprot_ep_as_rightupperarm_t, 56);  
-
-
-// /** @typedef    typedef struct eOprot_ep_as_rightlowerarm_t;
-//     @brief      contains all the variables in the endpoint analosensor for the ems board.
-//  **/
-// typedef struct                  // 48+0 = 160              
-// {
-//     eOas_mais_t                 mais;
-// } eOprot_ep_as_rightlowerarm_t;  EO_VERIFYsizeof(eOprot_ep_as_rightlowerarm_t, 48);  
-
-
-// /** @typedef    typedef struct eOprot_ep_as_leftupperleg_t;
-//     @brief      contains all the variables in the endpoint analosensor for the ems board.
-//  **/
-// typedef struct                  // 56+0 = 160              
-// {
-//     eOas_strain_t               strain;
-// } eOprot_ep_as_leftupperleg_t;  EO_VERIFYsizeof(eOprot_ep_as_leftupperleg_t, 56);  
-
-
-// /** @typedef    typedef struct eOprot_ep_as_rightupperleg_t;
-//     @brief      contains all the variables in the endpoint analosensor for the ems board.
-//  **/
-// typedef struct                  // 56+0 = 160              
-// {
-//     eOas_strain_t               strain;
-// } eOprot_ep_as_rightupperleg_t; EO_VERIFYsizeof(eOprot_ep_as_rightupperleg_t, 56); 
-
-
-/** @typedef    typedef struct eOprot_ep_as_upperleg_t;
-    @brief      contains all the variables in the endpoint analosensor for the ems board.
- **/
-typedef struct                  // 56+0 = 160              
-{
-    eOas_strain_t               strain;
-} eOprot_ep_as_upperleg_t;      EO_VERIFYsizeof(eOprot_ep_as_upperleg_t, 56); 
-
-typedef eOprot_ep_as_upperarm_t eOprot_ep_as_leftupperarm_t;
-typedef eOprot_ep_as_upperarm_t eOprot_ep_as_rightupperarm_t;
-typedef eOprot_ep_as_lowerarm_t eOprot_ep_as_leftlowerarm_t;
-typedef eOprot_ep_as_lowerarm_t eOprot_ep_as_rightlowerarm_t;
-typedef eOprot_ep_as_upperleg_t eOprot_ep_as_leftupperleg_t;
-typedef eOprot_ep_as_upperleg_t eOprot_ep_as_rightupperleg_t;
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
@@ -280,45 +167,68 @@ typedef eOprot_ep_as_upperleg_t eOprot_ep_as_rightupperleg_t;
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-/** @fn         extern uint16_t eoprot_ep_as_variable_numberof_Get(eOprotEP_t ep)
-    @brief      This function retrieves the number of variables given the endpoint @e ep
-    @param      ep              the endpoint
+#if 0   // dynamic mode
+extern eOresult_t eoprot_ep_as_number_of_boards_Load(uint16_t numofboards);
+#endif
+
+/** @fn         extern eOresult_t eoprot_ep_as_number_of_entities_Load(eOprotBRD_t brd, const uint8_t* numberofeachentity)
+    @brief      This function loads the maximum number of entities managed by the endpoint ...
+    @param      brd                     the board
+    @param      numberofeachentity      array of the values.
     @return     the number of variables.
   */
-extern uint16_t eoprot_ep_as_variables_numberof_Get(eOprotEP_t ep);
+extern eOresult_t eoprot_ep_as_number_of_entities_Load(eOprotBRD_t brd, const uint8_t* numberofeachentity);
 
 
-/** @fn         extern uint16_t eoprot_ep_as_variable_progressivenumber_Get(eOprotEP_t ep)
-    @brief      This function retrieves the progressive number of a variable given the endpoint @e ep and the @e id
-    @param      ep              the endpoint
+/** @fn         extern uint16_t eoprot_ep_as_variable_numberof_Get(eOprotBRD_t brd)
+    @brief      This function retrieves the number of variables given the board
+    @param      brd                     the board
+    @return     the number of variables.
+  */
+extern uint16_t eoprot_ep_as_variables_numberof_Get(eOprotBRD_t brd);
+
+
+/** @fn         extern eOprotID_t eoprot_ep_as_variable_idfromprognumber_Get(eOprotBRD_t brd, uint16_t prog)
+    @brief      This function retrieves the id of a variable from the progressive number given the board
+    @param      brd                     the board
+    @param      prog                    the progressive number
+    @return     the ID or EOK_uint16dummy if invalid .
+  */
+extern eOprotID_t eoprot_ep_as_variable_idfromprognumber_Get(eOprotBRD_t brd, uint16_t prog);
+
+
+/** @fn         extern uint16_t eoprot_ep_as_variable_progressivenumber_Get(eOprotBRD_t brd, eOprotID_t id)
+    @brief      This function retrieves the progressive number of a variable given the board and the @e id
+    @param      brd                     the board
+    @param      id                      the ID
     @return     the progressive number or EOK_uint16dummy if invalid .
   */
-extern uint16_t eoprot_ep_as_variable_progressivenumber_Get(eOprotEP_t ep, eOprotID_t id);
+extern uint16_t eoprot_ep_as_variable_progressivenumber_Get(eOprotBRD_t brd, eOprotID_t id);
 
 
-/** @fn         extern uint16_t eoprot_ep_as_strains_numberof_Get(eOprotEP_t ep)
-    @brief      This function retrieves the number of comms entities given the endpoint @e ep
-    @param      ep              the endpoint
-    @return     the number of comms.
+/** @fn         extern uint16_t eoprot_ep_as_strains_numberof_Get(eOprotBRD_t brd)
+    @brief      This function retrieves the number of strains entities given the board
+    @param      brd                     the board
+    @return     the number of strains.
   */
-extern uint16_t eoprot_ep_as_strains_numberof_Get(eOprotEP_t ep);
+extern uint16_t eoprot_ep_as_strains_numberof_Get(eOprotBRD_t brd);
 
 
-/** @fn         extern uint16_t eoprot_ep_as_maises_numberof_Get(eOprotEP_t ep)
-    @brief      This function retrieves the number of motors given the endpoint @e ep
-    @param      ep              the endpoint
-    @return     the number of maiss.
+/** @fn         extern uint16_t eoprot_ep_as_maises_numberof_Get(eOprotBRD_t brd)
+    @brief      This function retrieves the number of maises given the board
+    @param      brd                     the board
+    @return     the number of maises.
   */
-extern uint16_t eoprot_ep_as_maises_numberof_Get(eOprotEP_t ep);
+extern uint16_t eoprot_ep_as_maises_numberof_Get(eOprotBRD_t brd);
 
 
-extern uint16_t eoprot_ep_as_ram_sizeof_Get(eOprotEP_t ep);
+extern uint16_t eoprot_ep_as_ram_sizeof_Get(eOprotBRD_t brd);
 
-extern uint16_t eoprot_ep_as_variable_ram_sizeof_Get(eOprotEP_t ep, eOprotID_t id);
+extern uint16_t eoprot_ep_as_variable_ram_sizeof_Get(eOprotID_t id);
 
-extern void* eoprot_ep_as_variable_ram_Extract(void* epram, eOprotEP_t ep, eOprotID_t id);
+extern void* eoprot_ep_as_variable_ram_Extract(void* epram, eOprotBRD_t brd, eOprotID_t id);
 
-extern void* eoprot_ep_as_variable_rom_Get(eOprotEP_t ep, eOprotID_t id);
+extern void* eoprot_ep_as_variable_rom_Get(eOprotID_t id);
 
 extern const eOas_strain_t* eoprot_ep_as_strain_default_Get(void);
 
@@ -327,7 +237,7 @@ extern const eOas_mais_t* eoprot_ep_as_mais_default_Get(void);
 
 
 /** @}            
-    end of group eo_protocol_ep_as  
+    end of group eo_EoProtocolEPas  
  **/
 
 #ifdef __cplusplus

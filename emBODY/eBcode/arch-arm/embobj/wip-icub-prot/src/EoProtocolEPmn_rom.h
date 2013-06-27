@@ -30,7 +30,7 @@
 	@date       05/29/2013
 **/
 
-/** @defgroup eo_asfdgr23433 Configuration of the NVs ..
+/** @defgroup eo_EoProtocolEPmn_rom Configuration of the NVs ..
     Tcecece 
     
     @{		
@@ -40,11 +40,10 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "EoProtocolCommon.h"
-#include "EoProtocolEPmn.h"
 #include "EoManagement.h"
+#include "EoProtocolCommon.h"
+#include "EoProtocolEPmn.h" 
 
- 
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -63,14 +62,16 @@ extern const eOmn_appl_t eoprot_ep_mn_rom_appl_defaultvalue;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern uint16_t eoprot_ep_mn_rom_epid2progressivenumber(eOprotEP_t ep, eOprotID_t id);
-extern uint16_t eoprot_ep_mn_rom_epid2sizeofvar(eOprotEP_t ep, eOprotID_t id);
-extern void* eoprot_ep_mn_rom_dataepid2nvram(void* data, eOprotEP_t ep, eOprotID_t id);
-extern void* eoprot_ep_mn_rom_epid2nvrom(eOprotEP_t ep, eOprotID_t id);
+extern uint16_t eoprot_ep_mn_rom_comm_get_offset(eOprotTag_t tag);
+extern uint16_t eoprot_ep_mn_rom_appl_get_offset(eOprotTag_t tag);
+
+extern void* eoprot_ep_mn_rom_get_nvrom(eOprotID_t id);
+extern uint16_t eoprot_ep_mn_rom_get_sizeofvar(eOprotID_t id);
+extern uint16_t eoprot_ep_mn_rom_get_prognum(eOprotID_t id);
 
 
 /** @}            
-    end of group eo_asfdgr23433  
+    end of group eo_EoProtocolEPmn_rom  
  **/
 
 #endif  // include-guard

@@ -31,7 +31,7 @@ extern "C" {
     @date       06/05/2013
 **/
 
-/** @defgroup eo_protocol_ep_mn Protocol for management endpoint 
+/** @defgroup eo_EoProtocolEPmn Protocol for management endpoint 
     Ivreververv e
     
     @{        
@@ -45,7 +45,7 @@ extern "C" {
 #include "EoProtocolCommon.h"
 #include "EoProtocolEP.h"
 #include "EoManagement.h"
-
+#include "EOnv.h"
 
 
 
@@ -57,18 +57,6 @@ extern "C" {
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
-/** @typedef    typedef enum eOprot_endpoint_management_t;
-    @brief      It contains all the endpoints used for management. 
- **/
-typedef enum
-{
-    eoprot_ep_mn_emsboard           = eoprot_endpoint_mn_emsboard
-} eOprot_endpoint_management_t;
-
-
-enum { eoprot_endpoints_management_numberof = 1 };
-
-
 /** @typedef    typedef eOmn_entity_t eOprotEntityEPmn_t
     @brief      It contains the entities in endpoint management: comm and appl
  **/
@@ -77,14 +65,8 @@ typedef eOmn_entity_t eOprotEntityEPmn_t;
 enum { eoprot_ep_mn_entities_numberof = eomn_entities_numberof };
 
 
-// - definition of the comm: number of them in each endpoint, tag and funtyp values
+// - definition of the comm
 
-typedef enum
-{   
-    eoprot_ep_mn_comms_numberof_emsboard        = 1 
-} eOprot_ep_mn_comms_numberof_t;
-
-  
 
 /** @typedef    typedef enum eOprot_ep_mn_comm_tag_t
     @brief      It contains the tags for all variables in the management of the communication.
@@ -98,25 +80,20 @@ typedef enum
 enum { eoprot_ep_mn_comm_tags_numberof = 1 };  // it MUST be equal to the number of tags. 
 
 
-/** @typedef    typedef enum eOprot_ep_mn_comm_funtyp_t
-    @brief      It contains the function and type for all the network variables. There must be a one-to-one
+/** @typedef    typedef enum eOprot_ep_mn_comm_rwmode_t
+    @brief      It contains the rw mode for all the network variables. There must be a one-to-one
                 correspondence to the values in eOprot_ep_mn_comm_tag_t.
  **/
 typedef enum
 {
-    eoprot_ep_mn_comm_funtyp_cmmnds__ropsigcfg  = EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_pkd)
-} eOprot_ep_mn_comm_funtyp_t; 
+    eoprot_ep_mn_comm_rwmode_cmmnds__ropsigcfg  = eo_nv_rwmode_RW
+} eOprot_ep_mn_comm_rwmode_t; 
 
-enum { eoprot_ep_mn_comm_funtyps_numberof = 1 };  // it MUST be equal to the number of tags. 
+enum { eoprot_ep_mn_comm_rwmodes_numberof = 1 };  // it MUST be equal to the number of tags. 
 
 
-// - definition of the appl: number of them, tag and funtyp values
 
-typedef enum
-{   
-    eoprot_ep_mn_appls_numberof_emsboard        = 1 
-} eOprot_ep_mn_appls_numberof_t;
-
+// - definition of the appl
   
 
 /** @typedef    typedef enum eOprot_ep_mn_appl_tag_t
@@ -133,31 +110,31 @@ typedef enum
 enum { eoprot_ep_mn_appl_tags_numberof = 3 };  // it MUST be equal to the number of tags. 
 
 
-/** @typedef    typedef enum eOprot_ep_mn_appl_funtyp_t
-    @brief      It contains the function and type for all the network variables. There must be a one-to-one
+/** @typedef    typedef enum eOprot_ep_mn_appl_rwmode_t
+    @brief      It contains the rw mode for all the network variables. There must be a one-to-one
                 correspondence to the values in eOprot_ep_mn_appl_tag_t.
  **/
 typedef enum
 {
-    eoprot_ep_mn_appl_funtyp_config             = EO_nv_FUNTYP(eo_nv_FUN_cfg, eo_nv_TYP_pkd),
-    eoprot_ep_mn_appl_funtyp_status             = EO_nv_FUNTYP(eo_nv_FUN_inp, eo_nv_TYP_pkd),
-    eoprot_ep_mn_appl_funtyp_cmmnds__go2state   = EO_nv_FUNTYP(eo_nv_FUN_beh, eo_nv_TYP_b08)
-} eOprot_ep_mn_appl_funtyp_t; 
+    eoprot_ep_mn_appl_rwmode_config             = eo_nv_rwmode_RW,
+    eoprot_ep_mn_appl_rwmode_status             = eo_nv_rwmode_RO,
+    eoprot_ep_mn_appl_rwmode_cmmnds__go2state   = eo_nv_rwmode_RW
+} eOprot_ep_mn_appl_rwmode_t; 
 
-enum { eoprot_ep_mn_appl_funtyps_numberof = 3 };  // it MUST be equal to the number of tags. 
+enum { eoprot_ep_mn_appl_rwmodes_numberof = 3 };  // it MUST be equal to the number of tags. 
 
 
 // - structures implementing the endpoints
   
   
-/** @typedef    typedef struct eOprot_ep_mn_emsboard_t;
-    @brief      contains all the variables in the endpoint management for the ems board.
+/** @typedef    typedef struct eOprot_ep_mn_template_t;
+    @brief      it is a template for the organisation of the entities in the endpoint management.
  **/
 typedef struct                  // 136+24+0 = 160              
 {
     eOmn_comm_t                 communication; 
     eOmn_appl_t                 application;
-} eOprot_ep_mn_emsboard_t;      EO_VERIFYsizeof(eOprot_ep_mn_emsboard_t, 160);  
+} eOprot_ep_mn_template_t;      EO_VERIFYsizeof(eOprot_ep_mn_template_t, 160);  
 
   
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
@@ -170,45 +147,66 @@ typedef struct                  // 136+24+0 = 160
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-/** @fn         extern uint16_t eoprot_ep_mn_variable_numberof_Get(eOprotEP_t ep)
-    @brief      This function retrieves the number of variables given the endpoint @e ep
-    @param      ep              the endpoint
+#if 0   // dynamic mode
+extern eOresult_t eoprot_ep_mn_number_of_boards_Load(uint16_t numofboards);
+#endif
+
+/** @fn         extern eOresult_t eoprot_ep_mn_number_of_entities_Load(eOprotBRD_t brd, const uint8_t* numberofeachentity)
+    @brief      This function loads the maximum number of entities managed by the endpoint ...
+    @param      brd                     the board
+    @param      numberofeachentity      array of the values.
     @return     the number of variables.
   */
-extern uint16_t eoprot_ep_mn_variables_numberof_Get(eOprotEP_t ep);
+extern eOresult_t eoprot_ep_mn_number_of_entities_Load(eOprotBRD_t brd, const uint8_t* numberofeachentity);
 
 
-/** @fn         extern uint16_t eoprot_ep_mn_variable_progressivenumber_Get(eOprotEP_t ep)
-    @brief      This function retrieves the progressive number of a variable given the endpoint @e ep and the @e id
-    @param      ep              the endpoint
+/** @fn         extern uint16_t eoprot_ep_mn_variable_numberof_Get(eOprotBRD_t brd)
+    @brief      This function retrieves the number of variables given the board
+    @param      brd                     the board
+    @return     the number of variables.
+  */
+extern uint16_t eoprot_ep_mn_variables_numberof_Get(eOprotBRD_t brd);
+
+/** @fn         extern eOprotID_t eoprot_ep_mn_variable_idfromprognumber_Get(eOprotBRD_t brd, uint16_t prog)
+    @brief      This function retrieves the id of a variable from the progressive number given the board
+    @param      brd                     the board
+    @param      prog                    the progressive number
+    @return     the ID or EOK_uint16dummy if invalid .
+  */
+extern eOprotID_t eoprot_ep_mn_variable_idfromprognumber_Get(eOprotBRD_t brd, uint16_t prog);
+
+/** @fn         extern uint16_t eoprot_ep_mn_variable_progressivenumber_Get(eOprotBRD_t brd, eOprotID_t id)
+    @brief      This function retrieves the progressive number of a variable given the board and the @e id
+    @param      brd                     the board
+    @param      id                      the ID
     @return     the progressive number or EOK_uint16dummy if invalid .
   */
-extern uint16_t eoprot_ep_mn_variable_progressivenumber_Get(eOprotEP_t ep, eOprotID_t id);
+extern uint16_t eoprot_ep_mn_variable_progressivenumber_Get(eOprotBRD_t brd, eOprotID_t id);
 
 
-/** @fn         extern uint16_t eoprot_ep_mn_comms_numberof_Get(eOprotEP_t ep)
-    @brief      This function retrieves the number of comms entities given the endpoint @e ep
-    @param      ep              the endpoint
+/** @fn         extern uint16_t eoprot_ep_mn_comms_numberof_Get(eOprotBRD_t brd)
+    @brief      This function retrieves the number of comms entities given the board
+    @param      brd                     the board
     @return     the number of comms.
   */
-extern uint16_t eoprot_ep_mn_comms_numberof_Get(eOprotEP_t ep);
+extern uint16_t eoprot_ep_mn_comms_numberof_Get(eOprotBRD_t brd);
 
 
-/** @fn         extern uint16_t eoprot_ep_mn_appls_numberof_Get(eOprotEP_t ep)
-    @brief      This function retrieves the number of motors given the endpoint @e ep
-    @param      ep              the endpoint
+/** @fn         extern uint16_t eoprot_ep_mn_appls_numberof_Get(eOprotBRD_t brd)
+    @brief      This function retrieves the number of appls given the board
+    @param      brd                     the board
     @return     the number of appls.
   */
-extern uint16_t eoprot_ep_mn_appls_numberof_Get(eOprotEP_t ep);
+extern uint16_t eoprot_ep_mn_appls_numberof_Get(eOprotBRD_t brd);
 
 
-extern uint16_t eoprot_ep_mn_ram_sizeof_Get(eOprotEP_t ep);
+extern uint16_t eoprot_ep_mn_ram_sizeof_Get(eOprotBRD_t brd);
 
-extern uint16_t eoprot_ep_mn_variable_ram_sizeof_Get(eOprotEP_t ep, eOprotID_t id);
+extern uint16_t eoprot_ep_mn_variable_ram_sizeof_Get(eOprotID_t id);
 
-extern void* eoprot_ep_mn_variable_ram_Extract(void* epram, eOprotEP_t ep, eOprotID_t id);
+extern void* eoprot_ep_mn_variable_ram_Extract(void* epram, eOprotBRD_t brd, eOprotID_t id);
 
-extern void* eoprot_ep_mn_variable_rom_Get(eOprotEP_t ep, eOprotID_t id);
+extern void* eoprot_ep_mn_variable_rom_Get(eOprotID_t id);
 
 extern const eOmn_comm_t* eoprot_ep_mn_comm_default_Get(void);
 
@@ -217,7 +215,7 @@ extern const eOmn_appl_t* eoprot_ep_mn_appl_default_Get(void);
 
 
 /** @}            
-    end of group eo_protocol_ep_mn  
+    end of group eo_EoProtocolEPmn  
  **/
 
 #ifdef __cplusplus
