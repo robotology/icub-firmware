@@ -87,7 +87,7 @@ extern EOtheFormer * eo_former_GetHandle(void);
 extern uint16_t eo_former_GetSizeOfStream(EOtheFormer *p, const EOrop *rop);
 
 /** @fn         extern eOresult_t eo_former_GetStream(EOtheFormer *p, EOrop *rop_in, uint8_t *data, uint16_t size, EOrop *reply, uint8_t *replyneeded)
-    @brief      Builds the packet in stream form and executes actions required by the ROP on transmission.
+    @brief      Builds the packet in stream form.
     @param      p               The former.
     @param      rop             The ROP to send
     @return     Normally eores_OK, eores_NOK_generic upon failure.

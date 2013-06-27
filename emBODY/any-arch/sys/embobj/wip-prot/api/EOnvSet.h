@@ -72,6 +72,7 @@ typedef enum
  **/  
 typedef struct
 {
+    eOres_fp_void_t         fptr_device_initialise; /*< used to initialise whatever is needed before using the eOnvset_EPcfg_t. for instance the number of entities in the board */
     const EOconstvector*    vectorof_epcfg;         /*< a const vector of eOnvset_EPcfg_t items, of size equal to the number of managed endpoints */
     eOuint16_fp_uint16_t    fptr_ep2indexofepcfg;   /*< a function which maps a given ep to and index inside @e vectorof_epcfg. It returns EOK_uint16dummy if the ep is not managed */
 } eOnvset_DEVcfg_t;
@@ -85,11 +86,11 @@ typedef struct
     eOnvEP_t                            endpoint;                       /*< the endpoint value */
     uint16_t                            epram_sizeof;                   /*< the size of the ram used for the NVs in the endopoint */
     eOuint16_fp_uint16_t                fptr_ep2nvsnumberof;            /*< a function which returns the total number of the NVS in the endpoint */
+    eOuint16_fp_uint16_uint16_t         fptr_epnvprogressivenumber2id;  /*< a function which returns the ID given the pair (ep, prognumber)  */
     eOuint16_fp_uint16_uint16_t         fptr_epid2nvprogressivenumber;  /*< a function which returns a progressive number for the NV with pair (ep, id)  */
     eOvoidp_fp_uint16_uint16_t	        fptr_epid2nvrom;                /*< a function which returns the .rom part of the NV with pair (ep, id)  */
     eOvoidp_fp_voidp_uint16_uint16_t    fptr_epramepid2nvram;           /*< a function which returns the .ram part of the NV with pair (ep, id) given the entire ram of the endpoint */
-    eOvoid_fp_uint16_voidp_voidp_t      fptr_epram_initialise;          /*< a function which initialises all the ram of the endpoint */
-    eOvoid_fp_uint16_voidp_voidp_t      fptr_epram_retrieve;            /*< a function which retrieves the ram of the endpoint */
+    eOvoid_fp_uint16_voidp_t            fptr_epram_initialise;          /*< a function which initialises the ram of the endpoint */
 } eOnvset_EPcfg_t;
 
 
@@ -114,9 +115,11 @@ typedef enum
 
 extern EOnvSet* eo_nvset_New(uint16_t ndevices, eOnvset_protection_t prot, eov_mutex_fn_mutexderived_new mtxnew);
 
-extern eOresult_t eo_nvset_DEVpushback(EOnvSet* p, eOnvset_DEVcfg_t* cfgofdev, eOnvsetOwnership_t ownership, eOipv4addr_t ipaddress);
+extern eOresult_t eo_nvset_DEVpushback(EOnvSet* p, uint16_t ondevindex, eOnvset_DEVcfg_t* cfgofdev, eOnvsetOwnership_t ownership, eOipv4addr_t ipaddress);
 
 extern eOresult_t eo_nvset_NVSinitialise(EOnvSet* p);
+
+extern void* eo_nvset_EPRAMget(EOnvSet* p, eOipv4addr_t ip, eOnvEP_t ep);
 
 extern eOresult_t eo_nvset_NVget(EOnvSet* p, eOipv4addr_t ip, eOnvEP_t ep, eOnvID_t id, EOnv* thenv);
 

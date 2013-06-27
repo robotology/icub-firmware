@@ -95,23 +95,14 @@ extern EOtheAgent* eo_agent_Initialise(const eOagent_cfg_t *cfg);
 extern EOtheAgent* eo_agent_GetHandle(void);
 
 
-
-// receives a rop, it may call on_rop_confirmation_received(), it may execute some actions related to the rop,
+// processes a received rop, it may call on_rop_confirmation_received(), it may execute some actions related to the rop,
 // it may produce a rop in output. the rop in output must not be fed to eo_agent_OutROPinit() or eo_agent_OutROPfill()
 extern eOresult_t eo_agent_InpROPprocess(EOtheAgent *p, EOrop *ropin, EOnvSet* nvset, eOipv4addr_t fromipaddr, EOrop *replyrop);
 
+// OK: called by eo_transmitter_occasional_rops_Load() and eo_transmitter_regular_rops_Load(). 
+// if data is required this function uses ropdescr->data/size if not NULL/0, otherwise if NULL it used data from EOnv.
+extern eOresult_t eo_agent_OutROPprepare(EOtheAgent* p, EOnv* nv, eOropdescriptor_t* ropdescr, EOrop* rop, uint16_t* requiredbytes);
 
-// prepare a rop by taking data from the proper nv (or from argument ...), it may call on_rop_confirmation_requested()  
-extern eOresult_t eo_agent_OutROPinit(EOtheAgent *p, EOnvSet* nvset, eOipv4addr_t toipaddr, eOropdescriptor_t* ropdescr, EOrop *rop, uint16_t *requiredbytes);
-
-
-//extern eOresult_t eo_agent_OutROPfromNVold(EOtheAgent *p, EOnv* nv, eOropcode_t ropc, eOropconfig_t ropcfg, EOrop *rop, uint16_t *requiredbytes);
-
-extern eOresult_t eo_agent_OutROPfromNV(EOtheAgent* p, EOnv* nv, eOropdescriptor_t* ropdescr, EOrop* rop, uint16_t* requiredbytes);
-
-
-// updates an existing rop
-//extern eOresult_t eo_agent_OutROPrefresh(EOtheAgent *p, EOrop *rop);
 
 
 

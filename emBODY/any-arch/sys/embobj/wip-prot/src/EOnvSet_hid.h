@@ -56,9 +56,8 @@ typedef struct
     uint16_t                            epnvs_numberof; 
     uint16_t                            epram_sizeof;
     void*                               epram_ram;
-    void*                               epram_rem;
-    eOvoid_fp_uint16_voidp_voidp_t      fptr_epram_initialise;  // ep, vol, rem
-    eOvoid_fp_uint16_voidp_voidp_t      fptr_epram_retrieve; // ep, vol, rem
+    eOvoid_fp_uint16_voidp_t            fptr_epram_initialise;  // ep, vol
+    eOuint16_fp_uint16_uint16_t         fptr_epnvprogressivenumber2id;
     eOuint16_fp_uint16_uint16_t         fptr_epid2nvprogressivenumber;
     eOvoidp_fp_voidp_uint16_uint16_t    fptr_dataepid2nvram;    
     eOvoidp_fp_uint16_uint16_t          fptr_epid2nvrom; 

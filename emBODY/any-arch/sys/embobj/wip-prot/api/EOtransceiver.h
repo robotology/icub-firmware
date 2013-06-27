@@ -146,8 +146,7 @@ extern eOresult_t eo_transceiver_rop_regular_Clear(EOtransceiver *p);
 extern eOresult_t eo_transceiver_rop_regular_Load(EOtransceiver *p, eOropdescriptor_t *ropdes); 
 extern eOresult_t eo_transceiver_rop_regular_Unload(EOtransceiver *p, eOropdescriptor_t *ropdes); 
 
-extern eOresult_t eo_transceiver_rop_occasional_Load_without_data(EOtransceiver *p, eOropdescriptor_t *ropdesc, uint8_t itisobsolete);
-
+// if the rop requires data ... if the variable is local then it is used the ram of teh netvar. if remote the ropdescr must contain data and size
 extern eOresult_t eo_transceiver_rop_occasional_Load(EOtransceiver *p, eOropdescriptor_t *ropdes);
 
 

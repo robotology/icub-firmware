@@ -120,7 +120,7 @@ extern eOresult_t eo_transmitter_regular_rops_Refresh(EOtransmitter *p);
 // and after that they are cleared.
 
 // obsolete ...
-extern eOresult_t eo_transmitter_occasional_rops_Load_without_data(EOtransmitter *p, eOropdescriptor_t* ropdesc, uint8_t itisobsolete); 
+//extern eOresult_t eo_transmitter_occasional_rops_Load_without_data(EOtransmitter *p, eOropdescriptor_t* ropdesc, uint8_t itisobsolete); 
 
 extern eOresult_t eo_transmitter_occasional_rops_Load(EOtransmitter *p, eOropdescriptor_t* ropdesc);
 

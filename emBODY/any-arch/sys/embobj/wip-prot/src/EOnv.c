@@ -165,9 +165,8 @@ extern eOresult_t eo_nv_Clear(EOnv *nv)
     nv->id          = eo_nv_IDdummy;
     nv->rom         = NULL;       
     nv->ram         = NULL;  
-    nv->rem         = NULL; 
+//    nv->rem         = NULL; 
     nv->mtx         = NULL;
-//    nv->stg         = NULL;
       
     return(eores_OK);
 }
@@ -301,10 +300,10 @@ extern eOresult_t eo_nv_Init(const EOnv *nv)
     return(res);
 }
 
-extern eOresult_t eo_nv_Update(const EOnv *nv)
-{
-    return(eo_nv_hid_UpdateROP(nv, NULL));
-}
+// extern eOresult_t eo_nv_Update(const EOnv *nv)
+// {
+//     return(eo_nv_hid_UpdateROP(nv, NULL));
+// }
 
 
 
@@ -336,70 +335,83 @@ extern eOipv4addr_t eo_nv_GetIP(const EOnv *nv)
 }
 
 
-extern eOresult_t eo_nv_remoteSet(const EOnv *nv, const void *dat, eOnvUpdate_t upd)
-{
-    if((NULL == nv) || (NULL == dat))
-    {
-        return(eores_NOK_nullpointer);
-    }
-
-    if(eobool_true == eo_nv_hid_isLocal(nv))
-    {
-        return(eores_NOK_generic);
-    }
-
-    return(s_eo_nv_Set(nv, dat, nv->rem, upd));
-}
+// extern eOresult_t eo_nv_remoteSet(const EOnv *nv, const void *dat, eOnvUpdate_t upd)
+// {
+//     if((NULL == nv) || (NULL == dat))
+//     {
+//         return(eores_NOK_nullpointer);
+//     }
+//     if(eobool_true == eo_nv_hid_isLocal(nv))
+//     {
+//         return(eores_NOK_generic);
+//     }
+//     return(s_eo_nv_Set(nv, dat, nv->rem, upd));
+// }
 
 
 
-extern eOresult_t eo_nv_remoteGet(const EOnv *nv, void *data, uint16_t *size)
-{
-    void *source = NULL;
+// extern eOresult_t eo_nv_remoteGet(const EOnv *nv, void *data, uint16_t *size)
+// {
+//     void *source = NULL;
 
-    
-    if((NULL == data) || (NULL == size) || (NULL == nv))
-    {
-        return(eores_NOK_nullpointer);
-    }
+//     
+//     if((NULL == data) || (NULL == size) || (NULL == nv))
+//     {
+//         return(eores_NOK_nullpointer);
+//     }
 
-    if(eobool_true == eo_nv_hid_isLocal(nv))
-    {
-        return(eores_NOK_generic);
-    }
-  
-    source = nv->rem;
-    //*size = s_eo_nv_get_size1(nv, source);
-    *size = s_eo_nv_get_size2(nv);
-    
-    eov_mutex_Take(nv->mtx, eok_reltimeINFINITE);
-    memcpy(data, source, *size);
-    eov_mutex_Release(nv->mtx);
+//     if(eobool_true == eo_nv_hid_isLocal(nv))
+//     {
+//         return(eores_NOK_generic);
+//     }
+//   
+//     source = nv->rem;
+//     //*size = s_eo_nv_get_size1(nv, source);
+//     *size = s_eo_nv_get_size2(nv);
+//     
+//     eov_mutex_Take(nv->mtx, eok_reltimeINFINITE);
+//     memcpy(data, source, *size);
+//     eov_mutex_Release(nv->mtx);
 
-    
-    return(eores_OK);  
-}
+//     
+//     return(eores_OK);  
+// }
 
-extern eOnvFunc_t eo_nv_GetFUN(const EOnv *nv)
+extern eOnvRWmode_t eo_nv_GetRWmode(const EOnv *nv)
 {
     if((NULL == nv) || (NULL == nv->rom))
     {
-        return(eo_nv_FUN_NO0);
+        return(eo_nv_rwmode_NONE);
     }
 
-    return((eOnvFunc_t)EO_nv_FUN(nv->rom->funtyp));
+    return((eOnvRWmode_t)nv->rom->rwmode);    
 }
 
-
-extern eOnvType_t eo_nv_GetTYP(const EOnv *nv)
+extern eOnvOwnership_t eo_nv_GetOwnership(const EOnv *nv)
 {
-    if((NULL == nv) || (NULL == nv->rom))
-    {
-        return(eo_nv_TYP_NO4);
-    }
-
-    return((eOnvType_t)EO_nv_TYP(nv->rom->funtyp));
+    return((eobool_true == eo_nv_hid_isLocal(nv)) ? (eo_nv_ownership_local) : (eo_nv_ownership_remote));
 }
+
+// extern eOnvFunc_t eo_nv_GetFUN(const EOnv *nv)
+// {
+//     if((NULL == nv) || (NULL == nv->rom))
+//     {
+//         return(eo_nv_FUN_NO0);
+//     }
+
+//     return((eOnvFunc_t)EO_nv_FUN(nv->rom->funtyp));
+// }
+
+
+// extern eOnvType_t eo_nv_GetTYP(const EOnv *nv)
+// {
+//     if((NULL == nv) || (NULL == nv->rom))
+//     {
+//         return(eo_nv_TYP_NO4);
+//     }
+
+//     return((eOnvType_t)EO_nv_TYP(nv->rom->funtyp));
+// }
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -407,14 +419,14 @@ extern eOnvType_t eo_nv_GetTYP(const EOnv *nv)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvEP_t ep, eOnvID_t id, EOnv_rom_t* rom, void* ram, void* rem, EOVmutexDerived* mtx/*, EOVstorageDerived* stg*/)
+extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvEP_t ep, eOnvID_t id, EOnv_rom_t* rom, void* ram, EOVmutexDerived* mtx/*, EOVstorageDerived* stg*/)
 {
     nv->ip          = ip;
     nv->ep          = ep;
     nv->id          = id;
     nv->rom         = rom;
     nv->ram         = ram;
-    nv->rem         = rem;   
+//    nv->rem         = rem;   
     nv->mtx         = mtx;
 //    nv->stg         = stg;
            
@@ -431,42 +443,58 @@ extern void eo_nv_hid_Fast_LocalMemoryGet(EOnv *nv, void* dest)
 
 extern eObool_t eo_nv_hid_isWritable(const EOnv *nv)
 {
-    eOnvFunc_t fun = (eOnvFunc_t)EO_nv_FUN(nv->rom->funtyp);
-
-    if((fun == eo_nv_FUN_out) || (fun == eo_nv_FUN_cfg) || (fun == eo_nv_FUN_beh))
+//     eOnvFunc_t fun = (eOnvFunc_t)EO_nv_FUN(nv->rom->funtyp);
+//
+//     if((fun == eo_nv_FUN_out) || (fun == eo_nv_FUN_cfg) || (fun == eo_nv_FUN_beh))
+//     {
+//         return(eobool_true);
+//     }
+//     else
+//     {
+//         return(eobool_false);
+//     }
+    
+    if((eo_nv_rwmode_RW == nv->rom->rwmode) || (eo_nv_rwmode_WO == nv->rom->rwmode))
     {
         return(eobool_true);
     }
     else
     {
         return(eobool_false);
-    }
+    }    
 }
 
 
 extern eObool_t eo_nv_hid_isLocal(const EOnv *nv)
 {
-    return((NULL == nv->rem) ? (eobool_true) : (eobool_false));
+    return((eok_ipv4addr_localhost == nv->ip) ? (eobool_true) : (eobool_false));
 } 
 
 
-extern eObool_t eo_nv_hid_isPermanent(const EOnv *nv)
-{
-    eOnvFunc_t fun = (eOnvFunc_t)EO_nv_FUN(nv->rom->funtyp);
-    return((fun == eo_nv_FUN_cfg) ? (eobool_true) : (eobool_false));
-} 
+// extern eObool_t eo_nv_hid_isPermanent(const EOnv *nv)
+// {
+//     eOnvFunc_t fun = (eOnvFunc_t)EO_nv_FUN(nv->rom->funtyp);
+//     return((fun == eo_nv_FUN_cfg) ? (eobool_true) : (eobool_false));
+// } 
 
 extern eObool_t eo_nv_hid_isUpdateable(const EOnv *nv)
 {
-    eOnvFunc_t fun = (eOnvFunc_t)EO_nv_FUN(nv->rom->funtyp);
-
-    if((fun == eo_nv_FUN_inp) || (fun == eo_nv_FUN_out) || (fun == eo_nv_FUN_cfg) || (fun == eo_nv_FUN_beh))
+//     eOnvFunc_t fun = (eOnvFunc_t)EO_nv_FUN(nv->rom->funtyp);
+//     if((fun == eo_nv_FUN_inp) || (fun == eo_nv_FUN_out) || (fun == eo_nv_FUN_cfg) || (fun == eo_nv_FUN_beh))
+//     {
+//         return(eobool_true);
+//     }
+//     else
+//     {
+//         return(eobool_false);
+//     }
+    if(eobool_true == eo_nv_hid_isLocal(nv))
     {
-        return(eobool_true);
+        return(eo_nv_hid_isWritable(nv));
     }
     else
     {
-        return(eobool_false);
+        return(eobool_true);
     }
 } 
 
@@ -502,28 +530,28 @@ extern eOresult_t eo_nv_hid_SetROP(const EOnv *nv, const void *dat, eOnvUpdate_t
     return(s_eo_nv_SetROP(nv, dat, nv->ram, upd, ropdes));
 }
 
-extern eOresult_t eo_nv_hid_UpdateROP(const EOnv *nv, const eOropdescriptor_t* ropdes)
-{
-    eOresult_t res = eores_NOK_generic;
-    
-    if(NULL == nv)
-    {
-        return(eores_NOK_nullpointer);
-    }  	
+// extern eOresult_t eo_nv_hid_UpdateROP(const EOnv *nv, const eOropdescriptor_t* ropdes)
+// {
+//     eOresult_t res = eores_NOK_generic;
+//     
+//     if(NULL == nv)
+//     {
+//         return(eores_NOK_nullpointer);
+//     }  	
 
-    if(eobool_true == eo_nv_hid_isUpdateable(nv)) 
-    {
-        if(NULL != nv->rom->update)
-        {   // protect
-            eov_mutex_Take(nv->mtx, eok_reltimeINFINITE);
-            nv->rom->update(nv, ropdes);
-            eov_mutex_Release(nv->mtx);
-            res = eores_OK;
-        }
-    }
+//     if(eobool_true == eo_nv_hid_isUpdateable(nv)) 
+//     {
+//         if(NULL != nv->rom->update)
+//         {   // protect
+//             eov_mutex_Take(nv->mtx, eok_reltimeINFINITE);
+//             nv->rom->update(nv, ropdes);
+//             eov_mutex_Release(nv->mtx);
+//             res = eores_OK;
+//         }
+//     }
 
-    return(res);
-}
+//     return(res);
+// }
 
 extern eOresult_t eo_nv_hid_remoteSetROP(const EOnv *nv, const void *dat, eOnvUpdate_t upd, const eOropdescriptor_t* ropdes)
 {
@@ -532,13 +560,15 @@ extern eOresult_t eo_nv_hid_remoteSetROP(const EOnv *nv, const void *dat, eOnvUp
         return(eores_NOK_nullpointer);
     }
 
-    if(eobool_true == eo_nv_hid_isLocal(nv))
-    {
-        return(eores_NOK_generic);
-    }
+//     if(eobool_true == eo_nv_hid_isLocal(nv))
+//     {
+//         return(eores_NOK_generic);
+//     }
 
-    return(s_eo_nv_SetROP(nv, dat, nv->rem, upd, ropdes));
+    return(s_eo_nv_SetROP(nv, dat, nv->ram, upd, ropdes));
 }
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
