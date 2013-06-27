@@ -56,6 +56,8 @@ extern "C" {
 
 typedef uint16_t eObrd_boardId_t;
 
+#warning --> eval to use uint8_t for eObrd_boardId_t ...
+
 
 typedef enum
 {
@@ -65,7 +67,7 @@ typedef enum
     eobrd_mais                      = 3,
     eobrd_ems                       = 4,
     eobdr_aea                       = 5,
-    eobrd_skin                       = 6 	
+    eobrd_skin                      = 6 	
 } eObrd_types_t;
 
 
