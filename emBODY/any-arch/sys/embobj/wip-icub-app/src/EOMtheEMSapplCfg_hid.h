@@ -58,12 +58,12 @@ extern "C" {
         #define     EOMTHEEMSAPPLCFG_USE_EB1
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB1"
         #include    "eOcfg_EPs_eb1.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eo_cfg_EPs_eb1_object
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eocfg_EPs_eb1_object
 #elif   (2 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB2
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB2"
         #include    "eOcfg_EPs_eb2.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eo_cfg_EPs_eb2_object        
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eocfg_EPs_eb2_object        
 #elif   (3 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB3
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB3"
@@ -181,14 +181,14 @@ extern "C" {
 
 //definition on num of endpoint
 #if     defined(EOMTHEEMSAPPLCFG_USE_EB1)
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    eoprot_endpoint_mc_leftupperarm       
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    eoprot_endpoint_as_leftupperarm 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    eoprot_endpoint_motioncontrol       
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    eoprot_endpoint_analogsensors
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
         
 #elif     defined(EOMTHEEMSAPPLCFG_USE_EB2)
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    eoprot_endpoint_mc_leftlowerarm       
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    eoprot_endpoint_as_leftlowerarm 
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    eoprot_endpoint_sk_leftlowerarm 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    eoprot_endpoint_motioncontrol       
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    eoprot_endpoint_analogsensors 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    eoprot_endpoint_skin 
         
 #elif     defined(EOMTHEEMSAPPLCFG_USE_EB3)
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    eoprot_endpoint_mc_rightupperarm       
