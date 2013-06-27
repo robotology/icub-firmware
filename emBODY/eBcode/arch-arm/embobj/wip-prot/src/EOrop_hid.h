@@ -131,6 +131,8 @@ extern eObool_t eo_rop_hid_DataField_is_Present(const eOrophead_t *head);
 
 extern eObool_t eo_rop_hid_DataField_is_Required(const eOrophead_t *head);
 
+extern eObool_t eo_rop_hid_OPChasData(eOropcode_t ropc);
+
 extern void	eo_rop_hid_fill_ropdes(eOropdescriptor_t* ropdes, EOrop_stream_t* stream, uint16_t size, uint8_t* data);
 
 // - declaration of extern inline hidden functions --------------------------------------------------------------------

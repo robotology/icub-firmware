@@ -206,19 +206,20 @@ extern eOresult_t eo_agent_InpROPprocess(EOtheAgent *p, EOrop *ropin, EOnvSet* n
 }
 
 
-extern eOresult_t eo_agent_OutROPinit(EOtheAgent *p, EOnvSet* nvset, eOipv4addr_t toipaddr, eOropdescriptor_t* ropdescr, EOrop *rop, uint16_t *requiredbytes)
+
+extern eOresult_t eo_agent_OutROPprepare(EOtheAgent* p, EOnv* nv, eOropdescriptor_t* ropdescr, EOrop* rop, uint16_t* requiredbytes)
 {
     eOrophead_t rophead;
-    eOresult_t res;
 
-    if((NULL == p) || (NULL == rop) || (NULL == ropdescr))
+    if((NULL == p) || (NULL == rop) || (NULL == nv) || (NULL == ropdescr))
     {
         return(eores_NOK_nullpointer);
     } 
+    
 
     // reset the rop
     eo_rop_Reset(rop);  
-    
+        
     // put in rophead all the options
     rophead.ctrl.ffu        = 0;
     rophead.ctrl.confinfo   = eo_ropconf_none; // cannot do a ack/ack
@@ -230,98 +231,7 @@ extern eOresult_t eo_agent_OutROPinit(EOtheAgent *p, EOnvSet* nvset, eOipv4addr_
     rophead.ropc            = ropdescr->ropcode;
     rophead.endp            = ropdescr->ep;
     rophead.nvid            = ropdescr->id;
-    rophead.dsiz            = 0;
-
-
-    // check validity of ropdescr->ropcode     
-    if(eobool_false == eo_rop_hid_ropcode_is_valid(ropdescr->ropcode))
-    {
-        return(eores_NOK_generic);
-    }
-          
-
-    // get the ownership  
-    eOnvOwnership_t ownership = eo_rop_hid_GetOwnership(ropdescr->ropcode, eo_ropconf_none, eo_rop_dir_outgoing);  
-    // asfidanken
-//     rop->tmpdata.nvset = nvset;
-//     rop->tmpdata.nvownership = ownership;
-    
-
-    res = eo_nvset_NVget(   nvset, /*rop->tmpdata.nvset,*/  
-                            (eo_nv_ownership_local == ownership) ? (eok_ipv4addr_localhost) : (toipaddr), 
-                            ropdescr->ep, ropdescr->id,
-                            &rop->netvar
-                            );
-
-    // if the nvset does not have the triple (ip, ep, id) then we return an error because we cannot form the rop
-    if(eores_OK != res)
-    {
-        return(eores_NOK_generic);
-    }
-
-   
-    // --- ok: now we are ready to prepare the rop
-    
-    // head
-    memcpy(&rop->stream.head, &rophead, sizeof(eOrophead_t));
-    
-    // data
-    if(eobool_true == eo_rop_hid_DataField_is_Required(&rophead))
-    {
-        uint16_t sss;
-        eo_nv_Get(&rop->netvar, eo_nv_strg_volatile, rop->stream.data, &sss);
-        rop->stream.head.dsiz = sss;
-    }
-    
-    
-    // assign signature
-    rop->stream.sign = (0 == ropdescr->configuration.plussign) ? (EOK_uint32dummy) : (ropdescr->signature);
-
-    // assign time
-    rop->stream.time = (0 == ropdescr->configuration.plustime) ? (EOK_uint64dummy) : (eov_sys_LifeTimeGet(eov_sys_GetHandle()));
-
-
-    if(NULL != requiredbytes)
-    {
-        *requiredbytes = sizeof(eOrophead_t) + rop->stream.head.dsiz + (4*rop->stream.head.ctrl.plussign) + (8*rop->stream.head.ctrl.plustime);
-    }
-
-
-    return(eores_OK);
-}
-
-
-
-extern eOresult_t eo_agent_OutROPfromNV(EOtheAgent* p, EOnv* nv, eOropdescriptor_t* ropdescr, EOrop* rop, uint16_t* requiredbytes)
-{
-    eOrophead_t rophead;
-    eOnvID_t nvid;
-    eOnvEP_t nvep;
-
-    if((NULL == p) || (NULL == rop) || (NULL == nv) || (NULL == ropdescr))
-    {
-        return(eores_NOK_nullpointer);
-    } 
-    
-    nvep = nv->ep;
-    nvid = nv->id;
-
-    // reset the rop
-    eo_rop_Reset(rop);  
-    
-    
-    // put in rophead all the options
-    rophead.ctrl.ffu        = 0;
-    rophead.ctrl.confinfo   = eo_ropconf_none; // cannot do a ack/ack
-    rophead.ctrl.plustime   = ropdescr->configuration.plustime;
-    rophead.ctrl.plussign   = ropdescr->configuration.plussign;
-    rophead.ctrl.rqsttime   = ropdescr->configuration.timerqst;
-    rophead.ctrl.rqstconf   = ropdescr->configuration.confrqst;
-    rophead.ctrl.userdefn   = 0;
-    rophead.ropc            = ropdescr->ropcode;
-    rophead.endp            = nvep;
-    rophead.nvid            = nvid;
-    rophead.dsiz            = 0;
+    rophead.dsiz            = ropdescr->size;
 
 
     // check validity of ropc 
@@ -344,10 +254,22 @@ extern eOresult_t eo_agent_OutROPfromNV(EOtheAgent* p, EOnv* nv, eOropdescriptor
     // data
     if(eobool_true == eo_rop_hid_DataField_is_Required(&rophead))
     {
-        // we also need the nv
-        uint16_t sss;
-        eo_nv_Get(nv, eo_nv_strg_volatile, rop->stream.data, &sss);
-        rop->stream.head.dsiz = sss;
+        // ropdescr->data is not NULL ... use it
+        if(NULL != ropdescr->data)
+        {
+            rop->stream.head.dsiz   = ropdescr->size;
+            memcpy(rop->stream.data, ropdescr->data, rop->stream.head.dsiz);            
+        }
+        else
+        {
+            uint16_t sss;
+            eo_nv_Get(nv, eo_nv_strg_volatile, rop->stream.data, &sss);
+            rop->stream.head.dsiz = sss;
+        }
+    }
+    else
+    {
+        rop->stream.head.dsiz = eo_nv_Size(nv);
     }
     
     // assign sign
@@ -358,9 +280,10 @@ extern eOresult_t eo_agent_OutROPfromNV(EOtheAgent* p, EOnv* nv, eOropdescriptor
 
     if(NULL != requiredbytes)
     {
-        *requiredbytes = sizeof(eOrophead_t) + rop->stream.head.dsiz + (4*rop->stream.head.ctrl.plussign) + (8*rop->stream.head.ctrl.plustime);
+        uint16_t dataeffectivebytes = (rop->stream.head.dsiz + 3) / 4;
+        dataeffectivebytes *= 4;   
+        *requiredbytes = sizeof(eOrophead_t) + dataeffectivebytes + (4*rop->stream.head.ctrl.plussign) + (8*rop->stream.head.ctrl.plustime);
     }
-
 
     return(eores_OK);
 }
@@ -395,6 +318,304 @@ extern eOresult_t eo_agent_hid_OutROPonTransmission(EOtheAgent *p, EOrop *rop)
 
 
 // - oldies ------
+
+
+// OK: called by eo_transmitter_regular_rops_Load().
+//extern eOresult_t eo_agent_OutROPinit(EOtheAgent *p, EOnvSet* nvset, eOipv4addr_t toipaddr, eOropdescriptor_t* ropdescr, EOrop *rop, uint16_t *requiredbytes);
+
+
+// OK: called by eo_transmitter_occasional_rops_Load(). if data is required uses ropdescr->data/size if not NULL/0 otherwise uses nv.
+//extern eOresult_t eo_agent_OutROPfromNV(EOtheAgent* p, EOnv* nv, eOropdescriptor_t* ropdescr, EOrop* rop, uint16_t* requiredbytes);
+
+// if a payload is needed: if nv is local it uses nv->ram (nv is internally computed). it nv is remote it uses ropdescr->ram
+//extern eOresult_t eo_agent_OutROPprepareOld(EOtheAgent* p, EOnvSet* nvset, eOipv4addr_t toipaddr, eOropdescriptor_t* ropdescr, EOrop* rop, uint16_t* requiredbytes);
+
+
+// if a payload is needed: if nv is local it uses nv->ram (nv passed). it nv is remote it uses ropdescr->ram
+//extern eOresult_t eo_agent_OutROPprepareNV(EOtheAgent* p, EOnv* nv, eOropdescriptor_t* ropdescr, EOrop* rop, uint16_t* requiredbytes);
+
+
+// updates an existing rop
+//extern eOresult_t eo_agent_OutROPrefresh(EOtheAgent *p, EOrop *rop);
+
+
+#if 0
+extern eOresult_t eo_agent_OutROPinit(EOtheAgent *p, EOnvSet* nvset, eOipv4addr_t toipaddr, eOropdescriptor_t* ropdescr, EOrop *rop, uint16_t *requiredbytes)
+{
+    eOrophead_t rophead;
+    eOresult_t res;
+
+    if((NULL == p) || (NULL == rop) || (NULL == ropdescr))
+    {
+        return(eores_NOK_nullpointer);
+    } 
+
+    // reset the rop
+    eo_rop_Reset(rop);  
+    
+    // put in rophead all the options
+    rophead.ctrl.ffu        = 0;
+    rophead.ctrl.confinfo   = eo_ropconf_none; // cannot do a ack/ack
+    rophead.ctrl.plustime   = ropdescr->configuration.plustime;
+    rophead.ctrl.plussign   = ropdescr->configuration.plussign;
+    rophead.ctrl.rqsttime   = ropdescr->configuration.timerqst;
+    rophead.ctrl.rqstconf   = ropdescr->configuration.confrqst;
+    rophead.ctrl.userdefn   = 0;
+    rophead.ropc            = ropdescr->ropcode;
+    rophead.endp            = ropdescr->ep;
+    rophead.nvid            = ropdescr->id;
+    rophead.dsiz            = ropdescr->size;
+
+
+    // check validity of ropdescr->ropcode     
+    if(eobool_false == eo_rop_hid_ropcode_is_valid(ropdescr->ropcode))
+    {
+        return(eores_NOK_generic);
+    }
+          
+
+    // get the ownership  
+    eOnvOwnership_t ownership = eo_rop_hid_GetOwnership(ropdescr->ropcode, eo_ropconf_none, eo_rop_dir_outgoing);  
+
+    res = eo_nvset_NVget(   nvset, 
+                            (eo_nv_ownership_local == ownership) ? (eok_ipv4addr_localhost) : (toipaddr), 
+                            ropdescr->ep, ropdescr->id,
+                            &rop->netvar
+                            );
+
+    // if the nvset does not have the triple (ip, ep, id) then we return an error because we cannot form the rop
+    if(eores_OK != res)
+    {
+        return(eores_NOK_generic);
+    }
+
+   
+    // --- ok: now we are ready to prepare the rop
+    
+    // head
+    memcpy(&rop->stream.head, &rophead, sizeof(eOrophead_t));
+    
+    // data
+    if(eobool_true == eo_rop_hid_DataField_is_Required(&rophead))
+    {
+//         uint16_t sss;
+//         eo_nv_Get(&rop->netvar, eo_nv_strg_volatile, rop->stream.data, &sss);
+//         rop->stream.head.dsiz = sss;   
+        
+        // ropdescr->data is not NULL ... use it
+        if(NULL != ropdescr->data)
+        {
+            rop->stream.head.dsiz   = ropdescr->size;
+            memcpy(rop->stream.data, ropdescr->data, rop->stream.head.dsiz);            
+        }
+        else
+        {
+            uint16_t sss;
+            eo_nv_Get(&rop->netvar, eo_nv_strg_volatile, rop->stream.data, &sss);
+            rop->stream.head.dsiz = sss;
+        }        
+    }
+    else
+    {
+        rophead.dsiz = eo_nv_Size(&rop->netvar);
+    }
+    
+    
+    // assign signature
+    rop->stream.sign = (0 == ropdescr->configuration.plussign) ? (EOK_uint32dummy) : (ropdescr->signature);
+
+    // assign time
+    rop->stream.time = (0 == ropdescr->configuration.plustime) ? (EOK_uint64dummy) : (eov_sys_LifeTimeGet(eov_sys_GetHandle()));
+
+
+    if(NULL != requiredbytes)
+    {
+        uint16_t dataeffectivebytes = (rop->stream.head.dsiz + 3) / 4;
+        dataeffectivebytes *= 4;   
+        *requiredbytes = sizeof(eOrophead_t) + dataeffectivebytes + (4*rop->stream.head.ctrl.plussign) + (8*rop->stream.head.ctrl.plustime);
+    }
+
+
+    return(eores_OK);
+}
+#endif
+
+#if 0
+// this function uses only the ram passed inside ropdescriptor
+extern eOresult_t eo_agent_OutROPprepareOld(EOtheAgent* p, EOnvSet* nvset, eOipv4addr_t toipaddr, eOropdescriptor_t* ropdescr, EOrop* rop, uint16_t* requiredbytes)
+{
+    eOresult_t res = eores_NOK_generic;
+    eOrophead_t rophead;
+
+    if((NULL == p) || (NULL == nvset) || (NULL == ropdescr) || (NULL == rop))
+    {
+        return(eores_NOK_nullpointer);
+    } 
+    
+    // check validity of ropc 
+    if(eobool_false == eo_rop_hid_ropcode_is_valid(ropdescr->ropcode))
+    {
+        return(eores_NOK_generic);
+    }
+    
+    // 1. reset the rop
+    eo_rop_Reset(rop);  
+    
+    
+    // 2. put in rophead all the options
+    rophead.ctrl.ffu        = 0;
+    rophead.ctrl.confinfo   = eo_ropconf_none; // cannot do a ack/ack
+    rophead.ctrl.plustime   = ropdescr->configuration.plustime;
+    rophead.ctrl.plussign   = ropdescr->configuration.plussign;
+    rophead.ctrl.rqsttime   = ropdescr->configuration.timerqst;
+    rophead.ctrl.rqstconf   = ropdescr->configuration.confrqst;
+    rophead.ctrl.userdefn   = 0;
+    rophead.ropc            = ropdescr->ropcode;
+    rophead.endp            = ropdescr->ep;
+    rophead.nvid            = ropdescr->id;
+    rophead.dsiz            = 0;
+
+
+   
+    
+    // 3. the netvar
+    eOnvOwnership_t ownership = eo_rop_hid_GetOwnership(ropdescr->ropcode, eo_ropconf_none, eo_rop_dir_outgoing);  
+
+    res = eo_nvset_NVget(   nvset, 
+                            (eo_nv_ownership_local == ownership) ? (eok_ipv4addr_localhost) : (toipaddr), 
+                            ropdescr->ep, ropdescr->id,
+                            &rop->netvar
+                            );
+
+    // if the nvset does not have the triple (ip, ep, id) then we return an error because we cannot form the rop
+    if(eores_OK != res)
+    {
+        return(eores_NOK_generic);
+    }
+
+    
+    // 4. the stream
+    
+    // head
+    memcpy(&rop->stream.head, &rophead, sizeof(eOrophead_t));
+    
+    // data
+    if(eobool_true == eo_rop_hid_DataField_is_Required(&rophead))
+    {
+        rop->stream.head.dsiz = eo_nv_Size(&rop->netvar);
+        if(NULL != ropdescr->data)
+        {
+            memcpy(rop->stream.data, ropdescr->data, rop->stream.head.dsiz);  
+        }   
+        else
+        {
+            return(eores_NOK_generic);
+        }
+    }
+    
+    // assign sign
+    rop->stream.sign = (1 == ropdescr->configuration.plussign) ? (ropdescr->signature) : (EOK_uint32dummy);
+
+    // assign time
+    rop->stream.time = (0 == ropdescr->configuration.plustime) ? (EOK_uint64dummy) : (eov_sys_LifeTimeGet(eov_sys_GetHandle()));
+
+    if(NULL != requiredbytes)
+    {
+        uint16_t dataeffectivebytes = (rop->stream.head.dsiz + 3) / 4;
+        dataeffectivebytes *= 4;           
+        *requiredbytes = sizeof(eOrophead_t) + dataeffectivebytes + (4*rop->stream.head.ctrl.plussign) + (8*rop->stream.head.ctrl.plustime);
+    }
+
+
+    return(eores_OK);
+}
+
+
+// this function uses only the ram passed inside ropdescriptor
+extern eOresult_t eo_agent_OutROPprepareNV(EOtheAgent* p, EOnv* nv, eOropdescriptor_t* ropdescr, EOrop* rop, uint16_t* requiredbytes)
+{
+    eOrophead_t rophead;
+
+    if((NULL == p) || (NULL == nv) || (NULL == ropdescr) || (NULL == rop))
+    {
+        return(eores_NOK_nullpointer);
+    } 
+    
+    // check validity of ropc 
+    if(eobool_false == eo_rop_hid_ropcode_is_valid(ropdescr->ropcode))
+    {
+        return(eores_NOK_generic);
+    }
+    
+    // 1. reset the rop
+    eo_rop_Reset(rop);  
+    
+    
+    // 2. put in rophead all the options
+    rophead.ctrl.ffu        = 0;
+    rophead.ctrl.confinfo   = eo_ropconf_none; // cannot do a ack/ack
+    rophead.ctrl.plustime   = ropdescr->configuration.plustime;
+    rophead.ctrl.plussign   = ropdescr->configuration.plussign;
+    rophead.ctrl.rqsttime   = ropdescr->configuration.timerqst;
+    rophead.ctrl.rqstconf   = ropdescr->configuration.confrqst;
+    rophead.ctrl.userdefn   = 0;
+    rophead.ropc            = ropdescr->ropcode;
+    rophead.endp            = ropdescr->ep;
+    rophead.nvid            = ropdescr->id;
+    rophead.dsiz            = 0;
+
+    
+    // 3. the netvar
+    memcpy(&rop->netvar, nv, sizeof(EOnv));
+
+    
+    // 4. the stream
+    
+    // head
+    memcpy(&rop->stream.head, &rophead, sizeof(eOrophead_t));
+    
+    // data
+    if(eobool_true == eo_rop_hid_DataField_is_Required(&rophead))
+    {
+        eOnvOwnership_t ownership = eo_rop_hid_GetOwnership(ropdescr->ropcode, eo_ropconf_none, eo_rop_dir_outgoing);
+        
+        if(eo_nv_ownership_local == ownership)
+        {   // use nv for data
+            uint16_t sss;
+            eo_nv_Get(nv, eo_nv_strg_volatile, rop->stream.data, &sss);     
+            rop->stream.head.dsiz = sss;           
+        }
+        else
+        {   // use ropdescr for data
+            if(NULL != ropdescr->data)
+            {
+                rop->stream.head.dsiz = eo_nv_Size(nv);
+                memcpy(rop->stream.data, ropdescr->data, rop->stream.head.dsiz);  
+            }   
+            else
+            {
+                return(eores_NOK_generic);
+            }            
+        }
+    }
+    
+    // assign sign
+    rop->stream.sign = (1 == ropdescr->configuration.plussign) ? (ropdescr->signature) : (EOK_uint32dummy);
+
+    // assign time
+    rop->stream.time = (0 == ropdescr->configuration.plustime) ? (EOK_uint64dummy) : (eov_sys_LifeTimeGet(eov_sys_GetHandle()));
+
+    if(NULL != requiredbytes)
+    {
+        uint16_t dataeffectivebytes = (rop->stream.head.dsiz + 3) / 4;
+        dataeffectivebytes *= 4;        
+        *requiredbytes = sizeof(eOrophead_t) + dataeffectivebytes + (4*rop->stream.head.ctrl.plussign) + (8*rop->stream.head.ctrl.plustime);
+    }
+
+    return(eores_OK);
+}
+#endif
+
 
 //#if 0
 // extern eOresult_t eo_agent_OutROPrefresh(EOtheAgent *p, EOrop *rop)

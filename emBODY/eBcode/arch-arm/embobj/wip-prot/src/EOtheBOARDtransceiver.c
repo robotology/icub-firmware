@@ -93,7 +93,7 @@ const eOboardtransceiver_cfg_t eo_boardtransceiver_cfg_default =
     EO_INIT(.sizes)                     {0},
     EO_INIT(.mutex_fn_new)              NULL,
     EO_INIT(.transprotection)           eo_trans_protection_none,
-    EO_INIT(.nvsetprotection)          eo_nvset_protection_none
+    EO_INIT(.nvsetprotection)           eo_nvset_protection_none
 };
 
 
@@ -135,17 +135,17 @@ extern EOtransceiver * eo_boardtransceiver_Initialise(const eOboardtransceiver_c
     s_eo_theboardtrans.nvset = s_eo_boardtransceiver_nvset_get(cfg);
     
 
-    txrxcfg.capacityoftxpacket             = cfg->sizes.capacityoftxpacket;
-    txrxcfg.capacityofrop                  = cfg->sizes.capacityofrop;
-    txrxcfg.capacityofropframeregulars     = cfg->sizes.capacityofropframeregulars;
-    txrxcfg.capacityofropframeoccasionals  = cfg->sizes.capacityofropframeoccasionals;
-    txrxcfg.capacityofropframereplies      = cfg->sizes.capacityofropframereplies;
-    txrxcfg.maxnumberofregularrops         = cfg->sizes.maxnumberofregularrops;
-    txrxcfg.remipv4addr                    = cfg->remotehostipv4addr;
-    txrxcfg.remipv4port                    = cfg->remotehostipv4port;
-    txrxcfg.nvset                         = s_eo_theboardtrans.nvset;
-    txrxcfg.mutex_fn_new                   = cfg->mutex_fn_new;
-    txrxcfg.protection                     = cfg->transprotection;
+    txrxcfg.capacityoftxpacket              = cfg->sizes.capacityoftxpacket;
+    txrxcfg.capacityofrop                   = cfg->sizes.capacityofrop;
+    txrxcfg.capacityofropframeregulars      = cfg->sizes.capacityofropframeregulars;
+    txrxcfg.capacityofropframeoccasionals   = cfg->sizes.capacityofropframeoccasionals;
+    txrxcfg.capacityofropframereplies       = cfg->sizes.capacityofropframereplies;
+    txrxcfg.maxnumberofregularrops          = cfg->sizes.maxnumberofregularrops;
+    txrxcfg.remipv4addr                     = cfg->remotehostipv4addr;
+    txrxcfg.remipv4port                     = cfg->remotehostipv4port;
+    txrxcfg.nvset                           = s_eo_theboardtrans.nvset;
+    txrxcfg.mutex_fn_new                    = cfg->mutex_fn_new;
+    txrxcfg.protection                      = cfg->transprotection;
     
     s_eo_theboardtrans.transceiver = eo_transceiver_New(&txrxcfg);
     
@@ -178,7 +178,8 @@ extern EOnvSet * eo_boardtransceiver_hid_GetNVset(void)
 static EOnvSet* s_eo_boardtransceiver_nvset_get(const eOboardtransceiver_cfg_t *cfg)
 {
 #if 1
-    const uint16_t numofdevices = 1;    // one device only
+    const uint16_t numofdevices     = 1;    // one device only
+    const uint16_t ondevindexzero   = 0;    // one device only
 
     if(NULL != s_eo_theboardtrans.nvset)
     {   // if i call it more than once ... then i return the configuration but allocate and init only once 
@@ -187,7 +188,7 @@ static EOnvSet* s_eo_boardtransceiver_nvset_get(const eOboardtransceiver_cfg_t *
 
     EOnvSet* nvset = eo_nvset_New(numofdevices, cfg->nvsetprotection, cfg->mutex_fn_new);
     
-    eo_nvset_DEVpushback(nvset, (eOnvset_DEVcfg_t*)cfg->nvsetdevcfg, eo_nvset_ownership_local, EO_COMMON_IPV4ADDR_LOCALHOST);
+    eo_nvset_DEVpushback(nvset, ondevindexzero, (eOnvset_DEVcfg_t*)cfg->nvsetdevcfg, eo_nvset_ownership_local, EO_COMMON_IPV4ADDR_LOCALHOST);
     
     eo_nvset_NVSinitialise(nvset);
 

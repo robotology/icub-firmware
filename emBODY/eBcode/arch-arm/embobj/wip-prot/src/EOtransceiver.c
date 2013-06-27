@@ -303,6 +303,7 @@ extern eOresult_t eo_transceiver_rop_regular_Unload(EOtransceiver *p, eOropdescr
     return(res);
 }
 
+#if 0
 extern eOresult_t eo_transceiver_rop_occasional_Load_without_data(EOtransceiver *p, eOropdescriptor_t *ropdesc, uint8_t itisobsolete)
 {
     eOresult_t res;
@@ -327,7 +328,7 @@ extern eOresult_t eo_transceiver_rop_occasional_Load_without_data(EOtransceiver 
     
     return(res);
 }  
-
+#endif
 
 extern eOresult_t eo_transceiver_rop_occasional_Load(EOtransceiver *p, eOropdescriptor_t *ropdesc)
 {
@@ -338,26 +339,6 @@ extern eOresult_t eo_transceiver_rop_occasional_Load(EOtransceiver *p, eOropdesc
         return(eores_NOK_nullpointer);
     }
     
-//     uint16_t ondevindex;
-//     uint16_t onendpointindex;
-//     uint16_t onidindex;
-//     
-//     EOtreenode* treenode;
-//     EOnv nv;
-//     
-//     eObool_t hasdata2send = eobool_false;
-    
-    
-//      // caso in cui data e' non NULL
-//     if((eo_ropcode_say == ropdesc->ropcode) || (eo_ropcode_sig == ropdesc->ropcode) || (eo_ropcode_set == ropdesc->ropcode))
-//     {
-//         // we need data
-//         if((NULL == data) || (0 == size))
-//         {
-//             return(eo_transmitter_occasional_rops_Load(p->transmitter, ropdesc->ropcode, ropdesc->nvep, ropdesc->nvid, ropdesc->ropcfg));
-//         }
-//         
-//     }   
 
     res = eo_transmitter_occasional_rops_Load(p->transmitter, ropdesc);
  
@@ -372,50 +353,6 @@ extern eOresult_t eo_transceiver_rop_occasional_Load(EOtransceiver *p, eOropdesc
     
     return(res);
 
-//  #if 0  
-//
-//         
-//     eOnvOwnership_t nvownership = eo_rop_hid_GetOwnership(ropdesc->ropcode, eo_ropconf_none, eo_rop_dir_outgoing);
-//       
-//     
-//     // retrieve the indices inside the nvset given the triple (ip, ep, id)
-//     res = eo_nvscfg_GetIndices( (p->cfg.nvset),  
-//                                 (eo_nv_ownership_local == nvownership) ? (eok_ipv4addr_localhost) : (p->cfg.remipv4addr), 
-//                                 ropdesc->nvep, ropdesc->nvid, 
-//                                 &ondevindex,
-//                                 &onendpointindex,
-//                                 &onidindex); 
-
-//     // if the nvset does not have the triple (ip, ep, id) then we return an error because we cannot form the rop
-//     if(eores_OK != res)
-//     {
-//         return(eores_NOK_generic);
-//     }
-
-//     // we need a treenode of the nv
-//     //treenode = eo_nvscfg_GetTreeNode(&(p->cfg.nvset), ondevindex, onendpointindex, onidindex);
-//     
-//     // we need the nv (but only if the rop needs data).
-//     treenode = NULL; // eo_nvscfg_GetNV() internally calls eo_nvscfg_GetTreeNode()
-//     eo_nvscfg_GetNV((p->cfg.nvset), ondevindex, onendpointindex, onidindex, treenode, &nv);
-//     
-//     // now we have the nv. we set its value in local ram
-//     if(eobool_true == hasdata2send)
-//     {       
-//         eo_nv_Set(&nv, data, eobool_true, eo_nv_upd_dontdo);
-//     
-//     }
-//     
-//     //eo_agent_OutROPfromNV();
-//     
-//     
-//     
-//     
-//     
-//         
-//     return(res);
-//     
-//     #endif
 }    
 
 

@@ -137,7 +137,7 @@ extern eOresult_t eo_rop_Reset(EOrop *p)
     // - stream ---------------------------------------------------------------------
 		
     *((uint64_t*)(&(p->stream.head))) = 0;
-    //memset(p->stream.data, 0, p->stream.capacity);
+    memset(p->stream.data, 0, p->stream.capacity);
     p->stream.sign          = EOK_uint32dummy;
     p->stream.time          = EOK_uint64dummy;		
 		
@@ -185,9 +185,7 @@ extern eOresult_t eo_rop_Process(EOrop *p, EOrop *replyrop)
 // #if !defined(EO_NV_DONT_USE_ONROPRECEPTION)    
 //     eo_nv_hid_OnBefore_ROP(&p->netvar, (eOropcode_t)p->stream.head.ropc, p->stream.time, p->sign);
 // #endif
-        
-    #warning -> ATTENZIONE: un nodo non-leaf deve essere FUN_mix a meno che: (a) tutti i nodi sotto siano con stessa FUN_xxx    
-				
+        				
     s_eo_rop_exec_on_it(p, rop_o);
 
 // #if !defined(EO_NV_DONT_USE_ONROPRECEPTION)
@@ -320,6 +318,18 @@ extern eObool_t eo_rop_hid_DataField_is_Required(const eOrophead_t *head)
     if((eo_ropconf_none == head->ctrl.confinfo) && 
        ((eo_ropcode_set == head->ropc) || (eo_ropcode_say == head->ropc) || (eo_ropcode_sig == head->ropc))
       )
+    {
+        ret = eobool_true;
+    }
+
+    return(ret);
+}
+
+extern eObool_t eo_rop_hid_OPChasData(eOropcode_t ropc)
+{
+    eObool_t ret = eobool_false;
+
+    if((eo_ropcode_set == ropc) || (eo_ropcode_say == ropc) || (eo_ropcode_sig == ropc))
     {
         ret = eobool_true;
     }
@@ -560,17 +570,14 @@ static void s_eo_rop_exec_on_it(EOrop *rop_in, EOrop *rop_o)
             {   // rst
 
                 // just reset thenv without forcing anything.
-								res = eo_nv_hid_ResetROP(thenv, eo_nv_upd_ifneeded, theropdes);
-
+                res = eo_nv_hid_ResetROP(thenv, eo_nv_upd_ifneeded, theropdes);
             }
             else 
             {   // set
                 
                 // get the data to be set and its size.
                 source = rop_in->stream.data;
-							
-								res = eo_nv_hid_SetROP(thenv, source, eo_nv_upd_ifneeded, theropdes);
-
+                res = eo_nv_hid_SetROP(thenv, source, eo_nv_upd_ifneeded, theropdes);
             }
 
 
