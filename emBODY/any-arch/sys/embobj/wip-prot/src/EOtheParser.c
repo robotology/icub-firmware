@@ -133,7 +133,7 @@ extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, co
     // get the head of the rop with ctrl, ropc, endp, nvid, dsiz. 
     // for now the roptail is just after the four bytes of the head
     rophead = (eOrophead_t*)(&streamdata[0]);
-    roptail = (uint8_t*)(&streamdata[4]);
+    roptail = (uint8_t*)(&streamdata[sizeof(eOrophead_t)]);
     roptail = roptail;  // there is this instruction to force roptail to have its correct value in debugger
 
     // check validity of ctrl
@@ -193,6 +193,7 @@ extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, co
     if(streamsize < (sizeof(eOrophead_t) + dataeffectivesize + signeffectivesize + timeeffectivesize))
     {
         // not enough bytes in the passed packet to keep the data sugegsted by the dsiz
+        *consumedbytes = streamsize;
         return(eores_NOK_generic);
     }
 
