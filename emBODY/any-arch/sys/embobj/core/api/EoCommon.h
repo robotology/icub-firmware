@@ -462,6 +462,7 @@ typedef     void        (*eOvoid_fp_voidfpvoiduint32_t)             (void (*)(vo
 typedef     void        (*eOvoid_fp_voidfpvoiduint32uint8_t)       	(void (*)(void), uint32_t, uint8_t);
 typedef     uint16_t    (*eOuint16_fp_uint16_uint16_t)              (uint16_t, uint16_t);
 typedef     void*       (*eOvoidp_fp_uint16_uint16_t)               (uint16_t, uint16_t);
+typedef     eObool_t    (*eObool_fp_uint16_uint16_t)                (uint16_t, uint16_t);
 typedef     void*       (*eOvoidp_fp_voidp_uint16_uint16_t)         (void*, uint16_t, uint16_t);
 
 
