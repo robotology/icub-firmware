@@ -75,6 +75,8 @@ EO_VERIFYproposition(eoprot_ep_sk_tagsmax_sk, eoprot_ep_sk_skin_tags_numberof <=
 
 static uint16_t s_eoprot_ep_sk_brdid2ramoffset(eOprotBRD_t brd, eOprotID_t id);
 
+static eObool_t s_eoprot_ep_sk_skin_tag_is_valid(eOprotTag_t tag);
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -129,6 +131,37 @@ extern eOresult_t eoprot_ep_sk_number_of_entities_Load(eOprotBRD_t brd, const ui
     return(eores_OK);       
 }
 
+extern eObool_t eoprot_ep_sk_variables_id_isvalid(eOprotBRD_t brd, eOnvID_t id)
+{
+    eObool_t ret = eobool_false;    
+    
+    if((NULL == s_eoprot_ep_sk_board_numberofeachentity) || (NULL == s_eoprot_ep_sk_board_numberofeachentity[brd]))
+    {
+        return(eobool_false);
+    }    
+    
+    eOprotEntity_t ent = eoprot_ep_variable_ID2entity(eoprot_endpoint_skin, id);
+    eOprotIndex_t  ind = eoprot_ep_variable_ID2index(eoprot_endpoint_skin, id);
+    eOprotTag_t    tag = eoprot_ep_variable_ID2tag(eoprot_endpoint_skin, id);
+    
+    switch(ent)
+    {
+        case eosk_entity_skin:
+        {   
+            if(ind < s_eoprot_ep_sk_board_numberofeachentity[brd][eosk_entity_skin])
+            {
+                ret = s_eoprot_ep_sk_skin_tag_is_valid(tag);
+            }            
+        } break;
+        
+        default:
+        {           
+        } break;        
+    }
+    
+    return(ret);     
+}
+
 
 extern uint16_t eoprot_ep_sk_variables_numberof_Get(eOprotBRD_t brd)
 {
@@ -142,6 +175,34 @@ extern uint16_t eoprot_ep_sk_variables_numberof_Get(eOprotBRD_t brd)
     num = eoprot_ep_sk_skin_tags_numberof * s_eoprot_ep_sk_board_numberofeachentity[brd][eosk_entity_skin];
           
     return(num);
+}
+
+extern eOprotID_t eoprot_ep_sk_variable_idfromprognumber_Get(eOprotBRD_t brd, uint16_t prog)
+{
+    eOprotTag_t tag = 0xffff;
+    eOprotIndex_t index = 0xff;
+    eOprotEntity_t entity = 0xff;
+    
+    if((NULL == s_eoprot_ep_sk_board_numberofeachentity) || (NULL == s_eoprot_ep_sk_board_numberofeachentity[brd]))
+    {
+        return(0);
+    }
+    
+    uint16_t progsinskins = eoprot_ep_sk_skin_tags_numberof * s_eoprot_ep_sk_board_numberofeachentity[brd][eosk_entity_skin];
+    
+    if((0 != progsinskins) && (prog < (progsinskins)))
+    {   // entity is eosk_entity_skin 
+        entity  = eosk_entity_skin;
+        index   = prog / eoprot_ep_sk_skin_tags_numberof;       // eoprot_ep_sk_skin_tags_numberof cannot be zero if progsinskins is non-zero
+        tag     = prog % eoprot_ep_sk_skin_tags_numberof;        
+    }
+    else
+    {
+        return(EOK_uint16dummy);
+    }
+    
+    return(eoprot_ep_variable_ID_get(eoprot_endpoint_skin, entity, index, tag));
+    
 }
 
 extern uint16_t eoprot_ep_sk_variable_progressivenumber_Get(eOprotBRD_t brd, eOprotID_t id)
@@ -267,6 +328,12 @@ static uint16_t s_eoprot_ep_sk_brdid2ramoffset(eOprotBRD_t brd, eOprotID_t id)
     
     return(offset);  
 }
+
+static eObool_t s_eoprot_ep_sk_skin_tag_is_valid(eOprotTag_t tag)
+{   // in case of holes in tags ... change the code
+    return((tag < eoprot_ep_sk_skin_tags_numberof)?(eobool_true):(eobool_false));
+}
+
 
 
 

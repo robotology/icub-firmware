@@ -130,12 +130,30 @@ extern eOresult_t eoprot_ep_sk_number_of_boards_Load(uint16_t numofboards);
 extern eOresult_t eoprot_ep_sk_number_of_entities_Load(eOprotBRD_t brd, const uint8_t* numberofeachentity);
 
 
+/** @fn         extern eObool_t eoprot_ep_sk_variables_id_isvalid(eOprotBRD_t brd, eOnvID_t id)
+    @brief      This function tells if an id belongs to the board
+    @param      brd                     the board
+    @param      id                      the id
+    @return     eobool_true if the ID belongs to the board, eobool_false if not.
+  */
+extern eObool_t eoprot_ep_sk_variables_id_isvalid(eOprotBRD_t brd, eOnvID_t id);
+
+
 /** @fn         extern uint16_t eoprot_ep_sk_variable_numberof_Get(eOprotBRD_t brd)
     @brief      This function retrieves the number of variables given the board
     @param      brd                     the board
     @return     the number of variables.
   */
 extern uint16_t eoprot_ep_sk_variables_numberof_Get(eOprotBRD_t brd);
+
+
+/** @fn         extern eOprotID_t eoprot_ep_sk_variable_idfromprognumber_Get(eOprotBRD_t brd, uint16_t prog)
+    @brief      This function retrieves the id of a variable from the progressive number given the board
+    @param      brd                     the board
+    @param      prog                    the progressive number
+    @return     the ID or EOK_uint16dummy if invalid .
+  */
+extern eOprotID_t eoprot_ep_sk_variable_idfromprognumber_Get(eOprotBRD_t brd, uint16_t prog);
 
 
 /** @fn         extern uint16_t eoprot_ep_sk_variable_progressivenumber_Get(eOprotBRD_t brd, eOprotID_t id)

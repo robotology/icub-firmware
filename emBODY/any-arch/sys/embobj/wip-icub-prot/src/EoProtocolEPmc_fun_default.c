@@ -31,6 +31,9 @@
 #include "string.h"
 #include "stdio.h"
 
+#include "EOnv_hid.h"
+#include "EoProtocolEPmc_rom.h"
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -93,12 +96,13 @@ __weak extern void eoprot_ep_mc_fun_INITIALISE(eOnvEP_t ep, void *ram) {}
 
 
 #if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_config)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_config(const EOnv* nv) {}
+__weak extern void eoprot_ep_mc_fun_INIT_joint_config(const EOnv* nv) // {}
+    { memcpy(nv->ram, &eoprot_ep_mc_rom_joint_defaultvalue.config, sizeof(eoprot_ep_mc_rom_joint_defaultvalue.config)); }
 #endif
 
 
 #if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_config)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_config(const EOnv* nv, const eOropdescriptor_t* rd) {}
+__weak extern void eoprot_ep_mc_fun_UPDT_joint_config(const EOnv* nv, const eOropdescriptor_t* rd)  {}
 #endif
 
 
@@ -204,7 +208,8 @@ __weak extern void eoprot_ep_mc_fun_UPDT_joint_config__des02FORstatuschamaleon04
   
 
 #if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_status)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_status(const EOnv* nv) {}
+__weak extern void eoprot_ep_mc_fun_INIT_joint_status(const EOnv* nv) // {}
+    { memcpy(nv->ram, &eoprot_ep_mc_rom_joint_defaultvalue.status, sizeof(eoprot_ep_mc_rom_joint_defaultvalue.status)); }
 #endif
 
 #if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_status)

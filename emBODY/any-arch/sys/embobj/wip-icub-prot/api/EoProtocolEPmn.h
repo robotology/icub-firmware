@@ -160,6 +160,15 @@ extern eOresult_t eoprot_ep_mn_number_of_boards_Load(uint16_t numofboards);
 extern eOresult_t eoprot_ep_mn_number_of_entities_Load(eOprotBRD_t brd, const uint8_t* numberofeachentity);
 
 
+/** @fn         extern eObool_t eoprot_ep_mn_variables_id_isvalid(eOprotBRD_t brd, eOnvID_t id)
+    @brief      This function tells if an id belongs to the board
+    @param      brd                     the board
+    @param      id                      the id
+    @return     eobool_true if the ID belongs to the board, eobool_false if not.
+  */
+extern eObool_t eoprot_ep_mn_variables_id_isvalid(eOprotBRD_t brd, eOnvID_t id);
+
+
 /** @fn         extern uint16_t eoprot_ep_mn_variable_numberof_Get(eOprotBRD_t brd)
     @brief      This function retrieves the number of variables given the board
     @param      brd                     the board

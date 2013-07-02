@@ -82,7 +82,7 @@ static uint16_t s_eoprot_ep_mc_rom_controller_ramoffset(uint16_t tag);
 
 // - default value of a joint
 
-#if 1
+#if 0
 const eOmc_joint_t eoprot_ep_mc_rom_joint_defaultvalue = { 0 };
 #else
 const eOmc_joint_t eoprot_ep_mc_rom_joint_defaultvalue =
@@ -91,7 +91,7 @@ const eOmc_joint_t eoprot_ep_mc_rom_joint_defaultvalue =
     {
         EO_INIT(.pidposition)
         {
-            EO_INIT(.kp)                    0,
+            EO_INIT(.kp)                    0x6666,
             EO_INIT(.ki)                    0,
             EO_INIT(.kd)                    0,
             EO_INIT(.limitonintegral)       0,
@@ -102,7 +102,7 @@ const eOmc_joint_t eoprot_ep_mc_rom_joint_defaultvalue =
         },
         EO_INIT(.pidvelocity)
         {
-            EO_INIT(.kp)                    0,
+            EO_INIT(.kp)                    0x7777,
             EO_INIT(.ki)                    0,
             EO_INIT(.kd)                    0,
             EO_INIT(.limitonintegral)       0,
@@ -141,9 +141,9 @@ const eOmc_joint_t eoprot_ep_mc_rom_joint_defaultvalue =
     {
         EO_INIT(.basic)
         {
-            EO_INIT(.position)              0,
-            EO_INIT(.velocity)              0,       
-            EO_INIT(.acceleration)          0,     
+            EO_INIT(.position)              0x99999999,
+            EO_INIT(.velocity)              0x88888888,       
+            EO_INIT(.acceleration)          0x77777777,     
             EO_INIT(.torque)                0,
             EO_INIT(.motionmonitorstatus)   eomc_motionmonitorstatus_notmonitored,
             EO_INIT(.controlmodestatus)     eomc_controlmode_idle,
@@ -154,7 +154,7 @@ const eOmc_joint_t eoprot_ep_mc_rom_joint_defaultvalue =
             EO_INIT(.error)                 0,       
             EO_INIT(.output)                0             
         },
-        EO_INIT(.chamaleon04)               {0, 0, 0, 0} 
+        EO_INIT(.chamaleon04)               {0x0C, 0x01, 0x0A, 0x00} 
     },
     EO_INIT(.inputs)                       
     {

@@ -78,6 +78,9 @@ EO_VERIFYproposition(eoprot_ep_as_tagsmax_ma, eoprot_ep_as_mais_tags_numberof <=
 
 static uint16_t s_eoprot_ep_as_brdid2ramoffset(eOprotBRD_t brd, eOprotID_t id);
 
+static eObool_t s_eoprot_ep_as_strain_tag_is_valid(eOprotTag_t tag);
+static eObool_t s_eoprot_ep_as_mais_tag_is_valid(eOprotTag_t tag);
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -131,6 +134,45 @@ extern eOresult_t eoprot_ep_as_number_of_entities_Load(eOprotBRD_t brd, const ui
     s_eoprot_ep_as_board_numberofeachentity[brd] = numberofeachentity;
     
     return(eores_OK);       
+}
+
+extern eObool_t eoprot_ep_as_variables_id_isvalid(eOprotBRD_t brd, eOnvID_t id)
+{
+    eObool_t ret = eobool_false;    
+    
+    if((NULL == s_eoprot_ep_as_board_numberofeachentity) || (NULL == s_eoprot_ep_as_board_numberofeachentity[brd]))
+    {
+        return(eobool_false);
+    }    
+    
+    eOprotEntity_t ent = eoprot_ep_variable_ID2entity(eoprot_endpoint_analogsensors, id);
+    eOprotIndex_t  ind = eoprot_ep_variable_ID2index(eoprot_endpoint_analogsensors, id);
+    eOprotTag_t    tag = eoprot_ep_variable_ID2tag(eoprot_endpoint_analogsensors, id);
+    
+    switch(ent)
+    {
+        case eoas_entity_strain:
+        {   
+            if(ind < s_eoprot_ep_as_board_numberofeachentity[brd][eoas_entity_strain])
+            {
+                ret = s_eoprot_ep_as_strain_tag_is_valid(tag);
+            }            
+        } break;
+        
+        case eoas_entity_mais:
+        {
+            if(ind < s_eoprot_ep_as_board_numberofeachentity[brd][eoas_entity_mais]) 
+            {
+                ret = s_eoprot_ep_as_mais_tag_is_valid(tag);
+            }            
+        } break;        
+        
+        default:
+        {           
+        } break;        
+    }
+    
+    return(ret);     
 }
 
 
@@ -334,6 +376,16 @@ static uint16_t s_eoprot_ep_as_brdid2ramoffset(eOprotBRD_t brd, eOprotID_t id)
     }
     
     return(offset);  
+}
+
+static eObool_t s_eoprot_ep_as_strain_tag_is_valid(eOprotTag_t tag)
+{   // in case of holes in tags ... change the code
+    return((tag < eoprot_ep_as_strain_tags_numberof)?(eobool_true):(eobool_false));
+}
+
+static eObool_t s_eoprot_ep_as_mais_tag_is_valid(eOprotTag_t tag)
+{   // in case of holes in tags ... change the code  
+    return((tag < eoprot_ep_as_mais_tags_numberof)?(eobool_true):(eobool_false));
 }
 
 
