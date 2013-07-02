@@ -83,6 +83,7 @@ static eOnvID_t s_eocfg_eps_eb1_mn_epnvprogressivenumber2id(eOnvEP_t ep, uint16_
 static uint16_t s_eocfg_eps_eb1_mn_epid2nvprogressivenumber(eOnvEP_t ep, eOnvID_t id); 
 static uint16_t s_eocfg_eps_eb1_mn_ep2nvsnumberof(eOnvEP_t ep);
 static void s_eocfg_eps_eb1_mn_ram_initialise(eOnvEP_t ep, void *ram);
+static eObool_t s_eocfg_eps_eb1_mn_isepidsupported(eOnvEP_t ep, eOnvID_t id);
 
 // endpoint mc
 static void* s_eocfg_eps_eb1_mc_epid2nvrom(eOnvEP_t ep, eOnvID_t id);
@@ -91,6 +92,7 @@ static eOnvID_t s_eocfg_eps_eb1_mc_epnvprogressivenumber2id(eOnvEP_t ep, uint16_
 static uint16_t s_eocfg_eps_eb1_mc_epid2nvprogressivenumber(eOnvEP_t ep, eOnvID_t id); 
 static uint16_t s_eocfg_eps_eb1_mc_ep2nvsnumberof(eOnvEP_t ep);
 static void s_eocfg_eps_eb1_mc_ram_initialise(eOnvEP_t ep, void *ram);
+static eObool_t s_eocfg_eps_eb1_mc_isepidsupported(eOnvEP_t ep, eOnvID_t id);
 
 // endpoint as
 static void* s_eocfg_eps_eb1_as_epid2nvrom(eOnvEP_t ep, eOnvID_t id);
@@ -99,6 +101,7 @@ static eOnvID_t s_eocfg_eps_eb1_as_epnvprogressivenumber2id(eOnvEP_t ep, uint16_
 static uint16_t s_eocfg_eps_eb1_as_epid2nvprogressivenumber(eOnvEP_t ep, eOnvID_t id); 
 static uint16_t s_eocfg_eps_eb1_as_ep2nvsnumberof(eOnvEP_t ep);
 static void s_eocfg_eps_eb1_as_ram_initialise(eOnvEP_t ep, void *ram);
+static eObool_t s_eocfg_eps_eb1_as_isepidsupported(eOnvEP_t ep, eOnvID_t id);
 
 
 
@@ -133,6 +136,7 @@ static const eOnvset_EPcfg_t s_eocfg_EPs_vectorof_eb1_data[] =
         EO_INIT(.endpoint)                          eoprot_endpoint_management,
         EO_INIT(.epram_sizeof)                      sizeof(eocfg_EPs_eb1_mn_t),
         EO_INIT(.fptr_ep2nvsnumberof)               s_eocfg_eps_eb1_mn_ep2nvsnumberof,
+        EO_INIT(.fptr_isepidsupported)              s_eocfg_eps_eb1_mn_isepidsupported,
         EO_INIT(.fptr_epnvprogressivenumber2id)     s_eocfg_eps_eb1_mn_epnvprogressivenumber2id,
         EO_INIT(.fptr_epid2nvprogressivenumber)     s_eocfg_eps_eb1_mn_epid2nvprogressivenumber,
         EO_INIT(.fptr_epid2nvrom)                   s_eocfg_eps_eb1_mn_epid2nvrom,
@@ -144,6 +148,7 @@ static const eOnvset_EPcfg_t s_eocfg_EPs_vectorof_eb1_data[] =
         EO_INIT(.endpoint)                          eoprot_endpoint_motioncontrol,
         EO_INIT(.epram_sizeof)                      sizeof(eocfg_EPs_eb1_mc_t),
         EO_INIT(.fptr_ep2nvsnumberof)               s_eocfg_eps_eb1_mc_ep2nvsnumberof,
+        EO_INIT(.fptr_isepidsupported)              s_eocfg_eps_eb1_mc_isepidsupported,
         EO_INIT(.fptr_epnvprogressivenumber2id)     s_eocfg_eps_eb1_mc_epnvprogressivenumber2id,
         EO_INIT(.fptr_epid2nvprogressivenumber)     s_eocfg_eps_eb1_mc_epid2nvprogressivenumber,
         EO_INIT(.fptr_epid2nvrom)                   s_eocfg_eps_eb1_mc_epid2nvrom,
@@ -155,6 +160,7 @@ static const eOnvset_EPcfg_t s_eocfg_EPs_vectorof_eb1_data[] =
         EO_INIT(.endpoint)                          eoprot_endpoint_analogsensors,
         EO_INIT(.epram_sizeof)                      sizeof(eocfg_EPs_eb1_as_t),
         EO_INIT(.fptr_ep2nvsnumberof)               s_eocfg_eps_eb1_as_ep2nvsnumberof,
+        EO_INIT(.fptr_isepidsupported)              s_eocfg_eps_eb1_as_isepidsupported,
         EO_INIT(.fptr_epnvprogressivenumber2id)     s_eocfg_eps_eb1_as_epnvprogressivenumber2id,
         EO_INIT(.fptr_epid2nvprogressivenumber)     s_eocfg_eps_eb1_as_epid2nvprogressivenumber,
         EO_INIT(.fptr_epid2nvrom)                   s_eocfg_eps_eb1_as_epid2nvrom,
@@ -222,7 +228,6 @@ const eOnvset_DEVcfg_t* eocfg_EPs_eb1 = &eocfg_EPs_eb1_object;
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-#warning --> someone must call eocfg_EPs_eb1_Initialise()
 
 extern eOresult_t eocfg_EPs_eb1_Initialise(void)
 {
@@ -327,13 +332,22 @@ static void s_eocfg_eps_eb1_mn_ram_initialise(eOnvEP_t ep, void *ram)
         s_eocfg_eps_eb1_ram[i] = ram;
     }  
     
-    #warning --> someone must call eoprot_ep_mn_number_of_boards_Load() before ...
     // 2. load the number of entities of motion control in this board
     eoprot_ep_mn_number_of_entities_Load(eocfg_EPs_eb1_boardnumber, s_eocfg_eps_eb1_mn_numberofeachentity);
     
     
     // 3. initialise the values of the ram   
     eoprot_ep_mn_fun_INITIALISE(ep, ram);
+}
+
+static eObool_t s_eocfg_eps_eb1_mn_isepidsupported(eOnvEP_t ep, eOnvID_t id)
+{ 
+    if(eoprot_endpoint_management != ep)
+    {
+        return(eobool_false);
+    }
+    
+    return(eoprot_ep_mn_variables_id_isvalid(eocfg_EPs_eb1_boardnumber, id));   
 }
 
 
@@ -373,13 +387,22 @@ static void s_eocfg_eps_eb1_mc_ram_initialise(eOnvEP_t ep, void *ram)
         s_eocfg_eps_eb1_ram[i] = ram;
     }  
     
-    #warning --> someone must call eoprot_ep_mc_number_of_boards_Load() before ...
     // 2. load the number of entities of motion control in this board
     eoprot_ep_mc_number_of_entities_Load(eocfg_EPs_eb1_boardnumber, s_eocfg_eps_eb1_mc_numberofeachentity);
     
     
     // 3. initialise the values of the ram   
     eoprot_ep_mc_fun_INITIALISE(ep, ram);
+}
+
+static eObool_t s_eocfg_eps_eb1_mc_isepidsupported(eOnvEP_t ep, eOnvID_t id)
+{
+    if(eoprot_endpoint_motioncontrol != ep)
+    {
+        return(eobool_false);
+    }
+    
+    return(eoprot_ep_mc_variables_id_isvalid(eocfg_EPs_eb1_boardnumber, id));   
 }
 
 
@@ -419,7 +442,6 @@ static void s_eocfg_eps_eb1_as_ram_initialise(eOnvEP_t ep, void *ram)
         s_eocfg_eps_eb1_ram[i] = ram;
     }  
     
-    #warning --> someone must call eoprot_ep_as_number_of_boards_Load() before ...
     // 2. load the number of entities of motion control in this board
     eoprot_ep_as_number_of_entities_Load(eocfg_EPs_eb1_boardnumber, s_eocfg_eps_eb1_as_numberofeachentity);
     
@@ -428,6 +450,16 @@ static void s_eocfg_eps_eb1_as_ram_initialise(eOnvEP_t ep, void *ram)
     eoprot_ep_as_fun_INITIALISE(ep, ram);
 }
 
+
+static eObool_t s_eocfg_eps_eb1_as_isepidsupported(eOnvEP_t ep, eOnvID_t id)
+{ 
+    if(eoprot_endpoint_analogsensors != ep)
+    {
+        return(eobool_false);
+    }
+    
+    return(eoprot_ep_as_variables_id_isvalid(eocfg_EPs_eb1_boardnumber, id));   
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
