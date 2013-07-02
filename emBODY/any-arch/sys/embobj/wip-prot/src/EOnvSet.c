@@ -179,6 +179,7 @@ static eOresult_t s_eo_nvset_onDEV_PushBackEP(EOnvSet* p, uint16_t ondevindex, e
     eOnvEP_t endpoint;
     eOuint16_fp_uint16_uint16_t fptr_epid2nvprogressivenumber = NULL;
     eOuint16_fp_uint16_uint16_t fptr_epnvprogressivenumber2id = NULL;
+    eObool_fp_uint16_uint16_t fptr_isepidsupported = NULL;
     eOvoidp_fp_voidp_uint16_uint16_t fptr_dataepid2nvram =  NULL;
     eOvoidp_fp_uint16_uint16_t fptr_epid2nvrom = NULL;
     uint32_t epram_sizeof;
@@ -195,6 +196,7 @@ static eOresult_t s_eo_nvset_onDEV_PushBackEP(EOnvSet* p, uint16_t ondevindex, e
     fptr_epid2nvrom                 = cfgofep->fptr_epid2nvrom;
     fptr_epid2nvprogressivenumber   = cfgofep->fptr_epid2nvprogressivenumber;
     fptr_epnvprogressivenumber2id   = cfgofep->fptr_epnvprogressivenumber2id;
+    fptr_isepidsupported            = cfgofep->fptr_isepidsupported;
     fptr_epram_initialise           = cfgofep->fptr_epram_initialise;
     epnvsnumberof                   = cfgofep->fptr_ep2nvsnumberof(cfgofep->endpoint);
 
@@ -216,6 +218,7 @@ static eOresult_t s_eo_nvset_onDEV_PushBackEP(EOnvSet* p, uint16_t ondevindex, e
     theendpoint->epram_sizeof      		        = epram_sizeof;
     theendpoint->fptr_epid2nvprogressivenumber  = fptr_epid2nvprogressivenumber;
     theendpoint->fptr_epnvprogressivenumber2id  = fptr_epnvprogressivenumber2id;
+    theendpoint->fptr_isepidsupported           = fptr_isepidsupported;
     theendpoint->fptr_epid2nvrom                = fptr_epid2nvrom;
     theendpoint->fptr_dataepid2nvram			= fptr_dataepid2nvram;
     theendpoint->mtx_endpoint       		    = (eo_nvset_protection_one_per_endpoint == p->protection) ? p->mtxderived_new() : NULL;
@@ -284,7 +287,7 @@ extern eOresult_t eo_nvset_NVSinitialise(EOnvSet* p)
                     initialise((*theEndpoint)->endpoint, (*theEndpoint)->epram_ram);
                 }
             }
-#define EO_NVSET_INIT_EVERY_NV
+#undef EO_NVSET_INIT_EVERY_NV
 #if defined(EO_NVSET_INIT_EVERY_NV)
             
             EOnv thenv;
@@ -365,27 +368,41 @@ extern eOresult_t eo_nvset_NVget(EOnvSet* p, eOipv4addr_t ip, eOnvEP_t ep, eOnvI
 {
     eOnvset_dev_t* theDevice = NULL;
     eOnvset_ep_t* theEndpoint = NULL;
-    EOnv_rom_t* rom = NULL;
-    EOVmutexDerived* mtx2use = NULL;
+
  
     if((NULL == p) || (NULL == thenv)) 
     {
         return(eores_NOK_nullpointer); 
     }
 
-    // - retrieve the device and the endpoint
+    // - retrieve the device and the endpoint. if the ep is not recognised, then ... eores_NOK_generic
     if(eores_OK != s_eo_nvset_hid_get_device_endpoint_faster(p, ip, ep, &theDevice, &theEndpoint))   
     {
         return(eores_NOK_generic);
     }
+    
+    // - verify that on the given ep there is a valid id. if the id is not recognised, then ... eores_NOK_generic
+    if(eobool_false ==  theEndpoint->fptr_isepidsupported(ep, id))
+    {
+        return(eores_NOK_generic);       
+    }
 
     // - retrieve from the device and endpoint what is required to form the netvar: con, ram, mtx, etc.    
     // - 1. the rom
-    rom = (EOnv_rom_t*) theEndpoint->fptr_epid2nvrom(ep, id);
+    EOnv_rom_t* rom = (EOnv_rom_t*) theEndpoint->fptr_epid2nvrom(ep, id);
     // - 2. the ram
     uint8_t* ram = theEndpoint->fptr_dataepid2nvram(theEndpoint->epram_ram, ep, id);
     // - 3. the mtx
-    mtx2use = s_eo_nvset_get_nvmutex(p, theDevice, theEndpoint, id);
+    EOVmutexDerived* mtx2use = s_eo_nvset_get_nvmutex(p, theDevice, theEndpoint, id);
+    
+    
+    // - final control about the validity of ep-id. it may be redundant but it is safer. for instance if the fptr_isepidsupported()
+    //   does not take into account a removed tag and just checks that the tag-number is lower than the max allowed.
+    
+    if((NULL == rom) || (NULL == ram))  // mtx2use can be NULL
+    {
+        return(eores_NOK_generic); 
+    }
 
     // - load everything into the nv
     eo_nv_hid_Load(     thenv,
