@@ -77,6 +77,9 @@ EO_VERIFYproposition(eoprot_ep_mn_tagsmax_ap, eoprot_ep_mn_appl_tags_numberof <=
 
 static uint16_t s_eoprot_ep_mn_brdid2ramoffset(eOprotBRD_t brd, eOprotID_t id);
 
+static eObool_t s_eoprot_ep_mn_comm_tag_is_valid(eOprotTag_t tag);
+static eObool_t s_eoprot_ep_mn_appl_tag_is_valid(eOprotTag_t tag);
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -131,6 +134,46 @@ extern eOresult_t eoprot_ep_mn_number_of_entities_Load(eOprotBRD_t brd, const ui
     s_eoprot_ep_mn_board_numberofeachentity[brd] = numberofeachentity;
     
     return(eores_OK);       
+}
+
+
+extern eObool_t eoprot_ep_mn_variables_id_isvalid(eOprotBRD_t brd, eOnvID_t id)
+{
+    eObool_t ret = eobool_false;    
+    
+    if((NULL == s_eoprot_ep_mn_board_numberofeachentity) || (NULL == s_eoprot_ep_mn_board_numberofeachentity[brd]))
+    {
+        return(eobool_false);
+    }    
+    
+    eOprotEntity_t ent = eoprot_ep_variable_ID2entity(eoprot_endpoint_management, id);
+    eOprotIndex_t  ind = eoprot_ep_variable_ID2index(eoprot_endpoint_management, id);
+    eOprotTag_t    tag = eoprot_ep_variable_ID2tag(eoprot_endpoint_management, id);
+    
+    switch(ent)
+    {
+        case eomn_entity_comm:
+        {   
+            if(ind < s_eoprot_ep_mn_board_numberofeachentity[brd][eomn_entity_comm])
+            {
+                ret = s_eoprot_ep_mn_comm_tag_is_valid(tag);
+            }            
+        } break;
+        
+        case eomn_entity_appl:
+        {
+            if(ind < s_eoprot_ep_mn_board_numberofeachentity[brd][eomn_entity_appl]) 
+            {
+                ret = s_eoprot_ep_mn_appl_tag_is_valid(tag);
+            }            
+        } break;        
+        
+        default:
+        {           
+        } break;        
+    }
+    
+    return(ret);     
 }
 
 
@@ -336,6 +379,17 @@ static uint16_t s_eoprot_ep_mn_brdid2ramoffset(eOprotBRD_t brd, eOprotID_t id)
     
     return(offset);  
 }
+
+static eObool_t s_eoprot_ep_mn_comm_tag_is_valid(eOprotTag_t tag)
+{   // in case of holes in tags ... change the code
+    return((tag < eoprot_ep_mn_comm_tags_numberof)?(eobool_true):(eobool_false));
+}
+
+static eObool_t s_eoprot_ep_mn_appl_tag_is_valid(eOprotTag_t tag)
+{   // in case of holes in tags ... change the code  
+    return((tag < eoprot_ep_mn_appl_tags_numberof)?(eobool_true):(eobool_false));
+}
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
