@@ -46,6 +46,7 @@
 #include "EoProtocolEPmn_fun.h"
 
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
@@ -88,26 +89,18 @@ static void s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(eOmn_ropsigcfg_command_t
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern void eoprot_ep_mn_fun_INIT_comm_cmmnds__ropsigcfg(const EOnv* nv, uint16_t index) 
+extern void eoprot_ep_mn_fun_INIT_comm_cmmnds__ropsigcfg(const EOnv* nv) 
 {
+    //eOprotIndex_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
 
-    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
-    
-    eOmn_ropsigcfg_command_t* cmdloc = (eOmn_ropsigcfg_command_t*)nv->ram;
-    eOmn_ropsigcfg_command_t* cmdrem = (eOmn_ropsigcfg_command_t*)nv->rem;
-    
-    if(eobool_true == theOwnershipIsLocal)
+    eOmn_ropsigcfg_command_t* cmd = (eOmn_ropsigcfg_command_t*)nv->ram;
+        
+    if(eobool_true == eo_nv_hid_isLocal(nv))
     {   // function is called from within the local board
-        s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(cmdloc);  
+        s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(cmd);  
     }
     else
-    {   // function is called from within the remote host because it has initialised its data
-        // it is possible to know which board owns the cmdrem from the ip address
-        eOipv4addr_t ipaddress_of_remote_board = nv->ip;
-        
-        ipaddress_of_remote_board = ipaddress_of_remote_board;
-        cmdrem = cmdrem;
-
+    {   // function is called from within the remote host 
     }    
 
 }
@@ -115,31 +108,27 @@ extern void eoprot_ep_mn_fun_INIT_comm_cmmnds__ropsigcfg(const EOnv* nv, uint16_
 
 
 
-extern void eoprot_ep_mn_fun_UPDT_comm_cmmnds__ropsigcfg(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) 
+extern void eoprot_ep_mn_fun_UPDT_comm_cmmnds__ropsigcfg(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
-    eObool_t theOwnershipIsLocal = (NULL == nv->rem) ? eobool_true : eobool_false;
+    //eOprotIndex_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
     
-    eOmn_ropsigcfg_command_t* cmdloc = (eOmn_ropsigcfg_command_t*)nv->ram;
-    eOmn_ropsigcfg_command_t* cmdrem = (eOmn_ropsigcfg_command_t*)nv->rem;
+    eOmn_ropsigcfg_command_t* cmd = (eOmn_ropsigcfg_command_t*)nv->ram;
     
-    if(eobool_true == theOwnershipIsLocal)
+    
+    if(eobool_true == eo_nv_hid_isLocal(nv))
     {   // function is called from within the local board
-        s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(cmdloc);  
+        s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(cmd);  
     }
     else
     {   // function is called from within the remote host because it has received a say or a sig
         // it is possible to know which board has sent the say/sig by the ipaddress
-        eOipv4addr_t ipaddress_of_remote_board = nv->ip;
-        
-        ipaddress_of_remote_board = ipaddress_of_remote_board;
-        cmdrem = cmdrem;
-
+        //eOipv4addr_t ipaddress_of_remote_board = nv->ip;
     }    
 
 }
 
 
-extern void eoprot_ep_mn_fun_UPDT_appl_cmmnds__go2state(const EOnv* nv, const eOropdescriptor_t* rd, uint16_t index) 
+extern void eoprot_ep_mn_fun_UPDT_appl_cmmnds__go2state(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
 
     eOmn_appl_state_t *newstate_ptr = (eOmn_appl_state_t *)nv->ram;
