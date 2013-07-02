@@ -425,10 +425,8 @@ extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvEP_t ep, eOnvID_
     nv->ep          = ep;
     nv->id          = id;
     nv->rom         = rom;
-    nv->ram         = ram;
-//    nv->rem         = rem;   
+    nv->ram         = ram; 
     nv->mtx         = mtx;
-//    nv->stg         = stg;
            
     return(eores_OK);
 }

@@ -306,7 +306,8 @@ extern EOnv* eo_rop_hid_NV_Get(EOrop *p)
 // used when the rop is already built or when we already have a valid head from a stream
 extern eObool_t eo_rop_hid_DataField_is_Present(const eOrophead_t *head)
 {
-    return( (0 != head->dsiz) ? (eobool_true) : (eobool_false));
+    //return( (0 != head->dsiz) ? (eobool_true) : (eobool_false));
+    return(eo_rop_hid_DataField_is_Required(head));
 }
 
 
@@ -424,7 +425,7 @@ static EOrop * s_eo_rop_prepare_reply(EOrop *ropin, EOrop *ropout)
         if(1 == ropin->stream.head.ctrl.rqstconf)
         {
             r = ropout;
-            r->stream.head.ctrl.confinfo 	= eo_ropconf_nak;
+            r->stream.head.ctrl.confinfo 	        = eo_ropconf_nak;
             r->stream.head.endp 					= ropin->stream.head.endp;
             r->stream.head.ropc 					= ropin->stream.head.ropc;
             r->stream.head.dsiz 					= 0;
@@ -540,10 +541,10 @@ static void s_eo_rop_exec_on_it(EOrop *rop_in, EOrop *rop_o)
     uint8_t *destin = NULL;
     uint16_t size = 0;
     EOnv *thenv = NULL;
-		eOropdescriptor_t* theropdes = NULL;
+    eOropdescriptor_t* theropdes = NULL;
 
     thenv = &rop_in->netvar;
-		theropdes = &rop_in->ropdes;
+    theropdes = &rop_in->ropdes;
 
 
     switch(rop_in->stream.head.ropc)

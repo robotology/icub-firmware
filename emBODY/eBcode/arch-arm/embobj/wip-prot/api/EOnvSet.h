@@ -86,6 +86,7 @@ typedef struct
     eOnvEP_t                            endpoint;                       /*< the endpoint value */
     uint16_t                            epram_sizeof;                   /*< the size of the ram used for the NVs in the endopoint */
     eOuint16_fp_uint16_t                fptr_ep2nvsnumberof;            /*< a function which returns the total number of the NVS in the endpoint */
+    eObool_fp_uint16_uint16_t           fptr_isepidsupported;           /*< a function whcih tells if the pair (ep, id) is valid in this endpoint. */
     eOuint16_fp_uint16_uint16_t         fptr_epnvprogressivenumber2id;  /*< a function which returns the ID given the pair (ep, prognumber)  */
     eOuint16_fp_uint16_uint16_t         fptr_epid2nvprogressivenumber;  /*< a function which returns a progressive number for the NV with pair (ep, id)  */
     eOvoidp_fp_uint16_uint16_t	        fptr_epid2nvrom;                /*< a function which returns the .rom part of the NV with pair (ep, id)  */
