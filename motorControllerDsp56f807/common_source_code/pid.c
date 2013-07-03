@@ -153,6 +153,7 @@ Int16  _ko_torque[JN] = INIT_ARRAY (0);			// offset
 Int16  _kr_torque[JN] = INIT_ARRAY (10);		// scale factor (negative power of two) 
 Int16  _kstp_torque[JN] = INIT_ARRAY (0);       // stiction compensation: positive val
 Int16  _kstn_torque[JN] = INIT_ARRAY (0);       // stiction compensation: negative val
+Int16  _kff_torque[JN] = INIT_ARRAY (0);        // feedforward gain
 
 // SPEED PID (iKart)
 Int16  _error_speed[JN] = INIT_ARRAY (0);	    // actual feedback error 
