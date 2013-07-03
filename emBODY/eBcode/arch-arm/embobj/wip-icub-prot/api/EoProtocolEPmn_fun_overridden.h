@@ -46,7 +46,7 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-//#define OVERRIDE_eoprot_ep_mn_fun_INIT_comm_cmmnds__ropsigcfg
+//#define OVERRIDE_eoprot_ep_mn_fun_INIT_comm_cmmnds_ropsigcfg
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 

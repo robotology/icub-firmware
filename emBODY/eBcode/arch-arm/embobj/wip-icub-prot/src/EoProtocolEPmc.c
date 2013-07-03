@@ -63,14 +63,14 @@
 EO_VERIFYproposition(eoprot_ep_mc_dew4, eoprot_ep_mc_entities_numberof <= eoprot_entities_numberof);
 
 // - guard on tags ...
-EO_VERIFYproposition(eoprot_ep_mc_tagsnum_jo, eoprot_ep_mc_joint_tags_numberof == eoprot_ep_mc_joint_rwmodes_numberof);
-EO_VERIFYproposition(eoprot_ep_mc_tagsmax_jo, eoprot_ep_mc_joint_tags_numberof <= eoprot_tags_numberof);
+EO_VERIFYproposition(eoprot_ep_mc_tagsnum_jo, eoprot_ep_mc_tags_joint_numberof == eoprot_ep_mc_rwmodes_joint_numberof);
+EO_VERIFYproposition(eoprot_ep_mc_tagsmax_jo, eoprot_ep_mc_tags_joint_numberof <= eoprot_tags_numberof);
 
-EO_VERIFYproposition(eoprot_ep_mc_tagsnum_mo, eoprot_ep_mc_motor_tags_numberof == eoprot_ep_mc_motor_rwmodes_numberof);
-EO_VERIFYproposition(eoprot_ep_mc_tagsmax_mo, eoprot_ep_mc_motor_tags_numberof <= eoprot_tags_numberof);
+EO_VERIFYproposition(eoprot_ep_mc_tagsnum_mo, eoprot_ep_mc_tags_motor_numberof == eoprot_ep_mc_rwmodes_motor_numberof);
+EO_VERIFYproposition(eoprot_ep_mc_tagsmax_mo, eoprot_ep_mc_tags_motor_numberof <= eoprot_tags_numberof);
 
-EO_VERIFYproposition(eoprot_ep_mc_tagsnum_co, eoprot_ep_mc_controller_tags_numberof == eoprot_ep_mc_controller_rwmodes_numberof);
-EO_VERIFYproposition(eoprot_ep_mc_tagsmax_co, eoprot_ep_mc_controller_tags_numberof <= eoprot_tags_numberof);
+EO_VERIFYproposition(eoprot_ep_mc_tagsnum_co, eoprot_ep_mc_tags_controller_numberof == eoprot_ep_mc_rwmodes_controller_numberof);
+EO_VERIFYproposition(eoprot_ep_mc_tagsmax_co, eoprot_ep_mc_tags_controller_numberof <= eoprot_tags_numberof);
   
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -79,9 +79,9 @@ EO_VERIFYproposition(eoprot_ep_mc_tagsmax_co, eoprot_ep_mc_controller_tags_numbe
 
 static uint16_t s_eoprot_ep_mc_brdid2ramoffset(eOprotBRD_t brd, eOprotID_t id);
 
-static eObool_t s_eoprot_ep_mc_joint_tag_is_valid(eOprotTag_t tag);
-static eObool_t s_eoprot_ep_mc_motor_tag_is_valid(eOprotTag_t tag);
-static eObool_t s_eoprot_ep_mc_controller_tag_is_valid(eOprotTag_t tag);
+static eObool_t s_eoprot_ep_mc_tag_joint_is_valid(eOprotTag_t tag);
+static eObool_t s_eoprot_ep_mc_tag_motor_is_valid(eOprotTag_t tag);
+static eObool_t s_eoprot_ep_mc_tag_controller_is_valid(eOprotTag_t tag);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -157,7 +157,7 @@ extern eObool_t eoprot_ep_mc_variables_id_isvalid(eOprotBRD_t brd, eOnvID_t id)
         {   
             if(ind < s_eoprot_ep_mc_board_numberofeachentity[brd][eomc_entity_joint])
             {
-                ret = s_eoprot_ep_mc_joint_tag_is_valid(tag);
+                ret = s_eoprot_ep_mc_tag_joint_is_valid(tag);
             }            
         } break;
         
@@ -165,7 +165,7 @@ extern eObool_t eoprot_ep_mc_variables_id_isvalid(eOprotBRD_t brd, eOnvID_t id)
         {
             if(ind < s_eoprot_ep_mc_board_numberofeachentity[brd][eomc_entity_motor]) 
             {
-                ret = s_eoprot_ep_mc_motor_tag_is_valid(tag);
+                ret = s_eoprot_ep_mc_tag_motor_is_valid(tag);
             }            
         } break;        
  
@@ -173,7 +173,7 @@ extern eObool_t eoprot_ep_mc_variables_id_isvalid(eOprotBRD_t brd, eOnvID_t id)
         {
             if(ind < s_eoprot_ep_mc_board_numberofeachentity[brd][eomc_entity_controller]) 
             {
-                ret = s_eoprot_ep_mc_controller_tag_is_valid(tag);
+                ret = s_eoprot_ep_mc_tag_controller_is_valid(tag);
             }            
         } break; 
         
@@ -195,9 +195,9 @@ extern uint16_t eoprot_ep_mc_variables_numberof_Get(eOprotBRD_t brd)
         return(0);
     }
     
-    num = eoprot_ep_mc_joint_tags_numberof * s_eoprot_ep_mc_board_numberofeachentity[brd][eomc_entity_joint] +
-          eoprot_ep_mc_motor_tags_numberof * s_eoprot_ep_mc_board_numberofeachentity[brd][eomc_entity_motor] +
-          eoprot_ep_mc_controller_tags_numberof * s_eoprot_ep_mc_board_numberofeachentity[brd][eomc_entity_controller];
+    num = eoprot_ep_mc_tags_joint_numberof * s_eoprot_ep_mc_board_numberofeachentity[brd][eomc_entity_joint] +
+          eoprot_ep_mc_tags_motor_numberof * s_eoprot_ep_mc_board_numberofeachentity[brd][eomc_entity_motor] +
+          eoprot_ep_mc_tags_controller_numberof * s_eoprot_ep_mc_board_numberofeachentity[brd][eomc_entity_controller];
           
     return(num);
 }
@@ -213,29 +213,29 @@ extern eOprotID_t eoprot_ep_mc_variable_idfromprognumber_Get(eOprotBRD_t brd, ui
         return(0);
     }
     
-    uint16_t progsinjoints = eoprot_ep_mc_joint_tags_numberof * s_eoprot_ep_mc_board_numberofeachentity[brd][eomc_entity_joint];
-    uint16_t progsinmotors = eoprot_ep_mc_motor_tags_numberof * s_eoprot_ep_mc_board_numberofeachentity[brd][eomc_entity_motor];
-    uint16_t progsincontrollers = eoprot_ep_mc_controller_tags_numberof * s_eoprot_ep_mc_board_numberofeachentity[brd][eomc_entity_controller];
+    uint16_t progsinjoints = eoprot_ep_mc_tags_joint_numberof * s_eoprot_ep_mc_board_numberofeachentity[brd][eomc_entity_joint];
+    uint16_t progsinmotors = eoprot_ep_mc_tags_motor_numberof * s_eoprot_ep_mc_board_numberofeachentity[brd][eomc_entity_motor];
+    uint16_t progsincontrollers = eoprot_ep_mc_tags_controller_numberof * s_eoprot_ep_mc_board_numberofeachentity[brd][eomc_entity_controller];
     
     if((0 != progsinjoints) && (prog < (progsinjoints)))
     {   // entity is eomc_entity_joint 
         entity  = eomc_entity_joint;
-        index   = prog / eoprot_ep_mc_joint_tags_numberof;       // eoprot_ep_mc_joint_tags_numberof cannot be zero if progsinjoints is non-zero
-        tag     = prog % eoprot_ep_mc_joint_tags_numberof;        
+        index   = prog / eoprot_ep_mc_tags_joint_numberof;       // eoprot_ep_mc_tags_joint_numberof cannot be zero if progsinjoints is non-zero
+        tag     = prog % eoprot_ep_mc_tags_joint_numberof;        
     }
     else if((0 != progsinmotors) && (prog < (progsinjoints + progsinmotors)))
     {   // entity is eomc_entity_motor 
         prog -= (progsinjoints);
         entity  = eomc_entity_motor;
-        index   = prog / eoprot_ep_mc_motor_tags_numberof;       // eoprot_ep_mc_motor_tags_numberof cannot be zero if progsinmotors is non-zero
-        tag     = prog % eoprot_ep_mc_motor_tags_numberof;                      
+        index   = prog / eoprot_ep_mc_tags_motor_numberof;       // eoprot_ep_mc_tags_motor_numberof cannot be zero if progsinmotors is non-zero
+        tag     = prog % eoprot_ep_mc_tags_motor_numberof;                      
     }
     else if((0 != progsincontrollers) && (prog < (progsinjoints + progsinmotors + progsincontrollers)))
     {   // entity is eomc_entity_controller 
         prog -= (progsinjoints+progsinmotors);
         entity  = eomc_entity_controller;
-        index   = prog / eoprot_ep_mc_controller_tags_numberof;       // eoprot_ep_mc_controller_tags_numberof cannot be zero if progsincontrollers is non-zero
-        tag     = prog % eoprot_ep_mc_controller_tags_numberof;                      
+        index   = prog / eoprot_ep_mc_tags_controller_numberof;       // eoprot_ep_mc_tags_controller_numberof cannot be zero if progsincontrollers is non-zero
+        tag     = prog % eoprot_ep_mc_tags_controller_numberof;                      
     }    
     else
     {
@@ -262,20 +262,20 @@ extern uint16_t eoprot_ep_mc_variable_progressivenumber_Get(eOprotBRD_t brd, eOp
     {
         case eomc_entity_joint: 
         {
-            prog = index*eoprot_ep_mc_joint_tags_numberof + eoprot_ep_mc_rom_get_prognum(id);
+            prog = index*eoprot_ep_mc_tags_joint_numberof + eoprot_ep_mc_rom_get_prognum(id);
         } break;
         
         case eomc_entity_motor: 
         {
-            prog = s_eoprot_ep_mc_board_numberofeachentity[brd][eomc_entity_joint]*eoprot_ep_mc_joint_tags_numberof +
-                   index*eoprot_ep_mc_motor_tags_numberof + eoprot_ep_mc_rom_get_prognum(id);
+            prog = s_eoprot_ep_mc_board_numberofeachentity[brd][eomc_entity_joint]*eoprot_ep_mc_tags_joint_numberof +
+                   index*eoprot_ep_mc_tags_motor_numberof + eoprot_ep_mc_rom_get_prognum(id);
         } break; 
         
         case eomc_entity_controller: 
         {
-            prog = s_eoprot_ep_mc_board_numberofeachentity[brd][eomc_entity_joint]*eoprot_ep_mc_joint_tags_numberof +
-                   s_eoprot_ep_mc_board_numberofeachentity[brd][eomc_entity_motor]*eoprot_ep_mc_motor_tags_numberof +
-                   index*eoprot_ep_mc_controller_tags_numberof + eoprot_ep_mc_rom_get_prognum(id);
+            prog = s_eoprot_ep_mc_board_numberofeachentity[brd][eomc_entity_joint]*eoprot_ep_mc_tags_joint_numberof +
+                   s_eoprot_ep_mc_board_numberofeachentity[brd][eomc_entity_motor]*eoprot_ep_mc_tags_motor_numberof +
+                   index*eoprot_ep_mc_tags_controller_numberof + eoprot_ep_mc_rom_get_prognum(id);
         } break;   
         
         default:
@@ -430,19 +430,19 @@ static uint16_t s_eoprot_ep_mc_brdid2ramoffset(eOprotBRD_t brd, eOprotID_t id)
 }
 
 
-static eObool_t s_eoprot_ep_mc_joint_tag_is_valid(eOprotTag_t tag)
+static eObool_t s_eoprot_ep_mc_tag_joint_is_valid(eOprotTag_t tag)
 {   // in case of holes in tags ... change the code
-    return((tag < eoprot_ep_mc_joint_tags_numberof)?(eobool_true):(eobool_false));
+    return((tag < eoprot_ep_mc_tags_joint_numberof)?(eobool_true):(eobool_false));
 }
 
-static eObool_t s_eoprot_ep_mc_motor_tag_is_valid(eOprotTag_t tag)
+static eObool_t s_eoprot_ep_mc_tag_motor_is_valid(eOprotTag_t tag)
 {   // in case of holes in tags ... change the code  
-    return((tag < eoprot_ep_mc_motor_tags_numberof)?(eobool_true):(eobool_false));
+    return((tag < eoprot_ep_mc_tags_motor_numberof)?(eobool_true):(eobool_false));
 }
 
-static eObool_t s_eoprot_ep_mc_controller_tag_is_valid(eOprotTag_t tag)
+static eObool_t s_eoprot_ep_mc_tag_controller_is_valid(eOprotTag_t tag)
 {   // in case of holes in tags ... change the code 
-    return((tag < eoprot_ep_mc_controller_tags_numberof)?(eobool_true):(eobool_false));
+    return((tag < eoprot_ep_mc_tags_controller_numberof)?(eobool_true):(eobool_false));
 }
 
 // --------------------------------------------------------------------------------------------------------------------

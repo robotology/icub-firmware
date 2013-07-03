@@ -172,7 +172,17 @@ const eOas_mais_t eoprot_ep_as_rom_mais_defaultvalue =
 
 // - descriptors for the variables of a strain
 
-EOnv_rom_t eoprot_ep_as_rom_strain_descriptor_config =
+EOnv_rom_t eoprot_ep_as_rom_descriptor_strain_wholeitem =
+{   
+    EO_INIT(.capacity)  sizeof(eoprot_ep_as_rom_strain_defaultvalue),
+    EO_INIT(.rwmode)    eoprot_ep_as_strain_rwmode_config,
+    EO_INIT(.dummy)     0,    
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_as_rom_strain_defaultvalue,
+    EO_INIT(.init)      eoprot_ep_as_fun_INIT_strain_wholeitem,
+    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_strain_wholeitem
+};
+
+EOnv_rom_t eoprot_ep_as_rom_descriptor_strain_config =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_as_rom_strain_defaultvalue.config),
     EO_INIT(.rwmode)    eoprot_ep_as_strain_rwmode_config,
@@ -182,37 +192,37 @@ EOnv_rom_t eoprot_ep_as_rom_strain_descriptor_config =
     EO_INIT(.update)    eoprot_ep_as_fun_UPDT_strain_config
 };
 
-EOnv_rom_t eoprot_ep_as_rom_strain_descriptor_config__mode =
+EOnv_rom_t eoprot_ep_as_rom_descriptor_strain_config_mode =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_as_rom_strain_defaultvalue.config.mode),
-    EO_INIT(.rwmode)    eoprot_ep_as_strain_rwmode_config__mode,
+    EO_INIT(.rwmode)    eoprot_ep_as_strain_rwmode_config_mode,
     EO_INIT(.dummy)     0,    
     EO_INIT(.resetval)  (const void*)&eoprot_ep_as_rom_strain_defaultvalue.config.mode,
-    EO_INIT(.init)      eoprot_ep_as_fun_INIT_strain_config__mode,
-    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_strain_config__mode
+    EO_INIT(.init)      eoprot_ep_as_fun_INIT_strain_config_mode,
+    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_strain_config_mode
 };
 
-EOnv_rom_t eoprot_ep_as_rom_strain_descriptor_config__datarate =
+EOnv_rom_t eoprot_ep_as_rom_descriptor_strain_config_datarate =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_as_rom_strain_defaultvalue.config.datarate),
-    EO_INIT(.rwmode)    eoprot_ep_as_strain_rwmode_config__datarate,
+    EO_INIT(.rwmode)    eoprot_ep_as_strain_rwmode_config_datarate,
     EO_INIT(.dummy)     0,    
     EO_INIT(.resetval)  (const void*)&eoprot_ep_as_rom_strain_defaultvalue.config.datarate,
-    EO_INIT(.init)      eoprot_ep_as_fun_INIT_strain_config__datarate,
-    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_strain_config__datarate
+    EO_INIT(.init)      eoprot_ep_as_fun_INIT_strain_config_datarate,
+    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_strain_config_datarate
 };
 
-EOnv_rom_t eoprot_ep_as_rom_strain_descriptor_config__signaloncefullscale =
+EOnv_rom_t eoprot_ep_as_rom_descriptor_strain_config_signaloncefullscale =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_as_rom_strain_defaultvalue.config.signaloncefullscale),
-    EO_INIT(.rwmode)    eoprot_ep_as_strain_rwmode_config__signaloncefullscale,
+    EO_INIT(.rwmode)    eoprot_ep_as_strain_rwmode_config_signaloncefullscale,
     EO_INIT(.dummy)     0,    
     EO_INIT(.resetval)  (const void*)&eoprot_ep_as_rom_strain_defaultvalue.config.signaloncefullscale,
-    EO_INIT(.init)      eoprot_ep_as_fun_INIT_strain_config__signaloncefullscale,
-    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_strain_config__signaloncefullscale
+    EO_INIT(.init)      eoprot_ep_as_fun_INIT_strain_config_signaloncefullscale,
+    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_strain_config_signaloncefullscale
 };
 
-EOnv_rom_t eoprot_ep_as_rom_strain_descriptor_status =
+EOnv_rom_t eoprot_ep_as_rom_descriptor_strain_status =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_as_rom_strain_defaultvalue.status),
     EO_INIT(.rwmode)    eoprot_ep_as_strain_rwmode_status,
@@ -222,96 +232,106 @@ EOnv_rom_t eoprot_ep_as_rom_strain_descriptor_status =
     EO_INIT(.update)    eoprot_ep_as_fun_UPDT_strain_status
 };
 
-EOnv_rom_t eoprot_ep_as_rom_strain_descriptor_status__fullscale =
+EOnv_rom_t eoprot_ep_as_rom_descriptor_strain_status_fullscale =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_as_rom_strain_defaultvalue.status.fullscale),
-    EO_INIT(.rwmode)    eoprot_ep_as_strain_rwmode_status__fullscale,
+    EO_INIT(.rwmode)    eoprot_ep_as_strain_rwmode_status_fullscale,
     EO_INIT(.dummy)     0,    
     EO_INIT(.resetval)  (const void*)&eoprot_ep_as_rom_strain_defaultvalue.status.fullscale,
-    EO_INIT(.init)      eoprot_ep_as_fun_INIT_strain_status__fullscale,
-    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_strain_status__fullscale
+    EO_INIT(.init)      eoprot_ep_as_fun_INIT_strain_status_fullscale,
+    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_strain_status_fullscale
 };
 
-EOnv_rom_t eoprot_ep_as_rom_strain_descriptor_status__calibratedvalues =
+EOnv_rom_t eoprot_ep_as_rom_descriptor_strain_status_calibratedvalues =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_as_rom_strain_defaultvalue.status.calibratedvalues),
-    EO_INIT(.rwmode)    eoprot_ep_as_strain_rwmode_status__calibratedvalues,
+    EO_INIT(.rwmode)    eoprot_ep_as_strain_rwmode_status_calibratedvalues,
     EO_INIT(.dummy)     0,    
     EO_INIT(.resetval)  (const void*)&eoprot_ep_as_rom_strain_defaultvalue.status.calibratedvalues,
-    EO_INIT(.init)      eoprot_ep_as_fun_INIT_strain_status__calibratedvalues,
-    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_strain_status__calibratedvalues
+    EO_INIT(.init)      eoprot_ep_as_fun_INIT_strain_status_calibratedvalues,
+    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_strain_status_calibratedvalues
 };
 
-EOnv_rom_t eoprot_ep_as_rom_strain_descriptor_status__uncalibratedvalues =
+EOnv_rom_t eoprot_ep_as_rom_descriptor_strain_status_uncalibratedvalues =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_as_rom_strain_defaultvalue.status.uncalibratedvalues),
-    EO_INIT(.rwmode)    eoprot_ep_as_strain_rwmode_status__uncalibratedvalues,
+    EO_INIT(.rwmode)    eoprot_ep_as_strain_rwmode_status_uncalibratedvalues,
     EO_INIT(.dummy)     0,    
     EO_INIT(.resetval)  (const void*)&eoprot_ep_as_rom_strain_defaultvalue.status.uncalibratedvalues,
-    EO_INIT(.init)      eoprot_ep_as_fun_INIT_strain_status__uncalibratedvalues,
-    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_strain_status__uncalibratedvalues
+    EO_INIT(.init)      eoprot_ep_as_fun_INIT_strain_status_uncalibratedvalues,
+    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_strain_status_uncalibratedvalues
 };
 
 // - descriptors for the variables of a mais
 
-EOnv_rom_t eoprot_ep_as_rom_mais_descriptor_config =
+EOnv_rom_t eoprot_ep_as_rom_descriptor_mais_wholeitem =
+{   
+    EO_INIT(.capacity)  sizeof(eoprot_ep_as_rom_mais_defaultvalue),
+    EO_INIT(.rwmode)    eoprot_ep_as_rwmode_mais_wholeitem,
+    EO_INIT(.dummy)     0,    
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_as_rom_mais_defaultvalue,
+    EO_INIT(.init)      eoprot_ep_as_fun_INIT_mais_wholeitem,
+    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_mais_wholeitem
+};
+
+EOnv_rom_t eoprot_ep_as_rom_descriptor_mais_config =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_as_rom_mais_defaultvalue.config),
-    EO_INIT(.rwmode)    eoprot_ep_as_mais_rwmode_config,
+    EO_INIT(.rwmode)    eoprot_ep_as_rwmode_mais_config,
     EO_INIT(.dummy)     0,    
     EO_INIT(.resetval)  (const void*)&eoprot_ep_as_rom_mais_defaultvalue.config,
     EO_INIT(.init)      eoprot_ep_as_fun_INIT_mais_config,
     EO_INIT(.update)    eoprot_ep_as_fun_UPDT_mais_config
 };
 
-EOnv_rom_t eoprot_ep_as_rom_mais_descriptor_config__mode =
+EOnv_rom_t eoprot_ep_as_rom_descriptor_mais_config_mode =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_as_rom_mais_defaultvalue.config.mode),
-    EO_INIT(.rwmode)    eoprot_ep_as_mais_rwmode_config__mode,
+    EO_INIT(.rwmode)    eoprot_ep_as_rwmode_mais_config_mode,
     EO_INIT(.dummy)     0,    
     EO_INIT(.resetval)  (const void*)&eoprot_ep_as_rom_mais_defaultvalue.config.mode,
-    EO_INIT(.init)      eoprot_ep_as_fun_INIT_mais_config__mode,
-    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_mais_config__mode
+    EO_INIT(.init)      eoprot_ep_as_fun_INIT_mais_config_mode,
+    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_mais_config_mode
 };
 
-EOnv_rom_t eoprot_ep_as_rom_mais_descriptor_config__datarate =
+EOnv_rom_t eoprot_ep_as_rom_descriptor_mais_config_datarate =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_as_rom_mais_defaultvalue.config.datarate),
-    EO_INIT(.rwmode)    eoprot_ep_as_mais_rwmode_config__datarate,
+    EO_INIT(.rwmode)    eoprot_ep_as_rwmode_mais_config_datarate,
     EO_INIT(.dummy)     0,    
     EO_INIT(.resetval)  (const void*)&eoprot_ep_as_rom_mais_defaultvalue.config.datarate,
-    EO_INIT(.init)      eoprot_ep_as_fun_INIT_mais_config__datarate,
-    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_mais_config__datarate
+    EO_INIT(.init)      eoprot_ep_as_fun_INIT_mais_config_datarate,
+    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_mais_config_datarate
 };
 
-EOnv_rom_t eoprot_ep_as_rom_mais_descriptor_config__resolution =
+EOnv_rom_t eoprot_ep_as_rom_descriptor_mais_config_resolution =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_as_rom_mais_defaultvalue.config.resolution),
-    EO_INIT(.rwmode)    eoprot_ep_as_mais_rwmode_config__resolution,
+    EO_INIT(.rwmode)    eoprot_ep_as_rwmode_mais_config_resolution,
     EO_INIT(.dummy)     0,    
     EO_INIT(.resetval)  (const void*)&eoprot_ep_as_rom_mais_defaultvalue.config.resolution,
-    EO_INIT(.init)      eoprot_ep_as_fun_INIT_mais_config__resolution,
-    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_mais_config__resolution
+    EO_INIT(.init)      eoprot_ep_as_fun_INIT_mais_config_resolution,
+    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_mais_config_resolution
 };
 
-EOnv_rom_t eoprot_ep_as_rom_mais_descriptor_status =
+EOnv_rom_t eoprot_ep_as_rom_descriptor_mais_status =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_as_rom_mais_defaultvalue.status),
-    EO_INIT(.rwmode)    eoprot_ep_as_mais_rwmode_status,
+    EO_INIT(.rwmode)    eoprot_ep_as_rwmode_mais_status,
     EO_INIT(.dummy)     0,    
     EO_INIT(.resetval)  (const void*)&eoprot_ep_as_rom_mais_defaultvalue.status,
     EO_INIT(.init)      eoprot_ep_as_fun_INIT_mais_status,
     EO_INIT(.update)    eoprot_ep_as_fun_UPDT_mais_status
 };
 
-EOnv_rom_t eoprot_ep_as_rom_mais_descriptor_status__the15values =
+EOnv_rom_t eoprot_ep_as_rom_descriptor_mais_status_the15values =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_as_rom_mais_defaultvalue.status.the15values),
-    EO_INIT(.rwmode)    eoprot_ep_as_mais_rwmode_status__the15values,
+    EO_INIT(.rwmode)    eoprot_ep_as_rwmode_mais_status_the15values,
     EO_INIT(.dummy)     0,    
     EO_INIT(.resetval)  (const void*)&eoprot_ep_as_rom_mais_defaultvalue.status.the15values,
-    EO_INIT(.init)      eoprot_ep_as_fun_INIT_mais_status__the15values,
-    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_mais_status__the15values
+    EO_INIT(.init)      eoprot_ep_as_fun_INIT_mais_status_the15values,
+    EO_INIT(.update)    eoprot_ep_as_fun_UPDT_mais_status_the15values
 };
 
 
@@ -323,25 +343,27 @@ EOnv_rom_t eoprot_ep_as_rom_mais_descriptor_status__the15values =
 
 const EOnv_rom_t * const eoprot_ep_as_rom_folded_descriptors[] =
 {
-    // here are eoprot_ep_as_strain_tags_numberof descriptors for the strains (equal for every strain)
-    &eoprot_ep_as_rom_strain_descriptor_config,
-    &eoprot_ep_as_rom_strain_descriptor_config__mode,
-    &eoprot_ep_as_rom_strain_descriptor_config__datarate,
-    &eoprot_ep_as_rom_strain_descriptor_config__signaloncefullscale,
-    &eoprot_ep_as_rom_strain_descriptor_status,
-    &eoprot_ep_as_rom_strain_descriptor_status__fullscale,
-    &eoprot_ep_as_rom_strain_descriptor_status__calibratedvalues,
-    &eoprot_ep_as_rom_strain_descriptor_status__uncalibratedvalues,
+    // here are eoprot_ep_as_tags_strain_numberof descriptors for the strains (equal for every strain)
+    &eoprot_ep_as_rom_descriptor_strain_wholeitem,
+    &eoprot_ep_as_rom_descriptor_strain_config,
+    &eoprot_ep_as_rom_descriptor_strain_config_mode,
+    &eoprot_ep_as_rom_descriptor_strain_config_datarate,
+    &eoprot_ep_as_rom_descriptor_strain_config_signaloncefullscale,
+    &eoprot_ep_as_rom_descriptor_strain_status,
+    &eoprot_ep_as_rom_descriptor_strain_status_fullscale,
+    &eoprot_ep_as_rom_descriptor_strain_status_calibratedvalues,
+    &eoprot_ep_as_rom_descriptor_strain_status_uncalibratedvalues,
 
-    // here are eoprot_ep_as_mais_tags_numberof descriptors for the mais (equal for every mais)
-    &eoprot_ep_as_rom_mais_descriptor_config,
-    &eoprot_ep_as_rom_mais_descriptor_config__mode,
-    &eoprot_ep_as_rom_mais_descriptor_config__datarate,
-    &eoprot_ep_as_rom_mais_descriptor_config__resolution,
-    &eoprot_ep_as_rom_mais_descriptor_status,
-    &eoprot_ep_as_rom_mais_descriptor_status__the15values
+    // here are eoprot_ep_as_tags_mais_numberof descriptors for the mais (equal for every mais)
+    &eoprot_ep_as_rom_descriptor_mais_wholeitem,
+    &eoprot_ep_as_rom_descriptor_mais_config,
+    &eoprot_ep_as_rom_descriptor_mais_config_mode,
+    &eoprot_ep_as_rom_descriptor_mais_config_datarate,
+    &eoprot_ep_as_rom_descriptor_mais_config_resolution,
+    &eoprot_ep_as_rom_descriptor_mais_status,
+    &eoprot_ep_as_rom_descriptor_mais_status_the15values
          
-};  EO_VERIFYsizeof(eoprot_ep_as_rom_folded_descriptors, sizeof(EOnv_rom_t*)*(eoprot_ep_as_strain_tags_numberof+eoprot_ep_as_mais_tags_numberof));
+};  EO_VERIFYsizeof(eoprot_ep_as_rom_folded_descriptors, sizeof(EOnv_rom_t*)*(eoprot_ep_as_tags_strain_numberof+eoprot_ep_as_tags_mais_numberof));
 
 
 
@@ -428,7 +450,7 @@ static uint16_t s_eoprot_ep_as_rom_epid2index_of_folded_descriptors(eOprotID_t i
         
         case eoas_entity_mais:
         {   // must add the number of vars in a strain
-            tag += eoprot_ep_as_strain_tags_numberof; 
+            tag += eoprot_ep_as_tags_strain_numberof; 
         } break;      
 
         default:

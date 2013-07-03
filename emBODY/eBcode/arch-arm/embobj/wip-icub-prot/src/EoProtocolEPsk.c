@@ -64,8 +64,8 @@
 EO_VERIFYproposition(eoprot_ep_sk_ded34, eoprot_ep_sk_entities_numberof <= eoprot_entities_numberof);
 
 // - guard on tags ...
-EO_VERIFYproposition(eoprot_ep_sk_tagsnum_sk, eoprot_ep_sk_skin_tags_numberof == eoprot_ep_sk_skin_rwmodes_numberof);
-EO_VERIFYproposition(eoprot_ep_sk_tagsmax_sk, eoprot_ep_sk_skin_tags_numberof <= eoprot_tags_numberof);
+EO_VERIFYproposition(eoprot_ep_sk_tagsnum_sk, eoprot_ep_sk_tags_skin_numberof == eoprot_ep_sk_rwmodes_skin_numberof);
+EO_VERIFYproposition(eoprot_ep_sk_tagsmax_sk, eoprot_ep_sk_tags_skin_numberof <= eoprot_tags_numberof);
 
 
 
@@ -75,7 +75,7 @@ EO_VERIFYproposition(eoprot_ep_sk_tagsmax_sk, eoprot_ep_sk_skin_tags_numberof <=
 
 static uint16_t s_eoprot_ep_sk_brdid2ramoffset(eOprotBRD_t brd, eOprotID_t id);
 
-static eObool_t s_eoprot_ep_sk_skin_tag_is_valid(eOprotTag_t tag);
+static eObool_t s_eoprot_ep_sk_tag_skin_is_valid(eOprotTag_t tag);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -150,7 +150,7 @@ extern eObool_t eoprot_ep_sk_variables_id_isvalid(eOprotBRD_t brd, eOnvID_t id)
         {   
             if(ind < s_eoprot_ep_sk_board_numberofeachentity[brd][eosk_entity_skin])
             {
-                ret = s_eoprot_ep_sk_skin_tag_is_valid(tag);
+                ret = s_eoprot_ep_sk_tag_skin_is_valid(tag);
             }            
         } break;
         
@@ -172,7 +172,7 @@ extern uint16_t eoprot_ep_sk_variables_numberof_Get(eOprotBRD_t brd)
         return(0);
     }
     
-    num = eoprot_ep_sk_skin_tags_numberof * s_eoprot_ep_sk_board_numberofeachentity[brd][eosk_entity_skin];
+    num = eoprot_ep_sk_tags_skin_numberof * s_eoprot_ep_sk_board_numberofeachentity[brd][eosk_entity_skin];
           
     return(num);
 }
@@ -188,13 +188,13 @@ extern eOprotID_t eoprot_ep_sk_variable_idfromprognumber_Get(eOprotBRD_t brd, ui
         return(0);
     }
     
-    uint16_t progsinskins = eoprot_ep_sk_skin_tags_numberof * s_eoprot_ep_sk_board_numberofeachentity[brd][eosk_entity_skin];
+    uint16_t progsinskins = eoprot_ep_sk_tags_skin_numberof * s_eoprot_ep_sk_board_numberofeachentity[brd][eosk_entity_skin];
     
     if((0 != progsinskins) && (prog < (progsinskins)))
     {   // entity is eosk_entity_skin 
         entity  = eosk_entity_skin;
-        index   = prog / eoprot_ep_sk_skin_tags_numberof;       // eoprot_ep_sk_skin_tags_numberof cannot be zero if progsinskins is non-zero
-        tag     = prog % eoprot_ep_sk_skin_tags_numberof;        
+        index   = prog / eoprot_ep_sk_tags_skin_numberof;       // eoprot_ep_sk_tags_skin_numberof cannot be zero if progsinskins is non-zero
+        tag     = prog % eoprot_ep_sk_tags_skin_numberof;        
     }
     else
     {
@@ -220,7 +220,7 @@ extern uint16_t eoprot_ep_sk_variable_progressivenumber_Get(eOprotBRD_t brd, eOp
     {
         case eosk_entity_skin: 
         {
-            prog = index*eoprot_ep_sk_skin_tags_numberof + eoprot_ep_sk_rom_get_prognum(id);
+            prog = index*eoprot_ep_sk_tags_skin_numberof + eoprot_ep_sk_rom_get_prognum(id);
         } break;
         
                 
@@ -329,9 +329,9 @@ static uint16_t s_eoprot_ep_sk_brdid2ramoffset(eOprotBRD_t brd, eOprotID_t id)
     return(offset);  
 }
 
-static eObool_t s_eoprot_ep_sk_skin_tag_is_valid(eOprotTag_t tag)
+static eObool_t s_eoprot_ep_sk_tag_skin_is_valid(eOprotTag_t tag)
 {   // in case of holes in tags ... change the code
-    return((tag < eoprot_ep_sk_skin_tags_numberof)?(eobool_true):(eobool_false));
+    return((tag < eoprot_ep_sk_tags_skin_numberof)?(eobool_true):(eobool_false));
 }
 
 
