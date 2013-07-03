@@ -97,9 +97,6 @@ extern void eoprot_ep_mc_fun_UPDT_joint_config__encoderconversionfactor(const EO
 extern void eoprot_ep_mc_fun_INIT_joint_config__encoderconversionoffset(const EOnv* nv);
 extern void eoprot_ep_mc_fun_UPDT_joint_config__encoderconversionoffset(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_mc_fun_INIT_joint_config__des02FORstatuschamaleon04(const EOnv* nv);
-extern void eoprot_ep_mc_fun_UPDT_joint_config__des02FORstatuschamaleon04(const EOnv* nv, const eOropdescriptor_t* rd);
-
 
 extern void eoprot_ep_mc_fun_INIT_joint_status(const EOnv* nv);
 extern void eoprot_ep_mc_fun_UPDT_joint_status(const EOnv* nv, const eOropdescriptor_t* rd);
@@ -146,9 +143,6 @@ extern void eoprot_ep_mc_fun_UPDT_motor_config__maxvelocityofmotor(const EOnv* n
 extern void eoprot_ep_mc_fun_INIT_motor_config__maxcurrentofmotor(const EOnv* nv);
 extern void eoprot_ep_mc_fun_UPDT_motor_config__maxcurrentofmotor(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_mc_fun_INIT_motor_config__des02FORstatuschamaleon04(const EOnv* nv);
-extern void eoprot_ep_mc_fun_UPDT_motor_config__des02FORstatuschamaleon04(const EOnv* nv, const eOropdescriptor_t* rd);
-
 extern void eoprot_ep_mc_fun_INIT_motor_status(const EOnv* nv);
 extern void eoprot_ep_mc_fun_UPDT_motor_status(const EOnv* nv, const eOropdescriptor_t* rd);
 
@@ -157,6 +151,8 @@ extern void eoprot_ep_mc_fun_UPDT_motor_status__basic(const EOnv* nv, const eOro
 
 extern void eoprot_ep_mc_fun_INIT_motor_status__chamaleon04(const EOnv* nv);
 extern void eoprot_ep_mc_fun_UPDT_motor_status__chamaleon04(const EOnv* nv, const eOropdescriptor_t* rd);
+   
+   
    
 extern void eoprot_ep_mc_fun_INIT_controller_config(const EOnv* nv);
 extern void eoprot_ep_mc_fun_UPDT_controller_config(const EOnv* nv, const eOropdescriptor_t* rd);
