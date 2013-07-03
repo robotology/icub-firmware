@@ -135,7 +135,10 @@ void can_receive_additional_info();
 #define CAN_SET_BACKEMF_PARAMS      97
 #define CAN_GET_BACKEMF_PARAMS      98
 
-#define NUM_OF_MESSAGES				99
+#define CAN_SET_MODEL_PARAMS         99
+#define CAN_GET_MODEL_PARAMS        100
+
+#define NUM_OF_MESSAGES             101
 
 // class 1 messages, broadcast 
 // when in bcast mode, messages are sent periodically by the controller
