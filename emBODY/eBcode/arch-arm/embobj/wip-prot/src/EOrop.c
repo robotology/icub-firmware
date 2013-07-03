@@ -51,7 +51,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-#warning --> TODO in EOrop: (1) dualismo fra eOropconfiguration_t e eOropconfig_t, (2) fare macro per uso esterno di suoi campi
+#warning --> TODO in EOrop: (1) unifica eOropconfiguration_t, eOropconfig_t, e eOropctrl_t, (2) fare macro per uso esterno dei campi
 
 
 // --------------------------------------------------------------------------------------------------------------------
